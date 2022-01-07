@@ -1,0 +1,50 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
+<title>IIRF Filters</title>
+</head>
+
+<body>
+
+<h1>IIRF Filters</h1>
+<h2>Overview</h2><br>
+
+<p>
+Filters can be used to filter audio data within PAMGUARD. 
+They can be inserted anywhere in the PAMGUARD data model where there are raw audio data.<br>
+Note that some other modules, such as the 
+<a href = "../../../detectors/clickDetectorHelp/docs/ClickDetector_clickDetector.html"> click detector</a> 
+and the <a href = "../../decimatorHelp/docs/decimator_decimator.html">Decimator</a>, use the same
+filter modules, built into that module's functionality.</p>
+<br>
+<h3>Creating filters</h3>
+<p>
+From the <em><strong>File>Add modules>Sound Processing</strong></em> menu, or from the pop-up menu on the 
+data model display select "<em><strong>Filters (IIR and FIR)</strong></em>". 
+Enter a name for the new filter module (e.g. "Low Pass", "2kHz", etc) and press Ok.</p>
+<br>
+
+<h3>Data Source</h3>
+<p>The filers module requires a source of raw data before it can operate. 
+This may come directly from a Sound Acquisition module (e.g. a sound card or a National Instruments board) 
+or from processed data such as the output from a decimator or other filter. 
+</p>
+<p>
+To set the filter data source, go to the <em><strong>Detection>"your filter name">
+Filter Data Source"</strong></em> menu</p>
+<br>
+<img alt="Filters Data Source" src="Images/FiltersDataSource.png"/><br>
+<p>
+Select the data source and the channels you wish to filter from the checkboxes.
+</p> 
+
+<h3>Filter Settings</h3>
+<p>
+To configure the filter, open the Filter settings dialog from the <em><strong>Detection>"your filter name">
+Filter Settings"</strong></em> menu
+and the <a href="Filters_panel.html">Filter Design Panel</a> will appear.</p>
+
+<br><br><br>
+</body>
+
+</html>

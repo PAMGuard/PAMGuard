@@ -1,0 +1,146 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Hydrophone Array Configuration</title>
+<style type="text/css">
+<!--
+.style1 {
+	font-size: 12px
+}
+-->
+</style>
+</head>
+
+<body>
+
+<h1>Hydrophone Array</h1>
+<h2>Configuration</h2>
+<p><br>
+The array configuration dialog is now opened from the <em><strong>Settings>Hydrophone
+array</strong></em> menu.</p>
+<p><img alt="Hydrophone array dialog"
+	src="./Images/ArrayConfiguration.png" /><br>
+<br></p>
+
+<p>The array dialog is divided into five distinct regions.</p>
+
+<p><i><a href="#sec1">1) Hydrophone Positions</a></i> <br>Provides a graphical display of the
+hydrophone positions within the array. </p>
+
+<p><i><a href="#sec2">2) Array Configuration</a></i><br> Lists the individual streamers and hydrophone
+elements making up the array.</p>
+
+<p><i><a href="#sec3">3) Channel Configuration</a></i><br> Lists the software channels
+associated with a <a href="../../sound_processing.AcquisitionHelp/docs/AcquisitionOverview.html">Sound Acquisition Module.</a>.</p>
+
+<p><i><a href="#sec4">4) Environment</a></i><br> Lists environmental parameters.</p>
+
+<p><i><a href="#sec5">5) Array Management</a></i><br> Allows you to create, import, export and
+rename different hydrophone arrays.</p>
+
+<h3><a name="sec1"></a>Hydrophone Positions</h3>
+<p>This part of the dialog is for information purposes only and
+there are no configuration options. Hydrophone positions are shown relative 
+to the reference coordinate and heading. Physical hydrophone numbers are
+shown in black. Software channel numbers are shown in red. It is
+possible, if no software channel is connected to a particular hydrophone
+that the software channel will be absent for some hydrophones.</p>
+<p><i>Coordinate Frame</i>
+<br>For towed systems it is assumed that the vessel's GPS is at (x,y) = (0,0) and is travelling
+in the forward (increasing) y direction. Consequently, for an array
+towed astern of the vessel, y coordinates are generally negative
+numbers. For a single array in the centre line of the vessel with a
+centrally mounted GPS, all x coordinates will be zero, etc. For display
+purposes, depth is entered as a positive number, however developers
+should be aware that within the PAMGUARD data model, the positive z
+coordinate is upwards, therefore depths are stored as negative numbers.
+</p>
+<p>For fixed locations, the diagram is relative to the heading set for that mooring, 
+which should be an angle relative to True North. If no heading is set, the angles are relative to True North. </p> 
+<br>
+<h3><a name="sec2"></a>Array Configuration</h3>
+<p>This lists the individual streamers and hydrophone elements making up an array.
+</p>
+<p><i>Selecting an array</i>
+<br>If more than one array is available within a configuration, a
+particular array may be selected using the drop down list. Note that
+only one array is loaded at any one time.</p>
+<p><i>Hydrophone Streamers</i><br>
+If you are using a towed array you should define one or more streamers which will
+be shown in the Hydrophone Streamers table.</p>
+<p>A Streamer is used to refer to any cluster of hydrophones which share a common 
+origin, e.g. a towed array or a buoy of some sort would normally be entered as a single
+streamer containing one or more hydrophones. </p>
+<p>Use the Add, Edit and Delete buttons to add, edit and delete streamers. When you 
+add or edit a streamer the <a href="Array_NewStreamer.html">Streamer Dialog</a> will appear
+which allows you to set up the streamer coordinates and other properties.</p>
+<p>You will not be able to remove the last streamer. You will also only be able to delete a streamer 
+if no hydrophones are associated with that streamer. </p>
+
+<p><i>Hydrophone Elements</i><br>
+<p>This area lists individual hydrophone elements. Each hydrophone is given a unique Id which is referred to in the
+Channel Configuration section and is also associated with a single hydrophone streamer.</p>
+<p>Use the Add, Edit and Delete buttons to add, edit and delete hydrophones. When you 
+add or edit a hydrophone the <a href="Array_NewHydrophone.html">Hydrophone Dialog</a> will appear.</p>
+
+
+<h3><a name="sec3"></a>Channel Configuration</h3>
+<p>The first stage of most PAM processes is to acquire the sound
+with a digitiser (e.g. a <a
+	href="../../../sound_processing/AcquisitionHelp/docs/AcquisitionOverview.html">sound
+card</a>) or some other Sound Acquisition module within the PAMGUARD model.
+</p>
+<p>It is possible for PAMGUARD to operate with more than one Sound
+Acquisition module and a one-to-many relationship can exist between
+hydrophones and data channels within the sound acquisition modules. For
+instance, a single multi-element array may contain both low and high
+frequency hydrophones, some of which are connected to a low frequency
+digitiser and other high frequency hydrophones.</p>
+<p>The drop down list at the top of the Channel Configuration panel
+will list all Sound Acquisition Modules currently instantiated in the
+PAMGUARD data model. Information on a single Sound Acquisition module is
+displayed at any one time.</p>
+<p>By default, when a sound acquisition module is created, it will
+map it's channels 1 to 1 to the PAMGUARD array. To change these
+mappings, select the software channel of interest in the Channel
+Configuration panel and press 'Change hydrophone' and select the
+hydrophone you want to relate to that software channel.</p>
+<p>Other parameters displayed in the list area of the Channel
+Configuration panel are set in the Sound Acquisition dialog and are for
+information only.</p>
+<br>
+
+<h3><a name="sec4"></a>Environment</h3>
+<p>This currently contains the speed of sound in sea water and an estimate of
+the error on the speed of sound measurement.</p>
+<p>(It is possible that future releases of PAMGUARD will allow entry
+of a sound speed profile here ).</p>
+<br>
+
+<h3><a name="sec5"></a>Array Management</h3>
+<p>When you have finished with the PAMGUARD Hydrophone Array dialog,
+press the <em><strong>OK </strong></em>button.</p>
+<p>To exit without saving changes, press<em><strong>
+Cancel</strong></em>.</p>
+<p>Other buttons perform the following actions:</p>
+<p><strong>New Array</strong>: Creates a new PAMGUARD
+hydrophone array</p>
+<p><strong>Copy</strong>: Copies the currently loaded array</p>
+<p><strong>Rename</strong>: Renames the currently loaded
+array</p>
+<p><strong>Import</strong>: Imports a hydrophone array from a
+PAMGUARD Array File (.paf)</p>
+<p><strong>Export</strong>: Exports the currently selected
+array to a PAMGUARD Array File (.paf)</p>
+<p><strong>Delete</strong>: Deletes the currently selected
+array.</p>
+<br>
+<br>
+
+<p CLASS="previousLink"><a href="Array_Overview.html">Previous:
+Overview</a></p>
+<p CLASS="nextLink"><a href="Array_NewStreamer.html">Next: Streamer Dialog </a></p>
+<br><br><br>
+</body>
+</html>

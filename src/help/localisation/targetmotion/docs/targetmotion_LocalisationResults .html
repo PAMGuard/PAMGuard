@@ -1,0 +1,66 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
+<title>Target Motion Overview</title>
+</head>
+
+<h1>Target Motion</h1>
+<h2>Results</h2>
+<br>
+
+<body>
+<p>Results are displayed at the bottom of the Target Motion Analysis window described in the <a href="../../../localisation/targetmotion/docs/targetmotion_Localising.html">Localising an Event</a> section. Multiple localisation algorithms can be run from the Model Control panel populating the table with multiple results. The result which best fits the data is automaticaly selected by PAMGUARD however this can be manually changed by selecting one of the other result checkboxes. <br><br>
+</p>
+
+<table class="image" align="center" border="0">
+      <caption align="bottom"><p>Figure 1</p></caption>
+      <tr><td>
+        <img alt="Result Table(14K)" src="images/Results.png"; />
+      </td></tr>
+    </table>
+
+<p> <b>Table Columns</b>
+<br><br><u>
+</u><i><u>Model</u></i><u><br><br></u>
+Shows the localisation algorithm used to calculate the result.
+
+<br><br>
+<i><u>Symb</u></i><u><br><br></u>
+Shows the symbol used to represent the localisation result on the 2D Map. In the 3D Map the colour of this symbol is used for the for the result ellipse. 
+<br><br>
+<i><u>Side</u></i><u><br><br></u>
+Some localisation algorithms will show two possible results. In the case of a paired array two results occur due to a left right ambiguity.  
+These are labelled 0 and 1. <br><br>
+<i><u>LatLong</u></i><u><br><br></u>
+The latitude and longitude in decimal of the localised position.
+<br><br>
+<i><u>Depth</u></i><u><br><br></u>
+The depth of the localised source. For 2D algorithms this is -0.0.
+<br><br>
+<i><u>Dist</u></i><u><br><br></u>
+The distance (m) from the localised source position to the nearest point on the trackline. This is often referred to as perpendicular distance and is an important measurement in Distance sampling.  
+<br><br>
+<i><u>Error</u></i><u><br><br></u>
+The error (m) of the perpendicular distance.
+ <br><br>
+<i><u>Chi2</u></i><u><br><br></u>
+Chi squared value. A measure of how well the observed data fits the theoretical data. For example, referring to the <a href="../../../localisation/targetmotion/docs/targetmotion_overview.html">Overview</a> section, in the unlikely event that all the bearing lines cross at a single point then Chi2 will be very low. The greater the area over which the bearings cross the greater Chi2.   
+Chi2 is also a function of the measurement error. Assuming very low uncertainties in the position of the array will result in a much greater Chi2 whilst assuming larger uncertainties will reduce the final Chi2 value. <br><br>
+<i><u>p</u></i><br><br>p value. <u><br></u><br>
+<i><u>nDF</u></i><u><br><br></u>
+
+Number of Degrees of freedom.<br><br>
+<i><u>AIC</u></i><u><br><br></u>
+
+Akaike information criterion. A measure of the relative goodness of fit of the statistical model used to localise.  <br><br>
+<i><u>millis</u></i><u><br><br></u>
+The number of milliseconds required to compute the source location. 
+
+<br><br><br><a href="../../../localisation/targetmotion/docs/targetmotion_LocalisationAlgorithms.html">Previous: Target motion algorithms</a>
+
+
+<br><br><br>
+</p>
+</body>
+</html>
+

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Target Motion Annotation</title>
+</head>
+
+<body>
+<h1>Target Motion Annotation</h1>
+<h2>Overview</h2>
+<p>The Target Motion annotation can be used with the <a href="../../../localisation/detectiongroup/docs/dglocaliser.html">Detection Group Localiser</a> 
+to automatically localise detections which 
+have been grouped by the user by estimating the most likely crossing point of bearing lines from those individual detections.</p>
+<p>The Target Motion Annotation system uses the same algorithms as the real time Target Motion Analysis system 
+in the click detector. </p>
+ 
+<h2>Usage</h2>
+
+<h3>Configuring</h3>
+<p>Any module using Target Motion annotations will offer a way of configuring the Target Motion analyser.  
+(see <a href="../../../localisation/detectiongroup/docs/dglocaliser.html">Detection Group Localiser</a> for an example). 
+When you enter the configuration for the Target Motion analyser you will  be
+presented with a dialog allowing to select the Target Motion Algorithm and other options.</p>
+<center><img alt="" src="./images/tmoptions1.png"> <img alt="" src="./images/tmoptions2.png"></center>
+<br>
+<p>When data are added to an "event" or "group" the selected Target Motion Analysis algorithms will run on the data to compute the most likely
+crossing point of all the bearing lines. This location or locations will be saved to the database and will also be displayed on the PAMGuard map.</p> 
+
+<h2>Stored Data</h2>
+<p>Several columns are added to database tables to provide the results of the Target Motion analysis and an estimate on the errors on resulting locations.</p>
+<p>If there is a left-right ambiguity in the bearings from the data input to the Target Motion analysis, then two sets of possible localisations will be 
+generated ans stored.</p> 
+
+</body>

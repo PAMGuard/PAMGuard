@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+    <head>
+    <link href="../../../pamHelpStylesheet.css" type="text/css" rel="STYLESHEET"><title>Beamformer Configuration</title>
+    </head>
+
+<body>
+<h1>Beamformer Module</h1>
+<h2>Creation and Configuration</h2>
+<br>
+<h3>Creating a Beamformer module</h3>
+<p>From the <strong><em>File &gt; Add Modules
+&gt; Sound Processing</em></strong> menu, select "Beamformer".
+Enter a descriptive name for the new module and press OK.</p>
+<p></p>
+<br>
+<br>
+<h3>Configuring a Beamformer module</h3>
+<p>Note: A suitable Source module should be configured before configuring the Beamformer.  See below for details of acceptable sources.</p>
+<br>
+<p>From the Settings menu, select "Beamformer settings".  This will open up a new dialog containing 2 tabs: <a href="#BF_SourceTab">Source</a> and <a href="#BF_AlgoTab">Algorithms</a>.</p>
+<img src="images/BF menu select.PNG">
+<p></p>
+<br>
+<br>
+</a>
+<h3><a name="BF_SourceTab">Source tab</a></h3>
+<img alt="" src="images/BF Source FFT.PNG">
+<ol>
+<li>
+<p>Data Source: where the Beamformer should get it's input data from.  The Beamformer will accept any
+module that can output FFT information, such as from an
+<a href="../../../sound_processing/fftManagerHelp/docs/FFTEngine_Configuring.html">FFT Engine module</a> or
+<a href="../../../sound_processing/decimatorHelp/docs/decimator_decimator.html">Decimator module.</a></p>
+</li>
+<li>
+<p>Channel Group Type: Select how the channels should be grouped, either No Grouping, a Single Group, or multiple (User) Groups.</p>
+</li>
+<li>
+<p>Channel Grouping: When a data source is selected, the dialog will show a series of check boxes - one for each channel available
+from that Source.  Select the channels you want to use for beamformer calculation, then to the right of each channel check box,
+assign the channel to a group. The group numbers themselves are not important - they just need to be different for each group.</p>
+<p>The beamformer algorithm will combine the information from all channels in a group and output the resulting signal.  If there are
+multiple groups defined, there will be multiple output signals.  In such a case, each signal will be identified by the group number
+(also termed the <em>Sequence</em> number).
+</ol>
+<p></p>
+<br>
+<h3><a name="BF_AlgoTab">Algorithms tab</a></h3>
+<img alt="" src="images/BF Algo.PNG">
+<br>
+<p>The user is able to select a beamformer algorithm for each group defined on the Channel Groups tab.  The window displays the group number, and
+the number of channels associated with that group.</p>
+<ol>
+<li>
+<p>Algorithm: specify which algorithm to use for this group.  There are 2 types of algorithms available: Basic Frequency Domain (Conventional/Bartlett)
+and Minimum Variance Distortionless Response (MVDR).  The Basic Frequency Domain beamformer algorithm combines the signals from multiple channels into a
+single output using a static set of weights.  The MVDR also combines the signals from multiple channels into a single output, but uses an adaptive weighting
+scheme which continuously seeks to minimize the variance of the recorded signal.  The MVDR is more processor-intensive, but may result in better noise reduction
+and signal amplification.</p>
+</li>
+<li>
+<p>Settings: press the settings button to open up the settings for the algorithm in a new dialog.</p>
+</li>
+</ol>
+<br>
+<br>
+<p class="prevLink"><a href="Beamformer_Overview.html">Previous: Beamformer Overview</a></p>
+<p class="nextLink"><a href="Beamformer_AlgoConfig.html">Next: Configuring the Algorithms</a></p>
+</body>
+</html>

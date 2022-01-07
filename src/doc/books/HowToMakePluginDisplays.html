@@ -1,0 +1,30 @@
+<html>
+<head>
+<LINK href="pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
+<title>PamGuard</title>
+</head>
+
+<body>
+
+<h1>Writing plug-in displays</h1>
+<h2>Overview</h2><br>
+Plug in displays are designed to sit in the bottom of scrolling spectrogram 
+windows and display time series data which are not suitable fo roverlaying over
+the spectrgram display itself. 
+<p>
+plug in diplays take their time axis directly fromt he spectrogram display 
+so that whatever is displayed is time aligned with the spectrogram data. 
+<p>
+To create plug in displays, the developer must create two separate classes
+<ol>
+<li><a href="../Layout/DisplayPanelProvider.html">DisplayPanelProviders</a>
+are used within Pamguard to make a list of possible display
+panels that may be incorporated into other displays. </li>
+<li><a href="../Layout/DisplayPanel.html">DisplayPanels</a>
+provide a graphics panel 
+that is incorporated into the display, taking it's time information from
+the display.
+</ol>
+
+</body>
+</html>

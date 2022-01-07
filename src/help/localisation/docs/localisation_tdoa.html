@@ -1,0 +1,67 @@
+<html>
+<head>
+<LINK href="../../pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
+<title>Time Difference of Arrival</title>
+</head>
+
+<h1>Localisation</h1>
+<h3>Time Difference of Arrival</h3>
+<p>Many localisers use Time Difference of Arrival (TDOA) of signals on multiple hydrophones to estimate locations, whether it be just a bearing calculation, or a full 3D location. 
+Even when using localisation algorithms such as the Group 3D Localiser <a href="../group3d/docs/3dcrossedbearing.html">Crossed Bearing algorithm</a> it's 
+likely that the bearings being crossed will have been derived from TDOA measurements.</p>
+<p>TDOA measurements are most often made by finding the peak in the 
+<a href="https://en.wikipedia.org/wiki/Cross-correlation">cross correlation</a> function of the signal waveform recorded at each hydrophone.</p>
+<p>TDOA measurement are more accurate for louder signals and can be made more accurate through careful filtering of data, 
+up-sampling, and interpolation (Gillespie and Macaulay, 2019).</p>
+<p>Exactly how PAMGuard calculates a TDOA for a given detector depends slightly on the type of detection, what data are included with the detection
+and also on how far apart hydrophones are spaced.</p>
+
+<h4>Clicks</h4>
+<p>Transient sounds from the <a href="../../detectors/clickDetectorHelp/docs/ClickDetector_clickDetector.html">click detector</a> are stored with a short
+waveform clip which is used for TDOA measurement. There are a number of options available to control how the TDOA measurement is made, broadly 
+following the examples in Gillespie and Macaulay (2019). It is also possible to select different settings (e.g. different frequency ranges for 
+filtering) based on the classification of individual detected clicks.</p>
+
+<p><center>
+<img src="./images/clicktdoa.png" />
+</center></p>
+<p>Timing configuration options for the click detector are available from within the main Settings dialog of the Click Detector, or through a 
+settings button in the configuration of the <a href="../group3d/docs/3doverview.html">Group 3D localiser</a> when a TDOA based algorithm
+is selected.</p>
+
+<h4>Spectrogram based detectors</h4>
+<p>Several detectors, including the 
+<a href="../../detectors/whistleMoanHelp/docs/whistleMoan_Overview.html">Whistle and Moan detector</a> and
+the <a href = "../../detectors/gpl/docs/gpldetector.html">GPL detector</a> search a 
+<a href="../../displays/spectrogramDisplayHelp/docs/UserDisplay_Spectrogram.html">spectrogram</a> of 
+audio data to detect sounds. These detectors tend not to store the waveform of the detected sound (as is the case for the 
+click detector) but do often store the time-frequency contour of the detection. 
+For these detectors, TDOA's are calculated from the Complex FFT data used as input to the detection algorithm. Note that 
+this is mathematically the same as a waveform cross correlation, so time resolution (with interpolation) is still better
+than a single sample, and is NOT the time resolution of the FFT data frames. 
+For detectors providing detailed time-frequency contour information, the cross correlation is restricted to the frequency 
+limits of the detection.</p>  
+<p>Generally, there are no options controlling how the cross correlation of the spectrogram data is conducted, but some localisers
+may need you to select the correct source of FFT data appropriate to the detector.</p>
+<p>Localisers requiring a time delay will calculate the maximum possible time delay between two hydrophones. If this time delay is 
+less than half the length of an FFT frame, then the cross correlation is simply the sum of the cross correlations of all FFT frames
+included in the detection, with a 1:1 match between the FFT frames from the different channels of data. Where the maximum time 
+delay is greater than half a FFT frame, then data from each pair of channels will be 'slid' across one another, and the total cross correlation 
+calculated for all possible time delays, the best correlation value being selected. </p>
+<p>Some localisers also offer the option of selecting raw sound data for input to the TDOA calculation. In this instance, it will recalculate
+the FFT data, which is probably a waste of time if the FFT is already calculated.</p>
+
+ 
+<br>
+
+<h4>References</h4>
+<p><i>Gillespie, D., and Macaulay, J. (2019). “Time of arrival difference estimation for narrow band high frequency echolocation clicks,” 
+<a href="https://asa.scitation.org/doi/full/10.1121/1.5129678">The Journal of the Acoustical Society of America, 146, EL387–EL392.</a></i></p>
+
+
+<br><br>
+<p CLASS="prevLink"><a href="localisation_generic.html">Previous: Generic Localisers</a></p>
+
+</body>
+</html>
+

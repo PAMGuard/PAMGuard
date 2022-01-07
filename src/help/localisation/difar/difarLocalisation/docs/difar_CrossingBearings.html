@@ -1,0 +1,76 @@
+<html>
+<head>
+	<link href="../../../pamHelpStylesheet.css" rel="STYLESHEET" type="text/css" />
+	<title>Difar Module</title>
+</head>
+<body>
+<h1>DIFAR Localisation</h1>
+
+<h2>Advanced localisation</h2>
+
+<p>The DIFAR Localisation module has two features intended to aid in real-time localisation of whales:</p>
+
+<p>1) The ability to triangulate the location of a calling whale if the same call is received on two different sonobuoys.</p>
+
+<p>2) The ability to average a time-series of bearings that are believed to originate from a group of calling whales.</p>
+
+<p>&nbsp;</p>
+
+<h2>Crossing Bearings</h2>
+
+<p>If more than one buoy is in use then the system will automatically attempt to cross bearings from two or more buoys to give a localisation of a sound source.</p>
+
+<center><img alt="Map with DIFAR bearings and Crossed Bearings" src="./images/MapWithSlider.png" /></center>
+
+<p>When a sound is processed and it&rsquo;s bearing calculated, the system searches back through the list of recently processed DIFAR clips from other buoys and&nbsp;checks if any existing bearings&nbsp;from the same species are close enough in time that they may have been the same sound. If they are, then the crossing point is calculated.</p>
+
+<p>NB: Crossing points are calculated on a rectangular grid, however sound propagation over long distances will typically follow a great-circle path. Thus&nbsp;crossing points that are very far from both of the sonobuoys may contain errors that arise from&nbsp;applying a rectangular grid&nbsp;that does&nbsp;account for the curved surface of the earth.</p>
+
+<p>&nbsp;</p>
+
+<h2>Tracked Groups</h2>
+
+<p><br type="_moz" />
+<strong>Groups </strong>is a feature that allows the operator to semi-automatically assign a text label to bearings that are believed to originate from a closely spaced group of calling whales. Summary statistics for each group are then calculated and can be plotted on the PAMGuard Map. The <strong>Groups</strong> panel on the DifarGram is used to manage and view the list of&nbsp;<strong>Groups </strong>as well as assign groups to DIFAR clips.</p>
+
+<center><img alt="PAMGuard Map with Tracked Groups" src="./images/trackedGroups.png" /></center>
+
+<h3>Adding and removing groups</h3>
+
+<p>Groups can be created and removed using the buttons. The <strong>Add group</strong> button will create a dialog-window that&nbsp;asks the user to type the name of a new group, and upon&nbsp;accepting the dialog-window&nbsp;the name of the new group is added to the list-box in the Groups panel. The <strong>Remove group </strong>button&nbsp;removes the currently-selected group&#39;s label&nbsp;from the list-box. When a group is removed from the list-box, new bearings cannot be assigned to that group, however the PAMGuard database and map&nbsp;will retain the entry for that group. Groups that have been removed&nbsp;can be re-added to the list-box using the <strong>Add group</strong> button and typing the name of a previously removed group. NB: Group names are case sensitive, so &quot;Apple&quot; and &quot;apple&quot; are considered two different groups. The default group &quot;No group&quot; is always present in the list-box and cannot be removed. Summary statistics for the default group are not plotted on the map.</p>
+
+<h3>Assigning Groups</h3>
+
+<p>Assigning&nbsp;a group to a DIFAR clip involves&nbsp;selecting name of the group&nbsp;in the <strong>Groups</strong>&nbsp;panel before&nbsp;saving the clip. The selected/highlighted group&nbsp;will be&nbsp;assigned to the&nbsp;DIFAR clip when the clip is saved. The&nbsp;Groups module will then&nbsp;calculate a summary of&nbsp;the bearings from all of the DIFAR clips from that sonobuoy that were assigned to that group. Summary statistics include the mean and standard deviation of&nbsp;bearings to that group, the first and last bearings and detection times, and the total number of&nbsp;DIFAR clips assigned to that&nbsp;group. All summary statistics are calculated per-sonobuoy.</p>
+
+<p>After the first clip has been assigned to a group, PAMGuard will&nbsp;suggest&nbsp;that DIFAR clips with closely matching bearings be assigned to that group. When new clips appear in the DifarGram, the group with the closest-matching&nbsp;mean-bearing will be automatically highlighted. PAMGuard will only suggest groups that match closely to the bearing&nbsp;selected in the DifarGram.&nbsp;If the closest-matching mean-bearing is more than 10 degrees from that of the clip, then the default group will be selected (i.e. PAMGuard will not attempt to creat new groups, but the user should feel free to do so). NB: Because summary statistics are created for each group per-sonobuoy, automatic suggestions for a group&nbsp;will not work on newly deployed sonobuoys until at least one DIFAR clip has been assigned to that group on that sonobuoy.</p>
+
+<h3>Viewing Summary Statistics</h3>
+
+<center><img alt="DifarGram with Controls for Tracking Groups" src="./images/TrackedGroupsMap.png" /></center>
+
+<p class="previousLink">Tracked groups&nbsp;can be&nbsp;displayed on the PAMGuard Map in the same way as other detections (i.e. by right clicking on the map and selecting DIFAR Tracked Groups from the popup-menu). Tracked groups are shown on the map as semi-transparent wedges originating from each sonobuoy. The wedges are centred on the mean-bearing for that group, and the width of the wedges is four&nbsp;standard-deviations&nbsp;(two standard deviations anticlockwise from the mean-bearing, and two standard deviations clockwise from the mean-bearing).&nbsp;Hovering the mouse over the broad end of the wedge will popup the summary statistics for that group and that sonobuoy. Hovering the mouse over the name of the Group in the list-box on the DifarGram will display the summary statistics for all of the sonobuoys on which that group was detected.</p>
+
+<p class="previousLink"><a href="difar_UsingDifarGramDisplay.html">Previous: Using the DIFARGram Display</a></p>
+
+<p class="nextLink"><a href="difar_Calibration.html">Next: Calibration </a></p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+</body>
+</html>

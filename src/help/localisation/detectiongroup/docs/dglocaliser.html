@@ -1,0 +1,98 @@
+<html>
+<head>
+	<link href="../../../pamHelpStylesheet.css" rel="STYLESHEET" type="text/css" />
+	<title>Detection Grouper</title>
+</head>
+<body>
+<h1>Detection Grouper</h1>
+
+<h2>Overview</h2>
+<p>The Detection Grouper provides methods for manually selecting and sometimes localising groups of data within PAMGuard.</p>
+<p>A lot of the basic functionality replicates that of the offline functions in the Click Detector, whereby groups of clicks 
+can be linked into "Events" which then get localised using Target Motion Analysis". The Detection Grouper 
+extends this functionality to nearly all PAMGuard displays and to all types of data.</p>
+
+<h2>Creating a Detection Grouper</h2>
+
+<h3>Configuration</h3>
+<p>The Detection Grouper is configured from a menu item in the main PAMGuard Settings menu. Select the
+menu item and a dialog box will appear with three tabs for selecting which displays send marked data to 
+the grouper, which data from those displays are selected and finally, annotations which will be added 
+to each Detection Group.</p>
+<h4>Selecting Which displays</h4>
+<p>The Markers tab controls which displays send marks and data to the Detection Grouper</p>
+<br>
+<center><img src="./images/dgmarks.png" /></center>
+<br>
+<p>Select which displays you want to mark on. This may be all displays, or just some of them depending on the 
+complexity of the PAMGuard configuration.</p>
+<p>Display markers can also be selected from the global 
+<a href="../../../displays/displaymarks/docs/displaymarks.html">Display Marks menu and dialog</a></p>
+
+<h4>Selecting Which data</h4>
+<p>Select which types of data you wish to include when marks are sent to the Detection Grouper.
+Note that ANY type of data can be sent to the Detection Grouper, so consider carefully which types
+of data you are interested in.</p>
+<br>
+<center><img src="./images/dgdata.png" /></center>
+<br>
+<h5>Partial Overlaps</h5>
+<p>You may want to select data that only partially overlap the mark you've made on the display. 
+For instance, bearing lines on the map may cross at a clear point you want to mark, but extend beyond that 
+point. Detections whos bearing lines cross the mark will only be included if the 'partial' check box is selected.</p>
+<h5>Data Selection</h5>
+<p>Some types of data have additional selection options, for instance, types of identified clicks. If additional
+data selection options are available, then an additional symbol button
+<img src="./images/SettingsButtonSmall2.png" />
+appears beside the name of each data. Click the button for data selection options and refer to the help pages
+for each data type for further information.</p>
+
+
+<h4>Annotations</h4>
+<p>Annotations are in important feature of the Detection Grouper. They allow the user to select which 
+additional data are added to, or calculated from, the data in the selected marks</p>
+<br>
+<center><img src="./images/dgannotations.png" /></center>
+<br>
+
+
+<p>A certain amount of common sense is required to select annotations compatible with the types of data you are 
+planning to mark. For instance, if you are using the Target Motion annotation, then it will only be of use if
+the data you are marking have calculated bearings. Similarly, it may not be sensible to have more than one
+annotation that requires user input, for instance the text annotation AND the user forms annotation.</p>
+
+<p>For more information on annotations, see
+<a href="../../../overview/annotations/docs/annotations.html">Help With Annotations</a>
+</p>
+
+<h2>Using the Detection Grouper</h2>
+<p>When a mark is made on one of the displays associated with the Detection 
+Grouper and at least one data unit is selected within that mark, a 
+popup menu will appear. The exact appearance of the menu will depend on whether 
+selected data are already contained within a mark and whether marks already 
+exist in memory. Examples of menus are:</p>
+<br>
+<img src="./images/dgmenu1.png" />
+<p>or</p>
+<img src="./images/dgmenu2.png" />
+<br>
+
+
+
+<h4>Data Storage</h4>
+
+
+<h4>User display table</h4>
+
+
+
+
+<p><a href="../../../displays/displaymarks/docs/displaymarks.html">Help With Display Marks</a>
+<p><a href="../../../overview/annotations/docs/annotations.html">Help With Annotations</a>
+
+
+
+
+<p>&nbsp;</p>
+</body>
+</html>

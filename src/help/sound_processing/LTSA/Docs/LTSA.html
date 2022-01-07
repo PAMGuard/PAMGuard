@@ -1,0 +1,52 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Long Term Spectral Average</title>
+</head>
+
+<body>
+
+	<h1>Long Term Spectral Average</h1>
+	<h2>Overview</h2>
+	<br>
+
+	<p>This module allows you to make average measurements of spectrum data over periods 
+	of several seconds. </p>
+	<p>The output of a typical spectrogram (for example a 512 pt FFT with 50% overlap operating on 
+	data sampled at 48kHz) produces around 200 FFT 'slices' per second. Consequently a typical laptop display  
+	1600 or so pixels wide
+	can only display around 8s of data if one pixel of the display is used for one 'slice' of FFT data.</p>
+	<p>An LTSA is a great way of viewing large amounts of data. For example, even averaging FFT data over a single second
+	and displaying the result will mean that 200 time more data (about 20 minutes in this example) are shown on the display.</p> 
+
+	<h3>Creating the module</h3>
+	<p>
+		From the <em><strong>File>Add modules>Sound Processing</strong></em>
+		menu, or from the pop-up menu on the data model display select "<em><strong>Sound Processing>
+				Long Term Spectral Average</strong></em>". Enter a name for the new module and press Ok.
+	</p>
+	<p>Since the LTSA module needs to connect to the output of a 
+	<a href="../../fftManagerHelp/docs/FFTEngine_Overview.html">FFT (spectrogram) module</a>, if an FFT module 
+	is not already present, you will be prompted to create one. </p>
+	
+	<h3>Configuring the module</h3>
+	<p>
+		To configure the module, open the settings dialog from the <em><strong>Detection>"your
+				module name" </strong></em> menu:
+	</p>
+	<br>
+	<img alt="Filters Settings" src="Images/LTSADialog.png" />
+	<br>
+	<h4>Raw Data Source</h4>
+	<p>
+		Select a source of FFT data. This will generally be a 
+	<a href="../../fftManagerHelp/docs/FFTEngine_Overview.html">FFT (spectrogram) module</a>. Check
+		the channels you want to measure on.
+	</p>
+
+<br>
+<p CLASS="nextLink"><a href="LTSADisplays.html">Next: Displays and Output </a></p>
+	<br>
+</body>
+</html>

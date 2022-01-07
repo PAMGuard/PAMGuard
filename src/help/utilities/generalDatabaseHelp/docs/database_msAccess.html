@@ -1,0 +1,54 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
+<title>Microsoft Access Database</title>
+</head>
+
+<body>
+
+	<h1>Database</h1>
+	<h2>MS Access</h2>
+	<em><strong> <br>
+			<center>
+				<span style="color:red">
+					<p>
+						Please note that PAMGuard is not currently able to connect to
+						Microsoft Access databases. <br> This is caused by the
+						<a href="http://docs.oracle.com/javase/7/docs/technotes/guides/jdbc/bridge.html">
+						removal of the JDBC-ODBC bridge in Java 8</a>. <br> We recommend
+						that you use <a href="database_sqlite.html">SQLite databases</a> <br>
+						Limited connectivity to MS Access for the <a
+							href="import_export.html">import and export</a> of data is
+						provided using the open source UCanAccess library.
+					</p>
+				</span>
+			</center> <p>
+			If you are still using Java 7, then the following still apply ...
+			</p>
+	</strong></em>
+
+	<p>
+		To use a MS Access database you will need a licensed copy of MS Access
+		on your computer or the 32-bit MS Access database engine available <a
+			href="http://download.microsoft.com/download/2/4/3/24375141-E08D-4803-AB0E-10F2E3A07AAA/AccessDatabaseEngine.exe">here</a>
+		supported on XP sp3, Vista sp1 and Windows 7
+	</p>
+	<p>PAMGUARD works with Microsoft 2000, 2003, 2007 and 2010
+		databases (.mdb and .accdb).</p>
+	<p>One advantage of using a MS Access databases is that all your
+		data end up in a single file which is easy to copy and move and send
+		to other users.</p>
+	<h3>Configuring an MS Access database</h3>
+	<img alt="Microsoft Access Configuration"
+		src="Images/DatabaseMSAccess.png" />
+	<br>
+	<p>PAMGUARD is able to create an MS access 2007 database(.accdb) at
+		time of selection provided with a location.</p>
+	<p>You do not need to add tables to the database, PAMGUARD will
+		automatically create the tables it needs.</p>
+	<p>
+		<br> <a href="database_database.html">Back to database main
+			page</a>
+	</p>
+</body>
+</html>

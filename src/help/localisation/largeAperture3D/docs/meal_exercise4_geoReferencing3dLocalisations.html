@@ -1,0 +1,91 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Geo referencing 3D localisations</title>
+</head>
+
+<body>
+<h1>Large Aperture 3D Localiser</h1>
+<h2>Geo referencing 3D localisations</h2>
+<h3>
+Summary
+<NAME="Summary">
+</h3>
+
+<p><i>Use the MEAL localiser with vector GPS data. </i></p>
+
+<p>In the last
+exercise we used a vertical array which we assumed was stationary and
+determined a porpoise dive profile. In real life it is possible we will be
+using an array which is not stationary. If this is case there are two vital
+pieces of information needed to relate localisation information to real world
+co-ordinates, the heading and latitude/longitude of the array. </p>
+
+<p>Open PAMGUARD viewer mode and select the database <b><i>VertQuad</i></b> in the <b><i>Exercise
+4</i></b> folder. Open the binary file folder <b><i>20120715.</i></b></p>
+
+<p>In order to
+use GPS data you need to add the GPS module. <b><i>Go to File > Add
+Modules > Maps and Mapping</i></b> and add <b><i>NMEA Data Collection</i></b>,
+<b><i>GPS Processing</i></b> and <b><i>Map</i></b>. You should see the Map tab
+appear in PAMGUARD. </p>
+
+<center>
+<p><img width=601 height=376 id="Picture 312" src="images/image048.jpg"></p>
+</center>
+
+<p>To add GPS
+data go <b>to Detection > GPS > Import GPS Data....</b></p>
+
+<center>
+<p><img width=254 height=121 src="images/image049.png"></p>
+</center>
+
+<p>In the dialog
+box open the NMEA file in the Exercise 4 folder. A dialog box will appear
+asking you to select a date. Ignore this, tick <b><i>Use only GPRMC strings</i></b>
+and click <b><i>OK</i></b> .</p>
+
+<center>
+<p>
+<img width=171 height=211 id="Picture 314" src="images/image050.png">
+<img width=366 height=121 id="Picture 29" src="images/image051.png"></p>
+</center>
+
+<p>Wait until
+the GPS data has loaded</p>
+
+<p>Select the
+map. You should see GPS tracks. Use the slider to move the position of the
+vessel. You may need to use the scroll bars to load more hours of data into
+memory.</p>
+
+<center>
+<p><img width=602 height=323 id="Picture 289" src="images/image052.jpg"></p>
+
+<p>Figure 27. After successfully importing GPS data you should
+be able to view the ships’ tracks and heading in the MAP. </p>
+</center>
+
+<p>Now select
+the MEAL localiser module and find a suitable porpoise detection. Localise
+using one of the algorithms. You will notice a realistic GPS position in the <i>results</i>
+panel </p>
+
+<center>
+<p><img width=611 height=329 id="Picture 304" src="images/image053.jpg"></p>
+
+<p>Figure 28. The MEAL localiser will automatically import GPS
+data and convert localisation results to a real lat/long. </p>
+</center>
+
+<p CLASS="previousLink">
+<a href="meal_exercise3_localise.html">Previous: Exercise3 - Localise </a>
+</p>
+
+<p CLASS="nextLink">
+<a href="meal_exercise5_extraExercises.html">Next: Exercise5 - Extra Exercises </a>
+</p>
+
+</body>

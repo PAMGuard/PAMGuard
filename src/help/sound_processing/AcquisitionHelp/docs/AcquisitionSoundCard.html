@@ -1,0 +1,62 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
+<title>Sound Cards</title>
+</head>
+<body>
+<h1>Sound Cards</h1>
+<p>
+Sound Cards are by far the cheapest and most commonly used data acquisition 
+device since nearly all modern computers are equipped with one.
+</p><br>
+<h2>Setting up a sound card</h2>
+<p>
+Setting up a sound card is easy. In the data acquisition dialog select "Sound Card" 
+as the Data Source Type and a list of available sound cards will appear in the 
+drop down list under the title "Select Audio Line". Select the card you with to use and the 
+number of channels (which can only be either 1 or 2).</p>
+<p>
+Note that sound cards which have more than two input channels are likely to appear as multiple 
+two channel devices and you will not be able to read out more than two channels at a time. <p>
+
+<h2>Notes and Warnings</h2>
+<h3>Laptops</h3>
+<p>The audio quality of many sound cards is very poor and some, particularly those built into 
+laptops which are prone to picking up electrical noise from the motherboard.</p>
+
+<h3>USB</h3>
+<p>Many external sound cards connect using USB. While convenient, we have often experienced problems
+with USB sound cards 'dropping' data. This happens more when the computer is busy (which it will be when
+you're running PAMGUARD). These drop outs can result in the lost of several percent of your audio input data.</p>
+<p>If you are using a laptop and need an external sound card, try to get one that connects using Firewire (IEEE 1394).</p>
+
+<h3>Sample Rate Conversions</h3>
+<p>The Windows drivers in particular may make multiple sample rate conversions. this means that your beautiful 
+high frequency data that you sampled at 96 kHz may be down-sampled to 48kHz and then up-sampled to 96kHz again without
+you knowing it. This will of course destroy all data at higher frequencies.</p>
+<p>Some manufacturers provide alternative Windows drivers which you should use wherever possible.</p>
+<p>If possible, test your sound card with a signal generator while viewing a spectrogram of 
+the data to check that the high frequency data are OK</p> 
+
+<h3>Unwanted, unexpected and unnecessary filters</h3>
+<p>Most sound cards are designed for human audio. Since we can't hear much above about 15kHz (our children and 
+pets may be able to do a bit better) some sound card manufacturers include a filter at around 20kHz and even if 
+the software is allowing you to sample at high sample rates, you may not be getting any data through at high frequencies</p>
+<p>Ideally use a sound card where the manufacturer has published a technical specification showing a flat frequency response 
+over the range you're interested in. As with sample rate conversions,   test your sound card with a signal generator while viewing a spectrogram of 
+the data to check that the high frequency data are OK</p> 
+
+<h3>Calibration</h3>
+<p>Most sound cards do not come with calibration information.</p>
+<p>If calibration is important, you'll have to do this yourself. Note though that 
+settings may change depending on any adjustments made to the computers audio settings
+(e.g. from the windows mixer). </p>
+ 
+
+
+<br>
+<p CLASS="prevLink"><a href="AcquisitionConfiguration.html">Previous: Acquisition Configuration</a></p>
+<p CLASS="nextLink"><a href="AcquisitionAsioSoundCard.html">Next: Asio Sound Cards</a></p>
+<br><br><br>
+</body>
+</html>

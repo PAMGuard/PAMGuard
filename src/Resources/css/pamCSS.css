@@ -1,0 +1,641 @@
+/* General CSS for PAMGUARD. Deals mainly with custom controls but some general background colours are also defined here.
+*
+* Author: Jamie Macaulay; 
+**/
+/*******************************************************************************
+ *                                                                           
+ * Declare colour variables                                                                      *
+ *                                                                             *
+ ******************************************************************************/
+{
+  -fx-pambackground: rgba(238,238,238);
+
+  /*The colours of the settings CSS style*/
+  -fx-highlight: white;
+  -fx-highlight_settings: rgba(0,204,204,.75);
+  -fx-highlight_border_settings: rgba(0,204,204,1);
+  -fx_border_col: rgba(190,190,190,1);
+  -fx-darkbackground: rgba(70,70,70,1);
+  -fx-tabbackground: rgba(190,190,190,1);
+  -fx-icon_col: grey;
+
+    /*colours for the plot panes in PAMGuard- might change to dark if at night*/
+  -fx-plotbackground: white;
+}
+
+.root{
+    -fx-font-size: 9pt;
+    -fx-background-color: -fx-pambackground;
+    -fx-font-family: "Ubuntu";
+    -icons-color: -fx-icon_col;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Panes                                                                      *
+ *                                                                             *
+ ******************************************************************************/
+
+.pane {
+  -fx-background-color: -fx-pambackground;
+}
+
+.pane-opaque {
+  -fx-background-color: -fx-pambackground;
+}
+
+/*for plot panes*/
+.pane-plot {
+  -fx-background-color: -fx-plotbackground;
+}
+
+.border{
+  -fx-background-color: -fx-pambackground;
+}
+
+.grid {
+  -fx-background-color: -fx-pambackground;
+}
+
+.hBox {
+  -fx-background-color: -fx-pambackground;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Top Toolbar                                                                  *
+ *                                                                             *
+ ******************************************************************************/
+
+ 
+.button{
+ -fx-background-color: transparent;
+ -fx-background-radius: 5 5 5 5;
+ -fx-border-color:  transparent;
+ -fx-border-radius: 5 5 5 5;
+}
+
+.transparent-button-square{
+ -fx-background-color: transparent;
+ -fx-background-radius: 0 0 0 0;
+ -fx-border-color:  transparent;
+ -fx-border-radius: 0 0 0 0;
+}
+
+
+.button:hover {
+ -fx-border-color:  transparent;
+ -fx-background-color: -fx-highlight;
+}
+
+.transparent-button-square:hover {
+ -fx-background-color: -fx-highlight;
+ -fx-border-color:  transparent;
+}
+
+
+
+.opaque-button-square{
+ -fx-background-color: -fx-pambackground;
+ -fx-background-radius: 0 0 0 0;
+ -fx-border-color:  transparent;
+ -fx-border-radius: 0 0 0 0;
+}
+
+.opaque-button-square:hover {
+ -fx-background-color: -fx-highlight;
+ -fx-border-color:  transparent;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Label                                                              *
+ *                                                                             *
+ ******************************************************************************/
+
+
+
+#label-title1 {
+    -fx-font: bold 16pt  -fx-font-family;
+}
+
+#label-title2 {
+    -fx-font: bold 13pt  -fx-font-family;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Dialog Pane                                                                 *
+ *                                                                             *
+ ******************************************************************************/
+
+.dialog-pane-dark {
+  -fx-background-color: -fx-darkbackground;
+}
+
+.dialog-button-dark {
+   -fx-text-fill: white;
+   -fx-border-color: white;
+   -fx-border-radius: 5;
+   -fx-background-radius:6;
+   -fx-padding: 3 6 6 6;
+}
+
+.dialog-button-dark:hover{
+   -fx-background-color: -fx-highlight_settings; 
+   -fx-border-color: -fx-highlight_border_settings;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Hiding Tab                                                                  *
+ *                                                                             *
+ ******************************************************************************/
+
+ #hide-tab {
+    -fx-background-color: transparent;
+    -fx-border-radius: 5 5 0 0;
+    -fx-background-radius: 5 5 0 0;
+    -fx-border-color: -fx-border_col;
+}
+
+ #show-tab {
+    -fx-background-color: transparent;
+    -fx-border-radius: 5 5 0 0;
+    -fx-background-radius: 5 5 0 0;
+    -fx-border-color: -fx-border_col;
+}
+
+ #hide-tab-highlight {
+    -fx-background-color: -fx-highlight;
+    -fx-border-radius: 5 5 0 0;
+    -fx-background-radius: 5 5 0 0;
+    -fx-border-color: -fx-highlight_border;
+}
+
+
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Hiding Tab                                                                  *
+ *                                                                             *
+ ******************************************************************************/
+
+.menu-button {
+    -fx-mark-color: transparent;
+}
+
+.menu-button .arrow {
+    -fx-background-color: transparent;
+}
+
+.menu-button > .arrow-button {
+    -fx-padding: 0;
+}
+
+.menu-button > .arrow-button > .arrow {
+    -fx-padding: 0;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Hiding Pane                                                                  *
+ *                                                                             *
+ ******************************************************************************/
+
+
+/**
+ * Button for closing a hiding panel. Right indicates bottoms points towards the right, closing a hiding panel 
+ * on the right hand side of the screen. These buttons have a transparent background and rounded corners. 
+ */
+ /** top-left, top-right, bottom-right, and bottom-left corners, in that order. */
+.close-button-right{
+ -fx-background-color: transparent;
+ -fx-background-radius: 0 10 10 0;
+ -fx-border-radius: 0 10 10 0;
+}
+
+.close-button-right:hover {
+ -fx-background-color: -fx-highlight;
+}
+
+
+.close-button-left{
+ -fx-background-color: transparent;
+ -fx-background-radius: 10 0 0 10;
+ -fx-border-radius: 10 0 0 10;
+}
+
+.close-button-left:hover {
+ -fx-background-color: -fx-highlight;
+}
+
+
+.close-button-top{
+ -fx-background-color: transparent;
+ -fx-background-radius: 10 10 0 0;
+ -fx-border-radius: 10 10 0 0;
+}
+
+
+.close-button-bottom {
+ -fx-background-color: transparent;
+ -fx-background-radius: 0 0 10 10;
+ -fx-border-radius: 0 0 10 10;
+}
+
+.close-button-bottom:hover {
+ -fx-background-color: -fx-highlight;
+}
+
+
+.close-button-bottom-grey{
+-fx-border-color: transparent;
+ -fx-background-radius: 0 0 10 10;
+ -fx-border-radius: 0 0 10 10;
+}
+
+.close-button-left-trans{
+ -fx-border-color: transparent; 
+ -fx-background-color: transparent;
+ -fx-background-radius: 10 0 0 10;
+ -fx-border-radius: 10 0 0 10;
+}
+
+.close-button-right-trans{
+ -fx-border-color: transparent; 
+ -fx-background-color: transparent;
+ -fx-background-radius: 0 10 10 0;
+ -fx-border-radius: 0 10 10 0;
+}
+
+.menu-square-button {
+-fx-border-color: -fx_border_col; 
+ -fx-background-color: transparent;
+ -fx-background-radius: 0 0 0 0;
+ -fx-border-radius: 0 0 0 0;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Tab Panes are ugly in Modena!                                                                *
+ *                                                                             *
+ ******************************************************************************/
+
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-effect: null;
+    -fx-background-color: -fx-darkbackground;
+}
+.tab-pane
+{
+    -fx-tab-min-width:90px;
+}
+
+.tab{
+    -fx-background-insets: 0 1 0 1,0,0;
+}
+.tab-pane .tab
+{
+    -fx-background-color: -fx-tabbackground;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+
+}
+
+.tab-pane .tab:selected
+{
+    /*-fx-background-color:-fx-highlight;*/
+    -fx-background-color: -fx-pambackground;
+    -fx-focus-color: transparent;
+    -fx-border-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-effect: null;
+}
+
+.tab-pane .tab:focused
+{
+    -fx-focus-color: transparent;
+    -fx-border-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-effect: null;
+
+}
+
+.tab .tab-label { 
+    -fx-alignment: CENTER;
+    /*-fx-font-weight: bold;*/
+}
+
+.tab:selected .tab-label { 
+    -fx-alignment: CENTER;
+}
+
+.tab-button {
+    -fx-background-color: -fx-pambackground;
+}
+
+.tab-button:hover {
+    -fx-background-color: -fx-highlight
+}
+
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Pam Internal Pane                                                           *
+ *                                                                             *
+ ******************************************************************************/
+
+.circle-internal {
+  -fx-fill: -fx-highlight_settings;
+  -fx-stroke: -fx-highlight_border_settings;
+  -fx-stroke-width: 2;
+}
+
+.line-internal {
+  -fx-fill: -fx-highlight_border_settings;
+  -fx-stroke: -fx-highlight_border_settings;
+  -fx-stroke-width: 3;
+  -fx-stroke-dash-array: 3.0 7.0 3.0 7.0;
+}
+
+.button-internal {
+  -fx-background-color: -fx-highlight_settings;
+  -fx-border-color: -fx-highlight_border_settings;
+  -fx-background-radius: 10;
+  -fx-border-radius: 10;
+}
+
+.button-internal:hover {
+   -fx-background-color: -fx-highlight_border_settings;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * ToggleSwitch                                                                *
+ *                                                                             *
+ ******************************************************************************/
+.toggle-switch{
+    -thumb-move-animation-time: 200;
+}
+
+.toggle-switch .text {
+    -fx-font-size: 1em;
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.toggle-switch .thumb {
+    -fx-background-color: linear-gradient(to bottom, derive(-fx-text-box-border, -20%), derive(-fx-text-box-border, -30%)),
+                            -fx-inner-border,
+                            -fx-body-color;
+    -fx-background-insets: 0, 1, 2;
+    -fx-background-radius: 1.0em; /* large value to make sure this remains circular */
+    -fx-padding: 0.75em;
+    -fx-alignment: CENTER;
+    -fx-content-display: LEFT;
+}
+
+.toggle-switch .thumb-area{
+    -fx-background-radius: 1em;
+    -fx-background-color: linear-gradient(to bottom, derive(-fx-text-box-border, -20%), derive(-fx-text-box-border, -30%)), #f5f5f5;
+    -fx-background-insets: 0, 1;
+}
+
+.toggle-switch:hover .thumb{
+    -fx-color: -fx-hover-base
+}
+
+.toggle-switch:selected .thumb-area{
+    -fx-background-color: linear-gradient(to bottom, derive(-fx-text-box-border, -20%), derive(-fx-text-box-border, -30%)),
+                            linear-gradient(to bottom, derive(#0b99c9, 30%), #0b99c9);
+    -fx-background-insets: 0, 1;
+
+}
+
+.toggle-switch .thumb-area
+{
+    -fx-padding: 0.75em 1.333333em 0.75em 1.333333em; /* 7 16 7 16 */
+}
+
+.toggle-switch:disabled
+{
+    -fx-opacity: 0.4;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * ToggleSwitch                                                                *
+ *                                                                             *
+ ******************************************************************************/
+
+
+.text_field_trans {
+    -fx-background-color: rgba(255,255,255,0.3);;
+    -fx-background-radius: 0;
+    -fx-background-radius: 0;
+  -fx-border-radius: 0;
+    -fx-border-color: -fx_border_col;
+
+
+}
+
+.text-text_field_trans:focused {
+    -fx-background-color: rgba(255,255,255,0.3);;
+    -fx-background-radius: 0;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+      -fx-border-color:  -fx_border_col;
+
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Split pane                                              *
+ *                                                                             *
+ ******************************************************************************/
+
+.split-pane *.split-pane-divider {
+    -fx-padding: 0 1 0 1;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Combo Box                                          *
+ *                                                                             *
+ ******************************************************************************/
+.combo-box-base {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0 0 -1 0, 0, 1, 2;
+    -fx-background-radius: 3px, 3px, 2px, 1px;
+    -fx-padding: 0.333333em 0.666667em 0.333333em 0.666667em; /* 4 8 4 8 */
+    -fx-text-fill: -fx-text-base-color;
+    -fx-alignment: CENTER;
+    -fx-content-display: LEFT;
+    -fx-border-color:  -fx_border_col;
+    -fx-border-radius: 5,5,5,5; 
+}
+
+.combo-box-base:hover {
+ -fx-background-color: -fx-highlight;
+ -fx-border-radius: 5,5,5,5; 
+}
+
+
+/****************************************************************
+ 
+  Spinner  
+ 
+****************************************************************/
+
+.spinner {
+  -fx-background: -fx-pambackground;
+  -fx-background-color: -fx-pambackground;
+  -fx-background-radius: 5;
+  -fx-border-radius: 5;
+  -fx-border-color: none;
+}
+
+.spinner .text-field {
+  -fx-background: -fx-pambackground;
+  -fx-background-color: -fx-pambackground;
+  -fx-border-radius: 0 0 0 0;
+  -fx-padding: 5 0 5 0;
+  -fx-border-color: rgba(190,190,190,1);;
+}
+
+.spinner .increment-arrow-button {
+  -fx-background: rgba(210,210,210);
+  -fx-background-color: rgba(210,210,210);
+  -fx-border-color: rgba(190,190,190,1);;
+  -fx-border-radius: 5 5 0 0;
+  -fx-padding: 5 0 5 0;
+}
+
+
+.spinner .increment-arrow-button:hover {
+   -fx-background-color: -fx-highlight; 
+   -fx-border-color: white;
+   -fx-background-radius: 5 5 0 0;
+   -fx-border-radius: 5 5 0 0;
+}
+
+.spinner .decrement-arrow-button {
+  -fx-background: rgba(210,210,210,1);
+  -fx-background-color: rgba(210,210,210,1);
+  -fx-border-color: rgba(190,190,190,1);;
+  -fx-border-radius: 0 0 5 5
+}
+
+
+.spinner .decrement-arrow-button:hover {
+   -fx-background-color: -fx-highlight; 
+   -fx-border-color: white;
+   -fx-background-radius: 0 0 5 5;
+   -fx-border-radius: 0 0 5 5;
+}
+
+/*Arrows are horizontal either side of text box*/
+.spinner.split-arrows-horizontal .increment-arrow-button {
+   -fx-background-color: rgba(210,210,210,1);
+   -fx-border-color: rgba(190,190,190,1);
+   -fx-background-radius: 0 5 5 0;
+   -fx-border-radius: 0 5 5 0;
+}
+
+
+.spinner.split-arrows-horizontal .decrement-arrow-button {
+   -fx-background-color: rgba(210,210,210,1);
+   -fx-border-color: rgba(190,190,190,1);
+   -fx-background-radius: 5 0 0 5;
+   -fx-border-radius: 5 0 0 5;
+
+ }
+
+.spinner.split-arrows-horizontal .increment-arrow-button:hover {
+   -fx-background-color: -fx-highlight; 
+   -fx-border-color: white;
+   -fx-background-radius: 0 5 5 0;
+   -fx-border-radius: 0 5 5 0;
+}
+
+
+.spinner.split-arrows-horizontal .decrement-arrow-button:hover {
+   -fx-background-color: -fx-highlight; 
+   -fx-border-color: white;
+   -fx-background-radius: 5 0 0 5;
+   -fx-border-radius: 5 0 0 5;
+ }
+
+.spinner.split-arrows-horizontal .text-field {
+  -fx-background: -fx-pambackground;
+  -fx-background-color: -fx-pambackground;
+  -fx-border-radius: 0 0 0 0;
+  -fx-padding: 5 0 5 0;
+  -fx-border-color: rgba(190,190,190,1);
+  -fx-alignment:center;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Titled Pane                                                                  *
+ *                                                                             *
+ ******************************************************************************/
+
+ .titled-pane 
+{
+/*-fx-text-fill: -fx-text;*/
+}
+
+.titled-pane:focused 
+{
+/*-fx-text-fill: -fx-text;*/
+}
+
+
+ .titled-pane .title 
+{
+-fx-background-color: -fx-pambackground;
+-fx-background-insets: 0, 1, 2;
+-fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0;
+-fx-padding: 0.166667em 0.833333em 0.25em 0.833333em; /* 2 10 3 10 */
+}
+
+ .titled-pane .title:hover
+{
+-fx-background-color: -fx-highlight;
+-fx-background-insets: 0, 1, 2;
+-fx-background-radius: 0 0 0 0, 0 0 0 0, 0 0 0 0;
+-fx-padding: 0.166667em 0.833333em 0.25em 0.833333em; /* 2 10 3 10 */
+}
+
+
+
+.titled-pane > *.content 
+{
+-fx-background-color: -fx-pambackground;
+-fx-box-border: -fx-pambackground;
+-fx-background-insets: 10, 0 1 1 1;
+-fx-padding: 0.167em;
+ }
+
+
+/*******************************************************************************
+ *                                                                             *
+ *  ikonli icons                                                               *
+ *                                                                             *
+ ******************************************************************************/
+
+.ikonli-font-icon {
+  -fx-text-fill:  -fx-icon_col;
+  -fx-fill:  -fx-icon_col;
+}
+
+
+#module-pane .ikonli-font-icon {
+    -fx-icon-color: black;
+}

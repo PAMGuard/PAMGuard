@@ -1,0 +1,44 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Whistle Classifier Overview</title>
+</head>
+
+<body>
+
+<h1>Whistle Classifier</h1>
+<h2>Whistle Classifier Output</h2>
+<h3>Graphical Output</h3>
+<p>Classifier output is shown graphically on a tab on the 
+<a href="../../../overview/PamMasterHelp/docs/guiOverview.html">main PAMGUARD display</a>.</p>
+
+
+<br>
+<center><img alt="" src="images/classifierDisplay.png"></center>
+<br>
+<h4>Parameter Distributions</h4>
+<p>The top half of the display shows the distributions of parameters extracted from
+each whistle fragment (Note that the negative and positive inflections are not currently
+used).</p>
+<h4>Classifier History</h4>
+<p>The bottom half of the display shows the classification history.</p>
+<p>Each time the parameter distributions build up enough data and the 
+classification runs, the classification probability for each possible species with a 
+probability > 1% (0.01) is displayed</p>
+<p>The time axis of the display is logarithmic, so recent history (i.e. what's happened in the 
+last minute) gets as much space as the preceding 10 minutes or the 100 minutes before that. A 
+total of two hours of data are shown.</p>
+
+<h4>Database Output</h4>
+<p>If a <a href="../../../utilities/generalDatabaseHelp/docs/database_database.html">
+Database</a> is being used, each classification result is also written to the 
+database.  </p>
+ 
+
+<br>
+<p class="prevlink"><a href="whistleClassifier_Running.html">Previous:
+Running the Whistle Classifier</a></p>
+<br><br><br>
+</body>
+</html>

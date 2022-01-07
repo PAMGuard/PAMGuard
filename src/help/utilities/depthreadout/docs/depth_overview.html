@@ -1,0 +1,44 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Hydrophone Depth Readout Overview</title>
+</head>
+
+<body>
+
+<h1>Hydrophone Depth Readout</h1>
+<h2>Overview</h2>
+<p>The Hydrophone depth readout module can be used to read
+hydrophone depth information from one or more analogue depth sensors which
+output a voltage that changes as hydrophone depth changes.</p>
+<p>For current loop depth sensors (which output a current
+proportional to depth), the current output can be passed through a small
+resistor create a voltage.</p>
+<p>The system currently only works with MeasurementComputing data acquisition 
+cards (<a href="http://www.mccdaq.com">www.mccdaq.com</a>) but may be extended 
+to support other devices in the future.</p>
+<p>Time-stamped depth information is passed to the 
+<a href="../../hydrophoneArrayManagerHelp/docs/Array_Overview.html">
+hydrophone array manager</a> which makes it available to other 
+PAMGUARD modules as required, the information from the sensors effectively overriding the 
+default depth information in the 
+<a href="../../hydrophoneArrayManagerHelp/docs/Array_Configuration.html">hydrophone array configuration dialog</a>.</p>
+
+<p>A small side panel shows a graph of recent depth history.</p>
+
+<br>
+<img alt="Depth side panel" src="images/DepthSidePanel.png" />
+<br>
+<h3>Database output</h3>
+<p>Both the raw voltage data and the calculated depth for each
+sensor are written to the <a
+	href="../../generalDatabaseHelp/docs/database_database.html">database</a>.
+It is therefore possible to recalculate depths off-line if depth sensors
+are re-calibrated at any point. (PAMGUARD will not currently do
+this for you - you'll have to work it out for yourself using your own
+software). <br>
+<br>
+<p CLASS="nextLink"><a href="depth_configuration.html">Next: Depth Readout Configuration</a></p>
+</body>
+</html>

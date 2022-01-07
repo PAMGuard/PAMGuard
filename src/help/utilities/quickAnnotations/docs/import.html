@@ -1,0 +1,43 @@
+<html>
+<head>
+	<link href="../../../pamHelpStylesheet.css" rel="STYLESHEET" type="text/css" />
+	<title>Spectrogram Annotations</title>
+</head>
+<body>
+<h1>Quick Annotations</h1>
+
+<h2>Importing&nbsp;Quick Annotations</h2>
+
+<h3>Import</h3>
+
+<p>In Viewer Mode annotations can be imported into the QuickAnnotation module by selecting Import annotations from the file menu.</p>
+
+<p>As of 2018-08-02&nbsp;only&nbsp;CSV files of the following specific format can be&nbsp;imported, however this may change in the future.</p>
+
+<p>&nbsp;</p>
+
+<h3>CSV format for importing QuickAnnotations</h3>
+
+<p>The file format for importing QuickAnnotations is headerless&nbsp;CSV with a comma for the field-delimiter and&nbsp;no quote character&nbsp;for strings.</p>
+
+<p>One annotation should be listed per row, and each row should&nbsp;have&nbsp;seven columns (six commas). Fields marked with an asterisk (*) are required and cannot be blank/null. The&nbsp;fields for each row should be:&nbsp;</p>
+
+<p><strong>UTC, Channel, Duration,&nbsp;LowFreq, HighFreq, Label, Note&nbsp;</strong></p>
+
+<p><strong>*UTC</strong> should be a number in the same format as java.lang.System.currentTimeMillis(), i.e. the difference, measured in milliseconds, between the current time and midnight, January 1, 1970 UTC(coordinated universal time).&nbsp;</p>
+
+<p><strong>*Channel</strong> is the channel number for the annotation, and is <strong>one-indexed</strong>.</p>
+
+<p><strong>*Duration </strong>is the duration, <strong>in seconds</strong>.</p>
+
+<p><strong>*LowFreq </strong>and <strong>HighFreq </strong>are the lower and upper frequency bounds in Hz.</p>
+
+<p><strong>Label </strong>is a string (without commas) containing the user-designated label for the annotation.</p>
+
+<p><strong>Note </strong>is a string (without commas) containing the user-designated notes for the annotation.</p>
+
+<p><a href="adding.html">Previous: Annotations Configuration </a></p>
+
+<p><a href="import.html">Next: Importing Annotations</a></p>
+</body>
+</html>

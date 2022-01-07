@@ -1,0 +1,22 @@
+/** file: overlay-chart.css (place in same directory as QAChart).  Used to format
+the overlay charts in the QAM module */
+
+/* .chart-plot-background { -fx-background-color: transparent; } */ /* Only need this one for the overlay charts */
+
+/* line chart */
+.default-color0.chart-series-line { 
+  -fx-stroke: red; 
+}
+
+/* bar chart */
+.chart-bar {
+  -fx-bar-fill: silver;
+  -fx-border-color: gray;
+}
+
+/* Axes */
+.axis    {
+  -fx-font-weight: bold;
+  /* -fx-tick-label-font-weight: bold; */
+  /* -fx-tick-label-font: 0.833333em System; */
+}

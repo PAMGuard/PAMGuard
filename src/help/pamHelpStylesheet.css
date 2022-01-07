@@ -1,0 +1,66 @@
+BODY {
+	BACKGROUND-COLOR: FFFFFF
+}
+H1 {
+	FONT-FAMILY: Arial;
+	FONT-SIZE: 22;
+	COLOR: #6698FE;
+	BACKGROUND-COLOR: #DCFEEC;
+	margin-bottom: 0
+}
+H2 {
+	FONT-FAMILY: Arial;
+	FONT-SIZE: 20;
+	COLOR: #6698FE;
+	BACKGROUND-COLOR: #CBDAEB;
+	margin-top: 5;
+}
+H3 {
+	margin-top: 5; 
+	FONT-FAMILY: Arial;
+	FONT-SIZE: 18;
+	COLOR: #6698FE;
+}
+
+H4 {
+	margin-top: 5; 
+	FONT-FAMILY: Arial;
+	FONT-SIZE: 14;
+}
+
+H5 {
+	FONT-FAMILY: Arial;
+	FONT-SIZE: 14;
+	font-style: italic;
+	font-weight: normal;
+}
+
+p {
+	FONT-FAMILY: Arial;
+	FONT-SIZE: 14;
+	margin-top: 0; 
+	margin-left: 0; 
+	margin-bottom: 11
+}
+ul {
+	FONT-FAMILY: Arial;
+	FONT-SIZE: 14;
+
+}
+ol {
+	FONT-FAMILY: Arial;
+	FONT-SIZE: 14;
+
+}
+img.wrap {float: left}
+
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+th, td {
+  padding: 3px;
+}
+tr {
+  text-align: center;
+}

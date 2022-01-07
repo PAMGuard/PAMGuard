@@ -1,0 +1,91 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Whistle Classifier Overview</title>
+</head>
+
+<body>
+
+<h1>Whistle Classifier</h1>
+<h2>Discriminant Function Training</h2>
+<p>Discriminant Function Training is controlled from the <strong><em>Detection
+/ Whistle Classifier / Discriminant Function Training ...</em></strong> menu.</p>
+<p><br>
+</p>
+<center><img alt="" src="images/discriminantTraining.png"></center>
+<br>
+<h3>Training Data</h3>
+<p>Before running the training algorithms, you must process raw
+audio files for each species to create a training data set as described
+in the <a href="whistleClassifier_CollectTraining.html">Collecting
+Training Data</a> section. Training data will be in the form of a number of
+.wctd files containing extracted whistle contours from the <a
+	href="../../whistleMoanHelp/docs/whistleMoan_Overview.html">Whistle
+and Moan detector</a></p>
+<p>Select the file folder containing your .wctd files. The files can
+all be in the same folder or can be split into sub folders, in which case
+you should check the "Select Sub folders" option.</p>
+<p><b>Limit Frequency Search Range</b> - The frequency range to use.
+Contours outside this range will be discarded. <br>
+This is useful if there is low or high frequency noise in the system which you wish 
+to exclude from the training process.  </p>
+<p>You can also require the classifier to only use whistle contours over a certain number of FFT bins long. Again, this can
+be useful if there are short bits of noise in the training data sample. </p>
+<h4>species names</h4>
+<p>When the wctd files were created, the species name (either input
+by the user of taken from the folder name of the source audio file) was
+written into each file. Species names from the .wctd files are used by
+default during the classifier training. However, it is possible to
+override the species names in the .wctd files by organising you .wctd
+files into sub folders with different names and selecting the "Use
+folder names as species names" option.</p>
+<p>This allows you to merge data sets which may have been given
+slightly different names by different analyst (for instance, different
+people may have labelled training data for Bottlenose dolphin as "BND",
+"Bottlenose", "TT", "Tursiops", etc. It also allows you to merge species
+into groups, for instance, you might have a new "Small dolphin" category
+containing data for both common and striped dolphin.</p>
+
+<h3>Run Training</h3>
+<p>To run the training, set the following parameters:</p>
+<p><b>Classifier Type</b> - Two discriminant functions are available, 
+<a href="http://en.wikipedia.org/wiki/Linear_discriminant_analysis">
+Linear Discriminant Analysis</a> 
+and a <a href="http://en.wikipedia.org/wiki/Mahalanobis_distance">
+Mahalanobis Distances Classifier</a>.</p>
+
+<p><b>Fragment Length</b> - How long the fragments of whistle fed
+into the classifier should be.</p>
+<p><b>Section length</b> - how many fragments to accumulate before
+extracting parameters from the distribution and running a
+classification.</p>
+<p><b>Minimum probability threshold</b> - sets a minimum probability threshold for classification. If the 
+classifier probability for the best class falls below this threshold, then the whistle section is marked as 
+unclassified. </p>
+<p><b>Number of test bootstraps</b> - The number of randomised
+trials to run when testing classifier performance</p>
+<p><b>Batch Testing of Multiple Values</b> - This button will open an additional dialog which allows you to enter a 
+range of values for the fragment length, section length and probability threshold. The bootstrap is then carried
+out for each set of parameters and the output dumped to a text file. Examination of the text file help to decide on 
+the optimum values for these parameters.   </p>
+
+<p>Press the "Start Training" button and wait while the classifier training process runs.</p>
+<p>Progress will be indicated in the bar at the bottom of the window and also as text output in 
+the right hand display panel.</p>
+ 
+<h3>Training Output</h3>
+<p>The training process produces a number of matrices which will control the classification process. 
+These are automatically stored into the standard PAMGUARD settings file you are currently using.</p>
+<p>You can also export the classifier settings to a Whistle Classifier Settings (*.wcsd) file
+for archiving and easy sharing with other users so that they can set up the same classifier 
+without requiring access to the training data set. </p>   
+
+<br>
+<p class="prevlink"><a href="whistleClassifier_CollectTraining.html">Previous:
+Collecting Training Data</a></p>
+<p CLASS="nextLink"><a href="whistleClassifier_Running.html">Next:
+Running the Whistle Classifier</a></p>
+<br><br><br>
+</body>
+</html>

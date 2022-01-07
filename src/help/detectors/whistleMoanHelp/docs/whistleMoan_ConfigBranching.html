@@ -1,0 +1,112 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Whistle and Moan Branching</title>
+</head>
+
+<body>
+
+<h1>Whistle and Moan Detector</h1>
+<h2>Branching and Joining</h2>
+<p><br>
+It is often the case that multiple whistles from different animals will
+overlap in time and frequency. If large groups of dolphins are
+encountered, then overlapping whistles tend to be the norm rather than
+the exception. While this may not be a problem if you are only
+interested in detecting whistles, if you are measuring bearings to
+individual whistles or if you are using the <a
+	href="../../whistleClassifierHelp/docs/whistleClassifier_Overview.html">
+Whistle Classifier</a> it is necessary to separate out the different sounds.</p>
+<p>The Whistle and Moan detector has four options which control how
+overlapping whistles are handled</p>
+<ol>
+	<li>
+	<p>Leave branched regions intact</p>
+	</li>
+	<li>
+	<p>Discard branched regions</p>
+	</li>
+	<li>
+	<p>Separate all branches</p>
+	</li>
+	<li>
+	<p>Re-link across joins</p>
+	</li>
+</ol>
+<p>This option is set at the bottom of the Whistle and Moan
+configuration dialog.</p>
+<br>
+<center><img alt="dialog"
+	src="images/whistleMoanDialog_Branching.png" /></center>
+<br>
+<br>
+<p>The different options are illustrated below using three simulated
+overlapping linear chirps.</p>
+<h3>Leave branched regions intact</h3>
+<p>If this option is selected, then branched regions will be left
+intact and may contain more one actual sound.</p>
+<br>
+<center><img alt="" src="images/leaveIntact.png"></center>
+<br>
+
+<h3>Discard branched joins</h3>
+<p>If this option is selected, than any region that has more than
+one detected frequency peak in any time slice will be discarded.</p>
+<br>
+
+<h3>Separate all branches</h3>
+<p>If this option is selected, then all branches will be separated
+and passed on as individual sounds. A break is created every time the
+number of consecutive peaks changes. So a pair of crossing whistles will
+generally be broken into five parts - each of the four branches and the
+crossing point itself.</p>
+<p>In the example below, the three sounds have been broken into 12
+separate parts.</p>
+<br>
+<center><img alt="" src="images/separateBranches.png"></center>
+<br>
+
+<h3>Re-link across joins</h3>
+<p>If this option is selected, then the algorithm will attempt to
+rejoin individual tones across joins. First, the sound is broken up as
+above, it then rejoins the different components according to the
+following rules:</p>
+<ol>
+	<li>
+	<p>If there are the same number of sounds in consecutive time
+	slices and each sound in the earlier slice is in contact with one in
+	the later slice, then they are joined with 1:1 correspondence.</p>
+	</li>
+	<li>
+	<p>A crossing point is defined as a sound which has the same number
+	of other sounds entering it as leave it and has a total length no
+	longer than the set maximum in the options dialog. Sounds entering
+	and leaving a cross are linked across it with the highest frequency
+	sound on one side joining the lowest frequency sound on the other.</p>
+	</li>
+	<li><p>
+	If there is a branch (one sound splitting to two or more) or a
+	join (two or more sounds merging into one), then the frequency gradient
+	of the merged part is compared to that of the sounds entering or
+	leaving and the sound with the best match is joined to the merged
+	section. Very short sections (fewer than 10 time slices) are penalised
+	during the comparison to favour longer whistles.</p>
+	</li>
+</ol>
+<br>
+<center><img alt="" src="images/rejoinCrossings.png"></center>
+<br>
+<p>Which branching and joining method you chose may depend on the application. 
+Generally, re-linking across joins is the best option for small cetacean whistles. 
+</p> 
+<br>
+<p><br>
+
+</p>
+<p CLASS="prevLink"><a href="whistleMoan_ConfigConnect.html">Previous:
+Configure the region connector</a></p>
+
+<br><br><br>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
+<title>PAMGUARD Architecture</title>
+</head>
+
+<body>
+
+<h1>PAMGUARD</h1>
+<h2>PAMGUARD Architecture</h2><br>
+
+<p>
+Central to the software design is a flexible core architecture which allows the integration of a range of additional plugins. 
+This provides you with flexibility, allowing you to tailor PAMGUARD to your particular PAM operation. 
+</p>
+<p>
+Key elements of the PAMGUARD Core Functionality are: 
+<ol>
+<li><p><b>GUI Framework for PAMGUARD displays and configuration options</b></p></li><p>
+PAMGUARD is an interactive cetacean detection and tracking environment with a variety of 
+displays used both to configure and to display the output of a wide variety of detectors, mapping
+tools and sound processing modules.</p>
+<li><p><b>Data manager and profiler</b></p></li>
+<p>A typical PAMGUARD configuration will contain many data processing modules which produce many
+different types of data. The Data Manager handles all types of data, making data available
+to multiple displays and processes and also handling deletion and clean up of data from memory. It 
+will also tell you how much computer power each process is using <p>
+<li><p><b>Hydrophone array configuration and location manager</b></p></li>
+<p>PAMGUARD contains a sophisticated hydrophone array manager, which can manage towed hydrophones, 
+rigidly mounted hydrophones and fixed (i.e. bottom mounted) arrays. <p>
+<li><p><b>Configuration and settings manager</b></p></li>
+<p>The configuration manager offers an easy to use graphical depiction of loaded PAMGUARD modules and
+the data flow between them. Configurations are stored in a format which can easily be sent between
+users or downloaded from the Internet.<p>
+<li><p><b>Help manager</b></p></li>
+<p>PAMGUARD contains comprehensive online help. If you're reading this, then you've already found it, so press on ...<p>
+</ol>
+
+
+<p>The extensible nature of PAMGUARD allows developers to easily add to PAMGUARD's functionalities. For instance, 
+  a developer who wishes to make a detector that requires spectrogram data as input can subscribe to an existing 
+  module that computes FFT's and spectrogram information, which in turn will make use of PAMGUARD's sound acquisition 
+  modules to read data from a sound card, file, or some other input device. The PAMGUARD data manager and GUI will then 
+  display and store output data from their detector with a minimum of programming effort through the use of standardised 
+  detection and data handling class structures.   
+  
+  </p>
+  
+  
+  
+</p>
+<p CLASS="previousLink"><a href="pamguardBackground.html">Previous: PAMGUARD Background</a></p>
+<p CLASS="nextLink"><a href="modules.html">Next: PAMGUARD Modules</a></p>
+<!--p CLASS="nextLink"><a href="pamGuardQuickStartGuide.html">Next: PAMGUARD Quick Start Guide</a></p-->
+<br><br><br>
+</body>
+</html>

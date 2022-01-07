@@ -1,0 +1,208 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Detect Porpoises</title>
+</head>
+
+<body>
+<h1>Large Aperture 3D Localiser</h1>
+<h2>Detect Porpoises</h2>
+<h3>
+Summary
+<NAME="Summary">
+</h3>
+
+<p><i>Process
+10 channel .wav files using the click detector to detect porpoises and create
+binary files</i></p>
+
+<h3>
+1.1 Create the Module Structure
+<NAME="CreatetheModuleStructure">
+</h3>
+
+<p>To begin we
+need to analyse the raw .wav data in PAMGUARD. Start PAMGUARD in <b><i>normal
+mode. </i></b>Select<b><i> File > Add Modules > Sound Processing > Sound
+Acquisition </i></b>to add the sound acquisition module. This will allow the
+raw .wav files to be analysed in PAMGUARD. Next we need a click detector. Go to
+<b><i>File > Add Modules > Detector > Click Detector. </i></b>The click
+detector module should now appear. Finally we need a database (<b><i>File > Add
+Modules > Utilities > Database</i></b>) and binary storage (<b><i>File > Add
+Modules > Utilities > Binary Store</i></b>).</p>
+
+<p>Now you have
+added the modules the next stage is to set up everything. Your data model
+should look like. </p>
+
+<center>
+<p><img width=411 height=232
+id="Picture 3" src="images/image003.jpg"></p>
+
+<p>Figure 1 The data model should look roughly like this to analyse clicks.</p>
+</center>
+
+<p>In PAMGUARD
+you always move from modules on the left to modules on the right when inputting
+settings. So here we start with sound acquisition and then move to the click
+detector. <b><i>Select Detection > Sound Acquisition... </i></b>In the dialog
+box set the audio source to <b><i>Audio file or multiple file, </i></b>select <b><i>Select
+Folder or Files...</i></b> and choose the folder containing the porpoise .wav
+files. Now that the sound acquisition knows you are dealing with ten channels
+of data you will need to create a ten channel hydrophone array in the array
+manager. Go to <b><i>File > Hydrophone Array...</i></b> and use <b><i>Import.</i></b>
+to select the ten channel array file for this porpoise data. (In Exercise 1-2
+folder) The hydrophone array manager dialog box should look like.</p>
+<center>
+<p>
+<img width=311 height=246
+src="images/image005.jpg"></p>
+<p>Figure 2. Hydrophone array manager.</p>
+</center>
+
+<h3>
+1.2 Set
+up the Click Detector Params
+<NAME="SetuptheClickDetectorParams">
+</h3>
+
+<p>Now set up
+the click detector. Go to the <b><i>Click Detection</i></b> menu on the main
+screen and select <b><i>Detection Parameters...</i></b>. We want to detect clicks
+on all channels so select the check box for all ten channels. Make sure that
+no grouping is selected. This is usually sensible for wide aperture arrays (see
+note). Select the <b><i>Trigger</i></b> tab and ensure check boxes are selected
+for every channel. This ensures each channel individually runs the click detection
+algorithm. Click <b><i>OK.</i></b></p>
+
+<center>
+<p>
+<img width=173 height=238 id="Picture 316" src="images/image006.jpg">
+<img width=172 height=241 id="Picture 7" src="images/image007.jpg"></p>
+<p>Figure 3. Make sure the channels are not grouped and all selected in the trigger tab.</p>
+</center>
+
+<h3>
+1.3 Create filters to optimise for Porpoise Click Detection
+<NAME="CreatefilterstooptimiseforPorpoiseClickDetection">
+</h3>
+
+<p>Now we want
+to set up filters to optimise our chances of finding porpoise clicks. There are
+two filters in the click detector, a pre filter and digital trigger filter. The
+pre filter filters the raw sound data used by the click detector module. We
+want to get rid of low frequency noise so a high pass filter at 20kHz is ideal.
+Select <b><i>Click Detection > Digital Pre Filter...</i></b> In the dialog
+which pops up create a high pass Butterworth filter at 20000Hz.</p>
+
+<center>
+<p><img width=456 height=319 id="Picture 8" src="images/image008.jpg"></p>
+<p>Figure 4. The digital pre filter should be set to 20kHz, high pass. </p>
+</center>
+
+<p>Now we need
+to set the digital trigger filter. The digital trigger filter is only used by
+the algorithm which searches for clicks. The final saved click waveforms and
+spectra are taken from the raw sound data filtered only by the pre filter.
+Since porpoises have narrow band high frequency clicks it is sensible to search
+for clicks only in a narrow frequency band. Hence our digital trigger filter
+will be a band pass, from 100kHz to 150kHz. Select <b><i>Click Detection > 
+Digital trigger filter...</i></b> In the dialog which pops up create a band pass
+Chebyshev filter between 100000 and 150000Hz. </p>
+
+<center>
+<p><img width=440 height=308 src="images/image010.jpg" >
+</p>
+
+<p>Figure 5. The digital trigger filter should be a band pass between 100 and 150kHz.
+</p>
+</center>
+
+<h3>
+1.4 Create
+a porpoise click classifier
+<NAME="Createaporpoiseclickclassifier">
+</h3>
+
+<p>The click
+detector is now set up to detect clicks in the porpoise frequency range.
+However, although we have optimised the click detector for porpoise like
+vocalisations it will still detect many different types of sounds. In order to
+determine whether porpoise are present we need to classify clicks. For this we
+can use the PAMGUARD click classifier. Go to <b><i>Click Detection > Click
+Classification</i>. </b>In the <b><i>Click Classifier Selection</i></b> drop
+down box select<b><i> Classifier with frequency sweep. </i></b>Select<b><i> New
+</i></b>to bring up a new click classifier settings dialog. In the bottom of
+the dialog box use the <b><i>Set Defaults </i></b>button to create default
+porpoise parameters. Click OK. </p>
+
+<center>
+<p><img width=321 height=491 id="Picture 10" src="images/image011.jpg"></p>
+
+<p>Figure 6. The click classifier has default settings for porpoise clicks. </p>
+</center>
+
+<p>You've now
+created a porpoise click classifier. To ensure that classifier is applied to
+data make sure that the <b><i>Run classification online</i></b> and <b><i>Enable</i></b>
+check boxes are selected.</p>
+
+<center>
+<p><img width=427 height=359 id="Picture 11" src="images/image012.png"></p>
+
+<p>Figure 7. Click classifier manager. </p>
+</center>
+
+<h3>
+1.5 Running
+<NAME="Running">
+</h3>
+
+
+<p>We have now
+set the detector click detector up to detect and classifiy porpoise
+vocalisations. To run select <b><i>Detection > Start</i></b></p>
+
+<center>
+<p><img width=602 height=323 id="Picture 13"
+src="images/image013.jpg"></p>
+
+<p>Figure 8. The click detector running through the ten
+channel .wav files should look something like the above. </p>
+</center>
+
+
+
+<p><b><i>A note
+on groups.</i></b><i> In
+many detectors you have the option of "grouping channels". Grouping tells
+PAMGUARD to automatically calculate extra information for those channels which
+have been selected as belonging to a group. Grouped channels are saved as a
+single data unit containing information from each channel. For example, a towed
+array contains two closely spaced hydrophones. These two channels, when
+analysed in PAMGUARD, are usually grouped. If a click is detected on one of the
+hydrophones then a waveform clip is also automatically recorded from the other
+channel; this is then saved as a data unit containing information on both
+channels. PAMGUARD can calculate extra information for any data unit which
+contains more than channel of information. For our towed array, two clicks allow
+bearing information to be calculated for bearing time displays and target
+motion analysis. In general widely spaced hydrophones are not grouped.</i></p>
+
+
+
+
+
+
+
+
+
+<p CLASS="previousLink">
+<a href="meal_overview.html">Previous: Overview.html</a>
+</p>
+
+<p CLASS="nextLink">
+<a href="meal_exercise2_viewData.html">Next: Exercise2 - View Data </a>
+</p>
+
+</body>

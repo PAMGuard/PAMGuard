@@ -1,0 +1,202 @@
+<html>
+<head>
+	<link href="../../../pamHelpStylesheet.css" rel="STYLESHEET" type="text/css" />
+	<title>Difar Module</title>
+</head>
+<body>
+<h1>DIFAR Localisation</h1>
+
+<h2>Configure DIFAR Processing</h2>
+
+<p>The DIFAR localisation system is configured either from an item in the main Detection menu or by pressing the Settings button at the top of the DIFAR queue panel. Process Settings are laid out across&nbsp;a few&nbsp;different tabs on the dialog. Generally, you will only have to set up the Data and Species tabs and can leave other settings at their default values.</p>
+
+<p><a href="./difar_ConfigureProcessing.html#Data">Data and buffers</a><br />
+<a href="./difar_ConfigureProcessing.html#Species">Processing (Classification/Species)</a><br />
+<a href="./difar_ConfigureProcessing.html#Calibration">Calibration</a><br />
+<a href="./difar_ConfigureProcessing.html#Automation">Automation</a></p>
+
+<hr />
+<h3>Data and buffers<a name="Data"> </a></h3>
+
+<p><a name="Data"> </a></p>
+
+<center><a name="Data"><img alt="Data sources and buffers" src="./images/1-Data.png" /> </a></center>
+
+<center>&nbsp;</center>
+
+<p><a name="Data"><b>Data Source</b> determines which audio source will be used to when de-multiplexing DIFAR clips. This is generally the sound acquisition module connected to a sound card receiving&nbsp;multiplexed audio data&nbsp;from&nbsp;a VHF&nbsp;radio receiver. </a></p>
+
+<p><a name="Data"><strong>Demultiplexing Settings </strong>determines which demultiplexor (demodulator)&nbsp;will be used.</a></p>
+
+<p>Most DIFAR sonobuoys send data via VHF radio link back to an aircraft of nearby vessel. Consequently, the acoustic data from the three sensors are multiplexed into a single signal prior to transmission. An important part of the processing is therefore the de-multiplexing of the signal back into it&rsquo;s three separate components, and to achieve this, PAMGuard makes use of a software library developed by Greenridge Sciences Inc. Greeneridge Sciences Demultiplexing Library is not included with PAMGuard and must be purchased separately. Upon purchase, you be supplied with a file GreenridgeDemux32.dll or GreenridgeDemux64.dll, and this should be placed in your Program Files (x86)/PamguardBeata/lib folder prior to launching PAMGuard.</p>
+
+<p>An alternative to the Greenridge demultiplexor is the Australian Marine Mammal Centre (AMMC) Experimental Demultiplexor. This freely available, open source demodulator developed at the Australian Antarctic Division is included in PAMGuard within the DIFAR module. The AMMC Experimental Demodulator does not require purchase, and at the time of writing (July 2014) is not subject to export restrictions by the Australian Defence Control Export Agency. However, the AMMC module is considered Beta software and may not be as stable, reliable, or robust as the Greeneridge Demodulator.</p>
+
+<p>The Greenridge demultiplexor is more robust and well tested, but must be purchased separately. The AMMC Expermintal demultiplexer is included by default.</p>
+
+<h3><a name="Data">Buffers </a></h3>
+
+<p><a name="Buffers"><b>Prepend to clip:</b> This is the amount of data (in seconds) added to the start of each DIFAR clip.&nbsp;When using the&nbsp;Greeneridge demodulator, this&nbsp;should be set to approximately 3 s or more&nbsp;to enable the phased lock loop in the DIFAR de-multiplexing module to lock onto the carrier signal. When using the AMMC demodulator, this&nbsp;should be set to 0.&nbsp;</a></p>
+
+<p><a name="Buffers"><b>Time to keep Raw Data:</b> The time in seconds that raw data are held in memory. Once data are discarded it is no longer possible to make clips from the data for DIFAR processing. Generally a couple of minutes is adequate. Increasing this too much can cause PAMGuard to run out of memory. </a></p>
+
+<p><a name="Buffers"><b>Queued Data Buffer (m):</b> The minimum number of minutes that data are held in the queue prior to processing before being automatically discarded. Additionally, there&nbsp;are&nbsp;also controls on the DIFAR Queue&nbsp;Display to determine&nbsp;how long data are kept in the&nbsp;queue.&nbsp;&nbsp;</a></p>
+
+<p><a name="Buffers"><b>Processed Data Buffer (m):</b> The number of minutes that processed data are held prior to being discarded. Additionally, the Map&nbsp;Data Selector can determine how long processed data&nbsp;are kept.&nbsp;</a></p>
+
+<p><a name="Buffers"><b>Clear queued data at start:</b> If this is selected, then each time PAMGuard starts, all queued data&nbsp;clips will be discarded. </a></p>
+
+<p><a name="Buffers"><b>Clear processed data at start:</b> If this is selected, then each time PAMGuard starts, processed data objects will be discarded, and thus removed from the&nbsp;map.&nbsp;</a></p>
+
+<hr />
+<h3><a name="Species">&nbsp;Classification (Species)&nbsp;Processing </a><a name="Species"></a></h3>
+
+<p>&nbsp;</p>
+
+<center><a name="Clips"><img alt="difarParamsDialog_Clips" src="./images/2-Species.png" /> </a></center>
+
+<p>&nbsp;</p>
+
+<p>The PAMGuard DIFAR module uses the beamforming algorithms as described by (D&rsquo;Spain 1994, McDonald 2004) to obtain an estimate of the signal power as a function of tonal frequency and magnetic bearing. We refer to the display of signal power as a function of frequency and bearing as the DIFARGram. For a given detection, the bearing and frequency with the highest power can usually be said to represent the direction of the vocalisation.</p>
+
+<p>Parameters for creating the DIFARGram are controlled on this tab. The PAMGuard DIFAR module allows for a different DIFARGram parameters to be used for different &quot;Species&quot; (i.e. user-defined classifications)&nbsp;of vocalisations. The <strong>Edit Species List</strong> button allows the creation of new user-defined species classifications. The <strong>Select Species</strong> drop-down menu is used to select a species in order to edit itparameters.</p>
+
+<h4>DIFARGram parameters</h4>
+
+<p><a name="Data"><strong>DIFAR calculation&nbsp;</strong>allows selection of the beamforming method: either Bartlett or MVDR. </a></p>
+
+<p><a name="Clips"><strong>Sample Rate:</strong> After de-multiplexing, the data for each clip are decimated to a lower sample rate. </a></p>
+
+<p><a name="Clips"><b>FFT Length:</b> The Fourier Transform length to use during DIFAR processing and display. This must be a power of 2.&nbsp;</a></p>
+
+<p><a name="Clips"><b>FFT Hop:</b> The hop, in samples between successive FFT frames. </a></p>
+
+<p><a name="Data"><b>No. Angle Bins </b>determines the angular precision when computing the DIFARGram.&nbsp;Generally,&nbsp;360 bins, for a&nbsp;1 degree resolution is adequate. Increasing&nbsp;higher than&nbsp;360 degrees may substantially increase processing times.&nbsp;</a></p>
+
+<p><a name="Intensity Scale"><b>Intensity Scale</b> is a numeric factor that controls the color scaling (i.e. contrast) of the DIFARGram. Specifically, a &quot;floor&quot; value is set for the DIFARGram that is equal to the maximum power in the DIFARGram divided by the Intensity Scale. Intensity Scale values between 10 and 10000 provide adequate contrast for most DIFAR data.</a></p>
+
+<p><a name="Clips"><b>Beamforming&nbsp;Frequency Max. and&nbsp;Beamforming Frequency Min.</b> Maximum and Minimum frequencies to use to use when determining the bearings of a DIFAR localisation. For detections that were manually marked on the spectrogram, these values are overridden if the &ldquo;Marked&rdquo; button is selected, in which case the frequency limits of the mark made by the operator will be used. For automatic detections, the values will be overridden if the &ldquo;Detection&rdquo; button is pressed. </a></p>
+
+<p><strong>Load/Save List.</strong>&nbsp;These buttons can be used to&nbsp;save or load&nbsp;your list of classifications so that these lists can be easily&nbsp;shared and transferred among&nbsp;different settings files.</p>
+
+<p>&nbsp;</p>
+
+<hr />
+<h3><a name="Clips"> Calibration </a><a name="Calibration"></a><a name="Clips"> </a></h3>
+
+<p><a name="Calibration"> </a></p>
+
+<center><a name="Calibration"><img alt="Calibration panel" src="./images/3-Calibration.png" /> </a></center>
+
+<p><a name="Calibration"> </a></p>
+
+<h4><a name="Calibration">Intensity calibration (sonobuoy frequency response)</a></h4>
+
+<p><a name="Calibration"> Most sonobuoys have a non-flat frequency response i.e. the intensity is shaped as a function of frequency in order to optimise the dynamic range of the FM signals sent across the limited bandwidth of the VHF radio link. The effects of this &quot;pre-whitening&quot; filter must be reversed in order to make calibrated intensity measurements from signals from sonobuoys.<br />
+<br />
+In addtion to the frequency response of the sonobuoy, the frequency response of the VHF receiver must also be taken into account when measuring intensity of signals from sonobuoys that have been received over VHF radio. The <strong>View/Edit Frequency Response</strong> button can be used to create a single arbitrary FIR filter that will correct for the combined frequency response of the sonobuoy and the VHF receiver. Lastly, to ensure accuracy, make sure that the hydrophone sensitivity in the Array Manager is set to the correct reference sensitivity for each sonobuoy.<br />
+<br />
+Example: A DIFAR 53D sonobuoy is used with a WiNRADiO G39 sonobuoy VHF receiver.<br />
+<br />
+The frequency response of the 53D sonobuoy (figure below) is given relative to the reference pressure (100Hz) and reference intensity (122 dB re 1 uPa RMS; as per Greene et al 2004). </a></p>
+
+<p><a name="Calibration">&nbsp;</a></p>
+
+<p><a name="Calibration"> </a></p>
+
+<center><a name="Calibration"></a><a name="Calibration"></a><a name="Calibration"><img alt="Calibration panel" src="./images/3-Calibration-FreqResponse53D.png" /><br />
+Intensity frequency response of a DIFAR 53D Sonobuoy (adapted from Greene et al 2004)</a></center>
+
+<p>&nbsp;</p>
+
+<p>The hydrophone sensitivity is measured in dB re 1 V/uPa. Therefore the inverse of the reference intensity can be used as the sensitivity of the hydrophone in the Array Manager (Figure Below).</p>
+
+<p>&nbsp;</p>
+
+<center><a name="Calibration"><img alt="Calibration panel" src="./images/3-Calibration-HydrophoneSensitivity.png" /><br />
+Setting the hydrophone sensitivity in PAMGuard&#39;s Array Manager</a></center>
+
+<p>&nbsp;</p>
+
+<p>At the reference pressure and intensity the sonobuoy will generate a 25 kHz of frequency deviation. The voltage frequency response of the WiNRADiO G39 receiver is then measured at 25 kHz frequency deviation and found to be relatively flat at 1 V (i.e. 0 dB from 10 to 48000 Hz). These two frequency responses are combined and entered into the DIFAR module using the button <strong>View/Edit Freq. Response</strong> (Figure Below).</p>
+
+<p>&nbsp;</p>
+
+<center><a name="Calibration"><img alt="Calibration panel" src="./images/3-Calibration-InverseFreqResponse.png" /><br />
+Setting up a filter for obtaining calibrated intensity measurements from sonobuoys</a></center>
+
+<p>&nbsp;</p>
+
+<p>The DIFAR module will now apply this filter to the data from the omnidirectional hydrophone when measuring the intensity (i.e. processing) of an audio clip. The resulting intensity measurements will be accurately referenced to 1 uPa RMS. NB: Specifications from sonobuoy manufacturers typically suggest that intensity is accurate to within &plusmn;3 dB.</p>
+
+<p>&nbsp;</p>
+
+<p><strong>Calibration GPS Source</strong></p>
+
+<p>If multiple GPS modules have been added to PAMGuard (e.g. in viewer mode or mixed-mode for post-processing of data), then this drop-down menu can be used to select the GPS module that contains the position of the calibration sound source.</p>
+
+<p>&nbsp;</p>
+
+<h4><a name="Calibration">Compass calibration</a></h4>
+
+<p><a name="Calibration">In addition to providing a magnetic bearing to the source of acoustic detections, the DIFAR module provides a means to &ldquo;calibrate&rdquo; the compass of the sonobuoy in order to account for local magnetic anomaly and the magnetic deviation inherent in the compass within the sonobuoy. After &ldquo;calibration&rdquo; the DIFAR module will report all bearings referenced to true north. The procedure for &ldquo;calibrating&rdquo; the compass is the same as that presented in detail by (Miller 2012, Miller et al. 2013, Miller, Collins, et al. 2014), and basically involves measuring several magnetic bearings to the known positions of&nbsp;a research vessel as it moves away from a sonobuoy after deployment. </a>See <a href="./difar_RunningSystem">here</a> for details of running the calibration.</p>
+
+<p>Audio clips used for calibration, are treated as a special <a href="./difar_ConfigureProcessing.html#Species">species</a> and are processed and localised in much the same way as other <a href="./difar_ConfigureProcessing.html#Species">species</a>. The DIFARGram parameters for calibration clips are controlled using the top portion of this tab. The bottom portion of the tab&nbsp;can be used to&nbsp;set the length and number of clips to include in a calibration run.</p>
+
+<p><b>Clip length (s):</b> Length of each automatically generated calibration clip.</p>
+
+<p><b>Interval between clips(s):</b> The number of seconds between automatically generated calibration clips.</p>
+
+<p><b>Number of clips in sequence:</b> The number of clips to include in the calibration run.</p>
+
+<p><b>Auto-process vessel clips:</b> When checked,&nbsp;automatically generated calibration clips will be automatically moved from the DIFAR queue to the DIFAR processing module as soon as the previous clip is cleared from the DIFAR processing module.</p>
+
+<p>&nbsp;</p>
+
+<hr />
+<h3><a name="Species"> Automation </a><a name="Automation"></a><a name="Species"> </a></h3>
+
+<p><a name="Automation"> </a></p>
+
+<center><a name="Automation"><img alt="difarParamsDialog_Automation" src="./images/4-Automation.png" /> </a></center>
+
+<p>&nbsp;</p>
+
+<p>The main purpose of the DIFAR Localisation module is to process signals from directional DIFAR sonobuoys in order to obtain bearings to vocalisations from whales. The detection of whale vocalisations may take place automatically via any PAMGuard detector that can generate clips (e.g Ishmael energy and spectrogram detectors, PAMGuard&rsquo;s whistle and moan detectors) or can take place via manual selection of calls on the spectrogram. Any number of these automated detectors can be used to present detections to the DIFAR module.</p>
+
+<p><a name="Automation"><b>Automated Detectors:</b> This panel lists all of the PAMGuard modules that are capable of generating detections that can be processed and potentially localised with the DIFAR Localisation module. The first column lists the name of the detector, and&nbsp;the checkbox in the second column determines whether or not the detections&nbsp;will be used by the DIFAR Locasitaion module. Be warned though that many detectors produce false alarms at a high rate which may fill the DIFAR queue very rapidly. The final column labelled &quot;Classification&quot;&nbsp;contains a&nbsp;drop-down menu&nbsp;containing all of the&nbsp;&quot;Classifications&quot;&nbsp;known to the DIFAR module. Selection of a classification species will&nbsp;force all of the detections&nbsp;for that detector to be&nbsp;<strong>classified&nbsp;and automatically processed</strong> accordingly.&nbsp;Automatic&nbsp;detection without automatic processing can be achieved by selecting the &quot;Unclassified&quot;&nbsp;species (i.e.&nbsp;listed first in the&nbsp;&quot;Classification&quot; drop-down menu).&nbsp;</a></p>
+
+<p>&nbsp;</p>
+
+<p><a name="Quick Species"><b>Quick classification:</b> This panel controls which classifications,&nbsp;if any,&nbsp;will be&nbsp;prominently visible next to each detection in the DIFAR Queue.&nbsp;There can be&nbsp;up to three &ldquo;Favourite&rdquo; species which will appear as buttons next to each clip in the DIFAR queue. NB: Species that are not &quot;Favourites&quot;&nbsp;will be available via a drop-down menu next to each clip.</a></p>
+
+<p>&nbsp;</p>
+
+<p><strong>Auto Saving (and auto-processing)</strong></p>
+
+<p><strong>Auto-process classified clips:</strong>&nbsp; When this box is checked, clips that have a classification will be automatically processed (i.e. DIFARGrams will be created and displayed). If not checked, then the user must click on the <em>Process</em> button next to each clip in the DIFAR queue to process&nbsp;each clip.</p>
+
+<p><a name="Automation"><b>Auto save processed clips:</b> If you select to Auto save processed data, then once a DIFAR clip has been processed it will automatically be saved after the set delay time using the maximum DIFAR angle and automatically crossing bearings to other detections if more than one buoy is in operation. </a></p>
+
+<p>&nbsp;</p>
+
+<p><strong>Global Keyboard Shortcuts:</strong></p>
+
+<p>Keyboard shortcuts can be assigned to any or all of the five actions listed under this panel.&nbsp;If any of these keys are pressed in any PAMGuard window (including, but not limited to&nbsp;windows created by the&nbsp;DIFAR module)&nbsp;their corresponding actions will be carried out if possible.&nbsp;Three of these actions, Save, Save without Crossbearing, and Delete&nbsp;have corresponding buttons on the DIFARGram. The remaining two actions will change the selected classification in the <em>DIFAR Selection</em> sidebar.</p>
+
+<p>&nbsp;</p>
+
+<h3>Advanced</h3>
+
+<p><br type="_moz" />
+<strong>Use DifarGram summary line:</strong> When checked the angle with the&nbsp;maximum value of the summary line in the DifarGram will be automatically selected for newly processed bearings. When unchecked, the angle and frequency with&nbsp;that contain the&nbsp;maximum value of the DIFARGram will be selected for newly processed bearings.</p>
+
+<p><a href="difar_ConfigureUserDisplay.html">Previous: Configuring the User Display</a></p>
+
+<p class="nextLink"><a href="difar_RunningSystem.html">Next: Running the DIFAR System </a></p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+</body>
+</html>

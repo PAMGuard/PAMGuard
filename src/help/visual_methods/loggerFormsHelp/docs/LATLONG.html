@@ -1,0 +1,52 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
+<title>LATLONG Control</title>
+</head>
+
+<body>
+
+<h1>LATLONG Control</h1>
+
+<p>The LATLONG Type is used on a User Defined Form to create an input field for Latitude and Longitude data</p>
+
+<h3><u>Required Fields</u></h3>
+  
+<p><b>Order</b>
+ <p>The order in which the controls are read in by the program</p>
+<p><b>Title</b>
+<p>The text to be shown on the display</p>
+<p><b>Length</b></p>
+ <p>Length of the input field in characters</p>
+ 
+ 
+  
+<p></p> 
+<h3><u>Optional Fields</u></h3>
+  
+<p><strong>Autoclear</strong></p>
+  <p>The control is automatically cleared when data is saved</p>
+<p><b>DbTitle</b></p>
+  <p>Column heading for the output database. (This will default to the Title if this field is not completed)</p>
+<p><b>Hint</b></p>
+  <p>Text for a hint to be displayed when entering data in the control</p>
+<p><b>PostTitle</b></p>
+  <p>Additional text to display after the input box.</p>
+<p><b>Required</b></p>
+  <p>Forces the user to fill in the input box before the form can be saved</p>
+    
+  <br></br>
+ <h3><u>NMEA Input</u></h3>
+<p><b>NMEA_Module</b>
+<p>The name of the NMEA module from which data should be harvested</p>
+<p><b>NMEA_String</b></p>
+<p>The name of the NMEA string containing the data</p>
+<p><b>NMEA_Position</b>
+<p>The position of the first (Latitude) data item in the NMEA string. Strings are comma separated, the 0'the item will be the string name, the 1'st item the one after that, etc. </p>
+ <p>Two numbers will in face be read from the NMEA string. It is assumed that Latitude is at the position given by 
+ NMEA_Position and that the next number in the NMEA string (i.e. NMEA_Position+1) is the Longitude. Teh latitude and 
+ longitude should be in decimal degrees. If conversion of either number fails, the values will be set to null. </p>
+
+ <br></br><p><a href="./designingForms.html">Back to form Design</a></p>
+</body>
+</html>

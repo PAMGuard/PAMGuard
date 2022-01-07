@@ -1,0 +1,77 @@
+<html>
+<head>
+<link href="../../../pamHelpStylesheet.css" rel="STYLESHEET"
+	type="text/css" />
+<title>Bearing Localiser Overview</title>
+</head>
+<body>
+	<h1>Bearing Localiser</h1>
+
+	<h2>Overview</h2>
+
+<p>The bearing Localiser can be used to estimate bearings to sound sources using a number 
+of different algorithms.</p>
+<p>The type of bearing that can be estimated will depend on the shape of the hydrophone array:</p>
+ <dl>
+ <dt><strong>Single hydrophones</strong></dt>
+ <dd>No bearing calculation is possible</dd>
+ <dt><strong>Linear array of two or more hydrophones</strong></dt>
+ <dd>A single bearing is calculated relative to the axis of the array and there will be ambiguity about 
+ the array axis.</dd>
+ <dt><strong>Planar Array</strong></dt>
+ <dd>Two bearings are calculated relative to the plane of the array, an angle in the 
+ plane and and elevation above the plane. There will be an ambiguity across the plane (i.e. 
+ the source might be either side of it.</dd>
+ <dt><strong>Volumetric Arrays</strong></dt>
+ <dd>Two unambiguous bearings, a horizontal angle and and elevation angle, are caclulated relative to 
+ the arrays coordinate frame.</dd>  
+ </dl>
+ 
+ <p>The localiser is designed to work with "small" or "compact" arrays, which needs some definition. A small 
+ array is one in which the spacing of the hydrophones is less than half the length of the Fourier Transforms 
+ used in the localisation calculation. Although this can be varied in the configuration of the localiser, for 
+ clicks, it will typically be a bit longer than the longest click you're likely to detect and for whistles, it's 
+ likely to be 512 points for a typical configuration of the PAMGuard 
+ <a href="../../../detectors/whistleMoanHelp/docs/whistleMoan_Overview.html">Whistle and Moan Detector</a> for data sampled at 
+ 48kHz for a given Fourier Transform length, the maximum hydrophone separation is</p>
+ <p>max Separation = FTTLength / sampleRate * speedOfSound / 2</p>
+<p>The table below shows some typical maximum hydrophone separations for common configurations</p>
+<table>
+<tr>
+<th>Species</th><th>Sample Rate</th><th>FFT Length</th><th>Max Separation</th>
+</tr>
+<tr>
+<td align="center">Sperm Whale</td><td align="center">48 kHz</td><td align="center">1024</td><td align="center">16m</td>
+</tr>
+<tr>
+<td align="center">Porpoise</td><td align="center">500 kHz</td><td align="center">512</td><td align="center">77cm</td>
+</tr>
+<tr>
+<td align="center">Dolphin Whistles</td><td align="center">48 kHz</td><td align="center">512</td><td align="center">8m</td>
+</tr>
+<tr>
+<td align="center">Baleen Whale</td><td align="center">2 kHz</td><td align="center">256</td><td align="center">96m</td>
+</tr>
+
+</table> 
+<br>
+<p>In practice it is often better to keep hydrophone spacings to a lot less than this, for example, if clicks become too widely separated, 
+then the 
+<a href="../../../detectors/clickDetectorHelp/docs/ClickDetector_clickDetector.html">Click Detector</a> might separate them into separate detections. It is therefore generally wise to keep hydrophone separation small.  
+ <br>
+ <p>The bearing calculator can work with data from any detector in PAMGuard or with data marked manually on a 
+ <a href="../../../displays/spectrogramDisplayHelp/docs/UserDisplay_Spectrogram.html">spectrogram display</a>.</p> 
+     
+ <p>Both Time Of Arrival and Beam Forming algorithms are available. Note that the Time of arrival algorithms are the same as those already
+ built into the  
+<a href="../../../detectors/clickDetectorHelp/docs/ClickDetector_clickDetector.html">Click Detector</a> so there is little point in running
+these a second time on 
+<a href="../../../detectors/clickDetectorHelp/docs/ClickDetector_clickDetector.html">Click Detector</a> output.</p> 
+ 
+
+<br>
+	<p class="nextLink">
+		<a href="BL_Settings.html">Next: Configuring the module</a>
+	</p>
+</body>
+</html>

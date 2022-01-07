@@ -1,0 +1,143 @@
+package dbht;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.IOException;
+
+import PamguardMVC.PamDataUnit;
+import binaryFileStorage.BinaryDataSource;
+import binaryFileStorage.BinaryHeader;
+import binaryFileStorage.BinaryObjectData;
+import binaryFileStorage.ModuleFooter;
+import binaryFileStorage.ModuleHeader;
+import binaryFileStorage.PackedBinaryObject;
+
+public class DbHtDataSource extends BinaryDataSource {
+
+	private DbHtDataBlock dbHtDataBlock;
+	private DbHtControl dBHtControl;
+	private static final int currentVersion = 2;
+
+	public DbHtDataSource(DbHtControl dBHtControl, DbHtDataBlock dbHtDataBlock) {
+		super(dbHtDataBlock);
+		this.dBHtControl = dBHtControl;
+		this.dbHtDataBlock = dbHtDataBlock;
+	}
+
+	@Override
+	public byte[] getModuleHeaderData() {
+		return null;
+	}
+
+	@Override
+	public int getModuleVersion() {
+		return currentVersion;
+	}
+
+	@Override
+	public String getStreamName() {
+		return "dBHt";
+	}
+
+	@Override
+	public int getStreamVersion() {
+		return 1;
+	}
+
+	@Override
+	public void newFileOpened(File outputFile) {
+
+	}
+
+	private ByteArrayOutputStream bos;
+	private DataOutputStream dos;
+	
+	@Override
+
+	public BinaryObjectData getPackedData(PamDataUnit pamDataUnit) {
+		DbHtDataUnit du = (DbHtDataUnit) pamDataUnit;
+
+		// make a byte array output stream and write the data to that, 
+		// then dump that down to the main storage stream
+		if (dos == null || bos == null) {
+			dos = new DataOutputStream(bos = new ByteArrayOutputStream());
+		}
+		else {
+			bos.reset();
+		}
+		/**
+		 * dB levels should never be more than 100 or so. 
+		 * To save space for PAMBUOY, will write dB values as int16
+		 * data, scaled up by 100, so max dB scale is between -327.68 and + 327.67 dB
+		 */
+		try {
+//			dos.writeLong(du.getStartSample()); as of version 2, start sample included in DataUnitBaseData
+//			dos.writeInt(du.getChannelBitmap()); as of version 2, start sample included in DataUnitBaseData
+			dos.writeShort((int) Math.round(du.getRms()*100.));
+			dos.writeShort((int) Math.round(du.getZeroPeak()*100.));
+			dos.writeShort((int) Math.round(du.getPeakPeak()*100.));
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+
+//		getBinaryStorageStream().storeData(1, du.getTimeMilliseconds(), bos.toByteArray());
+		return new BinaryObjectData(1, bos.toByteArray());
+	}
+
+	@Override
+	public PamDataUnit sinkData(BinaryObjectData binaryObjectData,
+			BinaryHeader bh, int moduleVersion) {
+		ByteArrayInputStream bis = new ByteArrayInputStream(binaryObjectData.getData(), 
+				0, binaryObjectData.getDataLength());
+		DataInputStream dis = new DataInputStream(bis);
+		
+		int channelMap;
+		long startSample;
+		double rms, zp, pp;
+		try {
+			if (moduleVersion<2) {
+				startSample = dis.readLong();
+				channelMap = dis.readInt();
+			} else {
+				startSample = binaryObjectData.getDataUnitBaseData().getStartSample();
+				channelMap = binaryObjectData.getDataUnitBaseData().getChannelBitmap();
+			}
+			rms = dis.readShort();
+			zp = dis.readShort();
+			pp = dis.readShort();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+		
+		long duration = (long) (dBHtControl.dbHtParameters.measurementInterval * dBHtControl.getDbHtProcess().getSampleRate());
+		
+		DbHtDataUnit du = new DbHtDataUnit(binaryObjectData.getTimeMilliseconds(), channelMap, startSample, duration);
+		du.setRms(rms/100.);
+		du.setZeroPeak(zp/100.);
+		du.setPeakPeak(pp/100.);
+		
+		return du;
+	}
+
+	@Override
+	public ModuleFooter sinkModuleFooter(BinaryObjectData binaryObjectData,
+			BinaryHeader bh, ModuleHeader moduleHeader) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ModuleHeader sinkModuleHeader(BinaryObjectData binaryObjectData,
+			BinaryHeader bh) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}

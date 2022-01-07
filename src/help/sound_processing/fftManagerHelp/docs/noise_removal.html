@@ -1,0 +1,61 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
+<title>Configuring an FFT Engine</title>
+</head>
+
+<body>
+
+<h1>FFT Engine</h1>
+<h2>Noise Removal</h2><br>
+<p>The FFT Engine contains five different noise removal processes</p><br>
+<b>
+<p><a  href="#clickremoval">Click Removal</a><br></p>
+<p><a  href="#medianfilter">Median Filter</a><br></p>
+<p><a  href="#averagesubtraction">Average Subtraction</a><br> </p>
+<p><a  href="#kernelsmoothing">Gaussian Kernel Smoothing</a><br></p>
+<p><a  href="#thresholding">Thresholding</a><br></p><br>
+</b>
+<p>Each method can be enabled individually</p>
+<br>
+<h3><a name="clickremoval"></a>Click Removal</h3>
+<p>
+The click removal method operates on the time series data prior to the FFT calculation
+and therefore affects both output streams of the FFT Engine.
+<p>
+Click removal measures the standard deviation of
+		the time series data and then multiplies the signal
+		by a factor which increases rapidly for large signal
+		components. This has the effect of reducing the magnitude 
+		of short duration transient signals such as echolocation clicks
+</p>
+<h3><a name="medianfilter"></a>Median Filter</h3>
+<p>Within each spectrogram slice, the 
+		             median value about each point is
+		             taken and subtracted from that point.
+</p>
+<h3><a name="averagesubtraction"></a>Average Subtraction</h3>
+<p>
+A decaying average spectrogram is computed
+and subtracted from the current spectrogram value.
+</p>
+<h3><a name="kernelsmoothing"></a>Gaussian Kernel Smoothing</h3>
+<p>The spectrogram is smoothed by convolving 
+		             the image with a Gaussian smoothing kernel<p>
+		             1 2 1<br>
+		             2 4 2<br>
+		             1 2 1.
+</p>
+<h3><a name="thresholding"></a>Thresholding</h3>
+<p>
+A threshold is applied and all data
+falling below that threshold set to 0.
+</p>
+
+
+<br><br>
+
+<p CLASS="previousLink"><a href="FFTEngine_Configuring.html">Previous:	Creating an FFT Engine		 </a></p>
+
+</body>
+</html>

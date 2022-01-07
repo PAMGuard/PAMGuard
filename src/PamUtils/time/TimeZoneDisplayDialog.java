@@ -1,0 +1,193 @@
+package PamUtils.time;
+
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.TextArea;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.TimeZone;
+
+import javax.swing.ButtonGroup;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextArea;
+import javax.swing.border.TitledBorder;
+
+import PamUtils.PamCalendar;
+import PamView.dialog.PamDialog;
+import PamView.dialog.PamGridBagContraints;
+
+public class TimeZoneDisplayDialog extends PamDialog {
+	
+	private JRadioButton useUTC, usePC, useOther;
+	private JComboBox<String> timeZones;
+	private JLabel pcTimeZone;
+	private String[] timeZoneIds;
+	private TimeDisplayParameters timeDisplayParameters;
+	private TimeZone thisTimeZone;
+	private int utcTZIndex, pcTZIndex;
+	private static TimeZoneDisplayDialog singleInstance;
+
+	private TimeZoneDisplayDialog(Window parentFrame) {
+		super(parentFrame, "Time Zone", true);
+		
+		JPanel tzPanel = new JPanel(new GridBagLayout());
+		tzPanel.setBorder(new TitledBorder("Select Time Zone"));
+		GridBagConstraints c = new PamGridBagContraints();
+		c.gridwidth = 2;
+		tzPanel.add(useUTC = new JRadioButton("Display in UTC"), c);
+		c.gridy++;
+		c.gridwidth = 2;
+		tzPanel.add(usePC = new JRadioButton("Use PC Local Time"), c);
+		c.gridx+=c.gridwidth;
+		c.gridwidth = 1;
+		tzPanel.add(pcTimeZone = new JLabel(" PC Zone", JLabel.LEFT),c);
+		c.gridy++;
+		c.gridx = 0;
+		tzPanel.add(useOther = new JRadioButton("Other"), c);
+		c.gridx++;
+		c.gridwidth = 2;
+		tzPanel.add(timeZones = new JComboBox<>(), c);
+		c.gridwidth = 3;
+		c.gridy++;
+		c.gridx = 0;
+		JLabel ta = new JLabel();
+		ta.setText("<html>Note that all processing and data storage will continue to <p>use UTC, the selection " +
+		"you make here \nwill only affect what is displayed on the screen");
+		tzPanel.add(ta, c);
+		
+		ButtonGroup bg = new ButtonGroup();
+		bg.add(useUTC);
+		bg.add(usePC);
+		bg.add(useOther);
+
+		thisTimeZone = Calendar.getInstance().getTimeZone();
+		timeZoneIds = TimeZone.getAvailableIDs();
+		Arrays.sort(timeZoneIds, new TimeZoneComparator());
+		TimeZone tz;
+		String tzStr;
+		for (int i = 0; i < timeZoneIds.length; i++) {
+			tz = TimeZone.getTimeZone(timeZoneIds[i]);
+			if (timeZoneIds[i].equals(PamCalendar.defaultTimeZone.getID())) {
+				utcTZIndex = i;
+			}
+			if (timeZoneIds[i].equals(thisTimeZone.getID())) {
+				pcTZIndex = i;
+			}
+			if (tz.getRawOffset() < 0) {
+				tzStr = String.format("UTC%3.1f %s (%s)", (double)tz.getRawOffset()/3600000., tz.getID(), tz.getDisplayName());
+			}
+			else {
+				tzStr = String.format("UTC+%3.1f %s (%s)", (double)tz.getRawOffset()/3600000., tz.getID(), tz.getDisplayName());
+			}
+			timeZones.addItem(tzStr);
+		}
+		
+		ButtonChanged bc = new ButtonChanged();
+		useUTC.addActionListener(bc);
+		usePC.addActionListener(bc);
+		useOther.addActionListener(bc);
+		
+		setDialogComponent(tzPanel);
+	}
+	
+	public static TimeDisplayParameters showDialog(Window parentFrame, TimeDisplayParameters timeDisplayParameters) {
+		singleInstance = new TimeZoneDisplayDialog(parentFrame);
+		singleInstance.setParams(timeDisplayParameters);
+		singleInstance.setVisible(true);
+		return singleInstance.timeDisplayParameters;
+	}
+	
+	private class ButtonChanged implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			enableControls();
+			showSelection();
+		}
+		
+	}
+
+	private void setParams(TimeDisplayParameters timeDisplayParameters) {
+		this.timeDisplayParameters = timeDisplayParameters;
+		useUTC.setSelected(timeDisplayParameters.zoneType == TimeDisplayParameters.TIME_ZONE_UTC);
+		usePC.setSelected(timeDisplayParameters.zoneType == TimeDisplayParameters.TIME_ZONE_PC);
+		useOther.setSelected(timeDisplayParameters.zoneType == TimeDisplayParameters.TIME_ZONE_OTHER);
+		pcTimeZone.setText(String.format("(%s / %s)", thisTimeZone.getID(), thisTimeZone.getDisplayName()));
+		enableControls();
+		showSelection();
+	}
+
+	public void showSelection() {
+		if (useUTC.isSelected()) {
+			timeZones.setSelectedIndex(utcTZIndex);
+		}
+		else if (usePC.isSelected()) {
+			timeZones.setSelectedIndex(pcTZIndex);
+		}
+		else {
+			setSelTimeZone(timeDisplayParameters.timeZone);
+		}
+		
+	}
+
+	private void setSelTimeZone(TimeZone timeZone) {
+		if (timeZone == null) {
+			return;
+		}
+		int ind = findTimeZoneIndex(timeZone);
+		timeZones.setSelectedIndex(ind);
+	}
+
+	private int findTimeZoneIndex(TimeZone timeZone) {
+		for (int i = 0; i < timeZoneIds.length; i++) {
+			if (timeZoneIds[i].equals(timeZone.getID())) {
+				return i;
+			}
+		}
+		return 0;
+	}
+
+	public void enableControls() {
+		timeZones.setEnabled(useOther.isSelected());
+	}
+
+	@Override
+	public boolean getParams() {
+		if (useUTC.isSelected()) {
+			timeDisplayParameters.zoneType = TimeDisplayParameters.TIME_ZONE_UTC;
+			timeDisplayParameters.timeZone = PamCalendar.defaultTimeZone;
+		}
+		else if (usePC.isSelected()) {
+			timeDisplayParameters.zoneType = TimeDisplayParameters.TIME_ZONE_PC;
+			timeDisplayParameters.timeZone = thisTimeZone;
+		}
+		else if (useOther.isSelected()) {
+			timeDisplayParameters.zoneType = TimeDisplayParameters.TIME_ZONE_OTHER;
+			int tzInd = timeZones.getSelectedIndex();
+			if (tzInd < 0) {
+				return showWarning("You must select a time zone from the drop down list");
+			}
+			timeDisplayParameters.timeZone = TimeZone.getTimeZone(timeZoneIds[tzInd]);
+		}
+		return timeDisplayParameters.timeZone != null;
+	}
+
+	@Override
+	public void cancelButtonPressed() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void restoreDefaultSettings() {
+		// TODO Auto-generated method stub
+		
+	}
+
+}

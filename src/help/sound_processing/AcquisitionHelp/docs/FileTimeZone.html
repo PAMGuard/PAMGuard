@@ -1,0 +1,488 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
+<title>Time Zones</title>
+</head>
+<body>
+<h1>File Time Options</h1>
+<h2>File Times</h2>
+<p>PAMGuard will attempt to automatically derive a date and time from audio file names. While we have programmed in a large number
+of different time and date formats, we cannot capture them all so it's sometimes necessary to tell PAMGuard exactly how to extract date
+and time information from a file name. Characters (a-z) and be stripped automatically, but problems arise if other numbers are present.</p>
+<p>An example of names that can't be unpacked automatically might be</p>
+<p>1677738025.180912073628.d24.d8.wav</p>
+<p>The actual date is 12 September 2018 at 07:36:28. however it is impossible for PAMGuard to work out that the date information is between
+the second and third '.' characters and that the rest of the name should be ignored.</p> 
+<p>To define your own file format, select 'User defined date format' then in the format field, enter a set of characters that will tell PAMGuard
+how to unpack the information.</p> 
+<p>For every character in the file name that is NOT part of the date, enter the # character. The number of # must exactly match 
+the number of characters preceding the date part of the name. Leading and trailing non numeric characters will also be stripped automatically 
+after characters corresponding to a # have been removed. 
+<br>For the date section, Java lays down strict rules for how each character should be represented details of 
+which are <a href="https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html">here</a> and below. 
+Note that most of these are case sensitive, e.g. MM is for month and mm is for minute. 
+
+<table class=MsoNormalTable border=0 cellspacing=3 cellpadding=0
+ summary="Chart shows pattern letters, date/time component, presentation, and examples.">
+ <tr>
+  <td style='background:#CCCCFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><b>Letter </b></p>
+  </td>
+  <td style='background:#CCCCFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><b>Date or Time
+  Component </b></p>
+  </td>
+  <td style='background:#CCCCFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><b>Presentation </b></p>
+  </td>
+  <td style='background:#CCCCFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><b>Examples </b></p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>G</span> </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'>Era designator </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><a
+  href="https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html#text"><span
+  style='color:blue'>Text</span></a> </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>AD</span> </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>y</span> </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'>Year </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><a
+  href="https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html#year"><span
+  style='color:blue'>Year</span></a> </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>1996</span>; <span style='font-size:10.0pt;
+  font-family:"Courier New"'>96</span> </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>Y</span> </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'>Week year </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><a
+  href="https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html#year"><span
+  style='color:blue'>Year</span></a> </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>2009</span>; <span style='font-size:10.0pt;
+  font-family:"Courier New"'>09</span> </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>M</span> </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'>Month in year (context
+  sensitive) </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><a
+  href="https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html#month"><span
+  style='color:blue'>Month</span></a> </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>July</span>; <span style='font-size:10.0pt;
+  font-family:"Courier New"'>Jul</span>; <span style='font-size:10.0pt;
+  font-family:"Courier New"'>07</span> </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>L</span> </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'>Month in year
+  (standalone form) </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><a
+  href="https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html#month"><span
+  style='color:blue'>Month</span></a> </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>July</span>; <span style='font-size:10.0pt;
+  font-family:"Courier New"'>Jul</span>; <span style='font-size:10.0pt;
+  font-family:"Courier New"'>07</span> </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>w</span> </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'>Week in year </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><a
+  href="https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html#number"><span
+  style='color:blue'>Number</span></a> </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>27</span> </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>W</span> </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'>Week in month </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><a
+  href="https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html#number"><span
+  style='color:blue'>Number</span></a> </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>2</span> </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>D</span> </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'>Day in year </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><a
+  href="https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html#number"><span
+  style='color:blue'>Number</span></a> </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>189</span> </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>d</span> </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'>Day in month </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><a
+  href="https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html#number"><span
+  style='color:blue'>Number</span></a> </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>10</span> </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>F</span> </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'>Day of week in month </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><a
+  href="https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html#number"><span
+  style='color:blue'>Number</span></a> </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>2</span> </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>E</span> </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'>Day name in week </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><a
+  href="https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html#text"><span
+  style='color:blue'>Text</span></a> </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>Tuesday</span>; <span style='font-size:
+  10.0pt;font-family:"Courier New"'>Tue</span> </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>u</span> </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'>Day number of week (1 =
+  Monday, ..., 7 = Sunday) </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><a
+  href="https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html#number"><span
+  style='color:blue'>Number</span></a> </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>1</span> </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>a</span> </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'>Am/pm marker </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><a
+  href="https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html#text"><span
+  style='color:blue'>Text</span></a> </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>PM</span> </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>H</span> </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'>Hour in day (0-23) </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><a
+  href="https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html#number"><span
+  style='color:blue'>Number</span></a> </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>0</span> </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>k</span> </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'>Hour in day (1-24) </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><a
+  href="https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html#number"><span
+  style='color:blue'>Number</span></a> </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>24</span> </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>K</span> </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'>Hour in am/pm (0-11) </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><a
+  href="https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html#number"><span
+  style='color:blue'>Number</span></a> </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>0</span> </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>h</span> </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'>Hour in am/pm (1-12) </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><a
+  href="https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html#number"><span
+  style='color:blue'>Number</span></a> </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>12</span> </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>m</span> </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'>Minute in hour </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><a
+  href="https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html#number"><span
+  style='color:blue'>Number</span></a> </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>30</span> </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>s</span> </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'>Second in minute </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><a
+  href="https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html#number"><span
+  style='color:blue'>Number</span></a> </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>55</span> </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>S</span> </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'>Millisecond </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><a
+  href="https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html#number"><span
+  style='color:blue'>Number</span></a> </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>978</span> </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>z</span> </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'>Time zone </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><a
+  href="https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html#timezone"><span
+  style='color:blue'>General time zone</span></a> </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>Pacific Standard Time</span>; <span
+  style='font-size:10.0pt;font-family:"Courier New"'>PST</span>; <span
+  style='font-size:10.0pt;font-family:"Courier New"'>GMT-08:00</span> </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>Z</span> </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'>Time zone </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><a
+  href="https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html#rfc822timezone"><span
+  style='color:blue'>RFC 822 time zone</span></a> </p>
+  </td>
+  <td style='background:#EEEEFF;padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>-0800</span> </p>
+  </td>
+ </tr>
+ <tr>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>X</span> </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'>Time zone </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><a
+  href="https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html#iso8601timezone"><span
+  style='color:blue'>ISO 8601 time zone</span></a> </p>
+  </td>
+  <td style='padding:0cm 0cm 0cm 0cm'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-size:
+  10.0pt;font-family:"Courier New"'>-08</span>; <span style='font-size:10.0pt;
+  font-family:"Courier New"'>-0800</span>; <span style='font-size:10.0pt;
+  font-family:"Courier New"'>-08:00</span></p>
+  </td>
+ </tr>
+</table>
+<p>The example below shows an appropriate date format string used to correctly unpack the above example file name</p>
+
+<p><center><img alt="time Zone Dialog" src="images/NewDateOptions.png" /></center></p>
+<br><br>
+<h2>Time Zone</h2>
+<p>Ideally, all PAMGuard data should be referenced to UTC, this makes it easy to align with GPS data and data from other sources.</p>
+<p>Sometimes, it is necessary to process audio files which do not have a UTC based time encoded in their file name, but are referenced to some other time zone.</p>
+<p>The File Date Settings dialog allows you to set the time zone and any additional time offsets for an audio file or set of audio files.</p>
+
+
+<p>The time zone offset and optional daylight saving will be SUBTRACTED from the time value extracted from the file name.</p>
+<p>The additional time offset will be ADDED to the time value extracted from the file name.</p>
+<p>Check and double check that the time extracted from the file and corrected for time zone and offset is correct before
+processing sound file data.</p>
+
+<br><br>
+</body>
+</html>

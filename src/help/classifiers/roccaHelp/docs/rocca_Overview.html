@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+<link href="../../../pamHelpStylesheet.css" type="text/css" rel="STYLESHEET"><title>ROCCA Classifier Overview</title>
+
+</head>
+<body>
+<h1>ROCCA</h1>
+<h2>Overview</h2>
+<p>The ROCCA (Real-time Odontocete Call Classification Algorithm)
+module is intended to provide a set of measured variables for detected
+acoustic events. The variables differ depending on whether the acoustic
+detection is a delphinid whistle or click. ROCCA uses these parameters
+in conjunction with a user-selected random forest classification model
+to classify the whistle or click to species. Three random forest models
+are available; one for odontocete species in the northwest Atlantic,
+one for species in the temperate Pacific and one for species in the
+waters surrounding Hawaii.</p>
+<p>Individual
+whistle/click detections and classifications are grouped into
+user-defined <a href="rocca_Sidebar.html">Encounter
+Numbers</a>. An encounter is defined as&nbsp;a set of
+whistles and/or clicks that
+can all be attributed to one school of odontocetes. Variables
+describing the acoustic behavior of the encounter are <a href="rocca_WhistleSchoolClassification.html#SchoolClassification">
+measured</a> from the
+whistle and click detections for that encounter. Each encounter is
+classified based on information from detected whistles, clicks and
+ancillary variables using the encounter classifier,&nbsp;or as the
+species with the highest number of random forest tree votes if no event
+classifier has been selected. </p>
+<br>
+<h3>Delphinid Whistles</h3>
+<p>ROCCA classifies delphinid whistles based on spectrographic
+measurements extracted from whistle contours. The contour extraction
+algorithm <a href="rocca_WhistleSchoolClassification.html">measures</a>
+50 different variables for each contour. Whistles can be classified
+based on measurements taken manually or based on measurements taken
+automatically. Manual classifiers are available for species in the
+tropical Pacific Ocean (TropPacWhist.model) and for species in the
+northwest Atlantic
+(NWAtlWhist.model). Automated whistle
+classifiers are available for species in the northwest Atlantic
+(NWAtlWhist_auto.model),
+the temperate Pacific (TempPacWhist_auto.model) and the waters
+surrounding Hawaii (HIWhist_auto.model).</p>
+<p>The manual classifier requires seven main steps:
+</p>
+<ol>
+<li>
+<p>User selects a whistle from the spectrogram display by
+drawing a box around it using the cursor</p>
+</li>
+<li>
+<p>The whistle is captured by ROCCA and displayed in a new
+spectrogram window
+window</p>
+</li>
+<li>
+<p>The whistle contour is traced either automatically by
+ROCCA or
+manually using the cursor. The user can manipulate the trace, if
+desired</p>
+</li>
+<li>
+<p>The time-frequency points are automatically extracted from
+the contour</p>
+</li>
+<li>
+<p>The contour parameters are automatically measured</p>
+</li>
+<li>
+<p>The contour is classified using the currently-loaded
+classifier model</p>
+</li>
+<li>
+<p>The classified whistle statistics are added to the
+specified Encounter in the GUI display and the saved
+data files</p>
+</li>
+</ol>
+<p>ROCCA can also be used in conjunction with the <a href="../../whistleMoanHelp/docs/whistleMoan_Overview.html">Whistle
+&amp; Moan Detector</a> module to measure and classify
+whistles detected and extracted automatically.</p>
+<br>
+<h3>Odontocete Clicks</h3>
+<p>ROCCA <a href="rocca_WhistleSchoolClassification.html">measures</a>
+17 variables from clicks passed to it by the <a href="../../clickDetectorHelp/docs/ClickDetector_clickDetector.html">Click
+Detector</a> module. Each click is classified to species based on
+these variables and the currently loaded classifier model, and the
+click statistics are added to the specified&nbsp;Encounter
+in the GUI display and the saved data files.</p>
+<p>Classifiers are available for species in the tropical Pacific
+Ocean (TropPacClick.model),&nbsp;the northwest Atlantic
+(NWAtlClick.model), the temperate Pacific (TempPacClick.model) and the
+waters surrounding Hawaii (HIClick.model).</p>
+<br>
+<h3>Encounters</h3>
+<p>ROCCA <a href="rocca_WhistleSchoolClassification.html">measures</a>
+17 variables from the whistles and clicks classified within each
+encounter. The encounter is classified to species based on
+these variables and the currently loaded classifier model, and the
+results are passed to the GUI display and the saved data files.
+&nbsp;Note that if no encounter classifier has been specified, the
+encounter will be classified based on the species in the encounter with
+the highest cumulative percentage of random forest tree votes.</p>
+<p>Classifiers are available for encounters in the tropical Pacific
+Ocean (TropPacEnc.model),&nbsp;the northwest Atlantic
+(NWAtlEnc.model), the temperate Pacific (TempPacEnc.model) and the
+waters surrounding Hawaii (HIEnc.model).</p>
+<br>
+<br>
+<h4>References</h4>
+<p><em>Oswald, J. N., Rankin, S., Barlow, J., and Lammers, M. O. (2007). 
+“A tool for real-time acoustic species identification of delphinid whistles,” 
+<a href="https://asa.scitation.org/doi/10.1121/1.2743157">The Journal of the Acoustical Society of America, 122, 587</a>.</em></p>
+
+<br>
+<p class="nextLink"><a href="rocca_Configure.html">Next:
+Configuring ROCCA</a></p>
+<br>
+<br>
+<br>
+</body></html>

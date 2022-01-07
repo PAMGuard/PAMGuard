@@ -1,0 +1,58 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
+<title>Adding a New Hydrophone</title>
+</head>
+
+<body>
+
+<h1>Hydrophone Array</h1>
+<h2>New Streamer Dialog</h2><br>
+
+The Streamer dialog has changed in release 1.13. 
+<p>
+<img alt="Image" src="./Images/NewStreamer.png"/><br><br>
+<p>The Streamer name is for information purposes only. </p>
+
+<h3>Reference Position</h3>
+<p>Streamer locations can be referenced to either the "Ships GPS Data" or to "Fixed location (moorings and buoys)". 
+If GPS data is selected then the system will automatically connect to data from the 
+<a href="../../../mapping/NMEA/docs/ConfiguringGPS.html">GPS Module</a>. If a fixed location is selected, then 
+additional options will appear allowing you to enter a reference Latitude and Longitude.  
+</p>
+<img alt="Image" src="./Images/FixedStreamer.png"/><br>
+<p>To change the position, use the menu on the button to the right of the displayed location. It is possible 
+to enter a new value manually, take the current GPS position or to paste in the last location clicked on the 
+<a href="../../../mapping/mapHelp/docs/overview.html">PAMGuard map</a>.
+<br>
+<h3>Hydrophone Locator Method</h3>
+<p>Two methods are available for calculating true hydrophone coordinates from the reference position. These are 
+the "Threading Streamer" locator and the "Straight / Rigid Streamer" locator.</p>
+<p>The Threading system is most applicable to towed hydrophone systems referenced to ship GPS data. It assumes that 
+the streamer cable exactly follows the track of the vessel as it goes round corners. However, for hydrophones mounted
+rigidly on the hull of a vessel it would be more sensible to use the Straight / Rigid method. </p>
+<p>If the reference position is a fixed location, then it only makes sense to use the Straight / Rigid method.</p>
+<br>
+<h3>Hydrophone Coordinates</h3>
+<p>Enter the hydrophone coordinates  in metres relative to the reference position. </p>
+<p>Also enter estimates of the errors on those coordinates.</p>
+
+<h3>Orientation data</h3>
+<p>For GPS referenced locations, if these values are not null, they will override heading values from the GPS data. If they are null, 
+then the GPS values will be used.  
+Some users are starting to collect orientation data for hydrophones which can give a more accurate 
+position than relying on the threading hydrophone model. No systems for collecting these data are yet built 
+into PAMGuard and have to date only been imported during offline analysis of data. Expect further developments in this 
+area in the near future !</p>
+
+<br>
+<h3>Interpolation</h3>
+<p>Things sometimes move ! As we start to incorporate sensors into our arrays, it will be necessary to chose how to pick 
+a position from a list of evolving positions over time.</p><p>These options tell the system to take the latest value entered by the user, 
+to interpolate between values bracketing the time of an event or to use the values immediately preceding an event.<p>   
+
+<p CLASS="previousLink"><a href="Array_Configuration.html">Previous:	Array Configuration</a></p>
+<p CLASS="nextLink"><a href="Array_NewHydrophone.html">Next: Hydrophone Dialog </a></p>
+
+</body>
+</html>

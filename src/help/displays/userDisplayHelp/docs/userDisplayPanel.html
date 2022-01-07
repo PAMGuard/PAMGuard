@@ -1,0 +1,64 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
+<title>User Display Panel</title>
+</head>
+
+<body>
+
+<h1>User Display Panel</h1>
+<h2>User Display Panel</h2>
+
+<h3>Overview</h3>
+<p>
+User display panels are containers for other types of display window. </p>
+<p>Each User Display panel will appear as a new tab on the PAMGUARD GUI and can contain multiple display windows.
+</p>
+
+<img alt="Scroller coupling dialog" src="./images/userdisplay.png"/><br>
+
+<p>Currently supported standard display windows that can be incorporated into 
+a display panel are: <br>
+<a href="../../spectrogramDisplayHelp/docs/UserDisplay_Spectrogram.html">Spectrogram displays</a><br> 
+<a href="../../radarDisplayHelp/docs/UserDisplay_Radar.html">'Radar' displays</a><br>
+<a href="../../../mapping/mapHelp/docs/overview.html">Maps</a><br>
+<a href="../../timedisplayfx/docs/timedisplayfx.html">Time based displays</a>
+</p>
+
+<p>Several other PAMGuard modules may also create display windows which can be shown in a user display
+panel. The display menu will automatically show these additional displays when they are available.</p>
+
+<h3>Creating an instance of the user display</h3>
+<p>
+From the <i>File>Add module</i> menu, or from the pop-up menu on the data model display select "<i>User Display Panel</i>". 
+Enter a name for the new display panel (e.g. spectrograms, Ishmael data, etc) and press <i>Ok</i>. </p>
+
+<h3>Adding display windows to the user display</h3>
+<p>To add display windows to the user display, from the User Display menu select either <i>New Spectrogram…</i>, <i>New Radar Display…</i> etc.</p>
+
+<h3>Window Layout</h3>
+<p>Individual display windows may be dragged and resized in the normal way. Alternatively, you may use the options in the User <i>Display>Arrange Windows</i> sub menu. </p>
+<p>The positions of windows will be remembered when you exit PAMGUARD. </p>
+
+<h3>Scroller Coupling</h3>
+<p>Many display components, such as <a href="../../spectrogramDisplayHelp/docs/UserDisplay_Spectrogram.html">spectrograms</a>, 
+<a href="../../../mapping/mapHelp/docs/overview.html">the map</a> and 
+<a href="../../timedisplayfx/docs/timedisplayfx.html">time based displays</a> 
+contain a scroller which can be used to move back and forth through 
+data, particularly when using 
+<a href="../../../overview/PamMasterHelp/docs/viewerMode.html">PAMGuard Viewer mode</a> to review previously analysed data. 
+<p>Rules for scroller coupling are set from the <i>User Display / Scroller Coupling</i> menu:</p>
+<img alt="Scroller coupling dialog" src="./images/scrollcoupling.png"/>
+<p>
+No Coupling: Scrollers will not be coupled and can be moved independently.<br>
+Couple scroller starts: Start times of scrollers will follow each other.<br>
+Couple scroller middles: Middle / centre times of scrollers will follow each other.<br>
+Couple scroller range: Scrollers will maintain overlap, but more more independently.<br>
+<br>
+
+
+<p CLASS="previousLink"><a href="									 ">			 </a></p>
+<p CLASS="nextLink"><a href="											 ">							 </a></p>
+
+</body>
+</html>

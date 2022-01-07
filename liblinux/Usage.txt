@@ -1,0 +1,30 @@
+								REQUIRED BY
+14/03/2012  14:11           823,296 j3dcore-d3d.dll			Java3d
+14/03/2012  14:11            40,960 j3dcore-ogl-cg.dll		Java3d
+14/03/2012  14:11            49,152 j3dcore-ogl-chk.dll		Java3d
+14/03/2012  14:11           163,840 j3dcore-ogl.dll			Java3d
+									jasiohost32.dll			new for ASIO card usage
+07/03/2012  11:53            61,723 jninidaqmx.dll			NI card usage
+									libj3dcore-ogl-cg.so	Java3d
+									libj3dcore-ogl.so		Java3d
+14/03/2012  14:11            14,615 libjniAlsaLibrary.so	
+14/03/2012  14:11            47,665 libjninidaqmx.so		NI card usage
+									libPamguardJNI.so		hfdaq card (x)
+14/03/2012  14:11            45,271 librxtxParallel.so		
+14/03/2012  14:11           169,488 librxtxSerial.jnilib	
+14/03/2012  14:11           146,489 librxtxSerial.so		serial port usage
+14/03/2012  14:11            15,326 mccjniinterface.dll		Measurement Computing-Depth Sensors
+14/03/2012  14:11               216 pamguardasio.def		
+14/03/2012  14:11           537,932 pamguardasio.dll		ASIO card usage
+14/03/2012  14:11            46,592 PamTiming.dll			
+14/03/2012  14:11            77,759 rxtxSerial.dll			serial port usage
+									
+									
+									ROOT
+07/01/2011  21:35           107,520 libgcc_s_dw2-1.dll		jninidaqmx.dll
+07/01/2011  21:35           879,630 libstdc++-6.dll			jninidaqmx.dll
+									libPamguardJNI.so		hfdaq card (x)
+
+
+
+Java 3d version 1.5.2!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

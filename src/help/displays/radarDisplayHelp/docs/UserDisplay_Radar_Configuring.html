@@ -1,0 +1,53 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
+<title>Radar Display</title>
+</head>
+
+<body>
+
+<h1>Radar Display</h1>
+<h2>Configuring a Radar display</h2>
+<p>Radar display options are set when the display is first created,    and they can be adjusted at any time using the popup menu accessed by right    clicking on the radar plot.  </p>
+<p>
+The Radar Display Parameters Dialog has two tabs
+<h3>Scales Tab</h3>
+<p><img alt="Scales - Range" src="./images/RadarScale_range.png"/> 
+  <img alt="Scales - Amplitude" src="./images/RadarScale_amplitude.png"/><br>
+  <br> 
+  <strong>Name: </strong>each display may be named individually as an aid to the user</p>
+<p><strong>Style:</strong>  select the type of radar display - Full, Right half, Left half, Front half or Rear half.
+<p><strong>Radial Axis: </strong>select either amplitude or distance.<br></br>
+If  planar or a volumetric array is being used and slant angle is available, 
+then there will be an additional option to display slant angle on the radial axis. 
+<p>
+The lower panel will automatically change between Amplitude Range 
+and Distance Range depending on the Radial Axis selection.
+<p>
+When using Amplitude Range, it is common to enter the maximum amplitude as 
+the minimum value so that louder sounds appear closer to the centre of the display. 
+It is however possible to enter these numbers the other way around so that louder 
+sounds are closer to the perimeter of the display.  
+
+
+<br><br>
+<h3>Detectors Tab</h3>
+<p><img alt="Scales - Range" src="./images/RadarDetectors.png"/> <br>
+  <br>
+The detector tab lists data blocks in the PAMGUARD system that can be overlaid 
+on the radar plot. The contents of this list will depend on which detectors are 
+included in the current PAMGUARD system. 
+</p>
+<p>
+To display data from a particular detector, tick the check box. Also enter the 
+time in seconds that you wish each detection to be displayed for. Generally 
+detections which occur at a high rate, such as clicks, should only be displayed for 
+a short amount of time. Detections that are less common (such as manually 
+tracked clicks) may displayed for longer without cluttering the display.  
+
+<p CLASS="previousLink"><a href="UserDisplay_Radar_Creating.html">Previous: Creating a radar display</a></p>
+
+
+<br><br>
+</body>
+</html>

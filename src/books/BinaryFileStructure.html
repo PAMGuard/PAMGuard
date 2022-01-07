@@ -1,0 +1,1679 @@
+<html>
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<meta name=Generator content="Microsoft Word 11 (filtered)">
+<title>Binary file structure for PAMGUARD detector output</title>
+<style>
+<!--
+ /* Font Definitions */
+ @font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0cm;
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman";}
+h1
+	{margin-top:12.0pt;
+	margin-right:0cm;
+	margin-bottom:3.0pt;
+	margin-left:21.6pt;
+	text-align:justify;
+	text-indent:-21.6pt;
+	page-break-after:avoid;
+	font-size:16.0pt;
+	font-family:Calibri;}
+h2
+	{margin-top:12.0pt;
+	margin-right:0cm;
+	margin-bottom:3.0pt;
+	margin-left:0cm;
+	page-break-after:avoid;
+	font-size:14.0pt;
+	font-family:Arial;
+	font-style:italic;}
+p.MsoTitle, li.MsoTitle, div.MsoTitle
+	{margin-top:12.0pt;
+	margin-right:0cm;
+	margin-bottom:3.0pt;
+	margin-left:0cm;
+	text-align:center;
+	font-size:16.0pt;
+	font-family:Arial;
+	font-weight:bold;}
+p.MsoBodyText, li.MsoBodyText, div.MsoBodyText
+	{margin-top:0cm;
+	margin-right:0cm;
+	margin-bottom:6.0pt;
+	margin-left:0cm;
+	text-align:justify;
+	font-size:12.0pt;
+	font-family:"Times New Roman";}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;}
+@page Section1
+	{size:612.0pt 792.0pt;
+	margin:72.0pt 90.0pt 72.0pt 90.0pt;}
+div.Section1
+	{page:Section1;}
+ /* List Definitions */
+ ol
+	{margin-bottom:0cm;}
+ul
+	{margin-bottom:0cm;}
+-->
+</style>
+
+</head>
+
+<body lang=EN-US link=blue vlink=purple>
+
+<div class=Section1>
+
+<p class=MsoTitle><span lang=EN-GB>Binary file structure for PAMGUARD detector
+output.</span></p>
+
+<p class=MsoNormal><span lang=EN-GB>Douglas Gillespie, 2010</span></p>
+
+<h1><span lang=EN-GB>1<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-GB>Introduction</span></h1>
+
+<p class=MsoBodyText><span lang=EN-GB>The primary storage site for PAMGUARD
+output data is a relational database (currently either MS Access or MySQL
+although other types may be added in the future). </span></p>
+
+<p class=MsoBodyText><span lang=EN-GB>Pre 2010, the only other storage
+solutions comes from the click detector which writes binary files in the
+RainbowClick (*.clk) file format since click data is often additionally
+processed using RainbowClick offline. Over the next year or so, this offline
+nalysis functionality will be added to PAMGUARD, making RainbowClick redundant.
+Long term support for the .clk format is therefore not required. </span></p>
+
+<p class=MsoBodyText><span lang=EN-GB>Current annoyances are </span></p>
+
+<p class=MsoBodyText style='margin-left:36.0pt;text-indent:-18.0pt'><span
+lang=EN-GB>1.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-GB>The database is not suitable for storage of
+variable record length data (e.g. a snip of click waveform as used by
+RainbowClick or the time/amplitude/frequency contour of a whistle)</span></p>
+
+<p class=MsoBodyText style='margin-left:36.0pt;text-indent:-18.0pt'><span
+lang=EN-GB>2.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-GB>The RainbowClick file binary format is awful –
+works OK from C, but is a nightmare in Java and is not practical to evolve. </span></p>
+
+<p class=MsoBodyText style='margin-left:36.0pt;text-indent:-18.0pt'><span
+lang=EN-GB>3.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-GB>The click files need to be written with a random
+access file writer which is more complicated than a simple data stream output
+(most Java output types)</span></p>
+
+<p class=MsoBodyText style='margin-left:36.0pt;text-indent:-18.0pt'><span
+lang=EN-GB>4.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-GB>Databases often have limited size</span></p>
+
+<p class=MsoBodyText><span lang=EN-GB>Therefore:</span></p>
+
+<p class=MsoBodyText style='margin-left:36.0pt;text-indent:-18.0pt'><span
+lang=EN-GB>1.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-GB>We need a replacement for the .clk file format.</span></p>
+
+<p class=MsoBodyText style='margin-left:36.0pt;text-indent:-18.0pt'><span
+lang=EN-GB>2.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-GB>We need something similar for other PAMGUARD
+output tasks. </span></p>
+
+<p class=MsoBodyText style='margin-left:18.0pt'><span lang=EN-GB>Therefore we
+need some new binary format storage solution which can be used by many
+different PAMGUARD modules for storing detector (and other) data. </span></p>
+
+<h1><span lang=EN-GB>2<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-GB>Binary storage options</span></h1>
+
+<p class=MsoBodyText><span lang=EN-GB>Java serialisation: Fast and easy to
+write out Java objects but cannot open these files with anything but Java (e.g.
+could not write a Matlab function to access the data). </span></p>
+
+<p class=MsoBodyText><span lang=EN-GB>Pure binary storage (like .clk files) :
+Need to translate data from each stored object from it’s Java form into a byte
+array prior to storage and convert back the other way afterwards. However, data
+would be readable in Matlab or any other program so long as you knew the format
+of each object. </span></p>
+
+<h1><span lang=EN-GB>3<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-GB>solution:</span></h1>
+
+<p class=MsoBodyText><span lang=EN-GB>A common file format for All PAMGUARD
+module output, pgdf for <u>P</u>AM<u>G</u>UARD <u>D</u>ata <u>F</u>ile.</span></p>
+
+<p class=MsoBodyText><span lang=EN-GB>Output (from PAMGUARD) will assume one
+way output and input streams rather than random access, although other programs
+could of course open the files in any way they wish. This means that the files
+will know their start time, which will be encoded in both the file name and the
+header, but the end time will only be accessible as the last object in the file
+– which may take time to read. </span></p>
+
+<p class=MsoBodyText><span lang=EN-GB>Smaller index files (.pgdx)  will be
+written to accompany each pgdf file which contain just the start header and end
+footer of each file, so that PAMGUARD can rapidly query a file repository to
+see what’s in it. </span></p>
+
+<p class=MsoBodyText><span lang=EN-GB>Files will have a common structure, which
+PAMGUARD will always be able to understand, although specific objects within
+the file will require information specific to a particular module. </span></p>
+
+<p class=MsoBodyText><span lang=EN-GB>For a specific PAMGUARD configuration,
+all output files will be stored in the same master directory, although it’s possible
+that this may contain multiple sub folders, e.g. one sub folder per day. </span></p>
+
+<p class=MsoBodyText><span lang=EN-GB>There will be a 1:1 correspondence
+between PAMGUARD data blocks and binary data streams (i.e. all objects in a
+given file should be of the same type). </span></p>
+
+<p class=MsoBodyText><span lang=EN-GB>Output will be a series of binary
+objects. Every object will start with an int32 (long) integer giving the size
+of that object in bytes. This number includes itself in the size calculation.
+So it will always be possible to skip through the file using the following
+pseudocode:</span></p>
+
+<p class=MsoBodyText><span lang=EN-GB style='font-family:"Courier New"'>While
+not eof</span></p>
+
+<p class=MsoBodyText><span lang=EN-GB style='font-family:"Courier New"'>objectSize
+= ReadLong()</span></p>
+
+<p class=MsoBodyText><span lang=EN-GB style='font-family:"Courier New"'>SkipForwardBytes(objectSize-4)</span></p>
+
+<p class=MsoBodyText><span lang=EN-GB style='font-family:"Courier New"'>Next</span></p>
+
+<p class=MsoBodyText><span lang=EN-GB>The objects for the header and footer
+will be rigidly defined. However the data objects can be in any format (it
+being the responsibility of individual module developers to ensure backwards
+compatibility should anything change). </span></p>
+
+<p class=MsoBodyText><span lang=EN-GB>Following the standard PAMGUARD header,
+is an optional control structure or module header. For example, a detector may
+which to write out it’s detection parameters at this point, probably as a Java
+serialised object, although anything is allowed, it being the stream that
+writes the data’s responsibility to read it back in in a sensible way. </span></p>
+
+<h2><span lang=EN-GB>Format for main files:</span></h2>
+
+<p class=MsoNormal style='text-autospace:none'><span lang=EN-GB>All numbers
+(short, int, long, float, double) are written using Big Endians, i.e. big byte
+first. This is the standard for the platform independent Java DataOutputStream
+class and the C default for Linux and Mac. Matlab can read these files by
+setting the file format, e.g. </span><span style='font-size:10.0pt;font-family:
+"Courier New";color:black'>f = fopen(fileName, </span><span style='font-size:
+10.0pt;font-family:"Courier New";color:#A020F0'>'r'</span><span
+style='font-size:10.0pt;font-family:"Courier New";color:black'>, </span><span
+style='font-size:10.0pt;font-family:"Courier New";color:#A020F0'>'ieee-be.l64'</span><span
+style='font-size:10.0pt;font-family:"Courier New";color:black'>);</span></p>
+
+<p class=MsoNormal style='text-autospace:none'><span lang=EN-GB>Windows C
+programmes processing the files would need to re-order bytes. </span></p>
+
+<span lang=EN-GB style='font-size:12.0pt;font-family:"Times New Roman"'><br
+clear=all style='page-break-before:always'>
+</span>
+
+<p class=MsoNormal style='text-autospace:none'><span lang=EN-GB>&nbsp;</span></p>
+
+<p class=MsoNormal><span lang=EN-GB>&nbsp;</span></p>
+
+<table class=MsoTableGrid border=1 cellspacing=0 cellpadding=0
+ style='border-collapse:collapse;border:none'>
+ <tr>
+  <td width=63 valign=top style='width:37.5pt;border:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>&nbsp;</span></p>
+  </td>
+  <td width=227 valign=top style='width:135.9pt;border:solid windowtext 1.0pt;
+  border-left:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>&nbsp;</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border:solid windowtext 1.0pt;
+  border-left:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Format</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border:solid windowtext 1.0pt;
+  border-left:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Notes</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=63 rowspan=14 valign=top style='width:37.5pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText align=center style='margin-top:0cm;margin-right:5.65pt;
+  margin-bottom:6.0pt;margin-left:5.65pt;text-align:center'><span lang=EN-GB
+  style='font-size:10.0pt'>File Header</span></p>
+  </td>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Length of file
+  header in bytes</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Int32</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Every object
+  will start with this number. </span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Object
+  Identifier</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Int32</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>-1</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Header /
+  general file Format</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Int32</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Hope this
+  changes very very rarely</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>“PAMGUARDDATA”</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Char(12)</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Just so it’s
+  obvious that this really is a P file</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>PAMGUARD
+  Version </span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>CharUTF*</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>e.g. 1.8.00</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>PAMGUARD
+  Branch</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>CharUTF*</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>e.g. Core,
+  Beta, etc. </span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Data Date</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Long (int64)</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Data time at
+  start of file in Java millis</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Analysis Date</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Long (int64)</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Time at which
+  analysis started (same as data time for real time)</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>File Start
+  Sample</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Long (int64)</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Current sample
+  number for this data stream</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Module type</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>CharUTF*</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Module type</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Module Name</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>CharUTF*</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Module name</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Stream Name</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>CharUTF*</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Data stream
+  name </span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Extra info
+  length</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Int32</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Length of
+  additional data</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Extra info</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>byte[]</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Additional
+  data</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=63 rowspan=5 valign=top style='width:37.5pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText align=center style='margin-top:0cm;margin-right:5.65pt;
+  margin-bottom:6.0pt;margin-left:5.65pt;text-align:center'><span lang=EN-GB
+  style='font-size:10.0pt'>Module specific Control Structure </span></p>
+  </td>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Length in File</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Int32</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Length of this
+  object = 16 + object binary length</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Object
+  Identifier</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Int32</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>-3  </span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Module version
+  Info</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Int32</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Version info
+  specific to the pamguard module writing data to this stream. </span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Object binary
+  Length</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Int32</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>= Length in
+  File – 16 (a bit of redundancy) ! Can be zero if there is no additional data</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Object Data</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Byte[]</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Length =
+  Object binary Length</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=63 rowspan=5 valign=top style='width:37.5pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText align=center style='margin-top:0cm;margin-right:5.65pt;
+  margin-bottom:6.0pt;margin-left:5.65pt;text-align:center'><span lang=EN-GB
+  style='font-size:10.0pt'>Object 1</span></p>
+  </td>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Length in File</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Int32</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Length of this
+  object</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Object
+  Identifier</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Int32</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>class
+  identifier which must be unique to this data stream, not across PAMGUARD</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Time milliseconds</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Int32</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Timestamp in
+  milliseconds relative to start of file “Data Date”</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Object binary
+  Length</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Int32</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>= Length in
+  File – 12 (a bit of redundancy) !</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Object Data</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Byte[]</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Length =
+  Object binary Length</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=63 rowspan=5 valign=top style='width:37.5pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText align=center style='margin-top:0cm;margin-right:5.65pt;
+  margin-bottom:6.0pt;margin-left:5.65pt;text-align:center'><span lang=EN-GB
+  style='font-size:10.0pt'>Object 2</span></p>
+  </td>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Length in File</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Int32</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Length of this
+  object</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Object
+  Identifier</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Int32</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>class
+  identifier which must be unique to this data stream, not across PAMGUARD </span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Time
+  milliseconds</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Int32</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Timestamp in
+  milliseconds relative to start of file “Data Date”</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Object binary
+  Length</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Int32</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>= Length in
+  File – 12 (a bit of redundancy) ! </span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Object Data</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Byte[]</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Length =
+  Object binary Length. Need not be same as Object 1.</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=63 valign=top style='width:37.5pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Etc …</span></p>
+  </td>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>&nbsp;</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>&nbsp;</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=63 rowspan=4 valign=top style='width:37.5pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText align=center style='margin-top:0cm;margin-right:5.65pt;
+  margin-bottom:6.0pt;margin-left:5.65pt;text-align:center'><span lang=EN-GB
+  style='font-size:10.0pt'>Module footer</span></p>
+  </td>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Length in File</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Int32</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Length of this
+  object = 16 + object binary length</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Object
+  Identifier</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Int32</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>-3  </span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Object binary
+  Length</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Int32</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>= Length in
+  File – 16 (a bit of redundancy) ! Can be zero if there is no additional data</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Object Data</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Byte[]</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Length =
+  Object binary Length</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=63 rowspan=8 valign=top style='width:37.5pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText align=center style='margin-top:0cm;margin-right:5.65pt;
+  margin-bottom:6.0pt;margin-left:5.65pt;text-align:center'><span lang=EN-GB
+  style='font-size:10.0pt'>File Footer</span></p>
+  </td>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Length of
+  footer in bytes</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Int32 </span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Object
+  identifier</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Int32</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>-2</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Total number
+  of objects in file</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Int32</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Not counting
+  header, control struct and footer (i.e. can be = 0)</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Data Date</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Long (int64)</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Data time at end
+  of file in Java millis</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Analysis Date</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Long (int64)</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Time at which
+  analysis ended (same as data time for real time)</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>File End
+  Sample</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Long (int64)</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Sample number
+  at end of file</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>File length</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Long (int64)</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Total length
+  of the file (will be more use when this is repeated in an index file)</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>File End
+  Reason</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Int32</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Reason file
+  ended</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=63 valign=top style='width:37.5pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>EOF</span></p>
+  </td>
+  <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>&nbsp;</span></p>
+  </td>
+  <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>&nbsp;</span></p>
+  </td>
+  <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>&nbsp;</span></p>
+  </td>
+ </tr>
+</table>
+
+<p class=MsoNormal style='text-autospace:none'><span lang=EN-GB>*Strings are
+often written with the DataOutputStream.writeUTF() function. For standard ASCII
+characters, this will simply be a two bytes (written as a short) giving the
+length of the string followed by one byte per character. Unicode characters are
+also supported in this format – for details see the <a
+href="http://en.wikipedia.org/wiki/UTF-8#Modified_UTF-8">JAVA Help</a> and <a
+href="http://en.wikipedia.org/wiki/UTF-8#Modified_UTF-8">Wikipedia</a>. </span></p>
+
+<p class=MsoBodyText><span lang=EN-GB>Smaller indexing files (.pgdx) will
+contain the header, control structures and footer from the pgdf files, but none
+of the objects. </span></p>
+
+<h2><span lang=EN-GB>Object identifiers</span></h2>
+
+<p class=MsoBodyText><span lang=EN-GB>Object identifiers used by the file
+management system are negative </span></p>
+
+<p class=MsoBodyText><span lang=EN-GB>-1 = Header; </span></p>
+
+<p class=MsoBodyText><span lang=EN-GB>-2 = Footer; </span></p>
+
+<p class=MsoBodyText><span lang=EN-GB>-3 = Module header</span></p>
+
+<p class=MsoBodyText><span lang=EN-GB>-4 = Module footer </span></p>
+
+<p class=MsoBodyText><span lang=EN-GB>Individual modules can use any positive
+number and these numbers need only be unique within the module reading and
+writing the data.  </span></p>
+
+<p class=MsoBodyText><span lang=EN-GB>Example data formats for specific modules</span></p>
+
+<p class=MsoBodyText><span lang=EN-GB>Click Detector Version 0</span></p>
+
+<table class=MsoTableGrid border=1 cellspacing=0 cellpadding=0
+ style='border-collapse:collapse;border:none'>
+ <tr>
+  <td width=67 valign=top style='width:40.45pt;border:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+  <td width=251 valign=top style='width:150.6pt;border:solid windowtext 1.0pt;
+  border-left:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Time millis</span></p>
+  </td>
+  <td width=87 valign=top style='width:52.15pt;border:solid windowtext 1.0pt;
+  border-left:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Int64</span></p>
+  </td>
+  <td width=333 valign=top style='width:199.6pt;border:solid windowtext 1.0pt;
+  border-left:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=67 valign=top style='width:40.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+  <td width=251 valign=top style='width:150.6pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Start sample</span></p>
+  </td>
+  <td width=87 valign=top style='width:52.15pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Int64</span></p>
+  </td>
+  <td width=333 valign=top style='width:199.6pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=67 valign=top style='width:40.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+  <td width=251 valign=top style='width:150.6pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Channel map</span></p>
+  </td>
+  <td width=87 valign=top style='width:52.15pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Int32</span></p>
+  </td>
+  <td width=333 valign=top style='width:199.6pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=67 valign=top style='width:40.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+  <td width=251 valign=top style='width:150.6pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Triggered channels</span></p>
+  </td>
+  <td width=87 valign=top style='width:52.15pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Int32</span></p>
+  </td>
+  <td width=333 valign=top style='width:199.6pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=67 valign=top style='width:40.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+  <td width=251 valign=top style='width:150.6pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Num delay measurements</span></p>
+  </td>
+  <td width=87 valign=top style='width:52.15pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Int16</span></p>
+  </td>
+  <td width=333 valign=top style='width:199.6pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=67 valign=top style='width:40.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+  <td width=251 valign=top style='width:150.6pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Delay measurements</span></p>
+  </td>
+  <td width=87 valign=top style='width:52.15pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Float[]</span></p>
+  </td>
+  <td width=333 valign=top style='width:199.6pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Usually nChan*(nChan-1)/2 </span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=67 valign=top style='width:40.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+  <td width=251 valign=top style='width:150.6pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Num angle measurements</span></p>
+  </td>
+  <td width=87 valign=top style='width:52.15pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Int16</span></p>
+  </td>
+  <td width=333 valign=top style='width:199.6pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>(0, 1 or 2)</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=67 valign=top style='width:40.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+  <td width=251 valign=top style='width:150.6pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Angle measurements</span></p>
+  </td>
+  <td width=87 valign=top style='width:52.15pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Float[]</span></p>
+  </td>
+  <td width=333 valign=top style='width:199.6pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=67 valign=top style='width:40.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+  <td width=251 valign=top style='width:150.6pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Duration (samples)</span></p>
+  </td>
+  <td width=87 valign=top style='width:52.15pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Int16</span></p>
+  </td>
+  <td width=333 valign=top style='width:199.6pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=67 valign=top style='width:40.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+  <td width=251 valign=top style='width:150.6pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>WaveData</span></p>
+  </td>
+  <td width=87 valign=top style='width:52.15pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Int16[][]</span></p>
+  </td>
+  <td width=333 valign=top style='width:199.6pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+ </tr>
+</table>
+
+<p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+
+<p class=MsoBodyText><span lang=EN-GB>Click Detector Version 1</span></p>
+
+<table class=MsoTableGrid border=1 cellspacing=0 cellpadding=0
+ style='border-collapse:collapse;border:none'>
+ <tr>
+  <td width=69 valign=top style='width:41.4pt;border:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+  <td width=255 valign=top style='width:153.0pt;border:solid windowtext 1.0pt;
+  border-left:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Time millis</span></p>
+  </td>
+  <td width=75 valign=top style='width:45.0pt;border:solid windowtext 1.0pt;
+  border-left:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Int64</span></p>
+  </td>
+  <td width=339 valign=top style='width:203.4pt;border:solid windowtext 1.0pt;
+  border-left:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=69 valign=top style='width:41.4pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+  <td width=255 valign=top style='width:153.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Start sample</span></p>
+  </td>
+  <td width=75 valign=top style='width:45.0pt;border-top:none;border-left:none;
+  border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Int64</span></p>
+  </td>
+  <td width=339 valign=top style='width:203.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=69 valign=top style='width:41.4pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+  <td width=255 valign=top style='width:153.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Channel map</span></p>
+  </td>
+  <td width=75 valign=top style='width:45.0pt;border-top:none;border-left:none;
+  border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Int32</span></p>
+  </td>
+  <td width=339 valign=top style='width:203.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=69 valign=top style='width:41.4pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+  <td width=255 valign=top style='width:153.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Triggered channels</span></p>
+  </td>
+  <td width=75 valign=top style='width:45.0pt;border-top:none;border-left:none;
+  border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Int32</span></p>
+  </td>
+  <td width=339 valign=top style='width:203.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=69 valign=top style='width:41.4pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+  <td width=255 valign=top style='width:153.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Click Type</span></p>
+  </td>
+  <td width=75 valign=top style='width:45.0pt;border-top:none;border-left:none;
+  border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Int16</span></p>
+  </td>
+  <td width=339 valign=top style='width:203.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=69 valign=top style='width:41.4pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+  <td width=255 valign=top style='width:153.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Num delay measurements</span></p>
+  </td>
+  <td width=75 valign=top style='width:45.0pt;border-top:none;border-left:none;
+  border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Int16</span></p>
+  </td>
+  <td width=339 valign=top style='width:203.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Usually nChan*(nChan-1)/2</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=69 valign=top style='width:41.4pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+  <td width=255 valign=top style='width:153.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Delay measurements</span></p>
+  </td>
+  <td width=75 valign=top style='width:45.0pt;border-top:none;border-left:none;
+  border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Float[]</span></p>
+  </td>
+  <td width=339 valign=top style='width:203.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=69 valign=top style='width:41.4pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+  <td width=255 valign=top style='width:153.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Num angle measurements</span></p>
+  </td>
+  <td width=75 valign=top style='width:45.0pt;border-top:none;border-left:none;
+  border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Int16</span></p>
+  </td>
+  <td width=339 valign=top style='width:203.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>(0, 1 or 2)</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=69 valign=top style='width:41.4pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+  <td width=255 valign=top style='width:153.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Angle measurements</span></p>
+  </td>
+  <td width=75 valign=top style='width:45.0pt;border-top:none;border-left:none;
+  border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Float[]</span></p>
+  </td>
+  <td width=339 valign=top style='width:203.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=69 valign=top style='width:41.4pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+  <td width=255 valign=top style='width:153.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Duration (samples)</span></p>
+  </td>
+  <td width=75 valign=top style='width:45.0pt;border-top:none;border-left:none;
+  border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Int16</span></p>
+  </td>
+  <td width=339 valign=top style='width:203.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=69 valign=top style='width:41.4pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+  <td width=255 valign=top style='width:153.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Wave Max Amplitude</span></p>
+  </td>
+  <td width=75 valign=top style='width:45.0pt;border-top:none;border-left:none;
+  border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>float</span></p>
+  </td>
+  <td width=339 valign=top style='width:203.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Max amplitude of wave data.</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=69 valign=top style='width:41.4pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+  </td>
+  <td width=255 valign=top style='width:153.0pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>WaveData</span></p>
+  </td>
+  <td width=75 valign=top style='width:45.0pt;border-top:none;border-left:none;
+  border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Int8[][]</span></p>
+  </td>
+  <td width=339 valign=top style='width:203.4pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoBodyText><span lang=EN-GB>Wavedata scaled by 127/max amplitude so
+  if uses full dynamic range of 8 bit data</span></p>
+  </td>
+ </tr>
+</table>
+
+<p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+
+<p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+
+<h1><span lang=EN-GB>4<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-GB>Binary Storage Manager</span></h1>
+
+<p class=MsoBodyText><span lang=EN-GB>Binary Storage Manager (BSM) is a plugin
+module in the utilities group (next to database, since the two things perform
+similar function). Only one BSM module will be allowed </span></p>
+
+<p class=MsoBodyText><span lang=EN-GB>BSM will control: </span></p>
+
+<p class=MsoBodyText style='margin-left:36.0pt;text-indent:-18.0pt'><span
+lang=EN-GB>1.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-GB>The folder data are stored in. </span></p>
+
+<p class=MsoBodyText style='margin-left:36.0pt;text-indent:-18.0pt'><span
+lang=EN-GB>2.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-GB>Opening new files at program start and closing
+them at program end. Will set file names based on the data stream name and the
+time. </span></p>
+
+<p class=MsoBodyText style='margin-left:36.0pt;text-indent:-18.0pt'><span
+lang=EN-GB>3.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-GB>Reopening files on the hour (or at some other
+set time interval, e.g. when analysing wav file data offline, it may make a new
+file every time a file starts)</span></p>
+
+<p class=MsoBodyText style='margin-left:36.0pt;text-indent:-18.0pt'><span
+lang=EN-GB>4.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-GB>Reloading data for the PAMGUARD viewer. </span></p>
+
+<p class=MsoBodyText style='margin-left:36.0pt;text-indent:-18.0pt'><span
+lang=EN-GB>5.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-GB>Rewriting data files changed during offline
+analysis</span></p>
+
+<p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+
+<h1><span lang=EN-GB>5<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-GB>PAMGUARD Modules output data</span></h1>
+
+<p class=MsoBodyText><span lang=EN-GB>For data streams – modify PamDataBlock,
+and also make possibility of other objects sending data to BSM</span></p>
+
+<p class=MsoBodyText><span lang=EN-GB>Need to:</span></p>
+
+<p class=MsoBodyText style='margin-left:36.0pt;text-indent:-18.0pt'><span
+lang=EN-GB>1.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-GB>register with BSM</span></p>
+
+<p class=MsoBodyText style='margin-left:36.0pt;text-indent:-18.0pt'><span
+lang=EN-GB>2.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-GB>hand BSM settings data, which will be requested
+each time a new file is created (see format above). </span></p>
+
+<p class=MsoBodyText style='margin-left:36.0pt;text-indent:-18.0pt'><span
+lang=EN-GB>3.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-GB>send BSM references to all new data units</span></p>
+
+<p class=MsoBodyText style='margin-left:36.0pt;text-indent:-18.0pt'><span
+lang=EN-GB>4.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-GB>know how to recreate data units from data that
+have been read back in with PAMGUARD viewer. </span></p>
+
+<p class=MsoBodyText><span lang=EN-GB>PAMGUARD Data Units</span></p>
+
+<p class=MsoBodyText style='margin-left:36.0pt;text-indent:-18.0pt'><span
+lang=EN-GB>1.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-GB>Need functions to return their binary data
+object (which may just be a serialised version of themselves</span></p>
+
+<p class=MsoBodyText style='margin-left:36.0pt;text-indent:-18.0pt'><span
+lang=EN-GB>2.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span lang=EN-GB>Need to be able to identify themselves in
+agreement with a central registry</span></p>
+
+<p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
+
+<p class=MsoBodyText><span lang=EN-GB>PAMGUARD Settings</span></p>
+
+<p class=MsoBodyText><span lang=EN-GB>PAMGUARD Settings are written to the
+binary store whenever PAMGUARD starts from the Start menu or from the Network
+controller. They are not written when PAMGUARD restarts due to a buffer
+overflow in acquisition. Settings are written to .psfx files. These encapsulate
+the current psf format used for more general settings, but individual
+serialised Java objects are wrapped up in a similar way to other binary data so
+that other programmes (e.g. Matlab) can at least read a list of modules.</span></p>
+
+</div>
+
+</body>
+
+</html>

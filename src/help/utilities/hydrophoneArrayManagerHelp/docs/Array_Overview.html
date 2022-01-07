@@ -1,0 +1,67 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Hydrophone Array OVerview</title>
+</head>
+
+<body>
+
+<h1>Hydrophone Array</h1>
+<h2>Overview</h2>
+
+<h3>NEW Array localisation system !</h3>
+<p>PAMGuard users are deploying more and more complicated arrays and may now be working 
+with some hydrophones deployed from a vessel while others are on free floating buoys. Other users are adding 
+heading, pitch and roll sensors to their systems.</p>
+<p>To cater for these developments the array management and localisation system has been substantially updated
+so that arrays containing multiple types of streamer / buoys, etc. can be effectively managed.</p>  
+
+<p>
+Within the PAMGuard framework, an "Array" refers to all of the hydrophones
+currently in use and only a single "Array" is loaded into memory and used at any one time. 
+</p><p>
+An array may contain multiple "Streamers" or clusters of hydrophones. Hydrophones within 
+each streamer (or cluster) are assumed to be connected to one another in some way and have a common origin. 
+Within this context a moored or drifting buoy should be considered as a streamer.   
+The streamer origin will generally be referenced to the vessels GPS position, or a fixed Latitude and Longitude.  
+</p><p>
+Each streamer has a Hydrophone Locator system. This tells PAMGuard how to calculate the actual positions 
+of the individual hydrophones from the streamer origin. Moored hydrophones generally use a rigid locator, whereas towed 
+hydrophones are usually better off using a threading hydrophone locator which will give more accurate hydrophone 
+positions as the vessel turns a corner. 
+</p>
+<p>A single array can mix streamers of different types.</p>
+<p>Several different arrays may be managed and stored, although only one is loaded at any one time.</p>
+
+<p>Each array may contain up to 32 individual hydrophone
+elements (transducers).</p>
+
+<p>A one-to-many relationship exists between hydrophones and
+software channels.</p>
+
+<p>Each hydrophone element must be assigned to a streamer. The
+actual coordinates for each hydrophone used by PAMGUARD are the sum of
+the streamer coordinates and the individual hydrophone element
+coordinates. Although this appears to introduce some redundancy
+regarding the coordinates of each hydrophone, streamer assignment is
+important for two reasons. Firstly, it allows the errors on the relative
+locations of pairs of hydrophones to be more accurately defined (the
+errors between hydrophones in different streamers will generally be
+greater than the errors on a hydrophone in the same streamer). Secondly,
+should a streamer be moved or shortened, it is easier to adjust the
+coordinates of a single streamer than to adjust the coordinates of all
+hydrophones individually.</p>
+
+ 
+
+<h3>The Default Array</h3>
+<p>The first time you run PAMGUARD, a default array consisting of
+two hydrophone elements spaced 3m apart at 5m depth, 100m and 103m
+astern of the vessel. Channels in the array are mapped 1:1 to ADC
+channels 0 and 1.</p>
+<p CLASS="nextLink"><a href="Array_Configuration.html">Next:
+Array Configuration </a></p>
+
+</body>
+</html>

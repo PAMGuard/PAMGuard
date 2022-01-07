@@ -1,0 +1,62 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Seismic Veto Overview</title>
+</head>
+
+<body>
+
+<h1>Seismic Veto</h1>
+<h2>Overview</h2><br>
+<p>Many of the PAMGUARD detectors set detection thresholds
+automatically as a function of background noise. Loud sounds from
+airguns can upset this automatic threshold setting. It is of course
+extremely unpleasant listening on headphones when airguns are firing
+nearby and airgun sounds may even pose a risk to the operators hearing.
+</p>
+<p>During automatic threshold setting, a period of zero signal can
+upset threshold levels almost as much as a period of too much signal for
+some detector types</p>
+<p>The seismic veto module detects the airgun pulse automatically
+using a simple in-band energy detector operating on spectrogram data.
+When the signal level exceeds some threshold, that period of sound is
+either taken out and set to zero, or replaced with randomly generated
+noise with the same spectral properties as measured in the signal prior
+to the airgun pulse. The time window of vetoed data can be set to
+continue after the signal has fallen below threshold to ensure the end
+of the pulse is discarded. It can also be configured to start the veto
+before the onset of the pulse (this is achieved by delaying the signal
+slightly in an internal buffer).</p>
+<p>The seismic veto module has two output streams, the first
+containing vetoed FFT data and the second containing vetoed raw audio
+data. Other PAMGUARD modules can subscribe to the appropriate output of
+the seismic veto module and operate as normal, but without the loud
+airgun sounds.</p>
+
+<br><center>
+<img alt="Seismic Veto Data Model" src="images/VetoDataModel.png" /></center>
+<br>
+
+<p>The figure above shows a simple PAMGUARD configuration with the output
+of the seismic veto connected to a 
+<a href="../../soundPlaybackHelp/docs/soundPlayback_soundPlayback.html">
+sound playback module</a>, a click
+detector and a whistle detector. The figure below shows spectrograms and
+waveforms of data before and after the seismic veto module.</p>
+<br><center>
+<img alt="Seismic Veto Spectrograms" src="Images/VetoSpectrograms.png" /></center>
+<br>
+
+<p>A veto can be inserted anywhere in the PAMGUARD data model
+where there is 
+<a href="../../fftManagerHelp/docs/FFTEngine_Overview.html">FFT / Spectrogram data</a>.</p>
+<br>
+
+<br>
+<p CLASS="nextLink"><a href="veto_configuration.html">Next: Seismic Veto Configuration</a></p>
+
+
+<br><br><br>
+</body>
+</html>
