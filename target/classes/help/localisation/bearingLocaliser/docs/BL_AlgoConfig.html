@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+    <head>
+    <link href="../../../pamHelpStylesheet.css" type="text/css" rel="STYLESHEET"><title>Bearing Calculator Algorithm Configuration</title>
+    </head>
+
+<body>
+<h1>Bearing Localiser</h1>
+<h2>Algorithm Configuration</h2>
+<br>
+<h3>Algorithm Dialog Tabs</h3>
+<p>The Basic Frequency Domain beamformer, MVDR Beamformer and TOAD Algorithms all have similar user-configurable options to generate Beamograms.  Unlike
+the Beamformer module, the user cannot configure individual beams with the Bearing Calculator.</p>
+<p></p>
+<br>
+<br>
+<h3><a name="BFD_Config">Configuring the Basic Frequency Domain and MVDR beamformers</a></h3>
+<p>A beamogram can be used to sweep an entire area.  The resultant output is a 'heat-map' of the amplitude of the signal versus primary angle, secondary angle
+or frequency.  The output can be shown on a User Display tab by selecting New Bearing Calculator Display.</p></p>
+<p></p>
+<br>
+<img src="images/BL Beamogram.PNG">
+<ol>
+<li>
+<p><a name="BF_ArryInfo">Array Information</a>: The type of array <em>as defined by the channels in this group</em>.  Valid angle ranges are given in the appropriate sections below.
+There are three possible array types: Linear, Planar and Volumetric.</p>
+<ul>
+    <li><p>Linear arrays position all the hydrophones in a single line (1-dimensional).  This type of array has both left/right and up/down ambiguity.  The primary angle is
+    defined in the direction of the main array axis (Y-axis, as given in the Array Manager) and is valid from 0&deg (positive Y) to 180&deg (negative Y).  The secondary angle is
+    undefined.</p></li>
+    <li><p>Planar arrays position the hydrophones in two different axes (2-dimensional).  This type of array resolves one of the ambiguities of the linear array, but
+    not the other.  For example, a planar array with both axis in the horizontal plane (X and Y) would be able to distinguish between left and right of the array, but
+    not above or below.  In that case the primary angle is defined relative to the main axis (positive Y) and valid from
+    -180&deg to 180&deg. The secondary angle is measured perpendicular to the plane, and valid from 0&deg (in the same plane) to 90&deg (directly above/below).</p></li>
+    <li><p>Volumetric arrays position the hydrophones in all three axes (3-dimensional).  This type of array has no ambiguity.  The primary angle is defined
+    relative to the main axis (positive Y) and valid from -180&deg to 180&deg. The secondary angle is defined relative to the perpendicular axis (positive Z) and
+    valid from -90&deg to 90&deg.</p></li>
+</ul>
+</li>
+<li>
+<p>Checkbox indicating whether or not to calculate the beamogram.</p>
+</li>
+<li>
+    <p>Primary angle parameters: the minimum, maximum and step size to use when sweeping the primary angle.  The direction and valid range of the primary angle
+    depends on the type of array (see above for details).</p>
+</li>
+<li>
+    <p>Secondary angle parameters: the minimum, maximum and step size to use when sweeping the secondary angle.  The direction and valid range of the secondary angle
+    depends on the type of array (see above for details).</p>
+</li>
+<li>
+    <p>The Frequency range: in order to speed up the calculations and prevent memory overflow problems, it is recommended that the frequency range over which the
+    beamogram is calculated be limited to the frequencies containing the signals of interest.</p>
+</li>
+</ol>
+<p></p>
+<br>
+<h3><a name="BF_ConfigTOAD">Configuring the TOAD Algorithm</a></h3>
+<p>The TOAD algorithm uses the same primary and secondary angle parameters as the beamformer, but does not require a frequency range.</p>
+<img alt="" src="images/BL TOAD.PNG">
+<br>
+<ol>
+<li>
+<p><a name="BF_ArryInfo">Array Information</a>: The type of array <em>as defined by the channels in this group</em>.  Valid angle ranges are given in the appropriate sections below.
+There are three possible array types: Linear, Planar and Volumetric.</p>
+<ul>
+    <li><p>Linear arrays position all the hydrophones in a single line (1-dimensional).  This type of array has both left/right and up/down ambiguity.  The primary angle is
+    defined in the direction of the main array axis (Y-axis, as given in the Array Manager) and is valid from 0&deg (positive Y) to 180&deg (negative Y).  The secondary angle is
+    undefined.</p></li>
+    <li><p>Planar arrays position the hydrophones in two different axes (2-dimensional).  This type of array resolves one of the ambiguities of the linear array, but
+    not the other.  For example, a planar array with both axis in the horizontal plane (X and Y) would be able to distinguish between left and right of the array, but
+    not above or below.  In that case the primary angle is defined relative to the main axis (positive Y) and valid from
+    -180&deg to 180&deg. The secondary angle is measured perpendicular to the plane, and valid from 0&deg (in the same plane) to 90&deg (directly above/below).</p></li>
+    <li><p>Volumetric arrays position the hydrophones in all three axes (3-dimensional).  This type of array has no ambiguity.  The primary angle is defined
+    relative to the main axis (positive Y) and valid from -180&deg to 180&deg. The secondary angle is defined relative to the perpendicular axis (positive Z) and
+    valid from -90&deg to 90&deg.</p></li>
+</ul>
+</li>
+<li>
+    <p>Primary angle parameters: the minimum, maximum and step size to use when sweeping the primary angle.  The direction and valid range of the primary angle
+    depends on the type of array (see above for details).</p>
+</li>
+<li>
+    <p>Secondary angle parameters: the minimum, maximum and step size to use when sweeping the secondary angle.  The direction and valid range of the secondary angle
+    depends on the type of array (see above for details).</p>
+</li>
+</ol>
+<br>
+<br>
+<p class="prevLink"><a href="BL_Settings.html">Previous: Bearing Calculator Settings</a></p>
+<p class="nextLink"><a href="BL_Output.html">Next: Bearing Calculator Output</a></p>
+</body>
+</html>

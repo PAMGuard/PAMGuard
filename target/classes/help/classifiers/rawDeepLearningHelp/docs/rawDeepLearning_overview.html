@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>PAMGuard Deep Learning Module - Overview</title>
+
+</head>
+<body>
+	<h1 id="pamguard-s-deep-learning-module">PAMGuard Deep
+		Learning Module</h1>
+	<h2 id="overview">Overview</h2>
+
+	<p>PAMGuard&#39;s deep learning module allows users to deploy a
+		large variety of deep learning models natively in PAMGuard. It is core
+		module, fully integrated into PAMGuard&#39;s display and data
+		management system and can be used in real time or for post processing
+		data. It can therefore be used as a classifier for almost any acoustic
+		signal and can integrate into multiple types of acoustic analysis
+		workflows, for example post analysis of recorder data or used as part
+		of real time localisation workflow.</p>
+		
+	<br>
+	<h3 id="how-it-works">How it works</h3>
+	<p>The deep learning module accepts raw data from different types
+		of data sources, e.g. from the Sound Acquisition module, clicks and
+		clips. It segments data into equal sized chunks with a specified
+		overlap. Each chunk is passed through a set of transforms which
+		convert the data into a format which is accepted by the specified deep
+		learning model. These transforms are either manually set up by the
+		user or, if a specific type of framework has been used to train a deep
+		learning model, then can be automatically set up by PAMGuard.
+		Currently there are three implemented frameworks</p>
+	<p align="center">
+		<img width="900" height="370"
+			src="images/deep_learning_module_process.png">
+	</p>
+
+	<p>
+		<em>A diagram of how the deep learning module works in PAMGuard.
+			An input waveform is segmented into chunks. A series of transforms
+			are applied to each chunk creating the input for the deep learning
+			model. The transformed chunks are sent to the model. The results from
+			the model are saved and can be viewed in real time (e.g. mitigation)
+			or in post processing (e.g. data from SoundTraps).</em>
+	</p>
+	<br>
+	<h3 id="generic-model">Generic Model</h3>
+	<p>
+		A generic model allows a user to load any model compatible with the <a
+			href="https://djl.ai/">djl</a> (PyTorch (JIT), Tenserflow, ONXX)
+		library and then manually set up a series of transforms using
+		PAMGuard&#39;s transform library. It is recommended that users use an
+		existing framework instead of a generic model as these models will
+		automatically generate the required transforms.
+	</p>
+	<br>
+	<h3 id="animalspot">AnimalSpot</h3>
+	<p>
+		<a href="https://github.com/ChristianBergler/ANIMAL-SPOT">ANIMAL-SPOT</a>
+		is a deep learning based framework which was initially designed for <a
+			href="https://github.com/ChristianBergler/ORCA-SPOT">killer
+			whale sound detection</a>) in noise heavy underwater recordings (see <a
+			href="https://www.nature.com/articles/s41598-019-47335-w">Bergler
+			et al. (2019)</a>). It has now been expanded to a be species independent
+		framework for training acoustic deep learning models using <a
+			href="https://pytorch.org/">PyTorch</a> and Python. Imported
+		AnimalSpot models will automatically set up their own data transforms
+		and output classes.
+	</p>
+	<br>
+	<h3 id="ketos">Ketos</h3>
+	<p>
+		<a href="https://meridian.cs.dal.ca/2015/04/12/ketos/">Ketos</a> is an
+		acoustic deep learning framework based on Tensorflow and developed by
+		<a href="https://meridian.cs.dal.ca/">MERIDIAN</a>. It has excellent
+		resources and tutorials and Python libraries can be installed easily
+		via pip. Imported Ketos model will automatically set up their own data
+		transforms and output classes.
+	</p>
+	<br>
+	<br>
+	<br>
+	<p class="nextLink"><a href="rawDeepLearning_CreateAndConfig.html">Next:
+	Creating and Configuring the Deep Learning module</a></p>
+	<br>
+	<br>
+	<br>
+</body>
+</html>

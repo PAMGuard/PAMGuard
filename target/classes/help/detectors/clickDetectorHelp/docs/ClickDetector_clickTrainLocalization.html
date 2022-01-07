@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+<link href="../../../pamHelpStylesheet.css" type="text/css" rel="STYLESHEET"><title>Tracking and Click Train Identification</title>
+
+<link to="" overview="" pag="" in="" tm="" sectin="" of="" help=""></head>
+<body>
+<h1>Click Detector</h1>
+<h2>Tracking and Click Train Identification</h2>
+<br>
+<h3>Target Motion Analysis</h3>
+<br>
+<p>A common method for tracking animals, particularly sperm
+whales, is to use <a href="../../../localisation/targetmotion/docs/targetmotion_overview.html">Target Motion Analysis</a>
+
+or TMA. TMA works by measuring bearings to a sound source from multiple
+locations along a track-line. The crossing points of the bearings
+indicates the location of the tracked sound source.&nbsp;</p><p>There are two ways of linking clicks together to form click trains when
+using PAMGuard in &#8216;normal&#8217; mode, i.e. analysing data in real time. On
+the click detector bearing time display, clicks assigned to a train are
+shown in colour, depending on the options selected from the displays
+settings menu.</p><p>
+</p>
+<h4><a name="ManualID"></a>Manual Click Train Identification</h4>
+<p>The most effective method of click train identification is for
+the operator to manually select clicks from the click detector bearing
+time display which they believe come from the same animal. To track
+clicks manually, right click anywhere on the bearing time display,
+scrolling will then pause and you can then release the mouse over the
+click you wish to mark. A small popup menu will appear with a single
+option to create a New Click Train</p><p><img style="width: 214px; height: 95px;" alt="marking first click" src="images/MarkClick1.png">&nbsp;</p><p>Wait a while until the angle to that click train has changed and mark
+another one in the same way. This time, the menu will have the options
+of adding the click to the existing click train, or creating a new
+click train.</p><p><img style="width: 271px; height: 96px;" alt="marking click" src="images/MarkClick2.png"></p><p>If you ware tracking multiple animals, then start a New Click Train.</p><p></p>
+<h4>Automatic Click Train Identification</h4>
+<p>
+PAMGuard can attempt to mark Click Trains automatically. To enable
+automatic click train identification go to Click Detection &gt;
+Click Train Identification</p><p><img style="width: 280px; height: 301px;" alt="click train ID options" src="images/ClickTrainId.png"></p>
+<p>Clicks are associated if there is a regular Inter Click
+Interval (ICI) and the clicks are on a slowly and steadily changing
+bearing. In the control section set the minimum number of clicks for a
+train to be created, the minimum angle for Target Motion Analysis (TMA)
+to be run and in the minimum interval between location and database
+updates. This last parameter is important since the localisation
+calculations can take 100&#8217;s of milliseconds, so repeating them every
+time a click is added to a click train can cause PAMGuard to run too
+slowly. </p>
+<p>ICI changes controls the minimum and maximum allowable ICI and
+the change ratio governs how much the ICI can change for a new click to
+be added to an existing click train. For example, if the currently
+measured ICI is 1.0s and the change ratio is 1.2, then the ICI to the
+next click can be anything between 1/1.2 = 0.83s and 1.2s.</p>
+<p>Angle changes is the maximum angular deviation allowed
+for the next click. As a click train is starting, this is the angle
+difference between clicks. Once a train has enough clicks for a
+localisation, it&#8217;s the angle off from that localisation point.</p><p> </p>
+<h4>Correcting Mistakes</h4>
+<p>If you make a mistake tracking manually or if you think the
+automatic train identification has made a mistake, click on the click
+that&#8217;s been assigned incorrectly and a slightly different menu appears
+giving four options.</p><img style="width: 580px; height: 178px;" alt="correcting a marked click" src="images/MarkClickCorrect2.png"><br>
+<p>
+</p>
+<ol>
+<li>Remove the click from the train (the click will then not be
+assigned to anything)&nbsp;</li>
+<li>Reassign ALL clicks in that train to a different
+train&nbsp;</li>
+<li>Reassign that click as a new click train.&nbsp;</li>
+<li>Select the train the click should be assigned to (if other
+clicks have been started)
+</li>
+</ol>
+
+<p>It is very common for the automatic click train identification
+algorithm to break up an obvious click train into many smaller ones.
+This happened when there are pauses or changes in click rate.
+Reassigning all clicks in a train is a handy way of correcting these
+errors in order to generate long click trains which will yield accurate
+localisations.</p><p> </p>
+<h3>Database Output</h3>
+<p>Click train information is written to the PAMGuard database using
+the same database tables used for offline data analysis. This means
+that any event marking which took place in real time will be available
+for further offline analysis. Two database tables are used: The &#8220;events
+table&#8221; contains one record of information per click train, the second
+&#8220;clicks table&#8221; contains a record for each click in each event. To
+maintain compatibility with earlier versions, the two database tables
+are called Click_Detector_OfflineEvents and
+Click_Detector_OfflineClicks (the name Click_Detector_ in these table
+names will change to whatever the name of the click detector created in
+the PAMGuard configuration you are using and if you have multiple click
+detectors, multiple tables with different names will be created.)</p>
+<br>
+<br>
+<p class="previousLink"><a href="ClickDetector_betterClassification.html">Previous: Advanced Click Classification</a></p>
+<p class="nextLink"><a href="ClickDetector_clickAlarmOptions.html">Next: Click
+Storage Options</a></p>
+</body></html>

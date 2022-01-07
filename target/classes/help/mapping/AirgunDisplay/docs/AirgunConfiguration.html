@@ -1,0 +1,53 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
+<title>Airgun Configuration</title>
+</head>
+
+<body>
+
+<h1>Airgun Display</h1>
+<h2>Airgun Display Configuration</h2><br>
+
+<p>
+The airgun display configuration dialog is accessed from the 
+  <em>  <strong>Display>AIS Ship Reporting>Display Options</strong></em>... menu command. 
+<p><center>
+<img src="images/AirgunOptions.png" alt="Airgun Options"><br><br></center>
+
+<p>
+  The two pieces of information required to correctly position the guns are</p>
+<ol><p></p>
+  <li>
+    <p><b>The Source Vessel Identification</b><br>
+      This is either the vessel PAMGUARD is running on, in which case
+      the gun position will be relative to the GPS receiver plugged into PAMGUARD, or it can be 
+      another vessel in which case the guns' positions will be calculated relative to the 
+      GPS receiver feeding the AIS transponder on that vessel. If the guns are on another vessel, you will need to know the vessel's 
+      Maritime Mobile Service Identity (MMSI) number and input it to the 
+      AIS Display dialog. You can get this either from the AIS data listed within 
+  PAMGUARD, or ask the vessel's captain.</p>
+  </li>
+  <li>
+    <p><b>The location of the airgun array </b><br>
+      This is in the form of two coordinates relative to the GPS receiver feeding 
+      PAMGUARD or the GPS receiver feeding the AIS transponder on a different vessel. </p>
+  </li>
+</ol></p>
+<p>&nbsp; </p>
+<h3>Mitigation Zone</h3>
+<p>You may also enter a mitigation zone, which is a simple circle of fixed radius around 
+  the airgun location. 
+</p>
+<p>
+You may also enter a predicted mitigation zone which will display the area on the PAMGUARD 
+map which will fall within the mitigation zone within the specified time period.<br><br> 
+
+<br>
+
+
+<p CLASS="previousLink"><a href="AirgunOverview.html">Previous: Airgun Display Overview</a></p>
+<p CLASS="nextLink"><a href="AirgunDisplay.html">Next: Airgun Display</a>
+<br><br><br>
+</body>
+</html>

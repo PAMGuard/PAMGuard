@@ -1,0 +1,77 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
+<title>Clip Generator</title>
+</head>
+
+<body>
+
+<h1>Clip Generator</h1>
+<h2>Overview</h2>
+<p>
+The clip generator module can be used to generate short sound clips (typically a second or so long) in response 
+to either an automatic detection or to the user selecting an area on the spectrogram display.  
+</p>
+
+<h3>Creating a Clip Generator</h3>
+<p>From the <strong><em>File>Add modules>Sound
+Processing</em></strong> menu, or from the pop-up menu on the data model display
+select "<strong><em>Clip Generator</em></strong>". Enter a name for the new
+amplifier module and press Ok.</p>
+<br>
+
+<h3>Configuring the Clip Generator</h3>
+<p>To configure the clip generator, you will need to set a source of audio data and 
+also to set up triggers which can initiate clip generation. </p>
+<p>To set up the clip generator, open the dialog from the "Detectors/Clip Generator" menu</p>
+<br>
+<img alt="clip dialog" src="images/ClipDialog.jpg" />
+<br>
+<h4>Select an audio data source</h4>
+<p>Select a source of audio data. This will usually be from a sound acquisition module
+but it may also be from a decimator or filter module</p>
+
+
+<h4>Select an output format</h4>
+<p>Select to store the clips either as wav files or in binary storage. The advantage of
+wav files is that it will be possible to open your clips with other software. The binary 
+storage option stores the clips in a compressed format which uses slightly less disk space
+and also loads the clips more efficiently when looking at them with the PAMGuard viewer. </p>
+<p>Even if you are using wav file storage, you should include the Binary Storge module in 
+your PAMGuard configuration since some book keeping information will still need to be stored
+in binary files</p>
+
+<h4>Setup Data Triggers</h4>
+<p>Select which detectors can trigger clips. </p> <p>This can be one or more of the detectors
+set up in PAMGuard. If using more than one detector though, you might find it easier to 
+have separate clip generators for each detector so that files / binary data are stored in 
+different folders. </p>
+<p>Once you've enabled a trigger, configure it by pressing the adjacent "Settings" button</p>
+<br>
+<img alt="budget dialog" src="images/BudgetDialog.png" />
+<br>
+<p>Select the channels you want to trigger from</p>
+<p>Select the time in seconds before and after the actual trigger you want to record for. </p>
+<p>If data are being stored in wav files, also set "file initials" - a few characters which 
+will be added to the start of each file name</p>
+<h5>Data Budgets</h5>
+<p>You can set the clip generator to respond to every single detection or you 
+can set a data budget which will limit the amount of recorded data in a given time period. </p>
+<p>The latter option may be useful if you only want to store a few example sounds from each 
+encounter for species id check, but also runs the risk of discarding important data !</p>
+
+<h4>Manual clipping</h4>
+<p>To generate clips manually, right click on a 
+<a href="../../../displays/spectrogramDisplayHelp/docs/UserDisplay_Spectrogram.html">spectrogram display</a> 
+to open it's settings dialog. Go to the "Mark Observers" tab and select the Clip Generator check box. </p>
+<p>When the spectrogram display is running, you will now be able to mark out regions with the mouse which 
+will be used to fire the clip generator.  </p>
+<br>
+<img alt="manual clipping" src="images/MarkObserver.png" />
+<br>
+
+<p CLASS="nextLink"><a href="ClipGeneratorDisplay.html">Next: Clip Displays </a></p>
+<br>
+
+</body>
+</html>

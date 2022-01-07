@@ -1,0 +1,71 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Envelope Tracing</title>
+</head>
+
+<body>
+
+	<h1>Envelope Tracing</h1>
+	<h2>Overview</h2>
+	<br>
+
+	<p>This module allows you to drop the frequency of ultrasonic
+		transient sounds into the audio band.</p>
+	<p>For example, if you've a high speed acquisition card set up to
+		detect harbour porpoises, you won't be able to hear them because the
+		sounds are several octaves too high for human hearing and you won't be
+		able to play the sounds back over your sound card because the sound
+		card won't support those high sample rates</p>
+
+	<p>Envelope tracing takes place in four distinct stages:</p>
+	<p>1. High frequency data are band pass filters. This allows you to
+		select only the parts of the spectrum that you're interested in.</p>
+	<p>2. The high frequency data are rectified (i.e. all negative
+		values are made positive).</p>
+	<p>3. The data are smoothed using a low pass filter.</p>
+	<p>4. The data are decimated to a lower frequency.</p>
+
+	<p>In the configuration below, high frequency data are going to a
+		click detector and also via the envelope tracer to a sound output
+		module. The output sample rate of the Envelope Tracer is set to 48kHz,
+		which can be played back easily using a PC sound system</p>
+	<p></p>
+	<br>
+	<img alt="Envelope Model" src="Images/EnvelopeModel.png" />
+	<br>
+
+	<h3>Creating the module</h3>
+	<p>
+		From the <em><strong>File>Add modules>Sound Processing</strong></em>
+		menu, or from the pop-up menu on the data model display select "<em><strong>Sound
+				Processing> Envelope Tracing</strong></em>". Enter a name for the new module and
+		press Ok.
+	</p>
+
+	<h3>Configuring the module</h3>
+	<p>
+		To configure the module, open the settings dialog from the <em><strong>Detection>"your
+				module name" </strong></em> menu:
+	</p>
+	<br>
+	<img alt="Filters Settings" src="Images/EnvelopeDialog.png" />
+	<br>
+	<h4>Raw Data Source</h4>
+	<p>
+		Select a source of Raw data. This will generally be a <a
+			href="../../AcquisitionHelp/docs/AcquisitionOverview.html">Sound
+			Acquisition module</a>. Check the channels you want to envelope trace on.
+	</p>
+
+	<h4>Filter Band</h4>
+	<p>Select the filter band you want to apply before the envelope tracing. This should generally be 
+	matched to the sounds you are most interested in.</p>
+	
+	<h4>Output</h4>
+	<p>Set the output sample rate and smoothing filter. The output filter should generally be a low pass filter
+	with a cut off frequency at around half the output frequency.</p>
+	<br>
+</body>
+</html>

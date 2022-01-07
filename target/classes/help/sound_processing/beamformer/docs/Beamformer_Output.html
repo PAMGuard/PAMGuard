@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+    <head>
+    <link href="../../../pamHelpStylesheet.css" type="text/css" rel="STYLESHEET"><title>Beamformer Output</title>
+    </head>
+
+<body>
+<h1>Beamformer Module</h1>
+<h2>Beamformer Output</h2>
+<br>
+<h3><a name="BF_OutputIndivid">Individual Beam Output</a></h3>
+<p>The output of individually-configured beamformer beams is FFT data, and as such any module that can accept FFT data will be able to use the beamformer as input.  For visualisation
+purposes, this typically means a <a href="../../../displays/spectrogramDisplayHelp/docs/UserDisplay_Spectrogram.html">Spectrogram</a>.</p>
+<p></p>
+<img src="images/BF Output Individ.PNG">
+<ol>
+    <li>
+        <p>In the Spectrogram Parameters window, select Beamformer data as the FFT Source</p>
+    </li>
+    <li>
+        <p>The channel numbers here are actually the beam numbers, as defined in the <a href="Beamformer_AlgoConfig.html#BF_ConfigIndivid">Beam Algorithm Configuration</a> dialog.</p>
+    </li>
+</ol>
+<p></p>
+<br>
+<br>
+<h3><a name="BF_OutputBeamogram">Beamogram Output</a></h3>
+<p>The beamogram outputs a time-series dataset, and can be displayed on an FX Spectrogram.  When a User Display tab is active,
+select <em>User Display</em> from the main menu, and then select <em>New Time base Data display FX</em></p>
+<img src="images/FX Display.PNG">
+<p></p>
+<br>
+<p>See the <a href="../../../displays/timedisplayfx/docs/timedisplayfx.html">help file</a> for more information about FX displays.</p>
+<p>Add the beamogram data to the display, and adjust the angle range to view.  Although a beamformer can calculate up to 3 different dimensions
+of data for each time slice (primary angle, secondary angle and frequency), only primary angle versus time is displayed in the spectrogram.  To
+do this, the beamformer data is averaged over the frequency and secondary angle for each primary angle bin.</p>
+<p></p>
+<img src="images/BF Output Beamogram.PNG">
+<ol>
+<li>
+    <p>Standard Spectrogram, showing the FFT Engine output.</p>
+</li>
+<li>
+    <p>Beamogram Display, showing primary angle versus time with the amplitude represented by the colour.</p>
+</li>
+</ol>
+<p>The image above shows a simulated right whale call generated 90 degrees from the ship's heading, and captured with a 16 channel array.  The
+gain is proportional to the number of channels being combined, so with fewer channels the spread in amplitude will decrease.  This means that,
+with smaller arrays, it may be difficult to visually see the angle with the highest amplitude as the display will look more like vertical bars of the
+same (or similar) colour.</p>
+<br>
+<br>
+<p class="prevLink"><a href="Beamformer_AlgoConfig.html">Previous: Beamformer Algorithm Configuration</a></p>
+</body>
+</html>

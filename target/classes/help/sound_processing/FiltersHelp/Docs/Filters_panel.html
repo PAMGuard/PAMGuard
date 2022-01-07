@@ -1,0 +1,94 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Filter Design</title>
+</head>
+
+<body>
+
+	<h1>Filter Design</h1>
+	<h2>Overview</h2>
+	<br>
+
+	<p>Two main types of filter are available in PAMGuard. IIRF
+		(Infinite Impulse Response) Filters are generally preferred since they
+		are faster than the alternative FIR (Finite Impulse Response) filter
+		types. However there may be circumstances when you prefer to use an
+		FIR filter, particularly if an unusual filter response is required
+		(for instance, one mimicking the hearing response of an animal, or
+		with multiple 'notches' to remove noise).</p>
+	<p>
+		Both types of filter can be configured from within PAMGuard's filter
+		design panel. This is used in the stand alone <a
+			href="Filters_filters.html">Filters Module</a>, but also appears in
+		the configuration for several other modules, including the <a
+			href="../../../detectors/clickDetectorHelp/docs/ClickDetector_clickDetector.html">
+			click detector</a>, the <a
+			href="../../decimatorHelp/docs/decimator_decimator.html">Decimator</a>
+		and some noise measurement modules.
+	</p>
+
+	<h3>Configuration</h3>
+
+	<img alt="Filters Settings" src="Images/FiltersSettings.png" />
+	<br>
+	<h4>Filter Type</h4>
+	<p>Select the type of filter, which can be one of: "None", 
+	"IIR <a href="http://en.wikipedia.org/wiki/Butterworth_filter">Butterworth</a>", 
+		"IIR <a href="http://en.wikipedia.org/wiki/Chebyshev_filter">Chebyshev</a>", "FIR Filter (Window Method)",
+		"Arbitrary FIR Filter".</p>
+
+	<h4>Filter Response</h4>
+	<p>For Butterworth, Chebychev and FIR Filters using the Window
+		Method, select either a High pass, Band Pass, Band Stop or Low Pass
+		response and the filter cut off frequencies in Hz. Note that these
+		should be greater than 0 and less than half of the sample rate.</p>
+	<p>Also set the filter order - this controls how steeply the filter
+		will attenuate close to the cut off frequencies. High order filters
+		use more processing power than low order ones and can also have a long
+		impulse response which can reduce the time resolution of transient
+		signals. Note that for FIR filters, the filter order parameter that
+		you enter is actually the log base 2 of the length of the actual
+		filter, i.e. a filter order of 6 will generate 64 tap filer, 7 a 128
+		tap filter, etc.</p>
+	<p>For Chebychev filters, you can also set the amount of ripple in
+		the passband and for FIR filters, you can set 'gamma' which alters the
+		rate of filter attenuation verses ripple in the stop band.</p>
+	<p>For IIR filters, in the lower left part of the dialog, you will
+		see a pole-zero diagram. For FIR filters, this is replaced by the
+		filter taps, or impulse response of the filter.</p>
+	<br>
+	<img alt="Filters Settings" src="Images/FIRWindow.png" />
+	<br>
+	<p>If you have selected an FIR Arbitrary filter, the dialog will
+		change to show a list of frequencies and gains.</p>
+	<br>
+	<img alt="Filters Settings" src="Images/FIRArbitrary.png" />
+	<br>
+	<p>It's currently only possible to update this list by creating and
+	editing a text file, which should be a comma separated list of
+	frequencies and gains, e.g.
+	</p>
+	0, -80
+	<br> 5000, -80
+	<br> 6000, -40
+	<br> 7000, 0
+	<br> 11000, -5
+	<br> 13000, -10
+	<br> 15000, 0
+	<br> 17000, 0
+	<br> 17000, -30
+	<br> 18000, -80
+	<br> 24000, -80
+	<br>
+	<p>Use the import button to import the values from your text file</p>
+	<br>
+	<h4>Bode Plot</h4>
+		<p>The filter dialog displays a bode plot (attenuation verses
+			frequency) for the chosen filter parameters. You can show this on either a logarithmic
+			of linear frequency scale. Double clicking the amplitude axis will change the range
+			of the amplitude scale. </p>
+		<br> <br> <br>
+</body>
+</html>

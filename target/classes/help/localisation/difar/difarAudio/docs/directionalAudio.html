@@ -1,0 +1,89 @@
+<html>
+<head>
+	<link href="../../../pamHelpStylesheet.css" rel="STYLESHEET" type="text/css" />
+	<title>Difar Directional Audio</title>
+</head>
+<body>
+<h1>DIFAR Directional Audio</h1>
+
+<p>&nbsp;</p>
+
+<p><strong>*Warning*</strong></p>
+
+<p>This module is BETA software. It has only received limited testing as of 23/09/2016 and it may crash&nbsp;and/or halt PAMGuard. As such, it may not be advisable to use during fieldwork or real-time data collection, but is probably reasonably safe to use for post-processing of existing data.</p>
+
+<p><strong>*Use at your own risk*</strong></p>
+
+<h2>Overview</h2>
+
+<p>The DIFAR&nbsp;Directional Audio&nbsp;module can be&nbsp;used&nbsp;to create&nbsp;a directional audio&nbsp;stream&nbsp;from data that have been collected from DIFAR sonobuoys. The&nbsp; module can be run in <a href="../../overview/PamMasterHelp/docs/normalMode.html">normal-mode</a>, <a href="../../../overview/PamMasterHelp/docs/mixedMode.html">mixed-mode</a> for <a href="difar_PostProcessingTutorial.html">post-processing/re-analysis of existing DIFAR recordings</a>, and&nbsp;<a href="../../../overview/PamMasterHelp/docs/viewerMode.html">viewer-mode</a>.</p>
+
+<h3>Background</h3>
+
+<p>DIFAR sonobuoys contain a single omnidirectional pressure sensor, two directional particle-velocity sensors, and a magnetic compass. By applying signal processing techniques to the&nbsp;signals on each of the three acoustic sensors it is possible to&nbsp;listen preferentially in a chosen&nbsp;direction, and attenuate sounds that come from the opposite direction.</p>
+
+<p>This module works well with the DIFAR Localisation Module.</p>
+
+<h2>Configuring the Directional Audio</h2>
+
+<h3>Required PAMGuard modules</h3>
+
+<p>The following modules are required for DIFAR Localisation.</p>
+
+<ul>
+	<li><font face="arial">Sound Acquisition: Recording data from&nbsp;a VHF radio receiver at a sample rate of 48kHz.</font></li>
+	<li><font face="arial">NMEA, GPS. These module are required if you wish to use the Directional Audio module to reduce noise from the direction of the GPS (e.g. noise from the research vessel)</font></li>
+</ul>
+
+<h3>Recommended Modules</h3>
+
+<p>The following modules are not required, but are highly recommened to facilitate analysis of DIFAR data.</p>
+
+<ul>
+	<li>
+	<p>DIFAR Localisation: Contains a Sonobuoy Manager for easy tracking of metadata when deploying sonobuoys</p>
+	</li>
+	<li>
+	<p><font face="arial">Additional FFT (Spectrogram) Engine&nbsp;view the spectrum of the&nbsp;directional audio.</font></p>
+	</li>
+</ul>
+
+<h3>Settings</h3>
+
+<p>The&nbsp;configuration for the Directional Audio are accessed via the Settings menu.</p>
+
+<p><img src="./images/settings.png" /></p>
+
+<p>The Data Source must contain multiplexed audio from a DIFAR sonobuoy, including pilot tones at 7500 and 15000 Hz. The Directional audio module requires 24&nbsp;kHz of audio bandwidth from the raw audio source (48&nbsp;kHz&nbsp;minimum sample rate).&nbsp;An typical data source&nbsp;would&nbsp;be&nbsp;an Analog-Digital converter or sound card&nbsp;that is connected to the audio&nbsp;output&nbsp;of&nbsp;one or many&nbsp;VHF radio receivers.</p>
+
+<p>The output sample rate of the directional audio is presently fixed at 8000 Hz, but can be resampled with a <a href="../decimatorHelp/docs/decimator_decimator.html">Decimator module</a>.</p>
+
+<p>If the option <em>Use GPS data source&nbsp;for noise reduction </em>is checked, then the Directional Audio module will attempt to adjust the listening direction in the opposite direction of the GPS data. Presently only GPS sources are available for noise reduction, but AIS sources, and possibly DIFAR localisations&nbsp;may also&nbsp;be available as Noise Cancellation locations in future releases.</p>
+
+<h3>Usage</h3>
+
+<h4>Noise reduction</h4>
+
+<p>The Directional Audio module can be used to preferentially listen to audio from a particular direction, while attenuating audio from the opposite direction.</p>
+
+<p>This module requires audio from a DIFAR sonobuoy and will output&nbsp;&nbsp;directional audio by using a beamforming algorithm. This module&nbsp;makes use of the AMMC DIFAR demodulator, and beamforming algorithm is that described in&nbsp;Equation 1&nbsp;from Thode et al (2016). This module&nbsp;can use a GPS&nbsp;data stream to automatically&nbsp;set the listening direction in order to&nbsp;potentially reduce&nbsp;masking&nbsp;noise in the direciton of the GPS data source.</p>
+
+<p>When using GPS data for noise cancellation, the listening direction (steering angle of&nbsp;the beamformer)&nbsp;will automatically be set in the opposite direction of the GPS data source. The&nbsp;module uses the&nbsp;location of the current HydrophoneStreamer as the location of the sonobuoy. The Heading of the streamer&nbsp;is used to apply an additional Compass Correction to the angle between the Sonobuoy and GPS data.</p>
+
+<p>As described by Thode et al (2016)&nbsp;steering the null of the beam towards&nbsp;the GPS&nbsp;bearing&nbsp;will attenuate sounds originating from that direction. The expected performance and limitations are described in detail&nbsp;by Thode et al, but in short, noise reduction typically applies to an entire quadrant (90 degree span of bearings, 45 degrees on either side of the null angle).</p>
+
+<p>At present, this&nbsp;feature may be useful for detecting whales using DIFAR sonobuoys that have been deployed from a noisy vessel.</p>
+
+<h4>Directional Listening</h4>
+
+<p>If&nbsp;not using the&nbsp;GPS data for noise reduction,&nbsp;then the&nbsp;direction of listening can be adjusted manually by typing preferred listening angle into the Side Panel. The new listening direction will come into effect after&nbsp;hitting enter</p>
+
+<p><img src="./images/sidebar.png" /></p>
+
+<h3>References</h3>
+
+<p>Thode, AM, KH Kim, RG Norman, SB Blackwell and CR Greene&nbsp;2016. <em>Acoustic vector sensor beamforming reduces masking from&nbsp;underwater industrial noise during passive monitoring</em>. JASA-Express Letters 139(4)&nbsp;EL105-EL111. DOI:http://dx.doi.org/10.1121/1.4946011</p>
+
+<p class="previousLink">&nbsp;</p>
+</body>
+</html>

@@ -73,6 +73,12 @@ public class Pamguard {
 	 * and new results written to the database, but other data, such as GPS data, are read from
 	 * the database synchronised in time to the audio data to correctly reconstruct 
 	 * tracks, etc. 
+	 * PAMGuard generally needs more memory than allocated by default and you'll need to tell it where 
+	 * various library files are for access to Windows i/o devices. You will therefore need the following 
+	 * two commands to the jre, which if you're running from Eclipse are entered into the 
+	 * Arguments / VM arguments section of the run configuration:
+	 * -Xmx6g
+	 * -Djava.library.path=lib64
 	 * 
 	 * @param args
 	 */

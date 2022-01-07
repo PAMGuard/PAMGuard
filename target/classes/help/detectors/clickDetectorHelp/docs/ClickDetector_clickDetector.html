@@ -1,0 +1,208 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Click Detector</title>
+</head>
+
+<body>
+
+	<h1>Click Detector</h1>
+	<h2>Overview</h2>
+	<p>The click detector is used to detect transient signals,
+		primarily from odontocete species such as sperm whales, beaked whales
+		and harbour porpoises.</p>
+	<br>
+	<h3>Creating an instance of the click detector</h3>
+
+	<p>
+		From the <strong><em>File>Add modules>Detectors</em></strong> menu, or
+		from the pop-up menu on the data model display, select <i>'Click
+			Detector'</i>. Enter a descriptive name for the new detector (e.g. sperm
+		whale detector, beaked whale detector, etc) and press Ok.
+	</p>
+	<br>
+
+	<h3>Configure the Data Source</h3>
+
+	<p>
+		Go to <strong><em>Click Detection>Detection Parameters</em></strong>
+		to configure the click detector.
+	</p>
+	<br>
+	<img alt="Data Source" src="images/detection_parameters_source.png" />
+	<br>
+	<br>
+	<p>
+		The click detector requires a source of raw data before it can
+		operate. This may come directly from a <a
+			href="../../../sound_processing/AcquisitionHelp/docs/AcquisitionOverview.html">Sound
+			Acquisition module</a> (e.g. a sound card or a National Instruments
+		board) or from processed data such as the output from a <a
+			href="../../../sound_processing/decimatorHelp/docs/decimator_decimator.html">Decimator</a>
+		or <a
+			href="../../../sound_processing/FiltersHelp/Docs/Filters_filters.html">Filter</a>.
+	</p>
+	<p>Select an appropriate input source from the drop down list on
+		the click detector Detection Parameters menu,</p>
+	<h4>Channel Grouping</h4>
+	<p>Use the channel grouping controls to arrange the data channels
+		into groups.</p>
+	<p>Channels in the same group are analysed together so that if one
+		channel in a group is triggered, all channels in that group are
+		read-out together to create a detected click.</p>
+	<p>The click detector works best if data are analysed in pairs of
+		channels. It can then use the time delay within each pair to calculate
+		a bearing. If multiple pairs of hydrophones are used, these bearings
+		can be crossed to estimate source locations.</p>
+	<p>(Click detector output .clk files can also be further analysed
+		with RainbowClick software if the channels are arranged in pairs).</p>
+	<p>If you only have a pair of hydrophones, then select either 'One
+		group' or 'User groups' and set the group numbers to be the same.</p>
+	<p>If you have multiple pairs of hydrophones, select 'User groups'
+		and arrange the group numbers so that each group contains two channels
+		as shown above.</p>
+	<p>If you select 'no grouping' each channel will be analysed
+		totally independently. There are currently no PAMGUARD functions which
+		can re-group these single channel clicks for source localisation.</p>
+
+	<h3>Data flow and advanced configuration</h3>
+	<p>The data flow through the click detector is shown below</p>
+	<br>
+	<img alt="DataFlow (3K)" src="images/DataFlow.png" />
+	<br>
+	<br>
+
+	<p>The filters and trigger decision parameters can all be adjusted
+		by the user to be optimal for a particular species; and for the
+		background noise conditions from a particular vessel and operating
+		area. Setting many of these parameters is an expert procedure and
+		requires both experience and a thorough understanding of the types of
+		sound being detected.</p>
+	<br>
+
+	<h3>Filters</h3>
+	<p>You will see in the figure above that two filters are used; a
+		digital prefilter and a digital trigger filter. Two filters are
+		required for the following reason. For optimal detection efficiency,
+		the trigger only receives data in the frequency band in which the
+		animal is making sound. However, classifiers that assign clicks to a
+		particular species will require data from more parts of the spectrum.
+		For instance, when detecting harbour porpoises which produce narrow
+		band clicks between 100 and 150kHz, the trigger filter is set to a
+		band pass filter covering only that frequency range. The pre-filter
+		however is set to a high pass filter at 20kHz. The clip data therefore
+		contains data in the spectrum between 20kHz and 250kHz, which is used
+		by the classifier to distinguish between narrow band porpoise clicks
+		and broad band clicks from other sources.</p>
+	<p>
+		Both filters can be configured. Go to <strong><em>Click
+				Detection>Digital pre Filter...</em></strong> or <strong><em>Digital
+				trigger filter...</em></strong> respectively. Both filters configured using the <a
+			href="../../../sound_processing/FiltersHelp/Docs/Filters_panel.html">Filter Design</a> panel.
+	</p>
+	<br>
+
+
+	<h3>Trigger decision</h3>
+	<p>The trigger automatically makes a measure of background noise
+		and then compares the signal level to the noise level. When the signal
+		level reaches a certain threshold above the noise level a click clip
+		is started. When the signal level falls to below the threshold for
+		more than a set number of bins, the click clip ends and the clip is
+		sent to the localisation and classification modules.</p>
+
+	<p>
+		Trigger parameters are set in the Triggers tab of the <strong><em>Click
+				Detection>Detection Parameters </em></strong> menu:
+	</p>
+	<br>
+
+	<img alt="DetectionParameters-trigger (9K)"
+		src="images/DetectionParameters-trigger.png" />
+
+	<p>Individual channels can be 'turned off' in the trigger by
+		un-checking the appropriate check boxes. Note however, that if a
+		deactivated channel is part of a group, that channel will still be
+		read if another channel in that group triggers. This feature can be
+		used to reduce false triggers if one channel develops a noise problem.
+	</p>
+	<br>
+
+
+	<h4>The maths behind it all</h4>
+	<p>
+		The noise level <i><b>N</b></i> at sample <i>i</i> is measured using
+	</p>
+	<br>
+
+	<img alt="noiseLevelEquation (1K)" src="images/noiseLevelEquation.png" />
+
+	<p>
+		and the signal level <i><b>S</b></i> is measured using
+	</p>
+	<br>
+
+	<img alt="signalLevelEquation (2K)"
+		src="images/signalLevelEquation.png" />
+
+	<p>
+		where <i>&alpha;<sub>N</sub></i> is either the <i>long filter</i>
+		parameter when no click is active (i.e. the signal is below threshold)
+		or the <i>Long Filter 2</i> parameter when the signal is above
+		threshold. <i>&alpha;<sub>S</sub></i> is the <i>Short filter</i>
+		parameter. A click is started / stopped when the ratio S/N goes above
+		/ below the <i>Threshold</i> parameter.
+	</p>
+	<br>
+
+	<h4>Click Length</h4>
+	<img alt="DetectionParameters-length (9K)"
+		src="images/DetectionParameters-length.png" />
+	<br>
+	<br>
+
+	<p>The click only ends when all chosen channels have been below
+		threshold for the number of samples specified by &quot;Min Click
+		Separation&quot; .</p>
+	<p>The maximum length of a click is set such that click clips are
+		limited to a maximum number of samples.</p>
+	<p>When a clip is created, a number of extra samples are added to
+		the clip before the first and last samples to rise above threshold and
+		after the last sample to be above threshold (pre sample and post
+		sample in the dialog).</p>
+	<br>
+
+	<h4>Delays</h4>
+
+	<p>TEXT</p>
+	<img alt="detection_parameters_delays"
+		src="images/detection_parameters_delays.png" />
+	<br>
+	<br>
+	<img alt="FFT_filtersettings" src="images/FFT_filtersettings.png" />
+
+	<h4>Echoes</h4>
+	<p>TEXT</p>
+	<img alt="detection_parameters_echoes"
+		src="images/detection_parameters_echoes.png" />
+
+
+	<h4>Noise</h4>
+	<p>TEXT</p>
+	<img alt="detection_parameters_noise"
+		src="images/detection_parameters_noise.png" />
+	<br>
+	<br>
+
+	<p CLASS="previousLink">
+		<a href=""></a>
+	</p>
+	<p CLASS="nextLink">
+		<a href="ClickDetector_clickDetectorDisplays.html">Next: Click
+			Detector Displays </a>
+	</p>
+	<br>
+	<br>
+</body>
+</html>

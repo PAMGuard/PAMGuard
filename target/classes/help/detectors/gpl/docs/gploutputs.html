@@ -1,0 +1,53 @@
+<html>
+
+<head>
+	<LINK href="../../../pamHelpStylesheet.css" type="text/css" rel="STYLESHEET">
+	<title>Generalised Power Law Detector</title>
+</head>
+
+<body>
+
+	<h1>Generalised Power Law Detector</h1>
+	<h2>Outputs</h2>
+	
+	<p>The GPL Detector has three outputs, the whitened spectrogram,
+		the level of the detection statistic and detections made by the
+		detector. The first two of these are primarily for diagnostic purposes
+		and are not stored, the detections can be displayed as overlaid on
+		displays and are written to the <a href="../../../utilities/BinaryStore/docs/binarystore_overview.html">PAMGuard binary storage</a>.</p>
+
+
+	<h3>Binary Store</h3>
+	<p>The GPL detector outputs both detections and background noise information to the
+	<a href="../../../utilities/BinaryStore/docs/binarystore_overview.html">binary store</a>. </p>
+	<p>Both the detections and the background measurements can be read from the binary files into Matlab<super>®</super> and R using the 
+	<a href="../../../utilities/BinaryStore/docs/matlabandr.html">Matlab and R libraries</a>.
+	<h4>Detections</h4>
+	<p>Detailed information for each detection, including the full outline of each detection are written to the binary storage files. 
+	This provides a much higher level of detail than is written to the database, so is the preferred storage methods for GPL output.</p>
+	
+	<h4>Background measurements</h4>
+	<p>In order to assist in understanding detector performance, the background level within the GPL detection algorithm is also written to the 
+	binary store. If data are being processed in blocks, then this will be once per block, otherwise if data are being processed continuously it 
+	will be every 10s.</p>
+	<p>The stored background data are the spectral levels of the median filter used in the first stage of the detection algorithm. These provide a 
+	good measure of how feasible it is to detect sounds at different frequencies within the GPL detection band in varying noise conditions.</p>
+	<p>Depending on the configuration of the 
+	<a href="../../../utilities/BinaryStore/docs/binarystore_overview.html">binary store</a>, background measured will either be written to the 
+	pgdf files, along with detection data, or to separate pgnf pamguard noise files. </p>
+	
+	
+	<h3>Database</h3>
+	<p>
+		Detections can also be written to the <a
+			href="../../../utilities/generalDatabaseHelp/docs/database_database.html">PAMGuard database</a>.
+		However, the database records only contain the times and frequency limits of each detection and not the detailed contour
+		information. The binary store is therefore the preferred storage format for GPL output data.	</p>
+
+	<br><br>
+	<p CLASS="prevLink"><a href="configure.html">Previous: Configuration</a></p>
+	<p CLASS="nextLink"><a href="gpldisplays.html">Next: Displays</a></p>
+	<br><br><br>
+</body>
+
+</html>

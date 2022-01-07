@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<LINK href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Sound Output Control</title>
+</head>
+
+<body>
+
+<h1>Sound Output</h1>
+<h2>Control</h2>
+<br>
+<p>Many of the sound output's features can be controlled from the PAMGuard side bar which contains controls to</p>
+<ul>
+<li>High pass filter the data</li>
+<li>Run and envelope tracer and mix it's output with the raw audio</li>
+<li>Change the playback speed (only when using PAMGuard viewer, or processing data from files or simulated sources);</li>
+<li>Amplify or attenuate the data</li>
+</ul>
+
+<center><img alt="Sound Output Dialog" src="Images/SoundOutputSideBar.png" /></center>
+
+<h3>High Pass Filter</h3>
+<p>The filter type is currently fixed as a second order high pass Butterworth filter which is suitable
+for the removal of unwanted low frequency sound when listening to audio data. Drag the slider to 
+the required cut off frequency and the filter will automatically adjust.</p>
+
+<h3>Envelope Tracing</h3>
+<p>Many cetacean echolocation clicks are too high frequency to be audible to humans. However, it is possible
+to hear these sounds by listening to their outline, or "envelope" which is at a much lower frequency then the 
+main waveform and is generally audible.</p>
+<p>The envelope tracer works by first high pass or band pass filtering the data, 
+then all negative values in the waveform are set positive before the "rectified" waveform is low pass filtered 
+to smooth it out. The two filters can be adjusted from the drop down menu accessible from the small arrow by the slider.</p>
+<p>The operator can select how much of the raw audio and how much of the envelope traced signal are mixed together
+using the slider. This makes it possible to simultaneously listen to sounds, such as dolphin whistles, which are 
+in the human audio band and high frequency click trains from species such as harbour porpoise.</p>
+
+<h3>Speed</h3>
+<strong><p>Note that this feature will be hidden and disabled when processing data in real time.</p></strong>
+<p>When processing data from file, simulated data, or when using the 
+<a href="../../../overview/PamMasterHelp/docs/viewerMode.html">PAMGuard Viewer</a>, it is possible
+to adjust the playback speed. Drag the slider to the desired speed. When adjusting the playback speed, 
+the frequency of the sounds will change. e.g. when playing at half the true speed, the frequency 
+of sounds will halve.</p>
+<p>When speed adjustments are made, the selected sample rate of the output device remains the same. The speed
+change is affected by decimating or upsampling the audio data.</p>
+
+<h3>Gain</h3>
+<p>Attenuate or amplify the data.</p>
+<p>Note that you should also check the sound settings on your computer. Increasing the gain in PAMGuard to a high level when 
+the system's sound card volume is turned right down may lead to signal distortion, so make sure the sound on the computer 
+is turned up first. </p>
+
+<br>
+<p CLASS="prevLink"><a href="soundPlayback_Config.html">Previous: Sound Output Configuration</a></p>
+
+<br><br><br>
+</body>
+</html>

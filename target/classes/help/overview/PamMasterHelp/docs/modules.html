@@ -1,0 +1,1292 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>PAMGUARD Modules</title>
+</head>
+
+
+<body>
+	<h1>PAMGUARD</h1>
+	<h2>PAMGUARD Modules</h2>
+
+	<p>PAMGUARD contains of an ever growing number of plug-in modules,
+		each of which performs some sort of data handling task. Individual
+		modules may do anything from acquiring sound data, to managing a
+		database or searching for a particular sound type. Generally, every
+		module will acquire data either from another module, or through some
+		external interface (such as a sound card, GPS or depth sensor
+		readout). The output of a module may be a display, more data or both.
+		A single module may have multiple output data streams. For instance,
+		the sound acquisition module primarily outputs raw audio data to other
+		PAMGUARD modules, but also outputs data providing a record of when
+		sound acquisition was started and stopped which can be stored in the
+		database.</p>
+
+	<p>PAMGUARD currently contains 41 plug-in modules which can be
+		selected and configured by the user (See the table below). It is
+		generally possible to create multiple instances of a given module
+		type. For instance, the operator may wish to incorporate two click
+		detectors, each optimised for a different species, or have two sound
+		acquisition modules, one acquiring low frequency data and one high
+		frequency data. For certain module types (e.g. GPS acquisition), the
+		user may be restricted to having a single instance.</p>
+
+	<p>We are constantly developing new modules for PAMGuard. The table
+		also includes some information on modules which we're working on at
+		the moment. Due to PAMGuard being open source, there may of course be
+		other modules under development we don't yet know about.</p>
+
+	<p>
+		Last updated 27 November, 2014 <br /><br> <a href="#maps">Maps and
+			Mapping</a> <br /> <a href="#utilities">Utilities</a> <br /> <a
+			href="#sensors">Sensors</a> <br /> <a href="#displays">Displays</a>
+		<br /> <a href="#sound_processing">Sound Processing</a> <br /> <a
+			href="#detectors">Detectors</a> <br /> <a href="#classifiers">Classifiers</a>
+		<br /> <a href="#Localisers">Localisers</a> <br /> <a
+			href="#visual_methods">Visual Methods</a>
+	</p>
+	<p>&nbsp;</p>
+	<table border="2" cellpadding="5">
+		<tbody>
+			<tr>
+				<th>Module</th>
+				<th>Data Input</th>
+				<th>Output</th>
+				<th>Instances</th>
+				<th>Function</th>
+				<th>Status</th>
+			</tr>
+			<tr>
+				<td colspan="6"><strong><a name="maps"></a>Maps and
+						Mapping</strong></td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a
+							href="../../../mapping/NMEA/docs/configuringNMEADataSource.html">
+							NMEA data collection</a>
+					</p>
+				</td>
+				<td>
+					<p>Serial port or server</p>
+				</td>
+				<td>
+					<p>Strings of NMEA data</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Acquire NMEA data for use by other modules.</p>
+				</td>
+				<td>
+					<p>Core</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a href="../../../mapping/NMEA/docs/ConfiguringGPS.html">GPS
+							Processing</a>
+					</p>
+				</td>
+				<td>
+					<p>NMEA data</p>
+				</td>
+				<td>
+					<p>GPS locations</p>
+				</td>
+				<td>
+					<p>0-1</p>
+				</td>
+				<td>
+					<p>Identified GPS data and unpacks NMEA strings</p>
+				</td>
+				<td>
+					<p>Core</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a href="../../../mapping/mapHelp/docs/overview.html">Map</a>
+					</p>
+				</td>
+				<td>
+					<p>GPS and all detectors</p>
+				</td>
+				<td>
+					<p>
+						Map graphics panel<br /> map comments
+					</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Displays vessel location and data from other modules.</p>
+				</td>
+				<td>
+					<p>Core</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a href="../../../mapping/AIS/docs/AISOverview.html">AIS
+							Processing</a>
+					</p>
+				</td>
+				<td>
+					<p>NMEA data</p>
+				</td>
+				<td>
+					<p>Ship locations</p>
+				</td>
+				<td>
+					<p>0-1</p>
+				</td>
+				<td>
+					<p>Unpacks AIS data</p>
+				</td>
+				<td>
+					<p>Core</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a href="../../../mapping/AirgunDisplay/docs/AirgunOverview.html">Airgun
+							display</a>
+					</p>
+				</td>
+				<td>
+					<p>GPS or AIS Data</p>
+				</td>
+				<td>
+					<p>Graphic overlay for map</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Displays the locations of airguns and mitigation zones
+						referenced to either the PAMGUARD vessel or some other vessel
+						broadcasting Its position over AIS.</p>
+				</td>
+				<td>
+					<p>Core</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>Fixed Landmarks</p>
+				</td>
+				<td>
+					<p>Manual input</p>
+				</td>
+				<td>
+					<p>Fixed points on map</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Place object symbols on the PAMGUARD map.</p>
+				</td>
+				<td>
+					<p>Beta</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a href="../../../utilities/WILDInterface/docs/WILDOverview.html">WILD
+							ArcGIS Interface</a>
+					</p>
+				</td>
+				<td>
+					<p>None</p>
+				</td>
+				<td>
+					<p>NMEA strings</p>
+				</td>
+				<td>
+					<p>0-1</p>
+				</td>
+				<td>
+					<p>Outputs an NMEA string via the serial port for interfacing
+						to other software</p>
+				</td>
+				<td>
+					<p>Beta</p>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="6"><strong><a name="utilities"></a>Utilities</strong></td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a
+							href="../../../utilities/generalDatabaseHelp/docs/database_database.html">Database</a>
+					</p>
+				</td>
+				<td>
+					<p>Multiple modules</p>
+				</td>
+				<td>
+					<p>Database</p>
+				</td>
+				<td>
+					<p>0-1</p>
+				</td>
+				<td>
+					<p>Stores data from multiple modules in a Microsoft Access,
+						MySQL or ODF(Beta) database</p>
+				</td>
+				<td>
+					<p>Core</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a
+							href="../../../utilities/BinaryStore/docs/binarystore_overview.html">Binary
+							Storage</a>
+					</p>
+				</td>
+				<td>
+					<p>Multiple modules</p>
+				</td>
+				<td>
+					<p>Binary data files</p>
+				</td>
+				<td>
+					<p>0-1</p>
+				</td>
+				<td>
+					<p>Stores data from multiple modules in a proprietary data
+						format</p>
+				</td>
+				<td>
+					<p>Core</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a href="../../../utilities/datamap/docs/datamap.html">Data
+							Map</a>
+					</p>
+				</td>
+				<td>
+					<p>Multiple modules</p>
+				</td>
+				<td>
+					<p>None</p>
+				</td>
+				<td>
+					<p>0-1</p>
+				</td>
+				<td>
+					<p>
+						Provides an overview of all data in <a href="./viewerMode.html">Viewer
+							Mode</a>
+					</p>
+				</td>
+				<td>
+					<p>Core</p>
+				</td>
+			</tr>
+
+			<tr>
+				<td>
+					<p>
+						<a href="../../../utilities/userInputHelp/docs/userInput.html">User
+							Input</a>
+					</p>
+				</td>
+				<td>
+					<p>User comments</p>
+				</td>
+				<td>&nbsp;</td>
+				<td>
+					<p>0-1</p>
+				</td>
+				<td>
+					<p>Time stamps and stores any comment entered by the user</p>
+				</td>
+				<td>
+					<p>Core</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a
+							href="../../../utilities/listening/docs/Listening_Overview.html">Aural
+							Listening Form</a>
+					</p>
+				</td>
+				<td>
+					<p>Things heard by the operator</p>
+				</td>
+				<td>&nbsp;</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Time stamps and stores lists of things heard by an operator
+						monitoring hydrophones aurally.</p>
+				</td>
+				<td>
+					<p>Core</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a href="../../../utilities/Alarms/docs/Alarms_Overview.html">
+							Alarms</a>
+					</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Multiple possibilities of Actions</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Alarms can be used to alert the operator to specific events</p>
+				</td>
+				<td>
+					<p>Beta</p>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="6"><strong><a name="sensors"></a>Sensors</strong></td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a href="../../../utilities/depthreadout/docs/depth_overview.html">Hydrophone Depth
+							Readout</a>
+					</p>
+				</td>
+				<td>
+					<p>Analogue depth sensors</p>
+				</td>
+				<td>
+					<p>Depth data</p>
+				</td>
+				<td>
+					<p>0-1</p>
+				</td>
+				<td>
+					<p>Depth data are displayed on screen, used in real time to
+						update hydrophone locations and sent to the database.</p>
+				</td>
+				<td>
+					<p>Core</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a href="../../../sensors/arrayAccelerometer/docs/arrayAccelerometer.html">Array Accelerometer</a>
+					</p>
+				</td>
+				<td>
+					<p>Analogue acceleration sensors</p>
+				</td>
+				<td>
+					<p>Orientation data</p>
+				</td>
+				<td>
+					<p>0-1</p>
+				</td>
+				<td>
+					<p>Data from accelerometers are used in real time to
+						update hydrophone orientations and sent to the database.</p>
+				</td>
+				<td>
+					<p>Beta</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>Angle Measurement</p>
+				</td>
+				<td>
+					<p>Fluxgate World shaft encoder</p>
+				</td>
+				<td>
+					<p>Shaft angles</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Reads angles from a Fluxgate World shaft angle encode. (Can
+						be used to read angle of binocular stands).</p>
+				</td>
+				<td>
+					<p>Beta</p>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="6"><strong><a name="displays"></a>Displays</strong></td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a
+							href="../../../displays/userDisplayHelp/docs/userDisplayPanel.html">User
+							Display Panel</a>
+					</p>
+				</td>
+				<td>&nbsp;</td>
+				<td>
+					<p>Displays</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Provides a container for spectrogram and radar like
+						displays. Data from detectors can be overlaid on top of these
+						displays.</p>
+				</td>
+				<td>
+					<p>Core</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a href="../../../displays/LocalTime/Docs/LocalTime.html">
+							Local Time</a>
+					</p>
+				</td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Adds a small side panel showing the Local Time from the
+						computer (all other PAMGuard times are in UTC)</p>
+				</td>
+				<td>
+					<p>Beta</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a href="../../../displays/LevelMeters/Docs/LevelMeters.html">
+							Level Meters</a>
+					</p>
+				</td>
+				<td>
+					<p>Sound Acquisition</p>
+				</td>
+				<td>
+					<p>Display in Side-bar</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Adds a small side panel showing the Level from the Sound
+						Acquisition Module</p>
+				</td>
+				<td>
+					<p>Beta</p>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="6"><strong><a name="sound_processing"></a>Sound
+						Processing</strong></td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a
+							href="../../../sound_processing/AcquisitionHelp/docs/AcquisitionOverview.html">Sound
+							Acquisition</a>
+					</p>
+				</td>
+				<td>
+					<p>Sound cards, audio files and other acquisition devices.</p>
+				</td>
+				<td>
+					<p>Packed chunks of raw audio data</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Controls a data acquisition device and passes it's data on
+						to other modules</p>
+				</td>
+				<td>
+					<p>Core</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a
+							href="../../../sound_processing/soundPlaybackHelp/docs/soundPlayback_soundPlayback.html">Sound
+							Output</a>
+					</p>
+				</td>
+				<td>
+					<p>Audio data</p>
+				</td>
+				<td>
+					<p>Output to the system sound card</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Outputs audio data through a sound card so it can be
+						listened to on headphones</p>
+				</td>
+				<td>
+					<p>Core</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a
+							href="../../../sound_processing/fftManagerHelp/docs/FFTEngine_Overview.html">FFT
+							(Spectrogram) Engine</a>
+					</p>
+				</td>
+				<td>
+					<p>Audio data</p>
+				</td>
+				<td>
+					<p>FFT Data</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Computes spectrograms (Fourier transforms of multiple
+						overlapping chunks of audio data).</p>
+				</td>
+				<td>
+					<p>Core</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a
+							href="../../../sound_processing/FiltersHelp/Docs/Filters_filters.html">
+							Filters (IIR and FIR)</a>
+					</p>
+				</td>
+				<td>
+					<p>Audio data</p>
+				</td>
+				<td>
+					<p>Audio data</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Filters audio data using either Butterworth of Chebyshev
+						filter.</p>
+				</td>
+				<td>
+					<p>Core</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a
+							href="../../../sound_processing/decimatorHelp/docs/decimator_decimator.html">Decimator</a>
+					</p>
+				</td>
+				<td>
+					<p>Audio data</p>
+				</td>
+				<td>
+					<p>Audio data</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Filters and reduces the sample data of audio data</p>
+				</td>
+				<td>
+					<p>Core</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a
+							href="../../../sound_processing/soundRecorderHelp/docs/RecorderOverview.html">Sound
+							Recorder</a>
+					</p>
+				</td>
+				<td>
+					<p>Audio data</p>
+				</td>
+				<td>
+					<p>Wav of Aif files</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Writes audio data to file. Recording may be initiated by the
+						operator or triggered by a detector or make regular recordings
+						according to some set cycle.</p>
+				</td>
+				<td>
+					<p>Core</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a
+							href="../../../sound_processing/ClipGenerator/docs/ClipGenerator.html">Clip
+							Generator</a>
+					</p>
+				</td>
+				<td>
+					<p>Audio data</p>
+				</td>
+				<td>
+					<p>Short clips of sound</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Stores short clips of sound either in wav files or binary
+						files</p>
+				</td>
+				<td>
+					<p>Beta</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a href="../../../sound_processing/amplifier/docs/amplifier.html">Signal
+							Amplifier</a>
+					</p>
+				</td>
+				<td>
+					<p>Audio data</p>
+				</td>
+				<td>
+					<p>Audio data</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Amplifies audio data by some scaling factor (can invert data
+						if required)</p>
+				</td>
+				<td>
+					<p>Core</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a
+							href="../../../sound_processing/patchPanelHelp/docs/patchpanel.html">Patch
+							Panel</a>
+					</p>
+				</td>
+				<td>
+					<p>Audio data</p>
+				</td>
+				<td>
+					<p>Audio data</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Mixes data between multiple channels, changes channel
+						ordering, etc.</p>
+				</td>
+				<td>
+					<p>Beta</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a
+							href="../../../sound_processing/SpectrogramSmoothing/docs/SpectrogramSmoothing.html">Spectrogram
+							smoothing kernel</a>
+					</p>
+				</td>
+				<td>
+					<p>FFT Data</p>
+				</td>
+				<td>
+					<p>FFT Data</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Smoothes a spectrogram by convolving it with a Gaussian
+						smoothing kernel.</p>
+				</td>
+				<td>
+					<p>Core</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a
+							href="../../../sound_processing/seismicveto/docs/veto_overview.html">Seismic
+							Veto</a>
+					</p>
+				</td>
+				<td>
+					<p>FFT and raw data</p>
+				</td>
+				<td>
+					<p>FFT and raw data</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Detects very loud sounds using an in band energy detector
+						and replaces these with randomly generated coloured noise based on
+						recent measurements of the local noise field.</p>
+				</td>
+				<td>
+					<p>Core</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>Noise Monitor</p>
+				</td>
+				<td>
+					<p>FFT data</p>
+				</td>
+				<td>
+					<p>Noise Measurements</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Measures noise in predefined frequency bands (e.g. thrid
+						octave).</p>
+				</td>
+				<td>
+					<p>Beta</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a
+							href="../../../sound_processing/NoiseBands/Docs/NoiseBands.html">
+							Noise Band Monitor</a>
+					</p>
+				</td>
+				<td>
+					<p>Audio data</p>
+				</td>
+				<td>
+					<p>Noise Measurements</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>An alternative method of measuring noise in octave and third
+						octave bands which can work over a wider frequency range than the
+						Noise Monitor module</p>
+				</td>
+				<td>
+					<p>Dev'</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a
+							href="../../../sound_processing/NoiseOneBand/Docs/NoiseOneBand.html">
+							Filtered Noise Measurements</a>
+					</p>
+				</td>
+				<td>
+					<p>Audio data</p>
+				</td>
+				<td>
+					<p>Noise Measurements</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Measures noise relative to an arbitrarily shaped filter band
+						(e.g. the hearing response of a particular species)</p>
+				</td>
+				<td>
+					<p>Dev'</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a href="../../../sound_processing/LTSA/Docs/LTSA.html"> Long
+							Term Spectral Average</a>
+					</p>
+				</td>
+				<td>
+					<p>FFT Data</p>
+				</td>
+				<td>
+					<p>Averaged FFT Data</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Measures and stores averaged FFT data over extended time
+						periods (several minutes). USeful for generating a good overview
+						of a dataaset.</p>
+				</td>
+				<td>
+					<p>Dev'</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a
+							href="../../../sound_processing/EnvelopeTrace/Docs/EnvelopeOverview.html">
+							Envelope Tracing</a>
+					</p>
+				</td>
+				<td>
+					<p>Audio data</p>
+				</td>
+				<td>
+					<p>&nbsp;</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>This module allows you to drop the frequency of ultrasonic
+						transient sounds into the audio band.</p>
+				</td>
+				<td>
+					<p>Dev'</p>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="6"><strong><a name="detectors"></a>Detectors</strong></td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a
+							href="../../../detectors/clickDetectorHelp/docs/ClickDetector_clickDetector.html">Click
+							Detector</a>
+					</p>
+				</td>
+				<td>
+					<p>Audio Data</p>
+				</td>
+				<td>
+					<p>Detected Clicks</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Searches for transient sounds, attempts to assign species,
+						measure bearings to source, group into click trains, etc.</p>
+				</td>
+				<td>
+					<p>Core</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a
+							href="../../../detectors/whistleMoanHelp/docs/whistleMoan_Overview.html">Whistle
+							and Moan Detector</a>
+					</p>
+				</td>
+				<td>
+					<p>FFT Data</p>
+				</td>
+				<td>
+					<p>Whistle and Moan Contours</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Searches for tonal noises. Measures bearings and locations
+						of source. Replaces older Whistle Detector</p>
+				</td>
+				<td>
+					<p>Core</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a
+							href="../../../detectors/whistleDetectorHelp/docs/whistleDetector_Overview.html">Whistle
+							Detector</a>
+					</p>
+				</td>
+				<td>
+					<p>FFT Data</p>
+				</td>
+				<td>
+					<p>Detected Whistles</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Searches for tonal noises. Measures bearings and locations
+						of source.</p>
+				</td>
+				<td>
+					<p>Core</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>Ishmael Energy Sum</p>
+				</td>
+				<td>
+					<p>FFT Data</p>
+				</td>
+				<td>
+					<p>Detected sounds</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Detects sounds with energy in a specific frequency band</p>
+				</td>
+				<td>
+					<p>Core</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>Ishmael Spectrogram Correlation</p>
+				</td>
+				<td>
+					<p>FFT Data</p>
+				</td>
+				<td>
+					<p>Detected sounds</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Detects sounds matching a user defined 'shape' on a
+						spectrogram</p>
+				</td>
+				<td>
+					<p>Core</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>Ishmael Matched Filtering</p>
+				</td>
+				<td>
+					<p>Audio Data</p>
+				</td>
+				<td>
+					<p>Detected Sounds</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Detects sounds using a user defined matched filter.</p>
+				</td>
+				<td>
+					<p>Core</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a
+							href="../../../detectors/likelihoodDetectionModuleHelp/docs/LikelihoodDetector_Introduction.html">Likelihood
+							Detector</a>
+					</p>
+				</td>
+				<td>
+					<p>Audio Data</p>
+				</td>
+				<td>
+					<p>Detected Sounds</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>An implementation of a likelihood ratio test. Suitable for
+						detecting both short duration Odontocete clicks (Sperm, Beaked,
+						etc.) and moderate duration Mysticete calls (Humpback, Bowhead,
+						etc.)</p>
+				</td>
+				<td>
+					<p>Core</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>Right Whale Edge Detector</p>
+				</td>
+				<td>
+					<p>FFT Data</p>
+				</td>
+				<td>Right whale detections</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>
+						Searches for right whale upsweep calls using methods described in
+						Gillespie, D. (<strong>2004</strong>). &ldquo;Detection and
+						classification of right whale calls using an edge detector
+						operating on a smoothed spectrogram,&rdquo; Canadian Acoustics <strong>32</strong>,
+						39&ndash;47.
+					</p>
+				</td>
+				<td>
+					<p>Dev'</p>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="6"><strong><a name="classifiers"></a>Classifiers</strong></td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a
+							href="../../../detectors/whistleClassifierHelp/docs/whistleClassifier_Overview.html">Whistle
+							Classifier</a>
+					</p>
+				</td>
+				<td>
+					<p>Detected Whistles</p>
+				</td>
+				<td>
+					<p>Species probabilities</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Analyses multiple whistle contours and uses a discriminant
+						analysis function to assign to species.</p>
+				</td>
+				<td>
+					<p>Beta</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a href="../../../detectors/roccaHelp/docs/rocca_Overview.html">Rocca</a>
+					</p>
+				</td>
+				<td>
+					<p>FFT Data</p>
+				</td>
+				<td>Species Classes</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>The Rocca species classifier is used to assign dolphin
+						whistles selected by an operator to species. To do this it uses a
+						Random Forest classifier trained with known samples from each
+						species.</p>
+				</td>
+				<td>
+					<p>Beta</p>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="6"><strong><a name="Localisers"></a>Localisers</strong>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>Ishmael Locator</p>
+				</td>
+				<td>FFT Data / User input</td>
+				<td>Located sounds</td>
+				<td>Any</td>
+				<td>Locates sounds extracted either from areas marked out on a
+					spectrogram display or using output from a detector</td>
+				<td>Core</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a href="../../../detectors/Pam3DHelp/docs/guiOverview.html">
+							Multipath 3D Localiser</a>
+					</p>
+				</td>
+				<td>Detected Clicks</td>
+				<td>Located sounds</td>
+				<td>Any</td>
+				<td>Locates sounds detected by the click detector using surface
+					echo's to obtain slant angles and generate a 3-D location.</td>
+				<td>Core</td>
+			</tr>
+			<!-- Remove reference to static localiser
+			<tr>
+				<td>
+					<p>
+						<a
+							href="../../../localisation/largeAperture3D/docs/meal_overview.html">
+							Large Aperture 3D Localiser</a>
+					</p>
+				</td>
+				<td>Detected Clicks</td>
+				<td>Located sounds</td>
+				<td>Any</td>
+				<td>Used to determine the fine scale tracks of harbour
+					porpoises using data from a wide aperture multi-element hydrophone
+					array(~10)</td>
+				<td>Beta</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a href="../../../localisation/difar/docs/difar_Overview.html">
+							Difar Localiser</a>
+					</p>
+				</td>
+				<td>Multiplexed Audio from DIFAR Buoy</td>
+				<td>Located sounds</td>
+				<td>Any</td>
+				<td>Calculates bearings to sound sources from DIFAR sonobuoys.</td>
+				<td>Beta</td>
+			</tr>
+			-->
+			<tr>
+				<td colspan="6"><strong><a name="visual_methods"></a>Visual
+						Methods</strong></td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a
+							href="../../../visual_methods/videoRangeHelp/docs/videoRange_videoRange.html">Video
+							Range</a>
+					</p>
+				</td>
+				<td>
+					<p>Captured video images</p>
+				</td>
+				<td>
+					<p>Ranges to Sightings</p>
+				</td>
+				<td>
+					<p>Any</p>
+				</td>
+				<td>
+					<p>Calculates ranges based on angles measured from video,
+						observer height and earth radius.</p>
+				</td>
+				<td>
+					<p>Core</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p>
+						<a
+							href="../../../visual_methods/loggerFormsHelp/docs/loggerFormsOverview.html">Logger
+							Forms</a>
+					</p>
+				</td>
+				<td>
+					<p>None</p>
+				</td>
+				<td>
+					<p>Manually input data</p>
+				</td>
+				<td>
+					<p>0-1</p>
+				</td>
+				<td>
+					<p>
+						Replicates the functionality of User Defined Forms in the <a
+							href="http://www.marineconservationresearch.co.uk/downloads/logger-2000-rainbowclick-software-downloads/">IFAW
+							Logger software</a>.
+					</p>
+				</td>
+				<td>
+					<p>Beta</p>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<p>Core = Included in Core and Beta Releases; Beta = Included in
+		Beta release only; Dev' = Module under development</p>
+	<br>
+
+	<p CLASS="previousLink">
+		<a href="pamGuardArchitecture.html">Previous: PAMGUARD
+			Architecture</a>
+	</p>
+
+	<p CLASS="nextLink">
+		<a href="guiOverview.html">Next: Graphical User Interface Overview</a>
+	</p>
+	<br>
+	<br>
+</body>
+<!-- InstanceEnd -->
+</html>

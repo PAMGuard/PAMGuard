@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+<link href="../../../pamHelpStylesheet.css" type="text/css" rel="STYLESHEET"><title>Rocca Saved File Details</title>
+
+</head>
+<body>
+<h1>ROCCA</h1>
+<h2>Saved Files</h2>
+<br>
+<p>ROCCA saves three different files during manual whistle contour
+extraction and classification: whistle wav file clip, contour points
+and contour variable measurements. During automated click or whistle
+analysis, ROCCA only saves the measured variables to the contour
+variables file. ROCCA will also saves school stats automatically every
+five minutes,
+as well as when the <a href="rocca_Sidebar.html#SaveNow">&lt;Save Encounter&gt;</a> button is clicked.</p>
+<p>If a database module is being used, ROCCA will also save the
+data to two tables: Rocca_Whistle_Stats and Rocca_Encounter_Stats.</p>
+<br>
+<br>
+<h3><a name="individ">Whistle Clip</a></h3>
+<p>The whistle clip is saved with a wav format to the <a href="rocca_Configure.html#OutputDir">output directory</a>.
+The start and end points of the clip are defined by the start and end
+points originally selected by the user in the spectrogram popup. The
+channels saved to the clip file are specified in the <a href="rocca_Configure.html#rocca_SourceTab">ROCCA Parameters</a>
+window.</p>
+<p>The filename is defined by the user in the <a href="rocca_Configure.html#rocca_ParamsFilename">ROCCA
+Parameters</a> window</p>
+<br>
+<br>
+<h3>Contour Points</h3>
+<p>The time/frequency pair for each contour point in the extracted whistle contour is saved in
+CSV format in the <a href="rocca_Configure.html#OutputDir">output
+directory</a>. The duty cycle, the energy in a frequency bin
+around the peak frequency (as defined in the <a href="rocca_Configure.html#rocca_ParamsClassifier">ROCCA
+Parameters</a> window), and the RMS value of the amplitude are
+also saved.</p>
+<p>The filename is defined by the user in the <a href="rocca_Configure.html#rocca_ParamsFilename">ROCCA
+Parameters</a> window</p>
+<br>
+<br>
+<h3><a name="contour">Contour Variables</a></h3>
+<p>The variables measured from the current whistle contour/click, as
+well as
+the species classification (if a whistle), are saved in CSV format
+in the <a href="rocca_Configure.html#OutputDir">output
+directory</a>.
+The information from each whistle/click is appended to the end of the
+file and the file is never overwritten. Thus, this file will continue
+to collect classification information every time Pamguard/ROCCA is run.</p>
+<p>Other saved information for each whistle includes the sound
+source,
+the analysis date and time, the encounter number, and any notes included in the <a href="rocca_Configure.html#rocca_Notes">ROCCA Parameters
+Notes</a>
+tab. The end of each row lists the name of the random forest model, the
+random forest tree votes for each species and a list of
+the species included in the classifier. The species names were added to each row instead of
+the header line because the header would be created based on
+information from the very first whistle contour analyzed only. If the
+classification model is changed for subsequent analysis, the species
+list may be different and no longer match the header. By including the
+species list in the row, the user is always able to verify which
+species were included in the classification algorithm for that
+particular whistle contour or click.</p>
+<p>The filename is specified in the <a href="rocca_Configure.html#rocca_ParamsOutput">ROCCA
+Parameters</a> window.</p>
+<p>If a database module is being used, the data will also be
+saved to the Rocca_Whistle_Stats table.</p>
+<br>
+<br>
+<h3><a name="school">Encounter Stats</a></h3>
+<p>All encounter numbers, with the species classification
+break-down for each, are saved as a CSV file in the <a href="rocca_Configure.html#OutputDir">output directory</a>.
+Also included for each encounter number is the overall encounter
+duration, the duration of the whistles only, the duration of the clicks
+only, the number of whistles/clicks, the minimum/maximum/average time
+between whistles/clicks, the number of
+whistles/clicks per second, the whistle/click density (the sum of the
+individual durations / encounter length), the whistle/clicks overlap
+(the total number of seconds that two whistles/clicks overlap), the
+cumulative random forest tree vote totals for each species, as well as
+a species list and the overall encounter classification (based on the
+species with the highest cumulative tree vote total).</p>
+<p>Each time the encounter stats file is saved, either through the
+auto-save function or by the user pressing the <a href="rocca_Sidebar.html#SaveNow">&lt;Save
+Encounter&gt; button</a>, the file is overwritten in order to
+update any renamed encounter numbers. Since an encounter number can be
+renamed but never deleted, no information will be lost when overwriting
+an old file during a single Pamguard session. HOWEVER, if Pamguard is
+closed and restarted the file will be <strong>overwritten with
+blank data and all prior information will be lost</strong>. The
+file is checked during Pamguard startup, and if it exists the user is
+given the opportunity to rename it before it is lost, and/or load the
+existing data back into the system.</p>
+<p>Note that when examining a particular encounter number, the
+user should refer to the species list at the end of the row instead of
+the species listed in the header. The header information is taken from
+the first encounter number listed; if subsequent encounter numbers use
+a different classification model, the species may change and this
+change would not be reflected in the header.</p>
+<p>The filename is specified in the <a href="rocca_Configure.html#rocca_ParamsOutput">ROCCA
+Parameters window</a>.</p>
+<p>If a database module is being used, the data will also be
+saved to the Rocca_Encounter_Stats table.</p>
+<br>
+<br>
+<p></p>
+<p class="prevLink"><a href="rocca_Sidebar.html">Previous:
+ROCCA Sidebar</a></p>
+<br>
+<br>
+<br>
+</body></html>

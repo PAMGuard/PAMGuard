@@ -1,0 +1,58 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Sound Output Overview</title>
+</head>
+
+<body>
+
+<h1>Sound Output</h1>
+<h2>Overview</h2>
+
+<p>The sound output module can be used to play back sounds from
+PAMGUARD through a sound card or other data acquisition device.</p>
+
+<p>This allows you to aurally monitor sounds after they have been modified by PAMguard 
+modules such as <a href="../../FiltersHelp/Docs/filters_filters.html">Filters</a>
+or the <a href="../../seismicveto/docs/veto_overview.html">Seismic Veto</a></p>
+
+<p>The availability of the sound output function depends on the type of input
+selected in the <a href="../../AcquisitionHelp/docs/AcquisitionOverview.html">
+Sound Acquisition</a> module. </p>
+
+<h3>Real time play back</h3>
+<p>When processing in real time, it is of course essential that sound output is at the same speed as the 
+sound input. Ideally, you should select the same device for output as you are using for input to guarantee that 
+they are running at exactly the same speed. Sometimes this is either impossible (because the input device doesn't
+have any outputs) or impractical for other reasons in which case you can use a different device but should be 
+aware that there may be 'glitches' in the output.</p>
+<p>If you're using the same device for output as for input, always use the same output sample rate. If using a different
+device, then you may need to use a different output sample rate, for example if your input data come from a high speed 
+acquisition card sampling at 500kHz and you wish to play back through a sound card which can only output at 48kHz. In this case, 
+PAMGuard will automatically decimate or up-sample the data so that the play-back is in real time. Of course, if you're acquiring 
+high frequency data, you'll only be able to hear the part of that data that's in the audio band.</p>
+
+<h3>File or PAMGuard Viewer play-back</h3>  
+<p>If processing data from file, or using PAMGuard viewer, the speed at which data can play can be varied
+by the user via controls in the dialog or side panel.</p>
+<p>Data will automatically be decimated or up-sampled to match the input sample rate, output sample rate of the 
+device and the selected play speed.</p>
+
+
+<h3>Creating sound output modules</h3>
+<p>From the <em><strong>F</strong></em><strong><em>ile>Add
+modules>Sound Processing </em></strong>menu, or from the pop-up menu on the data model
+display select "<strong><em>Sound Output</em></strong>". Enter a name
+for the new module and press Ok.</p>
+<p>Sound output modules can be inserted anywhere in the PAMGUARD
+data model where there are raw audio data such as the output of a 
+<a 	href="../../AcquisitionHelp/docs/AcquisitionOverview.html">Sound acquisition module</a>, 
+a <a href="../../FiltersHelp/Docs/Filters_filters.html">Filter module</a>, a
+<a href="../../decimatorHelp/docs/decimator_decimator.html">Decimator</a>, a
+<a href="../../seismicveto/docs/veto_overview.html">Seismic Veto</a>, etc.</p>
+<br>
+<br>
+<p CLASS="nextLink"><a href="soundPlayback_Config.html">Next: Sound Output Configuration</a></p>
+</body>
+</html>

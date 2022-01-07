@@ -1,0 +1,210 @@
+<html>
+<head>
+<LINK href="pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
+<title>PamGuard</title>
+</head>
+
+<body>
+
+<h1>Writing PAMGUARD Plug-ins</h1>
+<h2>Overview</h2><br>
+Most of the functionality of PAMGUARD is implemented in a series of plug-ins which 
+either process data in some way and / or provide a display and / or provide 
+graphic overlays for other built in displays. 
+<p>
+All PAMGUARD plug-ins are subclasses of <a href="../PamController/PamControlledUnit.html">PamControlledUnit</a>
+<br>
+To make a plug in, first create a subclass of <a href="../PamController/PamControlledUnit.html">PamControlledUnit</a>,
+adding to the subclass the various components described below. Then add your new plug-in the the PAMGUARD
+data model. See <a href="HowToAddPlugins.html">How to add plug-ins</a> to learn how to do this. 
+<p>
+Available components of a PAMGUARD plug-in are
+<ol>
+<li>A Process that modifies data in some way</li>
+<li>A Tab panel display</li>
+<li>A Side panel display</li>
+<li>A Display Menu</li>
+<li>A Detection menu</li>
+<li>A File menu</li>
+<li>Graphic Overlays</li>
+<li>Plug in display panels</li>
+</ol>
+
+All components of a PAMGUARD plug-in are optional. The table shows existing plug-ins (end 2006) <br>
+<img alt="Table of Pamguard plug-ins" src="./images/plugintable.png"/><br><br>
+
+<h3>The Constructor</h3>
+<p>
+Although the default constructor for <a href="../PamController/PamControlledUnit.html">PamControlledUnit</a> is 
+<pre>
+public PamControlledUnit(String unitType, String unitName)
+</pre>
+you must provide a constructor in your sub class that takes just the unitName, e.g.
+<pre>
+public class MyDetectorController extends PamControlledUnit {
+  public MyDetectorController(String unitName) {
+    super("My detector", unitName);
+	  etc...
+</pre>
+Pamguard will search for and use this single parameter constructor when creating modules and adding them to the Pamguard data model. 
+
+<h3>Pamguard Processes</h3>
+<p>
+Pamguard Processes are subclasses of <a href="../PamguardMVC/PamProcess.html">PamProcess</a>. 
+A PamProcess will subscribe to one or more <a href="../PamguardMVC/PamDataBlock.html">PamDataBlock(s)</a>. 
+A PamProcess will generally also create one or more new
+ <a href="href=PamguardMVC/PamDataBlock.html">PamDataBlock(s)</a>. 
+
+When new data arrive from the PamDataBlock, the process will manipulate those data in some way and create information
+that is added to the output data blocks.   
+<p>
+Each Pamguard plug-in may have any number of processes, for example, most displays do not have a process at all. The whistle
+detector, on the other hand, has separate processes for peak detection and whistle linking. 
+<p>
+To add a process to a plug in, use the <A HREF="../PamController/PamControlledUnit.html#addPamProcess(PamguardMVC.PamProcess)">addPamProcess</A>
+function in <a href="../PamController/PamControlledUnit.html">PamControlledUnit</a>Unit. 
+<p>
+<br>
+
+<h3>PAMGUARD Tab Panels</h3>
+<p>
+PAMGUARD Tab panels are added as separate tabs on the main PAMGUARD GUI display. 
+A tab panel may contain graphics or tables to display information of any type. 
+<p>
+Each PAMGUARD plug-in may currently only have a single tab panel per plug in. 
+however, since the developer can put anything they like into that one tab panel,
+it is of course possible to place a tab panel in that one tab panel and for the inner
+tab panel to contain multiple tabs !
+<p>
+To add a tab panel to a plug in, use the <A HREF="../PamController/PamControlledUnit.html#setTabPanel(PamView.PamTabPanel)">setTabPanel</A>
+function in <a href="../PamController/PamControlledUnit.html">PamControlledUnit</a>. 
+<p>
+<br>
+
+<h3>Detection Menu</h3>
+A process that requires a detection menu should override the function
+<A HREF="../PamController/PamControlledUnit.html#createDetectionMenu(java.awt.Frame)">createDetectionMenu</A>
+function in <a href="../PamController/PamControlledUnit.html">PamControlledUnit</a>. 
+<p>
+Note that a new detection menu may be created multiple times as modules are added and removed from 
+the PAMGUARD system. Therefore the implementation of 
+<A HREF="../PamController/PamControlledUnit.html#createDetectionMenu(java.awt.Frame)">createDetectionMenu</A>
+should contain only a minimum amount of code required to make the actual menu and should avoid
+calling constructors for additional objects. 
+<p>
+Detection menus will automatically be incorporated as sub-menus in PAMGUARD's main detection menu.
+They will also be shown as separate menu items in the main menu bar when the tab panel (if one exists) for the
+plug-in is selected. 
+
+<p>
+<br>
+
+<h3>Display Menu</h3>
+A process that requires a display menu should override the function
+<A HREF="../PamController/PamControlledUnit.html#createDisplayMenu(java.awt.Frame)">createDisplayMenu</A>
+function in <a href="../PamController/PamControlledUnit.html">PamControlledUnit</a>. 
+<p>
+Note that a new display menu may be created multiple times as modules are added and removed from 
+the PAMGUARD system. Therefore the implementation of 
+<A HREF="../PamController/PamControlledUnit.html#createDisplayMenu(java.awt.Frame)">createDisplayMenu</A>
+should contain only a minimum amount of code required to make the actual menu and should avoid
+calling constructors for additional objects. 
+<p>
+Display menus will automatically be incorporated as sub-menus in PAMGUARD's main display menu.
+They will also be shown as separate menu items in the main menu bar when the tab panel (if one exists) for the
+plug-in is selected. 
+<p>
+<br>
+
+<h3>File Menu</h3>
+A process that requires a display menu should override the function
+<A HREF="../PamController/PamControlledUnit.html#createFileMenu(javax.swing.JFrame)">createFileMenu</A>
+function in <a href="../PamController/PamControlledUnit.html">PamControlledUnit</a>. 
+<p>
+Note that a new display menu may be created multiple times as modules are added and removed from 
+the PAMGUARD system. Therefore the implementation of 
+<A HREF="../PamController/PamControlledUnit.html#createFileMenu(javax.swing.JFrame)">createFileMenu</A>
+should contain only a minimum amount of code required to make the actual menu and should avoid
+calling constructors for additional objects. 
+<p>
+File menus will automatically be incorporated as sub-menus in PAMGUARD's main file menu.
+<p>
+<br>
+
+<h3>PAMGUARD Side Panels</h3>
+Sets the side panel for the PamControlledUnit
+Side panels are shown down the left hand side of 
+the main PAMGUARD GUI and are always visible, irrespective
+of which tab is being viewed on the main tabbed display. 
+<p>
+Side panels are generally used to display summary information
+for the PamControlledUnit or to provide quick access controls. 
+<p>
+To add a side panel to a plug in, use the <A HREF="../PamController/PamControlledUnit.html#setSidePanel(PamView.PamSidePanel)">setSidePanel</A>
+function in <a href="../PamController/PamControlledUnit.html">PamControlledUnit</a>. 
+<p>
+<br>
+
+<h3>Output Data Blocks</h3>
+Most Pam Processes will produce now data in one form or another. Data are stored
+as <a href="../PamguardMVC/PamDataUnit.html">PamDataUnits</a> in 
+<a href="../PamguardMVC/PamDataBlock.html">PamDataBlock(s)</a>. 
+<p>
+In general, the 
+<a href="../PamguardMVC/PamDataBlock.html">PamDataBlock(s)</a> 
+are created 
+at the same time as the <a href="../PamguardMVC/PamProcess.html">PamProcess</a>.  
+<a href="../PamguardMVC/PamDataUnit.html">PamDataUnits</a> 
+are then added to the 
+<a href="../PamguardMVC/PamDataBlock.html">PamDataBlock(s)</a> as and when they
+become available. 
+<p>
+For some processes, such as the <A HREF="../fftManager/PamFFTControl.html" title="class in fftManager">FFT Engine</A>, 
+<a href="../PamguardMVC/PamDataUnit.html">PamDataUnits</a>  will be added to the output
+<a href="../PamguardMVC/PamDataBlock.html">PamDataBlock</a> at regular intervals.
+For other processes, such as the 
+<A HREF="../clickDetector/ClickControl.html" title="class in clickDetector">Click Detector</A>
+new 
+<a href="../PamguardMVC/PamDataUnit.html">PamDataUnits</a>  will be only be added if
+and when detections are made. 
+<p>
+<br>
+
+<h3>Graphic Overlays</h3>
+As well as creating their own tab panel and side panels, PamProcess output can be
+overlaid on pre-existing PAMGUARD displays. 
+<p>
+Displays that currently support graphic overlays are (as of December 2006)
+<ol>
+<li><A HREF="../Map/MapController.html" title="Map">The Map</A></li>
+<li><A HREF="../Spectrogram/SpectrogramDisplay.html" title="Spectrogram">Spectrograms</A></li>
+<li><A HREF="../radardisplay/radardisplay.html" title="Map">Radar Displays</A></li>
+</ol>
+For details of how to make graphic overlays in PAMGUARD see
+<a href="HowToMakeOverlays.html">How to make graphic overlays</a>
+<p>
+<br>
+
+<h3>Plug-in Display Panels</h3>
+Sound data are often viewed on a scrolling 
+<A HREF="../Spectrogram/SpectrogramDisplay.html" title="Spectrogram Display">Spectrogram Display</A>.
+<br>
+PAMGUARD plug-ins can provide additional scrolling display panels which can be 
+added to the bottom of the spectrogram display in order to show data that are not
+suitable for display in a graphic overlay. 
+<p>
+Scroll speed of plug-in panels is controlled by the spectrogram display so that 
+the plug-in panel data remain in line with the spectrogram data. 
+<p>
+For details on how to make plug in display panels see
+<a href="HowToMakePluginDisplays.html">How to make plug in display panels</a>
+
+<p>
+<br>
+
+
+</p><br>
+<p CLASS="nextLink"><a href="HowToAddPlugins.html">Next:	Adding plug-ins to the PAMGUARD model	 </a></p>
+
+</body>
+</html>

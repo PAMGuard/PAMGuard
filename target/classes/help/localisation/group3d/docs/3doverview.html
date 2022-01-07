@@ -1,0 +1,56 @@
+<html>
+<head>
+	<link href="../../../pamHelpStylesheet.css" rel="STYLESHEET" type="text/css" />
+	<title>Group 3D Localiser</title>
+</head>
+<body>
+<h1>Group 3D Localiser</h1>
+
+<h2>Overview</h2>
+<p>The Group 3D Localiser is designed for 2D (latitude and longitude or x and y) and 3D  (latitude, longitude and depth or x, y and depth)
+localisation using wide aperture arrays. </p>
+
+<p>With a wide aperture array, there is an implicit assumption that a detection on one hydrophone is no guarantee of detections on 
+other hydrophones, either because the sound source was too far from some of the hydrophones, the sound source was too directional, or noise local 
+to one or more hydrophones was too high for detection to be possible. </p>
+
+<p>Furthermore, by their nature, wide aperture arrays are large compared to the duration of a typical sound being detected (this is true
+whatever the species, for example with harbour porpoise a 'wide' aperture array may only be a few metres across, which equates to a few milliseconds 
+travel time, but porpoise clicks are less than 100&#xB5s long; similarly baleen whale sounds may be a couple of seconds long, but arrays for 
+baleen whales are likely to be spread over many km).</p>
+
+<p>The Group 3D localiser is therefore used with detectors configured to detect independently on individual hydrophones or compact hydrophone clusters. 
+It then looks for possible matches of detections between available hydrophones, based on time of arrival differences, and forms groups of detections which 
+are then passed to the localisation algorithm. If an array is large, the possible time of arrival of a sound on multiple hydrophones may be great
+enough that there are multiple possible matches of detected sounds between the various hydrophones. This problem is known as spatial aliasing and
+may make localisation of some sounds impossible.</p>
+
+<p> Careful array design, considering animal vocalisation rate, overall call rate if many animals are likely to be present, detection range, sound directionality, 
+the extent of the study area, and number of hydrophones to use is therefore required if this localiser is to be successfully employed. </p>
+
+<h4>Device Synchronisation</h4>
+<p>Most of the algorithms rely on Time Difference of Arrival of signals at multiple hydrophones. If the hydrophones are autonomous recorders deployed some 
+distance apart, then it is likely that their clocks will be running at slightly different rates and methods must be employed to accurately measure these clock
+offsets and to account for them when merging files from separate recorders into multi channel files for analysis.
+How accurately clocks need to be synchronised depends on the size of the array. As a rule of thumb, clock synchronisation  should aim to be better than 1% of the
+time separation of the hydrophones. So if you're hydrophones are several km apart, then a few milliseconds time offset may be acceptable. A smaller array will 
+require more accurate synchronisation.</p>
+
+<h4>Simulating Success</h4>
+<p>When considering using the Group 3D Localiser a great way of testing a configuration is to set up a 
+<a href="../../../sound_processing/AcquisitionHelp/docs/AcquisitionSimulator.html">simulated sound source</a>. This allows you to test out 
+configurations with high signal to noise ratio sounds at known locations. While the simulation is somewhat idealised and a combination of 
+detectors and localisers which work with simulated data is no guarantee that the configuration will work with real data, if a configuration 
+doesn't work with simulated data, the chances of it working with real data are going to be impossibly low.</p>   
+<p>A series of demonstration configurations, all using simulated data, are being developed and made available through
+the <a href="http://www.pamguard.org/downloads.php?cat_id=3">PAMGuard website</a>. 
+You may want to take a look at these before developing your own configuration.</p> 
+
+
+<br>
+<p CLASS="nextLink"><a href="3dconfig.html">Next: Configuration</a></p>
+
+<p></p>
+
+</body>
+</html>

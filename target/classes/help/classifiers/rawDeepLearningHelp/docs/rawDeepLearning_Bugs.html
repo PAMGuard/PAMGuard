@@ -1,0 +1,32 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>PAMGuard Deep Learning Module - Mistakes</title>
+
+</head>
+<body>
+	<h1 id="pamguard-s-deep-learning-module">PAMGuard&#39;s Deep
+		Learning Module</h1>
+	<h2 id="common-bugs-and-mistakes">Common Bugs and Mistakes</h2>
+	<br>
+	<p>You should always have deep learning models in their own folder.
+		Do not have any additional jar files or other programming related
+		things (like .dll files) in the same or sub folders. This has been
+		known to cause issues with loading models which we have not got to the
+		bottom of yet.</p>
+	<p>Pytorch models must be saved using jit to be compatible with
+		PAMGuard.</p>
+	<p>Tensorflow models must be saved as .pb files to be opened in
+		PAMGuard.</p>
+	<br>
+	<br>
+	<br>
+	<p class="prevLink"><a href="rawDeepLearning_Results.html">Previous:
+	Viewing and Exporting Results</a></p>
+	<br>
+	<br>
+	<br>
+</body>
+</html>

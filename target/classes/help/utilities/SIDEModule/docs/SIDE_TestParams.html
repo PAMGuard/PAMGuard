@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+    <link href="../../../pamHelpStylesheet.css" type="text/css" rel="STYLESHEET">
+    <title>Test Parameters</title>
+</head>
+<body>
+    <h1>SIDE Module</h1>
+    <h2>Quick / Random Drill Test Parameters</h2>
+    <p>
+        For descriptions of the Quick Test and Random
+        Drill Tests, please see <a href="SIDE_Overview.html#tests">the
+        Overview</a> page.
+    </p>
+    <br>
+    <h3>Quick test</h3>
+    <img alt="" src="images/SIDEQuick.PNG">
+    <br>
+    <br>
+    <p>
+        The <strong><em>Number of Sequences</em></strong> defines how many <a
+        href="SIDE_Overview.html#seq">sequences</a> the SIDE Module will
+        generate for each of the species checked off under <em>Quick</em>
+        in the <a href="SIDE_SpClust.html#spClust">Species Cluster</a> window.
+        20 sequences are a recommended minimum to complete a Quick Test. A
+        20-sequence Quick Test with all species clusters should take
+        approximately 15 minutes to complete. If you have enough time, 40
+        sequences will provide you with more accuracy.
+    </p>
+    <p>
+        Pressing the <strong><em>Run Quick Tests</em></strong> button starts the Quick Test
+        process. Note that this button is disabled (as shown in the image above)
+        until all of the following conditions are met
+        <ul>
+            <li>PAMGuard processing has begun</li>
+            <li>At least one species has been selected for a Quick Test in the <em>Species Clusters</em> window</li>
+            <li>A Quick Test is not already running</li>
+            <li>PAMGuard is not in Viewer mode</li>
+            <li>An <a href="SIDE_OpStat.html">Operations Status</a> has been selected.</li>
+        </ul>
+    </p>
+    <p>
+        Poor results (e.g. poor regressions or all misses) likely indicate
+        system or noise issues. Rather than increase the number of sequences
+        injected in the hopes that a more accurate measure will yield better
+        results, those issues should be investigated and solved first. 
+    </p>
+    <p>
+        Checking the <strong><em>Auto generate report</em></strong> box will
+        cause a report to immediately be created upon completion of the Quick
+        Test. If this box is left unchecked, a report can be generated any time
+        after a test by simply right-clicking on one or more tests listed in the
+        PAMGuard <a href="SIDE_InfoTables.html#TestHistory">Test History
+        Information Table</a> and selecting <strong><em>Process Test
+        ##</em></strong> from the drop down menu. 
+    </p>
+    <br>
+    <br>
+    <h3>Random Drill Tests</h3>
+    <img alt="" src="images/SIDEDrill.PNG">
+    <br>
+    <br>
+    <p>
+        The <strong><em>Random Drill Interval</em></strong> defines the average
+        amount of time (in minutes) between injected sounds. Actual elapsed time
+        between sounds will be randomly distributed around this number. The
+        injection period may be adjusted depending on the monitoring phase. The
+        following <em>minimum</em> intervals are recommended to reduce the
+        frequency of injections:
+        <ul>
+            <li>60 minutes for 3-5 species clusters</li>
+            <li>120 minutes for > 5 species clusters</li>
+        </ul>
+    </p>
+    <br>
+    <br>
+    <br>
+    <p class="prevLink"><a href="SIDE_SpClust.html">Previous: Species Cluster Selection</a></p>
+    <p class="nextLink"><a href="SIDE_OpStat.html">Next: Operations Status</a></p>
+    <br>
+    <br>
+    <br>
+</body>
+</html>

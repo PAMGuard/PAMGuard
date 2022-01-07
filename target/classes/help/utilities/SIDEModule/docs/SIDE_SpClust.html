@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+    <link href="../../../pamHelpStylesheet.css" type="text/css" rel="STYLESHEET">
+    <title>Species Cluster Selection</title>
+</head>
+<body>
+    <h1>SIDE Module</h1>
+    <h2>Species Cluster Selection</h2>
+    <h3><a name="spClust">Species Cluster</a></h3>
+    <p>
+        The Species Clusters panel allows the user to specify which species to test for.
+    </p>
+    <img alt="" src="images/SIDESpClusters.PNG">
+    <br>
+    <br>
+    <br>
+    <p>
+        Species are selected by checking the box next to their name, under the
+        type of test desired. For descriptions of the Quick Test and Random
+        Drill Test, please see <a href="SIDE_Overview.html#tests">the
+        Overview</a> page. The selected clusters should match the species for
+        which you intend to monitor.
+    </p>
+    <p>
+        <a name="range">The</a> <strong><em>Nominal Range</em></strong> value is
+        the minimum detection range for the species. This is used as the mean
+        distance from the receiver for generated signals, and would typically
+        equal your exclusion zone for that cluster. Signals will be injected
+        both inside and outside the Nominal Range using the <strong><em>Test
+        Range Limits</em></strong> (see below) as a modifier.
+    </p>
+    <br>
+    <h3>Test Range Limits</h3>
+    <p>
+        The Test Range Limits window allows the user to specify the dispersion of the generated sounds.
+    </p>
+    <img alt="" src="images/SIDETestRangeLim.PNG">
+    <br>
+    <br>
+    <p>
+        Species sounds are randomly distributed between the minimum distance
+        (<sup><em>Nominal Range</em></sup>/<sub><em>Range Factor</em></sub>)
+        and the maximum distance
+        (<em>Nominal Range</em> &#215; <em>Range Factor</em>). To minimize
+        sequences injected at very close and very far ranges, edit the factor to
+        2. To increase the sequences that are injected at very close and very
+        far ranges, increase the factor above 4
+    </p>
+    <br>
+    <br>
+    <br>
+    <p class="prevLink"><a href="SIDE_Configure.html">Previous: SIDE Module Creation and Configuration</a></p>
+    <p class="nextLink"><a href="SIDE_TestParams.html">Next: Quick/Random Test Parameters</a></p>
+    <br>
+    <br>
+    <br>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+<link href="../../../pamHelpStylesheet.css" type="text/css" rel="STYLESHEET"><title>Marking out Events</title>
+
+</head>
+<body>
+<h1>Click Detector Viewer Functions</h1>
+<h2>Marking out Events</h2>
+<p>
+The Pamguard viewer click detector has the ability to allow manual
+marking of events. Events usually consist of a group of clicks
+associated with one acoustic encounter of a particular species. Event
+information is saved to the database and in certain situations, such as
+when using towed arrays, can be used to localise an animal´s position. <br>
+<br>
+<b>Creating an Event</b>
+<br>
+<br>
+To mark an event bring up the bearing/amplitude time display (in the
+Click Detector tab). The Figure shows a porpoise click train which
+needs to be marked and stored as an event. Note that the bearing time
+display is very similar to the online version
+just that instead of the trigger window you get a <a href="http://en.wikipedia.org/wiki/Wigner_quasi-probability_distribution">Wigner
+plot </a> as default setting. <br>
+<br>
+</p>
+<center><img alt="ClickTrain" src="images/ClickTrain.png"></center>
+<br>
+<br>
+<p>To see the classified clicks better (in this case porpoise
+clicks - the red triangles) you can untick the box at the top of the
+window <i>'Unclassified clicks'</i>.
+The bearing time display will now only show the classified clicks
+(depending on your settings you have more options i.e. echos, other
+species, etc.). Right click on a click and select <i>'Label
+click...'</i>.</p>
+<br>
+<br>
+<center><img alt="LabelClick_1" src="images/LabelClick_1.png"></center>
+<br>
+<br>
+<p>This will bring up the event dialogue box. Here you can create
+a new event by selecting the <i>'New Event'</i> button or
+add the click to an existing event by selecting any event from the
+Event list.</p>
+<br>
+<br>
+<center><img alt="Events_1" src="images/Events_1.png"></center>
+<br>
+<br>
+<p>When creating a new event the species/event type can be
+selected from the drop down menu. To add a new species/event type to
+the database simply right click on the drop down menu and select <i>'Edit
+list'</i>.</p>
+<br>
+<br>
+<center><img alt="CreateNewEvents" src="images/CreateNewEvent.png"></center>
+<br>
+<br>
+<p>In the Lookup Editor window select <i>'Add Item'</i>
+and create a Code, Text and Symbol for your new species/event type.
+Press ok.
+Now you can select your new Event type/species from the drop down list
+in the click event dialogue (previous figure).
+The Estimated number of animals and the comment are optional but always
+useful to fill in. (Note: Dont worry about the event number, Pamguard
+creates an ID automatically.)</p>
+<br>
+<br>
+<center><img alt="Lookup" src="images/Lookup.png"></center>
+<br>
+<br>
+<p>Multiple clicks can be selected using the advanced area
+selection tool. Double click on the bearing/amplitude time display.
+This will bring up a dotted line which you can use to draw around a
+group of clicks. By joining up the ends of the dotted line the selected
+area should appear grey.</p>
+<br>
+<br>
+<center> <img alt="MarkingAnEvent_1" src="images/MarkingAnEvent_1.png"></center>
+<br>
+<br>
+<p>All the clicks within this grey area can be added to an event
+by right clicking inside the grey area and selecting <i>'Label
+Clicks'</i> or use the key short cut <i>'Ctrl+L'</i>.
+Note that there are also other options available such as removing
+clicks from a certain event etc. So if you made a mistake, don´t
+panick.
+Other useful tools for marking an event include the <a href="../../../detectors/clickDetectorHelp/docs/offline_tools.html">amplitude
+selector</a> and
+<a href="../../../detectors/clickDetectorHelp/docs/offline_tools.html">zoom
+selection</a>.</p>
+<br>
+<br>
+<center> <img alt="LabelMultipleClicks" src="images/LabelMultipleClicks.png"></center>
+<br>
+<p>Following the described steps your event is saved. You can now
+localise it with <a href="../../../localisation/targetmotion/docs/targetmotion_Localising.html">target
+motion analysis</a>.
+<br>
+<br>
+All events are saved in the database. To get an overview about your
+events go to <i>'Click Detection'</i> and then <i>'Show
+events'</i>.</p>
+<br>
+<br>
+<center> <img alt="ShowEvents" src="images/ShowEvents2.png"></center>
+<br>
+<br>
+<p>Depending on your selection you see all events in your data
+set or only the ones which are in the current period. Right click on an
+event and you have the option for editing, deleting or going to the
+event.
+This comes in handy when you want to move between events.</p>
+<br>
+<br>
+<center> <img alt="EventList" src="images/EventList.png"></center>
+<br>
+<br>
+<p>Events which contain clicks with bearing information can be
+viewed in the map tab- simply right click and select <i>'Click
+Detector, Tracked Clicks'</i>.
+If using a towed array events can be localised using the <a href="../../../localisation/targetmotion/docs/targetmotion_overview.html">target
+motion analysis </a>module.
+Localisation information will also be displayed on the map.</p>
+<br>
+<br>
+<center> <img alt="MapEvents" src="images/LocaliseanMap.png"></center>
+<br>
+<br>
+<p>You can also send Events to <a href="../../../detectors/roccaHelp/docs/rocca_Overview.html">Rocca</a>
+for click analysis. Go to <i>'Click Detection'</i> and
+then <i>'Rocca Measurement'</i>.
+A new window will open up displaying all of the currently defined
+events. Select the events to analyse, and then click <i>'Analyze
+Selection'</i></p>
+<br>
+<br>
+<center><img alt="RoccaAnalysis" src="images/sendToRocca.png"></center>
+<br>
+<br>
+<p class="previousLink"><a href="offline_Navigating.html">Previous: Navigating through Data</a></p>
+<p class="nextLink"><a href="offline_Reclassify_clicks.html">Next: Reclassifying Click </a></p>
+<br>
+<br>
+<p></p>
+</body></html>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugins>
+  <pamcontrolledunit>
+    <unittype>Some Unit</unittype>
+    <unitclass></unitclass>
+    <author>Doug Gillespie</author>
+    <version>1.0</version>
+    <helpset></helpset>
+    <dependency>ClickDetection</dependency>
+    <maxnumber>0</maxnumber>
+    <minnumber>0</minnumber>
+   </pamcontrolledunit>
+ </plugins>

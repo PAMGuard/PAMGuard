@@ -1,0 +1,67 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
+<title>Create binary files offline</title>
+</head>
+<h1>Pamguard Viewer</h1>
+<h2>Create binary files offline</h2>
+<body>
+
+<p>The Viewer funtion is new so you probably did not include binary storage module when you collected your data. Also what about older data sets you would like to analyse now with viewer. This brief description shows you the necessary steps
+to process your data so you can create binary files offline so you can use <a href="../../../overview/PamMasterHelp/docs/viewerMode.html">Pamguard Viewer</a>. 
+<br><br>First you have collected <a href="../../../detectors/clickDetectorHelp/docs/offline_ImportingRBC.html">Rainbow Click Files</a>.
+These can be imported and converted directly.
+<br><br>Secondly, you have collected continous recordings (.wav files) but no binaries. You need to process your .wav files offline to create binaries. Open up Pamguard (online) and add the following modules:<a href="../../../sound_processing/AcquisitionHelp/docs/AcquisitionOverview.html">Sound Acquisition</a>,
+<a href="../../../ detectors/clickDetectorHelp/docs/ClickDetector_clickDetector.html">Click detector</a>, <a href="../../../utilities/generalDatabaseHelp/docs/database_database.html">Database</a> and
+<a href="../../../utilities/BinaryStore/docs/binarystore_overview.html">Binary Stoarage</a>. If you are not interested in clicks but whistles the same principle applies. You just have to add the <a href="../../../detectors/whistleMoanHelp/docs/whistleMoan_Overview.html">whistle & moan detector</a>. Noise measurments can also be processed this way. 
+
+<h3>Sound Acquisition</h3>
+<p>Go to <strong><em>Detection>Sound Aquistion</em></strong>. Choose either <i>'Audio file'</i> or <i>'Audio file folder or multiple files'</i> in the Data Dource Type dropdown list. Choose the appropiate folder where your file/files are stored. Make sure the box <i>'include subfolders is ticked'</i> so all files get processed.
+Check that the box<i>'Repeat: Ant end of file list, start again'</i> is NOT ticked. Press ok. 
+
+<br><br><center>
+<img alt="AudioDataAcquisition"
+	src="images/AudioDataAcquisition.png" /></center>
+<br><br>
+
+<h3>Database selection</h3>
+<p>Before you select your database, you have to create a blank database you can use. If you collected GPS data during the data collection you can import that table in your blank database. 
+Make sure it is called gpsData and is in the right <a href="../../../detectors/clickDetectorHelp/docs/offline_AddingGPSData.html">GPS format</a>. You can also add your GPS table after you processed the data.
+<br>Go to <strong><em>File>database selection</em></strong> and select the appropiate data base.
+
+<h3>Binary Storage</h3>
+<p>You have to select a folder where the binaries are going to be stored. Go to Go to <strong><em>File>Binary Storage options</em></strong> for your selection.
+
+<h3>Click Detector</h3>
+<p>Set up the <a href="../../../detectors/clickDetectorHelp/docs/ClickDetector_clickDetector.html">Click detector</a> for your purposes.
+You can change some paramters again in Viewer mode with the option <a href="../../../detectors/clickDetectorHelp/docs/offline_Reanalyse_click_types.html">Reanalyse click types</a> but as it it time intensive you should set it up correctly. 
+
+<br><br> After you set up everything you might as well save the .psf file so you have a template for the future. The data model should look like this.
+You can also add some notch <a href="../../../sound_processing/FiltersHelp/Docs/Filters_filters.html">filters</a> beforehand if the data is really noisy.
+
+<br><br><center>
+<img alt="Data_model"
+	src="images/Data_model.png" /></center>
+<br><br>
+ 
+<p>The next step is to start processing the data. Go to <strong><em>Detection>Start</em></strong>. Now the .wav files are processed and binary files are created. This can be quite time consuming depending on how much data you process
+and how fast your computer is. It could take a couple of hours to a couple of days. Pamguard will tell you approximatley when it is finishing, which file it is processing and how fast real time it is processing (RT).
+After it is finished you can open up <a href="../../../overview/PamMasterHelp/docs/viewerMode.html">Pamguard Viewer</a>. 
+ 
+ 
+<br><br><center>
+<img alt="Running"
+	src="images/Running.png" /></center>
+<br><br> 
+   
+</p>
+
+
+
+
+
+
+</p>
+
+</body>
+</html>

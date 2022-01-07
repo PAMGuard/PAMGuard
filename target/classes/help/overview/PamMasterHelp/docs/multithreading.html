@@ -1,0 +1,48 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
+<title>Multi-threading</title>
+</head>
+
+<body>
+
+<h1>PAMGUARD</h1>
+<h2>Multi-threading</h2>
+<p><br>
+  PAMGUARD can operate in either a single thread mode, or a multi-thread mode. 
+</p>
+<p>
+  In multi-thread mode, each process within each PAMGUARD module operates in a different 
+  processing thread, which basically allows several processes to take place at once in a multiprocessor computer. 
+</p>
+<p>
+  In single thread mode, actions take place one at a time as data propagates through PAMGUARD. 
+</p>
+<p>
+  The advantage of multi-thread operation is that the different tasks will spread between 
+  multiple processing cores on the computer, thereby gaining access to more processing power.
+</p>
+<p>
+  In single thread operation, only a single processing core will be used, so less processing 
+  power is available.
+</p>
+<p>
+  Multi-threading may introduce instability in some modules, where certain processes have to happen
+  in a certain sequence, so although multi-threading is usually  preferable, single thread 
+  operation is maintained as an option.</p>
+<h3>Turning multi-threading on and off</h3>
+<p>Multi-threading can be turned on and off from the <em><strong>Detection>Multi-threading</strong></em> menu command. </p>
+<br>
+<center><img alt="Main Menu" src="images/MultiThreadingDialog.png"/></center></p>
+<br><p>You can also set the amount of "jitter" between threads. This is the maximum amount of data
+that can be queued between two threads. If the data queue exceeds this time, then the earlier
+thread will wait until the second thread has processed some of the data in the queue.  </p>
+<p>More jitter allows more flexibility between threads which can allow PAMGUARD to use multiple 
+processor cores more efficiently. However, increased jitter can cause a loss of synchronisation 
+between the processing, graphics output and sound play back</p>  
+<p>
+<br>
+<p CLASS="previousLink"><a href="modelViewer.html">Previous: Model viewer</a></p>
+<p CLASS="nextLink"><a href="datastorage2.html">Next: Data Storage</a></p>
+</body>
+</html>

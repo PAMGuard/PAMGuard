@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+<link href="../../../pamHelpStylesheet.css" type="text/css" rel="STYLESHEET"><title>Rocca Sidebar</title>
+
+</head>
+<body>
+<h1>ROCCA</h1>
+<h2>ROCCA&nbsp;Sidebar</h2>
+<br>
+<p>ROCCA&nbsp;assembles the results of individual whistle
+classifications
+into groups as defined by the user. Each group must be given a name,
+the <strong>Encounter Number</strong>. In addition to
+classifying individual
+whistle, ROCCA will also classify the Encounter Number
+to species. This is known as the Encounter Classification and is
+determined by either using the encounter classifier model (if loaded),
+or summing the percentage of tree votes for each species over all of
+the whistles/clicks in that Encounter Number and selecting the species
+with the highest total.</p>
+<br>
+<img style="width: 323px; height: 720px;" alt="Rocca sidebar" src="images/sidebar3.png">
+<br>
+<ol>
+<li>
+<p>Encounter number: the current encounter number. This is
+the encounter number used when a whistle is selected from the
+spectrogram display.</p>
+</li>
+<li>
+<p>Scroll buttons: scroll through the list of encounter
+numbers.</p>
+</li>
+<li>
+<p>Classification
+results: the individual classification tally for the current encounter
+number. The list of possible species is based on the classifier model
+currently loaded. The number beside the species name indicates the
+number of whistles/clicks that have been <a href="rocca_WhistleSchoolClassification.html">classified</a>
+as that species.</p>
+</li>
+<li>
+<p>Encounter classification: the overall species <a href="rocca_WhistleSchoolClassification.html#SchoolClassification">classification</a>
+for the current encounter number.</p>
+</li>
+<li>
+<p>Encounter ID: text box allowing user to add notes to
+contour output file. This text box is identical to the box found in the
+<a href="rocca_Configure.html#rocca_Notes">ROCCA
+parameters configuration</a> window.</p>
+</li>
+<li>
+<p>Known Species: text box allowing user to add notes to
+contour output file. This text box is identical to the box found in the
+<a href="rocca_Configure.html#rocca_Notes">ROCCA
+parameters configuration</a> window.</p>
+</li>
+<li>
+<p>Rename
+Encounter: allows the user to rename the current encounter. Any output
+files previously
+saved that use the old encounter number in the filename will be renamed
+with the new encounter number. Note that the information <em>in</em>
+the <a href="rocca_SavedFiles.html#contour">whistle
+contour stats save file</a>
+is NOT updated - the user must modify any references to the old
+encounter number manually. Also note that the user will not be allowed
+to duplicate encounter numbers</p>
+</li>
+<li>
+<p>Classify Encounter: classifies the encounter one of two
+ways. &nbsp;If an Encounter Classifier model has been <a href="rocca_Configure.html#rocca_SchoolClassifierModel">loaded</a>
+and both whistle and click encounter stats have been <a href="rocca_Configure.html#SchoolStats">calculated</a>,
+a random forest classifier is used to classify the encounter based on
+the output of the whistle and click classifiers. If an Encounter
+Classifier model has not been loaded, or if either the whistle or click
+encounter stats are not being calculated, the encounter is classified
+as the species with the highest cumulative percentage of votes. </p>
+</li>
+<li>
+<p><a name="SaveNow">Save Encounter</a>:
+overwrites the current Encounter Stats file (as defined in the <a href="rocca_Configure.html#rocca_ParamsOutput">ROCCA
+Parameters window</a>) with the current list of encounters and
+statistics. Encounter statistics are also automatically saved every 5
+minutes.</p>
+</li>
+<li>
+<p>New Encounter: create a new encounter number</p>
+</li>
+<li>
+<p>Whistle Start: lists the time and frequency of the first
+user-selected point on the spectrogram</p>
+</li>
+<li>
+<p>Whistle
+End: lists the time and frequency of the second user-selected point on
+the spectrogram. Note that once the second point is selected, the
+portion of the spectrogram is captured in a new <a href="rocca_Spectrogram.html">popup</a> window.</p>
+</li>
+</ol>
+<br>
+<br>
+<p></p>
+<p class="prevLink"><a href="rocca_WhistleSchoolClassification.html">Previous:
+Whistle and School Classification</a></p>
+<p class="nextLink"><a href="rocca_SavedFiles.html">Next:
+Saved Files</a></p>
+<br>
+<br>
+<br>
+</body></html>

@@ -1,0 +1,54 @@
+<html>
+
+<head>
+	<LINK href="../../../pamHelpStylesheet.css" type="text/css" rel="STYLESHEET">
+	<title>Generalised Power Law Detector</title>
+</head>
+
+<body>
+
+	<h1>Generalised Power Law Detector</h1>
+	<h2>Overview</h2>
+	<p>The Generalised Power Law (GPL) Detector is a real time
+		implementation of the detector described in Helble et al, 2012. This
+		detector is particularly useful for the detection of highly variable
+		tonal sounds, such as those from humpbacks, where correlation or other
+		shape based detectors become ineffective.</p>
+	<p>A generalized power-law detection algorithm for humpback whale
+		vocalizations. Tyler A. Helble, Glenn R. Ierley, Gerald L. D’Spain,
+		and Marie A. Roch and John A. Hildebrand. The Journal of the
+		Acoustical Society of America 131, 2682 (2012).<br>
+		<a href="http://asa.scitation.org/doi/abs/10.1121/1.3685790">
+			http://asa.scitation.org/doi/abs/10.1121/1.3685790</a></p>
+
+	<h3>Algorithm</h3>
+	<p>For details of the algorithm, see Helble et al 2012. The papers
+		abstract is given here to give a quick summary of what happens. In
+		many ways, the algorithm is similar to an in band energy detector,
+		however by raising the amplitude of the data in a spectrogram to a
+		higher power, tonal sounds become amplified by a much greater amount
+		than broader band sources of noise such as shipping or wave motion.</p>
+		
+	<h4>ABSTRACT (from Helble et al, 2012)</h4>
+	<p>Conventional detection of humpback vocalizations is often based on frequency summation of band-limited
+		spectrograms under the assumption that energy (square of the Fourier amplitude) is the appropriate metric.
+		Power-law detectors allow for a higher power of the Fourier amplitude, appropriate when the signal occupies a
+		limited but unknown subset of these frequencies. Shipping noise is non-stationary and colored and problematic
+		for many marine mammal detection algorithms. Modifications to the standard power-law form are introduced to
+		minimize the effects of this noise. These same modifications also allow for a fixed detection threshold,
+		applicable to broadly varying ocean acoustic environments. The detection algorithm is general enough to detect
+		all types of humpback vocalizations. Tests presented in this paper show this algorithm matches human detection
+		performance with an acceptably small probability of false alarms (P<sub>FA</sub> < 6%) for even the noisiest environments.
+			The detector outperforms energy detection techniques, providing a probability of detection PD = 95% for
+			P<sub>FA</sub> < 5% for three acoustic deployments, compared to P<sub>FA</sub> > 40% for two energy-based techniques. The
+			generalized power-law detector also can be used for basic parameter estimation and can be adapted for other
+			types of transient sounds.</p>
+
+
+	<p></p>
+	<p CLASS="nextLink"><a href="configure.html">Next:
+			Configuring the GPL Detector</a></p>
+	<br><br><br>
+</body>
+
+</html>

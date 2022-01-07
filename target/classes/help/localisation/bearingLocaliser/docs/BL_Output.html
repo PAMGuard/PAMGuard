@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+    <head>
+    <link href="../../../pamHelpStylesheet.css" type="text/css" rel="STYLESHEET"><title>Bearing Calculator Output</title>
+    </head>
+
+<body>
+<h1>Bearing Localiser</h1>
+<h2>Output</h2>
+<br>
+<h3>Basic Frequency Domain and MVDR beamformer Output</h3>
+<p>The output image shown below was generated using simulated right whale calls located 90 degrees to the ship heading.</p>
+<img src="images/BL Output Beamogram.PNG">
+<ol>
+    <li>
+        <p>Standard spectrogram, using FFT Engine as source</p>
+    </li>
+    <li>
+        <p>A whistle selected using the Spectrogram Annotation module.</p>
+    </li>
+    <li>
+        <p>Bearing localiser output for a Volumetric Array.  The chart shows the amplitude (represented by the colour) vs. Primary and Secondary angles.  The data for each
+        point is averaged over all frequencies.</p>
+    </li>
+    <li>
+        <p>The white line shows the amplitude as a function of Primary angle.</p>
+    </li>
+    <li>
+        <p>The plus sign indicates the point of highest gain.  This primary/secondary angle position is output as the bearing of the detection.</p>
+    </li>
+    <li>
+        <p>Bearing localiser output for a Linear Array.  The chart shows the amplitude (represented by the colour) vs. Frequency and Primary angle.</p>
+    </li>
+    <li>
+        <p>The white line shows the amplitude as a function of Primary angle.</p>
+    </li>
+    <li>
+        <p>The plus sign indicates the point along the line of highest gain.  This primary angle is saved as the bearing of the detection.</p>
+    </li>
+</ol>
+<p></p>
+<br>
+<br>
+<h3>TOAD Output</h3>
+<p>The output image shown below was generated using simulated right whale calls located 90 degrees to the ship heading.</p>
+<img src="images/BL TOAD Output.PNG">
+<ol>
+    <li>
+        <p>Standard spectrogram, using FFT Engine as source</p>
+    </li>
+    <li>
+        <p>A whistle selected using the Spectrogram Annotation module.</p>
+    </li>
+    <li>
+        <p>Bearing localiser output for a Volumetric Array.  The chart shows the log likelihood (represented by the colour) vs. Primary and Secondary angles.</p>
+    </li>
+    <li>
+        <p>The white line shows the log likelihood as a function of Primary angle.</p>
+    </li>
+    <li>
+        <p>The circle indicates the point of highest likelihood.  This primary/secondary angle position is output as the bearing of the detection.</p>
+    </li>
+    <li>
+        <p>Bearing localiser output for a Linear Array.  The chart shows the log likelihood (represented by the colour) vs. Primary angle.  Since there is no
+        Secondary angle information, the output appears as vertical bars.</p>
+    </li>
+    <li>
+        <p>The white line shows the log likelihood as a function of Primary angle.</p>
+    </li>
+    <li>
+        <p>The circle indicates the point of highest likelihood.  This primary angle is saved as the bearing of the detection.</p>
+    </li>
+</ol>
+<br>
+<br>
+<p class="prevLink"><a href="BL_AlgoConfig.html">Previous: Bearing Calculator Algorithm Configuration</a></p>
+</body>
+</html>

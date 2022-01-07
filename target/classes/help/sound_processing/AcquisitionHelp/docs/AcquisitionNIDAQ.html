@@ -1,0 +1,117 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
+<title>National Instruments DAQ Cards</title>
+</head>
+<body>
+
+<h1>National Instruments DAQ Cards</h1>
+
+<p><a href="http://www.ni.com">National Instruments</a> Data Acquisition devices offer PAMGUARD
+users the highest sample rates and the highest numbers of channels.</p>
+<p>PAMGUARD will work with M-series DAQ cards. In principle, any M-series card should work with 
+PAMGUARD, but the software has so far only been tested with PCI-6250 and USB-6251 devices.</p>
+<p>If you plan to use a different device, you are strongly advised to install the National Instruments 
+software (available from the <a href="http://www.ni.com">National Instruments web site</a>)
+and set up and test a simulated card prior to purchase. While this is not a 100% guarantee that 
+the card will work with PAMGUARD, if the simulated device doesn't work, it's very unlikely that the real
+one will. The PAMGUARD team welcome any information regarding success or failure with other devices. <p> <br>
+
+<h2>Setting up National Instruments Cards</h2>
+<p>National Instruments cards and software drivers should be installed according to the 
+instructions provided by National Instruments.
+The National Instruments software should be installed before starting PAMGUARD</p>
+<p>Select "National Instruments DAQ Cards" in the drop down list at the top of the Audio Data Acquisition dialog. 
+You can then configure the card using the sound acquisition dialog shown below.</p> 
+
+<p><center><img alt="Sound Acquisition Dialog" src="images/NIDaqConfig.png" /></center></p>
+
+<h3>Using a single National Instruments device</h3>
+<p>Make sure that "Use Multiple DAQ boards" is not selected and choose the device you wish 
+to use from the "Master Device" drop down list (there may be several National 
+Instruments devices installed on a single system).</p>
+<h4>Terminal Configuration</h4>
+<p>The terminal configuration you select will depend on how your hydrophone and pre-amplifiers
+have been connected to the National Instruments device.  Detailed information on the four 
+available configurations and how to use them is given in the National Instruments help files 
+which should be installed on your system.</p>
+<br>
+<table border="1"
+cellpadding="5">
+<th><p>Terminal Configuration</p></th>	<th><p>Overview</p></th>
+<tr>
+<td><p>Referenced single ended</p></td>
+<td><p>Signals are referenced to a common ground (the AIGND) terminal</p></td>
+</tr>
+<tr>
+<td><p>Non-referenced single ended</p></td>
+<td><p>Signals are referenced to a common terminal (AISENSE) which is not necessarily the same as ground</p></td>
+</tr>
+<tr>
+<td><p>Differential</p></td>
+<td><p>Differential input signals are used</p><p>NB. This may halve the number of available channels</td>
+</tr>
+<tr>
+<td><p>Pseudo Differential</p></td>
+<td><p>Differential input, but one side of the differential input is tied to ground via a resistor</p></td>
+</tr>
+</table>
+ 
+<h3>Sample rate and number of channels</h3>
+<p>Set the sample rate in Hz and the number of channels. This must be within the limits of the device. With most devices, 
+the sample rate must be reduced for higher channel numbers, e.g. a PCI-6250 device can sample 
+two channels at 500 kHz per channels but can only sample four channels at 250 kHz per channel.</p> 
+
+<h3>Hardware channels</h3>
+<p>Select the hardware channels you wish to read. Note that it's not possible to read the same channel more than once.</p>
+<p>Whichever hardware channels are selected, software channel numbering in PAMGUARD will always be 0, 1, 2, etc...</p> 
+
+<h3>Range</h3>
+<p>The drop down list of ranges for each channel will be populated with a list of available input ranged for the selected
+device.</p>
+<p>Select the range you wish to use. Note that the Peak to peak voltage range in the Calibration panel at the bottom of the 
+dialog will automatically set to the range of the first channel. Values used in calculations of sound pressure levels in 
+PAMGUARD will use the correct values for each channel.</p>
+<p>If the range list is empty, then it is likely that the device you have selected is not working correctly</p>  
+
+
+<h3>Using multiple National Instruments devices</h3>
+<p>If you require more channels or higher sample rates than can be achieved using a single National Instruments device, 
+ it is possible to simultaneously sample from multiple devices. e.g. you could use two USB-6251 devices to sample four 
+channels at 500 kHz sample rate per channel. In principle, you can use as many different devices as you like. In practice you will be limited by the number of 
+PCI slots and USB ports on your computer and by the rate at which PAMGUARD can process the data</p>
+<p>To use multiple devices, check the "Use multiple DAQ boards" box on the dialog. The 'Master Device' selection will no
+longer be available and individual devices should be selected as shown below.</p>
+
+ 
+<p><center><img alt="Sound Acquisition Dialog" src="images/NIDaqMultiConfig.png" /></center></p>
+
+<h4>Device and Channel Ordering</h4>
+<p>All Channels on each device must me grouped together as shown in the above example which reads channels 0 and 1 on Dev4, then channels
+0 and 1 on Dev7. Reading Dev4 Channel 0 / Dev 7 Channel 0 / Dev 4 Channel 1 / Dev 7 Channel 1 is would not be allowed.</p> 
+
+<h4><span style="color:red">IMPORTANT Timing information when using multiple devices</span></h4>
+<p>When using a single device all timing (i.e. how often the device acquires samples) is taken from an internal
+clock in that one device. These are generally very accurate and the number of samples you expect to acquire in a given time 
+interval will be very close to that time interval x the sample rate.
+However, if multiple devices are used, and each device acquires samples based on it's own internal clock, the exact number 
+of samples acquired by each device will gradually differ. For example, even if the clocks were 0.0001% accurate, after just 
+two seconds sampling at 500 kHz sample rate, one device would have acquired one more sample than the other device. 
+Small timing differences based on sample counts between signals arriving on multiple channels would therefore rapidly become meaningless.</p>
+<p>When using multiple devices, the internal clock in the first (or master) device is therefore sent to the other devices 
+which use the master clock signal in preference to their own internal clock.</p>
+<p><b><span style="color:red">You must physically connect the clock signal from the master device to the other
+devices yourself: Using a single wire, connect the PFI 1 terminal of the master device to the PFI 1 
+terminals of all the other devices (yes, it is PFI 1 to PFI 1).</b></span> 
+<p>If you fail to do this, the other devices will not acquire data and you will continually receive the message 
+"NIDaq Error DAQmxReadAnalogF64 code -200284 Measurements: Some or all of the samples requested have not yet been acquired ..."
+</p> 
+
+ 
+
+<br>
+<p CLASS="prevLink"><a href="AcquisitionFileFolder.html">Previous: Audio File Folders</a></p>
+<p CLASS="nextLink"><a href="SAILDaqCard.html">Next: SAIL Daq Cards</a></p>
+<br><br><br>
+</body>
+</html>

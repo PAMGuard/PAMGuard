@@ -1,0 +1,179 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>PAMGuard Deep Learning Module - Results</title>
+
+</head>
+<body>
+	<h1 id="pamguard-s-deep-learning-module">PAMGuard&#39;s Deep
+		Learning Module</h1>
+	<h2 id="viewing-and-exporting-results">Viewing and exporting
+		results</h2>
+	<br>
+	<p>Output from the deep learning module can be viewed in PAMGuard
+		viewer mode, or extracted from binary files using MATLAB or R.</p>
+	<br>
+	<h3 id="pamguard-viewer-mode">PAMGuard viewer mode</h3>
+	<p>Detections form continuous raw data are shown in the datagram in
+		the same way as all data streams in PAMGuard.</p>
+	<p>The Time base display FX is best way to view detailed data
+		outputs from the deep learning algorithm. The time base display can
+		display almost all data types in PAMGuard on a large variety of
+		different data axis. For example, click detections can be displayed on
+		an amplitude, bearing, ICI, waveform and/or frequency axis. Deep
+		learning detections (i.e. data units which have been saved from raw
+		data using the deep learning detector) can be displayed on the time
+		base display in the same way as many other detections and in addition,
+		there is a symbol manager options which allows the deep learning
+		detections or other detections which have been classified by the deep
+		learning module to be coloured by prediction class. This means that a
+		manual analyst can quickly navigate to detections with high prediction
+		values for a certain class. Hovering over or right clicking on a data
+		unit in the time display and selecting the information button, will
+		show the data unit&#39;s metadata, including the prediction values for all
+		output classes from the deep learning model.</p>
+	<p align="center">
+		<img src="images/bat_time_base_display.png">
+	</p>
+
+	<p>
+		<em>An example click detection module output coloured by deep
+			learning annotations. Click detections are annotated with the results
+			from the deep learning module. The symbol manager in the time base
+			display can be used to colour the clicks by the prediction for a
+			selected class</em>
+	</p>
+	<p>Other displays also show outputs from the deep learning module.
+		Hovering over data units in the click display will, for example, show
+		deep learning prediction values. The spectrogram will also show deep
+		learning detections as translucent blue boxes (these must be selected
+		in the right click menu).</p>
+	<br>
+	<h3 id="matlab">MATLAB</h3>
+	<p>The easiest way to export to MATLAB is to select the desired
+		units in the time base display, right click and select the MATLAB
+		icon. Data units will be exported to a .mat file as list of structures
+		which is then saved to the clipboard. This file can be saved and then
+		dragged into MATLAB to open.</p>
+	<p>
+		Where it is necessary to further analyse large datasets produced by
+		PAMGuard, there is a MATLAB-PAMGuard library which can directly import
+		the binary files which store PAMGaurd detection data. The library is
+		simple to use with the primary function being
+		<code>loadPAMGuardBinaryFile.m.</code>
+		This will load any binary file type (e.g. clicks, whistles, deep
+		learning detections) and return a list of data structures with the
+		detection data. The structures include annotations where deep learning
+		predictions are stored.
+	</p>
+	<p>Here is a simple example loading up all the deep learning
+		detections for a right whale classifier.</p>
+	<pre>
+		<code class="lang-matlab">% <span class="hljs-keyword">the</span> <span
+				class="hljs-built_in">folder</span> containing PAMGuard binary <span
+				class="hljs-built_in">files</span>
+<span class="hljs-built_in">folder</span> = <span class="hljs-string">'/Users/me/right_whale_project_1/PAMBinary/'</span>; 
+
+ %<span class="hljs-built_in">load</span> all <span class="hljs-keyword">the</span> detections <span
+				class="hljs-keyword">in</span> <span class="hljs-keyword">the</span> <span
+				class="hljs-built_in">folder</span>
+dldetections = loadPamguardBinaryFolder(<span class="hljs-built_in">folder</span>, <span
+				class="hljs-string">'Deep_Learning_Classifier_Raw_Deep_Learning_Classifier_DL_detection_*.pgdf'</span>)
+</code>
+	</pre>
+	<p>The predicitons for each class (in this case the classes are
+		noise and right whale) are easily accessed in the structure via;</p>
+	<pre>
+		<code class="lang-matlab">
+			<span class="hljs-comment">%% access the prediciton form the first detection </span>
+predicitons = dldetections(<span class="hljs-number">1</span>).annotations.dlclassification(<span
+				class="hljs-built_in">j</span>).predictions;
+</code>
+	</pre>
+	<p>The loaded detections can then be plotted by accessing the
+		waveform data in each structure;</p>
+	<pre>
+		<code class="lang-matlab">
+<span class="hljs-comment">% plot all the spectrograms.</span>
+clf
+tiledlayout(<span class="hljs-number">5</span>,<span class="hljs-number">5</span>)
+<span class="hljs-keyword">for</span> <span class="hljs-built_in">i</span>=<span
+				class="hljs-number">1</span>:<span class="hljs-built_in">length</span>(dldetections)
+
+    nexttile
+
+    <span class="hljs-comment">% generate the data for a spectrgram</span>
+    [s, w, t] = spectrogram(dldetections(<span class="hljs-built_in">i</span>).wave,<span
+				class="hljs-number">512</span>, <span class="hljs-number">384</span>,[],sR,<span
+				class="hljs-string">'yaxis'</span>);
+
+    <span class="hljs-comment">% create the time and frequency matrices required to plot a surface </span>
+    [X, Y] = <span class="hljs-built_in">meshgrid</span>(t,w);
+    <span class="hljs-comment">% plot the surface (divide and multiply by 1000 to show milliseconds and kHz respectively)</span>
+    surf(X*<span class="hljs-number">1000</span>, Y/<span
+				class="hljs-number">1000</span>, <span class="hljs-number">20</span>*<span
+				class="hljs-built_in">log10</span>(<span class="hljs-built_in">abs</span>(s))<span
+				class="hljs-number">-140</span>, <span class="hljs-string">'EdgeColor'</span>, <span
+				class="hljs-string">'None'</span>)
+    view([<span class="hljs-number">0</span>,<span class="hljs-number">90</span>])
+
+    caxis([<span class="hljs-number">70</span>, <span
+				class="hljs-number">140</span>]<span class="hljs-number">-140</span>)  
+    ylim([<span class="hljs-number">0</span>,<span class="hljs-number">0.5</span>]); 
+    xlabel(<span class="hljs-string">''</span>)
+    ylabel(<span class="hljs-string">''</span>)
+
+    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">mod</span>(<span
+				class="hljs-built_in">i</span>,<span class="hljs-number">5</span>)==<span
+				class="hljs-number">0</span>)
+       c = colorbar;  
+       c.Label.String = <span class="hljs-string">'Amplitude (dB)'</span>; 
+    <span class="hljs-keyword">end</span>
+
+    <span class="hljs-comment">%x axis only on bottom plots</span>
+    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">i</span>&gt;=<span
+				class="hljs-number">20</span>)
+       xlabel(<span class="hljs-string">'Time (ms)'</span>) 
+    <span class="hljs-keyword">end</span>
+
+    <span class="hljs-comment">%y axis only on left most plots</span>
+    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">mod</span>(<span
+				class="hljs-built_in">i</span><span class="hljs-number">-1</span>,<span
+				class="hljs-number">5</span>)==<span class="hljs-number">0</span>)
+       ylabel(<span class="hljs-string">'Frequency (kHz)'</span>) 
+    <span class="hljs-keyword">end</span>
+</code>
+	</pre>
+	<p align="center">
+		<img width="800" height="700"
+			src="images/right_whale_detection_MATLAB.png">
+	</p>
+
+	<p>
+		<em>Right whale detections from a deep learning model imported
+			and then plotted in MATLAB</em>
+	</p>
+	<br>
+	<h3 id="r">R</h3>
+	<p>In the same way as MATLAB export, the PAMGuard time base display
+		and export selected data units directly to an R struct which can be
+		imported easily into R..</p>
+	<p>
+		R also has a well supported PAMGuard library with like for like
+		functions compared to the MATLAB library. The PAMBinaries R library
+		can be found <a href="https://github.com/TaikiSan21/PamBinaries">here</a>.
+	</p>
+	<br>
+	<br>
+	<br>
+	<p class="prevLink"><a href="rawDeepLearning_Running.html">Previous:
+	Running the Deep Learning module</a></p>
+	<p class="nextLink"><a href="rawDeepLearning_Bugs.html">Next:
+	Common Bugs and Mistakes</a></p>
+	<br>
+	<br>
+	<br>
+</body>
+</html>

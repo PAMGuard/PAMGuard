@@ -1,0 +1,34 @@
+BODY {
+	BACKGROUND-COLOR: FFFFFF
+}
+H1 {
+	FONT-FAMILY: Arial;
+	FONT-SIZE: 21;
+	COLOR: #6698FE;
+	BACKGROUND-COLOR: #DCFEEC;
+	margin-bottom: 0
+}
+H2 {
+	FONT-FAMILY: Arial;
+	FONT-SIZE: 17;
+	COLOR: #6698FE;
+	BACKGROUND-COLOR: #CBDAEB;
+	margin-top: 0;
+}
+H3 {
+	FONT-FAMILY: Arial;
+	FONT-SIZE: 15;
+}
+
+H4 {
+	FONT-FAMILY: Arial;
+	FONT-SIZE: 13;
+}
+
+p {
+	FONT-FAMILY: Arial;
+	FONT-SIZE: 13;
+	margin-top: 10; 
+	margin-left: 0; 
+	margin-bottom: 0
+}

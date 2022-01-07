@@ -1,0 +1,55 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
+<title>File Folders</title>
+</head>
+<body>
+<h1>Audio File Folders</h1>
+<p>If you've a whole folder (or many folders) full or archived data than you wish to 
+re-analyse, then you can set PAMGUARD up to work it's way through the whole lot in one go</p>
+<p>Processing speed and dates and times operate in the same way as for 
+<a href="AcquisitionFile.html">single audio file analysis</a></p>
+
+<br>
+<h2>Setting up Audio File Folders</h2>
+
+
+<p><center><img alt="File Folder Configuration" src="images/AcquisitionFileFolder.png" /></center></p>
+
+
+<h3>Select and entire folder</h3>
+<p>You can select an entire folder by pressing the "Select Folder of Files" button 
+and browsing for the folder containing the files you want to analyse.</p>
+<h4>Sub folders</h4>
+<p>If you want to analyse multiple sub folders of data, then check the 'Include sub folders' box.</p>
+
+<h3>Select multiple files</h3>
+<p>If you don't want to select all files in a folder, then navigate into the folder and highlight
+just file files you want to analyse.</p>
+
+<h3>Merging files</h3>
+<p>Files will be analysed in alphabetical order. It is not uncommon that a single recording session will have 
+been broken into many short files. You can have PAMGUARD merge files which are part of continuous
+recording together by checking the 'Merge contiguous files' box. If this box is not checked, then PAMGUARD 
+will stop at the end of each file and then restart on the next file.</p>
+ 
+<h3>Time and Date</h3>
+
+
+<p>During analysis, all times displayed on the screen and all times written to the database or binary storage will
+be based on the time extracted from the file name and the sample number within the file.</p>
+<p>If a valid date cannot be extracted from the file name, then times will be based on the time 
+at which analysis starts and the sample number within the files.</p>
+
+<p>Ideally the file times should be in UTC. If they are not, then the time zone of the file data
+can be <a href="FileTimeZone.html">set from the button to the right of the displayed file time</a>.</p>
+
+
+
+<br>
+<p CLASS="prevLink"><a href="AcquisitionFile.html">Previous: Audio Files</a></p>
+<p CLASS="nextLink"><a href="AcquisitionNIDAQ.html">Next: National Instruments DAQ Cards</a></p>
+
+<br><br><br>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
+<title>Audio Files</title>
+</head>
+<body>
+
+<h1>Simulated Sources</h1>
+<p>PAMGUARD can simulate data for a variety of different sound types from one or 
+multiple sources.</p>
+<p>Simulated data are useful in training and are can be used by developers to 
+test detection and localisation algorithms.</p>
+
+<br>
+<h2>Setting up simulated sources</h2>
+<p>In the data acquisition dialog select "Simulated Sources" 
+as the Data Source Type.</p> 
+<p>The dialog will then show a panel where you can create and alter 
+any number of simulated objects. </p> 
+ 
+<p><center><img alt="Simulated Sources" src="images/SimulatedSources.png" /></center></p>
+<h3>Background Noise</h3>
+<p>Background noise is simulated with a flat spectrum. Enter the spectrum level 
+background noise level in dB re.1&mu;Pa/&radic;Hz.</p>
+
+<h3>Propagation Model</h3>
+<p>Two very simple propagation models are currently available. These are Spherical Spreading 
+and Spherical Spreading with a surface echo. If the latter is selected, the sea surface is
+assumed to be a perfect reflector. <p>It is possible that more sophisticated models
+will be added in the future.</p>
+
+
+<h3>Creating and editing Simulated Objects</h3>
+<p>You can Add, Copy Remove and Edit objects in the simulated objects table 
+using the buttons situated below the list of simulated objects.</p> 
+<p>If you Add, Copy, or Edit an object, the following dialog will appear</p>
+
+<p><center><img alt="Simulated Sources" src="images/SimulatedSource.png" /></center></p>
+<p>The location for a new source is set at the current vessel position. Although it 
+is possible to edit these positions here, it is easier to drag them to the desired 
+location on the map display using the mouse. </p>
+<p>Give the sound source a name, select the sound type and set the signal amplitude in 
+dB re.1&mu;Pa p-p.</p>
+<p>Set the interval between successive sounds. If you check the 'Randomise' box, intervals
+will be selected at random between 0 and twice the Mean Interval. Otherwise, sounds will be regularly 
+spaced in time. Note that the first one or each sound will always be generated at a random start time
+so that regular sounds with the same interval do not always perfectly coincide.</p>  
+<p>You can also set the source depth, course and speed over ground.</p>
+ 
+
+
+<h3>Processing speed and listening to simulated data</h3>
+<p>If no <a href="../../soundPlaybackHelp/docs/soundPlayback_soundPlayback.html">Sound Playback</a>
+ module is included in the PAMGUARD configuration, or if no channels are
+selected in the <a href="../../soundPlaybackHelp/docs/soundPlayback_soundPlayback.html">Sound Playback</a> 
+module, then simulated data will be analysed as fast as possible, 
+which could be considerably faster than real time.</p>
+<p>If a <a href="../../soundPlaybackHelp/docs/soundPlayback_soundPlayback.html">Sound playback</a> 
+module is present and is in use, then analysis will run in real time and you will 
+be able to hear the sounds being played back from the computers sound card</p>. 
+
+
+<br>
+<p CLASS="prevLink"><a href="SAILDaqCard.html">Previous: SAIL Daq Cards</a></p>
+
+<br><br><br>
+</body>
+</html>

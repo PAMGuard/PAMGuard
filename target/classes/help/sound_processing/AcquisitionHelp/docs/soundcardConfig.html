@@ -1,0 +1,45 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
+<title>Sound Acquisition</title>
+</head>
+
+<body>
+
+<h1>PAMGUARD</h1>
+<h2>Sound Acquisition</h2><br>
+<h3>Adding a Sound Acquisition Module</h3>
+
+<p>Add a Sound Acquisition module using File>Add modules…>Sound Acquisition and enter a name of your choice. 
+To access the module's settings, select Detection from the main menu and click on the name of your module. 
+This will bring up an Audio Data Acquisition dialogue, as shown below.</p><br>
+
+<p><center><img alt="Audio Data Acquisition Dialogue" src="images/AcquisitionDialog.png" /></center></p>
+<br>
+
+<h3>Selecting a Device and Audio Line</h3>
+
+<p>Choose Sound Card from the Data Source Type drop down menu. 
+The Select Audio Line drop down list will then display the available mixer lines. 
+Choose the line associated with your sound card input(s).</p>
+<br>
+
+<h3>Sampling Settings</h3>
+<p>
+<ul>
+<li><p><b>Sample Rate: </b>Enter a sample rate that is supported by your sound card (you may need to consult your sound card documentation).</p></li>
+<li><p><b>Number of channels: </b>Enter the number of input channels from which you want to acquire data. For non-ASIO audio lines, this will be a maximum of 2.</p></li>
+<li><p><b>Peak-Peak voltage range: </b>This value represents the maximum input voltage range capable for your card, without overdriving the input (clipping) and is used to scale the sound data in PAMGUARD.
+You may find this value from your device's specifications. </p></li>
+<li><p><b>Preamplifier gain: </b>If you have any hardware which provides gain in your system, this value should equal the total gain (in dB). </p></li>
+<li><p><b>DC Background subtraction: </b>If your sound acquisition system has a DC offset in it (many do), tick 
+the 'Subtract DC ...' button and enter a time constant. A single pole high pass filter will then be applied to all incoming data.</p></li>
+</ul>
+</p>
+<p>(Note that the 'Bandwidth' field has been removed since it was not used in any way)</p>
+<br>
+<p CLASS="nextLink"><a href="AsioHelp.html">Next: Configuring ASIO Sound Cards</a></p>
+
+<br><br><br>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<html>
+<head>
+	<link href="../../../pamHelpStylesheet.css" rel="STYLESHEET" type="text/css" />
+	<title>Group 3D Localiser</title>
+</head>
+<body>
+<h1>Group 3D Localiser</h1>
+
+<h2>Simplex Algorithm</h2>
+<p>This algorithm uses a Simplex to estimate a most likely position for a sound source based on 
+<a href="../../docs/localisation_tdoa.html">Time Difference of Arrival</a> measurements on multiple 
+hydrophones.</p>
+<p>Two and Three dimensional versions of the algorithm are available. Select the one most suitable for your array geometry. Note
+that even with a 2D array, a better fit may be obtained using a 3D model than with 2D. As a general "rule of thumb", if the vertical 
+position of the animal is likely to be a significant fraction of the array dimension, then you're probably better off using the 3D
+model. If on the other hand, the array is large and in shallow water, so that the vertical position can only ever be a small fraction of 
+the array dimension, then the 2D model may be more stable.</p>
+
+<p> The minimisation function used by the Simplex is created in the following manner:
+<ol>
+<li>The propagation delay from the location to each hydrophone is calculated.</li>
+<li>From these values, the difference in time delay for each hydrophone pair is calculated.</li>
+<li>An estimate of the error on each time delay is calculated based on the errors on hydrophone locations entered
+into the <a href="../../../utilities/hydrophoneArrayManagerHelp/docs/Array_Configuration.html">Array Manager</a>, the entered
+sound speed error and the relative orientation of the hydrophone pair to the location.
+</li>The measured time delays from the appropriate <a href="../../docs/localisation_tdoa.html">TDOA calculation</a> are compared 
+to the calculated values for that pair, and a &chi;<sup>2</sup> value constructed from the differences in measured and expected times
+divided by the expected errors. 
+</li>
+</ol>
+</p>
+<p>The Simplex / Nelder-Mead algorithm then moves the location around to minimise the &chi;<sup>2</sup> value.</p>
+
+<h3>Configuration</h3>
+<p>To configure, select "Simplex 2D" or "Simplex 3D" from the list of available algorithms. Timing and channel configuration options will be shown. </p>
+
+<p><center><img alt="" src="images/3dsimplexoptions2.png"></center></p><br>
+<p>It is possible to set a minimum correlation value for each time delay, any hydrophone pair with a cross correlation value smaller than
+this being excluded from the minimisation function.</p>
+<p>Consequently, it is also possible to set a minimum number of TOAD measurements to use in the localisation, the localisation attempt
+being aborted if not enough hydrophone pairs can return adequate correlations between signals.</p>
+<p>If hydrophones are arranged in groups (e.g. a click detector operating on multiple small hydrophone clusters as in 
+Gillespie et al, 2020) then you can also define a minimum number of groups to use in a localisation.</p>
+
+<p>Timing <a href="../../docs/localisation_tdoa.html"> (TDOA) options</a>, displayed below the algorithm selection,  may vary depending
+on the type of detector used.</p>
+
+
+<h4>References</h4>
+<p><i>Gillespie, D., Palmer, L., Macaulay, J., Sparling, C., and Hastie, G. (2020). 
+“Passive acoustic methods for tracking the 3D movements of small cetaceans around marine structures,”
+<a href="https://doi.org/10.1371/journal.pone.0229058"> PLoS ONE, 15 (5), 16pp. doi:https://doi.org/10.1371/journal.pone.0229058</a></i></p>
+
+<br>
+<p CLASS="prevLink"><a href="3dhyperbolic.html">Previous: Hyperbolic localisation algorithm</a></p>
+<p CLASS="nextLink"><a href="3doutput.html">Next: localiser output</a></p>
+
+<p></p>
+
+</body>
+</html>

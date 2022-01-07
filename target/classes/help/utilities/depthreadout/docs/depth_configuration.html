@@ -1,0 +1,61 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Hydrophone Depth Readout Configuration</title>
+</head>
+
+<body>
+
+<h1>Hydrophone Depth Readout</h1>
+<h2>Configuration</h2>
+<h3>Creating a Depth Readout Module</h3>
+<p>From the <strong><em>File>Add modules>Utilities</em></strong>
+menu, or from the pop-up menu on the data model display select <i>'Hydrophone
+Depth Readout'</i>. Enter a name for the new module and press Ok.</p>
+<p>The depth readout module is not dependent on any other modules
+and will automatically find and exchange information with the <a
+	href="../../hydrophoneArrayManagerHelp/docs/Array_Overview.html">
+Hydrophone Array Manager</a>. Go to <strong><em>Detection>Hydrophone Depth Readout Settings...</em></strong> for configuration.</p>
+<br>
+
+
+<img alt="Depth Configuration" src="images/DepthConfiguration.png" />
+<br>
+<h3>Select Measurement Device</h3>
+<p>Select the data acquisition card you wish to use. Depending on
+the card type, it may be necessary to first configure the card using
+software provided by the card manufacturer. For Measurement Computing
+cards, you will need to run their 'instacal' configuration utility. You
+should also refer to your device manual.</p>
+<p>Select the maximum voltage range of the device. Generally, this
+should be as small as possible, since this will improve resolution.
+Obviously, the range has to be greater than the maximum values you are
+expecting from your sensor.</p>
+<p>Set the number of sensors and the interval between readouts.
+After changing the number of sensors, hit 'Enter' and the number of
+panels in the lower part of the dialog will change accordingly.</p>
+
+<h3>Sensor Configuration</h3>
+<p>For each sensor, set the data acquisition cards hardware channel,
+the position on the cable and the hydrophone channels data from that
+sensor should be applied to.</p>
+<p>If more than one sensor is set to apply data to the same
+hydrophone, then the actual hydrophone depth is calculated using linear
+interpolation based on the relative positions of the hydrophones and the
+depth sensors. This feature would be useful in longer arrays which may
+not be towing horizontally and contain more than one depth sensor.</p>
+
+<h3>Calibration</h3>
+<p>The depth is calculated from the measured voltage using a simple
+linear model of the form</p>
+<p>Depth = A * Voltage + B,</p>
+<p>where A and B are constants.</p>
+<br>
+</p>
+<p CLASS="prevLink"><a href="depth_overview.html">Previous:
+Hydrophone Depth Overview</a></p>
+
+<br><br><br>
+</body>
+</html>

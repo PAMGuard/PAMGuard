@@ -1,0 +1,81 @@
+<html>
+<head>
+	<link href="../../../pamHelpStylesheet.css" rel="STYLESHEET" type="text/css" />
+	<title>Difar Module</title>
+</head>
+<body>
+<h1>DIFAR Localisation</h1>
+
+<h2>Configuring the User Display</h2>
+
+<p>DIFAR processing is an interactive process with the computer doing the bulk of the work, but an operator making critical decisions such as validating detections,&nbsp;classifying sounds by&nbsp;species, and selecting/rejecting sounds for further processing and localisation.</p>
+
+<p>The DIFAR module does not have its own tab panel. Instead the various displays you&rsquo;ll need should be configured on a <a href="../../../displays/userDisplayHelp/docs/userDisplayPanel.html">user display</a> panel. Create a user display panel from the <b><i> File &gt; Add Module &gt; Displays &gt; User Display </i></b> menu.</p>
+
+<p>On your user display(s) you will need to configure a spectrogram, a DIFAR Queue and a DIFAR Processing display. You may also want an additional map. A typical display configuration is shown below:</p>
+
+<p>&nbsp;</p>
+
+<center><img alt="difarUserDisplayOverview" height="621" src="./images/Overview.png" width="1031" /></center>
+
+<p>&nbsp;</p>
+
+<hr />
+<h3>The DIFAR Display modules</h3>
+
+<p>Two different displays are required to run the DIFAR system. They are added separately to allow more flexibility in how the overall display system is laid out. The display first is a queue of selected or detected sounds which are waiting for DIFAR processing (i.e. localisation). The second display shows the output of DIFAR processing and allows the operator to make final decisions regarding the directionality of the detected sound, and ultimately allows validation, acceptance or rejection&nbsp;of the localisation results.</p>
+
+<p>The Display modules are added from the User Display menu:</p>
+
+<p>&nbsp;</p>
+
+<center><img alt="difarUserDisplayMenu" src="./images/UserDispMenu.png" /></center>
+
+<p>&nbsp;</p>
+
+<p>Add each of the display components in turn and drag them to the required positions on the screen.</p>
+
+<p>Note that you can only add one each of the two DIFAR displays, so the menu items will go grey once you&rsquo;ve added them.</p>
+
+<hr />
+<h3>The spectrogram</h3>
+
+<p>&nbsp;</p>
+
+<p>To create a <a href="difar_UsingSpectrogram.html">spectrogram</a>, from the User Display menu select <b><i> User Display &gt; New Spectrogram Display </i></b></p>
+
+<p>Configure the spectrogram, <b><i>right click &gt; Settings...</i></b> will reopen the dialog. Details of spectrogram configuration can be found <a href="../../../displays/spectrogramDisplayHelp/docs/UserDisplay_Spectrogram_Configuring.html">here</a></p>
+
+<p>The spectrogram should display the FFT from the decimated data. For diagnostic purposes it&rsquo;s useful to show the spectrum of the FFT from the raw 48kHz data as well. To show this, open the dialog and go to the &ldquo;plug-ins&rdquo; tab and check the box next to the data you want to display.</p>
+
+<p>If you&rsquo;re marking detections by hand on the spectrogram, then you also need to enable this feature by going to the Mark Observers tab and selecting the appropriate checkbox.</p>
+
+<p>&nbsp;</p>
+
+<center><img alt="difarSpectrogramPlugins" src="./images/SpecPlugins.png" /> <img alt="difarSpectrogramMarkObservers" src="./images/SpecMarkObs.png" /></center>
+
+<p>&nbsp;</p>
+
+<p class="previousLink"><a href="difar_HydrophoneArray.html">Previous: Deploying Sonobuoys</a></p>
+
+<p class="nextLink"><a href="difar_ConfigureProcessing.html">Next: Configure DIFAR Processing </a></p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+</body>
+</html>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/plugin" xmlns:tns="http://www.example.org/plugin" elementFormDefault="qualified">
+
+    <element name="unitName" type="string"></element>
+
+    <element name="contollerClass" type="string"></element>
+
+    <element name="helpSet" type="string"></element>
+
+    <element name="contolledUnits" type="string"></element>
+
+    <element name="controlledUnit" type="string"></element>
+</schema>
