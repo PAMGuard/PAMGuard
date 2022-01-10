@@ -88,7 +88,7 @@ import PamguardMVC.dataOffline.OfflineDataLoadInfo;
  * NI cards (via UDP), files, directories of files, etc.
  * <p>
  * Uses a plug in architecture to allow new types to be added. This
- * is done through RegisterDaqType()
+ * is done through RegisterDaqType().
  * 
  * @author Doug Gillespie
  * 
