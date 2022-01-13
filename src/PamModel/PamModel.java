@@ -63,7 +63,6 @@ import PamController.PamSettings;
 import PamDetection.RawDataUnit;
 import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
-import alfa.ALFAControl;
 import analogarraysensor.ArraySensorControl;
 import backupmanager.BackupManager;
 import beamformer.continuous.BeamFormerControl;
@@ -419,10 +418,11 @@ final public class PamModel implements PamModelInterface, PamSettings {
 		mi.setModulesMenuGroup(utilitiesGroup);
 		mi.setHidden(SMRUEnable.isEnable() == false);
 
-		mi = PamModuleInfo.registerControlledUnit(ALFAControl.class.getName(), "Master Controller");
-		mi.setToolTipText("Big brother - will keep an eye on you and look after you");
-		mi.setModulesMenuGroup(utilitiesGroup);
-		mi.setHidden(SMRUEnable.isEnable() == false);
+		// now releagate to a plugin module. 
+//		mi = PamModuleInfo.registerControlledUnit(ALFAControl.class.getName(), "Master Controller");
+//		mi.setToolTipText("Big brother - will keep an eye on you and look after you");
+//		mi.setModulesMenuGroup(utilitiesGroup);
+//		mi.setHidden(SMRUEnable.isEnable() == false);
 		
 		mi = PamModuleInfo.registerControlledUnit(PrintScreenControl.class.getName(), "Print Screen");
 		mi.setToolTipText(PrintScreenControl.getToolTip());

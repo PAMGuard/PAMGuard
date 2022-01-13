@@ -23,6 +23,7 @@ public class OneBandAlarmCounter extends AlarmDecibelCounter implements PamSetti
 		this.oneBandControl = oneBandControl;
 		PamSettingManager.getInstance().registerSettings(this);
 	}
+	
 
 	@Override
 	public double getValue(int countType, PamDataUnit dataUnit) {

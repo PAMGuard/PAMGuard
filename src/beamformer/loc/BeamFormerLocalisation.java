@@ -8,6 +8,7 @@ public class BeamFormerLocalisation extends AbstractLocalisation implements Clon
 	double[] angles = new double[1];
 	double[] angleErrors = new double[1];
 	
+	
 	public BeamFormerLocalisation(PamDataUnit pamDataUnit, int locContents, int referenceHydrophones, double[] angles, double angleError) {
 		super(pamDataUnit, locContents, referenceHydrophones);
 		this.angles = angles;
