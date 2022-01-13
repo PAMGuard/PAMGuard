@@ -294,17 +294,15 @@
 	        <url>https://nexus.bedatadriven.com/content/groups/public/</url>
 	    </repository>
 	    
-	    
-<!-- 	    <repository> -->
-<!-- 	        <snapshots> -->
-<!-- 	            <enabled>false</enabled> -->
-<!-- 	        </snapshots> -->
-<!-- 	        <id>talan</id> -->
-<!-- 	        <name>talan</name> -->
-<!-- 	        <url>https://nexus.talanlabs.com/content/repositories/releases/</url> -->
-<!-- 	    </repository> -->
-	    
-	    
+	    <repository>
+	        <snapshots>
+	            <enabled>false</enabled>
+	        </snapshots>
+	        <id>talan</id>
+	        <name>talan</name>
+	        <url>https://nexus.talanlabs.com/content/repositories/releases/</url>
+	    </repository>
+	   
 <!-- 	   Repo for jpam code- this used for deep learning -->
 <!-- 		<repository> -->
 <!-- 			<id>jdl4pam</id> -->
