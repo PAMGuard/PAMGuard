@@ -16,8 +16,8 @@
 
     <properties>
         <javafx.version>16</javafx.version>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>16</maven.compiler.source>
+        <maven.compiler.target>16</maven.compiler.target>
     </properties>
 
   <build>
@@ -246,6 +246,17 @@
 			</snapshots>
 			<url>file://${project.basedir}/repo</url>
 		</repository>
+
+	  	<!-- Repo for jpam code- this used for deep learning-->
+		<repository>
+			<id>jdl4pam</id>
+			<url>https://raw.github.com/macster110/jpam/mvn-repo/</url>
+		</repository>
+		<repository>
+			<id>jpamutils</id>
+			<url>https://raw.github.com/macster110/jpam/mvn-repo/</url>
+		</repository>
+
 		
 	  	<!-- Repo for Jamie's code -->
 	  	<!-- IMPORTANT: SOMEHOW THIS REPO INTERFERES WITH THE
@@ -255,14 +266,14 @@
 	  		repository.  Let Maven download the JavaFX files, and
 	  		then uncomment this repo again.
 	  		Same thing seems to be occurring if I try to update the postgresql library. -->
-		<repository>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-	        <id>central</id>
-            <name>a0u0ltozdsehx-artifactory-primary-0-releases</name>
-            <url>https://jmachund.jfrog.io/artifactory/jpam2</url>
-		</repository> 
+<!-- 		<repository> -->
+<!-- 			<snapshots> -->
+<!-- 				<enabled>false</enabled> -->
+<!-- 			</snapshots> -->
+<!-- 	        <id>central</id> -->
+<!--             <name>a0u0ltozdsehx-artifactory-primary-0-releases</name> -->
+<!--             <url>https://jmachund.jfrog.io/artifactory/jpam2</url> -->
+<!-- 		</repository>  -->
 		
 	    <!-- Repo for netCDF -->
 	    <repository>
@@ -321,7 +332,7 @@
 	<dependency>
 		<groupId>org.jamdev</groupId>
 		<artifactId>jdl4pam</artifactId>
-		<version>0.0.91</version>
+		<version>0.0.92</version>
 	</dependency>
 
 	<!-- https://mvnrepository.com/artifact/gov.nist.math/jama -->
@@ -660,11 +671,11 @@
 	<!-- https://mvnrepository.com/artifact/org.springframework/org.springframework.core -->
 
 	<!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
-	<dependency>
+	<!--<dependency>
 	    <groupId>org.postgresql</groupId>
 	    <artifactId>postgresql</artifactId>
 	    <version>42.2.24</version>
-	</dependency>
+	</dependency>-->
 
 	<!-- https://mvnrepository.com/artifact/org.renjin/renjin-script-engine -->
 	<dependency>

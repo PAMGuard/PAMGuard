@@ -99,11 +99,11 @@ public abstract class DLModelWorker<T> {
 
 			}
 
-			//run the model. The output is the 
+			//run the model. 
 			float[] output = null; 
 			long time1 = System.currentTimeMillis();
 			output = runModel(transformedDataStack); 
-			//System.out.println("Out: " + PamArrayUtils.array2String(output, 2, ","));
+			//System.out.println("Model out: " + PamArrayUtils.array2String(output, 2, ","));
 			long time2 = System.currentTimeMillis();
 
 

@@ -127,8 +127,11 @@ public class GenericDLClassifier implements DLClassiferModel, PamSettings {
 		 */
 		if ((PamCalendar.isSoundFile() && !forceQueue) || dlControl.isViewer()) {
 			//run the model 
+			
+			//System.out.println("GENERICDLCLASSIFIER: Run here!!!"); 
 			ArrayList<GenericPrediction> modelResult = getGenericDLWorker().runModel(groupedRawData, 
 					groupedRawData.get(0).getParentDataBlock().getSampleRate(), 0); 
+			//System.out.println("GENERICDLCLASSIFIER: RESULTS!!!: " + modelResult); 
 			
 			if (modelResult==null) {
 				genericModelWarning.setWarningMessage("Generic deep learning model returned null");

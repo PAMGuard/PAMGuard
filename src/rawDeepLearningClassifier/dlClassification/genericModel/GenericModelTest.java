@@ -18,12 +18,13 @@ public class GenericModelTest {
 	public static void rightWhaleTest() {
 
 		//the model path
-		String modelPath = "/Users/au671271/Desktop/model_lenet_dropout_input_conv_all/saved_model.pb";
+		String modelPath = "/Users/au671271/git/PAMGuard_resources/deep_learning/right_whale_tutorial/model_lenet_dropout_input_conv_all/saved_model.pb";
 
 		//the audio file to test
 		String wavFilePath = "/Users/au671271/Google Drive/PAMGuard_dev/Deep_Learning/Right_whales_DG/SouthernRightWhale001-v1/sar98_trk3_8000.wav";
 		
 		wavFilePath = "/Users/au671271/Google Drive/PAMGuard_dev/Deep_Learning/Right_whales_DG/SouthernRightWhale001-v1/wav_files_timestamp/PAM_20010327_113000.wav";
+		wavFilePath = "/Users/au671271/git/PAMGuard_resources/deep_learning/right_whale_tutorial/wav/wav_files_timestamp/PAM_20010327_113200.wav"; 
 
 		//define some bits and pieces we need for the classiifer. 
 		float sr = 2000; 
