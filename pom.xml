@@ -688,11 +688,11 @@
 	<!-- https://mvnrepository.com/artifact/org.springframework/org.springframework.core -->
 
 	<!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
-	<!--<dependency>
+	<dependency>
 	    <groupId>org.postgresql</groupId>
 	    <artifactId>postgresql</artifactId>
 	    <version>42.2.24</version>
-	</dependency>-->
+	</dependency>
 
 	<!-- https://mvnrepository.com/artifact/org.renjin/renjin-script-engine -->
 	<dependency>
