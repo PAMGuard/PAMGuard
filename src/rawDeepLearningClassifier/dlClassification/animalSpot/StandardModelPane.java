@@ -421,10 +421,15 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 
 
 		//get class names from the paramClone as these may have been set by a loaded model
-		//instea of a use changing a control.
+		//instead of a using changing a control.
 		currParams.classNames = paramsClone.classNames; 
-		
+		currParams.numClasses = paramsClone.numClasses; 
+
 		currParams.useDefaultSegLen = usedefaultSeg.isSelected(); 
+		
+		
+		//System.out.println("Get CLASS NAMES: currParams.classNames: " + currParams.classNames + " Num classes " + currParams.numClasses); 
+
 		
 		return currParams;
 	}

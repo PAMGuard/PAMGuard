@@ -13,6 +13,8 @@ import org.jamdev.jdl4pam.transforms.WaveTransform;
 import org.jamdev.jdl4pam.transforms.jsonfile.DLTransformsParser;
 import org.jamdev.jdl4pam.utils.DLUtils;
 import org.jamdev.jpamutils.wavFiles.AudioData;
+import org.jamdev.jpamutils.JamArr;
+
 
 /**
  * Test the Ketos models in PAMGuard. 
@@ -33,8 +35,9 @@ public class KetosModelTest {
 		//File file = new File("/Volumes/GoogleDrive-108005893101854397430/My Drive/PAMGuard_dev/Deep_Learning/Meridian/orca/kw_detector_v11_5s.ktpb"); 
 
 		//the wav file to test.
-		String wavFilePath = "/Volumes/GoogleDrive/My Drive/PAMGuard_dev/Deep_Learning/Meridian/right_whales/for_pamguard/input.wav"; 
-
+		//String wavFilePath = "/Volumes/GoogleDrive/My Drive/PAMGuard_dev/Deep_Learning/Meridian/right_whales/for_pamguard/input.wav"; 
+		String wavFilePath = "/Volumes/GoogleDrive-108005893101854397430/My Drive/PAMGuard_dev/Deep_Learning/Meridian/humpback_whales/wav/5353.210403161502.wav";
+		
 		try {
 			//the ketos model. 
 			KetosModel  ketosModel = new KetosModel(file);
@@ -44,12 +47,14 @@ public class KetosModelTest {
 
 			//get the audio representation file. 
 			KetosParams ketosParams = new KetosParams(jsonString); 			
+			ketosParams.defaultOutputShape = ketosModel.getOutShape();
 
 			//System.out.println(ketosParams.toString());
+			System.out.println("Output shape" + ketosParams.defaultOutputShape);
 
 			//Open wav files. 
 			AudioData soundData = DLUtils.loadWavFile(wavFilePath);
-			soundData = soundData.trim(0, (int) (soundData.getSampleRate()*3.0)); 
+			soundData = soundData.trim(0, (int) (soundData.getSampleRate()*3.52)); 
 
 			//generate the transforms. 
 			ArrayList<DLTransform> transforms =	DLTransformsFactory.makeDLTransforms(ketosParams.dlTransforms); 
@@ -83,6 +88,7 @@ public class KetosModelTest {
 				for (int j=0; j<nStack; j++) {
 					data[j] = DLUtils.toFloatArray(transformedData); 
 				}
+				System.out.println("Input len: " + data.length + "  " + data[0].length + "  " + data[0][0].length); 
 				output = ketosModel.runModel(data); 
 				long time2 = System.currentTimeMillis();
 				System.out.println("Time to run model: " + (time2-time1) + " ms"); 

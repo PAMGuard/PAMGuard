@@ -224,7 +224,6 @@ public class KetosClassifier implements DLClassiferModel, PamSettings {
 	 * @param ketosDLParams - the Ketos parameters. 
 	 */
 	public KetosDLParams getKetosParams() {
-		// TODO Auto-generated method stub
 		return ketosDLParams;
 	}
 
