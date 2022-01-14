@@ -6,6 +6,7 @@ import java.util.List;
 import org.jamdev.jdl4pam.transforms.DLTransform;
 import org.jamdev.jdl4pam.transforms.DLTransform.DLTransformType;
 import org.jamdev.jdl4pam.transforms.FreqTransform;
+import org.jamdev.jdl4pam.transforms.SimpleTransform;
 import org.jamdev.jdl4pam.transforms.WaveTransform;
 
 import javafx.geometry.Pos;
@@ -149,6 +150,10 @@ public class DLTransformsPane extends PamBorderPane {
 		ArrayList<DLTransformPane> dlTransformPanes = new ArrayList<DLTransformPane>(); 
 
 		sampleRate=-1; 
+		
+//		for (int i=0; i<dlTransforms.size() ; i++) {
+//			System.out.println("Set DL transfroms: " + dlTransforms.get(i).getDLTransformType() + " " + ((SimpleTransform) dlTransforms.get(i)).getParams()); 
+//		}
 
 		//create a pane for each transform
 		for (int i=0; i<dlTransforms.size() ; i++) {
@@ -157,7 +162,6 @@ public class DLTransformsPane extends PamBorderPane {
 				sampleRate = ((WaveTransform) dlTransforms.get(i)).getWaveData().getSampleRate(); 
 			}
 
-		//	System.out.println("Set DL transfroms: " + dlTransforms.get(i).getDLTransformType()); 
 			dlTransformPanes.add(DataTransformPaneFactory.getSettingsPane(dlTransforms.get(i))); 
 			dlTransformPanes.get(i).setParams(dlTransforms.get(i));
 			dlTransformPanes.get(i).addSettingsListener(()->{

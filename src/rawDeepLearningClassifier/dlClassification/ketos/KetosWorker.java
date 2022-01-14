@@ -70,7 +70,12 @@ public class KetosWorker extends DLModelWorker<KetosResult> {
 			
 			//convert the JSON string to a parameters object. 
 			KetosParams ketosParams = new KetosParams(jsonString); 			
-
+			//important to add this for Ketos models because the JSON string does not necessarily contain and output shape. 
+			//System.out.println("----Default output shape: " + ketosParams.defaultOutputShape + "  " + ketosModel.getOutShape()); 
+			if (ketosParams.defaultOutputShape==null) {
+				ketosParams.defaultOutputShape = ketosModel.getOutShape();
+			}
+			
 
 
 			///HACK here for now to fix an issue with dB and Ketos transforms having zero length somehow...
@@ -99,7 +104,7 @@ public class KetosWorker extends DLModelWorker<KetosResult> {
 			ketosDLParams.defaultSegmentLen = ketosParams.seglen*1000.; //the segment length in microseconds. 
 			//ketosParams.classNames = new String[] {"Noise", "Right Whale"}; // FIXME; 
 			ketosDLParams.numClasses = (int) ketosModel.getOutShape().get(1); 
-
+			
 			//ok 0 the other values are not user selectable but this is. If we relaod the same model we probably want to keep it....
 			//So this is a little bt of a hack but will probably be OK in most cases. 
 			if (ketosDLParams.binaryClassification==null || ketosDLParams.binaryClassification.length!=ketosDLParams.numClasses) {
@@ -110,18 +115,21 @@ public class KetosWorker extends DLModelWorker<KetosResult> {
 			}
 
 
-			//			if (dlParams.classNames!=null) {
-			//				for (int i = 0; i<dlParams.classNames.length; i++) {
-			//					System.out.println("Class name " + i + "  "  + dlParams.classNames[i]); 
-			//				}
-			//			}
-			//			ketosDLParams.classNames = dlControl.getClassNameManager().makeClassNames(ketosParams.classNames); 
-			//
-			//						if (ketosParams.classNames!=null) {
-			//							for (int i = 0; i<ketosDLParams.classNames.length; i++) {
-			//								System.out.println("Class name " + i + "  "  + ketosDLParams.classNames[i].className + " ID " + ketosDLParams.classNames[i].ID ); 
-			//							}
-			//						}
+//						if (dlParams.classNames!=null) {
+//							for (int i = 0; i<dlParams.classNames.length; i++) {
+//								System.out.println("Class name " + i + "  "  + dlParams.classNames[i]); 
+//							}
+//						}
+			
+	
+//			ketosDLParams.classNames = dlControl.getClassNameManager().makeClassNames(ketosParams.classNames); 
+
+			
+//									if (ketosParams.classNames!=null) {
+//										for (int i = 0; i<ketosDLParams.classNames.length; i++) {
+//											System.out.println("Class name " + i + "  "  + ketosDLParams.classNames[i].className + " ID " + ketosDLParams.classNames[i].ID ); 
+//										}
+//									}
 
 		}
 		catch (Exception e) {

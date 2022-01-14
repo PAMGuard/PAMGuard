@@ -255,6 +255,11 @@ public abstract class BinaryDataSource {
 				pamDataUnit.setDataUnitFileInformation(dataUnitFileInformation);
 			}
 		}
+		
+		//sometimes get a null pointer exception here when trying to close PAMGuard?
+		if (getBinaryStorageStream() == null) {
+			return false;
+		}
 				
 		return getBinaryStorageStream().storeData(data.getObjectType(), pamDataUnit.getBasicData(), data);
 	}

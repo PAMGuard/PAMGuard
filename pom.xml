@@ -255,14 +255,14 @@
 	  		repository.  Let Maven download the JavaFX files, and
 	  		then uncomment this repo again.
 	  		Same thing seems to be occurring if I try to update the postgresql library. -->
-		<repository>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-	        <id>central</id>
-            <name>a0u0ltozdsehx-artifactory-primary-0-releases</name>
-            <url>https://jmachund.jfrog.io/artifactory/jpam2</url>
-		</repository> 
+<!-- 		<repository> -->
+<!-- 			<snapshots> -->
+<!-- 				<enabled>false</enabled> -->
+<!-- 			</snapshots> -->
+<!-- 	        <id>central</id> -->
+<!--             <name>a0u0ltozdsehx-artifactory-primary-0-releases</name> -->
+<!--             <url>https://jmachund.jfrog.io/artifactory/jpam2</url> -->
+<!-- 		</repository>  -->
 		
 	    <!-- Repo for netCDF -->
 	    <repository>
@@ -294,7 +294,6 @@
 	        <url>https://nexus.bedatadriven.com/content/groups/public/</url>
 	    </repository>
 	    
-	    
 	    <repository>
 	        <snapshots>
 	            <enabled>false</enabled>
@@ -303,7 +302,34 @@
 	        <name>talan</name>
 	        <url>https://nexus.talanlabs.com/content/repositories/releases/</url>
 	    </repository>
-	    
+	   
+<!-- 	   Repo for jpam code- this used for deep learning -->
+<!-- 		<repository> -->
+<!-- 			<id>jdl4pam</id> -->
+<!-- 			<url>https://raw.github.com/macster110/jpam/mvn-repo/</url> -->
+<!-- 			<snapshots> -->
+<!-- 				<enabled>true</enabled> -->
+<!-- 				<updatePolicy>always</updatePolicy> -->
+<!-- 			</snapshots> -->
+<!-- 		</repository> -->
+		
+<!-- 		<repository> -->
+<!-- 			<id>jpamutils</id> -->
+<!-- 			<url>https://raw.github.com/macster110/jpam/mvn-repo/</url> -->
+<!-- 		</repository> -->
+		
+        <repository>
+          <id>central</id>
+          <url>https://repo1.maven.org/maven2</url>
+        </repository>
+        <repository>
+          <id>github</id>
+          <url>https://maven.pkg.github.com/macster110/jpam</url>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+        
 	</repositories>
 
 
@@ -321,8 +347,10 @@
 	<dependency>
 		<groupId>org.jamdev</groupId>
 		<artifactId>jdl4pam</artifactId>
-		<version>0.0.91</version>
+		<version>0.0.92</version>
 	</dependency>
+	
+	
 
 	<!-- https://mvnrepository.com/artifact/gov.nist.math/jama -->
   	<dependency>

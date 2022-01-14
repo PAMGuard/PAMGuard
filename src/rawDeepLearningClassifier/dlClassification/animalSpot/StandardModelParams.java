@@ -50,6 +50,12 @@ public class StandardModelParams implements Serializable, Cloneable {
 	public int numClasses = 0; 
 	
 	/**
+	 * The class names. e.g. porpoise, noise, bat
+	 */
+	public DLClassName[] classNames; 
+	
+	
+	/**
 	 * List of transforms for the raw data e.g. filtering, spectrogram, spectrogram normalisation etc. 
 	 * This is only used for saving serialised settings
 	 * 
@@ -74,10 +80,7 @@ public class StandardModelParams implements Serializable, Cloneable {
 	public 	boolean useDefaultSegLen = false;
 
 
-	/**
-	 * The class names. e.g. porpoise, noise, bat
-	 */
-	public DLClassName[] classNames; 
+
 
 	/**
 	 * Which classes to apply binary classification to. 
