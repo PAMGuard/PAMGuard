@@ -98,7 +98,13 @@ public class ColourComboBox extends PamPanel {
     	}
     }
     
-    public ColourArrayType getSelectedColourMap(){
+    @Override
+	public void setEnabled(boolean enabled) {
+		super.setEnabled(enabled);
+		colourBox.setEnabled(enabled);
+	}
+
+	public ColourArrayType getSelectedColourMap(){
     	return types[colourBox.getSelectedIndex()];
     }
     
