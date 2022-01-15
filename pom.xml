@@ -343,15 +343,26 @@
 		<version>0.0.55</version>
 	</dependency>
 
-	<!--jpam project - Deep learning java library -->
+	<!--jpam project - Deep learning java library 
+	DG has commented this out since there are problems with access to the maven repo
+	on JDJM's Github. For now a jar file is included in the build and we'll go back to 
+	Maven when we can ... DG 15 Jan 2022.
 	<dependency>
 		<groupId>org.jamdev</groupId>
 		<artifactId>jdl4pam</artifactId>
 		<version>0.0.92</version>
+	</dependency> -->
+	
+	<!-- This is needed for MalformedModelException which is in Jamies library above, but for some reason 
+	is not included in his jar. Seems to need v0.8.0-->
+	<!-- https://mvnrepository.com/artifact/ai.djl/api -->
+	<dependency>
+   	 	<groupId>ai.djl</groupId>
+    	<artifactId>api</artifactId>
+    	<version>0.8.0</version>
 	</dependency>
-	
-	
 
+		
 	<!-- https://mvnrepository.com/artifact/gov.nist.math/jama -->
   	<dependency>
   		<groupId>gov.nist.math</groupId>

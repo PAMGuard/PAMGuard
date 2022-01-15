@@ -4,7 +4,7 @@
   <groupId>org.pamguard</groupId>
   <artifactId>PamguardBeta</artifactId>
   <name>Pamguard Java12+</name>
-  <version>2.01.0601</version>
+  <version>2.02.02</version>
   <description>Pamguard for Java 12+, using Maven to control dependcies</description>
   <url>www.pamguard.org</url>
   <organization>
@@ -159,14 +159,6 @@
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
-      <id>central</id>
-      <name>a0u0ltozdsehx-artifactory-primary-0-releases</name>
-      <url>https://jmachund.jfrog.io/artifactory/jpam2</url>
-    </repository>
-    <repository>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
       <id>unidata-all</id>
       <name>Unidata netCDF</name>
       <url>https://artifacts.unidata.ucar.edu/repository/unidata-all/</url>
@@ -194,6 +186,15 @@
       <id>talan</id>
       <name>talan</name>
       <url>https://nexus.talanlabs.com/content/repositories/releases/</url>
+    </repository>
+    <repository>
+      <id>central</id>
+      <url>https://repo1.maven.org/maven2</url>
+    </repository>
+    <repository>
+      <snapshots />
+      <id>github</id>
+      <url>https://maven.pkg.github.com/macster110/jpam</url>
     </repository>
   </repositories>
   <reporting>
