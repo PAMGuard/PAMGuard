@@ -217,7 +217,9 @@ public class UIDRepairFunctions {
 //			}
 		}
 		uidMessageInterface.newMessage(null);
-		binaryStore.getBinaryStoreSettings().setStoreLocation(uidParams.newBinaryFolder);
+		if (binaryStore != null) {
+			binaryStore.getBinaryStoreSettings().setStoreLocation(uidParams.newBinaryFolder);
+		}
 	}
 
 	private void repairBinaryStore(UIDMessageInterface uidMessageInterface, PamDataBlock dataBlock, UIDRepairParams uidParams, BinaryStore binaryStore, DBControlUnit dbControl) {
