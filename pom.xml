@@ -302,32 +302,10 @@
 	        <name>talan</name>
 	        <url>https://nexus.talanlabs.com/content/repositories/releases/</url>
 	    </repository>
-	   
-<!-- 	   Repo for jpam code- this used for deep learning -->
-<!-- 		<repository> -->
-<!-- 			<id>jdl4pam</id> -->
-<!-- 			<url>https://raw.github.com/macster110/jpam/mvn-repo/</url> -->
-<!-- 			<snapshots> -->
-<!-- 				<enabled>true</enabled> -->
-<!-- 				<updatePolicy>always</updatePolicy> -->
-<!-- 			</snapshots> -->
-<!-- 		</repository> -->
-		
-<!-- 		<repository> -->
-<!-- 			<id>jpamutils</id> -->
-<!-- 			<url>https://raw.github.com/macster110/jpam/mvn-repo/</url> -->
-<!-- 		</repository> -->
 		
         <repository>
           <id>central</id>
           <url>https://repo1.maven.org/maven2</url>
-        </repository>
-        <repository>
-          <id>github</id>
-          <url>https://maven.pkg.github.com/macster110/jpam</url>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
         </repository>
         
 	</repositories>
@@ -338,7 +316,7 @@
 
 	<!--jpam project - utilities -->
 	<dependency>
-		<groupId>org.jamdev</groupId>
+		<groupId>io.github.macster110</groupId>
 		<artifactId>jpamutils</artifactId>
 		<version>0.0.55</version>
 	</dependency>
@@ -347,22 +325,13 @@
 	DG has commented this out since there are problems with access to the maven repo
 	on JDJM's Github. For now a jar file is included in the build and we'll go back to 
 	Maven when we can ... DG 15 Jan 2022.
+	 	   Repo for jpam code- this used for deep learning [15:17] Jamie MacAulay-->
 	<dependency>
-		<groupId>org.jamdev</groupId>
+		<groupId>io.github.macster110</groupId>
 		<artifactId>jdl4pam</artifactId>
 		<version>0.0.92</version>
-	</dependency> -->
-	
-	<!-- This is needed for MalformedModelException which is in Jamies library above, but for some reason 
-	is not included in his jar. Seems to need v0.8.0-->
-	<!-- https://mvnrepository.com/artifact/ai.djl/api -->
-	<dependency>
-   	 	<groupId>ai.djl</groupId>
-    	<artifactId>api</artifactId>
-    	<version>0.8.0</version>
-	</dependency>
-
-		
+	</dependency> 
+			
 	<!-- https://mvnrepository.com/artifact/gov.nist.math/jama -->
   	<dependency>
   		<groupId>gov.nist.math</groupId>
