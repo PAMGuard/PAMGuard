@@ -67,23 +67,40 @@ public class ThreadingHydrophoneLocator extends StraightHydrophoneLocator implem
 
 		synchronized (originMethod.getSynchronizationObject()) {
 			OriginIterator gpsIt = originMethod.getGpsDataIterator(PamDataBlock.ITERATOR_END);
-			//		GPSControl gpsControl = GPSControl.getGpsControl();
-			//		if (gpsControl == null) {
-			//			return new GpsData();
-			//		}
-			//		GPSDataBlock gpsDataBlock = gpsControl.getGpsDataBlock();
-
-			//		synchronized (gpsDataBlock.getSynchLock()) {
-			//			ListIterator<GpsDataUnit> gpsIt = gpsDataBlock.getListIterator(timeMilliseconds, 0, PamDataBlock.MATCH_BEFORE, PamDataBlock.POSITION_AFTER);
+			
 			if (gpsIt == null) {
-				return new GpsData();
+				return new GpsData(); // return (0,0)
 			}
-			if (gpsIt.hasPrevious()) {
+			/**
+			 * Now need to go back until we're close to the time of interest, or it all goes 
+			 * badly wrong. 
+			 */
+			while (gpsIt.hasPrevious()) {
 				gpsUnit = gpsIt.previous();
-				gpsData = prevGpsData = gpsUnit;
-				double ahead = (timeMilliseconds - gpsUnit.getTimeInMillis())*prevGpsData.getSpeedMetric()/1000.;
-				distBack -= ahead;
+				gpsData = gpsUnit;
+				if (gpsUnit.getTimeInMillis() < timeMilliseconds) {
+					break;
+				}
 			}
+			if (gpsData == null && gpsIt.hasPrevious()) {
+				/*
+				 *  I don't think this line can ever be called since gpsUnit must have been 
+				 *  set in the while loop avoe. 
+				 */			
+				gpsUnit = gpsIt.previous();
+			}
+			if (gpsIt.hasPrevious() == false) {
+				/**
+				 * We're off the start of the available track, so can do nothing except use the stright model to 
+				 * interpolate backwards. 
+				 */
+				return super.getStreamerGpsPos(timeMilliseconds);
+			}
+
+			gpsData = prevGpsData = gpsUnit;
+			double ahead = (timeMilliseconds - gpsUnit.getTimeInMillis())*prevGpsData.getSpeedMetric()/1000.;
+			distBack -= ahead;
+			
 			while (distBack > 0 && gpsIt.hasPrevious()) {
 				gpsUnit = gpsIt.previous();
 				gpsData = gpsUnit;
@@ -92,11 +109,15 @@ public class ThreadingHydrophoneLocator extends StraightHydrophoneLocator implem
 					continue;
 				}
 				double dist = gpsData.distanceToMetres(prevGpsData);
-				if (dist > distBack) {
+//				distBack += dist;
+				distBack-=dist;
+				if (distBack < 0) {
 					break;
 				}
+//				if (dist > distBack) {
+//					break;
+//				}
 				else {
-					distBack-=dist;
 					prevGpsData = gpsData;
 				}
 			}
