@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.jamdev.jpamutils.wavFiles.WavInterpolator;
 
 import com.jmatio.types.MLArray;
 import com.jmatio.types.MLDouble;
@@ -86,6 +87,12 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 
 
 	public final static int TEST_FFT_LENGTH=300; 
+	
+	/**
+	 * Decimates waveforms. 
+	 */
+	private WavInterpolator wavInterpolator = new WavInterpolator(); 
+
 	
 	/**
 	 * Default MT classifier 
@@ -444,9 +451,25 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 	 */
 	private double[] interpWaveform(MatchTemplate waveformMatch, double sR) {
 		//System.out.println("Interp waveform: " + " old: " + waveformMatch.sR + " new: " +  sR);
+		
+		if ( waveformMatch.sR>sR) {
+			//up sample
 			double[] interpWaveformMatch=reSampleWaveform(waveformMatch.waveform, waveformMatch.sR, sR);
-			//System.out.println("RESULT: old len: " + waveformMatch.waveform.length + "  new len: " +interpWaveformMatch.length);
 			return interpWaveformMatch; 
+		}
+		else if (waveformMatch.sR<sR){
+//			//TODO - make a better decimator?
+//			double[] interpWaveformMatch=reSampleWaveform(waveformMatch.waveform, waveformMatch.sR, sR);
+//			return interpWaveformMatch; 
+			if (wavInterpolator == null) wavInterpolator = new WavInterpolator(); 
+			return wavInterpolator.decimate(waveformMatch.waveform, waveformMatch.sR, (float) sR); 
+		}
+		else {
+			//nothing needed/ 
+			return waveformMatch.waveform;
+		}
+		
+			
 	}
 	
 	

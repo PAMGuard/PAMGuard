@@ -115,7 +115,7 @@ public class MTClassifierTest {
 			
 			testWaveform = MTClassifier.normaliseWaveform(testWaveform, MatchedTemplateParams.NORMALIZATION_RMS);
 			
-			System.out.println("Waveform max: " + PamArrayUtils.max(testWaveform) + " len: " + testWaveform.length); 
+			//System.out.println("Waveform max: " + PamArrayUtils.max(testWaveform) + " len: " + testWaveform.length); 
 
 			
 			//calculate the click FFT. 
@@ -196,7 +196,7 @@ public class MTClassifierTest {
 				MLDouble clickUID=(MLDouble) mlArrayRetrived.getField("UID", i);
 
 				
-				clicks.add(new MatchTemplate(Integer.toString((int) clickUID.get(0).doubleValue()), waveform, 288000)); 
+				clicks.add(new MatchTemplate(Long.toString(clickUID.get(0).longValue()), waveform, 288000)); 
 			}
 			return clicks; 
 		} 
@@ -327,14 +327,14 @@ public class MTClassifierTest {
 	 */
 	public static void testMatchCorrLen() {
 		
-		String testClicksPath = "/Users/au671271/MATLAB-Drive/MATLAB/PAMGUARD/matchedclickclassifer/DS2clks_test.mat";
-		String templteFilePath= "/Users/au671271/MATLAB-Drive/MATLAB/PAMGUARD/matchedclickclassifer/DS2templates_test.mat";
+		String testClicksPath = "/Users/au671271/MATLAB-Drive/MATLAB/PAMGUARD/matchedclickclassifer/DS3clks_test.mat";
+		String templteFilePath= "/Users/au671271/MATLAB-Drive/MATLAB/PAMGUARD/matchedclickclassifer/DS3templates_test.mat";
 		
 		float sR = 288000; //sample rate in samples per second. 
 		ArrayList<MatchTemplate> clicks = importClicks(testClicksPath, sR); 
 		ArrayList<MatchTemplate> templates = importTemplates(templteFilePath); 
 		
-		int index = 0; 
+		int index = 24; 
 		//values in MATLAB are9.73577287114938	8.82782814105430	3.51936216182390
 		System.out.println("Number of clicks: " + clicks.size() + " UID " + clicks.get(index).name); 
 		
@@ -343,7 +343,7 @@ public class MTClassifierTest {
 		
 		System.out.println("------Restricted Length--------"); 
 
-		int restrictedBins= 1024; 
+		int restrictedBins= 2048; 
 		
 		ClickLength clickLength = new ClickLength(); 
 		int[][] lengthPoints =  clickLength.createLengthData(clicks.get(index), sR, 5.5, 3, false, null); 
@@ -371,7 +371,7 @@ public class MTClassifierTest {
 	
 	
 	public static void main(String args[]) {
-		testMatchCorr(); 
+		testMatchCorrLen(); 
 	}
 	
 
