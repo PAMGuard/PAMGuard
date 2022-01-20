@@ -91,7 +91,7 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 	/**
 	 * Decimates waveforms. 
 	 */
-	private WavInterpolator wavInterpolator = new WavInterpolator(); 
+	transient private WavInterpolator wavInterpolator = new WavInterpolator(); 
 
 	
 	/**
