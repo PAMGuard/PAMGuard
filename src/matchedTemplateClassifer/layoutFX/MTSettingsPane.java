@@ -257,7 +257,7 @@ public class MTSettingsPane extends SettingsPane<MatchedTemplateParams> {
 
 		//click normalisation 
 		normBox = new ComboBox<String>();
-		normBox.getItems().addAll("peak to peak", "RMS", "none"); 
+		normBox.getItems().addAll("peak to peak", "norm", "none"); 
 
 		PamHBox clickNormPane= new PamHBox(); 
 		clickNormPane.setSpacing(5);

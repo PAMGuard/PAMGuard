@@ -103,8 +103,13 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 		if (waveformMatchFFT==null || currentSr!=sR) {
 			if (fft==null) fft=new FastFFT();
 			
+			
+			//System.out.println("interpWaveform: " + waveformMatch.waveform.length + " sR " + waveformMatch.sR);
+
 			//re-sample the waveform if the sample rate is different
 			this.interpWaveformMatch=interpWaveform(this.waveformMatch, sR); 
+			
+			//System.out.println("interpWaveformMatch: " + interpWaveformMatch.length + " sR " + sR);
 			
 			//normalise
 			//this.interpWaveformMatch=PamArrayUtils.normalise(interpWaveformMatch);
@@ -115,9 +120,11 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 //			System.out.println("MatchNorm: MATCH");
 //			MTClassifierTest.normalizeTest(interpWaveformMatch);
 			
-			//here use the FFT length with the maximum template size. 
-			waveformMatchFFT = fft.rfft(PamArrayUtils.flip(interpWaveformMatch), 
-					length); 
+			waveformMatchFFT = fft.rfft(interpWaveformMatch, length); 
+			
+			//need to calculate the complex conjugate - note that originally I was flipping the array but this means 
+			//the max value does not equal one with identical waveforms...doh. 
+			waveformMatchFFT = waveformMatchFFT.conj();
 //			System.out.println("waveformMatch: " + waveformMatch.waveform.length + 
 //					" interpWaveformMatch: " + interpWaveformMatch.length + " for " +sR + " sr "); 
 
@@ -155,9 +162,11 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 //			MTClassifierTest.printWaveform(inteprWaveformReject);
 			
 			//System.out.println("waveformReject: " +inteprWaveformReject.length +  " fftLength: " +  getFFTLength(sR)); 
+			waveformRejectFFT = fft.rfft(inteprWaveformReject, length); 
 			
-			//must flip the waveform for cross correlation - might as well do this here. 
-			waveformRejectFFT = fft.rfft(PamArrayUtils.flip(inteprWaveformReject), length); 
+			//need to calculate the complex conjugate - note that originally I was flipping the array but this means 
+			//the max value does not equal one with identical waveforms...doh. 
+			waveformRejectFFT = waveformRejectFFT.conj(); 
 		}
 		return waveformRejectFFT; 
 	}
@@ -342,11 +351,9 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 		//set the stored sR
 		currentSr=sR;
 		
-//		System.out.println("Matched click classifier: Waveform click: " + click.length()); 
-//		System.out.println("Matched click classifier: Waveform click: " + click.length()); 
+		//System.out.println("Waveform click: len: " + click.length()); 
 
-//		System.out.println("Waveform Reject max: " + PamArrayUtils.max(this.inteprWaveformReject)); 
-//		System.out.println("Waveform Reject max: " + PamArrayUtils.max(this.inteprWaveformReject)); 
+		//System.out.println("Waveform Reject max: " + PamArrayUtils.max(this.inteprWaveformReject)+ " len " + interpWaveformMatch.length); 
 
 		//int fftLength = getFFTLength(sR);
 		//int fftLength = this.getFFTLength(sR); 
@@ -363,7 +370,10 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 		
 		ComplexArray matchResult= new ComplexArray(fftLength); 
 		ComplexArray matchTemplate = getWaveformMatchFFT(sR,fftLength); 
-		//System.out.println("matchTemplate: Waveform click: " + matchTemplate.length()); 
+		
+		//System.out.println("matchTemplate interp: len: " + interpWaveformMatch.length+ " max: " +  PamArrayUtils.max(interpWaveformMatch)); 
+		//System.out.println("matchTemplate: len: " + waveformMatch.waveform.length+ " max: " +  PamArrayUtils.max(waveformMatch.waveform)); 
+
 		for (int i=0; i<Math.min(matchTemplate.length(), click.length()); i++) {
 			matchResult.set(i, click.get(i).times(matchTemplate.get(i)));
 		}
@@ -387,13 +397,13 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 		//System.out.println("Inverse MATCH RESULTS");
 	
 		//need to take the real part of the result and multiply by 2 to get same as 
-		//ifft function in MATLAB
+		//ifft function in MATLAB - dunno why this is...
 		double[] matchReal = new double[matchResult.length()]; 
 		double[] rejectReal = new double[rejectResult.length()]; 
 		
 		for (int i=0; i<matchResult.length(); i++) {
-			matchReal[i]=matchResult.getReal(i); 
-			rejectReal[i]=rejectResult.getReal(i); 
+			matchReal[i]=2*matchResult.getReal(i); 
+			rejectReal[i]=2*rejectResult.getReal(i); 
 			//System.out.println("iFFt match result: " + matchResult.get(i) + " iFFT rejectResult: " + rejectResult.get(i) );
 		}
 		
