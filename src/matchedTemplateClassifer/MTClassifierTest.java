@@ -134,14 +134,25 @@ public class MTClassifierTest {
 			MatchedTemplateResult matchResult = mtclassifier.calcCorrelationMatch(matchClick, sR);
 						
 			
-			System.out.println(String.format("The match correlation for %d is %.5f", i, matchResult.matchCorr)); 
+			System.out.println(String.format("The match correlation for %d is %.5f", i, matchResult.matchCorr));
+//			
+//			 printFFt(matchClick);
+//			 
+//			 System.out.println("-----------------------");
+//			
+//			 ComplexArray matchTemplate = mtclassifier.getWaveformMatchFFT(sR, matchClick.length()*2); 
+//
+//			 printFFt(matchTemplate);
+
+
 		}
 
 	}
 	
 	public static void printFFt(ComplexArray complexArray) {
 		for (int i=0; i<complexArray.length(); i++ ) {
-			System.out.println(complexArray.get(i).toString(6));
+			//System.out.println(complexArray.get(i).toString(6));
+			System.out.println(complexArray.get(i).real + "," + complexArray.get(i).imag);
 		}
 	}
 	

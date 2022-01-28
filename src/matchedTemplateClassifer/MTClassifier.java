@@ -11,6 +11,9 @@ import com.jmatio.types.MLDouble;
 import com.jmatio.types.MLStructure;
 
 import Filters.SmoothingFilter;
+import Localiser.DelayMeasurementParams;
+import Localiser.algorithms.Correlations;
+import Localiser.algorithms.TimeDelayData;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
@@ -92,13 +95,30 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 	 * Decimates waveforms. 
 	 */
 	transient private WavInterpolator wavInterpolator = new WavInterpolator(); 
+	
+	/**
+	 * The delay measurment parameters. 
+	 */
+	private transient DelayMeasurementParams delayMeasurementParams = defualtDelayParams(); 
 
+	/**
+	 * Runs the cross correlation algorithm. 
+	 */
+	private transient Correlations correlations = new Correlations(); 
 	
 	/**
 	 * Default MT classifier 
 	 */
 	public MTClassifier(){
 		fft= new FastFFT();
+	}
+
+	private DelayMeasurementParams defualtDelayParams() {
+		DelayMeasurementParams delayMeasurementParams = new DelayMeasurementParams(); 
+		//delayMeasurementParams.setUpSample(4);
+		delayMeasurementParams.setFftFilterParams(null);
+
+		return delayMeasurementParams;
 	}
 
 	/**
@@ -376,7 +396,7 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 		int fftLength = click.length()*2;
 		
 		ComplexArray matchResult= new ComplexArray(fftLength); 
-		ComplexArray matchTemplate = getWaveformMatchFFT(sR,fftLength); 
+		ComplexArray matchTemplate = getWaveformMatchFFT(sR,fftLength); //remember this is the  complex conjugate
 		
 		//System.out.println("matchTemplate interp: len: " + interpWaveformMatch.length+ " max: " +  PamArrayUtils.max(interpWaveformMatch)); 
 		//System.out.println("matchTemplate: len: " + waveformMatch.waveform.length+ " max: " +  PamArrayUtils.max(waveformMatch.waveform)); 
@@ -386,7 +406,7 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 		}
 		
 		ComplexArray rejectResult= new ComplexArray(fftLength); 
-		ComplexArray rejectTemplate = getWaveformRejectFFT(sR, fftLength); 
+		ComplexArray rejectTemplate = getWaveformRejectFFT(sR, fftLength); //remember this is the  complex conjugate
 		for (int i=0; i<Math.min(rejectTemplate.length(), click.length()); i++) {
 			rejectResult.set(i, click.get(i).times(rejectTemplate.get(i)));
 		}
@@ -395,6 +415,9 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 //		System.out.println("Waveform Reject max: " + PamArrayUtils.max(this.inteprWaveformReject)); 
 		
 		//System.out.println("Click input: " + click.length() + " click template: " + matchTemplate.length());
+		
+	
+
 
 		//must use scaling to get the same result as MATLAB 
 		if (fft==null) fft= new FastFFT();
@@ -423,6 +446,14 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 
 		double maxmatch=PamArrayUtils.max(matchReal); 
 		double maxreject=PamArrayUtils.max(rejectReal); 
+		
+		
+//		//TEST
+//		if (correlations==null) correlations=new Correlations(); 
+//		TimeDelayData matchResultTD = correlations.getDelay(click,  matchTemplate.conj(), null, sR,  fftLength); 
+//		System.out.println("Old xcorr method: " + maxmatch + " new PG method: " + matchResultTD.getDelayScore()); 
+		
+//		//TEST
 		
 		//if set to "none" then reject template will return a NaN - TODO bit messy and inefficient. 
 		double result; 
