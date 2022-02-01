@@ -12,8 +12,6 @@ import com.jmatio.types.MLStructure;
 
 import Filters.SmoothingFilter;
 import Localiser.DelayMeasurementParams;
-import Localiser.algorithms.Correlations;
-import Localiser.algorithms.TimeDelayData;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
@@ -96,15 +94,15 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 	 */
 	transient private WavInterpolator wavInterpolator = new WavInterpolator(); 
 	
-	/**
-	 * The delay measurment parameters. 
-	 */
-	private transient DelayMeasurementParams delayMeasurementParams = defualtDelayParams(); 
-
-	/**
-	 * Runs the cross correlation algorithm. 
-	 */
-	private transient Correlations correlations = new Correlations(); 
+//	/**
+//	 * The delay measurment parameters. 
+//	 */
+//	private transient DelayMeasurementParams delayMeasurementParams = defualtDelayParams(); 
+//
+//	/**
+//	 * Runs the cross correlation algorithm. 
+//	 */
+//	private transient Correlations correlations = new Correlations(); 
 	
 	/**
 	 * Default MT classifier 
