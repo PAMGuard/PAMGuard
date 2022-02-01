@@ -184,15 +184,21 @@ public class TDAcousticScroller extends AcousticScrollerFX implements PamSetting
 		
 		//add a listener so the visible amount changes of the spinner changes value. 
 		spinner.valueProperty().addListener((obsVal, oldVal, newVal)->{
-			if (spinnerCall) return ; //prevent overflow. 
-			if (newVal<=this.getRangeMillis()) {
-//					Debug.out.println("TDAcousticScroller: TimeRangeSpinner: " + newVal);
-				Platform.runLater(()->{ //why? But seems necessary
-					super.setVisibleMillis(newVal);
-				}); 
-			}
-			else spinner.getValueFactory().decrement(1); //need to use decrement here instead of set time because otherwise arrow buttons
-			//don't work. 
+			if (spinnerCall) return ; //prevent overflow
+			
+			/**
+			 * There are two slightly different modes here- in viewer mode we want the spinner to set
+			 * only the visible range. However in real time mode we want it to set the visible time and
+			 * the data keep time. 
+			 */
+				if (newVal<=this.getRangeMillis() || !isViewer) {
+	//					Debug.out.println("TDAcousticScroller: TimeRangeSpinner: " + newVal);
+					Platform.runLater(()->{ //why? But seems necessary
+						super.setVisibleMillis(newVal);
+						super.setRangeMillis(0, newVal, false); 
+					}); 
+				}
+				else spinner.getValueFactory().decrement(1); //need to use decrement here instead of set time because otherwise arrow buttons
 		});
 	}
 

@@ -75,7 +75,6 @@ public class GenericModelTest {
 				//long time1 = System.currentTimeMillis();
 				data = new float[][][] {DLUtils.toFloatArray(((FreqTransform) transform).getSpecTransfrom().getTransformedData())}; 
 				
-				
 				//data = new float[][][] { DLUtils.makeDummySpectrogram(40, 40)}; 
 				
 				//System.out.println("data len: " + data.length + " " + data[0].length + " " +  data[0][0].length); 

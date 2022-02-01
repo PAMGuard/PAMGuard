@@ -72,19 +72,32 @@ public class MTClassifierTest {
 		return struct; 
 	}
 	
+	/**
+	 * Test the correlation of several templates
+	 * @param testWaveform - the waveform to correlate against. 
+	 * @param sR - the sample rate of the waveform. 
+	 * @param templates - the match templates to test. 
+	 */
+	private static void testCorrelation(double[] testWaveform, float sR, ArrayList<MatchTemplate> templates) {
+		testCorrelation(testWaveform,  sR,  templates, MatchedTemplateParams.NORMALIZATION_RMS); 
+	}
+
+	
+	
 	
 	/**
 	 * Test the correlation of several templates
-	 * @param testWaveform
-	 * @param sR
-	 * @param templates
-	 * @return
+	 * @param testWaveform - the waveform to correlate against. 
+	 * @param sR - the sample rate of the waveform. 
+	 * @param templates - the match templates to test. 
+	 * @param normalisation - the normalisation type to use e.g.  MatchedTemplateParams.NORMALIZATION_RMS
 	 */
-	private static void testCorrelation(double[] testWaveform, float sR, ArrayList<MatchTemplate> templates) {
+	private static void testCorrelation(double[] testWaveform, float sR, ArrayList<MatchTemplate> templates, int normalisation) {
 
 		//create the classifier object 
 		for (int i=0; i<templates.size(); i++){
 			MTClassifier mtclassifier = new MTClassifier(); 
+			mtclassifier.normalisation = normalisation; 
 			
 			//System.out.println("Template " + i + " " + templates.get(i));
 			//add templates if inpout 
@@ -97,7 +110,13 @@ public class MTClassifierTest {
 
 			//System.out.println("Waveform len: " +testWaveform.length + " min: " + PamArrayUtils.min(testWaveform) +  " max: " + PamArrayUtils.max(testWaveform)); 
 
+		
 			testWaveform=PamArrayUtils.divide(testWaveform, PamUtils.PamArrayUtils.max(testWaveform));
+			
+			testWaveform = MTClassifier.normaliseWaveform(testWaveform, MatchedTemplateParams.NORMALIZATION_RMS);
+			
+			//System.out.println("Waveform max: " + PamArrayUtils.max(testWaveform) + " len: " + testWaveform.length); 
+
 			
 			//calculate the click FFT. 
 			fft = new FastFFT(); 
@@ -115,14 +134,25 @@ public class MTClassifierTest {
 			MatchedTemplateResult matchResult = mtclassifier.calcCorrelationMatch(matchClick, sR);
 						
 			
-			System.out.println(String.format("The match correlation for %d is %.5f", i, matchResult.matchCorr)); 
+			System.out.println(String.format("The match correlation for %d is %.5f", i, matchResult.matchCorr));
+//			
+//			 printFFt(matchClick);
+//			 
+//			 System.out.println("-----------------------");
+//			
+//			 ComplexArray matchTemplate = mtclassifier.getWaveformMatchFFT(sR, matchClick.length()*2); 
+//
+//			 printFFt(matchTemplate);
+
+
 		}
 
 	}
 	
 	public static void printFFt(ComplexArray complexArray) {
 		for (int i=0; i<complexArray.length(); i++ ) {
-			System.out.println(complexArray.get(i).toString(6));
+			//System.out.println(complexArray.get(i).toString(6));
+			System.out.println(complexArray.get(i).real + "," + complexArray.get(i).imag);
 		}
 	}
 	
@@ -177,7 +207,7 @@ public class MTClassifierTest {
 				MLDouble clickUID=(MLDouble) mlArrayRetrived.getField("UID", i);
 
 				
-				clicks.add(new MatchTemplate(Integer.toString((int) clickUID.get(0).doubleValue()), waveform, 288000)); 
+				clicks.add(new MatchTemplate(Long.toString(clickUID.get(0).longValue()), waveform, 288000)); 
 			}
 			return clicks; 
 		} 
@@ -303,16 +333,19 @@ public class MTClassifierTest {
 		
 	}
 	
-	public static void testMatchCorr() {
+	/**
+	 * Test how the length of the waveform affects the match correlation values
+	 */
+	public static void testMatchCorrLen() {
 		
-		String testClicksPath = "/Users/au671271/MATLAB-Drive/MATLAB/PAMGUARD/matchedclickclassifer/DS2clks_test.mat";
-		String templteFilePath= "/Users/au671271/MATLAB-Drive/MATLAB/PAMGUARD/matchedclickclassifer/DS2templates_test.mat";
+		String testClicksPath = "/Users/au671271/MATLAB-Drive/MATLAB/PAMGUARD/matchedclickclassifer/DS3clks_test.mat";
+		String templteFilePath= "/Users/au671271/MATLAB-Drive/MATLAB/PAMGUARD/matchedclickclassifer/DS3templates_test.mat";
 		
 		float sR = 288000; //sample rate in samples per second. 
 		ArrayList<MatchTemplate> clicks = importClicks(testClicksPath, sR); 
 		ArrayList<MatchTemplate> templates = importTemplates(templteFilePath); 
 		
-		int index = 0; 
+		int index = 24; 
 		//values in MATLAB are9.73577287114938	8.82782814105430	3.51936216182390
 		System.out.println("Number of clicks: " + clicks.size() + " UID " + clicks.get(index).name); 
 		
@@ -321,7 +354,7 @@ public class MTClassifierTest {
 		
 		System.out.println("------Restricted Length--------"); 
 
-		int restrictedBins= 1024; 
+		int restrictedBins= 2048; 
 		
 		ClickLength clickLength = new ClickLength(); 
 		int[][] lengthPoints =  clickLength.createLengthData(clicks.get(index), sR, 5.5, 3, false, null); 
@@ -333,9 +366,23 @@ public class MTClassifierTest {
 		
 	}
 	
+	/**
+	 * Test the match corr algorithm by cross correlating a waveform with itself. 
+	 */
+	public static void testMatchCorr() {
+		
+		String templteFilePath= "/Users/au671271/MATLAB-Drive/MATLAB/PAMGUARD/matchedclickclassifer/DS2templates_test.mat";
+		//float sR = 288000; //sample rate in samples per second. 
+
+		ArrayList<MatchTemplate> templates = importTemplates(templteFilePath); 
+		
+		testCorrelation(templates.get(0).waveform,  templates.get(0).sR, templates); 
+		
+	}
+	
 	
 	public static void main(String args[]) {
-		testMatchCorr(); 
+		testMatchCorrLen(); 
 	}
 	
 
