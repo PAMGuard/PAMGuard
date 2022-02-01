@@ -65,6 +65,7 @@ public class MTOfflineProcess {
 		//System.out.println("Click train offline data block " + clickTrainControl.getParentDataBlock());
 		mtOfflineGroup.setPrimaryDataBlock(mtContorl.getParentDataBlock());
 		mtOfflineTask.setParentDataBlock(mtContorl.getParentDataBlock());
+		mtOfflineTask.addAffectedDataBlock(mtContorl.getParentDataBlock());
 		
 		//if null open the dialog- also create a new offlineTask group if the datablock has changed. 
 		if (mtOfflineDialog == null) {
