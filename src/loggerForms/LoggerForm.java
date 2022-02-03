@@ -25,6 +25,12 @@ import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.Timer;
 
+import Array.streamerOrigin.GPSOriginMethod;
+import Array.streamerOrigin.GPSOriginSystem;
+import Array.streamerOrigin.HydrophoneOriginMethod;
+import Array.streamerOrigin.HydrophoneOriginMethods;
+import Array.streamerOrigin.OriginIterator;
+import Array.streamerOrigin.StaticOriginSystem;
 import loggerForms.PropertyTypes;
 import loggerForms.controlDescriptions.ControlDescription;
 import loggerForms.controlDescriptions.ControlTypes;
@@ -33,6 +39,7 @@ import loggerForms.controls.CounterControl;
 import loggerForms.controls.LoggerControl;
 import loggerForms.controls.NMEAControl;
 import GPS.GPSDataBlock;
+import GPS.GpsData;
 import GPS.GpsDataUnit;
 import NMEA.NMEADataBlock;
 import NMEA.NMEADataUnit;
@@ -44,6 +51,7 @@ import PamView.dialog.PamDialog;
 import PamView.dialog.PamLabel;
 import PamView.panel.PamPanel;
 import PamView.panel.VerticalLayout;
+import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamObserver;
@@ -94,6 +102,10 @@ public class LoggerForm{
 
 	private boolean hasCounter=false;
 	private CounterControl counter;
+	
+
+	private HydrophoneOriginMethods origins = HydrophoneOriginMethods.getInstance();
+	
 	/**
 	 * @return the hasCounter
 	 */
@@ -898,6 +910,32 @@ public class LoggerForm{
 	public JButton getSaveButton() {
 		return saveButton;
 	}
+	
+	public GpsData getOriginLatLong(FormsDataUnit formsDataUnit) {
+		GpsData gps = getOrigin(GPSOriginSystem.class, formsDataUnit);
+		if (gps != null) {
+			return gps;
+		}
+		gps = getOrigin(StaticOriginSystem.class, formsDataUnit);
+		return gps;
+	}
+	
+	private GpsData getOrigin(Class originClass, FormsDataUnit formsDataUnit) {
+		HydrophoneOriginMethod origin = origins.getMethod(GPSOriginMethod.class, null, null);
+		if (origin == null) {
+			return null;
+		}
+		OriginIterator gpsIter = origin.getGpsDataIterator(PamDataBlock.ITERATOR_END);
+		GpsData prev = null;
+		while (gpsIter.hasPrevious()) {
+			prev = gpsIter.previous();
+			if (prev.getTimeInMillis() < formsDataUnit.getTimeMilliseconds()) {
+				break;
+			}
+		}
+		return prev;		
+	}
+	
 
 	//	/**
 	//	 * @return formsDataUnit
