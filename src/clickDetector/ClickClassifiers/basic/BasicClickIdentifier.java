@@ -401,6 +401,7 @@ public class BasicClickIdentifier implements ClickIdentifier, PamSettings {
      */
     public ClickTypeCommonParams getCommonParams(int code) {
         int codeIdx = codeToListIndex(code);
+        if (codeIdx>=idParameters.clickTypeParams.size()) return null; 
         return idParameters.clickTypeParams.get(codeIdx);
     }
 
