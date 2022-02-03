@@ -4,6 +4,10 @@ import PamController.PamController;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamProcess;
+import PamguardMVC.dataSelector.DataSelector;
+import PamguardMVC.dataSelector.DataSelectorCreator;
+import loggerForms.dataselect.FormDataSelCreator;
+import loggerForms.monitor.FormsDataSelectorCreator;
 /**
  * 
  * @author Graham Weatherup
@@ -18,6 +22,7 @@ public class FormsDataBlock extends PamDataBlock<FormsDataUnit> {
 		super(FormsDataUnit.class, dataName, parentProcess, channelMap);
 		this.formDescription = formDescription;
 		setNaturalLifetime(600);
+		setDataSelectCreator(new FormDataSelCreator(this, formDescription));
 //		setBinaryDataSource(new FormsBinaryIO(formDescription.getFormsControl(), this));
 //		setNaturalLifetimeMillis(60000);
 	}
@@ -26,6 +31,18 @@ public class FormsDataBlock extends PamDataBlock<FormsDataUnit> {
 		return formDescription;
 	}
 	
+//	@Override
+//	public DataSelector getDataSelector(String selectorName, boolean allowScores, String selectorType) {
+//		// TODO Auto-generated method stub
+//		return super.getDataSelector(selectorName, allowScores, selectorType);
+//	}
+//
+//	@Override
+//	public DataSelectorCreator getDataSelectCreator() {
+//
+//		dataSelectorCreator = new FormDataSelCreator(this, formDescription);
+//	}
+
 	/**
 	 * Override this for Logger forms so that they always save.
 	 * @param pamDataUnit dataunit to consider

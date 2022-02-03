@@ -44,7 +44,7 @@ public class FormPlotOptions implements Serializable, Cloneable, ManagedParamete
 	 */
 	public boolean isPlotControl(int controlIndex, int itemIndex) {
 		checkDimension(controlIndex, itemIndex);
-		return controlChoices[controlIndex][itemIndex];
+		return controlChoices[controlIndex][itemIndex] | true;
 	}
 	
 	/**

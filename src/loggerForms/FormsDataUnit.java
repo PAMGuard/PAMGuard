@@ -1,5 +1,6 @@
 package loggerForms;
 
+import GPS.GpsData;
 import PamUtils.PamCalendar;
 import PamguardMVC.PamDataUnit;
 /**
@@ -27,6 +28,8 @@ public class FormsDataUnit extends PamDataUnit {
 	 */
 	private Object[] formData;
 	private FormDescription formDescription;
+
+	private GpsData formOriginLatLong;
 	
 	/**
 	 * Constructor for a form data unit. 
@@ -71,6 +74,24 @@ public class FormsDataUnit extends PamDataUnit {
 		this.formData=formData;
 		this.updateDataUnit(PamCalendar.getTimeInMillis());
 	}
+
+	@Override
+	public GpsData getOriginLatLong(boolean recalculate) {
+		/**
+		 * Need to do something a bit different here since Logger form data is generally 
+		 * not associated with a hydrophone (though that may change in the future). 
+		 * All we really want is the primary origin method, which is either GPS data 
+		 * or static data and then get the value. mostly people will want the GPS position 
+		 * for the time of the logger data, though really we should make a much better way 
+		 * of doing this, including offsets from GPS, options to use the hydrophones if 
+		 * we want to as a reference, etc. 
+		 */
+		if (recalculate || formOriginLatLong == null) {
+			formOriginLatLong = loggerForm.getOriginLatLong(this);
+		}
+		return formOriginLatLong;
+	}
+
 
 
 }
