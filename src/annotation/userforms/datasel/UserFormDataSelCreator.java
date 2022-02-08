@@ -10,6 +10,11 @@ import loggerForms.dataselect.FormDataSelCreator;
 import loggerForms.dataselect.FormDataSelector;
 import loggerForms.monitor.FormsDataSelectorCreator;
 
+/**
+ * User form data selector for use with annotations. Not normal selectors. 
+ * @author dg50
+ *
+ */
 public class UserFormDataSelCreator extends AnnotationDataSelCreator {
 
 	private FormDataSelCreator formsDataSelectorCreator;

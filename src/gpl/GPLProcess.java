@@ -87,6 +87,7 @@ public class GPLProcess extends PamBlockProcess {
 		addOutputDataBlock(whitenedSpectrogram);
 		
 		stateDataBlock = new GPLStateDataBlock(this, 0);
+		stateDataBlock.setBinaryDataSource(new GPLStateDataSource(stateDataBlock));
 		addOutputDataBlock(stateDataBlock);
 		
 		gplDetectionBlock = new GPLDetectionBlock(this);
@@ -780,12 +781,13 @@ public class GPLProcess extends PamBlockProcess {
 
 
 			//			quiet.noise_floor = 1.;
-			/**
-			 * This is the call to the detector, which is remembering state, will mostly return
-			 * null, but when there has been a detection, will return an object with time and 
-			 * frequency information. 
-			 */
-		}
+
+		}		
+		/**
+		 * This is the call to the detector, which is remembering state, will mostly return
+		 * null, but when there has been a detection, will return an object with time and 
+		 * frequency information. 
+		 */
 		public void runDetector(FFTDataUnit fftDataUnit, double[] wData, double base_in, double ceilnoise, double threshfloor) {		
 			//			DetectedPeak newPeak = peakDetector.detectPeaks(fftDataUnit, wData, base_in, 
 			//					gplParams.noise_ceiling * noise_floor, gplParams.thresh * noise_floor);		
