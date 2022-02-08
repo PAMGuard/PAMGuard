@@ -558,23 +558,35 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings{
 		boolean ans = false;
 		if (folderInputParameters.mergeFiles == false) return false;
 		
-		long fileEndTime = 0;
+		
+		long currFileStart = 0;
+		long currFileLength = 0;
+		long currFileEnd = 0;
+		if (currentFile >= 0) {
+			try {
+			WavFileType currentWav = allFiles.get(currentFile);
+			currFileStart = getFileStartTime(currentWav.getAbsoluteFile());
+			if (audioStream != null) {
+				fileSamples = audioStream.getFrameLength();
+				currFileLength = (long) (fileSamples * 1000 / audioStream.getFormat().getFrameRate());
+				currFileEnd = currFileStart + currFileLength;
+			}
+			}
+			catch (Exception e) {
+				
+			}
+		}
+		if (currFileEnd == 0) {
+			//			System.out.println("OpenNextfile " + currentFile + " " + allFiles.get(currentFile).getName());
+			// also check to see if the start time of the next file is the same as the 
+			// end time of the current file.
+			currFileEnd = PamCalendar.getTimeInMillis();
+			long lastBit = (long) ((blockSamples * 1000L) / getSampleRate());
+			currFileEnd += lastBit;
+		}
 		if (++currentFile < allFiles.size()) {
-			if (currentFile >= 0) {
-				WavFileType currentWav = allFiles.get(currentFile);
-				fileEndTime = getFileStartTime(currentWav.getAbsoluteFile());
-				fileEndTime += currentWav.getDurationInSeconds()* 1000.;
-			}
-			else {
-				//			System.out.println("OpenNextfile " + currentFile + " " + allFiles.get(currentFile).getName());
-				// also check to see if the start time of the next file is the same as the 
-				// end time of the current file.
-				fileEndTime = PamCalendar.getTimeInMillis();
-				long lastBit = (long) ((blockSamples * 1000L) / getSampleRate());
-				fileEndTime += lastBit;
-			}
 			long newStartTime = getFileStartTime(getCurrentFile());
-			long diff = newStartTime - fileEndTime;
+			long diff = newStartTime - currFileEnd;
 			if (diff > 2000 || diff < -5000 || newStartTime == 0) {
 				currentFile--;
 				return false;
