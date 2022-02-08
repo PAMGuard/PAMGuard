@@ -16,7 +16,7 @@ public class PamguardVersionInfo {
 	 * @return release type 
 	 */
 	static public ReleaseType getReleaseType() {
-		return ReleaseType.BETA; 
+		return ReleaseType.CORE; 
 	}
 	
 	/**
@@ -31,20 +31,24 @@ public class PamguardVersionInfo {
 	 * Version number, major version.minorversion.sub-release.
 	 * Note: can't go higher than sub-release 'f'
 	 */
-	static public final String version = "2.02.03a";
+	static public final String version = "2.02.03";
 	
 	/**
 	 * Release date
 	 */
-	static public final String date = "22 October 2021";
+	static public final String date = "8 February 2022";
 	
 //	/**
 //	 * Release type - Beta or Core
 //	 */
 //	static public final String release = "SMRU";
 
-	
-	static public final String revisionString = "$Rev: 6240 $";
+	/**
+	 * This is redundant now that we're no longer using SVN. 
+	 * Will have to do a better job of updating the version number
+	 * and correctly tagging code in the git repo. 
+	 */
+//	static public final String revisionString = "$Rev: 6240 $";
 	
 	/**
 	 * GNU License statement
@@ -70,33 +74,34 @@ public class PamguardVersionInfo {
 	
 
 	
-	/**
-	 * @return the code revision number from the SVN repository
-	 */
-	static public int getRevision() {
-		try {
-			int spacePos = revisionString.indexOf(' ');
-			if (spacePos == -1) {
-				return 0;
-			}
-			String newStr = revisionString.substring(spacePos+1);
-			spacePos = newStr.indexOf(' ');
-			if (spacePos > 0) {
-				newStr = newStr.substring(0, spacePos);
-			}
-			return Integer.valueOf(newStr);
-		}
-		catch (NumberFormatException e) {
-			return 0;
-		}
-	}
+//	/**
+//	 * @return the code revision number from the SVN repository
+//	 */
+//	static public int getRevision() {
+//		try {
+//			int spacePos = revisionString.indexOf(' ');
+//			if (spacePos == -1) {
+//				return 0;
+//			}
+//			String newStr = revisionString.substring(spacePos+1);
+//			spacePos = newStr.indexOf(' ');
+//			if (spacePos > 0) {
+//				newStr = newStr.substring(0, spacePos);
+//			}
+//			return Integer.valueOf(newStr);
+//		}
+//		catch (NumberFormatException e) {
+//			return 0;
+//		}
+//	}
 
 	/**
 	 * Don't delete this - it's required by the installer builder.  
 	 * @param args
 	 */
 	public static void main(String[] args){
-		System.out.println("VerNam:"+getReleaseType().toString()+":VerNum:"+version+":Rev:"+getRevision()+":D:"+date);
+//		System.out.println("VerNam:"+getReleaseType().toString()+":VerNum:"+version+":Rev:"+getRevision()+":D:"+date);
+		System.out.println("VerNam:"+getReleaseType().toString()+":VerNum:"+version+":D:"+date);
 	}
 	
 }
