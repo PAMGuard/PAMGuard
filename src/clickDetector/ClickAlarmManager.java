@@ -108,6 +108,9 @@ public class ClickAlarmManager extends PamProcess {
 //        System.out.println("ClickAlarm hashcode, time = " + System.identityHashCode(arg) + "," + cd.getTimeMilliseconds() + "," + cd.getClickType() );
         if (cd.getClickType()!=0) {
             ClickTypeCommonParams commonParams = clickControl.getClickIdentifier().getCommonParams(cd.getClickType());
+            
+            if (commonParams==null) return;
+            	
             Boolean soundAlarm = commonParams.getAlarmEnabled();
 
             if (soundAlarm != null && soundAlarm) {

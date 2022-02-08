@@ -60,7 +60,7 @@ public class ImportTemplateMAT implements TemplateImport {
 			//now create waveform
 //			System.out.println("Create a waveform with " + waveform.length + " samples with a sample rate of "
 //					+ sR + " Hz");
-			MatchTemplate matchedTemplate = new MatchTemplate("Imported Waveform", waveform, sR);
+			MatchTemplate matchedTemplate = new MatchTemplate(filePath.getName(), waveform, sR);
 			return matchedTemplate; 
 			
 		} catch (FileNotFoundException e) {
