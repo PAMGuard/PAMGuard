@@ -29,11 +29,14 @@ public class RWEDialog extends PamDialog {
 	private static RWEDialog singleInstance;
 	private SourcePanel sourcePanel;
 	
+	private RWEControl rweControl;
+	
 	private JTextField startFreq, endFreq, thresholdDB;
 	private JTextField minSoundType;
 		
-	private RWEDialog(Window parentFrame) {
+	private RWEDialog(RWEControl rweControl, Window parentFrame) {
 		super(parentFrame, "Right Whale Edge Detector Settings", true);
+		this.rweControl = rweControl;
 		sourcePanel = new SourcePanel(this, "Source and Channels", 
 				FFTDataUnit.class, true, true);
 		sourcePanel.setSourceToolTip("Data source should be the output of a Spectrogram Smmothing Kernel");
@@ -96,8 +99,8 @@ public class RWEDialog extends PamDialog {
 	}
 	
 	public static RWEParameters showDialog(Window frame, RWEControl rweControl) {
-		if (singleInstance == null || frame != singleInstance.getOwner()) {
-			singleInstance = new RWEDialog(frame);
+		if (singleInstance == null || frame != singleInstance.getOwner() || rweControl != singleInstance.rweControl) {
+			singleInstance = new RWEDialog(rweControl, frame);
 		}
 		singleInstance.rweParameters = rweControl.rweParameters.clone();
 		singleInstance.setParams();
@@ -137,24 +140,11 @@ public class RWEDialog extends PamDialog {
 		catch (NumberFormatException e) {
 			return showWarning("Invalid detection or classification parameter");
 		}
-		boolean gok = checkInputProcessing();
-		if (gok == false) {
-			return showWarning("Right whale detector input must include Gaussian Kernel Smoothing as part of the FFT module, or a stand alone smoothing module");
-		}
+//		boolean gok = rweControl.hasKernelSmoothing(sourcePanel.getSource());
+//		if (gok == false) {
+//			return showWarning("Right whale detector input must include Gaussian Kernel Smoothing as part of the FFT module, or a stand alone smoothing module");
+//		}
 		return true;
-	}
-
-	/**
-	 * Check that the input process has implemented kernel smoothing. 
-	 * @return
-	 */
-	private boolean checkInputProcessing() {
-		PamDataBlock db = sourcePanel.getSource();
-		if (db == null) {
-			return false;
-		}
-		ProcessAnnotation an = db.findAnnotation(KernelSmoothingProcess.processType, KernelSmoothingProcess.processName);
-		return an != null;
 	}
 
 	@Override

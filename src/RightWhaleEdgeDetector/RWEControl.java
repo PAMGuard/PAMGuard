@@ -10,6 +10,7 @@ import javax.swing.JMenuItem;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import KernelSmoothing.KernelSmoothingProcess;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
@@ -20,6 +21,8 @@ import PamUtils.PamUtils;
 import PamView.GroupedDataSource;
 import PamView.GroupedSourceParameters;
 import PamView.dialog.GroupedSourcePanel;
+import PamguardMVC.PamDataBlock;
+import PamguardMVC.ProcessAnnotation;
 
 /**
  * Exact implementation of the 2003 Right Whale detector I developed when I was 
@@ -84,6 +87,19 @@ public class RWEControl extends PamControlledUnit implements PamSettings {
 			this.rweParameters = newParams.clone();
 			rweProcess.setupProcesses();
 		}
+	}
+	
+	/**
+	 * Check that the input process has implemented kernel smoothing.
+	 * @param inputBlock input data block (should be fft data).  
+	 * @return true if kernel smoothing is in place. 
+	 */
+	protected boolean hasKernelSmoothing(PamDataBlock inputBlock) {
+		if (inputBlock == null) {
+			return false;
+		}
+		ProcessAnnotation an = inputBlock.findAnnotation(KernelSmoothingProcess.processType, KernelSmoothingProcess.processName);
+		return an != null;
 	}
 
 
