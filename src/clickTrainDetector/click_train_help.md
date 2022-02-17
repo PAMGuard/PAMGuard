@@ -97,11 +97,9 @@ The descriptors used in Eq. 1 on their own do not provide a good score for click
 _The advanced settings for calculating χ^2. These parameters are primarily used to prevent click train aliasing and fragmentation.
 The advanced settings (see Figure 4) are a series of additional factors that prevent aliasing and fragmentation and work as flows._ 
 
-***Low ICI Bonus:***  if the median ICI of the possible click train is above a specified maximum value, a large penalty is added which effectively makes it one of the least likely click trains in the hypothesis matrix. If the median ICI is below the maximum value then χ^2  = 〖(χ^2 (I ̃/max_k⁡〖I_k 〗 ))   〗^LI where I ̃ is the median ICI, max_k⁡〖I_k 〗 is the maximum ICI in the possible click train and LI is the low ICI Bonus. This bonus term favours lower ICI values, preventing aliased click trains. 
+***Low ICI Bonus:***  if the median ICI of the possible click train is above a specified maximum value, a large penalty is added which effectively makes it one of the least likely click trains in the hypothesis matrix. If the median ICI is below the maximum value then χ<sup>2</sup>  = (χ<sup>2</sup> (I/(max<sub>k</sub>⁡*I<sub>k</sub>))<sup>LI</sup> where  I is the median ICI, max<sub>k</sub>⁡*I<sub>k</sub> is the maximum ICI in the possible click train and LI is the low ICI Bonus constant term. This bonus term favours lower ICI values, preventing aliased click trains. 
 
-***Long track bonus:*** add a bonus factor for longer click trains to prevent fragmentation. This is the total length of the click train in seconds divided by the total hypothesis matrix time in seconds L which is then multiplied so that χ^2  = 〖(χ^2 L)   〗^LT  where LT is the long track bonus. 
-
-***Long track bonus:***  add a bonus factor for longer click trains to prevent fragmentation. This is the total length of the click train in seconds divided by the total hypothesis matrix time in seconds L which is then multiplied so that χ^2  = 〖(χ^2 L)   〗^LT  where LT is the long track bonus. 
+***Long track bonus:*** add a bonus factor for longer click trains to prevent fragmentation. This is the total length of the click train in seconds divided by the total hypothesis matrix time in seconds L which is then multiplied so that χ<sup>2</sup> = (χ<sup>2</sup>*L)<sup>LT</sup> where LT is the long track bonus. 
 
 ***Coast penalty:***  add a penalty for “coasting” i.e. when an expected click, based on ICI, is not present in the click train. This penalty is multiplied by the number of coasts i.e. the likely number of missed clicks based on ICI  
 
@@ -117,12 +115,12 @@ There is currently a basic spectral correlation/IDI/bearing classifier; more com
   <img width="510" height="800" src = "resources/classifier_pane.png">
 </p>
 
-_The classifier settings. Users can add multiple classifiers using the + button next to the classifier tabs.  Each classifier allows the user to choose a number of different approaches to classification based on the goodness of fit, inter-click interval, average spectra and bearings of the click trains. Users can use just one or all of these options and set specific parameters for each. 
+_The classifier settings. Users can add multiple classifiers using the + button next to the classifier tabs.  Each classifier allows the user to choose a number of different approaches to classification based on the goodness of fit, inter-click interval, average spectra and bearings of the click trains. Users can use just one or all of these options and set specific parameters for each._ 
 
 Users can add multiple classifiers by selecting the + button next to the classification tabs. Each classifier allows the user to choose a number of different methods for click train classification based on the goodness of fit, inter-click interval, average spectra and/or bearings of the click trains; for a click train to be classified it must pass all enabled methods (use toggle switches to enable and disable different types of classification). The different classification methods. 
 
 ### χ<sup>2</sup> threshold classifier
-The click train is classified if it’s overall χ^2 value is lower than the set χ^2 Threshold and it has more than Min. Clicks and the time between the first and last click is greater than Min. Time
+The click train is classified if it’s overall χ<sup>2</sup> value is lower than the set χ<sup>2</sup> Threshold and it has more than Min. Clicks and the time between the first and last click is greater than Min. Time
 
 ### IDI Classifier
 The click train is classified if the median/mean and standard deviation in the inter detection interval (IDI) between subsequent clicks are within user defined limits. 
@@ -136,14 +134,13 @@ The click train is classified if minimum and maximum bearing (Bearing Limits) th
 
 ## Parametrising the classifier
 
-Each classifier has a set of metadata that are added to click trains. This can be accessed through the tooltip or right click menus in various displays. For example, in the Time Base Display FX hover the mouse over a click train or bring the pop menu with a right click. Paramters such as the spectral correaltion value, IDI and bearing information etc are displayed which allows users to get an idea of which values to set for the classifier. Currently this requires (like most PAMGuard classifiers) a trial and error approach. It is hoped that future update will allow manually validated data to be used to parametrise both the detection and classification stage of the click train detector. 
-
+Each classifier has a set of metadata that are added to click trains. This can be accessed through the tooltip or right click menus in various displays. For example, in the Time Base Display FX hover the mouse over a click train or bring the pop menu with a right click. Parameters such as the spectral correlation value, IDI and bearing information etc are displayed which allows users to get an idea of which values to set for the classifier. Currently this requires (like most PAMGuard classifiers) a trial and error approach. It is hoped that future update will allow manually validated data to be used to parametrise both the detection and classification stage of the click train detector. 
 
 <p align="center">
   <img width="700" height="500" src = "resources/rightclickmenu.png">
 </p>
 
-_The metadata associated with each classifier is stored with every click train and be accessed through right clicking on or hovering the mouse over a click train detection. ._ 
+_The metadata associated with each classifier is stored with every click train and be accessed through right clicking on or hovering the mouse over a click train detection._ 
 
 ## Localisation
 The click train detector can be used to localise the position of animals detected by the click train detector using target motion analysis. This generally means that the localisation capabilities are generally restricted to data which has been collected using towed hydrophone arrays. 
@@ -196,5 +193,4 @@ The Time Display FX is a more modern display which allows any time-based data to
   <img width="940" height="500" src = "resources/clicktrain_TDFX.png">
 </p>
 
-_. Click train data displayed in the time display FX. Users can right click on click trains to view average spectra and waterfall spectrograms (shown here in top right)._
-
+_Click train data displayed in the time display FX. Users can right click on click trains to view average spectra and waterfall spectrograms (shown here in top right)._
