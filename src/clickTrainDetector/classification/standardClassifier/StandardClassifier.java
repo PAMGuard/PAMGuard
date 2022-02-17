@@ -7,9 +7,11 @@ import clickTrainDetector.ClickTrainControl;
 import clickTrainDetector.classification.CTClassification;
 import clickTrainDetector.classification.CTClassifier;
 import clickTrainDetector.classification.CTClassifierParams;
-import clickTrainDetector.classification.CTClassifierType;
 import clickTrainDetector.classification.bearingClassifier.BearingClassifier;
+import clickTrainDetector.classification.bearingClassifier.BearingClassifierParams;
+import clickTrainDetector.classification.idiClassifier.IDIClassification;
 import clickTrainDetector.classification.idiClassifier.IDIClassifier;
+import clickTrainDetector.classification.simplechi2classifier.Chi2CTClassification;
 import clickTrainDetector.classification.simplechi2classifier.Chi2ThresholdClassifier;
 import clickTrainDetector.classification.templateClassifier.CTTemplateClassifier;
 import clickTrainDetector.layout.classification.CTClassifierGraphics;
@@ -17,16 +19,11 @@ import clickTrainDetector.layout.classification.standardClassifier.StandardClass
 
 /**
  * Combines the IDI, CHI2, BEARING and TEMPLATE classifier into one. 
+
  * @author Jamie Macaulay
  *
  */
 public class StandardClassifier implements CTClassifier {
-	
-	/**
-	 * It's quite complicated to keep track of the species ID for all sub classifier but just set them 
-	 * to 1 to check whether the classifier has passed or not, 
-	 */
-	public int SUB_CLASSIFIER_SPECIESID = 1; 
 	
 	/**
 	 * The bearing classifier parameters. 
@@ -47,13 +44,6 @@ public class StandardClassifier implements CTClassifier {
 	 * Click train control. 
 	 */
 	private ClickTrainControl clickTrainControl; 
-	
-	
-	/**
-	 * The classifier types used in the standard classifier. 
-	 * ****New types MUST BE ADDED HERE****
-	 */
-	public static CTClassifierType[] CLASSIFIER_TYPES = {CTClassifierType.CHI2THRESHOLD, CTClassifierType.IDICLASSIFIER, CTClassifierType.TEMPLATECLASSIFIER, CTClassifierType.BEARINGCLASSIFIER}; 
 
 	public StandardClassifier(ClickTrainControl clickTrainControl, int speciesID) {
 		this.clickTrainControl = clickTrainControl; 
@@ -62,6 +52,7 @@ public class StandardClassifier implements CTClassifier {
 		
 		//load the settings
 		createClassifiers(); 
+
 	}
 	
 	/**
@@ -69,32 +60,18 @@ public class StandardClassifier implements CTClassifier {
 	 */
 	private void createClassifiers() {
 		classifiers = new ArrayList<CTClassifier>(); 
-
 		
-		//do this so that is CLASSIFIER_TYPES changes order things still work. 
-		for (int i=0; i<CLASSIFIER_TYPES.length; i++) {
-
-			switch (CLASSIFIER_TYPES[i]) {
-			default:
-				break;
-			case CHI2THRESHOLD:
-				classifiers.add(new Chi2ThresholdClassifier(clickTrainControl, SUB_CLASSIFIER_SPECIESID));
-				break;
-			case IDICLASSIFIER:
-				classifiers.add(new IDIClassifier(clickTrainControl,SUB_CLASSIFIER_SPECIESID));
-				break;
-			case TEMPLATECLASSIFIER:
-				classifiers.add(new CTTemplateClassifier(clickTrainControl, SUB_CLASSIFIER_SPECIESID));
-				break;
-			case BEARINGCLASSIFIER:
-				classifiers.add(new BearingClassifier(clickTrainControl, SUB_CLASSIFIER_SPECIESID));
-				break;
-			}
-		}
-
+		classifiers.add(new Chi2ThresholdClassifier(clickTrainControl, standardClssfrParams.speciesFlag));
+		
+		classifiers.add(new IDIClassifier(clickTrainControl, standardClssfrParams.speciesFlag));
+			
+		classifiers.add(new CTTemplateClassifier(clickTrainControl, standardClssfrParams.speciesFlag));
+		
+		classifiers.add(new BearingClassifier(clickTrainControl, standardClssfrParams.speciesFlag));
+		
 		setClassifierParams();
 	}
-
+	
 	/**
 	 * Set the parameters for the individual classifiers
 	 */
@@ -124,32 +101,11 @@ public class StandardClassifier implements CTClassifier {
 	@Override
 	public CTClassification classifyClickTrain(CTDataUnit clickTrain) {
 		
-		int speciesID = standardClssfrParams.speciesFlag; 
 		
-		System.out.println("Standard Classificiation: " ); 
-	
 		//all classifiers have to pass.  
-		CTClassification[] ctClassification = new CTClassification[classifiers.size()]; 
-		for (int i=0; i<classifiers.size(); i++) {
-			
-			ctClassification[i] = classifiers.get(i).classifyClickTrain(clickTrain); 
-			
-			System.out.println("Standard Classificiation: " + i + "  speciesID: " + ctClassification[i].getSpeciesID() 
-					+ "  sub species: "+ classifiers.get(i).getParams().speciesFlag + " standard species: " +speciesID + " use? : " + standardClssfrParams.enable[i]); 
-
-			if (standardClssfrParams.enable[i]) {
-				if (ctClassification[i].getSpeciesID() != SUB_CLASSIFIER_SPECIESID){
-					speciesID = CTClassifier.NOSPECIES;
-				}
-			}
-		}
+		
 	
-		System.out.println("SPECIES ID: " + speciesID); 
-
-		//create the classification. 
-		StandardClassification classification = new StandardClassification(ctClassification, speciesID); 
-	
-		return classification;
+		return null;
 	}
 
 	@Override
