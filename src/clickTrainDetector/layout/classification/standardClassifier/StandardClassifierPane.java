@@ -26,8 +26,6 @@ public class StandardClassifierPane extends  SettingsPane<StandardClassifierPara
 
 	private PamToggleSwitch[] enableSwitch;
 
-	private Label[] labels;
-
 	public StandardClassifierPane(StandardClassifier standardClassifier) {
 		super(null);
 		this.standardClassifier = standardClassifier; 
@@ -39,38 +37,32 @@ public class StandardClassifierPane extends  SettingsPane<StandardClassifierPara
 		PamVBox vBox = new PamVBox(); 
 		vBox.setSpacing(5);
 
-		labels = new Label[standardClassifier.getClassifiers().size()]; 
 		enableSwitch = new PamToggleSwitch[standardClassifier.getClassifiers().size()]; 
 		for (int i=0; i<standardClassifier.getClassifiers().size(); i++) {
 
 			enableSwitch[i] = new PamToggleSwitch(""); 
 			
-			labels[i] = new Label(standardClassifier.getClassifiers().get(i).getName()); 
-			PamGuiManagerFX.titleFont2style(labels[i]);
+			Label label = new Label(standardClassifier.getClassifiers().get(i).getName()); 
+			PamGuiManagerFX.titleFont2style(label);
 
 			final int ii = i; 
 			enableSwitch[i].selectedProperty().addListener((obsVal, oldVal, newVal)->{
-				disableClassifierPane(ii);
+				standardClassifier.getClassifiers().get(ii).getCTClassifierGraphics().getCTClassifierPane().setDisable(!enableSwitch[ii].isSelected());
+				label.setDisable(!enableSwitch[ii].isSelected()); 
 			});
-			disableClassifierPane(ii); //need to call here or else when the pane is first created stuff is not disabled. 
-		
+
 			PamHBox hBox = new PamHBox(); 
 			hBox.setSpacing(5);
 
-			hBox.getChildren().addAll(enableSwitch[i], labels[i]); 
+			hBox.getChildren().addAll(enableSwitch[i], label); 
 			
+
+
 			vBox.getChildren().addAll(hBox, standardClassifier.getClassifiers().get(i).getCTClassifierGraphics().getCTClassifierPane());
 		}
 
 		return vBox; 
-	}
-	
-	
-	
-	private void disableClassifierPane(int ii) {
-		standardClassifier.getClassifiers().get(ii).getCTClassifierGraphics().getCTClassifierPane().setDisable(!enableSwitch[ii].isSelected());
-		labels[ii].setDisable(!enableSwitch[ii].isSelected()); 
-	}
+	} 
 
 	@Override
 	public StandardClassifierParams getParams(StandardClassifierParams currParams) {
@@ -86,7 +78,6 @@ public class StandardClassifierPane extends  SettingsPane<StandardClassifierPara
 		for (int i=0; i<standardClassifier.getClassifiers().size(); i++) {
 			standardClassifier.getClassifiers().get(i).getCTClassifierGraphics().setParams(input.ctClassifierParams[i]);
 			enableSwitch[i].setSelected(input.enable[i]);
-			disableClassifierPane(i); 
 		}
 	}
 
