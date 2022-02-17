@@ -191,14 +191,26 @@ public class TDAcousticScroller extends AcousticScrollerFX implements PamSetting
 			 * only the visible range. However in real time mode we want it to set the visible time and
 			 * the data keep time. 
 			 */
-				if (newVal<=this.getRangeMillis() || !isViewer) {
-	//					Debug.out.println("TDAcousticScroller: TimeRangeSpinner: " + newVal);
+				if (newVal<=this.getRangeMillis()) {
+					//System.out.println("TDAcousticScroller: TimeRangeSpinner: " + newVal); 
+					//Debug.out.println("TDAcousticScroller: TimeRangeSpinner: " + newVal);
 					Platform.runLater(()->{ //why? But seems necessary
 						super.setVisibleMillis(newVal);
-						super.setRangeMillis(0, newVal, false); 
 					}); 
 				}
-				else spinner.getValueFactory().decrement(1); //need to use decrement here instead of set time because otherwise arrow buttons
+				else {
+					//in real time mode set the range of the display too -otherwise the spinner will max 
+					//max out and the user will not be able to make the visible time larger, 
+					if (!isViewer) {
+						Platform.runLater(()->{
+							super.setRangeMillis(0, newVal, false); //in real time mode just make the display larger. 
+							super.setVisibleMillis(newVal);
+						}); 
+					}
+					else {
+						spinner.getValueFactory().decrement(1); //need to use decrement here instead of set time becuase spinners with custom numbers are weird
+					}
+				}
 		});
 	}
 

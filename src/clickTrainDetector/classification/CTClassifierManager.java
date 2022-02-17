@@ -10,6 +10,8 @@ import clickTrainDetector.classification.bearingClassifier.BearingClassification
 import clickTrainDetector.classification.bearingClassifier.BearingClassifier;
 import clickTrainDetector.classification.simplechi2classifier.Chi2CTClassification;
 import clickTrainDetector.classification.simplechi2classifier.Chi2ThresholdClassifier;
+import clickTrainDetector.classification.standardClassifier.StandardClassification;
+import clickTrainDetector.classification.standardClassifier.StandardClassifier;
 import clickTrainDetector.classification.templateClassifier.TemplateClassification;
 import clickTrainDetector.classification.templateClassifier.CTTemplateClassifier;
 
@@ -43,18 +45,22 @@ public class CTClassifierManager {
 		this.preClassifier = new Chi2ThresholdClassifier(clickTrainControl, -1); 
 	}
 
+	@Deprecated
 	public String getClassifierName(CTClassifierType classifierType) {
-		switch (classifierType) {
-		case CHI2THRESHOLD:
-			return "X\u00b2 threshold classifier";
-		case TEMPLATECLASSIFIER:
-			return "Spectral Template";
-		case BEARINGCLASSIFIER:
-			return "Bearing Classifier";
-			/////****ADD NEW CLASSIFIERS HERE****/////
-		default:
-			return ""; 
-		}
+		return classifierType.toString(); 
+//		switch (classifierType) {
+//		case CHI2THRESHOLD:
+//			return "X\u00b2 threshold classifier";
+//		case TEMPLATECLASSIFIER:
+//			return "Spectral Template";
+//		case BEARINGCLASSIFIER:
+//			return "Bearing Classifier";
+//		case STANDARDCLASSIFIER:
+//			return "Click Train Classifier";
+//			/////****ADD NEW CLASSIFIERS HERE****/////
+//		default:
+//			return ""; 
+//		}
 	}
 
 	/**
@@ -72,6 +78,7 @@ public class CTClassifierManager {
 	 * @return the CT classifier 
 	 */
 	public CTClassifier createClassifier(CTClassifierType classifierType) {
+		if (classifierType==null) return null; 
 		switch (classifierType) {
 		case CHI2THRESHOLD:
 			return new Chi2ThresholdClassifier(clickTrainControl, 1); 
@@ -79,6 +86,8 @@ public class CTClassifierManager {
 			return new CTTemplateClassifier(clickTrainControl, 1);
 		case BEARINGCLASSIFIER:
 			return new BearingClassifier(clickTrainControl, -1); 
+		case STANDARDCLASSIFIER:
+			return new StandardClassifier(clickTrainControl, -1); 
 			/////****ADD NEW CLASSIFIERS HERE****/////
 		default:
 			return new Chi2ThresholdClassifier(clickTrainControl, 1); 
@@ -113,6 +122,8 @@ public class CTClassifierManager {
 			return new TemplateClassification(jsonstring); 
 		case BEARINGCLASSIFIER:
 			return new BearingClassification(jsonstring); 
+		case STANDARDCLASSIFIER:
+			return new StandardClassification(jsonstring); 
 			/////****ADD NEW CLASSIFICATIONTYPES HERE****/////
 		default:
 			return null; 
@@ -216,6 +227,10 @@ public class CTClassifierManager {
 		CTClassifier aClassifier; 
 		for (int i=0; i<ctParams.length; i++) {
 			aClassifier = createClassifier(ctParams[i].type); 
+			if (aClassifier==null) {
+				System.err.println("CTCLassifier manager: the classifier is null");
+				continue; 
+			}
 			aClassifier.setParams(ctParams[i]); 
 			cTClassifiers.add(aClassifier); 
 		}

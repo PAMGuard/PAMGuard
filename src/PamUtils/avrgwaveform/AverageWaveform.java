@@ -153,6 +153,41 @@ public class AverageWaveform {
 	}
 	
 	/**
+	 * Add to an average spectra when no raw data is present e.g. CPOD. Here the average spectra is an amplitude weighted historgram 
+	 * of the bandwidth of the detection. 
+	 * @param minFreq - the minimum frequency in Hz
+	 * @param maxFreq - the maximum frequency in Hz
+	 * @param amplitude - the amplitude of the detection in dB
+	 * @param sampleRate2 - the sample rate in samples per second. 
+	 * @param defaultFFTLen - the defaultFFT length. 
+	 */
+	public void addWaveform(double minFreq, double maxFreq, double amplitude, float sampleRate2, int defaultFFTLen) {
+		this.fftLength = defaultFFTLen; 
+		
+		//System.out.println("Add to averagewaveform: minFreq " + minFreq + " maxFreq: " + maxFreq + " amplitude: " + amplitude + " sR: " + sampleRate2); 
+
+		if (avrgSpectra==null) {
+			//the FFT length is the length of the first waveform 
+			avrgSpectra = new double[this.fftLength];
+			return; 
+		}
+		
+		double amplitudebin = amplitude/(maxFreq-minFreq); 
+
+		double minFreqBin;
+		double maxFreqBin;
+		for (int i= 0; i <avrgSpectra.length; i++) {
+			minFreqBin = (i/(double) avrgSpectra.length)*(sampleRate2/2); 
+			maxFreqBin = (i/(double) avrgSpectra.length)*(sampleRate2/2); 
+
+			if (minFreqBin > minFreq && maxFreqBin<=maxFreq) {
+				avrgSpectra[i]+=amplitudebin;
+			}
+		}
+		 count++;
+	}
+	
+	/**
 	 * Get the average waveform. Not normalised. 
 	 * @return the average waveform
 	 */
@@ -230,7 +265,7 @@ public class AverageWaveform {
 
 	/**
 	 * Get the sample rate for the average spectra. 
-	 * @return the smaple rate. 
+	 * @return the sample rate in samples per second. 
 	 */ 
 	public float getSampleRate() {
 		return sampleRate;
@@ -239,11 +274,14 @@ public class AverageWaveform {
 
 	/**
 	 * Set the sample rate for the average spectra. 
-	 * @param the smaple rate. 
+	 * @param the sample rate in samples per second. 
 	 */ 
 	public void setSampleRate(float sampleRate) {
 		this.sampleRate = sampleRate;
 	}
+
+
+
 	
 	
 }

@@ -18,13 +18,13 @@ public interface CTClassifierGraphics {
 	public Pane getCTClassifierPane();
 
 	/**
-	 * Called to save the params from the settings pane. 
+	 * Called to save the parameters from the settings pane. 
 	 */
 	public CTClassifierParams getParams();
 
 	/**
-	 * Set the parameters
-	 * @param params - the paramters for a classifier
+	 * Set the parameters. 
+	 * @param params - the parameters for a classifier. 
 	 */
 	public void setParams(CTClassifierParams params);
 

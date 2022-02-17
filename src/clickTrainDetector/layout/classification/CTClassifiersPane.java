@@ -32,11 +32,13 @@ public class CTClassifiersPane extends PamBorderPane {
 	 */
 	private CheckBox enableClassifierBox;
 	
+	
 	/**
 	 * Reference to the click train control. 
 	 */
 	private ClickTrainControl clickTrainControl;
 
+	
 	/**
 	 * Tab pane where each tab is a different classifier. 
 	 */
@@ -55,22 +57,18 @@ public class CTClassifiersPane extends PamBorderPane {
 	 */
 	private Pane createClassifierPane() {
 
-
-		// enable the classifier. 
-		enableClassifierBox = new CheckBox("Enable Click Train Classification"); 
-		enableClassifierBox.setOnAction(action ->{
-			enableClassifierPane(enableClassifierBox.isSelected()); 
-		});
-
-
-		
 		// enable the classifier. 
 		enableClassifierBox = new CheckBox("Enable Click Train Classification"); 
 		enableClassifierBox.setOnAction(action ->{
 			enableClassifierPane(enableClassifierBox.isSelected()); 
 		});
 		
-		
+		// enable the classifier. 
+		enableClassifierBox = new CheckBox("Enable Click Train Classification"); 
+		enableClassifierBox.setOnAction(action ->{
+			enableClassifierPane(enableClassifierBox.isSelected()); 
+		});
+				
 		//with just one classifier.
 		pamTabPane = new PamTabPane(); 
 		pamTabPane.setAddTabButton(true);
@@ -78,10 +76,7 @@ public class CTClassifiersPane extends PamBorderPane {
 		pamTabPane.getAddTabButton().setGraphic(PamGlyphDude.createPamIcon("mdi2p-plus", PamGuiManagerFX.iconSize));
 		pamTabPane.setTabClosingPolicy(TabClosingPolicy.SELECTED_TAB);
 		pamTabPane.getAddTabButton().setTooltip(new Tooltip(
-				"Add a new template. The classifier will check all templates \n"
-						+ 	"and classify the click train if any template passes it's designated \n"
-						+ 	"value. All template match, reject and threshold values are \n"
-						+ 	"stored as annotations in binary files."));
+				"Add a new classifier."));
 
 		pamTabPane.getAddTabButton().setOnAction((action)->{
 			CTClassifierPane clssfrPane = new CTClassifierPane(clickTrainControl);
@@ -113,9 +108,7 @@ public class CTClassifiersPane extends PamBorderPane {
 
 		enableClassifierPane(enableClassifierBox.isSelected()); 
 
-
 		enableClassifierPane(enableClassifierBox.isSelected()); 
-
 		
 		return holder; 
 	}
@@ -153,7 +146,7 @@ public class CTClassifiersPane extends PamBorderPane {
 			super("Tab");
 			this.ctClassifierPane = tmpltClassifierPane;
 			this.setContent(tmpltClassifierPane);
-			tmpltClassifierPane.getNameField().setText("Template " + (listPos+1));
+			tmpltClassifierPane.getNameField().setText("Classifer " + (listPos+1));
 			
 			this.textProperty().bind(tmpltClassifierPane.getNameField().textProperty());
 		}
@@ -187,8 +180,6 @@ public class CTClassifiersPane extends PamBorderPane {
 			ctClassifierParams.add(aClassifierParams);
 		}
 
-		
-		
 		if (!PamArrayUtils.unique(speciesCodeList) && speciesCodeList.length>1) {
 			System.err.println("CTClassifiersPane: The species codes are not unique");
 			PamArrayUtils.printArray(speciesCodeList);

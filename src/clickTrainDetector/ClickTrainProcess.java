@@ -94,6 +94,8 @@ public class ClickTrainProcess extends PamInstantProcess {
 					getClickTrainParams().dataSourceName);
 
 		}
+		
+		//System.out.println("CPOD sample rate: " + sourceDataBlock.getSampleRate()); 
 		//		if (sourceDataBlock!=null) System.out.println("Click train process: Source data" +   sourceDataBlock.getDataName());
 		//		else System.out.println("The source data is null: " + getClickTrainParams().dataSourceName); 
 
@@ -101,6 +103,9 @@ public class ClickTrainProcess extends PamInstantProcess {
 		setParentDataBlock(sourceDataBlock);
 
 		prepareProcess();
+		
+		//System.out.println("CLICK TRAIN sample rate: " + this.getSampleRate()); 
+
 	}
 
 

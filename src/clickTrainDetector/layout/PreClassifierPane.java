@@ -3,6 +3,7 @@ package clickTrainDetector.layout;
 import clickTrainDetector.ClickTrainControl;
 import clickTrainDetector.ClickTrainParams;
 import clickTrainDetector.layout.classification.simplechi2classifier.SimpleCTClassifierPane;
+import javafx.geometry.Insets;
 import javafx.scene.layout.Pane;
 import pamViewFX.fxNodes.PamBorderPane;
 
@@ -27,7 +28,8 @@ public class PreClassifierPane extends PamBorderPane {
 		this.clickTrainControl = clickTrainControl; 
 		
 		
-		this.setCenter(createClassifierPane()); 
+		this.setCenter(createClassifierPane());
+		this.setPadding(new Insets(5,5,5,5));
 	}
 
 	

@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import PamguardMVC.debug.Debug;
-import clickTrainDetector.classification.simplechi2classifier.Chi2CTClassification;
 
 public class SimpleClassifierJSONLogging extends ClassifierJSONLogging {
 	
@@ -27,7 +26,7 @@ public class SimpleClassifierJSONLogging extends ClassifierJSONLogging {
 		JsonFactory jf = new JsonFactory();
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		try {
-			JsonGenerator jg = jf.createJsonGenerator(os, JsonEncoding.UTF8);
+			JsonGenerator jg = jf.createGenerator(os, JsonEncoding.UTF8);
 			jg.writeStartObject();
 			jg.writeStringField(TYPEFIELD, ctClassification.getClassifierType().toString());
 			jg.writeNumberField(SPECIESFIELD, ctClassification.getSpeciesID());
