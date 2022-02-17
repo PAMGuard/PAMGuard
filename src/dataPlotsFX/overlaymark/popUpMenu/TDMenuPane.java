@@ -49,7 +49,7 @@ import pamViewFX.fxStyles.PamStylesManagerFX;
  */
 public class TDMenuPane extends PamBorderPane {
 
-	public static final int MENU_WIDTH=200; 
+	public static final int menuWidth=200; 
 
 	/**
 	 * The current data units. 
@@ -333,10 +333,10 @@ public class TDMenuPane extends PamBorderPane {
 
 		flipPane.getFront().getChildren().add(menuPane); 
 		flipPane.getBack().getChildren().add(infoPane); 
-		flipPane.setPrefWidth(MENU_WIDTH);
+		flipPane.setPrefWidth(menuWidth);
 
 		PamBorderPane holder = new PamBorderPane(flipPane); 
-		holder.setPrefWidth(MENU_WIDTH);
+		holder.setPrefWidth(menuWidth);
 
 
 		return holder;
@@ -392,7 +392,7 @@ public class TDMenuPane extends PamBorderPane {
 		ScrollPane scrollPane = new ScrollPane(externalMenuPane); 
 		scrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);		
 		scrollPane.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);		
-		scrollPane.setPrefHeight(300);
+		scrollPane.setPrefHeight(200);
 
 		menuPane.getChildren().add(scrollPane);
 

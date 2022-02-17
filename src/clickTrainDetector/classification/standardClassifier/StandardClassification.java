@@ -1,8 +1,10 @@
 package clickTrainDetector.classification.standardClassifier;
 
+import clickTrainDetector.ClickTrainControl;
 import clickTrainDetector.classification.CTClassification;
 import clickTrainDetector.classification.CTClassifierType;
 import clickTrainDetector.classification.ClassifierJSONLogging;
+import clickTrainDetector.classification.bearingClassifier.BearingClassifierJSON;
 
 /**
  * A classification object for a standard classification 
@@ -12,6 +14,12 @@ import clickTrainDetector.classification.ClassifierJSONLogging;
  */
 public class StandardClassification implements CTClassification {
 	
+	/**
+	 * Reference to the click control. 
+	 */
+	private ClickTrainControl clickTrainControl;
+	
+
 	/**
 	 * The current species ID.
 	 */
@@ -23,16 +31,17 @@ public class StandardClassification implements CTClassification {
 	private CTClassification[] ctClassifications;
 	
 	
+
 	/**
 	 * Standard classifier JSON logging. 
 	 */
 	private StandardClassificationJSON standardClassifierJSONLogging; 
 	
 	
-	public StandardClassification(CTClassification[] ctClassifications, int speciesID) {
+	public StandardClassification(ClickTrainControl clickTrainControl, CTClassification[] ctClassifications, int speciesID) {
+		this.clickTrainControl=clickTrainControl; 
 		this.ctClassifications=ctClassifications; 
-		standardClassifierJSONLogging = new StandardClassificationJSON(ctClassifications); 
-		this.speciesID=speciesID; 
+		standardClassifierJSONLogging = new StandardClassificationJSON(); 
 
 	}
 
