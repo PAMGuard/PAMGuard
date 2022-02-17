@@ -15,6 +15,7 @@ The detection stage is based on a multi hypothesis tracking (MHT) algorithm. Thi
 <p align="center">
   <img width="900" height="900" src = "resources/mht_diagram.png">
 </p>
+
 _Diagram demonstrating how the click train algorithm works. Black dots are a set of 14 detected clicks at times t1 to t14. The click train algorithm begins at click 1 and creates two possible clicks trains, one that includes the first click (filled circle) and the other in which the click is not part of the click train (non-filled circle). The algorithm then moves to the next click and adds it to the hypothesis matrix. As the number of clicks increases, the hypothesis matrix exponentially expands in size and must be pruned. After a minimum of Npmin clicks (in this case 4) each track hypothesis (possible click train) is assigned a χ^2score. The track hypothesis with lowest score (defined by larger coloured circles) has it’s branch traced back Np (in this case 3) clicks. Any track hypothesis which do not include the click Np steps back are pruned (defined by the double lines). Clicks which share no click associations with the first track hypothesis are then pruned and the process repeats until all clicks are part of a track or a maximum number of tracks have been considered (in this example there are two tracks). The algorithm then moves to the next click, adds it to the hypothesis matrix, assigns χ^2scores and traces the lowest χ^2 branch Np steps back, pruning the hypothesis  matrix again; the process repeats until the last click. Note that there is always a track hypothesis with no associated clicks (i.e. the bottom-most branch where no clicks belong to a click train). If a track hypothesis is confirmed and thus removed from the hypothesis matrix, then this track can be used to start another click train_
 
 The advantage of this MHT approach is that the click train detection module is quite general and can cope with a large variety of complex situations and multiple overlapping click trains. The disadvantage is that there are a large number of potential variables which can be set that affect the performance of the detector which can make it complex to initially set up.  
@@ -26,14 +27,11 @@ A click train which has been both detected and classified is saved to PAMGuard�
 
 ## Configuring the click train detector
 
-The click train detector was configured by optimising detection efficiency on 4 x 15-minute sub sections of the dataset, with two sub sections containing sperm whales and the other two containing dolphins. 
-
-A manual analyst used trial and error (based on previous experience) to optimize the detector for the detection and classification of sperm whales and dolphins. 
-
 The primary settings to configure can be split into MHT Kernel and χ^2 settings – these are all set in the primary click train detector dialog as shown in Figure 2. 
 
-
-
+<p align="center">
+  <img width="850" height="700" src = "resources/detection_pane.png">
+</p>
 
 _Figure 2. The settings pane of the click train detector._
 
@@ -41,16 +39,16 @@ _Figure 2. The settings pane of the click train detector._
 ### MHT Kernel Settings
 The MHT Kernel is the part of the detection algorithm which creates and then prunes the large hypothesis matrix which keeps a copy of all possible click trains. MHT Kernel settings are therefore important because they influence speed (a larger number of possible click trains in memory is more processor intensive) and the quality of the detections (the larger the number of possibilities the more likely that “true” click trains are contained in the hypothesis matrix). The specific settings are;
 
-Prune-back: The hypothesis matrix needs pruned so that it does not grow exponentially and cause memory issues. The matrix is pruned at Np (see Figure 1) previous detections i.e. if Np is 5 then then then the algorithm selects the most likely click train, moves back five detections back and discards other hypothesis that do not contain the combination of clicks in that branch. Thus, increasing the prune-back means that more hypothesis are kept at any one time but decreasing will lead to faster processing times as less combination are kept in memory. 
+<strong>Prune-back</strong>: The hypothesis matrix needs pruned so that it does not grow exponentially and cause memory issues. The matrix is pruned at Np (see Figure 1) previous detections i.e. if Np is 5 then then then the algorithm selects the most likely click train, moves back five detections back and discards other hypothesis that do not contain the combination of clicks in that branch. Thus, increasing the prune-back means that more hypothesis are kept at any one time but decreasing will lead to faster processing times as less combination are kept in memory. 
 
-Prune-start: The initial number of detections before the pruning process starts. This cannot be less than Prune-back and should generally should be set no more than 15 for 8GB of memory. 
+<strong>Prune-start</strong>:: The initial number of detections before the pruning process starts. This cannot be less than Prune-back and should generally should be set no more than 15 for 8GB of memory. 
 
-Max no. coasts: A click train is saved and removed the hypothesis mix once it has passed a number of tests. It must be over three clicks long, survive the pruning process and have missed the max no. coasts. A coast is when a click has been missed from a click train based on ICI. i.e. if the ICI is 2s and a click train goes for 6s without a detected click then there have been 3 coasts. Increasing the maximum number of coasts means that click trains are less fragmented but can come at the cost of keeping click trains in the hypothesis matrix for longer which have ended. 
+<strong>Max no. coasts</strong>:: A click train is saved and removed the hypothesis mix once it has passed a number of tests. It must be over three clicks long, survive the pruning process and have missed the max no. coasts. A coast is when a click has been missed from a click train based on ICI. i.e. if the ICI is 2s and a click train goes for 6s without a detected click then there have been 3 coasts. Increasing the maximum number of coasts means that click trains are less fragmented but can come at the cost of keeping click trains in the hypothesis matrix for longer which have ended. 
 
-Max no. trains: This is a maximum allowed number of trains in the hypothesis mix. Note this refers to the number of trains which can survive pruning – the actual number of potential click trains in the hypothesis mix will be much larger. Generally, just via pruning, the hypothesis matrix will keep itself below the max no. trains, however, in certain situations it can grow too large and requires a limit. The max no. trains therefore usually have little effect on results but should generally be set to less than 50 to ensure smooth processing  
+<strong>Max no. trains</strong>:: This is a maximum allowed number of trains in the hypothesis mix. Note this refers to the number of trains which can survive pruning – the actual number of potential click trains in the hypothesis mix will be much larger. Generally, just via pruning, the hypothesis matrix will keep itself below the max no. trains, however, in certain situations it can grow too large and requires a limit. The max no. trains therefore usually have little effect on results but should generally be set to less than 50 to ensure smooth processing  
 
 ### χ<sup>2</sup> Settings
-χ<sup>2</sup> is a measure of the likelihood that a click train is from a (usually) biological source. The higher the χ^2 value the lower the quality of a click train. 
+χ<sup>2</sup> is a measure of the likelihood that a click train is from a (usually) biological source. The higher the χ<sup>2</sup> value the lower the quality of a click train. 
 
 The χ<sup>2</sup> model used in the click train detector considers both the slowly varying properties of click trains, as well as bonus and penalty factors to discourage fragmentation and aliasing (selecting a multiple of the true ICI) of detected click trains. 
 
@@ -59,18 +57,18 @@ The initial basis of the model is:
 
 where m is the number of selected descriptors, e.g. ICI, amplitude, bearing etc., and y_(i,k) is the measurement of descriptor i for click k in a click train with n associated clicks.  t_(k+1) is the measured time of a click k. Each descriptor is divided by q_i which is a user tuneable parameter that alters the importance each descriptor has on the total χ<sup>2</sup>. Ideally it should correspond to a prediction of the likely variance of the descriptor. 
 
-The descriptors can be enabled and the variance set in the χ^2Settings pane. The toggle button next to each descriptor sets whether a descriptor is used to score a click train and the variance is then set using the slider or by inputting manually by clicking the settings cog. Increasing the variance means that the descriptor has less of an influence on the calculation of χ^2 and decreasing means that the descriptor has a larger influence on χ^2.  In some cases, clicks can be so close together that the variance is tiny and thus χ^2 becomes huge e.g. during buzzes. A minimum variance value (〖qt〗_i) prevents the variance (〖max⁡(q_i (t_(k+1)-t_k ),〖qt〗_i )〗^2) from falling below very low values. 
+The descriptors can be enabled and the variance set in the χ<sup>2</sup> Settings pane. The toggle button next to each descriptor sets whether a descriptor is used to score a click train and the variance is then set using the slider or by inputting manually by clicking the settings cog. Increasing the variance means that the descriptor has less of an influence on the calculation of χ<sup>2</sup> and decreasing means that the descriptor has a larger influence on χ<sup>2</sup>.  In some cases, clicks can be so close together that the variance is tiny and thus χ<sup>2</sup> becomes huge e.g. during buzzes. A minimum variance value (〖qt〗_i) prevents the variance (〖max⁡(q_i (t_(k+1)-t_k ),〖qt〗_i )〗^2) from falling below very low values. 
 
 Ideally the variance for each parameter would be calculated from a test dataset of manually annotated click trains e.g. by calculating the variance of ICI of all marked click trains.
 
  
-_Figure 3. Each descriptor has a variance setting which can be changed by moving the slider or manually inputting data by clicking the settings button. Variance is multiplied by the ICI for each click detection because clicks closer together in time the descriptor values will change less. In some cases, clicks can be so close together that the variance is tiny and thus χ^2 in Eq. 1 becomes huge e.g. during buzzes. A Min. Error prevents the variance from falling below very low values._ 
+_Figure 3. Each descriptor has a variance setting which can be changed by moving the slider or manually inputting data by clicking the settings button. Variance is multiplied by the ICI for each click detection because clicks closer together in time the descriptor values will change less. In some cases, clicks can be so close together that the variance is tiny and thus χ<sup>2</sup> in Eq. 1 becomes huge e.g. during buzzes. A Min. Error prevents the variance from falling below very low values._ 
 
 The available descriptors parameters can be set in the click detector settings pane (Figure 3) and works as follows;
 
 IDI: the inter-detection-interval in milliseconds. The algorithm looks for slowly changes in the interval between detections. 
 
-Amplitude:  the amplitude in dB re 1 Pa pp. The algorithm looks for slowly changing amplitude values. Note that the algorithm is comparing the change in change in amplitude so that the click train algorithm is not biased against large but consistent changes in amplitude (e.g. due to a narrow beam profile sweeping across a hydrophone). 
+Amplitude:  the amplitude in dB re 1/muPa pp. The algorithm looks for slowly changing amplitude values. Note that the algorithm is comparing the change in change in amplitude so that the click train algorithm is not biased against large but consistent changes in amplitude (e.g. due to a narrow beam profile sweeping across a hydrophone). 
 
 Bearing: the bearing of multi-channel clicks in degrees. Slowly changing bearings will increase the likelihood that click trains are detected. Note that in a similar way to Amplitude, the change in change in bearing is considered so that the algorithm is not biased against large but consistent changes in bearings. The bearing parameter has some additional settings which apply a large penalty to clicks trains if there is a large (user-defined) jump in bearing. 
 
