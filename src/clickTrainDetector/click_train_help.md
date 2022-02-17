@@ -197,3 +197,4 @@ The Time Display FX is a more modern display which allows any time-based data to
 </p>
 
 _. Click train data displayed in the time display FX. Users can right click on click trains to view average spectra and waterfall spectrograms (shown here in top right)._
+
