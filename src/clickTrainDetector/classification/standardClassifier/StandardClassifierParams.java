@@ -1,8 +1,6 @@
 package clickTrainDetector.classification.standardClassifier;
 
 import clickTrainDetector.classification.CTClassifierParams;
-import clickTrainDetector.classification.CTClassifierType;
-
 
 
 /**
@@ -25,13 +23,7 @@ public class StandardClassifierParams extends CTClassifierParams {
 	 * List of which classifiers are enabled. 
 	 */
 	public boolean[] enable; 
-
-	public StandardClassifierParams(){
-		///very important to set this or else the clasifier manager does not
-		//know which classifier to create. 
-		type = CTClassifierType.STANDARDCLASSIFIER; 
-	}
-
+	
 //	
 //	/**
 //	 * Standard classifier parameters.
