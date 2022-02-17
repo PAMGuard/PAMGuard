@@ -26,7 +26,7 @@ import clickTrainDetector.layout.classification.standardClassifier.StandardClass
 public class StandardClassifier implements CTClassifier {
 	
 	/**
-	 * It's quite complicated to keep track of the species ID for all sub classifier but just set them 
+	 * It's quite complicated to keep track of the species ID for all sub classifier but just set them
 	 * to 1 to check whether the classifier has passed or not, 
 	 */
 	public int SUB_CLASSIFIER_SPECIESID = 1; 
@@ -57,7 +57,7 @@ public class StandardClassifier implements CTClassifier {
 		standardClssfrParams.speciesFlag=speciesID; 
 		
 		//load the settings
-		createClassifiers(); 
+		createClassifiers();
 	}
 	
 	/**
@@ -73,6 +73,7 @@ public class StandardClassifier implements CTClassifier {
 		classifiers.add(new CTTemplateClassifier(clickTrainControl, SUB_CLASSIFIER_SPECIESID));
 		
 		classifiers.add(new BearingClassifier(clickTrainControl, SUB_CLASSIFIER_SPECIESID));
+
 		
 		setClassifierParams();
 	}
@@ -106,7 +107,7 @@ public class StandardClassifier implements CTClassifier {
 	@Override
 	public CTClassification classifyClickTrain(CTDataUnit clickTrain) {
 		
-		int speciesID = standardClssfrParams.speciesFlag; 
+		int speciesID = standardClssfrParams.speciesFlag;
 		
 		System.out.println("Standard Classificiation: " ); 
 	

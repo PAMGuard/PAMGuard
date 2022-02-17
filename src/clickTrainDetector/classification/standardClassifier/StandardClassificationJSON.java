@@ -58,7 +58,5 @@ public class StandardClassificationJSON extends SimpleClassifierJSONLogging {
 		return stClassification; 
 	}
 
-	
-
 
 }
