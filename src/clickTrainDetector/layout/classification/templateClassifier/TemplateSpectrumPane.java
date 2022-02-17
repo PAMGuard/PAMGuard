@@ -85,6 +85,7 @@ public class TemplateSpectrumPane  extends PamBorderPane {
 		templateDisplay.setDataInfo(templateSpectrumInfo=new TemplateDDDataInfo(templateDisplay, 192000));
 		templateDisplay.setPrefHeight(prefHeight);
 		templateDisplay.setMaxHeight(prefHeight);
+		//templateDisplay.setPrefWidth(500); //TODO - need to make this span the whole display...
 
 		templateDisplay.getDataTypePane().notifyDataChange(); //need this to initialise options pane for different plots. 
 
@@ -111,17 +112,28 @@ public class TemplateSpectrumPane  extends PamBorderPane {
 		splitMenuButtonReject.setTranslateX(-20);
 
 		detectionPlot.setMouseTransparent(true);
+		detectionPlot.setMaxWidth(Double.MAX_VALUE);
 		
 		StackPane stackPane = new StackPane(); 
 		stackPane.getChildren().add(detectionPlot); 
 		stackPane.getChildren().add(splitMenuButtonReject); 
 		stackPane.setPrefHeight(prefHeight);
 		stackPane.setMaxHeight(prefHeight);
+		stackPane.setMaxWidth(Double.MAX_VALUE);
+		stackPane.setPrefWidth(500); //need this for some reason to make the plot resize.
+
+		//stackPane.setStyle("-fx-background-color: red;");
+
+		detectionPlot.prefWidthProperty().bind(stackPane.widthProperty());
 
 
 		PamVBox holder = new PamVBox(); 
 		holder.setSpacing(5);
 		holder.getChildren().addAll(stackPane); 
+		holder.setMaxWidth(Double.MAX_VALUE);
+		
+		//holder.setStyle("-fx-background-color: green;");
+
 
 		holder.setPadding(new Insets(10,5,5,5));
 

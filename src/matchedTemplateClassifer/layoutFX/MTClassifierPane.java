@@ -35,7 +35,6 @@ import matchedTemplateClassifer.ImportTemplateMAT;
 import matchedTemplateClassifer.MTClassifier;
 import matchedTemplateClassifer.MTClassifierControl;
 import matchedTemplateClassifer.MatchTemplate;
-import matchedTemplateClassifer.MatchedTemplateParams;
 import matchedTemplateClassifer.TemplateImport;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;

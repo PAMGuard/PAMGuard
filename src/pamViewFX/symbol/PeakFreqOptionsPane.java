@@ -15,6 +15,7 @@ import pamViewFX.fxNodes.PamSpinner;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.comboBox.ColorComboBox;
 import pamViewFX.fxNodes.utilsFX.ColourArray;
+import pamViewFX.fxNodes.utilsFX.ColourArray.ColourArrayType;
 
 /**
  * Option pane for the PeakFreqSymbolChooser. Allows users to change the max and min frequency and 
@@ -129,12 +130,16 @@ public class PeakFreqOptionsPane extends StandardSymbolModifierPane  {
 //		PeakFreqSymbolOptions symbolOptions = (PeakFreqSymbolOptions) standardSymbolOptions.getModifierParams(this.getSymbolModifier().getName());
 
 		PeakFreqSymbolOptions symbolOptions =  (PeakFreqSymbolOptions) this.getSymbolModifier().getSymbolModifierParams(); 
-		if (initialised) {
+		if (initialised && !setParams) {
+			//must make sure we do not call get parameters during a set parameters - the listeners on the controls call getParams so all goes
+			//haywire if the setParams is not set properly. 
+			//System.out.println("GETPARAMS: " +  ColourArray.getColorArrayType(this.colourBox.getSelectionModel().getSelectedItem()) + "  " + setParams); 
 			symbolOptions.freqLimts=new double[] {minFreq.getValue(), maxFreq.getValue()};
 			symbolOptions.freqColourArray = ColourArray.getColorArrayType(this.colourBox.getSelectionModel().getSelectedItem()); 
-
 		}
+		
 		((PeakFreqModifier) this.getSymbolModifier()).checkColourArray(); 
+
 		//System.out.println("StandardSymbolModifierPane : getParams(): new mod: " +mod); 
 
 		return standardSymbolOptions; 
@@ -145,23 +150,24 @@ public class PeakFreqOptionsPane extends StandardSymbolModifierPane  {
 	public void setParams() {
 
 		if (initialised) {
-			setParams = true; 
 
 			super.setParams();
+			
+			//important to have here because the super.setParams set this bak to false. 
+			setParams = true; 
 
 //			StandardSymbolOptions standardSymbolOptions = (StandardSymbolOptions) getSymbolModifier().getSymbolChooser().getSymbolOptions();
 //			PeakFreqSymbolOptions symbolOptions = (PeakFreqSymbolOptions) standardSymbolOptions.getModifierParams(this.getSymbolModifier().getName());
 			PeakFreqSymbolOptions symbolOptions =  (PeakFreqSymbolOptions) this.getSymbolModifier().getSymbolModifierParams(); 
 
-			//now set frequency params; 
+			//now set frequency parameters; 
 			checkFreqLimits( symbolOptions ) ;
 			minFreq.getValueFactory().setValue(symbolOptions.freqLimts[0]);
 			maxFreq.getValueFactory().setValue(symbolOptions.freqLimts[1]);
 
 			colourBox.setValue(symbolOptions.freqColourArray);
-
+			
 			setParams = false; 
-
 		}
 	} 
 

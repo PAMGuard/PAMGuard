@@ -4,8 +4,13 @@ import PamController.SettingsPane;
 import clickTrainDetector.classification.simplechi2classifier.Chi2ThresholdClassifier;
 import clickTrainDetector.classification.simplechi2classifier.Chi2ThresholdParams;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.scene.Node;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Spinner;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.Pane;
+import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamSpinner;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.utilsFX.ControlField;
@@ -19,10 +24,12 @@ import pamViewFX.fxNodes.utilsFX.ControlField;
 public class SimpleCTClassifierPane extends SettingsPane<Chi2ThresholdParams>  {
 	
 
+	private static final double LABEL_WIDTH = 115;
+
 	/**
 	 * The main pane. 
 	 */
-	private PamVBox mainPane; 
+	private Pane mainPane; 
 
 	/**
 	 * The chi^2 threshold. 
@@ -47,23 +54,42 @@ public class SimpleCTClassifierPane extends SettingsPane<Chi2ThresholdParams>  {
 	public SimpleCTClassifierPane(Chi2ThresholdClassifier simpleChi2Classifier) {
 		super(null);
 		this.simpleChi2Classifier=simpleChi2Classifier; 
-		mainPane = createSimpleClassifierPane();
+		mainPane = createSimpleClassifierPane(Orientation.VERTICAL);
 	}
 	
 	public SimpleCTClassifierPane() {
 		super(null);
-		mainPane = createSimpleClassifierPane();
+		mainPane = createSimpleClassifierPane(Orientation.VERTICAL);
+	}
+	
+	public SimpleCTClassifierPane(Chi2ThresholdClassifier simpleChi2Classifier, Orientation orientation) {
+		super(null);
+		this.simpleChi2Classifier=simpleChi2Classifier; 
+		mainPane = createSimpleClassifierPane(orientation);
 	}
 
 
 	/**
 	 * Create simple classifier pane. 
 	 */
-	private PamVBox createSimpleClassifierPane() {
+	private Pane createSimpleClassifierPane(Orientation orientation) {
 
-		PamVBox vBox = new PamVBox(); 
+		Pane vBox;
+		
+		if (orientation == Orientation.VERTICAL) {
+			vBox = new PamVBox(); 
+			((PamVBox) vBox).setSpacing(5);
+		}
+		else {
+			vBox = new PamHBox(); 
+			((PamHBox) vBox).setSpacing(5);
+		}
+
 		vBox.setPadding(new Insets(5,0,0,0));
-		vBox.setSpacing(5);
+		
+		PamHBox pamHBox = new PamHBox();
+		pamHBox.setSpacing(5);
+	
 		
 		// create spinner. 		
 		chi2Threshold = new ControlField<Double>("X\u00b2 Threshold		", "", 0.0, Double.MAX_VALUE, 25.0);
@@ -72,17 +98,20 @@ public class SimpleCTClassifierPane extends SettingsPane<Chi2ThresholdParams>  {
 							"A click train has a X\u00b2 value which is based on the consistancy of inter detection interval \n"
 						+ 	"amplitude and other factors. The calculation of X\\\\u00b2 changes depending on the click train \n"
 						+ 	"detector is used."));
+		chi2Threshold.getLabel1().setPrefWidth(LABEL_WIDTH);
 
-		minClicks = new ControlField<Double>("Minimum Clicks	", "", 0, Integer.MAX_VALUE, 5);
+		minClicks = new ControlField<Double>("Min. Clicks	", "", 0, Integer.MAX_VALUE, 5);
 		minClicks.setTooltip(new Tooltip(
 				"The minimum number of detections."));
 		minClicks.getSpinner().setEditable(true);
+		minClicks.getLabel1().setPrefWidth(LABEL_WIDTH);
 
-		minTime = new ControlField<Double>("Minimum Time		", "s", 0.0, Double.MAX_VALUE, 1.0);
+		minTime = new ControlField<Double>("Min. Time		", "s", 0.0, Double.MAX_VALUE, 1.0);
 		minTime.getSpinner().getValueFactory().setConverter(PamSpinner.createStringConverter(2));		
 		minTime.setTooltip(new Tooltip(
 				"The minimum time for a click train."));
 		minTime.getSpinner().setEditable(true);
+		minTime.getLabel1().setPrefWidth(LABEL_WIDTH);
 
 		chi2Threshold.getSpinner().setEditable(true);
 		
@@ -125,7 +154,7 @@ public class SimpleCTClassifierPane extends SettingsPane<Chi2ThresholdParams>  {
 	 * Get the main pane. 
 	 * @return the main pane. 
 	 */
-	public PamVBox getMainPane() {
+	public Pane getMainPane() {
 		return mainPane;
 	}
 
@@ -134,6 +163,7 @@ public class SimpleCTClassifierPane extends SettingsPane<Chi2ThresholdParams>  {
 		// TODO Auto-generated method stub
 
 	}
+	
 
 
 

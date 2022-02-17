@@ -387,26 +387,33 @@ public abstract class RawFFTPlot<D extends PamDataUnit> extends FFTPlot<D> {
 			int iChannel = this.getParentDataBlock().getARealChannel(PamUtils.getSingleChannel(getChannelBitmap()));
 
 			// get the acquisition process. 
-			try {
-				//TODO- need to pick correct data block 
+//			try {
+//				//TODO- need to pick correct data block 
+			if (PamController.getInstance().getRawDataBlock(0)!=null) {
 				daqProcess = (AcquisitionProcess) PamController.getInstance().getRawDataBlock(0).getSourceProcess();
 				daqProcess.prepareFastAmplitudeCalculation(iChannel);
+				//			}
+				//			catch (ClassCastException e) {
+				//				e.printStackTrace();
+				//				return magSqData;
+				//			}
+
+				magSqData =  fftData.magsq();
+
+				//			System.out.println("Magnitude squared length is: " + magSqData.length + " "+ magSqData[0]);
+
+				for (int i = 0; i < magSqData.length; i++) {
+					magSqData[i] = daqProcess.fftAmplitude2dB(magSqData[i], iChannel, 
+							sR, magSqData.length*2, true, false);
+				}
+
+				//			System.out.println("Magnitude squared length is: " + magSqData.length + " "+ magSqData[0]);
+
+			} else {
+				for (int i = 0; i < magSqData.length; i++) {
+					magSqData[i] = 20*Math.log10(magSqData[i]) + 175; //Guess
+				}
 			}
-			catch (ClassCastException e) {
-				e.printStackTrace();
-				return magSqData;
-			}
-
-			magSqData =  fftData.magsq();
-
-			//			System.out.println("Magnitude squared length is: " + magSqData.length + " "+ magSqData[0]);
-
-			for (int i = 0; i < magSqData.length; i++) {
-				magSqData[i] = daqProcess.fftAmplitude2dB(magSqData[i], iChannel, 
-						sR, magSqData.length*2, true, false);
-			}
-
-			//			System.out.println("Magnitude squared length is: " + magSqData.length + " "+ magSqData[0]);
 			
 			//normalise data (used in subclasses for weird spectrograms)
 			//Debug.out.println("Max amplitude squared is: " + PamArrayUtils.max(magSqData));

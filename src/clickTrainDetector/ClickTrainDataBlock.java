@@ -86,6 +86,11 @@ public class ClickTrainDataBlock<T extends CTDetectionGroupDataUnit> extends Sup
 		this.sortData();
 	}
 	
+	@Override
+	public float getSampleRate() {		
+		return super.getSampleRate();
+	}
+	
 
 //	/* (non-Javadoc)
 //	 * @see PamguardMVC.PamDataBlock#removeOldUnitsT(long)

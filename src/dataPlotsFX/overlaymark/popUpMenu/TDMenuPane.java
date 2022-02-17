@@ -20,6 +20,8 @@ import javafx.geometry.Side;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.Labeled;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
@@ -371,6 +373,9 @@ public class TDMenuPane extends PamBorderPane {
 		PamVBox menuPane= new PamVBox();
 		Control menuButton;
 
+		//menu pane with options form other modules e.g. click event marking
+		PamVBox externalMenuPane= new PamVBox();
+
 		for (int i=0; i<menuNodes.size(); i++){
 			if (menuNodes.get(i).getFlag()==OverlayMenuItem.NO_GROUP){
 				//				int row=(int) Math.floor(i/3); 
@@ -379,10 +384,18 @@ public class TDMenuPane extends PamBorderPane {
 				menuButton=overlayItme.menuAction(detectionGroup, detectionGroup==null ? 0 : detectionGroup.getDataList().indexOf(currentDataUnit), 
 						overlayMarker==null ? null:overlayMarker.getCurrentMark()); 
 				//just add the node
-				menuPane.getChildren().add(menuButton);
+				externalMenuPane.getChildren().add(menuButton);
 				styleButton(menuButton, OverlayMenuItem.buttonWidthStandard);
 			}
 		}
+		
+		ScrollPane scrollPane = new ScrollPane(externalMenuPane); 
+		scrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);		
+		scrollPane.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);		
+		scrollPane.setPrefHeight(200);
+
+		menuPane.getChildren().add(scrollPane);
+
 
 		//add data info specific stuff. 
 		menuPane.getChildren().add(createDataInfoSpecificGroup(detectionGroup, menuNodes));
@@ -547,13 +560,16 @@ public class TDMenuPane extends PamBorderPane {
 				Debug.out.println("TDMenuPane: Detection Group NO raw wav data");
 			}
 		}
-		else {
+		else if (this.groupDetectionDisplay.getDetectionPlotCount()<1 && !groupDetectionDisplay.hasSuperDetectionDisplay()) {
 			//Debug.out.println("TDMenuPane: Detection Group Summary is NULL");
 			//if there is raw data then we can show that!
-			//this.toggle.setDisable(true);
-			//showDetDisplay=false; 
+			this.toggle.setDisable(true);
+			showDetDisplay=false; 
 		}
-	
+		else {
+			//nothing to do here as everything is fine. 
+		}
+
 		prepareDisplay(); 
 		layoutPane(showDetDisplay); 
 	}
