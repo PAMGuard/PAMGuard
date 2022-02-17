@@ -55,10 +55,10 @@ The χ<sup>2</sup> model used in the click train detector considers both the slo
 The initial basis of the model is: 
 
 <p align="center">
-  <img width="300" height="100" src = "resources/mht_equation.png">
+  <img width="550" height="100" src = "resources/mht_equation.png">
 </p>
 
-where m is the number of selected descriptors, e.g. ICI, amplitude, bearing etc., and _y(i,k)_ is the measurement of descriptor _i_ for click _k_ in a click train with n associated clicks.  _t(k+1)_ is the measured time of a click _k_. Each descriptor is divided by q_i which is a user tuneable parameter that alters the importance each descriptor has on the total χ<sup>2</sup>. Ideally it should correspond to a prediction of the likely variance of the descriptor. 
+where m is the number of selected descriptors, e.g. ICI, amplitude, bearing etc., and _y(i,k)_ is the measurement of descriptor _i_ for click _k_ in a click train with n associated clicks.  _t(k+1)_ is the measured time of a click _k_. Each descriptor is divided by q<sub>i</sub> which is a user tuneable parameter that alters the importance each descriptor has on the total χ<sup>2</sup>. Ideally it should correspond to a prediction of the likely variance of the descriptor. 
 
 The descriptors can be enabled and the variance set in the χ<sup>2</sup> Settings pane. The toggle button next to each descriptor sets whether a descriptor is used to score a click train and the variance is then set using the slider or by inputting manually by clicking the settings cog. Increasing the variance means that the descriptor has less of an influence on the calculation of χ<sup>2</sup> and decreasing means that the descriptor has a larger influence on χ<sup>2</sup>.  In some cases, clicks can be so close together that the variance is tiny and thus χ<sup>2</sup> becomes huge e.g. during buzzes. A minimum variance value (〖qt〗_i) prevents the variance _(〖max⁡(q<sub>i</sub> (t(k+1)-t_k ),〖qt〗_i )〗<sup>2</sup>)_ from falling below very low values. 
 
@@ -66,41 +66,44 @@ Ideally the variance for each parameter would be calculated from a test dataset 
 
  
 <p align="center">
-  <img width="300" height="200" src = "resources/varience_pane.png">
+  <img width="900" height="120" src = "resources/varience_pane.png">
 </p>
 
 _Figure 3. Each descriptor has a variance setting which can be changed by moving the slider or manually inputting data by clicking the settings button. Variance is multiplied by the ICI for each click detection because clicks closer together in time the descriptor values will change less. In some cases, clicks can be so close together that the variance is tiny and thus χ<sup>2</sup> in Eq. 1 becomes huge e.g. during buzzes. A Min. Error prevents the variance from falling below very low values._ 
 
 The available descriptors parameters can be set in the click detector settings pane (Figure 3) and works as follows;
 
-IDI: the inter-detection-interval in milliseconds. The algorithm looks for slowly changes in the interval between detections. 
+<strong>IDI:</strong> the inter-detection-interval in milliseconds. The algorithm looks for slowly changes in the interval between detections. 
 
-Amplitude:  the amplitude in dB re 1/muPa pp. The algorithm looks for slowly changing amplitude values. Note that the algorithm is comparing the change in change in amplitude so that the click train algorithm is not biased against large but consistent changes in amplitude (e.g. due to a narrow beam profile sweeping across a hydrophone). 
+<strong>Amplitude:</strong>  the amplitude in dB re 1/muPa pp. The algorithm looks for slowly changing amplitude values. Note that the algorithm is comparing the change in change in amplitude so that the click train algorithm is not biased against large but consistent changes in amplitude (e.g. due to a narrow beam profile sweeping across a hydrophone). 
 
-Bearing: the bearing of multi-channel clicks in degrees. Slowly changing bearings will increase the likelihood that click trains are detected. Note that in a similar way to Amplitude, the change in change in bearing is considered so that the algorithm is not biased against large but consistent changes in bearings. The bearing parameter has some additional settings which apply a large penalty to clicks trains if there is a large (user-defined) jump in bearing. 
+<strong>Bearing:</strong> the bearing of multi-channel clicks in degrees. Slowly changing bearings will increase the likelihood that click trains are detected. Note that in a similar way to Amplitude, the change in change in bearing is considered so that the algorithm is not biased against large but consistent changes in bearings. The bearing parameter has some additional settings which apply a large penalty to clicks trains if there is a large (user-defined) jump in bearing. 
 
-Correlation: the algorithm calculates the peak of the cross-correlation value of subsequent clicks and looks for slowly changing values in the cross-correlation value. This tells the click train algorithm to search for clicks with consistent/slowly changing spectra. The correlation descriptor also has some additional settings which allow the user to pre-filter waveforms before cross-correlation. This is especially useful in removing noise from higher frequency detections. 
+<strong>Correlation:</strong> the algorithm calculates the peak of the cross-correlation value of subsequent clicks and looks for slowly changing values in the cross-correlation value. This tells the click train algorithm to search for clicks with consistent/slowly changing spectra. The correlation descriptor also has some additional settings which allow the user to pre-filter waveforms before cross-correlation. This is especially useful in removing noise from higher frequency detections. 
 
-Time Delays:  the time delay between multi-channel clicks in milliseconds. The algorithm looks for slowly changing values in the time delays between multichannel clicks. This is useful for arrays with more than two hydrophones where an error in a single time delay measurement may cause a substantial error in bearing. Like amplitude and bearing, the time delay values are the change in change in time delays between subsequent clicks to ensure that click trains are not biased against faster changes in bearing. 
+<strong>Time Delays:</strong>  the time delay between multi-channel clicks in milliseconds. The algorithm looks for slowly changing values in the time delays between multichannel clicks. This is useful for arrays with more than two hydrophones where an error in a single time delay measurement may cause a substantial error in bearing. Like amplitude and bearing, the time delay values are the change in change in time delays between subsequent clicks to ensure that click trains are not biased against faster changes in bearing. 
 
-Click Length:  the length of the saved waveform of a click in milliseconds. This is a crude measure of the length of a click; however, it can be useful in helping the algorithm distinguish between species with long multi-modal clicks such as sperm whales, and much shorter broadband clicks such as dolphins.
+<strong>Click Length:</strong>  the length of the saved waveform of a click in milliseconds. This is a crude measure of the length of a click; however, it can be useful in helping the algorithm distinguish between species with long multi-modal clicks such as sperm whales, and much shorter broadband clicks such as dolphins.
 
-Peak Frequency: the peak frequency in Hz. The peak frequency between subsequent clicks is used score click trains. This is useful for click trains with very stable peak frequencies such as echosounders, narrow band high frequency species and perhaps some beaked whale species. 
+<strong>Peak Frequency:</strong> the peak frequency in Hz. The peak frequency between subsequent clicks is used score click trains. This is useful for click trains with very stable peak frequencies such as echosounders, narrow band high frequency species and perhaps some beaked whale species. 
 
 ### Advanced χ<sup>2</sup> Settings
 The descriptors used in Eq. 1 on their own do not provide a good score for click train detections. This is because Eq.1 can achieve the same score by either skipping clicks e.g. every second click in a click train, or by splitting click trains into smaller fragments. 
 
+<p align="center">
+  <img width="500" height="350" src = "resources/advanced_pane.png">
+</p>
  
-Figure 4. The advanced settings for calculating χ^2. These parameters are primarily used to prevent click train aliasing and fragmentation.
-The advanced settings (see Figure 4) are a series of additional factors that prevent aliasing and fragmentation and work as flows; 
+_Figure 4. The advanced settings for calculating χ^2. These parameters are primarily used to prevent click train aliasing and fragmentation.
+The advanced settings (see Figure 4) are a series of additional factors that prevent aliasing and fragmentation and work as flows._ 
 
-Low ICI Bonus: if the median ICI of the possible click train is above a specified maximum value, a large penalty is added which effectively makes it one of the least likely click trains in the hypothesis matrix. If the median ICI is below the maximum value then χ^2  = 〖(χ^2 (I ̃/max_k⁡〖I_k 〗 ))   〗^LI where I ̃ is the median ICI, max_k⁡〖I_k 〗 is the maximum ICI in the possible click train and LI is the low ICI Bonus. This bonus term favours lower ICI values, preventing aliased click trains. 
+<strong>Low ICI Bonus:</strong>  if the median ICI of the possible click train is above a specified maximum value, a large penalty is added which effectively makes it one of the least likely click trains in the hypothesis matrix. If the median ICI is below the maximum value then χ^2  = 〖(χ^2 (I ̃/max_k⁡〖I_k 〗 ))   〗^LI where I ̃ is the median ICI, max_k⁡〖I_k 〗 is the maximum ICI in the possible click train and LI is the low ICI Bonus. This bonus term favours lower ICI values, preventing aliased click trains. 
 
-Long track bonus: add a bonus factor for longer click trains to prevent fragmentation. This is the total length of the click train in seconds divided by the total hypothesis matrix time in seconds L which is then multiplied so that χ^2  = 〖(χ^2 L)   〗^LT  where LT is the long track bonus. 
+<strong>Long track bonus:</strong> add a bonus factor for longer click trains to prevent fragmentation. This is the total length of the click train in seconds divided by the total hypothesis matrix time in seconds L which is then multiplied so that χ^2  = 〖(χ^2 L)   〗^LT  where LT is the long track bonus. 
 
-Long track bonus: add a bonus factor for longer click trains to prevent fragmentation. This is the total length of the click train in seconds divided by the total hypothesis matrix time in seconds L which is then multiplied so that χ^2  = 〖(χ^2 L)   〗^LT  where LT is the long track bonus. 
+<strong>Long track bonus:</strong>  add a bonus factor for longer click trains to prevent fragmentation. This is the total length of the click train in seconds divided by the total hypothesis matrix time in seconds L which is then multiplied so that χ^2  = 〖(χ^2 L)   〗^LT  where LT is the long track bonus. 
 
-Coast penalty: add a penalty for “coasting” i.e. when an expected click, based on ICI, is not present in the click train. This penalty is multiplied by the number of coasts i.e. the likely number of missed clicks based on ICI  
+<strong>Coast penalty:</strong>  add a penalty for “coasting” i.e. when an expected click, based on ICI, is not present in the click train. This penalty is multiplied by the number of coasts i.e. the likely number of missed clicks based on ICI  
 
-New Track Penalty: if a track hypothesis is newly added in the hypothesis matrix, then add a minor penalty factor. This is added until the number of click trains exceeds No. New Track Clicks
+<strong>New Track Penalty:</strong>  if a track hypothesis is newly added in the hypothesis matrix, then add a minor penalty factor. This is added until the number of click trains exceeds No. New Track Clicks
 
