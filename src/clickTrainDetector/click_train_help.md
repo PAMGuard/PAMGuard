@@ -172,7 +172,7 @@ The click train detector can be run in real time or post processing. In real tim
   <img width="200" height="300" src = "resources/offlineprocessing.png">
 </p>
 
-_TThe filter tab allows users to pre-filter which click train are localised._ 
+_The filter tab allows users to pre-filter which click train are localised._ 
 
 In viewer mode, add the module and then go to Settings>Click Train Detector > Reanalyse click trains….This will bring up PAMGuard’s generic data reprocessing dialog with two settings, Click Train Detector or Click Train Classifier. The Click Train Detector option will run the detection and classification algorithm again. The Click Train Classifier will only run the classification algorithm on existing detected click trains (much faster). Note that users can select how much data to reprocess in the Data dropdown menu – All Data means the entire dataset will be reprocessed, Loaded Data means just the current data loaded in the display (all scrollable data), Select Data allows the user to define two time limits between which all data is reprocessed. 
 
