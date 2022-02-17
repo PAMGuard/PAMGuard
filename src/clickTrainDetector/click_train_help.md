@@ -10,7 +10,7 @@ The PAMGuard click train detector module is used to detect and then classify rep
 
 PAMGuard’s click train detector utilises both a detection and classification stage to extract click trains from recordings. 
 
-The detection stage is based on a multi hypothesis tracking (MHT) algorithm. This algorithm considers all possible combinations of transient detections creating a large hypothesis matrix which holds potential click trains. As more clicks are added to the hypothesis matrix it grows exponentially and so, to prevent a computer running out memory, it is regularly “pruned” to keep only the most likely click trains over time. The assigned likelihood of a click train is based on number of properties which can be defined in by the user. For example, a user might select, ICI, Amplitude and Correlation as variables to score click trains; this would mean that combinations of clicks with slowly changing ICI, amplitude and waveforms would be favoured by the algorithm and stay in the hypothesis matrix. Other properties such as bearing, click length and peak frequency can also be selected.  A graphical explanation of the click train detection algorithm is shown in Figure 1 and a more detailed explanation of the be found in Macaulay (2019). 
+The detection stage is currently based on a multi hypothesis tracking (MHT) algorithm. This algorithm considers all possible combinations of transient detections creating a large hypothesis matrix which holds potential click trains. As more clicks are added to the hypothesis matrix it grows exponentially and so, to prevent a computer running out memory, it is regularly “pruned” to keep only the most likely click trains over time. The assigned likelihood of a click train is based on number of properties which can be defined in by the user. For example, a user might select, ICI, Amplitude and Correlation as variables to score click trains; this would mean that combinations of clicks with slowly changing ICI, amplitude and waveforms would be favoured by the algorithm and stay in the hypothesis matrix. Other properties such as bearing, click length and peak frequency can also be selected.  A graphical explanation of the click train detection algorithm is shown in Figure 1 and a more detailed explanation of the be found in Macaulay (2019). 
 
 <p align="center">
   <img width="930" height="900" src = "resources/mht_diagram.png">
@@ -33,7 +33,7 @@ The primary settings to configure can be split into MHT Kernel and χ^2 settings
   <img width="850" height="700" src = "resources/detection_pane.png">
 </p>
 
-_Figure 2. The settings pane of the click train detector._
+_The settings pane of the click train detector._
 
 
 ### MHT Kernel Settings
@@ -69,7 +69,7 @@ Ideally the variance for each parameter would be calculated from a test dataset 
   <img width="900" height="120" src = "resources/varience_pane.png">
 </p>
 
-_Figure 3. Each descriptor has a variance setting which can be changed by moving the slider or manually inputting data by clicking the settings button. Variance is multiplied by the ICI for each click detection because clicks closer together in time the descriptor values will change less. In some cases, clicks can be so close together that the variance is tiny and thus χ<sup>2</sup> in Eq. 1 becomes huge e.g. during buzzes. A Min. Error prevents the variance from falling below very low values._ 
+_Each descriptor has a variance setting which can be changed by moving the slider or manually inputting data by clicking the settings button. Variance is multiplied by the ICI for each click detection because clicks closer together in time the descriptor values will change less. In some cases, clicks can be so close together that the variance is tiny and thus χ<sup>2</sup> in Eq. 1 becomes huge e.g. during buzzes. A Min. Error prevents the variance from falling below very low values._ 
 
 The available descriptors parameters can be set in the click detector settings pane (Figure 3) and works as follows;
 
@@ -94,7 +94,7 @@ The descriptors used in Eq. 1 on their own do not provide a good score for click
   <img width="500" height="350" src = "resources/advanced_pane.png">
 </p>
  
-_Figure 4. The advanced settings for calculating χ^2. These parameters are primarily used to prevent click train aliasing and fragmentation.
+_The advanced settings for calculating χ^2. These parameters are primarily used to prevent click train aliasing and fragmentation.
 The advanced settings (see Figure 4) are a series of additional factors that prevent aliasing and fragmentation and work as flows._ 
 
 <strong>Low ICI Bonus:</strong>  if the median ICI of the possible click train is above a specified maximum value, a large penalty is added which effectively makes it one of the least likely click trains in the hypothesis matrix. If the median ICI is below the maximum value then χ^2  = 〖(χ^2 (I ̃/max_k⁡〖I_k 〗 ))   〗^LI where I ̃ is the median ICI, max_k⁡〖I_k 〗 is the maximum ICI in the possible click train and LI is the low ICI Bonus. This bonus term favours lower ICI values, preventing aliased click trains. 
@@ -106,4 +106,20 @@ The advanced settings (see Figure 4) are a series of additional factors that pre
 <strong>Coast penalty:</strong>  add a penalty for “coasting” i.e. when an expected click, based on ICI, is not present in the click train. This penalty is multiplied by the number of coasts i.e. the likely number of missed clicks based on ICI  
 
 <strong>New Track Penalty:</strong>  if a track hypothesis is newly added in the hypothesis matrix, then add a minor penalty factor. This is added until the number of click trains exceeds No. New Track Clicks
+
+## Classification
+
+The classification process attempts to assign a species identification to each detected click trains. Currently there is only one implemented classifier, a simple binary classifier which tests user defined parameters (e.g. IDI, bearing, spectral correlation and classifies each click). Classification parameters are accessed via the classification tab in the settings dialog.
+
+There is currently a basic spectral correlation/IDI/bearing classifier; more complex classifiers can be implemented in the future. 
+
+<p align="center">
+  <img width="510" height="800" src = "resources/classifier_pane.png">
+</p>
+
+Multiple classifiers can be added by adding a new classifier tab using the + button in the tab pane - each classifier has a unique species ID and name. 
+
+
+
+
 
