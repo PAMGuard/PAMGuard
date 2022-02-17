@@ -13,7 +13,7 @@ PAMGuard’s click train detector utilises both a detection and classification s
 The detection stage is based on a multi hypothesis tracking (MHT) algorithm. This algorithm considers all possible combinations of transient detections creating a large hypothesis matrix which holds potential click trains. As more clicks are added to the hypothesis matrix it grows exponentially and so, to prevent a computer running out memory, it is regularly “pruned” to keep only the most likely click trains over time. The assigned likelihood of a click train is based on number of properties which can be defined in by the user. For example, a user might select, ICI, Amplitude and Correlation as variables to score click trains; this would mean that combinations of clicks with slowly changing ICI, amplitude and waveforms would be favoured by the algorithm and stay in the hypothesis matrix. Other properties such as bearing, click length and peak frequency can also be selected.  A graphical explanation of the click train detection algorithm is shown in Figure 1 and a more detailed explanation of the be found in Macaulay (2019). 
 
 <p align="center">
-  <img width="900" height="900" src = "resources/mht_diagram.png">
+  <img width="930" height="900" src = "resources/mht_diagram.png">
 </p>
 
 _Diagram demonstrating how the click train algorithm works. Black dots are a set of 14 detected clicks at times t1 to t14. The click train algorithm begins at click 1 and creates two possible clicks trains, one that includes the first click (filled circle) and the other in which the click is not part of the click train (non-filled circle). The algorithm then moves to the next click and adds it to the hypothesis matrix. As the number of clicks increases, the hypothesis matrix exponentially expands in size and must be pruned. After a minimum of Npmin clicks (in this case 4) each track hypothesis (possible click train) is assigned a χ^2score. The track hypothesis with lowest score (defined by larger coloured circles) has it’s branch traced back Np (in this case 3) clicks. Any track hypothesis which do not include the click Np steps back are pruned (defined by the double lines). Clicks which share no click associations with the first track hypothesis are then pruned and the process repeats until all clicks are part of a track or a maximum number of tracks have been considered (in this example there are two tracks). The algorithm then moves to the next click, adds it to the hypothesis matrix, assigns χ^2scores and traces the lowest χ^2 branch Np steps back, pruning the hypothesis  matrix again; the process repeats until the last click. Note that there is always a track hypothesis with no associated clicks (i.e. the bottom-most branch where no clicks belong to a click train). If a track hypothesis is confirmed and thus removed from the hypothesis matrix, then this track can be used to start another click train_
@@ -53,15 +53,22 @@ The MHT Kernel is the part of the detection algorithm which creates and then pru
 The χ<sup>2</sup> model used in the click train detector considers both the slowly varying properties of click trains, as well as bonus and penalty factors to discourage fragmentation and aliasing (selecting a multiple of the true ICI) of detected click trains. 
 
 The initial basis of the model is: 
-	χ^2=∑_(i=1)^m▒((((  ∑_(k=2)^(n-1)▒((〖y_(i,k)- y〗_(i,k-1))-(〖y_(i,k+1)- y〗_(i,k)))^2/〖max⁡(q_i (t_(k+1)-t_k ),〖qt〗_i )〗^2 ))⁄n))⁄m	Eq. 1
 
-where m is the number of selected descriptors, e.g. ICI, amplitude, bearing etc., and y_(i,k) is the measurement of descriptor i for click k in a click train with n associated clicks.  t_(k+1) is the measured time of a click k. Each descriptor is divided by q_i which is a user tuneable parameter that alters the importance each descriptor has on the total χ<sup>2</sup>. Ideally it should correspond to a prediction of the likely variance of the descriptor. 
+<p align="center">
+  <img width="300" height="100" src = "resources/mht_equation.png">
+</p>
 
-The descriptors can be enabled and the variance set in the χ<sup>2</sup> Settings pane. The toggle button next to each descriptor sets whether a descriptor is used to score a click train and the variance is then set using the slider or by inputting manually by clicking the settings cog. Increasing the variance means that the descriptor has less of an influence on the calculation of χ<sup>2</sup> and decreasing means that the descriptor has a larger influence on χ<sup>2</sup>.  In some cases, clicks can be so close together that the variance is tiny and thus χ<sup>2</sup> becomes huge e.g. during buzzes. A minimum variance value (〖qt〗_i) prevents the variance (〖max⁡(q_i (t_(k+1)-t_k ),〖qt〗_i )〗^2) from falling below very low values. 
+where m is the number of selected descriptors, e.g. ICI, amplitude, bearing etc., and _y(i,k)_ is the measurement of descriptor _i_ for click _k_ in a click train with n associated clicks.  _t(k+1)_ is the measured time of a click _k_. Each descriptor is divided by q_i which is a user tuneable parameter that alters the importance each descriptor has on the total χ<sup>2</sup>. Ideally it should correspond to a prediction of the likely variance of the descriptor. 
+
+The descriptors can be enabled and the variance set in the χ<sup>2</sup> Settings pane. The toggle button next to each descriptor sets whether a descriptor is used to score a click train and the variance is then set using the slider or by inputting manually by clicking the settings cog. Increasing the variance means that the descriptor has less of an influence on the calculation of χ<sup>2</sup> and decreasing means that the descriptor has a larger influence on χ<sup>2</sup>.  In some cases, clicks can be so close together that the variance is tiny and thus χ<sup>2</sup> becomes huge e.g. during buzzes. A minimum variance value (〖qt〗_i) prevents the variance _(〖max⁡(q<sub>i</sub> (t(k+1)-t_k ),〖qt〗_i )〗<sup>2</sup>)_ from falling below very low values. 
 
 Ideally the variance for each parameter would be calculated from a test dataset of manually annotated click trains e.g. by calculating the variance of ICI of all marked click trains.
 
  
+<p align="center">
+  <img width="300" height="200" src = "resources/varience_pane.png">
+</p>
+
 _Figure 3. Each descriptor has a variance setting which can be changed by moving the slider or manually inputting data by clicking the settings button. Variance is multiplied by the ICI for each click detection because clicks closer together in time the descriptor values will change less. In some cases, clicks can be so close together that the variance is tiny and thus χ<sup>2</sup> in Eq. 1 becomes huge e.g. during buzzes. A Min. Error prevents the variance from falling below very low values._ 
 
 The available descriptors parameters can be set in the click detector settings pane (Figure 3) and works as follows;
@@ -80,7 +87,7 @@ Click Length:  the length of the saved waveform of a click in milliseconds. This
 
 Peak Frequency: the peak frequency in Hz. The peak frequency between subsequent clicks is used score click trains. This is useful for click trains with very stable peak frequencies such as echosounders, narrow band high frequency species and perhaps some beaked whale species. 
 
-### Advanced χ^2 Settings
+### Advanced χ<sup>2</sup> Settings
 The descriptors used in Eq. 1 on their own do not provide a good score for click train detections. This is because Eq.1 can achieve the same score by either skipping clicks e.g. every second click in a click train, or by splitting click trains into smaller fragments. 
 
  
