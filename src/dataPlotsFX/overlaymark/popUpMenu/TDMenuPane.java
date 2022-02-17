@@ -392,7 +392,7 @@ public class TDMenuPane extends PamBorderPane {
 		ScrollPane scrollPane = new ScrollPane(externalMenuPane); 
 		scrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);		
 		scrollPane.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);		
-		scrollPane.setPrefHeight(200);
+		scrollPane.setPrefHeight(300);
 
 		menuPane.getChildren().add(scrollPane);
 
