@@ -45,17 +45,17 @@ public class BearingClassifierPane extends  SettingsPane<BearingClassifierParams
 	 */
 	private void createBearingClassifierPane() {
 		
-		Label label = new Label("Bearing Limits"); 
+//		Label label = new Label("Bearing Limits"); 
 //		label.setFont(PamGuiManagerFX.titleFontSize2);
-		PamGuiManagerFX.titleFont2style(label);
+//		PamGuiManagerFX.titleFont2style(label);
 
 		
-		bearingLims = new MinMaxPane<Double>("Bearing", "\u00B0", -180., 180., 2.); 
+		bearingLims = new MinMaxPane<Double>("Bearing Limits", "\u00B0", -180., 180., 2.); 
 		
 
-		Label label2 = new Label("\u0394 Bearing"); 
+//		Label label2 = new Label("\u0394 Bearing"); 
 //		label2.setFont(PamGuiManagerFX.titleFontSize2);
-		PamGuiManagerFX.titleFont2style(label2);
+//		PamGuiManagerFX.titleFont2style(label2);
 
 		
 		bearingDMean 	= new MinMaxPane<Double>("\u0394 Bearing Mean 	", "\u00B0/s", -180., 180., 0.001); 
@@ -70,7 +70,7 @@ public class BearingClassifierPane extends  SettingsPane<BearingClassifierParams
 		this.mainPane = new PamVBox(); 
 		mainPane.setSpacing(5);
 		
-		mainPane.getChildren().addAll(label, bearingLims, label2, bearingDMean, bearingDMedian, bearingDStd); 
+		mainPane.getChildren().addAll(bearingLims, bearingDMean, bearingDMedian, bearingDStd); 
 	}
 
 	@Override

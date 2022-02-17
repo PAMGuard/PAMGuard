@@ -45,6 +45,8 @@ public class PeakFreqModifier extends SymbolModifier {
 	 */
 	private ColourArrayType colourArrayType;
 
+	private PeakFreqOptionsPane peakFreqOptions;
+
 	public PeakFreqModifier(PamSymbolChooser symbolChooser) {
 		super(PEAK_FREQ_MODIFIER_NAME, symbolChooser, SymbolModType.FILLCOLOUR |  SymbolModType.LINECOLOUR );
 		 checkColourArray();
@@ -124,11 +126,17 @@ public class PeakFreqModifier extends SymbolModifier {
 	
 	@Override
 	public SymbolModifierPane getOptionsPane() {
-		return new PeakFreqOptionsPane(this); 
+		//System.out.println("PEAK FREQ COLOUR ARRAY2: " + peakFreqSymbolOptions.freqColourArray);
+		if (this.peakFreqOptions==null) {
+			peakFreqOptions = new PeakFreqOptionsPane(this); 
+			peakFreqOptions.setParams();
+		}
+		return peakFreqOptions; 
 	}
 	
 	@Override
 	public SymbolModifierParams getSymbolModifierParams() {
+		//System.out.println("PEAK FREQ COLOUR ARRAY3: " + peakFreqSymbolOptions.freqColourArray);
 		if (peakFreqSymbolOptions==null) peakFreqSymbolOptions = new PeakFreqSymbolOptions(); 
 		return peakFreqSymbolOptions;
 	}
@@ -138,9 +146,15 @@ public class PeakFreqModifier extends SymbolModifier {
 		if (!(symbolModifierParams instanceof PeakFreqSymbolOptions)) {
 			System.err.println("PeakFreqModifier: warning: the saved parameters were not an instance of PeakFreqSymbolOptions"); 
 			peakFreqSymbolOptions = new PeakFreqSymbolOptions(); 
+			checkColourArray();
 			return; 
 		}
-		else this.peakFreqSymbolOptions = (PeakFreqSymbolOptions) symbolModifierParams;
+		else {
+			this.peakFreqSymbolOptions = (PeakFreqSymbolOptions) symbolModifierParams;
+			//System.out.println("PEAK FREQ COLOUR ARRAY: " + peakFreqSymbolOptions.freqColourArray);
+			checkColourArray();
+		}
+		
 	}
 
 

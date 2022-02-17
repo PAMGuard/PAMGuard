@@ -1,5 +1,6 @@
-package clickTrainDetector.layout.classification.templateClassifier;
+package clickTrainDetector.layout.classification.idiClassifier;
 
+import clickTrainDetector.classification.idiClassifier.IDIClassifierParams;
 import clickTrainDetector.classification.templateClassifier.TemplateClassifierParams;
 
 import javafx.scene.layout.Pane;
@@ -63,45 +64,45 @@ public class IDIPane extends PamBorderPane {
 	
 	/**
 	 * Set IDI parameters.
-	 * @param templateClassifierParams - parameters to set. 
+	 * @param idiClassifierParams - parameters to set. 
 	 */
-	public void setParams(TemplateClassifierParams templateClassifierParams) {
+	public void setParams(IDIClassifierParams idiClassifierParams) {
 		
-		medianMinMax.setParams(templateClassifierParams.minMedianIDI, templateClassifierParams.maxMedianIDI, templateClassifierParams.useMedianIDI);
+		medianMinMax.setParams(idiClassifierParams.minMedianIDI, idiClassifierParams.maxMedianIDI, idiClassifierParams.useMedianIDI);
 		
-		meanMinMax.setParams(templateClassifierParams.minMeanIDI, templateClassifierParams.maxMeanIDI, templateClassifierParams.useMeanIDI);
+		meanMinMax.setParams(idiClassifierParams.minMeanIDI, idiClassifierParams.maxMeanIDI, idiClassifierParams.useMeanIDI);
 
-		stdMinMax.setParams(templateClassifierParams.minStdIDI, templateClassifierParams.maxStdIDI, templateClassifierParams.useStdIDI);
+		stdMinMax.setParams(idiClassifierParams.minStdIDI, idiClassifierParams.maxStdIDI, idiClassifierParams.useStdIDI);
 
 	}
 	
 	/**
 	 * Get IDI parameters.
-	 * @param templateClassifierParams - parameter class to add IDI parameters settings to./ 
+	 * @param idiClassifierParams - parameter class to add IDI parameters settings to./ 
 	 * @return altered parameters class. 
 	 */
-	public TemplateClassifierParams getParams(TemplateClassifierParams templateClassifierParams) {
+	public IDIClassifierParams getParams(IDIClassifierParams idiClassifierParams) {
 		
 		@SuppressWarnings("rawtypes")
 		MinMaxParams minMaxParams = medianMinMax.getParams(); 
 		
-		templateClassifierParams.minMedianIDI = (Double) minMaxParams.min;
-		templateClassifierParams.maxMedianIDI = (Double) minMaxParams.max;
-		templateClassifierParams.useMedianIDI = minMaxParams.enabled;
+		idiClassifierParams.minMedianIDI = (Double) minMaxParams.min;
+		idiClassifierParams.maxMedianIDI = (Double) minMaxParams.max;
+		idiClassifierParams.useMedianIDI = minMaxParams.enabled;
 		
 		 minMaxParams = meanMinMax.getParams(); 
 		
-		templateClassifierParams.minMeanIDI = (Double) minMaxParams.min;
-		templateClassifierParams.maxMeanIDI = (Double) minMaxParams.max;
-		templateClassifierParams.useMeanIDI = minMaxParams.enabled;
+		idiClassifierParams.minMeanIDI = (Double) minMaxParams.min;
+		idiClassifierParams.maxMeanIDI = (Double) minMaxParams.max;
+		idiClassifierParams.useMeanIDI = minMaxParams.enabled;
 		
 		minMaxParams = stdMinMax.getParams(); 
 		
-		templateClassifierParams.minStdIDI = (Double) minMaxParams.min;
-		templateClassifierParams.maxStdIDI = (Double) minMaxParams.max;
-		templateClassifierParams.useStdIDI = minMaxParams.enabled;
+		idiClassifierParams.minStdIDI = (Double) minMaxParams.min;
+		idiClassifierParams.maxStdIDI = (Double) minMaxParams.max;
+		idiClassifierParams.useStdIDI = minMaxParams.enabled;
 		
-		return templateClassifierParams; 
+		return idiClassifierParams; 
 	}
 	
 

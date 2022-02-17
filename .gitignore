@@ -35,3 +35,4 @@ bin/
 target/WMM.COF
 
 settings.xml
+.classpath
