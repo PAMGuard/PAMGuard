@@ -1,7 +1,5 @@
 package clickTrainDetector.classification.standardClassifier;
 
-
-import clickTrainDetector.ClickTrainControl;
 import clickTrainDetector.classification.CTClassification;
 import clickTrainDetector.classification.CTClassifierType;
 import clickTrainDetector.classification.ClassifierJSONLogging;
@@ -16,12 +14,6 @@ import clickTrainDetector.classification.bearingClassifier.BearingClassifierJSON
 public class StandardClassification implements CTClassification {
 	
 	/**
-	 * Reference to the click control. 
-	 */
-	private ClickTrainControl clickTrainControl;
-	
-
-	/**
 	 * The current species ID.
 	 */
 	private int speciesID;
@@ -30,17 +22,23 @@ public class StandardClassification implements CTClassification {
 	 * All the classifications. 
 	 */
 	private CTClassification[] ctClassifications;
+	
+	
+	public CTClassification[] getCtClassifications() {
+		return ctClassifications;
+	}
 
 	/**
 	 * Standard classifier JSON logging. 
 	 */
 	private StandardClassificationJSON standardClassifierJSONLogging; 
 	
-
-	public StandardClassification(ClickTrainControl clickTrainControl, CTClassification[] ctClassifications, int speciesID) {
-		this.clickTrainControl=clickTrainControl; 
+	
+	public StandardClassification(CTClassification[] ctClassifications, int speciesID) {
 		this.ctClassifications=ctClassifications; 
-		standardClassifierJSONLogging = new StandardClassificationJSON();
+		standardClassifierJSONLogging = new StandardClassificationJSON(ctClassifications); 
+		this.speciesID=speciesID; 
+
 	}
 
 	/**
@@ -48,9 +46,15 @@ public class StandardClassification implements CTClassification {
 	 * @param jsonstring
 	 */
 	public StandardClassification(String jsonstring) {
+		standardClassifierJSONLogging = new StandardClassificationJSON(); 
 		
+		CTClassification classification  = standardClassifierJSONLogging.createClassification(jsonstring); 
 		
+		this.ctClassifications = ((StandardClassification) classification).getCtClassifications();
+		this.speciesID			=classification.getSpeciesID(); 
+
 	}
+	
 
 	@Override
 	public CTClassifierType getClassifierType() {
