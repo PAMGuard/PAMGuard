@@ -225,6 +225,7 @@ public class RWEProcess extends PamProcess {
 			RWEDetectionPeak[] detectedPeaks = null;
 			int nPeaks = 0;
 			int nOver = 0;
+			double onDown = rweControl.rweParameters.downThreshold ? 1 : 0;
 			for (int i = searchBin1; i <= searchBin2; i++) {
 				magData[i] = complexArray.magsq(i);
 			}
@@ -267,7 +268,8 @@ public class RWEProcess extends PamProcess {
 					// do nothing it it's still off !
 				}
 				else {
-					if (oTh[i] && magData[i] > newPeak.maxAmp/threshold) { // continue peak
+					// if downThreshold == false then onDown is 0, so second threshold is always on since magData always > 0
+					if (oTh[i] && magData[i] > newPeak.maxAmp*onDown/threshold) { // continue peak
 						newPeak.bin2 = i;
 						if (magData[i] > newPeak.maxAmp) {
 							newPeak.maxAmp = magData[i];
@@ -287,11 +289,13 @@ public class RWEProcess extends PamProcess {
 						newPeak = new RWEDetectionPeak(0);
 						peakOn = false;
 						// now trim off the start of the peak if it's too wide. 
-						for (int ip = newPeak.bin1; ip < newPeak.peakBin; ip++) {
-							if (magData[ip] < newPeak.maxAmp/threshold) {
-								newPeak.bin1 = ip+1;
-								newPeak.signal -= magData[ip];
-								newPeak.noise -= backgroundData[ip];
+						if (onDown > 0) {
+							for (int ip = newPeak.bin1; ip < newPeak.peakBin; ip++) {
+								if (magData[ip] < newPeak.maxAmp/threshold) {
+									newPeak.bin1 = ip+1;
+									newPeak.signal -= magData[ip];
+									newPeak.noise -= backgroundData[ip];
+								}
 							}
 						}
 					}

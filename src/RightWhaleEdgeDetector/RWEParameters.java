@@ -27,6 +27,8 @@ public class RWEParameters implements Serializable, Cloneable, ManagedParameters
 	
 	public int minSoundType = 5;
 	
+	public boolean downThreshold = false;
+	
 	@Override
 	protected RWEParameters clone() {
 		try {
