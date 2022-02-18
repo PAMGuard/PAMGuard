@@ -402,10 +402,15 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 
 		//have a look through the files and check that there are some files to import. 		
 		for (int i=0; i<CPODFileType.values().length; i++) {
+			try {
 			List<File> cp1 = (List<File>) FileUtils.listFiles(folder, 
 					new String[]{CPODFileType.values()[i].getText()}, this.subFolder.isSelected());
 			System.out.println("Files out: " + cp1);
 			files.addAll(cp1); 
+			}
+			catch (Exception e) {
+				System.err.println("Current directory does not exist: " + folder ); 
+			}
 		}
 	}
 

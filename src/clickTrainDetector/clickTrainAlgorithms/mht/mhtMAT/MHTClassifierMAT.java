@@ -66,10 +66,9 @@ public class MHTClassifierMAT {
 			classification  = cTClassifiers.get(i).classifyClickTrain(dataUnit); 
 			dataUnit.addCtClassification(classification);
 			
-//			System.out.println("Classification " + classification.getSpeciesID() + " speciesID " + cTClassifiers.get(i).getSpeciesID()); 
+			System.out.println("Classification " + classification.getSpeciesID() + " speciesID " + cTClassifiers.get(i).getSpeciesID()); 
 
 			if (classification.getSpeciesID()>CTClassifier.NOSPECIES && !hasBeenClssfd) {
-//				System.out.println("Set classiifcation index: " + i); 
 				dataUnit.setClassificationIndex(i); //set the classification index. 
 				hasBeenClssfd = true; 
 			}
