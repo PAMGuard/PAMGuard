@@ -1,15 +1,11 @@
 package dataPlotsFX.overlaymark.menuOptions.MLExport;
 
-import com.jmatio.types.MLDouble;
 import com.jmatio.types.MLInt32;
-import com.jmatio.types.MLInt64;
 import com.jmatio.types.MLInt8;
 import com.jmatio.types.MLStructure;
 
-import PamUtils.PamUtils;
 import PamguardMVC.PamDataUnit;
 import clickDetector.ClickDetection;
-import whistlesAndMoans.ConnectedRegionDataUnit;
 
 /**
  * Export a click to a MATLAB structure. 

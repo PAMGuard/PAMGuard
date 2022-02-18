@@ -50,7 +50,7 @@ public class Chi2CTClassification implements CTClassification {
 
 	@Override
 	public String getSummaryString() {
-		return "Simple X\u00b2 Clssfr: Species ID: " + this.getSpeciesID();
+		return "X\u00b2 Clssfr: Species ID: " + this.getSpeciesID();
 	}
 	
 	@Override
