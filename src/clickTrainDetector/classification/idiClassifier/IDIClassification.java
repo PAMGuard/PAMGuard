@@ -81,7 +81,7 @@ public class IDIClassification implements CTClassification {
 
 	@Override
 	public String getSummaryString() {
-		return  String.format("IDI Classifier: Mean IDI %.4f\u00B0/s Median IDI %.4f\u00B0/s Std IDI%.4f\u00B0/s",
+		return  String.format("IDI Classifier: Mean IDI %.5fs Median IDI %.5fs Std IDI%.5fs",
 				meanIDI, medianIDI, stdIDI);
 	}
 
