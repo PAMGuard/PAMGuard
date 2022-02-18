@@ -91,7 +91,7 @@ public class BinaryStorageDialogPanel {
 		JPanel qb = new JPanel(new BorderLayout());
 		qb.add(BorderLayout.WEST, q);
 		qb.setBorder(new TitledBorder("Options"));
-		qb.setVisible(PamController.getInstance().getRunMode() != PamController.RUN_PAMVIEW);
+//		qb.setVisible(PamController.getInstance().getRunMode() != PamController.RUN_PAMVIEW);
 		
 		p.add(BorderLayout.CENTER, qb);
 

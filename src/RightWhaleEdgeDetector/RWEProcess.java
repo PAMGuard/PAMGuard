@@ -16,6 +16,7 @@ import fftManager.Complex;
 import fftManager.FFTDataBlock;
 import fftManager.FFTDataUnit;
 import networkTransfer.receive.BuoyStatusDataUnit;
+import spectrogramNoiseReduction.kernelSmoothing.KernelSmoothing;
 import whistlesAndMoans.WhistleBearingInfo;
 import PamController.PamController;
 import PamDetection.AbstractLocalisation;
@@ -43,6 +44,11 @@ public class RWEProcess extends PamProcess {
 		
 	private Hashtable<Integer, BearingLocaliser> bearingLocalisers;
 	private StandardSymbolManager symbolManager;
+	/**
+	 * Already has Kernel smoothing applied to input data. 
+	 */
+	private boolean isPreSmoothed;
+	private KernelSmoothing kernelSmoothing;
 	
 	public RWEProcess(RWEControl rweControl) {
 		super(rweControl, null);
@@ -96,6 +102,18 @@ public class RWEProcess extends PamProcess {
 		if (sourceDataBlock == null) {
 			return;
 		}
+		/**
+		 * work out if the fft source has already run the Guassian smoothing or not
+		 */
+		isPreSmoothed = rweControl.hasKernelSmoothing(sourceDataBlock);
+		if (isPreSmoothed) {
+			kernelSmoothing = null;
+		}
+		else {
+			kernelSmoothing = new KernelSmoothing();
+			kernelSmoothing.initialise(sourceDataBlock.getChannelMap());
+		}
+//		sourceDataBlock.findAnnotation(null);
 //		rweDataBlock.setChannelMap(rweControl.rweParameters.channelMap);
 		rweDataBlock.sortOutputMaps(sourceDataBlock.getChannelMap(), sourceDataBlock.getSequenceMapObject(), rweControl.rweParameters.channelMap);
 		if (db == null) {
@@ -135,6 +153,7 @@ public class RWEProcess extends PamProcess {
 		private int numOT; // number of bins in last analysed slice over threshold
 		private int minSoundType;
 		private RWClassifier classifier = new RWStandardClassifier();
+		
 		public RWEChannelProcess(RWEProcess rweProcess, int iChannel) {
 			this.rweProcess = rweProcess;
 			this.iChannel = iChannel;
@@ -160,6 +179,15 @@ public class RWEProcess extends PamProcess {
 		
 		
 		public void newData(FFTDataUnit fftDataUnit) {
+			if (!isPreSmoothed) {
+				FFTDataUnit newFFTUnit = new FFTDataUnit(fftDataUnit.getTimeMilliseconds(), fftDataUnit.getChannelBitmap(), 
+						fftDataUnit.getStartSample(), fftDataUnit.getSampleDuration(), null, fftDataUnit.getFftSlice());
+				newFFTUnit.setSequenceBitmap(fftDataUnit.getSequenceBitmapObject());
+				newFFTUnit.setFftData(fftDataUnit.getFftData().clone());
+				kernelSmoothing.runNoiseReduction(newFFTUnit);
+				fftDataUnit = newFFTUnit;
+			}
+			
 			RWEDetectionPeak[] newPeaks = findPeaks(fftDataUnit.getFftData());
 			RWESound[] newSounds = findSounds(fftDataUnit.getTimeMilliseconds(), newPeaks);
 			if (newSounds == null) {
@@ -197,6 +225,7 @@ public class RWEProcess extends PamProcess {
 			RWEDetectionPeak[] detectedPeaks = null;
 			int nPeaks = 0;
 			int nOver = 0;
+			double onDown = rweControl.rweParameters.downThreshold ? 1 : 0;
 			for (int i = searchBin1; i <= searchBin2; i++) {
 				magData[i] = complexArray.magsq(i);
 			}
@@ -239,7 +268,8 @@ public class RWEProcess extends PamProcess {
 					// do nothing it it's still off !
 				}
 				else {
-					if (oTh[i]) { // continue peak
+					// if downThreshold == false then onDown is 0, so second threshold is always on since magData always > 0
+					if (oTh[i] && magData[i] > newPeak.maxAmp*onDown/threshold) { // continue peak
 						newPeak.bin2 = i;
 						if (magData[i] > newPeak.maxAmp) {
 							newPeak.maxAmp = magData[i];
@@ -258,6 +288,16 @@ public class RWEProcess extends PamProcess {
 						detectedPeaks[nPeaks++] = newPeak;
 						newPeak = new RWEDetectionPeak(0);
 						peakOn = false;
+						// now trim off the start of the peak if it's too wide. 
+						if (onDown > 0) {
+							for (int ip = newPeak.bin1; ip < newPeak.peakBin; ip++) {
+								if (magData[ip] < newPeak.maxAmp/threshold) {
+									newPeak.bin1 = ip+1;
+									newPeak.signal -= magData[ip];
+									newPeak.noise -= backgroundData[ip];
+								}
+							}
+						}
 					}
 				}
 			}

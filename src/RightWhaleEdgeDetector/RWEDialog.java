@@ -5,6 +5,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Window;
 
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -29,11 +30,15 @@ public class RWEDialog extends PamDialog {
 	private static RWEDialog singleInstance;
 	private SourcePanel sourcePanel;
 	
+	private RWEControl rweControl;
+	
 	private JTextField startFreq, endFreq, thresholdDB;
 	private JTextField minSoundType;
+	private JCheckBox downThreshold;
 		
-	private RWEDialog(Window parentFrame) {
+	private RWEDialog(RWEControl rweControl, Window parentFrame) {
 		super(parentFrame, "Right Whale Edge Detector Settings", true);
+		this.rweControl = rweControl;
 		sourcePanel = new SourcePanel(this, "Source and Channels", 
 				FFTDataUnit.class, true, true);
 		sourcePanel.setSourceToolTip("Data source should be the output of a Spectrogram Smmothing Kernel");
@@ -67,6 +72,11 @@ public class RWEDialog extends PamDialog {
 		addComponent(det, thresholdDB = new JTextField(5), c);
 		c.gridx++;
 		addComponent(det, new JLabel(" dB", SwingConstants.RIGHT), c);
+		c.gridy++;
+		c.gridx = 0;
+		addComponent(det, new JLabel("Appy down threshold ", SwingConstants.RIGHT), c);
+		c.gridx++;
+		addComponent(det, downThreshold = new JCheckBox(), c);
 
 		JPanel cl = new JPanel(new GridBagLayout());
 		cl.setBorder(new TitledBorder("Detection"));
@@ -85,6 +95,7 @@ public class RWEDialog extends PamDialog {
 		}
 		txt += "</html>";
 		minSoundType.setToolTipText(txt);
+		downThreshold.setToolTipText("Applies threshold as dB down from the peak, as well as up from the noise floor");
 		
 		pp.add(BorderLayout.NORTH, det);
 		pp.add(BorderLayout.CENTER, cl);
@@ -96,8 +107,8 @@ public class RWEDialog extends PamDialog {
 	}
 	
 	public static RWEParameters showDialog(Window frame, RWEControl rweControl) {
-		if (singleInstance == null || frame != singleInstance.getOwner()) {
-			singleInstance = new RWEDialog(frame);
+		if (singleInstance == null || frame != singleInstance.getOwner() || rweControl != singleInstance.rweControl) {
+			singleInstance = new RWEDialog(rweControl, frame);
 		}
 		singleInstance.rweParameters = rweControl.rweParameters.clone();
 		singleInstance.setParams();
@@ -113,6 +124,7 @@ public class RWEDialog extends PamDialog {
 		endFreq.setText(String.format("%3.1f", rweParameters.endFreq));
 		double thDB = 10. * Math.log10(rweParameters.threshold);
 		thresholdDB.setText(String.format("%3.1f", thDB));
+		downThreshold.setSelected(rweParameters.downThreshold);
 		minSoundType.setText(String.format("%d", rweParameters.minSoundType));
 	}
 
@@ -120,6 +132,7 @@ public class RWEDialog extends PamDialog {
 	public boolean getParams() {
 		rweParameters.channelMap = sourcePanel.getChannelList();
 		rweParameters.dataSourceName = sourcePanel.getSource().getDataName();
+		rweParameters.downThreshold = downThreshold.isSelected();
 		if (rweParameters.dataSourceName == null) {
 			return showWarning("You must select a valid input data source");
 		}
@@ -137,24 +150,11 @@ public class RWEDialog extends PamDialog {
 		catch (NumberFormatException e) {
 			return showWarning("Invalid detection or classification parameter");
 		}
-		boolean gok = checkInputProcessing();
-		if (gok == false) {
-			return showWarning("Right whale detector input must include Gaussian Kernel Smoothing as part of the FFT module, or a stand alone smoothing module");
-		}
+//		boolean gok = rweControl.hasKernelSmoothing(sourcePanel.getSource());
+//		if (gok == false) {
+//			return showWarning("Right whale detector input must include Gaussian Kernel Smoothing as part of the FFT module, or a stand alone smoothing module");
+//		}
 		return true;
-	}
-
-	/**
-	 * Check that the input process has implemented kernel smoothing. 
-	 * @return
-	 */
-	private boolean checkInputProcessing() {
-		PamDataBlock db = sourcePanel.getSource();
-		if (db == null) {
-			return false;
-		}
-		ProcessAnnotation an = db.findAnnotation(KernelSmoothingProcess.processType, KernelSmoothingProcess.processName);
-		return an != null;
 	}
 
 	@Override
