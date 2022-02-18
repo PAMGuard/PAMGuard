@@ -43,6 +43,7 @@ public class IDIClassifier implements CTClassifier {
 		}
 
 		return new IDIClassification( speciesID,  clickTrain.getIDIInfo().medianIDI,   clickTrain.getIDIInfo().meanIDI,   clickTrain.getIDIInfo().stdIDI);
+
 	}
 
 	@Override
