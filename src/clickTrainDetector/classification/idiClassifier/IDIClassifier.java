@@ -37,7 +37,13 @@ public class IDIClassifier implements CTClassifier {
 		//check IDI classification is passed
 		boolean passesIDI = checkIDIMeasurements(clickTrain); 
 		
-		return null;
+		int speciesID = CTClassifier.NOSPECIES; 
+		if (passesIDI) {
+			speciesID =  idiParams.speciesFlag; 
+		}
+		
+		return new IDIClassification( speciesID,  clickTrain.getIDIInfo().medianIDI,   clickTrain.getIDIInfo().meanIDI,   clickTrain.getIDIInfo().stdIDI);
+		
 	}
 
 	@Override
