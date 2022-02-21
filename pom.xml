@@ -318,7 +318,7 @@
 	<dependency>
 		<groupId>io.github.macster110</groupId>
 		<artifactId>jpamutils</artifactId>
-		<version>0.0.55</version>
+		<version>0.0.56</version>
 	</dependency>
 
 	<!--jpam project - Deep learning java library 
@@ -329,7 +329,7 @@
 	<dependency>
 		<groupId>io.github.macster110</groupId>
 		<artifactId>jdl4pam</artifactId>
-		<version>0.0.92</version>
+		<version>0.0.93</version>
 	</dependency> 
 			
 	<!-- https://mvnrepository.com/artifact/gov.nist.math/jama -->
