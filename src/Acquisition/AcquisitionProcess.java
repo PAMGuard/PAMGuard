@@ -124,10 +124,14 @@ public class AcquisitionProcess extends PamProcess {
 //		daqStatusDataBlock.
 		addOutputDataBlock(daqStatusDataBlock);
 		daqStatusDataBlock.SetLogging(new AcquisitionLogging(daqStatusDataBlock, acquisitionControl));
-//		if (acquisitionControl.isViewer() || acquisitionControl.isNetRx()) {
-			daqStatusDataBlock.setBinaryDataSource(new DaqStatusBinaryStore(daqStatusDataBlock, acquisitionControl));
+		
+		/**
+		 * We really don't wand the binary data source set for normal ops since it stops the data getting
+		 * written to the database by default. When using certain Network receiver settings, they use binary 
+		 * type data, so do need it. this will therefore be configured from the network receiver when required.  
+		 */
+//			daqStatusDataBlock.setBinaryDataSource(new DaqStatusBinaryStore(daqStatusDataBlock, acquisitionControl));
 			AbstractScrollManager.getScrollManager().addToSpecialDatablock(daqStatusDataBlock);
-//		}
 		daqStatusDataBlock.setMixedDirection(PamDataBlock.MIX_INTODATABASE);
 
 		setupDataBlock();
