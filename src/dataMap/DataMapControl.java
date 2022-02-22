@@ -221,9 +221,16 @@ public class DataMapControl extends PamControlledUnit implements PamSettings {
 				firstTime = Math.min(firstTime, aSettingsSource.getSettings(0).getSettingsTime());
 				
 				//don't let crazy times from corrupted data make giant datamaps
-				if (aSettingsSource.getSettings(nSets-1).getSettingsTime()<PamConstants.MAX_DATE_TIME) {
-					lastTime = Math.max(lastTime, aSettingsSource.getSettings(nSets-1).getSettingsTime());
-				}
+				/* 
+				 * ALSO, DON'T ALLOW REANALYSIS TIME IN THE FAR FUTURE OVER EXTEND THE DISPLAY TIME
+				 * SINCE WHEN ANALYSING OLD DATA, IT'S INCREASINGLY SQUISHING THE SCROLL BAR AND MAKING IT HARD TO USE 
+				 * SO SET A MAX TIME WHICH IS ABOUT 10% BIGGER THAN THE MAX IN THE DATA. 
+				 */
+				long maxTime = lastTime + (lastTime-firstTime)/10;
+//				if (aSettingsSource.getSettings(nSets-1).getSettingsTime()<PamConstants.MAX_DATE_TIME) {
+//				if (aSettingsSource.getSettings(nSets-1).getSettingsTime()<maxTime) {
+					lastTime = Math.max(lastTime, Math.min(maxTime, aSettingsSource.getSettings(nSets-1).getSettingsTime()));
+//				}
 			}
 		}
 
