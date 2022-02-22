@@ -1,10 +1,12 @@
 package clickTrainDetector.clickTrainAlgorithms.mht;
 
+import PamguardMVC.PamDataBlock;
 import clickTrainDetector.clickTrainAlgorithms.mht.mhtvar.BearingChi2VarParams;
 import clickTrainDetector.clickTrainAlgorithms.mht.mhtvar.BearingChi2VarParams.BearingJumpDrctn;
 import clickTrainDetector.clickTrainAlgorithms.mht.mhtvar.CorrelationChi2Params;
 import clickTrainDetector.clickTrainAlgorithms.mht.mhtvar.IDIChi2Params;
 import clickTrainDetector.clickTrainAlgorithms.mht.mhtvar.SimpleChi2VarParams;
+import cpod.CPODClickDataBlock;
 
 /**
  * Default parameters for different species for the MHT click train detector. 
@@ -74,10 +76,11 @@ public class DefaultMHTParams {
 
 	/**
 	 * Get default MHT parameters for a particular default species. 
+	 * @param pamDataBlock 
 	 * 
 	 * @return the default MHT parameters for giver DefaultMHTSpecies. 
 	 */
-	public static MHTParams getDefaultMHTParams(DefaultMHTSpecies defaultSpecies) {
+	public static MHTParams getDefaultMHTParams(DefaultMHTSpecies defaultSpecies, PamDataBlock<?> pamDataBlock ) {
 
 		MHTParams mhtParams = new MHTParams();
 
@@ -146,28 +149,70 @@ public class DefaultMHTParams {
 
 			break;
 		case PORPOISE:
+			
+			if (pamDataBlock!=null && pamDataBlock.getClass().isAssignableFrom(CPODClickDataBlock.class)) {
+				
+				chi2Settings[0]= new IDIChi2Params("ICI", "s", 0.2, 0.0002, SimpleChi2VarParams.SCALE_FACTOR_ICI);
+				((IDIChi2Params) chi2Settings[0]).minIDI = 0.001; 
+				chi2Settings[1]= new SimpleChi2VarParams("Amplitude", "dB", 100, 0.6, SimpleChi2VarParams.SCALE_FACTOR_AMPLITUDE);
+				chi2Settings[2]= new BearingChi2VarParams("Bearing Delta", "\u00b0", Math.toRadians(0.2),  Math.toRadians(0.01), 
+						SimpleChi2VarParams.SCALE_FACTOR_BEARING); //RADIANS
+				chi2Settings[3]= new CorrelationChi2Params("Correlation"); 
 
-			chi2Settings[0]= new IDIChi2Params("ICI", "s", 0.2, 0.0002, SimpleChi2VarParams.SCALE_FACTOR_ICI);
-			chi2Settings[1]= new SimpleChi2VarParams("Amplitude", "dB", 30, 1, SimpleChi2VarParams.SCALE_FACTOR_AMPLITUDE);
-			chi2Settings[2]= new BearingChi2VarParams("Bearing Delta", "\u00b0", Math.toRadians(0.2),  Math.toRadians(0.01), 
-					SimpleChi2VarParams.SCALE_FACTOR_BEARING); //RADIANS
-			chi2Settings[3]= new CorrelationChi2Params("Correlation"); 
+				simpleChi2Params.chi2Settings = chi2Settings;
 
-			simpleChi2Params.chi2Settings = chi2Settings;
+				simpleChi2Params.enable = new boolean[] {true, true, false, false, false, false}; 
+				
+				simpleChi2Params.maxICI = 0.25; 
+				
+				simpleChi2Params.coastPenalty = 10; 
+				simpleChi2Params.newTrackPenalty = 50; 	
+				simpleChi2Params.longTrackExponent = 0.01; 
+				simpleChi2Params.lowICIExponent = 2; 
+				simpleChi2Params.newTrackN = 3; 
 
-			simpleChi2Params.enable = new boolean[] {true, true, true, false, false, false}; 
+				//the MHT kernel params
+				mhtKernelParams.maxCoast = 2; 
+				mhtKernelParams.nHold = 100; 
+				mhtKernelParams.nPruneBackStart = 15;
+				mhtKernelParams.nPruneback = 8;
+				
+				mhtKernelParams.nPruneback = 8;
+				
+				
+				
 
+				//set the  two main parameter classes. 
+				mhtParams.chi2Params = simpleChi2Params; 
+				mhtParams.mhtKernal = mhtKernelParams; 
+				
+			}
+			
+			else {
 
-
-			//the MHT kernel params
-			mhtKernelParams.maxCoast = 7; 
-			mhtKernelParams.nHold = 40; 
-			mhtKernelParams.nPruneBackStart = 15;
-			mhtKernelParams.nPruneback = 7;
-
-			//set the  two main parameter classes. 
-			mhtParams.chi2Params = simpleChi2Params; 
-			mhtParams.mhtKernal = mhtKernelParams; 
+				chi2Settings[0]= new IDIChi2Params("ICI", "s", 0.2, 0.0002, SimpleChi2VarParams.SCALE_FACTOR_ICI);
+				chi2Settings[1]= new SimpleChi2VarParams("Amplitude", "dB", 30, 1, SimpleChi2VarParams.SCALE_FACTOR_AMPLITUDE);
+				chi2Settings[2]= new BearingChi2VarParams("Bearing Delta", "\u00b0", Math.toRadians(0.2),  Math.toRadians(0.01), 
+						SimpleChi2VarParams.SCALE_FACTOR_BEARING); //RADIANS
+				chi2Settings[3]= new CorrelationChi2Params("Correlation"); 
+	
+				simpleChi2Params.chi2Settings = chi2Settings;
+	
+				simpleChi2Params.enable = new boolean[] {true, true, true, false, false, false}; 
+	
+	
+	
+				//the MHT kernel params
+				mhtKernelParams.maxCoast = 7; 
+				mhtKernelParams.nHold = 40; 
+				mhtKernelParams.nPruneBackStart = 15;
+				mhtKernelParams.nPruneback = 7;
+	
+				//set the  two main parameter classes. 
+				mhtParams.chi2Params = simpleChi2Params; 
+				mhtParams.mhtKernal = mhtKernelParams; 
+			
+			}
 
 			break;
 

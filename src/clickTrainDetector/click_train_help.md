@@ -16,7 +16,7 @@ The detection stage is currently based on a multi hypothesis tracking (MHT) algo
   <img width="930" height="900" src = "resources/mht_diagram.png">
 </p>
 
-_Diagram demonstrating how the click train algorithm works. Black dots are a set of 14 detected clicks at times t1 to t14. The click train algorithm begins at click 1 and creates two possible clicks trains, one that includes the first click (filled circle) and the other in which the click is not part of the click train (non-filled circle). The algorithm then moves to the next click and adds it to the hypothesis matrix. As the number of clicks increases, the hypothesis matrix exponentially expands in size and must be pruned. After a minimum of Npmin clicks (in this case 4) each track hypothesis (possible click train) is assigned a χ^2score. The track hypothesis with lowest score (defined by larger coloured circles) has it’s branch traced back Np (in this case 3) clicks. Any track hypothesis which do not include the click Np steps back are pruned (defined by the double lines). Clicks which share no click associations with the first track hypothesis are then pruned and the process repeats until all clicks are part of a track or a maximum number of tracks have been considered (in this example there are two tracks). The algorithm then moves to the next click, adds it to the hypothesis matrix, assigns χ^2scores and traces the lowest χ^2 branch Np steps back, pruning the hypothesis  matrix again; the process repeats until the last click. Note that there is always a track hypothesis with no associated clicks (i.e. the bottom-most branch where no clicks belong to a click train). If a track hypothesis is confirmed and thus removed from the hypothesis matrix, then this track can be used to start another click train_
+_Diagram demonstrating how the click train algorithm works. Black dots are a set of 14 detected clicks at times t1 to t14. The click train algorithm begins at click 1 and creates two possible clicks trains, one that includes the first click (filled circle) and the other in which the click is not part of the click train (non-filled circle). The algorithm then moves to the next click and adds it to the hypothesis matrix. As the number of clicks increases, the hypothesis matrix exponentially expands in size and must be pruned. After a minimum of Npmin clicks (in this case 4) each track hypothesis (possible click train) is assigned a χ<sup>2</sup> score. The track hypothesis with lowest score (defined by larger coloured circles) has it’s branch traced back Np (in this case 3) clicks. Any track hypothesis which do not include the click Np steps back are pruned (defined by the double lines). Clicks which share no click associations with the first track hypothesis are then pruned and the process repeats until all clicks are part of a track or a maximum number of tracks have been considered (in this example there are two tracks). The algorithm then moves to the next click, adds it to the hypothesis matrix, assigns χ<sup>2</sup> scores and traces the lowest χ<sup>2</sup> branch Np steps back, pruning the hypothesis  matrix again; the process repeats until the last click. Note that there is always a track hypothesis with no associated clicks (i.e. the bottom-most branch where no clicks belong to a click train). If a track hypothesis is confirmed and thus removed from the hypothesis matrix, then this track can be used to start another click train_
 
 The advantage of this MHT approach is that the click train detection module is quite general and can cope with a large variety of complex situations and multiple overlapping click trains. The disadvantage is that there are a large number of potential variables which can be set that affect the performance of the detector which can make it complex to initially set up.  
 
@@ -117,9 +117,83 @@ There is currently a basic spectral correlation/IDI/bearing classifier; more com
   <img width="510" height="800" src = "resources/classifier_pane.png">
 </p>
 
-Multiple classifiers can be added by adding a new classifier tab using the + button in the tab pane - each classifier has a unique species ID and name. 
+_The classifier settings. Users can add multiple classifiers using the + button next to the classifier tabs.  Each classifier allows the user to choose a number of different approaches to classification based on the goodness of fit, inter-click interval, average spectra and bearings of the click trains. Users can use just one or all of these options and set specific parameters for each. 
+
+Users can add multiple classifiers by selecting the + button next to the classification tabs. Each classifier allows the user to choose a number of different methods for click train classification based on the goodness of fit, inter-click interval, average spectra and/or bearings of the click trains; for a click train to be classified it must pass all enabled methods (use toggle switches to enable and disable different types of classification). The different classification methods. 
+
+### χ<sup>2</sup> threshold classifier
+The click train is classified if it’s overall χ^2 value is lower than the set χ^2 Threshold and it has more than Min. Clicks and the time between the first and last click is greater than Min. Time
+
+### IDI Classifier
+The click train is classified if the median/mean and standard deviation in the inter detection interval (IDI) between subsequent clicks are within user defined limits. 
+
+### Spectrum Template Classifier
+The click train is classified if the average spectra of the click train has a correlation value above Spectrum Correlation Threshold with a user defined spectral template. The template can be set using the button on the top right of the spectrum plot – a default spectrum can be loaded or a spectrum can be loaded from a .mat or .csv file. A csv file should have the first row as the spectrum and first column of the second row the sample rate.  A .mat file should be a single saved structure with sR (sample rate) and spectrum (array of spectrum values) fields. 
+
+### Bearing Classifier
+The click train is classified if minimum and maximum bearing (Bearing Limits) the average change in bearing ( Bearing Mean), the median change in bearing ( Bearing Median) and/or the average standard deviation in bearing change ( Bearing Std) are within user defined limits. 
 
 
+## Parametrising the classifier
+
+Each classifier has a set of metadata that are added to click trains. This can be accessed through the tooltip or right click menus in various displays. For example, in the Time Base Display FX hover the mouse over a click train or bring the pop menu with a right click. Paramters such as the spectral correaltion value, IDI and bearing information etc are displayed which allows users to get an idea of which values to set for the classifier. Currently this requires (like most PAMGuard classifiers) a trial and error approach. It is hoped that future update will allow manually validated data to be used to parametrise both the detection and classification stage of the click train detector. 
 
 
+<p align="center">
+  <img width="700" height="500" src = "resources/rightclickmenu.png">
+</p>
 
+_The metadata associated with each classifier is stored with every click train and be accessed through right clicking on or hovering the mouse over a click train detection. ._ 
+
+## Localisation
+The click train detector can be used to localise the position of animals detected by the click train detector using target motion analysis. This generally means that the localisation capabilities are generally restricted to data which has been collected using towed hydrophone arrays. 
+ 
+<p align="center">
+  <img width="242" height="430" src = "resources/localisation1.png">
+</p>
+
+_Screenshot of the click train localisation settings. Currently, only target motion is supported._ 
+
+Localisation is enabled by ticking Localise click trains. The type of localisation algorithm which is used is selected in the Localisation algorithms (See the localisation section in PAMGuard help for more info on localisation algorithms). Localisation using 3D simplex and MCMC can be processor intensive, especially when there are a large number of clicks in a train and so the Algorithm Limits pane can be used to set a maximum number of input clicks for a localisation. If the maximum is exceeded then clicks are sub sampled from the click train evenly in time.   
+
+Generally, target motion localisation only works well when there are a large number of clicks over a long time period. The Filters tab allows users to select which click trains are localised and also to remove spurious results from unsuccessful localisations. The Pre Localisation Filter allows users to select a minimum number of detections before localisations are attempted and a minimum bearing change in the click train (Min Angle range). Click trains with larger angle ranges will generally result in higher quality localisations.  
+ 
+<p align="center">
+  <img width="242" height="430" src = "resources/localisation2.png">
+</p>
+
+_The filter tab allows users to pre-filter which click train are localised._
+
+The Results Filter allows for spurious localisation results to be deleted: any results from target motion localisation (which can have more than one possible localisation) which are further away than Maximum Range, shallower than Minimum Depth or deeper than Maximum Depth are discarded.  
+Running
+The click train detector can be run in real time or post processing. In real time add the module and it will automatically detected click trains once PAMGuard started. 
+
+ <p align="center">
+  <img width="200" height="300" src = "resources/offlineprocessing.png">
+</p>
+
+_TThe filter tab allows users to pre-filter which click train are localised._ 
+
+In viewer mode, add the module and then go to Settings>Click Train Detector > Reanalyse click trains….This will bring up PAMGuard’s generic data reprocessing dialog with two settings, Click Train Detector or Click Train Classifier. The Click Train Detector option will run the detection and classification algorithm again. The Click Train Classifier will only run the classification algorithm on existing detected click trains (much faster). Note that users can select how much data to reprocess in the Data dropdown menu – All Data means the entire dataset will be reprocessed, Loaded Data means just the current data loaded in the display (all scrollable data), Select Data allows the user to define two time limits between which all data is reprocessed. 
+
+## Visualising Results
+The results from the click train detector can be visualised in a variety of displays in PAMGuard. 
+
+### Click bearing time display
+By default, clicks trains will be shown in the Click Detector Module’s in built bearing time display. Different click trains are represented as different colours. Note that you must right click on the display and select Colour by Click Trains 
+
+<p align="center">
+  <img width="940" height="500" src = "resources/clicktrain_BT.png">
+</p>
+
+_The results of the click train detector displayed on the bearing time display. Different colours correspond to different click trains._
+
+### Time Display FX
+The Time Display FX is a more modern display which allows any time-based data to be plotted together on a large variety of y-axis (e.g., frequency, bearing, amplitude etc.). Click trains will be plotted on the time-based display by adding Click detections to the display and then using the right   
+
+
+<p align="center">
+  <img width="940" height="500" src = "resources/clicktrain_TDFX.png">
+</p>
+
+_. Click train data displayed in the time display FX. Users can right click on click trains to view average spectra and waterfall spectrograms (shown here in top right)._

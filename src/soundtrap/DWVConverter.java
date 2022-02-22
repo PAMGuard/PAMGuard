@@ -46,7 +46,7 @@ public class DWVConverter {
 	}
 
 	public void start() {
-		dwvWorker = new DWVWorker();
+		dwvWorker = new DWVWorker();		
 		keepRunning = true;
 		dwvWorker.execute();
 	}

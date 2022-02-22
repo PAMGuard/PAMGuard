@@ -120,11 +120,7 @@ public class KetosWorker extends DLModelWorker<KetosResult> {
 //								System.out.println("Class name " + i + "  "  + dlParams.classNames[i]); 
 //							}
 //						}
-			
-	
 //			ketosDLParams.classNames = dlControl.getClassNameManager().makeClassNames(ketosParams.classNames); 
-
-			
 //									if (ketosParams.classNames!=null) {
 //										for (int i = 0; i<ketosDLParams.classNames.length; i++) {
 //											System.out.println("Class name " + i + "  "  + ketosDLParams.classNames[i].className + " ID " + ketosDLParams.classNames[i].ID ); 
