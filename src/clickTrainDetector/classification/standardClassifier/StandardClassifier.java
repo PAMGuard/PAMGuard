@@ -7,6 +7,7 @@ import clickTrainDetector.ClickTrainControl;
 import clickTrainDetector.classification.CTClassification;
 import clickTrainDetector.classification.CTClassifier;
 import clickTrainDetector.classification.CTClassifierParams;
+import clickTrainDetector.classification.CTClassifierType;
 import clickTrainDetector.classification.bearingClassifier.BearingClassifier;
 import clickTrainDetector.classification.bearingClassifier.BearingClassifierParams;
 import clickTrainDetector.classification.idiClassifier.IDIClassification;
@@ -50,6 +51,13 @@ public class StandardClassifier implements CTClassifier {
 	 * Click train control. 
 	 */
 	private ClickTrainControl clickTrainControl; 
+	
+	
+	/**
+	 * The classifier types used in the standard classifier. 
+	 * ****New types MUST BE ADDED HERE****
+	 */
+	public static CTClassifierType[] CLASSIFIER_TYPES = {CTClassifierType.CHI2THRESHOLD, CTClassifierType.IDICLASSIFIER, CTClassifierType.TEMPLATECLASSIFIER, CTClassifierType.BEARINGCLASSIFIER}; 
 
 	public StandardClassifier(ClickTrainControl clickTrainControl, int speciesID) {
 		this.clickTrainControl = clickTrainControl; 
@@ -65,18 +73,32 @@ public class StandardClassifier implements CTClassifier {
 	 */
 	private void createClassifiers() {
 		classifiers = new ArrayList<CTClassifier>(); 
+
 		
-		classifiers.add(new Chi2ThresholdClassifier(clickTrainControl, SUB_CLASSIFIER_SPECIESID));
-		
-		classifiers.add(new IDIClassifier(clickTrainControl,SUB_CLASSIFIER_SPECIESID));
-			
-		classifiers.add(new CTTemplateClassifier(clickTrainControl, SUB_CLASSIFIER_SPECIESID));
-		
-		classifiers.add(new BearingClassifier(clickTrainControl, SUB_CLASSIFIER_SPECIESID));
-		
+		//do this so that is CLASSIFIER_TYPES changes order things still work. 
+		for (int i=0; i<CLASSIFIER_TYPES.length; i++) {
+
+			switch (CLASSIFIER_TYPES[i]) {
+			default:
+				break;
+			case CHI2THRESHOLD:
+				classifiers.add(new Chi2ThresholdClassifier(clickTrainControl, SUB_CLASSIFIER_SPECIESID));
+				break;
+			case IDICLASSIFIER:
+				classifiers.add(new IDIClassifier(clickTrainControl,SUB_CLASSIFIER_SPECIESID));
+				break;
+			case TEMPLATECLASSIFIER:
+				classifiers.add(new CTTemplateClassifier(clickTrainControl, SUB_CLASSIFIER_SPECIESID));
+				break;
+			case BEARINGCLASSIFIER:
+				classifiers.add(new BearingClassifier(clickTrainControl, SUB_CLASSIFIER_SPECIESID));
+				break;
+			}
+		}
+
 		setClassifierParams();
 	}
-	
+
 	/**
 	 * Set the parameters for the individual classifiers
 	 */
