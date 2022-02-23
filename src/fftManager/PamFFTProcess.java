@@ -72,7 +72,7 @@ public class PamFFTProcess extends PamProcess {
 	
 	private double[] dataToFFT;
 
-	private ComplexArray fftData;
+//	private ComplexArray fftData;
 
 	private double[] fftRealBlock;
 
@@ -198,7 +198,7 @@ public class PamFFTProcess extends PamProcess {
 				channelPointer[i] = 0;
 			}
 		}
-		fftData = new ComplexArray(fftParameters.fftLength);
+//		fftData = new ComplexArray(fftParameters.fftLength);
 		/*
 		 * Tell the output data block - should then get passed on to Spectrogram
 		 * display which can come back and work it out for itself that life has
