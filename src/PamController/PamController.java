@@ -2461,7 +2461,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 	}
 
 	/**
-	 * Respond to storage options dialog. 
+	 * Respond to storage options dialog. Selects whethere data 
+	 * are stored in binary, database or both
 	 * @param parentFrame 
 	 */
 	public void storageOptions(JFrame parentFrame) {

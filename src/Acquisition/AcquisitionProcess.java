@@ -124,10 +124,14 @@ public class AcquisitionProcess extends PamProcess {
 //		daqStatusDataBlock.
 		addOutputDataBlock(daqStatusDataBlock);
 		daqStatusDataBlock.SetLogging(new AcquisitionLogging(daqStatusDataBlock, acquisitionControl));
-//		if (acquisitionControl.isViewer() || acquisitionControl.isNetRx()) {
-			daqStatusDataBlock.setBinaryDataSource(new DaqStatusBinaryStore(daqStatusDataBlock, acquisitionControl));
+		
+		/**
+		 * We really don't wand the binary data source set for normal ops since it stops the data getting
+		 * written to the database by default. When using certain Network receiver settings, they use binary 
+		 * type data, so do need it. this will therefore be configured from the network receiver when required.  
+		 */
+//			daqStatusDataBlock.setBinaryDataSource(new DaqStatusBinaryStore(daqStatusDataBlock, acquisitionControl));
 			AbstractScrollManager.getScrollManager().addToSpecialDatablock(daqStatusDataBlock);
-//		}
 		daqStatusDataBlock.setMixedDirection(PamDataBlock.MIX_INTODATABASE);
 
 		setupDataBlock();
@@ -916,9 +920,11 @@ public class AcquisitionProcess extends PamProcess {
 	 */
 	public double rawAmplitude2dB(double rawAmplitude, int channel, boolean fast){
 
+		channel = checkSingleChannel(channel);
+		
 		double constantTerm;
-		if (fast && fixedAmplitudeConstantTerm != 0) {
-			constantTerm = fixedAmplitudeConstantTerm;
+		if (fast && fixedAmplitudeConstantTerm[channel] != 0) {
+			constantTerm = fixedAmplitudeConstantTerm[channel];
 		}
 		else {
 			constantTerm = getAmplitudeConstantTerm(channel); 
@@ -940,6 +946,18 @@ public class AcquisitionProcess extends PamProcess {
 		return dB;
 	}
 
+	/**
+	 * Check it's a single channel and not a channel map. 
+	 * @param channel
+	 * @return single channel if it seemed to be a bitmap. 
+	 */
+	private int checkSingleChannel(int channel) {
+		int bitCount = PamUtils.getNumChannels(channel);
+		if (bitCount > 1 || channel > 32) {
+			channel = PamUtils.getLowestChannel(channel);
+		}
+		return channel;
+	}
 
 	/**
 	 * Some devices may be setting this per channel.
@@ -965,17 +983,20 @@ public class AcquisitionProcess extends PamProcess {
 	 * like preamp gain will remain constant. Contains a constant
 	 * term in the SPL calculations bases on preamp gains and 
 	 * hdrophone sensitivities. 
+	 * Changes to be channel specific since with multi threading it goes horribly 
+	 * wrong if different channels have different sensitivities. 
 	 */
-	double fixedAmplitudeConstantTerm;
+	private double[] fixedAmplitudeConstantTerm = new double[PamConstants.MAX_CHANNELS];
 	
-	DaqSystem ampSystem;
+	private DaqSystem ampSystem;
 	/**
-	 * Gets the fixedAmplitudeConstantTerm based on channel and hydrophone
-	 * numbers. 
+	 * Gets the fixedAmplitudeConstantTerm based on channel and hydrophone This is 
+	 * the hydrophone sensitivity + all gains + ADC sensitivity in counts / volt. 
 	 * @param channel = single software channel
 	 * @return constant term for amplitude calculations
 	 */
 	private double getAmplitudeConstantTerm(int channel) {
+		channel = checkSingleChannel(channel);
 		// need to fish around a bit working out which hydrophone it is, etc.
 		PamArray array = ArrayManager.getArrayManager().getCurrentArray();
 		int hydrophoneChannel = acquisitionControl.getChannelHydrophone(channel);
@@ -996,12 +1017,14 @@ public class AcquisitionProcess extends PamProcess {
 		}
 		return (hSens + preamp.getGain() + xtra);
 	}
+	
 	/**
 	 * Prepares for fast amplitude calculations
 	 * @param channel
 	 */
-	public void prepareFastAmplitudeCalculation(int channel) {
-		fixedAmplitudeConstantTerm = getAmplitudeConstantTerm(channel);
+	public double prepareFastAmplitudeCalculation(int channel) {
+		channel = checkSingleChannel(channel);
+		return fixedAmplitudeConstantTerm[channel] = getAmplitudeConstantTerm(channel);
 	}
 
 	/**

@@ -109,7 +109,12 @@ public class FilterControl extends PamControlledUnit implements PamSettings {
 	public void notifyModelChanged(int changeType) {
 		//System.out.println("FFTControl: notifyModelChanged : " +changeType);
 		super.notifyModelChanged(changeType);
-		if (filterGUIFX!=null) filterGUIFX.notifyGUIChange(changeType);
+		if (changeType == PamController.INITIALIZATION_COMPLETE) {
+			filterProcess.setupProcess();
+		}
+		if (filterGUIFX!=null) {
+			filterGUIFX.notifyGUIChange(changeType);
+		}
 	}
 	
 	public Serializable getSettingsReference() {

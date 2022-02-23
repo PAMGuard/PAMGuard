@@ -266,7 +266,7 @@ public class Pamguard {
 		}
 
 		System.out.println("PAMGUARD Version " + PamguardVersionInfo.version + " branch " + PamguardVersionInfo.getReleaseType().toString());
-		System.out.println("Revision " + PamguardVersionInfo.getRevision());
+//		System.out.println("Revision " + PamguardVersionInfo.getRevision());
 		System.out.println("Build Date " + PamguardVersionInfo.date);
 		writePropertyString("user.dir");
 		writePropertyString("java.home");

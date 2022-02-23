@@ -235,7 +235,7 @@ public class PamguardXMLWriter implements PamSettings {
 		String name = pamController.getPSFName();
 		info.setAttribute("CONFIGURATION", name);
 		info.setAttribute("VERSION", PamguardVersionInfo.version);
-		info.setAttribute("REVISION", PamguardVersionInfo.revisionString);
+//		info.setAttribute("REVISION", PamguardVersionInfo.revisionString);
 		info.setAttribute("RELEASETYPE", PamguardVersionInfo.getReleaseType().toString());
 		info.setAttribute("JAVA", VersionInfo.getVersion());
 		return info;
@@ -823,7 +823,7 @@ public class PamguardXMLWriter implements PamSettings {
 		root.appendChild(vInfo);
 		vInfo.setAttribute("Created", PamCalendar.formatDateTime(System.currentTimeMillis()));
 		vInfo.setAttribute("Version", PamguardVersionInfo.version);
-		vInfo.setAttribute("Revision", PamguardVersionInfo.revisionString);
+//		vInfo.setAttribute("Revision", PamguardVersionInfo.revisionString);
 		vInfo.setAttribute("ReleaseType", PamguardVersionInfo.getReleaseType().toString());
 
 

@@ -97,7 +97,7 @@ public class LoadOptionsDialog extends PamDialog {
 //		parentComponent.getp
 		setDialogComponent(panel);
 //		setSize(new Dimension(300,200));
-		pack();
+//		pack();
 		setLocationRelativeTo(parentComponent);
 		
 		
@@ -173,6 +173,7 @@ public class LoadOptionsDialog extends PamDialog {
 		stepSize.setText(String.format("%d", scroller.scrollerData.pageStep));
 		minDuration = scrollerData.getStepSizeMillis()*100;
 		maxDuration = minDuration * 1000000;
+		pack();
 	}
 	
 	private void setDuration(long duration) {

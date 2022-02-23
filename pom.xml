@@ -3,8 +3,8 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.pamguard</groupId>
-  <artifactId>PamguardBeta</artifactId>
-  <version>2.02.02</version>
+  <artifactId>Pamguard</artifactId>
+  <version>2.02.03</version>
   <name>Pamguard Java12+</name>
   <description>Pamguard for Java 12+, using Maven to control dependcies</description>
 	<url>www.pamguard.org</url>
@@ -772,7 +772,7 @@
 	    <version>1.0.2</version>
 	</dependency>
 	 -->
-	 
+
 	<!-- not in Maven repository -->
  	<dependency>
 	    <groupId>pamguard.org</groupId>

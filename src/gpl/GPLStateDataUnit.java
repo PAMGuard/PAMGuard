@@ -1,5 +1,6 @@
 package gpl;
 
+import PamguardMVC.DataUnitBaseData;
 import PamguardMVC.PamDataUnit;
 
 public class GPLStateDataUnit extends PamDataUnit {
@@ -24,6 +25,23 @@ public class GPLStateDataUnit extends PamDataUnit {
 		super(timeMilliseconds);
 		setSequenceBitmap(1<<sequenceNum);
 		setChannelBitmap(channelMap);
+		this.baseline = baseline;
+		this.peakState = peakState;
+		this.ceilnoise = ceilnoise;
+		this.threshfloor = threshfloor;
+	}
+	
+	/**
+	 * constructor used reading back from binary files. 
+	 * @param baseData
+	 * @param baseline
+	 * @param ceilnoise
+	 * @param threshfloor
+	 * @param peakState
+	 */
+	public GPLStateDataUnit(DataUnitBaseData baseData,double baseline, 
+			double ceilnoise, double threshfloor, int peakState) {
+		super(baseData);
 		this.baseline = baseline;
 		this.peakState = peakState;
 		this.ceilnoise = ceilnoise;

@@ -7,9 +7,9 @@ import PamView.PamOldSymbolManager;
 
 public class VRSymbolManager implements ManagedSymbol {
 		
-		PamSymbol symbol;
+		private PamSymbol symbol;
 		
-		ManagedSymbolInfo symbolInfo;
+		private ManagedSymbolInfo symbolInfo;
 		
 		public VRSymbolManager(PamSymbol defSymbol, String description) {
 			symbolInfo = new ManagedSymbolInfo(description);

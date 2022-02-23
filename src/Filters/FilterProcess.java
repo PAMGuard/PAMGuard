@@ -75,8 +75,12 @@ public class FilterProcess extends PamProcess {
 		if (rawDataBlock == null) {
 			return;
 		}
-		filterControl.filterParams.channelBitmap &= rawDataBlock.getChannelMap();
-		outputData.setChannelMap(filterControl.filterParams.channelBitmap);
+		boolean initComplete = PamController.getInstance().isInitializationComplete();
+		if (initComplete) {
+			int rawChannels = rawDataBlock.getChannelMap();
+			filterControl.filterParams.channelBitmap &= rawDataBlock.getChannelMap();
+			outputData.setChannelMap(filterControl.filterParams.channelBitmap);
+		}
 		int maxChan = PamUtils.getHighestChannel(filterControl.filterParams.channelBitmap);
 		iirfFilters = new Filter[maxChan+1];
 		FilterMethod filterMethod = FilterMethod.createFilterMethod(getSampleRate(), filterControl.filterParams.filterParams);

@@ -69,7 +69,7 @@ public class RWStandardClassifier implements RWClassifier {
 	@Override
 	public int getSoundClass(RWESound aSound) {
 		int soundType = 0;
-
+		
 		if (!isTonal(aSound)) {
 			return 0;
 		}

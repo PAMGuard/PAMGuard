@@ -417,6 +417,8 @@ public abstract class ScrollingImageSegmenter {
 	 * @param tm - the repaint time in millis.
 	 */
 	public void paintImages(GraphicsContext g, TDProjectorFX tdProjector, double scrollStart, long tm) {
+		//System.out.println("ScrollingImageSegmenter: paintImages: " + tm); 
+
 		if (tm==0) {
 			paintImages(g, tdProjector, scrollStart);
 			return;
@@ -452,6 +454,7 @@ public abstract class ScrollingImageSegmenter {
 		double y1; 
 		double y2; 
 		double tcMillis; 
+				
 		for (int i=0; i<this.imageSegments.size(); i++) {
 			//Parameters:
 			//    img - the image to be drawn or null.
@@ -482,8 +485,8 @@ public abstract class ScrollingImageSegmenter {
 			y2=tdProjector.getYPix(maxYVal); 
 
 
-			//			System.out.println("Paint the image: tC: "
-			//					+ "" + tC + " tCEnd: " + tCEnd + " tcMillis " + tcMillis + " y1: " + y1 + " y2 " + y2 ); 
+//						System.out.println("Paint the image: tC: "
+//								+ "" + tC + " tCEnd: " + tCEnd + " tcMillis " + tcMillis + " y1: " + y1 + " y2 " + y2 ); 
 
 			g.drawImage(imageSegments.get(i),
 					0,
