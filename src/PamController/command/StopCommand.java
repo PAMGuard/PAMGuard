@@ -15,4 +15,8 @@ public class StopCommand extends ExtCommand {
 	}
 
 
+	@Override
+	public String getHint() {
+		return "Stop PAMGuard processing";
+	}
 }

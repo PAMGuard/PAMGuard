@@ -56,4 +56,8 @@ public class SummaryCommand extends ExtCommand {
 		return totalString;
 	}
 
+	@Override
+	public String getHint() {
+		return "Get summary information about each running process";
+	}
 }

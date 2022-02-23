@@ -28,6 +28,7 @@ import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamguardVersionInfo;
 import PamController.pamBuoyGlobals;
+import PamController.command.TerminalController;
 import PamModel.SMRUEnable;
 import PamUtils.FileFunctions;
 import PamUtils.PamExceptionHandler;
@@ -298,7 +299,7 @@ public class Pamguard {
 		if(runMode == PamController.RUN_REMOTE) {
 			spashTime = 0;
 		}
-		if (spashTime > 0) {
+		if (spashTime > 0 && (PamGUIManager.getGUIType() != PamGUIManager.NOGUI)) {
 			new Splash(spashTime, chosenRunMode);
 		}
 		//		
@@ -323,8 +324,14 @@ public class Pamguard {
 		else {
 			PamController.create(chosenRunMode);
 		}		
+		
+		if (PamGUIManager.getGUIType() == PamGUIManager.NOGUI) {
+			TerminalController tc = new TerminalController(PamController.getInstance());
+			tc.getTerminalCommands();
+		}
 
 	}
+
 
 	static private String writePropertyString(String key) {
 		String property = System.getProperty(key);

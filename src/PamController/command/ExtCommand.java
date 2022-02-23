@@ -107,5 +107,11 @@ public abstract class ExtCommand {
 		this.immediate = immediate;
 	}
 	
-	
+	/**
+	 * Get a hint text for the help command. 
+	 * @return hint text. 
+	 */
+	public String getHint() {
+		return null;
+	};
 }
