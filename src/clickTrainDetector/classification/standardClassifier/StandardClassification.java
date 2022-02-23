@@ -3,6 +3,7 @@ package clickTrainDetector.classification.standardClassifier;
 import clickTrainDetector.classification.CTClassification;
 import clickTrainDetector.classification.CTClassifierType;
 import clickTrainDetector.classification.ClassifierJSONLogging;
+import clickTrainDetector.classification.bearingClassifier.BearingClassifierJSON;
 
 /**
  * A classification object for a standard classification 
@@ -23,6 +24,10 @@ public class StandardClassification implements CTClassification {
 	private CTClassification[] ctClassifications;
 	
 	
+	public CTClassification[] getCtClassifications() {
+		return ctClassifications;
+	}
+
 	/**
 	 * Standard classifier JSON logging. 
 	 */
@@ -41,9 +46,15 @@ public class StandardClassification implements CTClassification {
 	 * @param jsonstring
 	 */
 	public StandardClassification(String jsonstring) {
+		standardClassifierJSONLogging = new StandardClassificationJSON(); 
 		
+		CTClassification classification  = standardClassifierJSONLogging.createClassification(jsonstring); 
 		
+		this.ctClassifications = ((StandardClassification) classification).getCtClassifications();
+		this.speciesID			=classification.getSpeciesID(); 
+
 	}
+	
 
 	@Override
 	public CTClassifierType getClassifierType() {
