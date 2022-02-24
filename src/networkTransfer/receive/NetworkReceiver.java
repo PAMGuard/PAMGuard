@@ -646,15 +646,17 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings, N
 		try {
 			objectId = ds.readInt();
 			moduleVersion = ds.readInt();
-			baseData.readBaseData(ds, receivedData.getDataVersion());
 //			millis = ds.readLong();
 //			if (dataVersion2 >= 2) {
 //				nanos = ds.readLong();
 //				channelMap = ds.readInt();
 //			}
+			baseData.readBaseData(ds, receivedData.getDataVersion());
 			dataLength = ds.readInt();
 			data = new byte[dataLength];
-			ds.read(data);
+			int bytesRead = ds.read(data);
+//			System.out.printf("NetRX read %d of expected %d bytes\n", bytesRead, dataLength);
+//			if (1>0) return null;
 			ds.close();
 		} catch (IOException e) {
 			e.printStackTrace();

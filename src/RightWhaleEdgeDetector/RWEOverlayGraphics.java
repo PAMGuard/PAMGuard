@@ -65,12 +65,17 @@ public class RWEOverlayGraphics extends PamDetectionOverlayGraphics {
 		int[] polyY = new int[pf.length];
 		int[] edgeX = new int[pf.length*2];
 		int[] edgeY = new int[pf.length*2];
+		boolean isWrapped = false;
 		for (int i = 0, j = pf.length*2-1; i < pf.length; i++, j--) {
 			double t = t0 + (double) tbin[i] * ffthop / fs * 1000.;
 			double f = pf[i] * fs/fftLen;
 			 Point2D pos = generalProjector.getCoord3d(t, f, 0).getPoint2D();
 			 polyX[i] = (int) pos.getX();
 			 polyY[i] = (int) pos.getY();
+			 if (polyX[i] < polyX[0]) {
+				 isWrapped = true;
+				 polyX[i] += g.getClipBounds().width;
+			 }
 			 edgeX[i] = edgeX[j] = polyX[i];
 			 Point2D pe = generalProjector.getCoord3d(t, highF[i]*fs/fftLen, 0).getPoint2D();
 			 edgeY[i] = (int) pe.getY();
@@ -87,6 +92,13 @@ public class RWEOverlayGraphics extends PamDetectionOverlayGraphics {
 		}		
 //		g.drawPolyline(polyX, polyY, polyX.length);
 		g.drawPolygon(edgeX, edgeY, edgeX.length);
+		if (isWrapped) {
+			int dx = g.getClipBounds().width;
+			for (int i = 0; i < edgeX.length; i++) {
+				edgeX[i] -= dx;
+			}
+			g.drawPolygon(edgeX, edgeY, edgeX.length);
+		}
 		
 		return r;
 	}

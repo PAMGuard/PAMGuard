@@ -6,12 +6,13 @@ import java.io.IOException;
 
 import networkTransfer.NetworkObject;
 import networkTransfer.receive.NetworkReceiver;
-
+import PamguardMVC.DataUnitBaseData;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 
 import binaryFileStorage.BinaryDataSource;
 import binaryFileStorage.BinaryObjectData;
+import binaryFileStorage.BinaryStore;
 import jsonStorage.JSONObjectDataSource;
 
 //import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
@@ -73,16 +74,23 @@ public class NetworkObjectPacker {
 		short dataType1 = NetworkReceiver.NET_PAM_DATA;
 		BinaryDataSource binarySource = dataBlock.getBinaryDataSource();
 		int dataType2 = dataBlock.getQuickId();
+		
 		BinaryObjectData packedObject = binarySource.getPackedData(dataUnit);
 		byte[] data = packedObject.getData();
-		int duDataLength = data.length + 20;
+		int duDataLength = data.length + 12;
+		DataUnitBaseData baseData = dataUnit.getBasicData();
+		int baseDataLength = baseData.getBaseDataBinaryLength();
+		duDataLength += baseDataLength;
+		
+		
 //		ByteOutputStream bos = new ByteOutputStream(duDataLength);
 		ByteArrayOutputStream bos = new ByteArrayOutputStream(duDataLength);
 		DataOutputStream dos = new DataOutputStream(bos);
-		try {
+		try { // these are the extra 20 bytes refered to above. 
 			dos.writeInt(packedObject.getObjectType());
 			dos.writeInt(binarySource.getModuleVersion());
-			dos.writeLong(dataUnit.getTimeMilliseconds());
+//			dos.writeLong(dataUnit.getTimeMilliseconds());
+			baseData.writeBaseData(dos, BinaryStore.getCurrentFileFormat());
 			dos.writeInt(data.length);
 			dos.write(data);
 		} catch (IOException e) {
@@ -131,7 +139,7 @@ public class NetworkObjectPacker {
 		try {
 			dos.writeInt(DATASTARTFLAG);
 			dos.writeInt(totalSize);
-			dos.writeShort(1); // header version
+			dos.writeShort(BinaryStore.getCurrentFileFormat()); // header version
 			dos.writeShort(buoyId1);
 			dos.writeShort(buoyId2);
 			dos.writeShort(dataType1);
