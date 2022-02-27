@@ -61,4 +61,9 @@ public class StatusCommand extends ExtCommand {
 		return watchdogComms.getModifiedWatchdogState(status);
 	}
 
+
+	@Override
+	public String getHint() {
+		return "Get the current PAMGuard status. 0=idle, 1=running";
+	}
 }

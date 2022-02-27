@@ -1,6 +1,7 @@
 package PamController;
 
 import PamView.GuiFrameManager;
+import PamView.NullGuiController;
 import pamViewFX.PamGuiManagerFX;
 
 /**
@@ -39,7 +40,7 @@ public class PamGUIManager {
 	public static PAMControllerGUI createGUI(PamController pamController, Object object) {
 		switch (guiType) {
 		case NOGUI: 
-			return null; 
+			return new NullGuiController(pamController); 
 		case SWING: 
 			return new GuiFrameManager(pamController); 
 		case FX: 

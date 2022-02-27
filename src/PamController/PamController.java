@@ -54,6 +54,7 @@ import generalDatabase.DBControlUnit;
 import javafx.stage.Stage;
 import Array.ArrayManager;
 import PamController.command.NetworkController;
+import PamController.command.TerminalController;
 import PamController.command.WatchdogComms;
 import PamController.masterReference.MasterReferencePoint;
 import PamController.settings.output.xml.PamguardXMLWriter;
@@ -269,6 +270,11 @@ public class PamController implements PamControllerInterface, PamSettings {
 		setupPamguard();
 
 		setupGarbageCollector();
+		
+
+//		if (PamGUIManager.getGUIType() == PamGUIManager.NOGUI) {
+//		}
+		
 		//		diagnosticTimer = new Timer(1000, new DiagnosticTimer());
 		//		diagnosticTimer.start();
 	}
@@ -293,7 +299,10 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 */
 	public static void create(int runMode) {
 		if (uniqueController == null) {
-			new PamController(runMode, null);
+			PamController pamcontroller = new PamController(runMode, null);
+			// I don't see any reason not have have this running with the GUI. 
+			TerminalController tc = new TerminalController(pamcontroller);
+			tc.getTerminalCommands();
 		}
 	}
 	

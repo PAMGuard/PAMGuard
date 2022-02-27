@@ -13,4 +13,8 @@ public class PingCommand extends ExtCommand {
 		return true;
 	}
 
+	@Override
+	public String getHint() {
+		return "ping PAMGuard to see if it's alive";
+	}
 }
