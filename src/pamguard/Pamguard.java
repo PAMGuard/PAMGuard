@@ -325,10 +325,6 @@ public class Pamguard {
 			PamController.create(chosenRunMode);
 		}		
 		
-		if (PamGUIManager.getGUIType() == PamGUIManager.NOGUI) {
-			TerminalController tc = new TerminalController(PamController.getInstance());
-			tc.getTerminalCommands();
-		}
 
 	}
 

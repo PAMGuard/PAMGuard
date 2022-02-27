@@ -11,6 +11,7 @@ public class TerminalController extends CommandManager {
 	private BufferedReader reader;
 
 	private static String unitName = "Terminal Controller";
+	
 	public TerminalController(PamController pamController) {
 		super(pamController, unitName);
 	}
@@ -32,6 +33,21 @@ public class TerminalController extends CommandManager {
 	}
 
 	public void getTerminalCommands() {
+		Thread t = new Thread(new TerminalTread());
+		t.start();
+	}
+	
+	private class TerminalTread implements Runnable {
+
+		@Override
+		public void run() {
+			readCommands();
+		}
+		
+	}
+	
+	private void readCommands() {
+
         reader = new BufferedReader(
         		new InputStreamReader(System.in));
         try {
@@ -49,8 +65,5 @@ public class TerminalController extends CommandManager {
         	e.printStackTrace();
         } 
         System.out.println("Exiting PAMGuard, leave control thread");
-//		PamController pc =PamController.getInstance();
-//		pc.pamClose();
-//		System.exit(0);
 	}
 }

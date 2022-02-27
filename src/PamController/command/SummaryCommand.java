@@ -35,7 +35,7 @@ public class SummaryCommand extends ExtCommand {
 			lastCallTime = PamCalendar.getSessionStartTime();
 		}
 		long nowTime = PamCalendar.getTimeInMillis();
-		totalString = PamCalendar.formatDateTime(lastCallTime) + "-" + PamCalendar.formatDateTime(nowTime);
+		totalString = PamCalendar.formatDBDateTime(lastCallTime) + "-" + PamCalendar.formatDBDateTime(nowTime);
 		int usedModules = 0;
 		for (int i = 0; i < nMod; i++) {
 			aModule = pamController.getControlledUnit(i);
@@ -44,12 +44,6 @@ public class SummaryCommand extends ExtCommand {
 				continue;
 			}
 			usedModules ++;
-			/*
-		strcat(moduleSummaryText, "\n");
-		strcat(moduleSummaryText, module->getModuleName());
-		strcat(moduleSummaryText, ":");
-		strcat(moduleSummaryText, moduleText);
-			 */
 			totalString += String.format("\n<%s>%s:%s<\\%s>", aModule.getShortUnitType(), 
 					aModule.getUnitName(), aString, aModule.getShortUnitType());
 		}
