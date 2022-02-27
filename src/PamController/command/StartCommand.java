@@ -35,4 +35,9 @@ public class StartCommand extends ExtCommand {
 		return returnString;
 	}
 
+	@Override
+	public String getHint() {
+		return "Start PAMGuard processing";
+	}
+
 }
