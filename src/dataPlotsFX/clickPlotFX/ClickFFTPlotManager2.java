@@ -90,6 +90,8 @@ public class ClickFFTPlotManager2 extends FFTPlotManager  {
 			double[][] spectrum=clickSpectrogram.getSpectrogram(chanClick); 		
 			
 			double clipLevel = ArrayManager.getArrayManager().getCurrentArray().getClipLevel(PamUtils.getChannelArray(pamDataUnit.getChannelBitmap())[chanClick]); 
+			
+			//System.out.println("clipLevel: " + clipLevel); 
 
 			drawClipSpectrogram(spectrum,  pamDataUnit.getTimeMilliseconds(), 
 					writableImage.getScrollingPLot2DSegmenter().getMaxY(), clickPlotInfoFX.getClickDisplayParams().fftHop,
