@@ -1530,6 +1530,9 @@ public class SweepClassifierDialog extends PamDialog implements ImportExportUser
 		if  (clickControl!=null) {
 			int[] chanGroups = clickControl.getClickParameters().getGroupedSourceParameters().getChannelGroups();
 			multiChan = false;
+			
+			if (chanGroups==null) return multiChan; 
+			
 			for (int i=0; i<chanGroups.length; i++) {
 				int chans = clickControl.getClickParameters().getGroupedSourceParameters().getGroupChannels(i);
 //				Debug.out.println("Check multi-channel: " + chanGroups[i] + "  num: " + PamUtils.getNumChannels(chans));
