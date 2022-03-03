@@ -348,6 +348,9 @@ public abstract class FFTPlotManager {
 
 			//how many lines in the image does the FFT take up?
 
+			Color prevCol;
+			Color col = null;
+			int argb;
 			for (int j=0; j<writableImage.getHeight(); j++) {
 				
 				writableImage.getPixelWriter().setColor(0, j, Color.BLACK); 
@@ -360,7 +363,19 @@ public abstract class FFTPlotManager {
 				//find the correct colour for the spectrogram value and draw
 				for (int k=0; k<nslices; k++) {
 					if ((tc+k)>=writableImage.getWidth()) continue; 
-					writableImage.getPixelWriter().setColor(tc+k, j, getSpectrumColour(spectrogram[i][spec], clipLevel, rawClipInfo.getDataBlock().getSampleRate(), fftLength));
+					
+					//what do we do if a colour is already there? Take an avaerge with the other colours...
+					argb = writableImage.getPixelReader().getArgb(tc+k, j);
+					
+					col = getSpectrumColour(spectrogram[i][spec],clipLevel, rawClipInfo.getDataBlock().getSampleRate(), fftLength);
+
+					if (argb>0) {
+						prevCol = Color.rgb((argb >> 16) & 0xFF, (argb >> 8) & 0xFF, (argb) & 0xFF);	
+						col = Color.rgb((int) (col.getRed()+prevCol.getRed())/2, (int) (col.getGreen()+prevCol.getGreen())/2, 
+								(int) (col.getBlue()+prevCol.getBlue())/2);
+					}
+							
+					writableImage.getPixelWriter().setColor(tc+k, j, col);
 				}
 			}
 			//			}

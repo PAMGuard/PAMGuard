@@ -125,8 +125,6 @@ public class ClickFFTPlotManager2 extends FFTPlotManager  {
 		double[] minMax=PamUtils.getMinAndMax(spectrum);
 		double cutOff=clickPlotInfoFX.getClickDisplayParams().fftCutOf*minMax[1];  
 		double binSize = maxFreq/(double) spectrum.length; 
-		
-
 		//		System.out.println("cutOff: "+cutOff+ " fftCutOf: " + clickDisplayParams.fftCutOf);
 
 		int y1, y2; 
@@ -143,8 +141,6 @@ public class ClickFFTPlotManager2 extends FFTPlotManager  {
 		if (clickPlotInfoFX.getClickDisplayParams().fftCutOf==0){
 			y1=writableImage.getScrollingPLot2DSegmenter().getImageYPixels(0, writableImage); 
 			y2=writableImage.getScrollingPLot2DSegmenter().getImageYPixels(maxFreq, writableImage); 
-
-
 
 			strokeLine(writableImage, tc, y1, y2, ffColor); 
 		}
