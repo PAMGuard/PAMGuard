@@ -684,7 +684,7 @@ public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 	 * @param g
 	 * @param pamDataUnit
 	 * @param generalProjector
-	 * @return
+	 * @return updated rectange
 	 */
 	protected Rectangle drawOnSpectrogram(Graphics g, PamDataUnit pamDataUnit, GeneralProjector generalProjector) {
 		// draw a rectangle with time and frequency bounds of detection.
@@ -700,11 +700,8 @@ public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 				pamDetection.getSampleDuration() * 1000./parentDataBlock.getSampleRate(),
 				frequency[0], 0);
 				
-		boolean isWrapped = false;
 		if (botRight.x < topLeft.x){
-			// this means it's wrapped.
-			isWrapped = true;
-			botRight.x += g.getClipBounds().width;
+			botRight.x = g.getClipBounds().width;
 		}
 		if (generalProjector.isViewer()) {
 			Coordinate3d middle = new Coordinate3d();
@@ -726,13 +723,8 @@ public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 			// Not actually drawing on a spectrogramProjector, so don't have any info on the background color
 		}
 
-		if (isWrapped) {
-			g.drawRect((int) topLeft.x-g.getClipBounds().width, (int) topLeft.y, 
-					(int) botRight.x - (int) topLeft.x, (int) botRight.y - (int) topLeft.y);
-		}
 		g.drawRect((int) topLeft.x, (int) topLeft.y, 
 				(int) botRight.x - (int) topLeft.x, (int) botRight.y - (int) topLeft.y);
-		
 		return new Rectangle((int) topLeft.x, (int) topLeft.y, 
 				(int) botRight.x - (int) topLeft.x, (int) botRight.y - (int) topLeft.y);
 	}

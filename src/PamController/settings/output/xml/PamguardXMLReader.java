@@ -449,6 +449,7 @@ public class PamguardXMLReader {
 		return classNodes;
 	}
 
+	
 	public ArrayList<Node> findSettingsForClass(String className) {
 		ArrayList<Node> allSettings = new ArrayList<>();
 		if (moduleNodes == null) {
