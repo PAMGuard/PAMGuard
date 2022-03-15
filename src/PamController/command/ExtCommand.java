@@ -37,14 +37,14 @@ public abstract class ExtCommand {
 	 * @return true if the command executed OK, or if it was sent off
 	 * to execute in a later thread. 
 	 */
-	public final boolean executeCommand() {
+	public final String executeCommand(String commandString) {
 		if (immediate) {
-			return execute();
+			return execute(commandString);
 		}
 		
-		SwingUtilities.invokeLater(new ExecuteLater());		
+		SwingUtilities.invokeLater(new ExecuteLater(commandString));		
 		
-		return true;
+		return "Command sent";
 	}
 	
 	/**
@@ -54,28 +54,35 @@ public abstract class ExtCommand {
 	 */
 	private class ExecuteLater implements Runnable {
 
+		private String command;
+
+		public ExecuteLater(String command) {
+			this.command = command;
+		}
+
 		@Override
 		public void run() {
-			execute();
+			execute(command);
 		}
 		
 	}
 	
 	/**
 	 * Execute the command
+	 * @param commandWords 
 	 * @return true if command executed correctly. 
 	 */
-	public abstract boolean execute();
+	public abstract String execute(String command);
 	
-	/**
-	 * Get the return string from the command. 
-	 * <p>By default this is just the command name, but many 
-	 * commands will need to send back extensive information. 
-	 * @return command output information
-	 */
-	public String getReturnString() {
-		return name;
-	}
+//	/**
+//	 * Get the return string from the command. 
+//	 * <p>By default this is just the command name, but many 
+//	 * commands will need to send back extensive information. 
+//	 * @return command output information
+//	 */
+//	public String getReturnString() {
+//		return name;
+//	}
 
 	/**
 	 * @return the name of the command

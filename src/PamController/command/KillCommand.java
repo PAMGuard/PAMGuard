@@ -13,9 +13,9 @@ public class KillCommand extends ExtCommand {
 	}
 
 	@Override
-	public boolean execute() {
+	public String execute(String command) {
 		System.exit(0);
-		return true;
+		return getName();
 	}
 	
 	@Override

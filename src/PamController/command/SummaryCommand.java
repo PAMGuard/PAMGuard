@@ -20,11 +20,10 @@ public class SummaryCommand extends ExtCommand {
 	}
 
 	@Override
-	public boolean execute() {
-		return true;
+	public String execute(String command) {
+		return getReturnString();
 	}
 
-	@Override
 	public String getReturnString() {
 		PamController pamController = PamController.getInstance();
 		int nMod = pamController.getNumControlledUnits();

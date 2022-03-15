@@ -1,6 +1,10 @@
 package PamController.command;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.function.IntFunction;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import PamController.PamControlledUnit;
 import PamController.PamController;
@@ -31,6 +35,8 @@ public abstract class CommandManager extends PamControlledUnit {
 		commandsList.add(new ExitCommand());
 		commandsList.add(new KillCommand());
 		commandsList.add(new HelpCommand(this));
+		commandsList.add(new GetXMLSettings());
+		commandsList.add(new SetXMLSettings());
 		
 	}
 
@@ -54,58 +60,65 @@ public abstract class CommandManager extends PamControlledUnit {
 	 * the program (in which case this thread will
 	 * exit and close the port). True otherwise. 
 	 */
-	public boolean interpretCommand(String command) {
+	public boolean interpretCommand(String commandString) {
 		//System.out.println(String.format("New UDP Command %s", command));
+		if (commandString == null) {
+			return false;
+		}
+		String[] commandWords = commandString.split(" "); //splitCommandLine(commandString);
+		if (commandWords == null || commandWords.length < 1) {
+			return false;
+		}
+		String first = commandWords[0].toLowerCase();
 		
-		command = command.toLowerCase();
+		String command = commandWords[0].toLowerCase();
 		// strip of the first two letters if they begin pg ...
-		if (command.substring(0,2).equals("pg")) {
+		if (command.length() > 2 && command.substring(0,2).equals("pg")) {
 			command = command.substring(2); 
 		}
 		ExtCommand extCommand = findCommand(command);
 		if (extCommand == null) {
-			sendData("Cmd \"" + command + "\" Not Recognised.");
+			sendData("Cmd \"" + commandString + "\" Not Recognised.");
 			return false;
 		}
 		if (extCommand.canExecute() == false) {
 			sendData("Cmd \"" + command + "\" Cannot Execute.");
-			sendData("   Cmd return string = " + extCommand.getReturnString());
+//			sendData("   Cmd return string = " + extCommand.getReturnString());
 			return false;
 		}
-		extCommand.execute();
-		sendData(extCommand.getReturnString());
+		String output = extCommand.executeCommand(commandString);
+		sendData(output);
 		
-//		
-//		if (command.equals("pgstart")) {
-//			sendData("PgAck " + "pgstart");
-//			pamController.pamStart();
-//		}
-//		else if (command.equals("pgstop")) {
-//			sendData("PgAck " + "pgstop");
-//			pamController.pamStop();
-//		}
-//		else if (command.equals("pgping")) {
-//			sendData("PgAck " + "pgping");
-//		}
-//		else if (command.equals("pgstatus")) {
-//			sendData("PgAck Status " + pamController.getPamStatus());
-//		}
-//		else if (command.equals("pgsetrec")) {
-//			sendData("PgAck pgsetrec");
-//			
-//			//triggerRecording(String name, int seconds);
-//		}
-//		else if (command.equals("pgexit")) {
-//			sendData("Exiting PAMGUARD");
-//			System.exit(0);
-//			return false;
-//		}
-//		else{
-//			sendData("PgAck " + "Cmd Not Recognised.");
-//		}
-
 		
 		return true;
+	}
+	
+	/**
+	 * Slightly nasty split since some module names will be in quotes if they are names with spaces
+	 * so the split needs to a) take out multiple words surrounded by "" and then split what's left 
+	 * by word. Or split by work and rejoin anything with "" ? 
+	 * @param command
+	 * @return
+	 */
+	public static String[] splitCommandLine(String command) {
+		// https://stackoverflow.com/questions/7804335/split-string-on-spaces-in-java-except-if-between-quotes-i-e-treat-hello-wor
+		if (command == null) {
+			return null;
+		}
+		Matcher m = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(command);
+		List<String> bits = new ArrayList<>();
+		while (m.find()) {
+			String bit = m.group(1);
+			bit = bit.trim();
+			bit = bit.replace("\"", "");
+			bits.add(bit);
+		}
+		int n = bits.size();
+		String[] sbits = new String[n];
+		for (int i = 0; i < bits.size(); i++) {
+			sbits[i] = (String) bits.get(i);
+		}
+		return sbits;
 	}
 
 	/**

@@ -38,7 +38,7 @@ public class NetworkController extends CommandManager {
 	
 	private boolean initialisationComplete = false;
 	
-	static private final int MAX_COMMAND_LENGTH = 256;
+	static private final int MAX_COMMAND_LENGTH = 4096;
 	
 	private byte[] byteBuffer = new byte[MAX_COMMAND_LENGTH];
 	
@@ -127,6 +127,7 @@ public class NetworkController extends CommandManager {
 		packet.setPort(udpPacket.getPort());
 		try {
 			receiveSocket.send(packet);
+//			receiveSocket.
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

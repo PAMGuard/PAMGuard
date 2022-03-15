@@ -2262,6 +2262,37 @@ public class PamSettingManager {
 		return null;
 	}
 	
+	/**
+	 * Find a list of unit settings by type and name. If both are specified, then it's going to 
+	 * (hopefully only return one setting. Otherwise, with null or wildcard names we may get many. 
+	 * @param unitType unit type, can be wildcard * or null
+	 * @param unitName unit name, can be wildcard * or null
+	 * @return Array list of settings. 
+	 */
+	public ArrayList<PamSettings> findPamSettings(String unitType, String unitName) {
+		if (owners == null) {
+			return null;
+		}
+		ArrayList<PamSettings> foundSettings = new ArrayList<>();
+		if (unitType != null && unitType.equals("*")) {
+			unitType = null;
+		}
+		if (unitName != null && unitName.equals("*")) {
+			unitName = null;
+		}
+		for (PamSettings owner:owners) {
+			if (unitType != null && !unitType.equals(owner.getUnitType())) {
+				continue;
+			}
+			if (unitName != null && !unitName.equals(owner.getUnitName())) {
+				continue;
+			}
+			foundSettings.add(owner);
+		}
+		
+		return foundSettings;
+	}
+	
 	
 	/**
 	 * Show a dialog to allow the user to select a .psf file path. 

@@ -10,6 +10,8 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
 
+import binaryFileStorage.BinaryStoreSettings;
+
 /**
  * Description of the parameters within a class. Primarily holds a list
  * of PamParameterDataInterface objects each describing one field in the 
@@ -75,6 +77,9 @@ public class PamParameterSet {
 		if (special != null) {
 			return special;
 		}
+//		if (parentObject.getClass() == BinaryStoreSettings.class) {
+//			System.out.println("binary store");
+//		}
 //		System.out.println("Auto generate param set for " + parentObject.toString());
 		ArrayList<Field> allFields = new ArrayList<>();
 		PamParameterSet pps = new PamParameterSet(parentObject);
@@ -110,8 +115,9 @@ public class PamParameterSet {
 			}
 			else {
 				Method getter = findPublicGetter(parentObject, field);
+				Method setter = findPublicSetter(parentObject, field);
 				if (getter != null) {
-					pps.put(new PamParameterDataGetter(parentObject, field, getter));
+					pps.put(new PamParameterDataGetter(parentObject, field, getter, setter));
 				}
 				else {
 					pps.hiddenFields.add(field);
@@ -162,6 +168,48 @@ public class PamParameterSet {
 				return method;
 			}
 			if (name.startsWith("get") && fieldInd == 3 && methodLen == fieldLen+3) {
+				return method;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Find a getter who's got one input parameter and void return and who's name starts with 
+	 * set and contains the name if the field. 
+	 * @param parentObject2
+	 * @param field
+	 */
+	private static Method findPublicSetter(Object parentObject, Field field) {
+		Method[] methods = parentObject.getClass().getMethods();
+		if (methods == null) {
+			return null;
+		}
+		String fieldNameLower = field.getName().toLowerCase();
+		for (int i = 0; i < methods.length; i++) {
+			Method method = methods[i];			/*
+			 * Check that there are no input parameters. 
+			 */
+			Class<?>[] params = method.getParameterTypes();
+			if (params != null && params.length != 1) {
+				continue;
+			}
+			if ((method.getModifiers() & Modifier.PUBLIC) == 0) {
+				continue;
+			}
+			// check for void return type. 
+//			Class<?> returnType = method.getReturnType();
+//			if (returnType != Void.class) {
+//				continue;
+//			}
+			
+			String name = method.getName();
+			name = name.toLowerCase();
+			int fieldInd = name.indexOf(fieldNameLower);
+			int methodLen = name.length();
+			int fieldLen = fieldNameLower.length();
+			
+			if (name.startsWith("set") && fieldInd == 3 && methodLen == fieldLen+3) {
 				return method;
 			}
 		}
