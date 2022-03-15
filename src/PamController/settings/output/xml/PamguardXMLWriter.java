@@ -228,6 +228,26 @@ public class PamguardXMLWriter implements PamSettings {
 		}
 		return true;
 	}
+	
+	public Document writeModules(ArrayList<PamSettings> settings) {
+		Document doc = createDocument(System.currentTimeMillis());
+		Element modules = doc.createElement("MODULES");
+		Element root = doc.createElement("PAMGUARD");
+		doc.appendChild(root);
+		root.appendChild(getInfo(doc, System.currentTimeMillis()));
+		root.appendChild(modules);
+		Element moduleData;
+		for (PamSettings aSet:settings) {
+			PamSettings[] asArray = new PamSettings[1];
+			asArray[0] = aSet;
+			moduleData = writeUnitSettings(doc, modules, aSet, asArray);
+			if (moduleData != null) {
+				modules.appendChild(moduleData);
+			}
+		}
+		
+		return doc;
+	}
 
 	private Element getInfo(Document doc, long time) {
 		Element info = doc.createElement("INFO");

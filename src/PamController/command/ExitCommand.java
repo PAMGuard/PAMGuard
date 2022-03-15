@@ -15,11 +15,11 @@ public class ExitCommand extends ExtCommand {
 	}
 
 	@Override
-	public boolean execute() {
+	public String execute(String command) {
 		PamController.getInstance().pamStop();
 		PamSettingManager.getInstance().saveFinalSettings();
 		System.exit(0);
-		return true;
+		return getName();
 	}
 
 	@Override

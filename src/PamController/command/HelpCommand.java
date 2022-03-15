@@ -12,7 +12,7 @@ public class HelpCommand extends ExtCommand {
 	}
 
 	@Override
-	public boolean execute() {
+	public String execute(String commandString) {
 		ArrayList<ExtCommand> commands = commandManager.getCommandsList();
 		String out = "Available commands are:\n";
 		for (ExtCommand command : commands) {
@@ -26,13 +26,9 @@ public class HelpCommand extends ExtCommand {
 			}
 		}
 		commandManager.sendData(out);
-		return true;
+		return getName();
 	}
 
-	@Override
-	public String getReturnString() {
-		return super.getReturnString();
-	}
 
 	@Override
 	public String getHint() {

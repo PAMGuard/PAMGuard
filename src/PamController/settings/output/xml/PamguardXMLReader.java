@@ -37,12 +37,16 @@ public class PamguardXMLReader {
 	public PamguardXMLReader(String fileName) {
 		unpackFile(fileName);
 	}
+	
+	public PamguardXMLReader(Document doc) {
+		NodeList childNodes = doc.getChildNodes();
+		moduleNodes = new ArrayList<>();
+		findModuleNodes(childNodes, moduleNodes);
+	}
 
 	private void unpackFile(String fileName) {
 
 		Document doc = XMLUtils.createDocument(fileName);
-		String str = XMLUtils.getStringFromDocument(doc);
-//		System.out.println(str);
 		NodeList childNodes = doc.getChildNodes();
 		moduleNodes = new ArrayList<>();
 		findModuleNodes(childNodes, moduleNodes);
@@ -58,16 +62,18 @@ public class PamguardXMLReader {
 	 * Unpack a module node, creating a class and settings
 	 * it's data. 
 	 */
-	private Object unpackModuleNode(ModuleNode moduleNode) {
+	public Object[] unpackModuleNode(ModuleNode moduleNode) {
 		if (moduleNode == null) {
 			return null;
 		}
 		// first need to find the configuration node, then unpack that. 
 		ArrayList<Node> settingsNodes = findNodesByType(moduleNode.getNode(), "SETTINGS", null);
-		for (Node node : settingsNodes) {
-			unpackSettingsNode(node);
+		Object[] settings = new Object[settingsNodes.size()];
+		for (int i = 0; i < settingsNodes.size(); i++) {
+			Node node = settingsNodes.get(i);
+			settings[i] = unpackSettingsNode(node);
 		}
-		return null;
+		return settings;
 	}
 	
 	public Object unpackSettingsNode(Node settingsNode) {
@@ -565,6 +571,13 @@ public class PamguardXMLReader {
 			return null;
 		}
 		return node.getNodeValue();
+	}
+
+	/**
+	 * @return the moduleNodes
+	 */
+	public ArrayList<ModuleNode> getModuleNodes() {
+		return moduleNodes;
 	}
 
 

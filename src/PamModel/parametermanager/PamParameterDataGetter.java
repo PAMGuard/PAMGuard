@@ -25,9 +25,10 @@ public class PamParameterDataGetter extends PrivatePamParameterData {
 	 * @param field
 	 * @param getter
 	 */
-	public PamParameterDataGetter(Object parentObject, Field field, Method getter) {
+	public PamParameterDataGetter(Object parentObject, Field field, Method getter, Method setter) {
 		super(parentObject, field);
 		this.getter = getter;
+		this.setter = setter;
 	}
 
 	/**
@@ -36,9 +37,10 @@ public class PamParameterDataGetter extends PrivatePamParameterData {
 	 * @param shortName
 	 * @param toolTip
 	 */
-	public PamParameterDataGetter(Object parentObject, Field field, Method getter, String shortName, String toolTip) {
+	public PamParameterDataGetter(Object parentObject, Field field, Method getter, Method setter, String shortName, String toolTip) {
 		super(parentObject, field, shortName, toolTip);
 		this.getter = getter;
+		this.setter = setter;
 	}
 
 

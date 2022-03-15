@@ -679,12 +679,12 @@ public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 
 	/**
 	 * Draw on spectrogram changed March 2010 so that the default time unit is 
-	 * milliseconds (Jave time from 1970) rather than samples. This makes it posible 
-	 * to work with data colected over multiple files when operating in viewer mode. 
+	 * milliseconds (Java time from 1970) rather than samples. This makes it posible 
+	 * to work with data collected over multiple files when operating in viewer mode. 
 	 * @param g
 	 * @param pamDataUnit
 	 * @param generalProjector
-	 * @return updated rectange
+	 * @return updated rectangle
 	 */
 	protected Rectangle drawOnSpectrogram(Graphics g, PamDataUnit pamDataUnit, GeneralProjector generalProjector) {
 		// draw a rectangle with time and frequency bounds of detection.

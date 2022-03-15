@@ -18,11 +18,10 @@ public class StatusCommand extends ExtCommand {
 	}
 
 	@Override
-	public boolean execute() {
-		return true;
+	public String execute(String command) {
+		return getReturnString();
 	}
 
-	@Override
 	public String getReturnString() {
 		/*
 		 * Need to work out if it's stalled or not by looking at the Daq systems. 
