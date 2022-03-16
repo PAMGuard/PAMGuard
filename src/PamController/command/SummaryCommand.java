@@ -21,10 +21,20 @@ public class SummaryCommand extends ExtCommand {
 
 	@Override
 	public String execute(String command) {
-		return getReturnString();
+//		String[] cmdBits = CommandManager.splitCommandLine(command);
+//		boolean clear = true;
+//		// first word is the command, we want one after that. 
+//		if (cmdBits.length >= 2 && cmdBits[1] != null) {
+//			String bit = cmdBits[1].trim().toLowerCase();
+//			if (bit.equals("0") || bit.equals("false")) {
+//				clear = false;
+//			}
+//			
+//		}
+		return getModulesSummary(true);
 	}
-
-	public String getReturnString() {
+	
+	public String getModulesSummary(boolean clear) {
 		PamController pamController = PamController.getInstance();
 		int nMod = pamController.getNumControlledUnits();
 		PamControlledUnit aModule;
@@ -38,7 +48,7 @@ public class SummaryCommand extends ExtCommand {
 		int usedModules = 0;
 		for (int i = 0; i < nMod; i++) {
 			aModule = pamController.getControlledUnit(i);
-			aString = aModule.getModuleSummary();
+			aString = aModule.getModuleSummary(clear);
 			if (aString == null) {
 				continue;
 			}

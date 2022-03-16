@@ -50,6 +50,11 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 	
 	private long desiredSample = -1;
 	private long[] prevChannelSample = new long[PamConstants.MAX_CHANNELS];
+	
+	private double[] summaryTotals = new double[PamConstants.MAX_CHANNELS];
+	private double[] summaryTotals2 = new double[PamConstants.MAX_CHANNELS];
+	private double[] summaryMaxVal = new double[PamConstants.MAX_CHANNELS];
+	private int[] summaryCount = new int[PamConstants.MAX_CHANNELS];
 
 	/**
 	 * Keep a record of the last sample added. 
@@ -167,10 +172,12 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 		prevChannelSample[thisChannel] = pamDataUnit.getStartSample();
 //		System.out.println(String.format("Sample %d channel %d in %s is in  synch - expected sample %d",
 //				pamDataUnit.getStartSample(), thisChannel, getDataName(), desiredSample));
+		addSummaryData(thisChannel, pamDataUnit);
 		
 		super.addPamData(pamDataUnit);
 	}
 	
+
 	/**
 	 * Get available data from the raw data block. Similar to the functionality of 
 	 * getSamplesforMillis, but this will not throw an exception if not all of the samples
@@ -515,6 +522,66 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 	public void addObserver(PamObserver o, boolean reThread) {
 		// TODO Auto-generated method stub
 		super.addObserver(o, reThread);
+	}
+
+	private void addSummaryData(int channel, RawDataUnit pamDataUnit) {
+		double[] data = pamDataUnit.getRawData();
+		synchronized(summaryTotals) {
+			double tot = 0, tot2 = 0, mx = 0;
+			for (int i = 0; i < data.length; i++) {
+				double dat = data[i];
+				tot += dat;
+				tot2 += dat*dat;
+				mx = Math.max(mx, dat);
+			}
+			summaryTotals[channel] += tot/data.length;
+			summaryTotals2[channel] += tot2/data.length;
+			summaryMaxVal[channel] = Math.max(summaryMaxVal[channel], mx);
+			summaryCount[channel] ++;
+		}
+		
+	}
+	
+	public String getSummaryString(boolean clear) {
+		/*
+		 * 
+	sumString[0] = 0;
+	float rms, max, mean;
+	for (int i = 0; i < ringBufferChannels; i++) {
+		//		rms = sqrt(summaryTotals[i]/summaryCount);
+		rms = sqrt(summaryTotals2[i]/summaryCount) + 0.01;
+		max = (double)summaryMaxVal[i] + 0.01;
+		mean = summaryTotals[i]/summaryCount;
+		//		sprintf(sumString+strlen(sumString), "ch%d,%3.1f,%3.1f,", i, 20.*log10((double)summaryMaxVal[i]/32768.),
+		//				20*log10(rms/32768.));
+		sprintf(sumString+strlen(sumString), "ch%d,%3.1f,%3.1f,%3.1f,", i, mean, 20.*log10(max/32768.),
+				20.*log10(rms/32768.));
+	}
+		 */
+		String str = "";
+		int nChan = PamUtils.getNumChannels(getChannelMap());
+		synchronized(summaryTotals) {
+			for (int i = 0; i < nChan; i++) {
+				double rms = Math.sqrt(summaryTotals2[i]/summaryCount[i])+1e-6;
+				double max = summaryMaxVal[i]+1e-6;
+				double mean = summaryTotals[i]/summaryCount[i];
+				str += String.format("ch%d,%3.1f,%3.1f,%3.1f,", i, mean, 20.*Math.log10(max),
+						20.*Math.log10(rms));
+			}
+		}
+		if (clear) {
+			clearSummaryData();
+		}
+		return str;
+	}
+	
+	public void clearSummaryData() {
+		synchronized(summaryTotals) {
+			for (int i = 0; i < summaryTotals.length; i++) {
+				summaryTotals[i] = summaryTotals2[i] = summaryMaxVal[i] = 0;
+				summaryCount[i] = 0;
+			}
+		}
 	}
 
 //	@Override

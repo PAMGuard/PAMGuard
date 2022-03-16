@@ -1,8 +1,12 @@
 package PamController.command;
 
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.SwingUtilities;
+
+import PamController.PamControlledUnit;
+import PamController.PamController;
 
 public abstract class ExtCommand {
 
@@ -121,4 +125,21 @@ public abstract class ExtCommand {
 	public String getHint() {
 		return null;
 	};
+	
+	/**
+	 * Find a set of controlled units, allowing for wild cards or nulls. 
+	 * @param unitType unit type, can be null or * for wildcards
+	 * @param unitName unit name, can be null or * for wildcards
+	 * @return
+	 */
+	public ArrayList<PamControlledUnit> findControlledUnits(String unitType, String unitName) {
+		if (unitType != null && unitType.equals("*")) {
+			unitType = null;
+		}
+		if (unitName != null && unitName.equals("*")) {
+			unitName = null;
+		}
+		PamController pc = PamController.getInstance();
+		return pc.findControlledUnits(unitType, unitName);
+	}
 }
