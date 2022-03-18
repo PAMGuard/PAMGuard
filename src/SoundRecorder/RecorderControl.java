@@ -3,6 +3,7 @@ package SoundRecorder;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -22,6 +23,7 @@ import PamController.PamController;
 import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import PamController.command.CommandManager;
 import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamView.MenuItemEnabler;
@@ -561,6 +563,73 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 	@Override
 	public BackupInformation getBackupInformation() {
 		return backupInformation;
+	}
+
+	@Override
+	public String tellModule(String command) {
+		String[] parts = command.split(" ");
+		if (parts.length < 1) {
+			return "Unknown command to sound recorder: " + command;
+		}
+		switch(parts[0]) {
+		case "start":
+			buttonCommand(RecorderView.BUTTON_START);
+			break;
+		case "startbuffered":
+			buttonCommand(RecorderView.BUTTON_START_BUFFERED);
+			break;
+		case "stop":
+			buttonCommand(RecorderView.BUTTON_OFF);
+			break;
+		case "cycle":
+			buttonCommand(RecorderView.BUTTON_AUTO);
+			break;
+		case "outputfolder":
+			return setOutputFolder(command);
+		default:
+			return "Unknown command to sound recorder: " + command;
+		}
+		return getUnitName() + " executed " + command;
+	}
+
+	/**
+	 * set output folder. Trim off the command first. 
+	 * @param command
+	 * @return 
+	 */
+	private String setOutputFolder(String command) {
+		String[] parts = CommandManager.splitCommandLine(command);
+		if (parts.length < 2) {
+			return "Unspecified output folder for sound recorder";
+		}
+		File path = new File(parts[1].trim());
+		if (path.exists() == false) {
+			path.mkdirs();
+		}
+		if (path.isDirectory()) {
+			recorderSettings.outputFolder = path.getAbsolutePath();
+			return getUnitName() + "storing recordings in " + path.getAbsolutePath();
+		}
+		else {
+			return getUnitName() + "unable to switch to storage folder " + path.getAbsolutePath();
+		}
+	}
+
+	@Override
+	public String getModuleSummary(boolean clear) {
+		File path = new File(recorderSettings.outputFolder);
+		long space = -1;
+		double freeSpace = -1;
+		try {
+			space = path.getFreeSpace();
+			freeSpace = (double) space / 1048576.;
+		}
+		catch (SecurityException e) {
+			freeSpace = -9999;
+		}
+		int currButton = pressedButton;
+		int currState = recorderStatus;
+		return String.format("%d,%d,%3.1f", currButton, currState, freeSpace);
 	}
 
 }
