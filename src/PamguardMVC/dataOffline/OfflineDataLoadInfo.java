@@ -1,5 +1,6 @@
 package PamguardMVC.dataOffline;
 
+import PamUtils.PamCalendar;
 import PamguardMVC.LoadObserver;
 import PamguardMVC.PamObserver;
 
@@ -115,6 +116,7 @@ public class OfflineDataLoadInfo implements Cloneable {
 		this.loadKeepLayers = 0;
 		originalKeepLayers=0; 
 		this.allowRepeats = false;
+		checkLoadSize();
 	}
 	
 	public OfflineDataLoadInfo(PamObserver dataObserver, PamObserver endObserver, long startMillis, long endMillis, 
@@ -127,6 +129,7 @@ public class OfflineDataLoadInfo implements Cloneable {
 		this.loadKeepLayers = loadKeepLayers;
 		this.originalKeepLayers = loadKeepLayers;
 		this.allowRepeats = allowRepeats;
+		checkLoadSize();
 	}
 	
 	public OfflineDataLoadInfo(PamObserver dataObserver, LoadObserver loadObserver, long startMillis, long endMillis, 
@@ -141,12 +144,24 @@ public class OfflineDataLoadInfo implements Cloneable {
 		this.originalKeepLayers = loadKeepLayers;
 		this.interrupt=interrupt;
 		this.allowRepeats = allowRepeats;
+		checkLoadSize();
 	}
+	
 
 	public OfflineDataLoadInfo() {
 		// TODO Auto-generated constructor stub
 	}
 	
+	private boolean checkLoadSize() {
+//		if (getEndMillis()-getStartMillis() > 3600000L) {
+//			System.out.printf("Silly big load from %s or %s to %s\n", 
+//					PamCalendar.formatDBDateTime(getStartMillis()),
+//					PamCalendar.formatDBDateTime(this.startMillis),
+//					PamCalendar.formatDBDateTime(getEndMillis()));
+//			return false;
+//		}
+		return true;
+	}
 	/**
 	 * Resets the load data for another data load. 
 	 */
@@ -173,7 +188,12 @@ public class OfflineDataLoadInfo implements Cloneable {
 	 * @return the startMillis
 	 */
 	public long getStartMillis() {
-		if (this.lastLoadInfo!=null) return lastLoadInfo.lastLoadMillis(); 
+		if (this.lastLoadInfo!=null) {
+//			if (getEndMillis() - lastLoadInfo.lastLoadMillis() > 3600000L) {
+//				System.out.printf("Weird shit with lastLoadInfo: ");
+//			}
+			return lastLoadInfo.lastLoadMillis(); 
+		}
 		else return startMillis;
 	}
 	
@@ -191,6 +211,7 @@ public class OfflineDataLoadInfo implements Cloneable {
 	 */
 	public void setStartMillis(long startMillis) {
 		this.startMillis = startMillis;
+		checkLoadSize();
 	}
 	
 	/**
@@ -205,6 +226,7 @@ public class OfflineDataLoadInfo implements Cloneable {
 	 */
 	public void setEndMillis(long endMillis) {
 		this.endMillis = endMillis;
+		checkLoadSize();
 	}
 	
 	/**

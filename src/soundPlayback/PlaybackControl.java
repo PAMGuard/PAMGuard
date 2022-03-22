@@ -20,6 +20,7 @@ import PamController.PamControllerInterface;
 import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import PamUtils.PamCalendar;
 import PamView.MenuItemEnabler;
 import PamView.TopToolBar;
 import PamguardMVC.LoadObserver;
@@ -298,6 +299,11 @@ public class PlaybackControl extends PamControlledUnit implements PamSettings {
 		this.playbackEndMillis = endMillis;
 		playbackProcess.prepareProcess();
 		playbackProcess.pamStart();
+
+//		System.out.printf("***Viewer playback request from %s to %s\n", PamCalendar.formatDBDateTime(startMillis), PamCalendar.formatDBDateTime(endMillis));
+//		if (endMillis - startMillis > 600000) {
+//			System.out.println("Thats a stupidly big time period");
+//		}
 		dataBlock.orderOfflineData(playbackProcess, new PlayLoadObserver(),
 				startMillis, endMillis, 0,
 				OfflineDataLoading.OFFLINE_DATA_CANCEL, true);

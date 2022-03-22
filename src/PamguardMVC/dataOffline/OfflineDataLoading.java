@@ -175,6 +175,13 @@ public class OfflineDataLoading<T extends PamDataUnit> {
 			long t4 = t2;
 			//			String orderDates = String.format(" %s to %s", 
 			//					PamCalendar.formatDateTime(startMillis), PamCalendar.formatDateTime(endMillis));
+//			System.out.printf("Offline data order in %s %s from %s to %s\n", pamDataBlock.getDataName(), offlineDataInfo.toString(),
+//					PamCalendar.formatDBDateTime(offlineDataInfo.getStartMillis()), 
+//					PamCalendar.formatDBDateTime(offlineDataInfo.getEndMillis()));
+//			if (offlineDataInfo.getEndMillis()-offlineDataInfo.getStartMillis() > 3600000L) {
+//				System.out.printf("Stupid long load time !");
+//				return;
+//			}
 			try {
 			if (orderData != null) {
 				//				System.out.println("order Data is not null");
