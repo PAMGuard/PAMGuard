@@ -43,6 +43,8 @@ public class NetworkController extends CommandManager {
 	private byte[] byteBuffer = new byte[MAX_COMMAND_LENGTH];
 	
 	private NetworkRecorderTrigger[] recorderTriggers;
+
+	private static NetworkController singleInstance;
 	
 	private static String unitName = "Network Controller";
 
@@ -53,6 +55,8 @@ public class NetworkController extends CommandManager {
 		listenerThread = new ListenerThread();
 		Thread aThread = new Thread(listenerThread);
 		aThread.start();
+		
+		singleInstance = this;
 	}
 	
 	class ListenerThread implements Runnable {

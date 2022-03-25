@@ -154,6 +154,8 @@ public class RWEProcess extends PamProcess {
 		private int minSoundType;
 		private RWClassifier classifier = new RWStandardClassifier();
 		
+		private int[] soundCounts = new int[RWStandardClassifier.MAXSOUNDTYPE+1];
+		
 		public RWEChannelProcess(RWEProcess rweProcess, int iChannel) {
 			this.rweProcess = rweProcess;
 			this.iChannel = iChannel;
@@ -216,9 +218,17 @@ public class RWEProcess extends PamProcess {
 					f[1] = aSound.maxFreq * getSampleRate()/sourceDataBlock.getFftLength();
 					rweDataUnit.setFrequency(f);
 					rweDataBlock.addPamData(rweDataUnit);
+					soundCounts[rweDataUnit.rweSound.soundType]++;
 //					System.out.printf("RW %d at %s\n", rweDataUnit.rweSound.soundType, PamCalendar.formatTime(rweDataUnit.getTimeMilliseconds()));
 				}
 			}
+		}
+		
+		/**
+		 * Clear sound counts
+		 */
+		private void clearSoundCounts() {
+			Arrays.fill(soundCounts, 0);
 		}
 		
 		private RWEDetectionPeak[] findPeaks(ComplexArray complexArray) {
@@ -479,6 +489,24 @@ public class RWEProcess extends PamProcess {
 //		if (changeType == PamController.OFFLINE_DATA_LOADED) {
 //			recalculateAllAngles();
 //		}
+	}
+
+	public String getModuleSummary(boolean clear) {
+		String str = String.format("%d", RWStandardClassifier.MAXSOUNDTYPE+1);
+		for (int c = 0; c < rweChannelProcesses.length; c++) {
+			if (rweChannelProcesses[c] == null) {
+				continue;
+			}
+			str += String.format("ch%d", c);
+			int[] counts = rweChannelProcesses[c].soundCounts;
+			for (int i = 0; i < counts.length; i++) {
+				str += String.format(",%d", counts[i]);
+			}
+			if (clear) {
+				rweChannelProcesses[c].clearSoundCounts();
+			}
+		}
+		return str;
 	}
 
 //	private void recalculateAllAngles() {

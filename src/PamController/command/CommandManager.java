@@ -32,6 +32,8 @@ public abstract class CommandManager extends PamControlledUnit {
 		commandsList.add(new PingCommand());
 		commandsList.add(new StatusCommand());
 		commandsList.add(new SummaryCommand());
+		commandsList.add(new SummaryPeekCommand());
+		commandsList.add(new TellModuleCommand());
 		commandsList.add(new ExitCommand());
 		commandsList.add(new KillCommand());
 		commandsList.add(new HelpCommand(this));
@@ -120,6 +122,34 @@ public abstract class CommandManager extends PamControlledUnit {
 		}
 		return sbits;
 	}
+	
+	/**
+	 * Get the command string left from the given index. This can be used to get 
+	 * everything left in the string that follows the command name, module type and module name
+	 * fields for example. 
+	 * @param command full command string
+	 * @param index how many items to skip
+	 * @return remainder of the string, warts n all. 
+	 */
+	public static String getCommandFromIndex(String command, int index) {
+		if (command == null) {
+			return null;
+		}
+		int startCharIndex = 0;
+		int foundBits = 0;
+		Matcher m = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(command);
+		List<String> bits = new ArrayList<>();
+		while (m.find() && foundBits++ < index) {
+			String bit = m.group(1);
+			startCharIndex = command.indexOf(bit, startCharIndex) + bit.length();
+			if (startCharIndex >= command.length()) {
+				return null;
+			}
+		}
+		String wanted = command.substring(startCharIndex+1).trim();
+		return wanted;
+	}
+	
 
 	/**
 	 * Reply to data called from InterpredData
