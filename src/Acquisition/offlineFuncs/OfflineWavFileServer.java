@@ -24,6 +24,7 @@ import Acquisition.pamAudio.PamAudioSystem;
 import PamController.OfflineFileDataStore;
 import PamDetection.RawDataUnit;
 import PamUtils.PamAudioFileFilter;
+import PamUtils.PamCalendar;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
@@ -384,6 +385,9 @@ public class OfflineWavFileServer extends OfflineFileServer<FileDataMapPoint> {
 			this.fileStream = fileStream;
 			this.loadObserver = loadObserver;
 			this.offlineDataLoadInfo=offlineDataLoadInfo; 
+//			System.out.printf("New FLAC decoder %s working from %s to %s\n", offlineDataLoadInfo.toString(),
+//					PamCalendar.formatDBDateTime(offlineDataLoadInfo.getStartMillis()), 
+//					PamCalendar.formatDBDateTime(offlineDataLoadInfo.getEndMillis()));
 		}
 
 		@Override
@@ -392,6 +396,7 @@ public class OfflineWavFileServer extends OfflineFileServer<FileDataMapPoint> {
 
 				try {
 					fileStream.close();
+					ms = Math.max(offlineDataLoadInfo.getStartMillis(), ms);
 					offlineDataLoadInfo.setLastLoadInfo(new AquisitionLoadPoint(ms, -1)); 
 				} catch (IOException e) {
 					e.printStackTrace();

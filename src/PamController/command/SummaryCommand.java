@@ -35,6 +35,10 @@ public class SummaryCommand extends ExtCommand {
 	}
 	
 	public String getModulesSummary(boolean clear) {
+		return getReturnString();
+	}
+
+	public String getReturnString() {
 		PamController pamController = PamController.getInstance();
 		int nMod = pamController.getNumControlledUnits();
 		PamControlledUnit aModule;
