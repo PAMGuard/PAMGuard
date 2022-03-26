@@ -121,7 +121,7 @@ public class RawClipDataInfo extends GenericDataPlotInfo {
 			tdProjector.addHoverData(new HoverData(path2D, pamDataUnit, 0, plotNumber));
 			return null; 
 		}
-		
+				
 		return null; 
 	}
 

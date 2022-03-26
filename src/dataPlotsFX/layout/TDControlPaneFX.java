@@ -185,13 +185,14 @@ public class TDControlPaneFX extends Pane  {
 	private Node createGraphAddPane(){
 
 		//create button to add a graph
-		Button addGraph=new PamButton();
+		Button addGraph=new PamButton("Plot");
 //		addGraph.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.ADD, Color.WHITE, PamGuiManagerFX.iconSize));
 		addGraph.setGraphic(PamGlyphDude.createPamIcon("mdi2p-plus", Color.WHITE, PamGuiManagerFX.iconSize));
 		addGraph.setOnAction(new AddButton());
 
 		//create a menu button to remove graphs
 		SplitMenuButton removeGraph=new SplitMenuButton();
+		removeGraph.setText("Plot");
 //		removeGraph.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.REMOVE, Color.WHITE, PamGuiManagerFX.iconSize));
 		removeGraph.setGraphic(PamGlyphDude.createPamIcon("mdi2m-minus", Color.WHITE, PamGuiManagerFX.iconSize));
 		removeGraph.setOnAction(new RemoveLastGraph());

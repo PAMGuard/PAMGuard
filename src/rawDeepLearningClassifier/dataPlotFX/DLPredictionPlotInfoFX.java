@@ -1,6 +1,8 @@
 package rawDeepLearningClassifier.dataPlotFX;
 
 
+import java.io.Serializable;
+
 import PamController.PamController;
 import PamUtils.Coordinate3d;
 import PamView.GeneralProjector;
@@ -13,10 +15,12 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import dataPlotsFX.TDManagedSymbolChooserFX;
 import dataPlotsFX.TDSymbolChooserFX;
+import dataPlotsFX.clickPlotFX.ClickDisplayParams;
 import dataPlotsFX.data.TDDataInfoFX;
 import dataPlotsFX.data.TDDataProviderFX;
 import dataPlotsFX.data.generic.GenericScaleInfo;
 import dataPlotsFX.layout.TDGraphFX;
+import dataPlotsFX.layout.TDSettingsPane;
 import dataPlotsFX.projector.TDProjectorFX;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
@@ -28,7 +32,7 @@ import rawDeepLearningClassifier.dlClassification.DLDataUnit;
 /**
  * Plot the raw probability information. 
  * 
- * Plots multiple probability lines. Note that the deulat TDDataInfo can handle drawing lines for different channels
+ * Plots multiple probability lines. Note that the  TDDataInfo can handle drawing lines for different channels
  * but we are drawing for different prediction classes here. 
  * 
  * @author Jamie Macaulay
@@ -54,10 +58,26 @@ public class DLPredictionPlotInfoFX extends TDDataInfoFX {
 	 */
 	private GenericScaleInfo frequencyInfo; 
 
+	/**
+	 * The default colour.
+	 */
+	//private Color color = Color.DODGERBLUE;
 
-	Color color = Color.DODGERBLUE;
-
+	/**
+	 * DL control. 
+	 */
 	private DLControl dlControl; 
+
+	/**
+	 * The DL prediction pane. 
+	 */
+	private DLPredictionPane predictionSettingsPane; 
+
+	/**
+	 * The display parameters.
+	 */
+	private DLPredDisplayParams dlPredParams = new DLPredDisplayParams();
+
 
 	public DLPredictionPlotInfoFX(TDDataProviderFX tdDataProvider, DLControl dlContorl, TDGraphFX tdGraph, PamDataBlock pamDataBlock) {
 		super(tdDataProvider, tdGraph, pamDataBlock);
@@ -86,12 +106,13 @@ public class DLPredictionPlotInfoFX extends TDDataInfoFX {
 	private Polygon drawFrequencyData(int plotNumber, PamDataUnit pamDataUnit, GraphicsContext g, double scrollStart,
 			TDProjectorFX tdProjector, int type) {
 
+
+		Color color = getColor(0).color; 
+
 		DLDataUnit dataUnit = (DLDataUnit) pamDataUnit; 
 
-
-		g.setStroke(color);
 		g.setLineDashes(null);
-
+		g.setStroke(color);
 
 		//		double[] f = pamDataUnit.getFrequency();
 		//		if (f == null) {
@@ -102,7 +123,21 @@ public class DLPredictionPlotInfoFX extends TDDataInfoFX {
 		//		}
 
 		if (dataUnit.getPredicitionResult().isBinaryClassification()) {
-			g.setFill(Color.color(this.color.getRed(), this.color.getGreen(), this.color.getBlue(), 
+
+			//now which prediction is the highest. 
+			int index = -1;
+			double max = Double.NEGATIVE_INFINITY; 
+			for (int i=0; i<dataUnit.getPredicitionResult().getPrediction().length; i++) {
+				if (dataUnit.getPredicitionResult().getPrediction()[i]>max) {
+					index = i;
+				}
+			}
+
+			//color for the highest index.
+			Color predCol = getColor(index).color; 
+
+			//prediciton has been classified so use a fill. 
+			g.setFill(Color.color(predCol.getRed(), predCol.getGreen(), predCol.getBlue(), 
 					(Math.min(0.7, dlControl.getDLParams().sampleHop/(double) dlControl.getDLParams().rawSampleSize)))); 
 			//			float[] prediciton = dataUnit.getPredicitionResult().getPrediction(); 
 			//			float max = -(Float.MAX_VALUE+1);
@@ -201,41 +236,49 @@ public class DLPredictionPlotInfoFX extends TDDataInfoFX {
 		if (tC < -1000 || tC>tdProjector.getWidth()+1000) {
 			return null;
 		}
-		
+
 		//TODO -must sort out wrap
 		//dlControl.getDLParams().sampleHop; 
 
 		double dataPixel; 
 		Coordinate3d c; 
-		Color color = Color.color(this.color.getRed(), this.color.getGreen(), this.color.getBlue()); 
+		Color color;
 		for (int i=0; i<dataUnit.getPredicitionResult().getPrediction().length; i++) {
 
-			g.setStroke(color);
-			color = Color.color(color.getRed()*0.8, color.getGreen()*0.8, color.getBlue()*0.8); 
+			if (getColor(i).enabled) {
+				color = getColor(i).color;
 
-			//			System.out.println("TDDataInfoFX: tc: "+tC+ " dataUnitTime: "+PamCalendar.formatTime(timeMillis)+" scrollStart: "
-			//			+PamCalendar.formatTime((long) scrollStart)+" (timeMillis-scrollStart)/1000. "+((timeMillis-scrollStart)/1000.));
+				g.setStroke(color);
+				g.setFill(color); 
+
+				//brighten the colour up. 
+				//color = Color.color(color.getRed()*0.8, color.getGreen()*0.8, color.getBlue()*0.8); 
+
+				//System.out.println("TDDataInfoFX: tc: "+tC+ " dataUnitTime: "+PamCalendar.formatTime(timeMillis)+" scrollStart: "
+				//+PamCalendar.formatTime((long) scrollStart)+" (timeMillis-scrollStart)/1000. "+((timeMillis-scrollStart)/1000.));
 
 
-			c = tdProjector.getCoord3d(timeMillis, dataUnit.getPredicitionResult().getPrediction()[i], 0);
+				c = tdProjector.getCoord3d(timeMillis, dataUnit.getPredicitionResult().getPrediction()[i], 0);
 
-			dataPixel = tdProjector.getYPix(dataUnit.getPredicitionResult().getPrediction()[i]);
+				dataPixel = tdProjector.getYPix(dataUnit.getPredicitionResult().getPrediction()[i]);
 
 
-			if (lastUnits[i]==null) {
-				lastUnits[i] = new Point2D(tC, dataPixel); 
-				return null; 
-			}
-			else {
-				if (tC>lastUnits[i].getX()) {
-					//System.out.println("tC: " + tC + " lastUnits[i].getX(): " + lastUnits[i].getX());
-					g.strokeLine(tC, dataPixel, lastUnits[i].getX(), lastUnits[i].getY());				
+				if (lastUnits[i]==null) {
+					lastUnits[i] = new Point2D(tC, dataPixel); 
+					g.fillOval(tC, dataPixel, 5,5);
+					return null; 
 				}
-				lastUnits[i] = new Point2D(tC, dataPixel); 
-			}
+				else {
+					if (tC>lastUnits[i].getX()) {
+						//System.out.println("tC: " + tC + " lastUnits[i].getX(): " + lastUnits[i].getX());
+						g.strokeLine(tC, dataPixel, lastUnits[i].getX(), lastUnits[i].getY());				
+					}
+					lastUnits[i] = new Point2D(tC, dataPixel); 
+				}
 
-			//getSymbolChooser().getPamSymbol(pamDataUnit,type).draw(g, new Point2D(tC, dataPixel));
-			tdProjector.addHoverData(new HoverData(c , pamDataUnit, 0, plotNumber));
+				//getSymbolChooser().getPamSymbol(pamDataUnit,type).draw(g, new Point2D(tC, dataPixel));
+				tdProjector.addHoverData(new HoverData(c , pamDataUnit, 0, plotNumber));
+			}
 		}
 
 		return null; 
@@ -267,7 +310,6 @@ public class DLPredictionPlotInfoFX extends TDDataInfoFX {
 	public void notifyChange(int changeType) {
 		//System.out.println("Prediction NOTIFYMODELCHANGED: "); 
 		switch (changeType) {
-
 		case PamController.CHANGED_PROCESS_SETTINGS:
 			lastUnits = null; 
 			break;
@@ -276,12 +318,72 @@ public class DLPredictionPlotInfoFX extends TDDataInfoFX {
 			break;
 		}
 	}
+	/**
+	 * Get the color. 
+	 * @param i - the prediction index
+	 * @return the color for that prediciton
+	 */
+	public LineInfo getColor(int i) {
+		return this.dlPredParams.lineInfos[i];
+	}
 
 
 	@Override
 	public Double getDataValue(PamDataUnit pamDataUnit) {
-		// TODO Auto-generated method stub
 		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see dataPlots.data.TDDataInfo#getHidingDialogComponent()
+	 */
+	@Override
+	public TDSettingsPane getGraphSettingsPane() {
+		if (predictionSettingsPane==null) {
+			predictionSettingsPane = new DLPredictionPane(this); 
+		}
+		return predictionSettingsPane;
+	}
+
+
+	public DLControl getDlControl() {
+		return this.dlControl; 
+
+	}
+
+	/* (non-Javadoc)
+	 * @see dataPlots.data.TDDataInfo#getStoredSettings()
+	 */
+	@Override
+	public Serializable getStoredSettings() {
+		return dlPredParams;
+	}
+
+	/* (non-Javadoc)
+	 * @see dataPlots.data.TDDataInfo#setStoredSettings(java.io.Serializable)
+	 */
+	@Override
+	public boolean setStoredSettings(Serializable storedSettings) {
+		if (ClickDisplayParams.class.isAssignableFrom(storedSettings.getClass())) {
+			dlPredParams = (DLPredDisplayParams) storedSettings;
+			updateSettings();
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Get the DL prediction params.
+	 * @return the params
+	 */
+	public DLPredDisplayParams getDlPredParams() {
+		return dlPredParams;
+	}
+
+
+
+	private void updateSettings() {
+		// TODO Auto-generated method stub
+
 	}
 
 }
