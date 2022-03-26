@@ -329,7 +329,7 @@
 	<dependency>
 		<groupId>io.github.macster110</groupId>
 		<artifactId>jdl4pam</artifactId>
-		<version>0.0.93</version>
+		<version>0.0.94</version>
 	</dependency> 
 			
 	<!-- https://mvnrepository.com/artifact/gov.nist.math/jama -->

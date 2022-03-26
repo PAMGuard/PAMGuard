@@ -367,7 +367,7 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 			pathLabel .setText(this.currentSelectedFile.getName()); 
 			try {
 				pathLabel.setTooltip(new Tooltip(this.currentSelectedFile.getPath() 
-						+ "\n" +" Processor " + Device.defaultDevice().toString()));
+						+ "\n" +" Processor CPU " + Device.cpu() + "  " +  Device.gpu()));
 			}
 			catch (Exception e) {
 				//sometimes get an error here for some reason
