@@ -33,7 +33,7 @@ public class DLPredDisplayParams implements Serializable, Cloneable, ManagedPara
 	 * @see java.lang.Object#clone()
 	 */
 	@Override
-	protected DLPredDisplayParams clone() {
+	public DLPredDisplayParams clone() {
 		try {
 			return (DLPredDisplayParams) super.clone();
 		} catch (CloneNotSupportedException e) {

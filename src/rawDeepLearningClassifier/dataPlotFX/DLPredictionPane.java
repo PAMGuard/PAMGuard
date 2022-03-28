@@ -8,6 +8,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import pamViewFX.fxGlyphs.PamSVGIcon;
@@ -47,20 +48,30 @@ public class DLPredictionPane extends PamBorderPane implements TDSettingsPane {
 	 * Holds all the prediction colour controls. 
 	 */
 	private PamVBox predColHolder; 
+	
+	/**
+	 * Stops the set params from triggering listeners in controls
+	 * that call get params (all sorts of bad things happen if this occurs)
+	 */
+	private boolean setParams = false; 
 
 
 	public DLPredictionPane(DLPredictionPlotInfoFX dlPredictionPlotInfoFX) {
+		
+		System.out.println("HELLO PREDICTION PANE");
+		
 		this.dlPredictionPlotInfoFX=dlPredictionPlotInfoFX; 
 		mainPane = new PamBorderPane(); 
 		mainPane.setCenter(predColHolder = new PamVBox());
 		predColHolder.setSpacing(5);
 		predColHolder.setPadding(new Insets(5,0,0,0));
 
-		if (dlPredictionPlotInfoFX.getDlControl().getDLModel()!=null) {
-			layoutColourPanes( dlPredictionPlotInfoFX.getDlControl().getDLModel().getClassNames());
-		}
+		this.setParams();
+
+//		if (dlPredictionPlotInfoFX.getDlControl().getDLModel()!=null) {
+//			layoutColourPanes( dlPredictionPlotInfoFX.getDlControl().getDLModel().getClassNames());
+//		}
 		
-		this.getParams();
 	}
 
 	@Override
@@ -84,6 +95,8 @@ public class DLPredictionPane extends PamBorderPane implements TDSettingsPane {
 	}
 	
 	public void setParams() {
+//		System.out.println("SET params"); 
+		setParams= true;
 
 		if (dlPredictionPlotInfoFX.getDlControl().getDLModel()!=null) {
 			//populate the prediction pane. 
@@ -92,6 +105,7 @@ public class DLPredictionPane extends PamBorderPane implements TDSettingsPane {
 			layoutColourPanes(classNames);
 		}
 
+		setParams=false; 
 	}
 	
 	private void layoutColourPanes(DLClassName[] classNames){
@@ -103,11 +117,27 @@ public class DLPredictionPane extends PamBorderPane implements TDSettingsPane {
 		predColHolder.getChildren().clear();
 
 		for (int i=0; i<classNames.length; i++) {
-			if (i<colourPanes.size()-1 && classNames[i].className.equals(this.colourPanes.get(i).getName())) {
-				//probably the same
-				colourPanes.add(this.colourPanes.get(i));
+//			System.out.println("classNames: " + classNames[i].className + "   " 
+//		+ this.colourPanes.size() + " LINE INFOS: " + this.dlPredictionPlotInfoFX.getDlPredParams().lineInfos);
+			if (i<this.colourPanes.size()) {
+				if (!classNames[i].className.equals(this.colourPanes.get(i).getName())) {
+					colourPanes.add(new PredictionColourPane(classNames[i].className, true, Color.BLACK));
+				}
+				else {
+					colourPanes.add(this.colourPanes.get(i));
+				}
 			}
-			colourPanes.add(new PredictionColourPane(classNames[i].className, true, Color.BLACK));
+			else {
+				colourPanes.add(new PredictionColourPane(classNames[i].className, true, Color.BLACK));
+			}
+			
+			//now check if we can recycle colours
+			if (this.dlPredictionPlotInfoFX.getDlPredParams().lineInfos!=null && i<this.dlPredictionPlotInfoFX.getDlPredParams().lineInfos.length) {
+				//probably the same
+				//System.out.println("LINE INFOS: " + this.dlPredictionPlotInfoFX.getDlPredParams().lineInfos[i].color);
+				colourPanes.get(i).setLineInfo(dlPredictionPlotInfoFX.getDlPredParams().lineInfos[i]);
+			}
+			
 			predColHolder.getChildren().add(colourPanes.get(i));
 		}
 		
@@ -119,6 +149,9 @@ public class DLPredictionPane extends PamBorderPane implements TDSettingsPane {
 	 * Get the parameters.
 	 */
 	private void getParams() {
+//		System.out.println("GET params"); 
+		if (setParams) return; 
+
 		this.dlPredictionPlotInfoFX.getDlPredParams().lineInfos = new LineInfo[colourPanes.size()];
 		for (int i=0; i<colourPanes.size(); i++) {
 			this.dlPredictionPlotInfoFX.getDlPredParams().lineInfos[i] = new LineInfo(
@@ -164,8 +197,8 @@ public class DLPredictionPane extends PamBorderPane implements TDSettingsPane {
 	
 	
 	/**
-	 * Pane for 
-	 * @author au671271
+	 * Pane for showing prediciton and colour.
+	 * @author Jamie Macaulay
 	 *
 	 */
 	private class PredictionColourPane extends PamHBox {
@@ -192,6 +225,7 @@ public class DLPredictionPane extends PamBorderPane implements TDSettingsPane {
 				newSettings();
 			});
 			toggleSwitch.setPrefWidth(120);
+			toggleSwitch.setTooltip(new Tooltip(name));
 			
 			this.colourPicker = new ColorPicker();
 			this.colourPicker.valueProperty().addListener((obsVal, oldVal, newval)->{
@@ -210,6 +244,11 @@ public class DLPredictionPane extends PamBorderPane implements TDSettingsPane {
 			
 		}
 		
+		public void setLineInfo(LineInfo lineInfo) {
+			this.colourPicker.setValue(lineInfo.color);
+			
+		}
+
 		public String getName() {
 			return name;
 		}

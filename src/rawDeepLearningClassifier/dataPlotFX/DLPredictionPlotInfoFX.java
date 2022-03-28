@@ -15,12 +15,10 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import dataPlotsFX.TDManagedSymbolChooserFX;
 import dataPlotsFX.TDSymbolChooserFX;
-import dataPlotsFX.clickPlotFX.ClickDisplayParams;
 import dataPlotsFX.data.TDDataInfoFX;
 import dataPlotsFX.data.TDDataProviderFX;
 import dataPlotsFX.data.generic.GenericScaleInfo;
 import dataPlotsFX.layout.TDGraphFX;
-import dataPlotsFX.layout.TDSettingsPane;
 import dataPlotsFX.projector.TDProjectorFX;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
@@ -337,7 +335,7 @@ public class DLPredictionPlotInfoFX extends TDDataInfoFX {
 	 * @see dataPlots.data.TDDataInfo#getHidingDialogComponent()
 	 */
 	@Override
-	public TDSettingsPane getGraphSettingsPane() {
+	public DLPredictionPane getGraphSettingsPane() {
 		if (predictionSettingsPane==null) {
 			predictionSettingsPane = new DLPredictionPane(this); 
 		}
@@ -355,6 +353,15 @@ public class DLPredictionPlotInfoFX extends TDDataInfoFX {
 	 */
 	@Override
 	public Serializable getStoredSettings() {
+		if (dlPredParams.lineInfos!=null) {
+			for (int i=0; i<dlPredParams.lineInfos.length; i++) {
+				//set the colour as a double[] because it is not serializable. 
+				dlPredParams.lineInfos[i].colorSerializable = new double[] {dlPredParams.lineInfos[i].color.getRed(), 
+						dlPredParams.lineInfos[i].color.getGreen(), dlPredParams.lineInfos[i].color.getBlue()}; 
+			}
+		}
+		//System.out.println("First colour is getStore: " + dlPredParams.lineInfos[0].color); 
+
 		return dlPredParams;
 	}
 
@@ -363,9 +370,20 @@ public class DLPredictionPlotInfoFX extends TDDataInfoFX {
 	 */
 	@Override
 	public boolean setStoredSettings(Serializable storedSettings) {
-		if (ClickDisplayParams.class.isAssignableFrom(storedSettings.getClass())) {
+		if (DLPredDisplayParams.class.isAssignableFrom(storedSettings.getClass())) {
 			dlPredParams = (DLPredDisplayParams) storedSettings;
+			if (dlPredParams.lineInfos!=null) {
+				for (int i=0; i<dlPredParams.lineInfos.length; i++) {
+					//set the colour because it is not serializable <- what a pain
+					dlPredParams.lineInfos[i].color = Color.color(dlPredParams.lineInfos[i].colorSerializable[0], 
+							dlPredParams.lineInfos[i].colorSerializable[1], dlPredParams.lineInfos[i].colorSerializable[2]);
+				}
+			}
+			//System.out.println("First colour is setStore: " + dlPredParams.lineInfos[0].color); 
 			updateSettings();
+			//Platform.runLater(()->{		
+				getGraphSettingsPane().setParams();
+			//});
 			return true;
 		}
 		return false;
