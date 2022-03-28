@@ -25,7 +25,12 @@ public class LineInfo implements Serializable, Cloneable{
 	/**
 	 * The colour of the line
 	 */
-	public Color color = Color.DODGERBLUE;
+	public transient Color color = Color.DODGERBLUE;
+	
+	/**
+	 * Only used when serializing the data...
+	 */
+	public double[] colorSerializable =  new double[] {30/255., 144/255., 255/255.}; //DODOGER BLUE; 
 	
 	/**
 	 * True if the line is enabled (shown on the plot)

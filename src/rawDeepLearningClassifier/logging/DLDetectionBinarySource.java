@@ -81,8 +81,6 @@ public class DLDetectionBinarySource extends BinaryDataSource {
 		DLDetection cd = (DLDetection) pamDataUnit;
 		
 		//System.out.println("DLDetecitonBinarySource: packed: " +  pamDataUnit.getBasicData().getMeasuredAmplitudeType()); 
-
-		
 		// make a byte array output stream and write the data to that, 
 		// then dump that down to the main storage stream
 		if (dos == null || bos == null) {
