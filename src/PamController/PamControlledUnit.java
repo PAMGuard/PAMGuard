@@ -697,11 +697,33 @@ public abstract class PamControlledUnit implements SettingsNameProvider {
 	}
 
 	/**
-	 * Get a module summary text string for shorthand output to 
-	 * summary QC systems. 
+	 * Get a module summary text string for shorthand output to anyting wanting a 
+	 * short summary of data state / numbers of detections. <br> You should not 
+	 * override this version of the function, but instead override getModuleSummary(boolean clear)
+	 * which allows for optional clearing of summary data. 
 	 * @return module summary string - goings on since the last call to this function
 	 */
 	public String getModuleSummary() {
+		return getModuleSummary(true);
+	}
+
+	/**
+	 * Get a module summary text string for shorthand output to anyting wanting a 
+	 * short summary of data state / numbers of detections. 
+	 * @param clear clear data after generating string, so that counts of detections, etc. start again from 0. 
+	 * @return module summary string - goings on since the last call to this function
+	 */
+	public String getModuleSummary(boolean clear) {
+		return null;
+	}
+	
+	/**
+	 * Handle a module specific command sent by the 
+	 * tellmodule command. 
+	 * @param command command line (stripped of the command and the module type and name)
+	 * @return response to command
+	 */
+	public String tellModule(String command) {
 		return null;
 	}
 

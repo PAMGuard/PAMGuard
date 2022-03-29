@@ -70,6 +70,7 @@ import PamController.PamSettings;
 import PamModel.PamModel;
 import PamModel.SMRUEnable;
 import PamUtils.FrequencyFormat;
+import PamUtils.PamCalendar;
 import PamUtils.PlatformInfo;
 import PamUtils.PlatformInfo.OSType;
 import PamView.MenuItemEnabler;
@@ -776,9 +777,11 @@ public class AcquisitionControl extends PamControlledUnit implements PamSettings
 		return null;
 	}
 	
-	
-	@Override
-	public String getModuleSummary() {
+	/**
+	 * Get a summary of the daq settings for the QA module. 
+	 * @return summary of DAQ settings. 
+	 */
+	public String getDaqSummary() {
 		DaqSystem daqSys = findDaqSystem(null);
 		if (daqSys == null) {
 			return String.format("%s - currently unavailable", acquisitionParameters.daqSystemType);
@@ -795,8 +798,40 @@ public class AcquisitionControl extends PamControlledUnit implements PamSettings
 	}
 	
 	@Override
+	public String tellModule(String command) {
+		/**
+		 * Get timing summary and return as a string. 
+		 */
+		switch (command) {
+		case "gettimeinfo":
+			return getTimeInfoString();
+		}
+		return super.tellModule(command);
+	}
+	
+	
+	/**
+	 * Get a summary of time information as to what's going on in the DAQ
+	 * @return time summary
+	 */
+	private String getTimeInfoString() {
+		/*
+		 * 
+		sprintf(returned,"%s:%lld,%lld,%ld,%lld",getModuleName(),calendar->getRawStartTime(),
+				calendar->getMillisecondTime(),(int)daqProcess->getSampleRate(),acquiredSamples);
+		 */
+		return String.format("%s:%d,%d,%d,%d", getUnitName(), PamCalendar.getSessionStartTime(), PamCalendar.getTimeInMillis(), 
+				(int) acquisitionProcess.getSampleRate(), acquisitionProcess.getTotalSamples(0));
+	}
+	
+	@Override
 	public void pamHasStopped() {
 		acquisitionProcess.pamHasStopped();
+	}
+	
+	@Override
+	public String getModuleSummary(boolean clear) {
+		return getDaqProcess().getRawDataBlock().getSummaryString(clear);
 	}
 
 }

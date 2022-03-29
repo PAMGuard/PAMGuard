@@ -47,7 +47,7 @@ public class QASystemReport {
 			section.addSectionText("Configuration error: No acqusition system found");
 		}
 		else {
-			section.addSectionText("Acquisition System: " + daqControl.getModuleSummary());
+			section.addSectionText("Acquisition System: " + daqControl.getDaqSummary());
 		}
 		report.addSection(section);
 		report.addSection(makeArraySection(ArrayManager.getArrayManager().getCurrentArray(), daqControl));
