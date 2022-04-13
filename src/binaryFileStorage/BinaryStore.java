@@ -27,6 +27,7 @@ import org.w3c.dom.Element;
 
 import pamScrollSystem.ViewLoadObserver;
 import pamViewFX.pamTask.PamTaskUpdate;
+import pamguard.GlobalArguments;
 
 //import com.mysql.jdbc.NdbLoadBalanceExceptionChecker;
 
@@ -136,6 +137,9 @@ PamSettingsSource, OfflineDataStore {
 	
 	//TODO- temp; for debug; 
 	private int nUnits=0;
+	
+	// arg name for global change to store name. 
+	public static final String GlobalFolderArg = "-binaryfolder";
 	
 	/**
 	 * The FX GUI for binary store
@@ -402,9 +406,52 @@ PamSettingsSource, OfflineDataStore {
 	public boolean restoreSettings(
 			PamControlledUnitSettings pamControlledUnitSettings) {
 		binaryStoreSettings = ((BinaryStoreSettings) pamControlledUnitSettings.getSettings()).clone();
+		/*
+		 * Then check to see if there is a command line override of the currently stored folder name. 
+		 */
+		String globFolder = GlobalArguments.getParam(GlobalFolderArg);
+		if (globFolder != null) {
+			boolean ok = checkGlobFolder(globFolder);
+			if (ok) {
+				binaryStoreSettings.setStoreLocation(globFolder); // remember it. 
+			}
+			else {
+				System.err.println("Unable to set binary storage folder " + globFolder);
+			}
+		}
 		return true;
 	}
 
+	/**
+	 * Set and create if necessary the global folder. 
+	 * @param globFolder
+	 */
+	private boolean checkGlobFolder(String globFolder) {
+		File outFold = new File(globFolder);
+		if (outFold.exists()) {
+			if (outFold.isDirectory()) {
+				return true; // all OK
+			}
+			else {
+				return false; // it must be a file - that's bad !
+			}
+		}
+		// try to create it. 
+		try {
+			if (outFold.mkdirs()) {
+				FileFunctions.setNonIndexingBit(outFold);
+				return true;
+			}
+			else {
+				return false; // unable to make the folder. 
+			}
+		}
+		catch (Exception e) {
+			System.err.println("Can't set binary store folder: " + e.getLocalizedMessage());
+			return false;
+		}
+		
+	}
 	@Override
 	public JMenuItem createFileMenu(JFrame parentFrame) {
 		JMenuItem m;

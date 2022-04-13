@@ -33,6 +33,7 @@ public class GenericSwingDialog extends PamDialog {
 
 		GenericSwingDialog swingDialog = new GenericSwingDialog(parentFrame, title, dialogPanels);
 		swingDialog.setParams();
+		swingDialog.pack();
 		swingDialog.setVisible(true);
 		return swingDialog.allOk;
 	}
