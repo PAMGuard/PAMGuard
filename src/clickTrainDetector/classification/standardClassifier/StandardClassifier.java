@@ -9,7 +9,10 @@ import clickTrainDetector.classification.CTClassifier;
 import clickTrainDetector.classification.CTClassifierParams;
 import clickTrainDetector.classification.CTClassifierType;
 import clickTrainDetector.classification.bearingClassifier.BearingClassifier;
+import clickTrainDetector.classification.bearingClassifier.BearingClassifierParams;
+import clickTrainDetector.classification.idiClassifier.IDIClassification;
 import clickTrainDetector.classification.idiClassifier.IDIClassifier;
+import clickTrainDetector.classification.simplechi2classifier.Chi2CTClassification;
 import clickTrainDetector.classification.simplechi2classifier.Chi2ThresholdClassifier;
 import clickTrainDetector.classification.templateClassifier.CTTemplateClassifier;
 import clickTrainDetector.layout.classification.CTClassifierGraphics;
@@ -17,6 +20,7 @@ import clickTrainDetector.layout.classification.standardClassifier.StandardClass
 
 /**
  * Combines the IDI, CHI2, BEARING and TEMPLATE classifier into one. 
+
  * @author Jamie Macaulay
  *
  */
