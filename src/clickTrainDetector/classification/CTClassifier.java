@@ -56,6 +56,13 @@ public interface CTClassifier {
 	 * Set the classifier parameters. 
 	 * @param ctClassifierParams - the ct classifier paratmers
 	 */
-	public void setParams(CTClassifierParams ctClassifierParams); 
+	public void setParams(CTClassifierParams ctClassifierParams);
+
+	
+	/**
+	 * Get the CT classifier params. 
+	 * @return the CT classifier params. 
+	 */
+	public CTClassifierParams getParams(); 
 	
 }

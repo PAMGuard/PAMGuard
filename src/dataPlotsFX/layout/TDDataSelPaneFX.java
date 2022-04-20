@@ -13,6 +13,7 @@ import pamViewFX.fxNodes.PamGridPane;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamTilePane;
 import pamViewFX.fxNodes.PamVBox;
+import pamViewFX.fxNodes.utilityPanes.PamToggleSwitch;
 import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -28,6 +29,7 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
@@ -128,20 +130,20 @@ public class TDDataSelPaneFX extends PamVBox {
 		this.getChildren().clear();
 
 		//the data control pane.
-		Label addRemoveLabel = new Label("Display Data"); 
-		PamGuiManagerFX.titleFont2style(addRemoveLabel);
+		//Label addRemoveLabel = new Label("Display Data"); 
+		//PamGuiManagerFX.titleFont2style(addRemoveLabel);
 //		addRemoveLabel.setFont(PamGuiManagerFX.titleFontSize2);
 
-		this.getChildren().add(addRemoveLabel);
+		//this.getChildren().add(addRemoveLabel);
 		this.getChildren().add(dataControlPane);
 
 		if (tdGraph.getDataList().size()>0) {
-			Label yAxisLabel  = new Label("Y-Axis"); 
-			PamGuiManagerFX.titleFont2style(yAxisLabel);
+			//Label yAxisLabel  = new Label("Y-Axis"); 
+			//PamGuiManagerFX.titleFont2style(yAxisLabel);
 //			yAxisLabel.setFont(PamGuiManagerFX.titleFontSize2);
 			//this.getChildren().add(new Separator());
 
-			this.getChildren().add(yAxisLabel);
+			//this.getChildren().add(yAxisLabel);
 			this.getChildren().add(createYAxisDataList());
 			this.getChildren().add(axisMinMax);
 			this.getChildren().add(new Separator());
@@ -160,9 +162,9 @@ public class TDDataSelPaneFX extends PamVBox {
 		
 		PamHBox controlPane = new PamHBox();
 		controlPane.setSpacing(5);
-		controlPane.setAlignment(Pos.CENTER);
+		controlPane.setAlignment(Pos.CENTER_LEFT);
 
-		addMenuButton = new MenuButton("Add"); 
+		addMenuButton = new MenuButton("Data"); 
 		//addMenuButton.setPrefHeight(PamGuiManagerFX.iconSize);
 //		addMenuButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.ADD, Color.WHITE, PamGuiManagerFX.iconSize));
 		addMenuButton.setGraphic(PamGlyphDude.createPamIcon("mdi2p-plus", Color.WHITE, PamGuiManagerFX.iconSize));
@@ -172,7 +174,7 @@ public class TDDataSelPaneFX extends PamVBox {
 		});
 		TDControlPaneFX.createAddMenuItems(addMenuButton.getItems(), this.tdGraph);
 
-		removeMenuButton = new MenuButton("Remove");
+		removeMenuButton = new MenuButton("Data");
 		//removeMenuButton.setPrefHeight(PamGuiManagerFX.iconSize);
 //		removeMenuButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.REMOVE, Color.WHITE, PamGuiManagerFX.iconSize));
 		removeMenuButton.setGraphic(PamGlyphDude.createPamIcon("mdi2m-minus", Color.WHITE, PamGuiManagerFX.iconSize));
@@ -188,6 +190,7 @@ public class TDDataSelPaneFX extends PamVBox {
 //		button.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.COGS, Color.WHITE, PamGuiManagerFX.iconSize));
 		button.setGraphic(PamGlyphDude.createPamIcon("mdi2c-cogs", Color.WHITE, PamGuiManagerFX.iconSize));
 		controlPane.getChildren().addAll(addMenuButton, removeMenuButton, button); 
+		button.prefHeightProperty().bind(removeMenuButton.heightProperty());
 
 		button.setOnAction((action)->{
 			showPopMenu(button);
@@ -459,9 +462,9 @@ public class TDDataSelPaneFX extends PamVBox {
 		vBox.setPadding(new Insets(10,10,10,10));
 		vBox.setSpacing(10);
 
-		CheckBox dataCB; 
+		PamToggleSwitch dataCB; 
 		for (int i=0; i<tdGraph.getDataList().size(); i++){
-			dataCB = new CheckBox(tdGraph.getDataList().get(i).getDataName());
+			dataCB = new PamToggleSwitch(tdGraph.getDataList().get(i).getDataName());
 			dataCB.setSelected(tdGraph.getDataList().get(i).isShowing());
 			final int list=i; //need a final variable for listener. 
 			dataCB.selectedProperty().addListener(new ChangeListener<Boolean>() {
@@ -471,6 +474,7 @@ public class TDDataSelPaneFX extends PamVBox {
 					tdGraph.repaint(0);
 				}
 			});
+			dataCB.setTooltip(new Tooltip(tdGraph.getDataList().get(i).getDataName())); 
 			vBox.getChildren().add(dataCB);
 		}
 		return vBox;

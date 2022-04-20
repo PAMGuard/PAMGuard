@@ -4,6 +4,7 @@ import IshmaelDetector.EnergySumControl;
 import IshmaelDetector.EnergySumParams;
 import IshmaelDetector.IshDetParams;
 import PamController.SettingsPane;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -12,6 +13,7 @@ import javafx.scene.layout.Pane;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxNodes.PamSpinner;
 import pamViewFX.fxNodes.PamVBox;
+import pamViewFX.fxNodes.utilityPanes.PamToggleSwitch;
 import pamViewFX.fxNodes.utilsFX.ControlField;
 
 /**
@@ -46,14 +48,14 @@ public class EnergySumPane extends SettingsPane<IshDetParams> {
 	/**
 	 * Check box for changing using log scale or not. 
 	 */
-	private CheckBox logScaleCheckBox;
+	private PamToggleSwitch logScaleCheckBox;
 
 	//comparing ratios
 	
 	/**
 	 * Check box for comparing ratios in the Ishamel detector. 
 	 */
-	private CheckBox rationCheckBox;
+	private PamToggleSwitch rationCheckBox;
 	
 	private ControlField<Double> minRatioFreq;
 
@@ -62,7 +64,7 @@ public class EnergySumPane extends SettingsPane<IshDetParams> {
 	/**
 	 * Check box for the adaptive noise floor
 	 */
-	private CheckBox noiseFloorBox;
+	private PamToggleSwitch noiseFloorBox;
 
 	//adaptive threshold 
 	/**
@@ -81,12 +83,14 @@ public class EnergySumPane extends SettingsPane<IshDetParams> {
 	/**
 	 * Check box for enabling output smoothing. 
 	 */
-	private CheckBox outPutSmoothing;
+	private PamToggleSwitch outPutSmoothing;
 	
 	/**
 	 * Long filter control for adaptive noise floor
 	 */
 	private ControlField<Double> shortFilter;
+	
+	public static final double INSET_RIGHT = 130; 
 
 	public EnergySumPane(EnergySumControl ishEnergyControl) {
 		super(null);
@@ -107,15 +111,18 @@ public class EnergySumPane extends SettingsPane<IshDetParams> {
 		PamGuiManagerFX.titleFont2style(titleLabel);
 		//titleLabel.setFont(PamGuiManagerFX.titleFontSize2);
 		
-		minFreq = new ControlField<Double>("Lower Frequency Bound	", "Hz", 0, Double.MAX_VALUE, 500); 
+		minFreq = new ControlField<Double>("Lower Frequency Bound", "Hz", 0, Double.MAX_VALUE, 500); 
 		minFreq.getSpinner().getValueFactory().setConverter(PamSpinner.createStringConverter(3));
 		minFreq.setTooltip(new Tooltip("The lower bound of the frequency band to analyse"));
+//		minFreq.getLabel1().setPadding(new Insets(0,INSET_RIGHT,0,0));
+		minFreq.getLabel1().setPrefWidth(INSET_RIGHT);
 
-		maxFreq = new ControlField<Double>("Upper Frequency Bound	", "Hz", 0, Double.MAX_VALUE, 500);
+		maxFreq = new ControlField<Double>("Upper Frequency Bound", "Hz", 0, Double.MAX_VALUE, 500);
 		maxFreq.getSpinner().getValueFactory().setConverter(PamSpinner.createStringConverter(3));
 		maxFreq.setTooltip(new Tooltip("The upper bound frequency band to analyse"));
-		
-		rationCheckBox = new CheckBox("Use Energy Ratio");
+		maxFreq.getLabel1().setPrefWidth(INSET_RIGHT);
+
+		rationCheckBox = new PamToggleSwitch("Use Energy Ratio");
 		rationCheckBox.setTooltip(new Tooltip(
 						"Sometimes, pulsed noises (clicks or thumps) can be enough like a call of interest\n" +
 						"to trigger false detections by energy measurement. In this case, it can work to use\n "+
@@ -126,18 +133,20 @@ public class EnergySumPane extends SettingsPane<IshDetParams> {
 			//adaptive noise floor and ration are not compatible
 			if (rationCheckBox.isSelected()) noiseFloorBox.setSelected(false);
 		});
-		
-		minRatioFreq = new ControlField<Double>("Lower Ratio Bound		", "Hz", 0, Double.MAX_VALUE, 500); 
+
+		minRatioFreq = new ControlField<Double>("Lower Ratio Bound", "Hz", 0, Double.MAX_VALUE, 500); 
 		minRatioFreq.getSpinner().getValueFactory().setConverter(PamSpinner.createStringConverter(3));
 		minRatioFreq.setTooltip(new Tooltip("The lower bound frequency band to compare frequency ratios"));
+		minRatioFreq.getLabel1().setPrefWidth(INSET_RIGHT);
 
-		maxRatioFreq = new ControlField<Double>("Upper Ratio Bound		", "Hz", 0, Double.MAX_VALUE, 500);
+		maxRatioFreq = new ControlField<Double>("Upper Ratio Bound", "Hz", 0, Double.MAX_VALUE, 500);
 		maxRatioFreq.getSpinner().getValueFactory().setConverter(PamSpinner.createStringConverter(3));
 		maxRatioFreq.setTooltip(new Tooltip("The upper bound frequency band to compare frequency ratios"));
+		maxRatioFreq.getLabel1().setPrefWidth(INSET_RIGHT);
+
 		
 		
-		
-		noiseFloorBox = new CheckBox("Use Adaptive Threshold");
+		noiseFloorBox = new PamToggleSwitch("Use Adaptive Threshold");
 		noiseFloorBox.setTooltip(new Tooltip(
 							"The default Ishmael detector uses a static threshold. If noise suddenly increases\n"
 						+	"then the threshold can be below the noise either triggerring lots of detections or\n"
@@ -145,11 +154,12 @@ public class EnergySumPane extends SettingsPane<IshDetParams> {
 						+	"above the noise floor. An adaptive noise floor tracks the noise with a detection \n"
 						+	"triggered if the energy measurment reaches threshold above the adaptive noise floor."));
 		
-		longFilter = new ControlField<Double>("Long filter			", "", 0, Double.MAX_VALUE, 0.00001); 
+		longFilter = new ControlField<Double>("Long filter", "", 0, Double.MAX_VALUE, 0.00001); 
 		longFilter.getSpinner().getValueFactory().setConverter(PamSpinner.createStringConverter(9));
 		longFilter.setTooltip(new Tooltip("The long filter. Lower values mean the adaptive noise floor changes more slowly with changing energy"));
-		
-		spikeThresh = new ControlField<Double>("Spike Threshold		", "", 1, Double.MAX_VALUE, 10); 
+		longFilter.getLabel1().setPrefWidth(INSET_RIGHT);
+
+		spikeThresh = new ControlField<Double>("Spike Threshold", "", 1, Double.MAX_VALUE, 10); 
 		spikeThresh.getSpinner().getValueFactory().setConverter(PamSpinner.createStringConverter(9));
 		spikeThresh.setTooltip(new Tooltip(		"The maximum multiple above the Ishmael FFT detection output the adaptive threshold can be before\n"
 											+ 	"an exponential decay is added. Since the adaptive threshold is essentially an averaging filter\n"
@@ -157,7 +167,8 @@ public class EnergySumPane extends SettingsPane<IshDetParams> {
 											+ 	"adaptive threshold can end up being so high it takes a long time to settle back to tracking the\n"
 											+ 	"raw ouput. The spike threshold means that if this occurs the adaptive threshold will fall back to\n"
 											+ 	"sensible values much faster."));
-		
+		spikeThresh.getLabel1().setPrefWidth(INSET_RIGHT);
+
 		noiseFloorBox.selectedProperty().addListener((obsval, oldval, newval)->{
 			enableControls();
 			//adaptive noise floor and ration are not compatible
@@ -165,11 +176,12 @@ public class EnergySumPane extends SettingsPane<IshDetParams> {
 				rationCheckBox.setSelected(false);
 			}
 		});
+
 		
-		outPutSmoothing = new CheckBox("Use Detector Smoothing");
+		outPutSmoothing = new PamToggleSwitch("Use Detector Smoothing");
 		outPutSmoothing.setTooltip(new Tooltip(
-							"It can be advantageous to smootrh the out from the detector. This can mean that the detectors\n "
-							+ "is more robust for detecting some multi modal sounds, e.g. dynamite bombs, which have multiple\n"
+							"It can be advantageous to smooth the output from the detector. This can mean that the detectors\n "
+							+ "are more robust for detecting some multi modal sounds, e.g. dynamite bombs, which have multiple\n"
 							+ "closely spaced peaks do not briefly go below threshold and thus are not detected.")); 
 		outPutSmoothing.selectedProperty().addListener((obsval, oldval, newval)->{
 			enableControls();
@@ -178,8 +190,9 @@ public class EnergySumPane extends SettingsPane<IshDetParams> {
 		shortFilter = new ControlField<Double>("Short filter			", "", 0, Double.MAX_VALUE, 0.1); 
 		shortFilter.getSpinner().getValueFactory().setConverter(PamSpinner.createStringConverter(9));
 		shortFilter.setTooltip(new Tooltip("The short filter which defines smoothing. Lower values mean the smoothing is greater"));
-	
-		logScaleCheckBox = new CheckBox("Use log scale"); 
+		shortFilter.getLabel1().setPrefWidth(INSET_RIGHT);
+		
+		logScaleCheckBox = new PamToggleSwitch("Use log scale"); 
 		
 		mainPane.getChildren().addAll(titleLabel, minFreq, maxFreq, rationCheckBox, minRatioFreq, maxRatioFreq,
 				noiseFloorBox, longFilter, spikeThresh, outPutSmoothing, shortFilter, logScaleCheckBox);

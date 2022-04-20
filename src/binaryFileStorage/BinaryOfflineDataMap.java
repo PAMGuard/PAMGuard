@@ -117,9 +117,12 @@ public class BinaryOfflineDataMap extends OfflineDataMap<BinaryOfflineDataMapPoi
 		Datagram dataGram = mapPoint.getDatagram();
 		DatagramManager datagramManager = binaryStore.getDatagramManager();
 		int dataGramSecs = datagramManager.getDatagramSettings().datagramSeconds;
+		
 		long dataGramMillis = dataGramSecs * 1000L;
 		int gramLength = dataGramProvider.getNumDataGramPoints();
 		DatagramDataPoint datagramPoint = null;
+		
+		
 		if (dataGram == null) {
 			dataGram = new Datagram(dataGramSecs);
 			long pStart = mapPoint.getStartTime();
@@ -136,6 +139,7 @@ public class BinaryOfflineDataMap extends OfflineDataMap<BinaryOfflineDataMapPoi
 		 *  time of this data unit ... 
 		 */
 		while (pamDataUnit.getTimeMilliseconds() >= datagramPoint.getStartTime()+dataGramMillis) {
+
 			datagramPoint.setEndTime(datagramPoint.getStartTime()+dataGramMillis);
 			long newStart =  datagramPoint.getEndTime();
 			long newEnd = newStart + dataGramMillis;

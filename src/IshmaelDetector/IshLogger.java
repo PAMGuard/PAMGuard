@@ -71,6 +71,8 @@ public class IshLogger extends PamDetectionLogging {
 		long durationSam = getDuration().getIntegerValue();
 		double pHeight = peakHeight.getDoubleValue();
 		long pTimeSam = peakSample.getIntegerValue();
+		
+		//create the data unit - note that no raw waveform data is stored in the database. 
 		IshDetection id = new IshDetection(timeMilliseconds, endMillis, (float)getLowFreq().getDoubleValue(), 
 				(float)getHighFreq().getDoubleValue(), pTimeSam, pHeight, getPamDataBlock(), chanMap, startSam, durationSam);
 		id.setDatabaseIndex(databaseIndex);

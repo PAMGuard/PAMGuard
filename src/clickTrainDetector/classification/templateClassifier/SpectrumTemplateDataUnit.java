@@ -16,7 +16,7 @@ public class SpectrumTemplateDataUnit extends PamDataUnit {
 	public SpectrumTemplateDataUnit(MatchTemplate spectrumTemplate) {
 		super(0L);
 		this.spectrumTemplate=spectrumTemplate;
-	
+		this.setSampleDuration(1000L); //needed for some plots sometimes...
 	}
 
 }

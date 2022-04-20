@@ -168,7 +168,7 @@ public class GenericAdvPane extends SettingsPane<GenericModelParams> {
 		shapeSpinners= new Spinner[4]; //set at  for now but could be different in future?
 
 		for (int i=0; i<shapeSpinners.length; i++) {
-			shapeSpinners[i] =  new Spinner<Integer>(-1, Integer.MAX_VALUE, 10,  10); 
+			shapeSpinners[i] =  new Spinner<Integer>(-1, Integer.MAX_VALUE, 10,  1); 
 			shapeSpinners[i] .setPrefWidth(80);
 			shapeSpinners[i] .getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 			shapeSpinners[i] .setEditable(true);
@@ -201,7 +201,7 @@ public class GenericAdvPane extends SettingsPane<GenericModelParams> {
 
 		for (int i=0; i<outShapeSpinners.length; i++) {
 			
-			outShapeSpinners[i] =  new Spinner<Integer>(-1, Integer.MAX_VALUE, 10,  10); 
+			outShapeSpinners[i] =  new Spinner<Integer>(-1, Integer.MAX_VALUE, 10,  1); 
 			outShapeSpinners[i] .setPrefWidth(80);
 			outShapeSpinners[i] .getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 			outShapeSpinners[i] .setEditable(true);

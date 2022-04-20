@@ -84,16 +84,19 @@ public class DelayGroup {
 		int iOut = 0;
 		
 		//if max delays is null then it's just the spectrum length
-		if (maxDelays==null) {
+		//added maxDelays.length!=nOutputs because imported clicks (e.g. from Rainbow clicks) can have 
+		//a maxDelays length of 0. 
+		if (maxDelays==null || maxDelays.length!=nOutputs) {
 			maxDelays = new double[waveformInput.length];
 			for (int i = 0; i < nOutputs; i++) {
 				maxDelays[i]=specData[0].getFftLength(); 
 			}
 		}
 		
+
 		//perform the time delay calculations
 		for (int i = 0; i < nChan; i++) {
-			for (int j = i+1; j < nChan; j++, iOut++) {				
+			for (int j = i+1; j < nChan; j++, iOut++) {	
 				TimeDelayData td = correlations.getDelay(specData[i].getFftData(), specData[j].getFftData(), 
 						delayParams, sampleRate*delayParams.getUpSample(), specData[i].getFftLength(), maxDelays[iOut]);
 				td.scaleDelay(1./ delayParams.getUpSample());

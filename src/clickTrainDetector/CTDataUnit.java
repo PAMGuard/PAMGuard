@@ -149,6 +149,12 @@ public class CTDataUnit extends CTDetectionGroupDataUnit implements RawDataHolde
 //			Debug.println("CTDataUnit: Add data to raw data holder: " +
 //					averageWaveform.getAverageWaveform());
 		}
+		else {
+			//here we simply create a histogram of frequencies and add the freq limits to the histogram. 
+			averageWaveform.addWaveform(dataUnit.getBasicData().getFrequency()[0],dataUnit.getBasicData().getFrequency()[1], 
+					dataUnit.getAmplitudeDB(),
+					dataUnit.getParentDataBlock().getSampleRate(), defaultFFTLen);
+		}
 	}
 
 	@Override

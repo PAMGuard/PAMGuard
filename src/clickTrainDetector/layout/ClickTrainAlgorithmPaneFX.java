@@ -22,6 +22,7 @@ import clickTrainDetector.layout.classification.CTClassifiersPane;
 import cpod.CPODClick;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -50,7 +51,7 @@ public class ClickTrainAlgorithmPaneFX extends SettingsPane<ClickTrainParams> {
 	//there is something a little weird about template spectrum classifier which in Swing means
 	//it needs to be 850 in height or the template covers some of the controls and they
 	//cannot be clicked on??
-	private static final double prefHeight = 800; 
+	private static final double prefHeight = 750; 
 	
 	private static final double prefWidth = 450; 
 
@@ -194,12 +195,16 @@ public class ClickTrainAlgorithmPaneFX extends SettingsPane<ClickTrainParams> {
 		Label label = new Label("Click Train Detector Algorithm"); 
 //		label.setFont(PamGuiManagerFX.titleFontSize2);
 		PamGuiManagerFX.titleFont2style(label);
+		
+		
+		dataSelectorHolder = new PamBorderPane(); 
 
 		
 		PamVBox ctDetectorHolder = new PamVBox(); 
 		ctDetectorHolder.setSpacing(5); 
-		ctDetectorHolder.getChildren().addAll(label, clickTrainAlgorithmBox, ctSettingsHolder);
-		
+		ctDetectorHolder.getChildren().addAll(sourcePane, groupHolder, dataSelectorHolder, label, clickTrainAlgorithmBox, ctSettingsHolder);
+		ctDetectorHolder.setPadding(new Insets(5,5,5,5));
+
 		//the data selector pane. 
 		dataSelectorPane = createDataSelectorPane();
 		
@@ -209,6 +214,9 @@ public class ClickTrainAlgorithmPaneFX extends SettingsPane<ClickTrainParams> {
 		/***The species classifiers***/
 		ctClassifierHolder= new CTClassifiersPane(clickTrainControl); 
 		ctClassifierHolder.setPadding(new Insets(5,0,0,0));
+		
+		
+	
 		
 		//the tab pane to hold classifier and the detector pane. 
 		tabPane = new TabPane(); 
@@ -221,10 +229,11 @@ public class ClickTrainAlgorithmPaneFX extends SettingsPane<ClickTrainParams> {
 		tabPane.getTabs().addAll(tab1, tab3, tab2);
 		tabPane.setPrefHeight(prefHeight);
 		
-		dataSelectorHolder = new PamBorderPane();  
+		tabPane.setSide(Side.TOP);
+		
 
-		holder.getChildren().addAll(sourcePane, groupHolder, dataSelectorHolder,  tabPane); 
-		holder.setPadding(new Insets(5,5,5,5));	
+		holder.getChildren().addAll(tabPane); 
+		//holder.setPadding(new Insets(5,5,5,5));	
 
 		return holder; 
 	}

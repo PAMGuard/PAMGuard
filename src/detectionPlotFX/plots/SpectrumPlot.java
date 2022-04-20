@@ -128,11 +128,17 @@ public abstract class  SpectrumPlot <D extends PamDataUnit> implements Detection
 
 	@Override
 	public void setupAxis(D data, double sR, DetectionPlotProjector plotProjector) {
+		
+		if (data ==null) return;
 
 		this.sR=sR;  
 
 		int[] minmax = getAxisMinMaxSamples(plotProjector);
-
+		
+		if (minmax[1]>=data.getSampleDuration()) minmax[1]=(int) (data.getSampleDuration()-1);
+		if (minmax[0]<0 || minmax[0]>=minmax[1]) minmax[0]=0;
+		
+		//System.out.println("Min max: " + minmax[0] + "  " + minmax[1]);
 
 		plotProjector.setEnableScrollBar(false);
 		plotProjector.setScrollAxis(Side.TOP); //invisible. 
@@ -145,12 +151,15 @@ public abstract class  SpectrumPlot <D extends PamDataUnit> implements Detection
 	}
 
 	/**
-	 * Get the minimum and maximum samples currently shwon in the plot projector
-	 * @param plotProjector
-	 * @return
+	 * Get the minimum and maximum samples currently shown in the plot projector
+	 * @param plotProjector - the pot projector. 
+	 * @return the minimum and maximum samples
 	 */
 	private int[] getAxisMinMaxSamples(DetectionPlotProjector plotProjector) {
 		int[] minmax = new int[2]; 
+		
+//		System.out.println("Plot projector: " + plotProjector.getAxis(Side.TOP).getMinVal() + "  " +
+//				plotProjector.getAxis(Side.TOP).getMaxVal());
 
 		minmax[0] = (int) ((plotProjector.getAxis(Side.TOP).getMinVal()/1000.)*sR); //this is in milliseconds
 		minmax[1] = (int) ((plotProjector.getAxis(Side.TOP).getMaxVal()/1000.)*sR); 

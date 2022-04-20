@@ -32,7 +32,7 @@ public class CTClassifierParams implements Cloneable, Serializable, ManagedParam
 	public int speciesFlag = 1; 
 	
 	/**
-	 * Easy way to know which classifier the parameter class belong to rather than big instancof statement
+	 * Easy way to know which classifier the parameter class belong to rather than big instance of statement
 	 */
 	public CTClassifierType type; 
 	

@@ -385,13 +385,13 @@ public abstract class TDDataInfoFX {
 		
 		synchronized (pamDataBlock.getSynchLock()) {
 
-			//FIXME - shouldn;t have to clear every time but seems like we do? 
+			//FIXME - shouldn't have to clear every time but seems like we do? 
 			pamDataBlock.clearChannelIterators();
 
 //			scrollStart = PamCalendar.getTimeInMillis();
 			//work out start and stop times
-			long loopEnd = (long) (scrollStart + (tdProjector.getVisibleTime() * 1.05));
-			long loopStart = (long) (scrollStart - (tdProjector.getVisibleTime() * .05));
+			long loopEnd = (long) (scrollStart + (tdProjector.getVisibleTime() * 1.5));
+			long loopStart = (long) (scrollStart - (tdProjector.getVisibleTime() * .5));
 
 			//find a number close to the index start, 			
 			ListIterator<PamDataUnit> it = getUnitIterator( loopStart,  plotNumber);

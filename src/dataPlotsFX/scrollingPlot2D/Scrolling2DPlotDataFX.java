@@ -903,7 +903,7 @@ public class Scrolling2DPlotDataFX {
 	 */
 	 public void drawWrapLine(GraphicsContext g2d, double wrapScreenPix, double freqPixels){
 		 g2d.setStroke(this.specColors.getWrapColor());
-		 g2d.setLineWidth(3);
+		 g2d.setLineWidth(1);
 		 g2d.strokeLine(wrapScreenPix, 0 , wrapScreenPix, freqPixels);
 	 }
 

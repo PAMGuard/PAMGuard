@@ -51,6 +51,7 @@ public class PamUtils {
 				channels++;
 			}
 		}
+		
 		/*
 		 * Looks like this has been returning 1 instead of -1 for many years. 
 		 * May need to revert to this behaviour if modules have come to depend
@@ -58,6 +59,7 @@ public class PamUtils {
 		 */
 		if (channels > 1)
 			return -1; 
+		
 		return singleChan;
 	}
 

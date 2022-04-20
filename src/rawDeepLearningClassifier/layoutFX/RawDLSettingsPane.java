@@ -109,6 +109,8 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 	 */
 	private HBox dataSelectorPane;
 
+	private Label infoLabel;
+
 	public RawDLSettingsPane(DLControl dlControl){
 		super(null); 
 		this.dlControl=dlControl; 
@@ -173,12 +175,18 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 		windowLength.setPrefWidth(100);
 		windowLength.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 		windowLength.setEditable(true);
+		windowLength.valueProperty().addListener((obsVal, oldVal, newVal)->{
+			setSegInfoLabel(); 
+		});
 
 		hopLength =    new PamSpinner<Integer>(0, Integer.MAX_VALUE, 10,  10000); 
 		hopLength.setPrefWidth(100);
 		hopLength.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 		hopLength.setEditable(true);
-
+		hopLength.valueProperty().addListener((obsVal, oldVal, newVal)->{
+			setSegInfoLabel(); 
+		});
+		
 		reMergeSeg =    new PamSpinner<Integer>(0, Integer.MAX_VALUE, 1,  1); 
 		reMergeSeg.setPrefWidth(100);
 		reMergeSeg.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
@@ -208,6 +216,9 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 		segmenterGridPane.add(new Label("segments"), 2, 2);
 
 		vBox.getChildren().add(segmenterGridPane);
+		
+		vBox.getChildren().add(infoLabel = new Label());
+
 
 		Label label2 = new Label("Deep Learning Model"); 
 		label2.setPadding(new Insets(5,0,0,0));
@@ -267,6 +278,23 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 		return dataSelectorPane; 
 	}
 	
+	/**
+	 * Set extra information in the info label. 
+	 */
+	private void setSegInfoLabel() {
+		String text; 
+		if (sourcePane.getSource()==null) {
+			text = String.format("Window - s Hop: - s (no source data)"); 
+		}
+		else {
+			float sR =  sourcePane.getSource().getSampleRate(); 
+			double windowLenS = windowLength.getValue()/sR;
+			double hopLengthS = hopLength.getValue()/sR;
+
+			text = String.format("Window %.3f s Hop: %.3f s", windowLenS, hopLengthS); 
+		}
+		infoLabel.setText(text);
+	}
 	
 	/**
 	 * Creates pane allowing the user to change fine scale things such as error limits. 
@@ -442,6 +470,8 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 		setClassifierPane(); 
 		
 		enableControls(); 
+		
+		setSegInfoLabel();
 
 	}
 

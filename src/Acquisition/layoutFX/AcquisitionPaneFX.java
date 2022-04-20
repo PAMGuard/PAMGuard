@@ -4,20 +4,28 @@ import java.util.ArrayList;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import pamViewFX.PamGuiManagerFX;
+import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
+import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamComboBox;
 import pamViewFX.fxNodes.PamGridPane;
+import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamTextField;
 import pamViewFX.fxNodes.PamVBox;
+import pamViewFX.fxNodes.flipPane.FlipPane;
 import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionParameters;
 import Acquisition.ChannelListPanel;
@@ -109,6 +117,22 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 	private PamBorderPane mainPane;
 
 	/**
+	 * 
+	 */
+	private FlipPane flipPane;
+	
+	
+	/**
+	 * Pane which can be used for advanced settings. 
+	 */
+	private PamBorderPane advancedSettingPane;
+
+	/**
+	 * Title label for the advanced pane. 
+	 */
+	private Label advLabel; 
+
+	/**
 	 * Default spacing for VBox 
 	 */
 	private static double defaultVSpacing=5; 
@@ -124,6 +148,12 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 
 		this.acquisitionControl=aquisitionControl;
 		this.acquisitionParameters=acquisitionControl.getAcquisitionParameters();
+		
+		//create the flip pane. 
+		flipPane=new FlipPane(); 
+		flipPane.setFlipDirection(Orientation.HORIZONTAL);
+		flipPane.setFlipTime(250); //default is 700ms- way too high
+
 
 		if (aquisitionControl.isViewer()){
 			this.mainPane.setCenter(createViewerModePane()); 
@@ -131,10 +161,50 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 		else {
 			this.mainPane.setCenter(createRealTimePane());
 		}
+		flipPane.getFront().getChildren().add(mainPane);
+		
+		//create the advanced flip pane.
+		advancedSettingPane = createAdvSettingsPane(); 
+		flipPane.getBack().getChildren().add(advancedSettingPane);
+
 		
 		System.out.println("MAKE PANE: "  +  acquisitionParameters.getDaqSystemType());
 
 	} 
+	
+	/**
+	 * Create the advanced settings pane which can be accessed by DAQ panes if needed. 
+	 */
+	private PamBorderPane createAdvSettingsPane() {
+		
+		PamButton back = new PamButton(); 
+		back.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-left", Color.WHITE, PamGuiManagerFX.iconSize));
+		
+		back.setOnAction((action)->{
+			flipPane.flipToFront(); 
+		});
+		
+		PamBorderPane advPane = new PamBorderPane(); 
+		advPane.setPadding(new Insets(5,5,5,5));
+		
+		PamHBox buttonHolder = new PamHBox(); 
+		
+		buttonHolder.setBackground(null);
+		//buttonHolder.setStyle("-fx-background-color: red;");
+		buttonHolder.setAlignment(Pos.CENTER_LEFT);
+		buttonHolder.getChildren().addAll(back, advLabel = new Label("Adv. Settings")); 
+		advLabel.setAlignment(Pos.CENTER);
+		advLabel.setMaxWidth(Double.MAX_VALUE); //nneed ot make sure label is in center. 
+		PamGuiManagerFX.titleFont2style(advLabel);
+		
+		advLabel.setAlignment(Pos.CENTER);
+		HBox.setHgrow(advLabel, Priority.ALWAYS);
+		
+		advPane.setTop(buttonHolder);
+		
+		return advPane; 
+		
+	}
 
 	/**
 	 * Create the Sound Aquisition pane for real time monitoring. 
@@ -506,7 +576,7 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 
 	@Override
 	public Node getContentNode() {
-		return mainPane;
+		return flipPane;
 	}
 
 	@Override
@@ -526,6 +596,22 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 	public AcquisitionParameters getParams(AcquisitionParameters currParams) {
 		if (acquisitionParameters==null) acquisitionParameters=currParams;
 		return getParams();
+	}
+
+	/**
+	 * Get the flip pane. 
+	 * @return the flip pane. 
+	 */
+	public FlipPane getFlipPane() {
+		return this.flipPane;
+	}
+
+	public PamBorderPane getAdvancedPane() {
+		return this.advancedSettingPane;
+	}
+
+	public Label getAdvancedLabel() {
+		return this.advLabel;
 	}
 
 }

@@ -154,7 +154,8 @@ public class ColorComboBox extends ComboBox<String>{
 	 * @param freqColourArray - the colour array vlaue to set the combo box to. 
 	 */
 	public void setValue(ColourArrayType freqColourArray) {
-		this.setValue(ColourArray.getName(freqColourArray)); 
+		this.getSelectionModel().select(ColourArray.getName(freqColourArray));
+		//this.setValue(ColourArray.getName(freqColourArray)); 
 	}
 
 

@@ -4,9 +4,11 @@ import java.awt.geom.Path2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import IshmaelDetector.IshDetFnDataUnit;
 import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamDetection.LocalisationInfo;
+import PamUtils.Coordinate3d;
 import PamUtils.PamUtils;
 import PamView.GeneralProjector;
 import PamView.HoverData;
@@ -23,6 +25,7 @@ import dataPlotsFX.data.TDDataProviderFX;
 import dataPlotsFX.data.TDScaleInfo;
 import dataPlotsFX.layout.TDGraphFX;
 import dataPlotsFX.projector.TDProjectorFX;
+import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
@@ -59,6 +62,11 @@ public class GenericDataPlotInfo extends TDDataInfoFX {
 	 * The frequency info 
 	 */
 	protected GenericScaleInfo frequencyInfo;
+
+	/**
+	 * Previous points for a line chart. 
+	 */
+	private Point2D[] lastUnits;
 	
 
 	public GenericDataPlotInfo(TDDataProviderFX tdDataProvider, TDGraphFX tdGraph, PamDataBlock pamDataBlock) {
@@ -129,8 +137,12 @@ public class GenericDataPlotInfo extends TDDataInfoFX {
 
 		double y = Math.min(y0,  y1);
 		double h = Math.abs(y1-y0);
-		g.strokeRect(x0, y, x1-x0, h);
-		g.fillRect(x0, y, x1-x0, h);
+		
+		if (x1>x0 && (!this.getTDGraph().isWrap() || (x1<tdProjector.getWidth() && x0>=0))) {
+			//in wrap mode we can get some very werid plotting if x co-ordinates are less than 0 or greate than the grpah width. 
+			g.strokeRect(x0, y, x1-x0, h);
+			g.fillRect(x0, y, x1-x0, h);
+		}
 		
 		//create the polygon. 
 		
@@ -142,17 +154,24 @@ public class GenericDataPlotInfo extends TDDataInfoFX {
 		
 		Path2D path2D= new Path2D.Double(0,1); 
 		
-		//System.out.println("Generic Data Plot: " + "x0: " + x0 + " x1: " + x1 + " y1: " + y1 + " y: " + y0); 
-		path2D.moveTo(x0, y1-pix);
-		path2D.lineTo(x0, y0+pix);
-		path2D.lineTo(x1, y0+pix);
-		path2D.lineTo(x1, y1-pix);
+//		if (Math.abs(x1-x0)>50) {
+//	
+//			System.out.println("Generic Data Plot: " + "x0: " + x0 + " x1: " + x1 + " y1: " + y1 + " y: " + y0); 
+//		}
+		
+		if (x1>x0) {
+			path2D.moveTo(x0, y1-pix);
+			path2D.lineTo(x0, y0+pix);
+			path2D.lineTo(x1, y0+pix);
+			path2D.lineTo(x1, y1-pix);
+		}
 		
 		tdProjector.addHoverData(new HoverData(path2D, pamDataUnit, 0, plotNumber));
 		
 		
 		return null;
 	}
+	
 
 	@Override
 	public Double getDataValue(PamDataUnit pamDataUnit) {
@@ -195,7 +214,7 @@ public class GenericDataPlotInfo extends TDDataInfoFX {
 		return null;
 	}
 
-	private Double getBearingValue(PamDataUnit pamDataUnit) {
+	public Double getBearingValue(PamDataUnit pamDataUnit) {
 		AbstractLocalisation locData = pamDataUnit.getLocalisation();
 		if (locData == null) {
 			return null;
@@ -208,7 +227,7 @@ public class GenericDataPlotInfo extends TDDataInfoFX {
 		return null;
 	}
 
-	private Double getSlantValue(PamDataUnit pamDataUnit) {
+	public Double getSlantValue(PamDataUnit pamDataUnit) {
 		AbstractLocalisation locData = pamDataUnit.getLocalisation();
 		if (locData == null) {
 			return null;
@@ -221,7 +240,7 @@ public class GenericDataPlotInfo extends TDDataInfoFX {
 		return null;
 	}
 
-	private Double getAmplitudeValue(PamDataUnit pamDataUnit) {
+	public Double getAmplitudeValue(PamDataUnit pamDataUnit) {
 		//System.out.println("max val: " + ampScaleInfo.getMaxVal()); 
 		return pamDataUnit.getAmplitudeDB();
 	}

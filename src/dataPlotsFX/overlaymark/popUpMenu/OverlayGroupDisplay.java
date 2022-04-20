@@ -63,6 +63,10 @@ public class OverlayGroupDisplay extends PamBorderPane {
 	 */
 	private boolean hasSuper = false;
 
+	private DisplayTab detectionsTab;
+
+	private DisplayTab suprDetTab;
+
 	/**
 	 * Constructor for the group detection display.
 	 */
@@ -74,6 +78,15 @@ public class OverlayGroupDisplay extends PamBorderPane {
 		superDetectionsDisplay = new DetectionGroupDisplay();
 	}
 
+	/**
+	 * Get the current number of detection plots that are available to dsiplay the currently set 
+	 * data units. 
+	 * @return the number of deteciton plots. Will be zero if the data cannot be displayed. 
+	 */
+	public int getDetectionPlotCount() {
+		if (detectionsPane.getDetectionDisplay().getCurrentDataInfo()==null) return 0; 
+		return detectionsPane.getDetectionDisplay().getCurrentDataInfo().getDetectionPlotCount(); 
+	}
 
 	/**
 	 * Layout the pane. 
@@ -83,6 +96,8 @@ public class OverlayGroupDisplay extends PamBorderPane {
 			this.setCenter(null); 
 			return; 
 		}
+
+		
 		if (hasSuperDetectionDisplay()) {
 			hasSuper=true;
 			//need to redo this to prevent duplicate children issues...
@@ -100,11 +115,10 @@ public class OverlayGroupDisplay extends PamBorderPane {
 			tabPane.addEventHandler(EventType.ROOT, event -> this.fireEvent(event));
 			//		    tabPane.setPickOnBounds(false);
 
-			Tab tab; 
-			tabPane.getTabs().add(tab = new DisplayTab("Data Units", detectionsPane));
-			tab.setClosable(false);
-			tabPane.getTabs().add(tab = new DisplayTab("Super Detection", superDetectionsDisplay));
-			tab.setClosable(false);
+			tabPane.getTabs().add(detectionsTab = new DisplayTab("Data Units", detectionsPane));
+			detectionsTab.setClosable(false);
+			tabPane.getTabs().add(suprDetTab = new DisplayTab("Super Detection", superDetectionsDisplay));
+			suprDetTab.setClosable(false);
 
 			tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab)->{
 				DetectionGroupDisplay display = ((DisplayTab) newTab).getDetGroupDisplay(); 
@@ -112,11 +126,22 @@ public class OverlayGroupDisplay extends PamBorderPane {
 			}); 
 
 			this.setCenter(tabPane);
+			
+			//might have detections which cannot be individually shown but summaries are shown in super display. 
+			if (getDetectionPlotCount()<1) {
+				detectionsTab.setDisable(true);
+				tabPane.getSelectionModel().select(1);
+			} 
+			else {
+				detectionsTab.setDisable(false);
+			}
 		}
 		else  {
 			hasSuper=false; 
 			this.setCenter(detectionsPane);
 		}
+		
+
 	}
 
 	/**
@@ -148,7 +173,7 @@ public class OverlayGroupDisplay extends PamBorderPane {
 	 * can be displayed on a graph. 
 	 * @return true if super detection graph exists. 
 	 */
-	private boolean hasSuperDetectionDisplay() {
+	public boolean hasSuperDetectionDisplay() {
 
 		@SuppressWarnings("rawtypes")
 		HashSet<SuperDetection> dataUnitSet = getUniqueSuperDetections(); 
@@ -226,10 +251,12 @@ public class OverlayGroupDisplay extends PamBorderPane {
 		//		Debug.out.println("Super list size: " + superDets);
 
 		this.detectionsPane.setDetectionGroup(dataList);
+	
+		
+		
 		if (superDets!=null) {
 			this.superDetectionsDisplay.setDetectionGroup(new ArrayList<PamDataUnit>(superDets));
 		}
-
 		this.prepareDisplay(); 
 	}
 

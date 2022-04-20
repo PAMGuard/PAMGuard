@@ -35,6 +35,6 @@ public class DLPredictionProvider extends TDDataProviderFX {
 	}
 	
 	public String getName() {
-		return "Prediciton probability, " + dlControl.getUnitName();
+		return "Prediction probability, " + dlControl.getUnitName();
 	}
 }

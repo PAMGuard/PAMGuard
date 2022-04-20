@@ -47,7 +47,7 @@ public class CTTemplateClassifier implements CTClassifier {
 	/**
 	 * THe Chi2 threshold classifier. 
 	 */
-	public Chi2ThresholdClassifier chi2ThresholdClassifier;
+	//public Chi2ThresholdClassifier chi2ThresholdClassifier;
 	
 	/**
 	 * The spectrum template which has been interpolated for current sample rate and
@@ -57,15 +57,15 @@ public class CTTemplateClassifier implements CTClassifier {
 	
 	public CTTemplateClassifier(ClickTrainControl clickTrainControl, int defaultSpeciesID) {
 		this.clickTrainControl = clickTrainControl;
-		chi2ThresholdClassifier=new Chi2ThresholdClassifier(clickTrainControl, defaultSpeciesID); 
+		//chi2ThresholdClassifier=new Chi2ThresholdClassifier(clickTrainControl, defaultSpeciesID); 
 		templateClassifierParams.speciesFlag=defaultSpeciesID; 
-		templateClassifierParams.chi2ThresholdParams.speciesFlag=defaultSpeciesID; //must make this the same 
+		//templateClassifierParams.chi2ThresholdParams.speciesFlag=defaultSpeciesID; //must make this the same 
 	}
 	
 	public CTTemplateClassifier(int defaultSpeciesID) {
-		chi2ThresholdClassifier=new Chi2ThresholdClassifier(defaultSpeciesID); 
+		//chi2ThresholdClassifier=new Chi2ThresholdClassifier(defaultSpeciesID); 
 		templateClassifierParams.speciesFlag=defaultSpeciesID; 
-		templateClassifierParams.chi2ThresholdParams.speciesFlag=defaultSpeciesID; //must make this the same 
+		//templateClassifierParams.chi2ThresholdParams.speciesFlag=defaultSpeciesID; //must make this the same 
 	}
 
 	@Override
@@ -74,9 +74,9 @@ public class CTTemplateClassifier implements CTClassifier {
 		//Debug.out.println("Click train: " + clickTrain + " sub count: " + clickTrain.getSubDetectionsCount() + " UID: " + clickTrain.getUID());
 
 		//little HACK here to ensure species falgs are the same.
-		templateClassifierParams.chi2ThresholdParams.speciesFlag=templateClassifierParams.speciesFlag; 
+		//templateClassifierParams.chi2ThresholdParams.speciesFlag=templateClassifierParams.speciesFlag; 
 
-		chi2ThresholdClassifier.setParams(templateClassifierParams.chi2ThresholdParams);
+		//chi2ThresholdClassifier.setParams(templateClassifierParams.chi2ThresholdParams);
 
 		if (clickTrain.getAverageSpectra()==null) {
 			System.err.println("TemplateClassifier:There is no average waveform for template classification: " + clickTrain.averageWaveform);
@@ -89,25 +89,17 @@ public class CTTemplateClassifier implements CTClassifier {
 		//need to work out correlation threshold whatever
 		
 		//first check the chi2 value. 
-		Chi2CTClassification chi2Classification = chi2ThresholdClassifier.classifyClickTrain(clickTrain); 
+		//Chi2CTClassification chi2Classification = chi2ThresholdClassifier.classifyClickTrain(clickTrain); 
 		
 		
-		//check chi^2 classification is passed
-		if (chi2Classification.getSpeciesID()!=templateClassifierParams.speciesFlag) {
-			//no classification
-//			Debug.out.println(templateClassifierParams.classifierName + " Classifier: Failed chi2 classifier: " + chi2Classification.getSpeciesID() + 
-//					" " +chi2ThresholdClassifier.getParams().speciesFlag + " " + templateClassifierParams.speciesFlag + " min chi2: " + templateClassifierParams.chi2ThresholdParams.chi2Threshold); 
-			return new TemplateClassification(CTClassifier.PRECLASSIFIERFLAG, corrValue);
-		}
+//		//check chi^2 classification is passed
+//		if (chi2Classification.getSpeciesID()!=templateClassifierParams.speciesFlag) {
+//			//no classification
+////			Debug.out.println(templateClassifierParams.classifierName + " Classifier: Failed chi2 classifier: " + chi2Classification.getSpeciesID() + 
+////					" " +chi2ThresholdClassifier.getParams().speciesFlag + " " + templateClassifierParams.speciesFlag + " min chi2: " + templateClassifierParams.chi2ThresholdParams.chi2Threshold); 
+//			return new TemplateClassification(CTClassifier.PRECLASSIFIERFLAG, corrValue);
+//		}
 		
-		//check IDI classification is passed
-		boolean passesIDI = checkIDIMeasurements(clickTrain); 
-		//check chi^2 classification is passed
-		if (!passesIDI) {
-			//no classification 
-//			Debug.out.println(templateClassifierParams.classifierName +" Classifier: Failed IDI classifier: "); 
-			return new TemplateClassification(CTClassifier.PRECLASSIFIERFLAG, corrValue);
-		}
 		
 		// check template correlation. 
 		if (Double.isNaN(corrValue) || corrValue<templateClassifierParams.corrThreshold) {
@@ -219,30 +211,6 @@ public class CTTemplateClassifier implements CTClassifier {
 		return corr;
 	}
 
-	/**
-	 * Check IDI measurments for a click trian
-	 * @return true if all measurments are passed. 
-	 */
-	private boolean checkIDIMeasurements(CTDataUnit clickTrain) {
-		IDIInfo idiInfo = clickTrain.getIDIInfo();
-				
-		if (templateClassifierParams.useMedianIDI && 
-				(idiInfo.medianIDI<templateClassifierParams.minMedianIDI || idiInfo.medianIDI>templateClassifierParams.maxMedianIDI)) {
-			return false; 
-		}
-		
-		if (templateClassifierParams.useMeanIDI && 
-				(idiInfo.meanIDI<templateClassifierParams.minMeanIDI || idiInfo.meanIDI>templateClassifierParams.maxMeanIDI)) {
-			return false; 
-		}
-		
-		if (templateClassifierParams.useStdIDI && 
-				(idiInfo.stdIDI<templateClassifierParams.minStdIDI || idiInfo.stdIDI>templateClassifierParams.maxStdIDI)) {
-			return false; 
-		}
-		
-		return true; 
-	}
 
 	@Override
 	public String getName() {
@@ -270,14 +238,14 @@ public class CTTemplateClassifier implements CTClassifier {
 		this.templateClassifierParams=(TemplateClassifierParams) ctClassifierParams;
 	}
 
-	/**
-	 * Get the simple chi^2 classifier which forms one of the classification tests for 
-	 * the template classifier. 
-	 * @return the chi2 classifier. 
-	 */
-	public Chi2ThresholdClassifier getSimpleCTClassifier() {
-		return this.chi2ThresholdClassifier;
-	}
+//	/**
+//	 * Get the simple chi^2 classifier which forms one of the classification tests for 
+//	 * the template classifier. 
+//	 * @return the chi2 classifier. 
+//	 */
+//	public Chi2ThresholdClassifier getSimpleCTClassifier() {
+//		return this.chi2ThresholdClassifier;
+//	}
 
 	@Override
 	public int getSpeciesID() {

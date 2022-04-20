@@ -99,35 +99,11 @@ public class RawDataTransforms {
 	 */
 	private int shortestFFTLength;
 
-	/**
-	 * Object for synchronization. Get thread lock if this isn't the same as
-	 * the object holding the data. 
-	 */
-	private Object synchObject;
 
 
-
-	/**
-	 * Raw Data Transforms for a RawDataHolder using the rawDataHolder as the synchronization 
-	 * object.
-	 * @param rawDataHolder RawDataHolder object (e.g. a click)
-	 */
 	public RawDataTransforms(@SuppressWarnings("rawtypes") PamDataUnit rawDataHolder) {
-		this(rawDataHolder, rawDataHolder);
-	}
-	
-	/**
-	 * Raw Data Transforms for a RawDataHolder. 
-	 * @param rawDataHolder RawDataHolder object (e.g. a click)
-	 * @param synchObject synchronization object, which is most likely the RawDataHolder object. 
-	 */
-	public RawDataTransforms(@SuppressWarnings("rawtypes") PamDataUnit rawDataHolder, Object synchObject) {
 		this.rawData=(RawDataHolder) rawDataHolder; 
 		this.dataUnit  = rawDataHolder; 
-		this.synchObject = synchObject;
-		if (this.synchObject == null) {
-			this.synchObject = this;
-		}
 	}
 
 
@@ -167,25 +143,23 @@ public class RawDataTransforms {
 	 * @param fftLength
 	 * @return Power spectrum
 	 */
-	public double[] getPowerSpectrum(int channel, int minBin, int maxBin, int fftLength) {
-		synchronized (synchObject) {
-			if (minBin==0 && maxBin>=this.getWaveData(0).length-1) {
-				return getPowerSpectrum(channel,  fftLength); 
-			}		
-			if (fftLength == 0) {
-				fftLength = getCurrentSpectrumLength();
-			}
-
-			double[] waveformTrim = new double[maxBin-minBin]; 
-
-			//		System.out.println("minBin: " +  minBin + " maxBin: " + maxBin + " raw waveform: " + this.getWaveData(channel).length); 
-
-			System.arraycopy(this.getWaveData(channel), minBin, waveformTrim, 0, Math.min(this.getWaveData(channel).length-minBin-1, waveformTrim.length));
-
-			ComplexArray cData =  getComplexSpectrumHann(waveformTrim, fftLength); 
-
-			return cData.magsq();
+	public synchronized double[] getPowerSpectrum(int channel, int minBin, int maxBin, int fftLength) {
+		if (minBin==0 && maxBin>=this.getWaveData(0).length-1) {
+			return getPowerSpectrum(channel,  fftLength); 
+		}		
+		if (fftLength == 0) {
+			fftLength = getCurrentSpectrumLength();
 		}
+		
+		double[] waveformTrim = new double[maxBin-minBin]; 
+		
+		//System.out.println("minBin: " +  minBin + " maxBin: " + maxBin + " raw waveform: " + this.getWaveData(channel).length); 
+		
+		System.arraycopy(this.getWaveData(channel), minBin, waveformTrim, 0, Math.min(this.getWaveData(channel).length-minBin-1, waveformTrim.length));
+
+		ComplexArray cData =  getComplexSpectrumHann(waveformTrim, fftLength); 
+
+		return cData.magsq();
 	}
 
 	/**
@@ -196,31 +170,29 @@ public class RawDataTransforms {
 	 * @param fftLength
 	 * @return Power spectrum
 	 */
-	public double[] getPowerSpectrum(int channel, int fftLength) {
-		synchronized (synchObject) {
-			if (powerSpectra == null) {
-				powerSpectra = new double[PamUtils.getNumChannels(dataUnit.getChannelBitmap())][];
-			}
-			if (fftLength == 0) {
-				fftLength = getCurrentSpectrumLength();
-			}
-
-			if (powerSpectra[channel] == null
-					|| powerSpectra[channel].length != fftLength / 2) {
-				ComplexArray cData = getComplexSpectrumHann(channel, fftLength);
-				currentSpecLen = fftLength;
-				powerSpectra[channel] = cData.magsq();
-				if (powerSpectra==null){
-					System.err.println("DLDetection: could not calculate power spectra");
-					return null;
-
-				}
-				if (powerSpectra[channel].length != fftLength/2) {
-					powerSpectra[channel] = Arrays.copyOf(powerSpectra[channel], fftLength/2);
-				}
-			}
-			return powerSpectra[channel];
+	public synchronized double[] getPowerSpectrum(int channel, int fftLength) {
+		if (powerSpectra == null) {
+			powerSpectra = new double[PamUtils.getNumChannels(dataUnit.getChannelBitmap())][];
 		}
+		if (fftLength == 0) {
+			fftLength = getCurrentSpectrumLength();
+		}
+
+		if (powerSpectra[channel] == null
+				|| powerSpectra[channel].length != fftLength / 2) {
+			ComplexArray cData = getComplexSpectrumHann(channel, fftLength);
+			currentSpecLen = fftLength;
+			powerSpectra[channel] = cData.magsq();
+			if (powerSpectra==null){
+				System.err.println("DLDetection: could not calculate power spectra");
+				return null;
+
+			}
+			if (powerSpectra[channel].length != fftLength/2) {
+				powerSpectra[channel] = Arrays.copyOf(powerSpectra[channel], fftLength/2);
+			}
+		}
+		return powerSpectra[channel];
 	}
 
 
@@ -230,27 +202,25 @@ public class RawDataTransforms {
 	 * @param fftLength
 	 * @return Sum of power spectra
 	 */
-	public double[] getTotalPowerSpectrum(int fftLength) {
-		synchronized (synchObject) {
-			if (fftLength == 0) {
-				fftLength = getCurrentSpectrumLength();
-			}
-			if (fftLength == 0) {
-				fftLength = PamUtils.getMinFftLength(getSampleDuration());
-			}
-			double[] ps;
-			if (totalPowerSpectrum == null
-					|| totalPowerSpectrum.length != fftLength / 2) {
-				totalPowerSpectrum = new double[fftLength / 2];
-				for (int c = 0; c < PamUtils.getNumChannels(this.dataUnit.getChannelBitmap()); c++) {
-					ps = getPowerSpectrum(c, fftLength);
-					for (int i = 0; i < fftLength / 2; i++) {
-						totalPowerSpectrum[i] += ps[i];
-					}
+	public synchronized double[] getTotalPowerSpectrum(int fftLength) {
+		if (fftLength == 0) {
+			fftLength = getCurrentSpectrumLength();
+		}
+		if (fftLength == 0) {
+			fftLength = PamUtils.getMinFftLength(getSampleDuration());
+		}
+		double[] ps;
+		if (totalPowerSpectrum == null
+				|| totalPowerSpectrum.length != fftLength / 2) {
+			totalPowerSpectrum = new double[fftLength / 2];
+			for (int c = 0; c < PamUtils.getNumChannels(this.dataUnit.getChannelBitmap()); c++) {
+				ps = getPowerSpectrum(c, fftLength);
+				for (int i = 0; i < fftLength / 2; i++) {
+					totalPowerSpectrum[i] += ps[i];
 				}
 			}
-			return totalPowerSpectrum;
 		}
+		return totalPowerSpectrum;
 	}
 
 
@@ -265,17 +235,15 @@ public class RawDataTransforms {
 	 * @param fftLength - the FFT length to use. 
 	 * @return the complex spectrum - the comnplex spectrum of the wave data from the specified channel. 
 	 */
-	public ComplexArray getComplexSpectrumHann(int channel, int fftLength) {
-		synchronized (synchObject) {
-			complexSpectrum = new ComplexArray[PamUtils.getNumChannels(dataUnit.getChannelBitmap())];
-			if (complexSpectrum[channel] == null
-					|| complexSpectrum.length != fftLength / 2) {
+	public synchronized ComplexArray getComplexSpectrumHann(int channel, int fftLength) {
+		complexSpectrum = new ComplexArray[PamUtils.getNumChannels(dataUnit.getChannelBitmap())];
+		if (complexSpectrum[channel] == null
+				|| complexSpectrum.length != fftLength / 2) {
 
-				complexSpectrum[channel] =  getComplexSpectrumHann(rawData.getWaveData()[channel], fftLength); 
-				currentSpecLen = fftLength;
-			}
-			return complexSpectrum[channel];
+			complexSpectrum[channel] =  getComplexSpectrumHann(rawData.getWaveData()[channel], fftLength); 
+			currentSpecLen = fftLength;
 		}
+		return complexSpectrum[channel];
 	}
 
 
@@ -314,12 +282,10 @@ public class RawDataTransforms {
 	 * @return the spectrogram length. 
 	 */
 	private int getCurrentSpectrumLength() {
-		synchronized (synchObject) {
-			if (currentSpecLen<=0) {
-				currentSpecLen = PamUtils.getMinFftLength(dataUnit.getSampleDuration());
-			}
-			return currentSpecLen; 
+		if (currentSpecLen<=0) {
+			currentSpecLen = PamUtils.getMinFftLength(dataUnit.getSampleDuration());
 		}
+		return currentSpecLen; 
 	}
 
 
@@ -405,31 +371,29 @@ public class RawDataTransforms {
 	 * @param fftLength
 	 * @return the complex spectrum
 	 */
-	public ComplexArray getComplexSpectrum(int channel, int fftLength) {
-		synchronized (synchObject) {
-			double[] paddedRawData;
-			double[] rawData;
-			int i, mn;
+	public synchronized ComplexArray getComplexSpectrum(int channel, int fftLength) {
+		double[] paddedRawData;
+		double[] rawData;
+		int i, mn;
 
-			if (complexSpectrum == null) {
-				complexSpectrum = new ComplexArray[getNChan()];
-			}
-			if (complexSpectrum[channel] == null
-					|| complexSpectrum.length != fftLength / 2) {
-				paddedRawData = new double[fftLength];
-				rawData = getWaveData(channel);
-				//double[] rotData = getRotationCorrection(channel);
-				mn = Math.min(fftLength, getSampleDuration().intValue());
-				for (i = 0; i < mn; i++) {
-					paddedRawData[i] = rawData[i];//-rotData[i];
-				}
-				for (i = mn; i < fftLength; i++) {
-					paddedRawData[i] = 0;
-				}
-				complexSpectrum[channel] = fastFFT.rfft(paddedRawData, fftLength);
-			}
-			return complexSpectrum[channel];
+		if (complexSpectrum == null) {
+			complexSpectrum = new ComplexArray[getNChan()];
 		}
+		if (complexSpectrum[channel] == null
+				|| complexSpectrum.length != fftLength / 2) {
+			paddedRawData = new double[fftLength];
+			rawData = getWaveData(channel);
+			//double[] rotData = getRotationCorrection(channel);
+			mn = Math.min(fftLength, getSampleDuration().intValue());
+			for (i = 0; i < mn; i++) {
+				paddedRawData[i] = rawData[i];//-rotData[i];
+			}
+			for (i = mn; i < fftLength; i++) {
+				paddedRawData[i] = 0;
+			}
+			complexSpectrum[channel] = fastFFT.rfft(paddedRawData, fftLength);
+		}
+		return complexSpectrum[channel];
 	}
 
 
@@ -438,16 +402,14 @@ public class RawDataTransforms {
 	 * @param iChan channel index
 	 * @return analytic waveform
 	 */
-	public double[] getAnalyticWaveform(int iChan) {
-		synchronized (synchObject) {
-			if (analyticWaveform == null) {
-				analyticWaveform = new double[getNChan()][];
-			}
-			//		if (analyticWaveform[iChan] == null) {
-			analyticWaveform[iChan] = hilbert.getHilbert(getWaveData(iChan));
-			//		}
-			return analyticWaveform[iChan];
+	public synchronized double[] getAnalyticWaveform(int iChan) {
+		if (analyticWaveform == null) {
+			analyticWaveform = new double[getNChan()][];
 		}
+		//		if (analyticWaveform[iChan] == null) {
+		analyticWaveform[iChan] = hilbert.getHilbert(getWaveData(iChan));
+		//		}
+		return analyticWaveform[iChan];
 	}
 
 	/**
@@ -459,14 +421,12 @@ public class RawDataTransforms {
 	 * @param fftFilterParams fft filter parameters. 
 	 * @return analystic waveform. 
 	 */
-	public double[] getAnalyticWaveform(int iChan, boolean filtered, FFTFilterParams fftFilterParams) {
-		synchronized (synchObject) {
-			if (filtered == false || fftFilterParams == null) {
-				return getAnalyticWaveform(iChan);
-			}
-			else {
-				return getFilteredAnalyticWaveform(fftFilterParams, iChan);
-			}
+	public synchronized double[] getAnalyticWaveform(int iChan, boolean filtered, FFTFilterParams fftFilterParams) {
+		if (filtered == false || fftFilterParams == null) {
+			return getAnalyticWaveform(iChan);
+		}
+		else {
+			return getFilteredAnalyticWaveform(fftFilterParams, iChan);
 		}
 	}
 
@@ -477,8 +437,7 @@ public class RawDataTransforms {
 	 * @param iChan channel number
 	 * @return envelope of the filtered data. 
 	 */
-	public double[] getFilteredAnalyticWaveform(FFTFilterParams fftFilterParams, int iChan) {
-		synchronized (synchObject) {
+	public synchronized double[] getFilteredAnalyticWaveform(FFTFilterParams fftFilterParams, int iChan) {
 		if (analyticWaveform == null) {
 			analyticWaveform = new double[getNChan()][];
 		}
@@ -487,7 +446,6 @@ public class RawDataTransforms {
 				getHilbert(getFilteredWaveData(fftFilterParams, iChan));
 		//		}
 		return analyticWaveform[iChan];
-		}
 	}
 
 	/**
@@ -497,21 +455,19 @@ public class RawDataTransforms {
 	 * @return analystic waveforms 
 	 */
 	public double[][] getFilteredAnalyticWaveform(FFTFilterParams fftFilterParams) {
-		synchronized (synchObject) { // new
-			if (analyticWaveform == null) {
-				analyticWaveform = new double[getNChan()][];
-			}
-			for (int iChan = 0; iChan < getNChan(); iChan++) {
-				if (fftFilterParams != null) {
-					analyticWaveform[iChan] = hilbert.
-							getHilbert(getFilteredWaveData(fftFilterParams, iChan));
-				}
-				else {
-					analyticWaveform[iChan] = getAnalyticWaveform(iChan);
-				}
-			}
-			return analyticWaveform;
+		if (analyticWaveform == null) {
+			analyticWaveform = new double[getNChan()][];
 		}
+		for (int iChan = 0; iChan < getNChan(); iChan++) {
+			if (fftFilterParams != null) {
+				analyticWaveform[iChan] = hilbert.
+						getHilbert(getFilteredWaveData(fftFilterParams, iChan));
+			}
+			else {
+				analyticWaveform[iChan] = getAnalyticWaveform(iChan);
+			}
+		}
+		return analyticWaveform;
 	}
 
 
@@ -522,7 +478,7 @@ public class RawDataTransforms {
 	 * @param channelIndex channel index
 	 * @return filtered waveform data
 	 */
-	public double[] getFilteredWaveData(FFTFilterParams filterParams, int channelIndex) {
+	public synchronized double[] getFilteredWaveData(FFTFilterParams filterParams, int channelIndex) {
 		filteredWaveData = getFilteredWaveData(filterParams);
 		return filteredWaveData[channelIndex];
 	}
@@ -533,14 +489,12 @@ public class RawDataTransforms {
 	 * @param filterParams filter parameters
 	 * @return array of filtered data
 	 */
-	public double[][] getFilteredWaveData(FFTFilterParams filterParams) {
-		synchronized (synchObject) {
+	public synchronized double[][] getFilteredWaveData(FFTFilterParams filterParams) {
 		//System.out.println("Make filterred wave data!: " + (filterParams != oldFFTFilterParams));
 		if (filteredWaveData == null || filterParams != oldFFTFilterParams) {
 			filteredWaveData = makeFilteredWaveData(filterParams);
 		}
 		return filteredWaveData;
-		}
 	}
 
 
@@ -584,15 +538,13 @@ public class RawDataTransforms {
 	 * @return FFT filter object. 
 	 */
 	public FFTFilter getFFTFilter(FFTFilterParams fftFilterParams) {
-		synchronized (synchObject) {
-			if (fftFilter == null) {
-				fftFilter = new FFTFilter(fftFilterParams, this.dataUnit.getParentDataBlock().getSampleRate());
-			}
-			else {
-				fftFilter.setParams(fftFilterParams, this.dataUnit.getParentDataBlock().getSampleRate());
-			}
-			return fftFilter;
+		if (fftFilter == null) {
+			fftFilter = new FFTFilter(fftFilterParams, this.dataUnit.getParentDataBlock().getSampleRate());
 		}
+		else {
+			fftFilter.setParams(fftFilterParams, this.dataUnit.getParentDataBlock().getSampleRate());
+		}
+		return fftFilter;
 	}
 
 
@@ -637,9 +589,7 @@ public class RawDataTransforms {
 	 * @return
 	 */
 	private int getNChan() {
-		synchronized (synchObject) { // new
-			return this.rawData.getWaveData().length;
-		}
+		return this.rawData.getWaveData().length;
 	}
 
 	/**
@@ -672,11 +622,9 @@ public class RawDataTransforms {
 	 * Free eup some memory by deleting the filtered wave data, power spectra and analytic waveform. 
 	 */
 	public void freeMemory() {
-		synchronized (synchObject) {
-			filteredWaveData = null;
-			powerSpectra = null;
-			analyticWaveform = null;
-		}
+		filteredWaveData = null;
+		powerSpectra = null;
+		analyticWaveform = null;
 	}
 
 

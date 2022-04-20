@@ -222,7 +222,7 @@ public class MHTSettingsPane extends SettingsPane<MHTParams> {
 		for (DefaultMHTSpecies speciesTypes: DefaultMHTSpecies.values()) {
 			menuItem = new MenuItem(DefaultMHTParams.getDefaultSpeciesName(speciesTypes)); 
 			menuItem.setOnAction((action)->{
-				setParams(DefaultMHTParams.getDefaultMHTParams(speciesTypes)); 
+				setParams(DefaultMHTParams.getDefaultMHTParams(speciesTypes, mhtClickTrainAlgorithm.getClickTrainControl().getParentDataBlock())); 
 			});
 			speciesChoiceBox.getItems().add(menuItem); 
 		}

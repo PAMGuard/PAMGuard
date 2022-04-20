@@ -20,5 +20,11 @@ public class CPODProcess extends PamProcess {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	
+	@Override
+	public float getSampleRate() {
+		return CPODClickDataBlock.CPOD_SR;
+	}
 
 }

@@ -69,6 +69,7 @@ public class Datagram implements Serializable, ManagedParameters {
 	 * @param datagramPoint
 	 */
 	public synchronized void addDataPoint(DatagramDataPoint datagramPoint) {
+		//System.out.println("Datagram points: " + dataPoints.size() + " intervalSeconds: " + intervalSeconds);
 		dataPoints.add(datagramPoint);
 	}
 

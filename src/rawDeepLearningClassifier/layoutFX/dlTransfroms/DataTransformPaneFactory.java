@@ -40,8 +40,15 @@ public class DataTransformPaneFactory {
 		DLTransformPane settingsPane = null;
 		switch (dlTransfrom.getDLTransformType()) {
 		case DECIMATE:
-			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Sample rate "}, new String[]{"Hz. "}); 
-			double sR = ((SimpleTransform) dlTransfrom).getParams()[0].doubleValue(); 
+			double sR;
+			if (((SimpleTransform) dlTransfrom).getParams()!=null){
+				sR = ((SimpleTransform) dlTransfrom).getParams()[0].doubleValue(); 
+			}
+			else {
+				sR = 20000; 
+				((SimpleTransform) dlTransfrom).setParams(new Number[] {Double.valueOf(sR)});
+			}
+			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Sample rate "}, new String[]{"Hz. "});
 			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 100.0, Double.MAX_VALUE,   sR>10000.0 ? 1000.0 : 100.0);
 			break;
 		case PREEMPHSIS:

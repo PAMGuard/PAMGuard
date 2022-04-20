@@ -398,6 +398,8 @@ public class ImportBCLDialog extends PamDialog {
 		public void done() {
 			dwvConverter = null;
 			enableControls();
+			//update the datamap to show the new clicks. 
+			PamController.getInstance().updateDataMap();
 		}
 		
 	}

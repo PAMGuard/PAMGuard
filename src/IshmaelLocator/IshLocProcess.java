@@ -400,7 +400,7 @@ abstract public class IshLocProcess extends PamProcess implements SpectrogramMar
 			outputUnit.setInfo(startSam, channelMap, startSam, durationSam);
 		else {                                  //new outputUnit
 			outputUnit = new IshDetection(startMsec, endMsec, (float)f0, (float)f1, 
-					midSam, 1.0, outputDataBlock, channelMap, startSam, durationSam);
+					midSam, 1.0, outputDataBlock, channelMap, startSam, durationSam); //TODO - need to add ra data. 
 		}
 
 		////////////////////////////////// Do it! ////////////////////////////////////////

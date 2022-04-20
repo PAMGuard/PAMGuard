@@ -80,6 +80,7 @@ public class StandardFileDatePane extends FileDatePane<StandardFileDateSettings>
 		mainPane.setCenter(createDatePane());
 		this.setParams();
 		mainPane.setPrefWidth(350);
+		mainPane.setPadding(new Insets(5,5,5,5));
 	}
 
 

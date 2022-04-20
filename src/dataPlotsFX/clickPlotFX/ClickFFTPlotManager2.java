@@ -90,6 +90,8 @@ public class ClickFFTPlotManager2 extends FFTPlotManager  {
 			double[][] spectrum=clickSpectrogram.getSpectrogram(chanClick); 		
 			
 			double clipLevel = ArrayManager.getArrayManager().getCurrentArray().getClipLevel(PamUtils.getChannelArray(pamDataUnit.getChannelBitmap())[chanClick]); 
+			
+			//System.out.println("clipLevel: " + clipLevel); 
 
 			drawClipSpectrogram(spectrum,  pamDataUnit.getTimeMilliseconds(), 
 					writableImage.getScrollingPLot2DSegmenter().getMaxY(), clickPlotInfoFX.getClickDisplayParams().fftHop,
@@ -123,8 +125,6 @@ public class ClickFFTPlotManager2 extends FFTPlotManager  {
 		double[] minMax=PamUtils.getMinAndMax(spectrum);
 		double cutOff=clickPlotInfoFX.getClickDisplayParams().fftCutOf*minMax[1];  
 		double binSize = maxFreq/(double) spectrum.length; 
-		
-
 		//		System.out.println("cutOff: "+cutOff+ " fftCutOf: " + clickDisplayParams.fftCutOf);
 
 		int y1, y2; 
@@ -141,8 +141,6 @@ public class ClickFFTPlotManager2 extends FFTPlotManager  {
 		if (clickPlotInfoFX.getClickDisplayParams().fftCutOf==0){
 			y1=writableImage.getScrollingPLot2DSegmenter().getImageYPixels(0, writableImage); 
 			y2=writableImage.getScrollingPLot2DSegmenter().getImageYPixels(maxFreq, writableImage); 
-
-
 
 			strokeLine(writableImage, tc, y1, y2, ffColor); 
 		}

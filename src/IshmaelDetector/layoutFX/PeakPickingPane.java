@@ -43,6 +43,9 @@ public class PeakPickingPane extends SettingsPane<IshDetParams> {
 	 * 	Spinner for the minimum inter detection interval (IDI) between concurrent detections. 
 	 */
 	private PamSpinner<Double> minIDI; 
+	
+	public static final double INSET_RIGHT = 130; 
+
 
 	public PeakPickingPane() {
 		super(null);
@@ -69,14 +72,19 @@ public class PeakPickingPane extends SettingsPane<IshDetParams> {
 		
 		int row=0; 
 		
-		gridHolder.add(new Label("Threshold"), 0, 0);
+		Label threshLabel = new Label("Threshold"); 
+		threshLabel.setPrefWidth(INSET_RIGHT);
+		gridHolder.add(threshLabel, 0, 0);
+		
 		gridHolder.add(threshold = new PamSpinner<Double>(0, Double.MAX_VALUE, 0.05, 0.01), 1, 0);
 		threshold.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 		threshold.getValueFactory().setConverter(PamSpinner.createStringConverter(8));
 		threshold.setEditable(true);
 
 		row++;
-		gridHolder.add(new Label("Min time over threshold"), 0, row);
+		Label minThresh = new Label("Min time over threshold");
+		minThresh.setPrefWidth(INSET_RIGHT);
+		gridHolder.add(minThresh, 0, row);
 		gridHolder.add(minTime = new PamSpinner<Double>(0, Double.MAX_VALUE, 0.4, 0.1), 1, row);
 		minTime.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 		minTime.getValueFactory().setConverter(PamSpinner.createStringConverter(4));
@@ -92,7 +100,9 @@ public class PeakPickingPane extends SettingsPane<IshDetParams> {
 		});
 
 		row++;
-		gridHolder.add(new Label("Max time over threshold"), 0, row);
+		Label maxThresh = new Label("Max time over threshold");
+		maxThresh.setPrefWidth(INSET_RIGHT);
+		gridHolder.add(maxThresh, 0, row);
 		gridHolder.add(maxTime = new PamSpinner<Double>(0, Double.MAX_VALUE, 0, 0.1), 1, row);
 		maxTime.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 		maxTime.getValueFactory().setConverter(PamSpinner.createStringConverter(4));
@@ -107,7 +117,9 @@ public class PeakPickingPane extends SettingsPane<IshDetParams> {
 		});
 
 		row++;
-		gridHolder.add(new Label("Min IDI"), 0, row);
+		Label minIDILabel = new Label("Min IDI");
+		minIDILabel.setPrefWidth(INSET_RIGHT);
+		gridHolder.add(minIDILabel, 0, row);
 		gridHolder.add(minIDI = new PamSpinner<Double>(0, Double.MAX_VALUE, 0.4, 0.1), 1, row);
 		minIDI.getValueFactory().setConverter(PamSpinner.createStringConverter(4));
 		minIDI.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
