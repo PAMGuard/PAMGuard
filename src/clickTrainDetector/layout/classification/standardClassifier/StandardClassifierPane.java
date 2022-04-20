@@ -50,10 +50,10 @@ public class StandardClassifierPane extends  SettingsPane<StandardClassifierPara
 
 			final int ii = i; 
 			enableSwitch[i].selectedProperty().addListener((obsVal, oldVal, newVal)->{
-				standardClassifier.getClassifiers().get(ii).getCTClassifierGraphics().getCTClassifierPane().setDisable(!enableSwitch[ii].isSelected());
-				labels[ii].setDisable(!enableSwitch[ii].isSelected()); 
+				disableClassifierPane(ii);
 			});
-
+			disableClassifierPane(ii); //need to call here or else when the pane is first created stuff is not disabled. 
+		
 			PamHBox hBox = new PamHBox(); 
 			hBox.setSpacing(5);
 
@@ -63,7 +63,9 @@ public class StandardClassifierPane extends  SettingsPane<StandardClassifierPara
 		}
 
 		return vBox; 
-	} 
+	}
+	
+	
 	
 	private void disableClassifierPane(int ii) {
 		standardClassifier.getClassifiers().get(ii).getCTClassifierGraphics().getCTClassifierPane().setDisable(!enableSwitch[ii].isSelected());
