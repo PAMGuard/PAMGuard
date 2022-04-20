@@ -128,6 +128,8 @@ public abstract class  SpectrumPlot <D extends PamDataUnit> implements Detection
 
 	@Override
 	public void setupAxis(D data, double sR, DetectionPlotProjector plotProjector) {
+		
+		if (data ==null) return;
 
 		this.sR=sR;  
 
