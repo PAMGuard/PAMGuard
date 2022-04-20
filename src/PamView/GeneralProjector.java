@@ -85,7 +85,7 @@ public abstract class GeneralProjector<T extends PamCoordinate> {
 		TIME ("Time"), FREQUENCY ("Frequency"), AMPLITUDE ("Amplitude"), LATITUDE ("Latitude"), LONGITUDE ("Longitude") ,
 		BEARING ("Bearing"), RANGE ("Range"), SLANTANGLE ("Slant angle"), ICI ("Inter-click-interval"),
 		DEPTH ("Depth"), SLANTBEARING ("Slant bearing"), AMPLITUDE_STEM ("Amplitude (stem)"), AMPLITUDE_LIN ("Linear Amplitude"),
-		SPEED ("Speed"), PROBABILITY ("Probability"),  NCYCLES ("No. cycles"), BANDWIDTH("Bandwidth");
+		SPEED ("Speed"), PROBABILITY ("Probability"),  NCYCLES ("No. cycles"), BANDWIDTH("Bandwidth"), ISHDET("Detector Output");
 		
 		private String unit;
 
@@ -103,7 +103,8 @@ public abstract class GeneralProjector<T extends PamCoordinate> {
 
 	static public enum ParameterUnits {
 		SECONDS ("s"), HZ ("Hz"), DB ("dB"), RAW ("raw"), DECIMALDEGREES ("\u00B0"), METERS ("m"), 
-		NMILES ("nmi"), DEGREES ("\u00B0"), RADIANS ("rad"), METRESPERSECOND ("m/s"), PROBABILITY ("p"), N("N");
+		NMILES ("nmi"), DEGREES ("\u00B0"), RADIANS ("rad"), METRESPERSECOND ("m/s"), PROBABILITY ("p"),
+		N("N"), NONE("");
 		
 		private String unit;
 

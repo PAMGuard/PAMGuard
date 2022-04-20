@@ -842,5 +842,18 @@ public class PamArrayUtils {
 		return false;
 	}
 
+	/**
+	 * Convert a float array to a double array. 
+	 * @param arrf - the float array
+	 * @return a double array containing the same numbers as arrf. 
+	 */
+	public static double[] float2Double(float[] arrf) {
+		double[] arr = new double[arrf.length]; 
+		for (int i=0; i<arr.length; i++) {
+			arr[i] = (double) arrf[i]; 
+		}
+		return arr;
+	}
+
 }
 

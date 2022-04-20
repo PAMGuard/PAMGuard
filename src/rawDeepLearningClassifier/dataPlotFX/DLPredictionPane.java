@@ -58,7 +58,7 @@ public class DLPredictionPane extends PamBorderPane implements TDSettingsPane {
 
 	public DLPredictionPane(DLPredictionPlotInfoFX dlPredictionPlotInfoFX) {
 		
-		System.out.println("HELLO PREDICTION PANE");
+		//System.out.println("HELLO PREDICTION PANE");
 		
 		this.dlPredictionPlotInfoFX=dlPredictionPlotInfoFX; 
 		mainPane = new PamBorderPane(); 

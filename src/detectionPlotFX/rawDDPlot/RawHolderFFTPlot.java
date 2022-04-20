@@ -1,12 +1,10 @@
 package detectionPlotFX.rawDDPlot;
 
-import PamUtils.PamUtils;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.RawDataHolder;
 import detectionPlotFX.layout.DetectionPlot;
 import detectionPlotFX.layout.DetectionPlotDisplay;
 import detectionPlotFX.plots.FFTPlot;
-import detectionPlotFX.plots.RawFFTPlot;
 import detectionPlotFX.plots.WaveformPlot;
 import detectionPlotFX.projector.DetectionPlotProjector;
 import javafx.scene.canvas.GraphicsContext;

@@ -15,12 +15,14 @@ import java.io.Serializable;
 
 import javax.swing.JMenuItem;
 
+import IshmaelDetector.dataPlotFX.IshmaelDetPlotProvider;
 import IshmaelDetector.layoutFX.IshEnergyPaneFX;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamSettings;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamRawDataBlock;
+import dataPlotsFX.data.TDDataProviderRegisterFX;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
 
 @SuppressWarnings("rawtypes")
@@ -39,6 +41,7 @@ public class EnergySumControl extends IshDetControl implements PamSettings {
 	
 	public EnergySumControl(String unitName) {
 		super("Energy Sum Detector", unitName, new EnergySumParams());
+
 	}
 	
 	@Override

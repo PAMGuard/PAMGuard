@@ -220,6 +220,10 @@ public class FileDataDialogStripFX extends PamBorderPane {
 		advDatePane.setParams();
 	}
 
+	public FileDatePane<?> getAdvDatePane() {
+		return advDatePane;
+	}
+
 	/**
 	 * Enable the controls. 
 	 */

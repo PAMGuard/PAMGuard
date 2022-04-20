@@ -17,7 +17,7 @@ import PamguardMVC.PamProcess;
  * course of doing making detections. Currently this means it is the superclass
  * of EnergySumProcess, SgramCorrProcess, and MatchFiltProcess.
  * 
- * @author Dave Mellinger
+ * @author Dave Mellinger and Jamie Macaulay
  */ 
 @SuppressWarnings("rawtypes")
 public abstract class IshDetFnProcess extends PamProcess
@@ -36,7 +36,7 @@ public abstract class IshDetFnProcess extends PamProcess
 	/**
 	 * The binary data source. Records the raw detector output. 
 	 */
-	private IshmaelBinaryDataSource ishmealBinaryDataSource;
+	private IshFnBinarySource ishmealBinaryDataSource;
 	
 	/** Initialiser. 
 	 * <p>IMPORTANT: The subclass initializer should construct the ishDetParams
@@ -59,7 +59,7 @@ public abstract class IshDetFnProcess extends PamProcess
 				IshDetFnDataUnit.class, getLongName(), this, 1 << channel);
 		
 		
-		ishmealBinaryDataSource = new IshmaelBinaryDataSource(this, outputDataBlock, "Ishmael_det_raw");
+		ishmealBinaryDataSource = new IshFnBinarySource(this, outputDataBlock, "Ishmael Fn");
 		outputDataBlock.setBinaryDataSource(ishmealBinaryDataSource);
 		
 //		outputDataBlock = new RecyclingDataBlock<IshDetFnDataUnit>(
@@ -232,4 +232,12 @@ public abstract class IshDetFnProcess extends PamProcess
 	 * the upper bound of the detection kernel
 	 */
 	public abstract float getHiFreq();
+	
+	/**
+	 * Get the output data block. 
+	 * @return the output data block. 
+	 */
+	public PamDataBlock getOutputDataBlock() {
+		return outputDataBlock;
+	}
 }

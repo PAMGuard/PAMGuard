@@ -150,7 +150,8 @@ public class TDProjectorFX extends TimeProjectorFX {
 	@Override
 	public double getTimePix(double timeMillis){
 		double timePix = getTimeAxis().getPosition((timeMillis)/1000.);
-		if (isWrap()){		
+		if (isWrap()){	
+			//stops a small portion of the spectrogram showing at the end of the display
 			if (timePix<0) {
 				return timePix - 30;
 			}

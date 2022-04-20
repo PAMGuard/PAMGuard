@@ -228,7 +228,6 @@ public class RawClipDataInfo extends GenericDataPlotInfo {
 	 */
 	@Override
 	public ArrayList<TDScaleInfo> getScaleInfos() {		
-
 		setNPlotPanes(this.rawWaveInfo,this.getDataBlock(), false); 
 		//setNPlotPanes(this.frequencyInfo,this.getDataBlock(), false); 
 		return super.getScaleInfos();

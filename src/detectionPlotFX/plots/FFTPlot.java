@@ -395,7 +395,7 @@ public abstract class FFTPlot<D extends PamDataUnit> implements DetectionPlot<D>
 		
 		this.reDrawLastUnit(); //this checks settings and will redraw if necessary
 		
-		detectionPlotDisplay.setupScrollBar(); 
+		//detectionPlotDisplay.setupScrollBar(); 
 	}
 
 
