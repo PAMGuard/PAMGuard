@@ -24,11 +24,14 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.layout.HBox;
@@ -38,12 +41,14 @@ import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import pamViewFX.PamGuiManagerFX;
+import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamComboBox;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamProgressBar;
 import pamViewFX.fxNodes.PamVBox;
+import pamViewFX.fxNodes.utilityPanes.PamToggleSwitch;
 
 /**
  * Pane for the folder input of the sound acquisition. 
@@ -52,6 +57,8 @@ import pamViewFX.fxNodes.PamVBox;
  *
  */
 public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
+
+	private static final double UTIL_BUTTON_WIDTH = 120;
 
 	/**
 	 * Shows current and previous files. 
@@ -132,6 +139,16 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 	 * Reference to the Aquisition settings pane which holds this pane. 
 	 */
 	private AcquisitionPaneFX acquisitionPaneFX;
+
+	/**
+	 * Pane to fix the headers of wave files. 
+	 */
+	private FixWavPane fixWavPane;
+
+	/**
+	 * Toggle button for merging contigious files
+	 */
+	private ToggleButton mergeContigious;
 
 	//	/**
 	//	 * The folder input system. 
@@ -225,9 +242,15 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		fileDateStrip=new FileDataDialogStripFX(folderInputSystem.getAquisitionControl().getFileDate()); 
 		fileDateStrip.setMaxWidth(Double.MAX_VALUE);
 		fileDateStrip.prefWidthProperty().bind(pamVBox.widthProperty());
-
+		
+		
+		fixWavPane = new FixWavPane(folderInputSystem); 
+		
+		Label utilsLabel=new Label("Sound file utilities");
+		PamGuiManagerFX.titleFont2style(utilsLabel);
+		
 		pamVBox.getChildren().addAll(fileSelectBox, subFolderPane, progressBar,  createTablePane(), 
-				fileDateText=new Label(), fileDateStrip);
+				fileDateText=new Label(), utilsLabel, createUtilsPane());
 
 		//allow users to check file headers in viewer mode. 
 		//		if (PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW) {
@@ -237,7 +260,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		});
 		//pamVBox.getChildren().addAll(checkFiles);
 
-		mergeFiles=new CheckBox("Merge contiguous files");
+		//mergeFiles=new CheckBox("Merge contiguous files");
 		//		pamVBox.getChildren().addAll(subFolders, mergeFiles);
 		//
 		//		if (PamguardVersionInfo.getReleaseType() == PamguardVersionInfo.ReleaseType.BETA) {
@@ -246,6 +269,51 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 
 		return pamVBox; 		
 	}		
+	
+	
+	/**
+	 * Create
+	 * @return
+	 */
+	private Pane createUtilsPane() {
+		
+		PamHBox hBox = new PamHBox();
+		hBox.setSpacing(5);
+		hBox.setAlignment(Pos.CENTER_LEFT);
+		
+		
+		//Time stamp pane
+		PamButton time = new PamButton("Time stamps"); 
+		time.setPrefWidth(UTIL_BUTTON_WIDTH);
+		time.setGraphic(PamGlyphDude.createPamIcon("mdi2a-av-timer", PamGuiManagerFX.iconSize));
+		time.setOnAction((action)->{
+			acquisitionPaneFX.getAdvancedPane().setCenter(this.fileDateStrip.getAdvDatePane().getContentNode());
+			acquisitionPaneFX.getAdvancedLabel().setText("File Time Stamps");
+			acquisitionPaneFX.getFlipPane().flipToBack();
+		});
+		
+		acquisitionPaneFX.getFlipPane().flipFrontProperty().addListener((obsVal, oldVal, newVal)->{
+			this.fileDateStrip.getAdvDatePane().getParams();
+		});
+
+		
+		PamButton wavFix = new PamButton("Fix wav"); 
+		wavFix.setPrefWidth(UTIL_BUTTON_WIDTH);
+		wavFix.setGraphic(PamGlyphDude.createPamIcon("mdi2f-file-settings", PamGuiManagerFX.iconSize));
+		wavFix.setOnAction((action)->{
+			acquisitionPaneFX.getAdvancedLabel().setText("Fix Wave Files");
+			acquisitionPaneFX.getAdvancedPane().setCenter(this.fixWavPane);
+			acquisitionPaneFX.getFlipPane().flipToBack();
+		});
+		
+		mergeContigious = new ToggleButton("Merge files");
+		mergeContigious.setPrefWidth(UTIL_BUTTON_WIDTH);
+		mergeContigious.setGraphic(PamGlyphDude.createPamIcon("mdi2s-set-merge", PamGuiManagerFX.iconSize));
+
+		hBox.getChildren().addAll(time, wavFix, mergeContigious);
+		
+		return hBox;
+	}
 
 	/**
 	 * Create the table pane. 
@@ -437,6 +505,8 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		//			}
 		//		}
 		
+		folderInputParameters.mergeFiles = mergeContigious.isSelected();
+		
 		folderInputParameters.subFolders = this.subFolders.isSelected(); 
 		
 		return folderInputParameters; 
@@ -456,6 +526,8 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		}
 		
 		fileDateStrip.setFileList(table.getItems()); 
+		
+		mergeContigious.setSelected(currParams.mergeFiles);
 		
 	}
 

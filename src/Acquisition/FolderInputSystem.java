@@ -26,11 +26,11 @@ import Acquisition.filedate.FileDateDialogStrip;
 import Acquisition.layoutFX.AcquisitionPaneFX;
 import Acquisition.layoutFX.DAQSettingsPane;
 import Acquisition.layoutFX.FolderInputPane;
+import javafx.application.Platform;
 import Acquisition.pamAudio.PamAudioSystem;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamSettings;
-import PamModel.SMRUEnable;
 import PamUtils.PamAudioFileFilter;
 import PamUtils.PamCalendar;
 import PamUtils.PamFileChooser;
@@ -503,7 +503,9 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings{
 		
 		/****FX GUI stuff****/
 		if (folderInputPane!=null) {
+			Platform.runLater(()->{
 			folderInputPane.newFileList(fileListData); 
+			});
 		}
 	}
 

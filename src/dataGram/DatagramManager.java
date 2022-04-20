@@ -439,8 +439,16 @@ public class DatagramManager {
 		 * @param dmp
 		 */
 		private void processDataMapPoint(PamDataBlock dataBlock, OfflineDataMapPoint dmp) {
+			
 			long startTime = dmp.getStartTime();
 			long endTime = dmp.getEndTime();
+			
+//			if (endTime>=5951575134760222265L) {
+//				System.out.println("Darn: "+ dmp.toString());
+//			};
+			
+			//sometimes can get corrupt end times.
+			
 			DatagramProvider datagramProvider = dataBlock.getDatagramProvider();
 			int nPoints = datagramProvider.getNumDataGramPoints();
 			float[] tempData = new float[nPoints]; // temp holder - gets converted to float later on
@@ -499,6 +507,7 @@ public class DatagramManager {
 					}
 					datagramPoint.setData(gramData, usedDataUnits);
 				}
+				//System.out.println("Process Point: " + currentStart + " " + endTime); 
 				datagram.addDataPoint(datagramPoint);
 				currentStart = currentEnd;
 				currentEnd = currentStart+datagramMillis;

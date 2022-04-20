@@ -1145,6 +1145,7 @@ public class TDGraphFX extends PamBorderPane {
 			GraphicsContext gc = null;
 			TDScaleInfo scaleInfo;
 			boolean base = false;
+			boolean hasBase = false; 
 			synchronized (dataList) {
 				for (TDDataInfoFX dataInfo : dataList) {
 					base = false;
@@ -1169,6 +1170,7 @@ public class TDGraphFX extends PamBorderPane {
 					case TDScaleInfo.BASE_PRIORITY:
 						gc = baseCanvas.getGraphicsContext2D();
 						base = true;
+						hasBase = true;
 						break;
 					case TDScaleInfo.INLIST_PRIORITY:
 						gc = drawCanvas.getGraphicsContext2D();
@@ -1197,16 +1199,21 @@ public class TDGraphFX extends PamBorderPane {
 					gc = drawCanvas.getGraphicsContext2D();
 				}
 
-				if (graphProjector.isWrap() && !base && !getTDDisplay().isViewer()) {
-					drawWrapLine(gc);
-				}
 
 				// draw a line between displays if there multiple plot panels
 				if (gc != null && getCurrentScaleInfo() != null && iPanel != getCurrentScaleInfo().getNPlots() - 1) {
 					gc.setStroke(Color.GRAY);
 					gc.strokeLine(0, baseCanvas.getHeight(), baseCanvas.getWidth(), baseCanvas.getHeight());
 				}
+				
 				drawSoundOutputMarker(gc);
+			}
+			
+			//onlu show the wrap if there is not a base canvas - if there is a base canvas it is up
+			//to the TDPlotInfoFX of the base canvas to draw a wrap line. This means that, for example, 
+			//a spectorgram plot works better because wrap line stays in sync with the FFT chunks. 
+			if (graphProjector.isWrap() && !hasBase && !getTDDisplay().isViewer()) {
+				drawWrapLine(gc);
 			}
 
 		}
@@ -1260,7 +1267,7 @@ public class TDGraphFX extends PamBorderPane {
 			double pixX = tdDisplay.getTimeAxis().getPosition(
 					((scrollStart - getLastWrapMillis() + tdDisplay.getTimeScroller().getVisibleMillis()) / 1000.));
 			gc.setStroke(wrapColor);
-			gc.setLineWidth(2);
+			gc.setLineWidth(1);
 			// System.out.println("pix"+pixX);
 			gc.strokeLine(pixX, 0, pixX, this.getHeight());
 		}

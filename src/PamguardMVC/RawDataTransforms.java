@@ -153,7 +153,7 @@ public class RawDataTransforms {
 		
 		double[] waveformTrim = new double[maxBin-minBin]; 
 		
-//		System.out.println("minBin: " +  minBin + " maxBin: " + maxBin + " raw waveform: " + this.getWaveData(channel).length); 
+		//System.out.println("minBin: " +  minBin + " maxBin: " + maxBin + " raw waveform: " + this.getWaveData(channel).length); 
 		
 		System.arraycopy(this.getWaveData(channel), minBin, waveformTrim, 0, Math.min(this.getWaveData(channel).length-minBin-1, waveformTrim.length));
 
