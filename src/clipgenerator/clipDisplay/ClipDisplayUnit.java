@@ -181,6 +181,9 @@ public class ClipDisplayUnit extends PamPanel {
 		return mCol > 128 ? Color.BLACK : Color.WHITE;
 	}
 	private PamSymbol getBorderSymbol() {
+		if (clipDisplayPanel.getSymbolChooser() == null) {
+			return null;
+		}
 		PamSymbol symbol = clipDisplayPanel.getSymbolChooser().getPamSymbol(clipDisplayPanel.getClipDataProjector(), getClipDataUnit());
 		return symbol;
 	}

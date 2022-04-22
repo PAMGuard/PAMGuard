@@ -543,7 +543,6 @@ public class RawDataTransforms {
 		}
 	}
 
-
 	private double[][] makeFilteredWaveData(FFTFilterParams filterParams) {
 		double[][] waveData = this.rawData.getWaveData();
 		if (waveData == null || waveData[0].length == 0) {
@@ -568,10 +567,6 @@ public class RawDataTransforms {
 		oldFFTFilterParams = filterParams;
 		return filteredWaveData;
 	}
-
-
-
-
 
 	//	private FFTFilter getFFTFilter(FFTFilterParams filterParams) {
 	//		// TODO Auto-generated method stub
@@ -619,8 +614,30 @@ public class RawDataTransforms {
 	}
 
 
-	private double[] getWaveData(int channel) {
+	/**
+	 * Get the wave data for the given channel. 
+	 * @param channel channel index
+	 * @return wave data
+	 */
+	public double[] getWaveData(int channel) {
 		return this.rawData.getWaveData()[channel];
+	}
+	
+	/**
+	 * Get the wave data for the given channel in int16 format. 
+	 * @param channel channel index
+	 * @return int16 data array. 
+	 */
+	public short[] getShortWaveData(int channel) {
+		double[] dData = getWaveData(channel);
+		if (dData == null) {
+			return null;
+		}
+		short[] shortData = new short[dData.length];
+		for (int i = 0; i < shortData.length; i++) {
+			shortData[i] = (short) (dData[i]*32767);
+		}
+		return shortData;
 	}
 
 

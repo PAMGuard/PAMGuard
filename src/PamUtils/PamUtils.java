@@ -79,7 +79,7 @@ public class PamUtils {
 	 * the channel pos is the same as the single channel number. However, if there
 	 * are gaps in the channelBitmap, then the channel pos will be < than the 
 	 * channel Number.
-	 * @param singleChannel
+	 * @param singleChannel single channel number (index, not map)
 	 * @param channelBitmap
 	 * @return the channel position in the channel list or -1 if it isn't available
 	 */
