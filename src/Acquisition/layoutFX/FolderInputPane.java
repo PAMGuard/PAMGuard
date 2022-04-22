@@ -143,7 +143,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 	/**
 	 * Pane to fix the headers of wave files. 
 	 */
-	private FixWavPane fixWavPane;
+	private CheckWavHeadersPane fixWavPane;
 
 	/**
 	 * Toggle button for merging contigious files
@@ -244,7 +244,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		fileDateStrip.prefWidthProperty().bind(pamVBox.widthProperty());
 		
 		
-		fixWavPane = new FixWavPane(folderInputSystem); 
+		fixWavPane = new CheckWavHeadersPane(folderInputSystem); 
 		
 		Label utilsLabel=new Label("Sound file utilities");
 		PamGuiManagerFX.titleFont2style(utilsLabel);
