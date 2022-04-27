@@ -846,7 +846,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 				lastProgressUpdate = totalSamples;
 			}
 
-			while (newDataUnits.getQueueSize() > 2) {
+			while (newDataUnits.getQueueSize() > 3*nChannels) {
 				if (dontStop == false) break;
 				try {
 					Thread.sleep(2);
@@ -972,7 +972,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 					 * get it's act together on a timer and use this data
 					 * unit, then set it's reference to zero.
 					 */
-					while (newDataUnits.getQueueSize() > 10) {
+					while (newDataUnits.getQueueSize() > 3*nChannels) {
 						if (dontStop == false) break;
 						try {
 							Thread.sleep(1);
