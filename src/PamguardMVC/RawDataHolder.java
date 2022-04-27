@@ -19,7 +19,7 @@ public interface RawDataHolder {
 	/**
 	 * Get the raw data transforms class. This handles standard data transforms 
 	 * that are often used in raw data units, e.g. calculating the spectrum, filtering
-	 * waveforms etc. 
+	 * waveforms, getting data as an int16 (short) array, etc. 
 	 *  
 	 * @return the data transforms object. 
 	 */

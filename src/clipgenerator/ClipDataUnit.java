@@ -51,30 +51,6 @@ public class ClipDataUnit extends PamDataUnit<PamDataUnit, SuperDetection> imple
 	 */
 	private float sourceSampleRate;
 	
-//	/**
-//	 * Sample rate data are to be FFT's at for display purposes. 
-//	 */
-//	private float displaySampleRate;
-
-//	/**
-//	 * Constructor to use when data have gone into a wav file. 
-//	 * @param timeMilliseconds
-//	 * @param triggerMilliseconds
-//	 * @param startSample
-//	 * @param durationSamples
-//	 * @param channelMap
-//	 * @param fileName
-//	 * @param triggerName
-//	 */
-//	public ClipDataUnit(long timeMilliseconds, long triggerMilliseconds,
-//			long startSample, int durationSamples, int channelMap, String fileName,
-//			String triggerName) {
-//		super(timeMilliseconds, channelMap, startSample, durationSamples);
-//		this.triggerMilliseconds = triggerMilliseconds;
-//		this.fileName = fileName;
-//		this.triggerName = triggerName;
-//	}
-
 	/**
 	 * Constructor to use if storing data into the binary system. 
 	 * @param timeMilliseconds
@@ -102,6 +78,17 @@ public class ClipDataUnit extends PamDataUnit<PamDataUnit, SuperDetection> imple
 	}
 
 	private BufferedImage[] clipImages = new BufferedImage[PamConstants.MAX_CHANNELS];
+	
+	/**
+	 * Get an image of the clip
+	 * @param channel
+	 * @param fftLength
+	 * @param fftHop
+	 * @param scaleMin
+	 * @param scaleMax
+	 * @param colorTable
+	 * @return clip image (Swing buffered image)
+	 */
 	public BufferedImage getClipImage(int channel, int fftLength, int fftHop, 
 			double scaleMin, double scaleMax, Color[] colorTable) {
 		double[][] specData = getSpectrogramData(channel, fftLength, fftHop);
