@@ -182,6 +182,13 @@ public class ClickTrainProcess extends PamInstantProcess {
 	public ClickTrainControl getClickTrainControl() {
 		return this.clickTrainControl; 
 	}
+	
+	
+	@Override
+	public void masterClockUpdate(long timeMilliseconds, long sampleNumber) {
+		super.masterClockUpdate(timeMilliseconds, sampleNumber);
+		this.clickTrainControl.getCurrentCTAlgorithm().update(ClickTrainControl.CLOCK_UPDATE, Long.valueOf(timeMilliseconds));
+	}
 
 
 	//	/**

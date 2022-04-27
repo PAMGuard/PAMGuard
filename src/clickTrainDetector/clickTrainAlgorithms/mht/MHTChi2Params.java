@@ -15,7 +15,7 @@ public class MHTChi2Params implements Cloneable, Serializable, ManagedParameters
 	 */
 	private static final long serialVersionUID = 1L;
 	/**
-	 * The absolute maximum ICI for a click train
+	 * The absolute maximum ICI for a click train in seconds!
 	 */
 	public double maxICI = 0.4; 
 	

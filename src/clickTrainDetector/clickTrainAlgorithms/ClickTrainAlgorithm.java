@@ -32,9 +32,10 @@ public interface ClickTrainAlgorithm {
 
 	/**
 	 * Send update flag to the algorithm 
+	 * @param object - an object to add to update
 	 * @param flag - the flag. 
 	 */
-	public void update(int i);
+	public void update(int i, Object object);
 
 	/**
 	 * Get logging class for click algorithm specific information. 

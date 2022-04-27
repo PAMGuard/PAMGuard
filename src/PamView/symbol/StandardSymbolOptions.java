@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.io.Serializable;
 import java.util.HashMap;
 
+import PamUtils.PamArrayUtils;
 import PamView.symbol.modifier.SymbolModifier;
 import PamView.symbol.modifier.SymbolModifierParams;
 
@@ -138,7 +139,7 @@ public class StandardSymbolOptions extends PamSymbolOptions implements Serializa
 	 * @return the modifierOrder
 	 */
 	public int[] getModifierOrder(StandardSymbolChooser symbolChooser) {
-		if (modifierOrder == null || modifierOrder.length != symbolChooser.getSymbolModifiers().size()) {
+		if (modifierOrder == null || modifierOrder.length != symbolChooser.getSymbolModifiers().size() || PamArrayUtils.contains(modifierOrder, -1)) {
 			modifierOrder = new int[symbolChooser.getSymbolModifiers().size()];
 			for (int i = 0; i < modifierOrder.length; i++) {
 				modifierOrder[i] = i;
