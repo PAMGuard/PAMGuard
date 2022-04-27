@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 
 import PamguardMVC.PamDataUnit;
+import PamguardMVC.RawDataUtils;
 import binaryFileStorage.BinaryDataSource;
 import binaryFileStorage.BinaryHeader;
 import binaryFileStorage.BinaryObjectData;
@@ -19,6 +20,8 @@ public class ClipBinaryDataSource extends BinaryDataSource {
 
 	private ClipControl clipControl;
 	private ClipDisplayDataBlock clipDataBlock;
+	
+	private RawDataUtils rawDataUtils = new RawDataUtils();
 	
 	/**
 	 * <p>Module version changes</p>
@@ -161,42 +164,44 @@ public class ClipBinaryDataSource extends BinaryDataSource {
 	 * @param rawData
 	 * @throws IOException 
 	 */
-	private void writeWaveClip(DataOutputStream dos2, double[][] rawData) throws IOException {
-		int nChan = rawData.length;
-		int nSamps = rawData[0].length;
-		double minVal = 0, maxVal = 0;
-		for (int iC = 0; iC < nChan; iC++) {
-			double[] chanData = rawData[iC];
-			for (int iS = 0; iS < nSamps; iS++) {
-				minVal = Math.min(minVal, chanData[iS]);
-				maxVal = Math.max(maxVal, chanData[iS]);		
-			}
-		}
-		maxVal = Math.max(maxVal, -minVal);
-		float scale = (float) (127./maxVal);
-		dos.writeShort(nChan);
-		dos.writeInt(nSamps);
-		dos.writeFloat(scale);
-		for (int iC = 0; iC < nChan; iC++) {
-			double[] chanData = rawData[iC];
-			for (int iS = 0; iS < nSamps; iS++) {
-				dos.writeByte((int) (chanData[iS] * scale));
-			}
-		}
+	private void writeWaveClip(DataOutputStream dos, double[][] rawData) throws IOException {
+		rawDataUtils.writeWaveClipInt8(dos, rawData);
+//		int nChan = rawData.length;
+//		int nSamps = rawData[0].length;
+//		double minVal = 0, maxVal = 0;
+//		for (int iC = 0; iC < nChan; iC++) {
+//			double[] chanData = rawData[iC];
+//			for (int iS = 0; iS < nSamps; iS++) {
+//				minVal = Math.min(minVal, chanData[iS]);
+//				maxVal = Math.max(maxVal, chanData[iS]);		
+//			}
+//		}
+//		maxVal = Math.max(maxVal, -minVal);
+//		float scale = (float) (127./maxVal);
+//		dos.writeShort(nChan);
+//		dos.writeInt(nSamps);
+//		dos.writeFloat(scale);
+//		for (int iC = 0; iC < nChan; iC++) {
+//			double[] chanData = rawData[iC];
+//			for (int iS = 0; iS < nSamps; iS++) {
+//				dos.writeByte((int) (chanData[iS] * scale));
+//			}
+//		}
 	}
 
 	private double[][] readWavClip(DataInputStream dis) throws IOException {
-		int nChan = dis.readShort();
-		int nSamps = dis.readInt();
-		double scale = 1./dis.readFloat();
-		double[][] rawData = new double[nChan][nSamps];
-		for (int iC = 0; iC < nChan; iC++) {
-			double[] chanData = rawData[iC];
-			for (int iS = 0; iS < nSamps; iS++) {
-				chanData[iS] = (double) dis.readByte() * scale;
-			}
-		}
-		return rawData;
+//		int nChan = dis.readShort();
+//		int nSamps = dis.readInt();
+//		double scale = 1./dis.readFloat();
+//		double[][] rawData = new double[nChan][nSamps];
+//		for (int iC = 0; iC < nChan; iC++) {
+//			double[] chanData = rawData[iC];
+//			for (int iS = 0; iS < nSamps; iS++) {
+//				chanData[iS] = (double) dis.readByte() * scale;
+//			}
+//		}
+//		return rawData;
+		return rawDataUtils.readWavClipInt8(dis);
 	}
 
 	@Override

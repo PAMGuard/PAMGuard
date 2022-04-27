@@ -181,6 +181,9 @@ public class ClipDisplayUnit extends PamPanel {
 		return mCol > 128 ? Color.BLACK : Color.WHITE;
 	}
 	private PamSymbol getBorderSymbol() {
+		if (clipDisplayPanel.getSymbolChooser() == null) {
+			return null;
+		}
 		PamSymbol symbol = clipDisplayPanel.getSymbolChooser().getPamSymbol(clipDisplayPanel.getClipDataProjector(), getClipDataUnit());
 		return symbol;
 	}
@@ -285,8 +288,8 @@ public class ClipDisplayUnit extends PamPanel {
 			String tStr = PamCalendar.formatTime(clipDataUnit.getTimeMilliseconds(), true);
 			g.drawString(tStr, borderSize, fontAscent);
 			
-			
-			String lenString = String.format("%3.2fs", (float)clipDataUnit.getSampleDuration() / clipDisplayPanel.getSampleRate());
+			float fs = clipDataUnit.getSourceSampleRate(); // was clipDisplayPanel.getSampleRate()
+			String lenString = String.format("%3.2fs", (float)clipDataUnit.getSampleDuration() / fs);
 			Rectangle2D strSize = fm.getStringBounds(lenString, g);
 			g.drawString(lenString, (int) (getWidth()-strSize.getWidth()), getHeight()-fm.getDescent());
 

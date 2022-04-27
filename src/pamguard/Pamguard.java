@@ -39,6 +39,7 @@ import PamView.FullScreen;
 import PamView.ScreenSize;
 import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.debug.Debug;
+import binaryFileStorage.BinaryStore;
 import dataPlotsFX.JamieDev;
 import java.io.BufferedReader;
 import java.io.File;
@@ -212,6 +213,14 @@ public class Pamguard {
 				else if (anArg.equalsIgnoreCase("-nolog")) {
 					System.out.println("Disabling log file from command line switch...");
 					ProxyPrintStream.disableLogFile();
+				}
+				else if (anArg.equalsIgnoreCase(BinaryStore.GlobalFolderArg)) {
+					// output folder for binary files. 
+					GlobalArguments.setParam(anArg, args[iArg++]);
+				}
+				else if (anArg.equalsIgnoreCase("-databasefile")) {
+					// database file name
+					GlobalArguments.setParam(anArg, args[iArg++]);
 				}
 				else if (anArg.equalsIgnoreCase("-help")) {
 					System.out.println("--PamGuard Help");
