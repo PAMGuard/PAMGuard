@@ -304,6 +304,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		wavFix.setOnAction((action)->{
 			acquisitionPaneFX.getAdvancedLabel().setText("Fix Wave Files");
 			acquisitionPaneFX.getAdvancedPane().setCenter(this.fixWavPane);
+			fixWavPane.setParams();
 			acquisitionPaneFX.getFlipPane().flipToBack();
 		});
 		

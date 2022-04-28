@@ -3,12 +3,10 @@ package spectrogramNoiseReduction.layoutFX;
 
 import java.util.ArrayList;
 
-import org.controlsfx.control.ToggleSwitch;
-
 import pamViewFX.PamGuiManagerFX;
-import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamVBox;
+import pamViewFX.fxNodes.utilityPanes.PamToggleSwitch;
 import pamViewFX.fxNodes.utilityPanes.SourcePaneFX;
 import spectrogramNoiseReduction.SpecNoiseMethod;
 import spectrogramNoiseReduction.SpectrogramNoiseProcess;
@@ -16,10 +14,8 @@ import spectrogramNoiseReduction.SpectrogramNoiseSettings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.Pane;
 import PamController.SettingsPane;
 import PamguardMVC.PamDataBlock;
 
@@ -39,7 +35,7 @@ public class SpectrogramNoisePaneFX extends SettingsPane<SpectrogramNoiseSetting
 	
 	private SpectrogramNoiseSettings spectrogramNoiseSettings=new SpectrogramNoiseSettings(); 
 
-	private ToggleSwitch[] enableMethod;
+	private PamToggleSwitch[] enableMethod;
 	
 	private PamDataBlock dataSource;
 	
@@ -58,7 +54,7 @@ public class SpectrogramNoisePaneFX extends SettingsPane<SpectrogramNoiseSetting
 		PamVBox methodPane;
 		SpecNoiseNodeFX dC;
 		Node node;
-		enableMethod = new ToggleSwitch[methods.size()];
+		enableMethod = new PamToggleSwitch[methods.size()];
 		
 
 		for (int i = 0; i < methods.size(); i++) {
@@ -66,13 +62,14 @@ public class SpectrogramNoisePaneFX extends SettingsPane<SpectrogramNoiseSetting
 			methodPane.setSpacing(10); 
 			//create name
 			Label title=new Label(methods.get(i).getName());
-			PamGuiManagerFX.titleFont2style(title);
 //			title.setFont(PamGuiManagerFX.titleFontSize2);
 			
 			PamHBox toggleHolder = new PamHBox();
 			toggleHolder.setSpacing(5);
 			toggleHolder.getChildren().addAll(enableMethod[i] = 
-					new ToggleSwitch(), title); 
+					new PamToggleSwitch(methods.get(i).getName())); 
+			PamGuiManagerFX.titleFont2style(enableMethod[i].getLabel());
+
 			enableMethod[i].setAlignment(Pos.CENTER_LEFT);
 			toggleHolder.setAlignment(Pos.CENTER_LEFT);
 			

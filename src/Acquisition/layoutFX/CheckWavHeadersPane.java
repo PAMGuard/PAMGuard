@@ -7,6 +7,7 @@ import Acquisition.FolderInputSystem;
 import Acquisition.WavFileFuncs;
 import PamUtils.PamAudioFileFilter;
 import javafx.geometry.Insets;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.concurrent.Task;
 import javafx.geometry.Pos;
@@ -89,6 +90,8 @@ public class CheckWavHeadersPane extends PamBorderPane {
 	 */
 	private SimpleDoubleProperty progressProperty = new SimpleDoubleProperty(0);
 
+	private PamButton runButton;
+
 	/**
 	 * Constructor for the CheckWavHeadersPane
 	 * @param folderInputSystem - the folder input system. 
@@ -102,20 +105,19 @@ public class CheckWavHeadersPane extends PamBorderPane {
 		this.folderInputSystem=folderInputSystem;
 
 		folderName = new Label(" ");
-		PamGuiManagerFX.titleFont2style(folderName);
+		//PamGuiManagerFX.titleFont2style(folderName);
 		
 		textArea = new TextArea();
 		textArea.setEditable(false);
 		ScrollPane scrollPane = new ScrollPane(textArea);
 		scrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
 		//scrollPane.setPrefSize(322, 300);
-		this.setCenter(scrollPane);
 		
 		PamHBox pamHBox = new PamHBox();
 		pamHBox.setAlignment(Pos.CENTER_LEFT);
 		pamHBox.setSpacing(5);
 		
-		PamButton runButton = new PamButton();
+		runButton = new PamButton();
 		runButton.setGraphic(PamGlyphDude.createPamIcon("mdi2p-play"));
 		runButton.setOnAction((action)->{
 			checkFiles();
@@ -128,15 +130,15 @@ public class CheckWavHeadersPane extends PamBorderPane {
 		pamHBox.getChildren().addAll(runButton, progressBar);
 		progressBar.setMaxWidth(Double.MAX_VALUE);
 		
-		
 		mainPane.getChildren().addAll(folderName, textArea, pamHBox);
-	
-		this.setPadding(new Insets(5,0,5,15));
 		
+		this.setCenter(mainPane);
+
+		this.setPadding(new Insets(5,0,5,15));
 	}
 	
 	
-	private void setParams() {
+	void setParams() {
 		running = ran = false;
 		subFolders = folderInputSystem.getFolderInputParameters().subFolders;
 		if (subFolders) {
@@ -149,7 +151,7 @@ public class CheckWavHeadersPane extends PamBorderPane {
 		textArea.setText(" ");
 		allFiles.clear();
 		nFiles = countFiles(folder);
-		progressBar.setProgress(0);
+		progressProperty.setValue(0);
 		progressBar.progressProperty().bind(progressProperty);
 		//progressBar.setMaximum(Math.max(nFiles, 1));
 		enableControls();
@@ -213,6 +215,10 @@ public class CheckWavHeadersPane extends PamBorderPane {
 		nErrors = 0;
 		enableControls();
 		checkFilesWorker = new CheckFiles();
+
+        Thread th = new Thread(checkFilesWorker);
+        th.setDaemon(true);
+        th.start();
 	}
 	
 
@@ -245,10 +251,16 @@ public class CheckWavHeadersPane extends PamBorderPane {
 			 *  for each file, report on progress with it's name and 
 			 *  whether or not it had an error
 			 */
-			int error;
 			File aFile;
+			System.out.println("Analaysing files: Start: " + allFiles.size() );
 			for (int i = 0; i < allFiles.size(); i++) {
-				error = checkFile(aFile = allFiles.get(i));
+				System.out.println("Analaysing files: " + i);
+				final int error = checkFile(aFile = allFiles.get(i));
+				final File aFile1 = aFile;
+				Platform.runLater(()->{
+					textArea.appendText(String.format("\n File %s %s" , aFile1.getName() , 
+							error == AudioFileFuncs.FILE_OK ? "OK" : ("Error " + error)));
+				});
 				//progressBar.progressProperty().bind(null);
 				progressProperty.setValue(100*i/(double) allFiles.size());
 			}
