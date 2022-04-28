@@ -145,6 +145,7 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 	public AcquisitionPaneFX(AcquisitionControl aquisitionControl){
 		super(null);
 		mainPane = new PamBorderPane();
+		mainPane.setPrefWidth(400);
 
 		this.acquisitionControl=aquisitionControl;
 		this.acquisitionParameters=acquisitionControl.getAcquisitionParameters();
@@ -153,7 +154,7 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 		flipPane=new FlipPane(); 
 		flipPane.setFlipDirection(Orientation.HORIZONTAL);
 		flipPane.setFlipTime(250); //default is 700ms- way too high
-
+		//flipPane.prefWidthProperty().bind(mainPane.widthProperty());
 
 		if (aquisitionControl.isViewer()){
 			this.mainPane.setCenter(createViewerModePane()); 
@@ -166,9 +167,7 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 		//create the advanced flip pane.
 		advancedSettingPane = createAdvSettingsPane(); 
 		flipPane.getBack().getChildren().add(advancedSettingPane);
-
-		
-		System.out.println("MAKE PANE: "  +  acquisitionParameters.getDaqSystemType());
+		//System.out.println("MAKE PANE: "  +  acquisitionParameters.getDaqSystemType());
 
 	} 
 	
@@ -194,7 +193,7 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 		buttonHolder.setAlignment(Pos.CENTER_LEFT);
 		buttonHolder.getChildren().addAll(back, advLabel = new Label("Adv. Settings")); 
 		advLabel.setAlignment(Pos.CENTER);
-		advLabel.setMaxWidth(Double.MAX_VALUE); //nneed ot make sure label is in center. 
+		advLabel.setMaxWidth(Double.MAX_VALUE); //need to make sure label is in center. 
 		PamGuiManagerFX.titleFont2style(advLabel);
 		
 		advLabel.setAlignment(Pos.CENTER);
@@ -264,7 +263,6 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 
 			//TODO- this is a bit CUMBERSOME and maybe fixed in new version of JavaFX
 			//need to get stage and resize because new controls may have been added. 
-
 			if (mainPane!=null && mainPane.getScene()!=null) {
 				Stage stage = (Stage) mainPane.getScene().getWindow();
 				stage.sizeToScene();
@@ -498,7 +496,7 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 			acquisitionControl.getOfflineFileServer().setOfflineFileParameters(ofp);
 		}
 		
-		System.out.println("Get Params: Open Aquisition dialog: "  +  acquisitionParameters.getDaqSystemType());
+		//System.out.println("Get Params: Open Aquisition dialog: "  +  acquisitionParameters.getDaqSystemType());
 
 		return acquisitionParameters;
 	}

@@ -421,7 +421,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings{
 		}
 	}
 
-	protected String getCurrentFolder() {
+	public String getCurrentFolder() {
 		if (folderInputParameters.recentFiles.size() == 0) {
 			return null;
 		}

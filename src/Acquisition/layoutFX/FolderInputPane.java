@@ -143,7 +143,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 	/**
 	 * Pane to fix the headers of wave files. 
 	 */
-	private FixWavPane fixWavPane;
+	private CheckWavHeadersPane fixWavPane;
 
 	/**
 	 * Toggle button for merging contigious files
@@ -166,6 +166,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		this.folderInputSystem=folderInputSystem2; 
 		this.acquisitionPaneFX = acquisitionPaneFX; 
 		this.mainPane=createDAQPane(); 
+		this.mainPane.setPrefWidth(300);
 	}
 
 	/**
@@ -198,7 +199,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		browseFileButton.setGraphic(Glyph.create("FontAwesome|FILES_ALT").
 				size(PamGuiManagerFX.iconSize).color(Color.WHITE.darker()));
 		browseFileButton.prefHeightProperty().bind(fileSelectBox.heightProperty()); //make browse button same height as combo box. 
-		browseFileButton.setMinWidth(30);
+		browseFileButton.setMinWidth(35);
 		browseFileButton.setOnAction( (action) ->{	                
 			selectFolder(false); 
 		});
@@ -208,7 +209,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		browseFolderButton.setGraphic(Glyph.create("FontAwesome|FOLDER").
 				size(PamGuiManagerFX.iconSize).color(Color.WHITE.darker()));
 		browseFolderButton.prefHeightProperty().bind(fileSelectBox.heightProperty()); //make browse button same height as combo box. 
-		browseFolderButton.setMinWidth(30);
+		browseFolderButton.setMinWidth(35);
 		browseFolderButton.setOnAction( (action) ->{	                
 			selectFolder(true);
 		});		
@@ -244,7 +245,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		fileDateStrip.prefWidthProperty().bind(pamVBox.widthProperty());
 		
 		
-		fixWavPane = new FixWavPane(folderInputSystem); 
+		fixWavPane = new CheckWavHeadersPane(folderInputSystem); 
 		
 		Label utilsLabel=new Label("Sound file utilities");
 		PamGuiManagerFX.titleFont2style(utilsLabel);
@@ -323,10 +324,11 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 
 		table.setEditable(true);
 
-		TableColumn<WavFileType, Boolean > useWavFileColumn = new TableColumn<>( "Use file" );
+		TableColumn<WavFileType, Boolean > useWavFileColumn = new TableColumn<>( "Use" );
 		useWavFileColumn.setCellValueFactory(cellData -> cellData.getValue().useWavFileProperty());		
 		useWavFileColumn.setCellFactory( tc -> new CheckBoxTableCell<>());
 		useWavFileColumn.setEditable(true);
+		useWavFileColumn.setMaxWidth(40);
 
 		TableColumn<WavFileType, String > fileNameColumn = new TableColumn<WavFileType, String >("File Name");
 		fileNameColumn.setCellValueFactory( f ->  new SimpleStringProperty(f.getValue().getName()));
@@ -342,12 +344,13 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		TableColumn<WavFileType, Float > durationColumn = new TableColumn<WavFileType, Float > ("Duration");
 		durationColumn.setCellValueFactory(cellData -> new SimpleFloatProperty(cellData.getValue().getDurationInSeconds()).asObject());
 
-		TableColumn<WavFileType, Float > sampleRateColumn = new TableColumn<WavFileType, Float > ("Sample Rate");
+		TableColumn<WavFileType, Float > sampleRateColumn = new TableColumn<WavFileType, Float > ("sR");
 		sampleRateColumn.setCellValueFactory(cellData -> new SimpleFloatProperty(cellData.getValue().getAudioInfo().getSampleRate()).asObject());
 		//		
 
-		TableColumn<WavFileType, Integer > chanColumn = new TableColumn<WavFileType, Integer > ("No. Channels");
+		TableColumn<WavFileType, Integer > chanColumn = new TableColumn<WavFileType, Integer > ("Chan");
 		chanColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getAudioInfo().getChannels()).asObject());
+		useWavFileColumn.setPrefWidth(70);
 
 
 		TableColumn<WavFileType, String > typeColumn = new TableColumn<WavFileType, String > ("Type");

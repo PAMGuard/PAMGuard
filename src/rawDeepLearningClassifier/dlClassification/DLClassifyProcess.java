@@ -14,6 +14,7 @@ import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
 import binaryFileStorage.DataUnitFileInformation;
 import rawDeepLearningClassifier.DLControl;
+import rawDeepLearningClassifier.RawDLParams;
 import rawDeepLearningClassifier.layoutFX.DLDetectionGraphics;
 import rawDeepLearningClassifier.layoutFX.DLGraphics;
 import rawDeepLearningClassifier.logging.DLAnnotation;
@@ -127,7 +128,7 @@ public class DLClassifyProcess extends PamInstantProcess {
 	 */
 	private void setupClassifierProcess() {
 
-		System.out.println("Setup raw deep learning classiifer process: "); 
+		//System.out.println("Setup raw deep learning classiifer process: "); 
 
 		if (dlControl.getDLParams()==null) {
 			System.err.println("SegmenterProcess.setupSegmenter: The DLParams are null???");
@@ -138,6 +139,11 @@ public class DLClassifyProcess extends PamInstantProcess {
 			System.err.println("Raw Deep Learning Classifier: The grouped source parameters were null."
 					+ " A new instance has been created: Possible de-serialization error.");
 		}
+		
+
+		//important for downstream processes such as the bearing localiser.
+		dlModelResultDataBlock.setChannelMap(dlControl.getDLParams().groupedSourceParams.getChannelBitmap());
+		dlDetectionDataBlock.setChannelMap(dlControl.getDLParams().groupedSourceParams.getChannelBitmap());
 
 		int[] chanGroups = dlControl.getDLParams().groupedSourceParams.getChannelGroups();
 
@@ -159,6 +165,20 @@ public class DLClassifyProcess extends PamInstantProcess {
 	public void prepareProcess() {
 		setupClassifierProcess();
 	}
+	
+
+	/**
+	 * called for every process once the system model has been created. 
+	 * this is a good time to check out and find input data blocks and
+	 * similar tasks. 
+	 *
+	 */
+	@Override
+	public void setupProcess() {
+		setupClassifierProcess(); 
+		super.setupProcess();
+	}
+
 
 
 	/*
@@ -233,7 +253,6 @@ public class DLClassifyProcess extends PamInstantProcess {
 		//1) It's over  a max time
 		//2) Contains different parent data units (if not from raw data). 
 
-
 		GroupedRawData lastUnit = classificationBuffer2.get(classificationBuffer2.size()-1); 
 
 		if (!(lastUnit.getParentDataUnit() instanceof RawDataUnit) && lastUnit.getParentDataUnit()!=rawDataUnit.getParentDataUnit()) {
@@ -255,7 +274,7 @@ public class DLClassifyProcess extends PamInstantProcess {
 			//		if (timeDiff>=this.dlControl.getDLParams().maxBufferTime) {
 
 			//we are over the max buffer size. 
-			System.out.println("DLClassifyProcess: warning:  buffer is over max time gap"); 
+			//System.out.println("DLClassifyProcess: warning:  buffer is over max time gap"); 
 			return true; 
 		}
 
@@ -280,7 +299,8 @@ public class DLClassifyProcess extends PamInstantProcess {
 	}
 
 	/**
-	 * Create a data unit form a model result. 
+	 * Create a data unit form a model result. This is called whenever data passes a prediction threshold.
+	 * 
 	 * @param modelResult - the model result. 
 	 * @param pamRawData - the raw data unit which the model result came from. 
 	 */
@@ -288,7 +308,7 @@ public class DLClassifyProcess extends PamInstantProcess {
 
 		//the model result may be null if the classifier uses a new thread. 
 		
-		//System.out.println("New segment: parent UID: " + pamRawData.getParentDataUnit().getUID() + " Prediciton: " + modelResult.getPrediction()[4]);
+		//System.out.println("New segment: parent UID: " + pamRawData.getParentDataUnit().getUID() + " Prediciton: " + modelResult.getPrediction()[0]+ "  " + getSourceParams().countChannelGroups());
 
 		//create a new data unit - always add to the model result section. 
 		DLDataUnit dlDataUnit = new DLDataUnit(pamRawData.getTimeMilliseconds(), pamRawData.getChannelBitmap(), 
@@ -303,11 +323,14 @@ public class DLClassifyProcess extends PamInstantProcess {
 		//need to implement multiple groups. 
 		for (int i=0; i<getSourceParams().countChannelGroups(); i++) {
 
-			//			System.out.println("RawDataIn: chan: " + pamRawData.getChannelBitmap()+ "  " +
-			//			PamUtils.hasChannel(getSourceParams().getGroupChannels(i), pamRawData.getChannelBitmap()) + 
-			//			" grouped source: " +getSourceParams().getGroupChannels(i)); 
+//						System.out.println("RawDataIn: chan: " + pamRawData.getChannelBitmap()+ "  " +
+//						PamUtils.hasChannel(getSourceParams().getGroupChannels(i), pamRawData.getChannelBitmap()) + 
+//						" grouped source: " +getSourceParams().getGroupChannels(i) + " Channels OK? " 
+//						+PamUtils.hasChannel(getSourceParams().getGroupChannels(i), PamUtils.getSingleChannel(pamRawData.getChannelBitmap())) 
+//						+ "  groupchan: " + getSourceParams().getGroupChannels(i) + "  " + PamUtils.getLowestChannel(pamRawData.getChannelBitmap())
+//						+ " chan bitmap: " + pamRawData.getChannelBitmap()); 
 
-			if (PamUtils.hasChannel(getSourceParams().getGroupChannels(i), PamUtils.getSingleChannel(pamRawData.getChannelBitmap()))) {
+			if (PamUtils.hasChannel(getSourceParams().getGroupChannels(i), PamUtils.getLowestChannel(pamRawData.getChannelBitmap()))) {
 
 				/*** 
 				 * The are two options here. 
@@ -316,6 +339,8 @@ public class DLClassifyProcess extends PamInstantProcess {
 				 * 2) Annotated an existing data unit with a deep learning annotation. 
 				 */
 				if (pamRawData.getParentDataUnit() instanceof RawDataUnit) {
+
+					/****Make our own data units****/
 					if (dlDataUnit.getPredicitionResult().isBinaryClassification()) {
 						//if the model result has a binary classification then it is added to the data buffer unless the data
 						//buffer has reached a maximum size. In that case the data is saved. 
@@ -345,9 +370,11 @@ public class DLClassifyProcess extends PamInstantProcess {
 					}
 				}
 				else {
-					//need to go by the parent data unit for merging data not the segments. 
+					/****Add annotation to existing data unit (e.g. click, clip or other RawDataHolder)****/
+					//Need to go by the parent data unit for merging data not the segments. Note that we may still add multiple
+					//predicitions to a single data unit depending on how many segments it contains. 
 
-				    //System.out.println("New model data " + pamRawData.getParentDataUnit().getUID() + " " + groupDataBuffer[i].size() + " " + modelResultDataBuffer[i].size()); 
+				    System.out.println("New model data " + pamRawData.getParentDataUnit().getUID() + " " + groupDataBuffer[i].size() + " " + modelResultDataBuffer[i].size()); 
 
 					if (pamRawData.getParentDataUnit()!=lastParentDataUnit[i]) {
 						//save any data
@@ -371,7 +398,6 @@ public class DLClassifyProcess extends PamInstantProcess {
 					lastParentDataUnit[i]=pamRawData.getParentDataUnit();
 					groupDataBuffer[i].add(pamRawData); 
 					modelResultDataBuffer[i].add(modelResult); 
-
 					//System.out.println("Buffer click annotation to " + lastParentDataUnit[i].getUID() + " " + groupDataBuffer[i].size()); 
 				}
 			}
@@ -556,6 +582,14 @@ public class DLClassifyProcess extends PamInstantProcess {
 	 */
 	public DLAnnotationType getDLAnnotionType() {
 		return dlAnnotationType;
+	}
+
+	/**
+	 * Get the parameters for the raw deep learning module.
+	 * @return the parameters object for the raw deep learning classifier. 
+	 */
+	public RawDLParams getDLParams() {
+		return this.dlControl.getDLParams();
 	}
 
 }

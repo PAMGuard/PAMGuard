@@ -1,8 +1,8 @@
 package rawDeepLearningClassifier.dlClassification;
 
+import PamView.GroupedDataSource;
+import PamView.GroupedSourceParameters;
 import PamguardMVC.AcousticDataBlock;
-import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamProcess;
 
 /**
  * Holds classified data units from deep learning model. 
@@ -10,11 +10,18 @@ import PamguardMVC.PamProcess;
  * @author Jamie Macaulay
  *
  */
-public class DLDetectionDataBlock extends AcousticDataBlock<DLDetection> {
+public class DLDetectionDataBlock extends AcousticDataBlock<DLDetection> implements GroupedDataSource {
 
-	public DLDetectionDataBlock(String dataName, PamProcess parentProcess, int channelMap) {
+	private DLClassifyProcess dlClassifyProcess;
+
+	public DLDetectionDataBlock(String dataName, DLClassifyProcess parentProcess, int channelMap) {
 		super(DLDetection.class, dataName, parentProcess, channelMap);
-		
+		this.dlClassifyProcess = parentProcess; 
+	}
+
+	@Override
+	public GroupedSourceParameters getGroupSourceParameters() {
+		return dlClassifyProcess.getDLParams().groupedSourceParams;
 	}
 
 

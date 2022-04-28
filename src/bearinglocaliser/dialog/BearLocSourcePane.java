@@ -26,6 +26,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamGridPane;
 import pamViewFX.fxNodes.PamTextField;
@@ -50,6 +51,8 @@ public class BearLocSourcePane extends SettingsPane<BearingLocaliserParams> {
 //		sourcePane.setVgap(3);
 //		sourcePane.setHgap(4);
 		detSourcePane = new SourcePaneFX(PamDetection.class, false, true);
+		detSourcePane.setMaxWidth(Double.POSITIVE_INFINITY);
+		GridPane.setHgrow(detSourcePane, Priority.ALWAYS);
 //		sourcePane.add(detSourcePane, 0, 2);
 		sourcePane.add(detSourcePane, 0, 0);
 		mainPane.setTop(new PamTitledBorderPane("Detection Source", sourcePane));

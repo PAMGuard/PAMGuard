@@ -40,9 +40,6 @@ import javax.swing.Timer;
 
 import networkTransfer.receive.BuoyStatusDataUnit;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamController.PamControllerInterface;

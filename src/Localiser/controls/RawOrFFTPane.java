@@ -62,6 +62,7 @@ public class RawOrFFTPane extends SettingsPane<RawOrFFTParamsInterface> {
 //		BorderPane.setMargin(fftSourcePane, new Insets(15, 0, 0, 0));
 		beamDataSourcePane = new SourcePaneFX(FFTDataUnit.class, false, false);
 		beamDataSourcePane.addSourceType(RawDataUnit.class, false);
+		beamDataSourcePane.setMaxWidth(Double.POSITIVE_INFINITY);
 		/*
 		 * 
 		sourceList.setMaxWidth(Double.MAX_VALUE);
