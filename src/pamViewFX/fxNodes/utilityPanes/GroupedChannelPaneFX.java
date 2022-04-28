@@ -207,11 +207,11 @@ public class GroupedChannelPaneFX {
 	}
 
 	protected void showChannels(int channels) {
-
 		
 		//remove all channels from vertical box pane. 
 		channelListPane.getChildren().removeAll(channelListPane.getChildren());
-		channelListPane.getChildren().remove(selectAll);
+		channelListPane.getChildren().remove(selectAll);		
+
 		
 		channelListPane.add(selectAll,0,0);
 		for (int i = 0; i < Math.min(PamConstants.MAX_CHANNELS, channelBoxes.length); i++) {
@@ -306,13 +306,16 @@ public class GroupedChannelPaneFX {
 	}
 	
 	public void setParams(GroupedSourceParameters params) {
+		
 		/**
 		 * First try to find the source datablock and from there set up 
 		 * the panel.
-		 */
+		 */		
+		
 		PamController pamController = PamController.getInstance();
 		sourceDataBlock = pamController.getDataBlockByLongName(params.getDataSource());
 		setSourceDataBlock(sourceDataBlock);
+
 		if (sourceDataBlock != null) {
 //			showChannels(sourceDataBlock.getChannelMap());
 			showChannels(sourceDataBlock.getSequenceMap());

@@ -118,8 +118,7 @@ public class CTClassificationProcess extends PamInstantProcess {
 
 	@Override
 	public void pamStart() {
-
-		System.out.println("-----||||| This parent block: " +  this.getParentDataBlock() + "  " + this.getParentProcess()); 
+		//System.out.println("-----||||| This parent block: " +  this.getParentDataBlock() + "  " + this.getParentProcess()); 
 	}
 
 	@Override

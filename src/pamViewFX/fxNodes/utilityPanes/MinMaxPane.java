@@ -2,6 +2,7 @@ package pamViewFX.fxNodes.utilityPanes;
 
 import java.io.Serializable;
 
+import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
@@ -57,6 +58,7 @@ public class MinMaxPane<T extends Number> extends PamBorderPane {
 		
 		PamHBox pamHBox = new PamHBox();
 		pamHBox.setSpacing(5);
+		pamHBox.setAlignment(Pos.CENTER_LEFT);
 		
 		//e
 		checkBox = new CheckBox(varName); 

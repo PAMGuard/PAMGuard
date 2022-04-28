@@ -263,7 +263,7 @@ public class ClickTrainAlgorithmPaneFX extends SettingsPane<ClickTrainParams> {
 		
 		clickTrainControl.createDataSelector(sourcePane.getSource());
 		
-		System.out.println("ClickTrainAlgorithmPaneFX: Detection Selector: " + clickTrainControl.getDataSelector() + "  " + sourcePane.getSource());
+		//System.out.println("ClickTrainAlgorithmPaneFX: Detection Selector: " + clickTrainControl.getDataSelector() + "  " + sourcePane.getSource());
 		
 		if (clickTrainControl.getDataSelector()!=null) {
 			Label dataSelectorLabel  = new Label("Detection Selector");
@@ -557,8 +557,8 @@ public class ClickTrainAlgorithmPaneFX extends SettingsPane<ClickTrainParams> {
 		this.ctClassifierHolder.setParams(clickTrainParams);
 
 		//notify the algorithm of updates.
-		System.out.println("getSelectedCTAlgorithm(): " + getSelectedCTAlgorithm()); 
-		System.out.println("getSelectedCTAlgorithm().getClickTrainGraphics(): " + getSelectedCTAlgorithm().getClickTrainGraphics()); 
+//		System.out.println("getSelectedCTAlgorithm(): " + getSelectedCTAlgorithm()); 
+//		System.out.println("getSelectedCTAlgorithm().getClickTrainGraphics(): " + getSelectedCTAlgorithm().getClickTrainGraphics()); 
 
 		getSelectedCTAlgorithm().getClickTrainGraphics().notifyUpdate(ClickTrainControl.NEW_PARENT_DATABLOCK, 
 				sourcePane.getDataBlockBox().getSelectionModel().getSelectedItem());
