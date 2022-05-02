@@ -19,14 +19,23 @@ import java.io.IOException;
 public class RawDataUtils {
 
 	/**
-	 * Write the wave clip in scaled int8 format into a data output stream. 
+	 * Write the wave clip in scaled int8 format into a data output stream. If rawData is null
+	 * or empty, it will still write the header consisting of nChan, nSamp and a scale, but no
+	 * data. 
 	 * @param dos Data output stream
 	 * @param rawData raw data
 	 * @throws IOException 
 	 */
 	public void writeWaveClipInt8(DataOutputStream dos, double[][] rawData) throws IOException {
-		int nChan = rawData.length;
-		int nSamps = rawData[0].length;
+		int nChan, nSamps;
+		if (rawData == null || rawData.length == 0 || rawData[0] == null) {
+			nChan = 0;
+			nSamps = 0;
+		}
+		else {
+			nChan = rawData.length;
+			nSamps = rawData[0].length;
+		}
 		double minVal = 0, maxVal = 0;
 		for (int iC = 0; iC < nChan; iC++) {
 			double[] chanData = rawData[iC];
@@ -36,7 +45,13 @@ public class RawDataUtils {
 			}
 		}
 		maxVal = Math.max(maxVal, -minVal);
-		float scale = (float) (127./maxVal);
+		float scale;
+		if (maxVal == 0) {
+			scale = 1.f;
+		}
+		else {
+			scale = (float) (127./maxVal);
+		}
 		dos.writeShort(nChan);
 		dos.writeInt(nSamps);
 		dos.writeFloat(scale);
@@ -51,13 +66,17 @@ public class RawDataUtils {
 	/**
 	 * Read a waveform clip in scaled int8 format from a data input stream
 	 * @param dis data input stream
-	 * @return waveform double array
+	 * @return waveform double array or null if nChan or nSamps was zero (implying an empty array 
+	 * was written in the fist place)
 	 * @throws IOException
 	 */
 	public double[][] readWavClipInt8(DataInputStream dis) throws IOException {
 		int nChan = dis.readShort();
 		int nSamps = dis.readInt();
 		double scale = 1./dis.readFloat();
+		if (nChan == 0 || nSamps == 0) {
+			return null;
+		}
 		double[][] rawData = new double[nChan][nSamps];
 		for (int iC = 0; iC < nChan; iC++) {
 			double[] chanData = rawData[iC];
