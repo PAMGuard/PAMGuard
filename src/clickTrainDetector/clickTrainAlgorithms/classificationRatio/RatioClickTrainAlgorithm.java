@@ -44,7 +44,7 @@ public class RatioClickTrainAlgorithm implements ClickTrainAlgorithm {
 	}
 
 	@Override
-	public void update(int i) {
+	public void update(int i, Object data) {
 		// TODO Auto-generated method stub
 		
 	}

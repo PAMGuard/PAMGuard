@@ -1,9 +1,8 @@
 package clickTrainDetector.classification;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
-import PamUtils.PamCalendar;
-import PamguardMVC.debug.Debug;
 import clickTrainDetector.CTDataUnit;
 import clickTrainDetector.ClickTrainControl;
 import clickTrainDetector.classification.bearingClassifier.BearingClassification;
@@ -158,10 +157,10 @@ public class CTClassifierManager {
 		//first check the pre-classifier
 		Chi2CTClassification classification = this.preClassifier.classifyClickTrain(ctDataUnit); 
 		
-		System.out.println("Pre classifier: " + PamCalendar.formatDateTime(ctDataUnit.getTimeMilliseconds()) + " N. " + ctDataUnit.getSubDetectionsCount() + "UID first: " + ctDataUnit.getSubDetection(0).getUID() ); 
+		//System.out.println("Pre classifier: " + PamCalendar.formatDateTime(ctDataUnit.getTimeMilliseconds()) + " N. " + ctDataUnit.getSubDetectionsCount() + "UID first: " + ctDataUnit.getSubDetection(0).getUID() ); 
 
 		if (classification.getSpeciesID()==CTClassifier.NOSPECIES) {
-			System.out.println("No SPECIES: chi^2" + ctDataUnit.getCTChi2()); 
+			//System.out.println("No SPECIES: chi^2" + ctDataUnit.getCTChi2()); 
 			ctDataUnit.setJunkTrain(true);
 			//no need to do any more classification- the click train has been flagged for deletion.
 			ctDataUnit.clearClassifiers();
@@ -189,17 +188,17 @@ public class CTClassifierManager {
 		ctDataUnit.clearClassifiers();
 		ctDataUnit.setClassificationIndex(-1);
 		
-		System.out.println("Classify species: Num classifier " +  this.cTClassifiers.size()); 
+		//System.out.println("Classify species: Num classifier " +  this.cTClassifiers.size()); 
 
 		for (int i=0; i<this.cTClassifiers.size(); i++) {
 			
 		
-			System.out.println("Classifier: " + i); 
+			//System.out.println("Classifier: " + i); 
 
 			//the first classifier 
 			ctclassification = this.cTClassifiers.get(i).classifyClickTrain(ctDataUnit);
 			
-			System.out.println("Classifier complete: SPECIES: " + ctclassification.getSpeciesID()); 
+			//System.out.println("Classifier complete: SPECIES: " + ctclassification.getSpeciesID()); 
 
 			
 //			Debug.out.println(i + " ClassifierManager: Classify a click train data unit: " + ctDataUnit  + " parent data block: " +
@@ -208,7 +207,7 @@ public class CTClassifierManager {
 			
 			//set the species flag but only if this is the first time the ct data unit has been classified. 
 			if (ctclassification.getSpeciesID()>CTClassifier.NOSPECIES && !hasBeenClssfd) {
-				System.out.println("Set classiifcation index: " + i); 
+				//System.out.println("Set classiifcation index: " + i); 
 				ctDataUnit.setClassificationIndex(i); //set the classification index. 
 				hasBeenClssfd = true; 
 			}
@@ -237,6 +236,11 @@ public class CTClassifierManager {
 			if (aClassifier==null) {
 				System.err.println("CTCLassifier manager: the classifier is null");
 				continue; 
+			}
+			
+			if (ctParams[i].uniqueID ==null) {
+				//old versions may not have a unique ID so needs to be added. 
+				ctParams[i].uniqueID = UUID.randomUUID().toString();
 			}
 			aClassifier.setParams(ctParams[i]); 
 			cTClassifiers.add(aClassifier); 

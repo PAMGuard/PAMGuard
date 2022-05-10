@@ -1,18 +1,27 @@
 package clickTrainDetector.layout.classification.simplechi2classifier;
 
+import org.controlsfx.control.PopOver;
+
 import PamController.SettingsPane;
+import PamguardMVC.PamDataBlock;
 import clickTrainDetector.classification.simplechi2classifier.Chi2ThresholdClassifier;
 import clickTrainDetector.classification.simplechi2classifier.Chi2ThresholdParams;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
+import pamViewFX.PamGuiManagerFX;
+import pamViewFX.fxGlyphs.PamGlyphDude;
+import pamViewFX.fxNodes.PamBorderPane;
+import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamSpinner;
 import pamViewFX.fxNodes.PamVBox;
+import pamViewFX.fxNodes.utilityPanes.PamToggleSwitch;
 import pamViewFX.fxNodes.utilsFX.ControlField;
 
 /**
@@ -50,6 +59,12 @@ public class SimpleCTClassifierPane extends SettingsPane<Chi2ThresholdParams>  {
 	 * Minimum number of time. 
 	 */
 	private ControlField<Double> minTime;
+
+	private PamToggleSwitch dataSelectorCheckBox;
+
+	private PamButton dataSelectorButton;
+
+	private PopOver popOver;
 
 	public SimpleCTClassifierPane(Chi2ThresholdClassifier simpleChi2Classifier) {
 		super(null);
@@ -96,7 +111,7 @@ public class SimpleCTClassifierPane extends SettingsPane<Chi2ThresholdParams>  {
 		chi2Threshold.getSpinner().getValueFactory().setConverter(PamSpinner.createStringConverter(0));		
 		chi2Threshold.setTooltip(new Tooltip(
 							"A click train has a X\u00b2 value which is based on the consistancy of inter detection interval \n"
-						+ 	"amplitude and other factors. The calculation of X\\\\u00b2 changes depending on the click train \n"
+						+ 	"amplitude and other factors. The calculation of X\u00b2 changes depending on the click train \n"
 						+ 	"detector is used."));
 		chi2Threshold.getLabel1().setPrefWidth(LABEL_WIDTH);
 
@@ -105,6 +120,9 @@ public class SimpleCTClassifierPane extends SettingsPane<Chi2ThresholdParams>  {
 				"The minimum number of detections."));
 		minClicks.getSpinner().setEditable(true);
 		minClicks.getLabel1().setPrefWidth(LABEL_WIDTH);
+		
+	
+		
 
 		minTime = new ControlField<Double>("Min. Time		", "s", 0.0, Double.MAX_VALUE, 1.0);
 		minTime.getSpinner().getValueFactory().setConverter(PamSpinner.createStringConverter(2));		
@@ -120,6 +138,50 @@ public class SimpleCTClassifierPane extends SettingsPane<Chi2ThresholdParams>  {
 		return vBox;
 
 	}
+	
+	/**
+	 * Create the data selector. 
+	 * @return the data selector. 
+	 */
+	private Pane createDataSelectorPane() {
+		PamHBox hbox = new PamHBox();
+		hbox.setSpacing(5);
+		hbox.setAlignment(Pos.CENTER_LEFT);
+
+		dataSelectorButton = new PamButton();
+//		dataSelectorButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.SETTINGS, PamGuiManagerFX.iconSize));
+		dataSelectorButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconSize));
+		dataSelectorButton.setOnAction((action)->{
+			showDataSelectorPane();
+		});
+		hbox.getChildren().addAll(dataSelectorButton);
+		return hbox; 
+	}
+	
+	
+	/**
+	 * Creates pane allowing the user to change fine scale things such as error limits. 
+	 * @return the pop over pane. 
+	 */
+	public void showDataSelectorPane() {
+		
+		
+
+		if (popOver==null) {
+			popOver = new PopOver(); 
+			PamBorderPane holder = new PamBorderPane(simpleChi2Classifier.getDataSelector().getDialogPaneFX().getContentNode()); 
+			holder.setPadding(new Insets(5,5,5,5));
+			popOver.setContentNode(holder);
+		}
+
+		popOver.showingProperty().addListener((obs, old, newval)->{
+			if (newval) {
+				simpleChi2Classifier.getDataSelector().getDialogPaneFX().setParams(true);
+			}
+		});
+
+		popOver.show(dataSelectorButton);
+	} 
 
 	@Override
 	public Chi2ThresholdParams getParams(Chi2ThresholdParams currParams) {
@@ -128,6 +190,10 @@ public class SimpleCTClassifierPane extends SettingsPane<Chi2ThresholdParams>  {
 		//HACK - for some reason Integer spinner is returning a double
 		currParams.minClicks=minClicks.getSpinner().getValue().intValue(); 
 		currParams.minTime=minTime.getSpinner().getValue(); 
+		
+		if (simpleChi2Classifier!=null && simpleChi2Classifier.getDataSelector()!=null) {
+			simpleChi2Classifier.getDataSelector().getDialogPaneFX().getParams(true); 
+		}
 		
 		return currParams;
 	}

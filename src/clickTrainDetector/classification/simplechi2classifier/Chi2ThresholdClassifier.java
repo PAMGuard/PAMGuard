@@ -1,6 +1,8 @@
 package clickTrainDetector.classification.simplechi2classifier;
 
 import PamUtils.PamCalendar;
+import PamguardMVC.PamDataBlock;
+import PamguardMVC.dataSelector.DataSelector;
 import PamguardMVC.debug.Debug;
 import clickTrainDetector.CTDataUnit;
 import clickTrainDetector.ClickTrainControl;
@@ -31,6 +33,12 @@ public class Chi2ThresholdClassifier implements CTClassifier {
 	 * Reference to the click train control. 
 	 */
 	private ClickTrainControl clickTrainControl;
+
+	
+	/**
+	 * Data selector for the chi2 threshold classifier. 
+	 */
+	private DataSelector dataSelector;
 
 
 	public Chi2ThresholdClassifier(ClickTrainControl clickTrainControl, int defaultSpeciesID) {
@@ -67,6 +75,27 @@ public class Chi2ThresholdClassifier implements CTClassifier {
 		
 		return new Chi2CTClassification(clssfrParams.speciesFlag);
 	}
+	
+	/**
+	 * Get the data selector. 
+	 * @param source - the source data block 
+	 * @return the data selector.
+	 */
+	public void createDataSelector(PamDataBlock<?> source) {
+		if (dataSelector==null || dataSelector.getPamDataBlock()!=source) {
+			//create the data selector
+			//System.out.println("Data selector: " + dataSelector); 
+			if (source!=null) {
+				dataSelector=source.getDataSelectCreator().getDataSelector(clickTrainControl.getUnitName() +  " " + clssfrParams.uniqueID
+						+ "_X2_threshold_classifier", false, null);
+				//System.out.println("Data selector: " + dataSelector); 
+			}
+			else {
+				dataSelector=null; 
+			}
+		}
+	}
+	
 
 	@Override
 	public String getName() {
@@ -122,7 +151,6 @@ public class Chi2ThresholdClassifier implements CTClassifier {
 	public void setParams(Chi2ThresholdParams clssfrParams) {
 		//System.out.println("HELLO CLASSIFIER PARAMS: " + clssfrParams.chi2Threahold );
 		this.clssfrParams=clssfrParams;
-
 	}
 
 	/**
@@ -142,6 +170,11 @@ public class Chi2ThresholdClassifier implements CTClassifier {
 	@Override
 	public int getSpeciesID() {
 		return this.clssfrParams.speciesFlag;
+	}
+
+
+	public DataSelector getDataSelector() {
+		return this.dataSelector;
 	}
 
 

@@ -10,6 +10,7 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
+import PamUtils.PamArrayUtils;
 import PamView.GeneralProjector;
 import PamView.GeneralProjector.ParameterType;
 import PamView.dialog.GenericSwingDialog;
@@ -63,7 +64,8 @@ public class StandardSymbolChooser extends PamSymbolChooser {
 		ArrayList<SymbolModifier> modifiers = getSymbolModifiers();
 
 //		System.out.println("StandardSymbolChooser: " + modifiers.size() + " Defualt shape: " +  options.symbolData.symbol);
-//		System.out.println("StandardSymbolOptions: " + options);
+//		System.out.println("StandardSymbolOptions: " + mord.length + "  " + this.getSymbolManager() + "  " + options);
+//		PamArrayUtils.printArray(mord);
 
 		if (modifiers == null || modifiers.size() == 0) {
 			return symbolData;

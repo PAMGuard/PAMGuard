@@ -1,5 +1,7 @@
 package clickTrainDetector.classification.simplechi2classifier;
 
+import PamguardMVC.PamDataBlock;
+import PamguardMVC.dataSelector.DataSelector;
 import clickTrainDetector.classification.CTClassification;
 import clickTrainDetector.classification.CTClassifierType;
 import clickTrainDetector.classification.ClassifierJSONLogging;
@@ -22,15 +24,14 @@ public class Chi2CTClassification implements CTClassification {
 	private int speciesCode = -1;
 	
 	
-	private SimpleClassifierJSONLogging simpleClassifierJSONLogging; 
+	private SimpleClassifierJSONLogging simpleClassifierJSONLogging;
 
 
-	
 	public Chi2CTClassification(int speciesCode) {
 		this.speciesCode = speciesCode; 
 		simpleClassifierJSONLogging=new SimpleClassifierJSONLogging(); 
 	}
-	
+
 
 	/**
 	 * Create the classification from a JSON string
@@ -62,5 +63,7 @@ public class Chi2CTClassification implements CTClassification {
 	public ClassifierJSONLogging getJSONLogging() {
 		return simpleClassifierJSONLogging;
 	}
+	
+	
 
 }

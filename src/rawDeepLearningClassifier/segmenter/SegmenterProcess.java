@@ -375,7 +375,7 @@ public class SegmenterProcess extends PamProcess {
 
 				if (currentRawChunks[i]==null) {
 					//create a new data unit - should only be called once after initial start.  
-					currentRawChunks[i] = new GroupedRawData(timeMilliseconds, getSourceParams() .getGroupChannels(i), 
+					currentRawChunks[i] = new GroupedRawData(timeMilliseconds, getSourceParams().getGroupChannels(i), 
 							startSampleTime, dlControl.getDLParams().rawSampleSize, dlControl.getDLParams().rawSampleSize); 
 					currentRawChunks[i].setParentDataUnit(unit);; 
 				}
@@ -388,7 +388,7 @@ public class SegmenterProcess extends PamProcess {
 				//current time milliseconds is referenced from the first chunk with samples added. But, this can mean, especially for long period of times and multiple 
 				//chunks that things get a bit out of sync. So make a quick check to ensure that time millis is roughly correct. If not then fix. 
 				if (Math.abs(((double) currentRawChunks[i].getTimeMilliseconds() + 1000.*currentRawChunks[i].getRawDataPointer()[0]/this.getSampleRate()) - timeMilliseconds)>MAX_MILLIS_DRIFT) {
-					Debug.out.println("DL SEGMENTER: RESETTING TIME: "); 
+					//Debug.out.println("DL SEGMENTER: RESETTING TIME: "); 
 					currentRawChunks[i].setTimeMilliseconds((long) (timeMilliseconds - 1000.*currentRawChunks[i].getRawDataPointer()[0]/this.getSampleRate()));
 					currentRawChunks[i].setStartSample(startSampleTime-currentRawChunks[i].getRawDataPointer()[0]);
 				}
@@ -690,6 +690,7 @@ public class SegmenterProcess extends PamProcess {
 			for (int i =0; i<rawData.length; i++) {
 				rawData[i] = new double[samplesize];
 			}
+			
 		}
 
 		/**

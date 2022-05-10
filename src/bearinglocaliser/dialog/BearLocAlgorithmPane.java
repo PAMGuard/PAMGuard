@@ -21,6 +21,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
@@ -41,7 +42,7 @@ public class BearLocAlgorithmPane extends SettingsPane<BearingLocaliserParams> {
 		this.bfLocControl = bfLocControl;
 		algoPane = new GridPane();
 		algoPane.setVgap(2);
-		algoPane.setHgap(12);
+		algoPane.setHgap(5);
 //		algoPane.setPadding(new Insets(2, 12, 2, 12));
 		mainPane = new PamBorderPane(new PamTitledBorderPane("Algorithm selection", algoPane));
 		mainPane.setPadding(new Insets(10, 5, 10, 5));
@@ -140,6 +141,9 @@ public class BearLocAlgorithmPane extends SettingsPane<BearingLocaliserParams> {
 			algoPane.add(idLab = new Label(String.format("%d", i)), 0, iRow);
 			GridPane.setHalignment(idLab, HPos.CENTER);
 			algoSelection[i] = new ChoiceBox<>();
+			algoSelection[i].setMaxWidth(Double.POSITIVE_INFINITY);
+			algoSelection[i].setPrefWidth(150);
+			GridPane.setHgrow(algoSelection[i], Priority.ALWAYS); //stop the choice box from changing size on selection
 			for (BearingAlgorithmProvider anAlgo:allAlgorithms) {
 				algoSelection[i].getItems().add(anAlgo.getStaticProperties().getName());
 			}
