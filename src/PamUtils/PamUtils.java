@@ -397,7 +397,7 @@ public class PamUtils {
 	 /**
 	  * Force an angle to sit within some range. 
 	  * @param angle input angle (radians) 
-	  * @param maxAngle maximum angle in degrees
+	  * @param maxAngle maximum angle in radians
 	  * @return output angle (radians)
 	  */
 	static public double constrainedAngleR(double angle, double maxAngle) {
