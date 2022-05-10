@@ -22,6 +22,7 @@ public class TemplateClassifierParams extends CTClassifierParams implements Mana
 	private static final long serialVersionUID = 10L;
 	
 	public TemplateClassifierParams(){
+		super();
 		super.type=CTClassifierType.TEMPLATECLASSIFIER;
 //		chi2ThresholdParams = new Chi2ThresholdParams();  
 //		template = DefualtSpectrumTemplates.getTemplate(SpectrumTemplateType.BEAKED_WHALE);

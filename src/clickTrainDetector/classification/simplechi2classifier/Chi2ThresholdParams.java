@@ -1,5 +1,7 @@
 package clickTrainDetector.classification.simplechi2classifier;
 
+import java.util.UUID;
+
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import clickTrainDetector.classification.CTClassifierParams;
@@ -15,6 +17,7 @@ import clickTrainDetector.classification.CTClassifierType;
 public class Chi2ThresholdParams extends CTClassifierParams implements ManagedParameters  {
 	
 	public Chi2ThresholdParams(){
+		super();
 		super.type=CTClassifierType.CHI2THRESHOLD;
 	}
 	
