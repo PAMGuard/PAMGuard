@@ -33,6 +33,16 @@ public class CTSelectParams extends DataSelectParams implements Serializable, Cl
 	 * The minimum number of sub detections before a click train is plotted. 
 	 */
 	public int minSubDetections = 10; 
+	
+	/**
+	 * True of the click train detector needs a classifcation
+	 */
+	public boolean needsClassification = false; 
+	
+	/**
+	 * The classifier type(s) to select
+	 */
+	public int[] classifier = new int[]{-1}; 
 
 
 	/**
@@ -55,6 +65,8 @@ public class CTSelectParams extends DataSelectParams implements Serializable, Cl
 	 * overrides the maxAngle in RADIANS
 	 */
 	public double maxAngleChange = Math.toRadians(5);
+	
+	
 	
 	@Override
 	public ClickTrainSelectParameters clone() {

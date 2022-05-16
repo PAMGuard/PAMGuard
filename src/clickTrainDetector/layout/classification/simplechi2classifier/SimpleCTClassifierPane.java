@@ -121,8 +121,6 @@ public class SimpleCTClassifierPane extends SettingsPane<Chi2ThresholdParams>  {
 		minClicks.getSpinner().setEditable(true);
 		minClicks.getLabel1().setPrefWidth(LABEL_WIDTH);
 		
-	
-		
 
 		minTime = new ControlField<Double>("Min. Time		", "s", 0.0, Double.MAX_VALUE, 1.0);
 		minTime.getSpinner().getValueFactory().setConverter(PamSpinner.createStringConverter(2));		
@@ -165,8 +163,6 @@ public class SimpleCTClassifierPane extends SettingsPane<Chi2ThresholdParams>  {
 	 */
 	public void showDataSelectorPane() {
 		
-		
-
 		if (popOver==null) {
 			popOver = new PopOver(); 
 			PamBorderPane holder = new PamBorderPane(simpleChi2Classifier.getDataSelector().getDialogPaneFX().getContentNode()); 

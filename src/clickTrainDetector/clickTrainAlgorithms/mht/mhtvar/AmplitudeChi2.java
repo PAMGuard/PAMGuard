@@ -11,7 +11,7 @@ import PamguardMVC.PamDataUnit;
  *
  */
 @SuppressWarnings("rawtypes")
-public class AmplitudeChi2 extends SimpleChi2VarDelta {
+public class AmplitudeChi2 extends SimpleChi2Var {
 	
 	public AmplitudeChi2() {
 		super();

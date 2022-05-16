@@ -130,7 +130,7 @@ public class StandardClassifier implements CTClassifier {
 		
 		int speciesID = standardClssfrParams.speciesFlag; 
 		
-		System.out.println("Standard Classificiation: " ); 
+		//System.out.println("Standard Classificiation: " ); 
 	
 		//all classifiers have to pass.  
 		CTClassification[] ctClassification = new CTClassification[classifiers.size()]; 
@@ -138,8 +138,8 @@ public class StandardClassifier implements CTClassifier {
 			
 			ctClassification[i] = classifiers.get(i).classifyClickTrain(clickTrain); 
 			
-			System.out.println("Standard Classificiation: " + i + "  speciesID: " + ctClassification[i].getSpeciesID() 
-					+ "  sub species: "+ classifiers.get(i).getParams().speciesFlag + " standard species: " +speciesID + " use? : " + standardClssfrParams.enable[i]); 
+//			System.out.println("Standard Classificiation: " + i + "  speciesID: " + ctClassification[i].getSpeciesID() 
+//					+ "  sub species: "+ classifiers.get(i).getParams().speciesFlag + " standard species: " +speciesID + " use? : " + standardClssfrParams.enable[i]); 
 
 			if (standardClssfrParams.enable[i]) {
 				if (ctClassification[i].getSpeciesID() != SUB_CLASSIFIER_SPECIESID){
@@ -148,7 +148,7 @@ public class StandardClassifier implements CTClassifier {
 			}
 		}
 	
-		System.out.println("SPECIES ID: " + speciesID); 
+		//System.out.println("SPECIES ID: " + speciesID); 
 
 		//create the classification. 
 		StandardClassification classification = new StandardClassification(ctClassification, speciesID); 
