@@ -44,6 +44,10 @@ public abstract class AbstractPamScroller implements DataTimeLimits {
 	 */
 	protected double[] playSpeeds = {.1, 0.25, .5, 1.0, 2, 5, 10};
 
+	private long realTimerStart;
+
+	private long timerStartPosition;
+
 
 	public AbstractPamScroller(String name, int orientation, int stepSizeMillis, long defaultLoadTime, boolean hasMenu){
 
@@ -630,6 +634,8 @@ public abstract class AbstractPamScroller implements DataTimeLimits {
 					playTimerAction();
 				}
 			});
+			realTimerStart = System.currentTimeMillis();
+			timerStartPosition = getValueMillis();
 			playTimer.start();
 			playbackStarted();
 		}
@@ -671,11 +677,14 @@ public abstract class AbstractPamScroller implements DataTimeLimits {
 				stopPlayback();
 				return;
 			}
-			long step = Math.max((long) (timerInterval * scrollerData.getPlaySpeed()), 1);
-			setValueMillis(pos+step);
-			if (pos == getValueMillis()) {
-				playTimer.setDelay(playTimer.getDelay()*2);
-			}
+			long realMillis = System.currentTimeMillis() - realTimerStart;
+			long viewPos = (long) (realMillis*scrollerData.getPlaySpeed() + timerStartPosition);
+			setValueMillis(viewPos);
+//			long step = Math.max((long) (timerInterval * scrollerData.getPlaySpeed()), 1);
+//			setValueMillis(pos+step);
+//			if (pos == getValueMillis()) {
+//				playTimer.setDelay(playTimer.getDelay()*2);
+//			}
 		}
 	}
 
