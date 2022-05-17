@@ -42,7 +42,7 @@ public class CTSelectParams extends DataSelectParams implements Serializable, Cl
 	/**
 	 * The classifier type(s) to select
 	 */
-	public int[] classifier = new int[]{-1}; 
+	public int[] classifier = null; 
 
 
 	/**

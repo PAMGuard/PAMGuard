@@ -88,6 +88,7 @@ public class CTDataSelector extends DataSelector {
 
 	@Override
 	public DataSelectParams getParams() {
+		getDialogPanel().getParams(ctSelectParams);
 		return ctSelectParams;
 	}
 	
@@ -116,9 +117,9 @@ public class CTDataSelector extends DataSelector {
 	}
 
 	/**
-	 * Check whether a clikck train passes the data selector classification critera. 
-	 * @param ctDataUnit
-	 * @return
+	 * Check whether a click train passes the data selector classification criteria. 
+	 * @param ctDataUnit - the click train data unit to test.
+	 * @return true of the click train passes detection criterea. 
 	 */
 	private boolean isClassified(CTDetectionGroupDataUnit ctDataUnit) {
 
