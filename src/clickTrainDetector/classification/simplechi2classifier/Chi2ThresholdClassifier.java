@@ -44,6 +44,7 @@ public class Chi2ThresholdClassifier implements CTClassifier {
 	public Chi2ThresholdClassifier(ClickTrainControl clickTrainControl, int defaultSpeciesID) {
 		this.clickTrainControl=clickTrainControl; 
 		clssfrParams.speciesFlag=defaultSpeciesID; 
+		createDataSelector(clickTrainControl.getParentDataBlock());
 	}
 
 	
@@ -73,9 +74,42 @@ public class Chi2ThresholdClassifier implements CTClassifier {
 			return new Chi2CTClassification(CTClassifier.NOSPECIES); //no classification
 		}
 		
+		if (!isPercClicks(clickTrain)) {
+//			Debug.out.println("Failed on chi2Threshold"); 
+			return new Chi2CTClassification(CTClassifier.NOSPECIES); //no classification
+		}
+		
+		
 		return new Chi2CTClassification(clssfrParams.speciesFlag);
 	}
 	
+	
+	/**
+	 * Check the percentage of clicks which are correctly classified by the data selector. 
+	 * @param clickTrain - the click train
+	 * @return true if the percentage critera is passed
+	 * 
+	 */
+	private boolean isPercClicks(CTDataUnit clickTrain) {
+			
+		//no point iterating through click if we do not need to. 
+		if (clssfrParams.minPercentage==0) return true;
+				
+		double count = 0; 
+		for (int i=0; i<clickTrain.getSubDetectionsCount(); i++) {
+			if (this.getDataSelector().scoreData(clickTrain.getSubDetection(i))>0) {
+				count = count+1.; 
+			}
+		}
+		if (count/clickTrain.getSubDetectionsCount()>=clssfrParams.minPercentage) {
+			return true;	
+		}
+		else {
+			return false;
+		}
+	}
+
+
 	/**
 	 * Get the data selector. 
 	 * @param source - the source data block 
@@ -174,7 +208,8 @@ public class Chi2ThresholdClassifier implements CTClassifier {
 
 
 	public DataSelector getDataSelector() {
-		return this.dataSelector;
+		createDataSelector(clickTrainControl.getParentDataBlock());
+		return dataSelector;
 	}
 
 

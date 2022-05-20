@@ -248,6 +248,15 @@ public class CTClassifierManager {
 
 	}
 
+	/**
+	 * Get the pre-classifer. This is an intial very broad classifier that is used to determine
+	 * whether a click train should be saved or dumped from memory. 
+	 * @return the pre-classifier. 
+	 */
+	public Chi2ThresholdClassifier getPreClassifier() {
+		return preClassifier;
+	}
+
 
 
 

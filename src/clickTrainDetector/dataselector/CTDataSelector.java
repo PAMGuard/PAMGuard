@@ -139,9 +139,7 @@ public class CTDataSelector extends DataSelector {
 					}
 				}
 			}
-
 		}
-
 		return false;
 	}
 

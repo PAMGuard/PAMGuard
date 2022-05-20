@@ -11,7 +11,7 @@ import PamguardMVC.PamDataUnit;
  *
  */
 @SuppressWarnings("rawtypes")
-public class AmplitudeChi2 extends SimpleChi2Var {
+public class AmplitudeChi2 extends SimpleChi2VarDelta {
 	
 	public AmplitudeChi2() {
 		super();
@@ -39,7 +39,10 @@ public class AmplitudeChi2 extends SimpleChi2Var {
 	@Override
 	public double getDiffValue(PamDataUnit pamDataUnit0, PamDataUnit pamDataUnit1) {
 		//System.out.println("DB: " + pamDataUnit0.getAmplitudeDB());
-		return pamDataUnit0.getAmplitudeDB()-pamDataUnit1.getAmplitudeDB();
+		//made this abs so it can deal with increasing then decreasing click trains. i.e.
+		//the click trian is not penalised if it gradually increasing then starts to gradually decrease
+		//in amplitude. 
+		return Math.abs(pamDataUnit0.getAmplitudeDB()-pamDataUnit1.getAmplitudeDB());
 	}
 
 	@Override

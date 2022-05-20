@@ -1,5 +1,7 @@
 package clickTrainDetector.layout.classification.simplechi2classifier;
 
+import java.text.DecimalFormat;
+
 import org.controlsfx.control.PopOver;
 
 import PamController.SettingsPane;
@@ -11,9 +13,12 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Control;
 import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
+import javafx.util.StringConverter;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
@@ -66,6 +71,11 @@ public class SimpleCTClassifierPane extends SettingsPane<Chi2ThresholdParams>  {
 
 	private PopOver popOver;
 
+	/**
+	 * The minimum percentage of clicks for a certain class. 
+	 */
+	private ControlField<Double> minPercClicks;
+
 	public SimpleCTClassifierPane(Chi2ThresholdClassifier simpleChi2Classifier) {
 		super(null);
 		this.simpleChi2Classifier=simpleChi2Classifier; 
@@ -115,14 +125,31 @@ public class SimpleCTClassifierPane extends SettingsPane<Chi2ThresholdParams>  {
 						+ 	"detector is used."));
 		chi2Threshold.getLabel1().setPrefWidth(LABEL_WIDTH);
 
-		minClicks = new ControlField<Double>("Min. Clicks	", "", 0, Integer.MAX_VALUE, 5);
+		minClicks = new ControlField<Double>("Min. clicks	", "", 0, Integer.MAX_VALUE, 5);
 		minClicks.setTooltip(new Tooltip(
 				"The minimum number of detections."));
 		minClicks.getSpinner().setEditable(true);
 		minClicks.getLabel1().setPrefWidth(LABEL_WIDTH);
 		
+		
+		minPercClicks = new ControlField<Double>("Min. % clicks	", "", 0, 100., 1.);
+		minPercClicks.setTooltip(new Tooltip(
+				"The minimum number of detections."));
+		minPercClicks.getSpinner().setEditable(true);
+		SpinnerValueFactory<Double> valueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, 100., 0., 1.);		
+		valueFactory.setConverter(doubleConverter);
+		minPercClicks.getSpinner().setValueFactory(valueFactory);
+		minPercClicks.getSpinner().setEditable(true);
+		///HACK to get the percentage sign to show?
+		minPercClicks.getSpinner().increment();
+		minPercClicks.getSpinner().decrement();
 
-		minTime = new ControlField<Double>("Min. Time		", "s", 0.0, Double.MAX_VALUE, 1.0);
+		minPercClicks.getLabel1().setPrefWidth(LABEL_WIDTH);
+		
+		minPercClicks.getChildren().add( createDataSelectorPane()); 
+		
+
+		minTime = new ControlField<Double>("Min. time		", "s", 0.0, Double.MAX_VALUE, 1.0);
 		minTime.getSpinner().getValueFactory().setConverter(PamSpinner.createStringConverter(2));		
 		minTime.setTooltip(new Tooltip(
 				"The minimum time for a click train."));
@@ -131,7 +158,7 @@ public class SimpleCTClassifierPane extends SettingsPane<Chi2ThresholdParams>  {
 
 		chi2Threshold.getSpinner().setEditable(true);
 		
-		vBox.getChildren().addAll(chi2Threshold, minClicks, minTime);
+		vBox.getChildren().addAll(chi2Threshold, minClicks, minPercClicks, minTime);
 
 		return vBox;
 
@@ -172,21 +199,27 @@ public class SimpleCTClassifierPane extends SettingsPane<Chi2ThresholdParams>  {
 
 		popOver.showingProperty().addListener((obs, old, newval)->{
 			if (newval) {
+//				System.out.println("Data Selector: "  + simpleChi2Classifier.getDataSelector());
 				simpleChi2Classifier.getDataSelector().getDialogPaneFX().setParams(true);
 			}
+			else {
+				simpleChi2Classifier.getDataSelector().getDialogPaneFX().getParams(true);
+			}
 		});
-
+		
 		popOver.show(dataSelectorButton);
 	} 
 
 	@Override
 	public Chi2ThresholdParams getParams(Chi2ThresholdParams currParams) {
+		//System.out.println("Get PERC spinner value; " + minPercClicks.getSpinner().getValue());
 		
 		currParams.chi2Threshold=chi2Threshold.getSpinner().getValue(); 
 		//HACK - for some reason Integer spinner is returning a double
 		currParams.minClicks=minClicks.getSpinner().getValue().intValue(); 
 		currParams.minTime=minTime.getSpinner().getValue(); 
-		
+		currParams.minPercentage=minPercClicks.getSpinner().getValue()/100; 
+
 		if (simpleChi2Classifier!=null && simpleChi2Classifier.getDataSelector()!=null) {
 			simpleChi2Classifier.getDataSelector().getDialogPaneFX().getParams(true); 
 		}
@@ -196,10 +229,12 @@ public class SimpleCTClassifierPane extends SettingsPane<Chi2ThresholdParams>  {
 
 	@Override
 	public void setParams(Chi2ThresholdParams input) {
+		
 		chi2Threshold.getSpinner().getValueFactory().setValue(input.chi2Threshold);
 		//HACK - for some reason Integer spinner is returning a double
 		minClicks.getSpinner().getValueFactory().setValue((double) input.minClicks);
 		minTime.getSpinner().getValueFactory().setValue(input.minTime);
+		minPercClicks.getSpinner().getValueFactory().setValue(input.minPercentage*100.);
 	}
 
 	@Override
@@ -225,6 +260,24 @@ public class SimpleCTClassifierPane extends SettingsPane<Chi2ThresholdParams>  {
 		// TODO Auto-generated method stub
 
 	}
+	
+	
+	StringConverter<Double> doubleConverter = new StringConverter<Double>() {
+		private final DecimalFormat df = new DecimalFormat("###.#");
+		@Override
+		public String toString(Double object) {
+		    if (object == null) {return "";}
+		    return df.format(object)+"%";}
+		@Override
+		public Double fromString(String string) {
+		    try {
+		        if (string == null) {return null;}
+		        string = string.trim();
+		        if (string.length() < 1) {return null;}     
+		        return df.parse(string).doubleValue();
+		    } catch (Exception ex) {throw new RuntimeException(ex);}
+		    }
+		};
 	
 
 

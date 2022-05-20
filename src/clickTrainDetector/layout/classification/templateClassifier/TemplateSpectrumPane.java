@@ -91,7 +91,7 @@ public class TemplateSpectrumPane  extends PamBorderPane {
 
 		//now add the import button. 
 		Pane spectrumTemplate = createTemplatePane(templateDisplay);
-		
+				
 		
 		return spectrumTemplate; 
 	}
@@ -121,10 +121,12 @@ public class TemplateSpectrumPane  extends PamBorderPane {
 		stackPane.setMaxHeight(prefHeight);
 		stackPane.setMaxWidth(Double.MAX_VALUE);
 		stackPane.setPrefWidth(500); //need this for some reason to make the plot resize.
+	
 
 		//stackPane.setStyle("-fx-background-color: red;");
 
 		detectionPlot.prefWidthProperty().bind(stackPane.widthProperty());
+
 
 
 		PamVBox holder = new PamVBox(); 
@@ -360,6 +362,11 @@ public class TemplateSpectrumPane  extends PamBorderPane {
 		tooltipText+="A comma delimitted CSV file were the first row is the amplitude values of the spectrum between 0 and 1 and the "
 				+ "second column is a single value represenitng the sample rate in samples per second";
 		return 	PamUtilsFX.htmlToNormal(tooltipText);
+	}
+
+
+	public void drawCurrentUnit() {
+		templateDisplay.drawCurrentUnit();
 	}
 
 
