@@ -1,6 +1,7 @@
 package clickTrainDetector.classification;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
@@ -20,10 +21,21 @@ public class CTClassifierParams implements Cloneable, Serializable, ManagedParam
 	private static final long serialVersionUID = 1L;
 	
 	
+	public CTClassifierParams() {
+		this.uniqueID = UUID.randomUUID().toString();
+	}
+	
+	
 	/**
-	 * A very simple species flag to indicate what classifier was used. 0 means not classified. 
+	 * The name of the classifier. 
 	 */
 	public String classifierName = ""; 
+	
+	
+	/**
+	 * A unique ID for the classifier that never changes. This is important for accessing data selectors. 
+	 */
+	public String uniqueID; 
 	
 	
 	/**

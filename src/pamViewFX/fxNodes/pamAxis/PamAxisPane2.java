@@ -93,7 +93,7 @@ public class PamAxisPane2 extends StackPane {
 		this.getChildren().add(mainPane);
 	}
 
-	private void layoutAxis(){
+	public void layoutAxis(){
 
 		mainPane.setCenter(null);
 

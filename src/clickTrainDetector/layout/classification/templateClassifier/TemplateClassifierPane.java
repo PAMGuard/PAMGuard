@@ -118,6 +118,8 @@ public class TemplateClassifierPane extends SettingsPane<TemplateClassifierParam
 		spectrumPane.getChildren().addAll(spectrumthreshold, spectrumTemplatePane); 
 		spectrumPane.setPadding(new Insets(5,5,5,5));
 		
+		spectrumTemplatePane.prefWidthProperty().bind(spectrumPane.widthProperty());
+		
 		
 //		tabPane.setSide(Side.LEFT);
 		
@@ -135,6 +137,10 @@ public class TemplateClassifierPane extends SettingsPane<TemplateClassifierParam
 //		TabPane tabPane = new TabPane();
 //		tabPane.minWidthProperty().bind(generalPane.widthProperty());
 //		tabPane.getTabs().addAll(tab1, tab2);
+		
+		
+		spectrumTemplatePane.drawCurrentUnit();
+
 		
 		return new PamVBox(generalPane, spectrumPane); 
 	}

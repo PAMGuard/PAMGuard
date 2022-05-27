@@ -1,5 +1,7 @@
 package clickTrainDetector.classification.standardClassifier;
 
+import java.util.UUID;
+
 import clickTrainDetector.classification.CTClassifierParams;
 import clickTrainDetector.classification.CTClassifierType;
 
@@ -27,6 +29,7 @@ public class StandardClassifierParams extends CTClassifierParams {
 	
 	
 	public StandardClassifierParams(){
+		super();
 		///very important to set this or else the clasifier manager does not
 		//know which classifier to create. 
 		type = CTClassifierType.STANDARDCLASSIFIER; 
