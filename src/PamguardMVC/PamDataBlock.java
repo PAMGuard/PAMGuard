@@ -986,7 +986,9 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	}
 
 	/**
-	 * Instruction from the viewer scroll manager to load new data.
+	 * Instruction from the viewer scroll manager to load new data. <p>This just calls through
+	 * to loadViewerData(OfflineDataLoadInfo ...) so this should not be overridden. Override
+	 * the other function instead. 
 	 * 
 	 * @param dataStart    data start time in millis
 	 * @param dataEnd      data end time in millis.
