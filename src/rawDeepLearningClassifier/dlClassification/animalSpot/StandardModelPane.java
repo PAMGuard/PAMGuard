@@ -424,6 +424,15 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 		//instead of a using changing a control.
 		currParams.classNames = paramsClone.classNames; 
 		currParams.numClasses = paramsClone.numClasses; 
+		
+		if (paramsClone.classNames == null && speciesIDBox.getItems()!=null) {
+			
+			String[] classNames = new String[speciesIDBox.getItems().size()]; 
+			for (int i=0; i<speciesIDBox.getItems().size(); i++) {
+				classNames[i] = speciesIDBox.getItems().get(i);
+			}
+			currParams.classNames = this.dlClassifierModel.getDLControl().getClassNameManager().makeClassNames(classNames);
+		}
 
 		currParams.useDefaultSegLen = usedefaultSeg.isSelected(); 
 		
@@ -495,8 +504,6 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 
 			}
 		}
-
-
 	}
 
 	@Override

@@ -206,6 +206,7 @@ public class KetosClassifier implements DLClassiferModel, PamSettings {
 
 	@Override
 	public DLClassName[] getClassNames() {
+		//System.out.println("Ketos Model: " + ketosDLParams.numClasses); 
 		return ketosDLParams.classNames;
 	}
 
