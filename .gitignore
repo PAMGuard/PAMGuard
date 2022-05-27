@@ -21,6 +21,7 @@
 *.zip
 *.tar.gz
 *.rar
+*.dll
 
 # eclipse project file
 .project

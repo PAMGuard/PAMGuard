@@ -44,6 +44,14 @@ public abstract class AbstractPamScroller implements DataTimeLimits {
 	 */
 	protected double[] playSpeeds = {.1, 0.25, .5, 1.0, 2, 5, 10};
 
+//	private long realTimerStart;
+//
+//	private long timerStartPosition;
+
+	private long timerLastCurrentTime;
+
+//	private long timerTimeMillis;
+
 
 	public AbstractPamScroller(String name, int orientation, int stepSizeMillis, long defaultLoadTime, boolean hasMenu){
 
@@ -630,6 +638,8 @@ public abstract class AbstractPamScroller implements DataTimeLimits {
 					playTimerAction();
 				}
 			});
+			timerLastCurrentTime = System.currentTimeMillis();
+//			timeLastValue = getValueMillis();
 			playTimer.start();
 			playbackStarted();
 		}
@@ -671,11 +681,17 @@ public abstract class AbstractPamScroller implements DataTimeLimits {
 				stopPlayback();
 				return;
 			}
-			long step = Math.max((long) (timerInterval * scrollerData.getPlaySpeed()), 1);
-			setValueMillis(pos+step);
-			if (pos == getValueMillis()) {
-				playTimer.setDelay(playTimer.getDelay()*2);
-			}
+			/**
+			 * Since the action on setValue can take quite some time, the timer can run slow
+			 * if we just increment by what we think this delay is, so increment the value
+			 * based on how much system time has elapsed between the last call and now 
+			 */
+			long now = System.currentTimeMillis();
+			int elapsed = (int) (now - timerLastCurrentTime);
+			int toAdd = (int) (elapsed*scrollerData.getPlaySpeed());
+			timerLastCurrentTime = now;
+			
+			setValueMillis(getValueMillis()+toAdd);
 		}
 	}
 
