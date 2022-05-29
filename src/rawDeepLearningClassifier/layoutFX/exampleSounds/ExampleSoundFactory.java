@@ -15,9 +15,14 @@ public class ExampleSoundFactory {
 	 *
 	 */
 	public enum ExampleSoundType {
+		
 	    BAT_CALL("Bat Call (Myotis daubentonii)"),
 		
-	    RIGHT_WHALE("Southern Right Whale (Eubalaena australis)");
+	    RIGHT_WHALE("Southern Right Whale (Eubalaena australis)"),
+		
+		MINKE_WHALE("Minke Whale (Balaenoptera spp.)"),
+				
+		HUMPBACK_WHALE("Humpback whale (Megaptera novaeangliae) ");
 
 	    private final String text;
 
@@ -54,6 +59,16 @@ public class ExampleSoundFactory {
 		case RIGHT_WHALE:
 			 //file = new File("src/rawDeepLearningClassifier/layoutFX/exampleSounds/southern_right_whale_clip2.wav"); 
 			path = getClass().getResource("/Resources/exampleSounds/southern_right_whale_clip2.wav"); 
+			exampleSound = new SimpleExampleSound(path); 
+			break;
+		case MINKE_WHALE:
+			 //file = new File("src/rawDeepLearningClassifier/layoutFX/exampleSounds/southern_right_whale_clip2.wav"); 
+			path = getClass().getResource("/Resources/exampleSounds/Minke_whale.wav"); 
+			exampleSound = new SimpleExampleSound(path); 
+			break;
+		case HUMPBACK_WHALE:
+			 //file = new File("src/rawDeepLearningClassifier/layoutFX/exampleSounds/southern_right_whale_clip2.wav"); 
+			path = getClass().getResource("/Resources/exampleSounds/Humpback_whale.wav"); 
 			exampleSound = new SimpleExampleSound(path); 
 			break;
 		default:

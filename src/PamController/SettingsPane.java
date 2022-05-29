@@ -40,7 +40,7 @@ public abstract class SettingsPane<T> {
 	public abstract String getName();
 	
 	/**
-	 * Get node for GUI chnage of settings. 
+	 * Get node for GUI change of settings. 
 	*/
 	public abstract Node getContentNode(); 
 

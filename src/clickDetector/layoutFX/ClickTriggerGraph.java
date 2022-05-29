@@ -19,6 +19,9 @@ import simulatedAcquisition.sounds.SimSignal;
 public class ClickTriggerGraph extends PamBorderPane {
 	
 	public final static int PORPOISE_CLICK=0; 
+	
+	public final static int SPERM_WHALE=1; 
+
 
 	private int currentClick=PORPOISE_CLICK;
 	
@@ -44,11 +47,15 @@ public class ClickTriggerGraph extends PamBorderPane {
 	private LineChart<Number, Number> plotChart;
 
 	private int freq2;
+
+	private double[] waveform;
 	
 	public ClickTriggerGraph(){
 		this.setCenter(createWaveformGraph());
-		this.setPrefWidth(500);
+		this.setPrefWidth(400);
 		//FIXME - seems to a resize bug in high DPI displays. Seems fixed in 8u60. 
+		this.waveform=generateClickWaveform(currentClick, noise);		
+
 	}
 	
 	/**
@@ -67,7 +74,6 @@ public class ClickTriggerGraph extends PamBorderPane {
 		Series<Number, Number> noiseLevelSeries = new Series<Number, Number>();
 
 		
-		double[] waveform=generateClickWaveform(currentClick, noise);		
 		double[] signalLevel=calcFilter(waveform, shortFilter);
 		double[] noiseLevel=calcFilter(waveform, longFilter);
 
@@ -110,6 +116,10 @@ public class ClickTriggerGraph extends PamBorderPane {
 		case PORPOISE_CLICK:
 			clickSound=new ClickSound("Porpoise", freq=140000, freq2=140000, length=0.00015, WINDOWTYPE.HANN);
 			sR=500000;
+			break;
+		case SPERM_WHALE:
+			clickSound=(new ClickSound("Beaked Whale", 30000, 60000, length = 0.3e-3, WINDOWTYPE.HANN));
+			sR=192000;
 			break;
 		default:
 			clickSound=new ClickSound("Porpoise", freq=140000, freq2=140000, length=0.00015, WINDOWTYPE.HANN);

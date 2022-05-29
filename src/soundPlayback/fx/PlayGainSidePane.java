@@ -18,14 +18,14 @@ public class PlayGainSidePane implements PreProcessFXPane {
 	private PlayGainSlider playGainSlider;
 
 	public PlayGainSidePane(PlaybackGain playbackGain) {
-		this.playbackGain = playbackGain;
-		playGainSlider = new PlayGainSlider();
-		
-		basicSidebarLayout.setToolTipText("<html>Adjust the output volume.<br>"+
-		"N.B. You should also consider turning up the volume in the computers volume controls.");
-		playGainSlider.addChangeListener((oldval, newVal, obsVal)->{
-				gainChanged();
-			});
+//		this.playbackGain = playbackGain;
+//		playGainSlider = new PlayGainSlider();
+//		
+//		basicSidebarLayout.setToolTipText("<html>Adjust the output volume.<br>"+
+//		"N.B. You should also consider turning up the volume in the computers volume controls.");
+//		playGainSlider.addChangeListener((oldval, newVal, obsVal)->{
+//				gainChanged();
+//			});
 		}
 
 	@Override

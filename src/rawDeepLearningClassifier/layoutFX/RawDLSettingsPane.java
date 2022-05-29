@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.controlsfx.control.PopOver;
 
+import PamController.FlipSettingsPane;
 import PamController.SettingsPane;
 import PamDetection.RawDataUnit;
 import PamView.dialog.warn.WarnOnce;
@@ -14,10 +15,10 @@ import clipgenerator.ClipDataUnit;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.PopupControl;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.Alert.AlertType;
@@ -49,6 +50,8 @@ import warnings.PamWarning;
 public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 
 
+	public static double MAX_WIDTH = 250; 
+	
 	/**
 	 * The source for the FFT data source.  
 	 */
@@ -111,6 +114,10 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 
 	private Label infoLabel;
 
+	private Object flipPane;
+
+	private PopupControl advLabel;
+
 	public RawDLSettingsPane(DLControl dlControl){
 		super(null); 
 		this.dlControl=dlControl; 
@@ -128,8 +135,10 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 		mainPane.setCenter(createDLPane());
 		mainPane.setPadding(new Insets(5,5,5,5));
 		mainPane.setMinHeight(400);
-		mainPane.setMaxWidth(250);
-		mainPane.setPrefWidth(250);
+		mainPane.setMaxWidth(MAX_WIDTH);
+		mainPane.setPrefWidth(MAX_WIDTH);
+		//this.getAdvPane().setMaxWidth(MAX_WIDTH);
+		
 
 		//mainPane.getStylesheets().add(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getDialogCSS()); 
 
@@ -253,7 +262,7 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 
 		return vBox; 
 	}
-	
+
 	
 	/**
 	 * Create the data selector. 
@@ -483,7 +492,7 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 
 
 	@Override
-	public Node getContentNode() {
+	public Pane getContentNode() {
 		return mainPane;
 	}
 
@@ -500,5 +509,7 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 	public PamDataBlock getSelectedParentDataBlock() {
 		return sourcePane.getSource();
 	}
+
+
 
 }
