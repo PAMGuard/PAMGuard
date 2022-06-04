@@ -23,6 +23,24 @@ public class CornerLayoutContraint  implements Serializable, Cloneable {
 	
 	public int anchor = FIRST_LINE_START;
 
+	/**
+	 * Construct a corner layout constraint with the given anchor
+	 * @param anchor
+	 */
+	public CornerLayoutContraint(int anchor) {
+		super();
+		this.anchor = anchor;
+	}
+
+
+	/**
+	 * construct a corner layout constraint with the default anchor
+	 */
+	public CornerLayoutContraint() {
+		super();
+		this.anchor = anchor;
+	}
+
 	@Override
 	protected CornerLayoutContraint clone() {
 		try {

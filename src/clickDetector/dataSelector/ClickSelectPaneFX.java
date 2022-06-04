@@ -217,7 +217,8 @@ public class ClickSelectPaneFX extends DynamicSettingsPane<Boolean>  {
 		void setParams() {
 			ClickAlarmParameters clickAlarmParameters = clickDataSelector.getClickAlarmParameters();
 			speciesSelect.getChildren().clear();
-
+			
+			
 			//species pane setup
 			species = null;
 			weights = null;
@@ -350,6 +351,7 @@ public class ClickSelectPaneFX extends DynamicSettingsPane<Boolean>  {
 		}
 
 		boolean getParams() {
+			
 
 			ClickAlarmParameters clickAlarmParameters = clickDataSelector.getClickAlarmParameters().clone();
 			clickAlarmParameters.useEchoes = useEchoes.isSelected();
@@ -397,6 +399,7 @@ public class ClickSelectPaneFX extends DynamicSettingsPane<Boolean>  {
 
 			//			btDisplayParameters.showANDEvents = andEvents.isSelected();
 			//			btDisplayParameters.showEventsOnly = onlyEvents.isSelected();
+			
 			clickDataSelector.setClickAlarmParameters(clickAlarmParameters);
 			return true;
 		}

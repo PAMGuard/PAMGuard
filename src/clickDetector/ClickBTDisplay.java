@@ -1572,6 +1572,9 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 	}
 	private double clickAngleToY(ClickDetection click) {
 		AbstractLocalisation loc = click.getLocalisation();
+//		if (click.getUID() == 110006089) {
+//			System.out.println("Click 110006089 angle " + click.getAngle());
+//		}
 		if (loc == null) return 0;
 		double angle = 0;
 		GpsData oll;

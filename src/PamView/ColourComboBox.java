@@ -81,6 +81,15 @@ public class ColourComboBox extends PamPanel {
     	
     }
     
+//    private void createImages() {
+//    	for (int i = 0; i < ColourArray.ColourArrayType.values().length; i++) {
+//    		intArray[i] = new Integer(i);
+//    		colourStrings[i]=ColourArray.getName(types[i]);
+//    		colourArray=ColourArray.createStandardColourArray(256, ColourArray.ColourArrayType.values()[i]);
+//    		images[i]=new ImageIcon(createColourMapImage(colourArray,  height,  width));
+//    	}
+//    }
+    
     public void addActionListener(ActionListener actionListener){
     	colourBox.addActionListener(actionListener);
     }
@@ -161,7 +170,7 @@ public class ColourComboBox extends PamPanel {
 			    for (int i = 0; i < ColourArray.ColourArrayType.values().length; i++) {
 			    	intArray[i] = new Integer(i);
 			    	colourStrings[i]=ColourArray.getName(types[i]);
-			    	colourArray=ColourArray.createStandardColourArray(256, ColourArray.ColourArrayType.values()[i]);
+			    	colourArray=ColourArray.createStandardColourArray(width, ColourArray.ColourArrayType.values()[i]);
 			    	images[i]=new ImageIcon(createColourMapImage(colourArray,  height,  width));
 			    }
 			}

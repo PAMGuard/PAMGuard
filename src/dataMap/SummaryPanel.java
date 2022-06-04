@@ -99,8 +99,8 @@ public class SummaryPanel extends HidingDialogComponent {
 				dataEnds[i].setText(" ---No data---");
 			}
 			else {
-			dataStarts[i].setText(PamCalendar.formatDateTime2(dataExtent[0], true));
-			dataEnds[i].setText(PamCalendar.formatDateTime(dataExtent[1], true));
+				dataStarts[i].setText(PamCalendar.formatDateTime2(dataExtent[0], true));
+				dataEnds[i].setText(PamCalendar.formatDateTime(dataExtent[1], true));
 			}
 		}
 		for (int i = offlineDataStores.size(); i < maxDataSources; i++) {
