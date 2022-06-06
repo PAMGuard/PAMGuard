@@ -1,5 +1,6 @@
 package soundPlayback.preprocess;
 
+import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 
 /**
@@ -20,5 +21,10 @@ public interface PreProcessFXPane {
 	 * changed somewhere else. 
 	 */
 	public void update();
+	
+	/**
+	 * The name of the pre process. 
+	 */
+	public Label getLabel();
 	
 }
