@@ -171,6 +171,8 @@ public class RoccaWhistleSelect extends PamProcess implements SpectrogramMarkObs
                         roccaControl.roccaSidePanel.sidePanel.addASighting(false);
                 // if the user hit cancel, just exit
                 if (dummy == RoccaSightingDataUnit.NONE) {
+                    selectedWhistle.setNaturalLifetimeMillis(0);
+                    selectedWhistleRaw.setNaturalLifetimeMillis(0);
                 	return;
                 }
             }
@@ -198,6 +200,14 @@ public class RoccaWhistleSelect extends PamProcess implements SpectrogramMarkObs
                     selectedWhistleRaw,
                     display,
                     channel);
+
+            /**
+             * DG June '22.
+             * I hope IT's K to set these back here. It's possible it's also 
+             * done elsewhere.  
+             */
+            selectedWhistle.setNaturalLifetimeMillis(0);
+            selectedWhistleRaw.setNaturalLifetimeMillis(0);
         }
 	}
 

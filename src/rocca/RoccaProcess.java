@@ -363,6 +363,9 @@ public class RoccaProcess extends PamProcess {
 			
 			// 2017/12/4 set the natural lifetime to Integer.Max, so that we definitely keep all of the data
 			// units during this code block.  Set the lifetime back to 0 at the end of the block
+			/*
+			 * DG June '22 made sure this is the case when the function returns early !
+			 */
 			rcdb.setNaturalLifetimeMillis(Integer.MAX_VALUE);
 			rcdb.calculateStatistics();
 			
@@ -385,6 +388,7 @@ public class RoccaProcess extends PamProcess {
 						 rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) > 1.5 ||
 						 rcdb.getContour().get(RoccaContourStats.ParamIndx.FREQABSSLOPEMEAN) < 2000. ||
 						 rcdb.getContour().get(RoccaContourStats.ParamIndx.FREQABSSLOPEMEAN) > 28000. )) {
+					rcdb.setNaturalLifetimeMillis(0);
 					return;
 				}
 				if (roccaControl.roccaParameters.roccaClassifierModelFilename.getName().equals("HIWhist.model") &&
@@ -398,6 +402,7 @@ public class RoccaProcess extends PamProcess {
 						 rcdb.getContour().get(RoccaContourStats.ParamIndx.FREQABSSLOPEMEAN) > 60000.  ||
 						 rcdb.getContour().get(RoccaContourStats.ParamIndx.FREQRANGE) < 800. ||
 						 rcdb.getContour().get(RoccaContourStats.ParamIndx.FREQRANGE) > 14000.  )) {
+					rcdb.setNaturalLifetimeMillis(0);
 					return;
 				}
 				if (roccaControl.roccaParameters.roccaClassifierModelFilename.getName().equals("NWAtlWhist.model") &&
@@ -407,6 +412,7 @@ public class RoccaProcess extends PamProcess {
 						 rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) > 2.5 ||
 						 rcdb.getContour().get(RoccaContourStats.ParamIndx.FREQABSSLOPEMEAN) < 9100. ||
 						 rcdb.getContour().get(RoccaContourStats.ParamIndx.FREQABSSLOPEMEAN) > 82000. )) {
+					rcdb.setNaturalLifetimeMillis(0);
 					return;
 				}
 			}
@@ -743,6 +749,8 @@ public class RoccaProcess extends PamProcess {
 	        } else {
 	        	newTime = prdb.getNaturalLifetimeMillis()*2;
 	        }
+	        // stop it getting silly.
+	        newTime = Math.min(newTime, roccaControl.getMaxDataKeepTime());
 	        prdb.setNaturalLifetimeMillis(newTime); // increase the lifetime to try and prevent this from happening again
 			return null;
 		}
