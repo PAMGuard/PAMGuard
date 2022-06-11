@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import javax.swing.SwingUtilities;
 
 import pamScrollSystem.AbstractScrollManager;
-
 import generalDatabase.DBControlUnit;
 import binaryFileStorage.BinaryStore;
 import dataMap.layoutFX.DataMapGUIFX;
@@ -239,6 +238,32 @@ public class DataMapControl extends PamControlledUnit implements PamSettings {
 
 	public ArrayList<PamDataBlock> getMappedDataBlocks() {
 		return mappedDataBlocks;
+	}
+	
+	/**
+	 * Update a single data map. Useful when bringing in data 
+	 * from 'non standard' sources. Check overall time limits and 
+	 * redraw, but no total map creation. 
+	 * @param singleDataMap
+	 */
+	public void updateSingleDataMap(OfflineDataMap<?> singleDataMap) {
+		long newLastTime = singleDataMap.getLastDataTime();
+		long newFirstTime = singleDataMap.getFirstDataTime();
+		if (mappedDataBlocks == null) {
+			return;
+		}
+		for (PamDataBlock aBlock : mappedDataBlocks) {
+			int nMaps = aBlock.getNumOfflineDataMaps();
+			for (int iMap = 0; iMap < nMaps; iMap++) {
+				OfflineDataMap aMap = aBlock.getOfflineDataMap(iMap);
+				newFirstTime = Math.min(newFirstTime, aMap.getFirstDataTime());
+				newLastTime = Math.max(newLastTime, aMap.getLastDataTime());
+			}
+		}
+		firstTime = newFirstTime;
+		lastTime = newLastTime;
+		dataMapPanel.repaintAll();
+		dataMapPanel.getSummaryPanel().newDataSources();
 	}
 
 	/**
