@@ -742,7 +742,6 @@ public class RoccaProcess extends PamProcess {
 				PamUtils.makeChannelMap(lowestChanList));
 		int firstIndx = prdb.getUnitIndex(firstRDU);
 		if (firstIndx==-1) {
-			System.out.println("RoccaProcess: Cannot determine firstIndx, raw data lifetime = " + prdb.getNaturalLifetimeMillis() + " ms");
 	        int newTime;
 	        if (prdb.getNaturalLifetimeMillis() > Integer.MAX_VALUE/2) {
 	        	newTime = Integer.MAX_VALUE;
@@ -751,6 +750,7 @@ public class RoccaProcess extends PamProcess {
 	        }
 	        // stop it getting silly.
 	        newTime = Math.min(newTime, roccaControl.getMaxDataKeepTime());
+			System.out.println("RoccaProcess: Cannot determine firstIndx, raw data lifetime = " + prdb.getNaturalLifetimeMillis() + " ms");
 	        prdb.setNaturalLifetimeMillis(newTime); // increase the lifetime to try and prevent this from happening again
 			return null;
 		}
@@ -777,13 +777,14 @@ public class RoccaProcess extends PamProcess {
 				PamUtils.makeChannelMap(highestChanList));
 		int lastIndx = prdb.getUnitIndex(lastRDU);
 		if (lastIndx==-1) {
-	        System.out.println("RoccaProcess: Cannot determine lastIndx, raw data lifetime = " + prdb.getNaturalLifetimeMillis() + " ms");
 	        int newTime;
 	        if (prdb.getNaturalLifetimeMillis() > Integer.MAX_VALUE/2) {
 	        	newTime = Integer.MAX_VALUE;
 	        } else {
 	        	newTime = prdb.getNaturalLifetimeMillis()*2;
 	        }
+	        newTime = Math.min(newTime, roccaControl.getMaxDataKeepTime());
+	        System.out.println("RoccaProcess: Cannot determine lastIndx, raw data lifetime = " + prdb.getNaturalLifetimeMillis() + " ms");
 	        prdb.setNaturalLifetimeMillis(newTime); // increase the lifetime to try and prevent this from happening again
 	        return null;
 		}
