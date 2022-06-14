@@ -146,6 +146,17 @@ public abstract class AnnotationChoiceHandler extends AnnotationHandler {
 	 * @param annotationType
 	 */
 	public boolean updateAnnotation(PamDataUnit pamDataUnit, DataAnnotationType annotationType) {
+		/* 
+		 * need to check this is actually the right data unit, which matches the datablock of 
+		 * this annotatoin handler. Gets very confused when dealing with superdetections 
+		 */
+		if (pamDataUnit.getParentDataBlock() != this.getPamDataBlock()) {
+			pamDataUnit = pamDataUnit.getSuperDetection(getPamDataBlock(), true);
+			if (pamDataUnit == null) {
+				return false;
+			}
+		}
+		
 		DataAnnotation existingAnnotation = pamDataUnit.findDataAnnotation(annotationType.getAnnotationClass(), annotationType.getAnnotationName());
 		boolean changed = false;
 		if (annotationType.canAutoAnnotate()) {

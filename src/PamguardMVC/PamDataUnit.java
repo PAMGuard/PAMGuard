@@ -1292,6 +1292,32 @@ abstract public class PamDataUnit<T extends PamDataUnit, U extends PamDataUnit> 
 		return null;
 	}
 
+	/**
+	 * find a super detection form the parent data block of the super detection. 
+	 * @param superDataBlock data block of super detection
+	 * @param allowSuperSuper Allow iteration through mutilple super detection layers
+	 * @return data unit from that block, or null.
+	 */
+	public SuperDetection getSuperDetection(PamDataBlock superDataBlock, boolean allowSuperSuper) {
+		synchronized (superDetectionSyncronisation) {
+			if (superDetections == null) return null;
+			SuperDetection superDet;
+			for (int i = 0; i < superDetections.size(); i++) {
+				superDet = superDetections.get(i);
+				if (superDet.getParentDataBlock() == superDataBlock) {
+					return superDet;
+				}
+				if (allowSuperSuper) {
+					SuperDetection supersuper = superDet.getSuperDetection(superDataBlock, allowSuperSuper);
+					if (supersuper != null) {
+						return supersuper;
+					}
+				}
+			}
+		}		
+		return null;
+	}
+
 	public SuperDetection getSuperDetection(int ind) {
 		synchronized (superDetectionSyncronisation) {
 			if (superDetections == null || superDetections.size()<=ind) return null;
