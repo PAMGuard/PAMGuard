@@ -3,10 +3,14 @@ package PamView.dialog;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dialog;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.MouseInfo;
+import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -225,6 +229,9 @@ abstract public class PamDialog extends JDialog {
 			synchronized (this) {
 				PamColors.getInstance().notifyContianer(this.getContentPane());
 			}
+			if (getOwner() == null) {
+				moveToMouseLocation();
+			}
 		}
 		try{
 			super.setVisible(visible);
@@ -233,6 +240,35 @@ abstract public class PamDialog extends JDialog {
 			System.out.println("Error in opening dialog....");
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * put the dialog near the mouse location. 
+	 */
+	public void moveToMouseLocation() {
+		Point mouse = MouseInfo.getPointerInfo().getLocation();
+		moveToLocation(mouse);
+	}
+	
+	public void moveToLocation(Point point) {
+		if (point == null) {
+			return;
+		}
+		// check we're not going too far off the screen. 
+		Dimension sz = getPreferredSize();
+		Dimension screen = null;
+		if (getOwner() != null) {
+			screen = getOwner().getSize();
+		}
+		else {
+			screen = Toolkit.getDefaultToolkit().getScreenSize();
+		}
+		point.y = Math.min(point.y, screen.height-sz.height-10);
+		point.y = Math.max(point.y, 0);
+		point.x = Math.min(point.x, screen.width-sz.width-10);
+		point.x = Math.max(point.x, 0);
+
+		setLocation(point);
 	}
 
 	/**
