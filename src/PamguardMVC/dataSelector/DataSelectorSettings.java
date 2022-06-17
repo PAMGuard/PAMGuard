@@ -32,7 +32,7 @@ public class DataSelectorSettings implements Serializable, ManagedParameters {
 	 * @return Params or null if they don't exist. 
 	 */
 	public DataSelectParams getParams(String name) {
-		if (selectorParams == null) {
+		if (selectorParams == null || name == null) {
 			return null;
 		}
 		return selectorParams.get(name);

@@ -67,6 +67,8 @@ public interface PamPluginInterface extends CommonPluginInterface {
 	 * A short description of the plug in module.  This text is used in various informational
 	 * windows displayed to the user.  The value returned here is typically the same as the text returned
 	 * from the {@link #getDefaultName() getDefaultName()} method (e.g. <em>Click Detector</em> or <em>FFT (Spectrogram) Engine</em>).
+	 * <br>This is the text used in the main 'Add Modules' menus and is used as the 
+	 * second argument to PamModuleInfo.registerControlledUnit
 	 * <p>
 	 * This field cannot be null.
 	 * @return String describing the plugin.  Cannot be null.

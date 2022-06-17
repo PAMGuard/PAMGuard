@@ -326,7 +326,7 @@ public abstract class  SpectrumPlot <D extends PamDataUnit> implements Detection
 			}
 			g2.strokePolyline(scaledDataX, scaledDataY, scaledDataY.length-1);
 			if (fillSpectrum) {
-				//				System.out.println("Last point: " + x0 + "  y0 " + r.getHeight()); 
+				//System.out.println("Last point: " + x0 + "  y0 " + y0 + " " + scale + " " + clickLineData[iChan][0] + "  " + projector.getAxis(Side.LEFT).getMinVal() +  " " +projector.getAxis(Side.LEFT).getTotalPixels()); 
 				scaledDataX[scaledDataX.length-1]=x0; // the last x position
 				scaledDataY[scaledDataY.length-1]= r.getHeight() ; //return the line to zero for polygon drawing
 				//				PamUtils.PamArrayUtils.printArray(scaledDataY);

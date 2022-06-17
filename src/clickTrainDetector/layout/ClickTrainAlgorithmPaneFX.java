@@ -324,7 +324,13 @@ public class ClickTrainAlgorithmPaneFX extends SettingsPane<ClickTrainParams> {
 
 		popOver.showingProperty().addListener((obs, old, newval)->{
 			if (newval) {
-			clickTrainControl.getDataSelector().getDialogPaneFX().setParams(true);
+				//the dialog has opened
+				clickTrainControl.getDataSelector().getDialogPaneFX().setParams(true);
+			}
+			else {
+				//the dialog has closed
+				clickTrainControl.getDataSelector().getDialogPaneFX().getParams(true);
+	
 			}
 		});
 

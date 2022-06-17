@@ -4,8 +4,14 @@ import java.io.Serializable;
 
 import PamModel.parametermanager.ManagedParameters;
 import clickTrainDetector.classification.CTClassifierParams;
+import clickTrainDetector.classification.CTClassifierType;
 
 public class IDIClassifierParams extends CTClassifierParams implements Serializable, Cloneable, ManagedParameters {
+	
+	public IDIClassifierParams(){
+		super();
+		type = CTClassifierType.IDICLASSIFIER; 
+	}
 	
 	/**
 	 * 

@@ -210,8 +210,8 @@ public class ClickBinaryDataSource extends BinaryDataSource {
 //		long uid = binaryObjectData.getDataUnitBaseData().getUID();
 //		System.out.printf("Loading click with UID %d at %s\n", uid, 
 //				PamCalendar.formatDateTime(binaryObjectData.getTimeMilliseconds()));
-//		if (uid == lastUID) {
-//			System.out.println("Click repeat UID: " + lastUID);
+//		if (uid == 110006089) {
+//			System.out.println("Click  UID: " + 110006089);
 //		}
 //		else {
 //			lastUID = binaryObjectData.getDataUnitBaseData().getUID();

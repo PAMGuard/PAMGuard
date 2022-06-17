@@ -42,7 +42,6 @@ public abstract class OverlayDataManager<TOverlayInfoType extends OverlayDataInf
 	private ParameterType[] parameterTypes;
 
 	private ParameterUnits[] parameterUnits;
-	
 
 	/**
 	 * @param generalProjector

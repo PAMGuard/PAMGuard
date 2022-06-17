@@ -10,6 +10,7 @@ import java.awt.event.WindowEvent;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
+import PamUtils.PamCalendar;
 import annotation.AnnotationDialogPanel;
 import PamView.DBTextArea;
 import PamView.dialog.PamDialogPanel;
@@ -51,13 +52,21 @@ public class StringDialogPanel implements AnnotationDialogPanel {
 			note = note.trim();
 		}
 		if (note != null && note.length() > 0) {
-			StringAnnotation an = (StringAnnotation) pamDataUnit.findDataAnnotation(StringAnnotation.class,
-					stringAnnotationType.getAnnotationName());
-			if (an == null) {
+			StringAnnotation an;
+			/*
+			 *  always add a new annotation rather than editing the old one since
+			 *  the old one will get removed to handle annotation types which really 
+			 *  do need to make a new one each time. 
+			 */
+			
+//			= (StringAnnotation) pamDataUnit.findDataAnnotation(StringAnnotation.class,
+//					stringAnnotationType.getAnnotationName());
+//			if (an == null) {
 				an = new StringAnnotation(stringAnnotationType);
 				pamDataUnit.addDataAnnotation(an);
-			}
+//			}
 			an.setString(textArea.getText());
+			pamDataUnit.setLastUpdateTime(PamCalendar.getTimeInMillis());
 		}
 		return true;
 	}

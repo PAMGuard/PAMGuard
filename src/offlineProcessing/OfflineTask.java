@@ -4,6 +4,7 @@ import generalDatabase.DBControlUnit;
 import generalDatabase.PamConnection;
 import generalDatabase.SQLLogging;
 import generalDatabase.SQLTypes;
+import generalDatabase.SuperDetLogging;
 import generalDatabase.clauses.FixedClause;
 import generalDatabase.clauses.FromClause;
 import generalDatabase.clauses.PAMSelectClause;
@@ -354,6 +355,7 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 		}
 		aBlock.clearAll(); 
 
+		
 
 		SQLLogging logging = aBlock.getLogging();
 		if (logging == null) {
@@ -382,7 +384,15 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 			System.out.println("Unknown data selection option in OfflineTask.deleteOldData: " + taskGroupParams.dataChoice);
 			return;
 		}
-		logging.deleteData(clause);
+		while (logging != null) {
+			logging.deleteData(clause);
+			if (logging instanceof SuperDetLogging) {
+				logging = ((SuperDetLogging) logging).getSubLogging();
+			}
+			else {
+				break;
+			}
+		}
 	}
 
 

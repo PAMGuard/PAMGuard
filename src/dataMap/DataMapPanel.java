@@ -167,5 +167,12 @@ public class DataMapPanel extends PamBorderPanel implements PamTabPanel {
 		}
 		summaryPanel.newDataSources();
 	}
+
+	/**
+	 * @return the summaryPanel
+	 */
+	public SummaryPanel getSummaryPanel() {
+		return summaryPanel;
+	}
 	
 }

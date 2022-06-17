@@ -32,12 +32,13 @@ public class SuperDetSymbolWrapper extends SymbolModifier {
 
 	@Override
 	public SymbolData getSymbolData(GeneralProjector projector, PamDataUnit dataUnit) {
-		PamDataUnit superDet = dataUnit.getSuperDetection(superDetDataBlock);
+		PamDataUnit superDet = dataUnit.getSuperDetection(superDetDataBlock, true);
 		if (superDet == null) {
 			return null;
 		}
 		return superDetModifier.getSymbolData(getSymbolChooser().getProjector(), superDet);
 	}
+	
 
 	@Override
 	public String getToolTipText() {

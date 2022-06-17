@@ -114,7 +114,10 @@ public class RoccaSidePanel extends PamObserverAdapter implements PamSidePanel  
         this.rsdb = new RoccaSightingDataBlock
                 (roccaControl.roccaProcess,
                 roccaControl.roccaParameters.getChannelMap());
+        
+        // this one probably OK to never delete ? 
         rsdb.setNaturalLifetimeMillis(Integer.MAX_VALUE);
+        
         rdl = new RoccaDetectionLogger(this, rsdb);
         rsdb.SetLogging(rdl);
         rsdb.setMixedDirection(PamDataBlock.MIX_INTODATABASE);
