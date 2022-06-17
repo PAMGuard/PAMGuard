@@ -91,69 +91,15 @@ public class SqliteDialogPanel implements SystemDialogPanel {
 			
 			String newDB = sqliteSystem.browseDatabases(parent);
 			if (newDB != null) {
-				
-				// see if this file exists in the list and if it does, remove it
-				for (int i = 0; i < sqliteSystem.getRecentDatabases().size(); i++) {
-					if (sqliteSystem.getRecentDatabases().get(i).toString().equalsIgnoreCase(newDB)) {
-						sqliteSystem.getRecentDatabases().remove(i);
-					}
-				}
-				// then insert the file at the top of the list.
-				File newFile = new File(newDB);
-				// if the file doesn't exit, consider creating it.
-				if (newFile.exists() == false) {
-					newFile = createNewDatabase(newDB);
-					if (newFile == null) {
-						System.out.println("Unable to create "+newFile);
-						return;
-					}
-					
-				}
-				
-				sqliteSystem.getRecentDatabases().add(0, newFile);
+				sqliteSystem.setDatabaseName(newDB);
+
 				setParams();
-				
 			}
 			
 		}
 
 	}
 
-	public File createNewDatabase(String newDB) {
-
-		File newFile = new File(newDB);
-		newFile = PamFileFilter.checkFileEnd(newFile, ".sqlite3", true);
-
-		int ans = JOptionPane.showConfirmDialog(parent, "Create blank database " + newFile.getAbsolutePath() + " ?", "Sqlite", JOptionPane.OK_CANCEL_OPTION);
-		if (ans == JOptionPane.CANCEL_OPTION) {
-			return null;
-		}
-		Connection connection = null;
-
-		try {
-			// create a database connection;
-			// Sqlite will automatically create file if it does not exist; 
-			connection = DriverManager.getConnection("jdbc:sqlite:" + newFile);
-
-		}
-		catch(SQLException e)
-	    {
-	      System.err.println(e.getMessage());
-	    }
-	    finally
-	    {
-	      try
-	      {
-	        if(connection != null)
-	          connection.close();
-	      }
-	      catch(SQLException e)
-	      {
-	        // connection close failed.
-	        System.err.println(e);
-	      }
-	    }
-		return newFile;
-	}
+	
 
 }
