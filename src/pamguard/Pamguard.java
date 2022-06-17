@@ -23,6 +23,7 @@ package pamguard;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import Acquisition.FolderInputSystem;
 import PamController.PamController;
 import PamController.PamGUIManager;
 import PamController.PamSettingManager;
@@ -41,6 +42,8 @@ import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.debug.Debug;
 import binaryFileStorage.BinaryStore;
 import dataPlotsFX.JamieDev;
+import generalDatabase.DBControl;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -216,11 +219,15 @@ public class Pamguard {
 				}
 				else if (anArg.equalsIgnoreCase(BinaryStore.GlobalFolderArg)) {
 					// output folder for binary files. 
-					GlobalArguments.setParam(anArg, args[iArg++]);
+					GlobalArguments.setParam(BinaryStore.GlobalFolderArg, args[iArg++]);
 				}
-				else if (anArg.equalsIgnoreCase("-databasefile")) {
+				else if (anArg.equalsIgnoreCase(DBControl.GlobalDatabaseNameArg)) {
 					// database file name
-					GlobalArguments.setParam(anArg, args[iArg++]);
+					GlobalArguments.setParam(DBControl.GlobalDatabaseNameArg, args[iArg++]);
+				}
+				else if (anArg.equalsIgnoreCase(FolderInputSystem.GlobalWavFolderArg)) {
+					// source folder for wav files (or other supported sound files)
+					GlobalArguments.setParam(FolderInputSystem.GlobalWavFolderArg, args[iArg++]);
 				}
 				else if (anArg.equalsIgnoreCase("-help")) {
 					System.out.println("--PamGuard Help");
