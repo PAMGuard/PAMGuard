@@ -62,19 +62,38 @@ public abstract class DataSelectorCreator implements PamSettings {
 	}
 	
 	/**
-	 * Get a data selector of  a given name. 
+	 * Get a data selector of  a given name including all possible options for super detections and annotations. 
 	 * @param selectorName
 	 * @param allowScores
-	 * @return
+	 * @return data selector for given name. 
 	 */
 	public synchronized DataSelector getDataSelector(String selectorName, boolean allowScores, String selectorType) {
+		return getDataSelector(selectorName, allowScores, selectorType, true, true);
+	}
+
+	/**
+	 * 
+	 * Get a data selector of  a given name with optional inclusion of options for annotations and super detections
+	 * @param selectorName data selector name
+	 * @param allowScores allow scores
+	 * @param selectorType 
+	 * @param includeAnnotations include options from any annotators of this data stream
+	 * @param includeSuperDetections include any possible super detection data selectors. 
+	 * @return data selector for given name with appropriate options. 
+	 */
+	public synchronized DataSelector getDataSelector(String selectorName, boolean allowScores, String selectorType, 
+			boolean includeAnnotations, boolean includeSuperDetections) {
 		DataSelector ds = findDataSelector(selectorName);
 		if (ds == null) {
 			ds = createDataSelector(selectorName, allowScores, selectorType);
 			
-			ds = addAnnotationOptions(ds, selectorName, allowScores, selectorType);
+			if (includeAnnotations) {
+				ds = addAnnotationOptions(ds, selectorName, allowScores, selectorType);
+			}
 			
-			ds = addSuperDetectionOptions(ds, selectorName, allowScores, selectorType);
+			if (includeSuperDetections) {
+				ds = addSuperDetectionOptions(ds, selectorName, allowScores, selectorType);
+			}
 						
 			// and get it's params from the centralised list. 
 			DataSelectParams params = dataSelectorSettings.getParams(selectorName);
