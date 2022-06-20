@@ -1,7 +1,6 @@
 package pamViewFX.fxNodes.utilityPanes;
 
 import java.io.Serializable;
-
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;

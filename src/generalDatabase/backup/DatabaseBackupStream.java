@@ -120,6 +120,9 @@ public class DatabaseBackupStream extends FileBackupStream {
 
 	public FileLocation getSourceLocation() {
 		File dbFile = getDatabaesFile();
+		if (dbFile == null) {
+			return null;
+		}
 		FileLocation sl = new FileLocation();
 		sl.path = dbFile.getAbsolutePath();
 		sl.canEditMask = false;

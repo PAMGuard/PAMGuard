@@ -1,9 +1,12 @@
 package clickTrainDetector.dataselector;
 
+import java.util.Arrays;
+
 import PamDetection.LocContents;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataSelector.DataSelectParams;
 import PamguardMVC.dataSelector.DataSelector;
+import clickTrainDetector.CTDataUnit;
 import clickTrainDetector.CTDetectionGroupDataUnit;
 import clickTrainDetector.ClickTrainControl;
 import clickTrainDetector.ClickTrainDataBlock;
@@ -42,6 +45,8 @@ public class CTDataSelector extends DataSelector {
 	
 
 	private boolean allowScores;
+
+	private boolean[] useSpeciesList;
 
 	public CTDataSelector(ClickTrainControl clickTrainControl, ClickTrainDataBlock clickTrainDataBlock, 
 			String selectorName, boolean allowScores) {
@@ -83,6 +88,7 @@ public class CTDataSelector extends DataSelector {
 
 	@Override
 	public DataSelectParams getParams() {
+		getDialogPanel().getParams(ctSelectParams);
 		return ctSelectParams;
 	}
 	
@@ -99,6 +105,8 @@ public class CTDataSelector extends DataSelector {
 		CTDetectionGroupDataUnit ctDataUnit = (CTDetectionGroupDataUnit) pamDataUnit;
 		
 		if (ctDataUnit.getSubDetectionsCount()<ctSelectParams.minSubDetections) return 0; 
+		
+		if (!isClassified(ctDataUnit)) return 0; 
 	
 		if (ctSelectParams.needsLoc && pamDataUnit.getLocalisation()==null) return 0; 
 		
@@ -106,6 +114,33 @@ public class CTDataSelector extends DataSelector {
 
 		
 		return 1;
+	}
+
+	/**
+	 * Check whether a click train passes the data selector classification criteria. 
+	 * @param ctDataUnit - the click train data unit to test.
+	 * @return true of the click train passes detection criterea. 
+	 */
+	private boolean isClassified(CTDetectionGroupDataUnit ctDataUnit) {
+
+		if (!ctSelectParams.needsClassification) return true; 
+
+		if (ctDataUnit instanceof CTDataUnit) {
+
+			CTDataUnit clickTrain = (CTDataUnit) ctDataUnit; 
+
+			if (clickTrain.ctClassifications==null) return false; 
+
+			//iterate through all the classifiers and allowed classification types. 
+			for (int i=0; i<ctSelectParams.classifier.length; i++) {
+				for (int j=0; j<clickTrain.ctClassifications.size(); j++) {
+					if (clickTrain.ctClassifications.get(j).getSpeciesID()==ctSelectParams.classifier[i]) {
+						return true; 
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 }

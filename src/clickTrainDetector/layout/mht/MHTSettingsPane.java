@@ -159,25 +159,25 @@ public class MHTSettingsPane extends SettingsPane<MHTParams> {
 		pruneStartSpinner.setEditable(true);
 		pruneBackSpinner.setTooltip(new Tooltip("The minimum number of detections before pruning starts."));
 		gridPane.add(pruneStartSpinner, 1, gridY); 
-		gridY++;
+		gridY=0;
 
-		gridPane.add(new Label("Max no. coasts"), 0, gridY); 
+		gridPane.add(new Label("  Max no. coasts"), 2, gridY); 
 		nCoastsSpinner = new PamSpinner<Integer>(0,Integer.MAX_VALUE,3,1); 
 		nCoastsSpinner.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 		nCoastsSpinner.setPrefWidth(70);
 		nCoastsSpinner.setEditable(true);
 		nCoastsSpinner.setTooltip(new Tooltip("The maximum number of missing detections before a track is closed"));
 
-		gridPane.add(nCoastsSpinner, 1, gridY); 
+		gridPane.add(nCoastsSpinner, 3, gridY); 
 		gridY++; 
 
-		gridPane.add(new Label("Max no. trains"), 0, gridY); 
+		gridPane.add(new Label("  Max no. trains"), 2, gridY); 
 		nHoldSpinner = new PamSpinner<Integer>(0,1000,3,1); 
 		nHoldSpinner.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 		nHoldSpinner.setPrefWidth(70);
 		nHoldSpinner.setEditable(true);
 		nHoldSpinner.setTooltip(new Tooltip("The maximum number of unique click trains that can be tracked at the same time."));
-		gridPane.add(nHoldSpinner, 1, gridY); 
+		gridPane.add(nHoldSpinner, 3, gridY); 
 
 		pamVBox.getChildren().addAll(label, gridPane); 
 

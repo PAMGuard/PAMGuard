@@ -27,6 +27,7 @@ import Acquisition.layoutFX.AcquisitionPaneFX;
 import Acquisition.layoutFX.DAQSettingsPane;
 import Acquisition.layoutFX.FolderInputPane;
 import javafx.application.Platform;
+import pamguard.GlobalArguments;
 import Acquisition.pamAudio.PamAudioSystem;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
@@ -77,6 +78,8 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings{
 	protected long eta = -1;
 
 	private FolderInputParameters folderInputParameters;
+	
+	public static final String GlobalWavFolderArg = "wavfilefolder";
 
 
 	/**
@@ -110,10 +113,28 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings{
 		if (folderInputParameters == null)
 			setFolderInputParameters(new FolderInputParameters(getSystemType()));
 		//		PamSettingManager.getInstance().registerSettings(this); //calling super already registers this in the FileInputSystem constructor
+		checkComandLine();
 		makeSelFileList();
 		newFileTimer = new Timer(1000, new RestartTimer());
 		newFileTimer.setRepeats(false);
 		//		timer = new Timer(1000, new TimerAction());
+	}
+
+	/**
+	 * Check to see if acquisition source folder was set in the command line. 
+	 */
+	private void checkComandLine() {
+		String globalFolder = GlobalArguments.getParam(GlobalWavFolderArg);
+		if (globalFolder == null) {
+			return;
+		}
+		// see if it at least exists, though will we want to do this for Network folders ? 
+		File aFile = new File(globalFolder);
+		if (aFile.exists() == false) {
+			System.err.println("Command line folder does not exist: " + globalFolder);
+		}
+		String[] selList = {globalFolder};
+		folderInputParameters.setSelectedFiles(selList);
 	}
 
 	/**

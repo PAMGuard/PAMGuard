@@ -73,7 +73,7 @@ public class CTSwingGUI extends PamControlledGUISwing {
 			settingsDialog = new PamDialogFX2AWT<ClickTrainParams>(parentFrame, setPane, false);
 		}
 		
-		if (classificationTab!=null) settingsPane.setTab(classificationTab ? 2 : 0); //set the tab to the classification tab
+		if (classificationTab!=null && classificationTab) settingsPane.setTab(2); //set the tab to the classification tab
 		
 		ClickTrainParams newParams = settingsDialog.showDialog(this.clickTrainControl.getClickTrainParams());
 		

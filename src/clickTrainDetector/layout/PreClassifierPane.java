@@ -34,7 +34,7 @@ public class PreClassifierPane extends PamBorderPane {
 
 	
 	private Pane createClassifierPane() {
-		simpleCTClassifierPane = new SimpleCTClassifierPane(null); 
+		simpleCTClassifierPane = new SimpleCTClassifierPane(clickTrainControl.getClassifierManager().getPreClassifier()); 
 		return (Pane) simpleCTClassifierPane.getContentNode();
 	}
 	

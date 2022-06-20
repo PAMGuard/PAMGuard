@@ -249,6 +249,18 @@ public class StandardFileDate implements FileDate, PamSettings {
 		String name = file.getName();
 		name = removeWildChars(name, forcedDateFormat);
 		String redFormat = forcedDateFormat.replace("#", ""); 
+		// see if it's only all milliseconds, i.e. format is only 'S's and > 12 of them
+		if (allSSSS(redFormat)) {
+			// try pulling a number from the name.
+			try {
+				long millis = Long.valueOf(name);
+				return millis;
+			}
+			catch (NumberFormatException e) {
+				
+			}
+		}
+		
 		SimpleDateFormat sdf = null;
 		try {
 		 sdf = new SimpleDateFormat(redFormat);
@@ -269,6 +281,15 @@ public class StandardFileDate implements FileDate, PamSettings {
 		}  //throws ParseException if no match
 		setLastFormat(forcedDateFormat);
 		return d.getTime();
+	}
+
+	private boolean allSSSS(String redFormat) {
+		for(int i = 0; i < redFormat.length(); i++) {
+			if (redFormat.charAt(i) != 'S') {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private String removeWildChars(String name, String forcedDateFormat) {

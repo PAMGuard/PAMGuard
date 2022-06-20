@@ -21,6 +21,7 @@
 *.zip
 *.tar.gz
 *.rar
+*.dll
 
 # eclipse project file
 .project
@@ -35,7 +36,6 @@ bin/
 target/WMM.COF
 
 settings.xml
-.classpath
 .classpath
 .classpath
 .classpath

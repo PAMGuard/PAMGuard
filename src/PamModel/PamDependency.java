@@ -20,12 +20,22 @@ public class PamDependency {
 	
 	private String dataBlockName;
 
+	/**
+	 * 
+	 * @param requiredDataType Class of Data unit
+	 * @param defaultProvider Class name of default provider.
+	 * @param dataBlockName Specific data block name
+	 */
 	public PamDependency(Class requiredDataType, String defaultProvider, String dataBlockName) {
 		this.requiredDataType = requiredDataType;
 		this.defaultProvider = defaultProvider;
 		this.dataBlockName = dataBlockName;
 	}
 
+	/**
+	 * @param requiredDataType Class of Data unit
+	 * @param defaultProvider Class name of default provider.
+	 */
 	public PamDependency(Class requiredDataType, String defaultProvider) {
 		this.requiredDataType = requiredDataType;
 		this.defaultProvider = defaultProvider;
@@ -41,12 +51,10 @@ public class PamDependency {
 	/**
 	 * @return Returns the requiredDataType.
 	 */
-//	public DataType getRequiredDataType() {
-//		return requiredDataType;
-//	}
 	public Class getRequiredDataType() {
 		return requiredDataType;
 	}
+	
 	/**
 	 * @return Returns the dataBlockName.
 	 */
