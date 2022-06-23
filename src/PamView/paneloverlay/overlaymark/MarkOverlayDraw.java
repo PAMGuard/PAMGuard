@@ -76,6 +76,9 @@ public class MarkOverlayDraw extends PanelOverlayDraw {
 			hoverData.setTransformShape(t);
 			generalProjector.addHoverData(t, pamDataUnit);
 		}
+		if (drawnShape == null) {
+			return null;
+		}
 		return drawnShape.getBounds();
 	}
 
