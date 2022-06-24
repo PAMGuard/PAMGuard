@@ -16,6 +16,11 @@ public class EffortParams implements Cloneable, Serializable, ManagedParameters 
 	
 	public transient boolean isSet;
 	
+	/**
+	 * Only log outer scroll events when paging forwards, not every little movement. 
+	 */
+	public boolean outserScrollOnly = false;
+	
 	private static final int MAX_OBSERVERS = 10;
 	private static final int MAX_OBJECTIVES = 10;
 	

@@ -58,7 +58,7 @@ public class PamScrollerData implements Serializable, Cloneable {
 	
 
 	@Override
-	protected PamScrollerData clone() {
+	public PamScrollerData clone() {
 		try {
 			return (PamScrollerData) super.clone();
 		} catch (CloneNotSupportedException e) {
