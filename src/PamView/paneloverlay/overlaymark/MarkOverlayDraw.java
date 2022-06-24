@@ -76,6 +76,9 @@ public class MarkOverlayDraw extends PanelOverlayDraw {
 			hoverData.setTransformShape(t);
 			generalProjector.addHoverData(t, pamDataUnit);
 		}
+		if (drawnShape == null) {
+			return null;
+		}
 		return drawnShape.getBounds();
 	}
 
@@ -143,52 +146,60 @@ public class MarkOverlayDraw extends PanelOverlayDraw {
 		 * To allow for things like the rotated map which no longer show rectangles as
 		 * rectangles, we now need to draw rectangles are irregular polygons too !
 		 */
-		int[] x = new int[4];
-		int[] y = new int[4];
-		PamCoordinate m0 = mark.getCoordinate(0);
-		PamCoordinate m1 = mark.getCoordinate(1);
-		Point p;
-		p = generalProjector.getCoord3d(m0.getCoordinate(0), m0.getCoordinate(1), 0).getXYPoint();
-		x[0] = p.x;
-		y[0] = p.y;
-		p = generalProjector.getCoord3d(m0.getCoordinate(0), m1.getCoordinate(1), 0).getXYPoint();
-		x[1] = p.x;
-		y[1] = p.y;
-		p = generalProjector.getCoord3d(m1.getCoordinate(0), m1.getCoordinate(1), 0).getXYPoint();
-		x[2] = p.x;
-		y[2] = p.y;
-		p = generalProjector.getCoord3d(m1.getCoordinate(0), m0.getCoordinate(1), 0).getXYPoint();
-		x[3] = p.x;
-		y[3] = p.y;
-		Polygon pgon = new Polygon(x, y, 4);
-		Color fillCol = getFillCol();
-		if (fillCol != null) {
-			g2d.setColor(getFillCol());
-			g2d.fillPolygon(pgon);
+		try {
+			int[] x = new int[4];
+			int[] y = new int[4];
+			PamCoordinate m0 = mark.getCoordinate(0);
+			PamCoordinate m1 = mark.getCoordinate(1);
+			if (m0 == null || m1 == null) {
+				return null;
+			}
+			Point p;
+			p = generalProjector.getCoord3d(m0.getCoordinate(0), m0.getCoordinate(1), 0).getXYPoint();
+			x[0] = p.x;
+			y[0] = p.y;
+			p = generalProjector.getCoord3d(m0.getCoordinate(0), m1.getCoordinate(1), 0).getXYPoint();
+			x[1] = p.x;
+			y[1] = p.y;
+			p = generalProjector.getCoord3d(m1.getCoordinate(0), m1.getCoordinate(1), 0).getXYPoint();
+			x[2] = p.x;
+			y[2] = p.y;
+			p = generalProjector.getCoord3d(m1.getCoordinate(0), m0.getCoordinate(1), 0).getXYPoint();
+			x[3] = p.x;
+			y[3] = p.y;
+			Polygon pgon = new Polygon(x, y, 4);
+			Color fillCol = getFillCol();
+			if (fillCol != null) {
+				g2d.setColor(getFillCol());
+				g2d.fillPolygon(pgon);
+			}
+			return pgon;
 		}
-		return pgon;
-		
-//		
-//		Point p0 = generalProjector.getCoord3d(m0).getXYPoint();
-//		Point p1 = generalProjector.getCoord3d(m1).getXYPoint();
-//		g2d.setColor(getLineCol());
-//		g2d.setStroke(getLineStroke());
-//		g2d.drawLine(p0.x, p0.y, p1.x, p0.y);
-//		g2d.drawLine(p1.x, p0.y, p1.x, p1.y);
-//		g2d.drawLine(p1.x, p1.y, p0.x, p1.y);
-//		g2d.drawLine(p0.x, p1.y, p0.x, p0.y);
-//		int x = Math.min(p0.x, p1.x);
-//		int y = Math.min(p0.y, p1.y);
-//		int w = Math.abs(p0.x - p1.x);
-//		int h = Math.abs(p0.y - p1.y);
-//
-//		Color fillCol = getFillCol();
-//		if (fillCol != null) {
-//			g2d.setColor(getFillCol());
-//			g2d.fillRect(x, y, w, h);
-//		}
-//		Rectangle r = new Rectangle(x, y, w, h);
-//		return r;
+		catch (NullPointerException e) {
+			return null;
+		}
+
+		//		
+		//		Point p0 = generalProjector.getCoord3d(m0).getXYPoint();
+		//		Point p1 = generalProjector.getCoord3d(m1).getXYPoint();
+		//		g2d.setColor(getLineCol());
+		//		g2d.setStroke(getLineStroke());
+		//		g2d.drawLine(p0.x, p0.y, p1.x, p0.y);
+		//		g2d.drawLine(p1.x, p0.y, p1.x, p1.y);
+		//		g2d.drawLine(p1.x, p1.y, p0.x, p1.y);
+		//		g2d.drawLine(p0.x, p1.y, p0.x, p0.y);
+		//		int x = Math.min(p0.x, p1.x);
+		//		int y = Math.min(p0.y, p1.y);
+		//		int w = Math.abs(p0.x - p1.x);
+		//		int h = Math.abs(p0.y - p1.y);
+		//
+		//		Color fillCol = getFillCol();
+		//		if (fillCol != null) {
+		//			g2d.setColor(getFillCol());
+		//			g2d.fillRect(x, y, w, h);
+		//		}
+		//		Rectangle r = new Rectangle(x, y, w, h);
+		//		return r;
 	}
 
 	@Override
@@ -223,7 +234,7 @@ public class MarkOverlayDraw extends PanelOverlayDraw {
 	public Stroke getLineStroke() {
 		return plainStroke ;
 	}
-	
+
 	public Stroke getFinalLineStroke() {
 		return dashed;
 	}
