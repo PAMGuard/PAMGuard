@@ -115,8 +115,11 @@ public class RoccaSidePanel extends PamObserverAdapter implements PamSidePanel  
                 (roccaControl.roccaProcess,
                 roccaControl.roccaParameters.getChannelMap());
         
-        // this one probably OK to never delete ? 
-        rsdb.setNaturalLifetimeMillis(Integer.MAX_VALUE);
+        /*
+         *  this one probably OK to never delete ? Nope lots of stuff goes in 
+         *  here, so it seems it will eventually bring the system down. 
+         */
+        rsdb.setNaturalLifetimeMillis(roccaControl.getMaxDataKeepTime());
         
         rdl = new RoccaDetectionLogger(this, rsdb);
         rsdb.SetLogging(rdl);
