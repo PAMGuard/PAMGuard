@@ -1,11 +1,17 @@
 package soundPlayback.fx;
 
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
+import pamViewFX.fxNodes.PamButton;
+import pamViewFX.fxNodes.PamHBox;
 import soundPlayback.preprocess.PlaybackFilter;
 import soundPlayback.preprocess.PreProcessFXPane;
 
@@ -22,6 +28,9 @@ public class FilterSidePane  implements PreProcessFXPane {
 
 
 	private PamBorderPane mainPane;
+
+
+	private PamButton defaultGainButton;
 	
 	
 	public FilterSidePane(PlaybackFilter playBackFilter) {
@@ -35,9 +44,27 @@ public class FilterSidePane  implements PreProcessFXPane {
 			filterChanged();
 
 		});
-
+		
+		
+		defaultGainButton = new PamButton("off");
+		defaultGainButton.setGraphic(PamGlyphDude.createPamIcon("mdi2r-refresh", PamGuiManagerFX.iconSize-3));
+		defaultGainButton.setPrefWidth(70);
+		defaultGainButton.setOnAction((action)->{
+			filterSlider.setDataValue(filterSlider.getMinValue());
+		});
+		
+		label = new Label("Filter"); 
+		//label.setGraphic(PamGlyphDude.createPamIcon("mdi2f-filter", PamGuiManagerFX.iconSize));
+		
+		PamHBox hBox = new PamHBox();
+		hBox.setAlignment(Pos.CENTER_LEFT);
+		hBox.setSpacing(5);
+		hBox.getChildren().addAll(PamGlyphDude.createPamIcon("mdi2f-filter", PamGuiManagerFX.iconSize), filterSlider);
+		filterSlider.setMaxWidth(Double.MAX_VALUE);
+		HBox.setHgrow(filterSlider, Priority.ALWAYS);
+	
 		this.mainPane = new PamBorderPane();
-		this.mainPane.setCenter(filterSlider);
+		this.mainPane.setCenter(hBox);
 		
 	}
 	
@@ -55,6 +82,10 @@ public class FilterSidePane  implements PreProcessFXPane {
 	private void sayFilter() {
 		//playGainSlider.setTextLabel(playbackGain.getTextValue());
 		label.setText(playBackFilter.getTextValue());
+		defaultGainButton.setDisable(false);
+		if (playBackFilter.getValue()==filterSlider.getMinValue()) {
+			defaultGainButton.setDisable(true);
+		}
 	}
 
 
@@ -67,9 +98,12 @@ public class FilterSidePane  implements PreProcessFXPane {
 
 	@Override
 	public Label getLabel() {
-		label = new Label("Filter"); 
-		label.setGraphic(PamGlyphDude.createPamIcon("mdi2f-filter", PamGuiManagerFX.iconSize));
 		return label;
+	}
+
+	@Override
+	public Node getDefaultButton() {
+		return defaultGainButton;
 	}
 
 

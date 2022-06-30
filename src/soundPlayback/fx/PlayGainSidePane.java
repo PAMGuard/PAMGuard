@@ -1,13 +1,18 @@
 package soundPlayback.fx;
 
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.text.Text;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamButton;
+import pamViewFX.fxNodes.PamHBox;
 import soundPlayback.preprocess.PlaybackGain;
 import soundPlayback.preprocess.PreProcessFXPane;
 
@@ -35,6 +40,15 @@ public class PlayGainSidePane implements PreProcessFXPane {
 
 	private PamButton defaultGainButton;
 
+
+	private Label iconLabel;
+
+
+	private static final double DEFAULT_GAIN = 0; 
+
+
+//	private PamHBox labelHBox;
+
 	public PlayGainSidePane(PlaybackGain playbackGain) {
 		this.playbackGain = playbackGain;
 		playGainSlider = new PlayGainSlider();
@@ -45,35 +59,54 @@ public class PlayGainSidePane implements PreProcessFXPane {
 			gainChanged();
 		});
 		
-		playGainSlider.getChildren().add(defaultGainButton = new PamButton("0 dB"));
+		//create the label which also has a default button
+		
+		defaultGainButton = new PamButton("0 dB");
 		defaultGainButton.setGraphic(PamGlyphDude.createPamIcon("mdi2r-refresh", PamGuiManagerFX.iconSize-3));
-		defaultGainButton.setPrefWidth(60);
+		defaultGainButton.setPrefWidth(70);
 		defaultGainButton.setOnAction((action)->{
 			playGainSlider.setDataValue(0);
 		});
 
 		label = new Label("Gain"); 
+		
+//		labelHBox = new PamHBox();
+//		labelHBox.setAlignment(Pos.CENTER_LEFT);
+//		labelHBox.setSpacing(5);
+//		labelHBox.getChildren().addAll(label, defaultGainButton);
+	
 		lowVol = PamGlyphDude.createPamIcon("mdi2v-volume-low", PamGuiManagerFX.iconSize);
 		medVol = PamGlyphDude.createPamIcon("mdi2v-volume-medium", PamGuiManagerFX.iconSize);					
 		highVol = PamGlyphDude.createPamIcon("mdi2v-volume-high", PamGuiManagerFX.iconSize);
 		
+		iconLabel = new Label();
+		
+		this.mainPane = new PamBorderPane();
+		
+		PamHBox hBox = new PamHBox();
+		hBox.setAlignment(Pos.CENTER_LEFT);
+		hBox.setSpacing(5);
+		hBox.getChildren().addAll(iconLabel, playGainSlider);
+		playGainSlider.setMaxWidth(Double.MAX_VALUE);
+		HBox.setHgrow(playGainSlider, Priority.ALWAYS);
+		
+		this.mainPane.setCenter(hBox);
+			
 		setLabelVolGrpahic();
 
-		this.mainPane = new PamBorderPane();
-		this.mainPane.setCenter(playGainSlider);
 	}
 
 	private void setLabelVolGrpahic() {
 		//System.out.println("Playback gain: " + playbackGain.getGaindB());
 
-		if (playbackGain.getGaindB()<PlayGainSlider.MINGAIN+20 && label.getGraphic()!=lowVol)
-			label.setGraphic(lowVol);
+		if (playbackGain.getGaindB()<PlayGainSlider.MINGAIN+20 && iconLabel.getGraphic()!=lowVol)
+			iconLabel.setGraphic(lowVol);
 		else if (playbackGain.getGaindB()>=PlayGainSlider.MINGAIN+20 && playbackGain.getGaindB()<PlayGainSlider.MAXGAIN-20 
-				&& label.getGraphic()!=medVol) {
-			label.setGraphic(medVol); 
+				&& iconLabel.getGraphic()!=medVol) {
+			iconLabel.setGraphic(medVol); 
 		}
-		else if ( playbackGain.getGaindB()>=PlayGainSlider.MAXGAIN-20 && label.getGraphic()!=highVol) {
-			label.setGraphic(highVol);
+		else if ( playbackGain.getGaindB()>=PlayGainSlider.MAXGAIN-20 && iconLabel.getGraphic()!=highVol) {
+			iconLabel.setGraphic(highVol);
 		}
 
 
@@ -92,9 +125,14 @@ public class PlayGainSidePane implements PreProcessFXPane {
 	}
 
 	private void gainChanged() {
+		defaultGainButton.setDisable(false);
 		playbackGain.setGaindB(playGainSlider.getDataValue());
 		setLabelVolGrpahic();
 		sayGain();
+		if (playbackGain.getGaindB()==DEFAULT_GAIN) {
+			defaultGainButton.setDisable(true);
+		}
+		
 	}
 
 	@Override
@@ -103,8 +141,13 @@ public class PlayGainSidePane implements PreProcessFXPane {
 	}
 
 	@Override
-	public Label getLabel() {
+	public Node getLabel() {
 		return label;
+	}
+
+	@Override
+	public Node getDefaultButton() {
+		return defaultGainButton;
 	}
 
 }

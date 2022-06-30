@@ -1,18 +1,26 @@
 package soundPlayback.fx;
 
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamButton;
+import pamViewFX.fxNodes.PamHBox;
 import soundPlayback.preprocess.PlaybackDecimator;
 import soundPlayback.preprocess.PlaybackGain;
 import soundPlayback.preprocess.PreProcessFXPane;
 
 public class PlayDecimatorSidePane implements PreProcessFXPane {
+
+	private static final double DEFAULT_PLAY_SPEED = 1;
+
 
 	private PlaybackDecimator playbackDecimator;
 
@@ -40,13 +48,22 @@ public class PlayDecimatorSidePane implements PreProcessFXPane {
 
 		playSpeedSlider.getChildren().add(defaultSpeedButton = new PamButton("x 1"));
 		defaultSpeedButton.setGraphic(PamGlyphDude.createPamIcon("mdi2r-refresh", PamGuiManagerFX.iconSize-3));
-		defaultSpeedButton.setPrefWidth(60);
+		defaultSpeedButton.setPrefWidth(70);
 		defaultSpeedButton.setOnAction((action)->{
-			playSpeedSlider.setDataValue(1);
+			playSpeedSlider.setDataValue(DEFAULT_PLAY_SPEED);
 		});
-
+		
+		label = new Label("Speed"); 
+		
+		PamHBox hBox = new PamHBox();
+		hBox.setAlignment(Pos.CENTER_LEFT);
+		hBox.setSpacing(5);
+		hBox.getChildren().addAll(PamGlyphDude.createPamIcon("mdi2p-play", PamGuiManagerFX.iconSize), playSpeedSlider);
+		playSpeedSlider.setMaxWidth(Double.MAX_VALUE);
+		HBox.setHgrow(playSpeedSlider, Priority.ALWAYS);
+	
 		this.mainPane = new PamBorderPane();
-		this.mainPane.setCenter(playSpeedSlider);
+		this.mainPane.setCenter(hBox);
 	}
 
 	@Override
@@ -65,7 +82,7 @@ public class PlayDecimatorSidePane implements PreProcessFXPane {
 	protected void speedChanged() {
 		defaultSpeedButton.setDisable(false);
 		playbackDecimator.setPlaySpeed(playSpeedSlider.getDataValue());
-		if (playSpeedSlider.getDataValue()==1) {
+		if (playSpeedSlider.getDataValue()== DEFAULT_PLAY_SPEED) {
 			defaultSpeedButton.setDisable(true);
 		}
 		saySpeed();
@@ -78,9 +95,12 @@ public class PlayDecimatorSidePane implements PreProcessFXPane {
 
 	@Override
 	public Label getLabel() {
-		label = new Label("Speed"); 
-		label.setGraphic(PamGlyphDude.createPamIcon("mdi2p-play", PamGuiManagerFX.iconSize));
 		return label;
+	}
+
+	@Override
+	public Node getDefaultButton() {
+		return defaultSpeedButton;
 	}
 
 }
