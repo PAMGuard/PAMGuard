@@ -3706,6 +3706,28 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	}
 
 	/**
+	 * Convenience method to save programmer from having to call into the creator
+	 * all the time.
+	 * 
+	 * @param selectorName
+	 * @param allowScores
+	 * @param selectorType Type of selector, generally a ModuleType name, e.g. Map,
+	 *                     so that options can be tailored to specific needs
+	 * @param includeAnnotations include options from any annotators of this data stream
+	 * @param includeSuperDetections include any possible super detection data selectors. 
+	 * @return null or a DataSelector
+	 */
+	public DataSelector getDataSelector(String selectorName, boolean allowScores, String selectorType,
+			boolean includeAnnotations, boolean includeSuperDetections) {
+		DataSelector blockDataSelector = null;
+		DataSelectorCreator dsc = getDataSelectCreator();
+		if (dsc != null) {
+			blockDataSelector = dsc.getDataSelector(selectorName, allowScores, selectorType, includeAnnotations, includeSuperDetections);
+		}
+		return blockDataSelector;
+	}
+
+	/**
 	 * Get any information from the data block about cross referencing in database
 	 * tables.
 	 * <p>

@@ -160,9 +160,15 @@ public class DetectionGrouper {
 		if (motherGroup.getTotalChannelMap() == 0) {
 			return;
 		}
-//		if (maybeCloseMotherGroup(0, sampleNumber - (long) (sampleRate / 2))) {
+//		motherGroup.
+//		int lastGroup = motherGroup.getLastChannelGroup();
+		long buffer = (long) this.maxInterGroupSample;
+//		if (shouldCloseMotherGroup(lastGroup, sampleNumber, buffer)) {
+		if (sampleNumber > motherGroup.getVeryLastSample() + buffer + sampleRate) {
+			closeMotherGroup();
+//		if (maybeCloseMotherGroup(motherGroup.getLastChannelGroup(), sampleNumber - (long) (sampleRate / 2))) {
 //			System.out.println("Mother group closed on timer");
-//		}
+		}
 	}
 	
 	private synchronized boolean  maybeCloseMotherGroup(int iChanGroup, long currentSample) {

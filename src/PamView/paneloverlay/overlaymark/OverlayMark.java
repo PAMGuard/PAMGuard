@@ -232,6 +232,9 @@ public class OverlayMark {
 		}
 		PamCoordinate c0 = projector.getCoord3d(coordinates.get(0));
 		PamCoordinate c1 = projector.getCoord3d(coordinates.get(1));
+		if (c0 == null || c1 == null) {
+			return null;
+		}
 		double x = Math.min(c0.getCoordinate(0), c1.getCoordinate(0));
 		double y = Math.min(c0.getCoordinate(1), c1.getCoordinate(1));
 		double w = Math.abs(c0.getCoordinate(0) - c1.getCoordinate(0));

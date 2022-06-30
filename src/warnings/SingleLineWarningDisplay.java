@@ -67,7 +67,8 @@ public class SingleLineWarningDisplay implements WarningDisplay {
 			lastWarning.setToolTipText(null);
 		}
 		else {
-			String str = String.format("Warning: %s-%s   ", w.getWarningSource(), w.getWarningMessage());
+			String str = w.getWarnignLevel() > 0 ? "Warning: " : "";
+			str += String.format("%s-%s   ", w.getWarningSource(), w.getWarningMessage());
 			lastWarning.setText(str);
 			lastWarning.setWarningLevel(w.getWarnignLevel());
 			lastWarning.setToolTipText(w.getWarningTip());

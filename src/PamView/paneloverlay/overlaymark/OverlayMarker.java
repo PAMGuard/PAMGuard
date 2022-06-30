@@ -610,8 +610,6 @@ abstract public class OverlayMarker extends ExtMouseAdapter implements MarkManag
 			}
 		}
 		
-//		Debug.out.printf("OverlayMarker: _ 2 In getSelectedMarkedDataUnits with %d available units\n", selectedData.size());
-
 		
 		return selectedData;
 	}

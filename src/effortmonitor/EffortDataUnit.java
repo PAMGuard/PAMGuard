@@ -42,6 +42,7 @@ public class EffortDataUnit extends PamDataUnit {
 		getBasicData().setEndTime(scroller.getValueMillis()+scroller.getVisibleAmount());
 	}
 	
+	
 	/**
 	 * Constructor to use when reloading from database. 
 	 * @param databaseIndex
@@ -208,6 +209,15 @@ public class EffortDataUnit extends PamDataUnit {
 	 */
 	public String getRunMode() {
 		return runMode;
+	}
+
+
+	/**
+	 * Set the limits as the outer limits of the scroller. 
+	 */
+	public void setOuterLimits() {
+		setTimeMilliseconds(scroller.getMinimumMillis());
+		getBasicData().setEndTime(scroller.getMaximumMillis());
 	}
 
 }

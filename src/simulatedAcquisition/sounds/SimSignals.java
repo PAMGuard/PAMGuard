@@ -27,6 +27,9 @@ public class SimSignals  {
 		simSignalList.add(new ClickSound("Click", 3000, 3000, 2e-3, WINDOWTYPE.DECAY));
 		simSignalList.add(new ClickSound("Chirp", 3000, 6000, 0.1, WINDOWTYPE.TAPER10));
 		simSignalList.add(new ClickSound("Chirp", 3000, 8000, 0.5, WINDOWTYPE.TAPER10));
+		simSignalList.add(new ClickSound("Dolphin Click", 60000, 60000, 20.e-6, WINDOWTYPE.DECAY));
+		simSignalList.add(new ClickSound("Fin 20Hz", 20, 20, 0.5, WINDOWTYPE.HANN));
+		simSignalList.add(new ClickSound("Fin 40Hz", 40, 40, 0.5, WINDOWTYPE.HANN));
 //		simSignalList.add(new LinearChirp(simProcess.getSampleRate(), 3000, 6000, 0.1));
 //		simSignalList.add(new LinearChirp(simProcess.getSampleRate(), 3000, 8000, .5));
 		simSignalList.add(new RandomWhistles());

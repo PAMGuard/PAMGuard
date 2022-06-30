@@ -87,7 +87,8 @@ public class ExtMouseAdapter {
 	}
 
 	final public boolean mouseWheelMoved(MouseWheelEvent e) {
-		return mouseWheelMoved(fxScroll(e));
+//		return mouseWheelMoved(fxScroll(e));
+		return false;
 	}
 
 //	private MouseEvent swingMouse(javafx.scene.input.MouseEvent e) {

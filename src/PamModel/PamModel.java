@@ -451,7 +451,7 @@ final public class PamModel implements PamModelInterface, PamSettings {
 		mi = PamModuleInfo.registerControlledUnit(EffortControl.class.getName(), EffortControl.unitType);
 		mi.setToolTipText("Record observer monitoring effort");
 		mi.setModulesMenuGroup(utilitiesGroup);
-		mi.setHidden(SMRUEnable.isEnable() == false);
+//		mi.setHidden(SMRUEnable.isEnable() == false);
 		mi.setToolTipText("Enables an observer to enter their name and infomation about which displays are being monitored");
 		mi.setMaxNumber(1);
 

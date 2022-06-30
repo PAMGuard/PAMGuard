@@ -943,23 +943,27 @@ abstract public class PamDataUnit<T extends PamDataUnit, U extends PamDataUnit> 
 			}
 		}
 
-		int nAttotations = getNumDataAnnotations();
-		for (int i = 0; i < nAttotations; i++) {
-			DataAnnotation an = getDataAnnotation(i);
-			DataAnnotationType ant = an.getDataAnnotationType();
-			String anName = ant.getAnnotationName();
-			String anString = an.toString();
-			if (anString == null) {
-				continue;
-			}
-			if (anString.contains("<html>")) {
-				anString = anString.replace("<html>", "");
-			}
-			if (anString.contains("</html>")) {
-				anString = anString.replace("</html>", "");
-			}
-			str += anName + ": " + anString + "<br>";
+		String annotString = getAnnotationsSummaryString();
+		if (annotString != null) {
+			str += annotString;
 		}
+//		int nAttotations = getNumDataAnnotations();
+//		for (int i = 0; i < nAttotations; i++) {
+//			DataAnnotation an = getDataAnnotation(i);
+//			DataAnnotationType ant = an.getDataAnnotationType();
+//			String anName = ant.getAnnotationName();
+//			String anString = an.toString();
+//			if (anString == null) {
+//				continue;
+//			}
+//			if (anString.contains("<html>")) {
+//				anString = anString.replace("<html>", "");
+//			}
+//			if (anString.contains("</html>")) {
+//				anString = anString.replace("</html>", "");
+//			}
+//			str += anName + ": " + anString + "<br>";
+//		}
 
 		
 		// add frequency and amplitude information
@@ -997,6 +1001,36 @@ abstract public class PamDataUnit<T extends PamDataUnit, U extends PamDataUnit> 
 		}
 
 		return str;
+	}
+	
+	/**
+	 * Get string information for the annotations. Kept separate so 
+	 * it can be called in overridden version of getSummaryString()
+	 * @return
+	 */
+	public String getAnnotationsSummaryString() {
+		int nAnnotations = getNumDataAnnotations();
+		if (nAnnotations == 0) {
+			return null;
+		}
+		String str = "";
+		for (int i = 0; i < nAnnotations; i++) {
+			DataAnnotation an = getDataAnnotation(i);
+			DataAnnotationType ant = an.getDataAnnotationType();
+			String anName = ant.getAnnotationName();
+			String anString = an.toString();
+			if (anString == null) {
+				continue;
+			}
+			if (anString.contains("<html>")) {
+				anString = anString.replace("<html>", "");
+			}
+			if (anString.contains("</html>")) {
+				anString = anString.replace("</html>", "");
+			}
+			str += anName + ": " + anString + "<br>";
+		}
+		return str.length() > 0 ? str : null;
 	}
 	
 	/**
@@ -1252,6 +1286,32 @@ abstract public class PamDataUnit<T extends PamDataUnit, U extends PamDataUnit> 
 				superDet = superDetections.get(i);
 				if (superDet.getParentDataBlock() == superDataBlock) {
 					return superDet;
+				}
+			}
+		}		
+		return null;
+	}
+
+	/**
+	 * find a super detection form the parent data block of the super detection. 
+	 * @param superDataBlock data block of super detection
+	 * @param allowSuperSuper Allow iteration through mutilple super detection layers
+	 * @return data unit from that block, or null.
+	 */
+	public SuperDetection getSuperDetection(PamDataBlock superDataBlock, boolean allowSuperSuper) {
+		synchronized (superDetectionSyncronisation) {
+			if (superDetections == null) return null;
+			SuperDetection superDet;
+			for (int i = 0; i < superDetections.size(); i++) {
+				superDet = superDetections.get(i);
+				if (superDet.getParentDataBlock() == superDataBlock) {
+					return superDet;
+				}
+				if (allowSuperSuper) {
+					SuperDetection supersuper = superDet.getSuperDetection(superDataBlock, allowSuperSuper);
+					if (supersuper != null) {
+						return supersuper;
+					}
 				}
 			}
 		}		

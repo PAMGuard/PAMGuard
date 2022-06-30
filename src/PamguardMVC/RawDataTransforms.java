@@ -100,10 +100,26 @@ public class RawDataTransforms {
 	private int shortestFFTLength;
 
 
+	private Object synchObject;
 
-	public RawDataTransforms(@SuppressWarnings("rawtypes") PamDataUnit rawDataHolder) {
+	/**
+	 * Create a RawDataTransforms with a specified synchronisation object. This is mostly the data unit, 
+	 * but in some circumstances may need to be a different object to avoid thread lock. 
+	 * @param rawDataHolder
+	 * @param synchObject
+	 */
+	public RawDataTransforms(@SuppressWarnings("rawtypes") PamDataUnit rawDataHolder, Object synchObject) {
 		this.rawData=(RawDataHolder) rawDataHolder; 
 		this.dataUnit  = rawDataHolder; 
+		this.synchObject = synchObject;
+	}
+
+	/**
+	 * Create raw data transforms using the rawDatAholder for synchronisation. 
+	 * @param rawDataHolder
+	 */
+	public RawDataTransforms(@SuppressWarnings("rawtypes") PamDataUnit rawDataHolder) {
+		this(rawDataHolder, rawDataHolder);
 	}
 
 
@@ -118,7 +134,7 @@ public class RawDataTransforms {
 		return powerSpectra; 
 	}
 
-	
+
 	/**
 	 * Get the shortest FFT length for the number of samples. 
 	 * The is the 
@@ -143,12 +159,24 @@ public class RawDataTransforms {
 	 * @param fftLength
 	 * @return Power spectrum
 	 */
-	public synchronized double[] getPowerSpectrum(int channel, int minBin, int maxBin, int fftLength) {
-		if (minBin==0 && maxBin>=this.getWaveData(0).length-1) {
-			return getPowerSpectrum(channel,  fftLength); 
-		}		
-		if (fftLength == 0) {
-			fftLength = getCurrentSpectrumLength();
+	public double[] getPowerSpectrum(int channel, int minBin, int maxBin, int fftLength) {
+		synchronized (synchObject) {
+			if (minBin==0 && maxBin>=this.getWaveData(0).length-1) {
+				return getPowerSpectrum(channel,  fftLength); 
+			}		
+			if (fftLength == 0) {
+				fftLength = getCurrentSpectrumLength();
+			}
+
+			double[] waveformTrim = new double[maxBin-minBin]; 
+
+			//System.out.println("minBin: " +  minBin + " maxBin: " + maxBin + " raw waveform: " + this.getWaveData(channel).length); 
+
+			System.arraycopy(this.getWaveData(channel), minBin, waveformTrim, 0, Math.min(this.getWaveData(channel).length-minBin-1, waveformTrim.length));
+
+			ComplexArray cData =  getComplexSpectrumHann(waveformTrim, fftLength); 
+
+			return cData.magsq();
 		}
 		
 		double[] waveformTrim = new double[maxBin-minBin]; 
@@ -300,8 +328,8 @@ public class RawDataTransforms {
 	public ClipSpectrogram getSpectrogram(int fftSize, int fftHop) {
 		return getSpectrogram( fftSize, fftHop,  1);
 	}
-	
-	
+
+
 	/**
 	 * Get a spectrogram image of the wave clip. The clip is null until called. It is recalculated if the 
 	 * FFT length and/or hop size are different. 
@@ -437,15 +465,18 @@ public class RawDataTransforms {
 	 * @param iChan channel number
 	 * @return envelope of the filtered data. 
 	 */
-	public synchronized double[] getFilteredAnalyticWaveform(FFTFilterParams fftFilterParams, int iChan) {
-		if (analyticWaveform == null) {
-			analyticWaveform = new double[getNChan()][];
+
+	public double[] getFilteredAnalyticWaveform(FFTFilterParams fftFilterParams, int iChan) {
+		synchronized (synchObject) {
+			if (analyticWaveform == null) {
+				analyticWaveform = new double[getNChan()][];
+			}
+			//		if (analyticWaveform[iChan] == null) {
+			analyticWaveform[iChan] = hilbert.
+					getHilbert(getFilteredWaveData(fftFilterParams, iChan));
+			//		}
+			return analyticWaveform[iChan];
 		}
-		//		if (analyticWaveform[iChan] == null) {
-		analyticWaveform[iChan] = hilbert.
-				getHilbert(getFilteredWaveData(fftFilterParams, iChan));
-		//		}
-		return analyticWaveform[iChan];
 	}
 
 	/**
@@ -478,9 +509,12 @@ public class RawDataTransforms {
 	 * @param channelIndex channel index
 	 * @return filtered waveform data
 	 */
-	public synchronized double[] getFilteredWaveData(FFTFilterParams filterParams, int channelIndex) {
-		filteredWaveData = getFilteredWaveData(filterParams);
-		return filteredWaveData[channelIndex];
+
+	public double[] getFilteredWaveData(FFTFilterParams filterParams, int channelIndex) {
+		synchronized (synchObject) {
+			filteredWaveData = getFilteredWaveData(filterParams);
+			return filteredWaveData[channelIndex];
+		}
 	}
 
 	/**
@@ -489,12 +523,15 @@ public class RawDataTransforms {
 	 * @param filterParams filter parameters
 	 * @return array of filtered data
 	 */
-	public synchronized double[][] getFilteredWaveData(FFTFilterParams filterParams) {
-		//System.out.println("Make filterred wave data!: " + (filterParams != oldFFTFilterParams));
-		if (filteredWaveData == null || filterParams != oldFFTFilterParams) {
-			filteredWaveData = makeFilteredWaveData(filterParams);
+
+	public double[][] getFilteredWaveData(FFTFilterParams filterParams) {
+		synchronized (synchObject) {
+			//System.out.println("Make filterred wave data!: " + (filterParams != oldFFTFilterParams));
+			if (filteredWaveData == null || filterParams != oldFFTFilterParams) {
+				filteredWaveData = makeFilteredWaveData(filterParams);
+			}
+			return filteredWaveData;
 		}
-		return filteredWaveData;
 	}
 
 	private double[][] makeFilteredWaveData(FFTFilterParams filterParams) {
@@ -574,7 +611,7 @@ public class RawDataTransforms {
 	public double[] getWaveData(int channel) {
 		return this.rawData.getWaveData()[channel];
 	}
-	
+
 	/**
 	 * Get the wave data for the given channel in int16 format. 
 	 * @param channel channel index

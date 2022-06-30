@@ -8,9 +8,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedList;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.border.TitledBorder;
 
 import PamView.DBTextArea;
@@ -29,6 +31,7 @@ public class EffortDialog extends PamDialog {
 	private JComboBox<String> observer;
 	private JComboBox<String> oldObjectives;
 	private DBTextArea objective;
+	private JRadioButton outerOnly, allActions;
 
 	private EffortDialog(Window parentFrame, EffortControl effortControl) {
 		super(parentFrame, effortControl.getUnitName(), false);
@@ -40,6 +43,18 @@ public class EffortDialog extends PamDialog {
 		mainPanel.add(new JLabel("Observer name or initials"), c);
 		c.gridx++;
 		mainPanel.add(observer = new JComboBox<String>(), c);
+		outerOnly = new JRadioButton("Log uter scroll only");
+		allActions = new JRadioButton("Log all scroll actions");
+		ButtonGroup bg = new ButtonGroup();
+		bg.add(allActions);
+		bg.add(outerOnly);
+		c.gridx = 0;
+		c.gridy++;
+		c.gridwidth = 1;
+		mainPanel.add(allActions, c);
+		c.gridx+=c.gridwidth;
+		mainPanel.add(outerOnly, c);
+		
 		c.gridx = 0;
 		c.gridy++;
 		c.gridwidth = 2;
@@ -80,6 +95,8 @@ public class EffortDialog extends PamDialog {
 		for (String obs : oldObs) {
 			observer.addItem(obs);
 		}
+		allActions.setSelected(effortParams.outserScrollOnly == false);
+		outerOnly.setSelected(effortParams.outserScrollOnly);
 		oldObjectives.removeAllItems();
 		oldObjectives.addItem("");
 		for (String obj : effortParams.getRecentObjectives()) {
@@ -100,6 +117,7 @@ public class EffortDialog extends PamDialog {
 		if (obs == null || obs.length() == 0) {
 			return showWarning("You must give your name or initials to contine");
 		}
+		effortParams.outserScrollOnly = outerOnly.isSelected();
 		effortParams.setObserver(obs);
 		effortParams.setObjective(objective.getText());
 		return true;

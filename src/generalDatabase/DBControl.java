@@ -91,6 +91,8 @@ PamSettingsSource {
 	private boolean fullTablesCheck = false;
 
 	static private String dbUnitType = "Pamguard Database";
+	
+	static public final String GlobalDatabaseNameArg = "-databasefile";
 
 	private DBControl THIS;
 

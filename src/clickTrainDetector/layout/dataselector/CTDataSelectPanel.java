@@ -3,6 +3,7 @@ package clickTrainDetector.layout.dataselector;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.util.ArrayList;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -15,6 +16,7 @@ import PamView.dialog.PamDialog;
 import PamView.dialog.PamDialogPanel;
 import PamView.dialog.PamGridBagContraints;
 import PamguardMVC.dataSelector.DataSelectParams;
+import clickTrainDetector.classification.CTClassifier;
 import clickTrainDetector.classification.CTClassifierManager;
 import clickTrainDetector.dataselector.CTDataSelector;
 import clickTrainDetector.dataselector.CTSelectParams;
@@ -286,10 +288,12 @@ public class CTDataSelectPanel implements PamDialogPanel {
 			}
 			
 //			System.out.println("No. count: " + count);
-			currentParams.classifier = new int[count];  
+			currentParams.classifier = new int[count];  		
+			ArrayList<CTClassifier> classifiers = ctDataSelector.getClickControl().getClassifierManager().getCurrentClassifiers();
+			int used = 0;
 			for (int i=0; i<classifierCheckBoxes.length; i++) {
 				if (classifierCheckBoxes[i].isSelected()) {
-					currentParams.classifier[i] = ctDataSelector.getClickControl().getClassifierManager().getCurrentClassifiers().get(i).getSpeciesID(); 				
+					currentParams.classifier[used++] = classifiers.get(i).getSpeciesID(); 	
 				}
 			}
 		
