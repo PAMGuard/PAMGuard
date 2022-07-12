@@ -1,10 +1,15 @@
 package nidaqdev;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import PamController.PamControlledUnitSettings;
+import PamController.PamSettingManager;
+import PamController.PamSettings;
 import PamDetection.RawDataUnit;
 import PamUtils.PamUtils;
+import PamView.dialog.PamDialogPanel;
 import soundPlayback.FilePlayback;
 import soundPlayback.FilePlaybackDevice;
 import soundPlayback.PlayDeviceState;
@@ -17,7 +22,7 @@ import soundPlayback.PlaybackParameters;
  * @author Doug Gillespie
  *
  */
-public class NIFilePlayback implements FilePlaybackDevice {
+public class NIFilePlayback implements FilePlaybackDevice, PamSettings {
 
 	
 	private volatile boolean prepared;
@@ -39,9 +44,14 @@ public class NIFilePlayback implements FilePlaybackDevice {
 
 	private NIDeviceInfo currentDeviceInfo;
 	
+	private NIPlaybackSettingsPanel playSettingsPanel;
+	
+	private NIFilePlaybackParams niFilePlaybackParams = new NIFilePlaybackParams();
+	
 	public NIFilePlayback(FilePlayback filePlayback) {
 		super();
 		this.filePlayback = filePlayback;
+		PamSettingManager.getInstance().registerSettings(this);
 		niDaq = new Nidaq();
 		getNIDevices();
 	}
@@ -131,7 +141,7 @@ public class NIFilePlayback implements FilePlaybackDevice {
 		}
 
 		int playRate = (int) playbackParameters.getPlaybackRate();
-		int ans = niDaq.javaPreparePlayback(bn, playRate, playRate, outchans);
+		int ans = niDaq.javaPreparePlayback(bn, playRate, playRate, outchans, (float) niFilePlaybackParams.outputRange);
 //		System.out.println("NI Answer = " + ans);
 		prepared = (ans == 0);
 		return prepared;
@@ -161,6 +171,61 @@ public class NIFilePlayback implements FilePlaybackDevice {
 		else {
 			return currentDeviceInfo.getName();
 		}
+	}
+
+	@Override
+	public PamDialogPanel getSettingsPanel() {
+		if (playSettingsPanel == null) {
+			playSettingsPanel = new NIPlaybackSettingsPanel(this);
+		}
+		return playSettingsPanel;
+	}
+
+	/**
+	 * @return the niFilePlaybackParams
+	 */
+	public NIFilePlaybackParams getNiFilePlaybackParams() {
+		return niFilePlaybackParams;
+	}
+
+	/**
+	 * @param niFilePlaybackParams the niFilePlaybackParams to set
+	 */
+	public void setNiFilePlaybackParams(NIFilePlaybackParams niFilePlaybackParams) {
+		this.niFilePlaybackParams = niFilePlaybackParams;
+	}
+
+	@Override
+	public String getUnitName() {
+		return "NIFilePalybackSettings";
+	}
+
+	@Override
+	public String getUnitType() {
+		return "NIFilePalybackSettings";
+	}
+
+	@Override
+	public Serializable getSettingsReference() {
+		return niFilePlaybackParams;
+	}
+
+	@Override
+	public long getSettingsVersion() {
+		return NIFilePlaybackParams.serialVersionUID;
+	}
+
+	@Override
+	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
+		niFilePlaybackParams = (NIFilePlaybackParams) pamControlledUnitSettings.getSettings();
+		return true;
+	}
+
+	/**
+	 * @return the currentDeviceInfo
+	 */
+	public NIDeviceInfo getCurrentDeviceInfo() {
+		return currentDeviceInfo;
 	}
 
 }

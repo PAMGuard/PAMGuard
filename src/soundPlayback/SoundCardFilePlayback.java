@@ -15,6 +15,7 @@ import Acquisition.SoundCardSystem;
 import PamDetection.RawDataUnit;
 import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
+import PamView.dialog.PamDialogPanel;
 import warnings.PamWarning;
 import warnings.WarningSystem;
 
@@ -87,6 +88,12 @@ public class SoundCardFilePlayback implements FilePlaybackDevice {
 	@Override
 	public PlayDeviceState getDeviceState() {
 		return soundCardPlaybackBase.getDeviceState();
+	}
+
+	@Override
+	public PamDialogPanel getSettingsPanel() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
