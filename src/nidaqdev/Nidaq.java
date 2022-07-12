@@ -253,8 +253,20 @@ public class Nidaq {
 
 	public int javaPreparePlayback(int boardNumber, int sampleRate,
 			int bufferSamples, int[] outputChannelList) {
+//		if (loadLibraryOK) {
+//			return jniPreparePlayback(boardNumber, sampleRate, playVoltageRange, bufferSamples, outputChannelList);
+//		}
+//		else {
+//			return 0;
+//		}
+		return javaPreparePlayback(boardNumber, sampleRate, bufferSamples, outputChannelList, playVoltageRange);
+	}
+
+	public int javaPreparePlayback(int boardNumber, int sampleRate,
+			int bufferSamples, int[] outputChannelList, float outputLevel) {
 		if (loadLibraryOK) {
-			return jniPreparePlayback(boardNumber, sampleRate, playVoltageRange, bufferSamples, outputChannelList);
+			outputLevel = Math.abs(outputLevel);
+			return jniPreparePlayback(boardNumber, sampleRate, outputLevel, bufferSamples, outputChannelList);
 		}
 		else {
 			return 0;
