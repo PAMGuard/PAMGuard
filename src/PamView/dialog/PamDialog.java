@@ -257,15 +257,22 @@ abstract public class PamDialog extends JDialog {
 		// check we're not going too far off the screen. 
 		Dimension sz = getPreferredSize();
 		Dimension screen = null;
+		int w, h;
 		if (getOwner() != null) {
+			Window owner = getOwner();
+			Rectangle bounds = owner.getBounds();
+			w = bounds.x+bounds.width;
+			h = bounds.y+bounds.height;
 			screen = getOwner().getSize();
 		}
 		else {
 			screen = Toolkit.getDefaultToolkit().getScreenSize();
+			w = screen.width;
+			h = screen.height;
 		}
-		point.y = Math.min(point.y, screen.height-sz.height-10);
+		point.y = Math.min(point.y, h-sz.height-10);
 		point.y = Math.max(point.y, 0);
-		point.x = Math.min(point.x, screen.width-sz.width-10);
+		point.x = Math.min(point.x, w-sz.width-10);
 		point.x = Math.max(point.x, 0);
 
 		setLocation(point);
