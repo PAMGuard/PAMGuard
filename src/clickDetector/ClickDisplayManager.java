@@ -463,11 +463,12 @@ public class ClickDisplayManager implements PamSettings {
 	/**
 	 * Scroll the time displays to a specific event. 
 	 * @param event
+	 * @param beforeTime 
 	 */
-	public void gotoEvent(OfflineEventDataUnit event) {
+	public void gotoEvent(OfflineEventDataUnit event, int beforeTime) {
 		for (int i = 0; i < windowList.size(); i++) {
 			if (windowList.get(i).getClass() == ClickBTDisplay.class) {
-				((ClickBTDisplay)windowList.get(i)).gotoEvent(event);
+				((ClickBTDisplay)windowList.get(i)).gotoEvent(event, beforeTime);
 			}
 		}
 	}

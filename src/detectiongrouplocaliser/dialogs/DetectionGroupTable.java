@@ -56,23 +56,23 @@ import warnings.PamWarning;
 public class DetectionGroupTable extends UserDisplayComponentAdapter implements DetectionGroupObserver {
 
 	private JPanel mainPanel;
-	
+
 	private DetectionGroupProcess detectionGroupProcess;
-	
+
 	private DetectionGroupDataBlock detectionGroupDataBlock;
-	
+
 	private DetectionGroupControl detectionGroupControl;
-	
+
 	private JTable table;
 
 	private TableModel tableModel;
 
 	private JScrollPane scrollPane;
-	
+
 	private JPanel controlPanel;
-	
+
 	private JRadioButton showAll, showCurrent;
-	
+
 	private JButton checkIntegrity;
 
 	private boolean isViewer;
@@ -80,7 +80,7 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 	private DisplayOptionsHandler displayOptionsHandler;
 
 	private SwingTableColumnWidths widthManager;
-	
+
 	public DetectionGroupTable(DetectionGroupProcess detectionGroupProcess) {
 		super();
 		this.detectionGroupProcess = detectionGroupProcess;
@@ -95,7 +95,7 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 		mainPanel.add(BorderLayout.CENTER, scrollPane);
 		detectionGroupControl.addGroupObserver(this);
 		table.addMouseListener(new TableMouseHandler());
-		
+
 		if (isViewer) {
 			displayOptionsHandler = detectionGroupControl.getDisplayOptionsHandler();
 			controlPanel = new JPanel(new BorderLayout());
@@ -134,9 +134,9 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 				}
 			});
 		}
-		
-		
-//		sortColumnWidths();
+
+
+		//		sortColumnWidths();
 	}
 
 
@@ -144,7 +144,7 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 	public Component getComponent() {
 		return mainPanel;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see userDisplay.UserDisplayComponentAdapter#openComponent()
 	 */
@@ -195,7 +195,7 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 				showPopupMenu(e);
 			}
 		}
-		
+
 	}
 
 	@Override
@@ -205,7 +205,7 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 
 	public void editSelectedEvent(MouseEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 
@@ -234,26 +234,39 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 		menuItem = annotationHandler.createAnnotationEditMenu(dgdu);
 		menuItem.setIcon(menuIcon);
 		pMenu.add(menuItem);
-		
-		menuItem = new JMenuItem("Scroll to Group UID " + dgdu.getUID() + " at " + PamCalendar.formatDBDateTime(dgdu.getTimeMilliseconds()));
-		menuItem.setIcon(menuIcon);
-		menuItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				scrollToEvent(dgdu.getTimeMilliseconds());
+
+		int[] beforeTimesSecs = {0, 10, 60};
+		pMenu.addSeparator();
+		for (int i = 0; i < beforeTimesSecs.length; i++) {
+			int before = beforeTimesSecs[i];
+			String title;
+			if (before == 0) {
+				title = "Scroll to Group UID " + dgdu.getUID() + " at " + PamCalendar.formatDBDateTime(dgdu.getTimeMilliseconds());
 			}
-		});
-		pMenu.add(menuItem);
+			else {
+				title = String.format("Scroll to %ds before Group UID %d", before, dgdu.getUID());
+			}
+			menuItem = new JMenuItem(title);
+			//		menuItem.setIcon(menuIcon);
+			menuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					scrollToEvent(dgdu.getTimeMilliseconds()-before*1000);
+				}
+			});
+			pMenu.add(menuItem);
+		}
+
 		pMenu.show(e.getComponent(), e.getX(), e.getY());
 	}
 
 	protected void scrollToEvent(long timeMilliseconds) {
 		// start a it earlier. 
 		timeMilliseconds -= 5000;
-//		now WTF - how do I tell every scroller to go to this point in time ? 
+		//		now WTF - how do I tell every scroller to go to this point in time ? 
 		AbstractScrollManager scrollManager = AbstractScrollManager.getScrollManager();
 		scrollManager.startDataAt(detectionGroupDataBlock, timeMilliseconds);
-		
+
 	}
 
 
@@ -300,9 +313,9 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 			TableColumn tableCol = table.getColumnModel().getColumn(i);
 			tableCol.setPreferredWidth(tableModel.getRelativeWidth(i)*50);
 		}
-		
+
 	}
-	
+
 	private int getViewOption() {
 		if (!isViewer) {
 			return DisplayOptionsHandler.SHOW_ALL;
@@ -348,7 +361,7 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 
 		@Override
 		public int getRowCount() {
-//			System.out.println("getRowCount()");
+			//			System.out.println("getRowCount()");
 			if (getViewOption() ==  DisplayOptionsHandler.SHOW_ALL) {
 				firstRowToShow = 0;
 				return numRowsToShow = detectionGroupDataBlock.getUnitsCount();
@@ -396,9 +409,9 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 						return null;
 					}
 				case 2:
-//					if (iRow == 0) {
-//						System.out.println("getValueAt(0,0)");
-//					}
+					//					if (iRow == 0) {
+					//						System.out.println("getValueAt(0,0)");
+					//					}
 					return dgdu.getUID();
 				case 3:
 					return PamCalendar.formatDateTime(dgdu.getTimeMilliseconds());
@@ -416,16 +429,16 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 					if (annotation != null) {
 						return annotation.toString();
 					}
-					
+
 				}
-				
+
 			}
 			catch (Exception e) {
 				return null;
 			}
 			return null;
 		}
-		
+
 		@Override
 		public Class<?> getColumnClass(int col) {
 			if (col == 0) {
@@ -433,7 +446,7 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 			}
 			return super.getColumnClass(col);
 		}
-		
+
 		/* (non-Javadoc)
 		 * @see javax.swing.table.AbstractTableModel#fireTableStructureChanged()
 		 */
@@ -486,7 +499,7 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 		widthManager = new SwingTableColumnWidths(uniqueName, table);
 		super.setUniqueName(uniqueName);
 	}
-	
-	
-	
+
+
+
 }
