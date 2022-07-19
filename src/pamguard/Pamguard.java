@@ -247,7 +247,7 @@ public class Pamguard {
 		}
 		//going to need the run mode inside a Runnable later 
 		final int chosenRunMode = runMode;
-		if(runMode != PamController.RUN_REMOTE) {
+		if(runMode != PamController.RUN_REMOTE && PamGUIManager.getGUIType() != PamGUIManager.NOGUI) {
 			//			ScreenSize.startScreenSizeProcess();
 			ScreenSize.getScreenBounds();
 		}
