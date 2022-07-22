@@ -23,6 +23,7 @@ package pamguard;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import Acquisition.AcquisitionControl;
 import Acquisition.FolderInputSystem;
 import PamController.PamController;
 import PamController.PamGUIManager;
@@ -229,6 +230,14 @@ public class Pamguard {
 					// source folder for wav files (or other supported sound files)
 					GlobalArguments.setParam(FolderInputSystem.GlobalWavFolderArg, args[iArg++]);
 				}
+				else if (anArg.equalsIgnoreCase(PamController.AUTOSTART)) {
+					// auto start processing. 
+					GlobalArguments.setParam(PamController.AUTOSTART, PamController.AUTOSTART);
+				}
+				else if (anArg.equalsIgnoreCase(PamController.AUTOEXIT)) {
+					// auto exit at end of processing. 
+					GlobalArguments.setParam(PamController.AUTOEXIT, PamController.AUTOEXIT);
+				}
 				else if (anArg.equalsIgnoreCase("-help")) {
 					System.out.println("--PamGuard Help");
 					System.out.println("\n--For standard GUI deployment run without any options.\n");
@@ -329,10 +338,16 @@ public class Pamguard {
 		Thread.setDefaultUncaughtExceptionHandler(new PamExceptionHandler());
 		System.setProperty("sun.awt.exception.handler", PamExceptionHandler.class.getName());
 
-		//Amongst other stuff the call to PamController.create()
-		//will build and show the GUI and the user can't
-		//do much else until that's done so let's have all
-		//that kicked off from with the EDT CJB 2009-06-16 
+		/*
+		 * Amongst other stuff the call to PamController.create()
+		 * will build and show the GUI and the user can't
+		 * do much else until that's done so let's have all
+		 * that kicked off from with the EDT CJB 2009-06-16
+		 * Either of these will call .create, just one is in a different 
+		 * thread, so it's at the end of the create function that other automatic 
+		 * processes should be started. 
+		 *  
+		 */
 
 		if (PamGUIManager.isSwing()) {
 			SwingUtilities.invokeLater(createPamguard);

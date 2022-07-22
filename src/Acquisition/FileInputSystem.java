@@ -61,6 +61,7 @@ import PamView.dialog.PamLabel;
 import PamView.dialog.warn.WarnOnce;
 import PamView.panel.PamPanel;
 import PamView.panel.PamProgressBar;
+import pamguard.GlobalArguments;
 import warnings.PamWarning;
 
 /**
@@ -1075,8 +1076,17 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 
 	@Override
 	public void daqHasEnded() {
-		// TODO Auto-generated method stub
+		fileListComplete();
+	}
 
+	/**
+	 * Called when all files to be processed have been processed. 
+	 */
+	protected void fileListComplete() {
+		if (GlobalArguments.getParam(PamController.AUTOEXIT) != null) {
+			System.out.println("All sound files processed, PAMGuard can close on " + PamController.AUTOEXIT);
+			PamController.getInstance().batchProcessingComplete();
+		}
 	}
 
 	JPanel statusPanel;

@@ -86,15 +86,5 @@ abstract public class PamView implements PamViewInterface {
 		this.frameNumber = frameNumber;
 	}
 	
-	/**
-	 * Shut down Pamguard
-	 */
-	public void shutDownPamguard() {
-		// force close the javaFX thread (because it won't close by itself - see Platform.setImplicitExit(false) in constructor
-		Platform.exit();
-		
-		// terminate the JVM
-		System.exit(0);
-	}
 
 }
