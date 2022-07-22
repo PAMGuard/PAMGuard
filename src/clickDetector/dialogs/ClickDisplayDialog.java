@@ -106,6 +106,7 @@ public class ClickDisplayDialog extends PamDialog implements ActionListener {
 		btPanel.setParams(btDisplayParameters);
 		sizePanel.setParams(btDisplayParameters);
 		speciesPanel.setParams(btDisplayParameters);
+		pack();
 	}
 	
 	@Override
