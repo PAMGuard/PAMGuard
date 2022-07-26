@@ -30,6 +30,7 @@ import PamView.CancelObserver;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamFileBrowser;
 import PamView.dialog.PamGridBagContraints;
+import PamView.panel.PamAlignmentPanel;
 import PamView.panel.PamPanel;
 import PamView.panel.PamProgressBar;
 import PamguardMVC.PamDataBlock;
@@ -54,7 +55,8 @@ public class OLProcessDialog extends PamDialog {
 	private JCheckBox[] taskCheckBox;
 	private JButton[] settingsButton;
 	private JLabel status, currFile;
-	private JProgressBar globalProgress, fileProgress;
+	private JProgressBar globalProgress; // file by file progress 1: nFiles
+	private JProgressBar loadedProgress; // progress throgh loaded data
 	private JCheckBox deleteOldData;
 	private JLabel dataInfo;
 	/**
@@ -85,7 +87,7 @@ public class OLProcessDialog extends PamDialog {
 
 	public static ImageIcon settings = new ImageIcon(ClassLoader.getSystemResource("Resources/SettingsButtonSmall2.png"));
 
-	int currentStatus = TaskMonitor.TASK_IDLE;
+	TaskStatus currentStatus = TaskStatus.IDLE;
 
 
 	public OLProcessDialog(Window parentFrame, OfflineTaskGroup taskGroup, String title) {
@@ -96,7 +98,8 @@ public class OLProcessDialog extends PamDialog {
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
-		JPanel dataSelectPanel = new JPanel(new BorderLayout());
+		JPanel dataSelectPanel = new PamAlignmentPanel(BorderLayout.WEST);
+		dataSelectPanel.setLayout(new BorderLayout());
 		dataSelectPanel.setBorder(new TitledBorder("Data Options"));
 		dataSelectPanel.add(BorderLayout.WEST, new JLabel("Data "));
 		dataInfo = new JLabel(" ", SwingConstants.CENTER); // create this first to avoid null pointer exception
@@ -124,7 +127,8 @@ public class OLProcessDialog extends PamDialog {
 		dataSelectPanel.add(BorderLayout.SOUTH, southPanel);
 				
 
-		JPanel tasksPanel = new JPanel(new GridBagLayout());
+		JPanel tasksPanel = new PamAlignmentPanel(BorderLayout.WEST);
+		tasksPanel.setLayout(new GridBagLayout());
 		tasksPanel.setBorder(new TitledBorder("Tasks"));
 		int nTasks = taskGroup.getNTasks();
 		taskCheckBox = new JCheckBox[nTasks];
@@ -145,22 +149,26 @@ public class OLProcessDialog extends PamDialog {
 			c.gridy++;
 		}
 
-		JPanel progressPanel = new JPanel(new GridBagLayout());
+//		JPanel progressPanel = new JPanel(new GridBagLayout());
+		JPanel progressPanel = new PamAlignmentPanel(BorderLayout.WEST);
+		progressPanel.setLayout(new GridBagLayout());
 		progressPanel.setBorder(new TitledBorder("Progress"));
 		c = new PamGridBagContraints();
+		c.gridwidth = 3;
 		addComponent(progressPanel, status = new JLabel(" "), c);
-		c.gridx++;
+		c.gridy++;
 		addComponent(progressPanel, currFile = new JLabel(" "), c);
 		c.gridx = 0;
 		c.gridy++;
+		c.gridwidth = 1;
 		addComponent(progressPanel, new JLabel("File ", SwingConstants.RIGHT), c);
 		c.gridx++;
-		addComponent(progressPanel, fileProgress = new PamProgressBar(), c);
+		addComponent(progressPanel, loadedProgress = new PamProgressBar(0, 100), c);
 		c.gridx = 0;
 		c.gridy++;
 		addComponent(progressPanel, new JLabel("All Data ", SwingConstants.RIGHT), c);
 		c.gridx++;
-		addComponent(progressPanel, globalProgress = new PamProgressBar(), c);
+		addComponent(progressPanel, globalProgress = new PamProgressBar(00, 100), c);
 
 		mainPanel.add(dataSelectPanel);
 		
@@ -224,7 +232,7 @@ public class OLProcessDialog extends PamDialog {
 
 		@Override
 		public boolean cancelPressed() {
-			if (currentStatus==TaskMonitor.TASK_RUNNING) {	
+			if (currentStatus==TaskStatus.RUNNING) {	
 			cancelButtonPressed(); 
 			return false;
 			}
@@ -239,7 +247,7 @@ public class OLProcessDialog extends PamDialog {
 			return;
 		}
 		if (taskGroup.runTasks()) {
-			currentStatus = TaskMonitor.TASK_RUNNING;
+			currentStatus = TaskStatus.RUNNING;
 			getCancelButton().setText("Stop!");
 		}
 	}
@@ -257,7 +265,7 @@ public class OLProcessDialog extends PamDialog {
 	 * @param task - the task group in whihc enable controls has been called from
 	 */
 	public void enableControls(OfflineTask task) {
-		boolean nr = currentStatus != TaskMonitor.TASK_RUNNING;		
+		boolean nr = currentStatus != TaskStatus.RUNNING;		
 		int nTasks = taskGroup.getNTasks();
 		OfflineTask aTask;
 		int selectedTasks = 0;
@@ -279,9 +287,9 @@ public class OLProcessDialog extends PamDialog {
 
 	@Override
 	public void cancelButtonPressed() {
-		if (currentStatus == TaskMonitor.TASK_RUNNING) {
+		if (currentStatus == TaskStatus.RUNNING) {
 			taskGroup.killTasks();
-			currentStatus=TaskMonitor.TASK_INTERRRUPTED;
+			currentStatus=TaskStatus.INTERRUPTED;
 			enableControls();
 			getCancelButton().setText("Close");
 			
@@ -563,7 +571,7 @@ public class OLProcessDialog extends PamDialog {
 
 		@Override
 		public void windowClosing(WindowEvent arg0) {
-			if (currentStatus == TaskMonitor.TASK_RUNNING) {
+			if (currentStatus == TaskStatus.RUNNING) {
 				return;
 			}
 			setVisible(false);
@@ -639,47 +647,104 @@ public class OLProcessDialog extends PamDialog {
 	 */
 	class OLMonitor implements TaskMonitor {
 
-		int doneFiles = 0;
-
-		int numFiles = 0;
-
 		@Override
-		public void setFileName(String fileName) {
-			//			currFile.setText(fileName);
-			if (taskGroup.getTaskGroupParams().dataChoice == TaskGroupParams.PROCESS_LOADED) {
-				currFile.setText("Loaded data");
+		public void setTaskStatus(TaskMonitorData taskMonitorData) {
+			status.setText(taskMonitorData.taskStatus.toString() + ", " + taskMonitorData.taskActivity.toString());
+			if (taskMonitorData.fileOrStatus == null || taskMonitorData.fileOrStatus.length() == 0) {
+				currFile.setText("  ");
 			}
-			currFile.setText(String.format("File %d of %d", doneFiles, numFiles));
+			else {
+				currFile.setText(taskMonitorData.fileOrStatus);
+			}
+			switch (taskMonitorData.taskActivity) {
+			case LINKING:
+			case LOADING:
+//				globalProgress.setMaximum(taskMonitorData.progMaximum);
+				globalProgress.setValue(taskMonitorData.progValue*100/taskMonitorData.progMaximum);
+				loadedProgress.setIndeterminate(true);
+				break;
+			case PROCESSING:
+				int prog = taskMonitorData.progValue*100/taskMonitorData.progMaximum;
+//				System.out.println("Set loaded progress to " + prog);
+				loadedProgress.setIndeterminate(false);
+				loadedProgress.setValue(prog);
+				break;
+			case IDLE:
+//				globalProgress.setValue(100);
+				loadedProgress.setIndeterminate(false);
+				break;
+			case SAVING:
+			default:
+				break;
+			}
+			switch (taskMonitorData.taskStatus) {
+			case COMPLETE:
+				globalProgress.setValue(100);
+				loadedProgress.setValue(100);
+				break;
+			case CRASHED:
+				break;
+			case IDLE:
+				break;
+			case INTERRUPTED:
+				break;
+			case RUNNING:
+				break;
+			case STARTING:
+				globalProgress.setValue(0);
+				loadedProgress.setValue(0);
+				break;
+			default:
+				break;
+			
+			}
+			setStatus(taskMonitorData.taskStatus);
 		}
 
-		@Override
-		public void setNumFiles(int nFiles) {
-			globalProgress.setMaximum(numFiles = nFiles);
-		}
-
-		@Override
-		public void setProgress(int global, double loaded) {
-			doneFiles = global;
-			globalProgress.setValue(global);
-			fileProgress.setValue((int) (loaded*100));
-		}
-
-		@Override
-		public void setStatus(int taskStatus) {
-			status.setText(TaskMonitorData.getStatusString(taskStatus));
+//		int doneFiles = 0;
+//
+//		int numFiles = 0;
+//
+//		@Override
+//		public void setFileName(String fileName) {
+//			//			currFile.setText(fileName);
+//			if (taskGroup.getTaskGroupParams().dataChoice == TaskGroupParams.PROCESS_LOADED) {
+//				currFile.setText("Loaded data");
+//			}
+//			currFile.setText(String.format("File %d of %d", doneFiles, numFiles));
+//		}
+//
+//		@Override
+//		public void setNumFiles(int nFiles) {
+//			globalProgress.setMaximum(numFiles = nFiles);
+//		}
+//
+//		@Override
+//		public void setProgress(int global, double loaded) {
+//			doneFiles = global;
+//			globalProgress.setValue(global);
+//			fileProgress.setValue((int) (loaded*100));
+//		}
+//
+//		@Override
+		public void setStatus(TaskStatus taskStatus) {
+//			status.setText(TaskMonitorData.getStatusString(taskStatus));
 			currentStatus=taskStatus;
 			enableControls();
 			switch(taskStatus) {
-			case TaskMonitor.TASK_IDLE:
-			case TaskMonitor.TASK_COMPLETE:
+			case COMPLETE:
+			case CRASHED:
+			case IDLE:
+			case INTERRUPTED:
 				getCancelButton().setText("Close");
 				break;
-			case TaskMonitor.TASK_RUNNING:
+			case RUNNING:
+			case STARTING:
 				getCancelButton().setText("Stop!");
 				break;
 			default:
-				getCancelButton().setText("Close");
 				break;
+			
 			}
 		}
 	}
@@ -688,7 +753,7 @@ public class OLProcessDialog extends PamDialog {
 	 * Get the current status of the dialog. 
 	 * @return the current status. 
 	 */
-	public int getCurrentStatus() {
+	public TaskStatus getCurrentStatus() {
 		return currentStatus;
 	}
 	

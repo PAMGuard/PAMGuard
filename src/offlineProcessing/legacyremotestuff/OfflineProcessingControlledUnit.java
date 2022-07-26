@@ -1,12 +1,12 @@
 /**
  * 
  */
-package offlineProcessing;
+package offlineProcessing.legacyremotestuff;
 
 import java.util.ArrayList;
 
 import dataMap.DataMapPanel;
-
+import offlineProcessing.OfflineTaskGroup;
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamController.PamControllerInterface;
@@ -16,6 +16,7 @@ import PamController.PamSettingManager;
  * @author GrahamWeatherup
  *only run in Viewer mode to run all Offline Tasks
  */
+@Deprecated // too simplistic, won't be using this. 
 public class OfflineProcessingControlledUnit extends PamControlledUnit{
 
 //	static OfflineProcessingControlledUnit singleInstance;

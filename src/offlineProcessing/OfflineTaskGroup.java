@@ -12,6 +12,7 @@ import binaryFileStorage.DataUnitFileInformation;
 import dataMap.OfflineDataMap;
 import dataMap.OfflineDataMapPoint;
 import generalDatabase.DBControlUnit;
+import offlineProcessing.logging.TaskLogging;
 import offlineProcessing.superdet.OfflineSuperDetFilter;
 import pamScrollSystem.DataTimeLimits;
 import pamScrollSystem.ViewLoadObserver;
@@ -64,9 +65,10 @@ public class OfflineTaskGroup implements PamSettings {
 	
 	private DataTimeLimits dataTimeLimits;
 
+	private volatile TaskStatus completionStatus = TaskStatus.IDLE;
 	/**
 	 * PamControlledunit required in constructor since some bookkeeping will
-	 * be goign on in the background which will need the unit type and name. 
+	 * be going on in the background which will need the unit type and name. 
 	 * @param pamControlledUnit host controlled unit. 
 	 * @param settingsName  Name to be used in PamSettings for storing some basic information 
 	 * (which tasks are selected)
@@ -150,9 +152,102 @@ public class OfflineTaskGroup implements PamSettings {
 	 */
 	public boolean runTasks() {
 		setSummaryLists();
+		
+		checkTaskTimes();
+	
+		TaskMonitorData monData = new TaskMonitorData(TaskStatus.STARTING, TaskActivity.IDLE, 0, 0, null, 0);
+		if (taskMonitor != null) {
+			taskMonitor.setTaskStatus(monData);
+		}
+		logTaskStatus(monData);
+		
 		worker = new TaskGroupWorker();
 		worker.execute();
 		return true;
+	}
+
+	/**
+	 * Check the start and end times of tasks before they are run. while not 
+	 * needed for things like process loaded, this is needed for the database 
+	 * record of what's been done. 
+	 */
+	private void checkTaskTimes() {
+		if (primaryDataBlock == null) {
+			return;
+		}
+		long mapStart = 0;
+		long mapEnd = 0;
+		long loadedStart = 0;
+		long loadedEnd = 0;
+		OfflineDataMap dataMap = primaryDataBlock.getPrimaryDataMap();
+		if (dataMap != null) {
+			mapStart = dataMap.getFirstDataTime();
+			mapEnd = dataMap.getLastDataTime();
+		}
+		loadedStart = primaryDataBlock.getCurrentViewDataStart();
+		loadedEnd = primaryDataBlock.getCurrentViewDataEnd();
+		
+		switch (taskGroupParams.dataChoice) {
+		case TaskGroupParams.PROCESS_ALL:
+			taskGroupParams.startRedoDataTime = mapStart;
+			taskGroupParams.endRedoDataTime = mapEnd;
+			break;
+		case TaskGroupParams.PROCESS_LOADED:
+			taskGroupParams.startRedoDataTime = loadedStart;
+			taskGroupParams.endRedoDataTime = loadedEnd;
+			break;
+		case TaskGroupParams.PROCESS_NEW:
+			// need to get last processed time from the database for every task
+			// then worry about what to do if they are different. 
+			taskGroupParams.startRedoDataTime = getPreviousEndTime();
+			taskGroupParams.endRedoDataTime = mapEnd;
+			break;
+		case TaskGroupParams.PROCESS_SPECIFICPERIOD:
+			// should have been set already, but...
+			break;
+		case TaskGroupParams.PROCESS_TME_CHUNKS: // whatever this is ?
+			break;
+		}
+		
+	}
+
+	/**
+	 * Look in the database to get the previous end time for all tasks. if
+	 * it doesn't exist, then take the map start time. 
+	 * @return
+	 */
+	private long getPreviousEndTime() {
+		long previousEnd = 0;
+		OfflineDataMap dataMap = primaryDataBlock.getPrimaryDataMap();
+		if (dataMap != null) {
+			previousEnd = dataMap.getFirstDataTime();
+		}
+		// then scan the database to try to find if everything is later ...
+		long taskMinLatest = Long.MAX_VALUE;
+		for (OfflineTask aTask : offlineTasks) {
+			if (aTask.isDoRun() == false) {
+				continue;
+			}
+			Long taskLatest = getPreviousEndTime(aTask);
+			if (taskLatest != null) {
+				taskMinLatest = Math.min(taskMinLatest, taskLatest);
+			}
+		}
+		if (taskMinLatest != Long.MAX_VALUE) {
+			previousEnd = taskMinLatest;
+		}
+		
+		return previousEnd;
+	}
+
+	/**
+	 * Get the time of the end of the last run of data for this task.
+	 * @param aTask Offline task
+	 * @return end time of data in last record in database or NULL if no database records.
+	 */
+	private Long getPreviousEndTime(OfflineTask aTask) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	public void killTasks() {
@@ -285,7 +380,6 @@ public class OfflineTaskGroup implements PamSettings {
 
 		volatile boolean instantKill = false;
 
-		private int completionStatus = TaskMonitor.TASK_IDLE;
 		
 		private CPUMonitor cpuMonitor = new CPUMonitor();
 
@@ -303,7 +397,7 @@ public class OfflineTaskGroup implements PamSettings {
 
 		@Override
 		protected Integer doInBackground() {
-			completionStatus = TaskMonitor.TASK_RUNNING;
+			completionStatus = TaskStatus.RUNNING;
 			try {
 				prepareTasks();
 				switch (taskGroupParams.dataChoice) {
@@ -324,15 +418,15 @@ public class OfflineTaskGroup implements PamSettings {
 					break;
 				}
 				if (instantKill) {
-					completionStatus = TaskMonitor.TASK_INTERRRUPTED;
+					completionStatus = TaskStatus.INTERRUPTED;
 				}
 				else {
-					completionStatus = TaskMonitor.TASK_COMPLETE;
+					completionStatus = TaskStatus.COMPLETE;
 				}
 			}
 			catch (Exception e) {
 				e.printStackTrace();
-				completionStatus = TaskMonitor.TASK_CRASHED;
+				completionStatus = TaskStatus.CRASHED;
 			}
 			completeTasks();
 			return null;
@@ -375,14 +469,15 @@ public class OfflineTaskGroup implements PamSettings {
 			OfflineDataMap dataMap = primaryDataBlock.getPrimaryDataMap();
 			int nMapPoints = dataMap.getNumMapPoints(startTime, endTime);
 			int iMapPoint = 0;
-			publish(new TaskMonitorData(TaskMonitor.TASK_RUNNING, nMapPoints));
-			publish(new TaskMonitorData(0, 0.0));
+			publish(new TaskMonitorData(TaskStatus.RUNNING, TaskActivity.PROCESSING, nMapPoints, 0, "",  
+					taskGroupParams.startRedoDataTime));
 			OfflineDataStore dataSource = dataMap.getOfflineDataSource();
 			Iterator<OfflineDataMapPoint> mapIterator = dataMap.getListIterator();
 			OfflineDataMapPoint mapPoint;
 //			System.out.println("NUMBER OF MAP POINTS: " + mapIterator.hasNext()
 //			+ "Start time: " + PamCalendar.formatDateTime(startTime) +  "End time: " + PamCalendar.formatDateTime(endTime));
 			boolean reallyDoIt = false;
+			int iPoint = 0;
 			while (mapIterator.hasNext()) {
 				mapPoint = mapIterator.next();
 				reallyDoIt = true;
@@ -394,11 +489,16 @@ public class OfflineTaskGroup implements PamSettings {
 					Debug.out.printf("Skipping map point %s since no matching data\n", mapPoint.toString());
 					reallyDoIt = false;;
 				}
-				publish(new TaskMonitorData(mapPoint.getName()));
 				primaryDataBlock.clearAll();
 				
+				long lastTime = taskGroupParams.startRedoDataTime;
+				
 				if (reallyDoIt) {
+					
 					Runtime.getRuntime().gc(); //garbage collection
+
+					publish(new TaskMonitorData(TaskStatus.RUNNING , TaskActivity.LOADING, nMapPoints, iPoint++, mapPoint.getName(),
+							lastTime));
 
 					primaryDataBlock.loadViewerData(new OfflineDataLoadInfo(mapPoint.getStartTime(), mapPoint.getEndTime()), null);
 
@@ -424,17 +524,23 @@ public class OfflineTaskGroup implements PamSettings {
 					if (superDetectionFilter != null) {
 						superDetectionFilter.checkSubDetectionLinks();
 					}
+					publish(new TaskMonitorData(TaskStatus.RUNNING , TaskActivity.PROCESSING, nMapPoints, 0, mapPoint.getName(),
+							lastTime));
+					
 					processData(iMapPoint, mapPoint, mapPoint.getStartTime(), mapPoint.getEndTime());
+					
+					lastTime = mapPoint.getEndTime();
+					publish(new TaskMonitorData(TaskStatus.RUNNING , TaskActivity.SAVING, nMapPoints, 0, mapPoint.getName(),
+							lastTime));
 				}
 				iMapPoint++;
-				publish(new TaskMonitorData(iMapPoint+1, 0.0));
+//				publish(new TaskMonitorData(taskGroupParams.dataChoice, taskGroupParams.startRedoDataTime, taskGroupParams.endRedoDataTime, nMapPoints, 0, 
+//						TaskMonitor.TASK_COMPLETE, TaskMonitor.TASK_COMPLETE, lastTime));
 				if (instantKill) {
 					break;
 				}
 			}
 			//			}
-			publish(new TaskMonitorData(TaskMonitor.TASK_IDLE));
-			publish(new TaskMonitorData(TaskMonitor.TASK_COMPLETE));
 			primaryDataBlock.loadViewerData(new OfflineDataLoadInfo(currentStart, currentEnd), null);
 		}
 
@@ -456,15 +562,16 @@ public class OfflineTaskGroup implements PamSettings {
 		}
 
 		private void processLoadedData() {
-			publish(new TaskMonitorData(TaskMonitor.TASK_RUNNING, 1));
+			publish(new TaskMonitorData(TaskStatus.RUNNING, TaskActivity.PROCESSING, 1, 0, "Loaded Data",
+					taskGroupParams.startRedoDataTime));
 			if (dataTimeLimits == null) {
 				processData(0, null, 0, Long.MAX_VALUE);
 			}
 			else {
 				processData(0, null, dataTimeLimits.getMinimumMillis(), dataTimeLimits.getMaximumMillis());
 			}
-			publish(new TaskMonitorData(TaskMonitor.TASK_IDLE));
-			publish(new TaskMonitorData(TaskMonitor.TASK_COMPLETE));
+//			publish(new TaskMonitorData(TaskGroupParams.PROCESS_LOADED, taskGroupParams.startRedoDataTime, taskGroupParams.endRedoDataTime, 1, 0, "Loaded Data",
+//					TaskMonitor.TASK_COMPLETE, TaskMonitor.ACTIVITY_PROCESSING, taskGroupParams.endRedoDataTime));
 		}
 
 		/**
@@ -506,6 +613,13 @@ public class OfflineTaskGroup implements PamSettings {
 			OfflineTask aTask;
 			boolean unitChanged;
 			DataUnitFileInformation fileInfo;
+			String dataName;
+			if (mapPoint != null) {
+				dataName = mapPoint.getName();
+			}
+			else {
+				dataName = "Loaded Data";
+			}
 			/**
 			 * Make sure that any data from required data blocks is loaded. First check the 
 			 * start and end times of the primary data units we actually WANT to process
@@ -612,7 +726,8 @@ public class OfflineTaskGroup implements PamSettings {
 				}
 				unitsChanged++;
 				if (totalUnits%nSay == 0) {
-					publish(new TaskMonitorData(globalProgress+1, (double) totalUnits / (double) nDatas));
+					publish(new TaskMonitorData(TaskStatus.RUNNING, TaskActivity.PROCESSING, nToProcess, totalUnits, dataName,
+							dataUnit.getTimeMilliseconds()));
 				}
 			}
 			for (int iTask = 0; iTask < nTasks; iTask++) {
@@ -623,12 +738,13 @@ public class OfflineTaskGroup implements PamSettings {
 				aTask.loadedDataComplete();
 			}
 			//			}
+			publish(new TaskMonitorData(TaskStatus.RUNNING, TaskActivity.SAVING, nToProcess, totalUnits, dataName,
+					processEndTime));
 			for (int i = 0; i < affectedDataBlocks.size(); i++) {
 				//System.out.println("SAVE VIEWER DATA FOR: " + affectedDataBlocks.get(i) );
 				aDataBlock = affectedDataBlocks.get(i);
 				aDataBlock.saveViewerData();
 			}
-			publish(new TaskMonitorData(globalProgress+1, (double) totalUnits / (double) nDatas));
 			Debug.out.printf("Processd %d out of %d data units at " + mapPoint + "\n", unitsChanged, totalUnits);
 			commitDatabase();
 		}
@@ -707,9 +823,9 @@ public class OfflineTaskGroup implements PamSettings {
 
 		@Override
 		public void sayProgress(int state, long loadStart, long loadEnd, long lastTime, int nLoaded) {
-			TaskMonitorData tmd = new TaskMonitorData(TaskMonitorData.LOADING_DATA);
-			tmd.dataType = TaskMonitorData.LOADING_DATA;
-			publish(tmd);
+//			TaskMonitorData tmd = new TaskMonitorData(TaskMonitorData.LOADING_DATA);
+//			tmd.dataType = TaskMonitorData.LOADING_DATA;
+//			publish(tmd);
 			
 		}
 
@@ -725,29 +841,47 @@ public class OfflineTaskGroup implements PamSettings {
 		if (taskMonitor == null) {
 			return;
 		}
-		int dataType = monData.dataType;
-		if ((dataType & TaskMonitorData.SET_STATUS) != 0) {
-			taskMonitor.setStatus(monData.status);
-		}
-		if ((dataType & TaskMonitorData.SET_NFILES) != 0) {
-			taskMonitor.setNumFiles(monData.nFiles);
-		}
-		if ((dataType & TaskMonitorData.SET_PROGRESS) != 0) {
-			taskMonitor.setProgress(monData.globalProgress, monData.loadedProgress);
-			//			taskMonitor.setProgress(monData.globalProgress, .5);
-		}
-		if ((dataType & TaskMonitorData.SET_FILENAME) != 0) {
-			taskMonitor.setFileName(monData.fileName);
-		}
-		if (dataType == TaskMonitorData.LOADING_DATA) {
-			taskMonitor.setStatus(monData.status);
-		}
+		taskMonitor.setTaskStatus(monData);
+//		int dataType = monData.dataType;
+//		if ((dataType & TaskMonitorData.SET_STATUS) != 0) {
+//			taskMonitor.setStatus(monData.status);
+//		}
+//		if ((dataType & TaskMonitorData.SET_NFILES) != 0) {
+//			taskMonitor.setNumFiles(monData.nFiles);
+//		}
+//		if ((dataType & TaskMonitorData.SET_PROGRESS) != 0) {
+//			taskMonitor.setProgress(monData.globalProgress, monData.loadedProgress);
+//			//			taskMonitor.setProgress(monData.globalProgress, .5);
+//		}
+//		if ((dataType & TaskMonitorData.SET_FILENAME) != 0) {
+//			taskMonitor.setFileName(monData.fileName);
+//		}
+//		if (dataType == TaskMonitorData.LOADING_DATA) {
+//			taskMonitor.setStatus(monData.status);
+//		}
 	}
 
+	private void logTaskStatus(TaskMonitorData monitorData) {
+		for (OfflineTask aTask : offlineTasks) {
+			if (aTask.isDoRun() == false) {
+				continue;
+			}
+			
+			TaskLogging.getTaskLogging().logTask(this, aTask, monitorData);
+			
+		}
+	}
+	
 	/**
 	 * some bookkeeping - write information about task completion to the database. 
 	 */
 	public void tasksDone() {
+		// tell the logging that we're done. 
+		TaskMonitorData monData = new TaskMonitorData(completionStatus, TaskActivity.IDLE, 1, 1, "",
+				taskGroupParams.endRedoDataTime);
+		newMonitorData(monData);
+		logTaskStatus(monData);
+		
 		long currentStart = primaryDataBlock.getCurrentViewDataStart();
 		long currentEnd = primaryDataBlock.getCurrentViewDataEnd();
 		//System.out.println("TASKS COMPLETE:");

@@ -33,7 +33,7 @@ public class TaskGroupParams implements Cloneable, Serializable, ManagedParamete
 	static public final int PROCESS_NEW = 2;
 	
 	/**
-	 * Time of the last bit of data to be processed. 
+	 * Time of the last section of data to be processed. 
 	 */
 	public long lastDataTime;
 	

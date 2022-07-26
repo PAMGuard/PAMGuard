@@ -6,6 +6,7 @@ import offlineProcessing.OLProcessDialog;
 import offlineProcessing.OfflineTask;
 import offlineProcessing.OfflineTaskGroup;
 import offlineProcessing.TaskMonitor;
+import offlineProcessing.TaskStatus;
 
 /**
  * A click train offline dialog which ensure that the click train offline
@@ -33,7 +34,7 @@ public class CTProcessDialog extends OLProcessDialog {
 	 * @param task - the task group in whihc enable controls has been called from
 	 */
 	public void enableControls(OfflineTask task) {
-		boolean nr = getCurrentStatus() != TaskMonitor.TASK_RUNNING;		
+		boolean nr = getCurrentStatus() != TaskStatus.RUNNING;		
 		int nTasks = getTaskGroup().getNTasks();
 		OfflineTask aTask;
 		int selectedTasks = 0;

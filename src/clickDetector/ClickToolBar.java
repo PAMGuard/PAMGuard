@@ -10,6 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 import javax.swing.JToolBar;
 
+@Deprecated // - not used
 public class ClickToolBar implements ActionListener{
 	
 	private JToolBar toolBar;
@@ -18,7 +19,7 @@ public class ClickToolBar implements ActionListener{
 	private ClickTabPanelControl clickTabPanelControl;
 
 	
-	public ClickToolBar(ClickTabPanelControl clickTabPanelControl) {
+	private ClickToolBar(ClickTabPanelControl clickTabPanelControl) {
 
 		this.clickTabPanelControl = clickTabPanelControl;
 		toolBar = new JToolBar();
