@@ -27,6 +27,7 @@ import javax.swing.border.TitledBorder;
 import PamUtils.PamCalendar;
 import PamUtils.TxtFileUtils;
 import PamView.CancelObserver;
+import PamView.DBTextArea;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamFileBrowser;
 import PamView.dialog.PamGridBagContraints;
@@ -34,6 +35,8 @@ import PamView.panel.PamAlignmentPanel;
 import PamView.panel.PamPanel;
 import PamView.panel.PamProgressBar;
 import PamguardMVC.PamDataBlock;
+import offlineProcessing.logging.OldTaskData;
+import offlineProcessing.logging.TaskLogging;
 import offlineProcessing.superdet.OfflineSuperDetFilter;
 
 /**
@@ -59,6 +62,7 @@ public class OLProcessDialog extends PamDialog {
 	private JProgressBar loadedProgress; // progress throgh loaded data
 	private JCheckBox deleteOldData;
 	private JLabel dataInfo;
+	private DBTextArea noteText;
 	/**
 	 * Pane which can be used to add extra controls for different 'dataSelection' types.  
 	 */
@@ -148,6 +152,12 @@ public class OLProcessDialog extends PamDialog {
 			}
 			c.gridy++;
 		}
+		
+		JPanel notePanel = new JPanel(new BorderLayout());
+		notePanel.setBorder(new TitledBorder("Notes"));
+		noteText = new DBTextArea(2, 40, TaskLogging.TASK_NOTE_LENGTH);
+		noteText.getComponent().setToolTipText("Notes to add to database record of complete tasks");
+		notePanel.add(BorderLayout.CENTER, noteText.getComponent());
 
 //		JPanel progressPanel = new JPanel(new GridBagLayout());
 		JPanel progressPanel = new PamAlignmentPanel(BorderLayout.WEST);
@@ -178,6 +188,7 @@ public class OLProcessDialog extends PamDialog {
 		}
 
 		mainPanel.add(tasksPanel);
+		mainPanel.add(notePanel);
 		mainPanel.add(progressPanel);
 
 		getOkButton().setText("Start");
@@ -222,7 +233,10 @@ public class OLProcessDialog extends PamDialog {
 		for (int i = 0; i < nTasks; i++) {
 			aTask = taskGroup.getTask(i);
 			taskCheckBox[i].setSelected(taskGroupParams.getTaskSelection(i));
+			
 		}
+		noteText.setText(taskGroupParams.taskNote);
+		setTaskToolTips();
 //		deleteOldData.setSelected(offlineClassifierParams.deleteOld);
 	}
 	
@@ -333,7 +347,32 @@ public class OLProcessDialog extends PamDialog {
 			}
 		}
 		
+		String note = noteText.getText();
+		if (note == null || note.length() == 0) {
+			return PamDialog.showWarning(super.getOwner(), "Task note", "you must enter a note about what you are doing");
+		}
+		taskGroupParams.taskNote = note;
+		
 		return true;
+	}
+	
+	public void setTaskToolTips() {
+		int nTasks = taskGroup.getNTasks();
+		
+		OfflineTask aTask;
+		for (int i = 0; i < nTasks; i++) {
+			aTask = taskGroup.getTask(i);
+			OldTaskData taskData = TaskLogging.getTaskLogging().readLastTaskData(taskGroup, aTask);
+			if (taskData == null) {
+				taskCheckBox[i].setToolTipText("Task not run");
+			}
+			else {
+				String tip = "<html>Last run: " + taskData.toString() ;
+				tip = tip.replace("\n", "<br>");
+				taskCheckBox[i].setToolTipText(tip);
+			}
+		}
+		
 	}
 
 	public void newDataSelection() {
@@ -737,6 +776,7 @@ public class OLProcessDialog extends PamDialog {
 			case IDLE:
 			case INTERRUPTED:
 				getCancelButton().setText("Close");
+				setTaskToolTips();
 				break;
 			case RUNNING:
 			case STARTING:

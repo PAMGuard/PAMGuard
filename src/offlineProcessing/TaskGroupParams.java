@@ -92,6 +92,11 @@ public class TaskGroupParams implements Cloneable, Serializable, ManagedParamete
 	public ArrayList<long[]> timeChunks;
 	
 	/**
+	 * Note which will get written to the database of completed tasks. 
+	 */
+	public String taskNote;
+	
+	/**
 	 * Set the selection state of a particular task. 
 	 * @param iTask task number (counting from 0)
 	 * @param selState selection state

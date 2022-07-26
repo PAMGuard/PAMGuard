@@ -879,8 +879,8 @@ public class OfflineTaskGroup implements PamSettings {
 		// tell the logging that we're done. 
 		TaskMonitorData monData = new TaskMonitorData(completionStatus, TaskActivity.IDLE, 1, 1, "",
 				taskGroupParams.endRedoDataTime);
+		logTaskStatus(monData); // log first, since the dialog will update it's tool tips based on databse read.
 		newMonitorData(monData);
-		logTaskStatus(monData);
 		
 		long currentStart = primaryDataBlock.getCurrentViewDataStart();
 		long currentEnd = primaryDataBlock.getCurrentViewDataEnd();

@@ -1,6 +1,10 @@
 package offlineProcessing.logging;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.HashMap;
 
@@ -18,8 +22,10 @@ import generalDatabase.pamCursor.CursorFinder;
 import generalDatabase.pamCursor.PamCursor;
 import offlineProcessing.OfflineTask;
 import offlineProcessing.OfflineTaskGroup;
+import offlineProcessing.TaskActivity;
 import offlineProcessing.TaskGroupParams;
 import offlineProcessing.TaskMonitorData;
+import offlineProcessing.TaskStatus;
 
 /**
  * Handles logging of tasks to the database. 
@@ -32,9 +38,11 @@ public class TaskLogging {
 
 	private static TaskLogging taskLogging;
 	
+	public static final int TASK_NOTE_LENGTH = 80;
+	
 	private EmptyTableDefinition tableDef;
 	private PamTableItem utc, moduleType, moduleName, taskName, dataStart, dataEnd, runEnd,
-	completionCode; 
+	completionCode, note; 
 	
 	/**
 	 * Storage mostly to keep id's of last database index for each task. 
@@ -69,6 +77,7 @@ public class TaskLogging {
 		tableDef.addTableItem(dataEnd = new PamTableItem("DataEnd", Types.TIMESTAMP));
 		tableDef.addTableItem(runEnd = new PamTableItem("RunEnd", Types.TIMESTAMP));
 		tableDef.addTableItem(completionCode = new PamTableItem("CompletionCode", Types.CHAR, 20));
+		tableDef.addTableItem(note = new PamTableItem("Notes", Types.CHAR, TASK_NOTE_LENGTH));
 		
 		taskLoggingDataBlock = new TaskLoggingDataBlock();
 		
@@ -83,6 +92,7 @@ public class TaskLogging {
 		startTableDef.addTableItem(moduleName);
 		startTableDef.addTableItem(taskName);
 		startTableDef.addTableItem(dataStart);
+		startTableDef.addTableItem(note);
 //		startLogging = new StartLogging(taskLoggingDataBlock, startTableDef);
 		startCursorFinder = new CursorFinder();
 		
@@ -162,6 +172,77 @@ public class TaskLogging {
 		dataEnd.setValue(sqlTypes.getTimeStamp(monitorData.lastDataDate));
 		runEnd.setValue(sqlTypes.getTimeStamp(System.currentTimeMillis()));
 		completionCode.setValue(monitorData.taskStatus.toString());
+		note.setValue(groupParams.taskNote);
+	}
+	
+	/**
+	 * Get TaskMonitorData from the database cursor. 
+	 * @param taskGroup
+	 * @param task
+	 * @return
+	 */
+	private OldTaskData readTableData() {
+		SQLTypes sqlTypes = con.getSqlTypes();
+		long utc = SQLTypes.millisFromTimeStamp(this.utc.getValue());
+		String modType = moduleType.getDeblankedStringValue();
+		String modName = moduleName.getDeblankedStringValue();
+		String tskName = taskName.getDeblankedStringValue();
+		long dStart = SQLTypes.millisFromTimeStamp(dataStart.getValue());
+		long dEnd = SQLTypes.millisFromTimeStamp(dataEnd.getValue());
+		long procEnd = SQLTypes.millisFromTimeStamp(runEnd.getValue());
+		String compStatus = completionCode.getDeblankedStringValue();
+		TaskStatus status = null;
+		try {
+			status = TaskStatus.valueOf(TaskStatus.class, compStatus);
+		}
+		catch (IllegalArgumentException e) {
+			System.out.printf("Uknown completion code \"%s\" for task %s ended at %s\n", compStatus, tskName, PamCalendar.formatDateTime(dEnd));
+		}
+		String taskNote = note.getDeblankedStringValue();
+		OldTaskData monData = new OldTaskData(status, dStart, dEnd, utc, procEnd, taskNote);
+		return monData;
+	}
+	
+	/**
+	 * Get the last data for an offline task. 
+	 * @param taskGroup
+	 * @param task
+	 * @return
+	 */
+	public OldTaskData readLastTaskData(OfflineTaskGroup taskGroup, OfflineTask task) {
+		if (!checkConnection()) {
+			return null;
+		}
+		OldTaskData taskMonitorData = null;
+		String clause;
+		if (taskGroup == null) {
+			// only query on the task name (not good if there is more than one module with the same tasks)
+			clause = String.format(" WHERE TRIM(%s)='%s' ORDER BY Id DESC", taskName.getName(), task.getName());
+		}
+		else {
+			clause = String.format(" WHERE TRIM(%s)='%s' AND TRIM(%s)='%s' AND TRIM(%s)='%s' ORDER BY Id DESC", 
+					moduleType.getName(), task.getUnitType(),
+					moduleName.getName(), task.getUnitName(),
+					taskName.getName(), task.getName());
+		}
+		String selStr = tableDef.getSQLSelectString(con.getSqlTypes()) + clause;
+		try {
+			Statement selStmt = con.getConnection().createStatement();
+			ResultSet results = selStmt.executeQuery(selStr);
+			if (results.next()) {
+				for (int i = 0; i < tableDef.getTableItemCount(); i++) {
+					PamTableItem tableItem = tableDef.getTableItem(i);
+					tableItem.setValue(results.getObject(i+1));
+				}
+				taskMonitorData = readTableData();
+			}
+			selStmt.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return taskMonitorData;
 	}
 
 	private boolean logStart(OfflineTaskGroup taskGroup, OfflineTask task, TaskMonitorData monitorData) {
