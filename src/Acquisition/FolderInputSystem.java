@@ -79,7 +79,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings{
 
 	private FolderInputParameters folderInputParameters;
 	
-	public static final String GlobalWavFolderArg = "wavfilefolder";
+	public static final String GlobalWavFolderArg = "-wavfilefolder";
 
 
 	/**
@@ -652,6 +652,10 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings{
 		}
 		calculateETA();
 		setFolderProgress();
+		
+		if (currentFile > 0 && currentFile >= allFiles.size()) {
+			fileListComplete();
+		}
 //		System.out.println("FolderinputSytem: daqHasEnded");
 	}
 
