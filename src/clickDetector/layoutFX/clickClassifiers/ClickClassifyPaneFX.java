@@ -4,6 +4,7 @@ import org.controlsfx.glyphfont.Glyph;
 
 import clickDetector.ClickControl;
 import clickDetector.ClickParameters;
+import clickDetector.ClickClassifiers.ClickClassifierManager;
 import clickDetector.ClickClassifiers.ClickIdentifier;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -41,6 +42,7 @@ public class ClickClassifyPaneFX extends PamStackPane {
 	 */
 	private ClickControl clickControl;
 
+	
 	private CheckBox runOnlineCheckBox;
 
 	private CheckBox discardClicksCheckBox;
@@ -160,7 +162,11 @@ public class ClickClassifyPaneFX extends PamStackPane {
 		//set parameters - listener will do everything else.
 		currentClickIdentifier=clickControl.getClassifierManager().
 				getClassifier(clickParameters.clickClassifierType);
-		System.out.println("ClickClassifyPaneFX:setParams(): " +classifierComboBox.getSelectionModel().getSelectedIndex());
+		if (clickParameters.clickClassifierType == ClickClassifierManager.CLASSIFY_BASIC) {
+			
+		}
+		
+		//System.out.println("ClickClassifyPaneFX:setParams(): " +classifierComboBox.getSelectionModel().getSelectedIndex());
 		classifierComboBox.getSelectionModel().select(clickParameters.clickClassifierType);
 		//set classifier parameters
 		if (currentClickIdentifier!=null && currentClickIdentifier.getClassifierPane()!=null) {
@@ -171,7 +177,7 @@ public class ClickClassifyPaneFX extends PamStackPane {
 
 	public ClickParameters getParams(ClickParameters clickParameters){
 		//set all parameters in classifier. 
-		System.out.println("ClickClassifyPaneFX:getParams(): " +classifierComboBox.getSelectionModel().getSelectedIndex());
+		//System.out.println("ClickClassifyPaneFX:getParams(): " +classifierComboBox.getSelectionModel().getSelectedIndex());
 		
 		clickParameters.clickClassifierType=classifierComboBox.getSelectionModel().getSelectedIndex();
 		if (currentClickIdentifier != null && currentClickIdentifier.getClassifierPane() != null) {

@@ -639,3 +639,23 @@
 #module-pane .ikonli-font-icon {
     -fx-icon-color: black;
 }
+
+/*******************************************************************************
+ *                                                                             *
+ * Custom slider for volume controls                                           *
+ *                                                                             *
+ ******************************************************************************/
+#thickslider .track {
+    -fx-pref-height:14;
+    -fx-background-radius: 8;
+}
+
+#thickslider:vertical .track {
+    -fx-pref-width:12;
+    -fx-background-radius: 8;
+}
+
+#thickslider .thumb {
+    -fx-pref-height: 14;
+    -fx-pref-width: 14;
+}

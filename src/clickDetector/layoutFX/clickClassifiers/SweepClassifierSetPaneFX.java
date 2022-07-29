@@ -15,21 +15,23 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Priority;
 import javafx.scene.text.Font;
-import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamGridPane;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamSpinner;
-import pamViewFX.fxNodes.PamTitledPane;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
 import pamViewFX.fxNodes.picker.SymbolPicker;
 import pamViewFX.fxNodes.utilityPanes.FreqBandPane;
 import pamViewFX.fxNodes.utilityPanes.SimpleFilterPaneFX;
+import pamViewFX.PamGuiManagerFX;
+
+import org.controlsfx.control.ToggleSwitch;
 
 import PamController.SettingsPane;
 import clickDetector.ClickClassifiers.basicSweep.CodeHost;
@@ -38,6 +40,7 @@ import clickDetector.ClickClassifiers.basicSweep.SweepClassifierSet;
 
 /**
  * Pane which contains controls to change a SweepClassifierSet. 
+ * 
  * @author Jamie Macaulay
  *
  */
@@ -111,7 +114,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		
 		PamVBox holder=new PamVBox();
 		holder.setSpacing(10);
-		holder.setPadding(new Insets(10,5,5,40));
+		holder.setPadding(new Insets(10,0,0,0));
 
 		optionBox=new OptionsBox();
 		
@@ -139,6 +142,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		/**********Main Layout**************/
 		
 		TabPane tabPane= new TabPane(); 
+		tabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
 		tabPane.getTabs().addAll(waveformTab, spectrumTab); 
 					
 		holder.getChildren().add(optionBox);
@@ -153,12 +157,12 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 	 * @author Jamie Macaulay
 	 *
 	 */
-	private abstract class SweepBox extends PamTitledPane {
+	private abstract class SweepBox extends PamBorderPane {
 		
 		/**
 		 * Check box to enable pane
 		 */
-		private CheckBox enableBox;
+		private ToggleSwitch enableBox;
 		
 		/**
 		 * Border pane to hold content
@@ -167,41 +171,45 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		
 		
 		private Font disableFont;
+
+		private Label label;
 		
 
 		SweepBox(String borderTitle, Boolean enableButton) {
 			
 			//create holder pnae
 			borderPane=new PamBorderPane();
-			
+			this.setCenter(borderPane);
+
 			
 			if (borderTitle != null) {
-				//Label label=new Label(borderTitle); 
-				PamGuiManagerFX.titleFont2style(this);
-				//borderPane.setTop(label);
-				this.setText(borderTitle);
+				label=new Label(borderTitle); 
+				PamGuiManagerFX.titleFont2style(label);
+				this.setTop(label);
 			}
+			
 			if (enableButton) {
-				enableBox = new CheckBox("Enable");
-				PamVBox vBox=new PamVBox();
-				vBox.setPadding(new Insets(0,20,0,0));
-				vBox.setAlignment(Pos.CENTER);
-				vBox.getChildren().add(enableBox);
+				enableBox = new ToggleSwitch("");
+				//vBox.setPadding(new Insets(0,20,0,0));
 				enableBox.setTooltip(new Tooltip("Enable " + borderTitle + " measurements"));
-				
-				enableBox.setOnAction((action)->{
+
+				enableBox.selectedProperty().addListener((obsVal, oldVal, newVal)->{
 					disbleControls(!enableBox.isSelected());
 					
-					/**FIXME- this does not seem to work. If titlepane collapsed auto returns to white**/
-//					if (enableBox.isSelected()) this.setTextFill(Color.WHITE);
-//					else this.setTextFill(Color.GRAY);
-				});
+			});
 				
 				
-				borderPane.setLeft(vBox);
+//				setOnAction((action)->{
+//					disbleControls(!enableBox.isSelected());
+//					
+//					/**FIXME- this does not seem to work. If titlepane collapsed auto returns to white**/
+////					if (enableBox.isSelected()) this.setTextFill(Color.WHITE);
+////					else this.setTextFill(Color.GRAY);
+//				});								
+				//this.setDisable(!enableBox.isSelected());
 			}
-			this.setContent(borderPane);
-			/**Don't like this in old swing version*/ 
+			
+						/**Don't like this in old swing version*/ 
 			//tP.setCenter( description = new Label("", JLabel.CENTER));
 			//this.setTop(tP);
 		}
@@ -211,7 +219,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		 * @param desc - a description of the control
 		 */
 		protected void setDescription(String desc) {
-			this.setTooltip(new Tooltip(desc));
+			label.setTooltip(new Tooltip(desc));
 		}
 		
 //		private void showTopStrip() {
@@ -334,7 +342,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 			codeSpinner=new PamSpinner<Integer> (0, 500, 0, 1);
 			codeSpinner.setEditable(true);
-			codeSpinner.setPrefWidth(150);
+			//codeSpinner.setPrefWidth(150);
 			codeSpinner.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 			pamGridPane.add(codeSpinner, 4, 0);
 			
@@ -372,7 +380,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			
 			clickLengthSpinner=new PamSpinner<Integer>(4,102400,128,32); 
 			clickLengthSpinner.setEditable(true);
-			clickLengthSpinner.setPrefWidth(150);
+			//clickLengthSpinner.setPrefWidth(150);
 			clickLengthSpinner.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 			
 			clickCenterBox.getChildren().add(clickLengthSpinner);
@@ -494,7 +502,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		protected void setParams() {
 			//set sample rate. 
 			simpleFilterPane.setSampleRate(sweepClassifier.getClickDetector().getSampleRate());
-			simpleFilterPane.setParams(sweepClassifierSet.fftFilterParams);
+			if (sweepClassifierSet.fftFilterParams!=null) simpleFilterPane.setParams(sweepClassifierSet.fftFilterParams);
 
 			
 		}
@@ -558,7 +566,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 //			gridPane.add(new Label("Smoothing"),0,0); 
 			smoothing=new PamSpinner<Integer>(3,101,5,2); 
 			smoothing.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
-			smoothing.setPrefWidth(100);		
+			//smoothing.setPrefWidth(100);		
 //			gridPane.add(smoothing,1,0); 
 //			gridPane.add(new Label("bins (must be odd)"),2,0); 
 			
@@ -566,7 +574,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 //			gridPane.add(new Label("Threshold"),3,0); 
 			threshold=new PamSpinner<Double>(1., 300., 6.,1.);
 			threshold.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
-			threshold.setPrefWidth(100);
+			//threshold.setPrefWidth(100);
 //			gridPane.add(threshold,4,0); 
 //			gridPane.add(new Label("dB"),5,0); 
 			
@@ -583,12 +591,12 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			minLengthms=new PamSpinner<Double>(0.00, 1.00, 0.03,0.01);
 			minLengthms.setEditable(true);
 			minLengthms.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
-			minLengthms.setPrefWidth(130);
+			//minLengthms.setPrefWidth(130);
 						
 			maxLengthms=new PamSpinner<Double>(0.00, 1.00, 0.22,0.01);
 			maxLengthms.setEditable(true);
 			maxLengthms.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
-			maxLengthms.setPrefWidth(130);
+			//maxLengthms.setPrefWidth(130);
 
 		
 			PamHBox clickLengthHolder2=new PamHBox(); 

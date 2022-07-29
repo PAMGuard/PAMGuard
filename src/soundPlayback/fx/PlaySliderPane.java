@@ -3,6 +3,7 @@ package soundPlayback.fx;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
@@ -36,6 +37,7 @@ public abstract class PlaySliderPane extends PamHBox {
 		//setSliderSize();
 		
 		sliderLabel = new Label(); 
+		slider.setId("thickslider");
 		
 		HBox.setHgrow(slider, Priority.ALWAYS);
 		
@@ -43,6 +45,8 @@ public abstract class PlaySliderPane extends PamHBox {
 		this.setSpacing(5);
 		
 		slider.setTrackColor(Color.rgb(0,204,204));
+		slider.setTrackColor(Color.DODGERBLUE);
+		//slider.setTrackColor(Color.GRAY);
 		
 		this.getChildren().addAll(slider,sliderLabel);
 	}
@@ -62,7 +66,7 @@ public abstract class PlaySliderPane extends PamHBox {
 	/**
 	 * @return the slider
 	 */
-	public PamSlider getSlider() {
+	public Slider getSlider() {
 		return slider;
 	}
 
