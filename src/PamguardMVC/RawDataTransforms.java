@@ -178,7 +178,6 @@ public class RawDataTransforms {
 
 			return cData.magsq();
 		}
-
 	}
 
 	/**
