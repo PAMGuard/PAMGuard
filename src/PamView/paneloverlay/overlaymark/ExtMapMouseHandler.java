@@ -49,6 +49,11 @@ public class ExtMapMouseHandler extends ExtMouseAdapter {
 		this.compositePopupMenus = compositePopupMenus;
 	}
 	
+	/**
+	 * 
+	 * @param awtWindow
+	 * @param compositePopupMenus
+	 */
 	public ExtMapMouseHandler(Window awtWindow, boolean compositePopupMenus) {
 		this.awtWindow = awtWindow;
 		this.compositePopupMenus = compositePopupMenus;

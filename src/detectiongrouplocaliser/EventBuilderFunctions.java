@@ -4,6 +4,9 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
@@ -19,6 +22,7 @@ import PamView.PamSymbol;
 import PamView.paneloverlay.overlaymark.OverlayMark;
 import PamView.paneloverlay.overlaymark.OverlayMarkObserver;
 import PamView.paneloverlay.overlaymark.OverlayMarker;
+import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.debug.Debug;
 import javafx.scene.input.MouseEvent;
@@ -112,12 +116,13 @@ public class EventBuilderFunctions {
 	public JPopupMenu getPopupMenuItems(DetectionGroupSummary groupSummary) {
 		
 		//Debug.out.println("Detection Group Localiser Pop Up Options: " + groupSummary.getNumDataUnits()); 
-		
 		if (groupSummary == null || groupSummary.getNumDataUnits() == 0) {
 			noDataWarning.setEndOfLife(PamCalendar.getTimeInMillis() + 5000);
 			WarningSystem.getWarningSystem().addWarning(noDataWarning);
 			return null;
 		}
+
+		long currentTime = groupSummary.getFirstTimeMillis();
 		
 		JPopupMenu popMenu = new JPopupMenu(detectionGroupControl.getUnitName());
 		// get information about what's in the currently selected data units. 
@@ -163,17 +168,24 @@ public class EventBuilderFunctions {
 			popMenu.add(menuItem);
 			// now a submenu listing all other groups in memory ...
 			JMenu subMenu = new JMenu("Add to existing group");
+			int maxItems = 25; // if more than this, then limit to colsest ones. 
 			int nAdded = 0;
-			ListIterator<DetectionGroupDataUnit> gdIterator = gdDataBlock.getListIterator(0);
+//			ListIterator<DetectionGroupDataUnit> gdIterator = gdDataBlock.getListIterator(0);
+			ListIterator<DetectionGroupDataUnit> gdIterator = getGroupsForMenu(gdDataBlock, currentTime, maxItems);
 			while (gdIterator.hasNext()) {
 				DetectionGroupDataUnit gdUnit = gdIterator.next();
 //				if (superDets.contains(gdUnit)) {
 //					continue;
 //				}
-				String tit = String.format("Add %d %s to group with UID %d", groupSummary.getNumDataUnits(), dataName, gdUnit.getUID());
+				String tit = String.format("Add %d %s to group UID %d", groupSummary.getNumDataUnits(), dataName, 
+						gdUnit.getUID());
+				String tip = String.format("Group start %s, end %s", 
+						PamCalendar.formatDBDateTime(gdUnit.getTimeMilliseconds()),
+						PamCalendar.formatTime(gdUnit.getEndTimeInMilliseconds()));
 				Color detColor = PamColors.getInstance().getWhaleColor((int) gdUnit.getUID());
 				PamSymbol sym = new PamSymbol(detectionGroupControl.getSymbolforMenuItems(gdUnit));
 				menuItem = new JMenuItem(tit, sym);
+				menuItem.setToolTipText(tip);
 				menuItem.addActionListener(new AddToExisting(groupSummary, gdUnit));
 				subMenu.add(menuItem);
 				nAdded++;
@@ -200,6 +212,40 @@ public class EventBuilderFunctions {
 		}
 
 		return popMenu;
+	}
+	
+	/**
+	 * Get a shortened list of menu items for adding to the group. This is all a bit complicated
+	 * since there are often too many and we want the ones closest to our time. Therefore have
+	 * to mess about copying, sorting and relisting things. 
+	 * @param groupDataBlock
+	 * @param targetTime
+	 * @param maxEntries
+	 * @return
+	 */
+	private ListIterator<DetectionGroupDataUnit> getGroupsForMenu(DetectionGroupDataBlock groupDataBlock, long targetTime, int maxEntries) {
+		if (groupDataBlock.getUnitsCount() < maxEntries) {
+			return groupDataBlock.getListIterator(0);
+		}
+		ArrayList<DetectionGroupDataUnit> dataCopy = groupDataBlock.getDataCopy();
+		dataCopy.sort(new Comparator<DetectionGroupDataUnit>() {
+
+			@Override
+			public int compare(DetectionGroupDataUnit o1, DetectionGroupDataUnit o2) {
+				long t1 = Math.abs(o1.getTimeMilliseconds()-targetTime);
+				long t2 = Math.abs(o2.getTimeMilliseconds()-targetTime);
+				return (int) Math.signum((t1-t2));
+			}
+		});
+		// now reduce the size of the list to the allowed number
+		List<DetectionGroupDataUnit> dataCopy2 = dataCopy.subList(0, maxEntries-1);
+		dataCopy2.sort(new Comparator<DetectionGroupDataUnit>() {
+			@Override
+			public int compare(DetectionGroupDataUnit o1, DetectionGroupDataUnit o2) {
+				return (int) Math.signum(o1.getTimeMilliseconds()-o2.getTimeMilliseconds());
+			}
+		});
+		return dataCopy2.listIterator();
 	}
 
 	private class AddToExisting implements ActionListener {

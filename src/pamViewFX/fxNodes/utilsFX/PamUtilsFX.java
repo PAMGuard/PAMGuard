@@ -303,6 +303,10 @@ public class PamUtilsFX {
 		if (fxItem == null) {
 			return null;
 		}
+		String tip = swingItem.getToolTipText();
+		if (tip != null) {
+			fxItem.setUserData("Tip:" + tip);
+		}
 		// move over any action listeners from swing to fx. 
 		fxItem.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -383,6 +387,13 @@ public class PamUtilsFX {
 		}
 		if (jItem == null) {
 			return null;
+		}
+		Object userData = fxItem.getUserData();
+		if (userData instanceof String) {
+			String tip = (String) userData;
+			if (tip.startsWith("Tip:")) {
+				jItem.setToolTipText(tip.substring(4));
+			}
 		}
 		jItem.addActionListener(new ActionListener() {
 			@Override

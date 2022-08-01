@@ -238,7 +238,7 @@ public abstract class SuperDetLogging extends SQLLogging {
 	
 	/**
 	 * Modified view clause for super detections, may change the basic clause to either get absolutely
-	 * everything, or to get events that overlap with the load time, no tjust start within it (requires a 
+	 * everything, or to get events that overlap with the load time, not just start within it (requires a 
 	 * reference to an endtime column)
 	 * @param con
 	 * @param pamViewParameters
