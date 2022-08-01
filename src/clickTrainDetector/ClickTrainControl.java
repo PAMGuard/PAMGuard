@@ -246,7 +246,10 @@ public class ClickTrainControl extends PamControlledUnit implements PamSettings 
 		
 		this.ctLocalisationProcess.setTMlocParams(this.clickTrainParams); 
 		
-		this.getGUI(PamGUIManager.getGUIType()).notifyGUIChange(ClickTrainControl.NEW_PARAMS);
+		PamControlledUnitGUI gui = this.getGUI(PamGUIManager.getGUIType());
+		if (gui != null) {
+			gui.notifyGUIChange(ClickTrainControl.NEW_PARAMS);
+		}
 	}
 
 	/**
