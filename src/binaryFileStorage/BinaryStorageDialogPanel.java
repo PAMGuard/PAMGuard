@@ -191,6 +191,7 @@ public class BinaryStorageDialogPanel {
 		noiseStoreType.setSelectedItem(binaryStoreSettings.getNoiseStoreType());
 		
 		enableControls();
+		owner.pack();
 	}
 
 	/**
