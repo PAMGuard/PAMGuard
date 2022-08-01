@@ -122,7 +122,8 @@ public class SqliteSystem extends DBSystem implements PamSettings {
 		File newFile = new File(databaseName);
 		// if the file doesn't exit, consider creating it.
 		if (newFile.exists() == false) {
-			newFile = createNewDatabase(databaseName, null, true);
+			boolean ask = GlobalArguments.getParam(DBControl.GlobalDatabaseNameArg) == null;
+			newFile = createNewDatabase(databaseName, null, ask);
 			if (newFile == null) {
 				System.out.println("Unable to create "+newFile);
 				return;

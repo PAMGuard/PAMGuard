@@ -880,8 +880,9 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 			pamController.saveViewerData();
 		}
 
-		// deal with anything that needs sorting out in the realm of UID's. 
-		pamController.getUidManager().runShutDownOps();
+//		// deal with anything that needs sorting out in the realm of UID's.
+		// move this to pamController.pamClose()
+//		pamController.getUidManager().runShutDownOps();
 
 		// if the user doesn't want to save the config file, make sure they know
 		// that they'll lose any changes to the settings

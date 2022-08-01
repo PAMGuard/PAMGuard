@@ -32,6 +32,7 @@ public class NullGuiController implements PAMControllerGUI {
 	@Override
 	public void pamEnded() {
 		// TODO Auto-generated method stub
+		
 
 	}
 

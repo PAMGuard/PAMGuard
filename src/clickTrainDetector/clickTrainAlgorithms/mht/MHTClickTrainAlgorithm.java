@@ -12,6 +12,7 @@ import PamUtils.PamCalendar;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.debug.Debug;
 import clickTrainDetector.ClickTrainControl;
+import clickTrainDetector.ClickTrainDataBlock;
 import clickTrainDetector.TempCTDataUnit;
 import clickTrainDetector.CTDataUnit;
 import clickTrainDetector.clickTrainAlgorithms.CTAlgorithmInfo;
@@ -287,16 +288,19 @@ public class MHTClickTrainAlgorithm implements ClickTrainAlgorithm, PamSettings 
 	 */
 	private synchronized void grabUnconfirmedTrains(MHTAlgorithm mhtAlgorithm) {
 		
-		ListIterator<TempCTDataUnit> iterator  = clickTrainControl.getClickTrainProcess().getUnconfirmedCTDataBlock().getListIterator(0);
-		
-		//clear the data block
-		TempCTDataUnit tempCTUnit;
-		while (iterator.hasNext()) {
-			tempCTUnit = iterator.next(); 
-			tempCTUnit.removeAllSubDetections();
-			tempCTUnit.clearSubdetectionsRemoved();
+		ClickTrainDataBlock<TempCTDataUnit> unconfirmedBlock = clickTrainControl.getClickTrainProcess().getUnconfirmedCTDataBlock();
+		synchronized (unconfirmedBlock.getSynchLock()) {
+			ListIterator<TempCTDataUnit> iterator  = unconfirmedBlock.getListIterator(0);
+
+			//clear the data block
+			TempCTDataUnit tempCTUnit;
+			while (iterator.hasNext()) {
+				tempCTUnit = iterator.next(); 
+				tempCTUnit.removeAllSubDetections();
+				tempCTUnit.clearSubdetectionsRemoved();
+			}
+			unconfirmedBlock.clearAll(); 
 		}
-		clickTrainControl.getClickTrainProcess().getUnconfirmedCTDataBlock().clearAll(); 
 		
 		if (mhtAlgorithm.mhtKernal.getActiveTracks()==null) return;
 		

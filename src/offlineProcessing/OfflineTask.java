@@ -12,11 +12,13 @@ import generalDatabase.clauses.PAMSelectClause;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
+import PamController.PamControlledUnit;
 import PamController.PamViewParameters;
 import dataMap.OfflineDataMapPoint;
 
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import PamguardMVC.PamProcess;
 import PamguardMVC.superdet.SuperDetection;
 
 /**
@@ -45,21 +47,51 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 	 */
 	private PamDataBlock<T> parentDataBlock;
 
-	/**
-	 * Default constructor. Should no longer be used, but kept in case there are subclasses
-	 * of OfflineTask in other plugins. <br>
-	 * please use constructor 'public OfflineTask(PamDataBlock<T> parentDataBlock)' instead
-	 */
-	@Deprecated
-	public OfflineTask() {
-		super();
-	}
+//	/**
+//	 * Default constructor. Should no longer be used, but kept in case there are subclasses
+//	 * of OfflineTask in other plugins. <br>
+//	 * please use constructor 'public OfflineTask(PamDataBlock<T> parentDataBlock)' instead
+//	 */
+//	@Deprecated
+//	public OfflineTask() {
+//		super();
+//	}
 	/**
 	 * @param parentDataBlock
 	 */
 	public OfflineTask(PamDataBlock<T> parentDataBlock) {
 		super();
 		this.parentDataBlock = parentDataBlock;
+		/*
+		 *  every task is now going to be centrally registered in the offline task manager, but only
+		 *  if it has a PAMControlledUnit. Tasks can be identified in the database from the unit id
+		 *  information and the task name. 
+		 *  There may be a few teething problems with this if a task is created in the constructor of
+		 *  a PamProcess ? though it should by then know it's controlled unit I think. 
+		 */
+		PamControlledUnit parentControl = getTaskControlledUnit();
+		if (parentControl == null) {
+			System.out.printf("Offline task %d with datablock %s is not associated with a PAMGuard module\n", getName(), parentDataBlock);
+		}
+		else {
+			OfflineTaskManager.getManager().registerTask(this);
+		}
+		
+	}
+	
+	/**
+	 * Get the PAMControlled unit associated with a task. 
+	 * @return PAMControlled unit associated with a task. 
+	 */
+	public PamControlledUnit getTaskControlledUnit() {
+		if (parentDataBlock == null) {
+			return null;
+		}
+		PamProcess parentProcess = parentDataBlock.getParentProcess();
+		if (parentProcess == null) {
+			return null;
+		}
+		return parentProcess.getPamControlledUnit();
 	}
 
 	/**
@@ -96,6 +128,36 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 	 * @return a name for the task, to be displayed in the dialog. 
 	 */
 	abstract public String getName();
+	
+	/**
+	 * Get a unit type for the task. This is the unit type of 
+	 * the parent PAMGuard module. 
+	 * @return module name
+	 */
+	public String getUnitType() {
+		PamControlledUnit parentControl = getTaskControlledUnit();
+		if (parentControl == null) {
+			return "Unknown ModuleName";
+		}
+		else {
+			return parentControl.getUnitType();
+		}
+	}
+	
+	/**
+	 * Get a unit name for the task. This is the unit name of 
+	 * the parent PAMGuard module. 
+	 * @return module name
+	 */
+	public String getUnitName() {
+		PamControlledUnit parentControl = getTaskControlledUnit();
+		if (parentControl == null) {
+			return "Unknown ModuleName";
+		}
+		else {
+			return parentControl.getUnitName();
+		}
+	}
 
 	/**
 	 * task has settings which can be called

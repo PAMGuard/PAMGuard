@@ -21,7 +21,7 @@ public class BinaryStorageDialog extends PamDialog {
 		String help = "utilities.BinaryStore.docs.binarystore_overview";
 		setHelpPoint(help);
 
-		binaryStorageDialogPanel = new BinaryStorageDialogPanel(parentFrame, binaryStore.getClass() == SecondaryBinaryStore.class);
+		binaryStorageDialogPanel = new BinaryStorageDialogPanel(this, binaryStore.getClass() == SecondaryBinaryStore.class);
 		setDialogComponent(binaryStorageDialogPanel.getPanel());
 	}
 
