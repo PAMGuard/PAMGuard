@@ -56,7 +56,7 @@ public class Group3DLocaliserControl extends PamControlledUnit implements PamSet
 		 * only used in viewer, but no hard in creating it. 
 		 */
 		g3DOfflineTask = new Group3DOfflineTask(this);
-		addOfflineTask(g3DOfflineTask);
+//		addOfflineTask(g3DOfflineTask);
 	}
 
 	@Override

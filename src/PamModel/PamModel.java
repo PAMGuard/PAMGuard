@@ -392,11 +392,11 @@ final public class PamModel implements PamModelInterface, PamSettings {
 //			mi.setModulesMenuGroup(utilitiesGroup);
 //			mi.setHidden(SMRUEnable.isEnable() == false);
 
-			mi = PamModuleInfo.registerControlledUnit("offlineProcessing.OfflineProcessingControlledUnit", "Offline Processing");
-			mi.setModulesMenuGroup(utilitiesGroup);
-			mi.setMinNumber(0);
-			mi.setMaxNumber(1);
-			mi.setHidden(SMRUEnable.isEnable() == false);
+//			mi = PamModuleInfo.registerControlledUnit("offlineProcessing.OfflineProcessingControlledUnit", "Offline Processing");
+//			mi.setModulesMenuGroup(utilitiesGroup);
+//			mi.setMinNumber(0);
+//			mi.setMaxNumber(1);
+//			mi.setHidden(SMRUEnable.isEnable() == false);
 			
 
 			mi = PamModuleInfo.registerControlledUnit(TurbineOperationControl.class.getName(), TurbineOperationControl.unitType);

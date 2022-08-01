@@ -274,7 +274,7 @@
 	        <url>https://artifacts.unidata.ucar.edu/repository/unidata-all/</url>
 	    </repository>
 	    
-	    <!--  -->
+	    <!--  
 	    <repository>
 	        <snapshots>
 	            <enabled>false</enabled>
@@ -282,7 +282,7 @@
 	        <id>geomajas</id>
 	        <name>geomajas</name>
 	        <url>http://maven.geomajas.org/</url>
-	    </repository>
+	    </repository>-->
 	    
 	    <!-- Repo for Renjin Script Engine -->
 	    <repository>

@@ -599,7 +599,7 @@ public class ClicksOffline {
 		 * need click id and initial localisation information. 
 		 */
 //		offlineTaskGroup.addTasks(clickControl.getOfflineTasks());
-		OfflineTaskManager.addAvailableTasks(offlineTaskGroup, clickControl.getClickDataBlock());
+		OfflineTaskManager.getManager().addAvailableTasks(offlineTaskGroup, clickControl.getClickDataBlock());
 		OfflineSuperDetFilter sdf = OfflineSuperDetFilter.makeSuperDetFilter(clickControl.getClickDataBlock(), clickControl.getUnitName()+"SuperDetFilter");
 		offlineTaskGroup.setSuperDetectionFilter(sdf);
 //		offlineTaskGroup.addTask(new ClickTrainClass(clickControl)); // bad idea !

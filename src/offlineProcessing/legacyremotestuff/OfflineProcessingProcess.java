@@ -1,11 +1,12 @@
 /**
  * 
  */
-package offlineProcessing;
+package offlineProcessing.legacyremotestuff;
 
 import PamController.PamControlledUnit;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
+import offlineProcessing.OfflineTask;
 
 /**
  * @author GrahamWeatherup

@@ -22,7 +22,7 @@
 
 
 
-package offlineProcessing;
+package offlineProcessing.legacyremotestuff;
 
 import PamModel.PamDependency;
 import PamModel.PamPluginInterface;
