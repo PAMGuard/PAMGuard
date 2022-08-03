@@ -14,7 +14,9 @@ public class pamBuoyGlobals {
 //	public static Integer useGstreamer     = 0;
 //	public static boolean useNetworkCont   = false;
 	private static Integer networkControlPort = null;
+private static String multiportAddress;
 //	private static boolean useDSP = false;
+private static int muliportPort;
 
 	/**
 	 * @return the networkControlPort
@@ -28,6 +30,31 @@ public class pamBuoyGlobals {
 	 */
 	public static void setNetworkControlPort(Integer networkControlPort) {
 		pamBuoyGlobals.networkControlPort = networkControlPort;
+	}
+
+	/**
+	 * Set parameters for mulitport configutation.
+	 * @param mAddr
+	 * @param mPort
+	 */
+	public static void setMultiportConfig(String mAddr, int mPort) {
+		multiportAddress = mAddr;
+		muliportPort = mPort;
+		
+	}
+
+	/**
+	 * @return the multiportAddress
+	 */
+	public static String getMultiportAddress() {
+		return multiportAddress;
+	}
+
+	/**
+	 * @return the muliportPort
+	 */
+	public static int getMuliportPort() {
+		return muliportPort;
 	}
 	
 

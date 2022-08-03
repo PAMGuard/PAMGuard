@@ -212,7 +212,14 @@ public class Pamguard {
 					System.out.println("Running using settings from " + autoPsf);
 				}
 				else if (anArg.equalsIgnoreCase("-port")) {
+					// port id to open a udp port to receive commands
 					pamBuoyGlobals.setNetworkControlPort(Integer.parseInt(args[iArg++]));
+				}
+				else if (anArg.equalsIgnoreCase("-mport")) {
+					// multicast control (for multiple PAMGuards) 
+					String mAddr = args[iArg++];
+					int mPort = Integer.parseInt(args[iArg++]);
+					pamBuoyGlobals.setMultiportConfig(mAddr, mPort);
 				}
 				else if (anArg.equalsIgnoreCase("-nolog")) {
 					System.out.println("Disabling log file from command line switch...");

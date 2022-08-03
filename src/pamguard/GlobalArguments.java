@@ -24,10 +24,23 @@ public class GlobalArguments {
 	/**
 	 * Get a global parameter value
 	 * @param name value name
-	 * @return value
+	 * @return value in original String format
 	 */
 	public static String getParam(String name) {
 		return globalFlags.get(name);
+	}
+	
+	/**
+	 * Get a param read as an integer
+	 * @param name
+	 * @return value as integer or null if not set. Throws exception if invalid integer. 
+	 */
+	public static Integer getParamI(String name) {
+		String val = getParam(name);
+		if (val == null) {
+			return null;
+		}
+		return Integer.valueOf(val);
 	}
 	
 }
