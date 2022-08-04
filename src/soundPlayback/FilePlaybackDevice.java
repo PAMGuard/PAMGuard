@@ -1,6 +1,7 @@
 package soundPlayback;
 
 import PamDetection.RawDataUnit;
+import PamView.dialog.PamDialogPanel;
 
 /**
  * Interface to device types that can be used to play
@@ -66,5 +67,11 @@ public interface FilePlaybackDevice {
 	public PlayDeviceState getDeviceState();
 
 	public String getDeviceName();
+	
+	/**
+	 * Get a settings panel for additional options. Can be null. 
+	 * @return settings panel or null for additional options. 
+	 */
+	public PamDialogPanel getSettingsPanel();
 	
 }

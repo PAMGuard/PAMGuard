@@ -157,7 +157,10 @@ public abstract class OverlayDataManager<TOverlayInfoType extends OverlayDataInf
 	}
 
 	protected GeneralProjector getProjector() {
-		// TODO Auto-generated method stub
+		/**
+		 * Not 100% sure why, but this needs to return non-null if 
+		 * the overlay symbol and data select dialog is to be built correctly. 
+		 */
 		return null;
 	}
 

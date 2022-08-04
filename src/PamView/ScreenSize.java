@@ -10,6 +10,7 @@ import javax.swing.SwingUtilities;
 
 import com.sun.glass.ui.Screen;
 
+import PamController.PamGUIManager;
 import javafx.scene.layout.Pane;
 
 /**
@@ -138,40 +139,49 @@ public class ScreenSize {
 
 	private static Rectangle findScreenBounds() {
 		Rectangle virtualBounds = new Rectangle();
-		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-		GraphicsDevice[] gs =ge.getScreenDevices();
-		nScreens = gs.length;
-		screenDimensions = new Rectangle[nScreens];
-		for (int j = 0; j < gs.length; j++) { 
-			GraphicsDevice gd = gs[j];
-			//Think to get screen sizes on multiple monitors
-			//can just use getDefaultConfiguration for
-			//each device rather than looping over 
-			//all configurations. Hopefully should 
-			//let PAMGUARD start up a little quicker
-			//CJB 2009-06-15
-			GraphicsConfiguration dgc = gd.getDefaultConfiguration();
-//			System.out.printf("", dgc.getBufferCapabilities().)
-//			System.out.println(dgc);
-			screenDimensions[j] = dgc.getBounds();
-			virtualBounds = virtualBounds.union(dgc.getBounds());
-			
-		} 
-//		new Pane();
-//		List<Screen> screens = Screen.getScreens();
-//		if (screens != null) {
-//			for (Screen aScreen : screens) {
-//				System.out.printf("Screen resX %d, resY %d\n", 	
-//						aScreen.getResolutionX(),
-//						aScreen.getResolutionY());
-//			}
-//		}
+		if (PamGUIManager.getGUIType() == PamGUIManager.NOGUI) {
+			virtualBounds = new Rectangle(0,0,1024,768);
+			nScreens = 1;
+			screenDimensions = new Rectangle[nScreens];
+			screenDimensions[0] = virtualBounds;
+		}
+		else {
+
+			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+			GraphicsDevice[] gs =ge.getScreenDevices();
+			nScreens = gs.length;
+			screenDimensions = new Rectangle[nScreens];
+			for (int j = 0; j < gs.length; j++) { 
+				GraphicsDevice gd = gs[j];
+				//Think to get screen sizes on multiple monitors
+				//can just use getDefaultConfiguration for
+				//each device rather than looping over 
+				//all configurations. Hopefully should 
+				//let PAMGUARD start up a little quicker
+				//CJB 2009-06-15
+				GraphicsConfiguration dgc = gd.getDefaultConfiguration();
+				//			System.out.printf("", dgc.getBufferCapabilities().)
+				//			System.out.println(dgc);
+				screenDimensions[j] = dgc.getBounds();
+				virtualBounds = virtualBounds.union(dgc.getBounds());
+
+			} 
+		}
+		//		new Pane();
+		//		List<Screen> screens = Screen.getScreens();
+		//		if (screens != null) {
+		//			for (Screen aScreen : screens) {
+		//				System.out.printf("Screen resX %d, resY %d\n", 	
+		//						aScreen.getResolutionX(),
+		//						aScreen.getResolutionY());
+		//			}
+		//		}
 		//System.out.println("virtualBounds="+virtualBounds);
 		return virtualBounds;
 	}
 
-//	/**
-//	 * Thread to obtain the screen bounds. 
+	//	/**
+	//	 * Thread to obtain the screen bounds. 
 //	 * @author Doug
 //	 *
 //	 */

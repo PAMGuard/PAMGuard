@@ -44,7 +44,10 @@ public class PamWorker<T> {
 	 */
 	public PamWorker(PamWorkWrapper<T> pamWorkWrapper, Window parentFrame, int nTextRows, String title) {
 		this.pamWorkWrapper = pamWorkWrapper;
-		if (PamGUIManager.isFX()) {
+		if (PamGUIManager.getGUIType() == PamGUIManager.NOGUI) {
+			
+		}
+		else if (PamGUIManager.isFX()) {
 			//TODO - make a node that can be extracted here. 
 			pamWorkProgress = new PamWorkerProgressFX(); 
 		}

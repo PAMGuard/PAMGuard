@@ -3332,7 +3332,8 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			return false;
 		}
 		if (btDisplayParameters.VScale == BTDisplayParameters.DISPLAY_ICI) {
-			if (btDisplayParameters.showUnassignedICI == false && click.getICI() < 0) return false;
+//			if (btDisplayParameters.showUnassignedICI == false && click.getICI() < 0) return false;
+			if (btDisplayParameters.showUnassignedICI == false && click.getSuperDetectionsCount() <= 0) return false;
 			// otherwise may be ok, since will estimate all ici's on teh fly. 
 		}
 		if (btDisplayParameters.amplitudeSelect && click.getAmplitudeDB() < btDisplayParameters.minAmplitude) {

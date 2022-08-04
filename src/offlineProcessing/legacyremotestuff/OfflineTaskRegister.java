@@ -1,4 +1,4 @@
-package offlineProcessing;
+package offlineProcessing.legacyremotestuff;
 
 
 /**
@@ -8,6 +8,7 @@ package offlineProcessing;
  * @author Jamie Macaulay 
  *
  */
+@Deprecated // there is nothing in here which shouldn't be in OfflineTaskManager
 public class OfflineTaskRegister {
 	
 	/**

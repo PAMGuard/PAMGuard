@@ -16,6 +16,7 @@ import com.synthbot.jasiohost.AsioSampleType;
 import PamController.PamController;
 import PamDetection.RawDataUnit;
 import PamUtils.PamUtils;
+import PamView.dialog.PamDialogPanel;
 import PamguardMVC.PamConstants;
 import soundPlayback.FilePlayback;
 import soundPlayback.FilePlaybackDevice;
@@ -330,6 +331,12 @@ public class ASIOFilePlaybackSystem implements FilePlaybackDevice {
 	
 	@Override
 	public PlayDeviceState getDeviceState() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public PamDialogPanel getSettingsPanel() {
 		// TODO Auto-generated method stub
 		return null;
 	}
