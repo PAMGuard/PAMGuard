@@ -18,7 +18,7 @@ public class PamSpinner<T> extends Spinner<T>{
 	 * Default widths are way off in JavaFX for spinners. 
 	 */
 //	private static final double PAMSPINNER_PREF_WIDTH = USE_COMPUTED_SIZE;
-	private static final double PAMSPINNER_PREF_WIDTH = 90;
+	private static final double PAMSPINNER_PREF_WIDTH = 100;
 
 	public PamSpinner() {
 		super();

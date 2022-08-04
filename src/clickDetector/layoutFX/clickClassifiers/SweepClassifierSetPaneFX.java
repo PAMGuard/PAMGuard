@@ -28,10 +28,9 @@ import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
 import pamViewFX.fxNodes.picker.SymbolPicker;
 import pamViewFX.fxNodes.utilityPanes.FreqBandPane;
+import pamViewFX.fxNodes.utilityPanes.PamToggleSwitch;
 import pamViewFX.fxNodes.utilityPanes.SimpleFilterPaneFX;
 import pamViewFX.PamGuiManagerFX;
-
-import org.controlsfx.control.ToggleSwitch;
 
 import PamController.SettingsPane;
 import clickDetector.ClickClassifiers.basicSweep.CodeHost;
@@ -113,7 +112,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 	private Node createSweepPane(){
 		
 		PamVBox holder=new PamVBox();
-		holder.setSpacing(10);
+		holder.setSpacing(15);
 		holder.setPadding(new Insets(10,0,0,0));
 
 		optionBox=new OptionsBox();
@@ -121,6 +120,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		/*********Waveform Tab************/
 		Tab waveformTab=new Tab("Waveform"); 
 		PamVBox waveformHolder=new PamVBox(5); 
+		waveformHolder.setPadding(new Insets(10,0,0,0));
 		
 		clickLength=new ClickLengthBox(); 
 		filterBox=new FilterBox();
@@ -137,8 +137,9 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		energyBox=new EnergyBandBox();
 		freqBox=new FrequencySearchBlock();
 		spectrumHolder.getChildren().addAll(energyBox, freqBox); 
+		spectrumHolder.setPadding(new Insets(10,0,0,0));
 		spectrumTab.setContent(spectrumHolder);
-		
+
 		/**********Main Layout**************/
 		
 		TabPane tabPane= new TabPane(); 
@@ -162,7 +163,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		/**
 		 * Check box to enable pane
 		 */
-		private ToggleSwitch enableBox;
+		private PamToggleSwitch enableBox;
 		
 		/**
 		 * Border pane to hold content
@@ -176,40 +177,48 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		
 
 		SweepBox(String borderTitle, Boolean enableButton) {
-			
+
 			//create holder pnae
 			borderPane=new PamBorderPane();
 			this.setCenter(borderPane);
 
-			
+			PamHBox hBox = new PamHBox();
+			hBox.setSpacing(5);
+
+
 			if (borderTitle != null) {
 				label=new Label(borderTitle); 
+
 				PamGuiManagerFX.titleFont2style(label);
-				this.setTop(label);
+
+				hBox.getChildren().add(label);
 			}
-			
-			if (enableButton) {
-				enableBox = new ToggleSwitch("");
+
+			if (enableButton.booleanValue() == true) {
+
+				enableBox = new PamToggleSwitch("");
 				//vBox.setPadding(new Insets(0,20,0,0));
 				enableBox.setTooltip(new Tooltip("Enable " + borderTitle + " measurements"));
 
 				enableBox.selectedProperty().addListener((obsVal, oldVal, newVal)->{
 					disbleControls(!enableBox.isSelected());
-					
-			});
-				
-				
-//				setOnAction((action)->{
-//					disbleControls(!enableBox.isSelected());
-//					
-//					/**FIXME- this does not seem to work. If titlepane collapsed auto returns to white**/
-////					if (enableBox.isSelected()) this.setTextFill(Color.WHITE);
-////					else this.setTextFill(Color.GRAY);
-//				});								
+				});
+
+				hBox.getChildren().add(0,enableBox);
+
+				//				setOnAction((action)->{
+				//					disbleControls(!enableBox.isSelected());
+				//					
+				//					/**FIXME- this does not seem to work. If titlepane collapsed auto returns to white**/
+				//					if (enableBox.isSelected()) this.setTextFill(Color.WHITE);
+				//					else this.setTextFill(Color.GRAY);
+				//				});								
 				//this.setDisable(!enableBox.isSelected());
 			}
-			
-						/**Don't like this in old swing version*/ 
+
+			this.setTop(hBox);
+
+			/**Don't like this in old swing version*/ 
 			//tP.setCenter( description = new Label("", JLabel.CENTER));
 			//this.setTop(tP);
 		}
@@ -334,7 +343,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 			nameField=new TextField();
 			nameField.setPrefColumnCount(10);
-			pamGridPane.add(nameField, 1, 0);
+			pamGridPane.add(nameField, 0, 0);
 			PamGridPane.setColumnSpan(nameField, 2);
 
 			
@@ -344,15 +353,15 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			codeSpinner.setEditable(true);
 			//codeSpinner.setPrefWidth(150);
 			codeSpinner.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
-			pamGridPane.add(codeSpinner, 4, 0);
+			pamGridPane.add(codeSpinner, 1, 0);
 			
 //			pamGridPane.add(new Label("Symbol"), 0,1);
 			
 			//create colour picker to allow users to change symbol colour. 
 			symbolPicker=new SymbolPicker(); 
-			pamGridPane.add(symbolPicker, 6, 0);
+			pamGridPane.add(symbolPicker, 2, 0);
 			
-			pamGridPane.add(new Label("Symbol"), 5,0);
+			pamGridPane.add(new Label("Symbol"), 3,0);
 
 //			//create a button to allow users to change symbol shape. 
 //			symbolColour=new ColorPicker(); 
@@ -388,7 +397,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			clickCenterBox.getChildren().add(lengthMS=new Label("()")); 
 			clickCenterBox.getChildren().add(new Label("around click center.")); 
 			clickCenterBox.setAlignment(Pos.CENTER_LEFT);
-			PamGridPane.setColumnSpan(clickCenterBox, 7);
+			PamGridPane.setColumnSpan(clickCenterBox, 4);
 			PamGridPane.setHgrow(clickCenterBox, Priority.ALWAYS);
 			pamGridPane.add(clickCenterBox, 0,2);
 
@@ -760,9 +769,9 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 	 */
 	private class FrequencySearchBlock extends SweepBox {
 
-		private CheckBox peakFreqCheckBox;
-		private CheckBox peakWidthCheckBox;
-		private CheckBox meanFreqCheckBox;
+		private PamToggleSwitch peakFreqCheckBox;
+		private PamToggleSwitch peakWidthCheckBox;
+		private PamToggleSwitch meanFreqCheckBox;
 		
 		
 		/**
@@ -775,7 +784,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		private FreqBandPane meanFreq;
 
 		FrequencySearchBlock() {
-			super("Peak and Mean Frequency", false);
+			super("Peak and Mean Frequency", true);
 			this.getHolderPane().setCenter(createFreqSearchPane());
 		}
 		
@@ -804,8 +813,8 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 			
 			//peak frequency
-			peakFreqCheckBox=new CheckBox("Enable");
-			peakFreqCheckBox.setOnAction((action)->{
+			peakFreqCheckBox=new PamToggleSwitch("");
+			peakFreqCheckBox.selectedProperty().addListener((obsVal, oldVal, newVal)->{
 				peakFreqPane.setDisableFreqPane(!peakWidthCheckBox.isSelected());
 			});
 			
@@ -819,8 +828,8 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 					
 			
 			//peak width
-			peakWidthCheckBox=new CheckBox("Enable");
-			peakWidthCheckBox.setOnAction((action)->{
+			peakWidthCheckBox=new PamToggleSwitch("");
+			peakWidthCheckBox.selectedProperty().addListener((obsVal, oldVal, newVal)->{
 				//peakWidthPane.setDisable(!peakWidthCheckBox.isSelected());
 				peakWidthPane.setDisableFreqPane(!peakWidthCheckBox.isSelected());
 				threshold.setDisable(!peakWidthCheckBox.isSelected());
@@ -846,8 +855,8 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 			
 			//mean frequency
-			meanFreqCheckBox=new CheckBox("Enable");
-			meanFreqCheckBox.setOnAction((action)->{
+			meanFreqCheckBox=new PamToggleSwitch("");
+			meanFreqCheckBox.selectedProperty().addListener((obsVal, oldVal, newVal)->{
 				meanFreq.setDisableFreqPane(!peakWidthCheckBox.isSelected());
 			});
 			
