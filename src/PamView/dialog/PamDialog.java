@@ -40,6 +40,7 @@ import PamModel.SMRUEnable;
 import PamView.CancelObserver;
 import PamView.ClipboardCopier;
 import PamView.PamColors;
+import PamView.ScreenSize;
 import PamView.help.PamHelp;
 import gpl.GPLParameters;
 
@@ -149,6 +150,56 @@ abstract public class PamDialog extends JDialog {
 		}
 		catch (Exception e) {
 			return null;
+		}
+	}
+	
+	/**
+	 * Try to set the central location of the dialog at point
+	 * but also check entire dialog is on screen. 
+	 * @param point
+	 */
+	protected void setCentreLocation(Point point) {
+		if (point == null) {
+			return;
+		}
+		Rectangle dialogBounds = this.getBounds();
+		if (dialogBounds == null) {
+			return;
+		}
+		point.x -= dialogBounds.width/2;
+		point.y -= dialogBounds.height/2;
+		setCloseLocation(point);
+	}
+	
+	/**
+	 * Set a location as close as possible to the given point, but
+	 * ensure that the dialog stays in it's parent frame. 
+	 * If there isn't a parent frame, make sure it's at least on 
+	 * the screen. 
+	 * @param point
+	 */
+	protected void setCloseLocation(Point point) {
+		if (point == null) {
+			return;
+		}
+		try {
+			Rectangle frameRect = ScreenSize.getScreenBounds();
+			if (getOwner() != null) {
+				frameRect = getOwner().getBounds();
+			}
+			Rectangle dialogBounds = this.getBounds();
+			/*
+			 * Check max first, then min in case dialog is too big for screen. Ensures
+			 * top left will always be visible. 
+			 */
+			point.x = Math.min(point.x, frameRect.x+frameRect.width-dialogBounds.width);
+			point.x = Math.max(point.x, frameRect.x);
+			point.y = Math.min(point.y, frameRect.y+frameRect.height-dialogBounds.height);
+			point.y = Math.max(point.y, frameRect.y);
+			super.setLocation(point);
+		}
+		catch (Exception e) {
+			
 		}
 	}
 
