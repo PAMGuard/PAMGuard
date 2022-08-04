@@ -45,7 +45,7 @@ public class AnnotationDialog extends PamDialog {
 		
 		AnnotationDialog annotationDialog = new AnnotationDialog(parentFrame, dataAnnotationType, dataUnit);
 		if (positionInFrame != null) {
-			annotationDialog.setLocation(positionInFrame);
+			annotationDialog.setCentreLocation(positionInFrame);
 		}
 		annotationDialog.setParams();
 		annotationDialog.setVisible(true);
