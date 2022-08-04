@@ -2637,7 +2637,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 		int nDot = 0;
 		for (int i = 0; i < version.length(); i++) {
 			char ch = version.charAt(i);
-			if (Character.isDigit(ch) || (ch == '.' && nDot <= 1)) {
+			if (Character.isDigit(ch) || (ch == '.' && nDot == 0)) {
 				iLen++;
 				if (ch == '.') {
 					nDot++;
