@@ -262,7 +262,7 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 
 	protected void scrollToEvent(long timeMilliseconds) {
 		// start a it earlier. 
-		timeMilliseconds -= 5000;
+//		timeMilliseconds -= 5000;
 		//		now WTF - how do I tell every scroller to go to this point in time ? 
 		AbstractScrollManager scrollManager = AbstractScrollManager.getScrollManager();
 		scrollManager.startDataAt(detectionGroupDataBlock, timeMilliseconds);
