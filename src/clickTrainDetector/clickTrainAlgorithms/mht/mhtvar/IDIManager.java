@@ -536,6 +536,10 @@ public class IDIManager {
 		return (this.lastDetection.getTimeMilliseconds()- this.firstDetection.getTimeMilliseconds())/1000.;
 	}
 
+	public PamDataUnit getFirstDataUnit() {
+		return this.firstDetection;
+	}
+
 
 
 

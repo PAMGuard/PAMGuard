@@ -74,7 +74,7 @@ public class PlaybackFilter implements PlaybackPreprocess {
 	}
 	
 	public String getTextValue() {
-		System.out.println("Playback control Sample rate:  " + playbackControl.getSourceSampleRate() + " val: " + getValue());
+		//System.out.println("Playback control Sample rate:  " + playbackControl.getSourceSampleRate() + " val: " + getValue());
 		double f = getValue() * playbackControl.getSourceSampleRate();
 		if (f == 0) {
 			return "High pass filter off";

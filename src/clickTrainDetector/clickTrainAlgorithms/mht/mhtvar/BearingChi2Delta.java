@@ -141,7 +141,7 @@ public class BearingChi2Delta extends SimpleChi2VarDelta {
 
 			if (delta>bearingParams.maxBearingJump) {
 				//System.out.println("Hello!!!! Reverse Bearing");
-				chi2=chi2*StandardMHTChi2Params.JUNK_TRACK_PENALTY; 
+				chi2=chi2+StandardMHTChi2Params.JUNK_TRACK_PENALTY; 
 			}	
 		}
 

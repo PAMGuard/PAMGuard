@@ -158,10 +158,10 @@ public class MHTKernel<T> {
 			if (verbosity>0) {
 				Debug.out.println("Possiblity matrix size is " + possibleTracks.size() + " x " +  kcount );
 			}
-			//		for (int i=0; i<possibleTracks.size(); i++) {
-			//			System.out.println("Pos " + i +  " chi^2 "+ possibleTracks.get(i).chi2Track + 
-			//					"  " +  printBitSet(possibleTracks.get(i).trackBitSet) );
-			//		}
+//					for (int i=0; i<possibleTracks.size(); i++) {
+//						System.out.println("Pos " + i +  " chi^2 "+ possibleTracks.get(i).chi2Track.getChi2() + 
+//								"  " +  MHTKernel.bitSetString(possibleTracks.get(i).trackBitSet,kcount));
+//					}
 
 			//prune the probability matrix.
 			pruneProbMatrix(false);
@@ -412,6 +412,7 @@ public class MHTKernel<T> {
 					testBranch = newPossibleTracks.get(j); 
 					testBitSet=testBranch.trackBitSet.get(0, kcount-(pruneback));
 
+					
 					//now test whether the current and test branch are the same. 
 					if (testBitSet.equals(currentBitSet)) {
 						indexConfirm[j]=true; 
@@ -423,6 +424,7 @@ public class MHTKernel<T> {
 							indexRemove[j]=true; 	
 						}						
 					}
+					
 				}
 
 				//long time2a=System.currentTimeMillis();
@@ -437,9 +439,11 @@ public class MHTKernel<T> {
 				if (nCoasts>=this.mHTParams.maxCoast || confirmAll || currentBranch.flag==TrackBitSet.JUNK_TRACK) {
 					//the branch needs to be confirmed. 
 
-					//					System.out.println(i + " DONE: "+ String.format("%.3f 		", possibleTracks.get(i).chi2Track.getChi2())+
-					//							"  "  + String.format("%d 	", possibleTracks.get(i).chi2Track.getNCoasts())
-					//								+ MHTKernel.bitSetString(possibleTracks.get(i).trackBitSet, kcount));		
+//					System.out.println(i + " DONE: " + (nCoasts >= this.mHTParams.maxCoast) + "  " + confirmAll + "  "
+//							+ (currentBranch.flag == TrackBitSet.JUNK_TRACK) + " "
+//							+ String.format("%.3f 		", currentBranch.chi2Track.getChi2()) + "  "
+//							+ String.format("%d 	", currentBranch.chi2Track.getNCoasts())
+//							+ MHTKernel.bitSetString(currentBranch.trackBitSet, kcount));
 
 					/**
 					 * 27/02/2020
@@ -460,7 +464,7 @@ public class MHTKernel<T> {
 
 					//add confirmed track
 					confirmedTracks.add(currentBranch); 
-
+					
 					////					//if a branch is confirmed then all the tracks which include it's clicks must also be removed. 
 					////					//test the testBranch against all other branches. TODO - Is this the most efficient code -could add if statements to above loop?
 					for (int j=0; j<newPossibleTracks.size(); j++) {
@@ -471,6 +475,7 @@ public class MHTKernel<T> {
 							indexRemove[j]=true; 	
 						}					
 					}
+					
 				}
 				else {
 					//save as an active track. 
@@ -678,7 +683,7 @@ public class MHTKernel<T> {
 	/**
 	 * 
 	 * Set a new reference index and junk all data before that index. This can be
-	 * useful for long data sets to save memory once all click trains in preceeding
+	 * useful for long data sets to save memory once all click trains in preceding
 	 * data units have been detecteded. Note that the function deletes the currently
 	 * confirmed tracks. These should be extracted beforehand;
 	 * 

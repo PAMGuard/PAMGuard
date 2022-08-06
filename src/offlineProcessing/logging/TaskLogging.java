@@ -187,20 +187,31 @@ public class TaskLogging {
 		String modType = moduleType.getDeblankedStringValue();
 		String modName = moduleName.getDeblankedStringValue();
 		String tskName = taskName.getDeblankedStringValue();
-		long dStart = SQLTypes.millisFromTimeStamp(dataStart.getValue());
-		long dEnd = SQLTypes.millisFromTimeStamp(dataEnd.getValue());
-		long procEnd = SQLTypes.millisFromTimeStamp(runEnd.getValue());
+
+		Long dEnd = null, dStart = null, procEnd = null; 
+		dStart = SQLTypes.millisFromTimeStamp(dataStart.getValue());
+		dEnd = SQLTypes.millisFromTimeStamp(dataEnd.getValue());
+		procEnd = SQLTypes.millisFromTimeStamp(runEnd.getValue());
+		if (dStart==null && dEnd==null && procEnd==null) return null;
+		
 		String compStatus = completionCode.getDeblankedStringValue();
 		TaskStatus status = null;
+		if (compStatus==null) return null; 
 		try {
 			status = TaskStatus.valueOf(TaskStatus.class, compStatus);
 		}
 		catch (IllegalArgumentException e) {
 			System.out.printf("Uknown completion code \"%s\" for task %s ended at %s\n", compStatus, tskName, PamCalendar.formatDateTime(dEnd));
 		}
+		
 		String taskNote = note.getDeblankedStringValue();
-		OldTaskData monData = new OldTaskData(status, dStart, dEnd, utc, procEnd, taskNote);
-		return monData;
+		if (dStart!=null && dEnd!=null && procEnd!=null) {
+			OldTaskData monData = new OldTaskData(status, dStart, dEnd, utc, procEnd, taskNote);
+			return monData;
+		}
+		else {
+			return null;
+		}
 	}
 	
 	/**

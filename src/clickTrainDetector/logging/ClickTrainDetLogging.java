@@ -98,7 +98,7 @@ public class ClickTrainDetLogging extends SuperDetLogging {
 		//average spectrum
 		tableDef.addTableItem(avrg_Spectrum_max = new PamTableItem("avrg_spectrum_max", Types.DOUBLE)); 
 		tableDef.addTableItem(avrg_Spectrum = new PamTableItem("avrg_spectrum", Types.CHAR, 8*DEFAULT_SPECTRUM_LEN)); 
-		tableDef.addTableItem(classifiers = new PamTableItem("classifiers", Types.CHAR, 4096));
+		tableDef.addTableItem(classifiers = new PamTableItem("classifiers", Types.CHAR, 8128));
 
 		//a species flag, this is entirely for user convenience and is NOT read back - the species flag 
 		//is read from the JSON strings when reloading the data unit. If they end being different something has gone 
@@ -279,7 +279,9 @@ public class ClickTrainDetLogging extends SuperDetLogging {
 
 		//set the classifications. 
 		String classifiersData = classifiers.getStringValue();
-
+		
+		//FIXME
+		//System.out.println(classifiersData);
 
 		if (classifiersData!=null && classifiersData.length()>0) {
 			String[] classifiersDatas = classifiersData.split(JSON_DELIMITER);

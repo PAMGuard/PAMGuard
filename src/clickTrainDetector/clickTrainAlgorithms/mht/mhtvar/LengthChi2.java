@@ -16,7 +16,6 @@ public class LengthChi2 extends SimpleChi2Var {
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "Click Length";
 	}
 
@@ -44,7 +43,7 @@ public class LengthChi2 extends SimpleChi2Var {
 		//simpleChiVarParams.errLimits=new double[] {Double.MIN_VALUE, 100}; 
 		simpleChiVarParams.error=0.2;
 		simpleChiVarParams.minError=0.002;
-		simpleChiVarParams.errorScaleValue = SimpleChi2VarParams.SCALE_FACTOR_ICI; 
+		simpleChiVarParams.errorScaleValue = SimpleChi2VarParams.SCALE_FACTOR_ICI*10; 
 		return simpleChiVarParams; 
 	}
 	
