@@ -203,7 +203,6 @@ public class TaskLogging {
 		catch (IllegalArgumentException e) {
 			System.out.printf("Uknown completion code \"%s\" for task %s ended at %s\n", compStatus, tskName, PamCalendar.formatDateTime(dEnd));
 		}
-		
 		String taskNote = note.getDeblankedStringValue();
 		if (dStart!=null && dEnd!=null && procEnd!=null) {
 			OldTaskData monData = new OldTaskData(status, dStart, dEnd, utc, procEnd, taskNote);
