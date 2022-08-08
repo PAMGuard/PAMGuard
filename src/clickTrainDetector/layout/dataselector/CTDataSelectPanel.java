@@ -288,7 +288,7 @@ public class CTDataSelectPanel implements PamDialogPanel {
 			}
 			
 //			System.out.println("No. count: " + count);
-			currentParams.classifier = new int[count];  
+			currentParams.classifier = new int[count];  		
 			ArrayList<CTClassifier> classifiers = ctDataSelector.getClickControl().getClassifierManager().getCurrentClassifiers();
 			int used = 0;
 			for (int i=0; i<classifierCheckBoxes.length; i++) {

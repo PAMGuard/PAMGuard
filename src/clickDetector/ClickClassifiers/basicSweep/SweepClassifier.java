@@ -24,6 +24,7 @@ import clickDetector.ClickClassifiers.ClickIdentifier;
 import clickDetector.ClickClassifiers.ClickTypeCommonParams;
 import clickDetector.ClickClassifiers.basic.BasicClickIdentifier;
 import clickDetector.layoutFX.clickClassifiers.ClassifyPaneFX;
+import clickDetector.layoutFX.clickClassifiers.SweepClassifierPaneFX;
 
 /**
  * An improvements on the BasicClickIdentifier based on work by 
@@ -43,6 +44,9 @@ public class SweepClassifier implements ClickIdentifier , PamSettings {
 	private ClickControl clickControl;
 	
 	private SweepClassifierPanel dialogPanel;
+	
+	private SweepClassifierPaneFX fxPane;
+
 	
 	private SweepClassifierWorker sweepClassifierWorker;
 	
@@ -408,8 +412,8 @@ public class SweepClassifier implements ClickIdentifier , PamSettings {
 
 	@Override
 	public ClassifyPaneFX getClassifierPane() {
-		// TODO Auto-generated method stub
-		return null;
+		if (fxPane==null) fxPane = new SweepClassifierPaneFX(this, clickControl);
+		return fxPane;
 	}
 
 	@Override

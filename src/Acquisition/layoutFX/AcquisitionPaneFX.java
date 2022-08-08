@@ -26,6 +26,7 @@ import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamTextField;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.flipPane.FlipPane;
+import pamViewFX.fxNodes.flipPane.PamFlipPane;
 import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionParameters;
 import Acquisition.ChannelListPanel;
@@ -153,7 +154,7 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 		//create the flip pane. 
 		flipPane=new FlipPane(); 
 		flipPane.setFlipDirection(Orientation.HORIZONTAL);
-		flipPane.setFlipTime(250); //default is 700ms- way too high
+		flipPane.setFlipTime(PamFlipPane.FLIP_TIME); //default is 700ms- way too high
 		//flipPane.prefWidthProperty().bind(mainPane.widthProperty());
 
 		if (aquisitionControl.isViewer()){

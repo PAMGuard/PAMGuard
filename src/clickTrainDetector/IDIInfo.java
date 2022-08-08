@@ -5,6 +5,7 @@ import java.util.List;
 
 import PamUtils.PamArrayUtils;
 import PamguardMVC.PamDataUnit;
+import PamguardMVC.debug.Debug;
 
 /**
  * Holds some basic IDI info on the click train. 
@@ -47,7 +48,7 @@ public class IDIInfo {
 		lastNumber = dataUnits.size();
 
 		if (dataUnits.size()<3) {
-			System.out.println("CTDataUnit: Cannot calculate IDIInfo for less than three data units"); 
+			Debug.out.println("CTDataUnit: Cannot calculate IDIInfo for less than three data units"); 
 			return; 
 		}
 

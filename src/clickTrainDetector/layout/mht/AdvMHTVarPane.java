@@ -28,7 +28,7 @@ public class AdvMHTVarPane extends DynamicSettingsPane<SimpleChi2VarParams> {
 	/**
 	 * Default divisor of error for min error. 
 	 */
-	private static final Double ERROR_DIVISOR = 10000.0;
+	private static final Double ERROR_DIVISOR = 100.0;
 
 	/**
 	 * The main pane. 

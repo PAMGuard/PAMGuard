@@ -14,7 +14,8 @@ import pamViewFX.fxNodes.connectionPane.StandardConnectionNode;
 import pamViewFX.fxNodes.connectionPane.structures.ExtensionSocketStructure;
 
 /**
- * PAM extension structure
+ * PAM extension structure. The extension structure allows one parent to be split into multiple 
+ * children primarily a way to neaten up a data model display. 
  * 
  * @author Jamie Macaulay
  *
@@ -22,10 +23,11 @@ import pamViewFX.fxNodes.connectionPane.structures.ExtensionSocketStructure;
 public class PamExtensionStructure extends ExtensionSocketStructure implements PAMConnectionNode {
 
 	private PamStructureParams groupStructureParams;
-
-
+	
+	
 	public PamExtensionStructure(ConnectionPane connectionPane) {
 		super(connectionPane);
+		
 		groupStructureParams = new PamStructureParams(this); 
 
 		final ContextMenu contextMenu = new ContextMenu();
@@ -34,12 +36,17 @@ public class PamExtensionStructure extends ExtensionSocketStructure implements P
 		paste.setOnAction((action)->{
 			removeStructure(); 
 		});
-
-		this.getConnectionNodeBody().setOnMousePressed((event)->{
+		
+		
+		//this is a bit of a hack. We can't add this to the main connection body because 
+		//it is already used for dragging. So instead at to the circle within the connection group. The event is registered
+		//by both the group and the circle. 
+		circle.setOnMousePressed((event)->{
 			if (event.isSecondaryButtonDown()) {
 				contextMenu.show(this.getConnectionNodeBody(), event.getScreenX(), event.getScreenY());
 			}
 		});
+
 
 	}
 

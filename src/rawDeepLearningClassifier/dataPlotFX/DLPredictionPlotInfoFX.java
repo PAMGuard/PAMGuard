@@ -307,7 +307,13 @@ public class DLPredictionPlotInfoFX extends GenericLinePlotInfo {
 	@Override
 	public double[][] getDetData(PamDataUnit pamDataUnit) {
 		double[] data = PamArrayUtils.float2Double(((DLDataUnit) pamDataUnit).getPredicitionResult().getPrediction());
-		return new double[][] {data};
+		
+		double[][] dataD = new double[data.length][]; 
+		for (int i=0; i<data.length; i++) {
+			dataD[i] = new double[] {data[i]};
+		}
+		
+		return dataD;
 	}
 
 }

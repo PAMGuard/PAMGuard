@@ -71,7 +71,7 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 		 */
 		PamControlledUnit parentControl = getTaskControlledUnit();
 		if (parentControl == null) {
-			System.out.printf("Offline task %d with datablock %s is not associated with a PAMGuard module\n", getName(), parentDataBlock);
+			System.out.printf("Offline task %s with datablock %s is not associated with a PAMGuard module\n", getName(), parentDataBlock==null ?  "null": parentDataBlock.getDataName());
 		}
 		else {
 			OfflineTaskManager.getManager().registerTask(this);

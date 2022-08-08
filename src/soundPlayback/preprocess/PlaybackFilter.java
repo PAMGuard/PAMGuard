@@ -12,6 +12,8 @@ import PamUtils.FrequencyFormat;
 import PamUtils.PamUtils;
 import soundPlayback.PlaybackControl;
 import soundPlayback.PlaybackParameters;
+import soundPlayback.fx.FilterSidePane;
+import soundPlayback.fx.PlayDecimatorSidePane;
 import soundPlayback.swing.PlayFilterSideBar;
 
 /**
@@ -30,6 +32,8 @@ public class PlaybackFilter implements PlaybackPreprocess {
 	private Filter[] filters;
 	
 	private PlayFilterSideBar playFilterSideBar;
+
+	private FilterSidePane filterSidePane;
 
 	public PlaybackFilter(PlaybackControl playbackControl) {
 		this.playbackControl = playbackControl;
@@ -70,6 +74,7 @@ public class PlaybackFilter implements PlaybackPreprocess {
 	}
 	
 	public String getTextValue() {
+		//System.out.println("Playback control Sample rate:  " + playbackControl.getSourceSampleRate() + " val: " + getValue());
 		double f = getValue() * playbackControl.getSourceSampleRate();
 		if (f == 0) {
 			return "High pass filter off";
@@ -114,8 +119,10 @@ public class PlaybackFilter implements PlaybackPreprocess {
 
 	@Override
 	public PreProcessFXPane getSideParPane() {
-		// TODO Auto-generated method stub
-		return null;
+		if (filterSidePane==null) {
+			filterSidePane = new FilterSidePane(this);
+		}
+		return filterSidePane;
 	}
 
 }

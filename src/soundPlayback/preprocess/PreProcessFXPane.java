@@ -1,5 +1,7 @@
 package soundPlayback.preprocess;
 
+import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 
 /**
@@ -20,5 +22,15 @@ public interface PreProcessFXPane {
 	 * changed somewhere else. 
 	 */
 	public void update();
+	
+	/**
+	 * Pane which shows the name of the pre-process. 
+	 */
+	public Node getLabel();
+	
+	/**
+	 * Pane which allows the user to switch to a default. 
+	 */
+	public Node getDefaultButton();
 	
 }

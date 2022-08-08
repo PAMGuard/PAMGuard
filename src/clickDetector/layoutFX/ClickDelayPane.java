@@ -194,8 +194,8 @@ public class ClickDelayPane extends SettingsPane<ClickParameters> {
 	public ClickParameters getParams(ClickParameters clickParameters) {
 		if (clickParameters==null) return null; 
 		
-		if (delayParams[0] == null) {
-			return null;
+		if (delayParams==null || delayParams[0] == null) {
+			return clickParameters;
 		}
 		clickParameters.setDelayMeasurementParams(0, delayParams[0]);
 		for (int i = 1; i < typesList.length; i++) {

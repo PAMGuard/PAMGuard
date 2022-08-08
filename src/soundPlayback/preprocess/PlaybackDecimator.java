@@ -11,6 +11,7 @@ import soundPlayback.PBSampleRateData;
 import soundPlayback.PlaybackControl;
 import soundPlayback.PlaybackParameters;
 import soundPlayback.PlaybackProcess;
+import soundPlayback.fx.PlayDecimatorSidePane;
 import soundPlayback.swing.DecimatorSideBar;
 
 public class PlaybackDecimator implements PlaybackPreprocess {
@@ -22,6 +23,8 @@ public class PlaybackDecimator implements PlaybackPreprocess {
 	private PlaybackControl playbackControl;
 	
 	private DecimatorSideBar decimatorSideBar;
+
+	private PlayDecimatorSidePane playDecimatorSidePane;
 	
 	public PlaybackDecimator(PlaybackControl playbackControl) {
 		this.playbackControl = playbackControl;
@@ -72,7 +75,9 @@ public class PlaybackDecimator implements PlaybackPreprocess {
 
 	@Override
 	public PreProcessFXPane getSideParPane() {
-		// TODO Auto-generated method stub
-		return null;
+		if (playDecimatorSidePane==null) {
+			playDecimatorSidePane = new PlayDecimatorSidePane(this);
+		}
+		return playDecimatorSidePane;
 	}
 }

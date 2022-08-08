@@ -7,9 +7,9 @@ package soundPlayback.fx;
  */
 public class PlayGainSlider extends PlaySliderPane {
 	
-	private static final int MINGAIN = -20;
+	static final int MINGAIN = -20;
 	
-	private static final int MAXGAIN = 60;
+	static final int MAXGAIN = 60;
 	
 	
 	public PlayGainSlider() {
@@ -25,5 +25,6 @@ public class PlayGainSlider extends PlaySliderPane {
 	public double getMaxValue() {
 		return MAXGAIN;
 	}
+
 
 }

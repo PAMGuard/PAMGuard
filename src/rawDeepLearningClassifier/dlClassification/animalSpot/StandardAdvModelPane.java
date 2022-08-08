@@ -72,7 +72,8 @@ public class StandardAdvModelPane extends SettingsPane<StandardModelParams> {
 		
 		defaultTogglePane = createTogglePane(); 
 		transfromPane = new DLImageTransformPane(); 
-		mainPane.setPadding(new Insets(5,5,5,5));
+		mainPane.setPadding(new Insets(2,2,2,2));
+		mainPane.setPrefWidth(400);
 		
 	}
 	

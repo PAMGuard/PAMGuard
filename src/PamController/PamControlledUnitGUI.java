@@ -17,7 +17,7 @@ public abstract class PamControlledUnitGUI {
 	public abstract int getGUIFlag();
 	
 	/**
-	 * Allows the GUI to be notified of changes, e.g. in the PAMControlle.r 
+	 * Allows the GUI to be notified of changes, e.g. in the PAMController
 	 * @param flag - the change flag. 
 	 */
 	public void notifyGUIChange(int flag) {

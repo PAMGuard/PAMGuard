@@ -70,11 +70,13 @@ public class MHTGarbageBot {
 		double maxICI = mhtKernel.getMHTParams().maxCoast * mhtKernel.getMHTChi2Provider().getChi2Params().maxICI; 
 		
 		//check the current set of click train possible ICI's 
-				
+		
+		//Debug.out.println("MHTGARBAGEBOT: maxICI " + maxICI + "  " + iciPrev); 
+		
 		//we have reached the hard limit. Save click trains, wipe the detector and start again. 
 		if (mhtKernel.getKCount()>mhtKernel.getMHTParams().nPruneBackStart && (iciPrev>maxICI || mhtKernel.getKCount()>DETECTION_HARD_LIMIT)) {
 			
-//			Debug.out.println("MHTGarbageBot: KERNEL HARD LIMIT"); 
+			//Debug.out.println("MHTGARBAGEBOT: KERNEL HARD LIMIT"); 
 			//check whether the next click has a gap so big that all click trains should be restarted 			
 			//grab tracks
 			mhtKernel.confirmRemainingTracks();

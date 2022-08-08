@@ -31,7 +31,6 @@ public class SimpleCTClassification implements CTClassification {
 
 	@Override
 	public String getSummaryString() {
-		// TODO Auto-generated method stub
 		return "SimpleClssf: SpeciesID: " + speciesID + " ClassifierType: " + classifierType;
 	}
 
