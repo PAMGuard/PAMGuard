@@ -1748,23 +1748,47 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 			int topBorder, bottomBorder;
 			Color borderColour = Color.BLACK;
 			synchronized (innerPanelSynchObject) {
+				/*
+				 * Update code August 2022 so it only creates and destroys
+				 * panels if the number of panels has changed. 
+				 */			
+				int nOld = 0;
+				int nNew =spectrogramParameters.nPanels; 
 				if (spectrogramPanels != null) {
-					for (int i = 0; i < spectrogramPanels.length; i++) {
-						if (spectrogramPanels[i] != null) {
+					nOld = spectrogramPanels.length;
+					if (nNew < nOld) {
+						for (int i = nNew; i < nOld; i++) {
 							spectrogramPanels[i].destroyPanel();
 						}
+						spectrogramPanels = Arrays.copyOf(spectrogramPanels, nNew);
 					}
+//					for (int i = 0; i < spectrogramPanels.length; i++) {
+//						if (spectrogramPanels[i] != null) {
+//							spectrogramPanels[i].destroyPanel();
+//						}
+//					}
 				}
-				spectrogramPanels = new SpectrogramPanel[spectrogramParameters.nPanels];
-				//popupListener = new PopupListener();
-				nPanels = spectrogramParameters.nPanels;
-				for (int i = 0; i < nPanels; i++) {
+				if (spectrogramPanels == null) {
+					spectrogramPanels = new SpectrogramPanel[spectrogramParameters.nPanels];
+				}
+				else if (nOld != nNew) {
+					spectrogramPanels = Arrays.copyOf(spectrogramPanels, nNew);
+				}
+				for (int i = nOld; i < nNew; i++) {
+					spectrogramPanels[i] = new SpectrogramPanel(spectrogramDisplay, i);
+				}
+//				//popupListener = new PopupListener();
+//				nPanels = spectrogramParameters.nPanels;
+				for (int i = 0; i < nNew; i++) {
 					PamPanel panelBorder = new PamPanel(new BorderLayout());
+					if (spectrogramPanels[i].getParent() != null) {
+						// remove from any previous panel parent if it's being reused. 
+						spectrogramPanels[i].getParent().remove(spectrogramPanels[i]);
+					}
 					topBorder = 1;
 					bottomBorder = 0;
 					if (i == 0) topBorder = 0;
 					if (i == spectrogramParameters.nPanels-1) bottomBorder = 0;
-					spectrogramPanels[i] = new SpectrogramPanel(spectrogramDisplay, i);
 					panelBorder.setBorder((BorderFactory.createEmptyBorder(topBorder,0,bottomBorder,0)));
 					panelBorder.add(BorderLayout.CENTER, spectrogramPanels[i]);
 					add(panelBorder);
