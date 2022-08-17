@@ -133,11 +133,14 @@ public class ClickTrainDetLogging extends SuperDetLogging {
 
 			String classificationData =  getClassifierData(ctDataUnit); 
 
-			//			Debug.out.println("Classifier Save: " + classificationData);
+			System.out.println("Classifier Save: " + classificationData);
 
 			if (classificationData.length()>0) {
-				classifiers.setLength(classificationData.length());
+				//classifiers.setLength(classificationData.length());
 				classifiers.setValue(classificationData);
+			}
+			else {
+				classifiers.setValue(null);
 			}
 
 			if (ctDataUnit.getClassificationIndex()>=0) {
@@ -301,8 +304,8 @@ public class ClickTrainDetLogging extends SuperDetLogging {
 					}
 				}
 				catch (Exception e) {
-					Debug.err.println("ClickTrainDetLogging: BAD JSON CLASSIFIER STRING: " + classifiersDatas[i]);
-					Debug.err.println(classifiersData);
+					System.err.println("ClickTrainDetLogging: BAD JSON CLASSIFIER STRING: " + classifiersDatas[i]);
+					System.err.println(classifiersData);
 					e.printStackTrace();
 				}
 			}
