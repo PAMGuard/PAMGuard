@@ -2629,17 +2629,44 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 */
 	static double getVersion () {
 		String version = System.getProperty("java.version");
-		int pos = version.indexOf('.');		// get the index of the first decimal
-		if (pos==-1) {						// if there is no decimal place (e.g. Java 13) then just use the full string
-			pos=version.length();
-		}
-		else {
-			pos = version.indexOf('.', pos+1);	// get the position of the second decimal
-			if (pos==-1) {						// if there is no second decimal place (e.g. Java 12.0) then just use the full string
-				pos=version.length();
+		/*
+		 *  strip down to the first non numeric character. and allow 0 or 1 decimal points.
+		 *  This should pull out any valid decimal number from the front of the string.  
+		 */
+		int iLen = 0;
+		int nDot = 0;
+		for (int i = 0; i < version.length(); i++) {
+			char ch = version.charAt(i);
+			if (Character.isDigit(ch) || (ch == '.' && nDot == 0)) {
+				iLen++;
+				if (ch == '.') {
+					nDot++;
+				}
 			}
+			else {
+				break;
+			};
 		}
-		return Double.parseDouble (version.substring (0, pos));
+		
+//		int pos = version.indexOf('.');		// get the index of the first decimal
+//		if (pos==-1) {						// if there is no decimal place (e.g. Java 13) then just use the full string
+//			pos=version.length();
+//		}
+//		else {
+//			pos = version.indexOf('.', pos+1);	// get the position of the second decimal
+//			if (pos==-1) {						// if there is no second decimal place (e.g. Java 12.0) then just use the full string
+//				pos=version.length();
+//			}
+//		}
+		double mainVersion = 0;
+		try {
+			mainVersion = Double.parseDouble (version.substring (0, iLen));
+		}
+		catch (NumberFormatException e) {
+			
+		}
+		
+		return mainVersion;
 	}
 
 	/**

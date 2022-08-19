@@ -238,7 +238,8 @@ public class PamObservable {//extends PanelOverlayDraw {
 		 * instance of any observer
 		 */
 //		synchronized (pamObservers) {
-			while (pamObservers.remove(o));
+		boolean removed = false;
+			while (removed = pamObservers.remove(o));
 			PamObserver threadedObserver = findThreadedObserver(o);
 			if (threadedObserver != null) {
 				deleteObserver(threadedObserver);
@@ -247,7 +248,14 @@ public class PamObservable {//extends PanelOverlayDraw {
 					tObs.terminateThread();
 				}
 			}
-			while (instantObservers.remove(o));
+			while (removed = instantObservers.remove(o));
+//			if (removed && o != null) {
+//				String name = this.toString();
+//				if (this instanceof PamDataBlock) {
+//					name = ((PamDataBlock) this).getLongDataName();
+//				}
+//				System.out.printf("Datablock %s removed observer %s\n", this.toString(), o.getObserverName());
+//			}
 //		}
 		//		o.removeObservable(this);
 	}
@@ -263,7 +271,7 @@ public class PamObservable {//extends PanelOverlayDraw {
 	}
 
 	/**
-	 * @return Count of PamObservers subscribing to this observable
+	 * @return Count of PamObservers subscribing to this observable including instant and rethreaded
 	 */
 	public int countObservers() {
 		synchronized (pamObservers) {
