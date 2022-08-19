@@ -39,7 +39,6 @@ import rawDeepLearningClassifier.layoutFX.exampleSounds.ExampleSoundFactory.Exam
  */
 public abstract class DLTransformImage extends PamBorderPane{
 
-
 	/**
 	 * Plot pane. 
 	 */
@@ -70,7 +69,6 @@ public abstract class DLTransformImage extends PamBorderPane{
 	 */
 	private SpectrogramImage specImage = null; 
 
-
 	/**
 	 * The current 1D transform data. 
 	 */
@@ -97,7 +95,7 @@ public abstract class DLTransformImage extends PamBorderPane{
 	private RangeSlider timeSlider;
 
 	/**
-	 * tIME BINS. 
+	 * Time bins.
 	 */
 	private int[] timeBins = new int[2];
 
@@ -139,6 +137,7 @@ public abstract class DLTransformImage extends PamBorderPane{
 			plotPane.repaint();
 		});
 		transformschoiceBox.setConverter(new DLTransformConverter());
+		transformschoiceBox.setPrefWidth(170); 
 
 		plotPane.getPlotCanvas().widthProperty().addListener((obsval, oldval, newval)->{
 			plotPane.repaint();
@@ -174,6 +173,7 @@ public abstract class DLTransformImage extends PamBorderPane{
 			updateExampleSound(newval); 
 		});
 		speciesChoiceBox.getSelectionModel().select(0);
+		speciesChoiceBox.setPrefWidth(170); 
 
 		PamHBox hBox = new PamHBox(); 
 		hBox.setAlignment(Pos.CENTER_RIGHT);

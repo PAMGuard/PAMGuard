@@ -13,41 +13,55 @@ import javafx.util.StringConverter;
  */
 public class PamSpinner<T> extends Spinner<T>{
 
+	
+	/**
+	 * Default widths are way off in JavaFX for spinners. 
+	 */
+//	private static final double PAMSPINNER_PREF_WIDTH = USE_COMPUTED_SIZE;
+	private static final double PAMSPINNER_PREF_WIDTH = 100;
+
 	public PamSpinner() {
 		super();
+		this.setPrefWidth(PAMSPINNER_PREF_WIDTH);
 		// TODO Auto-generated constructor stub
 	}
 
 
 	public PamSpinner(double min, double max, double initialValue, double amountToStepBy) {
 		super(min, max, initialValue, amountToStepBy);
+		this.setPrefWidth(PAMSPINNER_PREF_WIDTH);
 		addDefocusConverter();
 	}
 
 
 	public PamSpinner(double min, double max, double initialValue) {
 		super(min, max, initialValue);
+		this.setPrefWidth(PAMSPINNER_PREF_WIDTH);
 		addDefocusConverter();
 	}
 
 	public PamSpinner(int min, int max, int initialValue, int amountToStepBy) {
 		super(min, max, initialValue, amountToStepBy);
+		this.setPrefWidth(PAMSPINNER_PREF_WIDTH);
 		addDefocusConverter();
 	}
 
 	public PamSpinner(int min, int max, int initialValue) {
 		super(min, max, initialValue);
+		this.setPrefWidth(PAMSPINNER_PREF_WIDTH);
 		addDefocusConverter();
 	}
 
 	public PamSpinner(ObservableList<T> arg0) {
 		super(arg0);
+		this.setPrefWidth(PAMSPINNER_PREF_WIDTH);
 		addDefocusConverter();
 	}
 
 	public PamSpinner(SpinnerValueFactory<T> arg0) {
 		super(arg0);
 		addDefocusConverter();
+		this.setPrefWidth(PAMSPINNER_PREF_WIDTH);
 	}
 	
 	/**

@@ -5,6 +5,7 @@ import java.util.BitSet;
 
 import PamUtils.PamArrayUtils;
 import PamguardMVC.PamDataUnit;
+import PamguardMVC.debug.Debug;
 import clickTrainDetector.clickTrainAlgorithms.CTAlgorithmInfo;
 import clickTrainDetector.clickTrainAlgorithms.mht.electricalNoiseFilter.ElectricalNoiseFilter;
 import clickTrainDetector.clickTrainAlgorithms.mht.electricalNoiseFilter.SimpleElectricalNoiseFilter;
@@ -225,16 +226,17 @@ public class StandardMHTChi2 implements MHTChi2<PamDataUnit>, Cloneable {
 			getIDIManager().setForceCalc(true);
 			this.lastIDIData = getIDIManager().getIDIStruct(bitSet);
 			
-						
 			//System.out.println("Time diff: " + lastIDIData.timeDiff + "  " + lastIDIData.medianIDI); 
 			
 			nCoasts=(int) Math.floor(lastIDIData.timeDiff/Math.abs(lastIDIData.medianIDI)); 
 		}
 		else if (bitcount==1) {
 			//this stops a single units being stuck in the back of the probability matrix. 
-			nCoasts = (int) Math.floor((newdataUnit.getTimeMilliseconds()/1000.
-					-getIDIManager().getLastTime(bitSet)/this.getChi2Params().maxICI)); 
+			nCoasts = (int) Math.floor(((newdataUnit.getTimeMilliseconds()-getIDIManager().getFirstDataUnit().getTimeMilliseconds())/1000.
+					-getIDIManager().getLastTime(bitSet))/this.getChi2Params().maxICI); 
 		}
+		
+		//System.out.println("nCoasts: " + nCoasts); 
 
 		return nCoasts;
 	}
@@ -332,6 +334,8 @@ public class StandardMHTChi2 implements MHTChi2<PamDataUnit>, Cloneable {
 			
 			double totalTracktime = PamArrayUtils.sum(lastIDIData.idiSeries); 
 			
+			//System.out.println("Total track time: " + totalTracktime);
+			
 			/**
 			* Add a nudge towards longer tracks (remember to cast to double when dividing). Note that 
 			* kcount coefficient is meaningless because all tracks are multiplied by it and x^2 is only used
@@ -341,7 +345,7 @@ public class StandardMHTChi2 implements MHTChi2<PamDataUnit>, Cloneable {
 			//19/03/2020 - fixed a bug; Was multiplying instead of dividing - as such long tracks were being 
 			//discriminated against causing fragmentation...ooops
 			chi2=chi2/Math.pow(totalTracktime/getIDIManager().getTotalTime(),getChi2Params().longTrackExponent);
-			
+			//chi2=chi2/Math.pow(bitSet.cardinality(),getChi2Params().longTrackExponent);
 			
 			
 		}
@@ -374,6 +378,8 @@ public class StandardMHTChi2 implements MHTChi2<PamDataUnit>, Cloneable {
 		//All done. Set the values. 
 		//set the chi2 values. 
 		//long time3=System.nanoTime();
+		//Debug.out.println("Track chi2: " + chi2 + " " + bitcount ); 
+
 		return chi2; 
 	}
 

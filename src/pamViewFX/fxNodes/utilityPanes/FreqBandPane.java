@@ -72,7 +72,7 @@ public class FreqBandPane extends PamGridPane {
 			if (after>sampleRate/2.) highPassFreq.getValueFactory().setValue(sampleRate/2.); 
 		});
 		highPassFreq.setEditable(true);
-		highPassFreq.setPrefWidth(140);
+		//highPassFreq.setPrefWidth(140);
 		
 		//highCut.setPrefColumnCount(6);
 		if (orientation==Orientation.VERTICAL){
@@ -94,7 +94,7 @@ public class FreqBandPane extends PamGridPane {
 			
 		});
 		lowPassFreq.setEditable(true);
-		lowPassFreq.setPrefWidth(140);
+		//lowPassFreq.setPrefWidth(140);
 
 		
 		if (orientation==Orientation.VERTICAL){

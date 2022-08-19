@@ -77,7 +77,7 @@ public class DataTransformPaneFactory {
 			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(1, -1000.0, 1000.0,   0.1);
 			break;
 		case SPECCROPINTERP:
-			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Min. Freq. ", "Max. Freq. ", " No. bins "},  new String[]{"Hz", "Hz", ""}, 2); 
+			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Min. Freq. ", "Max. Freq. ", "No. bins "},  new String[]{"Hz", "Hz", ""}, 2); 
 			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 0.0, 500000.0,   100.); //hmmmm would be nice to have the sample rate here...
 			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(1, 0.0, 500000.0,   100.);
 			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(2, 0, Integer.MAX_VALUE,   10);

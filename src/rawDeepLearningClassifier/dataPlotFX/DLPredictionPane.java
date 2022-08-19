@@ -110,6 +110,9 @@ public class DLPredictionPane extends PamBorderPane implements TDSettingsPane {
 	
 	private void layoutColourPanes(DLClassName[] classNames){
 		
+		if (classNames==null) return;
+		
+		
 		//System.out.println("Class name map: " +  dlPredictionPlotInfoFX.getDlControl().getDLParams().classNameMap);
 			
 		ArrayList<PredictionColourPane> colourPanes = new ArrayList<PredictionColourPane>();

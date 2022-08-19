@@ -144,6 +144,7 @@ public class PlaybackControl extends PamControlledUnit implements PamSettings {
 		playbackSystem = findPlaybackSystem(sourceDataBlock);
 		playbackProcess.noteNewSettings();
 		playbackSidePanel.newSettings();
+		if (playBackGUI!=null) playBackGUI.notifyGUIChange(PamController.CHANGED_PROCESS_SETTINGS);
 //		if (this.getSidePanel() != null){
 //			this.getSidePanel().getPanel().setVisible(!isRealTimePlayback());
 //		}

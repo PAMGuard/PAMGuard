@@ -183,6 +183,7 @@ public class SimpleFilterPaneFX extends DynamicSettingsPane<FFTFilterParams>{
 
 	@Override
 	public FFTFilterParams getParams(FFTFilterParams fftFilterParams) {
+		if (fftFilterParams==null) fftFilterParams=new FFTFilterParams();
 		fftFilterParams.filterBand = getBand();
 		try {
 			//if (fftFilterParams.filterBand != FilterBand.HIGHPASS) {

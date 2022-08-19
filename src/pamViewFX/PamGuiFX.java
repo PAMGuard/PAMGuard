@@ -48,6 +48,11 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 	 */
 	private PamTabPane mainTabPane; 
 	
+	/**
+	 * The preferred width of the side pane. 
+	 */
+	public static final double SIDE_PANE_PREF_WIDTH = 250;
+	
 //	/**
 //	 * Icon for menu
 //	 */
@@ -157,7 +162,9 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 
 		/**create right hiding pane**/
 		sidePaneContent=new PamVBox();
-		sidePaneContent.setPrefWidth(250);
+		sidePaneContent.setPrefWidth(SIDE_PANE_PREF_WIDTH);
+		sidePaneContent.setPadding(new Insets(25,5,5,5)); //give quite  abit of spacing at the top so that there is room for close button
+		sidePaneContent.setMinWidth(0);
 		hidingSidePane=new HidingPane(Side.RIGHT, sidePaneContent, this, false);
 		hidingSidePane.showHidePane(false);
 
@@ -176,7 +183,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 //		showButton.prefWidthProperty().addListener((listener)->{
 //			mainTabPane.layout(); //Don't need this
 //		});
-		
+				
 		hidingSidePane.getTimeLineShow().setOnFinished((value)->{
 			showButtonRight.setPrefWidth(1);
 			showButtonRight.setVisible(false);
@@ -187,6 +194,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 			showButtonRight.setPrefWidth(40);
 			showButtonRight.setVisible(true);
 			hidingSidePane.getHideButton().setVisible(false);
+			//sidePaneContent.setVisible(false);
 			layout.layout();
 		});
 

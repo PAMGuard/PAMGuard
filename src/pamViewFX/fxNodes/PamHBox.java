@@ -24,4 +24,5 @@ public class PamHBox  extends HBox {
 		// TODO Auto-generated constructor stub
 	}
 
+
 }
