@@ -46,6 +46,7 @@ public abstract class CTDetectionGroupDataUnit extends DetectionGroupDataUnit im
 	public int addSubDetections(List<PamDataUnit> list) {
 		int h = super.addSubDetections(list);
 		this.calcMinMaxAng();
+		
 		//make sure there is a non null start sample otherwise
 		//the click trian detector will crash in real time mode. 
 //		this.calcStartSample(); 

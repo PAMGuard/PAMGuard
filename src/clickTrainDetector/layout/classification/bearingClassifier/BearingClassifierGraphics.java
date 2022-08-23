@@ -41,7 +41,7 @@ public class BearingClassifierGraphics implements CTClassifierGraphics {
 			bearingClassifierPane = new BearingClassifierPane(bearingClassifer);
 		}
 		//params are set here. 
-		bearingClassifierPane.setParams(bearingClassifer.getParams());
+		//bearingClassifierPane.setParams(bearingClassifer.getParams()); <- warning - causes an error in which params are overriden
 		return (Pane) bearingClassifierPane.getContentNode();
 	}
 

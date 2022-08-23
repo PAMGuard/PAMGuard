@@ -154,7 +154,6 @@ public class BearingClassifier implements CTClassifier {
 		
 		Debug.out.println("SPECIESID!! " + speciesID);
 
-
 		return new BearingClassification(speciesID, meanBearingD, medianBearingD, stdBearingD);
 	}
 

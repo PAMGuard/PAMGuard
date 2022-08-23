@@ -228,6 +228,7 @@ public class CTClassifiersPane extends PamBorderPane {
 
 				//set the parameters. 
 				tab = (ClassifierTab) pamTabPane.getTabs().get(i); 
+				
 				//set the parameters for the tab.
 				tab.getCTClassifierPane().setParams(clickTrainParams.ctClassifierParams[i]);
 			}

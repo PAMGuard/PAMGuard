@@ -848,6 +848,7 @@ public class MHTKernel<T> {
 	 */
 	public T getLastDataUnit() {
 		if (this.dataUnits==null) return null;
+		if (this.dataUnits.size()<1) return null; 
 		return dataUnits.get(dataUnits.size()-1);
 	}
 

@@ -170,11 +170,16 @@ public class CTClassifierPane extends PamBorderPane {
 //				break; 
 //			}
 //		}
+		
 		classifierListBox.getSelectionModel().select(params.type);
+		
+
 		setClassifierPane(params.type);
 		
 		//species Id
 		setBasicParams(params);
+		
+
 		
 		//		//when setting parameters have to figure out what pane to create first!
 		//		currentClassifier = clickTrainControl.getClassifierManager().createClassifier(params.type); 
@@ -197,7 +202,9 @@ public class CTClassifierPane extends PamBorderPane {
 	 */
 	private void setClassifierPane(CTClassifierType ctClassifierType) {
 		if (ctClassifierType==null) return;
+		
 		currentClassifier = clickTrainControl.getClassifierManager().createClassifier(ctClassifierType); 
+
 		//Classifier pane- this also sets parameters for the classifier specific pane
 		if (currentClassifier.getCTClassifierGraphics()!=null) {
 			settingsHolder.setCenter(currentClassifier.getCTClassifierGraphics().getCTClassifierPane());		

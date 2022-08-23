@@ -105,7 +105,7 @@ public class BearingClassifierPane extends  SettingsPane<BearingClassifierParams
 		currParams.minStdBearingD =  Math.toRadians(params.min.doubleValue());
 		currParams.maxStdBearingD =  Math.toRadians(params.max.doubleValue());
 		currParams.useStD = params.enabled;
-
+		
 		return currParams;
 	}
 
@@ -126,6 +126,7 @@ public class BearingClassifierPane extends  SettingsPane<BearingClassifierParams
 
 	@Override
 	public void setParams(BearingClassifierParams input) {
+		
 		//bearing limits
 		this.bearingLims.setParams(Math.toDegrees(input.bearingLimMin), Math.toDegrees(input.bearingLimMax), true);
 		
