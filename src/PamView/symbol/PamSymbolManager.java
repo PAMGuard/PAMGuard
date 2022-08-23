@@ -222,6 +222,9 @@ abstract public class PamSymbolManager<T extends PamSymbolChooser> implements Pa
 	 * @param psc
 	 */
 	private void addSuperDetectionModifiers(PamSymbolChooser psc) {
+		/**
+		 * This is going in an infinite loop. Need to do something to stop it !
+		 */
 		ArrayList<SuperDetDataBlock> superDetBlocks = OfflineSuperDetFilter.findPossibleSuperDetections(getPamDataBlock());
 		
 //		Debug.out.println("The number of super det datablock is: " + superDetBlocks + " for the chooser: " +  psc); 
@@ -231,6 +234,12 @@ abstract public class PamSymbolManager<T extends PamSymbolChooser> implements Pa
 		for (SuperDetDataBlock superBlock : superDetBlocks) {
 			PamSymbolManager superMan = superBlock.getPamSymbolManager();
 			if (superMan == null) {
+				continue;
+			}
+			if (superBlock == getPamDataBlock()) {
+				continue;
+			}
+			if (superBlock.getClass() == getPamDataBlock().getClass()) {
 				continue;
 			}
 //			Debug.out.println("The number of super det datablock superMan: " + superMan +  " for the chooser: " +  psc); 
