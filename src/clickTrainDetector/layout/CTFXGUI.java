@@ -61,7 +61,7 @@ public class CTFXGUI  extends PamControlledGUIFX {
 			//data source may have potentially changed. e.g. by a datamodelfx Need to set in params.
 			//System.out.println("FFTControl: CHANGED_PROCESS_SETTINGS : " +fftProcess.getParentDataBlock());
 					if (clickTrainControl.getClickTrainProcess().getParentDataBlock()!=null){
-						clickTrainControl.getClickTrainParams().dataSourceName=clickTrainControl.getClickTrainProcess().getParentDataBlock().getDataName();
+						clickTrainControl.getClickTrainParams().dataSourceName=clickTrainControl.getClickTrainProcess().getParentDataBlock().getLongDataName();
 					}
 					else clickTrainControl.getClickTrainParams().dataSourceName="";
 			break;

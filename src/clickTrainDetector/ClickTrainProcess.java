@@ -86,13 +86,20 @@ public class ClickTrainProcess extends PamInstantProcess {
 
 		//TODO - this is a bit messy. Ideally probably should have the datablock's long name in the settings but 
 		//this would break previous configurations...
-		sourceDataBlock = PamController.getInstance().getDataBlock(ClickDetection.class, 
-				getClickTrainParams().dataSourceName);
+//		sourceDataBlock = PamController.getInstance().getDataBlock(ClickDetection.class, 
+//				getClickTrainParams().dataSourceName);
+		/*
+		 * Identify by long name since that is unique, otherwise doesn't work with multiple click detectors. 
+		 */
+		sourceDataBlock = PamController.getInstance().getDataBlockByLongName(getClickTrainParams().dataSourceName);
+		if (sourceDataBlock == null) {
+			// otherwise find any click detector. 
+			sourceDataBlock = PamController.getInstance().getDataBlock(ClickDetection.class, 0);
+		}
 
 		if (sourceDataBlock==null) {
 			sourceDataBlock = PamController.getInstance().getDataBlock(CPODClick.class, 
 					getClickTrainParams().dataSourceName);
-
 		}
 		
 		//System.out.println("CPOD sample rate: " + sourceDataBlock.getSampleRate()); 

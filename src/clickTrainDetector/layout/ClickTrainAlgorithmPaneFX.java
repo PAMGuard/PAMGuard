@@ -408,7 +408,7 @@ public class ClickTrainAlgorithmPaneFX extends SettingsPane<ClickTrainParams> {
 	public ClickTrainParams getParams(ClickTrainParams currParams) {
 		try {
 			currParams.dataSourceIndex = sourcePane.getSourceIndex();
-			currParams.dataSourceName = sourcePane.getSourceName();
+			currParams.dataSourceName = sourcePane.getSourceLongName();
 			
 			
 			//use the data selector. 
