@@ -134,9 +134,12 @@ public abstract class  SpectrumPlot <D extends PamDataUnit> implements Detection
 		this.sR=sR;  
 
 		int[] minmax = getAxisMinMaxSamples(plotProjector);
-		
-		if (minmax[1]>=data.getSampleDuration()) minmax[1]=(int) (data.getSampleDuration()-1);
+	
+		if (data.getSampleDuration()!=null) {	
+			if (minmax[1]>=data.getSampleDuration()) minmax[1]=(int) (data.getSampleDuration()-1);
+		}
 		if (minmax[0]<0 || minmax[0]>=minmax[1]) minmax[0]=0;
+	
 		
 		//System.out.println("Min max: " + minmax[0] + "  " + minmax[1]);
 
