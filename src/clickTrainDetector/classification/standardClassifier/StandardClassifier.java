@@ -116,7 +116,7 @@ public class StandardClassifier implements CTClassifier {
 		for (int i=0; i<classifiers.size(); i++) {
 			if (standardClssfrParams.ctClassifierParams[i]==null) {
 				//set default settings
-				standardClssfrParams.ctClassifierParams[i]= classifiers.get(i).getParams(); 
+				standardClssfrParams.ctClassifierParams[i] = classifiers.get(i).getParams(); 
 			}
 			else {
 				//the standard classifier should have settings set. 
@@ -178,6 +178,7 @@ public class StandardClassifier implements CTClassifier {
 	}
 
 	public StandardClassifierParams getParams() {
+		
 		return standardClssfrParams;
 	}
 
