@@ -33,6 +33,7 @@ import PamController.pamBuoyGlobals;
 import PamController.command.TerminalController;
 import PamModel.SMRUEnable;
 import PamUtils.FileFunctions;
+import PamUtils.PamCalendar;
 import PamUtils.PamExceptionHandler;
 import PamUtils.PlatformInfo;
 import PamUtils.Splash;
@@ -133,6 +134,8 @@ public class Pamguard {
 		FolderSizeMonitor folderSizeMon = new FolderSizeMonitor();
 		Thread folderSizeThread  = new Thread(folderSizeMon);
 		folderSizeThread.start();
+
+		TimeZone.setDefault(PamCalendar.defaultTimeZone);
 
 		System.out.println("**********************************************************");
 		try {
