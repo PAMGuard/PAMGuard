@@ -68,8 +68,12 @@ public abstract class DLModelWorker<T> {
 			double[][] transformedData2; //spec data
 			double[] transformedData1;  //waveform data
 			for (int j=0; j<numChunks; j++) {
-
+			
+				
 				soundData  = new AudioData(rawDataUnits.get(j).getRawData()[iChan], sampleRate); 
+				
+				
+				
 				//			for (int i=0; i<modelTransforms.size(); i++) {
 				//				System.out.println("Transfrom type: " + modelTransforms.get(i).getDLTransformType()); 
 				//			}
