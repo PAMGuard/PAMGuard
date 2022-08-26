@@ -151,6 +151,8 @@ public class BearingClassifier implements CTClassifier {
 		if (passed) {
 			speciesID = this.bearingClssfrParams.speciesFlag;
 		}
+		
+		Debug.out.println("SPECIESID!! " + speciesID);
 
 		return new BearingClassification(speciesID, meanBearingD, medianBearingD, stdBearingD);
 	}
