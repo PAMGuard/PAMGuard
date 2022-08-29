@@ -76,10 +76,10 @@ _Screenshot of clicks classified from the matched click classifier showing match
 The time base display FX can show clicks classified by the matched clicks classifier. _Colour by Matched Template Classifier_ must be selecting in the right settings window. 
 
 <p align="center">
-  <img width="950" height="520" src = "resources/matched_click_classifier_tdisplay.png">
+  <img width="950" height="520" src = "resources/matched_click_tdisplay_example.png">
 </p>
 
-_Screenshot of Time Base display FX showing clicks classified by the match click classifier (coloured pink)_
+_Screenshot of Time Base display FX showing clicks classified by the match click classifier (coloured pink). The correlation values can be found in the meta data section of the detection pop up menu (highlighted)_
 
 ### Extracting correlation values using MATLAB/R 
 
