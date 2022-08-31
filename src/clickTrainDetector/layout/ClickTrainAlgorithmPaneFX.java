@@ -511,7 +511,7 @@ public class ClickTrainAlgorithmPaneFX extends SettingsPane<ClickTrainParams> {
 
 		// and fill in the data source list (may have changed - or might in later versions)
 		ArrayList<PamDataBlock> rd = PamController.getInstance().getDataBlocks(ClickDetection.class, true); 
-		PamDataBlock  datablock = PamController.getInstance().getRawDataBlock(clickTrainParams.dataSourceName);
+		PamDataBlock  datablock = PamController.getInstance().getDataBlockByLongName(clickTrainParams.dataSourceName);
 		
 		//use the data selector. 
 		dataSelectorCheckBox.setSelected(clickTrainParams.useDataSelector); 

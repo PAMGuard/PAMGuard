@@ -94,7 +94,7 @@ public class CTSwingGUI extends PamControlledGUISwing {
 
 	@Override
 	public JMenuItem createDetectionMenu(Frame parentFrame) {
-		JMenu submenu = new JMenu("Click Train Detector");
+		JMenu submenu = new JMenu(clickTrainControl.getUnitName());
 
 		JMenuItem menuItem = new JMenuItem("Detection Settings ..."); 
 
