@@ -33,7 +33,7 @@ _Symbol_ and _Fill_ define the default colours clicks which have been classified
 
 Before a click is classified it undergoes some pre-conditioning by the matched click classifier. 
 
-_Restrict parameter extraction to XX samples_ sets the maximum length of the waveform to the classifier. If this is selected, then center of the click is located and samples trimmed around the center. In some use cases, for example SoundTrap detections, which may be 10,000 samples long, setting a lower number of maximum samples can greatly increase processing speed and improve the accuracy of results. 
+_Restrict parameter extraction to XX samples_ sets the maximum length of the waveform to the classifier. If this is selected, then center of the click is located and samples trimmed around the center. In some use cases, for example SoundTrap detections, which may be 10,000 samples long, setting a lower number of maximum samples can greatly increase processing speed and improve the accuracy of results. Note that if the number of samples is set too low (e.g. well below the click template length) then the correaltion values will not make much sense.
 
 _Peak threshold_ and _Smoothing_ are both parameters used to find the click center so that a click can be trimmed to the maximum number of samples. The click length is measured by calculating the waveform envelope using a Hilbert Transform. The envelope is smoothed using a moving average filter (the _Smoothing_ parameter defines the size of the averaging window). The click is trimmed as follows. First the peak of the waveform envelope is found. The length of the click is defined as the point at which the click falls _Peak threshold_ dB below the peak. The center of the click is then the middle of this snippet. The click is then trimmed from the center of the click. 
 
@@ -48,7 +48,7 @@ The matched click classifier has two templates, a match and a reject. The match 
 
 **.csv** - the first _row_ are the waveform measurements from -1 to 1 (make sure you save with a sufficient number of decimal points). The second row and first column is the sample rate in sample per second.
 
-**.mat** - a .mat file that contains two variables named _sR_ and _waveform_. _sR_ is the sample rate in samples per second and _waveform_ is a 1D array containing the waveform for the template form -1 to 1. 
+**.mat** - a .mat file that contains two variables named _sR_ and _waveform_. _sR_ is the sample rate in samples per second and _waveform_ is a 1D array containing the waveform for the template form -1 to 1. Arrays of click structures imported using the PAMGuard to MATLAB library can also be used. The first channel of the first click in a list of clicks structures will be imported as the template. The click structure should be names _clicks_ and the sample rate should be saved as a seperate variable named _sR_ in sampes per second.
 
 The match and reject templates are plotted to provide a user with some visualisation of the classifier settings - the drop down menu allows the user to select different ways to plot the templates and is purely for visualisation purposes so makes no difference to classifier settings. 
 
@@ -80,6 +80,14 @@ The time base display FX can show clicks classified by the matched clicks classi
 </p>
 
 _Screenshot of Time Base display FX showing clicks classified by the match click classifier (coloured pink). The correlation values can be found in the meta data section of the detection pop up menu (highlighted)_
+
+Note that the time base display allows users to export clicks to be used as templates. Using the advanced pop up menu right click on a click detection and select the MATLAB icon. A .mat file of the selected click or clicks will be saved to your root user folder in a folder called _PAMGuard Manual Export_.  This .mat file can be opened by the matched click classifier - the first channel of the first click in the list will be imported as a template. 
+
+
+<p align="center">
+  <img width="510" height="300" src = "resources/exporting_mat_clicks.png">
+</p>
+
 
 ### Extracting correlation values using MATLAB/R 
 
