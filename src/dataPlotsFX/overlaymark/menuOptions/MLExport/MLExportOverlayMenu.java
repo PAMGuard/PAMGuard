@@ -139,13 +139,13 @@ public class MLExportOverlayMenu extends ExportOverlayMenu {
 			//create the filename; 
 			long millisStart=foundDataUnits.getFirstTimeMillis();
 			String currentPath = PamCalendar.formatFileDateTime(millisStart, false);
-			//add data types to the filen,ae
-			for (int i=0 ;i<mlData.size(); i++ ){
+			//add data types to the filename
+			for (int i=0 ;i<mlData.size(); i=i+2 ){//bit of a hack but every second name is the samplerate so leave that out of filename.  
 				currentPath=currentPath + "_" + mlData.get(i).getName(); 
 			}
 			//add correct file type.	
 			currentPath = currentPath + ".mat";
-			currentPath = currentFolder+"\\"+currentPath;
+			currentPath = currentFolder+ File.separator +currentPath;
 
 			//now write the file
 			try {
