@@ -142,6 +142,7 @@ public class SweepClassifier implements ClickIdentifier , PamSettings {
 	@Override
     public ClickTypeCommonParams getCommonParams(int code) {
         int codeIdx = codeToListIndex(code);
+        if (codeIdx<0 || codeIdx>=sweepClassifierParameters.getNumSets()) return null;
         return sweepClassifierParameters.getSet(codeIdx);
     }
 

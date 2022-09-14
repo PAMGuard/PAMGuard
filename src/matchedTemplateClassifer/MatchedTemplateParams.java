@@ -114,7 +114,7 @@ public class MatchedTemplateParams implements Serializable, Cloneable, ManagedPa
 	/**
 	 * The number of bins to sample around. 
 	 */
-	public int restrictedBins=128;
+	public int restrictedBins=2048;
 
 	/**
 	 * True to search for for wave peak and sample around it. 
