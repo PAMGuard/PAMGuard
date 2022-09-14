@@ -33,7 +33,7 @@ _Symbol_ and _Fill_ define the default colours clicks which have been classified
 
 Before a click is classified it undergoes some pre-conditioning by the matched click classifier. 
 
-_Restrict parameter extraction to XX samples_ sets the maximum length of the waveform to the classifier. If this is selected, then center of the click is located and samples trimmed around the center. In some use cases, for example SoundTrap detections, which may be 10,000 samples long, setting a lower number of maximum samples can greatly increase processing speed and improve the accuracy of results. 
+_Restrict parameter extraction to XX samples_ sets the maximum length of the waveform to the classifier. If this is selected, then center of the click is located and samples trimmed around the center. In some use cases, for example SoundTrap detections, which may be 10,000 samples long, setting a lower number of maximum samples can greatly increase processing speed and improve the accuracy of results. Note that if the number of samples is set too low (e.g. well below the click template length) then the correaltion values will not make much sense.
 
 _Peak threshold_ and _Smoothing_ are both parameters used to find the click center so that a click can be trimmed to the maximum number of samples. The click length is measured by calculating the waveform envelope using a Hilbert Transform. The envelope is smoothed using a moving average filter (the _Smoothing_ parameter defines the size of the averaging window). The click is trimmed as follows. First the peak of the waveform envelope is found. The length of the click is defined as the point at which the click falls _Peak threshold_ dB below the peak. The center of the click is then the middle of this snippet. The click is then trimmed from the center of the click. 
 
@@ -85,7 +85,7 @@ Note that the time base display allows users to export clicks to be used as temp
 
 
 <p align="center">
-  <src = "resources/exporting_mat_clicks.png">
+  <img width="510" height="300" src = "resources/exporting_mat_clicks.png">
 </p>
 
 
