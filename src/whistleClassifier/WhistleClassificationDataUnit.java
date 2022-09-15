@@ -1,9 +1,10 @@
 package whistleClassifier;
 
+import PamDetection.PamDetection;
 import PamguardMVC.AcousticDataUnit;
 import PamguardMVC.PamDataUnit;
 
-public class WhistleClassificationDataUnit extends PamDataUnit<PamDataUnit,PamDataUnit> implements AcousticDataUnit {
+public class WhistleClassificationDataUnit extends PamDataUnit<PamDataUnit,PamDataUnit> implements AcousticDataUnit, PamDetection {
 	
 	private double[] speciesLogLikelihoods;
 	

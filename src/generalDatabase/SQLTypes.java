@@ -351,15 +351,13 @@ public class SQLTypes {
 		 * goes to the default, so it needs to be on UTC at the moment data are written to the database, not
 		 * just in this function. 
 		 */
+//		return timeMillis;
 		if (timeMillis == null) {
 			return null;
 		}
-//		TimeZone tz = TimeZone.getDefault();
-//		TimeZone.setDefault(PamCalendar.defaultTimeZone);
-//		Timestamp ts = new Timestamp(timeMillis - tz.getOffset(timeMillis));
-		Timestamp ts = new Timestamp(timeMillis);
-//		TimeZone.setDefault(tz);
-//		Timestamp newTS = ts.toLocalDateTime();
+//		return PamCalendar.formatDBDateTime(timeMillis, false);
+		TimeZone tz = TimeZone.getDefault();
+		Timestamp ts = new UTCTimestamp(timeMillis - tz.getOffset(timeMillis));
 		return ts;
 	}
 

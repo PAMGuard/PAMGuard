@@ -65,7 +65,7 @@ public class WhistleClassifierProcess extends PamProcess {
 
 		this.whistleClassifierControl  = whistleClassifierControl;
 
-		whistleClasificationDataBlock = new WhistleClasificationDataBlock(this, 3);
+		whistleClasificationDataBlock = new WhistleClasificationDataBlock(whistleClassifierControl, this, 3);
 
 		addOutputDataBlock(whistleClasificationDataBlock);
 
