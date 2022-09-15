@@ -217,14 +217,16 @@ public class TemplateSpectrumPane  extends PamBorderPane {
 	 * @param file - the file to open. 
 	 */
 	private MatchTemplate openFile(File file) {
+		try {
 		MatchTemplate template = null;
 		String extension = getFileExtension(file);
 		for (int i=0; i< this.templateImporters.size(); i++) {
 			for (int j=0; j<templateImporters.get(i).getExtension().length; j++) {
-				//System.out.println(templateImporters.get(i).getExtension()[j] + " : " + extension);
+//				System.out.println(templateImporters.get(i).getExtension()[j] + " : " + extension);
 				if (templateImporters.get(i).getExtension()[j].equals(extension)) {
-					//System.out.println("Import using the extensions: " + extension);
+//					System.out.println("Import using the extensions: " + extension);
 					template=templateImporters.get(i).importTemplate(file);
+
 				}
 			}
 		}
@@ -233,6 +235,11 @@ public class TemplateSpectrumPane  extends PamBorderPane {
 			return null;
 		}
 		else return template; 
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return null; 
+		}
 	}
 
 

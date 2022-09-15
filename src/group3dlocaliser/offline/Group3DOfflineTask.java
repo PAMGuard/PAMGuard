@@ -30,6 +30,9 @@ public class Group3DOfflineTask extends OfflineTask<PamDataUnit>{
 
 	@Override
 	public String getName() {
+		if (group3DControl == null) {
+			return null;
+		}
 		return group3DControl.getUnitName();
 	}
 

@@ -82,16 +82,16 @@ public class ExampleClickTrains {
 		String path = null; 
 		switch (type) {
 		case SIMCLICKS_1:
-			 path = masterPath + "\\" + "simtrains_1.mat";
+			 path = masterPath + File.separator + "simtrains_1.mat";
 			 break;
 		case SIMCLICKS_2:
-			 path = masterPath + "\\" + "simtrains_2.mat";
+			 path = masterPath + File.separator + "simtrains_2.mat";
 			 break;
 		case DOLPHINS_ST:
-			 path = masterPath + "\\" + "20190801_212731_clicks_dolphins_ST.mat";
+			 path = masterPath + File.separator + "20190801_212731_clicks_dolphins_ST.mat";
 			 break;
 		case SIMCLICKS_3:
-			 path = masterPath + "\\" + "simtrains_3_corr.mat";
+			 path = masterPath + File.separator + "simtrains_3_corr.mat";
 			 break;
 		}
 		File file = new File(path); 

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.jmatio.types.MLArray;
+import com.jmatio.types.MLDouble;
 import com.jmatio.types.MLStructure;
 
 import PamguardMVC.PamDataUnit;
@@ -63,6 +64,11 @@ public class MLDetectionsManager {
 		//so, need to sort compatible data units.  		
 
 		ArrayList<MLArray> list = new ArrayList<MLArray>();
+
+		//keep a track of the data units that have been transcribed. This means data units that are multiple types
+		//(e.g. a raw data holder and click) are not added to two different list of structures. 
+		boolean[] alreadyStruct = new boolean[dataUnits.size()];
+
 		//iterate through possible export functions. 
 		for (int i=0; i<mlDataUnitsExport.size(); i++){
 
@@ -78,20 +84,33 @@ public class MLDetectionsManager {
 
 			if (n==0) continue; //no need to do anything else. There are no data units of this type. 
 
+			//create a structure for each type of data unit. 
 			MLStructure mlStructure= new MLStructure(mlDataUnitsExport.get(i).getName(), new int[]{n, 1}); 
+			float sampleRate = -1;
 
 			n=0; 
 			//allocate the class now. 
 			for (int j=0; j<dataUnits.size(); j++){
 				//check whether the same. 
-				if (mlDataUnitsExport.get(i).getUnitClass().isAssignableFrom(dataUnits.get(j).getClass())) {
+				if (mlDataUnitsExport.get(i).getUnitClass().isAssignableFrom(dataUnits.get(j).getClass()) && !alreadyStruct[j]) {
 					mlStructure=mlDataUnitsExport.get(i).detectionToStruct(mlStructure, dataUnits.get(j), n); 
+					sampleRate = dataUnits.get(j).getParentDataBlock().getSampleRate(); 
 					n++; 
+					alreadyStruct[j] = true;
 				}
+
+
 			}
-			if (n>=1) list.add(mlStructure);	
+
+			if (n>=1) {
+				list.add(mlStructure);
+				list.add(new MLDouble((mlDataUnitsExport.get(i).getName()+"_sR"), new double[] {sampleRate}, 1)); 
+			}
+
 
 		}
+
+
 
 		//now ready to save. 
 		return list; 
