@@ -45,6 +45,31 @@ public class SqliteSQLTypes extends SQLTypes {
 	}
 	
 	@Override
+	public Object getTimeStamp(Long timeMillis) {
+		/**
+		 * This has just got nasty WRT time zones. 
+		 * When the TimeStamp is written to database it uses the default time zone correction, which of course 
+		 * I don't want since I only do UTC. I was therefore subtracting this off before creating the ts 
+		 * so that it all worked fine when it was added back on again. 
+		 * This was fine for many years until someone processed data from exactly when the clocks went 
+		 * forward in the spring. Because the data were just after the clocks going forward, it took off
+		 * an hour, then failed to add it back on again since the time was now before daylight saving. 
+		 * Amazed this has never happened before. Well done G and E ! I can fix it by setting the 
+		 * default time zone to UTC when PAMGuard starts, but note that all future references to local time
+		 * will then be UTC. If I try to change it temporarily it doesn't help since the Timestamp always 
+		 * goes to the default, so it needs to be on UTC at the moment data are written to the database, not
+		 * just in this function. 
+		 * 
+		 * Seems that for SQLite we can get away with a string, for MySQL we need a TimeStamp object still 
+		 */
+//		return timeMillis;
+		if (timeMillis == null) {
+			return null;
+		}
+		return PamCalendar.formatDBDateTime(timeMillis, true);
+	}
+	
+	@Override
 	public String formatDBDateTimeQueryString(long timeMilliseconds) {
 		switch (dateClass) {
 		case TEXT:
