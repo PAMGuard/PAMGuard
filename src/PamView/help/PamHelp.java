@@ -376,8 +376,18 @@ public class PamHelp {
 				// set up a URL to point to the helpset file inside the jar
 				try {
 			        //URL helpSetLoc = new URL("jar:file:\\C:\\Users\\SCANS\\workspace\\Pamguard_MikeBranch\\plugins\\TestPlugin.jar!/TestPlugin/PluginHelp.hs"); this one worked - passed argument should match
-					URL helpSetLoc = new URL("jar:file:" + File.separator + pluginList.get(i).getJarFile()+"!/"+pluginList.get(i).getHelpSetName());
-					addPluginHelpSet(helpSetLoc);
+					String pluginJar = pluginList.get(i).getJarFile();
+					URL helpSetLoc;
+					if (pluginJar != null) {
+						helpSetLoc = new URL("jar:file:" + File.separator + pluginList.get(i).getJarFile()+"!/"+pluginList.get(i).getHelpSetName());
+						addPluginHelpSet(helpSetLoc);
+					}
+					else {
+						// this used when developing plugins and they are not actually in a jar file yet, rather they
+						// have just been manually added to the list of available plugins. 
+						String hsN = pluginList.get(i).getHelpSetName();
+						addHelpSet(hsN);
+					}
 				} catch (MalformedURLException e) {
 					System.err.println("Error generating URL for help set " + pluginList.get(i).getHelpSetName());
 					System.err.println(e.getMessage());
@@ -552,16 +562,16 @@ public class PamHelp {
 		this.helpLocURL = helpLocURL;
 	}
 
-	/**
-	 * Quick main function 
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception e) { }
-		PamHelp.getInstance().displayHelp();
-	}
+//	/**
+//	 * Quick main function 
+//	 * @param args
+//	 */
+//	public static void main(String[] args) {
+//		try {
+//			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//		} catch (Exception e) { }
+//		PamHelp.getInstance().displayHelp();
+//	}
 
 
 }

@@ -133,7 +133,7 @@ public class ClickTrainDetLogging extends SuperDetLogging {
 
 			String classificationData =  getClassifierData(ctDataUnit); 
 
-			System.out.println("Classifier Save: " + classificationData);
+//			System.out.println("Classifier Save: " + classificationData);
 
 			if (classificationData.length()>0) {
 				//classifiers.setLength(classificationData.length());
