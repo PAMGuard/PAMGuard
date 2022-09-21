@@ -481,6 +481,10 @@
    <tocitem text="Localisation " target="detectors.gpl.docs.localisation" image="topic"/>
 
   </tocitem>
+  <tocitem text="Click Train Detector " target="detectors.ClickTrainDetector.docs.ClickTrainDetector">
+   <tocitem text="Overview " target="detectors.ClickTrainDetector.docs.ClickTrainDetector" image="topic"/>
+
+  </tocitem>
  </tocitem>
  <tocitem text="Classifiers ">
   <tocitem text="Whistle Classifier ">

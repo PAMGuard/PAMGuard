@@ -442,6 +442,8 @@
 
 <mapID target="localisation.bearingLocaliser.docs.BL_Settings" url="localisation/bearingLocaliser/docs/BL_Settings.html"/>
 
+<mapID target="detectors.ClickTrainDetector.docs.ClickTrainDetector" url="detectors/ClickTrainDetector/docs/ClickTrainDetector.html"/>
+
 <mapID target="sound_processing.FiltersHelp.Docs.Filters_filters" url="sound_processing/FiltersHelp/Docs/Filters_filters.html"/>
 
 <mapID target="localisation.bearingLocaliser.docs.BL_Output" url="localisation/bearingLocaliser/docs/BL_Output.html"/>
