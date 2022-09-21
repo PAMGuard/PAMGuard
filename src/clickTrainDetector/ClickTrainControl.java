@@ -146,6 +146,11 @@ public class ClickTrainControl extends PamControlledUnit implements PamSettings 
 	 * Click info manager- handles information from the algorithms. 
 	 */
 	private CTAlgorithmInfoManager clAlgorithmInfoManager;
+	
+	/**
+	 * Help point which can be referenced form dialogs, etc. 
+	 */
+	public static final String helpPoint = "detectors.ClickTrainDetector.docs.ClickTrainDetector";
  
 	/**
 	 * Constructor for the ClickTrainControl. 
