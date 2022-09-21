@@ -644,6 +644,8 @@
 
 <mapID target="mapping.AirgunDisplay.docs.AirgunConfiguration" url="mapping/AirgunDisplay/docs/AirgunConfiguration.html"/>
 
+<mapID target="utilities.backupmanager.docs.backupmanager" url="utilities/backupmanager/docs/backupmanager.html"/>
+
 <mapID target="localisation.targetmotion.docs.targetmotion_Localising" url="localisation/targetmotion/docs/targetmotion_Localising.html"/>
 
 <mapID target="detectors.clickDetectorHelp.docs.offline_Tools" url="detectors/clickDetectorHelp/docs/offline_Tools.html"/>
