@@ -482,8 +482,8 @@ public class DLClassifyProcess extends PamInstantProcess {
 
 		DataUnitBaseData basicData  = groupDataBuffer.get(0).getBasicData().clone(); 
 		basicData.setMillisecondDuration(1000.*rawdata[0].length/this.sampleRate);
-		basicData.setSampleDuration((long) (groupDataBuffer.size()*dlControl.getDLParams().sampleHop));
-
+		//basicData.setSampleDuration((long) (groupDataBuffer.size()*dlControl.getDLParams().sampleHop));
+		basicData.setSampleDuration((long) (rawdata[0].length));
 		//		System.out.println("Model result: " + modelResult.size()); 
 		DLDetection dlDetection = new DLDetection(basicData, rawdata); 
 		addDLAnnotation(dlDetection, groupDataBuffer,modelResult); 

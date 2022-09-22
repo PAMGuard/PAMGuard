@@ -172,7 +172,7 @@ public class KetosClassifier implements DLClassiferModel, PamSettings {
 		public void newResult(GenericPrediction soundSpotResult, GroupedRawData groupedRawData) {
 			soundSpotResult.setClassNameID(GenericDLClassifier.getClassNameIDs(ketosDLParams)); 
 			soundSpotResult.setBinaryClassification(GenericDLClassifier.isBinaryResult(soundSpotResult, ketosDLParams)); 
-			newResult(soundSpotResult, groupedRawData);
+			newModelResult(soundSpotResult, groupedRawData);
 		}
 
 	}
@@ -291,6 +291,14 @@ public class KetosClassifier implements DLClassiferModel, PamSettings {
 	@Override
 	public ArrayList<PamWarning> checkSettingsOK() {
 		return GenericDLClassifier.checkSettingsOK(ketosDLParams, dlControl); 
+	}
+		/**
+	 * Send a new result form the thread queue to the process. 
+	 * @param modelResult - the model result;
+	 * @param groupedRawData - the grouped raw data. 
+	 */
+	private void newModelResult(GenericPrediction modelResult, GroupedRawData groupedRawData) {
+		this.dlControl.getDLClassifyProcess().newModelResult(modelResult, groupedRawData);
 	}
 
 }

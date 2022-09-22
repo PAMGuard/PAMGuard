@@ -164,7 +164,7 @@ public class SoundSpotClassifier implements DLClassiferModel, PamSettings {
 		public void newResult(GenericPrediction soundSpotResult, GroupedRawData groupedRawData) {
 			soundSpotResult.setClassNameID(getClassNameIDs()); 
 			soundSpotResult.setBinaryClassification(isBinaryResult(soundSpotResult)); 
-			newResult(soundSpotResult, groupedRawData);
+			newModelResult(soundSpotResult, groupedRawData);
 		}
 
 	}
@@ -241,7 +241,7 @@ public class SoundSpotClassifier implements DLClassiferModel, PamSettings {
 	 * @param modelResult - the model result;
 	 * @param groupedRawData - the grouped raw data. 
 	 */
-	private void newResult(GenericPrediction modelResult, GroupedRawData groupedRawData) {
+	private void newModelResult(GenericPrediction modelResult, GroupedRawData groupedRawData) {
 		this.dlControl.getDLClassifyProcess().newModelResult(modelResult, groupedRawData);
 	}
 

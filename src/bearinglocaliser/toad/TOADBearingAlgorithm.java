@@ -231,9 +231,9 @@ public class TOADBearingAlgorithm extends BaseFFTBearingAlgorithm {
 		 */
 //		locBearings[0][0] = Math.PI/2-locBearings[0][0];
 		
-		if (arrayShape == ArrayManager.ARRAY_TYPE_PLANE) {
+		/*if (arrayShape == ArrayManager.ARRAY_TYPE_PLANE) {
 			locBearings[0][0] = Math.PI/2-locBearings[0][0];
-		}
+		}*/
 
 		PamVector[] arrayAxis = bearingLocaliser.getArrayAxis();
 		double[] arrayAngles = PamVector.getMinimalHeadingPitchRoll(arrayAxis);
