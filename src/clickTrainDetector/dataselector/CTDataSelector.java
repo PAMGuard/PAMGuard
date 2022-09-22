@@ -112,8 +112,8 @@ public class CTDataSelector extends DataSelector {
 		
 		if (ctSelectParams.needsLoc && !pamDataUnit.getLocalisation().hasLocContent(LocContents.HAS_RANGE)) return 0; 
 
-		
 		return 1;
+		
 	}
 
 	/**
@@ -123,7 +123,11 @@ public class CTDataSelector extends DataSelector {
 	 */
 	private boolean isClassified(CTDetectionGroupDataUnit ctDataUnit) {
 
-		if (!ctSelectParams.needsClassification) return true; 
+		if (ctSelectParams.allowAnyClassification) return true; 
+		
+		if (this.getSelectorName().contains("Dolphin")) {
+			System.out.println("Dolphin classifier looking at " + ctDataUnit);
+		}
 
 		if (ctDataUnit instanceof CTDataUnit) {
 
@@ -131,9 +135,13 @@ public class CTDataSelector extends DataSelector {
 
 			if (clickTrain.ctClassifications==null) return false; 
 
+			int nClass = clickTrain.ctClassifications.size();
+			if (ctSelectParams.allowMultipleChoices == false) {
+				nClass = Math.min(nClass, 1);
+			}
 			//iterate through all the classifiers and allowed classification types. 
 			for (int i=0; i<ctSelectParams.classifier.length; i++) {
-				for (int j=0; j<clickTrain.ctClassifications.size(); j++) {
+				for (int j=0; j<nClass; j++) {
 					if (clickTrain.ctClassifications.get(j).getSpeciesID()==ctSelectParams.classifier[i]) {
 						return true; 
 					}
