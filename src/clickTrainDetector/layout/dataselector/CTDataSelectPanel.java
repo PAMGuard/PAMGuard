@@ -77,6 +77,8 @@ public class CTDataSelectPanel implements PamDialogPanel {
 	private JPanel classification;
 
 	private JCheckBox[] classifierCheckBoxes;
+	
+	private JCheckBox allowMultipleChoices; // 
 
 	private JCheckBox unclassifiedCheckBox;
 
@@ -232,6 +234,12 @@ public class CTDataSelectPanel implements PamDialogPanel {
 			classifierCheckBoxes[i].setSelected(true); //default should be selected
 			constraints.gridy++; 
 		}	
+		
+		constraints.gridy++;
+		classification.add(allowMultipleChoices = new JCheckBox("Allow multiple classification options"), constraints);
+		allowMultipleChoices.setToolTipText("If not selected, then only the first choice classification is compared to the " +
+		"selected list. If selected, then all classifiers passing minimum score may be used");
+		
 		classification.validate(); //make sure everything is laid out properly.
 		
 		setClassifierParams(); 
@@ -245,6 +253,7 @@ public class CTDataSelectPanel implements PamDialogPanel {
 				classifierCheckBoxes[i].setEnabled(!unclassifiedCheckBox.isSelected());
 			}
 		}
+		allowMultipleChoices.setEnabled(!unclassifiedCheckBox.isSelected());
 	}
 	
 	
@@ -253,7 +262,7 @@ public class CTDataSelectPanel implements PamDialogPanel {
 	 */
 	private void setClassifierParams() {
 		
-		unclassifiedCheckBox.setSelected(currentParams.needsClassification ); 
+		unclassifiedCheckBox.setSelected(currentParams.allowAnyClassification ); 
 
 		if (currentParams.classifier==null ) {
 			for (int i=0; i<classifierCheckBoxes.length; i++) {
@@ -270,6 +279,7 @@ public class CTDataSelectPanel implements PamDialogPanel {
 				}
 			}
 		}
+		allowMultipleChoices.setSelected(currentParams.allowMultipleChoices);
 
 	}
 		
@@ -278,7 +288,9 @@ public class CTDataSelectPanel implements PamDialogPanel {
 	 * Get the parameters for the classifiers to  use. 	
 	 */
 	private void getClassifierParams() {
-			currentParams.needsClassification  = unclassifiedCheckBox.isSelected(); 
+			currentParams.allowAnyClassification  = unclassifiedCheckBox.isSelected(); 
+			
+			currentParams.allowMultipleChoices = allowMultipleChoices.isSelected();
 			
 			int count = 0; 
 			for (int i=0; i<classifierCheckBoxes.length; i++) {

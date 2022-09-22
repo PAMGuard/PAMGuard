@@ -489,7 +489,7 @@ abstract public class PamCursor {
 			preparedUpdateStatement.setObject(iCol + 1, tableDef.getIndexItem().getValue());
 			int result = preparedUpdateStatement.executeUpdate();
 			if (result<1) {
-				System.out.println("update db result = " + String.valueOf(result));
+//				System.out.println("update db result = " + String.valueOf(result));
 				String msg = String.format("There was a problem updating row %d in table %s", 
 						tableDef.getIndexItem().getValue(), tableDef.getTableName());
 				PamWarning dispWarning = new PamWarning("Database Error", msg, 2);

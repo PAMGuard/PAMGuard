@@ -22,7 +22,7 @@ public class CTClassifierParams implements Cloneable, Serializable, ManagedParam
 	
 	
 	public CTClassifierParams() {
-		this.uniqueID = UUID.randomUUID().toString();
+//		this.uniqueID = UUID.randomUUID().toString(); // see comment below 
 	}
 	
 	
@@ -32,10 +32,13 @@ public class CTClassifierParams implements Cloneable, Serializable, ManagedParam
 	public String classifierName = ""; 
 	
 	
-	/**
-	 * A unique ID for the classifier that never changes. This is important for accessing data selectors. 
-	 */
-	public String uniqueID; 
+//	/**
+//	 * A unique ID for the classifier that never changes. This is important for accessing data selectors. 
+//	 * GET RID OF THIS, Every time you make a new set of params you get a new ID and it then creates a new 
+//	 * classifier selector with default settings, so the classifier selectors never work. 
+//	Classifier selectors need to be names on something that's not oging to change, so the module name and the classifier species ame. 
+//	 */
+//	public String uniqueID; 
 	
 	
 	/**
