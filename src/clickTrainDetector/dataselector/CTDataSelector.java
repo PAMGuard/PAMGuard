@@ -10,6 +10,7 @@ import clickTrainDetector.CTDataUnit;
 import clickTrainDetector.CTDetectionGroupDataUnit;
 import clickTrainDetector.ClickTrainControl;
 import clickTrainDetector.ClickTrainDataBlock;
+import clickTrainDetector.classification.CTClassification;
 import clickTrainDetector.layout.dataselector.CTDataSelectPane;
 import clickTrainDetector.layout.dataselector.CTDataSelectPanel;
 import pamViewFX.fxSettingsPanes.DynamicSettingsPane;
@@ -125,9 +126,9 @@ public class CTDataSelector extends DataSelector {
 
 		if (ctSelectParams.allowAnyClassification) return true; 
 		
-		if (this.getSelectorName().contains("Dolphin")) {
-			System.out.println("Dolphin classifier looking at " + ctDataUnit);
-		}
+//		if (this.getSelectorName().contains("Dolphin")) {
+//			System.out.println("Dolphin classifier looking at " + ctDataUnit);
+//		}
 
 		if (ctDataUnit instanceof CTDataUnit) {
 
@@ -137,13 +138,28 @@ public class CTDataSelector extends DataSelector {
 
 			int nClass = clickTrain.ctClassifications.size();
 			if (ctSelectParams.allowMultipleChoices == false) {
-				nClass = Math.min(nClass, 1);
+				int clsInd = clickTrain.getClassificationIndex();
+				if (clsInd < 0) {
+					return false;
+				}
+				if (clsInd >= clickTrain.ctClassifications.size()) {
+					return false;
+				}
+				CTClassification singleClass = clickTrain.ctClassifications.get(clsInd);
+				for (int i = 0; i < ctSelectParams.classifier.length; i++) {
+					if (ctSelectParams.classifier[i] == singleClass.getSpeciesID()) {
+						return true;
+					}
+				}
+				return false;
 			}
-			//iterate through all the classifiers and allowed classification types. 
-			for (int i=0; i<ctSelectParams.classifier.length; i++) {
-				for (int j=0; j<nClass; j++) {
-					if (clickTrain.ctClassifications.get(j).getSpeciesID()==ctSelectParams.classifier[i]) {
-						return true; 
+			else {
+				//iterate through all the classifiers and allowed classification types. 
+				for (int i=0; i<ctSelectParams.classifier.length; i++) {
+					for (int j=0; j<nClass; j++) {
+						if (clickTrain.ctClassifications.get(j).getSpeciesID()==ctSelectParams.classifier[i]) {
+							return true; 
+						}
 					}
 				}
 			}
