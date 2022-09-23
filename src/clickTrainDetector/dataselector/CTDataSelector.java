@@ -126,10 +126,6 @@ public class CTDataSelector extends DataSelector {
 
 		if (ctSelectParams.allowAnyClassification) return true; 
 		
-//		if (this.getSelectorName().contains("Dolphin")) {
-//			System.out.println("Dolphin classifier looking at " + ctDataUnit);
-//		}
-
 		if (ctDataUnit instanceof CTDataUnit) {
 
 			CTDataUnit clickTrain = (CTDataUnit) ctDataUnit; 
