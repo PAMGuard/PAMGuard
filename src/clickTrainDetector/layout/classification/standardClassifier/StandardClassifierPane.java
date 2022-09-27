@@ -84,7 +84,15 @@ public class StandardClassifierPane extends  SettingsPane<StandardClassifierPara
 	@Override
 	public void setParams(StandardClassifierParams input) {
 		for (int i=0; i<standardClassifier.getClassifiers().size(); i++) {
+			
+			standardClassifier.getClassifiers().get(i).setParams(input.ctClassifierParams[i]);
+			/**
+			 * It is important to set this here because otherwise the params can be out of sync with the classifer class. Usually this
+			 * is not an issue because they are set later, however, if there is a paramter that does not have a correpsonding UI control, then
+			 * this may change back to default - thus we have to explicitlly set here. (Note this caused issues with the uniqueID data selector string)
+			 */
 			standardClassifier.getClassifiers().get(i).getCTClassifierGraphics().setParams(input.ctClassifierParams[i]);
+
 			enableSwitch[i].setSelected(input.enable[i]);
 			disableClassifierPane(i); 
 		}

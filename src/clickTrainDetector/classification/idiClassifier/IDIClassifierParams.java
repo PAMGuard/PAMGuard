@@ -11,6 +11,8 @@ public class IDIClassifierParams extends CTClassifierParams implements Serializa
 	public IDIClassifierParams(){
 		super();
 		type = CTClassifierType.IDICLASSIFIER; 
+		//System.out.println("IDI classifier params: " + this);
+
 	}
 	
 	/**

@@ -76,6 +76,8 @@ public class SimpleCTClassifierPane extends SettingsPane<Chi2ThresholdParams>  {
 	 */
 	private ControlField<Double> minPercClicks;
 
+	private Chi2ThresholdParams currParams;
+
 	public SimpleCTClassifierPane(Chi2ThresholdClassifier simpleChi2Classifier) {
 		super(null);
 		this.simpleChi2Classifier=simpleChi2Classifier; 
@@ -214,6 +216,9 @@ public class SimpleCTClassifierPane extends SettingsPane<Chi2ThresholdParams>  {
 	public Chi2ThresholdParams getParams(Chi2ThresholdParams currParams) {
 		//System.out.println("Get PERC spinner value; " + minPercClicks.getSpinner().getValue());
 		
+		//System.out.println("Chi2 pane get params: " + this.currParams.speciesFlag + "  " + this.currParams.uniqueID + "  " + this.currParams); 
+		
+
 		currParams.chi2Threshold=chi2Threshold.getSpinner().getValue(); 
 		//HACK - for some reason Integer spinner is returning a double
 		currParams.minClicks=minClicks.getSpinner().getValue().intValue(); 
@@ -224,17 +229,25 @@ public class SimpleCTClassifierPane extends SettingsPane<Chi2ThresholdParams>  {
 			simpleChi2Classifier.getDataSelector().getDialogPaneFX().getParams(true); 
 		}
 		
-		return currParams;
+		currParams.uniqueID = this.currParams.uniqueID; 
+		
+		return currParams=this.currParams;
 	}
 
 	@Override
 	public void setParams(Chi2ThresholdParams input) {
+		
+		this.currParams = input; 
+		
+		//System.out.println("Chi2 pane set params: " + this.currParams.speciesFlag + "  " +  currParams.uniqueID + "  " + currParams); 
 		
 		chi2Threshold.getSpinner().getValueFactory().setValue(input.chi2Threshold);
 		//HACK - for some reason Integer spinner is returning a double
 		minClicks.getSpinner().getValueFactory().setValue((double) input.minClicks);
 		minTime.getSpinner().getValueFactory().setValue(input.minTime);
 		minPercClicks.getSpinner().getValueFactory().setValue(input.minPercentage*100.);
+		
+		
 	}
 
 	@Override

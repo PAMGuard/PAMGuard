@@ -64,7 +64,6 @@ public class StandardClassifierGraphics implements CTClassifierGraphics {
 	@Override
 	public void setParams(CTClassifierParams params) {
 		standardClassifierPane.setParams((StandardClassifierParams) params);
-		
 	}
 
 }

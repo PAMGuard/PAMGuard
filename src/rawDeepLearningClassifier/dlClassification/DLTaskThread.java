@@ -58,7 +58,7 @@ public abstract class DLTaskThread extends Thread {
 					for (int i =0; i<modelResult.size(); i++) {
 //						modelResult.get(i).setClassNameID(getClassNameIDs()); 
 //						modelResult.get(i).setBinaryClassification(isBinaryResult(modelResult.get(i))); 
-						newResult(modelResult.get(i), groupedRawData.get(i));
+						newDLResult(modelResult.get(i), groupedRawData.get(i));
 					}
 
 				}
@@ -79,7 +79,7 @@ public abstract class DLTaskThread extends Thread {
 	 * @param soundSpotResult - the new result.
 	 * @param groupedRawData - the grouped data unit. 
 	 */
-	public abstract void newResult(GenericPrediction soundSpotResult, GroupedRawData groupedRawData); 
+	public abstract void newDLResult(GenericPrediction soundSpotResult, GroupedRawData groupedRawData); 
 
 	/**
 	 * Get the grouped data queue
