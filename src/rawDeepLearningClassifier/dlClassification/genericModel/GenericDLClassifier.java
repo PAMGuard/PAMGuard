@@ -323,12 +323,21 @@ public class GenericDLClassifier implements DLClassiferModel, PamSettings {
 		}
 
 		@Override
-		public void newResult(GenericPrediction modelResult, GroupedRawData groupedRawData) {
+		public void newDLResult(GenericPrediction modelResult, GroupedRawData groupedRawData) {
 			modelResult.setClassNameID(getClassNameIDs(genericModelParams)); 
 			modelResult.setBinaryClassification(isBinaryResult(modelResult, genericModelParams)); 
 			newResult(modelResult, groupedRawData);
 		}
 
+	}
+	
+	/**
+	 * Send a new result form the thread queue to the process. 
+	 * @param modelResult - the model result;
+	 * @param groupedRawData - the grouped raw data. 
+	 */
+	protected void newResult(GenericPrediction modelResult, GroupedRawData groupedRawData) {
+		this.dlControl.getDLClassifyProcess().newModelResult(modelResult, groupedRawData);
 	}
 	
 	/**

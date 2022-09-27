@@ -45,6 +45,14 @@ public class PamAudioSystem {
 				
 			}
 		}
+		else if (file != null && isSudFile(file)) {
+			try {
+				return new SudAudioFileReader().getAudioInputStream(file);
+			}
+			catch (UnsupportedAudioFileException e) {
+				
+			}
+		}
 		try {
 		return AudioSystem.getAudioInputStream(file);
 		}
@@ -76,5 +84,21 @@ public class PamAudioSystem {
 		String end = name.substring(name.length()-5).toLowerCase();
 		return (end.equals(".flac"));
 	}
+	
+	/**
+	 * Check whether a file is a .sud file. This is the file format used
+	 * by SoundTraps which contains X3 compressed data. 
+	 * @param file - the file to check. 
+	 * @return  true if a .sud file. 
+	 */
+	private static boolean isSudFile(File file) {
+		String name = file.getName();
+		if (name.length() < 5) {
+			return false;
+		}
+		String end = name.substring(name.length()-5).toLowerCase();
+		return (end.equals(".sud"));
+	}
+
 
 }

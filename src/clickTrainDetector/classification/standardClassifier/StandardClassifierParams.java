@@ -33,6 +33,7 @@ public class StandardClassifierParams extends CTClassifierParams {
 		///very important to set this or else the clasifier manager does not
 		//know which classifier to create. 
 		type = CTClassifierType.STANDARDCLASSIFIER; 
+		//System.out.println("Standard classifier params: " + this);
 	}
 
 	

@@ -44,7 +44,7 @@ public class Chi2ThresholdClassifier implements CTClassifier {
 	public Chi2ThresholdClassifier(ClickTrainControl clickTrainControl, int defaultSpeciesID) {
 		this.clickTrainControl=clickTrainControl; 
 		clssfrParams.speciesFlag=defaultSpeciesID; 
-		createDataSelector(clickTrainControl.getParentDataBlock());
+		//createDataSelector(clickTrainControl.getParentDataBlock());
 	}
 
 	
@@ -110,19 +110,21 @@ public class Chi2ThresholdClassifier implements CTClassifier {
 	}
 
 
+
 	/**
 	 * Get the data selector. 
 	 * @param source - the source data block 
 	 * @return the data selector.
 	 */
 	public void createDataSelector(PamDataBlock<?> source) {
+		//System.out.println("Create data selector " +" " + clssfrParams.classifierName + "  " + clssfrParams.speciesFlag + " " + clssfrParams.uniqueID ); 
+
 		if (dataSelector==null || dataSelector.getPamDataBlock()!=source) {
 			//create the data selector
 			//System.out.println("Data selector: " + dataSelector); 
 			if (source!=null) {
 				dataSelector=source.getDataSelectCreator().getDataSelector(clickTrainControl.getUnitName() +  " " + clssfrParams.uniqueID
 						+ "_X2_threshold_classifier", false, null);
-				//System.out.println("Data selector: " + dataSelector); 
 			}
 			else {
 				dataSelector=null; 
@@ -197,7 +199,6 @@ public class Chi2ThresholdClassifier implements CTClassifier {
 
 	@Override
 	public void setParams(CTClassifierParams ctClassifierParams) {
-		// TODO Auto-generated method stub
 		this.clssfrParams=(Chi2ThresholdParams) ctClassifierParams;
 	}
 

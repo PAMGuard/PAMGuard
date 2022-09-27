@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ISO-8859-1"?><PAMGUARD>
+    <VERSIONINFO Created="14 September 2022 at 09:26:33 UTC" MinAspVersion="2.35.23" Release="CORE" Version="2.02.04a"/>
+    <MODULES>
+        <MODULE>
+            <BinFilePrefix>Data_Acquisition_Sound_Acquisition_Raw_Data_</BinFilePrefix>
+            <lastUID>870</lastUID>
+        </MODULE>
+        <MODULE>
+            <BinFilePrefix>Click_Detector_Click_Detector_Clicks_</BinFilePrefix>
+            <lastUID>13000083</lastUID>
+        </MODULE>
+        <MODULE>
+            <BinFilePrefix>Click_Detector_Click_Detector_Trigger_Background_</BinFilePrefix>
+            <lastUID>13000003</lastUID>
+        </MODULE>
+    </MODULES>
+</PAMGUARD>
