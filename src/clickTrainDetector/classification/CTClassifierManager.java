@@ -238,10 +238,10 @@ public class CTClassifierManager {
 				continue; 
 			}
 			
-			if (ctParams[i].uniqueID ==null) {
-				//old versions may not have a unique ID so needs to be added. 
-				ctParams[i].uniqueID = UUID.randomUUID().toString();
-			}
+//			if (ctParams[i].uniqueID ==null) {
+//				//old versions may not have a unique ID so needs to be added. 
+//				ctParams[i].uniqueID = UUID.randomUUID().toString();
+//			}
 			aClassifier.setParams(ctParams[i]); 
 			cTClassifiers.add(aClassifier); 
 		}

@@ -123,7 +123,8 @@ public class Chi2ThresholdClassifier implements CTClassifier {
 			//create the data selector
 			//System.out.println("Data selector: " + dataSelector); 
 			if (source!=null) {
-				dataSelector=source.getDataSelectCreator().getDataSelector(clickTrainControl.getUnitName() +  " " + clssfrParams.uniqueID
+				
+				dataSelector=source.getDataSelectCreator().getDataSelector(clickTrainControl.getUnitName() +  "_" + clssfrParams.classifierName
 						+ "_X2_threshold_classifier", false, null);
 			}
 			else {
