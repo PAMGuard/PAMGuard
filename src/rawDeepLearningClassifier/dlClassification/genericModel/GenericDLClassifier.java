@@ -326,7 +326,7 @@ public class GenericDLClassifier implements DLClassiferModel, PamSettings {
 		public void newResult(GenericPrediction modelResult, GroupedRawData groupedRawData) {
 			modelResult.setClassNameID(getClassNameIDs(genericModelParams)); 
 			modelResult.setBinaryClassification(isBinaryResult(modelResult, genericModelParams)); 
-			newResult(modelResult, groupedRawData);
+			newModelResult(modelResult, groupedRawData);
 		}
 
 	}
@@ -392,7 +392,14 @@ public class GenericDLClassifier implements DLClassiferModel, PamSettings {
 		return warnings;
 		
 	}
-
+	/**
+	 * Send a new result form the thread queue to the process. 
+	 * @param modelResult - the model result;
+	 * @param groupedRawData - the grouped raw data. 
+	 */
+	private void newModelResult(GenericPrediction modelResult, GroupedRawData groupedRawData) {
+		this.dlControl.getDLClassifyProcess().newModelResult(modelResult, groupedRawData);
+	}
 
 
 //	/**
