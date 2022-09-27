@@ -2000,6 +2000,10 @@ public abstract class SQLLogging {
 				}
 				PamSubtableData subtableData = new PamSubtableData();
 				long utc = SQLTypes.millisFromTimeStamp(subtableTableDef.getTimeStampItem().getValue());
+				if (utc % 1000 == 0) {
+					int millis = subtableTableDef.getTimeStampMillis().getIntegerValue();
+					utc += millis;
+				}
 				subtableData.setChildUTC(utc);
 				subtableData.setParentID(subtableTableDef.getParentID().getIntegerValue());
 				subtableData.setParentUID(subtableTableDef.getParentUID().getLongValue());

@@ -587,6 +587,11 @@ public class ClickTrainAlgorithmPaneFX extends SettingsPane<ClickTrainParams> {
 	public void paneInitialized() {
 
 	}
+
+	@Override
+	public String getHelpPoint() {
+		return ClickTrainControl.helpPoint;
+	}
 	
 
 }

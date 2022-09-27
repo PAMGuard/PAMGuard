@@ -1068,6 +1068,22 @@ final public class PamModel implements PamModelInterface, PamSettings {
 		// clear the current list
 		pluginList.clear();
 		daqList.clear();
+		
+		/*
+		 * If developing a new PAMPlugin in eclipse, the easiest way to do it is to make a new
+		 * Eclipse project for your plugin code. Within that project, copy this PamModel class 
+		 * and put it into a package with exactly the same name within your new project (i.e. PamModel)
+		 * then add a line to the copy of this class to explicitly add the class name of your new
+		 * plugin, e.g. 
+		pluginList.add(new CollatorPlugin());
+		 * The plugin information will then be extracted from the PamPluginInterface in the same way as
+		 * it would should it be being used as a real plugin, inclusing help information which will be 
+		 * added to the PAMGuard help 
+		 * 
+		 * When you export the code for your plugin to a jar file, remember to NOT inlcude the copy of 
+		 * PamModel !
+		 */
+		
 
 		// Load up whatever default classloader was used to create this class.  Must use the same classloader
 		// for all plugins, or else we will not be able to create proper dependencies between them or be able

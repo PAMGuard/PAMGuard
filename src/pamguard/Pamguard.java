@@ -135,7 +135,7 @@ public class Pamguard {
 		Thread folderSizeThread  = new Thread(folderSizeMon);
 		folderSizeThread.start();
 
-		TimeZone.setDefault(PamCalendar.defaultTimeZone);
+//		TimeZone.setDefault(PamCalendar.defaultTimeZone);
 
 		System.out.println("**********************************************************");
 		try {

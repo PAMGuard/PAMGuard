@@ -442,6 +442,8 @@
 
 <mapID target="localisation.bearingLocaliser.docs.BL_Settings" url="localisation/bearingLocaliser/docs/BL_Settings.html"/>
 
+<mapID target="detectors.ClickTrainDetector.docs.ClickTrainDetector" url="detectors/ClickTrainDetector/docs/ClickTrainDetector.html"/>
+
 <mapID target="sound_processing.FiltersHelp.Docs.Filters_filters" url="sound_processing/FiltersHelp/Docs/Filters_filters.html"/>
 
 <mapID target="localisation.bearingLocaliser.docs.BL_Output" url="localisation/bearingLocaliser/docs/BL_Output.html"/>
@@ -641,6 +643,8 @@
 <mapID target="overview.annotations.docs.textannotation" url="overview/annotations/docs/textannotation.html"/>
 
 <mapID target="mapping.AirgunDisplay.docs.AirgunConfiguration" url="mapping/AirgunDisplay/docs/AirgunConfiguration.html"/>
+
+<mapID target="utilities.backupmanager.docs.backupmanager" url="utilities/backupmanager/docs/backupmanager.html"/>
 
 <mapID target="localisation.targetmotion.docs.targetmotion_Localising" url="localisation/targetmotion/docs/targetmotion_Localising.html"/>
 

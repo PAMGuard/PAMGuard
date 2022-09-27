@@ -191,6 +191,10 @@
    <tocitem text="Importing " target="utilities.quickAnnotations.docs.import" image="topic"/>
 
   </tocitem>
+  <tocitem text="Backup Manager " target="utilities.backupmanager.docs.backupmanager">
+   <tocitem text="Overview " target="utilities.backupmanager.docs.backupmanager" image="topic"/>
+
+  </tocitem>
  </tocitem>
  <tocitem text="Sensors ">
   <tocitem text="Analog Array Sensors ">
@@ -479,6 +483,10 @@
    <tocitem text="Displays " target="detectors.gpl.docs.gpldisplays" image="topic"/>
 
    <tocitem text="Localisation " target="detectors.gpl.docs.localisation" image="topic"/>
+
+  </tocitem>
+  <tocitem text="Click Train Detector " target="detectors.ClickTrainDetector.docs.ClickTrainDetector">
+   <tocitem text="Overview " target="detectors.ClickTrainDetector.docs.ClickTrainDetector" image="topic"/>
 
   </tocitem>
  </tocitem>
