@@ -74,7 +74,7 @@ public class StandardClassifier implements CTClassifier {
 	private void createClassifiers() {
 		classifiers = new ArrayList<CTClassifier>(); 
 
-		
+		//System.out.println("------CREATE CLASSIFIERS: -------"); 
 		//do this so that is CLASSIFIER_TYPES changes order things still work. 
 		for (int i=0; i<CLASSIFIER_TYPES.length; i++) {
 
@@ -104,6 +104,7 @@ public class StandardClassifier implements CTClassifier {
 	 */
 	private void setClassifierParams() {
 		
+		
 		if (standardClssfrParams.ctClassifierParams ==null || standardClssfrParams.ctClassifierParams.length != classifiers.size()) {
 			standardClssfrParams.ctClassifierParams = new CTClassifierParams[classifiers.size()];  
 			standardClssfrParams.enable = new boolean[classifiers.size()]; 
@@ -119,6 +120,11 @@ public class StandardClassifier implements CTClassifier {
 				standardClssfrParams.ctClassifierParams[i] = classifiers.get(i).getParams(); 
 			}
 			else {
+				
+				//set the current species ID and name for convenience
+				standardClssfrParams.ctClassifierParams[i].classifierName=standardClssfrParams.classifierName;
+				standardClssfrParams.ctClassifierParams[i].speciesFlag=standardClssfrParams.speciesFlag;
+
 				//the standard classifier should have settings set. 
 				classifiers.get(i).setParams(standardClssfrParams.ctClassifierParams[i]); 
 			}

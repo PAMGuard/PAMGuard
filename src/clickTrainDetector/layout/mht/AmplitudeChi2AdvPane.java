@@ -64,9 +64,7 @@ public class AmplitudeChi2AdvPane extends AdvMHTVarPane {
 	
 	@Override
 	public AmplitudeChi2Params getParams(SimpleChi2VarParams currParams) {	
-		
-		System.out.println("Get params: AMPLITUDE");
-		
+				
 		AmplitudeChi2Params newParams = new AmplitudeChi2Params(super.getParams(currParams));
 
 		newParams.maxAmpJump = ampJumpSpinner.getValue();

@@ -26,6 +26,7 @@ public class TemplateClassifierParams extends CTClassifierParams implements Mana
 		super.type=CTClassifierType.TEMPLATECLASSIFIER;
 //		chi2ThresholdParams = new Chi2ThresholdParams();  
 //		template = DefualtSpectrumTemplates.getTemplate(SpectrumTemplateType.BEAKED_WHALE);
+		//System.out.println("Template classifier params: " + this);
 	}
 	
 	

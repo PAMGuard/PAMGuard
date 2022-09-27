@@ -20,6 +20,7 @@ public class Chi2ThresholdParams extends CTClassifierParams implements ManagedPa
 	public Chi2ThresholdParams(){
 		super();
 		super.type=CTClassifierType.CHI2THRESHOLD;
+		//System.out.println("Chi2thrwesh classifier params: " + this);
 	}
 	
 	/**

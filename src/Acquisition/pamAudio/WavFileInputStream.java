@@ -79,6 +79,8 @@ public class WavFileInputStream extends AudioInputStream {
 		
 		return new WavFileInputStream(wavHeader, inputStream, audioFormat, nFrames);
 	}
+	
+	
 	static AudioFormat.Encoding getEncoding(int formatCode) {
 		switch (formatCode) {
 		case 1:

@@ -17,6 +17,7 @@ public class BearingClassifierParams extends CTClassifierParams implements Manag
 	public BearingClassifierParams(){
 		super();
 		type = CTClassifierType.BEARINGCLASSIFIER; 
+		//System.out.println("Bearing classifier params");
 	}
 
 	/**

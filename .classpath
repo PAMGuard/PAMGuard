@@ -16,5 +16,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="/X3/src/org"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

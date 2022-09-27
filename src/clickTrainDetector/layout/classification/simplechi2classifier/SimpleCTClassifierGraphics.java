@@ -43,7 +43,7 @@ public class SimpleCTClassifierGraphics implements CTClassifierGraphics {
 
 	@Override
 	public CTClassifierParams getParams() {
-		Chi2ThresholdParams clssfrParams = simpleCTClassiferPane.getParams(simpleChi2Classifier.getParams()).clone(); 
+		Chi2ThresholdParams clssfrParams = simpleCTClassiferPane.getParams(simpleChi2Classifier.getParams()).clone();
 		if (clssfrParams==null) {
 			System.err.print("Simple Chi2 Classifier returned null params");
 			return null;
