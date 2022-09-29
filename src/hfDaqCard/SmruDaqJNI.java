@@ -20,7 +20,14 @@ public class SmruDaqJNI {
 	
 	static public final int SMRU_RET_OK = 0;
 
+	/**
+	 * Have rebuilt SAIL Daq interface in 2022, but in principle this was 
+	 * just a straight rebuild of the exact same JNI code. the main purpose was to check
+	 * we could still rebuild it after all these years and it seems to work. No real
+	 * need though to move on from the older and trusted version. 
+	 */
 	private static final String SILIB = "SailDaqJNI";
+//	private static final String SILIB = "SailDaqV7";
 	
 	/**
 	 * this is the verbose level for the C code part. 
@@ -407,8 +414,8 @@ public class SmruDaqJNI {
 			}
 			catch (UnsatisfiedLinkError e)
 			{
-				smruDaqSystem.terminalPrint("SAIL DAQ Card lib '" + SILIB + "' cannot be loaded for the following reason:", 1);
-				smruDaqSystem.terminalPrint("Unsatisfied Link Error : " + e.getMessage(), 1);
+				System.out.println("SAIL DAQ Card lib '" + SILIB + "' cannot be loaded for the following reason:");
+				System.out.println("Unsatisfied Link Error : " + e.getMessage());
 				haveLibrary = false;
 			}
 		}
@@ -838,6 +845,22 @@ public class SmruDaqJNI {
 		}
 		return true;
 		
+	}
+	
+	/**
+	 * Get the dll library name. 
+	 * @return
+	 */
+	public String getLibrary() {
+		return SILIB;
+	}
+	
+	/**
+	 * Get the version of the dll library. 
+	 * @return
+	 */
+	public int getLibarayVersion() {
+		return libVersion;
 	}
 
 
