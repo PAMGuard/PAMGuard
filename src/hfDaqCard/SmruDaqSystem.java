@@ -86,6 +86,19 @@ public class SmruDaqSystem extends DaqSystem implements PamSettings {
 			System.out.println(str);
 		}
 	}
+	
+	public String getJNILibInfo() {
+		String lib = smruDaqJNI.getLibrary();
+		int libVer = smruDaqJNI.getLibarayVersion();
+		String verStr;
+		if (libVer < 0) {
+			verStr = String.format("%s not loaded", lib);
+		}
+		else {
+			verStr = String.format("%s.dll Version %d", lib, libVer);
+		}
+		return verStr;
+	}
 
 	@Override
 	public boolean canPlayBack(float sampleRate) {
@@ -417,6 +430,15 @@ public class SmruDaqSystem extends DaqSystem implements PamSettings {
 
 	@Override
 	public void stopSystem(AcquisitionControl daqControl) {
+		if (keepRunning == false) {
+			/*
+			 *  it was never running, so no need to do this. From the GUI this isn't ever a problem 
+			 *  but PAMDog can call stop a little over zealously, and there seems to be a problem
+			 *  with calling this when it's not running bunging up the cards. So basically without
+			 *  this PAMDog won't run properly with PAMDog 
+			 */
+			return;
+		}
 		keepRunning = false;
 		try {
 			while(daqThreadRunning) {
