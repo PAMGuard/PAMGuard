@@ -121,7 +121,7 @@ public class StandardClassifier implements CTClassifier {
 			}
 			else {
 				
-				//set the current species ID and name for convenience
+//				//set the current species ID and name for convenience
 				standardClssfrParams.ctClassifierParams[i].classifierName=standardClssfrParams.classifierName;
 				standardClssfrParams.ctClassifierParams[i].speciesFlag=standardClssfrParams.speciesFlag;
 
@@ -148,13 +148,13 @@ public class StandardClassifier implements CTClassifier {
 //					+ "  sub species: "+ classifiers.get(i).getParams().speciesFlag + " standard species: " +speciesID + " use? : " + standardClssfrParams.enable[i]); 
 
 			if (standardClssfrParams.enable[i]) {
-				if (ctClassification[i].getSpeciesID() != SUB_CLASSIFIER_SPECIESID){
+				if (ctClassification[i].getSpeciesID() < 0){
 					speciesID = CTClassifier.NOSPECIES;
 				}
 			}
 		}
 	
-		//System.out.println("SPECIES ID: " + speciesID); 
+		//System.out.println("SPECIES ID: " + speciesID + " clickTrain: " +  clickTrain.getUID()); 
 
 		//create the classification. 
 		StandardClassification classification = new StandardClassification(ctClassification, speciesID); 
