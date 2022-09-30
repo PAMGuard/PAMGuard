@@ -121,7 +121,7 @@ public class StandardClassifier implements CTClassifier {
 			}
 			else {
 				
-//				//set the current species ID and name for convenience
+				//set the current species ID and name for convenience
 				standardClssfrParams.ctClassifierParams[i].classifierName=standardClssfrParams.classifierName;
 				standardClssfrParams.ctClassifierParams[i].speciesFlag=standardClssfrParams.speciesFlag;
 
