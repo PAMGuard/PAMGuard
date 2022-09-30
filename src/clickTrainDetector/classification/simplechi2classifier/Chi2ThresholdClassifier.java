@@ -119,14 +119,13 @@ public class Chi2ThresholdClassifier implements CTClassifier {
 	public void createDataSelector(PamDataBlock<?> source) {
 		//System.out.println("Create data selector " +" " + clssfrParams.classifierName + "  " + clssfrParams.speciesFlag + " " + clssfrParams.uniqueID ); 
 		
-		if (clssfrParams.uniqueID==null) clssfrParams.newUniqueID();
 
 		if (dataSelector==null || dataSelector.getPamDataBlock()!=source) {
 			//create the data selector
 			//System.out.println("Data selector: " + dataSelector); 
 			if (source!=null) {
 				
-				dataSelector=source.getDataSelectCreator().getDataSelector(clickTrainControl.getUnitName() +  "_" + clssfrParams.uniqueID
+				dataSelector=source.getDataSelectCreator().getDataSelector(clickTrainControl.getUnitName() +  "_" + clssfrParams.getUniqueID()
 						+ "_X2_threshold_classifier", false, null);
 			}
 			else {
