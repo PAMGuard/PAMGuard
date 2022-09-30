@@ -49,6 +49,13 @@ public class CTClassifierParams implements Cloneable, Serializable, ManagedParam
 	 */
 	public CTClassifierType type; 
 	
+	/**
+	 * Create a new unique string identifier - USE WITH CAUTION as the unique ID is used to identify data selectors. 
+	 */
+	public void newUniqueID() {
+		this.uniqueID =  UUID.randomUUID().toString();
+	};
+	
 	public CTClassifierParams clone() {
 		try {
 			CTClassifierParams clonedParams =(CTClassifierParams) super.clone();
