@@ -229,7 +229,7 @@ public class SimpleCTClassifierPane extends SettingsPane<Chi2ThresholdParams>  {
 			simpleChi2Classifier.getDataSelector().getDialogPaneFX().getParams(true); 
 		}
 		if (this.currParams != null) {
-			currParams.uniqueID = this.currParams.uniqueID; 
+			currParams.setUniqueID(this.currParams.getUniqueID()); 
 		}
 		
 		return this.currParams=currParams;

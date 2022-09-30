@@ -36,7 +36,7 @@ public class CTClassifierParams implements Cloneable, Serializable, ManagedParam
 	/**
 	 * A unique ID for the classifier that never changes. This is important for accessing data selectors. 
 	 */
-	public String uniqueID =  UUID.randomUUID().toString();
+	private String uniqueID =  UUID.randomUUID().toString();
 	
 	
 	/**
@@ -70,6 +70,23 @@ public class CTClassifierParams implements Cloneable, Serializable, ManagedParam
 	public PamParameterSet getParameterSet() {
 		PamParameterSet ps = PamParameterSet.autoGenerate(this);
 		return ps;
+	}
+
+	/**
+	 * @return the uniqueID
+	 */
+	public String getUniqueID() {
+		if (uniqueID == null) {
+			uniqueID =  UUID.randomUUID().toString();
+		}
+		return uniqueID;
+	}
+
+	/**
+	 * @param uniqueID the uniqueID to set
+	 */
+	public void setUniqueID(String uniqueID) {
+		this.uniqueID = uniqueID;
 	}
 
 }
