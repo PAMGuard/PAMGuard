@@ -101,6 +101,7 @@ public class Chi2ThresholdClassifier implements CTClassifier {
 				count = count+1.; 
 			}
 		}
+		
 		if (count/clickTrain.getSubDetectionsCount()>=clssfrParams.minPercentage) {
 			return true;	
 		}
