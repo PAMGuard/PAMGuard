@@ -131,6 +131,10 @@ public class CTDataSelector extends DataSelector {
 			CTDataUnit clickTrain = (CTDataUnit) ctDataUnit; 
 
 			if (clickTrain.ctClassifications==null) return false; 
+			
+			if (ctSelectParams.classifier == null) {
+				return false;
+			}
 
 			int nClass = clickTrain.ctClassifications.size();
 			if (ctSelectParams.allowMultipleChoices == false) {
