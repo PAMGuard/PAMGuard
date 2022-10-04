@@ -148,7 +148,7 @@ public class StandardClassifier implements CTClassifier {
 //					+ "  sub species: "+ classifiers.get(i).getParams().speciesFlag + " standard species: " +speciesID + " use? : " + standardClssfrParams.enable[i]); 
 
 			if (standardClssfrParams.enable[i]) {
-				if (ctClassification[i].getSpeciesID() < 0){
+				if (ctClassification[i].getSpeciesID() <= CTClassifier.NOSPECIES){
 					speciesID = CTClassifier.NOSPECIES;
 				}
 			}
