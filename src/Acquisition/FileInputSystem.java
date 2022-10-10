@@ -537,6 +537,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	}
 
 	public File getCurrentFile() {
+		System.out.println("fileInputParameters: " + fileInputParameters); 
 		if (fileInputParameters.recentFiles == null) return null;
 		if (fileInputParameters.recentFiles.size() < 1) return null;
 		String fileName = fileInputParameters.recentFiles.get(0);
@@ -559,8 +560,11 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	public boolean prepareInputFile() {
 
 		File currentFile = getCurrentFile();
-//		System.out.printf("***********************************             Opening file %s\n", currentFile.getName());
-		if (currentFile == null) return false;
+		if (currentFile == null) {
+			System.out.println("The current file was null");
+			return false;
+		}
+		System.out.printf("***********************************             Opening file %s\n", currentFile.getName());
 
 		try {
 
@@ -645,7 +649,8 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 			
 			String audioFileStr = getCurrentFile()==null? "Null File": getCurrentFile().getAbsolutePath();
 
-			System.err.println("FileInputSystem: runFileAnalysis: AudioFilr format is null: " + audioFileStr); 
+			System.err.println("FileInputSystem: runFileAnalysis: AudioFile format is null: " + audioFileStr); 
+			
 			return false; 
 		}
 		

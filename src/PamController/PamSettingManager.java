@@ -536,7 +536,8 @@ public class PamSettingManager {
 						"This could occur if the psf file location is in a read-only folder, or the filename is " +
 						"invalid.  Please check and try again.";
 				String help = null;
-				int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help);
+				//Let the warning dialog class choose GUI frame or get a class cast exception  if closing PG with different GUI
+				int ans = WarnOnce.showWarning( title, msg, WarnOnce.WARNING_MESSAGE, help);
 			}
 		}
 		/**

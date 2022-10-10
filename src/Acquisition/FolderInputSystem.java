@@ -429,6 +429,8 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings{
 				File aFile = files[0];
 				setNewFile(aFile.getAbsolutePath());
 			}
+			
+			
 			/*
 			 *  The file chooser is returning sub classes of File which are not
 			 *  serialisable, so we can't use them. We need to convert their 
@@ -568,6 +570,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings{
 
 	@Override
 	public File getCurrentFile() {
+		//System.out.println("All files: " +  allFiles);
 		if (allFiles != null && allFiles.size() > currentFile) {
 			return allFiles.get(currentFile);
 		}

@@ -9,9 +9,10 @@ import java.net.Socket;
 import javax.swing.JComponent;
 import javax.swing.Timer;
 
-import x3.CRC16;
-import x3.X3FrameDecode;
-import x3.X3FrameHeader;
+import org.pamguard.x3.x3.CRC16;
+import org.pamguard.x3.x3.X3FrameDecode;
+import org.pamguard.x3.x3.X3FrameHeader;
+
 import networkTransfer.NetworkObject;
 import networkTransfer.receive.BuoyStatusDataUnit;
 import networkTransfer.receive.NetworkDataUser;
