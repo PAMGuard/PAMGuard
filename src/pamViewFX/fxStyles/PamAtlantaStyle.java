@@ -22,13 +22,6 @@ package pamViewFX.fxStyles;
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-
-import PamView.ColourScheme;
-import PamView.PamColors;
-import atlantafx.base.theme.NordDark;
-import atlantafx.base.theme.PrimerDark;
-import atlantafx.base.theme.PrimerLight;
-
 /**
  * Class defining the default CSS Style sheets to use for JavaFX displays.  This class can be extended and one or more methods overridden to
  * specify new CSS styles.  Style sheets can be specified for 3 different categories: sliding dialogs, regular dialogs, and all other components
@@ -63,8 +56,6 @@ public class PamAtlantaStyle extends PamDefaultStyle {
 	//private String slidingDialogCSS = "/Resources/css/pamCSS.css";
 	//private String slidingDialogCSS = new PrimerDark().getUserAgentStylesheet();
 	protected String primerSlidingDialogCSS = "/Resources/css/primer-pamguard.css";
-
-
 	
 	public PamAtlantaStyle() {
 		super.guiCSS = primerGuiCSS;

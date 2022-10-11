@@ -48,6 +48,12 @@ public class OfflineWavFileServer extends OfflineFileServer<FileDataMapPoint> {
 
 	private AudioInputStream audioInputStream;
 	private AudioFormat audioFormat;
+	
+	/**
+	 * 	The standard file formats which implement and AudioStream. 
+	 */
+	private String[] standardAudioTypes = {".wav", ".aif", ".aiff", ".sud"};
+
 
 	public OfflineWavFileServer(OfflineFileDataStore offlineRawDataStore, FileDate fileDate) {
 		super(offlineRawDataStore);
@@ -173,6 +179,15 @@ public class OfflineWavFileServer extends OfflineFileServer<FileDataMapPoint> {
 		OfflineDataMap<FileDataMapPoint> dataMap = getDataMap();
 		Iterator<FileDataMapPoint> mapIt = dataMap.getListIterator();
 		FileDataMapPoint mapPoint = findFirstMapPoint(mapIt, offlineDataLoadInfo.getStartMillis(), offlineDataLoadInfo.getEndMillis());
+		
+//		System.out.println("Open sound file: " + mapPoint.getSoundFile());
+//		 mapIt = dataMap.getListIterator();
+//			while (mapIt.hasNext()) {
+//				mapPoint = mapIt.next();
+//				System.out.println("Map point: " + mapPoint.getStartTime() +  "  "  + mapPoint.getEndTime() + " Total mins: " + ((mapPoint.getEndTime() -mapPoint.getStartTime())/1000/60)); 
+//
+//			}
+		
 		if (openSoundFile(mapPoint.getSoundFile()) == false) {
 			System.out.println("Could not open .wav sound file " + mapPoint.getSoundFile().getAbsolutePath());
 			return false;
@@ -208,8 +223,11 @@ public class OfflineWavFileServer extends OfflineFileServer<FileDataMapPoint> {
 			// need to fast forward in current file. 
 			long skipBytes = (long) (((offlineDataLoadInfo.getStartMillis()-currentTime)*audioFormat.getSampleRate()*audioFormat.getFrameSize())/1000.);
 			try {
+				
+				//System.out.println("Skipped " + skipped+  " " + skipBytes + " " + audioInputStream.available());
 				skipped = audioInputStream.skip(skipBytes);
-				//				Debug.out.println("Skipped " + skipped);
+				//System.out.println("Offline " + (offlineDataLoadInfo.getStartMillis()-currentTime) + " ms : frame size: " + audioFormat.getFrameSize());
+
 			} catch (IOException e) {
 				/**
 				 * The datamap point may be longer than the actual file here ? In any case, with the 
@@ -231,6 +249,7 @@ public class OfflineWavFileServer extends OfflineFileServer<FileDataMapPoint> {
 				break;
 			}
 			try {
+				
 				bytesRead = audioInputStream.read(inputBuffer);
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -493,7 +512,6 @@ public class OfflineWavFileServer extends OfflineFileServer<FileDataMapPoint> {
 		return true;
 	}
 
-	private String[] standardAudioTypes = {".wav", ".aif", ".aiff"};
 	
 	/**
 	 * Is it a standard aif or wav audio file which can be opened with the standard reader ? 

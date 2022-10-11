@@ -113,6 +113,7 @@
   -fx-background-insets: inherit;
   -fx-padding: inherit;
 }
+
 .root.popup {
   -fx-background-color: transparent;
 }
@@ -1972,7 +1973,7 @@ Text {
   -fx-underline: true;
 }
 .dialog-pane > .content {
-  -fx-padding: 1em 1em 0 1em;
+  -fx-padding: 1em 1em 1em 1em;
 }
 .dialog-pane > .content.label {
   -fx-alignment: TOP_LEFT;
@@ -1989,10 +1990,10 @@ Text {
   -fx-padding: 0 0 0 1em;
 }
 .dialog-pane:no-header > .content {
-  -fx-padding: 1em 1em 0 0;
+  -fx-padding: 1em 1em 1em 1em;
 }
 .dialog-pane:no-header > * > .graphic-container {
-  -fx-padding: 1em 1em 0 1em;
+  -fx-padding: 1em 1em 1em 1em;
 }
 .dialog-pane.information > .header-panel {
   -fx-background-color: -color-accent-fg, -color-bg-subtle;
@@ -3661,4 +3662,16 @@ Text {
   -fx-padding: 8px 12px 8px 12px;
   -fx-opacity: 0.85;
   -fx-effect: dropshadow(three-pass-box, -color-shadow-default, 8px, 0.6, 0, 2);
+}
+
+
+/********************************************
+*                                           *
+*      Spinner                 *
+*                                           *
+*********************************************/
+
+
+.spinner  {
+    -fx-pref-width: 120px;
 }
