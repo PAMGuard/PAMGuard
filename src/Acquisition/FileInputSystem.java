@@ -47,6 +47,8 @@ import wavFiles.ByteConverter;
 import Acquisition.filedate.FileDate;
 import Acquisition.filedate.FileDateDialogStrip;
 import Acquisition.filedate.FileDateObserver;
+import Acquisition.pamAudio.PamAudioFileManager;
+import Acquisition.pamAudio.PamAudioFileFilter;
 import Acquisition.pamAudio.PamAudioSystem;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
@@ -54,7 +56,6 @@ import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamDetection.RawDataUnit;
 import PamModel.SMRUEnable;
-import PamUtils.PamAudioFileFilter;
 import PamUtils.PamCalendar;
 import PamUtils.PamFileChooser;
 import PamView.dialog.PamLabel;
@@ -408,7 +409,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		//		acquisitionDialog.NotifyChange();
 		if (file.isFile() && !file.isHidden() && acquisitionDialog != null) {
 			try {
-				AudioInputStream audioStream = PamAudioSystem.getAudioInputStream(file);
+				AudioInputStream audioStream = PamAudioFileManager.getInstance().getAudioInputStream(file);
 
 				//      // Get additional information from the header if it's a wav file. 
 				//				if (WavFileInputStream.class.isAssignableFrom(audioStream.getClass())) {
@@ -572,7 +573,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 				audioStream.close();
 			}
 
-			audioStream = PamAudioSystem.getAudioInputStream(currentFile);
+			audioStream = PamAudioFileManager.getInstance().getAudioInputStream(currentFile);
 
 			if (audioStream == null) {
 				return false;

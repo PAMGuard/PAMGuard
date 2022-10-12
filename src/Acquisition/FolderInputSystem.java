@@ -28,11 +28,12 @@ import Acquisition.layoutFX.DAQSettingsPane;
 import Acquisition.layoutFX.FolderInputPane;
 import javafx.application.Platform;
 import pamguard.GlobalArguments;
+import Acquisition.pamAudio.PamAudioFileManager;
+import Acquisition.pamAudio.PamAudioFileFilter;
 import Acquisition.pamAudio.PamAudioSystem;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamSettings;
-import PamUtils.PamAudioFileFilter;
 import PamUtils.PamCalendar;
 import PamUtils.PamFileChooser;
 import PamUtils.PamFileFilter;
@@ -507,7 +508,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings{
 		if (file.isFile() && !file.isHidden() && acquisitionDialog != null) {
 			//Hidden files should not be used in analysis...
 			try {
-				audioStream = PamAudioSystem.getAudioInputStream(file);
+				audioStream = PamAudioFileManager.getInstance().getAudioInputStream(file);
 				AudioFormat audioFormat = audioStream.getFormat();
 				fileSamples = audioStream.getFrameLength();
 				acquisitionDialog.setSampleRate(audioFormat.getSampleRate());

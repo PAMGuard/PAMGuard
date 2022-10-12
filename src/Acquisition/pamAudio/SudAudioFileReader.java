@@ -28,7 +28,7 @@ public class SudAudioFileReader {
 
 	public SudAudioFileReader() {
 		 sudParams = new SudParams(); 
-		 //set up[ the sud params for default. i.e. just read files and 
+		 //set up the sud params for default. i.e. just read files and 
 		 //don't save any decompressed or meta data. 
 		 sudParams.saveWav = false; 
 		 sudParams.saveMeta = false; 

@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
+import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.sound.sampled.AudioFormat.Encoding;
@@ -25,10 +26,11 @@ import org.jflac.metadata.StreamInfo;
 import org.jflac.util.ByteData;
 
 import wavFiles.ByteConverter;
+import Acquisition.pamAudio.PamAudioFileManager;
+import Acquisition.pamAudio.PamAudioFileFilter;
 import Acquisition.pamAudio.PamAudioSystem;
 import PamDetection.RawDataUnit;
 import PamUtils.FileParts;
-import PamUtils.PamAudioFileFilter;
 import PamUtils.PamCalendar;
 import PamUtils.PamFileFilter;
 import PamUtils.PamUtils;
@@ -150,7 +152,7 @@ public class RonaInputSystem extends FolderInputSystem {
 					audioStreams[i].close();
 				}
 
-				audioStreams[i] = PamAudioSystem.getAudioInputStream(findChannelFile(currentFile, i, 2));
+				audioStreams[i] = PamAudioFileManager.getInstance().getAudioInputStream(findChannelFile(currentFile, i, 2));
 
 				audioFormat = audioStreams[i].getFormat();
 

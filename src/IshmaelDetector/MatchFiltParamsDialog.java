@@ -33,8 +33,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import Acquisition.pamAudio.PamAudioFileFilter;
 import PamDetection.RawDataUnit;
-import PamUtils.PamAudioFileFilter;
 import PamUtils.PamFileChooser;
 
 

@@ -10,7 +10,13 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 //import org.kc7bfi.jflac.sound.spi.FlacAudioFileReader;
 import org.jflac.sound.spi.FlacAudioFileReader;
 
-
+/**
+ * Now replaced with PamAudioFileManager.
+ * 
+ * @author Jamie Macaulay
+ *
+ */
+@Deprecated
 public class PamAudioSystem {
 
 	private static final long largeFileSize = 01L<<31;
@@ -42,7 +48,7 @@ public class PamAudioSystem {
 				return new FlacAudioFileReader().getAudioInputStream(file);
 			}
 			catch (UnsupportedAudioFileException e) {
-				
+
 			}
 		}
 		else if (file != null && isSudFile(file)) {
@@ -54,7 +60,7 @@ public class PamAudioSystem {
 			}
 		}
 		try {
-		return AudioSystem.getAudioInputStream(file);
+			return AudioSystem.getAudioInputStream(file);
 		}
 		catch (Exception e) {
 			System.out.println("Error in audio file " + file.getName() + ":  " + e.getMessage());

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import Acquisition.AudioFileFuncs;
 import Acquisition.FolderInputSystem;
 import Acquisition.WavFileFuncs;
-import PamUtils.PamAudioFileFilter;
+import Acquisition.pamAudio.PamAudioFileFilter;
 import javafx.geometry.Insets;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;

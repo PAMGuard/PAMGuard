@@ -15,7 +15,7 @@ import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
 import javax.swing.border.TitledBorder;
 
-import PamUtils.PamAudioFileFilter;
+import Acquisition.pamAudio.PamAudioFileFilter;
 import PamView.dialog.PamDialog;
 
 public class CheckWavFileHeaders extends PamDialog {
