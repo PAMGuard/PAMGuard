@@ -120,8 +120,8 @@ public class binaryUIDFunctions {
 				}
 			}
 		} catch (Exception e) {
-			System.out.println("Error reading binary UID data from log file");
-			e.printStackTrace();
+			System.out.println("Error reading binary UID data from log file" + logFileData);
+//			e.printStackTrace();
 		}
 
 //        try (BufferedReader br = new BufferedReader(new FileReader(logFileData))) {
