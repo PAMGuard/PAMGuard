@@ -386,7 +386,7 @@ public class MccDialog extends PamDialog {
 				String msg = "<html><p>PAMGuard cannot find an analog input device.  Please ensure that you have a " +
 				"device plugged into your computer, and you have the correct drivers installed.</p></html>";
 				String help = null;
-				int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help);
+				int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help);
 				return;
 			}
 			if (mccDepthParameters.iBoard >= 0 &&

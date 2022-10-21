@@ -121,7 +121,7 @@ public class DLOfflineTask extends OfflineTask<PamDataUnit<?,?>>{
 
 	@Override
 	public boolean callSettings() {
-		dlControl.showSettingsDialog(PamController.getInstance().getGuiFrameManager().getFrame(0));
+		dlControl.showSettingsDialog(PamController.getMainFrame());
 		return true;
 	}
 

@@ -172,7 +172,7 @@ public class RadarParameters extends UserFrameParameters implements Serializable
 		String msg = "<html><p>The Radar Display parameters have been upgraded.  Please open the " +
 				"Radar Display dialog panel to ensure that the correct datablocks are being displayed</p></html>";
 		String help = null;
-		int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help);
+		int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help);
 	}
 	
 	@Override
