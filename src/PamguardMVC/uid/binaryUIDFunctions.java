@@ -531,10 +531,12 @@ public class binaryUIDFunctions {
 				out.close();
 			}
 		} catch (TransformerException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
+//			e.printStackTrace();
 			return false;
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
+//			e.printStackTrace();
 			return false;
 		}
 		return true;
