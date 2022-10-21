@@ -52,7 +52,7 @@ public class CTClassifierOfflineTask  extends OfflineTask<CTDataUnit> {
 		//			Debug.out.println("Hello: CTDataUnit: UID " + ctDataUnit.getUID() + "  " + ctDataUnit.getSubDetectionsCount()); 
 		//		}
 
-		clickTrainControl.getSwingGUI().showSettingsDialog(PamController.getInstance().getGuiFrameManager().getFrame(0), true);
+		clickTrainControl.getSwingGUI().showSettingsDialog(PamController.getMainFrame(), true);
 		return true;
 	}
 

@@ -940,7 +940,7 @@ public class RoccaProcess extends PamProcess {
 					"This will happen when re-analyzing data that has already been analyzed, but it may " +
 					"also indicate that your filename template is inadequate and returning duplicate filenames.</p></html>";
 			String help = null;
-			int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help);
+			int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help);
       }
 
 
@@ -1088,7 +1088,7 @@ public class RoccaProcess extends PamProcess {
   					"This will happen when re-analyzing data that has already been analyzed, but it may " +
   					"also indicate that your filename template is inadequate and returning duplicate filenames.</p></html>";
   			String help = null;
-  			int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help);
+  			int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help);
         }
 
 

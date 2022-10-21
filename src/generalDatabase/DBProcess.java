@@ -290,7 +290,7 @@ public class DBProcess extends PamProcess {
 								+ theForm.getUdfTableDefinition().getTableName() + " with the " + theForm.getFormName()
 								+ " form format currently in memory.  If this is correct, press Ok.  If you do not want to "
 								+ "change the format stored in the database, press Cancel.<br><br>";
-						int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0),
+						int ans = WarnOnce.showWarning(PamController.getMainFrame(),
 								title, msg, WarnOnce.OK_CANCEL_OPTION);
 						if (ans == WarnOnce.CANCEL_OPTION) {
 							continue;

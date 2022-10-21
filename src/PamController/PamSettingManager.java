@@ -536,7 +536,7 @@ public class PamSettingManager {
 						"This could occur if the psf file location is in a read-only folder, or the filename is " +
 						"invalid.  Please check and try again.";
 				String help = null;
-				int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help);
+				int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help);
 			}
 		}
 		/**
@@ -1292,7 +1292,7 @@ public class PamSettingManager {
 						"loads it may have lost it's settings.  Please check before performing any analysis.</p>";
 				String help = null;
 				
-				int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help);
+				int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help);
 				
 				break;
 			}
@@ -1312,7 +1312,7 @@ public class PamSettingManager {
 						"It is likely that an older version of Java is trying to load a class which is from a newer version. " +
 						"This module will not be loaded, and will be removed from the psf file to prevent instabilities.";
 				String help = null;
-				int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help);
+				int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help);
 				System.err.println("Exception while loading " +	Ex.getMessage());
 			}
 			catch (ClassNotFoundException Ex){
@@ -1327,7 +1327,7 @@ public class PamSettingManager {
 							"depending on which modules are being used and if they've changed between versions.  It is recommended that you " +
 							"check all module configuration parameters to verify the information is still accurate, prior to running.  ";
 					String help = null;
-					int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help, Ex);
+					int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help, Ex);
 				}
 
 				// print and continue - there may be other things we can deal with.
@@ -1341,7 +1341,7 @@ public class PamSettingManager {
 							"support@pamguard.org.<p>" +
 							"This module will not be loaded, and will be removed from the psf file to prevent instabilities.";
 					String help = null;
-					int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help, Ex);
+					int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help, Ex);
 					System.err.println("Exception while loading " +	Ex.getMessage());
 				}
 			}

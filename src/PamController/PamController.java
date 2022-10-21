@@ -2731,7 +2731,12 @@ public class PamController implements PamControllerInterface, PamSettings {
 
 	@Override
 	public GuiFrameManager getGuiFrameManager() {
-		return (GuiFrameManager)  guiFrameManager;
+		if (guiFrameManager instanceof GuiFrameManager) {
+			return (GuiFrameManager)  guiFrameManager;
+		}
+		else {
+			return null;
+		}
 	}
 
 	public void sortFrameTitles(){

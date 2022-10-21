@@ -152,7 +152,7 @@ public class LookUpTables {
 			String msg = "PAMGuard is about to modify the Lookup table in the database.  It will be adding new rows to the end of the table, possibly " +
 					"duplicating existing topics if you are switching from a database that already had Lookup information.<br><br>  " +
 					"If this is correct, press Ok.  If you do not want to change the database table, press Cancel.<br><br>";
-			int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.OK_CANCEL_OPTION);
+			int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.OK_CANCEL_OPTION);
 			if (ans==WarnOnce.CANCEL_OPTION) {
 				return false;
 			}

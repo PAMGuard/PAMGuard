@@ -9,13 +9,17 @@ public class DWVConvertInformation {
 
 	private STGroupInfo fileGroup;
 	private int nDWV;
-	private int nDone;
+	private int nDWVDone;
+	private int nFileDone;
+	private int nFile;
 
 
-	public DWVConvertInformation(STGroupInfo fileGroup, int nDWV, int nDone) {
+	public DWVConvertInformation(STGroupInfo fileGroup, int nFile, int nFileDone, int nDWV, int nDWVDone) {
 		this.fileGroup = fileGroup;
+		this.nFile = nFile;
+		this.nFileDone = nFileDone;
 		this.nDWV = nDWV;
-		this.nDone = nDone;
+		this.nDWVDone = nDWVDone;
 	}
 
 
@@ -36,10 +40,26 @@ public class DWVConvertInformation {
 
 
 	/**
-	 * @return the nDone
+	 * @return the nDWVDone
 	 */
-	public int getnDone() {
-		return nDone;
+	public int getnDWVDone() {
+		return nDWVDone;
+	}
+
+
+	/**
+	 * @return the nFileDone
+	 */
+	public int getnFileDone() {
+		return nFileDone;
+	}
+
+
+	/**
+	 * @return the nFile
+	 */
+	public int getnFile() {
+		return nFile;
 	}
 
 }
