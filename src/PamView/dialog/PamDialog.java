@@ -63,6 +63,7 @@ abstract public class PamDialog extends JDialog {
 	private String warningTitle;
 	private boolean warnDefaultSetting = true;
 	private CancelObserver cancelObserver;
+	private boolean firstShowing = true;
 
 	public JPanel getButtonPanel() {
 		return buttonPanel;
@@ -146,7 +147,7 @@ abstract public class PamDialog extends JDialog {
 			return parentFrame;
 		}
 		try {
-			return PamController.getInstance().getGuiFrameManager().getFrame(0);
+			return PamController.getMainFrame();
 		}
 		catch (Exception e) {
 			return null;
@@ -282,6 +283,10 @@ abstract public class PamDialog extends JDialog {
 			}
 			if (getOwner() == null) {
 				moveToMouseLocation();
+			}
+			if (firstShowing) {
+				firstShowing = false;
+				super.pack();
 			}
 		}
 		try{

@@ -257,7 +257,7 @@ public class MVDRalgorithm implements BeamFormerAlgorithm {
 					"The beamformer needs this information in order to run.  There will be no output until " +
 					"a valid Acquisition module is added and the Pamguard run is restarted.";
 			String help = null;
-			int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help, e);
+			int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help, e);
 			sourceProcess=null;
 			e.printStackTrace();
 			return;
@@ -268,7 +268,7 @@ public class MVDRalgorithm implements BeamFormerAlgorithm {
 					"The beamformer needs this information in order to run.  There will be no output until " +
 					"a valid Acquisition module is added and the Pamguard run is restarted.";
 			String help = null;
-			int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help, null);
+			int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help, null);
 			return;
 		}
 		

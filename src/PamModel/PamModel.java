@@ -1255,7 +1255,7 @@ final public class PamModel implements PamModelInterface, PamSettings {
 										"for help.<p>" +
 										"This plug-in will not be available for loading";
 								String help = null;
-								int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help, e1);
+								int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help, e1);
 								System.err.println("Exception while loading " +	className);
 								continue;
 							}
@@ -1269,7 +1269,7 @@ final public class PamModel implements PamModelInterface, PamSettings {
 							"for help.<p>" +
 							"This plug-in will not be available for loading";
 					String help = null;
-					int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help, ex);
+					int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help, ex);
 					System.err.println("Exception while loading " +	jarList.get(i).getName());
 					continue;
 				}
@@ -1360,7 +1360,7 @@ final public class PamModel implements PamModelInterface, PamSettings {
 								"for help.<p>" +
 								"This plug-in will not be available for loading";
 						String help = null;
-						int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help, e1);
+						int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help, e1);
 						System.err.println("Exception while loading " +	pf.getDefaultName());
 						pluginList.remove(pf);
 						continue;
