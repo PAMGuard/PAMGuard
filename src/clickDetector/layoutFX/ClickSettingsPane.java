@@ -6,6 +6,7 @@ import java.text.ParseException;
 import clickDetector.ClickControl;
 import clickDetector.ClickParameters;
 import clickDetector.layoutFX.clickClassifiers.ClickClassifyPaneFX;
+import javafx.geometry.HPos;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -14,6 +15,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -43,8 +45,8 @@ import pamViewFX.fxNodes.utilityPanes.GroupedSourcePaneFX;
  * @author Jamie Macaulay	
  */
 public class ClickSettingsPane extends SettingsPane<ClickParameters>{
-	
-	public static double PREF_SPINNER_WIDTH = 100; 
+
+	public static double PREF_SPINNER_WIDTH = 140; 
 
 	/**
 	 * Group source pane for the click settings pane.
@@ -160,25 +162,26 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 	private Tab tdoaTab;
 
 	/**
-	 * The default pane width
+	 * The main holder pane. 
 	 */
-	public static double paneWidth=500;
+	private PamBorderPane mainPane;
 
 	/**
 	 * The default pane height. 
 	 */
-	public static double paneHeigt=800;
+	public static double PREF_PANE_HEIGHT=850;
 
 	/**
-	 * The main holder pane. 
+	 * The default pane width
 	 */
-	private PamBorderPane mainPane; 
+	public static double PREF_PANE_WIDTH=550;
+
 
 	public ClickSettingsPane(ClickControl clickControl){
 		super(null);
 		this.clickControl=clickControl; 
 		mainPane= new PamBorderPane(); 
-		
+
 		pamTabbedPane=new PamTabPane();
 		pamTabbedPane.setAddTabButton(false);
 		pamTabbedPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
@@ -187,19 +190,19 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 		PamVBox detectionPane=new PamVBox();
 		detectionPane.setSpacing(20);
 		detectionPane.getChildren().add(createClickDetectionPane());
-		
-		
+
+
 		PamHBox holder=new PamHBox(); 
 		holder.setSpacing(20);
 		holder.getChildren().addAll(createClickLengthPane(), createClickTriggerPane());
 		detectionPane.getChildren().add(holder);
-		
+
 		detectionPane.getChildren().add(createTriggerGraph()); 
 
 		//add everything to tabs.
 		pamTabbedPane.getTabs().add(new Tab("Click Detection", detectionPane));
 		clickDelayPane=createDelayPane();
-		pamTabbedPane.getTabs().add(tdoaTab=new Tab("Click TDOA", clickDelayPane.getContentNode()));
+		pamTabbedPane.getTabs().add(tdoaTab=new Tab("TDOA and Echoes", clickDelayPane.getContentNode()));
 		tdoaTab.setOnSelectionChanged((event)->{
 			if (pamTabbedPane.getSelectionModel().getSelectedItem()==tdoaTab){
 				System.out.println("clickDelayPane: "+clickDelayPane);
@@ -207,29 +210,29 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 				clickDelayPane.setParams(clickClassificationPane.getParams(clickParameters.clone())); 
 			}
 		});
-		
-		
+
+
 		//pre filter pane.
 		preFilter=new FilterPaneFX(Orientation.VERTICAL); 
 		pamTabbedPane.getTabs().add(new Tab("Pre Filter", preFilter.getContentNode()));
-		
+
 		//trigger pane 
 		triggerFilter=new FilterPaneFX(Orientation.VERTICAL); 
 		pamTabbedPane.getTabs().add(new Tab("Trigger Filter", triggerFilter.getContentNode()));
-		
-		//echo detection pane. 
-		echoDetection= new ClickEchoPane(clickControl); 
-		pamTabbedPane.getTabs().add(new Tab("Echo Detection", echoDetection.getContentNode()));
-		
+
+		//		//echo detection pane. 
+		//		echoDetection= new ClickEchoPane(clickControl); 
+		//		pamTabbedPane.getTabs().add(new Tab("Echo Detection", echoDetection.getContentNode()));
+
 		/***Note: FX does not implment click train detection in click detector****/
 
 		//classifiaction pane. 
-		pamTabbedPane.getTabs().add(new Tab("Click Classification", clickClassificationPane=new ClickClassifyPaneFX(clickControl)));
+		pamTabbedPane.getTabs().add(new Tab("Classification", clickClassificationPane=new ClickClassifyPaneFX(clickControl)));
 
 		//want a slightly bigger pane as a lot going on in this dialog. 
 		//Note JavaFX 8u61 + has auto DPI scaling so this is really the size of a dialog on a standard HD monitor of 
 		//reasonable size, rather than actual pixels 
-		mainPane.setPrefSize(paneWidth, paneHeigt);
+		mainPane.setPrefSize(PREF_PANE_WIDTH, PREF_PANE_HEIGHT);
 
 		//addTabListeners();
 		mainPane.setCenter(new PamBorderPane(pamTabbedPane));
@@ -267,16 +270,17 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 
 		//channels, groups and trigger are all in one pane to make it easy not to make mistakes 
 		sourcePane=createClickSourcePane(); //create the source pane. 
-		
-		
-		GridPane.setColumnSpan(sourcePane.getDataBlockBox(), 4); 
+
+
+		GridPane.setColumnSpan(sourcePane.getDataBlockBox(), 2); 
 		//now create trigger pane. The trigger pane is added to the source pane. 
 		Label triggerLabel = new Label("Trigger Channels");
 		PamGuiManagerFX.titleFont2style(triggerLabel);
 		sourcePane.getSourcePane().add(triggerLabel,1,2);
-		
+
 		triggerChannels=new Pane();
 		sourcePane.getSourcePane().add(triggerChannels,1,3);
+		GridPane.setHalignment(triggerChannels, HPos.RIGHT);
 		createTriggerChannels();
 		//sourcePane.getSourcePane().add(createClickTriggerPane(), 2, 3);
 
@@ -285,7 +289,16 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 		//		pamTabbedPane.getTabs().add(new Tab("Click Echoes", createEchoPane()));
 		//		pamTabbedPane.getTabs().add(new Tab("Click Delays", createDelayPane()));
 
-		sourcePane.setPrefWidth(paneWidth);
+		ColumnConstraints col1 = new ColumnConstraints();
+		col1.setHgrow(Priority.ALWAYS);
+
+		ColumnConstraints col2 = new ColumnConstraints();
+		col2.setHgrow(Priority.SOMETIMES);
+		col2.setHalignment(HPos.RIGHT);
+		sourcePane.getSourcePane().getColumnConstraints().addAll(col1, col2); 
+
+		//sourcePane.setMinWidth(PREF_PANE_WIDTH);
+		sourcePane.getSourcePane().setPrefWidth(PREF_PANE_WIDTH);
 
 		return sourcePane;
 	}
@@ -317,7 +330,7 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 		maxClickLength.setEditable(true);
 		maxClickLength.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 		maxClickLength.setPrefWidth(PREF_SPINNER_WIDTH);
-		
+
 		lengthPane.add(maxClickLength,1,1);
 		lengthPane.add(new Label("samples"),2,1);
 
@@ -326,7 +339,7 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 		preSampleSpinner=new PamSpinner<Integer>(0, 10000000, 100, 20);
 		preSampleSpinner.setEditable(true);
 		preSampleSpinner.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
-		preSampleSpinner.setPrefWidth(PREF_SPINNER_WIDTH);
+		//preSampleSpinner.setPrefWidth(PREF_SPINNER_WIDTH);
 
 		lengthPane.add(preSampleSpinner,1,2);
 		lengthPane.add(new Label("samples"),2,2);
@@ -336,7 +349,8 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 		postSampleSpinner=new PamSpinner<Integer>(0, 10000000, 100, 20);
 		postSampleSpinner.setEditable(true);
 		postSampleSpinner.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
-		postSampleSpinner.setPrefWidth(PREF_SPINNER_WIDTH);
+		//postSampleSpinner.setPrefWidth(PREF_SPINNER_WIDTH);
+
 
 		lengthPane.add(postSampleSpinner,1,3);
 		lengthPane.add(new Label("samples"),2,3);
@@ -406,7 +420,7 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 		threshold.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 		threshold.getValueFactory().valueProperty().addListener((obs, before, after)->{
 			clickParameters.dbThreshold=after;
-			clickTriggerGraph.updateWaveformGraph(this.clickParameters);
+			clickTriggerGraph.updateGraphFilter();
 		});
 		triggerBox.add(threshold,1,0);
 		triggerBox.add(new Label("dB"),2,0);
@@ -420,7 +434,7 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 		longFilter.getValueFactory().valueProperty().addListener((obs, before, after)->{
 			clickParameters.longFilter=after;
 			clickTriggerGraph.setLongFilter(clickParameters.longFilter);
-			clickTriggerGraph.updateWaveformGraph(this.clickParameters);
+			clickTriggerGraph.updateGraphFilter();
 		});
 		triggerBox.add(longFilter,1,1);
 		longFilter.setPrefWidth(PREF_SPINNER_WIDTH);
@@ -444,10 +458,13 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 		shortFilter.getValueFactory().valueProperty().addListener((obs, before, after)->{
 			clickParameters.shortFilter=after;
 			clickTriggerGraph.setShortFilter(clickParameters.shortFilter);
-			clickTriggerGraph.updateWaveformGraph(this.clickParameters);
+			clickTriggerGraph.updateGraphFilter();
 		});
 		shortFilter.setPrefWidth(PREF_SPINNER_WIDTH);
 		triggerBox.add(shortFilter,1,3);
+
+		//forces the grid pane to be larger - grid panes can be a little funny. 
+		shortFilter.setMinWidth(PREF_SPINNER_WIDTH);
 
 		triggerPane.add(triggerBox,0,1);
 
@@ -456,7 +473,7 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 		return triggerPane; 
 	}
 
-	
+
 	private Pane createTriggerGraph() {
 		//trigger graph
 		Label graphLabel = new Label("Filter Graph");
@@ -469,9 +486,9 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 		PamVBox triggerGraph = new PamVBox(); 
 		triggerGraph.setSpacing(5);
 		triggerGraph.getChildren().addAll(graphLabel, clickTriggerGraph); 
-		
+
 		return triggerGraph; 
-		
+
 	}
 
 	/**
@@ -603,14 +620,14 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 				return null;
 			}
 
-//			clickParameters.rawDataSource = rawDataBlock.toString();
-//			clickParameters.channelBitmap = sourcePane.getChannelList();
-//			clickParameters.channelGroups = sourcePane.getChannelGroups();
-//			clickParameters.groupingType = sourcePane.getGrouping();
-			
+			//			clickParameters.rawDataSource = rawDataBlock.toString();
+			//			clickParameters.channelBitmap = sourcePane.getChannelList();
+			//			clickParameters.channelGroups = sourcePane.getChannelGroups();
+			//			clickParameters.groupingType = sourcePane.getGrouping();
+
 			//sets the params for source pane. 
 			sourcePane.getParams(clickParameters.getGroupedSourceParameters());
-			
+
 			//		if (sourcePanel.getParams() == false) return false;
 			try {
 				clickParameters.dbThreshold = Double.valueOf(threshold.getValue());
@@ -696,12 +713,12 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 		else {
 			sourcePane.setSourceIndex(0);
 		}
-		
+
 		sourcePane.setParams(clickParameters.getGroupedSourceParameters());
-		
-//		sourcePane.setGrouping(clickParameters.groupingType);
-//		sourcePane.setChannelGroups(clickParameters.channelGroups);
-//		sourcePane.setChannelList(clickParameters.channelBitmap);
+
+		//		sourcePane.setGrouping(clickParameters.groupingType);
+		//		sourcePane.setChannelGroups(clickParameters.channelGroups);
+		//		sourcePane.setChannelList(clickParameters.channelBitmap);
 
 		//click length pane
 		minClickSep.getValueFactory().setValue(clickParameters.minSep);

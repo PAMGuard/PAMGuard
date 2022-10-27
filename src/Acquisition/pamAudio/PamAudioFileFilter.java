@@ -45,7 +45,7 @@ public class PamAudioFileFilter extends PamFileFilter {
 	public PamAudioFileFilter() {
 		this(PamAudioFileManager.getInstance());
 	}
-	
+
 	@Override
 	public boolean accept(File f) {
 		//System.out.println("Accept?: " + super.accept(f) + "  " + f.getName() ); 

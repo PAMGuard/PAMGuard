@@ -3,6 +3,7 @@ package pamViewFX.fxNodes.utilityPanes;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -149,6 +150,8 @@ public class GroupedSourcePaneFX extends SourcePaneFX {
 		PamHBox channelGroupPane=new PamHBox();
 		channelGroupPane.setSpacing(15);
 		channelGroupPane.getChildren().addAll(channelPanel, autoGroupPane);
+		PamHBox.setHgrow(autoGroupPane, Priority.NEVER);
+		channelGroupPane.setAlignment(Pos.TOP_LEFT);
 		
 		sourcePane.add(channelGroupPane,0,3);
 		

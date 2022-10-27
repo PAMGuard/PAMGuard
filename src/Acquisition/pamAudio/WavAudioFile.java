@@ -130,8 +130,12 @@ public class WavAudioFile implements PamAudioFileLoader {
 				break;
 			}
 			try {
-
-				bytesRead = audioInputStream.read(inputBuffer);
+				if (inputBuffer.length<audioInputStream.available()) {
+					bytesRead = audioInputStream.read(inputBuffer);
+				}
+				else {
+					bytesRead = 0; //force new file to load. 
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}			

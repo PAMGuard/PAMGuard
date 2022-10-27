@@ -3,6 +3,7 @@ package clickDetector.layoutFX.clickClassifiers;
 
 import fftFilter.FFTFilterParams;
 import fftManager.FFTLengthModeled;
+import javafx.beans.property.StringProperty;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -12,6 +13,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Labeled;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -463,6 +465,10 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		@Override
 		protected void disbleControls(boolean enable) {
 			// TODO Auto-generated method stub
+		}
+
+		public TextField getNameLabel() {
+			return this.nameField;
 		}
 		
 	}
@@ -1109,6 +1115,11 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 	public void paneInitialized() {
 		// TODO Auto-generated method stub
 		
+	}
+
+
+	public StringProperty getNameTextProperty() {
+		return optionBox.getNameLabel().textProperty();
 	}
 
 }
