@@ -391,6 +391,13 @@
            <version>${javafx.version}</version>
 	</dependency>
 	
+	<!-- Decorates JavaFX components-->
+	<dependency>
+		<groupId>net.synedra</groupId>
+		<artifactId>validatorfx</artifactId>
+		<version>0.4.0</version>
+	</dependency>
+	
 	<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-compress -->
 	<dependency>
 	    <groupId>org.apache.commons</groupId>
@@ -825,12 +832,13 @@
 	    <artifactId>swingx-all</artifactId>
 	    <version>1.6.5-1</version>
 	</dependency>
-	
+
+	<!--  Theme for JavaFX -->
 	<dependency>
-    <groupId>io.github.mkpaz</groupId>
-    <artifactId>atlantafx-base</artifactId>
-    <version>1.0.0</version>
-</dependency>
+		<groupId>io.github.mkpaz</groupId>
+		<artifactId>atlantafx-base</artifactId>
+		<version>1.0.0</version>
+	</dependency>
 	
  	
   </dependencies>

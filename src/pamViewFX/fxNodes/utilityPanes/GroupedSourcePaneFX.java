@@ -12,6 +12,7 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import net.synedra.validatorfx.Validator;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxNodes.PamGridPane;
 import pamViewFX.fxNodes.PamHBox;
@@ -56,7 +57,11 @@ public class GroupedSourcePaneFX extends SourcePaneFX {
 	 * Holds channels and group settings. 
 	 */
 	private PamVBox channelPanel;
-
+	
+	/**
+	 * Validator for channels 
+	 */
+    private Validator validator;
 
 
 	public GroupedSourcePaneFX(Class sourceType, boolean hasChannels, boolean includeSubClasses, boolean autoGrouping) {
@@ -70,6 +75,8 @@ public class GroupedSourcePaneFX extends SourcePaneFX {
 
 	@Override
 	protected void createPanel() {
+		
+		validator = new Validator();
 		
 		sourcePane=new PamGridPane();
 		sourcePane.setVgap(5);
@@ -131,15 +138,39 @@ public class GroupedSourcePaneFX extends SourcePaneFX {
 		selectAll.setOnAction((action)->{
 			if (selectAll.isSelected()) selectAllChannels();
 			else selectNoChannels();
+            validator.validate(); //makes sure any error signs are removed
 		});
+		
+		//create check to show at least some check boxes need to be selected.
+		validator.createCheck()
+        .dependsOn(("select all"), selectAll.selectedProperty())
+        .withMethod(c -> {
+          if (!isAChannelSelected() ) {
+	              c.error("At least one channel needs to be selected for the module to work");
+          }
+        })
+        .decorates(selectAll)
+        .immediate();
+      ;
 		//create a list of channels and combo boxes for groups. 
 		if (isHasChannels()){
 			for (int i = 0; i < PamConstants.MAX_CHANNELS; i++){
 				channelBoxes[i] = new CheckBox("Channel " + i);
+				 validator.createCheck()
+		          .dependsOn(("channel " + i), channelBoxes[i].selectedProperty())
+		          .withMethod(c -> {
+		            if (!isAChannelSelected() ) {
+			              c.error("At least one channel needs to be selected for the module to work");
+		            }
+		          })
+		          .decorates(channelBoxes[i])
+		          .immediate();
+		        ;
 				//channelPanel.getChildren().add(channelBoxes[i]);
 				final int n=i;
 				channelBoxes[i].setOnAction((action)->{
 					selectionChanged(n);
+		            validator.validate(); //makes sure any error signs are removed.
 				});
 				groupList[i]=new ComboBox<Integer>();
 				//System.out.println("SourcePanel.java creatPanel"+i);
@@ -162,77 +193,28 @@ public class GroupedSourcePaneFX extends SourcePaneFX {
 		
 		//create source comboBox. 
 		this.setCenter(sourcePane);
-		
 
-//		//old swing layout panels
-//		panel = new JPanel();
-//		JPanel sourcePanel = new JPanel();
-//		sourcePanel.setLayout(new BorderLayout());
-//		// add stuff to the panel.
-//		if (borderTitle != null) {
-//			sourcePanel.setBorder(new TitledBorder(borderTitle));
-//		}
-//		panel.setLayout(new BorderLayout());
-////		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-//		sourcePanel.add(BorderLayout.CENTER, sourceList = new JComboBox());
-//		panel.add(BorderLayout.NORTH, sourcePanel);
-//		sourceList.addActionListener(this);
-//		if (hasChannels) {
-//			JPanel channelGroupPanel = new JPanel();
-//			channelGroupPanel.setLayout(new BorderLayout());
-//			channelGroupPanel.setBorder(new TitledBorder("Channel list and grouping"));
-//			JPanel channelPanel = new JPanel();
-//			JPanel autoGroupPanel = new JPanel();
-//			autoGroupPanel.setLayout(new BoxLayout(autoGroupPanel, BoxLayout.Y_AXIS));
-//			autoGroupPanel.add(new JLabel("Auto Grouping"));
-//			autoGroupPanel.add(allSingles = new JRadioButton("No grouping"));
-//			autoGroupPanel.add(allTogether = new JRadioButton("One group"));
-//			autoGroupPanel.add(userGrouped = new JRadioButton("User groups"));
-//			allSingles.addActionListener(new GroupAction(GROUP_SINGLES));
-//			allTogether.addActionListener(new GroupAction(GROUP_ALL));
-//			userGrouped.addActionListener(new GroupAction(GROUP_USER));
-//			ButtonGroup bg = new ButtonGroup();
-//			bg.add(allSingles);
-//			bg.add(allTogether);
-//			bg.add(userGrouped);
-////			channelPanel.setLayout(new BoxLayout(channelPanel, BoxLayout.Y_AXIS));
-//			GridBagLayout layout;
-////			channelPanel.setBorder(new TitledBorder("Channel list and grouping"));
-//			channelPanel.setLayout(layout = new GridBagLayout());
-//			GridBagConstraints c = new GridBagConstraints();
-//			c.gridwidth = 2;
-//			c.anchor = GridBagConstraints.WEST;
-//			c.gridx = c.gridy = 0;
-//			addComponent(channelPanel, autoGroupPanel, c);
-////			addComponent(channelPanel, new JLabel("Channel list ..."), c);
-//			c.gridwidth = 1;
-//			c.insets = new Insets(0,5,0,5);
-//			c.gridy++;
-//			c.gridx = 0;
-//			addComponent(channelPanel, new JLabel("Channel"), c);
-//			c.gridx++;
-//			addComponent(channelPanel, new JLabel("Group"), c);
-//			groupList = new JComboBox[PamConstants.MAX_CHANNELS];
-//			channelBoxes = new JCheckBox[PamConstants.MAX_CHANNELS];
-//			for (int i = 0; i < PamConstants.MAX_CHANNELS; i++){
-//				channelBoxes[i] = new JCheckBox("Channel " + i);
-//				groupList[i] = new JComboBox();
-//				c.gridy ++;
-//				c.gridx = 0;
-//				addComponent(channelPanel, channelBoxes[i], c);
-//				c.gridx ++;
-//				addComponent(channelPanel, groupList[i], c);
-////				channelPanel.add(channelBoxes[i]);
-//				channelBoxes[i].setVisible(false);
-//				groupList[i].setVisible(false);
-//				channelBoxes[i].addActionListener(new SelectionListener(i));
-//			}
-//			channelGroupPanel.add(BorderLayout.WEST, autoGroupPanel);
-//			channelGroupPanel.add(BorderLayout.CENTER, channelPanel);
-//			panel.add(BorderLayout.CENTER, channelGroupPanel);
-//		}
 	}
 	
+	/**
+	 * Check if 
+	 * @return
+	 */
+	private boolean isAChannelSelected() {
+		int channels = 0;
+		PamDataBlock sb = getSource();
+		if (sb != null) {
+	//		channels = sb.getChannelMap();
+			channels = sb.getSequenceMap();
+		}
+		int n=0; 
+		//remove all channels from vertical box pane. 
+		for (int i = 0; i < Math.min(PamConstants.MAX_CHANNELS, channelBoxes.length); i++) {
+			if ((channels & 1<<i) != 0 && this.channelBoxes[i].isSelected()) n++;
+		} 
+		if (n==0) return false;
+		else return true;
+	}
 	
 	@Override
 	protected void showChannels() {

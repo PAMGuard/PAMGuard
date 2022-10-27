@@ -270,6 +270,7 @@ public class SourcePaneFX extends PamBorderPane {
 
 	}
 
+
 	/**
 	 * Tell the pane the source has changed. 
 	 */

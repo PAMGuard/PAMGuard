@@ -10,11 +10,9 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.Labeled;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -35,6 +33,7 @@ import pamViewFX.fxNodes.utilityPanes.PamToggleSwitch;
 import pamViewFX.fxNodes.utilityPanes.SimpleFilterPaneFX;
 import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
 import pamViewFX.PamGuiManagerFX;
+import net.synedra.validatorfx.Validator;
 
 import PamController.SettingsPane;
 import PamView.PamSymbol;
@@ -101,7 +100,9 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 	 */
 	private AmplitudeBlock amplitudeBlock;
 	
-	PamBorderPane mainPane = new PamBorderPane();
+	private PamBorderPane mainPane = new PamBorderPane();
+	
+    private Validator validator = new Validator();
 
 	public int classifierItemRow;
 	
@@ -364,9 +365,22 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			PamGridPane.setColumnSpan(nameField, 8);
 			PamGridPane.setHgrow(nameField, Priority.ALWAYS);
 			
+			 validator.createCheck()
+	          .dependsOn("speciesname", nameField.textProperty())
+	          .withMethod(c -> {
+	            String userName = c.get("speciesname");
+	            if (userName == null || userName.length()<=0) {
+		              c.error("The classifier must have a name");
+	            }
+	          })
+	          .decorates(nameField)
+	          .immediate();
+	        ;
+			
+			
 			pamGridPane.add(new Label("Code"), 0, 1);
 
-			codeSpinner=new PamSpinner<Integer> (0, 500, 0, 1);
+			codeSpinner=new PamSpinner<Integer> (1, 500, 0, 1);
 			codeSpinner.setEditable(true);
 			//codeSpinner.setPrefWidth(150);
 			codeSpinner.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
@@ -382,11 +396,17 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			
 			lineColourPicker = new ColorPicker(); 
 			lineColourPicker.setStyle("-fx-color-label-visible: false ;");
+			lineColourPicker.setOnAction((action)->{
+				symbolPicker.setLineColour(lineColourPicker.getValue());
+			});
 			pamGridPane.add(lineColourPicker, 4, 1);
 			
 			
 			fillColourPicker = new ColorPicker(); 
 			fillColourPicker.setStyle("-fx-color-label-visible: false ;");
+			fillColourPicker.setOnAction((action)->{
+				symbolPicker.setFillColour(fillColourPicker.getValue());
+			});
 			pamGridPane.add(fillColourPicker, 5, 1);
 
 
@@ -462,7 +482,6 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 		@Override
 		public int getCode() {
-			// TODO Auto-generated method stub
 			return codeSpinner.getValue();
 		}
 
