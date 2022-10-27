@@ -226,7 +226,7 @@ public class SweepClassifier implements ClickIdentifier , PamSettings {
 		return clickDetector;
 	}
 	
-	protected int getNextFreeCode(int currCode) {
+	public int getNextFreeCode(int currCode) {
 		int newCode = currCode;
 		while (codeTaken(++newCode));
 		return newCode;
@@ -277,7 +277,7 @@ public class SweepClassifier implements ClickIdentifier , PamSettings {
 	 * Set the params for the sweep classifier. 
 	 * @params the sweep classifier params to set. 
 	 */
-	public void setSeepClassifierParams(SweepClassifierParameters sweepClassifierParameters) {
+	public void setSweepClassifierParams(SweepClassifierParameters sweepClassifierParameters) {
 		this.sweepClassifierParameters=sweepClassifierParameters; 
 	} 
 	

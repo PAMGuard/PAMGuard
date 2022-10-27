@@ -205,7 +205,7 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 		pamTabbedPane.getTabs().add(tdoaTab=new Tab("TDOA and Echoes", clickDelayPane.getContentNode()));
 		tdoaTab.setOnSelectionChanged((event)->{
 			if (pamTabbedPane.getSelectionModel().getSelectedItem()==tdoaTab){
-				System.out.println("clickDelayPane: "+clickDelayPane);
+				//System.out.println("clickDelayPane: "+clickDelayPane);
 				//need to update the tab with a copy of the current click params. 
 				clickDelayPane.setParams(clickClassificationPane.getParams(clickParameters.clone())); 
 			}
@@ -296,6 +296,8 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 		col2.setHgrow(Priority.SOMETIMES);
 		col2.setHalignment(HPos.RIGHT);
 		sourcePane.getSourcePane().getColumnConstraints().addAll(col1, col2); 
+		
+		PamHBox.setHgrow(sourcePane.getChannelPane(), Priority.NEVER);
 
 		//sourcePane.setMinWidth(PREF_PANE_WIDTH);
 		sourcePane.getSourcePane().setPrefWidth(PREF_PANE_WIDTH);
@@ -686,6 +688,8 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 					return null;
 				}
 			}
+			
+			clickParameters = clickClassificationPane.getParams(clickParameters); 
 
 		}
 		catch (Exception e){

@@ -18,6 +18,7 @@ import clickDetector.ClickClassifiers.basic.BasicClickIdentifier;
 
 /**
  * Pane for the basic click classifier. 
+ * 
  * @author Jamie Macaulay	
  *
  */
@@ -317,6 +318,15 @@ public class BasicIdentifierPaneFX implements ClassifyPaneFX {
 	 */
 	public ObservableList<ClickTypeProperty> getClickClassifiers() {
 		return clickClassifiers;
+	}
+
+
+	/**
+	 * Get the flip pane. One side shows the table, the other shows the currently selected classifier settings. 
+	 * @return the flip pane. 
+	 */
+	public PamFlipPane getFlipPane() {
+		return flipPane;
 	}
 
 }

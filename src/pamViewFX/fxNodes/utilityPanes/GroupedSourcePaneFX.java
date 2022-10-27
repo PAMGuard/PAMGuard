@@ -10,6 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxNodes.PamGridPane;
@@ -51,6 +52,11 @@ public class GroupedSourcePaneFX extends SourcePaneFX {
 	 */
 	private PamGridPane sourcePane;
 
+	/**
+	 * Holds channels and group settings. 
+	 */
+	private PamVBox channelPanel;
+
 
 
 	public GroupedSourcePaneFX(Class sourceType, boolean hasChannels, boolean includeSubClasses, boolean autoGrouping) {
@@ -91,7 +97,7 @@ public class GroupedSourcePaneFX extends SourcePaneFX {
 		sourcePane.setMaxWidth(Double.MAX_VALUE);
 
 		//create pane to hold channels. 
-		PamVBox channelPanel=new PamVBox();
+		channelPanel=new PamVBox();
 		channelPanel.setSpacing(5);
 		
 		Label channelLabel = new Label("Channels");
@@ -150,7 +156,6 @@ public class GroupedSourcePaneFX extends SourcePaneFX {
 		PamHBox channelGroupPane=new PamHBox();
 		channelGroupPane.setSpacing(15);
 		channelGroupPane.getChildren().addAll(channelPanel, autoGroupPane);
-		PamHBox.setHgrow(autoGroupPane, Priority.NEVER);
 		channelGroupPane.setAlignment(Pos.TOP_LEFT);
 		
 		sourcePane.add(channelGroupPane,0,3);
@@ -460,6 +465,14 @@ public class GroupedSourcePaneFX extends SourcePaneFX {
 	 */
 	public PamGridPane getChannelListPane() {
 		return channelListPane;
+	}
+	
+	/**
+	 * The pane that holds the channels and the group settings. 
+	 * @return the channel pane. 
+	 */
+	public Pane getChannelPane() {
+		return channelPanel;
 	}
 	
 }
