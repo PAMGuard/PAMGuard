@@ -28,11 +28,11 @@ public class BTDisplayParameters implements Serializable, Cloneable, ManagedPara
 	public static final String[] angleTypeNames = {"Relative to array", "Relative to vessel", "Relative to north"};
 	
 	/**
-	 * Rotation options for angles. 
+	 * Rotation options for angles. These should match the above angleTypeNames. 
 	 */
 	static public final int ROTATE_TOARRAY = 0; // no rotation, raw angles relative to the array
-	static public final int ROTATE_PITCHROLL = 1; // fix pitch and roll, but leave the heading relative to the array
-	static public final int ROTATE_HEADPITCHROLL = 2; // rotate by heading pitch and roll. 
+	static public final int ROTATE_TOVESSEL = 1; // fix pitch and roll, but leave the heading relative to the array
+	static public final int ROTATE_TONORTH = 2; // rotate by heading pitch and roll. 
 	
 	
 	// main BT display
