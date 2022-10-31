@@ -499,8 +499,8 @@ audio files. </span></p>
 
 <h2><span lang=EN-US>Bug Fixes</span></h2>
 
-<p class=MsoNormal><span lang=EN-US>Soundtrap DWV import. Will now generate
-binary files even if DWV file doesn’t exist (which is correct behavior in quiet
+<p class=MsoNormal><span lang=EN-US>Soundtrap DWV import. Will now generate binary
+files even if DWV file doesnÂ’t exist (which is correct behavior in quiet
 conditions when no clicks were detected). </span></p>
 
 <p class=MsoNormal><span lang=EN-US>Spectrogram. Changes to stop occasional
@@ -535,7 +535,7 @@ running in real time. Added template names based on file names. </p>
 <p class=MsoNormal>#13 Merging files when offline processing file folders: Had
 an error introduced in last release which caused it to fail to recognise gaps
 between files, meaning that some output data (i.e. after a gap) would have an
-incorrect time stamp. This did not affect data if the ‘merge contiguous files’
+incorrect time stamp. This did not affect data if the Â‘merge contiguous filesÂ’
 option was not selected. </p>
 
 <p class=MsoNormal>#14 Logger forms data were not plotting correctly. This was
@@ -609,7 +609,7 @@ href="http://www.pamguard.org/downloads.php?cat_id=3">here</a>.</p>
 <p class=MsoNormal><b><span lang=EN-US>Detection Group Localiser</span></b><span
 lang=EN-US> </span></p>
 
-<p class=MsoNormal>This module has been renamed “Detection Grouper”, so as to
+<p class=MsoNormal>This module has been renamed Â“Detection GrouperÂ”, so as to
 avoid confusion with the Group 3D localizer. This is because the Detection
 Grouper is more for organizing data into groups to be localized than it is for
 doing localization.</p>
@@ -730,9 +730,9 @@ included in a future release. </p>
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>17. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
 An implementation of the Generalized Power Law Detector, developed by Tyler
-Helble ([Helble et al., ‘A generalized power-law detection algorithm for humpback
-whale vocalizations’, The Journal of the Acoustical Society of America, vol.
-131, no. 4, pp. 2682–2699, 2012) is now available. For details, see the online
+Helble ([Helble et al., Â‘A generalized power-law detection algorithm for humpback
+whale vocalizationsÂ’, The Journal of the Acoustical Society of America, vol.
+131, no. 4, pp. 2682Â–2699, 2012) is now available. For details, see the online
 help </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>18. </span><span
@@ -755,10 +755,10 @@ Version 2.00.10</a> before proceeding with installation and use of this
 version.</b></p>
 
 <p class=MsoNormal>This version of PAMGuard has been bundled with Java 13
-(release 13.0.1). PSFX files generated in previous beta releases (2.xx.xx)
-should be compatible with this version, and vice-versa. PSF files generated in
-core releases (1.15.xx) can be loaded in this version, but will be converted to
-PSFX files when PAMGuard exits.</p>
+(release 13.0.1). PSFX files generated in previous beta releases (2.xx.xx) should
+be compatible with this version, and vice-versa. PSF files generated in core
+releases (1.15.xx) can be loaded in this version, but will be converted to PSFX
+files when PAMGuard exits.</p>
 
 <p class=MsoNormal><b><span lang=EN-US>Bug Fixes</span></b></p>
 
@@ -1705,8 +1705,8 @@ lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nb
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>10. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 376. Error when using a serialised data map which spans a period of
-time in which Pamguard modules have changed.</p>
+</span>Bug 376. Error when using a serialised data map which spans a period of time
+in which Pamguard modules have changed.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>11. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -1996,7 +1996,7 @@ file format is the addition of a Unique Data Identifier (UID) to each unit of
 data. This is intended to aid in offline analysis by making it easier for the
 user to link what they are seeing on different PAMGuard displays and also to
 link with any data post processed in Matlab or other custom analysis software.
-UID’s are also added to PAMGuard database tables. </span></p>
+UIDÂ’s are also added to PAMGuard database tables. </span></p>
 
 <h4><span lang=EN-US>Converting Old Data</span></h4>
 
@@ -2004,13 +2004,13 @@ UID’s are also added to PAMGuard database tables. </span></p>
 viewer they will automatically be converted. For safety, the original binary
 files will not be overwritten and the new data will be placed in a new folder
 on your computer with the same path as the old data, but suffixed with
-‘_WithUID’, e.g. if your binary data were previously stored in the folder
+Â‘_WithUIDÂ’, e.g. if your binary data were previously stored in the folder
 C:\MySurvey\binarydata the new data will be written to
 C:\MySurvey\binarydata_WithUID. </span></p>
 
 <p class=MsoNormal><span lang=EN-US>The additional UID column will be added to
 all database tables and populated with unique values. For data which are stored
-in both the binary files and in database tables, the same UID’s will be used in
+in both the binary files and in database tables, the same UIDÂ’s will be used in
 both data stores. </span></p>
 
 <h3><span lang=EN-US>New Displays</span></h3>
@@ -2116,14 +2116,14 @@ switches/parameters to be included in *.ini files.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>1.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span><span lang=EN-US>Bug 308. Map Overlay Control. </span>Storage of data saying
-what get's plotted on each map and for how long became corrupted and the list
-grew to a ridiculous size. Code has been put in place to a) stop it happening
-again and b) to repair any configuration files which are corrupted. Corrupted
-files will be slow to load, slow to save and will be &gt; several megabytes in
-size. It may be necessary to delete the PamguardSettings table in any databases
-since these too may have become oversized which will slow down viewer mode
-PAMGuard start-up.</p>
+</span><span lang=EN-US>Bug 308. Map Overlay Control. </span>Storage of data
+saying what get's plotted on each map and for how long became corrupted and the
+list grew to a ridiculous size. Code has been put in place to a) stop it
+happening again and b) to repair any configuration files which are corrupted.
+Corrupted files will be slow to load, slow to save and will be &gt; several
+megabytes in size. It may be necessary to delete the PamguardSettings table in
+any databases since these too may have become oversized which will slow down viewer
+mode PAMGuard start-up.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2245,7 +2245,7 @@ November 2016</span></h1>
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 Bug 303. Some ASIO sound cards not working with either ASIO system in PAMGuard.
 For the PAMGuard ASIO system, this was due to a data format used by some sound
-cards never being properly implemented. For the “New ASIO system” which is
+cards never being properly implemented. For the Â“New ASIO systemÂ” which is
 based on jAsioHost, the unpacking of that format contained a bug which returned
 incorrect numbers, so data were swamped with noise. Both systems are now fixed.
 By preference, users should use the PAMGuard ASIO system since the JAsioHost
@@ -2394,9 +2394,9 @@ automatic click train identification and tracking. </span></p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>5.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span><span lang=EN-US>The automatic click train identification is now using
-the same internal structures as the manual tracking, so it's possible to
-combine automatic and manual tracking. </span></p>
+</span><span lang=EN-US>The automatic click train identification is now using the
+same internal structures as the manual tracking, so it's possible to combine
+automatic and manual tracking. </span></p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>6.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2476,9 +2476,8 @@ today.&nbsp; </p>
 
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'>5.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 277. Text fields in classifier dialog were not large enough to
-display times greater than 10ms. We have increased length of text fields in the
-dialog.</p>
+</span>Bug 277. Text fields in classifier dialog were not large enough to display
+times greater than 10ms. We have increased length of text fields in the dialog.</p>
 
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'>6.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2496,8 +2495,8 @@ style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&n
 </span>Bug 279. GUI Resizing: The whole PAMGuard GUI would suddenly resize to
 something very small when a dialog is opened. This has been traced to improper
 use of a common dialog component SourcePanel which tries to repack its parent
-Window. Some programmers had inadvertently set it to repack the main PAMGuard
-GUI instead. This has been Fixed.</p>
+Window. Some programmers had inadvertently set it to repack the main PAMGuard GUI
+instead. This has been Fixed.</p>
 
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'>8.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2571,8 +2570,8 @@ and datagram creation.</p>
 
 <h1><a name="_Toc444450394"></a><span lang=EN-US>Version 1.15.00 February 2016</span></h1>
 
-<p class=MsoNormal><span lang=EN-US>Beta Version 1.15.00 64 bit and Core
-version 1.15.00 32 bit. Both using identical Java core software but linking to
+<p class=MsoNormal><span lang=EN-US>Beta Version 1.15.00 64 bit and Core version
+1.15.00 32 bit. Both using identical Java core software but linking to
 different libraries for control of sound input devices. </span></p>
 
 <p class=MsoNormal><span lang=EN-US>This is the first release of a 64 bit
@@ -2818,9 +2817,9 @@ lang=EN-US>1.</span><span lang=EN-US style='font-size:7.0pt;font-family:"Times N
 </span>Spectrogram annotation marks. A simple system for marking spectrograms
 during real time analysis has been incorporated. To use it, add the module, in
 the spectrogram settings, select the annotation marks in the 'Mark Observers'
-tab of the spectrogram configuration dialog, and also right click on the spectrogram
-and select to display the annotations. Annotations are saved to the database so
-you will also need a database module in your configuration. &nbsp;</p>
+tab of the spectrogram configuration dialog, and also right click on the
+spectrogram and select to display the annotations. Annotations are saved to the
+database so you will also need a database module in your configuration. &nbsp;</p>
 
 <p class=MsoListParagraph style='margin-left:47.25pt;text-indent:-29.25pt'><span
 lang=EN-US>2.</span><span lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2880,8 +2879,8 @@ minutes and seconds. Now correctly displays the number of remaining days. </p>
 
 <p class=MsoListParagraph style='margin-left:47.25pt;text-indent:-29.25pt'><span
 lang=EN-US>4.</span><span lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 226. Spectrogram Mark Observer list doesn't refresh when modules
-added or removed. </p>
+</span>Bug 226. Spectrogram Mark Observer list doesn't refresh when modules added
+or removed. </p>
 
 <p class=MsoListParagraph style='margin-left:47.25pt;text-indent:-29.25pt'><span
 lang=EN-US>5.</span><span lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -3277,9 +3276,9 @@ other data sources for the PAMGuard viewer. </p>
 
 <p class=MsoNormal style='margin-left:36.0pt'><i>Database</i></p>
 
-<p class=MsoNormal style='margin-left:36.0pt'>Can now copy data from binary
-storage to the database offline for any module having both binary and database
-storage. </p>
+<p class=MsoNormal style='margin-left:36.0pt'>Can now copy data from binary storage
+to the database offline for any module having both binary and database storage.
+</p>
 
 <p class=MsoNormal style='margin-left:36.0pt'>Can create a blank MS Access
 database (2007 and later *.accdb formats only).</p>
@@ -3471,9 +3470,9 @@ Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span>Offline event marking. Offline event marking similar to functionality in
-RainbowClick is now available in the PAMGUARD viewer. Event summary data is
-stored in the database and can also be exported to text files (e.g. for
-importing into the Distance software).&nbsp; </p>
+RainbowClick is now available in the PAMGUARD viewer. Event summary data is stored
+in the database and can also be exported to text files (e.g. for importing into
+the Distance software).&nbsp; </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -3620,11 +3619,11 @@ Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif
 
 <p class=MsoNormal>2. Improved offline viewer functionality. </p>
 
-<p class=MsoNormal>The offline viewer is much improved with better data
-scrolling and the ability to view data either stored in the database or the
-binary storage system. Work has stated on functions which read and use data
-stored in audio files. This is currently limited to re-calculating and
-displaying displaying spectrogram data during viewer mode operation.&nbsp; </p>
+<p class=MsoNormal>The offline viewer is much improved with better data scrolling
+and the ability to view data either stored in the database or the binary
+storage system. Work has stated on functions which read and use data stored in
+audio files. This is currently limited to re-calculating and displaying
+displaying spectrogram data during viewer mode operation.&nbsp; </p>
 
 <p class=MsoNormal>3. Heading sensor readout</p>
 
@@ -4137,10 +4136,10 @@ help pages</p>
 
 <p class=MsoNormal><b>Bug Fixes</b></p>
 
-<p class=MsoNormal>Memory leak caused by Night / Day colour manager now fixed.
-This would cause memory leaks when multiple files were being analysed off-line
-and would eventually crash PAMGUARD. The way that colours are managed in
-PAMGUARD has been rewritten.&nbsp; </p>
+<p class=MsoNormal>Memory leak caused by Night / Day colour manager now fixed. This
+would cause memory leaks when multiple files were being analysed off-line and
+would eventually crash PAMGUARD. The way that colours are managed in PAMGUARD
+has been rewritten.&nbsp; </p>
 
 <p class=MsoNormal>Some issues with Swing fixed that might have been causing
 hang ups on startup especially on Macs/Linux machines</p>
@@ -4211,8 +4210,8 @@ file)</p>
 
 <p class=MsoNormal><b>Changes</b></p>
 
-<p class=MsoNormal>The User Input module (for text entry of information by the
-user) has been moved from the Displays sub menu of the Add Modules menu, to
+<p class=MsoNormal>The User Input module (for text entry of information by the user)
+has been moved from the Displays sub menu of the Add Modules menu, to
 Utilities. This will not affect how existing settings files are loaded. </p>
 
 <p class=MsoNormal><b>Multi-screen environments.</b></p>
@@ -4383,8 +4382,8 @@ channels or textual content change. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Model viewer. Have stopped it from jumping on top of the main PAMGUARD
-&nbsp;display when dialogs are closed. </p>
+</span>Model viewer. Have stopped it from jumping on top of the main PAMGUARD &nbsp;display
+when dialogs are closed. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

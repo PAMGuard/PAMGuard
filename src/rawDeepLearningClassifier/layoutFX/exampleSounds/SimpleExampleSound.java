@@ -39,6 +39,21 @@ public class SimpleExampleSound implements ExampleSound{
 			e.printStackTrace();
 		}
 	}
+	
+	
+	public SimpleExampleSound(URL path, int start, int end) {
+		try {
+			data = DLUtils.loadWavFile(path);
+		} catch (IOException | UnsupportedAudioFileException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		data = data.trim(start, end); 
+	}
+	
+	public SimpleExampleSound(double[] wave, float sampleRate) {
+		this.data = new AudioData(wave, sampleRate);
+	}
 
 	@Override
 	public double[] getWave() {
@@ -49,5 +64,6 @@ public class SimpleExampleSound implements ExampleSound{
 	public float getSampleRate() {
 		return  data.getSampleRate();
 	}
+
 
 }

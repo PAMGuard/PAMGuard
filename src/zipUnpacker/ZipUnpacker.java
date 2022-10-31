@@ -16,8 +16,8 @@ import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.utils.IOUtils;
+import org.pamguard.x3.x3.X3JNIEncoder;
 
-import x3.X3JNIEncoder;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamSettingManager;
@@ -37,7 +37,7 @@ public class ZipUnpacker implements PamSettings {
 	
 	private ZipSettings zipSettings = new ZipSettings();
 
-	private x3.X3JNIEncoder x3Encoder;
+	private X3JNIEncoder x3Encoder;
 
 	public ZipUnpacker(PamController pamController) {
 		super();

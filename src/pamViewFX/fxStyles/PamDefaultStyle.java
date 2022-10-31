@@ -42,35 +42,35 @@ public class PamDefaultStyle {
 	/**
 	 * Relative location of the CSS style sheet to be used for the Pamguard GUI (but not dialogs)
 	 */
-	private String guiCSS = "/Resources/css/pamCSS.css";
+	protected String guiCSS = "/Resources/css/pamCSS.css";
 	
 	/**
 	 * Relative location of the CSS style sheet to be used for the Pamguard GUI when in night mode.  If there
 	 * is not a style sheet specific to night mode, set it to null or point back to the guiCSS field.
 	 */
-	private String guiCSSNightMode = guiCSS;
+	protected String guiCSSNightMode = guiCSS;
 	
 	/**
 	 * Relative location of the CSS style sheet to be used for the Pamguard standard dialogs
 	 */
-	private String dialogCSS = "/Resources/css/pamDefaultDialogCSS.css";
+	protected String dialogCSS = "/Resources/css/pamDefaultDialogCSS.css";
 	
 	/**
 	 * Relative location of the CSS style sheet to be used for the Pamguard std dialogs when in night mode.  If there
 	 * is not a style sheet specific to night mode, set it to null or point back to the dialogCSS field.
 	 */
-	private String dialogCSSNightMode = dialogCSS;
+	protected String dialogCSSNightMode = dialogCSS;
 	
 	/**
 	 * Relative location of the CSS style sheet to be used for the Pamguard sliding dialogs
 	 */
-	private String slidingDialogCSS = "/Resources/css/pamSettingsCSS.css";
+	protected String slidingDialogCSS = "/Resources/css/pamSettingsCSS.css";
 	
 	/**
 	 * Relative location of the CSS style sheet to be used for the Pamguard sliding dialogs when in night mode.  If there
 	 * is not a style sheet specific to night mode, set it to null or point back to the slidingDialogCSS field.
 	 */
-	private String slidingDialogCSSNightMode = slidingDialogCSS;
+	protected String slidingDialogCSSNightMode = slidingDialogCSS;
 	
 	/**
 	 * <p>Return the CSS Style sheet to be used for the Pamguard GUI (displays and such) but not the dialogs.</p>

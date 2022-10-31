@@ -50,7 +50,7 @@ import warnings.PamWarning;
 public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 
 
-	public static double MAX_WIDTH = 250; 
+	public static double MAX_WIDTH = 270; 
 	
 	/**
 	 * The source for the FFT data source.  
@@ -181,7 +181,6 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 		vBox.getChildren().add(label);
 
 		windowLength = new PamSpinner<Integer>(0, Integer.MAX_VALUE, 10,  10000); 
-		windowLength.setPrefWidth(100);
 		windowLength.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 		windowLength.setEditable(true);
 		windowLength.valueProperty().addListener((obsVal, oldVal, newVal)->{
@@ -189,7 +188,6 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 		});
 
 		hopLength =    new PamSpinner<Integer>(0, Integer.MAX_VALUE, 10,  10000); 
-		hopLength.setPrefWidth(100);
 		hopLength.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 		hopLength.setEditable(true);
 		hopLength.valueProperty().addListener((obsVal, oldVal, newVal)->{
@@ -197,7 +195,6 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 		});
 		
 		reMergeSeg =    new PamSpinner<Integer>(0, Integer.MAX_VALUE, 1,  1); 
-		reMergeSeg.setPrefWidth(100);
 		reMergeSeg.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 		reMergeSeg.setEditable(true);
 

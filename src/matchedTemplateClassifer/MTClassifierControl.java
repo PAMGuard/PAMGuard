@@ -7,11 +7,14 @@ import java.util.ArrayList;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import PamController.PamControlledUnit;
+import PamController.PamControlledUnitGUI;
 import PamController.PamControlledUnitSettings;
 import PamController.PamControllerInterface;
+import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamController.SettingsPane;
+import PamView.WrapperControlledGUISwing;
 import PamView.symbol.SymbolData;
 import PamguardMVC.PamDataBlock;
 import clickDetector.ClickClassifiers.ClickTypeProvider;
@@ -66,6 +69,17 @@ public class MTClassifierControl extends PamControlledUnit implements PamSetting
 	 * The offline process. 
 	 */
 	private MTOfflineProcess mtOfflineProcess;
+	
+	/**
+	 * The JavaFX graphics
+	 */
+	private MTControlGUI matchedClickGUIFX;
+	
+	/**
+	 * The swing graphics - in this case the graphics are JavaFX so this calls a swing wrapper
+	 * to hold the JavaFX graphics. 
+	 */
+	private PamControlledUnitGUI matchedClickGUIGUISwing;
 
 
 	public MTClassifierControl(String unitName) {
@@ -379,6 +393,33 @@ public class MTClassifierControl extends PamControlledUnit implements PamSetting
 		return mtOfflineProcess;
 	}
 
+	public void setMTParams(MatchedTemplateParams newParams) {
+		this.matchedTemplateParams = newParams;
+		
+	}
+
+	/**
+	 * Get the GUI for the PAMControlled unit. This has multiple GUI options which
+	 * are instantiated depending on the view type.
+	 * 
+	 * @param flag. The GUI type flag defined in PAMGuiManager.
+	 * @return the GUI for the PamControlledUnit unit.
+	 */
+	public PamControlledUnitGUI getGUI(int flag) {
+		if (flag == PamGUIManager.FX) {
+			if (matchedClickGUIFX == null) {
+				matchedClickGUIFX = new MTControlGUI(this);
+			}
+			return matchedClickGUIFX;
+		}
+		if (flag == PamGUIManager.SWING) {
+			if (matchedClickGUIGUISwing == null) {
+				matchedClickGUIGUISwing = new WrapperControlledGUISwing(this);
+			}
+			return matchedClickGUIGUISwing;
+		}
+		return null;
+	}
 
 
 

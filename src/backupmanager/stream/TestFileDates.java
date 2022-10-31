@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import PamUtils.PamAudioFileFilter;
+import Acquisition.pamAudio.PamAudioFileFilter;
 import PamUtils.PamCalendar;
 
 public class TestFileDates {

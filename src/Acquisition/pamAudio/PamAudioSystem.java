@@ -10,7 +10,13 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 //import org.kc7bfi.jflac.sound.spi.FlacAudioFileReader;
 import org.jflac.sound.spi.FlacAudioFileReader;
 
-
+/**
+ * Now replaced with PamAudioFileManager.
+ * 
+ * @author Jamie Macaulay
+ *
+ */
+@Deprecated
 public class PamAudioSystem {
 
 	private static final long largeFileSize = 01L<<31;
@@ -42,7 +48,7 @@ public class PamAudioSystem {
 				return new FlacAudioFileReader().getAudioInputStream(file);
 			}
 			catch (UnsupportedAudioFileException e) {
-				
+
 			}
 		}
 		else if (file != null && isSudFile(file)) {
@@ -50,14 +56,15 @@ public class PamAudioSystem {
 				return new SudAudioFileReader().getAudioInputStream(file);
 			}
 			catch (UnsupportedAudioFileException e) {
-				
+				//e.printStackTrace();
 			}
 		}
 		try {
-		return AudioSystem.getAudioInputStream(file);
+			return AudioSystem.getAudioInputStream(file);
 		}
 		catch (Exception e) {
 			System.out.println("Error in audio file " + file.getName() + ":  " + e.getMessage());
+			e.printStackTrace();
 			return null;
 		}
 	}
@@ -93,10 +100,10 @@ public class PamAudioSystem {
 	 */
 	private static boolean isSudFile(File file) {
 		String name = file.getName();
-		if (name.length() < 5) {
+		if (name.length() < 4) {
 			return false;
 		}
-		String end = name.substring(name.length()-5).toLowerCase();
+		String end = name.substring(name.length()-4).toLowerCase();
 		return (end.equals(".sud"));
 	}
 

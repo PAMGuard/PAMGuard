@@ -6,6 +6,7 @@ import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 
+import Acquisition.pamAudio.PamAudioFileManager;
 import Acquisition.pamAudio.PamAudioSystem;
 import PamController.PamGUIManager;
 import javafx.beans.property.BooleanProperty;
@@ -64,7 +65,7 @@ public class WavFileType extends File {
 	 */
 	private AudioFormat getAudioFormat(File file) {
 		try {
-			AudioInputStream audioStream = PamAudioSystem.getAudioInputStream(file);
+			AudioInputStream audioStream = PamAudioFileManager.getInstance().getAudioInputStream(file);
 			
 			AudioFormat audioFormat = audioStream.getFormat();
 			

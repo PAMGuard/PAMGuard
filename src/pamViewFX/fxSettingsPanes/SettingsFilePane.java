@@ -72,6 +72,9 @@ public class SettingsFilePane extends SettingsPane<SettingsFileData> {
 		browseButton.setOnAction((action)->{
 			browseFile(false);
 		});
+		browseButton.prefHeightProperty().bind(fileBox.heightProperty());
+		
+		
 		PamButton browseSaveButton = new PamButton();
 //		browseSaveButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.PLUS, Color.WHITE, PamGuiManagerFX.iconSize));
 		browseSaveButton.setGraphic(PamGlyphDude.createPamIcon("mdi2p-plus", Color.WHITE, PamGuiManagerFX.iconSize));
@@ -81,6 +84,9 @@ public class SettingsFilePane extends SettingsPane<SettingsFileData> {
 		});
 		folderSelectPane.getChildren().addAll(fileBox, browseSaveButton, browseButton);
 		vBox.getChildren().add(folderSelectPane);
+		
+		browseSaveButton.prefHeightProperty().bind(fileBox.heightProperty());
+
 		
 		fileBox.prefHeightProperty().bind(browseButton.heightProperty());
 		

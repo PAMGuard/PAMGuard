@@ -1,0 +1,16 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Thu Oct 06 15:51:34 BST 2022
+@default-talan-https\://nexus.talanlabs.com/content/repositories/releases/.lastUpdated=1665067894494
+https\://dl.bintray.com/macster110/jtorch4pam/.error=Could not transfer artifact pamguard.org\:x3\:pom\:2.1.0 from/to bintray-macster110-jtorch4pam (https\://dl.bintray.com/macster110/jtorch4pam)\: Remote host terminated the handshake
+@default-repo-file\://${project.basedir}/repo/.lastUpdated=1665067029837
+https\://repo1.maven.org/maven2/.error=
+file\:///Users/au671271/git/PAMGuard/repo/.error=
+https\://nexus.bedatadriven.com/content/groups/public/.error=
+https\://artifacts.unidata.ucar.edu/repository/unidata-all/.error=
+https\://artifacts.unidata.ucar.edu/repository/unidata-all/.lastUpdated=1665067032579
+https\://repo1.maven.org/maven2/.lastUpdated=1665067036872
+https\://nexus.talanlabs.com/content/repositories/releases/.error=Could not transfer artifact pamguard.org\:x3\:pom\:2.1.0 from/to talan (https\://nexus.talanlabs.com/content/repositories/releases/)\: Access denied to https\://nexus.talanlabs.com/content/repositories/releases/pamguard/org/x3/2.1.0/x3-2.1.0.pom. Error code 401, Unauthorized
+file\://${project.basedir}/repo/.error=Could not transfer artifact pamguard.org\:x3\:pom\:2.1.0 from/to repo (file\://${project.basedir}/repo)\: Repository path /repo does not exist, and cannot be created.
+file\:///Users/au671271/git/PAMGuard/repo/.lastUpdated=1665067033714
+4d1f727a0c17e3b21ef2f6654eed0b3113a4db97@default-bintray-macster110-jtorch4pam-https\://dl.bintray.com/macster110/jtorch4pam/.lastUpdated=1665067894257
+https\://nexus.bedatadriven.com/content/groups/public/.lastUpdated=1665067034011
