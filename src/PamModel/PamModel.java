@@ -765,6 +765,7 @@ final public class PamModel implements PamModelInterface, PamSettings {
 		mi.addDependency(new PamDependency(ClickDetection.class, "clickDetector.ClickControl"));	
 		mi.setToolTipText("Classifies clicks based on an ideal template to match and a template to reject. "
 				+ "An example of this is to classify beaked whale clicks in an environment with dolphin clicks");
+		mi.addGUICompatabilityFlag(PamGUIManager.FX);
 		mi.setModulesMenuGroup(classifierGroup);
 		
 		

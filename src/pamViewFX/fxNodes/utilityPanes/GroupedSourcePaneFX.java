@@ -61,7 +61,7 @@ public class GroupedSourcePaneFX extends SourcePaneFX {
 	/**
 	 * Validator for channels 
 	 */
-    private Validator validator;
+    private Validator channelValidator;
 
 
 	public GroupedSourcePaneFX(Class sourceType, boolean hasChannels, boolean includeSubClasses, boolean autoGrouping) {
@@ -76,7 +76,7 @@ public class GroupedSourcePaneFX extends SourcePaneFX {
 	@Override
 	protected void createPanel() {
 		
-		validator = new Validator();
+		channelValidator = new Validator();
 		
 		sourcePane=new PamGridPane();
 		sourcePane.setVgap(5);
@@ -138,11 +138,11 @@ public class GroupedSourcePaneFX extends SourcePaneFX {
 		selectAll.setOnAction((action)->{
 			if (selectAll.isSelected()) selectAllChannels();
 			else selectNoChannels();
-            validator.validate(); //makes sure any error signs are removed
+            channelValidator.validate(); //makes sure any error signs are removed
 		});
 		
 		//create check to show at least some check boxes need to be selected.
-		validator.createCheck()
+		channelValidator.createCheck()
         .dependsOn(("select all"), selectAll.selectedProperty())
         .withMethod(c -> {
           if (!isAChannelSelected() ) {
@@ -156,7 +156,7 @@ public class GroupedSourcePaneFX extends SourcePaneFX {
 		if (isHasChannels()){
 			for (int i = 0; i < PamConstants.MAX_CHANNELS; i++){
 				channelBoxes[i] = new CheckBox("Channel " + i);
-				 validator.createCheck()
+				 channelValidator.createCheck()
 		          .dependsOn(("channel " + i), channelBoxes[i].selectedProperty())
 		          .withMethod(c -> {
 		            if (!isAChannelSelected() ) {
@@ -170,7 +170,7 @@ public class GroupedSourcePaneFX extends SourcePaneFX {
 				final int n=i;
 				channelBoxes[i].setOnAction((action)->{
 					selectionChanged(n);
-		            validator.validate(); //makes sure any error signs are removed.
+		            channelValidator.validate(); //makes sure any error signs are removed.
 				});
 				groupList[i]=new ComboBox<Integer>();
 				//System.out.println("SourcePanel.java creatPanel"+i);
@@ -196,6 +196,15 @@ public class GroupedSourcePaneFX extends SourcePaneFX {
 
 	}
 	
+	/**
+	 * Get the validator for the channel. This can identify errors
+	 * in 
+	 * @return
+	 */
+	public Validator getChannelValidator() {
+		return channelValidator;
+	}
+
 	/**
 	 * Check if 
 	 * @return

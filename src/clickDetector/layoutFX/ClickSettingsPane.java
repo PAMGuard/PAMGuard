@@ -22,6 +22,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.util.StringConverter;
+import net.synedra.validatorfx.Validator;
 import PamController.PamController;
 import PamController.SettingsPane;
 import PamDetection.RawDataUnit;
@@ -175,12 +176,21 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 	 * The default pane width
 	 */
 	public static double PREF_PANE_WIDTH=550;
+	
+	
+	/**
+	 * Validator which checks for errors
+	 */
+    private Validator clickValidator;
+
 
 
 	public ClickSettingsPane(ClickControl clickControl){
 		super(null);
 		this.clickControl=clickControl; 
 		mainPane= new PamBorderPane(); 
+		
+		clickValidator = new Validator(); 
 
 		pamTabbedPane=new PamTabPane();
 		pamTabbedPane.setAddTabButton(false);
@@ -376,13 +386,24 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 			else selectNoChannels();
 		});
 
-		//create a list of trigger boxes
+		//create a list of trigger boxesc
 		for (int i=0; i<triggerBoxes.length; i++){
 			triggerBoxes[i]=new CheckBox(("Channel "+i));
 			final int n=i;
 			triggerBoxes[i].setOnAction((action)->{
 				selectionChanged(n);
+	        	clickValidator.validate(); //make sure all nodes are resrt when one channel is ticked. 
 			});
+			clickValidator.createCheck()
+	          .dependsOn(("trigger " + n), triggerBoxes[i].selectedProperty())
+	          .withMethod(c -> {
+	            if (!isATriggerSelected() ) {
+		              c.error("At least one trigger channel needs to be selected for the module to work");
+	            }
+	          })
+	          .decorates(triggerBoxes[n])
+	          .immediate();
+	        
 		}
 
 		populateTriggerPane(); 
@@ -544,7 +565,7 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 	}
 
 	/**
-	 * Get the current channle bitmap. 
+	 * Get the current channels bitmap. 
 	 * @return integer channel bitmap
 	 */
 	private int getChannels(){
@@ -557,6 +578,32 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 		}
 		return channels;
 	}
+	
+	
+	/**
+	 * Get the number of selected trigger channels.
+	 * @return the number of selected trigger channels. 
+	 */
+	private int getNSelectedTrigger() {
+		int channels=getChannels(); 
+		int n=0; 
+		//now add correct trigger children again
+		for (int i = 0; i < Math.min(PamConstants.MAX_CHANNELS, triggerBoxes.length); i++) {
+			if ((channels & 1<<i) != 0  && triggerBoxes[i].isSelected()){
+				n++;
+			}; 
+		} 
+		return n; 
+	}
+	
+	/**
+	 * Check whether at least one trigger channel is selected. 
+	 * @return true of a trigger channel is selected. 
+	 */
+	private boolean isATriggerSelected() {
+		return  getNSelectedTrigger()>0; 
+	}
+
 
 	/**
 	 * Create trigger channels
@@ -574,6 +621,8 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 		triggerChannels.getChildren().add(selectAll);		
 		for (int i = 0; i < Math.min(PamConstants.MAX_CHANNELS, triggerBoxes.length); i++) {
 			if ((channels & 1<<i) != 0){
+				
+				//triggerBoxes[i] = new CheckBox("Channel " + i);
 				triggerChannels.getChildren().add(triggerBoxes[i]);
 				triggerBoxes[i].layoutYProperty().unbind();
 				triggerBoxes[i].layoutYProperty().bind(sourcePane.getChannelBoxes()[i].layoutYProperty());
