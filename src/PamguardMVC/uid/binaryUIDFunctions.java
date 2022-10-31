@@ -120,8 +120,8 @@ public class binaryUIDFunctions {
 				}
 			}
 		} catch (Exception e) {
-			System.out.println("Error reading binary UID data from log file");
-			e.printStackTrace();
+			System.out.println("Error reading binary UID data from log file" + logFileData);
+//			e.printStackTrace();
 		}
 
 //        try (BufferedReader br = new BufferedReader(new FileReader(logFileData))) {
@@ -320,7 +320,7 @@ public class binaryUIDFunctions {
 							+ footer.getHighestUID()
 							+ ".  It is not possible to know whether all of the original data objects have been recovered.<br><br>";
 					String help = null;
-					int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title,
+					int ans = WarnOnce.showWarning(PamController.getMainFrame(), title,
 							msg, WarnOnce.WARNING_MESSAGE, help);
 				}
 			}
@@ -429,7 +429,7 @@ public class binaryUIDFunctions {
 								+ " data objects.  The last object UID recovered is " + footer.getHighestUID()
 								+ ".  It is not possible to know whether all of the original data objects have been recovered.<br><br>";
 						String help = null;
-						int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0),
+						int ans = WarnOnce.showWarning(PamController.getMainFrame(),
 								title, msg, WarnOnce.WARNING_MESSAGE, help);
 					}
 				}
@@ -531,10 +531,12 @@ public class binaryUIDFunctions {
 				out.close();
 			}
 		} catch (TransformerException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
+//			e.printStackTrace();
 			return false;
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
+//			e.printStackTrace();
 			return false;
 		}
 		return true;

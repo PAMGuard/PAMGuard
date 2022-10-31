@@ -187,7 +187,7 @@ public class RoccaWhistleSelect extends PamProcess implements SpectrogramMarkObs
     					"underlying detection information necessary to recalculate ancillary variables (e.g. time between detections, detection density, " +
     					"detections/second, etc).  You will need to start a new Encounter to ensure all variables are calculated correctly.</p></html>";
     			String help = null;
-    			int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help);
+    			int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help);
                 String dummy = roccaControl.roccaSidePanel.sidePanel.addASighting(false);
             }
 

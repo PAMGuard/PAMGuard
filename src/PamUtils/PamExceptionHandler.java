@@ -35,7 +35,7 @@ public class PamExceptionHandler implements Thread.UncaughtExceptionHandler {
 					"for help.<p>" +
 					"This plug-in will not be available for loading";
 			String help = null;
-			int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help, exception);
+			int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help, exception);
 			System.err.println("Exception while loading " +	pluginInterface);
 		    exception.printStackTrace();
 	    } else {

@@ -88,7 +88,7 @@ public class WarnOnce implements PamSettings {
 	public static int showWarning(String title, String message, int messageType, String helpPoint, Throwable error, 
 			String okButtonText, String cancelButtonText) {
 		if (PamGUIManager.isSwing()) {
-			return singleInstance.showWarningDialog(PamController.getInstance().getGuiFrameManager().getFrame(0), 
+			return singleInstance.showWarningDialog(PamController.getMainFrame(), 
 					title, message, messageType, helpPoint, error, okButtonText, cancelButtonText);
 		}
 		else if (PamGUIManager.isFX()) {
@@ -220,7 +220,7 @@ public class WarnOnce implements PamSettings {
 	 * otherwise OK_OPTION will always be returned. 
 	 */
 	public static int showWarning(Window parent, String title, String message, int messageType, String helpPoint, Throwable error) {
-		if (! PamController.checkIfNetworkControlled()) {
+		if (canShowDialog()) {
 			return singleInstance.showWarningDialog(parent, title, message, messageType, helpPoint, error, null, null);
 		} else {
 			System.out.println(" ");
@@ -229,6 +229,16 @@ public class WarnOnce implements PamSettings {
 			System.out.println(" ");
 			return 0;
 		}
+	}
+	
+	private static boolean canShowDialog() {
+		if (PamController.checkIfNetworkControlled()) {
+			return false;
+		}
+		if (PamGUIManager.getGUIType() == PamGUIManager.NOGUI) {
+			return false;
+		}
+		return true;
 	}
 	
 	/**
@@ -361,10 +371,16 @@ public class WarnOnce implements PamSettings {
 		}
 		
 		// show the warning
-		WarnOnceDialog wo = new WarnOnceDialog(parent, title, message, messageType, helpPoint, error, okButtonText, cancelButtonText);
-		warnOnceList.setShowWarning(messageName, wo.isShowAgain());
-		showThisSess.put(messageName, wo.isShowThisSess());
-		return wo.getAnswer();
+		if (canShowDialog()) {
+			WarnOnceDialog wo = new WarnOnceDialog(parent, title, message, messageType, helpPoint, error, okButtonText, cancelButtonText);
+			warnOnceList.setShowWarning(messageName, wo.isShowAgain());
+			showThisSess.put(messageName, wo.isShowThisSess());
+			return wo.getAnswer();
+		}
+		else {
+			System.out.println(message);
+			return OK_OPTION;
+		}
 	}
 	
 

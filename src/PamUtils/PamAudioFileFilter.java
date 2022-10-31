@@ -17,7 +17,7 @@ public class PamAudioFileFilter extends PamFileFilter {
 //		addFileType(".AIFF");
 //		addFileType(".FLAC");
 		addFileType(".flac");
-		addFileType(".sud");
+//		addFileType(".sud");
 	}
 
 }

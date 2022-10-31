@@ -156,7 +156,7 @@ public class ClickTrainOfflineTask extends OfflineTask<PamDataUnit<?,?>> {
 	
 	@Override
 	public boolean callSettings() {
-		clickTrainControl.getSwingGUI().showSettingsDialog(PamController.getInstance().getGuiFrameManager().getFrame(0), false);
+		clickTrainControl.getSwingGUI().showSettingsDialog(PamController.getMainFrame(), false);
 		return true;
 	}
 	
