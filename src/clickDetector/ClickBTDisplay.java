@@ -1642,16 +1642,26 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		double[] rotAngles = new double[3];
 		rotAngles[1] = Math.toRadians(oll.getPitch());
 		rotAngles[2] = Math.toRadians(oll.getRoll());
-		if (rType == BTDisplayParameters.ROTATE_HEADPITCHROLL) {
+		if (rType == BTDisplayParameters.ROTATE_TOVESSEL) {
 			// use head as well as pitch and roll. 
-			rotAngles[0] = Math.toRadians(oll.getHeading());
+			PamVector[] vr = loc.getWorldVectors();
+			if (vr != null && vr.length > 0) {
+				return vr[0];
+			}
+//			rotAngles[0] = Math.toRadians(oll.getHeading());
 		}
-		if (rotAngles[0] == 0 && rotAngles[1] == 0 && rotAngles[2] == 0) {
-			return v;
+		else if (rType == BTDisplayParameters.ROTATE_TONORTH) {
+			PamVector[] vr = loc.getRealWorldVectors();
+			if (vr != null && vr.length > 0) {
+				return vr[0];
+			}			
 		}
-		PamQuaternion pq = new PamQuaternion(rotAngles[0], rotAngles[1], rotAngles[2]);
-		PamVector v2 = PamVector.rotateVector(v, pq);
-		return v2;
+//		if (rotAngles[0] == 0 && rotAngles[1] == 0 && rotAngles[2] == 0) {
+//			return v;
+//		}
+//		PamQuaternion pq = new PamQuaternion(rotAngles[0], rotAngles[1], rotAngles[2]);
+//		PamVector v2 = PamVector.rotateVector(v, pq);
+		return v;
 	}
 	
 	private double angleFromYPos(int yPos) {
