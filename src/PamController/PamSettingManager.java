@@ -536,8 +536,7 @@ public class PamSettingManager {
 						"This could occur if the psf file location is in a read-only folder, or the filename is " +
 						"invalid.  Please check and try again.";
 				String help = null;
-				//Let the warning dialog class choose GUI frame or get a class cast exception  if closing PG with different GUI
-				int ans = WarnOnce.showWarning( title, msg, WarnOnce.WARNING_MESSAGE, help);
+				int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help);
 			}
 		}
 		/**
@@ -1292,9 +1291,9 @@ public class PamSettingManager {
 						"<p>The module may or may not load, and even if it " +
 						"loads it may have lost it's settings.  Please check before performing any analysis.</p>";
 				String help = null;
-
+				
 				int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help);
-
+				
 				break;
 			}
 			catch (IOException io){
