@@ -11,10 +11,9 @@ import org.controlsfx.glyphfont.Glyph;
 import Acquisition.FileInputParameters;
 import Acquisition.FolderInputParameters;
 import Acquisition.FolderInputSystem;
+import Acquisition.pamAudio.PamAudioFileFilter;
 import PamController.PamController;
 import PamController.PamFolders;
-import PamController.SettingsPane;
-import PamUtils.PamAudioFileFilter;
 import PamUtils.PamCalendar;
 import PamUtils.worker.PamWorker;
 import PamUtils.worker.filelist.FileListData;
@@ -24,7 +23,6 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
@@ -48,7 +46,6 @@ import pamViewFX.fxNodes.PamComboBox;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamProgressBar;
 import pamViewFX.fxNodes.PamVBox;
-import pamViewFX.fxNodes.utilityPanes.PamToggleSwitch;
 
 /**
  * Pane for the folder input of the sound acquisition. 
@@ -413,7 +410,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		for (int i=0; i<filesArr.length; i++) {
 			filesArr[i] = files.get(i); 
 		}
-
+		
 		folderInputSystem.getFolderInputParameters().setSelectedFiles(filesArr);
 		folderInputSystem.makeSelFileList();
 		//		folderInputSystem.makeSelFileList(folderInputSystem.getFolderInputParameters().getSelectedFiles());
@@ -626,7 +623,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 			return; 
 		}
 
-		System.out.println("File list worker: " + worker ); 
+		//System.out.println("File list worker: " + worker ); 
 		//must ensure this is on the FX thread
 		//Platform.runLater(()->{
 		this.progressBar.progressProperty().bind(worker.getPamWorkProgress().getProgressProperty()); 

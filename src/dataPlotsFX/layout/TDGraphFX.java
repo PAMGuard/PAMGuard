@@ -272,7 +272,7 @@ public class TDGraphFX extends PamBorderPane {
 		 * blocks.
 		 */
 		tdAxisSelPane = new TDDataSelPaneFX(this);
-		tdAxisSelPane.setPrefWidth(250);
+		tdAxisSelPane.setPrefWidth(280);
 		// put pane inside a scroll pane for graph resizing
 		PamScrollPane scrollPane = new PamScrollPane(tdAxisSelPane);
 		// scrollPane.setFitToWidth(true);

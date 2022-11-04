@@ -1,0 +1,14 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Thu Oct 06 15:37:20 BST 2022
+@default-talan-https\://nexus.talanlabs.com/content/repositories/releases/.lastUpdated=1665067039941
+https\://dl.bintray.com/macster110/jtorch4pam/.error=Could not transfer artifact pamguard.org\:x3\:jar\:sources\:2.1.0 from/to bintray-macster110-jtorch4pam (https\://dl.bintray.com/macster110/jtorch4pam)\: Remote host terminated the handshake
+https\://repo1.maven.org/maven2/.error=
+file\:///Users/au671271/git/PAMGuard/repo/.error=
+https\://nexus.bedatadriven.com/content/groups/public/.error=
+https\://artifacts.unidata.ucar.edu/repository/unidata-all/.error=
+https\://artifacts.unidata.ucar.edu/repository/unidata-all/.lastUpdated=1665067039627
+https\://repo1.maven.org/maven2/.lastUpdated=1665067040128
+https\://nexus.talanlabs.com/content/repositories/releases/.error=Could not transfer artifact pamguard.org\:x3\:jar\:sources\:2.1.0 from/to talan (https\://nexus.talanlabs.com/content/repositories/releases/)\: Access denied to https\://nexus.talanlabs.com/content/repositories/releases/pamguard/org/x3/2.1.0/x3-2.1.0-sources.jar. Error code 401, Unauthorized
+file\:///Users/au671271/git/PAMGuard/repo/.lastUpdated=1665067038933
+4d1f727a0c17e3b21ef2f6654eed0b3113a4db97@default-bintray-macster110-jtorch4pam-https\://dl.bintray.com/macster110/jtorch4pam/.lastUpdated=1665067038929
+https\://nexus.bedatadriven.com/content/groups/public/.lastUpdated=1665067039782

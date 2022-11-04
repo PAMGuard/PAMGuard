@@ -1,0 +1,779 @@
+
+
+{
+  -color-dark: #010409;
+  -color-light: #ffffff;
+  -color-base-0: #f0f6fc;
+  -color-base-1: #c9d1d9;
+  -color-base-2: #b1bac4;
+  -color-base-3: #8b949e;
+  -color-base-4: #6e7681;
+  -color-base-5: #484f58;
+  -color-base-6: #30363d;
+  -color-base-7: #21262d;
+  -color-base-8: #161b22;
+  -color-base-9: #0d1117;
+  -color-accent-0: #cae8ff;
+  -color-accent-1: #a5d6ff;
+  -color-accent-2: #79c0ff;
+  -color-accent-3: #58a6ff;
+  -color-accent-4: #388bfd;
+  -color-accent-5: #1f6feb;
+  -color-accent-6: #1158c7;
+  -color-accent-7: #0d419d;
+  -color-accent-8: #0c2d6b;
+  -color-accent-9: #051d4d;
+  -color-success-0: #aff5b4;
+  -color-success-1: #7ee787;
+  -color-success-2: #56d364;
+  -color-success-3: #3fb950;
+  -color-success-4: #2ea043;
+  -color-success-5: #238636;
+  -color-success-6: #196c2e;
+  -color-success-7: #0f5323;
+  -color-success-8: #033a16;
+  -color-success-9: #04260f;
+  -color-warning-0: #f8e3a1;
+  -color-warning-1: #f2cc60;
+  -color-warning-2: #e3b341;
+  -color-warning-3: #d29922;
+  -color-warning-4: #bb8009;
+  -color-warning-5: #9e6a03;
+  -color-warning-6: #845306;
+  -color-warning-7: #693e00;
+  -color-warning-8: #4b2900;
+  -color-warning-9: #341a00;
+  -color-danger-0: #ffdcd7;
+  -color-danger-1: #ffc1ba;
+  -color-danger-2: #ffa198;
+  -color-danger-3: #ff7b72;
+  -color-danger-4: #f85149;
+  -color-danger-5: #da3633;
+  -color-danger-6: #b62324;
+  -color-danger-7: #8e1519;
+  -color-danger-8: #67060c;
+  -color-danger-9: #490202;
+  -color-fg-default: #c9d1d9;
+  -color-fg-muted: #8b949e;
+  -color-fg-subtle: #6e7681;
+  -color-fg-emphasis: #ffffff;
+  -color-bg-default: #0d1117;
+  -color-bg-overlay: #0d1117;
+  -color-bg-subtle: #161b22;
+  -color-bg-inset: #010409;
+  -color-border-default: #30363d;
+  -color-border-muted: #21262d;
+  -color-border-subtle: rgba(240, 246, 252, 0.1);
+  -color-shadow-default: #010409;
+  -color-neutral-emphasis-plus: #6e7681;
+  -color-neutral-emphasis: #6e7681;
+  -color-neutral-muted: rgba(110, 118, 129, 0.4);
+  -color-neutral-subtle: rgba(110, 118, 129, 0.1);
+  -color-accent-fg: #58a6ff;
+  -color-accent-emphasis: #1f6feb;
+  -color-accent-muted: rgba(56, 139, 253, 0.4);
+  -color-accent-subtle: rgba(56, 139, 253, 0.15);
+  -color-warning-fg: #d29922;
+  -color-warning-emphasis: #9e6a03;
+  -color-warning-muted: rgba(187, 128, 9, 0.4);
+  -color-warning-subtle: rgba(187, 128, 9, 0.15);
+  -color-success-fg: #3fb950;
+  -color-success-emphasis: #238636;
+  -color-success-muted: rgba(46, 160, 67, 0.4);
+  -color-success-subtle: rgba(46, 160, 67, 0.15);
+  -color-danger-fg: #f85149;
+  -color-danger-emphasis: #da3633;
+  -color-danger-muted: rgba(248, 81, 73, 0.4);
+  -color-danger-subtle: rgba(248, 81, 73, 0.15);
+  -color-chart-1: #f3622d;
+  -color-chart-2: #fba71b;
+  -color-chart-3: #57b757;
+  -color-chart-4: #41a9c9;
+  -color-chart-5: #4258c9;
+  -color-chart-6: #9a42c8;
+  -color-chart-7: #c84164;
+  -color-chart-8: #888888;
+  -color-chart-1-alpha70: rgba(243, 98, 45, 0.7);
+  -color-chart-2-alpha70: rgba(251, 167, 27, 0.7);
+  -color-chart-3-alpha70: rgba(87, 183, 87, 0.7);
+  -color-chart-4-alpha70: rgba(65, 169, 201, 0.7);
+  -color-chart-5-alpha70: rgba(66, 88, 201, 0.7);
+  -color-chart-6-alpha70: rgba(154, 66, 200, 0.7);
+  -color-chart-7-alpha70: rgba(200, 65, 100, 0.7);
+  -color-chart-8-alpha70: rgba(136, 136, 136, 0.7);
+  -color-chart-1-alpha20: rgba(243, 98, 45, 0.2);
+  -color-chart-2-alpha20: rgba(251, 167, 27, 0.2);
+  -color-chart-3-alpha20: rgba(87, 183, 87, 0.2);
+  -color-chart-4-alpha20: rgba(65, 169, 201, 0.2);
+  -color-chart-5-alpha20: rgba(66, 88, 201, 0.2);
+  -color-chart-6-alpha20: rgba(154, 66, 200, 0.2);
+  -color-chart-7-alpha20: rgba(200, 65, 100, 0.2);
+  -color-chart-8-alpha20: rgba(136, 136, 136, 0.2);
+
+  -fx-pambackground: rgba(238,238,238);
+  -fx-darkbackground: -color-bg-default;
+  -fx-darkbackground-trans: rgba(13, 17, 23,0.90);
+  -fx-highlight: -color-base-6;
+  -fx-highlight_border: -color-button-fg;
+  -fx-text: -color-fg-default;
+  -fx-border_col: -color-border-default;
+  -fx-icon_col: -color-fg-default;
+}
+
+.root {
+  -fx-background-color:-fx-darkbackground;
+  -fx-font-size: 12px;
+  -fx-background-radius: inherit;
+  -fx-background-insets: inherit;
+  -fx-padding: 5px 5px 5px 5px;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ *  Panes                                                           *
+ *                                                                             *
+ ******************************************************************************/
+
+.pane {
+  -fx-background-color: -fx-darkbackground;
+}
+
+.pane-trans{
+  -fx-background-color: -fx-darkbackground-trans;
+}
+
+.pane-opaque {
+  -fx-background-color: -fx-pambackground;
+}
+
+/*for plot panes*/
+.pane-plot {
+  -fx-background-color: -fx-plotbackground;
+}
+
+
+.button {
+  -color-button-bg: -color-bg-subtle;
+  -color-button-fg: -color-fg-default;
+  -color-button-border: -color-border-default;
+  -color-button-bg-hover: -color-base-6;
+  -color-button-fg-hover: -color-button-fg;
+  -color-button-border-hover: -color-button-border;
+  -color-button-bg-focused: -color-button-bg;
+  -color-button-fg-focused: -color-button-fg;
+  -color-button-border-focused: -color-accent-emphasis;
+  -color-button-bg-pressed: -color-bg-subtle;
+  -color-button-fg-pressed: -color-button-fg;
+  -color-button-border-pressed: transparent;
+  -fx-background-color: -color-button-border, -color-button-bg;
+  -fx-background-insets: 0, 1px;
+  -fx-background-radius: 4px;
+  -fx-graphic-text-gap: 6px;
+  -fx-text-fill: -color-button-fg;
+  -fx-alignment: CENTER;
+  -fx-padding: 8px 12px 8px 12px;
+}
+
+.menu-button,
+.split-menu-button {
+  -color-button-bg: -color-bg-subtle;
+  -color-button-fg: -color-fg-default;
+  -color-button-border: -color-border-default;
+  -color-button-bg-hover: -color-base-6;
+  -color-button-fg-hover: -color-button-fg;
+  -color-button-border-hover: -color-button-border;
+  -color-button-bg-focused: -color-button-bg;
+  -color-button-fg-focused: -color-button-fg;
+  -color-button-border-focused: -color-accent-emphasis;
+  -color-button-bg-pressed: -color-bg-subtle;
+  -color-button-fg-pressed: -color-button-fg;
+  -color-button-border-pressed: transparent;
+  -fx-background-color: -color-button-border, -color-button-bg;
+  -fx-background-insets: 0, 1px;
+  -fx-background-radius: 4px;
+  -fx-graphic-text-gap: 6px;
+  -fx-text-fill: -color-button-fg;
+  -fx-alignment: CENTER;
+  -fx-padding: 0;
+  -fx-alignment: CENTER_LEFT;
+}
+
+.menu-button.accent,
+.split-menu-button.accent {
+  -color-button-bg: -color-accent-emphasis;
+  -color-button-fg: -color-fg-emphasis;
+  -color-button-border: -color-accent-emphasis;
+  -color-button-bg-hover: -color-accent-emphasis;
+  -color-button-fg-hover: -color-fg-emphasis;
+  -color-button-border-hover: -color-accent-emphasis;
+  -color-button-bg-focused: -color-accent-6;
+  -color-button-fg-focused: -color-fg-emphasis;
+  -color-button-border-focused: -color-accent-emphasis;
+  -color-button-bg-pressed: -color-accent-emphasis;
+  -color-button-fg-pressed: -color-fg-emphasis;
+  -color-button-border-pressed: transparent;
+}
+.menu-button.accent.button-outlined,
+.split-menu-button.accent.button-outlined {
+  -color-button-bg: -color-bg-default;
+  -color-button-fg: -color-accent-fg;
+  -color-button-bg-hover: -color-accent-emphasis;
+  -color-button-fg-hover: -color-fg-emphasis;
+}
+.menu-button.accent.flat,
+.split-menu-button.accent.flat {
+  -color-button-fg: -color-accent-fg;
+  -color-button-bg-hover: -color-accent-subtle;
+}
+.menu-button.success,
+.split-menu-button.success {
+  -color-button-bg: -color-success-emphasis;
+  -color-button-fg: -color-fg-emphasis;
+  -color-button-border: -color-success-emphasis;
+  -color-button-bg-hover: -color-success-emphasis;
+  -color-button-fg-hover: -color-fg-emphasis;
+  -color-button-border-hover: -color-success-emphasis;
+  -color-button-bg-focused: -color-success-6;
+  -color-button-fg-focused: -color-fg-emphasis;
+  -color-button-border-focused: -color-success-emphasis;
+  -color-button-bg-pressed: -color-success-emphasis;
+  -color-button-fg-pressed: -color-fg-emphasis;
+  -color-button-border-pressed: transparent;
+}
+.menu-button.success.button-outlined,
+.split-menu-button.success.button-outlined {
+  -color-button-bg: -color-bg-default;
+  -color-button-fg: -color-success-fg;
+  -color-button-bg-hover: -color-success-emphasis;
+  -color-button-fg-hover: -color-fg-emphasis;
+}
+.menu-button.success.flat,
+.split-menu-button.success.flat {
+  -color-button-fg: -color-success-fg;
+  -color-button-bg-hover: -color-success-subtle;
+}
+.menu-button.danger,
+.split-menu-button.danger {
+  -color-button-bg: -color-danger-emphasis;
+  -color-button-fg: -color-fg-emphasis;
+  -color-button-border: -color-danger-emphasis;
+  -color-button-bg-hover: -color-danger-emphasis;
+  -color-button-fg-hover: -color-fg-emphasis;
+  -color-button-border-hover: -color-danger-emphasis;
+  -color-button-bg-focused: -color-danger-6;
+  -color-button-fg-focused: -color-fg-emphasis;
+  -color-button-border-focused: -color-danger-emphasis;
+  -color-button-bg-pressed: -color-danger-emphasis;
+  -color-button-fg-pressed: -color-fg-emphasis;
+  -color-button-border-pressed: transparent;
+}
+.menu-button.danger.button-outlined,
+.split-menu-button.danger.button-outlined {
+  -color-button-bg: -color-bg-default;
+  -color-button-fg: -color-danger-fg;
+  -color-button-bg-hover: -color-danger-emphasis;
+  -color-button-fg-hover: -color-fg-emphasis;
+}
+.menu-button.danger.flat,
+.split-menu-button.danger.flat {
+  -color-button-fg: -color-danger-fg;
+  -color-button-bg-hover: -color-danger-subtle;
+}
+.menu-button.flat,
+.split-menu-button.flat {
+  -color-button-bg: transparent;
+  -color-button-fg: -color-fg-default;
+  -color-button-border: transparent;
+  -color-button-bg-hover: -color-bg-subtle;
+  -color-button-fg-hover: -color-button-fg;
+  -color-button-border-hover: -color-bg-subtle;
+  -color-button-bg-focused: -color-button-bg;
+  -color-button-fg-focused: -color-button-fg;
+  -color-button-border-focused: -color-button-bg;
+  -color-button-bg-pressed: -color-button-bg;
+  -color-button-fg-pressed: -color-button-fg;
+  -color-button-border-pressed: transparent;
+}
+
+
+.toggle-button {
+  -color-button-bg: -color-bg-subtle;
+  -color-button-fg: -color-fg-default;
+  -color-button-border: -color-border-default;
+  -color-button-bg-hover: -color-base-6;
+  -color-button-fg-hover: -color-button-fg;
+  -color-button-border-hover: -color-button-border;
+  -color-button-bg-focused: -color-button-bg;
+  -color-button-fg-focused: -color-button-fg;
+  -color-button-border-focused: -color-accent-emphasis;
+  -color-button-bg-pressed: -color-bg-subtle;
+  -color-button-fg-pressed: -color-button-fg;
+  -color-button-border-pressed: transparent;
+  -fx-background-color: -color-button-border, -color-button-bg;
+  -fx-background-insets: 0, 1px;
+  -fx-background-radius: 4px;
+  -fx-graphic-text-gap: 6px;
+  -fx-text-fill: -color-button-fg;
+  -fx-alignment: CENTER;
+  -color-button-bg-selected: -color-accent-emphasis;
+  -color-button-fg-selected: -color-fg-emphasis;
+  -fx-padding: 8px 12px 8px 12px;
+}
+
+
+.list-view {
+  -color-cell-bg: -color-bg-default;
+  -color-cell-fg: -color-fg-default;
+  -color-cell-bg-selected: -color-base-6;
+  -color-cell-fg-selected: -color-fg-default;
+  -color-cell-bg-odd: -color-bg-subtle;
+  -color-cell-border: -color-border-default;
+  -fx-border-color: -color-cell-border;
+  -fx-border-width: 1px;
+  -fx-border-radius: 0;
+}
+
+.table-view {
+  -color-cell-bg: -color-bg-default;
+  -color-cell-fg: -color-fg-default;
+  -color-cell-bg-selected: -color-base-6;
+  -color-cell-fg-selected: -color-fg-default;
+  -color-cell-bg-odd: -color-bg-subtle;
+  -color-cell-border: -color-border-default;
+  -fx-border-color: -color-cell-border;
+  -fx-border-width: 1px;
+  -fx-border-radius: 0;
+  -color-header-bg: -color-bg-subtle;
+  -color-header-fg: -color-fg-default;
+}
+
+.titled-pane > .title > .text {
+  -fx-font-size: 1em;
+}
+
+.tree-view {
+  -color-cell-bg: -color-bg-default;
+  -color-cell-fg: -color-fg-default;
+  -color-cell-bg-selected: -color-base-6;
+  -color-cell-fg-selected: -color-fg-default;
+  -color-cell-bg-odd: -color-bg-subtle;
+  -color-cell-border: -color-border-default;
+  -fx-border-color: -color-cell-border;
+  -fx-border-width: 1px;
+  -fx-border-radius: 0;
+}
+
+.tree-table-view {
+  -color-cell-bg: -color-bg-default;
+  -color-cell-fg: -color-fg-default;
+  -color-cell-bg-selected: -color-base-6;
+  -color-cell-fg-selected: -color-fg-default;
+  -color-cell-bg-odd: -color-bg-subtle;
+  -color-cell-border: -color-border-default;
+  -fx-border-color: -color-cell-border;
+  -fx-border-width: 1px;
+  -fx-border-radius: 0;
+  -color-header-bg: -color-bg-subtle;
+  -color-header-fg: -color-fg-default;
+}
+
+.list-view:focused > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
+.tree-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-cell:filled:selected,
+.table-view:focused > .virtual-flow > .clipped-container > .sheet > .table-row-cell:filled:selected,
+.tree-table-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell:filled:selected {
+  -color-cell-fg: -color-cell-fg-selected;
+  -fx-background-color: -color-cell-border, -color-cell-bg-selected;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ *  ikonli icons                                                               *
+ *                                                                             *
+ ******************************************************************************/
+
+#module-pane .ikonli-font-icon {
+    -fx-icon-color: black;
+}
+
+
+.titled-pane {
+  -fx-background-color: -color-bg-default;
+  -fx-text-fill: -color-fg-default;
+  -fx-effect: none;
+}
+
+
+/****************************************************************
+ 
+  ScrollPane  
+ 
+****************************************************************/
+.scroll-pane {
+  -fx-background: #0d1117;
+  -fx-background-color: transparent;
+}
+
+.scroll-pane > .viewport {
+   -fx-background-color: transparent;
+}
+
+.scroll-pane-dark {
+  -fx-background: -fx-darkbackground;
+  -fx-background-color: -fx-darkbackground;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Hiding Tab                                                                  *
+ *                                                                             *
+ ******************************************************************************/
+ #hide-tab {
+    -fx-background-color: transparent;
+    -fx-border-radius: 5 5 0 0;
+    -fx-background-radius: 5 5 0 0;
+    -fx-border-color: -fx-border_col;
+}
+
+ #show-tab {
+    -fx-background-color: transparent;
+    -fx-border-radius: 5 5 0 0;
+    -fx-background-radius: 5 5 0 0;
+    -fx-border-color: -fx-border_col;
+}
+
+ #hide-tab-highlight {
+    -fx-background-color: -fx-highlight;
+    -fx-border-radius: 5 5 0 0;
+    -fx-background-radius: 5 5 0 0;
+    -fx-border-color: -fx-highlight_border;
+}
+
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Button                                                                      *
+ *                                                                             *
+ ******************************************************************************/
+
+/*.button{
+   -fx-text-fill: white;
+   -fx-background-color: -fx-darkbackground;
+   -fx-border-color: -fx-border_col;
+   -fx-border-radius: 5;
+   -fx-background-radius:6;
+   -fx-padding: 3 6 6 6;
+}*/
+
+/*.button:hover{
+   -fx-background-color: -fx-highlight; 
+   -fx-border-color: -fx-highlight_border;
+}
+
+.button:selected{
+  -fx-border-color: -fx-highlight;
+}
+*/
+/**
+ * Button for closing a hiding panel. Right indicates bottoms points towards the right, closing a hiding panel 
+ * on the right hand side of the screen. These buttons have a transparent background and rounded corners. 
+ */
+ /** top-left, top-right, bottom-right, and bottom-left corners, in that order. */
+.close-button-right{
+ -fx-background-color: transparent;
+ -fx-background-radius: 0 10 10 0;
+  -fx-border-color: transparent;
+ -fx-border-radius: 0 10 10 0;
+}
+
+
+.close-button-left{
+ -fx-background-color: transparent;
+ -fx-background-radius: 10 0 0 10;
+ -fx-border-color: transparent;
+ -fx-border-radius: 10 0 0 10;
+}
+
+
+.close-button-top{
+ -fx-background-color: transparent;
+ -fx-background-radius: 10 10 0 0;
+-fx-border-color: transparent;
+ -fx-border-radius: 10 10 0 0;
+}
+
+
+.close-button-bottom{
+ -fx-background-color: transparent;
+ -fx-background-radius: 0 0 10 10;
+  -fx-border-color: transparent;
+ -fx-border-radius: 0 0 10 10;
+}
+
+
+.close-button-bottom-trans{
+ -fx-border-color: transparent;
+ -fx-background-color: transparent;
+ -fx-background-radius: 0 0 10 10;
+ -fx-border-radius: 0 0 10 10;
+}
+
+.close-button-left-trans{
+ -fx-border-color: transparent; 
+ -fx-background-color: transparent;
+ -fx-background-radius: 10 0 0 10;
+ -fx-border-radius: 10 0 0 10;
+}
+
+.close-button-right-trans{
+ -fx-border-color: transparent; 
+ -fx-background-color: transparent;
+ -fx-background-radius: 0 10 10 0;
+ -fx-border-radius: 0 10 10 0;
+}
+
+.square-button{
+  -fx-background-radius: 0 0 0 0;
+  -fx-border-radius: 0 0 0 0;
+}
+
+.square-button-trans{
+  -fx-background-color: transparent;
+  -fx-border-color: transparent;
+  -fx-background-radius: 0 0 0 0;
+  -fx-border-radius: 0 0 0 0;
+}
+
+.module-hide-top{
+ -fx-border-color: transparent;
+ -fx-background-radius: 5 5 0 0;
+ -fx-border-radius: 5 5 0 0;
+}
+
+.module-hide-bottom{
+ -fx-border-color: transparent;
+ -fx-background-radius: 0 0 5 5;
+ -fx-border-radius: 0 0 5 5;
+}
+
+.delete-button:hover{
+    -fx-background-color: rgba(1,0,0,0.7);
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Pop over                                                                         *
+ *                                                                             *
+ ******************************************************************************/
+
+.popover {       
+    -fx-background-color: -fx-darkbackground;          
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;                    
+}
+
+.popover > .content {
+    -fx-background-color: -fx-darkbackground;     
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;                   
+}
+
+.popover > .arrow {
+    -fx-background-color: -fx-darkbackground;       
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;                 
+}
+
+/*weird way to do it but need this to colour the arrow*/
+.popover > .border {
+    /*-fx-stroke: linear-gradient(to bottom, rgba(0,0,0, .3), rgba(0, 0, 0, .7)) ;*/
+    -fx-stroke-width: 0.5;
+    -fx-fill: -fx-darkbackground;  /* instead -fx-background-color */
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * SplitMenuButton                                                             *
+ *                                                                             *
+ ******************************************************************************/
+
+.split-menu-button{
+  -fx-text-fill: -fx-text;
+  -fx-background-color: -fx-darkbackground;
+  -fx-border-color: -fx-border_col;
+  -fx-border-radius: 5;
+}
+
+
+.split-menu-button:hover{
+ /*-fx-border-color: -fx-highlight_border;*/
+}
+
+
+.split-menu-button .label {
+  -fx-text-fill: white;
+  -fx-background-color: -fx-darkbackground;
+  -fx-border-radius: 5;
+}
+
+
+.split-menu-button .label:hover {
+   -fx-background-color: -fx-highlight; 
+}
+
+
+.split-menu-button .arrow-button {
+  -fx-text-fill: -fx-text;
+  -fx-background-color: -fx-darkbackground;
+  -fx-border-radius: 5;
+}
+
+
+.split-menu-button .arrow-button:hover {
+ -fx-background-color: -fx-highlight; 
+}
+
+
+/**********/
+
+
+.menu-item {
+  -fx-background-color: -color-bg-default;
+  -fx-padding: 8px 12px 8px 12px;
+}
+.menu-item > .graphic-container {
+  -fx-padding: 0 6px 0 0;
+}
+.menu-item > .label {
+  -fx-padding: 0 1em 0 0;
+  -fx-text-fill: -color-fg-default;
+}
+.menu-item > .left-container {
+  -fx-padding: 0 1em 0 0;
+}
+.menu-item > .right-container {
+  -fx-padding: 0 0 0 0.5em;
+}
+.menu-item:focused {
+  -fx-background-color: -color-base-7, -color-base-7;
+}
+.menu-item:disabled {
+  -fx-opacity: 0.4;
+  -fx-background-color: -color-bg-default;
+}
+
+
+
+/********************************************
+*                                           *
+*      Spinner                 *
+*                                           *
+*********************************************/
+
+
+.spinner  {
+    -fx-pref-width: 120px;
+}
+
+.dialog-pane > .content {
+  -fx-padding: 1em 1em 1em 1em;
+}
+
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Hiding Pane                                                                  *
+ *                                                                             *
+ ******************************************************************************/
+
+
+/**
+ * Button for closing a hiding panel. Right indicates bottoms points towards the right, closing a hiding panel 
+ * on the right hand side of the screen. These buttons have a transparent background and rounded corners. 
+ */
+ /** top-left, top-right, bottom-right, and bottom-left corners, in that order. */
+.close-button-right{
+ -fx-background-color: transparent;
+ -fx-background-radius: 0 10 10 0;
+ -fx-border-radius: 0 10 10 0;
+}
+
+.close-button-right:hover {
+ -fx-background-color: -fx-highlight;
+}
+
+
+.close-button-left{
+ -fx-background-color: transparent;
+ -fx-background-radius: 10 0 0 10;
+ -fx-border-radius: 10 0 0 10;
+}
+
+.close-button-left:hover {
+ -fx-background-color: -fx-highlight;
+}
+
+
+.close-button-top{
+ -fx-background-color: transparent;
+ -fx-background-radius: 10 10 0 0;
+ -fx-border-radius: 10 10 0 0;
+}
+
+
+.close-button-bottom {
+ -fx-background-color: transparent;
+ -fx-background-radius: 0 0 10 10;
+ -fx-border-radius: 0 0 10 10;
+}
+
+.close-button-bottom:hover {
+ -fx-background-color: -fx-highlight;
+}
+
+
+.close-button-bottom-grey{
+-fx-border-color: transparent;
+ -fx-background-radius: 0 0 10 10;
+ -fx-border-radius: 0 0 10 10;
+}
+
+.close-button-left-trans{
+ -fx-border-color: transparent; 
+ -fx-background-color: transparent;
+ -fx-background-radius: 10 0 0 10;
+ -fx-border-radius: 10 0 0 10;
+}
+
+.close-button-left-trans:focused {
+ -fx-border-color: transparent; 
+ -fx-background-color: transparent;
+ -fx-background-radius: 10 0 0 10;
+ -fx-border-radius: 10 0 0 10;
+}
+
+.close-button-right-trans{
+ -fx-border-color: transparent; 
+ -fx-background-color: transparent;
+ -fx-background-radius: 0 10 10 0;
+ -fx-border-radius: 0 10 10 0;
+}
+
+.close-button-right-trans:focused {
+ -fx-border-color: transparent; 
+ -fx-background-color: transparent;
+ -fx-background-radius: 0 10 10 0;
+ -fx-border-radius: 0 10 10 0;
+}
+
+
+.menu-square-button {
+-fx-border-color: -fx_border_col; 
+ -fx-background-color: transparent;
+ -fx-background-radius: 0 0 0 0;
+ -fx-border-radius: 0 0 0 0;
+}
+

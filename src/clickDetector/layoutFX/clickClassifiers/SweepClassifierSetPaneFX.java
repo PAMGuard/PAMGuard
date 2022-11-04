@@ -3,6 +3,7 @@ package clickDetector.layoutFX.clickClassifiers;
 
 import fftFilter.FFTFilterParams;
 import fftManager.FFTLengthModeled;
+import javafx.beans.property.StringProperty;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -30,9 +31,13 @@ import pamViewFX.fxNodes.picker.SymbolPicker;
 import pamViewFX.fxNodes.utilityPanes.FreqBandPane;
 import pamViewFX.fxNodes.utilityPanes.PamToggleSwitch;
 import pamViewFX.fxNodes.utilityPanes.SimpleFilterPaneFX;
+import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
 import pamViewFX.PamGuiManagerFX;
+import net.synedra.validatorfx.Validator;
 
 import PamController.SettingsPane;
+import PamView.PamSymbol;
+import PamView.symbol.SymbolData;
 import clickDetector.ClickClassifiers.basicSweep.CodeHost;
 import clickDetector.ClickClassifiers.basicSweep.SweepClassifier;
 import clickDetector.ClickClassifiers.basicSweep.SweepClassifierSet;
@@ -95,7 +100,11 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 	 */
 	private AmplitudeBlock amplitudeBlock;
 	
-	PamBorderPane mainPane = new PamBorderPane();
+	private PamBorderPane mainPane = new PamBorderPane();
+	
+    private Validator validator = new Validator();
+
+	public int classifierItemRow;
 	
 	public SweepClassifierSetPaneFX(SweepClassifier sweepClassifier){
 		super(null);
@@ -325,6 +334,14 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		 */
 		private Label lengthMS;
 
+		private ComboBox<String> lengthTypeBox;
+
+		private CheckBox restrictLength;
+
+		private ColorPicker lineColourPicker;
+
+		private ColorPicker fillColourPicker;
+
 		OptionsBox() {
 			super("General Options", false);
 			this.getHolderPane().setCenter(createOptionsPane());
@@ -334,6 +351,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		//create the general options 
 		private Node createOptionsPane(){
 			
+
 			PamGridPane pamGridPane=new PamGridPane();
 			pamGridPane.setHgap(5);
 			pamGridPane.setVgap(5);
@@ -343,25 +361,54 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 			nameField=new TextField();
 			nameField.setPrefColumnCount(10);
-			pamGridPane.add(nameField, 0, 0);
-			PamGridPane.setColumnSpan(nameField, 2);
-
+			pamGridPane.add(nameField, 1, 0);
+			PamGridPane.setColumnSpan(nameField, 8);
+			PamGridPane.setHgrow(nameField, Priority.ALWAYS);
 			
-			pamGridPane.add(new Label("Code"), 3, 0);
+			 validator.createCheck()
+	          .dependsOn("speciesname", nameField.textProperty())
+	          .withMethod(c -> {
+	            String userName = c.get("speciesname");
+	            if (userName == null || userName.length()<=0) {
+		              c.error("The classifier must have a name");
+	            }
+	          })
+	          .decorates(nameField)
+	          .immediate();
+	        ;
+			
+			
+			pamGridPane.add(new Label("Code"), 0, 1);
 
-			codeSpinner=new PamSpinner<Integer> (0, 500, 0, 1);
+			codeSpinner=new PamSpinner<Integer> (1, 500, 0, 1);
 			codeSpinner.setEditable(true);
 			//codeSpinner.setPrefWidth(150);
 			codeSpinner.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
-			pamGridPane.add(codeSpinner, 1, 0);
+			pamGridPane.add(codeSpinner, 1, 1);
 			
 //			pamGridPane.add(new Label("Symbol"), 0,1);
 			
 			//create colour picker to allow users to change symbol colour. 
 			symbolPicker=new SymbolPicker(); 
-			pamGridPane.add(symbolPicker, 2, 0);
+			pamGridPane.add(symbolPicker, 3,1);
 			
-			pamGridPane.add(new Label("Symbol"), 3,0);
+			pamGridPane.add(new Label("Symbol"), 2,1);
+			
+			lineColourPicker = new ColorPicker(); 
+			lineColourPicker.setStyle("-fx-color-label-visible: false ;");
+			lineColourPicker.setOnAction((action)->{
+				symbolPicker.setLineColour(lineColourPicker.getValue());
+			});
+			pamGridPane.add(lineColourPicker, 4, 1);
+			
+			
+			fillColourPicker = new ColorPicker(); 
+			fillColourPicker.setStyle("-fx-color-label-visible: false ;");
+			fillColourPicker.setOnAction((action)->{
+				symbolPicker.setFillColour(fillColourPicker.getValue());
+			});
+			pamGridPane.add(fillColourPicker, 5, 1);
+
 
 //			//create a button to allow users to change symbol shape. 
 //			symbolColour=new ColorPicker(); 
@@ -371,35 +418,46 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 //			});
 			
 			//channel options
-			pamGridPane.add(new Label("Channels"), 0,1);
+			pamGridPane.add(new Label("Channels"), 0,2);
 			
 			channelsBox = new ComboBox<String>();
 			for (int i = 0; i < 3; i++) {
 				channelsBox.getItems().add(SweepClassifierSet.getChannelOptionsName(i));
 			}
-			pamGridPane.add(channelsBox, 1,1);
+			pamGridPane.add(channelsBox, 1,2);
 			
-			PamGridPane.setColumnSpan(channelsBox, 7);
+			PamGridPane.setColumnSpan(channelsBox,8 );
 			
 			//restrict parameter to click centre
 			PamHBox clickCenterBox=new PamHBox(); 
 			clickCenterBox.setSpacing(5); 
 
-			clickCenterBox.getChildren().add(new CheckBox("Analyse click ")); 
+			clickCenterBox.getChildren().add(restrictLength = new CheckBox("Trim click")); 
 			
 			clickLengthSpinner=new PamSpinner<Integer>(4,102400,128,32); 
 			clickLengthSpinner.setEditable(true);
 			//clickLengthSpinner.setPrefWidth(150);
 			clickLengthSpinner.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
+			clickLengthSpinner.valueProperty().addListener((obsVal, oldVal, newVal)->{
+				setLengthLabel();
+			});
 			
 			clickCenterBox.getChildren().add(clickLengthSpinner);
-			clickCenterBox.getChildren().add(new Label("samples")); 
+			Label samplesLabel =new Label("samples");
+			clickCenterBox.getChildren().add(samplesLabel); 
 			clickCenterBox.getChildren().add(lengthMS=new Label("()")); 
-			clickCenterBox.getChildren().add(new Label("around click center.")); 
+			clickCenterBox.getChildren().add(lengthTypeBox = new ComboBox<String>()); 
+			lengthTypeBox.getItems().add("around click center");
+			lengthTypeBox.getItems().add("from start of click");
 			clickCenterBox.setAlignment(Pos.CENTER_LEFT);
-			PamGridPane.setColumnSpan(clickCenterBox, 4);
-			PamGridPane.setHgrow(clickCenterBox, Priority.ALWAYS);
-			pamGridPane.add(clickCenterBox, 0,2);
+			
+			restrictLength.setOnAction((action)->{
+				lengthTypeBox.setDisable(!restrictLength.isSelected());
+				clickLengthSpinner.setDisable(!restrictLength.isSelected());
+				samplesLabel.setDisable(!restrictLength.isSelected());
+				lengthMS.setDisable(!restrictLength.isSelected());
+			});
+			
 
 //			//column constraints
 //			ColumnConstraints col1 = new ColumnConstraints();
@@ -414,14 +472,16 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 //			col4.setPercentWidth(35);
 //			
 //			pamGridPane.getColumnConstraints().addAll(col1, col2, col3,col4);
-
-			return pamGridPane; 
-
+			
+			PamVBox  holder = new PamVBox(); 
+			holder.setSpacing(5);
+			holder.getChildren().addAll(pamGridPane,clickCenterBox); 
+			
+			return holder; 
 		}
 
 		@Override
 		public int getCode() {
-			// TODO Auto-generated method stub
 			return codeSpinner.getValue();
 		}
 
@@ -441,28 +501,98 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			float sr = sweepClassifier.getClickDetector().getSampleRate();
 			lengthMS.setText(String.format("(%.2f ms)", fftLength * 1000 / sr));
 		}
+		
+		/**
+		 * Set the length in seconds. 
+		 */
+		private void setLengthLabel() {
+			float sr = sweepClassifier.getClickDetector().getSampleRate();
+			lengthMS.setText(String.format("(%.2f ms)", clickLengthSpinner.getValue() * 1000 / sr));
+		}
 
 		@Override
 		protected void setParams() {
-			nameField.setText(sweepClassifierSet.getName());
-			codeSpinner.getValueFactory().setValue(sweepClassifierSet.getSpeciesCode());
+			
+			if (sweepClassifierSet == null) {
+				//symbolViewer.setSymbol(null);
+				symbolPicker.getSelectionModel().select(0);
+				nameField.setText("");
+				setCode(sweepClassifier.getNextFreeCode(0));
+			}
+			else {
+				symbolPicker.setSymbol(sweepClassifierSet.symbol == null? null : sweepClassifierSet.symbol.getSymbol());
+				nameField.setText(sweepClassifierSet.getName());
+				setCode(sweepClassifierSet.getSpeciesCode());
+			}
+
+			if (sweepClassifierSet == null) {
+				return;
+			}
+			
+			lengthTypeBox.getSelectionModel().select(sweepClassifierSet.restrictedBinstype);
+			
 			channelsBox.getSelectionModel().select(sweepClassifierSet.channelChoices);
-			clickLengthSpinner.getValueFactory().setValue(sweepClassifierSet.restrictedBins); 
+			restrictLength.setSelected(sweepClassifierSet.restrictLength);
+			setFFTLength(sweepClassifierSet.restrictedBins);
+			
+			
+//			nameField.setText(sweepClassifierSet.getName());
+//			codeSpinner.getValueFactory().setValue(sweepClassifierSet.getSpeciesCode());
+//			channelsBox.getSelectionModel().select(sweepClassifierSet.channelChoices);
+//			
+//			//length stuff
+//			clickLengthSpinner.getValueFactory().setValue(sweepClassifierSet.restrictedBins); 
+		
 			
 		}
 
 		@Override
 		protected boolean getParams() {
 			sweepClassifierSet.setName(nameField.getText());
-			sweepClassifierSet.setSpeciesCode(codeSpinner.getValue());
-			sweepClassifierSet.channelChoices=channelsBox.getSelectionModel().getSelectedIndex(); 
-			sweepClassifierSet.restrictedBins=clickLengthSpinner.getValue(); 
+			
+			if (this.symbolPicker.getValue()==null) {
+				return showWarning("You must pick a symbol");
+			}
+			
+			SymbolData symbolData = new SymbolData(this.symbolPicker.getValue().getSymbol(), 10,10,true, 
+					PamUtilsFX.fxToAWTColor(this.lineColourPicker.getValue()), PamUtilsFX.fxToAWTColor(this.fillColourPicker.getValue())); 
+			sweepClassifierSet.symbol= new PamSymbol(symbolData);
+			if (sweepClassifierSet.getName().length() <= 0) {
+				return showWarning("You must enter a name for this type of click");
+			}
+			sweepClassifierSet.setSpeciesCode(getCode());
+			if (sweepClassifier.codeDuplicated(sweepClassifierSet, classifierItemRow) ||
+					sweepClassifierSet.getSpeciesCode() <= 0){
+				return showWarning("You must enter a unique positive integer species code");
+			}
+			if (sweepClassifierSet.symbol == null) {
+				return showWarning("You must select a symbol");
+			}
+			sweepClassifierSet.channelChoices = channelsBox.getSelectionModel().getSelectedIndex();
+			sweepClassifierSet.restrictLength = restrictLength.isSelected();
+			
+			sweepClassifierSet.restrictedBinstype = lengthTypeBox.getSelectionModel().getSelectedIndex();
+			
+			try {
+				sweepClassifierSet.restrictedBins = clickLengthSpinner.getValue(); 
+			}
+			catch (NumberFormatException e) {
+				return showWarning("Invalid Restricted length value");
+			}
 			return true;
+//			sweepClassifierSet.setName(nameField.getText());
+//			sweepClassifierSet.setSpeciesCode(codeSpinner.getValue());
+//			sweepClassifierSet.channelChoices=channelsBox.getSelectionModel().getSelectedIndex(); 
+//			sweepClassifierSet.restrictedBins=clickLengthSpinner.getValue(); 
 		}
 
 		@Override
 		protected void disbleControls(boolean enable) {
 			// TODO Auto-generated method stub
+		}
+
+		public TextField getNameLabel() {
+			return this.nameField;
 		}
 		
 	}
@@ -1110,5 +1240,16 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		// TODO Auto-generated method stub
 		
 	}
+
+
+	public StringProperty getNameTextProperty() {
+		return optionBox.getNameLabel().textProperty();
+	}
+	
+	private boolean showWarning(String string) {
+		PamDialogFX.showWarning(string);
+		return false;
+	}
+
 
 }

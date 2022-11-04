@@ -2,7 +2,7 @@ package PamUtils.worker.filelist;
 
 import java.io.File;
 
-import PamUtils.PamAudioFileFilter;
+import Acquisition.pamAudio.PamAudioFileFilter;
 
 /**
  * Worker which extracts acoustic files from a folder. 

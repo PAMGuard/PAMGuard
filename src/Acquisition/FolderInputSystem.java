@@ -28,11 +28,12 @@ import Acquisition.layoutFX.DAQSettingsPane;
 import Acquisition.layoutFX.FolderInputPane;
 import javafx.application.Platform;
 import pamguard.GlobalArguments;
+import Acquisition.pamAudio.PamAudioFileManager;
+import Acquisition.pamAudio.PamAudioFileFilter;
 import Acquisition.pamAudio.PamAudioSystem;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamSettings;
-import PamUtils.PamAudioFileFilter;
 import PamUtils.PamCalendar;
 import PamUtils.PamFileChooser;
 import PamUtils.PamFileFilter;
@@ -429,6 +430,8 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings{
 				File aFile = files[0];
 				setNewFile(aFile.getAbsolutePath());
 			}
+			
+			
 			/*
 			 *  The file chooser is returning sub classes of File which are not
 			 *  serialisable, so we can't use them. We need to convert their 
@@ -505,7 +508,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings{
 		if (file.isFile() && !file.isHidden() && acquisitionDialog != null) {
 			//Hidden files should not be used in analysis...
 			try {
-				audioStream = PamAudioSystem.getAudioInputStream(file);
+				audioStream = PamAudioFileManager.getInstance().getAudioInputStream(file);
 				AudioFormat audioFormat = audioStream.getFormat();
 				fileSamples = audioStream.getFrameLength();
 				acquisitionDialog.setSampleRate(audioFormat.getSampleRate());
@@ -568,6 +571,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings{
 
 	@Override
 	public File getCurrentFile() {
+		//System.out.println("All files: " +  allFiles);
 		if (allFiles != null && allFiles.size() > currentFile) {
 			return allFiles.get(currentFile);
 		}
