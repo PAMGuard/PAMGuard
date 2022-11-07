@@ -770,7 +770,7 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings, N
 	}
 
 	private NetworkObject interpretPamCommand(NetworkObject receivedData, BuoyStatusDataUnit buoyStatusDataUnit) {
-		//		System.out.println("Network command received: " + getPamCommandString(dataId2));
+//			System.out.println("Network command received: " + getPamCommandString(dataId2));
 		buoyStatusDataUnit.setCommandStatus(receivedData.getDataType2());
 		long time = PamCalendar.getTimeInMillis();
 		if (receivedData.getData() != null && receivedData.getDataLength() >= 8) {

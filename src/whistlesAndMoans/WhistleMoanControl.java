@@ -184,11 +184,6 @@ public class WhistleMoanControl extends PamControlledUnit implements PamSettings
 	}
 
 	@Override
-	public String getModuleSummary() {
-		return whistleToneProcess.getModuleSummary();
-	}
-
-	@Override
 	public Object getShortUnitType() {
 		return "WMD";
 	}
@@ -224,5 +219,10 @@ public class WhistleMoanControl extends PamControlledUnit implements PamSettings
 			return binaryStoreGUISwing;
 		}
 		return null;
+	}
+
+	@Override
+	public String getModuleSummary(boolean clear) {
+		return whistleToneProcess.getModuleSummary(clear);
 	}
 }

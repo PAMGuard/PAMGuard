@@ -50,6 +50,14 @@ public class PamTableItem implements Cloneable {
 	 */
 	private Object value;
 	
+	/**
+	 * Test description of field. Can be exported to schema and may 
+	 * be possible to write into database description fields one day. In any case
+	 * it can be useful to the programmer when looking back to see what on earth
+	 * code is supposed to be doing. 
+	 */
+	private String description;
+	
 	/*
 	 * Reference to another PamTableItem in a different
 	 * table. This must be of the same sqlType as this
@@ -60,6 +68,11 @@ public class PamTableItem implements Cloneable {
 	 */
 	private PamTableItem crossReferenceItem;
 
+	/**
+	 * Generate a table item
+	 * @param name name of table item
+	 * @param sqlType SQL Type from java.sql.Types, e.g. Types.INTEGER
+	 */
 	public PamTableItem(String name, int sqlType) {
 		super();
 		this.name = name;
@@ -67,12 +80,49 @@ public class PamTableItem implements Cloneable {
 		this.length = 0;
 		this.required = false;
 	}
-	
+
+	/**
+	 * Generate a table item
+	 * @param name name of table item
+	 * @param sqlType SQL Type from java.sql.Types, e.g. Types.INTEGER
+	 * @param description optional description
+	 */
+	public PamTableItem(String name, int sqlType, String description) {
+		super();
+		this.name = name;
+		this.sqlType = sqlType;
+		this.description = description;
+		this.length = 0;
+		this.required = false;
+	}
+
+	/**
+	 * Generate a table item
+	 * @param name name of table item
+	 * @param sqlType SQL Type from java.sql.Types, e.g. Types.INTEGER
+	 * @param length length (only applicable to Types.CHAR types)
+	 */
 	public PamTableItem(String name, int sqlType, int length) {
 		super();
 		this.name = name;
 		this.sqlType = sqlType;
 		this.length = length;
+		this.required = false;
+	}
+
+	/**
+	 * Generate a table item
+	 * @param name name of table item
+	 * @param sqlType SQL Type from java.sql.Types, e.g. Types.INTEGER
+	 * @param length length (only applicable to Types.CHAR types)
+	 * @param description optional description
+	 */
+	public PamTableItem(String name, int sqlType, int length, String description) {
+		super();
+		this.name = name;
+		this.sqlType = sqlType;
+		this.length = length;
+		this.description = description;
 		this.required = false;
 	}
 
@@ -499,6 +549,20 @@ public class PamTableItem implements Cloneable {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	/**
+	 * @return the description
+	 */
+	public String getDescription() {
+		return description;
+	}
+
+	/**
+	 * @param description the description to set
+	 */
+	public void setDescription(String description) {
+		this.description = description;
 	}
 	
 	
