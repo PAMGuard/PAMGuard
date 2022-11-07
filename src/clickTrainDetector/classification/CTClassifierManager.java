@@ -1,15 +1,16 @@
 package clickTrainDetector.classification;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
-import PamUtils.PamCalendar;
-import PamguardMVC.debug.Debug;
 import clickTrainDetector.CTDataUnit;
 import clickTrainDetector.ClickTrainControl;
 import clickTrainDetector.classification.bearingClassifier.BearingClassification;
 import clickTrainDetector.classification.bearingClassifier.BearingClassifier;
 import clickTrainDetector.classification.simplechi2classifier.Chi2CTClassification;
 import clickTrainDetector.classification.simplechi2classifier.Chi2ThresholdClassifier;
+import clickTrainDetector.classification.standardClassifier.StandardClassification;
+import clickTrainDetector.classification.standardClassifier.StandardClassifier;
 import clickTrainDetector.classification.templateClassifier.TemplateClassification;
 import clickTrainDetector.classification.templateClassifier.CTTemplateClassifier;
 
@@ -43,18 +44,22 @@ public class CTClassifierManager {
 		this.preClassifier = new Chi2ThresholdClassifier(clickTrainControl, -1); 
 	}
 
+	@Deprecated
 	public String getClassifierName(CTClassifierType classifierType) {
-		switch (classifierType) {
-		case CHI2THRESHOLD:
-			return "X\u00b2 threshold classifier";
-		case TEMPLATECLASSIFIER:
-			return "Spectral Template";
-		case BEARINGCLASSIFIER:
-			return "Bearing Classifier";
-			/////****ADD NEW CLASSIFIERS HERE****/////
-		default:
-			return ""; 
-		}
+		return classifierType.toString(); 
+//		switch (classifierType) {
+//		case CHI2THRESHOLD:
+//			return "X\u00b2 threshold classifier";
+//		case TEMPLATECLASSIFIER:
+//			return "Spectral Template";
+//		case BEARINGCLASSIFIER:
+//			return "Bearing Classifier";
+//		case STANDARDCLASSIFIER:
+//			return "Click Train Classifier";
+//			/////****ADD NEW CLASSIFIERS HERE****/////
+//		default:
+//			return ""; 
+//		}
 	}
 
 	/**
@@ -72,6 +77,7 @@ public class CTClassifierManager {
 	 * @return the CT classifier 
 	 */
 	public CTClassifier createClassifier(CTClassifierType classifierType) {
+		if (classifierType==null) return null; 
 		switch (classifierType) {
 		case CHI2THRESHOLD:
 			return new Chi2ThresholdClassifier(clickTrainControl, 1); 
@@ -79,6 +85,8 @@ public class CTClassifierManager {
 			return new CTTemplateClassifier(clickTrainControl, 1);
 		case BEARINGCLASSIFIER:
 			return new BearingClassifier(clickTrainControl, -1); 
+		case STANDARDCLASSIFIER:
+			return new StandardClassifier(clickTrainControl, -1); 
 			/////****ADD NEW CLASSIFIERS HERE****/////
 		default:
 			return new Chi2ThresholdClassifier(clickTrainControl, 1); 
@@ -113,6 +121,8 @@ public class CTClassifierManager {
 			return new TemplateClassification(jsonstring); 
 		case BEARINGCLASSIFIER:
 			return new BearingClassification(jsonstring); 
+		case STANDARDCLASSIFIER:
+			return new StandardClassification(jsonstring); 
 			/////****ADD NEW CLASSIFICATIONTYPES HERE****/////
 		default:
 			return null; 
@@ -147,10 +157,10 @@ public class CTClassifierManager {
 		//first check the pre-classifier
 		Chi2CTClassification classification = this.preClassifier.classifyClickTrain(ctDataUnit); 
 		
-		Debug.out.println("Pre classifier: " + PamCalendar.formatDateTime(ctDataUnit.getTimeMilliseconds()) + " N. " + ctDataUnit.getSubDetectionsCount() + "UID first: " + ctDataUnit.getSubDetection(0).getUID() ); 
+		//System.out.println("Pre classifier: " + PamCalendar.formatDateTime(ctDataUnit.getTimeMilliseconds()) + " N. " + ctDataUnit.getSubDetectionsCount() + "UID first: " + ctDataUnit.getSubDetection(0).getUID() ); 
 
 		if (classification.getSpeciesID()==CTClassifier.NOSPECIES) {
-			System.out.println("No SPECIES: chi^2" + ctDataUnit.getCTChi2()); 
+			//System.out.println("No SPECIES: chi^2" + ctDataUnit.getCTChi2()); 
 			ctDataUnit.setJunkTrain(true);
 			//no need to do any more classification- the click train has been flagged for deletion.
 			ctDataUnit.clearClassifiers();
@@ -178,12 +188,18 @@ public class CTClassifierManager {
 		ctDataUnit.clearClassifiers();
 		ctDataUnit.setClassificationIndex(-1);
 		
+		//System.out.println("Classify species: Num classifier " +  this.cTClassifiers.size()); 
 
-		for (int i=0; i<clickTrainControl.getCurrentClassifiers().size(); i++) {
+		for (int i=0; i<this.cTClassifiers.size(); i++) {
 			
 		
+			//System.out.println("Classifier: " + i); 
+
 			//the first classifier 
-			ctclassification = clickTrainControl.getCurrentClassifiers().get(i).classifyClickTrain(ctDataUnit);
+			ctclassification = this.cTClassifiers.get(i).classifyClickTrain(ctDataUnit);
+			
+			//System.out.println("Classifier complete: SPECIES: " + ctclassification.getSpeciesID()); 
+
 			
 //			Debug.out.println(i + " ClassifierManager: Classify a click train data unit: " + ctDataUnit  + " parent data block: " +
 //					" " + ctDataUnit.getnSubDetections()); 
@@ -191,6 +207,7 @@ public class CTClassifierManager {
 			
 			//set the species flag but only if this is the first time the ct data unit has been classified. 
 			if (ctclassification.getSpeciesID()>CTClassifier.NOSPECIES && !hasBeenClssfd) {
+				//System.out.println("Set classiifcation index: " + i); 
 				ctDataUnit.setClassificationIndex(i); //set the classification index. 
 				hasBeenClssfd = true; 
 			}
@@ -216,10 +233,28 @@ public class CTClassifierManager {
 		CTClassifier aClassifier; 
 		for (int i=0; i<ctParams.length; i++) {
 			aClassifier = createClassifier(ctParams[i].type); 
+			if (aClassifier==null) {
+				System.err.println("CTCLassifier manager: the classifier is null");
+				continue; 
+			}
+			
+//			if (ctParams[i].uniqueID ==null) {
+//				//old versions may not have a unique ID so needs to be added. 
+//				ctParams[i].uniqueID = UUID.randomUUID().toString();
+//			}
 			aClassifier.setParams(ctParams[i]); 
 			cTClassifiers.add(aClassifier); 
 		}
 
+	}
+
+	/**
+	 * Get the pre-classifer. This is an intial very broad classifier that is used to determine
+	 * whether a click train should be saved or dumped from memory. 
+	 * @return the pre-classifier. 
+	 */
+	public Chi2ThresholdClassifier getPreClassifier() {
+		return preClassifier;
 	}
 
 

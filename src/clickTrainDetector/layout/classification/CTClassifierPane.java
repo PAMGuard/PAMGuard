@@ -5,6 +5,7 @@ import clickTrainDetector.ClickTrainControl;
 import clickTrainDetector.classification.CTClassifier;
 import clickTrainDetector.classification.CTClassifierParams;
 import clickTrainDetector.classification.CTClassifierType;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -28,7 +29,7 @@ public class CTClassifierPane extends PamBorderPane {
 	/**
 	 * The classifier type combo box. 
 	 */
-	private ComboBox<String> classifierListBox;
+	private ComboBox<CTClassifierType> classifierListBox;
 
 	/**
 	 * Reference to the click train control. 
@@ -45,17 +46,25 @@ public class CTClassifierPane extends PamBorderPane {
 	 */
 	private CTClassifier currentClassifier;
 
+	/**
+	 * A list of the type of classifiers. 
+	 */
 	private CTClassifierType[] ctClassifierTypes;
 
+	/**
+	 * The name field. 
+	 */
 	private TextField nameField;
 
+	/**
+	 * Selects the species ID for the classifier. 
+	 */
 	private PamSpinner<Integer> speciesIDSpinner;
 	
 	/**
 	 * The default species to set 
 	 */
 	private int defaultSpeciesID = 1; 
-
 
 	/**
 	 * Constructor for the classifier pane. 
@@ -102,12 +111,16 @@ public class CTClassifierPane extends PamBorderPane {
 
 		ctClassifierTypes = CTClassifierType.values();
 
-		classifierListBox = new ComboBox<String>(); 
+		int nClassifiers = 0; 
+		classifierListBox = new ComboBox<CTClassifierType>(); 
 		for (int i=0; i<ctClassifierTypes.length; i++) {
-			classifierListBox.getItems().add(clickTrainControl.getClassifierManager().getClassifierName(ctClassifierTypes[i])); 
+			if (ctClassifierTypes[i].isEnable()) {
+				classifierListBox.getItems().add(ctClassifierTypes[i]); 
+				nClassifiers++;
+			}
 		}
 		classifierListBox.setOnAction((action)->{
-			setClassifierPane(classifierListBox.getSelectionModel().getSelectedIndex()); 
+			setClassifierPane(classifierListBox.getSelectionModel().getSelectedItem()); 
 		});
 		classifierListBox.getSelectionModel().select(0);
 
@@ -116,9 +129,15 @@ public class CTClassifierPane extends PamBorderPane {
 		settingsHolder = new PamBorderPane(); 
 
 		//set the current classifier pane. 
-		setClassifierPane(0);
+		setClassifierPane(classifierListBox.getItems().get(0));
 
-		mainHolder.getChildren().addAll(label1, holder, label2, classifierListBox,  settingsHolder);
+		//only add the classifiers type box if there is more than one type of classifier. 
+		mainHolder.getChildren().addAll(label1, holder);
+		if (nClassifiers>1) mainHolder.getChildren().addAll(label2, classifierListBox);
+		mainHolder.getChildren().addAll(settingsHolder);
+		
+		mainHolder.setPadding(new Insets(5,5,5,5)); //otherwise looks messy against edges of tab pane.
+
 
 		return mainHolder; 
 	}
@@ -144,18 +163,23 @@ public class CTClassifierPane extends PamBorderPane {
 	 */
 	public void setParams(CTClassifierParams params) {		
 		//probably a more elegent way to do this.
-		int index =-1; 
-		for (int i=0; i<ctClassifierTypes.length; i++) {
-			if (ctClassifierTypes[i]==params.type) {
-				index=i;
-				break; 
-			}
-		}
-		classifierListBox.getSelectionModel().select(index);
-		setClassifierPane(index);
+//		int index =-1; 
+//		for (int i=0; i<ctClassifierTypes.length; i++) {
+//			if (ctClassifierTypes[i]==params.type) {
+//				index=i;
+//				break; 
+//			}
+//		}
+		
+		classifierListBox.getSelectionModel().select(params.type);
+		
+
+		setClassifierPane(params.type);
 		
 		//species Id
 		setBasicParams(params);
+		
+
 		
 		//		//when setting parameters have to figure out what pane to create first!
 		//		currentClassifier = clickTrainControl.getClassifierManager().createClassifier(params.type); 
@@ -174,10 +198,13 @@ public class CTClassifierPane extends PamBorderPane {
 
 	/**
 	 * Set the classifier pane. 
-	 * @param clssfrIndex - set the index. 
+	 * @param ctClassifierType - set the index. 
 	 */
-	private void setClassifierPane(int clssfrIndex) {
-		currentClassifier = clickTrainControl.getClassifierManager().createClassifier(clssfrIndex); 
+	private void setClassifierPane(CTClassifierType ctClassifierType) {
+		if (ctClassifierType==null) return;
+		
+		currentClassifier = clickTrainControl.getClassifierManager().createClassifier(ctClassifierType); 
+
 		//Classifier pane- this also sets parameters for the classifier specific pane
 		if (currentClassifier.getCTClassifierGraphics()!=null) {
 			settingsHolder.setCenter(currentClassifier.getCTClassifierGraphics().getCTClassifierPane());		

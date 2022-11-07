@@ -471,6 +471,7 @@ public class SuperDetDataBlock<Tunit extends SuperDetection, TSubDet extends Pam
 						PamDataUnit subDet = subDetectionFinder.findDataUnit(sdInfo);
 						sdInfo.setSubDetection(subDet);
 						if (subDet != null) {
+							aData.addSubDetection(subDet);
 							subDet.addSuperDetection(aData);
 						}
 					}

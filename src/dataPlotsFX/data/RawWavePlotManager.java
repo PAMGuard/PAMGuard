@@ -75,6 +75,7 @@ public abstract class RawWavePlotManager {
 		
 		int plot = PamUtils.getSingleChannel(rawClipInfo.getScaleInfo().getPlotChannels()[plotnumber]); //needs to be the plot channels because the waveSegmenter is organised by channel
 		
+		if (rawClipInfo.getScaleInfo().getPlotChannels()[plotnumber]==0) plot=0; 
 		
 		//System.out.println("Plot plot: " + plot + "  " + plotnumber);
 		

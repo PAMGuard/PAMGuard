@@ -10,6 +10,7 @@ import binaryFileStorage.BinaryStore;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamGridPane;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
+import pamViewFX.fxStyles.PamStylesManagerFX;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -55,6 +56,8 @@ public class StorageOptionsPane  extends SettingsPane<StorageParameters>{
 		bsCheckBoxes.clear();
 		
 		PamGridPane gridPane=new PamGridPane();
+		
+
 		
 		
 		Label l = new Label("  Binary Store  ");

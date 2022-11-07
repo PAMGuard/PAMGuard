@@ -46,7 +46,7 @@ public class CPODTDSettingsPane implements TDSettingsPane {
 	public CPODTDSettingsPane(CPODPlotInfoFX cpodPlotInfoFX) {
 		this.cpodPlotInfoFX=cpodPlotInfoFX; 
 		mainPane = createMainPane(); 
-		mainPane.setPrefWidth(300);
+		mainPane.setPrefWidth(330);
 	}
 
 	/**

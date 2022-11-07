@@ -41,6 +41,7 @@ public class ImportTemplateCSV implements TemplateImport {
 		//the first row is the waveform 
 		double[] waveform = new double[data.get(0).size()];
 		for (int i=0; i<waveform.length; i++) {
+			//System.out.println("i: " + i + " : " +  data.get(0).get(i));
 			waveform[i]=data.get(0).get(i); 
 		}
 		

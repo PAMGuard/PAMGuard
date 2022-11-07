@@ -571,13 +571,17 @@ public class Scrolling2DPlotDataFX {
 	
 	/****Some useful variables used all the time**/
 	
+	//Note 	- "imageXX" indicates that the number refers to pixels in the writable images
+	//		- "screenXX" indicates the number refers to pixels on the screen. 
+	
 	//time axis
 	private double tScale; // the time scale in pixels per millisecond. 
 //	private long wrapLengthMillis;	//the length of the left wrap section in millis
 	private double wrapScreenPix;	//the number of screen pixels the wrap takes up
 	private double wrapImagePixdw;	//the length of the wrap section in spectrogram image pixels (not time display pixels)
 	private double imagePixdw; // the width of the screen in image pixels. 
-	private double imagestart;	//the start of time image 
+	private double imageStart1;	//the start of time image 
+	private double imageStart2;	//the start of the image for the second wrap segment
 	private double endScreenPix; 	//the end of the screen in pixels. This s not just timePixels
 	private double nImagePixs;//the number of pixels on image in memory, from zero to current location of pointer. 
 	//the number of screen pixels corresponding to the current position on the writable image to zero. 
@@ -585,10 +589,19 @@ public class Scrolling2DPlotDataFX {
 	private double scrollEndTime; //the current time. 
 	//location to start drawing image on screen from. 
 	private double screenStartPix;  
-	//freq axis
+	
+	/**Frequency (vertical) axis***/
 	private double freqPixels;
 	private double imageFP1, imageFP2;
 	private double freqWidth;
+	
+	/*
+	 * The maximum pixel jitter allowed. The calculated image start position can jitter because
+	 * of rounding errors. MAX_PIXEL_JITTER ensures that the image location is kep constant for 
+	 * different frames by assumin that any chnage below MAX_PIXEL_JITTER is a rounding error and not 
+	 * a change in the display.
+	 */
+	private double MAX_PIXEL_JITTER = 3; //pixels
 
 	
 	public double drawSpectrogramWrap(GraphicsContext g2d, double timePixels, double freqPixels, PamAxisFX timeAxis,
@@ -609,69 +622,89 @@ public class Scrolling2DPlotDataFX {
 
 		//the length of the wrap section in spectrogram image pixels (not time display pixels)
 		 wrapImagePixdw=wrapScreenPix/(timeScale * 1000. * tScale * timeCompression); 
+		 
+		 imagePixdw = timePixels/(timeScale * 1000. * tScale * timeCompression);
+		 
+//		 System.out.println(String.format(" timeScale %.3f timeCompression %d  timePixels %.3f wrapImagePixdw %.3f", 
+//				 timeScale,  timeCompression, timePixels, wrapImagePixdw));
 
-		 imagePixdw= timePixels/(timeScale * 1000. * tScale * timeCompression);
 
-		//the start of time image 
-		 imagestart=imageXPos+1-wrapImagePixdw;
+		/**
+		 * Because everything related to pixel measurements is a double in JavaFX we sometimes 
+		 * get a rounding issue which means the wrap display. The way to get around this is to only
+		 * change the imageStart whenever the displays finishes wrapping. It's a bit of a HACK but it
+		 * works. 
+		 */
+		double imageStart=imageXPos+1-wrapImagePixdw;
+		if (Math.abs(imageStart-this.imageStart1)>=MAX_PIXEL_JITTER) {
+			//System.out.println("Reset image start: " + imageStart + "  " +  this.imageStart1); 
+			this.imageStart1=imageStart; 
+		}
 
 		//location to start drawing image on screne from. 
 		 screenStartPix=0; 
 
-		if (imagestart<-1){
+		if (this.imageStart1<-1){
 			//gotta shift the start of the screen a bit if there is not enough image 
-			screenStartPix=(Math.abs(imagestart))*timeScale * 1000. * tScale * timeCompression; 
+			screenStartPix=(Math.abs(imageStart1))*timeScale * 1000. * tScale * timeCompression; 
 		}
-
-		//			System.out.println("imageXPos: "+imageXPos+"wrapLengthMillis: "+wrapLengthMillis+ " wrapScreenPix "+wrapScreenPix+
-		//					" wrapScreenPixdw: "+wrapScreenPix+ " wrapImagePixdw: "+wrapImagePixdw+ " imagestart: "+
-		//					imagestart + "nScreenPix: "+nScreenPix);
+		
+		
+		//System.out.println(String.format(" imageStart %.4f imageXPos %.4f  imagePixdw %.4f", imageStart1,imageXPos, imagePixdw ));
 
 		/**
 		 * Lift as much as possible into first section
 		 */
-		g2d.drawImage(writableImage, Math.max(0,imagestart), freqBinRange[1], wrapImagePixdw, freqWidth,
+		g2d.drawImage(writableImage,  Math.max(0,this.imageStart1), freqBinRange[1], wrapImagePixdw, freqWidth,
 				screenStartPix, imageFP1, wrapScreenPix, imageFP2);
 
-		if (imagestart<-1){
+		if (imageStart1<-1){
 			/**
 			 * If this occurs, the image is negative, i.e. we have to go back and fill a bit in from the end of the image in the wrap section. 
 			 */				
-			g2d.drawImage(writableImage, writableImage.getWidth()+imagestart, freqBinRange[1], Math.abs(imagestart), freqWidth,
+			g2d.drawImage(writableImage, writableImage.getWidth()+ imageStart1, freqBinRange[1], Math.abs(imageStart1), freqWidth,
 					0, imageFP1, screenStartPix, imageFP2);
 
 		}
 
 		//System.out.println(String.format(" totalXDraw %d wrapImagePixdw %.2f", totalXDraw,wrapImagePixdw ));
 		if (totalXDraw>imagePixdw){
-
-			imagestart=imageXPos+1-imagePixdw;
+			
+			/**
+			 * Because imageStart1 has remained clamped to prevent jitter in the image, we have to add a compensation factor
+			 * to prevent jitter on the other half of the image. The compensation factor is the difference between the clamped 
+			 * start of the image (imageStart1) and the true image start (imagesStart)
+			 */
+			imageStart2= imageXPos +1 - imagePixdw- (imageStart-this.imageStart1);
+			
+			//System.out.println(String.format(" imageStart %.4f imageXPos %.4f  imagePixdw %.4f", imageStart,imageXPos, imagePixdw ));
 
 			screenStartPix= wrapScreenPix;
-			imagePixdw=imagePixdw-wrapImagePixdw;
-
-			if (imagestart<-1){
+			imagePixdw=imagePixdw - wrapImagePixdw;
+			
+			if (imageStart2<-1){
 				/**
 				 * Cannot fill the entire area in one go without going into negative parts of the image. 
 				 */
-				screenStartPix=wrapScreenPix+(Math.abs(imagestart))*timeScale * 1000. * tScale * timeCompression; 
-				imagePixdw=imagePixdw+imagestart; 
+				screenStartPix=wrapScreenPix+(Math.abs(imageStart2))*timeScale * 1000. * tScale * timeCompression; 
+				imagePixdw=imagePixdw+imageStart2; 
 			}
 
-			//System.out.println(String.format(" imagestart %.3f imagePixdw %.3f  screenstart %.3f", imagestart,  imagePixdw,(timePixels-(endScreenPix-timePixels)+wrapScreenPix)));
+			//System.out.println(String.format(" imagestart %.3f imagePixdw %.3f  screenStartPix %.3f imageXPos %.3f", imageStart2,  imagePixdw, screenStartPix, imageXPos));
 
 			/**
 			 * Now draw the data after the wrap line. i.e. the older part of the image
 			 */
-			g2d.drawImage(writableImage,  Math.max(0,imagestart), freqBinRange[1], imagePixdw, freqWidth,
+			g2d.drawImage(writableImage,  Math.max(0,imageStart2), freqBinRange[1], imagePixdw, freqWidth,
 					screenStartPix, imageFP1, timePixels-screenStartPix, imageFP2);
+			
 
-			if (imagestart<-1){
+			if (imageStart2<-1){
 
 				/**
 				 * Fill the remaining section with the negative parts of the image 
 				 */
-				g2d.drawImage(writableImage, writableImage.getWidth()+imagestart, freqBinRange[1], Math.abs(imagestart), freqWidth,
+				g2d.drawImage(writableImage, writableImage.getWidth()+imageStart2, freqBinRange[1], Math.abs(imageStart2), freqWidth,
 						wrapScreenPix, imageFP1, screenStartPix-wrapScreenPix, imageFP2);
 			}
 		
@@ -903,7 +936,7 @@ public class Scrolling2DPlotDataFX {
 	 */
 	 public void drawWrapLine(GraphicsContext g2d, double wrapScreenPix, double freqPixels){
 		 g2d.setStroke(this.specColors.getWrapColor());
-		 g2d.setLineWidth(3);
+		 g2d.setLineWidth(1);
 		 g2d.strokeLine(wrapScreenPix, 0 , wrapScreenPix, freqPixels);
 	 }
 

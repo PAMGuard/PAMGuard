@@ -91,6 +91,8 @@ PamSettingsSource {
 	private boolean fullTablesCheck = false;
 
 	static private String dbUnitType = "Pamguard Database";
+	
+	static public final String GlobalDatabaseNameArg = "-databasefile";
 
 	private DBControl THIS;
 
@@ -227,7 +229,7 @@ PamSettingsSource {
 					"be configured to be looking in a different folder.  Please check the expected folder location, as well " +
 					"as the PAMGuard settings.";
 			String help = null;
-			int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help);
+			int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help);
 			return false;
 		}
 		if (forcedName == null) {

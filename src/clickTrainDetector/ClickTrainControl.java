@@ -67,6 +67,11 @@ public class ClickTrainControl extends PamControlledUnit implements PamSettings 
 	public static final int NEW_PARENT_DATABLOCK= 3;
 
 	/**
+	 * The PAMGuard clock has been updated. 
+	 */
+	public static final int CLOCK_UPDATE = 4;
+
+	/**
 	 * Reference to the click train process. 
 	 */
 	private ClickTrainProcess clickTrainProcess;
@@ -141,6 +146,11 @@ public class ClickTrainControl extends PamControlledUnit implements PamSettings 
 	 * Click info manager- handles information from the algorithms. 
 	 */
 	private CTAlgorithmInfoManager clAlgorithmInfoManager;
+	
+	/**
+	 * Help point which can be referenced form dialogs, etc. 
+	 */
+	public static final String helpPoint = "detectors.ClickTrainDetector.docs.ClickTrainDetector";
  
 	/**
 	 * Constructor for the ClickTrainControl. 
@@ -233,7 +243,7 @@ public class ClickTrainControl extends PamControlledUnit implements PamSettings 
 		}
 		
 		for (int i=0; i<this.clickTrainAlgorithms.size(); i++) {
-			clickTrainAlgorithms.get(i).update(ClickTrainControl.NEW_PARAMS); 
+			clickTrainAlgorithms.get(i).update(ClickTrainControl.NEW_PARAMS, null); 
 		}
 		
 		//set up the classifier parameters
@@ -241,7 +251,10 @@ public class ClickTrainControl extends PamControlledUnit implements PamSettings 
 		
 		this.ctLocalisationProcess.setTMlocParams(this.clickTrainParams); 
 		
-		this.getGUI(PamGUIManager.getGUIType()).notifyGUIChange(ClickTrainControl.NEW_PARAMS);
+		PamControlledUnitGUI gui = this.getGUI(PamGUIManager.getGUIType());
+		if (gui != null) {
+			gui.notifyGUIChange(ClickTrainControl.NEW_PARAMS);
+		}
 	}
 
 	/**
@@ -326,7 +339,7 @@ public class ClickTrainControl extends PamControlledUnit implements PamSettings 
 	 */
 	public void update(int flag) {
 		for (int i=0; i<this.clickTrainAlgorithms.size(); i++) {
-			clickTrainAlgorithms.get(i).update(flag);
+			clickTrainAlgorithms.get(i).update(flag, null);
 		}
 	}
 	
@@ -536,6 +549,7 @@ public class ClickTrainControl extends PamControlledUnit implements PamSettings 
 	public CTAlgorithmInfoManager getCTAlgorithmInfoManager() {
 		return clAlgorithmInfoManager;
 	}
+
 
 	
 

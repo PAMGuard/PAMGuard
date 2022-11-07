@@ -59,8 +59,8 @@ public class MHTGarbageBot {
 	 * then the possibility matrix will simply keep resizing and click train
 	 * detector will run indefinitely.
 	 * 
-	 * @param - the new data unit
-	 * @param -the channel based MHTAlgorithm.
+	 * @param dataUnit - the new data unit
+	 * @param mhtKernel - the current MHT Kernel. 
 	 * @return - true if a garbage collection task was executed. 
 	 */
 	public boolean checkCTGarbageCollect(PamDataUnit dataUnit, MHTKernel<PamDataUnit> mhtKernel) {
@@ -70,11 +70,13 @@ public class MHTGarbageBot {
 		double maxICI = mhtKernel.getMHTParams().maxCoast * mhtKernel.getMHTChi2Provider().getChi2Params().maxICI; 
 		
 		//check the current set of click train possible ICI's 
-				
+		
+		//Debug.out.println("MHTGARBAGEBOT: maxICI " + maxICI + "  " + iciPrev); 
+		
 		//we have reached the hard limit. Save click trains, wipe the detector and start again. 
 		if (mhtKernel.getKCount()>mhtKernel.getMHTParams().nPruneBackStart && (iciPrev>maxICI || mhtKernel.getKCount()>DETECTION_HARD_LIMIT)) {
 			
-//			Debug.out.println("MHTGarbageBot: KERNEL HARD LIMIT"); 
+			//Debug.out.println("MHTGARBAGEBOT: KERNEL HARD LIMIT"); 
 			//check whether the next click has a gap so big that all click trains should be restarted 			
 			//grab tracks
 			mhtKernel.confirmRemainingTracks();
@@ -124,6 +126,25 @@ public class MHTGarbageBot {
 		}
 		
 		return false; 
+	}
+	
+	
+	/**
+	 * Check whether a garbage collection of the hypothesis matrix is required based on current time rather than the current data unit. 
+	 * @param currentTimemillis - the current time in millis
+	 * @param mhtKernel - the MHT kernel
+	 * @return true if a garbage collect is required. 
+	 */
+	public boolean checkCTGarbageCollect(long currentTimemillis, MHTKernel<PamDataUnit> mhtKernel) {
+		
+		if (mhtKernel.getLastDataUnit()==null) return false; 
+		
+		if ((currentTimemillis - mhtKernel.getLastDataUnit().getTimeMilliseconds())
+				>mhtKernel.getMHTParams().maxCoast*mhtKernel.getMHTChi2Provider().getChi2Params().maxICI*1000.) {
+			return true;
+		}
+		
+		return false;
 	}
 	
 	/**

@@ -46,7 +46,7 @@ public class DWVConverter {
 	}
 
 	public void start() {
-		dwvWorker = new DWVWorker();
+		dwvWorker = new DWVWorker();		
 		keepRunning = true;
 		dwvWorker.execute();
 	}
@@ -81,8 +81,10 @@ public class DWVConverter {
 				binarySource.setBinaryStorageStream(outputStream);
 				binaryStream = clickBinaryDataSource.getBinaryStorageStream();
 
+				int iFile = 0;
+				int nFile = fileGroups.size();
 				for (STGroupInfo fileGroup:fileGroups) {
-					processFiles(fileGroup);
+					processFiles(fileGroup, nFile, ++iFile);
 					if (keepRunning == false) {
 						break;
 					}
@@ -94,16 +96,30 @@ public class DWVConverter {
 			return null;
 		}
 
-		private void processFiles(STGroupInfo fileGroup) {
-			this.publish(new DWVConvertInformation(fileGroup, 0, 0));
-			if (fileGroup.hasDWV() == false) return;
+		private void processFiles(STGroupInfo fileGroup, int nFile, int iFile) {
+			this.publish(new DWVConvertInformation(fileGroup, nFile, iFile, 0, 0));
+			if (fileGroup.hasDWV() == false) {
+				/*
+				 * Don't do this. In quiet conditions there will be a BCL file with a start and stop time
+				 * but if there were no detections there will be no dwv file. We should make the pgdf file
+				 * in any case so that there is a full PAMGuard record of effort. 
+				 * In other circumstances dwv files don't actually have data, in which case there may still be
+				 * a null file, which is not so good. Will have to think about how to report this - perhaps in 
+				 * this case it's better not to make a pgdf file to show a genuine gap in the data.  
+				 */
+//				return;
+			}
 			BCLReader bclReader = new BCLReader(fileGroup.getBclFile());
 			boolean ok = bclReader.open();
 			if (ok == false) return;
-			DWVReader dwvReader = new DWVReader(fileGroup.getDwvFile(), fileGroup.getDwvInfo());
-			dwvReader.openDWV();
-			int nDWV = dwvReader.getNumDWV();
-			int repStep = Math.max(1, nDWV/100);
+			int nDWV = 0;
+			DWVReader dwvReader = null;
+			if (fileGroup.hasDWV()) {
+				dwvReader = new DWVReader(fileGroup.getDwvFile(), fileGroup.getDwvInfo());
+				dwvReader.openDWV();
+				nDWV = dwvReader.getNumDWV();
+			}
+			int repStep = Math.max(10, nDWV/100);
 			int nRead = 0;
 			while (true) {
 				BCLLine bclLine = bclReader.nextBCLLine();
@@ -127,7 +143,7 @@ public class DWVConverter {
 					dataLine(fileGroup, bclLine, dwvReader);
 					nRead++;
 					if (nRead%repStep == 0) {
-						this.publish(new DWVConvertInformation(fileGroup, nDWV, nRead));
+						this.publish(new DWVConvertInformation(fileGroup, nFile, iFile, nDWV, nRead));
 					}
 					break;
 
@@ -140,10 +156,14 @@ public class DWVConverter {
 				//					e.printStackTrace();
 				//				}
 			}
+			this.publish(new DWVConvertInformation(fileGroup, nFile, iFile, nDWV, nDWV));
 		}
 
 		private void dataLine(STGroupInfo fileGroup, BCLLine bclLine, DWVReader dwvReader) {
-			double[] dwvData = dwvReader.readNextClick(null);
+			double[] dwvData = null;
+			if (dwvReader != null) {
+				dwvData = dwvReader.readNextClick(null);
+			}
 			if (dwvData == null) {
 				return; // can happen if file didn't flush correclty and some dwv is missing. 
 			}
@@ -185,21 +205,37 @@ public class DWVConverter {
 			}
 			
 			if (bclLine.getState() == 1) {
-				long dwvFileStart = fileGroup.getDwvInfo().getTimeInfo().samplingStartTimeUTC;
-				long wavFileStart = fileGroup.getWavInfo().getTimeInfo().samplingStartTimeUTC;
 				fileStartMicroseconds = bclLine.getMicroSeconds();
-				Debug.out.printf("DWV start %s wav start %s bcl start %s\n", PamCalendar.formatDBDateTime(dwvFileStart),
-						PamCalendar.formatDBDateTime(wavFileStart), PamCalendar.formatDBDateTime(bclLine.getMilliseconds()));
+				long wavFileStart = fileGroup.getWavInfo().getTimeInfo().samplingStartTimeUTC;
+				try {
+					if (fileGroup.getDwvInfo() != null) {
+						long dwvFileStart = fileGroup.getDwvInfo().getTimeInfo().samplingStartTimeUTC;
+						Debug.out.printf("DWV start %s wav start %s bcl start %s\n", PamCalendar.formatDBDateTime(dwvFileStart),
+								PamCalendar.formatDBDateTime(wavFileStart), PamCalendar.formatDBDateTime(bclLine.getMilliseconds()));
+					}
+					else {
+						Debug.out.printf("No DWV File !!! wav start %s bcl start %s\n", 
+								PamCalendar.formatDBDateTime(wavFileStart), PamCalendar.formatDBDateTime(bclLine.getMilliseconds()));
+					}
+				}
+				catch (Exception e) {
+					System.out.println(e.getMessage());
+				}
 				binaryStream.openOutputFiles(bclLine.getMilliseconds());
 				binaryStream.writeHeader(bclLine.getMilliseconds(), System.currentTimeMillis());
 				binaryStream.writeModuleHeader();
 				onEffort = true;
 			}
 			if (bclLine.getState() == 0) {
-				long dwvFileStop = fileGroup.getDwvInfo().getTimeInfo().samplingStopTimeUTC;
-				long wavFileStop = fileGroup.getWavInfo().getTimeInfo().samplingStopTimeUTC;
-				Debug.out.printf("DWV stop %s wav stop %s E stop %s\n", PamCalendar.formatDBDateTime(dwvFileStop),
-						PamCalendar.formatDBDateTime(wavFileStop), PamCalendar.formatDBDateTime(bclLine.getMilliseconds()));
+				try {
+					long dwvFileStop = fileGroup.getDwvInfo().getTimeInfo().samplingStopTimeUTC;
+					long wavFileStop = fileGroup.getWavInfo().getTimeInfo().samplingStopTimeUTC;
+					Debug.out.printf("DWV stop %s wav stop %s E stop %s\n", PamCalendar.formatDBDateTime(dwvFileStop),
+							PamCalendar.formatDBDateTime(wavFileStop), PamCalendar.formatDBDateTime(bclLine.getMilliseconds()));
+				}
+				catch (Exception e) {
+					System.out.println(e.getMessage());
+				}
 				binaryStream.writeModuleFooter();
 				binaryStream.writeFooter(bclLine.getMilliseconds(), System.currentTimeMillis(), BinaryFooter.END_UNKNOWN);
 				binaryStream.closeFile();

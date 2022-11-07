@@ -17,6 +17,7 @@ import Acquisition.DaqSystem;
 import Acquisition.AudioDataQueue;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
+import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamDetection.RawDataUnit;
@@ -85,6 +86,19 @@ public class SmruDaqSystem extends DaqSystem implements PamSettings {
 		if (verboseLevel <= VERBOSELEVEL) {
 			System.out.println(str);
 		}
+	}
+	
+	public String getJNILibInfo() {
+		String lib = smruDaqJNI.getLibrary();
+		int libVer = smruDaqJNI.getLibarayVersion();
+		String verStr;
+		if (libVer < 0) {
+			verStr = String.format("%s not loaded", lib);
+		}
+		else {
+			verStr = String.format("%s.dll Version %d", lib, libVer);
+		}
+		return verStr;
 	}
 
 	@Override
@@ -179,7 +193,12 @@ public class SmruDaqSystem extends DaqSystem implements PamSettings {
 					+ " in another instance of PAMGuard. \n"
 					+ "Check that no other instances of PAMGuard are open and try again. \nIf no other instances of PAMGuard are open "
 					+ "then you should cycle the power on the card(s) and restart PAMGuard");
-			JOptionPane.showMessageDialog(daqControl.getGuiFrame(), msg, daqControl.getUnitName() + " Error", JOptionPane.ERROR_MESSAGE);
+			if (PamGUIManager.getGUIType() == PamGUIManager.NOGUI) {
+				System.out.println(msg);
+			}
+			else {
+				JOptionPane.showMessageDialog(daqControl.getGuiFrame(), msg, daqControl.getUnitName() + " Error", JOptionPane.ERROR_MESSAGE);
+			}
 			PamController.getInstance().stopLater();
 			return false;
 		}
@@ -417,6 +436,15 @@ public class SmruDaqSystem extends DaqSystem implements PamSettings {
 
 	@Override
 	public void stopSystem(AcquisitionControl daqControl) {
+		if (keepRunning == false) {
+			/*
+			 *  it was never running, so no need to do this. From the GUI this isn't ever a problem 
+			 *  but PAMDog can call stop a little over zealously, and there seems to be a problem
+			 *  with calling this when it's not running bunging up the cards. So basically without
+			 *  this PAMDog won't run properly with PAMDog 
+			 */
+			return;
+		}
 		keepRunning = false;
 		try {
 			while(daqThreadRunning) {

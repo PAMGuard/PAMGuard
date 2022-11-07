@@ -85,12 +85,13 @@ public class TemplateSpectrumPane  extends PamBorderPane {
 		templateDisplay.setDataInfo(templateSpectrumInfo=new TemplateDDDataInfo(templateDisplay, 192000));
 		templateDisplay.setPrefHeight(prefHeight);
 		templateDisplay.setMaxHeight(prefHeight);
+		//templateDisplay.setPrefWidth(500); //TODO - need to make this span the whole display...
 
 		templateDisplay.getDataTypePane().notifyDataChange(); //need this to initialise options pane for different plots. 
 
 		//now add the import button. 
 		Pane spectrumTemplate = createTemplatePane(templateDisplay);
-		
+				
 		
 		return spectrumTemplate; 
 	}
@@ -111,17 +112,30 @@ public class TemplateSpectrumPane  extends PamBorderPane {
 		splitMenuButtonReject.setTranslateX(-20);
 
 		detectionPlot.setMouseTransparent(true);
+		detectionPlot.setMaxWidth(Double.MAX_VALUE);
 		
 		StackPane stackPane = new StackPane(); 
 		stackPane.getChildren().add(detectionPlot); 
 		stackPane.getChildren().add(splitMenuButtonReject); 
 		stackPane.setPrefHeight(prefHeight);
 		stackPane.setMaxHeight(prefHeight);
+		stackPane.setMaxWidth(Double.MAX_VALUE);
+		stackPane.setPrefWidth(500); //need this for some reason to make the plot resize.
+	
+
+		//stackPane.setStyle("-fx-background-color: red;");
+
+		detectionPlot.prefWidthProperty().bind(stackPane.widthProperty());
+
 
 
 		PamVBox holder = new PamVBox(); 
 		holder.setSpacing(5);
 		holder.getChildren().addAll(stackPane); 
+		holder.setMaxWidth(Double.MAX_VALUE);
+		
+		//holder.setStyle("-fx-background-color: green;");
+
 
 		holder.setPadding(new Insets(10,5,5,5));
 
@@ -203,14 +217,16 @@ public class TemplateSpectrumPane  extends PamBorderPane {
 	 * @param file - the file to open. 
 	 */
 	private MatchTemplate openFile(File file) {
+		try {
 		MatchTemplate template = null;
 		String extension = getFileExtension(file);
 		for (int i=0; i< this.templateImporters.size(); i++) {
 			for (int j=0; j<templateImporters.get(i).getExtension().length; j++) {
-				//System.out.println(templateImporters.get(i).getExtension()[j] + " : " + extension);
+//				System.out.println(templateImporters.get(i).getExtension()[j] + " : " + extension);
 				if (templateImporters.get(i).getExtension()[j].equals(extension)) {
-					//System.out.println("Import using the extensions: " + extension);
+//					System.out.println("Import using the extensions: " + extension);
 					template=templateImporters.get(i).importTemplate(file);
+
 				}
 			}
 		}
@@ -219,6 +235,11 @@ public class TemplateSpectrumPane  extends PamBorderPane {
 			return null;
 		}
 		else return template; 
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return null; 
+		}
 	}
 
 
@@ -348,6 +369,11 @@ public class TemplateSpectrumPane  extends PamBorderPane {
 		tooltipText+="A comma delimitted CSV file were the first row is the amplitude values of the spectrum between 0 and 1 and the "
 				+ "second column is a single value represenitng the sample rate in samples per second";
 		return 	PamUtilsFX.htmlToNormal(tooltipText);
+	}
+
+
+	public void drawCurrentUnit() {
+		templateDisplay.drawCurrentUnit();
 	}
 
 

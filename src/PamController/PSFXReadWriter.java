@@ -178,7 +178,7 @@ public class PSFXReadWriter {
 			 * occurr when running under PAMDog control. 
 			 */
 			if (pamBuoyGlobals.getNetworkControlPort() == null) {
-				int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help);
+				int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help);
 			}
 			else {
 				/*

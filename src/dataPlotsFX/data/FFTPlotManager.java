@@ -85,13 +85,25 @@ public abstract class FFTPlotManager {
 	}
 
 
-	public void lastUnitDrawn(GraphicsContext g, double scrollStart, TDProjectorFX tdProjector,int plotnumber) {
+	public void lastUnitDrawn(GraphicsContext g, double scrollStart, TDProjectorFX tdProjector, int plotnumber) {
+		
+		//System.out.println("FFTPlotManager: Last drawn unit1"); 
 
-		if (rawClipInfo.getScaleInfo()==null) return; 
+		if (rawClipInfo.getScaleInfo()==null){
+			System.err.println("FFTPlotManager: the rawClipInfo.getScaleInfo() is null"); 
+			return; 
+		}
 
-		int plot = PamUtils.getSingleChannel(rawClipInfo.getScaleInfo().getPlotChannels()[plotnumber]); //needs to be the plot channels because the waveSegmenter is organised by channel
+		 //needs to be the plot channels because the waveSegmenter is organised by channel
+		int plot = PamUtils.getSingleChannel(rawClipInfo.getScaleInfo().getPlotChannels()[plotnumber]);
+	
+		if (rawClipInfo.getScaleInfo().getPlotChannels()[plotnumber]==0) plot=0; 
 
-
+//		System.out.println("FFTPlotManager: Last drawn unit2: " + "  " + rawClipInfo.getScaleInfo().getPlotChannels()[plotnumber] + "  " + plotnumber); 
+//		
+//		System.out.println("FFTPlotManager: Last drawn unit2: " + plot + " rawClipInfo.getScaleInfoIndex(): "
+//				+ rawClipInfo.getScaleInfoIndex() + "  "  +rawClipInfo.getScaleInfos().indexOf(getFrequencyScaleInfo())); 
+		
 		//only draw the writable images once we have the last data unit. 
 		if (plot>=0 && fftImageSegmenter[plot]!=null && rawClipInfo.getScaleInfoIndex()==rawClipInfo.getScaleInfos().indexOf(getFrequencyScaleInfo())) {
 			fftImageSegmenter[plot].paintImages(g, tdProjector, scrollStart, 0);
@@ -310,7 +322,7 @@ public abstract class FFTPlotManager {
 		double timeMillisFFT; 
 		int newtc; 
 		//if zero just draw one line to be efficient
-		//		System.out.println("SpectrogramLength: "  + spectrogram.length); 
+		//System.out.println("SpectrogramLength: "  + spectrogram.length); 
 
 		//maybe compress image? 
 
@@ -331,13 +343,17 @@ public abstract class FFTPlotManager {
 
 			tc=newtc; 
 
-			//double[] minmax = PamUtils.getMinAndMax(spectrogram); 
-			//System.out.println("Plot spectrogram: tc " + tc + " minmax: " +  20*Math.log10(minmax[0])+clipLevel + " " + 20*Math.log10(minmax[1])+ " Clip level: " + clipLevel); 
-
+//			double[] minmax = PamUtils.getMinAndMax(spectrogram); 
+//			System.out.println("Plot spectrogram: tc " + tc + " minmax: " +  20*Math.log10(minmax[0])+clipLevel + " " + 20*Math.log10(minmax[1])+ " Clip level: " + clipLevel); 
 
 			//how many lines in the image does the FFT take up?
 
+			Color prevCol;
+			Color col = null;
+			int argb;
 			for (int j=0; j<writableImage.getHeight(); j++) {
+				
+				writableImage.getPixelWriter().setColor(0, j, Color.BLACK); 
 
 				//what is the spectrum value for the height?
 				int spec = (int) ((j/(double) writableImage.getHeight())*spectrogram[i].length); 
@@ -347,7 +363,19 @@ public abstract class FFTPlotManager {
 				//find the correct colour for the spectrogram value and draw
 				for (int k=0; k<nslices; k++) {
 					if ((tc+k)>=writableImage.getWidth()) continue; 
-					writableImage.getPixelWriter().setColor(tc+k, j, getSpectrumColour(spectrogram[i][spec], clipLevel, rawClipInfo.getDataBlock().getSampleRate(), fftLength));
+					
+					//what do we do if a colour is already there? Take an avaerge with the other colours...
+					argb = writableImage.getPixelReader().getArgb(tc+k, j);
+					
+					col = getSpectrumColour(spectrogram[i][spec],clipLevel, rawClipInfo.getDataBlock().getSampleRate(), fftLength);
+
+					if (argb>0) {
+						prevCol = Color.rgb((argb >> 16) & 0xFF, (argb >> 8) & 0xFF, (argb) & 0xFF);	
+						col = Color.rgb((int) (col.getRed()+prevCol.getRed())/2, (int) (col.getGreen()+prevCol.getGreen())/2, 
+								(int) (col.getBlue()+prevCol.getBlue())/2);
+					}
+							
+					writableImage.getPixelWriter().setColor(tc+k, j, col);
 				}
 			}
 			//			}
@@ -437,20 +465,20 @@ public abstract class FFTPlotManager {
 		return dB;
 	}
 
-	//	/**
-	//	 * Stroke a vertical line in the writable image. 
-	//	 * @param writableImage - the writable image
-	//	 * @param x1 - x start of the line to stroke.
-	//	 * @param y1 - y start of the line to stroke.  
-	//	 * @param x2 - x end of the line to stroke. 
-	//	 * @param y2 - 
-	//	 */
-	//	private void strokeLine(WritableImageSegment writableImage, int x1, int y1, int y2, Color color) {
-	//		//weird. y==y2 does not work but i<y2 does?
-	//		for (int i=y1; i<y2; i++) {
-	//			writableImage.getPixelWriter().setColor((int) Math.min(x1, writableImage.getWidth()-1), i, color);
-	//		}
-	//	}
+//		/**
+//		 * Stroke a vertical line in the writable image. 
+//		 * @param writableImage - the writable image
+//		 * @param x1 - x start of the line to stroke.
+//		 * @param y1 - y start of the line to stroke.  
+//		 * @param x2 - x end of the line to stroke. 
+//		 * @param y2 - 
+//		 */
+//		private void strokeLine(WritableImageSegment writableImage, int x1, int y1, int y2, Color color) {
+//			//weird. y==y2 does not work but i<y2 does?
+//			for (int i=y1; i<y2; i++) {
+//				writableImage.getPixelWriter().setColor((int) Math.min(x1, writableImage.getWidth()-1), i, color);
+//			}
+//		}
 
 
 	/**

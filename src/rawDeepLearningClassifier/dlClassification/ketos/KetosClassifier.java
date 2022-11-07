@@ -91,9 +91,8 @@ public class KetosClassifier implements DLClassiferModel, PamSettings {
 		//		System.out.println("SoundSpotClassifier: PamCalendar.isSoundFile(): " 
 		//		+ PamCalendar.isSoundFile() + "   " + (PamCalendar.isSoundFile() && !forceQueue));
 		
-		
 		/**
-		 * If a sound file is being analysed then SoundSpot can go as slow as it wants. if used in real time
+		 * If a sound file is being analysed then Ketos can go as slow as it wants. if used in real time
 		 * then there is a buffer with a maximum queue size. 
 		 */
 		if ((PamCalendar.isSoundFile() && !forceQueue) || dlControl.isViewer()) {
@@ -132,6 +131,7 @@ public class KetosClassifier implements DLClassiferModel, PamSettings {
 	public void prepModel() {
 		//System.out.println("PrepModel! !!!");
 		getKetosWorker().prepModel(ketosDLParams, dlControl);
+		
 		if (!ketosDLParams.useDefaultTransfroms) {
 			//set custom transforms in the model. 
 			getKetosWorker().setModelTransforms(ketosDLParams.dlTransfroms);
@@ -169,12 +169,21 @@ public class KetosClassifier implements DLClassiferModel, PamSettings {
 		}
 
 		@Override
-		public void newResult(GenericPrediction soundSpotResult, GroupedRawData groupedRawData) {
+		public void newDLResult(GenericPrediction soundSpotResult, GroupedRawData groupedRawData) {
 			soundSpotResult.setClassNameID(GenericDLClassifier.getClassNameIDs(ketosDLParams)); 
 			soundSpotResult.setBinaryClassification(GenericDLClassifier.isBinaryResult(soundSpotResult, ketosDLParams)); 
 			newResult(soundSpotResult, groupedRawData);
 		}
 
+	}
+	
+	/**
+	 * Send a new result form the thread queue to the process. 
+	 * @param modelResult - the model result;
+	 * @param groupedRawData - the grouped raw data. 
+	 */
+	protected void newResult(GenericPrediction modelResult, GroupedRawData groupedRawData) {
+		this.dlControl.getDLClassifyProcess().newModelResult(modelResult, groupedRawData);
 	}
 
 
@@ -206,6 +215,7 @@ public class KetosClassifier implements DLClassiferModel, PamSettings {
 
 	@Override
 	public DLClassName[] getClassNames() {
+		//System.out.println("Ketos Model: " + ketosDLParams.numClasses); 
 		return ketosDLParams.classNames;
 	}
 

@@ -263,7 +263,7 @@ public class SendEmailAction extends AlarmAction implements PamSettings {
 					 ".  The alarm will not be able to send emails until " +
 					 "this is fixed.  Please check the Alarm Email Settings to ensure they are correct.";
 			 String help = null;
-			 int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help, e);
+			 int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help, e);
 			 e.printStackTrace();
 			 emailReady=AlarmAction.ALARM_CANT_DO;
 		 }

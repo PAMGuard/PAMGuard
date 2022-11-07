@@ -24,7 +24,7 @@ public class ExitCommand extends ExtCommand {
 
 	@Override
 	public String getHint() {
-		return "Exit PAMGuard, stopping detectors prior to exiting";
+		return "Exit PAMGuard, stopping detectors and saving configuration prior to exiting";
 	}
 
 

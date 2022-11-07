@@ -3,10 +3,14 @@ package PamView.dialog;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dialog;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.MouseInfo;
+import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -36,6 +40,7 @@ import PamModel.SMRUEnable;
 import PamView.CancelObserver;
 import PamView.ClipboardCopier;
 import PamView.PamColors;
+import PamView.ScreenSize;
 import PamView.help.PamHelp;
 import gpl.GPLParameters;
 
@@ -58,6 +63,7 @@ abstract public class PamDialog extends JDialog {
 	private String warningTitle;
 	private boolean warnDefaultSetting = true;
 	private CancelObserver cancelObserver;
+	private boolean firstShowing = true;
 
 	public JPanel getButtonPanel() {
 		return buttonPanel;
@@ -141,10 +147,60 @@ abstract public class PamDialog extends JDialog {
 			return parentFrame;
 		}
 		try {
-			return PamController.getInstance().getGuiFrameManager().getFrame(0);
+			return PamController.getMainFrame();
 		}
 		catch (Exception e) {
 			return null;
+		}
+	}
+	
+	/**
+	 * Try to set the central location of the dialog at point
+	 * but also check entire dialog is on screen. 
+	 * @param point
+	 */
+	protected void setCentreLocation(Point point) {
+		if (point == null) {
+			return;
+		}
+		Rectangle dialogBounds = this.getBounds();
+		if (dialogBounds == null) {
+			return;
+		}
+		point.x -= dialogBounds.width/2;
+		point.y -= dialogBounds.height/2;
+		setCloseLocation(point);
+	}
+	
+	/**
+	 * Set a location as close as possible to the given point, but
+	 * ensure that the dialog stays in it's parent frame. 
+	 * If there isn't a parent frame, make sure it's at least on 
+	 * the screen. 
+	 * @param point
+	 */
+	protected void setCloseLocation(Point point) {
+		if (point == null) {
+			return;
+		}
+		try {
+			Rectangle frameRect = ScreenSize.getScreenBounds();
+			if (getOwner() != null) {
+				frameRect = getOwner().getBounds();
+			}
+			Rectangle dialogBounds = this.getBounds();
+			/*
+			 * Check max first, then min in case dialog is too big for screen. Ensures
+			 * top left will always be visible. 
+			 */
+			point.x = Math.min(point.x, frameRect.x+frameRect.width-dialogBounds.width);
+			point.x = Math.max(point.x, frameRect.x);
+			point.y = Math.min(point.y, frameRect.y+frameRect.height-dialogBounds.height);
+			point.y = Math.max(point.y, frameRect.y);
+			super.setLocation(point);
+		}
+		catch (Exception e) {
+			
 		}
 	}
 
@@ -225,6 +281,13 @@ abstract public class PamDialog extends JDialog {
 			synchronized (this) {
 				PamColors.getInstance().notifyContianer(this.getContentPane());
 			}
+			if (getOwner() == null) {
+				moveToMouseLocation();
+			}
+			if (firstShowing) {
+				firstShowing = false;
+				super.pack();
+			}
 		}
 		try{
 			super.setVisible(visible);
@@ -233,6 +296,42 @@ abstract public class PamDialog extends JDialog {
 			System.out.println("Error in opening dialog....");
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * put the dialog near the mouse location. 
+	 */
+	public void moveToMouseLocation() {
+		Point mouse = MouseInfo.getPointerInfo().getLocation();
+		moveToLocation(mouse);
+	}
+	
+	public void moveToLocation(Point point) {
+		if (point == null) {
+			return;
+		}
+		// check we're not going too far off the screen. 
+		Dimension sz = getPreferredSize();
+		Dimension screen = null;
+		int w, h;
+		if (getOwner() != null) {
+			Window owner = getOwner();
+			Rectangle bounds = owner.getBounds();
+			w = bounds.x+bounds.width;
+			h = bounds.y+bounds.height;
+			screen = getOwner().getSize();
+		}
+		else {
+			screen = Toolkit.getDefaultToolkit().getScreenSize();
+			w = screen.width;
+			h = screen.height;
+		}
+		point.y = Math.min(point.y, h-sz.height-10);
+		point.y = Math.max(point.y, 0);
+		point.x = Math.min(point.x, w-sz.width-10);
+		point.x = Math.max(point.x, 0);
+
+		setLocation(point);
 	}
 
 	/**

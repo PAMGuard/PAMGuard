@@ -121,7 +121,7 @@ public class RawClipDataInfo extends GenericDataPlotInfo {
 			tdProjector.addHoverData(new HoverData(path2D, pamDataUnit, 0, plotNumber));
 			return null; 
 		}
-		
+				
 		return null; 
 	}
 
@@ -228,7 +228,6 @@ public class RawClipDataInfo extends GenericDataPlotInfo {
 	 */
 	@Override
 	public ArrayList<TDScaleInfo> getScaleInfos() {		
-
 		setNPlotPanes(this.rawWaveInfo,this.getDataBlock(), false); 
 		//setNPlotPanes(this.frequencyInfo,this.getDataBlock(), false); 
 		return super.getScaleInfos();

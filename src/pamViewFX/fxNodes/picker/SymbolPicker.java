@@ -1,5 +1,6 @@
 package pamViewFX.fxNodes.picker;
 
+import PamView.PamSymbol;
 import PamView.PamSymbolType;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
@@ -127,7 +128,7 @@ public class SymbolPicker extends ComboBox<PamSymbolFX> {
 
 	/**
 	 * Set the symbol with a symbol type. 
-	 * @param symbol
+	 * @param symbol - the symbol type. 
 	 */
 	public void setValue(PamSymbolType symbol) {
 		for (int i=0; i<getItems().size(); i++){
@@ -136,6 +137,17 @@ public class SymbolPicker extends ComboBox<PamSymbolFX> {
 			};
 		} 
 	}
+
+	/**
+	 * Set the symbol with a symbol type. Note, replicates setValue for convenience. 
+	 * @param symbol - the symbol type. 
+	 */
+	public void setSymbol(PamSymbolType symbol) {
+		setValue(symbol);
+		
+	}
+
+
 
 
 }

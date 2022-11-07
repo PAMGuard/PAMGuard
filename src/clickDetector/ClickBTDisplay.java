@@ -1572,6 +1572,9 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 	}
 	private double clickAngleToY(ClickDetection click) {
 		AbstractLocalisation loc = click.getLocalisation();
+//		if (click.getUID() == 110006089) {
+//			System.out.println("Click 110006089 angle " + click.getAngle());
+//		}
 		if (loc == null) return 0;
 		double angle = 0;
 		GpsData oll;
@@ -1639,16 +1642,26 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		double[] rotAngles = new double[3];
 		rotAngles[1] = Math.toRadians(oll.getPitch());
 		rotAngles[2] = Math.toRadians(oll.getRoll());
-		if (rType == BTDisplayParameters.ROTATE_HEADPITCHROLL) {
+		if (rType == BTDisplayParameters.ROTATE_TOVESSEL) {
 			// use head as well as pitch and roll. 
-			rotAngles[0] = Math.toRadians(oll.getHeading());
+			PamVector[] vr = loc.getWorldVectors();
+			if (vr != null && vr.length > 0) {
+				return vr[0];
+			}
+//			rotAngles[0] = Math.toRadians(oll.getHeading());
 		}
-		if (rotAngles[0] == 0 && rotAngles[1] == 0 && rotAngles[2] == 0) {
-			return v;
+		else if (rType == BTDisplayParameters.ROTATE_TONORTH) {
+			PamVector[] vr = loc.getRealWorldVectors();
+			if (vr != null && vr.length > 0) {
+				return vr[0];
+			}			
 		}
-		PamQuaternion pq = new PamQuaternion(rotAngles[0], rotAngles[1], rotAngles[2]);
-		PamVector v2 = PamVector.rotateVector(v, pq);
-		return v2;
+//		if (rotAngles[0] == 0 && rotAngles[1] == 0 && rotAngles[2] == 0) {
+//			return v;
+//		}
+//		PamQuaternion pq = new PamQuaternion(rotAngles[0], rotAngles[1], rotAngles[2]);
+//		PamVector v2 = PamVector.rotateVector(v, pq);
+		return v;
 	}
 	
 	private double angleFromYPos(int yPos) {
@@ -3329,7 +3342,8 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			return false;
 		}
 		if (btDisplayParameters.VScale == BTDisplayParameters.DISPLAY_ICI) {
-			if (btDisplayParameters.showUnassignedICI == false && click.getICI() < 0) return false;
+//			if (btDisplayParameters.showUnassignedICI == false && click.getICI() < 0) return false;
+			if (btDisplayParameters.showUnassignedICI == false && click.getSuperDetectionsCount() <= 0) return false;
 			// otherwise may be ok, since will estimate all ici's on teh fly. 
 		}
 		if (btDisplayParameters.amplitudeSelect && click.getAmplitudeDB() < btDisplayParameters.minAmplitude) {
@@ -3657,15 +3671,15 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 	/**
 	 * Scroll the display to a specific event. 
 	 * @param event event to scroll to
+	 * @param beforeTime seconds before the event to scroll to. 
 	 */
-	public void gotoEvent(OfflineEventDataUnit event) {
-		long evStart = event.getTimeMilliseconds();
+	public void gotoEvent(OfflineEventDataUnit event, int beforeTime) {
+		long evStart = event.getTimeMilliseconds() - beforeTime*1000;
 		if (evStart < hScrollBar.getMinimumMillis() || evStart > hScrollBar.getMaximumMillis()) {
 			long range = hScrollBar.getMaximumMillis() - hScrollBar.getMinimumMillis();
 			hScrollBar.setRangeMillis(evStart, evStart + range, true);
 		}
 		hScrollBar.setValueMillis(evStart);
-
 	}
 
 	int playbackStatus = PlaybackProgressMonitor.PLAY_END;

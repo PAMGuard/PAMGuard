@@ -5,7 +5,7 @@ import clickTrainDetector.clickTrainAlgorithms.mht.mhtvar.SimpleChi2VarParams;
 
 /**
  * The IDI Chi2 Pane. 
- * @author au671271
+ * @author Jamie Macaulay
  *
  */
 public class IDIChi2Pane extends SimpleMHTVarPane {

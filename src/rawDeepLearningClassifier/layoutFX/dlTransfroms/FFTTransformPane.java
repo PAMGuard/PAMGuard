@@ -25,6 +25,7 @@ public class FFTTransformPane extends SimpleTransformPane {
 			//System.out.println("Create step list: " + createStepList().size()); 
 			PamSpinner<Number> spinner = new PamSpinner<Number>(createStepList());
 			spinner.getValueFactory().setConverter(new NumberConverter()); 
+			spinner.setPrefWidth(PREF_SPINNER_WIDITH);
 			return spinner; 
 		}
 		else return super.createSpinner(i); 

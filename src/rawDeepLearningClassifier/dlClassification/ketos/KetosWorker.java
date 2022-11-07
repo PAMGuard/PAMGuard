@@ -113,18 +113,17 @@ public class KetosWorker extends DLModelWorker<KetosResult> {
 					ketosDLParams.binaryClassification[i] = true; //set default to true. 
 				}
 			}
-
+			
+			if (ketosParams.classNames!=null) {
+				ketosDLParams.classNames = dlControl.getClassNameManager().makeClassNames(ketosParams.classNames); 
+			}
 
 //						if (dlParams.classNames!=null) {
 //							for (int i = 0; i<dlParams.classNames.length; i++) {
 //								System.out.println("Class name " + i + "  "  + dlParams.classNames[i]); 
 //							}
 //						}
-			
-	
 //			ketosDLParams.classNames = dlControl.getClassNameManager().makeClassNames(ketosParams.classNames); 
-
-			
 //									if (ketosParams.classNames!=null) {
 //										for (int i = 0; i<ketosDLParams.classNames.length; i++) {
 //											System.out.println("Class name " + i + "  "  + ketosDLParams.classNames[i].className + " ID " + ketosDLParams.classNames[i].ID ); 

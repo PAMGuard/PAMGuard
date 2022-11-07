@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import PamController.PamController;
+import PamDetection.RawDataUnit;
 import PamUtils.complex.ComplexArray;
 import PamView.symbol.PamSymbolManager;
 import PamguardMVC.PamDataBlock;
@@ -12,8 +13,10 @@ import PamguardMVC.PamInstantProcess;
 import PamguardMVC.PamObservable;
 import PamguardMVC.RawDataHolder;
 import Spectrogram.WindowFunction;
+import clickDetector.ClickDetection;
 import clickDetector.ClickLength;
 import clickDetector.ClickClassifiers.basicSweep.SweepClassifierSet;
+import clipgenerator.ClipDataUnit;
 import fftManager.FastFFT;
 import matchedTemplateClassifer.annotation.MatchedClickAnnotation;
 import matchedTemplateClassifer.annotation.MatchedClickAnnotationType;
@@ -485,6 +488,21 @@ public class MTProcess extends PamInstantProcess {
 	public BeskopeClassifierManager getBespokeClassifierManager() {
 		return bespokeClassifierManager;
 	}
+	
+	/**
+	 * A list of data block class types which are compatible as parent data blocks
+	 * for the PamProcess. This can return null, e.g. in the case of Acquisition
+	 * process.
+	 * 
+	 * @return a list of PamDataBlock sub class types which can be used as parent
+	 *         data blocks for the process.
+	 */
+	@Override
+	public ArrayList getCompatibleDataUnits(){
+		return new ArrayList<Class<? extends PamDataUnit>>(Arrays.asList(ClickDetection.class));
+	}
+
+
 
 //	/**
 //	 * Get the parent click data block.

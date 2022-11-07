@@ -342,7 +342,7 @@ public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> impl
 		return "Sound Files";
 	}
 	
-	protected TmapPoint findFirstMapPoint(Iterator<TmapPoint> mapIterator, long startMillis, long endMillis) {
+	public TmapPoint findFirstMapPoint(Iterator<TmapPoint> mapIterator, long startMillis, long endMillis) {
 		TmapPoint mapPoint, prevMapPoint = null;
 		while (mapIterator.hasNext()) {
 			mapPoint = mapIterator.next();

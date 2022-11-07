@@ -83,7 +83,8 @@ public class PamCalendar {
 	 * viewPositions which is the number of milliseconds from the sessionsStartTime.
 	 */
 	private static long viewPosition;
-
+	
+	
 	/**
 	 * If files are being analysed, return the time based on the file
 	 * position. Otherwise just take the normal system time.

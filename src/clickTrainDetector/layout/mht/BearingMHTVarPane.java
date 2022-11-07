@@ -8,7 +8,6 @@ public class BearingMHTVarPane extends SimpleMHTVarPane {
 	
 	public BearingMHTVarPane(SimpleChi2VarParams simpleChi2Var, ResultConverter resultsConverter) {
 		super(simpleChi2Var, resultsConverter);
-		// TODO Auto-generated constructor stub
 	}
 	
 	/**

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.controlsfx.control.ToggleSwitch;
 
+import PamUtils.PamArrayUtils;
 import PamView.symbol.ManagedSymbolData;
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.PamSymbolManager;
@@ -248,6 +249,10 @@ public class StandardSymbolOptionsPane extends FXSymbolOptionsPane<StandardSymbo
 		for (int i=0; i<modifierorder.length; i++ ) {
 			modifierorder[i] = getWhichChooser().getSymbolModifiers().indexOf(sortedPanelist.get(i).getSymbolModifier()); 
 		}
+		
+//		System.out.println("Modifier Order: " + standardSymbolManager); 
+//		PamArrayUtils.printArray(modifierorder); 
+
 
 		return modifierorder;
 	}

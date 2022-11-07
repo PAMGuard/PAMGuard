@@ -59,13 +59,15 @@ public class DatabaseCatalog extends BackupCatalog {
 			actionMap.put(action, ++ind);
 		}
 		makeTableDefinition();
-		
+
 		dbControlUnit = DBControlUnit.findDatabaseControl();
-		pamConnection = dbControlUnit.getConnection();
-		DBProcess dbProcess = dbControlUnit.getDbProcess();
-		boolean tableOk = dbProcess.checkTable(fullTableDef);
-		if (tableOk == false) {
-			System.err.println("Error checking backup table " + fullTableDef.getTableName());
+		if (dbControlUnit != null) {
+			pamConnection = dbControlUnit.getConnection();
+			DBProcess dbProcess = dbControlUnit.getDbProcess();
+			boolean tableOk = dbProcess.checkTable(fullTableDef);
+			if (tableOk == false) {
+				System.err.println("Error checking backup table " + fullTableDef.getTableName());
+			}
 		}
 	}
 

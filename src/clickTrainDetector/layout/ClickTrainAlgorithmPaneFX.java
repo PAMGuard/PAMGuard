@@ -22,6 +22,7 @@ import clickTrainDetector.layout.classification.CTClassifiersPane;
 import cpod.CPODClick;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -50,7 +51,7 @@ public class ClickTrainAlgorithmPaneFX extends SettingsPane<ClickTrainParams> {
 	//there is something a little weird about template spectrum classifier which in Swing means
 	//it needs to be 850 in height or the template covers some of the controls and they
 	//cannot be clicked on??
-	private static final double prefHeight = 800; 
+	private static final double prefHeight = 750; 
 	
 	private static final double prefWidth = 450; 
 
@@ -194,12 +195,16 @@ public class ClickTrainAlgorithmPaneFX extends SettingsPane<ClickTrainParams> {
 		Label label = new Label("Click Train Detector Algorithm"); 
 //		label.setFont(PamGuiManagerFX.titleFontSize2);
 		PamGuiManagerFX.titleFont2style(label);
+		
+		
+		dataSelectorHolder = new PamBorderPane(); 
 
 		
 		PamVBox ctDetectorHolder = new PamVBox(); 
 		ctDetectorHolder.setSpacing(5); 
-		ctDetectorHolder.getChildren().addAll(label, clickTrainAlgorithmBox, ctSettingsHolder);
-		
+		ctDetectorHolder.getChildren().addAll(sourcePane, groupHolder, dataSelectorHolder, label, clickTrainAlgorithmBox, ctSettingsHolder);
+		ctDetectorHolder.setPadding(new Insets(5,5,5,5));
+
 		//the data selector pane. 
 		dataSelectorPane = createDataSelectorPane();
 		
@@ -209,6 +214,9 @@ public class ClickTrainAlgorithmPaneFX extends SettingsPane<ClickTrainParams> {
 		/***The species classifiers***/
 		ctClassifierHolder= new CTClassifiersPane(clickTrainControl); 
 		ctClassifierHolder.setPadding(new Insets(5,0,0,0));
+		
+		
+	
 		
 		//the tab pane to hold classifier and the detector pane. 
 		tabPane = new TabPane(); 
@@ -221,10 +229,11 @@ public class ClickTrainAlgorithmPaneFX extends SettingsPane<ClickTrainParams> {
 		tabPane.getTabs().addAll(tab1, tab3, tab2);
 		tabPane.setPrefHeight(prefHeight);
 		
-		dataSelectorHolder = new PamBorderPane();  
+		tabPane.setSide(Side.TOP);
+		
 
-		holder.getChildren().addAll(sourcePane, groupHolder, dataSelectorHolder,  tabPane); 
-		holder.setPadding(new Insets(5,5,5,5));	
+		holder.getChildren().addAll(tabPane); 
+		//holder.setPadding(new Insets(5,5,5,5));	
 
 		return holder; 
 	}
@@ -254,7 +263,7 @@ public class ClickTrainAlgorithmPaneFX extends SettingsPane<ClickTrainParams> {
 		
 		clickTrainControl.createDataSelector(sourcePane.getSource());
 		
-		System.out.println("ClickTrainAlgorithmPaneFX: Detection Selector: " + clickTrainControl.getDataSelector() + "  " + sourcePane.getSource());
+		//System.out.println("ClickTrainAlgorithmPaneFX: Detection Selector: " + clickTrainControl.getDataSelector() + "  " + sourcePane.getSource());
 		
 		if (clickTrainControl.getDataSelector()!=null) {
 			Label dataSelectorLabel  = new Label("Detection Selector");
@@ -315,7 +324,13 @@ public class ClickTrainAlgorithmPaneFX extends SettingsPane<ClickTrainParams> {
 
 		popOver.showingProperty().addListener((obs, old, newval)->{
 			if (newval) {
-			clickTrainControl.getDataSelector().getDialogPaneFX().setParams(true);
+				//the dialog has opened
+				clickTrainControl.getDataSelector().getDialogPaneFX().setParams(true);
+			}
+			else {
+				//the dialog has closed
+				clickTrainControl.getDataSelector().getDialogPaneFX().getParams(true);
+	
 			}
 		});
 
@@ -393,7 +408,7 @@ public class ClickTrainAlgorithmPaneFX extends SettingsPane<ClickTrainParams> {
 	public ClickTrainParams getParams(ClickTrainParams currParams) {
 		try {
 			currParams.dataSourceIndex = sourcePane.getSourceIndex();
-			currParams.dataSourceName = sourcePane.getSourceName();
+			currParams.dataSourceName = sourcePane.getSourceLongName();
 			
 			
 			//use the data selector. 
@@ -496,7 +511,7 @@ public class ClickTrainAlgorithmPaneFX extends SettingsPane<ClickTrainParams> {
 
 		// and fill in the data source list (may have changed - or might in later versions)
 		ArrayList<PamDataBlock> rd = PamController.getInstance().getDataBlocks(ClickDetection.class, true); 
-		PamDataBlock  datablock = PamController.getInstance().getRawDataBlock(clickTrainParams.dataSourceName);
+		PamDataBlock  datablock = PamController.getInstance().getDataBlockByLongName(clickTrainParams.dataSourceName);
 		
 		//use the data selector. 
 		dataSelectorCheckBox.setSelected(clickTrainParams.useDataSelector); 
@@ -548,8 +563,8 @@ public class ClickTrainAlgorithmPaneFX extends SettingsPane<ClickTrainParams> {
 		this.ctClassifierHolder.setParams(clickTrainParams);
 
 		//notify the algorithm of updates.
-		System.out.println("getSelectedCTAlgorithm(): " + getSelectedCTAlgorithm()); 
-		System.out.println("getSelectedCTAlgorithm().getClickTrainGraphics(): " + getSelectedCTAlgorithm().getClickTrainGraphics()); 
+//		System.out.println("getSelectedCTAlgorithm(): " + getSelectedCTAlgorithm()); 
+//		System.out.println("getSelectedCTAlgorithm().getClickTrainGraphics(): " + getSelectedCTAlgorithm().getClickTrainGraphics()); 
 
 		getSelectedCTAlgorithm().getClickTrainGraphics().notifyUpdate(ClickTrainControl.NEW_PARENT_DATABLOCK, 
 				sourcePane.getDataBlockBox().getSelectionModel().getSelectedItem());
@@ -571,6 +586,11 @@ public class ClickTrainAlgorithmPaneFX extends SettingsPane<ClickTrainParams> {
 	@Override
 	public void paneInitialized() {
 
+	}
+
+	@Override
+	public String getHelpPoint() {
+		return ClickTrainControl.helpPoint;
 	}
 	
 

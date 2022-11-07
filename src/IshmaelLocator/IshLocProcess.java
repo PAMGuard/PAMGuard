@@ -380,6 +380,10 @@ abstract public class IshLocProcess extends PamProcess implements SpectrogramMar
 			} else {
 				newTime = oldTime*2;
 			}
+			/*
+			 * Above causes same error as in Rocca and needs fixing
+			 */
+			newTime = Math.min(newTime, 600000); // don't let this exceed 10 minutes. 
 //			System.out.println("Adjusting raw data natural lifetime from " + oldTime + " ms to " + newTime + " ms");
 			daqBlock.setNaturalLifetimeMillis(newTime); // increase the lifetime to try and prevent this from happening again
 			return;		
@@ -400,7 +404,7 @@ abstract public class IshLocProcess extends PamProcess implements SpectrogramMar
 			outputUnit.setInfo(startSam, channelMap, startSam, durationSam);
 		else {                                  //new outputUnit
 			outputUnit = new IshDetection(startMsec, endMsec, (float)f0, (float)f1, 
-					midSam, 1.0, outputDataBlock, channelMap, startSam, durationSam);
+					midSam, 1.0, outputDataBlock, channelMap, startSam, durationSam); //TODO - need to add ra data. 
 		}
 
 		////////////////////////////////// Do it! ////////////////////////////////////////

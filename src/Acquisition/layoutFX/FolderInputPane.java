@@ -11,10 +11,9 @@ import org.controlsfx.glyphfont.Glyph;
 import Acquisition.FileInputParameters;
 import Acquisition.FolderInputParameters;
 import Acquisition.FolderInputSystem;
+import Acquisition.pamAudio.PamAudioFileFilter;
 import PamController.PamController;
 import PamController.PamFolders;
-import PamController.SettingsPane;
-import PamUtils.PamAudioFileFilter;
 import PamUtils.PamCalendar;
 import PamUtils.worker.PamWorker;
 import PamUtils.worker.filelist.FileListData;
@@ -24,11 +23,13 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.layout.HBox;
@@ -38,6 +39,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import pamViewFX.PamGuiManagerFX;
+import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamComboBox;
@@ -52,6 +54,8 @@ import pamViewFX.fxNodes.PamVBox;
  *
  */
 public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
+
+	private static final double UTIL_BUTTON_WIDTH = 120;
 
 	/**
 	 * Shows current and previous files. 
@@ -133,6 +137,16 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 	 */
 	private AcquisitionPaneFX acquisitionPaneFX;
 
+	/**
+	 * Pane to fix the headers of wave files. 
+	 */
+	private CheckWavHeadersPane fixWavPane;
+
+	/**
+	 * Toggle button for merging contigious files
+	 */
+	private ToggleButton mergeContigious;
+
 	//	/**
 	//	 * The folder input system. 
 	//	 * @param folderInputSystem - the folder system. 
@@ -149,6 +163,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		this.folderInputSystem=folderInputSystem2; 
 		this.acquisitionPaneFX = acquisitionPaneFX; 
 		this.mainPane=createDAQPane(); 
+		this.mainPane.setPrefWidth(300);
 	}
 
 	/**
@@ -181,7 +196,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		browseFileButton.setGraphic(Glyph.create("FontAwesome|FILES_ALT").
 				size(PamGuiManagerFX.iconSize).color(Color.WHITE.darker()));
 		browseFileButton.prefHeightProperty().bind(fileSelectBox.heightProperty()); //make browse button same height as combo box. 
-		browseFileButton.setMinWidth(30);
+		browseFileButton.setMinWidth(35);
 		browseFileButton.setOnAction( (action) ->{	                
 			selectFolder(false); 
 		});
@@ -191,7 +206,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		browseFolderButton.setGraphic(Glyph.create("FontAwesome|FOLDER").
 				size(PamGuiManagerFX.iconSize).color(Color.WHITE.darker()));
 		browseFolderButton.prefHeightProperty().bind(fileSelectBox.heightProperty()); //make browse button same height as combo box. 
-		browseFolderButton.setMinWidth(30);
+		browseFolderButton.setMinWidth(35);
 		browseFolderButton.setOnAction( (action) ->{	                
 			selectFolder(true);
 		});		
@@ -225,9 +240,15 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		fileDateStrip=new FileDataDialogStripFX(folderInputSystem.getAquisitionControl().getFileDate()); 
 		fileDateStrip.setMaxWidth(Double.MAX_VALUE);
 		fileDateStrip.prefWidthProperty().bind(pamVBox.widthProperty());
-
+		
+		
+		fixWavPane = new CheckWavHeadersPane(folderInputSystem); 
+		
+		Label utilsLabel=new Label("Sound file utilities");
+		PamGuiManagerFX.titleFont2style(utilsLabel);
+		
 		pamVBox.getChildren().addAll(fileSelectBox, subFolderPane, progressBar,  createTablePane(), 
-				fileDateText=new Label(), fileDateStrip);
+				fileDateText=new Label(), utilsLabel, createUtilsPane());
 
 		//allow users to check file headers in viewer mode. 
 		//		if (PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW) {
@@ -237,7 +258,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		});
 		//pamVBox.getChildren().addAll(checkFiles);
 
-		mergeFiles=new CheckBox("Merge contiguous files");
+		//mergeFiles=new CheckBox("Merge contiguous files");
 		//		pamVBox.getChildren().addAll(subFolders, mergeFiles);
 		//
 		//		if (PamguardVersionInfo.getReleaseType() == PamguardVersionInfo.ReleaseType.BETA) {
@@ -246,6 +267,52 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 
 		return pamVBox; 		
 	}		
+	
+	
+	/**
+	 * Create
+	 * @return
+	 */
+	private Pane createUtilsPane() {
+		
+		PamHBox hBox = new PamHBox();
+		hBox.setSpacing(5);
+		hBox.setAlignment(Pos.CENTER_LEFT);
+		
+		
+		//Time stamp pane
+		PamButton time = new PamButton("Time stamps"); 
+		time.setPrefWidth(UTIL_BUTTON_WIDTH);
+		time.setGraphic(PamGlyphDude.createPamIcon("mdi2a-av-timer", PamGuiManagerFX.iconSize));
+		time.setOnAction((action)->{
+			acquisitionPaneFX.getAdvancedPane().setCenter(this.fileDateStrip.getAdvDatePane().getContentNode());
+			acquisitionPaneFX.getAdvancedLabel().setText("File Time Stamps");
+			acquisitionPaneFX.getFlipPane().flipToBack();
+		});
+		
+		acquisitionPaneFX.getFlipPane().flipFrontProperty().addListener((obsVal, oldVal, newVal)->{
+			this.fileDateStrip.getAdvDatePane().getParams();
+		});
+
+		
+		PamButton wavFix = new PamButton("Fix wav"); 
+		wavFix.setPrefWidth(UTIL_BUTTON_WIDTH);
+		wavFix.setGraphic(PamGlyphDude.createPamIcon("mdi2f-file-settings", PamGuiManagerFX.iconSize));
+		wavFix.setOnAction((action)->{
+			acquisitionPaneFX.getAdvancedLabel().setText("Fix Wave Files");
+			acquisitionPaneFX.getAdvancedPane().setCenter(this.fixWavPane);
+			fixWavPane.setParams();
+			acquisitionPaneFX.getFlipPane().flipToBack();
+		});
+		
+		mergeContigious = new ToggleButton("Merge files");
+		mergeContigious.setPrefWidth(UTIL_BUTTON_WIDTH);
+		mergeContigious.setGraphic(PamGlyphDude.createPamIcon("mdi2s-set-merge", PamGuiManagerFX.iconSize));
+
+		hBox.getChildren().addAll(time, wavFix, mergeContigious);
+		
+		return hBox;
+	}
 
 	/**
 	 * Create the table pane. 
@@ -255,10 +322,11 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 
 		table.setEditable(true);
 
-		TableColumn<WavFileType, Boolean > useWavFileColumn = new TableColumn<>( "Use file" );
+		TableColumn<WavFileType, Boolean > useWavFileColumn = new TableColumn<>( "Use" );
 		useWavFileColumn.setCellValueFactory(cellData -> cellData.getValue().useWavFileProperty());		
 		useWavFileColumn.setCellFactory( tc -> new CheckBoxTableCell<>());
 		useWavFileColumn.setEditable(true);
+		useWavFileColumn.setMaxWidth(40);
 
 		TableColumn<WavFileType, String > fileNameColumn = new TableColumn<WavFileType, String >("File Name");
 		fileNameColumn.setCellValueFactory( f ->  new SimpleStringProperty(f.getValue().getName()));
@@ -274,12 +342,13 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		TableColumn<WavFileType, Float > durationColumn = new TableColumn<WavFileType, Float > ("Duration");
 		durationColumn.setCellValueFactory(cellData -> new SimpleFloatProperty(cellData.getValue().getDurationInSeconds()).asObject());
 
-		TableColumn<WavFileType, Float > sampleRateColumn = new TableColumn<WavFileType, Float > ("Sample Rate");
+		TableColumn<WavFileType, Float > sampleRateColumn = new TableColumn<WavFileType, Float > ("sR");
 		sampleRateColumn.setCellValueFactory(cellData -> new SimpleFloatProperty(cellData.getValue().getAudioInfo().getSampleRate()).asObject());
 		//		
 
-		TableColumn<WavFileType, Integer > chanColumn = new TableColumn<WavFileType, Integer > ("No. Channels");
+		TableColumn<WavFileType, Integer > chanColumn = new TableColumn<WavFileType, Integer > ("Chan");
 		chanColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getAudioInfo().getChannels()).asObject());
+		useWavFileColumn.setPrefWidth(70);
 
 
 		TableColumn<WavFileType, String > typeColumn = new TableColumn<WavFileType, String > ("Type");
@@ -341,7 +410,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		for (int i=0; i<filesArr.length; i++) {
 			filesArr[i] = files.get(i); 
 		}
-
+		
 		folderInputSystem.getFolderInputParameters().setSelectedFiles(filesArr);
 		folderInputSystem.makeSelFileList();
 		//		folderInputSystem.makeSelFileList(folderInputSystem.getFolderInputParameters().getSelectedFiles());
@@ -437,6 +506,8 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		//			}
 		//		}
 		
+		folderInputParameters.mergeFiles = mergeContigious.isSelected();
+		
 		folderInputParameters.subFolders = this.subFolders.isSelected(); 
 		
 		return folderInputParameters; 
@@ -456,6 +527,8 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		}
 		
 		fileDateStrip.setFileList(table.getItems()); 
+		
+		mergeContigious.setSelected(currParams.mergeFiles);
 		
 	}
 
@@ -550,7 +623,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 			return; 
 		}
 
-		System.out.println("File list worker: " + worker ); 
+		//System.out.println("File list worker: " + worker ); 
 		//must ensure this is on the FX thread
 		//Platform.runLater(()->{
 		this.progressBar.progressProperty().bind(worker.getPamWorkProgress().getProgressProperty()); 

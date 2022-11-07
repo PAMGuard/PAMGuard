@@ -171,6 +171,8 @@ public class RoccaWhistleSelect extends PamProcess implements SpectrogramMarkObs
                         roccaControl.roccaSidePanel.sidePanel.addASighting(false);
                 // if the user hit cancel, just exit
                 if (dummy == RoccaSightingDataUnit.NONE) {
+                    selectedWhistle.setNaturalLifetimeMillis(0);
+                    selectedWhistleRaw.setNaturalLifetimeMillis(0);
                 	return;
                 }
             }
@@ -185,7 +187,7 @@ public class RoccaWhistleSelect extends PamProcess implements SpectrogramMarkObs
     					"underlying detection information necessary to recalculate ancillary variables (e.g. time between detections, detection density, " +
     					"detections/second, etc).  You will need to start a new Encounter to ensure all variables are calculated correctly.</p></html>";
     			String help = null;
-    			int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help);
+    			int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help);
                 String dummy = roccaControl.roccaSidePanel.sidePanel.addASighting(false);
             }
 
@@ -198,6 +200,14 @@ public class RoccaWhistleSelect extends PamProcess implements SpectrogramMarkObs
                     selectedWhistleRaw,
                     display,
                     channel);
+
+            /**
+             * DG June '22.
+             * I hope IT's K to set these back here. It's possible it's also 
+             * done elsewhere.  
+             */
+            selectedWhistle.setNaturalLifetimeMillis(0);
+            selectedWhistleRaw.setNaturalLifetimeMillis(0);
         }
 	}
 

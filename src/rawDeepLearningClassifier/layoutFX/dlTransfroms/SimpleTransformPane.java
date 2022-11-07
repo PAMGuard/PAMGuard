@@ -29,7 +29,7 @@ public class SimpleTransformPane extends DLTransformPane {
 	/**
 	 * The default spinner width. 
 	 */
-	protected static int prefSpinnerWidth = 80; 
+	protected static int PREF_SPINNER_WIDITH = 70; 
 
 	int nParamCol=10; 
 
@@ -80,7 +80,7 @@ public class SimpleTransformPane extends DLTransformPane {
 		gridPane.setHgap(5);
 		gridPane.setVgap(5);
 
-		gridPane.setPadding(new Insets(5,5.,5.,15));
+		gridPane.setPadding(new Insets(2,2,2,2));
 
 
 		PamSpinner<Number> spinner; 
@@ -139,7 +139,9 @@ public class SimpleTransformPane extends DLTransformPane {
 	 * @return a new spinner
 	 */
 	protected PamSpinner<Number> createSpinner(int i) {
-		return new PamSpinner<Number>(0.0, Double.MAX_VALUE, 2, 0.01);
+		PamSpinner spnner =  new PamSpinner<Number>(0.0, Double.MAX_VALUE, 2, 0.01);
+		spnner.setPrefWidth(PREF_SPINNER_WIDITH);
+		return spnner;
 	}
 
 	/**

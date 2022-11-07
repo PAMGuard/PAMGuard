@@ -67,6 +67,17 @@ public class PlayBackGUI extends PamControlledGUIFX {
 	}
 	
 	
+	/**
+	 * Allows the GUI to be notified of changes, e.g. in the PAMController
+	 * @param flag - the change flag. 
+	 */
+	public void notifyGUIChange(int flag) {
+		for (Pane sidePane: sidePanes) {
+			((PlayBackSidePane) sidePane).newSettings();
+		}
+	}
+	
+	
 
 }
 

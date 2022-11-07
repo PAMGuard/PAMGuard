@@ -31,12 +31,19 @@ public class KetosModelTest {
 
 		//test on a right whale. 
 		//File file = new File("/Volumes/GoogleDrive/My Drive/PAMGuard_dev/Deep_Learning/Meridian/right_whales/for_pamguard/narw.ktpb"); 
-		File file = new File("/Volumes/GoogleDrive-108005893101854397430/My Drive/PAMGuard_dev/Deep_Learning/Meridian/humpback_whales/SOCAL_Mn_Network.ktpb");
+//		File file = new File("/Volumes/GoogleDrive-108005893101854397430/My Drive/PAMGuard_dev/Deep_Learning/Meridian/humpback_whales/SOCAL_Mn_Network.ktpb");
 		//File file = new File("/Volumes/GoogleDrive-108005893101854397430/My Drive/PAMGuard_dev/Deep_Learning/Meridian/orca/kw_detector_v11_5s.ktpb"); 
 
 		//the wav file to test.
 		//String wavFilePath = "/Volumes/GoogleDrive/My Drive/PAMGuard_dev/Deep_Learning/Meridian/right_whales/for_pamguard/input.wav"; 
-		String wavFilePath = "/Volumes/GoogleDrive-108005893101854397430/My Drive/PAMGuard_dev/Deep_Learning/Meridian/humpback_whales/wav/5353.210403161502.wav";
+//		String wavFilePath = "/Volumes/GoogleDrive-108005893101854397430/My Drive/PAMGuard_dev/Deep_Learning/Meridian/humpback_whales/wav/5353.210403161502.wav";
+//		double windowSize = 3.52; 
+		
+		
+		//Minke model
+		File file = new File("/Users/au671271/Desktop/Minke_test/Minke_Network_12s.ktpb");
+		String wavFilePath = "/Users/au671271/Desktop/Minke_test/1705_FLAC_1705_20171106_185953_253.wav";
+		double windowSize = 12; 
 		
 		try {
 			//the ketos model. 
@@ -54,7 +61,7 @@ public class KetosModelTest {
 
 			//Open wav files. 
 			AudioData soundData = DLUtils.loadWavFile(wavFilePath);
-			soundData = soundData.trim(0, (int) (soundData.getSampleRate()*3.52)); 
+			soundData = soundData.trim(0, (int) (soundData.getSampleRate()*windowSize)); 
 
 			//generate the transforms. 
 			ArrayList<DLTransform> transforms =	DLTransformsFactory.makeDLTransforms(ketosParams.dlTransforms); 

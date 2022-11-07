@@ -24,6 +24,7 @@ import clickDetector.ClickClassifiers.ClickIdentifier;
 import clickDetector.ClickClassifiers.ClickTypeCommonParams;
 import clickDetector.ClickClassifiers.basic.BasicClickIdentifier;
 import clickDetector.layoutFX.clickClassifiers.ClassifyPaneFX;
+import clickDetector.layoutFX.clickClassifiers.SweepClassifierPaneFX;
 
 /**
  * An improvements on the BasicClickIdentifier based on work by 
@@ -43,6 +44,9 @@ public class SweepClassifier implements ClickIdentifier , PamSettings {
 	private ClickControl clickControl;
 	
 	private SweepClassifierPanel dialogPanel;
+	
+	private SweepClassifierPaneFX fxPane;
+
 	
 	private SweepClassifierWorker sweepClassifierWorker;
 	
@@ -138,6 +142,7 @@ public class SweepClassifier implements ClickIdentifier , PamSettings {
 	@Override
     public ClickTypeCommonParams getCommonParams(int code) {
         int codeIdx = codeToListIndex(code);
+        if (codeIdx<0 || codeIdx>=sweepClassifierParameters.getNumSets()) return null;
         return sweepClassifierParameters.getSet(codeIdx);
     }
 
@@ -221,7 +226,7 @@ public class SweepClassifier implements ClickIdentifier , PamSettings {
 		return clickDetector;
 	}
 	
-	protected int getNextFreeCode(int currCode) {
+	public int getNextFreeCode(int currCode) {
 		int newCode = currCode;
 		while (codeTaken(++newCode));
 		return newCode;
@@ -272,7 +277,7 @@ public class SweepClassifier implements ClickIdentifier , PamSettings {
 	 * Set the params for the sweep classifier. 
 	 * @params the sweep classifier params to set. 
 	 */
-	public void setSeepClassifierParams(SweepClassifierParameters sweepClassifierParameters) {
+	public void setSweepClassifierParams(SweepClassifierParameters sweepClassifierParameters) {
 		this.sweepClassifierParameters=sweepClassifierParameters; 
 	} 
 	
@@ -408,8 +413,8 @@ public class SweepClassifier implements ClickIdentifier , PamSettings {
 
 	@Override
 	public ClassifyPaneFX getClassifierPane() {
-		// TODO Auto-generated method stub
-		return null;
+		if (fxPane==null) fxPane = new SweepClassifierPaneFX(this, clickControl);
+		return fxPane;
 	}
 
 	@Override

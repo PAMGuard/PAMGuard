@@ -141,7 +141,7 @@ public abstract class PamControlledUnit implements SettingsNameProvider {
 	
 	private ModuleStatusManager moduleStatusManager;
 	
-	private ArrayList<OfflineTask> offlineTasks = new ArrayList<>();
+//	private ArrayList<OfflineTask> offlineTasks = new ArrayList<>();
 	
 	/**
 	 * Instance number of this module. This is simply a count of
@@ -829,26 +829,27 @@ public abstract class PamControlledUnit implements SettingsNameProvider {
 		return worstStatus;
 	}
 
-	/**
-	 * Get a list of available offline tasks for this module. This is mostly used for tasks that 
-	 * might apply to many different types of data such as a localiser. e.g. the click detector knows
-	 * that it has bearing and click id tasks, but it doens't know that there is a localiser that can 
-	 * also operate on the clicks, so it's important the localiser registers it's class and has it set
-	 * to the right input data so that the task group in the click detector can find it. 
-	 * @return the offlineTasks
-	 */
-	public ArrayList<OfflineTask> getOfflineTasks() {
-		return offlineTasks;
-	}
-
-	/**
-	 * Add an offline task, which will become available to other modules should a 
-	 * TaskGroup request all available tasks from the system. 
-	 * @param offlineTask the offlineTask to add
-	 */
-	public void addOfflineTask(OfflineTask offlineTask) {
-		this.offlineTasks.add(offlineTask);
-	}
+//	/**
+//	 * Get a list of available offline tasks for this module. This is mostly used for tasks that 
+//	 * might apply to many different types of data such as a localiser. e.g. the click detector knows
+//	 * that it has bearing and click id tasks, but it doens't know that there is a localiser that can 
+//	 * also operate on the clicks, so it's important the localiser registers it's class and has it set
+//	 * to the right input data so that the task group in the click detector can find it. 
+//	 * @return the offlineTasks
+//	 */
+//	public ArrayList<OfflineTask> getOfflineTasks() {
+	// moved to Global OfflineTaskManager class which does everything !
+//		return offlineTasks;
+//	}
+//
+//	/**
+//	 * Add an offline task, which will become available to other modules should a 
+//	 * TaskGroup request all available tasks from the system. 
+//	 * @param offlineTask the offlineTask to add
+//	 */
+//	public void addOfflineTask(OfflineTask offlineTask) {
+//		this.offlineTasks.add(offlineTask);
+//	}
 	
 	public BackupInformation getBackupInformation() {
 		return null;

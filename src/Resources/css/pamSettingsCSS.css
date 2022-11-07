@@ -35,8 +35,8 @@
   -fx-font-color: -fx-text;
   -fx-font-family: "Ubuntu";
 
-   -fx-border-radius: 5 5 5 5;
-   -fx-background-radius: 5 5 5 5;
+  -fx-border-radius: 5 5 5 5;
+  -fx-background-radius: 5 5 5 5;
 
    -icons-color: -fx-icon_col;
 }
@@ -615,7 +615,7 @@
   -fx-background: -fx-darkbackground;
   -fx-background-color: -fx-darkbackground;
   -fx-border-radius: 0 0 0 0;
-  -fx-padding: 7 0 7 0;
+  -fx-padding: 5 0 5 0;
   -fx-border-color: transparent;
 }
 
@@ -623,9 +623,9 @@
   -fx-text-fill: white;
   -fx-background-color: -fx-darkbackground;
   -fx-border-color: -fx-border_col;
-  -fx-background-radius: 6 6 0 0;
-  -fx-border-radius: 6 6 0 0;
-  -fx-padding: 7 0 7 0;
+  -fx-background-radius: 5 5 0 0;
+  -fx-border-radius: 5 5 0 0;
+  -fx-padding: 5 0 5 0;
 }
 
 .spinner .increment-arrow {
@@ -635,16 +635,16 @@
 .spinner .increment-arrow-button:hover {
    -fx-background-color: -fx-highlight; 
    -fx-border-color: -fx-highlight_border;
-   -fx-background-radius: 6 6 0 0;
-   -fx-border-radius: 6 6 0 0;
+   -fx-background-radius: 5 5 0 0;
+   -fx-border-radius: 5 5 0 0;
 }
 
 .spinner .decrement-arrow-button {
   -fx-text-fill: white;
   -fx-background-color: -fx-darkbackground;
   -fx-border-color: -fx-border_col;
-  -fx-background-radius: 0 0 6 6;
-  -fx-border-radius: 0 0 6 6
+  -fx-background-radius: 0 0 5 5;
+  -fx-border-radius: 0 0 5 5
 }
 
 .spinner .decrement-arrow {
@@ -654,8 +654,8 @@
 .spinner .decrement-arrow-button:hover {
    -fx-background-color: -fx-highlight; 
    -fx-border-color: -fx-highlight_border;
-   -fx-background-radius: 0 0 6 6;
-   -fx-border-radius: 0 0 6 6;
+   -fx-background-radius: 0 0 5 5;
+   -fx-border-radius: 0 0 5 5;
 }
 
 /*Arrows are horizontal either side of text box*/
@@ -663,7 +663,7 @@
   -fx-text-fill: white;
   -fx-background-color: -fx-darkbackground;
   -fx-border-color: -fx-border_col;
-  -fx-border-radius: 0 6 6 0
+  -fx-border-radius: 0 5 5 0
 }
 
 
@@ -671,22 +671,22 @@
    -fx-text-fill: white;
   -fx-background-color: -fx-darkbackground;
   -fx-border-color: -fx-border_col;
-  -fx-border-radius: 6 0 0 6
+  -fx-border-radius: 5 0 0 5
  }
 
  .spinner.split-arrows-horizontal .increment-arrow-button:hover {
    -fx-background-color: -fx-highlight; 
    -fx-border-color: -fx-highlight_border;
-   -fx-background-radius: 0 6 6 0;
-   -fx-border-radius: 0 6 6 0;
+   -fx-background-radius: 0 5 5 0;
+   -fx-border-radius: 0 5 5 0;
 }
 
 
 .spinner.split-arrows-horizontal .decrement-arrow-button:hover {
    -fx-background-color: -fx-highlight; 
    -fx-border-color: -fx-highlight_border;
-   -fx-background-radius: 6 0 0 6;
-   -fx-border-radius: 6 0 0 6;
+   -fx-background-radius: 5 0 0 5;
+   -fx-border-radius: 5 0 0 5;
  }
 
 .spinner.split-arrows-horizontal .text-field {
@@ -977,4 +977,13 @@
     -fx-icon-color: black;
 }
 
+/********************************************
+*                                           *
+*      Spinner                 *
+*                                           *
+*********************************************/
 
+
+.spinner  {
+    -fx-pref-width: 100px;
+}

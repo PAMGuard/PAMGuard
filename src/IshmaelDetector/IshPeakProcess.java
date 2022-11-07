@@ -26,7 +26,6 @@ import PamguardMVC.PamProcess;
 public class IshPeakProcess extends PamProcess
 {
 
-	
 	public static final SymbolData defaultSymbol = new SymbolData(PamSymbolType.SYMBOL_DIAMOND, 10, 10, false, Color.GREEN, Color.GREEN);
 	//public Complex[] inputData;
 	//IshDetCalcIntfc ishDetCalcIntfc;
@@ -49,6 +48,11 @@ public class IshPeakProcess extends PamProcess
 	 */
 	private int activeChannels;
 	
+	/**
+	 * The Ishmael binary data source. 
+	 */
+	private IshBinaryDataSource ishmealBinaryDataSource;
+	
 	
 	public IshPeakProcess(IshDetControl ishDetControl, 
 			PamDataBlock parentDataBlock) {
@@ -61,6 +65,12 @@ public class IshPeakProcess extends PamProcess
 				ishDetControl.getUnitName() + " events", this, parentDataBlock.getSequenceMap());
 		outputDataBlock.setCanClipGenerate(true);
 		addOutputDataBlock(outputDataBlock);
+		
+		//set the binary data source. 
+		ishmealBinaryDataSource = new IshBinaryDataSource(this, outputDataBlock, "Ishmael Detections");
+		outputDataBlock.setBinaryDataSource(ishmealBinaryDataSource);
+
+		//graphics for the map and spectrogram. 
 		PamDetectionOverlayGraphics overlayGraphics = new PamDetectionOverlayGraphics(outputDataBlock, new PamSymbol(defaultSymbol));
 		outputDataBlock.setOverlayDraw(overlayGraphics);
 		StandardSymbolManager symbolManager = new StandardSymbolManager(outputDataBlock, defaultSymbol, true);
@@ -129,7 +139,6 @@ public class IshPeakProcess extends PamProcess
 		else {
 			maxTimeN        = Math.max(0, (long)(dRate * p.maxTime));
 		}
-
 		
 		refactoryTimeSam = Math.max(0, (long)(this.getSampleRate() * p.refractoryTime));
 		
@@ -191,7 +200,7 @@ public class IshPeakProcess extends PamProcess
 				Math.round(1000.0 * (float)durationSam * ishDetControl.ishDetFnProcess.getDetSampleRate()); 
 				float lowFreq = ishDetControl.ishDetFnProcess.getLoFreq();
 				float highFreq = ishDetControl.ishDetFnProcess.getHiFreq();
-
+			
 				IshDetection iDet = outputDataBlock.getRecycledUnit();
 				if (iDet != null) {                //refurbished
 //					iDet.setInfo(startMsec, 1 << chanIx, startSam, durationSam, 
@@ -205,6 +214,7 @@ public class IshPeakProcess extends PamProcess
 					//11/03/2020 - major bug fix - start sample of Ishamel detector data unit was wrong - it was at the end of the data unit for some reason. 
 					iDet = new IshDetection(startMsec, endMsec, lowFreq, highFreq, chan.peakTimeSam, 
 							chan.peakHeight, outputDataBlock, arg1.getChannelBitmap(), startSam - durationSam, durationSam);
+					
 					iDet.setSequenceBitmap(arg1.getSequenceBitmapObject());
 					iDet.setParentDataBlock(outputDataBlock);
 				}
@@ -238,6 +248,7 @@ public class IshPeakProcess extends PamProcess
 		}
 	}
 	
+
 	/**
 	 * Checks whether a peak is over threshold...
 	 * @param value - the current value of the detector
@@ -270,4 +281,8 @@ public class IshPeakProcess extends PamProcess
 	
 	//This keeps the compiler happy -- it's abstract in the superclass.
 	@Override public void pamStop() { }
+
+	public PamDataBlock getOutputDataBlock() {
+		 return this.outputDataBlock;
+	}
 }

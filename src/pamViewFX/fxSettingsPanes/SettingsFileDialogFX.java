@@ -39,7 +39,7 @@ public class SettingsFileDialogFX  {
 			singleInstance = new SettingsFileDialogFX();
 			singleInstance.settingsDialog=new PamSettingsDialogFX(singleInstance.settingsFilePane); 
 			//			singleInstance.settingsDialog.getDialogPane().getStylesheets().add(singleInstance.getClass().getResource("/Resources/css/pamSettingsCSS.css").toExternalForm());
-			singleInstance.settingsDialog.getDialogPane().getStylesheets().add(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
+			singleInstance.settingsDialog.getDialogPane().getStylesheets().add(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getDialogCSS());
 		}
 
 		singleInstance.settingsFilePane.setParams(settingsFileData);

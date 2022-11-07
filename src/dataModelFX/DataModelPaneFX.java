@@ -16,6 +16,7 @@ import pamViewFX.fxNodes.connectionPane.StandardConnectionNode;
 import pamViewFX.fxNodes.connectionPane.StandardConnectionPlug;
 import pamViewFX.fxNodes.connectionPane.structures.ConnectionGroupStructure;
 import pamViewFX.fxNodes.connectionPane.structures.ConnectionStructure;
+import pamViewFX.fxStyles.PamStylesManagerFX;
 import javafx.beans.property.ObjectProperty;
 import javafx.geometry.Orientation;
 import javafx.scene.control.SplitPane;

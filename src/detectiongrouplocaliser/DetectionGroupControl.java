@@ -24,7 +24,8 @@ import detectiongrouplocaliser.dialogs.DisplayOptionsHandler;
 import userDisplay.UserDisplayControl;
 
 /**
- * Class for grouping any type of data together. 
+ * Class for grouping any type of data together. Not really a localiser, but 
+ * does include some localisation options.<br> 
  * Will attempt to offer a variety of localisation options and will store data for each group
  * in a pair of database tables. 
  * @author dg50

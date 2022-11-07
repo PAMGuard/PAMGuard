@@ -447,6 +447,11 @@ public class DetectionPlotDisplay extends PamBorderPane implements UserDisplayNo
 	private void drawDataUnit(PamDataUnit newDataUnit) {
 		//Debug.out.println("DetectionPlotDisplay DrawDataUnit: " +newDataUnit);
 		if (currentDataInfo!=null){
+			//sometimes the axis just need a little push to make sure the pane and axis object bindings have been updated
+			for (int i=0; i<Side.values().length; i++) {
+				dDPlotPane.getAxisPane(Side.values()[i]).layout(); 
+			}
+
 			currentDataInfo.drawData(dDPlotPane.getPlotCanvas().getGraphicsContext2D(), 
 					new Rectangle(0,0,dDPlotPane.getPlotCanvas().getWidth(),dDPlotPane.getPlotCanvas().getHeight()), 
 					this.detectionPlotProjector, newDataUnit);

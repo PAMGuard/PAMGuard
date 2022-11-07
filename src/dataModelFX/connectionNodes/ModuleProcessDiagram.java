@@ -71,7 +71,7 @@ public class ModuleProcessDiagram extends PamBorderPane {
 
 	
 	public ModuleProcessDiagram (PamControlledUnit pamControlledUnit){
-		this.getStylesheets().add(PamController.getInstance().getGuiManagerFX().getPamSettingsCSS());
+		//this.getStylesheets().add(PamController.getInstance().getGuiManagerFX().getPamSettingsCSS());
 		this.pamControlledUnit=pamControlledUnit; 
 		createUpdateTimer();
 		createControlDataModel();
@@ -81,7 +81,7 @@ public class ModuleProcessDiagram extends PamBorderPane {
 	private void createControlDataModel(){
 		this.setMinWidth(100);
 		this.setPrefWidth(USE_COMPUTED_SIZE); 
-		this.setStyle("-fx-background-color: -fx-darkbackground");
+		//this.setStyle("-fx-background-color: -fx-darkbackground");
 		this.populateDataModel();
 	}
 	

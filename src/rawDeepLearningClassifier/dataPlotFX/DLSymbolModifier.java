@@ -20,7 +20,7 @@ import rawDeepLearningClassifier.logging.DLAnnotationType;
 
 
 /**
- * The DL symbol modifier. Colours symbols by prediciton.
+ * The DL symbol modifier. Colours symbols by prediction.
  * 
  * @author Jamie Macaulay. 
  *

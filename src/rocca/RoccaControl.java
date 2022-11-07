@@ -69,6 +69,11 @@ public class RoccaControl extends PamControlledUnit implements PamSettings {
      */
 	public static final String unitType = "Rocca";
 	
+	/*
+	 * Max max data keep time to avoid memory overflows. Currently at 15 minutes. 
+	 */
+	private static final int MAXMAXDATAKEEPTIME = 900000;
+	
 	/**
 	 * reference to the ClickControl module when it is loaded in Viewer mode
 	 */
@@ -194,6 +199,17 @@ public class RoccaControl extends PamControlledUnit implements PamSettings {
 	}
     
     /**
+     * A bit of a fudge to deal with some old code which kept doubling the 
+     * keep time of the raw data, which eventually led to raw data using too 
+     * much memory and bringing down PG. I don't fully understand that code so 
+     * have left as much of it as possible, but put this in as an absolute 
+     * maximum which cannot be exceeded. 
+     * @return max in milliseconds as int, which is what's used in PAMDataBlock. 
+     */
+    public int getMaxDataKeepTime() {
+    	return MAXMAXDATAKEEPTIME;
+    }
+    /**
      * 
      * @param eventList
      */
@@ -242,18 +258,21 @@ public class RoccaControl extends PamControlledUnit implements PamSettings {
 					(rcdb.getContour().get(RoccaContourStats.ParamIndx.SNR) > 35. ||
 							rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) < 0.005 ||
 							rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) > 0.6 )) {
+				rcdb.setNaturalLifetimeMillis(0);
 				return;
 			}
 			if (roccaParameters.roccaClassifierModelFilename.getName().equals("HIClick.model") &&
 					(rcdb.getContour().get(RoccaContourStats.ParamIndx.SNR) > 40. ||
 							rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) < 0.01 ||
 							rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) > 0.6 )) {
+				rcdb.setNaturalLifetimeMillis(0);
 				return;
 			}
 			if (roccaParameters.roccaClassifierModelFilename.getName().equals("NWAtlClick.model") &&
 					(rcdb.getContour().get(RoccaContourStats.ParamIndx.SNR) > 35. ||
 							rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) < 0.005 ||
 							rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) > 0.6 )) {
+				rcdb.setNaturalLifetimeMillis(0);
 				return;
 			}
 

@@ -4,6 +4,7 @@ import org.controlsfx.glyphfont.Glyph;
 
 import clickDetector.ClickControl;
 import clickDetector.ClickParameters;
+import clickDetector.ClickClassifiers.ClickClassifierManager;
 import clickDetector.ClickClassifiers.ClickIdentifier;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -22,10 +23,13 @@ import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamStackPane;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.hidingPane.HidingPane;
+import pamViewFX.fxNodes.utilityPanes.PamToggleSwitch;
 
 /**
  * Pane which allows users to select click classifiers. Rather than opening endless dialogs click settings are 
  * handled by sliding panes. 
+ * <p>
+ * Note that this is a copy...ish of the swing frameowrk - wouldn't od things this way usually. 
  * @author Jamie Macaulay
  *
  */
@@ -41,7 +45,8 @@ public class ClickClassifyPaneFX extends PamStackPane {
 	 */
 	private ClickControl clickControl;
 
-	private CheckBox runOnlineCheckBox;
+	
+	private PamToggleSwitch runOnlineCheckBox;
 
 	private CheckBox discardClicksCheckBox;
 
@@ -118,16 +123,16 @@ public class ClickClassifyPaneFX extends PamStackPane {
 			classifierComboBox.getItems().add(clickControl.getClassifierManager().getClassifierName(i));
 			classifierComboBox.setOnAction((action)->{
 				//get the current click identifier.
-				System.out.println("ClickClassifyPaneFX:setOnAction: " +classifierComboBox.getSelectionModel().getSelectedIndex());
+				//System.out.println("ClickClassifyPaneFX:setOnAction: " +classifierComboBox.getSelectionModel().getSelectedIndex());
 				currentClickIdentifier=clickControl.getClassifierManager().
-						getClassifier(classifierComboBox.getSelectionModel().getSelectedIndex());
+						getClassifier(classifierComboBox.getSelectionModel().getSelectedIndex());				
 				//change the centre pane to classifier specific pane
 				setCenterPane();
 			});
 		}
 
-		runOnlineCheckBox=new CheckBox("Run Classifier");
-		discardClicksCheckBox=new CheckBox("Discdard Classified Clicks");
+		runOnlineCheckBox=new PamToggleSwitch("Run Classifier");
+		//discardClicksCheckBox=new CheckBox("Discdard Classified Clicks");
 
 		PamHBox pamHBox=new PamHBox();
 		pamHBox.setAlignment(Pos.CENTER);
@@ -160,8 +165,15 @@ public class ClickClassifyPaneFX extends PamStackPane {
 		//set parameters - listener will do everything else.
 		currentClickIdentifier=clickControl.getClassifierManager().
 				getClassifier(clickParameters.clickClassifierType);
-		System.out.println("ClickClassifyPaneFX:setParams(): " +classifierComboBox.getSelectionModel().getSelectedIndex());
+		if (clickParameters.clickClassifierType == ClickClassifierManager.CLASSIFY_BASIC) {
+			
+		}
+		
+		//System.out.println("ClickClassifyPaneFX:setParams(): " +classifierComboBox.getSelectionModel().getSelectedIndex());
 		classifierComboBox.getSelectionModel().select(clickParameters.clickClassifierType);
+		
+		//System.out.println("ClickClassifyPaneFX: setParams: get selected classifier is: " + 	clickParameters.clickClassifierType);
+
 		//set classifier parameters
 		if (currentClickIdentifier!=null && currentClickIdentifier.getClassifierPane()!=null) {
 			this.currentClickIdentifier.getClassifierPane().setParams();
@@ -171,9 +183,11 @@ public class ClickClassifyPaneFX extends PamStackPane {
 
 	public ClickParameters getParams(ClickParameters clickParameters){
 		//set all parameters in classifier. 
-		System.out.println("ClickClassifyPaneFX:getParams(): " +classifierComboBox.getSelectionModel().getSelectedIndex());
+		//System.out.println("ClickClassifyPaneFX:getParams(): " +classifierComboBox.getSelectionModel().getSelectedIndex());
 		
 		clickParameters.clickClassifierType=classifierComboBox.getSelectionModel().getSelectedIndex();
+		
+		//System.out.println("ClickClassifyPaneFX: getParams: get selected classifier is: " + 	clickParameters.clickClassifierType);
 		if (currentClickIdentifier != null && currentClickIdentifier.getClassifierPane() != null) {
 			 currentClickIdentifier.getClassifierPane().getParams();
 		}

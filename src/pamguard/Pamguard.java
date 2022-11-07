@@ -23,6 +23,8 @@ package pamguard;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import Acquisition.AcquisitionControl;
+import Acquisition.FolderInputSystem;
 import PamController.PamController;
 import PamController.PamGUIManager;
 import PamController.PamSettingManager;
@@ -31,6 +33,7 @@ import PamController.pamBuoyGlobals;
 import PamController.command.TerminalController;
 import PamModel.SMRUEnable;
 import PamUtils.FileFunctions;
+import PamUtils.PamCalendar;
 import PamUtils.PamExceptionHandler;
 import PamUtils.PlatformInfo;
 import PamUtils.Splash;
@@ -39,7 +42,10 @@ import PamView.FullScreen;
 import PamView.ScreenSize;
 import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.debug.Debug;
+import binaryFileStorage.BinaryStore;
 import dataPlotsFX.JamieDev;
+import generalDatabase.DBControl;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -129,6 +135,8 @@ public class Pamguard {
 		Thread folderSizeThread  = new Thread(folderSizeMon);
 		folderSizeThread.start();
 
+//		TimeZone.setDefault(PamCalendar.defaultTimeZone);
+
 		System.out.println("**********************************************************");
 		try {
 			// get the java runnable file name. 
@@ -207,11 +215,38 @@ public class Pamguard {
 					System.out.println("Running using settings from " + autoPsf);
 				}
 				else if (anArg.equalsIgnoreCase("-port")) {
+					// port id to open a udp port to receive commands
 					pamBuoyGlobals.setNetworkControlPort(Integer.parseInt(args[iArg++]));
+				}
+				else if (anArg.equalsIgnoreCase("-mport")) {
+					// multicast control (for multiple PAMGuards) 
+					String mAddr = args[iArg++];
+					int mPort = Integer.parseInt(args[iArg++]);
+					pamBuoyGlobals.setMultiportConfig(mAddr, mPort);
 				}
 				else if (anArg.equalsIgnoreCase("-nolog")) {
 					System.out.println("Disabling log file from command line switch...");
 					ProxyPrintStream.disableLogFile();
+				}
+				else if (anArg.equalsIgnoreCase(BinaryStore.GlobalFolderArg)) {
+					// output folder for binary files. 
+					GlobalArguments.setParam(BinaryStore.GlobalFolderArg, args[iArg++]);
+				}
+				else if (anArg.equalsIgnoreCase(DBControl.GlobalDatabaseNameArg)) {
+					// database file name
+					GlobalArguments.setParam(DBControl.GlobalDatabaseNameArg, args[iArg++]);
+				}
+				else if (anArg.equalsIgnoreCase(FolderInputSystem.GlobalWavFolderArg)) {
+					// source folder for wav files (or other supported sound files)
+					GlobalArguments.setParam(FolderInputSystem.GlobalWavFolderArg, args[iArg++]);
+				}
+				else if (anArg.equalsIgnoreCase(PamController.AUTOSTART)) {
+					// auto start processing. 
+					GlobalArguments.setParam(PamController.AUTOSTART, PamController.AUTOSTART);
+				}
+				else if (anArg.equalsIgnoreCase(PamController.AUTOEXIT)) {
+					// auto exit at end of processing. 
+					GlobalArguments.setParam(PamController.AUTOEXIT, PamController.AUTOEXIT);
 				}
 				else if (anArg.equalsIgnoreCase("-help")) {
 					System.out.println("--PamGuard Help");
@@ -231,7 +266,7 @@ public class Pamguard {
 		}
 		//going to need the run mode inside a Runnable later 
 		final int chosenRunMode = runMode;
-		if(runMode != PamController.RUN_REMOTE) {
+		if(runMode != PamController.RUN_REMOTE && PamGUIManager.getGUIType() != PamGUIManager.NOGUI) {
 			//			ScreenSize.startScreenSizeProcess();
 			ScreenSize.getScreenBounds();
 		}
@@ -313,10 +348,16 @@ public class Pamguard {
 		Thread.setDefaultUncaughtExceptionHandler(new PamExceptionHandler());
 		System.setProperty("sun.awt.exception.handler", PamExceptionHandler.class.getName());
 
-		//Amongst other stuff the call to PamController.create()
-		//will build and show the GUI and the user can't
-		//do much else until that's done so let's have all
-		//that kicked off from with the EDT CJB 2009-06-16 
+		/*
+		 * Amongst other stuff the call to PamController.create()
+		 * will build and show the GUI and the user can't
+		 * do much else until that's done so let's have all
+		 * that kicked off from with the EDT CJB 2009-06-16
+		 * Either of these will call .create, just one is in a different 
+		 * thread, so it's at the end of the create function that other automatic 
+		 * processes should be started. 
+		 *  
+		 */
 
 		if (PamGUIManager.isSwing()) {
 			SwingUtilities.invokeLater(createPamguard);

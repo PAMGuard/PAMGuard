@@ -110,7 +110,7 @@ public class MTClassifierOfflineTask extends OfflineTask<PamDataUnit<?,?>> {
 
 	@Override
 	public boolean callSettings() {
-		mtClassifierControl.showSettingsDialog(PamController.getInstance().getGuiFrameManager().getFrame(0));
+		mtClassifierControl.showSettingsDialog(PamController.getMainFrame());
 		return true;
 	}
 

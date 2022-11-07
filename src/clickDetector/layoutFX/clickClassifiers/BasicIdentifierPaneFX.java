@@ -1,17 +1,15 @@
 package clickDetector.layoutFX.clickClassifiers;
 
 import pamViewFX.fxNodes.PamBorderPane;
-import pamViewFX.fxNodes.hidingPane.HidingPane;
+import pamViewFX.fxNodes.flipPane.PamFlipPane;
 import pamViewFX.fxNodes.table.TableSettingsPane;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.CheckBoxTableCell;
-import javafx.scene.paint.Color;
 import clickDetector.BasicClickIdParameters;
 import clickDetector.ClickControl;
 import clickDetector.ClickTypeParams;
@@ -20,6 +18,7 @@ import clickDetector.ClickClassifiers.basic.BasicClickIdentifier;
 
 /**
  * Pane for the basic click classifier. 
+ * 
  * @author Jamie Macaulay	
  *
  */
@@ -40,10 +39,10 @@ public class BasicIdentifierPaneFX implements ClassifyPaneFX {
 	 */
 	private TableSettingsPane<ClickTypeProperty> settingsPane;
 	
-	/**
-	 * Hiding pane which slides out to allow users to change click type settings. 
-	 */
-	protected HidingPane hidingPane; 
+//	/**
+//	 * Hiding pane which slides out to allow users to change click type settings. 
+//	 */
+//	protected HidingPane hidingPane; 
 	
 	/**
 	 * Holds click classifier controls inside hiding pane. 
@@ -62,10 +61,10 @@ public class BasicIdentifierPaneFX implements ClassifyPaneFX {
 	 */
 	protected PamBorderPane mainHolderPane;
 	
-	/**
-	 * The width of the hiding pane
-	 */
-	private double hidingPaneWidth=900;
+//	/**
+//	 * The width of the hiding pane
+//	 */
+//	private double hidingPaneWidth=900;
 
 	/**
 	 * Cloned copy of BasicClickIdParameters. 
@@ -73,10 +72,12 @@ public class BasicIdentifierPaneFX implements ClassifyPaneFX {
 	private BasicClickIdParameters basicClickIdParameters;
 	
 	private PamBorderPane mainPane; 
+	
+	private PamFlipPane flipPane;
 
 	/**
 	 * Create a BasicClickIdParameters pane which allows users to add multiple basic click identifiers to the PAMGuard click classifier. 
-	 * @param basicClickIdentifier - the ClickIdentifier. 
+	 * @param basicClickIdentifier - the ClickIdentifier. ob  
 	 * @param clickControl -a reference to the ClickControl the classifier is associated with. 
 	 */
 	public BasicIdentifierPaneFX(ClickIdentifier basicClickIdentifier, 
@@ -84,8 +85,16 @@ public class BasicIdentifierPaneFX implements ClassifyPaneFX {
 		this.basicClickIdentifier= basicClickIdentifier;
 		this.clickControl=clickControl; 
 		mainPane= new PamBorderPane(); 
-		mainPane.setCenter(createSettingsPane());
+		
+		flipPane = new PamFlipPane(); 
+		flipPane.getFrontPane().setCenter(createSettingsPane()); 
+		flipPane.getBackPane().setCenter(clickTypeHolder); 
+
+		mainPane.setCenter(flipPane);
+
 	}
+	
+	
 	
 	/**
 	 * Create the controls for the basic click identifier pane. 
@@ -97,21 +106,23 @@ public class BasicIdentifierPaneFX implements ClassifyPaneFX {
 		mainHolderPane.setCenter(settingsPane=new ClickClassifierTable(clickClassifiers));
 		
 		clickTypeHolder=new PamBorderPane();
-		clickTypeHolder.setPrefWidth(hidingPaneWidth);
+		//clickTypeHolder.setPrefWidth(hidingPaneWidth);
 				
 		return mainHolderPane;
 		
 	}
 	
-	/**
-	 * Added purely so can be override and hiding pane set in different location if required
-	 */
-	public void createHidingPane(){
-		hidingPane=new HidingPane(Side.RIGHT, clickTypeHolder, mainPane, false);
-		//hidingPane.showHidePane(false);		
-		mainHolderPane.setRight(hidingPane);
-		hidingPane.showHidePane(false);
-	}
+//	/**
+//	 * Added purely so can be override and hiding pane set in different location if required
+//	 */
+//	public void createHidingPane(){
+//		hidingPane=new HidingPane(Side.RIGHT, clickTypeHolder, mainPane, false);
+//		//hidingPane.showHidePane(false);		
+//		mainHolderPane.setRight(hidingPane);
+//		hidingPane.showHidePane(false);
+//	}
+	
+
 
 	@Override
 	public Node getNode() {
@@ -192,14 +203,14 @@ public class BasicIdentifierPaneFX implements ClassifyPaneFX {
 		public Dialog<ClickTypeProperty> createSettingsDialog(ClickTypeProperty data) {
 			//we do not use dialogs here- sliding pane instead. 
 			setClassifierPane(data);
-			showHidingPane(true);		
+			showFlipPane(true);		
 			return null;
 		}
 		
 		@Override
 		public void editData(ClickTypeProperty data){
 			setClassifierPane(data);
-			showHidingPane(true);		
+			showFlipPane(true);		
 		}
 		
 		@Override
@@ -210,16 +221,31 @@ public class BasicIdentifierPaneFX implements ClassifyPaneFX {
 		
 	}
 	
+//	/**
+//	 * Show the hiding pane which contains classifier settings
+//	 * NOTE: needed to add this to stop a stack overflow error in BasicClickIdentifier 06/09/2016
+//	 * @param show - true to show pane. 
+//	 */
+//	public void showHidingPane(boolean show){
+//		if (hidingPane==null){
+//			this.createHidingPane();
+//		}
+//		hidingPane.showHidePane(true);		
+//	}
+	
 	/**
-	 * Show the hiding pane which contains classifier settings
+	 * Show the flip pane. 
 	 * NOTE: needed to add this to stop a stack overflow error in BasicClickIdentifier 06/09/2016
 	 * @param show - true to show pane. 
 	 */
-	public void showHidingPane(boolean show){
-		if (hidingPane==null){
-			this.createHidingPane();
+	public void showFlipPane(boolean show){
+		if (show) {
+			//System.out.println("Show flip pane: " + show);
+			flipPane.flipToBack();
 		}
-		hidingPane.showHidePane(true);		
+		else {
+			flipPane.flipToFront();
+		}
 	}
 	
 	/**
@@ -243,7 +269,9 @@ public class BasicIdentifierPaneFX implements ClassifyPaneFX {
 		
 		//now need to make sure on closing the pane that settings are saved. Need to 
 		//remove the old click type from the list and add new one in the same position. 
-		getHidingPaneCloseButton().setOnAction((action)->{
+		getFlipPaneCloseButton().setOnAction((action)->{
+			//System.out.println("CLOSE FLIP PANE");
+			showFlipPane(false);
 			//this should update the click type property in the observable list thus changing the table
 			clickTypePane.getParams(clickTypeProperty);
 		});
@@ -253,20 +281,20 @@ public class BasicIdentifierPaneFX implements ClassifyPaneFX {
 	 * Get the button which closes the hiding pane. 
 	 * @return button which closes the hiding pane. 
 	 */
-	public Button getHidingPaneCloseButton() {
-		return getClickTypeHidingPane().getHideButton();
+	public Button getFlipPaneCloseButton() {
+		return flipPane.getBackButton();
 	}
 
-	/**
-	 * Get the hiding pane which holds settings for different click types. 
-	 * @return the HidingPane for click classifiers. 
-	 */
-	public HidingPane getClickTypeHidingPane() {
-		if (hidingPane==null) {
-			this.createHidingPane();
-		}
-		return hidingPane;
-	}
+//	/**
+//	 * Get the hiding pane which holds settings for different click types. 
+//	 * @return the HidingPane for click classifiers. 
+//	 */
+//	public HidingPane getClickTypeHidingPane() {
+//		if (hidingPane==null) {
+//			this.createHidingPane();
+//		}
+//		return hidingPane;
+//	}
 
 	/**
 	 * Get the pane which holds the ClickTypePaneFX.
@@ -290,6 +318,15 @@ public class BasicIdentifierPaneFX implements ClassifyPaneFX {
 	 */
 	public ObservableList<ClickTypeProperty> getClickClassifiers() {
 		return clickClassifiers;
+	}
+
+
+	/**
+	 * Get the flip pane. One side shows the table, the other shows the currently selected classifier settings. 
+	 * @return the flip pane. 
+	 */
+	public PamFlipPane getFlipPane() {
+		return flipPane;
 	}
 
 }

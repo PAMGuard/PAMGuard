@@ -1,6 +1,8 @@
 package clickTrainDetector.classification.simplechi2classifier;
 
 import PamUtils.PamCalendar;
+import PamguardMVC.PamDataBlock;
+import PamguardMVC.dataSelector.DataSelector;
 import PamguardMVC.debug.Debug;
 import clickTrainDetector.CTDataUnit;
 import clickTrainDetector.ClickTrainControl;
@@ -32,10 +34,17 @@ public class Chi2ThresholdClassifier implements CTClassifier {
 	 */
 	private ClickTrainControl clickTrainControl;
 
+	
+	/**
+	 * Data selector for the chi2 threshold classifier. 
+	 */
+	private DataSelector dataSelector;
+
 
 	public Chi2ThresholdClassifier(ClickTrainControl clickTrainControl, int defaultSpeciesID) {
 		this.clickTrainControl=clickTrainControl; 
 		clssfrParams.speciesFlag=defaultSpeciesID; 
+		//createDataSelector(clickTrainControl.getParentDataBlock());
 	}
 
 	
@@ -65,8 +74,67 @@ public class Chi2ThresholdClassifier implements CTClassifier {
 			return new Chi2CTClassification(CTClassifier.NOSPECIES); //no classification
 		}
 		
+		if (!isPercClicks(clickTrain)) {
+//			Debug.out.println("Failed on chi2Threshold"); 
+			return new Chi2CTClassification(CTClassifier.NOSPECIES); //no classification
+		}
+		
+		
 		return new Chi2CTClassification(clssfrParams.speciesFlag);
 	}
+	
+	
+	/**
+	 * Check the percentage of clicks which are correctly classified by the data selector. 
+	 * @param clickTrain - the click train
+	 * @return true if the percentage critera is passed
+	 * 
+	 */
+	private boolean isPercClicks(CTDataUnit clickTrain) {
+			
+		//no point iterating through click if we do not need to. 
+		if (clssfrParams.minPercentage==0) return true;
+				
+		double count = 0; 
+		for (int i=0; i<clickTrain.getSubDetectionsCount(); i++) {
+			if (this.getDataSelector().scoreData(clickTrain.getSubDetection(i))>0) {
+				count = count+1.; 
+			}
+		}
+		
+		if (count/clickTrain.getSubDetectionsCount()>=clssfrParams.minPercentage) {
+			return true;	
+		}
+		else {
+			return false;
+		}
+	}
+
+
+
+	/**
+	 * Get the data selector. 
+	 * @param source - the source data block 
+	 * @return the data selector.
+	 */
+	public void createDataSelector(PamDataBlock<?> source) {
+		//System.out.println("Create data selector " +" " + clssfrParams.classifierName + "  " + clssfrParams.speciesFlag + " " + clssfrParams.uniqueID ); 
+		
+
+		if (dataSelector==null || dataSelector.getPamDataBlock()!=source) {
+			//create the data selector
+			//System.out.println("Data selector: " + dataSelector); 
+			if (source!=null) {
+				
+				dataSelector=source.getDataSelectCreator().getDataSelector(clickTrainControl.getUnitName() +  "_" + clssfrParams.getUniqueID()
+						+ "_X2_threshold_classifier", false, null);
+			}
+			else {
+				dataSelector=null; 
+			}
+		}
+	}
+	
 
 	@Override
 	public String getName() {
@@ -122,7 +190,6 @@ public class Chi2ThresholdClassifier implements CTClassifier {
 	public void setParams(Chi2ThresholdParams clssfrParams) {
 		//System.out.println("HELLO CLASSIFIER PARAMS: " + clssfrParams.chi2Threahold );
 		this.clssfrParams=clssfrParams;
-
 	}
 
 	/**
@@ -135,13 +202,18 @@ public class Chi2ThresholdClassifier implements CTClassifier {
 
 	@Override
 	public void setParams(CTClassifierParams ctClassifierParams) {
-		// TODO Auto-generated method stub
 		this.clssfrParams=(Chi2ThresholdParams) ctClassifierParams;
 	}
 
 	@Override
 	public int getSpeciesID() {
 		return this.clssfrParams.speciesFlag;
+	}
+
+
+	public DataSelector getDataSelector() {
+		createDataSelector(clickTrainControl.getParentDataBlock());
+		return dataSelector;
 	}
 
 

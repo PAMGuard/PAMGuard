@@ -6,6 +6,7 @@ import PamUtils.PamUtils;
 import PamUtils.complex.ComplexArray;
 import PamguardMVC.DataUnit2D;
 import PamguardMVC.PamDataUnit;
+import PamguardMVC.RawDataHolder;
 import PamguardMVC.debug.Debug;
 import clickDetector.ClickDetection;
 import detectionPlotFX.layout.DetectionPlotDisplay;
@@ -211,16 +212,40 @@ public class WaterfallSpecPlot<D extends DetectionGroupDataUnit> extends RawFFTP
 	 */
 	public DataUnit2D getFFTdata(PamDataUnit dataUnit, int fftLen, int channel) {
 		//data units will be clicks 
-		if (dataUnit instanceof ClickDetection) {
-			ComplexArray fftData  = ((ClickDetection) dataUnit).getComplexSpectrum(channel, fftLen); 
-
-			SimpleFFTDataUnit fftDataUnit = new SimpleFFTDataUnit(dataUnit.getTimeMilliseconds(), 
-					PamUtils.makeChannelMap(channel), dataUnit.getStartSample(), 
-					fftLen, fftData, 0, dataUnit.getParentDataBlock().getSampleRate()); 
-
-			return fftDataUnit; 
+		ComplexArray fftData;
+		if (dataUnit instanceof RawDataHolder) {
+			 fftData  = ((RawDataHolder) dataUnit).getDataTransforms().getComplexSpectrum(channel, fftLen); 
 		}
-		return null; 
+		else {
+			//used for example, in CPOD data. 
+			double[] realData =  new double[fftLen/2];
+			double[] imagData = new double[fftLen/2]; //no phase info for this - just keep it all zeros. 
+			
+			//if there is no FFT data then just use the frequency limits.
+					 
+				double amplitudebin = dataUnit.getAmplitudeDB()/(dataUnit.getFrequency()[1]-dataUnit.getFrequency()[0]); 
+
+				double minFreqBin;
+				double maxFreqBin;
+				for (int i= 0; i <realData.length; i++) {
+					minFreqBin = (i/(double) realData.length)*(dataUnit.getParentDataBlock().getSampleRate()/2); 
+					maxFreqBin = (i/(double) realData.length)*(dataUnit.getParentDataBlock().getSampleRate()/2); 
+
+					if (minFreqBin > dataUnit.getFrequency()[0] && maxFreqBin<=dataUnit.getFrequency()[1]) {
+						realData[i]+=amplitudebin;
+						
+						//System.out.println("real data amplitude bin: " + realData[i]); 
+					}
+				}
+				
+				 fftData  = new ComplexArray(realData, imagData); 
+
+		}
+		
+		SimpleFFTDataUnit fftDataUnit = new SimpleFFTDataUnit(dataUnit.getTimeMilliseconds(), 
+				PamUtils.makeChannelMap(channel), dataUnit.getStartSample(), 
+				fftLen, fftData, 0, dataUnit.getParentDataBlock().getSampleRate()); 
+		return fftDataUnit; 
 	}
 
 	@Override

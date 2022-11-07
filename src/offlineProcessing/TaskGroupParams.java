@@ -33,7 +33,7 @@ public class TaskGroupParams implements Cloneable, Serializable, ManagedParamete
 	static public final int PROCESS_NEW = 2;
 	
 	/**
-	 * Time of the last bit of data to be processed. 
+	 * Time of the last section of data to be processed. 
 	 */
 	public long lastDataTime;
 	
@@ -90,6 +90,11 @@ public class TaskGroupParams implements Cloneable, Serializable, ManagedParamete
 	 * An array of time chunks in millis. 
 	 */
 	public ArrayList<long[]> timeChunks;
+	
+	/**
+	 * Note which will get written to the database of completed tasks. 
+	 */
+	public String taskNote;
 	
 	/**
 	 * Set the selection state of a particular task. 

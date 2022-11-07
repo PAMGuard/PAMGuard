@@ -34,6 +34,8 @@ public class ExtensionSocketStructure extends StandardConnectionNode implements 
 	 * The colour of the extension socket body
 	 */
 	private static  Color bodyColour = Color.DODGERBLUE;
+
+	protected Shape circle;
 	
 	/**
 	 * Extension structure construction. 
@@ -69,7 +71,7 @@ public class ExtensionSocketStructure extends StandardConnectionNode implements 
 	@Override
 	public ConnectionNodeBody createNodeBody() {
 		
-		Circle circle  =  new Circle(DEFAULT_BODY_WIDTH/2,DEFAULT_BODY_WIDTH/2, DEFAULT_BODY_WIDTH/2);
+		circle  =  new Circle(DEFAULT_BODY_WIDTH/2,DEFAULT_BODY_WIDTH/2, DEFAULT_BODY_WIDTH/2);
 		circle.setFill(bodyColour);
 		
 		ConnectionNodeBody connectionNodeBody = new ConnectionNodeBody(this); 
@@ -78,7 +80,6 @@ public class ExtensionSocketStructure extends StandardConnectionNode implements 
 				new BackgroundFill(Color.TRANSPARENT,CornerRadii.EMPTY,Insets.EMPTY)));
 		
 		connectionNodeBody.getChildren().add(circle); 
-		
 		
 		connectionNodeBody.setPrefHeight(DEFAULT_BODY_WIDTH);
 		connectionNodeBody.setPrefWidth(DEFAULT_BODY_WIDTH);

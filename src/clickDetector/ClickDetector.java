@@ -374,7 +374,7 @@ public class ClickDetector extends PamProcess {
 	 * @see PamguardMVC.PamProcess#SetupProcess()
 	 */
 	@Override
-	public void setupProcess() {
+	public synchronized void setupProcess() {
 
 		pauseDetection = true;
 

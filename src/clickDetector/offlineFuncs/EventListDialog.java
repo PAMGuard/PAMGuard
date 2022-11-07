@@ -175,9 +175,19 @@ public class EventListDialog extends PamDialog {
 		JPopupMenu menu = new JPopupMenu();
 		JMenuItem menuItem;
 		int evNo = event.getDatabaseIndex();
-		menuItem = new JMenuItem(String.format("Goto event %d ...", evNo));
-		menuItem.addActionListener(new GotoEvent(event));
-		menu.add(menuItem);
+		int[] beforeTimes = {0, 10, 60};
+		for (int i = 0; i < beforeTimes.length; i++) {
+			String title;
+			if (beforeTimes[i] == 0) {
+				title = String.format("Goto event %d ...", evNo);
+			}
+			else {
+				title = String.format("Goto %ds before event %d ...", beforeTimes[i], evNo);
+			}
+			menuItem = new JMenuItem(title);
+			menuItem.addActionListener(new GotoEvent(event, beforeTimes[i]));
+			menu.add(menuItem);
+		}
 		menuItem = new JMenuItem(String.format("Edit event %d ...", evNo));
 		menuItem.addActionListener(new EditEvent(event));
 		menu.add(menuItem);
@@ -219,14 +229,16 @@ public class EventListDialog extends PamDialog {
 	private class GotoEvent implements ActionListener {
 		
 		private OfflineEventDataUnit event;
+		private int beforeTime;
 
-		public GotoEvent(OfflineEventDataUnit event) {
+		public GotoEvent(OfflineEventDataUnit event, int beforeTime) {
 			this.event = event;
+			this.beforeTime = beforeTime;
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			clickControl.gotoEvent(event);
+			clickControl.gotoEvent(event, beforeTime);
 		}
 		
 	}

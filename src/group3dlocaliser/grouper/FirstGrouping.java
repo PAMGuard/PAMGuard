@@ -24,6 +24,8 @@ public class FirstGrouping {
 	private long veryLastSample;
 	
 	private int[] groupCount;
+	
+	private int lastChannelGroup;
 
 	public FirstGrouping(int nChannelGroups, int channelGroup, PamDataUnit pamDataUnit) {
 		this.nChannelGroups = nChannelGroups;
@@ -44,6 +46,7 @@ public class FirstGrouping {
 			lastSamples[channelGroup] += pamDataUnit.getSampleDuration();
 		}
 		veryLastSample = Math.max(veryLastSample, lastSamples[channelGroup]);
+		lastChannelGroup = channelGroup;
 	}
 
 //	/**
@@ -90,6 +93,13 @@ public class FirstGrouping {
 	 */
 	public List<PamDataUnit> getDataUnits() {
 		return dataUnits;
+	}
+
+	/**
+	 * @return the lastChannelGroup
+	 */
+	public int getLastChannelGroup() {
+		return lastChannelGroup;
 	}
 
 }

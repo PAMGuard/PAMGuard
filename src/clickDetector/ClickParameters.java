@@ -106,7 +106,10 @@ public class ClickParameters implements Serializable, Cloneable, ManagedParamete
 	 */
 	public int backgroundIntervalMillis = 5000;
 	
-	public int clickClassifierType = ClickClassifierManager.CLASSIFY_BASIC;
+	/**
+	 * The type of classifier to use - CLASSIFY_SWEEP is the default. 
+	 */
+	public int clickClassifierType = ClickClassifierManager.CLASSIFY_BETTER;
 	
 	public boolean runEchoOnline = false;
 	

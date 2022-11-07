@@ -12,6 +12,7 @@ import PamUtils.PamCalendar;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.debug.Debug;
 import clickTrainDetector.ClickTrainControl;
+import clickTrainDetector.ClickTrainDataBlock;
 import clickTrainDetector.TempCTDataUnit;
 import clickTrainDetector.CTDataUnit;
 import clickTrainDetector.clickTrainAlgorithms.CTAlgorithmInfo;
@@ -217,6 +218,25 @@ public class MHTClickTrainAlgorithm implements ClickTrainAlgorithm, PamSettings 
 			}
 		}
 	}
+	
+	
+	/**
+	 * Check for garbage collection based on the current time. This is used when, for example, no click are detected for a 
+	 * long period. 
+	 * @param timeMillis - the time in millis
+	 * @param mhtAlgorithm - the channel based MHTAlgorithm.
+	 */
+	private void checkCTGarbageCollect(long timeMillis, MHTAlgorithm mhtAlgorithm) {
+			boolean isGarbage = this.mhtGarbageBot.checkCTGarbageCollect(timeMillis, mhtAlgorithm.getMHTKernal()); 
+			if (isGarbage) {
+				//grab tracks
+				mhtAlgorithm.getMHTKernal().confirmRemainingTracks();
+				grabDoneTrains(mhtAlgorithm); 
+				//reset the kernel; 
+				mhtAlgorithm.getMHTKernal().clearKernel(); 
+		}
+	}
+
 
 //	/**
 //	 * Get the interval between the new unit and the last unit. 
@@ -268,16 +288,19 @@ public class MHTClickTrainAlgorithm implements ClickTrainAlgorithm, PamSettings 
 	 */
 	private synchronized void grabUnconfirmedTrains(MHTAlgorithm mhtAlgorithm) {
 		
-		ListIterator<TempCTDataUnit> iterator  = clickTrainControl.getClickTrainProcess().getUnconfirmedCTDataBlock().getListIterator(0);
-		
-		//clear the data block
-		TempCTDataUnit tempCTUnit;
-		while (iterator.hasNext()) {
-			tempCTUnit = iterator.next(); 
-			tempCTUnit.removeAllSubDetections();
-			tempCTUnit.clearSubdetectionsRemoved();
+		ClickTrainDataBlock<TempCTDataUnit> unconfirmedBlock = clickTrainControl.getClickTrainProcess().getUnconfirmedCTDataBlock();
+		synchronized (unconfirmedBlock.getSynchLock()) {
+			ListIterator<TempCTDataUnit> iterator  = unconfirmedBlock.getListIterator(0);
+
+			//clear the data block
+			TempCTDataUnit tempCTUnit;
+			while (iterator.hasNext()) {
+				tempCTUnit = iterator.next(); 
+				tempCTUnit.removeAllSubDetections();
+				tempCTUnit.clearSubdetectionsRemoved();
+			}
+			unconfirmedBlock.clearAll(); 
 		}
-		clickTrainControl.getClickTrainProcess().getUnconfirmedCTDataBlock().clearAll(); 
 		
 		if (mhtAlgorithm.mhtKernal.getActiveTracks()==null) return;
 		
@@ -396,7 +419,7 @@ public class MHTClickTrainAlgorithm implements ClickTrainAlgorithm, PamSettings 
 	 * Update the algorithm
 	 * @param flag- flag indicating the update type. 
 	 */
-	public void update(int flag) {
+	public void update(int flag, Object info) {
 
 		switch (flag) {
 		case ClickTrainControl.PROCESSING_START:
@@ -437,9 +460,15 @@ public class MHTClickTrainAlgorithm implements ClickTrainAlgorithm, PamSettings 
 		case ClickTrainControl.NEW_PARAMS:
 			setupAlgorithm(); 
 			break;
+		case ClickTrainControl.CLOCK_UPDATE:
+			for (int i=0; i<this.mHTAlgorithms.size(); i++) {
+				checkCTGarbageCollect((Long) info,  mHTAlgorithms.get(i)); 
+			}
+			break;
 		}
 
 	}
+
 
 	/**
 	 * Set up the algorithm. 
@@ -547,13 +576,12 @@ public class MHTClickTrainAlgorithm implements ClickTrainAlgorithm, PamSettings 
 		 */
 		public void printSettings() {
 
-			System.out.println("/********MHT PARAMS*******/");
-
-			pamMHTChi2.printSettings();
-
-			mhtKernal.getMHTParams().printSettings();
-
-			System.out.println("/*************************/");
+			Debug.out.println("/********MHT PARAMS*******/");
+			if (Debug.isPrintDebug()) {
+				pamMHTChi2.printSettings();
+				mhtKernal.getMHTParams().printSettings();
+			}
+			Debug.out.println("/*************************/");
 
 			//			//MHT kernel params
 			//			System.out.println("npruneback: " + mhtKernal.getMHTParams().nPruneback); 

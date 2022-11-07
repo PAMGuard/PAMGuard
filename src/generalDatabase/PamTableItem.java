@@ -426,7 +426,11 @@ public class PamTableItem implements Cloneable {
 		return (Double) value;
 	}
 	
-	
+	/**
+	 * Get a float value, being aware that some DBMS may have
+	 * decided to store as a Double anyway. Return Float.NaN for null data
+	 * @return float value or NaN
+	 */
 	public float getFloatValue() {
 		if (value == null) {
 			return Float.NaN;

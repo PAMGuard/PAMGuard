@@ -86,11 +86,11 @@ public class CorrelationAdvMHTPane extends AdvMHTVarPane {
 
 		CorrelationChi2Params newParams = new CorrelationChi2Params(super.getParams(currParams));
 
-		System.out.println("GETPARAMS:fftFilterParams_OLD HIGHPASS: " + newParams.fftFilterParams.highPassFreq);
+		//System.out.println("GETPARAMS:fftFilterParams_OLD HIGHPASS: " + newParams.fftFilterParams.highPassFreq);
 
 		newParams.fftFilterParams=filterPane.getParams(newParams.fftFilterParams); 
 
-		System.out.println("GETPARAMS:fftFilterParams_NEW HIGHPASS: " + newParams.fftFilterParams.highPassFreq);
+		//System.out.println("GETPARAMS:fftFilterParams_NEW HIGHPASS: " + newParams.fftFilterParams.highPassFreq);
 
 		newParams.useFilter=this.useFilterBox.isSelected();
 

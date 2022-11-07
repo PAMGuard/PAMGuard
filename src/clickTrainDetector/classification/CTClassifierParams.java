@@ -1,6 +1,7 @@
 package clickTrainDetector.classification;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
@@ -20,10 +21,22 @@ public class CTClassifierParams implements Cloneable, Serializable, ManagedParam
 	private static final long serialVersionUID = 1L;
 	
 	
+	public CTClassifierParams() {
+		//this.uniqueID = UUID.randomUUID().toString();
+		//System.out.println("Create classifier params: " + uniqueID); 
+	}
+	
+	
 	/**
-	 * A very simple species flag to indicate what classifier was used. 0 means not classified. 
+	 * The name of the classifier. 
 	 */
 	public String classifierName = ""; 
+	
+	
+	/**
+	 * A unique ID for the classifier that never changes. This is important for accessing data selectors. 
+	 */
+	private String uniqueID =  UUID.randomUUID().toString();
 	
 	
 	/**
@@ -32,9 +45,16 @@ public class CTClassifierParams implements Cloneable, Serializable, ManagedParam
 	public int speciesFlag = 1; 
 	
 	/**
-	 * Easy way to know which classifier the parameter class belong to rather than big instancof statement
+	 * Easy way to know which classifier the parameter class belong to rather than big instance of statement
 	 */
 	public CTClassifierType type; 
+	
+	/**
+	 * Create a new unique string identifier - USE WITH CAUTION as the unique ID is used to identify data selectors. 
+	 */
+	public void newUniqueID() {
+		this.uniqueID =  UUID.randomUUID().toString();
+	};
 	
 	public CTClassifierParams clone() {
 		try {
@@ -50,6 +70,23 @@ public class CTClassifierParams implements Cloneable, Serializable, ManagedParam
 	public PamParameterSet getParameterSet() {
 		PamParameterSet ps = PamParameterSet.autoGenerate(this);
 		return ps;
+	}
+
+	/**
+	 * @return the uniqueID
+	 */
+	public String getUniqueID() {
+		if (uniqueID == null) {
+			uniqueID =  UUID.randomUUID().toString();
+		}
+		return uniqueID;
+	}
+
+	/**
+	 * @param uniqueID the uniqueID to set
+	 */
+	public void setUniqueID(String uniqueID) {
+		this.uniqueID = uniqueID;
 	}
 
 }

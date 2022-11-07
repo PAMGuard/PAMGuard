@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.controlsfx.control.PopOver;
 
+import PamController.FlipSettingsPane;
 import PamController.SettingsPane;
 import PamDetection.RawDataUnit;
 import PamView.dialog.warn.WarnOnce;
@@ -14,10 +15,10 @@ import clipgenerator.ClipDataUnit;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.PopupControl;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.Alert.AlertType;
@@ -49,6 +50,8 @@ import warnings.PamWarning;
 public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 
 
+	public static double MAX_WIDTH = 270; 
+	
 	/**
 	 * The source for the FFT data source.  
 	 */
@@ -109,6 +112,12 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 	 */
 	private HBox dataSelectorPane;
 
+	private Label infoLabel;
+
+	private Object flipPane;
+
+	private PopupControl advLabel;
+
 	public RawDLSettingsPane(DLControl dlControl){
 		super(null); 
 		this.dlControl=dlControl; 
@@ -126,8 +135,10 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 		mainPane.setCenter(createDLPane());
 		mainPane.setPadding(new Insets(5,5,5,5));
 		mainPane.setMinHeight(400);
-		mainPane.setMaxWidth(250);
-		mainPane.setPrefWidth(250);
+		mainPane.setMaxWidth(MAX_WIDTH);
+		mainPane.setPrefWidth(MAX_WIDTH);
+		//this.getAdvPane().setMaxWidth(MAX_WIDTH);
+		
 
 		//mainPane.getStylesheets().add(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getDialogCSS()); 
 
@@ -170,17 +181,20 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 		vBox.getChildren().add(label);
 
 		windowLength = new PamSpinner<Integer>(0, Integer.MAX_VALUE, 10,  10000); 
-		windowLength.setPrefWidth(100);
 		windowLength.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 		windowLength.setEditable(true);
+		windowLength.valueProperty().addListener((obsVal, oldVal, newVal)->{
+			setSegInfoLabel(); 
+		});
 
 		hopLength =    new PamSpinner<Integer>(0, Integer.MAX_VALUE, 10,  10000); 
-		hopLength.setPrefWidth(100);
 		hopLength.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 		hopLength.setEditable(true);
-
+		hopLength.valueProperty().addListener((obsVal, oldVal, newVal)->{
+			setSegInfoLabel(); 
+		});
+		
 		reMergeSeg =    new PamSpinner<Integer>(0, Integer.MAX_VALUE, 1,  1); 
-		reMergeSeg.setPrefWidth(100);
 		reMergeSeg.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 		reMergeSeg.setEditable(true);
 
@@ -208,6 +222,9 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 		segmenterGridPane.add(new Label("segments"), 2, 2);
 
 		vBox.getChildren().add(segmenterGridPane);
+		
+		vBox.getChildren().add(infoLabel = new Label());
+
 
 		Label label2 = new Label("Deep Learning Model"); 
 		label2.setPadding(new Insets(5,0,0,0));
@@ -242,7 +259,7 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 
 		return vBox; 
 	}
-	
+
 	
 	/**
 	 * Create the data selector. 
@@ -267,6 +284,23 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 		return dataSelectorPane; 
 	}
 	
+	/**
+	 * Set extra information in the info label. 
+	 */
+	private void setSegInfoLabel() {
+		String text; 
+		if (sourcePane.getSource()==null) {
+			text = String.format("Window - s Hop: - s (no source data)"); 
+		}
+		else {
+			float sR =  sourcePane.getSource().getSampleRate(); 
+			double windowLenS = windowLength.getValue()/sR;
+			double hopLengthS = hopLength.getValue()/sR;
+
+			text = String.format("Window %.3f s Hop: %.3f s", windowLenS, hopLengthS); 
+		}
+		infoLabel.setText(text);
+	}
 	
 	/**
 	 * Creates pane allowing the user to change fine scale things such as error limits. 
@@ -442,6 +476,8 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 		setClassifierPane(); 
 		
 		enableControls(); 
+		
+		setSegInfoLabel();
 
 	}
 
@@ -453,7 +489,7 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 
 
 	@Override
-	public Node getContentNode() {
+	public Pane getContentNode() {
 		return mainPane;
 	}
 
@@ -470,5 +506,7 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 	public PamDataBlock getSelectedParentDataBlock() {
 		return sourcePane.getSource();
 	}
+
+
 
 }

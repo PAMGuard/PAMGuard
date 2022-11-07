@@ -20,7 +20,7 @@ import rawDeepLearningClassifier.dlClassification.DLClassName;
 
 
 /*
- * Symbol Options for the annotaion pane
+ * Symbol Options for the annotation pane
  */
 public class DLSymbolOptionPane extends StandardSymbolModifierPane {
 	
@@ -55,11 +55,8 @@ public class DLSymbolOptionPane extends StandardSymbolModifierPane {
 		this.setBottom(createProbPane());
 		this.dlSymbolModifier = (DLSymbolModifier) symbolModifer; 
 		initialised=true; 
-
 	}
-	
-	
-	
+
 	private Pane createProbPane() {
 				
 		PamVBox holder = new PamVBox(); 

@@ -304,7 +304,7 @@ public class SimProcess extends DaqSystem implements PamSettings {
 			/* simulate the noise, need to divide fs by 2 to only generate for 0 to Nyquist to get correct values out.
 			 * that match the results of the noise band monitor modules.  
 			 */
-			double dbNse = simParameters.backgroundNoise + 10*Math.log10(getSampleRate()/2);
+			double dbNse = simParameters.backgroundNoise + 10*Math.log10(getSampleRate()/2.);
 			nse = daqControl.getDaqProcess().dbMicropascalToSignal(i, dbNse);
 			generateNoise(channelData, nse);
 //			generateNoiseQuickly(channelData, nse, i);

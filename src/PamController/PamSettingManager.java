@@ -1,19 +1,19 @@
 /*	PAMGUARD - Passive Acoustic Monitoring GUARDianship.
- * To assist in the Detection Classification and Localisation 
+ * To assist in the Detection Classification and Localisation
  * of marine mammals (cetaceans).
- *  
- * Copyright (C) 2006 
- * 
+ *
+ * Copyright (C) 2006
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 3
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -33,13 +33,8 @@ import java.io.IOException;
 import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.OutputStream;
-import java.io.Writer;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -47,11 +42,6 @@ import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 
-import GPS.GPSParameters;
-import GPS.UpdateClockDialog;
-import binaryFileStorage.BinaryStoreSettings;
-import offlineProcessing.OfflineProcessingControlledUnit;
-import offlineProcessing.OfflineProcessingProcess;
 import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
 import pamViewFX.fxSettingsPanes.SettingsFileDialogFX;
 
@@ -110,10 +100,10 @@ import amplifier.AmpParameters;
 
 /**
  * @author Doug Gillespie
- * 
+ *
  * Singleton class for managing Pam settings - where and how they are stored in
  * a persistent way between runs.
- * 
+ *
  * Any class that wants is settings saved should register with the
  * PamSettingsManager.
  * <p>
@@ -132,8 +122,8 @@ import amplifier.AmpParameters;
  * type and settings version. Once one is found, it is given the reference to
  * the settings data which t is responsible for casting into whatever class it
  * requires.
- * 
- * 
+ *
+ *
  */
 public class PamSettingManager {
 
@@ -145,34 +135,34 @@ public class PamSettingManager {
 
 	/**
 	 * List of modules that have / want PAMGUARD Settings
-	 * which get stored in the psf file and / or the database store. 
+	 * which get stored in the psf file and / or the database store.
 	 */
 	private ArrayList<PamSettings> owners;
 
 	/**
 	 * List of modules that specifically use settings from the database
-	 * storage. 
+	 * storage.
 	 */
 	private ArrayList<PamSettings> databaseOwners;
 
 	/**
 	 * List of modules that are stored globally on the PC
-	 * with a single common psf type file. 
+	 * with a single common psf type file.
 	 */
 	private ArrayList<PamSettings> globalOwners;
 
 	private ArrayList<PamControlledUnitSettings> globalSettings;
 
 	/**
-	 * List of settings used by 'normal' modules. 
+	 * List of settings used by 'normal' modules.
 	 */
 	private ArrayList<PamControlledUnitSettings> initialSettingsList;
 
 	/**
-	 * List of settings used specifically by databases. 
+	 * List of settings used specifically by databases.
 	 * This list never get's stored anywhere, but is just held
-	 * in memory so that the database identified at startup in 
-	 * viewer and mixed modes gets reloaded later on . 
+	 * in memory so that the database identified at startup in
+	 * viewer and mixed modes gets reloaded later on .
 	 */
 	private ArrayList<PamControlledUnitSettings> databaseSettingsList;
 
@@ -182,7 +172,7 @@ public class PamSettingManager {
 	static public final String fileEndx = "psfx";
 	static public final String fileEndXML = "psfxml";
 	private static boolean saveAsPSFX = true;
-	
+
 	static public String getCurrentSettingsFileEnd() {
 		if (saveAsPSFX) {
 			return fileEndx;
@@ -193,7 +183,7 @@ public class PamSettingManager {
 	}
 
 	/**
-	 * Name of the file that contains a list of recent psf files. 
+	 * Name of the file that contains a list of recent psf files.
 	 */
 	transient private final String settingsListFileName = "PamSettingsFilesUID";
 
@@ -216,13 +206,13 @@ public class PamSettingManager {
 	public static final int LIST_UNITS = 0x1;
 
 	/**
-	 * Identifier for modules which are part of the database system. 
+	 * Identifier for modules which are part of the database system.
 	 */
 	public static final int LIST_DATABASESTUFF = 0x2;
 
 	/**
-	 * Stuff which is global to the computer system (at the user level). 
-	 * Invented for colour settings, might extend to other things too. 
+	 * Stuff which is global to the computer system (at the user level).
+	 * Invented for colour settings, might extend to other things too.
 	 */
 	public static final int LIST_SYSTEMGLOBAL = 0x4;
 
@@ -231,7 +221,7 @@ public class PamSettingManager {
 	 */
 	static private final int SAVE_PSF = 0x1;
 	/**
-	 * Save settings to database tables (if available). 
+	 * Save settings to database tables (if available).
 	 */
 	static private final int SAVE_DATABASE = 0x2;
 
@@ -253,7 +243,7 @@ public class PamSettingManager {
 	private boolean programStart = true;
 
 	private SettingsFileData settingsFileData;
-	
+
 
 	private PamSettingManager() {
 		owners = new ArrayList<PamSettings>();
@@ -284,9 +274,9 @@ public class PamSettingManager {
 	 * Flag to indicate that initialisation of PAMGUARD has completed.
 	 */
 	private boolean initializationComplete = false;
-	
+
 	/**
-	 * Called everytime anything in the model changes. 
+	 * Called everytime anything in the model changes.
 	 * @param changeType type of change
 	 */
 	public void notifyModelChanged(int changeType) {
@@ -296,14 +286,14 @@ public class PamSettingManager {
 	}
 
 	/**
-	 * Register a PAMGAURD module that wants to store settings in a 
+	 * Register a PAMGAURD module that wants to store settings in a
 	 * serialised file (.psf file) and / or have those settings stored
-	 * in the database settings table. 
-	 * <p>Normally, all modules will 
+	 * in the database settings table.
+	 * <p>Normally, all modules will
 	 * call this for at least one set of settings. Often the PamSettings
-	 * is implemented by the class that extends PamControlledunit, but 
+	 * is implemented by the class that extends PamControlledunit, but
 	 * it's also possible to have multiple sub modules, processes or displays
-	 * implemnt PamSettings so that different settings for different bits of 
+	 * implemnt PamSettings so that different settings for different bits of
 	 * a PamControlledUnit are stored separately.
 	 * @see PamSettings
 	 * @see PamControlledUnit
@@ -316,15 +306,15 @@ public class PamSettingManager {
 	}
 
 	/**
-	 * Register modules that have settings information that 
-	 * should be stored in serialised form in 
-	 * psf files and database Pamguard_Settings tables. 
+	 * Register modules that have settings information that
+	 * should be stored in serialised form in
+	 * psf files and database Pamguard_Settings tables.
 	 * @param pamUnit Unit containing the settings
 	 * @param whichLists which lists to store the settings in. <p>
-	 * N.B. These are internal lists and not the external storage. Basically 
+	 * N.B. These are internal lists and not the external storage. Basically
 	 * any database modules connected with settings should to in LIST_DATABASESTUFF
-	 * everything else (including the normal database) should go to LISTS_UNITS 
-	 * @return true if settings registered sucessfully. 
+	 * everything else (including the normal database) should go to LISTS_UNITS
+	 * @return true if settings registered sucessfully.
 	 */
 	public boolean registerSettings(PamSettings pamUnit, int whichLists) {
 
@@ -352,10 +342,10 @@ public class PamSettingManager {
 	}
 
 	/**
-	 * Find settings for a particular user in one or more lists. 
-	 * @param user PamSettings user. 
-	 * @param whichLists lists to search 
-	 * @return settings object. 
+	 * Find settings for a particular user in one or more lists.
+	 * @param user PamSettings user.
+	 * @param whichLists lists to search
+	 * @return settings object.
 	 */
 	private PamControlledUnitSettings findSettings(PamSettings user, int whichLists) {
 		PamControlledUnitSettings settings = null;
@@ -383,18 +373,18 @@ public class PamSettingManager {
 	}
 	/**
 	 * Find settings in a list of settings, ignoring settings which have
-	 * already been used by a module. 
+	 * already been used by a module.
 	 * @param settingsList settings list
-	 * @param usedSettings list of settings that have already been used. 
-	 * @param user module that uses the settings. 
-	 * @return Settings object. 
+	 * @param usedSettings list of settings that have already been used.
+	 * @param user module that uses the settings.
+	 * @return Settings object.
 	 */
-	private PamControlledUnitSettings findSettings(ArrayList<PamControlledUnitSettings> settingsList, 
+	private PamControlledUnitSettings findSettings(ArrayList<PamControlledUnitSettings> settingsList,
 			boolean[] usedSettings,	PamSettings user) {
 		if (settingsList == null) return null;
 		// go through the list and see if any match this module. Avoid repeats.
 		for (int i = 0; i < settingsList.size(); i++) {
-			if (usedSettings != null && usedSettings[i]) continue; 
+			if (usedSettings != null && usedSettings[i]) continue;
 			if (isSettingsUnit(user, settingsList.get(i))) {
 				if (usedSettings != null) {
 					usedSettings[i] = true;
@@ -403,10 +393,10 @@ public class PamSettingManager {
 			}
 		}
 		/*
-		 * To improve complex module loading where settings may be saved by multiple sub-modules, in 
+		 * To improve complex module loading where settings may be saved by multiple sub-modules, in
 		 * July 2015 many modules which had fixed settings had their settings names and types changed !
 		 * Therefore these modules won't have found their settings on the first go, so need to also check
-		 * against the alternate names defined for each class. 
+		 * against the alternate names defined for each class.
 		 * It should be possible to work out from the settingsUser.Class what changes may have been made !
 		 */
 		SettingsNameChange otherName = SettingsNameChanger.getInstance().findNameChange(user);
@@ -414,7 +404,7 @@ public class PamSettingManager {
 			return null;
 		}
 		for (int i = 0; i < settingsList.size(); i++) {
-			if (usedSettings != null && usedSettings[i]) continue; 
+			if (usedSettings != null && usedSettings[i]) continue;
 			if (isSettingsUnit(otherName, settingsList.get(i))) {
 				if (usedSettings != null) {
 					usedSettings[i] = true;
@@ -429,7 +419,7 @@ public class PamSettingManager {
 
 	/**
 	 * Searches a list of settings for settings with a
-	 * specific type. 
+	 * specific type.
 	 * @param unitType
 	 * @return PamControlledUnitSettings or null if none found
 	 * @see PamControlledUnitSettings
@@ -447,8 +437,8 @@ public class PamSettingManager {
 	}
 
 	/**
-	 * Find settings in a list of settings by name and by type. 
-	 * @param settingsList settings list to search 
+	 * Find settings in a list of settings by name and by type.
+	 * @param settingsList settings list to search
 	 * @param unitType unit name
 	 * @param unitName unit type
 	 * @return settings object
@@ -478,11 +468,11 @@ public class PamSettingManager {
 	}
 
 	/**
-	 * Find a settings owner for a type, name and class. 
+	 * Find a settings owner for a type, name and class.
 	 * @param unitType unit Type
 	 * @param unitName unit Name
 	 * @param unitClass unit Class
-	 * @return Settings owner or null. 
+	 * @return Settings owner or null.
 	 */
 	public PamSettings findSettingsOwner(String unitType, String unitName, String unitClassName) {
 		for (PamSettings owner:owners) {
@@ -501,8 +491,8 @@ public class PamSettingManager {
 
 	/**
 	 * Call just before PAMGUARD exits to save the settings
-	 * either to psf and / or database tables. 
-	 * @return true if settings saved sucessfully. 
+	 * either to psf and / or database tables.
+	 * @return true if settings saved sucessfully.
 	 */
 	public boolean saveFinalSettings() {
 		int runMode = PamController.getInstance().getRunMode();
@@ -521,9 +511,9 @@ public class PamSettingManager {
 	}
 
 	/**
-	 * Save settings to a psf file and / or the database tables. 
+	 * Save settings to a psf file and / or the database tables.
 	 * @param saveWhere
-	 * @return true if sucessful 
+	 * @return true if sucessful
 	 */
 	public boolean saveSettings(int saveWhere) {
 
@@ -546,12 +536,12 @@ public class PamSettingManager {
 						"This could occur if the psf file location is in a read-only folder, or the filename is " +
 						"invalid.  Please check and try again.";
 				String help = null;
-				int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help);
+				int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help);
 			}
 		}
 		/**
 		 * Always save the settings file data (list of recent files) since it includes
-		 * static information such as whether to show day tips. 
+		 * static information such as whether to show day tips.
 		 */
 		saveSettingsFileData();
 
@@ -569,8 +559,8 @@ public class PamSettingManager {
 	}
 
 	/**
-	 * Save configuration settings to the default (most recently used) psf file. 
-	 * @return true if successful. 
+	 * Save configuration settings to the default (most recently used) psf file.
+	 * @return true if successful.
 	 */
 	public boolean saveSettingsToFile(String fileName) {
 		if (saveAsPSFX) {
@@ -596,7 +586,7 @@ public class PamSettingManager {
 		ObjectOutputStream outStream = openOutputFile(setFile.getAbsolutePath());
 
 		for (PamSettings gs:globalOwners) {
-			PamControlledUnitSettings pus = new PamControlledUnitSettings(gs.getUnitType(), 
+			PamControlledUnitSettings pus = new PamControlledUnitSettings(gs.getUnitType(),
 					gs.getUnitName(), gs.getClass().getName(), gs.getSettingsVersion(), gs.getSettingsReference());
 			try {
 				outStream.writeObject(pus);
@@ -614,7 +604,7 @@ public class PamSettingManager {
 		ObjectInputStream  ois = null;
 		boolean ok= true;
 		try {
-			ois = new ObjectInputStream(new FileInputStream(setFile));	
+			ois = new ObjectInputStream(new FileInputStream(setFile));
 		}
 		catch (IOException e) {
 			ok = false;
@@ -646,8 +636,8 @@ public class PamSettingManager {
 	}
 
 	/**
-	 * Save configuration settings to the default (most recently used) psf file. 
-	 * @return true if successful. 
+	 * Save configuration settings to the default (most recently used) psf file.
+	 * @return true if successful.
 	 */
 	public boolean saveSettingsToPSFFile(String fileName) {
 
@@ -660,9 +650,9 @@ public class PamSettingManager {
 		for (int i = 0; i < owners.size(); i++) {
 			pamSettingsList
 			.add(new PamControlledUnitSettings(owners.get(i)
-					.getUnitType(), owners.get(i).getUnitName(), 
+					.getUnitType(), owners.get(i).getUnitName(),
 					owners.get(i).getClass().getName(),
-					owners.get(i).getSettingsVersion(), 
+					owners.get(i).getSettingsVersion(),
 					owners.get(i).getSettingsReference()));
 		}
 		int nUsed = pamSettingsList.size();
@@ -676,14 +666,14 @@ public class PamSettingManager {
 		if (initialSettingsList != null) {
 			for (int i = 0; i < initialSettingsList.size(); i++) {
 				if (settingsUsed != null && settingsUsed.length > i && settingsUsed[i]) continue;
-				
+
 				// if this is a duplicate of something already in the list, warn the user and find out if they want to remove it
 				if (thisIsADuplicate(pamSettingsList, initialSettingsList.get(i))) {
 					if (firstDuplicateFound) {
 						firstDuplicateFound = false;
 						String msg = "<html>Duplicate settings have been found in the psf file.  Please select whether to keep them in the psf, or to" +
 						" delete them.  Duplicate settings will not cause Pamguard to crash, however they will enlarge the psf file over time.</html>";
-						int ans; 
+						int ans;
 						if (PamGUIManager.getGUIType()==PamGUIManager.FX)  ans = WarnOnce.showWarningFX(PamController.getInstance().getGuiManagerFX().getMainScene().getOwner(),
 								"Duplicate settings encountered", PamUtilsFX.htmlToNormal(msg), AlertType.WARNING, null, null, "Keep Duplicates", "Delete Duplicates");
 						else  ans = WarnOnce.showWarning(null, "Duplicate settings encountered", msg, WarnOnce.OK_CANCEL_OPTION, null, null,"Keep Duplicates", "Delete Duplicates");
@@ -694,7 +684,7 @@ public class PamSettingManager {
 					if (purgeDuplicates) continue;
 					pamSettingsList.add(initialSettingsList.get(i));
 				}
-				
+
 				// if this is not a duplicate, go ahead and add it to the list
 				else {
 					pamSettingsList.add(initialSettingsList.get(i));
@@ -723,7 +713,7 @@ public class PamSettingManager {
 			return false;
 		}
 
-		//		try { // experimenting with xml output. 
+		//		try { // experimenting with xml output.
 		//			FileOutputStream fos = new FileOutputStream("pamguard.xml");
 		//			XMLEncoder xe = new XMLEncoder(fos);
 		//			for (int i = 0; i < nUsed; i++) {
@@ -747,7 +737,7 @@ public class PamSettingManager {
 
 	/**
 	 * Checks if the PamControlledSettings object is already in the settings ArrayList.  Comparison is done by
-	 * checking the unit type and unit name. 
+	 * checking the unit type and unit name.
 	 * @param pamSettingsList the ArrayList containing the PamControlledUnitSettings
 	 * @param settingToCheck the PamControlledUnitSettings to check
 	 * @return true if it is in the list, false if not
@@ -765,7 +755,7 @@ public class PamSettingManager {
 	}
 
 	/**
-	 * Save configuration settings to a PSFX file (XML). 
+	 * Save configuration settings to a PSFX file (XML).
 	 * @return true if successful.
 	 */
 	public boolean saveSettingsToXMLFile(File file) {
@@ -780,9 +770,9 @@ public class PamSettingManager {
 		for (int i = 0; i < owners.size(); i++) {
 			pamSettingsList
 			.add(new PamControlledUnitSettings(owners.get(i)
-					.getUnitType(), owners.get(i).getUnitName(), 
-					owners.get(i).getClass().getName(), 
-					owners.get(i).getSettingsVersion(), 
+					.getUnitType(), owners.get(i).getUnitName(),
+					owners.get(i).getClass().getName(),
+					owners.get(i).getSettingsVersion(),
 					owners.get(i).getSettingsReference()));
 		}
 		int nUsed = pamSettingsList.size();
@@ -833,16 +823,16 @@ public class PamSettingManager {
 		//				e.printStackTrace();
 		//			}
 		//	        System.out.println("done!");
-		//	        
+		//
 		//	    }
 		System.out.println("The code for objectToXMLFile(Object serialisableObject, File file) has been commented out!!");
 	}
 
 	/**
-	 * Load the PAMGAURD settings either from psf file or from 
-	 * a database, depending on the run mode and type of settings required. 
+	 * Load the PAMGAURD settings either from psf file or from
+	 * a database, depending on the run mode and type of settings required.
 	 * @param runMode
-	 * @return OK if load was successful. 
+	 * @return OK if load was successful.
 	 */
 	public int loadPAMSettings(int runMode) {
 		int ans = LOAD_SETTINGS_OK;
@@ -866,7 +856,7 @@ public class PamSettingManager {
 			ans = loadNormalSettings();
 			break;
 		default:
-			return LOAD_SETTINGS_CANCEL;	
+			return LOAD_SETTINGS_CANCEL;
 		}
 		if (ans == LOAD_SETTINGS_OK) {
 			initialiseRegisteredModules();
@@ -875,36 +865,36 @@ public class PamSettingManager {
 	}
 
 	/**
-	 * Load settings perfectly 'normally' from a psf file. 
-	 * @return OK whether or not any settings were loaded. 
+	 * Load settings perfectly 'normally' from a psf file.
+	 * @return OK whether or not any settings were loaded.
 	 */
 	private int loadNormalSettings() {
 		return loadPSFSettings();
 	}
 
 	/**
-	 * Load settings for viewer mode. These must come from 
-	 * an old PAMGUARD database containing settings information. 
-	 * @return true if settings loaded sucessfully. 
+	 * Load settings for viewer mode. These must come from
+	 * an old PAMGUARD database containing settings information.
+	 * @return true if settings loaded sucessfully.
 	 */
 	private int loadViewerSettings() {
 		return loadDBSettings();
 	}
 
 	/**
-	 * Load settings for mixed mode. These must come from 
-	 * an old PAMGUARD database containing settings information. 
-	 * @return true if settings loaded sucessfully. 
+	 * Load settings for mixed mode. These must come from
+	 * an old PAMGUARD database containing settings information.
+	 * @return true if settings loaded sucessfully.
 	 */
 	private int loadMixedModeSettings() {
 		return loadDBSettings();
 	}
 
 	/**
-	 * Some modules may have already registered before the 
+	 * Some modules may have already registered before the
 	 * settings were loaded, so this function is called
-	 * as soon as they are loaded which sends settings to 
-	 * all modules in the list. 
+	 * as soon as they are loaded which sends settings to
+	 * all modules in the list.
 	 */
 	private void initialiseRegisteredModules() {
 		if (owners == null) {
@@ -929,9 +919,9 @@ public class PamSettingManager {
 
 	/**
 	 * Open the file that contains a list of files and optionally open a dialog
-	 * giving the list of recent files. 
+	 * giving the list of recent files.
 	 * <p>
-	 * Unfortunately, as soon as this gets called the first time, it tries to 
+	 * Unfortunately, as soon as this gets called the first time, it tries to
 	 * open a database to get more settings information and different database
 	 * plug ins all start trying to get more settings and it goes round and round and
 	 * round. Need to ensure that these loop around only get given the general settings
@@ -945,14 +935,14 @@ public class PamSettingManager {
 			}
 			if (loadingLocalSettings) return LOAD_SETTINGS_OK;
 			if (
-					//					settingsFileData.showFileList && 
+					//					settingsFileData.showFileList &&
 					programStart) {
 				SettingsFileData newData = showSettingsDailog(settingsFileData);
 				if (newData != null) {
 					settingsFileData = newData.clone();
 					/*
 					 * Save the settings file data immediately so that if we crash, this file
-					 * is still at the top of the list next time we run. 
+					 * is still at the top of the list next time we run.
 					 */
 					saveSettingsFileData();
 				}
@@ -963,19 +953,19 @@ public class PamSettingManager {
 			}
 			File ff = settingsFileData.getFirstFile();
 		}
-		
+
 		// if we are running a psf remotely, add it to the SettingsFileData list
 		else {
 			setDefaultFile(PamSettingManager.remote_psf);
 		}
 
 		initialSettingsList = loadSettingsFromFile();
-		//XMLSettings		
+		//XMLSettings
 		//		initialSettingsList = loadSettingsFromXMLFile();
 
 		/*TODO FIXME -implement this properly (see also PamGui-line 478) to enable saving menu item
 		 * so far it works for some settings- one it doesn't work for is File Folder Acquisition
-		 * 
+		 *
 		 * output from loading XML
 		 * ------------------------------------
 						PAMGUARD Version 1.11.02j branch SMRU
@@ -989,7 +979,7 @@ public class PamSettingManager {
 						os.version 6.1
 						java.library.path lib
 						For further information and bug reporting visit www.pamguard.org
-						If possible, bug reports and support requests should 
+						If possible, bug reports and support requests should
 						contain a copy of the full text displayed in this window.
 						(Windows users right click on window title bar for edit / copy options)
 
@@ -1014,7 +1004,7 @@ public class PamSettingManager {
 						</PamController.PamControlledUnitSettings>
 		 * -------------------------------------
 		 * Looks like not ALL information has been stored correctly-might be best to contact XStream about resolution
-		 *  
+		 *
 		 */
 
 
@@ -1026,7 +1016,7 @@ public class PamSettingManager {
 	 * Load data from settings files.
 	 * <p>
 	 * This is just the general data - the list of recently used
-	 * psf files and recent database files.  
+	 * psf files and recent database files.
 	 */
 	public boolean loadLocalSettings() {
 
@@ -1037,25 +1027,25 @@ public class PamSettingManager {
 		if (PamSettingManager.RUN_REMOTE == false) {
 			if (settingsFileData != null) {
 				TipOfTheDayManager.getInstance().setShowAtStart(settingsFileData.showTipAtStartup);
-				if (settingsFileData.showTipAtStartup) {	
+				if (settingsFileData.showTipAtStartup) {
 					if (PamGUIManager.isSwing()) {
 					TipOfTheDayManager.getInstance().showTip(null, null);
 					}
 				}
 			}
 		}
-		
+
 		// if the scaling factor = 0 (happens on first load), set it to 1.  Then scale the display
 		if (settingsFileData.getScalingFactor()==0.0) {
 			settingsFileData.setScalingFactor(1.0);
 		}
 		scaleDisplay(settingsFileData.getScalingFactor());
-		
-		
-		boolean ok = true; // always ok if non - database settings are used. 
+
+
+		boolean ok = true; // always ok if non - database settings are used.
 		//
 		//		if (PamController.getInstance().getRunMode() != PamController.RUN_NORMAL) {
-		//			ok = loadDBSettings();		
+		//			ok = loadDBSettings();
 		//		}
 
 		loadingLocalSettings = false;
@@ -1068,9 +1058,9 @@ public class PamSettingManager {
 	 * Adjust the size of the text by the scaleFactor variable.  This was added in response to the issue of PAMGuard not
 	 * scaling properly on 4K monitors.  Things that aren't affected by this code: buttons and icons, the window title font,
 	 * the time font, and the html in the help files.
-	 * 
+	 *
 	 * In order to finish this off, put more work into scaling the button images.
-	 * 
+	 *
 	 * @param scalingFactor
 	 */
 	private void scaleDisplay(double scalingFactor) {
@@ -1113,14 +1103,14 @@ public class PamSettingManager {
 				"Tree.font",
 				"Viewport.font"
 		};
-		//TODO - does work with NIMBUS look and feel. 
+		//TODO - does work with NIMBUS look and feel.
 		for (int i=0; i<theKeys.length; i++) {
 			FontUIResource f = (FontUIResource) UIManager.get(theKeys[i]);
 			if (f==null) continue;
 			float curSize = f.getSize2D();
 			FontUIResource fNew = new FontUIResource(f.deriveFont((float) (curSize*scalingFactor)));
 			UIManager.put(theKeys[i], fNew);
-		}		
+		}
 	}
 
 	/**
@@ -1133,7 +1123,7 @@ public class PamSettingManager {
 	/**
 	 * Try to get settings information from a valid database. If none are
 	 * loaded, then return null and Pamguard will try to get them from a psf file.
-	 * @param showDatabaseDialog Show a dialog to ask for a database. 0 = never, 1 = if no database open 2 = always. 
+	 * @param showDatabaseDialog Show a dialog to ask for a database. 0 = never, 1 = if no database open 2 = always.
 	 */
 	public int loadDBSettings(int showDatabaseDialog) {
 
@@ -1151,14 +1141,14 @@ public class PamSettingManager {
 
 		/*
 		 * Get settings from the database from either the Pamguard_Settings_Last
-		 * or from the Pamguard_Settings table. 
+		 * or from the Pamguard_Settings table.
 		 */
 		initialSettingsList = dbControlSettings.loadSettingsFromDB(showDatabaseDialog);
 
 
 		/**
 		 *  now need to get parameters back from the listed modules in databaseOwners
-		 *  so that the correct settings can be passed over to the initialSettingsList. 
+		 *  so that the correct settings can be passed over to the initialSettingsList.
 		 */
 
 		if (initialSettingsList == null) {
@@ -1166,17 +1156,17 @@ public class PamSettingManager {
 		}
 		else {
 			/* reading settings from the database was sucessful. Now the problem we have is that
-			 *  this database closes, and when the 'real' database opens up later, it won't be pointing 
+			 *  this database closes, and when the 'real' database opens up later, it won't be pointing
 			 *  at the same place !
 			 *  Two options are 1) try to keep this version of the database alive
 			 *  2) frig the generalsettings so that the 'real' database gets the same ones.
-			 *  
+			 *
 			 *  Trouble is that there are multiple settings in the settings database stuff.
 			 *  Copy them all back into the generalSettings list
-			 */ 
+			 */
 			PamControlledUnitSettings aSet, generalSet;
 			/**
-			 * Don't take these out of databaseSettingsList - go throuh 
+			 * Don't take these out of databaseSettingsList - go throuh
 			 */
 			PamSettings dbOwner;
 			databaseSettingsList.clear();
@@ -1188,7 +1178,7 @@ public class PamSettingManager {
 							dbOwner.getSettingsVersion(), dbOwner.getSettingsReference());
 					databaseSettingsList.add(aSet);
 					// see if there is any settings with the same type and name
-					// in the general list and copy settings object over. 
+					// in the general list and copy settings object over.
 					generalSet = findSettings(initialSettingsList, aSet.getUnitType(), null);
 					if (generalSet != null) {
 						generalSet.setSettings(aSet.getSettings());
@@ -1208,14 +1198,14 @@ public class PamSettingManager {
 	}
 
 	/**
-	 * See if there is a database module in PAMGUARD and if so, save the 
+	 * See if there is a database module in PAMGUARD and if so, save the
 	 * settings in serialised from in the Pamguard_Settings and Pamguard_Settings_Last
-	 * tables. 
-	 * @return true if successful. 
+	 * tables.
+	 * @return true if successful.
 	 */
 	private boolean saveSettingsToDatabase() {
-		// see if there is an existing database module and if there is, then 
-		// it will know how to save settings. 
+		// see if there is an existing database module and if there is, then
+		// it will know how to save settings.
 		DBControl dbControl = (DBControl) PamController.getInstance().findControlledUnit(DBControl.getDbUnitType());
 		if (dbControl == null) {
 			return false;
@@ -1224,11 +1214,11 @@ public class PamSettingManager {
 	}
 
 	/**
-	 * Find the owner of some PAMGUARD settings. 
-	 * @param ownersList which list to search 
+	 * Find the owner of some PAMGUARD settings.
+	 * @param ownersList which list to search
 	 * @param unitType unit type
 	 * @param unitName unit name
-	 * @return owner of the settings. 
+	 * @return owner of the settings.
 	 */
 	private PamSettings findOwner(ArrayList<PamSettings> ownersList, String unitType, String unitName) {
 		PamSettings owner;
@@ -1243,8 +1233,8 @@ public class PamSettingManager {
 	}
 
 	/**
-	 * Load PAMGUARD settings from a psf OR a psfx file. 
-	 * @return Array list of settings. 
+	 * Load PAMGUARD settings from a psf OR a psfx file.
+	 * @return Array list of settings.
 	 */
 	private ArrayList<PamControlledUnitSettings> loadSettingsFromFile() {
 		String inputFile = getSettingsFileName();
@@ -1266,13 +1256,13 @@ public class PamSettingManager {
 		return null;
 	}
 	/**
-	 * Load PAMGUARD settings from a psf file. 
-	 * @return Array list of settings. 
+	 * Load PAMGUARD settings from a psf file.
+	 * @return Array list of settings.
 	 */
 	private ArrayList<PamControlledUnitSettings> loadSettingsFromPSFFile() {
 
 
-		ArrayList<PamControlledUnitSettings> newSettingsList = 
+		ArrayList<PamControlledUnitSettings> newSettingsList =
 				new ArrayList<PamControlledUnitSettings>();
 
 		PamControlledUnitSettings newSetting;
@@ -1302,16 +1292,16 @@ public class PamSettingManager {
 						"loads it may have lost it's settings.  Please check before performing any analysis.</p>";
 				String help = null;
 				
-				int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help);
+				int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help);
 				
 				break;
 			}
 			catch (IOException io){
 				System.out.println(io.getMessage());
 				/**
-				 * DG 10/8/2015 There is a break here, basically if I change the 
+				 * DG 10/8/2015 There is a break here, basically if I change the
 				 * serialVerionUID of any class it will get stuck in an infinite loop
-				 * unless I break - so don't ever change serialVersionUID's !!!!! 
+				 * unless I break - so don't ever change serialVersionUID's !!!!!
 				 */
 				break;
 			}
@@ -1322,7 +1312,7 @@ public class PamSettingManager {
 						"It is likely that an older version of Java is trying to load a class which is from a newer version. " +
 						"This module will not be loaded, and will be removed from the psf file to prevent instabilities.";
 				String help = null;
-				int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help);
+				int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help);
 				System.err.println("Exception while loading " +	Ex.getMessage());
 			}
 			catch (ClassNotFoundException Ex){
@@ -1337,7 +1327,7 @@ public class PamSettingManager {
 							"depending on which modules are being used and if they've changed between versions.  It is recommended that you " +
 							"check all module configuration parameters to verify the information is still accurate, prior to running.  ";
 					String help = null;
-					int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help, Ex);
+					int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help, Ex);
 				}
 
 				// print and continue - there may be other things we can deal with.
@@ -1351,7 +1341,7 @@ public class PamSettingManager {
 							"support@pamguard.org.<p>" +
 							"This module will not be loaded, and will be removed from the psf file to prevent instabilities.";
 					String help = null;
-					int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help, Ex);
+					int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help, Ex);
 					System.err.println("Exception while loading " +	Ex.getMessage());
 				}
 			}
@@ -1387,8 +1377,8 @@ public class PamSettingManager {
 
 	//XMLSettings
 	//	/**
-	//	 * Load PAMGUARD settings from a psf file. 
-	//	 * @return Array list of settings. 
+	//	 * Load PAMGUARD settings from a psf file.
+	//	 * @return Array list of settings.
 	//	 */
 	//	private ArrayList<PamControlledUnitSettings> loadSettingsFromXMLFile() {
 	//
@@ -1429,24 +1419,24 @@ public class PamSettingManager {
 
 
 	/**
-	 * Quick print list of all settings to work out wtf is going on. 
+	 * Quick print list of all settings to work out wtf is going on.
 	 * @param newSettingsList
 	 */
 	private void listSettings(
 			ArrayList<PamControlledUnitSettings> newSettingsList) {
 		int iSet = 0;
 		for (PamControlledUnitSettings set:newSettingsList) {
-			System.out.printf("%02d Type %s Name %s Class %s\n", iSet++, set.getUnitType(), 
+			System.out.printf("%02d Type %s Name %s Class %s\n", iSet++, set.getUnitType(),
 					set.getUnitName(), set.getSettings().getClass().toString());
 		}
 
 	}
 
-	
+
 	/**
 	 * Similar to listSettings, but instead of listing all modules only list them once but with a note if
 	 * there are duplicates
-	 * 
+	 *
 	 * @param newSettingsList
 	 */
 	private boolean summarizeSettings(ArrayList<PamControlledUnitSettings> newSettingsList) {
@@ -1466,19 +1456,19 @@ public class PamSettingManager {
 					alreadySeen[j] = true;
 				}
 			}
-//			System.out.printf("Type: %s; Name: %s; Class: %s; is found in psf settings %d time(s)\n", set.getUnitType(), 
+//			System.out.printf("Type: %s; Name: %s; Class: %s; is found in psf settings %d time(s)\n", set.getUnitType(),
 //					set.getUnitName(), set.getSettings().getClass().toString(), count);
 			if (count>1) duplicatesFound=true;
 		}
 		return duplicatesFound;
 	}
-	
+
 	/**
 	 * See if a particular PamControlledUnitSettings object is the right one
-	 * for a particular module that wants some settings. 
+	 * for a particular module that wants some settings.
 	 * @param settingsUser User of settings
-	 * @param settings Settings object. 
-	 * @return true if matched. 
+	 * @param settings Settings object.
+	 * @return true if matched.
 	 */
 	public boolean isSettingsUnit(PamSettings settingsUser, PamControlledUnitSettings settings) {
 		if (settings.getUnitName() == null || settingsUser.getUnitName() == null) return false;
@@ -1486,10 +1476,10 @@ public class PamSettingManager {
 
 
 		if (settings.getUnitName().equals(settingsUser.getUnitName())
-				&& settings.getUnitType().equals(settingsUser.getUnitType()) 
+				&& settings.getUnitType().equals(settingsUser.getUnitType())
 				&& settings.versionNo == settingsUser.getSettingsVersion()){
 			return true;
-		}		
+		}
 
 		return false;
 	}
@@ -1497,10 +1487,10 @@ public class PamSettingManager {
 
 	/**
 	 * Name check used when the initial setting search failed but it's been found that there has been a type
-	 * name change within the settings user. 
+	 * name change within the settings user.
 	 * @param otherName alternate name information
-	 * @param settings PAm Settings. 
-	 * @return true if seem to be the same. 
+	 * @param settings PAm Settings.
+	 * @return true if seem to be the same.
 	 */
 	private boolean isSettingsUnit(SettingsNameChange otherName, PamControlledUnitSettings settings) {
 		if (otherName.getModuleClass().getName().equals(settings.getOwnerClassName())) {
@@ -1516,8 +1506,8 @@ public class PamSettingManager {
 	}
 
 	/**
-	 * Open psf file for settings serialised output. 
-	 * @return stream handle. 
+	 * Open psf file for settings serialised output.
+	 * @return stream handle.
 	 */
 	public ObjectOutputStream openOutputFile(String outputFile) {
 		try {
@@ -1531,7 +1521,7 @@ public class PamSettingManager {
 
 	/**
 	 * Open psf file for settings input. <br> does no work with psfx files
-	 * @return stream handle. 
+	 * @return stream handle.
 	 */
 	private ObjectInputStream openInputFile() {
 		//		System.out.println("Loading settings from " + getSettingsFileName());
@@ -1553,7 +1543,7 @@ public class PamSettingManager {
 			//	                +"\nThis is expected on first use."
 			//	                ,
 			//	                "PamSettingManager",
-			//	                JOptionPane.WARNING_MESSAGE);  
+			//	                JOptionPane.WARNING_MESSAGE);
 			//				userNotifiedAbsentSettingsFile= true;
 			//			}
 			String msg = "You are opening new configuration file: " + getSettingsFileName();
@@ -1570,13 +1560,13 @@ public class PamSettingManager {
 
 	//	/**
 	//	 * Returns total gobbledygook - need to improve the way
-	//	 * PAMGAURD creates new psf files. 
-	//	 * @return lies. 
+	//	 * PAMGAURD creates new psf files.
+	//	 * @return lies.
 	//	 */
 	//	private ObjectInputStream openInputFileResource() {
 	//		try {
 	//			return new ObjectInputStream( //new FileInputStream(
-	//					ClassLoader.getSystemResourceAsStream("DefaultPamguardSettings.psf"));		
+	//					ClassLoader.getSystemResourceAsStream("DefaultPamguardSettings.psf"));
 	//		} catch (Exception Ex) {
 	////			//Ex.printStackTrace();
 	////			System.out.println("Serialized default settings file not found!");
@@ -1592,8 +1582,8 @@ public class PamSettingManager {
 	//	}
 
 	/**
-	 * The settings list file is a file containing a list of recently 
-	 * used psf files. 
+	 * The settings list file is a file containing a list of recently
+	 * used psf files.
 	 * @return The settings list file
 	 */
 	private File getSettingsListFile() {
@@ -1613,7 +1603,7 @@ public class PamSettingManager {
 
 	/**
 	 * Get a file for global settings
-	 * @return File for global settings storage. 
+	 * @return File for global settings storage.
 	 */
 	private File getGlobalSettingsFile() {
 		String fileName = pamguard.Pamguard.getSettingsFolder() + File.separator + gloablListfileName + settingsListFileEnd;
@@ -1621,7 +1611,7 @@ public class PamSettingManager {
 	}
 
 	/**
-	 * Get a list of recently used databases. 
+	 * Get a list of recently used databases.
 	 * @return list of recently used databases
 	 */
 	private File getDatabaseListFile() {
@@ -1630,13 +1620,13 @@ public class PamSettingManager {
 	}
 
 	/**
-	 * Get the settings folder name and if necessary, 
-	 * create the folder since it may not exist. 
-	 * 
+	 * Get the settings folder name and if necessary,
+	 * create the folder since it may not exist.
+	 *
 	 * 2019/10/02 mo
 	 * MOVED TO pamguard.Pamguard AS A STATIC FUNCTION, SO THAT WE CAN ACCESS
 	 * IT FOR THE LOG FILE WHEN PAMGUARD FIRST STARTS
-	 *  
+	 *
 	 * @return folder name string, (with no file separator on the end)
 	 */
 //	private String getSettingsFolder() {
@@ -1647,24 +1637,24 @@ public class PamSettingManager {
 //		if (f.exists() == false) {
 //			f.mkdirs();
 //		}
-//		// default folder doesn't work for psf since it saves the settings file back into the wrong place. 
+//		// default folder doesn't work for psf since it saves the settings file back into the wrong place.
 ////		String defFolder =  PamFolders.getDefaultProjectFolder();
 //		return settingsFolder;
 //	}
 
 	/**
 	 * Now that the database is becoming much more fundamental to settings
-	 * storage and retrieval, the latest database settings should go into 
+	 * storage and retrieval, the latest database settings should go into
 	 * the main settings file. This contains a list of recent databases. The trouble is,
-	 * the settings are spread amongst several different settings object (e.g. one that 
-	 * tells us what type of database, another that tells us a list of recent databases 
-	 * for a specific database type, etc. 
+	 * the settings are spread amongst several different settings object (e.g. one that
+	 * tells us what type of database, another that tells us a list of recent databases
+	 * for a specific database type, etc.
 	 * <p>
 	 * We therefore need some modules (i.e. database ones) to also store their settings
 	 * in a general settings list so that they can be read in before any other settings
 	 * are read in. So each unit when it registers, says whether it should be included in
-	 * the general list as well as the specific data file. 
-	 * 
+	 * the general list as well as the specific data file.
+	 *
 	 */
 	public boolean loadSettingsFileData() {
 		ObjectInputStream is = null;
@@ -1708,25 +1698,25 @@ public class PamSettingManager {
 	 * will do is copy all psf files from the installed directory
 	 * over into the settingsFolder and then populate the list
 	 * in a settings list file so that users get a reasonably
-	 * coherent startup experience. 
+	 * coherent startup experience.
 	 */
 	private void createSettingsListFile() {
 		/**
-		 * List all psf files in the program folder. 
-		 * I think that we should already be working in that folder, 
-		 * so can just list the files. 
+		 * List all psf files in the program folder.
+		 * I think that we should already be working in that folder,
+		 * so can just list the files.
 		 */
 		settingsFileData = new SettingsFileData();
 		PamFileFilter psfFilter = new PamFileFilter("psf files", ".psf");
-		
-		// if we're running the beta version, also add in psfx files. To test for beta, check if 
+
+		// if we're running the beta version, also add in psfx files. To test for beta, check if
 		// the version number starts with anything besides a 1
 		if (!PamguardVersionInfo.version.startsWith("1")) {
 			psfFilter.addFileType(".psfx");
 		}
 		psfFilter.setAcceptFolders(false);
 		String settingsFolder = pamguard.Pamguard.getSettingsFolder() + File.separator;
-		// list files in the current folder. 
+		// list files in the current folder.
 		String userDir = System.getProperty("user.dir");
 		File folder = new File(userDir);
 		File[] psfFiles = folder.listFiles(psfFilter);
@@ -1738,7 +1728,7 @@ public class PamSettingManager {
 				File newFile = new File(settingsFolder + File.separator + aFile.getName());
 				//				aFile.renameTo(newFile);
 				copyFile(aFile, newFile);
-				// then add it to the list. 
+				// then add it to the list.
 				settingsFileData.setFirstFile(newFile);
 			}
 		}
@@ -1772,7 +1762,7 @@ public class PamSettingManager {
 	}
 
 	/**
-	 * Save the list of recently used settings files. 
+	 * Save the list of recently used settings files.
 	 * @return true if write OK.
 	 */
 	private boolean saveSettingsFileData() {
@@ -1803,9 +1793,9 @@ public class PamSettingManager {
 	}
 
 	/**
-	 * Loads the details of the last database to be opened. This will 
+	 * Loads the details of the last database to be opened. This will
 	 * probably be in the form of multiple serialised objects since
-	 * the database information is spread amongst several plug in sub-modules. 
+	 * the database information is spread amongst several plug in sub-modules.
 	 * @return true if settings data loaded ok
 	 */
 	private boolean loadDatabaseFileData() {
@@ -1850,8 +1840,8 @@ public class PamSettingManager {
 		return true;
 	}
 	/**
-	 * Save the details of the most recently used database. 
-	 * @return true if successful. 
+	 * Save the details of the most recently used database.
+	 * @return true if successful.
 	 */
 	private boolean saveDatabaseFileData() {
 
@@ -1867,7 +1857,7 @@ public class PamSettingManager {
 		for (int i = 0; i < databaseOwners.size(); i++) {
 			dbOwner = databaseOwners.get(i);
 			aSet = new PamControlledUnitSettings(dbOwner.getUnitType(),
-					dbOwner.getUnitName(), dbOwner.getClass().getName(), 
+					dbOwner.getUnitName(), dbOwner.getClass().getName(),
 					dbOwner.getSettingsVersion(), dbOwner.getSettingsReference());
 			databaseSettingsList.add(aSet);
 		}
@@ -1879,15 +1869,15 @@ public class PamSettingManager {
 			return false;
 		}
 
-		//		write out the settings for all units in the general owners list. 
+		//		write out the settings for all units in the general owners list.
 		ArrayList<PamControlledUnitSettings> generalSettingsList;
 		generalSettingsList = new ArrayList<PamControlledUnitSettings>();
 		for (int i = 0; i < databaseOwners.size(); i++) {
 			generalSettingsList
 			.add(new PamControlledUnitSettings(databaseOwners.get(i)
-					.getUnitType(), databaseOwners.get(i).getUnitName(), 
-					databaseOwners.get(i).getClass().getName(), 
-					databaseOwners.get(i).getSettingsVersion(), 
+					.getUnitType(), databaseOwners.get(i).getUnitName(),
+					databaseOwners.get(i).getClass().getName(),
+					databaseOwners.get(i).getSettingsVersion(),
 					databaseOwners.get(i).getSettingsReference()));
 		}
 		try {
@@ -1913,13 +1903,13 @@ public class PamSettingManager {
 	 * Get the most recently used settings file name. We have added a switch in here
 	 * to allow for the direct setting of the psf used from the command line. This
 	 * can be used in remote on non remote deployments.
-	 * @return File name string. 
+	 * @return File name string.
 	 */
 	public String getSettingsFileName() {
 		if (PamSettingManager.remote_psf != null) {
 			//			System.out.println("Automatically loading settings from " + remote_psf);
 			return remote_psf;
-		} 
+		}
 		else {
 			if (settingsFileData == null || settingsFileData.getFirstFile() == null) {
 				return null;
@@ -1947,7 +1937,7 @@ public class PamSettingManager {
 	}
 
 	/**
-	 * Save settings to a new psf file. 
+	 * Save settings to a new psf file.
 	 * @param frame parent frame for dialog.
 	 */
 	public void saveSettingsAs(JFrame frame) {
@@ -1991,7 +1981,7 @@ public class PamSettingManager {
 	}
 
 	//	/**
-	//	 * Save settings to a new psf file. 
+	//	 * Save settings to a new psf file.
 	//	 * @param frame parent frame for dialog.
 	//	 */
 	//	public void saveSettingsAsXML(JFrame frame) {
@@ -2027,15 +2017,15 @@ public class PamSettingManager {
 
 
 	/**
-	 * Set the default (first) file in the settings file data. 
-	 * @param defaultFile File name string. 
+	 * Set the default (first) file in the settings file data.
+	 * @param defaultFile File name string.
 	 */
 	public void setDefaultFile(String defaultFile) {
 
 		/**
-		 * If saving from viewer or mixed mode, then the 
+		 * If saving from viewer or mixed mode, then the
 		 * settingsFileData may not have been loaded, in which case
-		 * load it now so that old psf names remain in the list. 
+		 * load it now so that old psf names remain in the list.
 		 */
 		if (settingsFileData == null) {
 			//			System.out.println("Must load settings file first");
@@ -2053,7 +2043,7 @@ public class PamSettingManager {
 	 * Pop up the dialog that's shown at start up to show
 	 * a list of recent settings file and give the opportunity
 	 * for browsing for more. IF the new settings file is
-	 * different from the current one, then send a command off 
+	 * different from the current one, then send a command off
 	 * to the Controller to re-do the entire Pamguard system model
 	 * @param frame parent frame for dialog (can be null)
 	 */
@@ -2064,7 +2054,7 @@ public class PamSettingManager {
 		if (settingsFileData != null) {
 			currentFile = settingsFileData.getFirstFile();
 		}
-		SettingsFileData newData = showSettingsDailog(settingsFileData); 
+		SettingsFileData newData = showSettingsDailog(settingsFileData);
 		if (newData == null) {
 			return;
 		}
@@ -2072,7 +2062,7 @@ public class PamSettingManager {
 		if (settingsFileData.getFirstFile() != currentFile) {
 			settingsFileData.setFirstFile(currentFile);
 			saveSettingsFileData();
-			// rebuild the entire model. 
+			// rebuild the entire model.
 			PamControllerInterface pamController = PamController.getInstance();
 			if (pamController == null) return;
 			pamController.totalModelRebuild();
@@ -2081,7 +2071,7 @@ public class PamSettingManager {
 	}
 
 	/**
-	 * Import a configuration during viewer mode operation. 
+	 * Import a configuration during viewer mode operation.
 	 * @param frame
 	 */
 	public void importSettings(JFrame frame) {
@@ -2092,22 +2082,22 @@ public class PamSettingManager {
 		if (settingsFileData != null) {
 			currentFile = settingsFileData.getFirstFile();
 		}
-		
-		
+
+
 		SettingsFileData newData = showSettingsDailog(settingsFileData);
 		if (newData == null) {
 			return;
 		}
-		
+
 		ArrayList<PamControlledUnitSettings> settings = loadSettingsFromFile();
 		if (settings == null) {
 			String msg = "Unable to load settings from " + getSettingsFileName();
 			WarnOnce.showWarning(frame, "Settings Import", msg, WarnOnce.OK_OPTION);
 			return;
 		}
-		
+
 		/*
-		 * Should now have a valid settings file. Import the data from it. 
+		 * Should now have a valid settings file. Import the data from it.
 		 */
 		PamSettingsGroup pamSettingsGroup = new PamSettingsGroup(System.currentTimeMillis());
 		for (PamControlledUnitSettings pus:settings) {
@@ -2122,10 +2112,10 @@ public class PamSettingManager {
 	 * Load a settings file and return the contents in a settings group
 	 * object. Give the time of the settings group as the time the file
 	 * was modified. the settings load code is a bit of a mess - this function
-	 * has been written mainly so that it can be called from Matlab and r 
-	 * so that those languages can load PAMGuard settings. 
-	 * @param psfFile psf file object. 
-	 * @return loaded settings from the file. 
+	 * has been written mainly so that it can be called from Matlab and r
+	 * so that those languages can load PAMGuard settings.
+	 * @param psfFile psf file object.
+	 * @return loaded settings from the file.
 	 */
 	public PamSettingsGroup loadSettings(File psfFile) {
 		if (psfFile == null) {
@@ -2160,7 +2150,7 @@ public class PamSettingManager {
 			catch (ClassNotFoundException Ex){
 				// print and continue - there may be othere things we can deal with.
 				Ex.printStackTrace();
-				
+
 			}
 			catch (Exception Ex) {
 				Ex.printStackTrace();
@@ -2188,8 +2178,8 @@ public class PamSettingManager {
 	}
 
 	/**
-	 * 
-	 * @return everything about every set of settings currently loaded. 
+	 *
+	 * @return everything about every set of settings currently loaded.
 	 */
 	public PamSettingsGroup getCurrentSettingsGroup() {
 		PamSettingsGroup psg = new PamSettingsGroup(PamCalendar.getTimeInMillis());
@@ -2197,7 +2187,7 @@ public class PamSettingManager {
 		PamSettings ps;
 		for (int i = 0; i < owners.size(); i++) {
 			ps = owners.get(i);
-			pcus = new PamControlledUnitSettings(ps.getUnitType(), ps.getUnitName(), 
+			pcus = new PamControlledUnitSettings(ps.getUnitType(), ps.getUnitName(),
 					ps.getClass().getName(),
 					ps.getSettingsVersion(), ps.getSettingsReference());
 			psg.addSettings(pcus);
@@ -2208,9 +2198,9 @@ public class PamSettingManager {
 	/**
 	 * Load some old settings into all modules.
 	 * <p>Currently used in viewer mode to load reloaded settings
-	 * from binary files and the database. 
+	 * from binary files and the database.
 	 * @param settingsGroup settings group to load.
-	 * @param send these new settings round to all existing modules.  
+	 * @param send these new settings round to all existing modules.
 	 */
 	public void loadSettingsGroup(PamSettingsGroup settingsGroup, boolean notifyExisting) {
 		ArrayList<PamControlledUnitSettings> tempSettingsList = settingsGroup.getUnitSettings();
@@ -2218,7 +2208,7 @@ public class PamSettingManager {
 
 		/////////////deleteDBsettings
 		/* TODO FIXME -better way? TEMPORARY - GW
-		 * delete DB settings so when old settings psf is restored over current settings 
+		 * delete DB settings so when old settings psf is restored over current settings
 		 * the current DB will not be changed!!
 		 */
 		ArrayList<String> DBsettingTypes = new ArrayList<String>();
@@ -2261,13 +2251,13 @@ public class PamSettingManager {
 		}
 		return null;
 	}
-	
+
 	/**
-	 * Find a list of unit settings by type and name. If both are specified, then it's going to 
-	 * (hopefully only return one setting. Otherwise, with null or wildcard names we may get many. 
+	 * Find a list of unit settings by type and name. If both are specified, then it's going to
+	 * (hopefully only return one setting. Otherwise, with null or wildcard names we may get many.
 	 * @param unitType unit type, can be wildcard * or null
 	 * @param unitName unit name, can be wildcard * or null
-	 * @return Array list of settings. 
+	 * @return Array list of settings.
 	 */
 	public ArrayList<PamSettings> findPamSettings(String unitType, String unitName) {
 		if (owners == null) {
@@ -2289,19 +2279,19 @@ public class PamSettingManager {
 			}
 			foundSettings.add(owner);
 		}
-		
+
 		return foundSettings;
 	}
-	
-	
+
+
 	/**
-	 * Show a dialog to allow the user to select a .psf file path. 
-	 * @param settingsFileData 
-	 * @return the settings file data. 
+	 * Show a dialog to allow the user to select a .psf file path.
+	 * @param settingsFileData
+	 * @return the settings file data.
 	 */
 	private SettingsFileData showSettingsDailog(SettingsFileData settingsFileData) {
 		SettingsFileData newData;
-		int flag=PamGUIManager.getGUIType(); 
+		int flag=PamGUIManager.getGUIType();
 		switch (flag) {
 		case PamGUIManager.SWING:
 			 newData = SettingsFileDialog.showDialog(null, settingsFileData);
@@ -2322,10 +2312,10 @@ public class PamSettingManager {
 	public ArrayList<PamControlledUnitSettings> getInitialSettingsList() {
 		return initialSettingsList;
 	}
-	
+
 	/**
 	 * Get the current scaling factor
-	 * 
+	 *
 	 * @return
 	 */
 	public double getCurrentDisplayScaling() {
@@ -2340,11 +2330,11 @@ public class PamSettingManager {
 		if (newScalingFactor != 0 && newScalingFactor != settingsFileData.getScalingFactor()) {
 //			scaleDisplay(newScalingFactor);
 			settingsFileData.setScalingFactor(newScalingFactor);
-			
+
 			String message = "<html>You have changed PAMGuard's display scaling.  Please restart PAMGuard in order to update your display.</html>";
 			int ans = WarnOnce.showWarning(frame, "New Display Scaling", message, WarnOnce.OK_OPTION);
 		}
-		
+
 	}
 
 }

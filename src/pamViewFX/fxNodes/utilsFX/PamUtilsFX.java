@@ -14,7 +14,9 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JPopupMenu.Separator;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 
 import PamView.PamSymbol;
@@ -197,6 +199,12 @@ public class PamUtilsFX {
 			if (JMenuItem.class.isAssignableFrom(item.getClass())) {
 				itemList.add(swingMenuItemToFX( (JMenuItem) item));
 			}
+			else {
+				Component unkItem = item;
+				if (item instanceof Separator) {
+//					MenuItem mi = new Separator();
+				}
+			}
 		}
 		
 		return itemList;
@@ -300,8 +308,15 @@ public class PamUtilsFX {
 			radioItem.setSelected(((JRadioButtonMenuItem) swingItem).isSelected());
 			
 		}
+//		else if (swingItem.getClass() == JSeparator.class) {
+//			
+//		}
 		if (fxItem == null) {
 			return null;
+		}
+		String tip = swingItem.getToolTipText();
+		if (tip != null) {
+			fxItem.setUserData("Tip:" + tip);
 		}
 		// move over any action listeners from swing to fx. 
 		fxItem.setOnAction(new EventHandler<ActionEvent>() {
@@ -383,6 +398,13 @@ public class PamUtilsFX {
 		}
 		if (jItem == null) {
 			return null;
+		}
+		Object userData = fxItem.getUserData();
+		if (userData instanceof String) {
+			String tip = (String) userData;
+			if (tip.startsWith("Tip:")) {
+				jItem.setToolTipText(tip.substring(4));
+			}
 		}
 		jItem.addActionListener(new ActionListener() {
 			@Override

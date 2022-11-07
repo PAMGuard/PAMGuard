@@ -39,7 +39,6 @@ import rawDeepLearningClassifier.layoutFX.exampleSounds.ExampleSoundFactory.Exam
  */
 public abstract class DLTransformImage extends PamBorderPane{
 
-
 	/**
 	 * Plot pane. 
 	 */
@@ -70,7 +69,6 @@ public abstract class DLTransformImage extends PamBorderPane{
 	 */
 	private SpectrogramImage specImage = null; 
 
-
 	/**
 	 * The current 1D transform data. 
 	 */
@@ -97,7 +95,7 @@ public abstract class DLTransformImage extends PamBorderPane{
 	private RangeSlider timeSlider;
 
 	/**
-	 * tIME BINS. 
+	 * Time bins.
 	 */
 	private int[] timeBins = new int[2];
 
@@ -139,6 +137,7 @@ public abstract class DLTransformImage extends PamBorderPane{
 			plotPane.repaint();
 		});
 		transformschoiceBox.setConverter(new DLTransformConverter());
+		transformschoiceBox.setPrefWidth(170); 
 
 		plotPane.getPlotCanvas().widthProperty().addListener((obsval, oldval, newval)->{
 			plotPane.repaint();
@@ -174,6 +173,7 @@ public abstract class DLTransformImage extends PamBorderPane{
 			updateExampleSound(newval); 
 		});
 		speciesChoiceBox.getSelectionModel().select(0);
+		speciesChoiceBox.setPrefWidth(170); 
 
 		PamHBox hBox = new PamHBox(); 
 		hBox.setAlignment(Pos.CENTER_RIGHT);
@@ -225,9 +225,13 @@ public abstract class DLTransformImage extends PamBorderPane{
 		double nSamples = this.exampleSound.getSampleRate()*((timeSlider.getHighValue()-timeSlider.getLowValue())/1000.0);
 		
 
-		if (shape!=null) {
+		if (shape!=null && shape.length==2) {
 			int timeShape =  (int) (shape[0]*(nSamples/(double) exampleSound.getWave().length));
 			timeLabel.setText(String.format("Segment size %.0f (samples) Transform shape: [%d %d]",  nSamples, timeShape, shape[1])); 
+		}
+		else if (shape!=null && shape.length==1) {
+			int timeShape =  (int) (shape[0]*(nSamples/(double) exampleSound.getWave().length));
+			timeLabel.setText(String.format("Segment size %.0f (samples) Transform shape: [%d]",  nSamples, timeShape)); 
 		}
 		else {
 			timeLabel.setText(String.format("Segment size %.0f (samples) Transform shape: NaN",  nSamples)); 
@@ -245,14 +249,24 @@ public abstract class DLTransformImage extends PamBorderPane{
 		ArrayList<DLTransform> transforms = getDLTransforms(); 
 		
 		if  (transforms==null)  return null; 
-
-		FreqTransform freqTransform = ((FreqTransform) transforms.get(transforms.size()-1)); 
-	
-		if (freqTransform.getSpecTransfrom()==null) return null; 
 		
-		double[][] data2D = freqTransform.getSpecTransfrom().getTransformedData();
-
-		long[] shape = new long[] {data2D.length, data2D[0].length};
+		long[] shape; 
+		if (transforms.get(transforms.size()-1) instanceof FreqTransform) {
+			FreqTransform freqTransform = ((FreqTransform) transforms.get(transforms.size()-1)); 
+		
+			if (freqTransform.getSpecTransfrom()==null) return null; 
+			
+			double[][] data2D = freqTransform.getSpecTransfrom().getTransformedData();
+	
+			shape = new long[] {data2D.length, data2D[0].length};
+		}
+		else {
+			WaveTransform waveTransform = ((WaveTransform) transforms.get(transforms.size()-1)); 
+			
+			double[] data = waveTransform.getWaveData().getScaledSampleAmpliudes(); 
+			
+			shape = new long[] {data.length};
+		}
 
 		return shape;
 	}

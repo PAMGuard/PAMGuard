@@ -307,7 +307,10 @@ public interface PamControllerInterface {
 	public static final int REORDER_CONTROLLEDUNITS = 8;
 	/**
 	 * Automatically sent when PAMGAURD has finished loading it's
-	 * initial settings file and created the GUI
+	 * initial settings file and created the GUI. It's a good time for modules
+	 * to subscribe to their data sources, but they shouldn't do much else since 
+	 * these go around in order, so when this arrives in the first module, other
+	 * modules may not yet be setup. 
 	 */
 	public static final int INITIALIZATION_COMPLETE = 9;
 	/**
@@ -404,6 +407,13 @@ public interface PamControllerInterface {
 	 * The medium has been updated. 
 	 */
 	public static final int GLOBAL_MEDIUM_UPDATE = 24;
+	
+	/**
+	 * Sent shortly after the main PAMGUard setup has been completed, but this point
+	 * all modules will have received INITIALIZATION_COMPLETE and should be ready to 
+	 * go. 
+	 */
+	public static final int READY_TO_RUN = 25;
 
 	
 

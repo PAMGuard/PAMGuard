@@ -35,14 +35,15 @@ public class SimpleCTClassifierGraphics implements CTClassifierGraphics {
 		if (simpleCTClassiferPane==null) {
 			simpleCTClassiferPane = new SimpleCTClassifierPane(simpleChi2Classifier);
 		}
-		//params are set here. 
-		simpleCTClassiferPane.setParams(simpleChi2Classifier.getParams());
+		//System.out.println("SimpleCTClassifierGraphics getCTClassifierPane: " + simpleChi2Classifier.getParams().chi2Threshold); 
+		//params are set here. <- do not do this because you may wish to store the classifier params somewhere else. 
+		//simpleCTClassiferPane.setParams(simpleChi2Classifier.getParams());
 		return (Pane) simpleCTClassiferPane.getContentNode();
 	}
 
 	@Override
 	public CTClassifierParams getParams() {
-		Chi2ThresholdParams clssfrParams = simpleCTClassiferPane.getParams(simpleChi2Classifier.getParams()); 
+		Chi2ThresholdParams clssfrParams = simpleCTClassiferPane.getParams(simpleChi2Classifier.getParams()).clone();
 		if (clssfrParams==null) {
 			System.err.print("Simple Chi2 Classifier returned null params");
 			return null;
@@ -51,13 +52,14 @@ public class SimpleCTClassifierGraphics implements CTClassifierGraphics {
 //			simpleChi2Classifier.setParams(clssfrParams); 
 //			return clssfrParams;
 //		}
+		//System.out.println("SimpleCTClassifierGraphics - getParams: " + clssfrParams.chi2Threshold);
 		return clssfrParams; 
 	}
 
 	@Override
 	public void setParams(CTClassifierParams params) {
 		simpleCTClassiferPane.setParams((Chi2ThresholdParams) params);
-		
+		//System.out.println("SimpleCTClassifierGraphics - setParams: " + ((Chi2ThresholdParams) params).chi2Threshold);
 	}
 
 }

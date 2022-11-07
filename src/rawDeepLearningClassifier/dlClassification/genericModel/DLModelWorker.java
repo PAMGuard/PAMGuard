@@ -63,13 +63,17 @@ public abstract class DLModelWorker<T> {
 			//data input into the model - a stack of spectrogram images. 
 			float[][][] transformedDataStack = new float[numChunks][][]; 
 
-			//geenrate the spectrogram stack. 
+			//generate the spectrogram stack. 
 			AudioData soundData; 
-			double[][] transformedData;
+			double[][] transformedData2; //spec data
+			double[] transformedData1;  //waveform data
 			for (int j=0; j<numChunks; j++) {
-
+			
+				
 				soundData  = new AudioData(rawDataUnits.get(j).getRawData()[iChan], sampleRate); 
-
+				
+				
+				
 				//			for (int i=0; i<modelTransforms.size(); i++) {
 				//				System.out.println("Transfrom type: " + modelTransforms.get(i).getDLTransformType()); 
 				//			}
@@ -83,20 +87,25 @@ public abstract class DLModelWorker<T> {
 				DLTransform transform = modelTransforms.get(0); 
 				for (int i =0; i<modelTransforms.size(); i++) {
 					transform = modelTransforms.get(i).transformData(transform); 
-					
-////					//TEMP
+//					//TEMP
 //					if (transform instanceof FreqTransform) {
 //						transformedData = ((FreqTransform) transform).getSpecTransfrom().getTransformedData(); 
 //						System.out.println("DLModelWorker: transform : " + modelTransforms.get(i).getDLTransformType() + " "+ i + transformedData.length + "  " + transformedData[0].length + " minmax: " + PamArrayUtils.minmax(transformedData)[0] + " " + PamArrayUtils.minmax(transformedData)[1]);
 //					}
 				}
 
-				//the transformed data
-				transformedData = ((FreqTransform) transform).getSpecTransfrom().getTransformedData(); 
+				if (transform instanceof FreqTransform) {
+					//add a spectrogram to the stacl
+					transformedData2 = ((FreqTransform) transform).getSpecTransfrom().getTransformedData(); 
+					transformedDataStack[j] = DLUtils.toFloatArray(transformedData2); 
 
-
-				transformedDataStack[j] = DLUtils.toFloatArray(transformedData); 
-
+				}
+				else {
+					//add wavefrom to the stack = we make the 2nd dimesnion 1. 
+					transformedData1 = ((WaveTransform) transform).getWaveData().getScaledSampleAmpliudes(); 
+					transformedDataStack[j] = new float[1][transformedData1.length];
+					transformedDataStack[j][0] = DLUtils.toFloatArray(transformedData1); 
+				}
 			}
 
 			//run the model. 
@@ -105,7 +114,6 @@ public abstract class DLModelWorker<T> {
 			output = runModel(transformedDataStack); 
 			//System.out.println("Model out: " + PamArrayUtils.array2String(output, 2, ","));
 			long time2 = System.currentTimeMillis();
-
 
 			int numclasses = (int) (output.length/transformedDataStack.length); 
 
@@ -117,8 +125,6 @@ public abstract class DLModelWorker<T> {
 			float[] prob; 
 			float[] classOut; 
 			for (int i=0; i<transformedDataStack.length; i++) {
-
-
 				/**
 				 * This is super weird. Reading the documentation for copeOfRange the index from and index to are enclusive. So 
 				 * to copy the first two elements indexfrom =0 and indexto = 1. But actually it seems that this should be indexfrom =0 and indexto =2. 
@@ -128,13 +134,12 @@ public abstract class DLModelWorker<T> {
 
 				//				System.out.println("The copyOfRange is: " + i*numclasses + " to " + ((i+1)*numclasses-1) + " class out len: " + classOut.length); 
 
-
 				if (enableSoftMax) {
 					prob = new float[classOut.length]; 
 					for (int j=0; j<classOut.length; j++) {
 						//python code for this. 
-						//	    	prob = torch.nn.functional.softmax(out).numpy()[n, 1]
-						//                    pred = int(prob >= ARGS.threshold)		    	
+						//prob = torch.nn.functional.softmax(out).numpy()[n, 1]
+						//pred = int(prob >= ARGS.threshold)		    	
 						//softmax function
 						prob[j] = (float) DLUtils.softmax(classOut[j], classOut); 
 						//System.out.println("The probability is: " + j + ": " + prob[j]); 
@@ -143,13 +148,12 @@ public abstract class DLModelWorker<T> {
 				else {
 					prob = classOut; 
 				}
-
-
+				
 				//does this pass binary classification
 				long timeEnd = System.nanoTime(); 
 
 				T modelResult = makeModelResult(prob, (timeEnd-timeStart)/1000/1000/1000); 
-				//				soundSpotResult.setAnalysisTime((timeEnd-timeStart)/1000/1000/1000);
+				//soundSpotResult.setAnalysisTime((timeEnd-timeStart)/1000/1000/1000);
 
 				modelResults.add(modelResult);
 			}

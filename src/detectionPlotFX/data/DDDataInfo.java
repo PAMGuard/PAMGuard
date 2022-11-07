@@ -131,7 +131,7 @@ public abstract class DDDataInfo<T extends PamDataUnit> {
 	
 	
 	/**
-	 * Get the sample rate. This is aquired form the datablock if one exists. Otherwise a hard 
+	 * Get the sample rate. This is acquired form the datablock if one exists. Otherwise a hard 
 	 * wired sample rate is used. 
 	 * @return the sample rate. 
 	 */
@@ -283,7 +283,6 @@ public abstract class DDDataInfo<T extends PamDataUnit> {
 
 
 	public void setupAxis( DetectionPlotProjector projector, T pamDataUnit){
-		
 		getCurrentDetectionPlot().setupAxis((PamDataUnit) pamDataUnit, this.getHardSampleRate(), projector);
 	}
 

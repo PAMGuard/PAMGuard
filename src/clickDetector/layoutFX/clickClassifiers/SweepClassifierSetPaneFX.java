@@ -3,6 +3,7 @@ package clickDetector.layoutFX.clickClassifiers;
 
 import fftFilter.FFTFilterParams;
 import fftManager.FFTLengthModeled;
+import javafx.beans.property.StringProperty;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -15,29 +16,35 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Priority;
 import javafx.scene.text.Font;
-import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamGridPane;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamSpinner;
-import pamViewFX.fxNodes.PamTitledPane;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
 import pamViewFX.fxNodes.picker.SymbolPicker;
 import pamViewFX.fxNodes.utilityPanes.FreqBandPane;
+import pamViewFX.fxNodes.utilityPanes.PamToggleSwitch;
 import pamViewFX.fxNodes.utilityPanes.SimpleFilterPaneFX;
+import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
+import pamViewFX.PamGuiManagerFX;
+import net.synedra.validatorfx.Validator;
 
 import PamController.SettingsPane;
+import PamView.PamSymbol;
+import PamView.symbol.SymbolData;
 import clickDetector.ClickClassifiers.basicSweep.CodeHost;
 import clickDetector.ClickClassifiers.basicSweep.SweepClassifier;
 import clickDetector.ClickClassifiers.basicSweep.SweepClassifierSet;
 
 /**
  * Pane which contains controls to change a SweepClassifierSet. 
+ * 
  * @author Jamie Macaulay
  *
  */
@@ -93,7 +100,11 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 	 */
 	private AmplitudeBlock amplitudeBlock;
 	
-	PamBorderPane mainPane = new PamBorderPane();
+	private PamBorderPane mainPane = new PamBorderPane();
+	
+    private Validator validator = new Validator();
+
+	public int classifierItemRow;
 	
 	public SweepClassifierSetPaneFX(SweepClassifier sweepClassifier){
 		super(null);
@@ -110,14 +121,15 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 	private Node createSweepPane(){
 		
 		PamVBox holder=new PamVBox();
-		holder.setSpacing(10);
-		holder.setPadding(new Insets(10,5,5,40));
+		holder.setSpacing(15);
+		holder.setPadding(new Insets(10,0,0,0));
 
 		optionBox=new OptionsBox();
 		
 		/*********Waveform Tab************/
 		Tab waveformTab=new Tab("Waveform"); 
 		PamVBox waveformHolder=new PamVBox(5); 
+		waveformHolder.setPadding(new Insets(10,0,0,0));
 		
 		clickLength=new ClickLengthBox(); 
 		filterBox=new FilterBox();
@@ -134,11 +146,13 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		energyBox=new EnergyBandBox();
 		freqBox=new FrequencySearchBlock();
 		spectrumHolder.getChildren().addAll(energyBox, freqBox); 
+		spectrumHolder.setPadding(new Insets(10,0,0,0));
 		spectrumTab.setContent(spectrumHolder);
-		
+
 		/**********Main Layout**************/
 		
 		TabPane tabPane= new TabPane(); 
+		tabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
 		tabPane.getTabs().addAll(waveformTab, spectrumTab); 
 					
 		holder.getChildren().add(optionBox);
@@ -153,12 +167,12 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 	 * @author Jamie Macaulay
 	 *
 	 */
-	private abstract class SweepBox extends PamTitledPane {
+	private abstract class SweepBox extends PamBorderPane {
 		
 		/**
 		 * Check box to enable pane
 		 */
-		private CheckBox enableBox;
+		private PamToggleSwitch enableBox;
 		
 		/**
 		 * Border pane to hold content
@@ -167,40 +181,52 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		
 		
 		private Font disableFont;
+
+		private Label label;
 		
 
 		SweepBox(String borderTitle, Boolean enableButton) {
-			
+
 			//create holder pnae
 			borderPane=new PamBorderPane();
-			
-			
+			this.setCenter(borderPane);
+
+			PamHBox hBox = new PamHBox();
+			hBox.setSpacing(5);
+
+
 			if (borderTitle != null) {
-				//Label label=new Label(borderTitle); 
-				PamGuiManagerFX.titleFont2style(this);
-				//borderPane.setTop(label);
-				this.setText(borderTitle);
+				label=new Label(borderTitle); 
+
+				PamGuiManagerFX.titleFont2style(label);
+
+				hBox.getChildren().add(label);
 			}
-			if (enableButton) {
-				enableBox = new CheckBox("Enable");
-				PamVBox vBox=new PamVBox();
-				vBox.setPadding(new Insets(0,20,0,0));
-				vBox.setAlignment(Pos.CENTER);
-				vBox.getChildren().add(enableBox);
+
+			if (enableButton.booleanValue() == true) {
+
+				enableBox = new PamToggleSwitch("");
+				//vBox.setPadding(new Insets(0,20,0,0));
 				enableBox.setTooltip(new Tooltip("Enable " + borderTitle + " measurements"));
-				
-				enableBox.setOnAction((action)->{
+
+				enableBox.selectedProperty().addListener((obsVal, oldVal, newVal)->{
 					disbleControls(!enableBox.isSelected());
-					
-					/**FIXME- this does not seem to work. If titlepane collapsed auto returns to white**/
-//					if (enableBox.isSelected()) this.setTextFill(Color.WHITE);
-//					else this.setTextFill(Color.GRAY);
 				});
-				
-				
-				borderPane.setLeft(vBox);
+
+				hBox.getChildren().add(0,enableBox);
+
+				//				setOnAction((action)->{
+				//					disbleControls(!enableBox.isSelected());
+				//					
+				//					/**FIXME- this does not seem to work. If titlepane collapsed auto returns to white**/
+				//					if (enableBox.isSelected()) this.setTextFill(Color.WHITE);
+				//					else this.setTextFill(Color.GRAY);
+				//				});								
+				//this.setDisable(!enableBox.isSelected());
 			}
-			this.setContent(borderPane);
+
+			this.setTop(hBox);
+
 			/**Don't like this in old swing version*/ 
 			//tP.setCenter( description = new Label("", JLabel.CENTER));
 			//this.setTop(tP);
@@ -211,7 +237,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		 * @param desc - a description of the control
 		 */
 		protected void setDescription(String desc) {
-			this.setTooltip(new Tooltip(desc));
+			label.setTooltip(new Tooltip(desc));
 		}
 		
 //		private void showTopStrip() {
@@ -308,6 +334,14 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		 */
 		private Label lengthMS;
 
+		private ComboBox<String> lengthTypeBox;
+
+		private CheckBox restrictLength;
+
+		private ColorPicker lineColourPicker;
+
+		private ColorPicker fillColourPicker;
+
 		OptionsBox() {
 			super("General Options", false);
 			this.getHolderPane().setCenter(createOptionsPane());
@@ -317,6 +351,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		//create the general options 
 		private Node createOptionsPane(){
 			
+
 			PamGridPane pamGridPane=new PamGridPane();
 			pamGridPane.setHgap(5);
 			pamGridPane.setVgap(5);
@@ -327,24 +362,53 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			nameField=new TextField();
 			nameField.setPrefColumnCount(10);
 			pamGridPane.add(nameField, 1, 0);
-			PamGridPane.setColumnSpan(nameField, 2);
-
+			PamGridPane.setColumnSpan(nameField, 8);
+			PamGridPane.setHgrow(nameField, Priority.ALWAYS);
 			
-			pamGridPane.add(new Label("Code"), 3, 0);
+			 validator.createCheck()
+	          .dependsOn("speciesname", nameField.textProperty())
+	          .withMethod(c -> {
+	            String userName = c.get("speciesname");
+	            if (userName == null || userName.length()<=0) {
+		              c.error("The classifier must have a name");
+	            }
+	          })
+	          .decorates(nameField)
+	          .immediate();
+	        ;
+			
+			
+			pamGridPane.add(new Label("Code"), 0, 1);
 
-			codeSpinner=new PamSpinner<Integer> (0, 500, 0, 1);
+			codeSpinner=new PamSpinner<Integer> (1, 500, 0, 1);
 			codeSpinner.setEditable(true);
-			codeSpinner.setPrefWidth(150);
+			//codeSpinner.setPrefWidth(150);
 			codeSpinner.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
-			pamGridPane.add(codeSpinner, 4, 0);
+			pamGridPane.add(codeSpinner, 1, 1);
 			
 //			pamGridPane.add(new Label("Symbol"), 0,1);
 			
 			//create colour picker to allow users to change symbol colour. 
 			symbolPicker=new SymbolPicker(); 
-			pamGridPane.add(symbolPicker, 6, 0);
+			pamGridPane.add(symbolPicker, 3,1);
 			
-			pamGridPane.add(new Label("Symbol"), 5,0);
+			pamGridPane.add(new Label("Symbol"), 2,1);
+			
+			lineColourPicker = new ColorPicker(); 
+			lineColourPicker.setStyle("-fx-color-label-visible: false ;");
+			lineColourPicker.setOnAction((action)->{
+				symbolPicker.setLineColour(lineColourPicker.getValue());
+			});
+			pamGridPane.add(lineColourPicker, 4, 1);
+			
+			
+			fillColourPicker = new ColorPicker(); 
+			fillColourPicker.setStyle("-fx-color-label-visible: false ;");
+			fillColourPicker.setOnAction((action)->{
+				symbolPicker.setFillColour(fillColourPicker.getValue());
+			});
+			pamGridPane.add(fillColourPicker, 5, 1);
+
 
 //			//create a button to allow users to change symbol shape. 
 //			symbolColour=new ColorPicker(); 
@@ -354,35 +418,46 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 //			});
 			
 			//channel options
-			pamGridPane.add(new Label("Channels"), 0,1);
+			pamGridPane.add(new Label("Channels"), 0,2);
 			
 			channelsBox = new ComboBox<String>();
 			for (int i = 0; i < 3; i++) {
 				channelsBox.getItems().add(SweepClassifierSet.getChannelOptionsName(i));
 			}
-			pamGridPane.add(channelsBox, 1,1);
+			pamGridPane.add(channelsBox, 1,2);
 			
-			PamGridPane.setColumnSpan(channelsBox, 7);
+			PamGridPane.setColumnSpan(channelsBox,8 );
 			
 			//restrict parameter to click centre
 			PamHBox clickCenterBox=new PamHBox(); 
 			clickCenterBox.setSpacing(5); 
 
-			clickCenterBox.getChildren().add(new CheckBox("Analyse click ")); 
+			clickCenterBox.getChildren().add(restrictLength = new CheckBox("Trim click")); 
 			
 			clickLengthSpinner=new PamSpinner<Integer>(4,102400,128,32); 
 			clickLengthSpinner.setEditable(true);
-			clickLengthSpinner.setPrefWidth(150);
+			//clickLengthSpinner.setPrefWidth(150);
 			clickLengthSpinner.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
+			clickLengthSpinner.valueProperty().addListener((obsVal, oldVal, newVal)->{
+				setLengthLabel();
+			});
 			
 			clickCenterBox.getChildren().add(clickLengthSpinner);
-			clickCenterBox.getChildren().add(new Label("samples")); 
+			Label samplesLabel =new Label("samples");
+			clickCenterBox.getChildren().add(samplesLabel); 
 			clickCenterBox.getChildren().add(lengthMS=new Label("()")); 
-			clickCenterBox.getChildren().add(new Label("around click center.")); 
+			clickCenterBox.getChildren().add(lengthTypeBox = new ComboBox<String>()); 
+			lengthTypeBox.getItems().add("around click center");
+			lengthTypeBox.getItems().add("from start of click");
 			clickCenterBox.setAlignment(Pos.CENTER_LEFT);
-			PamGridPane.setColumnSpan(clickCenterBox, 7);
-			PamGridPane.setHgrow(clickCenterBox, Priority.ALWAYS);
-			pamGridPane.add(clickCenterBox, 0,2);
+			
+			restrictLength.setOnAction((action)->{
+				lengthTypeBox.setDisable(!restrictLength.isSelected());
+				clickLengthSpinner.setDisable(!restrictLength.isSelected());
+				samplesLabel.setDisable(!restrictLength.isSelected());
+				lengthMS.setDisable(!restrictLength.isSelected());
+			});
+			
 
 //			//column constraints
 //			ColumnConstraints col1 = new ColumnConstraints();
@@ -397,14 +472,16 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 //			col4.setPercentWidth(35);
 //			
 //			pamGridPane.getColumnConstraints().addAll(col1, col2, col3,col4);
-
-			return pamGridPane; 
-
+			
+			PamVBox  holder = new PamVBox(); 
+			holder.setSpacing(5);
+			holder.getChildren().addAll(pamGridPane,clickCenterBox); 
+			
+			return holder; 
 		}
 
 		@Override
 		public int getCode() {
-			// TODO Auto-generated method stub
 			return codeSpinner.getValue();
 		}
 
@@ -424,28 +501,98 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			float sr = sweepClassifier.getClickDetector().getSampleRate();
 			lengthMS.setText(String.format("(%.2f ms)", fftLength * 1000 / sr));
 		}
+		
+		/**
+		 * Set the length in seconds. 
+		 */
+		private void setLengthLabel() {
+			float sr = sweepClassifier.getClickDetector().getSampleRate();
+			lengthMS.setText(String.format("(%.2f ms)", clickLengthSpinner.getValue() * 1000 / sr));
+		}
 
 		@Override
 		protected void setParams() {
-			nameField.setText(sweepClassifierSet.getName());
-			codeSpinner.getValueFactory().setValue(sweepClassifierSet.getSpeciesCode());
+			
+			if (sweepClassifierSet == null) {
+				//symbolViewer.setSymbol(null);
+				symbolPicker.getSelectionModel().select(0);
+				nameField.setText("");
+				setCode(sweepClassifier.getNextFreeCode(0));
+			}
+			else {
+				symbolPicker.setSymbol(sweepClassifierSet.symbol == null? null : sweepClassifierSet.symbol.getSymbol());
+				nameField.setText(sweepClassifierSet.getName());
+				setCode(sweepClassifierSet.getSpeciesCode());
+			}
+
+			if (sweepClassifierSet == null) {
+				return;
+			}
+			
+			lengthTypeBox.getSelectionModel().select(sweepClassifierSet.restrictedBinstype);
+			
 			channelsBox.getSelectionModel().select(sweepClassifierSet.channelChoices);
-			clickLengthSpinner.getValueFactory().setValue(sweepClassifierSet.restrictedBins); 
+			restrictLength.setSelected(sweepClassifierSet.restrictLength);
+			setFFTLength(sweepClassifierSet.restrictedBins);
+			
+			
+//			nameField.setText(sweepClassifierSet.getName());
+//			codeSpinner.getValueFactory().setValue(sweepClassifierSet.getSpeciesCode());
+//			channelsBox.getSelectionModel().select(sweepClassifierSet.channelChoices);
+//			
+//			//length stuff
+//			clickLengthSpinner.getValueFactory().setValue(sweepClassifierSet.restrictedBins); 
+		
 			
 		}
 
 		@Override
 		protected boolean getParams() {
 			sweepClassifierSet.setName(nameField.getText());
-			sweepClassifierSet.setSpeciesCode(codeSpinner.getValue());
-			sweepClassifierSet.channelChoices=channelsBox.getSelectionModel().getSelectedIndex(); 
-			sweepClassifierSet.restrictedBins=clickLengthSpinner.getValue(); 
+			
+			if (this.symbolPicker.getValue()==null) {
+				return showWarning("You must pick a symbol");
+			}
+			
+			SymbolData symbolData = new SymbolData(this.symbolPicker.getValue().getSymbol(), 10,10,true, 
+					PamUtilsFX.fxToAWTColor(this.lineColourPicker.getValue()), PamUtilsFX.fxToAWTColor(this.fillColourPicker.getValue())); 
+			sweepClassifierSet.symbol= new PamSymbol(symbolData);
+			if (sweepClassifierSet.getName().length() <= 0) {
+				return showWarning("You must enter a name for this type of click");
+			}
+			sweepClassifierSet.setSpeciesCode(getCode());
+			if (sweepClassifier.codeDuplicated(sweepClassifierSet, classifierItemRow) ||
+					sweepClassifierSet.getSpeciesCode() <= 0){
+				return showWarning("You must enter a unique positive integer species code");
+			}
+			if (sweepClassifierSet.symbol == null) {
+				return showWarning("You must select a symbol");
+			}
+			sweepClassifierSet.channelChoices = channelsBox.getSelectionModel().getSelectedIndex();
+			sweepClassifierSet.restrictLength = restrictLength.isSelected();
+			
+			sweepClassifierSet.restrictedBinstype = lengthTypeBox.getSelectionModel().getSelectedIndex();
+			
+			try {
+				sweepClassifierSet.restrictedBins = clickLengthSpinner.getValue(); 
+			}
+			catch (NumberFormatException e) {
+				return showWarning("Invalid Restricted length value");
+			}
 			return true;
+//			sweepClassifierSet.setName(nameField.getText());
+//			sweepClassifierSet.setSpeciesCode(codeSpinner.getValue());
+//			sweepClassifierSet.channelChoices=channelsBox.getSelectionModel().getSelectedIndex(); 
+//			sweepClassifierSet.restrictedBins=clickLengthSpinner.getValue(); 
 		}
 
 		@Override
 		protected void disbleControls(boolean enable) {
 			// TODO Auto-generated method stub
+		}
+
+		public TextField getNameLabel() {
+			return this.nameField;
 		}
 		
 	}
@@ -494,7 +641,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		protected void setParams() {
 			//set sample rate. 
 			simpleFilterPane.setSampleRate(sweepClassifier.getClickDetector().getSampleRate());
-			simpleFilterPane.setParams(sweepClassifierSet.fftFilterParams);
+			if (sweepClassifierSet.fftFilterParams!=null) simpleFilterPane.setParams(sweepClassifierSet.fftFilterParams);
 
 			
 		}
@@ -558,7 +705,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 //			gridPane.add(new Label("Smoothing"),0,0); 
 			smoothing=new PamSpinner<Integer>(3,101,5,2); 
 			smoothing.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
-			smoothing.setPrefWidth(100);		
+			//smoothing.setPrefWidth(100);		
 //			gridPane.add(smoothing,1,0); 
 //			gridPane.add(new Label("bins (must be odd)"),2,0); 
 			
@@ -566,7 +713,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 //			gridPane.add(new Label("Threshold"),3,0); 
 			threshold=new PamSpinner<Double>(1., 300., 6.,1.);
 			threshold.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
-			threshold.setPrefWidth(100);
+			//threshold.setPrefWidth(100);
 //			gridPane.add(threshold,4,0); 
 //			gridPane.add(new Label("dB"),5,0); 
 			
@@ -583,12 +730,12 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			minLengthms=new PamSpinner<Double>(0.00, 1.00, 0.03,0.01);
 			minLengthms.setEditable(true);
 			minLengthms.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
-			minLengthms.setPrefWidth(130);
+			//minLengthms.setPrefWidth(130);
 						
 			maxLengthms=new PamSpinner<Double>(0.00, 1.00, 0.22,0.01);
 			maxLengthms.setEditable(true);
 			maxLengthms.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
-			maxLengthms.setPrefWidth(130);
+			//maxLengthms.setPrefWidth(130);
 
 		
 			PamHBox clickLengthHolder2=new PamHBox(); 
@@ -752,9 +899,9 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 	 */
 	private class FrequencySearchBlock extends SweepBox {
 
-		private CheckBox peakFreqCheckBox;
-		private CheckBox peakWidthCheckBox;
-		private CheckBox meanFreqCheckBox;
+		private PamToggleSwitch peakFreqCheckBox;
+		private PamToggleSwitch peakWidthCheckBox;
+		private PamToggleSwitch meanFreqCheckBox;
 		
 		
 		/**
@@ -767,7 +914,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		private FreqBandPane meanFreq;
 
 		FrequencySearchBlock() {
-			super("Peak and Mean Frequency", false);
+			super("Peak and Mean Frequency", true);
 			this.getHolderPane().setCenter(createFreqSearchPane());
 		}
 		
@@ -796,8 +943,8 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 			
 			//peak frequency
-			peakFreqCheckBox=new CheckBox("Enable");
-			peakFreqCheckBox.setOnAction((action)->{
+			peakFreqCheckBox=new PamToggleSwitch("");
+			peakFreqCheckBox.selectedProperty().addListener((obsVal, oldVal, newVal)->{
 				peakFreqPane.setDisableFreqPane(!peakWidthCheckBox.isSelected());
 			});
 			
@@ -811,8 +958,8 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 					
 			
 			//peak width
-			peakWidthCheckBox=new CheckBox("Enable");
-			peakWidthCheckBox.setOnAction((action)->{
+			peakWidthCheckBox=new PamToggleSwitch("");
+			peakWidthCheckBox.selectedProperty().addListener((obsVal, oldVal, newVal)->{
 				//peakWidthPane.setDisable(!peakWidthCheckBox.isSelected());
 				peakWidthPane.setDisableFreqPane(!peakWidthCheckBox.isSelected());
 				threshold.setDisable(!peakWidthCheckBox.isSelected());
@@ -838,8 +985,8 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 			
 			//mean frequency
-			meanFreqCheckBox=new CheckBox("Enable");
-			meanFreqCheckBox.setOnAction((action)->{
+			meanFreqCheckBox=new PamToggleSwitch("");
+			meanFreqCheckBox.selectedProperty().addListener((obsVal, oldVal, newVal)->{
 				meanFreq.setDisableFreqPane(!peakWidthCheckBox.isSelected());
 			});
 			
@@ -1093,5 +1240,16 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		// TODO Auto-generated method stub
 		
 	}
+
+
+	public StringProperty getNameTextProperty() {
+		return optionBox.getNameLabel().textProperty();
+	}
+	
+	private boolean showWarning(String string) {
+		PamDialogFX.showWarning(string);
+		return false;
+	}
+
 
 }

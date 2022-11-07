@@ -1,8 +1,8 @@
 package clickTrainDetector.classification.bearingClassifier;
 
-import org.renjin.gcc.runtime.Debug;
 
 import PamUtils.PamArrayUtils;
+import PamguardMVC.debug.Debug;
 import clickTrainDetector.CTDataUnit;
 import clickTrainDetector.ClickTrainControl;
 import clickTrainDetector.classification.CTClassification;
@@ -95,7 +95,7 @@ public class BearingClassifier implements CTClassifier {
 		
 		if (nullcount>clickTrain.getSubDetectionsCount()-4) {
 			//less than three data units with loc results 
-			Debug.println("The bearing classifier has a null count: "); 
+			Debug.out.println("The bearing classifier has a null count: "); 
 			return new BearingClassification(CTClassifier.NOSPECIES, Double.NaN, Double.NaN, Double.NaN);
 		}
 
@@ -111,7 +111,7 @@ public class BearingClassifier implements CTClassifier {
 		double medianBearingD = PamArrayUtils.median(bearingDiff);
 		double stdBearingD = PamArrayUtils.std(bearingDiff);
 		
-		Debug.println("Bearing classifier: No. Detections: " + clickTrain.getSubDetectionsCount() + " medianBearing: " + medianBearingD);
+		Debug.out.println("Bearing classifier: No. Detections: " + clickTrain.getSubDetectionsCount() + " medianBearing: " + medianBearingD);
 
 		int speciesID = CTClassifier.NOSPECIES;
 		boolean passed= true; 
@@ -120,31 +120,31 @@ public class BearingClassifier implements CTClassifier {
 		//is the minimum and maximum bearing in range...
 		if ((min>=bearingClssfrParams.bearingLimMin && min<=bearingClssfrParams.bearingLimMax) ||
 				(max>=bearingClssfrParams.bearingLimMin && max<=bearingClssfrParams.bearingLimMax)) {
-			Debug.println("Passed on min max bearing");
+			Debug.out.println("Passed on min max bearing");
 		}
 		else passed =false; 
 		
 		//mean bearing derivative
 		if (bearingClssfrParams.useMean && meanBearingD>=bearingClssfrParams.minMeanBearingD 
 				&& meanBearingD<=bearingClssfrParams.maxMeanBearingD) {
-			Debug.println("Passed on mean bearing");
+			Debug.out.println("Passed on mean bearing");
 		}
 		else if (bearingClssfrParams.useMean) passed=false; 
 		
 		//median bearing derivative
-		Debug.println("Median Bearing: " + Math.toDegrees(medianBearingD) +
+		Debug.out.println("Median Bearing: " + Math.toDegrees(medianBearingD) +
 				"   minlim: " + Math.toDegrees(bearingClssfrParams.minMedianBearingD)+
 				"   maxlim: " + Math.toDegrees(bearingClssfrParams.maxMedianBearingD)); 
 		if (bearingClssfrParams.useMedian && medianBearingD>=bearingClssfrParams.minMedianBearingD 
 				&& medianBearingD<=bearingClssfrParams.maxMedianBearingD) {
-			Debug.println("Passed on median bearing");
+			Debug.out.println("Passed on median bearing");
 		}
 		else if (bearingClssfrParams.useMedian) passed = false; 
 		
 		//standard deviation derivative
 		if (bearingClssfrParams.useStD && stdBearingD>=bearingClssfrParams.minStdBearingD 
 				&& stdBearingD<=bearingClssfrParams.maxStdBearingD) {
-			Debug.println("Passed on std bearing");
+			Debug.out.println("Passed on std bearing");
 		}
 		else if (bearingClssfrParams.useStD) passed= false; 
 
@@ -152,8 +152,7 @@ public class BearingClassifier implements CTClassifier {
 			speciesID = this.bearingClssfrParams.speciesFlag;
 		}
 		
-		Debug.println("SPECIESID!! " + speciesID);
-
+		Debug.out.println("SPECIESID!! " + speciesID);
 
 		return new BearingClassification(speciesID, meanBearingD, medianBearingD, stdBearingD);
 	}

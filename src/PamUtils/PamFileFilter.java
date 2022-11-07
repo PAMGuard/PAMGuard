@@ -33,7 +33,7 @@ public class PamFileFilter extends javax.swing.filechooser.FileFilter implements
 	 
 	 private String prefix = null;
 	 
-	 private boolean acceptFolders = true;
+	 protected boolean acceptFolders = true;
 	 	 
 
 	public PamFileFilter(String description, String defExtension) {

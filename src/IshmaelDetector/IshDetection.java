@@ -1,13 +1,21 @@
 package IshmaelDetector;
 
 import PamDetection.PamDetection;
+import PamguardMVC.DataUnitBaseData;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.superdet.SuperDetection;
 
-/** Basic detection on a single channel for the Ishmael det/loc.
+/** 
+ * Basic detection on a single channel for the Ishmael det/loc.
+ * <p>
+ * Note that the Ishmael detection does not contain raw wav data - this is
+ * intentional as the clip generator can be used to generate clips if required. 
+ * As the Ishmael detector is a high false positive rate intial detection stage
+ * then it may very well be beneficial not to store clips but simply pass the raw 
+ * data to downstream processes. 
  *  
- * @author Doug Gillespie and Dave Mellinger
+ * @author Doug Gillespie, Jamie Macaulay and Dave Mellinger 
  *
  */
 public class IshDetection extends PamDataUnit<PamDataUnit, SuperDetection> implements PamDetection {
@@ -27,6 +35,17 @@ public class IshDetection extends PamDataUnit<PamDataUnit, SuperDetection> imple
 		peakDelaySec = (peakTimeSam - startSam)/parentDataBlock.getSampleRate(); 
 		setInfo(startMsec, channelBitmap, startSam, durationSam, lowFreq, highFreq, peakTimeSam, peakHeight);
 	}
+	
+	
+	public IshDetection(DataUnitBaseData baseData, long peakTimeSample, double peakHeight) {
+		super(baseData);
+		setInfo(baseData.getTimeMilliseconds(), baseData.getChannelBitmap(), 
+				baseData.getStartSample(), baseData.getSampleDuration(), (float) baseData.getFrequency()[0], 
+				(float) baseData.getFrequency()[1], peakTimeSample, peakHeight);
+
+	}
+
+
 	public String getCallType() { return callType; }
 	public void setCallType(String callType) { this.callType = callType; }
 	public double getPeakDelaySec() { return peakDelaySec; }

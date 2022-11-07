@@ -26,7 +26,6 @@ public class EnergySumProcess extends IshDetFnProcess {
 	
 	private int loBinRatio, hiBinRatio; //the hi and lo ratio bin
 
-	
 	/**
 	 * Keeps a track of the adaptive noise floor
 	 */
@@ -161,7 +160,6 @@ public class EnergySumProcess extends IshDetFnProcess {
 		if (getEnergySumParams().adaptiveThreshold) {
 			
 			//System.out.println("Result dB: " + result);
-			
 			if (noisefloor==-Double.MIN_VALUE) noisefloor = result; 
 			else noisefloor = getEnergySumParams().longFilter*result + (1-getEnergySumParams().longFilter)*noisefloor; 
 			
@@ -171,11 +169,11 @@ public class EnergySumProcess extends IshDetFnProcess {
 			//Set up structure for depositing the result -- a vector of length 2 to also include noise floor data. 
 			//and append the new data to the end of the data stream.
 			outputUnit.detData = new double[3][1];
-			outputUnit.detData[1][0]= noisefloor; 
-			outputUnit.detData[2][0]= result; 
+			outputUnit.detData[1][0]= noisefloor; //the smoothed average of detection data (add static threshold for absolute threshold)
+			outputUnit.detData[2][0]= result; //the raw result
 			
 			//now the result is just the result minus the noise floor <- keeps all the Ishmael calculations in line with current code structure. 
-			result = result - noisefloor;
+			result = result - noisefloor; //the result minus noise floor i..e the difference - this allows Ishmael downstream modules to use the same code structure. 
 		}
 		else {
 			//Set up structure for depositing the result -- a vector of length 1 --

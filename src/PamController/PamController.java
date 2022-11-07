@@ -43,6 +43,7 @@ import Acquisition.AcquisitionProcess;
 import pamScrollSystem.AbstractScrollManager;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.pamTask.PamTaskUpdate;
+import pamguard.GlobalArguments;
 import pamguard.Pamguard;
 import soundPlayback.PlaybackControl;
 import warnings.PamWarning;
@@ -51,8 +52,10 @@ import zipUnpacker.ZipUnpacker;
 import fftManager.FFTDataBlock;
 import fftManager.FFTDataUnit;
 import generalDatabase.DBControlUnit;
+import javafx.application.Platform;
 import javafx.stage.Stage;
 import Array.ArrayManager;
+import PamController.command.MultiportController;
 import PamController.command.NetworkController;
 import PamController.command.TerminalController;
 import PamController.command.WatchdogComms;
@@ -128,6 +131,11 @@ public class PamController implements PamControllerInterface, PamSettings {
 	public static final int RUN_NETWORKRECEIVER = 5;
 
 	private int runMode = RUN_NORMAL;
+	
+	// flag used in main() to indicate that processing should start immediately. 
+	public static final String AUTOSTART = "-autostart";
+	// flag used in main() to indicate that pamguard should exit as soon as processing ends. 
+	public static final String AUTOEXIT = "-autoexit";
 
 	/**
 	 * The pam model. 
@@ -248,6 +256,9 @@ public class PamController implements PamControllerInterface, PamSettings {
 		if (pamBuoyGlobals.getNetworkControlPort() != null) {
 			networkController = new NetworkController(this);
 		}
+		if (pamBuoyGlobals.getMultiportAddress() != null) {
+			new MultiportController(this);
+		}
 
 		
 		//		binaryStore = new BinaryStore(this);
@@ -300,9 +311,32 @@ public class PamController implements PamControllerInterface, PamSettings {
 	public static void create(int runMode) {
 		if (uniqueController == null) {
 			PamController pamcontroller = new PamController(runMode, null);
-			// I don't see any reason not have have this running with the GUI. 
+			/*
+			 *  I don't see any reason not have have this running with the GUI.
+			 *  It launches in a new thread, so it should be fine to have 
+			 *  additional commands afterwards.  
+			 */
 			TerminalController tc = new TerminalController(pamcontroller);
 			tc.getTerminalCommands();
+		}
+		
+		SwingUtilities.invokeLater(new Runnable() {
+			
+			@Override
+			public void run() {
+				uniqueController.creationComplete();
+			}
+		});
+	}
+	
+	/**
+	 * Not to sound God like, but this will be called on the AWT dispatch thread shortly 
+	 * after all modules are created, PAMGuard should be fully setup and all modules will 
+	 * have recieved INITIALISATION_COMPLETE and should be good to run 
+	 */
+	private void creationComplete() {
+		if (GlobalArguments.getParam(PamController.AUTOSTART) != null) {
+			startLater(); // may as well give AWT time to loop it's queue once more
 		}
 	}
 	
@@ -526,6 +560,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 		
 		clearSelectorsAndSymbols();
 
+		
 		/**
 		 * Debug code for starting PG as soon as it's initialised. 
 		 */
@@ -660,9 +695,22 @@ public class PamController implements PamControllerInterface, PamSettings {
 	@Override
 	public void pamClose() {
 
+		getUidManager().runShutDownOps();
+		
 		for (int i = 0; i < pamControlledUnits.size(); i++) {
 			pamControlledUnits.get(i).pamClose();
 		}
+	}
+
+	/**
+	 * Shut down Pamguard
+	 */
+	public void shutDownPamguard() {
+		// force close the javaFX thread (because it won't close by itself - see Platform.setImplicitExit(false) in constructor
+		Platform.exit();
+		
+		// terminate the JVM
+		System.exit(0);
 	}
 
 	/**
@@ -1297,6 +1345,25 @@ public class PamController implements PamControllerInterface, PamSettings {
 			pamControlledUnits.get(iU).pamHasStopped();
 		}
 		guiFrameManager.pamEnded();
+		
+		// no good having this here since it get's called at the end of every file. 
+//		if (GlobalArguments.getParam(PamController.AUTOEXIT) != null) {
+////			can exit here, since we've auto started, can auto exit.
+//			if (canClose()) {
+//				pamClose();
+//				shutDownPamguard();
+//			}
+//		}
+	}
+	
+	public void batchProcessingComplete( ) {
+		if (GlobalArguments.getParam(PamController.AUTOEXIT) != null) {
+			//	can exit here, since we've auto started, can auto exit.
+			if (canClose()) {
+				pamClose();
+				shutDownPamguard();
+			}
+		}
 	}
 
 
@@ -2562,17 +2629,44 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 */
 	static double getVersion () {
 		String version = System.getProperty("java.version");
-		int pos = version.indexOf('.');		// get the index of the first decimal
-		if (pos==-1) {						// if there is no decimal place (e.g. Java 13) then just use the full string
-			pos=version.length();
-		}
-		else {
-			pos = version.indexOf('.', pos+1);	// get the position of the second decimal
-			if (pos==-1) {						// if there is no second decimal place (e.g. Java 12.0) then just use the full string
-				pos=version.length();
+		/*
+		 *  strip down to the first non numeric character. and allow 0 or 1 decimal points.
+		 *  This should pull out any valid decimal number from the front of the string.  
+		 */
+		int iLen = 0;
+		int nDot = 0;
+		for (int i = 0; i < version.length(); i++) {
+			char ch = version.charAt(i);
+			if (Character.isDigit(ch) || (ch == '.' && nDot == 0)) {
+				iLen++;
+				if (ch == '.') {
+					nDot++;
+				}
 			}
+			else {
+				break;
+			};
 		}
-		return Double.parseDouble (version.substring (0, pos));
+		
+//		int pos = version.indexOf('.');		// get the index of the first decimal
+//		if (pos==-1) {						// if there is no decimal place (e.g. Java 13) then just use the full string
+//			pos=version.length();
+//		}
+//		else {
+//			pos = version.indexOf('.', pos+1);	// get the position of the second decimal
+//			if (pos==-1) {						// if there is no second decimal place (e.g. Java 12.0) then just use the full string
+//				pos=version.length();
+//			}
+//		}
+		double mainVersion = 0;
+		try {
+			mainVersion = Double.parseDouble (version.substring (0, iLen));
+		}
+		catch (NumberFormatException e) {
+			
+		}
+		
+		return mainVersion;
 	}
 
 	/**
@@ -2637,7 +2731,12 @@ public class PamController implements PamControllerInterface, PamSettings {
 
 	@Override
 	public GuiFrameManager getGuiFrameManager() {
-		return (GuiFrameManager)  guiFrameManager;
+		if (guiFrameManager instanceof GuiFrameManager) {
+			return (GuiFrameManager)  guiFrameManager;
+		}
+		else {
+			return null;
+		}
 	}
 
 	public void sortFrameTitles(){

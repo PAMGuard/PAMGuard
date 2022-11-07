@@ -21,9 +21,11 @@
 *.zip
 *.tar.gz
 *.rar
+*.dll
 
 # eclipse project file
 .project
+.hprof
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
@@ -34,3 +36,6 @@ bin/
 target/WMM.COF
 
 settings.xml
+.classpath
+.classpath
+.classpath

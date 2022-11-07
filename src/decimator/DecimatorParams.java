@@ -41,12 +41,44 @@ public class DecimatorParams implements Serializable, Cloneable, ManagedParamete
 	
 	public int interpolation = 0;
 
-	DecimatorParams() {
-		super();
+	/**
+	 * Create decimator params with a nominal output sample rate of 2Kz and 
+	 * a 6th order low pass filter 
+	 */
+	public DecimatorParams() {
+		this(2000);
+//		filterParams = new FilterParams();
+//		filterParams.filterBand = FilterBand.LOWPASS;
+//		filterParams.lowPassFreq = newSampleRate / 2;
+//		filterParams.filterOrder = 6;
+	}
+	
+	/**
+	 * Create decimator parameters with the given output frequency and a 
+	 * 6th order low pass filter. 
+	 * @param newSampleRate
+	 */
+	public DecimatorParams(float newSampleRate) {
+		this(newSampleRate, 6);
+//		this.newSampleRate = newSampleRate;
+//		filterParams = new FilterParams();
+//		filterParams.filterBand = FilterBand.LOWPASS;
+//		filterParams.lowPassFreq = newSampleRate / 2;
+//		filterParams.filterOrder = 6;
+	}
+	
+	/**
+	 * Create decimator parameters with the given output frequency and a 
+	 * low pass filter with given order. 
+	 * @param newSampleRate
+	 * @param filterOrder filter order
+	 */
+	public DecimatorParams(float newSampleRate, int filterOrder) {
+		this.newSampleRate = newSampleRate;
 		filterParams = new FilterParams();
 		filterParams.filterBand = FilterBand.LOWPASS;
 		filterParams.lowPassFreq = newSampleRate / 2;
-		filterParams.filterOrder = 6;
+		filterParams.filterOrder = filterOrder;
 	}
 
 	/* (non-Javadoc)

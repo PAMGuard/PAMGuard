@@ -6,6 +6,7 @@ import clickTrainDetector.classification.templateClassifier.CTTemplateClassifier
 import clickTrainDetector.classification.templateClassifier.DefualtSpectrumTemplates;
 import clickTrainDetector.classification.templateClassifier.DefualtSpectrumTemplates.SpectrumTemplateType;
 import clickTrainDetector.classification.templateClassifier.TemplateClassifierParams;
+import clickTrainDetector.layout.classification.idiClassifier.IDIPane;
 import clickTrainDetector.layout.classification.simplechi2classifier.SimpleCTClassifierPane;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -35,7 +36,7 @@ public class TemplateClassifierPane extends SettingsPane<TemplateClassifierParam
 	/**
 	 * Simple classifier pane 
 	 */
-	private SimpleCTClassifierPane simpleCTClassifierPane;
+	//private SimpleCTClassifierPane simpleCTClassifierPane;
 
 	/**
 	 * Reference to the CT classifer. 
@@ -45,7 +46,7 @@ public class TemplateClassifierPane extends SettingsPane<TemplateClassifierParam
 	/**
 	 * The inter-detection settings pane. 
 	 */
-	private IDIPane idiPane;
+	//private IDIPane idiPane;
 
 	private TemplateSpectrumPane spectrumTemplatePane;
 
@@ -73,24 +74,24 @@ public class TemplateClassifierPane extends SettingsPane<TemplateClassifierParam
 
 	private Node createTemplatePane() {
 
-		//create the simple classifier pane. 
-		Label label1 = new Label("X\u00b2 Threshold"); 
-//		label1.setFont(PamGuiManagerFX.titleFontSize2);
-		PamGuiManagerFX.titleFont2style(label1);
-
-		simpleCTClassifierPane = new SimpleCTClassifierPane(cTTemplateClassifier.getSimpleCTClassifier()); 
-		
-		//the IDI settings
-		Label label2 = new Label("IDI Settings"); 
-//		label2.setFont(PamGuiManagerFX.titleFontSize2);
-		PamGuiManagerFX.titleFont2style(label2);
-
-		idiPane = new IDIPane(); 
+//		//create the simple classifier pane. 
+//		Label label1 = new Label("X\u00b2 Threshold"); 
+////		label1.setFont(PamGuiManagerFX.titleFontSize2);
+//		PamGuiManagerFX.titleFont2style(label1);
+//
+//		simpleCTClassifierPane = new SimpleCTClassifierPane(cTTemplateClassifier.getSimpleCTClassifier()); 
+//		
+//		//the IDI settings
+//		Label label2 = new Label("IDI Settings"); 
+////		label2.setFont(PamGuiManagerFX.titleFontSize2);
+//		PamGuiManagerFX.titleFont2style(label2);
+//
+//		idiPane = new IDIPane(); 
 		
 		//the spectrum template pane.
-		Label label3 = new Label("Spectrum Template"); 
+		//Label label3 = new Label("Spectrum Template"); 
 //		label3.setFont(PamGuiManagerFX.titleFontSize2);
-		PamGuiManagerFX.titleFont2style(label3);
+		//PamGuiManagerFX.titleFont2style(label3);
 		
 		// create spinner. 		
 		spectrumthreshold = new ControlField<Double>("Spectrum Correlation Threshold", "", 0.0, Double.MAX_VALUE, 0.2);
@@ -100,19 +101,24 @@ public class TemplateClassifierPane extends SettingsPane<TemplateClassifierParam
 
 		spectrumTemplatePane = new TemplateSpectrumPane(); 
 		spectrumTemplatePane.setPadding(new Insets(5,5,5,5));
+		spectrumTemplatePane.setMaxWidth(Double.POSITIVE_INFINITY);
+		spectrumTemplatePane.setMinWidth(50);
+
 //		spectrumTemplatePane.setMouseTransparent(true);
 
 		//make general and spectrum correlation pane. 
 		PamVBox generalPane = new PamVBox(); 
 		generalPane.setSpacing(5);
-		generalPane.getChildren().addAll(label1, simpleCTClassifierPane.getContentNode(), label2,
-				idiPane); 
+//		generalPane.getChildren().addAll(label1, simpleCTClassifierPane.getContentNode(), label2,
+//				idiPane); 
 		generalPane.setPadding(new Insets(5,5,5,5));
 
 		PamVBox spectrumPane = new PamVBox(); 
 		spectrumPane.setSpacing(5);
-		spectrumPane.getChildren().addAll(label3, spectrumthreshold, spectrumTemplatePane); 
+		spectrumPane.getChildren().addAll(spectrumthreshold, spectrumTemplatePane); 
 		spectrumPane.setPadding(new Insets(5,5,5,5));
+		
+		spectrumTemplatePane.prefWidthProperty().bind(spectrumPane.widthProperty());
 		
 		
 //		tabPane.setSide(Side.LEFT);
@@ -132,6 +138,10 @@ public class TemplateClassifierPane extends SettingsPane<TemplateClassifierParam
 //		tabPane.minWidthProperty().bind(generalPane.widthProperty());
 //		tabPane.getTabs().addAll(tab1, tab2);
 		
+		
+		spectrumTemplatePane.drawCurrentUnit();
+
+		
 		return new PamVBox(generalPane, spectrumPane); 
 	}
 
@@ -139,9 +149,9 @@ public class TemplateClassifierPane extends SettingsPane<TemplateClassifierParam
 	@Override
 	public TemplateClassifierParams getParams(TemplateClassifierParams currParams) {
 
-		currParams.chi2ThresholdParams = simpleCTClassifierPane.getParams(currParams.chi2ThresholdParams); 
-		
-		currParams = idiPane.getParams(currParams); 
+//		currParams.chi2ThresholdParams = simpleCTClassifierPane.getParams(currParams.chi2ThresholdParams); 
+//		
+//		currParams = idiPane.getParams(currParams); 
 		
 		currParams.spectrumTemplate = spectrumTemplatePane.getSpectrum(); 
 		
@@ -153,11 +163,11 @@ public class TemplateClassifierPane extends SettingsPane<TemplateClassifierParam
 	@Override
 	public void setParams(TemplateClassifierParams input) {		
 		//TEMP- testing settings classes. 
-		if (input.chi2ThresholdParams==null) input.chi2ThresholdParams=new Chi2ThresholdParams(); 
+		//if (input.chi2ThresholdParams==null) input.chi2ThresholdParams=new Chi2ThresholdParams(); 
 		if (input.spectrumTemplate==null) input.spectrumTemplate=DefualtSpectrumTemplates.getTemplate(SpectrumTemplateType.DOLPHIN); 
 
-		simpleCTClassifierPane.setParams(input.chi2ThresholdParams);
-		idiPane.setParams(input);
+//		simpleCTClassifierPane.setParams(input.chi2ThresholdParams);
+//		idiPane.setParams(input);
 		spectrumTemplatePane.setSpectrum(input.spectrumTemplate); 
 		spectrumthreshold.setValue(input.corrThreshold);
 	}

@@ -18,10 +18,14 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.Labeled;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.FileChooser;
@@ -34,6 +38,7 @@ import pamViewFX.fxNodes.PamGridPane;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamSpinner;
 import pamViewFX.fxNodes.PamVBox;
+import pamViewFX.fxNodes.flipPane.FlipPane;
 import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
 
 /**
@@ -111,12 +116,14 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 
 	protected PamHBox defaultSegBox;
 
-	private ProgressIndicator modelLoadIndicator; 
+	private ProgressIndicator modelLoadIndicator;
+
 
 
 	public StandardModelPane(DLClassiferModel soundSpotClassifier) {
 		super(null);
 		this.dlClassifierModel=soundSpotClassifier; 
+
 		mainPane = createPane(); 
 		//the directory chooser. 
 		fileChooser = new FileChooser();
@@ -283,7 +290,7 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 		vBoxHolder = new PamVBox(); 
 		vBoxHolder.setSpacing(5);
 		vBoxHolder.getChildren().addAll(classiferInfoLabel, hBox, advSettings, classiferInfoLabel2, gridPane); 
-
+		
 		mainPane.setCenter(vBoxHolder);
 
 		return mainPane; 
@@ -336,6 +343,11 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 	 * @param advSettingsButton - the advanced settings. 
 	 */
 	public void showAdvPane(PamButton advSettingsButton) {
+		
+		
+//		dlClassifierModel.getDLControl().getSettingsPane().setAdvPaneContents(getAdvSettingsPane().getContentNode());
+//		dlClassifierModel.getDLControl().getSettingsPane().flipToBack();
+		
 
 		if (popOver==null) {
 			popOver = new PopOver(); 
@@ -352,6 +364,9 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 
 		popOver.show(advSettingsButton);
 	}
+	
+	
+
 
 	/**
 	 * Update the path label and tool tip text; 
@@ -367,7 +382,7 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 			pathLabel .setText(this.currentSelectedFile.getName()); 
 			try {
 				pathLabel.setTooltip(new Tooltip(this.currentSelectedFile.getPath() 
-						+ "\n" +" Processor " + Device.defaultDevice().toString()));
+						+ "\n" +" Processor CPU " + Device.cpu() + "  " +  Device.gpu()));
 			}
 			catch (Exception e) {
 				//sometimes get an error here for some reason
@@ -424,6 +439,15 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 		//instead of a using changing a control.
 		currParams.classNames = paramsClone.classNames; 
 		currParams.numClasses = paramsClone.numClasses; 
+		
+		if (paramsClone.classNames == null && speciesIDBox.getItems()!=null) {
+			
+			String[] classNames = new String[speciesIDBox.getItems().size()]; 
+			for (int i=0; i<speciesIDBox.getItems().size(); i++) {
+				classNames[i] = speciesIDBox.getItems().get(i);
+			}
+			currParams.classNames = this.dlClassifierModel.getDLControl().getClassNameManager().makeClassNames(classNames);
+		}
 
 		currParams.useDefaultSegLen = usedefaultSeg.isSelected(); 
 		
@@ -495,8 +519,6 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 
 			}
 		}
-
-
 	}
 
 	@Override

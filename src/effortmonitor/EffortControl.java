@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Vector;
 
 import javax.swing.JCheckBoxMenuItem;
@@ -18,14 +19,18 @@ import PamController.PamController;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamUtils.PamCalendar;
+import PamView.PamSidePanel;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
 import PamguardMVC.debug.Debug;
 import effortmonitor.swing.EffortDataMapGraph;
 import effortmonitor.swing.EffortDialog;
 import effortmonitor.swing.EffortDisplayProvider;
+import effortmonitor.swing.EffortSidePanel;
 import pamScrollSystem.AbstractPamScroller;
 import pamScrollSystem.AbstractScrollManager;
+import pamScrollSystem.PamScroller;
+import pamScrollSystem.PamScrollerData;
 import userDisplay.UserDisplayControl;
 
 public class EffortControl extends PamControlledUnit implements PamSettings{
@@ -42,6 +47,10 @@ public class EffortControl extends PamControlledUnit implements PamSettings{
 	
 	private EffortDataMapGraph dataMapGraph;
 	
+	private HashMap<AbstractPamScroller, PamScrollerData> lastOuterStarts = new HashMap<>();
+	
+	private EffortSidePanel effortSidePanel;
+	
 	public EffortControl(String unitName) {
 		super("unitType", unitName);
 		EffortProcess effortProc = new EffortProcess();
@@ -50,10 +59,20 @@ public class EffortControl extends PamControlledUnit implements PamSettings{
 		effortProc.addOutputDataBlock(effortDataBlock);
 		effortDataBlock.SetLogging(new EffortLogging(this, effortDataBlock));
 		dataMapGraph = new EffortDataMapGraph(this);
+		
+//		PamScroller
 
 		UserDisplayControl.addUserDisplayProvider(new EffortDisplayProvider(this));
 		
 		PamSettingManager.getInstance().registerSettings(this);
+	}
+
+	@Override
+	public PamSidePanel getSidePanel() {
+		if (effortSidePanel == null) {
+			effortSidePanel = new EffortSidePanel(this);
+		}
+		return effortSidePanel;
 	}
 
 	@Override
@@ -65,6 +84,10 @@ public class EffortControl extends PamControlledUnit implements PamSettings{
 			break;
 		case PamController.NEW_SCROLL_TIME:
 			updateScrollerInfo();
+			break;
+		case PamController.DATA_LOAD_COMPLETE:
+			updateScrollerInfo();
+			break;
 		}
 	}
 
@@ -102,7 +125,25 @@ public class EffortControl extends PamControlledUnit implements PamSettings{
 			 */
 			return;
 		}
+		
+		boolean newOuter = isNewOuter(scroller);
+		if (effortParams.outserScrollOnly) {
+			if (newOuter) {
+				logOuterScroll(scroller);
+			}
+		}
+		else {
+			logInnerScroll(scroller);
+		}
+	}
+	
+	private void logOuterScroll(AbstractPamScroller scroller) {
+		EffortDataUnit effortData = new EffortDataUnit(scroller, effortParams.getObserver(), effortParams.getObjective());
+		effortData.setOuterLimits();
+		effortDataBlock.addPamData(effortData);
+	}
 
+	private void logInnerScroll(AbstractPamScroller scroller) {
 //		checkObserverName();
 		
 		EffortDataUnit effortData = effortDataBlock.findActiveUnit(scroller);
@@ -127,6 +168,38 @@ public class EffortControl extends PamControlledUnit implements PamSettings{
 				effortDataBlock.updatePamData(effortData, System.currentTimeMillis());
 			}
 		}
+	}
+
+	/**
+	 * Has the outer scroll moved. 
+	 * @param scroller
+	 * @return true if the outer has moved. 
+	 */
+	private boolean isNewOuter(AbstractPamScroller scroller) {
+		PamScrollerData lastData = lastOuterStarts.get(scroller);
+		PamScrollerData nowVal = scroller.getScrollerData();
+		if (nowVal == null) {
+			return false; // shouldn't happen !
+		}
+		boolean changed = isChanged(lastData, nowVal);
+		if (changed) {
+			lastOuterStarts.put(scroller, nowVal.clone());
+		}
+		return changed;
+	}
+
+	private boolean isChanged(PamScrollerData lastData, PamScrollerData nowVal) {
+		if (lastData == null || nowVal == null) {
+			return true;
+		}
+		if (lastData.getMinimumMillis() != nowVal.getMinimumMillis()) {
+			return true;
+		}
+		if (lastData.getMaximumMillis() != nowVal.getMaximumMillis()) {
+			return true;
+		}
+		
+		return false;
 	}
 
 	/**
@@ -203,9 +276,11 @@ public class EffortControl extends PamControlledUnit implements PamSettings{
 				existingUnit.setObserver(newParams.getObserver());
 				existingUnit.setObjective(newParams.getObjective());
 			}
-			return true;
 		}
-		return false;
+		if (effortSidePanel != null) {
+			effortSidePanel.updateSettings();
+		}
+		return newParams!=null;
 	}
 
 	public void goToTime(AbstractPamScroller scroller, long timeInMilliseconds) {
@@ -235,6 +310,9 @@ public class EffortControl extends PamControlledUnit implements PamSettings{
 	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		effortParams = ((EffortParams) pamControlledUnitSettings.getSettings());
+		if (effortSidePanel != null) {
+			effortSidePanel.updateSettings();
+		}
 		return true;
 	}
 

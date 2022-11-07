@@ -42,7 +42,8 @@ public class ICIChi2AdvPane  extends AdvMHTVarPane {
 		});
 		gridPane.add(minICISpinner, 1, gridY); 
 		gridPane.add(new Label("ms"), 2, gridY); 
-		
+		minICISpinner.setEditable(true);
+
 		//create tool tip
 		Tooltip errorCoeffTip = new Tooltip(  "The minimum IDI defines a minimum IDI allowed in a click train \n"
 											+ "If an IDI below this minimum occurs in a click train it will incur\n"

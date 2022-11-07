@@ -9,6 +9,8 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JMenuItem;
 
+import IshmaelDetector.dataPlotFX.IshmaelDetPlotProvider;
+import IshmaelDetector.dataPlotFX.IshmaelFnPlotProvider;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
@@ -19,6 +21,7 @@ import PamUtils.PamUtils;
 import PamView.dialog.GroupedSourcePanel;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamRawDataBlock;
+import dataPlotsFX.data.TDDataProviderRegisterFX;
 
 
 /**
@@ -65,11 +68,28 @@ public abstract class IshDetControl extends PamControlledUnit implements PamSett
 		
 		//Display.
 		ishDetGraphics = new IshDetGraphics(this, getOutputDataBlock());
+		//FX display data providers
+		IshmaelDetPlotProvider ishDetPlotProviderFX = new IshmaelDetPlotProvider(this);
+		IshmaelFnPlotProvider ishFnPlotProviderFX = new IshmaelFnPlotProvider(this);
+
+		TDDataProviderRegisterFX.getInstance().registerDataInfo(ishDetPlotProviderFX);
+		TDDataProviderRegisterFX.getInstance().registerDataInfo(ishFnPlotProviderFX);
 		
 		//Saver.
 		ishDetSave = new IshDetSave(this);
+		
+
 	}
 	
+	/**
+	 * Get the Ishmael Fn process - this creates the detector output but 
+	 * does not perform the binary classification. 
+	 * @returnc the Ishmael Fn process
+	 */
+	public IshDetFnProcess getIshDetFnProcess() {
+		return ishDetFnProcess;
+	}
+
 	/** Return any old data block of the right type so that the detection 
 	 * process's input can get hooked up to something from the get-go.  The
 	 * input is typically re-hooked when the settings file is read.
@@ -233,6 +253,15 @@ public abstract class IshDetControl extends PamControlledUnit implements PamSett
 			if (PamUtils.hasChannel(channelMap, PamUtils.getSingleChannel(chanGroups[i]))) return true; 
 		}
 		return false;
+	}
+
+	/**
+	 * Get the Ishmael peak process. The peak process selects handles
+	 * binary classification of the detector output. 
+	 * @return the Ishamel peak process. 
+	 */
+	public IshPeakProcess getIshPeakProcess() {
+		return this.ishPeakProcess;
 	}
 	
 }

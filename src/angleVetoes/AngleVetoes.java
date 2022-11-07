@@ -9,6 +9,7 @@ import javax.swing.JMenuItem;
 
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
+import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 
@@ -35,7 +36,10 @@ public class AngleVetoes extends Object implements PamSettings {
 		super();
 		this.pamControlledUnit = pamControlledUnit;
 		
-		angleVetoDisplay = new AngleVetoDisplay(this);
+
+		if (PamGUIManager.getGUIType() != PamGUIManager.NOGUI) {
+			angleVetoDisplay = new AngleVetoDisplay(this);
+		}
 		
 		PamSettingManager.getInstance().registerSettings(this);
 	}
@@ -96,7 +100,9 @@ public class AngleVetoes extends Object implements PamSettings {
 		AngleVetoParameters newParams = AngleVetoesDialog.showDialog(frame, this);	
 		if (newParams != null) {
 			angleVetoParameters = newParams.clone();
-			angleVetoDisplay.repaint();
+			if (angleVetoDisplay != null) {
+				angleVetoDisplay.repaint();
+			}
 		}
 	}
 
@@ -132,7 +138,9 @@ public class AngleVetoes extends Object implements PamSettings {
 	}
 	
 	private void displayAction(Frame frame) {
-		angleVetoDisplay.setVisible(true);
+		if (angleVetoDisplay != null) {
+			angleVetoDisplay.setVisible(true);
+		}
 	}
 
 	/**
@@ -205,7 +213,9 @@ public class AngleVetoes extends Object implements PamSettings {
 	 * @param angle angle in degrees
 	 */
 	public void addAngleData(double angle) {
-		angleVetoDisplay.newAngle(angle);
+		if (angleVetoDisplay != null) {
+			angleVetoDisplay.newAngle(angle);
+		}
 	}
 	
 	/**
@@ -213,6 +223,8 @@ public class AngleVetoes extends Object implements PamSettings {
 	 * @param pass true if there was a pass, false for a fail. 
 	 */
 	public void addPassData(boolean pass) {
-		angleVetoDisplay.newPassData(pass);
+		if (angleVetoDisplay != null) {
+			angleVetoDisplay.newPassData(pass);
+		}
 	}
 }

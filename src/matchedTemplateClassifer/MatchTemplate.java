@@ -46,7 +46,7 @@ public class MatchTemplate implements RawDataHolder, Serializable, Cloneable, Ma
 	
 	@Override
 	 public String toString() {
-        return super.toString() +  " sR: " + sR + " waveform length: " + waveform  + " " + name;
+        return super.toString() +  " sR: " + sR + " waveform length: " + waveform == null ? "null waveform" : waveform.length  + " " + name;
     }
 	
 	@Override

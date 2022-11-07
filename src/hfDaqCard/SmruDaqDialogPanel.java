@@ -32,6 +32,7 @@ public class SmruDaqDialogPanel {
 	JComboBox[] gains = new JComboBox[PamConstants.MAX_CHANNELS];
 	JComboBox[] filters = new JComboBox[PamConstants.MAX_CHANNELS];
 	
+	JLabel libVersion;	
 
 	private SmruDaqParameters smruDaqParameters;
 
@@ -53,6 +54,12 @@ public class SmruDaqDialogPanel {
 		dialogPanel = new JPanel(new GridBagLayout());
 		dialogPanel.setBorder(new TitledBorder("Daq card configuration"));
 		GridBagConstraints c = new PamGridBagContraints();
+		c.gridwidth = 3;
+		dialogPanel.add(new JLabel("Library version: ", JLabel.RIGHT), c);
+		c.gridx += c.gridwidth;
+		dialogPanel.add(libVersion = new JLabel("Unknown"));
+		c.gridx = 0;
+		c.gridy++;
 		c.gridwidth = 3;
 		PamDialog.addComponent(dialogPanel,new JLabel("Sample Rate ", SwingConstants.RIGHT),c);
 		c.gridx += c.gridwidth;
@@ -169,6 +176,9 @@ public class SmruDaqDialogPanel {
 	}
 
 	public void setParams(SmruDaqParameters smruDaqParameters) {
+		
+		libVersion.setText(smruDaqSystem.getJNILibInfo());
+		
 		this.smruDaqParameters = smruDaqParameters.clone();
 		sampleRate.setSelectedIndex(smruDaqParameters.getSampleRateIndex());
 		for (int i = 0; i < SmruDaqParameters.NCHANNELS * nShownBoards; i++) {

@@ -3,6 +3,7 @@ package generalDatabase.sqlite;
 import generalDatabase.pamCursor.NonScrollablePamCursor;
 import generalDatabase.pamCursor.PamCursor;
 import javafx.stage.FileChooser;
+import pamguard.GlobalArguments;
 
 import java.awt.Component;
 import java.awt.Desktop;
@@ -10,10 +11,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 import org.sqlite.SQLiteConfig;
 
@@ -82,6 +85,54 @@ public class SqliteSystem extends DBSystem implements PamSettings {
 		if (sqliteParameters.getRecentDatabases() == null) {
 			sqliteParameters.setRecentDatabases(new ArrayList<File>());
 		}
+		checkCommandLineOption();
+	}
+
+	/**
+	 * Check to see if the database name was included as a command line option, 
+	 * in which case, put it at the top of the list. this is better than just using 
+	 * it,since it then gets stored within it's own settings. 
+	 */
+	private void checkCommandLineOption() {
+		// TODO Auto-generated method stub		
+		/*
+		 * If a database name was passed as a global argument, then use the passed name instead of 
+		 * the name in the list of recent databases. 
+		 */
+		String commandName = GlobalArguments.getParam(DBControl.GlobalDatabaseNameArg);
+		if (commandName == null) {
+			return;
+		}
+		setDatabaseName(commandName);
+	}
+
+	/**
+	 * Set the database name, check it exists, check it's end
+	 * and add to top of list of databases. 
+	 * @param databaseName
+	 */
+	public void setDatabaseName(String databaseName) {
+		// see if this file exists in the list and if it does, remove it
+		for (int i = 0; i < getRecentDatabases().size(); i++) {
+			if (getRecentDatabases().get(i).toString().equalsIgnoreCase(databaseName)) {
+				getRecentDatabases().remove(i);
+			}
+		}
+		// then insert the file at the top of the list.
+		File newFile = new File(databaseName);
+		// if the file doesn't exit, consider creating it.
+		if (newFile.exists() == false) {
+			boolean ask = GlobalArguments.getParam(DBControl.GlobalDatabaseNameArg) == null;
+			newFile = createNewDatabase(databaseName, null, ask);
+			if (newFile == null) {
+				System.out.println("Unable to create "+newFile);
+				return;
+			}
+			
+		}
+		
+		getRecentDatabases().add(0, newFile);
+		
 	}
 
 	@Override
@@ -110,6 +161,52 @@ public class SqliteSystem extends DBSystem implements PamSettings {
 			return currFile.getAbsolutePath();
 		}
 		return null;
+	}
+	
+	/**
+	 * Create a new empty database file. 
+	 * @param newDB full path for database file (can be missing .sqlit3 if you like - this will get checked and added). 
+	 * @param parent window (for confirm dialog, can be null)
+	 * @param askFirst show a confirm dialog before creating the database file. 
+	 * @return a path to the file, whether created or no. 
+	 */
+	public File createNewDatabase(String newDB, Component parent, boolean askFirst) {
+
+		File newFile = new File(newDB);
+		newFile = PamFileFilter.checkFileEnd(newFile, ".sqlite3", true);
+
+		if (askFirst) {
+			int ans = JOptionPane.showConfirmDialog(parent, "Create blank database " + newFile.getAbsolutePath() + " ?", "Sqlite", JOptionPane.OK_CANCEL_OPTION);
+			if (ans == JOptionPane.CANCEL_OPTION) {
+				return null;
+			}
+		}
+		Connection connection = null;
+
+		try {
+			// create a database connection;
+			// Sqlite will automatically create file if it does not exist; 
+			connection = DriverManager.getConnection("jdbc:sqlite:" + newFile);
+
+		}
+		catch(SQLException e)
+	    {
+	      System.err.println(e.getMessage());
+	    }
+	    finally
+	    {
+	      try
+	      {
+	        if(connection != null)
+	          connection.close();
+	      }
+	      catch(SQLException e)
+	      {
+	        // connection close failed.
+	        System.err.println(e);
+	      }
+	    }
+		return newFile;
 	}
 
 	@Override
@@ -208,6 +305,15 @@ public class SqliteSystem extends DBSystem implements PamSettings {
 
 	@Override
 	public String getDatabaseName() {
+		/*
+		 * If a database name was passed as a global argument, then use the passed name instead of 
+		 * the name in the list of recent databases. 
+		 */
+		String commandName = GlobalArguments.getParam(DBControl.GlobalDatabaseNameArg);
+		if (commandName != null) {
+			return commandName;
+		}
+		
 		if (getRecentDatabases() == null) return null;
 		if (getRecentDatabases().size() < 1) return null;
 		return getRecentDatabases().get(0).getAbsolutePath();
@@ -271,7 +377,7 @@ public class SqliteSystem extends DBSystem implements PamSettings {
 
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		Object settings = pamControlledUnitSettings.getSettings();
-		if (settings instanceof ArrayList) {
+		if (settings instanceof ArrayList) { // deal with old format which just stored a list. 
 			sqliteParameters.getRecentDatabases().clear();
 			sqliteParameters.getRecentDatabases().addAll((ArrayList) settings);
 		}

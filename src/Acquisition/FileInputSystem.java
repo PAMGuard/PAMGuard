@@ -47,6 +47,8 @@ import wavFiles.ByteConverter;
 import Acquisition.filedate.FileDate;
 import Acquisition.filedate.FileDateDialogStrip;
 import Acquisition.filedate.FileDateObserver;
+import Acquisition.pamAudio.PamAudioFileManager;
+import Acquisition.pamAudio.PamAudioFileFilter;
 import Acquisition.pamAudio.PamAudioSystem;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
@@ -54,13 +56,13 @@ import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamDetection.RawDataUnit;
 import PamModel.SMRUEnable;
-import PamUtils.PamAudioFileFilter;
 import PamUtils.PamCalendar;
 import PamUtils.PamFileChooser;
 import PamView.dialog.PamLabel;
 import PamView.dialog.warn.WarnOnce;
 import PamView.panel.PamPanel;
 import PamView.panel.PamProgressBar;
+import pamguard.GlobalArguments;
 import warnings.PamWarning;
 
 /**
@@ -407,7 +409,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		//		acquisitionDialog.NotifyChange();
 		if (file.isFile() && !file.isHidden() && acquisitionDialog != null) {
 			try {
-				AudioInputStream audioStream = PamAudioSystem.getAudioInputStream(file);
+				AudioInputStream audioStream = PamAudioFileManager.getInstance().getAudioInputStream(file);
 
 				//      // Get additional information from the header if it's a wav file. 
 				//				if (WavFileInputStream.class.isAssignableFrom(audioStream.getClass())) {
@@ -536,6 +538,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	}
 
 	public File getCurrentFile() {
+		System.out.println("fileInputParameters: " + fileInputParameters); 
 		if (fileInputParameters.recentFiles == null) return null;
 		if (fileInputParameters.recentFiles.size() < 1) return null;
 		String fileName = fileInputParameters.recentFiles.get(0);
@@ -558,8 +561,11 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	public boolean prepareInputFile() {
 
 		File currentFile = getCurrentFile();
-//		System.out.printf("***********************************             Opening file %s\n", currentFile.getName());
-		if (currentFile == null) return false;
+		if (currentFile == null) {
+			System.out.println("The current file was null");
+			return false;
+		}
+		System.out.printf("***********************************             Opening file %s\n", currentFile.getName());
 
 		try {
 
@@ -567,7 +573,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 				audioStream.close();
 			}
 
-			audioStream = PamAudioSystem.getAudioInputStream(currentFile);
+			audioStream = PamAudioFileManager.getInstance().getAudioInputStream(currentFile);
 
 			if (audioStream == null) {
 				return false;
@@ -621,7 +627,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 					"</b><br><br><p>Please check to ensure that the file exists, and that the path entered in PAMGuard is correct.</p>" +
 					"<p>Note this error may also indicate that the file is corrupt and unreadable by PAMGuard.</p></html>";
 			String help = null;
-			int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help);
+			int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help);
 			return false;
 		}
 
@@ -644,7 +650,8 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 			
 			String audioFileStr = getCurrentFile()==null? "Null File": getCurrentFile().getAbsolutePath();
 
-			System.err.println("FileInputSystem: runFileAnalysis: AudioFilr format is null: " + audioFileStr); 
+			System.err.println("FileInputSystem: runFileAnalysis: AudioFile format is null: " + audioFileStr); 
+			
 			return false; 
 		}
 		
@@ -846,7 +853,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 				lastProgressUpdate = totalSamples;
 			}
 
-			while (newDataUnits.getQueueSize() > 2) {
+			while (newDataUnits.getQueueSize() > 3*nChannels) {
 				if (dontStop == false) break;
 				try {
 					Thread.sleep(2);
@@ -972,7 +979,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 					 * get it's act together on a timer and use this data
 					 * unit, then set it's reference to zero.
 					 */
-					while (newDataUnits.getQueueSize() > 10) {
+					while (newDataUnits.getQueueSize() > 3*nChannels) {
 						if (dontStop == false) break;
 						try {
 							Thread.sleep(1);
@@ -1075,8 +1082,17 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 
 	@Override
 	public void daqHasEnded() {
-		// TODO Auto-generated method stub
+		fileListComplete();
+	}
 
+	/**
+	 * Called when all files to be processed have been processed. 
+	 */
+	protected void fileListComplete() {
+		if (GlobalArguments.getParam(PamController.AUTOEXIT) != null) {
+			System.out.println("All sound files processed, PAMGuard can close on " + PamController.AUTOEXIT);
+			PamController.getInstance().batchProcessingComplete();
+		}
 	}
 
 	JPanel statusPanel;

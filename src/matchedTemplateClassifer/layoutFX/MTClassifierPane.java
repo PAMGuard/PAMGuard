@@ -35,7 +35,6 @@ import matchedTemplateClassifer.ImportTemplateMAT;
 import matchedTemplateClassifer.MTClassifier;
 import matchedTemplateClassifer.MTClassifierControl;
 import matchedTemplateClassifer.MatchTemplate;
-import matchedTemplateClassifer.MatchedTemplateParams;
 import matchedTemplateClassifer.TemplateImport;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
@@ -368,10 +367,11 @@ public class MTClassifierPane extends SettingsPane<MTClassifier> {
 		String extension = getFileExtension(file);
 		for (int i=0; i< this.templateImporters.size(); i++) {
 			for (int j=0; j<templateImporters.get(i).getExtension().length; j++) {
-				//System.out.println(templateImporters.get(i).getExtension()[j] + " : " + extension);
+				System.out.println(templateImporters.get(i).getExtension()[j] + " : " + extension);
 				if (templateImporters.get(i).getExtension()[j].equals(extension)) {
-					//System.out.println("Import using the extensions: " + extension);
+//					System.out.println("Import using the extensions: " + extension);
 					template=templateImporters.get(i).importTemplate(file);
+//					System.out.println("Match template 3: " + template) ;
 				}
 			}
 		}

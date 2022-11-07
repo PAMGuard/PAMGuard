@@ -158,7 +158,7 @@ public class TDDisplayFX extends PamBorderPane {
 	/**
 	 * The height of the control pane. 
 	 */
-	final static double controlPaneHeight=63;
+	final static double CONTROL_PANE_HEIGHT=80;
 
 
 	/**
@@ -238,7 +238,7 @@ public class TDDisplayFX extends PamBorderPane {
 		//create top hiding panel. 
 		controlPane=new TDControlPaneFX(tdControl,this);
 		controlPane.setParams(tdParametersFX);
-		controlPane.setPrefHeight(controlPaneHeight);
+		controlPane.setPrefHeight(CONTROL_PANE_HEIGHT);
 
 		hidingControlPane=new HidingPane(Side.TOP, controlPane, this, false );
 		hidingControlPane.showHidePane(tdParametersFX.showControl);

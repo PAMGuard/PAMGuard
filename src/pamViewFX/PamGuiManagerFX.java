@@ -13,12 +13,15 @@ import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.internalNode.PamInternalPane;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
 import pamViewFX.fxNodes.pamDialogFX.PamSettingsDialogFX;
+import pamViewFX.fxStyles.PamAtlantaStyle;
 import pamViewFX.fxStyles.PamStylesManagerFX;
 import pamViewFX.pamTask.PamTaskUpdate;
 import userDisplayFX.UserDisplayNodeFX;
 import PamModel.PamModel;
 import PamModel.PamModuleInfo;
 import PamView.PamViewInterface;
+import atlantafx.base.theme.PrimerDark;
+import atlantafx.base.theme.PrimerLight;
 import dataMap.layoutFX.DataMapPaneFX;
 import PamController.PAMControllerGUI;
 import PamController.PamControlledUnit;
@@ -28,6 +31,7 @@ import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import dataModelFX.DataModelPaneFX;
+import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
@@ -134,11 +138,11 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 
 
 	public PamGuiManagerFX(PamController pamController, Object stage) {
-		
+
 		
 		this.pamController=pamController; 
 		pamGuiSettings= new PAMGuiFXSettings(); 
-		
+				
 		primaryStage= (Stage) stage;
 		
 		primaryStage.setOnCloseRequest(e->{
@@ -159,19 +163,22 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 	 */
 	private void start(Stage primaryStage) {
 		
+		PamStylesManagerFX.getPamStylesManagerFX().setCurStyle(new PamAtlantaStyle());
+
 		//add stage
 		stages.add(primaryView = new PamGuiFX(primaryStage, this)); 
 		//create new data model. 
 		dataModelFX=stages.get(0).addDataModelTab();
 		
 		scene = new Scene(stages.get(0));
+		scene.getStylesheets().add(getPamCSS());
+
 		
+//		Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
 		//		stages.get(0).prefWidthProperty().bind(scene.widthProperty());
 		//	    stages.get(0).prefHeightProperty().bind(scene.heightProperty());
 
 		primaryStage.setScene(scene);
-		//		scene.getStylesheets().add(pamCSS); 
-		scene.getStylesheets().add(getPamCSS());
 		//need to add this for material design icons and fontawesome icons
 //		scene.getStylesheets().addAll(GlyphsStyle.DEFAULT.getStylePath());
 
@@ -458,7 +465,7 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 			TabSelectionPane tabSelectionPane=new TabSelectionPane(stages.get(0));
 
 			PamSettingsDialogFX<?> settingsDialog=new PamSettingsDialogFX(tabSelectionPane); 
-			settingsDialog.getDialogPane().getStylesheets().add(PamController.getInstance().getGuiManagerFX().getPamSettingsCSS());
+			settingsDialog.getDialogPane().getStylesheets().add(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getDialogCSS());
 			settingsDialog.initStyle(StageStyle.UNDECORATED);
 
 			//			ChoiceDialog<String> dialog = new ChoiceDialog<>(tabStrings.get(1), tabStrings);
@@ -485,7 +492,7 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 	 * Get CSS for PAMGUARD setting 'look and feel' for sliding dialogs
 	 * @return the CSS for settings feels. 
 	 */
-	public String getPamSettingsCSS() {
+	public String getPamSettingsCSS() {//return new PrimerDark().getUserAgentStylesheet();
 		//		return getClass().getResource("/Resources/css/pamSettingsCSS.css").toExternalForm();
 		return PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS();
 	}
@@ -495,6 +502,7 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 	 * @return the standard CSS fro PAMGUARD. 
 	 */
 	public String getPamCSS() {
+		//return new PrimerLight().getUserAgentStylesheet();
 		//		return getClass().getResource("/Resources/css/pamCSS.css").toExternalForm();
 		return PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getGUICSS();
 	}
@@ -503,8 +511,9 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 	 * Get CSS for PAMGUARD GUI standard 'look and feel' for regular dialogs
 	 * @return the standard CSS fro PAMGUARD. 
 	 */
-	public String getPamDialogCSS() {
-		return PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS();
+	public String getPamDialogCSS() {//return new PrimerDark().getUserAgentStylesheet();
+
+		return PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getDialogCSS();
 	}
 
 
@@ -644,7 +653,7 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 		mainPane.getChildren().addAll(title, namePane);
 
 		dialog.getDialogPane().setContent(mainPane);
-		dialog.getDialogPane().getStylesheets().add(PamController.getInstance().getGuiManagerFX().getPamSettingsCSS());
+		dialog.getDialogPane().getStylesheets().add(this.getPamDialogCSS());
 
 		//add listener to prevent close request if the dialog
 		final Button btOk = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
@@ -880,8 +889,9 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 			pamController.saveViewerData();
 		}
 
-		// deal with anything that needs sorting out in the realm of UID's. 
-		pamController.getUidManager().runShutDownOps();
+//		// deal with anything that needs sorting out in the realm of UID's.
+		// move this to pamController.pamClose()
+//		pamController.getUidManager().runShutDownOps();
 
 		// if the user doesn't want to save the config file, make sure they know
 		// that they'll lose any changes to the settings

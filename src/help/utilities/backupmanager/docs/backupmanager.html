@@ -1,0 +1,61 @@
+<html>
+<head>
+<link href="../../../pamHelpStylesheet.css" rel="STYLESHEET"
+	type="text/css" />
+<title>Backup Manager</title>
+</head>
+<body>
+	<h1>Backup Manager</h1>
+
+	<h2>Overview</h2>
+
+	<p>
+The backup manager can be used to automatically backup (copy) data from PAMGuard on a daily basis, e.g. to external hard drives. For example, you might initially 
+write data to internal hard drives, then want copies of the data made to external hard drives prior to deleting the data data on the internal drives. 	</p>
+<p>Note that this module is really intended to be used with PAMGuard installations running continuously, and is probably of very little use if you're using it
+on a more ad-hoc or daily basis from a boat with an operator present</p>
+
+	<p>The three main outputs from PAMGuard are the <a href="../../BinaryStore/docs/binarystore_overview.html">Binary Store</a>, 
+	the <a href="../../generalDatabaseHelp/docs/database_database.html">Database</a>, and the
+	<a href="../../../sound_processing/soundRecorderHelp/docs/RecorderOverview.html">Sound Recorder</a>. Data for each of these can be automatically copied
+	each day and then, if you wish, also deleted from the main hard drive. <p>
+		
+	<h2>Configuration</h2>
+	<p>To use the backup manager, add a Backup Manager module from the utilities group menu: <b>File>Add Module>Utilities>Backup Manager</b></p>
+	<p>You then add (or use an existing) <a href="../../../displays/userDisplayHelp/docs/userDisplayPanel.html">User Display</a> and add a 
+	Backup Manager Display from the User Display menu. </p>
+	
+	<center><img src="./images/backupdisplay1.png">
+	<br><em>Figure 1. Backup manager display panel prior to configuration.</em></center>
+	<br>
+	<p>Until correctly configured, the backup manager won't do anything. For each type of data you should add one or more <em>actions</em>. Possible actions for 
+	the binary store and the sound recorder are "Copy Files", "Move Files", "Delete Files". The actions will take place in order, and the Delete action will not run 
+	if a preceding copy action has failed (e.g. due to an external hard disk being full).</p>
+	<p>Add the actions you want, then click on the configure button (small wheel) to set the destination folder. 
+	<center><img src="./images/backupdisplay2.png">
+	<br><em>Figure 1. Backup manager display panel prior to configuration.</em></center>
+	<br>
+	
+	<p>Actions for the database are slightly different: "Copy database" and "Clone database". "Copy"" performs a straight forward 
+	file copy of the database file. "Clone" creates a new database, then runs a series of SQL commands to copy data from the old to 
+	the new database. The latter is slightly safer since the copied database can become corrupted if the database it updated while
+	it is copying.</p> 
+	
+	
+	<h3>Other types of data</h3>
+	<p>If you also want to back up other types of data being collected on the same computer, but not by PAMGuard, then you can use the menu
+	<b>Settings>Backup Manager>Add Stream</b> and then configure the new data stream on the main backup manager display to take files from within
+	a designated folder and Copy / Move / Delete them as for the binary files and recordings above. As an example, we are using this to automatically 
+	backup data being collected using Tritech Genesis software which acquires data from multibeam sonars.<p> 
+	
+	<h2>Running and Pausing</h2>
+	<p>There is currently only one available backup schedule whereby the backup is run each day at at 01:00 UTC. Other possible schedules allowing 
+	more user control may be added in the future.</p>
+	<p>By default, the backup will run every day. You can pause the backup, e.g. pausing for a few days while you wait for someone to change over external 
+	hard drives. </p>  
+	
+	<h2>Database Output</h2>
+	<p>If a database is present on the system, then a record of all backup actions for each file will be recorded in the database.</p>
+	
+</body>
+</html>

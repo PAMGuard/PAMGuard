@@ -74,6 +74,7 @@ public class BearLocGroupPane extends SettingsPane<BearingLocaliserParams> {
 
 	@Override
 	public void setParams(BearingLocaliserParams params) {
+		System.out.println("Bearing Localiser: params: " + params.getChannelBitmap()); 
 		groupedChannelPanel.setParams(params.getRawOrFFTSourceParameters());
 		doAllGroups.setSelected(params.doAllGroups);
 	}

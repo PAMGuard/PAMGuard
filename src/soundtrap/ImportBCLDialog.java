@@ -56,7 +56,7 @@ public class ImportBCLDialog extends PamDialog {
 	private JTextField customDateTimeFormat;
 	private JLabel fileCountInfo;
 	private JLabel thisFileInfo;
-	private JProgressBar allProgress;
+	private JProgressBar oneFileProgress, totalProgress;
 	private JComboBox<String> detectorName;
 	private int nSoundTraps;	
 	private Hashtable<String, String> uniqueDevices = new Hashtable<>();
@@ -162,8 +162,10 @@ public class ImportBCLDialog extends PamDialog {
 		thisFileInfo = new JLabel(" - ");
 		progressPanel.add(thisFileInfo);
 		
-		allProgress = new JProgressBar();
-		progressPanel.add(allProgress);
+		totalProgress = new JProgressBar();
+		progressPanel.add(totalProgress);
+		oneFileProgress = new JProgressBar();
+		progressPanel.add(oneFileProgress);
 		
 		startButton = new JButton("Start");
 		getButtonPanel().add(startButton, 0);
@@ -388,16 +390,22 @@ public class ImportBCLDialog extends PamDialog {
 				thisFileInfo.setText("NO DWV records");
 				return;
 			}
-			int prog = dwvConvertInformation.getnDone() * 100 / dwvConvertInformation.getnDWV();
-			allProgress.setValue(prog);
-			thisFileInfo.setText(String.format("Repacked %d of %d clicks", dwvConvertInformation.getnDone(), 
-					dwvConvertInformation.getnDWV()));
+			int prog = dwvConvertInformation.getnDWVDone() * 100 / dwvConvertInformation.getnDWV();
+			oneFileProgress.setValue(prog);
+			thisFileInfo.setText(String.format("Repacked %d of %d clicks in file %d of %d", 
+					dwvConvertInformation.getnDWVDone(), dwvConvertInformation.getnDWV(), 
+					dwvConvertInformation.getnFileDone(), dwvConvertInformation.getnFile()));
+			
+			prog = dwvConvertInformation.getnFileDone() * 100 / dwvConvertInformation.getnFile();
+			totalProgress.setValue(prog);
 		}
 
 		@Override
 		public void done() {
 			dwvConverter = null;
 			enableControls();
+			//update the datamap to show the new clicks. 
+			PamController.getInstance().updateDataMap();
 		}
 		
 	}
@@ -458,7 +466,7 @@ public class ImportBCLDialog extends PamDialog {
 						".  The file may be corrupt, or missing information needed.  Import is suspended; " +
 						"Please fix the file manually or remove it from the folder, and try to import again.";
 				String help = null;
-				int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.OK_OPTION, null, null, "Cancel Import", null);
+				int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.OK_OPTION, null, null, "Cancel Import", null);
 				break;
 			}
 			
@@ -471,7 +479,7 @@ public class ImportBCLDialog extends PamDialog {
 						".  PAMGuard is trying to use the format " + customDateTimeFormat.getText() + " but without " +
 						"success.  Please change the format in this dialog to match the one used for SamplingStartTimeUTC in your *.log.xml files";
 				String help = null;
-				int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.OK_OPTION, null, null, "Cancel Import", null);
+				int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.OK_OPTION, null, null, "Cancel Import", null);
 //				if (ans == WarnOnce.OK_OPTION) {
 				break;
 //				}

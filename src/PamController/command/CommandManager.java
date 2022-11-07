@@ -35,6 +35,7 @@ public abstract class CommandManager extends PamControlledUnit {
 		commandsList.add(new SummaryPeekCommand());
 		commandsList.add(new TellModuleCommand());
 		commandsList.add(new ExitCommand());
+		commandsList.add(new ExitNoSaveCommand());
 		commandsList.add(new KillCommand());
 		commandsList.add(new HelpCommand(this));
 		commandsList.add(new GetXMLSettings());

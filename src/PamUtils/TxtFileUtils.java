@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -62,7 +63,7 @@ public class TxtFileUtils {
 		boolean isNaN=false;
 		for (String line : lines) {
 
-			System.out.println(line);
+			//System.out.println(line);
 
 			String[] recordsOnLine = line.split(delimeter);
 
@@ -82,11 +83,15 @@ public class TxtFileUtils {
 						
 //						//This was causing isses with some numbers with e-06...dunno why so switched to parse double
 //						String input = new String(recordsOnLine[i].toCharArray()); 
-//						//System.out.println(input);
+//						System.out.println("|" + recordsOnLine[i] + "|");
 //						dat = nF.parse(input).doubleValue();
 					
-						
-						dat = Double.parseDouble(recordsOnLine[i]);
+						//5/08/2022 - there was a bug here where there is some sort of invisible character that does not appear on the 
+						//print screen - the only way you can tell is the char array is greater than the number of digits - removed all non numeric
+						//characters. 
+						String number = new String(recordsOnLine[i].strip().replaceAll("[^\\d.]", ""));
+						dat = Double.valueOf(number);
+						//dat = DecimalFormat.getNumberInstance().parse(new String(recordsOnLine[i].strip().toCharArray())).doubleValue();
 					}
 				catch (Exception e){
 					e.printStackTrace();

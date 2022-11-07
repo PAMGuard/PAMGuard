@@ -2,6 +2,7 @@ package pamViewFX.fxNodes.pamDialogFX;
 
 import java.util.Optional;
 
+import javafx.geometry.Insets;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import pamViewFX.fxStyles.PamStylesManagerFX;
@@ -25,11 +26,13 @@ public class PamSettingsDialogFX<T> extends PamDialogFX<T> {
 		this.settingsPane=settingsPane;
 		this.setTitle(settingsPane.getName());
 		this.setContent(settingsPane.getContentNode());
+		
+
 //		if (PamController.getInstance().getGuiManagerFX()!=null){
 //			this.getDialogPane().getStylesheets().add(PamController.getInstance().getGuiManagerFX().getPamSettingsCSS());
 //		}
 		PamStylesManagerFX stylesManager = PamStylesManagerFX.getPamStylesManagerFX();
-		this.getDialogPane().getStylesheets().add(stylesManager.getCurStyle().getSlidingDialogCSS());
+		this.getDialogPane().getStylesheets().add(stylesManager.getCurStyle().getDialogCSS());
 		this.setOnShown((value)->{
 			settingsPane.paneInitialized();
 		});

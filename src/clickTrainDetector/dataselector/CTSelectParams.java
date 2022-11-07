@@ -33,6 +33,29 @@ public class CTSelectParams extends DataSelectParams implements Serializable, Cl
 	 * The minimum number of sub detections before a click train is plotted. 
 	 */
 	public int minSubDetections = 10; 
+	
+	/**
+	 * True of the click train detector needs a classifcation No !!!!
+	 * This 'needsClassification' variable was been used the wrong way around throughout and is screwing the classiifer. 
+	 * I've therefore replaced it with the variable allowAll which is how this is actually used !
+	 * Given that anything using this would have has screwed logic, I don't care if I break 
+	 * a config or two ! DG 22/9/22
+	 */
+	public boolean allowAnyClassification = false; 
+//	private boolean needsClassification = false; 
+	
+	/**
+	 * In the data selector, if this is false it will only look at the best classifier, i.e. the
+	 * one with the best classifier score. If set true it will check every species above min
+	 * score even if it's not the first classification choice. 
+	 */
+	public boolean allowMultipleChoices = false;
+	
+	
+	/**
+	 * The classifier type(s) to select
+	 */
+	public int[] classifier = null; 
 
 
 	/**
@@ -55,6 +78,8 @@ public class CTSelectParams extends DataSelectParams implements Serializable, Cl
 	 * overrides the maxAngle in RADIANS
 	 */
 	public double maxAngleChange = Math.toRadians(5);
+	
+	
 	
 	@Override
 	public ClickTrainSelectParameters clone() {

@@ -1,5 +1,7 @@
 package PamUtils;
 
+import PamUtils.PamFileFilter;
+
 public class PamAudioFileFilter extends PamFileFilter {
 
 	public PamAudioFileFilter() {
@@ -15,6 +17,7 @@ public class PamAudioFileFilter extends PamFileFilter {
 //		addFileType(".AIFF");
 //		addFileType(".FLAC");
 		addFileType(".flac");
+//		addFileType(".sud");
 	}
 
 }

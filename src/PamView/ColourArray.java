@@ -344,7 +344,7 @@ public class ColourArray implements Cloneable, Serializable, ManagedParameters {
 	 * @return a contrasting colour. 
 	 */
 	private Color createContrastingColour() {
-		Color[] tryCols = {Color.white, Color.red, Color.blue, Color.green, Color.black};
+		Color[] tryCols = {Color.white, Color.red, Color.CYAN, Color.blue, Color.green, Color.black};
 		if (colours == null) {
 			return tryCols[0];
 		}

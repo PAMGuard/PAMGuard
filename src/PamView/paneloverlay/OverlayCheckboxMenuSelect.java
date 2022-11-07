@@ -48,6 +48,9 @@ public class OverlayCheckboxMenuSelect implements ActionListener {
 				return;
 			}
 			DataSelectDialog dataSelectDialog = new DataSelectDialog(javaFrame, dataBlock, dataSelector, symbolChooser);
+			if (javaFrame == null) {
+				dataSelectDialog.moveToMouseLocation();
+			}
 			boolean ok = dataSelectDialog.showDialog();
 			if (ok) {
 				menuItem.setSelected(true);

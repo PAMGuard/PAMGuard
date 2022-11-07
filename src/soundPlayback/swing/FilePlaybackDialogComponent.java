@@ -20,8 +20,11 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import PamView.dialog.GenericSwingDialog;
 import PamView.dialog.PamDialog;
+import PamView.dialog.PamDialogPanel;
 import PamView.dialog.PamGridBagContraints;
+import PamView.dialog.SettingsButton;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamRawDataBlock;
 import soundPlayback.FilePlayback;
@@ -48,6 +51,8 @@ public class FilePlaybackDialogComponent extends PlaybackDialogComponent {
 	private FilePlayback filePlayback;
 
 	private PlaybackParameters playbackParameters;
+	
+	private SettingsButton deviceSettingsButton;
 
 	private JButton defButton;
 	
@@ -56,6 +61,8 @@ public class FilePlaybackDialogComponent extends PlaybackDialogComponent {
 	private boolean isRT;
 
 	private PamDataBlock dataSource;
+	
+	private FilePlaybackDevice selectedDeviceType;
 	
 	/**
 	 * Dialog component for sound playback when input is from a file. 
@@ -91,10 +98,23 @@ public class FilePlaybackDialogComponent extends PlaybackDialogComponent {
 		c.gridy++;
 		PamDialog.addComponent(panel, deviceTypes, c);
 		c.gridy++;
+		c.gridwidth = 3;
 		PamDialog.addComponent(panel, new JLabel("Output device name ..."), c);
+		c.gridx += c.gridwidth;
+		c.gridwidth = 1;
+		PamDialog.addComponent(panel, deviceSettingsButton = new SettingsButton(), c);
+		c.gridx = 0;
+		c.gridwidth = 4;
 		c.gridy++;
 		PamDialog.addComponent(panel, soundCards, c);
 
+		deviceSettingsButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				deviceSettings();
+			}
+		});
+		
 		c.gridy++;
 		c.gridx = 0;
 		c.gridwidth = 1;
@@ -153,6 +173,17 @@ public class FilePlaybackDialogComponent extends PlaybackDialogComponent {
 		
 	}
 	
+	protected void deviceSettings() {
+		if (selectedDeviceType == null) {
+			return;
+		}
+		PamDialogPanel devicePanel = selectedDeviceType.getSettingsPanel();
+		if (devicePanel == null) {
+			return;
+		}
+		GenericSwingDialog.showDialog(getParentDialog(), "More Settings", devicePanel);
+	}
+
 	private void playSpeedChange() {
 		playbackSpeed.setText(playSpeedSlider.getRatioString());
 		sayDecimateInfo();
@@ -280,6 +311,9 @@ public class FilePlaybackDialogComponent extends PlaybackDialogComponent {
 			if (parentDialog != null) {
 				parentDialog.pack();
 			}
+			if (selectedDeviceType != null) {
+				deviceSettingsButton.setEnabled(selectedDeviceType.getSettingsPanel() != null);
+			}
 		}
 
 	}
@@ -297,7 +331,7 @@ public class FilePlaybackDialogComponent extends PlaybackDialogComponent {
 	public void fillDeviceSpecificList() {
 		int deviceType = deviceTypes.getSelectedIndex();
 		deviceType = Math.max(0, deviceType);
-		FilePlaybackDevice selectedDeviceType = filePlayback.getFilePBDevices().get(deviceType);
+		selectedDeviceType = filePlayback.getFilePBDevices().get(deviceType);
 		soundCards.removeAllItems();
 		String[] devList = selectedDeviceType.getDeviceNames();
 		for (int i = 0; i < devList.length; i++) {
