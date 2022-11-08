@@ -3,6 +3,8 @@ package generalDatabase;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -20,8 +22,22 @@ import PamguardMVC.PamDataBlock;
  */
 public class DBSchemaWriter {
 
+	private PamTableDefinition baseTableDefinition = new PamTableDefinition("PamTableDefinition");
+
+	private PamTableDefinition parentTable;
+
 	public DBSchemaWriter() {
 		// TODO Auto-generated constructor stub
+	}
+
+
+	public boolean writeStandardTableDef(File outputFolder, PamDataBlock dataBlock) {
+		PamTableDefinition aTable = new PamTableDefinition("PamStandardTable");
+		parentTable = null;
+		exportDatabaseSchema(outputFolder, dataBlock, null, aTable);
+		parentTable = aTable;
+
+		return true;
 	}
 
 	public boolean writeSchema(File outputFolder, PamDataBlock dataBlock) {
@@ -33,21 +49,105 @@ public class DBSchemaWriter {
 			return false;
 		}
 
+
 		PamTableDefinition tableDef = logging.getTableDefinition();
-		exportDatabaseSchema(outputFolder, dataBlock, tableDef);
-		
+		tableDef = logging.getBaseTableDefinition();
+
+		if (tableDef instanceof PamTableDefinition) {
+			writeStandardTableDef(outputFolder, dataBlock);
+		}
+		else {
+			parentTable = null;
+		}
+
+		exportDatabaseSchema(outputFolder, dataBlock, logging, tableDef);
+
 		return true;
 	}
 
-	private void exportDatabaseSchema(File outputFolder, PamDataBlock dataBlock, PamTableDefinition tableDef) {
+	private void exportDatabaseSchema(File outputFolder, PamDataBlock dataBlock, SQLLogging logging, PamTableDefinition tableDef) {
+
+		/**
+		 * write a parent item, e.g. if tableDef is a sub class of PamTableDefinition
+		 */
+		//		String parentName = writeParentTableSchema(outputFolder, dataBlock, tableDef);
+
 		String tableName = tableDef.getTableName();
-		File outputFile = new File(outputFolder, tableName+".xsd");
 		Document doc = PamUtils.XMLUtils.createBlankDoc();
-		Element el = doc.createElement("xs:schema");
-		el.setAttribute("xmlns:xs","http://www.w3.org/2001/XMLSchema");
-		el.setAttribute("targetNamespace", "http://tethys.sdsu.edu/schema/1.0");
-		doc.appendChild(el);
-		for (PamTableItem tableItem : tableDef.pamTableItems) {
+		Element schemaEl = doc.createElement("xs:schema");
+		schemaEl.setAttribute("xmlns:xs","http://www.w3.org/2001/XMLSchema");
+		schemaEl.setAttribute("targetNamespace", "http://tethys.sdsu.edu/schema/1.0");		
+		doc.appendChild(schemaEl);
+		if (parentTable != null) {
+			Element parentEl = doc.createElement("xs:include");
+			parentEl.setAttribute("schemaLocation", parentTable.getTableName()+".xsd");
+			schemaEl.appendChild(parentEl);
+		}
+		
+		fillItemElement(doc, schemaEl, tableDef.pamTableItems);
+		
+		if (logging != null) {
+			ArrayList<SQLLoggingAddon> annots = logging.getLoggingAddOns();
+			if (annots != null) {
+				for (SQLLoggingAddon addon : annots) {
+					Element compEl = addAddonElement(doc, schemaEl, addon);
+					if (compEl != null) {
+						schemaEl.appendChild(compEl);
+					}
+				}
+			}
+		}
+
+		try {
+			File outputFile = new File(outputFolder, tableName+".xsd");
+			XMLUtils.writeToFile(doc, outputFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Add a complex element for a SQLLogging addon. 
+	 * @param doc
+	 * @param schemaEl
+	 * @param addon
+	 */
+	private Element addAddonElement(Document doc, Element schemaEl, SQLLoggingAddon addon) {
+		Element compEl = doc.createElement("xs:complexType");
+		
+		Element oEl = doc.createElement("xs:element");
+		oEl.setAttribute("name", addon.getName());
+		
+		Element seqEl = doc.createElement("xs:sequence");
+		
+		
+		PamTableDefinition mtTable = new PamTableDefinition(addon.getName());
+		addon.addTableItems(mtTable);
+		// this is a mess ! must avoid the standard items. 
+		fillItemElement(doc, seqEl, mtTable.pamTableItems);
+		
+		
+		compEl.appendChild(seqEl);
+		
+		oEl.appendChild(compEl);
+		return oEl;
+	}
+
+
+	/**
+	 * Fills information on items in a list into the given element
+	 * This may be the schema element or may be a complex element. 
+	 * @param doc
+	 * @param schemaEl
+	 * @param tableItems
+	 */
+	private void fillItemElement(Document doc, Element schemaEl, List<PamTableItem> tableItems) {
+		for (PamTableItem tableItem : tableItems) {
+			if (shouldSkip(tableItem, parentTable)) {
+				// element is included in parent table, so skip it. 
+				continue;
+			}
+
 			Element itemEl = doc.createElement("xs:element");
 			itemEl.setAttribute("name", tableItem.getName());
 			itemEl.setAttribute("type", sqlTypeToString(tableItem.getSqlType(), tableItem.getLength()));
@@ -59,17 +159,42 @@ public class DBSchemaWriter {
 				docEl.setTextContent(documentation);
 				annotation.appendChild(docEl);
 			}
-			el.appendChild(itemEl);
-		}
-		
-		
-		try {
-			XMLUtils.writeToFile(doc, outputFile);
-		} catch (IOException e) {
-			e.printStackTrace();
+			schemaEl.appendChild(itemEl);
 		}
 	}
-	
+
+	private boolean shouldSkip(PamTableItem tableItem, PamTableDefinition parentTable) {
+		if (parentTable == null) {
+			return false;
+		}
+		if (parentTable.findTableItem(tableItem.getName()) != null) {
+			return true;
+		}
+		return false;
+	}
+
+
+	//	private String writeParentTableSchema(File outputFolder, PamDataBlock dataBlock, PamTableDefinition tableDef) {
+	//		/**
+	//		 * Write a schema of everything that is in the parent table, then include a reference to that
+	//		 * schema. To do this, we need to a) establish if there is a table def parent, then go through 
+	//		 * all the fields in THIS tableDef, see if the field exists in the parent. IF it exists in the 
+	//		 * parent, write it in the parent doc, if it's only in this, write it in this doc. So far so good, but
+	//		 * we need to also make this recursive so it can build layer on layer ? 
+	//		 * Reaslistically, this is all too complicated ! Just write out the schema for the PamTableDefinition 
+	//		 * at the start of everything, and skip those fields in everything else. This will be a bit ad-hoc, but 
+	//		 * it will otherwise be a nightmare since we don't know which table items are in which class at this point. 
+	//		 */
+	//		Class tableClass = tableDef.getClass();
+	//		Class parentClass = tableClass.getSuperclass();
+	//		if (parentClass.isAssignableFrom(tableClass) == false) {
+	//			return null;
+	//		}
+	//		
+	//		
+	//		return null;
+	//	}
+
 	private String sqlTypeToString(int sqlType, int length) {
 		switch (sqlType) {
 		case Types.ARRAY:

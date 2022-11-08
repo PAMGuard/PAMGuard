@@ -43,7 +43,7 @@ public class EmptyTableDefinition implements Cloneable {
 		this.tableName = tableName;
 		this.setUpdatePolicy(updatePolicy);
 		pamTableItems = new ArrayList<PamTableItem>();
-		pamTableItems.add(indexItem = new PamTableItem(indexColName, Types.INTEGER));
+		pamTableItems.add(indexItem = new PamTableItem(indexColName, Types.INTEGER, "Primary key"));
 		indexItem.setPrimaryKey(true);
 		indexItem.setCounter(true);
 	}

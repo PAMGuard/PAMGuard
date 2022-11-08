@@ -17,7 +17,7 @@ public class SnrSqlAddon implements SQLLoggingAddon {
 	public SnrSqlAddon(SNRAnnotationType snrAnnotationType) {
 		super();
 		this.snrAnnotationType = snrAnnotationType;
-		snr  = new PamTableItem("snr", Types.DOUBLE);
+		snr  = new PamTableItem("snr", Types.DOUBLE, "Signal to Noise ratio");
 	}
 
 	@Override
