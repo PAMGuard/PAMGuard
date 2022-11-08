@@ -278,7 +278,7 @@ public class WhistleBinaryDataSource extends BinaryDataSource {
 		 *  If we're n network receive mode, we can't do this until 
 		 *  channel numbers have been reassigned.   
 		 */
-		if (runMode == PamController.RUN_PAMVIEW && delays != null) {
+		if ((runMode == PamController.RUN_PAMVIEW || runMode == PamController.RUN_NOTHING) && delays != null) {
 			ShapeConnector shapeConnector = wmDetector.findShapeConnector(channelMap);
 			if (shapeConnector != null) {
 				BearingLocaliser bl = shapeConnector.getBearingLocaliser();

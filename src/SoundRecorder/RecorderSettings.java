@@ -64,6 +64,10 @@ public class RecorderSettings implements Serializable, Cloneable, ManagedParamet
 	 */
 	public String outputFolder;
 
+	public void setOutputFolder(String outputFolder) {
+		this.outputFolder = outputFolder;
+	}
+
 	/**
 	 * Initials to add to the start of a file name, the rest
 	 * of which is made up from the date. 

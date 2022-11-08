@@ -17,6 +17,7 @@ import javax.swing.Timer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import Acquisition.FolderInputSystem;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
@@ -24,6 +25,7 @@ import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamController.command.CommandManager;
+import PamUtils.FileFunctions;
 import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamView.MenuItemEnabler;
@@ -35,6 +37,7 @@ import SoundRecorder.trigger.RecorderTrigger;
 import SoundRecorder.trigger.RecorderTriggerData;
 import SoundRecorder.trigger.TriggerDecisionMaker;
 import backupmanager.BackupInformation;
+import pamguard.GlobalArguments;
 
 /**
  * Control a sound file recorder. The sound file recorder has two
@@ -434,9 +437,51 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		recorderSettings = ((RecorderSettings) pamControlledUnitSettings.getSettings()).clone();
 		newParams();
+		/*
+		 * Then check to see if there is a command line override of the currently stored folder name. 
+		 */
+		String globFolder = GlobalArguments.getParam(FolderInputSystem.GlobalWavFolderArg);
+		if (globFolder != null) {
+			boolean ok = checkGlobFolder(globFolder);
+			if (ok) {
+				recorderSettings.setOutputFolder(globFolder); // remember it. 
+			}
+			else {
+				System.err.println("Unable to set recording storage folder " + globFolder);
+			}
+		}
 		return true;
 	}
 
+	/**
+	 * Set and create if necessary the global folder. 
+	 * @param globFolder
+	 */
+	private boolean checkGlobFolder(String globFolder) {
+		File outFold = new File(globFolder);
+		if (outFold.exists()) {
+			if (outFold.isDirectory()) {
+				return true; // all OK
+			}
+			else {
+				return false; // it must be a file - that's bad !
+			}
+		}
+		// try to create it. 
+		try {
+			if (outFold.mkdirs()) {
+				FileFunctions.setNonIndexingBit(outFold);
+				return true;
+			}
+			else {
+				return false; // unable to make the folder. 
+			}
+		}
+		catch (Exception e) {
+			System.err.println("Can't set recording store folder: " + e.getLocalizedMessage());
+			return false;
+		}
+	}
 
 	/**
 	 * Adds a recorder trigger to this recorderControl. This can either be called
