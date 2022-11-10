@@ -30,8 +30,11 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import Acquisition.AcquisitionControl;
+import Acquisition.sud.SUDNotificationManager;
+import PamController.PamController;
 import PamguardMVC.PamRawDataBlock;
 import clickDetector.ClickControl;
+import soundtrap.sud.SudFileDWVHandler;
 
 /**
  * @author mo55
@@ -45,6 +48,9 @@ public class STClickControl extends ClickControl {
 	 * The private sound acquisition module linked to the Soundtrap click data
 	 */
 	private AcquisitionControl rawSource;
+	
+	private SudFileDWVHandler sudFileDWVHandler;
+
 
 	/**
 	 * @param name
@@ -54,6 +60,9 @@ public class STClickControl extends ClickControl {
 		
 		// create a private acquisition control that only this module can see
 		rawSource = new AcquisitionControl("Private Sound Acq for Soundtrap Click Detector");
+		
+		sudFileDWVHandler = new SudFileDWVHandler(this);
+		sudFileDWVHandler.subscribeSUD();
 	}
 
 	@Override
@@ -105,6 +114,26 @@ public class STClickControl extends ClickControl {
 		}
 		
 		return newMenu;
+	}
+
+	@Override
+	public void pamStart() {
+		sudFileDWVHandler.pamStart();
+		super.pamStart();
+	}
+
+	@Override
+	public void pamStop() {
+		sudFileDWVHandler.pamStop();
+		super.pamStop();
+	}
+
+	@Override
+	public void notifyModelChanged(int changeType) {
+		super.notifyModelChanged(changeType);
+		if (changeType == PamController.INITIALIZATION_COMPLETE) {
+			sudFileDWVHandler.subscribeSUD();
+		}
 	}
 	
 

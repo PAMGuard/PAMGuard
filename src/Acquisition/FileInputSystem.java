@@ -7,6 +7,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -31,6 +33,10 @@ import javax.swing.border.TitledBorder;
 import org.jflac.FLACDecoder;
 import org.jflac.frame.Frame;
 import org.jflac.util.ByteData;
+import org.pamguard.x3.sud.Chunk;
+import org.pamguard.x3.sud.SudAudioInputStream;
+import org.pamguard.x3.sud.SudFileListener;
+import org.pamguard.x3.sud.SudParams;
 import org.jflac.PCMProcessor;
 import org.jflac.metadata.StreamInfo;
 import org.jflac.sound.spi.FlacEncoding;
@@ -49,13 +55,11 @@ import Acquisition.filedate.FileDateDialogStrip;
 import Acquisition.filedate.FileDateObserver;
 import Acquisition.pamAudio.PamAudioFileManager;
 import Acquisition.pamAudio.PamAudioFileFilter;
-import Acquisition.pamAudio.PamAudioSystem;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamDetection.RawDataUnit;
-import PamModel.SMRUEnable;
 import PamUtils.PamCalendar;
 import PamUtils.PamFileChooser;
 import PamView.dialog.PamLabel;
@@ -151,6 +155,9 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	 */
 	private PamWarning fileWarning;
 
+	private SudAudioInputStream sudAudioInputStream;
+
+	private SudListener sudListener;
 
 	public FileInputSystem(AcquisitionControl acquisitionControl) {
 		this.acquisitionControl = acquisitionControl;
@@ -177,7 +184,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		}
 		return daqDialog;
 	}
-	
+
 	protected JPanel createDaqDialogPanel() {
 
 		JPanel p = new JPanel();
@@ -216,18 +223,18 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		fileDateStrip.addObserver(this);
 		p.add(fileDateStrip.getDialogComponent(), constraints);
 
-//		if (SMRUEnable.isEnable()) {
+		//		if (SMRUEnable.isEnable()) {
 		// no reason to hide this option from users. 
-			constraints.gridy++;
-			constraints.gridx = 0;
-			constraints.gridwidth = 1;
-			addComponent(p,  new JLabel("Skip initial"), constraints);
-			constraints.gridx++;
-			addComponent(p, skipSecondsField = new JTextField(4), constraints);
-			constraints.gridx++;
-			addComponent(p,  new JLabel("seconds"), constraints);
-			constraints.anchor = GridBagConstraints.EAST;
-//		}
+		constraints.gridy++;
+		constraints.gridx = 0;
+		constraints.gridwidth = 1;
+		addComponent(p,  new JLabel("Skip initial"), constraints);
+		constraints.gridx++;
+		addComponent(p, skipSecondsField = new JTextField(4), constraints);
+		constraints.gridx++;
+		addComponent(p,  new JLabel("seconds"), constraints);
+		constraints.anchor = GridBagConstraints.EAST;
+		//		}
 
 		//		addComponent(p, new JLabel("File date :"), constraints);
 		//		constraints.gridx++;
@@ -251,7 +258,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		// would hold a null.  The system type is used by the getParameterSet method to decide
 		// whether or not to include the parameters in the XML output
 		if (fileInputParameters.systemType==null) fileInputParameters.systemType=getSystemType();
-		
+
 		fillFileList();
 
 		if (repeat != null) {
@@ -289,7 +296,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 				fileInputParameters.recentFiles.trimToSize();
 			}
 		}
-		
+
 		if (repeat == null) {
 			fileInputParameters.repeatLoop = false;
 		}
@@ -306,7 +313,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 				return false; 
 			}
 		}
-		
+
 		return true;
 	}
 
@@ -337,7 +344,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	protected void selectFile() {
 		//IshmaelDetector.MatchFiltParamsDialog copies a bunch of this.  If you
 		//modifiy this, please check that too.
-		
+
 		String currFile = (String) fileNameCombo.getSelectedItem();
 		// seems to just support aif and wav files at the moment
 		//		Type[] audioTypes = AudioSystem.getAudioFileTypes();
@@ -421,6 +428,10 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 				//					}
 				//				}
 
+				if (audioStream instanceof SudAudioInputStream) {
+					acquisitionControl.getSUDNotificationManager().interpretNewFile(newFile, (SudAudioInputStream) audioStream);
+				}
+				
 				AudioFormat audioFormat = audioStream.getFormat();
 				//				fileLength = file.length();
 				fileSamples = audioStream.getFrameLength();
@@ -477,7 +488,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	public long getSkipStartFileTime() {
 		return fileInputParameters.skipStartFileTime;
 	}
-	
+
 	@Override
 	public boolean canPlayBack(float sampleRate) {
 		// TODO Auto-generated method stub
@@ -538,7 +549,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	}
 
 	public File getCurrentFile() {
-		System.out.println("fileInputParameters: " + fileInputParameters); 
+//		System.out.println("fileInputParameters: " + fileInputParameters); 
 		if (fileInputParameters.recentFiles == null) return null;
 		if (fileInputParameters.recentFiles.size() < 1) return null;
 		String fileName = fileInputParameters.recentFiles.get(0);
@@ -575,12 +586,25 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 
 			audioStream = PamAudioFileManager.getInstance().getAudioInputStream(currentFile);
 
+			if (audioStream instanceof SudAudioInputStream) {
+				sudAudioInputStream = (SudAudioInputStream) audioStream;
+				if (sudListener == null) {
+					sudListener = new SudListener();
+				}
+				sudAudioInputStream.addSudFileListener(sudListener);
+//				sudAudioInputStream.ad
+				acquisitionControl.getSUDNotificationManager().newSudInputStream(sudAudioInputStream);
+			}
+			else {
+				sudAudioInputStream = null;
+			}
+
 			if (audioStream == null) {
 				return false;
 			}
 
 			audioFormat = audioStream.getFormat();
-			
+
 			if (audioFormat==null) {
 				System.err.println("AudioFormat was null: " + currentFile.getAbsolutePath()); 
 				return false; 
@@ -592,7 +616,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 
 			acquisitionControl.getAcquisitionProcess().setSampleRate(audioFormat.getSampleRate(), true);
 			fileInputParameters.bitDepth = audioFormat.getSampleSizeInBits();
-			
+
 			loadByteConverter(audioFormat);
 
 		} catch (UnsupportedAudioFileException ex) {
@@ -608,18 +632,27 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		return true;
 	}
 
+	private class SudListener implements SudFileListener {
+
+		@Override
+		public void chunkProcessed(int chunkID, Chunk sudChunk) {
+			acquisitionControl.getSUDNotificationManager().chunkProcessed(chunkID, sudChunk);
+		}
+
+	}
+
 
 	public boolean runFileAnalysis() {
 		// keep a reference to where data will be put.
 		this.newDataUnits = acquisitionControl.getDaqProcess().getNewDataQueue();
-		
-//		if (this.newDataUnits == null) {
-//			System.err.println("newDataUnits: == null: "); 
-//			return false;
-//		}
+
+		//		if (this.newDataUnits == null) {
+		//			System.err.println("newDataUnits: == null: "); 
+		//			return false;
+		//		}
 
 		if (!prepareInputFile() && getCurrentFile()!=null) {
-			
+
 			String audioFileStr = getCurrentFile()==null? "Null File": getCurrentFile().getAbsolutePath();
 			String title = "Error loading audio file";
 			String msg = "<html><p>There was an error trying to access the audio file </p><b> " + 
@@ -647,14 +680,14 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		this.startTimeMS = PamCalendar.getTimeInMillis();
 
 		if (audioFormat==null) {
-			
+
 			String audioFileStr = getCurrentFile()==null? "Null File": getCurrentFile().getAbsolutePath();
 
 			System.err.println("FileInputSystem: runFileAnalysis: AudioFile format is null: " + audioFileStr); 
-			
+
 			return false; 
 		}
-		
+
 		nChannels = audioFormat.getChannels();
 
 		acquisitionControl.getDaqProcess().setSampleRate(sampleRate = audioFormat.getSampleRate(), true);
@@ -997,6 +1030,9 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 				}
 			}
 			if (audioStream != null) {
+				if (audioStream instanceof SudAudioInputStream) {
+					acquisitionControl.getSUDNotificationManager().sudStreamClosed();
+				}
 				try {
 					audioStream.close();
 					audioStream = null;
@@ -1124,7 +1160,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	}
 
 	public void sayEta(long timeMs) {
-		
+
 		if (etaLabel==null) return;
 
 		if (timeMs < 0) {
