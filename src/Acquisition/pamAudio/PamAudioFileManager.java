@@ -109,7 +109,7 @@ public class PamAudioFileManager {
 
 		AudioInputStream stream = null;
 		for (int i = 0; i < pamAudioFileTypes.size(); i++) {
-			System.out.println(file.getName() + "   " + pamAudioFileTypes.get(i).getName()); 
+//			System.out.println(file.getName() + "   " + pamAudioFileTypes.get(i).getName()); 
 			if (isExtension(file, pamAudioFileTypes.get(i))) {
 				//System.out.println("Get stream for: " +pamAudioFileTypes.get(i).getName()); 
 				stream = pamAudioFileTypes.get(i).getAudioStream(file);
