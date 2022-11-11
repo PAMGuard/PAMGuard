@@ -17,6 +17,7 @@ import Acquisition.DaqSystem;
 import Acquisition.AudioDataQueue;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
+import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamDetection.RawDataUnit;
@@ -192,7 +193,12 @@ public class SmruDaqSystem extends DaqSystem implements PamSettings {
 					+ " in another instance of PAMGuard. \n"
 					+ "Check that no other instances of PAMGuard are open and try again. \nIf no other instances of PAMGuard are open "
 					+ "then you should cycle the power on the card(s) and restart PAMGuard");
-			JOptionPane.showMessageDialog(daqControl.getGuiFrame(), msg, daqControl.getUnitName() + " Error", JOptionPane.ERROR_MESSAGE);
+			if (PamGUIManager.getGUIType() == PamGUIManager.NOGUI) {
+				System.out.println(msg);
+			}
+			else {
+				JOptionPane.showMessageDialog(daqControl.getGuiFrame(), msg, daqControl.getUnitName() + " Error", JOptionPane.ERROR_MESSAGE);
+			}
 			PamController.getInstance().stopLater();
 			return false;
 		}
