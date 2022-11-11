@@ -65,6 +65,7 @@ import PamDetection.LocalisationInfo;
 import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamView.symbol.PamSymbolManager;
+import PamguardMVC.background.BackgroundDataBlock;
 import PamguardMVC.background.BackgroundManager;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import PamguardMVC.dataOffline.OfflineDataLoading;
@@ -942,6 +943,12 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			lastSlowFoundUnit = null;
 			if (recycledUnits != null) {
 				recycledUnits.clear();
+			}
+		}
+		if (backgroundManager != null) {
+			BackgroundDataBlock bdb = backgroundManager.getBackgroundDataBlock();
+			if (bdb != null) {
+				bdb.clearAll();
 			}
 		}
 	}
