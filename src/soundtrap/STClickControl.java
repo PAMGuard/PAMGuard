@@ -25,6 +25,7 @@
 package soundtrap;
 
 import java.awt.Frame;
+import java.util.ArrayList;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -33,7 +34,10 @@ import Acquisition.AcquisitionControl;
 import Acquisition.sud.SUDNotificationManager;
 import PamController.PamController;
 import PamguardMVC.PamRawDataBlock;
+import clickDetector.ClickBTDisplay;
 import clickDetector.ClickControl;
+import clickDetector.ClickDisplay;
+import clickDetector.ClickDisplayManager;
 import soundtrap.sud.SudFileDWVHandler;
 
 /**
@@ -133,6 +137,20 @@ public class STClickControl extends ClickControl {
 		super.notifyModelChanged(changeType);
 		if (changeType == PamController.INITIALIZATION_COMPLETE) {
 			sudFileDWVHandler.subscribeSUD();
+		}
+	}
+	
+	/**
+	 * Called when running SUD file data to find and scroll the BT Display's
+	 * @param timeMillis
+	 */
+	public void updateDisplayScrollers(long timeMillis) {
+		ClickDisplayManager dispManager = getDisplayManager();
+		ArrayList<ClickDisplay> dispList = dispManager.getWindowList();
+		for (ClickDisplay display : dispList) {
+			if (display instanceof ClickBTDisplay) {
+				((ClickBTDisplay) display).newScrollTimingData(timeMillis);
+			}
 		}
 	}
 	

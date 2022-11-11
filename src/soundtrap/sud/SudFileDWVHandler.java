@@ -46,7 +46,7 @@ public class SudFileDWVHandler implements SUDNotificationHandler {
 	private List<BCLDetectionChunk> bclChunks = new LinkedList();
 
 	int bclDetCount, bclNoiseCount, dwvCount, processedChunks;
-	private long effortStart;
+	private long effortStart, fileStartMicros;
 	private double sampleRate;
 	private ByteConverter byteConverter;
 	private ClickDetector clickDetector;
@@ -73,6 +73,7 @@ public class SudFileDWVHandler implements SUDNotificationHandler {
 //		sampleRate = sudAudioInputStream.getFormat().getFrameRate();
 		// this is the right one
 		sampleRate = sudAudioInputStream.getSudMap().clickDetSampleRate;
+		fileStartMicros = sudAudioInputStream.getSudMap().getFirstChunkTimeMicros();
 		stClickControl.findRawDataBlock().setChannelMap(1);
 		stClickControl.findRawDataBlock().setSampleRate((float) sampleRate, true);
 		stClickControl.getSTAcquisition().acquisitionParameters.sampleRate = (float) sampleRate;
@@ -100,8 +101,12 @@ public class SudFileDWVHandler implements SUDNotificationHandler {
 		String chunkName = "Unknown";
 		int chunkSize = sudChunk.buffer.length;
 		if (sudAudioInputStream.getChunkIDString(chunkID).equals("wav")) {
+			
+			long millis = sudChunk.getChunkHeader().getMillisTime();
+			stClickControl.updateDisplayScrollers(millis);
+			
 			if (sudAudioInputStream.isChunkIDWav(chunkID)) {
-				chunkName = "RECORDINGS";
+//				chunkName = "RECORDINGS";
 				// System.out.printf("Chunk ID %d, size %d, type %s\n", chunkID, chunkSize,
 				// chunkName);
 				// System.out.println("ID: " + chunkID + " This is raw data from detected
@@ -201,8 +206,8 @@ public class SudFileDWVHandler implements SUDNotificationHandler {
 	}
 
 	private void makeClick(BCLDetectionChunk bclChunk, Chunk dwvChunk) {
-		long elapsedSamples = (long) ((bclChunk.getJavaMicros() - effortStart) * (sampleRate / 1e6));
-
+		long elapsedSamples = (long) ((bclChunk.getJavaMicros() - fileStartMicros) * (sampleRate / 1e6));
+		long millis = bclChunk.getJavaMillis();
 		byte[] rawData = dwvChunk.getBuffer();
 		int nBytes = rawData.length;
 		int nSamples = nBytes / Short.BYTES;
@@ -213,7 +218,12 @@ public class SudFileDWVHandler implements SUDNotificationHandler {
 		ClickDetection click = new ClickDetection(1, elapsedSamples, nSamples, clickDetector, channelGroupDetector, 1);
 		click.setWaveData(wavData);
 
-		clickDetector.getClickDataBlock().addPamData(click);
+//		if (groupDetector != null) {
+//			groupDetector.
+//		}
+		if (clickDetector.completeClick(click)) {
+			clickDetector.getClickDataBlock().addPamData(click);
+		}
 	}
 
 	private void dwvEffort(long javaMillis, boolean isStart) {

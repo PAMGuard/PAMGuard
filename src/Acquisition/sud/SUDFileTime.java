@@ -48,7 +48,7 @@ public class SUDFileTime {
 			if (sudMap == null) {
 				return Long.MIN_VALUE;
 			}
-			long t = sudMap.getFirstChunkTime();
+			long t = sudMap.getFirstChunkTimeMillis();
 			if (t != 0) {
 				sudTime = t;
 			}
