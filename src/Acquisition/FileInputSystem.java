@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.List;
+
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -53,6 +55,7 @@ import wavFiles.ByteConverter;
 import Acquisition.filedate.FileDate;
 import Acquisition.filedate.FileDateDialogStrip;
 import Acquisition.filedate.FileDateObserver;
+import Acquisition.filetypes.SoundFileType;
 import Acquisition.pamAudio.PamAudioFileManager;
 import Acquisition.pamAudio.PamAudioFileFilter;
 import PamController.PamControlledUnitSettings;
@@ -144,6 +147,11 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	protected ByteConverter byteConverter;
 
 	protected FileDateDialogStrip fileDateStrip;
+	
+	/**
+	 * Sound file types present in the current selections.
+	 */
+	private List<SoundFileType> selectedFileTypes;
 
 	/**
 	 * Text field for skipping initial few seconds of a file. 
@@ -400,6 +408,9 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		if (newFile.length() == 0) return;
 
 		File file = new File(newFile);
+		
+		setSelectedFileTypes(acquisitionControl.soundFileTypes.getUsedTypes(file));
+		
 		if (file == null) return;
 
 		// try to work out the date of the file
@@ -1220,6 +1231,29 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		super.setSelected(select);
 		if (select) {
 			getDialogPanel();
+		}
+	}
+
+	/**
+	 * @return the selectedFileTypes
+	 */
+	public List<SoundFileType> getSelectedFileTypes() {
+		return selectedFileTypes;
+	}
+
+	/**
+	 * Called when the file or file list selection is changes and finds a list of all
+	 * sound file types included in the selection. this is only implemented for SUD files
+	 * at the moment, the idea being to offer some additional functionality. 
+	 * @param selectedFileTypes the selectedFileTypes to set
+	 */
+	public void setSelectedFileTypes(List<SoundFileType> selectedFileTypes) {
+		this.selectedFileTypes = selectedFileTypes;
+		if (selectedFileTypes == null) {
+			return;
+		}
+		for (SoundFileType aType : selectedFileTypes) {
+			aType.selected(this);
 		}
 	}
 }

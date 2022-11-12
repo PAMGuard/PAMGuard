@@ -278,8 +278,10 @@
 
    <tocitem text="Asio Sound Cards " target="sound_processing.AcquisitionHelp.docs.AcquisitionAsioSoundCard" image="topic"/>
 
-   <tocitem text="Audio Files " target="sound_processing.AcquisitionHelp.docs.AcquisitionFile" image="topic"/>
+   <tocitem text="Audio Files " target="sound_processing.AcquisitionHelp.docs.AcquisitionFile" image="topic">
+    <tocitem text="SUD Files " target="sound_processing.AcquisitionHelp.docs.sudfiles" image="topic"/>
 
+   </tocitem>
    <tocitem text="Audio File Folders " target="sound_processing.AcquisitionHelp.docs.AcquisitionFileFolder" image="topic"/>
 
    <tocitem text="File Dates " target="sound_processing.AcquisitionHelp.docs.FileTimeZone" image="topic"/>
@@ -426,6 +428,8 @@
     <tocitem text="Create Binary Files Offline " target="utilities.BinaryStore.docs.CreateBinariesOffline" image="topic"/>
 
    </tocitem>
+   <tocitem text="SoundTrap Click Detector " target="detectors.clickDetectorHelp.docs.SoundTrapClickDetector" image="topic"/>
+
   </tocitem>
   <tocitem text="Whistle and Moan Detector ">
    <tocitem text="Overview " target="detectors.whistleMoanHelp.docs.whistleMoan_Overview" image="topic"/>

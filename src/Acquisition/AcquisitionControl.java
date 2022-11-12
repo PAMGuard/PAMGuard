@@ -54,6 +54,7 @@ import asiojni.NewAsioSoundSystem;
 import nidaqdev.NIDAQProcess;
 import Acquisition.filedate.FileDate;
 import Acquisition.filedate.StandardFileDate;
+import Acquisition.filetypes.SoundFileTypes;
 import Acquisition.layoutFX.AquisitionGUIFX;
 import Acquisition.offlineFuncs.OfflineWavFileServer;
 import Acquisition.rona.RonaOfflineFileServer;
@@ -138,6 +139,8 @@ public class AcquisitionControl extends PamControlledUnit implements PamSettings
 	
 	private SUDNotificationManager sudNotificationManager;
 	
+	protected SoundFileTypes soundFileTypes;
+	
 	/**
 	 * Main control unit for audio data acquisition.
 	 * <p>
@@ -161,6 +164,8 @@ public class AcquisitionControl extends PamControlledUnit implements PamSettings
 		fileDate = new StandardFileDate(this);
 
 		pamController = PamController.getInstance();
+		
+		soundFileTypes = new SoundFileTypes(this);
 		
 		registerDaqSystem(new SoundCardSystem(this));
 		if (PlatformInfo.calculateOS() == OSType.WINDOWS) {

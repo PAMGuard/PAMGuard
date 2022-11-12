@@ -10,6 +10,8 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
+
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.swing.BoxLayout;
@@ -494,6 +496,9 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings{
 //		System.out.printf("Wav list recieved with %d files after %d millis\n", 
 //				fileListData.getFileCount(), System.currentTimeMillis() - wavListStart);
 		allFiles = fileListData.getListCopy();
+		
+		List<WavFileType> asList = allFiles;
+		setSelectedFileTypes(acquisitionControl.soundFileTypes.getUsedTypes(allFiles));
 
 		setFileDateText();
 		// also open up the first file and get the sample rate and number of channels from it

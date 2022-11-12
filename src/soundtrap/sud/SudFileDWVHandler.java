@@ -216,6 +216,7 @@ public class SudFileDWVHandler implements SUDNotificationHandler {
 
 //		channelGroupDetector = clickDetector.getChannelGroupDetector(0);
 		ClickDetection click = new ClickDetection(1, elapsedSamples, nSamples, clickDetector, channelGroupDetector, 1);
+		click.setTimeMilliseconds(millis);
 		click.setWaveData(wavData);
 
 //		if (groupDetector != null) {
