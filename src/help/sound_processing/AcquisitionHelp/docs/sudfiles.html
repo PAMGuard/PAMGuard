@@ -18,6 +18,11 @@ SoundTrap recorders from
  <p>Inflating SUD files to WAV files generally required between 3 and 5 times as much disk space and could also take 
  a fair amount of time, so not inflating will save both!</p>
  
+ <h3>Mixing SUD and WAV files</h3>
+ <p>If a SUD file and a WAV file with the same name are in the same folder, then PAMGuard will ignore the SUD file
+ and process the WAV file. Note that in this case, PAMGuard will be unable to extract any metadata from the SUD file
+ and will not extract SoundTrap Click Detections (see below).</p>
+ 
  <h3>SoundTrap Click Detector</h3>
  <p>If you are using the SoundTrap build in click detector (see SoundTrap manuals) then the SUD files will also contain 
  detected clicks.</p> <p>See the help page for the <a href="../../../detectors/clickDetectorHelp/docs/SoundTrapClickDetector.html">SoundTrap Click Detector</a> 

@@ -40,7 +40,7 @@ public class SoundFileTypes {
 	}
 	
 	/**
-	 * Get a list of used file types. Reaslistically this 
+	 * Get a list of used file types. Realistically this 
 	 * can only return one value but possibly it's useful to have it in the same
 	 * format as the multiple file version. . 
 	 * @param aFile

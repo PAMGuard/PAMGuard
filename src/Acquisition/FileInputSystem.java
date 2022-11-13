@@ -587,7 +587,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 			System.out.println("The current file was null");
 			return false;
 		}
-		System.out.printf("***********************************             Opening file %s\n", currentFile.getName());
+//		System.out.printf("***********************************             Opening file %s\n", currentFile.getName());
 
 		try {
 

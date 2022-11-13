@@ -1,23 +1,21 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
 <link href="../../../pamHelpStylesheet.css" type="text/css" rel="STYLESHEET"><title>Click Classification</title></head>
-<body><h1>
-SoundTrap Click Detector
-</h1><h2>SoundTrap Click Detector</h2>
-<br>
+<body><h1>Click Detector</h1>
+<h2>SoundTrap Click Detector</h2>
 
-<h3>Overview</h3>
+
 <p>If you are using a SountTrap recording device with built in click detection from 
 <a href="https://www.oceaninstruments.co.nz/">Ocean Instruments</a>, 
 you may need to use a modified version of the <a href="ClickDetector_clickDetector.html">Click Detector</a>. 
 </p>
-<p>The SoundTrap click detector allows you to detect and store clicks at high frequencies (say 384kHz), suitable for odontocete echolocation clicks, and 
-at the same time, record audio data files at a lower frequency (e.g. 96 or 48kHz). This optimises disk space usage and makes long deployments 
-of several months possible with moderate data storage. </p> 
-<p>Having two sample rates present within a single PAMGuard configuration is possible, using 
-<a href="../../../sound_processing/decimatorHelp/docs/decimator_decimator.html">Decimator</</a> modules, however such configurations become particularly
+<p>The SoundTrap click detector allows you to detect and store clicks at high frequencies (say 384kS/sec), suitable for odontocete echolocation clicks, and 
+at the same time, record audio data files at a lower frequency (e.g. 96 or 48kS/sec). This optimises disk space usage and makes long deployments 
+of several months possible without running out of data storage. </p> 
+<p>Having two sample rates present within a single PAMGuard configuration is possible using 
+<a href="../../../sound_processing/decimatorHelp/docs/decimator_decimator.html">Decimator</</a> modules. However such configurations become particularly
 complicated to configure when the sample rate of the recorded files is lower than the sample rate of the click detector.</p>
-<p>We therefore recommend that you use a modified version of the <a href="ClickDetector_clickDetector.html">Click Detector</a>which manages it's own sample rate and 
+<p>We therefore recommend that you use a modified version of the <a href="ClickDetector_clickDetector.html">Click Detector</a>, which manages it's own sample rate and 
 channel information based on information extracted from the SoundTrap data.</p>
 <p>Note that the SoundTrap click detector should only be used for clicks automatically detected by the SoundTrap. If you want to detect clicks from the 
 SoundTrap recordings, then use a normal <a href="ClickDetector_clickDetector.html">Click Detector</a> in the normal way.</p>
@@ -28,7 +26,7 @@ SoundTrap recordings, then use a normal <a href="ClickDetector_clickDetector.htm
 	<p>
 		From the <strong><em>File>Add modules>Detectors</em></strong> menu, or
 		from the pop-up menu on the data model display, select <i>'SoundTrap Click
-			Detector'</i> near the bottom of the list. Enter a descriptive name for the new detector and press Ok.
+			Detector'</i> near the bottom of the Detectors list. Enter a descriptive name for the new detector and press Ok.
 	</p>
 	
 	<h3>Importing SoundTrap Data</h3>
@@ -50,13 +48,17 @@ SoundTrap recordings, then use a normal <a href="ClickDetector_clickDetector.htm
 	 SoundTrap Click Detector and also create a  'SoundTrap Detector Import' module. Then use the import module to import the BCL and DWV 
 	 data into PAMGuard. Once imported you can run <a href="ClickDetector_clickClassification.html">Click Classifiers</a>
 	  and use other Click Detector offline functions to mark events, etc. </p>
-	 <p>If you want to run additional analysis on the WAV file data (for example to make noise measurements or to detect whistles), 
+	 <p>If you want to run additional analysis on the WAV file data (for example to 
+	<a href="../../../sound_processing/NoiseBands/Docs/NoiseBands.html">make noise measurements</a> or to 
+	 <a href="../../whistleMoanHelp/docs/whistleMoan_Overview.html">detect whistles</a>), 
 	 create a different PAMGuard configuration to process those data.<p>
 
 	<h4>The (better) New Way</h4>
-	<p>Current versions of PAMGuard can read SUD files directly, without first unpacking them into WAV, XML, BCL and DWV files. This not 
+	<p>Current versions of PAMGuard can read <a href="../../../sound_processing/AcquisitionHelp/docs/sudfiles.html">SUD files</a> directly, 
+	without first unpacking them into WAV, XML, BCL and DWV files. This not 
 	only reduces the amount of disk space you need by about x4, but also saves a lot of time.</p>
-	<p>Better still, you can now set up PAMGuard in normal mode to simultaneously process the audio data in the sud file with one set of 
+	<p>Better still, you can now set up PAMGuard in normal mode to simultaneously process the audio data in the 
+	<a href="../../../sound_processing/AcquisitionHelp/docs/sudfiles.html">SUD file</a> with one set of 
 	detectors, and simultaneously extract the click detector data into appropriate files for a SoundTrap Click Detector. </p>
 	
 	<p>Start PAMGuard in <a href="../../../overview/PamMasterHelp/docs/normalMode.html">Normal Mode</a> and add a 
