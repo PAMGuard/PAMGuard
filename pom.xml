@@ -780,12 +780,12 @@
 	</dependency>
 	 -->
 
-	<!-- not in Maven repository -->
+	<!-- not in Maven repository  -->
  	<dependency>
 	    <groupId>pamguard.org</groupId>
 	    <artifactId>x3</artifactId>
-	    <version>2.1.0</version>
-	</dependency> 
+	    <version>2.2.0</version>
+	</dependency>
 	
 		<!-- https://mvnrepository.com/artifact/it.sauronsoftware/jave -->
  	<dependency>

@@ -18,10 +18,10 @@ public class SPLSqlAddon implements SQLLoggingAddon {
 	public SPLSqlAddon(SPLAnnotationType splAnnotationType) {
 		super();
 		this.splAnnotationType = splAnnotationType;
-		rms =  new PamTableItem("RMS", Types.DOUBLE);
-		zeroPeak  = new PamTableItem("ZeroPeak", Types.DOUBLE);
-		peakPeak  = new PamTableItem("PeakPeak", Types.DOUBLE);
-		sel = new PamTableItem("SEL", Types.DOUBLE);
+		rms =  new PamTableItem("RMS", Types.DOUBLE, "RMS Level");
+		zeroPeak  = new PamTableItem("ZeroPeak", Types.DOUBLE, "Zero to Peak Level");
+		peakPeak  = new PamTableItem("PeakPeak", Types.DOUBLE, "Peak to Peak Level");
+		sel = new PamTableItem("SEL", Types.DOUBLE, "Sound Exposure Level");
 	}
 
 	@Override

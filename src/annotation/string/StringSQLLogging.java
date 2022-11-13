@@ -20,7 +20,7 @@ public class StringSQLLogging implements SQLLoggingAddon {
 		super();
 		this.stringAnnotationType = stringAnnotationType;
 		notes = new PamTableItem(stringAnnotationType.getAnnotationName(),
-				Types.CHAR, stringAnnotationType.getMaxLength());
+				Types.CHAR, stringAnnotationType.getMaxLength(), "Notes");
 	}
 
 	@Override

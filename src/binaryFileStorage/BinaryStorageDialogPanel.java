@@ -130,7 +130,18 @@ public class BinaryStorageDialogPanel {
 		binaryStoreSettings.autoNewFiles = autoNewFiles.isSelected();
 		binaryStoreSettings.datedSubFolders = dateSubFolders.isSelected();
 		binaryStoreSettings.limitFileSize = limitfileSize.isSelected();
-		
+
+		if (allowChannelOffsets) {
+			try {
+				binaryStoreSettings.channelShift = Integer.valueOf(channelOffset.getText());
+			}
+			catch (NumberFormatException e) {
+				return PamDialog.showWarning(owner, errorTitle, "Invalid channel offset number format");
+			}
+			if (binaryStoreSettings.channelShift < 0 || binaryStoreSettings.channelShift > 31) {
+				return PamDialog.showWarning(owner, errorTitle, "Channel offset bust be between 0 and 31");
+			}
+		}
 		if (PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW) {
 			return true;
 		}
@@ -155,17 +166,6 @@ public class BinaryStorageDialogPanel {
 			}
 			catch (NumberFormatException e) {
 				return PamDialog.showWarning(owner, errorTitle, "Invalid file size data");
-			}
-		}
-		if (allowChannelOffsets) {
-			try {
-				binaryStoreSettings.channelShift = Integer.valueOf(channelOffset.getText());
-			}
-			catch (NumberFormatException e) {
-				return PamDialog.showWarning(owner, errorTitle, "Invalid channel offset number format");
-			}
-			if (binaryStoreSettings.channelShift < 0 || binaryStoreSettings.channelShift > 31) {
-				return PamDialog.showWarning(owner, errorTitle, "Channel offset bust be between 0 and 31");
 			}
 		}
 		NoiseStoreType nst = (NoiseStoreType) noiseStoreType.getSelectedItem();

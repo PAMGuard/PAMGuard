@@ -77,6 +77,9 @@ public class ThreadingHydrophoneLocator extends StraightHydrophoneLocator implem
 			 */
 			while (gpsIt.hasPrevious()) {
 				gpsUnit = gpsIt.previous();
+				if (gpsUnit == null) {
+					continue;
+				}
 				gpsData = gpsUnit;
 				if (gpsUnit.getTimeInMillis() < timeMilliseconds) {
 					break;

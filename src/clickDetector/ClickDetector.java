@@ -1096,7 +1096,7 @@ public class ClickDetector extends PamProcess {
 	 * @return true if the tasks complete successfully and the click is to be kept.
 	 *         false otherwise.
 	 */
-	private boolean completeClick(ClickDetection newClick) {
+	public boolean completeClick(ClickDetection newClick) {
 
 		if (newClick.dataType == ClickDetection.CLICK_CLICK) {
 			int nChannels = PamUtils.getNumChannels(newClick.getChannelBitmap());
