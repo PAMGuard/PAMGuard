@@ -26,7 +26,6 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Vector;
@@ -48,8 +47,6 @@ import PamUtils.PamFileChooser;
 import PamView.dialog.PamDialog;
 import PamView.dialog.SourcePanel;
 import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamDataUnit;
-
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -60,20 +57,14 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
-
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JRadioButton;
 import javax.swing.JFileChooser;
 import javax.swing.JScrollPane;
@@ -87,7 +78,6 @@ import javax.swing.border.EtchedBorder;
 import clickDetector.ClickControl;
 import clickDetector.ClickDetection;
 import clickDetector.NoiseDataBlock;
-import weka.classifiers.AbstractClassifier;
 import weka.core.Attribute;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
@@ -523,7 +513,13 @@ public class RoccaParametersDialog extends PamDialog implements ActionListener, 
         reclassifyButton.addActionListener(this);
         reclassifyButton.setToolTipText("Load the whistle data from the contour stats output file, and run it through the current Classifier");
         reclassifyButton.setVisible(true);
-        extraButtonsSubPanel.setVisible(true);		// ******** THIS LINES CONTROLS THE VISIBILITY ********
+        
+        // ******** THIS LINES CONTROLS THE VISIBILITY ********
+        if (RoccaDev.isEnabled()) {
+        	extraButtonsSubPanel.setVisible(true);
+        } else {
+        	extraButtonsSubPanel.setVisible(false);
+        }
         GroupLayout extraPanelLayout = new GroupLayout(extraButtonsSubPanel);
         extraButtonsSubPanel.setLayout(extraPanelLayout);
         extraPanelLayout.setAutoCreateGaps(true);
