@@ -83,8 +83,8 @@ public class SudFileDWVHandler implements SUDNotificationHandler {
 
 	@Override
 	public void sudStreamClosed() {
-		System.out.printf("SUD input stream closed, %d DWV, %d bcl Detectins and %d BCL Noise, %d chunks processed\n",
-				dwvCount, bclDetCount, bclNoiseCount, processedChunks);
+//		System.out.printf("SUD input stream closed, %d DWV, %d bcl Detectins and %d BCL Noise, %d chunks processed\n",
+//				dwvCount, bclDetCount, bclNoiseCount, processedChunks);
 	}
 
 	@Override
