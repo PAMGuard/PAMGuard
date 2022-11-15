@@ -313,6 +313,9 @@ public abstract class IIRFilterMethod extends FilterMethod {
 //		if (nOddOnes != 0) {
 			pole1 = pzPairs[i].getPole();
 			zero1 = pzPairs[i].getZero();
+			if (pole1 == null || zero1 == null) {
+				continue;
+			}
 			a1 = -zero1.real;
 			b1 = pole1.real;
 			doubleCoefficients[j+0] = a1;
