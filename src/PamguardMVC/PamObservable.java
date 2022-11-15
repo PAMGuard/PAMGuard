@@ -400,7 +400,7 @@ public class PamObservable {//extends PanelOverlayDraw {
 		}
 	}
 
-	private Timer t = new Timer(1000, new ActionListener() {
+	private Timer t = new Timer(4321, new ActionListener() {
 		public void actionPerformed(ActionEvent evt) {
 			long now = System.currentTimeMillis();
 			if (cpuUsage == null) return;
@@ -412,6 +412,16 @@ public class PamObservable {//extends PanelOverlayDraw {
 			lastCPUCheckTime = now;
 		}
 	});
+	
+	
+	/**
+	 * Had some issues with the Timer holding a reference to the underlying PamDataBlock 
+	 * (RoccaContourDataBlock, in this case) and not releasing it for garbage collection.
+	 * Added in this method to force the timer to stop and release it's hold.
+	 */
+	public void stopTimer() {
+		t.stop();
+	}
 
 	public double getCPUPercent(int objectIndex) {
 		if (objectIndex < 0 || objectIndex >= cpuPercent.length) return -1;
