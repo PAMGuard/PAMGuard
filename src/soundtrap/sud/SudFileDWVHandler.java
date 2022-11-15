@@ -77,6 +77,8 @@ public class SudFileDWVHandler implements SUDNotificationHandler {
 		stClickControl.findRawDataBlock().setChannelMap(1);
 		stClickControl.findRawDataBlock().setSampleRate((float) sampleRate, true);
 		stClickControl.getSTAcquisition().acquisitionParameters.sampleRate = (float) sampleRate;
+		stClickControl.getSTAcquisition().getAcquisitionProcess().setSampleRate((float) sampleRate, true);
+//		stClickControl.getSTAcquisition().getS().setSampleRate((float) sampleRate, true);
 //		System.out.printf("Open input stream fs = %3.1f\n", sampleRate);
 		
 	}

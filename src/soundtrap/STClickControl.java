@@ -63,7 +63,7 @@ public class STClickControl extends ClickControl {
 		super(name);
 		
 		// create a private acquisition control that only this module can see
-		rawSource = new AcquisitionControl("Private Sound Acq for Soundtrap Click Detector");
+		rawSource = new STAcquisitionControl("Private Sound Acq for Soundtrap Click Detector");
 		
 		sudFileDWVHandler = new SudFileDWVHandler(this);
 		sudFileDWVHandler.subscribeSUD();

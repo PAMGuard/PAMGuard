@@ -24,7 +24,10 @@
 
 package soundtrap;
 
+import java.awt.Component;
+
 import Acquisition.AcquisitionControl;
+import Acquisition.DaqSystem;
 
 /**
  * @author SCANS
@@ -34,6 +37,7 @@ public class STAcquisitionControl extends AcquisitionControl {
 
 	public static final String STUNITTYPE = "SoundTrap Data Acquisition";
 	private STAcquisitionProcess stAcquisitionProcess;
+	private STDaqSystem stDaqSystem;
 
 	/**
 	 * @param name
@@ -79,6 +83,7 @@ public class STAcquisitionControl extends AcquisitionControl {
 //		TDDataProviderRegisterFX.getInstance().registerDataInfo(new RawSoundProviderFX(this));
 
 		// add a second PAM process, for the click data
+		registerDaqSystem(stDaqSystem = new STDaqSystem());
 		addPamProcess(stAcquisitionProcess = new STAcquisitionProcess(this));
 
 	}
@@ -99,6 +104,30 @@ public class STAcquisitionControl extends AcquisitionControl {
 	 */
 	public STAcquisitionProcess getStAcquisitionProcess() {
 		return stAcquisitionProcess;
+	}
+
+//	@Override
+//	protected Component getStatusBarComponent() {
+//		// call it to create the fields, just incase, then return null;
+//		super.getStatusBarComponent();
+//		return null;
+//	}
+
+//	@Override
+//	protected void setupStatusBar() {
+////		if (systemPanel == null) return;
+////		systemPanel.removeAll();
+////		DaqSystem daqSys = findDaqSystem(null);
+////		if (daqSys == null) return;
+////		Component specialComponent = daqSys.getStatusBarComponent();
+////		if (specialComponent != null) {
+////			systemPanel.add(specialComponent);
+////		}
+//	}
+
+	@Override
+	public DaqSystem findDaqSystem(String systemType) {
+		return stDaqSystem;
 	}
 
 	

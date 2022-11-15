@@ -210,14 +210,8 @@ public class AcquisitionControl extends PamControlledUnit implements PamSettings
 		else {
 			PamStatusBar statusBar = PamStatusBar.getStatusBar();
 
-			if (statusBar != null) {
-				//				statusBar.getToolBar().add(statusBarText = new JLabel());
-				//				fillStatusBarText();
-				//				statusBar.getToolBar().add(levelBar = new JProgressBar(-60, 0));
-				//				levelBar.setValue(-60);
-				//				levelBar.setOrientation(JProgressBar.HORIZONTAL);
+			if (statusBar != null && statusBarComponent != null) {
 				statusBar.add(statusBarComponent);
-//				statusBar.getToolBar().addSeparator();
 				setupStatusBar();
 			}
 		}
@@ -248,6 +242,7 @@ public class AcquisitionControl extends PamControlledUnit implements PamSettings
 	
 
 	private PamPanel systemPanel;
+	
 	protected Component getStatusBarComponent() {
 		PamPanel p = new PamPanel();
 		p.add(statusBarText = new PamLabel());
