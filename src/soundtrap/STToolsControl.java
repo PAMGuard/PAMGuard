@@ -12,6 +12,7 @@ import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import PamView.dialog.warn.WarnOnce;
 
 public class STToolsControl extends PamControlledUnit implements PamSettings {
 
@@ -21,9 +22,17 @@ public class STToolsControl extends PamControlledUnit implements PamSettings {
 	public static final String dwvFileEnd = ".dwv";
 	public static final String bclFileEnd = ".bcl";
 	
+	private String warn = "<html>Versions 2.02.06 of PAMGuard and later can read SoundTrap SUD files directly, removing the need " +
+	" to decompress them and then use this module to import the SoundTrap click detector data into PAMGuard.<p><br>" + 
+			"Instead you should process the SUD files in 'normal mode' and include a SoundTrap Click Detector in "
+			+ "your configuration. Click data will then be automatically unpacked into the correct binary files"
+			+ " as you process the SUD file audio data.<p><br>"
+			+ "You can remove this module which is now obsolete. See the online help for details.";
+	
 	public STToolsControl(String unitName) {
 		super("Sound Trap Tools", unitName);
 		PamSettingManager.getInstance().registerSettings(this);
+		WarnOnce.showWarning("Importing SoundTrap data", warn, WarnOnce.WARNING_MESSAGE);
 	}
 
 	/* (non-Javadoc)
