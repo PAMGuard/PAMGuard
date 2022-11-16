@@ -254,9 +254,11 @@ public class AcquisitionProcess extends PamProcess {
 		
 		bufferOverflow = false;
 		//		daqCheckTime = PamCalendar.getTimeInMillis();
-		Timer t = new Timer(1, new ReallyStart());
-		t.setRepeats(false);
-		t.start();
+		if (!netRX) {
+			Timer t = new Timer(1, new ReallyStart());
+			t.setRepeats(false);
+			t.start();
+		}
 	}
 	
 	private boolean addServerTime(DaqStatusDataUnit daqStatusDataUnit) {

@@ -387,6 +387,11 @@ public class BuoyStatusDataUnit extends PamDataUnit {
 		return buoyStatusData;
 	}
 
+	@Override
+	public String toString() {
+		return String.format("Status %s\n", buoyStatusData.toString());
+	}
+
 //	/**
 //	 * @return the genericStringPairsChanged
 //	 */

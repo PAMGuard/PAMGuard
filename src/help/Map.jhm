@@ -574,6 +574,8 @@
 
 <mapID target="utilities.SIDEModule.docs.SIDE_Overview_seq" url="utilities/SIDEModule/docs/SIDE_Overview.html#seq"/>
 
+<mapID target="detectors.clickDetectorHelp.docs.SoundTrapClickDetector" url="detectors/clickDetectorHelp/docs/SoundTrapClickDetector.html"/>
+
 <mapID target="utilities.spectrogramannotations.docs.using" url="utilities/spectrogramannotations/docs/using.html"/>
 
 <mapID target="visual_methods.loggerFormsHelp.docs.NMEAINT" url="visual_methods/loggerFormsHelp/docs/NMEAINT.html"/>
@@ -801,6 +803,8 @@
 <mapID target="sound_processing.fftManagerHelp.docs.noise_removal" url="sound_processing/fftManagerHelp/docs/noise_removal.html"/>
 
 <mapID target="visual_methods.loggerFormsHelp.docs.NMEACHAR" url="visual_methods/loggerFormsHelp/docs/NMEACHAR.html"/>
+
+<mapID target="sound_processing.AcquisitionHelp.docs.sudfiles" url="sound_processing/AcquisitionHelp/docs/sudfiles.html"/>
 
 <mapID target="sound_processing.LTSA.Docs.LTSADisplays" url="sound_processing/LTSA/Docs/LTSADisplays.html"/>
 

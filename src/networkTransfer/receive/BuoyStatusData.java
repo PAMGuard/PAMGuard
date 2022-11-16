@@ -144,4 +144,9 @@ public class BuoyStatusData implements Serializable, ManagedParameters {
 		return ps;
 	}
 
+	@Override
+	public String toString() {
+		return String.format("Buoy %d(%d) ip %s", buoyId1, buoyId2, ipAddr);
+	}
+
 }

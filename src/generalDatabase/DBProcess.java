@@ -22,6 +22,8 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -36,7 +38,9 @@ import loggerForms.UDFTableDefinition;
 import loggerForms.formdesign.FormEditor;
 import PamController.PamControlledUnit;
 import PamController.PamController;
+import PamController.PamFolders;
 import PamUtils.PamCalendar;
+import PamUtils.PamFileChooser;
 import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
@@ -1391,6 +1395,44 @@ public class DBProcess extends PamProcess {
 	 */
 	public LogSettings getLogViewerSettings() {
 		return logViewerSettings;
+	}
+
+	/**
+	 * Export all available database schema, converting PamTableDefinitions into 
+	 * valid xsd documents. 
+	 * @param parentFrame
+	 */
+	public void exportDatabaseSchema(JFrame parentFrame) {
+		File startLoc = PamFolders.getFileChooserPath(PamFolders.getDefaultProjectFolder());
+			PamFileChooser fc = new PamFileChooser();
+			fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		startLoc = PamFolders.getFileChooserPath(startLoc);
+		fc.setCurrentDirectory(startLoc);
+
+		int ans = fc.showDialog(parentFrame, "Select storage folder");
+
+		if (ans == JFileChooser.APPROVE_OPTION) {
+			startLoc = fc.getSelectedFile();		
+			exportDatabaseSchema(parentFrame, startLoc);
+		}
+		
+	}
+
+	/**
+	 * Export all table definitions to xsd files in given folder. 
+	 * @param parentFrame
+	 * @param folder
+	 */
+	private void exportDatabaseSchema(JFrame parentFrame, File folder) {
+		ArrayList<PamDataBlock> allDataBlocks = PamController.getInstance().getDataBlocks();
+		DBSchemaWriter schemaWriter = new DBSchemaWriter();
+		for (PamDataBlock aBlock : allDataBlocks) {
+			SQLLogging logging = aBlock.getLogging();
+			if (logging == null) {
+				continue;
+			}
+			schemaWriter.writeSchema(folder, aBlock);
+		}
 	}
 
 }

@@ -13,6 +13,7 @@ import java.util.TimeZone;
 import Acquisition.KETime;
 import Acquisition.layoutFX.FileDatePane;
 import Acquisition.layoutFX.StandardFileDatePane;
+import Acquisition.sud.SUDFileTime;
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
@@ -157,6 +158,11 @@ public class StandardFileDate implements FileDate, PamSettings {
 		if (settings.isUseBespokeFormat() && settings.getForcedDateFormat() != null) {
 			return forcedDataFormat(file, settings.getForcedDateFormat());
 		}
+
+		long sudTime = SUDFileTime.getSUDFileTime(file);
+		if (sudTime != Long.MIN_VALUE) {
+			return sudTime;
+		}
 		
 		/*
 		 * Dtag files have an accompanying XML file which 
@@ -168,6 +174,7 @@ public class StandardFileDate implements FileDate, PamSettings {
 			setLastFormat("D3 time from xml file");
 			return dTagTime;
 		}
+		
 
 		long stTime = SoundTrapTime.getSoundTrapTime(file, settings.getDateTimeFormatToUse());
 		if (stTime != Long.MIN_VALUE) {

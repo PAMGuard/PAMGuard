@@ -1,6 +1,5 @@
 package PamController.command;
 
-import Map.GetMapFile;
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamUtils.PamCalendar;
@@ -55,6 +54,9 @@ public class SummaryCommand extends ExtCommand {
 			usedModules ++;
 			totalString += String.format("\n<%s>%s:%s<\\%s>", aModule.getShortUnitType(), 
 					aModule.getUnitName(), aString, aModule.getShortUnitType());
+		}
+		if (clear) {
+			lastCallTime = nowTime;
 		}
 		return totalString;
 	}

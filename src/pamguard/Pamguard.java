@@ -23,17 +23,14 @@ package pamguard;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
-import Acquisition.AcquisitionControl;
 import Acquisition.FolderInputSystem;
 import PamController.PamController;
 import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamguardVersionInfo;
 import PamController.pamBuoyGlobals;
-import PamController.command.TerminalController;
 import PamModel.SMRUEnable;
 import PamUtils.FileFunctions;
-import PamUtils.PamCalendar;
 import PamUtils.PamExceptionHandler;
 import PamUtils.PlatformInfo;
 import PamUtils.Splash;
@@ -45,6 +42,7 @@ import PamguardMVC.debug.Debug;
 import binaryFileStorage.BinaryStore;
 import dataPlotsFX.JamieDev;
 import generalDatabase.DBControl;
+import rocca.RoccaDev;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -189,6 +187,10 @@ public class Pamguard {
 				else if (anArg.equalsIgnoreCase("-jamie")) {
 					JamieDev.setEnabled(true);
 					System.out.println("Enabling Jamie Macaulay modifications.");
+				}
+				else if (anArg.equalsIgnoreCase("-rocca")) {
+					RoccaDev.setEnabled(true);
+					System.out.println("Enabling Rocca development mode");
 				}
 				else if (anArg.equalsIgnoreCase(Debug.flag)) {
 					Debug.setPrintDebug(true);

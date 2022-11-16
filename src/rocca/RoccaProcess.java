@@ -388,7 +388,9 @@ public class RoccaProcess extends PamProcess {
 						 rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) > 1.5 ||
 						 rcdb.getContour().get(RoccaContourStats.ParamIndx.FREQABSSLOPEMEAN) < 2000. ||
 						 rcdb.getContour().get(RoccaContourStats.ParamIndx.FREQABSSLOPEMEAN) > 28000. )) {
-					rcdb.setNaturalLifetimeMillis(0);
+//					rcdb.setNaturalLifetimeMillis(0);
+			        rcdb.stopTimer();
+					rcdb = null;
 					return;
 				}
 				if (roccaControl.roccaParameters.roccaClassifierModelFilename.getName().equals("HIWhist.model") &&
@@ -402,7 +404,9 @@ public class RoccaProcess extends PamProcess {
 						 rcdb.getContour().get(RoccaContourStats.ParamIndx.FREQABSSLOPEMEAN) > 60000.  ||
 						 rcdb.getContour().get(RoccaContourStats.ParamIndx.FREQRANGE) < 800. ||
 						 rcdb.getContour().get(RoccaContourStats.ParamIndx.FREQRANGE) > 14000.  )) {
-					rcdb.setNaturalLifetimeMillis(0);
+//					rcdb.setNaturalLifetimeMillis(0);
+			        rcdb.stopTimer();
+					rcdb = null;
 					return;
 				}
 				if (roccaControl.roccaParameters.roccaClassifierModelFilename.getName().equals("NWAtlWhist.model") &&
@@ -412,7 +416,9 @@ public class RoccaProcess extends PamProcess {
 						 rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) > 2.5 ||
 						 rcdb.getContour().get(RoccaContourStats.ParamIndx.FREQABSSLOPEMEAN) < 9100. ||
 						 rcdb.getContour().get(RoccaContourStats.ParamIndx.FREQABSSLOPEMEAN) > 82000. )) {
-					rcdb.setNaturalLifetimeMillis(0);
+//					rcdb.setNaturalLifetimeMillis(0);
+			        rcdb.stopTimer();
+					rcdb = null;
 					return;
 				}
 			}
@@ -431,7 +437,9 @@ public class RoccaProcess extends PamProcess {
 	        saveContourPoints(rcdb, rcdb.getChannelMap(), ++numDetections, sNum);
 	        saveContourStats(rcdb, rcdb.getChannelMap(), numDetections, sNum);
 	        saveContour(rcdb, rcdb.getChannelMap(), numDetections, sNum);
-			rcdb.setNaturalLifetimeMillis(0);
+//			rcdb.setNaturalLifetimeMillis(0);
+	        rcdb.stopTimer();
+			rcdb = null;
 
 	    /* if this is a click detection (signal, not noise) */
 		} else if (o==manClickSourceData || o==autoClickSourceData) {
@@ -499,18 +507,24 @@ public class RoccaProcess extends PamProcess {
 							(rcdb.getContour().get(RoccaContourStats.ParamIndx.SNR) > 35. ||
 							 rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) < 0.005 ||
 							 rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) > 0.6 )) {
+				        rcdb.stopTimer();
+						rcdb = null;
 						return;
 					}
 					if (roccaControl.roccaParameters.roccaClassifierModelFilename.getName().equals("HIClick.model") &&
 							(rcdb.getContour().get(RoccaContourStats.ParamIndx.SNR) > 40. ||
 							 rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) < 0.01 ||
 							 rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) > 0.6 )) {
+				        rcdb.stopTimer();
+						rcdb = null;
 						return;
 					}
 					if (roccaControl.roccaParameters.roccaClassifierModelFilename.getName().equals("NWAtlClick.model") &&
 							(rcdb.getContour().get(RoccaContourStats.ParamIndx.SNR) > 35. ||
 							 rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) < 0.005 ||
 							 rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) > 0.6 )) {
+				        rcdb.stopTimer();
+						rcdb = null;
 						return;
 					}
 				}
@@ -529,7 +543,9 @@ public class RoccaProcess extends PamProcess {
 		        // add call to update side panel.  Set the isClick flag to True
 		        updateSidePanel(rcdb, true);
 		        saveContourStats(rcdb, rcdb.getChannelMap(), numDetections, sNum);
-		        rcdb.setNaturalLifetimeMillis(0);
+//		        rcdb.setNaturalLifetimeMillis(0);
+		        rcdb.stopTimer();
+		        rcdb = null;
 			}
 
 			
