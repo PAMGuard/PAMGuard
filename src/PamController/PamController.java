@@ -414,9 +414,9 @@ public class PamController implements PamControllerInterface, PamSettings {
 			System.exit(0);
 		}
 
-		if (getRunMode() == RUN_NOTHING) {
+		/*if (getRunMode() == RUN_NOTHING) {
 			return;
-		}
+		}*/
 
 		// get the general settings out of the file immediately.
 		//		PamSettingManager.getInstance().loadSettingsFileData();
@@ -506,7 +506,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 		 * We are running as a remote application, start process straight away!
 		 */
 		if (getRunMode() == RUN_NOTHING) {
-
+			return;
 		}else if (PamSettingManager.RUN_REMOTE == true) {
 			// Initialisation is complete.
 			initializationComplete = true;

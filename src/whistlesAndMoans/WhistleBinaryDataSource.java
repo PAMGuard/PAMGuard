@@ -264,12 +264,15 @@ public class WhistleBinaryDataSource extends BinaryDataSource {
 //		cr.addOfflineSlice(sliceData);
 //		cr.condenseInfo();
 		crdu = new ConnectedRegionDataUnit(binaryObjectData.getDataUnitBaseData(), cr, wmDetector);
-//		crdu.setTimeMilliseconds(binaryObjectData.getTimeMilliseconds());
-//		crdu.setTimeDelaysSeconds(delays);
-//		crdu.setCalculatedAmlitudeDB(amplitude);
-//		crdu.setSampleDuration((long) ((nSlices+1) * fftHop));
-//		crdu.setSequenceBitmap(binaryObjectData.getDataUnitBaseData().getSequenceBitmap());
-//		crdu.setChannelBitmap(binaryObjectData.getDataUnitBaseData().getChannelBitmap());
+		if(fileVersion<2) {
+			crdu.setTimeMilliseconds(binaryObjectData.getTimeMilliseconds());
+			crdu.setTimeDelaysSeconds(delays);
+			crdu.setCalculatedAmlitudeDB(amplitude);
+			crdu.setSampleDuration((long) ((nSlices+1) * fftHop));
+			crdu.setChannelBitmap(channelMap);
+			crdu.setStartSample(startSample);
+		}
+		
 		/*
 		 *  now also need to recalculate bearings using the appropriate bearing localiser.
 		 *  These are hidden away in the sub processes and may be different for different 
