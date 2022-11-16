@@ -420,7 +420,14 @@ public class ClickBinaryDataSource extends BinaryDataSource {
 			if (clickLocalisation != null && angleErrors != null) {
 					clickLocalisation.setAngleErrors(angleErrors);
 			}
+			
+			if(clickLocalisation==null && maxDelays>1 && moduleVersion==1) {
+				clickDetector.processNewBuoyData(null, newClick);
+			}
+			
 			newClick.setTimeMilliseconds(binaryObjectData.getTimeMilliseconds());
+			
+			
 //			clickDetector.getClickDataBlock().addPamData(newClick);
 			
 		} catch (IOException e1) {
