@@ -673,11 +673,6 @@ final public class PamModel implements PamModelInterface, PamSettings {
 				+ "bearings to source, group into click trains, etc.");
 		mi.setModulesMenuGroup(detectorsGroup);
 		mi.addGUICompatabilityFlag(PamGUIManager.FX);
-		
-		mi = PamModuleInfo.registerControlledUnit("soundtrap.STClickControl", "SoundTrap Click Detector");
-		mi.setModulesMenuGroup(detectorsGroup);
-		mi.setToolTipText("Click Detector module for Soundtrap detector data");
-		mi.setHidden(isViewer == false);
 
 		mi = PamModuleInfo.registerControlledUnit("clickTrainDetector.ClickTrainControl", "Click Train Detector");
 		mi.addDependency(new PamDependency(RawDataUnit.class, "clickDetector.ClickControl"));	
@@ -728,6 +723,11 @@ final public class PamModel implements PamModelInterface, PamSettings {
 		mi.addDependency(new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));
 		mi.setToolTipText("Generalised Power Law Detector for tonal sounds");
 		mi.setModulesMenuGroup(detectorsGroup);	
+
+		mi = PamModuleInfo.registerControlledUnit("soundtrap.STClickControl", "SoundTrap Click Detector");
+		mi.setModulesMenuGroup(detectorsGroup);
+		mi.setToolTipText("Click Detector module for Soundtrap detector data only");
+//		mi.setHidden(isViewer == false);
 
 //		mi = PamModuleInfo.registerControlledUnit("WorkshopDemo.WorkshopController", "Workshop Demo Detector");
 //		mi.addDependency(new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));

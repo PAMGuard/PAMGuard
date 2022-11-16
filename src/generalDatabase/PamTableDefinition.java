@@ -55,15 +55,15 @@ public class PamTableDefinition extends EmptyTableDefinition implements Cloneabl
 	 */
 	public PamTableDefinition(String tableName, int updatePolicy) {
 		super(tableName, updatePolicy);
-		pamTableItems.add(uid = new PamTableItem("UID", Types.BIGINT));
-		pamTableItems.add(timeStampItem = new PamTableItem(utcColName, Types.TIMESTAMP));
-		pamTableItems.add(timeStampMillis = new PamTableItem("UTCMilliseconds", Types.SMALLINT));
-		pamTableItems.add(localTime = new PamTableItem("PCLocalTime", Types.TIMESTAMP));
-		pamTableItems.add(pcTime = new PamTableItem("PCTime", Types.TIMESTAMP));
-		pamTableItems.add(channelBitmap = new PamTableItem("ChannelBitmap", Types.INTEGER));
-		pamTableItems.add(sequenceBitmap = new PamTableItem("SequenceBitmap", Types.INTEGER));
+		pamTableItems.add(uid = new PamTableItem("UID", Types.BIGINT, "Unique Identifier"));
+		pamTableItems.add(timeStampItem = new PamTableItem(utcColName, Types.TIMESTAMP, "Timestamp UTC"));
+		pamTableItems.add(timeStampMillis = new PamTableItem("UTCMilliseconds", Types.SMALLINT, "Time milliseconds (for databases which do not support millis)"));
+		pamTableItems.add(localTime = new PamTableItem("PCLocalTime", Types.TIMESTAMP, "Local time on PC"));
+		pamTableItems.add(pcTime = new PamTableItem("PCTime", Types.TIMESTAMP, "Time data written, UTC. Same as UTC for real time data, current time for offline file analysis"));
+		pamTableItems.add(channelBitmap = new PamTableItem("ChannelBitmap", Types.INTEGER, "Bitmap of input channels used"));
+		pamTableItems.add(sequenceBitmap = new PamTableItem("SequenceBitmap", Types.INTEGER, "Bitmap of beam or channel outputs used"));
 		if (updatePolicy == SQLLogging.UPDATE_POLICY_WRITENEW) {
-			addTableItem(updateReference = new PamTableItem("UpdateOf", Types.INTEGER));
+			addTableItem(updateReference = new PamTableItem("UpdateOf", Types.INTEGER, "Reference to previous value"));
 		}
 	}
 

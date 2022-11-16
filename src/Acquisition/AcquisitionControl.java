@@ -38,6 +38,9 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 
+import org.pamguard.x3.sud.Chunk;
+import org.pamguard.x3.sud.SudFileListener;
+
 import dataGram.DatagramManager;
 import dataMap.OfflineDataMapPoint;
 import dataMap.filemaps.OfflineFileServer;
@@ -49,12 +52,13 @@ import simulatedAcquisition.SimProcess;
 import asiojni.ASIOSoundSystem;
 import asiojni.NewAsioSoundSystem;
 import nidaqdev.NIDAQProcess;
-import nidaqdev.networkdaq.NINetworkDaq;
 import Acquisition.filedate.FileDate;
 import Acquisition.filedate.StandardFileDate;
+import Acquisition.filetypes.SoundFileTypes;
 import Acquisition.layoutFX.AquisitionGUIFX;
 import Acquisition.offlineFuncs.OfflineWavFileServer;
 import Acquisition.rona.RonaOfflineFileServer;
+import Acquisition.sud.SUDNotificationManager;
 import Array.ArrayManager;
 import Array.PamArray;
 import Array.Preamplifier;
@@ -132,7 +136,10 @@ public class AcquisitionControl extends PamControlledUnit implements PamSettings
 	 * The JavaFX GUI for the sound acquisition module. 
 	 */
 	private AquisitionGUIFX aquisitionGUIFX;
-
+	
+	private SUDNotificationManager sudNotificationManager;
+	
+	protected SoundFileTypes soundFileTypes;
 	
 	/**
 	 * Main control unit for audio data acquisition.
@@ -157,6 +164,8 @@ public class AcquisitionControl extends PamControlledUnit implements PamSettings
 		fileDate = new StandardFileDate(this);
 
 		pamController = PamController.getInstance();
+		
+		soundFileTypes = new SoundFileTypes(this);
 		
 		registerDaqSystem(new SoundCardSystem(this));
 		if (PlatformInfo.calculateOS() == OSType.WINDOWS) {
@@ -201,14 +210,8 @@ public class AcquisitionControl extends PamControlledUnit implements PamSettings
 		else {
 			PamStatusBar statusBar = PamStatusBar.getStatusBar();
 
-			if (statusBar != null) {
-				//				statusBar.getToolBar().add(statusBarText = new JLabel());
-				//				fillStatusBarText();
-				//				statusBar.getToolBar().add(levelBar = new JProgressBar(-60, 0));
-				//				levelBar.setValue(-60);
-				//				levelBar.setOrientation(JProgressBar.HORIZONTAL);
+			if (statusBar != null && statusBarComponent != null) {
 				statusBar.add(statusBarComponent);
-//				statusBar.getToolBar().addSeparator();
 				setupStatusBar();
 			}
 		}
@@ -239,6 +242,7 @@ public class AcquisitionControl extends PamControlledUnit implements PamSettings
 	
 
 	private PamPanel systemPanel;
+	
 	protected Component getStatusBarComponent() {
 		PamPanel p = new PamPanel();
 		p.add(statusBarText = new PamLabel());
@@ -833,5 +837,16 @@ public class AcquisitionControl extends PamControlledUnit implements PamSettings
 	public String getModuleSummary(boolean clear) {
 		return getDaqProcess().getRawDataBlock().getSummaryString(clear);
 	}
-
+	
+	/**
+	 * Get the SUD processing notification manager. 
+	 * @return SUD processing notification manager. 
+	 */
+	public SUDNotificationManager getSUDNotificationManager() {
+		if (sudNotificationManager == null) {
+			sudNotificationManager = new SUDNotificationManager();
+		}
+		return sudNotificationManager;
+	}
+	
 }

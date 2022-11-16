@@ -428,8 +428,23 @@ PamSettingsSource {
 			JMenuItem speedMenu = new JMenuItem("Test database speed");
 			speedMenu.addActionListener(new SpeedMenu(parentFrame));
 			menu.add(speedMenu);
+			
+			JMenuItem exSchema = new JMenuItem("Export database schema");
+			exSchema.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					exportDatabaseSchema(parentFrame);
+				}
+			});
+			menu.add(exSchema);
 		}
 		return menu;
+	}
+
+
+	protected void exportDatabaseSchema(JFrame parentFrame) {
+		dbProcess.exportDatabaseSchema(parentFrame);
 	}
 
 

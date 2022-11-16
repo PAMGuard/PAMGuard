@@ -21,16 +21,16 @@ public class BearingAnnotationSQL implements SQLLoggingAddon {
 	public BearingAnnotationSQL(BearingAnnotationType bearingAnnotationType) {
 		super();
 		this.bearingAnnotationType = bearingAnnotationType;
-		algoName = new PamTableItem("BearingAlgorithm", Types.CHAR, 30);
-		angle[0] = new PamTableItem("BearingAngle1", Types.REAL);
-		angle[1] = new PamTableItem("BearingAngle2", Types.REAL);
-		angleError[0] = new PamTableItem("BearingError1", Types.REAL);
-		angleError[1] = new PamTableItem("BearingError2", Types.REAL);
-		refAngles[0] = new PamTableItem("ReferenceAngle1", Types.REAL);
-		refAngles[1] = new PamTableItem("ReferenceAngle2", Types.REAL);
-		bfPhones = new PamTableItem("BearingPhones", Types.INTEGER);
-		bfArrayType = new PamTableItem("BearingArrayType", Types.SMALLINT);
-		bfContents = new PamTableItem("BearingLocContents", Types.INTEGER);
+		algoName = new PamTableItem("BearingAlgorithm", Types.CHAR, 30, "Algorithm Name");
+		angle[0] = new PamTableItem("BearingAngle1", Types.REAL, "Horizontal angle (radians)");
+		angle[1] = new PamTableItem("BearingAngle2", Types.REAL, "Vertical angle (radians)");
+		angleError[0] = new PamTableItem("BearingError1", Types.REAL, "Horizontal angle error (radians)");
+		angleError[1] = new PamTableItem("BearingError2", Types.REAL, "Vertical angle error (radians)");
+		refAngles[0] = new PamTableItem("ReferenceAngle1", Types.REAL, "Horizontal angle reference");
+		refAngles[1] = new PamTableItem("ReferenceAngle2", Types.REAL, "Vertical angle reference");
+		bfPhones = new PamTableItem("BearingPhones", Types.INTEGER, "Used hydrophones bitmap");
+		bfArrayType = new PamTableItem("BearingArrayType", Types.SMALLINT, "Array Type 1=point;2=line;3=plane;4=volume");
+		bfContents = new PamTableItem("BearingLocContents", Types.INTEGER, "Bitmap of localisation information types");
 	}
 
 	@Override

@@ -24,7 +24,10 @@
 
 package soundtrap;
 
+import java.awt.Component;
+
 import Acquisition.AcquisitionControl;
+import Acquisition.DaqSystem;
 
 /**
  * @author SCANS
@@ -34,6 +37,14 @@ public class STAcquisitionControl extends AcquisitionControl {
 
 	public static final String STUNITTYPE = "SoundTrap Data Acquisition";
 	private STAcquisitionProcess stAcquisitionProcess;
+	private STDaqSystem stDaqSystem;
+	
+	/*
+	 * Standard voltage for soundtrap data. note that ST calibration is only 
+	 * provided as end to end peak input, so the correct thing to do is set the peak to peak as 2
+	 * (0-peak = 1) and then put the hydrophone sensitivity as - the end to end and all will be well. 
+	 */
+	public static final double SOUNDTRAPVP2P = 2.0;
 
 	/**
 	 * @param name
@@ -41,46 +52,12 @@ public class STAcquisitionControl extends AcquisitionControl {
 	public STAcquisitionControl(String name) {
 		super(name);
 		
-//		super(STUNITTYPE, name);
-//
-//		acquisitionControl = this;
-//		
-//		fileDate = new StandardFileDate(this);
-//
-//		pamController = PamController.getInstance();
-//		
-//		registerDaqSystem(new FileInputSystem(this));
-//		registerDaqSystem(folderSystem = new FolderInputSystem(this));
-//
-//		daqChannelListManager = new DAQChannelListManager(this);
-//
-//		PamSettingManager.getInstance().registerSettings(this);
-//
-//		addPamProcess(acquisitionProcess = new STAcquisitionProcess(this));
-//
-//		daqMenuEnabler = new MenuItemEnabler();
-//
-//		statusBarComponent = getStatusBarComponent();
-//
-//		if (isViewer) {
-//				offlineFileServer = new OfflineFileServer(this, fileDate);
-//		}
-//		else {
-//			PamStatusBar statusBar = PamStatusBar.getStatusBar();
-//
-//			if (statusBar != null) {
-//				statusBar.getToolBar().add(statusBarComponent);
-//				statusBar.getToolBar().addSeparator();
-//				setupStatusBar();
-//			}
-//		}
-//		setSelectedSystem();
-//		
-//		TDDataProviderRegisterFX.getInstance().registerDataInfo(new RawSoundProviderFX(this));
-
 		// add a second PAM process, for the click data
+		registerDaqSystem(stDaqSystem = new STDaqSystem());
 		addPamProcess(stAcquisitionProcess = new STAcquisitionProcess(this));
 
+		acquisitionParameters.voltsPeak2Peak = SOUNDTRAPVP2P;
+		
 	}
 
 	@Override
@@ -99,6 +76,30 @@ public class STAcquisitionControl extends AcquisitionControl {
 	 */
 	public STAcquisitionProcess getStAcquisitionProcess() {
 		return stAcquisitionProcess;
+	}
+
+//	@Override
+//	protected Component getStatusBarComponent() {
+//		// call it to create the fields, just incase, then return null;
+//		super.getStatusBarComponent();
+//		return null;
+//	}
+
+//	@Override
+//	protected void setupStatusBar() {
+////		if (systemPanel == null) return;
+////		systemPanel.removeAll();
+////		DaqSystem daqSys = findDaqSystem(null);
+////		if (daqSys == null) return;
+////		Component specialComponent = daqSys.getStatusBarComponent();
+////		if (specialComponent != null) {
+////			systemPanel.add(specialComponent);
+////		}
+//	}
+
+	@Override
+	public DaqSystem findDaqSystem(String systemType) {
+		return stDaqSystem;
 	}
 
 	

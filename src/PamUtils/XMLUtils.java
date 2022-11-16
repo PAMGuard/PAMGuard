@@ -1,7 +1,9 @@
 package PamUtils;
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -9,6 +11,7 @@ import java.io.StringWriter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -182,5 +185,48 @@ public class XMLUtils {
 			e.printStackTrace();
 		}
 		return doc;
+	}
+	/**
+	 * Write to the given file. 
+	 * @param doc xml document
+	 * @param outFile file
+	 * @throws IOException 
+	 */
+	public static void writeToFile(Document doc, File outFile) throws IOException {
+		String asString = getAsString(doc);
+		if (asString!=null) {
+			try {
+				BufferedWriter out = new BufferedWriter(new FileWriter(outFile, false));
+				out.write(asString);
+			    out.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}			
+		}
+	}
+
+	/**
+	 * Get the xml document as a String.
+	 * @param doc xml document
+	 * @return xml content as a a string. 
+	 */
+	public static String getAsString(Document doc) {
+		try {
+			DOMSource domSource = new DOMSource(doc);
+			StringWriter writer = new StringWriter();
+			StreamResult result = new StreamResult(writer);
+			TransformerFactory tf = TransformerFactory.newInstance();
+			Transformer transformer = tf.newTransformer();
+			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+			transformer.setOutputProperty(OutputKeys.ENCODING, "ISO-8859-1");
+//			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+			transformer.transform(domSource, result);
+			return writer.toString();
+		} catch (TransformerException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 }
