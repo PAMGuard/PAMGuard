@@ -19,6 +19,7 @@ import PamUtils.PamCalendar;
 import clickDetector.ClickDetection;
 import clickDetector.ClickDetector;
 import clickDetector.ClickDetector.ChannelGroupDetector;
+import soundtrap.STAcquisitionControl;
 import soundtrap.STClickControl;
 import wavFiles.ByteConverter;
 
@@ -77,6 +78,8 @@ public class SudFileDWVHandler implements SUDNotificationHandler {
 		stClickControl.findRawDataBlock().setChannelMap(1);
 		stClickControl.findRawDataBlock().setSampleRate((float) sampleRate, true);
 		stClickControl.getSTAcquisition().acquisitionParameters.sampleRate = (float) sampleRate;
+		stClickControl.getSTAcquisition().acquisitionParameters.voltsPeak2Peak = STAcquisitionControl.SOUNDTRAPVP2P;
+		stClickControl.getSTAcquisition().getAcquisitionProcess().setSampleRate((float) sampleRate, true);
 //		System.out.printf("Open input stream fs = %3.1f\n", sampleRate);
 		
 	}
