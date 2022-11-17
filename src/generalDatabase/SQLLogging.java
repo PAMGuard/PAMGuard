@@ -2183,5 +2183,12 @@ public abstract class SQLLogging {
 		return subDetection.getSuperDetection(superDataBlock);
 	}
 
+	/**
+	 * @return the loggingAddOns
+	 */
+	public ArrayList<SQLLoggingAddon> getLoggingAddOns() {
+		return loggingAddOns;
+	}
+
 
 }

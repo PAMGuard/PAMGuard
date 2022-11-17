@@ -1,0 +1,45 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
+<title>SUD Files</title>
+</head>
+<body>
+<h1>SoundTrap data files</h1>
+<h3>SUD Files</h3>
+<p>
+SoundTrap recorders from 
+<a href="https://www.oceaninstruments.co.nz/">Ocean Instruments</a>
+ store data in proprietary files called SUD files. See SoundTrap documentation for information on how to 
+ extract SUD files from SoundTrap recorders. </p>
+ 
+ <p>Earlier versions of PAMGuard required you to 'inflate' the SUD files into standard wav audio files using 
+ the <a href="https://www.oceaninstruments.co.nz/downloads/">SoundTrap Host software</a> before they could be processed.</p>
+ <p>The current version of PAMGuard no longer requires this since it can read data directly from the SUD files.</p>
+ <p>Inflating SUD files to WAV files generally required between 3 and 5 times as much disk space and could also take 
+ a fair amount of time, so not inflating will save both!</p>
+ 
+ <h3>SUD Index Files</h3>
+ <p>To efficiently navigate SUD files, PAMGuard makes a map of each file and stores it in a new file in the same 
+ folder as the original SUD file. The index files have the same name as the original file, but end with .sudx. 
+ The index files are about 2.5% of the size of the original SUD files. When processing SUD files it is therefore 
+ important that a) the drive containing the SUD files is less than 95% full and b) that the system running PAMGuard has
+ write access to the folder containing the SUD files. </p>
+ 
+ <h3>SUD File Times</h3>
+ <p>The name of each SUD file contains the device serial number and a timestamp (data and time) in the form YYMMDDhhmmss. 
+ Note that these time stamps are in local time. When processing the file, PAMGuard will extract a UTC timestamp from within 
+ each SUD file and apply the UTC time to the data. you may therefore notice that the times of binary files and database
+ entries differ from the times in the file names. </p>
+ 
+ <h3>Mixing SUD and WAV files</h3>
+ <p>If a SUD file and a WAV file with the same name are in the same folder, then PAMGuard will ignore the SUD file
+ and process the WAV file. Note that in this case, PAMGuard will be unable to extract any metadata from the SUD file
+ and will not extract SoundTrap Click Detections (see below).</p>
+ 
+ <h3>SoundTrap Click Detector</h3>
+ <p>If you are using the SoundTrap build in click detector (see SoundTrap manuals) then the SUD files will also contain 
+ detected clicks.</p> <p>See the help page for the <a href="../../../detectors/clickDetectorHelp/docs/SoundTrapClickDetector.html">SoundTrap Click Detector</a> 
+ for information on how to get these clicks from the SUD files into PAMGuard. </p>
+<br><br><br>
+</body>
+</html>

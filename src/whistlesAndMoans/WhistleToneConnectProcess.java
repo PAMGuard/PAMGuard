@@ -968,17 +968,6 @@ public class WhistleToneConnectProcess extends PamProcess {
 	}
 
 
-	public String getModuleSummary() {
-		String sumText = String.format("%d", NSUMMARYPOINTS);
-		for (int i = 0; i < NSUMMARYPOINTS; i++) {
-			sumText += String.format(",%d",whistleSummaryCount[i]);
-		}
-
-		clearSummaryData();
-		return sumText;
-	}
-
-
 	/**
 	 * When delay data are written to binary files, int16's are used, but these
 	 * must be scaled up to allow for sub-sample timing. How much they can be 
@@ -1097,6 +1086,22 @@ public class WhistleToneConnectProcess extends PamProcess {
 			}
 		}
 		return fftUnitsOut;
+	}
+
+	/*
+	 * replicate Decimus function to give counts of whistles in four evenly spaced frequency 
+	 * bins. 
+	 */
+	public String getModuleSummary(boolean clear) {
+		String sumText = String.format("%d", NSUMMARYPOINTS);
+		for (int i = 0; i < NSUMMARYPOINTS; i++) {
+			sumText += String.format(",%d",whistleSummaryCount[i]);
+		}
+	
+		if (clear) {
+			clearSummaryData();
+		}
+		return sumText;
 	}
 
 }

@@ -408,92 +408,102 @@ public class RoccaClassifier {
 
     	// load the whistle classifier
     	if (roccaControl.roccaParameters.isClassifyWhistles()) {
-	        String fname = roccaControl.roccaParameters.roccaClassifierModelFilename.getAbsolutePath();
-	        File f = new File(fname);
-	        if (f.exists() == false) {
-	        	WarnOnce.showWarning(roccaControl.getUnitName(), "Rocca whistle classifier file cannot be found at " + fname, WarnOnce.WARNING_MESSAGE);
-	            roccaControl.roccaParameters.setClassifyWhistles(false);
-	        }
-	        else {
-	        	try {
-	        		BufferedInputStream input = new BufferedInputStream(
-	        				(new ProgressMonitorInputStream(null, "Loading Whistle Classifier - Please wait",
-	        						new FileInputStream(fname))));
-	        		Object[] modelParams = SerializationHelper.readAll(input);
-	        		// separate the classifier model from the training dataset info
-	        		// roccaClassifierModel = (AbstractClassifier) modelParams[0];
-	        		// trainedDataset = (Instances) modelParams[1];
-
-	        		// there are 2 different styles of model file, the original version and the version
-	        		// developed for the 2-stage classifier.  Both files contain 2 objects.
-	        		// The original version contained the classifier and the training dataset.  The newer
-	        		// version contains a String description and the classifier.  Test the first object;
-	        		// if it's a String, then this is the newer version and the String is the description.
-	        		// If it's not a String, assume this is the old version and create a RoccaRFModel
-	        		// object from the file contents.
-	        		if (modelParams[0] instanceof String) {
-	        			modelList = (RoccaRFModel) modelParams[1];
-	        		} else {
-	        			AbstractClassifier classifier = (AbstractClassifier) modelParams[0];
-	        			Instances dataset = (Instances) modelParams[1];
-	        			RoccaRFModel[] models = new RoccaRFModel[dataset.numClasses()];
-	        			for (int i=0; i<dataset.numClasses(); i++) {
-	        				models[i]=null;
-	        			}
-	        			modelList = new RoccaRFModel(classifier, dataset, models);
-	        		}
-
-	        	} catch (Exception ex) {
-	        		System.err.println("Deserialization of Whistle Classifier failed: " + ex.getMessage());
-	        		ex.printStackTrace();
-	        		roccaControl.roccaParameters.setClassifyWhistles(false);
-	        	}
-	        }
+    		if (roccaControl.roccaParameters.roccaClassifierModelFilename==null) {
+    			roccaControl.roccaParameters.setClassifyWhistles(false);
+    		}
+    		else {
+		        String fname = roccaControl.roccaParameters.roccaClassifierModelFilename.getAbsolutePath();
+		        File f = new File(fname);
+		        if (f.exists() == false) {
+		        	WarnOnce.showWarning(roccaControl.getUnitName(), "Rocca whistle classifier file cannot be found at " + fname, WarnOnce.WARNING_MESSAGE);
+		            roccaControl.roccaParameters.setClassifyWhistles(false);
+		        }
+		        else {
+		        	try {
+		        		BufferedInputStream input = new BufferedInputStream(
+		        				(new ProgressMonitorInputStream(null, "Loading Whistle Classifier - Please wait",
+		        						new FileInputStream(fname))));
+		        		Object[] modelParams = SerializationHelper.readAll(input);
+		        		// separate the classifier model from the training dataset info
+		        		// roccaClassifierModel = (AbstractClassifier) modelParams[0];
+		        		// trainedDataset = (Instances) modelParams[1];
+	
+		        		// there are 2 different styles of model file, the original version and the version
+		        		// developed for the 2-stage classifier.  Both files contain 2 objects.
+		        		// The original version contained the classifier and the training dataset.  The newer
+		        		// version contains a String description and the classifier.  Test the first object;
+		        		// if it's a String, then this is the newer version and the String is the description.
+		        		// If it's not a String, assume this is the old version and create a RoccaRFModel
+		        		// object from the file contents.
+		        		if (modelParams[0] instanceof String) {
+		        			modelList = (RoccaRFModel) modelParams[1];
+		        		} else {
+		        			AbstractClassifier classifier = (AbstractClassifier) modelParams[0];
+		        			Instances dataset = (Instances) modelParams[1];
+		        			RoccaRFModel[] models = new RoccaRFModel[dataset.numClasses()];
+		        			for (int i=0; i<dataset.numClasses(); i++) {
+		        				models[i]=null;
+		        			}
+		        			modelList = new RoccaRFModel(classifier, dataset, models);
+		        		}
+	
+		        	} catch (Exception ex) {
+		        		System.err.println("Deserialization of Whistle Classifier failed: " + ex.getMessage());
+		        		ex.printStackTrace();
+		        		roccaControl.roccaParameters.setClassifyWhistles(false);
+		        	}
+		        }
+	    	}
     	}
         
         // serialVersionUID=24 2016/08/10 added to load click classifier
     	if (roccaControl.roccaParameters.isClassifyClicks()) {
-	        String fname = roccaControl.roccaParameters.roccaClickClassifierModelFilename.getAbsolutePath();
-	        File f = new File(fname);
-	        if (f.exists() == false) {
-	        	WarnOnce.showWarning(roccaControl.getUnitName(), "Rocca click classifier file cannot be found at " + fname, WarnOnce.WARNING_MESSAGE);
-	            roccaControl.roccaParameters.setClassifyClicks(false);
-	        }
-	        else {
-	        	try {
-	        		BufferedInputStream input = new BufferedInputStream(
-	        				(new ProgressMonitorInputStream(null, "Loading Click Classifier - Please wait",
-	        						new FileInputStream(fname))));
-	        		Object[] modelParams = SerializationHelper.readAll(input);
-	        		// separate the classifier model from the training dataset info
-	        		// roccaClassifierModel = (AbstractClassifier) modelParams[0];
-	        		// trainedDataset = (Instances) modelParams[1];
-
-	        		// there are 2 different styles of model file, the original version and the version
-	        		// developed for the 2-stage classifier.  Both files contain 2 objects.
-	        		// The original version contained the classifier and the training dataset.  The newer
-	        		// version contains a String description and the classifier.  Test the first object;
-	        		// if it's a String, then this is the newer version and the String is the description.
-	        		// If it's not a String, assume this is the old version and create a RoccaRFModel
-	        		// object from the file contents.
-	        		if (modelParams[0] instanceof String) {
-	        			clickModelList = (RoccaRFModel) modelParams[1];
-	        		} else {
-	        			AbstractClassifier classifier = (AbstractClassifier) modelParams[0];
-	        			Instances dataset = (Instances) modelParams[1];
-	        			RoccaRFModel[] models = new RoccaRFModel[dataset.numClasses()];
-	        			for (int i=0; i<dataset.numClasses(); i++) {
-	        				models[i]=null;
-	        			}
-	        			clickModelList = new RoccaRFModel(classifier, dataset, models);
-	        		}
-
-	        	} catch (Exception ex) {
-	        		System.err.println("Deserialization of Click Classifier failed: " + ex.getMessage());
-	        		ex.printStackTrace();
-	        		roccaControl.roccaParameters.setClassifyClicks(false);
-	        	}
+    		if (roccaControl.roccaParameters.roccaClickClassifierModelFilename==null) {
+    			roccaControl.roccaParameters.setClassifyClicks(false);
     		}
+    		else {
+		        String fname = roccaControl.roccaParameters.roccaClickClassifierModelFilename.getAbsolutePath();
+		        File f = new File(fname);
+		        if (f.exists() == false) {
+		        	WarnOnce.showWarning(roccaControl.getUnitName(), "Rocca click classifier file cannot be found at " + fname, WarnOnce.WARNING_MESSAGE);
+		            roccaControl.roccaParameters.setClassifyClicks(false);
+		        }
+		        else {
+		        	try {
+		        		BufferedInputStream input = new BufferedInputStream(
+		        				(new ProgressMonitorInputStream(null, "Loading Click Classifier - Please wait",
+		        						new FileInputStream(fname))));
+		        		Object[] modelParams = SerializationHelper.readAll(input);
+		        		// separate the classifier model from the training dataset info
+		        		// roccaClassifierModel = (AbstractClassifier) modelParams[0];
+		        		// trainedDataset = (Instances) modelParams[1];
+	
+		        		// there are 2 different styles of model file, the original version and the version
+		        		// developed for the 2-stage classifier.  Both files contain 2 objects.
+		        		// The original version contained the classifier and the training dataset.  The newer
+		        		// version contains a String description and the classifier.  Test the first object;
+		        		// if it's a String, then this is the newer version and the String is the description.
+		        		// If it's not a String, assume this is the old version and create a RoccaRFModel
+		        		// object from the file contents.
+		        		if (modelParams[0] instanceof String) {
+		        			clickModelList = (RoccaRFModel) modelParams[1];
+		        		} else {
+		        			AbstractClassifier classifier = (AbstractClassifier) modelParams[0];
+		        			Instances dataset = (Instances) modelParams[1];
+		        			RoccaRFModel[] models = new RoccaRFModel[dataset.numClasses()];
+		        			for (int i=0; i<dataset.numClasses(); i++) {
+		        				models[i]=null;
+		        			}
+		        			clickModelList = new RoccaRFModel(classifier, dataset, models);
+		        		}
+	
+		        	} catch (Exception ex) {
+		        		System.err.println("Deserialization of Click Classifier failed: " + ex.getMessage());
+		        		ex.printStackTrace();
+		        		roccaControl.roccaParameters.setClassifyClicks(false);
+		        	}
+	    		}
+	    	}
     	}
     	
         // if we didn't load either classifier, don't bother loading trying to load an encounter
@@ -505,43 +515,48 @@ public class RoccaClassifier {
         
         // serialVersionUID=24 2016/08/10 added to load event classifier
     	if (roccaControl.roccaParameters.isClassifyEvents()) {
-	        String fname = roccaControl.roccaParameters.roccaEventClassifierModelFilename.getAbsolutePath();
-	        File f = new File(fname);
-	        if (f.exists() == false) {
-	        	WarnOnce.showWarning(roccaControl.getUnitName(), "Rocca events classifier file cannot be found at " + fname, WarnOnce.WARNING_MESSAGE);
-	            roccaControl.roccaParameters.setClassifyEvents(false);
-	        }
-	        else {
-	        	try {
-	        		BufferedInputStream input = new BufferedInputStream(
-	        				(new ProgressMonitorInputStream(null, "Loading Event Classifier - Please wait",
-	        						new FileInputStream(fname))));
-	        		Object[] modelParams = SerializationHelper.readAll(input);
-
-	        		// there are 2 different styles of model file, the original version and the version
-	        		// developed for the 2-stage classifier.  Both files contain 2 objects.
-	        		// The original version contained the classifier and the training dataset.  The newer
-	        		// version contains a String description and the classifier.  Test the first object;
-	        		// if it's a String, then this is the newer version and the String is the description.
-	        		// If it's not a String, assume this is the old version and create a RoccaRFModel
-	        		// object from the file contents.
-	        		if (modelParams[0] instanceof String) {
-	        			eventModelList = (RoccaRFModel) modelParams[1];
-	        		} else {
-	        			AbstractClassifier classifier = (AbstractClassifier) modelParams[0];
-	        			Instances dataset = (Instances) modelParams[1];
-	        			RoccaRFModel[] models = new RoccaRFModel[dataset.numClasses()];
-	        			for (int i=0; i<dataset.numClasses(); i++) {
-	        				models[i]=null;
-	        			}
-	        			eventModelList = new RoccaRFModel(classifier, dataset, models);
-	        		}
-
-	        	} catch (Exception ex) {
-	        		System.err.println("Deserialization of Event Classifier failed: " + ex.getMessage());
-	        		roccaControl.roccaParameters.setClassifyEvents(false);
-	        	}
-	        }
+       		if (roccaControl.roccaParameters.roccaEventClassifierModelFilename==null) {
+    			roccaControl.roccaParameters.setClassifyEvents(false);
+    		}
+    		else {
+		        String fname = roccaControl.roccaParameters.roccaEventClassifierModelFilename.getAbsolutePath();
+		        File f = new File(fname);
+		        if (f.exists() == false) {
+		        	WarnOnce.showWarning(roccaControl.getUnitName(), "Rocca events classifier file cannot be found at " + fname, WarnOnce.WARNING_MESSAGE);
+		            roccaControl.roccaParameters.setClassifyEvents(false);
+		        }
+		        else {
+		        	try {
+		        		BufferedInputStream input = new BufferedInputStream(
+		        				(new ProgressMonitorInputStream(null, "Loading Event Classifier - Please wait",
+		        						new FileInputStream(fname))));
+		        		Object[] modelParams = SerializationHelper.readAll(input);
+	
+		        		// there are 2 different styles of model file, the original version and the version
+		        		// developed for the 2-stage classifier.  Both files contain 2 objects.
+		        		// The original version contained the classifier and the training dataset.  The newer
+		        		// version contains a String description and the classifier.  Test the first object;
+		        		// if it's a String, then this is the newer version and the String is the description.
+		        		// If it's not a String, assume this is the old version and create a RoccaRFModel
+		        		// object from the file contents.
+		        		if (modelParams[0] instanceof String) {
+		        			eventModelList = (RoccaRFModel) modelParams[1];
+		        		} else {
+		        			AbstractClassifier classifier = (AbstractClassifier) modelParams[0];
+		        			Instances dataset = (Instances) modelParams[1];
+		        			RoccaRFModel[] models = new RoccaRFModel[dataset.numClasses()];
+		        			for (int i=0; i<dataset.numClasses(); i++) {
+		        				models[i]=null;
+		        			}
+		        			eventModelList = new RoccaRFModel(classifier, dataset, models);
+		        		}
+	
+		        	} catch (Exception ex) {
+		        		System.err.println("Deserialization of Event Classifier failed: " + ex.getMessage());
+		        		roccaControl.roccaParameters.setClassifyEvents(false);
+		        	}
+		        }
+	    	}
     	}
 
         resetSidePanel();
