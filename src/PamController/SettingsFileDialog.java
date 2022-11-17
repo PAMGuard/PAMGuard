@@ -63,6 +63,7 @@ public class SettingsFileDialog extends PamDialog {
 		pan.add(BorderLayout.CENTER, p);
 		pan.add(BorderLayout.SOUTH, q);
 		
+		setMoveToMouse(false);
 		setDialogComponent(pan);
 	}
 	
