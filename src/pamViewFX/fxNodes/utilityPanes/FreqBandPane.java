@@ -23,7 +23,7 @@ public class FreqBandPane extends PamGridPane {
 	/**
 	 * Low pass frequency spinner.
 	 */
-	private Spinner<Double> lowPassFreq;
+	private PamSpinner<Double> lowPassFreq;
 
 	/**
 	 * Layout of the pane- either horizontal or vertical
