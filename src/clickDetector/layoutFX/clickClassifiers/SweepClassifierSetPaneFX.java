@@ -986,21 +986,21 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 				return false;
 			}
 
-			for (int j = 0; j < SweepClassifierSet.nControlBands; j++) {
+			for (int j = 0; j < SweepClassifierSet.nControlBands; j++ ) {
 
 			}
 
 
-			try {
-				for (int i = 0; i < 2; i++) {
-					sweepClassifierSet.testEnergyBand[i] = Double.valueOf(testEnergy[i].getText());
-					for (int j = 0; j < SweepClassifierSet.nControlBands; j++) {
-						sweepClassifierSet.controlEnergyBand[j][i] = Double.valueOf(controlEnergy[j][i].getText());
-					}
-				}
-				for (int j = 0; j < SweepClassifierSet.nControlBands; j++) {
-					sweepClassifierSet.energyThresholds[j] = Double.valueOf(thresholds[j].getText());
-				}
+			try { //TODO
+//				for (int i = 0; i < 2; i++) {
+//					sweepClassifierSet.testEnergyBand[i] = Double.valueOf(testEnergy[i].getText());
+//					for (int j = 0; j < SweepClassifierSet.nControlBands; j++) {
+//						sweepClassifierSet.controlEnergyBand[j][i] = Double.valueOf(controlEnergy[j][i].getText());
+//					}
+//				}
+//				for (int j = 0; j < SweepClassifierSet.nControlBands; j++) {
+//					sweepClassifierSet.energyThresholds[j] = Double.valueOf(thresholds[j].getText());
+//				}
 			}
 			catch (NumberFormatException e) {
 				return showWarning("Invalid energy band parameter");
