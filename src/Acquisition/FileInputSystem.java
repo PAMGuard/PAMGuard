@@ -167,6 +167,8 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 
 	private SudListener sudListener;
 
+	private boolean fullyStopped;
+
 	public FileInputSystem(AcquisitionControl acquisitionControl) {
 		this.acquisitionControl = acquisitionControl;
 		PamSettingManager.getInstance().registerSettings(this);
@@ -738,6 +740,8 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		if (audioStream == null) return false;
 
 		dontStop = true;
+		
+		fullyStopped = false;
 
 		theThread.start();
 
@@ -780,6 +784,9 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	}
 
 	public void systemHasStopped(boolean wasRunning) {
+		if (fullyStopped) {
+			return;
+		}
 		long stopTime = System.currentTimeMillis();
 		if (getCurrentFile() == null) {
 			return;
@@ -788,6 +795,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		double analSecs = (stopTime - fileStartTime) / 1000.;
 		System.out.println(String.format("File %s, SR=%dHz, length=%3.1fs took %3.1fs = %3.1fx real time",
 				getCurrentFile().getName(), (int)getSampleRate(), fileSecs, analSecs, fileSecs / analSecs));
+		fullyStopped = true;
 	}
 
 	/**
@@ -933,7 +941,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 			 * PamDataUnits from them. Once a unit is created, tell this thread
 			 * to wait until it has been used by the main thread.
 			 */
-			System.out.println("File system start processing");
+//			System.out.println("File system start processing");
 			/*
 			 * File should have been opened in the constructor so just read it
 			 * in in chunks and pass to datablock

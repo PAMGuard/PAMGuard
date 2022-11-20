@@ -1225,8 +1225,9 @@ public class PamController implements PamControllerInterface, PamSettings {
 		if (PamCalendar.isSoundFile() == false) {
 			PamCalendar.setSessionStartTime(PamCalendar.getTimeInMillis());
 		}
-
-		System.out.printf("PAMGUARD Startup took %d milliseconds at time %s\n", startDelay, PamCalendar.formatDateTime(PamCalendar.getSessionStartTime()));
+		if (PamCalendar.isSoundFile() == false) {
+			System.out.printf("PAMGUARD Startup took %d milliseconds at time %s\n", startDelay, PamCalendar.formatDateTime(PamCalendar.getSessionStartTime()));
+		}
 		guiFrameManager.pamStarted();
 
 		return true;
