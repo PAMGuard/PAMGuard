@@ -55,7 +55,7 @@ public class PamGenericModel {
 	 */
 	private Shape outShape = null; 
 
-
+	
 	private SpectrogramTranslator specTranslator;
 
 	
@@ -64,6 +64,8 @@ public class PamGenericModel {
 
 
 	public PamGenericModel(String modelPath) throws MalformedModelException, IOException{
+		
+		//System.out.println("NEW GENERIC MODEL:"); 
 
 		File file = new File(modelPath); 
 
@@ -95,7 +97,6 @@ public class PamGenericModel {
 		if (model == null) {
 			System.err.println("Generic Model: Could not load model: " + modelPath);
 		}
-
 		else {
 			if (model!=null && model.describeInput()!=null) {
 				System.out.println("Generic Model: Input: " + model.describeInput().toString()); 
@@ -117,7 +118,6 @@ public class PamGenericModel {
 			
 			//predictor for the model if using
 			wavePredictor = model.newPredictor(waveTranslator);
-
 		}
 
 	}
@@ -199,8 +199,6 @@ public class PamGenericModel {
 		}
 		return null;
 	}
-
-	
 
 	
 	public Model getModel() {
