@@ -765,9 +765,10 @@ public class PamguardXMLWriter implements PamSettings {
 		processData.setAttribute("Name", process.getProcessName());
 		PamDataBlock source = process.getParentDataBlock();
 		if (source != null) {
-			Element inputEl = doc.createElement("Input");
-			inputEl.setAttribute("Name", source.getLongDataName());
-			inputEl.setAttribute("Channels", String.format("0x%X", source.getChannelMap()));
+			Element inputEl = source.getDataBlockXML(doc);
+//			Element inputEl = doc.createElement("Input");
+//			inputEl.setAttribute("Name", source.getLongDataName());
+//			inputEl.setAttribute("Channels", String.format("0x%X", source.getChannelMap()));
 			processData.appendChild(inputEl);
 		}
 		int nOut = process.getNumOutputDataBlocks();

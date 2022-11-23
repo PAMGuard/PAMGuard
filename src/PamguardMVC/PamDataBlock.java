@@ -44,6 +44,8 @@ import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 
 import org.springframework.core.GenericTypeResolver;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionProcess;
@@ -4198,5 +4200,24 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 */
 	public void setBackgroundManager(BackgroundManager backgroundManager) {
 		this.backgroundManager = backgroundManager;
+	}
+
+	/**
+	 * Get a brief summary of datablock to include in XML descriptions. 
+	 * Basic output is very simple. Expect other datablock to extend this by 
+	 * adding additional attributes. 
+	 * @param doc
+	 * @return XML element with description of data. 
+	 */
+	public Element getDataBlockXML(Document doc) {
+		Element inputEl = doc.createElement("Input");
+		if (getParentProcess() != null && getParentProcess().getPamControlledUnit() != null) {
+			PamControlledUnit pcu = getParentProcess().getPamControlledUnit();
+			inputEl.setAttribute("ModuleType", pcu.getUnitType());
+			inputEl.setAttribute("ModuleName", pcu.getUnitName());
+		}
+		inputEl.setAttribute("Name", getLongDataName());
+		inputEl.setAttribute("Channels", String.format("0x%X", getChannelMap()));
+		return inputEl;
 	}
 }
