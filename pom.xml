@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.pamguard</groupId>
   <artifactId>Pamguard</artifactId>
-  <version>2.02.06a</version>
+  <version>2.02.06b</version>
   <name>Pamguard Java12+</name>
   <description>Pamguard for Java 12+, using Maven to control dependcies</description>
 	<url>www.pamguard.org</url>
