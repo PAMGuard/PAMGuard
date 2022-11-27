@@ -544,7 +544,7 @@ public class RoccaProcess extends PamProcess {
 		        updateSidePanel(rcdb, true);
 		        saveContourStats(rcdb, rcdb.getChannelMap(), numDetections, sNum);
 //		        rcdb.setNaturalLifetimeMillis(0);
-		        rcdb.stopTimer();
+		        rcdb.dispose();
 		        rcdb = null;
 			}
 

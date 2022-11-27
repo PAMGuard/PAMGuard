@@ -1574,6 +1574,28 @@ public class RoccaContourDataBlock extends PamDataBlock<RoccaContourDataUnit> {
 	public double[][] getWavInfo() {
 		return wavInfo;
 	}
-	
+
+
+//	int nS, nT;
+//	@Override
+//	protected int removeOldUnitsT(long currentTimeMS) {
+//		// TODO Auto-generated method stub
+//		nT++;
+//		System.out.printf("Enter removeoldUnitsT, entry count %d\n", nT);
+//		int n = super.removeOldUnitsT(currentTimeMS);
+//		nT--;
+//		return n;
+//	}
+//
+//	@Override
+//	protected int removeOldUnitsS(long mastrClockSample) {
+//		// TODO Auto-generated method stub
+//		nS++;
+//		System.out.printf("Enter removeoldUnitsS, entry count %d\n", nS);
+//		int n  = super.removeOldUnitsS(mastrClockSample);
+//		nS--;
+//		return n;
+//	}
+//	
 	
 }
