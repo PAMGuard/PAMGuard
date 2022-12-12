@@ -4,7 +4,9 @@ import PamUtils.PamCalendar;
 import PamView.symbol.StandardSymbolManager;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
+import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import autecPhones.AutecGraphics;
+import pamScrollSystem.ViewLoadObserver;
 
 public class LandmarkDataBlock extends PamDataBlock<LandmarkDataUnit> {
 
@@ -29,6 +31,16 @@ public class LandmarkDataBlock extends PamDataBlock<LandmarkDataUnit> {
 		for (int i = 0; i < landmarkDatas.size(); i++) {
 			addPamData(new LandmarkDataUnit(now, landmarkDatas.get(i)));
 		}
+	}
+
+	@Override
+	public boolean loadViewerData(long dataStart, long dataEnd, ViewLoadObserver loadObserver) {
+		return true;
+	}
+
+	@Override
+	public boolean loadViewerData(OfflineDataLoadInfo offlineDataLoadInfo, ViewLoadObserver loadObserver) {
+		return true;
 	}
 
 }

@@ -61,6 +61,7 @@ public class LandmarkControl extends PamControlledUnit implements PamSettings {
 
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		landmarkDatas = ((LandmarkDatas) pamControlledUnitSettings.getSettings()).clone();
+		landmarkDataBlock.createDataUnits(landmarkDatas);
 		return true;
 	}
 
