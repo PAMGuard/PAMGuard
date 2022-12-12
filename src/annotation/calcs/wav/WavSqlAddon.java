@@ -3,6 +3,7 @@ package annotation.calcs.wav;
 import java.sql.Types;
 
 import PamguardMVC.PamDataUnit;
+import generalDatabase.EmptyTableDefinition;
 import generalDatabase.PamTableDefinition;
 import generalDatabase.PamTableItem;
 import generalDatabase.SQLLoggingAddon;
@@ -21,13 +22,13 @@ public class WavSqlAddon implements SQLLoggingAddon {
 	}
 
 	@Override
-	public void addTableItems(PamTableDefinition pamTableDefinition) {
+	public void addTableItems(EmptyTableDefinition pamTableDefinition) {
 		pamTableDefinition.addTableItem(wavFileName);
 		
 	}
 
 	@Override
-	public boolean saveData(SQLTypes sqlTypes, PamTableDefinition pamTableDefinition,
+	public boolean saveData(SQLTypes sqlTypes, EmptyTableDefinition pamTableDefinition,
 			PamDataUnit pamDataUnit) {
 		WavAnnotation annotation = (WavAnnotation) pamDataUnit.findDataAnnotation(WavAnnotation.class);
 		if (annotation == null) {
@@ -40,7 +41,7 @@ public class WavSqlAddon implements SQLLoggingAddon {
 	}
 
 	@Override
-	public boolean loadData(SQLTypes sqlTypes, PamTableDefinition pamTableDefinition,
+	public boolean loadData(SQLTypes sqlTypes, EmptyTableDefinition pamTableDefinition,
 			PamDataUnit pamDataUnit) {
 		String fileName = (String) wavFileName.getValue();
 		if (fileName != null) {

@@ -15,6 +15,7 @@ import PamView.dialog.GenericSwingDialog;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import generalDatabase.DBControlUnit;
+import generalDatabase.EmptyTableDefinition;
 import generalDatabase.PamTableDefinition;
 import generalDatabase.SQLLogging;
 
@@ -126,7 +127,7 @@ public abstract class OneStopAnnotationHandler extends AnnotationChoiceHandler i
 			return;
 		}
 		// get, modify and set the modified tabelDef
-		PamTableDefinition tableDef = logging.getBaseTableDefinition();
+		EmptyTableDefinition tableDef = logging.getBaseTableDefinition();
 		logging.setTableDefinition(tableDef);
 		addAnnotationSqlAddons(logging); // this will add the additional columns. 
 		DBControlUnit dbc = DBControlUnit.findDatabaseControl();

@@ -572,9 +572,15 @@ PamSettingsSource {
 	 */
 	@Override
 	public boolean saveStartSettings(long timeNow) {
-		return dbProcess.saveStartSettings();
+		return dbProcess.saveStartSettings(timeNow);
 	}
 
+
+	@Override
+	public boolean saveEndSettings(long timeNow) {
+		// TODO Auto-generated method stub
+		return true;
+	}
 
 	@Override
 	public int getNumSettings() {

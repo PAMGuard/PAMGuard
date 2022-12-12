@@ -1,5 +1,6 @@
 package loc3d_Thode;
 
+import generalDatabase.EmptyTableDefinition;
 import generalDatabase.PamDetectionLogging;
 import generalDatabase.PamTableDefinition;
 import generalDatabase.PamTableItem;
@@ -17,7 +18,6 @@ public class TowedArray3DSQLLogging extends PamDetectionLogging {
 
 	TowedArray3DController towedArray3DController;
 	
-	PamTableDefinition tableDefinition;
 	
 	PamTableItem dateItem, range_boat_Item, range_f_Item, range_r_Item, depthItem, azi_boat_Item,azi_f_Item, azi_r_Item, tdd_Item, 
 		bearing_f_Item,bearing_r_Item, tds_f_Item, tds_r_Item, za_f_Item, za_r_Item;
@@ -34,14 +34,14 @@ public class TowedArray3DSQLLogging extends PamDetectionLogging {
 		this.towedArray3DController = towedArray3DController;
 		
 		// create the table definition. 
-		tableDefinition = createTableDefinition();
+		EmptyTableDefinition tableDefinition = createTableDefinition();
 	}
 	
-	public PamTableDefinition createTableDefinition() {
+	public EmptyTableDefinition createTableDefinition() {
 		
 		
 //		PamTableDefinition tableDef = new PamTableDefinition(towedArray3DController.getUnitName(), getUpdatePolicy());
-		PamTableDefinition tableDef = super.getTableDefinition();
+		EmptyTableDefinition tableDef = super.getTableDefinition();
 		tableDef.setUpdatePolicy(SQLLogging.UPDATE_POLICY_WRITENEW);
 		
 //		PamTableItem tableItem;

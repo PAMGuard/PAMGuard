@@ -1192,6 +1192,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 		}
 
 		if (saveSettings) {
+			startTime = PamCalendar.getSessionStartTime();
+//			System.out.printf("Saving settings for start time %s\n", PamCalendar.formatDBDateTime(startTime));
 			saveSettings(PamCalendar.getSessionStartTime());
 		}
 
@@ -1342,6 +1344,9 @@ public class PamController implements PamControllerInterface, PamSettings {
 		}
 		guiFrameManager.pamEnded();
 		
+		long stopTime = PamCalendar.getTimeInMillis();
+		saveEndSettings(stopTime);
+		
 		// no good having this here since it get's called at the end of every file. 
 //		if (GlobalArguments.getParam(PamController.AUTOEXIT) != null) {
 ////			can exit here, since we've auto started, can auto exit.
@@ -1466,6 +1471,25 @@ public class PamController implements PamControllerInterface, PamSettings {
 		}
 		PamguardXMLWriter.getXMLWriter().writeStartSettings(timeNow);
 	}
+
+	/**
+	 * Gets called in pamStart and may / will attempt to store all
+	 * PAMGUARD settings via the database and binary storage modules. 
+	 */
+	private void saveEndSettings(long timeNow) {
+//		System.out.printf("Updating settings with end time %s\n", PamCalendar.formatDBDateTime(timeNow));
+		PamControlledUnit pcu;
+		PamSettingsSource settingsSource;
+		for (int iU = 0; iU < pamControlledUnits.size(); iU++) {
+			pcu = pamControlledUnits.get(iU);
+			if (PamSettingsSource.class.isAssignableFrom(pcu.getClass())) {
+				settingsSource = (PamSettingsSource) pcu;
+				settingsSource.saveEndSettings(timeNow);
+			}
+		}
+	}
+	
+	
 
 	/**
 	 * Export configuration into an XML file

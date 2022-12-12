@@ -23,7 +23,7 @@ import PamUtils.PamCalendar;
 import PamguardMVC.PamDataUnit;
 
 /**
- * Functions for writing Pamguard Settings into any database as character data
+ * Functions for writing serialised Pamguard Settings into any database as character data
  * Runs at DAQ start, goes through the settings manager list and for each
  * set of settings, it serialises the settings data into a binary array, this
  * is then converted from binary data to 6 bit ascii data (using the character set
@@ -185,6 +185,7 @@ public class LogSettings extends DbSpecial {
 		DeserialisationWarning dsWarning = new DeserialisationWarning(getDbControl().getDatabaseName());
 
 		SQLTypes sqlTypes = con.getSqlTypes();
+		
 		boolean haveData;
 		if (result != null) try {
 			haveData = result.next();
@@ -193,7 +194,7 @@ public class LogSettings extends DbSpecial {
 				// transfer data back into the tableItems store.
 				transferDataFromResult(sqlTypes, result);
 
-				tableItem = getTableDefinition().getTimeStampItem();
+				tableItem = tableDef.getTimeStampItem();
 //				timestamp = (Timestamp) tableItem.getTimestampValue();
 				timeMillis = sqlTypes.millisFromTimeStamp(tableItem.getValue());
 

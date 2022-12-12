@@ -371,6 +371,32 @@ public class PamguardXMLWriter implements PamSettings {
 	 * @return xml content as a a string. 
 	 */
 	public String getAsString(Document doc) {
+		return getAsString(doc, true);
+//		try {
+//			DOMSource domSource = new DOMSource(doc);
+//			StringWriter writer = new StringWriter();
+//			StreamResult result = new StreamResult(writer);
+//			TransformerFactory tf = TransformerFactory.newInstance();
+//			Transformer transformer = tf.newTransformer();
+//			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+//			transformer.setOutputProperty(OutputKeys.ENCODING, "ISO-8859-1");
+////			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+//			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+//			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+//			transformer.transform(domSource, result);
+//			return writer.toString();
+//		} catch (TransformerException e) {
+//			e.printStackTrace();
+//			return null;
+//		}
+	}
+	/**
+	 * Get the xml document as a String.
+	 * @param doc xml document
+	 * @param indent Indent / format the document. 
+	 * @return xml content as a a string. 
+	 */
+	public String getAsString(Document doc, boolean indent) {
 		try {
 			DOMSource domSource = new DOMSource(doc);
 			StringWriter writer = new StringWriter();
@@ -380,7 +406,7 @@ public class PamguardXMLWriter implements PamSettings {
 			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
 			transformer.setOutputProperty(OutputKeys.ENCODING, "ISO-8859-1");
 //			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			transformer.setOutputProperty(OutputKeys.INDENT, indent ? "yes" : "no");
 			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 			transformer.transform(domSource, result);
 			return writer.toString();

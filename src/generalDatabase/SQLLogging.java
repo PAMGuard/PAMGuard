@@ -92,7 +92,7 @@ public abstract class SQLLogging {
 	 * Reference to the table definition object.
 	 * This MUST be set from within the concrete logging class.  
 	 */
-	private PamTableDefinition pamTableDefinition;
+	private EmptyTableDefinition pamTableDefinition;
 	
 	/**
 	 * More and more data blocks are starting to use annotations, which require
@@ -102,7 +102,7 @@ public abstract class SQLLogging {
 	 * table definition is set, so that it can be got and modified by the 
 	 * annotation handler shortly after the main table is created.  
 	 */
-	private PamTableDefinition baseTableDefinition;
+	private EmptyTableDefinition baseTableDefinition;
 
 	//	private long selectT1, selectT2;
 	private PamViewParameters currentViewParameters;
@@ -190,7 +190,7 @@ public abstract class SQLLogging {
 		ArrayList<PamDataBlock> blockList = PamController.getInstance()
 				.getDataBlocks();
 		SQLLogging logger;
-		PamTableDefinition tableDef;
+		EmptyTableDefinition tableDef;
 		for (int i = 0; i < blockList.size(); i++) {
 			if ((logger = blockList.get(i).getLogging()) != null) {
 				tableDef = logger.getTableDefinition();
@@ -234,7 +234,7 @@ public abstract class SQLLogging {
 	 * @return a Pamguard database table definition object
 	 * @see PamTableDefinition
 	 */
-	public final PamTableDefinition getTableDefinition() {
+	public final EmptyTableDefinition getTableDefinition() {
 		return pamTableDefinition;
 	}
 
@@ -243,7 +243,7 @@ public abstract class SQLLogging {
 	 * 
 	 * @param pamTableDefinition PamTableDefinition to set
 	 */
-	public void setTableDefinition(PamTableDefinition pamTableDefinition) {
+	public void setTableDefinition(EmptyTableDefinition pamTableDefinition) {
 		this.pamTableDefinition = pamTableDefinition;
 		if (baseTableDefinition == null && pamTableDefinition != null) {
 			baseTableDefinition = pamTableDefinition.clone();
@@ -293,37 +293,42 @@ public abstract class SQLLogging {
 	 * @param superDetection 
 	 */
 	protected void fillTableData(SQLTypes sqlTypes, PamDataUnit pamDataUnit, PamDataUnit superDetection) {
+		
+		EmptyTableDefinition emptyTableDef = getTableDefinition();
 
-		PamTableDefinition tableDef = getTableDefinition();
 		PamTableItem tableItem;
 
-		tableDef.getIndexItem().setValue(pamDataUnit.getDatabaseIndex());
-		/*
-		 * All tables have a timestamp near the front of the table. And all data
-		 * units have a time in milliseconds, so always fill this in !
-		 */
-		tableDef.getTimeStampItem().setValue(
-				sqlTypes.getTimeStamp(pamDataUnit.getTimeMilliseconds()));
+		emptyTableDef.getIndexItem().setValue(pamDataUnit.getDatabaseIndex());
+		
+		if (emptyTableDef instanceof PamTableDefinition) {
+			PamTableDefinition tableDef = (PamTableDefinition) emptyTableDef;
+			/*
+			 * All tables have a timestamp near the front of the table. And all data
+			 * units have a time in milliseconds, so always fill this in !
+			 */
+			tableDef.getTimeStampItem().setValue(
+					sqlTypes.getTimeStamp(pamDataUnit.getTimeMilliseconds()));
 
-		tableDef.getTimeStampMillis().setValue((int) (pamDataUnit.getTimeMilliseconds()%1000));
+			tableDef.getTimeStampMillis().setValue((int) (pamDataUnit.getTimeMilliseconds()%1000));
 
-		tableDef.getLocalTimeItem().setValue(sqlTypes.getLocalTimeStamp(pamDataUnit.getTimeMilliseconds()));
+			tableDef.getLocalTimeItem().setValue(sqlTypes.getLocalTimeStamp(pamDataUnit.getTimeMilliseconds()));
 
-		tableDef.getPCTimeItem().setValue(sqlTypes.getTimeStamp(System.currentTimeMillis()));
+			tableDef.getPCTimeItem().setValue(sqlTypes.getTimeStamp(System.currentTimeMillis()));
 
-		tableDef.getUidItem().setValue(pamDataUnit.getUID());
+			tableDef.getUidItem().setValue(pamDataUnit.getUID());
 
-		tableDef.getChannelBitmap().setValue(pamDataUnit.getChannelBitmap());
+			tableDef.getChannelBitmap().setValue(pamDataUnit.getChannelBitmap());
 
-		tableDef.getSequenceBitmap().setValue(pamDataUnit.getSequenceBitmapObject());
+			tableDef.getSequenceBitmap().setValue(pamDataUnit.getSequenceBitmapObject());
 
-		if (tableDef.getUpdateReference() != null) {
-			tableDef.getUpdateReference().setValue(pamDataUnit.getDatabaseIndex());
+			if (tableDef.getUpdateReference() != null) {
+				tableDef.getUpdateReference().setValue(pamDataUnit.getDatabaseIndex());
+			}
 		}
 
-		for (int i = 0; i < tableDef.getTableItemCount(); i++) {
+		for (int i = 0; i < emptyTableDef.getTableItemCount(); i++) {
 
-			tableItem = tableDef.getTableItem(i);
+			tableItem = emptyTableDef.getTableItem(i);
 			// if (tableItem.isCounter()) {
 			// tableItem.setValue(1);
 			// }
@@ -333,8 +338,8 @@ public abstract class SQLLogging {
 			}
 		}
 
-		if (tableDef instanceof PamSubtableDefinition) {
-			PamSubtableDefinition subTableDef = (PamSubtableDefinition) tableDef;
+		if (emptyTableDef instanceof PamSubtableDefinition) {
+			PamSubtableDefinition subTableDef = (PamSubtableDefinition) emptyTableDef;
 			fillSubTableData(subTableDef, pamDataUnit, superDetection);
 		}
 
@@ -525,7 +530,7 @@ public abstract class SQLLogging {
 		}
 		// now put some sql into the statement
 		//		if (resultSet == null) {
-		PamTableDefinition tableDef = getTableDefinition();
+		EmptyTableDefinition tableDef = getTableDefinition();
 		String sqlString = tableDef.getSQLSelectString(con.getSqlTypes());
 		// sqlString = "select \"comment\" from userinput";
 		try {
@@ -1067,7 +1072,7 @@ public abstract class SQLLogging {
 
 	public boolean transferDataFromResult(SQLTypes sqlTypes, ResultSet resultSet) {
 
-		PamTableDefinition tableDef = getTableDefinition();
+		EmptyTableDefinition tableDef = getTableDefinition();
 		PamTableItem tableItem;
 		try {
 			for (int i = 0; i < tableDef.getTableItemCount(); i++) {
@@ -1078,17 +1083,20 @@ public abstract class SQLLogging {
 			//			Timestamp ts = (Timestamp) getTableDefinition().getTimeStampItem().getValue();
 			//			Timestamp ts = getTableDefinition().getTimeStampItem().getTimestampValue();
 			//			lastTime = sqlTypes.millisFromTimeStamp(ts);
-			lastTime = sqlTypes.millisFromTimeStamp(getTableDefinition().getTimeStampItem().getValue());
-			if (lastTime%1000 == 0) {
-				// some databases may have stored the milliseconds, in which 
-				// case this next bit is redundant. 
-				lastTime += getTableDefinition().getTimeStampMillis().getIntegerValue();
-			}
-			
 			lastLoadIndex = getTableDefinition().getIndexItem().getIntegerValue();
-			lastLoadUID = getTableDefinition().getUidItem().getLongObject();
-			lastChannelBitmap = getTableDefinition().getChannelBitmap().getIntegerValue();
-			lastSequenceBitmap = getTableDefinition().getSequenceBitmap().getIntegerObject();
+			if (tableDef instanceof PamTableDefinition) {
+				PamTableDefinition pamTableDef = (PamTableDefinition) tableDef;
+				lastTime = sqlTypes.millisFromTimeStamp(pamTableDef.getTimeStampItem().getValue());
+				if (lastTime%1000 == 0) {
+					// some databases may have stored the milliseconds, in which 
+					// case this next bit is redundant. 
+					lastTime += pamTableDef.getTimeStampMillis().getIntegerValue();
+				}
+
+				lastLoadUID = pamTableDef.getUidItem().getLongObject();
+				lastChannelBitmap = pamTableDef.getChannelBitmap().getIntegerValue();
+				lastSequenceBitmap = pamTableDef.getSequenceBitmap().getIntegerObject();
+			}
 			return true;
 
 		} catch (SQLException ex) {
@@ -1745,7 +1753,7 @@ public abstract class SQLLogging {
 	 * annotation handler shortly after the main table is created.  
 	 * @return the baseTableDefinition
 	 */
-	public PamTableDefinition getBaseTableDefinition() {
+	public EmptyTableDefinition getBaseTableDefinition() {
 		return baseTableDefinition;
 	}
 

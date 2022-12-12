@@ -48,7 +48,7 @@ public class DBSchemaWriter {
 		}
 
 
-		PamTableDefinition tableDef = logging.getTableDefinition();
+		EmptyTableDefinition tableDef = logging.getTableDefinition();
 		tableDef = logging.getBaseTableDefinition();
 
 		if (tableDef instanceof PamTableDefinition) {
@@ -63,7 +63,7 @@ public class DBSchemaWriter {
 		return true;
 	}
 
-	private void exportDatabaseSchema(File outputFolder, PamDataBlock dataBlock, SQLLogging logging, PamTableDefinition tableDef) {
+	private void exportDatabaseSchema(File outputFolder, PamDataBlock dataBlock, SQLLogging logging, EmptyTableDefinition tableDef) {
 
 		/**
 		 * write a parent item, e.g. if tableDef is a sub class of PamTableDefinition

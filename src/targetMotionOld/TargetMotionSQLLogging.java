@@ -15,6 +15,7 @@ import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamUtils.LatLong;
 import PamguardMVC.PamDataUnit;
+import generalDatabase.EmptyTableDefinition;
 import generalDatabase.PamTableDefinition;
 import generalDatabase.PamTableItem;
 import generalDatabase.SQLLoggingAddon;
@@ -119,7 +120,7 @@ public class TargetMotionSQLLogging implements SQLLoggingAddon {
 	}
 	
 	@Override
-	public void addTableItems(PamTableDefinition pamTableDefinition) {
+	public void addTableItems(EmptyTableDefinition pamTableDefinition) {
 
 	
 		pamTableDefinition.addTableItem(modelName);
@@ -146,7 +147,7 @@ public class TargetMotionSQLLogging implements SQLLoggingAddon {
 	}
 
 	@Override
-	public boolean saveData(SQLTypes sqlTypes, PamTableDefinition pamTableDefinition,
+	public boolean saveData(SQLTypes sqlTypes, EmptyTableDefinition pamTableDefinition,
 			PamDataUnit pamDataUnit) {
 		AbstractLocalisation tmResult = pamDataUnit.getLocalisation();
 		clearEverything();
@@ -218,7 +219,7 @@ public class TargetMotionSQLLogging implements SQLLoggingAddon {
 		return true;
 	}
 
-	private boolean saveGroupLocalisation(SQLTypes sqlTypes, PamTableDefinition pamTableDefinition,
+	private boolean saveGroupLocalisation(SQLTypes sqlTypes, EmptyTableDefinition pamTableDefinition,
 			PamDataUnit pamDataUnit, GroupLocalisation groupLocalisation) {
 		
 		int nAmbiguities = groupLocalisation.getAmbiguityCount();
@@ -239,7 +240,7 @@ public class TargetMotionSQLLogging implements SQLLoggingAddon {
 		return true;
 	}
 
-	private boolean saveGroupLocalisation(SQLTypes sqlTypes, PamTableDefinition pamTableDefinition,
+	private boolean saveGroupLocalisation(SQLTypes sqlTypes, EmptyTableDefinition pamTableDefinition,
 			PamDataUnit pamDataUnit, int resultIndex, GroupLocResult tmResult) {
 		
 		
@@ -323,7 +324,7 @@ public class TargetMotionSQLLogging implements SQLLoggingAddon {
 	}
 
 	@Override
-	public boolean loadData(SQLTypes sqlTypes, PamTableDefinition pamTableDefinition,
+	public boolean loadData(SQLTypes sqlTypes, EmptyTableDefinition pamTableDefinition,
 			PamDataUnit pamDataUnit) {
 		
 		GroupLocalisation tml = new GroupLocalisation(pamDataUnit, null);
@@ -341,7 +342,7 @@ public class TargetMotionSQLLogging implements SQLLoggingAddon {
 		return true;
 	}
 
-		private GroupLocResult loadLocResult(SQLTypes sqlTypes, PamTableDefinition pamTableDefinition,
+		private GroupLocResult loadLocResult(SQLTypes sqlTypes, EmptyTableDefinition pamTableDefinition,
 				PamDataUnit pamDataUnit, GroupLocalisation tml, int resultIndex) {
 			
 		double latVal, longVal;
