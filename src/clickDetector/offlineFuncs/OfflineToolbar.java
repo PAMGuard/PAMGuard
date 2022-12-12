@@ -164,15 +164,14 @@ public class OfflineToolbar {
 			return;
 		}
 		String[] speciesList = clickId.getSpeciesList();
-		if (speciesList == null || speciesList.length == 0) {
-			return;
-		}
-		speciesButtons = new JCheckBox[speciesList.length];
-		for (int i = 0; i < speciesList.length; i++) {
-			speciesButtons[i] = new SpeciesCheckBox(speciesList[i] + space);
-			c.gridx++;
-			speciesBar.add(speciesButtons[i]);
-			speciesButtons[i].addActionListener(showClicks);
+		if (speciesList != null) {
+			speciesButtons = new JCheckBox[speciesList.length];
+			for (int i = 0; i < speciesList.length; i++) {
+				speciesButtons[i] = new SpeciesCheckBox(speciesList[i] + space);
+				c.gridx++;
+				speciesBar.add(speciesButtons[i]);
+				speciesButtons[i].addActionListener(showClicks);
+			}
 		}
 		c.gridx++;
 		speciesBar.add(andOrSelection = new JComboBox<String>());
