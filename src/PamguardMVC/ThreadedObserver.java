@@ -66,6 +66,9 @@ public class ThreadedObserver implements PamObserver {
 		observerThread = new Thread(newObserverThread = new NewObserverThread(), threadName);
 		observerThread.setPriority(Thread.MAX_PRIORITY);
 		observerThread.start();
+		if(PamController.getInstance().getRunMode()==PamController.RUN_NOTHING){
+			ThreadedObserverRepository.getInstance().addObserver(this);
+		}
 	}
 	
 	/**

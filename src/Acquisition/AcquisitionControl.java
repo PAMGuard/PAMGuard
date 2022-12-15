@@ -172,8 +172,10 @@ public class AcquisitionControl extends PamControlledUnit implements PamSettings
 			registerDaqSystem(new ASIOSoundSystem(this));
 			registerDaqSystem(new NewAsioSoundSystem(this));
 		}
-		registerDaqSystem(new FileInputSystem(this));
-		registerDaqSystem(folderSystem = new FolderInputSystem(this));
+		if(PamController.getInstance().getRunMode()!=PamController.RUN_NOTHING){
+			registerDaqSystem(new FileInputSystem(this));
+			registerDaqSystem(folderSystem = new FolderInputSystem(this));
+		}
 //		registerDaqSystem(dclSystem = new DCL5System());
 		registerDaqSystem(new NIDAQProcess(this));
 		registerDaqSystem(new SmruDaqSystem(this));

@@ -88,6 +88,7 @@ import PamguardMVC.PamObserver;
 import PamguardMVC.PamProcess;
 import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.ThreadedObserver;
+import PamguardMVC.ThreadedObserverRepository;
 import PamguardMVC.dataSelector.DataSelectorCreator;
 import PamguardMVC.datakeeper.DataKeeper;
 import PamguardMVC.uid.UIDManager;
@@ -310,6 +311,9 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 */
 	public static void create(int runMode) {
 		if (uniqueController == null) {
+			if(runMode==RUN_NOTHING){
+				ThreadedObserverRepository.createRepository();
+			}
 			PamController pamcontroller = new PamController(runMode, null);
 			/*
 			 *  I don't see any reason not have have this running with the GUI.
@@ -1437,6 +1441,11 @@ public class PamController implements PamControllerInterface, PamSettings {
 //		}
 //		Debug.out.println("   Are we finished? " + areWeFinished);
 //		return areWeFinished;
+		
+		if(this.getRunMode()==RUN_NOTHING) {
+			return false;
+		}
+		
 		boolean running = false;
 		for (PamControlledUnit aUnit : pamControlledUnits) {
 			int numProcesses = aUnit.getNumPamProcesses();
@@ -1995,6 +2004,26 @@ public class PamController implements PamControllerInterface, PamSettings {
 		}
 		return true;
 	}
+	
+	public void cleanupModel() {
+		guiFrameManager.destroyModel();
+		while(pamControlledUnits.size()!=0) {
+			int nProcesses = pamControlledUnits.get(0).getNumPamProcesses();
+			while(pamControlledUnits.get(0).getPamProcess(0)!=null) {
+				pamControlledUnits.get(0).getPamProcess(0).getOutputDataBlocks().forEach(block->block.deleteObservers());
+				pamControlledUnits.get(0).getPamProcess(0).destroyProcess();
+				pamControlledUnits.get(0).getPamProcess(0).notifyModelChanged(DESTROY_EVERYTHING);
+				pamControlledUnits.get(0).removePamProcess(pamControlledUnits.get(0).getPamProcess(0));
+			}
+			pamControlledUnits.remove(0).notifyModelChanged(DESTROY_EVERYTHING);
+		}
+		/*for (int i = 0; i < pamControlledUnits.size(); i++) {
+			pamControlledUnits.get(i).notifyModelChanged(DESTROY_EVERYTHING);
+		}*/
+		ThreadedObserverRepository.getInstance().destroyAllObservers();
+		pamControlledUnits = new ArrayList<PamControlledUnit>();
+		PamSettingManager.getInstance().reset();
+	}
 
 	public void destroyModel() {
 		pamStop();
@@ -2006,7 +2035,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 		for (int i = 0; i < pamControlledUnits.size(); i++) {
 			pamControlledUnits.get(i).notifyModelChanged(DESTROY_EVERYTHING);
 		}
-		pamControlledUnits = null;
+		pamControlledUnits = new ArrayList<PamControlledUnit>();
 
 		PamSettingManager.getInstance().reset();
 
