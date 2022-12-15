@@ -63,7 +63,7 @@ public class MapParametersDialog extends PamDialog {
 	
 	private JCheckBox headingUp = new JCheckBox("Ship heading always up");
 	
-	private JCheckBox showSurface = new JCheckBox("Show sea sueface");
+	private JCheckBox showSurface = new JCheckBox("Show sea surface");
 
 	private MapFileManager mapFileManager;
 
@@ -261,7 +261,7 @@ public class MapParametersDialog extends PamDialog {
 
 		public HydrophonePanel() {
 			super();
-			setBorder(new TitledBorder("Hydropone Options"));
+			setBorder(new TitledBorder("Hydrophone Options"));
 			setLayout(new GridBagLayout());
 			GridBagConstraints c = new PamGridBagContraints();
 			c.gridx = 0;
@@ -272,7 +272,7 @@ public class MapParametersDialog extends PamDialog {
 			addComponent(this, colourByChannel, c);
 			c.gridy++;
 			c.gridwidth = 1;
-			addComponent(this, new JLabel("Symbox size ",  JLabel.RIGHT), c);
+			addComponent(this, new JLabel("Symbol size ",  JLabel.RIGHT), c);
 			c.gridx++;
 			symbolSize = new SpinnerNumberModel(Hydrophone.DefaultSymbolSize, 4, 30, 2);
 			addComponent(this, symbolSizeSpinner = new JSpinner(symbolSize), c);

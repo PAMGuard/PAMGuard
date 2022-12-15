@@ -391,7 +391,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			isNetworkReceive = PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER;
 
 		if (!isOffline) {
-			t.start();
+			removeTimer.start();
 		}
 	}
 
@@ -469,7 +469,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 		// }
 	}
 
-	Timer t = new Timer(500, new ActionListener() {
+	Timer removeTimer = new Timer(500, new ActionListener() {
 		public void actionPerformed(ActionEvent evt) {
 			int n;
 			if (shouldDelete()) {
@@ -2411,6 +2411,25 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 */
 	public Class getUnitClass() {
 		return unitClass;
+	}
+
+	/**
+	 * clean up datablock when it's no longer needed
+	 */
+	public void dispose() {
+		stopTimer();
+		clearAll();
+	}
+	
+	/**
+	 * Had some issues with the Timer holding a reference to the underlying PamDataBlock 
+	 * (RoccaContourDataBlock, in this case) and not releasing it for garbage collection.
+	 * Added in this method to force the timer to stop and release it's hold.
+	 */
+	@Override
+	public void stopTimer() {
+		super.stopTimer();
+		removeTimer.stop();
 	}
 
 	public void autoSetDataBlockMixMode() {

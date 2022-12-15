@@ -67,11 +67,11 @@ public class GridSwingPainter {
 		 *  now go back and recalculate the latlongs of those pixel values since
 		 *  we need the lat longs of those bounds to be more precise. 
 		 */
-		double pixsOffs = -.5;
-		pLatMin = lat[0] + (lat[1]-lat[0]) * (double) (nLat-pyMax-pixsOffs) / (nLat-1);
-		pLatMax = lat[0] + (lat[1]-lat[0]) * (double) (nLat-pyMin-pixsOffs) / (nLat-1);
-		pLonMin = lon[0] + (lon[1]-lon[0]) * (double) (pxMin+pixsOffs) / (nLon-1);
-		pLonMax = lon[0] + (lon[1]-lon[0]) * (double) (pxMax+pixsOffs) / (nLon-1);
+		double pixsOffs = 0;//-.5;
+		pLatMin = lat[0] + (lat[1]-lat[0]) * (double) (nLat-pyMax-pixsOffs) / (nLat);
+		pLatMax = lat[0] + (lat[1]-lat[0]) * (double) (nLat-pyMin-pixsOffs) / (nLat);
+		pLonMin = lon[0] + (lon[1]-lon[0]) * (double) (pxMin+pixsOffs) / (nLon);
+		pLonMax = lon[0] + (lon[1]-lon[0]) * (double) (pxMax+pixsOffs) / (nLon);
 //		pxMin = Math.max(0, Math.min(pxMin, lon.length-1));
 //		pxMax = Math.max(0, Math.min(pxMax, lon.length-1));
 //		pyMin = Math.max(0, Math.min(pyMin, lat.length-1));

@@ -79,8 +79,9 @@ public class EnergySumProcess extends IshDetFnProcess {
 		EnergySumParams p = (EnergySumParams)ishDetControl.ishDetParams;
 		PamDataBlock inputDataBlock = getInputDataBlock();		//might be null
 		
-		if (inputDataBlock != null && inputDataBlock.getUnitsCount() > 0) {
-			savedGramHeight = ((FFTDataUnit)inputDataBlock.getLastUnit()).getFftData().length();	
+		FFTDataUnit lastFFTUnit = ((FFTDataUnit)inputDataBlock.getLastUnit());
+		if (lastFFTUnit != null) {
+			savedGramHeight = lastFFTUnit.getFftData().length();	
 			int len = savedGramHeight;
 			//Should be max(1,...) here, but FFT bin 0 has 0's in it.
 			loBin = Math.max(1,     (int) Math.floor(len * p.f0 / (sampleRate/2)));
