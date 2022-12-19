@@ -3,6 +3,8 @@ package Array;
 import java.sql.Connection;
 import java.sql.Types;
 
+import Array.sensors.ArrayParameterType;
+import Array.sensors.ArraySensorFieldType;
 import Array.streamerOrigin.HydrophoneOriginMethod;
 import Array.streamerOrigin.HydrophoneOriginMethods;
 import Array.streamerOrigin.HydrophoneOriginSystem;
@@ -147,9 +149,16 @@ public class StreamerLogging extends SQLLogging {
 		 * Enable orientation is not saved in the database. It is handy to switch between enabling and disabling orientation for all streamers. Therefore we use the default streamer
 		 * in the array manager to determine if our saved streamers will use their orientation data or not. 
 		 */
-		Streamer defualtStreamer=ArrayManager.getArrayManager().getCurrentArray().getStreamer(streamer.getStreamerIndex());
+		Streamer defaultStreamer=ArrayManager.getArrayManager().getCurrentArray().getStreamer(streamer.getStreamerIndex());
 //		if (defualtStreamer!=null) streamer.setEnableOrientation(ArrayManager.getArrayManager().getCurrentArray().getStreamer(streamer.getStreamerIndex()).isEnableOrientation());
 //		else streamer.setEnableOrientation(true);
+		if (defaultStreamer != null) {
+			ArraySensorFieldType[] fieldTypes = ArraySensorFieldType.values();
+			for (int i = 0; i < fieldTypes.length; i++) {
+				ArrayParameterType aType = defaultStreamer.getOrientationTypes(fieldTypes[i]);
+				streamer.setOrientationTypes(fieldTypes[i], aType);
+			}
+		}
 		
 		StreamerDataUnit sdu = new StreamerDataUnit(timeMilliseconds, streamer);
 		sdu.setDatabaseIndex(databaseIndex);

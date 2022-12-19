@@ -4,6 +4,8 @@ import GPS.NavDataSynchronisation;
 import PamController.PamController;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import PamguardMVC.dataOffline.OfflineDataLoadInfo;
+import pamScrollSystem.ViewLoadObserver;
 
 public class StreamerDataBlock extends PamDataBlock<StreamerDataUnit>{
 
@@ -90,6 +92,10 @@ public class StreamerDataBlock extends PamDataBlock<StreamerDataUnit>{
 			}
 			notifyOfflineObservers(newUnit);
 		}
+	}
+
+	public boolean loadViewerData(OfflineDataLoadInfo offlineDataLoadInfo, ViewLoadObserver loadObserver) {
+		return super.loadViewerData(offlineDataLoadInfo, loadObserver);
 	}
 
 }
