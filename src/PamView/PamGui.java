@@ -46,6 +46,7 @@ import java.net.URL;
 import java.util.List;
 
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -57,6 +58,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -250,6 +252,8 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		frame.setExtendedState(guiParameters.extendedState);
 
 		frame.setVisible(true);
+		
+		hideToolTips(guiParameters.isHideAllToolTips());
 
 		somethingShowing = true;
 	}
@@ -819,6 +823,11 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		menuItem.setToolTipText("Warnings told \"Not to show again\" will be shown again");
 		menuItem.addActionListener(new ClearHiddenWarnings());
 		menu.add(menuItem);
+		
+		JCheckBoxMenuItem hideTips = new JCheckBoxMenuItem("Hide all tool tips", guiParameters.isHideAllToolTips());
+		hideTips.setToolTipText("Hide annoying pop-up tool tips which keep getting in the way");
+		hideTips.addActionListener(new HideToolTips(hideTips));
+		menu.add(hideTips);
 
 		/*
 		 * Add menu item to redirect output to file or console screen
@@ -1173,6 +1182,32 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		}
 	}
 
+	private class HideToolTips implements ActionListener {
+		
+		private JCheckBoxMenuItem hideTipsCheckbox;
+
+		public HideToolTips(JCheckBoxMenuItem hideTips) {
+			this.hideTipsCheckbox = hideTips;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			boolean shouldHide = !guiParameters.isHideAllToolTips();
+			hideToolTips(shouldHide);
+			guiParameters.setHideAllToolTips(shouldHide);
+			hideTipsCheckbox.setSelected(shouldHide);
+			
+		}
+	}
+	
+	/**
+	 * hide all tool tips
+	 * @param hide
+	 */
+	private void hideToolTips(boolean hide) {
+		ToolTipManager.sharedInstance().setEnabled(!hide);
+	}
+	
 	class ClearHiddenWarnings implements ActionListener {
 		public void actionPerformed(ActionEvent ev){
 			WarnOnce.clearHiddenList(getGuiFrame());
@@ -1778,7 +1813,6 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	 */
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		guiParameters = ((GuiParameters) pamControlledUnitSettings.getSettings()).clone();
-
 		return true;
 	}
 	public PamTabbedPane getMainTab() {

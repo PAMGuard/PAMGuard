@@ -30,6 +30,12 @@ public class GuiParameters implements Serializable, Cloneable {
 	
 	private String currentSelectedTab;
 	
+	/**
+	 * Flag to hide all tool tips - which are 
+	 * very annoying when they cover controls you want to use!
+	 */
+	private boolean hideAllToolTips = false;
+	
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#clone()
@@ -59,6 +65,22 @@ public class GuiParameters implements Serializable, Cloneable {
 	 */
 	public void setCurrentSelectedTab(String currentSelectedTab) {
 		this.currentSelectedTab = currentSelectedTab;
+	}
+
+
+	/**
+	 * @return the hideAllToolTips
+	 */
+	public boolean isHideAllToolTips() {
+		return hideAllToolTips;
+	}
+
+
+	/**
+	 * @param hideAllToolTips the hideAllToolTips to set
+	 */
+	public void setHideAllToolTips(boolean hideAllToolTips) {
+		this.hideAllToolTips = hideAllToolTips;
 	}
 		
 }
