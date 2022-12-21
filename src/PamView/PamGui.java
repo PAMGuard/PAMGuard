@@ -23,10 +23,13 @@ package PamView;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.DefaultKeyboardFocusManager;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
+import java.awt.HeadlessException;
+import java.awt.KeyEventDispatcher;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Window;
@@ -34,6 +37,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
@@ -58,6 +63,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.ToolTipManager;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
@@ -140,7 +146,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		removeModuleEnabler = new MenuItemEnabler();
 		orderModulesEnabler = new MenuItemEnabler();
 
-		frame = new JFrame(getModeName());
+		frame = new MainFrame(getModeName());
 
 		if (FullScreen.isGoFullScreen()) {
 			//			frame.setUndecorated(true);
@@ -178,6 +184,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
 
 		frame.addWindowListener(this);
+		
 
 		mainPanel = new PamBorderPanel(new BorderLayout());
 		mainPanel.setOpaque(true);
@@ -252,12 +259,52 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		frame.setExtendedState(guiParameters.extendedState);
 
 		frame.setVisible(true);
-		
+				
 		hideToolTips(guiParameters.isHideAllToolTips());
+
+
+		ToolTipManager.sharedInstance().setDismissDelay(20000);
+//		ToolTipManager.sharedInstance().setReshowDelay(5000);
+//		System.out.println("Tool tip : getReshowDelay" + ToolTipManager.sharedInstance().getReshowDelay());
+//		System.out.println("Tool tip : getInitialDelay" + ToolTipManager.sharedInstance().getInitialDelay());
+//		System.out.println("Tool tip : getDismissDelay" + ToolTipManager.sharedInstance().getDismissDelay());
 
 		somethingShowing = true;
 	}
 
+	private class MainFrame extends JFrame implements KeyEventDispatcher {
+
+		private static final long serialVersionUID = 1L;
+
+		private Timer noTipTimer;
+				
+		public MainFrame(String title) throws HeadlessException {
+			super(title);
+			DefaultKeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
+			noTipTimer = new Timer(6000, new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					hideToolTips(guiParameters.isHideAllToolTips());
+					noTipTimer.stop();
+				}
+			});
+		}
+
+		@Override
+		public boolean dispatchKeyEvent(KeyEvent e) {
+			if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+				if (noTipTimer.isRunning()) {
+					noTipTimer.restart();
+				}
+				else {
+					noTipTimer.start();
+				}
+				hideToolTips(true);
+			}
+			return false;
+		}
+		
+	}
 
 	private static volatile boolean somethingShowing = false;
 
@@ -825,7 +872,8 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		menu.add(menuItem);
 		
 		JCheckBoxMenuItem hideTips = new JCheckBoxMenuItem("Hide all tool tips", guiParameters.isHideAllToolTips());
-		hideTips.setToolTipText("Hide annoying pop-up tool tips which keep getting in the way");
+		hideTips.setToolTipText("<html>Hide annoying pop-up tool tips which keep getting in the way" +
+		"<br>(or press the Escape key to hide them for 6 seconds)</html>");
 		hideTips.addActionListener(new HideToolTips(hideTips));
 		menu.add(hideTips);
 
@@ -1285,11 +1333,11 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 
 	/**
 	 * Rewrote the menu enablers for the Logging menu (and made it more general
-	 * to extend to other menus shoule they ever need to be anabled. 
+	 * to extend to other menus should they ever need to be enabled). 
 	 * 
 	 * This arises now that we have multiple main menus on the frame depending on
 	 * which tab is being viewed. Since each menu bar has references to different
-	 * menus and menu items, we can no lnger use the ones set in the constuctors for
+	 * menus and menu items, we can no longer use the ones set in the constructors for
 	 * the menu. Each item is therefore found by name before it's enabled. For now
 	 * I'm taking the names out of the reference to the last menu item. 
 	 *

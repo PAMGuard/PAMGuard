@@ -260,11 +260,6 @@ public class PamController implements PamControllerInterface, PamSettings {
 			new MultiportController(this);
 		}
 
-		
-		//		binaryStore = new BinaryStore(this);
-		ToolTipManager.sharedInstance().setDismissDelay(20000);
-
-
 		guiFrameManager = PamGUIManager.createGUI(this, object);
 		guiFrameManager.init(); //perform any start up processes for the GUI. 
 
