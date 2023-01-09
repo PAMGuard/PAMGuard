@@ -111,15 +111,15 @@ public class GebcoNETCDF {
 	 * @param bin
 	 * @return
 	 */
-	double binToValue(double[] valueRange, int nBin, int bin) {
-		return valueRange[0] + (valueRange[1]-valueRange[0])*(double) bin / (double) (nBin-1);
+	double binToValue(double[] valueRange, int nBin, double bin) {
+		return valueRange[0] + (valueRange[1]-valueRange[0])*(double) bin / (double) (nBin);
 	}
 	
-	double latBinToValue(int latBin) {
+	double latBinToValue(double latBin) {
 		return binToValue(latRange, nLat, latBin);
 	}
 	
-	double lonBinToValue(int lonBin) {
+	double lonBinToValue(double lonBin) {
 		return binToValue(lonRange, nLon, lonBin);
 	}
 
@@ -131,9 +131,9 @@ public class GebcoNETCDF {
 	
 	public MapRasterImage createImage(int[] latRangeBins, int[] lonRangeBins, ColourArray heightColours, ColourArray depthColours, int hop) {
 		latRangeBins[0] = Math.max(latRangeBins[0], 0);
-		latRangeBins[1] = Math.min(latRangeBins[1], nLat-1);
+		latRangeBins[1] = Math.min(latRangeBins[1], nLat);
 		lonRangeBins[0] = Math.max(lonRangeBins[0], 0);
-		lonRangeBins[1] = Math.min(lonRangeBins[1], nLon-1);
+		lonRangeBins[1] = Math.min(lonRangeBins[1], nLon);
 		hop = Math.max(1, hop);
 		int nLatBins = (latRangeBins[1]-latRangeBins[0])/hop;
 		int nLonBins = (lonRangeBins[1]-lonRangeBins[0])/hop;
@@ -184,9 +184,10 @@ public class GebcoNETCDF {
 		
 		double[] latRange = new double[2];
 		double[] lonRange = new double[2];
+		double[] edges = {-.5, +.5};
 		for (int i = 0; i < 2; i++) {
-			latRange[i] = latBinToValue(latRangeBins[i]);
-			lonRange[i] = lonBinToValue(lonRangeBins[i]);
+			latRange[i] = latBinToValue(latRangeBins[i]+edges[i]);
+			lonRange[i] = lonBinToValue(lonRangeBins[i]+edges[i]);
 		}
 
 		return new MapRasterImage(latRange, lonRange, image);
@@ -233,11 +234,14 @@ public class GebcoNETCDF {
 	public static GebcoNETCDF makeGebcoNCDFFile(File ncFile) {
 		if (ncFile.exists() == false) {
 			System.out.println("Bathymetry file " + ncFile.getAbsolutePath() + " cannot be found");
+			return null;
 		}
 		NetcdfFile ncf;
 		try {
 			ncf = new NetcdfFile(ncFile, true);
-			return new GebcoNETCDF(ncf);
+			GebcoNETCDF gebcoRaster = new GebcoNETCDF(ncf);
+//			ncf.close();
+			return gebcoRaster;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

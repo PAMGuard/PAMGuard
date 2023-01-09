@@ -260,11 +260,6 @@ public class PamController implements PamControllerInterface, PamSettings {
 			new MultiportController(this);
 		}
 
-		
-		//		binaryStore = new BinaryStore(this);
-		ToolTipManager.sharedInstance().setDismissDelay(20000);
-
-
 		guiFrameManager = PamGUIManager.createGUI(this, object);
 		guiFrameManager.init(); //perform any start up processes for the GUI. 
 
@@ -1225,8 +1220,9 @@ public class PamController implements PamControllerInterface, PamSettings {
 		if (PamCalendar.isSoundFile() == false) {
 			PamCalendar.setSessionStartTime(PamCalendar.getTimeInMillis());
 		}
-
-		System.out.printf("PAMGUARD Startup took %d milliseconds at time %s\n", startDelay, PamCalendar.formatDateTime(PamCalendar.getSessionStartTime()));
+		if (PamCalendar.isSoundFile() == false) {
+			System.out.printf("PAMGUARD Startup took %d milliseconds at time %s\n", startDelay, PamCalendar.formatDateTime(PamCalendar.getSessionStartTime()));
+		}
 		guiFrameManager.pamStarted();
 
 		return true;

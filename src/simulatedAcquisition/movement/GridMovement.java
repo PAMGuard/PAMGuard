@@ -131,7 +131,12 @@ public class GridMovement extends MovementModel implements PamSettings {
 
 	@Override
 	public String getUnitName() {
-		return getSimObject().name;
+		if (getSimObject() != null && getSimObject().name != null) {
+			return getSimObject().name;
+		}
+		else {
+			return "Unknown";
+		}
 	}
 
 	@Override

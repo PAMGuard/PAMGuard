@@ -30,6 +30,7 @@ import javax.swing.text.MaskFormatter;
 import Array.ArrayManager;
 import GPS.GPSControl;
 import GPS.GPSDataBlock;
+import GPS.GpsData;
 import GPS.GpsDataUnit;
 import NMEA.NMEADataBlock;
 import NMEA.NMEADataUnit;
@@ -657,98 +658,25 @@ public class LatLongControl extends LoggerControl implements ClipboardOwner{
 
 	}
 
-	//	private class LatChangeListener implements PropertyChangeListener{
-	//
-	//		/* (non-Javadoc)
-	//		 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
-	//		 */
-	//		@Override
-	//		public void propertyChange(PropertyChangeEvent arg0) {
-	//
-	//			System.out.println("old:"+arg0.getOldValue());
-	//			System.out.println("new:"+arg0.getNewValue());
-	//			try {
-	//				textFieldLat.commitEdit();
-	//			} catch (ParseException e) {
-	//				// TODO Auto-generated catch block
-	////				e.printStackTrace();
-	//			}
-	//		}
-	//		
-	//	}
-	//	private class LonChangeListener implements PropertyChangeListener{
-	//
-	//		/* (non-Javadoc)
-	//		 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
-	//		 */
-	//		@Override
-	//		public void propertyChange(PropertyChangeEvent arg0) {
-	//
-	////			System.out.println("old:"+arg0.getOldValue());
-	////			System.out.println("new:"+arg0.getNewValue());
-	//			try {
-	//				textFieldLon.commitEdit();
-	//			} catch (ParseException e) {
-	//				// TODO Auto-generated catch block
-	////				e.printStackTrace();
-	//			}
-	//		}
-	//		
-	//	}
 
 	@Override
 	public void setData(Object latLong) {
+		
 
-		LatLong a = (LatLong)latLong;
-		if (a==null){
+		if (latLong==null || latLong instanceof LatLong == false){
 			//			System.out.println("latLon null");
 			textFieldLat.setValue(null);
 			textFieldLon.setValue(null);
 			return;
 		}
+		
+		
+		LatLong a = (LatLong)latLong;
+		
 		//		System.out.println("a       :"+a.toString());
 		textFieldLat.setValue(a.getLatitude());
-		//		textFieldLat.setText(a.formatLatitude());
-
-		//		System.out.println("a latVal:"+textFieldLat.getValue());
-		//		System.out.println("a latTxt:"+textFieldLat.getText());
 		textFieldLon.setValue(a.getLongitude());
-		//		textFieldLon.setText(a.formatLongitude());
-
-		//		addPropertyChangeListener("value", this);
-		//		try {
-		//			textFieldLat.commitEdit();
-		//			textFieldLon.commitEdit();
-		//		} catch (ParseException e) {
-		//			if (dataWarning==null) dataWarning="";
-		//			dataWarning+=" Unable to setData(...) ";
-		//			e.printStackTrace();
-		//		}
-		//		if (latLong==null){
-		//			System.out.println("LatLont null");
-		//			textFieldLat.setText("");
-		//			textFieldLon.setText("");
-		//			return;
-		//		}
-		//		
-		//		if (latLong.getClass().isAssignableFrom(LatLong.class)){
-		//			System.out.println("LatLont assignable");
-		//			LatLong latLon = (LatLong) latLong;
-		//			
-		//			if (latLon==null){
-		//				System.out.println("LatLont still null");
-		//				textFieldLat.setText("");
-		//				textFieldLon.setText("");
-		//				return;
-		//			}
-		//			
-		//			textFieldLat.setText(LatLong.formatLatitude(latLon.getLatitude()));
-		//			System.out.println(latLon.toString());
-		//			textFieldLon.setText(LatLong.formatLongitude(latLon.getLongitude()));
-		//		}
-
-
-
+		
 	}
 
 	@Override
@@ -856,6 +784,15 @@ public class LatLongControl extends LoggerControl implements ClipboardOwner{
 		
 		try {
 			GpsDataUnit gpsUnit = findGpsDataBlock().getLastUnit();
+			if (gpsUnit == null) {
+				setData(null);
+				return AUTO_UPDATE_FAIL;
+			}
+			GpsData gpsData = gpsUnit.getGpsData();
+			if (gpsData == null) {
+				setData(null);
+				return AUTO_UPDATE_FAIL;
+			}
 			latitude = gpsUnit.getGpsData().getLatitude();
 			longitude = gpsUnit.getGpsData().getLongitude();
 

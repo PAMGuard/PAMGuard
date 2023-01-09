@@ -93,7 +93,7 @@ public class PamObservable {//extends PanelOverlayDraw {
 		pamObservers = new ArrayList<PamObserver>();
 		instantObservers = new ArrayList<PamObserver>();
 		pamProfiler = PamProfiler.getInstance();
-		t.start();
+		cpuTimer.start();
 	}
 
 	/**
@@ -400,7 +400,7 @@ public class PamObservable {//extends PanelOverlayDraw {
 		}
 	}
 
-	private Timer t = new Timer(4321, new ActionListener() {
+	private Timer cpuTimer = new Timer(4321, new ActionListener() {
 		public void actionPerformed(ActionEvent evt) {
 			long now = System.currentTimeMillis();
 			if (cpuUsage == null) return;
@@ -420,7 +420,7 @@ public class PamObservable {//extends PanelOverlayDraw {
 	 * Added in this method to force the timer to stop and release it's hold.
 	 */
 	public void stopTimer() {
-		t.stop();
+		cpuTimer.stop();
 	}
 
 	public double getCPUPercent(int objectIndex) {

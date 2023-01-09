@@ -83,9 +83,14 @@ public class SgramCorrProcess extends IshDetFnProcess
 	protected void prepareMyParams() {
 		SgramCorrParams p = (SgramCorrParams)ishDetControl.ishDetParams;
 		PamDataBlock inputDataBlock = getInputDataBlock();
-		
-		if (inputDataBlock != null && inputDataBlock.getUnitsCount() > 0) {
-			savedGramHeight = ((FFTDataUnit)inputDataBlock.getLastUnit()).getFftData().length();
+		/*
+		 *  get the unit. first, then check it's null. Due to multithreading it's 
+		 *  possible that checking there are units and then asking for one,without
+		 *  synchronization will crash if the unit is deleted between those two calls.  
+		 */
+		FFTDataUnit lastFFTUnit = ((FFTDataUnit)inputDataBlock.getLastUnit());
+		if (lastFFTUnit != null) {
+			savedGramHeight = lastFFTUnit.getFftData().length();
 			/*
 			 * fft information is now stored in an FFTDataBLock, so no need to get
 			 * back to the process above it. 

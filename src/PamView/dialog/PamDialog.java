@@ -64,6 +64,10 @@ abstract public class PamDialog extends JDialog {
 	private boolean warnDefaultSetting = true;
 	private CancelObserver cancelObserver;
 	private boolean firstShowing = true;
+/*
+ * 	Move to mouse position is parent is null 
+ */
+	private boolean moveToMouse = true;
 
 	public JPanel getButtonPanel() {
 		return buttonPanel;
@@ -281,7 +285,7 @@ abstract public class PamDialog extends JDialog {
 			synchronized (this) {
 				PamColors.getInstance().notifyContianer(this.getContentPane());
 			}
-			if (getOwner() == null) {
+			if (getOwner() == null && isMoveToMouse()) {
 				moveToMouseLocation();
 			}
 			if (firstShowing) {
@@ -689,6 +693,20 @@ abstract public class PamDialog extends JDialog {
 		else {
 			textField.setText(String.format(format, value));
 		}
+	}
+
+	/**
+	 * @return the moveToMouse
+	 */
+	public boolean isMoveToMouse() {
+		return moveToMouse;
+	}
+
+	/**
+	 * @param moveToMouse the moveToMouse to set
+	 */
+	public void setMoveToMouse(boolean moveToMouse) {
+		this.moveToMouse = moveToMouse;
 	}
 
 }

@@ -167,7 +167,7 @@ abstract public class AbstractPamScrollerAWT extends AbstractPamScroller impleme
 	protected JPanel getButtonPanel() {
 		return buttonPanel;
 	}
-
+	
 	class PageForwardAction implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
