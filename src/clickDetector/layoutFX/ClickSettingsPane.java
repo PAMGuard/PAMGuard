@@ -176,7 +176,7 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 	/**
 	 * The default pane width
 	 */
-	public static double PREF_PANE_WIDTH=550;
+	public static double PREF_PANE_WIDTH=560;
 	
 	
 	/**

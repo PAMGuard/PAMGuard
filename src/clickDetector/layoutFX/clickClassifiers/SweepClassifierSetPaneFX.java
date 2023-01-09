@@ -19,6 +19,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.text.Font;
 import net.synedra.validatorfx.GraphicDecoration;
@@ -366,7 +367,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		private ColorPicker fillColourPicker;
 
 		OptionsBox() {
-			super("General Options", false);
+			super(null, false);
 			this.getHolderPane().setCenter(createOptionsPane());
 
 		}
@@ -536,6 +537,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		@Override
 		protected void setParams() {
 
+			//set basic data
 			if (sweepClassifierSet == null) {
 				//symbolViewer.setSymbol(null);
 				symbolPicker.getSelectionModel().select(0);
@@ -547,11 +549,21 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 				nameField.setText(sweepClassifierSet.getName());
 				setCode(sweepClassifierSet.getSpeciesCode());
 			}
+			
+			
 
 			if (sweepClassifierSet == null) {
 				return;
 			}
+			
+			//set the colours. 
+			lineColourPicker.setValue(PamUtilsFX.awtToFXColor(sweepClassifierSet.symbol.getSymbolData().getLineColor()));
+			fillColourPicker.setValue(PamUtilsFX.awtToFXColor(sweepClassifierSet.symbol.getSymbolData().getFillColor()));
+			symbolPicker.setValue(sweepClassifierSet.symbol.getSymbolData().symbol);
+			symbolPicker.setLineColour(lineColourPicker.getValue());
+			symbolPicker.setFillColour(fillColourPicker.getValue());
 
+			//set the click length data
 			lengthTypeBox.getSelectionModel().select(sweepClassifierSet.restrictedBinstype);
 
 			channelsBox.getSelectionModel().select(sweepClassifierSet.channelChoices);
@@ -577,6 +589,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 				return showWarning("You must pick a symbol");
 			}
 
+			//get the symbol data.
 			SymbolData symbolData = new SymbolData(this.symbolPicker.getValue().getSymbol(), 10,10,true, 
 					PamUtilsFX.fxToAWTColor(this.lineColourPicker.getValue()), PamUtilsFX.fxToAWTColor(this.fillColourPicker.getValue())); 
 			sweepClassifierSet.symbol= new PamSymbol(symbolData);
@@ -891,6 +904,12 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 			testBandFreqPane=new FreqBandPane(Orientation.HORIZONTAL);
 			testBandFreqPane.setBandText("");
+			
+			
+			addValidatorFreqCheck(getValidator(), testBandFreqPane, "test band ",  ("test_band"));
+
+			
+			
 			pamGridPane.add(testBandFreqPane, 1, 1);
 
 
@@ -910,35 +929,28 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 				thresholdSpinners.get(i).setMaxWidth(100);			
 
 				//add validation. 
+				final int ii = i; 
+				addValidatorFreqCheck(getValidator(), contralBandFreqPanes.get(i), ("controlband "+ii),  ("controlband_"+ii));
+				
+				
+				contralBandFreqPanes.get(i).getLowPassFreq().valueProperty().addListener((obsVal, oldVal, newVal)->{
+					getValidator().validate();
+				});
+				
+				contralBandFreqPanes.get(i).getLowPassFreq().valueProperty().addListener((obsVal, oldVal, newVal)->{
+					getValidator().validate();
+				});
 
-				final int ii=i; 
-				getValidator().createCheck()
-				.dependsOn("minfreq_controlband_"+ii, contralBandFreqPanes.get(i).getLowPassFreq().valueProperty())
-				.withMethod(c -> {
-					Double minfreq = c.get("minfreq_controlband_"+ii); 
-					if (minfreq>=contralBandFreqPanes.get(ii).getHighPassFreq().getValue() && isPaneShowing()) {
-						c.error("Minimum control band frequency in control band " + ii + "must be lower than the maximum frequency ");
-					}
-				})
-				.decorates(contralBandFreqPanes.get(i).getLowPassFreq())
-				.immediate();
 
-				getValidator().createCheck()
-				.dependsOn("controlband_"+ii, contralBandFreqPanes.get(i).getHighPassFreq().valueProperty())
-				.withMethod(c -> {
-					Double maxFreq = c.get("controlband_"+ii); 
-					if (maxFreq<contralBandFreqPanes.get(ii).getLowPassFreq().getValue() && isPaneShowing()) {
-						c.error("Minimum control band frequency in control band " + ii + "must be lower than the maximum frequency ");
-					}
-				})
-				.decorates(contralBandFreqPanes.get(i).getHighPassFreq())
-				.immediate();
 
 			}
 
 			return pamGridPane; 
 
 		}
+		
+		
+
 
 
 		@Override
@@ -949,12 +961,14 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			}
 
 			sweepClassifierSet.checkEnergyParamsAllocation();
-
+			
+			testBandFreqPane.getLowPassFreq().getValueFactory().setValue(sweepClassifierSet.testEnergyBand[0]);
+			testBandFreqPane.getHighPassFreq().getValueFactory().setValue(sweepClassifierSet.testEnergyBand[1]);
+			
 			for (int j = 0; j < SweepClassifierSet.nControlBands; j++) {
 
 				contralBandFreqPanes.get(j).getLowPassFreq().getValueFactory().setValue(sweepClassifierSet.controlEnergyBand[j][0]);
 				contralBandFreqPanes.get(j).getHighPassFreq().getValueFactory().setValue(sweepClassifierSet.controlEnergyBand[j][1]);
-
 
 				thresholdSpinners.get(j).getValueFactory().setValue(sweepClassifierSet.energyThresholds[j]);
 
@@ -986,21 +1000,18 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 				return false;
 			}
 
-			for (int j = 0; j < SweepClassifierSet.nControlBands; j++ ) {
+			try { 
+				
+				sweepClassifierSet.testEnergyBand[0] = testBandFreqPane.getLowPassFreq().getValue().doubleValue(); 
+				sweepClassifierSet.testEnergyBand[1] = testBandFreqPane.getHighPassFreq().getValue().doubleValue(); 
 
-			}
-
-
-			try { //TODO
-//				for (int i = 0; i < 2; i++) {
-//					sweepClassifierSet.testEnergyBand[i] = Double.valueOf(testEnergy[i].getText());
-//					for (int j = 0; j < SweepClassifierSet.nControlBands; j++) {
-//						sweepClassifierSet.controlEnergyBand[j][i] = Double.valueOf(controlEnergy[j][i].getText());
-//					}
-//				}
-//				for (int j = 0; j < SweepClassifierSet.nControlBands; j++) {
-//					sweepClassifierSet.energyThresholds[j] = Double.valueOf(thresholds[j].getText());
-//				}
+				for (int j = 0; j < SweepClassifierSet.nControlBands; j++) {
+						sweepClassifierSet.controlEnergyBand[j][0] = contralBandFreqPanes.get(j).getLowPassFreq().getValue();
+						sweepClassifierSet.controlEnergyBand[j][1] = contralBandFreqPanes.get(j).getHighPassFreq().getValue();
+						
+						sweepClassifierSet.energyThresholds[j] = thresholdSpinners.get(j).getValue();
+				}
+	
 			}
 			catch (NumberFormatException e) {
 				return showWarning("Invalid energy band parameter");
@@ -1055,6 +1066,8 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		}
 
 		private Node createFreqSearchPane(){
+			
+			int gridy=0; 
 
 			PamGridPane pamGridPane=new PamGridPane();
 			pamGridPane.setHgap(5);
@@ -1062,36 +1075,50 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 
 			//search and integration range
-			pamGridPane.add(new Label("Search Range"),1,0);
+			pamGridPane.add(new Label("Search Range"),1,gridy);
 
 			searchRange=new FreqBandPane(Orientation.HORIZONTAL);		
 			searchRange.setBandText("");
-			pamGridPane.add(searchRange,2,0);
+			pamGridPane.add(searchRange,2,gridy);
+			GridPane.setColumnSpan(searchRange, GridPane.REMAINING);
 
-			pamGridPane.add(new Label("Smoothing"), 3,0);
+			gridy++;
+
+			pamGridPane.add(new Label("Smooth"), 1,gridy);
 
 			smoothing=new PamSpinner<Integer>(3,101,5,2); 
 			smoothing.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
-			smoothing.setPrefWidth(100);
-			pamGridPane.add(smoothing, 4,0);
+			smoothing.setMaxWidth(100);
+			pamGridPane.add(smoothing, 2,gridy);
+			
 
-			pamGridPane.add(new Label("bins"), 5,0);
+			
+			//GridPane.setHgrow(smoothing, Priority.NEVER);
+
+			pamGridPane.add(new Label("bins"), 3,gridy);
 
 
+			gridy++;
 			//peak frequency
 			peakFreqCheckBox=new PamToggleSwitch("");
 			peakFreqCheckBox.selectedProperty().addListener((obsVal, oldVal, newVal)->{
-				peakFreqPane.setDisableFreqPane(!peakWidthCheckBox.isSelected());
+				peakFreqPane.setDisableFreqPane(!peakFreqCheckBox.isSelected());
 			});
 
-			pamGridPane.add(peakFreqCheckBox,0,1);
+			pamGridPane.add(peakFreqCheckBox,0,gridy);
 
-			pamGridPane.add(new Label("Peak Frequency"),1,1);
+			pamGridPane.add(new Label("Peak Frequency"),1,gridy);
 
 			peakFreqPane=new FreqBandPane(Orientation.HORIZONTAL);		
+			peakFreqPane.setHgap(0);
 			peakFreqPane.setBandText("");
-			pamGridPane.add(peakFreqPane,2,1);
+			pamGridPane.add(peakFreqPane,2,gridy);
+			GridPane.setColumnSpan(peakFreqPane, GridPane.REMAINING);
 
+			
+			addValidatorFreqCheck(getValidator(), peakFreqPane, "peak freq. ",  "peak_freq");
+			
+			gridy++;
 
 			//peak width
 			peakWidthCheckBox=new PamToggleSwitch("");
@@ -1100,39 +1127,50 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 				peakWidthPane.setDisableFreqPane(!peakWidthCheckBox.isSelected());
 				threshold.setDisable(!peakWidthCheckBox.isSelected());
 			});
+			
+			addValidatorFreqCheck(getValidator(), peakFreqPane, "peak width ",  "peak_width");
 
-			pamGridPane.add(peakWidthCheckBox,0,2);
 
-			pamGridPane.add(new Label("Peak Width"),1,2);
+			pamGridPane.add(peakWidthCheckBox,0,gridy);
+			pamGridPane.add(new Label("Peak Width"),1,gridy);
 
 			peakWidthPane=new FreqBandPane(Orientation.HORIZONTAL);		
 			peakWidthPane.setBandText("");
-			pamGridPane.add(peakWidthPane,2,2);
+			pamGridPane.add(peakWidthPane,2,gridy);
+			GridPane.setColumnSpan(peakWidthPane, GridPane.REMAINING);
 
-			pamGridPane.add(new Label("Threshold"), 3,2);
+			gridy++;
+
+			pamGridPane.add(new Label(""), 1,gridy);
 
 			threshold=new PamSpinner<Double>(1., 300., 6.,1.);
 			threshold.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 			threshold.setPrefWidth(100);
 
-			pamGridPane.add(threshold,4,2); 
+			pamGridPane.add(threshold,2,gridy); 
 
-			pamGridPane.add(new Label("dB"), 5,2);
+			pamGridPane.add(new Label("dB"), 3,gridy);
 
 
+			gridy++;
+			
 			//mean frequency
 			meanFreqCheckBox=new PamToggleSwitch("");
 			meanFreqCheckBox.selectedProperty().addListener((obsVal, oldVal, newVal)->{
-				meanFreq.setDisableFreqPane(!peakWidthCheckBox.isSelected());
+				meanFreq.setDisableFreqPane(!meanFreqCheckBox.isSelected());
 			});
 
-			pamGridPane.add(meanFreqCheckBox,0,3);
+			pamGridPane.add(meanFreqCheckBox,0,gridy);
 
-			pamGridPane.add(new Label("Mean Frequency"),1,3);
+			pamGridPane.add(new Label("Mean Frequency"),1,gridy);
 
 			meanFreq=new FreqBandPane(Orientation.HORIZONTAL);		
 			meanFreq.setBandText("");
-			pamGridPane.add(meanFreq,2,3);
+			pamGridPane.add(meanFreq,2,gridy);
+			GridPane.setColumnSpan(meanFreq, GridPane.REMAINING);
+
+			addValidatorFreqCheck(getValidator(), meanFreq, "mean freq. ",  "mean_freq");
+
 
 			return pamGridPane;
 
@@ -1140,7 +1178,8 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 		@Override
 		protected void setParams() {
-			// TODO Auto-generated method stub
+			setEnableBox(sweepClassifierSet.enableEnergyBands);
+
 
 		}
 
@@ -1152,11 +1191,23 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 		@Override
 		protected void disbleControls(boolean enable) {
-			// TODO Auto-generated method stub
+			peakFreqCheckBox.setDisable(enable);
+			peakWidthCheckBox.setDisable(enable);
+			meanFreqCheckBox.setDisable(enable);
 
+
+			/**
+			 * Pane to set frequency band range		 */
+			peakFreqPane.setDisable(enable);
+			smoothing.setDisable(enable);
+			peakWidthPane.setDisable(enable);
+			threshold.setDisable(enable);
+			searchRange.setDisable(enable);
+			meanFreq.setDisable(enable);
 		}
 
 	}
+
 
 
 	/**
@@ -1169,12 +1220,12 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		/**
 		 * Spinner for the minimum number of zero crossings
 		 */
-		private PamSpinner<Integer> zeroCorssingsMin;
+		private PamSpinner<Integer> zeroCrossingsMin;
 
 		/**
 		 * Spinner for the maximum number of zero crossings 
 		 */
-		private PamSpinner<Integer> zeroCorssingsMax;
+		private PamSpinner<Integer> zeroCrossingsMax;
 
 		/**
 		 * Spinner for the minimum zero crossing frequency sweep in kHz/ms
@@ -1201,11 +1252,11 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			Label zeroLabel;
 			pamGridPane.add(zeroLabel = new Label("Number of zero crossings"),0,0);
 
-			zeroCorssingsMin=new PamSpinner<Integer>(0,999999,0,1); 
-			zeroCorssingsMin.setEditable(true);
-			zeroCorssingsMin.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
-			zeroCorssingsMin.setPrefWidth(100);
-			pamGridPane.add(zeroCorssingsMin, 1,0);
+			zeroCrossingsMin=new PamSpinner<Integer>(0,999999,0,1); 
+			zeroCrossingsMin.setEditable(true);
+			zeroCrossingsMin.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
+			zeroCrossingsMin.setPrefWidth(100);
+			pamGridPane.add(zeroCrossingsMin, 1,0);
 
 			pamGridPane.add(new Label("to"),2,0);
 
@@ -1215,22 +1266,22 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			zeroCorssingsMax.setPrefWidth(100);
 			pamGridPane.add(zeroCorssingsMax, 3,0);
 
-			this.zeroCorssingsMax=zeroCorssingsMax;
+			this.zeroCrossingsMax=zeroCorssingsMax;
 
 
 
 			getValidator().createCheck()
-			.dependsOn("minzero", zeroCorssingsMin.valueProperty())
+			.dependsOn("minzero", zeroCrossingsMin.valueProperty())
 			.withMethod(c -> {
 				Integer minZero = c.get("minzero"); 
 				if (minZero>=zeroCorssingsMax.getValue() && isPaneShowing()) {
 					c.error("Minimum zero corssing must be less than the maximum zero crossing");
 				}
 			})
-			.decorates(zeroCorssingsMin)
+			.decorates(zeroCrossingsMin)
 			.immediate();
 
-			zeroCorssingsMin.valueProperty().addListener((obsVal, oldval, newVal)->{
+			zeroCrossingsMin.valueProperty().addListener((obsVal, oldval, newVal)->{
 				getValidator().validate(); //need to make sure the min undecorates if this changes
 			});
 
@@ -1240,7 +1291,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			.withMethod(c -> {
 				try {
 					Integer maxZero = c.get("maxzero"); 
-					if (maxZero<=zeroCorssingsMin.getValue() && isPaneShowing()) { //For some reason the validator does not work with flip panes. 
+					if (maxZero<=zeroCrossingsMin.getValue() && isPaneShowing()) { //For some reason the validator does not work with flip panes. 
 						c.error("Maxmimum zero crossing must be greater than the minimum zero crossing");
 					}
 				}
@@ -1332,8 +1383,8 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			//			setEnableBox(sweepClassifierSet.enableZeroCrossings);
 			//enableSweep.setSelected(sweepClassifierSet.enableSweep);
 
-			zeroCorssingsMin.getValueFactory().setValue(sweepClassifierSet.nCrossings[0]);
-			zeroCorssingsMax.getValueFactory().setValue(sweepClassifierSet.nCrossings[1]);
+			zeroCrossingsMin.getValueFactory().setValue(sweepClassifierSet.nCrossings[0]);
+			zeroCrossingsMax.getValueFactory().setValue(sweepClassifierSet.nCrossings[1]);
 
 			freqZeroMin.getValueFactory().setValue(sweepClassifierSet.zcSweep[0]);
 			freqZeroMax.getValueFactory().setValue(sweepClassifierSet.zcSweep[1]);
@@ -1359,8 +1410,8 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 				sweepClassifierSet.checkZCAllocation();
 
 				sweepClassifierSet.nCrossings = new int[2]; 
-				sweepClassifierSet.nCrossings[0] =  zeroCorssingsMin.getValue(); 
-				sweepClassifierSet.nCrossings[1] =  zeroCorssingsMax.getValue(); 
+				sweepClassifierSet.nCrossings[0] =  zeroCrossingsMin.getValue(); 
+				sweepClassifierSet.nCrossings[1] =  zeroCrossingsMax.getValue(); 
 
 				//return showWarning("Zero Crossings", "Invalid number of zero crossings");
 
@@ -1379,8 +1430,8 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 		@Override
 		protected void disbleControls(boolean disable) {
-			zeroCorssingsMin.setDisable(disable);
-			zeroCorssingsMax.setDisable(disable);
+			zeroCrossingsMin.setDisable(disable);
+			zeroCrossingsMax.setDisable(disable);
 			freqZeroMin.setDisable(disable);
 			freqZeroMax.setDisable(disable);
 		}
@@ -1516,6 +1567,63 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 	public StringProperty getNameTextProperty() {
 		return optionBox.getNameLabel().textProperty();
+	}
+	
+	
+	
+	
+	/**
+	 * Add a validator check to the frequency band pane to prevent minimum and maximum frequencies being above or below themsleves and 
+	 * the maximum frequency being above Nyquist. 
+	 * @param freqBandPane - the frequency band pane. 
+	 * @param name - the name for user interface
+	 * @param ID - the ID of the check. 
+	 */
+	private void addValidatorFreqCheck(Validator validator, FreqBandPane freqBandPane, String name, String ID) {
+		
+		validator.createCheck()
+		.dependsOn("minfreq_"+ID, freqBandPane.getHighPassFreq().valueProperty())
+		.withMethod(c -> {
+			Double minfreq = c.get("minfreq_"+ID); 
+			if (minfreq>=freqBandPane.getLowPassFreq().getValue() && isPaneShowing()) {
+				c.error("Minimum frequency in " + name + "must be lower than the maximum frequency ");
+			}
+		})
+		.decorates(freqBandPane.getHighPassFreq())
+		.immediate();
+
+		validator.createCheck()
+		.dependsOn("maxfreq_"+ID, freqBandPane.getLowPassFreq().valueProperty())
+		.withMethod(c -> {
+			Double maxFreq = c.get("maxfreq_"+ID); 
+			if (maxFreq<freqBandPane.getHighPassFreq().getValue() && isPaneShowing()) {
+				c.error("Maximum control band frequency in " + name + "must be lower than the minimum frequency ");
+			}
+		})
+		.decorates(freqBandPane.getLowPassFreq())
+		.immediate();
+		
+		
+		freqBandPane.getLowPassFreq().valueProperty().addListener((obsVal, oldVal, newVal)->{
+			validator.validate();
+		});
+		
+		freqBandPane.getHighPassFreq().valueProperty().addListener((obsVal, oldVal, newVal)->{
+			validator.validate();
+		});
+		
+	
+		validator.createCheck()
+		.dependsOn("maxfreq_samplerate_"+ID, freqBandPane.getLowPassFreq().valueProperty())
+		.withMethod(c -> {
+			Double maxFreq = c.get("maxfreq_samplerate_"+ID); 
+			if (maxFreq>sweepClassifier.getClickDetector().getSampleRate()/2 && isPaneShowing()) {
+				c.error("The maximum frequency for  " + name +  " cannot be above the Nyquist frequency of " + sweepClassifier.getClickDetector().getSampleRate()/2 + "Hz"); 
+			}
+		})
+		.decorates(freqBandPane.getLowPassFreq())
+		.immediate();
+		
 	}
 
 	private boolean showWarning(String string) {
