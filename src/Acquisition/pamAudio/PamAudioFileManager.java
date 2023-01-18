@@ -14,7 +14,7 @@ import org.codehaus.plexus.util.FileUtils;
  * <p>
  * PamAudioFieManager holds a list of PamAudioFile classes. Each PamAudioFile
  * can open a certain type of sound file e.g. flac or raw wav files.
- * PamAudioFieManager provides fucntions around the list to open files, provide
+ * PamAudioFieManager provides functions around the list to open files, provide
  * file filters etc.
  * 
  * @author Jamie Macaulay
@@ -81,8 +81,16 @@ public class PamAudioFileManager {
 	}
 
 	public boolean isSoundFile(File soundFile, String soundExtension) {
+		if (soundFile == null) {
+			return false;
+		}
+
 		String extension = FileUtils.getExtension(soundFile.getName());
-		
+		if (extension == null) {
+			return false;
+		}
+		extension = extension.toLowerCase();
+		soundExtension = soundExtension.toLowerCase();
 		//System.out.println("Sound Extension: " + soundExtension + " File extension: " + extension);
 		return (soundExtension.equals(extension) || soundExtension.equals("." + extension));
 	}

@@ -351,10 +351,15 @@ public class SuperDetection<T extends PamDataUnit> extends PamDataUnit<T, SuperD
 		if (subDetections == null) {
 			return null;
 		}
-		for (int i=0; i<subDetections.size(); i++) {
-			T aSub = subDetections.get(i).getSubDetection();
-			if (aSub.getUID() == UID) {
-				return aSub;
+		synchronized (subDetectionSyncronisation) {
+			for (int i=0; i<subDetections.size(); i++) {
+				T aSub = subDetections.get(i).getSubDetection();
+				if (aSub == null) {
+					continue;
+				}
+				if (aSub.getUID() == UID) {
+					return aSub;
+				}
 			}
 		}
 		return null;

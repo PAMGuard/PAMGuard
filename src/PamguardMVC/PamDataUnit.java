@@ -1696,7 +1696,15 @@ abstract public class PamDataUnit<T extends PamDataUnit, U extends PamDataUnit> 
 	 * @return any integer.
 	 */
 	public int getColourIndex() {
-		return (int) getUID();
+		/*
+		 * This can go wrong when UID > 2^31 since the colour choser takes 
+		 * a mod WRT number of whale colours and it doesn't like negative numbers. 
+		 * So need to keep the value going in positive. 
+		 */
+		long uid = getUID();
+		uid -= uid/2^31;
+		return (int) uid;
+//		return (int) getUID();
 	}
 
 	/**
