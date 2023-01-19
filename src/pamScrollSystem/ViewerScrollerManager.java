@@ -699,6 +699,23 @@ public class ViewerScrollerManager extends AbstractScrollManager implements PamS
 			if (aScroller == pamScroller) {
 				continue;
 			}
+			/*
+			 * Can end up with some horrible feedback here if two 
+			 * coupled scrollers bring in rounding errors and start 
+			 * to oscillate each other. 
+			 */
+			long currentVal = aScroller.getValueMillis();
+			long change = Math.abs(value-currentVal);
+			long range = aScroller.getMaximumMillis() - aScroller.getMinimumMillis();
+			if (range == 0) {
+				aScroller.setValueMillis(aScroller.getMinimumMillis());
+				continue;
+			}
+			double fracChange = (double) change / (double) range;
+			if (fracChange <= .0001) {
+				continue;
+			}
+			
 			aScroller.setValueMillis(value);
 		}
 	}

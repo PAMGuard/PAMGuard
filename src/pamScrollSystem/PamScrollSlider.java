@@ -140,6 +140,7 @@ public class PamScrollSlider extends AbstractPamScrollerAWT {
 		valueMillis = Math.max(scrollerData.minimumMillis, Math.min(scrollerData.maximumMillis, valueMillis));
 		int val = (int) ((valueMillis - scrollerData.minimumMillis) / scrollerData.getStepSizeMillis());
 		if (val >= slider.getMinimum() && val <= slider.getMaximum()) {
+//			System.out.printf("Set slider val %d in range %d to %d\n", val, slider.getMinimum(), slider.getMaximum());
 			slider.setValue(val);
 		}
 	}
