@@ -1719,18 +1719,4 @@ abstract public class PamDataUnit<T extends PamDataUnit, U extends PamDataUnit> 
 	public void setEmbryonic(boolean embryonic) {
 		this.embryonic = embryonic;
 	}
-
-	/**
-	 * @return the embryonic
-	 */
-	public boolean isEmbryonic() {
-		return embryonic;
-	}
-
-	/**
-	 * @param embryonic the embryonic to set
-	 */
-	public void setEmbryonic(boolean embryonic) {
-		this.embryonic = embryonic;
-	}
 }
