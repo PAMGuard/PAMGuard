@@ -36,15 +36,25 @@ import pamViewFX.fxNodes.utilityPanes.FreqBandPane;
 import pamViewFX.fxNodes.utilityPanes.PamToggleSwitch;
 import pamViewFX.fxNodes.utilityPanes.SimpleFilterPaneFX;
 import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
-import pamViewFX.validator.PamValidator;
 import pamViewFX.PamGuiManagerFX;
+import pamViewFX.fxGlyphs.PamGlyphDude;
 
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-import PamController.PamController;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
 import PamController.SettingsPane;
+import PamUtils.PamUtils;
 import PamView.PamSymbol;
+import PamView.dialog.PamGridBagContraints;
 import PamView.symbol.SymbolData;
 import clickDetector.ClickClassifiers.basicSweep.CodeHost;
 import clickDetector.ClickClassifiers.basicSweep.SweepClassifier;
@@ -107,11 +117,19 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 	 * Changes the amplitude range
 	 */
 	private AmplitudeBlock amplitudeBlock;
+	
+	
+	/**
+	 * Changes the bearing paramters fro clicks. 
+	 */
+	private BearingBlock bearingBox;
+
 
 	private PamBorderPane mainPane = new PamBorderPane();
 
 
 	public int classifierItemRow;
+
 
 	public SweepClassifierSetPaneFX(SweepClassifier sweepClassifier){
 		super(null);
@@ -135,6 +153,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 		/*********Waveform Tab************/
 		Tab waveformTab=new Tab("Waveform"); 
+		waveformTab.setGraphic(PamGlyphDude.createPamIcon("mdi2w-waveform",	PamGuiManagerFX.iconSize));
 		PamVBox waveformHolder=new PamVBox(5); 
 		waveformHolder.setPadding(new Insets(10,0,0,0));
 
@@ -148,6 +167,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 		/*********Spectrum Tab****************/
 		Tab spectrumTab=new Tab("Spectrum"); 
+		spectrumTab.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chart-bell-curve",	PamGuiManagerFX.iconSize));
 		PamVBox spectrumHolder=new PamVBox(5); 
 
 		energyBox=new EnergyBandBox();
@@ -155,6 +175,19 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		spectrumHolder.getChildren().addAll(energyBox, freqBox); 
 		spectrumHolder.setPadding(new Insets(10,0,0,0));
 		spectrumTab.setContent(spectrumHolder);
+		
+		/*********Spectrum Tab****************/
+		Tab bearingTab=new Tab("Bearing"); 
+		spectrumTab.setGraphic(PamGlyphDude.createPamIcon("mdi2c-compass-outline",	PamGuiManagerFX.iconSize));
+		
+		PamVBox bearingHolder=new PamVBox(5); 
+
+		bearingBox=new BearingBlock();
+		
+		bearingHolder.getChildren().addAll(bearingBox); 
+		bearingHolder.setPadding(new Insets(10,0,0,0));
+		bearingTab.setContent(bearingHolder);
+
 
 		/**********Main Layout**************/
 
@@ -556,12 +589,14 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 				return;
 			}
 			
-			//set the colours. 
-			lineColourPicker.setValue(PamUtilsFX.awtToFXColor(sweepClassifierSet.symbol.getSymbolData().getLineColor()));
-			fillColourPicker.setValue(PamUtilsFX.awtToFXColor(sweepClassifierSet.symbol.getSymbolData().getFillColor()));
-			symbolPicker.setValue(sweepClassifierSet.symbol.getSymbolData().symbol);
-			symbolPicker.setLineColour(lineColourPicker.getValue());
-			symbolPicker.setFillColour(fillColourPicker.getValue());
+			if (sweepClassifierSet.symbol!=null) {
+				//set the colours. 
+				lineColourPicker.setValue(PamUtilsFX.awtToFXColor(sweepClassifierSet.symbol.getSymbolData().getLineColor()));
+				fillColourPicker.setValue(PamUtilsFX.awtToFXColor(sweepClassifierSet.symbol.getSymbolData().getFillColor()));
+				symbolPicker.setValue(sweepClassifierSet.symbol.getSymbolData().symbol);
+				symbolPicker.setLineColour(lineColourPicker.getValue());
+				symbolPicker.setFillColour(fillColourPicker.getValue());
+			}
 
 			//set the click length data
 			lengthTypeBox.getSelectionModel().select(sweepClassifierSet.restrictedBinstype);
@@ -1082,6 +1117,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			pamGridPane.add(searchRange,2,gridy);
 			GridPane.setColumnSpan(searchRange, GridPane.REMAINING);
 
+			
 			gridy++;
 
 			pamGridPane.add(new Label("Smooth"), 1,gridy);
@@ -1090,8 +1126,8 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			smoothing.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 			smoothing.setMaxWidth(100);
 			pamGridPane.add(smoothing, 2,gridy);
-			
 
+			GridPane.setMargin(smoothing, new Insets(0,0,0,5)); //bit of a hack to make sure everything lines up nicely with the frequency pane. 
 			
 			//GridPane.setHgrow(smoothing, Priority.NEVER);
 
@@ -1110,7 +1146,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			pamGridPane.add(new Label("Peak Frequency"),1,gridy);
 
 			peakFreqPane=new FreqBandPane(Orientation.HORIZONTAL);		
-			peakFreqPane.setHgap(0);
+			//peakFreqPane.setHgap(0);
 			peakFreqPane.setBandText("");
 			pamGridPane.add(peakFreqPane,2,gridy);
 			GridPane.setColumnSpan(peakFreqPane, GridPane.REMAINING);
@@ -1128,8 +1164,6 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 				threshold.setDisable(!peakWidthCheckBox.isSelected());
 			});
 			
-			addValidatorFreqCheck(getValidator(), peakFreqPane, "peak width ",  "peak_width");
-
 
 			pamGridPane.add(peakWidthCheckBox,0,gridy);
 			pamGridPane.add(new Label("Peak Width"),1,gridy);
@@ -1138,6 +1172,8 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			peakWidthPane.setBandText("");
 			pamGridPane.add(peakWidthPane,2,gridy);
 			GridPane.setColumnSpan(peakWidthPane, GridPane.REMAINING);
+			
+			addValidatorFreqCheck(getValidator(), peakWidthPane, "peak width ",  "peak_width");
 
 			gridy++;
 
@@ -1146,6 +1182,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			threshold=new PamSpinner<Double>(1., 300., 6.,1.);
 			threshold.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 			threshold.setPrefWidth(100);
+			GridPane.setMargin(threshold, new Insets(0,0,0,5)); //bit of a hack to make sure everything lines up nicely with the frequency pane. 
 
 			pamGridPane.add(threshold,2,gridy); 
 
@@ -1260,13 +1297,13 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 			pamGridPane.add(new Label("to"),2,0);
 
-			final PamSpinner<Integer> zeroCorssingsMax=new PamSpinner<Integer>(0,999999,0,1); 
-			zeroCorssingsMax.setEditable(true);
-			zeroCorssingsMax.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
-			zeroCorssingsMax.setPrefWidth(100);
-			pamGridPane.add(zeroCorssingsMax, 3,0);
+			zeroCrossingsMax=new PamSpinner<Integer>(0,999999,0,1); 
+			zeroCrossingsMax.setEditable(true);
+			zeroCrossingsMax.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
+			zeroCrossingsMax.setPrefWidth(100);
+			pamGridPane.add(zeroCrossingsMax, 3,0);
 
-			this.zeroCrossingsMax=zeroCorssingsMax;
+			//this.zeroCrossingsMax=zeroCorssingsMax;
 
 
 
@@ -1274,7 +1311,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			.dependsOn("minzero", zeroCrossingsMin.valueProperty())
 			.withMethod(c -> {
 				Integer minZero = c.get("minzero"); 
-				if (minZero>=zeroCorssingsMax.getValue() && isPaneShowing()) {
+				if (minZero>=zeroCrossingsMax.getValue() && isPaneShowing()) {
 					c.error("Minimum zero corssing must be less than the maximum zero crossing");
 				}
 			})
@@ -1287,7 +1324,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 
 			getValidator().createCheck()
-			.dependsOn("maxzero", zeroCorssingsMax.valueProperty())
+			.dependsOn("maxzero", zeroCrossingsMax.valueProperty())
 			.withMethod(c -> {
 				try {
 					Integer maxZero = c.get("maxzero"); 
@@ -1299,10 +1336,10 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 					e.printStackTrace();
 				}
 			})
-			.decorates(zeroCorssingsMax)
+			.decorates(zeroCrossingsMax)
 			.immediate();
 
-			GraphicDecoration.updateDecorations(zeroCorssingsMax);
+			GraphicDecoration.updateDecorations(zeroCrossingsMax);
 			//			 
 			//			 zeroCorssingsMax.valueProperty().addListener((obsVal, oldval, newVal)->{
 			//				 getValidator().validate(); //need to make sure the min undecorates if this changes
@@ -1321,7 +1358,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 
 
-			zeroCorssingsMax.valueProperty().addListener((obsVal, oldval, newVal)->{
+			zeroCrossingsMax.valueProperty().addListener((obsVal, oldval, newVal)->{
 				getValidator().validate(); //need to make sure the min undecorates if this changes
 			});
 
@@ -1339,7 +1376,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			.withMethod(c -> {
 				Double minFreq = c.get("minzerofreq"); 
 				if (minFreq>=freqZeroMax.getValue() && isPaneShowing()) {
-					c.error("Minimum frequency must be less than the maximum frequency");
+					c.error("Minimum zero crossingsfrequency be less than the minimum.");
 				}
 			})
 			.decorates(freqZeroMin)
@@ -1356,7 +1393,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			.withMethod(c -> {
 				Double maxZero = c.get("maxzerofreq"); 
 				if (maxZero<=freqZeroMin.getValue() && isPaneShowing()) {
-					c.error("Maxmimum frequency must be greater than the minimum frequency");
+					c.error("Maxmimum zero crossingsfrequency must be greater than the minimum.");
 				}
 			})
 			.decorates(freqZeroMax)
@@ -1512,6 +1549,170 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 		}
 	}
+	
+	/**
+	 * 
+	 * Parameters for testing bearing values. 
+	 * 
+	 * @author Jamie Macaulay
+	 *
+	 */
+	private class BearingBlock extends SweepBox {
+
+		/**
+		 * The minimum correlation value. 
+		 */
+		private JTextField minBearing;
+		
+		/**
+		 * The maximum bearing field
+		 */
+		private JTextField maxBearing;
+		
+		/**
+		 * The enable bearings check box. 
+		 */
+		private JCheckBox enableBearings; 
+
+		/**
+		 * True if using multi-channel data
+		 */
+		boolean multiChan = false;
+
+		/**
+		 * Combo box to select whetrher bearings should be kept or excluded within limits. 
+		 */
+		private JComboBox<String> bearingsExcludeBox;
+
+
+		BearingBlock() {
+			super("Bearings", false);
+			
+			JPanel p = new JPanel();
+			
+			minBearing = new JTextField(5); 
+			maxBearing = new JTextField(5); 
+			
+			bearingsExcludeBox = new JComboBox<String>(); 
+			bearingsExcludeBox.addItem("Include only");
+			bearingsExcludeBox.addItem("Exclude");
+		
+			p.setLayout(new GridBagLayout());
+			GridBagConstraints c = new PamGridBagContraints();
+			
+			c.gridx = 0;
+			addComponent(p, enableBearings, c);
+			c.gridx += c.gridwidth;
+			addComponent(p, bearingsExcludeBox, c);
+			c.gridx += c.gridwidth;
+			addComponent(p, new JLabel("bearings between ", JLabel.RIGHT), c);
+			c.gridx += c.gridwidth;
+			addComponent(p, minBearing, c);
+			c.gridx += c.gridwidth;
+			addComponent(p, new JLabel(" and ", JLabel.RIGHT), c);
+			c.gridx += c.gridwidth;
+			addComponent(p, maxBearing, c);
+			c.gridx += c.gridwidth;
+			addComponent(p, new JLabel("(\u00B0)", JLabel.LEFT), c);
+
+			add(BorderLayout.WEST, p);
+			
+			this.multiChan = checkMultiChan();
+
+		}
+
+		@Override
+		protected void setParams() {
+			sweepClassifierSet.checkBearingAllocation();
+//			setEnableBox(sweepClassifierSet.enableZeroCrossings);
+			enableBearings.setSelected(sweepClassifierSet.enableBearingLims);
+			
+			if (sweepClassifierSet.excludeBearingLims) bearingsExcludeBox.setSelectedIndex(1);
+			else  bearingsExcludeBox.setSelectedIndex(0);
+			
+			this.minBearing.setText(String.format("%3.1f", Math.toDegrees(sweepClassifierSet.bearingLims[0])));
+			this.maxBearing.setText(String.format("%3.1f", Math.toDegrees(sweepClassifierSet.bearingLims[1])));
+			
+			this.multiChan = checkMultiChan();
+		}
+		
+	
+		@Override
+		protected boolean getParams() {
+			if (enableBearings.isSelected()) {
+
+				sweepClassifierSet.enableBearingLims	 = enableBearings.isSelected();
+				sweepClassifierSet.excludeBearingLims	 = bearingsExcludeBox.getSelectedIndex()==1 ? true : false; 
+
+				try {
+					sweepClassifierSet.bearingLims[0] = Math.toRadians(Double.valueOf(minBearing.getText()));
+				}
+				catch (NumberFormatException e) {
+					return showWarning("Invalid minimum correlation value");
+				}
+				
+				try {
+					sweepClassifierSet.bearingLims[1] = Math.toRadians(Double.valueOf(maxBearing.getText()));
+				}
+				catch (NumberFormatException e) {
+					return showWarning("Invalid maximum bearing limits value");
+				}
+			}
+			return true;
+		}
+
+		@Override
+		protected void enableControls() {
+				checkMultiChan();
+			
+				enableBearings.setEnabled(multiChan);
+				bearingsExcludeBox.setEnabled(multiChan);
+				minBearing.setEnabled(multiChan);
+				maxBearing.setEnabled(multiChan);
+			
+				if (!multiChan) return;
+				
+				bearingsExcludeBox.setEnabled(enableBearings.isSelected());
+				minBearing.setEnabled(enableBearings.isSelected());
+				maxBearing.setEnabled(enableBearings.isSelected());
+		}
+
+		@Override
+		protected void disbleControls(boolean disable) {
+			// TODO Auto-generated method stub
+			
+		}
+	}
+
+	
+	/**
+	 * Check whether the click classifier is set up for multi-channel and set 
+	 * the dialog components uprightly
+	 */
+	private boolean checkMultiChan() {
+		boolean multiChan = false; 
+		//do we have multi-channel clicks?
+		if  (clickControl!=null) {
+			int[] chanGroups = clickControl.getClickParameters().getGroupedSourceParameters().getChannelGroups();
+			multiChan = false;
+			
+			if (chanGroups==null) return multiChan; 
+			
+			for (int i=0; i<chanGroups.length; i++) {
+				int chans = clickControl.getClickParameters().getGroupedSourceParameters().getGroupChannels(i);
+//				Debug.out.println("Check multi-channel: " + chanGroups[i] + "  num: " + PamUtils.getNumChannels(chans));
+				if (PamUtils.getNumChannels(chans)>1) {
+					multiChan = true;
+					break; 
+				}
+			}
+		}
+		else multiChan = true;
+//		Debug.out.println("Check multi-channel: " + multiChan);
+		
+		return multiChan; 
+	}
+
 
 	/**~*main set and get params functions***/	
 
@@ -1573,7 +1774,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 	
 	
 	/**
-	 * Add a validator check to the frequency band pane to prevent minimum and maximum frequencies being above or below themsleves and 
+	 * Add a validator check to the frequency band pane to prevent minimum and maximum frequencies being above or below themselves and 
 	 * the maximum frequency being above Nyquist. 
 	 * @param freqBandPane - the frequency band pane. 
 	 * @param name - the name for user interface
