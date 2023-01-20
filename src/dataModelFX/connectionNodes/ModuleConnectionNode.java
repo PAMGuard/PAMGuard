@@ -619,9 +619,11 @@ public class ModuleConnectionNode extends StandardConnectionNode implements PAMC
 		
 		//add tool tip
 		if (pamControlledUnit!=null){
-			Tooltip tp = new Tooltip(pamControlledUnit.getUnitType());
-			tp.getStyleClass().removeAll(tp.getStyleClass());
-			Tooltip.install(this, tp);
+			
+			//sometimes seems to cause an issue woith dialogs disappearing. 
+//			Tooltip tp = new Tooltip(pamControlledUnit.getUnitType());
+//			tp.getStyleClass().removeAll(tp.getStyleClass());
+//			Tooltip.install(this, tp);
 			
 			//if no way for input then remove socket.
 			if (!hasInput(pamControlledUnit)){

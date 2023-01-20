@@ -1422,6 +1422,7 @@ Text {
   -color-cell-bg-odd: -color-bg-subtle;
   -color-cell-border: -color-border-default;
   -fx-border-color: -color-cell-border;
+  -fx-control-inner-background: -color-bg-default;
   -fx-border-width: 1px;
   -fx-border-radius: 0;
   -color-header-bg: -color-bg-subtle;
@@ -3703,4 +3704,20 @@ Text {
 
 #label-title2 {
     -fx-font: bold 13pt  -fx-font-family;
+  }
+
+/*******************************************************************************
+ *                                                                             *
+ * Label                                                                      *
+ *                                                                             *
+ ******************************************************************************/
+
+
+.validatorfx-error {
+  -fx-text-fill: rgb(164, 0, 0);  
+}
+
+.validatorfx-warning {
+  -fx-text-fill: rgb(196, 160, 0);  
+}
 }

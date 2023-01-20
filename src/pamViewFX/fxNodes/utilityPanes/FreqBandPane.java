@@ -14,6 +14,8 @@ import pamViewFX.fxNodes.PamSpinner;
  */
 public class FreqBandPane extends PamGridPane {
 	
+	private final static double FREQ_SPINNER_WIDTH= 130; 
+	
 
 	/**
 	 * High pass spinner.
@@ -23,7 +25,7 @@ public class FreqBandPane extends PamGridPane {
 	/**
 	 * Low pass frequency spinner.
 	 */
-	private Spinner<Double> lowPassFreq;
+	private PamSpinner<Double> lowPassFreq;
 
 	/**
 	 * Layout of the pane- either horizontal or vertical
@@ -65,14 +67,14 @@ public class FreqBandPane extends PamGridPane {
 		this.setHgap(5);
 		this.setVgap(5);
 	
-		highPassFreq=new PamSpinner<Double>(10.,500000.,1000.,2000.);
+		highPassFreq=new PamSpinner<Double>(0.,500000.,1000.,2000.);
 		highPassFreq.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
-		highPassFreq.getValueFactory().valueProperty().addListener((obs, before, after)->{
-			if (after>=lowPassFreq.getValue()) lowPassFreq.getValueFactory().setValue(Math.min(sampleRate/2.,highPassFreq.getValue()+100)); 
-			if (after>sampleRate/2.) highPassFreq.getValueFactory().setValue(sampleRate/2.); 
-		});
+//		highPassFreq.getValueFactory().valueProperty().addListener((obs, before, after)->{
+//			if (after>=lowPassFreq.getValue()) lowPassFreq.getValueFactory().setValue(Math.min(sampleRate/2.,highPassFreq.getValue()+100)); 
+//			if (after>sampleRate/2.) highPassFreq.getValueFactory().setValue(sampleRate/2.); 
+//		});
 		highPassFreq.setEditable(true);
-		//highPassFreq.setPrefWidth(140);
+		highPassFreq.setMinWidth(FREQ_SPINNER_WIDTH);
 		
 		//highCut.setPrefColumnCount(6);
 		if (orientation==Orientation.VERTICAL){
@@ -86,15 +88,15 @@ public class FreqBandPane extends PamGridPane {
 			this.add(highPassHzLabel=new Label("Hz"), 2, 0);
 		}
 
-		lowPassFreq=new PamSpinner<Double>(1.,500000.,2000.,2000.);
+		lowPassFreq=new PamSpinner<Double>(0.,500000.,2000.,2000.);
 		lowPassFreq.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
-		lowPassFreq.getValueFactory().valueProperty().addListener((obs, before, after)->{
-			if (after<=highPassFreq.getValue()) highPassFreq.getValueFactory().setValue(Math.min(0,lowPassFreq.getValue()-100));
-			if (after>sampleRate/2.) lowPassFreq.getValueFactory().setValue(sampleRate/2.); 
-			
-		});
+//		lowPassFreq.getValueFactory().valueProperty().addListener((obs, before, after)->{
+//			if (after<=highPassFreq.getValue()) highPassFreq.getValueFactory().setValue(Math.min(0,lowPassFreq.getValue()-100));
+//			if (after>sampleRate/2.) lowPassFreq.getValueFactory().setValue(sampleRate/2.); 
+//			
+//		});
 		lowPassFreq.setEditable(true);
-		//lowPassFreq.setPrefWidth(140);
+		lowPassFreq.setMinWidth(FREQ_SPINNER_WIDTH);
 
 		
 		if (orientation==Orientation.VERTICAL){

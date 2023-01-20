@@ -91,7 +91,8 @@ public class DataTransformPaneFactory {
 		case SPECTROGRAM:
 			settingsPane = new FFTTransformPane((SimpleTransform) dlTransfrom, new String[]{"FFT Length ", "FFT Hop"},  new String[]{"", ""}); 
 //			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 4, Integer.MAX_VALUE,   4);
-			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(1, 4, Integer.MAX_VALUE,   4);
+			
+			((FFTTransformPane) settingsPane).setSpinnerMinMaxValues(1, 4, Integer.MAX_VALUE,   4);
 //			//make an FFT spinner here with doubling FFT lengths - DOES NOT WORK FOR SOME REASON...
 //			((SimpleTransformPane) settingsPane).getSpinners().get(0).setValueFactory(new SpinnerValueFactory.ListSpinnerValueFactory<>(createStepList()));
 //			((SimpleTransformPane) settingsPane).getSpinners().get(0).getValueFactory().setValue(4);

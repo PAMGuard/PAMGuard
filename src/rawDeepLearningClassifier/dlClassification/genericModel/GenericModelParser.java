@@ -283,6 +283,8 @@ public class GenericModelParser {
 			classNames[i]=classNames[i].trim(); //remove whitespace
 
 		}
+		
+		paramsClone.numClasses = classNames.length;
 
 		
 		if (classNameManager!=null) {

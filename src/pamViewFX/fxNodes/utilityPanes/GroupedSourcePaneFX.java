@@ -17,6 +17,7 @@ import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxNodes.PamGridPane;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamVBox;
+import pamViewFX.validator.PamValidator;
 import PamUtils.PamUtils;
 import PamView.GroupedSourceParameters;
 import PamguardMVC.PamConstants;
@@ -76,7 +77,7 @@ public class GroupedSourcePaneFX extends SourcePaneFX {
 	@Override
 	protected void createPanel() {
 		
-		channelValidator = new Validator();
+		channelValidator = new PamValidator();
 		
 		sourcePane=new PamGridPane();
 		sourcePane.setVgap(5);
