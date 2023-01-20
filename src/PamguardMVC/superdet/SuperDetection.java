@@ -278,23 +278,28 @@ public class SuperDetection<T extends PamDataUnit> extends PamDataUnit<T, SuperD
 	 * @return an array list of sub detection data units
 	 */
 	public ArrayList<PamDataUnit<?,?>> getSubDetections() {
-		if (subDetections == null) {
-			return null;
-		}
-		ArrayList<PamDataUnit<?,?>> subDets = new ArrayList<>(getSubDetectionsCount());
-		for (SubdetectionInfo<T> subInfo:subDetections) {
-			T subDet = subInfo.getSubDetection();
-			if (subDet == null) {
-				continue;
+		synchronized (getSubDetectionSyncronisation()) {
+			if (subDetections == null) {
+				return null;
 			}
-			subDets.add(subDet);
+			ArrayList<PamDataUnit<?,?>> subDets = new ArrayList<>(getSubDetectionsCount());
+			for (SubdetectionInfo<T> subInfo:subDetections) {
+				T subDet = subInfo.getSubDetection();
+				if (subDet == null) {
+					continue;
+				}
+				subDets.add(subDet);
+			}
+			return subDets;
 		}
-		return subDets;
 	}
 
 	public T getSubDetection(int ind) {
 		synchronized (subDetectionSyncronisation) {
 			if (subDetections == null) return null;
+			if (ind >= subDetections.size()) {
+				return null;
+			}
 			return subDetections.get(ind).getSubDetection();
 		}
 	}
@@ -484,6 +489,24 @@ public class SuperDetection<T extends PamDataUnit> extends PamDataUnit<T, SuperD
 //		}
 		
 	}
+	
+	/**
+	 * Get a list of sub detections which are actually present. 
+	 * @return list of sub detections which have a non-null sub data unit. 
+	 */
+	public List<SubdetectionInfo<T>> getPresentSubDetections() {
+		ArrayList<SubdetectionInfo<T>> exList = new ArrayList<>(getSubDetectionsCount());
+		synchronized (getSubDetectionSyncronisation()) {
+			for (SubdetectionInfo<T> subInf : subDetections) {
+				if (subInf.getSubDetection() == null) {
+					continue;
+				}
+				exList.add(subInf);
+			}
+			exList.trimToSize();
+		}
+		return exList;
+	}
 
 	/**
 	 * Get the full list of subdetection info's (which may not all 
@@ -549,5 +572,22 @@ public class SuperDetection<T extends PamDataUnit> extends PamDataUnit<T, SuperD
 			subInf.setSubDetection(null);
 		}
 	}
+
+	/**
+	 * Remove sub detection infos which have no actual sub detection 
+	 * loaded. Don't use since super dets are supposed to keep the full 
+	 * list even if they don't have loaded subdets. 
+	 */
+//	public void weedMissingSubDetections() {
+//		synchronized (getSubDetectionSyncronisation()) {
+//			ListIterator<SubdetectionInfo<T>> subInfIter = subDetections.listIterator();
+//			while (subInfIter.hasNext()) {
+//				SubdetectionInfo<T> subDetInfo = subInfIter.next();
+//				if (subDetInfo.getSubDetection() == null) {
+//					subInfIter.remove();
+//				}
+//			}
+//		}
+//	}
 
 }

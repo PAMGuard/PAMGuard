@@ -191,9 +191,9 @@ public class ViewerScrollerManager extends AbstractScrollManager implements PamS
 	 */
 	private void loadDataQueueItem(DataLoadQueData dataLoadQueData, int queuePosition, ViewLoadObserver loadObserver) {
 		PamDataBlock dataBlock = dataLoadQueData.getPamDataBlock();
-		if (dataBlock instanceof OfflineEventDataBlock) {
-			System.out.println(dataBlock);
-		}
+//		if (dataBlock instanceof OfflineEventDataBlock) {
+//			System.out.println("in loadDataQueueItem" + dataBlock);
+//		}
 		
 		// 2019-11-12 add a check of the counts to this 'if' statement as well.  If the data start time is negative
 		// (which can indicate that this is a 'special' data block and we should be loading all of it rather than just

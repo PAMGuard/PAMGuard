@@ -159,21 +159,20 @@ public class TMGroupLocInfo implements GroupLocInfo {
 	
 	
 	private void copySubDetections(SuperDetection parentDataUnit, DetectionGroupOptions detectionGroupOptions) {
-		synchronized (parentDataUnit.getSubDetectionSyncronisation()) {
-			int totalUnits = parentDataUnit.getSubDetectionsCount();
-			int keptUnits = totalUnits;
-			if (detectionGroupOptions != null) {
-				if (detectionGroupOptions.getMaxLocalisationPoints() == 0 ||			
-						detectionGroupOptions.getMaxLocalisationPoints() < parentDataUnit.getSubDetectionsCount()) {
-					keptUnits = detectionGroupOptions.getMaxLocalisationPoints();
-				}
+		ArrayList<PamDataUnit> subDets = parentDataUnit.getSubDetections();
+		int totalUnits = subDets.size();
+		int keptUnits = totalUnits;
+		if (detectionGroupOptions != null) {
+			if (detectionGroupOptions.getMaxLocalisationPoints() == 0 ||			
+					detectionGroupOptions.getMaxLocalisationPoints() < parentDataUnit.getSubDetectionsCount()) {
+				keptUnits = detectionGroupOptions.getMaxLocalisationPoints();
 			}
-			subDetectionList = new Vector<>(keptUnits);
-			float keepRat = (float) (totalUnits-1) / (float) (keptUnits-1);
-			for (int i = 0; i < keptUnits; i++) {
-				int unitIndex = Math.round(i*keepRat);
-				subDetectionList.add(parentDataUnit.getSubDetection(unitIndex));
-			}
+		}
+		subDetectionList = new Vector<>(keptUnits);
+		float keepRat = (float) (totalUnits-1) / (float) (keptUnits-1);
+		for (int i = 0; i < keptUnits; i++) {
+			int unitIndex = Math.round(i*keepRat);
+			subDetectionList.add(subDets.get(unitIndex));
 		}
 	}
 
@@ -454,7 +453,7 @@ public class TMGroupLocInfo implements GroupLocInfo {
 	 * The real word vectors are relative to the earth surface. Thus they are the bearings vectors 
 	 * from an array, rotated by the true heading, pitch and roll of the array.  
 	 */
-	protected void calculateWorldVectors() {		
+	protected void calculateWorldVectors() {	
 		int nSubDetections=getDetectionCount();
 		rawRealWorldVectors = new PamVector[nSubDetections][];
 		PamVector[] v;
