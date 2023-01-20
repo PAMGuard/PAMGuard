@@ -1511,7 +1511,7 @@ public class ClickDetection extends PamDataUnit<PamDataUnit, PamDataUnit> implem
 	 * @param iCI the iCI to set
 	 */
 	public void setICI(double iCI) {
-		ICI = iCI;
+		this.ICI = iCI;
 	}
 
 	protected void setChannelGroupDetector(ChannelGroupDetector channelGroupDetector) {

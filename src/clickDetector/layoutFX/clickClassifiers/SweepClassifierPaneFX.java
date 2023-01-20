@@ -39,11 +39,11 @@ public class SweepClassifierPaneFX extends BasicIdentifierPaneFX {
 	public void setClassifierPane(ClickTypeProperty clickTypeProperty){
 		SweepClassifierSetPaneFX sweepPane=new SweepClassifierSetPaneFX(sweepClickClassifier);
 	
+		
 		//make it so the title of the pane is the same as the name as the classifier
 		getFlipPane().getAdvLabel().textProperty().unbind();
 		getFlipPane().getAdvLabel().textProperty().bind(	sweepPane.getNameTextProperty());
 		
-		//System.out.println("sweepPane.classifierItemRow: " + sweepPane.classifierItemRow);
 		sweepPane.classifierItemRow = sweepClickClassifier.getSweepClassifierParams().getSetRow((SweepClassifierSet) clickTypeProperty.getClickType());
 		
 		sweepPane.setParams(clickTypeProperty);
@@ -62,6 +62,7 @@ public class SweepClassifierPaneFX extends BasicIdentifierPaneFX {
 	public void setParams() {
 		
 		sweepIdParameters = sweepClickClassifier.getSweepClassifierParams().clone();
+		
 
 		//change the table
 		tableDataChanged();
@@ -79,6 +80,7 @@ public class SweepClassifierPaneFX extends BasicIdentifierPaneFX {
 		for (int i=0; i<getClickClassifiers().size() ;i++){
 			sweepClickClassifier.getSweepClassifierParams().addSet((SweepClassifierSet) getClickClassifiers().get(i).getClickType());
 		}
+		
 
 		return true;
 	}

@@ -27,7 +27,11 @@ public class SimpleAlarmCounter extends AlarmCounter {
 
 	@Override
 	public double getValue(int countType, PamDataUnit dataUnit) {
-		return 1;
+		if (dataSelector == null) {
+			return 1;
+		}
+		double val = dataSelector.scoreData(dataUnit);
+		return val;
 	}
 
 	@Override
