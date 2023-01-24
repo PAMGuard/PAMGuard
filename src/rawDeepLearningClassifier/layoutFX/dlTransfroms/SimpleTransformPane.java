@@ -89,7 +89,7 @@ public class SimpleTransformPane extends DLTransformPane {
 
 		int row = 0; 
 		int column = 0; 
-		if  (simpleTransfrom.getParams()!=null) {
+//		if  (simpleTransfrom.getParams()!=null) {
 			for (int i=0; i<paramNames.length; i++) {
 				if (i%nParamCol == 0 && i!=0) {
 					row++; 
@@ -117,8 +117,7 @@ public class SimpleTransformPane extends DLTransformPane {
 
 				//System.out.println("New line: " + i + "  " + nParamCol + "  " +  i%nParamCol); 
 			}
-
-		}
+//		}
 		
 		TitledPane titledPane = new TitledPane(simpleTransfrom.getDLTransformType().toString(), gridPane); 
 
@@ -190,8 +189,8 @@ public class SimpleTransformPane extends DLTransformPane {
 		SimpleTransform simpleTransform = (SimpleTransform) currParams;
 
 		//Set the new numbers
-		Number[] params = new Number[simpleTransform.getParams().length]; 
-		for (int i=0; i<simpleTransform.getParams().length; i++) {
+		Number[] params = new Number[spinners.size()]; 
+		for (int i=0; i<spinners.size(); i++) {
 			params[i] = spinners.get(i).getValue(); 
 		}
 
@@ -207,6 +206,11 @@ public class SimpleTransformPane extends DLTransformPane {
 	public void setParams(DLTransform input) {
 
 		SimpleTransform simpleTransform = (SimpleTransform) input;
+		
+		if (simpleTransform.getParams()==null) {
+			System.err.println("SimpleTransformPane: params for " + simpleTransform.getDLTransformType() + " are null - maybe backwards compatibility issue ");
+			simpleTransform.setParams(((SimpleTransform)DLTransformsFactory.makeDLTransform(simpleTransform.getDLTransformType(), 1000)).getParams());
+		}
 		
 		//System.out.println("Transform type: " + simpleTransform.getDLTransformType() + " " + simpleTransform.getParams().length + "  " + spinners.size());
 		

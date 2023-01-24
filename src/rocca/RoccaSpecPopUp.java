@@ -451,7 +451,7 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
             for(int currentFreqBin = 0; currentFreqBin < fftVals.length(); currentFreqBin++) {
                 rawAmp = fftVals.magsq(currentFreqBin);
                 dB = daq.fftAmplitude2dB(rawAmp,
-                        channelMap,
+                        PamUtils.getLowestChannel(channelMap),
                         fftData.getSampleRate(),
                         fftLength,
                         true,

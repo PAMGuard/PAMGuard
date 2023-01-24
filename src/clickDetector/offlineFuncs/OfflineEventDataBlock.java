@@ -284,5 +284,17 @@ public class OfflineEventDataBlock extends SuperDetDataBlock<OfflineEventDataUni
 		return (clickDetector.getClickDataBlock() == subDataBlock || clickDetector.getTrackedClicks() == subDataBlock);
 	}
 
+//	int nName = 0;
+//	@Override
+//	public String getDataName() {
+//		// TODO Auto-generated method stub
+//		System.out.println("Call into getDataName " + ++nName);
+//		if (nName == 58) {
+//
+//			System.out.println("Call into getDataName " + ++nName);
+//		}
+//		return super.getDataName();
+//	}
+
 }
 	

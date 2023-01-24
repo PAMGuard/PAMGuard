@@ -91,6 +91,7 @@ public class ColourScheme implements Serializable, Cloneable {
 		}
 		// avoid overflows. 
 		int nCol = whaleColors.length - 1;
+//		iCol = Math.abs(iCol);
 		iCol = ((iCol-1)%nCol) + 1;
 		if (iCol < 0) {
 			return whaleColors[0];

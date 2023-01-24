@@ -191,9 +191,9 @@ public class ViewerScrollerManager extends AbstractScrollManager implements PamS
 	 */
 	private void loadDataQueueItem(DataLoadQueData dataLoadQueData, int queuePosition, ViewLoadObserver loadObserver) {
 		PamDataBlock dataBlock = dataLoadQueData.getPamDataBlock();
-		if (dataBlock instanceof OfflineEventDataBlock) {
-			System.out.println(dataBlock);
-		}
+//		if (dataBlock instanceof OfflineEventDataBlock) {
+//			System.out.println("in loadDataQueueItem" + dataBlock);
+//		}
 		
 		// 2019-11-12 add a check of the counts to this 'if' statement as well.  If the data start time is negative
 		// (which can indicate that this is a 'special' data block and we should be loading all of it rather than just
@@ -699,6 +699,23 @@ public class ViewerScrollerManager extends AbstractScrollManager implements PamS
 			if (aScroller == pamScroller) {
 				continue;
 			}
+			/*
+			 * Can end up with some horrible feedback here if two 
+			 * coupled scrollers bring in rounding errors and start 
+			 * to oscillate each other. 
+			 */
+			long currentVal = aScroller.getValueMillis();
+			long change = Math.abs(value-currentVal);
+			long range = aScroller.getMaximumMillis() - aScroller.getMinimumMillis();
+			if (range == 0) {
+				aScroller.setValueMillis(aScroller.getMinimumMillis());
+				continue;
+			}
+			double fracChange = (double) change / (double) range;
+			if (fracChange <= .0001) {
+				continue;
+			}
+			
 			aScroller.setValueMillis(value);
 		}
 	}

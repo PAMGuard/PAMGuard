@@ -1,9 +1,13 @@
 package targetMotionOld;
 
 import pamMaths.PamVector;
+
+import java.util.List;
+
 import PamDetection.AbstractLocalisation;
 import PamUtils.LatLong;
 import PamguardMVC.PamDataUnit;
+import PamguardMVC.superdet.SubdetectionInfo;
 import PamguardMVC.superdet.SuperDetection;
 import Stats.LinFit;
 
@@ -74,12 +78,18 @@ public class EventRotator {
 	private double[] rotatedArrayAngles;
 
 	private int referenceHydrophones;
+
+	/**
+	 * List of present (actual sub detection is not null) sub detections. 
+	 */
+	private List<SubdetectionInfo<PamDataUnit>> subDetections;
 	/**
 	 * @param pamDetection
 	 */
 	public EventRotator(SuperDetection pamDetection) {
 		super();
 		this.pamDetection = pamDetection;
+		this.subDetections = pamDetection.getPresentSubDetections();
 		rotatedWorldVectors = null;
 		calculateMetrePoints();
 	}
@@ -90,14 +100,14 @@ public class EventRotator {
 	 */
 	private void calculateMetrePoints() {
 		lastUpdateTime = pamDetection.getLastUpdateTime();
-		nSubDetections = pamDetection.getSubDetectionsCount();
+		nSubDetections = subDetections.size();
 		subDetectionOrigins = new PamVector[nSubDetections];
 		subDetectionHeadings = new PamVector[nSubDetections];
 		pointTimes = new long[nSubDetections];
 		if (nSubDetections == 0) {
 			return;
 		}
-		PamDataUnit pd = pamDetection.getSubDetection(0);
+		PamDataUnit pd = subDetections.get(0).getSubDetection();
 		if (pd == null) {
 			return;
 		}
@@ -110,7 +120,10 @@ public class EventRotator {
 		LatLong detOrigin;
 
 		for (int i = 0; i < nSubDetections; i++) {
-			pd = pamDetection.getSubDetection(i);
+			pd = subDetections.get(i).getSubDetection();
+			if (pd == null) {
+				continue;
+			}
 			localisation = pd.getLocalisation();
 			if (localisation == null) {
 				continue;
@@ -152,6 +165,9 @@ public class EventRotator {
 		rotatedOrigins = new PamVector[nSubDetections];
 		rotatedHeadings = new PamVector[nSubDetections];
 		for (int i = 0; i < nSubDetections; i++) {
+			if (subDetectionOrigins[i] == null) {
+				continue;
+			}
 			subDetectionHeadings[i] = new PamVector(Math.cos(Math.PI/2-rotatedArrayAngles[i]), Math.sin(Math.PI/2-rotatedArrayAngles[i]), 0);
 			rotatedOrigins[i] = subDetectionOrigins[i].rotate(-referenceAngle);
 			rotatedArrayAngles[i] = Math.PI/2. - rotatedArrayAngles[i];
@@ -170,7 +186,7 @@ public class EventRotator {
 		PamDataUnit pd;
 		AbstractLocalisation localisation;
 		for (int i = 0; i < nSubDetections; i++) {
-			pd = pamDetection.getSubDetection(i);
+			pd = subDetections.get(i).getSubDetection();
 			localisation = pd.getLocalisation();
 			if (localisation == null) {
 				continue;
@@ -187,7 +203,7 @@ public class EventRotator {
 		PamDataUnit pd;
 		AbstractLocalisation localisation;
 		for (int i = 0; i < nSubDetections; i++) {
-			pd = pamDetection.getSubDetection(i);
+			pd = subDetections.get(i).getSubDetection();
 			localisation = pd.getLocalisation();
 			if (localisation == null) {
 				continue;

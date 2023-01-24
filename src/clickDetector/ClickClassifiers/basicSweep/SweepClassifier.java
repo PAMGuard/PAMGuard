@@ -412,7 +412,7 @@ public class SweepClassifier implements ClickIdentifier , PamSettings {
 	}
 
 	@Override
-	public ClassifyPaneFX getClassifierPane() {
+	public SweepClassifierPaneFX getClassifierPane() {
 		if (fxPane==null) fxPane = new SweepClassifierPaneFX(this, clickControl);
 		return fxPane;
 	}
