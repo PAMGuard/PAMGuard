@@ -436,7 +436,7 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		recorderSettings = ((RecorderSettings) pamControlledUnitSettings.getSettings()).clone();
-		newParams();
+		
 		/*
 		 * Then check to see if there is a command line override of the currently stored folder name. 
 		 */
@@ -450,6 +450,8 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 				System.err.println("Unable to set recording storage folder " + globFolder);
 			}
 		}
+		
+		newParams();
 		return true;
 	}
 

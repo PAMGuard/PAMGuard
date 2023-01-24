@@ -23,10 +23,12 @@ import javax.swing.SwingWorker;
 
 import networkTransfer.emulator.NetworkEmulator;
 import networkTransfer.receive.NetworkReceiver;
+import pamguard.GlobalArguments;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import Acquisition.FolderInputSystem;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
@@ -44,6 +46,11 @@ import PamguardMVC.PamDataBlock;
  *
  */
 public class NetworkSender extends PamControlledUnit implements PamSettings {
+	
+	public static final String ADDRESS = "-newSend.address";
+	public static final String PORT = "-netSend.port";
+	public static final String ID1 = "-netSend.id1";
+	public static final String ID2 = "-netSend.id2";
 
 	protected NetworkSendParams networkSendParams = new NetworkSendParams();
 	private NetworkEmulator networkEmulator;
@@ -169,6 +176,28 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 	public boolean restoreSettings(
 			PamControlledUnitSettings pamControlledUnitSettings) {
 		networkSendParams = ((NetworkSendParams) pamControlledUnitSettings.getSettings()).clone();
+		
+		String address = GlobalArguments.getParam(ADDRESS);
+		String portString = GlobalArguments.getParam(ADDRESS);
+		String id1String = GlobalArguments.getParam(ID1);
+		String id2String = GlobalArguments.getParam(ID2);
+	
+		if (address != null) {
+			networkSendParams.ipAddress = address; // remember it. 
+		}
+		
+		if(portString != null) {
+			networkSendParams.portNumber = Integer.valueOf(portString);
+		}
+		
+		if(id1String!=null) {
+			networkSendParams.stationId1 = Integer.valueOf(id1String);
+		}
+		
+		if(id2String!=null) {
+			networkSendParams.stationId1 = Integer.valueOf(id2String);
+		}
+		
 		return (networkSendParams != null);
 	}
 
