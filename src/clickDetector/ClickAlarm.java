@@ -31,7 +31,6 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 
-import PamController.PamController;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
@@ -130,9 +129,6 @@ public class ClickAlarm implements Comparable<ClickAlarm>, Serializable, Cloneab
         String clipFile = null;
         URL clipURL = null;
 
-        if(PamController.getInstance().getRunMode()==PamController.RUN_NOTHING) {
-    		return false;
-    	}
         /* Create a URL that points to our file.  If we're using the default ding,
          * generate the URL from the clipFile location since the default ding
          * is included in the jar package.  If we're using a user-selected wav,
