@@ -11,6 +11,8 @@ import javax.swing.JMenuItem;
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamguardMVC.PamDataBlock;
+import nilus.Deployment;
+import nilus.Deployment.Instrument;
 import tethys.output.StreamExportParams;
 import tethys.output.TethysExportParams;
 import tethys.output.swing.TethysExportDialog;
@@ -55,6 +57,19 @@ public class TethysControl extends PamControlledUnit {
 	 */
 	public TethysExportParams getTethysExportParams() {
 		return tethysExportParams;
+	}
+	
+	/**
+	 * Get a nilus deployment document, as full populated as possible. 
+	 * @return
+	 */
+	public Deployment getDeployment() {
+		Deployment deployment = new Deployment();
+		Deployment.Instrument instrument = new Instrument();
+//		instrument.
+//		deployment.
+		
+		return null;
 	}
 
 	/**
