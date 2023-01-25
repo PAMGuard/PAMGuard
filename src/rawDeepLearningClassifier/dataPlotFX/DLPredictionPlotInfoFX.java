@@ -22,6 +22,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import rawDeepLearningClassifier.DLControl;
+import rawDeepLearningClassifier.dlClassification.DLClassName;
 import rawDeepLearningClassifier.dlClassification.DLDataUnit;
 
 /**
@@ -79,6 +80,16 @@ public class DLPredictionPlotInfoFX extends GenericLinePlotInfo {
 		probabilityScaleInfo = new GenericScaleInfo(-0.1, 1.1, ParameterType.PROBABILITY, ParameterUnits.PROBABILITY);
 
 		frequencyInfo = new GenericScaleInfo(0, 1, ParameterType.FREQUENCY, ParameterUnits.HZ);
+		
+		DLClassName[] classNames = getDlControl().getDLModel().getClassNames();
+
+		//make sure this is initialised otherwise the plot won't work when first created. 
+		if (dlPredParams.lineInfos==null ) dlPredParams.lineInfos = new LineInfo[classNames.length];
+		for (int i=0; i<classNames.length; i++) {
+			if (dlPredParams.lineInfos[i]==null) {
+				dlPredParams.lineInfos[i] = new LineInfo(true, Color.rgb(0, 0, 255%(i*30 + 50)));
+			}
+		}
 
 		addScaleInfo(probabilityScaleInfo);
 		addScaleInfo(frequencyInfo);

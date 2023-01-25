@@ -1,6 +1,7 @@
 package rawDeepLearningClassifier.dlClassification.ketos;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import org.jamdev.jdl4pam.ketos.KetosModel;
@@ -15,6 +16,7 @@ import PamModel.PamModel.PluginClassloader;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
+import rawDeepLearningClassifier.dlClassification.genericModel.PamGenericModel;
 
 /**
  * 
@@ -30,7 +32,12 @@ public class KetosWorker extends DLModelWorker<KetosResult> {
 	/**
 	 * The ketos model 
 	 */
-	private KetosModel ketosModel; 
+	private KetosModel ketosModel;
+	
+	/**
+	 * Thelast loaded model path., 
+	 */
+	private String currentPath; 
 
 
 	/**
@@ -56,7 +63,15 @@ public class KetosWorker extends DLModelWorker<KetosResult> {
 				Thread.currentThread().setContextClassLoader(newCL);
 			}
 			//first open the model and get the correct parameters. 
-			ketosModel = new KetosModel(new File(ketosDLParams.modelPath)); 
+			//21/11/2022 - Added a null and filename check here to stop the mdoel reloading everytime PAMGuard hits a new file or 
+			//is stopped or started - this was causing a memory leak. 
+			if (ketosModel==null || currentPath ==null || !Paths.get(currentPath).equals(Paths.get(ketosDLParams.modelPath))) {
+				//System.out.println(Paths.get(genericParams.modelPath)); 
+				this.currentPath = ketosDLParams.modelPath; 
+				ketosModel = new KetosModel(new File(ketosDLParams.modelPath)); 
+				//System.out.println("LOAD A NEW MODEL: "); 
+				//System.out.println(genericModel.getModel().getModelPath().getFileName()); 
+			}
 		}
 		catch (Exception e) {
 			e.printStackTrace();

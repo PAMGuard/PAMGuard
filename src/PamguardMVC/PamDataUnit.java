@@ -150,6 +150,13 @@ abstract public class PamDataUnit<T extends PamDataUnit, U extends PamDataUnit> 
 	 */
 	private boolean forceAmpRecalc = false;
 
+	/**
+	 * Flag to say that this is data under development. If this is set true
+	 * then when the data are added to the datablock, they will not get saved
+	 * to the binary store. They will get saved on the first update AFTER the 
+	 * embryonic flag is set false. 
+	 */
+	private boolean embryonic = false;
 
 
 	/**
@@ -1689,6 +1696,27 @@ abstract public class PamDataUnit<T extends PamDataUnit, U extends PamDataUnit> 
 	 * @return any integer.
 	 */
 	public int getColourIndex() {
-		return (int) getUID();
+		/*
+		 * This can go wrong when UID > 2^31 since the colour chooser takes 
+		 * a mod WRT number of whale colours and it doesn't like negative numbers. 
+		 * So need to keep the value going in positive. 
+		 */
+		long uid = getUID();
+		uid &= 0x7FFFFFFF; // avoid anything in top bit of an int32 or higher
+		return (int) uid;
+	}
+
+	/**
+	 * @return the embryonic
+	 */
+	public boolean isEmbryonic() {
+		return embryonic;
+	}
+
+	/**
+	 * @param embryonic the embryonic to set
+	 */
+	public void setEmbryonic(boolean embryonic) {
+		this.embryonic = embryonic;
 	}
 }

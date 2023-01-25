@@ -1,5 +1,7 @@
 package rawDeepLearningClassifier.dlClassification.genericModel;
 
+import java.nio.file.Paths;
+
 import org.apache.commons.io.FilenameUtils;
 import org.jamdev.jdl4pam.genericmodel.GenericModel;
 import org.jamdev.jdl4pam.transforms.DLTransform;
@@ -69,8 +71,22 @@ public class GenericModelWorker extends DLModelWorker<GenericPrediction> {
 //				Thread.currentThread().setContextClassLoader(newCL);
 //			}
 			
-			//first open the model and get the correct parameters. 
-			genericModel = new PamGenericModel(genericParams.modelPath); 
+//			if (genericModel!=null) {
+//					System.out.println(Paths.get(genericModel.getModel().getName())); 
+//					System.out.println(Paths.get(genericParams.modelPath)); 
+//					System.out.println(Paths.get(genericModel.getModel().getName()).equals(Paths.get(genericParams.modelPath)));
+//			}
+			
+			//first open the model and get the correct parameters.
+			//21/11/2022 - Added a null and filename check here to stop the mdoel reloading everytime PAMGuard hits a new file or 
+			//is stopped or started - this was causing a memory leak. 
+			if (genericModel==null || !Paths.get(genericModel.getModel().getName()).equals(Paths.get(genericParams.modelPath))) {
+				//System.out.println(Paths.get(genericParams.modelPath)); 
+				genericModel = new PamGenericModel(genericParams.modelPath); 
+
+				//System.out.println("LOAD A NEW MODEL: "); 
+				//System.out.println(genericModel.getModel().getModelPath().getFileName()); 
+			}
 			
 			//is this a waveform or a spectrogram model?
 			DLTransform transform = genericParams.dlTransfroms.get(genericParams.dlTransfroms.size()-1); 

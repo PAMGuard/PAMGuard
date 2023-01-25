@@ -47,6 +47,8 @@ import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.ListIterator;
 
 import javax.swing.JCheckBox;
@@ -134,7 +136,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 
 	private PamScroller hScrollBar;
 
-//	private PamDataBlock<ClickDetection> trackedClicks;
+	//	private PamDataBlock<ClickDetection> trackedClicks;
 
 	protected  BTPlot btPlot;
 
@@ -157,7 +159,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 	private Zoomer zoomer;
 
 	private JScrollBar vScrollBar;
-	
+
 	private VScaleManager[] vScaleManagers;
 
 	private OfflineEventDataBlock offlineEventDatablock;
@@ -200,7 +202,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 	private PamSymbol highlightSymbol = new PamSymbol(PamSymbolType.SYMBOL_CIRCLE, 20, 20, false, Color.WHITE, Color.GRAY);
 
 	public PamLabel cursorLabel;
-	
+
 	private PamLabel amplitudeSelectorLabel;
 
 	private boolean isViewer, isNetReceiver;
@@ -219,7 +221,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 	/**
 	 * The symbol chooser for the BT display
 	 */
-//	private ClickDetSymbolChooser symbolChooser;
+	//	private ClickDetSymbolChooser symbolChooser;
 
 	public ClickBTDisplay(ClickControl clickControl, ClickDisplayManager clickDisplayManager, ClickDisplayManager.ClickDisplayInfo clickDisplayInfo) {
 
@@ -228,13 +230,13 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		clickBTDisplay = this;
 
 		this.clickControl = clickControl;
-		
+
 		/* 
 		 * count the number of bearing time displays and
 		 * set the displayNumber 
 		 */
 		displayNumber = clickDisplayManager.countDisplays(ClickBTDisplay.class);
-		
+
 		PamSettingManager.getInstance().registerSettings(this);
 
 		ctrlKeyManager = new CtrlKeyManager();
@@ -255,7 +257,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		btPlot.addKeyListener(ctrlKeyManager);
 
 		btAxis.addMouseListener(new BorderMouse());
-		
+
 		btPlot.requestFocus();
 
 		//		getPlotPanel().addKeyListener(new PlotKeyListener());
@@ -265,7 +267,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		topControls = new TopControls();
 		setNorthPanel(topControls);
 
-//		trackedClicks = clickControl.getClickDetector().getTrackedClicks();
+		//		trackedClicks = clickControl.getClickDetector().getTrackedClicks();
 
 		highlightSymbol.setLineThickness(3);
 
@@ -286,12 +288,12 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 
 		// was in start, put here so it works with the net receiver. 
 		clickControl.clickDetector.getClickDataBlock().addObserver(this);
-		
+
 		btProjector = new BTProjector(this);
 		btMarker = new BTOverlayMarker(this, this.btPlot, 0);
-		
+
 	}
-	
+
 	private ClickDetSymbolChooser getSymbolChooser() {
 		return (ClickDetSymbolChooser) clickControl.getClickDataBlock().getPamSymbolManager().
 				getSymbolChooser(("ClickBTDisplay" + displayNumber), btProjector);
@@ -307,7 +309,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 	public ClickBTDisplay(STClickControl clickControl, ClickDisplayManager clickDisplayManager, ClickDisplayManager.ClickDisplayInfo clickDisplayInfo) {
 		this((ClickControl) clickControl, clickDisplayManager, clickDisplayInfo);
 	}
-	
+
 	@Override
 	public PamObserver getObserverObject() {
 		return this;
@@ -368,14 +370,50 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 
 	@Override
 	public void updateData(PamObservable observable, PamDataUnit pamDataUnit) {
+
+		if (pamDataUnit instanceof ClickDetection) {
+			updateClick((ClickDetection) pamDataUnit);
+		}
+
+	}
+
+	private void updateClick(ClickDetection clickDetection) {
+		// ICI may have been set when the click was added to an event
+		// so work it out there rather than rebuilding the entire list. 
+		SuperDetection superDet = clickDetection.getSuperDetection(0);
+		if (superDet == null) {
+//			sortTempICIs();
+			return;
+		}
+		/**
+		 * Work only within the superdetection to find the previous 
+		 * click within that for this clicks channel combination and update
+		 * the ICI accordingly. For the first click an event, it won't find
+		 * a preceeding click, but that's OK. 
+		 */
+		synchronized (superDet.getSubDetectionSyncronisation()) {
+			int subDetInd = superDet.findSubdetectionInfo(clickDetection);
+			for (int i = subDetInd-1; i >= 0; i--) {
+				PamDataUnit subDet = superDet.getSubDetection(i);
+				if (subDet.getChannelBitmap() == clickDetection.getChannelBitmap()) {
+					double ici = (double) (clickDetection.getTimeMilliseconds() - subDet.getTimeMilliseconds())/1000.;
+					clickDetection.setTempICI(ici);
+					break;
+				}
+			}
+		}
 		
 	}
 
 	private void changedEvent(OfflineEventDataUnit event) {
+		sortTempICIs();
 		btPlot.repaint(10);
 	}
 
 	public void newClick(ClickDetection clickDataUnit) {
+
+		sortTempICI(clickDataUnit);
+
 		if (shouldPlot(clickDataUnit)){
 			//			btPlot.drawClick(btPlot.getImageGraphics(), clickDataUnit, null);
 			//			btPlot.repaint(minPaintTime);
@@ -386,6 +424,71 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 
 	}
 
+	private HashMap<Long, ClickDetection> lastClicks = new HashMap<>();
+
+	/**
+	 * Sort out all ICI's for all clicks. 
+	 */
+	private void sortTempICIs() {
+//		long t1 = System.nanoTime();
+		PamDataBlock<ClickDetection> clickData = clickControl.getClickDataBlock();
+		ArrayList<ClickDetection> allClicks = clickData.getDataCopy();
+		sortTempICIs(allClicks);
+//		long t2 = System.nanoTime();
+//		System.out.printf("time to sort %d ICI measures is %3.1fms\n", allClicks.size(), (double) (t2-t1)/1.e6);
+	}
+
+
+	/**
+	 * Clear ICI history, e.g. when new data are loaded or processing starts. 
+	 */
+	private void clearICIHistory() {
+		synchronized(lastClicks) {
+			lastClicks.clear();
+		}
+	}
+
+	/**
+	 * Sorts ICI's for a list of clicks. 
+	 * @param clicks
+	 */
+	private void sortTempICIs(List<ClickDetection> clicks) {
+		clearICIHistory();
+
+		for (ClickDetection aClick : clicks) {
+			sortTempICI(aClick);
+		}
+	}
+
+	/**
+	 * Sorts ICI information for a new click. 
+	 * @param aClick
+	 */
+	private void sortTempICI(ClickDetection aClick) {
+		long chans = aClick.getChannelBitmap(); // int32 channel group. 
+		long superId = 0;
+		SuperDetection superDet = aClick.getSuperDetection(0);
+		if (superDet != null) {
+			superId = superDet.getUID(); 
+		}
+		/*
+		 *  make an overall id for the click in a long. This could in theory wrap 
+		 *  a superdet, but that is very unlikely and we probably don't care anyway
+		 *  since it's unlikely a uid that different would be in memory at the same time.  
+		 */
+		long totalId = superId<<32 | chans;
+		synchronized(lastClicks) {
+			ClickDetection prevClick = lastClicks.get(totalId);
+			if (prevClick == null) {
+				aClick.setTempICI(0);
+			}
+			else {
+				double ici = (double) (aClick.getTimeMilliseconds() - prevClick.getTimeMilliseconds()) / 1000.;
+				aClick.setTempICI(ici);
+			}
+			lastClicks.put(totalId, aClick);
+		}
+	}
 
 
 	/**
@@ -466,6 +569,8 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		if (hScrollManager != null) {
 			hScrollManager.reset();
 		}
+
+		clearICIHistory();
 
 		//		hScrollManager.setupScrollBar(0);
 		//		setupTimeBar();
@@ -593,7 +698,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		public boolean canStartZoomArea(MouseEvent mouseEvent) {
 			return true;
 		}
-		
+
 		@Override
 		public boolean canClearZoomShape(MouseEvent mouseEvent){
 			return !trackClick(mouseEvent);
@@ -1193,6 +1298,8 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			hScrollBar.setUnitIncrement(getUnitIncrement(getTimeRangeMillis()));
 			hScrollBar.setBlockIncrement(getTimeRangeMillis() * 7 / 8);
 
+			sortTempICIs();
+			
 			return true;
 		}
 
@@ -1265,7 +1372,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			//			System.out.println("New max time = " + PamCalendar.formatTime(displayMaxMillis));
 			//			System.out.println(String.format("Set up scroll bar at %s", PamCalendar.formatDateTime(displayMaxMillis)));
 			long displayLength = getTimeRangeMillis();
-//			long currentStart = hScrollBar.getMinimumMillis();
+			//			long currentStart = hScrollBar.getMinimumMillis();
 			long scrollRange = hScrollBar.getRangeMillis(); // total scrollable range
 			long currentValue = hScrollBar.getValueMillis();
 			long displayMinMillis = displayMaxMillis-scrollRange; // start of scrollable region. 
@@ -1444,6 +1551,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 
 	@Override
 	public void offlineDataChanged() {
+		sortTempICIs();
 		repaintBoth();
 	}
 
@@ -1572,9 +1680,9 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 	}
 	private double clickAngleToY(ClickDetection click) {
 		AbstractLocalisation loc = click.getLocalisation();
-//		if (click.getUID() == 110006089) {
-//			System.out.println("Click 110006089 angle " + click.getAngle());
-//		}
+		//		if (click.getUID() == 110006089) {
+		//			System.out.println("Click 110006089 angle " + click.getAngle());
+		//		}
 		if (loc == null) return 0;
 		double angle = 0;
 		GpsData oll;
@@ -1590,20 +1698,20 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		case ArrayManager.ARRAY_TYPE_VOLUME:
 			PamVector v = getDisplayVector(click);
 			angle = Math.toDegrees(PamVector.vectorToSurfaceBearing(v));
-//			PamVector[] vecs = null;
-//			angle = click.getAngle();
-//			if (btDisplayParameters.bearingType == BTDisplayParameters.BEARING_FROMVESSEL) {
+			//			PamVector[] vecs = null;
+			//			angle = click.getAngle();
+			//			if (btDisplayParameters.bearingType == BTDisplayParameters.BEARING_FROMVESSEL) {
 			// have to use real world vectors to get the array rotation vector
 			// then subtract back off the heading 
-//				vecs = loc.getPlanarAngles()();
-//			if (vecs == null || vecs.length < 1) {
-//				return 0;
-//			}
-//			angle = Math.toDegrees(PamVector.vectorToSurfaceBearing(vecs[0]));
-//			oll = click.getOriginLatLong(false);
-//			if (oll != null) {
-//				angle -= oll.getHeading();
-//			}
+			//				vecs = loc.getPlanarAngles()();
+			//			if (vecs == null || vecs.length < 1) {
+			//				return 0;
+			//			}
+			//			angle = Math.toDegrees(PamVector.vectorToSurfaceBearing(vecs[0]));
+			//			oll = click.getOriginLatLong(false);
+			//			if (oll != null) {
+			//				angle -= oll.getHeading();
+			//			}
 			break;
 		default:
 			return 0;
@@ -1648,7 +1756,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			if (vr != null && vr.length > 0) {
 				return vr[0];
 			}
-//			rotAngles[0] = Math.toRadians(oll.getHeading());
+			//			rotAngles[0] = Math.toRadians(oll.getHeading());
 		}
 		else if (rType == BTDisplayParameters.ROTATE_TONORTH) {
 			PamVector[] vr = loc.getRealWorldVectors();
@@ -1656,14 +1764,14 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 				return vr[0];
 			}			
 		}
-//		if (rotAngles[0] == 0 && rotAngles[1] == 0 && rotAngles[2] == 0) {
-//			return v;
-//		}
-//		PamQuaternion pq = new PamQuaternion(rotAngles[0], rotAngles[1], rotAngles[2]);
-//		PamVector v2 = PamVector.rotateVector(v, pq);
+		//		if (rotAngles[0] == 0 && rotAngles[1] == 0 && rotAngles[2] == 0) {
+		//			return v;
+		//		}
+		//		PamQuaternion pq = new PamQuaternion(rotAngles[0], rotAngles[1], rotAngles[2]);
+		//		PamVector v2 = PamVector.rotateVector(v, pq);
 		return v;
 	}
-	
+
 	private double angleFromYPos(int yPos) {
 		return yStart + yPos/yScale;
 	}
@@ -1677,16 +1785,16 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		return yStart + (yMax-yPos)/yScale;
 	}
 
-	private ClickDetection lastICIClick;
+	//	private ClickDetection lastICIClick;
 	private double clickICIToY(ClickDetection click) {
-		if (click.getICI() > 0) {
-			return btPlot.getHeight() - yAxis.getPosition(click.getICI());
-			//			return click.getICI() * yScale;
-		}
-		else {
-			return btPlot.getHeight() - yAxis.getPosition(click.getTempICI());
-			//			return click.getTempICI()  * yScale;
-		}
+		//		if (click.getTempICI() > 0) {
+		return btPlot.getHeight() - yAxis.getPosition(click.getTempICI());
+		//			return click.getICI() * yScale;
+		//		}
+		//		else {
+		//			return btPlot.getHeight() - yAxis.getPosition(click.getTempICI());
+		//			//			return click.getTempICI()  * yScale;
+		//		}
 
 	}
 
@@ -1705,8 +1813,8 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 
 	private double getClickWidth(ClickDetection click) {
 		return (double) click.getSampleDuration() / (double) clickControl.clickParameters.maxLength * 
-		(btDisplayParameters.maxClickLength - btDisplayParameters.minClickLength) + 
-		btDisplayParameters.minClickLength;		
+				(btDisplayParameters.maxClickLength - btDisplayParameters.minClickLength) + 
+				btDisplayParameters.minClickLength;		
 	}
 
 	/**
@@ -1783,7 +1891,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 
 	}
 
-//	private JPopupMenu clickPopupMenu = null;
+	//	private JPopupMenu clickPopupMenu = null;
 
 	public RangeSpinner rangeSpinner;
 
@@ -1792,31 +1900,31 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 	public ClickDetSymbolChooser symbolChooser;
 
 	private JPopupMenu getClickPUMenu(ClickDetection click) {
-//		if (clickPopupMenu == null){
-//			clickPopupMenu = new JPopupMenu();
-//			JMenuItem menuItem;
-//			PamSymbol pamSymbol;
-//			Color symbolColour;
-//			for (int i = 0; i < PamColors.getInstance().getNWhaleColours(); i++) {
-//				menuItem = new JMenuItem(" Whale Train " + i);
-//				symbolColour = PamColors.getInstance().getWhaleColor(i);
-//				pamSymbol = new PamSymbol(PamSymbol.SYMBOL_CIRCLE, 12, 12, true, symbolColour, symbolColour);
-//				menuItem.setIcon(pamSymbol);
-//				menuItem.addActionListener(new clickPUListener(i));
-//				clickPopupMenu.add(menuItem);
-//			}
-//		}
+		//		if (clickPopupMenu == null){
+		//			clickPopupMenu = new JPopupMenu();
+		//			JMenuItem menuItem;
+		//			PamSymbol pamSymbol;
+		//			Color symbolColour;
+		//			for (int i = 0; i < PamColors.getInstance().getNWhaleColours(); i++) {
+		//				menuItem = new JMenuItem(" Whale Train " + i);
+		//				symbolColour = PamColors.getInstance().getWhaleColor(i);
+		//				pamSymbol = new PamSymbol(PamSymbol.SYMBOL_CIRCLE, 12, 12, true, symbolColour, symbolColour);
+		//				menuItem.setIcon(pamSymbol);
+		//				menuItem.addActionListener(new clickPUListener(i));
+		//				clickPopupMenu.add(menuItem);
+		//			}
+		//		}
 		/*
 		 * Make a menu based on which whales are currently alive and active and also
 		 * a "new" category at the end ... 
 		 */
-		
+
 		OfflineEventDataUnit clickEvent = null;
 		try {
 			clickEvent = (OfflineEventDataUnit) click.getSuperDetection(OfflineEventDataUnit.class, true);
 		}
 		catch (Exception e) {
-			
+
 		}
 		JPopupMenu clickPopupMenu = new JPopupMenu();
 		JMenuItem menuItem;
@@ -1830,7 +1938,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			OfflineEventDataUnit clickGroup = it.next();
 			whaleId =  clickGroup.getEventId();
 			if (click.getSuperDetection(0) == clickGroup) continue;
-//			if (whaleId == click.getEventId()) continue;
+			//			if (whaleId == click.getEventId()) continue;
 			biggestId = Math.max(biggestId, whaleId);
 			menuItem = new JMenuItem("Click Train " + whaleId);
 			symbolColour = PamColors.getInstance().getWhaleColor(clickGroup.getColourIndex());
@@ -1841,12 +1949,12 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		}
 		whaleId = biggestId + 1;
 		menuItem = new JMenuItem("New Click Train");
-//		symbolColour = PamColors.getInstance().getWhaleColor(whaleId);
-//		pamSymbol = new PamSymbol(PamSymbol.SYMBOL_CIRCLE, 12, 12, true, symbolColour, symbolColour);
-//		menuItem.setIcon(pamSymbol);
+		//		symbolColour = PamColors.getInstance().getWhaleColor(whaleId);
+		//		pamSymbol = new PamSymbol(PamSymbol.SYMBOL_CIRCLE, 12, 12, true, symbolColour, symbolColour);
+		//		menuItem.setIcon(pamSymbol);
 		menuItem.addActionListener(new clickPUListener(whaleId));
 		clickPopupMenu.add(menuItem, 0);
-		
+
 		if (click != null && click.getEventId() > 0) {
 			menuItem = new JMenuItem(" Remove Click from Train Id " + click.getEventId());
 			symbolColour = PamColors.getInstance().getWhaleColor(click.getEventId());
@@ -1861,9 +1969,9 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			if (nEvents >= 2 && clickEvent != null) {
 				// >= 2 since if there is only one i tmust be this one. 
 				JMenu reassignMenu = new JMenu("Reassign train " + click.getEventId() + " to");
-					symbolColour = PamColors.getInstance().getWhaleColor(clickEvent.getColourIndex());
-					pamSymbol = new PamSymbol(PamSymbolType.SYMBOL_CIRCLE, 12, 12, true, symbolColour, symbolColour);
-					reassignMenu.setIcon(pamSymbol);
+				symbolColour = PamColors.getInstance().getWhaleColor(clickEvent.getColourIndex());
+				pamSymbol = new PamSymbol(PamSymbolType.SYMBOL_CIRCLE, 12, 12, true, symbolColour, symbolColour);
+				reassignMenu.setIcon(pamSymbol);
 				it = trackedClickGroups.getListIterator(0);
 				while (it.hasNext()) {
 					OfflineEventDataUnit clickGroup = it.next();
@@ -1879,14 +1987,14 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 				clickPopupMenu.add(reassignMenu, 1);
 			}
 		}
-		
+
 		return clickPopupMenu;
 	}
-	
+
 	private class clickReassignListener implements ActionListener {
 
 		private OfflineEventDataUnit clickEvent, reassignEvent;
-		
+
 		public clickReassignListener(OfflineEventDataUnit clickEvent, OfflineEventDataUnit reassignEvent) {
 			this.clickEvent = clickEvent;
 			this.reassignEvent = reassignEvent;
@@ -1895,12 +2003,12 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			clickControl.reassignEventClicks(clickEvent, reassignEvent);
-			
+
 			//need this or clicks do not change colour!!!
 			btPlot.setTotalRepaint();
 			btPlot.repaint(minPaintTime);
 		}
-		
+
 	}
 
 	/**
@@ -1921,12 +2029,12 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 
 			if (popupClick == null) return;
 
-//			popupClick.setEventId(whaleId);
+			//			popupClick.setEventId(whaleId);
 
 			trackClick(popupClick, whaleId);
 
 			popupClick = null;
-			
+
 			//need this or clicks do not change colour!!!
 			btPlot.setTotalRepaint();
 			btPlot.repaint(minPaintTime);
@@ -1934,7 +2042,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		}
 
 	}
-	
+
 	/**
 	 * Action listener used to remove clicks from a click train. 
 	 * @author dg50
@@ -1951,22 +2059,22 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			clickControl.trackedClickLocaliser.removeClick(removeClick);
-			
+
 			//need this or clicks do not change colour!!!
 			btPlot.setTotalRepaint();
 			btPlot.repaint(minPaintTime);
 		}
-		
+
 	}
 
 	private void trackClick(ClickDetection click, int whaleId) {
 
 		click.setTracked(true);
-//		clickControl.clickDetector.reWriteClick(click, false);
+		//		clickControl.clickDetector.reWriteClick(click, false);
 
 		//		ClickDetection newDataUnit = new ClickDetection(click.getChannelBitmap(), click.getStartSample(), 
 		//				click.getDuration(), click.clickDetector, click.triggerList);
-		
+
 		/*
 		 * Send straight to localiser where life can get a little more complicated. 
 		 */
@@ -2000,35 +2108,35 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			if (scaleManager == null) {
 				return;
 			}
-//			scaleManager
-//			System.out.println(String.format("set y range from %s %3.4f to %3.4fs", scaleManager.getTitle(), 
-//					scaleManager.getCurrentStart(), scaleManager.getCurrentEnd()));
+			//			scaleManager
+			//			System.out.println(String.format("set y range from %s %3.4f to %3.4fs", scaleManager.getTitle(), 
+			//					scaleManager.getCurrentStart(), scaleManager.getCurrentEnd()));
 			yAxis.setRange(scaleManager.getCurrentStart(), scaleManager.getCurrentEnd());
 			yAxis.setLogScale(btDisplayParameters.logICIScale && btDisplayParameters.VScale == BTDisplayParameters.DISPLAY_ICI);
 			yAxis.setInterval(scaleManager.getYAxisInterval());
 			yAxis.setLabel(scaleManager.getTitle());
 			yAxis.setAutoFormat(false);
-//			String format = getYAxisFormat()
-//			double range = Math.abs(scaleManager.currentRange);
-//			if (range > 30) {
-//				yAxis.setFormat("%d");
-//			}
-//			else if (range > 8) {
-//				yAxis.setFormat("%3.1f");
-//			}
-//			else if (range > 1) {
-//				yAxis.setFormat("%3.1f");
-//			}
-//			else if (range > .1) {
-//				yAxis.setFormat("%3.2f");
-//			}
-//			else if (range <= 0) {
-//				yAxis.setFormat("%3.2f");
-//			}
-//			else {
-//				int nDP = (int)Math.ceil(Math.abs(Math.log10(range)));
-//				yAxis.setFormat(String.format("%%%d.%df", nDP+2, nDP));
-//			}
+			//			String format = getYAxisFormat()
+			//			double range = Math.abs(scaleManager.currentRange);
+			//			if (range > 30) {
+			//				yAxis.setFormat("%d");
+			//			}
+			//			else if (range > 8) {
+			//				yAxis.setFormat("%3.1f");
+			//			}
+			//			else if (range > 1) {
+			//				yAxis.setFormat("%3.1f");
+			//			}
+			//			else if (range > .1) {
+			//				yAxis.setFormat("%3.2f");
+			//			}
+			//			else if (range <= 0) {
+			//				yAxis.setFormat("%3.2f");
+			//			}
+			//			else {
+			//				int nDP = (int)Math.ceil(Math.abs(Math.log10(range)));
+			//				yAxis.setFormat(String.format("%%%d.%df", nDP+2, nDP));
+			//			}
 
 			//			switch (btDisplayParameters.VScale) {
 			//			
@@ -2196,7 +2304,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		}
 
 	}
-	
+
 	public class PlotKeyListener extends KeyAdapter {
 
 		@Override
@@ -2215,7 +2323,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 				setSelectedClick(selectedClick);
 			}
 		}
-		
+
 	}
 
 
@@ -2227,11 +2335,11 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 	 * @return
 	 */
 	private JPopupMenu getPopupMenu(ClickDetection clickedClick) {
-//		System.out.println("Create click right click menu.....");
+		//		System.out.println("Create click right click menu.....");
 		boolean isView = PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW;
 		JPopupMenu menu = new JPopupMenu();
 		JMenuItem menuItem;
-		
+
 		if (isView) {
 			/**
 			 * Bit of  aporblem here - need to have some sort of event mark to 
@@ -2241,20 +2349,20 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			if (clickControl.getClicksOffline().addBTMenuItems(menu, oMark, this, false, clickedClick)>0) {
 				menu.addSeparator();
 			}
-			
+
 			/**
 			 * Menu functions to decide if we can localise a click or not. 
 			 */
 			if (clickedClick != null) {
-				
+
 				menuItem = new JMenuItem("Classify Click");
 				menuItem.addActionListener(new ClassifyClick(clickedClick));
 				menu.add(menuItem);
 
-				
+
 				addClickClassifierOption(menu, clickedClick);
 				menu.addSeparator();
-				
+
 				//If the static localiser is currently implemented and the click is part of the list then have option to localise
 				addLocaliserMenuItems(menu, clickedClick);
 
@@ -2264,16 +2372,16 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 						//uurgh...what??
 						if (sd instanceof GroupDetection) {
 							menuItem = clickControl.getTargetMotionLocaliser().getEventMenuItem((GroupDetection) sd, "Click Train");
-						menu.add(menuItem);
-					}
+							menu.add(menuItem);
+						}
 					}
 				}
-				
-				
+
+
 			}
 
 		}
-		
+
 		menuItem = new JMenuItem("Settings ...");
 		menuItem.addActionListener(new SettingsMenuAction());
 		menu.add(menuItem);
@@ -2288,24 +2396,24 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			}
 			menu.addSeparator();
 		}
-		
-//		menuItem = new JCheckBoxMenuItem("Colour by species id", 
-//				btDisplayParameters.colourScheme == BTDisplayParameters.COLOUR_BY_SPECIES);
-//		menuItem.addActionListener(new ColourByAction(BTDisplayParameters.COLOUR_BY_SPECIES));
-//		menu.add(menuItem);
-//		menuItem = new JCheckBoxMenuItem("Colour by click train", 
-//				btDisplayParameters.colourScheme == BTDisplayParameters.COLOUR_BY_TRAIN);
-//		menuItem.addActionListener(new ColourByAction(BTDisplayParameters.COLOUR_BY_TRAIN));
-//		menu.add(menuItem);
-//		menuItem = new JCheckBoxMenuItem("Colour by train, then species", 
-//				btDisplayParameters.colourScheme == BTDisplayParameters.COLOUR_BY_TRAINANDSPECIES);
-//		menuItem.addActionListener(new ColourByAction(BTDisplayParameters.COLOUR_BY_TRAINANDSPECIES));
-//		menu.add(menuItem);
-//		//		if (isNetReceiver) {
-//		menuItem = new JCheckBoxMenuItem("Colour by hydrophone", 
-//				btDisplayParameters.colourScheme == BTDisplayParameters.COLOUR_BY_HYDROPHONE);
-//		menuItem.addActionListener(new ColourByAction(BTDisplayParameters.COLOUR_BY_HYDROPHONE));
-//		menu.add(menuItem);			
+
+		//		menuItem = new JCheckBoxMenuItem("Colour by species id", 
+		//				btDisplayParameters.colourScheme == BTDisplayParameters.COLOUR_BY_SPECIES);
+		//		menuItem.addActionListener(new ColourByAction(BTDisplayParameters.COLOUR_BY_SPECIES));
+		//		menu.add(menuItem);
+		//		menuItem = new JCheckBoxMenuItem("Colour by click train", 
+		//				btDisplayParameters.colourScheme == BTDisplayParameters.COLOUR_BY_TRAIN);
+		//		menuItem.addActionListener(new ColourByAction(BTDisplayParameters.COLOUR_BY_TRAIN));
+		//		menu.add(menuItem);
+		//		menuItem = new JCheckBoxMenuItem("Colour by train, then species", 
+		//				btDisplayParameters.colourScheme == BTDisplayParameters.COLOUR_BY_TRAINANDSPECIES);
+		//		menuItem.addActionListener(new ColourByAction(BTDisplayParameters.COLOUR_BY_TRAINANDSPECIES));
+		//		menu.add(menuItem);
+		//		//		if (isNetReceiver) {
+		//		menuItem = new JCheckBoxMenuItem("Colour by hydrophone", 
+		//				btDisplayParameters.colourScheme == BTDisplayParameters.COLOUR_BY_HYDROPHONE);
+		//		menuItem.addActionListener(new ColourByAction(BTDisplayParameters.COLOUR_BY_HYDROPHONE));
+		//		menu.add(menuItem);			
 		//		}
 		menuItem = new JCheckBoxMenuItem("Bearing / Time");
 		menuItem.addActionListener(new AxesMenuAction(BTDisplayParameters.DISPLAY_BEARING));
@@ -2362,7 +2470,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 
 		return menu;
 	}
-	
+
 	/**
 	 * Looks through the current modules and finds if there is a target motion or static localiser
 	 */
@@ -2374,7 +2482,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			}
 		}
 	}
-	
+
 
 	/**
 	 * Creates options in the menu to force clicks to be classified as a particular species.
@@ -2382,17 +2490,17 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 	private void addClickClassifierOption(JPopupMenu menu, ClickDetection detection){
 		JMenuItem mi;
 		JMenu subMenu=new 	JMenu("Classify as...");
-		
+
 		mi=new JMenuItem("Classify as Unclassified");
 		mi.addActionListener(new ForceClassifyClick(detection, (byte) 0));
 		subMenu.add(mi);
-		
+
 		if (clickControl.getClickIdentifier().getCodeList()==null) return;
 		if (clickControl.getClickIdentifier().getCodeList().length==0) return;
-		
-		
+
+
 		for (int i=0; i<clickControl.getClickIdentifier().getCodeList().length; i++){
-			
+
 			if (i==0){
 				mi=new JMenuItem("Classify as "+ clickControl.getClickIdentifier().getSpeciesList()[i]);
 				menu.add(mi);
@@ -2401,16 +2509,16 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 				mi=new JMenuItem( clickControl.getClickIdentifier().getSpeciesList()[i]);
 				subMenu.add(mi);
 			}
-			
+
 			mi.addActionListener(new ForceClassifyClick(detection, (byte) clickControl.getClickIdentifier().getCodeList()[i]));
 
 		}
-		
+
 		menu.add(subMenu);
-		
+
 	}
-	
-	
+
+
 	/**
 	 * Action listener for classifying a click. Runs the click classifier on an individual click.
 	 * @author Doug Gillespie
@@ -2440,7 +2548,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			repaintTotal();
 		}
 	}
-	
+
 	/**
 	 * This action listener forces a click to be reclassified to a specific code.  
 	 * @author Jamie Macaulay
@@ -2459,14 +2567,14 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			
+
 			if (click==null) return;
 			click.setClickType((byte) code);
 			repaintTotal();
 		}
 	}
-	
-	
+
+
 	/**
 	 * Handle mouse events on the plot border. 
 	 * @author dg50
@@ -2631,7 +2739,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		}
 		return true;
 	}
-	
+
 	class ShowKeyAction implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			btDisplayParameters.showKey = !btDisplayParameters.showKey;
@@ -2639,38 +2747,38 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		}
 	}
 
-//	class ColourByAction implements ActionListener {
-//
-//		private int colourChoice;
-//
-//		public ColourByAction(int colourChoice) {
-//			super();
-//			this.colourChoice = colourChoice;
-//		}
-//		public void actionPerformed(ActionEvent e) {
-//			btDisplayParameters.colourScheme = colourChoice;
-//			symbolChooser.setSymbolType(colourChoice);
-//			
-//			btPlot.setTotalRepaint();
-//			btPlot.repaint(minPaintTime);
-//			btPlot.createKey();
-//		}
-//	}
+	//	class ColourByAction implements ActionListener {
+	//
+	//		private int colourChoice;
+	//
+	//		public ColourByAction(int colourChoice) {
+	//			super();
+	//			this.colourChoice = colourChoice;
+	//		}
+	//		public void actionPerformed(ActionEvent e) {
+	//			btDisplayParameters.colourScheme = colourChoice;
+	//			symbolChooser.setSymbolType(colourChoice);
+	//			
+	//			btPlot.setTotalRepaint();
+	//			btPlot.repaint(minPaintTime);
+	//			btPlot.createKey();
+	//		}
+	//	}
 
 	class SettingsMenuAction implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
 
 			BTDisplayParameters newParameters = 
-				ClickDisplayDialog.showDialog(clickControl, 
-						clickControl.getPamView().getGuiFrame(), btDisplayParameters);
+					ClickDisplayDialog.showDialog(clickControl, 
+							clickControl.getPamView().getGuiFrame(), btDisplayParameters);
 			if (newParameters != null){
 				btDisplayParameters = newParameters.clone();
 				if (getVScaleManager() != null) {
 					getVScaleManager().setSelected();
 				}
 				btAxis.makeAxis();
-//				System.out.println("360: "+btDisplayParameters.view360);
+				//				System.out.println("360: "+btDisplayParameters.view360);
 				repaintBoth();
 				btPlot.createKey();
 				if (clickControl.getOfflineToolbar() != null) {
@@ -2689,21 +2797,21 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 	}
 
 	private void showAmplitudeSelector() {
-		
+
 		//TODO FIXME! quick fix so scales reset without scrolling/restarting
 		Rectangle b = null ;
 		if (btAmplitudeSelector != null) {
 			b= btAmplitudeSelector.getFrame().getBounds();
-//			btAmplitudeSelector.getFrame().setVisible(true);
-//			//			btAmplitudeSelector.getFrame().
+			//			btAmplitudeSelector.getFrame().setVisible(true);
+			//			//			btAmplitudeSelector.getFrame().
 		}
-//		else {
-			btAmplitudeSelector = BTAmplitudeSelector.showAmplitudeFrame(clickControl, this);
-			if(b!=null){
-				
-				btAmplitudeSelector.getFrame().setBounds(b);
-			}
-//		}
+		//		else {
+		btAmplitudeSelector = BTAmplitudeSelector.showAmplitudeFrame(clickControl, this);
+		if(b!=null){
+
+			btAmplitudeSelector.getFrame().setBounds(b);
+		}
+		//		}
 	}
 
 	private void checkBTAmplitudeSelectHisto() {
@@ -2895,12 +3003,12 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 
 
 		public boolean redrawAllClicks(){
-//			System.out.println("redrawAllClicks " +	hScrollBar.getValueMillis()+ " "+vScrollBar.getValue()+" "+	hScrollBar.getMaximumMillis()+"  "+hScrollBar.getStepSizeMillis());
+			//			System.out.println("redrawAllClicks " +	hScrollBar.getValueMillis()+ " "+vScrollBar.getValue()+" "+	hScrollBar.getMaximumMillis()+"  "+hScrollBar.getStepSizeMillis());
 			if (totalRepaint) {
 				return true;
 			}
 			if (hScrollBar.getValueMillis()!=lasthScrollPos || vScrollBar.getValue()!= lastVScrollPos || lastHeight!=this.getHeight() || lastWidth!=this.getWidth() ){
-		
+
 				lasthScrollPos=hScrollBar.getValueMillis();
 				lastVScrollPos=vScrollBar.getValue();
 				lastHeight=this.getHeight();
@@ -2914,9 +3022,9 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			}
 		}
 
-//		double lastPaintTime;
+		//		double lastPaintTime;
 		public void paintClicks(Graphics g, Rectangle clipRectangle) {
-			
+
 			long t0 = System.nanoTime();
 			//			System.out.println("Paint all clicks");
 
@@ -2928,18 +3036,21 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 				zoomer.paintShape(g, this, true);
 			}
 
-//			long t1 = System.nanoTime();
+			//			long t1 = System.nanoTime();
 			synchronized (clickData.getSynchLock()) {
-//				long t2 = System.nanoTime();
-//				double ms = ((double) (t2-t1)) / 1000000.;
-				
+				//				long t2 = System.nanoTime();
+				//				double ms = ((double) (t2-t1)) / 1000000.;
+				//				if (btDisplayParameters.VScale == BTDisplayParameters.DISPLAY_ICI) { 
+				//					sortTempICIs();
+				//				}
+
 				ListIterator<ClickDetection> clickIterator = clickData.getListIterator(PamDataBlock.ITERATOR_END);
 				while (clickIterator.hasPrevious()) {
 					click = clickIterator.previous();
 					if (shouldPlot(prevPlottedClick)){
-						if (btDisplayParameters.VScale == BTDisplayParameters.DISPLAY_ICI) {
-							prevPlottedClick.setTempICI((double) (prevPlottedClick.getStartSample()-click.getStartSample()) / sampleRate);
-						}
+						//						if (btDisplayParameters.VScale == BTDisplayParameters.DISPLAY_ICI) {
+						//							prevPlottedClick.setTempICI((double) (prevPlottedClick.getStartSample()-click.getStartSample()) / sampleRate);
+						//						}
 						if (drawClick(g, prevPlottedClick, clipRectangle) < -0){
 							break;
 						}
@@ -2949,27 +3060,27 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 				if (shouldPlot(prevPlottedClick)){ // and draw the last one !
 					drawClick(g, prevPlottedClick, clipRectangle);
 				}
-//				g.drawString(String.format("Wait synch %3.3fms", ms), 0, 20);
+				//				g.drawString(String.format("Wait synch %3.3fms", ms), 0, 20);
 			}
-//			long t3 = System.nanoTime();
-//			g.drawString(String.format("Last draw %3.3fms", lastPaintTime), 0, 20);
-//			lastPaintTime = ((double) (t3-t0)) / 1000000.;
+			//			long t3 = System.nanoTime();
+			//			g.drawString(String.format("Last draw %3.3fms", lastPaintTime), 0, 20);
+			//			lastPaintTime = ((double) (t3-t0)) / 1000000.;
 		}
 
 		@Override
 		public void paintPanel(Graphics g, Rectangle clipRectangle) {
-//			long tNow = System.currentTimeMillis();
+			//			long tNow = System.currentTimeMillis();
 			redrawClicks=redrawAllClicks();
 			/**
 			 * Need to call this every time since the original symbol chooser will get deleted after
 			 * initialisation complete, so needs regeneration. 
 			 */
 			symbolChooser = getSymbolChooser();
-			
+
 			if (isViewer){
 				((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
 			}
-			
+
 			//			g.setColor(Color.BLUE);
 			//			g.fillRect(0, 0, 30, 30);
 			if (hasData == false) {
@@ -2981,12 +3092,12 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 				int y = getPlotPanel().getHeight()/2 - (int)r.getHeight();
 				g.setColor(Color.RED);
 				g.drawString(str, (int) ((getWidth() - r.getWidth())/2), y);
-				
+
 				str = "Double click or use Ctrl-right click for display options";
 				r = g2d.getFontMetrics().getStringBounds(str, g2d);
 				y += (int)r.getHeight()*2;
 				g.drawString(str, (int) ((getWidth() - r.getWidth())/2), y);
-				
+
 				//				return;
 			}
 			setScales();
@@ -3090,15 +3201,15 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 				if (pt.x - width > clipRegion.x + clipRegion.width) return +1;
 			}
 			if (click.tracked) {
-//				System.out.println("Drawing tracked click");
+				//				System.out.println("Drawing tracked click");
 			}
-			
+
 			//set the colour scheme.
-//			symbolChooser.setSymbolType(btDisplayParameters.colourScheme);
+			//			symbolChooser.setSymbolType(btDisplayParameters.colourScheme);
 			PamSymbol symbol = symbolChooser.getPamSymbol(btProjector, click);
-			
-					//.getClickSymbol(clickControl.getClickIdentifier(), click, btDisplayParameters.colourScheme);
-			
+
+			//.getClickSymbol(clickControl.getClickIdentifier(), click, btDisplayParameters.colourScheme);
+
 			symbol.setFill(!click.isEcho());
 			symbol.draw(g, pt, width, height);
 			if (click.isTracked()) {
@@ -3156,8 +3267,8 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 				return null;
 			}
 			String tip = click.getSummaryString();
-//			String tip = String.format("<html>UID. %d; Click No. %d; Channels %s", click.getUID(),
-//					click.clickNumber, PamUtils.getChannelList(click.getChannelBitmap()));
+			//			String tip = String.format("<html>UID. %d; Click No. %d; Channels %s", click.getUID(),
+			//					click.clickNumber, PamUtils.getChannelList(click.getChannelBitmap()));
 			byte type = click.getClickType();
 			if (clickControl.getClickIdentifier() != null) {
 				String typeStr = clickControl.getClickIdentifier().getSpeciesName(type);
@@ -3258,11 +3369,11 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			}
 			setKeyPanel(keyPanel);
 			try {
-			keyPanel.getTitledBorder().setTitleColor(PamColors.getInstance().getColor(PamColor.AXIS));
-			setKeyPosition(CornerLayoutContraint.LAST_LINE_START);
+				keyPanel.getTitledBorder().setTitleColor(PamColors.getInstance().getColor(PamColor.AXIS));
+				setKeyPosition(CornerLayoutContraint.LAST_LINE_START);
 			}
 			catch (NullPointerException e) {
-//				e.printStackTrace();
+				//				e.printStackTrace();
 			}
 		}
 
@@ -3342,7 +3453,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			return false;
 		}
 		if (btDisplayParameters.VScale == BTDisplayParameters.DISPLAY_ICI) {
-//			if (btDisplayParameters.showUnassignedICI == false && click.getICI() < 0) return false;
+			//			if (btDisplayParameters.showUnassignedICI == false && click.getICI() < 0) return false;
 			if (btDisplayParameters.showUnassignedICI == false && click.getSuperDetectionsCount() <= 0) return false;
 			// otherwise may be ok, since will estimate all ici's on teh fly. 
 		}
@@ -3436,7 +3547,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		 * to zero. However DO call these functions which were previously in
 		 * reset();
 		 */
-//		reset();
+		//		reset();
 		int channels = clickControl.clickParameters.getChannelBitmap();
 		int[] channelGroups = clickControl.clickParameters.getChannelGroups();
 		int nChannelGroups = GroupedSourcePanel.countChannelGroups(channels, channelGroups);
@@ -3445,7 +3556,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 				channels, channelGroups) < 0) {
 			btDisplayParameters.displayChannels = 0;
 		}
-		
+
 		btPlot.createKey();
 		repaintBoth();
 	}
@@ -3502,8 +3613,8 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		this.btDisplayParameters = ((BTDisplayParameters) pamControlledUnitSettings
 				.getSettings()).clone();
 		//			rangeScrollBar.setValue(btDisplayParameters.vScrollValue);
-//		rangeSpinner.setSpinnerValue(btDisplayParameters.getTimeRange());
-//		btPlot.createKey();
+		//		rangeSpinner.setSpinnerValue(btDisplayParameters.getTimeRange());
+		//		btPlot.createKey();
 		return true;
 	}
 
@@ -4016,7 +4127,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 	public void symbolUpdate() {
 		repaintBoth();
 	}
-	
+
 	@Override
 	public void receiveSourceNotification(int type, Object object) {
 		// don't do anything by default

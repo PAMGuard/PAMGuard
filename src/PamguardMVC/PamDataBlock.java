@@ -1237,7 +1237,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			if (offlineDataLoading.isCurrentOfflineLoadKeep()) {
 				pamDataUnits.add(pamDataUnit);
 			}
-			if (shouldBinary && getBinaryDataSource() != null && !isOffline) {
+			if (shouldBinary && getBinaryDataSource() != null && !isOffline && pamDataUnit.isEmbryonic() == false) {
 				getBinaryDataSource().saveData(pamDataUnit);
 			}
 		}
@@ -1311,8 +1311,14 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	public void updatePamData(Tunit pamDataUnit, long updateTimeMillis) {
 		pamDataUnit.updateDataUnit(updateTimeMillis);
 		setChanged();
-		if (!isOffline) {
-			if (getBinaryDataSource() != null && getBinaryDataSource().isSaveUpdates()) {
+		if (!isOffline && pamDataUnit.isEmbryonic() == false) {
+			/*
+			 * Save it if it't not been saved already or we're saving updates. 
+			 * Detectors can keep a dataunit in an embryonic state and add them to the 
+			 * datablock so they get displayed, but they will still save when the embryonic
+			 * flag is set false and an update is sent. 
+			 */
+			if (getBinaryDataSource() != null && (getBinaryDataSource().isSaveUpdates() || pamDataUnit.getDataUnitFileInformation() == null)) {
 				getBinaryDataSource().saveData(pamDataUnit);
 			}
 		}

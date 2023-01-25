@@ -128,22 +128,27 @@ public class LevelMeterSidePanel extends PamObserverAdapter implements PamSidePa
 			levelDisplays[i].setLimits(levelMeterControl.levelMeterParams.minLevel, 0);
 		}
 		
+		checkConstants();
+	}
+	private void checkConstants() {
 		// now find the source acquisition module and any gain that's in between them. 
 		PamRawDataBlock rawBlock = (PamRawDataBlock) parentBlock;		
-		if (rawBlock!=null) {
-			AcquisitionProcess daqProcess = (AcquisitionProcess) rawBlock.getSourceProcess();
-			AcquisitionControl daqControl = daqProcess.getAcquisitionControl();
-			voltsPeak2Peak = daqControl.acquisitionParameters.voltsPeak2Peak;
-			int nChan = PamUtils.getNumChannels(channelMap);
-			maxFullScale = Double.NEGATIVE_INFINITY;
-			for (int i = 0; i < nChan; i++) {
-				int chan = PamUtils.getNthChannel(i, channelMap);
-				gains[chan] = rawBlock.getDataGain(chan);
-				dbFullScale[chan] = daqProcess.rawAmplitude2dB(1, chan, false);
-				maxFullScale = Math.max(maxFullScale, dbFullScale[chan]);
-			}
-			setupLabels();
+		if (rawBlock==null) {
+			return;
 		}
+		int channelMap = parentBlock.getChannelMap();
+		AcquisitionProcess daqProcess = (AcquisitionProcess) rawBlock.getSourceProcess();
+		AcquisitionControl daqControl = daqProcess.getAcquisitionControl();
+		voltsPeak2Peak = daqControl.acquisitionParameters.voltsPeak2Peak;
+		int nChan = PamUtils.getNumChannels(channelMap);
+		maxFullScale = Double.NEGATIVE_INFINITY;
+		for (int i = 0; i < nChan; i++) {
+			int chan = PamUtils.getNthChannel(i, channelMap);
+			gains[chan] = rawBlock.getDataGain(chan);
+			dbFullScale[chan] = daqProcess.rawAmplitude2dB(1, chan, false);
+			maxFullScale = Math.max(maxFullScale, dbFullScale[chan]);
+		}
+		setupLabels();
 	}
 
 	private void setupLabels() {
@@ -228,7 +233,7 @@ public class LevelMeterSidePanel extends PamObserverAdapter implements PamSidePa
 		case LevelMeterParams.DISPLAY_VOLTS:
 			return 20.*Math.log10(level*(voltsPeak2Peak/2));
 		case LevelMeterParams.DISPLAY_MICROPASCAL:
-			return 20.*Math.log10(level) + maxFullScale;
+			return 20.*Math.log10(level) + dbFullScale[channel];
 		}
 		return 0;
 	}
