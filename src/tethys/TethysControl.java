@@ -15,6 +15,7 @@ import nilus.Deployment;
 import nilus.Deployment.Instrument;
 import tethys.output.StreamExportParams;
 import tethys.output.TethysExportParams;
+import tethys.output.TethysExporter;
 import tethys.output.swing.TethysExportDialog;
 
 /**
@@ -92,6 +93,14 @@ public class TethysControl extends PamControlledUnit {
 	private void exportTethysData(TethysExportParams tethysExportParams) {
 		TethysExporter tethysExporter = new TethysExporter(this, tethysExportParams);
 		tethysExporter.doExport();		
+	}
+	
+	/**
+	 * A name for any deta selectors. 
+	 * @return
+	 */
+	public String getDataSelectName() {
+		return getUnitName();
 	}
 
 }

@@ -6,7 +6,9 @@ import java.awt.GridBagLayout;
 import java.awt.Window;
 import java.util.ArrayList;
 
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
@@ -14,6 +16,7 @@ import PamController.PamController;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamguardMVC.PamDataBlock;
+import PamguardMVC.dataSelector.DataSelector;
 import tethys.TethysControl;
 import tethys.output.StreamExportParams;
 import tethys.output.TethysExportParams;
@@ -81,22 +84,35 @@ public class TethysExportDialog extends PamDialog {
 		streamsPanel.setLayout(new GridBagLayout());
 		GridBagConstraints c = new PamGridBagContraints();
 		dataStreamSets = findDataStreams();
+		streamsPanel.add(new JLabel(" Data Stream ", JLabel.CENTER), c);
+		c.gridx++;
+		streamsPanel.add(new JLabel(" Data Select ", JLabel.CENTER), c);
 		for (DataStreamSet aSet : dataStreamSets) {
-			streamsPanel.add(aSet.checkBox, c);
+			c.gridx = 0;
 			c.gridy++;
+			streamsPanel.add(aSet.checkBox, c);
+			// try to add a data selector
+			DataSelector dataSelector = aSet.dataBlock.getDataSelector(tethysControl.getDataSelectName(), false);
+			if (dataSelector != null) {
+				c.gridx++;
+				JButton button = dataSelector.getDialogButton(this);
+				if (button != null) {
+					streamsPanel.add(button, c);
+				}
+			}
 		}
 		pack();
 	}
 	
 	/**
-	 * Get a set of data blocks that have SQLLogging. 
-	 * @return
+	 * Get a set of data blocks that can provide Tethys data. 
+	 * @return datablocks which can provide Tethys data
 	 */
 	private ArrayList<DataStreamSet> findDataStreams() {
 		ArrayList<DataStreamSet> sets = new ArrayList<>();
 		ArrayList<PamDataBlock> allDataBlocks = PamController.getInstance().getDataBlocks();
 		for (PamDataBlock aDataBlock : allDataBlocks) {
-			if (aDataBlock.getLogging() != null) {
+			if (aDataBlock.getTethysDataProvider() != null) {
 				sets.add(new DataStreamSet(aDataBlock));
 			}
 		}

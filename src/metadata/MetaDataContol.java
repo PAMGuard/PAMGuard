@@ -27,4 +27,18 @@ public class MetaDataContol extends PamControlledUnit {
 		return deploymentSetManager.getMenuItem(parentFrame);
 	}
 
+	/**
+	 * @return the deploymentData
+	 */
+	public DeploymentData getDeploymentData() {
+		return deploymentData;
+	}
+
+	/**
+	 * @param deploymentData the deploymentData to set
+	 */
+	public void setDeploymentData(DeploymentData deploymentData) {
+		this.deploymentData = deploymentData;
+	}
+
 }

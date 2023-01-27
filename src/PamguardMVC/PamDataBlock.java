@@ -50,6 +50,8 @@ import org.w3c.dom.Element;
 import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionProcess;
 import pamScrollSystem.ViewLoadObserver;
+import tethys.pamdata.AutoTethysProvider;
+import tethys.pamdata.TethysDataProvider;
 import dataGram.DatagramProvider;
 import dataMap.BespokeDataMapGraphic;
 import dataMap.OfflineDataMap;
@@ -64,6 +66,7 @@ import PamController.PamController;
 import PamController.PamControllerInterface;
 import PamDetection.LocContents;
 import PamDetection.LocalisationInfo;
+import PamDetection.PamDetection;
 import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamView.symbol.PamSymbolManager;
@@ -2835,8 +2838,11 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	private Vector<OfflineDataMap> offlineDataMaps = null;
 
 	private SQLLogging logging;
+	
+	private TethysDataProvider tethysDataProvider;
 
 	private JSONObjectDataSource jsonDataSource;
+	
 
 	public Vector<ProcessAnnotation> getProcessAnnotations() {
 		return processAannotations;
@@ -3045,6 +3051,26 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 
 	public SQLLogging getLogging() {
 		return logging;
+	}
+	
+	/**
+	 * Gets a data provider for Tethys. These will probably need
+	 * to be bespoke, but for now will autogenerate based on the SALLogging information. 
+	 * @return the tethysDataProvider
+	 */
+	public TethysDataProvider getTethysDataProvider() {
+		if (tethysDataProvider == null && PamDetection.class.isAssignableFrom(unitClass) && getLogging() != null) {
+			tethysDataProvider = new AutoTethysProvider(this);
+		}
+		return tethysDataProvider;
+	}
+
+	/**
+	 * Set a data provider for Tethys.
+	 * @param tethysDataProvider the tethysDataProvider to set
+	 */
+	public void setTethysDataProvider(TethysDataProvider tethysDataProvider) {
+		this.tethysDataProvider = tethysDataProvider;
 	}
 
 	final public boolean getCanLog() {
