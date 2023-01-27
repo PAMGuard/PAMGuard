@@ -1600,22 +1600,22 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			p.setLayout(new GridBagLayout());
 			GridBagConstraints c = new PamGridBagContraints();
 			
-			c.gridx = 0;
-			addComponent(p, enableBearings, c);
-			c.gridx += c.gridwidth;
-			addComponent(p, bearingsExcludeBox, c);
-			c.gridx += c.gridwidth;
-			addComponent(p, new JLabel("bearings between ", JLabel.RIGHT), c);
-			c.gridx += c.gridwidth;
-			addComponent(p, minBearing, c);
-			c.gridx += c.gridwidth;
-			addComponent(p, new JLabel(" and ", JLabel.RIGHT), c);
-			c.gridx += c.gridwidth;
-			addComponent(p, maxBearing, c);
-			c.gridx += c.gridwidth;
-			addComponent(p, new JLabel("(\u00B0)", JLabel.LEFT), c);
-
-			add(BorderLayout.WEST, p);
+//			c.gridx = 0;
+//			addComponent(p, enableBearings, c);
+//			c.gridx += c.gridwidth;
+//			addComponent(p, bearingsExcludeBox, c);
+//			c.gridx += c.gridwidth;
+//			addComponent(p, new JLabel("bearings between ", JLabel.RIGHT), c);
+//			c.gridx += c.gridwidth;
+//			addComponent(p, minBearing, c);
+//			c.gridx += c.gridwidth;
+//			addComponent(p, new JLabel(" and ", JLabel.RIGHT), c);
+//			c.gridx += c.gridwidth;
+//			addComponent(p, maxBearing, c);
+//			c.gridx += c.gridwidth;
+//			addComponent(p, new JLabel("(\u00B0)", JLabel.LEFT), c);
+//
+//			add(BorderLayout.WEST, p);
 			
 			this.multiChan = checkMultiChan();
 
@@ -1661,7 +1661,6 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			return true;
 		}
 
-		@Override
 		protected void enableControls() {
 				checkMultiChan();
 			
@@ -1692,22 +1691,22 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 	private boolean checkMultiChan() {
 		boolean multiChan = false; 
 		//do we have multi-channel clicks?
-		if  (clickControl!=null) {
-			int[] chanGroups = clickControl.getClickParameters().getGroupedSourceParameters().getChannelGroups();
-			multiChan = false;
-			
-			if (chanGroups==null) return multiChan; 
-			
-			for (int i=0; i<chanGroups.length; i++) {
-				int chans = clickControl.getClickParameters().getGroupedSourceParameters().getGroupChannels(i);
-//				Debug.out.println("Check multi-channel: " + chanGroups[i] + "  num: " + PamUtils.getNumChannels(chans));
-				if (PamUtils.getNumChannels(chans)>1) {
-					multiChan = true;
-					break; 
-				}
-			}
-		}
-		else multiChan = true;
+//		if  (clickControl!=null) {
+//			int[] chanGroups = clickControl.getClickParameters().getGroupedSourceParameters().getChannelGroups();
+//			multiChan = false;
+//			
+//			if (chanGroups==null) return multiChan; 
+//			
+//			for (int i=0; i<chanGroups.length; i++) {
+//				int chans = clickControl.getClickParameters().getGroupedSourceParameters().getGroupChannels(i);
+////				Debug.out.println("Check multi-channel: " + chanGroups[i] + "  num: " + PamUtils.getNumChannels(chans));
+//				if (PamUtils.getNumChannels(chans)>1) {
+//					multiChan = true;
+//					break; 
+//				}
+//			}
+//		}
+//		else multiChan = true;
 //		Debug.out.println("Check multi-channel: " + multiChan);
 		
 		return multiChan; 
