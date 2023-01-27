@@ -5,6 +5,11 @@ import java.util.HashMap;
 
 import PamguardMVC.PamDataBlock;
 
+/**
+ * Parameters for controlling export of Tethys data. 
+ * @author dg50
+ *
+ */
 public class TethysExportParams implements Serializable, Cloneable{
 
 	public static final long serialVersionUID = 1L;
