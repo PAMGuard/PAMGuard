@@ -1,5 +1,8 @@
 package PamguardMVC;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import dataPlotsFX.data.DataTypeInfo;
 
 abstract public class DataBlock2D<Tunit extends PamDataUnit> extends AcousticDataBlock<Tunit> {
@@ -39,4 +42,18 @@ abstract public class DataBlock2D<Tunit extends PamDataUnit> extends AcousticDat
 	 * @return data type information.
 	 */
 	abstract public DataTypeInfo getScaleInfo();
+
+	public Element getDataBlockXML(Document doc) {
+		Element el = super.getDataBlockXML(doc);
+		DataTypeInfo dti = getScaleInfo();
+		if (dti != null) {
+			if (dti.dataType != null) {
+				el.setAttribute("DataType", dti.dataType.toString());
+			}
+			if (dti.dataUnits != null) {
+				el.setAttribute("DataUnits", dti.dataUnits.toString());
+			}
+		}
+		return el;
+	}
 }

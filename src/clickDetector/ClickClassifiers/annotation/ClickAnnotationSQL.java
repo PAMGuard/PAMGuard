@@ -3,6 +3,7 @@ package clickDetector.ClickClassifiers.annotation;
 import java.sql.Types;
 
 import PamguardMVC.PamDataUnit;
+import generalDatabase.EmptyTableDefinition;
 import generalDatabase.PamTableDefinition;
 import generalDatabase.PamTableItem;
 import generalDatabase.SQLLoggingAddon;
@@ -33,12 +34,12 @@ public class ClickAnnotationSQL implements SQLLoggingAddon {
 	}
 
 	@Override
-	public void addTableItems(PamTableDefinition pamTableDefinition) {
+	public void addTableItems(EmptyTableDefinition pamTableDefinition) {
 		pamTableDefinition.addTableItem(classifierSetTable);
 	}
 
 	@Override
-	public boolean saveData(SQLTypes sqlTypes, PamTableDefinition pamTableDefinition, PamDataUnit pamDataUnit) {
+	public boolean saveData(SQLTypes sqlTypes, EmptyTableDefinition pamTableDefinition, PamDataUnit pamDataUnit) {
 		ClickClassifierAnnotation clickAnnotation = (ClickClassifierAnnotation) pamDataUnit.findDataAnnotation(ClickClassificationType.class);
 		
 		//create a comma delimited string
@@ -53,7 +54,7 @@ public class ClickAnnotationSQL implements SQLLoggingAddon {
 
 	@Override
 	
-	public boolean loadData(SQLTypes sqlTypes, PamTableDefinition pamTableDefinition, PamDataUnit pamDataUnit) {
+	public boolean loadData(SQLTypes sqlTypes, EmptyTableDefinition pamTableDefinition, PamDataUnit pamDataUnit) {
 		String array = classifierSetTable.getDeblankedStringValue();
 		
 		//read in the classification set. This a list of all the classifiers the clicks passed. 

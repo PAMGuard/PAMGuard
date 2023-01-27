@@ -1,5 +1,6 @@
 package whistleDetector;
 
+import generalDatabase.EmptyTableDefinition;
 import generalDatabase.PamDetectionLogging;
 import generalDatabase.PamTableDefinition;
 import generalDatabase.PamTableItem;
@@ -24,7 +25,7 @@ public class WhistleLogger extends PamDetectionLogging {
 		
 		this.whistleControl = whistleControl;
 		
-		PamTableDefinition tableDefinition = getTableDefinition();
+		EmptyTableDefinition tableDefinition = getTableDefinition();
 		tableDefinition.addTableItem(sliceCount = new PamTableItem("SliceCount", Types.INTEGER));
 		tableDefinition.addTableItem(length = new PamTableItem("WhistleLength", Types.DOUBLE));
 		tableDefinition.addTableItem(minFreq = new PamTableItem("MinFreq", Types.DOUBLE));

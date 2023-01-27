@@ -44,11 +44,13 @@ import whistlesAndMoans.AbstractWhistleDataUnit;
 import fftManager.FFTDataUnit;
 import fftManager.PamFFTControl;
 import group3dlocaliser.Group3DLocaliserControl;
+import metadata.MetaDataContol;
 import meygenturbine.MeygenTurbine;
 import networkTransfer.receive.BuoyStatusDataUnit;
 import networkTransfer.receive.NetworkReceiver;
 import printscreen.PrintScreenControl;
 import rockBlock.RockBlockControl;
+import tethys.TethysControl;
 import turbineops.TurbineOperationControl;
 import GPS.GpsDataUnit;
 import Map.MapController;
@@ -459,6 +461,19 @@ final public class PamModel implements PamModelInterface, PamSettings {
 		mi.setToolTipText("Manage automated data backups");
 		mi.setModulesMenuGroup(utilitiesGroup);
 		mi.setMaxNumber(1);
+
+
+		mi = PamModuleInfo.registerControlledUnit(MetaDataContol.class.getName(), MetaDataContol.unitType);
+		mi.setToolTipText("Deployment Meta Data");
+		mi.setModulesMenuGroup(utilitiesGroup);
+		mi.setMaxNumber(1); 
+		
+		if (isViewer) {
+			mi = PamModuleInfo.registerControlledUnit(TethysControl.class.getName(), TethysControl.defaultName);
+			mi.setToolTipText("Interface to Tethys Database");
+			mi.setModulesMenuGroup(utilitiesGroup);
+			mi.setMaxNumber(1);
+		}
 		
 		
 

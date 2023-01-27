@@ -13,6 +13,7 @@ import javax.swing.JOptionPane;
 
 import PamUtils.LatLong;
 import PamUtils.PamFileChooser;
+import PamView.dialog.warn.WarnOnce;
 
 public class GebcoMapFile implements MapFileManager {
 	
@@ -83,7 +84,15 @@ public class GebcoMapFile implements MapFileManager {
 	 * @see Map.MapFile#readFileData(java.io.File)
 	 */
 	public boolean readFileData(File file) {
-		return readMapFile(file, true);
+		try {
+			return readMapFile(file, true);
+		}
+		catch (Exception e) {
+			// trap error someone reported at end November 22. Suspect it was their corrupt map file causing problems. 
+			String err = String.format("Map file %s is missing or corrupt and cannot be loaded", file.getName());
+			WarnOnce.showWarning("Map File Error", err, WarnOnce.OK_OPTION);
+			return false;
+		}
 	}
 
 	private boolean readMapFile(File gebcoFile, boolean readContours) {

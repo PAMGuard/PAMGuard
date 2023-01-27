@@ -17,5 +17,10 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/dg50/Tethys/NilusXMLGenerator/target/nilus-1.5.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/C:/Users/dg50/Tethys/NilusXMLGenerator/target/nilus-1.5-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

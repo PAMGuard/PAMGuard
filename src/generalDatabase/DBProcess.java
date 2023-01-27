@@ -96,6 +96,8 @@ public class DBProcess extends PamProcess {
 		dbSpecials.add(logSettings = new LogSettings(databaseControll, "Pamguard Settings", false));
 		dbSpecials.add(logLastSettings = new LogSettings(databaseControll, "Pamguard Settings Last", true));
 		dbSpecials.add(logViewerSettings = new LogSettings(databaseControll, "Pamguard Settings Viewer", true));
+		
+		dbSpecials.add(new LogXMLSettings(databaseControll));
 
 	}
 
@@ -107,15 +109,24 @@ public class DBProcess extends PamProcess {
 		}
 	}
 
-	protected boolean saveStartSettings() {
+	protected boolean saveStartSettings(long timeNow) {
 		PamConnection con = databaseControll.getConnection();
 		if (con != null) {
+			/**
+			 * This first one is the 'old' pre 2022 method which saves a serialised lump of all
+			 * the settings in the database. It ain't broke, so not fixing it. 
+			 */
 			for (int i = 0; i < dbSpecials.size(); i++) {
 				dbSpecials.get(i).pamStart(con);
 			}
 			return true;
 		}
 		return false;
+	}
+
+	protected boolean saveEndSettings(long timeNow) {
+		
+		return true;
 	}
 
 	@Override
@@ -206,7 +217,7 @@ public class DBProcess extends PamProcess {
 		}
 
 		dataBlocks = PamController.getInstance().getDataBlocks();
-		PamTableDefinition tableDefinition;
+		EmptyTableDefinition tableDefinition;
 		SQLLogging logging;
 
 		// for each datablock, check that the process can log (ignoring GPS process)
