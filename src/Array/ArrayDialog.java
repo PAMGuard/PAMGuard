@@ -33,7 +33,6 @@ import PamView.help.PamHelp;
  */
 public class ArrayDialog extends PamDialog implements ActionListener {
 
-
 	private static final long serialVersionUID = 1L;
 
 	static private ArrayDialog singleInstance = null;
@@ -56,9 +55,6 @@ public class ArrayDialog extends PamDialog implements ActionListener {
 	private ArrayDialog(Frame parentFrame) {
 		super(parentFrame, "Pamguard hydrophone array", false);
 
-//		JPanel p = new JPanel();
-//		p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-//		p.setLayout(new BorderLayout());
 		JPanel mainPanel = new JPanel(new BorderLayout());
 		JSplitPane splitPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		mainPanel.add(BorderLayout.CENTER, splitPanel);
@@ -73,8 +69,6 @@ public class ArrayDialog extends PamDialog implements ActionListener {
 		eastPanel.add(channelPanel.getChannelPanel());
 
 		environmentPanel = new EnvironmentPanel(this);
-		//		eastPanel.add(environmentPanel.getEnvironmentPanel());
-
 
 		hydrophoneDiagram = new HydrophoneDiagram(this);
 		JPanel westPanel = new JPanel(new BorderLayout());
