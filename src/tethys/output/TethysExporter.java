@@ -16,6 +16,7 @@ import PamController.settings.output.xml.PamguardXMLWriter;
 import PamUtils.PamCalendar;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import PamguardMVC.dataSelector.DataSelector;
 import generalDatabase.DBSchemaWriter;
 import generalDatabase.SQLLogging;
 import metadata.MetaDataContol;
@@ -234,9 +235,36 @@ public class TethysExporter {
 		// do it with a data copy which can avoid synchronising the entire block for what may be a long time
 		// the copy function is itself synched, and is quite fast, so easier and safe this way
 		ArrayList<PamDataUnit> dataCopy = aDataBlock.getDataCopy();
+		DataSelector dataSelector = aDataBlock.getDataSelector(tethysControl.getDataSelectName(), false);
+		int nSkipped = 0;
+		int nExport = 0;
+		
 		for (PamDataUnit aData : dataCopy) {
-			// then we do whatever we need to do to convert this into 
+			/*
+			 *  see if we want this data unit. PAMGuard has a complicated system of data selectors specific to 
+			 *  each data type. These are centrally managed so you don't need to worry too much about them. They
+			 *  are identified by name for each data stream and the behaviour here should follow the selections you 
+			 *  made in the dialog. 
+			 *  the data selection system allows different displays to show different data, so a stream can have many differently
+			 *  named selectors active at any one time, all doing different things in different parts of PAMGuard.  
+			 */
+			if (dataSelector != null) {
+				if (dataSelector.scoreData(aData) <= 0) {
+					nSkipped++;
+					continue; // don't want this one. 
+				}
+			}
+			
+			/*
+			 *  then we do whatever we need to do to convert this into something for Tethys
+			 *  this might happen in the tethysSchema object for each data stream ????
+			 */
+			
+			
+			nExport ++;
 		}
+		
+		System.out.printf("Exported %d data units and skipped %d in %s", nExport, nSkipped, aDataBlock.getLongDataName());
 		
 		
 	}

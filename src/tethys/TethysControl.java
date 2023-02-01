@@ -59,19 +59,6 @@ public class TethysControl extends PamControlledUnit {
 	public TethysExportParams getTethysExportParams() {
 		return tethysExportParams;
 	}
-	
-	/**
-	 * Get a nilus deployment document, as full populated as possible. 
-	 * @return
-	 */
-	public Deployment getDeployment() {
-		Deployment deployment = new Deployment();
-		Deployment.Instrument instrument = new Instrument();
-//		instrument.
-//		deployment.
-		
-		return null;
-	}
 
 	/**
 	 * We'll probably want to 
