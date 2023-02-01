@@ -368,7 +368,7 @@ public class SuperDetDataBlock<Tunit extends SuperDetection, TSubDet extends Pam
 					}
 					if (!found) {
 						superDet = null;
-						System.out.printf("Can't find data unit id %d, UID %d in %s\n", superID, superUID, getDataName());
+						Debug.out.printf("Can't find data unit id %d, UID %d in %s\n", superID, superUID, getDataName());
 					}
 				}
 				if (superDet == null) {
@@ -448,6 +448,9 @@ public class SuperDetDataBlock<Tunit extends SuperDetection, TSubDet extends Pam
 			int iDone = 0;
 			while (duIt.hasNext()) {
 				Tunit aData = duIt.next(); // looping through superdetections.
+//				if (aData.getDatabaseIndex() == 131) {
+//					System.out.println("On event 131");
+//				}
 				if (viewLoadObserver != null) {
 					viewLoadObserver.sayProgress(1, aData.getTimeMilliseconds(), firstTime, lastTime, iDone++);
 				}
@@ -479,6 +482,7 @@ public class SuperDetDataBlock<Tunit extends SuperDetection, TSubDet extends Pam
 						sdInfo.setSubDetection(null);
 					}
 				}
+//				aData.weedMissingSubDetections();
 			}
 		}
 		return true;

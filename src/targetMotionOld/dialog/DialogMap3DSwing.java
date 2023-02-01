@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -18,6 +19,7 @@ import PamUtils.LatLong;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataSelector.DataSelector;
+import PamguardMVC.superdet.SubdetectionInfo;
 import clickDetector.ClickDataBlock;
 import targetMotionOld.TargetMotionLocaliser;
 
@@ -66,9 +68,14 @@ public class DialogMap3DSwing<T extends GroupDetection> extends DialogMap<T> {
 		mapDetData.allAvailable = true;
 		mapDetData.select = true;
 
-		int nSub = currentEvent.getSubDetectionsCount();
+		List<SubdetectionInfo<PamDataUnit>> subDets = currentEvent.getPresentSubDetections();
+		
+		int nSub = subDets.size();
 		for (int i = 0; i < nSub; i++) {
-			PamDataUnit subDet = currentEvent.getSubDetection(i);
+			PamDataUnit subDet = subDets.get(i).getSubDetection();
+			if (subDet == null) {
+				continue;
+			}
 			MapDetectionData subDetData = mapDetectionsManager.findDetectionData(subDet.getParentDataBlock());
 			if (subDetData != null && subDetData != mapDetData) {
 				mapDetData = subDetData;
@@ -81,8 +88,8 @@ public class DialogMap3DSwing<T extends GroupDetection> extends DialogMap<T> {
 		 */
 		LatLong eventCentre = currentEvent.getOriginLatLong(true);
 		if (nSub >= 2) {
-			LatLong ll1 = currentEvent.getSubDetection(0).getOriginLatLong(true);
-			LatLong ll2 = currentEvent.getSubDetection(nSub-1).getOriginLatLong(true);
+			LatLong ll1 = subDets.get(0).getSubDetection().getOriginLatLong(true);
+			LatLong ll2 = subDets.get(nSub-1).getSubDetection().getOriginLatLong(true);
 			if (ll1 != null & ll2 != null) {
 				double lat = (ll1.getLatitude() + ll2.getLatitude())/2.;
 				double lon = (ll1.getLongitude() + ll2.getLongitude())/2.;

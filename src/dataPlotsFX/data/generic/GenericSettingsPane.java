@@ -25,6 +25,9 @@ import pamViewFX.symbol.StandardSymbolOptionsPane;
  */
 public class GenericSettingsPane extends PamBorderPane implements TDSettingsPane {
 
+	/**
+	 *
+	 */
 	private static final double PREF_WIDTH = 300;
 
 	/*

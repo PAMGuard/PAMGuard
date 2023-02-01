@@ -23,8 +23,12 @@ import Stats.LinFit;
  * Step 3 is to rotate all position and angle vectors so that they correspond to 
  * a track as close as possible to the x axis. 
  * @author Doug Gillespie
+ * 
+ * Deprecated. Not used and will probably fall over with system whereby sub detection info
+ * is present, but not all sub detections are. 
  *
  */
+@Deprecated
 @SuppressWarnings("rawtypes") 
 public class EventRotator extends AbstractTargetMotionInformation{
 

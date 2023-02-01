@@ -950,15 +950,22 @@ public class AcquisitionProcess extends PamProcess {
 
 	/**
 	 * Check it's a single channel and not a channel map. 
+	 * This fundamentally messed up the amplitude calculations when the
+	 * channels were > 2 since it was only taking the number of the lowest set 
+	 * bit. So if a genuine channel was sent, rather than a channel map with a 
+	 * single set channel, it messed up. Have made this function redundant
+	 * and we need to be 100% sure that all amplitude calculations are sent a 
+	 * channel number not a bitmap with a single set channel.  
 	 * @param channel
 	 * @return single channel if it seemed to be a bitmap. 
 	 */
 	private int checkSingleChannel(int channel) {
-		int bitCount = PamUtils.getNumChannels(channel);
-		if (bitCount > 1 || channel > 32) {
-			channel = PamUtils.getLowestChannel(channel);
-		}
 		return channel;
+//		int bitCount = PamUtils.getNumChannels(channel);
+//		if (bitCount > 1 || channel > 32) {
+//			channel = PamUtils.getLowestChannel(channel);
+//		}
+//		return channel;
 	}
 
 	/**
@@ -1022,7 +1029,7 @@ public class AcquisitionProcess extends PamProcess {
 	
 	/**
 	 * Prepares for fast amplitude calculations
-	 * @param channel
+	 * @param channel number i.e. 0 - 31, NOT a bitmap. 
 	 */
 	public double prepareFastAmplitudeCalculation(int channel) {
 		channel = checkSingleChannel(channel);
@@ -1035,7 +1042,7 @@ public class AcquisitionProcess extends PamProcess {
 	 * for an array of double data
 	 * 
 	 * @param rawAmplitude raw amplitude (should be -1 < rawAmplitude < 1)
-	 * @param channel channel number (MUST be a channel, not a sequence number)
+	 * @param channel channel number (MUST be a channel 0 - 31, not a sequence number)
 	 * @return amplitude in dB re 1 uPa.
 	 */
 	public double[] rawAmplitude2dB(double[] rawAmplitude, int channel){
@@ -1122,7 +1129,7 @@ public class AcquisitionProcess extends PamProcess {
 
 	/**
 	 * Converts dB in micropascal to ADC counts on a 0 - 1 scale. 
-	 * @param channel channel number. 
+	 * @param channel channel number, i.e. channel index 0 - 31 NOT a bitmap. 
 	 * @param dBMuPascal db in micropascal
 	 * @return ADC counts on a 0-1 scale. 
 	 */

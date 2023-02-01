@@ -37,6 +37,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.WindowConstants;
 
@@ -882,6 +883,7 @@ public class PamObjectViewer implements PamViewInterface, ComponentListener,
 			blockTimer.start();
 
 			setVisible(true);
+			
 
 		}
 
@@ -1003,6 +1005,22 @@ public class PamObjectViewer implements PamViewInterface, ComponentListener,
 				}
 			}
 			return null;
+		}
+
+		@Override
+		public void setVisible(boolean vis) {
+			if (vis) {
+				SwingUtilities.invokeLater(new Runnable() {
+					/**
+					 * This seems to work and resize the text fields on high def displays. 
+					 */
+					@Override
+					public void run() {
+						pack();
+					}
+				});
+			}
+			super.setVisible(vis);
 		}
 
 		void fillPanelContent() {

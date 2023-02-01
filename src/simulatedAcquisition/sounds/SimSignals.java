@@ -35,6 +35,7 @@ public class SimSignals  {
 		simSignalList.add(new RandomWhistles());
 		simSignalList.add(new BranchedChirp(5000, 12000, 8000, 3000, .6));
 		simSignalList.add(new RightWhales());
+		simSignalList.add(new RandomMystecete());
 		simSignalList.add(new BlueWhaleD());
 		simSignalList.add(new WhiteNoise());
 		simSignalList.add(new PinkNoise());

@@ -161,7 +161,8 @@ public class NoiseBandProcess extends PamProcess {
 				lastOutputTime = timeMillis;
 			}
 			else if (timeMillis - lastOutputTime >= noiseBandControl.noiseBandSettings.outputIntervalSeconds*1000) {
-				daqProcess.prepareFastAmplitudeCalculation(iChan);
+				double ampTerm = daqProcess.prepareFastAmplitudeCalculation(iChan);
+//				System.out.printf("Amplitude term cahnnel %d is %3.1f\n", iChan, ampTerm);
 				double[][] measurementStats = new double[bandOutputs.length][2];
 				for (int i = 0; i < bandOutputs.length; i++) {
 					measurementStats[bandOutputs.length-i-1][0] = daqProcess.rawAmplitude2dB(bandOutputs[i].getRMS(), iChan, true);

@@ -150,7 +150,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings{
 
 		public void actionPerformed(ActionEvent e) {
 
-			System.out.println("Restart later time action");
+//			System.out.println("Restart later time action");
 			newFileTimer.stop();
 			PamController.getInstance().startLater(false); //don't save settings on restarts
 
@@ -655,7 +655,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings{
 		if (currentFile < allFiles.size()) {
 			// only restart if the file ended - not if it stopped
 			if (getStreamStatus() == STREAM_ENDED) {
-				System.out.println(String.format("Start new file timer (file %d/%d)",currentFile+1,allFiles.size()));
+//				System.out.println(String.format("Start new file timer (file %d/%d)",currentFile+1,allFiles.size()));
 				newFileTimer.start();
 			}
 		}
@@ -778,7 +778,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings{
 
 	@Override
 	public boolean startSystem(AcquisitionControl daqControl) {
-		System.out.println("Start system");
+//		System.out.println("Start system");
 		setFolderProgress();
 		return super.startSystem(daqControl);
 	}

@@ -40,6 +40,7 @@ import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
 import pamViewFX.fxNodes.utilityPanes.FilterPaneFX;
 import pamViewFX.fxNodes.utilityPanes.GroupedSourcePaneFX;
+import pamViewFX.validator.PamValidator;
 
 /**
  * A pane to change click detector settings. 
@@ -175,7 +176,7 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 	/**
 	 * The default pane width
 	 */
-	public static double PREF_PANE_WIDTH=550;
+	public static double PREF_PANE_WIDTH=560;
 	
 	
 	/**
@@ -190,7 +191,7 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 		this.clickControl=clickControl; 
 		mainPane= new PamBorderPane(); 
 		
-		clickValidator = new Validator(); 
+		clickValidator = new PamValidator(); 
 
 		pamTabbedPane=new PamTabPane();
 		pamTabbedPane.setAddTabButton(false);

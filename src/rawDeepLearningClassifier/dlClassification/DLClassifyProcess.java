@@ -36,6 +36,7 @@ import rawDeepLearningClassifier.segmenter.SegmenterProcess.GroupedRawData;
  */
 public class DLClassifyProcess extends PamInstantProcess {
 
+	
 	/**
 	 *  Holds all model results but no other information 
 	 */
@@ -538,7 +539,9 @@ public class DLClassifyProcess extends PamInstantProcess {
 	@Override
 	public void pamStop() {
 		runModel(); //make sure to run the last data in the buffer. 
-		this.dlControl.getDLModel().closeModel(); 
+		
+		//21/11/2022 - it seems like this causes a memory leak when models are reopened and closed every file...
+		//this.dlControl.getDLModel().closeModel(); 
 	}
 
 	/**

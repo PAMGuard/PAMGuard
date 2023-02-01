@@ -168,7 +168,11 @@ public class GenericDLClassifier implements DLClassiferModel, PamSettings {
 
 	@Override
 	public void closeModel() {
-		// TODO Auto-generated method stub
+		//very important to prevent memory leak for long term processing. 
+		if (genericModelWorker.getModel()!=null && genericModelWorker.getModel().getModel()!=null) {
+			//System.out.println("CLOSE GENERNIC MODEL"); 
+			genericModelWorker.getModel().getModel().close();
+		}
 	}
 
 

@@ -247,15 +247,15 @@ public class SelectFolder {
 		folderName.setColumns(textLength);
 	}
 
-//	public boolean isShowSubFolderOption() {
-//		return showSubFolderOption;
-//	}
-//
-//	
-//	public void setShowSubFolderOption(boolean showSubFolderOption) {
-//		this.showSubFolderOption = showSubFolderOption;
-//		setVisibleControls();
-//	}
+	public boolean isShowSubFolderOption() {
+		return showSubFolderOption;
+	}
+
+	
+	public void setShowSubFolderOption(boolean showSubFolderOption) {
+		this.showSubFolderOption = showSubFolderOption;
+		setVisibleControls();
+	}
 
 	private void setVisibleControls() {
 		includeSubFoldersCheckBox.setVisible(showSubFolderOption);
