@@ -287,6 +287,9 @@ public class StandardFileDate implements FileDate, PamSettings {
 			System.out.println(e.getMessage());
 		}  //throws ParseException if no match
 		setLastFormat(forcedDateFormat);
+		if (d == null) {
+			return 0;
+		}
 		return d.getTime();
 	}
 
