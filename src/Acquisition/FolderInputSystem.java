@@ -33,6 +33,8 @@ import pamguard.GlobalArguments;
 import Acquisition.pamAudio.PamAudioFileManager;
 import Acquisition.pamAudio.PamAudioFileFilter;
 import Acquisition.pamAudio.PamAudioSystem;
+import PamController.DataInputStore;
+import PamController.InputStoreInfo;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamSettings;
@@ -57,7 +59,7 @@ import PamView.panel.PamProgressBar;
  * @author Doug Gillespie
  *
  */
-public class FolderInputSystem extends FileInputSystem implements PamSettings{
+public class FolderInputSystem extends FileInputSystem implements PamSettings, DataInputStore {
 
 	//	Timer timer;
 	public static final String daqType = "File Folder Acquisition System";
@@ -138,6 +140,8 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings{
 		}
 		String[] selList = {globalFolder};
 		folderInputParameters.setSelectedFiles(selList);
+		// need to immediately make the allfiles list since it's about to get used by the reprocess manager
+		makeSelFileList();
 	}
 
 	/**
@@ -825,6 +829,52 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings{
 	 */
 	public void dialogFXSetParams() {
 		folderInputPane.setParams(folderInputParameters);
+	}
+
+	@Override
+	public InputStoreInfo getStoreInfo(boolean detail) {
+		if (allFiles == null || allFiles.size() == 0) {
+			return null;
+		}
+		WavFileType firstFile = allFiles.get(0);
+		long firstFileStart = getFileStartTime(firstFile.getAbsoluteFile());
+		WavFileType lastFile = allFiles.get(allFiles.size()-1);
+		long lastFileStart = getFileStartTime(lastFile.getAbsoluteFile());
+		lastFile.getAudioInfo();
+		long lastFileEnd = (long) (lastFileStart + lastFile.getDurationInSeconds()*1000.);
+		InputStoreInfo storeInfo = new InputStoreInfo(acquisitionControl, allFiles.size(), firstFileStart, lastFileStart, lastFileEnd);
+		if (detail) {
+			long[] allFileStarts = new long[allFiles.size()];
+			for (int i = 0; i < allFiles.size(); i++) {
+				allFileStarts[i] = getFileStartTime(allFiles.get(i).getAbsoluteFile());
+			}
+			storeInfo.setFileStartTimes(allFileStarts);
+		}
+		return storeInfo;
+	}
+
+	@Override
+	public boolean setAnalysisStartTime(long startTime) {
+		/**
+		 * Called from the reprocess manager just before PAMGuard starts with a time
+		 * we want to process from. This should be equal to the start of one of the files
+		 * so all we have to do (in principle) is to set the currentfile to that index and 
+		 * processing will continue from there. 
+		 */
+		if (allFiles == null || allFiles.size() == 0) {
+			return false;
+		}
+		for (int i = 0; i < allFiles.size(); i++) {
+			long fileStart = getFileStartTime(allFiles.get(i).getAbsoluteFile());
+			if (fileStart >= startTime) {
+				currentFile = i;
+				System.out.printf("Sound Acquisition start processing at file %s time %s\n", allFiles.get(i).getName(),
+						PamCalendar.formatDBDateTime(fileStart));
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 

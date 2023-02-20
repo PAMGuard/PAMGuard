@@ -45,6 +45,7 @@ import PamController.PamController;
 import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import PamController.fileprocessing.StoreStatus;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamProcess;
@@ -261,6 +262,6 @@ public class DecimatorControl extends PamControlledUnit implements PamSettings, 
 		double m = fbig % fsmall;
 		return m == 0;
 	}
-	
+
 	
 }

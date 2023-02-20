@@ -1146,6 +1146,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	protected void fileListComplete() {
 		if (GlobalArguments.getParam(PamController.AUTOEXIT) != null) {
 			System.out.println("All sound files processed, PAMGuard can close on " + PamController.AUTOEXIT);
+			PamController.getInstance().setPamStatus(PamController.PAM_COMPLETE);
 			PamController.getInstance().batchProcessingComplete();
 		}
 	}

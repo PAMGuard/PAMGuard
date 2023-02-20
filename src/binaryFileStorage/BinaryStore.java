@@ -36,6 +36,8 @@ import dataGram.DatagramManager;
 import dataMap.OfflineDataMap;
 import dataMap.OfflineDataMapPoint;
 import PamController.AWTScheduler;
+import PamController.DataInputStore;
+import PamController.DataOutputStore;
 import PamController.OfflineDataStore;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitGUI;
@@ -49,6 +51,7 @@ import PamController.PamSettingsGroup;
 import PamController.PamSettingsSource;
 import PamController.StorageOptions;
 import PamController.StorageParameters;
+import PamController.fileprocessing.StoreStatus;
 import PamController.status.ModuleStatus;
 import PamController.status.QuickRemedialAction;
 import PamModel.SMRUEnable;
@@ -89,7 +92,7 @@ import binaryFileStorage.layoutFX.BinaryStoreGUIFX;
  *
  */
 public class BinaryStore extends PamControlledUnit implements PamSettings, 
-PamSettingsSource, OfflineDataStore {
+PamSettingsSource, DataOutputStore {
 
 	public static final String fileType = "pgdf";
 
@@ -1113,6 +1116,8 @@ PamSettingsSource, OfflineDataStore {
 
 	String lastFailedStream = null;
 
+	private BinaryStoreStatusFuncs binaryStoreStatusFuncs;
+
 	public boolean removeMapPoint(File aFile, ArrayList<PamDataBlock> streams) {
 		BinaryHeaderAndFooter bhf = getFileHeaderAndFooter(aFile);
 		if (bhf == null || bhf.binaryHeader == null) {
@@ -1354,6 +1359,26 @@ PamSettingsSource, OfflineDataStore {
 		}
 		return newFile;
 	}
+
+	/**
+	 * Find the noise file to match a given data file. 
+	 * @param dataFile data file. 
+	 * @param checkExists check the file exists and if it doens't return null
+	 * @return index file to go with the data file. 
+	 */
+	public File findNoiseFile(File dataFile, boolean checkExists) {
+//		String filePath = dataFile.getAbsolutePath();
+//		// check that the last 4 characters are "pgdf"
+//		int pathLen = filePath.length();
+//		String newPath = filePath.substring(0, pathLen-4) + indexFileType;
+		File newFile = swapFileType(dataFile, noiseFileType);
+		if (checkExists) {
+			if (newFile.exists() == false) {
+				return null;
+			}
+		}
+		return newFile;
+	}
 	
 	/**
 	 * Create an index file (pgdx) name from a data file (pgdf) file name
@@ -1488,7 +1513,7 @@ PamSettingsSource, OfflineDataStore {
 	 * @param folder folder to search
 	 * @param filter file filter
 	 */
-	private void listDataFiles(ArrayList<File> fileList, File folder, PamFileFilter filter) {
+	public void listDataFiles(ArrayList<File> fileList, File folder, PamFileFilter filter) {
 		File[] newFiles = folder.listFiles(filter);
 		if (newFiles == null) {
 			return;
@@ -1684,7 +1709,7 @@ PamSettingsSource, OfflineDataStore {
 	 * @param binaryObjectData
 	 * @param dataSink
 	 */
-	private void unpackAnnotationData(int fileVersion, PamDataUnit createdUnit, BinaryObjectData binaryObjectData, BinaryDataSink dataSink) {
+	protected void unpackAnnotationData(int fileVersion, PamDataUnit createdUnit, BinaryObjectData binaryObjectData, BinaryDataSink dataSink) {
 		
 		//System.out.println("Hello annotation  " + binaryObjectData.getAnnotationDataLength());
 		if (binaryObjectData.getAnnotationDataLength() == 0) {
@@ -2211,7 +2236,7 @@ PamSettingsSource, OfflineDataStore {
 	
 	
 
-	private boolean reportError(String string) {
+	boolean reportError(String string) {
 		System.out.println(string);
 		return false;
 	}
@@ -2507,6 +2532,19 @@ PamSettingsSource, OfflineDataStore {
 	 */
 	public NoiseStoreType getNoiseStore() {
 		return binaryStoreSettings.getNoiseStoreType();
+	}
+	
+	@Override
+	public StoreStatus getStoreStatus(boolean getDetail) {
+		if (binaryStoreStatusFuncs == null) {
+			binaryStoreStatusFuncs = new BinaryStoreStatusFuncs(this);
+		}
+		return binaryStoreStatusFuncs.getStoreStatus(getDetail);
+	}
+	@Override
+	public boolean deleteDataFrom(long timeMillis) {
+		BinaryStoreDeleter storeDeleter = new BinaryStoreDeleter(this);
+		return storeDeleter.deleteDataFrom(timeMillis);
 	}
 	
 }

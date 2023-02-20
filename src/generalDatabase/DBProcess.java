@@ -1,6 +1,9 @@
 package generalDatabase;
 
 import generalDatabase.ColumnMetaData.METACOLNAMES;
+import generalDatabase.clauses.FixedClause;
+import generalDatabase.clauses.FromClause;
+import generalDatabase.clauses.PAMSelectClause;
 import generalDatabase.pamCursor.PamCursor;
 import generalDatabase.ucanAccess.UCanAccessSystem;
 
@@ -14,6 +17,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -21,6 +25,7 @@ import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -39,6 +44,7 @@ import loggerForms.formdesign.FormEditor;
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamController.PamFolders;
+import PamController.fileprocessing.StoreStatus;
 import PamUtils.PamCalendar;
 import PamUtils.PamFileChooser;
 import PamView.dialog.warn.WarnOnce;
@@ -1433,6 +1439,143 @@ public class DBProcess extends PamProcess {
 			}
 			schemaWriter.writeSchema(folder, aBlock);
 		}
+	}
+
+	/**
+	 * Get the store status for use with pre-process checks. 
+	 * @param getDetail get full details of start and end times. 
+	 * @return database store status. 
+	 */
+	public StoreStatus getStoreStatus(DBControlUnit dbControlUnit, boolean getDetail) {
+		DatabaseStoreStatus dbStoreStatus = new DatabaseStoreStatus(dbControlUnit);
+		// and work out if any tables have anything in them already ...
+		int status = 0;
+		if (dbControlUnit.getConnection() == null) {
+			status = StoreStatus.STATUS_MISSING;
+		}
+		else {
+			boolean anyData = hasAnyOutputData(); 
+			if (anyData) {
+				status = StoreStatus.STATUS_HASDATA;
+			}
+			else {
+				status = StoreStatus.STATUS_EMPTY;
+			}
+		}
+		if (status == StoreStatus.STATUS_HASDATA && getDetail) {
+			getStoreLimits(dbStoreStatus);
+		}
+		dbStoreStatus.setStoreStatus(status);
+		return dbStoreStatus;
+	}
+
+	private void getStoreLimits(DatabaseStoreStatus dbStoreStatus) {
+		ArrayList<PamDataBlock> allDataBlocks = PamController.getInstance().getDataBlocks();
+		PamTableDefinition tableDefinition;
+		SQLLogging logging;
+
+		// for each datablock, check that the process can log (ignoring GPS process)
+		for (int i = 0; i < allDataBlocks.size(); i++) {
+			PamDataBlock aBlock = allDataBlocks.get(i);
+			logging = aBlock.getLogging();
+			if (logging == null) {
+				continue; 
+			}
+			if (aBlock.getMixedDirection() != PamDataBlock.MIX_INTODATABASE) {
+				continue; // don't want things like GPS data. 
+			}
+			getStoreLimits(aBlock, dbStoreStatus);
+		}
+		
+	}
+
+	/**
+	 * Get first and last records for a table. 
+	 * @param aBlock
+	 * @param dbStoreStatus
+	 */
+	private void getStoreLimits(PamDataBlock aBlock, DatabaseStoreStatus dbStoreStatus) {
+		// TODO Auto-generated method stub
+		SQLLogging logging = aBlock.getLogging();
+		PamConnection con = databaseControll.getConnection();
+		SQLTypes sqlTypes = con.getSqlTypes();
+		String q1 = String.format("SELECT MIN(UTC) FROM %s",sqlTypes.formatTableName(logging.getTableDefinition().getTableName())); 
+		Long t = getUTC(con, q1);
+		dbStoreStatus.testFirstDataTime(t);
+		String q2 = String.format("SELECT MAX(UTC) FROM %s",sqlTypes.formatTableName(logging.getTableDefinition().getTableName())); 
+		Long t2 = getUTC(con, q2);
+		dbStoreStatus.testLastDataTime(t2);
+	}
+
+	private Long getUTC(PamConnection con, String qStr) {
+
+		Object utcObject = null;
+		try {
+			PreparedStatement stmt = con.getConnection().prepareStatement(qStr);
+			ResultSet result = stmt.executeQuery();
+			if (result.next()) {
+				utcObject = result.getObject(1);
+				
+			}
+			result.close();
+			stmt.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+		if (utcObject == null) {
+			return null;
+		}
+		Long millis = SQLTypes.millisFromTimeStamp(utcObject);
+		return millis;
+	}
+
+	/**
+	 * Is there any data in any output tables ? 
+	 * @return
+	 */
+	private boolean hasAnyOutputData() {
+		ArrayList<PamDataBlock> allDataBlocks = PamController.getInstance().getDataBlocks();
+		PamTableDefinition tableDefinition;
+		SQLLogging logging;
+
+		// for each datablock, check that the process can log (ignoring GPS process)
+		for (int i = 0; i < allDataBlocks.size(); i++) {
+			PamDataBlock aBlock = allDataBlocks.get(i);
+			logging = aBlock.getLogging();
+			if (logging == null) {
+				continue; 
+			}
+			if (aBlock.getMixedDirection() != PamDataBlock.MIX_INTODATABASE) {
+				continue; // don't want things like GPS data. 
+			}
+			// get a record count.
+			Integer count = logging.countTableItems(null);
+			if (count != null && count > 0) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public boolean deleteDataFrom(long timeMillis) {
+		ArrayList<PamDataBlock> allDataBlocks = PamController.getInstance().getDataBlocks();
+		PamTableDefinition tableDefinition;
+		SQLLogging logging;
+
+		// for each datablock, check that the process can log (ignoring GPS process)
+		boolean ok = true;
+		for (int i = 0; i < allDataBlocks.size(); i++) {
+			PamDataBlock aBlock = allDataBlocks.get(i);
+			logging = aBlock.getLogging();
+			if (logging == null) {
+				continue;
+			}
+			PAMSelectClause clause = new FromClause(timeMillis);			
+			ok &= logging.deleteData(clause);
+		}
+		return ok;
 	}
 
 }
