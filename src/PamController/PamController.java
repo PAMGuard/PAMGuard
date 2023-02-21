@@ -1212,6 +1212,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 		}
 
 		/*
+		 * 
+		 * This needs to be called after prepareproces. 
 		 * Now we do some extra checks on the stores to see if we want to overwite data, 
 		 * carry on from where we left off, etc. 
 		 */
@@ -1221,14 +1223,15 @@ public class PamController implements PamControllerInterface, PamSettings {
 			if (goonthen == false) {
 				System.out.println("Data processing will not start since you've chosen not to overwrite existing output data");
 				pamStop();
+				setPamStatus(PAM_IDLE);
 				return false;
 			}
-
-			if (saveSettings) {
-				saveSettings(PamCalendar.getSessionStartTime());
-			}
 		}
-		
+
+		if (saveSettings) {
+			saveSettings(PamCalendar.getSessionStartTime());
+		}
+
 		StorageOptions.getInstance().setBlockOptions();
 
 		t1 = System.currentTimeMillis();

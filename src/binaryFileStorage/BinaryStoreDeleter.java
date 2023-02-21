@@ -142,9 +142,10 @@ public class BinaryStoreDeleter {
 		boolean headOk = false;
 		BinaryHeader binaryHead = new BinaryHeader();
 		try {
-			DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(indexFile)));
+			FileInputStream fis = new FileInputStream(indexFile);
+			DataInputStream dis = new DataInputStream(new BufferedInputStream(fis));
 			headOk = binaryHead.readHeader(dis);
-			dis.close();
+			fis.close();
 		}
 		catch (IOException e) {
 			headOk = false;
@@ -188,6 +189,7 @@ public class BinaryStoreDeleter {
 	}
 	
 	private boolean partialCopyFile(PamDataBlock aBlock, File dataFile, long timeMillis) {
+		System.out.printf("Partial delete of file %s from %s\n", dataFile.getAbsoluteFile(), PamCalendar.formatDBDateTime(timeMillis));
 		try {
 			BinaryInputStream inputStream = new BinaryInputStream(binaryStore, aBlock);
 			if (inputStream.openFile(dataFile) == false) {
@@ -303,10 +305,11 @@ public class BinaryStoreDeleter {
 	 * @return
 	 */
 	private boolean deleteFileSet(File dataFile) {
+		System.out.printf("Deleting full file set for %s\n", dataFile.getAbsoluteFile());
+		boolean deleteOk = true;
 		try {
 			File indexFile = binaryStore.findIndexFile(dataFile, true);
 			File noiseFile = binaryStore.findNoiseFile(dataFile, true);
-			boolean deleteOk = true;
 			deleteOk &= dataFile.delete();
 			if (indexFile != null) {
 				deleteOk &= indexFile.delete();
@@ -314,11 +317,14 @@ public class BinaryStoreDeleter {
 			if (noiseFile != null) {
 				deleteOk &= noiseFile.delete();
 			}
-			return deleteOk;
 		}
 		catch (Exception e) {
-			return false;
+			deleteOk = false;
 		}
+
+		System.out.printf("Deleting full file set %s for %s\n", deleteOk?"OK":"Error", dataFile.getAbsoluteFile());
+		
+		return deleteOk;
 		
 	}
 

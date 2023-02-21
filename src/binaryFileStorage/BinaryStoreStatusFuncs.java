@@ -136,15 +136,16 @@ public class BinaryStoreStatusFuncs {
 		 *  get the UID and time of the last item in the file. Can return these in the form of
 		 *  a BinaryFooter since it's pretty much the same information needed.  
 		 */
+		BinaryInputStream inputStream = new BinaryInputStream(binaryStore, null);
 		try {
 			// need to work through the file now. 
-			BinaryInputStream inputStream = new BinaryInputStream(binaryStore, null);
 			if (inputStream.openFile(aFile) == false) {
 				return null;
 			};
 			BinaryObjectData binaryObjectData;
 			BinaryHeader bh = inputStream.readHeader();
 			if (bh==null) {
+				inputStream.closeFile();
 				return null; 
 			}
 			int inputFormat = bh.getHeaderFormat();
@@ -159,6 +160,7 @@ public class BinaryStoreStatusFuncs {
 					bf = new BinaryFooter();
 					if (bf.readFooterData(binaryObjectData.getDataInputStream(), inputFormat)) {
 						if (bf.getDataDate() != 0) {
+							inputStream.closeFile();
 							return bf;
 						}
 					}
@@ -184,11 +186,18 @@ public class BinaryStoreStatusFuncs {
 					}
 				}
 			}
-			inputStream.closeFile();
 		}
 		catch (Exception e) {
 			System.out.printf("Corrupt data file %s: %s\n", aFile, e.getMessage());
 //			return null;
+		}
+		try {
+			if (inputStream != null) {
+				inputStream.closeFile();
+			}
+		}
+		catch (Exception e) {
+			
 		}
 		if (lastTime != null && lastUID != null) {
 			BinaryFooter bf = new BinaryFooter();
@@ -211,18 +220,23 @@ public class BinaryStoreStatusFuncs {
 	 */
 	private BinaryHeader findFirstHeader(List<File> binFiles) {
 		BinaryHeader binaryHead = new BinaryHeader();
+		DataInputStream dis = null;
 		for (File aFile : binFiles) {
 			try {
-				DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(aFile)));
-				if (binaryHead.readHeader(dis)) {
-					return binaryHead;
-				}
+				dis = new DataInputStream(new BufferedInputStream(new FileInputStream(aFile)));
 			}
 			catch (IOException e) {
+				binaryHead = null;
 				continue;
 			}
+			try {
+				dis.close();
+			}
+			catch (IOException e) {
+				
+			}
 		}
-		return null;
+		return binaryHead;
 	}
 
 	/**

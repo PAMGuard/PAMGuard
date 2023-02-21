@@ -141,6 +141,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		String[] selList = {globalFolder};
 		folderInputParameters.setSelectedFiles(selList);
 		// need to immediately make the allfiles list since it's about to get used by the reprocess manager
+		// need to worry about how to wait for this since it's starting in a different thread. 
 		makeSelFileList();
 	}
 
@@ -868,6 +869,8 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			long fileStart = getFileStartTime(allFiles.get(i).getAbsoluteFile());
 			if (fileStart >= startTime) {
 				currentFile = i;
+				PamCalendar.setSoundFile(true);
+				PamCalendar.setSessionStartTime(startTime);
 				System.out.printf("Sound Acquisition start processing at file %s time %s\n", allFiles.get(i).getName(),
 						PamCalendar.formatDBDateTime(fileStart));
 				return true;

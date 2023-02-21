@@ -2404,6 +2404,7 @@ PamSettingsSource, DataOutputStore {
 		}
 		else {
 			reportError("No valid header in file " + file.getAbsolutePath());
+			inputStream.closeFile();
 			return null;
 		}
 

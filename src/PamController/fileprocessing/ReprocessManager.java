@@ -48,6 +48,10 @@ public class ReprocessManager {
 			return true;
 		}
 		
+		if (choiceSummary.getInputStoreInfo() == null) {
+			return true;
+		}
+		
 		// need to decide what to do based on the list of possible choices. 
 		ReprocessStoreChoice choice = chosePartStoreAction(choiceSummary);
 		
