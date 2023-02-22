@@ -1,22 +1,29 @@
 package tethys.output;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.w3c.dom.Document;
 
 import Acquisition.AcquisitionControl;
+import Acquisition.AcquisitionParameters;
 import Acquisition.AcquisitionProcess;
+import Acquisition.DaqStatusDataUnit;
 import Array.ArrayManager;
 import Array.Hydrophone;
 import Array.PamArray;
 import Array.SnapshotGeometry;
 import PamController.PamControlledUnit;
 import PamController.PamController;
+import PamController.PamSettings;
 import PamController.settings.output.xml.PamguardXMLWriter;
 import PamUtils.PamCalendar;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataSelector.DataSelector;
+import dataMap.OfflineDataMap;
+import dataMap.OfflineDataMapPoint;
+import generalDatabase.DBControlUnit;
 import generalDatabase.DBSchemaWriter;
 import generalDatabase.SQLLogging;
 import metadata.MetaDataContol;
@@ -65,6 +72,29 @@ public class TethysExporter {
 		}
 		
 		SnapshotGeometry arrayGeometry = findArrayGeometrey();
+		
+		/**
+		 * Doug populate instrument fields - may need to add a few things. Marie
+		 * to define what we mean by instrument. 
+		 * Instrument names probably need to be added to the PAMGuard Array dialog and can 
+		 * then be extraced from there. We had some useful discussion about what constitutes
+		 * an instrumnet in Tinas dataset where there was a deployment of 10 MARU's, but the
+		 * files from all of them were merged into a single 10 channel wav file dataset and 
+		 * processed together for detection and localisation. Clearly this goes into a single
+		 * Tethys database, but do we put 'MARU Array' as the instrument and then include
+		 * serial numbers of individual MARU's with the hydrophone data, or what ?  
+		 */
+		
+		
+		/**
+		 * Doug write something here to get most of the 'samplingdetails' schema.
+		 * This all comes out of the Sound Acquisition module. Code below shows how 
+		 * to find this and iterate through various bits of information ...
+		 * (I've put it in a separate function. Currently returning void,but could 
+		 * presumably return a Tethys samplingdetails document?) 
+		 */
+		getSamplingDetails();
+	
 		
 		/*
 		 * Call some general export function
@@ -152,6 +182,84 @@ public class TethysExporter {
 		
 		return currentGeometry;
 	}
+	
+	private void getSamplingDetails() {
+		// first find an acquisition module. 
+		PamControlledUnit aModule = PamController.getInstance().findControlledUnit(AcquisitionControl.class, null);
+		if (aModule instanceof AcquisitionControl == false) {
+			// will return if it's null. Impossible for it to be the wrong type. 
+			// but it's good practice to check anyway before casting. 
+			return;
+		}
+		// cast it to the right type. 
+		AcquisitionControl daqControl = (AcquisitionControl) aModule;
+		AcquisitionParameters daqParams = daqControl.getAcquisitionParameters();
+		/**
+		 * The daqParams class has most of what we need about the set up in terms of sample rate, 
+		 * number of channels, instrument type, ADC input range (part of calibration), etc. 
+		 * It also has a hydrophone list, which maps the input channel numbers to the hydrophon numbers. 
+		 * Realistically, this list is always 0,1,2,etc or it goes horribly wrong !
+		 */
+		// so write functions here to get information from the daqParams. 
+		System.out.printf("Sample regime: %s input with rate %3.1fHz, %d channels, gain %3.1fdB, ADCp-p %3.1fV\n", daqParams.getDaqSystemType(),
+				daqParams.getSampleRate(), daqParams.getNChannels(), daqParams.preamplifier.getGain(), daqParams.voltsPeak2Peak);
+		/**
+		 * then there is the actual sampling. This is a bit harder to find. I thought it would be in the data map
+		 * but the datamap is a simple count of what's in the databasase which is not quite what we want.  
+		 * we're going to have to query the database to get more detailed informatoin I think. 
+		 * I'll do that here for now, but we may want to move this when we better organise the code. 
+		 * It also seems that there are 'bad' dates in the database when it starts new files, which are the date
+		 * data were analysed at. So we really need to check the start and stop records only. 
+		 */
+		PamDataBlock<DaqStatusDataUnit> daqInfoDataBlock = daqControl.getAcquisitionProcess().getDaqStatusDataBlock();
+		// just load everything. Probably OK for the acqusition, but will bring down 
+		daqInfoDataBlock.loadViewerData(0, Long.MAX_VALUE, null);
+		ArrayList<DaqStatusDataUnit> allStatusData = daqInfoDataBlock.getDataCopy();
+		if (allStatusData != null && allStatusData.size() > 0) {
+			long dataStart = Long.MAX_VALUE;
+			long dataEnd = Long.MIN_VALUE;
+			// find the number of times it started and stopped ....
+			int nStart = 0, nStop = 0, nFile=0;
+			for (DaqStatusDataUnit daqStatus : allStatusData) {
+				switch (daqStatus.getStatus()) {
+				case "Start":
+					nStart++;
+					dataStart = Math.min(dataStart, daqStatus.getTimeMilliseconds());
+					break;
+				case "Stop":
+					nStop++;
+					dataEnd = Math.max(dataEnd, daqStatus.getEndTimeInMilliseconds());
+					break;
+				case "NextFile":
+					nFile++;
+					break;
+				}
+			}
+			
+			System.out.printf("Input map of sound data indicates data from %s to %s with %d starts and %d stops over %d files\n", 
+					PamCalendar.formatDateTime(dataStart), PamCalendar.formatDateTime(dataEnd), nStart, nStop, nFile+1);
+			
+		}
+		
+//		// and we find the datamap within that ...
+//		OfflineDataMap daqMap = daqInfoDataBlock.getOfflineDataMap(DBControlUnit.findDatabaseControl());
+//		if (daqMap != null) {
+//			// iterate through it. 
+//			long dataStart = daqMap.getFirstDataTime();
+//			long dataEnd = daqMap.getLastDataTime();
+//			List<OfflineDataMapPoint> mapPoints = daqMap.getMapPoints();
+//			System.out.printf("Input map of sound data indicates data from %s to %s with %d individual files\n", 
+//					PamCalendar.formatDateTime(dataStart), PamCalendar.formatDateTime(dataEnd), mapPoints.size());
+//			/*
+//			 *  clearly in the first database I've been looking at of Tinas data, this is NOT getting sensible start and
+//			 *  end times. Print them out to see what's going on. 
+//			 */
+////			for ()
+//		}
+		
+		
+		
+	}
 
 	/**
 	 * No idea if we need this or not. May want to return something different to void, e.g. 
@@ -201,7 +309,7 @@ public class TethysExporter {
 		 * (though I'd assume that having the Document is more useful)
 		 */
 		String schemaXMLString = pamXMLWriter.getAsString(tethysSchema.getXsd(), false);
-//		System.out.printf("Schema for %s is %s\n", aDataBlock.getDataName(), schemaXMLString);
+		System.out.printf("Schema for %s is %s\n", aDataBlock.getDataName(), schemaXMLString);
 		
 		
 		/*
@@ -209,7 +317,7 @@ public class TethysExporter {
 		 * the parameters that were controlling that module, with adequate data about 
 		 * upstream modules). I think this has to go somewhere into the Detections document. 
 		 */
-		Document doc = pamXMLWriter.writeOneModule(pamXMLWriter, System.currentTimeMillis());
+		Document doc = pamXMLWriter.writeOneModule((PamSettings) pamControlledUnit, System.currentTimeMillis());
 		String moduleXML = null;
 		if (doc != null) {
 			// this string should be XML of all the settings for the module controlling this datablock. 
