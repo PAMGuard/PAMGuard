@@ -2,7 +2,7 @@ package tethys.deployment;
 
 import java.io.Serializable;
 
-import nilus.DeploymentRecoveryDetails;
+//import nilus.DeploymentRecoveryDetails;
 
 /**
  * Wrapper and functions associated with the Tethys Deployment object which can
@@ -49,12 +49,12 @@ public class PamDeployment {
 	public PamDeployment() {
 
 	}
-	
-	public DeploymentRecoveryDetails getDeploymentRecoveryDetails() {
-		DeploymentRecoveryDetails drd = new DeploymentRecoveryDetails();
-		
-		return null;
-	}
+//	
+//	public DeploymentRecoveryDetails getDeploymentRecoveryDetails() {
+//		DeploymentRecoveryDetails drd = new DeploymentRecoveryDetails();
+//		
+//		return null;
+//	}
 	
 	private void ripApart(Serializable object) {
 		Class cls = object.getClass();
