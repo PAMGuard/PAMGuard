@@ -1,10 +1,14 @@
 package clickDetector.layoutFX.clickClassifiers;
 
 
+
 import clickDetector.ClickControl;
 import clickDetector.ClickClassifiers.basicSweep.SweepClassifier;
 import clickDetector.ClickClassifiers.basicSweep.SweepClassifierParameters;
 import clickDetector.ClickClassifiers.basicSweep.SweepClassifierSet;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Font;
 
 /**
  * Slightly different pane for the sweep classifier.  
@@ -42,7 +46,7 @@ public class SweepClassifierPaneFX extends BasicIdentifierPaneFX {
 		
 		//make it so the title of the pane is the same as the name as the classifier
 		getFlipPane().getAdvLabel().textProperty().unbind();
-		getFlipPane().getAdvLabel().textProperty().bind(	sweepPane.getNameTextProperty());
+		getFlipPane().getAdvLabel().textProperty().bind(sweepPane.getNameTextProperty());
 		
 		sweepPane.classifierItemRow = sweepClickClassifier.getSweepClassifierParams().getSetRow((SweepClassifierSet) clickTypeProperty.getClickType());
 		

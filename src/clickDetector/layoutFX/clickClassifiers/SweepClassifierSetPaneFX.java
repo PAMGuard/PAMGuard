@@ -19,6 +19,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.text.Font;
@@ -36,15 +37,21 @@ import pamViewFX.fxNodes.utilityPanes.FreqBandPane;
 import pamViewFX.fxNodes.utilityPanes.PamToggleSwitch;
 import pamViewFX.fxNodes.utilityPanes.SimpleFilterPaneFX;
 import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
+import pamViewFX.validator.PamValidator;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 
+import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+
 import PamController.SettingsPane;
 import PamUtils.PamUtils;
 import PamView.PamSymbol;
@@ -113,11 +120,16 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 	 */
 	private AmplitudeBlock amplitudeBlock;
 	
-	
 	/**
-	 * Changes the bearing paramters fro clicks. 
+	 * Changes the bearing parameters for clicks. 
 	 */
 	private BearingBlock bearingBox;
+	
+	/**
+	 * Allows classification based on correlation scores.
+	 */
+	private XCorrBlock xCorrBox;
+
 
 
 	private PamBorderPane mainPane = new PamBorderPane();
@@ -179,8 +191,9 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		PamVBox bearingHolder=new PamVBox(5); 
 
 		bearingBox=new BearingBlock();
-		
-		bearingHolder.getChildren().addAll(bearingBox); 
+		xCorrBox=new XCorrBlock();
+
+		bearingHolder.getChildren().addAll(bearingBox, xCorrBox); 
 		bearingHolder.setPadding(new Insets(10,0,0,0));
 		bearingTab.setContent(bearingHolder);
 
@@ -268,6 +281,9 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			}
 
 			this.setTop(hBox);
+			//little bit of space between the top and bottom button.m
+			BorderPane.setMargin(hBox, new Insets(0,0,5,0));
+
 
 			/**Don't like this in old swing version*/ 
 			//tP.setCenter( description = new Label("", JLabel.CENTER));
@@ -1581,12 +1597,12 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		/**
 		 * The minimum correlation value. 
 		 */
-		private Spinner<Double> minBearing;
+		private PamSpinner<Double> minBearing;
 		
 		/**
 		 * The maximum bearing field
 		 */
-		private Spinner<Double> maxBearing;
+		private PamSpinner<Double> maxBearing;
 		/**
 		 * True if using multi-channel data
 		 */
@@ -1599,17 +1615,17 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 		private PamHBox bearingHolder;
 
-
+		
 		BearingBlock() {
 			super("Bearings", true);
 			
 			JPanel p = new JPanel();
 			
-			minBearing = new PamSpinner<Double>(-180, 180, 0, 1); 
+			minBearing = new PamSpinner<Double>(-180., 180., 0., 1.); 
 			minBearing.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 			minBearing.setMaxWidth(110);
 			minBearing.setEditable(true);
-			maxBearing = new PamSpinner<Double>(-180, 180, 0, 1); 
+			maxBearing = new PamSpinner<Double>(-180., 180., 0., 1.); 
 			maxBearing.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 			maxBearing.setMaxWidth(110);
 			maxBearing.setEditable(true);
@@ -1623,24 +1639,63 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			bearingHolder.setAlignment(Pos.CENTER_LEFT);
 		
 			p.setLayout(new GridBagLayout());
-			GridBagConstraints c = new PamGridBagContraints();
 			
 			bearingHolder.getChildren().add(bearingsExcludeBox);
 			bearingHolder.getChildren().add(new Label("bearings between "));
-			c.gridx += c.gridwidth;
 			bearingHolder.getChildren().add(minBearing);
 			bearingHolder.getChildren().add(new Label("\u00B0 and "));
 			bearingHolder.getChildren().add(maxBearing);
 			bearingHolder.getChildren().add(new Label("\u00B0"));
 			
+			
+			getValidator() .createCheck().dependsOn("maxbearing_", maxBearing.valueProperty())
+			.withMethod(c -> {
+				Double maxBearingVal = c.get("maxbearing_"); 
+				if (maxBearingVal>=minBearing.getValue() && isPaneShowing()) {
+					c.error("Maximum bearing must be greater than the minimum bearing");
+				}
+				if (maxBearingVal<-180 || maxBearingVal>180) {
+					c.error("Bearing values must be between -180\u00B0 and 180\u00B0");
+				}
+			})
+			.decorates(maxBearing)
+			.immediate();
+
+			getValidator() .createCheck().dependsOn("minbearing_", minBearing.valueProperty())
+			.withMethod(c -> {
+				Double minBearingVal = c.get("minbearing_"); 
+				if (minBearingVal<maxBearing.getValue() && isPaneShowing()) {
+					c.error("Minimum bearing must be less than the maximum bearing");
+				}
+				if (minBearingVal<-180 || minBearingVal>180) {
+					c.error("Bearing values must be between -180\u00B0 and 180\u00B0");
+				}
+			})
+			.decorates(minBearing)
+			.immediate();
+			
+			
+			maxBearing.valueProperty().addListener((obsVal, oldVal, newVal)->{
+				getValidator().validate();
+			});
+			
+			minBearing.valueProperty().addListener((obsVal, oldVal, newVal)->{
+				getValidator().validate();
+			});
+			
 			this.multiChan = checkMultiChan();
 			
 			this.getHolderPane().setCenter(bearingHolder);
+			
+			//setParams();
 
 		}
 
 		@Override
 		protected void setParams() {
+			
+//			System.out.println("SET BEARING PARAMS");
+			
 			sweepClassifierSet.checkBearingAllocation();
 //			setEnableBox(sweepClassifierSet.enableZeroCrossings);
 			//enableBearings.setSelected(sweepClassifierSet.enableBearingLims);
@@ -1714,6 +1769,128 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		
 		return multiChan; 
 	}
+	
+	/**
+	 * 
+	 * Parameters for testing the cross correlation value. 
+	 * 
+	 * @author Jamie Macaulay
+	 *
+	 */
+	private class XCorrBlock extends SweepBox {
+
+		/**
+		 * The minimum correlation value. 
+		 */
+		private PamSpinner<Double> minCorrelation;
+		
+		private PamSpinner<Double> minPeakTorugh;
+
+		private PamToggleSwitch minXCorrEnable;
+
+		private PamToggleSwitch minPeakTroughEnable;
+
+		private PamSpinner<Double> minPeakFactor;
+		
+		/**
+		 * True if using multi-channel data
+		 */
+		boolean multiChan = false;
+
+		private GridPane gridPane;
+
+
+		XCorrBlock() {
+			super("Cross Correlation", true);
+			
+
+			minXCorrEnable = new PamToggleSwitch(""); 
+			minXCorrEnable.selectedProperty().addListener((obsVal, oldVal, newVal)->{
+				disbleControls(!newVal);
+			});
+
+			minCorrelation = new PamSpinner<Double>(-Double.MAX_VALUE, Double.MAX_VALUE, 0, 0.1);
+			minCorrelation.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
+
+			minPeakTroughEnable = new PamToggleSwitch(""); 
+			minPeakTroughEnable.selectedProperty().addListener((obsVal, oldVal, newVal)->{
+				disbleControls(!newVal);
+			});
+			
+			minPeakFactor = new PamSpinner<Double>(-Double.MAX_VALUE, Double.MAX_VALUE, 1., 0.1);
+			minPeakFactor.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
+
+			int x = 0;
+			int y = 0;
+			
+			gridPane = new GridPane();
+			gridPane.setHgap(5);
+			gridPane.setVgap(5);
+
+			gridPane.add(minXCorrEnable, x, y);
+			gridPane.add(new Label("Min. xcorr value "), ++x, y);
+			gridPane.add(minCorrelation, ++x, y);
+			
+			y++;
+			x=0; 
+			gridPane.add(minPeakTroughEnable, x, y);
+			gridPane.add(new Label("Max. xcorr value greater than "), ++x, y);
+			gridPane.add(minPeakFactor,++x, y);
+			gridPane.add(new Label("* absolute min. value"),++x, y);
+			
+			this.getHolderPane().setCenter(gridPane);
+
+			this.multiChan = checkMultiChan();
+		}
+
+		@Override
+		protected void setParams() {
+			sweepClassifierSet.checkXCCorrAllocation();
+//			setEnableBox(sweepClassifierSet.enableZeroCrossings);
+			minXCorrEnable.setSelected(sweepClassifierSet.enableMinXCrossCorr);
+			minPeakTroughEnable.setSelected(sweepClassifierSet.enablePeakXCorr);
+			
+			this.minCorrelation.getValueFactory().setValue(sweepClassifierSet.minCorr);
+			this.minPeakFactor.getValueFactory().setValue(sweepClassifierSet.corrFactor);
+			
+			this.multiChan = checkMultiChan();		
+		}
+	
+		@Override
+		protected boolean getParams() {
+			sweepClassifierSet.enableMinXCrossCorr	 = minXCorrEnable.isSelected();
+			sweepClassifierSet.enablePeakXCorr	 = minPeakTroughEnable.isSelected();
+
+			if (minXCorrEnable.isSelected()) {
+					sweepClassifierSet.minCorr = minCorrelation.getValue();
+			}
+			
+			if (minPeakTroughEnable.isSelected()) {
+					sweepClassifierSet.corrFactor = minPeakFactor.getValue();
+			}
+			return true;
+		}
+
+		@Override
+		protected void disbleControls(boolean disable) {
+				this.multiChan = checkMultiChan();
+			
+				minXCorrEnable.setDisable(!multiChan);
+				minCorrelation.setDisable(!multiChan);
+				minPeakTroughEnable.setDisable(!multiChan);
+				minPeakFactor.setDisable(!multiChan);
+			
+				if (!multiChan) return;
+				
+				gridPane.setDisable(disable);
+				
+				minCorrelation.setDisable(!minXCorrEnable.isSelected());
+				minPeakFactor.setDisable(!minPeakTroughEnable.isSelected());
+		}
+
+
+	}
+	
 
 
 	/**~*main set and get params functions***/	
@@ -1729,6 +1906,9 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		freqBox.getParams();
 		zeroCrossingsBox.getParams();
 		amplitudeBlock.getParams();
+		bearingBox.getParams();
+		xCorrBox.getParams();
+
 
 		currentClickProperty.setClickType(sweepClassifierSet);
 
@@ -1748,6 +1928,8 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		freqBox.setParams();
 		zeroCrossingsBox.setParams();
 		amplitudeBlock.setParams();
+		bearingBox.setParams();
+		xCorrBox.setParams();
 
 	}
 

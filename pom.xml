@@ -840,6 +840,16 @@
 		<version>1.0.0</version>
 	</dependency>
 	
- 	
+	
+	<!-- https://mvnrepository.com/artifact/junit/junit
+	Testing framework for PAMGuard -->
+	<dependency>
+	    <groupId>junit</groupId>
+	    <artifactId>junit</artifactId>
+	    <version>4.13.2</version>
+	    <scope>test</scope>
+	</dependency>
+	
+	
   </dependencies>
 </project>
