@@ -103,7 +103,10 @@ public class SqliteSystem extends DBSystem implements PamSettings {
 		if (commandName == null) {
 			return;
 		}
-		setDatabaseName(commandName);
+		File commandFile = new File(commandName);
+		// check the file end is of the right type. Some batch systems may not get this right. 
+		commandFile = PamFileFilter.checkFileEnd(commandFile, "sqlite3", true);
+		setDatabaseName(commandFile.getAbsolutePath());
 	}
 
 	/**
@@ -304,6 +307,30 @@ public class SqliteSystem extends DBSystem implements PamSettings {
 	}
 
 	@Override
+	public boolean checkDatabaseExists(String dbName) {
+		String commandName = GlobalArguments.getParam(DBControl.GlobalDatabaseNameArg);
+		if (commandName != null) {
+			return checkCommandLineDatabase();
+		}
+		return super.checkDatabaseExists(dbName);
+	}
+
+	private boolean checkCommandLineDatabase() {
+		String commandName = GlobalArguments.getParam(DBControl.GlobalDatabaseNameArg);
+		if (commandName == null) {
+			return false;
+		}
+		File dbFile = new File(commandName);
+		dbFile = PamFileFilter.checkFileEnd(dbFile, ".sqlite3", true);
+		commandName = dbFile.getAbsolutePath();
+		if (dbFile.exists() == false) {
+			// create a new database without asking. 
+			createNewDatabase(commandName);
+		}
+		return dbFile.exists();
+	}
+
+	@Override
 	public String getDatabaseName() {
 		/*
 		 * If a database name was passed as a global argument, then use the passed name instead of 
@@ -311,6 +338,9 @@ public class SqliteSystem extends DBSystem implements PamSettings {
 		 */
 		String commandName = GlobalArguments.getParam(DBControl.GlobalDatabaseNameArg);
 		if (commandName != null) {
+			File dbFile = new File(commandName);
+			dbFile = PamFileFilter.checkFileEnd(dbFile, ".sqlite3", true);
+			commandName = dbFile.getAbsolutePath();
 			return commandName;
 		}
 		
