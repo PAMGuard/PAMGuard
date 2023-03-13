@@ -84,7 +84,8 @@ public class KetosWorker extends DLModelWorker<KetosResult> {
 			String jsonString  = DLTransformsParser.readJSONString(new File(ketosModel.getAudioReprFile()));
 			
 			//convert the JSON string to a parameters object. 
-			KetosParams ketosParams = new KetosParams(jsonString); 			
+			KetosParams ketosParams = new KetosParams(jsonString); 		
+			
 			//important to add this for Ketos models because the JSON string does not necessarily contain and output shape. 
 			//System.out.println("----Default output shape: " + ketosParams.defaultOutputShape + "  " + ketosModel.getOutShape()); 
 			if (ketosParams.defaultOutputShape==null) {

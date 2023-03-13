@@ -9,7 +9,7 @@ import pamViewFX.fxNodes.PamSpinner;
 import javafx.util.StringConverter;
 
 /**
- * Transform pane for fourier transform
+ * Transform pane for Fourier transform
  * @author Jamie Macaulay 
  *
  */
@@ -29,7 +29,6 @@ public class FFTTransformPane extends SimpleTransformPane {
 			return spinner; 
 		}
 		else return super.createSpinner(i); 
-			
 	}
 	
 	
@@ -46,8 +45,9 @@ public class FFTTransformPane extends SimpleTransformPane {
 		return stepSizeListLength;
 	}
 	
+	
+	
 	class NumberConverter extends StringConverter<Number> {
-
 		@Override
 		public String toString(Number object) {
 			// TODO Auto-generated method stub
@@ -60,5 +60,8 @@ public class FFTTransformPane extends SimpleTransformPane {
 		}
 		
 	}
+	
+
+
 	
 }

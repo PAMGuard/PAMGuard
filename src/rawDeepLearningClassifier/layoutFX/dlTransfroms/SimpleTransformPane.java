@@ -191,6 +191,7 @@ public class SimpleTransformPane extends DLTransformPane {
 		//Set the new numbers
 		Number[] params = new Number[spinners.size()]; 
 		for (int i=0; i<spinners.size(); i++) {
+			System.out.println("Get params" + spinners.get(i).getValue()); 
 			params[i] = spinners.get(i).getValue(); 
 		}
 
@@ -218,7 +219,7 @@ public class SimpleTransformPane extends DLTransformPane {
 			
 			//spinners.get(i).getValueFactory().setValue(simpleTransform.getParams()[i] ); 
 			
-			//System.out.println("Set params: " + input.getDLTransformType() + " param val: " + simpleTransform.getParams()[i] + "  " + (simpleTransform.getParams()[i] instanceof Float)); 
+			System.out.println("Set params: " + input.getDLTransformType() + " param val: " + simpleTransform.getParams()[i] + "  " + (simpleTransform.getParams()[i] instanceof Float)); 
 			if (simpleTransform.getParams()[i] instanceof Float || simpleTransform.getParams()[i] instanceof Double) {
 				//System.out.println("Double: simpleTransform.getParams()[i]: " + simpleTransform.getParams()[i] + "  " +spinners.get(i).getValueFactory());
 				spinners.get(i).getValueFactory().setValue(simpleTransform.getParams()[i].doubleValue());
