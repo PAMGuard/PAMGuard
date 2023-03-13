@@ -97,7 +97,7 @@ public class TethysExporter {
 		 */
 		
 		/*
-		 * A load of notes Katie put in ....
+		 * A load of notes Katie put in ....654654654
 		 */
 		//1. grab DeploymentRecoveryPair that has deployment details and recovery details
 				//a. this is based on start and end times
