@@ -28,6 +28,7 @@ import generalDatabase.DBSchemaWriter;
 import generalDatabase.SQLLogging;
 import metadata.MetaDataContol;
 import metadata.deployment.DeploymentData;
+import nilus.DeploymentRecoveryDetails;
 import tethys.TethysControl;
 import tethys.dbxml.DBXMLConnect;
 import tethys.pamdata.TethysDataProvider;
@@ -70,6 +71,7 @@ public class TethysExporter {
 			 */
 			return false;
 		}
+				
 		
 		SnapshotGeometry arrayGeometry = findArrayGeometrey();
 		
@@ -93,8 +95,80 @@ public class TethysExporter {
 		 * (I've put it in a separate function. Currently returning void,but could 
 		 * presumably return a Tethys samplingdetails document?) 
 		 */
-		getSamplingDetails();
+		
+		
+		//1. grab DeploymentRecoveryPair that has deployment details and recovery details
+				//a. this is based on start and end times
+					//Douglas calculates out dutycycles to only grab the
+				
+		//2. loop through the pairs to populate the extra information
+			//one pair is one deployment
+			//see below for matching
+				
+		
+		//id => unique
+		//project => project in pamguard
+		//deploymentId == id
+		//deploymentAlias => blank
+		//site => UI addition in pamguard, not done, can be blank
+		//siteAlias => blank
+		//cruise => UI addition, optional
+		//Platform=> UI addition in pamguard
+		//region => UI addition
+		//Instrument/Type => UI, array manager details (hydrophone names area)
+		//Instrument/Id => UI, array manager details
+		//Instrument/Geometry => in pamguard array manager
+		//SamplingDetails/Channel
+			//ChannelNumber => in pamguard, hyrdrophone array  
+			//SensorNumber => in pamguard, 
+			//Start => same as timestamp deployment detail
+			//End => same as timestamp recovery detail
+			//Sampling/Regimen (change sample rate, pamgauard doesnt handle, only on, get channel info in that loop)
+				//TimeStamp => start time
+				//SampleRate_kHz => 
+				//SampleBits => 
+			//Gain (another func call to get gain info)
+			//DutyCycles => needs to be calculated, not fields in pamguard, have fun Douglas
+		//QualityAssurance => not in pamguard, UI, maybe deployment notes, optional
+		//Data/Audio (static)
+			//URI => folder where audio is saved
+		//Data/Tracks
+			//Track => GPS datatable (granularity filter)
+				//TrackId => not unique between deployments, 
+			//TrackEffort
+				//OnPath => scattered throughout pamguard
+			//URI => option, check with Shannon on how they are doing deployments
+		//Sensors/Audio (per hydrophone not quad array) streamer info + individual hydrophone data together
+			//pamguard hydrophone data
+			//number => hydrophoneId
+			//sensorId => sensor serial number
+			//Geometry => array geometry field goes to 
+		//Sensors/Depth
+			//optional 
+		//Sensors/Sensor 
+			//Number => hydrophoneId in pamguard
+			//SensorId => addition to UI
+			//Geometry => array geometry fields
+			//Type => Hydrophone Type
+		
+		
+		
+		
+		
+		//get list of deployment recovery details (start, stop times and lat/long)
+		//deployment details and recovery details are same structure
+		//per pair, go through a loop to fill in each deployment
+		ArrayList<DeploymentRecoveryPair> deployRecover = getSamplingDetails();
+		if (deployRecover == null) {
+			return false;
+		}
 	
+		for (DeploymentRecoveryPair drd : deployRecover) {
+			
+			
+			
+			
+		}
 		
 		/*
 		 * Call some general export function
@@ -183,13 +257,14 @@ public class TethysExporter {
 		return currentGeometry;
 	}
 	
-	private void getSamplingDetails() {
+	//in each channel
+	private ArrayList<DeploymentRecoveryPair> getSamplingDetails() {
 		// first find an acquisition module. 
 		PamControlledUnit aModule = PamController.getInstance().findControlledUnit(AcquisitionControl.class, null);
 		if (aModule instanceof AcquisitionControl == false) {
 			// will return if it's null. Impossible for it to be the wrong type. 
 			// but it's good practice to check anyway before casting. 
-			return;
+			return null;
 		}
 		// cast it to the right type. 
 		AcquisitionControl daqControl = (AcquisitionControl) aModule;
@@ -257,9 +332,10 @@ public class TethysExporter {
 ////			for ()
 //		}
 		
-		
+		return null;
 		
 	}
+	
 
 	/**
 	 * No idea if we need this or not. May want to return something different to void, e.g. 
