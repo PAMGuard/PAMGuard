@@ -96,7 +96,9 @@ public class TethysExporter {
 		 * presumably return a Tethys samplingdetails document?) 
 		 */
 		
-		
+		/*
+		 * A load of notes Katie put in ....
+		 */
 		//1. grab DeploymentRecoveryPair that has deployment details and recovery details
 				//a. this is based on start and end times
 					//Douglas calculates out dutycycles to only grab the
