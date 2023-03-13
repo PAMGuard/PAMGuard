@@ -28,8 +28,11 @@ import generalDatabase.DBSchemaWriter;
 import generalDatabase.SQLLogging;
 import metadata.MetaDataContol;
 import metadata.deployment.DeploymentData;
+import nilus.Deployment;
 import nilus.DeploymentRecoveryDetails;
 import tethys.TethysControl;
+import tethys.TethysLocationFuncs;
+import tethys.TethysTimeFuncs;
 import tethys.dbxml.DBXMLConnect;
 import tethys.pamdata.TethysDataProvider;
 import tethys.pamdata.TethysSchema;
@@ -168,9 +171,10 @@ public class TethysExporter {
 		/*
 		 * This will become the main loop over deployment documents
 		 */
+		int i = 0;
 		for (DeploymentRecoveryPair drd : deployRecover) {
 			
-			
+			Deployment deployment = createDeploymentDocument(i++, drd);
 			
 			
 		}
@@ -200,6 +204,19 @@ public class TethysExporter {
 		return true;
 	}
 	
+	private Deployment createDeploymentDocument(int i, DeploymentRecoveryPair drd) {
+		Deployment deployment = new Deployment();
+		deployment.setDeploymentDetails(drd.deploymentDetails);
+		deployment.setRecoveryDetails(drd.recoveryDetails);
+		
+		TethysLocationFuncs.getTrackAndPositionData(deployment);
+		
+		
+		
+		return deployment;
+	}
+
+
 	/**
 	 * find Deployment data. This is stored in a separate PAMGuard module, which may not 
 	 * be present. 
@@ -295,9 +312,9 @@ public class TethysExporter {
 		// just load everything. Probably OK for the acqusition, but will bring down 
 		daqInfoDataBlock.loadViewerData(0, Long.MAX_VALUE, null);
 		ArrayList<DaqStatusDataUnit> allStatusData = daqInfoDataBlock.getDataCopy();
+		long dataStart = Long.MAX_VALUE;
+		long dataEnd = Long.MIN_VALUE;
 		if (allStatusData != null && allStatusData.size() > 0) {
-			long dataStart = Long.MAX_VALUE;
-			long dataEnd = Long.MIN_VALUE;
 			// find the number of times it started and stopped ....
 			int nStart = 0, nStop = 0, nFile=0;
 			for (DaqStatusDataUnit daqStatus : allStatusData) {
@@ -336,8 +353,20 @@ public class TethysExporter {
 //			 */
 ////			for ()
 //		}
+		DeploymentRecoveryPair pair = new DeploymentRecoveryPair();
+		DeploymentRecoveryDetails deployment = new DeploymentRecoveryDetails();
+		DeploymentRecoveryDetails recovery = new DeploymentRecoveryDetails();
+		pair.deploymentDetails = deployment;
+		pair.recoveryDetails = recovery;
 		
-		return null;
+		deployment.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(dataStart));
+		deployment.setAudioTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(dataStart));
+		recovery.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(dataEnd));
+		recovery.setAudioTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(dataEnd));
+		
+		ArrayList<DeploymentRecoveryPair> drPairs = new ArrayList<>();
+		drPairs.add(pair);
+		return drPairs;
 		
 	}
 	
