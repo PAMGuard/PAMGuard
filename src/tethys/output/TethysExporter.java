@@ -165,6 +165,9 @@ public class TethysExporter {
 			return false;
 		}
 	
+		/*
+		 * This will become the main loop over deployment documents
+		 */
 		for (DeploymentRecoveryPair drd : deployRecover) {
 			
 			
