@@ -1,12 +1,10 @@
 package tethys.output;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.FileAttribute;
-import java.io.StringWriter;
+import java.util.ArrayList;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -15,9 +13,7 @@ import javax.xml.bind.Marshaller;
 import org.w3c.dom.Document;
 
 import Acquisition.AcquisitionControl;
-import Acquisition.AcquisitionParameters;
 import Acquisition.AcquisitionProcess;
-import Acquisition.DaqStatusDataUnit;
 import Array.ArrayManager;
 import Array.Hydrophone;
 import Array.PamArray;
@@ -30,25 +26,16 @@ import PamUtils.PamCalendar;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataSelector.DataSelector;
-import dataMap.OfflineDataMap;
-import dataMap.OfflineDataMapPoint;
-import generalDatabase.DBControlUnit;
-import generalDatabase.DBSchemaWriter;
-import generalDatabase.SQLLogging;
+import dbxml.uploader.Importer;
 import metadata.MetaDataContol;
 import metadata.deployment.DeploymentData;
 import nilus.Deployment;
-import nilus.DeploymentRecoveryDetails;
 import tethys.TethysControl;
-import tethys.TethysLocationFuncs;
-import tethys.TethysTimeFuncs;
 import tethys.dbxml.DBXMLConnect;
+import tethys.deployment.DeploymentHandler;
+import tethys.deployment.DeploymentRecoveryPair;
 import tethys.pamdata.TethysDataProvider;
 import tethys.pamdata.TethysSchema;
-
-import dbxml.uploader.Importer;
-import nilus.Deployment;
-import nilus.MarshalXML;
 
 /**
  * Class sitting at the centre of all operations. It will talk to PAMGuard
@@ -58,7 +45,7 @@ import nilus.MarshalXML;
  * dialogs alive, show progress for big export jobs, etc. For now though, it's a
  * relatively simple set of function which we can use to a) open the database,
  * b) check everything such as schemas, etc. c) export data and d) clean up.
- * 
+ *
  * @author dg50
  *
  */
@@ -79,7 +66,7 @@ public class TethysExporter {
 	 * Does the work. In reality this will need an awful lot of changing, for
 	 * instance to provide feedback to an observer class to show progress on the
 	 * display.
-	 * 
+	 *
 	 * @return OK if success.
 	 */
 	public boolean doExport() {
@@ -98,7 +85,7 @@ public class TethysExporter {
 
 		Path tempFile = null;
 		try {
-			
+
 			JAXBContext jaxB = JAXBContext.newInstance(Deployment.class);
 			Marshaller marshall = jaxB.createMarshaller();
 			marshall.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
@@ -106,12 +93,12 @@ public class TethysExporter {
 			marshall.marshal(deployment1, sw);
 			tempFile = Files.createTempFile("pamGuardToTethys", ".xml");
 			Files.write(tempFile, sw.toString().getBytes());
-			
-			String fileText = Importer.ImportFiles("http://localhost:9779", "Deployment", 
+
+			String fileText = Importer.ImportFiles("http://localhost:9779", "Deployment",
 					new String[] { tempFile.toString() }, "", "", false);
-			
+
 			tempFile.toFile().deleteOnExit();
-			
+
 		} catch(IllegalArgumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -122,7 +109,7 @@ public class TethysExporter {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	
+
 		SnapshotGeometry arrayGeometry = findArrayGeometrey();
 
 		/**
@@ -152,12 +139,12 @@ public class TethysExporter {
 		//1. grab DeploymentRecoveryPair that has deployment details and recovery details
 				//a. this is based on start and end times
 					//Douglas calculates out dutycycles to only grab the
-				
+
 		//2. loop through the pairs to populate the extra information
 			//one pair is one deployment
 			//see below for matching
-				
-		
+
+
 		//id => unique
 		//project => project in pamguard
 		//deploymentId == id
@@ -171,14 +158,14 @@ public class TethysExporter {
 		//Instrument/Id => UI, array manager details
 		//Instrument/Geometry => in pamguard array manager
 		//SamplingDetails/Channel
-			//ChannelNumber => in pamguard, hyrdrophone array  
-			//SensorNumber => in pamguard, 
+			//ChannelNumber => in pamguard, hyrdrophone array
+			//SensorNumber => in pamguard,
 			//Start => same as timestamp deployment detail
 			//End => same as timestamp recovery detail
 			//Sampling/Regimen (change sample rate, pamgauard doesnt handle, only on, get channel info in that loop)
 				//TimeStamp => start time
-				//SampleRate_kHz => 
-				//SampleBits => 
+				//SampleRate_kHz =>
+				//SampleBits =>
 			//Gain (another func call to get gain info)
 			//DutyCycles => needs to be calculated, not fields in pamguard, have fun Douglas
 		//QualityAssurance => not in pamguard, UI, maybe deployment notes, optional
@@ -186,7 +173,7 @@ public class TethysExporter {
 			//URI => folder where audio is saved
 		//Data/Tracks
 			//Track => GPS datatable (granularity filter)
-				//TrackId => not unique between deployments, 
+				//TrackId => not unique between deployments,
 			//TrackEffort
 				//OnPath => scattered throughout pamguard
 			//URI => option, check with Shannon on how they are doing deployments
@@ -194,42 +181,43 @@ public class TethysExporter {
 			//pamguard hydrophone data
 			//number => hydrophoneId
 			//sensorId => sensor serial number
-			//Geometry => array geometry field goes to 
+			//Geometry => array geometry field goes to
 		//Sensors/Depth
-			//optional 
-		//Sensors/Sensor 
+			//optional
+		//Sensors/Sensor
 			//Number => hydrophoneId in pamguard
 			//SensorId => addition to UI
 			//Geometry => array geometry fields
 			//Type => Hydrophone Type
-		
-		
-		
-		
-		
+
+
+
+
+
 		//get list of deployment recovery details (start, stop times and lat/long)
 		//deployment details and recovery details are same structure
 		//per pair, go through a loop to fill in each deployment
-		ArrayList<DeploymentRecoveryPair> deployRecover = getSamplingDetails();
+		DeploymentHandler deploymentHandler = new DeploymentHandler();
+
+		ArrayList<DeploymentRecoveryPair> deployRecover = deploymentHandler.getDeployments();
 		if (deployRecover == null) {
 			return false;
 		}
-	
+
 		/*
 		 * This will become the main loop over deployment documents
 		 */
 		int i = 0;
 		for (DeploymentRecoveryPair drd : deployRecover) {
-			
-			Deployment deployment = createDeploymentDocument(i++, drd);
-			
-			
+
+			Deployment deployment = deploymentHandler.createDeploymentDocument(i++, drd);
+//			System.out.println(deployment.toString());
+
+
 		}
 
-		/*
-		 * Call some general export function
-		 */
-		exportGeneralData(tethysExportParams);
+		
+
 		/*
 		 * go through the export params and call something for every data block that's
 		 * enabled.
@@ -237,7 +225,7 @@ public class TethysExporter {
 		ArrayList<PamDataBlock> allDataBlocks = PamController.getInstance().getDataBlocks();
 		for (PamDataBlock aDataBlock : allDataBlocks) {
 			StreamExportParams streamExportParams = tethysExportParams.getStreamParams(aDataBlock);
-			if (streamExportParams == null || streamExportParams.selected == false) {
+			if (streamExportParams == null || !streamExportParams.selected) {
 				continue; // not interested in this one.
 			}
 			exportDataStream(aDataBlock, tethysExportParams, streamExportParams);
@@ -250,23 +238,11 @@ public class TethysExporter {
 
 		return true;
 	}
-	
-	private Deployment createDeploymentDocument(int i, DeploymentRecoveryPair drd) {
-		Deployment deployment = new Deployment();
-		deployment.setDeploymentDetails(drd.deploymentDetails);
-		deployment.setRecoveryDetails(drd.recoveryDetails);
-		
-		TethysLocationFuncs.getTrackAndPositionData(deployment);
-		
-		
-		
-		return deployment;
-	}
 
 	/**
 	 * find Deployment data. This is stored in a separate PAMGuard module, which may
 	 * not be present.
-	 * 
+	 *
 	 * @return
 	 */
 	public DeploymentData findDeploymentData() {
@@ -332,119 +308,11 @@ public class TethysExporter {
 		return currentGeometry;
 	}
 
-	// in each channel
-	private ArrayList<DeploymentRecoveryPair> getSamplingDetails() {
-		// first find an acquisition module.
-		PamControlledUnit aModule = PamController.getInstance().findControlledUnit(AcquisitionControl.class, null);
-		if (aModule instanceof AcquisitionControl == false) {
-			// will return if it's null. Impossible for it to be the wrong type.
-			// but it's good practice to check anyway before casting.
-			return null;
-		}
-		// cast it to the right type.
-		AcquisitionControl daqControl = (AcquisitionControl) aModule;
-		AcquisitionParameters daqParams = daqControl.getAcquisitionParameters();
-		/**
-		 * The daqParams class has most of what we need about the set up in terms of
-		 * sample rate, number of channels, instrument type, ADC input range (part of
-		 * calibration), etc. It also has a hydrophone list, which maps the input
-		 * channel numbers to the hydrophon numbers. Realistically, this list is always
-		 * 0,1,2,etc or it goes horribly wrong !
-		 */
-		// so write functions here to get information from the daqParams.
-		System.out.printf("Sample regime: %s input with rate %3.1fHz, %d channels, gain %3.1fdB, ADCp-p %3.1fV\n",
-				daqParams.getDaqSystemType(), daqParams.getSampleRate(), daqParams.getNChannels(),
-				daqParams.preamplifier.getGain(), daqParams.voltsPeak2Peak);
-		/**
-		 * then there is the actual sampling. This is a bit harder to find. I thought it
-		 * would be in the data map but the datamap is a simple count of what's in the
-		 * databasase which is not quite what we want. we're going to have to query the
-		 * database to get more detailed informatoin I think. I'll do that here for now,
-		 * but we may want to move this when we better organise the code. It also seems
-		 * that there are 'bad' dates in the database when it starts new files, which
-		 * are the date data were analysed at. So we really need to check the start and
-		 * stop records only.
-		 */
-		PamDataBlock<DaqStatusDataUnit> daqInfoDataBlock = daqControl.getAcquisitionProcess().getDaqStatusDataBlock();
-		// just load everything. Probably OK for the acqusition, but will bring down
-		daqInfoDataBlock.loadViewerData(0, Long.MAX_VALUE, null);
-		ArrayList<DaqStatusDataUnit> allStatusData = daqInfoDataBlock.getDataCopy();
-		long dataStart = Long.MAX_VALUE;
-		long dataEnd = Long.MIN_VALUE;
-		if (allStatusData != null && allStatusData.size() > 0) {
-			// find the number of times it started and stopped ....
-			int nStart = 0, nStop = 0, nFile = 0;
-			for (DaqStatusDataUnit daqStatus : allStatusData) {
-				switch (daqStatus.getStatus()) {
-				case "Start":
-					nStart++;
-					dataStart = Math.min(dataStart, daqStatus.getTimeMilliseconds());
-					break;
-				case "Stop":
-					nStop++;
-					dataEnd = Math.max(dataEnd, daqStatus.getEndTimeInMilliseconds());
-					break;
-				case "NextFile":
-					nFile++;
-					break;
-				}
-			}
 
-			System.out.printf(
-					"Input map of sound data indicates data from %s to %s with %d starts and %d stops over %d files\n",
-					PamCalendar.formatDateTime(dataStart), PamCalendar.formatDateTime(dataEnd), nStart, nStop,
-					nFile + 1);
-
-		}
-
-//		// and we find the datamap within that ...
-//		OfflineDataMap daqMap = daqInfoDataBlock.getOfflineDataMap(DBControlUnit.findDatabaseControl());
-//		if (daqMap != null) {
-//			// iterate through it. 
-//			long dataStart = daqMap.getFirstDataTime();
-//			long dataEnd = daqMap.getLastDataTime();
-//			List<OfflineDataMapPoint> mapPoints = daqMap.getMapPoints();
-//			System.out.printf("Input map of sound data indicates data from %s to %s with %d individual files\n", 
-//					PamCalendar.formatDateTime(dataStart), PamCalendar.formatDateTime(dataEnd), mapPoints.size());
-//			/*
-//			 *  clearly in the first database I've been looking at of Tinas data, this is NOT getting sensible start and
-//			 *  end times. Print them out to see what's going on. 
-//			 */
-////			for ()
-//		}
-
-
-		DeploymentRecoveryPair pair = new DeploymentRecoveryPair();
-		DeploymentRecoveryDetails deployment = new DeploymentRecoveryDetails();
-		DeploymentRecoveryDetails recovery = new DeploymentRecoveryDetails();
-		pair.deploymentDetails = deployment;
-		pair.recoveryDetails = recovery;
-		
-		deployment.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(dataStart));
-		deployment.setAudioTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(dataStart));
-		recovery.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(dataEnd));
-		recovery.setAudioTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(dataEnd));
-		
-		ArrayList<DeploymentRecoveryPair> drPairs = new ArrayList<>();
-		drPairs.add(pair);
-		return drPairs;
-		
-	}
-
-	/**
-	 * No idea if we need this or not. May want to return something different to
-	 * void, e.g. a reference to the main object for a tethys export. I've no idea !
-	 * 
-	 * @param tethysExportParams2
-	 */
-	private void exportGeneralData(TethysExportParams tethysExportParams) {
-		// TODO Auto-generated method stub
-
-	}
 
 	/**
 	 * Here is where we export data for a specific data stream to Tethys.
-	 * 
+	 *
 	 * @param aDataBlock
 	 * @param tethysExportParams
 	 * @param streamExportParams
