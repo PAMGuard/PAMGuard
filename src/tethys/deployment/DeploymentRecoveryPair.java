@@ -1,4 +1,4 @@
-package tethys.output;
+package tethys.deployment;
 
 import nilus.DeploymentRecoveryDetails;
 

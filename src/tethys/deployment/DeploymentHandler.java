@@ -347,13 +347,13 @@ public class DeploymentHandler {
 			audioList.add(audio);
 			iPhone++;
 		}
-		try {
-			MarshalXML mXML = new MarshalXML();
-			mXML.marshal(sensors);
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			MarshalXML mXML = new MarshalXML();
+//			mXML.marshal(sensors);
+//		} catch (JAXBException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		deployment.setSensors(sensors);		
 		return true;
 	}
