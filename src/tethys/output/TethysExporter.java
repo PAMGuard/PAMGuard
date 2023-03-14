@@ -93,8 +93,8 @@ public class TethysExporter {
 		// return false;
 		// }
 
-		Deployment deployment = new Deployment();
-		deployment.setId("1");
+		Deployment deployment1 = new Deployment();
+		deployment1.setId("1");
 
 		Path tempFile = null;
 		try {
@@ -103,7 +103,7 @@ public class TethysExporter {
 			Marshaller marshall = jaxB.createMarshaller();
 			marshall.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			StringWriter sw = new StringWriter();
-			marshall.marshal(deployment, sw);
+			marshall.marshal(deployment1, sw);
 			tempFile = Files.createTempFile("pamGuardToTethys", ".xml");
 			Files.write(tempFile, sw.toString().getBytes());
 			
