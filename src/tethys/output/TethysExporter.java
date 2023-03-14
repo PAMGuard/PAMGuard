@@ -43,6 +43,7 @@ import tethys.TethysControl;
 import tethys.TethysLocationFuncs;
 import tethys.TethysTimeFuncs;
 import tethys.dbxml.DBXMLConnect;
+import tethys.deployment.DeploymentRecoveryPair;
 import tethys.pamdata.TethysDataProvider;
 import tethys.pamdata.TethysSchema;
 
