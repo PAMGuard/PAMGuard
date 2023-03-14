@@ -333,7 +333,7 @@ public class Hydrophone implements Serializable, Cloneable, ManagedParameters {
 	/**
 	 * @return Returns the coordinate.
 	 */
-	protected double[] getCoordinates() {
+	public double[] getCoordinates() {
 		return Arrays.copyOf(coordinate,3);
 	}
 	
