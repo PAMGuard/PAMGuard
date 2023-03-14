@@ -473,8 +473,7 @@ final public class PamModel implements PamModelInterface, PamSettings {
 			mi.setToolTipText("Interface to Tethys Database");
 			mi.setModulesMenuGroup(utilitiesGroup);
 			mi.setMaxNumber(1);
-		}
-		
+		}		
 		
 
 		/*

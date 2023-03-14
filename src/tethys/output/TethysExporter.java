@@ -37,8 +37,11 @@ import generalDatabase.DBSchemaWriter;
 import generalDatabase.SQLLogging;
 import metadata.MetaDataContol;
 import metadata.deployment.DeploymentData;
+import nilus.Deployment;
 import nilus.DeploymentRecoveryDetails;
 import tethys.TethysControl;
+import tethys.TethysLocationFuncs;
+import tethys.TethysTimeFuncs;
 import tethys.dbxml.DBXMLConnect;
 import tethys.pamdata.TethysDataProvider;
 import tethys.pamdata.TethysSchema;
@@ -145,77 +148,83 @@ public class TethysExporter {
 		/*
 		 * A load of notes Katie put in ....654654654
 		 */
-		// 1. grab DeploymentRecoveryPair that has deployment details and recovery
-		// details
-		// a. this is based on start and end times
-		// Douglas calculates out dutycycles to only grab the
 
-		// 2. loop through the pairs to populate the extra information
-		// one pair is one deployment
-		// see below for matching
-
-		// id => unique
-		// project => project in pamguard
-		// deploymentId == id
-		// deploymentAlias => blank
-		// site => UI addition in pamguard, not done, can be blank
-		// siteAlias => blank
-		// cruise => UI addition, optional
-		// Platform=> UI addition in pamguard
-		// region => UI addition
-		// Instrument/Type => UI, array manager details (hydrophone names area)
-		// Instrument/Id => UI, array manager details
-		// Instrument/Geometry => in pamguard array manager
-		// SamplingDetails/Channel
-		// ChannelNumber => in pamguard, hyrdrophone array
-		// SensorNumber => in pamguard,
-		// Start => same as timestamp deployment detail
-		// End => same as timestamp recovery detail
-		// Sampling/Regimen (change sample rate, pamgauard doesnt handle, only on, get
-		// channel info in that loop)
-		// TimeStamp => start time
-		// SampleRate_kHz =>
-		// SampleBits =>
-		// Gain (another func call to get gain info)
-		// DutyCycles => needs to be calculated, not fields in pamguard, have fun
-		// Douglas
-		// QualityAssurance => not in pamguard, UI, maybe deployment notes, optional
-		// Data/Audio (static)
-		// URI => folder where audio is saved
-		// Data/Tracks
-		// Track => GPS datatable (granularity filter)
-		// TrackId => not unique between deployments,
-		// TrackEffort
-		// OnPath => scattered throughout pamguard
-		// URI => option, check with Shannon on how they are doing deployments
-		// Sensors/Audio (per hydrophone not quad array) streamer info + individual
-		// hydrophone data together
-		// pamguard hydrophone data
-		// number => hydrophoneId
-		// sensorId => sensor serial number
-		// Geometry => array geometry field goes to
-		// Sensors/Depth
-		// optional
-		// Sensors/Sensor
-		// Number => hydrophoneId in pamguard
-		// SensorId => addition to UI
-		// Geometry => array geometry fields
-		// Type => Hydrophone Type
-
-		// get list of deployment recovery details (start, stop times and lat/long)
-		// deployment details and recovery details are same structure
-		// per pair, go through a loop to fill in each deployment
-//		ArrayList<DeploymentRecoveryPair> deployRecover = getSamplingDetails();
-//		if (deployRecover == null) {
-//			return false;
-//		}
-//	
-//		for (DeploymentRecoveryPair drd : deployRecover) {
-//			
-//			
-//			
-//			
-//		}
+		//1. grab DeploymentRecoveryPair that has deployment details and recovery details
+				//a. this is based on start and end times
+					//Douglas calculates out dutycycles to only grab the
+				
+		//2. loop through the pairs to populate the extra information
+			//one pair is one deployment
+			//see below for matching
+				
+		
+		//id => unique
+		//project => project in pamguard
+		//deploymentId == id
+		//deploymentAlias => blank
+		//site => UI addition in pamguard, not done, can be blank
+		//siteAlias => blank
+		//cruise => UI addition, optional
+		//Platform=> UI addition in pamguard
+		//region => UI addition
+		//Instrument/Type => UI, array manager details (hydrophone names area)
+		//Instrument/Id => UI, array manager details
+		//Instrument/Geometry => in pamguard array manager
+		//SamplingDetails/Channel
+			//ChannelNumber => in pamguard, hyrdrophone array  
+			//SensorNumber => in pamguard, 
+			//Start => same as timestamp deployment detail
+			//End => same as timestamp recovery detail
+			//Sampling/Regimen (change sample rate, pamgauard doesnt handle, only on, get channel info in that loop)
+				//TimeStamp => start time
+				//SampleRate_kHz => 
+				//SampleBits => 
+			//Gain (another func call to get gain info)
+			//DutyCycles => needs to be calculated, not fields in pamguard, have fun Douglas
+		//QualityAssurance => not in pamguard, UI, maybe deployment notes, optional
+		//Data/Audio (static)
+			//URI => folder where audio is saved
+		//Data/Tracks
+			//Track => GPS datatable (granularity filter)
+				//TrackId => not unique between deployments, 
+			//TrackEffort
+				//OnPath => scattered throughout pamguard
+			//URI => option, check with Shannon on how they are doing deployments
+		//Sensors/Audio (per hydrophone not quad array) streamer info + individual hydrophone data together
+			//pamguard hydrophone data
+			//number => hydrophoneId
+			//sensorId => sensor serial number
+			//Geometry => array geometry field goes to 
+		//Sensors/Depth
+			//optional 
+		//Sensors/Sensor 
+			//Number => hydrophoneId in pamguard
+			//SensorId => addition to UI
+			//Geometry => array geometry fields
+			//Type => Hydrophone Type
+		
+		
+		
+		
+		
+		//get list of deployment recovery details (start, stop times and lat/long)
+		//deployment details and recovery details are same structure
+		//per pair, go through a loop to fill in each deployment
+		ArrayList<DeploymentRecoveryPair> deployRecover = getSamplingDetails();
+		if (deployRecover == null) {
+			return false;
+		}
+	
+		/*
+		 * This will become the main loop over deployment documents
+		 */
+		int i = 0;
+		for (DeploymentRecoveryPair drd : deployRecover) {
+			
+			Deployment deployment = createDeploymentDocument(i++, drd);
+			
+			
+		}
 
 		/*
 		 * Call some general export function
@@ -240,6 +249,18 @@ public class TethysExporter {
 		dbxmlConnect.closeDatabase();
 
 		return true;
+	}
+	
+	private Deployment createDeploymentDocument(int i, DeploymentRecoveryPair drd) {
+		Deployment deployment = new Deployment();
+		deployment.setDeploymentDetails(drd.deploymentDetails);
+		deployment.setRecoveryDetails(drd.recoveryDetails);
+		
+		TethysLocationFuncs.getTrackAndPositionData(deployment);
+		
+		
+		
+		return deployment;
 	}
 
 	/**
@@ -348,9 +369,9 @@ public class TethysExporter {
 		// just load everything. Probably OK for the acqusition, but will bring down
 		daqInfoDataBlock.loadViewerData(0, Long.MAX_VALUE, null);
 		ArrayList<DaqStatusDataUnit> allStatusData = daqInfoDataBlock.getDataCopy();
+		long dataStart = Long.MAX_VALUE;
+		long dataEnd = Long.MIN_VALUE;
 		if (allStatusData != null && allStatusData.size() > 0) {
-			long dataStart = Long.MAX_VALUE;
-			long dataEnd = Long.MIN_VALUE;
 			// find the number of times it started and stopped ....
 			int nStart = 0, nStop = 0, nFile = 0;
 			for (DaqStatusDataUnit daqStatus : allStatusData) {
@@ -392,8 +413,22 @@ public class TethysExporter {
 ////			for ()
 //		}
 
-		return null;
 
+		DeploymentRecoveryPair pair = new DeploymentRecoveryPair();
+		DeploymentRecoveryDetails deployment = new DeploymentRecoveryDetails();
+		DeploymentRecoveryDetails recovery = new DeploymentRecoveryDetails();
+		pair.deploymentDetails = deployment;
+		pair.recoveryDetails = recovery;
+		
+		deployment.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(dataStart));
+		deployment.setAudioTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(dataStart));
+		recovery.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(dataEnd));
+		recovery.setAudioTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(dataEnd));
+		
+		ArrayList<DeploymentRecoveryPair> drPairs = new ArrayList<>();
+		drPairs.add(pair);
+		return drPairs;
+		
 	}
 
 	/**
