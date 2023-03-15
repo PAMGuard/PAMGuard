@@ -13,9 +13,12 @@ import PamController.PamSettings;
 import PamController.PamguardVersionInfo;
 import PamController.settings.output.xml.PamguardXMLWriter;
 import PamUtils.XMLUtils;
+import PamguardMVC.DataUnitBaseData;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamProcess;
+import PamguardMVC.TFContourData;
+import PamguardMVC.TFContourProvider;
 import generalDatabase.DBSchemaWriter;
 import generalDatabase.SQLLogging;
 import nilus.AlgorithmType;
@@ -27,6 +30,7 @@ import nilus.SpeciesIDType;
 import tethys.TethysTimeFuncs;
 import tethys.output.StreamExportParams;
 import tethys.output.TethysExportParams;
+import whistleClassifier.WhistleContour;
 
 /**
  * Automatically provides Tethys data based on the SQL database interface 
@@ -182,7 +186,62 @@ public class AutoTethysProvider implements TethysDataProvider {
 		 */
 		detection.setChannel(BigInteger.valueOf(dataUnit.getChannelBitmap()));
 		
+		nilus.Detection.Parameters detParams = new nilus.Detection.Parameters();
+		detection.setParameters(detParams);
+		double[] freqs = dataUnit.getFrequency();
+		if (freqs != null) {
+			detParams.setMinFreqHz(freqs[0]);
+			detParams.setMaxFreqHz(freqs[1]);
+		}
+		double ampli = dataUnit.getAmplitudeDB();
+		detParams.setReceivedLevelDB(ampli);
+//		DataUnitBaseData basicData = dataUnit.getBasicData();
+		gotTonalContour(dataUnit, detParams);
+		
 		return detection;
+	}
+
+	/**
+	 * Get tonal sounds contour. Sadly there are two slightly different interfaces in use
+	 * in PAMGuard, so try them both. 
+	 * @param detParams
+	 * @return true if a contour was added
+	 */
+	private boolean gotTonalContour(PamDataUnit dataUnit, nilus.Detection.Parameters detParams) {
+		if (dataUnit instanceof TFContourProvider) {
+			TFContourProvider tfcp = (TFContourProvider) dataUnit;
+			TFContourData cd = tfcp.getTFContourData();
+			if (cd != null) {
+				long[] tMillis = cd.getContourTimes();
+				double[] fHz = cd.getRidgeFrequency();
+				nilus.Detection.Parameters.Tonal tonal = new nilus.Detection.Parameters.Tonal();
+				List<Double> offsetS = tonal.getOffsetS();
+				List<Double> hz = tonal.getHz();
+				for (int i = 0; i < tMillis.length; i++) {
+					offsetS.add((double) (tMillis[i]-tMillis[0]) / 1000.);
+					hz.add(fHz[i]);
+				}
+				detParams.setTonal(tonal);
+				return true;
+			}
+		}
+		if (dataUnit instanceof WhistleContour) {
+			WhistleContour wc = (WhistleContour) dataUnit;
+			double[] t = wc.getTimesInSeconds();
+			double[] f = wc.getFreqsHz();
+			if (t != null && f != null) {
+				nilus.Detection.Parameters.Tonal tonal = new nilus.Detection.Parameters.Tonal();
+				List<Double> offsetS = tonal.getOffsetS();
+				List<Double> hz = tonal.getHz();
+				for (int i = 0; i < t.length; i++) {
+					offsetS.add(t[i]-t[0]);
+					hz.add(f[i]);
+				}
+				detParams.setTonal(tonal);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private SpeciesIDType getSpeciesIdType() {

@@ -464,7 +464,7 @@ final public class PamModel implements PamModelInterface, PamSettings {
 
 
 		mi = PamModuleInfo.registerControlledUnit(MetaDataContol.class.getName(), MetaDataContol.unitType);
-		mi.setToolTipText("Deployment Meta Data");
+		mi.setToolTipText("Project Meta Data");
 		mi.setModulesMenuGroup(utilitiesGroup);
 		mi.setMaxNumber(1); 
 		

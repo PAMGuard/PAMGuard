@@ -6,26 +6,31 @@ import whistlesAndMoans.AbstractWhistleDataUnit;
 public class RWEDataUnit extends AbstractWhistleDataUnit {
 
 	public RWESound rweSound;
+	private RWEProcess rweProcess;
 	
-	public RWEDataUnit(long timeMilliseconds, int channelBitmap,
+	public RWEDataUnit(RWEProcess rweProcess, long timeMilliseconds, int channelBitmap,
 			long startSample, long duration,  RWESound rweSound) {
 		super(timeMilliseconds, channelBitmap, startSample, duration);
 		this.rweSound = rweSound;
+		this.rweProcess = rweProcess;
 		// TODO Auto-generated constructor stub
 	}
 
-	public RWEDataUnit(DataUnitBaseData basicData,  RWESound rweSound) {
+	public RWEDataUnit(RWEProcess rweProcess, DataUnitBaseData basicData,  RWESound rweSound) {
 		super(basicData);
 		this.rweSound = rweSound;
+		this.rweProcess = rweProcess;
 	}
 
-	double[] freqsHz;
 	@Override
 	public double[] getFreqsHz() {
-		if (freqsHz == null) {
-			freqsHz = new double[rweSound.sliceCount];
+		double[] f = new double[rweSound.sliceCount];
+		RWEDataBlock rweDataBlock = rweProcess.getRweDataBlock();
+		double binToHz = rweDataBlock.getSampleRate() / rweDataBlock.getFftLength();
+		for (int i = 0; i < f.length; i++) {
+			f[i] = (double) rweSound.peakFreq[i] * binToHz;
 		}
-		return null;
+		return f;
 	}
 
 	@Override
@@ -35,8 +40,16 @@ public class RWEDataUnit extends AbstractWhistleDataUnit {
 
 	@Override
 	public double[] getTimesInSeconds() {
-		// TODO Auto-generated method stub
-		return null;
+		if (rweSound == null) {
+			return null;
+		}
+		double[] t = new double[rweSound.sliceCount];
+		RWEDataBlock rweDataBlock = rweProcess.getRweDataBlock();
+		double binToT = rweDataBlock.getFftHop() / rweDataBlock.getSampleRate();
+		for (int i = 0; i < t.length; i++) {
+			t[i] = (double) rweSound.sliceList[i] * binToT;
+		}
+		return t;
 	}
 
 	@Override
