@@ -1,6 +1,10 @@
 package tethys.pamdata;
 
 import PamguardMVC.PamDataUnit;
+import nilus.AlgorithmType;
+import nilus.Deployment;
+import nilus.DescriptionType;
+import tethys.output.TethysExportParams;
 
 /**
  * Any PAMGuard data stream which can provide Detection data to PAMGuard will 
@@ -28,5 +32,11 @@ public interface TethysDataProvider {
 	 * @return
 	 */
 	public TethysDataPoint getDataPoint(PamDataUnit pamDataUnit);
+
+
+	public DescriptionType getDescription(Deployment deployment, TethysExportParams tethysExportParams);
+
+
+	public AlgorithmType getAlgorithm();
 	
 }

@@ -34,6 +34,9 @@ import tethys.TethysControl;
 import tethys.dbxml.DBXMLConnect;
 import tethys.deployment.DeploymentHandler;
 import tethys.deployment.DeploymentRecoveryPair;
+import tethys.detection.DetectionGranularity;
+import tethys.detection.DetectionGranularity.GRANULARITY;
+import tethys.detection.DetectionsHandler;
 import tethys.pamdata.TethysDataProvider;
 import tethys.pamdata.TethysSchema;
 
@@ -204,6 +207,7 @@ public class TethysExporter {
 			return false;
 		}
 
+		ArrayList<Deployment> deploymentDocs = new ArrayList<>();
 		/*
 		 * This will become the main loop over deployment documents
 		 */
@@ -212,7 +216,7 @@ public class TethysExporter {
 
 			Deployment deployment = deploymentHandler.createDeploymentDocument(i++, drd);
 //			System.out.println(deployment.toString());
-
+			deploymentDocs.add(deployment1);
 
 		}
 
@@ -222,13 +226,21 @@ public class TethysExporter {
 		 * go through the export params and call something for every data block that's
 		 * enabled.
 		 */
+		DetectionsHandler detectionsHandler = new DetectionsHandler(tethysControl);
 		ArrayList<PamDataBlock> allDataBlocks = PamController.getInstance().getDataBlocks();
-		for (PamDataBlock aDataBlock : allDataBlocks) {
-			StreamExportParams streamExportParams = tethysExportParams.getStreamParams(aDataBlock);
-			if (streamExportParams == null || !streamExportParams.selected) {
-				continue; // not interested in this one.
+		/**
+		 * Outer loop is through deployemnt documents. Will then export detections within each 
+		 * deployment detector by detector
+		 */
+		for (Deployment aDeployment : deploymentDocs) {
+			for (PamDataBlock aDataBlock : allDataBlocks) {
+				StreamExportParams streamExportParams = tethysExportParams.getStreamParams(aDataBlock);
+				if (streamExportParams == null || !streamExportParams.selected) {
+					continue; // not interested in this one.
+				}
+				detectionsHandler.exportDetections(aDataBlock, aDeployment, 
+						new DetectionGranularity(GRANULARITY.TIME, 3600), tethysExportParams, streamExportParams);
 			}
-			exportDataStream(aDataBlock, tethysExportParams, streamExportParams);
 		}
 		/*
 		 * Then do whatever else is needed to complete the document.
@@ -309,113 +321,5 @@ public class TethysExporter {
 	}
 
 
-
-	/**
-	 * Here is where we export data for a specific data stream to Tethys.
-	 *
-	 * @param aDataBlock
-	 * @param tethysExportParams
-	 * @param streamExportParams
-	 */
-	private void exportDataStream(PamDataBlock aDataBlock, TethysExportParams tethysExportParams,
-			StreamExportParams streamExportParams) {
-		/**
-		 * This will probably need to be passed additional parameters and may also want
-		 * to return something other than void in order to build a bigger Tethys
-		 * document.
-		 */
-		/*
-		 * Some examples of how to do whatever is needed to get schema and data out of
-		 * PAMGuard.
-		 */
-		/*
-		 * first we'll probably want a reference to the module containing the data. in
-		 * principle this can't get null, since the datablock was found be searching in
-		 * the other direction.
-		 */
-		PamControlledUnit pamControlledUnit = aDataBlock.getParentProcess().getPamControlledUnit();
-
-		TethysDataProvider dataProvider = aDataBlock.getTethysDataProvider();
-
-		PamguardXMLWriter pamXMLWriter = PamguardXMLWriter.getXMLWriter();
-
-		if (dataProvider == null) {
-			return;
-		}
-
-		TethysSchema tethysSchema = dataProvider.getSchema();
-		/*
-		 * the schema should have a Document object in it. If we wanted to turn that
-		 * into an XML string we can ... (though I'd assume that having the Document is
-		 * more useful)
-		 */
-		String schemaXMLString = pamXMLWriter.getAsString(tethysSchema.getXsd(), false);
-		System.out.printf("Schema for %s is %s\n", aDataBlock.getDataName(), schemaXMLString);
-
-		/*
-		 * Get the XML settings for that datablock. This is (or should be the parameters
-		 * that were controlling that module, with adequate data about upstream
-		 * modules). I think this has to go somewhere into the Detections document.
-		 */
-		Document doc = pamXMLWriter.writeOneModule((PamSettings) pamControlledUnit, System.currentTimeMillis());
-		String moduleXML = null;
-		if (doc != null) {
-			// this string should be XML of all the settings for the module controlling this
-			// datablock.
-			moduleXML = pamXMLWriter.getAsString(doc, true); // change to false to get smaller xml
-			System.out.printf("Module settings for datablock %s are:\n", moduleXML);
-			System.out.println(moduleXML);
-		}
-
-		/**
-		 * Now can go through the data. Probably, we'll want to go through all the data
-		 * in the project, but we can hold off on that for now and just go for data that
-		 * are in memory. We'll also have to think a lot about updating parts of the
-		 * database which have been reprocessed - what we want to do, should eventually
-		 * all be options set in the dialog and available within TethysExportParams For
-		 * now though, we're just going to export data that are in memory. Once basic
-		 * export is working, I can easily enough write something which will go through
-		 * an entire data set, go through between two times, etc.
-		 */
-		// so this is a way of iterating through the data that are in memory, which will
-		// do for now ..
-		// do it with a data copy which can avoid synchronising the entire block for
-		// what may be a long time
-		// the copy function is itself synched, and is quite fast, so easier and safe
-		// this way
-		ArrayList<PamDataUnit> dataCopy = aDataBlock.getDataCopy();
-		DataSelector dataSelector = aDataBlock.getDataSelector(tethysControl.getDataSelectName(), false);
-		int nSkipped = 0;
-		int nExport = 0;
-
-		for (PamDataUnit aData : dataCopy) {
-			/*
-			 * see if we want this data unit. PAMGuard has a complicated system of data
-			 * selectors specific to each data type. These are centrally managed so you
-			 * don't need to worry too much about them. They are identified by name for each
-			 * data stream and the behaviour here should follow the selections you made in
-			 * the dialog. the data selection system allows different displays to show
-			 * different data, so a stream can have many differently named selectors active
-			 * at any one time, all doing different things in different parts of PAMGuard.
-			 */
-			if (dataSelector != null) {
-				if (dataSelector.scoreData(aData) <= 0) {
-					nSkipped++;
-					continue; // don't want this one.
-				}
-			}
-
-			/*
-			 * then we do whatever we need to do to convert this into something for Tethys
-			 * this might happen in the tethysSchema object for each data stream ????
-			 */
-
-			nExport++;
-		}
-
-		System.out.printf("Exported %d data units and skipped %d in %s", nExport, nSkipped,
-				aDataBlock.getLongDataName());
-
-	}
 
 }

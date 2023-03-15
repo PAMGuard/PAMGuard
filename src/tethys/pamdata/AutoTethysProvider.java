@@ -1,11 +1,27 @@
 package tethys.pamdata;
 
-import org.w3c.dom.Document;
+import java.util.List;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import PamController.PamControlledUnit;
+import PamController.PamSettings;
+import PamController.PamguardVersionInfo;
+import PamController.settings.output.xml.PamguardXMLWriter;
+import PamUtils.XMLUtils;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import PamguardMVC.PamProcess;
 import generalDatabase.DBSchemaWriter;
 import generalDatabase.SQLLogging;
+import nilus.AlgorithmType;
+import nilus.AlgorithmType.Parameters;
+import nilus.Deployment;
+import nilus.DescriptionType;
+import tethys.output.TethysExportParams;
 
 /**
  * Automatically provides Tethys data based on the SQL database interface 
@@ -16,9 +32,13 @@ import generalDatabase.SQLLogging;
 public class AutoTethysProvider implements TethysDataProvider {
 
 	private PamDataBlock pamDataBlock;
+	private PamProcess pamProcess;
+	private PamControlledUnit pamControlledUnit;
 
 	public AutoTethysProvider(PamDataBlock pamDataBlock) {
 		this.pamDataBlock = pamDataBlock;
+		pamProcess = pamDataBlock.getParentProcess();
+		pamControlledUnit = pamProcess.getPamControlledUnit();
 	}
 
 	@Override
@@ -37,6 +57,112 @@ public class AutoTethysProvider implements TethysDataProvider {
 	public TethysDataPoint getDataPoint(PamDataUnit pamDataUnit) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public DescriptionType getDescription(Deployment deployment, TethysExportParams tethysExportParams) {
+		DescriptionType description = new DescriptionType();
+		String fullUnitName = pamControlledUnit.getUnitType() + " " + pamControlledUnit.getUnitName();
+		description.setAbstract(fullUnitName);
+		description.setObjectives(fullUnitName);
+		description.setMethod(pamControlledUnit.getUnitType());
+		
+		return description;
+	}
+
+	@Override
+	public AlgorithmType getAlgorithm() {
+		AlgorithmType algorithm = new AlgorithmType();
+		algorithm.setMethod(this.getAlgorithmMethod());
+		algorithm.setSoftware("PAMGuard");
+		algorithm.setVersion(PamguardVersionInfo.version);
+		algorithm.setParameters(this.getAlgorithmParameters());
+		
+		return algorithm;
+	}
+
+	private Parameters getAlgorithmParameters() {
+		if (pamControlledUnit instanceof PamSettings == false) {
+			return null;
+		}
+		PamSettings pamSettings = (PamSettings) pamControlledUnit;
+		Parameters parameters = new Parameters();
+		List<Element> paramList = parameters.getAny();
+		Document doc = XMLUtils.createBlankDoc();
+		PamguardXMLWriter pamXMLWriter = PamguardXMLWriter.getXMLWriter();
+		Element dummyEl = doc.createElement("MODULES");
+		doc.appendChild(dummyEl);
+		PamSettings[] settingsObjs = getSettingsObjects();
+		if (settingsObjs == null) {
+			return null;
+		}
+		Element settingsEl = pamXMLWriter.writeUnitSettings(doc, dummyEl, pamSettings, settingsObjs);
+		if (settingsEl == null) {
+			return null;
+		}
+		dummyEl.appendChild(settingsEl);
+		NodeList childs = settingsEl.getChildNodes();
+		for (int i = 0; i < childs.getLength(); i++) {
+			Node el = childs.item(i);
+			System.out.println(el.getNodeName());
+			if (el instanceof Element) {
+				paramList.add((Element) el);
+			}
+		}
+
+//		Document doc = pamXMLWriter.writeOneModule((PamSettings) pamControlledUnit, System.currentTimeMillis());
+//		String moduleXML = null;
+		if (doc != null) {
+			// this string should be XML of all the settings for the module controlling this
+			// datablock.
+//			moduleXML = pamXMLWriter.getAsString(doc, true); // change to false to get smaller xml
+//			System.out.printf("Module settings for datablock %s are:\n", moduleXML);
+//			System.out.println(moduleXML);
+//			Element pamguard = doc.get("PAMGUARD");
+//			Element modules = (Element) pamguard.getElementsByTagName("MODULES");
+//			doc.get
+//			NodeList childs = doc.getChildNodes();
+//			for (int i = 0; i < childs.getLength(); i++) {
+//				Node el = childs.item(i);
+//				System.out.println(el.getNodeName());
+//				if (el instanceof Element) {
+//					paramList.add((Element) el);
+//				}
+//			}
+//			String moduleXML = pamXMLWriter.getAsString(doc, true); // change to false to get smaller xml
+//			System.out.printf("Module settings for datablock %s are:\n%s", this.pamDataBlock.getDataName(), moduleXML);
+		}
+		
+//		// try the old say
+//		Document doc2 = pamXMLWriter.writeOneModule((PamSettings) pamControlledUnit, System.currentTimeMillis());
+//		String moduleXML = null;
+//		if (doc2 != null) {
+//			// this string should be XML of all the settings for the module controlling this
+//			// datablock.
+//			moduleXML = pamXMLWriter.getAsString(doc2, true); // change to false to get smaller xml
+//			System.out.printf("Module settings for datablock %s are:\n%s", pamDataBlock.getDataName(),moduleXML);
+//		}
+//		
+		
+		return parameters;
+	}
+	
+	private PamSettings[] getSettingsObjects() {
+		if (pamControlledUnit instanceof PamSettings) {
+			PamSettings[] settings = new PamSettings[1];
+			settings[0] = (PamSettings) pamControlledUnit;
+			return settings;
+		}
+		return null;
+	}
+
+	/**
+	 * Algorithm method. Default is the module name. Can change to a paper citation 
+	 * by overriding this 
+	 * @return
+	 */
+	private String getAlgorithmMethod() {
+		return pamControlledUnit.getUnitType();
 	}
 
 }

@@ -437,7 +437,7 @@ public class PamguardXMLWriter implements PamSettings {
 	 * @param pamSettingsUnit 
 	 * @return xml element
 	 */
-	private Element writeUnitSettings(Document doc, Element parent, PamSettings pamSettingsUnit) {
+	public Element writeUnitSettings(Document doc, Element parent, PamSettings pamSettingsUnit) {
 
 		int[] settingInds = findSettings(null, pamSettingsUnit.getUnitName());
 		PamSettings[] settingsObjects = null;
@@ -462,7 +462,7 @@ public class PamguardXMLWriter implements PamSettings {
 	 * can be temporary settings objects when writing temporary settings from dialogs. 
 	 * @return new XML element. 
 	 */
-	private Element writeUnitSettings(Document doc, Element parent, PamSettings pamSettingsUnit, PamSettings[] toWrite) {
+	public Element writeUnitSettings(Document doc, Element parent, PamSettings pamSettingsUnit, PamSettings[] toWrite) {
 		Element moduleData = doc.createElement("MODULE");
 		moduleData.setAttribute("Java.class", pamSettingsUnit.getClass().getName());
 		moduleData.setAttribute("UnitType", pamSettingsUnit.getUnitType());

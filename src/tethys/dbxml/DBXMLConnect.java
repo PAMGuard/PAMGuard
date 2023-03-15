@@ -2,6 +2,12 @@ package tethys.dbxml;
 
 import tethys.TethysControl;
 
+/**
+ * Class containing functions for managing the database connection. Opening, closing,
+ * writing, keeping track of performance, etc. 
+ * @author Doug Gillespie, Katie O'Laughlin
+ *
+ */
 public class DBXMLConnect {
 
 	private TethysControl tethysControl;
@@ -19,6 +25,6 @@ public class DBXMLConnect {
 		
 	}
 	
-	// add whatever calls are necessary to set up schema's etc. 
+	// add whatever calls are necessary ... 
 
 }
