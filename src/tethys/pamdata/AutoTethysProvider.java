@@ -249,7 +249,7 @@ public class AutoTethysProvider implements TethysDataProvider {
 
 	private SpeciesIDType getSpeciesIdType() {
 		SpeciesIDType species = new SpeciesIDType();
-//		species.s
+		species.setValue(BigInteger.valueOf(180537));
 		return species;
 	}
 

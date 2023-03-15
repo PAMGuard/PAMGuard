@@ -1,5 +1,6 @@
 package tethys.detection;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -166,7 +167,10 @@ public class DetectionsHandler {
 		 * We should now have a fully populated Detections object, so write it to the database
 		 * using functions in DBXMLConnect 
 		 */
-		tethysControl.getDbxmlConnect(); // call whatever you need to call in here to write the Detections. 
+		ArrayList<Detections> detectionDocuments = new ArrayList();
+		detectionDocuments.add(detections);
+		
+		tethysControl.getDbxmlConnect().postToTethys(detectionDocuments); // call whatever you need to call in here to write the Detections. 
 		
 		
 		return true;
@@ -185,6 +189,25 @@ public class DetectionsHandler {
 		effort.setEnd(TethysTimeFuncs.xmlGregCalFromMillis(effortEnd));
 //		effort.set // no setter for DetectionEffortKind
 		List<DetectionEffortKind> effortKinds = effort.getKind();
+		DetectionEffortKind kind = new DetectionEffortKind();
+		try {
+			nilus.Helper.createRequiredElements(kind);
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		kind.getSpeciesId().setValue(BigInteger.valueOf(180537));
+		kind.getGranularity().setValue(nilus.GranularityEnumType.CALL);
+		
+		effortKinds.add(kind);		
+				 
 		return effort;
 	}
 

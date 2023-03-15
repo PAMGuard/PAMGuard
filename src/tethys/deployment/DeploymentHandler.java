@@ -22,6 +22,7 @@ import Array.ThreadingHydrophoneLocator;
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamguardMVC.PamDataBlock;
+import javafx.scene.chart.PieChart.Data;
 import metadata.MetaDataContol;
 import metadata.deployment.DeploymentData;
 import nilus.Audio;
@@ -143,7 +144,7 @@ public class DeploymentHandler {
 		}
 		double[] ons = new double[n-1]; // ignore the last one since it may be artificially shortened which is OK
 		double[] gaps = new double[n-1];
-		for (int i = 0; i < n; i++) {
+		for (int i = 0; i < n-1; i++) {
 			ons[i] = tempPeriods.get(i).getDuration();
 		}
 		return null;
@@ -283,13 +284,25 @@ public class DeploymentHandler {
 
 	public Deployment createDeploymentDocument(int i, DeploymentRecoveryPair drd) {
 		Deployment deployment = new Deployment();
+		try {
+			nilus.Helper.createRequiredElements(deployment);
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		String id = String.format("%d", i);
 		deployment.setId(id);
 		deployment.setDeploymentId(i);
 		deployment.setDeploymentDetails(drd.deploymentDetails);
 		deployment.setRecoveryDetails(drd.recoveryDetails);
 
-		TethysLocationFuncs.getTrackAndPositionData(deployment);
+		TethysLocationFuncs.getTrackAndPositionData(deployment);			
 
 		getProjectData(deployment);
 
@@ -317,9 +330,16 @@ public class DeploymentHandler {
 	 */
 	private boolean getProjectData(Deployment deployment) {
 		PamControlledUnit aUnit = PamController.getInstance().findControlledUnit(MetaDataContol.class, null);
-		if (aUnit instanceof MetaDataContol == false) {
+		if (aUnit instanceof MetaDataContol == false || true) {
+			deployment.setProject("thisIsAProject");
+			deployment.setPlatform("Yay a platform");
+			Instrument instrument = new Instrument();
+			instrument.setType("machiney");
+			instrument.setInstrumentId("12345555");			
+			deployment.setInstrument(instrument);
 			return false;
 		}
+		
 		MetaDataContol metaControl = (MetaDataContol) aUnit;
 		DeploymentData deploymentData = metaControl.getDeploymentData();
 		deployment.setProject(deploymentData.getProject());

@@ -1,7 +1,7 @@
 package tethys.output;
 
 import java.io.IOException;
-import java.io.StringWriter;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -82,39 +82,7 @@ public class TethysExporter {
 		 */
 		// return false;
 		// }
-
-		Deployment deployment1 = new Deployment();
-		deployment1.setId("1");
-
-		Path tempFile = null;
-		try {
-
-			JAXBContext jaxB = JAXBContext.newInstance(Deployment.class);
-			Marshaller marshall = jaxB.createMarshaller();
-			marshall.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			StringWriter sw = new StringWriter();
-			marshall.marshal(deployment1, sw);
-			tempFile = Files.createTempFile("pamGuardToTethys", ".xml");
-			Files.write(tempFile, sw.toString().getBytes());
-
-			String fileText = Importer.ImportFiles("http://localhost:9779", "Deployment",
-					new String[] { tempFile.toString() }, "", "", false);
-
-			tempFile.toFile().deleteOnExit();
-
-		} catch(IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		SnapshotGeometry arrayGeometry = findArrayGeometrey();
-
+				
 		/**
 		 * Doug populate instrument fields - may need to add a few things. Marie to
 		 * define what we mean by instrument. Instrument names probably need to be added
@@ -220,7 +188,7 @@ public class TethysExporter {
 
 		}
 
-		
+		tethysControl.getDbxmlConnect().postToTethys(deploymentDocs);
 
 		/*
 		 * go through the export params and call something for every data block that's
