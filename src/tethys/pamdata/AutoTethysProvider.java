@@ -27,6 +27,7 @@ import nilus.Deployment;
 import nilus.DescriptionType;
 import nilus.Detection;
 import nilus.SpeciesIDType;
+import tethys.TethysControl;
 import tethys.TethysTimeFuncs;
 import tethys.output.StreamExportParams;
 import tethys.output.TethysExportParams;
@@ -105,10 +106,12 @@ public class AutoTethysProvider implements TethysDataProvider {
 		if (settingsObjs == null) {
 			return null;
 		}
+//		pamXMLWriter.setStaticNameSpace(TethysControl.xmlNameSpace);
 		Element settingsEl = pamXMLWriter.writeUnitSettings(doc, dummyEl, pamSettings, settingsObjs);
 		if (settingsEl == null) {
 			return null;
 		}
+		pamXMLWriter.addNameSpaceToElements(doc, settingsEl, TethysControl.xmlNameSpace);
 		dummyEl.appendChild(settingsEl);
 		NodeList childs = settingsEl.getChildNodes();
 		for (int i = 0; i < childs.getLength(); i++) {

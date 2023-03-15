@@ -29,6 +29,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 
 import com.sun.javafx.runtime.VersionInfo;
 
@@ -48,6 +49,7 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamProcess;
 import binaryFileStorage.BinaryStore;
+import tethys.TethysControl;
 
 /**
  * Class for writing XML configuration output to a file. 
@@ -62,6 +64,7 @@ public class PamguardXMLWriter implements PamSettings {
 	private static final Set<Class<?>> WRAPPER_TYPES = getWrapperTypes();
 	
 	private XMLWriterSettings writerSettings = new XMLWriterSettings();
+//	private String xmlNameSpace;
 	
 	private static PamguardXMLWriter singleInstance;
 
@@ -82,6 +85,19 @@ public class PamguardXMLWriter implements PamSettings {
 			singleInstance = new PamguardXMLWriter();
 		}
 		return singleInstance;
+	}
+	
+	/**
+	 * Recursively walk the tree and add a namespace to every
+	 * single element. 
+	 * @param doc 
+	 * @param nameSpace
+	 * @return
+	 */
+	public boolean addNameSpaceToElements(Document doc, Element el, String nameSpace) {
+//		el.setAttributeNS(nameSpace, nameSpace, nameSpace);
+		NamedNodeMap attributes = el.getAttributes();
+		return true;
 	}
 
 	/**
@@ -966,6 +982,10 @@ public class PamguardXMLWriter implements PamSettings {
 		writerSettings = ((XMLWriterSettings) pamControlledUnitSettings.getSettings()).clone();
 		return true;
 	}
+
+//	public void setStaticNameSpace(String xmlNameSpace) {
+//		this.xmlNameSpace = xmlNameSpace;
+//	}
 
 	
 }

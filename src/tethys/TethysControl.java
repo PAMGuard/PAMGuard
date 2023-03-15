@@ -30,6 +30,7 @@ public class TethysControl extends PamControlledUnit {
 
 	public static final String unitType = "Tethys Interface";
 	public static String defaultName = "Tethys";
+	public static String xmlNameSpace = "http://tethys.sdsu.edu/schema/1.0";
 	
 
 	private TethysExportParams tethysExportParams = new TethysExportParams();
