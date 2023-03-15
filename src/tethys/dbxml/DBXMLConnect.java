@@ -84,7 +84,7 @@ public class DBXMLConnect {
 		switch(className) {
 			case "nilus.Deployment": 
 				return "Deployments";				
-			case "nilus.Detection": 
+			case "nilus.Detections": 
 				return "Detections";
 			case "nilus.Calibration": 
 				return "Calibrations";				
