@@ -141,7 +141,7 @@ public class DeploymentHandler {
 		}
 		double[] ons = new double[n-1]; // ignore the last one since it may be artificially shortened which is OK
 		double[] gaps = new double[n-1];
-		for (int i = 0; i < n; i++) {
+		for (int i = 0; i < n-1; i++) {
 			ons[i] = tempPeriods.get(i).getDuration();
 		}
 		return null;

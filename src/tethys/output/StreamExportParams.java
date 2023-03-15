@@ -12,7 +12,7 @@ import java.io.Serializable;
  */
 public class StreamExportParams implements Serializable {
 
-	public static final long serialVersionUID = 1L;
+	public static final long serialVersionUID = 1L;	
 
 	public StreamExportParams(String longDataName, boolean selected) {
 		super();

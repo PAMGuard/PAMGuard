@@ -30,7 +30,6 @@ import dbxml.uploader.Importer;
 import metadata.MetaDataContol;
 import metadata.deployment.DeploymentData;
 import nilus.Deployment;
-import nilus.MarshalXML;
 import tethys.TethysControl;
 import tethys.dbxml.DBXMLConnect;
 import tethys.deployment.DeploymentHandler;
@@ -83,36 +82,7 @@ public class TethysExporter {
 		 */
 		// return false;
 		// }
-
-		Deployment deployment1 = new Deployment();
-		deployment1.setId("1");
-
-		Path tempFile = null;
-		try {
-			
-			MarshalXML marshal = new MarshalXML();
-			marshal.createInstance(Deployment.class);	
-			tempFile = Files.createTempFile("pamGuardToTethys", ".xml");
-			marshal.marshal(deployment1, tempFile.toString());
-			String fileError = Importer.ImportFiles("http://localhost:9779", "Deployments",
-					new String[] { tempFile.toString() }, "", "", false);
-
-			tempFile.toFile().deleteOnExit();
-
-		} catch(IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		
-		SnapshotGeometry arrayGeometry = findArrayGeometrey();
-
+				
 		/**
 		 * Doug populate instrument fields - may need to add a few things. Marie to
 		 * define what we mean by instrument. Instrument names probably need to be added
@@ -218,7 +188,7 @@ public class TethysExporter {
 
 		}
 
-		
+		tethysControl.getDbxmlConnect().postToTethys(deploymentDocs);
 
 		/*
 		 * go through the export params and call something for every data block that's

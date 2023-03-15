@@ -166,7 +166,7 @@ public class DetectionsHandler {
 		 * We should now have a fully populated Detections object, so write it to the database
 		 * using functions in DBXMLConnect 
 		 */
-		tethysControl.getDbxmlConnect(); // call whatever you need to call in here to write the Detections. 
+		//tethysControl.getDbxmlConnect().postToTethys(detectionList); // call whatever you need to call in here to write the Detections. 
 		
 		
 		return true;

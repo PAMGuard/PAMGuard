@@ -2,8 +2,8 @@ package tethys.output;
 
 import java.io.Serializable;
 import java.util.HashMap;
-
 import PamguardMVC.PamDataBlock;
+
 
 /**
  * Parameters for controlling export of Tethys data. 
@@ -18,6 +18,13 @@ public class TethysExportParams implements Serializable, Cloneable{
 	 * Need to add lots of other parameters here, such as the connection detils
 	 * for the tethys database. 
 	 */
+	public String serverName = "http://localhost";
+	
+	public String port = "9779";
+	
+	public String getFullServerName() {
+		return serverName + ":" + port;			
+	}
 	
 	private HashMap<String, StreamExportParams> streamParamsMap = new HashMap();
 
