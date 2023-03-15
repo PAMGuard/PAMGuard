@@ -3055,7 +3055,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	
 	/**
 	 * Gets a data provider for Tethys. These will probably need
-	 * to be bespoke, but for now will autogenerate based on the SALLogging information. 
+	 * to be bespoke, but for now will autogenerate based on the SQLLogging information. 
 	 * @return the tethysDataProvider
 	 */
 	public TethysDataProvider getTethysDataProvider() {

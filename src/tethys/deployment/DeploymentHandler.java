@@ -67,8 +67,8 @@ public class DeploymentHandler {
 		 * Realistically, this list is always 0,1,2,etc or it goes horribly wrong !
 		 */
 		// so write functions here to get information from the daqParams. 
-		System.out.printf("Sample regime: %s input with rate %3.1fHz, %d channels, gain %3.1fdB, ADCp-p %3.1fV\n", daqParams.getDaqSystemType(),
-				daqParams.getSampleRate(), daqParams.getNChannels(), daqParams.preamplifier.getGain(), daqParams.voltsPeak2Peak);
+//		System.out.printf("Sample regime: %s input with rate %3.1fHz, %d channels, gain %3.1fdB, ADCp-p %3.1fV\n", daqParams.getDaqSystemType(),
+//				daqParams.getSampleRate(), daqParams.getNChannels(), daqParams.preamplifier.getGain(), daqParams.voltsPeak2Peak);
 		/**
 		 * then there is the actual sampling. This is a bit harder to find. I thought it would be in the data map
 		 * but the datamap is a simple count of what's in the databasase which is not quite what we want.  
@@ -207,8 +207,8 @@ public class DeploymentHandler {
 		 * Realistically, this list is always 0,1,2,etc or it goes horribly wrong !
 		 */
 		// so write functions here to get information from the daqParams. 
-		System.out.printf("Sample regime: %s input with rate %3.1fHz, %d channels, gain %3.1fdB, ADCp-p %3.1fV\n", daqParams.getDaqSystemType(),
-				daqParams.getSampleRate(), daqParams.getNChannels(), daqParams.preamplifier.getGain(), daqParams.voltsPeak2Peak);
+//		System.out.printf("Sample regime: %s input with rate %3.1fHz, %d channels, gain %3.1fdB, ADCp-p %3.1fV\n", daqParams.getDaqSystemType(),
+//				daqParams.getSampleRate(), daqParams.getNChannels(), daqParams.preamplifier.getGain(), daqParams.voltsPeak2Peak);
 		/**
 		 * then there is the actual sampling. This is a bit harder to find. I thought it would be in the data map
 		 * but the datamap is a simple count of what's in the databasase which is not quite what we want.  
@@ -242,8 +242,8 @@ public class DeploymentHandler {
 				}
 			}
 			
-			System.out.printf("Input map of sound data indicates data from %s to %s with %d starts and %d stops over %d files\n", 
-					PamCalendar.formatDateTime(dataStart), PamCalendar.formatDateTime(dataEnd), nStart, nStop, nFile+1);
+//			System.out.printf("Input map of sound data indicates data from %s to %s with %d starts and %d stops over %d files\n", 
+//					PamCalendar.formatDateTime(dataStart), PamCalendar.formatDateTime(dataEnd), nStart, nStop, nFile+1);
 			
 		}
 		

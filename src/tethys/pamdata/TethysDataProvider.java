@@ -1,6 +1,12 @@
 package tethys.pamdata;
 
 import PamguardMVC.PamDataUnit;
+import nilus.AlgorithmType;
+import nilus.Deployment;
+import nilus.DescriptionType;
+import nilus.Detection;
+import tethys.output.StreamExportParams;
+import tethys.output.TethysExportParams;
 
 /**
  * Any PAMGuard data stream which can provide Detection data to PAMGuard will 
@@ -28,5 +34,33 @@ public interface TethysDataProvider {
 	 * @return
 	 */
 	public TethysDataPoint getDataPoint(PamDataUnit pamDataUnit);
+
+
+	/**
+	 * Get DescriptionType object to include in a Tethys Detections document. 
+	 * @param deployment
+	 * @param tethysExportParams
+	 * @return Tethys DescriptionType object, which contains infromation about detections
+	 */
+	public DescriptionType getDescription(Deployment deployment, TethysExportParams tethysExportParams);
+
+
+	/**
+	 * Get Algorithm information for a Tethys Detections document
+	 * @return Algorithm information
+	 */
+	public AlgorithmType getAlgorithm();
+
+
+	/**
+	 * Create a Tethys Detection object from a PamDataUnit.<br>
+	 * It's OK for this to return null if for some reason the unit shouldn't be stored. 
+	 * @param dataUnit PAMGuard data unit
+	 * @param tethysExportParams 
+	 * @param streamExportParams
+	 * @return Detection Tethys Detection object. 
+	 */
+	public Detection createDetection(PamDataUnit dataUnit, TethysExportParams tethysExportParams,
+			StreamExportParams streamExportParams);
 	
 }

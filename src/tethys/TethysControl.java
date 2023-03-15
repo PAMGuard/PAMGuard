@@ -11,6 +11,7 @@ import javax.swing.JMenuItem;
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamguardMVC.PamDataBlock;
+import tethys.dbxml.DBXMLConnect;
 //import nilus.Deployment;
 //import nilus.Deployment.Instrument;
 import tethys.output.StreamExportParams;
@@ -33,9 +34,20 @@ public class TethysControl extends PamControlledUnit {
 
 	private TethysExportParams tethysExportParams = new TethysExportParams();
 	
+	private DBXMLConnect dbxmlConnect;
 
 	public TethysControl(String unitName) {
 		super(unitType, unitName);
+		dbxmlConnect = new DBXMLConnect(this);
+	}
+
+	/**
+	 * Get DBXML Connector. This class contains all the functions that are needed
+	 * to talk to the database. 
+	 * @return DBXML functions. 
+	 */
+	public DBXMLConnect getDbxmlConnect() {
+		return dbxmlConnect;
 	}
 
 	@Override
