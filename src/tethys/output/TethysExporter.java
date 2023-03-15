@@ -1,7 +1,7 @@
 package tethys.output;
 
 import java.io.IOException;
-import java.io.StringWriter;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -30,6 +30,7 @@ import dbxml.uploader.Importer;
 import metadata.MetaDataContol;
 import metadata.deployment.DeploymentData;
 import nilus.Deployment;
+import nilus.MarshalXML;
 import tethys.TethysControl;
 import tethys.dbxml.DBXMLConnect;
 import tethys.deployment.DeploymentHandler;
@@ -85,16 +86,12 @@ public class TethysExporter {
 
 		Path tempFile = null;
 		try {
-
-			JAXBContext jaxB = JAXBContext.newInstance(Deployment.class);
-			Marshaller marshall = jaxB.createMarshaller();
-			marshall.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			StringWriter sw = new StringWriter();
-			marshall.marshal(deployment1, sw);
+			
+			MarshalXML marshal = new MarshalXML();
+			marshal.createInstance(Deployment.class);	
 			tempFile = Files.createTempFile("pamGuardToTethys", ".xml");
-			Files.write(tempFile, sw.toString().getBytes());
-
-			String fileText = Importer.ImportFiles("http://localhost:9779", "Deployment",
+			marshal.marshal(deployment1, tempFile.toString());
+			String fileError = Importer.ImportFiles("http://localhost:9779", "Deployments",
 					new String[] { tempFile.toString() }, "", "", false);
 
 			tempFile.toFile().deleteOnExit();
@@ -110,6 +107,7 @@ public class TethysExporter {
 			e.printStackTrace();
 		}
 
+		
 		SnapshotGeometry arrayGeometry = findArrayGeometrey();
 
 		/**
