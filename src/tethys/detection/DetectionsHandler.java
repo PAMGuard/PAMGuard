@@ -3,11 +3,7 @@ package tethys.detection;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.w3c.dom.Document;
-
-import PamController.PamControlledUnit;
-import PamController.PamSettings;
-import PamController.settings.output.xml.PamguardXMLWriter;
+import PamUtils.PamCalendar;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataSelector.DataSelector;
@@ -15,8 +11,10 @@ import dataMap.OfflineDataMap;
 import dataMap.OfflineDataMapPoint;
 import nilus.DataSourceType;
 import nilus.Deployment;
+import nilus.Detection;
 import nilus.DetectionEffort;
 import nilus.DetectionEffortKind;
+import nilus.DetectionGroup;
 import nilus.Detections;
 import tethys.TethysControl;
 import tethys.TethysTimeFuncs;
@@ -24,7 +22,6 @@ import tethys.detection.DetectionGranularity.GRANULARITY;
 import tethys.output.StreamExportParams;
 import tethys.output.TethysExportParams;
 import tethys.pamdata.TethysDataProvider;
-import tethys.pamdata.TethysSchema;
 
 public class DetectionsHandler {
 
@@ -58,35 +55,9 @@ public class DetectionsHandler {
 			return exportByTimeChunk(aDataBlock, deployment, granularity.granularityIntervalSeconds, tethysExportParams, streamExportParams);
 		default:
 			break;
-		
 		}
-		/**
-		 * This will probably need to be passed additional parameters and may also want
-		 * to return something other than void in order to build a bigger Tethys
-		 * document.
-		 */
-		/*
-		 * first we'll probably want a reference to the module containing the data. in
-		 * principle this can't get null, since the datablock was found be searching in
-		 * the other direction.
-		 */
-		PamControlledUnit pamControlledUnit = aDataBlock.getParentProcess().getPamControlledUnit();
 
-		TethysDataProvider dataProvider = aDataBlock.getTethysDataProvider();
-
-		Detections detections = new Detections();
-		detections.setId(deployment.getId());
-		detections.setDescription(dataProvider.getDescription(deployment, tethysExportParams));
-		DataSourceType dataSource = new DataSourceType();
-		dataSource.setDeploymentId(deployment.getId());
-//		dataSource.setEnsembleId(""); ToDo
-		detections.setDataSource(dataSource);
-		detections.setAlgorithm(dataProvider.getAlgorithm());
-		
-		detections.setUserId("Unknown user");
-		detections.setEffort(getDetectorEffort(deployment));
-		
-		return true;
+		return false;
 	
 
 	}
@@ -168,13 +139,34 @@ public class DetectionsHandler {
 		/*
 		 * Here, make Detection object and add the DetectionEffort data. 
 		 */
+		TethysDataProvider dataProvider = dataBlock.getTethysDataProvider();
+		Detections detections = new Detections();
+		detections.setId(deployment.getId());
+		detections.setDescription(dataProvider.getDescription(deployment, tethysExportParams));
+		DataSourceType dataSource = new DataSourceType();
+		dataSource.setDeploymentId(deployment.getId());
+//		dataSource.setEnsembleId(""); ToDo
+		detections.setDataSource(dataSource);
+		detections.setAlgorithm(dataProvider.getAlgorithm());
+		detections.setUserId("Unknown user");
+		detections.setEffort(getDetectorEffort(deployment, startTimeMillis, endTimeMillis));
+		DetectionGroup detectionGroup = new DetectionGroup();
+		detections.setOnEffort(detectionGroup);
+		List<Detection> detectionList = detectionGroup.getDetection();
 		for (int i = 0; i < data.size(); i++) {
 			PamDataUnit dataUnit = data.get(i);
-			// add many Detecion objects
+			Detection detection = dataProvider.createDetection(dataUnit, tethysExportParams, streamExportParams);
+			if (detection != null) {
+				detectionList.add(detection);
+			}
 		}
-		
-//		write to database
-		
+		System.out.printf("Exporting %d %s detections for time period %s to %s\n", detectionList.size(), dataBlock.getDataName(), 
+				detections.getEffort().getStart().toString(), detections.getEffort().getEnd().toString());
+		/*
+		 * We should now have a fully populated Detections object, so write it to the database
+		 * using functions in DBXMLConnect 
+		 */
+		tethysControl.getDbxmlConnect(); // call whatever you need to call in here to write the Detections. 
 		
 		
 		return true;
@@ -187,10 +179,10 @@ public class DetectionsHandler {
 //		return false;
 //	}
 
-	private DetectionEffort getDetectorEffort(Deployment deployment) {
+	private DetectionEffort getDetectorEffort(Deployment deployment, long effortStart, long effortEnd) {
 		DetectionEffort effort = new DetectionEffort();
-		effort.setStart(deployment.getDeploymentDetails().getAudioTimeStamp());
-		effort.setEnd(deployment.getRecoveryDetails().getAudioTimeStamp());
+		effort.setStart(TethysTimeFuncs.xmlGregCalFromMillis(effortStart));
+		effort.setEnd(TethysTimeFuncs.xmlGregCalFromMillis(effortEnd));
 //		effort.set // no setter for DetectionEffortKind
 		List<DetectionEffortKind> effortKinds = effort.getKind();
 		return effort;

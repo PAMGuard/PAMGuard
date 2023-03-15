@@ -1,5 +1,6 @@
 package tethys.pamdata;
 
+import java.math.BigInteger;
 import java.util.List;
 
 import org.w3c.dom.Document;
@@ -21,6 +22,10 @@ import nilus.AlgorithmType;
 import nilus.AlgorithmType.Parameters;
 import nilus.Deployment;
 import nilus.DescriptionType;
+import nilus.Detection;
+import nilus.SpeciesIDType;
+import tethys.TethysTimeFuncs;
+import tethys.output.StreamExportParams;
 import tethys.output.TethysExportParams;
 
 /**
@@ -104,7 +109,7 @@ public class AutoTethysProvider implements TethysDataProvider {
 		NodeList childs = settingsEl.getChildNodes();
 		for (int i = 0; i < childs.getLength(); i++) {
 			Node el = childs.item(i);
-			System.out.println(el.getNodeName());
+//			System.out.println(el.getNodeName());
 			if (el instanceof Element) {
 				paramList.add((Element) el);
 			}
@@ -163,6 +168,27 @@ public class AutoTethysProvider implements TethysDataProvider {
 	 */
 	private String getAlgorithmMethod() {
 		return pamControlledUnit.getUnitType();
+	}
+
+	@Override
+	public Detection createDetection(PamDataUnit dataUnit, TethysExportParams tethysExportParams,
+			StreamExportParams streamExportParams) {
+		Detection detection = new Detection();
+		detection.setStart(TethysTimeFuncs.xmlGregCalFromMillis(dataUnit.getTimeMilliseconds()));
+		detection.setEnd(TethysTimeFuncs.xmlGregCalFromMillis(dataUnit.getEndTimeInMilliseconds()));
+		detection.setSpeciesId(getSpeciesIdType());
+		/*
+		 * NOTE: I use channel bitmaps throughout since detections are often made on multiple channels. 
+		 */
+		detection.setChannel(BigInteger.valueOf(dataUnit.getChannelBitmap()));
+		
+		return detection;
+	}
+
+	private SpeciesIDType getSpeciesIdType() {
+		SpeciesIDType species = new SpeciesIDType();
+//		species.s
+		return species;
 	}
 
 }

@@ -216,7 +216,7 @@ public class TethysExporter {
 
 			Deployment deployment = deploymentHandler.createDeploymentDocument(i++, drd);
 //			System.out.println(deployment.toString());
-			deploymentDocs.add(deployment1);
+			deploymentDocs.add(deployment);
 
 		}
 
@@ -311,9 +311,9 @@ public class TethysExporter {
 			for (int iPhone = 0; iPhone < hydrophones.size(); iPhone++) {
 				Hydrophone aPhone = hydrophones.get(iPhone);
 				double totalCal = -daqProcess.rawAmplitude2dB(1, iPhone, false);
-				System.out.printf(
-						"hydrophone %d has sensitivity %3.1fdB + gain %3.1fdB. Total calibration is %3.1fdB re1U/uPa\n",
-						iPhone, aPhone.getSensitivity(), aPhone.getPreampGain(), totalCal);
+//				System.out.printf(
+//						"hydrophone %d has sensitivity %3.1fdB + gain %3.1fdB. Total calibration is %3.1fdB re1U/uPa\n",
+//						iPhone, aPhone.getSensitivity(), aPhone.getPreampGain(), totalCal);
 			}
 		}
 
