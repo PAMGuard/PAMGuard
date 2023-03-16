@@ -188,6 +188,32 @@
       <url>https://repo1.maven.org/maven2</url>
     </repository>
   </repositories>
+  <dependencies>
+    <dependency>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-runner</artifactId>
+      <version>1.9.2</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>junit</artifactId>
+          <groupId>junit</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>junit-platform-launcher</artifactId>
+          <groupId>org.junit.platform</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>junit-platform-suite-api</artifactId>
+          <groupId>org.junit.platform</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>junit-platform-suite-commons</artifactId>
+          <groupId>org.junit.platform</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+  </dependencies>
   <reporting>
     <plugins>
       <plugin>
