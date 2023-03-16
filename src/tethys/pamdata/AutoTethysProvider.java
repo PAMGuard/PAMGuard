@@ -92,11 +92,23 @@ public class AutoTethysProvider implements TethysDataProvider {
 	@Override
 	public AlgorithmType getAlgorithm() {
 		AlgorithmType algorithm = new AlgorithmType();
+		try {
+			nilus.Helper.createRequiredElements(algorithm);
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		algorithm.setMethod(this.getAlgorithmMethod());
 		algorithm.setSoftware("PAMGuard");
 		algorithm.setVersion(PamguardVersionInfo.version);
-		algorithm.setParameters(this.getAlgorithmParameters());
-
+		//algorithm.setParameters(this.getAlgorithmParameters());
+		
 		return algorithm;
 	}
 

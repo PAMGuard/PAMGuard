@@ -37,6 +37,7 @@ import nilus.DeploymentRecoveryDetails;
 import nilus.GeometryTypeM;
 import nilus.Helper;
 import pamMaths.PamVector;
+import tethys.TethysControl;
 import tethys.TethysLocationFuncs;
 import tethys.TethysTimeFuncs;
 
@@ -46,7 +47,14 @@ import tethys.TethysTimeFuncs;
  *
  */
 public class DeploymentHandler {
+	
+	private TethysControl tethysControl;
 
+
+	public DeploymentHandler(TethysControl tethysControl) {
+		super();
+		this.tethysControl = tethysControl;
+	}
 
 	/**
 	 * Get an overview of all the deployments.
@@ -329,19 +337,19 @@ public class DeploymentHandler {
 	 * @param deployment
 	 */
 	private boolean getProjectData(Deployment deployment) {
-		PamControlledUnit aUnit = PamController.getInstance().findControlledUnit(MetaDataContol.class, null);
-		if (aUnit instanceof MetaDataContol == false || true) {
-			deployment.setProject("thisIsAProject");
-			deployment.setPlatform("Yay a platform");
-			Instrument instrument = new Instrument();
-			instrument.setType("machiney");
-			instrument.setInstrumentId("12345555");			
-			deployment.setInstrument(instrument);
-			return false;
-		}
-		
-		MetaDataContol metaControl = (MetaDataContol) aUnit;
-		DeploymentData deploymentData = metaControl.getDeploymentData();
+//		PamControlledUnit aUnit = PamController.getInstance().findControlledUnit(MetaDataContol.class, null);
+//		if (aUnit instanceof MetaDataContol == false || true) {
+//			deployment.setProject("thisIsAProject");
+//			deployment.setPlatform("Yay a platform");
+//			Instrument instrument = new Instrument();
+//			instrument.setType("machiney");
+//			instrument.setInstrumentId("12345555");			
+//			deployment.setInstrument(instrument);
+//			return false;
+//		}
+//		
+//		MetaDataContol metaControl = (MetaDataContol) aUnit;
+		DeploymentData deploymentData = tethysControl.getGlobalDeplopymentData();
 		deployment.setProject(deploymentData.getProject());
 		deployment.setDeploymentAlias(deploymentData.getDeploymentAlias());
 		deployment.setSite(deploymentData.getSite());
