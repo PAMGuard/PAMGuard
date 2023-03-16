@@ -168,7 +168,7 @@ public class TethysExporter {
 		//get list of deployment recovery details (start, stop times and lat/long)
 		//deployment details and recovery details are same structure
 		//per pair, go through a loop to fill in each deployment
-		DeploymentHandler deploymentHandler = new DeploymentHandler();
+		DeploymentHandler deploymentHandler = new DeploymentHandler(tethysControl);
 
 		ArrayList<DeploymentRecoveryPair> deployRecover = deploymentHandler.getDeployments();
 		if (deployRecover == null) {

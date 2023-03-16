@@ -11,6 +11,9 @@ import javax.swing.JMenuItem;
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamguardMVC.PamDataBlock;
+import metadata.MetaDataContol;
+import metadata.deployment.DeploymentData;
+import nilus.Deployment.Instrument;
 import tethys.dbxml.DBXMLConnect;
 //import nilus.Deployment;
 //import nilus.Deployment.Instrument;
@@ -92,6 +95,33 @@ public class TethysControl extends PamControlledUnit {
 	private void exportTethysData(TethysExportParams tethysExportParams) {
 		TethysExporter tethysExporter = new TethysExporter(this, tethysExportParams);
 		tethysExporter.doExport();		
+	}
+	
+	public DeploymentData getGlobalDeplopymentData() {
+		PamControlledUnit aUnit = PamController.getInstance().findControlledUnit(MetaDataContol.class, null);
+//		if (aUnit instanceof MetaDataContol == false || true) {
+//			deployment.setProject("thisIsAProject");
+//			deployment.setPlatform("Yay a platform");
+//			Instrument instrument = new Instrument();
+//			instrument.setType("machiney");
+//			instrument.setInstrumentId("12345555");			
+//			deployment.setInstrument(instrument);
+//			return false;
+//		}
+		
+		MetaDataContol metaControl = (MetaDataContol) aUnit;
+		DeploymentData deploymentData = metaControl != null ? metaControl.getDeploymentData() : new DeploymentData();			
+			
+		deploymentData.setProject("thisIsAProject");
+		deploymentData.setPlatform("Yay a platform");
+		deploymentData.setCruise("cruisey");
+		deploymentData.setDeploymentId(142536);
+		deploymentData.setInstrumentId("super instrument");
+		deploymentData.setSite("in the ocean somewhere");
+		deploymentData.setRegion("ocean water");
+		deploymentData.setInstrumentType("sensor of sorts");		
+		
+		return deploymentData;
 	}
 	
 	/**

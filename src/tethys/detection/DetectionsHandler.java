@@ -29,6 +29,9 @@ public class DetectionsHandler {
 
 	private TethysControl tethysControl;
 	
+	public int uniqueDetectionsId;
+	public int uniqueDetectionId;
+	
 	public DetectionsHandler(TethysControl tethysControl) {
 		super();
 		this.tethysControl = tethysControl;
@@ -142,7 +145,7 @@ public class DetectionsHandler {
 		 */
 		TethysDataProvider dataProvider = dataBlock.getTethysDataProvider();
 		Detections detections = new Detections();
-		detections.setId(deployment.getId());
+		detections.setId(String.format("%d", uniqueDetectionsId++));
 		detections.setDescription(dataProvider.getDescription(deployment, tethysExportParams));
 		DataSourceType dataSource = new DataSourceType();
 		dataSource.setDeploymentId(deployment.getId());
@@ -156,7 +159,7 @@ public class DetectionsHandler {
 		List<Detection> detectionList = detectionGroup.getDetection();
 		for (int i = 0; i < data.size(); i++) {
 			PamDataUnit dataUnit = data.get(i);
-			Detection detection = dataProvider.createDetection(dataUnit, tethysExportParams, streamExportParams);
+			Detection detection = dataProvider.createDetection(dataUnit, tethysExportParams, streamExportParams);			
 			if (detection != null) {
 				detectionList.add(detection);
 			}
