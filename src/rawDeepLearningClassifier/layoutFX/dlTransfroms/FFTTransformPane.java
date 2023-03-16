@@ -6,7 +6,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.util.StringConverter;
 import pamViewFX.fxNodes.PamSpinner;
-import javafx.util.StringConverter;
 
 /**
  * Transform pane for Fourier transform
@@ -40,7 +39,6 @@ public class FFTTransformPane extends SimpleTransformPane {
 		ObservableList<Number> stepSizeListLength=FXCollections.observableArrayList();
 		for (int i=2; i<15; i++){
 			stepSizeListLength.add(Integer.valueOf((int) Math.pow(2,i)));
-			
 		}
 		return stepSizeListLength;
 	}

@@ -433,8 +433,9 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 		
 		
 		currParams = (StandardModelParams) this.getAdvSettingsPane().getParams(currParams);
-
-
+		
+		System.out.println("GET advanced params: "); 
+		
 		//get class names from the paramClone as these may have been set by a loaded model
 		//instead of a using changing a control.
 		currParams.classNames = paramsClone.classNames; 
@@ -451,10 +452,7 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 
 		currParams.useDefaultSegLen = usedefaultSeg.isSelected(); 
 		
-		
 		//System.out.println("Get CLASS NAMES: currParams.classNames: " + currParams.classNames + " Num classes " + currParams.numClasses); 
-
-		
 		return currParams;
 	}
 
@@ -466,15 +464,14 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 
 		detectionSpinner.getValueFactory().setValue(Double.valueOf(currParams.threshold));
 
-		
 		//set the params on the advanced pane. 
 		this.getAdvSettingsPane().setParams(paramsClone);
+		//System.out.println("SET advanced params: " + paramsClone.dlTransfroms); 
 
 		if (paramsClone.modelPath!=null) {
 			currentSelectedFile = new File(paramsClone.modelPath);
 			newModelSelected(currentSelectedFile); 
 		}
-
 
 		setClassNames(currParams);
 

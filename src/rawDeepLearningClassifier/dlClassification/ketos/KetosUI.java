@@ -43,8 +43,9 @@ public class KetosUI  implements DLCLassiferModelUI {
 
 	@Override
 	public void getParams() {
-		KetosDLParams genericParams =  (KetosDLParams) getSettingsPane().getParams(ketosClassifier.getKetosParams()); 
-		ketosClassifier.setKetosParams(genericParams); 
+		KetosDLParams ketosParams =  (KetosDLParams) getSettingsPane().getParams(ketosClassifier.getKetosParams()); 
+		System.out.println("KetosUI PARMAS: " + ketosParams.dlTransfromParams); 
+		ketosClassifier.setKetosParams(ketosParams); 
 	}
 
 	

@@ -3,6 +3,11 @@ package rawDeepLearningClassifier.dlClassification;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import org.jamdev.jdl4pam.transforms.DLTransform;
+import org.jamdev.jdl4pam.transforms.DLTransfromParams;
+import org.jamdev.jdl4pam.transforms.SimpleTransform;
+import org.jamdev.jdl4pam.transforms.SimpleTransformParams;
+
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
 import rawDeepLearningClassifier.segmenter.SegmenterProcess.GroupedRawData;
@@ -89,6 +94,23 @@ public interface DLClassiferModel {
 	 * @return a list of warnings. If the list is null or size() is zero then settings are OK. 
 	 */
 	public ArrayList<PamWarning> checkSettingsOK();
+	
+	
+	/**
+	 * Get the parameters which can be serialized  from  transforms. 
+	 * @param dlTransfroms- the dl transforms. 
+	 */
+	public static ArrayList<DLTransfromParams> getDLTransformParams(ArrayList<DLTransform> dlTransfroms) {
+		ArrayList<DLTransfromParams> dlTransformParams = new ArrayList<DLTransfromParams>(); 
+		
+		if (dlTransfroms==null) return null; 
+		//need to set the generic model params. 
+		for (int i=0; i<dlTransfroms.size(); i++) {
+			dlTransformParams.add(new SimpleTransformParams(dlTransfroms.get(i).getDLTransformType(), ((SimpleTransform) dlTransfroms.get(i)).getParams())); 
+		}
+		return dlTransformParams;
+	}
+
 	
 	
 

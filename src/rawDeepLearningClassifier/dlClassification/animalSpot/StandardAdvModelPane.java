@@ -1,6 +1,10 @@
 package rawDeepLearningClassifier.dlClassification.animalSpot;
 
+import java.util.ArrayList;
+
 import org.controlsfx.control.ToggleSwitch;
+import org.jamdev.jdl4pam.transforms.DLTransfromParams;
+
 import PamController.SettingsPane;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -106,6 +110,11 @@ public class StandardAdvModelPane extends SettingsPane<StandardModelParams> {
 	@Override
 	public StandardModelParams getParams(StandardModelParams currParams) {
 		currParams.dlTransfroms = transfromPane.getDLTransforms(); 
+			
+		currParams.dlTransfromParams = new ArrayList<DLTransfromParams>();
+//		for (int i=0; i<currParams.dlTransfroms.size(); i++) {
+//			//currParams.dlTransfromParams.add(currParams.dlTransfroms.get(i).getDLTransformType()); 
+//		}
 		currParams.useDefaultTransfroms = toggleSwitch.isSelected(); 
 		return currParams; 
 	}

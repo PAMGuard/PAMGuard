@@ -3,6 +3,9 @@ package rawDeepLearningClassifier.dlClassification.ketos;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import org.jamdev.jdl4pam.transforms.DLTransformsFactory;
+import org.jamdev.jdl4pam.transforms.DLTransfromParams;
+
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
@@ -275,7 +278,13 @@ public class KetosClassifier implements DLClassiferModel, PamSettings {
 		if (ketosDLParams==null) {
 			ketosDLParams = new KetosDLParams(); 
 		}
-		//System.out.println("SoundSpot have been saved. : " + soundSpotParmas.modelPath); 
+		
+		ArrayList<DLTransfromParams> dlTransformParams = DLClassiferModel.getDLTransformParams(ketosDLParams.dlTransfroms);
+		
+		ketosDLParams.dlTransfromParams=dlTransformParams; 
+		
+		System.out.println("KetosParams have been saved. : " + ketosDLParams.dlTransfromParams); 
+		
 		return ketosDLParams;
 	}
 
@@ -291,7 +300,10 @@ public class KetosClassifier implements DLClassiferModel, PamSettings {
 		KetosDLParams newParameters = (KetosDLParams) pamControlledUnitSettings.getSettings();
 		if (newParameters!=null) {
 			ketosDLParams = newParameters.clone();
-			//System.out.println("SoundSpot have been restored. : " + soundSpotParmas.modelPath); 
+			System.out.println("KetosParams have been restored. : " + ketosDLParams.dlTransfromParams); 
+			if (ketosDLParams.dlTransfromParams!=null) {
+				ketosDLParams.dlTransfroms = DLTransformsFactory.makeDLTransforms((ArrayList<DLTransfromParams>) ketosDLParams.dlTransfromParams); 
+			}
 		}
 		else ketosDLParams = new KetosDLParams(); 
 		return true;

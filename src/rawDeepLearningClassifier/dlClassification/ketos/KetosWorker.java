@@ -58,14 +58,15 @@ public class KetosWorker extends DLModelWorker<KetosResult> {
 			// NOTE THAT THIS IS REQUIRED TO MAKE THIS MODULE RUN AS A PLUGIN WHEN THE CLASS FILES
 			// ARE BUNDLED INTO A FATJAR, HOWEVER THIS WILL STOP THE PLUGIN FROM RUNNING AS A SEPARATE
 			// PROJECT IN ECLIPSE.  So while testing the code and debugging, make sure the 
-			if (DLControl.PLUGIN_BUILD) {
-				PluginClassloader newCL = PamModel.getPamModel().getClassLoader();
-				Thread.currentThread().setContextClassLoader(newCL);
-			}
+//			if (DLControl.PLUGIN_BUILD) {
+//				PluginClassloader newCL = PamModel.getPamModel().getClassLoader();
+//				Thread.currentThread().setContextClassLoader(newCL);
+//			}
 			//first open the model and get the correct parameters. 
 			//21/11/2022 - Added a null and filename check here to stop the mdoel reloading everytime PAMGuard hits a new file or 
 			//is stopped or started - this was causing a memory leak. 
 			if (ketosModel==null || currentPath ==null || !Paths.get(currentPath).equals(Paths.get(ketosDLParams.modelPath))) {
+
 				//System.out.println(Paths.get(genericParams.modelPath)); 
 				this.currentPath = ketosDLParams.modelPath; 
 				ketosModel = new KetosModel(new File(ketosDLParams.modelPath)); 
@@ -102,19 +103,28 @@ public class KetosWorker extends DLModelWorker<KetosResult> {
 				}
 			}
 		
-			//generate the transforms from the KetosParams objectts. 
+			//generate the transforms from the KetosParams objects. 
 			ArrayList<DLTransform> transforms =	DLTransformsFactory.makeDLTransforms(ketosParams.dlTransforms); 
 			
 			///HACK here for now to fix an issue with dB and Ketos transforms having zero length somehow...
 			for (int i=0; i<ketosParams.dlTransforms.size(); i++) {
 				System.out.println(ketosParams.dlTransforms.get(i)); 
 			}
-
-			//System.out.println("Ketos transforms: " + transforms); 
 			
+			//only load new transforms if defaults are selected
+			if (getModelTransforms()==null || ketosDLParams.dlTransfroms==null || ketosDLParams.useDefaultTransfroms) {
+				System.out.println("  " + transforms); 
+				System.out.println("SET MODEL TRANSFORMS: " + ketosDLParams.dlTransfroms + "  " +  ketosDLParams.useDefaultTransfroms); 
 
-			//set the transforms. 
-			setModelTransforms(transforms); 
+				//only set the transforms if they are null - otherwise handled elsewhere. 
+				setModelTransforms(transforms); 
+				ketosDLParams.useDefaultTransfroms = true; 
+			}
+			else {
+				System.out.println("SET CURRENT TRANSFORMS: " + ketosDLParams.dlTransfroms + "  " +  ketosDLParams.useDefaultTransfroms); 
+				//use the old transforms. 
+				setModelTransforms(ketosDLParams.dlTransfroms); 
+			}
 
 			//ketosDLParams.dlTransfroms = transforms; //this is done after prep model in the settings pane. 
 			ketosDLParams.defaultSegmentLen = ketosParams.seglen*1000.; //the segment length in microseconds. 
@@ -152,7 +162,7 @@ public class KetosWorker extends DLModelWorker<KetosResult> {
 			e.printStackTrace();
 			//WarnOnce.showWarning(null, "Model Metadata Error", "There was an error extracting the metadata from the model.", WarnOnce.OK_OPTION); 
 		}
-		Thread.currentThread().setContextClassLoader(origCL);
+		//Thread.currentThread().setContextClassLoader(origCL);
 	}
 
 

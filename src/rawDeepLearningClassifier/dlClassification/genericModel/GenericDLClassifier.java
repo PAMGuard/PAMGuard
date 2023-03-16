@@ -225,7 +225,7 @@ public class GenericDLClassifier implements DLClassiferModel, PamSettings {
 			genericModelParams = new GenericModelParams(); 
 		}
 		
-		ArrayList<DLTransfromParams> dlTransformParams = getDLTransformParams(genericModelParams.dlTransfroms);
+		ArrayList<DLTransfromParams> dlTransformParams = DLClassiferModel.getDLTransformParams(genericModelParams.dlTransfroms);
 		
 		genericModelParams.dlTransfromParams=dlTransformParams; 
 		
@@ -240,21 +240,6 @@ public class GenericDLClassifier implements DLClassiferModel, PamSettings {
 		return genericModelParams;
 	}
 	
-	/**
-	 * Get the parameters which can be serialized  from  transforms. 
-	 * @param dlTransfroms- the dl transforms. 
-	 */
-	public ArrayList<DLTransfromParams> getDLTransformParams(ArrayList<DLTransform> dlTransfroms) {
-		ArrayList<DLTransfromParams> dlTransformParams = new ArrayList<DLTransfromParams>(); 
-		
-		if (genericModelParams.dlTransfroms==null) return null; 
-		//need to set the generic model params. 
-		for (int i=0; i<genericModelParams.dlTransfroms.size(); i++) {
-			dlTransformParams.add(new SimpleTransformParams(dlTransfroms.get(i).getDLTransformType(), ((SimpleTransform) dlTransfroms.get(i)).getParams())); 
-		}
-		return dlTransformParams;
-	}
-
 	@Override
 	public long getSettingsVersion() {
 		return GenericModelParams.serialVersionUID;

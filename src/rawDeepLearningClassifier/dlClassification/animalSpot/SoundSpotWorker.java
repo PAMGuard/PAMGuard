@@ -40,7 +40,7 @@ public class SoundSpotWorker extends DLModelWorker<SoundSpotResult> {
 	public void prepModel(StandardModelParams soundSpotParams, DLControl dlControl) {
 		//ClassLoader origCL = Thread.currentThread().getContextClassLoader();
 		
-		System.out.println("prepModel: " + soundSpotParams.useDefaultTransfroms); 
+		//System.out.println("prepModel: " + soundSpotParams.useDefaultTransfroms); 
 
 		try {
 
@@ -66,7 +66,7 @@ public class SoundSpotWorker extends DLModelWorker<SoundSpotResult> {
 			AnimalSpotParams dlParams = new AnimalSpotParams(soundSpotModel.getTransformsString());
 
 			//only load new transforms if defaults are selected
-			if (getModelTransforms()==null || soundSpotParams.useDefaultTransfroms) {
+			if (getModelTransforms()==null || soundSpotParams.dlTransfroms==null || soundSpotParams.useDefaultTransfroms) {
 				//only set the transforms if they are null - otherwise handled elsewhere. 
 				setModelTransforms(model2DLTransforms(dlParams)); 
 				soundSpotParams.useDefaultTransfroms = true; 

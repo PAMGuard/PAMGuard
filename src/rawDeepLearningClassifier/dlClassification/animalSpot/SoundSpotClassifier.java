@@ -2,8 +2,9 @@ package rawDeepLearningClassifier.dlClassification.animalSpot;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import org.jamdev.jdl4pam.transforms.DLTransformsFactory;
+import org.jamdev.jdl4pam.transforms.DLTransfromParams;
+
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
@@ -308,22 +309,33 @@ public class SoundSpotClassifier implements DLClassiferModel, PamSettings {
 		if (soundSpotParmas==null) {
 			soundSpotParmas = new StandardModelParams(); 
 		}
+		
+		ArrayList<DLTransfromParams> dlTransformParams = DLClassiferModel.getDLTransformParams(soundSpotParmas.dlTransfroms);
+		
+		soundSpotParmas.dlTransfromParams=dlTransformParams; 
+		
+		
 		//System.out.println("SoundSpot have been saved. : " + soundSpotParmas.classNames); 
 		return soundSpotParmas;
 
 	}
 
+	
 	@Override
 	public long getSettingsVersion() {
 		return StandardModelParams.serialVersionUID;
 	}
 
+	
 	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		StandardModelParams newParameters = (StandardModelParams) pamControlledUnitSettings.getSettings();
 		if (newParameters!=null) {
 			soundSpotParmas = newParameters.clone();
 		//System.out.println("SoundSpot have been restored. : " + soundSpotParmas.classNames); 
+			if (soundSpotParmas.dlTransfromParams!=null) {
+				soundSpotParmas.dlTransfroms = DLTransformsFactory.makeDLTransforms((ArrayList<DLTransfromParams>) soundSpotParmas.dlTransfromParams); 
+			}
 		}
 		else soundSpotParmas = new StandardModelParams(); 
 		return true;

@@ -33,19 +33,21 @@ public class FFTSpinnerBug  extends Application{
 		
 	    Scene scene = new Scene(pane, 350, 300);
 	    
-	    System.out.println("Size before: " + ((ListSpinnerValueFactory) spinner.getValueFactory()).getItems().size());
-	    spinner.getValueFactory().setValue(1019);
-	    System.out.println("Size after: " + ((ListSpinnerValueFactory) spinner.getValueFactory()).getItems().size());
-	    
-	    
-	    for (int i=0; i<((ListSpinnerValueFactory) spinner.getValueFactory()).getItems().size(); i++) {
-		    System.out.println("List value: " + i + ": " +  ((ListSpinnerValueFactory) spinner.getValueFactory()).getItems().get(i));
-
-	    }
-
 	    stage.setTitle("Hello Spinner");
 	    stage.setScene(scene);
 	    stage.show();
+	  
+	     
+	    System.out.println("Size before: " + ((ListSpinnerValueFactory) spinner.getValueFactory()).getItems().size());
+	    spinner.getValueFactory().setValue(1019);
+	    System.out.println("Size after: " + ((ListSpinnerValueFactory) spinner.getValueFactory()).getItems().size());
+	        
+	    for (int i=0; i<((ListSpinnerValueFactory) spinner.getValueFactory()).getItems().size(); i++) {
+		    System.out.println("List value: " + i + ": " + ((ListSpinnerValueFactory) spinner.getValueFactory()).getItems().get(i));
+	    }
+	    
+	    spinner.increment(0);
+
 	}
 	
 	

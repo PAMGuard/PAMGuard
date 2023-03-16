@@ -62,6 +62,7 @@ public class StandardModelParams implements Serializable, Cloneable {
 	 */
 	public List<DLTransfromParams> dlTransfromParams = null; 
 	
+	
 	/**
 	 * The DL custom transforms if the default transforms for the model are not being used. 
 	 */
@@ -102,6 +103,7 @@ public class StandardModelParams implements Serializable, Cloneable {
 		StandardModelParams newParams = null;
 		try {
 			newParams = (StandardModelParams) super.clone();
+			
 //			if (newParams.spectrogramNoiseSettings == null) {
 //				newParams.spectrogramNoiseSettings = new SpectrogramNoiseSettings();
 //			}
