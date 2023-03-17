@@ -1,7 +1,12 @@
 package tethys;
 
+import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
@@ -10,17 +15,20 @@ import javax.swing.JMenuItem;
 
 import PamController.PamControlledUnit;
 import PamController.PamController;
+import PamView.PamTabPanel;
 import PamguardMVC.PamDataBlock;
 import metadata.MetaDataContol;
 import metadata.deployment.DeploymentData;
 import nilus.Deployment.Instrument;
 import tethys.dbxml.DBXMLConnect;
+import tethys.dbxml.DBXMLQueries;
 //import nilus.Deployment;
 //import nilus.Deployment.Instrument;
 import tethys.output.StreamExportParams;
 import tethys.output.TethysExportParams;
 import tethys.output.TethysExporter;
 import tethys.output.swing.TethysExportDialog;
+import tethys.swing.TethysTabPanel;
 
 /**
  * Quick play with a simple system for outputting data to Tethys. At it's start
@@ -39,10 +47,18 @@ public class TethysControl extends PamControlledUnit {
 	private TethysExportParams tethysExportParams = new TethysExportParams();
 	
 	private DBXMLConnect dbxmlConnect;
+	
+	private TethysTabPanel tethysTabPanel;
+	
+	private DBXMLQueries dbxmlQueries;
+	
+	private ArrayList<TethysStateObserver> stateObservers;
 
 	public TethysControl(String unitName) {
 		super(unitType, unitName);
+		stateObservers = new ArrayList();
 		dbxmlConnect = new DBXMLConnect(this);
+		dbxmlQueries = new DBXMLQueries(this);
 	}
 
 	/**
@@ -60,13 +76,49 @@ public class TethysControl extends PamControlledUnit {
 		JMenuItem tethysExport = new JMenuItem("Export ...");
 		tethysMenu.add(tethysExport);
 		tethysExport.addActionListener(new ActionListener() {
-			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				tethysExport(parentFrame);
 			}
 		});
+		JMenuItem openClient = new JMenuItem("Open client in browser");
+		openClient.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				openTethysClient();
+			}
+		});
+		tethysMenu.add(openClient);
 		return tethysMenu;
+	}
+
+	protected void openTethysClient() {
+		String urlString = tethysExportParams.getFullServerName() + "/Client";
+		System.out.println("Opening url " + urlString);
+		URL url = null;
+		try {
+			url = new URL(urlString);
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+		if (url == null) {
+			return;
+		}
+		try {
+			Desktop.getDesktop().browse(url.toURI());
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public PamTabPanel getTabPanel() {
+		if (tethysTabPanel == null) {
+			tethysTabPanel = new TethysTabPanel(this);
+		}
+		return tethysTabPanel;
 	}
 
 	/**
@@ -124,13 +176,43 @@ public class TethysControl extends PamControlledUnit {
 		
 		return deploymentData;
 	}
+
+	/**
+	 * Add a new state observer. 
+	 * @param stateObserver
+	 */
+	public void addStateObserver(TethysStateObserver stateObserver) {
+		stateObservers.add(stateObserver);
+	}
+
+	/**
+	 * Remove a state observer. 
+	 * @param stateObserver
+	 * @return true if it existed. 
+	 */
+	public boolean removeStateObserver(TethysStateObserver stateObserver) {
+		return stateObservers.remove(stateObserver);
+	}
 	
+	/**
+	 * Send state updates around to all state observers. 
+	 * @param tethysState
+	 */
+	public void sendStateUpdate(TethysState tethysState) {
+		for (TethysStateObserver stateObserver : this.stateObservers) {
+			stateObserver.updateState(tethysState);
+		}
+	}
 	/**
 	 * A name for any deta selectors. 
 	 * @return
 	 */
 	public String getDataSelectName() {
 		return getUnitName();
+	}
+
+	public DBXMLQueries getDbxmlQueries() {
+		return dbxmlQueries;
 	}
 
 }

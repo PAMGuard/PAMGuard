@@ -9,6 +9,7 @@ import javax.xml.bind.JAXBException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import dbxml.JerseyClient;
 import dbxml.uploader.Importer;
 import nilus.Deployment;
 import nilus.MarshalXML;
@@ -112,6 +113,22 @@ public class DBXMLConnect {
 	
 	public void closeDatabase() {
 		
+	}
+
+	/**
+	 * Get the server state via a ping ? 
+	 * @return String descritption of state ? 
+	 */
+	public ServerStatus pingServer() {
+		JerseyClient jerseyClient = new JerseyClient(tethysControl.getTethysExportParams().getFullServerName());
+		boolean ok = false;
+		try {
+			ok = jerseyClient.ping();
+		}
+		catch (Exception ex) {
+			return new ServerStatus(false, ex);
+		}
+		return new ServerStatus(ok, null);
 	}
 	
 	// add whatever calls are necessary ... 

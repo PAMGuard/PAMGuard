@@ -20,7 +20,7 @@ public class TethysExportParams implements Serializable, Cloneable{
 	 */
 	public String serverName = "http://localhost";
 	
-	public String port = "9779";
+	public int port = 9779;
 	
 	public String getFullServerName() {
 		return serverName + ":" + port;			
