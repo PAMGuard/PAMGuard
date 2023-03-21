@@ -56,25 +56,25 @@ public class DeploymentData implements Serializable, Cloneable, ManagedParameter
 	 */
 	private String cruise;
 
-	/**
-	 * On what platform is the instrument deployed? (e.g. mooring, tag)
-	 */
-	private String platform = "Unknown";
+//	/**
+//	 * On what platform is the instrument deployed? (e.g. mooring, tag)
+//	 */
+//	private String platform = "Unknown";
 
 	/**
 	 * Name of geographic region.
 	 */
 	private String region;
 
-	/**
-	 * Instrument type, e.g. HARP, EAR, Popup, DMON, etc.
-	 */
-	private String instrumentType;
-
-	/**
-	 * Instrument identifier, e.g. serial number
-	 */
-	private String instrumentId;
+//	/**
+//	 * Instrument type, e.g. HARP, EAR, Popup, DMON, etc.
+//	 */
+//	private String instrumentType;
+//
+//	/**
+//	 * Instrument identifier, e.g. serial number
+//	 */
+//	private String instrumentId;
 
 	public DeploymentData() {
 	}
@@ -207,19 +207,19 @@ public class DeploymentData implements Serializable, Cloneable, ManagedParameter
 		this.cruise = cruise;
 	}
 
-	/**
-	 * @return the platform
-	 */
-	public String getPlatform() {
-		return platform;
-	}
-
-	/**
-	 * @param platform the platform to set
-	 */
-	public void setPlatform(String platform) {
-		this.platform = platform;
-	}
+//	/**
+//	 * @return the platform
+//	 */
+//	public String getPlatform() {
+//		return platform;
+//	}
+//
+//	/**
+//	 * @param platform the platform to set
+//	 */
+//	public void setPlatform(String platform) {
+//		this.platform = platform;
+//	}
 
 	/**
 	 * @return the region
@@ -235,32 +235,32 @@ public class DeploymentData implements Serializable, Cloneable, ManagedParameter
 		this.region = region;
 	}
 
-	/**
-	 * @return the instrumentType
-	 */
-	public String getInstrumentType() {
-		return instrumentType;
-	}
-
-	/**
-	 * @param instrumentType the instrumentType to set
-	 */
-	public void setInstrumentType(String instrumentType) {
-		this.instrumentType = instrumentType;
-	}
-
-	/**
-	 * @return the instrumentId
-	 */
-	public String getInstrumentId() {
-		return instrumentId;
-	}
-
-	/**
-	 * @param instrumentId the instrumentId to set
-	 */
-	public void setInstrumentId(String instrumentId) {
-		this.instrumentId = instrumentId;
-	}
+//	/**
+//	 * @return the instrumentType
+//	 */
+//	public String getInstrumentType() {
+//		return instrumentType;
+//	}
+//
+//	/**
+//	 * @param instrumentType the instrumentType to set
+//	 */
+//	public void setInstrumentType(String instrumentType) {
+//		this.instrumentType = instrumentType;
+//	}
+//
+//	/**
+//	 * @return the instrumentId
+//	 */
+//	public String getInstrumentId() {
+//		return instrumentId;
+//	}
+//
+//	/**
+//	 * @param instrumentId the instrumentId to set
+//	 */
+//	public void setInstrumentId(String instrumentId) {
+//		this.instrumentId = instrumentId;
+//	}
 
 }

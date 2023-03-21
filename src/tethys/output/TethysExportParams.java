@@ -3,6 +3,7 @@ package tethys.output;
 import java.io.Serializable;
 import java.util.HashMap;
 import PamguardMVC.PamDataBlock;
+import metadata.deployment.DeploymentData;
 
 
 /**
@@ -27,6 +28,8 @@ public class TethysExportParams implements Serializable, Cloneable{
 	}
 	
 	private HashMap<String, StreamExportParams> streamParamsMap = new HashMap();
+
+	private DeploymentData deploymentData;
 
 	@Override
 	public TethysExportParams clone() {
@@ -61,6 +64,13 @@ public class TethysExportParams implements Serializable, Cloneable{
 
 	private StreamExportParams getStreamParams(String longDataName) {
 		return streamParamsMap.get(longDataName);
+	}
+
+	public DeploymentData getProjectData() {
+		if (deploymentData == null) {
+			deploymentData = new DeploymentData();
+		}
+		return deploymentData;
 	}
 
 }

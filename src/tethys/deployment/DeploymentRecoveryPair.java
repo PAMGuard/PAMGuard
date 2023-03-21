@@ -4,8 +4,8 @@ import nilus.DeploymentRecoveryDetails;
 
 public class DeploymentRecoveryPair {
 
-	public DeploymentRecoveryDetails deploymentDetails;
-	
-	public DeploymentRecoveryDetails recoveryDetails;
+//	public DeploymentRecoveryDetails deploymentDetails;
+//	
+//	public DeploymentRecoveryDetails recoveryDetails;
 	
 }

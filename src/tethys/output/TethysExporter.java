@@ -33,7 +33,9 @@ import nilus.Deployment;
 import tethys.TethysControl;
 import tethys.dbxml.DBXMLConnect;
 import tethys.deployment.DeploymentHandler;
+import tethys.deployment.DeploymentOverview;
 import tethys.deployment.DeploymentRecoveryPair;
+import tethys.deployment.RecordingPeriod;
 import tethys.detection.DetectionGranularity;
 import tethys.detection.DetectionGranularity.GRANULARITY;
 import tethys.detection.DetectionsHandler;
@@ -168,21 +170,23 @@ public class TethysExporter {
 		//get list of deployment recovery details (start, stop times and lat/long)
 		//deployment details and recovery details are same structure
 		//per pair, go through a loop to fill in each deployment
-		DeploymentHandler deploymentHandler = new DeploymentHandler(tethysControl);
+//		DeploymentHandler deploymentHandler = new DeploymentHandler(tethysControl);
+		DeploymentHandler deploymentHandler = tethysControl.getDeploymentHandler();
 
-		ArrayList<DeploymentRecoveryPair> deployRecover = deploymentHandler.getDeployments();
-		if (deployRecover == null) {
-			return false;
-		}
+//		ArrayList<DeploymentRecoveryPair> deployRecover = deploymentHandler.getDeployments();
+//		if (deployRecover == null) {
+//			return false;
+//		}
 
 		ArrayList<Deployment> deploymentDocs = new ArrayList<>();
 		/*
 		 * This will become the main loop over deployment documents
 		 */
-		int i = 0;
-		for (DeploymentRecoveryPair drd : deployRecover) {
+		DeploymentOverview deploymentOverview = deploymentHandler.getDeploymentOverview();
+		int i = deploymentHandler.getFirstFreeDeploymentId();
+		for (RecordingPeriod recordingPeriod : deploymentOverview.getRecordingPeriods()) {
 
-			Deployment deployment = deploymentHandler.createDeploymentDocument(i++, drd);
+			Deployment deployment = deploymentHandler.createDeploymentDocument(i++, recordingPeriod);
 //			System.out.println(deployment.toString());
 			deploymentDocs.add(deployment);
 
@@ -196,10 +200,10 @@ public class TethysExporter {
 		 */
 		DetectionsHandler detectionsHandler = new DetectionsHandler(tethysControl);
 		ArrayList<PamDataBlock> allDataBlocks = PamController.getInstance().getDataBlocks();
-		/**
-		 * Outer loop is through deployemnt documents. Will then export detections within each 
-		 * deployment detector by detector
-		 */
+//		/**
+//		 * Outer loop is through deployemnt documents. Will then export detections within each 
+//		 * deployment detector by detector
+//		 */
 		for (Deployment aDeployment : deploymentDocs) {
 			for (PamDataBlock aDataBlock : allDataBlocks) {
 				StreamExportParams streamExportParams = tethysExportParams.getStreamParams(aDataBlock);
@@ -207,7 +211,7 @@ public class TethysExporter {
 					continue; // not interested in this one.
 				}
 				detectionsHandler.exportDetections(aDataBlock, aDeployment, 
-						new DetectionGranularity(GRANULARITY.TIME, 3600), tethysExportParams, streamExportParams);
+						new DetectionGranularity(GRANULARITY.TIME, 3600*12), tethysExportParams, streamExportParams);
 			}
 		}
 		/*

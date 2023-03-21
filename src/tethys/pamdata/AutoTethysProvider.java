@@ -84,7 +84,7 @@ public class AutoTethysProvider implements TethysDataProvider {
 		String fullUnitName = pamControlledUnit.getUnitType() + " " + pamControlledUnit.getUnitName();
 		description.setAbstract(fullUnitName);
 		description.setObjectives(fullUnitName);
-		description.setMethod(pamControlledUnit.getUnitType());
+		description.setMethod(pamDataBlock.getLongDataName());
 
 		return description;
 	}

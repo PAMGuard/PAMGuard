@@ -90,6 +90,32 @@ public class PamArray implements Serializable, Cloneable, ManagedParameters {
 	private String arrayName;
 
 	private String arrayFile;
+	
+	/**
+	 * Type, used for Tethys and other meta data control 
+	 */
+	private String instrumentType;
+	
+	public String getInstrumentType() {
+		return instrumentType;
+	}
+
+	public void setInstrumentType(String instrumentType) {
+		this.instrumentType = instrumentType;
+	}
+
+	public String getInstrumentId() {
+		return instrumentId;
+	}
+
+	public void setInstrumentId(String instrumentId) {
+		this.instrumentId = instrumentId;
+	}
+
+	/**
+	 * Array Id. Can be anything. Compulsory for Tethys. 
+	 */
+	private String instrumentId;
 
 	//	private int originInterpolation = ORIGIN_USE_LATEST;
 	private int originInterpolation = ORIGIN_USE_PRECEEDING;

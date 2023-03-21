@@ -1,10 +1,17 @@
 package tethys;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+
+import PamUtils.PamCalendar;
 
 public class TethysTimeFuncs {
 
@@ -35,5 +42,44 @@ public class TethysTimeFuncs {
 		}
 	    GregorianCalendar gc2 = xmlGregorian.toGregorianCalendar();
 		return gc2.getTimeInMillis();
+	}
+	
+	/**
+	 * Make a Gregorian calendar object from a returned XML string. 
+	 * @param gregorianString
+	 * @return
+	 */
+	public static XMLGregorianCalendar fromGregorianXML(String gregorianString) {
+		// typical string is 2018-10-20T00:00:00Z
+		if (gregorianString == null) {
+			return null;
+		}
+//		GregorianCalendar gCal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+		gregorianString = gregorianString.replace("T", " ");
+		gregorianString = gregorianString.replace("Z", "");
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		df.setTimeZone(TimeZone.getTimeZone("UTC"));
+		Date date = null;
+		try {
+			date = df.parse(gregorianString);
+		} catch (ParseException e) {
+			e.printStackTrace();
+			return null;
+		}
+		return xmlGregCalFromMillis(date.getTime());
+//		gCal.setTimeInMillis(date.getTime());
+////		gCal.se
+//		return gCal;
+	}
+	
+	public static String formatGregorianTime(XMLGregorianCalendar gregCal) {
+		if (gregCal == null) {
+			return null;
+		}
+		Long millis = millisFromGregorianXML(gregCal);
+		if (millis == null) {
+			return gregCal.toString();
+		}
+		return PamCalendar.formatDBDateTime(millis);
 	}
 }

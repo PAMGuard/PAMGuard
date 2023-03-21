@@ -10,6 +10,7 @@ import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataSelector.DataSelector;
 import dataMap.OfflineDataMap;
 import dataMap.OfflineDataMapPoint;
+import metadata.deployment.DeploymentData;
 import nilus.DataSourceType;
 import nilus.Deployment;
 import nilus.Detection;
@@ -143,9 +144,12 @@ public class DetectionsHandler {
 		/*
 		 * Here, make Detection object and add the DetectionEffort data. 
 		 */
+		DeploymentData globalDeplData = tethysControl.getGlobalDeplopymentData();
 		TethysDataProvider dataProvider = dataBlock.getTethysDataProvider();
 		Detections detections = new Detections();
-		detections.setId(String.format("%d", uniqueDetectionsId++));
+//		String prefix = getDetectionsDocIdPrefix(globalDeplData.getProject(), dataBlock);
+		String prefix = deployment.getId();
+		detections.setId(String.format("%s_%d", prefix, uniqueDetectionsId++));
 		detections.setDescription(dataProvider.getDescription(deployment, tethysExportParams));
 		DataSourceType dataSource = new DataSourceType();
 		dataSource.setDeploymentId(deployment.getId());
@@ -214,4 +218,15 @@ public class DetectionsHandler {
 		return effort;
 	}
 
+//	/**
+//	 * Get a prefix for a id for a Detections document. This is just the project name 
+//	 * and the datablock name. Something may need to be added to allow for multiple
+//	 * analysis going into one database. 
+//	 * @param project
+//	 * @param dataBlock
+//	 * @return Detections document prefix. 
+//	 */
+//	public static final String getDetectionsDocIdPrefix(String project, PamDataBlock dataBlock) {
+//		return project + "_" + dataBlock.getDataName();
+//	}
 }

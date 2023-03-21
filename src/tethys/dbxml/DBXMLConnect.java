@@ -2,6 +2,7 @@ package tethys.dbxml;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.JAXBException;
@@ -58,7 +59,7 @@ public class DBXMLConnect {
 				fileError = Importer.ImportFiles(params.getFullServerName(), collection,
 						new String[] { tempFile.toString() }, "", "", false);
 
-				System.out.println(fileError);
+//				System.out.println(fileError);
 				
 				tempFile.toFile().deleteOnExit();
 			}
@@ -77,11 +78,11 @@ public class DBXMLConnect {
 	}
 	
 	/**
-	 * get tethys collection name from nilus collection objects
+	 * get Tethys collection name from nilus collection objects
 	 * @param className nilus object Class Name
 	 * @return name of Tethys collection
 	 */
-	private String getTethysCollection(String className) {
+	public String getTethysCollection(String className) {
 		switch(className) {
 			case "nilus.Deployment": 
 				return "Deployments";				
@@ -106,6 +107,44 @@ public class DBXMLConnect {
 		}
 	}
 	
+	/**
+	 * Delete a Deploymnet and any contained Detections document. Doesn't work !
+	 * @param deploymentId
+	 * @return
+	 */
+	public boolean deleteDeployment(String deploymentId) {
+		ArrayList<String> detDocNames = tethysControl.getDbxmlQueries().getDetectionsDocsIds(deploymentId);
+		JerseyClient jerseyClient = null;
+		try {
+			jerseyClient = new JerseyClient(tethysControl.getTethysExportParams().getFullServerName());
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		String result;
+		for (int i = 0; i < detDocNames.size(); i++) {
+			try {
+				System.out.println("Delete " + detDocNames.get(i));
+				result = jerseyClient.removeDocument("Detections", detDocNames.get(i));
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+//				return false;
+//				break;
+			}
+		}
+		try {
+			result = jerseyClient.removeDocument("Deployments", deploymentId);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+
+
 	public boolean openDatabase() {
 		
 		return true;
@@ -117,7 +156,7 @@ public class DBXMLConnect {
 
 	/**
 	 * Get the server state via a ping ? 
-	 * @return String descritption of state ? 
+	 * @return Server state ? 
 	 */
 	public ServerStatus pingServer() {
 		JerseyClient jerseyClient = new JerseyClient(tethysControl.getTethysExportParams().getFullServerName());

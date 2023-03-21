@@ -14,14 +14,15 @@ public class DeploymentOverview {
 	
 	private ArrayList<RecordingPeriod> recordingPeriods = new ArrayList<>();
 	
-	private boolean dutyCycled;
+	private DutyCycleInfo dutyCycleInfo;
 
-	public DeploymentOverview(boolean dutyCycled) {
+	public DeploymentOverview(DutyCycleInfo dutyCycleInfo) {
 		super();
-		this.dutyCycled = dutyCycled;
+		this.dutyCycleInfo = dutyCycleInfo;
 	}
 	
-	public DeploymentOverview(boolean b, ArrayList<RecordingPeriod> tempPeriods) {
+	public DeploymentOverview(DutyCycleInfo dutyCycleInfo, ArrayList<RecordingPeriod> tempPeriods) {
+		this.dutyCycleInfo = dutyCycleInfo;
 		this.recordingPeriods = tempPeriods;
 	}
 
@@ -33,16 +34,34 @@ public class DeploymentOverview {
 		recordingPeriods.add(recordingPeriod);
 	}
 
-	public boolean isDutyCycled() {
-		return dutyCycled;
-	}
-
-	public void setDutyCycled(boolean dutyCycled) {
-		this.dutyCycled = dutyCycled;
-	}
-
 	public ArrayList<RecordingPeriod> getRecordingPeriods() {
 		return recordingPeriods;
+	}
+
+	public DutyCycleInfo getDutyCycleInfo() {
+		return dutyCycleInfo;
+	}
+	
+	/**
+	 * Get the start time of the first recording
+	 * @return
+	 */
+	public Long getFirstStart() {
+		if (recordingPeriods.size() > 0) {
+			return recordingPeriods.get(0).getRecordStart();
+		}
+		return null;
+	}
+	
+	/**
+	 * Get the end time of the last recording
+	 * @return
+	 */
+	public Long getLastEnd() {
+		if (recordingPeriods.size() > 0) {
+			return recordingPeriods.get(recordingPeriods.size()-1).getRecordStop();
+		}
+		return null;
 	}
 	
 	
