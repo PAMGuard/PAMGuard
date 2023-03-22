@@ -17,6 +17,7 @@ import org.xml.sax.InputSource;
 import PamController.settings.output.xml.PamguardXMLWriter;
 import PamguardMVC.PamDataBlock;
 import dbxml.JerseyClient;
+import dbxml.Queries;
 import nilus.Deployment;
 import nilus.Deployment.Instrument;
 import nilus.DeploymentRecoveryDetails;
@@ -28,7 +29,7 @@ import tethys.output.TethysExportParams;
 
 /**
  * Some standard queries we're going to want to make from various
- * parts of the system as the user interracts with the GUI.
+ * parts of the system as the user interacts with the GUI.
  * @author dg50
  *
  */
@@ -65,6 +66,8 @@ public class DBXMLQueries {
 		try {
 			JerseyClient jerseyClient = new JerseyClient(params.getFullServerName());
 
+			Queries queries = new Queries(jerseyClient);
+			
 			queryResult = jerseyClient.queryJSON(jsonQueryString, 0);
 			schemaPlan = jerseyClient.queryJSON(jsonQueryString, 1);
 
@@ -159,10 +162,12 @@ public class DBXMLQueries {
 		NodeList returns = doc.getElementsByTagName("Return");
 		//		System.out.println("N projects = " + returns.getLength());
 		int n = returns.getLength();
+//		Queries queries = new Queries(null)
 		for (int i = 0; i < n; i++) {
 			Node aNode = returns.item(i);
 			if (aNode instanceof Element) {
 				Element returnedEl = (Element) aNode;
+				
 				String Id = getElementData(returnedEl, "Id");
 				String project = getElementData(returnedEl, "Project");
 				String DeploymentId = getElementData(returnedEl, "DeploymentId");

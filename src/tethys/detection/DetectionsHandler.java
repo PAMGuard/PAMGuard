@@ -177,7 +177,7 @@ public class DetectionsHandler {
 		ArrayList<Detections> detectionDocuments = new ArrayList();
 		detectionDocuments.add(detections);
 		
-		tethysControl.getDbxmlConnect().postToTethys(detectionDocuments); // call whatever you need to call in here to write the Detections. 
+//		tethysControl.getDbxmlConnect().postToTethys(detectionDocuments); // call whatever you need to call in here to write the Detections. 
 		
 		
 		return true;

@@ -189,10 +189,10 @@ public class TethysExporter {
 			Deployment deployment = deploymentHandler.createDeploymentDocument(i++, recordingPeriod);
 //			System.out.println(deployment.toString());
 			deploymentDocs.add(deployment);
+			tethysControl.getDbxmlConnect().postToTethys(deployment);
 
 		}
 
-		tethysControl.getDbxmlConnect().postToTethys(deploymentDocs);
 
 		/*
 		 * go through the export params and call something for every data block that's
