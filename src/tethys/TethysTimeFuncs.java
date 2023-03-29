@@ -14,6 +14,8 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import PamUtils.PamCalendar;
 
 public class TethysTimeFuncs {
+	
+	private static TimeZone timeZone = TimeZone.getTimeZone("UTC");
 
 	/*
 	 * Copied from http://www.java2s.com/Code/Java/Development-Class/ConvertsagiventimeinmillisecondsintoaXMLGregorianCalendarobject.htm
@@ -21,6 +23,7 @@ public class TethysTimeFuncs {
 	public static XMLGregorianCalendar xmlGregCalFromMillis(long millis) {
 		try {
             final GregorianCalendar calendar = new GregorianCalendar();
+            calendar.setTimeZone(timeZone);
             calendar.setTimeInMillis(millis);
             return DatatypeFactory.newInstance().newXMLGregorianCalendar(
                 calendar);
@@ -41,6 +44,7 @@ public class TethysTimeFuncs {
 			return null;
 		}
 	    GregorianCalendar gc2 = xmlGregorian.toGregorianCalendar();
+	    gc2.setTimeZone(timeZone);
 		return gc2.getTimeInMillis();
 	}
 	

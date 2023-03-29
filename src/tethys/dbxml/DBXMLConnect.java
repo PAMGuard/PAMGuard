@@ -33,6 +33,12 @@ public class DBXMLConnect {
 
 	private TethysControl tethysControl;
 	private File tempDirectory;
+	
+	private JerseyClient jerseyClient;
+	
+	private Queries queries;
+	
+	private String currentSiteURL;
 			
 	public DBXMLConnect(TethysControl tethysControl) {
 		this.tethysControl = tethysControl;
@@ -41,20 +47,97 @@ public class DBXMLConnect {
 		
 	}
 	
+	/**
+	 * Check the jersey client and the queries. Need to recreate
+	 * if the url has changed. 
+	 * @return
+	 */
+	private boolean checkClient() {
+		if (jerseyClient == null || queries == null || currentSiteURL == null) {
+			return false;
+		}
+		TethysExportParams params = tethysControl.getTethysExportParams();
+		if (currentSiteURL.equalsIgnoreCase(params.getFullServerName()) == false) {
+			return false;
+		}
+		return true;
+	}
 	
 	/**
-	 * take list of nilus objects loaded with PamGuard data and post them to the Tethys database
-	 * all objects must be of the same nilus object
-	 * TethysExportParams obj used from UI inputs  
+	 * Get the client. The client will only be recreated if the url changes
+	 * @return Jersy client
+	 */
+	public synchronized  JerseyClient getJerseyClient() {
+		if (checkClient() == false) {
+			openConnections();
+		}
+		return jerseyClient;
+	}
+	
+	/**
+	 * Get the Queries object. This will only be recreated if the client changes. 
+	 * @return
+	 */
+	public synchronized  Queries getTethysQueries() {
+		if (checkClient() == false) {
+			openConnections();
+		}
+		return queries;
+	}
+	
+	/**
+	 * Update a document within Tethys. We're assuming that a
+	 * document with the same name in the same collection already
+	 * exists. If it doesn't / has a different name, then use
+	 * the removedocument function
+	 * @param nilusDocument
+	 * @return
+	 */
+	public String updateDocument(Object nilusDocument) {
+		deleteDocument(nilusDocument);
+		return postToTethys(nilusDocument);		
+	}
+	
+	/**
+	 * Delete a nilus document from the database. The only field which 
+	 * needs to be populated here is the Id. The code also uses the object
+	 * class to identify the correct collection. 
+	 * @param nilusDocument
+	 * @return
+	 */
+	public boolean deleteDocument(Object nilusDocument) {
+
+		Class objClass = nilusDocument.getClass();
+		String collection = getTethysCollection(objClass.getName());
+		String docId = getDocumentId(nilusDocument);
+		String result = null;
+		try {
+			result = jerseyClient.removeDocument(collection, docId );
+			/**
+			 * Return from a sucessful delete is something like
+			 * 
+				deployment = getTethysControl().getDeploymentHandler().createDeploymentDocument(freeId++, recordPeriod);
+				<DELETE>
+  <ITEM> ['ECoastNARW0'] </ITEM>
+</DELETE>
+			 */
+		}
+		catch (Exception e) {
+			System.out.printf("Error deleting %s %s: %s\n", collection, docId, e.getMessage());	
+		}
+		return result == null;
+	}
+	
+	/**
+	 * take a nilus object loaded with PamGuard data and post it to the Tethys database
 	 * 
-	 * @param pamGuardObjs all nilus objects loaded with PamGuard data
+	 * @param pamGuardObjs a nilus object loaded with PamGuard data
 	 * @return error string, null string means there are no errors
 	 */
 	public String postToTethys(Object nilusObject) 
 	{
 		Class objClass = nilusObject.getClass();
 		String collection = getTethysCollection(objClass.getName());
-		PamDataBlock defaultPamBlock = null;
 		TethysExportParams params = new TethysExportParams();
 		String fileError = null;
 		String tempName = getTempFileName(nilusObject);
@@ -95,61 +178,55 @@ public class DBXMLConnect {
 			
 			File tempDir = new File(javaTmpDirs);
 			if (tempDir.exists() == false) {
-				if (tempDir.mkdirs()) {
-					tempDirectory = tempDir;
-				};
+				tempDir.mkdirs();
 			}
+			if (tempDir.exists()) {
+				tempDirectory = tempDir;
+			};
 			if (tempDirectory == null) {
 				tempDirectory = new File(System.getProperty("java.io.tmpdir"));
 			}
 		
 	}
 
-
 	/**
-	 * needs to be based on the document id, but the getter for this can vary by type, so time 
-	 * to start casting !
+	 * Get a document Id string. All Document objects should have a getId() function
+	 * however they do not have a type hierarchy, so it can't be accessed directly.
+	 * instead go via the class.getDeclaredMethod function and it should be possible to find 
+	 * it. 
 	 * @param nilusObject
-	 * @return
+	 * @return document Id for any type of document, or null if the document doesn't have a getID function
 	 */
-	private String getTempFileName(Object nilusObject) {
-		/**
-		 * While all nilus objects should have a getId function, they have no 
-		 * common root, so try to get the function via the class declared methods. 
-		 */
-		String tempName = "PamguardTethys";
+	private String getDocumentId(Object nilusObject) {
+		String tempName = null;
 		Class nilusClass = nilusObject.getClass();
+		Method getId;
 		try {
-			Method getId = nilusClass.getDeclaredMethod("getId", null);
+			getId = nilusClass.getDeclaredMethod("getId", null);
 			Object[] inputs = new Object[0];
 			Object res = getId.invoke(nilusObject, inputs);
 			if (res instanceof String) {
 				tempName = (String) res;
 				return tempName;
 			}
-		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
+		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			e.printStackTrace();
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if (nilusObject instanceof nilus.Deployment) {
-			tempName = ((Deployment) nilusObject).getId();
-		}
-		else if (nilusObject instanceof nilus.Detections) {
-			tempName = ((nilus.Detections) nilusObject).getId();
 		}
 		return tempName;
+	}
+
+	/**
+	 * needs to be based on the document id, 
+	 * @param nilusObject
+	 * @return
+	 */
+	private String getTempFileName(Object nilusObject) {
+
+		String docId = getDocumentId(nilusObject);
+		if (docId == null || docId.length() == 0) {
+			docId = "PamguardTethys";
+		}
+		return docId;
 	}
 
 
@@ -190,16 +267,8 @@ public class DBXMLConnect {
 	 */
 	public boolean deleteDeployment(String deploymentId) {
 		ArrayList<String> detDocNames = tethysControl.getDbxmlQueries().getDetectionsDocsIds(deploymentId);
-		JerseyClient jerseyClient = null;
+		JerseyClient jerseyClient = getJerseyClient();
 		Queries queries = null;
-		try {
-			jerseyClient = new JerseyClient(tethysControl.getTethysExportParams().getFullServerName());
-			queries = new Queries(jerseyClient);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
 		String result;
 //		for (int i = 0; i < detDocNames.size(); i++) {
 //			try {
@@ -225,13 +294,19 @@ public class DBXMLConnect {
 	}
 
 
-	public boolean openDatabase() {
-		
-		return true;
+	public synchronized boolean openConnections() {
+		TethysExportParams params = tethysControl.getTethysExportParams();
+		currentSiteURL = params.getFullServerName();
+		jerseyClient = new JerseyClient(currentSiteURL);
+		queries = new Queries(jerseyClient);
+		ServerStatus state = pingServer();
+		return state.ok;
 	}
 	
-	public void closeDatabase() {
-		
+	public synchronized void closeConnections() {
+		jerseyClient = null;
+		queries = null;
+		currentSiteURL = null;
 	}
 
 	/**
@@ -239,10 +314,10 @@ public class DBXMLConnect {
 	 * @return Server state ? 
 	 */
 	public ServerStatus pingServer() {
-		JerseyClient jerseyClient = new JerseyClient(tethysControl.getTethysExportParams().getFullServerName());
+
 		boolean ok = false;
 		try {
-			ok = jerseyClient.ping();
+			ok = getJerseyClient().ping();
 		}
 		catch (Exception ex) {
 			return new ServerStatus(false, ex);

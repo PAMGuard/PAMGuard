@@ -2,6 +2,9 @@ package tethys.output;
 
 import java.io.Serializable;
 
+import nilus.DescriptionType;
+import nilus.GranularityEnumType;
+
 /**
  * Parameters controlling export of a single stream. 
  * Starts just with a boolean 'selected', but may grow. 
@@ -23,5 +26,16 @@ public class StreamExportParams implements Serializable {
 	public String longDataName;
 	
 	public boolean selected;
+	
+	public GranularityEnumType granularity = GranularityEnumType.CALL;
+	
+	public nilus.DescriptionType detectionDescription;
+
+	public DescriptionType getDetectionDescription() {
+		if (detectionDescription == null) {
+			detectionDescription = new DescriptionType();
+		}
+		return detectionDescription;
+	}
 
 }

@@ -218,7 +218,6 @@ public class TethysExporter {
 		 * Then do whatever else is needed to complete the document.
 		 */
 
-		dbxmlConnect.closeDatabase();
 
 		return true;
 	}

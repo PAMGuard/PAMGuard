@@ -38,6 +38,7 @@ import tethys.output.DatablockSynchInfo;
 import tethys.output.TethysExportParams;
 import tethys.output.TethysExporter;
 import tethys.output.swing.TethysExportDialog;
+import tethys.swing.ProjectDeploymentsDialog;
 import tethys.swing.TethysTabPanel;
 
 /**
@@ -75,7 +76,7 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		super(unitType, unitName);
 		stateObservers = new ArrayList();
 		dbxmlConnect = new DBXMLConnect(this);
-		dbxmlQueries = new DBXMLQueries(this);
+		dbxmlQueries = new DBXMLQueries(this, dbxmlConnect);
 		deploymentHandler = new DeploymentHandler(this);
 		serverCheckTimer = new Timer(10000, new ActionListener() {
 			@Override
@@ -126,9 +127,21 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 			}
 		});
 		tethysMenu.add(openClient);
+		JMenuItem showDeps = new JMenuItem("Show project deployments");
+		showDeps.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				showProjectDeploymentsDialog();
+			}
+		});
+		tethysMenu.add(showDeps);
 		return tethysMenu;
 	}
 	
+	public void showProjectDeploymentsDialog() {
+		ProjectDeploymentsDialog.showDialog(getGuiFrame(), this);
+	}
+
 	public ArrayList<PamDataBlock> getExportableDataBlocks() {
 		ArrayList<PamDataBlock> sets = new ArrayList<>();
 		ArrayList<PamDataBlock> allDataBlocks = PamController.getInstance().getDataBlocks();
@@ -182,7 +195,7 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	/**
 	 * open client in the default web browser
 	 */
-	protected void openTethysClient() {
+	public void openTethysClient() {
 		String urlString = tethysExportParams.getFullServerName() + "/Client";
 		System.out.println("Opening url " + urlString);
 		URL url = null;
@@ -340,7 +353,7 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	private void initializationStuff() {
 		deploymentHandler.createPamguardOverview();
 		serverCheckTimer.start();
-		updateState(new TethysState(StateType.NEWPAMGUARDSELECTION));
+		sendStateUpdate(new TethysState(StateType.NEWPAMGUARDSELECTION));
 	}
 
 	/**

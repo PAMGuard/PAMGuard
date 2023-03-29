@@ -22,7 +22,7 @@ public class NewProjectDialog extends PamView.dialog.PamDialog {
 	private JTextField projectName;
 	
 	private JTextField projectRegion;	
-	
+		
 	private DeploymentData deploymentData;
 	
 	private NewProjectDialog(Window parentFrame, TethysControl tethysControl) {

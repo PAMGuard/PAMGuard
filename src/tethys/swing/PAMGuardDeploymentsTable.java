@@ -5,7 +5,9 @@ import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -39,6 +41,10 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 	private JPanel mainPanel;
 
 	private DeploymentOverview deploymentOverview;
+	
+	private boolean[] selection = new boolean[0];
+	
+	private ArrayList<DeploymentTableObserver> observers = new ArrayList<>();
 
 	public PAMGuardDeploymentsTable(TethysControl tethysControl) {
 		super(tethysControl);
@@ -47,7 +53,7 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 		mainPanel.setBorder(new TitledBorder("PAMGuard recording periods"));
 		tableModel = new TableModel();
 		table = new JTable(tableModel);
-		table.setRowSelectionAllowed(true);
+//		table.setRowSelectionAllowed(true);
 		table.addMouseListener(new TableMouse());
 		JScrollPane scrollPane = new JScrollPane(table);
 		mainPanel.add(BorderLayout.CENTER, scrollPane);
@@ -73,6 +79,18 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 		public void mouseReleased(MouseEvent e) {
 			if (e.isPopupTrigger()) {
 				showPopup();
+			}
+		}
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			int aRow = table.getSelectedRow();
+			int col = table.getSelectedColumn();
+			if (aRow >= 0 && aRow < selection.length && col == 6) {
+				selection[aRow] = !selection[aRow];
+				for (DeploymentTableObserver obs : observers) {
+					obs.selectionChanged();
+				}
 			}
 		}
 
@@ -107,6 +125,24 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 		 */
 		
 	}
+	
+	/**
+	 * Get a list of selected recording periods. 
+	 * @return list of selected periods. 
+	 */
+	public ArrayList<RecordingPeriod> getSelectedDeployments() {
+		if (deploymentOverview == null) {
+			return null;
+		}
+		ArrayList<RecordingPeriod> selDeps = new ArrayList<>();
+		int n = Math.min(selection.length, deploymentOverview.getRecordingPeriods().size());
+		for (int i = 0; i < n; i++) {
+			if (selection[i]) {
+				selDeps.add(deploymentOverview.getRecordingPeriods().get(i));
+			}
+		}
+		return selDeps;
+	}
 
 	@Override
 	public void updateState(TethysState tethysState) {
@@ -136,15 +172,28 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 	private void updateDeployments() {
 		DeploymentHandler deploymentHandler = getTethysControl().getDeploymentHandler();
 		deploymentOverview = deploymentHandler.getDeploymentOverview();
+		int n = deploymentOverview.getRecordingPeriods().size();
+		if (selection.length < n) {
+			selection = Arrays.copyOf(selection, n);
+//			for (int i = 0; i < setDefaultStores.length; i++) {
+//				if (selectBoxes[i] == null) {
+//					selectBoxes[i] = new JCheckBox();
+//				}
+//			}
+		}
 		tableModel.fireTableDataChanged();
 //		DeploymentData deplData = getTethysControl().getGlobalDeplopymentData();
 //		ArrayList<Deployment> projectDeployments = getTethysControl().getDbxmlQueries().getProjectDeployments(deplData.getProject());
 //		deploymentHandler.matchPamguard2Tethys(deploymentOverview, projectDeployments);
 	}
+	
+	public void addObserver(DeploymentTableObserver observer) {
+		observers.add(observer);
+	}
 
 	private class TableModel extends AbstractTableModel {
 
-		private String[] columnNames = {"Id", "Start", "Stop", "Duration", "Cycle", "Tethys Deployment"};
+		private String[] columnNames = {"Id", "Start", "Stop", "Duration", "Cycle", "Tethys Deployment", "Select"};
 
 		@Override
 		public int getRowCount() {
@@ -165,6 +214,15 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 		public int getColumnCount() {
 			return columnNames.length;
 		}
+		
+		@Override
+		public Class<?> getColumnClass(int columnIndex) {
+			if (columnIndex == 6) {
+				return Boolean.class;
+//				return JCheckBox.class;
+			}
+			return super.getColumnClass(columnIndex);
+		}
 
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
@@ -174,6 +232,11 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 				return deploymentOverview.getDutyCycleInfo();
 			}
 			return getValueAt(period, rowIndex, columnIndex);
+		}
+
+		@Override
+		public boolean isCellEditable(int rowIndex, int columnIndex) {
+			return columnIndex == 6;
 		}
 
 		private Object getValueAt(RecordingPeriod period, int rowIndex, int columnIndex) {
@@ -193,6 +256,9 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 			case 5:
 				PDeployment deployment = period.getMatchedTethysDeployment();
 				return makeDeplString(period, deployment);
+			case 6:
+//				return selectBoxes[rowIndex];
+				return selection[rowIndex];
 			}
 
 			return null;

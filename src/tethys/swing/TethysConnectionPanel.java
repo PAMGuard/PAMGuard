@@ -62,6 +62,8 @@ public class TethysConnectionPanel extends TethysGUIPanel {
 	
 	private JButton newInstrument;
 	
+	private JButton openClient;
+	
 	public TethysConnectionPanel(TethysControl tethysControl) {
 		super(tethysControl);
 		mainPanel = new WestAlignedPanel(new GridBagLayout());
@@ -71,11 +73,19 @@ public class TethysConnectionPanel extends TethysGUIPanel {
 		serverSelButton.setToolTipText("Select server");
 		serverStatus = new ScrollingPamLabel(SERVERSTATUSLENGTH);
 		serverName.setEditable(false);
+		openClient = new JButton("Open Client");
+		openClient.setToolTipText("Open Tethys client in web browser");
 //		serverStatus.setEditable(false);
 		serverSelButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				selectServer();
+			}
+		});
+		openClient.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				tethysControl.openTethysClient();
 			}
 		});
 		newProjectButton = new JButton("New project");
@@ -121,6 +131,9 @@ public class TethysConnectionPanel extends TethysGUIPanel {
 		c.gridx++;
 		c.gridwidth = 2;
 		mainPanel.add(serverStatus, c);
+		c.gridx += c.gridwidth;
+		c.gridwidth = 1;
+		mainPanel.add(openClient, c);
 		
 		c.gridx =0;
 		c.gridy++;

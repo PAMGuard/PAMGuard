@@ -520,6 +520,14 @@ public class PamguardXMLWriter implements PamSettings {
 	private Element writeSettings(Document doc, PamSettings pamSettings, ArrayList<Object> objectHierarchy) {
 		return writeSettings(doc, pamSettings, pamSettings.getSettingsReference(), objectHierarchy);
 	}
+	
+	public Document writeOneObject(Object data) {
+		Document doc = XMLUtils.createBlankDoc();
+		Element el = doc.createElement("Settings");
+		Element newel = writeObjectData(doc, el, data, new ArrayList<Object>());
+		doc.appendChild(newel);
+		return doc;
+	}
 
 	/**
 	 * Write settings using an object of choice instead of the standard one from PamSettings. 
@@ -567,8 +575,10 @@ public class PamguardXMLWriter implements PamSettings {
 		if (parameterSet == null) {
 			return null;
 		}
-
-		objectHierarchy.add(data);
+		
+		if (objectHierarchy != null) {
+			objectHierarchy.add(data);
+		}
 		for (PamParameterData pamParam:parameterSet.getParameterCollection()) {
 			try {
 				Object paramData = pamParam.getData();

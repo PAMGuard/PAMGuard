@@ -36,10 +36,12 @@ import tethys.output.TethysExportParams;
 public class DBXMLQueries {
 
 	private TethysControl tethysControl;
-
-	public DBXMLQueries(TethysControl tethysControl) {
+	private DBXMLConnect dbXMLConnect;
+	
+	public DBXMLQueries(TethysControl tethysControl, DBXMLConnect dbXMLConnect) {
 		super();
 		this.tethysControl = tethysControl;
+		this.dbXMLConnect = dbXMLConnect;
 	}
 
 	/**
@@ -64,7 +66,8 @@ public class DBXMLQueries {
 		TethysExportParams params = tethysControl.getTethysExportParams();
 
 		try {
-			JerseyClient jerseyClient = new JerseyClient(params.getFullServerName());
+			JerseyClient jerseyClient = dbxmlConnect.getJerseyClient();
+//			String url = jerseyClient.getURL();
 
 			Queries queries = new Queries(jerseyClient);
 			
@@ -210,6 +213,9 @@ public class DBXMLQueries {
 	}
 	
 	public int countData(PamDataBlock dataBlock, String deploymentId) {
+		/**
+		 * first query for Detections documents associated with this deployment and datablock. 
+		 */
 		String queryNoDepl = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/Id\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Description/Method\",\"LongDataName\"],\"optype\":\"binary\"}],\"enclose\":1}";
 		String queryWithDepl = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/Id\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Description/Method\",\"LongDataName\"],\"optype\":\"binary\"},{\"op\":\"=\",\"operands\":[\"Detections/DataSource/DeploymentId\",\"TheDeploymentId\"],\"optype\":\"binary\"}],\"enclose\":1}";
 		String query;
@@ -235,11 +241,40 @@ public class DBXMLQueries {
 			Node aNode = returns.item(i);
 			String docName = aNode.getTextContent();
 //			System.out.println(aNode.getTextContent());
-			count += countDetecionsData(docName);
+			int count2 = countDetections2(docName);
+			count += count2; //countDetecionsData(docName);
+			
 		}
 		return count;
 	}
 	
+	private int countDetections2(String docName) {
+		TethysExportParams params = tethysControl.getTethysExportParams();
+		String queryBase = "count(collection(\"Detections\")/Detections[Id=\"ReplaceDocumentId\"]/OnEffort/Detection)";
+		String query = queryBase.replace("ReplaceDocumentId", docName);
+
+		String result = null;
+		try {
+			Queries queries = dbXMLConnect.getTethysQueries();
+			result = queries.QueryTethys(query);
+//			System.out.println(result);			
+		}
+		catch (Exception e) {
+			System.out.println("Error executing " + query);
+//			e.printStackTrace();
+			return -1;
+		}
+		int count = 0;
+		try {
+		 count = Integer.valueOf(result);
+		}
+		catch (NumberFormatException e) {
+			System.out.println("Unable to interpret count data " + result);
+			return 0;
+		}
+		return count;
+	}
+
 	/**
 	 * Count the data in a detections document. 
 	 * @param detectionDocId

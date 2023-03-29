@@ -50,6 +50,10 @@ public class PDeployment {
 	public void setMatchedPAMGaurdPeriod(RecordingPeriod matchedPAMGaurdPeriod) {
 		this.matchedPAMGaurdPeriod = matchedPAMGaurdPeriod;
 	}
+
+	public String getShortDescription() {
+		return String.format("%s %s", deployment.getId(), PamCalendar.formatDBDate(getAudioStart()));
+	}
 	
 	
 }
