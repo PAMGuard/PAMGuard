@@ -2,13 +2,10 @@ package rawDeepLearningClassifier.dlClassification.genericModel;
 
 import java.io.File;
 import java.io.Serializable;
+import java.net.URI;
 import java.util.ArrayList;
-import org.jamdev.jdl4pam.transforms.DLTransform;
 import org.jamdev.jdl4pam.transforms.DLTransformsFactory;
 import org.jamdev.jdl4pam.transforms.DLTransfromParams;
-import org.jamdev.jdl4pam.transforms.SimpleTransform;
-import org.jamdev.jdl4pam.transforms.SimpleTransformParams;
-
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
@@ -388,6 +385,20 @@ public class GenericDLClassifier implements DLClassiferModel, PamSettings {
 
 			
 		return warnings;
+		
+	}
+
+
+	@Override
+	public boolean isModelType(URI uri) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	@Override
+	public void setModel(URI model) {
+		// TODO Auto-generated method stub
 		
 	}
 

@@ -46,7 +46,11 @@ public class SweepClassifierPaneFX extends BasicIdentifierPaneFX {
 		
 		//make it so the title of the pane is the same as the name as the classifier
 		getFlipPane().getAdvLabel().textProperty().unbind();
+		
+		
 		getFlipPane().getAdvLabel().textProperty().bind(sweepPane.getNameTextProperty());
+		getFlipPane().getAdvLabel().graphicProperty().bind(sweepPane.getNameGraphicProperty());
+
 		
 		sweepPane.classifierItemRow = sweepClickClassifier.getSweepClassifierParams().getSetRow((SweepClassifierSet) clickTypeProperty.getClickType());
 		
@@ -58,6 +62,8 @@ public class SweepClassifierPaneFX extends BasicIdentifierPaneFX {
 		getFlipPaneCloseButton().setOnAction((action)->{
 			showFlipPane(false);
 			sweepPane.getParams(clickTypeProperty);
+			//need to refresh table to show symbol. 
+			clickTypesTable.getTableView().refresh();
 		});
 	}
 	

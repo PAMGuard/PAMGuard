@@ -11,6 +11,7 @@ import javafx.beans.property.StringProperty;
 /**
  * A property wrapper for a basic click with JavaFX properties. This is used so JavaFX controls 
  * automatically change.
+ * 
  * @author Jamie Macaulay
  *
  */

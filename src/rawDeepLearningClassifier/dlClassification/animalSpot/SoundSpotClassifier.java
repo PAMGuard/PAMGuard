@@ -1,6 +1,7 @@
 package rawDeepLearningClassifier.dlClassification.animalSpot;
 
 import java.io.Serializable;
+import java.net.URI;
 import java.util.ArrayList;
 import org.jamdev.jdl4pam.transforms.DLTransformsFactory;
 import org.jamdev.jdl4pam.transforms.DLTransfromParams;
@@ -399,6 +400,20 @@ public class SoundSpotClassifier implements DLClassiferModel, PamSettings {
 	@Override
 	public ArrayList<PamWarning> checkSettingsOK() {
 		return GenericDLClassifier.checkSettingsOK(soundSpotParmas, dlControl); 
+	}
+
+
+	@Override
+	public boolean isModelType(URI uri) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	@Override
+	public void setModel(URI model) {
+		// TODO Auto-generated method stub
+		
 	}
 
 

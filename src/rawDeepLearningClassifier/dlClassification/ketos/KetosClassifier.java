@@ -1,6 +1,7 @@
 package rawDeepLearningClassifier.dlClassification.ketos;
 
 import java.io.Serializable;
+import java.net.URI;
 import java.util.ArrayList;
 
 import org.jamdev.jdl4pam.transforms.DLTransformsFactory;
@@ -312,6 +313,19 @@ public class KetosClassifier implements DLClassiferModel, PamSettings {
 	@Override
 	public ArrayList<PamWarning> checkSettingsOK() {
 		return GenericDLClassifier.checkSettingsOK(ketosDLParams, dlControl); 
+	}
+
+
+	@Override
+	public boolean isModelType(URI uri) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	@Override
+	public void setModel(URI model) {
+		ketosDLParams.modelPath = model.getPath();
 	}
 
 }

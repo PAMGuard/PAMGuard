@@ -1,9 +1,6 @@
 package rawDeepLearningClassifier.dlClassification.animalSpot;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
 import java.util.ArrayList;
 
 import org.controlsfx.control.CheckComboBox;
@@ -12,23 +9,15 @@ import org.controlsfx.control.ToggleSwitch;
 
 import PamController.SettingsPane;
 import PamView.dialog.warn.WarnOnce;
-import ai.djl.Device;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.control.Labeled;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Spinner;
-import javafx.scene.control.Tooltip;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
@@ -38,7 +27,6 @@ import pamViewFX.fxNodes.PamGridPane;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamSpinner;
 import pamViewFX.fxNodes.PamVBox;
-import pamViewFX.fxNodes.flipPane.FlipPane;
 import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
 
 /**
@@ -54,20 +42,12 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 	 */
 	private PamBorderPane mainPane;
 
-	/**
-	 * The directory chooser.
-	 */
-	private FileChooser fileChooser;
 
 	/**
 	 * Currently selected file.
 	 */
 	private File currentSelectedFile = new File(System.getProperty("user.home"));
 
-	/**
-	 * The label showing the path to the file. 
-	 */
-	private Label pathLabel;
 
 	/**
 	 * Detection spinner
@@ -114,8 +94,14 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 	 */
 	private PamVBox vBoxHolder;
 
+	/**
+	 * Use the default segment length
+	 */
 	protected PamHBox defaultSegBox;
 
+	/**
+	 * Model indicator. 
+	 */
 	private ProgressIndicator modelLoadIndicator;
 
 
@@ -125,10 +111,8 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 		this.dlClassifierModel=soundSpotClassifier; 
 
 		mainPane = createPane(); 
-		//the directory chooser. 
-		fileChooser = new FileChooser();
-		fileChooser.setTitle("Classifier Model Location");
-		setAdvSettingsPane(new StandardAdvModelPane()); 
+
+		setAdvSettingsPane(new StandardAdvModelPane());
 	}
 
 	/**
@@ -143,84 +127,6 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 		//PamGuiManagerFX.titleFont2style(classiferInfoLabel);
 		Font font= Font.font(null, FontWeight.BOLD, 11);
 		classiferInfoLabel.setFont(font);
-
-		/**Basic classifier info**/
-		pathLabel = new Label("No classifier file selected"); 
-//		PamButton pamButton = new PamButton("", PamGlyphDude.createPamGlyph(MaterialDesignIcon.FILE, PamGuiManagerFX.iconSize)); 
-		PamButton pamButton = new PamButton("", PamGlyphDude.createPamIcon("mdi2f-file", PamGuiManagerFX.iconSize)); 
-		
-		modelLoadIndicator = new ProgressIndicator(-1);
-		modelLoadIndicator.setVisible(false);
-		modelLoadIndicator.prefHeightProperty().bind(pamButton.heightProperty().subtract(3));
-		
-		pamButton.setMinWidth(30);
-		pamButton.setTooltip(new Tooltip("Browse to selcect a model file"));
-		
-
-		pamButton.setOnAction((action)->{
-			
-			fileChooser.getExtensionFilters().clear();
-			fileChooser.getExtensionFilters().addAll(getExtensionFilters()); 
-
-
-			Path path = currentSelectedFile.toPath();
-			if(path!=null && Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
-				fileChooser.setInitialDirectory(new File(currentSelectedFile.getParent()));
-			}
-			else { 
-				fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-			}
-
-			File file = fileChooser.showOpenDialog(null); 
-
-			if (file==null) {
-				return; 
-			}
-			
-			modelLoadIndicator.setVisible(true);
-
-			pathLabel.setText("Loading model...");
-			
-			//whenever a new model is selected then the the paramters should be set to use defualt transforms again - this ensures
-			//that the new transforms are loaded up 
-			advSettingsPane.getParams(paramsClone); 
-			paramsClone.useDefaultTransfroms=true; 
-			advSettingsPane.setParams(paramsClone);
-			
-			
-            // separate non-FX thread - load the model 
-			//on a separate thread so we can show a moving load 
-			//bar on the FX thread. Otherwise the GUI locks up  
-			//whilst stuff is loaded. 
-			new Thread() {
-				// runnable for that thread
-				public void run() {
-					try {
-						newModelSelected(file); 
-						Thread.sleep(5000);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-					Platform.runLater(new Runnable() {
-						public void run() {
-							modelLoadIndicator.setVisible(false);
-							updatePathLabel(); 
-							setClassNames(paramsClone);  
-						}
-					});
-				}
-			}.start();
-
-			
-			
-		});
-
-		PamHBox hBox = new PamHBox(); 
-		hBox.setSpacing(5);
-		hBox.getChildren().addAll(modelLoadIndicator, pathLabel, pamButton); 
-		hBox.setAlignment(Pos.CENTER_RIGHT);
 
 //		PamButton advButton = new PamButton("", PamGlyphDude.createPamGlyph(MaterialDesignIcon.SETTINGS, PamGuiManagerFX.iconSize)); 
 		PamButton advButton = new PamButton("", PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconSize)); 
@@ -289,7 +195,7 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 
 		vBoxHolder = new PamVBox(); 
 		vBoxHolder.setSpacing(5);
-		vBoxHolder.getChildren().addAll(classiferInfoLabel, hBox, advSettings, classiferInfoLabel2, gridPane); 
+		vBoxHolder.getChildren().addAll(classiferInfoLabel, advSettings, classiferInfoLabel2, gridPane); 
 		
 		mainPane.setCenter(vBoxHolder);
 
@@ -368,31 +274,7 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 	
 
 
-	/**
-	 * Update the path label and tool tip text; 
-	 */
-	private void updatePathLabel() {
-		if (currentSelectedFile==null || !dlClassifierModel.checkModelOK()) {
-			pathLabel.setText("No classifier model loaded: Select model");
-			pathLabel.setTooltip(new Tooltip("Use the Browse... button to select a .pk file"));
-			usedefaultSeg.setDisable(true);
 
-		}
-		else {
-			pathLabel .setText(this.currentSelectedFile.getName()); 
-			try {
-				pathLabel.setTooltip(new Tooltip(this.currentSelectedFile.getPath() 
-						+ "\n" +" Processor CPU " + Device.cpu() + "  " +  Device.gpu()));
-			}
-			catch (Exception e) {
-				//sometimes get an error here for some reason
-				//does not make a difference other than tooltip. 
-				System.err.println("StandardModelPane: Error getting the default device!");
-			}
-			usedefaultSeg.setDisable(false);
-		}
-
-	}
 
 	@Override
 	public StandardModelParams getParams(StandardModelParams currParams) {
@@ -460,7 +342,7 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 	public void setParams(StandardModelParams currParams) {
 		this.paramsClone = currParams.clone(); 
 
-		pathLabel .setText(this.currentSelectedFile.getPath()); 
+		//pathLabel .setText(this.currentSelectedFile.getPath()); 
 
 		detectionSpinner.getValueFactory().setValue(Double.valueOf(currParams.threshold));
 
@@ -478,7 +360,7 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 		usedefaultSeg.setSelected(currParams.useDefaultSegLen); 
 		defaultSegmentLenChanged();
 
-		updatePathLabel(); 
+		//updatePathLabel(); 
 
 	}
 

@@ -1,6 +1,7 @@
 package rawDeepLearningClassifier.dlClassification.dummyClassifier;
 
 import java.io.Serializable;
+import java.net.URI;
 import java.util.ArrayList;
 
 import rawDeepLearningClassifier.DLControl;
@@ -87,6 +88,18 @@ public class DummyClassifier implements DLClassiferModel{
 	public ArrayList<PamWarning> checkSettingsOK() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public boolean isModelType(URI uri) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setModel(URI model) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

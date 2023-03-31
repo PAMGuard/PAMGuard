@@ -30,6 +30,7 @@ import rawDeepLearningClassifier.ddPlotFX.RawDLDDPlotProvider;
 import rawDeepLearningClassifier.dlClassification.DLClassName;
 import rawDeepLearningClassifier.dlClassification.DLClassNameManager;
 import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
+import rawDeepLearningClassifier.dlClassification.DLClassifierChooser;
 import rawDeepLearningClassifier.dlClassification.DLClassifyProcess;
 import rawDeepLearningClassifier.dlClassification.animalSpot.SoundSpotClassifier;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericDLClassifier;
@@ -179,6 +180,12 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	 * The current data selector. 
 	 */
 	private DataSelector dataSelector;
+	
+	/**
+	 * Figure out which model type has been imported. 
+	 */
+	private DLClassifierChooser dlClassifierChooser; 
+
 
 	/**
 	 * Constructor for the DL Control.
@@ -525,6 +532,14 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 				dataSelector=null; 
 			}
 		}
+	}
+	
+	/**
+	 * Get the classifier chooser. 
+	 * @return the classifier chooser.Take it
+	 */
+	public DLClassifierChooser getDlClassifierChooser() {
+		return dlClassifierChooser;
 	}
 
 

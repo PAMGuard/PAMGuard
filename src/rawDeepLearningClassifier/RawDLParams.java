@@ -1,6 +1,7 @@
 package rawDeepLearningClassifier;
 
 import java.io.Serializable;
+import java.net.URI;
 import java.util.ArrayList;
 
 import PamView.GroupedSourceParameters;
@@ -21,8 +22,17 @@ public class RawDLParams implements Serializable, Cloneable {
 
 	/**
 	 * The currently selected Deep Learning model.
+	 * (Models are now automatically selected)
 	 */
+	@Deprecated
 	public int modelSelection = 0;
+	
+	/**
+	 * The current model URI. The deep learning model must have some sort of external file to run. 
+	 * This might be a model, a .exe file etc. 
+	 * 
+	 */
+	public URI modelURI; 
 
 	/**
 	 * Holds channel and grouping information

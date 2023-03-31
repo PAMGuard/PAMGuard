@@ -1,6 +1,7 @@
 package rawDeepLearningClassifier.dlClassification;
 
 import java.io.Serializable;
+import java.net.URI;
 import java.util.ArrayList;
 
 import org.jamdev.jdl4pam.transforms.DLTransform;
@@ -34,8 +35,21 @@ public interface DLClassiferModel {
 
 	/**
 	 * Prepare the model. This is called on PAMGuard start up.
+	 * @param file 
 	 */
 	public void prepModel();
+	
+	/**
+	 * Called whenever PAMGuard stops.
+	 */
+	public void setModel(URI model);
+	
+	/**
+	 * Check whether a URI is compatible with a classification framework 
+	 * @param model - the URI to the model 
+	 * @return true if the model is compatible. 
+	 */
+	public boolean isModelType(URI model); 
 
 	/**
 	 * Called whenever PAMGuard stops.
@@ -87,6 +101,8 @@ public interface DLClassiferModel {
 	 * Check whether a model has been selected and can be loaded successfully. 
 	 */
 	public boolean checkModelOK();
+	
+
 	
 	/**
 	 * Get warnings for the classifier model. This is called when the user confirms settings and 

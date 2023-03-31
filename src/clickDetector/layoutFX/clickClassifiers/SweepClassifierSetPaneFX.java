@@ -4,9 +4,12 @@ package clickDetector.layoutFX.clickClassifiers;
 import fftFilter.FFTFilterParams;
 import fftManager.FFTLengthModeled;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
@@ -23,6 +26,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.text.Font;
+import javafx.scene.canvas.Canvas;
 import net.synedra.validatorfx.GraphicDecoration;
 import net.synedra.validatorfx.ValidationMessage;
 import net.synedra.validatorfx.Validator;
@@ -30,6 +34,7 @@ import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamGridPane;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamSpinner;
+import pamViewFX.fxNodes.PamSymbolFX;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
 import pamViewFX.fxNodes.picker.SymbolPicker;
@@ -37,25 +42,17 @@ import pamViewFX.fxNodes.utilityPanes.FreqBandPane;
 import pamViewFX.fxNodes.utilityPanes.PamToggleSwitch;
 import pamViewFX.fxNodes.utilityPanes.SimpleFilterPaneFX;
 import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
-import pamViewFX.validator.PamValidator;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 
-import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-
 import PamController.SettingsPane;
 import PamUtils.PamUtils;
 import PamView.PamSymbol;
-import PamView.dialog.PamGridBagContraints;
 import PamView.symbol.SymbolData;
 import clickDetector.ClickControl;
 import clickDetector.ClickClassifiers.basicSweep.CodeHost;
@@ -130,8 +127,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 	 */
 	private XCorrBlock xCorrBox;
 
-
-
+	
 	private PamBorderPane mainPane = new PamBorderPane();
 
 
@@ -239,7 +235,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		private Font disableFont;
 
 		private Label label;
-
+		
 
 		SweepBox(String borderTitle, Boolean enableButton) {
 
@@ -361,11 +357,18 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 
 	/**
-	 * General options for the sweep classifier set
+	 * General options for the sweep classifier set. This inlcudes, name, symbol, and some basics on
+	 * what part of the click to analyse. 
+	 * 
 	 * @author Jamie Macaulay
 	 *
 	 */
 	private class OptionsBox extends SweepBox implements FFTLengthModeled, CodeHost {
+
+		/**
+		 * The size of the preview symbol to show next to the title
+		 */
+		private static final double TITLE_SYMBOL_SIZE = 20.;
 
 		/**
 		 * Text field to set classifier name.
@@ -401,6 +404,13 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		 * Shows lengths of extraction samples in millis.
 		 */
 		private Label lengthMS;
+		
+		/**
+		 * The property for the PAMSymbol
+		 */
+		private  SimpleObjectProperty<Canvas> pamSymbolProperty = new SimpleObjectProperty<Canvas>(); 
+		
+		private PamSymbolFX currentSymbol = new PamSymbolFX(); 
 
 		private ComboBox<String> lengthTypeBox;
 
@@ -419,6 +429,8 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		//create the general options 
 		private Node createOptionsPane(){
 
+			//set the canvas for the canvas property. 
+			pamSymbolProperty.set(new Canvas(25,25));
 
 			PamGridPane pamGridPane=new PamGridPane();
 			pamGridPane.setHgap(5);
@@ -458,6 +470,9 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 			//create colour picker to allow users to change symbol colour. 
 			symbolPicker=new SymbolPicker(); 
+			symbolPicker.setOnAction((action)->{
+				drawSymbolProperty();
+			});
 			pamGridPane.add(symbolPicker, 3,1);
 
 			pamGridPane.add(new Label("Symbol"), 2,1);
@@ -466,6 +481,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			lineColourPicker.setStyle("-fx-color-label-visible: false ;");
 			lineColourPicker.setOnAction((action)->{
 				symbolPicker.setLineColour(lineColourPicker.getValue());
+				drawSymbolProperty();
 			});
 			pamGridPane.add(lineColourPicker, 4, 1);
 
@@ -474,6 +490,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			fillColourPicker.setStyle("-fx-color-label-visible: false ;");
 			fillColourPicker.setOnAction((action)->{
 				symbolPicker.setFillColour(fillColourPicker.getValue());
+				drawSymbolProperty();
 			});
 			pamGridPane.add(fillColourPicker, 5, 1);
 
@@ -548,6 +565,21 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			return holder; 
 		}
 
+		private void drawSymbolProperty() {
+			
+			this.pamSymbolProperty.get().getGraphicsContext2D().clearRect(0, 0,  TITLE_SYMBOL_SIZE, TITLE_SYMBOL_SIZE);
+			
+			currentSymbol.setSymbol(this.symbolPicker.getValue() == null ? null : this.symbolPicker.getValue().getSymbol());
+			currentSymbol.setLineColor(this.lineColourPicker.getValue());
+			currentSymbol.setFillColor(this.fillColourPicker.getValue());
+			
+			if (currentSymbol.getSymbol()!=null) {
+				currentSymbol.draw(this.pamSymbolProperty.get().getGraphicsContext2D(), new Point2D(TITLE_SYMBOL_SIZE/2,TITLE_SYMBOL_SIZE/2), TITLE_SYMBOL_SIZE, TITLE_SYMBOL_SIZE); 
+			}
+			
+			this.pamSymbolProperty.setValue(this.pamSymbolProperty.get());
+		}
+
 		@Override
 		public int getCode() {
 			return codeSpinner.getValue();
@@ -580,11 +612,13 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 		@Override
 		protected void setParams() {
+			
+			//must have a symbol selected by default or a null symbol will be returned.
+			symbolPicker.getSelectionModel().select(0);
 
 			//set basic data
 			if (sweepClassifierSet == null) {
 				//symbolViewer.setSymbol(null);
-				symbolPicker.getSelectionModel().select(0);
 				nameField.setText("");
 				setCode(sweepClassifier.getNextFreeCode(0));
 			}
@@ -624,6 +658,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			//			//length stuff
 			//			clickLengthSpinner.getValueFactory().setValue(sweepClassifierSet.restrictedBins); 
 
+			drawSymbolProperty();
 
 		}
 
@@ -637,9 +672,9 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 			//get the symbol data.
 			SymbolData symbolData = new SymbolData(this.symbolPicker.getValue().getSymbol(), 10,10,true, 
-					PamUtilsFX.fxToAWTColor(this.lineColourPicker.getValue()), PamUtilsFX.fxToAWTColor(this.fillColourPicker.getValue())); 
+					PamUtilsFX.fxToAWTColor(this.fillColourPicker.getValue()), PamUtilsFX.fxToAWTColor(this.lineColourPicker.getValue())); 
 			sweepClassifierSet.symbol= new PamSymbol(symbolData);
-			if (sweepClassifierSet.getName().length() <= 0) {
+			if (sweepClassifierSet.getName()==null || sweepClassifierSet.getName().length() <= 0) {
 				return showWarning("You must enter a name for this type of click");
 			}
 			sweepClassifierSet.setSpeciesCode(getCode());
@@ -679,6 +714,11 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		public TextField getNameLabel() {
 			return this.nameField;
 		}
+
+		public ObservableValue<? extends Node> getNameGraphicsProperty() {
+			return pamSymbolProperty;
+		}
+	
 
 	}
 
@@ -1651,7 +1691,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			getValidator() .createCheck().dependsOn("maxbearing_", maxBearing.valueProperty())
 			.withMethod(c -> {
 				Double maxBearingVal = c.get("maxbearing_"); 
-				if (maxBearingVal>=minBearing.getValue() && isPaneShowing()) {
+				if (maxBearingVal<=minBearing.getValue() && isPaneShowing()) {
 					c.error("Maximum bearing must be greater than the minimum bearing");
 				}
 				if (maxBearingVal<-180 || maxBearingVal>180) {
@@ -1664,7 +1704,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			getValidator() .createCheck().dependsOn("minbearing_", minBearing.valueProperty())
 			.withMethod(c -> {
 				Double minBearingVal = c.get("minbearing_"); 
-				if (minBearingVal<maxBearing.getValue() && isPaneShowing()) {
+				if (minBearingVal>maxBearing.getValue() && isPaneShowing()) {
 					c.error("Minimum bearing must be less than the maximum bearing");
 				}
 				if (minBearingVal<-180 || minBearingVal>180) {
@@ -1692,10 +1732,10 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		}
 
 		@Override
-		protected void setParams() {
+		protected void setParams() {			
 			
-//			System.out.println("SET BEARING PARAMS");
-			
+			this.setEnableBox(sweepClassifierSet.enableBearingLims);
+
 			sweepClassifierSet.checkBearingAllocation();
 //			setEnableBox(sweepClassifierSet.enableZeroCrossings);
 			//enableBearings.setSelected(sweepClassifierSet.enableBearingLims);
@@ -1803,7 +1843,6 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		XCorrBlock() {
 			super("Cross Correlation", true);
 			
-
 			minXCorrEnable = new PamToggleSwitch(""); 
 			minXCorrEnable.selectedProperty().addListener((obsVal, oldVal, newVal)->{
 				disbleControls(!newVal);
@@ -1845,6 +1884,9 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 		@Override
 		protected void setParams() {
+			
+			this.setEnableBox(sweepClassifierSet.enableMinXCrossCorr);
+
 			sweepClassifierSet.checkXCCorrAllocation();
 //			setEnableBox(sweepClassifierSet.enableZeroCrossings);
 			minXCorrEnable.setSelected(sweepClassifierSet.enableMinXCrossCorr);
@@ -1955,6 +1997,12 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 	}
 	
 	
+	public ObservableValue<? extends Node> getNameGraphicProperty() {		// TODO Auto-generated method stub
+		return optionBox.getNameGraphicsProperty(); 
+
+	}
+	
+	
 	
 	
 	/**
@@ -2060,4 +2108,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 	private boolean isPaneShowing() {
 		return sweepClassifier.getClassifierPane().getFlipPane().isBackVisible();
 	}
+
+
+
 }
