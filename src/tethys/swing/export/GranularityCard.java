@@ -21,6 +21,7 @@ import org.w3c.dom.Document;
 
 import PamController.settings.output.xml.PamguardXMLWriter;
 import PamView.dialog.PamGridBagContraints;
+import PamView.panel.WestAlignedPanel;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.dataSelector.DataSelectParams;
 import PamguardMVC.dataSelector.DataSelector;
@@ -47,7 +48,7 @@ public class GranularityCard extends ExportWizardCard {
 		// granularity
 		GranularityEnumType[] grans = GranularityEnumType.values();
 		granularities = new JRadioButton[grans.length];
-		JPanel granPanel = new JPanel(new GridBagLayout());
+		JPanel granPanel = new WestAlignedPanel(new GridBagLayout());
 		GridBagConstraints c = new PamGridBagContraints();
 		granPanel.setBorder(new TitledBorder("Granularity"));
 		ButtonGroup granGroup = new ButtonGroup();

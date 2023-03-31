@@ -362,6 +362,28 @@ abstract public class OfflineDataMap<TmapPoint extends OfflineDataMapPoint> {
 	}
 	
 	/**
+	 * Get the start time of the first datamap point or Long.minval
+	 * @return
+	 */
+	public long getMapStartTime() {
+		if (mapPoints == null || mapPoints.size() == 0) {
+			return Long.MIN_VALUE;
+		}
+		return mapPoints.get(0).getStartTime();
+	}
+	
+	/**
+	 * Get the start time of the first datamap point or Long.minval
+	 * @return
+	 */
+	public long getMapEndTime() {
+		if (mapPoints == null || mapPoints.size() == 0) {
+			return Long.MIN_VALUE;
+		}
+		return mapPoints.get(mapPoints.size()-1).getEndTime();
+	}
+	
+	/**
 	 * @return the lowestPoint
 	 */
 	public double getLowestPoint(int vScaleType) {

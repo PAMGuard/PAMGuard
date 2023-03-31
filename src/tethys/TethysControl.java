@@ -71,6 +71,7 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	private ArrayList<DatablockSynchInfo> dataBlockSynchInfos; 
 	
 	private DeploymentHandler deploymentHandler;
+	private DetectionsHandler detectionsHandler;
 
 	public TethysControl(String unitName) {
 		super(unitType, unitName);
@@ -78,6 +79,7 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		dbxmlConnect = new DBXMLConnect(this);
 		dbxmlQueries = new DBXMLQueries(this, dbxmlConnect);
 		deploymentHandler = new DeploymentHandler(this);
+		detectionsHandler = new DetectionsHandler(this);
 		serverCheckTimer = new Timer(10000, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -111,14 +113,14 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	@Override
 	public JMenuItem createFileMenu(JFrame parentFrame) {
 		JMenu tethysMenu = new JMenu("Tethys");
-		JMenuItem tethysExport = new JMenuItem("Export ...");
-		tethysMenu.add(tethysExport);
-		tethysExport.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				tethysExport(parentFrame);
-			}
-		});
+//		JMenuItem tethysExport = new JMenuItem("Export ...");
+//		tethysMenu.add(tethysExport);
+//		tethysExport.addActionListener(new ActionListener() {
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				tethysExport(parentFrame);
+//			}
+//		});
 		JMenuItem openClient = new JMenuItem("Open client in browser");
 		openClient.addActionListener(new ActionListener() {
 			@Override
@@ -428,6 +430,10 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	 */
 	public DeploymentHandler getDeploymentHandler() {
 		return deploymentHandler;
+	}
+
+	public DetectionsHandler getDetectionsHandler() {
+		return detectionsHandler;
 	}
 
 }

@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.border.TitledBorder;
@@ -22,26 +23,37 @@ public class DetectionsExportWizard extends PamDialog {
 
 	private PamDataBlock dataBlock;
 	private CardLayout cardLayout;
-	private JPanel mainPanel;
+	private JPanel cardPanel;
 	private GranularityCard granularityCard;
 	private DescriptionCard descriptionCard;
 	private JButton prevButton;
 	private StreamExportParams streamExportParams;
 	
 	private ArrayList<ExportWizardCard> wizardCards = new ArrayList();
+	private AlgorithmCard algorithmCard;
+	private ExportWorkerCard exportWorkerCard;
 	
 	private DetectionsExportWizard(Window parentFrame,  TethysControl tethysControl, PamDataBlock dataBlock) {
 		super(parentFrame, "Detections Export", false);
 		this.dataBlock = dataBlock;
-		cardLayout = new CardLayout();
-		mainPanel = new JPanel(cardLayout);
 		
+		streamExportParams = tethysControl.getTethysExportParams().getStreamParams(dataBlock);
+		if (streamExportParams == null) {
+			streamExportParams = new StreamExportParams(dataBlock.getLongDataName(), false);
+		}
+		
+		cardLayout = new CardLayout();
+		JPanel mainPanel = new JPanel(new BorderLayout());
+		mainPanel.add(BorderLayout.NORTH, new ExportStreamInfoPanel(dataBlock));
+		cardPanel = new JPanel(cardLayout);
+		mainPanel.add(BorderLayout.CENTER, cardPanel);
+
+		addCard(algorithmCard = new AlgorithmCard(tethysControl, dataBlock));
 		addCard(granularityCard = new GranularityCard(tethysControl, dataBlock));
 		addCard(descriptionCard = new DescriptionCard(tethysControl, dataBlock));
-	
-		streamExportParams = tethysControl.getTethysExportParams().getStreamParams(dataBlock);
+		addCard(exportWorkerCard = new ExportWorkerCard(tethysControl, dataBlock));
 		
-		cardLayout.first(mainPanel);
+		cardLayout.first(cardPanel);
 		
 		setDialogComponent(mainPanel);
 		
@@ -56,10 +68,12 @@ public class DetectionsExportWizard extends PamDialog {
 		});
 		
 		setResizable(true);
+		
+//		this.get
 	}
 	
 	private void addCard(ExportWizardCard wizPanel) {
-		mainPanel.add(wizPanel, wizPanel.getTitle());
+		cardPanel.add(wizPanel, wizPanel.getTitle());
 		wizardCards.add(wizPanel);
 	}
 
@@ -73,6 +87,7 @@ public class DetectionsExportWizard extends PamDialog {
 		for (ExportWizardCard wizCard : wizardCards) {
 			wizCard.setParams(streamExportParams);
 		}
+		enableControls();
 //		granularityCard.setParams(streamExportParams);
 	}
 
@@ -80,7 +95,7 @@ public class DetectionsExportWizard extends PamDialog {
 	 * Called when 'previous' button is clicked. 
 	 */
 	protected void previousButton() {
-		cardLayout.previous(mainPanel);
+		cardLayout.previous(cardPanel);
 		enableControls();
 	}
 
@@ -89,7 +104,7 @@ public class DetectionsExportWizard extends PamDialog {
 		int iCard = getCardIndex();
 		if (iCard < wizardCards.size()-1) {
 			if (checkCurrentCard()) {
-				cardLayout.next(mainPanel);
+				cardLayout.next(cardPanel);
 				enableControls();
 			}
 			return false;
@@ -123,7 +138,8 @@ public class DetectionsExportWizard extends PamDialog {
 		int iCard = getCardIndex();
 		prevButton.setEnabled(iCard > 0);
 		boolean isLast = iCard == wizardCards.size()-1;
-		getOkButton().setText(isLast ? "Export" : "Next");
+		getOkButton().setEnabled(!isLast);
+//		getOkButton().setText(isLast ? "Export" : "Next");
 	}
 	
 	private boolean checkCurrentCard() {
@@ -135,8 +151,8 @@ public class DetectionsExportWizard extends PamDialog {
 	}
 	
 	private int getCardIndex() {
-		for (int i = 0; i < mainPanel.getComponentCount(); i++) {
-			Component component = mainPanel.getComponent(i);
+		for (int i = 0; i < cardPanel.getComponentCount(); i++) {
+			Component component = cardPanel.getComponent(i);
 			if (component.isVisible()) {
 				return i;
 			}

@@ -125,6 +125,7 @@ public class DBXMLConnect {
 		catch (Exception e) {
 			System.out.printf("Error deleting %s %s: %s\n", collection, docId, e.getMessage());	
 		}
+		forceFlush();
 		return result == null;
 	}
 	
@@ -164,8 +165,26 @@ public class DBXMLConnect {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	
-		
+//		System.out.println(fileError);
 		return fileError;
+	}
+	
+
+	/*
+	 * force a fluch by sending a dummy document to th eimporter which will rail, but ...
+	 */
+	private void forceFlush() {
+		TethysExportParams params = new TethysExportParams();
+		String fileError = null;
+		try {
+		fileError = Importer.ImportFiles(params.getFullServerName(), "NoCollection",
+				new String[] { "ThereIsNoFileE" }, "", "", false);
+		}
+		catch (Exception e) {
+			
+		}
+//		System.out.println(fileError);
+		
 	}
 	
 	/**
@@ -266,7 +285,7 @@ public class DBXMLConnect {
 	 * @return
 	 */
 	public boolean deleteDeployment(String deploymentId) {
-		ArrayList<String> detDocNames = tethysControl.getDbxmlQueries().getDetectionsDocsIds(deploymentId);
+		ArrayList<String> detDocNames = tethysControl.getDbxmlQueries().getDetectionsDocuments(deploymentId);
 		JerseyClient jerseyClient = getJerseyClient();
 		Queries queries = null;
 		String result;
@@ -324,6 +343,7 @@ public class DBXMLConnect {
 		}
 		return new ServerStatus(ok, null);
 	}
+
 	
 	// add whatever calls are necessary ... 
 

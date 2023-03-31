@@ -25,7 +25,7 @@ public class TethysMenuActions {
 	}
 
 	public void deploymentMouseActions(MouseEvent e, PDeployment pDeployment) {
-		ArrayList<String> detDocNames = tethysControl.getDbxmlQueries().getDetectionsDocsIds(pDeployment.deployment.getId());
+		ArrayList<String> detDocNames = tethysControl.getDbxmlQueries().getDetectionsDocuments(pDeployment.deployment.getId());
 //		System.out.println("Detections for deployment " + pDeployment.deployment.getId());
 //		for (String detName : detDocNames) {
 //			System.out.println(detName);

@@ -204,16 +204,16 @@ public class TethysExporter {
 //		 * Outer loop is through deployemnt documents. Will then export detections within each 
 //		 * deployment detector by detector
 //		 */
-		for (Deployment aDeployment : deploymentDocs) {
-			for (PamDataBlock aDataBlock : allDataBlocks) {
-				StreamExportParams streamExportParams = tethysExportParams.getStreamParams(aDataBlock);
-				if (streamExportParams == null || !streamExportParams.selected) {
-					continue; // not interested in this one.
-				}
-				detectionsHandler.exportDetections(aDataBlock, aDeployment, 
-						new DetectionGranularity(GRANULARITY.TIME, 3600*12), tethysExportParams, streamExportParams);
-			}
-		}
+//		for (Deployment aDeployment : deploymentDocs) {
+//			for (PamDataBlock aDataBlock : allDataBlocks) {
+//				StreamExportParams streamExportParams = tethysExportParams.getStreamParams(aDataBlock);
+//				if (streamExportParams == null || !streamExportParams.selected) {
+//					continue; // not interested in this one.
+//				}
+//				detectionsHandler.exportDetections(aDataBlock, aDeployment, 
+//						new DetectionGranularity(GRANULARITY.TIME, 3600*12), tethysExportParams, streamExportParams);
+//			}
+//		}
 		/*
 		 * Then do whatever else is needed to complete the document.
 		 */

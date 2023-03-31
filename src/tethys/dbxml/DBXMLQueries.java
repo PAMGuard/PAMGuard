@@ -1,5 +1,6 @@
 package tethys.dbxml;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,12 +8,14 @@ import java.util.Collections;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import PamController.settings.output.xml.PamguardXMLWriter;
 import PamguardMVC.PamDataBlock;
@@ -21,6 +24,8 @@ import dbxml.Queries;
 import nilus.Deployment;
 import nilus.Deployment.Instrument;
 import nilus.DeploymentRecoveryDetails;
+import nilus.DescriptionType;
+import nilus.Detections;
 import nilus.Helper;
 import tethys.TethysControl;
 import tethys.TethysTimeFuncs;
@@ -137,7 +142,9 @@ public class DBXMLQueries {
 	}
 
 	/**
-	 * Get some basic (not all) data for deployments associated with a project. 
+	 * Get some basic (not all) data for deployments associated with a project. Note that 
+	 * this may include deployments which are NOT part of the current dataset. That requires
+	 * a search on Instrument as well. 
 	 * @param projectName
 	 * @return
 	 */
@@ -212,12 +219,18 @@ public class DBXMLQueries {
 		return deployments;
 	}
 	
-	public int countData(PamDataBlock dataBlock, String deploymentId) {
+	/**
+	 * Get a list of Detections documents which associate with a datablock and a deploymentId.
+	 * @param dataBlock
+	 * @param deploymentId
+	 * @return
+	 */
+	public ArrayList<String> getDetectionsDocuments(PamDataBlock dataBlock, String deploymentId) {
 		/**
 		 * first query for Detections documents associated with this deployment and datablock. 
 		 */
-		String queryNoDepl = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/Id\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Description/Method\",\"LongDataName\"],\"optype\":\"binary\"}],\"enclose\":1}";
-		String queryWithDepl = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/Id\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Description/Method\",\"LongDataName\"],\"optype\":\"binary\"},{\"op\":\"=\",\"operands\":[\"Detections/DataSource/DeploymentId\",\"TheDeploymentId\"],\"optype\":\"binary\"}],\"enclose\":1}";
+		String queryNoDepl = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/Id\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Algorithm/Software\",\"LongDataName\"],\"optype\":\"binary\"}],\"enclose\":1}";
+		String queryWithDepl = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/Id\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Algorithm/Software\",\"LongDataName\"],\"optype\":\"binary\"},{\"op\":\"=\",\"operands\":[\"Detections/DataSource/DeploymentId\",\"TheDeploymentId\"],\"optype\":\"binary\"}],\"enclose\":1}";
 		String query;
 		if (deploymentId == null) {
 			query = queryNoDepl;
@@ -228,18 +241,92 @@ public class DBXMLQueries {
 		query = query.replace("LongDataName", dataBlock.getLongDataName());
 		DBQueryResult queryResult = executeQuery(query);
 		if (queryResult ==null) {
-			return 0;
+			return null;
 		}
-		Document doc = convertStringToXMLDocument(queryResult.queryResult);
-		if (doc == null) {
-			return 0;
+		Document doc;
+		try {
+			doc = queryResult.getDocument();
+		} catch (ParserConfigurationException | SAXException | IOException e) {
+			e.printStackTrace();
+			return null;
 		}
-
+		ArrayList<String> detectionsNames = new ArrayList();
 		int count = 0;
 		NodeList returns = doc.getElementsByTagName("Return");
 		for (int i = 0; i < returns.getLength(); i++) {
 			Node aNode = returns.item(i);
 			String docName = aNode.getTextContent();
+			detectionsNames.add(docName);
+		}
+		return detectionsNames;
+	}
+	
+	/**
+		 * Get the names of all detection documents for a given deployment for all data streams. 
+		 * @param deploymentId
+		 * @return
+		 */
+		public ArrayList<String> getDetectionsDocuments(String deploymentId) {
+			String queryBase = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/Id\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/DataSource/DeploymentId\",\"SomeDeploymentId\"],\"optype\":\"binary\"}],\"enclose\":1}";
+			String queryStr = queryBase.replace("SomeDeploymentId", deploymentId);
+			DBQueryResult queryResult = executeQuery(queryStr);
+			if (queryResult == null || queryResult.queryException != null) {
+				return null;
+			}
+	
+	//		PamguardXMLWriter pamXMLWriter = PamguardXMLWriter.getXMLWriter();
+	
+			Document doc = convertStringToXMLDocument(queryResult.queryResult);
+			if (doc == null) {
+				return null;
+			}
+	
+			ArrayList<String> detectionDocs = new ArrayList<>();
+	
+			NodeList returns = doc.getElementsByTagName("Return");
+			for (int i = 0; i < returns.getLength(); i++) {
+				Node aNode = returns.item(i);
+				detectionDocs.add(aNode.getTextContent());
+			}
+			return detectionDocs;
+		}
+
+	public int countData(PamDataBlock dataBlock, String deploymentId) {
+//		/**
+//		 * first query for Detections documents associated with this deployment and datablock. 
+//		 */
+//		String queryNoDepl = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/Id\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Algorithm/Software\",\"LongDataName\"],\"optype\":\"binary\"}],\"enclose\":1}";
+//		String queryWithDepl = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/Id\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Algorithm/Software\",\"LongDataName\"],\"optype\":\"binary\"},{\"op\":\"=\",\"operands\":[\"Detections/DataSource/DeploymentId\",\"TheDeploymentId\"],\"optype\":\"binary\"}],\"enclose\":1}";
+//		String query;
+//		if (deploymentId == null) {
+//			query = queryNoDepl;
+//		}
+//		else {
+//			query = queryWithDepl.replace("TheDeploymentId", deploymentId);
+//		}
+//		query = query.replace("LongDataName", dataBlock.getLongDataName());
+//		DBQueryResult queryResult = executeQuery(query);
+//		if (queryResult ==null) {
+//			return 0;
+//		}
+//		Document doc;
+//		try {
+//			doc = queryResult.getDocument();
+//		} catch (ParserConfigurationException | SAXException | IOException e) {
+//			e.printStackTrace();
+//			return 0;
+//		}
+//
+//		int count = 0;
+//		NodeList returns = doc.getElementsByTagName("Return");
+		ArrayList<String> documentNames = getDetectionsDocuments(dataBlock, deploymentId);
+		if (documentNames == null) {
+			return 0;
+		}
+		int count = 0;
+		for (int i = 0; i < documentNames.size(); i++) {
+//			Node aNode = returns.item(i);
+			String docName = documentNames.get(i);
 //			System.out.println(aNode.getTextContent());
 			int count2 = countDetections2(docName);
 			count += count2; //countDetecionsData(docName);
@@ -248,7 +335,12 @@ public class DBXMLQueries {
 		return count;
 	}
 	
-	private int countDetections2(String docName) {
+	/**
+	 * Count on effort detections in a Detections document
+	 * @param docName
+	 * @return
+	 */
+	public int countDetections2(String docName) {
 		TethysExportParams params = tethysControl.getTethysExportParams();
 		String queryBase = "count(collection(\"Detections\")/Detections[Id=\"ReplaceDocumentId\"]/OnEffort/Detection)";
 		String query = queryBase.replace("ReplaceDocumentId", docName);
@@ -275,115 +367,67 @@ public class DBXMLQueries {
 		return count;
 	}
 
-	/**
-	 * Count the data in a detections document. 
-	 * @param detectionDocId
-	 * @return count of on effort detections in document. 
-	 */
-	private int countDetecionsData(String detectionDocId) {
-		String queryBase = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/OnEffort/Detection/Start\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Id\",\"DetectionsDocName\"],\"optype\":\"binary\"}],\"enclose\":1}";
-		String query = queryBase.replace("DetectionsDocName", detectionDocId);
-		DBQueryResult queryResult = executeQuery(query);
-		Document doc = convertStringToXMLDocument(queryResult.queryResult);
-		if (doc == null) {
-			return 0;
-		}
-
-		NodeList returns = doc.getElementsByTagName("Start");
-		return returns.getLength();
-	}
-
-	/**
-	 * Get the names of all detection documents for a given deployment
-	 * @param deploymentId
-	 * @return
-	 */
-	public ArrayList<String> getDetectionsDocsIds(String deploymentId) {
-		String queryBase = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/Id\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/DataSource/DeploymentId\",\"SomeDeploymentId\"],\"optype\":\"binary\"}],\"enclose\":1}";
-		String queryStr = queryBase.replace("SomeDeploymentId", deploymentId);
-		DBQueryResult queryResult = executeQuery(queryStr);
-		if (queryResult == null || queryResult.queryException != null) {
-			return null;
-		}
-
+//	/**
+//	 * Get a count of the detections in a detections document. 
+//	 * Only looking in onEffort so far. 
+//	 * @param deploymentId
+//	 * @param detectionDocId
+//	 * @param dataBlock 
+//	 * @return
+//	 */
+//	public int getDetectionsDetectionCount(String deploymentId, String detectionDocId, PamDataBlock dataBlock) {
+//		String queryBase = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/OnEffort/Detection/Start\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Id\",\"SomeDetectionsId\"],\"optype\":\"binary\"},{\"op\":\"=\",\"operands\":[\"Detections/DataSource/DeploymentId\",\"SomeDeploymentId\"],\"optype\":\"binary\"}],\"enclose\":1}";
+//		String queryStr = queryBase.replace("SomeDetectionsId", detectionDocId);
+//		queryStr = queryStr.replace("SomeDeploymentId", deploymentId);
+//		DBQueryResult queryResult = executeQuery(queryStr);
+//		if (queryResult == null || queryResult.queryException != null) {
+//			return 0;
+//		}
+////		System.out.println("Detections query time ms = " + queryResult.queryTimeMillis);
+//
 //		PamguardXMLWriter pamXMLWriter = PamguardXMLWriter.getXMLWriter();
+//
+//		Document doc = convertStringToXMLDocument(queryResult.queryResult);
+//		if (doc == null) {
+//			return 0;
+//		}
+//		
+////		System.out.println(pamXMLWriter.getAsString(doc));
+//
+////		ArrayList<String> detectionDocs = new ArrayList<>();
+//
+//		NodeList returns = doc.getElementsByTagName("Start");
+//		int n = returns.getLength();
+//		return n;
+//	}
 
-		Document doc = convertStringToXMLDocument(queryResult.queryResult);
-		if (doc == null) {
-			return null;
-		}
-
-		ArrayList<String> detectionDocs = new ArrayList<>();
-
-		NodeList returns = doc.getElementsByTagName("Return");
-		for (int i = 0; i < returns.getLength(); i++) {
-			Node aNode = returns.item(i);
-			detectionDocs.add(aNode.getTextContent());
-		}
-		return detectionDocs;
-	}
-	
-	/**
-	 * Get a count of the detections in a detections document. 
-	 * Only looking in onEffort so far. 
-	 * @param deploymentId
-	 * @param detectionDocId
-	 * @param dataBlock 
-	 * @return
-	 */
-	public int getDetectionsDetectionCount(String deploymentId, String detectionDocId, PamDataBlock dataBlock) {
-		String queryBase = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/OnEffort/Detection/Start\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Id\",\"SomeDetectionsId\"],\"optype\":\"binary\"},{\"op\":\"=\",\"operands\":[\"Detections/DataSource/DeploymentId\",\"SomeDeploymentId\"],\"optype\":\"binary\"}],\"enclose\":1}";
-		String queryStr = queryBase.replace("SomeDetectionsId", detectionDocId);
-		queryStr = queryStr.replace("SomeDeploymentId", deploymentId);
-		DBQueryResult queryResult = executeQuery(queryStr);
-		if (queryResult == null || queryResult.queryException != null) {
-			return 0;
-		}
-//		System.out.println("Detections query time ms = " + queryResult.queryTimeMillis);
-
-		PamguardXMLWriter pamXMLWriter = PamguardXMLWriter.getXMLWriter();
-
-		Document doc = convertStringToXMLDocument(queryResult.queryResult);
-		if (doc == null) {
-			return 0;
-		}
-		
-//		System.out.println(pamXMLWriter.getAsString(doc));
-
-//		ArrayList<String> detectionDocs = new ArrayList<>();
-
-		NodeList returns = doc.getElementsByTagName("Start");
-		int n = returns.getLength();
-		return n;
-	}
-
-	/**
-	 * This is the quickest way of counting data in a project, but it will load the start
-	 * times for every detection in a project at once, so might use a lot of memory. Also
-	 * it wll probably get data for all deployments in a project, which may not be what we want.  
-	 * @param projectName
-	 * @param dataPrefixes
-	 * @return
-	 */
-	public int[] countDataForProject(String projectName, String[] dataPrefixes) {
-		int[] n = new int[dataPrefixes.length];
-		ArrayList<PDeployment> matchedDeployments = tethysControl.getDeploymentHandler().getMatchedDeployments();
-//		ArrayList<nilus.Deployment> deployments = getProjectDeployments(projectName);
-		if (matchedDeployments == null) {
-			return null;
-		}
-		for (PDeployment aDeployment : matchedDeployments) {
-//			ArrayList<String> detectionsIds = getDetectionsDocsIds(aDeployment.getId());
-//			for (String detId : detectionsIds) {
-//				n += getDetectionsDetectionCount(aDeployment.getId(), detId, dataBlock);
+//	/**
+//	 * This is the quickest way of counting data in a project, but it will load the start
+//	 * times for every detection in a project at once, so might use a lot of memory. Also
+//	 * it wll probably get data for all deployments in a project, which may not be what we want.  
+//	 * @param projectName
+//	 * @param dataPrefixes
+//	 * @return
+//	 */
+//	public int[] countDataForProject(String projectName, String[] dataPrefixes) {
+//		int[] n = new int[dataPrefixes.length];
+//		ArrayList<PDeployment> matchedDeployments = tethysControl.getDeploymentHandler().getMatchedDeployments();
+////		ArrayList<nilus.Deployment> deployments = getProjectDeployments(projectName);
+//		if (matchedDeployments == null) {
+//			return null;
+//		}
+//		for (PDeployment aDeployment : matchedDeployments) {
+////			ArrayList<String> detectionsIds = getDetectionsDocsIds(aDeployment.getId());
+////			for (String detId : detectionsIds) {
+////				n += getDetectionsDetectionCount(aDeployment.getId(), detId, dataBlock);
+////			}
+//			int[] newN =  countDataForDeployment(projectName, aDeployment.deployment.getId(), dataPrefixes);
+//			for (int i = 0; i < n.length; i++) {
+//				n[i] += newN[i];
 //			}
-			int[] newN =  countDataForDeployment(projectName, aDeployment.deployment.getId(), dataPrefixes);
-			for (int i = 0; i < n.length; i++) {
-				n[i] += newN[i];
-			}
-		}
-		return n;
-	}
+//		}
+//		return n;
+//	}
 
 	/**
 	 * Count data within a deployment document which is associated with a set of datablocks
@@ -484,6 +528,57 @@ public class DBXMLQueries {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	/**
+	 * Get the basic information about a Detections document. This is basically everything apart from 
+	 * the actual detections themselves. 
+	 * @param aDoc
+	 * @return
+	 */
+	public Detections getDetectionsDocInfo(String detectionsDocName) {
+		String queryBase = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/Id\",\"Detections/Description\",\"Detections/DataSource\",\"Detections/Algorithm\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Id\",\"DetectionsDocName\"],\"optype\":\"binary\"}],\"enclose\":1}";
+		String query = queryBase.replace("DetectionsDocName", detectionsDocName);
+		DBQueryResult queryResult = executeQuery(query);
+		Document doc;
+		try {
+			doc = queryResult.getDocument();
+		} catch (ParserConfigurationException | SAXException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+//		System.out.println(queryResult.queryResult);
+		
+		Detections detections = new Detections();
+		try {
+			Helper.createRequiredElements(detections);
+		} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
+			e.printStackTrace();
+		}
+
+		NodeList returns = doc.getElementsByTagName("Result");
+		//		System.out.println("N projects = " + returns.getLength());
+		int n = returns.getLength();
+		if (n == 0) {
+			return null;
+		}
+		Element result = (Element) returns.item(0);
+		
+		DescriptionType description = detections.getDescription();
+		if (description == null) {
+			description = new DescriptionType();
+			detections.setDescription(description);
+		}
+		detections.setId(getElementData(result, "Id"));
+		description.setAbstract(getElementData(result, "Description.Abstract"));
+		description.setMethod(getElementData(result, "Description.Method"));
+		description.setObjectives(getElementData(result, "Description.Objectives"));
+		
+		
+		
+		// TODO Auto-generated method stub
+		return detections;
 	}
 
 }

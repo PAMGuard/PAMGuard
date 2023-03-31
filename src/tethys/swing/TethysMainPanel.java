@@ -55,9 +55,11 @@ public class TethysMainPanel extends TethysGUIPanel {
 		southEastPanel.add(detectionsExportPanel.getComponent(), BorderLayout.EAST);
 		splitPane.add(southwestSplit);
 		SwingUtilities.invokeLater(new Runnable() {
+			// these only work if called after display is visible
 			@Override
 			public void run() {
 				splitPane.setDividerLocation(0.5);
+				southwestSplit.setDividerLocation(0.5);
 			}
 		});
 	}
