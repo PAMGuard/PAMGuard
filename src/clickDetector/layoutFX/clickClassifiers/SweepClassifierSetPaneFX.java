@@ -1661,21 +1661,20 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			return true;
 		}
 
-//		@Override
-//		protected void enableControls() {
-//				checkMultiChan();
-//			
-//				enableBearings.setEnabled(multiChan);
-//				bearingsExcludeBox.setEnabled(multiChan);
-//				minBearing.setEnabled(multiChan);
-//				maxBearing.setEnabled(multiChan);
-//			
-//				if (!multiChan) return;
-//				
-//				bearingsExcludeBox.setEnabled(enableBearings.isSelected());
-//				minBearing.setEnabled(enableBearings.isSelected());
-//				maxBearing.setEnabled(enableBearings.isSelected());
-//		}
+		protected void enableControls() {
+				checkMultiChan();
+			
+				enableBearings.setEnabled(multiChan);
+				bearingsExcludeBox.setEnabled(multiChan);
+				minBearing.setEnabled(multiChan);
+				maxBearing.setEnabled(multiChan);
+			
+				if (!multiChan) return;
+				
+				bearingsExcludeBox.setEnabled(enableBearings.isSelected());
+				minBearing.setEnabled(enableBearings.isSelected());
+				maxBearing.setEnabled(enableBearings.isSelected());
+		}
 
 		@Override
 		protected void disbleControls(boolean disable) {
@@ -1708,7 +1707,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 //			}
 //		}
 //		else multiChan = true;
-////		Debug.out.println("Check multi-channel: " + multiChan);
+  		Debug.out.println("Check multi-channel: " + multiChan);
 		
 		return multiChan; 
 	}

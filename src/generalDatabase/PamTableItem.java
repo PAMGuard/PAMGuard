@@ -225,7 +225,10 @@ public class PamTableItem implements Cloneable {
 //	}
 	
 	public String getDeblankedStringValue() {
-		if (sqlType != Types.CHAR || value == null) {
+//		if (sqlType != Types.CHAR || value == null) {
+//			return null;
+//		}
+		if (value instanceof String == false) {
 			return null;
 		}
 		return ((String) value).trim();

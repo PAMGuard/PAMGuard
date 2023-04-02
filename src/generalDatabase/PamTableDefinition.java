@@ -13,7 +13,7 @@ import PamUtils.PamCalendar;
  * tables. Also used to prepare Sql statements for writing and
  * reading back data.
  * 
- * I did a bit of redifining what columns are used for on 4 Oct, 2012. 
+ * I did a bit of redefining what columns are used for on 4 Oct, 2012. 
  * PCLocalTime was a UTC time from the PC of the time analysis took place. 
  * When running in real time, this would be the same as the data in the UTC column
  * (give or take the odd second for data to get through the system). I've now defined

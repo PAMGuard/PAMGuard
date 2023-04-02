@@ -46,6 +46,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.io.comparator.NameFileComparator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -391,7 +392,7 @@ public class binaryUIDFunctions {
 //    			System.out.println("Warning - no " + filePrefix + " binary files found in " + binStore.getBinaryStoreSettings().getStoreLocation());
 				return maxUID;
 			}
-			Collections.sort(binFiles);
+			Collections.sort(binFiles, NameFileComparator.NAME_COMPARATOR);
 
 			// loop through the binary files from the last one to the first, and stop as
 			// soon as we find

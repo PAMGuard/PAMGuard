@@ -55,9 +55,19 @@ public class WavFileType extends File {
 	 * @return the audioInfo
 	 */
 	public AudioFormat getAudioInfo() {
+		if (audioInfo == null) {
+			audioInfo = getAudioFormat();
+		}
 		return audioInfo;
 	}
-	
+
+	/**
+	 * Get the audio format. 
+	 * @return the audio format.
+	 */
+	private AudioFormat getAudioFormat() {
+		return getAudioFormat(this);
+	}
 	
 	/**
 	 * Get the audio format. 

@@ -475,7 +475,6 @@ final public class PamModel implements PamModelInterface, PamSettings {
 			mi.setMaxNumber(1);
 		}		
 		
-
 		/*
 		 * ************* End Utilities  Group *******************
 		 */
@@ -1272,6 +1271,7 @@ final public class PamModel implements PamModelInterface, PamSettings {
 								String help = null;
 								int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help, e1);
 								System.err.println("Exception while loading " +	className);
+								System.err.println(e1.getMessage());								
 								continue;
 							}
 						}						

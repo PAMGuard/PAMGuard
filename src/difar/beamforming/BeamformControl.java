@@ -17,6 +17,7 @@ import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import PamController.fileprocessing.StoreStatus;
 import PamUtils.PamUtils;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
@@ -197,5 +198,6 @@ public class BeamformControl extends PamControlledUnit implements PamSettings, O
 		// TODO Auto-generated method stub
 		return beamformProcess;
 	}
+
 }
 	

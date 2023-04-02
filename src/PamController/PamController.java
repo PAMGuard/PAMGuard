@@ -59,6 +59,7 @@ import PamController.command.MultiportController;
 import PamController.command.NetworkController;
 import PamController.command.TerminalController;
 import PamController.command.WatchdogComms;
+import PamController.fileprocessing.ReprocessManager;
 import PamController.masterReference.MasterReferencePoint;
 import PamController.settings.output.xml.PamguardXMLWriter;
 import PamController.settings.output.xml.XMLWriterDialog;
@@ -119,6 +120,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	public static final int PAM_STALLED = 3;
 	public static final int PAM_INITIALISING = 4;
 	public static final int PAM_STOPPING = 5;
+	public static final int PAM_COMPLETE = 6;
 
 	// status' for RunMode = RUN_PAMVIEW
 	public static final int PAM_LOADINGDATA = 2;
@@ -705,7 +707,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 		Platform.exit();
 		
 		// terminate the JVM
-		System.exit(0);
+		System.exit(getPamStatus());
 	}
 
 	/**
@@ -1021,6 +1023,24 @@ public class PamController implements PamControllerInterface, PamSettings {
 		}
 		return foundUnits;
 	}
+	
+	/**
+	 * Get an Array list of PamControlledUnits of a particular class (exact matches only). 
+	 * @param unitClass PamControlledUnit class
+	 * @return List of current instances of this class. 
+	 */
+	public ArrayList<PamControlledUnit> findControlledUnits(Class unitClass, boolean includeSubClasses) {
+		if (includeSubClasses == false) {
+			return findControlledUnits(unitClass);
+		}
+		ArrayList<PamControlledUnit> foundUnits = new ArrayList<>();
+		for (int i = 0; i < getNumControlledUnits(); i++) {
+			if (unitClass.isAssignableFrom(pamControlledUnits.get(i).getClass())) {
+				foundUnits.add(pamControlledUnits.get(i));
+			}
+		}
+		return foundUnits;
+	}
 
 	/**
 	 * Check whether a controlled unit exists based on it's name. 
@@ -1189,6 +1209,23 @@ public class PamController implements PamControllerInterface, PamSettings {
 		boolean prepError = (runMode == PamController.RUN_NORMAL && prepErrors > 0);
 		if (prepError) {
 			return false;
+		}
+
+		/*
+		 * 
+		 * This needs to be called after prepareproces. 
+		 * Now we do some extra checks on the stores to see if we want to overwite data, 
+		 * carry on from where we left off, etc. 
+		 */
+		if (saveSettings && getRunMode() == RUN_NORMAL) { // only true on a button press or network start. 
+			ReprocessManager reprocessManager = new ReprocessManager();
+			boolean goonthen = reprocessManager.checkOutputDataStatus();
+			if (goonthen == false) {
+				System.out.println("Data processing will not start since you've chosen not to overwrite existing output data");
+				pamStop();
+				setPamStatus(PAM_IDLE);
+				return false;
+			}
 		}
 
 		if (saveSettings) {

@@ -29,6 +29,7 @@ import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamguardVersionInfo;
 import PamController.pamBuoyGlobals;
+import PamController.fileprocessing.ReprocessStoreChoice;
 import PamModel.SMRUEnable;
 import PamUtils.FileFunctions;
 import PamUtils.PamExceptionHandler;
@@ -249,6 +250,15 @@ public class Pamguard {
 				else if (anArg.equalsIgnoreCase(PamController.AUTOEXIT)) {
 					// auto exit at end of processing. 
 					GlobalArguments.setParam(PamController.AUTOEXIT, PamController.AUTOEXIT);
+				}
+				else if (anArg.equalsIgnoreCase(ReprocessStoreChoice.paramName)) {
+					String arg = args[iArg++];
+					ReprocessStoreChoice choice = ReprocessStoreChoice.valueOf(arg);
+					if (choice == null) {
+						String warn = String.format("Reprocessing storage input parameter %s value \"%s\" is not a recognised value", ReprocessStoreChoice.paramName, arg);
+						WarnOnce.showWarning("Invalid input parameter", warn, WarnOnce.WARNING_MESSAGE);
+					}
+					GlobalArguments.setParam(ReprocessStoreChoice.paramName, arg);
 				}
 				else if (anArg.equalsIgnoreCase("-help")) {
 					System.out.println("--PamGuard Help");
