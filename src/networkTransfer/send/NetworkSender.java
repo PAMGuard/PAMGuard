@@ -47,7 +47,7 @@ import PamguardMVC.PamDataBlock;
  */
 public class NetworkSender extends PamControlledUnit implements PamSettings {
 	
-	public static final String ADDRESS = "-newSend.address";
+	public static final String ADDRESS = "-netSend.address";
 	public static final String PORT = "-netSend.port";
 	public static final String ID1 = "-netSend.id1";
 	public static final String ID2 = "-netSend.id2";
