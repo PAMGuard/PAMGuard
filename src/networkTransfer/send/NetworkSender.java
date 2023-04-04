@@ -178,7 +178,7 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 		networkSendParams = ((NetworkSendParams) pamControlledUnitSettings.getSettings()).clone();
 		
 		String address = GlobalArguments.getParam(ADDRESS);
-		String portString = GlobalArguments.getParam(ADDRESS);
+		String portString = GlobalArguments.getParam(PORT);
 		String id1String = GlobalArguments.getParam(ID1);
 		String id2String = GlobalArguments.getParam(ID2);
 	
