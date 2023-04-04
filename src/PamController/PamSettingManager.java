@@ -1752,10 +1752,10 @@ public class PamSettingManager {
 			fIs.close();
 			fOs.close();
 		} catch (FileNotFoundException e) {
-			System.out.println(e.getMessage());
+			System.out.println("FileNotFound exception in PamSettingsManager: " + e.getMessage());
 			return false;
 		} catch (IOException e) {
-			System.out.println(e.getMessage());
+			System.out.println("IO exception in PamSettingsManager: " + e.getMessage());
 			return false;
 		}
 		return true;

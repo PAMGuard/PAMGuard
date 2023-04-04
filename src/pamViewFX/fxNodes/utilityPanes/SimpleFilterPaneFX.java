@@ -238,11 +238,13 @@ public class SimpleFilterPaneFX extends DynamicSettingsPane<FFTFilterParams>{
 	 * @param disable - true to disable the pane
 	 */
 	public void setDisableFilterPane(boolean disable){
-		highPass.setDisable(disable);
-		lowPass.setDisable(disable);
-		bandPass.setDisable(disable);
-		bandStop.setDisable(disable);
-		freqPane.setDisableFreqPane(disable);
+		mainPane.setDisable(disable);
+		
+//		highPass.setDisable(disable);
+//		lowPass.setDisable(disable);
+//		bandPass.setDisable(disable);
+//		bandStop.setDisable(disable);
+//		freqPane.setDisableFreqPane(disable);
 	}
 	
 	public double getSampleRate() {

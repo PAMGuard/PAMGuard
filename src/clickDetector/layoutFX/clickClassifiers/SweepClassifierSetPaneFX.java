@@ -51,11 +51,18 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JPanel;
 import PamController.SettingsPane;
 import PamUtils.PamUtils;
 import PamView.PamSymbol;
 import PamView.dialog.PamGridBagContraints;
 import PamView.symbol.SymbolData;
+import clickDetector.ClickControl;
 import clickDetector.ClickClassifiers.basicSweep.CodeHost;
 import clickDetector.ClickClassifiers.basicSweep.SweepClassifier;
 import clickDetector.ClickClassifiers.basicSweep.SweepClassifierSet;
@@ -237,10 +244,9 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			//create holder pane
 			borderPane=new PamBorderPane();
 			this.setCenter(borderPane);
-
+			
 			PamHBox hBox = new PamHBox();
 			hBox.setSpacing(5);
-
 
 			if (borderTitle != null) {
 				label=new Label(borderTitle); 
@@ -764,6 +770,8 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		 */
 		PamSpinner<Double> threshold;
 
+		private PamVBox vboxholder;
+
 
 		ClickLengthBox() {
 			super("Click Length", true);
@@ -882,10 +890,11 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 		@Override
 		protected void disbleControls(boolean disable) {
-			smoothing.setDisable(disable);
-			minLengthms.setDisable(disable);
-			maxLengthms.setDisable(disable);
-			threshold.setDisable(disable);
+			vboxholder.setDisable(disable);
+//			smoothing.setDisable(disable);
+//			minLengthms.setDisable(disable);
+//			maxLengthms.setDisable(disable);
+//			threshold.setDisable(disable);
 		}
 
 	}
@@ -929,13 +938,13 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			pamGridPane.setVgap(5);
 
 			Label freqLabel=new Label("Frequency (Hz)");
-			pamGridPane.add(freqLabel, 0, 0);
-			pamGridPane.add(new Label("Threshold (dB)"), 2, 0);
-			PamGridPane.setHalignment(freqLabel, HPos.CENTER);
-			PamGridPane.setColumnSpan(pamGridPane, 2);
-
-			//test band
-			pamGridPane.add(new Label("Test Band"), 0, 1);
+////			gridPaneHolder.add(freqLabel, 0, 0);
+////			gridPaneHolder.add(new Label("Threshold (dB)"), 2, 0);
+//			PamGridPane.setHalignment(freqLabel, HPos.CENTER);
+//			PamGridPane.setColumnSpan(gridPaneHolder, 2);
+//
+//			//test band
+//			gridPaneHolder.add(new Label("Test Band"), 0, 1);
 
 			testBandFreqPane=new FreqBandPane(Orientation.HORIZONTAL);
 			testBandFreqPane.setBandText("");
@@ -1094,6 +1103,9 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		private PamSpinner<Double> threshold;
 		private FreqBandPane searchRange;
 		private FreqBandPane meanFreq;
+		
+		//the main holder pane. 
+		private PamGridPane gridPaneHolder;
 
 		FrequencySearchBlock() {
 			super("Peak and Mean Frequency", true);
@@ -1176,14 +1188,12 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			addValidatorFreqCheck(getValidator(), peakWidthPane, "peak width ",  "peak_width");
 
 			gridy++;
-
 			pamGridPane.add(new Label(""), 1,gridy);
 
 			threshold=new PamSpinner<Double>(1., 300., 6.,1.);
 			threshold.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 			threshold.setPrefWidth(100);
 			GridPane.setMargin(threshold, new Insets(0,0,0,5)); //bit of a hack to make sure everything lines up nicely with the frequency pane. 
-
 			pamGridPane.add(threshold,2,gridy); 
 
 			pamGridPane.add(new Label("dB"), 3,gridy);
@@ -1216,8 +1226,6 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		@Override
 		protected void setParams() {
 			setEnableBox(sweepClassifierSet.enableEnergyBands);
-
-
 		}
 
 		@Override
@@ -1227,6 +1235,22 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		}
 
 		@Override
+//		protected void disbleControls(boolean disable) {
+//			this.gridPaneHolder.setDisable(disable);
+			
+//			peakFreqCheckBox.setDisable(enable);
+//			peakWidthCheckBox.setDisable(enable);
+//			meanFreqCheckBox.setDisable(enable);
+//
+//
+//			/**
+//			 * Pane to set frequency band range		 */
+//			peakFreqPane.setDisable(enable);
+//			smoothing.setDisable(enable);
+//			peakWidthPane.setDisable(enable);
+//			threshold.setDisable(enable);
+//			searchRange.setDisable(enable);
+//			meanFreq.setDisable(enable);
 		protected void disbleControls(boolean enable) {
 			peakFreqCheckBox.setDisable(enable);
 			peakWidthCheckBox.setDisable(enable);
@@ -1273,6 +1297,11 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		 * Spinner for the minimum zero crossing frequency sweep in kHz/ms
 		 */
 		private PamSpinner<Double> freqZeroMax;
+
+		/**
+		 * The main holder
+		 */
+		private PamGridPane gridPaneHolder;
 
 		ZeroCrossingsBox() {
 			super("Zero Crossings", true);
@@ -1600,22 +1629,23 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			p.setLayout(new GridBagLayout());
 			GridBagConstraints c = new PamGridBagContraints();
 			
-			c.gridx = 0;
-			addComponent(p, enableBearings, c);
-			c.gridx += c.gridwidth;
-			addComponent(p, bearingsExcludeBox, c);
-			c.gridx += c.gridwidth;
-			addComponent(p, new JLabel("bearings between ", JLabel.RIGHT), c);
-			c.gridx += c.gridwidth;
-			addComponent(p, minBearing, c);
-			c.gridx += c.gridwidth;
-			addComponent(p, new JLabel(" and ", JLabel.RIGHT), c);
-			c.gridx += c.gridwidth;
-			addComponent(p, maxBearing, c);
-			c.gridx += c.gridwidth;
-			addComponent(p, new JLabel("(\u00B0)", JLabel.LEFT), c);
 
-			add(BorderLayout.WEST, p);
+//			c.gridx = 0;
+//			addComponent(p, enableBearings, c);
+//			c.gridx += c.gridwidth;
+//			addComponent(p, bearingsExcludeBox, c);
+//			c.gridx += c.gridwidth;
+//			addComponent(p, new JLabel("bearings between ", JLabel.RIGHT), c);
+//			c.gridx += c.gridwidth;
+//			addComponent(p, minBearing, c);
+//			c.gridx += c.gridwidth;
+//			addComponent(p, new JLabel(" and ", JLabel.RIGHT), c);
+//			c.gridx += c.gridwidth;
+//			addComponent(p, maxBearing, c);
+//			c.gridx += c.gridwidth;
+//			addComponent(p, new JLabel("(\u00B0)", JLabel.LEFT), c);
+//
+//			add(BorderLayout.WEST, p);
 			
 			this.multiChan = checkMultiChan();
 
@@ -1661,7 +1691,6 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			return true;
 		}
 
-		@Override
 		protected void enableControls() {
 				checkMultiChan();
 			
@@ -1692,22 +1721,22 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 	private boolean checkMultiChan() {
 		boolean multiChan = false; 
 		//do we have multi-channel clicks?
-		if  (clickControl!=null) {
-			int[] chanGroups = clickControl.getClickParameters().getGroupedSourceParameters().getChannelGroups();
-			multiChan = false;
-			
-			if (chanGroups==null) return multiChan; 
-			
-			for (int i=0; i<chanGroups.length; i++) {
-				int chans = clickControl.getClickParameters().getGroupedSourceParameters().getGroupChannels(i);
-//				Debug.out.println("Check multi-channel: " + chanGroups[i] + "  num: " + PamUtils.getNumChannels(chans));
-				if (PamUtils.getNumChannels(chans)>1) {
-					multiChan = true;
-					break; 
-				}
-			}
-		}
-		else multiChan = true;
+//		if  (clickControl!=null) {
+//			int[] chanGroups = clickControl.getClickParameters().getGroupedSourceParameters().getChannelGroups();
+//			multiChan = false;
+//			
+//			if (chanGroups==null) return multiChan; 
+//			
+//			for (int i=0; i<chanGroups.length; i++) {
+//				int chans = clickControl.getClickParameters().getGroupedSourceParameters().getGroupChannels(i);
+////				Debug.out.println("Check multi-channel: " + chanGroups[i] + "  num: " + PamUtils.getNumChannels(chans));
+//				if (PamUtils.getNumChannels(chans)>1) {
+//					multiChan = true;
+//					break; 
+//				}
+//			}
+//		}
+//		else multiChan = true;
 //		Debug.out.println("Check multi-channel: " + multiChan);
 		
 		return multiChan; 
@@ -1833,11 +1862,18 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 	}
 
 
-
 	private boolean showWarning(String string, String string2) {
 		//PamController.getInstance();
 		PamDialogFX.showWarning(null, string, string2);
 		return false;
+	}
+	
+	/**
+	 * Get the click control associated with the classifier. 
+	 * @return the click control. 
+	 */
+	public ClickControl getClickControl() {
+		return this.sweepClassifier.getClickDetector().getClickControl();
 	}
 
 

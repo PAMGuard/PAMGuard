@@ -94,7 +94,7 @@ public class PlaySound extends AlarmAction implements PamSettings {
 			double secs = fl/sr*1000;
 		}
 		catch (Exception e) {
-			System.out.println(e.getMessage());
+			System.out.println("Error in PlaySound.playSound:" + e.getMessage());
 			return false;
 		}
 		return true;
@@ -114,10 +114,10 @@ public class PlaySound extends AlarmAction implements PamSettings {
 			System.out.println(f.getMessage());
 			return currentClip = null;
 		} catch (IOException e) {
-			System.out.println(e.getMessage());
+			System.out.println("IOError in PlaySound.prepareClip: " + e.getMessage());
 			return currentClip = null;
 		} catch (LineUnavailableException e) {
-			System.out.println(e.getMessage());
+			System.out.println("LineUnavailableException in PlaySound.prepareClip: " + e.getMessage());
 			return currentClip = null;
 		}
 		currentFile = soundFile;		

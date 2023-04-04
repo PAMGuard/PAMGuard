@@ -75,79 +75,81 @@ public class DLImageTransformPane  extends PamBorderPane {
 		if (getDLTransforms()==null) return;
 
 		//System.out.println("Set transforms: " + sampleRate);
+		
+		/****This was way too much hassle in bugs than it was worth****/
 
 		//OK so when we change samplerates massively e.g. from bat to right whale we could technically use the 
 		//same transforms but this can cause weird issues - for example upsampling a 2s right whale call to 256000 Hz is 
 		//not pretty. So just be nice to the user and set a few default 
 
-		ArrayList<DLTransform> transforms =  getDLTransforms(); 
-		WaveTransform waveTransForm ;
-		FreqTransform freqTranform ;
+//		ArrayList<DLTransform> transforms =  getDLTransforms(); 
+//		WaveTransform waveTransForm ;
+//		FreqTransform freqTranform ;
 
-		//extra things that may need changed...
-		for (DLTransform dlTransfrom:  transforms) {
-			switch (dlTransfrom.getDLTransformType()) {
-			case DECIMATE:
-				waveTransForm = ((WaveTransform)  dlTransfrom);
-				
-				//change if the example sample rate is higher to if there is a large differenc in sample rates and decimation. 
-				if (exampleSound.getSampleRate()<waveTransForm.getParams()[0].floatValue() 
-						|| exampleSound.getSampleRate()/waveTransForm.getParams()[0].floatValue()>4) {
-					waveTransForm.setParams(new Number[] {exampleSound.getSampleRate()}); //set the correct samplerate
-					dlTransformPane.getDLTransformPanes().get(transforms.indexOf(dlTransfrom)).setParams(waveTransForm);
-				}
-				break;
-			case PREEMPHSIS:
-				waveTransForm = ((WaveTransform)  dlTransfrom);
-				if (exampleSound.getSampleRate()<10000 && waveTransForm.getParams()[0].doubleValue()>0.1) {
-					waveTransForm.setParams(new Number[] {0.1}); //set the correct samplerate
-					dlTransformPane.getDLTransformPanes().get(transforms.indexOf(dlTransfrom)).setParams(waveTransForm);
-				}
-				break;
-			case SPEC2DB:
-				break;
-			case SPECCLAMP:
-				break;
-			case SPECCROPINTERP:
-
-				freqTranform = ((FreqTransform)  dlTransfrom);
-				Number[] params = freqTranform.getParams();
-				
-				double highestFreq = exampleSound.getSampleRate()/2; //nyquist
-
-				if (params[0].doubleValue()>=highestFreq) params[0]=0.0;
-
-				//this will break stuff if interp frequency is greater than nyquist
-				if (params[1].doubleValue()>highestFreq) {
-//					System.out.println("----HERE 1----");
-					params[1]=highestFreq; //nyquist
-				}
-				//if we switch to a high frequency want to the interp not to just select the lowest band
-				
-//				else if (params[1].doubleValue()<highestFreq/10) {
-////					System.out.println("----HERE 2----" + exampleSound.getSampleRate()/10.0 + "  " + params[1].doubleValue());
+//		//extra things that may need changed...
+//		for (DLTransform dlTransfrom:  transforms) {
+//			switch (dlTransfrom.getDLTransformType()) {
+//			case DECIMATE:
+//				waveTransForm = ((WaveTransform)  dlTransfrom);
+//				
+//				//change if the example sample rate is higher to if there is a large differenc in sample rates and decimation. 
+//				if (exampleSound.getSampleRate()<waveTransForm.getParams()[0].floatValue() 
+//						|| exampleSound.getSampleRate()/waveTransForm.getParams()[0].floatValue()>4) {
+//					waveTransForm.setParams(new Number[] {exampleSound.getSampleRate()}); //set the correct samplerate
+//					dlTransformPane.getDLTransformPanes().get(transforms.indexOf(dlTransfrom)).setParams(waveTransForm);
+//				}
+//				break;
+//			case PREEMPHSIS:
+//				waveTransForm = ((WaveTransform)  dlTransfrom);
+//				if (exampleSound.getSampleRate()<10000 && waveTransForm.getParams()[0].doubleValue()>0.1) {
+//					waveTransForm.setParams(new Number[] {0.1}); //set the correct samplerate
+//					dlTransformPane.getDLTransformPanes().get(transforms.indexOf(dlTransfrom)).setParams(waveTransForm);
+//				}
+//				break;
+//			case SPEC2DB:
+//				break;
+//			case SPECCLAMP:
+//				break;
+//			case SPECCROPINTERP:
+//
+//				freqTranform = ((FreqTransform)  dlTransfrom);
+//				Number[] params = freqTranform.getParams();
+//				
+//				double highestFreq = exampleSound.getSampleRate()/2; //nyquist
+//
+//				if (params[0].doubleValue()>=highestFreq) params[0]=0.0;
+//
+//				//this will break stuff if interp frequency is greater than nyquist
+//				if (params[1].doubleValue()>highestFreq) {
+////					System.out.println("----HERE 1----");
 //					params[1]=highestFreq; //nyquist
 //				}
-
-				//System.out.println("Interp params: " + params[0] + "  " + params[1] + "  " + params[2]); 
-				freqTranform.setParams(params);
-
-				dlTransformPane.getDLTransformPanes().get(transforms.indexOf(dlTransfrom)).setParams(freqTranform);
-
-				break;
-			case SPECNORMALISE:
-				break;
-			case SPECNORMALISEROWSUM:
-				break;
-			case SPECTROGRAM:
-				break;
-			case TRIM:
-				break;
-			default:
-				break;
-
-			}
-		}
+//				//if we switch to a high frequency want to the interp not to just select the lowest band
+//				
+////				else if (params[1].doubleValue()<highestFreq/10) {
+//////					System.out.println("----HERE 2----" + exampleSound.getSampleRate()/10.0 + "  " + params[1].doubleValue());
+////					params[1]=highestFreq; //nyquist
+////				}
+//
+//				//System.out.println("Interp params: " + params[0] + "  " + params[1] + "  " + params[2]); 
+//				freqTranform.setParams(params);
+//
+//				dlTransformPane.getDLTransformPanes().get(transforms.indexOf(dlTransfrom)).setParams(freqTranform);
+//
+//				break;
+//			case SPECNORMALISE:
+//				break;
+//			case SPECNORMALISEROWSUM:
+//				break;
+//			case SPECTROGRAM:
+//				break;
+//			case TRIM:
+//				break;
+//			default:
+//				break;
+//
+//			}
+//		}
 	}
 
 
