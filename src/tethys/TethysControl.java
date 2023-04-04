@@ -121,14 +121,52 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 //				tethysExport(parentFrame);
 //			}
 //		});
-		JMenuItem openClient = new JMenuItem("Open client in browser");
-		openClient.addActionListener(new ActionListener() {
+		JMenuItem menuItem;
+		menuItem = new JMenuItem("Open client in browser");
+		menuItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				openTethysClient();
 			}
 		});
-		tethysMenu.add(openClient);
+		tethysMenu.add(menuItem);
+		
+		JMenuItem collections = new JMenu("Collections");
+		
+		menuItem = new JMenuItem("Open Deployments collection in browser");
+		menuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				openTethysCollection("Deployments");
+			}
+		});
+		collections.add(menuItem);
+		menuItem = new JMenuItem("Open Detections collection in browser");
+		menuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				openTethysCollection("Detections");
+			}
+		});
+		collections.add(menuItem);
+		menuItem = new JMenuItem("Open Calibrations collection in browser");
+		menuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				openTethysCollection("Calibrations");
+			}
+		});
+		collections.add(menuItem);
+		menuItem = new JMenuItem("Open Species Abbreviations collection in browser");
+		menuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				openTethysCollection("SpeciesAbbreviations");
+			}
+		});
+		collections.add(menuItem);
+		tethysMenu.add(collections);
+		tethysMenu.addSeparator();
 		JMenuItem showDeps = new JMenuItem("Show project deployments");
 		showDeps.addActionListener(new ActionListener() {
 			@Override
@@ -198,7 +236,31 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	 * open client in the default web browser
 	 */
 	public void openTethysClient() {
-		String urlString = tethysExportParams.getFullServerName() + "/Client";
+//		String urlString = tethysExportParams.getFullServerName() + "/Client";
+//		System.out.println("Opening url " + urlString);
+//		URL url = null;
+//		try {
+//			url = new URL(urlString);
+//		} catch (MalformedURLException e) {
+//			e.printStackTrace();
+//		}
+//		if (url == null) {
+//			return;
+//		}
+//		try {
+//			Desktop.getDesktop().browse(url.toURI());
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		} catch (URISyntaxException e) {
+//			e.printStackTrace();
+//		}
+		openTethysCollection("Client");
+	}
+	/**
+	 * open client in the default web browser
+	 */
+	public void openTethysCollection(String collectionName) {
+		String urlString = tethysExportParams.getFullServerName() + "/" + collectionName;
 		System.out.println("Opening url " + urlString);
 		URL url = null;
 		try {
