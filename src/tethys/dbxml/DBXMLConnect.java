@@ -4,28 +4,20 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.xml.bind.JAXBException;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import dbxml.JerseyClient;
 import dbxml.Queries;
 import dbxml.uploader.Importer;
-import nilus.Deployment;
 import nilus.MarshalXML;
 import tethys.TethysControl;
 import tethys.output.TethysExportParams;
-import tethys.output.StreamExportParams;
-import PamguardMVC.PamDataBlock;
 
 /**
  * Class containing functions for managing the database connection. Opening, closing,
- * writing, keeping track of performance, etc. 
+ * writing, keeping track of performance, etc.
  * @author Doug Gillespie, Katie O'Laughlin
  *
  */
@@ -33,23 +25,23 @@ public class DBXMLConnect {
 
 	private TethysControl tethysControl;
 	private File tempDirectory;
-	
+
 	private JerseyClient jerseyClient;
-	
+
 	private Queries queries;
-	
+
 	private String currentSiteURL;
-			
+
 	public DBXMLConnect(TethysControl tethysControl) {
 		this.tethysControl = tethysControl;
 
 		checkTempFolder();
-		
+
 	}
-	
+
 	/**
 	 * Check the jersey client and the queries. Need to recreate
-	 * if the url has changed. 
+	 * if the url has changed.
 	 * @return
 	 */
 	private boolean checkClient() {
@@ -57,34 +49,34 @@ public class DBXMLConnect {
 			return false;
 		}
 		TethysExportParams params = tethysControl.getTethysExportParams();
-		if (currentSiteURL.equalsIgnoreCase(params.getFullServerName()) == false) {
+		if (!currentSiteURL.equalsIgnoreCase(params.getFullServerName())) {
 			return false;
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Get the client. The client will only be recreated if the url changes
 	 * @return Jersy client
 	 */
 	public synchronized  JerseyClient getJerseyClient() {
-		if (checkClient() == false) {
+		if (!checkClient()) {
 			openConnections();
 		}
 		return jerseyClient;
 	}
-	
+
 	/**
-	 * Get the Queries object. This will only be recreated if the client changes. 
+	 * Get the Queries object. This will only be recreated if the client changes.
 	 * @return
 	 */
 	public synchronized  Queries getTethysQueries() {
-		if (checkClient() == false) {
+		if (!checkClient()) {
 			openConnections();
 		}
 		return queries;
 	}
-	
+
 	/**
 	 * Update a document within Tethys. We're assuming that a
 	 * document with the same name in the same collection already
@@ -95,13 +87,13 @@ public class DBXMLConnect {
 	 */
 	public String updateDocument(Object nilusDocument) {
 		deleteDocument(nilusDocument);
-		return postToTethys(nilusDocument);		
+		return postToTethys(nilusDocument);
 	}
-	
+
 	/**
-	 * Delete a nilus document from the database. The only field which 
+	 * Delete a nilus document from the database. The only field which
 	 * needs to be populated here is the Id. The code also uses the object
-	 * class to identify the correct collection. 
+	 * class to identify the correct collection.
 	 * @param nilusDocument
 	 * @return
 	 */
@@ -115,7 +107,7 @@ public class DBXMLConnect {
 			result = jerseyClient.removeDocument(collection, docId );
 			/**
 			 * Return from a sucessful delete is something like
-			 * 
+			 *
 				deployment = getTethysControl().getDeploymentHandler().createDeploymentDocument(freeId++, recordPeriod);
 				<DELETE>
   <ITEM> ['ECoastNARW0'] </ITEM>
@@ -123,19 +115,19 @@ public class DBXMLConnect {
 			 */
 		}
 		catch (Exception e) {
-			System.out.printf("Error deleting %s %s: %s\n", collection, docId, e.getMessage());	
+			System.out.printf("Error deleting %s %s: %s\n", collection, docId, e.getMessage());
 		}
-		forceFlush();
+//		forceFlush();
 		return result == null;
 	}
-	
+
 	/**
 	 * take a nilus object loaded with PamGuard data and post it to the Tethys database
-	 * 
+	 *
 	 * @param pamGuardObjs a nilus object loaded with PamGuard data
 	 * @return error string, null string means there are no errors
 	 */
-	public String postToTethys(Object nilusObject) 
+	public String postToTethys(Object nilusObject)
 	{
 		Class objClass = nilusObject.getClass();
 		String collection = getTethysCollection(objClass.getName());
@@ -146,14 +138,14 @@ public class DBXMLConnect {
 		File tempFile = new File(tempName);
 		try {
 			MarshalXML marshal = new MarshalXML();
-			marshal.createInstance(objClass);	
+			marshal.createInstance(objClass);
 //				Path tempFile = Files.createTempFile("pamGuardToTethys", ".xml");
 				marshal.marshal(nilusObject, tempFile.toString());
 				fileError = Importer.ImportFiles(params.getFullServerName(), collection,
 						new String[] { tempFile.toString() }, "", "", false);
 
 //				System.out.println(fileError);
-				
+
 				tempFile.deleteOnExit();
 		} catch(IllegalArgumentException e) {
 			// TODO Auto-generated catch block
@@ -164,55 +156,55 @@ public class DBXMLConnect {
 		} catch (JAXBException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}	
+		}
 //		System.out.println(fileError);
 		return fileError;
 	}
-	
 
-	/*
-	 * force a fluch by sending a dummy document to th eimporter which will rail, but ...
-	 */
-	private void forceFlush() {
-		TethysExportParams params = new TethysExportParams();
-		String fileError = null;
-		try {
-		fileError = Importer.ImportFiles(params.getFullServerName(), "NoCollection",
-				new String[] { "ThereIsNoFileE" }, "", "", false);
-		}
-		catch (Exception e) {
-			
-		}
-//		System.out.println(fileError);
-		
-	}
-	
+
+//	/*
+//	 * force a fluch by sending a dummy document to th eimporter which will rail, but ...
+//	 */
+//	private void forceFlush() {
+//		TethysExportParams params = new TethysExportParams();
+//		String fileError = null;
+//		try {
+//		fileError = Importer.ImportFiles(params.getFullServerName(), "NoCollection",
+//				new String[] { "ThereIsNoFileE" }, "", "", false);
+//		}
+//		catch (Exception e) {
+//
+//		}
+////		System.out.println(fileError);
+//
+//	}
+
 	/**
-	 * Get a temp folder to hold xml output. This will be the standard 
+	 * Get a temp folder to hold xml output. This will be the standard
 	 * temp folder + /PAMGuardTethys. Files will be left here until PAMGUard
-	 * exits then should delete automatically  
+	 * exits then should delete automatically
 	 */
 	private void checkTempFolder() {
 			String javaTmpDirs = System.getProperty("java.io.tmpdir") + File.separator + "PAMGuardTethys";
-			
+
 			File tempDir = new File(javaTmpDirs);
-			if (tempDir.exists() == false) {
+			if (!tempDir.exists()) {
 				tempDir.mkdirs();
 			}
 			if (tempDir.exists()) {
 				tempDirectory = tempDir;
-			};
+			}
 			if (tempDirectory == null) {
 				tempDirectory = new File(System.getProperty("java.io.tmpdir"));
 			}
-		
+
 	}
 
 	/**
 	 * Get a document Id string. All Document objects should have a getId() function
 	 * however they do not have a type hierarchy, so it can't be accessed directly.
-	 * instead go via the class.getDeclaredMethod function and it should be possible to find 
-	 * it. 
+	 * instead go via the class.getDeclaredMethod function and it should be possible to find
+	 * it.
 	 * @param nilusObject
 	 * @return document Id for any type of document, or null if the document doesn't have a getID function
 	 */
@@ -235,7 +227,7 @@ public class DBXMLConnect {
 	}
 
 	/**
-	 * needs to be based on the document id, 
+	 * needs to be based on the document id,
 	 * @param nilusObject
 	 * @return
 	 */
@@ -256,29 +248,29 @@ public class DBXMLConnect {
 	 */
 	public String getTethysCollection(String className) {
 		switch(className) {
-			case "nilus.Deployment": 
-				return "Deployments";				
-			case "nilus.Detections": 
+			case "nilus.Deployment":
+				return "Deployments";
+			case "nilus.Detections":
 				return "Detections";
-			case "nilus.Calibration": 
-				return "Calibrations";				
-			case "nilus.Ensemble": 
-				return "Ensembles";			
-			case "nilus.Localization": 
-				return "Localizations";				
-			case "nilus.SpeciesAbbreviation": 
-				return "SpeciesAbbreviations";				
-			case "nilus.SourceMap": 
-				return "SourceMaps";				
-			case "nilus.ITIS": 
-				return "ITIS";							
-			case "nilus.ranks": 
+			case "nilus.Calibration":
+				return "Calibrations";
+			case "nilus.Ensemble":
+				return "Ensembles";
+			case "nilus.Localization":
+				return "Localizations";
+			case "nilus.SpeciesAbbreviation":
+				return "SpeciesAbbreviations";
+			case "nilus.SourceMap":
+				return "SourceMaps";
+			case "nilus.ITIS":
+				return "ITIS";
+			case "nilus.ranks":
 				return "ITIS_ranks";
-			default: 
-				return "";									
+			default:
+				return "";
 		}
 	}
-	
+
 	/**
 	 * Delete a Deploymnet and any contained Detections document. Doesn't work !
 	 * @param deploymentId
@@ -301,7 +293,7 @@ public class DBXMLConnect {
 //			}
 //		}
 		try {
-			String doc = queries.getDocument("Deployments", deploymentId);
+//			String doc = queries.getDocument("Deployments", deploymentId);
 //			queries.
 			result = jerseyClient.removeDocument("Deployments", deploymentId );
 		}
@@ -319,9 +311,29 @@ public class DBXMLConnect {
 		jerseyClient = new JerseyClient(currentSiteURL);
 		queries = new Queries(jerseyClient);
 		ServerStatus state = pingServer();
+
+		setCache(false);
+
 		return state.ok;
 	}
-	
+
+
+	private void setCache(boolean cacheOn) {
+		// from Marie. 4/4/2022: Basically it is a PUT to http://localhost:9979/Tethys/cache/off  (or on).
+		TethysExportParams params = tethysControl.getTethysExportParams();
+
+		String cmd = String.format("curl -X PUT -data \"\" %s/Tethys/cache/%s", params.getFullServerName(), cacheOn ? "on" : "off");
+		System.out.println(cmd);
+		try {
+			Runtime.getRuntime().exec(cmd);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+//		CUrl curl = new CUrl(cmd);
+
+	}
+
 	public synchronized void closeConnections() {
 		jerseyClient = null;
 		queries = null;
@@ -329,8 +341,8 @@ public class DBXMLConnect {
 	}
 
 	/**
-	 * Get the server state via a ping ? 
-	 * @return Server state ? 
+	 * Get the server state via a ping ?
+	 * @return Server state ?
 	 */
 	public ServerStatus pingServer() {
 
@@ -344,7 +356,7 @@ public class DBXMLConnect {
 		return new ServerStatus(ok, null);
 	}
 
-	
-	// add whatever calls are necessary ... 
+
+	// add whatever calls are necessary ...
 
 }

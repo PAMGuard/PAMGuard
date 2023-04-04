@@ -14,11 +14,11 @@ import org.xml.sax.SAXException;
 public class DBQueryResult {
 
 	public long queryTimeMillis;
-	
+
 	public String queryResult;
-	
+
 	public String schemaPlan;
-	
+
 	public Exception queryException;
 
 	public DBQueryResult(long queryTimeMillis, String queryResult, String schemaPlan) {
@@ -33,9 +33,9 @@ public class DBQueryResult {
 		this.queryTimeMillis = queryTimeMillis;
 		this.queryException = queryException;
 	}
-	
+
 	/**
-	 * Get the result as an XML document. 
+	 * Get the result as an XML document.
 	 * @return XML document
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
@@ -58,5 +58,5 @@ public class DBQueryResult {
 		Document doc = builder.parse(new InputSource(new StringReader(queryResult)));
 		return doc;
 	}
-	
+
 }

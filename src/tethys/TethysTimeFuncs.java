@@ -14,7 +14,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import PamUtils.PamCalendar;
 
 public class TethysTimeFuncs {
-	
+
 	private static TimeZone timeZone = TimeZone.getTimeZone("UTC");
 
 	/*
@@ -33,9 +33,9 @@ public class TethysTimeFuncs {
             return null;
         }
 	}
-	
+
 	/**
-	 * Convert a Gregorian calendar value back to milliseconds. 
+	 * Convert a Gregorian calendar value back to milliseconds.
 	 * @param xmlGregorian
 	 * @return
 	 */
@@ -47,9 +47,9 @@ public class TethysTimeFuncs {
 	    gc2.setTimeZone(timeZone);
 		return gc2.getTimeInMillis();
 	}
-	
+
 	/**
-	 * Make a Gregorian calendar object from a returned XML string. 
+	 * Make a Gregorian calendar object from a returned XML string.
 	 * @param gregorianString
 	 * @return
 	 */
@@ -75,7 +75,7 @@ public class TethysTimeFuncs {
 ////		gCal.se
 //		return gCal;
 	}
-	
+
 	public static String formatGregorianTime(XMLGregorianCalendar gregCal) {
 		if (gregCal == null) {
 			return null;

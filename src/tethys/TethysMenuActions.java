@@ -12,11 +12,11 @@ import javax.swing.JPopupMenu;
 import tethys.niluswraps.PDeployment;
 
 /*
- * Some standard meny dirven functions which we may want to call from 
- * a few different places. 
+ * Some standard meny dirven functions which we may want to call from
+ * a few different places.
  */
 public class TethysMenuActions {
-	
+
 	private TethysControl tethysControl;
 
 	public TethysMenuActions(TethysControl tethysControl) {

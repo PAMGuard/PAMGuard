@@ -29,7 +29,10 @@ public class StreamExportParams implements Serializable {
 	
 	public GranularityEnumType granularity = GranularityEnumType.CALL;
 	
-	public nilus.DescriptionType detectionDescription;
+	/*
+	 * Can't have this here since it isn't serializable. 
+	 */
+	transient public nilus.DescriptionType detectionDescription;
 
 	public DescriptionType getDetectionDescription() {
 		if (detectionDescription == null) {

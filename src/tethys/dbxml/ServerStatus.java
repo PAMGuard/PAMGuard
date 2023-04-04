@@ -1,9 +1,9 @@
 package tethys.dbxml;
 
 public class ServerStatus {
-	
+
 	public boolean ok;
-	
+
 	public Exception error;
 
 	public ServerStatus(boolean ok, Exception error) {
@@ -11,7 +11,7 @@ public class ServerStatus {
 		this.ok = ok;
 		this.error = error;
 	}
-	
+
 	public String getFormatted() {
 		if (ok) {
 			return "Server OK";
@@ -30,6 +30,6 @@ public class ServerStatus {
 	public String toString() {
 		return getFormatted();
 	}
-	
+
 
 }

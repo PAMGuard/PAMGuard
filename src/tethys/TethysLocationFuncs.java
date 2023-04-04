@@ -5,18 +5,16 @@ import Array.HydrophoneLocator;
 import Array.PamArray;
 import Array.Streamer;
 import GPS.GPSControl;
-import GPS.GpsData;
 import GPS.GpsDataUnit;
 import PamUtils.LatLong;
 import PamUtils.PamUtils;
-import PamguardMVC.PamDataUnit;
 import generalDatabase.DBControlUnit;
 import generalDatabase.PamConnection;
 import nilus.Deployment;
 import nilus.DeploymentRecoveryDetails;
 
 /**
- * Function(s) to get location information for Tethys in the required format. 
+ * Function(s) to get location information for Tethys in the required format.
  * @author dg50
  *
  */
@@ -25,10 +23,10 @@ public class TethysLocationFuncs {
 
 	/**
 	 * Get everything we need for a deployment document including the track #
-	 * and the deployment / recovery information. Basically this means we 
-	 * have to load the GPS data, then potentially filter it. Slight risk this 
-	 * may all be too much for memory, but give it a go by loading GPS data for 
-	 * the deployment times. 
+	 * and the deployment / recovery information. Basically this means we
+	 * have to load the GPS data, then potentially filter it. Slight risk this
+	 * may all be too much for memory, but give it a go by loading GPS data for
+	 * the deployment times.
 	 * @param deployment
 	 */
 	public static void getTrackAndPositionData(Deployment deployment) {
@@ -41,16 +39,16 @@ public class TethysLocationFuncs {
 		boolean ok = true;
 		ok &= addPositionData(deployment.getDeploymentDetails());
 		ok &= addPositionData(deployment.getRecoveryDetails());
-		
+
 	}
-	
+
 	/**
-	 * Add position data to DeploymentRecoveryDetails. 
+	 * Add position data to DeploymentRecoveryDetails.
 	 * @param drd
 	 * @return
 	 */
 	public static boolean addPositionData(DeploymentRecoveryDetails drd) {
-		long timeMillis = TethysTimeFuncs.millisFromGregorianXML(drd.getAudioTimeStamp()); 
+		long timeMillis = TethysTimeFuncs.millisFromGregorianXML(drd.getAudioTimeStamp());
 		LatLong pos = getLatLongData(timeMillis);
 		if (pos == null) {
 			return false;
@@ -61,15 +59,15 @@ public class TethysLocationFuncs {
 		drd.setDepthInstrumentM(-pos.getHeight());
 		return true;
 	}
-	
+
 	public static LatLong getLatLongData(long timeMillis) {
-		// check the array time. 
+		// check the array time.
 		PamArray array = ArrayManager.getArrayManager().getCurrentArray();
 		Streamer aStreamer = array.getStreamer(0);
 		GPSControl gpsControl = GPSControl.getGpsControl();
 		PamConnection con = DBControlUnit.findConnection();
 		if (gpsControl != null) {
-//			check GPS data are loaded for times around this. 
+//			check GPS data are loaded for times around this.
 			GpsDataUnit gpsData = (GpsDataUnit) gpsControl.getGpsDataBlock().getLogging().findClosestDataPoint(con, timeMillis);
 			if (gpsData != null) {
 				return gpsData.getGpsData();

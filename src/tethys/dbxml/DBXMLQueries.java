@@ -29,7 +29,6 @@ import nilus.Detections;
 import nilus.Helper;
 import tethys.TethysControl;
 import tethys.TethysTimeFuncs;
-import tethys.niluswraps.PDeployment;
 import tethys.output.TethysExportParams;
 
 /**
@@ -42,7 +41,7 @@ public class DBXMLQueries {
 
 	private TethysControl tethysControl;
 	private DBXMLConnect dbXMLConnect;
-	
+
 	public DBXMLQueries(TethysControl tethysControl, DBXMLConnect dbXMLConnect) {
 		super();
 		this.tethysControl = tethysControl;
@@ -75,7 +74,7 @@ public class DBXMLQueries {
 //			String url = jerseyClient.getURL();
 
 			Queries queries = new Queries(jerseyClient);
-			
+
 			queryResult = jerseyClient.queryJSON(jsonQueryString, 0);
 			schemaPlan = jerseyClient.queryJSON(jsonQueryString, 1);
 
@@ -114,26 +113,33 @@ public class DBXMLQueries {
 		if (doc == null) {
 			return null;
 		}
-		NodeList returns = doc.getElementsByTagName("Return");
+		NodeList returns = doc.getElementsByTagName("Project");
 		//		System.out.println("N projects = " + returns.getLength());
 		int n = returns.getLength();
 		for (int i = 0; i < n; i++) {
 			Node aNode = returns.item(i);
-			if (aNode instanceof Element) {
-				Node depEl = ((Element) aNode).getFirstChild();
-				if (depEl == null) {
-					continue;
-				}
-				if (depEl instanceof Element) {
-					Element projEl = (Element) ((Element) depEl).getFirstChild();
-					String projName = projEl.getTextContent();
-					if (projName != null) {
-						if (!projectNames.contains(projName)) {
-							projectNames.add(projName);
-						}
-					}
+			String projName = aNode.getTextContent();
+			if (projName != null) {
+				if (!projectNames.contains(projName)) {
+					projectNames.add(projName);
 				}
 			}
+//		}
+//			if (aNode instanceof Element) {
+//				Node depEl = ((Element) aNode).getFirstChild();
+//				if (depEl == null) {
+//					continue;
+//				}
+//				if (depEl instanceof Element) {
+//					Element projEl = (Element) ((Element) depEl).getFirstChild();
+//					String projName = projEl.getTextContent();
+//					if (projName != null) {
+//						if (!projectNames.contains(projName)) {
+//							projectNames.add(projName);
+//						}
+//					}
+//				}
+//			}
 		}
 
 		Collections.sort(projectNames);
@@ -142,9 +148,9 @@ public class DBXMLQueries {
 	}
 
 	/**
-	 * Get some basic (not all) data for deployments associated with a project. Note that 
+	 * Get some basic (not all) data for deployments associated with a project. Note that
 	 * this may include deployments which are NOT part of the current dataset. That requires
-	 * a search on Instrument as well. 
+	 * a search on Instrument as well.
 	 * @param projectName
 	 * @return
 	 */
@@ -164,20 +170,25 @@ public class DBXMLQueries {
 		if (doc == null) {
 			return null;
 		}
-		
+
 //		System.out.println(pamXMLWriter.getAsString(doc));
 
 		ArrayList<Deployment> deployments = new ArrayList<>();
 
-		NodeList returns = doc.getElementsByTagName("Return");
+		NodeList returns = doc.getElementsByTagName("Deployment");
+//		if (returns.getLength() == 0) {
+//			// try REsult instead !
+//			returns = doc.getElementsByTagName("Result");
+//		}
 		//		System.out.println("N projects = " + returns.getLength());
 		int n = returns.getLength();
+
 //		Queries queries = new Queries(null)
 		for (int i = 0; i < n; i++) {
 			Node aNode = returns.item(i);
 			if (aNode instanceof Element) {
 				Element returnedEl = (Element) aNode;
-				
+
 				String Id = getElementData(returnedEl, "Id");
 				String project = getElementData(returnedEl, "Project");
 				String DeploymentId = getElementData(returnedEl, "DeploymentId");
@@ -218,7 +229,7 @@ public class DBXMLQueries {
 		}
 		return deployments;
 	}
-	
+
 	/**
 	 * Get a list of Detections documents which associate with a datablock and a deploymentId.
 	 * @param dataBlock
@@ -227,7 +238,7 @@ public class DBXMLQueries {
 	 */
 	public ArrayList<String> getDetectionsDocuments(PamDataBlock dataBlock, String deploymentId) {
 		/**
-		 * first query for Detections documents associated with this deployment and datablock. 
+		 * first query for Detections documents associated with this deployment and datablock.
 		 */
 		String queryNoDepl = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/Id\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Algorithm/Software\",\"LongDataName\"],\"optype\":\"binary\"}],\"enclose\":1}";
 		String queryWithDepl = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/Id\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Algorithm/Software\",\"LongDataName\"],\"optype\":\"binary\"},{\"op\":\"=\",\"operands\":[\"Detections/DataSource/DeploymentId\",\"TheDeploymentId\"],\"optype\":\"binary\"}],\"enclose\":1}";
@@ -252,7 +263,10 @@ public class DBXMLQueries {
 		}
 		ArrayList<String> detectionsNames = new ArrayList();
 		int count = 0;
-		NodeList returns = doc.getElementsByTagName("Return");
+		NodeList returns = doc.getElementsByTagName("Detections");
+//		if (returns.getLength() == 0) {
+//			returns = doc.getElementsByTagName("Result");
+//		}
 		for (int i = 0; i < returns.getLength(); i++) {
 			Node aNode = returns.item(i);
 			String docName = aNode.getTextContent();
@@ -260,9 +274,9 @@ public class DBXMLQueries {
 		}
 		return detectionsNames;
 	}
-	
+
 	/**
-		 * Get the names of all detection documents for a given deployment for all data streams. 
+		 * Get the names of all detection documents for a given deployment for all data streams.
 		 * @param deploymentId
 		 * @return
 		 */
@@ -273,17 +287,20 @@ public class DBXMLQueries {
 			if (queryResult == null || queryResult.queryException != null) {
 				return null;
 			}
-	
+
 	//		PamguardXMLWriter pamXMLWriter = PamguardXMLWriter.getXMLWriter();
-	
+
 			Document doc = convertStringToXMLDocument(queryResult.queryResult);
 			if (doc == null) {
 				return null;
 			}
-	
+
 			ArrayList<String> detectionDocs = new ArrayList<>();
-	
+
 			NodeList returns = doc.getElementsByTagName("Return");
+			if (returns.getLength() == 0) {
+				returns = doc.getElementsByTagName("Result");
+			}
 			for (int i = 0; i < returns.getLength(); i++) {
 				Node aNode = returns.item(i);
 				detectionDocs.add(aNode.getTextContent());
@@ -293,7 +310,7 @@ public class DBXMLQueries {
 
 	public int countData(PamDataBlock dataBlock, String deploymentId) {
 //		/**
-//		 * first query for Detections documents associated with this deployment and datablock. 
+//		 * first query for Detections documents associated with this deployment and datablock.
 //		 */
 //		String queryNoDepl = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/Id\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Algorithm/Software\",\"LongDataName\"],\"optype\":\"binary\"}],\"enclose\":1}";
 //		String queryWithDepl = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/Id\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Algorithm/Software\",\"LongDataName\"],\"optype\":\"binary\"},{\"op\":\"=\",\"operands\":[\"Detections/DataSource/DeploymentId\",\"TheDeploymentId\"],\"optype\":\"binary\"}],\"enclose\":1}";
@@ -324,17 +341,15 @@ public class DBXMLQueries {
 			return 0;
 		}
 		int count = 0;
-		for (int i = 0; i < documentNames.size(); i++) {
-//			Node aNode = returns.item(i);
-			String docName = documentNames.get(i);
+		for (String docName : documentNames) {
 //			System.out.println(aNode.getTextContent());
 			int count2 = countDetections2(docName);
 			count += count2; //countDetecionsData(docName);
-			
+
 		}
 		return count;
 	}
-	
+
 	/**
 	 * Count on effort detections in a Detections document
 	 * @param docName
@@ -349,7 +364,7 @@ public class DBXMLQueries {
 		try {
 			Queries queries = dbXMLConnect.getTethysQueries();
 			result = queries.QueryTethys(query);
-//			System.out.println(result);			
+//			System.out.println(result);
 		}
 		catch (Exception e) {
 			System.out.println("Error executing " + query);
@@ -368,11 +383,11 @@ public class DBXMLQueries {
 	}
 
 //	/**
-//	 * Get a count of the detections in a detections document. 
-//	 * Only looking in onEffort so far. 
+//	 * Get a count of the detections in a detections document.
+//	 * Only looking in onEffort so far.
 //	 * @param deploymentId
 //	 * @param detectionDocId
-//	 * @param dataBlock 
+//	 * @param dataBlock
 //	 * @return
 //	 */
 //	public int getDetectionsDetectionCount(String deploymentId, String detectionDocId, PamDataBlock dataBlock) {
@@ -391,7 +406,7 @@ public class DBXMLQueries {
 //		if (doc == null) {
 //			return 0;
 //		}
-//		
+//
 ////		System.out.println(pamXMLWriter.getAsString(doc));
 //
 ////		ArrayList<String> detectionDocs = new ArrayList<>();
@@ -404,7 +419,7 @@ public class DBXMLQueries {
 //	/**
 //	 * This is the quickest way of counting data in a project, but it will load the start
 //	 * times for every detection in a project at once, so might use a lot of memory. Also
-//	 * it wll probably get data for all deployments in a project, which may not be what we want.  
+//	 * it wll probably get data for all deployments in a project, which may not be what we want.
 //	 * @param projectName
 //	 * @param dataPrefixes
 //	 * @return
@@ -432,7 +447,7 @@ public class DBXMLQueries {
 	/**
 	 * Count data within a deployment document which is associated with a set of datablocks
 	 * Since the detections all come back in one query, it's easier to count all datablocks at once so
-	 * that it can all happen off a single query.  
+	 * that it can all happen off a single query.
 	 * @param id
 	 * @param dataBlockPrefixes
 	 * @return
@@ -450,20 +465,20 @@ public class DBXMLQueries {
 		if (doc == null) {
 			return null;
 		}
-		
+
 //		System.out.println(pamXMLWriter.getAsString(doc));
 
 		NodeList detsDocs = doc.getElementsByTagName("Detections");
 		int[] blockCounts = new int[dataPrefixes.length];
-	
+
 //		String detDocPrefix = projectId + "_" + dataBlock.getDataName();
-		
+
 //		int totalCalls = 0;
 		int detCount = 0;
 		int dataIndex;
 		for (int i = 0; i < detsDocs.getLength(); i++) {
 			Node detNode = detsDocs.item(i);
-			
+
 			NodeList childNodes = detNode.getChildNodes();
 			detCount = childNodes.getLength()-1;
 			dataIndex = -1;
@@ -531,8 +546,8 @@ public class DBXMLQueries {
 	}
 
 	/**
-	 * Get the basic information about a Detections document. This is basically everything apart from 
-	 * the actual detections themselves. 
+	 * Get the basic information about a Detections document. This is basically everything apart from
+	 * the actual detections themselves.
 	 * @param aDoc
 	 * @return
 	 */
@@ -549,7 +564,7 @@ public class DBXMLQueries {
 			return null;
 		}
 //		System.out.println(queryResult.queryResult);
-		
+
 		Detections detections = new Detections();
 		try {
 			Helper.createRequiredElements(detections);
@@ -564,7 +579,7 @@ public class DBXMLQueries {
 			return null;
 		}
 		Element result = (Element) returns.item(0);
-		
+
 		DescriptionType description = detections.getDescription();
 		if (description == null) {
 			description = new DescriptionType();
@@ -574,9 +589,9 @@ public class DBXMLQueries {
 		description.setAbstract(getElementData(result, "Description.Abstract"));
 		description.setMethod(getElementData(result, "Description.Method"));
 		description.setObjectives(getElementData(result, "Description.Objectives"));
-		
-		
-		
+
+
+
 		// TODO Auto-generated method stub
 		return detections;
 	}

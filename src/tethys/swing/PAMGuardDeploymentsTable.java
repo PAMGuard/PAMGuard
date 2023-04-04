@@ -86,7 +86,7 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 		public void mouseClicked(MouseEvent e) {
 			int aRow = table.getSelectedRow();
 			int col = table.getSelectedColumn();
-			if (aRow >= 0 && aRow < selection.length && col == 6) {
+			if (aRow >= 0 && aRow < selection.length && col == TableModel.SELECTCOLUMN) {
 				selection[aRow] = !selection[aRow];
 				for (DeploymentTableObserver obs : observers) {
 					obs.selectionChanged();
@@ -193,7 +193,9 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 
 	private class TableModel extends AbstractTableModel {
 
-		private String[] columnNames = {"Id", "Start", "Stop", "Duration", "Cycle", "Tethys Deployment", "Select"};
+		private String[] columnNames = {"Id", "Start", "Stop", "Gap", "Duration", "Cycle", "Tethys Deployment", "Select"};
+		
+		private static final int SELECTCOLUMN = 7;
 
 		@Override
 		public int getRowCount() {
@@ -217,7 +219,7 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 		
 		@Override
 		public Class<?> getColumnClass(int columnIndex) {
-			if (columnIndex == 6) {
+			if (columnIndex == SELECTCOLUMN) {
 				return Boolean.class;
 //				return JCheckBox.class;
 			}
@@ -228,40 +230,45 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			RecordingPeriod period = deploymentOverview.getRecordingPeriods().get(rowIndex);
 //			DeploymentRecoveryPair deplInfo = deploymentInfo.get(rowIndex);
-			if (columnIndex == 4) {
+			if (columnIndex == 5) {
 				return deploymentOverview.getDutyCycleInfo();
+			}
+			if (columnIndex == 3 && rowIndex > 0) {
+				RecordingPeriod prevPeriod = deploymentOverview.getRecordingPeriods().get(rowIndex-1);
+				long gap = period.getRecordStart() - prevPeriod.getRecordStop();
+				return PamCalendar.formatDuration(gap);
 			}
 			return getValueAt(period, rowIndex, columnIndex);
 		}
 
+		private Object getValueAt(RecordingPeriod period, int rowIndex, int columnIndex) {
+					switch (columnIndex) {
+					case 0:
+						return rowIndex;
+					case 1:
+						return PamCalendar.formatDBDateTime(period.getRecordStart());
+		//				return TethysTimeFuncs.formatGregorianTime(deplInfo.deploymentDetails.getAudioTimeStamp());
+					case 2:
+						return PamCalendar.formatDBDateTime(period.getRecordStop());
+		//				return TethysTimeFuncs.formatGregorianTime(deplInfo.recoveryDetails.getAudioTimeStamp());
+					case 4:
+		//				long t1 = TethysTimeFuncs.millisFromGregorianXML(deplInfo.deploymentDetails.getAudioTimeStamp());
+		//				long t2 = TethysTimeFuncs.millisFromGregorianXML(deplInfo.recoveryDetails.getAudioTimeStamp());
+						return PamCalendar.formatDuration(period.getRecordStop()-period.getRecordStart());
+					case 6:
+						PDeployment deployment = period.getMatchedTethysDeployment();
+						return makeDeplString(period, deployment);
+					case SELECTCOLUMN:
+		//				return selectBoxes[rowIndex];
+						return selection[rowIndex];
+					}
+		
+					return null;
+				}
+
 		@Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			return columnIndex == 6;
-		}
-
-		private Object getValueAt(RecordingPeriod period, int rowIndex, int columnIndex) {
-			switch (columnIndex) {
-			case 0:
-				return rowIndex;
-			case 1:
-				return PamCalendar.formatDBDateTime(period.getRecordStart());
-//				return TethysTimeFuncs.formatGregorianTime(deplInfo.deploymentDetails.getAudioTimeStamp());
-			case 2:
-				return PamCalendar.formatDBDateTime(period.getRecordStop());
-//				return TethysTimeFuncs.formatGregorianTime(deplInfo.recoveryDetails.getAudioTimeStamp());
-			case 3:
-//				long t1 = TethysTimeFuncs.millisFromGregorianXML(deplInfo.deploymentDetails.getAudioTimeStamp());
-//				long t2 = TethysTimeFuncs.millisFromGregorianXML(deplInfo.recoveryDetails.getAudioTimeStamp());
-				return PamCalendar.formatDuration(period.getRecordStop()-period.getRecordStart());
-			case 5:
-				PDeployment deployment = period.getMatchedTethysDeployment();
-				return makeDeplString(period, deployment);
-			case 6:
-//				return selectBoxes[rowIndex];
-				return selection[rowIndex];
-			}
-
-			return null;
+			return columnIndex == SELECTCOLUMN;
 		}
 
 		private String makeDeplString(RecordingPeriod period, PDeployment deployment) {

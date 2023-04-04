@@ -1,10 +1,8 @@
 package tethys;
 
-import tethys.detection.DetectionExportProgress;
-
 /**
- * Basis for a message system which will get passed around whenever something happens in 
- * Tethys, whether it be a new connection, progress during data output, etc. 
+ * Basis for a message system which will get passed around whenever something happens in
+ * Tethys, whether it be a new connection, progress during data output, etc.
  * @author dg50
  *
  */
@@ -16,8 +14,8 @@ public class TethysState {
 		NEWPAMGUARDSELECTION, // new PAMGuard data are available (called once on first load)
 		UPDATEMETADATA, // META Data being prepared for output have changed (so may be able to enable output!)
 		EXPORTING // currently exporting data.  may be a while ...
-		};
-	
+		}
+
 	public StateType stateType;
 	private Object stateObject;
 

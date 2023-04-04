@@ -1,24 +1,14 @@
 package tethys.dbxml;
 
-import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.sax.SAXTransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
 import PamController.settings.output.xml.PamguardXMLWriter;
-import PamUtils.XMLUtils;
 import dbxml.JerseyClient;
 import tethys.output.TethysExportParams;
 
@@ -30,23 +20,23 @@ public class DMXMLQueryTest {
 
 	private void runTest() {
 		TethysExportParams params = new TethysExportParams();
-		
+
 		JerseyClient jerseyClient = new JerseyClient(params.getFullServerName());
-		
+
 //		String testJson = "{\"return\":[\"Deployment/Project\",\"Deployment/DeploymentId\",\"Deployment/Site\",\"Deployment/DeploymentDetails/AudioTimeStamp\",\"Deployment/RecoveryDetails/AudioTimeStamp\"],\"select\":[],\"enclose\":1}";
 //		String testJson = "{\"return\":[\"Deployment/Project\",\"Deployment/Region\",\"Deployment/DeploymentDetails/AudioTimeStamp\",\"Deployment/RecoveryDetails/AudioTimeStamp\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Deployment/DeploymentId\",\"2\"],\"optype\":\"binary\"}],\"enclose\":1}";
 		//String testJson = "{\"return\":[\"Deployment/Project\",\"Deployment/Region\",\"Deployment/DeploymentDetails/AudioTimeStamp\",\"Deployment/RecoveryDetails/AudioTimeStamp\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Deployment/DeploymentId\",\"2\"],\"optype\":\"binary\"},{\"op\":\"=\",\"operands\":[\"Deployment/Project\",\"DCLDE2022\"],\"optype\":\"binary\"}],\"enclose\":1}";
 //		String testJson = "{\"return\":[\"Deployment/Project\",\"Deployment/Region\",\"Deployment/DeploymentDetails/AudioTimeStamp\",\"Deployment/RecoveryDetails/AudioTimeStamp\",\"Deployment/DeploymentId\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Deployment/DeploymentId\",\"2\"],\"optype\":\"binary\"},{\"op\":\"=\",\"operands\":[\"Deployment/Project\",\"DCLDE2022\"],\"optype\":\"binary\"}],\"enclose\":1}";
 		String testJson = "{\"return\":[\"Deployment/Project\"],\"select\":[],\"enclose\":1}";
 		// web browse to http://localhost:9779/Client
-		
+
 		String testResult = jerseyClient.queryJSON(testJson);
 
 		Document doc = convertStringToXMLDocument(testResult);
-		
+
 		PamguardXMLWriter pamXMLWriter = PamguardXMLWriter.getXMLWriter();
 		String formettedXML = pamXMLWriter.getAsString(doc, true);
-		
+
 		System.out.println(testResult);
 		System.out.println(formettedXML);
 //		try {

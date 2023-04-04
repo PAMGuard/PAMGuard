@@ -56,6 +56,7 @@ import PamUtils.PamUtils;
 import PamView.PamSymbol;
 import PamView.dialog.PamGridBagContraints;
 import PamView.symbol.SymbolData;
+import PamguardMVC.debug.Debug;
 import clickDetector.ClickClassifiers.basicSweep.CodeHost;
 import clickDetector.ClickClassifiers.basicSweep.SweepClassifier;
 import clickDetector.ClickClassifiers.basicSweep.SweepClassifierSet;
@@ -1707,7 +1708,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 //			}
 //		}
 //		else multiChan = true;
-  		Debug.out.println("Check multi-channel: " + multiChan);
+//  		Debug.out.println("Check multi-channel: " + multiChan);
 		
 		return multiChan; 
 	}

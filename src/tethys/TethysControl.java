@@ -19,13 +19,13 @@ import javax.swing.Timer;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
+import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamView.PamTabPanel;
 import PamguardMVC.PamDataBlock;
 import metadata.MetaDataContol;
 import metadata.deployment.DeploymentData;
-import pamViewFX.PamSettingsMenuPane;
 import tethys.TethysState.StateType;
 import tethys.dbxml.DBXMLConnect;
 import tethys.dbxml.DBXMLQueries;
@@ -43,8 +43,8 @@ import tethys.swing.TethysTabPanel;
 
 /**
  * Quick play with a simple system for outputting data to Tethys. At it's start
- * this is simply going to offer a dialog and have a few functions which show how 
- * to access data within PAMGuard. 
+ * this is simply going to offer a dialog and have a few functions which show how
+ * to access data within PAMGuard.
  * @author dg50
  *
  */
@@ -53,23 +53,23 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	public static final String unitType = "Tethys Interface";
 	public static String defaultName = "Tethys";
 	public static String xmlNameSpace = "http://tethys.sdsu.edu/schema/1.0";
-	
+
 	private TethysExportParams tethysExportParams = new TethysExportParams();
-	
+
 	private DBXMLConnect dbxmlConnect;
-	
+
 	private TethysTabPanel tethysTabPanel;
-	
+
 	private DBXMLQueries dbxmlQueries;
-	
+
 	private ArrayList<TethysStateObserver> stateObservers;
-	
+
 	private Timer serverCheckTimer;
-	
+
 	private ServerStatus lastServerStatus;
-	
-	private ArrayList<DatablockSynchInfo> dataBlockSynchInfos; 
-	
+
+	private ArrayList<DatablockSynchInfo> dataBlockSynchInfos;
+
 	private DeploymentHandler deploymentHandler;
 	private DetectionsHandler detectionsHandler;
 
@@ -89,7 +89,7 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		serverCheckTimer.setInitialDelay(0);
 		PamSettingManager.getInstance().registerSettings(this);
 		addStateObserver(this);
-		
+
 		if (PamController.getInstance().isInitializationComplete()) {
 			// must be adding module later on ...
 			SwingUtilities.invokeLater(new Runnable() {
@@ -103,8 +103,8 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 
 	/**
 	 * Get DBXML Connector. This class contains all the functions that are needed
-	 * to talk to the database. 
-	 * @return DBXML functions. 
+	 * to talk to the database.
+	 * @return DBXML functions.
 	 */
 	public DBXMLConnect getDbxmlConnect() {
 		return dbxmlConnect;
@@ -139,7 +139,7 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		tethysMenu.add(showDeps);
 		return tethysMenu;
 	}
-	
+
 	public void showProjectDeploymentsDialog() {
 		ProjectDeploymentsDialog.showDialog(getGuiFrame(), this);
 	}
@@ -154,11 +154,11 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		}
 		return sets;
 	}
-	
+
 	/**
-	 * Get the synchronisation info for all datablocks. 
+	 * Get the synchronisation info for all datablocks.
 	 * This list should be static, but check it in case something has been
-	 * added or removed. 
+	 * added or removed.
 	 * @return
 	 */
 	public ArrayList<DatablockSynchInfo> getSynchronisationInfos() {
@@ -172,13 +172,13 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 				dataBlockSynchInfos.add(new DatablockSynchInfo(this, aBlock));
 			}
 		}
-		// and remove any which are no longer there. 
+		// and remove any which are no longer there.
 		for (DatablockSynchInfo synchInfo : dataBlockSynchInfos) {
-			if (dataBlocks.contains(synchInfo.getDataBlock()) == false) {
+			if (!dataBlocks.contains(synchInfo.getDataBlock())) {
 				dataBlockSynchInfos.remove(synchInfo);
 			}
 		}
-		
+
 		return dataBlockSynchInfos;
 	}
 
@@ -193,7 +193,7 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		}
 		return null;
 	}
-	
+
 	/**
 	 * open client in the default web browser
 	 */
@@ -234,34 +234,34 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	}
 
 	/**
-	 * We'll probably want to 
+	 * We'll probably want to
 	 * @param parentFrame
 	 */
 	protected void tethysExport(JFrame parentFrame) {
 		TethysExportParams newExportParams = TethysExportDialog.showDialog(parentFrame, this);
 		if (newExportParams != null) {
-			// dialog returns null if cancel was pressed. 
+			// dialog returns null if cancel was pressed.
 			tethysExportParams = newExportParams;
 			exportTethysData(tethysExportParams);
 		}
 	}
 
 	/**
-	 * We'll arrive here if the dialog has been opened and we want to export Tethys data. 
+	 * We'll arrive here if the dialog has been opened and we want to export Tethys data.
 	 * @param tethysExportParams2
 	 */
 	private void exportTethysData(TethysExportParams tethysExportParams) {
 		TethysExporter tethysExporter = new TethysExporter(this, tethysExportParams);
-		tethysExporter.doExport();		
-		
+		tethysExporter.doExport();
+
 		sendStateUpdate(new TethysState(StateType.TRANSFERDATA));
 		countProjectDetections();
 		sendStateUpdate(new TethysState(StateType.NEWPAMGUARDSELECTION));
 	}
-	
+
 	/**
 	 * Get global deployment data. This is a bit of a mess, trying to use a separate module
-	 * so that the rest of PAMGuard can use it, but creating the 
+	 * so that the rest of PAMGuard can use it, but creating the
 	 * @return
 	 */
 	public DeploymentData getGlobalDeplopymentData() {
@@ -271,14 +271,14 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 //			deployment.setPlatform("Yay a platform");
 //			Instrument instrument = new Instrument();
 //			instrument.setType("machiney");
-//			instrument.setInstrumentId("12345555");			
+//			instrument.setInstrumentId("12345555");
 //			deployment.setInstrument(instrument);
 //			return false;
 //		}
-		
+
 		MetaDataContol metaControl = (MetaDataContol) aUnit;
-		DeploymentData deploymentData = metaControl != null ? metaControl.getDeploymentData() : getTethysProjectData();			
-			
+		DeploymentData deploymentData = metaControl != null ? metaControl.getDeploymentData() : getTethysProjectData();
+
 //		deploymentData.setProject("thisIsAProject");
 ////		deploymentData.setPlatform("Yay a platform");
 //		deploymentData.setCruise("cruisey");
@@ -286,14 +286,14 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 ////		deploymentData.setInstrumentId("super instrument");
 //		deploymentData.setSite("in the ocean somewhere");
 //		deploymentData.setRegion("ocean water");
-////		deploymentData.setInstrumentType("sensor of sorts");		
-		
+////		deploymentData.setInstrumentType("sensor of sorts");
+
 		return deploymentData;
 	}
 
 	/**
 	 * Gets a copy of Deployment data stored with other Tethys params when the more
-	 * general meta data provider is not present. 
+	 * general meta data provider is not present.
 	 * @return
 	 */
 	private DeploymentData getTethysProjectData() {
@@ -301,7 +301,7 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	}
 
 	/**
-	 * Add a new state observer. 
+	 * Add a new state observer.
 	 * @param stateObserver
 	 */
 	public void addStateObserver(TethysStateObserver stateObserver) {
@@ -309,16 +309,16 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	}
 
 	/**
-	 * Remove a state observer. 
+	 * Remove a state observer.
 	 * @param stateObserver
-	 * @return true if it existed. 
+	 * @return true if it existed.
 	 */
 	public boolean removeStateObserver(TethysStateObserver stateObserver) {
 		return stateObservers.remove(stateObserver);
 	}
-	
+
 	/**
-	 * Send state updates around to all state observers. 
+	 * Send state updates around to all state observers.
 	 * @param tethysState
 	 */
 	public void sendStateUpdate(TethysState tethysState) {
@@ -327,7 +327,7 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		}
 	}
 	/**
-	 * A name for any deta selectors. 
+	 * A name for any deta selectors.
 	 * @return
 	 */
 	public String getDataSelectName() {
@@ -342,15 +342,15 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	public void notifyModelChanged(int changeType) {
 		super.notifyModelChanged(changeType);
 		switch (changeType) {
-		case PamController.INITIALIZATION_COMPLETE:
+		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			initializationStuff();
 			break;
 		}
 	}
-	
+
 	/**
-	 * Stuff to do on initial load (initialization complete or addition of 
-	 * a Tethys module after initialisation). 
+	 * Stuff to do on initial load (initialization complete or addition of
+	 * a Tethys module after initialisation).
 	 */
 	private void initializationStuff() {
 		deploymentHandler.createPamguardOverview();
@@ -360,9 +360,9 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 
 	/**
 	 * Check the server. This will send around a notification if the state
-	 * has changed since the last call to this function, so it's unlikely you'll 
+	 * has changed since the last call to this function, so it's unlikely you'll
 	 * need to use the return value
-	 * @return server status. 
+	 * @return server status.
 	 */
 	public ServerStatus checkServer() {
 		ServerStatus serverState = dbxmlConnect.pingServer();
@@ -425,8 +425,8 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 
 	/**
 	 * One stop place to get Deployment information. Will provide
-	 * both information on record periods in PAMGuard and also Deployment docs in Tethys. 
-	 * @return set of functions for handling deployments. 
+	 * both information on record periods in PAMGuard and also Deployment docs in Tethys.
+	 * @return set of functions for handling deployments.
 	 */
 	public DeploymentHandler getDeploymentHandler() {
 		return deploymentHandler;
