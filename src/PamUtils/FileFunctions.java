@@ -108,7 +108,7 @@ public class FileFunctions {
 		return attrib;
 		}
 		catch (Error e) {
-			System.out.println(e.getMessage());
+			System.out.println("Error in FileFunctions.getAttributes: " + e.getMessage());
 			return 0;
 		}
 	}

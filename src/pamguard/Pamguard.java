@@ -121,6 +121,7 @@ public class Pamguard {
 
 		int runMode = PamController.RUN_NORMAL;
 		String InputPsf = "NULL";
+		
 
 
 		// set up the system to output to both a log file and the console window.  Also
@@ -136,6 +137,14 @@ public class Pamguard {
 //		TimeZone.setDefault(PamCalendar.defaultTimeZone);
 
 		System.out.println("**********************************************************");
+		// print out the entire command line
+		if (args != null && args.length > 0) {
+			System.out.printf("Command line options: ");
+			for (int i = 0; i < args.length; i++) {
+				System.out.printf("\"%s\" ", args[i]);
+			}
+			System.out.printf("\n");
+		}
 		try {
 			// get the java runnable file name. 
 			//	    	http://stackoverflow.com/questions/4294522/jar-file-name-form-java-code
@@ -209,6 +218,7 @@ public class Pamguard {
 				}
 				else if (anArg.equalsIgnoreCase("-nogui")) {
 					PamGUIManager.setType(PamGUIManager.NOGUI);
+					System.out.println("no gui operation.");
 				}
 				///////////////
 				else if (anArg.equalsIgnoreCase("-psf")) {
@@ -218,13 +228,16 @@ public class Pamguard {
 				}
 				else if (anArg.equalsIgnoreCase("-port")) {
 					// port id to open a udp port to receive commands
-					pamBuoyGlobals.setNetworkControlPort(Integer.parseInt(args[iArg++]));
+					String port = args[iArg++];
+					pamBuoyGlobals.setNetworkControlPort(Integer.parseInt(port));
+					System.out.println("Setting UDP control port " + port);
 				}
 				else if (anArg.equalsIgnoreCase("-mport")) {
 					// multicast control (for multiple PAMGuards) 
 					String mAddr = args[iArg++];
 					int mPort = Integer.parseInt(args[iArg++]);
 					pamBuoyGlobals.setMultiportConfig(mAddr, mPort);
+					System.out.printf("Setting multiport control addr %s port %d\n", mAddr, mPort);
 				}
 				else if (anArg.equalsIgnoreCase("-nolog")) {
 					System.out.println("Disabling log file from command line switch...");
@@ -232,23 +245,31 @@ public class Pamguard {
 				}
 				else if (anArg.equalsIgnoreCase(BinaryStore.GlobalFolderArg)) {
 					// output folder for binary files. 
-					GlobalArguments.setParam(BinaryStore.GlobalFolderArg, args[iArg++]);
+					String binFolder = args[iArg++];
+					GlobalArguments.setParam(BinaryStore.GlobalFolderArg, binFolder);
+					System.out.println("Setting output folder for binary files to " + binFolder);
 				}
 				else if (anArg.equalsIgnoreCase(DBControl.GlobalDatabaseNameArg)) {
 					// database file name
-					GlobalArguments.setParam(DBControl.GlobalDatabaseNameArg, args[iArg++]);
+					String dbName = args[iArg++];
+					GlobalArguments.setParam(DBControl.GlobalDatabaseNameArg, dbName);
+					System.out.println("Setting output database file to " + dbName);
 				}
 				else if (anArg.equalsIgnoreCase(FolderInputSystem.GlobalWavFolderArg)) {
 					// source folder for wav files (or other supported sound files)
-					GlobalArguments.setParam(FolderInputSystem.GlobalWavFolderArg, args[iArg++]);
+					String wavFolder = args[iArg++];
+					GlobalArguments.setParam(FolderInputSystem.GlobalWavFolderArg, wavFolder);
+					System.out.println("Setting input wav file folder to " + wavFolder);
 				}
 				else if (anArg.equalsIgnoreCase(PamController.AUTOSTART)) {
 					// auto start processing. 
 					GlobalArguments.setParam(PamController.AUTOSTART, PamController.AUTOSTART);
+					System.out.println("Setting autostart ON");
 				}
 				else if (anArg.equalsIgnoreCase(PamController.AUTOEXIT)) {
 					// auto exit at end of processing. 
 					GlobalArguments.setParam(PamController.AUTOEXIT, PamController.AUTOEXIT);
+					System.out.println("Setting autoexit ON");
 				}
 				else if (anArg.equalsIgnoreCase("-help")) {
 					System.out.println("--PamGuard Help");

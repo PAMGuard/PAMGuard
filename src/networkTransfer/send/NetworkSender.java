@@ -452,7 +452,7 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 			return true;
 		} catch (IOException e) {
 //			e.printStackTrace();
-			System.out.println(e.getMessage());
+			System.out.println("IOException in NeetworkSender.writeByteData: " + e.getMessage());
 			currStatus = "Socket Closed";
 			return false;
 		}
@@ -465,7 +465,7 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 			return true;
 		} catch (IOException e) {
 //			e.printStackTrace();
-			System.out.println(e.getMessage());
+			System.out.println("IOException in NeetworkSender.writeStringData" + e.getMessage());
 			currStatus = "Socket Closed";
 			return false;
 		}
@@ -513,7 +513,7 @@ public class NetworkSender extends PamControlledUnit implements PamSettings {
 			tcpWriter.close();
 		} catch (IOException e) {
 //			e.printStackTrace();
-			System.out.println(e.getMessage());
+			System.out.println("IOException in NeetworkSender.closeconnection" + e.getMessage());
 		}
 		tcpSocket = null;
 		tcpWriter = null;

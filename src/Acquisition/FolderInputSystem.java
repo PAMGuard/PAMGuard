@@ -48,6 +48,7 @@ import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.PamLabel;
 import PamView.panel.PamPanel;
 import PamView.panel.PamProgressBar;
+import PamguardMVC.debug.Debug;
 
 /**
  * Read multiple files in sequence. Options exist to either pause and
@@ -116,7 +117,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings{
 		if (folderInputParameters == null)
 			setFolderInputParameters(new FolderInputParameters(getSystemType()));
 		//		PamSettingManager.getInstance().registerSettings(this); //calling super already registers this in the FileInputSystem constructor
-		checkComandLine();
+//		checkComandLine();
 		makeSelFileList();
 		newFileTimer = new Timer(1000, new RestartTimer());
 		newFileTimer.setRepeats(false);
@@ -126,18 +127,21 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings{
 	/**
 	 * Check to see if acquisition source folder was set in the command line. 
 	 */
-	private void checkComandLine() {
+	private String[] checkComandLineFolder() {
 		String globalFolder = GlobalArguments.getParam(GlobalWavFolderArg);
+		Debug.out.println("Checking -wavfilefolder option: is " + globalFolder);
 		if (globalFolder == null) {
-			return;
+			return null;
 		}
 		// see if it at least exists, though will we want to do this for Network folders ? 
 		File aFile = new File(globalFolder);
 		if (aFile.exists() == false) {
-			System.err.println("Command line folder does not exist: " + globalFolder);
+			System.err.printf("Command line wav folder \"%s\" does not exist", globalFolder);
+//			return null;
 		}
 		String[] selList = {globalFolder};
-		folderInputParameters.setSelectedFiles(selList);
+//		folderInputParameters.setSelectedFiles(selList);
+		return selList;
 	}
 
 	/**
@@ -290,15 +294,24 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings{
 	}
 
 	/**
-	 * Make a list of wav files within a folder. 
+	 * Make a list of wav files within a folder. In some circumstances this can be a list 
+	 * of actual files in a folder. Also needs to handle the possibility of it using 
+	 * a globally set folder name. 
 	 * @return flag to indicate...nothing?
 	 */
 	public int makeSelFileList() {
 
-		if (fileInputParameters.recentFiles == null || fileInputParameters.recentFiles.size() < 1) {
-			return 0;
+		String[] selection = checkComandLineFolder();
+		
+		if (selection == null) {
+			if (fileInputParameters.recentFiles == null || fileInputParameters.recentFiles.size() < 1) {
+				return 0;
+			}
+			selection = folderInputParameters.getSelectedFiles();
 		}
-		String[] selection = folderInputParameters.getSelectedFiles();
+		if (selection.length > 0) {
+			System.out.println("FolderInputSystem.makeSelFileList(): Searching for sound files in " + selection[0]);
+		}
 		return makeSelFileList(selection);
 	}
 	
