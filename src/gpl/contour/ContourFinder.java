@@ -261,7 +261,13 @@ public class ContourFinder {
 		 * Note that binData is padded, whiteData isn't. 
 		 */
 		GPLContour newContour = new GPLContour(iT-1, iF-1+gplProcess.binLo, whiteData[iT-1][iF-1], energyData[iT-1][iF-1]);
-		findAdjacentPoints(newContour, iT, iF, binData, whiteData, energyData, con);
+		try {
+			findAdjacentPoints(newContour, iT, iF, binData, whiteData, energyData, con);
+		}
+		catch (StackOverflowError e) {
+			System.out.println("Stack overflow in GPLContour.findRegion for bloated contour size " + newContour.getArea());
+			System.out.println("The contour is incomplete, but has not been discarded");
+		}
 		return newContour;
 	}
 
@@ -282,6 +288,10 @@ public class ContourFinder {
 		 * Separate loops to get above and to sides, NOT diagonal matches. 
 		 * could also easily change to connect 8 instead of connect 4. 
 		 */
+		if (newContour.getArea() >= 500) {
+			System.out.println("GPL Contour size exceeds maximum value of 500 points so ceasing to grow it");
+			return;
+		}
 		binData[currT][currF] = 0; // set current point to 0 so it doesn't get found again
 		int nX = binData.length-1;
 		int nY = binData[0].length-1;

@@ -217,7 +217,7 @@ public class HyperbolicLocaliser extends TOADBaseAlgorithm {
 //			answer2 = rightMatrix.times(leftInverse.transpose());
 		}
 		catch (Exception e) {
-			System.out.println(e.getMessage());
+			System.out.println("Error in HyperbolicLocaliser.processTOADsPlane: " + e.getMessage());
 //			Matrix m = leftMatrix.transpose();
 //			m = m.inverse();
 			return null;
@@ -254,7 +254,7 @@ public class HyperbolicLocaliser extends TOADBaseAlgorithm {
 			
 		}
 		catch (Exception e) {
-			System.out.println(e.getMessage());
+			System.out.println("Error2 in HyperbolicLocaliser.processTOADsPlane: " + e.getMessage());
 		}
 		
 		// now need to rotate back from the plane that we're in to get back to the original position. 
@@ -736,7 +736,7 @@ public class HyperbolicLocaliser extends TOADBaseAlgorithm {
 			
 		}
 		catch (Exception e) {
-			System.out.println(e.getMessage());
+			System.out.println("Error in HyperbolicLocaliser.processTOADs3D: " + e.getMessage());
 		}
 		
 		LatLong pos = geometry.getReferenceGPS().addDistanceMeters(centre.getCoordinate(0)+answer.get(0,0), 

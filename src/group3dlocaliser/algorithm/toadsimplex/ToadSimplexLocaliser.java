@@ -146,7 +146,7 @@ public class ToadSimplexLocaliser extends TOADBaseAlgorithm {
 			try {
 				result = optimiser.optimize(chiFunc, goal, start);
 			} catch (OptimizationException | FunctionEvaluationException | IllegalArgumentException e) {
-				System.out.println(e.getMessage());
+				System.out.println("Error in TOADSimplexLocaliser.processTOADs: " + e.getMessage());
 				nFails++;
 				System.out.printf("%d  fails out of %d = %3.2f%%\n", nFails, nCalls, (double) nFails * 100. / nCalls);
 				resultChiData[iStart] = null;

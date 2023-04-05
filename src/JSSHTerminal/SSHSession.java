@@ -287,7 +287,7 @@ public final class SSHSession implements UserInfo {
         out.write(k);
         out.flush();
       } catch (IOException e) {
-        System.out.println(e.getMessage());
+        System.out.println("IOException in SSHSession.write: " + e.getMessage());
       }
     }
 
@@ -349,7 +349,7 @@ public final class SSHSession implements UserInfo {
           }
         }
       } catch (IOException e) {
-        System.out.println(e.getMessage());
+        System.out.println("Error in SSHSession.pump: " + e.getMessage());
       } finally {
         closeQuietly(in);
         closeQuietly(out);

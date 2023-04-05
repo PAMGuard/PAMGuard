@@ -2333,7 +2333,7 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
         	}
         }
         catch (RawDataUnavailableException e) {
-        	System.out.println(e.getMessage());	
+        	System.out.println("RawDataUnavailableException in ROCCASpecPopUp: " + e.getMessage());	
         }
 
         if (rawDataValues==null) {

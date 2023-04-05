@@ -41,6 +41,8 @@ public abstract class BinaryDataSource {
 	private boolean saveUpdates = false;
 	
 	private BackgroundBinaryWriter backgroundBinaryWriter;
+	
+	public static final Object packSynchObject = new Object();
 
 	/**
 	 * Create a binary data source. These are used both to store data in binary 
@@ -224,11 +226,13 @@ public abstract class BinaryDataSource {
 		 * Then pack the data
 		 */
 		BinaryObjectData data;
-		if (pamDataUnit instanceof BackgroundDataUnit) {
-			data = getBackgroundBinaryWriter().packBackgroundData((BackgroundDataUnit) pamDataUnit);
-		}
-		else {
-			data = getPackedData(pamDataUnit);
+		synchronized (packSynchObject) {
+			if (pamDataUnit instanceof BackgroundDataUnit) {
+				data = getBackgroundBinaryWriter().packBackgroundData((BackgroundDataUnit) pamDataUnit);
+			}
+			else {
+				data = getPackedData(pamDataUnit);
+			}
 		}
 		/*
 		 * Then put it back to how it was a moment ago.

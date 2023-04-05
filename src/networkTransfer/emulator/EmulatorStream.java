@@ -129,7 +129,7 @@ public class EmulatorStream {
 		try {
 			emSocket.getOutputStream().write(data);
 		} catch (IOException e) {
-			System.out.println(e.getMessage());
+			System.out.println("Error in EmulatorStream.sendPamCommand: " + e.getMessage());
 		}
 	}
 	private boolean openSocket() {
@@ -137,9 +137,9 @@ public class EmulatorStream {
 		try {
 			emSocket = new Socket(sktParams.ipAddress, sktParams.portNumber);
 		} catch (UnknownHostException e) {
-			System.out.println(e.getMessage());
+			System.out.println("UnknownHostException in EmulatorStream.sendPamCommand: " + e.getMessage());
 		} catch (IOException e) {
-			System.out.println(e.getMessage());
+			System.out.println("IOException in EmulatorStream.sendPamCommand: " + e.getMessage());
 		}
 		if (emSocket != null) {
 			status.socketStatus = emSocket.isConnected();
