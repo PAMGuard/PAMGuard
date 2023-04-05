@@ -280,7 +280,7 @@ public class RockBlockProcess2 extends PamProcess implements ModuleStatusManager
 					timeDelays[0] = rockBlockControl.getParams().getCommTiming();
 					initializeRockBlock();
 				} catch (Exception e) {
-					System.out.println(e.getMessage());
+					System.out.println("Exception in rockBlockProcess: " + e.getMessage());
 					rbStatus.setPortError(e.getMessage());
 					rbStatus.setCommReady(false);
 					commReady = false;

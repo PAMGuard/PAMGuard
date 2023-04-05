@@ -291,7 +291,7 @@ public class ClipProcess extends SpectrogramMarkProcess {
 		try {
 			rawData = rawDataBlock.getSamples(startSample, numSamples, channelMap);
 		} catch (RawDataUnavailableException e) {
-			System.out.println(e.getMessage());
+			System.out.println("RawDataUnavailableException in ClipProcess.spectrogramNotification  :" + e.getMessage());
 			return false;
 		}
 		if (rawData == null) {

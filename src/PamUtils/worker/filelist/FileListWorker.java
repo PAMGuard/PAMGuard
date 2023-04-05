@@ -65,6 +65,9 @@ public abstract class FileListWorker<T extends File> implements PamWorkWrapper<F
 		this.fileList = rootList;
 		this.subFolders = subFolders;
 		this.useOldIfPossible = useOldIfPossible;
+		for (int i = 0; i < rootList.length; i++) {
+			Debug.out.println(">>>>>>>>Starting file search in " + rootList[i]);
+		}
 		if (noChange(rootList, subFolders, useOldIfPossible)) {
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
@@ -163,6 +166,7 @@ public abstract class FileListWorker<T extends File> implements PamWorkWrapper<F
 	private void addFiles(PamWorker<FileListData<T>> pamWorker, FileListData<T> newFileList, File folder) {
 		newFileList.addFolder();
 		pamWorker.update(new PamWorkProgressMessage(-1, "Searching folder " + folder.getAbsolutePath()));
+		Debug.out.println(">>>> Searching for files in abs path " + folder.getAbsolutePath());
 		//		System.out.println(folder.getAbsolutePath());
 		File[] moreFiles = folder.listFiles(fileFilter);
 		if (moreFiles == null) {

@@ -250,7 +250,7 @@ public class PamAxisPane2 extends StackPane {
 //				}
 			}
 			catch (Exception e) {
-				System.out.println(e.getMessage());
+				System.out.println("Exception in PamAxisPanel2.ScaledNumberFormatter: " + e.getMessage());
 				e.printStackTrace();
 				return "Err";
 			}

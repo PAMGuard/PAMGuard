@@ -21,8 +21,6 @@ import dataMap.OfflineDataMapPoint;
  * @param <T>
  */
 public class DataCopyTask<T extends PamDataUnit> extends OfflineTask<T> {
-
-	private PamDataBlock<T> pamDataBlock;
 	
 	private SQLLogging sqlLogging;
 	
@@ -40,7 +38,6 @@ public class DataCopyTask<T extends PamDataUnit> extends OfflineTask<T> {
 	 */
 	public DataCopyTask(PamDataBlock<T> pamDataBlock) {
 		super(pamDataBlock);
-		this.pamDataBlock = pamDataBlock;
 		this.sqlLogging = pamDataBlock.getLogging();
 		this.binaryDataSource = pamDataBlock.getBinaryDataSource();
 		setParentDataBlock(pamDataBlock);
@@ -77,7 +74,7 @@ public class DataCopyTask<T extends PamDataUnit> extends OfflineTask<T> {
 
 	@Override
 	public String getName() {
-		return "Copy " + pamDataBlock.getDataName() + " To database";
+		return "Copy " + getDataBlock().getDataName() + " To database";
 	}
 
 	@Override

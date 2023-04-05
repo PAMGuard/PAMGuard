@@ -199,7 +199,7 @@ public class DbHtDialog extends PamDialog {
 			params.calculateFilterThings(currentSampleRate);
 		}
 		catch (DbHtException e) {
-			System.out.println(e.getMessage());
+			System.out.println("Error in DbHtDialog.updateEverything: " + e.getMessage());
 			return;
 		}
 		double[] f = params.getFilterFrequencies(currentSampleRate);
