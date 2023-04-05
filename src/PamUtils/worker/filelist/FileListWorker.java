@@ -8,6 +8,7 @@ import PamUtils.PamFileFilter;
 import PamUtils.worker.PamWorkProgressMessage;
 import PamUtils.worker.PamWorkWrapper;
 import PamUtils.worker.PamWorker;
+import PamguardMVC.debug.Debug;
 
 /**
  * Class to list files in one or more directories. 
