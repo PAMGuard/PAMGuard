@@ -42,6 +42,7 @@ import PamguardMVC.debug.Debug;
 import binaryFileStorage.BinaryStore;
 import dataPlotsFX.JamieDev;
 import generalDatabase.DBControl;
+import networkTransfer.send.NetworkSender;
 import rocca.RoccaDev;
 
 import java.io.BufferedReader;
@@ -271,6 +272,23 @@ public class Pamguard {
 					GlobalArguments.setParam(PamController.AUTOEXIT, PamController.AUTOEXIT);
 					System.out.println("Setting autoexit ON");
 				}
+				else if (anArg.equalsIgnoreCase(NetworkSender.ADDRESS)) {
+					// auto exit at end of processing. 
+					GlobalArguments.setParam(NetworkSender.ADDRESS, args[iArg++]);
+				}
+				else if (anArg.equalsIgnoreCase(NetworkSender.ID1)) {
+					// auto exit at end of processing. 
+					GlobalArguments.setParam(NetworkSender.ID1, args[iArg++]);
+				}
+				else if (anArg.equalsIgnoreCase(NetworkSender.ID2)) {
+					// auto exit at end of processing. 
+					GlobalArguments.setParam(NetworkSender.ID2, args[iArg++]);
+				}
+				else if (anArg.equalsIgnoreCase(NetworkSender.PORT)) {
+					// auto exit at end of processing. 
+					GlobalArguments.setParam(NetworkSender.PORT, args[iArg++]);
+				}
+				
 				else if (anArg.equalsIgnoreCase("-help")) {
 					System.out.println("--PamGuard Help");
 					System.out.println("\n--For standard GUI deployment run without any options.\n");
