@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 
 import javax.swing.JComponent;
 import javax.swing.JMenuItem;
@@ -48,6 +49,14 @@ public abstract class DataBlockTableView<T extends PamDataUnit> {
 	private PamPanel topPanel;
 
 	private SwingTableColumnWidths columnWidths;
+
+	/**
+	 * Most work will run off a copy of the data. 
+	 * Makes it easier to include data selectors, etc. 
+	 */
+	private ArrayList<T> dataUnitCopy;
+	
+	private Object copySynch = new Object();
 
 	public DataBlockTableView(PamDataBlock<T> pamDataBlock, String displayName) {
 		this.pamDataBlock = pamDataBlock;
@@ -141,6 +150,9 @@ public abstract class DataBlockTableView<T extends PamDataUnit> {
             String tip = null;
             java.awt.Point p = e.getPoint();
             int rowIndex = rowAtPoint(p);
+            if (rowIndex < 0) {
+            	return null;
+            }
             int colIndex = columnAtPoint(p);
             int realColumnIndex = convertColumnIndexToModel(colIndex);
             T dataUnit = getDataUnit(rowIndex);
@@ -201,10 +213,14 @@ public abstract class DataBlockTableView<T extends PamDataUnit> {
 	 * @return data unit for the table row. 
 	 */
 	private final T getDataUnit(int tableRow) {
-		synchronized (pamDataBlock.getSynchLock()) {
+		synchronized (copySynch) {
 			int rowIndex = getDataIndexForRow(tableRow);
 			if (rowIndex < 0) return null;
-			return pamDataBlock.getDataUnit(rowIndex, PamDataBlock.REFERENCE_CURRENT);
+			if (dataUnitCopy == null) {
+				return null;
+			}
+			return dataUnitCopy.get(tableRow);
+//			return pamDataBlock.getDataUnit(rowIndex, PamDataBlock.REFERENCE_CURRENT);
 		}
 	}
 	
@@ -212,10 +228,13 @@ public abstract class DataBlockTableView<T extends PamDataUnit> {
 	 * Get the number of rows in the table - default behaviour is the 
 	 * number of rows in the datablock, but this may be overridded if
 	 * data are being selected in a different way. 
-	 * @return numer of table rows to show. 
+	 * @return number of table rows to show. 
 	 */
 	public int getRowCount() {
-		return pamDataBlock.getUnitsCount();
+		if (dataUnitCopy == null) {
+			return 0;
+		}
+		return dataUnitCopy.size();
 	}
 	
 	/**
@@ -227,7 +246,10 @@ public abstract class DataBlockTableView<T extends PamDataUnit> {
 	 * @return
 	 */
 	public int getDataIndexForRow(int tableRow) {
-		int nRow = pamDataBlock.getUnitsCount();
+		if (dataUnitCopy == null) {
+			return tableRow;
+		}
+		int nRow = dataUnitCopy.size();
 		if (!isViewer) {
 			tableRow = nRow-tableRow-1;
 		}		
@@ -244,12 +266,14 @@ public abstract class DataBlockTableView<T extends PamDataUnit> {
 
 		@Override
 		public void addData(PamObservable o, PamDataUnit arg) {
-			blockTableModel.fireTableDataChanged();
+			DataBlockTableView.this.updatePamData();
+//			blockTableModel.fireTableDataChanged();
 		}
 		
 		@Override
 		public void updateData(PamObservable observable, PamDataUnit pamDataUnit) {
-			blockTableModel.fireTableDataChanged();
+			DataBlockTableView.this.updatePamData();
+//			blockTableModel.fireTableDataChanged();
 		}
 
 		@Override
@@ -258,6 +282,15 @@ public abstract class DataBlockTableView<T extends PamDataUnit> {
 		}
 
 	}
+	
+	private void updatePamData() {
+		synchronized (copySynch) {
+			dataUnitCopy = pamDataBlock.getDataCopy();
+		}
+		blockTableModel.fireTableDataChanged();
+	}
+	
+	
 	private class MouseAction extends MouseAdapter {
 
 		/* (non-Javadoc)
@@ -304,7 +337,11 @@ public abstract class DataBlockTableView<T extends PamDataUnit> {
 	 * @return Array of multiple rows selected. 
 	 */
 	public T[] getMultipleSelectedRows() {
-		synchronized(pamDataBlock.getSynchLock()) {
+		if (dataUnitCopy == null) {
+			return null;
+		}
+//		synchronized(pamDataBlock.getSynchLock()) { // synch not needed with data copy. 
+		synchronized (copySynch) {
 			int[] selRows = testTable.getSelectedRows();
 			if (selRows == null) {
 				return null;
@@ -337,12 +374,14 @@ public abstract class DataBlockTableView<T extends PamDataUnit> {
 
 		@Override
 		public void scrollValueChanged(AbstractPamScroller abstractPamScroller) {
-			blockTableModel.fireTableDataChanged();
+//			blockTableModel.fireTableDataChanged();
+			updatePamData();
 		}
 
 		@Override
 		public void scrollRangeChanged(AbstractPamScroller pamScroller) {
-			blockTableModel.fireTableDataChanged();
+//			blockTableModel.fireTableDataChanged();
+			updatePamData();
 		}
 		
 	}

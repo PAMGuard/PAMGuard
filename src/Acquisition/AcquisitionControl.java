@@ -62,6 +62,8 @@ import Acquisition.sud.SUDNotificationManager;
 import Array.ArrayManager;
 import Array.PamArray;
 import Array.Preamplifier;
+import PamController.DataInputStore;
+import PamController.InputStoreInfo;
 import PamController.OfflineFileDataStore;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitGUI;
@@ -71,6 +73,8 @@ import PamController.PamControllerInterface;
 import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import PamController.RawInputControlledUnit;
+import PamController.fileprocessing.StoreStatus;
 import PamModel.PamModel;
 import PamModel.SMRUEnable;
 import PamUtils.FrequencyFormat;
@@ -100,7 +104,7 @@ import PamguardMVC.dataOffline.OfflineDataLoadInfo;
  * @see Acquisition.DaqSystem
  *
  */
-public class AcquisitionControl extends PamControlledUnit implements PamSettings, OfflineFileDataStore {
+public class AcquisitionControl extends RawInputControlledUnit implements PamSettings, OfflineFileDataStore, DataInputStore {
 
 	protected ArrayList<DaqSystem> systemList;
 
@@ -847,6 +851,26 @@ public class AcquisitionControl extends PamControlledUnit implements PamSettings
 			sudNotificationManager = new SUDNotificationManager();
 		}
 		return sudNotificationManager;
+	}
+	
+	
+	@Override
+	public int getRawInputType() {
+		DaqSystem system = acquisitionProcess.getRunningSystem();
+		if (system == null) {
+			return RAW_INPUT_UNKNOWN;
+		}
+		else {
+			return system.isRealTime() ? RAW_INPUT_REALTIME : RAW_INPUT_FILEARCHIVE;
+		}
+	}
+	@Override
+	public InputStoreInfo getStoreInfo(boolean detail) {
+		return getDaqProcess().getStoreInfo(detail);
+	}
+	@Override
+	public boolean setAnalysisStartTime(long startTime) {
+		return getDaqProcess().setAnalysisStartTime(startTime);
 	}
 	
 }
