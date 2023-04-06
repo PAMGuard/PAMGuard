@@ -17,7 +17,7 @@ public class TerminalController extends CommandManager {
 	}
 
 	@Override
-	public boolean sendData(String dataString) {
+	public boolean sendData(ExtCommand extcommand, String dataString) {
 		System.out.println(dataString);
 		return true;
 	}
