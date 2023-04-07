@@ -12,12 +12,14 @@ import java.nio.charset.StandardCharsets;
 
 import PamController.PamController;
 import PamController.pamBuoyGlobals;
+import networkTransfer.send.NetworkSender;
+import pamguard.GlobalArguments;
 
-public class MultiportController extends CommandManager {
+public class MulticastController extends CommandManager {
 	
 	//The multicast addresses are in the range 224.0.0.0 through 239.255.255.255
 
-	private static String unitName = "Multiport Controller";
+	private static String unitName = "Multicast Controller";
 	private PamController pamController;
 	private String mAddress;
 	private int mPort;
@@ -29,11 +31,11 @@ public class MultiportController extends CommandManager {
 	private byte[] byteBuffer = new byte[MAX_COMMAND_LENGTH];
 	private DatagramPacket lastDatagram;
 
-	public MultiportController(PamController pamController) {
+	public MulticastController(PamController pamController) {
 		super(pamController, unitName);
 		this.pamController = pamController;
-		this.mAddress = pamBuoyGlobals.getMultiportAddress();
-		this.mPort = pamBuoyGlobals.getMuliportPort();
+		this.mAddress = pamBuoyGlobals.getMulticastAddress();
+		this.mPort = pamBuoyGlobals.getMulticastPort();
 		
 		Thread t = new Thread(new ListenerThread());
 		t.start();
@@ -83,17 +85,35 @@ public class MultiportController extends CommandManager {
 	private void processDatagram(DatagramPacket datagram) {
 		lastDatagram = datagram;
 		String str = new String(datagram.getData(), 0, datagram.getLength());
-//		str = str.substring(0, datagram.getLength());
-		System.out.println("Datagram received \"" + str + "\"");
+		str = str.substring(0, datagram.getLength());
+//		System.out.println("Datagram received \"" + str + "\"");
 		interpretCommand(str);
 	}
 
 	@Override
-	public boolean sendData(String dataString) {
+	public boolean sendData(ExtCommand extCommand, String dataString) {
+		if (dataString == null || dataString.length() == 0) {
+			return false;
+		}
 		DatagramPacket senderInfo = lastDatagram;
-		System.out.printf("Send back data \"%s\" to %s port %d\n", dataString, senderInfo.getAddress(), senderInfo.getPort());
+		String commandName;
+		if (extCommand == null) {
+			commandName = "Unknown";
+		}
+		else {
+			commandName = extCommand.getName();
+		}
+//		System.out.printf("Send back data \"%s\" to %s port %d\n", dataString, senderInfo.getAddress(), senderInfo.getPort());
+		/*
+		 *  for multicast, we need to send a slightly different string back which has the station id as part of
+		 *  the returned string. These will be 0 if they weren't passed in at the command line.  
+		 */
+		String id1 = GlobalArguments.getParam(NetworkSender.ID1);
+		String id2 = GlobalArguments.getParam(NetworkSender.ID2);
+		String bigString = String.format("%s,%s,%s,%s", commandName, id1, id2, dataString);
+		
 //		dataString += "\n";
-		DatagramPacket packet = new DatagramPacket(dataString.getBytes(), dataString.length());
+		DatagramPacket packet = new DatagramPacket(bigString.getBytes(), bigString.length());
 		packet.setAddress(senderInfo.getAddress());
 		packet.setPort(senderInfo.getPort());
 		try {

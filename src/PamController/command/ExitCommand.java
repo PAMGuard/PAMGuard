@@ -10,8 +10,10 @@ import PamController.PamSettingManager;
  */
 public class ExitCommand extends ExtCommand {
 
+	public static final String commandId = "Exit";
+	
 	public ExitCommand() {
-		super("Exit", false);
+		super(commandId, false);
 	}
 
 	@Override

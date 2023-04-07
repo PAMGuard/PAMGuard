@@ -222,8 +222,7 @@ public class Pamguard {
 					PamGUIManager.setType(PamGUIManager.NOGUI);
 					System.out.println("no gui operation.");
 				}
-				///////////////
-				else if (anArg.equalsIgnoreCase("-psf")) {
+				else if (anArg.equalsIgnoreCase("-psf") || anArg.equalsIgnoreCase("-psfx")) {
 					String autoPsf = args[iArg++];
 					PamSettingManager.remote_psf = autoPsf;
 					System.out.println("Running using settings from " + autoPsf);
@@ -234,12 +233,12 @@ public class Pamguard {
 					pamBuoyGlobals.setNetworkControlPort(Integer.parseInt(port));
 					System.out.println("Setting UDP control port " + port);
 				}
-				else if (anArg.equalsIgnoreCase("-mport")) {
+				else if (anArg.equalsIgnoreCase("-multicast") || anArg.equalsIgnoreCase("-mport")) {
 					// multicast control (for multiple PAMGuards) 
 					String mAddr = args[iArg++];
 					int mPort = Integer.parseInt(args[iArg++]);
 					pamBuoyGlobals.setMultiportConfig(mAddr, mPort);
-					System.out.printf("Setting multiport control addr %s port %d\n", mAddr, mPort);
+					System.out.printf("Setting multicast control addr %s port %d\n", mAddr, mPort);
 				}
 				else if (anArg.equalsIgnoreCase("-nolog")) {
 					System.out.println("Disabling log file from command line switch...");

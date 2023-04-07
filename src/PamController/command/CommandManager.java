@@ -40,6 +40,8 @@ public abstract class CommandManager extends PamControlledUnit {
 		commandsList.add(new HelpCommand(this));
 		commandsList.add(new GetXMLSettings());
 		commandsList.add(new SetXMLSettings());
+		commandsList.add(new BatchStatusCommand());
+		commandsList.add(new BatchCommand(this));
 		
 	}
 
@@ -81,16 +83,16 @@ public abstract class CommandManager extends PamControlledUnit {
 		}
 		ExtCommand extCommand = findCommand(command);
 		if (extCommand == null) {
-			sendData("Cmd \"" + commandString + "\" Not Recognised.");
+			sendData(extCommand, "Cmd \"" + commandString + "\" Not Recognised.");
 			return false;
 		}
 		if (extCommand.canExecute() == false) {
-			sendData("Cmd \"" + command + "\" Cannot Execute.");
+			sendData(extCommand, "Cmd \"" + command + "\" Cannot Execute.");
 //			sendData("   Cmd return string = " + extCommand.getReturnString());
 			return false;
 		}
 		String output = extCommand.executeCommand(commandString);
-		sendData(output);
+		sendData(extCommand,output);
 		
 		
 		return true;
@@ -154,9 +156,10 @@ public abstract class CommandManager extends PamControlledUnit {
 
 	/**
 	 * Reply to data called from InterpredData
+	 * @param extCommand 
 	 * @param dataString
 	 * @return true if replay successful
 	 */
-	abstract public boolean sendData(String dataString); 
+	abstract public boolean sendData(ExtCommand extCommand, String dataString); 
 
 }

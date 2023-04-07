@@ -893,5 +893,19 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		return false;
 	}
 
+	/**
+	 * Get a status update for batch processing. 
+	 */
+	public String getBatchStatus() {
+		int nFiles = 0;
+		if (allFiles != null) {
+			nFiles = allFiles.size();
+		}
+		int generalStatus = PamController.getInstance().getPamStatus();
+		File currFile = getCurrentFile();
+		String bs = String.format("%d,%d,%d,%s", nFiles,currentFile,generalStatus,currFile);
+		return bs;
+	}
+
 
 }

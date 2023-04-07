@@ -55,7 +55,7 @@ import generalDatabase.DBControlUnit;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 import Array.ArrayManager;
-import PamController.command.MultiportController;
+import PamController.command.MulticastController;
 import PamController.command.NetworkController;
 import PamController.command.TerminalController;
 import PamController.command.WatchdogComms;
@@ -258,8 +258,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 		if (pamBuoyGlobals.getNetworkControlPort() != null) {
 			networkController = new NetworkController(this);
 		}
-		if (pamBuoyGlobals.getMultiportAddress() != null) {
-			new MultiportController(this);
+		if (pamBuoyGlobals.getMulticastAddress() != null) {
+			new MulticastController(this);
 		}
 
 		guiFrameManager = PamGUIManager.createGUI(this, object);

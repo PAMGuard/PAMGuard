@@ -16,7 +16,7 @@ public enum ReprocessStoreChoice {
 	public String toString() {
 		switch (this) {
 		case STARTNORMAL:
-			return "Start normally. No risk of overwriting";
+			return "Start normally. Note risk of overwriting!";
 		case CONTINUECURRENTFILE:
 			return "Continue from start of last input file processed";
 		case CONTINUENEXTFILE:
