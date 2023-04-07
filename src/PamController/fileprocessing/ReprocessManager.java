@@ -54,13 +54,19 @@ public class ReprocessManager {
 		
 		// need to decide what to do based on the list of possible choices. 
 		ReprocessStoreChoice choice = chosePartStoreAction(choiceSummary);
+
+		/**
+		 * Need to call this even though we aren't reprocessing so that
+		 * the Folderinput stream reports correctly on how many files have 
+		 * been processed. 
+		 */
+		boolean setupOK = setupInputStream(choiceSummary, choice);
 		
 		if (choice == ReprocessStoreChoice.DONTSSTART) {
 			return false;
 		}
 		
 		boolean deleteOK = deleteOldData(choiceSummary, choice);
-		boolean setupOK = setupInputStream(choiceSummary, choice);
 		
 		return true;
 		

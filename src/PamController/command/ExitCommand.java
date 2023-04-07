@@ -20,7 +20,10 @@ public class ExitCommand extends ExtCommand {
 	public String execute(String command) {
 		PamController.getInstance().pamStop();
 		PamSettingManager.getInstance().saveFinalSettings();
-		System.exit(0);
+		PamController pamController = PamController.getInstance();
+		pamController.pamClose();
+		// shut down the JavaFX thread and the JVM
+		pamController.shutDownPamguard();
 		return getName();
 	}
 
