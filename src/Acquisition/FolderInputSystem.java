@@ -876,16 +876,30 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		 * processing will continue from there. 
 		 */
 		if (allFiles == null || allFiles.size() == 0) {
+			System.out.println("Daq setanal start time: no files to check against");
 			return false;
+		}
+		System.out.printf("setAnalysisStarttTime: checking %d files for start time of %s\n", allFiles.size(), PamCalendar.formatDBDateTime(startTime));
+		/*
+		 * If the starttime is maxint then there is nothing to do, but we do need to set the file index
+		 * correctly to not over confuse the batch processing system. 
+		 */
+		long lastFileTime = getFileStartTime(allFiles.get(allFiles.size()-1).getAbsoluteFile());
+		if (startTime > lastFileTime) {
+			currentFile = allFiles.size();
+			System.out.println("Folder Acquisition processing is complete and no files require processing");
+			return true;
 		}
 		for (int i = 0; i < allFiles.size(); i++) {
 			long fileStart = getFileStartTime(allFiles.get(i).getAbsoluteFile());
 			if (fileStart >= startTime) {
 				currentFile = i;
 				PamCalendar.setSoundFile(true);
-				PamCalendar.setSessionStartTime(startTime);
-				System.out.printf("Sound Acquisition start processing at file %s time %s\n", allFiles.get(i).getName(),
-						PamCalendar.formatDBDateTime(fileStart));
+				if (startTime > 0) {
+					PamCalendar.setSessionStartTime(startTime);
+					System.out.printf("Sound Acquisition start processing at file %s time %s\n", allFiles.get(i).getName(),
+							PamCalendar.formatDBDateTime(fileStart));
+				}
 				return true;
 			}
 		}
