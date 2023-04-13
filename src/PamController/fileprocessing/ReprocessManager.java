@@ -175,9 +175,11 @@ public class ReprocessManager {
 		
 		ArrayList<PamControlledUnit> outputStores = PamController.getInstance().findControlledUnits(DataOutputStore.class, true);
 		boolean partStores = false; 
+		int nOutputStores = 0;
 		for (PamControlledUnit aPCU : outputStores) {
 			DataOutputStore offlineStore = (DataOutputStore) aPCU;
 			StoreStatus status = offlineStore.getStoreStatus(false);
+			nOutputStores++;
 			if (status == null) {
 				continue;
 			}
@@ -191,8 +193,8 @@ public class ReprocessManager {
 		}
 				
 		if (partStores == false)  {
-			choiceSummary.addChoice(ReprocessStoreChoice.STARTNORMAL);
-			return choiceSummary;
+//			choiceSummary.addChoice(ReprocessStoreChoice.STARTNORMAL);
+			return null; // no part full stores, so can start without questions
 		}
 		if (choiceSummary.getInputStartTime() >= choiceSummary.getOutputEndTime()) {
 			/*
