@@ -149,6 +149,14 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 			}
 		});
 		collections.add(menuItem);
+		menuItem = new JMenuItem("Open Localizations collection in browser");
+		menuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				openTethysCollection("Localizations");
+			}
+		});
+		collections.add(menuItem);
 		menuItem = new JMenuItem("Open Calibrations collection in browser");
 		menuItem.addActionListener(new ActionListener() {
 			@Override
