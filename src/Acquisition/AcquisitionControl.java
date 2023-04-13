@@ -873,4 +873,19 @@ public class AcquisitionControl extends RawInputControlledUnit implements PamSet
 		return getDaqProcess().setAnalysisStartTime(startTime);
 	}
 	
+	/**
+	 * Very specific command handler for batch status which will only work 
+	 * with the folderinputSystem. 
+	 * @return
+	 */
+	public String getBatchStatus() {
+		DaqSystem runningSystem = getAcquisitionProcess().getRunningSystem();
+		if (runningSystem instanceof FolderInputSystem) {
+			return ((FolderInputSystem) runningSystem).getBatchStatus();
+		}
+		else {
+			return null;
+		}
+	}
+	
 }

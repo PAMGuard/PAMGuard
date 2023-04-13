@@ -714,7 +714,7 @@ public class PamguardXMLWriter implements PamSettings {
 			}
 		}
 		catch (Exception e) {
-			System.out.println(e.getMessage());
+			System.out.println("Error in PamguardXMLWriter.writeArray: " + e.getMessage());
 		}
 		return null;
 	}
@@ -756,7 +756,7 @@ public class PamguardXMLWriter implements PamSettings {
 			return e;
 		}
 		catch (Exception e) {
-			System.out.println(e.getMessage());
+			System.out.println("Error in PamguardXMLWriter.writeObjectArray: " + e.getMessage());
 		}
 		return null;
 	}
@@ -781,7 +781,7 @@ public class PamguardXMLWriter implements PamSettings {
 			//			el.appendChild(e);
 		}
 		catch (Exception e) {
-			System.out.println(e.getMessage());
+			System.out.println("Error in PamguardXMLWriter.writePrimativeArray: " + e.getMessage());
 		}
 		return null;
 	}

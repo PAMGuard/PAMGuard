@@ -124,16 +124,14 @@ public class NetworkController extends CommandManager {
 		}
 	}
 
-	
-	public boolean sendData(String dataString) {
+	@Override
+	public boolean sendData(ExtCommand extCommand, String dataString) {
 		DatagramPacket packet = new DatagramPacket(dataString.getBytes(), dataString.length());
 		packet.setAddress(udpPacket.getAddress());
 		packet.setPort(udpPacket.getPort());
 		try {
 			receiveSocket.send(packet);
-//			receiveSocket.
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}

@@ -205,9 +205,12 @@ public class RoccaWhistleSelect extends PamProcess implements SpectrogramMarkObs
              * DG June '22.
              * I hope IT's K to set these back here. It's possible it's also 
              * done elsewhere.  
+             * 
+             * MO Jan '23
+             * These are set to 0 in the RoccaSpecPopUp class, before the user closes the window.  If set here, the objects are cleared before the user can trace the whistle and throws an exception
              */
-            selectedWhistle.setNaturalLifetimeMillis(0);
-            selectedWhistleRaw.setNaturalLifetimeMillis(0);
+//            selectedWhistle.setNaturalLifetimeMillis(0);
+//            selectedWhistleRaw.setNaturalLifetimeMillis(0);
         }
 	}
 

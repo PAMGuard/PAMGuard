@@ -412,8 +412,9 @@ PamSettingsSource {
 
 		}
 
-		if (dbParameters.getUseAutoCommit() == false) {
+//		if (dbParameters.getUseAutoCommit() == false) {
 			JMenuItem commitItem = new JMenuItem("Commit Changes");
+			commitItem.setEnabled(dbParameters.getUseAutoCommit() == false);
 			commitItem.setToolTipText("Immediately commit recent changes to the database");
 			commitItem.addActionListener(new ActionListener() {
 				@Override
@@ -422,7 +423,7 @@ PamSettingsSource {
 				}
 			});
 			menu.add(commitItem);
-		}
+//		}
 
 		if (SMRUEnable.isEnable()) {
 			JMenuItem speedMenu = new JMenuItem("Test database speed");

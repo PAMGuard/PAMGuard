@@ -109,7 +109,7 @@ public class GroupedSourcePaneFX extends SourcePaneFX {
 		channelPanel.setSpacing(5);
 		
 		Label channelLabel = new Label("Channels");
-//		channelLabel.setFont(PamGuiManagerFXAWT.titleFontSize2);
+		PamGuiManagerFX.titleFont2style(channelLabel);
 		sourcePane.add(channelLabel,0,2);
 		
 		//create radio buttons to allow user to quickly select type of grouping. 

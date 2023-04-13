@@ -488,6 +488,15 @@ public class PamTableItem implements Cloneable {
 		if (value == null) {
 			return Float.NaN;
 		}
+		if (value instanceof String) {
+			try {
+				double val = Double.valueOf((String) value);
+				return (float) val;
+			}
+			catch (NumberFormatException ex) {
+				return Float.NaN;
+			}
+		}
 		if (value.getClass() == Double.class) {
 			double dVal = (Double) value;
 			return (float) dVal;

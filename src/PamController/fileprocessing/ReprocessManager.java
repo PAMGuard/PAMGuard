@@ -54,13 +54,19 @@ public class ReprocessManager {
 		
 		// need to decide what to do based on the list of possible choices. 
 		ReprocessStoreChoice choice = chosePartStoreAction(choiceSummary);
+
+		/**
+		 * Need to call this even though we aren't reprocessing so that
+		 * the Folderinput stream reports correctly on how many files have 
+		 * been processed. 
+		 */
+		boolean setupOK = setupInputStream(choiceSummary, choice);
 		
 		if (choice == ReprocessStoreChoice.DONTSSTART) {
 			return false;
 		}
 		
 		boolean deleteOK = deleteOldData(choiceSummary, choice);
-		boolean setupOK = setupInputStream(choiceSummary, choice);
 		
 		return true;
 		
@@ -169,9 +175,11 @@ public class ReprocessManager {
 		
 		ArrayList<PamControlledUnit> outputStores = PamController.getInstance().findControlledUnits(DataOutputStore.class, true);
 		boolean partStores = false; 
+		int nOutputStores = 0;
 		for (PamControlledUnit aPCU : outputStores) {
 			DataOutputStore offlineStore = (DataOutputStore) aPCU;
 			StoreStatus status = offlineStore.getStoreStatus(false);
+			nOutputStores++;
 			if (status == null) {
 				continue;
 			}
@@ -185,8 +193,8 @@ public class ReprocessManager {
 		}
 				
 		if (partStores == false)  {
-			choiceSummary.addChoice(ReprocessStoreChoice.STARTNORMAL);
-			return choiceSummary;
+//			choiceSummary.addChoice(ReprocessStoreChoice.STARTNORMAL);
+			return null; // no part full stores, so can start without questions
 		}
 		if (choiceSummary.getInputStartTime() >= choiceSummary.getOutputEndTime()) {
 			/*

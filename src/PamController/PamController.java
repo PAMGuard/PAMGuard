@@ -55,7 +55,7 @@ import generalDatabase.DBControlUnit;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 import Array.ArrayManager;
-import PamController.command.MultiportController;
+import PamController.command.MulticastController;
 import PamController.command.NetworkController;
 import PamController.command.TerminalController;
 import PamController.command.WatchdogComms;
@@ -258,8 +258,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 		if (pamBuoyGlobals.getNetworkControlPort() != null) {
 			networkController = new NetworkController(this);
 		}
-		if (pamBuoyGlobals.getMultiportAddress() != null) {
-			new MultiportController(this);
+		if (pamBuoyGlobals.getMulticastAddress() != null) {
+			new MulticastController(this);
 		}
 
 		guiFrameManager = PamGUIManager.createGUI(this, object);
@@ -1316,7 +1316,12 @@ public class PamController implements PamControllerInterface, PamSettings {
 
 		@Override
 		public void run() {
+			long t1 = System.currentTimeMillis();
 			while (checkRunStatus()) {
+				long t2 = System.currentTimeMillis();
+				if (t2 - t1 > 5000) {
+					System.out.printf("Stopping, but stuck in loop for CheckRunStatus for %3.1fs\n", (double) (t2-t1)/1000.);
+				}
 				try {
 					Thread.sleep(10);
 				} catch (InterruptedException e) {

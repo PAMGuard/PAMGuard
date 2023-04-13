@@ -225,6 +225,11 @@ public class AlarmProcess extends PamProcess {
 	}
 
 
+	@Override
+	public void updateData(PamObservable o, PamDataUnit arg) {
+		newData(o, arg);
+	}
+
 	public boolean setupAlarm() {
 		dataSource = PamController.getInstance().getDataBlock(PamDataUnit.class, alarmControl.alarmParameters.dataSourceName);
 		if (dataSource == null) {

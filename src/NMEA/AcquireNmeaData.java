@@ -203,7 +203,7 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 		try {
 			pjSerialComm = PJSerialComm.openSerialPort(params.serialPortName, params.serialPortBitsPerSecond);
 		} catch (PJSerialException e) {
-			System.out.println(e.getMessage());
+			System.out.println("PJSerialException in AcquireNMEAData" + e.getMessage());
 //			WarnOnce.sho
 			return;
 		}
