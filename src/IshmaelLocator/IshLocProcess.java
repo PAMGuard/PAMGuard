@@ -368,7 +368,7 @@ abstract public class IshLocProcess extends PamProcess implements SpectrogramMar
 			selectionSams =	daqBlock.getSamples(startSam, (int)durationSam, channelMap);
 		}
 		catch (RawDataUnavailableException e) {
-			System.out.println(e.getMessage());
+			System.out.println("RawDataUnavailableException in IshLocProcess:" + e.getMessage());
 
 			// if the raw data has already been discarded, adjust the natural lifetime to try and avoid this in the future
 			int newTime;

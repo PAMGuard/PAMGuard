@@ -117,6 +117,8 @@ public class BinaryOutputStream {
 		File outputFile = new File(mainFileName);
 
 		boolean open = openPGDFFile(outputFile);
+		
+//		System.out.println("Open outout file " + outputFile.getAbsolutePath());
 
 		if (open) {
 			addToDataMap(outputFile);
@@ -260,6 +262,7 @@ public class BinaryOutputStream {
 
 	public synchronized boolean closeFile() {
 		boolean ok = true;
+//		System.out.println("Close output file " + mainFileName);
 		if (dataOutputStream != null) {
 			if (currentDataMapPoint != null) {
 				currentDataMapPoint.setBinaryFooter(footer);

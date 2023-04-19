@@ -75,7 +75,10 @@ public class NetworkObjectPacker {
 		BinaryDataSource binarySource = dataBlock.getBinaryDataSource();
 		int dataType2 = dataBlock.getQuickId();
 		
-		BinaryObjectData packedObject = binarySource.getPackedData(dataUnit);
+		BinaryObjectData packedObject = null;
+		synchronized (BinaryDataSource.packSynchObject) {
+			packedObject = binarySource.getPackedData(dataUnit);
+		}
 		byte[] data = packedObject.getData();
 		int duDataLength = data.length + 12;
 		DataUnitBaseData baseData = dataUnit.getBasicData();

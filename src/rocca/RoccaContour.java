@@ -192,7 +192,7 @@ public class RoccaContour {
             	(currentStartSample, fftLength, channelMap );
             }
             catch (RawDataUnavailableException e) {
-            	System.out.println(e.getMessage());	
+            	System.out.println("RawDataUnavailableException in ROCCAContour.generateContour: " + e.getMessage());	
             	currentRawData = null;
             }
             /* every now and then the FFTDataUnit start sample doesn't match up
@@ -237,7 +237,7 @@ public class RoccaContour {
                 	nextRawData = rawDataBlockIn.getSamples(nextStartSample, fftLength, channelMap );
                 }
                 catch (RawDataUnavailableException e) {
-                	System.out.println(e.getMessage());
+                	System.out.println("RawDataUnavailableException (2) in ROCCAContour.generateContour: " + e.getMessage());
                 	nextRawData = null;
                 }
                 nextFFT = nextFFTDataUnit.getFftData();

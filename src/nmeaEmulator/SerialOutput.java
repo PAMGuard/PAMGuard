@@ -68,7 +68,7 @@ public class SerialOutput {
 					SerialPort.NO_PARITY,
 					SerialPort.FLOW_CONTROL_DISABLED); // disable flow control, since this is the RXTX default and it's not specified above
 		} catch (PJSerialException e) {
-			System.out.println(e.getMessage());
+			System.out.println("PJSerialException in SerialOutput: " + e.getMessage());
 			e.printStackTrace();
 			return false;
 		}

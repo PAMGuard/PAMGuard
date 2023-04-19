@@ -190,7 +190,7 @@ public class DBSpeedTest {
 				dropStmt.execute();
 			} catch (SQLException e) {
 				//			e.printStackTrace();
-				System.out.println(e.getMessage());
+				System.out.println("Error in DBSpeedTest testSpeed2:" + e.getMessage());
 			}
 		}
 		try {

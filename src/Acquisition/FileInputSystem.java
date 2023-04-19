@@ -558,7 +558,10 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		//		if (fileInputParameters.recentFiles == null) return false;
 		//		if (fileInputParameters.recentFiles.size() < 1) return false;
 		//		String fileName = fileInputParameters.recentFiles.get(0);
-		return runFileAnalysis();
+		if (runFileAnalysis() == false) {
+			return false;
+		}
+		return true;
 	}
 
 	public File getCurrentFile() {
@@ -737,6 +740,8 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	@Override
 	public boolean startSystem(AcquisitionControl daqControl) {
 
+
+		
 		if (audioStream == null) return false;
 
 		dontStop = true;
@@ -1146,6 +1151,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	protected void fileListComplete() {
 		if (GlobalArguments.getParam(PamController.AUTOEXIT) != null) {
 			System.out.println("All sound files processed, PAMGuard can close on " + PamController.AUTOEXIT);
+			PamController.getInstance().setPamStatus(PamController.PAM_COMPLETE);
 			PamController.getInstance().batchProcessingComplete();
 		}
 	}

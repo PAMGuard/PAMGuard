@@ -460,8 +460,6 @@ final public class PamModel implements PamModelInterface, PamSettings {
 		mi.setModulesMenuGroup(utilitiesGroup);
 		mi.setMaxNumber(1);
 		
-		
-
 		/*
 		 * ************* End Utilities  Group *******************
 		 */

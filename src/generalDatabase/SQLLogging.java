@@ -635,11 +635,20 @@ public abstract class SQLLogging {
 		if (pamConn == null) {
 			return null;
 		}
+
 		SQLTypes sqlTypes = pamConn.getSqlTypes();
 		//the clause contains 'WHERE' so it's possible to make a null one.
-		String qStr = String.format("SELECT COUNT(%s.Id) FROM %s %s",
-				pamTableDefinition.getTableName(),
-				pamViewParameters.getSelectClause(sqlTypes));
+		String qStr;
+		if (pamViewParameters == null) {
+			qStr = String.format("SELECT COUNT(Id) FROM %s",
+					pamTableDefinition.getTableName());
+		}
+		else {
+			qStr = String.format("SELECT COUNT(%s.Id) FROM %s %s",
+					pamTableDefinition.getTableName(),
+					pamTableDefinition.getTableName(),
+					pamViewParameters.getSelectClause(sqlTypes));
+		}
 		int count = 0;
 		try {
 			PreparedStatement stmt = pamConn.getConnection().prepareStatement(qStr);

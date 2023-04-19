@@ -225,7 +225,10 @@ public class PamTableItem implements Cloneable {
 //	}
 	
 	public String getDeblankedStringValue() {
-		if (sqlType != Types.CHAR || value == null) {
+//		if (sqlType != Types.CHAR || value == null) {
+//			return null;
+//		}
+		if (value instanceof String == false) {
 			return null;
 		}
 		return ((String) value).trim();
@@ -484,6 +487,15 @@ public class PamTableItem implements Cloneable {
 	public float getFloatValue() {
 		if (value == null) {
 			return Float.NaN;
+		}
+		if (value instanceof String) {
+			try {
+				double val = Double.valueOf((String) value);
+				return (float) val;
+			}
+			catch (NumberFormatException ex) {
+				return Float.NaN;
+			}
 		}
 		if (value.getClass() == Double.class) {
 			double dVal = (Double) value;

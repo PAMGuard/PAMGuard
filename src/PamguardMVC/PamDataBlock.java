@@ -2078,6 +2078,9 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 		/*
 		 * Doesnt notify it's own parent to avoid an infinite loop
 		 */
+		if (Float.isNaN(sampleRate)) {
+			System.out.println("NaN sample rate being set in " + getLongDataName());
+		}
 		if (notify) {
 			for (int i = 0; i < countObservers(); i++) {
 				if (getPamObserver(i).getObserverObject() != parentProcess) {
