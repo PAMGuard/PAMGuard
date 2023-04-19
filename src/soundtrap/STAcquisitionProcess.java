@@ -87,6 +87,12 @@ public class STAcquisitionProcess extends AcquisitionProcess {
 			}
 		}
 	}
+	
+	@Override
+	public float getSampleRate() {
+		float fs = super.getSampleRate();
+		return fs;
+	}
 
 	@Override
 	/**
@@ -150,6 +156,7 @@ public class STAcquisitionProcess extends AcquisitionProcess {
 	public boolean isStalled() {
 		return false;
 	}
+
 	
 	
 	
