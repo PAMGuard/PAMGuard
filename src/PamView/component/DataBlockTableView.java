@@ -106,6 +106,13 @@ public abstract class DataBlockTableView<T extends PamDataUnit> {
 		}
 	}
 	
+	/**
+	 * Call the table data changed function to update table values. 
+	 */
+	public void fireTableDataChanged() {
+		blockTableModel.fireTableDataChanged();
+	}
+	
 	public JComponent getComponent() {
 		return tablePanel;
 	}
@@ -150,13 +157,22 @@ public abstract class DataBlockTableView<T extends PamDataUnit> {
             String tip = null;
             java.awt.Point p = e.getPoint();
             int rowIndex = rowAtPoint(p);
+//            int column = columnAtPoint(p);
+//            System.out.println("Get tooltip for row " + rowIndex + " column" + column);
             if (rowIndex < 0) {
             	return null;
             }
             int colIndex = columnAtPoint(p);
             int realColumnIndex = convertColumnIndexToModel(colIndex);
-            T dataUnit = getDataUnit(rowIndex);
-        	return DataBlockTableView.this.getToolTipText(dataUnit, realColumnIndex);
+            try {
+            	T dataUnit = getDataUnit(rowIndex);
+            	return DataBlockTableView.this.getToolTipText(dataUnit, realColumnIndex);
+            }
+            catch (Exception ex) {
+            	// I once got an index out of bounds here, or it might have been 
+            	// a concurrent modification exception ? Either way return null; 
+            	return null;
+            }
         }
 	}
 	
@@ -226,13 +242,16 @@ public abstract class DataBlockTableView<T extends PamDataUnit> {
 	
 	/**
 	 * Get the number of rows in the table - default behaviour is the 
-	 * number of rows in the datablock, but this may be overridded if
+	 * number of rows in the datablock, but this may be overridden if
 	 * data are being selected in a different way. 
 	 * @return number of table rows to show. 
 	 */
 	public int getRowCount() {
 		if (dataUnitCopy == null) {
-			return 0;
+			updatePamData();
+			if (dataUnitCopy == null) {
+				return 0;
+			}
 		}
 		return dataUnitCopy.size();
 	}

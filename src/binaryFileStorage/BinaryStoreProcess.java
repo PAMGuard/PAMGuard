@@ -46,7 +46,7 @@ public class BinaryStoreProcess extends PamProcess {
 		startTime = PamCalendar.getTimeInMillis();
 		long round = binaryStore.binaryStoreSettings.fileSeconds * 1000;
 		nextFileTime = (startTime/round) * round + round;
-		System.out.println("Next file start at " + PamCalendar.formatDateTime(nextFileTime));
+//		System.out.println("Next file start at " + PamCalendar.formatDateTime(nextFileTime));
 		timer = new Timer();
 		timer.schedule(new FileTimerTask(), 1000, 1000);
 		

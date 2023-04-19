@@ -177,7 +177,7 @@ public class RWEProcess extends PamProcess {
 			minSoundType = rweControl.rweParameters.minSoundType;
 			classifier.setSoundData(getSampleRate(), sourceDataBlock.getFftLength(),
 					sourceDataBlock.getFftHop());
-			System.out.println("Create right whale channel process " + iChannel);
+//			System.out.println("Create right whale channel process " + iChannel);
 		}
 		
 		

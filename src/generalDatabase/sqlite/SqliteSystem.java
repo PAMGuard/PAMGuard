@@ -279,7 +279,9 @@ public class SqliteSystem extends DBSystem implements PamSettings {
 		{
 			if(connection != null){
 				//	        	if (USEAUTOCOMMIT == false) {
-				connection.getConnection().commit();
+				if (connection.getConnection().getAutoCommit()) {
+					connection.getConnection().commit();
+				}
 				//	        	}
 				connection.getConnection().close();
 			}
