@@ -146,6 +146,10 @@ public class STClickControl extends ClickControl {
 	 */
 	public void updateDisplayScrollers(long timeMillis) {
 		ClickDisplayManager dispManager = getDisplayManager();
+		if (dispManager == null) {
+			// happens in -nogui operation. 
+			return;
+		}
 		ArrayList<ClickDisplay> dispList = dispManager.getWindowList();
 		for (ClickDisplay display : dispList) {
 			if (display instanceof ClickBTDisplay) {

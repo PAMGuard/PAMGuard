@@ -1086,6 +1086,9 @@ public class ClickControl extends PamControlledUnit implements PamSettings {
 	}
 
 	public ClickDisplayManager getDisplayManager(){
+		if (tabPanelControl == null) {
+			return null;
+		}
 		return tabPanelControl.clickDisplayManager;
 	}
 
