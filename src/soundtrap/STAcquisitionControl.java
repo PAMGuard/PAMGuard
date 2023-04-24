@@ -28,6 +28,7 @@ import java.awt.Component;
 
 import Acquisition.AcquisitionControl;
 import Acquisition.DaqSystem;
+import PamController.PamControlledUnitSettings;
 
 /**
  * @author SCANS
@@ -100,6 +101,18 @@ public class STAcquisitionControl extends AcquisitionControl {
 	@Override
 	public DaqSystem findDaqSystem(String systemType) {
 		return stDaqSystem;
+	}
+
+	@Override
+	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
+		// TODO Auto-generated method stub
+		boolean ok =  super.restoreSettings(pamControlledUnitSettings);
+		if (Float.isNaN(this.getAcquisitionParameters().sampleRate)) {
+			System.out.println("Nan sample rate read back in sound trap data control. ");
+			this.getAcquisitionParameters().sampleRate = 384000.f;
+		}
+		
+		return ok;
 	}
 
 	
