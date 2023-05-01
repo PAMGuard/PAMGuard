@@ -46,8 +46,6 @@ import fftManager.PamFFTControl;
 import group3dlocaliser.Group3DLocaliserControl;
 import metadata.MetaDataContol;
 import meygenturbine.MeygenTurbine;
-import networkTransfer.receive.BuoyStatusDataUnit;
-import networkTransfer.receive.NetworkReceiver;
 import printscreen.PrintScreenControl;
 import rockBlock.RockBlockControl;
 import tethys.TethysControl;
@@ -1098,6 +1096,7 @@ final public class PamModel implements PamModelInterface, PamSettings {
 		 * PamModel !
 		 */
 		
+//		pluginList.add(new MorlaisWP1aPlugin());
 
 		// Load up whatever default classloader was used to create this class.  Must use the same classloader
 		// for all plugins, or else we will not be able to create proper dependencies between them or be able

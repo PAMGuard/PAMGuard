@@ -155,6 +155,9 @@ public class DBXMLQueries {
 	 * @return
 	 */
 	public ArrayList<nilus.Deployment> getProjectDeployments(String projectName) {
+		if (projectName == null) {
+			return null;
+		}
 		String qBase = "{\"return\":[\"Deployment\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Deployment/Project\",\"%s\"],\"optype\":\"binary\"}],\"enclose\":1}";
 		String qStr = String.format(qBase, projectName);
 

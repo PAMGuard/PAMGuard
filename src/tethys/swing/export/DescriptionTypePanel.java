@@ -12,6 +12,7 @@ import javax.swing.border.TitledBorder;
 
 import PamView.dialog.PamDialog;
 import nilus.DescriptionType;
+import tethys.niluswraps.PDescriptionType;
 
 /**
  * Panel containing the three test entry fields for nilus.DescriptionType
@@ -65,7 +66,7 @@ public class DescriptionTypePanel {
 		return mainPanel;
 	}
 	
-	public void setParams(DescriptionType description) {
+	public void setParams(PDescriptionType description) {
 		if (description == null) {
 			tObjectives.setText(null);
 			tAbstract.setText(null);
@@ -73,7 +74,7 @@ public class DescriptionTypePanel {
 		}
 	}
 	
-	public boolean getParams(DescriptionType description) {
+	public boolean getParams(PDescriptionType description) {
 		if (checkField(requireObjective, tObjectives) == false) {
 			return PamDialog.showWarning(null, "Objectives", "The objectives field must be competed");
 		}

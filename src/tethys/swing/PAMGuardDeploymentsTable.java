@@ -2,6 +2,8 @@ package tethys.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -9,7 +11,9 @@ import java.util.Arrays;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -17,10 +21,13 @@ import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
 
 import PamUtils.PamCalendar;
+import PamView.dialog.warn.WarnOnce;
 import PamView.panel.PamPanel;
 import PamView.tables.SwingTableColumnWidths;
+import nilus.Deployment;
 import tethys.TethysControl;
 import tethys.TethysState;
+import tethys.TethysState.StateType;
 import tethys.deployment.DeploymentHandler;
 import tethys.deployment.DeploymentOverview;
 import tethys.deployment.RecordingPeriod;
@@ -71,14 +78,14 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 		@Override
 		public void mousePressed(MouseEvent e) {
 			if (e.isPopupTrigger()) {
-				showPopup();
+				showPopup(e);
 			}
 		}
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
 			if (e.isPopupTrigger()) {
-				showPopup();
+				showPopup(e);
 			}
 		}
 
@@ -96,7 +103,7 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 
 	}
 
-	public void showPopup() {
+	public void showPopup(MouseEvent e) {
 		int aRow = table.getSelectedRow();
 		int[] selRows = table.getSelectedRows();
 		if (selRows == null || selRows.length == 0) {
@@ -111,21 +118,56 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 		// make a list of RecordingPeriods which don't currently have a Deployment document
 		ArrayList<RecordingPeriod> newPeriods = new ArrayList<>();
 		ArrayList<RecordingPeriod> allPeriods = deploymentOverview.getRecordingPeriods();
+		ArrayList<PDeployment> matchedDeployments = new ArrayList<>();
 		for (int i = 0; i < selRows.length; i++) {
-			if (allPeriods.get(selRows[i]).getMatchedTethysDeployment() == null) {
+			PDeployment tethysDeployment = allPeriods.get(selRows[i]).getMatchedTethysDeployment();
+			if (tethysDeployment == null) {
 				newPeriods.add(allPeriods.get(i));
 			}
+			else {
+				if (matchedDeployments.contains(tethysDeployment) == false) {
+					matchedDeployments.add(tethysDeployment);
+				}
+			}
 		}
-		if (newPeriods.size() == 0) {
-			return;
+		if (matchedDeployments.size() == 1) {
+			JPopupMenu popMenu = new JPopupMenu();
+			JMenuItem menuItem = new JMenuItem("Remove deployment document " + matchedDeployments.get(0));
+			menuItem.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					deleteDeployment(matchedDeployments.get(0));
+				}
+			});
+			popMenu.add(menuItem);
+			popMenu.show(e.getComponent(), e.getX(), e.getY());
 		}
-		/*
-		 *  if we get here, we've one or more rows without a Tethys output, so can have
-		 *  a menu to create them. 
-		 */
+//		if (newPeriods.size() == 0) {
+//			return;
+//		}
+//		/*
+//		 *  if we get here, we've one or more rows without a Tethys output, so can have
+//		 *  a menu to create them. 
+//		 */
+		
 		
 	}
 	
+	protected void deleteDeployment(PDeployment pDeployment) {
+		Deployment dep = pDeployment.deployment;
+		if (dep == null) {
+			return;
+		}
+		int ans = WarnOnce.showWarning(getTethysControl().getGuiFrame(), "Delete Deployment document", 
+				"Are you sure you want to delete the deployment document " + dep.getId(), WarnOnce.OK_CANCEL_OPTION);
+		if (ans == WarnOnce.CANCEL_OPTION) {
+			return;
+		}
+		boolean gone = getTethysControl().getDbxmlConnect().deleteDocument(dep);
+		getTethysControl().sendStateUpdate(new TethysState(StateType.UPDATESERVER));
+	}
+
 	/**
 	 * Get a list of selected recording periods. 
 	 * @return list of selected periods. 
@@ -172,6 +214,9 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 	private void updateDeployments() {
 		DeploymentHandler deploymentHandler = getTethysControl().getDeploymentHandler();
 		deploymentOverview = deploymentHandler.getDeploymentOverview();
+		if (deploymentOverview == null) {
+			return;
+		}
 		int n = deploymentOverview.getRecordingPeriods().size();
 		if (selection.length < n) {
 			selection = Arrays.copyOf(selection, n);

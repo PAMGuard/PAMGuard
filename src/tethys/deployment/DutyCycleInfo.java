@@ -1,5 +1,7 @@
 package tethys.deployment;
 
+import PamUtils.PamCalendar;
+
 public class DutyCycleInfo {
 
 	public boolean isDutyCycled;
@@ -24,7 +26,8 @@ public class DutyCycleInfo {
 			return "No duty cycle";
 		}
 		else {
-			return String.format("%3.1fs on, %3.1fs off, for %d cycles", meanOnTimeS, meanGapS, nCycles);
+			return String.format("%s on, %s off, for %d cycles", PamCalendar.formatDuration((long) (meanOnTimeS*1000)), 
+					PamCalendar.formatDuration((long) (meanGapS*1000)), nCycles);
 		}
 	}
 	

@@ -32,6 +32,7 @@ import nilus.Deployment;
 import nilus.Deployment.Data;
 import tethys.TethysControl;
 import tethys.TethysState;
+import tethys.TethysState.StateType;
 import tethys.dbxml.DBXMLConnect;
 import tethys.deployment.RecordingPeriod;
 import tethys.niluswraps.PDeployment;
@@ -149,6 +150,10 @@ public class DeploymentExportPanel extends TethysGUIPanel implements DeploymentT
 		case NEWPROJECTSELECTION:
 			updateDeployments();
 			enableControls();
+			break;
+		case UPDATEMETADATA:
+			setInternal();
+			break;
 		}
 	}
 
@@ -258,6 +263,7 @@ public class DeploymentExportPanel extends TethysGUIPanel implements DeploymentT
 				dbxmlConnect.postToTethys(deployment);
 			}
 		}
+		getTethysControl().sendStateUpdate(new TethysState(StateType.UPDATESERVER));
 	}
 
 	private void enableControls() {

@@ -466,7 +466,7 @@ public class DetectionsHandler {
 		String prefix = deployment.deployment.getId();
 		detections.setId(String.format("%s_%d", prefix, uniqueDetectionsId++));
 //		detections.setDescription(dataProvider.getDescription(deployment, tethysExportParams));
-		detections.setDescription(exportParams.detectionDescription);
+		detections.setDescription(exportParams.getNilusDetectionDescription());
 		DataSourceType dataSource = new DataSourceType();
 		dataSource.setDeploymentId(deployment.deployment.getId());
 //		dataSource.setEnsembleId(""); ToDo

@@ -1,9 +1,11 @@
 package tethys.output;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 import nilus.DescriptionType;
 import nilus.GranularityEnumType;
+import tethys.niluswraps.PDescriptionType;
 
 /**
  * Parameters controlling export of a single stream. 
@@ -32,13 +34,21 @@ public class StreamExportParams implements Serializable {
 	/*
 	 * Can't have this here since it isn't serializable. 
 	 */
-	transient public nilus.DescriptionType detectionDescription;
+	public PDescriptionType detectionDescription;
 
-	public DescriptionType getDetectionDescription() {
+	public PDescriptionType getDetectionDescription() {
 		if (detectionDescription == null) {
-			detectionDescription = new DescriptionType();
+			detectionDescription = new PDescriptionType();
 		}
 		return detectionDescription;
+	}
+	
+	/**
+	 * Get the nilus detection description
+	 * @return
+	 */
+	public DescriptionType getNilusDetectionDescription() {
+		return getDetectionDescription().getDescription();
 	}
 
 }

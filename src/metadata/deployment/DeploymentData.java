@@ -5,6 +5,7 @@ import java.io.Serializable;
 import PamModel.parametermanager.FieldNotFoundException;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamUtils.LatLong;
 
 /**
  * Class to hold Deployment data in a form consistent with the ANSI PAM
@@ -65,6 +66,46 @@ public class DeploymentData implements Serializable, Cloneable, ManagedParameter
 	 * Name of geographic region.
 	 */
 	private String region;
+	
+	/**
+	 * time of instrument deployment (different to recording start);
+	 */
+	private Long deploymentMillis;
+
+	/**
+	 * time of actual recovery (different to recording end);
+	 */
+	private Long recoveryMillis;
+
+	private LatLong recoverLatLong;
+	
+	/**
+	 * @return the deploymentMillis
+	 */
+	public Long getDeploymentMillis() {
+		return deploymentMillis;
+	}
+
+	/**
+	 * @param deploymentMillis the deploymentMillis to set
+	 */
+	public void setDeploymentMillis(Long deploymentMillis) {
+		this.deploymentMillis = deploymentMillis;
+	}
+
+	/**
+	 * @return the recoveryMillis
+	 */
+	public Long getRecoveryMillis() {
+		return recoveryMillis;
+	}
+
+	/**
+	 * @param recoveryMillis the recoveryMillis to set
+	 */
+	public void setRecoveryMillis(Long recoveryMillis) {
+		this.recoveryMillis = recoveryMillis;
+	}
 
 //	/**
 //	 * Instrument type, e.g. HARP, EAR, Popup, DMON, etc.
@@ -233,6 +274,22 @@ public class DeploymentData implements Serializable, Cloneable, ManagedParameter
 	 */
 	public void setRegion(String region) {
 		this.region = region;
+	}
+
+	/**
+	 * Set the recovery position latlong for a static recorder. 
+	 * Deployment lat long is in the hydrophone array data. 
+	 * @param recoverLatLong
+	 */
+	public void setRecoveryLatLong(LatLong recoverLatLong) {
+		this.recoverLatLong = recoverLatLong;
+	}
+
+	/**
+	 * @return the recoverLatLong (may often be null)
+	 */
+	public LatLong getRecoverLatLong() {
+		return recoverLatLong;
 	}
 
 //	/**

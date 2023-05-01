@@ -2,6 +2,8 @@ package tethys.deployment;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -21,6 +23,8 @@ import Array.Streamer;
 import Array.ThreadingHydrophoneLocator;
 import PamController.PamControlledUnit;
 import PamController.PamController;
+import PamUtils.LatLong;
+import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamguardMVC.PamDataBlock;
 import SoundRecorder.RecordingInfo;
@@ -156,6 +160,20 @@ public class DeploymentHandler implements TethysStateObserver {
 		// just load everything. Probably OK for the acqusition, but will bring down
 		daqInfoDataBlock.loadViewerData(0, Long.MAX_VALUE, null);
 		ArrayList<DaqStatusDataUnit> allStatusData = daqInfoDataBlock.getDataCopy();
+		/**
+		 * Due to seird file overlaps we need to resort this by id if we can.
+		 * 
+		 */
+		Collections.sort(allStatusData, new Comparator<DaqStatusDataUnit>() {
+
+			@Override
+			public int compare(DaqStatusDataUnit o1, DaqStatusDataUnit o2) {
+				if (o1.getDatabaseIndex() == 0) {
+					return (int) (o1.getTimeMilliseconds()-o2.getTimeMilliseconds());
+				}
+				return o1.getDatabaseIndex()-o2.getDatabaseIndex();
+			}
+		});
 
 		ArrayList<RecordingPeriod> tempPeriods = null;
 
@@ -168,8 +186,15 @@ public class DeploymentHandler implements TethysStateObserver {
 		}
 		if (tempPeriods == null || tempPeriods.size() == 0) {
 			System.out.println("Data appear to have no logged recording periods available either from the database or the raw recordings.");
+			return null;
 		}
+
 		int nPeriods = tempPeriods.size();
+//		int i = 0;
+//		for (RecordingPeriod aP : tempPeriods) {
+//			System.out.printf("Pre merge %d : %s to %s\n", i++, PamCalendar.formatDBDateTime(aP.getRecordStart()), 
+//					PamCalendar.formatDBDateTime(aP.getRecordStop()));
+//		}
 		// now go through those and merge into longer periods where there is no gap between files.
 		ListIterator<RecordingPeriod> iterator = tempPeriods.listIterator();
 		RecordingPeriod prevPeriod = null;
@@ -191,6 +216,11 @@ public class DeploymentHandler implements TethysStateObserver {
 			}
 			prevPeriod = nextPeriod;
 		}
+//		i = 0;
+//		for (RecordingPeriod aP : tempPeriods) {
+//			System.out.printf("Post merge %d : %s to %s\n", i++, PamCalendar.formatDBDateTime(aP.getRecordStart()), 
+//					PamCalendar.formatDBDateTime(aP.getRecordStop()));
+//		}
 //		System.out.printf("Data have %d distinct files, but only %d distinct recording periods\n", nPeriods, tempPeriods.size());
 		DutyCycleInfo dutyCycleinfo = assessDutyCycle(tempPeriods);
 		// if it's duty cycles, then we only want a single entry. 
@@ -202,6 +232,17 @@ public class DeploymentHandler implements TethysStateObserver {
 			deploymentPeriods = new ArrayList<>();
 			deploymentPeriods.add(new RecordingPeriod(tempPeriods.get(0).getRecordStart(), tempPeriods.get(tempPeriods.size()-1).getRecordStop()));
 		}
+		/*
+		 * do another sort of the deploymentPeriods. The start stops were in the order they went into the 
+		 * database in the hope that pairs were the right way round. Now check all data are/
+		 */
+		Collections.sort(deploymentPeriods, new Comparator<RecordingPeriod>() {
+			@Override
+			public int compare(RecordingPeriod o1, RecordingPeriod o2) {
+				return (int) (o1.getRecordStart()-o2.getRecordStart());
+			}
+		});
+		
 		DeploymentOverview deploymentOverview = new DeploymentOverview(dutyCycleinfo, deploymentPeriods);
 		matchPamguard2Tethys(deploymentOverview, projectDeployments);
 		this.deploymentOverview = deploymentOverview;
@@ -300,7 +341,6 @@ public class DeploymentHandler implements TethysStateObserver {
 		return cycleInfo;
 	}
 
-
 	private ArrayList<RecordingPeriod> extractTimesFromStatus(ArrayList<DaqStatusDataUnit> allStatusData) {
 		ArrayList<RecordingPeriod> tempPeriods = new ArrayList<>();
 		long dataStart = Long.MAX_VALUE;
@@ -315,13 +355,19 @@ public class DeploymentHandler implements TethysStateObserver {
 				nStart++;
 				dataStart = Math.min(dataStart, daqStatus.getTimeMilliseconds());
 				lastStart = daqStatus.getTimeMilliseconds();
+//				System.out.println("Start at " + PamCalendar.formatDBDateTime(lastStart));
 				break;
 			case "Stop":
 				nStop++;
 				dataEnd = Math.max(dataEnd, daqStatus.getEndTimeInMilliseconds());
 				long lastEnd = daqStatus.getEndTimeInMilliseconds();
 				if (lastStart != null) {
+//					System.out.printf("Adding period %s to %s\n", PamCalendar.formatDBDateTime(lastStart), 
+//							PamCalendar.formatDBDateTime(lastEnd));
 					tempPeriods.add(new RecordingPeriod(lastStart, lastEnd));
+				}
+				else {
+//					System.out.println("Skipping stop at " + PamCalendar.formatDBDateTime(lastEnd));
 				}
 				lastStart = null;
 				break;
@@ -505,16 +551,23 @@ public class DeploymentHandler implements TethysStateObserver {
 			e.printStackTrace();
 		}
 		DeploymentData globalDeplData = tethysControl.getGlobalDeplopymentData();
-		String id = String.format("%s%d", globalDeplData.getProject(), i);
+		String id = String.format("%s_%d", globalDeplData.getProject(), i);
 		deployment.setId(id);
 		deployment.setDeploymentId(i);
 
-		DeploymentRecoveryDetails deploymentDetails = new DeploymentRecoveryDetails();
-		DeploymentRecoveryDetails recoveryDetails = new DeploymentRecoveryDetails();
-		deploymentDetails.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(recordingPeriod.getRecordStart()));
+		DeploymentRecoveryDetails deploymentDetails = deployment.getDeploymentDetails();
+		if (deploymentDetails == null) {
+			deploymentDetails = new DeploymentRecoveryDetails();
+		}
+		DeploymentRecoveryDetails recoveryDetails = deployment.getRecoveryDetails();
+		if (recoveryDetails == null) {
+			recoveryDetails = new DeploymentRecoveryDetails();
+		}
 		deploymentDetails.setAudioTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(recordingPeriod.getRecordStart()));
-		recoveryDetails.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(recordingPeriod.getRecordStop()));
 		recoveryDetails.setAudioTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(recordingPeriod.getRecordStop()));
+
+		deploymentDetails.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(recordingPeriod.getRecordStart()));
+		recoveryDetails.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(recordingPeriod.getRecordStop()));
 		
 		deployment.setDeploymentDetails(deploymentDetails);
 		deployment.setRecoveryDetails(recoveryDetails);
@@ -572,6 +625,22 @@ public class DeploymentHandler implements TethysStateObserver {
 		String geomType = getGeometryType();
 		instrument.setGeometryType(geomType);
 		deployment.setInstrument(instrument);
+		
+		// overwrite the default deployment and recovery times if there is non null data
+		Long depMillis = deploymentData.getDeploymentMillis();
+		if (depMillis != null) {
+			deployment.getDeploymentDetails().setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(depMillis));
+		}
+		Long recMillis = deploymentData.getRecoveryMillis();
+		if (recMillis != null) {
+			deployment.getRecoveryDetails().setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(recMillis));
+		}
+		LatLong recLatLong = deploymentData.getRecoverLatLong();
+		if (recLatLong != null) {
+			deployment.getRecoveryDetails().setLatitude(recLatLong.getLatitude());
+			deployment.getRecoveryDetails().setLongitude(PamUtils.constrainedAngle(recLatLong.getLongitude()));
+		}
+		
 		return true;
 	}
 

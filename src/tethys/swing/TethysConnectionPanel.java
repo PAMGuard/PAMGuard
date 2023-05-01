@@ -62,7 +62,7 @@ public class TethysConnectionPanel extends TethysGUIPanel {
 	
 	private JButton newInstrument;
 	
-	private JButton openClient;
+	private FancyClientButton openClient;
 	
 	public TethysConnectionPanel(TethysControl tethysControl) {
 		super(tethysControl);
@@ -73,8 +73,8 @@ public class TethysConnectionPanel extends TethysGUIPanel {
 		serverSelButton.setToolTipText("Select server");
 		serverStatus = new ScrollingPamLabel(SERVERSTATUSLENGTH);
 		serverName.setEditable(false);
-		openClient = new JButton("Open Client");
-		openClient.setToolTipText("Open Tethys client in web browser");
+		openClient = new FancyClientButton(tethysControl);
+//		openClient.setToolTipText("Open Tethys client in web browser");
 //		serverStatus.setEditable(false);
 		serverSelButton.addActionListener(new ActionListener() {
 			@Override

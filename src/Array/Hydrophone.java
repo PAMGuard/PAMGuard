@@ -158,7 +158,7 @@ public class Hydrophone implements Serializable, Cloneable, ManagedParameters {
 		return sensitivity;
 	}
 
-	protected void setSensitivity(double sensitivity) {
+	public void setSensitivity(double sensitivity) {
 		this.sensitivity = sensitivity;
 	}
 	
@@ -364,7 +364,7 @@ public class Hydrophone implements Serializable, Cloneable, ManagedParameters {
 	/**
 	 * @param preampGain The preampGain to set.
 	 */
-	protected void setPreampGain(double preampGain) {
+	public void setPreampGain(double preampGain) {
 		this.preampGain = preampGain;
 	}
 

@@ -1,9 +1,15 @@
 package tethys.dbxml;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
 import java.util.ArrayList;
 
 import javax.xml.bind.JAXBException;
@@ -31,6 +37,8 @@ public class DBXMLConnect {
 	private Queries queries;
 
 	private String currentSiteURL;
+	
+	public static String[] collections = {"Deployments", "Detections", "Localizations", "Calibrations", "SpeciesAbbreviations"};
 
 	public DBXMLConnect(TethysControl tethysControl) {
 		this.tethysControl = tethysControl;
@@ -136,13 +144,15 @@ public class DBXMLConnect {
 		String tempName = getTempFileName(nilusObject);
 		tempName = tempDirectory.getAbsolutePath() + File.separator + tempName + ".xml";
 		File tempFile = new File(tempName);
+		String bodgeName = tempName;//"C:\\Users\\dg50\\AppData\\Local\\Temp\\PAMGuardTethys\\Meygen2022_10a.xml";
 		try {
 			MarshalXML marshal = new MarshalXML();
 			marshal.createInstance(objClass);
 //				Path tempFile = Files.createTempFile("pamGuardToTethys", ".xml");
 				marshal.marshal(nilusObject, tempFile.toString());
+//				tempFile = stripXMLHeader(tempFile);
 				fileError = Importer.ImportFiles(params.getFullServerName(), collection,
-						new String[] { tempFile.toString() }, "", "", false);
+						new String[] { bodgeName }, "", "", false);
 
 //				System.out.println(fileError);
 
@@ -157,10 +167,61 @@ public class DBXMLConnect {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-//		System.out.println(fileError);
+		System.out.println(fileError);
 		return fileError;
 	}
 
+
+	/**
+	 * Seems we have to get rid of the line <?xml version="1.0" encoding="UTF-8"?>
+	 * which is being put there by the marshaller ? 
+	 * @param tempFile
+	 */
+	private File stripXMLHeader(File tempFile) {
+		// TODO Auto-generated method stub
+
+		File tempTemp = new File(tempFile.getAbsolutePath().replace(".temp.xml", ".xml"));
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(tempFile));
+			BufferedWriter writer = new BufferedWriter(new FileWriter(tempTemp));
+			String line = reader.readLine(); 
+			while (line != null) {
+				// see if the line has any unicode in it
+				int len = line.length();
+				byte[] bytes = line.getBytes();
+				if (len == bytes.length) {
+					System.out.println(line);
+				}
+				
+				if (line.startsWith("<?xml version=")) {
+					
+				}
+				else {
+					writer.write(line + "\r\n");
+				}
+				line = reader.readLine();
+			}
+			writer.close();
+			reader.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return tempFile;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return tempFile;
+		}
+		boolean deleted = tempFile.delete();
+		if (deleted) {
+			tempTemp.renameTo(tempFile);
+			return tempFile;
+		}
+		else {
+			return tempTemp;
+		}
+	
+	}
 
 //	/*
 //	 * force a fluch by sending a dummy document to th eimporter which will rail, but ...

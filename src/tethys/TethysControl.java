@@ -412,7 +412,8 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	public void notifyModelChanged(int changeType) {
 		super.notifyModelChanged(changeType);
 		switch (changeType) {
-		case PamControllerInterface.INITIALIZATION_COMPLETE:
+		case PamControllerInterface.INITIALIZE_LOADDATA:
+//		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			initializationStuff();
 			break;
 		}
