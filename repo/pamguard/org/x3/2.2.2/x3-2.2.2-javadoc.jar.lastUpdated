@@ -1,0 +1,12 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Wed May 03 19:03:35 BST 2023
+@default-talan-https\://nexus.talanlabs.com/content/repositories/releases/.lastUpdated=1683137015553
+file\://C\:\\Users\\dg50\\source\\repos\\PAMGuardDG/repo/.error=
+https\://repo1.maven.org/maven2/.error=
+file\://C\:\\Users\\dg50\\source\\repos\\PAMGuardDG/repo/.lastUpdated=1683137014154
+https\://artifacts.unidata.ucar.edu/repository/unidata-all/.error=
+https\://nexus.bedatadriven.com/content/groups/public/.error=
+https\://nexus.bedatadriven.com/content/groups/public/.lastUpdated=1683137015343
+https\://artifacts.unidata.ucar.edu/repository/unidata-all/.lastUpdated=1683137015146
+https\://repo1.maven.org/maven2/.lastUpdated=1683137015762
+https\://nexus.talanlabs.com/content/repositories/releases/.error=Could not transfer artifact pamguard.org\:x3\:jar\:javadoc\:2.2.2 from/to talan (https\://nexus.talanlabs.com/content/repositories/releases/)\: Access denied to https\://nexus.talanlabs.com/content/repositories/releases/pamguard/org/x3/2.2.2/x3-2.2.2-javadoc.jar. Error code 401, Unauthorized
