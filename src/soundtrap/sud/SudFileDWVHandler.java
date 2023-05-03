@@ -10,6 +10,7 @@ import java.util.List;
 import org.pamguard.x3.sud.Chunk;
 import org.pamguard.x3.sud.SudAudioInputStream;
 import org.pamguard.x3.sud.SudDataInputStream;
+import org.pamguard.x3.sud.SudFileMap;
 
 import Acquisition.AcquisitionControl;
 import Acquisition.sud.SUDNotificationHandler;
@@ -73,7 +74,15 @@ public class SudFileDWVHandler implements SUDNotificationHandler {
 		// this is the wav sample rate, not the detector sample rate, so don't use it
 //		sampleRate = sudAudioInputStream.getFormat().getFrameRate();
 		// this is the right one
-		sampleRate = sudAudioInputStream.getSudMap().clickDetSampleRate;
+		SudFileMap sudMap = sudAudioInputStream.getSudMap();
+		sampleRate = 0;
+		if (sudMap.detectorInfo != null) {
+			sampleRate = sudMap.detectorInfo.sampleRate;
+			stClickControl.setSudClickDetectorInfo(sudMap.detectorInfo);
+		}
+		if (sampleRate == 0) {
+			sampleRate = sudAudioInputStream.getSudMap().clickDetSampleRate;
+		}
 		fileStartMicros = sudAudioInputStream.getSudMap().getFirstChunkTimeMicros();
 		stClickControl.findRawDataBlock().setChannelMap(1);
 		stClickControl.findRawDataBlock().setSampleRate((float) sampleRate, true);
@@ -81,7 +90,7 @@ public class SudFileDWVHandler implements SUDNotificationHandler {
 		stClickControl.getSTAcquisition().acquisitionParameters.voltsPeak2Peak = STAcquisitionControl.SOUNDTRAPVP2P;
 		stClickControl.getSTAcquisition().getAcquisitionProcess().setSampleRate((float) sampleRate, true);
 //		System.out.printf("Open input stream fs = %3.1f\n", sampleRate);
-		
+
 	}
 
 	@Override
@@ -104,10 +113,10 @@ public class SudFileDWVHandler implements SUDNotificationHandler {
 		String chunkName = "Unknown";
 		int chunkSize = sudChunk.buffer.length;
 		if (sudAudioInputStream.getChunkIDString(chunkID).equals("wav")) {
-			
+
 			long millis = sudChunk.getChunkHeader().getMillisTime();
 			stClickControl.updateDisplayScrollers(millis);
-			
+
 			if (sudAudioInputStream.isChunkIDWav(chunkID)) {
 //				chunkName = "RECORDINGS";
 				// System.out.printf("Chunk ID %d, size %d, type %s\n", chunkID, chunkSize,
