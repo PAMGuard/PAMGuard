@@ -1,8 +1,11 @@
 package rawDeepLearningClassifier.dlClassification.orcaSpot;
 
+import java.util.List;
+
 import javax.swing.SwingUtilities;
 
 import PamController.SettingsPane;
+import javafx.stage.FileChooser.ExtensionFilter;
 import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
 
 /**
@@ -68,6 +71,12 @@ public class OrcaSpotClassifierUI implements DLCLassiferModelUI {
 			orcaSpotSidePanel = new OrcaSpotSidePanel(orcaSpotClassiifer); 
 		}
 		return orcaSpotSidePanel; 
+	}
+
+	@Override
+	public List<ExtensionFilter> getModelFileExtensions() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

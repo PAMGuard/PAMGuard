@@ -9,20 +9,13 @@ import org.jamdev.jdl4pam.transforms.DLTransfromParams;
 
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
-import PamController.PamSettings;
-import PamUtils.PamCalendar;
 import rawDeepLearningClassifier.DLControl;
-import rawDeepLearningClassifier.dlClassification.DLClassName;
 import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
-import rawDeepLearningClassifier.dlClassification.DLTaskThread;
-import rawDeepLearningClassifier.dlClassification.PredictionResult;
+import rawDeepLearningClassifier.dlClassification.StandardClassifierModel;
+import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
-import rawDeepLearningClassifier.dlClassification.genericModel.GenericDLClassifier;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
 import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
-import rawDeepLearningClassifier.segmenter.SegmenterProcess.GroupedRawData;
-import warnings.PamWarning;
-import warnings.WarningSystem;
 
 /**
  * Classifier which uses deep learning models from Meridian's Ketos framework.
@@ -36,12 +29,9 @@ import warnings.WarningSystem;
  * @author Jamie Macaulay
  *
  */
-public class KetosClassifier implements DLClassiferModel, PamSettings {
+public class KetosClassifier extends StandardClassifierModel {
+	
 
-	/**
-	 * Reference to the DL contro.. 
-	 */
-	private DLControl dlControl;
 
 	/**
 	 * Paramters for a Ketos classifier. 
@@ -59,27 +49,12 @@ public class KetosClassifier implements DLClassiferModel, PamSettings {
 	 */
 	private KetosWorker ketosWorker; 
 
-	/**
-	 * True to force the classifier to use a queue - can be used for simulating real time operation. 
-	 */
-	private boolean forceQueue = false; 
-
-	/**
-	 * Sound spot warning. 
-	 */
-	PamWarning ketosWarning = new PamWarning("Ketos_Classifier", "",2);
-
-	/**
-	 * The Ketos worker thread has a buffer so that Ketos models can be run
-	 * in real time without dslowing down the rest of PAMGaurd. 
-	 */
-	private KetosThread workerThread;
-
 
 	/**
 	 * The ketos classifier. 
 	 */
 	public KetosClassifier(DLControl dlControl) {
+		super(dlControl); 
 		this.dlControl=dlControl; 
 		this.ketosDLParams = new KetosDLParams(); 
 		this.ketosUI= new KetosUI(this); 
@@ -87,115 +62,6 @@ public class KetosClassifier implements DLClassiferModel, PamSettings {
 		PamSettingManager.getInstance().registerSettings(this);
 	}
 
-
-	@Override
-	public ArrayList<? extends PredictionResult> runModel(ArrayList<GroupedRawData> groupedRawData) {
-		if (getKetosWorker().getModel()==null) return null; 
-
-		//		System.out.println("SoundSpotClassifier: PamCalendar.isSoundFile(): " 
-		//		+ PamCalendar.isSoundFile() + "   " + (PamCalendar.isSoundFile() && !forceQueue));
-		
-		/**
-		 * If a sound file is being analysed then Ketos can go as slow as it wants. if used in real time
-		 * then there is a buffer with a maximum queue size. 
-		 */
-		if ((PamCalendar.isSoundFile() && !forceQueue) || dlControl.isViewer()) {
-			//run the model 
-			ArrayList<KetosResult> modelResult = getKetosWorker().runModel(groupedRawData, 
-					groupedRawData.get(0).getParentDataBlock().getSampleRate(), 0); 
-			
-			if (modelResult==null) {
-				ketosWarning.setWarningMessage("Generic deep learning model returned null");
-				WarningSystem.getWarningSystem().addWarning(ketosWarning);
-				return null;
-			}
-			
-			for (int i =0; i<modelResult.size(); i++) {
-				modelResult.get(i).setClassNameID(GenericDLClassifier.getClassNameIDs(ketosDLParams)); 
-				modelResult.get(i).setBinaryClassification(GenericDLClassifier.isBinaryResult(modelResult.get(i), ketosDLParams)); 
-				modelResult.get(i).setTimeMillis(groupedRawData.get(i).getTimeMilliseconds());
-
-			}
-
-			return modelResult; //returns to the classifier. 
-		}
-		else {
-			//add to a buffer if in real time. 
-			if (workerThread.getQueue().size()>DLModelWorker.MAX_QUEUE_SIZE) {
-				//we are not doing well - clear the buffer
-				workerThread.getQueue().clear();
-			}
-			workerThread.getQueue().add(groupedRawData);
-		}
-		return null;
-	}
-
-
-	@Override
-	public void prepModel() {
-		//System.out.println("PrepModel! !!!");
-		getKetosWorker().prepModel(ketosDLParams, dlControl);
-		
-		if (!ketosDLParams.useDefaultTransfroms) {
-			//set custom transforms in the model. 
-			getKetosWorker().setModelTransforms(ketosDLParams.dlTransfroms);
-		}
-
-		if (getKetosWorker().getModel()==null) {
-			ketosWarning.setWarningMessage("There is no loaded classifier model. Ketos disabled.");
-			WarningSystem.getWarningSystem().addWarning(ketosWarning);
-		}
-
-
-		if ((!PamCalendar.isSoundFile() || forceQueue) && !dlControl.isViewer()) {
-			//for real time only
-			if (workerThread!=null) {
-				workerThread.stopTaskThread();
-			}
-
-			workerThread = new KetosThread(getKetosWorker());
-			workerThread.setPriority(Thread.MAX_PRIORITY);
-			workerThread.start();
-		}
-
-	}
-
-	/**
-	 * The task thread to run Ketos classifier in real time.  
-	 * 
-	 * @author Jamie Macaulay 
-	 *
-	 */
-	public class KetosThread extends DLTaskThread {
-
-		KetosThread(DLModelWorker soundSpotWorker) {
-			super(soundSpotWorker);
-		}
-
-		@Override
-		public void newDLResult(GenericPrediction soundSpotResult, GroupedRawData groupedRawData) {
-			soundSpotResult.setClassNameID(GenericDLClassifier.getClassNameIDs(ketosDLParams)); 
-			soundSpotResult.setBinaryClassification(GenericDLClassifier.isBinaryResult(soundSpotResult, ketosDLParams)); 
-			newResult(soundSpotResult, groupedRawData);
-		}
-
-	}
-	
-	/**
-	 * Send a new result form the thread queue to the process. 
-	 * @param modelResult - the model result;
-	 * @param groupedRawData - the grouped raw data. 
-	 */
-	protected void newResult(GenericPrediction modelResult, GroupedRawData groupedRawData) {
-		this.dlControl.getDLClassifyProcess().newModelResult(modelResult, groupedRawData);
-	}
-
-
-	@Override
-	public void closeModel() {
-		// TODO Auto-generated method stub
-
-	}
 
 	@Override
 	public String getName() {
@@ -206,33 +72,19 @@ public class KetosClassifier implements DLClassiferModel, PamSettings {
 	public DLCLassiferModelUI getModelUI() {
 		return this.ketosUI;
 	}
+	
 
 	@Override
-	public Serializable getDLModelSettings() {
+	public DLModelWorker<GenericPrediction> getDLWorker() {
+		return getKetosWorker();
+	}
+
+
+	@Override
+	public StandardModelParams getDLParams() {
 		return ketosDLParams;
 	}
-
-	@Override
-	public int getNumClasses() {
-		return ketosDLParams.numClasses;
-	}
-
-	@Override
-	public DLClassName[] getClassNames() {
-		//System.out.println("Ketos Model: " + ketosDLParams.numClasses); 
-		return ketosDLParams.classNames;
-	}
-
-	@Override
-	public DLControl getDLControl() {
-		return dlControl;
-	}
-
-	@Override
-	public boolean checkModelOK() {
-		return getKetosWorker().getModel()!=null;
-	}
-
+	
 	/**
 	 * Get the parameters for the Ketos classifier. 
 	 * @param ketosDLParams - the Ketos parameters. 
@@ -247,6 +99,11 @@ public class KetosClassifier implements DLClassiferModel, PamSettings {
 	 */
 	public void setKetosParams(KetosDLParams ketosDLParams) {
 		this.ketosDLParams = ketosDLParams; 
+	}
+
+	@Override
+	public Serializable getDLModelSettings() {
+		return ketosDLParams;
 	}
 
 	/**
@@ -309,23 +166,12 @@ public class KetosClassifier implements DLClassiferModel, PamSettings {
 		else ketosDLParams = new KetosDLParams(); 
 		return true;
 	}
-	
-	@Override
-	public ArrayList<PamWarning> checkSettingsOK() {
-		return GenericDLClassifier.checkSettingsOK(ketosDLParams, dlControl); 
-	}
 
 
 	@Override
 	public boolean isModelType(URI uri) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-
-	@Override
-	public void setModel(URI model) {
-		ketosDLParams.modelPath = model.getPath();
+		//Ketos is easy because there are not many files with a .ktpb extension. 
+		return super.isModelExtensions(uri);
 	}
 
 }

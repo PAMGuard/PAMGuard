@@ -24,15 +24,9 @@ public class KetosModelPane extends StandardModelPane {
 		super(soundSpotClassifier);
 		this.ketosClassifier = soundSpotClassifier; 
 		
-		extensionFilters = new ArrayList<ExtensionFilter>(); 
-		//import the settings holder
-		extensionFilters.add(new ExtensionFilter("Ketos Model", "*.ktpb")); 
 	}
 
-	@Override
-	public ArrayList<ExtensionFilter> getExtensionFilters() {
-		return extensionFilters;
-	}
+
 
 	@Override
 	public void newModelSelected(File file) {

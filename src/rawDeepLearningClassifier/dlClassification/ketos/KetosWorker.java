@@ -11,12 +11,14 @@ import org.jamdev.jdl4pam.transforms.DLTransform.DLTransformType;
 import org.jamdev.jdl4pam.transforms.DLTransformsFactory;
 import org.jamdev.jdl4pam.transforms.jsonfile.DLTransformsParser;
 
-import PamModel.PamModel;
-import PamModel.PamModel.PluginClassloader;
+import PamView.dialog.PamDialog;
+import PamView.dialog.warn.WarnOnce;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
-import rawDeepLearningClassifier.dlClassification.genericModel.PamGenericModel;
+import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
+
+import ai.djl.ndarray.types.Shape;
 
 /**
  * 
@@ -26,7 +28,7 @@ import rawDeepLearningClassifier.dlClassification.genericModel.PamGenericModel;
  * @author Jamie Macaulay 
  *
  */
-public class KetosWorker extends DLModelWorker<KetosResult> {
+public class KetosWorker extends DLModelWorker<GenericPrediction> {
 
 
 	/**
@@ -66,6 +68,12 @@ public class KetosWorker extends DLModelWorker<KetosResult> {
 			//21/11/2022 - Added a null and filename check here to stop the mdoel reloading everytime PAMGuard hits a new file or 
 			//is stopped or started - this was causing a memory leak. 
 			if (ketosModel==null || currentPath ==null || !Paths.get(currentPath).equals(Paths.get(ketosDLParams.modelPath))) {
+				
+				
+				//TODO
+//				if (ketosModel!=null && ketosModel.getModel()!=null) {
+//					ketosModel.getModel().close();
+//				}
 
 				//System.out.println(Paths.get(genericParams.modelPath)); 
 				this.currentPath = ketosDLParams.modelPath; 
@@ -93,8 +101,13 @@ public class KetosWorker extends DLModelWorker<KetosResult> {
 				ketosParams.defaultOutputShape = ketosModel.getOutShape();
 			}
 			
-
-
+			//HACK there seems to be some sort of bug in ketos where the params input shape is correct but the model input shape is wrong. 
+			if (ketosModel.getInputShape()==null || !ketosModel.getInputShape().equals(ketosParams.defaultInputShape)) {
+				WarnOnce.showWarning("Model shape", "The model shape does not match the model metadata. \n Metadata shape will be used used.", WarnOnce.OK_OPTION);
+				ketosModel.setInputShape(ketosParams.defaultInputShape);
+			}
+			
+			
 			///HACK here for now to fix an issue with dB and Ketos transforms having zero length somehow...
 			for (int i=0; i<ketosParams.dlTransforms.size(); i++) {
 				if (ketosParams.dlTransforms.get(i).dltransfromType == DLTransformType.SPEC2DB) {
@@ -114,14 +127,14 @@ public class KetosWorker extends DLModelWorker<KetosResult> {
 			//only load new transforms if defaults are selected
 			if (getModelTransforms()==null || ketosDLParams.dlTransfroms==null || ketosDLParams.useDefaultTransfroms) {
 				System.out.println("  " + transforms); 
-				System.out.println("SET MODEL TRANSFORMS: " + ketosDLParams.dlTransfroms + "  " +  ketosDLParams.useDefaultTransfroms); 
+				//System.out.println("SET MODEL TRANSFORMS: " + ketosDLParams.dlTransfroms + "  " +  ketosDLParams.useDefaultTransfroms); 
 
 				//only set the transforms if they are null - otherwise handled elsewhere. 
 				setModelTransforms(transforms); 
 				ketosDLParams.useDefaultTransfroms = true; 
 			}
 			else {
-				System.out.println("SET CURRENT TRANSFORMS: " + ketosDLParams.dlTransfroms + "  " +  ketosDLParams.useDefaultTransfroms); 
+				//System.out.println("SET CURRENT TRANSFORMS: " + ketosDLParams.dlTransfroms + "  " +  ketosDLParams.useDefaultTransfroms); 
 				//use the old transforms. 
 				setModelTransforms(ketosDLParams.dlTransfroms); 
 			}
@@ -129,8 +142,12 @@ public class KetosWorker extends DLModelWorker<KetosResult> {
 			//ketosDLParams.dlTransfroms = transforms; //this is done after prep model in the settings pane. 
 			ketosDLParams.defaultSegmentLen = ketosParams.seglen*1000.; //the segment length in microseconds. 
 			//ketosParams.classNames = new String[] {"Noise", "Right Whale"}; // FIXME; 
-			ketosDLParams.numClasses = (int) ketosModel.getOutShape().get(1); 
 			
+			
+			ketosDLParams.numClasses = (int) ketosModel.getOutShape().get(1); 
+						
+			
+			/*****
 			//ok 0 the other values are not user selectable but this is. If we relaod the same model we probably want to keep it....
 			//So this is a little bt of a hack but will probably be OK in most cases. 
 			if (ketosDLParams.binaryClassification==null || ketosDLParams.binaryClassification.length!=ketosDLParams.numClasses) {
@@ -186,6 +203,7 @@ public class KetosWorker extends DLModelWorker<KetosResult> {
 	 */
 	public void closeModel() {
 		//TODO
+		this.currentPath = null; 
 	}
 
 
@@ -195,6 +213,11 @@ public class KetosWorker extends DLModelWorker<KetosResult> {
 	 */
 	public KetosModel getModel() {
 		return ketosModel;
+	}
+
+	@Override
+	public boolean isModelNull() {
+		return ketosModel==null;
 	}
 
 

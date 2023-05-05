@@ -22,10 +22,10 @@ public class RawDLParams implements Serializable, Cloneable {
 
 	/**
 	 * The currently selected Deep Learning model.
-	 * (Models are now automatically selected)
+	 * (Models are now automatically selected). 
+	 * -1 means no model selected. 
 	 */
-	@Deprecated
-	public int modelSelection = 0;
+	public int modelSelection = -1;
 	
 	/**
 	 * The current model URI. The deep learning model must have some sort of external file to run. 

@@ -9,7 +9,6 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 
 	public ArraySettingsPane() {
 		super(null);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -26,13 +25,11 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "Array Parameters";
 	}
 
 	@Override
 	public Node getContentNode() {
-		// TODO Auto-generated method stub
 		return new Label("TODO: The Array Manager needs an FX GUI");
 	}
 

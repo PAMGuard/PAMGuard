@@ -112,7 +112,7 @@ public abstract class DLModelWorker<T> {
 			float[] output = null; 
 			long time1 = System.currentTimeMillis();
 			output = runModel(transformedDataStack); 
-			//System.out.println("Model out: " + PamArrayUtils.array2String(output, 2, ","));
+//			System.out.println("Model out: " + PamArrayUtils.array2String(output, 2, ","));
 			long time2 = System.currentTimeMillis();
 
 			int numclasses = (int) (output.length/transformedDataStack.length); 
@@ -169,6 +169,13 @@ public abstract class DLModelWorker<T> {
 	}
 
 	public abstract float[] runModel(float[][][] transformedDataStack);
+	
+	/**
+	 * Check whether a model is null or not. 
+	 * @return true of the model is null. 
+	 */
+	public abstract boolean isModelNull();
+
 
 	public abstract T makeModelResult(float[] prob, double time);
 

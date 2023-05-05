@@ -1,5 +1,6 @@
 package rawDeepLearningClassifier.layoutFX;
 
+import java.net.URI;
 import java.util.ArrayList;
 
 import org.controlsfx.control.PopOver;
@@ -117,11 +118,10 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 	private Object flipPane;
 
 	private PopupControl advLabel;
+
+	private DLModelSelectPane modelSelectPane;
 	
-	/**
-	 * The currently loaded classifier model
-	 */
-	private DLClassiferModel classifierModel = null;
+
 	
 	public RawDLSettingsPane(DLControl dlControl){
 		super(null); 
@@ -139,7 +139,7 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 		mainPane=new PamBorderPane(); 
 		mainPane.setCenter(createDLPane());
 		mainPane.setPadding(new Insets(5,5,5,5));
-		mainPane.setMinHeight(400);
+		mainPane.setMinHeight(430);
 		mainPane.setMaxWidth(MAX_WIDTH);
 		mainPane.setPrefWidth(MAX_WIDTH);
 		//this.getAdvPane().setMaxWidth(MAX_WIDTH);
@@ -240,7 +240,7 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 		/**
 		 * Pane which allows users to select a model type. 
 		 */
-		DLModelSelectPane selectPane = new DLModelSelectPane(dlControl); 
+		 modelSelectPane = new DLModelSelectPane(this); 
 
 //		//add the possible deep learning models. 
 //		dlModelBox= new ComboBox<String>();
@@ -264,7 +264,7 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 
 		classifierPane = new PamBorderPane(); 
 
-		vBox.getChildren().addAll(selectPane, classifierPane);
+		vBox.getChildren().addAll(modelSelectPane, classifierPane);
 
 
 		return vBox; 
@@ -370,12 +370,14 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 	/**
 	 * Set the classifier pane. 
 	 */
-	private void setClassifierPane() {
+	protected void setClassifierPane() {
 		//set the classifier Pane.class 
+		
+		System.out.println("Set CLASSIFIER PANE: " + modelSelectPane.currentClassifierModel); 
 
-		if (classifierModel!=null && classifierModel.getModelUI()!=null) {
-			classifierPane.setCenter(classifierModel.getModelUI().getSettingsPane().getContentNode()); 
-			classifierModel.getModelUI().setParams(); 
+		if (modelSelectPane.currentClassifierModel!=null && modelSelectPane.currentClassifierModel.getModelUI()!=null) {
+			classifierPane.setCenter(modelSelectPane.currentClassifierModel.getModelUI().getSettingsPane().getContentNode()); 
+			modelSelectPane.currentClassifierModel.getModelUI().setParams(); 
 		}
 		else {
 			classifierPane.setCenter(null); 
@@ -410,6 +412,14 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 		currParams.rawSampleSize = windowLength.getValue(); 
 		currParams.sampleHop = hopLength.getValue(); 
 		currParams.maxMergeHops = reMergeSeg.getValue(); 
+		
+		
+		if (modelSelectPane.currentClassifierModel == null) {
+			currParams.modelSelection = -1; 
+		}
+		else {
+			currParams.modelSelection = dlControl.getDLModels().indexOf((modelSelectPane.currentClassifierModel)); 
+		}
 
 
 //		//update any changes
@@ -432,8 +442,18 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 		if (dlControl.getDataSelector()!=null) {
 			dlControl.getDataSelector().getDialogPaneFX().getParams(true); 
 		}
+		
+		
+		//need to make sure we call get params for the current model when the oK button is pressed. 
+		if (this.modelSelectPane.currentClassifierModel!=null) {
+			if (this.modelSelectPane.currentClassifierModel.getModelUI()!=null) {
+				this.modelSelectPane.currentClassifierModel.getModelUI().getParams();
+			}
+		}
 	
 
+		currParams.modelURI = this.modelSelectPane.currentSelectedFile; 
+		
 		return currParams;
 	}
 
@@ -473,7 +493,9 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 		dlControl.createDataSelector(sourcePane.getSource());
 		
 		//set the classifier model. 
-		classifierModel = dlControl.getDLModel(); 
+		if (currParams.modelURI  !=null) {
+			modelSelectPane.currentClassifierModel = dlControl.getDLModel(); 
+		}
 
 //		dlModelBox.getSelectionModel().select(currParams.modelSelection);
 
@@ -490,6 +512,14 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 		enableControls(); 
 		
 		setSegInfoLabel();
+		
+		
+		//set up the model and the custom pane if necessary.  
+		this.modelSelectPane.loadNewModel(currParams.modelURI); 
+		//this.modelSelectPane.updatePathLabel(); 
+		this.setClassifierPane();
+		
+		sourcePane.getChannelValidator().validate();
 
 	}
 
@@ -517,6 +547,14 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 	 */
 	public PamDataBlock getSelectedParentDataBlock() {
 		return sourcePane.getSource();
+	}
+
+	/**
+	 * Get the DLControl associated with the pane. 
+	 * @return a reference to the DLControl. 
+	 */
+	public DLControl getDLControl() {
+		return  dlControl;
 	}
 
 

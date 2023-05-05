@@ -38,9 +38,9 @@ public abstract class DLTaskThread extends Thread {
 	public void stopTaskThread() {
 		run.set(false);  
 		//Clean up daemon.
-		if (dlModelWorker!=null) {
-			dlModelWorker.closeModel();
-		}
+//		if (dlModelWorker!=null) {
+//			dlModelWorker.closeModel();
+//		}
 		dlModelWorker = null; 
 	}
 

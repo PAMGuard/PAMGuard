@@ -1,8 +1,12 @@
 package rawDeepLearningClassifier.dlClassification.ketos;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.JPanel;
 
 import PamController.SettingsPane;
+import javafx.stage.FileChooser.ExtensionFilter;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
 
@@ -23,6 +27,8 @@ public class KetosUI  implements DLCLassiferModelUI {
 	 * The sound spot classifier. 
 	 */
 	private KetosClassifier ketosClassifier;
+
+	private ArrayList<ExtensionFilter> extensionFilters;
 	
 	/**
 	 * SondSpot classifier. 
@@ -30,6 +36,10 @@ public class KetosUI  implements DLCLassiferModelUI {
 	 */
 	public KetosUI(KetosClassifier ketosClassifier) {
 		this.ketosClassifier=ketosClassifier; 
+		
+		extensionFilters = new ArrayList<ExtensionFilter>(); 
+		//import the settings holder
+		extensionFilters.add(new ExtensionFilter("Ketos Model", "*.ktpb")); 
 	}
 
 	@Override
@@ -44,7 +54,6 @@ public class KetosUI  implements DLCLassiferModelUI {
 	@Override
 	public void getParams() {
 		KetosDLParams ketosParams =  (KetosDLParams) getSettingsPane().getParams(ketosClassifier.getKetosParams()); 
-		System.out.println("KetosUI PARMAS: " + ketosParams.dlTransfromParams); 
 		ketosClassifier.setKetosParams(ketosParams); 
 	}
 
@@ -61,5 +70,12 @@ public class KetosUI  implements DLCLassiferModelUI {
 		//no side pane for Ketos just now. 
 		return null;
 	}
+	
+	@Override
+	public List<ExtensionFilter> getModelFileExtensions() {
+		return extensionFilters;
+	}
+
+
 	
 }

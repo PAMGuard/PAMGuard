@@ -11,7 +11,6 @@ import PamguardMVC.DataUnitBaseData;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamInstantProcess;
 import PamguardMVC.PamObservable;
-import PamguardMVC.PamProcess;
 import binaryFileStorage.DataUnitFileInformation;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.RawDLParams;

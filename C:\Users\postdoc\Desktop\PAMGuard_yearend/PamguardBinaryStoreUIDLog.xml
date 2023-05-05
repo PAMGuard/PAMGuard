@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ISO-8859-1"?><PAMGUARD>
+    <VERSIONINFO Created="7 April 2023 at 08:06:41 UTC" MinAspVersion="2.35.23" Release="CORE" Version="2.02.07b"/>
+    <MODULES>
+        <MODULE>
+            <BinFilePrefix>Data_Acquisition_Sound_Acquisition_Raw_Data_</BinFilePrefix>
+            <lastUID>0</lastUID>
+        </MODULE>
+        <MODULE>
+            <BinFilePrefix>Deep_Learning_Classifier_Deep_Learning_Classifier_DL_Model_Data_</BinFilePrefix>
+            <lastUID>2000047</lastUID>
+        </MODULE>
+        <MODULE>
+            <BinFilePrefix>Deep_Learning_Classifier_Deep_Learning_Classifier_DL_detection_</BinFilePrefix>
+            <lastUID>2000000</lastUID>
+        </MODULE>
+    </MODULES>
+</PAMGUARD>

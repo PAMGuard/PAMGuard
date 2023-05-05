@@ -216,7 +216,7 @@ public class SimpleTransformPane extends DLTransformPane {
 		//System.out.println("Transform type: " + simpleTransform.getDLTransformType() + " " + simpleTransform.getParams().length + "  " + spinners.size());
 		for (int i=0; i<spinners.size(); i++) {
 			//spinners.get(i).getValueFactory().setValue(simpleTransform.getParams()[i] ); 
-			System.out.println("Set params: " + input.getDLTransformType() + " param val: " + simpleTransform.getParams()[i] + "  " + (simpleTransform.getParams()[i] instanceof Float)); 
+			//System.out.println("Set params: " + input.getDLTransformType() + " param val: " + simpleTransform.getParams()[i] + "  " + (simpleTransform.getParams()[i] instanceof Float)); 
 			if (simpleTransform.getParams()[i] instanceof Float || simpleTransform.getParams()[i] instanceof Double) {
 				//System.out.println("Double: simpleTransform.getParams()[i]: " + simpleTransform.getParams()[i] + "  " +spinners.get(i).getValueFactory());
 				spinners.get(i).getValueFactory().setValue(simpleTransform.getParams()[i].doubleValue());

@@ -1,7 +1,9 @@
 package rawDeepLearningClassifier.layoutFX;
 
-import javax.swing.JPanel;
+import java.util.List;
 
+import javax.swing.JPanel;
+import javafx.stage.FileChooser.ExtensionFilter;
 import PamController.SettingsPane;
 
 /**
@@ -26,6 +28,13 @@ public interface DLCLassiferModelUI {
 	 * Set the parameters for the settings pane. 
 	 */
 	public void setParams(); 
+	
+	
+	/**
+	 * If using a file dialog to search for 
+	 * @return the file extensions (if any) for this type of classifier
+	 */
+	public List<ExtensionFilter> getModelFileExtensions(); 
 	
 	/**
 	 * Get a side panel specific to the classifier. 

@@ -1,8 +1,6 @@
 package rawDeepLearningClassifier.dlClassification.animalSpot;
 
 import java.io.File;
-import java.util.ArrayList;
-
 import org.controlsfx.control.CheckComboBox;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.ToggleSwitch;
@@ -18,7 +16,6 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.stage.FileChooser.ExtensionFilter;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
@@ -204,14 +201,6 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 
 
 	/**
-	 * Get a list of extension fitlers for the file dialog. 
-	 * e.g. 
-	 * new ExtensionFilter("Pytorch Model", "*.pk")
-	 * @return a list of extension fitlers for the file dialog. 
-	 */
-	public abstract ArrayList<ExtensionFilter> getExtensionFilters(); 
-
-	/**
 	 * The default segment len changed. 
 	 */
 	private void defaultSegmentLenChanged() {
@@ -278,7 +267,7 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 
 	@Override
 	public StandardModelParams getParams(StandardModelParams currParams) {
-
+		
 		if (currentSelectedFile==null) {
 			//uuurgh need to sort this out with FX stuff
 			WarnOnce.showWarningFX(null,  "No Model File",  "There is no model file selected in the path: Please select a compatible model" , AlertType.ERROR);
@@ -296,13 +285,9 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 		currParams.threshold = detectionSpinner.getValue(); 
 		//		currParams.useCUDA = useCuda.isSelected(); 
 
-		//System.out.println("StandardModelParams 1: " + currParams); 
+//		System.out.println("StandardModelParams : this.paramsClone.numClasses " + this.paramsClone.numClasses); 
+	
 		
-		//System.out.println("StandardModelParams 2: " + currParams.useDefaultTransfroms); 
-
-		
-		//System.out.println("StandardModelParams 2: " + currParams.useDefaultTransfroms); 
-
 		boolean[] speciesClass = new boolean[this.paramsClone.numClasses]; 
 
 		for (int i=0; i< speciesClass.length; i++) {
@@ -315,15 +300,13 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 		
 		
 		currParams = (StandardModelParams) this.getAdvSettingsPane().getParams(currParams);
-		
-		System.out.println("GET advanced params: "); 
-		
+				
 		//get class names from the paramClone as these may have been set by a loaded model
 		//instead of a using changing a control.
 		currParams.classNames = paramsClone.classNames; 
 		currParams.numClasses = paramsClone.numClasses; 
 		
-		if (paramsClone.classNames == null && speciesIDBox.getItems()!=null) {
+		if ((paramsClone.classNames == null ||  paramsClone.classNames.length<=0) && speciesIDBox.getItems()!=null) {
 			
 			String[] classNames = new String[speciesIDBox.getItems().size()]; 
 			for (int i=0; i<speciesIDBox.getItems().size(); i++) {
@@ -331,6 +314,10 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 			}
 			currParams.classNames = this.dlClassifierModel.getDLControl().getClassNameManager().makeClassNames(classNames);
 		}
+		
+//		System.out.println("GET CLASS NAMES: currParams.classNames: " + currParams.classNames + " " +   
+//		(currParams.classNames!=null?  currParams.classNames.length: 0 + " " + currParams.numClasses)); 
+
 
 		currParams.useDefaultSegLen = usedefaultSeg.isSelected(); 
 		
@@ -371,12 +358,11 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 	private void setClassNames(StandardModelParams currParams) {
 		speciesIDBox.getItems().clear();
 
+		System.out.println("SET CLASS NAMES: currParams.classNames: " + currParams.classNames + " " +  (currParams.classNames!=null ? currParams.classNames.length: 0) + " " + currParams.numClasses); 
 
 		int classNamesLen = 0; 
 
 		if (currParams.classNames!=null) classNamesLen = currParams.classNames.length; 
-
-		//System.out.println("SET CLASS NAMES: currParams.classNames: " + currParams.classNames + " " +  classNamesLen + " " + currParams.numClasses); 
 
 
 		for (int i=0; i<Math.max(classNamesLen, currParams.numClasses); i++) {

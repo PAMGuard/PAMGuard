@@ -11,20 +11,14 @@ public class SoundSpotModelPane extends StandardModelPane {
 	 * Reference to the currently selected sound spot classifier. 
 	 */
 	private SoundSpotClassifier soundSpotClassifier;
-	
-	/**
-	 * The extension filter for sound spot models. 
-	 */
-	private ArrayList<ExtensionFilter> extensionFilters; 
+
 
 
 	public SoundSpotModelPane(SoundSpotClassifier soundSpotClassifier) {
 		super(soundSpotClassifier);
 		// TODO Auto-generated constructor stub
 		this.soundSpotClassifier=soundSpotClassifier; 
-		
-		extensionFilters = new  ArrayList<ExtensionFilter> (); 
-		extensionFilters.add(new ExtensionFilter("Pytorch Model", "*.pk")); 
+
 	}
 	
 	
@@ -58,9 +52,9 @@ public class SoundSpotModelPane extends StandardModelPane {
 		 * Note that the model prep will determine whether new transforms need to be loaded from the 
 		 * model or to use the existing transforms in the settings. 
 		 */
-		soundSpotClassifier.getSoundSpotWorker().prepModel(params, soundSpotClassifier.getDLControl());
+		soundSpotClassifier.getDLWorker().prepModel(params, soundSpotClassifier.getDLControl());
 		//get the model tansforms calculated from the model by SoundSpoyWorker and apply them to our temporary params clone. 
-		getParamsClone().dlTransfroms = this.soundSpotClassifier.getSoundSpotWorker().getModelTransforms(); 
+		getParamsClone().dlTransfroms = this.soundSpotClassifier.getDLWorker().getModelTransforms(); 
 		
 	
 //		if (getParamsClone().defaultSegmentLen!=null) {
@@ -72,10 +66,5 @@ public class SoundSpotModelPane extends StandardModelPane {
 
 	}
 
-
-	@Override
-	public ArrayList<ExtensionFilter> getExtensionFilters() {
-		return extensionFilters;
-	}
 
 }

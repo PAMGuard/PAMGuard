@@ -78,9 +78,13 @@ public class GenericModelWorker extends DLModelWorker<GenericPrediction> {
 //			}
 			
 			//first open the model and get the correct parameters.
-			//21/11/2022 - Added a null and filename check here to stop the mdoel reloading everytime PAMGuard hits a new file or 
+			//21/11/2022 - Added a null and filename check here to stop the model reloading everytime PAMGuard hits a new file or 
 			//is stopped or started - this was causing a memory leak. 
 			if (genericModel==null || !Paths.get(genericModel.getModel().getName()).equals(Paths.get(genericParams.modelPath))) {
+				
+				if (genericModel!=null && genericModel.getModel()!=null) {
+					genericModel.getModel().close();
+				}
 				//System.out.println(Paths.get(genericParams.modelPath)); 
 				genericModel = new PamGenericModel(genericParams.modelPath); 
 
@@ -88,6 +92,8 @@ public class GenericModelWorker extends DLModelWorker<GenericPrediction> {
 				//System.out.println(genericModel.getModel().getModelPath().getFileName()); 
 			}
 			
+			setModelTransforms(genericParams.dlTransfroms); 
+
 			//is this a waveform or a spectrogram model?
 			DLTransform transform = genericParams.dlTransfroms.get(genericParams.dlTransfroms.size()-1); 
 			if (transform instanceof FreqTransform) {
@@ -140,7 +146,10 @@ public class GenericModelWorker extends DLModelWorker<GenericPrediction> {
 
 	@Override
 	public void closeModel() {
-		genericModel.getModel().close();
+//		can be very important to prevent memory leak for long term processing. 
+		if (genericModel!=null && genericModel.getModel()!=null) {
+			genericModel.getModel().close();
+		}
 	}
 
 	/**
@@ -149,6 +158,11 @@ public class GenericModelWorker extends DLModelWorker<GenericPrediction> {
 	 */
 	public PamGenericModel getModel() {
 		return genericModel;
+	}
+
+	@Override
+	public boolean isModelNull() {
+		return genericModel==null;
 	}
 
 }

@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import org.controlsfx.control.PopOver;
@@ -42,7 +43,7 @@ import rawDeepLearningClassifier.dlClassification.DefaultModels.DefualtModel;
 /**
  * A pane which allows users to select a model. 
  * 
- * Models could be potnetially selected from 
+ * Models could be potentially selected from 
  * 1) A file (implemented)
  * 2) A URL (not implemented)
  * 3) A default list of models (not implemented. )
@@ -61,7 +62,7 @@ public class DLModelSelectPane extends PamBorderPane {
 	/**
 	 * Currently selected file.
 	 */
-	private File currentSelectedFile = new File(System.getProperty("user.home"));
+	protected URI currentSelectedFile = new File(System.getProperty("user.home")).toURI();
 
 	/**
 	 * The label showing the path to the file. 
@@ -87,7 +88,7 @@ public class DLModelSelectPane extends PamBorderPane {
 	/**
 	 * The current classifier model. 
 	 */
-	private DLClassiferModel currentClassifierModel;
+	DLClassiferModel currentClassifierModel;
 	
 	/**
 	 * The default models. 
@@ -99,11 +100,14 @@ public class DLModelSelectPane extends PamBorderPane {
 	 */
 	private PopOver urlPopOver;
 
-	private TextField uriTextField; 
+	private TextField uriTextField;
+
+	private RawDLSettingsPane rawDLSettingsPane; 
 
 	
-	public DLModelSelectPane(DLControl dlControl) {
-		this.dlControl=dlControl; 
+	public DLModelSelectPane(RawDLSettingsPane rawDLSettingsPane) {
+		this.rawDLSettingsPane=rawDLSettingsPane; 
+		this.dlControl=rawDLSettingsPane.getDLControl(); 
 		this.setCenter(createDLSelectPane());
 		//the directory chooser. 
 		fileChooser = new FileChooser();
@@ -140,9 +144,9 @@ public class DLModelSelectPane extends PamBorderPane {
 			fileChooser.getExtensionFilters().addAll(getExtensionFilters()); 
 
 
-			Path path = currentSelectedFile.toPath();
+			Path path = Paths.get(currentSelectedFile); 
 			if(path!=null && Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
-				fileChooser.setInitialDirectory(new File(currentSelectedFile.getParent()));
+				fileChooser.setInitialDirectory(new File(new File(currentSelectedFile).getParent()));
 			}
 			else { 
 				fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
@@ -154,38 +158,10 @@ public class DLModelSelectPane extends PamBorderPane {
 				return; 
 			}
 			
-			modelLoadIndicator.setVisible(true);
-
-			pathLabel.setText("Loading model...");
+			loadNewModel(file.toURI()); 
 			
-			
-            // separate non-FX thread - load the model 
-			//on a separate thread so we can show a moving load 
-			//bar on the FX thread. Otherwise the GUI locks up  
-			//whilst stuff is loaded. 
-			new Thread() {
-				// runnable for that thread
-				public void run() {
-					try {
-						newModelSelected(file.toURI()); 
-						Thread.sleep(5000);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-					Platform.runLater(new Runnable() {
-						public void run() {
-							modelLoadIndicator.setVisible(false);
-							updatePathLabel(); 
-						}
-		
-					});
-				}			
-			}.start();
+     
 		});
-		
-		
 		
 		
 		PamVBox urlBox = new PamVBox(); 
@@ -252,30 +228,89 @@ public class DLModelSelectPane extends PamBorderPane {
 		
 		return hBox; 
 	}
+	
+	/**
+	 * Load a new model on a seperate thread. 
+	 * @param uri - the uri to the model. 
+	 */
+	public void loadNewModel(URI uri) {
+	     // separate non-FX thread - load the model 
+				//on a separate thread so we can show a moving load 
+				//bar on the FX thread. Otherwise the GUI locks up  
+				//whilst stuff is loaded. 
+		if (uri==null) return; 
+		
+		pathLabel.setText("Loading model...");
+		modelLoadIndicator.setVisible(true);
+		
+				new Thread() {
+					// runnable for that thread
+					public void run() {
+						try {
+							newModelSelected(uri); 
+							currentSelectedFile = uri;
+							Thread.sleep(1000); //just show the user something happened if model loading is rapid. 
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+						Platform.runLater(new Runnable() {
+
+								public void run() {
+									try {
+									rawDLSettingsPane.setClassifierPane(); 
+									modelLoadIndicator.setVisible(false);
+									updatePathLabel(); 
+									}
+									catch (Exception e) {
+										e.printStackTrace();
+									}
+								}
+					
+						});
+					}			
+				}.start();
+	}
 
 	/**
 	 * A new model has been selected 
 	 * @param 
 	 */
 	private void newModelSelected(URI file) {
-		this.currentClassifierModel = this.dlControl.getDlClassifierChooser().selectClassiferModel(file); 
-		if (currentClassifierModel==null) {
-			currentClassifierModel.setModel(file);
+		if (file == null) {
+			return;
 		}
+		
+		this.currentClassifierModel = this.dlControl.getDlClassifierChooser().selectClassiferModel(file); 
+		
+		System.out.println("New classifier model selected!: " + currentClassifierModel); 
+		if (currentClassifierModel!=null) {
+			currentClassifierModel.setModel(file);
+			currentClassifierModel.prepModel();
+		}
+		
+		
 	}
 	
 	
 	/**
 	 * Update the path label and tool tip text; 
 	 */
-	private void updatePathLabel() {
-		if (currentClassifierModel == null ? true : !currentClassifierModel.checkModelOK()) {
+	protected void updatePathLabel() {
+		//System.out.println("Update path label: " + currentClassifierModel.checkModelOK()); 
+		if (currentClassifierModel == null) {
 			pathLabel.setText("No classifier model loaded: Select model");
+			pathLabel.setTooltip(new Tooltip("Use the browse button/ URI botton to select a model or select a default model"));
+		}
+		
+		else if (!currentClassifierModel.checkModelOK()) {
+			pathLabel.setText("The model could not be loaded?");
 			pathLabel.setTooltip(new Tooltip("Use the browse button/ URI botton to select a model or select a default model"));
 
 		}
 		else {
-			pathLabel .setText(this.currentSelectedFile.getName()); 
+			pathLabel .setText(new File(this.currentSelectedFile).getName()); 
 			try {
 				pathLabel.setTooltip(new Tooltip(this.currentSelectedFile.getPath() 
 						+ "\n" +" Processor CPU " + Device.cpu() + "  " +  Device.gpu()));
@@ -295,10 +330,23 @@ public class DLModelSelectPane extends PamBorderPane {
 	 */
 
 	public ArrayList<ExtensionFilter> getExtensionFilters() {
+				
 		
+		 ArrayList<String> extensionFilters  = new  ArrayList<String>(); 
 		
+		 for (DLClassiferModel dlModel: dlControl.getDLModels()) {
+			 if (dlModel.getModelUI()!=null) {
+				 for (ExtensionFilter extFilter: dlModel.getModelUI().getModelFileExtensions()){
+					 extensionFilters.addAll(extFilter.getExtensions()); 
+				 }
+			 }
+		 }
+		 
+		//Now we don't really want lots of extension filters 
+		 ArrayList<ExtensionFilter> dlExtFilter = new  ArrayList<ExtensionFilter>(); 		
+		 dlExtFilter.add(new ExtensionFilter("Deep Learning Models", extensionFilters));
 		
-		return null; 
+		return dlExtFilter ; 
 	}
 	
 	

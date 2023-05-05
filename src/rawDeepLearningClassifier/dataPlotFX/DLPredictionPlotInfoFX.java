@@ -82,13 +82,19 @@ public class DLPredictionPlotInfoFX extends GenericLinePlotInfo {
 		frequencyInfo = new GenericScaleInfo(0, 1, ParameterType.FREQUENCY, ParameterUnits.HZ);
 		
 		DLClassName[] classNames = getDlControl().getDLModel().getClassNames();
+		
+		System.out.println("Class names are: !!! " + (classNames == null ? "null" : classNames.length)); 
+		
+		if (classNames!=null) {
 
-		//make sure this is initialised otherwise the plot won't work when first created. 
-		if (dlPredParams.lineInfos==null ) dlPredParams.lineInfos = new LineInfo[classNames.length];
-		for (int i=0; i<classNames.length; i++) {
-			if (dlPredParams.lineInfos[i]==null) {
-				dlPredParams.lineInfos[i] = new LineInfo(true, Color.rgb(0, 0, 255%(i*30 + 50)));
+			//make sure this is initialised otherwise the plot won't work when first created. 
+			if (dlPredParams.lineInfos==null ) dlPredParams.lineInfos = new LineInfo[classNames.length];
+			for (int i=0; i<classNames.length; i++) {
+				if (dlPredParams.lineInfos[i]==null) {
+					dlPredParams.lineInfos[i] = new LineInfo(true, Color.rgb(0, 0, 255%(i*30 + 50)));
+				}
 			}
+			
 		}
 
 		addScaleInfo(probabilityScaleInfo);

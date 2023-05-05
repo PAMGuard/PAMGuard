@@ -2,26 +2,21 @@ package rawDeepLearningClassifier.dlClassification.animalSpot;
 
 import java.io.Serializable;
 import java.net.URI;
+
 import java.util.ArrayList;
+
+import org.jamdev.jdl4pam.animalSpot.AnimalSpotModel;
 import org.jamdev.jdl4pam.transforms.DLTransformsFactory;
 import org.jamdev.jdl4pam.transforms.DLTransfromParams;
 
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
-import PamController.PamSettings;
-import PamUtils.PamCalendar;
 import rawDeepLearningClassifier.DLControl;
-import rawDeepLearningClassifier.dlClassification.DLClassName;
 import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
-import rawDeepLearningClassifier.dlClassification.DLTaskThread;
+import rawDeepLearningClassifier.dlClassification.StandardClassifierModel;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
-import rawDeepLearningClassifier.dlClassification.genericModel.GenericDLClassifier;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
 import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
-import rawDeepLearningClassifier.layoutFX.RawDLSettingsPane;
-import rawDeepLearningClassifier.segmenter.SegmenterProcess.GroupedRawData;
-import warnings.PamWarning;
-import warnings.WarningSystem;
 
 /**
  * A deep learning classifier running models wihc have been created using the
@@ -42,12 +37,7 @@ import warnings.WarningSystem;
  * @author JamieMacaulay
  *
  */
-public class SoundSpotClassifier implements DLClassiferModel, PamSettings {
-
-	/**
-	 * Reference to the control.
-	 */
-	private DLControl dlControl;
+public class SoundSpotClassifier extends StandardClassifierModel {
 
 	/**
 	 * The user interface for sound spot. 
@@ -63,87 +53,127 @@ public class SoundSpotClassifier implements DLClassiferModel, PamSettings {
 	/**
 	 * The deep learning model worker.
 	 */
-	private SoundSpotWorker soundSpotWorker;
+	private DLModelWorker<GenericPrediction> soundSpotWorker;
 
-	/**
-	 * True to force the classifier to use a queue - used for simulating real time operation. 
-	 */
-	private boolean forceQueue = false; 
-
-	/**
-	 * Sound spot warning. 
-	 */
-	PamWarning soundSpotWarning = new PamWarning("AnimalSpot_Classifier", "",2);
-
-	/**
-	 * Runs the deep leanring on a different thread with a data buffer. For real time only. 
-	 */
-	private DLTaskThread workerThread; 
 
 	public SoundSpotClassifier(DLControl dlControl) {
-		this.dlControl=dlControl; 
+		super(dlControl); 
 		this.soundSpotParmas = new StandardModelParams(); 
 		this.soundSpotUI= new SoundSpotUI(this); 
 		//load the previous settings
 		PamSettingManager.getInstance().registerSettings(this);
-		
-		System.out.println("LOADED CLASS NAMES: currParams.classNames: " + soundSpotParmas.classNames); 
+
+//		System.out.println("LOADED CLASS NAMES: currParams.classNames: " + soundSpotParmas.classNames); 
 
 	}
 
 
 	@Override
-	public ArrayList<SoundSpotResult> runModel(ArrayList<GroupedRawData> groupedRawData) {
+	public String getName() {
+		return "AnimalSpot";
+	}
 
-		//		System.out.println("SoundSpotClassifier: PamCalendar.isSoundFile(): " 
-		//		+ PamCalendar.isSoundFile() + "   " + (PamCalendar.isSoundFile() && !forceQueue));
-		/**
-		 * If a sound file is being analysed then SoundSpot can go as slow as it wants. if used in real time
-		 * then there is a buffer with a maximum queue size. 
-		 */
-		if ((PamCalendar.isSoundFile() && !forceQueue) || dlControl.isViewer()) {
-			//run the model 
-			ArrayList<SoundSpotResult> modelResult = getSoundSpotWorker().runModel(groupedRawData, 
-					groupedRawData.get(0).getParentDataBlock().getSampleRate(), 0); 
+	@Override
+	public DLCLassiferModelUI getModelUI() {
+		return soundSpotUI;
+	}
 
-			for (int i =0; i<modelResult.size(); i++) {
-				modelResult.get(i).setClassNameID(getClassNameIDs()); 
-				modelResult.get(i).setBinaryClassification(isBinaryResult(modelResult.get(i))); 
-			}
+	@Override
+	public Serializable getDLModelSettings() {
+		return soundSpotParmas;
+	}
 
-			return modelResult; //returns to the classifier. 
+	@Override
+	public String getUnitName() {
+		return dlControl.getUnitName()+"_SoundSpot"; 
+	}
+
+	@Override
+	public String getUnitType() {
+		return dlControl.getUnitType()+"_SoundSpot";
+	}
+
+	@Override
+	public Serializable getSettingsReference() {
+		if (soundSpotParmas==null) {
+			soundSpotParmas = new StandardModelParams(); 
 		}
-		else {
-			//add to a buffer if in real time. 
-			if (workerThread.getQueue().size()>DLModelWorker.MAX_QUEUE_SIZE) {
-				//we are not doing well - clear the buffer
-				workerThread.getQueue().clear();
+
+		ArrayList<DLTransfromParams> dlTransformParams = DLClassiferModel.getDLTransformParams(soundSpotParmas.dlTransfroms);
+
+		soundSpotParmas.dlTransfromParams=dlTransformParams; 
+
+
+		//System.out.println("SoundSpot have been saved. : " + soundSpotParmas.classNames); 
+		return soundSpotParmas;
+
+	}
+
+
+	@Override
+	public long getSettingsVersion() {
+		return StandardModelParams.serialVersionUID;
+	}
+
+
+	@Override
+	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
+		StandardModelParams newParameters = (StandardModelParams) pamControlledUnitSettings.getSettings();
+		if (newParameters!=null) {
+			soundSpotParmas = newParameters.clone();
+			//System.out.println("SoundSpot have been restored. : " + soundSpotParmas.classNames); 
+			if (soundSpotParmas.dlTransfromParams!=null) {
+				soundSpotParmas.dlTransfroms = DLTransformsFactory.makeDLTransforms((ArrayList<DLTransfromParams>) soundSpotParmas.dlTransfromParams); 
 			}
-			workerThread.getQueue().add(groupedRawData);
 		}
-		return null;
+		else soundSpotParmas = new StandardModelParams(); 
+		return true;
 	}
 
 	/**
-	 * Check whether a model passes a binary test...
-	 * @param modelResult - the model results
-	 * @return the model results. 
+	 * Get the sound spot parameters. 
+	 * @return sound spot parameters. 
 	 */
-	private boolean isBinaryResult(GenericPrediction modelResult) {
-		for (int i=0; i<modelResult.getPrediction().length; i++) {
-			if (modelResult.getPrediction()[i]>soundSpotParmas.threshold && soundSpotParmas.binaryClassification[i]) {
-				//System.out.println("SoundSpotClassifier: prediciton: " + i + " passed threshold with val: " + modelResult.getPrediction()[i]); 
-				return true; 
-			}
-		}
-		return  false;
+	public StandardModelParams getSoundSpotParams() {
+		return soundSpotParmas;
 	}
 
 	/**
-	 * Get the sound spot worker. 
-	 * @return the sound spot worker. 
+	 * Set the sound spot parameters. 
+	 * @param the params to set 
 	 */
-	SoundSpotWorker getSoundSpotWorker() {
+	public void setSoundSpotParams(StandardModelParams soundSpotParmas) {
+		this.soundSpotParmas=soundSpotParmas; 
+	}
+
+
+
+	@Override
+	public boolean isModelType(URI uri) {
+		//TODO need to be more sophisticated here. 
+		if (super.isModelExtensions(uri)) {
+			//we have a PyTorch model but is it animal spot.
+			
+			try {
+				AnimalSpotModel soundSpotModel = new AnimalSpotModel(uri.getPath()); 
+				if (soundSpotModel!=null && soundSpotModel.getExtraFiles()!=null) {
+					return true;
+				}
+				return false; 
+			}
+			
+			catch (Exception e) {
+				return false;
+			}
+			
+		}
+		
+		return false; 
+	}
+
+
+	@Override
+	public DLModelWorker<GenericPrediction> getDLWorker() {
 		if (soundSpotWorker==null) {
 			soundSpotWorker = new SoundSpotWorker(); 
 		}
@@ -151,25 +181,31 @@ public class SoundSpotClassifier implements DLClassiferModel, PamSettings {
 	}
 
 
-	/**
-	 * The task thread. 
-	 * @author Jamie Macaulay 
-	 *
-	 */
-	public class TaskThread extends DLTaskThread {
 
-		TaskThread(DLModelWorker soundSpotWorker) {
-			super(soundSpotWorker);
-		}
-
-		@Override
-		public void newDLResult(GenericPrediction soundSpotResult, GroupedRawData groupedRawData) {
-			soundSpotResult.setClassNameID(getClassNameIDs()); 
-			soundSpotResult.setBinaryClassification(isBinaryResult(soundSpotResult)); 
-			newResult(soundSpotResult, groupedRawData);
-		}
-
+	@Override
+	public StandardModelParams getDLParams() {
+		return soundSpotParmas;
 	}
+
+
+
+//	/**
+//	 * Check whether a model passes a binary test...
+//	 * @param modelResult - the model results
+//	 * @return the model results. 
+//	 */
+//	private boolean isBinaryResult(GenericPrediction modelResult) {
+//		for (int i=0; i<modelResult.getPrediction().length; i++) {
+//			if (modelResult.getPrediction()[i]>soundSpotParmas.threshold && soundSpotParmas.binaryClassification[i]) {
+//				//System.out.println("SoundSpotClassifier: prediciton: " + i + " passed threshold with val: " + modelResult.getPrediction()[i]); 
+//				return true; 
+//			}
+//		}
+//		return  false;
+//	}
+
+
+
 
 
 	//	public class TaskThread extends Thread {
@@ -225,196 +261,19 @@ public class SoundSpotClassifier implements DLClassiferModel, PamSettings {
 	//
 	//	}
 
-	/**
-	 * Get the class name IDs
-	 * @return an array of class name IDs
-	 */
-	private short[] getClassNameIDs() {
-		if (soundSpotParmas.classNames==null || soundSpotParmas.classNames.length<=0) return null; 
-		short[] nameIDs = new short[soundSpotParmas.classNames.length]; 
-		for (int i = 0 ; i<soundSpotParmas.classNames.length; i++) {
-			nameIDs[i] = soundSpotParmas.classNames[i].ID; 
-		}
-		return nameIDs; 
-	}
+//	/**
+//	 * Get the class name IDs
+//	 * @return an array of class name IDs
+//	 */
+//	private short[] getClassNameIDs() {
+//		if (soundSpotParmas.classNames==null || soundSpotParmas.classNames.length<=0) return null; 
+//		short[] nameIDs = new short[soundSpotParmas.classNames.length]; 
+//		for (int i = 0 ; i<soundSpotParmas.classNames.length; i++) {
+//			nameIDs[i] = soundSpotParmas.classNames[i].ID; 
+//		}
+//		return nameIDs; 
+//	}
 
-	/**
-	 * Send a new result form the thread queue to the process. 
-	 * @param modelResult - the model result;
-	 * @param groupedRawData - the grouped raw data. 
-	 */
-	protected void newResult(GenericPrediction modelResult, GroupedRawData groupedRawData) {
-		this.dlControl.getDLClassifyProcess().newModelResult(modelResult, groupedRawData);
-	}
-	
-
-
-	@Override
-	public void prepModel() {
-		//System.out.println("PrepModel! !!!");
-		StandardModelParams oldParams = soundSpotParmas.clone();
-		getSoundSpotWorker().prepModel(soundSpotParmas, dlControl);
-
-
-		if (getSoundSpotWorker().getModel()==null) {
-			soundSpotWarning.setWarningMessage("There is no loaded classifier model. AnimalSpot disabled.");
-			WarningSystem.getWarningSystem().addWarning(soundSpotWarning);
-		}
-
-
-		if ((!PamCalendar.isSoundFile() || forceQueue) && !dlControl.isViewer()) {
-			//for real time only
-			if (workerThread!=null) {
-				workerThread.stopTaskThread();
-			}
-			
-			workerThread = new TaskThread(getSoundSpotWorker());
-			workerThread.setPriority(Thread.MAX_PRIORITY);
-			workerThread.start();
-		}
-	}
-
-	@Override
-	public void closeModel() {
-
-
-	}
-
-	@Override
-	public String getName() {
-		return "AnimalSpot";
-	}
-
-	@Override
-	public DLCLassiferModelUI getModelUI() {
-		return soundSpotUI;
-	}
-
-	@Override
-	public Serializable getDLModelSettings() {
-		return soundSpotParmas;
-	}
-
-	@Override
-	public String getUnitName() {
-		return dlControl.getUnitName()+"_SoundSpot"; 
-	}
-
-	@Override
-	public String getUnitType() {
-		return dlControl.getUnitType()+"_SoundSpot";
-	}
-
-	@Override
-	public Serializable getSettingsReference() {
-		if (soundSpotParmas==null) {
-			soundSpotParmas = new StandardModelParams(); 
-		}
-		
-		ArrayList<DLTransfromParams> dlTransformParams = DLClassiferModel.getDLTransformParams(soundSpotParmas.dlTransfroms);
-		
-		soundSpotParmas.dlTransfromParams=dlTransformParams; 
-		
-		
-		//System.out.println("SoundSpot have been saved. : " + soundSpotParmas.classNames); 
-		return soundSpotParmas;
-
-	}
-
-	
-	@Override
-	public long getSettingsVersion() {
-		return StandardModelParams.serialVersionUID;
-	}
-
-	
-	@Override
-	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
-		StandardModelParams newParameters = (StandardModelParams) pamControlledUnitSettings.getSettings();
-		if (newParameters!=null) {
-			soundSpotParmas = newParameters.clone();
-		//System.out.println("SoundSpot have been restored. : " + soundSpotParmas.classNames); 
-			if (soundSpotParmas.dlTransfromParams!=null) {
-				soundSpotParmas.dlTransfroms = DLTransformsFactory.makeDLTransforms((ArrayList<DLTransfromParams>) soundSpotParmas.dlTransfromParams); 
-			}
-		}
-		else soundSpotParmas = new StandardModelParams(); 
-		return true;
-	}
-
-	/**
-	 * Get the sound spot parameters. 
-	 * @return sound spot parameters. 
-	 */
-	public StandardModelParams getSoundSpotParams() {
-		return soundSpotParmas;
-	}
-
-	/**
-	 * Set the sound spot parameters. 
-	 * @param the params to set 
-	 */
-	public void setSoundSpotParams(StandardModelParams soundSpotParmas) {
-		this.soundSpotParmas=soundSpotParmas; 
-
-	}
-
-	/**
-	 * Get raw settings pane
-	 * @return the setting pane. 
-	 */
-	public RawDLSettingsPane getRawSettingsPane() {
-		return this.dlControl.getSettingsPane();
-	}
-
-	/**
-	 * Get the number of samples for microseconds. Based on the sample rate of the parent data block. 
-	 */
-	public double millis2Samples(double millis) {
-		//System.out.println("Samplerate: " + this.dlControl.getSegmenter().getSampleRate() ); 
-		return millis*this.dlControl.getSegmenter().getSampleRate()/1000.0;
-	}
-
-	@Override
-	public int getNumClasses() {
-		return this.soundSpotParmas.numClasses;
-	}
-
-	@Override
-	public DLClassName[] getClassNames() {
-		return soundSpotParmas.classNames;
-	}
-
-
-	public DLControl getDLControl() {
-		return dlControl;
-	}
-
-
-	@Override
-	public boolean checkModelOK() {
-		return getSoundSpotWorker().getModel()!=null;
-	}
-
-
-	@Override
-	public ArrayList<PamWarning> checkSettingsOK() {
-		return GenericDLClassifier.checkSettingsOK(soundSpotParmas, dlControl); 
-	}
-
-
-	@Override
-	public boolean isModelType(URI uri) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-
-	@Override
-	public void setModel(URI model) {
-		// TODO Auto-generated method stub
-		
-	}
 
 
 }

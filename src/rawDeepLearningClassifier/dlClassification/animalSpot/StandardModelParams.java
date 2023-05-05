@@ -1,6 +1,8 @@
 package rawDeepLearningClassifier.dlClassification.animalSpot;
 
+import java.io.File;
 import java.io.Serializable;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,6 +99,18 @@ public class StandardModelParams implements Serializable, Cloneable {
 	 * params class somehow and gets very complicated. 
 	 */
 	public int exampleSoundIndex = 0; 
+	
+	
+	/**
+	 * Set the URI in standard model params. 
+	 * @param uri - the uri to a model
+	 * @param standarModelParams - the standard model params. 
+	 * @return the standard model params. 
+	 */
+	public static StandardModelParams setModel(URI uri, StandardModelParams standarModelParams) {
+		standarModelParams.modelPath = new File(uri).getPath(); 
+		return standarModelParams; 
+	}
 	
 	@Override
 	public StandardModelParams clone() {

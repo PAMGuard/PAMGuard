@@ -1,9 +1,6 @@
 package rawDeepLearningClassifier.dlClassification.genericModel;
 
 import java.io.File;
-import java.util.ArrayList;
-
-import javafx.stage.FileChooser.ExtensionFilter;
 import pamViewFX.fxNodes.PamButton;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelPane;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
@@ -17,10 +14,6 @@ import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams
  */
 public class GenericModelPane extends StandardModelPane  {
 
-	/**
-	 * The extension filter for sound spot models. 
-	 */
-	private ArrayList<ExtensionFilter> extensionFilters;
 
 
 	private GenericAdvPane advPane;
@@ -34,13 +27,6 @@ public class GenericModelPane extends StandardModelPane  {
 		super(genericDLClassifier);
 
 		this.genericDLClassifier = genericDLClassifier;
-
-		//must add an additional import settings button. 
-		extensionFilters = new ArrayList<ExtensionFilter>(); 
-
-		//import the settings holder
-		extensionFilters.add(new ExtensionFilter("TensorFlow Model", "*.pb")); 
-		extensionFilters.add(new ExtensionFilter("Pytorch Model", 	"*.pk"));
 
 		//this.getVBoxHolder().getChildren().add(2, new Label("Classifier Settings"));
 		usedefaultSeg.setDisable(true); 
@@ -91,7 +77,6 @@ public class GenericModelPane extends StandardModelPane  {
 	@Override
 	public void newModelSelected(File file) {
 		this.setCurrentSelectedFile(file);
-		this.genericDLClassifier.newModelSelected(file); 
 
 		//this.setParamsClone(new GenericModelParams()); 
 		//prep the model with current parameters; 
@@ -105,10 +90,6 @@ public class GenericModelPane extends StandardModelPane  {
 	}
 
 
-	@Override
-	public ArrayList<ExtensionFilter> getExtensionFilters() {
-		return extensionFilters;
-	}
 }
 
 

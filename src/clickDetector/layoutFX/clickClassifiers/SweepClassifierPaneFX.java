@@ -43,10 +43,8 @@ public class SweepClassifierPaneFX extends BasicIdentifierPaneFX {
 	public void setClassifierPane(ClickTypeProperty clickTypeProperty){
 		SweepClassifierSetPaneFX sweepPane=new SweepClassifierSetPaneFX(sweepClickClassifier);
 	
-		
 		//make it so the title of the pane is the same as the name as the classifier
 		getFlipPane().getAdvLabel().textProperty().unbind();
-		
 		
 		getFlipPane().getAdvLabel().textProperty().bind(sweepPane.getNameTextProperty());
 		getFlipPane().getAdvLabel().graphicProperty().bind(sweepPane.getNameGraphicProperty());

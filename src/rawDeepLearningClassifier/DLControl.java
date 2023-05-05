@@ -77,7 +77,7 @@ import rawDeepLearningClassifier.segmenter.SegmenterProcess;
  * AnimalSpot is a framework for training acoustic deep learning
  * models using Pytorch. Users can load a .py model which contains embedded
  * metadata so that PMAGuard knows the exact transforms required for the model
- * input. This makes deployin models in PAMGuard very easy - users require little
+ * input. This makes deploying models in PAMGuard very easy - users require little
  * or no experience to get this working.
  * <p>
  * <li>Ketos</li>
@@ -118,6 +118,7 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	 * List of different deep learning models that are available.
 	 */
 	private ArrayList<DLClassiferModel> dlModels = new ArrayList<DLClassiferModel>();
+	
 
 	/**
 	 * The settings pane.
@@ -184,7 +185,8 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	/**
 	 * Figure out which model type has been imported. 
 	 */
-	private DLClassifierChooser dlClassifierChooser; 
+	private DLClassifierChooser dlClassifierChooser;
+
 
 
 	/**
@@ -197,6 +199,7 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 
 		PamRawDataBlock rawDataBlock = PamController.getInstance()
 				.getRawDataBlock(rawDLParmas.groupedSourceParams.getDataSource());
+		
 		
 		/**
 		 * In the latest release of djl (0.11.0) there is a bug with the dll's of tensorflow and 
@@ -230,9 +233,12 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 
 		/***** Add new deep learning models here ****/
 
-		dlModels.add(new GenericDLClassifier(this));
 		dlModels.add(new SoundSpotClassifier(this));
 		dlModels.add(new KetosClassifier(this));
+		//it is important the Generic Model is last because we need to check 
+		//for PG metadata in all other models before resorting to manually 
+		//setting up a model. 
+		dlModels.add(new GenericDLClassifier(this));
 
 		// dlModels.add(new DummyClassifier());
 		// dlModels.add(new OrcaSpotClassifier(this)); //removed soon.
@@ -258,6 +264,9 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 		// serialized
 		if (rawDLParmas.classNameMap == null)
 			rawDLParmas.classNameMap = new ArrayList<DLClassName>();
+		
+		//create the classiifer chooser. 
+		dlClassifierChooser = new DLClassifierChooser(this); 
 
 		// ensure everything is updated.
 		updateParams(rawDLParmas);
@@ -278,7 +287,12 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	 * @return the current deep learning model.
 	 */
 	public DLClassiferModel getDLModel() {
-		return dlModels.get(rawDLParmas.modelSelection);
+		if (this.rawDLParmas.modelSelection<0 || this.rawDLParmas.modelSelection>=dlModels.size()) {
+			return null;
+		}
+		else {
+			return dlModels.get(this.rawDLParmas.modelSelection);
+		}
 	}
 
 	/**
