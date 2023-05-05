@@ -49,6 +49,9 @@ public class BinaryStoreStatusFuncs {
 				continue;
 			}
 			BinaryStoreStatus blockStatus = getStreamStartEnd(dataSource);
+			if (blockStatus == null) {
+				continue;
+			}
 			binStoreStatus.considerBlockStatus(blockStatus);
 		}
 
