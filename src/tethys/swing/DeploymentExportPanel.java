@@ -34,6 +34,7 @@ import tethys.TethysControl;
 import tethys.TethysState;
 import tethys.TethysState.StateType;
 import tethys.dbxml.DBXMLConnect;
+import tethys.deployment.DeploymentHandler;
 import tethys.deployment.RecordingPeriod;
 import tethys.niluswraps.PDeployment;
 
@@ -94,7 +95,7 @@ public class DeploymentExportPanel extends TethysGUIPanel implements DeploymentT
 		addPair("Cruise ", cruise, c);
 		addPair("Raw data URI ", rawURI, c);
 		addPair("Binary data URI ", binaryURI, c);
-		addPair("Datbase URI ", databaseURI, c);
+		addPair("Database URI ", databaseURI, c);
 		addPair("Contact ", contact, c);
 		addPair("Date ", date, c);
 		addPair("Set from ", projectDeployments, c);
@@ -197,31 +198,35 @@ public class DeploymentExportPanel extends TethysGUIPanel implements DeploymentT
 	
 	private void setDefaultStores() {
 		
+		DeploymentHandler deploymentHandler = getTethysControl().getDeploymentHandler();
+		binaryURI.setText(deploymentHandler.getBinaryDataURI());
+		databaseURI.setText(deploymentHandler.getDatabaseURI());
+		rawURI.setText(deploymentHandler.getRawDataURI());
 		
-		BinaryStore binStore = BinaryStore.findBinaryStoreControl();
-		if (binStore != null) {
-			binaryURI.setText(binStore.getBinaryStoreSettings().getStoreLocation());
-		}
-		
-		DBControlUnit databaseControl = DBControlUnit.findDatabaseControl();
-		if (databaseControl != null) {
-			databaseURI.setText(databaseControl.getLongDatabaseName());
-		}
-		
-		try {
-		PamControlledUnit daq = PamController.getInstance().findControlledUnit(AcquisitionControl.class, null);
-		if (daq instanceof AcquisitionControl) {
-			AcquisitionControl daqCtrl = (AcquisitionControl) daq;
-			DaqSystem system = daqCtrl.findDaqSystem(null);// getAcquisitionProcess().getRunningSystem();
-			if (system instanceof FolderInputSystem) {
-				FolderInputSystem fip = (FolderInputSystem) system;
-				rawURI.setText(fip.getFolderInputParameters().recentFiles.get(0));
-			}
-		}
-		}
-		catch (Exception e) {
-			rawURI.setText("unknown");
-		}
+//		BinaryStore binStore = BinaryStore.findBinaryStoreControl();
+//		if (binStore != null) {
+//			binaryURI.setText(binStore.getBinaryStoreSettings().getStoreLocation());
+//		}
+//		
+//		DBControlUnit databaseControl = DBControlUnit.findDatabaseControl();
+//		if (databaseControl != null) {
+//			databaseURI.setText(databaseControl.getLongDatabaseName());
+//		}
+//		
+//		try {
+//		PamControlledUnit daq = PamController.getInstance().findControlledUnit(AcquisitionControl.class, null);
+//		if (daq instanceof AcquisitionControl) {
+//			AcquisitionControl daqCtrl = (AcquisitionControl) daq;
+//			DaqSystem system = daqCtrl.findDaqSystem(null);// getAcquisitionProcess().getRunningSystem();
+//			if (system instanceof FolderInputSystem) {
+//				FolderInputSystem fip = (FolderInputSystem) system;
+//				rawURI.setText(fip.getFolderInputParameters().recentFiles.get(0));
+//			}
+//		}
+//		}
+//		catch (Exception e) {
+//			rawURI.setText("unknown");
+//		}
 		
 	}
 
@@ -235,36 +240,9 @@ public class DeploymentExportPanel extends TethysGUIPanel implements DeploymentT
 		if (selectedDeployments == null || selectedDeployments.size() == 0) {
 			return;
 		};
-		int freeId = getTethysControl().getDeploymentHandler().getFirstFreeDeploymentId();
-		for (int i = 0; i < selectedDeployments.size(); i++) {
-			RecordingPeriod recordPeriod = selectedDeployments.get(i);
-			PDeployment exDeploymnet = recordPeriod.getMatchedTethysDeployment();
-			Deployment deployment = null;
-			if (exDeploymnet != null) {
-				deployment = getTethysControl().getDeploymentHandler().createDeploymentDocument(freeId, recordPeriod);
-				deployment.setId(exDeploymnet.deployment.getId());
-			}
-			if (deployment == null) {
-				deployment = getTethysControl().getDeploymentHandler().createDeploymentDocument(freeId++, recordPeriod);
-			}
-			// fill in a few things from here
-			deployment.setCruise(cruise.getText());
-			deployment.setSite(site.getText());
-			// also need to sort out track data here, etc. 
-//			Should really  tidy this up a lot and move functionality to DeploymentHandler with all 
-//			the metadata in a object ? 
-//			Data data = new nilus.Deployment.Data();
-//			d
-			DBXMLConnect dbxmlConnect = getTethysControl().getDbxmlConnect();
-			if (exDeploymnet != null) {
-				dbxmlConnect.updateDocument(deployment);
-			}
-			else {
-				dbxmlConnect.postToTethys(deployment);
-			}
-		}
-		getTethysControl().sendStateUpdate(new TethysState(StateType.UPDATESERVER));
+		getTethysControl().getDeploymentHandler().exportDeployments(selectedDeployments);
 	}
+	
 
 	private void enableControls() {
 		boolean enable = selectedDeployments != null && selectedDeployments.size() > 0;

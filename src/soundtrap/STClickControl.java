@@ -37,6 +37,7 @@ import javax.swing.JSeparator;
 import org.pamguard.x3.sud.SUDClickDetectorInfo;
 
 import Acquisition.AcquisitionControl;
+import PamController.PamSensor;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamguardMVC.PamRawDataBlock;
@@ -51,7 +52,7 @@ import soundtrap.sud.SudFileDWVHandler;
  * @author mo55
  *
  */
-public class STClickControl extends ClickControl {
+public class STClickControl extends ClickControl implements PamSensor {
 	
 	private SUDClickDetectorInfo sudClickDetectorInfo;
 	
@@ -216,6 +217,17 @@ public class STClickControl extends ClickControl {
 	 */
 	public void setSudClickDetectorInfo(SUDClickDetectorInfo sudClickDetectorInfo) {
 		this.sudClickDetectorInfo = sudClickDetectorInfo;
+	}
+
+	@Override
+	public String getSensorDescription() {
+		String desc = String.format("SoundTrap Click Detector at %dHz", (int) getClickDataBlock().getSampleRate());
+		return desc;
+	}
+
+	@Override
+	public String getSensorId() {
+		return null;
 	}
 	
 

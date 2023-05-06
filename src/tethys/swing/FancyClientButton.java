@@ -1,6 +1,7 @@
 package tethys.swing;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -8,10 +9,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.border.EmptyBorder;
 
 import tethys.TethysControl;
 import tethys.dbxml.DBXMLConnect;
@@ -32,17 +35,36 @@ public class FancyClientButton extends JPanel {
 	public FancyClientButton(TethysControl tethysControl) {
 		this.tethysControl = tethysControl;
 		setLayout(new GridBagLayout());
+//		setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		GridBagConstraints c = new GridBagConstraints();
 		c.ipadx = c.ipady = 0;
 		c.insets = new Insets(0,0,0,0);
+		c.fill = GridBagConstraints.VERTICAL;
 		clientButton = new JButton("Open Client");
 		clientButton.setToolTipText("Open Tethys web client in default browser");
-		dropButton = new JButton("v");
+		ImageIcon arrowDown= null;
+		try {
+		arrowDown = new ImageIcon(ClassLoader
+				.getSystemResource("Resources/SidePanelShowH.png"));
+		}
+		catch (Exception e) {
+		}
+		if (arrowDown != null) {
+			dropButton = new JButton(arrowDown);
+		}
+		else {
+			dropButton = new JButton("v");
+		}
 		dropButton.setToolTipText("Open Tethys collections pages in default browser");
 		c.gridx = 0;
 		add(clientButton, c);
 		c.gridx++;
 		add(dropButton, c);
+		Insets dInsets = dropButton.getInsets();
+		if (dInsets != null) {
+			dInsets.left = dInsets.right = 4;
+			dropButton.setBorder(new EmptyBorder(dInsets));
+		}
 		
 		String[] collections = DBXMLConnect.collections;
 		collectionsMenu = new JPopupMenu();

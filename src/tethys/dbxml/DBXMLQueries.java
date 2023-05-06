@@ -264,6 +264,9 @@ public class DBXMLQueries {
 			e.printStackTrace();
 			return null;
 		}
+		if (doc == null) {
+			return null;
+		}
 		ArrayList<String> detectionsNames = new ArrayList();
 		int count = 0;
 		NodeList returns = doc.getElementsByTagName("Detections");

@@ -47,7 +47,7 @@ public class PamCalendar {
 	
 	public static TimeZone defaultTimeZone = TimeZone.getTimeZone("UTC");
 	
-	private static TimeZone localTimeZone = TimeZone.getDefault();
+	private static TimeZone localTimeZone = defaultTimeZone;// TimeZone.getDefault();
 
 	public static final long millisPerDay = 1000L*24L*3600L;
 

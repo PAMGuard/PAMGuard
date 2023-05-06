@@ -747,9 +747,9 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 
 			String tipText;
 			if (startTimeArrow != null && startTimeArrow.contains(me.getPoint())) {
-				tipText = "Data Start: " + PamCalendar.formatDateTime(dataBlock.getCurrentViewDataStart(), true);
+				tipText = "Data Start: " + PamCalendar.formatDateTime(dataBlock.getCurrentViewDataStart(), false);
 			} else if (endTimeArrow != null && endTimeArrow.contains(me.getPoint())) {
-				tipText = "Data End: " + PamCalendar.formatDateTime(dataBlock.getCurrentViewDataEnd(), true);
+				tipText = "Data End: " + PamCalendar.formatDateTime(dataBlock.getCurrentViewDataEnd(), false);
 			} else {
 				tipText = "Cursor: " + PamCalendar.formatDateTime(tm, true);
 			}

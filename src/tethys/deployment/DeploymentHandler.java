@@ -15,21 +15,24 @@ import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionParameters;
 import Acquisition.DaqStatusDataUnit;
 import Acquisition.DaqSystem;
+import Acquisition.FolderInputSystem;
 import Array.ArrayManager;
 import Array.Hydrophone;
 import Array.HydrophoneLocator;
 import Array.PamArray;
 import Array.Streamer;
 import Array.ThreadingHydrophoneLocator;
+import PamController.PamSensor;
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamUtils.LatLong;
-import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamguardMVC.PamDataBlock;
-import SoundRecorder.RecordingInfo;
-import javafx.scene.chart.PieChart.Data;
-import metadata.MetaDataContol;
+import PamguardMVC.PamRawDataBlock;
+import binaryFileStorage.BinaryStore;
+import dataMap.OfflineDataMap;
+import dataMap.OfflineDataMapPoint;
+import generalDatabase.DBControlUnit;
 import metadata.deployment.DeploymentData;
 import nilus.Audio;
 import nilus.ChannelInfo;
@@ -39,12 +42,14 @@ import nilus.ChannelInfo.DutyCycle.Regimen.RecordingIntervalS;
 import nilus.ChannelInfo.Sampling;
 import nilus.ChannelInfo.Sampling.Regimen;
 import nilus.Deployment;
+import nilus.Deployment.Data;
 import nilus.Deployment.Instrument;
 import nilus.Deployment.SamplingDetails;
 import nilus.Deployment.Sensors;
 import nilus.DeploymentRecoveryDetails;
 import nilus.GeometryTypeM;
 import nilus.Helper;
+import nilus.UnknownSensor;
 import pamMaths.PamVector;
 import pamMaths.STD;
 import tethys.TethysControl;
@@ -52,7 +57,10 @@ import tethys.TethysLocationFuncs;
 import tethys.TethysState;
 import tethys.TethysStateObserver;
 import tethys.TethysTimeFuncs;
+import tethys.TethysState.StateType;
+import tethys.dbxml.DBXMLConnect;
 import tethys.niluswraps.PDeployment;
+import tethys.output.TethysExportParams;
 
 /**
  * Functions to gather data for the deployment document from all around PAMGuard.
@@ -66,6 +74,13 @@ public class DeploymentHandler implements TethysStateObserver {
 	
 	private TethysControl tethysControl;
 	
+	/**
+	 * @return the tethysControl
+	 */
+	public TethysControl getTethysControl() {
+		return tethysControl;
+	}
+
 	private DeploymentOverview deploymentOverview;
 	
 	private ArrayList<PDeployment> projectDeployments;
@@ -186,6 +201,10 @@ public class DeploymentHandler implements TethysStateObserver {
 		}
 		if (tempPeriods == null || tempPeriods.size() == 0) {
 			System.out.println("Data appear to have no logged recording periods available either from the database or the raw recordings.");
+			tempPeriods = extractTimesFromOutputMaps();
+		}
+		if (tempPeriods == null || tempPeriods.size() == 0) {
+			System.out.println("Data appear to have no logged recording periods available either from the database or the raw recordings.");
 			return null;
 		}
 
@@ -255,6 +274,123 @@ public class DeploymentHandler implements TethysStateObserver {
 
 	}
 	
+	/**
+	 * Exprt deployments docs. Playing with a couple of different ways of doing this. 
+	 * @param selectedDeployments
+	 */
+	public void exportDeployments(ArrayList<RecordingPeriod> selectedDeployments) {
+		if (false) {
+			exportSeparateDeployments(selectedDeployments);
+		}
+		else {
+			exportOneDeploymnet(selectedDeployments);
+		}
+		
+	}
+	/**
+	 * Make one big deployment document with all the recording periods in it. 
+	 */
+	private void exportOneDeploymnet(ArrayList<RecordingPeriod> selectedDeployments) {
+		// do the lot, whatever ...
+		selectedDeployments = getDeploymentOverview().getRecordingPeriods();
+		int freeId = getTethysControl().getDeploymentHandler().getFirstFreeDeploymentId();
+		RecordingPeriod onePeriod = new RecordingPeriod(selectedDeployments.get(freeId).getRecordStart(), 
+				selectedDeployments.get(selectedDeployments.size()-1).getRecordStop());
+		Deployment deployment = createDeploymentDocument(freeId, onePeriod);
+		// fill in a few things from here
+		DeploymentData globalMeta = getTethysControl().getGlobalDeplopymentData();
+		deployment.setCruise(globalMeta.getCruise());
+		deployment.setSite(globalMeta.getSite());
+		if (selectedDeployments.size() > 1) {
+			// now need to remove the 
+			SamplingDetails samplingDetails = deployment.getSamplingDetails();
+			samplingDetails.getChannel().clear();
+			for (int i = 0; i < selectedDeployments.size(); i++) {
+				addSamplingDetails(deployment, selectedDeployments.get(i));
+			}
+		}
+		DBXMLConnect dbxmlConnect = getTethysControl().getDbxmlConnect();
+		PDeployment exDeploymnet = onePeriod.getMatchedTethysDeployment();
+		if (exDeploymnet != null) {
+			deployment.setId(exDeploymnet.deployment.getId());
+			dbxmlConnect.updateDocument(deployment);
+		}
+		else {
+			dbxmlConnect.postToTethys(deployment);
+		}
+		getTethysControl().sendStateUpdate(new TethysState(StateType.UPDATESERVER));
+	}
+	
+	/**
+	 * Make a separate deployment document for every recording period. 
+	 */
+	private void exportSeparateDeployments(ArrayList<RecordingPeriod> selectedDeployments) {
+		
+		int freeId = getTethysControl().getDeploymentHandler().getFirstFreeDeploymentId();
+		for (int i = 0; i < selectedDeployments.size(); i++) {
+			RecordingPeriod recordPeriod = selectedDeployments.get(i);
+			PDeployment exDeploymnet = recordPeriod.getMatchedTethysDeployment();
+			Deployment deployment = null;
+			if (exDeploymnet != null) {
+				deployment = createDeploymentDocument(freeId, recordPeriod);
+				deployment.setId(exDeploymnet.deployment.getId());
+			}
+			if (deployment == null) {
+				deployment = createDeploymentDocument(freeId++, recordPeriod);
+			}
+			// fill in a few things from here
+			DeploymentData globalMeta = getTethysControl().getGlobalDeplopymentData();
+			deployment.setCruise(globalMeta.getCruise());
+			deployment.setSite(globalMeta.getSite());
+			// also need to sort out track data here, etc.
+			DBXMLConnect dbxmlConnect = getTethysControl().getDbxmlConnect();
+			if (exDeploymnet != null) {
+				dbxmlConnect.updateDocument(deployment);
+			}
+			else {
+				dbxmlConnect.postToTethys(deployment);
+			}
+		}
+		getTethysControl().sendStateUpdate(new TethysState(StateType.UPDATESERVER));
+	}
+
+	/**
+	 * Get data times from any other datamap, since this will generally match the acquisition anyway
+	 * @return
+	 */
+	private ArrayList<RecordingPeriod> extractTimesFromOutputMaps() {
+		OfflineDataMap bestMap = null;
+		PamDataBlock bestBlock = null;
+		long firstStart = Long.MAX_VALUE;
+		long lastEnd = Long.MIN_VALUE;
+		ArrayList<PamDataBlock> dataBlocks = PamController.getInstance().getDetectorDataBlocks();
+		for (PamDataBlock aBlock : dataBlocks) {
+			if (aBlock instanceof PamRawDataBlock) {
+				continue; // don't want acquisition !
+			}
+			OfflineDataMap dataMap = aBlock.getPrimaryDataMap();
+			if (dataMap == null) {
+				continue;
+			}
+			if (dataMap.getFirstDataTime() < firstStart && dataMap.getLastDataTime() > lastEnd) {
+				bestMap = dataMap;
+				bestBlock = aBlock;
+				firstStart = dataMap.getFirstDataTime();
+				lastEnd = dataMap.getLastDataTime();
+			}
+		}
+		if (bestMap == null) {
+			return null;
+		}
+		// get the times out of it. 
+		ArrayList<RecordingPeriod> recPeriods = new ArrayList<>();
+		List<OfflineDataMapPoint> mapPoints = bestMap.getMapPoints();
+		for (OfflineDataMapPoint mapPoint : mapPoints) {
+			recPeriods.add(new RecordingPeriod(mapPoint.getStartTime(), mapPoint.getEndTime()));
+		}
+		return recPeriods;
+	}
+
 	public DeploymentOverview getDeploymentOverview() {
 		return deploymentOverview;
 	}
@@ -305,7 +441,7 @@ public class DeploymentHandler implements TethysStateObserver {
 	 * @return overlap in milliseconds
 	 */
 	public long getDeploymentOverlap(PDeployment aDeployment, RecordingPeriod aPeriod) {
-		long start = aPeriod.getRecordStart();
+		long start = aPeriod.getRecordStart(); // recording period. 
 		long stop = aPeriod.getRecordStop();
 		long depStart = aDeployment.getAudioStart();
 		long depStop = aDeployment.getAudioEnd();
@@ -551,7 +687,8 @@ public class DeploymentHandler implements TethysStateObserver {
 			e.printStackTrace();
 		}
 		DeploymentData globalDeplData = tethysControl.getGlobalDeplopymentData();
-		String id = String.format("%s_%d", globalDeplData.getProject(), i);
+		TethysExportParams exportParams = tethysControl.getTethysExportParams();
+		String id = String.format("%s_%d", exportParams.getDatasetName(), i);
 		deployment.setId(id);
 		deployment.setDeploymentId(i);
 
@@ -576,9 +713,11 @@ public class DeploymentHandler implements TethysStateObserver {
 
 		getProjectData(deployment);
 
-		getSamplingDetails(deployment, recordingPeriod);
+		addSamplingDetails(deployment, recordingPeriod);
 
 		getSensorDetails(deployment);
+		
+		getSensors(deployment);
 
 		/**
 		 * Stuff that may need to be put into the UI:
@@ -586,10 +725,99 @@ public class DeploymentHandler implements TethysStateObserver {
 		 * this may be for the export UI ?
 		 * Tracks: trackline information. General problem in PAMGUard.
 		 */
-
+		getDataDetails(deployment);
 
 
 		return deployment;
+	}
+
+	public String getBinaryDataURI() {
+		BinaryStore binStore = BinaryStore.findBinaryStoreControl();
+		if (binStore != null) {
+			return binStore.getBinaryStoreSettings().getStoreLocation();
+		}
+		return null;
+	}
+	
+	public String getDatabaseURI() {
+		DBControlUnit databaseControl = DBControlUnit.findDatabaseControl();
+		if (databaseControl != null) {
+			return databaseControl.getLongDatabaseName();
+		}
+		return null;
+	}
+	
+	public String getRawDataURI() {
+		try {
+			PamControlledUnit daq = PamController.getInstance().findControlledUnit(AcquisitionControl.class, null);
+		if (daq instanceof AcquisitionControl) {
+			AcquisitionControl daqCtrl = (AcquisitionControl) daq;
+			DaqSystem system = daqCtrl.findDaqSystem(null);// getAcquisitionProcess().getRunningSystem();
+			if (system instanceof FolderInputSystem) {
+				FolderInputSystem fip = (FolderInputSystem) system;
+				return fip.getFolderInputParameters().recentFiles.get(0);
+			}
+		}
+		}
+		catch (Exception e) {
+		}
+		return "unknown";
+	}
+	
+	private void getDataDetails(Deployment deployment) {
+		Data data = deployment.getData();
+		if (data == null) {
+			data = new Data();
+			deployment.setData(data);
+		}
+		nilus.Deployment.Data.Audio audio = data.getAudio();
+		if (audio == null) {
+			audio = new nilus.Deployment.Data.Audio();
+			data.setAudio(audio);
+		}
+		audio.setURI(getRawDataURI());
+		String processed = "Database:"+getDatabaseURI();
+		String binary = getBinaryDataURI();
+		if (binary != null) {
+			binary += ";Binary:"+binary;
+		}
+		audio.setProcessed(processed);
+		
+	}
+	
+	/**
+	 * Get sensor information. The Soundtrap CTD will count as a sensor. 
+	 * Modules that are sensors will have to implement a PAMSensor interface
+	 * @param deployment
+	 */
+	private void getSensors(Deployment deployment) {
+		ArrayList<PamControlledUnit> sensorModules = PamController.getInstance().findControlledUnits(PamSensor.class, true);
+		if (sensorModules == null || sensorModules.size() == 0) {
+			return;
+		}
+		Sensors sensors = deployment.getSensors();
+		if (sensors == null) {
+			sensors = new Sensors();
+			deployment.setSensors(sensors);
+		}
+		List<UnknownSensor> sensorList = sensors.getSensor();
+		for (PamControlledUnit aUnit : sensorModules) {
+			PamSensor pamSensor = (PamSensor) aUnit;
+			UnknownSensor nilusSensor = new UnknownSensor();
+			try {
+				Helper.createRequiredElements(nilusSensor);
+			} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+//			nilusSensor.setName(pamSensor.getUnitName());
+			nilusSensor.setType(pamSensor.getUnitType());
+			nilusSensor.setNumber(BigInteger.ZERO);
+			nilusSensor.setDescription(pamSensor.getSensorDescription());
+			nilusSensor.setSensorId(pamSensor.getUnitType());
+			
+			sensorList.add(nilusSensor);			
+		}
 	}
 
 	/**
@@ -781,10 +1009,18 @@ public class DeploymentHandler implements TethysStateObserver {
 	 * @param deployment
 	 * @param recordingPeriod 
 	 */
-	private boolean getSamplingDetails(Deployment deployment, RecordingPeriod recordingPeriod) {
-		SamplingDetails samplingDetails = new SamplingDetails();
+	private boolean addSamplingDetails(Deployment deployment, RecordingPeriod recordingPeriod) {
+		
+		SamplingDetails samplingDetails = deployment.getSamplingDetails();
+		if (samplingDetails == null) {
+			samplingDetails = new SamplingDetails();
+			deployment.setSamplingDetails(samplingDetails);
+		}
 		// this is basically going to be a list of almost identical channel information
 		// currently just for the first acquisition. May extend to more.
+		// see if there is > 1 acquisition. May want to include many.
+		ArrayList<PamControlledUnit> daqUnits = PamController.getInstance().findControlledUnits(AcquisitionControl.class);
+		
 		AcquisitionControl daq = (AcquisitionControl) PamController.getInstance().findControlledUnit(AcquisitionControl.class, null);
 		if (daq == null) {
 			return false;
@@ -858,7 +1094,6 @@ public class DeploymentHandler implements TethysStateObserver {
 			 * earlier to a wrapper around the Deployment class.
 			 */
 		}
-		deployment.setSamplingDetails(samplingDetails);
 		return true;
 	}
 
