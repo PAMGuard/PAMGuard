@@ -12,6 +12,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.pamguard.x3.sud.SUDClickDetectorInfo;
+import org.pamguard.x3.sud.SUDXMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -41,6 +43,7 @@ public class STXMLFile {
 	private WAVInfo wavInfo;
 	private String soundTrapId;
 	private	String dateFormat = defaultDateFormat;
+	private SUDClickDetectorInfo sudDetectorInfo;
 
 	
 	public static void main(String[] args) {
@@ -70,6 +73,9 @@ public class STXMLFile {
 	}
 	
 	private void unpackXMLDoc() throws Exception{
+		// try to get the new format complete settings as has been developed for the 
+		// SUD direct reader. 		
+		
 		cfgNodes = doc.getElementsByTagName("CFG");
 		NodeList procEvents = doc.getElementsByTagName("PROC_EVENT");
 		
@@ -231,8 +237,14 @@ public class STXMLFile {
 			return null;
 		}
 		doc.getDocumentElement().normalize();
+		
+		STXMLFile stXMLFile = new STXMLFile(doc, xmlFile, dateTimeFormat);
+
+		SUDXMLUtils sudXml = new SUDXMLUtils();
+		SUDClickDetectorInfo detectorInfo = sudXml.extractDetectorInfo(doc);
+		stXMLFile.setSudDetectorInfo(detectorInfo);
 	
-		return new STXMLFile(doc, xmlFile, dateTimeFormat);
+		return stXMLFile;
 	}
 
 	/**
@@ -298,5 +310,19 @@ public class STXMLFile {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * @return the sudDetectorInfo
+	 */
+	public SUDClickDetectorInfo getSudDetectorInfo() {
+		return sudDetectorInfo;
+	}
+
+	/**
+	 * @param sudDetectorInfo the sudDetectorInfo to set
+	 */
+	public void setSudDetectorInfo(SUDClickDetectorInfo sudDetectorInfo) {
+		this.sudDetectorInfo = sudDetectorInfo;
 	}
 }
