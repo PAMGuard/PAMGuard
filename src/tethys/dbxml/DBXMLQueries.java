@@ -30,6 +30,8 @@ import nilus.Helper;
 import tethys.TethysControl;
 import tethys.TethysTimeFuncs;
 import tethys.output.TethysExportParams;
+import warnings.PamWarning;
+import warnings.WarningSystem;
 
 /**
  * Some standard queries we're going to want to make from various
@@ -41,11 +43,14 @@ public class DBXMLQueries {
 
 	private TethysControl tethysControl;
 	private DBXMLConnect dbXMLConnect;
+	
+	private PamWarning queryWarning;
 
 	public DBXMLQueries(TethysControl tethysControl, DBXMLConnect dbXMLConnect) {
 		super();
 		this.tethysControl = tethysControl;
 		this.dbXMLConnect = dbXMLConnect;
+		queryWarning = new PamWarning("Tethys Query", null, 0);
 	}
 
 	/**
@@ -57,7 +62,63 @@ public class DBXMLQueries {
 	 * @throws TethysQueryException 
 	 */
 	private DBQueryResult executeQuery(String jsonQueryString) throws TethysQueryException {
+		long t1 = System.currentTimeMillis();
+		DBQueryResult result = null;
+		TethysQueryException tException = null;
+		try {
+			result = executeQueryT(jsonQueryString);
+		}
+		catch (TethysQueryException e) {
+			tException = e;
+		}
+		if (result == null) {
+			// try pinging the server and throw an exception if it's not alive.
+			ServerStatus serverStatus = tethysControl.getDbxmlConnect().pingServer();
+			if (serverStatus.ok) {
+				queryWarning.setWarnignLevel(2);
+				queryWarning.setWarningMessage("null return from Tethys json query");
+				queryWarning.setWarningTip(jsonQueryString);
+				queryWarning.setEndOfLife(Long.MAX_VALUE);
+				WarningSystem.getWarningSystem().addWarning(queryWarning);
+			}
+			else {
+				queryWarning.setWarnignLevel(2);
+				if (serverStatus.error != null) {
+					queryWarning.setWarningMessage(serverStatus.error.getMessage());
+				}
+				else {
+					queryWarning.setWarningMessage("Unknown Tethys server error");
+				}
+				queryWarning.setWarningTip(jsonQueryString);
+				queryWarning.setEndOfLife(Long.MAX_VALUE);
+				WarningSystem.getWarningSystem().addWarning(queryWarning);
+				return null;
+			}
+		}
+		long t2 = System.currentTimeMillis();
 
+		if (tException != null) {
+			// display query warning then throw the exception anyway
+			queryWarning.setWarnignLevel(2);
+			queryWarning.setWarningMessage("Error running Tethys json query");
+			queryWarning.setWarningTip(jsonQueryString);
+			queryWarning.setEndOfLife(Long.MAX_VALUE);
+			WarningSystem.getWarningSystem().addWarning(queryWarning);
+			throw tException;
+		}
+		else {
+			// clear warning, but say how long query took still
+			queryWarning.setWarnignLevel(0);
+			queryWarning.setWarningMessage(String.format("Tethys json query executed in %4.2f seconds", (double) (t2-t1)/1000.));
+			queryWarning.setWarningTip(jsonQueryString);
+			WarningSystem.getWarningSystem().addWarning(queryWarning);
+			queryWarning.setEndOfLife(t2+10000);
+			return result;
+		}
+		
+	}
+
+	private DBQueryResult executeQueryT(String jsonQueryString) throws TethysQueryException {
 		long t1 = System.currentTimeMillis();
 
 		DBXMLConnect dbxmlConnect = tethysControl.getDbxmlConnect();
@@ -72,8 +133,6 @@ public class DBXMLQueries {
 
 		try {
 			JerseyClient jerseyClient = dbxmlConnect.getJerseyClient();
-//			String url = jerseyClient.getURL();
-
 //			Queries queries = new Queries(jerseyClient);
 
 			queryResult = jerseyClient.queryJSON(jsonQueryString, 0);
@@ -81,7 +140,6 @@ public class DBXMLQueries {
 
 		}
 		catch (Exception e) {
-//			return new DBQueryResult(System.currentTimeMillis()-t1, e);
 			throw new TethysQueryException("Error running JSON query", jsonQueryString);
 
 		}
@@ -255,9 +313,10 @@ public class DBXMLQueries {
 	public ArrayList<String> getDetectionsDocuments(PamDataBlock dataBlock, String deploymentId) {
 		/**
 		 * first query for Detections documents associated with this deployment and datablock.
+		 * updated May 23
 		 */
-		String queryNoDepl = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/Id\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Algorithm/Software\",\"LongDataName\"],\"optype\":\"binary\"}],\"enclose\":1}";
-		String queryWithDepl = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/Id\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Algorithm/Software\",\"LongDataName\"],\"optype\":\"binary\"},{\"op\":\"=\",\"operands\":[\"Detections/DataSource/DeploymentId\",\"TheDeploymentId\"],\"optype\":\"binary\"}],\"enclose\":1}";
+		String queryNoDepl = "{\"species\":{\"query\":{\"op\":\"lib:completename2tsn\",\"optype\":\"function\",\"operands\":[\"%s\"]},\"return\":{\"op\":\"lib:tsn2completename\",\"optype\":\"function\",\"operands\":[\"%s\"]}},\"return\":[\"Detections/Id\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Algorithm/Software\",\"LongDataName\"],\"optype\":\"binary\"}],\"enclose\":1}";
+		String queryWithDepl = "{\"species\":{\"query\":{\"op\":\"lib:completename2tsn\",\"optype\":\"function\",\"operands\":[\"%s\"]},\"return\":{\"op\":\"lib:tsn2completename\",\"optype\":\"function\",\"operands\":[\"%s\"]}},\"return\":[\"Detections/Id\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/DataSource/DeploymentId\",\"TheDeploymentId\"],\"optype\":\"binary\"},{\"op\":\"=\",\"operands\":[\"Detections/Algorithm/Software\",\"LongDataName\"],\"optype\":\"binary\"}],\"enclose\":1}";
 		String query;
 		if (deploymentId == null) {
 			query = queryNoDepl;
@@ -589,7 +648,9 @@ public class DBXMLQueries {
 	 * @return
 	 */
 	public Detections getDetectionsDocInfo(String detectionsDocName) {
-		String queryBase = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/Id\",\"Detections/Description\",\"Detections/DataSource\",\"Detections/Algorithm\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Id\",\"DetectionsDocName\"],\"optype\":\"binary\"}],\"enclose\":1}";
+		String oldqueryBase = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/Id\",\"Detections/Description\",\"Detections/DataSource\",\"Detections/Algorithm\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Id\",\"DetectionsDocName\"],\"optype\":\"binary\"}],\"enclose\":1}";
+		// updated May 23
+		String queryBase = "{\"species\":{\"query\":{\"op\":\"lib:completename2tsn\",\"optype\":\"function\",\"operands\":[\"%s\"]},\"return\":{\"op\":\"lib:tsn2completename\",\"optype\":\"function\",\"operands\":[\"%s\"]}},\"return\":[\"Detections/Id\",\"Detections/Description\",\"Detections/DataSource\",\"Detections/Algorithm\",\"Detections/QualityAssurance\",\"Detections/UserId\",\"Detections/MetadataInfo\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Id\",\"DetectionsDocName\"],\"optype\":\"binary\"}],\"enclose\":1}";
 		String query = queryBase.replace("DetectionsDocName", detectionsDocName);
 		DBQueryResult queryResult;
 		try {

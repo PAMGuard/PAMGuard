@@ -32,6 +32,7 @@ import tethys.dbxml.DBXMLConnect;
 import tethys.dbxml.DBXMLQueries;
 import tethys.dbxml.ServerStatus;
 import tethys.dbxml.TethysException;
+import tethys.dbxml.TethysQueryException;
 import tethys.deployment.DeploymentHandler;
 import tethys.detection.DetectionsHandler;
 import tethys.niluswraps.PDeployment;
@@ -515,17 +516,24 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		String msg = "";
 		if (stack != null) {
 			msg = "Caused in";
-			for (int i = 0; i < Math.min(stack.length, 2); i++) {
+			for (int i = 0; i < Math.min(stack.length, 3); i++) {
 				msg += "<br>" + stack[i].getClassName() + "." + stack[i].getMethodName();
 			}
 		}
+		if (tethysException instanceof TethysQueryException) {
+			TethysQueryException tqe = (TethysQueryException) tethysException;
+//			msg += tqe.
+		}
+			
 		String xml = tethysException.getXmlError();
 		if (xml != null) {
-//			msg += "<textarea rows=\"6\" cols=\"80\" style=\"border:none;\">" + xml + "</textarea>";
+			/**
+			 * html can't handle the < and > in xml without getting very confused
+			 * but it seems to work fine if they are replaced with their html codes.
+			 */
 			xml = xml.replace("<", "&lt;");
 			xml = xml.replace(">", "&gt;");
 			xml = xml.replace("\n", "<br>");
-//			msg += xml;
 			msg += "<pre>"+xml+"</pre>";
 		}
 		WarnOnce.showWarning(title, msg, WarnOnce.WARNING_MESSAGE);
