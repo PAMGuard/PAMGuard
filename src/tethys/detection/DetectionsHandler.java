@@ -34,6 +34,7 @@ import tethys.deployment.DeploymentHandler;
 import tethys.TethysStateObserver;
 import tethys.TethysTimeFuncs;
 import tethys.dbxml.DBXMLConnect;
+import tethys.dbxml.TethysException;
 import tethys.detection.DetectionGranularity.GRANULARITY;
 import tethys.niluswraps.PDeployment;
 import tethys.niluswraps.PDetections;
@@ -434,7 +435,11 @@ public class DetectionsHandler {
 							lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_WRITING);
 					exportObserver.update(prog);
 					closeDetectionsDocument(currentDetections, mapPoint.getEndTime());
-					dbxmlConnect.postToTethys(currentDetections);
+					try {
+						dbxmlConnect.postToTethys(currentDetections);
+					} catch (TethysException e) {
+						tethysControl.showException(e);
+					}
 					currentDetections = null;
 				}
 			}
@@ -443,7 +448,11 @@ public class DetectionsHandler {
 				prog = new DetectionExportProgress(deployment, currentDetections, 
 						lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_WRITING);
 				closeDetectionsDocument(currentDetections, deployment.getAudioEnd());
-				dbxmlConnect.postToTethys(currentDetections);
+				try {
+					dbxmlConnect.postToTethys(currentDetections);
+				} catch (TethysException e) {
+					tethysControl.showException(e);
+				}
 				currentDetections = null;
 			}
 		}

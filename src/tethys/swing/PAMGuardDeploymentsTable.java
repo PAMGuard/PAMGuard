@@ -28,6 +28,7 @@ import nilus.Deployment;
 import tethys.TethysControl;
 import tethys.TethysState;
 import tethys.TethysState.StateType;
+import tethys.dbxml.TethysException;
 import tethys.deployment.DeploymentHandler;
 import tethys.deployment.DeploymentOverview;
 import tethys.deployment.RecordingPeriod;
@@ -164,7 +165,11 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 		if (ans == WarnOnce.CANCEL_OPTION) {
 			return;
 		}
-		boolean gone = getTethysControl().getDbxmlConnect().deleteDocument(dep);
+		try {
+			boolean gone = getTethysControl().getDbxmlConnect().deleteDocument(dep);
+		} catch (TethysException e) {
+			getTethysControl().showException(e);
+		}
 		getTethysControl().sendStateUpdate(new TethysState(StateType.UPDATESERVER));
 	}
 

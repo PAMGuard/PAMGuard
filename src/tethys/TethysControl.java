@@ -23,6 +23,7 @@ import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamView.PamTabPanel;
+import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
 import metadata.MetaDataContol;
 import metadata.deployment.DeploymentData;
@@ -30,6 +31,7 @@ import tethys.TethysState.StateType;
 import tethys.dbxml.DBXMLConnect;
 import tethys.dbxml.DBXMLQueries;
 import tethys.dbxml.ServerStatus;
+import tethys.dbxml.TethysException;
 import tethys.deployment.DeploymentHandler;
 import tethys.detection.DetectionsHandler;
 import tethys.niluswraps.PDeployment;
@@ -505,6 +507,28 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 
 	public DetectionsHandler getDetectionsHandler() {
 		return detectionsHandler;
+	}
+
+	public void showException(TethysException tethysException) {
+		String title = tethysException.getMessage();
+		StackTraceElement[] stack = tethysException.getStackTrace();
+		String msg = "";
+		if (stack != null) {
+			msg = "Caused in";
+			for (int i = 0; i < Math.min(stack.length, 2); i++) {
+				msg += "<br>" + stack[i].getClassName() + "." + stack[i].getMethodName();
+			}
+		}
+		String xml = tethysException.getXmlError();
+		if (xml != null) {
+//			msg += "<textarea rows=\"6\" cols=\"80\" style=\"border:none;\">" + xml + "</textarea>";
+			xml = xml.replace("<", "&lt;");
+			xml = xml.replace(">", "&gt;");
+			xml = xml.replace("\n", "<br>");
+//			msg += xml;
+			msg += "<pre>"+xml+"</pre>";
+		}
+		WarnOnce.showWarning(title, msg, WarnOnce.WARNING_MESSAGE);
 	}
 
 }

@@ -27,6 +27,7 @@ import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamUtils.LatLong;
 import PamUtils.PamUtils;
+import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamRawDataBlock;
 import binaryFileStorage.BinaryStore;
@@ -59,6 +60,7 @@ import tethys.TethysStateObserver;
 import tethys.TethysTimeFuncs;
 import tethys.TethysState.StateType;
 import tethys.dbxml.DBXMLConnect;
+import tethys.dbxml.TethysException;
 import tethys.niluswraps.PDeployment;
 import tethys.output.TethysExportParams;
 
@@ -311,12 +313,17 @@ public class DeploymentHandler implements TethysStateObserver {
 		}
 		DBXMLConnect dbxmlConnect = getTethysControl().getDbxmlConnect();
 		PDeployment exDeploymnet = onePeriod.getMatchedTethysDeployment();
-		if (exDeploymnet != null) {
-			deployment.setId(exDeploymnet.deployment.getId());
-			dbxmlConnect.updateDocument(deployment);
+		try {
+			if (exDeploymnet != null) {
+				deployment.setId(exDeploymnet.deployment.getId());
+				dbxmlConnect.updateDocument(deployment);
+			}
+			else {
+				dbxmlConnect.postToTethys(deployment);
+			}
 		}
-		else {
-			dbxmlConnect.postToTethys(deployment);
+		catch (TethysException e) {
+			getTethysControl().showException(e);
 		}
 		getTethysControl().sendStateUpdate(new TethysState(StateType.UPDATESERVER));
 	}
@@ -344,11 +351,16 @@ public class DeploymentHandler implements TethysStateObserver {
 			deployment.setSite(globalMeta.getSite());
 			// also need to sort out track data here, etc.
 			DBXMLConnect dbxmlConnect = getTethysControl().getDbxmlConnect();
-			if (exDeploymnet != null) {
-				dbxmlConnect.updateDocument(deployment);
+			try {
+				if (exDeploymnet != null) {
+					dbxmlConnect.updateDocument(deployment);
+				}
+				else {
+					dbxmlConnect.postToTethys(deployment);
+				}
 			}
-			else {
-				dbxmlConnect.postToTethys(deployment);
+			catch (TethysException e) {
+				getTethysControl().showException(e);
 			}
 		}
 		getTethysControl().sendStateUpdate(new TethysState(StateType.UPDATESERVER));

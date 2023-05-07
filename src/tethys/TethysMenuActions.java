@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import tethys.dbxml.TethysException;
 import tethys.niluswraps.PDeployment;
 
 /*
@@ -36,7 +37,11 @@ public class TethysMenuActions {
 			menuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					deleteDeployment(pDeployment);
+					try {
+						deleteDeployment(pDeployment);
+					} catch (TethysException e1) {
+						tethysControl.showException(e1);
+					}
 				}
 			});
 			menu.add(menuItem);
@@ -47,7 +52,11 @@ public class TethysMenuActions {
 			menuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					deleteDeployment(pDeployment);
+					try {
+						deleteDeployment(pDeployment);
+					} catch (TethysException e1) {
+						tethysControl.showException(e1);
+					}
 				}
 			});
 			menu.add(menuItem);
@@ -55,7 +64,7 @@ public class TethysMenuActions {
 		menu.show(e.getComponent(), e.getX(), e.getY());
 	}
 
-	protected void deleteDeployment(PDeployment pDeployment) {
+	protected void deleteDeployment(PDeployment pDeployment) throws TethysException {
 		tethysControl.getDbxmlConnect().deleteDeployment(pDeployment.deployment.getId());
 	}
 }

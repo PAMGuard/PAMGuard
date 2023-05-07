@@ -54,8 +54,9 @@ public class DBXMLQueries {
 	 * Or will return null if the server is not connected
 	 * @param jsonQueryString
 	 * @return query result
+	 * @throws TethysQueryException 
 	 */
-	private DBQueryResult executeQuery(String jsonQueryString) {
+	private DBQueryResult executeQuery(String jsonQueryString) throws TethysQueryException {
 
 		long t1 = System.currentTimeMillis();
 
@@ -73,14 +74,15 @@ public class DBXMLQueries {
 			JerseyClient jerseyClient = dbxmlConnect.getJerseyClient();
 //			String url = jerseyClient.getURL();
 
-			Queries queries = new Queries(jerseyClient);
+//			Queries queries = new Queries(jerseyClient);
 
 			queryResult = jerseyClient.queryJSON(jsonQueryString, 0);
 			schemaPlan = jerseyClient.queryJSON(jsonQueryString, 1);
 
 		}
 		catch (Exception e) {
-			return new DBQueryResult(System.currentTimeMillis()-t1, e);
+//			return new DBQueryResult(System.currentTimeMillis()-t1, e);
+			throw new TethysQueryException("Error running JSON query", jsonQueryString);
 
 		}
 		return new DBQueryResult(System.currentTimeMillis()-t1, queryResult, schemaPlan);
@@ -90,7 +92,13 @@ public class DBXMLQueries {
 
 		String projectQuery = "{\"return\":[\"Deployment/Project\"],\"select\":[],\"enclose\":1}";
 
-		DBQueryResult result = executeQuery(projectQuery);
+		DBQueryResult result;
+		try {
+			result = executeQuery(projectQuery);
+		} catch (TethysQueryException e) {
+			tethysControl.showException(e);
+			return null;
+		}
 
 		if (result == null || result.queryResult == null) {
 			return null;
@@ -161,7 +169,12 @@ public class DBXMLQueries {
 		String qBase = "{\"return\":[\"Deployment\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Deployment/Project\",\"%s\"],\"optype\":\"binary\"}],\"enclose\":1}";
 		String qStr = String.format(qBase, projectName);
 
-		DBQueryResult result = executeQuery(qStr);
+		DBQueryResult result = null;
+		try {
+			result = executeQuery(qStr);
+		} catch (TethysQueryException e1) {
+			tethysControl.showException(e1);
+		}
 		if (result == null)  {
 			return null;
 		}
@@ -253,7 +266,13 @@ public class DBXMLQueries {
 			query = queryWithDepl.replace("TheDeploymentId", deploymentId);
 		}
 		query = query.replace("LongDataName", dataBlock.getLongDataName());
-		DBQueryResult queryResult = executeQuery(query);
+		DBQueryResult queryResult = null;
+		try {
+			queryResult = executeQuery(query);
+		} catch (TethysQueryException e1) {
+			tethysControl.showException(e1);
+			return null;
+		}
 		if (queryResult ==null) {
 			return null;
 		}
@@ -289,7 +308,13 @@ public class DBXMLQueries {
 		public ArrayList<String> getDetectionsDocuments(String deploymentId) {
 			String queryBase = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/Id\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/DataSource/DeploymentId\",\"SomeDeploymentId\"],\"optype\":\"binary\"}],\"enclose\":1}";
 			String queryStr = queryBase.replace("SomeDeploymentId", deploymentId);
-			DBQueryResult queryResult = executeQuery(queryStr);
+			DBQueryResult queryResult = null;
+			try {
+				queryResult = executeQuery(queryStr);
+			} catch (TethysQueryException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			if (queryResult == null || queryResult.queryException != null) {
 				return null;
 			}
@@ -461,7 +486,13 @@ public class DBXMLQueries {
 	private int[] countDataForDeployment(String projectId, String deploymentId, String[] dataPrefixes) {
 		String queryBase = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/Id\",\"Detections/OnEffort/Detection/Start\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/DataSource/DeploymentId\",\"ReplaceDeploymentIdString\"],\"optype\":\"binary\"}],\"enclose\":1}";
 		String queryString = queryBase.replace("ReplaceDeploymentIdString", deploymentId);
-		DBQueryResult result = executeQuery(queryString);
+		DBQueryResult result;
+		try {
+			result = executeQuery(queryString);
+		} catch (TethysQueryException e) {
+			tethysControl.showException(e);
+			return null;
+		}
 		if (result == null || result.queryResult == null) {
 			return null;
 		}
@@ -560,7 +591,13 @@ public class DBXMLQueries {
 	public Detections getDetectionsDocInfo(String detectionsDocName) {
 		String queryBase = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/Id\",\"Detections/Description\",\"Detections/DataSource\",\"Detections/Algorithm\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Id\",\"DetectionsDocName\"],\"optype\":\"binary\"}],\"enclose\":1}";
 		String query = queryBase.replace("DetectionsDocName", detectionsDocName);
-		DBQueryResult queryResult = executeQuery(query);
+		DBQueryResult queryResult;
+		try {
+			queryResult = executeQuery(query);
+		} catch (TethysQueryException e) {
+			tethysControl.showException(e);
+			return null;
+		}
 		Document doc;
 		try {
 			doc = queryResult.getDocument();

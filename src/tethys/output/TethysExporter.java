@@ -32,6 +32,7 @@ import metadata.deployment.DeploymentData;
 import nilus.Deployment;
 import tethys.TethysControl;
 import tethys.dbxml.DBXMLConnect;
+import tethys.dbxml.TethysException;
 import tethys.deployment.DeploymentHandler;
 import tethys.deployment.DeploymentOverview;
 import tethys.deployment.DeploymentRecoveryPair;
@@ -189,7 +190,11 @@ public class TethysExporter {
 			Deployment deployment = deploymentHandler.createDeploymentDocument(i++, recordingPeriod);
 //			System.out.println(deployment.toString());
 			deploymentDocs.add(deployment);
-			tethysControl.getDbxmlConnect().postToTethys(deployment);
+			try {
+				tethysControl.getDbxmlConnect().postToTethys(deployment);
+			} catch (TethysException e) {
+				tethysControl.showException(e);
+			}
 
 		}
 

@@ -20,6 +20,7 @@ import PamView.tables.SwingTableColumnWidths;
 import PamguardMVC.PamDataBlock;
 import nilus.Detections;
 import tethys.TethysControl;
+import tethys.dbxml.TethysException;
 import tethys.detection.StreamDetectionsSummary;
 import tethys.niluswraps.PDetections;
 
@@ -117,7 +118,11 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 	}
 	
 	protected void deleteDocument(PDetections pDets) {
-		getTethysControl().getDbxmlConnect().deleteDocument(pDets.detections);
+		try {
+			getTethysControl().getDbxmlConnect().deleteDocument(pDets.detections);
+		} catch (TethysException e) {
+			getTethysControl().showException(e);
+		}
 		selectDataBlock(dataBlock); // force table update. 
 	}
 
