@@ -110,6 +110,9 @@ public class BinaryStoreStatus extends StoreStatus {
 	 * @param blockStatus
 	 */
 	public void considerBlockStatus(BinaryStoreStatus blockStatus) {
+		if (blockStatus == null) {
+			return;
+		}
 		considerFirstHeader(blockStatus.firstHeader);
 		considerLastFooter(blockStatus.lastFooter);
 		considerLastData(blockStatus.lastData);
