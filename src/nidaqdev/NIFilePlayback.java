@@ -127,7 +127,8 @@ public class NIFilePlayback implements FilePlaybackDevice, PamSettings {
 
 	@Override
 	public boolean preparePlayback(PlaybackParameters playbackParameters) {
-		if (niDeviceLUT == null || niDeviceLUT.length <= playbackParameters.deviceNumber) {
+		if (niDeviceLUT == null || niDeviceLUT.length <= playbackParameters.deviceNumber
+				|| playbackParameters.deviceNumber < 0) {
 			return false;
 		}
 		int bn = niDeviceLUT[playbackParameters.deviceNumber];
