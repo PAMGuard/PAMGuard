@@ -861,7 +861,19 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			long[] allFileStarts = new long[allFiles.size()];
 			for (int i = 0; i < allFiles.size(); i++) {
 				allFileStarts[i] = getFileStartTime(allFiles.get(i).getAbsoluteFile());
+				if (allFileStarts[i] < firstFileStart) {
+//					System.out.printf("Swap first file from %s to %s\n", firstFile.getName(), allFiles.get(i).getName());
+					firstFile = allFiles.get(i);
+					firstFileStart = allFileStarts[i];
+				}
+				if (allFileStarts[i] > lastFileEnd) {
+//					System.out.printf("Swap last file from %s to %s\n", lastFile.getName(), allFiles.get(i).getName());
+					lastFile = allFiles.get(i);
+					lastFileEnd = allFileStarts[i] + (long) (lastFile.getDurationInSeconds()*1000.);
+				}
 			}
+			storeInfo.setFirstFileStart(firstFileStart); // just incase changed. 
+			storeInfo.setLastFileEnd(lastFileEnd); // just incase changed
 			storeInfo.setFileStartTimes(allFileStarts);
 		}
 		return storeInfo;
