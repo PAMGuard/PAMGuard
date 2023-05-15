@@ -280,6 +280,22 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	public ArrayList<DLClassiferModel> getDLModels() {
 		return dlModels;
 	}
+	
+	
+	/**
+	 * Get a model by it's name. 
+	 * @param the name the model. 
+	 * @return the corresponding model object or null if no model with the name exists.  
+	 */
+	public DLClassiferModel getDLModel(String string) {
+		for (int i=0; i< this.dlModels.size(); i++) {
+			if (dlModels.get(i).getName().equals(string)) {
+				return dlModels.get(i); 
+			}
+		}
+		return null;
+	}
+
 
 	/**
 	 * Get the current deep learning model.
@@ -555,6 +571,7 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	public DLClassifierChooser getDlClassifierChooser() {
 		return dlClassifierChooser;
 	}
+
 
 
 }

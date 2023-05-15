@@ -24,11 +24,12 @@ public class ClickTypeProperty {
 
 
 	public ClickTypeProperty(ClickTypeCommonParams clickType){
-		this.commonClickParams=clickType;
-		name.setValue(clickType.getName());
-		discardClassifier.setValue(clickType.getDiscard());
-		code.setValue(clickType.getSpeciesCode());
-
+//		this.commonClickParams=clickType;
+//		name.setValue(clickType.getName());
+//		discardClassifier.setValue(clickType.getDiscard());
+//		code.setValue(clickType.getSpeciesCode());
+		setClickType( clickType);
+		
 	}
 
 	public StringProperty name= new SimpleStringProperty("blank");
@@ -48,7 +49,7 @@ public class ClickTypeProperty {
 		this.commonClickParams = clickType;
 		//TODO-need to set properties;
 		name.setValue(clickType.getName());
-		enableClassifier.setValue(clickType.enable);
+		enableClassifier.setValue(clickType.getEnable());
 		discardClassifier.setValue(clickType.getDiscard());
 		code.setValue(clickType.getSpeciesCode());
 	}

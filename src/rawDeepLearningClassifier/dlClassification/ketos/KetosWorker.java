@@ -11,14 +11,11 @@ import org.jamdev.jdl4pam.transforms.DLTransform.DLTransformType;
 import org.jamdev.jdl4pam.transforms.DLTransformsFactory;
 import org.jamdev.jdl4pam.transforms.jsonfile.DLTransformsParser;
 
-import PamView.dialog.PamDialog;
 import PamView.dialog.warn.WarnOnce;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
-
-import ai.djl.ndarray.types.Shape;
 
 /**
  * 
@@ -143,11 +140,7 @@ public class KetosWorker extends DLModelWorker<GenericPrediction> {
 			ketosDLParams.defaultSegmentLen = ketosParams.seglen*1000.; //the segment length in microseconds. 
 			//ketosParams.classNames = new String[] {"Noise", "Right Whale"}; // FIXME; 
 			
-			
-			ketosDLParams.numClasses = (int) ketosModel.getOutShape().get(1); 
-						
-			
-			/*****
+									
 			//ok 0 the other values are not user selectable but this is. If we relaod the same model we probably want to keep it....
 			//So this is a little bt of a hack but will probably be OK in most cases. 
 			if (ketosDLParams.binaryClassification==null || ketosDLParams.binaryClassification.length!=ketosDLParams.numClasses) {

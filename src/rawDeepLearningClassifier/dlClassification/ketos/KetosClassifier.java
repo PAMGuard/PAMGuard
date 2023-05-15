@@ -31,6 +31,8 @@ import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
  */
 public class KetosClassifier extends StandardClassifierModel {
 	
+	public static String MODEL_NAME = "Ketos";
+	
 
 
 	/**
@@ -65,7 +67,7 @@ public class KetosClassifier extends StandardClassifierModel {
 
 	@Override
 	public String getName() {
-		return "Ketos";
+		return MODEL_NAME;
 	}
 
 	@Override
@@ -120,13 +122,13 @@ public class KetosClassifier extends StandardClassifierModel {
 
 	@Override
 	public String getUnitName() {
-		return dlControl.getUnitName()+"_Ketos"; 
+		return dlControl.getUnitName()+"_" + MODEL_NAME; 
 	}
 
 
 	@Override
 	public String getUnitType() {
-		return dlControl.getUnitType()+"_Ketos";
+		return dlControl.getUnitType()+"_" + MODEL_NAME;
 
 	}
 
