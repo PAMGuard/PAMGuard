@@ -1110,7 +1110,7 @@ public class DifarProcess extends PamProcess {
 				rawData[0] = rawDataAll[0]; // is fine since getSamples was fed a channel map. 
 			}
 		} catch (RawDataUnavailableException e) {
-			System.out.println(e.getMessage());
+			System.out.println("Error in DifarProcess.difarTrigger" + e.getMessage());
 			return;
 		}
 		if (rawData[0] == null) {

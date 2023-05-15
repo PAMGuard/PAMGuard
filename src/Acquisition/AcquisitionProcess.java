@@ -1,7 +1,9 @@
 package Acquisition;
 
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,7 +21,13 @@ import Filters.FilterBand;
 import Filters.FilterParams;
 import Filters.FilterType;
 import Filters.IirfFilter;
+import PamController.DataInputStore;
+import PamController.InputStoreInfo;
+import PamController.OfflineDataStore;
+import PamController.PamControlledUnit;
 import PamController.PamController;
+import PamController.fileprocessing.ReprocessManager;
+import PamController.fileprocessing.StoreStatus;
 import PamController.status.BaseProcessCheck;
 import PamController.status.ProcessCheck;
 import PamDetection.RawDataUnit;
@@ -36,7 +44,10 @@ import PamguardMVC.PamProcess;
 import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.RequestCancellationObject;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
+import dataGram.DatagramManager;
+import dataMap.OfflineDataMapPoint;
 import pamScrollSystem.AbstractScrollManager;
+import pamScrollSystem.ViewLoadObserver;
 
 /**
  * Data acquisition process for all types of input device. 
@@ -54,7 +65,7 @@ import pamScrollSystem.AbstractScrollManager;
  * @see PamguardMVC.PamDataUnit
  *
  */
-public class AcquisitionProcess extends PamProcess {
+public class AcquisitionProcess extends PamProcess implements DataInputStore {
 	
 	public static final int LASTDATA = 2; // don't use zero since need to see if no notification has been received. 
 	
@@ -523,11 +534,11 @@ public class AcquisitionProcess extends PamProcess {
 			System.out.printf("Unable to find daq system %s\n", acquisitionControl.acquisitionParameters.daqSystemType);
 			return;
 		}
-
-
+		
 		systemPrepared = runningSystem.prepareSystem(acquisitionControl);
 
 	}
+
 
 	@Override
 	public void setSampleRate(float sampleRate, boolean notify) {
@@ -1223,6 +1234,28 @@ public class AcquisitionProcess extends PamProcess {
 	public PamDataBlock<DaqStatusDataUnit> getDaqStatusDataBlock() {
 		return daqStatusDataBlock;
 	}
+
+	@Override
+	public InputStoreInfo getStoreInfo(boolean detail) {
+		if (runningSystem instanceof DataInputStore) {
+			return ((DataInputStore) runningSystem).getStoreInfo(detail);
+		}
+		else {
+			return null;
+		}
+	}
+
+	@Override
+	public boolean setAnalysisStartTime(long startTime) {
+		if (runningSystem instanceof DataInputStore) {
+			return ((DataInputStore) runningSystem).setAnalysisStartTime(startTime);
+		}
+		else {
+			return false;
+		}
+	}
+
+
 	
 
 }

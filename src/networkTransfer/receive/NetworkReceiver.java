@@ -458,7 +458,7 @@ public class NetworkReceiver extends PamControlledUnit implements PamSettings, N
 //					checkExistingThreads(clientSocket, rxThread);
 				}
 			} catch (IOException e) {
-				System.out.println(e.getMessage());
+				System.out.println("IOException in NeetworkReceiver" + e.getMessage());
 			}
 
 		}

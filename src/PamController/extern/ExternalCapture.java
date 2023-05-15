@@ -46,7 +46,7 @@ public class ExternalCapture extends ExternalController {
 				}
 			}
 		} catch (IOException e) {
-			System.out.println(e.getMessage());
+			System.out.println("IOError in ExternalCapture.readInputStream: " + e.getMessage());
 		}
 	}
 

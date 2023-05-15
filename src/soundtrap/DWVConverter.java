@@ -219,7 +219,7 @@ public class DWVConverter {
 					}
 				}
 				catch (Exception e) {
-					System.out.println(e.getMessage());
+					System.out.println("Exception 1 in DWVConverter.effortLine: " + e.getMessage());
 				}
 				binaryStream.openOutputFiles(bclLine.getMilliseconds());
 				binaryStream.writeHeader(bclLine.getMilliseconds(), System.currentTimeMillis());
@@ -234,7 +234,7 @@ public class DWVConverter {
 							PamCalendar.formatDBDateTime(wavFileStop), PamCalendar.formatDBDateTime(bclLine.getMilliseconds()));
 				}
 				catch (Exception e) {
-					System.out.println(e.getMessage());
+					System.out.println("Exception 2 in DWVConverter.effortLine: " + e.getMessage());
 				}
 				binaryStream.writeModuleFooter();
 				binaryStream.writeFooter(bclLine.getMilliseconds(), System.currentTimeMillis(), BinaryFooter.END_UNKNOWN);

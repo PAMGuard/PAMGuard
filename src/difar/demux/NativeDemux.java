@@ -98,7 +98,7 @@ public class NativeDemux extends GreenridgeDemux {
 			return true;
 		}
 		catch (UnsatisfiedLinkError e) {
-			System.out.println(e.getMessage());
+			System.out.println("Error in NativeDemux.loadLibrary" + e.getMessage());
 			return false; 
 		}
 	}

@@ -18,12 +18,14 @@ import generalDatabase.backup.DatabaseBackupStream;
 import pamScrollSystem.ViewLoadObserver;
 import pamViewFX.pamTask.PamTaskUpdate;
 import PamController.AWTScheduler;
+import PamController.DataOutputStore;
 import PamController.OfflineDataStore;
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamController.PamControllerInterface;
 import PamController.PamGUIManager;
 import PamController.PamSettingManager;
+import PamController.fileprocessing.StoreStatus;
 import PamController.status.ModuleStatus;
 import PamController.status.QuickRemedialAction;
 import PamguardMVC.PamDataBlock;
@@ -39,7 +41,7 @@ import backupmanager.BackupInformation;
  * @see DBControl
  *
  */
-public class DBControlUnit extends DBControl implements OfflineDataStore {
+public class DBControlUnit extends DBControl implements DataOutputStore {
 
 
 	
@@ -490,6 +492,16 @@ public class DBControlUnit extends DBControl implements OfflineDataStore {
 	@Override
 	public BackupInformation getBackupInformation() {
 		return backupInformation;
+	}
+
+	@Override
+	public StoreStatus getStoreStatus(boolean getDetail) {
+		return getDbProcess().getStoreStatus(this, getDetail);
+	}
+
+	@Override
+	public boolean deleteDataFrom(long timeMillis) {
+		return getDbProcess().deleteDataFrom(timeMillis);
 	}
 
 

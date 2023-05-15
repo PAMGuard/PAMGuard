@@ -25,7 +25,7 @@ public class HelpCommand extends ExtCommand {
 				out += "\n";
 			}
 		}
-		commandManager.sendData(out);
+		commandManager.sendData(this, out);
 		return getName();
 	}
 

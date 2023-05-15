@@ -1809,7 +1809,7 @@ public class ClickDetector extends PamProcess {
 						newClick.setStartSample(newClick.getStartSample() - firstFilterDelay - secondFilterDelay);
 						waveDataError = false;
 					} catch (RawDataUnavailableException e) {
-						System.out.println("RawDataUnavailableException");
+						System.out.println(" Click Detector RawDataUnavailableException");
 						System.out.println(e.getMessage());
 					}
 					for (int k = 0; k < nChannels; k++) {

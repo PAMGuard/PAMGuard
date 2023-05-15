@@ -25,19 +25,29 @@
 package soundtrap;
 
 import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JSeparator;
+
+import org.pamguard.x3.sud.SUDClickDetectorInfo;
 
 import Acquisition.AcquisitionControl;
-import Acquisition.sud.SUDNotificationManager;
+import PamController.PamControlledUnitSettings;
 import PamController.PamController;
+import PamController.PamSettingManager;
+import PamController.PamSettings;
 import PamguardMVC.PamRawDataBlock;
 import clickDetector.ClickBTDisplay;
 import clickDetector.ClickControl;
 import clickDetector.ClickDisplay;
 import clickDetector.ClickDisplayManager;
+import clickDetector.ClickParameters;
+import soundtrap.sud.SUDParamsDialog;
 import soundtrap.sud.SudFileDWVHandler;
 
 /**
@@ -45,6 +55,8 @@ import soundtrap.sud.SudFileDWVHandler;
  *
  */
 public class STClickControl extends ClickControl {
+	
+	private SUDClickDetectorInfo sudClickDetectorInfo;
 	
 	public static final String STUNITTYPE = "SoundTrap Click Detector";
 
@@ -67,6 +79,8 @@ public class STClickControl extends ClickControl {
 		
 		sudFileDWVHandler = new SudFileDWVHandler(this);
 		sudFileDWVHandler.subscribeSUD();
+		
+		PamSettingManager.getInstance().registerSettings(new SUDSettings());
 	}
 
 	@Override
@@ -117,7 +131,21 @@ public class STClickControl extends ClickControl {
 			}
 		}
 		
+		JMenuItem sudItem = new JMenuItem("Sound Trap settings ...");
+		sudItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				showSudParameters(parentFrame);
+			}
+		});
+		newMenu.add(sudItem, 0);
+		newMenu.add(new JSeparator(), 1);
+		
 		return newMenu;
+	}
+
+	protected void showSudParameters(Frame parentFrame) {
+		SUDParamsDialog.showDialog(parentFrame, this);
 	}
 
 	@Override
@@ -146,6 +174,10 @@ public class STClickControl extends ClickControl {
 	 */
 	public void updateDisplayScrollers(long timeMillis) {
 		ClickDisplayManager dispManager = getDisplayManager();
+		if (dispManager == null) {
+			// happens in -nogui operation. 
+			return;
+		}
 		ArrayList<ClickDisplay> dispList = dispManager.getWindowList();
 		for (ClickDisplay display : dispList) {
 			if (display instanceof ClickBTDisplay) {
@@ -153,6 +185,89 @@ public class STClickControl extends ClickControl {
 			}
 		}
 	}
+
+	// this was a bad idea since we need to keep hold of settings for the 
+	// classifier, which are in with the main set ...
+//	@Override
+//	public long getSettingsVersion() {
+//		return SUDClickDetectorInfo.serialVersionUID;
+//	}
+//
+//	@Override
+//	public Serializable getSettingsReference() {
+//		return getSudClickDetectorInfo();
+//	}
+
+	@Override
+	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
+		// have to leave this in since I've now run data with it using the ST settings, 
+		// so some configs may return these !
+		Object o = pamControlledUnitSettings.getSettings();
+		if (o instanceof SUDClickDetectorInfo) {
+			sudClickDetectorInfo = (SUDClickDetectorInfo) o;
+			return true;
+		}
+		if (o instanceof ClickParameters) {
+			return super.restoreSettings(pamControlledUnitSettings);
+		}
+		return false;
+	}
+
+	/**
+	 * @return the sudClickDetectorInfo
+	 */
+	public SUDClickDetectorInfo getSudClickDetectorInfo() {
+		if (sudClickDetectorInfo == null) {
+			sudClickDetectorInfo  = new SUDClickDetectorInfo();
+		}
+		return sudClickDetectorInfo;
+	}
+
+	/**
+	 * @param sudClickDetectorInfo the sudClickDetectorInfo to set
+	 */
+	public void setSudClickDetectorInfo(SUDClickDetectorInfo sudClickDetectorInfo) {
+		this.sudClickDetectorInfo = sudClickDetectorInfo;
+	}
 	
+	/**
+	 * Class to handle SoundTrap click detector settings without messing up
+	 * the standard click detector ones which are needed for the classifier. 
+	 * @author dg50
+	 *
+	 */
+	private class SUDSettings implements PamSettings {
+
+		@Override
+		public String getUnitName() {
+			return STClickControl.this.getUnitName();
+		}
+
+		@Override
+		public String getUnitType() {
+			return STUNITTYPE;
+		}
+
+		@Override
+		public Serializable getSettingsReference() {
+			return sudClickDetectorInfo;
+		}
+
+		@Override
+		public long getSettingsVersion() {
+			return SUDClickDetectorInfo.serialVersionUID;
+		}
+
+		@Override
+		public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
+			Object o = pamControlledUnitSettings.getSettings();
+			if (o instanceof SUDClickDetectorInfo) {
+				sudClickDetectorInfo = (SUDClickDetectorInfo) o;
+				return true;
+			}
+			return false;
+		}
+		
+	}
 
 }

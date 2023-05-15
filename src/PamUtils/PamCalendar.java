@@ -46,6 +46,8 @@ public class PamCalendar {
 
 	
 	public static TimeZone defaultTimeZone = TimeZone.getTimeZone("UTC");
+	
+	private static TimeZone localTimeZone = TimeZone.getDefault();
 
 	public static final long millisPerDay = 1000L*24L*3600L;
 
@@ -174,8 +176,9 @@ public class PamCalendar {
 	}
 
 	public static TimeZone getDisplayTimeZone(boolean useLocal) {
-		return TimeZone.getTimeZone("UTC");
-		//		return useLocal ? CalendarControl.getInstance().getChosenTimeZone() : defaultTimeZone;
+//		return TimeZone.getTimeZone("UTC");
+//		return useLocal ? CalendarControl.getInstance().getChosenTimeZone() : defaultTimeZone;
+		return useLocal ? localTimeZone : defaultTimeZone;
 	}
 
 	public static String formatDateTime(Date date) {
