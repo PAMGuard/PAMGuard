@@ -140,7 +140,7 @@ public class BBED549 {
 	public static double hexToEngineering(int range, int data) {
 		/**
 		 * convert integer data to engineering units. 
-		 * @param range range on device, asumed the same for all channels. 
+		 * @param range range on device, assumed the same for all channels. 
 		 * @param data data array
 		 * @return
 		 */

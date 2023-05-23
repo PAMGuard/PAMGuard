@@ -225,7 +225,8 @@ public class AnalogDiagnosticsDisplay extends UserDisplayComponentAdapter implem
 				}
 				break;
 			case 4:
-				if (allItemData[rowIndex] != null) {
+				ItemAllData data = allItemData[rowIndex];
+				if (data != null) {
 					return allItemData[rowIndex].getIntValue();
 				}
 				break;
