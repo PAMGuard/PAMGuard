@@ -1,5 +1,6 @@
 package PamController.settings;
 
+import java.io.ByteArrayInputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,6 +15,7 @@ import PamController.PamController;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamController.PamSettingsGroup;
+import PamModel.PamModel;
 import PamModel.PamModuleInfo;
 import PamModel.SMRUEnable;
 import PamView.dialog.PamFileBrowser;
@@ -226,7 +228,13 @@ public class SettingsImport {
 				ownerClass = Class.forName(aSet.getOwnerClassName());
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+//				e.printStackTrace();
+				// this is happening since the ownerclassname is not set correctly in psfx files
+				// so we have to deserialise the data to find the class. 
+//				ownerClass = getClassFromData(aSet.getSerialisedByteArray());
+//				ownerClass = PamModuleInfo.findModuleClass(aSet.getUnitType());
+			}
+			if (ownerClass == null) {
 				continue;
 			}
 			if (PamControlledUnit.class.isAssignableFrom(ownerClass)) {
@@ -262,6 +270,17 @@ public class SettingsImport {
 		
 
 		return groupedSettings;
+	}
+	
+	private Class getClassFromData(byte[] data) {
+		try {
+			ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data));
+			Object obj = ois.readObject();
+			return obj.getClass();
+		} catch (Exception e) {
+			return null;
+		}
+		
 	}
 
 	private SettingsImportGroup findGroup(ArrayList<SettingsImportGroup> groupedSettings, String unitName) {
