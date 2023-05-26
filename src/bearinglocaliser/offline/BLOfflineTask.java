@@ -4,6 +4,7 @@ import java.util.ListIterator;
 
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import bearinglocaliser.BearingLocaliserControl;
 import bearinglocaliser.BearingProcess;
 import dataMap.OfflineDataMapPoint;
@@ -28,6 +29,9 @@ public class BLOfflineTask extends OfflineTask {
 
 	@Override
 	public String getName() {
+		if (bearingLocaliserControl == null) {
+			return null;
+		}
 		return bearingLocaliserControl.getUnitName();
 	}
 
@@ -67,15 +71,21 @@ public class BLOfflineTask extends OfflineTask {
 		if (rawOrFFTBlock == null) {
 			return;
 		}
-		ListIterator it = rawOrFFTBlock.getListIterator(dataUnit.getTimeMilliseconds(), rawOrFFTBlock.getChannelMap(), 
-				PamDataBlock.MATCH_BEFORE, PamDataBlock.POSITION_BEFORE);
-		if (it == null || it.hasNext() == false) {
-			long dataStart = dataUnit.getTimeMilliseconds();
-			long dataEnd = dataUnit.getEndTimeInMilliseconds();
-			if (dataEnd-dataStart <= 0) {
-				dataEnd = dataStart + 1000;
-			}
-			rawOrFFTBlock.loadViewerData(dataStart, dataEnd, null);
+		long dataStart = dataUnit.getTimeMilliseconds();
+		long dataEnd = dataUnit.getEndTimeInMilliseconds();
+		boolean haveData = rawOrFFTBlock.hasDataRange(dataStart, dataEnd);
+		if (haveData == false) {
+//		ListIterator it = rawOrFFTBlock.getListIterator(dataUnit.getTimeMilliseconds(), rawOrFFTBlock.getChannelMap(), 
+//				PamDataBlock.MATCH_BEFORE, PamDataBlock.POSITION_BEFORE);
+//		if (it == null || it.hasNext() == false) {
+//			if (dataEnd-dataStart <= 0) {
+//				dataEnd = dataStart + 1000;
+//			}
+			OfflineDataLoadInfo offlineLoadInfo = new OfflineDataLoadInfo(dataStart, dataEnd);
+			offlineLoadInfo.setLoadKeepLayers(2);
+			rawOrFFTBlock.getOfflineData(offlineLoadInfo);
+//			System.out.printf("Loaded some FFT data I hope\n");
+//			rawOrFFTBlock.loadViewerData(dataStart, dataEnd, null);
 		}
 		
 	}

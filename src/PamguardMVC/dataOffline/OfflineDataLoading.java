@@ -527,7 +527,10 @@ public class OfflineDataLoading<T extends PamDataUnit> {
 	public void notifyOfflineObservers(T pamDataUnit) {
 		if (requestingObservers != null) {
 			for (int i = 0; i < requestingObservers.size(); i++) {
-				requestingObservers.get(i).addData(pamDataBlock, pamDataUnit);
+				PamObserver obs = requestingObservers.get(i);
+				if (obs != null) {
+					obs.addData(pamDataBlock, pamDataUnit);
+				}
 			}
 		}
 
