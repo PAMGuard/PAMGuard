@@ -86,6 +86,44 @@ public class DBXMLConnect {
 	}
 
 	/**
+	 * Convert a nilus Object into a file
+	 * @param nilusObject nilus object
+	 * @param file file (should not exist)
+	 * @return file (will be the same as input file)
+	 * @throws TethysException
+	 */
+	public File createXMLDocument(Object nilusObject, File file) throws TethysException {
+		Class objClass = nilusObject.getClass();
+		try {
+			MarshalXML marshal = new MarshalXML();
+			marshal.createInstance(objClass);
+			marshal.marshal(nilusObject, file.toString());
+		} catch(IllegalArgumentException e) {
+			throw new TethysException("IllegalArgumentException posting to Tethys: " + e.getMessage(), null);
+		} catch (IOException e) {
+			throw new TethysException("IOException posting to Tethys: " + e.getMessage(), null);
+		} catch (JAXBException e) {
+			throw new TethysException("JAXBException posting to Tethys: " + e.getMessage(), null);
+		}
+		return file;
+	}
+	
+	/**
+	 * Create a temporary nilus file. 
+	 * @param nilusObject
+	 * @return
+	 * @throws TethysException
+	 */
+	public File createTempXMLDocument(Object nilusObject) throws TethysException {
+		String tempName = getTempFileName(nilusObject);
+		tempName = tempDirectory.getAbsolutePath() + File.separator + tempName + ".xml";
+		File tempFile = new File(tempName);
+		File retFile = createXMLDocument(nilusObject, tempFile);	
+		retFile.deleteOnExit();
+		return retFile;
+	}
+	
+	/**
 	 * take a nilus object loaded with PamGuard data and post it to the Tethys database
 	 *
 	 * @param pamGuardObjs a nilus object loaded with PamGuard data
@@ -162,7 +200,7 @@ public class DBXMLConnect {
 		String docId = getDocumentId(nilusDocument);
 		String result = null;
 		try {
-			result = jerseyClient.removeDocument(collection+" uio", docId );
+			result = jerseyClient.removeDocument(collection, docId );
 			/**
 			 * Return from a sucessful delete is something like
 			 *

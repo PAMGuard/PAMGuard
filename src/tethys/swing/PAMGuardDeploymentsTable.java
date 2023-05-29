@@ -33,6 +33,7 @@ import tethys.deployment.DeploymentHandler;
 import tethys.deployment.DeploymentOverview;
 import tethys.deployment.RecordingPeriod;
 import tethys.niluswraps.PDeployment;
+import tethys.niluswraps.TethysCollections;
 
 /**
  * Table view of PAMGuard deployments. For a really simple deployment, this may have only
@@ -135,13 +136,30 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 			JPopupMenu popMenu = new JPopupMenu();
 			JMenuItem menuItem = new JMenuItem("Remove deployment document " + matchedDeployments.get(0));
 			menuItem.addActionListener(new ActionListener() {
-				
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					deleteDeployment(matchedDeployments.get(0));
 				}
 			});
 			popMenu.add(menuItem);
+			menuItem = new JMenuItem("Display deployment document " + matchedDeployments.get(0));
+			menuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					displayDeployment(matchedDeployments.get(0));
+				}
+			});
+			popMenu.add(menuItem);
+			menuItem = new JMenuItem("Export deployment document " + matchedDeployments.get(0));
+			menuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					exportDeployment(matchedDeployments.get(0));
+				}
+			});
+			popMenu.add(menuItem);
+			
+			
 			popMenu.show(e.getComponent(), e.getX(), e.getY());
 		}
 //		if (newPeriods.size() == 0) {
@@ -155,6 +173,14 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 		
 	}
 	
+	protected void exportDeployment(PDeployment pDeployment) {
+		getTethysControl().exportDocument(TethysCollections.Deployments.toString(), pDeployment.deployment.getId());
+	}
+
+	protected void displayDeployment(PDeployment pDeployment) {
+		getTethysControl().displayDocument(TethysCollections.Deployments.toString(), pDeployment.deployment.getId());
+	}
+
 	protected void deleteDeployment(PDeployment pDeployment) {
 		Deployment dep = pDeployment.deployment;
 		if (dep == null) {

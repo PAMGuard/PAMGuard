@@ -3,6 +3,10 @@ package tethys;
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.MalformedURLException;
@@ -10,9 +14,11 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
@@ -20,8 +26,11 @@ import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamControllerInterface;
+import PamController.PamFolders;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import PamUtils.PamFileChooser;
+import PamUtils.PamFileFilter;
 import PamView.PamTabPanel;
 import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
@@ -43,6 +52,7 @@ import tethys.output.TethysExporter;
 import tethys.output.swing.TethysExportDialog;
 import tethys.swing.ProjectDeploymentsDialog;
 import tethys.swing.TethysTabPanel;
+import tethys.swing.XMLStringView;
 
 /**
  * Quick play with a simple system for outputting data to Tethys. At it's start
@@ -537,6 +547,72 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 			msg += "<pre>"+xml+"</pre>";
 		}
 		WarnOnce.showWarning(title, msg, WarnOnce.WARNING_MESSAGE);
+	}
+
+	/**
+	 * Load a document from the database and display it in a popup window
+	 * @param collection
+	 * @param documentId
+	 */
+	public void displayDocument(String collection, String documentId) {
+		String doc = getDbxmlQueries().getDocument(collection, documentId);
+		if (doc == null | doc.length() == 0) {
+			doc = String.format("Unable to retrieve document %s/%s from database\n", collection, documentId);
+			
+		}
+		XMLStringView.showDialog(getGuiFrame(), collection, documentId, doc);
+	}
+
+	/**
+	 * Load a document from the database and write to a file selected by the user
+	 * @param collection
+	 * @param documentId
+	 */
+	public void exportDocument(String collection, String documentId) {
+		String doc = getDbxmlQueries().getDocument(collection, documentId);
+		if (doc == null | doc.length() == 0) {
+			String msg = String.format("Unable to retrieve document %s/%s from database\n", collection, documentId);
+			WarnOnce.showWarning("Error", msg, WarnOnce.WARNING_MESSAGE);			
+		}
+		
+		PamFileFilter fileFilter = new PamFileFilter("XML documents", ".xml");
+//		fileFilter
+		JFileChooser fileChooser = new PamFileChooser();
+		fileChooser.setFileFilter(fileFilter);
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		// make a default name based on the document id and the dataset directory. 
+		String defFolder = PamFolders.getDefaultProjectFolder();
+		if (defFolder != null) {
+			defFolder = String.format("%s%s%s.xml", defFolder,File.separator,documentId);
+			File defFile = new File(defFolder);
+			fileChooser.setSelectedFile(defFile);
+			fileChooser.setAcceptAllFileFilterUsed(true);
+			
+		}
+		int state = fileChooser.showSaveDialog(getGuiFrame());
+		if (state != JFileChooser.APPROVE_OPTION) return;
+		File newFile = fileChooser.getSelectedFile();
+		if (newFile == null) return;
+		newFile = PamFileFilter.checkFileEnd(newFile, "xml", true);
+		if (newFile == null) {
+			return;
+		}
+		if (newFile.exists()) {
+			int ans2 = WarnOnce.showWarning(newFile.getAbsolutePath(), 
+					"The file already exists. Do you want to overwrite it ?", WarnOnce.OK_CANCEL_OPTION);
+			if (ans2 == WarnOnce.CANCEL_OPTION) {
+				return;
+			}
+		}
+		try {
+			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(newFile));
+			bos.write(doc.getBytes());
+			bos.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

@@ -5,11 +5,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.SwingWorker;
+import javax.xml.XMLConstants;
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.pamguard.x3.sud.SUDClickDetectorInfo;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import PamController.PamControlledUnit;
 import PamController.PamguardVersionInfo;
+import PamController.settings.output.xml.PamguardXMLWriter;
 import PamModel.PamPluginInterface;
 import PamUtils.PamCalendar;
+import PamUtils.XMLUtils;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamProcess;
@@ -18,6 +27,7 @@ import dataMap.OfflineDataMap;
 import dataMap.OfflineDataMapPoint;
 import metadata.deployment.DeploymentData;
 import nilus.AlgorithmType;
+import nilus.AlgorithmType.Parameters;
 import nilus.AlgorithmType.SupportSoftware;
 import nilus.DataSourceType;
 import nilus.Deployment;
@@ -484,6 +494,69 @@ public class DetectionsHandler {
 		algorithm.setMethod(getMethodString(dataBlock));
 		algorithm.setSoftware(getSoftwareString(dataBlock));
 		algorithm.setVersion(getVersionString(dataBlock));
+		
+		TethysDataProvider dataProvider = dataBlock.getTethysDataProvider();
+		if (dataProvider != null) {
+//			Parameters parameters = dataProvider.getAlgorithmParameters();
+			Parameters parameters = algorithm.getParameters();
+			if (parameters == null) {
+				parameters = new Parameters();
+				algorithm.setParameters(parameters);
+			}
+			List<Element> paramList = parameters.getAny();
+//			algorithm.setParameters(parameters);
+			// make a really simple parameter or two to see if it works with simpler xml than PG generates. 
+			/**
+			 * Parameters should look something like
+			 * 
+  <Algorithm>
+    <Method>Analyst detections</Method>
+    <Software>Triton</Software>
+    <Version>unknown</Version>
+    <Parameters>
+      <LTSA_plot_time_h>0.75</LTSA_plot_time_h>
+      <LTSA_low_Hz>0.0</LTSA_low_Hz>
+      <LTSA_high_Hz>5000.0</LTSA_high_Hz>
+      <LTSA_brightness>30.0</LTSA_brightness>
+    </Parameters>
+  </Algorithm>
+			 */
+			// this works. Can look at the source to see how it's done. 
+			// may have fun making this work for more complex structures. 
+			try {
+				Helper helper = new Helper();
+				helper.AddAnyElement(paramList, "Threshold", "3.5");
+				/*
+				 *  and see Matlab code for dbStruct2DOM for more complex structures
+				 *  This looks like it may be possible to rewrite my functions for 
+				 *  writing structures to XML using the helper.AddAnyElement function as 
+				 *  an example and I should be able to output my complex structures. 
+				 */
+			} catch (JAXBException | ParserConfigurationException e) {
+				e.printStackTrace();
+			}
+
+			Document doc = XMLUtils.createBlankDoc();
+//			PamguardXMLWriter pamXMLWriter = PamguardXMLWriter.getXMLWriter();
+			Element dummyEl = doc.createElement("SomeParam");
+////			dummyEl.setNodeValue("nothing");
+			dummyEl.setTextContent("3.0");
+			/*
+			 * xsl:stylesheet version=\"1.0\" \n"
+				+ "  xmlns:xsl=http://www.w3.org/1999/XSL/Transform\n"
+				+ "  xmlns:ns0=http://mydata.com/H2H/Automation\n"
+			 */
+			dummyEl.setAttribute("xmlns:ns0", TethysControl.xmlNameSpace);
+//			dummyEl.set
+//			paramList.add(dummyEl);
+			
+//			Element mainEl = doc.createElement("CONFIG");
+//			mainEl.appendChild(dummyEl);
+//			doc.appendChild(mainEl);
+//			System.out.println(pamXMLWriter.getAsString(doc));
+		}
+		
+		
 		List<SupportSoftware> supSoft = algorithm.getSupportSoftware();
 		SupportSoftware supportSoft = new SupportSoftware();
 		supportSoft.setSoftware(getSupportSoftware(dataBlock));

@@ -440,6 +440,37 @@ public class DBXMLQueries {
 		return count;
 	}
 
+	public String getDocument(String collection, String documentId) {
+//		String queryBase = "return:(collection(\"replaceCollectionName\")/Detections[Id=\"ReplaceDocumentId\"])";
+//		queryBase = queryBase.replace("replaceCollectionName", collection);
+//		queryBase = queryBase.replace("ReplaceDocumentId", documentId);
+//
+//		String result = null;
+//		try {
+//			Queries queries = dbXMLConnect.getTethysQueries();
+//			result = queries.QueryTethys(queryBase);
+////			System.out.println(result);
+//		}
+//		catch (Exception e) {
+//			System.out.println("Error executing " + queryBase);
+////			e.printStackTrace();
+//			return null;
+//		}
+//		return result;
+
+		Queries queries = dbXMLConnect.getTethysQueries();
+		String result = null;
+		try {
+			result = queries.getDocument(collection, documentId);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
+
+//		String queryBase = "{\"return\":[\"Deployment/Project\"],\"select\":[],\"enclose\":1}";
+	}
+	
 	/**
 	 * Count on effort detections in a Detections document
 	 * @param docName

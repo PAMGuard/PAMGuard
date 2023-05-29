@@ -2,6 +2,7 @@ package tethys.pamdata;
 
 import PamguardMVC.PamDataUnit;
 import nilus.AlgorithmType;
+import nilus.AlgorithmType.Parameters;
 import nilus.Deployment;
 import nilus.DescriptionType;
 import nilus.Detection;
@@ -62,5 +63,8 @@ public interface TethysDataProvider {
 	 */
 	public Detection createDetection(PamDataUnit dataUnit, TethysExportParams tethysExportParams,
 			StreamExportParams streamExportParams);
+
+
+	public Parameters getAlgorithmParameters();
 	
 }

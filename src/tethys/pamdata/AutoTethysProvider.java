@@ -112,7 +112,8 @@ public class AutoTethysProvider implements TethysDataProvider {
 		return algorithm;
 	}
 
-	private Parameters getAlgorithmParameters() {
+	@Override
+	public Parameters getAlgorithmParameters() {
 		if (pamControlledUnit instanceof PamSettings == false) {
 			return null;
 		}
@@ -127,13 +128,13 @@ public class AutoTethysProvider implements TethysDataProvider {
 		if (settingsObjs == null) {
 			return null;
 		}
-		//		pamXMLWriter.setStaticNameSpace(TethysControl.xmlNameSpace);
+//				pamXMLWriter.setStaticNameSpace(TethysControl.xmlNameSpace);
 		Element settingsEl = pamXMLWriter.writeUnitSettings(doc, dummyEl, pamSettings, settingsObjs);
 		if (settingsEl == null) {
 			return null;
 		}
 
-		settingsEl = addNameSpaceToElements(doc, settingsEl, TethysControl.xmlNameSpace);
+//		settingsEl = addNameSpaceToElements(doc, settingsEl, TethysControl.xmlNameSpace);
 
 
 		dummyEl.appendChild(settingsEl);
