@@ -3,6 +3,8 @@ package fileOfflineData;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Make a list of files with the given file filter. 
@@ -28,6 +30,21 @@ public class OfflineFileList {
 		File current = new File(this.folder);
 		addFiles(current);
 		return files.size();
+	}
+	
+	public void sortByFileName() {
+		if (files == null || files.size() == 0) {
+			return;
+		}
+		Collections.sort(files, new Comparator<File>() {
+
+			@Override
+			public int compare(File file1, File file2) {
+				String n1 = file1.getName();
+				String n2 = file2.getName();
+				return n1.compareTo(n2);
+			}
+		});
 	}
 
 	private void addFiles(File current) {

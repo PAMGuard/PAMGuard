@@ -848,6 +848,30 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 
 		return unitsInInterval;
 	}
+	
+	/**
+	 * Do data exist which cover the given time range ?  
+	 * @param startMillis
+	 * @param endMillis
+	 * @return true if data exist covering that time range. 
+	 */
+	public boolean hasDataRange(long startMillis, long endMillis) {
+		PamDataUnit first = null, last = null;
+		synchronized (synchronizationLock) {
+			first = getFirstUnit();
+			last = getLastUnit();
+		}
+		if (first == null || last == null) {
+			return false;
+		}
+		if (first.getTimeMilliseconds() > startMillis) {
+			return false;
+		}
+		if (last.getEndTimeInMilliseconds() < endMillis) {
+			return false;
+		}
+		return true;
+	}
 
 	// recursive search for the correct unit
 	// private Tunit searchFirstUnitAfter(int i1, int i2, long timems) {
@@ -1019,6 +1043,9 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 * @return true if we need to reload offline data.
 	 */
 	public boolean needViewerDataLoad(OfflineDataLoadInfo offlineDataLoadInfo) {
+		if (pamDataUnits.size() == 0) {
+			return true;
+		}
 		if (offlineDataLoadInfo.getStartMillis() == currentViewDataStart
 				&& offlineDataLoadInfo.getEndMillis() == currentViewDataEnd) {
 			return false;

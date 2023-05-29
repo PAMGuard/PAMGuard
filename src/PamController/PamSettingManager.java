@@ -519,9 +519,15 @@ public class PamSettingManager {
 
 		if (initializationComplete == false) {
 			// if PAMGAURD hasn't finished loading, then don't save the settings
-			// or the file will get wrecked (bug tracker 2269579)
-			System.out.println("Settings have not yet loaded. Don't save file");
-			return false;
+			// or the file will get wrecked (bug tracker 2269579)			
+			String msg = "There was an error loading settings from this configuration, so the configuration"
+					+ " may be incomplete. <p>Do you want to save anyway ? <p>"
+					+ " If you have added new modules, the answer is probably \"Yes\"";
+			int ans = WarnOnce.showWarning("Confuguration file warning", msg, WarnOnce.YES_NO_OPTION);
+			if (ans == WarnOnce.CANCEL_OPTION) {
+				System.out.println("Settings have not yet loaded. Don't save file");
+				return false;
+			}
 		}
 
 		saveGlobalSettings();

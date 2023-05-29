@@ -391,6 +391,9 @@ public class ScrollingDataPanel extends PamBorderPanel {
 	public void scrollToData(PamDataBlock dataBlock) {
 		long startTime = dataBlock.getCurrentViewDataStart();
 		int val = (int) ((startTime - getScreenStartMillis())/1000 - getScreenSeconds()/5)  ;
+		val += hScrollBar.getValue();
+//		System.out.printf("Scroll bar %d to %d set %d\n", hScrollBar.getMinimum(), 
+//				hScrollBar.getMaximum(), val);
 		hScrollBar.setValue(val);
 	}
 

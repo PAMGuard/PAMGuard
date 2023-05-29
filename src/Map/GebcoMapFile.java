@@ -11,6 +11,7 @@ import java.util.Vector;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+import PamController.PamController;
 import PamUtils.LatLong;
 import PamUtils.PamFileChooser;
 import PamView.dialog.warn.WarnOnce;
@@ -118,10 +119,19 @@ public class GebcoMapFile implements MapFileManager {
 		int pointCount;
 		int depth;
 		MapContour mapContour;
+		boolean error = false;
 		try {
+			int iLine = 0;
 			while((line = reader.readLine())!=null){
+				iLine++;
 				line = line.trim();
 				spaceIndex = line.indexOf(' ');
+				if (spaceIndex < 0) {
+					String msg = String.format("Error in map file at line %d \"%s\"", iLine, line);
+					WarnOnce.showNamedWarning("Gebco Map File Warning", PamController.getMainFrame(), gebcoFile.getName(), msg, WarnOnce.WARNING_MESSAGE);
+					error = true;
+					break;
+				}
 				num1 = line.substring(0,spaceIndex).trim();
 				num2 = line.substring(spaceIndex).trim();
 				depth = Integer.valueOf(num1);
@@ -152,11 +162,22 @@ public class GebcoMapFile implements MapFileManager {
 		}
 		catch (NumberFormatException nex) {
 			nex.printStackTrace();
-			return false;
+			error = true;
+		}
+		catch (IndexOutOfBoundsException iex) {
+			iex.printStackTrace();
+			error = true;
+		}
+		if (reader != null) {
+			try {
+				reader.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		Collections.sort(mapContours);
 		Collections.sort(availableContours);
-		return true;
+		return !error;
 	}
 	
 	
