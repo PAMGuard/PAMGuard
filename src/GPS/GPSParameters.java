@@ -59,6 +59,8 @@ public class GPSParameters implements Serializable, Cloneable, ManagedParameters
 	public String rmcInitials = "GP";
 	public String ggaInitials = "GP";
 	
+	public boolean allowWildcard = true;
+	
 	/**
 	 * Attempt to read true heading information
 	 */
