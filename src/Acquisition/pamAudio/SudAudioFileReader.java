@@ -46,7 +46,8 @@ public class SudAudioFileReader {
 		try {
 			sudAudioInputStream = SudAudioInputStream.openInputStream(file, sudParams, false); 
 		} catch (Exception e) {
-			e.printStackTrace();
+			String msg = String.format("Corrupt sud file %s: %s", file.getName(), e.getMessage());
+			throw new UnsupportedAudioFileException(msg);
 		} 
 		return sudAudioInputStream;
 	}
