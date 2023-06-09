@@ -245,6 +245,31 @@ public class GPSControl extends PamControlledUnit implements PamSettings, Positi
 	public GpsDataUnit getShipPosition(long timeMilliseconds) {
 		return getGpsDataBlock().getClosestUnitMillis(timeMilliseconds);
 	}
+	/**
+	 * Do we want this string ? It will be either RMC or GGA and may want wildcarding
+	 * @param stringId
+	 * @return
+	 */
+	public boolean wantString(String stringId) {
+		if (stringId == null || stringId.length() < 6) {
+			return false;
+		}
+		if (gpsControl.gpsParameters.allowWildcard) {
+			String lastBit = stringId.substring(3, 6);
+			switch (gpsControl.gpsParameters.mainString) {
+			case GPSParameters.READ_RMC:
+				return lastBit.equals("RMC");
+			case GPSParameters.READ_GGA:
+				return lastBit.equals("GGA");
+			default:
+				return false;
+			}
+		}
+		else {
+			String wantedString = gpsControl.getWantedString();
+			return stringId.equals(wantedString);
+		}
+	}
 	
 	/**
 	 * Get the name of the string we're wanting. 

@@ -173,6 +173,9 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 			algoOptsButton.setDisable(true);
 			return;
 		}
+		// also enable / disable the more options button ...
+		algoOptsButton.setDisable(localiserAlgorithm.hasParams() == false);
+		
 		/**
 		 * Need to immediately tell the algorithm which input we're using so that it can 
 		 * show the correct settings...
@@ -208,10 +211,7 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 //			newPane.setDetectionSource(sourcePanel.getSource());
 		}
 		algorithmSourcePane = newPane;
-		
-		// also enable / disable the more options button ...
-		algoOptsButton.setDisable(localiserAlgorithm.hasParams() == false);
-		
+				
 		
 		repackDialog();
 	}
