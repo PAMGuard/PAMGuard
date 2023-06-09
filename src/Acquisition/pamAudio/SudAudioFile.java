@@ -48,9 +48,9 @@ public class SudAudioFile extends WavAudioFile {
 			}
 				// don't do anything and it will try the built in Audiosystem
 			catch (UnsupportedAudioFileException e) {
-				System.err.println("Could not open sud file: not a supported file " + soundFile.getName()); 
-
-				e.printStackTrace();
+				System.err.println("UnsupportedAudioFileException: Could not open sud file: not a supported file " + soundFile.getName()); 
+				System.err.println(e.getMessage());
+//				e.printStackTrace();
 			} catch (IOException e) {
 				System.err.println("Could not open sud file: IO Exception: " + soundFile.getName()); 
 

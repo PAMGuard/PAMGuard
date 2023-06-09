@@ -22,7 +22,7 @@ public class SUDFileType extends SoundFileType {
 		if (isShown) {
 			return;
 		}
-		WarnOnce.showWarning("SoundTrap SUD Files", sudInfoText, WarnOnce.OK_OPTION);
+//		WarnOnce.showWarning("SoundTrap SUD Files", sudInfoText, WarnOnce.OK_OPTION);
 		isShown = true;		
 	}
 
