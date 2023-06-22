@@ -2,6 +2,7 @@ package Array.layoutFX;
 
 import Array.Streamer;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 
@@ -14,13 +15,27 @@ import javafx.beans.property.SimpleStringProperty;
  */
 public class StreamerProperty {
 	
+	/**
+	 * The simple name property. 
+	 */
 	private SimpleStringProperty name = new SimpleStringProperty(); 
 
-	private SimpleDoubleProperty x,y,z = new SimpleDoubleProperty(); 
+	private SimpleStringProperty reference = new SimpleStringProperty(); 
+
+	/**
+	 * Get the x, y and z. 
+	 */
+	private SimpleDoubleProperty x = new SimpleDoubleProperty(); 
+	
+	private SimpleDoubleProperty y = new SimpleDoubleProperty(); 
+
+	private SimpleDoubleProperty z = new SimpleDoubleProperty(); 
+
 
 	private Streamer streamer;
 
-	
+	private SimpleIntegerProperty streamerIDProperty = new SimpleIntegerProperty();
+
 	public StreamerProperty(Streamer streamer) {
 		setStreamer( streamer); 
 	}
@@ -31,6 +46,8 @@ public class StreamerProperty {
 		x.setValue(streamer.getX());
 		y.setValue(streamer.getY());
 		z.setValue(streamer.getZ());
+		streamerIDProperty.setValue(streamer.getStreamerIndex());
+		reference.setValue(streamer.getHydrophoneLocator() != null ? streamer.getHydrophoneLocator().getName() : "null");
 	}
 	
 	public SimpleStringProperty getName() {
@@ -68,6 +85,22 @@ public class StreamerProperty {
 
 	public Streamer getStreamer() {
 		return streamer;
+	}
+
+	/**
+	 * Get the index property of the streamer. 
+	 * @return the streamer index. 
+	 */
+	public SimpleIntegerProperty getID() {
+		return streamerIDProperty;
+	}
+
+	/**
+	 * Get the reference property. 
+	 * @return the reference property. 
+	 */
+	public SimpleStringProperty getHydrophineLocator() {
+		return reference;
 	}
 
 }

@@ -178,6 +178,23 @@
         </executions>
       </plugin>
       
+      
+	<!-- Allows Maven to run JUnit tests -->
+	<!-- Note that for some reason surefire 3.0.0 does not seem to work.
+		It fails to find or run any of the unit tests - no idea why. -->
+	 <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.22.0</version>
+    </plugin>
+    
+    
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>2.22.0</version>
+    </plugin>
+  
  
     </plugins>
     <pluginManagement>
@@ -313,6 +330,23 @@
 
   <!--  ************************* Dependencies ************************************* -->
   <dependencies>
+	  
+	  
+  	<!-- https://mvnrepository.com/artifact/junit/junit Testing framework for PAMGuard -->
+	<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+	<dependency>
+		<groupId>org.junit.jupiter</groupId>
+		<artifactId>junit-jupiter-engine</artifactId>
+		<version>5.9.2</version>
+	</dependency>
+	
+	<dependency>
+		<groupId>org.junit.platform</groupId>
+		<artifactId>junit-platform-runner</artifactId>
+		<version>1.9.2</version>
+		<scope>test</scope> 
+	</dependency>
+
 
 	<!--jpam project - utilities -->
 	<dependency>
@@ -329,7 +363,7 @@
 	<dependency>
 		<groupId>io.github.macster110</groupId>
 		<artifactId>jdl4pam</artifactId>
-		<version>0.0.94</version>
+		<version>0.0.96</version>
 	</dependency> 
 			
 	<!-- https://mvnrepository.com/artifact/gov.nist.math/jama -->
