@@ -60,7 +60,7 @@ public class AnalogArraySensorDataUnit extends PamDataUnit implements Array.sens
 	}
 
 	private Double getFieldVal(int iVal) {
-		if (sensorData == null || sensorData.length <= iVal) {
+		if (sensorData == null || sensorData.length <= iVal || iVal < 0) {
 			return null;
 		}
 		AnalogSensorData sensDat = sensorData[iVal];

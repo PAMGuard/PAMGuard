@@ -282,6 +282,7 @@ public class PamModuleInfo implements PamDependent{
 		return moduleClass;
 	}
 	
+
 	
 	public static JMenu getModulesMenu(Frame parentFrame) {
 

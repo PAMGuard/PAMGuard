@@ -149,9 +149,9 @@ public class GPSParametersDialog extends PamDialog {
 		}
 	}
 	public static GPSParameters showDialog(Frame parentFrame, GPSParameters gpsParameters) {
-		if (parentFrame != lastFrame || gpsParametersDialog == null) {
+//		if (parentFrame != lastFrame || gpsParametersDialog == null) {
 			gpsParametersDialog = new GPSParametersDialog(parentFrame);
-		}
+//		}
 		gpsParametersDialog.gpsParameters = gpsParameters.clone();
 		gpsParametersDialog.setParams();
 		gpsParametersDialog.setVisible(true);		
@@ -335,6 +335,7 @@ public class GPSParametersDialog extends PamDialog {
 		JRadioButton ggaString;
 		JTextField rmcInitials;
 		JTextField ggaInitials;
+		JCheckBox allowWildcard;
 		public MainStringPanel() {
 			super();
 			setBorder(new TitledBorder("Main Nav' data string"));
@@ -344,9 +345,17 @@ public class GPSParametersDialog extends PamDialog {
 			c.fill = GridBagConstraints.HORIZONTAL;
 			
 			ButtonGroup buttonGroup = new ButtonGroup();
-			
+
+			c.gridx = 0;
+			c.gridy++;
+			c.gridwidth = 5;
+			this.add(allowWildcard = new JCheckBox("Allow any string initials"), c);
+			allowWildcard.setToolTipText("Use RMC or GGA data from any source independent of the string initials (e.g. GP, GN, etc.)");
+			c.gridy ++;
+			c.gridwidth = 1;
+			c.gridx=0;
 			addComponent(this, new JLabel("RMC String"), c);
-			c.gridx++;
+			c.gridx ++;
 			addComponent(this, rmcString = new JRadioButton(""), c);
 			c.gridx++;
 			addComponent(this, rmcInitials = new JTextField(2), c);
@@ -355,6 +364,7 @@ public class GPSParametersDialog extends PamDialog {
 			
 			c.gridx = 0;
 			c.gridy ++;
+			c.gridwidth = 1;
 			addComponent(this, new JLabel("GGA String"), c);
 			c.gridx++;
 			addComponent(this, ggaString = new JRadioButton(""), c);
@@ -363,6 +373,7 @@ public class GPSParametersDialog extends PamDialog {
 			c.gridx++;
 			addComponent(this, new JLabel(" GGA"), c);
 			
+			allowWildcard.addActionListener(this);			
 			rmcString.addActionListener(this);
 			ggaString.addActionListener(this);
 			buttonGroup.add(rmcString);
@@ -374,10 +385,12 @@ public class GPSParametersDialog extends PamDialog {
 			ggaString.setSelected(gpsParameters.mainString == GPSParameters.READ_GGA);
 			rmcInitials.setText(gpsParameters.rmcInitials);
 			ggaInitials.setText(gpsParameters.ggaInitials);
+			allowWildcard.setSelected(gpsParameters.allowWildcard);
 			enableControls();
 		}
 		
 		public boolean getParams() {
+			gpsParameters.allowWildcard = allowWildcard.isSelected();
 			if (ggaString.isSelected()) {
 				gpsParameters.mainString = GPSParameters.READ_GGA;
 			}
@@ -385,12 +398,12 @@ public class GPSParametersDialog extends PamDialog {
 				gpsParameters.mainString = GPSParameters.READ_RMC;
 			}
 			gpsParameters.rmcInitials = rmcInitials.getText();
-			if (gpsParameters.rmcInitials.length() != 2) {
-				return false;
+			if (gpsParameters.rmcInitials.length() != 2 && !gpsParameters.allowWildcard) {
+				return showWarning("Expecting a two character identifier for RMC strings");
 			}
 			gpsParameters.ggaInitials = ggaInitials.getText();
-			if (gpsParameters.ggaInitials.length() != 2) {
-				return false;
+			if (gpsParameters.ggaInitials.length() != 2 && !gpsParameters.allowWildcard) {
+				return showWarning("Expecting a two character identifier for GGA strings");
 			}
 			return true;
 		}
@@ -400,8 +413,9 @@ public class GPSParametersDialog extends PamDialog {
 		}
 		
 		private void enableControls() {
-			rmcInitials.setEnabled(rmcString.isSelected());
-			ggaInitials.setEnabled(ggaString.isSelected());
+			boolean wild = allowWildcard.isSelected();
+			rmcInitials.setEnabled(rmcString.isSelected() & !wild);
+			ggaInitials.setEnabled(ggaString.isSelected() & !wild);
 		}
 		
 		

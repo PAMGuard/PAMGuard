@@ -92,11 +92,16 @@ public class WarnOnceDialog extends PamDialog {
 		}
 		
 		// if the message type is OK_OPTION, hide the cancel button
-		if (messageType == WarnOnce.OK_OPTION) {
+		if (messageType == WarnOnce.YES_NO_OPTION) {
+			getOkButton().setText("Yes");
+			getCancelButton().setText("No");
+		}
+		else if (messageType == WarnOnce.OK_OPTION) {
 			getCancelButton().setVisible(false);
 		} else {
 			getCancelButton().setVisible(true);
 		}
+		
 		
 		// change the button text to custom text, if needed
 		if (okButtonText!=null) {
