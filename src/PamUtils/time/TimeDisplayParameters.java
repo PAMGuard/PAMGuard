@@ -18,6 +18,10 @@ public class TimeDisplayParameters implements Serializable, Cloneable, ManagedPa
 
 	public TimeZone timeZone;
 	
+	public TimeDisplayParameters() {
+		super();
+	}
+
 	@Override
 	protected TimeDisplayParameters clone() {
 		try {
