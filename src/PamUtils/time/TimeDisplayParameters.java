@@ -11,8 +11,8 @@ public class TimeDisplayParameters implements Serializable, Cloneable, ManagedPa
 	public static final long serialVersionUID = 1L;
 	
 	public static final int TIME_ZONE_UTC = 0;
-	public static final int TIME_ZONE_PC = 1;
 	public static final int TIME_ZONE_OTHER = 1;
+	public static final int TIME_ZONE_PC = 2;
 	
 	public int zoneType = TIME_ZONE_UTC;
 
