@@ -223,32 +223,24 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		PamSettingManager.getInstance().registerSettings(this);
 
 		if (guiParameters.bounds != null) {
-			/* 
-			 * now need to check that the frame is visible on the
-			 * current screen - a pain when psf files are sent between
-			 * users, or when I work on two screens at work and then one
-			 * at home !
-			 */
-			//			Rectangle screenRect = ScreenSize.getScreenBounds(20000);
-			Rectangle screenRect = ScreenSize.getScreenBounds();
-			//			Rectangle intercept = screenRect.intersection(frame.getBounds());
-			if (screenRect == null) {
-				System.out.println("Unable to get screen dimensions from system");
+//			/* 
+//			 * now need to check that the frame is visible on the
+//			 * current screen - a pain when psf files are sent between
+//			 * users, or when I work on two screens at work and then one
+//			 * at home !
+//			 */
+
+			Point topCorner = guiParameters.bounds.getLocation();
+			boolean posOK = true;
+			try {
+				posOK = ScreenSize.isPointOnScreen(topCorner);
+			} catch (Exception e) {
 			}
-			else {
-				while (guiParameters.bounds.x + guiParameters.bounds.width < screenRect.x + 200) {
-					guiParameters.bounds.x += screenRect.width;
-				}
-				while (guiParameters.bounds.x > screenRect.x+screenRect.width) {
-					guiParameters.bounds.x -= screenRect.width;
-				}
-				while (guiParameters.bounds.y + guiParameters.bounds.height < screenRect.y + 200) {
-					guiParameters.bounds.y += screenRect.height;
-				}
-				while (guiParameters.bounds.y > screenRect.y+screenRect.height) {
-					guiParameters.bounds.y -= screenRect.height;
-				}
+			if (!posOK) {
+				// put it in the top corner of the main screen. 
+				guiParameters.bounds.x = guiParameters.bounds.y = 10;
 			}
+				
 
 			frame.setBounds(guiParameters.bounds);
 
