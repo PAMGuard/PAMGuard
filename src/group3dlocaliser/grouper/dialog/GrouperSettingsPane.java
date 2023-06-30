@@ -46,6 +46,7 @@ public class GrouperSettingsPane extends SettingsPane<DetectionGrouperParams>{
 		
 //		PamBorderPane setPane = new PamBorderPane();
 		groupOptions = new ChoiceBox();
+		groupOptions.setMaxWidth(Double.MAX_VALUE);
 		groupOptions.getItems().add("Return all possible combinations");
 		groupOptions.getItems().add("Return only the first combination");
 //		setPane.setTop(groupOptions);
@@ -93,7 +94,7 @@ public class GrouperSettingsPane extends SettingsPane<DetectionGrouperParams>{
 		});
 		
 		VBox vBox = new VBox(groupOptions, gridPane);
-		
+		vBox.setSpacing(5);
 		
 //		setPane.setBottom(gridPane);
 		if (borderTitle == null) {

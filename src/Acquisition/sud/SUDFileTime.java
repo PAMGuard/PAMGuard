@@ -2,7 +2,6 @@ package Acquisition.sud;
 
 import java.io.File;
 
-import org.pamguard.x3.sud.ChunkHeader;
 import org.pamguard.x3.sud.SudAudioInputStream;
 import org.pamguard.x3.sud.SudFileMap;
 import org.pamguard.x3.sud.SudParams;
@@ -75,7 +74,8 @@ public class SUDFileTime {
 //			System.out.printf("SUD file time %s extracted in %d milliseconds\n", PamCalendar.formatDBDateTime(sudTime), t2-t1);
 			
 		} catch (Exception e) {
-			System.err.println("Error getting time from SUD file: " + e.getMessage());
+			System.err.println("Error getting time from SUD file: " + file + "  " + e.getMessage());
+			e.printStackTrace();
 		}
 		
 		return sudTime;

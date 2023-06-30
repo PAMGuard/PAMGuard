@@ -101,6 +101,7 @@ public class PamTabPane extends TabPane {
 	 */
 	public void setAddTabButton(boolean addTabButton) {
 		this.addTabButton = addTabButton;
+		tabPaneSkin = new PamTabPaneSkin(this);
 	}
 	
 	/**
