@@ -129,7 +129,6 @@ public class DBXMLQueries {
 
 		String queryResult = null;
 		String schemaPlan = null;
-		TethysExportParams params = tethysControl.getTethysExportParams();
 
 		try {
 			JerseyClient jerseyClient = dbxmlConnect.getJerseyClient();

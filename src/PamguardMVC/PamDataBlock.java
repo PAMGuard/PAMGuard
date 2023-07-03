@@ -3102,6 +3102,16 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	public void setTethysDataProvider(TethysDataProvider tethysDataProvider) {
 		this.tethysDataProvider = tethysDataProvider;
 	}
+	
+
+	/**
+	 * Get information about species types that may occur within this data 
+	 * block.  
+	 * @return Types of species information available within this datablock. 
+	 */
+	public tethys.species.SpeciesTypes getSpeciesTypes() {
+		return null;
+	}
 
 	final public boolean getCanLog() {
 		return (logging != null);
