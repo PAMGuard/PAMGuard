@@ -48,7 +48,7 @@ public interface LocaliserModel<T extends PamDataUnit> {
 
 	/**
 	 * Run the localisation model. Once completed the results are added to the AbstractLoclaisation class of the input PamDataUnit.
-	 *	Note that algorithms may run on a separate thread. Once processing has finished the notifyModelFinished function is called with 
+	 *Note that algorithms may run on a separate thread. Once processing has finished the notifyModelFinished function is called with 
 	 * a progress of 1;. 
 	 * @param pamDataUnit the pamDataUnit. This can be a super unit if multiple detections are required.
 	 * @param addLoc  automatically add the localisation result to the data unit, replacing it's current localisation info. 

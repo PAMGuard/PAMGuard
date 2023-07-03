@@ -2,47 +2,32 @@ package group3dlocaliser.dialog;
 
 import java.util.ArrayList;
 
-import javax.swing.JFrame;
-
 import Array.ArrayManager;
 import PamController.SettingsPane;
-import PamDetection.PamDetection;
 import PamView.GroupedDataSource;
-import PamView.symbol.SwingSymbolOptionsPanel;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import group3dlocaliser.Group3DLocaliserControl;
 import group3dlocaliser.Group3DParams;
 import group3dlocaliser.algorithm.LocaliserAlgorithm3D;
 import group3dlocaliser.algorithm.LocaliserAlgorithmParams;
-import group3dlocaliser.algorithm.LocaliserAlgorithmProvider;
 import group3dlocaliser.grouper.DetectionGrouperParams;
 import group3dlocaliser.grouper.dialog.GrouperSettingsPane;
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
-import pamViewFX.fxNodes.PamGridPane;
 import pamViewFX.fxNodes.PamTabPane;
 import pamViewFX.fxNodes.PamTitledBorderPane;
 import pamViewFX.fxNodes.pamDialogFX.ManagedSettingsPane;
@@ -90,10 +75,10 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 			public void changed(ObservableValue<? extends PamDataBlock> observable, PamDataBlock oldValue,
 					PamDataBlock newValue) {
 				newDataBlockSelection(newValue);
-				
+//				grouperSettingsPane.newSourceGroup(((GroupedDataSource) newValue).getGroupSourceParameters()); 
 			}
 		});
-		
+				
 		grouperSettingsPane = new GrouperSettingsPane(ownerWindow, "Detection matching options");
 		PamBorderPane gsp = new PamBorderPane();
 		gsp.setTop(grouperSettingsPane.getContentNode());
@@ -120,8 +105,9 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 		GridPane.setFillWidth(algorithms, true);
 //		algoGrid.add(new Label("Algorithm Options "), 0, 1);
 //		algoOptsButton = new Button("",PamGlyphDude.createPamGlyph(MaterialIcon.SETTINGS,Color.WHITE, PamGuiManagerFX.iconSize));
-		algoOptsButton = new Button("",PamGlyphDude.createPamIcon("mdi2c-cog",Color.WHITE, PamGuiManagerFX.iconSize));
+		algoOptsButton = new Button("",PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconSize));
 		algoGrid.setRight(algoOptsButton);
+		PamBorderPane.setMargin(algoOptsButton, new Insets(0,0,0,5));
 		algoOptsButton.setTooltip(new Tooltip("More Algorithm Options ..."));
 		algoSourceHolder = new PamBorderPane();
 //		HBox.setHgrow(algoSourceHolder, Priority.ALWAYS);
@@ -130,7 +116,7 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 		PamTitledBorderPane ptb = new PamTitledBorderPane("Select Localisation Algorithm", algoGrid);
 		algoMainPane.setTop(ptb);
 		algoMainPane.setCenter(algoSourceHolder);
-		tabPane.getTabs().add(new Tab("Algorithm", algoMainPane));
+		tabPane.getTabs().add(new Tab("Localisation", algoMainPane));
 		
 		algoOptsButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -329,6 +315,8 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 //		algorithms.getSelectionModel().select(input.getAlgorithmName());
 		currentParams = input;
 		newDataBlockSelection(sourcePanel.getSource());
+	
+
 	}
 	
 	/**
@@ -411,6 +399,7 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 		}
 		setAlgorithmList();
 		setAlgorithmSourceParameters();
+		grouperSettingsPane.newSourceGroup(((GroupedDataSource) pamDataBlock).getGroupSourceParameters()); 
 	}
 
 	@Override

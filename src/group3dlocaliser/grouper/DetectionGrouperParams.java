@@ -18,6 +18,13 @@ public class DetectionGrouperParams implements Serializable, Cloneable, ManagedP
 	
 	public int minSubGroups = 2;
 	
+	/**
+	 * The primary detection groups. The slected detection groups must be included in the combination for a loclaisation 
+	 * 
+	 * null means there is no primary group. 
+	 */
+	public int[] primaryDetGroup = null; 
+	
 	public int groupingChoice = GROUPS_ALL_POSSIBLE;
 	
 	// data selection options

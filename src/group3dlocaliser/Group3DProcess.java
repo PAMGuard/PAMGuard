@@ -180,7 +180,10 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 	}
 
 	@Override
-	public void newGroupedDataSet(DetectionGroupedSet detectionGroupedSet) {
+	public void newGroupedDataSet(DetectionGroupedSet detectionGroupedSet1) {
+		
+		DetectionGroupedSet detectionGroupedSet = this.localiserAlgorithm3D.preFilterLoc(detectionGroupedSet1); 
+		
 		int nGroups = detectionGroupedSet.getNumGroups();
 		AbstractLocalisation abstractLocalisation;
 		GroupLocalisation groupLocalisation;

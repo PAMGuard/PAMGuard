@@ -9,6 +9,7 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.superdet.SuperDetection;
 import generalDatabase.SQLLoggingAddon;
+import group3dlocaliser.grouper.DetectionGroupedSet;
 import pamViewFX.fxNodes.pamDialogFX.ManagedSettingsPane;
 
 abstract public class LocaliserAlgorithm3D implements LocaliserModel<PamDataUnit> {
@@ -29,6 +30,14 @@ abstract public class LocaliserAlgorithm3D implements LocaliserModel<PamDataUnit
 	 * @return SQL Logging information. 
 	 */
 	abstract public SQLLoggingAddon getSQLLoggingAddon(int arrayType);
+	
+	/**
+	 * Option to pre-filter the localisation results. This can be useful when using algorithms that 
+	 * internally handle detection match uncertainity. 
+	 */
+	public DetectionGroupedSet preFilterLoc(DetectionGroupedSet arrayType) {
+		return arrayType; 
+	}
 	
 	/**
 	 * Configure parameters for this algorithm. Show a dialog with 
