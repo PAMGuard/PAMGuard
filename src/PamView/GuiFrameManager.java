@@ -633,5 +633,26 @@ public class GuiFrameManager implements PamSettings, PAMControllerGUI {
 		return frameIcon;
 	}
 
+	/**
+	 * Function that can move GUI frames back onto the main window. 
+	 * Can be used to recover a GUI if it's on a monitor that is not present. 
+	 */
+	public void findGUI() {
+		if (pamViewList == null) {
+			return;
+		}
+		int loc = 10;
+		for (PamViewInterface view : pamViewList) {
+			JFrame frame = view.getGuiFrame();
+			if (frame == null) {
+				continue;
+			}
+			frame.setLocation(loc, loc);
+			frame.setState(JFrame.NORMAL);
+			frame.setVisible(true);
+			loc += 20;
+		}
+	}
+
 
 }

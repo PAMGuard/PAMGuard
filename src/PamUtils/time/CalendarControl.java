@@ -83,7 +83,7 @@ public class CalendarControl implements PamSettings{
 	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		timeDisplayParameters = ((TimeDisplayParameters) pamControlledUnitSettings.getSettings()).clone();
-		return false;
+		return true;
 	}
 	
 	public String getTZCode(boolean daylight) {
