@@ -2,6 +2,7 @@ package group3dlocaliser.grouper.dialog;
 
 
 import PamController.SettingsPane;
+import PamUtils.PamArrayUtils;
 import PamView.GroupedSourceParameters;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.dataSelector.DataSelector;
@@ -47,6 +48,8 @@ public class GrouperSettingsPane extends SettingsPane<DetectionGrouperParams>{
 	private Button dataSelButton;
 
 	private GroupedChannelBox checkGroupBox;
+
+	private DetectionGrouperParams currentParams;
 	
 	public GrouperSettingsPane(Object ownerWindow, String borderTitle) {
 		super(ownerWindow);
@@ -200,14 +203,16 @@ public class GrouperSettingsPane extends SettingsPane<DetectionGrouperParams>{
 			}
 		}
 		
+		currParams.primaryDetGroup = getGroupParams(); 
+		
 		return currParams;
 	}
 
 	@Override
 	public void setParams(DetectionGrouperParams params) {
-						
-		
+				
 		groupOptions.getSelectionModel().select(params.groupingChoice);
+		
 		minDets.setText(String.format("%d", params.minSubGroups));
 		maxDets.setText(String.format("%d", params.maxPerGroup));
 		
@@ -215,7 +220,75 @@ public class GrouperSettingsPane extends SettingsPane<DetectionGrouperParams>{
 		requireSome.setSelected(params.dataSelectOption == DetectionGrouperParams.DATA_SELECT_MIN_N);
 		requiredN.setText(String.format("%d", params.dataSelectMinimum));
 		
+		setGroupParams(params.primaryDetGroup); 
+		
 		enableControls();
+	}
+	
+	/**
+	 * Set which primary groups are ticked. 
+	 * @param groups - the groups. 
+	 */
+	private int[] getGroupParams(){
+	
+		//the check box should have already had the correct source params set. 
+		
+		int n = 0; 
+		for (int i=0; i<checkGroupBox.getItems().size(); i++) {
+			if (checkGroupBox.getItemBooleanProperty(i).get()) n++;
+		}
+		
+		if (n==0) return null; 
+		
+		int[] selectedGroups = new int[n]; 
+		
+		n=0;
+		for (int i=0; i<checkGroupBox.getItems().size(); i++) {
+			if (checkGroupBox.getItemBooleanProperty(i).get()) {
+				selectedGroups[n] = checkGroupBox.getGroupedParams().getGroupChannels(i); 	
+			
+				n++; 
+			}
+		}
+		
+//		System.out.println("GETPARAMS: SELECTED GROUPS:"); 
+//		PamArrayUtils.printArray(selectedGroups);
+		
+		return selectedGroups; 
+	}
+	
+	
+	/**
+	 * Set which primary groups are ticked. 
+	 * @param groups - the groups. 
+	 */
+	private void setGroupParams(int[] groups){
+		
+//		System.out.println("SETPARAMS: SELECTED GROUPS:"); 
+//		PamArrayUtils.printArray(groups);
+//	
+		//the check box should have already had the correct source params set. 
+		GroupedSourceParameters params = checkGroupBox.getGroupedParams(); 
+		
+		if (params==null) return; 
+		
+		for (int i=0; i<params.countChannelGroups(); i++) {
+
+			int group = params.getGroupChannels(i);
+			
+//			System.out.println("CHANNEL ARRAY:"); 
+//			PamArrayUtils.printArray(PamUtils.PamUtils.getChannelArray(group));
+			
+			checkGroupBox.getItemBooleanProperty(i).set(false);; 
+
+			if (groups!=null) {
+				for (int j=0; j<groups.length; j++) {
+					if (groups[j] == group) {
+						checkGroupBox.getItemBooleanProperty(i).set(true);; 
+					}
+				}
+			}
+		}
 	}
 
 	@Override
@@ -235,7 +308,17 @@ public class GrouperSettingsPane extends SettingsPane<DetectionGrouperParams>{
 	}
 	
 	private void populateChannelBox(GroupedSourceParameters source) {
+		int[] selected = null;
+			
+		//Need to preserve the selection - check whether the groups are equal and if so set the selected back again
+		if (checkGroupBox.getGroupedParams()!=null && (PamArrayUtils.arrEquals(source.getChannelGroups(), checkGroupBox.getGroupedParams().getChannelGroups()))) {
+			selected = getGroupParams(); 
+		}
+		
 		checkGroupBox.setSource(source);
+		
+		setGroupParams(selected); 
+		
 	}
 
 	/**

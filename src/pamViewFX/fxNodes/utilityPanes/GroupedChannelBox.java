@@ -12,13 +12,25 @@ import PamView.GroupedSourceParameters;
  *
  */
 public class GroupedChannelBox extends CheckComboBox<String> {
+		
+	
+	/**
+	 * The last set grouped parameters. 
+	 */
+	GroupedSourceParameters params;
+	
+	public GroupedSourceParameters getGroupedParams() {
+		return params;
+	}
 
 	/**
 	 * Set the channel grouping for the check box. 
 	 * @param params - the parameters. 
 	 */
 	public void setSource(GroupedSourceParameters params) {
-
+		
+		this.params = params; 
+		
 		this.getItems().clear();
 
 		for (int i=0; i<params.countChannelGroups(); i++) {
@@ -26,9 +38,7 @@ public class GroupedChannelBox extends CheckComboBox<String> {
 			int group = params.getGroupChannels(i);
 
 			int[] chanArray = PamUtils.PamUtils.getChannelArray(group); 
-			
-			System.out.println("CHANNEL ARRAY:"); 
-			PamArrayUtils.printArray(chanArray);
+		
 
 			String channels = ""; 
 			for (int j =0 ; j<chanArray.length; j++) {

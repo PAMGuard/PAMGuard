@@ -3,6 +3,7 @@ package pamViewFX.fxNodes.flipPane;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -80,6 +81,23 @@ public class PamFlipPane extends FlipPane {
 	public PamBorderPane getAdvPane() {
 		return advPane;
 	}
+	
+	
+	/**
+	 * Set the advanced pane content. 
+	 * @param - the content to set. 
+	 */
+	public void setAdvPaneContent(Node content) {
+		 advPane.setCenter(content);
+	}
+	
+	/**
+	 * Set the front pane content. 
+	 * @param - the content to set. 
+	 */
+	public void setFrontContent(Node content) {
+		frontPane.setCenter(content);
+	}
 
 
 	/**
@@ -125,9 +143,9 @@ public class PamFlipPane extends FlipPane {
 		return advLabel;
 	}
 
-	public void setAdvLabel(Label advLabel) {
-		this.advLabel = advLabel;
-	}
+//	public void setAdvLabel(Label advLabel) {
+//		this.advLabel = advLabel;
+//	}
 
 	public PamButton getBackButton() {
 		return backButton;

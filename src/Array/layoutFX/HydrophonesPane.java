@@ -1,12 +1,15 @@
 package Array.layoutFX;
 
+import Array.Hydrophone;
 import Array.Streamer;
 import Array.layoutFX.BasicArrayPane.BasicArrayTable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import pamViewFX.fxNodes.PamBorderPane;
+import pamViewFX.fxNodes.flipPane.PamFlipPane;
 import pamViewFX.fxNodes.table.TableSettingsPane;
 
 /**
@@ -14,7 +17,17 @@ import pamViewFX.fxNodes.table.TableSettingsPane;
  * @author Jamie Macaulay
  *
  */
-public class HydrophonePane extends PamBorderPane {
+public class HydrophonesPane extends PamBorderPane {
+	
+	
+	static final double  defaultx = 0.;
+	static final double  defaulty = 0.;
+	static final double defaultz = 0.;
+	static final double defaultxErr = 0.;
+	static final double defaultyErr = 0.; 
+	static final double defaultzErr = 0.;
+	static final		String defaulttype = "Unknown";
+	static final double defaultsensitivity = -201; 
 	
 	/**
 	 * A list of all the current hydrophones. 
@@ -25,11 +38,25 @@ public class HydrophonePane extends PamBorderPane {
 	 * The hydrophone array table.
 	 */
 	private HydrophoneTable tableArrayPane;
+	
+	private PamFlipPane  pamFlipePane; 
+	
+	/**
+	 * Settings pane for a single hydrophone. 
+	 */
+	private HydrophoneSettingsPane hydrophonePane = new HydrophoneSettingsPane(); 
 
-	public HydrophonePane() {
+	public HydrophonesPane() {
 		
 			tableArrayPane = new HydrophoneTable(hydrophoneList); 
-			this.setCenter(tableArrayPane);
+			
+			pamFlipePane = new PamFlipPane(); 
+			pamFlipePane.getAdvLabel().setText("Hydrophone Settings");
+			
+			pamFlipePane.setAdvPaneContent(hydrophonePane.getContentNode()); 
+			pamFlipePane.setFrontContent(tableArrayPane);
+
+			this.setCenter(pamFlipePane);
 	}
 	
 	/**
@@ -85,25 +112,28 @@ public class HydrophonePane extends PamBorderPane {
 		public Dialog<HydrophoneProperty> createSettingsDialog(HydrophoneProperty data) {
 			//we do not use dialogs here- sliding pane instead. 
 //			setClassifierPane(data);
-//			showFlipPane(true);		
+			pamFlipePane.flipToBack();	
 			return null;
 		}
 
 		@Override
 		public void editData(HydrophoneProperty data){
 //			setClassifierPane(data);
-			//showFlipPane(true);		
+			
+			pamFlipePane.getAdvLabel().setText("Hydrophone " +  data.getID().get() + " Settings");
+			pamFlipePane.flipToBack();	
 		}
 
 		@Override
 		public void createNewData(){
 			//create a new classifier. 
 //			this.getDa
-//			hydrophoneData.add(createDefaultStreamerProperty()); 
+			hydrophoneList.add(createDefaultHydrophoneProperty(hydrophoneList.size())); 
 		}
 
-		private StreamerProperty createDefaultHydrophoneProperty() {
-			return new StreamerProperty(new Streamer(1, 0.,0.,0.,0.,0.,0.));
+		private HydrophoneProperty createDefaultHydrophoneProperty(int id) {
+			return new HydrophoneProperty(new  Hydrophone(id,  defaultx, defaulty,defaultz, defaultxErr, defaultyErr, defaultzErr,  defaulttype, defaultsensitivity,
+			null, 0. ));
 		}
 
 	}

@@ -9,7 +9,14 @@ public class DetectionGrouperParams implements Serializable, Cloneable, ManagedP
 
 	public static final long serialVersionUID = 1L;
 
+	/**
+	 * Use all the possible combinations
+	 */
 	public static final int GROUPS_ALL_POSSIBLE = 0;
+	
+	/**
+	 * Use only the first combination
+	 */
 	public static final int GROUPS_FIRST_ONLY = 1;
 
 	public int maxPerSubGroup = 10;

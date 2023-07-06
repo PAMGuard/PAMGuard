@@ -26,7 +26,7 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 	
 	private PamFlipPane mainPane;
 	
-	private HydrophonePane hydrophonePane; 
+	private HydrophonesPane hydrophonePane; 
 
 	public ArraySettingsPane() {
 		super(null);
@@ -51,7 +51,7 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 		Label hydrophoneLabel = new Label("Hydrophone"); 
 		PamGuiManagerFX.titleFont1style(hydrophoneLabel);
 		
-		hydrophonePane = new HydrophonePane(); 
+		hydrophonePane = new HydrophonesPane(); 
 			
 		PamButton advancedButton = new PamButton(); 
 		advancedButton.setOnAction((action)->{

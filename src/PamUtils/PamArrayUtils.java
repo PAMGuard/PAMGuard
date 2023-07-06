@@ -855,5 +855,37 @@ public class PamArrayUtils {
 		return arr;
 	}
 
+	
+	/**
+	 * Check if two int arrays contain the same elements
+	 * @param arr1 - the array to compare to. 
+	 * @param arr2 - the array to be compared. 
+	 */
+	public static boolean arrEquals(int[] arr1, int[] arr2) {
+		if (arr1.length!=arr2.length) return false; 
+		
+		for (int i =0 ;i<arr1.length; i++) {
+			if (arr1[i]!=arr2[i]) return false; 
+		}
+		
+		return true; 
+	}
+	
+	/**
+	 * Check if two double arrays contain the same elements
+	 * @param arr1 - the array to compare to. 
+	 * @param arr2 - the array to be compared. 
+	 */
+	public static boolean arrEquals(double[] arr1, double[] arr2) {
+		if (arr1.length!=arr2.length) return false; 
+		
+		for (int i =0 ;i<arr1.length; i++) {
+			if (arr1[i]!=arr2[i]) return false; 
+		}
+		
+		return true; 
+	}
+
+
 }
 
