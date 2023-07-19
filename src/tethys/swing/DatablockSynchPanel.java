@@ -1,6 +1,8 @@
 package tethys.swing;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyAdapter;
@@ -10,7 +12,9 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import javax.swing.JComponent;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.border.TitledBorder;
@@ -25,6 +29,7 @@ import dataMap.OfflineDataMap;
 import tethys.TethysControl;
 import tethys.TethysState;
 import tethys.output.DatablockSynchInfo;
+import tethys.species.DataBlockSpeciesManager;
 
 public class DatablockSynchPanel extends TethysGUIPanel  {
 	
@@ -68,21 +73,63 @@ public class DatablockSynchPanel extends TethysGUIPanel  {
 	private class MouseActions extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			selectRow();
+			int row = selectRow();
+			if (e.isPopupTrigger() && row >= 0) {
+				showPopup(e, row);
+			}
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+			int row = selectRow();
+			if (e.isPopupTrigger() && row >= 0) {
+				showPopup(e, row);
+			}
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			int row = selectRow();
+			if (e.isPopupTrigger() && row >= 0) {
+				showPopup(e, row);
+			}
 		}
 		
 	}
 	
-	private void selectRow() {
+	private int selectRow() {
 		int row = synchTable.getSelectedRow();
 		if (row < 0) {
-			return;
+			return row;
 		}
 		DatablockSynchInfo synchInfo = dataBlockSynchInfo.get(row);
 //		datablockDetectionsPanel.setDataBlock(synchInfo.getDataBlock());
 		notifyObservers(synchInfo.getDataBlock());
+		return row;
 	}
 	
+	public void showPopup(MouseEvent e, int row) {
+		DatablockSynchInfo synchInfo = dataBlockSynchInfo.get(row);
+		if (synchInfo == null) {
+			return;
+		}
+		PamDataBlock dataBlock = synchInfo.getDataBlock();
+		DataBlockSpeciesManager speciesManager = dataBlock.getDatablockSpeciesManager();
+		if (speciesManager == null) {
+			return;
+		}
+		JPopupMenu popMenu = new JPopupMenu();
+		JMenuItem menuItem = new JMenuItem("Species info ...");
+		menuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				speciesManager.showSpeciesDialog();
+			}
+		});
+		popMenu.add(menuItem);
+		popMenu.show(e.getComponent(), e.getX(), e.getY());
+	}
+
 	@Override
 	public void updateState(TethysState tethysState) {
 		synchTableModel.fireTableDataChanged();

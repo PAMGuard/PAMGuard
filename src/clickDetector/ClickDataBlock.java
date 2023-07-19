@@ -3,6 +3,7 @@ package clickDetector;
 import java.util.ListIterator;
 
 import pamScrollSystem.ViewLoadObserver;
+import tethys.species.DataBlockSpeciesManager;
 //import staticLocaliser.StaticLocaliserControl;
 //import staticLocaliser.StaticLocaliserProvider;
 //import staticLocaliser.panels.AbstractLocaliserControl;
@@ -10,6 +11,7 @@ import pamScrollSystem.ViewLoadObserver;
 import alarm.AlarmCounterProvider;
 import alarm.AlarmDataSource;
 import binaryFileStorage.BinaryStore;
+import clickDetector.ClickClassifiers.ClickBlockSpeciesManager;
 import clickDetector.dataSelector.ClickDataSelectCreator;
 import clickDetector.offlineFuncs.OfflineClickLogging;
 import clickDetector.toad.ClickTOADCalculator;
@@ -40,6 +42,8 @@ public class ClickDataBlock extends AcousticDataBlock<ClickDetection>  implement
 	private OfflineClickLogging offlineClickLogging;
 	
 	private boolean isViewer;
+	
+	private ClickBlockSpeciesManager clickBlockSpeciesManager;
 	
 	
 	public ClickDataBlock(ClickControl clickControl, PamProcess parentProcess, int channelMap) {
@@ -302,6 +306,14 @@ public class ClickDataBlock extends AcousticDataBlock<ClickDetection>  implement
 			ClickDetection aClick = cIt.next();
 			aClick.setForceAmpRecalc(true);
 		}
+	}
+
+	@Override
+	public DataBlockSpeciesManager<ClickDetection> getDatablockSpeciesManager() {
+		if (clickBlockSpeciesManager == null) {
+			clickBlockSpeciesManager = new ClickBlockSpeciesManager(clickControl, this);
+		}
+		return clickBlockSpeciesManager;
 	}
 
 

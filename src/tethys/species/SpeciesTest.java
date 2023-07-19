@@ -5,7 +5,7 @@ import dbxml.Queries;
 import tethys.dbxml.DBQueryResult;
 import tethys.dbxml.TethysQueryException;
 
-public class SpeciesTest extends SpeciesTypes {
+public class SpeciesTest {
 
 	String uri = "http://localhost:9779";
 	public static void main(String[] args) {

@@ -52,6 +52,7 @@ import Acquisition.AcquisitionProcess;
 import pamScrollSystem.ViewLoadObserver;
 import tethys.pamdata.AutoTethysProvider;
 import tethys.pamdata.TethysDataProvider;
+import tethys.species.DataBlockSpeciesManager;
 import dataGram.DatagramProvider;
 import dataMap.BespokeDataMapGraphic;
 import dataMap.OfflineDataMap;
@@ -3103,13 +3104,13 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 		this.tethysDataProvider = tethysDataProvider;
 	}
 	
-
 	/**
 	 * Get information about species types that may occur within this data 
-	 * block.  
+	 * block.  Primarily for conversion into Tethys compatible data, but may 
+	 * prove to have other uses. 
 	 * @return Types of species information available within this datablock. 
 	 */
-	public tethys.species.SpeciesTypes getSpeciesTypes() {
+	public DataBlockSpeciesManager<Tunit> getDatablockSpeciesManager() {
 		return null;
 	}
 
