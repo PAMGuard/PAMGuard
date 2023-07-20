@@ -50,6 +50,7 @@ import tethys.output.DatablockSynchInfo;
 import tethys.output.TethysExportParams;
 import tethys.output.TethysExporter;
 import tethys.output.swing.TethysExportDialog;
+import tethys.species.ITISFunctions;
 import tethys.swing.ProjectDeploymentsDialog;
 import tethys.swing.TethysTabPanel;
 import tethys.swing.XMLStringView;
@@ -85,6 +86,8 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 
 	private DeploymentHandler deploymentHandler;
 	private DetectionsHandler detectionsHandler;
+	
+	private ITISFunctions itisFunctions;
 
 	public TethysControl(String unitName) {
 		super(unitType, unitName);
@@ -613,6 +616,16 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * @return the itisFunctions
+	 */
+	public ITISFunctions getItisFunctions() {
+		if (itisFunctions == null) {
+			itisFunctions = new ITISFunctions(this);
+		}
+		return itisFunctions;
 	}
 
 }

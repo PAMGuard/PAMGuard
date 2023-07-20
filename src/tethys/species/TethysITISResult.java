@@ -1,12 +1,5 @@
 package tethys.species;
 
-import java.io.StringReader;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
 
 /**
  * Class to hold and unpack a XML string returned from the ITIS_ranks document
@@ -16,22 +9,52 @@ import org.xml.sax.InputSource;
  */
 public class TethysITISResult {
 
+	private int itisCode;
+	private String taxon_unit;
+	private String latin;
+	private String vernacular;
+
 	/**
 	 * Construct a ITIS object from XML data
+	 * @param itisCode 
 	 * @param xmlData
+	 * @param vernacular 
+	 * @param latin 
 	 */
-	public TethysITISResult(String xmlData) {
+	public TethysITISResult(int itisCode, String taxon_unit, String latin, String vernacular) {
 
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-
-		//API to obtain DOM Document instance
-		DocumentBuilder builder = null;
-
-//		//Create DocumentBuilder with default configuration
-//		builder = factory.newDocumentBuilder();
-//
-//		//Parse the content to Document object
-//		Document doc = builder.parse(new InputSource(new StringReader(xmlData)));
+		this.itisCode = itisCode;
+		this.taxon_unit = taxon_unit;
+		this.latin = latin;
+		this.vernacular = vernacular;
 		
+	}
+
+	/**
+	 * @return the itisCode
+	 */
+	public int getItisCode() {
+		return itisCode;
+	}
+
+	/**
+	 * @return the taxon_unit
+	 */
+	public String getTaxon_unit() {
+		return taxon_unit;
+	}
+
+	/**
+	 * @return the latin
+	 */
+	public String getLatin() {
+		return latin;
+	}
+
+	/**
+	 * @return the vernacular
+	 */
+	public String getVernacular() {
+		return vernacular;
 	}
 }

@@ -23,6 +23,7 @@ abstract public class DataBlockSpeciesManager<T extends PamDataUnit> {
 	public DataBlockSpeciesManager(PamDataBlock<T> dataBlock) {
 		super();
 		this.dataBlock = dataBlock;
+		datablockSpeciesMap = SpeciesMapManager.getInstance().getSpeciesMap(dataBlock);
 	}
 	
 	public SpeciesMapItem getSpeciesItem(T dataUnit) {
@@ -38,6 +39,9 @@ abstract public class DataBlockSpeciesManager<T extends PamDataUnit> {
 	}
 	
 	public DataBlockSpeciesMap getDatablockSpeciesMap() {
+		if (datablockSpeciesMap == null) {
+			datablockSpeciesMap = new DataBlockSpeciesMap();
+		}
 		return datablockSpeciesMap;
 	}
 

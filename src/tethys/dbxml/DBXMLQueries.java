@@ -61,7 +61,7 @@ public class DBXMLQueries {
 	 * @return query result
 	 * @throws TethysQueryException 
 	 */
-	private DBQueryResult executeQuery(String jsonQueryString) throws TethysQueryException {
+	public DBQueryResult executeQuery(String jsonQueryString) throws TethysQueryException {
 		long t1 = System.currentTimeMillis();
 		DBQueryResult result = null;
 		TethysQueryException tException = null;
@@ -636,7 +636,7 @@ public class DBXMLQueries {
 		return blockCounts;
 	}
 
-	private String getElementData(Element root, String elName) {
+	public String getElementData(Element root, String elName) {
 		String[] tree = elName.split("\\.");
 		for (String element : tree) {
 			NodeList nodeList = root.getElementsByTagName(element);
@@ -647,12 +647,13 @@ public class DBXMLQueries {
 			Node firstNode = nodeList.item(0);
 			if (firstNode instanceof Element) {
 				root = (Element) firstNode;
+				break;
 			}
 		}
 		return root.getTextContent();
 	}
 
-	private Document convertStringToXMLDocument(String xmlString) {
+	public Document convertStringToXMLDocument(String xmlString) {
 		//Parser that produces DOM object trees from XML content
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
