@@ -1,5 +1,6 @@
 package PamView;
 
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -9,6 +10,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.Window;
+import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -496,14 +498,14 @@ public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 	}
 
 
-	/**
-	 * Draw a localisation symbol. This is just a circel with a specified radius. 
-	 * @param g - graphics handle
-	 * @param pamDataUnit - the PAM data unit which holds the localisation that is being plotted/ 
-	 * @param originPoint - the origin of the localisation. 
-	 * @param locPoint - the location of the localisation
-	 * @return a rectangle which is the bounds of the localisation symbol. 
-	 */
+//	/**
+//	 * Draw a localisation symbol. This is just a circel with a specified radius. 
+//	 * @param g - graphics handle
+//	 * @param pamDataUnit - the PAM data unit which holds the localisation that is being plotted/ 
+//	 * @param originPoint - the origin of the localisation. 
+//	 * @param locPoint - the location of the localisation
+//	 * @return a rectangle which is the bounds of the localisation symbol. 
+//	 */
 //	protected Rectangle drawLocSymbol(Graphics g, PamDataUnit pamDataUnit, Point originPoint, Point locPoint, Color color){
 //
 //		//need some better graphics options- cast to Graphics2D. 
@@ -527,79 +529,79 @@ public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 //
 //		return oval.getBounds(); 
 //	}
-
-
-	//	/**
-	//	 * Plots errors as an ellipse. 
-	//	 * @param g - the graphics handle. 
-	//	 * @param errorOrigin - the error origin point. 
-	//	 * @param errorDirection. The direction of the perpendicular error. In RADIANS
-	//	 * @param perpError - the error perpendicular to the track line or (if no track line this is simply the error in x)
-	//	 * @param horzError - the error horizontal to the track line or (if no track line this is simply the error in x)
-	//	 * @param color
-	//	 * @return
-	//	 */
-	//	private Rectangle drawErrors(Graphics g, PamDataUnit pamDataUnit, GeneralProjector generalProjector, LatLong errorOrigin, double errorDirection, double perpError, double horzError, Color color) {
-	//		
-	//		//System.out.println("Plot errors:  perp: "+ perpError+  " horz: "+horzError+ " " + errorDirection); 
-	//		
-	//		Graphics2D g2d = (Graphics2D)g;
-	//
-	//		//draw oval
-	////		//need to work out the size of the horizontal error. 
-	////		perpError=Math.max(perpError, 100);
-	////		horzError=Math.max(horzError, 50);
-	//		
-	//		//must work out the horizontal and perpindicular error size in pixels using the projector
-	//		//this is a bit of round about way to do thinfs but best use of framework here. 
-	//		LatLong llperp=errorOrigin.addDistanceMeters(0, perpError); 
-	//		LatLong l2perp=errorOrigin.addDistanceMeters(horzError, 0); 
-	//	
-	//		Point pointPerp = generalProjector.getCoord3d(llperp.getLatitude(), llperp.getLongitude(), 0).getXYPoint();
-	//		Point pointHorz = generalProjector.getCoord3d(l2perp.getLatitude(), l2perp.getLongitude(), 0).getXYPoint();
-	//		Point errorOriginXY=generalProjector.getCoord3d(errorOrigin.getLatitude(), errorOrigin.getLongitude(), 0).getXYPoint();
-	//		
-	//		double perpErrPix=errorOriginXY.distance(pointPerp);
-	//		double horzErrPix=errorOriginXY.distance(pointHorz);
-	//
-	//		//draw the ellipse and rotate if possible. 
-	//		Ellipse2D oval=new Ellipse2D.Double(errorOriginXY.getX()-horzErrPix/2, errorOriginXY.getY()-perpErrPix/2, horzErrPix, perpErrPix);
-	//		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 5 * 0.1f));
-	//		g2d.setPaint(color.brighter());
-	//
-	//		if (!Double.isNaN(errorDirection)) g2d.rotate(errorDirection,errorOriginXY.getX(), errorOriginXY.getY());
-	//		g2d.draw(oval); 
-	//		g2d.fill(oval); 
-	//
-	//		//reset transparency. 
-	//		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
-	//		//need to reset the rotation
-	//		if (!Double.isNaN(errorDirection)) g2d.rotate(-errorDirection,errorOriginXY.getX(), errorOriginXY.getY());
-	//		 
-	//		 
-	//		return oval.getBounds();
-	//		
-	//		
-	////		// refBEaring should be an angle in radians from the x axis (trig coordinates)
-	////		// convert this to a compass heading and get the positions of the ends. 
-	////		g.setColor(col);
-	////		double compassHeading = 90 - (refAngle * 180 / Math.PI);
-	////		Coordinate3d centre = generalProjector.getCoord3d(refPoint.getLatitude(), refPoint.getLongitude(), 0);
-	////		LatLong ll1 = refPoint.travelDistanceMeters(compassHeading, err1);
-	////		LatLong ll2 = refPoint.travelDistanceMeters(compassHeading+90, err2);
-	////		Coordinate3d p1 = generalProjector.getCoord3d(ll1.getLatitude(), ll1.getLongitude(), 0);
-	////		Coordinate3d p2 = generalProjector.getCoord3d(ll2.getLatitude(), ll2.getLongitude(), 0);
-	////		int cx = (int) centre.x;
-	////		int cy = (int) centre.y;
-	////		int dx = (int) (p1.x- centre.x);
-	////		int dy = (int) (p1.y- centre.y);
-	////		g.drawLine(cx + dx, cy - dy, cx - dx, cy + dy);
-	////		dx = (int) (p2.x- centre.x);
-	////		dy = (int) (p2.y- centre.y);
-	////		g.drawLine(cx + dx, cy - dy, cx - dx, cy + dy);
-	////		
-	////		return null;
-	//	}
+//
+//
+//		/**
+//		 * Plots errors as an ellipse. 
+//		 * @param g - the graphics handle. 
+//		 * @param errorOrigin - the error origin point. 
+//		 * @param errorDirection. The direction of the perpendicular error. In RADIANS
+//		 * @param perpError - the error perpendicular to the track line or (if no track line this is simply the error in x)
+//		 * @param horzError - the error horizontal to the track line or (if no track line this is simply the error in x)
+//		 * @param color
+//		 * @return
+//		 */
+//		private Rectangle drawErrors(Graphics g, PamDataUnit pamDataUnit, GeneralProjector generalProjector, LatLong errorOrigin, double errorDirection, double perpError, double horzError, Color color) {
+//			
+//			//System.out.println("Plot errors:  perp: "+ perpError+  " horz: "+horzError+ " " + errorDirection); 
+//			
+//			Graphics2D g2d = (Graphics2D)g;
+//	
+//			//draw oval
+//	//		//need to work out the size of the horizontal error. 
+//	//		perpError=Math.max(perpError, 100);
+//	//		horzError=Math.max(horzError, 50);
+//			
+//			//must work out the horizontal and perpindicular error size in pixels using the projector
+//			//this is a bit of round about way to do thinfs but best use of framework here. 
+//			LatLong llperp=errorOrigin.addDistanceMeters(0, perpError); 
+//			LatLong l2perp=errorOrigin.addDistanceMeters(horzError, 0); 
+//		
+//			Point pointPerp = generalProjector.getCoord3d(llperp.getLatitude(), llperp.getLongitude(), 0).getXYPoint();
+//			Point pointHorz = generalProjector.getCoord3d(l2perp.getLatitude(), l2perp.getLongitude(), 0).getXYPoint();
+//			Point errorOriginXY=generalProjector.getCoord3d(errorOrigin.getLatitude(), errorOrigin.getLongitude(), 0).getXYPoint();
+//			
+//			double perpErrPix=errorOriginXY.distance(pointPerp);
+//			double horzErrPix=errorOriginXY.distance(pointHorz);
+//	
+//			//draw the ellipse and rotate if possible. 
+//			Ellipse2D oval=new Ellipse2D.Double(errorOriginXY.getX()-horzErrPix/2, errorOriginXY.getY()-perpErrPix/2, horzErrPix, perpErrPix);
+//			g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 5 * 0.1f));
+//			g2d.setPaint(color.brighter());
+//	
+//			if (!Double.isNaN(errorDirection)) g2d.rotate(errorDirection,errorOriginXY.getX(), errorOriginXY.getY());
+//			g2d.draw(oval); 
+//			g2d.fill(oval); 
+//	
+//			//reset transparency. 
+//			g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
+//			//need to reset the rotation
+//			if (!Double.isNaN(errorDirection)) g2d.rotate(-errorDirection,errorOriginXY.getX(), errorOriginXY.getY());
+//			 
+//			 
+//			return oval.getBounds();
+//			
+//			
+//	//		// refBEaring should be an angle in radians from the x axis (trig coordinates)
+//	//		// convert this to a compass heading and get the positions of the ends. 
+//	//		g.setColor(col);
+//	//		double compassHeading = 90 - (refAngle * 180 / Math.PI);
+//	//		Coordinate3d centre = generalProjector.getCoord3d(refPoint.getLatitude(), refPoint.getLongitude(), 0);
+//	//		LatLong ll1 = refPoint.travelDistanceMeters(compassHeading, err1);
+//	//		LatLong ll2 = refPoint.travelDistanceMeters(compassHeading+90, err2);
+//	//		Coordinate3d p1 = generalProjector.getCoord3d(ll1.getLatitude(), ll1.getLongitude(), 0);
+//	//		Coordinate3d p2 = generalProjector.getCoord3d(ll2.getLatitude(), ll2.getLongitude(), 0);
+//	//		int cx = (int) centre.x;
+//	//		int cy = (int) centre.y;
+//	//		int dx = (int) (p1.x- centre.x);
+//	//		int dy = (int) (p1.y- centre.y);
+//	//		g.drawLine(cx + dx, cy - dy, cx - dx, cy + dy);
+//	//		dx = (int) (p2.x- centre.x);
+//	//		dy = (int) (p2.y- centre.y);
+//	//		g.drawLine(cx + dx, cy - dy, cx - dx, cy + dy);
+//	//		
+//	//		return null;
+//		}
 
 	protected Rectangle drawLineAndSymbol(Graphics g, PamDataUnit pamDataUnit, GeneralProjector generalProjector, LatLong LL1, LatLong LL2, PamSymbol symbol, ProjectorDrawingOptions drawingOptions) {
 		return drawLineAndSymbol(g, pamDataUnit, generalProjector.getCoord3d(LL1.getLatitude(), LL1.getLongitude(), 0).getXYPoint(),

@@ -33,7 +33,7 @@ abstract public class LocaliserAlgorithm3D implements LocaliserModel<PamDataUnit
 	
 	/**
 	 * Option to pre-filter the localisation results. This can be useful when using algorithms that 
-	 * internally handle detection match uncertainity. 
+	 * internally handle detection match uncertainty. 
 	 */
 	public DetectionGroupedSet preFilterLoc(DetectionGroupedSet arrayType) {
 		return arrayType; 

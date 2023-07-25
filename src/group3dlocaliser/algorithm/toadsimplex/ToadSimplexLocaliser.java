@@ -26,6 +26,7 @@ import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamUtils.CPUMonitor;
 import PamUtils.LatLong;
+import PamUtils.PamArrayUtils;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.debug.Debug;
 import generalDatabase.SQLLoggingAddon;
@@ -87,7 +88,13 @@ public class ToadSimplexLocaliser extends TOADBaseAlgorithm {
 	public GroupLocalisation processTOADs(PamDataUnit groupDataUnit, SnapshotGeometry geometry, TOADInformation toadInformation) {
 		// get the channel geometry. 
 		nCalls++;
-
+		
+		
+//		/////////////////////////////
+//		System.out.println("TOADInformation: " + toadInformation); 
+//		PamArrayUtils.printArray(toadInformation.getToadSeconds()); 
+//		//////////////////////
+		
 		PamVector centre = geometry.getGeometricCentre();
 
 		double arraySize = geometry.getMaxSeparation();
@@ -123,10 +130,11 @@ public class ToadSimplexLocaliser extends TOADBaseAlgorithm {
 				start = Arrays.copyOf(start, nDimensions);
 			}
 
-			boolean usell = true;
+			boolean usell = false;
 			MultivariateRealFunction chiFunc;
 			GoalType goal;
 			if (usell) {
+				//This does not seem to work very well!
 				chiFunc = new LogLikelihoodFunction(geometry, toadInformation);
 				goal = GoalType.MAXIMIZE;
 			}
@@ -156,9 +164,14 @@ public class ToadSimplexLocaliser extends TOADBaseAlgorithm {
 			//			double[] pos = result.getPoint();
 			//			resultVectors[iStart] = new PamVector(pos);
 			//		lastGoodDelays = delays;
+			
+//			System.out.println("Simplex result " + iStart); 
+//			PamArrayUtils.printArray( result.getPoint());
 
 			Chi2Data chiData = calcChi2(geometry, toadInformation, result.getPoint());
 			resultChiData[iStart] = chiData; 
+			
+			
 		}
 		cpuSimplex.stop();
 
@@ -166,8 +179,6 @@ public class ToadSimplexLocaliser extends TOADBaseAlgorithm {
 		if (iBest < 0) {
 			return null;
 		}
-
-
 		Chi2Data chiData = resultChiData[iBest];
 		
 		if (chiData.getChi2() / chiData.getDegreesOfFreedom() < 100) {
@@ -176,6 +187,12 @@ public class ToadSimplexLocaliser extends TOADBaseAlgorithm {
 		
 		double[] posVec = results[iBest].getPoint();
 		double r = new PamVector(posVec).norm(nDimensions);
+		
+		
+		//		lastGoodDelays = delays;
+		
+		System.out.println("Simplex best " + iBest); 
+		PamArrayUtils.printArray(posVec);
 
 		if (chiData.getChi2() / chiData.getDegreesOfFreedom() < 100 && r < 30) {
 			// some diagnostic book keeping for better results.
@@ -212,14 +229,20 @@ public class ToadSimplexLocaliser extends TOADBaseAlgorithm {
 
 		//		System.out.printf(", Chi2 = %3.1f, p=%3.1f, ndf = %d, Err=%s\n", 
 		//				chiData.getChi2(), cumProb, chiData.getNdf(), cartErr.getJsonErrorString());
-
+			System.out.println(ellipErr.getJsonErrorString()); 
 
 		/**
 		 * Calculated position was relative to array centre, so now need to add the array
 		 * centre to the estimated position and then reference this to the ref GPS position. 
 		 */
 		LatLong pos = geometry.getReferenceGPS().addDistanceMeters(new PamVector(posVec).add(centre));
+		
+
 		//		TargetMotionResult tmResult = new TargetMotionResult(geometry.getTimeMilliseconds(), null, pos, 0, 0);
+		
+		System.out.println("New group localisation: height: " + pos.getHeight() + " ref height: " + 
+		geometry.getReferenceGPS().getHeight() +  " posVec: " + posVec[2]); 
+		
 		GroupLocResult glr = new GroupLocResult(pos, 0, chiData.getChi2());
 		glr.setError(ellipErr);
 		glr.setPerpendicularDistance(0.);
@@ -240,7 +263,7 @@ public class ToadSimplexLocaliser extends TOADBaseAlgorithm {
 			glr.setProbability(null);
 		}
 		GroupLocalisation groupLocalisation = new GroupLocalisation(groupDataUnit, glr);
-
+	
 		return groupLocalisation;
 	}
 

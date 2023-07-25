@@ -4,12 +4,14 @@ import Array.Hydrophone;
 import PamController.SettingsPane;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import pamViewFX.fxNodes.PamBorderPane;
 
 public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
+	
+	PamBorderPane mainPane; 
 
 	public HydrophoneSettingsPane() {
 		super(null);
-		// TODO Auto-generated constructor stub
 	}
 
 	

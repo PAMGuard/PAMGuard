@@ -226,7 +226,7 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 					logViewerData(newDataUnit);
 				}
 			}
-//			System.out.println("Ran localisation " + localiserAlgorithm3D.getName() + "  got: " + abstractLocalisation);
+			System.out.println("Ran localisation " + localiserAlgorithm3D.getName() + "  got: " + abstractLocalisation.getLatLong(0) + "  " + abstractLocalisation.getHeight(0) );
 
 			if (abstractLocalisation instanceof GroupLocalisation) {
 				groupLocalisation = (GroupLocalisation) abstractLocalisation;
@@ -275,6 +275,8 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 			// }
 			Group3DDataUnit newDataUnit = group3dDataUnits[bestSet];
 			newDataUnit.setLocalisation(bestLocalisation);
+			
+			System.out.println("Set click localisation: " + bestLocalisation.getRange(0));
 			group3dDataBlock.addPamData(newDataUnit);
 			if (group3DControl.isViewer()) {
 				// call explicityly since it won't happen in normal mode.

@@ -17,6 +17,7 @@ import PamUtils.PamUtils;
  * <p>
  * The hyperbolic localiser also includes an error estimation by sampling time delays from a distribution of errors. As a localisation has to 
  * occur for each sample, this drastically increases the computational time for the hyperbolic localiser. 
+ * 
  * @author Jamie Macaulay
  *
  */
