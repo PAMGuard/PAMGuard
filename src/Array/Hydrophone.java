@@ -426,7 +426,7 @@ public class Hydrophone implements Serializable, Cloneable, ManagedParameters {
 		this.symbol = symbol;
 	}
 
-	protected int getStreamerId() {
+	public int getStreamerId() {
 		return streamerId;
 	}
 

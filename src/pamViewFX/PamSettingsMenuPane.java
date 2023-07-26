@@ -13,24 +13,35 @@ import PamController.PamSettingManager;
 import PamController.SettingsPane;
 import PamController.StorageOptions;
 import PamController.StorageParameters;
+import PamController.soundMedium.GlobalMedium;
+import PamController.soundMedium.GlobalMedium.SoundMedium;
 import PamModel.PamModuleInfo;
+import PamView.dialog.warn.WarnOnce;
 import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamVBox;
+import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
 import pamViewFX.fxNodes.pamDialogFX.PamSettingsDialogFX;
 import pamViewFX.fxNodes.utilityPanes.SettingsDialog;
 import pamViewFX.fxSettingsPanes.StorageOptionsPane;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
 import javafx.scene.control.Label;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Separator;
 import javafx.scene.text.TextAlignment;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.Priority;
 
 /**
  * Pane which holds settings menu. All primary settings are accessed from this pane which sits in a hiding pane to the right 
  * of the main GUI. 
+ * 
  * @author Jamie Macaulay
  *
  */
@@ -40,6 +51,12 @@ public class PamSettingsMenuPane extends PamVBox {
 	private double heightSpacer=2; 
 	
 	StorageOptionsPane storageOptionPane; 
+	
+	public String warning =  "	Changing to between air and water requires a PAMGuard restart\n"
+			+ "	for some display changes to take effect. Settings such as\n"
+			+ " sound speed, reciever sensitivity values and data unit amplitudes\n"
+			+ " will be recalculated or set to new default values.\n"
+			+ " <p>Data processing changes are ready to use immediately."; 
 	
 	public PamSettingsMenuPane(){
 		
@@ -53,7 +70,7 @@ public class PamSettingsMenuPane extends PamVBox {
 		settingsLabel.setPadding(new Insets(14,0,10,0));
 		settingsLabel.setAlignment(Pos.CENTER);
 		settingsLabel.setPrefWidth(Double.MAX_VALUE);
-		settingsLabel.setTextAlignment(TextAlignment.CENTER);
+		settingsLabel.setTextAlignment(TextAlignment.LEFT);
 		settingsLabel.setStyle("-fx-font-weight: bold;");
 
 		PamButton saveConfig=new PamButton("Save");
@@ -68,12 +85,55 @@ public class PamSettingsMenuPane extends PamVBox {
 		});
 		styleButton(saveConfigAs);
 		
+		
+		//Air or water mode
+		ToggleButton toggleButton1 = new ToggleButton("Water");
+		toggleButton1.setPrefWidth(60);
+		toggleButton1.setTooltip(new Tooltip(GlobalMedium.getToolTip(SoundMedium.Water))); 
+		toggleButton1.setOnAction((action)->{
+			if (PamController.getInstance().getGlobalMediumManager().getGlobalMediumParameters().currentMedium==SoundMedium.Air) return; //do nothing. 
+			int goAhead = WarnOnce.showWarning("Changing Medium", warning , WarnOnce.OK_CANCEL_OPTION); 
+//			System.out.println("WarnOnce: " +  goAhead); 
+			if (goAhead==WarnOnce.OK_OPTION || goAhead<0) PamController.getInstance().getGlobalMediumManager().setCurrentMedium(SoundMedium.Air);
+		});
+
+	    ToggleButton toggleButton2 = new ToggleButton("Air");
+	    toggleButton2.setPrefWidth(60);
+		toggleButton1.setTooltip(new Tooltip(GlobalMedium.getToolTip(SoundMedium.Air))); 
+
+
+	    ToggleGroup toggleGroup = new ToggleGroup();
+	    toggleButton1.setToggleGroup(toggleGroup);
+	    toggleButton2.setToggleGroup(toggleGroup);
+	    toggleGroup.selectToggle(toggleButton1);
+
+	    Label mediumLabel = new Label("Sound Medium"); 
+	    mediumLabel.setAlignment(Pos.CENTER_LEFT);
+	    mediumLabel.setPadding(new Insets(0,0,0,15));
+		//styleButton(mediumLabel);
+
+	    
+	    PamHBox toggleButtonBox = new PamHBox(); 
+	    toggleButtonBox.setAlignment(Pos.CENTER_RIGHT);
+	    toggleButtonBox.setSpacing(5);
+	    toggleButtonBox.getChildren().addAll(toggleButton1, toggleButton2); 
+	    toggleButtonBox.setMaxWidth(Double.MAX_VALUE);
+	    
+	    PamHBox mediumToggleBox = new PamHBox(mediumLabel,toggleButtonBox);
+	    PamHBox.setHgrow(toggleButtonBox, Priority.ALWAYS);
+	    mediumToggleBox.setAlignment(Pos.CENTER_LEFT);
+	    mediumToggleBox.setSpacing(5);
+		
+		
 		PamButton generalSettings=new PamButton("General Settings..."); 
 		styleButton(generalSettings);
 		
 		MenuButton settings=new MenuButton("Module Settings"); 
-		settings.setStyle("-fx-background-radius: 0;"
-				+ " -fx-border-color: transparent; -fx-padding: 0 0 0 0;");
+		settings.setPopupSide(Side.RIGHT);
+//		settings.setStyle("-fx-background-radius: 0;"
+//				+ " -fx-border-color: transparent; -fx-padding: 0 0 0 0;");
+		
+		styleButton(settings);
 		settings.setAlignment(Pos.CENTER_LEFT);
 		settings.setPrefWidth(Double.MAX_VALUE);
 		settings.setPrefHeight(40);
@@ -155,7 +215,8 @@ public class PamSettingsMenuPane extends PamVBox {
 		PamButton contact=new PamButton("Contact and Support"); 
 		styleButton(contact);
 		
-		this.getChildren().addAll(settingsLabel,saveConfig,saveConfigAs, generalSettings, settings, storageManager, database, binaryStorage, help, about, tip, website, contact);
+		this.getChildren().addAll(settingsLabel,saveConfig,saveConfigAs, new Separator(),  mediumToggleBox, generalSettings, settings, new Separator(), 
+				storageManager, database, binaryStorage, new Separator(), help, about, tip, website, contact);
 
 	}
 	
@@ -168,6 +229,7 @@ public class PamSettingsMenuPane extends PamVBox {
 	public void styleButton(Labeled control){
 		Insets buttonInsets=new Insets(0,leftInset,0,leftInset);
 		control.setAlignment(Pos.CENTER_LEFT);
+		control.setStyle("-fx-alignment: center-left;");
 		control.setPadding(buttonInsets);
 		control.getStyleClass().add("square-button-trans");
 		control.setPrefWidth(Double.MAX_VALUE);
@@ -198,6 +260,4 @@ public class PamSettingsMenuPane extends PamVBox {
 		}
 	}
 	
-	
-
 }

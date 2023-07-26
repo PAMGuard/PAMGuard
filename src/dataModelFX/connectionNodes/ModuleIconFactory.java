@@ -34,7 +34,7 @@ public class ModuleIconFactory {
 	 */
 	public enum ModuleIcon {
 		DATAMAP, NMEA, GPS, MAP, SOUND_AQ, SOUND_OUTPUT, FFT, FILTER, CLICK, CLICK_TRAIN, RECORDER, WHISTLE_MOAN,
-		NOISE_BAND, NOISE_FILT, DATABASE, BINARY, TIME_DISPLAY, DETECTION_DISPLAY, ARRAY, DEEP_LEARNING
+		NOISE_BAND, NOISE_FILT, DATABASE, BINARY, TIME_DISPLAY, DETECTION_DISPLAY, ARRAY, DEEP_LEARNING, MATCHED_CLICK_CLASSIFIER
 	}
 
 	/**
@@ -78,6 +78,8 @@ public class ModuleIconFactory {
 			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/recorder.png")));
 		case SOUND_AQ:
 			return getSVGIcon("/Resources/modules/noun_Soundwave_1786340.svg");
+		case MATCHED_CLICK_CLASSIFIER:
+			return getSVGIcon("/Resources/modules/matched_click_classifier.svg");
 			//return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/aquisition.png")));
 		case SOUND_OUTPUT:
 //			return PamGlyphDude.createModuleGlyph(MaterialDesignIcon.HEADPHONES); 
@@ -114,6 +116,7 @@ public class ModuleIconFactory {
 			svgsprite.getSpriteNode().setStyle("-fx-fill: black");
 			svgsprite.setFitHeight(DataModelStyle.iconSize-10);
 			svgsprite.setFitWidth(DataModelStyle.iconSize-10);
+		
 			return svgsprite.getSpriteNode(); 
 		}
 		catch (Exception e) {
@@ -162,7 +165,7 @@ public class ModuleIconFactory {
 	 * @return the module icon enum
 	 */
 	public ModuleIcon getModuleIcon(String className) {
-		//System.out.println("CLASS NAME: " + className);
+		System.out.println("CLASS NAME: " + className);
 		ModuleIcon icon = null; 
 		switch (className) {
 		case "Acquisition.AcquisitionControl":
@@ -206,6 +209,9 @@ public class ModuleIconFactory {
 			break; 
 		case "rawDeepLearningClassifier.DLControl":
 			icon=ModuleIcon.DEEP_LEARNING; 
+			break; 
+		case "matchedTemplateClassifer.MTClassifierControl":
+			icon=ModuleIcon.MATCHED_CLICK_CLASSIFIER; 
 			break; 
 		}
 		return icon;

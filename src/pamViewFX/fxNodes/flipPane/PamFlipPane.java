@@ -45,6 +45,10 @@ public class PamFlipPane extends FlipPane {
 		super();
 		this.advPane = createAdvSettingsPane();
 		this.getFront().getChildren().add(frontPane = new PamBorderPane()); 
+		
+//		this.getFront().setStyle("-fx-background-color: grey;");
+//		this.getBack().setStyle("-fx-background-color: grey;");
+
 		this.getBack().getChildren().add(advPane); 
 		this.setFlipTime(FLIP_TIME);
 
@@ -107,6 +111,7 @@ public class PamFlipPane extends FlipPane {
 		
 		backButton = new PamButton(); 
 		backButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-left", Color.WHITE, PamGuiManagerFX.iconSize));
+		//backButton.setStyle("-fx-padding: 0,0,0,0");
 		
 		backButton.setOnAction((action)->{
 		//	System.out.println("FLIP BACK TO FRONT"); 
@@ -116,7 +121,7 @@ public class PamFlipPane extends FlipPane {
 		//backButton.setPrefWidth(150);
 		
 		PamBorderPane advPane = new PamBorderPane(); 
-		advPane.setPadding(new Insets(5,5,5,5));
+		//advPane.setPadding(new Insets(5,5,5,5));
 		
 		PamHBox buttonHolder = new PamHBox(); 
 		

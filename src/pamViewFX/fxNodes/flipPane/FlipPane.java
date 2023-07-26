@@ -73,7 +73,7 @@ public class FlipPane extends StackPane {
         flipTime      = 700;
         flipDirection = FLIP_DIRECTION;
         flippedFrontProperty.setValue(true);
-
+       
 
         registerListeners();
     }

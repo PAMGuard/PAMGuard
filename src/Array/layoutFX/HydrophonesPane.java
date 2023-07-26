@@ -1,12 +1,11 @@
 package Array.layoutFX;
 
 import Array.Hydrophone;
-import Array.Streamer;
-import Array.layoutFX.BasicArrayPane.BasicArrayTable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
+import javafx.scene.layout.Pane;
 import javafx.scene.control.TableColumn;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.flipPane.PamFlipPane;
@@ -50,11 +49,17 @@ public class HydrophonesPane extends PamBorderPane {
 		
 			tableArrayPane = new HydrophoneTable(hydrophoneList); 
 			
+			tableArrayPane.setPadding(new Insets(5,5,5,5));
+
 			pamFlipePane = new PamFlipPane(); 
 			pamFlipePane.getAdvLabel().setText("Hydrophone Settings");
 			
+			((Pane) hydrophonePane.getContentNode()).setPadding(new Insets(5,5,5,5)); 
+			
 			pamFlipePane.setAdvPaneContent(hydrophonePane.getContentNode()); 
 			pamFlipePane.setFrontContent(tableArrayPane);
+			
+			//this.setStyle("-fx-background-color: grey;");
 
 			this.setCenter(pamFlipePane);
 	}

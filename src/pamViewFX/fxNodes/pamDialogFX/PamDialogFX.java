@@ -20,6 +20,7 @@ import javafx.stage.Window;
 
 /**
  * Creates a dialog with some useful PAMGUARD customisation.
+ * 
  * @author Jamie Macaulay
  *
  */

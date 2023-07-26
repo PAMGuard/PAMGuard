@@ -9,6 +9,8 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.geometry.Insets;
+
 
 /**
  * Pane which holds data within a table  and has add, settings and delete buttons. 
@@ -88,7 +90,7 @@ public abstract class TableSettingsPane<T> extends PamBorderPane {
     	
         //make sure table resized with pane to stop blank column
         getTableView().setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        
+                
     	getButtonPane().getSettingsButton().setDisable(table.getItems().size()<=0);
 		getButtonPane().getDeleteButton().setDisable(table.getItems().size()<=0);
 
