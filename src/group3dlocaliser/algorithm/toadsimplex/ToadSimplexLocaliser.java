@@ -1,6 +1,5 @@
 package group3dlocaliser.algorithm.toadsimplex;
 
-
 import java.util.Arrays;
 import java.util.Random;
 
@@ -13,29 +12,23 @@ import org.apache.commons.math.optimization.OptimizationException;
 import org.apache.commons.math.optimization.RealPointValuePair;
 import org.apache.commons.math.optimization.SimpleScalarValueChecker;
 import org.apache.commons.math.optimization.direct.NelderMead;
-import org.apache.commons.math3.distribution.ChiSquaredDistribution;
-
 import Array.ArrayManager;
 import Array.SnapshotGeometry;
 import Localiser.LocaliserPane;
+import Localiser.algorithms.genericLocaliser.MinimisationFunction;
 import Localiser.algorithms.locErrors.EllipticalError;
-import Localiser.algorithms.locErrors.SimpleError;
+import Localiser.algorithms.locErrors.LikilihoodError;
 import Localiser.detectionGroupLocaliser.GroupLocResult;
 import Localiser.detectionGroupLocaliser.GroupLocalisation;
-import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamUtils.CPUMonitor;
 import PamUtils.LatLong;
-import PamUtils.PamArrayUtils;
 import PamguardMVC.PamDataUnit;
-import PamguardMVC.debug.Debug;
 import generalDatabase.SQLLoggingAddon;
 import group3dlocaliser.Group3DLocaliserControl;
 import group3dlocaliser.algorithm.Chi2Data;
 import group3dlocaliser.algorithm.LogLikelihoodData;
 import group3dlocaliser.algorithm.crossedbearing.CrossedBearingSQLAddon;
-import group3dlocaliser.algorithm.gridsearch.TOADGridSearch;
-import group3dlocaliser.algorithm.hyperbolic.HyperbolicLocaliser;
 import group3dlocaliser.algorithm.toadbase.TOADBaseAlgorithm;
 import group3dlocaliser.algorithm.toadbase.TOADInformation;
 import pamMaths.PamHistogram;
@@ -108,6 +101,9 @@ public class ToadSimplexLocaliser extends TOADBaseAlgorithm {
 		RealPointValuePair[] results = new RealPointValuePair[nStartPositions];
 		Chi2Data[] resultChiData = new Chi2Data[nStartPositions];
 		cpuSimplex.start();
+		
+		MultivariateRealFunction chiFunc = null;
+
 		for (int iStart = 0; iStart < nStartPositions; iStart ++) {
 			/*
 			 * Start the first iteration in the centre, then randomly jump about guided by the array size. 
@@ -131,7 +127,7 @@ public class ToadSimplexLocaliser extends TOADBaseAlgorithm {
 			}
 
 			boolean usell = false;
-			MultivariateRealFunction chiFunc;
+			//MultivariateRealFunction chiFunc;
 			GoalType goal;
 			if (usell) {
 				//This does not seem to work very well!
@@ -191,8 +187,8 @@ public class ToadSimplexLocaliser extends TOADBaseAlgorithm {
 		
 		//		lastGoodDelays = delays;
 		
-		System.out.println("Simplex best " + iBest); 
-		PamArrayUtils.printArray(posVec);
+//		System.out.println("Simplex best " + iBest); 
+//		PamArrayUtils.printArray(posVec);
 
 		if (chiData.getChi2() / chiData.getDegreesOfFreedom() < 100 && r < 30) {
 			// some diagnostic book keeping for better results.
@@ -225,7 +221,17 @@ public class ToadSimplexLocaliser extends TOADBaseAlgorithm {
 		//			System.out.printf("Res %d = %3.5f, ", i, posVec[i]);
 		//		}
 //		SimpleError cartErr = estimateCartesianError(geometry, toadInformation, posVec);
-		EllipticalError ellipErr = estimateEllipticalError(geometry, toadInformation, posVec);
+		
+		//FIXME - this return super weird results
+		//EllipticalError ellipErr = estimateEllipticalError(geometry, toadInformation, posVec);
+		
+		
+		//FIXME  - this elliptical error seems to work far better
+		SimpleMinimisation simpleMin  = new SimpleMinimisation(chiFunc, nDimensions, start, firstStep); 
+		LikilihoodError lError = new LikilihoodError(simpleMin, posVec); 
+		
+		EllipticalError ellipErr = lError; 
+		
 
 		//		System.out.printf(", Chi2 = %3.1f, p=%3.1f, ndf = %d, Err=%s\n", 
 		//				chiData.getChi2(), cumProb, chiData.getNdf(), cartErr.getJsonErrorString());
@@ -469,6 +475,56 @@ public class ToadSimplexLocaliser extends TOADBaseAlgorithm {
 			return arrayShape >= ArrayManager.ARRAY_TYPE_VOLUME;	
 		}
 		return arrayShape >= ArrayManager.ARRAY_TYPE_PLANE;
+	}
+	
+	
+	/**
+	 * Wrapper for converting a MultivariateRealFunction to a MinimisationFunction. 
+	 * 
+	 * @author Jamie Macaulay
+	 *
+	 */
+	class SimpleMinimisation implements MinimisationFunction {
+		
+		private MultivariateRealFunction fucntion;
+		private int nDim;
+		private double[] start;
+		private double[] firstStep;
+
+		public SimpleMinimisation(MultivariateRealFunction fucntion, int nDim, double[] start, double[] firstStep) {
+			this.fucntion=fucntion; 
+			this.nDim= nDim; 
+			this.start= start; 
+			this.firstStep= firstStep; 
+		}
+
+		@Override
+		public double value(double[] location) {
+			try {
+				return fucntion.value(location);
+			} catch (FunctionEvaluationException | IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return Double.NaN;
+
+			}
+		}
+
+		@Override
+		public int getDim() {
+			return nDim;
+		}
+
+		@Override
+		public double[] getStart() {
+			return start;
+		}
+
+		@Override
+		public double[] getFirstStep() {
+			return firstStep;
+		}
+		
 	}
 
 

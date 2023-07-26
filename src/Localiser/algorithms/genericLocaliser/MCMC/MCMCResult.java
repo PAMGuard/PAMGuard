@@ -133,6 +133,39 @@ public class MCMCResult {
 		}
 		return jumps;
 	}
+	
+	
+	public double[][] getJumpsd() {
+		return  getJumpsd(1); 
+	}
+
+	
+	/**
+	 * Get the jumps for the MCMC algorithm in double[][] format. This is for legacy code. 
+	 * @param div - reduce the data by div times (e.g. for plotting).
+	 * @return the MCMC jumps from all chains. 
+	 */
+	public double[][] getJumpsd(int div) {
+		
+		if (div<1) div =1; 
+		
+		int nJumps = 0; 
+		for (int i=0; i<this.data.size(); i++) {
+			nJumps = nJumps + this.data.get(i).successJump.size(); 
+		}
+		double[][] jumps = new double[(int) Math.floor(nJumps/div)][]; 
+
+		double[] ajump; 
+		int n=0; 
+		for (int i=0; i<this.data.size(); i=i+div) {
+			for (int j=0; j<this.data.get(i).successJump.size(); j++) {
+				ajump= this.data.get(i).successJump.get(j); 
+				jumps[n] = ajump; 
+				n++; 
+			}
+		}
+		return jumps;
+	}
 
 }
 

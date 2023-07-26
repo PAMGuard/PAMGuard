@@ -51,6 +51,8 @@ public class EllipticalError implements LocaliserError {
 		errorEllipse = new ErrorEllipse(errors, angles);
 	}
 
+	
+	
 	@Override
 	public double getError(PamVector errorDirection) {
 		return errorEllipse.getErrorMagnitude(errorDirection.getUnitVector().getVector());

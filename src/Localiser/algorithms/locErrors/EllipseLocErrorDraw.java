@@ -10,6 +10,7 @@ import java.awt.geom.Point2D;
 
 import PamUtils.Coordinate3d;
 import PamUtils.LatLong;
+import PamUtils.PamArrayUtils;
 import PamView.TransformShape;
 import PamView.GeneralProjector;
 import PamguardMVC.PamDataUnit;
@@ -104,10 +105,13 @@ public class EllipseLocErrorDraw implements LocErrorGraphics {
 	}
 	public TransformShape drawOvalsOnMap(Graphics g, PamDataUnit pamDetection, LatLong errorOrigin, 
 			GeneralProjector generalProjector, Color ellipseColor) {
+		
 
 		//this is 2D- need to make a slice through the ellipse and get the localisation points. 
 		double[] errors2D=ellipticalError.getErrorEllipse2D(ErrorEllipse.PLANE_XY_PROJ);
 		//		if (1>0) return null;
+
+		//System.out.println("Draw ovals on map"); 
 
 		//System.out.println("EllipseLocErrorDraw: draw ellipse:"+errors2D[0]+" "+errors2D[1]+" "+Math.toDegrees(errors2D[2]));
 

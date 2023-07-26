@@ -18,6 +18,8 @@ import PamUtils.CoordUtils;
 import org.apache.commons.math3.ml.clustering.Cluster;
 import org.apache.commons.math3.ml.clustering.DoublePoint;
 import org.apache.commons.math3.ml.clustering.KMeansPlusPlusClusterer;
+
+
 /**
 * Markov chain Monte Carlo (MCMC) is a minimisation technique used widely in a variety of field, from finding exo planets, 
 * to solving complex intergals. 
@@ -164,7 +166,7 @@ public class MCMC implements MinimisationAlgorithm {
 
 		ChainResult chainResult=new ChainResult(successJump, successChi); 
 		chainResult= analyseChain( chainResult); 
-		chainResult.nDim=this.chi2.getDim(); 
+		chainResult.nDim=chi2.getDim(); 
 //		System.out.println("Chain results is: " + chainResult.mean[0] + " " +  chainResult.mean[1] + " " +  chainResult.mean[2]); 
 //		System.out.println("End MCMC millis: "+ System.currentTimeMillis());
 
