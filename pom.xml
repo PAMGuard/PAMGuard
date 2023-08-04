@@ -819,9 +819,9 @@ you may need to copy files from your downloaded PAMGuard source code, e.g. C:\Us
 C:\Users\*yourusername*\.m2\repository\pamguard\org\x3\2.2.2
 -->
  	<dependency>
-	    <groupId>pamguard.org</groupId>
+	    <groupId>org.pamguard</groupId>
 	    <artifactId>x3</artifactId>
-	    <version>2.2.2</version>
+	    <version>2.2.5</version>
 	</dependency>
 	
 		<!-- https://mvnrepository.com/artifact/it.sauronsoftware/jave -->

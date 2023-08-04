@@ -82,7 +82,9 @@ public class ToadSimplexLocaliser extends TOADBaseAlgorithm {
 		// get the channel geometry. 
 		nCalls++;
 		
-		
+		boolean usell = false; 
+
+	
 //		/////////////////////////////
 //		System.out.println("TOADInformation: " + toadInformation); 
 //		PamArrayUtils.printArray(toadInformation.getToadSeconds()); 
@@ -125,8 +127,6 @@ public class ToadSimplexLocaliser extends TOADBaseAlgorithm {
 				// deal with 2D case
 				start = Arrays.copyOf(start, nDimensions);
 			}
-
-			boolean usell = false;
 			//MultivariateRealFunction chiFunc;
 			GoalType goal;
 			if (usell) {
@@ -223,19 +223,21 @@ public class ToadSimplexLocaliser extends TOADBaseAlgorithm {
 //		SimpleError cartErr = estimateCartesianError(geometry, toadInformation, posVec);
 		
 		//FIXME - this return super weird results
-		//EllipticalError ellipErr = estimateEllipticalError(geometry, toadInformation, posVec);
+		EllipticalError ellipErr;
+		if (usell) {
+			 ellipErr = estimateEllipticalError(geometry, toadInformation, posVec);
+		}
+		else {
+			//FIXME  - this elliptical error seems to work far better
+			SimpleMinimisation simpleMin  = new SimpleMinimisation(chiFunc, nDimensions, start, firstStep); 
+			ellipErr = new LikilihoodError(simpleMin, posVec); 
+		}
 		
-		
-		//FIXME  - this elliptical error seems to work far better
-		SimpleMinimisation simpleMin  = new SimpleMinimisation(chiFunc, nDimensions, start, firstStep); 
-		LikilihoodError lError = new LikilihoodError(simpleMin, posVec); 
-		
-		EllipticalError ellipErr = lError; 
 		
 
 		//		System.out.printf(", Chi2 = %3.1f, p=%3.1f, ndf = %d, Err=%s\n", 
-		//				chiData.getChi2(), cumProb, chiData.getNdf(), cartErr.getJsonErrorString());
-			System.out.println(ellipErr.getJsonErrorString()); 
+		//		chiData.getChi2(), cumProb, chiData.getNdf(), cartErr.getJsonErrorString());
+		//		System.out.println(ellipErr.getJsonErrorString()); 
 
 		/**
 		 * Calculated position was relative to array centre, so now need to add the array
@@ -246,8 +248,8 @@ public class ToadSimplexLocaliser extends TOADBaseAlgorithm {
 
 		//		TargetMotionResult tmResult = new TargetMotionResult(geometry.getTimeMilliseconds(), null, pos, 0, 0);
 		
-		System.out.println("New group localisation: height: " + pos.getHeight() + " ref height: " + 
-		geometry.getReferenceGPS().getHeight() +  " posVec: " + posVec[2]); 
+//		System.out.println("New group localisation: height: " + pos.getHeight() + " ref height: " + 
+//		geometry.getReferenceGPS().getHeight() +  " posVec: " + posVec[2]); 
 		
 		GroupLocResult glr = new GroupLocResult(pos, 0, chiData.getChi2());
 		glr.setError(ellipErr);

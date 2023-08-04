@@ -24,13 +24,13 @@ import org.apache.commons.math3.ml.clustering.KMeansPlusPlusClusterer;
 * Markov chain Monte Carlo (MCMC) is a minimisation technique used widely in a variety of field, from finding exo planets, 
 * to solving complex intergals. 
 * <p>
-* This is an advanced and highly computationally intensive localisation algorithm based on MCMC methods. For a good description see;  
+* This is a highly computationally intensive localisation algorithm based on MCMC methods. For a good description see;  
 * The Transit Light Curve (TLC) Project.I. Four Consecutive Transits of the Exoplanet XO-1b Matthew J. Holman1
 * <p>
-* This is an abstract class and requires a chi2 function to operate. 
+* A chi2 function is required to define the minimisation problem. 
 * <p>
-* Multiple MCMC chains can and should be run. These are executed on different threads to take advantage of multi-core processing as much as possible. 
-* Even so a large number of chains or large observation set can result in significant processing times. 
+* Multiple MCMC chains can and should be run. These are executed on different threads to take advantage of multi-core processing if possible. 
+* Even so, a large number of chains or large observation set can result in significant processing times. 
 * <p>
 * Results are analysed for convergence and final locations packed into an MCMCTDResults class. 
 * 
@@ -119,7 +119,7 @@ public class MCMC implements MinimisationAlgorithm {
 		double newChi;
 
 		ArrayList<Double> successChi=new ArrayList<Double>(settings.numberOfJumps/5);
-		ArrayList<double[]> successJump=new ArrayList<double[]>(settings.numberOfJumps/5);
+		ArrayList<float[]> successJump=new ArrayList<float[]>(settings.numberOfJumps/5);
 
 //		System.out.println("Start MCMC milliseconds: "+ System.currentTimeMillis());
 		
@@ -145,7 +145,7 @@ public class MCMC implements MinimisationAlgorithm {
 				chainPos=potentialNewJump;
 				currentChi=newChi;
 				successChi.add(newChi);
-				successJump.add(chainPos);
+				successJump.add(PamArrayUtils.double2Float(chainPos));
 				//System.out.println(ChainPos);
 				//System.out.println(NewChi);
 				//System.out.println(ObservedTimeDelays);
@@ -155,7 +155,7 @@ public class MCMC implements MinimisationAlgorithm {
 				chainPos=potentialNewJump;
 				currentChi=newChi;
 				successChi.add(newChi);
-				successJump.add(chainPos);
+				successJump.add(PamArrayUtils.double2Float(chainPos));
 				//System.out.println(ChainPos);
 				//System.out.println(NewChi);
 				//System.out.println(ObservedTimeDelays);
@@ -186,7 +186,7 @@ public class MCMC implements MinimisationAlgorithm {
 		 * @param successJump - list of successful jumps
 		 * @param successChi - list of successful chi2 values. 
 		 */
-		public ChainResult(ArrayList<double[]> successJump, ArrayList<Double> successChi) {
+		public ChainResult(ArrayList<float[]> successJump, ArrayList<Double> successChi) {
 			this.successJump=successJump;
 			this.successChi=successChi; 
 		}
@@ -199,7 +199,7 @@ public class MCMC implements MinimisationAlgorithm {
 		/**
 		 * A list of points of the successful jumps. 
 		 */
-		public ArrayList<double[]> successJump;
+		public ArrayList<float[]> successJump;
 		
 		/**
 		 * The number of dimensions. 
@@ -586,7 +586,7 @@ public class MCMC implements MinimisationAlgorithm {
 				//find min value 
 				int minIndex = chainResult.successChi.indexOf(Collections.min(chainResult.successChi));
 				minChi2=chainResult.successChi.get(minIndex); 
-				minChi2Pos=chainResult.successJump.get(minIndex); 
+				minChi2Pos=PamArrayUtils.float2Double(chainResult.successJump.get(minIndex)); 
 
 			break; 
 			}
@@ -730,19 +730,19 @@ public class MCMC implements MinimisationAlgorithm {
 	 */
 	private EllipticalError getLocError(ArrayList<ChainResult> data) {
 		
-		ArrayList<double[]> successJumpAll = new ArrayList<double[]>(); 
-		List<double[]> successJump; 
+		ArrayList<float[]> successJumpAll = new ArrayList<float[]>(); 
+		List<float[]> successJump; 
 		for (int i=0; i<data.size(); i++) {
 			successJump = data.get(i).successJump.subList((int) this.settings.percentageToIgnore*data.get(i).successJump.size(),
 					data.get(i).successJump.size()-1);
 			successJumpAll.addAll(successJump); 
 		}
 	
-		double[][] results= new double[successJumpAll.size()][3]; 
+		float[][] results= new float[successJumpAll.size()][3]; 
 		results=successJumpAll.toArray(results); 
 		
 		//Elliptical error
-		EllipticalError ellError= new EllipticalError(results); 
+		EllipticalError ellError= new EllipticalError(PamArrayUtils.float2Double(results)); 
 		
 		return ellError;
 	}

@@ -17,6 +17,7 @@ import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamUtils.CPUMonitor;
 import PamUtils.LatLong;
+import PamUtils.PamArrayUtils;
 import PamguardMVC.PamDataUnit;
 import generalDatabase.SQLLoggingAddon;
 import group3dlocaliser.Group3DLocaliserControl;
@@ -67,8 +68,7 @@ public class ToadMCMCLocaliser extends TOADBaseAlgorithm {
 
 	@Override
 	public boolean hasParams() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
@@ -80,6 +80,10 @@ public class ToadMCMCLocaliser extends TOADBaseAlgorithm {
 	@Override
 	public AbstractLocalisation processTOADs(PamDataUnit groupDataUnit, SnapshotGeometry geometry,
 			TOADInformation toadInformation) {
+		
+//		System.out.println("Run MCMC: ------ " + groupDataUnit.getUID()); 
+//		PamArrayUtils.printArray(toadInformation.getToadSeconds());
+		
 		
 		cpuMCMC.start();
 		PamVector centre = geometry.getGeometricCentre();
@@ -95,9 +99,9 @@ public class ToadMCMCLocaliser extends TOADBaseAlgorithm {
 		GroupLocalisation groupLocalisation = null; 
 		for (int i=0; i<mcmcResult.size(); i++) {
 			
-			double[][] jumps = mcmcResult.get(i).getJumpsd(); 
+			double[][] jumps = mcmcResult.get(i).getJumpsd(10); //we don't need all the jumps to calculate an error. 
 			
-			EllipticalError ellipErr = new EllipticalError(jumps); 
+			EllipticalError ellipErr = new MCMCEllipticalError(jumps, mcmcResult.get(i).getMeanLoc()); 
 					
 					
 			LatLong pos = geometry.getReferenceGPS().addDistanceMeters(new PamVector(mcmcResult.get(i).getMeanLoc()).add(centre));

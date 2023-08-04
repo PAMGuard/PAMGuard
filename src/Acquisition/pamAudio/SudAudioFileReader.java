@@ -30,26 +30,45 @@ public class SudAudioFileReader {
 		 sudParams = new SudParams(); 
 		 //set up the sud params for default. i.e. just read files and 
 		 //don't save any decompressed or meta data. 
-		 sudParams.saveWav = false; 
-		 sudParams.saveMeta = false; 
+//		 sudParams.saveWav = false; 
+//		 sudParams.saveMeta = false; 
+		 sudParams.setFileSave(false, false, false, false);
 		 sudParams.zeroPad = true; 
 	}
 	
 	/**
-	 * Get the audio input streamn. 
+	 * Get the audio input stream for a sud file. 
 	 * @param file - the .sud file to open.
 	 * @return the sud AudioStream. 
 	 * @throws UnsupportedAudioFileException
 	 * @throws IOException
 	 */
 	public AudioInputStream getAudioInputStream(File file) throws UnsupportedAudioFileException, IOException {
+		return getAudioInputStream( file, null);
+	}
+	
+	/**
+	 * Get the audio input stream for a sud file. 
+	 * @param file - the .sud file to open.
+	 * @param mapListener- a listener for the sud file maps - can be null.
+	 * @return the sud AudioStream. 
+	 * @throws UnsupportedAudioFileException
+	 * @throws IOException
+	 */
+	public AudioInputStream getAudioInputStream(File file, SudMapListener mapListener) throws UnsupportedAudioFileException, IOException {
+		
+//		System.out.println("Get SUD getAudioInputStream"); 
+
 		try {
-			sudAudioInputStream = SudAudioInputStream.openInputStream(file, sudParams, false); 
+			sudAudioInputStream = SudAudioInputStream.openInputStream(file, sudParams, mapListener, false); 
 		} catch (Exception e) {
 			String msg = String.format("Corrupt sud file %s: %s", file.getName(), e.getMessage());
 			throw new UnsupportedAudioFileException(msg);
 		} 
 		return sudAudioInputStream;
 	}
+	
+	
+	
 
 }

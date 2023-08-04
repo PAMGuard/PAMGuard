@@ -76,7 +76,7 @@ public class GenericModelWorker extends DLModelWorker<GenericPrediction> {
 //					System.out.println(Paths.get(genericParams.modelPath)); 
 //					System.out.println(Paths.get(genericModel.getModel().getName()).equals(Paths.get(genericParams.modelPath)));
 //			}
-			
+					
 			//first open the model and get the correct parameters.
 			//21/11/2022 - Added a null and filename check here to stop the model reloading everytime PAMGuard hits a new file or 
 			//is stopped or started - this was causing a memory leak. 

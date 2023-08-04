@@ -3,10 +3,6 @@ package Acquisition.sud;
 import java.io.File;
 
 import org.pamguard.x3.sud.SudAudioInputStream;
-import org.pamguard.x3.sud.SudFileMap;
-import org.pamguard.x3.sud.SudParams;
-
-import PamUtils.PamCalendar;
 
 public class SUDFileTime {
 
@@ -19,6 +15,9 @@ public class SUDFileTime {
 	 * @return
 	 */
 	public static long getSUDFileTime(File file) {
+		
+		//System.out.println("Get sud file time: " + file.getName()); 
+		
 		if (file == null || file.exists() == false) {
 			return Long.MIN_VALUE;
 		}
@@ -35,22 +34,28 @@ public class SUDFileTime {
 		 */
 //		long t1 = System.currentTimeMillis();
 		sudTime = Long.MIN_VALUE;
-		SudParams sudParams = new SudParams();
-		sudParams.saveMeta = false;
-		sudParams.saveWav = false;
+//		SudParams sudParams = new SudParams();
+//		sudParams.saveMeta = false;
+//		sudParams.saveWav = false;
 		try {
-			SudAudioInputStream sudAudioInputStream = SudAudioInputStream.openInputStream(file, sudParams, false);
-			if (sudAudioInputStream == null) {
-				return Long.MIN_VALUE;
-			}
-			SudFileMap sudMap = sudAudioInputStream.getSudMap();
-			if (sudMap == null) {
-				return Long.MIN_VALUE;
-			}
-			long t = sudMap.getFirstChunkTimeMillis();
+//			
+//			SudAudioInputStream sudAudioInputStream = SudAudioInputStream.openInputStream(file, sudParams, false);
+//			if (sudAudioInputStream == null) {
+//				return Long.MIN_VALUE;
+//			}
+//			SudFileMap sudMap = sudAudioInputStream.getSudMap();
+//			if (sudMap == null) {
+//				return Long.MIN_VALUE;
+//			}
+//			long t = sudMap.getFirstChunkTimeMillis();
+		
+			long t = SudAudioInputStream.quickFileTime(file);
+			t=t/1000; //turn to milliseconds. 
 			if (t != 0) {
 				sudTime = t;
 			}
+		
+		
 //			sudAudioInputStream.addSudFileListener((chunkID, sudChunk)->{
 //				ChunkHeader chunkHead = sudChunk.chunkHeader;
 //				if (chunkHead == null || sudTime != Long.MIN_VALUE) {
@@ -69,7 +74,7 @@ public class SUDFileTime {
 //				sudAudioInputStream.read();
 //			}
 //			
-			sudAudioInputStream.close();
+//			sudAudioInputStream.close();
 //			long t2 = System.currentTimeMillis();
 //			System.out.printf("SUD file time %s extracted in %d milliseconds\n", PamCalendar.formatDBDateTime(sudTime), t2-t1);
 			

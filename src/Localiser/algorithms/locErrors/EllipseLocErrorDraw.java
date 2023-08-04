@@ -29,15 +29,20 @@ public class EllipseLocErrorDraw implements LocErrorGraphics {
 	 */
 	private EllipticalError ellipticalError;
 
+	public EllipticalError getEllipticalError() {
+		return ellipticalError;
+	}
+
 	public static final int DRAW_LINES = 1;
 	public static final int DRAW_OVALS = 2;
 	private int drawType = DRAW_OVALS;
+
 
 	/**
 	 * Constructor for drawing an ellipsoid. 
 	 * @param ellipticalError
 	 */
-	EllipseLocErrorDraw(EllipticalError ellipticalError){
+	protected EllipseLocErrorDraw(EllipticalError ellipticalError){
 		this.ellipticalError=ellipticalError;
 	}
 
@@ -56,6 +61,8 @@ public class EllipseLocErrorDraw implements LocErrorGraphics {
 		}
 		return null;
 	}
+	
+	
 	public TransformShape drawLinesOnMap(Graphics g, PamDataUnit pamDetection, LatLong errorOrigin, 
 			GeneralProjector generalProjector, Color ellipseColor) {
 		Graphics2D g2d = (Graphics2D) g;
@@ -103,6 +110,7 @@ public class EllipseLocErrorDraw implements LocErrorGraphics {
 		
 		return null;
 	}
+	
 	public TransformShape drawOvalsOnMap(Graphics g, PamDataUnit pamDetection, LatLong errorOrigin, 
 			GeneralProjector generalProjector, Color ellipseColor) {
 		
@@ -160,6 +168,10 @@ public class EllipseLocErrorDraw implements LocErrorGraphics {
 
 		return new TransformShape(oval, paintAngle, new Point2D.Double(errorOriginXY.getX(), errorOriginXY.getY()));
 
+	}
+
+	public int getDrawType() {
+		return drawType;
 	}
 
 }

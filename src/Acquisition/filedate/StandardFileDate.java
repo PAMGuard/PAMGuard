@@ -135,6 +135,8 @@ public class StandardFileDate implements FileDate, PamSettings {
 	@Override
 	public long getTimeFromFile(File file) {
 		
+//		System.out.println("Get time from file: getTimeFromFile" ); 
+		
 		// if the user wants to force the local PC time, return immediately
 		if (settings.isForcePCTime()) return 0;
 		

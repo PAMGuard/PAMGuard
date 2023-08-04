@@ -27,7 +27,7 @@ public class PamArrayUtils {
 	 * @param dim - the dimension of the point to calculate the average for
 	 * @return the mean of one dimension of the list of the points. 
 	 */
-	public static double mean(ArrayList<double[]> array, double InitialtoIgnorePercentage, int dim){
+	public static double mean(ArrayList<float[]> array, double InitialtoIgnorePercentage, int dim){
 
 		double meanTotal=0;
 		int n=0;
@@ -42,6 +42,7 @@ public class PamArrayUtils {
 		double mean=meanTotal/n;
 		return mean;
 	}
+	
 
 	/**
 	 * Calculate the standard deviation of an array of doubles, ignoring an 'initialtoIgnorePercentage' percentage of jumps
@@ -49,7 +50,7 @@ public class PamArrayUtils {
 	 * @param initialtoIgnorePercentage- percentage of initial values to ignore.
 	 * @return standard deviation of array. 
 	 */
-	public static double std(ArrayList<double[]> array, double initialtoIgnorePercentage, int dim){
+	public static double std(ArrayList<float[]> array, double initialtoIgnorePercentage, int dim){
 		double std=0.0;
 
 		int n=0;
@@ -855,6 +856,48 @@ public class PamArrayUtils {
 		return arr;
 	}
 
+	/**
+	 * Convert a 2D float array to a 2D double array. 
+	 * @param arrf - the float array
+	 * @return a double array containing the same numbers as arrf. 
+	 */
+	public static double[][] float2Double(float[][] arrf) {
+		double[][] newArray = new double[arrf.length][];
+		for (int i=0; i<arrf.length; i++) {
+			newArray[i] = float2Double(arrf[i]); 
+		}
+		
+		return newArray; 
+	}
+	
+	/**
+	 * Convert a float array to a double array. 
+	 * @param arrd - the double array
+	 * @return a double array containing the same numbers as arrf. 
+	 */
+	public static float[] double2Float(double[] arrd) {
+		float[] arr = new float[arrd.length]; 
+		for (int i=0; i<arr.length; i++) {
+			arr[i] = (float) arrd[i]; 
+		}
+		return arr;
+	}
+	
+	/**
+	 * Convert a 2D float array to a 2D double array. 
+	 * @param arrd - the double array
+	 * @return a double array containing the same numbers as arrf. 
+	 */
+	public static float[][] double2Float(double[][] arrd) {
+		float[][] newArray = new float[arrd.length][];
+		for (int i=0; i<arrd.length; i++) {
+			newArray[i] = double2Float(arrd[i]); 
+		}
+		
+		return newArray; 
+	}
+
+
 	
 	/**
 	 * Check if two int arrays contain the same elements
@@ -885,6 +928,13 @@ public class PamArrayUtils {
 		
 		return true; 
 	}
+
+
+
+
+
+
+
 
 
 }
