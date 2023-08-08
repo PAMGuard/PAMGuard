@@ -1,15 +1,21 @@
 package tethys.swing.export;
 
+import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Label;
+import java.awt.Window;
 
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 
+import PamView.PamGui;
 import PamView.dialog.PamDialog;
 import nilus.DescriptionType;
 import tethys.niluswraps.PDescriptionType;
@@ -75,14 +81,15 @@ public class DescriptionTypePanel {
 	}
 	
 	public boolean getParams(PDescriptionType description) {
+		Window f = PamGui.findComponentWindow(mainPanel);
 		if (checkField(requireObjective, tObjectives) == false) {
-			return PamDialog.showWarning(null, "Objectives", "The objectives field must be competed");
+			return PamDialog.showWarning(f, "Objectives", "The objectives field must be completed");
 		}
 		if (checkField(requireAbstract, tAbstract) == false) {
-			return PamDialog.showWarning(null, "Abstract", "The abstract field must be competed");
+			return PamDialog.showWarning(f, "Abstract", "The abstract field must be completed");
 		}
 		if (checkField(requireMethod, tMethod) == false) {
-			return PamDialog.showWarning(null, "Method", "The method field must be competed");
+			return PamDialog.showWarning(f, "Method", "The method field must be completed");
 		}
 
 		description.setObjectives(tObjectives.getText());

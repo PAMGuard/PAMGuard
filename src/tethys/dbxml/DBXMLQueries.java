@@ -144,6 +144,77 @@ public class DBXMLQueries {
 		}
 		return new DBQueryResult(System.currentTimeMillis()-t1, queryResult, schemaPlan);
 	}
+	
+	/**
+	 * Check whether or not to strip of the s of one of the collection names. 
+	 * This is caused by some daft thing whereby the Deployments colleciton is called Deployments
+	 * byt the Detections collection is called Detection
+	 * @param collection
+	 * @return
+	 */
+	public String checkCollectionPlural(String collection) {
+		switch (collection) {
+		case "Deployments":
+			return "Deployment";
+		case "Localizations":
+			return "Localize";
+		case "Calibrations":
+			return "Calibration";
+		case "SpeciesAbbreviations":
+			return "SpeciesAbbreviations";
+		}
+		return collection;
+	}
+	
+	/**
+	 * Get a list of all documents in a collection. 
+	 * @param collection
+	 * @return list of all documents in a collection, or null if no collection. 
+	 */
+	public ArrayList<String> getCollectionDocumentList(String collection) {
+		if (collection == null) {
+			return null;
+		}
+		collection = checkCollectionPlural(collection);
+//		if (collection.endsWith("s")) {
+//			collection = collection.substring(0, collection.length()-1);
+//		}
+		String baseQuery = "{\"return\":[\"COLLECTIONNAME/Id\"],\"select\":[],\"enclose\":1}";
+		baseQuery = baseQuery.replace("COLLECTIONNAME", collection);
+		String tagName = "Id";
+		
+		if (collection.equals("SpeciesAbbreviations")) {
+			baseQuery = "{\"return\":[\"Abbreviations/Name\"],\"select\":[],\"enclose\":1}";
+			tagName = "Name";
+		}
+		
+		DBQueryResult result;
+		try {
+			result = executeQuery(baseQuery);
+		} catch (TethysQueryException e) {
+			System.out.println("Error with query: " + baseQuery);
+			tethysControl.showException(e);
+			return null;
+		}
+
+		if (result == null || result.queryResult == null) {
+			return null;
+		}
+		Document doc = convertStringToXMLDocument(result.queryResult);
+		if (doc == null) {
+			return null;
+		}
+		NodeList returns = doc.getElementsByTagName(tagName);
+		ArrayList<String> docIds = new ArrayList<>();
+		int n = returns.getLength();
+		for (int i = 0; i < n; i++) {
+			Node aNode = returns.item(i);
+			String docId = aNode.getTextContent();
+			docIds.add(docId);
+		}
+		
+		return docIds;
+	}
 
 	public ArrayList<String> getProjectNames() {
 
@@ -644,10 +715,13 @@ public class DBXMLQueries {
 			if (nodeList == null || nodeList.getLength() == 0) {
 				return null;
 			}
-			Node firstNode = nodeList.item(0);
-			if (firstNode instanceof Element) {
-				root = (Element) firstNode;
-				break;
+			int count = nodeList.getLength();
+			for (int i = 0; i < count; i++) {
+				Node firstNode = nodeList.item(i);
+				if (firstNode instanceof Element) {
+					root = (Element) firstNode;
+					break;
+				}
 			}
 		}
 		return root.getTextContent();

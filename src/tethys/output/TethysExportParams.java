@@ -38,6 +38,8 @@ public class TethysExportParams implements Serializable, Cloneable{
 	 */
 	private String datasetName;
 
+	public boolean listDocsInPamguard;
+
 	/**
 	 * @return the datasetName
 	 */

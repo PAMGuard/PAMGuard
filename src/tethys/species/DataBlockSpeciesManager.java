@@ -15,6 +15,10 @@ abstract public class DataBlockSpeciesManager<T extends PamDataUnit> {
 	private DataBlockSpeciesMap datablockSpeciesMap;
 	
 	private PamDataBlock<T> dataBlock;
+	
+	private String defaultName = null;
+	
+	private SpeciesMapItem defaultDefaultSpecies = null;
 
 	public abstract DataBlockSpeciesTypes getSpeciesTypes();
 	
@@ -29,7 +33,7 @@ abstract public class DataBlockSpeciesManager<T extends PamDataUnit> {
 	public SpeciesMapItem getSpeciesItem(T dataUnit) {
 		String speciesString = getSpeciesString(dataUnit);
 		if (speciesString == null) {
-			return null;
+			return getDefaultDefaultSpecies();
 		}
 		DataBlockSpeciesMap speciesMap = getDatablockSpeciesMap();
 		if (speciesMap == null) {
@@ -41,8 +45,16 @@ abstract public class DataBlockSpeciesManager<T extends PamDataUnit> {
 	public DataBlockSpeciesMap getDatablockSpeciesMap() {
 		if (datablockSpeciesMap == null) {
 			datablockSpeciesMap = new DataBlockSpeciesMap();
+			checkMapDefault();
 		}
 		return datablockSpeciesMap;
+	}
+
+	private void checkMapDefault() {
+		SpeciesMapItem defaultItem = datablockSpeciesMap.getItem(getDefaultName());
+		if (defaultItem == null) {
+			datablockSpeciesMap.putItem(getDefaultName(), getDefaultDefaultSpecies());
+		}
 	}
 
 	public void setDatablockSpeciesMap(DataBlockSpeciesMap datablockSpeciesMap) {
@@ -58,5 +70,33 @@ abstract public class DataBlockSpeciesManager<T extends PamDataUnit> {
 	 */
 	public PamDataBlock<T> getDataBlock() {
 		return dataBlock;
+	}
+
+	/**
+	 * @return the defaultSpecies
+	 */
+	public SpeciesMapItem getDefaultDefaultSpecies() {
+		return defaultDefaultSpecies;
+	}
+
+	/**
+	 * @param defaultSpecies the defaultSpecies to set
+	 */
+	public void setDefaultDefaultSpecies(SpeciesMapItem defaultDefaultSpecies) {
+		this.defaultDefaultSpecies = defaultDefaultSpecies;
+	}
+
+	/**
+	 * @return the defaultName
+	 */
+	public String getDefaultName() {
+		return defaultName;
+	}
+
+	/**
+	 * @param defaultName the defaultName to set
+	 */
+	public void setDefaultName(String defaultName) {
+		this.defaultName = defaultName;
 	}
 }

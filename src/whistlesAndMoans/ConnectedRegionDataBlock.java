@@ -2,6 +2,7 @@ package whistlesAndMoans;
 
 import whistlesAndMoans.alarm.WMAlarmCounterProvider;
 import whistlesAndMoans.dataSelector.WMDDataSelectCreator;
+import whistlesAndMoans.species.WhistleSpeciesManager;
 import whistlesAndMoans.toad.WSLToadCalculator;
 import PamView.GroupedDataSource;
 import PamView.GroupedSourceParameters;
@@ -10,14 +11,16 @@ import PamguardMVC.dataSelector.DataSelectorCreator;
 import PamguardMVC.toad.TOADCalculator;
 import alarm.AlarmCounterProvider;
 import alarm.AlarmDataSource;
+import tethys.species.DataBlockSpeciesManager;
 
-public class ConnectedRegionDataBlock extends AbstractWhistleDataBlock implements AlarmDataSource, GroupedDataSource, FFTDataHolderBlock  {
+public class ConnectedRegionDataBlock extends AbstractWhistleDataBlock<ConnectedRegionDataUnit> implements AlarmDataSource, GroupedDataSource, FFTDataHolderBlock  {
 
 	private WhistleToneConnectProcess parentProcess;
 	private WhistleMoanControl whistleMoanControl;
 	private WMAlarmCounterProvider wmAlarmCounterProvider;
 	private WMDDataSelectCreator dataSelectCreator;
 	private WSLToadCalculator wslToadCalculator;
+	private WhistleSpeciesManager whistleSpeciesManager;
 		
 	public ConnectedRegionDataBlock(String dataName,
 			WhistleMoanControl whistleMoanControl, WhistleToneConnectProcess parentProcess, int channelMap) {
@@ -84,6 +87,14 @@ public class ConnectedRegionDataBlock extends AbstractWhistleDataBlock implement
 		fftParams[0] = getFftLength();
 		fftParams[1] = getFftHop();
 		return fftParams;
+	}
+
+	@Override
+	public DataBlockSpeciesManager<ConnectedRegionDataUnit> getDatablockSpeciesManager() {
+		if (whistleSpeciesManager == null) {
+			whistleSpeciesManager = new WhistleSpeciesManager(this);
+		}
+		return whistleSpeciesManager;
 	}
 
 	

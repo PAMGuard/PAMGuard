@@ -54,6 +54,7 @@ import tethys.species.ITISFunctions;
 import tethys.swing.ProjectDeploymentsDialog;
 import tethys.swing.TethysTabPanel;
 import tethys.swing.XMLStringView;
+import tethys.swing.documents.TethysDocumentsFrame;
 
 /**
  * Quick play with a simple system for outputting data to Tethys. At it's start
@@ -284,8 +285,23 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	 * open client in the default web browser
 	 */
 	public void openTethysCollection(String collectionName) {
+		if (collectionName == null) {
+			return;
+		}
+		if (getTethysExportParams().listDocsInPamguard && collectionName.equals("Client") == false) {
+			openCollectionInPAMGuard(collectionName);
+		}
+		else {
+			openCollectionInBrowser(collectionName);
+		}
+	}
+	public void openCollectionInPAMGuard(String collectionName) {
+		TethysDocumentsFrame.showTable(getGuiFrame(), this, collectionName);
+	}
+	
+	public void openCollectionInBrowser(String collectionName) {
 		String urlString = tethysExportParams.getFullServerName() + "/" + collectionName;
-		System.out.println("Opening url " + urlString);
+//		System.out.println("Opening url " + urlString);
 		URL url = null;
 		try {
 			url = new URL(urlString);

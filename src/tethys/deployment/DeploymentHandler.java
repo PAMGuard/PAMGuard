@@ -455,8 +455,11 @@ public class DeploymentHandler implements TethysStateObserver {
 	public long getDeploymentOverlap(PDeployment aDeployment, RecordingPeriod aPeriod) {
 		long start = aPeriod.getRecordStart(); // recording period. 
 		long stop = aPeriod.getRecordStop();
-		long depStart = aDeployment.getAudioStart();
-		long depStop = aDeployment.getAudioEnd();
+		Long depStart = aDeployment.getAudioStart();
+		Long depStop = aDeployment.getAudioEnd();
+		if (depStart == null || depStop == null) {
+			return -1;
+		}
 		long overlap = (Math.min(stop, depStop)-Math.max(start, depStart));
 		return overlap;
 	}

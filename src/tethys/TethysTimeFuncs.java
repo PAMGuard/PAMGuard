@@ -67,6 +67,7 @@ public class TethysTimeFuncs {
 		try {
 			date = df.parse(gregorianString);
 		} catch (ParseException e) {
+			System.out.printf("Unparsable date string:\"%s\"", gregorianString);
 			e.printStackTrace();
 			return null;
 		}

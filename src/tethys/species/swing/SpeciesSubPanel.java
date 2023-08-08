@@ -124,7 +124,7 @@ public class SpeciesSubPanel {
 			commonName.setText(null);
 			return;
 		}
-		pamguardName.setText(speciesMapItem.getPamguardName());
+		pamguardName.setText("\"" + speciesMapItem.getPamguardName() + "\"");
 		itisCode.setText(String.format("%d", speciesMapItem.getItisCode()));
 		callType.setText(speciesMapItem.getCallType());
 		latinName.setText(speciesMapItem.getLatinName());

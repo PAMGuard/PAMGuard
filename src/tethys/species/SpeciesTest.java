@@ -1,5 +1,15 @@
 package tethys.species;
 
+import java.io.StringReader;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
+
+import PamController.settings.output.xml.PamguardXMLWriter;
 import dbxml.JerseyClient;
 import dbxml.Queries;
 import tethys.dbxml.DBQueryResult;
@@ -66,26 +76,62 @@ public class SpeciesTest {
 	private void runXQuery() {
 		System.out.println("Running runXQuery()");
 		String queryBase = "count(collection(\"Detections\")/Detections[Id=\"ReplaceDocumentId\"]/OnEffort/Detection)";
-		String xQ = "collection(\"ITIS_ranks\")/ty:ranks/ty:rank[dbxml:contains(ty:completename, \"Physeter\")]";
+//		String xQ = "collection(\"ITIS_ranks\")/ty:ranks/ty:rank[dbxml:contains(ty:completename, \"Physeter\")]";
+		
+//		String xQ = "<Result xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"> {\r\n"
+//				+ "  for $Deployment0 in collection(\"Deployments\")/Deployment[Project = \"BM\"]\r\n"
+//				+ "  return\r\n"
+//				+ "    <Deployment>{\r\n"
+//				+ "      $Deployment0/Id\r\n"
+//				+ "    }</Deployment>\r\n"
+//				+ "} </Result>";
+
+		String xQ = "<Result xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"> {\r\n"
+				+ "  for $rank0 in collection(\"ITIS_ranks\")/rank[tsn = \"180488\"]\r\n"
+				+ "  return\r\n"
+				+ "    <rank>{\r\n"
+				+ "      $rank0/completename\r\n"
+				+ "    }</rank>\r\n"
+				+ "} </Result>";
+		
 
 		JerseyClient jerseyClient = new JerseyClient(uri);
 		Queries queries = new Queries(jerseyClient);
 		
-		String result = null;
+		String queryResult = null;
 		try {
-			 result = queries.QueryTethys(xQ);
+			 queryResult = queries.QueryTethys(xQ);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println(result);
+		//API to obtain DOM Document instance
+		DocumentBuilder builder = null;
+		Document doc = null;
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		try {
+			//Create DocumentBuilder with default configuration
+			builder = factory.newDocumentBuilder();
+
+			//Parse the content to Document object
+			doc = builder.parse(new InputSource(new StringReader(queryResult)));
+		} catch (Exception e) {
+//			e.printStackTrace();
+			System.out.println(queryResult);
+		}
+//		PAMGuardXMLPreview xmlPreview = new PAMGuardXMLPreview(null, "returned", qResult.queryResult)
+		PamguardXMLWriter pamXMLWriter = PamguardXMLWriter.getXMLWriter();
+		String fDoc = pamXMLWriter.getAsString(doc, true);
+		System.out.println(fDoc);
+//		System.out.println(queryResult);
 		
 	}
 	private void runJson() {
 //		String jQ = "{\"return\":[\"Deployment\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Deployment/Project\",\"DCLDE2022\"],\"optype\":\"binary\"}],\"enclose\":1}";
-		String jQ =  "{\"return\":[\"ranks/rank\"],\"select\":[{\"op\":\"=\",\"operands\":[\"ranks/rank/tsn\",\"180488\"],\"optype\":\"binary\"}],\"enclose\":1}";
-//		String jQ = "{\"return\":[\"ranks/rank\"],\"select\":[{\"op\":\"=\",\"operands\":[\"ranks/rank/completename\",\"Mesoplodon\"],\"optype\":\"binary\"}],\"enclose\":1}";
-//		String jQ = "{\"return\":[\"ranks/rank\"],\"select\":[{\"op\":\"dbxml:contains\",\"operands\":[\"ranks/rank/completename\",\"Mesoplodon\"],\"optype\":\"function\"}],\"enclose\":1}";
+//		String jQ = "{\"return\":[\"ranks/rank\"],\"select\":[{\"op\":\"=\",\"operands\":[\"ranks/rank/tsn\",\"180488\"],\"optype\":\"binary\"}],\"enclose\":1}";
+		String jQ = "{\"return\":[\"ranks/rank\"],\"select\":[{\"op\":\"=\",\"operands\":[\"ranks/rank/tsn\",\"180488\"],\"optype\":\"binary\"}],\"enclose\":1}";
+//		String jQ = "{\"return\":[\"ranks/rank\"],\"select\":[{\"op\":\"=\",\"operands\":[\"ranks/rank/completename\",\"Physeter macrocephalus\"],\"optype\":\"binary\"}],\"enclose\":1}";
+//		String jQ = "{\"return\":[\"ranks/rank\"],\"select\":[{\"op\":\"dbxml:contains\",\"operands\":[\"ranks/rank/completename\",\"Sperm\"],\"optype\":\"function\"}],\"enclose\":1}";
 
 		System.out.println(jQ);
 
@@ -103,7 +149,26 @@ public class SpeciesTest {
 		}
 		long t2 = System.nanoTime();
 		System.out.printf("Query time was %3.1fms\n" , (double) (t2-t1)/1e6);
-		System.out.println(queryResult);
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+		//API to obtain DOM Document instance
+		DocumentBuilder builder = null;
+		Document doc = null;
+		try {
+			//Create DocumentBuilder with default configuration
+			builder = factory.newDocumentBuilder();
+
+			//Parse the content to Document object
+			doc = builder.parse(new InputSource(new StringReader(queryResult)));
+		} catch (Exception e) {
+//			e.printStackTrace();
+			System.out.println(queryResult);
+		}
+//		PAMGuardXMLPreview xmlPreview = new PAMGuardXMLPreview(null, "returned", qResult.queryResult)
+		PamguardXMLWriter pamXMLWriter = PamguardXMLWriter.getXMLWriter();
+		String fDoc = pamXMLWriter.getAsString(doc, true);
+		System.out.println(fDoc);
+//		System.out.println(queryResult);
 		
 	}
 

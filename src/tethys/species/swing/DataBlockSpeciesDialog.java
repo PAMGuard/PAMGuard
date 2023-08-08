@@ -25,13 +25,16 @@ public class DataBlockSpeciesDialog extends PamDialog {
 		speciesPanel = new DataBlockSpeciesPanel(dataBlock);
 		mainPanel.add(BorderLayout.CENTER, speciesPanel.getDialogComponent());
 		JButton itisButton = new JButton("Go to ITIS web site");
+		itisButton.setToolTipText("Go to ITIS website to search for species codes");
 		itisButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				gotoITIS();
 			}
 		});
-		mainPanel.add(BorderLayout.NORTH, itisButton);
+		JPanel nPanel = new JPanel(new BorderLayout());
+		nPanel.add(BorderLayout.EAST, itisButton);
+		mainPanel.add(BorderLayout.NORTH, nPanel);
 		setDialogComponent(mainPanel);
 	}
 	

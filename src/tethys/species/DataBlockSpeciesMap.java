@@ -11,7 +11,7 @@ import java.util.HashMap;
 public class DataBlockSpeciesMap implements Serializable {
 
 	public static final long serialVersionUID = 1L;
-	
+		
 	private HashMap<String, SpeciesMapItem> speciesTable = new HashMap<>();
 
 	protected HashMap<String, SpeciesMapItem> getSpeciesTable() {

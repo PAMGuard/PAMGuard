@@ -23,7 +23,7 @@ public class PDeployment {
 	
 	public Long getAudioStart() {
 		DeploymentRecoveryDetails detail = deployment.getDeploymentDetails();
-		if (detail == null) {
+		if (detail == null || detail.getAudioTimeStamp() == null) {
 			return null;
 		}
 		return TethysTimeFuncs.millisFromGregorianXML(detail.getAudioTimeStamp());
@@ -31,7 +31,7 @@ public class PDeployment {
 	
 	public Long getAudioEnd() {
 		DeploymentRecoveryDetails detail = deployment.getRecoveryDetails();
-		if (detail == null) {
+		if (detail == null || detail.getAudioTimeStamp() == null) {
 			return null;
 		}
 		return TethysTimeFuncs.millisFromGregorianXML(detail.getAudioTimeStamp());
@@ -52,7 +52,13 @@ public class PDeployment {
 	}
 
 	public String getShortDescription() {
-		return String.format("%s %s", deployment.getId(), PamCalendar.formatDBDate(getAudioStart()));
+		Long audioStart = getAudioStart();
+		if (audioStart == null) {
+			return String.format("%s %s", deployment.getId(), "unknown start");
+		}
+		else {
+			return String.format("%s %s", deployment.getId(), PamCalendar.formatDBDate(getAudioStart()));
+		}
 	}
 	
 	

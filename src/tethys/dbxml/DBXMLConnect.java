@@ -44,7 +44,6 @@ public class DBXMLConnect {
 		this.tethysControl = tethysControl;
 
 		checkTempFolder();
-
 	}
 
 	/**
@@ -62,6 +61,7 @@ public class DBXMLConnect {
 		}
 		return true;
 	}
+	
 
 	/**
 	 * Get the client. The client will only be recreated if the url changes
