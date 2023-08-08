@@ -153,7 +153,6 @@ public class ModelControlPanel {
 		//settings panel
 		public void actionPerformed(ActionEvent arg0) {
 			model.getSettingsPane();
-			
 			//AWT implementation. 
 		}
 	}

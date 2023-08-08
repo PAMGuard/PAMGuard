@@ -27,7 +27,7 @@ public interface LocaliserModel<T extends PamDataUnit> {
 	public String getToolTipText();
 	
 	/**
-	 * The type of localisation information the localizer can accept. e.g. bearings, time delays etc. The types are
+	 * The type of localisation information the localiser can accept. e.g. bearings, time delays etc. The types are
 	 * defined in the AbstractLocalisation class.  
 	 * @return integer bitmap of the type of localisation information the localiser can use. 
 	 */
@@ -35,13 +35,13 @@ public interface LocaliserModel<T extends PamDataUnit> {
 	
 	/**
 	 * Get the settings pane for the localiser. Allows users to change localiser settings.
-	 * @return the settings pane for the loclaiser. 
+	 * @return the settings pane for the localiser. 
 	 */
 	public LocaliserPane<?> getSettingsPane(); 
 
 
 	/**
-	 * True if the model has paramaters to set. If has the loclaiser has a settings pane it will have
+	 * True if the model has parameters to set. If has the localiser has a settings pane it will have
 	 * parameters. This generally puts an extra button onto a display panel. 
 	 */
 	public boolean hasParams(); 
@@ -56,7 +56,7 @@ public interface LocaliserModel<T extends PamDataUnit> {
 	public AbstractLocalisation runModel(T pamDataUnit, DetectionGroupOptions detectionGroupOptions, boolean addLoc);
 
 	/**
-	 * This should be called whenever the localiser has finished processing and, if the loclaisation process is long, then updates progress. 
+	 * This should be called whenever the localiser has finished processing and, if the localisation process is long, then updates progress. 
 	 */
 	public void notifyModelProgress(double progress); 
 

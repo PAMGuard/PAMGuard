@@ -63,7 +63,7 @@ public class Hyperbolic implements TimeDelayLocaliserModel {
 	 * @param timeDelays - time delay values in seconds. Each is a list of time delays using to indexM1 and indexM2 conventions and corresponding to hydrophones in hydrophoneArray list.  
 	 * @param timeDelayErrors - time delay error values in seconds. Each is a list of time delay errors using to indexM1 and indexM2 conventions and corresponding to hydrophones in hydrophoneArray list.  
 	 * @param speedOfSound - the speed of sound in m/s
-	 * @param hyperbolicParams - hyperbolic paramaters to use for this instance of the localiser. 
+	 * @param hyperbolicParams - hyperbolic parameters to use for this instance of the localiser. 
 	 */
 	public Hyperbolic(ArrayList<ArrayList<Point3f>> hydrophoneArray ,ArrayList<ArrayList<Double>> timeDelays, ArrayList< ArrayList<Double>> timeDelayErrors, float speedOfSound, HyperbolicParams hyperbolicParams){
 		this.speedOfSound=speedOfSound;

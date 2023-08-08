@@ -33,6 +33,7 @@ import PamguardMVC.toad.TOADCalculator;
 import fftManager.FFTDataUnit;
 import group3dlocaliser.Group3DLocaliserControl;
 import group3dlocaliser.Group3DParams;
+import group3dlocaliser.ToadManagedSettingsPane;
 import group3dlocaliser.algorithm.Chi2Data;
 import group3dlocaliser.algorithm.FitTestValue;
 import group3dlocaliser.algorithm.LocaliserAlgorithm3D;
@@ -632,7 +633,7 @@ abstract public class TOADBaseAlgorithm extends LocaliserAlgorithm3D {
 	 * @see group3dlocaliser.algorithm.LocaliserAlgorithm3D#getSourceSettingsPane(java.awt.Window)
 	 */
 	@Override
-	public ManagedSettingsPane<?> getSourceSettingsPane(Window parent, PamDataBlock<?> detectionSource) {
+	public ToadManagedSettingsPane<?> getSourceSettingsPane(Window parent, PamDataBlock<?> detectionSource) {
 		//		return new TOADSourcePane(parent);
 		//		return toadCalculator.getSettingsPane();
 		if (toadCalculator != null) {

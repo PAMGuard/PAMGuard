@@ -51,7 +51,7 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 	
 	private ManagedSettingsPane<?> algorithmSourcePane;
 
-	private Button algoOptsButton;
+//	private Button algoOptsButton;
 	
 	private PamBorderPane algoSourceHolder;
 
@@ -105,10 +105,10 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 		GridPane.setFillWidth(algorithms, true);
 //		algoGrid.add(new Label("Algorithm Options "), 0, 1);
 //		algoOptsButton = new Button("",PamGlyphDude.createPamGlyph(MaterialIcon.SETTINGS,Color.WHITE, PamGuiManagerFX.iconSize));
-		algoOptsButton = new Button("",PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconSize));
-		algoGrid.setRight(algoOptsButton);
-		PamBorderPane.setMargin(algoOptsButton, new Insets(0,0,0,5));
-		algoOptsButton.setTooltip(new Tooltip("More Algorithm Options ..."));
+//		algoOptsButton = new Button("",PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconSize));
+//		algoGrid.setRight(algoOptsButton);
+//		PamBorderPane.setMargin(algoOptsButton, new Insets(0,0,0,5));
+//		algoOptsButton.setTooltip(new Tooltip("More Algorithm Options ..."));
 		algoSourceHolder = new PamBorderPane();
 //		HBox.setHgrow(algoSourceHolder, Priority.ALWAYS);
 //		algoGrid.add(algoSourceHolder, 0, 2, 4, 1);
@@ -118,12 +118,12 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 		algoMainPane.setCenter(algoSourceHolder);
 		tabPane.getTabs().add(new Tab("Localisation", algoMainPane));
 		
-		algoOptsButton.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				moreAlgorithmOptions();
-			}
-		});
+//		algoOptsButton.setOnAction(new EventHandler<ActionEvent>() {
+//			@Override
+//			public void handle(ActionEvent event) {
+//				moreAlgorithmOptions();
+//			}
+//		});
 		
 		algorithms.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -152,16 +152,16 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 		 */
 		String algoName  = algorithms.getSelectionModel().getSelectedItem();
 		if (algoName == null) {
-			algoOptsButton.setDisable(true);
+			//algoOptsButton.setDisable(true);
 			return;
 		}
 		LocaliserAlgorithm3D localiserAlgorithm = group3dLocaliserControl.findAlgorithm(algoName);
 		if (localiserAlgorithm == null) {
-			algoOptsButton.setDisable(true);
+			//algoOptsButton.setDisable(true);
 			return;
 		}
 		// also enable / disable the more options button ...
-		algoOptsButton.setDisable(localiserAlgorithm.hasParams() == false);
+		//algoOptsButton.setDisable(localiserAlgorithm.hasParams() == false);
 		
 		/**
 		 * Need to immediately tell the algorithm which input we're using so that it can 
@@ -195,8 +195,20 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 			algoSourceHolder.setCenter(borderPane);
 			LocaliserAlgorithmParams locParams = group3dLocaliserControl.getLocaliserAlgorithmParams(localiserAlgorithm);
 			newPane.setParams();
+
 //			newPane.setDetectionSource(sourcePanel.getSource());
 		}
+		
+		if (localiserAlgorithm.getSettingsPane()!=null) {
+			if (newPane==null) {
+				algoSourceHolder.setCenter(localiserAlgorithm.getSettingsPane().getContentNode());
+			}
+			else {
+				Tab tab = new Tab(localiserAlgorithm.getName()); 
+				tab.setGraphic(PamGlyphDude.createPamIcon("mdi2c-cogs"));
+			}
+		}
+
 		algorithmSourcePane = newPane;
 				
 		
@@ -237,7 +249,11 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 			return;
 		}
 		LocaliserAlgorithmParams algorithmPaams = group3dLocaliserControl.getLocaliserAlgorithmParams(localiserAlgorithm);
+		
+		//two option here - either show a dialog if swing, or flip to an FX pane.
 		algorithmPaams = localiserAlgorithm.showAlgorithmDialog(getAWTWindow(), algorithmPaams);
+		
+		
 		if (algorithmPaams != null) {
 			group3dLocaliserControl.setAlgorithmParams(localiserAlgorithm, algorithmPaams);
 		}

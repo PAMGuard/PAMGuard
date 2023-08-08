@@ -226,7 +226,8 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 					logViewerData(newDataUnit);
 				}
 			}
-			System.out.println("Ran localisation " + localiserAlgorithm3D.getName() + "  got: " + abstractLocalisation.getLatLong(0) + "  " + abstractLocalisation.getHeight(0) );
+		
+			System.out.println("Ran localisation " + i + " " + localiserAlgorithm3D.getName() + "  got: " + abstractLocalisation.getLatLong(0) + "  " + abstractLocalisation.getHeight(0) + " Error: " +  abstractLocalisation.getLocError(0));
 
 			if (abstractLocalisation instanceof GroupLocalisation) {
 				groupLocalisation = (GroupLocalisation) abstractLocalisation;
@@ -234,14 +235,20 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 				if (groupLocalisation != null) {
 					groupLocalisation.sortLocResults();
 					GroupLocResult locResult = groupLocalisation.getGroupLocaResult(0);
+					
+					System.out.println("TEST groupLoc " + locResult);
+
 					if (locResult == null) {
+						System.out.println("TEST localisation 1");
 						continue;
 					}
 					if (bestResult == null) {
+						System.out.println("TEST localisation 2");
 						bestResult = locResult;
 						bestLocalisation = groupLocalisation;
 						bestSet = i;
 					} else if (isBetter(groupSet, detectionGroupedSet.getGroup(bestSet), locResult, bestResult)) {
+						System.out.println("TEST localisation 3");
 						bestResult = locResult;
 						bestLocalisation = groupLocalisation;
 						bestSet = i;
@@ -260,10 +267,18 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 //						bestSet = i;
 //					}
 				}
-			} else {
+			} else if (bestLocalisation==null) {
+				//note it is important here to make sure bestLoclaisation is null. If we have an array which has a linear
+				//compenent than a set of time delays of only the linear system may return a linear loclaisation in which case, without a
+				// null check, this will always override a group loclaisation. 
+				
+				System.out.println("WHAT _test!" + abstractLocalisation);
+
 				bestLocalisation = abstractLocalisation;
 				bestSet = i;
 			}
+			
+			
 		}
 		if (bestLocalisation != null && logAll == false) {
 			// best make and output a data unit !
@@ -276,7 +291,7 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 			Group3DDataUnit newDataUnit = group3dDataUnits[bestSet];
 			newDataUnit.setLocalisation(bestLocalisation);
 			
-			System.out.println("Set click localisation: " + bestLocalisation.getRange(0));
+			System.out.println("Set click localisation: " + bestSet + "  " + bestLocalisation.getRange(0) + "  " + bestLocalisation.getLatLong(0));
 			group3dDataBlock.addPamData(newDataUnit);
 			if (group3DControl.isViewer()) {
 				// call explicityly since it won't happen in normal mode.
@@ -293,7 +308,7 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 	 * @param group2
 	 * @param result1
 	 * @param result2
-	 * @return
+	 * @return true if group 1 is better than group 2. 
 	 */
 	private boolean isBetter(List<PamDataUnit> group1, List<PamDataUnit> group2, GroupLocResult result1,
 			GroupLocResult result2) {
@@ -303,6 +318,17 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 		double chi2 = result2.getChi2() / nch2;
 		Double errMag1 = null, errMag2 = null;
 		LocaliserError err = result1.getLocError();
+		
+		//if one has location information and the other does not, choose the one with the 
+		System.out.println("LAT LONG TEST: " + result1.getLatLong() + "  " + result2.getLatLong()); 
+		if (result1.getLatLong()==null && result2.getLatLong()!=null) {
+			return false;
+		}
+		
+		if (result2.getLatLong() == null && result1.getLatLong() != null) {
+			return true;
+		}
+		
 		if (err != null) {
 			errMag1 = err.getErrorMagnitude();
 			if (errMag1.isInfinite()) {

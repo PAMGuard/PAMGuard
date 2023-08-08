@@ -284,7 +284,6 @@ public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 
 	protected Rectangle drawOnMap(Graphics g, PamDataUnit pamDetection, GeneralProjector generalProjector) {
 
-
 		/*
 		 * 
 		 * four possibilities here.

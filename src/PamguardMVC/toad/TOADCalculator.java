@@ -4,7 +4,6 @@ import java.awt.Window;
 import java.util.List;
 
 import Array.SnapshotGeometry;
-import PamController.SettingsPane;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import group3dlocaliser.algorithm.toadbase.TOADInformation;

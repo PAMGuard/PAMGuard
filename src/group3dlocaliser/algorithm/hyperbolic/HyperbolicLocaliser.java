@@ -1,6 +1,8 @@
 package group3dlocaliser.algorithm.hyperbolic;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
 
 import org.apache.commons.math3.distribution.ChiSquaredDistribution;
 
@@ -9,13 +11,14 @@ import Array.SnapshotGeometry;
 import GPS.GpsData;
 import Jama.Matrix;
 import Localiser.LocaliserPane;
+import Localiser.algorithms.locErrors.SimpleError;
 import Localiser.detectionGroupLocaliser.GroupLocResult;
 import Localiser.detectionGroupLocaliser.GroupLocalisation;
 import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamUtils.LatLong;
+import PamUtils.PamArrayUtils;
 import PamguardMVC.PamDataUnit;
-import PamguardMVC.debug.Debug;
 import generalDatabase.SQLLoggingAddon;
 import group3dlocaliser.Group3DLocaliserControl;
 import group3dlocaliser.algorithm.Chi2Data;
@@ -26,13 +29,13 @@ import pamMaths.PamVector;
 
 /**
  * Hyperbolic localisation using methods described in 
- * Gillette, M. D., and Silverman, H. F. (2008). “A linear closed-form algorithm for source localization from time-differences of arrival,” IEEE Signal Processing Letters, 15, 1–4.<p>
+ * Gillette, M. D., and Silverman, H. F. (2008). ï¿½A linear closed-form algorithm for source localization from time-differences of arrival,ï¿½ IEEE Signal Processing Letters, 15, 1ï¿½4.<p>
  * 
- * Also worth reading Spiesberger, J. L. (2001). “Hyperbolic location errors due to insufficient numbers of receivers,” The Journal of the Acoustical Society of America, 109, 3076–3079.
+ * Also worth reading Spiesberger, J. L. (2001). ï¿½Hyperbolic location errors due to insufficient numbers of receivers,ï¿½ The Journal of the Acoustical Society of America, 109, 3076ï¿½3079.
  * which gives a clearer explanation of why at least 4 recievers are needed for 2D localisation and 5 for 3D localisation.<p>
  * Worth noting that the equations derived in Gillette 2008 are functionally identical to those in Spiesberger 2001 and an earlier work by Speisberger and Fristrup:<br>
- * Spiesberger, J. L., and Fristrup, K. M. (1990). “Passive localization of calling animals and sensing of their acoustic environment using acoustic tomography,” 
- * The american naturalist, 135, 107–153.
+ * Spiesberger, J. L., and Fristrup, K. M. (1990). ï¿½Passive localization of calling animals and sensing of their acoustic environment using acoustic tomography,ï¿½ 
+ * The american naturalist, 135, 107ï¿½153.
  *  
  * @author Doug Gillespie
  *
@@ -41,6 +44,8 @@ public class HyperbolicLocaliser extends TOADBaseAlgorithm {
 
 	private double[] lastPosVector;
 	private LocContents locContents = new LocContents(0);
+	
+	private HyperbolicParams params = new HyperbolicParams(); 
 
 	public HyperbolicLocaliser(Group3DLocaliserControl group3dLocaliser) {
 		super(group3dLocaliser);
@@ -49,19 +54,34 @@ public class HyperbolicLocaliser extends TOADBaseAlgorithm {
 
 	@Override
 	public AbstractLocalisation processTOADs(PamDataUnit groupDataUnit, SnapshotGeometry geometry, TOADInformation toadInformation) {
+
+		
 		int shape = geometry.getShape();
+		GroupLocalisation loclaisation = null; 
 		switch (shape) {
 		case ArrayManager.ARRAY_TYPE_LINE:
+			//System.out.println("HyperbolicLocaliser: Line");
+
 			return processTOADs2D(groupDataUnit, geometry, toadInformation);
 		case ArrayManager.ARRAY_TYPE_PLANE:
-			return processTOADsPlane(groupDataUnit, geometry, toadInformation);
+			//System.out.println("HyperbolicLocaliser: Plane");
+
+			loclaisation = processTOADsPlane(groupDataUnit, geometry, toadInformation);
+			calcErrors(loclaisation.getGroupLocaResult(0),  groupDataUnit,  geometry,  toadInformation,    params);
+			return loclaisation;
+
 		case ArrayManager.ARRAY_TYPE_VOLUME:
-			return processTOADs3D(groupDataUnit, geometry, toadInformation);
+			//System.out.println("HyperbolicLocaliser: Volume");
+
+			loclaisation =  processTOADs3D(groupDataUnit, geometry, toadInformation);
+			calcErrors(loclaisation.getGroupLocaResult(0),  groupDataUnit,  geometry,  toadInformation,    params);
+			return loclaisation;
 		}
-		return null;
+		System.out.println("HyperbolicLocaliser: Shape is null?");
+		return loclaisation; //will be null if no array geometry found. 
 	}
 
-	private GroupLocalisation processTOADsPlane(PamDataUnit groupDataUnit, SnapshotGeometry geometry,
+	private HyperbolicGroupLocalisation processTOADsPlane(PamDataUnit groupDataUnit, SnapshotGeometry geometry,
 			TOADInformation toadInformation) {
 		PamVector[] arrayAxes = geometry.getArrayAxes();
 		if (arrayAxes.length < 2) {
@@ -322,8 +342,9 @@ public class HyperbolicLocaliser extends TOADBaseAlgorithm {
 		GroupLocResult glr = new GroupLocResult(pos, 0, 0);
 		glr.setPerpendicularDistance(0.);
 //		glr.setModel(model);
-		GroupLocalisation groupLocalisation = new GroupLocalisation(groupDataUnit, glr);
-		
+		HyperbolicGroupLocalisation groupLocalisation = new HyperbolicGroupLocalisation(groupDataUnit, glr);
+		groupLocalisation.setPosVec(posVec);
+
 		return groupLocalisation;
 		
 	}
@@ -581,7 +602,8 @@ public class HyperbolicLocaliser extends TOADBaseAlgorithm {
 		return new Chi2Data(chiTot, nGood-2);
 	}
 
-	private GroupLocalisation processTOADs3D(PamDataUnit groupDataUnit, SnapshotGeometry geometry, TOADInformation toadInformation) {
+	private HyperbolicGroupLocalisation processTOADs3D(PamDataUnit groupDataUnit, SnapshotGeometry geometry, TOADInformation toadInformation) {
+
 		// follow formulation in http://ieeexplore.ieee.org/document/4418389/#full-text-section
 
 //		for (int i = 0; i < delays.length; i++) {
@@ -703,6 +725,7 @@ public class HyperbolicLocaliser extends TOADBaseAlgorithm {
 //			System.out.println(e.getMessage());
 //			Matrix m = leftMatrix.transpose();
 //			m = m.inverse();
+			System.out.println("HyperbolicLoclaiser: localisation failed");
 			return null;
 		}
 		// get a chi2 value for this location. 
@@ -720,24 +743,25 @@ public class HyperbolicLocaliser extends TOADBaseAlgorithm {
 //			System.out.printf("Res %d = %3.5f, ", i, answer.get(i,  0));
 //		}
 //		System.out.printf(", Chi2 = %3.1f, p=%3.1f, ndf = %d\n", chiData.getChi2(), cumProb, chiData.getNdf());
+		
 				
-		// error estimation
-		try {
-			/*
-			 * Error estimation based on 
-			 * https://www.math.umd.edu/~petersd/460/linsysterrn.pdf
-			 * 
-			 */
-			double cond1 = leftMatrix.norm1()*leftInverse.norm1();
-			double errorSscale = (rightPlusErrorMatrix.minus(rightMatrix)).norm1();
-			errorSscale *= cond1;
-			errorSscale /= rightMatrix.norm1();
-//			System.out.printf("Error scale = %3.3f\n", errorSscale);
-			
-		}
-		catch (Exception e) {
-			System.out.println("Error in HyperbolicLocaliser.processTOADs3D: " + e.getMessage());
-		}
+//		// error estimation
+//		try {
+//			/*
+//			 * Error estimation based on 
+//			 * https://www.math.umd.edu/~petersd/460/linsysterrn.pdf
+//			 * 
+//			 */
+//			double cond1 = leftMatrix.norm1()*leftInverse.norm1();
+//			double errorSscale = (rightPlusErrorMatrix.minus(rightMatrix)).norm1();
+//			errorSscale *= cond1;
+//			errorSscale /= rightMatrix.norm1();
+//			//System.out.printf("Error scale = %3.3f\n", errorSscale);
+//			
+//		}
+//		catch (Exception e) {
+//			System.out.println("Error in HyperbolicLocaliser.processTOADs3D: " + e.getMessage());
+//		}
 		
 		LatLong pos = geometry.getReferenceGPS().addDistanceMeters(centre.getCoordinate(0)+answer.get(0,0), 
 				centre.getCoordinate(1)+answer.get(1, 0), 
@@ -745,10 +769,101 @@ public class HyperbolicLocaliser extends TOADBaseAlgorithm {
 //		TargetMotionResult tmResult = new TargetMotionResult(geometry.getTimeMilliseconds(), null, pos, 0, 0);
 		GroupLocResult glr = new GroupLocResult(pos, 0, 0);
 		glr.setPerpendicularDistance(0.);
+		glr.setModel(this);
+		int nToads = countUsableTOADS(toadInformation);
+		int nDF = nToads-3;
+		glr.setnDegreesFreedom(nDF);
+		glr.setDim(3);
+		glr.setBeamLatLong(geometry.getReferenceGPS());
+		glr.setBeamTime(groupDataUnit.getTimeMilliseconds());
+		glr.setAic(chiData.getChi2()-6);
 //		glr.setModel(model);
-		GroupLocalisation groupLocalisation = new GroupLocalisation(groupDataUnit, glr);
+		HyperbolicGroupLocalisation groupLocalisation = new HyperbolicGroupLocalisation(groupDataUnit, glr);
+		groupLocalisation.setPosVec(posVec);
+		
+		//System.out.println("HyperbolicLoclaiser: Lat long: " + groupLocalisation.getLatLong(0) + "  " + groupLocalisation.hasLocContent(LocContents.HAS_LATLONG) );
+
 		
 		return groupLocalisation;
+	}
+	
+	/**
+	 * Calculate and add the errors in source position. This is achieved by sampling a random number from the time delay error distributions, localising and looking at the distribution 
+	 * in position of localisation results.
+	 * @param loclaisation - the localisation result.  
+	 * @param timeDelays - object containing time delay data. 
+	 * @param hydrophonePos - the hydrophone positions. 
+	 * @param params - hyperbolic params object with settings for error calculations.  
+	 * @return the loclaisation object iwth errors added. 
+	 */
+	public GroupLocResult calcErrors(GroupLocResult loclaisation, PamDataUnit groupDataUnit, SnapshotGeometry geometry, TOADInformation toadInformation,   HyperbolicParams params){
+		 double[] errors = calcErrors( groupDataUnit,  geometry,  toadInformation ,  params);
+		 loclaisation.setError(new SimpleError(errors[0], errors[1], errors[2],geometry.getArrayAngles()[0])); 
+		 return loclaisation; 
+	}
+
+	
+	
+	/**
+	 * Calculate the errors in source position. This is achieved by sampling a random number from the time delay error distributions, localising and looking at the distribution 
+	 * in position of localisation results. 
+	 * @param timeDelays - object containing time delay data. 
+	 * @param hydrophonePos - the hydrophone positions. 
+	 * @param params - hyperbolic params object with settings for error calculations.  
+	 * @return the errors in meters
+	 */
+	public double[] calcErrors(PamDataUnit groupDataUnit, SnapshotGeometry geometry, TOADInformation toadInformation , HyperbolicParams params){
+		
+		Random r = new Random(); 
+		double[][] sourcePositions=new double[params.bootStrapN][3];
+		
+		TOADInformation errToadInformation;
+		HyperbolicGroupLocalisation errLoc;
+		for (int i=0; i<params.bootStrapN; i++){
+			//create new time delays from errors 
+			ArrayList<Double> timeDelaysJitter=new ArrayList<Double>();
+			double error; 
+			
+			errToadInformation = (TOADInformation) toadInformation.clone();
+
+			//generate the new time delay errors. 
+			for (int j=0; j<toadInformation.getToadErrorsSeconds().length ; j++){
+				for (int jj=0; jj<toadInformation.getToadErrorsSeconds()[j].length ; jj++){
+					//generate random Gaussina 
+					error=r.nextGaussian()*toadInformation.getToadErrorsSeconds()[j][jj]; 
+					//				//add cross correlation error
+					//				error=Math.sqrt(Math.pow(error,2)+Math.pow((r.nextGaussian()*this.hyperbolicParams.crossCorrError)/sampleRate,2));
+
+					//now add that error to the time delay
+					errToadInformation.getToadSeconds()[j][jj] = toadInformation.getToadSeconds()[j][jj]+error;
+				}
+			}
+			
+			double[] posVec = null; 
+			switch (geometry.getShape()) {
+			case ArrayManager.ARRAY_TYPE_LINE:
+				//System.out.println("HyperbolicLocaliser: Line");
+				//TODO
+			case ArrayManager.ARRAY_TYPE_PLANE:
+				//System.out.println("HyperbolicLocaliser: Plane");
+				errLoc = processTOADsPlane(groupDataUnit, geometry, toadInformation);
+				posVec = errLoc.getPosVec(); 
+
+			case ArrayManager.ARRAY_TYPE_VOLUME:
+				//System.out.println("HyperbolicLocaliser: Volume");
+
+				errLoc=  processTOADs3D(groupDataUnit, geometry, toadInformation);
+				posVec = errLoc.getPosVec(); 
+
+			}
+			
+			sourcePositions[i]= posVec;
+		}
+		
+		//now take the standard deviation of all the measurements
+		double[] errors=PamArrayUtils.std(sourcePositions); 
+		
+		return errors; 
 	}
 
 	@Override
@@ -799,8 +914,7 @@ public class HyperbolicLocaliser extends TOADBaseAlgorithm {
 	 */
 	@Override
 	public boolean hasParams() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	/* (non-Javadoc)
@@ -811,5 +925,9 @@ public class HyperbolicLocaliser extends TOADBaseAlgorithm {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	
+	
+	
 
 }

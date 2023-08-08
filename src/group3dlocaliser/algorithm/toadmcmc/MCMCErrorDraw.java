@@ -77,7 +77,7 @@ public class MCMCErrorDraw extends EllipseLocErrorDraw {
 			 */
 			Point errorOriginXY=generalProjector.getCoord3d(errorOrigin).getXYPoint();
 
-			g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,  0.1f));
+			g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,  0.05f));
 			g2d.setPaint(ellipseColor.brighter().brighter());
 			
 			PamVector meanLoc = new PamVector(ellipticalErr.getMeanLoc()); 

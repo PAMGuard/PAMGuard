@@ -25,6 +25,7 @@ import group3dlocaliser.algorithm.Chi2Data;
 import group3dlocaliser.algorithm.crossedbearing.CrossedBearingSQLAddon;
 import group3dlocaliser.algorithm.toadbase.TOADBaseAlgorithm;
 import group3dlocaliser.algorithm.toadbase.TOADInformation;
+import group3dlocaliser.grouper.DetectionGroupedSet;
 import pamMaths.PamVector;
 
 public class ToadMCMCLocaliser extends TOADBaseAlgorithm {
@@ -40,6 +41,13 @@ public class ToadMCMCLocaliser extends TOADBaseAlgorithm {
 		super(group3dLocaliser);
 		cpuMCMC = new CPUMonitor();
 
+	}
+	
+	
+	public DetectionGroupedSet preFilterLoc(DetectionGroupedSet preGroups) {
+		
+		
+		return preGroups; 
 	}
 
 	@Override

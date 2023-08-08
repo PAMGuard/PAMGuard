@@ -1,6 +1,5 @@
 package group3dlocaliser.algorithm.toadmcmc;
 
-import Array.SnapshotGeometry;
 import Localiser.algorithms.locErrors.EllipseLocErrorDraw;
 import Localiser.algorithms.locErrors.EllipticalError;
 import Localiser.algorithms.locErrors.LocErrorGraphics;
