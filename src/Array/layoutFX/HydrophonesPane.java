@@ -1,9 +1,11 @@
 package Array.layoutFX;
 
 import Array.Hydrophone;
+import Array.PamArray;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.scene.control.Button;
 import javafx.scene.control.Dialog;
 import javafx.scene.layout.Pane;
 import javafx.scene.control.TableColumn;
@@ -28,6 +30,12 @@ public class HydrophonesPane extends PamBorderPane {
 	static final		String defaulttype = "Unknown";
 	static final double defaultsensitivity = -201; 
 	
+	/**
+	 * Reference to the current array
+	 */
+	protected PamArray currentArray;
+
+
 	/**
 	 * A list of all the current hydrophones. 
 	 */
@@ -59,6 +67,10 @@ public class HydrophonesPane extends PamBorderPane {
 			pamFlipePane.setAdvPaneContent(hydrophonePane.getContentNode()); 
 			pamFlipePane.setFrontContent(tableArrayPane);
 			
+			pamFlipePane.getFront().setPadding(new Insets(5,5,5,5));
+			
+//			tableArrayPane.setPadding(new Insets(5,5,5,5));
+			
 			//this.setStyle("-fx-background-color: grey;");
 
 			this.setCenter(pamFlipePane);
@@ -70,6 +82,7 @@ public class HydrophonesPane extends PamBorderPane {
 	 *
 	 */
 	class HydrophoneTable extends TableSettingsPane<HydrophoneProperty> {
+
 
 		public HydrophoneTable(ObservableList<HydrophoneProperty> hydrophoneData) {
 			super(hydrophoneData);
@@ -110,7 +123,9 @@ public class HydrophonesPane extends PamBorderPane {
 
 		@Override
 		public void dialogClosed(HydrophoneProperty data) {
-			// TODO Auto-generated method stub	
+			System.out.println("Get hydrophone paramters"); 
+			Hydrophone hydro = hydrophonePane.getParams(data.getHydrophone());
+			data.setHydrophone(hydro);
 		}
 
 		@Override
@@ -126,7 +141,44 @@ public class HydrophonesPane extends PamBorderPane {
 //			setClassifierPane(data);
 			
 			pamFlipePane.getAdvLabel().setText("Hydrophone " +  data.getID().get() + " Settings");
+			
+			hydrophonePane.setParams(data.getHydrophone());
+			
 			pamFlipePane.flipToBack();	
+		}
+		
+		/**
+		 * Set hydrophone pane within hiding pane.
+		 * @param clickTypeProperty
+		 */
+		public void setHydrophonePane(HydrophoneProperty data){
+
+			hydrophonePane.setCurrentArray(getCurrentArray()); 
+			hydrophonePane.setParams(data.getHydrophone());
+
+			//now need to make sure on closing the pane that settings are saved. Need to 
+			//remove the old click type from the list and add new one in the same position. 
+			getFlipPaneCloseButton().setOnAction((action)->{
+				pamFlipePane.flipToFront();
+				
+				Hydrophone hydro = hydrophonePane.getParams(data.getHydrophone());
+				data.setHydrophone(hydro);
+
+				//need to refresh table to show symbol. 
+				this.getTableView().refresh();
+			});
+		}
+
+		private PamArray getCurrentArray() {
+			return currentArray;
+		}
+
+		/**
+		 * Get the button which closes the hiding pane. 
+		 * @return button which closes the hiding pane. 
+		 */
+		public Button getFlipPaneCloseButton() {
+			return pamFlipePane.getBackButton();
 		}
 
 		@Override
@@ -141,6 +193,10 @@ public class HydrophonesPane extends PamBorderPane {
 			null, 0. ));
 		}
 
+	}
+	
+	public void setParams(PamArray currentArray) {
+		this.currentArray=currentArray;
 	}
 
 

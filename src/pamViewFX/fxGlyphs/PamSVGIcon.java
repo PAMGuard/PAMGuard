@@ -63,7 +63,7 @@ public class PamSVGIcon {
 		return instance;
 	}
 
-	public PamSVGIcon create(URL path, Color color) throws Exception {
+	public PamSVGIcon create(URL path, Color color, double lineWidth) throws Exception {
 
 //		System.out.println("Create icon start");
 
@@ -92,7 +92,8 @@ public class PamSVGIcon {
 				if(map.getNamedItem("style") != null) {
 					shape.setStyle(convertStyle(map.getNamedItem("style").getTextContent()));
 				} else {
-					shape.setStyle("-fx-fill: "+col+"; -fx-stroke-width: 2;");
+					shape.setStyle("-fx-fill: "+col+"; -fx-stroke-width: " + lineWidth + ";-fx-stroke: "+col);
+//					shape.setStyle("-fx-fill: "+col+"-fx-stroke: "+col);
 				}
 				shapes.add(shape);
 			} catch (Exception e) {

@@ -33,7 +33,7 @@ import pamViewFX.fxNodes.PamHBox;
  */
 public class ArraySettingsPane extends SettingsPane<PamArray >{
 	
-	private BasicArrayPane basicArrayPane; 
+	private StreamerPane basicArrayPane; 
 	
 	private PamFlipPane mainPane;
 	
@@ -85,12 +85,15 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 	private Pane createArrayPane() {
 		
 		Label arrayLabel = new Label("Array"); 
+		arrayLabel.setPadding(new Insets(5,5,5,5));
 		PamGuiManagerFX.titleFont1style(arrayLabel);
 		
-		basicArrayPane = new BasicArrayPane(); 
+		basicArrayPane = new StreamerPane(); 
 		
 		Label hydrophoneLabel = new Label("Hydrophone"); 
 		PamGuiManagerFX.titleFont1style(hydrophoneLabel);
+		hydrophoneLabel.setPadding(new Insets(5,5,5,5));
+
 		
 		hydrophonePane = new HydrophonesPane(); 
 			
@@ -123,7 +126,7 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 
 	@Override
 	public void setParams(PamArray  input) {
-		// TODO Auto-generated method stub
+		hydrophonePane.setParams(input); 
 		
 	}
 

@@ -50,7 +50,8 @@ public class ModuleIconFactory {
 //			return PamGlyphDude.createModuleGlyph(OctIcon.FILE_BINARY); 
 			return PamGlyphDude.createModuleIcon("mdi2f-file-star-outline"); 
 		case CLICK:
-			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/click.png")));
+//			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/click.png")));
+			return getSVGIcon("/Resources/modules/Click Detector Icon.svg", Color.BLACK, 2);
 		case CLICK_TRAIN:
 			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/clicktrain.png")));
 		case DATABASE:
@@ -79,7 +80,7 @@ public class ModuleIconFactory {
 		case SOUND_AQ:
 			return getSVGIcon("/Resources/modules/noun_Soundwave_1786340.svg");
 		case MATCHED_CLICK_CLASSIFIER:
-			return getSVGIcon("/Resources/modules/matched_click_classifier.svg");
+			return getSVGIcon("/Resources/modules/matched_click_classifier.svg",Color.BLACK, 2);
 			//return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/aquisition.png")));
 		case SOUND_OUTPUT:
 //			return PamGlyphDude.createModuleGlyph(MaterialDesignIcon.HEADPHONES); 
@@ -101,17 +102,28 @@ public class ModuleIconFactory {
 		}
 		return null;
 	}; 
-
+	
 	/**
 	 * Get an SVG icon.
 	 * @param resourcePath - the path from the src folder
 	 * @return a node for the SVG icon. 
 	 */
 	private Node getSVGIcon(String resourcePath) {
+		return getSVGIcon( resourcePath, Color.BLACK, 1);
+	}
+
+	
+
+	/**
+	 * Get an SVG icon.
+	 * @param resourcePath - the path from the src folder
+	 * @return a node for the SVG icon. 
+	 */
+	private Node getSVGIcon(String resourcePath, Color colour, double lineWidth) {
 		try {
 			
 			PamSVGIcon iconMaker= new PamSVGIcon(); 
-			PamSVGIcon svgsprite = iconMaker.create(getClass().getResource(resourcePath).toURI().toURL(), Color.BLACK);
+			PamSVGIcon svgsprite = iconMaker.create(getClass().getResource(resourcePath).toURI().toURL(), colour, lineWidth);
 			svgsprite.getSpriteNode().setStyle("-fx-text-color: black");				
 			svgsprite.getSpriteNode().setStyle("-fx-fill: black");
 			svgsprite.setFitHeight(DataModelStyle.iconSize-10);

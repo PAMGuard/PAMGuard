@@ -7,6 +7,7 @@ import javafx.scene.control.Dialog;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.table.TableSettingsPane;
 import javafx.scene.control.TableColumn;
+import javafx.geometry.Insets;
 
 /**
  *  A pane for setting up hydrophones. Note that this is entirely separate from PAMGuard so can be used in
@@ -15,17 +16,18 @@ import javafx.scene.control.TableColumn;
  * @author Jamie Macaulay
  *
  */
-public class BasicArrayPane extends PamBorderPane {
+public class StreamerPane extends PamBorderPane {
 	
 	BasicArrayTable tableArrayPane;
 	
 	ObservableList<StreamerProperty> streamerData = FXCollections.observableArrayList();
 	
 		
-	public BasicArrayPane() {
+	public StreamerPane() {
 		
 		 tableArrayPane = new BasicArrayTable(streamerData); 
 		 
+		 tableArrayPane.setPadding(new Insets(5,5,5,5));
 		 this.setCenter(tableArrayPane);
 		
 	}

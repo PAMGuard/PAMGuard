@@ -18,11 +18,27 @@ public class HydrophoneProperty {
 	SimpleDoubleProperty y = new SimpleDoubleProperty(); 
 
 	SimpleDoubleProperty z = new SimpleDoubleProperty(); 
+	
+	SimpleDoubleProperty xErr = new SimpleDoubleProperty(); 
+	
+	SimpleDoubleProperty yErr = new SimpleDoubleProperty(); 
 
-	SimpleIntegerProperty id = new SimpleIntegerProperty(); 
+	SimpleDoubleProperty zErr = new SimpleDoubleProperty(); 
+
+	SimpleIntegerProperty id = new SimpleIntegerProperty();
+
+	private Hydrophone hydrophone; 
 
 	public HydrophoneProperty(Hydrophone hydrophone) {
-		hydrophone.getCoordinateError(0);
+		setHydrophone(hydrophone);
+	}
+	
+	public void setHydrophone(Hydrophone hydrophone) {
+		this.hydrophone = hydrophone;
+		x .set(hydrophone.getX());
+		y .set(hydrophone.getY());
+		z .set(hydrophone.getZ());
+		id.set(hydrophone.getStreamerId());
 	}
 
 	/**
@@ -51,6 +67,10 @@ public class HydrophoneProperty {
 
 	public SimpleIntegerProperty getID() {
 		return id;
+	}
+
+	public Hydrophone getHydrophone() {
+		return hydrophone;
 	}
 
 }
