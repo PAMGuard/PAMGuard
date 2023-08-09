@@ -87,7 +87,7 @@ public class MLExportOverlayMenu extends ExportOverlayMenu {
 				PamSVGIcon svgIconMaker = new PamSVGIcon();
 
 			    
-				svgsprite = svgIconMaker.create(getClass().getResource("/Resources/matlab_icon2.svg").toURI().toURL(), Color.WHITE);
+				svgsprite = svgIconMaker.create(getClass().getResource("/Resources/matlab_icon2.svg").toURI().toURL(), Color.WHITE, 1);
 //						"-fx-fill: white; -fx-stroke-width: 2;");
 				svgsprite.setFitHeight(standardIconSize+7);
 				svgsprite.setFitWidth(standardIconSize+7);		

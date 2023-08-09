@@ -1,12 +1,12 @@
 package group3dlocaliser.algorithm.crossedbearing;
 
 import java.awt.Window;
-import java.util.List;
+import java.io.Serializable;
 
 import Array.ArrayManager;
 import Localiser.LocaliserPane;
 import Localiser.detectionGroupLocaliser.DetectionGroupOptions;
-import Localiser.detectionGroupLocaliser.GroupLocalisation;
+import PamController.SettingsPane;
 import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamDetection.LocalisationInfo;
@@ -17,17 +17,18 @@ import annotation.localise.targetmotion.TMAnnotation;
 import annotation.localise.targetmotion.TMAnnotationOptions;
 import annotation.localise.targetmotion.TMAnnotationType;
 import generalDatabase.SQLLoggingAddon;
-import group3dlocaliser.GroupLocDataUnit;
 import group3dlocaliser.algorithm.LocaliserAlgorithm3D;
 import group3dlocaliser.algorithm.LocaliserAlgorithmParams;
 
-public class CrossedBearingGroupLocaliser extends LocaliserAlgorithm3D{
+public class CrossedBearingGroupLocaliser extends LocaliserAlgorithm3D {
 
 	private double sampleRate;
 	
 	private TMAnnotationType tmAnnotationType;
 	
 	private LocContents locContents = new LocContents(LocContents.HAS_BEARING);
+
+	private CrossedBearingPane crossedBearingPane;
 
 	public CrossedBearingGroupLocaliser() {
 		tmAnnotationType = new TMAnnotationType();
@@ -124,9 +125,11 @@ public class CrossedBearingGroupLocaliser extends LocaliserAlgorithm3D{
 	 * @see Localiser.LocaliserModel#getSettingsPane()
 	 */
 	@Override
-	public LocaliserPane<?> getSettingsPane() {
-		// TODO Auto-generated method stub
-		return null;
+	public LocaliserPane<Serializable> getAlgorithmSettingsPane() {
+		if (crossedBearingPane == null) {
+			crossedBearingPane = new CrossedBearingPane(); 
+		}
+		return crossedBearingPane;
 	}
 
 	/* (non-Javadoc)
@@ -145,27 +148,39 @@ public class CrossedBearingGroupLocaliser extends LocaliserAlgorithm3D{
 		// TODO Auto-generated method stub
 		
 	}
+	
+	
+	public class CrossedBearingPane extends LocaliserPane<Serializable> {
 
-	/* (non-Javadoc)
-	 * @see group3dlocaliser.algorithm.LocaliserAlgorithmProvider#showAlgorithmDialog(java.awt.Window, group3dlocaliser.algorithm.LocaliserAlgorithmParams)
-	 */
-	@Override
-	public LocaliserAlgorithmParams showAlgorithmDialog(Window parent, LocaliserAlgorithmParams currentParams) {
-		
-		if (currentParams != null && currentParams.getAlgorithmParameters() instanceof TMAnnotationOptions) {
-			TMAnnotationOptions p = (TMAnnotationOptions) currentParams.getAlgorithmParameters();
-			this.setTmAnnotationOptions(p);
-		}
-		
-//		AnnotationSettingsPanel settingsPanel = cbLocaliser.getTmAnnotationType().getSettingsPanel();
-		boolean asd = AnnotationSettingsDialog.showDialog(parent, this.getTmAnnotationType());
-		if (asd) {
-			return new LocaliserAlgorithmParams(this.getTmAnnotationOptions());
-		}
-		else {
+		@Override
+		public SettingsPane<Serializable> getSettingsPane() {
+			// TODO Auto-generated method stub
 			return null;
 		}
+		
+		/* (non-Javadoc)
+		 * @see group3dlocaliser.algorithm.LocaliserAlgorithmProvider#showAlgorithmDialog(java.awt.Window, group3dlocaliser.algorithm.LocaliserAlgorithmParams)
+		 */
+		public LocaliserAlgorithmParams showAlgorithmDialog(Window parent, LocaliserAlgorithmParams currentParams) {
+			
+			if (currentParams != null && currentParams.getAlgorithmParameters() instanceof TMAnnotationOptions) {
+				TMAnnotationOptions p = (TMAnnotationOptions) currentParams.getAlgorithmParameters();
+				setTmAnnotationOptions(p);
+			}
+			
+//			AnnotationSettingsPanel settingsPanel = cbLocaliser.getTmAnnotationType().getSettingsPanel();
+			boolean asd = AnnotationSettingsDialog.showDialog(parent, getTmAnnotationType());
+			if (asd) {
+				return new LocaliserAlgorithmParams(getTmAnnotationOptions());
+			}
+			else {
+				return null;
+			}
+		}
+		
 	}
+
+	
 
 	@Override
 	public boolean canLocalise(PamDataBlock pamDataBlock) {

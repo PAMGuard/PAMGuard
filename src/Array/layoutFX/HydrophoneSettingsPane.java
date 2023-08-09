@@ -1,7 +1,5 @@
 package Array.layoutFX;
 
-import javax.swing.JOptionPane;
-
 import Array.Hydrophone;
 import PamController.SettingsPane;
 import javafx.scene.Node;

@@ -37,7 +37,7 @@ public interface LocaliserModel<T extends PamDataUnit> {
 	 * Get the settings pane for the localiser. Allows users to change localiser settings.
 	 * @return the settings pane for the localiser. 
 	 */
-	public LocaliserPane<?> getSettingsPane(); 
+	public LocaliserPane<?> getAlgorithmSettingsPane(); 
 
 
 	/**

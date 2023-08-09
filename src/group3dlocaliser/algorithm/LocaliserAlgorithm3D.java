@@ -1,14 +1,17 @@
 package group3dlocaliser.algorithm;
 
 import java.awt.Window;
+import java.io.Serializable;
 
 import Array.ArrayManager;
 import Localiser.LocaliserModel;
+import Localiser.LocaliserPane;
 import PamController.SettingsPane;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.superdet.SuperDetection;
 import generalDatabase.SQLLoggingAddon;
+import group3dlocaliser.ToadManagedSettingsPane;
 import group3dlocaliser.grouper.DetectionGroupedSet;
 import pamViewFX.fxNodes.pamDialogFX.ManagedSettingsPane;
 
@@ -40,19 +43,25 @@ abstract public class LocaliserAlgorithm3D implements LocaliserModel<PamDataUnit
 		return preGroups; 
 	}
 	
-	/**
-	 * Configure parameters for this algorithm. Show a dialog with 
-	 * anything you want ...
-	 * <br>This may be Swing or FX for compatibility with old code. 
-	 * @param parent parent frame / window, etc. 
-	 * @param currentParams current algorithm params. These may be null
-	 * the first time this gets called, so prepare for this and create new as 
-	 * required
-	 * @return null if the dialog cancelled, a new params object otherwise. 
-	 */
-	public LocaliserAlgorithmParams showAlgorithmDialog(Window parent, LocaliserAlgorithmParams currentParams) {
-		return null;
+//	/**
+//	 * Configure parameters for this algorithm. Show a dialog with 
+//	 * anything you want ...
+//	 * <br>This may be Swing or FX for compatibility with old code. 
+//	 * @param parent parent frame / window, etc. 
+//	 * @param currentParams current algorithm params. These may be null
+//	 * the first time this gets called, so prepare for this and create new as 
+//	 * required
+//	 * @return null if the dialog cancelled, a new params object otherwise. 
+//	 */
+//	public LocaliserAlgorithmParams showAlgorithmDialog(Window parent, LocaliserAlgorithmParams currentParams) {
+//		return null;
+//	}
+	
+	@Override
+	public LocaliserPane<Serializable> getAlgorithmSettingsPane(){
+		return null; 
 	}
+
 	
 	/**
 	 * Get a source settings pane. This will be inserted into the dialog beneath where the 
@@ -62,7 +71,7 @@ abstract public class LocaliserAlgorithm3D implements LocaliserModel<PamDataUnit
 	 * @param parent
 	 * @return Pane to insert into the main 3D localiser dialog. 
 	 */
-	public ManagedSettingsPane<?> getSourceSettingsPane(Window parent, PamDataBlock<?> detectionSource) {
+	public ToadManagedSettingsPane<Serializable> getSourceSettingsPane(Window parent, PamDataBlock<?> detectionSource) {
 		return null;
 	}
 	

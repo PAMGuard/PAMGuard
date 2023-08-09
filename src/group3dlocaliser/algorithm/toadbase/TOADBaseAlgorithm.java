@@ -3,7 +3,6 @@ package group3dlocaliser.algorithm.toadbase;
 import java.awt.Window;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import Acquisition.AcquisitionControl;
@@ -18,11 +17,8 @@ import Localiser.detectionGroupLocaliser.DetectionGroupOptions;
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
-import PamController.SettingsNameProvider;
-import PamController.SettingsPane;
 import PamDetection.AbstractLocalisation;
 import PamUtils.PamUtils;
-import PamUtils.complex.ComplexArray;
 import PamguardMVC.FFTDataHolder;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
@@ -32,7 +28,6 @@ import PamguardMVC.toad.GenericTOADCalculator;
 import PamguardMVC.toad.TOADCalculator;
 import fftManager.FFTDataUnit;
 import group3dlocaliser.Group3DLocaliserControl;
-import group3dlocaliser.Group3DParams;
 import group3dlocaliser.ToadManagedSettingsPane;
 import group3dlocaliser.algorithm.Chi2Data;
 import group3dlocaliser.algorithm.FitTestValue;
@@ -56,6 +51,8 @@ abstract public class TOADBaseAlgorithm extends LocaliserAlgorithm3D {
 	private TOADBaseParams toadBaseParams = new TOADBaseParams();
 
 	private Group3DLocaliserControl group3dLocaliser;
+
+	private TOADSettingsPaneWithChannels tspwc;
 	
 	private static double halflog2pi = Math.log(2.*Math.PI)/2.;
 
@@ -633,23 +630,22 @@ abstract public class TOADBaseAlgorithm extends LocaliserAlgorithm3D {
 	 * @see group3dlocaliser.algorithm.LocaliserAlgorithm3D#getSourceSettingsPane(java.awt.Window)
 	 */
 	@Override
-	public ToadManagedSettingsPane<?> getSourceSettingsPane(Window parent, PamDataBlock<?> detectionSource) {
+	public ToadManagedSettingsPane<Serializable> getSourceSettingsPane(Window parent, PamDataBlock<?> detectionSource) {
 		//		return new TOADSourcePane(parent);
 		//		return toadCalculator.getSettingsPane();
-		if (toadCalculator != null) {
+		if (toadCalculator != null && tspwc == null) {
 			/*
 			 *  this gets the algorithm specific settings pane. We want to tab
 			 *  this with a channel panel. 
 			 */
-			ManagedSettingsPane<?> toadPane = toadCalculator.getSettingsPane(parent, detectionSource);
-			TOADSettingsPaneWithChannels<?> tspwc = new TOADSettingsPaneWithChannels<>(parent, this, toadPane);
+			ManagedSettingsPane<?> toadPane =  toadCalculator.getSettingsPane(parent, detectionSource);
+			tspwc = new TOADSettingsPaneWithChannels(parent, this, toadPane);
 			tspwc.getChannelPanel().setMultiColumn(true);
 			tspwc.getChannelPanel().setAvailableChannels(detectionSource.getChannelMap());
 			return tspwc;
 		}
-		else {
-			return null;
-		}
+		return tspwc;
+
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package group3dlocaliser.algorithm.toadsimplex;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -27,6 +28,7 @@ import PamguardMVC.PamDataUnit;
 import generalDatabase.SQLLoggingAddon;
 import group3dlocaliser.Group3DLocaliserControl;
 import group3dlocaliser.algorithm.Chi2Data;
+import group3dlocaliser.algorithm.LocaliserAlgorithmParams;
 import group3dlocaliser.algorithm.LogLikelihoodData;
 import group3dlocaliser.algorithm.crossedbearing.CrossedBearingSQLAddon;
 import group3dlocaliser.algorithm.toadbase.TOADBaseAlgorithm;
@@ -441,7 +443,7 @@ public class ToadSimplexLocaliser extends TOADBaseAlgorithm {
 	 * @see Localiser.LocaliserModel#getSettingsPane()
 	 */
 	@Override
-	public LocaliserPane<?> getSettingsPane() {
+	public LocaliserPane<Serializable> getAlgorithmSettingsPane() {
 		// TODO Auto-generated method stub
 		return null;
 	}

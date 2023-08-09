@@ -1,6 +1,7 @@
 package PamguardMVC.toad;
 
 import java.awt.Window;
+import java.io.Serializable;
 import java.util.List;
 
 import Array.SnapshotGeometry;

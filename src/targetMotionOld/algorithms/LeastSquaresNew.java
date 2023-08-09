@@ -78,8 +78,8 @@ public class LeastSquaresNew<T extends GroupDetection> extends AbstractTargetMot
 	}
 
 	@Override
-	public LocaliserPane<?> getSettingsPane() {
-		return detectionGroupLocaliser.getSettingsPane();
+	public LocaliserPane<?> getAlgorithmSettingsPane() {
+		return detectionGroupLocaliser.getAlgorithmSettingsPane();
 	}
 
 	@Override

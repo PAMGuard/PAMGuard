@@ -1,5 +1,6 @@
 package group3dlocaliser.algorithm.toadmcmc;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
@@ -17,11 +18,11 @@ import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamUtils.CPUMonitor;
 import PamUtils.LatLong;
-import PamUtils.PamArrayUtils;
 import PamguardMVC.PamDataUnit;
 import generalDatabase.SQLLoggingAddon;
 import group3dlocaliser.Group3DLocaliserControl;
 import group3dlocaliser.algorithm.Chi2Data;
+import group3dlocaliser.algorithm.LocaliserAlgorithmParams;
 import group3dlocaliser.algorithm.crossedbearing.CrossedBearingSQLAddon;
 import group3dlocaliser.algorithm.toadbase.TOADBaseAlgorithm;
 import group3dlocaliser.algorithm.toadbase.TOADInformation;
@@ -58,7 +59,6 @@ public class ToadMCMCLocaliser extends TOADBaseAlgorithm {
 
 	@Override
 	public String getToolTipText() {
-		// TODO Auto-generated method stub
 		return "Time delay of arrival Markov chain Monte Carlo (MCMC) based localisation Computationaly very slow but less prone to runaway and calculates more accurate error distributions" ;
 	}
 
@@ -69,7 +69,7 @@ public class ToadMCMCLocaliser extends TOADBaseAlgorithm {
 	}
 
 	@Override
-	public LocaliserPane<?> getSettingsPane() {
+	public LocaliserPane<Serializable> getAlgorithmSettingsPane() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -84,6 +84,7 @@ public class ToadMCMCLocaliser extends TOADBaseAlgorithm {
 		// TODO Auto-generated method stub
 	}
 	
+
 
 	@Override
 	public AbstractLocalisation processTOADs(PamDataUnit groupDataUnit, SnapshotGeometry geometry,
@@ -206,3 +207,4 @@ public class ToadMCMCLocaliser extends TOADBaseAlgorithm {
 	
 
 }
+

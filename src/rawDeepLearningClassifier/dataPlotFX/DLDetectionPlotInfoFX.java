@@ -47,7 +47,7 @@ public class DLDetectionPlotInfoFX extends RawClipDataInfo {
 		try {
 			PamSVGIcon iconMaker= new PamSVGIcon(); 
 			//PamSVGIcon svgsprite = iconMaker.create(new File(getClass().getResource(resourcePath).toURI()), Color.WHITE);
-			PamSVGIcon svgsprite = iconMaker.create(getClass().getResource(resourcePath).toURI().toURL(), Color.WHITE);
+			PamSVGIcon svgsprite = iconMaker.create(getClass().getResource(resourcePath).toURI().toURL(), Color.WHITE,1);
 			 
 //			svgsprite.getSpriteNode().setStyle("-fx-text-color: white");				
 //			svgsprite.getSpriteNode().setStyle("-fx-fill: white");

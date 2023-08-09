@@ -52,6 +52,7 @@ public class TOADSettingsPaneWithChannels<T> extends ToadManagedSettingsPane<T> 
 	@Override
 	public boolean useParams(T newParams) {
 		int chMap = channelPanel.getChannelMap();
+		System.out.println("Get channel map: " +  chMap);
 		toadBaseAlgorithm.getToadBaseParams().setChannelBitmap(chMap);
 		int nSelChannels = PamUtils.getNumChannels(chMap);
 		if (nSelChannels < 3) {

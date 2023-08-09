@@ -73,7 +73,7 @@ public class RExportOverlayMenu extends ExportOverlayMenu {
 
 			PamSVGIcon svgIconMaker = new PamSVGIcon();
 
-			svgsprite = svgIconMaker.create(getClass().getResource("/Resources/r-project.svg").toURI().toURL(), Color.WHITE);
+			svgsprite = svgIconMaker.create(getClass().getResource("/Resources/r-project.svg").toURI().toURL(), Color.WHITE, 1);
 
 //			svgsprite = PamSVGIcon.create(new File(getClass().getResource("/Resources/r-project.svg").toURI()), 
 //					 "-fx-fill: white; -fx-stroke-width: 2;");
