@@ -33,7 +33,7 @@ import pamViewFX.fxNodes.PamHBox;
  */
 public class ArraySettingsPane extends SettingsPane<PamArray >{
 	
-	private StreamerPane basicArrayPane; 
+	private StreamerPane streamerPane; 
 	
 	private PamFlipPane mainPane;
 	
@@ -88,7 +88,7 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 		arrayLabel.setPadding(new Insets(5,5,5,5));
 		PamGuiManagerFX.titleFont1style(arrayLabel);
 		
-		basicArrayPane = new StreamerPane(); 
+		streamerPane = new StreamerPane(); 
 		
 		Label hydrophoneLabel = new Label("Hydrophone"); 
 		PamGuiManagerFX.titleFont1style(hydrophoneLabel);
@@ -111,7 +111,7 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 		PamVBox vBox = new PamVBox(); 
 		
 		vBox.setSpacing(5);
-		vBox.getChildren().addAll(arrayLabel, basicArrayPane, hydrophoneLabel,
+		vBox.getChildren().addAll(arrayLabel, streamerPane, hydrophoneLabel,
 				hydrophonePane, advancedPane); 
 
 		return vBox; 
@@ -126,8 +126,9 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 
 	@Override
 	public void setParams(PamArray  input) {
+		System.out.println("Hydrophone array is: "+ input); 
 		hydrophonePane.setParams(input); 
-		
+		streamerPane.setParams(input); 
 	}
 
 	@Override

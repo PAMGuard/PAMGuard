@@ -1,5 +1,6 @@
 package group3dlocaliser.algorithm.hyperbolic;
 
+import java.awt.Window;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,6 +16,7 @@ import Localiser.LocaliserPane;
 import Localiser.algorithms.locErrors.SimpleError;
 import Localiser.detectionGroupLocaliser.GroupLocResult;
 import Localiser.detectionGroupLocaliser.GroupLocalisation;
+import PamController.SettingsPane;
 import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamUtils.LatLong;
@@ -47,15 +49,22 @@ public class HyperbolicLocaliser extends TOADBaseAlgorithm {
 	private double[] lastPosVector;
 	private LocContents locContents = new LocContents(0);
 	
-	private HyperbolicParams params = new HyperbolicParams(); 
+	private HyperbolicParams params = new HyperbolicParams();
+	private HyperbolicLocaliserPane hyperbolicLocaliserPane;
+	
 
 	public HyperbolicLocaliser(Group3DLocaliserControl group3dLocaliser) {
 		super(group3dLocaliser);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public AbstractLocalisation processTOADs(PamDataUnit groupDataUnit, SnapshotGeometry geometry, TOADInformation toadInformation) {
+
+		
+		/**
+		 * This module is a little odd in that it stores paramters for each algorithm in it's own has table without acc
+		 */
+		params = (HyperbolicParams) group3dLocaliser.getLocaliserAlgorithmParams(this).getAlgorithmParameters();
 
 		
 		int shape = geometry.getShape();
@@ -907,8 +916,11 @@ public class HyperbolicLocaliser extends TOADBaseAlgorithm {
 	 * @see Localiser.LocaliserModel#getSettingsPane()
 	 */
 	@Override
-	public LocaliserPane<Serializable> getAlgorithmSettingsPane() {
-		return null;
+	public LocaliserPane getAlgorithmSettingsPane() {
+		if (hyperbolicLocaliserPane == null) {
+			hyperbolicLocaliserPane= new HyperbolicLocaliserPane(); 
+		}
+		return hyperbolicLocaliserPane;
 	}
 
 	/* (non-Javadoc)
@@ -928,7 +940,25 @@ public class HyperbolicLocaliser extends TOADBaseAlgorithm {
 		
 	}
 	
-	
+	public class  HyperbolicLocaliserPane extends LocaliserPane<HyperbolicParams> {
+		
+		private HyperbolicSettingsPane hyperBolicSettingsPane;
+
+		public HyperbolicLocaliserPane() {
+			hyperBolicSettingsPane = new HyperbolicSettingsPane(); 
+		}
+
+		@Override
+		public SettingsPane getSettingsPane() {
+			return hyperBolicSettingsPane;
+		}
+
+		@Override
+		public LocaliserAlgorithmParams showAlgorithmDialog(Window awtWindow, LocaliserAlgorithmParams algorithmPaams) {
+			return null;
+		}
+		
+	}
 	
 	
 

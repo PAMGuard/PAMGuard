@@ -14,7 +14,8 @@ public enum DefaultHydrophone {
 	 * The name of the hydrophones.
 	 */
 	private String name;
-	
+
+
 	/**
 	 * The sensitivity of the hydrophone in dB re 1V/uPa. 
 	 */
@@ -38,5 +39,20 @@ public enum DefaultHydrophone {
 		
 	}
 	
+	/**
+	 * The sensitivity of the hydrophone in dB re 1V/uPa. 
+	 */
+	public double getSens() {
+		return sens;
+	}
+
+
+	/**
+	 * The gain in dB. 
+	 */
+	public double getGain() {
+		return gain;
+	}
+
 
 }

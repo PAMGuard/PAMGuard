@@ -1,5 +1,6 @@
 package Array.layoutFX;
 
+import Array.PamArray;
 import Array.Streamer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,8 +22,9 @@ public class StreamerPane extends PamBorderPane {
 	BasicArrayTable tableArrayPane;
 	
 	ObservableList<StreamerProperty> streamerData = FXCollections.observableArrayList();
+
+	private PamArray currentArray;
 	
-		
 	public StreamerPane() {
 		
 		 tableArrayPane = new BasicArrayTable(streamerData); 
@@ -106,6 +108,10 @@ public class StreamerPane extends PamBorderPane {
 			return new StreamerProperty(new Streamer(1, 0.,0.,0.,0.,0.,0.));
 		}
 
+	}
+	
+	public void setParams(PamArray currentArray) {
+		this.currentArray=currentArray;
 	}
 
 

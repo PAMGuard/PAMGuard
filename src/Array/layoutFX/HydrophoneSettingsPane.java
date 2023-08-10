@@ -17,7 +17,7 @@ import javafx.scene.layout.Pane;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.PamGridPane;
-
+import pamViewFX.fxNodes.PamSpinner;
 import pamViewFX.validator.PamValidator;
 
 /**
@@ -61,8 +61,8 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 	private TextField xPosErr;
 	private TextField zPosErr;
 
-	private TextField hSens;
-	private TextField preampGain;
+	private PamSpinner<Double> hSens;
+	private PamSpinner<Double> preampGain;
 
 	private ComboBox<String> streamers;
 	private ChoiceBox<DefaultHydrophone> defaultArrays;
@@ -92,9 +92,7 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 
 	private InterpSettingsPane interpPane;
 
-	private ComboBox<DefaultHydrophone> defaultHydro;
-
-
+	private ComboBox<String> defaultHydro;
 
 	//create the dialog
 	public HydrophoneSettingsPane() {
@@ -228,13 +226,33 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 		gridy++;
 		mainControls.add(recieverTypeLabel = new Label(""), 0, gridy);
 		recieverTypeLabel.setAlignment(Pos.CENTER_RIGHT);
-		defaultHydro = new ComboBox<DefaultHydrophone>(); 
+		defaultHydro = new ComboBox<String>(); 
+		
+		for (int i=0; i<DefaultHydrophone.values().length; i++) {
+			defaultHydro.getItems().add(DefaultHydrophone.values()[i].toString()); 
+		}
+		defaultHydro.getItems().add(0, "User defined"); 
+		defaultHydro.getSelectionModel().select(0);
+		
+		defaultHydro.setOnAction((action)->{
+			if (defaultHydro.getSelectionModel().getSelectedIndex() == 0) {
+				//do nothing.
+			}
+			hSens.getValueFactory().setValue(Double.valueOf(DefaultHydrophone.values()[defaultHydro.getSelectionModel().getSelectedIndex()-1].getSens()));
+			preampGain.getValueFactory().setValue(Double.valueOf(DefaultHydrophone.values()[defaultHydro.getSelectionModel().getSelectedIndex()-1].getGain()));
+		});
+	
 		mainControls.add(defaultHydro, 1, gridy);
 
 		gridy++;
 		mainControls.add(recieverSensLabel = new Label(""), 0, gridy);
 		recieverSensLabel.setAlignment(Pos.CENTER_RIGHT);
-		hSens = new TextField(); 
+		hSens = new PamSpinner<Double>(); 
+		
+		hSens.valueProperty().addListener((obs, oldval, newVal)->{
+			defaultHydro.getSelectionModel().select(0);
+		});
+
 		mainControls.add(hSens, 1, gridy);
 		mainControls.add(dBSensLabel  = new Label(""), 2, gridy);
 
@@ -243,7 +261,11 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 		Label preAmpLabel = new Label("Preamplifier gain");
 		mainControls.add(preAmpLabel, 0, gridy);
 		preAmpLabel.setAlignment(Pos.CENTER_RIGHT);
-		preampGain = new TextField(); 
+		preampGain =new PamSpinner<Double>(); 
+		preampGain.valueProperty().addListener((obs, oldval, newVal)->{
+			defaultHydro.getSelectionModel().select(0);
+		});
+		
 		mainControls.add(preampGain, 1, gridy);
 		mainControls.add(new Label("dB"), 2, gridy);
 
@@ -396,9 +418,8 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 		}
 		
 		//hydrophone stuff
-		hSens.setText(String.format("%.1f", hydrophone.getSensitivity()-PamController.getInstance().getGlobalMediumManager().getdBSensOffset()));
-		preampGain.setText(String.format("%.1f", hydrophone.getPreampGain()));
-		
+		hSens.getValueFactory().setValue(hydrophone.getSensitivity()-PamController.getInstance().getGlobalMediumManager().getdBSensOffset());
+		preampGain.getValueFactory().setValue(hydrophone.getPreampGain());
 		
 		double zCoeff = PamController.getInstance().getGlobalMediumManager().getZCoeff(); 
 		setCoordsText(); 
@@ -423,8 +444,8 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 			//hydrophone.setType(type.getText());
 			
 			hydrophone.setStreamerId(streamers.getSelectionModel().getSelectedIndex());
-			hydrophone.setSensitivity(Double.valueOf(hSens.getText())+PamController.getInstance().getGlobalMediumManager().getdBSensOffset());
-			hydrophone.setPreampGain(Double.valueOf(preampGain.getText()));
+			hydrophone.setSensitivity(hSens.getValue()+PamController.getInstance().getGlobalMediumManager().getdBSensOffset());
+			hydrophone.setPreampGain(preampGain.getValue());
 //			double[] bw = new double[2];
 				//				bw[0] = Double.valueOf(bandwidth0.getText());
 				//				bw[1] = Double.valueOf(bandwidth1.getText());

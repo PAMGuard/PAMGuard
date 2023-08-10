@@ -50,7 +50,7 @@ abstract public class TOADBaseAlgorithm extends LocaliserAlgorithm3D {
 
 	private TOADBaseParams toadBaseParams = new TOADBaseParams();
 
-	private Group3DLocaliserControl group3dLocaliser;
+	protected Group3DLocaliserControl group3dLocaliser;
 
 	private TOADSettingsPaneWithChannels tspwc;
 	

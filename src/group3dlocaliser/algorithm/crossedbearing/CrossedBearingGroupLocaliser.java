@@ -19,6 +19,15 @@ import annotation.localise.targetmotion.TMAnnotationType;
 import generalDatabase.SQLLoggingAddon;
 import group3dlocaliser.algorithm.LocaliserAlgorithm3D;
 import group3dlocaliser.algorithm.LocaliserAlgorithmParams;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
+import pamViewFX.PamGuiManagerFX;
+import pamViewFX.fxGlyphs.PamGlyphDude;
+import pamViewFX.fxNodes.PamButton;
+import pamViewFX.fxNodes.PamHBox;
 
 public class CrossedBearingGroupLocaliser extends LocaliserAlgorithm3D {
 
@@ -152,11 +161,56 @@ public class CrossedBearingGroupLocaliser extends LocaliserAlgorithm3D {
 	
 	public class CrossedBearingPane extends LocaliserPane<Serializable> {
 
-		@Override
-		public SettingsPane<Serializable> getSettingsPane() {
-			// TODO Auto-generated method stub
-			return null;
+
+		public CrossedBearingPane() {
+				PamHBox hBox = new PamHBox(); 
+				hBox.setSpacing(5);
+				hBox.setAlignment(Pos.CENTER);
+				hBox.setPadding(new Insets(5,5,5,5));
+				
+				PamButton algoOptsButton = new PamButton("",PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconSize));
+				algoOptsButton.setOnAction((action)->{
+					moreAlgorithmOptions() ;
+				});
+				algoOptsButton.setTooltip(new Tooltip("More Algorithm Options ..."));
+				
+				hBox.getChildren().addAll(new Label(localiserAlgorithm.getName() + " settings"), algoOptsButton); 
+				
+				
+				mainPane = new PamBordepPane(); 
+				mainPane.setCenter
+	
+			
+			
 		}
+		
+		/**
+		 * Handle algorithm options ...
+		 */
+		protected void moreAlgorithmOptions() {
+			String algoName  = getName();
+			if (algoName == null) {
+				return;
+			}
+			LocaliserAlgorithm3D localiserAlgorithm = group3dLocaliserControl.findAlgorithm(algoName);
+			if (localiserAlgorithm == null) {
+				return;
+			}
+			if (localiserAlgorithm.hasParams() == false) {
+				return;
+			}
+			
+			LocaliserAlgorithmParams algorithmPaams = group3dLocaliserControl.getLocaliserAlgorithmParams(localiserAlgorithm);
+			
+			
+			algorithmPaams = showAlgorithmDialog(getAWTWindow(), algorithmPaams);
+			
+			
+			if (algorithmPaams != null) {
+				group3dLocaliserControl.setAlgorithmParams(localiserAlgorithm, algorithmPaams);
+			}
+		}
+		
 		
 		/* (non-Javadoc)
 		 * @see group3dlocaliser.algorithm.LocaliserAlgorithmProvider#showAlgorithmDialog(java.awt.Window, group3dlocaliser.algorithm.LocaliserAlgorithmParams)
@@ -176,6 +230,36 @@ public class CrossedBearingGroupLocaliser extends LocaliserAlgorithm3D {
 			else {
 				return null;
 			}
+		}
+
+		@Override
+		public Serializable getParams(Serializable currParams) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void setParams(Serializable input) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public String getName() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Node getContentNode() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void paneInitialized() {
+			// TODO Auto-generated method stub
+			
 		}
 		
 	}

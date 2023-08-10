@@ -30,6 +30,8 @@ public class ArrayGUIFX extends PamControlledGUIFX {
 		if (arraySettingsPane==null) {
 			arraySettingsPane= new ArraySettingsPane(); 
 		}
+		System.out.println("The current array is "+ arrayManager.getCurrentArray()); 
+		arraySettingsPane.setParams(arrayManager.getCurrentArray());
 		return arraySettingsPane; 
 	}
 	

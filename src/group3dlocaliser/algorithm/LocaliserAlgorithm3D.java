@@ -43,6 +43,18 @@ abstract public class LocaliserAlgorithm3D implements LocaliserModel<PamDataUnit
 		return preGroups; 
 	}
 	
+	
+	/**
+	 * The loclaiser params. The 
+	 * <p>
+	 * 
+	 * Note: the localiser params for each model are stored in 
+	 * @param localiserParams
+	 */
+	public void setLocaliserParams(LocaliserAlgorithmParams localiserParams){
+	}
+
+	
 //	/**
 //	 * Configure parameters for this algorithm. Show a dialog with 
 //	 * anything you want ...
@@ -57,6 +69,11 @@ abstract public class LocaliserAlgorithm3D implements LocaliserModel<PamDataUnit
 //		return null;
 //	}
 	
+	
+	/**
+	 * Get an algorithm specific settings pane. This holds settings which are specific to the 
+	 * localisation algorithm. 
+	 */
 	@Override
 	public LocaliserPane<Serializable> getAlgorithmSettingsPane(){
 		return null; 

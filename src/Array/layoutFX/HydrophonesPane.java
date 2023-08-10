@@ -14,7 +14,8 @@ import pamViewFX.fxNodes.flipPane.PamFlipPane;
 import pamViewFX.fxNodes.table.TableSettingsPane;
 
 /**
- * Table which allows users to add and edit hydrophones. 
+ * Table which allows users to add and edit hydrophones.
+ *  
  * @author Jamie Macaulay
  *
  */
@@ -34,7 +35,6 @@ public class HydrophonesPane extends PamBorderPane {
 	 * Reference to the current array
 	 */
 	protected PamArray currentArray;
-
 
 	/**
 	 * A list of all the current hydrophones. 
@@ -142,6 +142,7 @@ public class HydrophonesPane extends PamBorderPane {
 			
 			pamFlipePane.getAdvLabel().setText("Hydrophone " +  data.getID().get() + " Settings");
 			
+			hydrophonePane.setCurrentArray(currentArray);
 			hydrophonePane.setParams(data.getHydrophone());
 			
 			pamFlipePane.flipToBack();	
@@ -154,6 +155,8 @@ public class HydrophonesPane extends PamBorderPane {
 		public void setHydrophonePane(HydrophoneProperty data){
 
 			hydrophonePane.setCurrentArray(getCurrentArray()); 
+			
+			hydrophonePane.setCurrentArray(currentArray);
 			hydrophonePane.setParams(data.getHydrophone());
 
 			//now need to make sure on closing the pane that settings are saved. Need to 
