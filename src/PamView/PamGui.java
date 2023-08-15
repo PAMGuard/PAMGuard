@@ -234,13 +234,20 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 			boolean posOK = true;
 			try {
 				posOK = ScreenSize.isPointOnScreen(topCorner);
+				// some weird stuff going down whereby the screen position is
+				// given as -8 from the corner where it really it. this can return 
+				// false and then push the display onto a different monitor, so alow for this. 
+				if (posOK == false) {
+					topCorner.x += 10;
+					topCorner.y += 10;
+					posOK = ScreenSize.isPointOnScreen(topCorner);
+				}
 			} catch (Exception e) {
 			}
 			if (!posOK) {
 				// put it in the top corner of the main screen. 
 				guiParameters.bounds.x = guiParameters.bounds.y = 10;
 			}
-				
 
 			frame.setBounds(guiParameters.bounds);
 

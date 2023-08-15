@@ -34,7 +34,7 @@ public class DataSelectDialog extends PamDialog {
 	private static final String helpPoint = "displays.dataselect.docs.selectandsymbol";
 
 	public DataSelectDialog(Window parentFrame, PamDataBlock pamDataBlock, DataSelector dataSelector, PamSymbolChooser symbolChooser) {
-		super(parentFrame, pamDataBlock.getDataName(), false);
+		super(parentFrame, (pamDataBlock==null) ? "Data Selection":pamDataBlock.getDataName(), false);
 		this.dataSelector = dataSelector;
 		this.symbolChooser = symbolChooser;
 		tabPane = new JTabbedPane();
