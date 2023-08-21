@@ -1,41 +1,41 @@
 package group3dlocaliser.algorithm.toadmcmc;
 
-import java.awt.Window;
-
-import Localiser.algorithms.genericLocaliser.MCMC.old.MCMCParams;
-import PamController.SettingsPane;
-import group3dlocaliser.algorithm.LocaliserAlgorithmParams;
+import Localiser.LocaliserPane;
+import Localiser.algorithms.genericLocaliser.MCMC.MCMCParams2;
+import Localiser.controls.MCMCPane;
 import javafx.scene.Node;
+import javafx.scene.layout.Pane;
+import javafx.geometry.Insets;
 
-public class MCMCLoclaiserPane extends SettingsPane<MCMCParams> {
 
-	public MCMCLoclaiserPane(Object ownerWindow) {
-		super(null);
-		// TODO Auto-generated constructor stub
+public class MCMCLoclaiserPane extends LocaliserPane<MCMCParams2> {
+
+	private MCMCPane mainPane;
+
+	public MCMCLoclaiserPane() {
+		mainPane = new MCMCPane(); 
+		((Pane) mainPane.getContentNode()).setPadding(new Insets(5,5,5,5)); 
+	}
+	
+
+	@Override
+	public MCMCParams2 getParams(MCMCParams2 currParams) {
+		return mainPane.getParams(currParams);
 	}
 
 	@Override
-	public MCMCParams getParams(MCMCParams currParams) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setParams(MCMCParams input) {
-		// TODO Auto-generated method stub
-		
+	public void setParams(MCMCParams2 input) {
+		mainPane.setParams(input);
 	}
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "MCMC Settings";
 	}
 
 	@Override
 	public Node getContentNode() {
-		// TODO Auto-generated method stub
-		return null;
+		return mainPane.getContentNode();
 	}
 
 	@Override

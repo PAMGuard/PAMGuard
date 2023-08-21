@@ -1,6 +1,5 @@
 package group3dlocaliser.algorithm.toadmcmc;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
@@ -14,6 +13,7 @@ import Localiser.algorithms.genericLocaliser.MCMC.MCMCResult;
 import Localiser.algorithms.locErrors.EllipticalError;
 import Localiser.detectionGroupLocaliser.GroupLocResult;
 import Localiser.detectionGroupLocaliser.GroupLocalisation;
+import Localiser.algorithms.genericLocaliser.MCMC.MCMCParams2;
 import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamUtils.CPUMonitor;
@@ -24,10 +24,13 @@ import group3dlocaliser.Group3DLocaliserControl;
 import group3dlocaliser.algorithm.Chi2Data;
 import group3dlocaliser.algorithm.LocaliserAlgorithmParams;
 import group3dlocaliser.algorithm.crossedbearing.CrossedBearingSQLAddon;
+import group3dlocaliser.algorithm.hyperbolic.HyperbolicParams;
 import group3dlocaliser.algorithm.toadbase.TOADBaseAlgorithm;
 import group3dlocaliser.algorithm.toadbase.TOADInformation;
 import group3dlocaliser.grouper.DetectionGroupedSet;
 import pamMaths.PamVector;
+
+
 
 public class ToadMCMCLocaliser extends TOADBaseAlgorithm {
 	
@@ -36,7 +39,9 @@ public class ToadMCMCLocaliser extends TOADBaseAlgorithm {
 	/**
 	 * CPU monitor
 	 */
-	private CPUMonitor cpuMCMC; 
+	private CPUMonitor cpuMCMC;
+
+	private MCMCLoclaiserPane mcmcSettingsPane; 
 
 	public ToadMCMCLocaliser(Group3DLocaliserControl group3dLocaliser) {
 		super(group3dLocaliser);
@@ -69,9 +74,11 @@ public class ToadMCMCLocaliser extends TOADBaseAlgorithm {
 	}
 
 	@Override
-	public LocaliserPane<Serializable> getAlgorithmSettingsPane() {
-		// TODO Auto-generated method stub
-		return null;
+	public LocaliserPane getAlgorithmSettingsPane() {
+		if (mcmcSettingsPane==null) {
+			mcmcSettingsPane = new MCMCLoclaiserPane(); 
+		}
+		return mcmcSettingsPane;
 	}
 
 	@Override
@@ -93,6 +100,10 @@ public class ToadMCMCLocaliser extends TOADBaseAlgorithm {
 //		System.out.println("Run MCMC: ------ " + groupDataUnit.getUID()); 
 //		PamArrayUtils.printArray(toadInformation.getToadSeconds());
 		
+		/**
+		 * This module is a little odd in that it stores paramters for each algorithm in it's own has table without acc
+		 */
+		MCMCParams2 params = (MCMCParams2) group3dLocaliser.getLocaliserAlgorithmParams(this).getAlgorithmParameters();
 		
 		cpuMCMC.start();
 		PamVector centre = geometry.getGeometricCentre();
@@ -101,8 +112,12 @@ public class ToadMCMCLocaliser extends TOADBaseAlgorithm {
 		MCMCChi2Function chi2Func =  new MCMCChi2Function(geometry, toadInformation); 
 		mcmc.setChi2(chi2Func);
 		
+		//set the parameters. 
+		mcmc.setSettings(params);
+		
 		//these are the *best results. 
 		ArrayList<MCMCResult> mcmcResult = mcmc.runMCMCAlgorithm(); 
+		
 		
 		
 		GroupLocalisation groupLocalisation = null; 

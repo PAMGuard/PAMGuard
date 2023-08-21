@@ -19,21 +19,14 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.Tooltip;
-import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
-import javafx.geometry.Insets;
-import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
-import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamTabPane;
-import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamTitledBorderPane;
 import pamViewFX.fxNodes.pamDialogFX.ManagedSettingsPane;
 import pamViewFX.fxNodes.pamDialogFX.SwingFXDialogWarning;
@@ -217,9 +210,9 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 			
 			Node settingsPane = null;
 			
-			if (localiserAlgorithm.getAlgorithmSettingsPane().getSettingsPane()!=null) {
+			if (localiserAlgorithm.getAlgorithmSettingsPane()!=null) {
 				//preferentially select FX pane of one exists. 
-				settingsPane = localiserAlgorithm.getAlgorithmSettingsPane().getSettingsPane().getContentNode(); 
+				settingsPane = localiserAlgorithm.getAlgorithmSettingsPane().getContentNode(); 
 			}
 			//there must be a dialog - otherwise what is the point of a settings pane that does nothing - it should be null. 
 //			else  {
@@ -256,7 +249,7 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 				if (settingsPane!=null) {
 					Tab tab = new Tab(localiserAlgorithm.getName()); 
 					tab.setGraphic(PamGlyphDude.createPamIcon("mdi2c-cogs"));
-					tab.setContent(localiserAlgorithm.getAlgorithmSettingsPane().getSettingsPane().getContentNode());
+					tab.setContent(localiserAlgorithm.getAlgorithmSettingsPane().getContentNode());
 					newPane.getTabPane().getTabs().add(tab);
 				}
 				
@@ -323,13 +316,16 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 			
 			LocaliserAlgorithm3D algoProvider = group3dLocaliserControl.findAlgorithm(algorithms.getItems().get(i));
 			
-			LocaliserAlgorithmParams locAlgorithmParams = new LocaliserAlgorithmParams(); 
+			LocaliserAlgorithmParams locAlgorithmParams = currParams.getAlgorithmParams(algoProvider);
 			
 			
-			if (algoProvider.getAlgorithmSettingsPane()!=null && algoProvider.getAlgorithmSettingsPane().getSettingsPane()!=null) {
-				//get the algorithm paramters. 
-				Serializable newAlgorithmParams = algoProvider.getAlgorithmSettingsPane().getSettingsPane().getParams(currParams.getAlgorithmParams(algoProvider).getAlgorithmParameters());
+			if (algoProvider.getAlgorithmSettingsPane()!=null) {
 				
+				//get the algorithm paramters. 
+				Serializable newAlgorithmParams = algoProvider.getAlgorithmSettingsPane().getParams(
+						currParams.getAlgorithmParams(algoProvider) == null? null : currParams.getAlgorithmParams(algoProvider).getAlgorithmParameters());
+				
+				if (locAlgorithmParams==null) locAlgorithmParams = new LocaliserAlgorithmParams(); 
 				locAlgorithmParams.setAlgorithmParameters(newAlgorithmParams);
 				
 				//FIXME - note that, if a swing dialog has been used the algorithms have already been set....not great - want to 
@@ -341,12 +337,18 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 				//get the source pane paramters
 				Serializable newSourceParams = algoProvider.getSourceSettingsPane(null, currSource).getParams(); 
 				
+				if (locAlgorithmParams==null) locAlgorithmParams = new LocaliserAlgorithmParams(); 
 				locAlgorithmParams.setXtraSourceParameters(newSourceParams);
 			}
 			
 
 			//now set the source paramters. 
-			currParams.setAlgorithmParams(algoProvider, currParams.getAlgorithmParams(algoProvider));
+			currParams.setAlgorithmParams(algoProvider, locAlgorithmParams);
+			
+			
+			System.out.println("Get params" + algoProvider.getName() + "  " + currParams.getAlgorithmParams(algoProvider)); 
+
+
 		
 		}
 		
@@ -453,13 +455,15 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 		//been filtered for suitability depending on array geometry. 
 		for (int i=0; i<this.algorithms.getItems().size(); i++) {
 			
+			
 			LocaliserAlgorithm3D algoProvider = group3dLocaliserControl.findAlgorithm(this.algorithms.getItems().get(i));
 			
 			LocaliserAlgorithmParams params = currentParams.getAlgorithmParams(algoProvider); 
 			
-			if (params!=null && algoProvider.getAlgorithmSettingsPane()!=null && algoProvider.getAlgorithmSettingsPane().getSettingsPane()!=null) {
+			System.out.println("Set params for: " + algoProvider.getName() + "  " + params); 
 			
-				algoProvider.getAlgorithmSettingsPane().getSettingsPane().setParams(params.getAlgorithmParameters());
+			if (params!=null && algoProvider.getAlgorithmSettingsPane()!=null)  {
+				algoProvider.getAlgorithmSettingsPane().setParams(params.getAlgorithmParameters());
 			}
 			
 			if (algoProvider.getSourceSettingsPane(null, currSource)!=null) {

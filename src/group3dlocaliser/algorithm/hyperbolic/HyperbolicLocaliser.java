@@ -1,7 +1,5 @@
 package group3dlocaliser.algorithm.hyperbolic;
 
-import java.awt.Window;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -16,7 +14,6 @@ import Localiser.LocaliserPane;
 import Localiser.algorithms.locErrors.SimpleError;
 import Localiser.detectionGroupLocaliser.GroupLocResult;
 import Localiser.detectionGroupLocaliser.GroupLocalisation;
-import PamController.SettingsPane;
 import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamUtils.LatLong;
@@ -25,7 +22,6 @@ import PamguardMVC.PamDataUnit;
 import generalDatabase.SQLLoggingAddon;
 import group3dlocaliser.Group3DLocaliserControl;
 import group3dlocaliser.algorithm.Chi2Data;
-import group3dlocaliser.algorithm.LocaliserAlgorithmParams;
 import group3dlocaliser.algorithm.toadbase.TOADBaseAlgorithm;
 import group3dlocaliser.algorithm.toadbase.TOADInformation;
 import group3dlocaliser.localisation.LinearLocalisation;
@@ -50,7 +46,8 @@ public class HyperbolicLocaliser extends TOADBaseAlgorithm {
 	private LocContents locContents = new LocContents(0);
 	
 	private HyperbolicParams params = new HyperbolicParams();
-	private HyperbolicLocaliserPane hyperbolicLocaliserPane;
+	
+	private HyperbolicSettingsPane hyperbolicLocaliserPane;
 	
 
 	public HyperbolicLocaliser(Group3DLocaliserControl group3dLocaliser) {
@@ -918,7 +915,7 @@ public class HyperbolicLocaliser extends TOADBaseAlgorithm {
 	@Override
 	public LocaliserPane getAlgorithmSettingsPane() {
 		if (hyperbolicLocaliserPane == null) {
-			hyperbolicLocaliserPane= new HyperbolicLocaliserPane(); 
+			hyperbolicLocaliserPane= new HyperbolicSettingsPane(); 
 		}
 		return hyperbolicLocaliserPane;
 	}
@@ -940,26 +937,7 @@ public class HyperbolicLocaliser extends TOADBaseAlgorithm {
 		
 	}
 	
-	public class  HyperbolicLocaliserPane extends LocaliserPane<HyperbolicParams> {
-		
-		private HyperbolicSettingsPane hyperBolicSettingsPane;
 
-		public HyperbolicLocaliserPane() {
-			hyperBolicSettingsPane = new HyperbolicSettingsPane(); 
-		}
-
-		@Override
-		public SettingsPane getSettingsPane() {
-			return hyperBolicSettingsPane;
-		}
-
-		@Override
-		public LocaliserAlgorithmParams showAlgorithmDialog(Window awtWindow, LocaliserAlgorithmParams algorithmPaams) {
-			return null;
-		}
-		
-	}
-	
 	
 
 }

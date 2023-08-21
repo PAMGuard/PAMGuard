@@ -1,5 +1,6 @@
 package group3dlocaliser.algorithm.hyperbolic;
 
+import Localiser.LocaliserPane;
 import PamController.SettingsPane;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -16,7 +17,7 @@ import pamViewFX.fxNodes.utilityPanes.PamToggleSwitch;
  * @author Jamie Macaulay
  *
  */
-public class HyperbolicSettingsPane extends SettingsPane<HyperbolicParams> {
+public class HyperbolicSettingsPane extends LocaliserPane<HyperbolicParams> {
 	
 	PamBorderPane mainPane;
 	
@@ -28,7 +29,6 @@ public class HyperbolicSettingsPane extends SettingsPane<HyperbolicParams> {
 	private PamSpinner<Integer> numIterations;
 
 	public HyperbolicSettingsPane() {
-		super(null);
 		mainPane = new PamBorderPane(); 
 		mainPane.setPadding(new Insets(5,5,5,5));
 		
@@ -53,6 +53,7 @@ public class HyperbolicSettingsPane extends SettingsPane<HyperbolicParams> {
 
 	@Override
 	public HyperbolicParams getParams(HyperbolicParams currParams) {
+		if (currParams ==null) currParams = new HyperbolicParams();
 		currParams.bootStrapN = numIterations.getValue();
 		currParams.calcErrors = hyperbolicToggleSwitch.isSelected();
 		
@@ -61,6 +62,7 @@ public class HyperbolicSettingsPane extends SettingsPane<HyperbolicParams> {
 
 	@Override
 	public void setParams(HyperbolicParams input) {
+		System.out.println("Hyperbolic set Params: " + input.bootStrapN); 
 		numIterations.getValueFactory().setValue(input.bootStrapN);
 		hyperbolicToggleSwitch.setSelected(input.calcErrors);
 	}

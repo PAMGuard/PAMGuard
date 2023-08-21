@@ -53,7 +53,7 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 	public Group3DProcess(Group3DLocaliserControl group3DControl) {
 		super(group3DControl, null);
 		this.group3DControl = group3DControl;
-		localiserAlgorithm3D = new CrossedBearingGroupLocaliser();
+		localiserAlgorithm3D = group3DControl.getAlgorithmProviders().get(0);
 		detectionGrouper = new DetectionGrouper(this);
 		group3dDataBlock = new Group3DDataBlock(group3DControl.getUnitName() + " Localisations", this, 0,
 				group3DControl);

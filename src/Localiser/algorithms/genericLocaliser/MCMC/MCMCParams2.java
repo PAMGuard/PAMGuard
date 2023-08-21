@@ -29,7 +29,7 @@ public class MCMCParams2 implements Serializable, Cloneable, ManagedParameters  
 	public int numberOfJumps=250000; //int
 	
 	/**
-	 * Where in paramter space the chains should start. Each value in the array is for one dimension. When
+	 * Where in parameter space the chains should start. Each value in the array is for one dimension. When
 	 * chains start a random number between the two numbers is chosen as the start position in that dimension for the
 	 * chain. 
 	 */
@@ -41,12 +41,12 @@ public class MCMCParams2 implements Serializable, Cloneable, ManagedParameters  
 	public int numberOfChains=4; //int 
 	
 	/**
-	 * Use cyclindrical jumps. 
+	 * Use cylindrical jumps. 
 	 */
 	public boolean cylindricalCoOrdinates = false; 
 	/**
-	 * Set the chain jump size- sets the jump size of all dimensions to the input jumpsize
-	 * @param jumpsize the jumpsize for all dimensions. 
+	 * Set the chain jump size- sets the jump size of all dimensions to the input jump size.
+	 * @param jumpsize the jump size for all dimensions. 
 	 * @param nDim the number of dimensions. 
 	 */
 	public void setJumpSize(double jumpsize, int nDim){
@@ -58,8 +58,8 @@ public class MCMCParams2 implements Serializable, Cloneable, ManagedParameters  
 	
 	/**
 	 * Set chain start dispersion to one value for all dimensions. The start dispersion is a random number centered
-	 * on zero and from a distribution with a size defined by the dispersion input paramater. 
-	 * @param dispersion the chain start dispersion for all dimensions. element 1 is th
+	 * on zero and from a distribution with a size defined by the dispersion input parameter. 
+	 * @param dispersion the chain start dispersion for all dimensions. 
 	 */
 	public double[][] setChainDispersion(double dispersion, int nDim){
 		chainStartDispersion=new double[nDim][2];

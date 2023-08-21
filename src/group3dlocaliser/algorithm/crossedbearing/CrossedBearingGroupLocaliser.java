@@ -6,7 +6,6 @@ import java.io.Serializable;
 import Array.ArrayManager;
 import Localiser.LocaliserPane;
 import Localiser.detectionGroupLocaliser.DetectionGroupOptions;
-import PamController.SettingsPane;
 import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamDetection.LocalisationInfo;
@@ -17,6 +16,7 @@ import annotation.localise.targetmotion.TMAnnotation;
 import annotation.localise.targetmotion.TMAnnotationOptions;
 import annotation.localise.targetmotion.TMAnnotationType;
 import generalDatabase.SQLLoggingAddon;
+import group3dlocaliser.Group3DLocaliserControl;
 import group3dlocaliser.algorithm.LocaliserAlgorithm3D;
 import group3dlocaliser.algorithm.LocaliserAlgorithmParams;
 import javafx.geometry.Insets;
@@ -26,6 +26,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
+import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamHBox;
 
@@ -39,7 +40,10 @@ public class CrossedBearingGroupLocaliser extends LocaliserAlgorithm3D {
 
 	private CrossedBearingPane crossedBearingPane;
 
-	public CrossedBearingGroupLocaliser() {
+	private Group3DLocaliserControl group3dLocaliserControl;
+
+	public CrossedBearingGroupLocaliser(Group3DLocaliserControl group3dLocaliserControl) {
+		this.group3dLocaliserControl = group3dLocaliserControl; 
 		tmAnnotationType = new TMAnnotationType();
 		TMAnnotationOptions tmAnnotationOptions = new TMAnnotationOptions("CrossedBearingGroupLocaliser");
 		tmAnnotationOptions.getLocalisationParams().setIsSelected(0, false);
@@ -158,9 +162,17 @@ public class CrossedBearingGroupLocaliser extends LocaliserAlgorithm3D {
 		
 	}
 	
-	
+	//TODO - make this full FX 
+	/**
+	 * Settings pane for the crossed bearing loclaiser. Note that this just shows a settings button which open a swing dialog.. 
+	 * @author Jamie Macaulay
+	 *
+	 */
 	public class CrossedBearingPane extends LocaliserPane<Serializable> {
 
+		private PamBorderPane mainPane;
+		
+		private LocaliserAlgorithmParams algorithmPaams;
 
 		public CrossedBearingPane() {
 				PamHBox hBox = new PamHBox(); 
@@ -174,14 +186,11 @@ public class CrossedBearingGroupLocaliser extends LocaliserAlgorithm3D {
 				});
 				algoOptsButton.setTooltip(new Tooltip("More Algorithm Options ..."));
 				
-				hBox.getChildren().addAll(new Label(localiserAlgorithm.getName() + " settings"), algoOptsButton); 
+				hBox.getChildren().addAll(new Label(getName() + " settings"), algoOptsButton); 
 				
 				
-				mainPane = new PamBordepPane(); 
-				mainPane.setCenter
-	
-			
-			
+				mainPane = new PamBorderPane(); 
+				mainPane.setCenter(hBox); 
 		}
 		
 		/**
@@ -203,12 +212,12 @@ public class CrossedBearingGroupLocaliser extends LocaliserAlgorithm3D {
 			LocaliserAlgorithmParams algorithmPaams = group3dLocaliserControl.getLocaliserAlgorithmParams(localiserAlgorithm);
 			
 			
-			algorithmPaams = showAlgorithmDialog(getAWTWindow(), algorithmPaams);
+			this.algorithmPaams  = showAlgorithmDialog(getAWTWindow(), algorithmPaams);
 			
 			
-			if (algorithmPaams != null) {
-				group3dLocaliserControl.setAlgorithmParams(localiserAlgorithm, algorithmPaams);
-			}
+//			if (algorithmPaams != null) {
+//				group3dLocaliserControl.setAlgorithmParams(localiserAlgorithm, algorithmPaams);
+//			}
 		}
 		
 		
@@ -224,6 +233,8 @@ public class CrossedBearingGroupLocaliser extends LocaliserAlgorithm3D {
 			
 //			AnnotationSettingsPanel settingsPanel = cbLocaliser.getTmAnnotationType().getSettingsPanel();
 			boolean asd = AnnotationSettingsDialog.showDialog(parent, getTmAnnotationType());
+			
+			
 			if (asd) {
 				return new LocaliserAlgorithmParams(getTmAnnotationOptions());
 			}
@@ -234,26 +245,25 @@ public class CrossedBearingGroupLocaliser extends LocaliserAlgorithm3D {
 
 		@Override
 		public Serializable getParams(Serializable currParams) {
-			// TODO Auto-generated method stub
-			return null;
+			if (algorithmPaams!=null) {
+				return this.algorithmPaams ; 
+			}
+			return currParams;
 		}
 
 		@Override
 		public void setParams(Serializable input) {
-			// TODO Auto-generated method stub
-			
+			this.algorithmPaams = (LocaliserAlgorithmParams) input;
 		}
 
 		@Override
 		public String getName() {
-			// TODO Auto-generated method stub
-			return null;
+			return "Crossed Bearing Settings";
 		}
 
 		@Override
 		public Node getContentNode() {
-			// TODO Auto-generated method stub
-			return null;
+			return mainPane;
 		}
 
 		@Override
