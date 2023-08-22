@@ -14,10 +14,13 @@ import org.apache.commons.math3.stat.correlation.Covariance;
 
 
 /**
- * Class for calculating errors from localisation data. An error ellipse describes N dimensional error based on a scatter of points or 
- * chi2 surface. The dimensions and rotation of the ellipse describe the distribution of error. Note that although an ellipse will often be a satisfactory
- * description of an error surface, in some cases it will not adequately represent errors. e.g. a linear array produces a doughnut shaped error 
- * surface which would not be described well by an ellipse. 
+ * Class for calculating errors from localisation data. An error ellipse
+ * describes N dimensional error based on a scatter of points or chi2 surface.
+ * The dimensions and rotation of the ellipse describe the distribution of
+ * error. Note that although an ellipse will often be a satisfactory description
+ * of an error surface, in some cases it will not adequately represent errors.
+ * e.g. a linear array produces a doughnut shaped error surface which would not
+ * be described well by an ellipse.
  * 
  * @author Jamie Macaulay
  *
@@ -41,17 +44,17 @@ public class ErrorEllipse {
 	public static final int PLANE_ZX=2; 
 	
 	/**
-	 *Project the ellipse ontpo the XY plane- the extremties oif the ellipse are kept
+	 *Project the ellipse ontpo the XY plane- the extremities of the ellipse are kept
 	 */
 	public static final int PLANE_XY_PROJ=3; 
 	
 	/**
-	 *Project the ellipse ontpo the Yz plane- the extremties oif the ellipse are kept
+	 *Project the ellipse ontpo the Yz plane- the extremities of the ellipse are kept
 	 */
 	public static final int PLANE_ZY_PROJ=4; 
 	
 	/**
-	 *Project the ellipse ontpo the ZX plane- the extremties oif the ellipse are kept
+	 *Project the ellipse ontpo the ZX plane- the extremities of the ellipse are kept
 	 */
 	public static final int PLANE_ZX_PROJ=5; 
 	
@@ -191,7 +194,7 @@ public class ErrorEllipse {
 	/**
 	 * Calculate the error ellipse from eigenvalues and eigenvectors. 
 	 * @param eigenVal - matrix the eigenvalues - this is the size of the ellipse
-	 * @param eigenVec - matrix eigenvectors- the direction of the ellispe. Not necassarily in order. 
+	 * @param eigenVec - matrix eigenvectors- the direction of the ellipse. Not necassarily in order. 
 	 */
 	private void calcErrorEllipse(RealMatrix eigenVal, RealMatrix eigenVec){
 		
@@ -340,7 +343,7 @@ public class ErrorEllipse {
 	
 	/**
 	 * Get the ellipse projected onto a 3D plane. 
-	 * @return an array. array [0] is the first radii. array[1] is the second radii. array[2] is the rotation irelative to the plane in radians. 
+	 * @return an array. array [0] is the first radii. array[1] is the second radii. array[2] is the rotation relative to the plane in RADIANS. 
 	 */
 	public double[] getErrorEllipse2D(int planeType){
 	
@@ -356,7 +359,7 @@ public class ErrorEllipse {
 			}
 			else {
 				if(errorEllipseXY==null){
-					//here we calculate and save the prjection- once saved the projection is never
+					//here we calculate and save the projection- once saved the projection is never
 					//recalculated. 
 					errorEllipseXY = calc2DEllipse(planeType); 
 					if (errorEllipseXY == null) return null;
@@ -365,7 +368,7 @@ public class ErrorEllipse {
 				data[0]=errorEllipseXY.getEllipseDim()[0];
 				data[1]=errorEllipseXY.getEllipseDim()[1];
 				data[2]=errorEllipseXY.getAngles()[0];
-				//System.out.println("ErrorEllipse: data: "+data[0]+ " "+data[1]+" "+data[1] +  " Ellipse largest vector: "+getEllipseDim()[0]);
+				//System.out.println("ErrorEllipse: data: "+data[0]+ " "+data[1]+" "+data[2] +  " Ellipse largest vector: "+getEllipseDim()[0]);
 			}
 		
 			break;
@@ -388,7 +391,7 @@ public class ErrorEllipse {
 	
 	
 	/**
-	 * Claculate a 2D projec tion of the 3D ellipse. 
+	 * Calculate a 2D projection of the 3D ellipse. 
 	 * @param planeType
 	 * @return
 	 */
@@ -426,8 +429,10 @@ public class ErrorEllipse {
 			dim1=0;
 			dim2=1;
 			
+			//22 Aug 2023 - dim[1] was using sin instead of cos - for projecting onto a 2d plane cos 
+			//is the correct trig function to use. 
 			dim[0]=this.ellipseDim[0]*Math.cos(this.angles[1]); //the major axis on 2D
-			dim[1]=this.ellipseDim[1]*Math.sin(this.angles[2]); //the minor Axis. 
+			dim[1]=this.ellipseDim[1]*Math.cos(this.angles[2]); //the minor Axis. 
 			angles[0]=this.angles[0]; 
 			
 			break;
@@ -450,13 +455,11 @@ public class ErrorEllipse {
 		ErrorEllipse errorEllipse2D=new ErrorEllipse(dim, angles); 
 
 		return errorEllipse2D; 
-
-	
 	}
 	
 	
 	/**
-	 * Generate a projection of the ellipse into 2D. The prjection is a defined plane slicing throug the center of the ellipse
+	 * Generate a projection of the ellipse into 2D. The projection is a defined plane slicing through the center of the ellipse
 	 * @param planeType - the type of plane. PLANE_XY, PLANE_ZY, PLANE_ZX
 	 * @return the 2D projection of the ellipse onto a plane. 
 	 */

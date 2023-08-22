@@ -20,6 +20,7 @@ public class MCMCLoclaiserPane extends LocaliserPane<MCMCParams2> {
 
 	@Override
 	public MCMCParams2 getParams(MCMCParams2 currParams) {
+		if (currParams==null) return mainPane.getParams(new MCMCParams2());
 		return mainPane.getParams(currParams);
 	}
 

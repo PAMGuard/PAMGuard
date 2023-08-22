@@ -579,6 +579,27 @@ public class PamArrayUtils {
 		ArrayUtils.reverse(clone);
 		return clone; 
 	}
+	
+	/**
+	 * Split an array based on start index and end index. A new array with index 0
+	 * as start and the last index at end is created and data from the input array
+	 * copied to it.
+	 * 
+	 * @param arr   - the array to split
+	 * @param start - the start index
+	 * @param end   - the end index
+	 * @return the split array.
+	 */
+	public static double[][] split(double[][] arr, int start, int end) {
+		double[][] newArr = new double[end - start][];
+		int n = 0;
+		for (int i = start; i < end; i++) {
+			newArr[n] = arr[i];
+			n++;
+		}
+		return newArr;
+	}
+
 
 	/**
 	 * Sum the elements in an array 

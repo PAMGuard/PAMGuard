@@ -80,7 +80,7 @@ public class EllipticalError implements LocaliserError {
 
 	/**
 	 * Get the 2D elliptical error.
-	 * @param planeXy - the plane on whihc to find the ellipse for. 
+	 * @param planeXy - the plane on which to find the ellipse for. 
 	 * @return the elliptical error. 
 	 */
 	public double[] getErrorEllipse2D(int planeXy) {

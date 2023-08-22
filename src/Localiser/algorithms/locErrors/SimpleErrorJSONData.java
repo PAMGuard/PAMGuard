@@ -1,14 +1,13 @@
 package Localiser.algorithms.locErrors;
 
-import java.text.DecimalFormat;
 
-public class SimpleErrorXMLData extends ErrorXMLData {
+public class SimpleErrorJSONData extends ErrorJSONData {
 
 	private String errorType;
 	private double[] errorData;
 	
 	
-	public SimpleErrorXMLData(String errorType, double[] errorData) {
+	public SimpleErrorJSONData(String errorType, double[] errorData) {
 		this.errorType = errorType;
 		this.errorData = errorData;
 	}

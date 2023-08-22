@@ -119,9 +119,8 @@ public class EllipseLocErrorDraw implements LocErrorGraphics {
 		double[] errors2D=ellipticalError.getErrorEllipse2D(ErrorEllipse.PLANE_XY_PROJ);
 		//		if (1>0) return null;
 
-		//System.out.println("Draw ovals on map"); 
-
-		//System.out.println("EllipseLocErrorDraw: draw ellipse:"+errors2D[0]+" "+errors2D[1]+" "+Math.toDegrees(errors2D[2]));
+//		System.out.println("Draw ovals on map"); 
+//		System.out.println("EllipseLocErrorDraw: draw ellipse:"+errors2D[0]+" "+errors2D[1]+" "+Math.toDegrees(errors2D[2]));
 
 		//System.out.println("Plot errors:  perp: "+ perpError+  " horz: "+horzError+ " " + errorDirection); 
 		Graphics2D g2d = (Graphics2D)g;
@@ -152,7 +151,7 @@ public class EllipseLocErrorDraw implements LocErrorGraphics {
 		
 		//draw the ellipse and rotate. 
 		Ellipse2D oval=new Ellipse2D.Double(errorOriginXY.getX()-horzErrPix/2, errorOriginXY.getY()-perpErrPix/2, horzErrPix, perpErrPix);
-		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 5 * 0.1f));
+		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 5 * 0.05f));
 		g2d.setPaint(ellipseColor.brighter());
 
 		if (!Double.isNaN(errorDirection)) g2d.rotate(-paintAngle, errorOriginXY.getX(), errorOriginXY.getY());

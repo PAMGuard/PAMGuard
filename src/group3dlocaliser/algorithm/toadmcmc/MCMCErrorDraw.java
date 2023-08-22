@@ -60,7 +60,7 @@ public class MCMCErrorDraw extends EllipseLocErrorDraw {
 			GeneralProjector generalProjector, Color ellipseColor) {
 
 
-		//System.out.println("Plot errors:  perp: "+ perpError+  " horz: "+horzError+ " " + errorDirection); 
+		//System.out.println("Start MCMCM Plot errors: start " + ellipticalErr.getPoints().length); 
 		Graphics2D g2d = (Graphics2D)g;
 
 		ellipticalErr.getPoints(); 
@@ -72,12 +72,12 @@ public class MCMCErrorDraw extends EllipseLocErrorDraw {
 		for (int i=0; i<ellipticalErr.getPoints().length-1; i++) {
 
 			/**
-			 * Need to do all the error dimension calculation in true latlong coorinates, or it simply won't
+			 * Need to do all the error dimension calculation in true latlong co-ordinates, or it simply won't
 			 * work with a rotated map. 
 			 */
 			Point errorOriginXY=generalProjector.getCoord3d(errorOrigin).getXYPoint();
 
-			g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,  0.05f));
+			g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,  0.03f));
 			g2d.setPaint(ellipseColor.brighter().brighter());
 			
 			PamVector meanLoc = new PamVector(ellipticalErr.getMeanLoc()); 
@@ -98,6 +98,9 @@ public class MCMCErrorDraw extends EllipseLocErrorDraw {
 
 
 		}
+		
+		//System.out.println("END MCMC Plot errors: start " + ellipticalErr.getPoints().length); 
+
 
 
 		return null; 

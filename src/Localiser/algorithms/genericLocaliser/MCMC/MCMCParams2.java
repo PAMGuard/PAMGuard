@@ -5,6 +5,12 @@ import java.io.Serializable;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 
+/**
+ * Paramters for running a Marklov chain Monte Carlo algorithm.
+ * 
+ * @author Jamie Macaulay 
+ *
+ */
 public class MCMCParams2 implements Serializable, Cloneable, ManagedParameters  {
 	
 	public static final long serialVersionUID = 3L;
@@ -86,11 +92,20 @@ public class MCMCParams2 implements Serializable, Cloneable, ManagedParameters  
 	public double percentageToIgnore=0.7; //%
 
 	
-	//cluster analysis;
+	/**
+	 * The type of cluster analysis to use to merge the different chains if they converge on the same or ambiguous results. See K_MEANS and NONE constants. 
+	 */
 	public int clusterAnalysis=K_MEANS; 
 	
+	/**
+	 * Do not attempt to cluster the chains. 
+	 */
 	public static final int NONE=0;
-			
+	
+	
+	/**
+	 * Use K_MEANS to cluster the different chains		
+	 */
 	public static final int K_MEANS=1;
 	
 	public Integer nKMeans=2; //int
@@ -98,12 +113,12 @@ public class MCMCParams2 implements Serializable, Cloneable, ManagedParameters  
 	public double maxClusterSize=5; //meters
 
 	/**
-	 * The number of times to perform a kmeans algorithm on results The algorithm starts clusters at random locations. 
+	 * The number of times to perform a k-means algorithm on results The algorithm starts clusters at random locations. 
 	 */
 	public int kmeanAttempts=10;
 
 	/**
-	 * The number of iterations for each kmeans attempt. Kmeans converges to a result but requires a certain number of iteration to 
+	 * The number of iterations for each k-means attempt. K-means converges to a result but requires a certain number of iteration to 
 	 * do so. 
 	 */
 	public int kmeansIterations=20;

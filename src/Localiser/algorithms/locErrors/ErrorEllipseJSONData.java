@@ -1,10 +1,10 @@
 package Localiser.algorithms.locErrors;
 
-public class ErrorEllipseXMLData extends ErrorXMLData {
+public class ErrorEllipseJSONData extends ErrorJSONData {
 
 	private EllipticalError ellipticalError;
 
-	public ErrorEllipseXMLData(EllipticalError ellipticalError) {
+	public ErrorEllipseJSONData(EllipticalError ellipticalError) {
 		this.ellipticalError = ellipticalError;
 	}
 

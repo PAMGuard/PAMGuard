@@ -6,7 +6,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.geometry.Insets;
-
+import javafx.geometry.Pos;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamSpinner;
@@ -42,6 +42,7 @@ public class HyperbolicSettingsPane extends LocaliserPane<HyperbolicParams> {
 		numIterations.setEditable(true);
 		
 		PamHBox hBox = new PamHBox( ); 
+		hBox.setAlignment(Pos.CENTER_LEFT);
 		hBox.setSpacing(5);
 		hBox.getChildren().addAll(hyperbolicToggleSwitch, numIterations, new Label("Iterations")); 
 		

@@ -164,7 +164,12 @@ public class GrouperSettingsPane extends SettingsPane<DetectionGrouperParams>{
 		boolean d = dataSelector == null;
 		requireAll.setDisable(d);
 		requireSome.setDisable(d);
-		requiredN.setDisable(d);
+	
+		
+		//need to disable if no data selector but do not enable unless requireSome selected
+		if (!d) enableControls();
+		else requiredN.setDisable(d);
+		
 		dataSelButton.setDisable(d);
 	}
 	

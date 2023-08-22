@@ -152,7 +152,7 @@ public class MCMCResult {
 	 */
 	public double[][] getJumpsd(int div) {
 		
-		if (div<1) div =1; 
+		if (div<1) div = 1; 
 		
 //		int nJumps = 0; 
 //		for (int i=0; i<this.data.size(); i++) {

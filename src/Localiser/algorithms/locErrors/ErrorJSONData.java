@@ -2,7 +2,7 @@ package Localiser.algorithms.locErrors;
 
 import java.text.DecimalFormat;
 
-public abstract class ErrorXMLData {
+public abstract class ErrorJSONData {
 
 
 	protected static final DecimalFormat errorDigitFormat = new DecimalFormat("0.###E0");

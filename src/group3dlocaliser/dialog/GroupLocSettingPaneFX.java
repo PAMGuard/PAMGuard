@@ -182,7 +182,7 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 		 */
 		ToadManagedSettingsPane newPane = localiserAlgorithm.getSourceSettingsPane(getAWTWindow(), currSource);
 		
-		System.out.println(" selectAlgorithm: newPane " + newPane);
+		//System.out.println(" selectAlgorithm: newPane " + newPane);
 
 
 		algoSourceHolder.setCenter(null);
@@ -201,7 +201,7 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 //			newPane.setDetectionSource(sourcePanel.getSource());
 		}
 		
-		System.out.println(" selectAlgorithm: newPane " + localiserAlgorithm.getAlgorithmSettingsPane());
+		//System.out.println(" selectAlgorithm: newPane " + localiserAlgorithm.getAlgorithmSettingsPane());
 
 		/**
 		 * Now set up the advanced settings for the localiser algorothm. If FX add as a tab. If Swing then add a settings button to a new tab. 
@@ -234,7 +234,7 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 //			
 			
 			if (newPane==null) {
-				System.out.println("Set settings pane: " + settingsPane);
+				//System.out.println("Set settings pane: " + settingsPane);
 				algoSourceHolder.setCenter(settingsPane);
 			}
 			else {

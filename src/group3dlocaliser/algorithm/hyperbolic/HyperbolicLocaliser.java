@@ -57,6 +57,7 @@ public class HyperbolicLocaliser extends TOADBaseAlgorithm {
 	@Override
 	public AbstractLocalisation processTOADs(PamDataUnit groupDataUnit, SnapshotGeometry geometry, TOADInformation toadInformation) {
 
+		//System.out.println("Process TOADS: Hyperbolic: " + toadInformation.getChannelMap()); 
 		
 		/**
 		 * This module is a little odd in that it stores paramters for each algorithm in it's own has table without acc

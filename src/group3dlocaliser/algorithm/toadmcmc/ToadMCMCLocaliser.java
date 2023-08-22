@@ -18,6 +18,7 @@ import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamUtils.CPUMonitor;
 import PamUtils.LatLong;
+import PamUtils.PamArrayUtils;
 import PamguardMVC.PamDataUnit;
 import generalDatabase.SQLLoggingAddon;
 import group3dlocaliser.Group3DLocaliserControl;
@@ -124,6 +125,14 @@ public class ToadMCMCLocaliser extends TOADBaseAlgorithm {
 		for (int i=0; i<mcmcResult.size(); i++) {
 			
 			double[][] jumps = mcmcResult.get(i).getJumpsd(10); //we don't need all the jumps to calculate an error. 
+			
+			//System.out.println("Jumps before: " + jumps.length); 
+
+			
+			jumps = PamArrayUtils.split(jumps, (int) (0.9*jumps.length), jumps.length);  
+			
+			//System.out.println("Jumps after: " + jumps.length); 
+
 			
 			EllipticalError ellipErr = new MCMCEllipticalError(jumps, mcmcResult.get(i).getMeanLoc()); 
 					

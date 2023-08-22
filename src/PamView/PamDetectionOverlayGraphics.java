@@ -391,7 +391,12 @@ public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 				generalProjector.addHoverData(endPoint, pamDetection);
 				//plot localisation errors. 
 				if (localisation.getLocError(i)!=null){
-					TransformShape shape=localisation.getLocError(i).getErrorDraw().drawOnMap(g, pamDetection, endLatLong, generalProjector, symbol.getLineColor());
+					
+					Color col =symbol.getLineColor();
+					if (drawingOptions != null) {
+						col = drawingOptions.createColor(symbol.getLineColor(), drawingOptions.getLineOpacity());
+					}
+					TransformShape shape=localisation.getLocError(i).getErrorDraw().drawOnMap(g, pamDetection, endLatLong, generalProjector, col);
 					generalProjector.addHoverData(shape, pamDetection);
 				}
 				else {

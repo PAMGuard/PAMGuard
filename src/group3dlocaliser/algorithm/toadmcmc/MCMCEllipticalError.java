@@ -30,7 +30,7 @@ public class MCMCEllipticalError extends EllipticalError {
 		}
 
 
-
+	
 	public MCMCEllipticalError(double[][] points, double[] meanLoc) {
 		super(points);
 		this.points = PamArrayUtils.double2Float(points);
