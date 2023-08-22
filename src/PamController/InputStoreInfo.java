@@ -75,6 +75,27 @@ public class InputStoreInfo {
 	public long[] getFileStartTimes() {
 		return fileStartTimes;
 	}
+
+	/**
+	 * @param firstFileStart the firstFileStart to set
+	 */
+	public void setFirstFileStart(long firstFileStart) {
+		this.firstFileStart = firstFileStart;
+	}
+
+	/**
+	 * @param lastFileStart the lastFileStart to set
+	 */
+	public void setLastFileStart(long lastFileStart) {
+		this.lastFileStart = lastFileStart;
+	}
+
+	/**
+	 * @param lastFileEnd the lastFileEnd to set
+	 */
+	public void setLastFileEnd(long lastFileEnd) {
+		this.lastFileEnd = lastFileEnd;
+	}
 	
 
 

@@ -104,9 +104,13 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		boolean ans = super.prepareInputFile();
 		if (ans == false && ++currentFile < allFiles.size()) {
 			System.out.println("Failed to open sound file. Try again with file " + allFiles.get(currentFile).getName());
-
+			/*
+			 *  jumping striaght to the next file messes it up if it thinks the files
+			 *  are continuous, so we HAVE to stop and restart.  
+			 */
+//			return prepareInputFile();
 			PamController.getInstance().pamStop();
-			PamController.getInstance().startLater();
+			PamController.getInstance().startLater(false);
 		}
 		return ans;
 	}
@@ -614,16 +618,16 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		long currFileEnd = 0;
 		if (currentFile >= 0) {
 			try {
-			WavFileType currentWav = allFiles.get(currentFile);
-			currFileStart = getFileStartTime(currentWav.getAbsoluteFile());
-			if (audioStream != null) {
-				fileSamples = audioStream.getFrameLength();
-				currFileLength = (long) (fileSamples * 1000 / audioStream.getFormat().getFrameRate());
-				currFileEnd = currFileStart + currFileLength;
-			}
+				WavFileType currentWav = allFiles.get(currentFile);
+				currFileStart = getFileStartTime(currentWav.getAbsoluteFile());
+				if (audioStream != null) {
+					fileSamples = audioStream.getFrameLength();
+					currFileLength = (long) (fileSamples * 1000 / audioStream.getFormat().getFrameRate());
+					currFileEnd = currFileStart + currFileLength;
+				}
 			}
 			catch (Exception e) {
-				
+
 			}
 		}
 		if (currFileEnd == 0) {
@@ -648,7 +652,17 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			}
 			setFolderProgress();
 			//			sayEta();
-			ans = prepareInputFile();
+			/*
+			 * I think that here, we just need a check of the file. the prepareInputFile in 
+			 * this class will (on failure) move straight to the next file and also issue a 
+			 * stop/start, which is not good if it's trying a continuous file, where this is
+			 * being called, if false is returned it should manage moving onto the next file by 
+			 * itself if we use the super.prep .... 
+			 */
+			ans = super.prepareInputFile();
+			if (ans == false) {
+				return false;
+			}
 			currentFileStart = System.currentTimeMillis();
 			//			if (ans && audioFormat.getSampleRate() != currentSampleRate && currentFile > 0) {
 			//				acquisitionControl.getDaqProcess().setSampleRate(currentSampleRate = audioFormat.getSampleRate(), true);
@@ -861,7 +875,19 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			long[] allFileStarts = new long[allFiles.size()];
 			for (int i = 0; i < allFiles.size(); i++) {
 				allFileStarts[i] = getFileStartTime(allFiles.get(i).getAbsoluteFile());
+				if (allFileStarts[i] < firstFileStart) {
+//					System.out.printf("Swap first file from %s to %s\n", firstFile.getName(), allFiles.get(i).getName());
+					firstFile = allFiles.get(i);
+					firstFileStart = allFileStarts[i];
+				}
+				if (allFileStarts[i] > lastFileEnd) {
+//					System.out.printf("Swap last file from %s to %s\n", lastFile.getName(), allFiles.get(i).getName());
+					lastFile = allFiles.get(i);
+					lastFileEnd = allFileStarts[i] + (long) (lastFile.getDurationInSeconds()*1000.);
+				}
 			}
+			storeInfo.setFirstFileStart(firstFileStart); // just incase changed. 
+			storeInfo.setLastFileEnd(lastFileEnd); // just incase changed
 			storeInfo.setFileStartTimes(allFileStarts);
 		}
 		return storeInfo;

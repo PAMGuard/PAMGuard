@@ -57,7 +57,7 @@ public class ProcessNmeaData extends PamProcess {
 
 	private GpsLogger gpsLogger;
 
-	private String wantedString = "$GPRMC";
+//	private String wantedString = "$GPRMC";
 
 	private GpsDataUnit previousUnit = null;
 	
@@ -161,7 +161,7 @@ public class ProcessNmeaData extends PamProcess {
 	@Override
 	public void noteNewSettings() {
 		findNMEADataBlock();
-		setWantedString();
+//		setWantedString();
 		double minRate = Math.max(.2, 1./gpsController.gpsParameters.readInterval);
 		processCheck.getOutputCounter().setMinRate(minRate);
 	}
@@ -179,7 +179,8 @@ public class ProcessNmeaData extends PamProcess {
 		StringBuffer nmeaString = nmeaData.getCharData();
 		String stringId = NMEADataBlock.getSubString(nmeaString, 0);
 
-		if (stringId.equalsIgnoreCase(wantedString)) {
+//		if (stringId.equalsIgnoreCase(wantedString)) {
+		if (gpsController.wantString(stringId)) {
 			gpsData = new GpsData(nmeaString, gpsController.gpsParameters.mainString); // GpsData constructor which
 			// unpacks the string.
 			if (gpsData.isDataOk()) {
@@ -316,13 +317,13 @@ public class ProcessNmeaData extends PamProcess {
 		super.clearOldData();
 	}
 
-	public String getWantedString() {
-		return wantedString;
-	}
-	
-	public void setWantedString() {
-		wantedString = gpsController.getWantedString();
-	}
+//	public String getWantedString() {
+//		return wantedString;
+//	}
+//	
+//	public void setWantedString() {
+//		wantedString = gpsController.getWantedString();
+//	}
 
 	public GPSControl getGpsController() {
 		return gpsController;

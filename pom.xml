@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.pamguard</groupId>
   <artifactId>Pamguard</artifactId>
-  <version>2.02.07f</version>
+  <version>2.02.09</version>
   <name>Pamguard Java12+</name>
   <description>Pamguard for Java 12+, using Maven to control dependcies</description>
 	<url>www.pamguard.org</url>
@@ -780,11 +780,14 @@
 	</dependency>
 	 -->
 
-	<!-- not in Maven repository  -->
+	<!-- not in Maven repository  
+you may need to copy files from your downloaded PAMGuard source code, e.g. C:\Users\*yourreposfolder*\source\repos\PAMGuardPAMGuard\repo\pamguard\org\x3\2.2.2 to 
+C:\Users\*yourusername*\.m2\repository\pamguard\org\x3\2.2.2
+-->
  	<dependency>
 	    <groupId>pamguard.org</groupId>
 	    <artifactId>x3</artifactId>
-	    <version>2.2.0</version>
+	    <version>2.2.2</version>
 	</dependency>
 	
 		<!-- https://mvnrepository.com/artifact/it.sauronsoftware/jave -->

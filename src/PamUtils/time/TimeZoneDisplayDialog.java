@@ -29,7 +29,7 @@ public class TimeZoneDisplayDialog extends PamDialog {
 	private JLabel pcTimeZone;
 	private String[] timeZoneIds;
 	private TimeDisplayParameters timeDisplayParameters;
-	private TimeZone thisTimeZone;
+//	private TimeZone thisTimeZone;
 	private int utcTZIndex, pcTZIndex;
 	private static TimeZoneDisplayDialog singleInstance;
 
@@ -57,8 +57,8 @@ public class TimeZoneDisplayDialog extends PamDialog {
 		c.gridy++;
 		c.gridx = 0;
 		JLabel ta = new JLabel();
-		ta.setText("<html>Note that all processing and data storage will continue to <p>use UTC, the selection " +
-		"you make here \nwill only affect what is displayed on the screen");
+		ta.setText("<html>Note that all processing and data storage will continue to use UTC. <p>The selection " +
+		"you make here will only affect what is displayed on the screen.");
 		tzPanel.add(ta, c);
 		
 		ButtonGroup bg = new ButtonGroup();
@@ -66,7 +66,7 @@ public class TimeZoneDisplayDialog extends PamDialog {
 		bg.add(usePC);
 		bg.add(useOther);
 
-		thisTimeZone = Calendar.getInstance().getTimeZone();
+		TimeZone pcTimeZone = TimeZone.getDefault();
 		timeZoneIds = TimeZone.getAvailableIDs();
 		Arrays.sort(timeZoneIds, new TimeZoneComparator());
 		TimeZone tz;
@@ -76,7 +76,7 @@ public class TimeZoneDisplayDialog extends PamDialog {
 			if (timeZoneIds[i].equals(PamCalendar.defaultTimeZone.getID())) {
 				utcTZIndex = i;
 			}
-			if (timeZoneIds[i].equals(thisTimeZone.getID())) {
+			if (timeZoneIds[i].equals(pcTimeZone.getID())) {
 				pcTZIndex = i;
 			}
 			if (tz.getRawOffset() < 0) {
@@ -118,7 +118,8 @@ public class TimeZoneDisplayDialog extends PamDialog {
 		useUTC.setSelected(timeDisplayParameters.zoneType == TimeDisplayParameters.TIME_ZONE_UTC);
 		usePC.setSelected(timeDisplayParameters.zoneType == TimeDisplayParameters.TIME_ZONE_PC);
 		useOther.setSelected(timeDisplayParameters.zoneType == TimeDisplayParameters.TIME_ZONE_OTHER);
-		pcTimeZone.setText(String.format("(%s / %s)", thisTimeZone.getID(), thisTimeZone.getDisplayName()));
+		TimeZone defaultTimeZone = TimeZone.getDefault();
+		pcTimeZone.setText(String.format("(%s / %s)", defaultTimeZone.getID(), defaultTimeZone.getDisplayName()));
 		enableControls();
 		showSelection();
 	}
@@ -165,7 +166,7 @@ public class TimeZoneDisplayDialog extends PamDialog {
 		}
 		else if (usePC.isSelected()) {
 			timeDisplayParameters.zoneType = TimeDisplayParameters.TIME_ZONE_PC;
-			timeDisplayParameters.timeZone = thisTimeZone;
+			timeDisplayParameters.timeZone = TimeZone.getDefault();
 		}
 		else if (useOther.isSelected()) {
 			timeDisplayParameters.zoneType = TimeDisplayParameters.TIME_ZONE_OTHER;

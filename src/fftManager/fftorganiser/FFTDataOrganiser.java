@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 
+import PamController.PamController;
 import PamController.SettingsNameProvider;
 import PamDetection.RawDataUnit;
 import PamUtils.PamUtils;
@@ -143,6 +144,11 @@ public class FFTDataOrganiser {
 		if (rawOrFFTData == null) {
 			return null;
 		}
+		
+//		if (PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW) {
+//			checkOfflineDataLoad(rawOrFFTData, pamDataUnit.getTimeMilliseconds(), pamDataUnit.getEndTimeInMilliseconds());
+//		}
+		
 		switch (inputType) {
 		case FFTData:
 			return createFromFFTData(pamDataUnit, sampleRate, channelMap);
@@ -156,6 +162,52 @@ public class FFTDataOrganiser {
 			return null;		
 		}
 	}
+
+	/**
+	 * Called when running offline to try to ensure required raw or fft data are in memory. 
+	 * @param sourceData
+	 * @param timeMilliseconds
+	 * @param endTimeInMilliseconds
+	 */
+	private boolean checkOfflineDataLoad(PamDataBlock sourceData, long startMilliseconds, long endMilliseconds) {
+		if (sourceData == null) {
+			return false;
+		}
+		boolean needData = needOfflineDataLoad(sourceData, startMilliseconds, endMilliseconds);
+		if (needData) {
+			sourceData.loadViewerData(startMilliseconds, endMilliseconds, null);
+		}
+		return needOfflineDataLoad(sourceData, startMilliseconds, endMilliseconds);		
+	}
+	
+	/**
+	 * Test to see if we still need to load offline data. 
+	 * @param sourceData
+	 * @param startMilliseconds
+	 * @param endMilliseconds
+	 * @return
+	 */
+	private boolean needOfflineDataLoad(PamDataBlock sourceData, long startMilliseconds, long endMilliseconds) {
+		if (sourceData == null) {
+			return false;
+		}
+		synchronized (sourceData.getSynchLock()) {
+			PamDataUnit first = sourceData.getFirstUnit();
+			PamDataUnit last = sourceData.getLastUnit();
+			if (first == null || last == null) {
+				return true;
+			}
+			if (first.getTimeMilliseconds() > startMilliseconds) {
+				return true;
+			}
+			if (last.getEndTimeInMilliseconds() < endMilliseconds) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	
 
 	/**
 	 * Get FFT data units matching in time from the source 

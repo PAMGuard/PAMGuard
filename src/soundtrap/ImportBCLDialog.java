@@ -453,12 +453,18 @@ public class ImportBCLDialog extends PamDialog {
 		int nFiles = 0;
 		int nCDET = 0;
 		int nDWV = 0;
+
+		STClickControl clickControl = (STClickControl) PamController.getInstance().findControlledUnit(STClickControl.STUNITTYPE, stToolsParams.clickDetName);
+		
 		for (File xmlFile:xmlFiles) {
 			Debug.out.println("Opening xml file " + xmlFile.getAbsolutePath());
-			if (xmlFile.getAbsolutePath().equals("E:\\STOctober2016\\335839252\\335839252.161031002807.log.xml")) {
-				System.out.println("Opening xml file " + xmlFile.getAbsolutePath());
-			}
+//			if (xmlFile.getAbsolutePath().equals("E:\\STOctober2016\\335839252\\335839252.161031002807.log.xml")) {
+//				System.out.println("Opening xml file " + xmlFile.getAbsolutePath());
+//			}
 			STXMLFile xmlFileInfo = STXMLFile.openXMLFile(xmlFile, customDateTimeFormat.getText());
+			if (clickControl != null && xmlFileInfo.getSudDetectorInfo() != null) {
+				clickControl.setSudClickDetectorInfo(xmlFileInfo.getSudDetectorInfo());
+			}
 			
 			if (xmlFileInfo == null || xmlFileInfo.getDwvInfo() == null) {
 				String title = "Error with Soundtrap file";
