@@ -42,6 +42,7 @@ public abstract class CommandManager extends PamControlledUnit {
 		commandsList.add(new SetXMLSettings());
 		commandsList.add(new BatchStatusCommand());
 		commandsList.add(new BatchCommand(this));
+		commandsList.add(new FindGUICommand());
 		
 	}
 
