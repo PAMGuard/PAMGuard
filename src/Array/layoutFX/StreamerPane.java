@@ -114,5 +114,10 @@ public class StreamerPane extends PamBorderPane {
 		this.currentArray=currentArray;
 	}
 
+	public PamArray getParams(PamArray currParams) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }

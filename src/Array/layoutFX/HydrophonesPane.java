@@ -37,10 +37,16 @@ public class HydrophonesPane extends PamBorderPane {
 	protected PamArray currentArray;
 
 	/**
+	 * The current hydrophone data. 
+	 */
+	private HydrophoneProperty currentHydrophoneData;
+
+	/**
 	 * A list of all the current hydrophones. 
 	 */
 	ObservableList<HydrophoneProperty> hydrophoneList = FXCollections.observableArrayList();
 	
+
 	/**
 	 * The hydrophone array table.
 	 */
@@ -67,12 +73,19 @@ public class HydrophonesPane extends PamBorderPane {
 			pamFlipePane.setAdvPaneContent(hydrophonePane.getContentNode()); 
 			pamFlipePane.setFrontContent(tableArrayPane);
 			
-			pamFlipePane.getFront().setPadding(new Insets(5,5,5,5));
+			pamFlipePane.getFront().setPadding(new Insets(5,5,5,10));
 			
-//			tableArrayPane.setPadding(new Insets(5,5,5,5));
-			
-			//this.setStyle("-fx-background-color: grey;");
+			pamFlipePane.flipFrontProperty().addListener((obsval, oldVal, newVal)->{
+				//the flip pane
+				if (newVal) {
+					Hydrophone hydro = hydrophonePane.getParams(currentHydrophoneData.getHydrophone());
+					currentHydrophoneData.setHydrophone(hydro);
 
+					//need to refresh table to show symbol. 
+					tableArrayPane.getTableView().refresh();
+				}
+			});
+		
 			this.setCenter(pamFlipePane);
 	}
 	
@@ -82,7 +95,6 @@ public class HydrophonesPane extends PamBorderPane {
 	 *
 	 */
 	class HydrophoneTable extends TableSettingsPane<HydrophoneProperty> {
-
 
 		public HydrophoneTable(ObservableList<HydrophoneProperty> hydrophoneData) {
 			super(hydrophoneData);
@@ -145,32 +157,12 @@ public class HydrophonesPane extends PamBorderPane {
 			hydrophonePane.setCurrentArray(currentArray);
 			hydrophonePane.setParams(data.getHydrophone());
 			
+			
+			currentHydrophoneData = data; 
+			
 			pamFlipePane.flipToBack();	
 		}
 		
-		/**
-		 * Set hydrophone pane within hiding pane.
-		 * @param clickTypeProperty
-		 */
-		public void setHydrophonePane(HydrophoneProperty data){
-
-			hydrophonePane.setCurrentArray(getCurrentArray()); 
-			
-			hydrophonePane.setCurrentArray(currentArray);
-			hydrophonePane.setParams(data.getHydrophone());
-
-			//now need to make sure on closing the pane that settings are saved. Need to 
-			//remove the old click type from the list and add new one in the same position. 
-			getFlipPaneCloseButton().setOnAction((action)->{
-				pamFlipePane.flipToFront();
-				
-				Hydrophone hydro = hydrophonePane.getParams(data.getHydrophone());
-				data.setHydrophone(hydro);
-
-				//need to refresh table to show symbol. 
-				this.getTableView().refresh();
-			});
-		}
 
 		private PamArray getCurrentArray() {
 			return currentArray;
@@ -201,6 +193,24 @@ public class HydrophonesPane extends PamBorderPane {
 	public void setParams(PamArray currentArray) {
 		this.currentArray=currentArray;
 	}
+
+	public PamArray getParams(PamArray currParams) {
+		return currParams;
+	}
+	
+	
+	/**
+	 * Get the current hydrophone list. 
+	 * @return the current hydrophone list. 
+	 */
+	public ObservableList<HydrophoneProperty> getHydrophoneList() {
+		return hydrophoneList;
+	}
+
+	public void setHydrophoneList(ObservableList<HydrophoneProperty> hydrophoneList) {
+		this.hydrophoneList = hydrophoneList;
+	}
+
 
 
 }

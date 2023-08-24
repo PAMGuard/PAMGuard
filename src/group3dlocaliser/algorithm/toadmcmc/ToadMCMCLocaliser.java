@@ -59,7 +59,6 @@ public class ToadMCMCLocaliser extends TOADBaseAlgorithm {
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "MCMC";
 	}
 

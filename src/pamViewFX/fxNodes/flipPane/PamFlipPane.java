@@ -1,6 +1,5 @@
 package pamViewFX.fxNodes.flipPane;
 
-import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -8,9 +7,6 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
@@ -39,7 +35,7 @@ public class PamFlipPane extends FlipPane {
 	private Label advLabel;
 
 	private PamButton backButton;
-
+	
 
 	public PamFlipPane() {
 		super();
@@ -156,4 +152,10 @@ public class PamFlipPane extends FlipPane {
 		return backButton;
 	}
 
+	/**
+	 * True if the flip pane is showing the front. 
+	 */
+	public boolean isShowingFront() {
+		return super.flipFrontProperty().get();
+	}
 }

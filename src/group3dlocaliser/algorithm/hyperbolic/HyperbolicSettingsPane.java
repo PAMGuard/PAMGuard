@@ -63,7 +63,8 @@ public class HyperbolicSettingsPane extends LocaliserPane<HyperbolicParams> {
 
 	@Override
 	public void setParams(HyperbolicParams input) {
-		System.out.println("Hyperbolic set Params: " + input.bootStrapN); 
+		if (input==null) input = new HyperbolicParams(); 
+		//System.out.println("Hyperbolic set Params: " + input.bootStrapN); 
 		numIterations.getValueFactory().setValue(input.bootStrapN);
 		hyperbolicToggleSwitch.setSelected(input.calcErrors);
 	}

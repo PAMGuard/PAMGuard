@@ -15,6 +15,12 @@ import pamViewFX.fxNodes.PamLabel;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
 import pamViewFX.validator.PamValidator;
 
+/**
+ * The TOAD options pane.
+ *  
+ * @author Jamie Macaulay
+ *
+ */
 public class TOADOptionsPane extends SettingsPane<TOADBaseParams>{
 	
 	private BorderPane mainPane;
@@ -34,7 +40,7 @@ public class TOADOptionsPane extends SettingsPane<TOADBaseParams>{
 		GridPane gridPane = new PamGridPane();
 		int x = 0, y = 0;
 		gridPane.add(new PamLabel("Min correlation ", Pos.CENTER_RIGHT), x++, y);
-		gridPane.add(minCorrelation = new TextField("1234"), x, y);
+		gridPane.add(minCorrelation = new TextField("0"), x, y);
 		
 		
 		//create check to show at least some check boxes need to be selected.
@@ -63,7 +69,7 @@ public class TOADOptionsPane extends SettingsPane<TOADBaseParams>{
 		x = 0;
 		y++;
 		gridPane.add(new PamLabel("Min TOAD measurements ", Pos.CENTER_RIGHT), x++, y);
-		gridPane.add(minTimeDelays = new TextField("1234"), x, y);
+		gridPane.add(minTimeDelays = new TextField("3"), x, y);
 		
 		validator.createCheck()
         .dependsOn(("min_delays"), minTimeDelays.textProperty())
@@ -79,13 +85,13 @@ public class TOADOptionsPane extends SettingsPane<TOADBaseParams>{
   	              c.error("Min TOAD measurements cannot be read as a number");
         	}    
         })
-        .decorates(minCorrelation)
+        .decorates(minTimeDelays)
         .immediate();
 		
 		x = 0;
 		y++;
 		gridPane.add(new PamLabel("Min groups ", Pos.CENTER_RIGHT), x++, y);
-		gridPane.add(minGroups = new TextField("1234"), x, y);
+		gridPane.add(minGroups = new TextField("0"), x, y);
 		
 		
 		validator.createCheck()
@@ -102,11 +108,8 @@ public class TOADOptionsPane extends SettingsPane<TOADBaseParams>{
   	              c.error("Minb groups input cannot be read as a number");
         	}    
         })
-        .decorates(minCorrelation)
+        .decorates(minGroups)
         .immediate();
-		
-		
-		
 		
 		minCorrelation.setTooltip(new Tooltip("Minimum cross correlation coefficient for each hydrophone pair"));
 		minTimeDelays.setTooltip(new Tooltip("Minimum number of time delays with acceptable cross correlation"));

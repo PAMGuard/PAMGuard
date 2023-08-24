@@ -26,6 +26,7 @@ public class MCMCLoclaiserPane extends LocaliserPane<MCMCParams2> {
 
 	@Override
 	public void setParams(MCMCParams2 input) {
+		if (input==null) input= new MCMCParams2(); 
 		mainPane.setParams(input);
 	}
 

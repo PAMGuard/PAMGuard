@@ -48,7 +48,7 @@ public class FlipPane extends StackPane {
     private double      flipTime;
     private Orientation flipDirection;
     
-    private BooleanProperty flippedFrontProperty = new SimpleBooleanProperty(); 
+    protected BooleanProperty flippedFrontProperty = new SimpleBooleanProperty(); 
 
 	// ******************** Constructors **************************************
     public FlipPane() {

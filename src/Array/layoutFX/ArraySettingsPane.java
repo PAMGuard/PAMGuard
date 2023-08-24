@@ -120,8 +120,9 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 	
 	@Override
 	public PamArray  getParams(PamArray  currParams) {
-		// TODO Auto-generated method stub
-		return null;
+		currParams = hydrophonePane.getParams(currParams); 
+		currParams = streamerPane.getParams(currParams); 
+		return currParams;
 	}
 
 	@Override

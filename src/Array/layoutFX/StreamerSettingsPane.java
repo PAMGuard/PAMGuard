@@ -28,8 +28,7 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 
 	@Override
 	public Streamer getParams(Streamer currParams) {
-		// TODO Auto-generated method stub
-		return null;
+		return currParams;
 	}
 
 	@Override

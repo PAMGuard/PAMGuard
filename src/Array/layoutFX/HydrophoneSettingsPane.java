@@ -83,7 +83,8 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 	private Label recieverSensLabel;
 
 	private Label dBSensLabel;
-
+	
+	private boolean ressetHydrophoneType = false; 
 
 	/**
 	 * The main holder pane. 
@@ -235,11 +236,15 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 		defaultHydro.getSelectionModel().select(0);
 		
 		defaultHydro.setOnAction((action)->{
-			if (defaultHydro.getSelectionModel().getSelectedIndex() == 0) {
+			//don't want to trigger this if we are programtically setting it back
+			if (defaultHydro.getSelectionModel().getSelectedIndex() <= 0 || ressetHydrophoneType) {
 				//do nothing.
+				return;
 			}
+			ressetHydrophoneType=true;
 			hSens.getValueFactory().setValue(Double.valueOf(DefaultHydrophone.values()[defaultHydro.getSelectionModel().getSelectedIndex()-1].getSens()));
 			preampGain.getValueFactory().setValue(Double.valueOf(DefaultHydrophone.values()[defaultHydro.getSelectionModel().getSelectedIndex()-1].getGain()));
+			ressetHydrophoneType=false;
 		});
 	
 		mainControls.add(defaultHydro, 1, gridy);
@@ -247,10 +252,14 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 		gridy++;
 		mainControls.add(recieverSensLabel = new Label(""), 0, gridy);
 		recieverSensLabel.setAlignment(Pos.CENTER_RIGHT);
-		hSens = new PamSpinner<Double>(); 
+		hSens = new PamSpinner<Double>(-Double.MAX_VALUE, Double.MAX_VALUE, -200., 1.); 
+		hSens.setEditable(true);
 		
 		hSens.valueProperty().addListener((obs, oldval, newVal)->{
+			if (ressetHydrophoneType) return;
+			ressetHydrophoneType = true; //make sure we don't trigger anything when resetting the combo box
 			defaultHydro.getSelectionModel().select(0);
+			ressetHydrophoneType= false;
 		});
 
 		mainControls.add(hSens, 1, gridy);
@@ -261,10 +270,15 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 		Label preAmpLabel = new Label("Preamplifier gain");
 		mainControls.add(preAmpLabel, 0, gridy);
 		preAmpLabel.setAlignment(Pos.CENTER_RIGHT);
-		preampGain =new PamSpinner<Double>(); 
+		preampGain =new PamSpinner<Double>(-Double.MAX_VALUE, Double.MAX_VALUE, 0., 1.); 
 		preampGain.valueProperty().addListener((obs, oldval, newVal)->{
+			if (ressetHydrophoneType) return;
+			ressetHydrophoneType = true;//make sure we don't trigger anything when resetting the combo box
 			defaultHydro.getSelectionModel().select(0);
+			ressetHydrophoneType= false;
 		});
+		preampGain.setEditable(true);
+
 		
 		mainControls.add(preampGain, 1, gridy);
 		mainControls.add(new Label("dB"), 2, gridy);
@@ -439,10 +453,8 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 		double zCoeff = PamController.getInstance().getGlobalMediumManager().getZCoeff(); 
 
 		try {
-			
 			//hydrophone.setID(Integer.valueOf(iD.getText()));
 			//hydrophone.setType(type.getText());
-			
 			hydrophone.setStreamerId(streamers.getSelectionModel().getSelectedIndex());
 			hydrophone.setSensitivity(hSens.getValue()+PamController.getInstance().getGlobalMediumManager().getdBSensOffset());
 			hydrophone.setPreampGain(preampGain.getValue());

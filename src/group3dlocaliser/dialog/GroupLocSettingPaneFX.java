@@ -462,7 +462,9 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 			
 			System.out.println("Set params for: " + algoProvider.getName() + "  " + params); 
 			
-			if (params!=null && algoProvider.getAlgorithmSettingsPane()!=null)  {
+			if (algoProvider.getAlgorithmSettingsPane()!=null)  {
+				
+				//note that if params are null but a pane exists the algorithm needs to make a new set of params. 
 				algoProvider.getAlgorithmSettingsPane().setParams(params.getAlgorithmParameters());
 			}
 			
@@ -483,11 +485,7 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 		if (currAlgo == null) {
 			return;
 		}
-		
-		
-		
-		
-		
+
 //		algorithmSourcePane.setDetectionSource(sourcePanel.getSource());
 //		LocaliserAlgorithmParams locParams = currentParams.getAlgorithmParams(currAlgo);
 //		if (locParams != null) {
