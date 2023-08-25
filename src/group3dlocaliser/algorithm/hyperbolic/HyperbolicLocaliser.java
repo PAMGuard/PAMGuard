@@ -28,15 +28,24 @@ import group3dlocaliser.localisation.LinearLocalisation;
 import pamMaths.PamVector;
 
 /**
- * Hyperbolic localisation using methods described in 
- * Gillette, M. D., and Silverman, H. F. (2008). �A linear closed-form algorithm for source localization from time-differences of arrival,� IEEE Signal Processing Letters, 15, 1�4.<p>
+ * Hyperbolic localisation using methods described in Gillette, M. D., and
+ * Silverman, H. F. (2008). �A linear closed-form algorithm for source
+ * localization from time-differences of arrival,� IEEE Signal Processing
+ * Letters, 15, 1�4.
+ * <p>
  * 
- * Also worth reading Spiesberger, J. L. (2001). �Hyperbolic location errors due to insufficient numbers of receivers,� The Journal of the Acoustical Society of America, 109, 3076�3079.
- * which gives a clearer explanation of why at least 4 recievers are needed for 2D localisation and 5 for 3D localisation.<p>
- * Worth noting that the equations derived in Gillette 2008 are functionally identical to those in Spiesberger 2001 and an earlier work by Speisberger and Fristrup:<br>
- * Spiesberger, J. L., and Fristrup, K. M. (1990). �Passive localization of calling animals and sensing of their acoustic environment using acoustic tomography,� 
- * The american naturalist, 135, 107�153.
- *  
+ * Also worth reading Spiesberger, J. L. (2001). �Hyperbolic location errors due
+ * to insufficient numbers of receivers,� The Journal of the Acoustical Society
+ * of America, 109, 3076�3079. which gives a clearer explanation of why at least
+ * 4 recievers are needed for 2D localisation and 5 for 3D localisation.
+ * <p>
+ * Worth noting that the equations derived in Gillette 2008 are functionally
+ * identical to those in Spiesberger 2001 and an earlier work by Speisberger and
+ * Fristrup:<br>
+ * Spiesberger, J. L., and Fristrup, K. M. (1990). �Passive localization of
+ * calling animals and sensing of their acoustic environment using acoustic
+ * tomography,� The american naturalist, 135, 107�153.
+ * 
  * @author Doug Gillespie
  *
  */

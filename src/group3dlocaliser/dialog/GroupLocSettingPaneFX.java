@@ -447,20 +447,19 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 			return;
 		}
 		
-		
 		PamDataBlock<?> currSource = sourcePanel.getSource();
 
-		
 		//note that we get the algorithms from the choice box here because these will already have
 		//been filtered for suitability depending on array geometry. 
 		for (int i=0; i<this.algorithms.getItems().size(); i++) {
-			
 			
 			LocaliserAlgorithm3D algoProvider = group3dLocaliserControl.findAlgorithm(this.algorithms.getItems().get(i));
 			
 			LocaliserAlgorithmParams params = currentParams.getAlgorithmParams(algoProvider); 
 			
-			System.out.println("Set params for: " + algoProvider.getName() + "  " + params); 
+//			System.out.println("Set params for: " + algoProvider.getName() + "  " + params); 
+			//need this here so that the source pane is created - otherwise channels 
+			algoProvider.prepare(currSource);
 			
 			if (algoProvider.getAlgorithmSettingsPane()!=null)  {
 				
@@ -472,14 +471,10 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 				//get the source pane paramters
 				algoProvider.getSourceSettingsPane(null, currSource).setParams();
 			}
-			
 //			if (algoProvider.getSourceSettingsPane(null, null).useParams(params){
 //				
 //			}
-			
-			
 		}
-		
 		
 		LocaliserAlgorithm3D currAlgo = getSelectedAlgorithm();
 		if (currAlgo == null) {

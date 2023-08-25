@@ -225,15 +225,16 @@ public class ToadSimplexLocaliser extends TOADBaseAlgorithm {
 //		SimpleError cartErr = estimateCartesianError(geometry, toadInformation, posVec);
 		
 		//FIXME - this return super weird results
-		EllipticalError ellipErr;
-		if (usell) {
-			 ellipErr = estimateEllipticalError(geometry, toadInformation, posVec);
-		}
-		else {
-			//FIXME  - this elliptical error seems to work far better
-			SimpleMinimisation simpleMin  = new SimpleMinimisation(chiFunc, nDimensions, start, firstStep); 
-			ellipErr = new LikilihoodError(simpleMin, posVec); 
-		}
+		EllipticalError ellipErr = estimateEllipticalError(geometry, toadInformation, posVec);
+//		if (usell) {
+//			 ellipErr = estimateEllipticalError(geometry, toadInformation, posVec);
+//		}
+//		else {
+//			 ellipErr = estimateEllipticalError(geometry, toadInformation, posVec);
+//
+////			SimpleMinimisation simpleMin  = new SimpleMinimisation(chiFunc, nDimensions, start, firstStep); 
+////			ellipErr = new LikilihoodError(simpleMin, posVec); 
+//		}
 		
 		
 

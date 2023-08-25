@@ -382,8 +382,9 @@ public class PamVector implements Serializable, Cloneable, PamCoordinate, Manage
 	 * @return magnitude of those dimensions only. 
 	 */
 	public double norm(int nDim) {
-		return Math.sqrt(normSquared(2));
+		return Math.sqrt(normSquared(nDim));
 	}
+	
 	/**
 	 * 
 	 * @param vec a PamVector

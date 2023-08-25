@@ -13,6 +13,7 @@ import PamUtils.LatLong;
 import PamUtils.PamArrayUtils;
 import PamView.TransformShape;
 import PamView.GeneralProjector;
+import PamguardMVC.PamConstants;
 import PamguardMVC.PamDataUnit;
 import pamMaths.PamVector;
 
@@ -118,14 +119,18 @@ public class EllipseLocErrorDraw implements LocErrorGraphics {
 		//this is 2D- need to make a slice through the ellipse and get the localisation points. 
 		double[] errors2D=ellipticalError.getErrorEllipse2D(ErrorEllipse.PLANE_XY_PROJ);
 		//		if (1>0) return null;
+		
+		if (errors2D==null) return null; 
 
+
+		if (errors2D[0] > PamConstants.EARTH_RADIUS_METERS || errors2D[1] > PamConstants.EARTH_RADIUS_METERS) {
+			return null; //don't draw infintie stuff - causes nasty errors. 
+		}
 //		System.out.println("Draw ovals on map"); 
 //		System.out.println("EllipseLocErrorDraw: draw ellipse:"+errors2D[0]+" "+errors2D[1]+" "+Math.toDegrees(errors2D[2]));
 
 		//System.out.println("Plot errors:  perp: "+ perpError+  " horz: "+horzError+ " " + errorDirection); 
 		Graphics2D g2d = (Graphics2D)g;
-
-		if (errors2D==null) return null; 
 
 		//draw oval
 		//		//need to work out the size of the horizontal error. 

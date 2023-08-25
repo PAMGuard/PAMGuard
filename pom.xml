@@ -318,7 +318,7 @@
 	<dependency>
 		<groupId>io.github.macster110</groupId>
 		<artifactId>jpamutils</artifactId>
-		<version>0.0.56</version>
+		<version>0.0.57</version>
 	</dependency>
 
 	<!--jpam project - Deep learning java library 
@@ -329,7 +329,7 @@
 	<dependency>
 		<groupId>io.github.macster110</groupId>
 		<artifactId>jdl4pam</artifactId>
-		<version>0.0.94</version>
+		<version>0.0.97</version>
 	</dependency> 
 			
 	<!-- https://mvnrepository.com/artifact/gov.nist.math/jama -->
@@ -785,9 +785,9 @@ you may need to copy files from your downloaded PAMGuard source code, e.g. C:\Us
 C:\Users\*yourusername*\.m2\repository\pamguard\org\x3\2.2.2
 -->
  	<dependency>
-	    <groupId>pamguard.org</groupId>
+	    <groupId>org.pamguard</groupId>
 	    <artifactId>x3</artifactId>
-	    <version>2.2.2</version>
+	    <version>2.2.5</version>
 	</dependency>
 	
 		<!-- https://mvnrepository.com/artifact/it.sauronsoftware/jave -->

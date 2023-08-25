@@ -246,6 +246,8 @@ public class MCMCPane extends SettingsPane<MCMCParams2> {
 		jumpSize[0] = jumpXSpinner.getValue();
 		jumpSize[1] = jumpYSpinner.getValue();
 		jumpSize[2] = jumpZSpinner.getValue();
+		
+		currParams.jumpSize = jumpSize;
 
 		//bit messy but works...
 		currParams.setChainDispersion(startDispersion.getValue(), 3);

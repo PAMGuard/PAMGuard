@@ -36,7 +36,22 @@ import group3dlocaliser.algorithm.LogLikelihoodData;
 import pamMaths.PamVector;
 import pamViewFX.fxNodes.pamDialogFX.ManagedSettingsPane;
 
+
+
 abstract public class TOADBaseAlgorithm extends LocaliserAlgorithm3D {
+	
+	public enum MultiVariateType {
+			/**
+			 * Chi2 fucntion
+			 */
+			CHI2, 
+			
+			/**
+			 * Log liklilihood function
+			 */
+			LOG_LIKILIHOOD;
+	}
+
 
 	private double sampleRate;
 
@@ -53,7 +68,7 @@ abstract public class TOADBaseAlgorithm extends LocaliserAlgorithm3D {
 	protected Group3DLocaliserControl group3dLocaliser;
 
 	private TOADSettingsPaneWithChannels tspwc;
-	
+
 	private static double halflog2pi = Math.log(2.*Math.PI)/2.;
 
 	public TOADBaseAlgorithm(Group3DLocaliserControl group3dLocaliser) {
@@ -110,9 +125,9 @@ abstract public class TOADBaseAlgorithm extends LocaliserAlgorithm3D {
 				groupDataUnit.getTimeMilliseconds());
 
 		//		if (groupDataUnit.getSubDetection(0).getUID() == 9035003222L) {
-//		if (superDetection.getSubDetection(0).getUID() == 9035004477L) {
-//			System.out.println("Found it");
-//		}
+		//		if (superDetection.getSubDetection(0).getUID() == 9035004477L) {
+		//			System.out.println("Found it");
+		//		}
 		TOADInformation toadInformation = toadCalculator.getTOADInformation(superDetection.getSubDetections(), sampleRate, allChannels, geometry);
 
 		boolean toadOK = checkTOADInformation(toadInformation);
@@ -150,7 +165,7 @@ abstract public class TOADBaseAlgorithm extends LocaliserAlgorithm3D {
 	public int countUsableTOADS(TOADInformation toadInformation) {
 		return countUsableTOADS(toadInformation, toadBaseParams.getMinCorrelation());
 	}
-	
+
 	/**
 	 * Count the number of TOAD values which have a correlation coefficient or 'score' 
 	 * >= the minimum.
@@ -256,21 +271,24 @@ abstract public class TOADBaseAlgorithm extends LocaliserAlgorithm3D {
 		return null;
 	}
 
+
 	/**
-	 * Calculate a Log Likelihood value for the given geometry and set of delays. 
-	 * @param geometry
-	 * @param delays
-	 * @return
+	 * Calculates chi2 or log likelihood for a position. 
+	 * @param geometry - the geometry of the receivers. 
+	 * @param toadInformation - the received time delay information. 
+	 * @param position - the position to test. 
+	 * @param flag - which value to calculate.
+	 * @return the chi2 or log likilihood value. 
 	 */
-	public LogLikelihoodData calcLogLikelihood(SnapshotGeometry geometry, TOADInformation toadInformation, double[] position) {
+	private FitTestValue multivariateFunction(SnapshotGeometry geometry, TOADInformation toadInformation, double[] position, MultiVariateType flag) {
 		/**
 		 * There is an awful lot of repeated code in this and the Chi2 function. Would be good
 		 * to sort out some time !
 		 */
-//		if (1>0) {
-//			Chi2Data chiRes = calcChi2(geometry, toadInformation, position);
-//			LogLikelihoodData lld = new LogLikelihoodData(-chiRes.getChi2(), chiRes.getDegreesOfFreedom());
-//		}
+		//		if (1>0) {
+		//			Chi2Data chiRes = calcChi2(geometry, toadInformation, position);
+		//			LogLikelihoodData lld = new LogLikelihoodData(-chiRes.getChi2(), chiRes.getDegreesOfFreedom());
+		//		}
 
 		if (position == null || position.length == 0) {
 			return null;
@@ -341,18 +359,140 @@ abstract public class TOADBaseAlgorithm extends LocaliserAlgorithm3D {
 				 * delay error, but more if you're end on.  
 				 */
 				errSq += Math.pow(exp*cError/c, 2.);
-				/*
-				 * Do the full calc -ln(2pi)/2 - .5ln(sig) - .5(diff^2/errSq). 
-				 * So note the 0.5 instead of the which is to take the sqrt(errSq) !
-				 */
-				llVal -= (halflog2pi + 0.5*Math.log(errSq) + Math.pow(val-exp, 2)/errSq/2);
-//				llVal -= Math.pow(val-exp, 2)/errSq/2.;
-				nGood++;
+
+				switch (flag) {
+
+				case LOG_LIKILIHOOD:
+					/*
+					 * Do the full calc -ln(2pi)/2 - .5ln(sig) - .5(diff^2/errSq). 
+					 * So note the 0.5 instead of the which is to take the sqrt(errSq) !
+					 */
+					llVal -= (halflog2pi + 0.5*Math.log(errSq) + Math.pow(val-exp, 2)/errSq/2);
+					//					llVal -= Math.pow(val-exp, 2)/errSq/2.;
+					nGood++;
+					break;
+
+				case CHI2:
+					llVal += Math.pow(val-exp, 2)/errSq;
+					nGood++;
+					break;
+
+				}
 			}
 		}
-		return new LogLikelihoodData(llVal, nGood-nDim);
-	}
+
+		switch (flag) {
+		case LOG_LIKILIHOOD:
+			return new LogLikelihoodData(llVal, nGood-nDim);				
+		case CHI2:
+			return new Chi2Data(llVal, nGood-nDim);		
+		}
 		
+		//something has gone pretty wrong
+		return null; 
+		
+	}
+
+
+	/**
+	 * Calculate a Log Likelihood value for the given geometry and set of delays. 
+	 * @param geometry
+	 * @param delays
+	 * @return
+	 */
+	public LogLikelihoodData calcLogLikelihood(SnapshotGeometry geometry, TOADInformation toadInformation, double[] position) {
+		
+		 return (LogLikelihoodData) multivariateFunction( geometry,  toadInformation, position, MultiVariateType.LOG_LIKILIHOOD);
+//		/**
+//		 * There is an awful lot of repeated code in this and the Chi2 function. Would be good
+//		 * to sort out some time !
+//		 */
+//		//		if (1>0) {
+//		//			Chi2Data chiRes = calcChi2(geometry, toadInformation, position);
+//		//			LogLikelihoodData lld = new LogLikelihoodData(-chiRes.getChi2(), chiRes.getDegreesOfFreedom());
+//		//		}
+//
+//		if (position == null || position.length == 0) {
+//			return null;
+//		}
+//		double[][] delays = toadInformation.getToadSeconds();
+//		double[][] delayErrors = toadInformation.getToadErrorsSeconds();
+//
+//		double minCorrelationValue = toadBaseParams.getMinCorrelation();
+//
+//		int nDim = position.length;
+//		int[] hydrophones = toadInformation.getHydrophoneList();
+//		int[] channels = toadInformation.getChannelList();
+//		int nChan = channels.length;
+//		double[] expectedDelays = new double[nChan];
+//		double c = geometry.getCurrentArray().getSpeedOfSound();
+//		double cError = geometry.getCurrentArray().getSpeedOfSoundError();
+//		PamVector centre = geometry.getGeometricCentre();
+//		double[] channelErrors = new double[nChan];
+//		double[] streamerErrors = new double[nChan];
+//		int[] streamerId = new int[nChan];
+//		double[][] correlationScores = toadInformation.getToadScores();
+//		PamVector positionVec = new PamVector(position).add(centre);
+//		// calculate the absolute distance (then time) to each hydrophone used in the delay matrix.  
+//		for (int i = 0; i < nChan; i++) {
+//			double r = 0;
+//			/*
+//			 *  use the hydrophone LUT from TOAD information to make sure we get the right phone
+//			 *  since channel groups may not be in a sensible order. 
+//			 */
+//			PamVector hydrophoneGeom = geometry.getGeometry()[hydrophones[i]];
+//			PamVector rv = positionVec.sub(hydrophoneGeom);
+//			expectedDelays[i] = rv.norm(nDim) / c;
+//			/**
+//			 * Now work out the expected range error along the unit vector position-hydrophone+centre 
+//			 */
+//			PamVector rvu = rv.getUnitVector();
+//			PamVector hErr = geometry.getHydrophoneErrors()[hydrophones[i]]; //NB. this is not really a vector !
+//			channelErrors[i] = Math.pow(rvu.sumComponentsSquared(hErr)/c, 2); // square and convert to time now
+//			PamVector sErr = geometry.getStreamerErrors()[hydrophones[i]]; // this isn't a vector either
+//			streamerId[i] = geometry.getCurrentArray().getStreamerForPhone(hydrophones[i]);
+//			if (sErr != null) {
+//				streamerErrors[i] = Math.pow(rvu.sumComponentsSquared(sErr)/c, 2);
+//			}
+//		}
+//		double llVal = 0.;
+//		int nGood = 0;
+//		for (int i = 0; i < nChan; i++) {
+//			for (int j = i+1; j < nChan; j++) {
+//				double val = (delays[i][j]);
+//				if (Double.isNaN(val)) {
+//					continue;
+//				}
+//				if (correlationScores == null || correlationScores[i][j] < minCorrelationValue) {
+//					continue;
+//				}
+//				double exp = expectedDelays[j]-expectedDelays[i];
+//				// now work out the squared error...
+//				double errSq = Math.pow(delayErrors[i][j], 2)+channelErrors[i]+channelErrors[j];
+//
+//				// add in the streamer errors if they are in different streamers. 
+//				if (streamerId[i] != streamerId[j]) {
+//					errSq += streamerErrors[i]+streamerErrors[j];
+//				}
+//				/*
+//				 * Finally there is an error due to uncertainty in c, which is 
+//				 * obviously proportional to the expected delay. i.e. if you're 
+//				 * perpendicular to a hydrophone pair, then there will be zero 
+//				 * delay error, but more if you're end on.  
+//				 */
+//				errSq += Math.pow(exp*cError/c, 2.);
+//				/*
+//				 * Do the full calc -ln(2pi)/2 - .5ln(sig) - .5(diff^2/errSq). 
+//				 * So note the 0.5 instead of the which is to take the sqrt(errSq) !
+//				 */
+//				llVal -= (halflog2pi + 0.5*Math.log(errSq) + Math.pow(val-exp, 2)/errSq/2);
+//				//				llVal -= Math.pow(val-exp, 2)/errSq/2.;
+//				nGood++;
+//			}
+//		}
+//		return new LogLikelihoodData(llVal, nGood-nDim);
+	}
+
 	/**
 	 * Calculate a chi2 value for the given geometry and set of delays. 
 	 * @param geometry array geometry. 
@@ -361,93 +501,104 @@ abstract public class TOADBaseAlgorithm extends LocaliserAlgorithm3D {
 	 * @return
 	 */
 	public Chi2Data calcChi2(SnapshotGeometry geometry, TOADInformation toadInformation, double[] position) {
-		if (position == null || position.length == 0) {
-			return null;
-		}
-		double[][] delays = toadInformation.getToadSeconds();
-		double[][] delayErrors = toadInformation.getToadErrorsSeconds();
-
-		double minCorrelationValue = toadBaseParams.getMinCorrelation();
-
-		int nDim = position.length;
-		int[] hydrophones = toadInformation.getHydrophoneList();
-		int[] channels = toadInformation.getChannelList();
-		int nChan = channels.length;
-		double[] expectedDelays = new double[nChan];
-		double c = geometry.getCurrentArray().getSpeedOfSound();
-		double cError = geometry.getCurrentArray().getSpeedOfSoundError();
-		PamVector centre = geometry.getGeometricCentre();
-		double[] channelErrors = new double[nChan];
-		double[] streamerErrors = new double[nChan];
-		int[] streamerId = new int[nChan];
-		double[][] correlationScores = toadInformation.getToadScores();
-		PamVector positionVec = new PamVector(position).add(centre);
-		// calculate the absolute distance (then time) to each hydrophone used in the delay matrix.  
-		for (int i = 0; i < nChan; i++) {
-			double r = 0;
-			/*
-			 *  use the hydrophone LUT from TOAD information to make sure we get the right phone
-			 *  since channel groups may not be in a sensible order. 
-			 */
-			PamVector hydrophoneGeom = geometry.getGeometry()[hydrophones[i]];
-			PamVector rv = positionVec.sub(hydrophoneGeom);
-			expectedDelays[i] = rv.norm() / c;
-			/**
-			 * Now work out the expected range error along the unit vector position-hydrophone+centre 
-			 * 
-			 * These calculations were incorrect since they look at dot of the 
-			 * error against the direction to the source, which is wrong ! 
-			 * e.g. if error was (1,1,1) it appears as a vector along that bearing, if this
-			 * were dotted with an angle perpendicular to this, then it would give a very 
-			 * different answer. 
-			 * The correct way to calculate the inter pair error is to add each component of
-			 * the error along the vector joining the two hydrophones. This error should be stored
-			 * as a pair error and then dot producted with the unit vector towards the source.
-			 * Need to rewrite and produce a matrix of channel pair errors!
-			 */
-			PamVector rvu = rv.getUnitVector();
-			PamVector hErr = geometry.getHydrophoneErrors()[hydrophones[i]];
-			//			if (hErr != null) {
-			channelErrors[i] = Math.pow(rvu.sumComponentsSquared(hErr)/c, 2); // square and convert to time now
-			//			}
-			PamVector sErr = geometry.getStreamerErrors()[hydrophones[i]];
-			streamerId[i] = geometry.getCurrentArray().getStreamerForPhone(hydrophones[i]);
-			if (sErr != null) {
-				streamerErrors[i] = Math.pow(rvu.sumComponentsSquared(sErr)/c, 2);
-			}
-		}
-		double chiVal = 0.;
-		int nGood = 0;
-		for (int i = 0; i < nChan; i++) {
-			for (int j = i+1; j < nChan; j++) {
-				double val = (delays[i][j]);
-				if (Double.isNaN(val)) {
-					continue;
-				}
-				if (correlationScores == null || correlationScores[i][j] < minCorrelationValue) {
-					continue;
-				}
-				double exp = expectedDelays[j]-expectedDelays[i];
-				// now work out the squared error...
-				double errSq = Math.pow(delayErrors[i][j], 2)+channelErrors[i]+channelErrors[j];
-
-				// add in the streamer errors if they are in different streamers. 
-				if (streamerId[i] != streamerId[j]) {
+		
+		return (Chi2Data) multivariateFunction( geometry,  toadInformation, position, MultiVariateType.CHI2);
+//
+//		if (position == null || position.length == 0) {
+//			return null;
+//		}
+//		double[][] delays = toadInformation.getToadSeconds();
+//		double[][] delayErrors = toadInformation.getToadErrorsSeconds();
+//
+//		double minCorrelationValue = toadBaseParams.getMinCorrelation();
+//
+//		int nDim = position.length;
+//		int[] hydrophones = toadInformation.getHydrophoneList();
+//		int[] channels = toadInformation.getChannelList();
+//		int nChan = channels.length;
+//		double[] expectedDelays = new double[nChan];
+//		double c = geometry.getCurrentArray().getSpeedOfSound();
+//		double cError = geometry.getCurrentArray().getSpeedOfSoundError();
+//		PamVector centre = geometry.getGeometricCentre();
+//		double[] channelErrors = new double[nChan];
+//		double[] streamerErrors = new double[nChan];
+//		int[] streamerId = new int[nChan];
+//		double[][] correlationScores = toadInformation.getToadScores();
+//		PamVector positionVec = new PamVector(position).add(centre);
+//		// calculate the absolute distance (then time) to each hydrophone used in the delay matrix.  
+//		for (int i = 0; i < nChan; i++) {
+//			double r = 0;
+//			/*
+//			 *  use the hydrophone LUT from TOAD information to make sure we get the right phone
+//			 *  since channel groups may not be in a sensible order. 
+//			 */
+//			PamVector hydrophoneGeom = geometry.getGeometry()[hydrophones[i]];
+//			PamVector rv = positionVec.sub(hydrophoneGeom);
+//			
+//			
+//			expectedDelays[i] = rv.norm() / c;
+//			/**
+//			 * Now work out the expected range error along the unit vector position-hydrophone+centre 
+//			 * 
+//			 * These calculations were incorrect since they look at dot of the 
+//			 * error against the direction to the source, which is wrong ! 
+//			 * e.g. if error was (1,1,1) it appears as a vector along that bearing, if this
+//			 * were dotted with an angle perpendicular to this, then it would give a very 
+//			 * different answer. 
+//			 * The correct way to calculate the inter pair error is to add each component of
+//			 * the error along the vector joining the two hydrophones. This error should be stored
+//			 * as a pair error and then dot producted with the unit vector towards the source.
+//			 * Need to rewrite and produce a matrix of channel pair errors!
+//			 */
+//			PamVector rvu = rv.getUnitVector();
+//			PamVector hErr = geometry.getHydrophoneErrors()[hydrophones[i]];
+//			//			if (hErr != null) {
+//			channelErrors[i] = Math.pow(rvu.sumComponentsSquared(hErr)/c, 2); // square and convert to time now
+//			//			}
+//			PamVector sErr = geometry.getStreamerErrors()[hydrophones[i]];
+//			streamerId[i] = geometry.getCurrentArray().getStreamerForPhone(hydrophones[i]);
+//			if (sErr != null) {
+//				streamerErrors[i] = Math.pow(rvu.sumComponentsSquared(sErr)/c, 2);
+//			}
+//		}
+//		double chiVal = 0.;
+//		int nGood = 0;
+//		for (int i = 0; i < nChan; i++) {
+//			for (int j = i+1; j < nChan; j++) {
+//				double val = (delays[i][j]);
+//				if (Double.isNaN(val)) {
+//					continue;
+//				}
+//				if (correlationScores == null || correlationScores[i][j] < minCorrelationValue) {
+//					continue;
+//				}
+//				double exp = expectedDelays[j]-expectedDelays[i];
+//				// now work out the squared error...
+//				double errSq = Math.pow(delayErrors[i][j], 2)+channelErrors[i]+channelErrors[j];
+//
+//				// add in the streamer errors if they are in different streamers. 
+//				if (streamerId[i] != streamerId[j]) {
+//					//					errSq += streamerErrors[i]+streamerErrors[j];
+//					//					continue; simulate unsynchronised streamers.
+//				}
+//
+//				// add in the streamer errors if they are in different streamers. 
+//				if (streamerId[i] != streamerId[j]) {
 //					errSq += streamerErrors[i]+streamerErrors[j];
-					//					continue; simulate unsynchronised streamers.
-				}
-				/*
-				 * Finally there is an error due to uncertainty in c, which is 
-				 * obviously proportional to the expected delay. i.e. if you're 
-				 * perpendicular to a hydrophone pair, then there will be zero 
-				 * delay error, but more if you're end on.  
-				 */
-				errSq += Math.pow(exp*cError/c, 2.);
-				chiVal += Math.pow(val-exp, 2)/errSq;
-				nGood++;
-			}
-		}
-		return new Chi2Data(chiVal, nGood-nDim);
+//				}
+//
+//				/*
+//				 * Finally there is an error due to uncertainty in c, which is 
+//				 * obviously proportional to the expected delay. i.e. if you're 
+//				 * perpendicular to a hydrophone pair, then there will be zero 
+//				 * delay error, but more if you're end on.  
+//				 */
+//				errSq += Math.pow(exp*cError/c, 2.);
+//				chiVal += Math.pow(val-exp, 2)/errSq;
+//				nGood++;
+//			}
+//		}
+//		return new Chi2Data(chiVal, nGood-nDim);
 	}
 	/**
 	 * Estimate an elliptical error with axes aligned with largest error coordinate based on the curvature of the Chi2 / likelihood surface. 
@@ -457,22 +608,22 @@ abstract public class TOADBaseAlgorithm extends LocaliserAlgorithm3D {
 	 * @return Elliptical error
 	 */
 	public EllipticalError estimateEllipticalError(SnapshotGeometry geometry, TOADInformation toadInformation, double[] position) {
-//		Chi2Data centralChi2 = calcChi2(geometry, toadInformation, position);
+		//		Chi2Data centralChi2 = calcChi2(geometry, toadInformation, position);
 		/**
 		 * Will take the principle axis as a direct line to the detection from the central point of the array 
 		 * geometry. 
 		 */
-//		PamVector arrayCentre = geometry.getGeometricCentre();
+		//		PamVector arrayCentre = geometry.getGeometricCentre();
 		// position is already relative to the geometric centre of the array. 
 		PamVector posVec = new PamVector(position);
 		double[] errors = new double[6];
 		PamVector[] errVecs = new PamVector[3];
 		// get a unit vector along the direction from the array centre to the calculated coordinate. 
 		errVecs[0] = posVec.getUnitVector();
-//		if (posVec.getCoordinate(0) > 6 && posVec.getCoordinate(0) < 8 && Math.abs(posVec.getCoordinate(1)) < 5) {
-//			System.out.println(posVec);
-//		}
-		
+		//		if (posVec.getCoordinate(0) > 6 && posVec.getCoordinate(0) < 8 && Math.abs(posVec.getCoordinate(1)) < 5) {
+		//			System.out.println(posVec);
+		//		}
+
 		/*
 		 * to get secondary axis we can rotate by 90 degrees in any direction apart from
 		 * the principle direction of the vector. 
@@ -488,7 +639,7 @@ abstract public class TOADBaseAlgorithm extends LocaliserAlgorithm3D {
 			errVecs[1] = (errVecs[0].vecProd(PamVector.zAxis)).getUnitVector();
 			errVecs[2] = errVecs[1].vecProd(errVecs[0]);
 		}
-		
+
 		/*
 		 * Error along each principle axis. 
 		 */
@@ -499,11 +650,11 @@ abstract public class TOADBaseAlgorithm extends LocaliserAlgorithm3D {
 		}
 		// now need to convert the error vectors to heading, pitch and roll.
 		double[] angles = PamVector.getHeadingPitchRoll(errVecs);
-		
+
 		EllipticalError elError = new EllipticalError(angles, errors);
 		return elError;
 	}
-	
+
 	/**
 	 * Estimate the error in Cartesian coordinates based on the curvature of the Chi2 / likelihood surface. 
 	 * @param geometry Array geometry
@@ -542,7 +693,7 @@ abstract public class TOADBaseAlgorithm extends LocaliserAlgorithm3D {
 
 		return simpleError;
 	}
-	
+
 	/**
 	 * Get the error along the principle direction 
 	 * @param geometry current array geometry
@@ -586,9 +737,9 @@ abstract public class TOADBaseAlgorithm extends LocaliserAlgorithm3D {
 		 */
 		double nDF = Math.max(centralChi2.getDegreesOfFreedom(), 1);
 		double chiCent = centralChi2.getTestScore();
-//		if (chiCent == 0) {
-//			chiCent = 1;
-//		}
+		//		if (chiCent == 0) {
+		//			chiCent = 1;
+		//		}
 		double step;
 		double[] sig = new double[2];
 		double[] shiftedChi = new double[2];
@@ -633,6 +784,9 @@ abstract public class TOADBaseAlgorithm extends LocaliserAlgorithm3D {
 	public ToadManagedSettingsPane<Serializable> getSourceSettingsPane(Window parent, PamDataBlock<?> detectionSource) {
 		//		return new TOADSourcePane(parent);
 		//		return toadCalculator.getSettingsPane();
+		
+		System.out.println("Get source settings pane: " +toadCalculator + "  " + tspwc); 
+
 		if (toadCalculator != null && tspwc == null) {
 			/*
 			 *  this gets the algorithm specific settings pane. We want to tab
@@ -645,7 +799,6 @@ abstract public class TOADBaseAlgorithm extends LocaliserAlgorithm3D {
 			return tspwc;
 		}
 		return tspwc;
-
 	}
 
 	@Override
