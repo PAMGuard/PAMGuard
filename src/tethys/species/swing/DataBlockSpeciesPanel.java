@@ -12,7 +12,7 @@ import PamView.dialog.PamDialogPanel;
 import PamguardMVC.PamDataBlock;
 import tethys.species.DataBlockSpeciesManager;
 import tethys.species.DataBlockSpeciesMap;
-import tethys.species.DataBlockSpeciesTypes;
+import tethys.species.DataBlockSpeciesCodes;
 import tethys.species.SpeciesMapItem;
 
 public class DataBlockSpeciesPanel implements PamDialogPanel {
@@ -46,8 +46,8 @@ public class DataBlockSpeciesPanel implements PamDialogPanel {
 		subPanels.clear();
 		
 		DataBlockSpeciesManager speciesManager = dataBlock.getDatablockSpeciesManager();
-		DataBlockSpeciesTypes speciesTypes = speciesManager.getSpeciesTypes();
-		ArrayList<String> speciesNames = speciesTypes.getSpeciesNames();
+//		DataBlockSpeciesCodes speciesTypes = speciesManager.getSpeciesCodes();
+		ArrayList<String> speciesNames = speciesManager.getAllSpeciesCodes();
 		DataBlockSpeciesMap speciesMap = speciesManager.getDatablockSpeciesMap();
 		for (String aSpecies : speciesNames) {
 			SpeciesSubPanel subPanel = new SpeciesSubPanel(aSpecies);

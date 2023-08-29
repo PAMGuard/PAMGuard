@@ -139,7 +139,7 @@ public class SpeciesSubPanel {
 			tsn = Integer.valueOf(itisCode.getText());
 		}
 		catch (NumberFormatException e) {
-			PamDialog.showWarning(PamController.getMainFrame(), pamguardName.getText(), "You must specified an ITIS taxanomic code");
+			PamDialog.showWarning(PamController.getMainFrame(), pamguardName.getText(), "You must specify an ITIS taxanomic code");
 			return null;
 		}
 		latin = latinName.getText();
@@ -149,7 +149,8 @@ public class SpeciesSubPanel {
 			PamDialog.showWarning(PamController.getMainFrame(), pamguardName.getText(), "You must specified a call type");
 			return null;			
 		}
-		return new SpeciesMapItem(tsn, callType, pamguardName.getText(), latin, vernacular);
+		String pamName = pamguardName.getText().replace("\"", "");
+		return new SpeciesMapItem(tsn, callType, pamName, latin, vernacular);
 	}
 
 }

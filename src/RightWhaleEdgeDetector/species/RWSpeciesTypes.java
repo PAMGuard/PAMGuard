@@ -1,15 +1,17 @@
 package RightWhaleEdgeDetector.species;
 
-import tethys.species.DataBlockSpeciesTypes;
+import tethys.species.DataBlockSpeciesCodes;
 
-public class RWSpeciesTypes extends DataBlockSpeciesTypes {
+public class RWSpeciesTypes extends DataBlockSpeciesCodes {
 	
 	public static final String onlyType = "Up call";
 	
-	private static final int glacialis = 180536;
+	public static final int eubalaena = 180536;
+	
+	public static final String defaultName = "Right Whale";
 
 	public RWSpeciesTypes() {
-		super(glacialis, onlyType);
+		super(eubalaena, defaultName, onlyType);
 	}
 
 }

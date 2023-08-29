@@ -9,11 +9,12 @@ import java.util.ArrayList;
  * @author dg50
  *
  */
-public class DataBlockSpeciesTypes {
+public class DataBlockSpeciesCodes {
 
 	/**
 	 * List of species names / codes associated with this data block. These can be translated, 
 	 * via a HashMap to more detailed objects which include an ITIS code. 
+	 * These are the internal codes of each detector - whatever it uses. 
 	 */
 	private ArrayList<String> speciesNames;
 	
@@ -31,7 +32,7 @@ public class DataBlockSpeciesTypes {
 	/**
 	 * @param defaultType
 	 */
-	public DataBlockSpeciesTypes(String defaultType) {
+	public DataBlockSpeciesCodes(String defaultType) {
 		this.defaultType = defaultType;
 	}
 
@@ -39,8 +40,10 @@ public class DataBlockSpeciesTypes {
 	 * @param itisDefault
 	 * @param defaultType
 	 */
-	public DataBlockSpeciesTypes(int itisDefault, String defaultType) {
+	public DataBlockSpeciesCodes(int itisDefault, String defaultName, String defaultType) {
 		this.itisDefault = itisDefault;
+		speciesNames = new ArrayList<>();
+		speciesNames.add(defaultName);
 		this.defaultType = defaultType;
 	}
 
@@ -48,7 +51,7 @@ public class DataBlockSpeciesTypes {
 	 * constructor to use with a array of String names. 
 	 * @param speciesList
 	 */
-	public DataBlockSpeciesTypes(String defaultType, String[] speciesList) {
+	public DataBlockSpeciesCodes(String defaultType, String[] speciesList) {
 		this.defaultType = defaultType;
 		if (speciesList == null) {
 			speciesNames = new ArrayList<>();

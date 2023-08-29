@@ -3,7 +3,8 @@ package RightWhaleEdgeDetector.species;
 import PamguardMVC.PamDataBlock;
 import RightWhaleEdgeDetector.RWEDataUnit;
 import tethys.species.DataBlockSpeciesManager;
-import tethys.species.DataBlockSpeciesTypes;
+import tethys.species.DataBlockSpeciesCodes;
+import tethys.species.SpeciesMapItem;
 
 public class RWSpeciesManager extends DataBlockSpeciesManager<RWEDataUnit> {
 	
@@ -11,15 +12,16 @@ public class RWSpeciesManager extends DataBlockSpeciesManager<RWEDataUnit> {
 
 	public RWSpeciesManager(PamDataBlock<RWEDataUnit> dataBlock) {
 		super(dataBlock);
+		setDefaultDefaultSpecies(new SpeciesMapItem(RWSpeciesTypes.eubalaena, RWSpeciesTypes.onlyType, RWSpeciesTypes.defaultName));
 	}
 
 	@Override
-	public DataBlockSpeciesTypes getSpeciesTypes() {
-		return rwSpeciesTypes;
+	public DataBlockSpeciesCodes getSpeciesCodes() {
+		return null;
 	}
 
 	@Override
-	public String getSpeciesString(RWEDataUnit dataUnit) {
+	public String getSpeciesCode(RWEDataUnit dataUnit) {
 		return RWSpeciesTypes.onlyType;
 	}
 

@@ -3,7 +3,7 @@ package whistlesAndMoans.species;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import tethys.species.DataBlockSpeciesManager;
-import tethys.species.DataBlockSpeciesTypes;
+import tethys.species.DataBlockSpeciesCodes;
 import tethys.species.ITISTypes;
 import tethys.species.SpeciesMapItem;
 import whistlesAndMoans.ConnectedRegionDataUnit;
@@ -15,19 +15,20 @@ public class WhistleSpeciesManager extends DataBlockSpeciesManager<ConnectedRegi
 
 	public WhistleSpeciesManager(PamDataBlock<ConnectedRegionDataUnit> dataBlock) {
 		super(dataBlock);
-		setDefaultDefaultSpecies(new SpeciesMapItem(180404, "Tonal", "Odontocete"));
+		setDefaultDefaultSpecies(new SpeciesMapItem(180404, "Tonal", "Tonal"));
 	}
 
 	@Override
-	public DataBlockSpeciesTypes getSpeciesTypes() {
-		String spList[] = {"Unknown"};
-
-		DataBlockSpeciesTypes whistleSpeciesTypes = new DataBlockSpeciesTypes("Tonal", spList);
-		return whistleSpeciesTypes;
+	public DataBlockSpeciesCodes getSpeciesCodes() {
+//		String spList[] = {"Unknown"};
+//
+//		DataBlockSpeciesCodes whistleSpeciesTypes = new DataBlockSpeciesCodes("Tonal", spList);
+//		return whistleSpeciesTypes;
+		return null;
 	}
 
 	@Override
-	public String getSpeciesString(ConnectedRegionDataUnit dataUnit) {
+	public String getSpeciesCode(ConnectedRegionDataUnit dataUnit) {
 		return defaultName;
 	}
 

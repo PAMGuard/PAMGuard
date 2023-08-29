@@ -129,9 +129,9 @@ public class SpeciesTest {
 	private void runJson() {
 //		String jQ = "{\"return\":[\"Deployment\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Deployment/Project\",\"DCLDE2022\"],\"optype\":\"binary\"}],\"enclose\":1}";
 //		String jQ = "{\"return\":[\"ranks/rank\"],\"select\":[{\"op\":\"=\",\"operands\":[\"ranks/rank/tsn\",\"180488\"],\"optype\":\"binary\"}],\"enclose\":1}";
-		String jQ = "{\"return\":[\"ranks/rank\"],\"select\":[{\"op\":\"=\",\"operands\":[\"ranks/rank/tsn\",\"180488\"],\"optype\":\"binary\"}],\"enclose\":1}";
+//		String jQ = "{\"return\":[\"ranks/rank\"],\"select\":[{\"op\":\"=\",\"operands\":[\"ranks/rank/tsn\",\"180488\"],\"optype\":\"binary\"}],\"enclose\":1}";
 //		String jQ = "{\"return\":[\"ranks/rank\"],\"select\":[{\"op\":\"=\",\"operands\":[\"ranks/rank/completename\",\"Physeter macrocephalus\"],\"optype\":\"binary\"}],\"enclose\":1}";
-//		String jQ = "{\"return\":[\"ranks/rank\"],\"select\":[{\"op\":\"dbxml:contains\",\"operands\":[\"ranks/rank/completename\",\"Sperm\"],\"optype\":\"function\"}],\"enclose\":1}";
+		String jQ = "{\"return\":[\"ranks/rank\"],\"select\":[{\"op\":\"dbxml:contains\",\"operands\":[\"ranks/rank/completename\",\"Sperm\"],\"optype\":\"function\"}],\"enclose\":1}";
 
 		System.out.println(jQ);
 
