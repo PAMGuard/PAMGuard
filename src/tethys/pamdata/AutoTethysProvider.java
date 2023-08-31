@@ -31,7 +31,12 @@ import tethys.TethysControl;
 import tethys.TethysTimeFuncs;
 import tethys.output.StreamExportParams;
 import tethys.output.TethysExportParams;
+import tethys.species.DataBlockSpeciesManager;
+import tethys.species.ITISTypes;
+import tethys.species.SpeciesMapItem;
 import whistleClassifier.WhistleContour;
+
+import javax.xml.bind.JAXBException;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
@@ -104,10 +109,13 @@ public class AutoTethysProvider implements TethysDataProvider {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		algorithm.setMethod(this.getAlgorithmMethod());
-		algorithm.setSoftware("PAMGuard");
-		algorithm.setVersion(PamguardVersionInfo.version);
-		//algorithm.setParameters(this.getAlgorithmParameters());
+//		algorithm.setMethod(this.getAlgorithmMethod());
+//		algorithm.setSoftware("PAMGuard");
+//		algorithm.setVersion(PamguardVersionInfo.version);
+		Parameters algoParameters = this.getAlgorithmParameters();
+		if (algoParameters != null) {
+			algorithm.setParameters(algoParameters);
+		}
 		
 		return algorithm;
 	}
@@ -120,66 +128,80 @@ public class AutoTethysProvider implements TethysDataProvider {
 		PamSettings pamSettings = (PamSettings) pamControlledUnit;
 		Parameters parameters = new Parameters();
 		List<Element> paramList = parameters.getAny();
-		Document doc = XMLUtils.createBlankDoc();
-		PamguardXMLWriter pamXMLWriter = PamguardXMLWriter.getXMLWriter();
-		Element dummyEl = doc.createElement("MODULES");
-		doc.appendChild(dummyEl);
-		PamSettings[] settingsObjs = getSettingsObjects();
-		if (settingsObjs == null) {
+		Object settings = pamSettings.getSettingsReference();
+		TethysParameterPacker paramPacker = null;
+		try {
+			paramPacker = new TethysParameterPacker();
+		} catch (JAXBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		List<Element> genList = paramPacker.packParameters(settings);
+		if (genList == null || genList.size() == 0) {
 			return null;
 		}
-//				pamXMLWriter.setStaticNameSpace(TethysControl.xmlNameSpace);
-		Element settingsEl = pamXMLWriter.writeUnitSettings(doc, dummyEl, pamSettings, settingsObjs);
-		if (settingsEl == null) {
-			return null;
-		}
-
-//		settingsEl = addNameSpaceToElements(doc, settingsEl, TethysControl.xmlNameSpace);
-
-
-		dummyEl.appendChild(settingsEl);
-		NodeList childs = settingsEl.getChildNodes();
-		for (int i = 0; i < childs.getLength(); i++) {
-			Node el = childs.item(i);
-			//			System.out.println(el.getNodeName());
-			if (el instanceof Element) {
-				paramList.add((Element) el);
-			}
-		}
-
-		//		Document doc = pamXMLWriter.writeOneModule((PamSettings) pamControlledUnit, System.currentTimeMillis());
-		//		String moduleXML = null;
-		if (doc != null) {
-			// this string should be XML of all the settings for the module controlling this
-			// datablock.
-			//			moduleXML = pamXMLWriter.getAsString(doc, true); // change to false to get smaller xml
-			//			System.out.printf("Module settings for datablock %s are:\n", moduleXML);
-			//			System.out.println(moduleXML);
-			//			Element pamguard = doc.get("PAMGUARD");
-			//			Element modules = (Element) pamguard.getElementsByTagName("MODULES");
-			//			doc.get
-			//			NodeList childs = doc.getChildNodes();
-			//			for (int i = 0; i < childs.getLength(); i++) {
-			//				Node el = childs.item(i);
-			//				System.out.println(el.getNodeName());
-			//				if (el instanceof Element) {
-			//					paramList.add((Element) el);
-			//				}
-			//			}
-			//			String moduleXML = pamXMLWriter.getAsString(doc, true); // change to false to get smaller xml
-			//			System.out.printf("Module settings for datablock %s are:\n%s", this.pamDataBlock.getDataName(), moduleXML);
-		}
-
-		//		// try the old say
-		//		Document doc2 = pamXMLWriter.writeOneModule((PamSettings) pamControlledUnit, System.currentTimeMillis());
-		//		String moduleXML = null;
-		//		if (doc2 != null) {
-		//			// this string should be XML of all the settings for the module controlling this
-		//			// datablock.
-		//			moduleXML = pamXMLWriter.getAsString(doc2, true); // change to false to get smaller xml
-		//			System.out.printf("Module settings for datablock %s are:\n%s", pamDataBlock.getDataName(),moduleXML);
-		//		}
-		//		
+		paramList.addAll(genList);
+		
+//		Document doc = XMLUtils.createBlankDoc();
+//		PamguardXMLWriter pamXMLWriter = PamguardXMLWriter.getXMLWriter();
+//		Element dummyEl = doc.createElement("MODULES");
+//		doc.appendChild(dummyEl);
+//		PamSettings[] settingsObjs = getSettingsObjects();
+//		if (settingsObjs == null) {
+//			return null;
+//		}
+////				pamXMLWriter.setStaticNameSpace(TethysControl.xmlNameSpace);
+//		Element settingsEl = pamXMLWriter.writeUnitSettings(doc, dummyEl, pamSettings, settingsObjs);
+//		if (settingsEl == null) {
+//			return null;
+//		}
+//
+////		settingsEl = addNameSpaceToElements(doc, settingsEl, TethysControl.xmlNameSpace);
+//
+//
+//		dummyEl.appendChild(settingsEl);
+//		NodeList childs = settingsEl.getChildNodes();
+//		for (int i = 0; i < childs.getLength(); i++) {
+//			Node el = childs.item(i);
+//			//			System.out.println(el.getNodeName());
+//			if (el instanceof Element) {
+//				paramList.add((Element) el);
+//			}
+//		}
+//
+//		//		Document doc = pamXMLWriter.writeOneModule((PamSettings) pamControlledUnit, System.currentTimeMillis());
+//		//		String moduleXML = null;
+//		if (doc != null) {
+//			// this string should be XML of all the settings for the module controlling this
+//			// datablock.
+//			//			moduleXML = pamXMLWriter.getAsString(doc, true); // change to false to get smaller xml
+//			//			System.out.printf("Module settings for datablock %s are:\n", moduleXML);
+//			//			System.out.println(moduleXML);
+//			//			Element pamguard = doc.get("PAMGUARD");
+//			//			Element modules = (Element) pamguard.getElementsByTagName("MODULES");
+//			//			doc.get
+//			//			NodeList childs = doc.getChildNodes();
+//			//			for (int i = 0; i < childs.getLength(); i++) {
+//			//				Node el = childs.item(i);
+//			//				System.out.println(el.getNodeName());
+//			//				if (el instanceof Element) {
+//			//					paramList.add((Element) el);
+//			//				}
+//			//			}
+//			//			String moduleXML = pamXMLWriter.getAsString(doc, true); // change to false to get smaller xml
+//			//			System.out.printf("Module settings for datablock %s are:\n%s", this.pamDataBlock.getDataName(), moduleXML);
+//		}
+//
+//		//		// try the old say
+//		//		Document doc2 = pamXMLWriter.writeOneModule((PamSettings) pamControlledUnit, System.currentTimeMillis());
+//		//		String moduleXML = null;
+//		//		if (doc2 != null) {
+//		//			// this string should be XML of all the settings for the module controlling this
+//		//			// datablock.
+//		//			moduleXML = pamXMLWriter.getAsString(doc2, true); // change to false to get smaller xml
+//		//			System.out.printf("Module settings for datablock %s are:\n%s", pamDataBlock.getDataName(),moduleXML);
+//		//		}
+//		//		
 
 		return parameters;
 	}
@@ -275,7 +297,29 @@ public class AutoTethysProvider implements TethysDataProvider {
 		Detection detection = new Detection();
 		detection.setStart(TethysTimeFuncs.xmlGregCalFromMillis(dataUnit.getTimeMilliseconds()));
 		detection.setEnd(TethysTimeFuncs.xmlGregCalFromMillis(dataUnit.getEndTimeInMilliseconds()));
-		detection.setSpeciesId(getSpeciesIdType());
+		
+		DataBlockSpeciesManager speciesManager = pamDataBlock.getDatablockSpeciesManager();
+		SpeciesMapItem speciesItem = null;
+		if (speciesManager != null) {
+			speciesItem = speciesManager.getSpeciesItem(dataUnit);
+//			detection.setSpeciesId(new Species);
+//			detection.setSpeciesId(getSpeciesIdType());
+		}
+		else {
+		}
+		SpeciesIDType species = new SpeciesIDType();
+		List<String> calls = detection.getCall();
+		if (speciesItem != null) {
+			species.setValue(BigInteger.valueOf(speciesItem.getItisCode()));
+			if (speciesItem.getCallType() != null) {
+				calls.add(speciesItem.getCallType());
+			}
+		}
+		else {
+			species.setValue(BigInteger.valueOf(ITISTypes.ANTHROPOGENIC));
+			calls.add("unknown");
+		}
+		detection.setSpeciesId(species);
 		/*
 		 * NOTE: I use channel bitmaps throughout since detections are often made on multiple channels. 
 		 */

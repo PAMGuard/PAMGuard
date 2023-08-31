@@ -72,6 +72,9 @@ abstract public class DataBlockSpeciesManager<T extends PamDataUnit> {
 		super();
 		this.dataBlock = dataBlock;
 		datablockSpeciesMap = SpeciesMapManager.getInstance().getSpeciesMap(dataBlock);
+		if (datablockSpeciesMap == null) {
+			datablockSpeciesMap = new DataBlockSpeciesMap();
+		}
 //		datablockSpeciesMap.clearMap();
 		clearMapNulls();
 		checkMapDefault();
@@ -81,6 +84,9 @@ abstract public class DataBlockSpeciesManager<T extends PamDataUnit> {
 	 * Clear up some old maps which have got a null null default. 
 	 */
 	private void clearMapNulls() {
+		if (datablockSpeciesMap == null) {
+			return;
+		}
 		SpeciesMapItem nullVal = datablockSpeciesMap.getItem(null);
 		if (nullVal == null) {
 			datablockSpeciesMap.removeItem(null);
@@ -136,7 +142,7 @@ abstract public class DataBlockSpeciesManager<T extends PamDataUnit> {
 //		if (defaultItem == null) {
 //			datablockSpeciesMap.putItem(getDefaultSpeciesCode(), getDefaultDefaultSpecies());
 //		}
-		if (defaultDefaultSpecies == null) {
+		if (defaultDefaultSpecies == null || datablockSpeciesMap == null) {
 			return;
 		}
 		SpeciesMapItem defaultItem = datablockSpeciesMap.getItem(defaultDefaultSpecies.getPamguardName());

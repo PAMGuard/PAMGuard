@@ -16,9 +16,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
+import PamController.PamController;
 import PamView.dialog.PamDialogPanel;
+import PamView.dialog.warn.WarnOnce;
 import PamView.tables.SwingTableColumnWidths;
 import tethys.TethysControl;
+import tethys.dbxml.TethysException;
 
 /**
  * Table view of a collection of Tethys documents. 
@@ -118,8 +121,17 @@ public class TethysDocumentTable implements PamDialogPanel {
 	}
 
 	private void deleteDocument(String docName) {
-		// TODO Auto-generated method stub
-		
+		int ans = WarnOnce.showNamedWarning("deletedoc"+collectionName, PamController.getMainFrame(), "Delete document", 
+				"Are you sure you want to delete the document " + docName, WarnOnce.OK_CANCEL_OPTION);
+		if (ans == WarnOnce.OK_OPTION) {
+			try {
+				tethysControl.getDbxmlConnect().removeDocument(collectionName, docName);
+			} catch (TethysException e) {
+				System.out.println("Failed to delete " + docName);
+				System.out.println(e.getMessage());
+			}
+		}
+		updateTableData();
 	}
 	
 	private class TableModel extends AbstractTableModel {

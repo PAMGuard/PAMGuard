@@ -22,7 +22,7 @@ public class RWSpeciesManager extends DataBlockSpeciesManager<RWEDataUnit> {
 
 	@Override
 	public String getSpeciesCode(RWEDataUnit dataUnit) {
-		return RWSpeciesTypes.onlyType;
+		return RWSpeciesTypes.defaultName;
 	}
 
 }

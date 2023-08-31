@@ -903,6 +903,14 @@ public class PamguardXMLWriter implements PamSettings {
 		return doc;
 	}
 
+	/**
+	 * Is this element a writable type ? Basically, this means 
+	 * that it's a primitive of some sort. Otherwise it's 
+	 * probably an object and may even be a list in which case
+	 * it will need treating differently. 
+	 * @param clazz
+	 * @return
+	 */
 	public static boolean isWritableType(Class<?> clazz)
 	{
 		if (clazz.isEnum()) return true;

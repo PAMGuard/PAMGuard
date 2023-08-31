@@ -239,6 +239,34 @@ An error will throw an exception.
 		}
 		return true;
 	}
+	
+	/**
+	 * Remove a document based on a collection name and a cdocument Id. 
+	 * @param collection
+	 * @param docId
+	 * @return
+	 * @throws TethysException
+	 */
+	public boolean removeDocument(String collection, String docId) throws TethysException {
+		try {
+			Object result = jerseyClient.removeDocument(collection, docId );
+			/**
+			 * Return from a sucessful delete is something like
+			 *
+				deployment = getTethysControl().getDeploymentHandler().createDeploymentDocument(freeId++, recordPeriod);
+				<DELETE>
+  <ITEM> ['ECoastNARW0'] </ITEM>
+</DELETE>
+An error will throw an exception. 
+			 */
+		}
+		catch (Exception e) {
+//			System.out.printf("Error deleting %s %s: %s\n", collection, docId, e.getMessage());
+			String msg = String.format("Error deleting %s:%s", collection, docId);
+			throw new TethysException(msg, e.getLocalizedMessage());
+		}
+		return true;
+	}
 
 	/**
 	 *  check the return string from importFiles and if it's an 
