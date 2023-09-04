@@ -321,7 +321,7 @@ public class DifarProcess extends PamProcess {
 				double[] frequency = {sP.processFreqMin, sP.processFreqMax};
 				difarDataUnit.setFrequency(frequency);
 			}
-		} else {
+		} else { //Check whether to override auto detection freq limits with DIFAR limits
 			if (!sP.useDetectionLimitsForTriggeredDetections ){ // Auto-detection
 				double[] frequency = {sP.processFreqMin, sP.processFreqMax};
 				difarDataUnit.setFrequency(frequency);
