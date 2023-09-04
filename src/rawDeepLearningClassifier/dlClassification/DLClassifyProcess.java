@@ -107,7 +107,8 @@ public class DLClassifyProcess extends PamInstantProcess {
 		addOutputDataBlock(dlDetectionDataBlock);
 		dlDetectionDataBlock.setNaturalLifetimeMillis(600*1000); //keep this data for a while.
 		dlDetectionDataBlock.addDataAnnotationType(dlAnnotationType);
-
+		//ClipGeneration allows processing of detections by DIFAR module (and possibly others)
+		dlDetectionDataBlock.setCanClipGenerate(true); 
 		//add custom graphics
 		PamDetectionOverlayGraphics overlayGraphics = new DLGraphics(dlModelResultDataBlock);
 		overlayGraphics.setDetectionData(true);
