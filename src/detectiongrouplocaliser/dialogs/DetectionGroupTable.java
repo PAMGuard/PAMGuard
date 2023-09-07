@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -31,10 +32,12 @@ import PamUtils.PamCalendar;
 import PamView.PamColors;
 import PamView.PamSymbol;
 import PamView.PamSymbolType;
+import PamView.component.DataBlockTableView;
 import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.warn.WarnOnce;
 import PamView.tables.SwingTableColumnWidths;
 import PamguardMVC.PamDataBlock;
+import PamguardMVC.dataSelector.DataSelector;
 import annotation.DataAnnotation;
 import annotation.DataAnnotationType;
 import detectiongrouplocaliser.DetectionGroupControl;
@@ -44,12 +47,11 @@ import detectiongrouplocaliser.DetectionGroupObserver;
 import detectiongrouplocaliser.DetectionGroupProcess;
 import detectiongrouplocaliser.GroupAnnotationHandler;
 import pamScrollSystem.AbstractScrollManager;
-import pamScrollSystem.PamScroller;
 import userDisplay.UserDisplayComponentAdapter;
-import warnings.PamWarning;
 
 /**
- * Panel to show a table of data on all DetectionGroup data units. 
+ * Panel to show a table of data on all DetectionGroup data units.
+ * 
  * @author dg50
  *
  */
@@ -75,11 +77,16 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 
 	private JButton checkIntegrity;
 
+	private JButton dataSelection;
+
 	private boolean isViewer;
 
 	private DisplayOptionsHandler displayOptionsHandler;
 
 	private SwingTableColumnWidths widthManager;
+
+//	private DataBlockTableView<DetectionGroupDataUnit> groupTableView;
+	private ArrayList<DetectionGroupDataUnit> dataCopy;
 
 	public DetectionGroupTable(DetectionGroupProcess detectionGroupProcess) {
 		super();
@@ -104,14 +111,20 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 			JPanel lControlPanel = new JPanel(new GridBagLayout());
 			controlPanel.add(BorderLayout.WEST, lControlPanel);
 			GridBagConstraints c = new PamGridBagContraints();
-			lControlPanel.add(showAll = displayOptionsHandler.createButton(DisplayOptionsHandler.SHOW_ALL, "Show all groups in database", false), c);
+			lControlPanel.add(showAll = displayOptionsHandler.createButton(DisplayOptionsHandler.SHOW_ALL,
+					"Show all groups in database", false), c);
 			c.gridx++;
-			lControlPanel.add(showCurrent = displayOptionsHandler.createButton(DisplayOptionsHandler.SHOW_CURRENT, "Show only data currently loaded", false), c);
+			lControlPanel.add(showCurrent = displayOptionsHandler.createButton(DisplayOptionsHandler.SHOW_CURRENT,
+					"Show only data currently loaded", false), c);
 			c.gridx++;
 			checkIntegrity = new JButton("Check Data Integrity");
 			checkIntegrity.setToolTipText("Check and fix start and end times of events against the database data");
+			dataSelection = new JButton("Data Selection");
+			dataSelection.setToolTipText("Select data to list");
 			lControlPanel.add(checkIntegrity, c);
 			checkIntegrity.setVisible(detectionGroupControl.isViewer());
+			c.gridx++;
+			lControlPanel.add(dataSelection, c);
 			showAll.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -133,19 +146,39 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 					detectionGroupProcess.checkDataIntegrity();
 				}
 			});
+			dataSelection.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					dataSelectionButton(e);
+				}
+			});
 		}
 
-
-		//		sortColumnWidths();
+		// sortColumnWidths();
 	}
 
+	protected void dataSelectionButton(ActionEvent e) {
+		DataSelector dataSelector = getDataSelector();
+		if (dataSelector != null) {
+			boolean changed = dataSelector.showSelectDialog(null);
+			if (changed) {
+				dataChanged();
+			}
+		}
+	}
+
+	private DataSelector getDataSelector() {
+		return detectionGroupDataBlock.getDataSelector(getUniqueName(), isViewer);
+	}
 
 	@Override
 	public Component getComponent() {
 		return mainPanel;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see userDisplay.UserDisplayComponentAdapter#openComponent()
 	 */
 	@Override
@@ -154,8 +187,9 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 		super.openComponent();
 	}
 
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see userDisplay.UserDisplayComponentAdapter#closeComponent()
 	 */
 	@Override
@@ -166,7 +200,9 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 
 	private class TableMouseHandler extends MouseAdapter {
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.awt.event.MouseAdapter#mouseClicked(java.awt.event.MouseEvent)
 		 */
 		@Override
@@ -176,7 +212,9 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 			}
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.awt.event.MouseAdapter#mousePressed(java.awt.event.MouseEvent)
 		 */
 		@Override
@@ -186,7 +224,9 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 			}
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.awt.event.MouseAdapter#mouseReleased(java.awt.event.MouseEvent)
 		 */
 		@Override
@@ -197,9 +237,17 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 		}
 
 	}
-
 	@Override
 	public void dataChanged() {
+		long t1 = 0;
+		long t2 = Long.MAX_VALUE;
+		if (showCurrent.isSelected()) {
+			t1 = detectionGroupDataBlock.getCurrentViewDataStart();
+			t2 = detectionGroupDataBlock.getCurrentViewDataEnd();
+		}
+		dataCopy = detectionGroupDataBlock.getDataCopy(t1, t2, false, getDataSelector());
+		Collections.sort(dataCopy);
+
 		tableModel.fireTableDataChanged();
 	}
 
@@ -208,17 +256,17 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 
 	}
 
-
 	public void editSelectedEvent() {
 		DetectionGroupDataUnit dgdu = getSelectedDataRow();
-		if (dgdu == null) return;
+		if (dgdu == null)
+			return;
 		editGroup(dgdu);
 	}
 
-
 	public void showPopupMenu(MouseEvent e) {
 		DetectionGroupDataUnit dgdu = getSelectedDataRow();
-		if (dgdu == null) return;
+		if (dgdu == null)
+			return;
 		PamSymbol menuIcon = new PamSymbol(detectionGroupControl.getSymbolforMenuItems(dgdu));
 		JPopupMenu pMenu = new JPopupMenu("Detection Group UID " + dgdu.getUID());
 		JMenuItem menuItem;
@@ -235,23 +283,23 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 		menuItem.setIcon(menuIcon);
 		pMenu.add(menuItem);
 
-		int[] beforeTimesSecs = {0, 10, 60};
+		int[] beforeTimesSecs = { 0, 10, 60 };
 		pMenu.addSeparator();
 		for (int i = 0; i < beforeTimesSecs.length; i++) {
 			int before = beforeTimesSecs[i];
 			String title;
 			if (before == 0) {
-				title = "Scroll to Group UID " + dgdu.getUID() + " at " + PamCalendar.formatDBDateTime(dgdu.getTimeMilliseconds());
-			}
-			else {
+				title = "Scroll to Group UID " + dgdu.getUID() + " at "
+						+ PamCalendar.formatDBDateTime(dgdu.getTimeMilliseconds());
+			} else {
 				title = String.format("Scroll to %ds before Group UID %d", before, dgdu.getUID());
 			}
 			menuItem = new JMenuItem(title);
-			//		menuItem.setIcon(menuIcon);
+			// menuItem.setIcon(menuIcon);
 			menuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					scrollToEvent(dgdu.getTimeMilliseconds()-before*1000);
+					scrollToEvent(dgdu.getTimeMilliseconds() - before * 1000);
 				}
 			});
 			pMenu.add(menuItem);
@@ -261,24 +309,22 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 	}
 
 	protected void scrollToEvent(long timeMilliseconds) {
-		// start a it earlier. 
+		// start a it earlier.
 //		timeMilliseconds -= 5000;
-		//		now WTF - how do I tell every scroller to go to this point in time ? 
+		// now WTF - how do I tell every scroller to go to this point in time ?
 		AbstractScrollManager scrollManager = AbstractScrollManager.getScrollManager();
 		scrollManager.startDataAt(detectionGroupDataBlock, timeMilliseconds);
 
 	}
-
 
 	protected void editGroup(DetectionGroupDataUnit dgdu) {
 		detectionGroupProcess.editDetectionGroup(dgdu);
 		dataChanged();
 	}
 
-
 	protected void deleteGroup(DetectionGroupDataUnit dgdu, boolean askFirst) {
 		if (askFirst) {
-			int ans = WarnOnce.showWarning(PamController.getMainFrame(), "Delete Group Detection", 
+			int ans = WarnOnce.showWarning(PamController.getMainFrame(), "Delete Group Detection",
 					"Are you sure you want to permanently delete this group detection ?", WarnOnce.OK_CANCEL_OPTION);
 			if (ans == WarnOnce.CANCEL_OPTION) {
 				return;
@@ -288,17 +334,17 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 		dataChanged();
 	}
 
-
 	/**
 	 * 
-	 * @return which data row is selected, or null. 
+	 * @return which data row is selected, or null.
 	 */
 	private DetectionGroupDataUnit getSelectedDataRow() {
 		int row = table.getSelectedRow();
-		if (row < 0) {
+		if (row < 0 || dataCopy == null || row >= dataCopy.size()) {
 			return null;
 		}
-		return (DetectionGroupDataUnit) detectionGroupDataBlock.getDataUnit(row, PamDataBlock.REFERENCE_ABSOLUTE);
+		return dataCopy.get(row);
+//		return (DetectionGroupDataUnit) detectionGroupDataBlock.getDataUnit(row, PamDataBlock.REFERENCE_ABSOLUTE);
 	}
 
 	@Override
@@ -311,7 +357,7 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 	private void sortColumnWidths() {
 		for (int i = 0; i < tableModel.getColumnCount(); i++) {
 			TableColumn tableCol = table.getColumnModel().getColumn(i);
-			tableCol.setPreferredWidth(tableModel.getRelativeWidth(i)*50);
+			tableCol.setPreferredWidth(tableModel.getRelativeWidth(i) * 50);
 		}
 
 	}
@@ -319,8 +365,7 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 	private int getViewOption() {
 		if (!isViewer) {
 			return DisplayOptionsHandler.SHOW_ALL;
-		}
-		else if (showCurrent != null) {
+		} else if (showCurrent != null) {
 			if (showCurrent.isSelected()) {
 				return displayOptionsHandler.SHOW_CURRENT;
 			}
@@ -334,7 +379,7 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 		private List<DataAnnotationType<?>> usedAnnotations;
 		private ArrayList<String> columnNames = new ArrayList<>();
 		private int nBaseColumns = 4;
-		PamSymbol symbol = new PamSymbol(PamSymbolType.SYMBOL_SQUARE,48,12,true,Color.BLACK,Color.BLUE);
+		PamSymbol symbol = new PamSymbol(PamSymbolType.SYMBOL_SQUARE, 48, 12, true, Color.BLACK, Color.BLUE);
 		private int firstRowToShow;
 		private int numRowsToShow;
 
@@ -351,7 +396,9 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 			return columnNames.size();
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see javax.swing.table.AbstractTableModel#getColumnName(int)
 		 */
 		@Override
@@ -361,37 +408,47 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 
 		@Override
 		public int getRowCount() {
-			//			System.out.println("getRowCount()");
-			if (getViewOption() ==  DisplayOptionsHandler.SHOW_ALL) {
-				firstRowToShow = 0;
-				return numRowsToShow = detectionGroupDataBlock.getUnitsCount();
+			// System.out.println("getRowCount()");
+			if (dataCopy == null) {
+				return 0;
 			}
-			else {
-				// work through datablock and work out the first and n indexes to show. 
-				firstRowToShow = -1;
-				int lastRowToShow = -1;
-				int i = 0;
-				synchronized (detectionGroupDataBlock.getSynchLock()) {
-					ListIterator it = detectionGroupDataBlock.getListIterator(0);
-					while (it.hasNext()) {
-						DetectionGroupDataUnit nextData = (DetectionGroupDataUnit) it.next();
-						if (nextData.getSubDetectionsCount() > 0) {
-							if (firstRowToShow < 0) {
-								firstRowToShow = i;
-							}
-							lastRowToShow = i+1;
-						}
-						i++;
-					}
-				}
-				return lastRowToShow - firstRowToShow;
-			}
+			return dataCopy.size();
+
+//			if (getViewOption() ==  DisplayOptionsHandler.SHOW_ALL) {
+//				firstRowToShow = 0;
+//				return numRowsToShow = dataCopy.size();
+////				return numRowsToShow = detectionGroupDataBlock.getUnitsCount();
+//			}
+//			else {
+//				// work through datablock and work out the first and n indexes to show. 
+//				firstRowToShow = -1;
+//				int lastRowToShow = -1;
+//				int i = 0;
+//				synchronized (detectionGroupDataBlock.getSynchLock()) {
+//					ListIterator it = detectionGroupDataBlock.getListIterator(0);
+//					while (it.hasNext()) {
+//						DetectionGroupDataUnit nextData = (DetectionGroupDataUnit) it.next();
+//						if (nextData.getSubDetectionsCount() > 0) {
+//							if (firstRowToShow < 0) {
+//								firstRowToShow = i;
+//							}
+//							lastRowToShow = i+1;
+//						}
+//						i++;
+//					}
+//				}
+//				return lastRowToShow - firstRowToShow;
+//			}
 		}
 
 		@Override
 		public Object getValueAt(int iRow, int iCol) {
+			if (dataCopy == null) {
+				return null;
+			}
 			try {
-				DetectionGroupDataUnit dgdu = (DetectionGroupDataUnit) detectionGroupDataBlock.getDataUnit(iRow+firstRowToShow, PamDataBlock.REFERENCE_ABSOLUTE);
+//				DetectionGroupDataUnit dgdu = (DetectionGroupDataUnit) detectionGroupDataBlock.getDataUnit(iRow+firstRowToShow, PamDataBlock.REFERENCE_ABSOLUTE);
+				DetectionGroupDataUnit dgdu = dataCopy.get(iRow);
 				if (dgdu == null) {
 					return null;
 				}
@@ -403,15 +460,14 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 					return symbol;
 				case 1:
 					if (dgdu.getUpdateCount() > 0) {
-						return "*"+dgdu.getUpdateCount();
-					}
-					else {
+						return "*" + dgdu.getUpdateCount();
+					} else {
 						return null;
 					}
 				case 2:
-					//					if (iRow == 0) {
-					//						System.out.println("getValueAt(0,0)");
-					//					}
+					// if (iRow == 0) {
+					// System.out.println("getValueAt(0,0)");
+					// }
 					return dgdu.getUID();
 				case 3:
 					return PamCalendar.formatDateTime(dgdu.getTimeMilliseconds());
@@ -432,8 +488,7 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 
 				}
 
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				return null;
 			}
 			return null;
@@ -447,7 +502,9 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 			return super.getColumnClass(col);
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see javax.swing.table.AbstractTableModel#fireTableStructureChanged()
 		 */
 		@Override
@@ -463,25 +520,25 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 			// count columns in each annotation ...
 			annotationHandler = detectionGroupProcess.getAnnotationHandler();
 			usedAnnotations = annotationHandler.getUsedAnnotationTypes();
-			for (DataAnnotationType annotation:usedAnnotations) {
+			for (DataAnnotationType annotation : usedAnnotations) {
 				columnNames.add(annotation.getAnnotationName());
 			}
 			super.fireTableStructureChanged();
 		}
 
-
 		/**
-		 * Attempt to set column widths. 
+		 * Attempt to set column widths.
+		 * 
 		 * @param colIndex
 		 * @return relative column widths.
 		 */
 		public int getRelativeWidth(int colIndex) {
-			switch(colIndex) {
+			switch (colIndex) {
 			case 0:
 				return 1;
 			case 1:
 				return 1;
-			case 2: 
+			case 2:
 				return 5;
 			case 3:
 				return 5;
@@ -491,7 +548,9 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see userDisplay.UserDisplayComponentAdapter#setUniqueName(java.lang.String)
 	 */
 	@Override
@@ -499,7 +558,5 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 		widthManager = new SwingTableColumnWidths(uniqueName, table);
 		super.setUniqueName(uniqueName);
 	}
-
-
 
 }
