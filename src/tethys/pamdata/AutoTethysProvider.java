@@ -1,6 +1,7 @@
 package tethys.pamdata;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.w3c.dom.Document;
@@ -26,12 +27,15 @@ import nilus.AlgorithmType.Parameters;
 import nilus.Deployment;
 import nilus.DescriptionType;
 import nilus.Detection;
+import nilus.DetectionEffortKind;
 import nilus.SpeciesIDType;
 import tethys.TethysControl;
 import tethys.TethysTimeFuncs;
+import tethys.niluswraps.PDeployment;
 import tethys.output.StreamExportParams;
 import tethys.output.TethysExportParams;
 import tethys.species.DataBlockSpeciesManager;
+import tethys.species.DataBlockSpeciesMap;
 import tethys.species.ITISTypes;
 import tethys.species.SpeciesMapItem;
 import whistleClassifier.WhistleContour;
@@ -136,7 +140,7 @@ public class AutoTethysProvider implements TethysDataProvider {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		List<Element> genList = paramPacker.packParameters(settings);
+		List<Element> genList = paramPacker.packParameters(pamControlledUnit);
 		if (genList == null || genList.size() == 0) {
 			return null;
 		}
@@ -387,6 +391,47 @@ public class AutoTethysProvider implements TethysDataProvider {
 		SpeciesIDType species = new SpeciesIDType();
 		species.setValue(BigInteger.valueOf(180537));
 		return species;
+	}
+
+	@Override
+	public void getEffortKinds(PDeployment pDeployment, List<DetectionEffortKind> effortKinds, StreamExportParams exportParams) {
+
+		DataBlockSpeciesManager speciesManager = pamDataBlock.getDatablockSpeciesManager();
+		if (speciesManager == null) {
+			return;
+		}
+		DataBlockSpeciesMap speciesMap = speciesManager.getDatablockSpeciesMap();
+		ArrayList<String> speciesCodes = speciesManager.getAllSpeciesCodes();
+		if (speciesCodes == null || speciesMap == null) {
+			return;
+		}
+		for (String speciesCode : speciesCodes) {
+
+			SpeciesMapItem mapItem = speciesMap.getItem(speciesCode);
+
+			DetectionEffortKind kind = new DetectionEffortKind();
+			try {
+				nilus.Helper.createRequiredElements(kind);
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			kind.getSpeciesId().setValue(BigInteger.valueOf(mapItem.getItisCode()));
+			kind.getGranularity().setValue(exportParams.granularity);
+			kind.setCall(mapItem.getCallType());
+
+
+			effortKinds.add(kind);		
+
+		}
+		
 	}
 
 }

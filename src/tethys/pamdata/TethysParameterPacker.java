@@ -17,6 +17,8 @@ import javax.xml.transform.dom.DOMResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import PamController.PamControlledUnit;
+import PamController.PamSettings;
 import PamController.settings.output.xml.PamguardXMLWriter;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterData;
@@ -67,6 +69,8 @@ public class TethysParameterPacker {
 	 */
 
 	private MarshalXML marshaller;
+	
+	private PamguardXMLWriter xmlWriter;
 
 	/**
 	 * @throws JAXBException 
@@ -78,11 +82,20 @@ public class TethysParameterPacker {
 			marshaller = new MarshalXML();
 		} catch (JAXBException e) {
 		}
+		xmlWriter = PamguardXMLWriter.getXMLWriter();
 	}
 
-
-	public List<Element> packParameters(Object data) {
+	public List<Element> packParameters(PamControlledUnit pamControlledUnit) {
+		if (pamControlledUnit instanceof PamSettings == false) {
+			return null;
+		}
+		PamSettings pamSettings = (PamSettings) pamControlledUnit;
+//		return null;
+//	}
+//
+//	public List<Element> packParameters(Object data) {
 		List<Element> elList = new ArrayList<Element>();
+		Object data = pamSettings.getSettingsReference();
 
 		ArrayList<Object> objectHierarchy = new ArrayList<>();
 
@@ -121,15 +134,16 @@ public class TethysParameterPacker {
 			try {
 				Object paramData = pamParam.getData();
 				boolean ok = createElement(doc, el, paramData, pamParam, objectHierarchy);
-//				if (newEl != null) {
-//					elList.add(newEl);
-//				}
 			} catch (IllegalArgumentException | IllegalAccessException e) {
 				e.printStackTrace();
 			}
-
 		}
 		elList.add(el);
+		Element pgEl = xmlWriter.writeUnitSettings(doc, el, pamSettings);
+		if (pgEl != null) {
+			el.appendChild(pgEl);
+//			elList.add(pgEl);
+		}
 		return elList;
 	}
 

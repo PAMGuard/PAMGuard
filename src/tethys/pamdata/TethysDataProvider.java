@@ -1,11 +1,15 @@
 package tethys.pamdata;
 
+import java.util.List;
+
 import PamguardMVC.PamDataUnit;
 import nilus.AlgorithmType;
 import nilus.AlgorithmType.Parameters;
 import nilus.Deployment;
 import nilus.DescriptionType;
 import nilus.Detection;
+import nilus.DetectionEffortKind;
+import tethys.niluswraps.PDeployment;
 import tethys.output.StreamExportParams;
 import tethys.output.TethysExportParams;
 
@@ -65,7 +69,22 @@ public interface TethysDataProvider {
 			StreamExportParams streamExportParams);
 
 
+	/**
+	 * Get the algorithm parameters. 
+	 * @return
+	 */
 	public Parameters getAlgorithmParameters();
+
+
+	/**
+	 * Fill in the effort kind list for the top of a Detections document. This must contain a list
+	 * of every species that's going to be output within this effort period. Any species assigned
+	 * to an actual detection must be in this list, or the document will be rejected. 
+	 * @param pDeployment
+	 * @param effortKinds tethys object list to add to. 
+	 * @param exportParams 
+	 */
+	public void getEffortKinds(PDeployment pDeployment, List<DetectionEffortKind> effortKinds, StreamExportParams exportParams);
 	
 	
 }

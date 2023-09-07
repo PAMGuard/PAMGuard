@@ -23,6 +23,7 @@ import tethys.TethysControl;
 import tethys.dbxml.TethysException;
 import tethys.detection.StreamDetectionsSummary;
 import tethys.niluswraps.PDetections;
+import tethys.niluswraps.TethysCollections;
 
 /**
  * Table of Detections documents for a single PAMGuard datablock. 
@@ -103,6 +104,8 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 		if (pDets == null) {
 			return;
 		}
+
+		JPopupMenu popMenu = new JPopupMenu();
 		
 		JMenuItem menuItem = new JMenuItem("Delete " + pDets.detections.getId());
 		menuItem.addActionListener(new ActionListener() {
@@ -111,8 +114,19 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 				deleteDocument(pDets);
 			}
 		});
-		JPopupMenu popMenu = new JPopupMenu();
 		popMenu.add(menuItem);
+		
+		menuItem = new JMenuItem("Display " + pDets.detections.getId());
+		menuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				displayDocument(pDets);
+			}
+		});
+		popMenu.add(menuItem);
+		
+		
+		
 		popMenu.show(e.getComponent(), e.getX(), e.getY());
 		
 	}
@@ -124,6 +138,11 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 			getTethysControl().showException(e);
 		}
 		selectDataBlock(dataBlock); // force table update. 
+	}
+
+	private void displayDocument(PDetections pDets) {
+		getTethysControl().displayDocument(TethysCollections.Detections.toString(), pDets.detections.getId());
+		
 	}
 
 	private PDetections detectionsForRow(int iRow) {

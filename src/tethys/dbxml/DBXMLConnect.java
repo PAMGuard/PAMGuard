@@ -163,8 +163,9 @@ public class DBXMLConnect {
 		 * Quite hard to see much common structure in this, so just look for 
 		 * two words, <Success> and <Error>
 		 */
-		boolean error = importReturn.contains("<Error>");
+		boolean error = importReturn.contains("<Error");
 		boolean success = importReturn.contains("<Success>");
+//		error = !success; might be a better options. 
 		if (error) {
 			throw new TethysException("Error posting to Tethys", importReturn);
 		}

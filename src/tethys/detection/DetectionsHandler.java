@@ -262,30 +262,19 @@ public class DetectionsHandler {
 //		return false;
 //	}
 
-	private DetectionEffort getDetectorEffort(Deployment deployment, long effortStart, long effortEnd) {
+	private DetectionEffort getDetectorEffort(PDeployment pDeployment, PamDataBlock dataBlock, StreamExportParams exportParams) {
 		DetectionEffort effort = new DetectionEffort();
+		Deployment deployment = pDeployment.deployment;
+		Long effortStart = pDeployment.getAudioStart();
+		Long effortEnd = pDeployment.getAudioEnd();
 		effort.setStart(TethysTimeFuncs.xmlGregCalFromMillis(effortStart));
 		effort.setEnd(TethysTimeFuncs.xmlGregCalFromMillis(effortEnd));
 //		effort.set // no setter for DetectionEffortKind
 		List<DetectionEffortKind> effortKinds = effort.getKind();
-		DetectionEffortKind kind = new DetectionEffortKind();
-		try {
-			nilus.Helper.createRequiredElements(kind);
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
+		TethysDataProvider dataProvider = dataBlock.getTethysDataProvider();
+		dataProvider.getEffortKinds(pDeployment, effortKinds, exportParams);
 		
-		kind.getSpeciesId().setValue(BigInteger.valueOf(180537));
-		kind.getGranularity().setValue(nilus.GranularityEnumType.CALL);
-		
-		effortKinds.add(kind);		
 				 
 		return effort;
 	}
@@ -508,7 +497,7 @@ public class DetectionsHandler {
 		supSoft.add(supportSoft);
 		detections.setAlgorithm(algorithm);
 		detections.setUserId("Unknown user");
-		detections.setEffort(getDetectorEffort(deployment.deployment, deployment.getAudioStart(), deployment.getAudioEnd()));
+		detections.setEffort(getDetectorEffort(deployment, dataBlock, exportParams));
 		
 		return detections;
 	}
