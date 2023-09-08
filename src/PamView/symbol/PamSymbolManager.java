@@ -125,7 +125,7 @@ abstract public class PamSymbolManager<T extends PamSymbolChooser> implements Pa
 		 * This doesn't work since different displays will still need different options based on 
 		 * their projector - so it can work, but need to set the projector.
 		 */
-		if (managedSymbolData.useGeneric) {
+		if (managedSymbolData.useGeneric || displayName==null) {
 			displayName = GENERICNAME;
 		}
 		
