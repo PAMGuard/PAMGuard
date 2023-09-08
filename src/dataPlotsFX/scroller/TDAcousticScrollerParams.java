@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import dataPlotsFX.scrollingPlot2D.StandardPlot2DColours;
 import pamViewFX.fxNodes.utilsFX.ColourArray.ColourArrayType;
 
@@ -55,7 +56,7 @@ public class TDAcousticScrollerParams implements Cloneable, Serializable, Manage
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DISPLAY);
 		return ps;
 	}
 

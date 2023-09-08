@@ -15,6 +15,7 @@ import Localiser.DelayMeasurementParams;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamUtils.PamArrayUtils;
 import PamUtils.PamInterp;
 import PamUtils.complex.ComplexArray;
@@ -583,7 +584,7 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 	 */
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("inteprWaveformReject");
 			ps.put(new PrivatePamParameterData(this, field) {

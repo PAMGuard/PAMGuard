@@ -28,6 +28,7 @@ import java.util.Arrays;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
 import pamMaths.PamVector;
 import PamView.PamSymbol;
@@ -478,7 +479,7 @@ public class Hydrophone implements Serializable, Cloneable, ManagedParameters {
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet pps = PamParameterSet.autoGenerate(this);
+		PamParameterSet pps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		Field f;
 		try {
 			f = this.getClass().getDeclaredField("coordinate");

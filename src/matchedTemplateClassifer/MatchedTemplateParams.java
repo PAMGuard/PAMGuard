@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamView.PamSymbolType;
 import PamView.symbol.SymbolData;
 import fftFilter.FFTFilterParams;
@@ -150,7 +151,7 @@ public class MatchedTemplateParams implements Serializable, Cloneable, ManagedPa
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("fftFilterParams");
 			ps.put(new PrivatePamParameterData(this, field) {

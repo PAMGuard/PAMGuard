@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import dataPlotsFX.scrollingPlot2D.PlotParams2D;
 import pamViewFX.fxNodes.utilsFX.ColourArray.ColourArrayType;
 import javafx.beans.property.DoubleProperty;
@@ -125,7 +126,7 @@ public class SpectrogramParamsFX  extends PlotParams2D implements Serializable, 
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DISPLAY);
 		return ps;
 	}
 

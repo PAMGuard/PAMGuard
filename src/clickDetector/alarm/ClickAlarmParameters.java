@@ -7,6 +7,7 @@ import java.util.Hashtable;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
 import PamguardMVC.dataSelector.DataSelectParams;
 
@@ -127,7 +128,7 @@ public class ClickAlarmParameters extends DataSelectParams implements Cloneable,
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("eventTypes");
 			ps.put(new PrivatePamParameterData(this, field) {

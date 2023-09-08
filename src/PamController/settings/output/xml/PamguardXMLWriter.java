@@ -43,6 +43,7 @@ import PamController.PamguardVersionInfo;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterData;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamUtils.PamCalendar;
 import PamUtils.XMLUtils;
 import PamguardMVC.PamDataBlock;
@@ -64,6 +65,7 @@ public class PamguardXMLWriter implements PamSettings {
 	private static final Set<Class<?>> WRAPPER_TYPES = getWrapperTypes();
 	
 	private XMLWriterSettings writerSettings = new XMLWriterSettings();
+	private boolean excludeDisplaySettings;
 //	private String xmlNameSpace;
 	
 	private static PamguardXMLWriter singleInstance;
@@ -454,7 +456,6 @@ public class PamguardXMLWriter implements PamSettings {
 	 * @return xml element
 	 */
 	public Element writeUnitSettings(Document doc, Element parent, PamSettings pamSettingsUnit) {
-
 		int[] settingInds = findSettings(null, pamSettingsUnit.getUnitName());
 		PamSettings[] settingsObjects = null;
 		if (settingInds != null) {
@@ -499,6 +500,9 @@ public class PamguardXMLWriter implements PamSettings {
 			Element settingEl = doc.createElement("CONFIGURATION");
 			moduleData.appendChild(settingEl);
 			for (int i = 0; i < toWrite.length; i++) {
+				if (wantObject(toWrite[i]) == false) {
+					continue;
+				}
 				Element setEl = writeSettings(doc, toWrite[i], new ArrayList<Object>());
 				if (setEl != null) {
 					settingEl.appendChild(setEl);
@@ -507,6 +511,32 @@ public class PamguardXMLWriter implements PamSettings {
 		}
 
 		return moduleData;
+	}
+
+	/**
+	 * USed by the Tethys writer to avoid writing display settings. 
+	 * @param pamSettings
+	 * @return
+	 */
+	private boolean wantObject(PamSettings pamSettings) {
+		if (excludeDisplaySettings == false) {
+			return true;
+		}
+		Object obj = pamSettings.getSettingsReference();
+		if (obj == null) {
+			return false;
+		}
+		if (obj instanceof ManagedParameters) {
+			ManagedParameters managedParams = (ManagedParameters) obj;
+			PamParameterSet paramSet = managedParams.getParameterSet();
+			if (paramSet == null) {
+				return false;
+			}
+			if (paramSet.getParameterSetType() == ParameterSetType.DISPLAY && excludeDisplaySettings) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -539,6 +569,7 @@ public class PamguardXMLWriter implements PamSettings {
 	 * @return
 	 */
 	private Element writeSettings(Document doc, PamSettings pamSettings, Object data, ArrayList<Object> objectHierarchy) {
+		
 		Element el = doc.createElement("SETTINGS");
 		el.setAttribute("Type", pamSettings.getUnitType());
 		el.setAttribute("Name", pamSettings.getUnitName());
@@ -851,7 +882,16 @@ public class PamguardXMLWriter implements PamSettings {
 	 */
 	private int[] findSettings(String type, String name) {
 		if (settingsSets == null) {
-			return null;
+			makeSettingsList();
+			if (settingsSets == null) {
+				return null;
+			}
+		}
+		if (usedSettingsSets == null) {
+			usedSettingsSets = new boolean[settingsSets.size()];
+		}
+		else if (usedSettingsSets.length < settingsSets.size()) {
+			usedSettingsSets = Arrays.copyOf(usedSettingsSets, settingsSets.size());
 		}
 		int[] found = new int[settingsSets.size()];
 		int nFound = 0;
@@ -871,7 +911,7 @@ public class PamguardXMLWriter implements PamSettings {
 		return Arrays.copyOf(found, nFound);
 	}
 
-	private ArrayList<PamSettings> makeSettingsList() {
+	public ArrayList<PamSettings> makeSettingsList() {
 		PamSettingManager settingsManager = PamSettingManager.getInstance();
 		settingsSets = settingsManager.getOwners();
 		if (settingsSets == null) {
@@ -999,6 +1039,20 @@ public class PamguardXMLWriter implements PamSettings {
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		writerSettings = ((XMLWriterSettings) pamControlledUnitSettings.getSettings()).clone();
 		return true;
+	}
+
+	/**
+	 * @return the excludeDisplaySettings
+	 */
+	public boolean isExcludeDisplaySettings() {
+		return excludeDisplaySettings;
+	}
+
+	/**
+	 * @param excludeDisplaySettings the excludeDisplaySettings to set
+	 */
+	public void setExcludeDisplaySettings(boolean excludeDisplaySettings) {
+		this.excludeDisplaySettings = excludeDisplaySettings;
 	}
 
 //	public void setStaticNameSpace(String xmlNameSpace) {

@@ -5,6 +5,7 @@ import java.io.Serializable;
 import Filters.FilterParams;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 public class EnvelopeParams implements Serializable, Cloneable, ManagedParameters {
 
@@ -34,7 +35,7 @@ public class EnvelopeParams implements Serializable, Cloneable, ManagedParameter
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
 	}
 

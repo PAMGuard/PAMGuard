@@ -35,6 +35,7 @@ import Array.streamerOrigin.StreamerDataIterator;
 import GPS.GpsData;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
 import PamUtils.LatLong;
 import PamUtils.PamArrayUtils;
@@ -1600,7 +1601,7 @@ public class PamArray implements Serializable, Cloneable, ManagedParameters {
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("streamers");
 			ps.put(new PrivatePamParameterData(this, field) {

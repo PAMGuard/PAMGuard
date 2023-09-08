@@ -7,6 +7,7 @@ import java.util.Arrays;
 import Localiser.detectionGroupLocaliser.DetectionGroupOptions;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
 
 public class ClickLocParams implements Serializable, Cloneable, DetectionGroupOptions, ManagedParameters {
@@ -110,7 +111,7 @@ public class ClickLocParams implements Serializable, Cloneable, DetectionGroupOp
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("internalVersion");
 			ps.put(new PrivatePamParameterData(this, field) {

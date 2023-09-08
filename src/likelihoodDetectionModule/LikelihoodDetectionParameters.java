@@ -11,6 +11,7 @@ import java.util.Iterator;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 /**
  * The Class LikelihoodDetectionParameters provides the standard PamGuard
@@ -271,7 +272,7 @@ public class LikelihoodDetectionParameters implements Serializable, Cloneable, M
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
 	}
 

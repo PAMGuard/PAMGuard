@@ -23,6 +23,8 @@ import PamController.settings.output.xml.PamguardXMLWriter;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterData;
 import PamModel.parametermanager.PamParameterSet;
+import PamguardMVC.PamDataBlock;
+import PamguardMVC.PamProcess;
 import nilus.MarshalXML;
 
 /**
@@ -85,8 +87,10 @@ public class TethysParameterPacker {
 		xmlWriter = PamguardXMLWriter.getXMLWriter();
 	}
 
-	public List<Element> packParameters(PamControlledUnit pamControlledUnit) {
-		if (pamControlledUnit instanceof PamSettings == false) {
+	public List<Element> packParameters(PamDataBlock pamDataBlock) {
+		PamProcess pamProcess = pamDataBlock.getParentProcess();
+		PamControlledUnit pamControlledUnit = pamProcess.getPamControlledUnit();
+		if (pamControlledUnit == null || pamControlledUnit instanceof PamSettings == false) {
 			return null;
 		}
 		PamSettings pamSettings = (PamSettings) pamControlledUnit;
@@ -139,12 +143,43 @@ public class TethysParameterPacker {
 			}
 		}
 		elList.add(el);
-		Element pgEl = xmlWriter.writeUnitSettings(doc, el, pamSettings);
-		if (pgEl != null) {
-			el.appendChild(pgEl);
-//			elList.add(pgEl);
+		xmlWriter.setExcludeDisplaySettings(true);
+		xmlWriter.makeSettingsList();
+		ArrayList<PamControlledUnit> moduleChain = getParentChain(pamDataBlock);
+		for (PamControlledUnit pcu : moduleChain) {
+			if (pcu instanceof PamSettings == false) {
+				continue;
+			}
+			pamSettings = (PamSettings) pcu;
+			Element pgEl = xmlWriter.writeUnitSettings(doc, el, pamSettings);
+			if (pgEl != null) {
+				el.appendChild(pgEl);
+				//			elList.add(pgEl);
+			}
 		}
 		return elList;
+	}
+	
+	/**
+	 * Get a list of parent modules of the datablock, including it's own. 
+	 * @param dataBlock
+	 * @return
+	 */
+	private ArrayList<PamControlledUnit> getParentChain(PamDataBlock dataBlock) {
+		ArrayList<PamControlledUnit> chain = new ArrayList<>();
+		while (dataBlock != null) {
+			PamProcess parentProcess = dataBlock.getParentProcess();
+			if (parentProcess == null) {
+				break;
+			}
+			PamControlledUnit pamControlledUnit = parentProcess.getPamControlledUnit();
+			if (pamControlledUnit == null) {
+				break;
+			}
+			chain.add(pamControlledUnit);
+			dataBlock = parentProcess.getParentDataBlock();
+		}
+		return chain;
 	}
 
 	private boolean createElement(Document document, Element parentEl, Object paramData, PamParameterData pamParam, ArrayList<Object> objectHierarchy) {

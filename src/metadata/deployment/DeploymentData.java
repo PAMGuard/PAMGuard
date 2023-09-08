@@ -5,6 +5,7 @@ import java.io.Serializable;
 import PamModel.parametermanager.FieldNotFoundException;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamUtils.LatLong;
 
 /**
@@ -132,7 +133,7 @@ public class DeploymentData implements Serializable, Cloneable, ManagedParameter
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			ps.findParameterData("id").setInfo("Unique Id", null, "String that uniquely identifies this deployment", 128);
 //			ps.setOrder("id", 0);

@@ -140,7 +140,7 @@ public class AutoTethysProvider implements TethysDataProvider {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		List<Element> genList = paramPacker.packParameters(pamControlledUnit);
+		List<Element> genList = paramPacker.packParameters(pamDataBlock);
 		if (genList == null || genList.size() == 0) {
 			return null;
 		}
