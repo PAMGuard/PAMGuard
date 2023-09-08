@@ -316,10 +316,18 @@ public class DifarProcess extends PamProcess {
 			sP = difarControl.getDifarParameters().findSpeciesParams(difarDataUnit);
 		}
 		difarDataUnit.setDisplaySampleRate(sP.sampleRate);
-		if (!sP.useMarkedBandsForSpectrogramClips){
-			double[] frequency = {sP.processFreqMin, sP.processFreqMax};
-			difarDataUnit.setFrequency(frequency);
+		if (difarDataUnit.triggerName.equals(difarControl.getUnitName())) { // User detection
+			if (!sP.useMarkedBandsForSpectrogramClips ){
+				double[] frequency = {sP.processFreqMin, sP.processFreqMax};
+				difarDataUnit.setFrequency(frequency);
+			}
+		} else { //Check whether to override auto detection freq limits with DIFAR limits
+			if (!sP.useDetectionLimitsForTriggeredDetections ){ // Auto-detection
+				double[] frequency = {sP.processFreqMin, sP.processFreqMax};
+				difarDataUnit.setFrequency(frequency);
+			}
 		}
+		
 		
 		demuxDataUnit(difarDataUnit, demuxWorker, startTime);
 

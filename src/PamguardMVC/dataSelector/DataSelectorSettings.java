@@ -23,7 +23,9 @@ public class DataSelectorSettings implements Serializable, ManagedParameters {
 		if (selectorParams == null) {
 			selectorParams = new Hashtable<>();
 		}
+		if (name != null) {
 		selectorParams.put(name, params);
+		}
 	}
 	
 	/**

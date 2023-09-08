@@ -249,7 +249,6 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 				// put it in the top corner of the main screen. 
 				guiParameters.bounds.x = guiParameters.bounds.y = 10;
 			}
-				
 
 			frame.setBounds(guiParameters.bounds);
 

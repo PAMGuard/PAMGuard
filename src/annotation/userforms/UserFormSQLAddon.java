@@ -29,6 +29,7 @@ public class UserFormSQLAddon implements SQLLoggingAddon {
 	}
 
 	ArrayList<PamTableItem> loggerTableItems = new ArrayList<>();
+	private ArrayList<InputControlDescription> controlDescriptions;
 
 
 	@Override
@@ -39,7 +40,13 @@ public class UserFormSQLAddon implements SQLLoggingAddon {
 			return;
 		}
 		UDFTableDefinition formTableDef = formDescription.getUdfTableDefinition();
-		ArrayList<InputControlDescription> controlDescriptions = formDescription.getInputControlDescriptions();
+		controlDescriptions = formDescription.getInputControlDescriptions();
+		/*
+		 * It's possible the controlDescriptions get rewritten, so hold references to 
+		 * the actual items buy copying the list. 
+		 */
+		controlDescriptions = new ArrayList<>(controlDescriptions);
+		
 		for (ControlDescription cd:controlDescriptions) {
 			FormsTableItem[] ctrlTableItems = cd.getFormsTableItems();
 			if (ctrlTableItems != null) {
@@ -74,15 +81,25 @@ public class UserFormSQLAddon implements SQLLoggingAddon {
 		// is created.  So the inputControls list in FormDescription will only point to the last set of controls created,
 		// which isn't necessarily the ones that this table is pointing to.  Instead, load the loggerTableItems with
 		// the data because loggerTableItems and pamTableDefinition both point to the same thing
+		/*
+		 * That doesn't work though since some controls have > 1 field, so it all gets out of synch. HAVE to 
+		 * use the moveDataToTableItems fields for it to work. 
+		 */
 //		ArrayList<ControlDescription> inputCtrls = formDescription.getInputControlDescriptions();
 //		ControlDescription cd;
 //		for (int i = 0; i < inputCtrls.size(); i++) {
 //			cd = inputCtrls.get(i);
 //			cd.moveDataToTableItems(datas[i]);
 //		}
-		for (int i = 0; i < loggerTableItems.size(); i++) {
-			loggerTableItems.get(i).setValue(datas[i]);
+		for (int i = 0; i < controlDescriptions.size(); i++) {
+			controlDescriptions.get(i).moveDataToTableItems(datas[i]);
 		}
+		
+		// below doesn't work since some controls have > 1 field (e.g. latlong, 
+//		int n = Math.min(loggerTableItems.size(), datas.length);
+//		for (int i = 0; i < n; i++) {
+//			loggerTableItems.get(i).setValue(datas[i]);
+//		}
 		return true;
 	}
 
