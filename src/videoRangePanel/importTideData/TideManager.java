@@ -74,6 +74,7 @@ public class TideManager extends  DataImport<String>   {
 		tideParsers.add(new POLPREDParser1()); 
 		tideParsers.add(new POLPREDParser2());
 		tideParsers.add(new POLPREDParser3());
+		tideParsers.add(new CSVTideParser());
 
 
 	}
