@@ -47,7 +47,10 @@ public class PamCalendar {
 	
 	public static TimeZone defaultTimeZone = TimeZone.getTimeZone("UTC");
 	
-	private static TimeZone localTimeZone = TimeZone.getDefault();
+	/*
+	 * Not used: all now handled in PamCalendar.
+	 */
+//	private static TimeZone localTimeZone = defaultTimeZone;// TimeZone.getDefault();
 
 	public static final long millisPerDay = 1000L*24L*3600L;
 
@@ -60,7 +63,7 @@ public class PamCalendar {
 	private static boolean soundFile;
 
 	/**
-	 * time from the start of the file to the currentmoment. 
+	 * time from the start of the file to the current moment. 
 	 * This is updated every time data re read from the file, so is
 	 * accurate to about 1/10 second. 
 	 * For accurate timing within detectors, always try to use sample number
@@ -177,8 +180,44 @@ public class PamCalendar {
 
 	public static TimeZone getDisplayTimeZone(boolean useLocal) {
 //		return TimeZone.getTimeZone("UTC");
-//		return useLocal ? CalendarControl.getInstance().getChosenTimeZone() : defaultTimeZone;
-		return useLocal ? localTimeZone : defaultTimeZone;
+		return useLocal ? CalendarControl.getInstance().getChosenTimeZone() : defaultTimeZone;
+//		return useLocal ? localTimeZone : defaultTimeZone;
+	}
+	
+	/**
+	 * Get the display time zone offset in milliseconds. 
+	 * @param useLocal
+	 * @return
+	 */
+	public static long getDisplayTimeZoneOffest(boolean useLocal) {
+		TimeZone tz = getDisplayTimeZone(useLocal);
+		return tz.getOffset(getTimeInMillis());
+	}
+	
+	/**
+	 * Get a short string describing the time zone. This should be less than 
+	 * 10 characters. So if the full name of the TZ is long, then write it 
+	 * in the format "UTC+..."
+	 * @param useLocal
+	 * @return
+	 */
+	public static String getShortDisplayTimeZoneString(boolean useLocal) {
+		TimeZone tz = getDisplayTimeZone(useLocal);
+		String str = tz.getDisplayName();
+		str = CalendarControl.getInstance().getTZCode(true);
+		if (str.length() <= 10) {
+			return str;
+		}
+		// otherwise make up a string. 
+		long offset = getDisplayTimeZoneOffest(useLocal) / 1000;
+		boolean isInt = offset % 3600 == 0;
+		if (isInt) {
+			str = String.format("UTC%+d", offset/3600);
+		}
+		else {
+			str = String.format("UTC%+3.1f", (double) offset/3600.);
+		}
+		return str;
 	}
 
 	public static String formatDateTime(Date date) {
@@ -391,8 +430,13 @@ public class PamCalendar {
 
 	public static String formatDBStyleTime(long timeInMillis, boolean showMillis, boolean useLocal) {
 		Calendar c = Calendar.getInstance();
+		TimeZone tz = getDisplayTimeZone(useLocal);
+//		if (tz != null) {
+//			long offs = tz.getOffset(timeInMillis);
+//			timeInMillis += tz.getOffset(timeInMillis);
+//		}
 		c.setTimeInMillis(timeInMillis);
-		c.setTimeZone(getDisplayTimeZone(useLocal));
+		c.setTimeZone(tz);
 		DateFormat df;
 		if (showMillis) {
 			df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
@@ -400,7 +444,7 @@ public class PamCalendar {
 		else {
 			df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		}
-		df.setTimeZone(getDisplayTimeZone(useLocal));
+		df.setTimeZone(tz);
 		Date d = c.getTime();
 		//		return String.format("%tY-%<tm-%<td %<tH:%<tM:%<tS", d);
 
@@ -732,6 +776,7 @@ public class PamCalendar {
 	public static long msFromDateString(String dateString) {
 		return msFromDateString(dateString, false);
 	}
+	
 	/**
 	 * Read a date string and turn it into a millisecond time.
 	 * @param dateString

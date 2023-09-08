@@ -810,6 +810,9 @@ public class TMGroupLocInfo implements GroupLocInfo {
 		 for (int i = 0; i < nSubDetections; i++) {
 			 
 			 localisation = getParentDetection().getSubDetection(i).getLocalisation();
+			 if (localisation == null) {
+				 continue;
+			 }
 			 angles = localisation.getAngles();
 			 angleErrors = localisation.getAngleErrors();
 			 
@@ -877,6 +880,10 @@ public class TMGroupLocInfo implements GroupLocInfo {
 			 minVectors = Math.min(minVectors, nVectors);
 			 maxVectors = Math.max(maxVectors, nVectors);
 			 totalVectors += nVectors;
+		 }
+		 
+		 if (totalVectors == 0) {
+			 return;
 		 }
 		 
 		 //now create the separate arrays for different ambiguities. 

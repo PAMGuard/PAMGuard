@@ -221,9 +221,8 @@ public class UpdateClockDialog extends JDialog implements ActionListener, PamObs
 //		NMEADataBlock nmeaDataBlock = (NMEADataBlock) o;
 		NMEADataUnit nmeaDataUnit = (NMEADataUnit) arg;
 		StringBuffer nmeaData = nmeaDataUnit.getCharData();
-		String wantedString = gpsControl.getWantedString();
 		String stringId = NMEADataBlock.getSubString(nmeaData, 0);
-		if (wantedString.equals(stringId) == false) {
+		if (gpsControl.wantString(stringId) == false) {
 			return;
 		}
 		if (gpsControl.gpsParameters.mainString == GPSParameters.READ_GGA) {
@@ -232,6 +231,8 @@ public class UpdateClockDialog extends JDialog implements ActionListener, PamObs
 			newRMCData(nmeaData);
 		}
 	}
+	
+	
 	@Override
 	public void updateData(PamObservable observable, PamDataUnit pamDataUnit) {
 		// TODO Auto-generated method stub

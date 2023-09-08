@@ -49,7 +49,7 @@ public class OverlayMarkProviders {
 				continue;
 			}
 			String existingName = marker.getMarkerName();
-			if (existingName.equals(nameToAdd)) {
+			if (existingName!=null && existingName.equals(nameToAdd)) {
 				markProviders.remove(i);
 				break;
 			}
