@@ -20,6 +20,8 @@ import PamView.tables.SwingTableColumnWidths;
 import PamguardMVC.PamDataBlock;
 import nilus.Detections;
 import tethys.TethysControl;
+import tethys.TethysState;
+import tethys.TethysState.StateType;
 import tethys.dbxml.TethysException;
 import tethys.detection.StreamDetectionsSummary;
 import tethys.niluswraps.PDetections;
@@ -75,6 +77,13 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 		tableModel.fireTableDataChanged();
 	}
 	
+	@Override
+	public void updateState(TethysState tethysState) {
+		if (dataBlock != null) {
+			selectDataBlock(dataBlock);
+		}
+	}
+
 	private class MouseActions extends MouseAdapter {
 
 		@Override
@@ -137,6 +146,7 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 		} catch (TethysException e) {
 			getTethysControl().showException(e);
 		}
+		getTethysControl().exportedDetections(dataBlock);
 		selectDataBlock(dataBlock); // force table update. 
 	}
 

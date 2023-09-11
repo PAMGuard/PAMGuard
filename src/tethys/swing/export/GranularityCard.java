@@ -34,17 +34,22 @@ import tethys.output.StreamExportParams;
 public class GranularityCard extends ExportWizardCard {
 
 	private JRadioButton[] granularities;
-	
+
 	private JTextArea dataSelectionText;
-	
-	private JTextField binLength, encounterGap;
+
+	private JTextField binLength, minCalls, encounterGap;
 
 	private DataSelector dataSelector;
-	
-	public GranularityCard(TethysControl tethysControl, PamDataBlock dataBlock) {
+
+	private DetectionsExportWizard detectionsExportWizard;
+
+	private int encounterIndex, binnedIndex;
+
+	public GranularityCard(DetectionsExportWizard detectionsExportWizard, TethysControl tethysControl, PamDataBlock dataBlock) {
 		super(tethysControl, "Granularity", dataBlock);
+		this.detectionsExportWizard = detectionsExportWizard;
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		
+
 		// granularity
 		GranularityEnumType[] grans = GranularityEnumType.values();
 		granularities = new JRadioButton[grans.length];
@@ -52,34 +57,41 @@ public class GranularityCard extends ExportWizardCard {
 		GridBagConstraints c = new PamGridBagContraints();
 		granPanel.setBorder(new TitledBorder("Granularity"));
 		ButtonGroup granGroup = new ButtonGroup();
+		GranularityChange gc = new GranularityChange();
 		for (int i = 0; i < grans.length; i++) {
 			c.gridx = 0;
 			granularities[i] = new JRadioButton(PGranularityType.prettyString(grans[i]));
 			granularities[i].setToolTipText(PGranularityType.toolTip(grans[i]));
+			granularities[i].addActionListener(gc);
 			granPanel.add(granularities[i], c);
 			granGroup.add(granularities[i]);
 			if (grans[i] == GranularityEnumType.BINNED) {
+				binnedIndex = i;
 				c.gridx++;
 				granPanel.add(new JLabel(" bin duration ", JLabel.RIGHT), c);
 				c.gridx++;
 				granPanel.add(binLength = new JTextField(5), c);
 				c.gridx++;
-				granPanel.add(new JLabel(" (s) ", JLabel.LEFT), c);
-				
+				granPanel.add(new JLabel("(s), min Calls", JLabel.LEFT), c);
+				c.gridx++;
+				granPanel.add(minCalls = new JTextField(5), c);			
+				binLength.setToolTipText("Time bin duration in seconds");
+				minCalls.setToolTipText("Minimum number of calls for a bin to be output");	
 			}
 			if (grans[i] == GranularityEnumType.ENCOUNTER) {
+				encounterIndex = i;
 				c.gridx++;
 				granPanel.add(new JLabel(" min gap ", JLabel.RIGHT), c);
 				c.gridx++;
 				granPanel.add(encounterGap = new JTextField(5), c);
 				c.gridx++;
-				granPanel.add(new JLabel(" (s) ", JLabel.LEFT), c);
-				
+				granPanel.add(new JLabel("(s) ", JLabel.LEFT), c);
+				encounterGap.setToolTipText("Minimum gap between separate encounters");
 			}
 			c.gridy++;
 		}
 		this.add(granPanel);
-		
+
 		// data selection
 		dataSelector = dataBlock.getDataSelector(tethysControl.getDataSelectName(), false);
 		if (dataSelector != null) {
@@ -101,7 +113,22 @@ public class GranularityCard extends ExportWizardCard {
 			dataPanel.add(BorderLayout.CENTER, sp);
 			this.add(dataPanel);
 		}
-		
+
+	}
+
+	private class GranularityChange implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			enableControls();
+		}
+
+	}
+
+	private void enableControls() {
+		binLength.setEnabled(granularities[binnedIndex].isSelected());
+		minCalls.setEnabled(granularities[binnedIndex].isSelected());
+		encounterGap.setEnabled(granularities[encounterIndex].isSelected());
 	}
 
 	protected void newDataSelection() {
@@ -129,7 +156,29 @@ public class GranularityCard extends ExportWizardCard {
 				break;
 			}
 		}
-		
+		if (streamExportParams.granularity == GranularityEnumType.BINNED) {
+			try {
+				streamExportParams.binDurationS = Double.valueOf(binLength.getText());
+			}
+			catch (NumberFormatException e) {
+				return detectionsExportWizard.showWarning("Invalid bin duration parameter");
+			}
+			try {
+				streamExportParams.minBinCount = Integer.valueOf(minCalls.getText());
+			}
+			catch (NumberFormatException e) {
+				return detectionsExportWizard.showWarning("Invalid minimum call count");
+			}
+		}
+		if (streamExportParams.granularity == GranularityEnumType.ENCOUNTER) {
+			try {
+				streamExportParams.encounterGapS = Double.valueOf(encounterGap.getText());
+			}
+			catch (NumberFormatException e) {
+				return detectionsExportWizard.showWarning("Invalid encounter gap parameter");
+			}
+		}
+
 		return streamExportParams.granularity != null;
 	}
 
@@ -139,7 +188,11 @@ public class GranularityCard extends ExportWizardCard {
 		for (int i = 0; i < grans.length; i++) {
 			granularities[i].setSelected(streamExportParams.granularity == grans[i]);
 		}
+		binLength.setText(String.format("%3.1f", streamExportParams.binDurationS));
+		minCalls.setText(String.format("%d", streamExportParams.minBinCount));
+		encounterGap.setText(String.format("%3.1f", streamExportParams.encounterGapS));
 		newDataSelection();
+		enableControls();
 	}
 
 }

@@ -48,10 +48,10 @@ public class DetectionsExportWizard extends PamDialog {
 		cardPanel = new JPanel(cardLayout);
 		mainPanel.add(BorderLayout.CENTER, cardPanel);
 
-		addCard(algorithmCard = new AlgorithmCard(tethysControl, dataBlock));
-		addCard(granularityCard = new GranularityCard(tethysControl, dataBlock));
-		addCard(descriptionCard = new DescriptionCard(tethysControl, dataBlock));
-		addCard(exportWorkerCard = new ExportWorkerCard(tethysControl, dataBlock));
+		addCard(algorithmCard = new AlgorithmCard(this, tethysControl, dataBlock));
+		addCard(granularityCard = new GranularityCard(this, tethysControl, dataBlock));
+		addCard(descriptionCard = new DescriptionCard(this, tethysControl, dataBlock));
+		addCard(exportWorkerCard = new ExportWorkerCard(this, tethysControl, dataBlock));
 		
 		cardLayout.first(cardPanel);
 		
@@ -97,6 +97,10 @@ public class DetectionsExportWizard extends PamDialog {
 	protected void previousButton() {
 		cardLayout.previous(cardPanel);
 		enableControls();
+	}
+	
+	public JButton getPreviousButton() {
+		return prevButton;
 	}
 
 	@Override

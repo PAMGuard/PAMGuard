@@ -14,6 +14,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.dom.DOMResult;
 
+import org.docx4j.model.listnumbering.NumberFormatLowerLetter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -25,7 +26,10 @@ import PamModel.parametermanager.PamParameterData;
 import PamModel.parametermanager.PamParameterSet;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
+import PamguardMVC.dataSelector.DataSelectParams;
+import PamguardMVC.dataSelector.DataSelector;
 import nilus.MarshalXML;
+import tethys.TethysControl;
 
 /**
  * Functions to pack up a PAMGuard parameters object into the correct format
@@ -74,12 +78,15 @@ public class TethysParameterPacker {
 	
 	private PamguardXMLWriter xmlWriter;
 
+	private TethysControl tethysControl;
+
 	/**
 	 * @throws JAXBException 
 	 * 
 	 */
-	public TethysParameterPacker() throws JAXBException {
+	public TethysParameterPacker(TethysControl tethysControl) throws JAXBException {
 		super();
+		this.tethysControl = tethysControl;
 		try {
 			marshaller = new MarshalXML();
 		} catch (JAXBException e) {
@@ -117,12 +124,43 @@ public class TethysParameterPacker {
 		if (parameterSet == null) {
 			return null;
 		}
-//		Document document = null;
-//		try {
-//			document =  DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-//		} catch (ParserConfigurationException e1) {
-//			e1.printStackTrace();
-//		}
+		// get the XML writer ready for a new export ...
+		xmlWriter.setExcludeDisplaySettings(true);
+		xmlWriter.makeSettingsList();
+		
+		/**
+		 * first do the data filter. I can't see any way of doing this
+		 * without creating a doc as was in the helper example. 
+		 */
+		QName qnamef = new QName(MarshalXML.schema, "datafilter", "ty");
+		JAXBElement<String> jaxelf = new JAXBElement<String>(
+				qnamef, String.class, parameterSet.getParentObject().getClass().getCanonicalName());
+		Document docf = null;
+		try {
+			docf = marshaller.marshalToDOM(jaxelf);
+		} catch (JAXBException | ParserConfigurationException e1) {
+			e1.printStackTrace();
+		}  
+		Element elf = docf.getDocumentElement();
+		elList.add(elf);/**
+		 * Is there a data filter ? If so, write it's 
+		 * XML parameters out here. 
+		 */
+		DataSelector dataSelector = pamDataBlock.getDataSelector(tethysControl.getDataSelectName(), false);
+		if (dataSelector != null) {
+			DataSelectParams filterParams = dataSelector.getParams();
+			if (filterParams != null) {
+				Element pEl = xmlWriter.writeObjectData(docf, elf, filterParams, null);
+//				if (pEl != null) {
+////					filterEl.appendChild(pEl);
+//					elf.appendChild(filterEl);
+//				}
+			}
+		}
+
+		
+		
+		
 		QName qname = new QName(MarshalXML.schema, "parameters", "ty");
 		JAXBElement<String> jaxel = new JAXBElement<String>(
 				qname, String.class, parameterSet.getParentObject().getClass().getCanonicalName());
@@ -133,18 +171,14 @@ public class TethysParameterPacker {
 			e1.printStackTrace();
 		}  
 		Element el = doc.getDocumentElement();
-
-		for (PamParameterData pamParam : parameterSet.getParameterCollection()) {
-			try {
-				Object paramData = pamParam.getData();
-				boolean ok = createElement(doc, el, paramData, pamParam, objectHierarchy);
-			} catch (IllegalArgumentException | IllegalAccessException e) {
-				e.printStackTrace();
-			}
-		}
 		elList.add(el);
-		xmlWriter.setExcludeDisplaySettings(true);
-		xmlWriter.makeSettingsList();
+
+		
+		
+		/**
+		 * Now get the chain of PAMGuard modules for the current detector and for 
+		 * all upstream modules. 
+		 */
 		ArrayList<PamControlledUnit> moduleChain = getParentChain(pamDataBlock);
 		for (PamControlledUnit pcu : moduleChain) {
 			if (pcu instanceof PamSettings == false) {

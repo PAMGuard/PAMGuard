@@ -31,6 +31,7 @@ import nilus.DetectionEffortKind;
 import nilus.SpeciesIDType;
 import tethys.TethysControl;
 import tethys.TethysTimeFuncs;
+import tethys.detection.DetectionsHandler;
 import tethys.niluswraps.PDeployment;
 import tethys.output.StreamExportParams;
 import tethys.output.TethysExportParams;
@@ -62,8 +63,10 @@ public class AutoTethysProvider implements TethysDataProvider {
 	private PamDataBlock pamDataBlock;
 	private PamProcess pamProcess;
 	private PamControlledUnit pamControlledUnit;
+	private TethysControl tethysControl;
 
-	public AutoTethysProvider(PamDataBlock pamDataBlock) {
+	public AutoTethysProvider(TethysControl tethysControl, PamDataBlock pamDataBlock) {
+		this.tethysControl = tethysControl;
 		this.pamDataBlock = pamDataBlock;
 		pamProcess = pamDataBlock.getParentProcess();
 		pamControlledUnit = pamProcess.getPamControlledUnit();
@@ -135,7 +138,7 @@ public class AutoTethysProvider implements TethysDataProvider {
 		Object settings = pamSettings.getSettingsReference();
 		TethysParameterPacker paramPacker = null;
 		try {
-			paramPacker = new TethysParameterPacker();
+			paramPacker = new TethysParameterPacker(tethysControl);
 		} catch (JAXBException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -425,6 +428,22 @@ public class AutoTethysProvider implements TethysDataProvider {
 
 			kind.getSpeciesId().setValue(BigInteger.valueOf(mapItem.getItisCode()));
 			kind.getGranularity().setValue(exportParams.granularity);
+//			nilus.DetectionEffortKind.Parameters granularityParams = kind.getParameters();
+			switch (exportParams.granularity) {
+			case BINNED:
+				kind.getGranularity().setBinSizeM(exportParams.binDurationS/60.);
+				long firstBin = DetectionsHandler.roundDownBinStart(pDeployment.getAudioStart(), (long) (exportParams.binDurationS*1000));
+				kind.getGranularity().setFirstBinStart(TethysTimeFuncs.xmlGregCalFromMillis(firstBin));
+				break;
+			case CALL:
+				break;
+			case ENCOUNTER:
+				kind.getGranularity().setEncounterGapM(exportParams.encounterGapS/60.);
+				break;
+			case GROUPED:
+				break;
+			
+			}
 			kind.setCall(mapItem.getCallType());
 
 

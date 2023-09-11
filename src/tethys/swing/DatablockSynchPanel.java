@@ -28,10 +28,11 @@ import PamguardMVC.PamDataBlock;
 import dataMap.OfflineDataMap;
 import tethys.TethysControl;
 import tethys.TethysState;
+import tethys.TethysStateObserver;
 import tethys.output.DatablockSynchInfo;
 import tethys.species.DataBlockSpeciesManager;
 
-public class DatablockSynchPanel extends TethysGUIPanel  {
+public class DatablockSynchPanel extends TethysGUIPanel {
 	
 	public JPanel mainPanel;
 	
@@ -133,6 +134,7 @@ public class DatablockSynchPanel extends TethysGUIPanel  {
 	@Override
 	public void updateState(TethysState tethysState) {
 		synchTableModel.fireTableDataChanged();
+		selectRow();
 	}
 	
 	public void addTableObserver(StreamTableObserver observer) {

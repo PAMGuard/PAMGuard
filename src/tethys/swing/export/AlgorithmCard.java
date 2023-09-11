@@ -20,7 +20,7 @@ public class AlgorithmCard extends ExportWizardCard {
 	
 	private JTextField method, software, version, supportSoftware;
 
-	public AlgorithmCard(TethysControl tethysControl, PamDataBlock dataBlock) {
+	public AlgorithmCard(DetectionsExportWizard detectionsExportWizard, TethysControl tethysControl, PamDataBlock dataBlock) {
 		super(tethysControl, "Algorithm", dataBlock);
 		setBorder(new TitledBorder("Algorithm details"));
 		method = new JTextField(40);

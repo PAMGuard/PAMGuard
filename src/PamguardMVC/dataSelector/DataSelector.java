@@ -139,7 +139,7 @@ public abstract class DataSelector {
 		}
 		return null;
 	}
-	
+		
 	/**
 	 * Score a PAMDataUnit. this is used in preference 
 	 * to a boolean select function so that the user can add different

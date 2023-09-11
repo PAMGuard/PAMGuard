@@ -8,7 +8,7 @@ import tethys.TethysControl;
  * All the information needed to populate a table row in the synchronisation table. 
  * some will need to be set as rarely as possible since it may
  * be slow to update. <br>
- * This needs to sit alongside the StreamExportParams objects since those others are serialisable wheras
+ * This needs to sit alongside the StreamExportParams objects since those others are serialisable whereas
  * there is a lot of stuff in here which isn't. 
  * @author dg50
  *

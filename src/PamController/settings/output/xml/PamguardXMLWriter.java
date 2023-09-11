@@ -581,9 +581,12 @@ public class PamguardXMLWriter implements PamSettings {
 		return el;
 	}
 
-	private Element writeObjectData(Document doc, Element el, Object data, ArrayList<Object> objectHierarchy) {
+	public Element writeObjectData(Document doc, Element el, Object data, ArrayList<Object> objectHierarchy) {
 		if (data == null) {
 			return null;
+		}
+		if (objectHierarchy == null) {
+			objectHierarchy = new ArrayList<>();
 		}
 		if (objectHierarchy.contains(data)) {
 			// just write the reference, but nothing else or we'll end up in an infinite loop of objects. 

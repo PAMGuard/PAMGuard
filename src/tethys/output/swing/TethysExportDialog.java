@@ -112,7 +112,7 @@ public class TethysExportDialog extends PamDialog {
 		ArrayList<DataStreamSet> sets = new ArrayList<>();
 		ArrayList<PamDataBlock> allDataBlocks = PamController.getInstance().getDataBlocks();
 		for (PamDataBlock aDataBlock : allDataBlocks) {
-			if (aDataBlock.getTethysDataProvider() != null) {
+			if (aDataBlock.getTethysDataProvider(tethysControl) != null) {
 				sets.add(new DataStreamSet(aDataBlock));
 			}
 		}

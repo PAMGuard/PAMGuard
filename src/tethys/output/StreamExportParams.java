@@ -31,6 +31,12 @@ public class StreamExportParams implements Serializable {
 	
 	public GranularityEnumType granularity = GranularityEnumType.CALL;
 	
+	public double binDurationS = 60;
+	
+	public double encounterGapS = 60;
+	
+	public int minBinCount = 1;
+	
 	/*
 	 * Can't have this here since it isn't serializable. 
 	 */

@@ -1,16 +1,6 @@
 package tethys.output;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-
-import org.w3c.dom.Document;
 
 import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionProcess;
@@ -18,15 +8,9 @@ import Array.ArrayManager;
 import Array.Hydrophone;
 import Array.PamArray;
 import Array.SnapshotGeometry;
-import PamController.PamControlledUnit;
 import PamController.PamController;
-import PamController.PamSettings;
-import PamController.settings.output.xml.PamguardXMLWriter;
 import PamUtils.PamCalendar;
 import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamDataUnit;
-import PamguardMVC.dataSelector.DataSelector;
-import dbxml.uploader.Importer;
 import metadata.MetaDataContol;
 import metadata.deployment.DeploymentData;
 import nilus.Deployment;
@@ -35,15 +19,13 @@ import tethys.dbxml.DBXMLConnect;
 import tethys.dbxml.TethysException;
 import tethys.deployment.DeploymentHandler;
 import tethys.deployment.DeploymentOverview;
-import tethys.deployment.DeploymentRecoveryPair;
 import tethys.deployment.RecordingPeriod;
-import tethys.detection.DetectionGranularity;
-import tethys.detection.DetectionGranularity.GRANULARITY;
 import tethys.detection.DetectionsHandler;
-import tethys.pamdata.TethysDataProvider;
-import tethys.pamdata.TethysSchema;
 
 /**
+ * No longer used. This was purely a test class used for making the first couple 
+ * of test connections and exports to Tethys. Can probably delete. 
+ * 
  * Class sitting at the centre of all operations. It will talk to PAMGuard
  * objects to get schemas and data and talk to the database connection to move
  * data out (and possibly in). Eventually, a lot of the functionality in here
@@ -55,6 +37,7 @@ import tethys.pamdata.TethysSchema;
  * @author dg50
  *
  */
+@Deprecated
 public class TethysExporter {
 
 	private TethysControl tethysControl;
@@ -62,7 +45,7 @@ public class TethysExporter {
 
 	private DBXMLConnect dbxmlConnect;
 
-	public TethysExporter(TethysControl tethysControl, TethysExportParams tethysExportParams) {
+	private TethysExporter(TethysControl tethysControl, TethysExportParams tethysExportParams) {
 		this.tethysControl = tethysControl;
 		this.tethysExportParams = tethysExportParams;
 		dbxmlConnect = new DBXMLConnect(tethysControl);
@@ -85,7 +68,7 @@ public class TethysExporter {
 		 */
 		// return false;
 		// }
-				
+
 		/**
 		 * Doug populate instrument fields - may need to add a few things. Marie to
 		 * define what we mean by instrument. Instrument names probably need to be added
@@ -206,7 +189,7 @@ public class TethysExporter {
 		DetectionsHandler detectionsHandler = new DetectionsHandler(tethysControl);
 		ArrayList<PamDataBlock> allDataBlocks = PamController.getInstance().getDataBlocks();
 //		/**
-//		 * Outer loop is through deployemnt documents. Will then export detections within each 
+//		 * Outer loop is through deployemnt documents. Will then export detections within each
 //		 * deployment detector by detector
 //		 */
 //		for (Deployment aDeployment : deploymentDocs) {
@@ -215,7 +198,7 @@ public class TethysExporter {
 //				if (streamExportParams == null || !streamExportParams.selected) {
 //					continue; // not interested in this one.
 //				}
-//				detectionsHandler.exportDetections(aDataBlock, aDeployment, 
+//				detectionsHandler.exportDetections(aDataBlock, aDeployment,
 //						new DetectionGranularity(GRANULARITY.TIME, 3600*12), tethysExportParams, streamExportParams);
 //			}
 //		}

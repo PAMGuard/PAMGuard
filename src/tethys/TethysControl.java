@@ -211,7 +211,7 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		ArrayList<PamDataBlock> sets = new ArrayList<>();
 		ArrayList<PamDataBlock> allDataBlocks = PamController.getInstance().getDataBlocks();
 		for (PamDataBlock aDataBlock : allDataBlocks) {
-			if (aDataBlock.getTethysDataProvider() != null) {
+			if (aDataBlock.getTethysDataProvider(this) != null) {
 				sets.add(aDataBlock);
 			}
 		}
@@ -335,31 +335,31 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		return tethysExportParams;
 	}
 
-	/**
-	 * We'll probably want to
-	 * @param parentFrame
-	 */
-	protected void tethysExport(JFrame parentFrame) {
-		TethysExportParams newExportParams = TethysExportDialog.showDialog(parentFrame, this);
-		if (newExportParams != null) {
-			// dialog returns null if cancel was pressed.
-			tethysExportParams = newExportParams;
-			exportTethysData(tethysExportParams);
-		}
-	}
-
-	/**
-	 * We'll arrive here if the dialog has been opened and we want to export Tethys data.
-	 * @param tethysExportParams2
-	 */
-	private void exportTethysData(TethysExportParams tethysExportParams) {
-		TethysExporter tethysExporter = new TethysExporter(this, tethysExportParams);
-		tethysExporter.doExport();
-
-		sendStateUpdate(new TethysState(StateType.TRANSFERDATA));
-		countProjectDetections();
-		sendStateUpdate(new TethysState(StateType.NEWPAMGUARDSELECTION));
-	}
+//	/**
+//	 * We'll probably want to
+//	 * @param parentFrame
+//	 */
+//	protected void tethysExport(JFrame parentFrame) {
+//		TethysExportParams newExportParams = TethysExportDialog.showDialog(parentFrame, this);
+//		if (newExportParams != null) {
+//			// dialog returns null if cancel was pressed.
+//			tethysExportParams = newExportParams;
+//			exportTethysData(tethysExportParams);
+//		}
+//	}
+//
+//	/**
+//	 * We'll arrive here if the dialog has been opened and we want to export Tethys data.
+//	 * @param tethysExportParams2
+//	 */
+//	private void exportTethysData(TethysExportParams tethysExportParams) {
+//		TethysExporter tethysExporter = new TethysExporter(this, tethysExportParams);
+//		tethysExporter.doExport();
+//
+//		sendStateUpdate(new TethysState(StateType.TRANSFERDATA));
+//		countProjectDetections();
+//		sendStateUpdate(new TethysState(StateType.NEWPAMGUARDSELECTION));
+//	}
 
 	/**
 	 * Get global deployment data. This is a bit of a mess, trying to use a separate module
@@ -642,6 +642,16 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 			itisFunctions = new ITISFunctions(this);
 		}
 		return itisFunctions;
+	}
+
+	/**
+	 * Called when a detections document has been exported. 
+	 * @param dataBlock
+	 */
+	public void exportedDetections(PamDataBlock dataBlock) {
+		sendStateUpdate(new TethysState(StateType.TRANSFERDATA));
+		countProjectDetections();
+		sendStateUpdate(new TethysState(StateType.NEWPAMGUARDSELECTION));
 	}
 
 }

@@ -542,6 +542,27 @@ public class DBXMLQueries {
 	}
 	
 	/**
+	 * Find out if a document exists ?
+	 * @param collection
+	 * @param documentId
+	 * @return
+	 */
+	public boolean documentExists(String collection, String documentId) {
+		Queries queries = dbXMLConnect.getTethysQueries();
+		String result = null;
+		try {
+			result = queries.getDocument(collection, documentId);
+		} catch (Exception e) {
+			return false;
+		}
+		if (result == null || result.length() == 0) {
+			return false;
+		}
+		
+		return result.contains(documentId);
+	}
+	
+	/**
 	 * Count on effort detections in a Detections document
 	 * @param docName
 	 * @return

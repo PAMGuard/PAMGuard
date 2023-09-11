@@ -50,6 +50,7 @@ import org.w3c.dom.Element;
 import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionProcess;
 import pamScrollSystem.ViewLoadObserver;
+import tethys.TethysControl;
 import tethys.pamdata.AutoTethysProvider;
 import tethys.pamdata.TethysDataProvider;
 import tethys.species.DataBlockSpeciesManager;
@@ -3089,9 +3090,9 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 * to be bespoke, but for now will autogenerate based on the SQLLogging information. 
 	 * @return the tethysDataProvider
 	 */
-	public TethysDataProvider getTethysDataProvider() {
+	public TethysDataProvider getTethysDataProvider(TethysControl tethysControl) {
 		if (tethysDataProvider == null && PamDetection.class.isAssignableFrom(unitClass) && getLogging() != null) {
-			tethysDataProvider = new AutoTethysProvider(this);
+			tethysDataProvider = new AutoTethysProvider(tethysControl, this);
 		}
 		return tethysDataProvider;
 	}

@@ -36,8 +36,11 @@ public class ExportWorkerCard extends ExportWizardCard implements DetectionExpor
 
 	private StreamExportParams streamExportParams;
 
-	public ExportWorkerCard(TethysControl tethysControl, PamDataBlock dataBlock) {
+	private DetectionsExportWizard detectionsExportWizard;
+
+	public ExportWorkerCard(DetectionsExportWizard detectionsExportWizard, TethysControl tethysControl, PamDataBlock dataBlock) {
 		super(tethysControl, "Export", dataBlock);
+		this.detectionsExportWizard = detectionsExportWizard;
 		setLayout(new BorderLayout());
 		setBorder(new TitledBorder("Export data"));
 		JPanel exPanel = new PamNorthPanel(new GridBagLayout());
@@ -146,6 +149,8 @@ public class ExportWorkerCard extends ExportWizardCard implements DetectionExpor
 			break;
 		case DetectionExportProgress.STATE_COMPLETE:
 			progressText.setText("Export complete");
+			detectionsExportWizard.getCancelButton().setText("Close");
+			detectionsExportWizard.getPreviousButton().setEnabled(false);
 			break;
 		case DetectionExportProgress.STATE_WRITING:
 			progressText.setText("Writing to Tethys: " + progress.currentDetections.getId());
