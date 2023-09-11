@@ -17,6 +17,8 @@ import javax.swing.JTable;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
 
+import PamView.PamGui;
+import PamView.dialog.warn.WarnOnce;
 import PamView.tables.SwingTableColumnWidths;
 import PamguardMVC.PamDataBlock;
 import nilus.DetectionEffortKind;
@@ -120,7 +122,7 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 
 		JPopupMenu popMenu = new JPopupMenu();
 		
-		JMenuItem menuItem = new JMenuItem("Delete " + pDets.detections.getId());
+		JMenuItem menuItem = new JMenuItem("Delete document " + pDets.detections.getId());
 		menuItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -129,11 +131,20 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 		});
 		popMenu.add(menuItem);
 		
-		menuItem = new JMenuItem("Display " + pDets.detections.getId());
+		menuItem = new JMenuItem("Display document " + pDets.detections.getId());
 		menuItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				displayDocument(pDets);
+			}
+		});
+		popMenu.add(menuItem);
+		
+		menuItem = new JMenuItem("Export document " + pDets.detections.getId());
+		menuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				exportDocument(pDets);
 			}
 		});
 		popMenu.add(menuItem);
@@ -145,6 +156,11 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 	}
 	
 	protected void deleteDocument(PDetections pDets) {
+		String msg = String.format("Are you sure you want to delete the Detections document %s ?", pDets.detections.getId());
+		int ans = WarnOnce.showWarning(PamGui.findComponentWindow(mainPanel), "Delete Document", msg, WarnOnce.OK_CANCEL_OPTION);
+		if (ans != WarnOnce.OK_OPTION) {
+			return;
+		}
 		try {
 			getTethysControl().getDbxmlConnect().deleteDocument(pDets.detections);
 		} catch (TethysException e) {
@@ -156,6 +172,11 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 
 	private void displayDocument(PDetections pDets) {
 		getTethysControl().displayDocument(TethysCollections.Detections.toString(), pDets.detections.getId());
+		
+	}
+
+	private void exportDocument(PDetections pDets) {
+		getTethysControl().exportDocument(TethysCollections.Detections.toString(), pDets.detections.getId());
 		
 	}
 

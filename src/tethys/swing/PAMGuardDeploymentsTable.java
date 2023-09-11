@@ -134,7 +134,7 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 		}
 		if (matchedDeployments.size() == 1) {
 			JPopupMenu popMenu = new JPopupMenu();
-			JMenuItem menuItem = new JMenuItem("Remove deployment document " + matchedDeployments.get(0));
+			JMenuItem menuItem = new JMenuItem("Delete deployment document " + matchedDeployments.get(0));
 			menuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {

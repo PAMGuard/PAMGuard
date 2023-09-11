@@ -132,26 +132,29 @@ public class TethysParameterPacker {
 		 * first do the data filter. I can't see any way of doing this
 		 * without creating a doc as was in the helper example. 
 		 */
-		QName qnamef = new QName(MarshalXML.schema, "datafilter", "ty");
-		JAXBElement<String> jaxelf = new JAXBElement<String>(
-				qnamef, String.class, parameterSet.getParentObject().getClass().getCanonicalName());
-		Document docf = null;
-		try {
-			docf = marshaller.marshalToDOM(jaxelf);
-		} catch (JAXBException | ParserConfigurationException e1) {
-			e1.printStackTrace();
-		}  
-		Element elf = docf.getDocumentElement();
-		elList.add(elf);/**
-		 * Is there a data filter ? If so, write it's 
-		 * XML parameters out here. 
-		 */
 		DataSelector dataSelector = pamDataBlock.getDataSelector(tethysControl.getDataSelectName(), false);
 		if (dataSelector != null) {
 			DataSelectParams filterParams = dataSelector.getParams();
 			if (filterParams != null) {
-				Element pEl = xmlWriter.writeObjectData(docf, elf, filterParams, null);
-//				if (pEl != null) {
+				int selected = filterParams.getCombinationFlag();
+				if (selected != DataSelectParams.DATA_SELECT_DISABLE) {
+					QName qnamef = new QName(MarshalXML.schema, "datafilter", "ty");
+					JAXBElement<String> jaxelf = new JAXBElement<String>(
+							qnamef, String.class, parameterSet.getParentObject().getClass().getCanonicalName());
+					Document docf = null;
+					try {
+						docf = marshaller.marshalToDOM(jaxelf);
+					} catch (JAXBException | ParserConfigurationException e1) {
+						e1.printStackTrace();
+					}  
+					Element elf = docf.getDocumentElement();
+					elList.add(elf);/**
+					 * Is there a data filter ? If so, write it's 
+					 * XML parameters out here. 
+					 */
+					Element pEl = xmlWriter.writeObjectData(docf, elf, filterParams, null);
+				}
+				//				if (pEl != null) {
 ////					filterEl.appendChild(pEl);
 //					elf.appendChild(filterEl);
 //				}

@@ -88,6 +88,7 @@ public class BinnedGranularityHandler extends GranularityHandler {
 		Detection[] detections = null;
 		if (dataUnit.getTimeMilliseconds() >= binEndMillis) {
 			detections = closeBins(dataUnit.getTimeMilliseconds());
+			prepare(dataUnit.getTimeMilliseconds());
 		}
 		String speciesCode = speciesManager.getSpeciesCode(dataUnit);
 		Detection det = currentDetections.get(speciesCode);
@@ -140,8 +141,6 @@ public class BinnedGranularityHandler extends GranularityHandler {
 		}
 		
 		
-		// finally, start new bins (not really needed on last call, but do anyway). 
-		startBin(binEndMillis);
 		
 		/*
 		 * Clean up the end of the array and return detections that have enough calls.  

@@ -596,17 +596,20 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		
 		PamFileFilter fileFilter = new PamFileFilter("XML documents", ".xml");
 //		fileFilter
-		JFileChooser fileChooser = new PamFileChooser();
+		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setFileFilter(fileFilter);
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		// make a default name based on the document id and the dataset directory. 
 		String defFolder = PamFolders.getDefaultProjectFolder();
+		File defFile = null;
 		if (defFolder != null) {
-			defFolder = String.format("%s%s%s.xml", defFolder,File.separator,documentId);
-			File defFile = new File(defFolder);
-			fileChooser.setSelectedFile(defFile);
+			defFolder = String.format("%s%s%s_%s.xml", defFolder,File.separator,collection,documentId);
+			defFile = new File(defFolder);
 			fileChooser.setAcceptAllFileFilterUsed(true);
+			fileChooser.setSelectedFile(defFile);
 			
+//			fileChooser.setSelectedFile(new File(String.format("%s.xml", documentId)));
+//			fileChooser.set
 		}
 		int state = fileChooser.showSaveDialog(getGuiFrame());
 		if (state != JFileChooser.APPROVE_OPTION) return;
