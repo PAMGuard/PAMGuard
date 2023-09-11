@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -18,12 +19,15 @@ import javax.swing.table.AbstractTableModel;
 
 import PamView.tables.SwingTableColumnWidths;
 import PamguardMVC.PamDataBlock;
+import nilus.DetectionEffortKind;
 import nilus.Detections;
+import nilus.GranularityType;
 import tethys.TethysControl;
 import tethys.TethysState;
 import tethys.TethysState.StateType;
 import tethys.dbxml.TethysException;
 import tethys.detection.StreamDetectionsSummary;
+import tethys.niluswraps.PDeployment;
 import tethys.niluswraps.PDetections;
 import tethys.niluswraps.TethysCollections;
 
@@ -167,7 +171,7 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 
 	private class TableModel extends AbstractTableModel {
 		
-		private String[] colNames = {"Document", "Count", "Abstract"};
+		private String[] colNames = {"Document", "Granularity", "Count", "Abstract"};
 
 		@Override
 		public int getRowCount() {
@@ -205,8 +209,23 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 			case 0:
 				return dets.getId();
 			case 1:
-				return pDets.count;
+				List<DetectionEffortKind> kinds = dets.getEffort().getKind();
+				if (kinds == null) {
+					return null;
+				}
+				for (DetectionEffortKind kind : kinds) {
+					if (kind.getGranularity() != null) {
+						GranularityType granularity = kind.getGranularity();
+						return PDeployment.formatGranularity(granularity);
+//						if (granularity != null) {
+//							return granularity.getValue();
+//						}
+					}
+				}
+				break;
 			case 2:
+				return pDets.count;
+			case 3:
 				return dets.getDescription().getAbstract();
 			}
 			return null;

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.DocumentBuilder;
@@ -25,7 +26,10 @@ import nilus.Deployment;
 import nilus.Deployment.Instrument;
 import nilus.DeploymentRecoveryDetails;
 import nilus.DescriptionType;
+import nilus.DetectionEffortKind;
 import nilus.Detections;
+import nilus.GranularityEnumType;
+import nilus.GranularityType;
 import nilus.Helper;
 import tethys.TethysControl;
 import tethys.TethysTimeFuncs;
@@ -748,6 +752,27 @@ public class DBXMLQueries {
 		return root.getTextContent();
 	}
 
+
+	public String getElementAttribute(Element root, String elName, String attribute) {
+		String[] tree = elName.split("\\.");
+		for (String element : tree) {
+			NodeList nodeList = root.getElementsByTagName(element);
+			// should only be one node for what we're unpacking.
+			if (nodeList == null || nodeList.getLength() == 0) {
+				return null;
+			}
+			int count = nodeList.getLength();
+			for (int i = 0; i < count; i++) {
+				Node firstNode = nodeList.item(i);
+				if (firstNode instanceof Element) {
+					root = (Element) firstNode;
+					break;
+				}
+			}
+		}
+		return root.getAttribute(attribute);
+	}
+
 	public Document convertStringToXMLDocument(String xmlString) {
 		//Parser that produces DOM object trees from XML content
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -776,7 +801,7 @@ public class DBXMLQueries {
 	public Detections getDetectionsDocInfo(String detectionsDocName) {
 		String oldqueryBase = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/Id\",\"Detections/Description\",\"Detections/DataSource\",\"Detections/Algorithm\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Id\",\"DetectionsDocName\"],\"optype\":\"binary\"}],\"enclose\":1}";
 		// updated May 23
-		String queryBase = "{\"species\":{\"query\":{\"op\":\"lib:completename2tsn\",\"optype\":\"function\",\"operands\":[\"%s\"]},\"return\":{\"op\":\"lib:tsn2completename\",\"optype\":\"function\",\"operands\":[\"%s\"]}},\"return\":[\"Detections/Id\",\"Detections/Description\",\"Detections/DataSource\",\"Detections/Algorithm\",\"Detections/QualityAssurance\",\"Detections/UserId\",\"Detections/MetadataInfo\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Id\",\"DetectionsDocName\"],\"optype\":\"binary\"}],\"enclose\":1}";
+		String queryBase = "{\"species\":{\"query\":{\"op\":\"lib:completename2tsn\",\"optype\":\"function\",\"operands\":[\"%s\"]},\"return\":{\"op\":\"lib:tsn2completename\",\"optype\":\"function\",\"operands\":[\"%s\"]}},\"return\":[\"Detections/Id\",\"Detections/Description\",\"Detections/DataSource\",\"Detections/Algorithm\",\"Detections/QualityAssurance\",\"Detections/UserId\",\"Detections/MetadataInfo\",\"Detections/Effort\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Id\",\"DetectionsDocName\"],\"optype\":\"binary\"}],\"enclose\":1}";
 		String query = queryBase.replace("DetectionsDocName", detectionsDocName);
 		DBQueryResult queryResult;
 		try {
@@ -819,6 +844,35 @@ public class DBXMLQueries {
 		description.setAbstract(getElementData(result, "Description.Abstract"));
 		description.setMethod(getElementData(result, "Description.Method"));
 		description.setObjectives(getElementData(result, "Description.Objectives"));
+		
+		// try to find the granularity. 
+		String granularityString = getElementData(result, "Effort.Kind.Granularity");
+		GranularityEnumType granularity = null;
+		if (granularityString != null) {
+			granularity = GranularityEnumType.fromValue(granularityString);  
+			List<DetectionEffortKind> kinds = detections.getEffort().getKind();
+			DetectionEffortKind kind = new DetectionEffortKind();
+			GranularityType granularityType = new GranularityType();
+			granularityType.setValue(granularity);
+			kind.setGranularity(granularityType);
+			// try to find the rest of the granularity information. 
+			String binSize_m = getElementAttribute(result, "Effort.Kind.Granularity", "BinSize_m");
+			String encounterGap_m = getElementAttribute(result, "Effort.Kind.Granularity", "EncounterGap_m");
+			String firstBinStart = getElementAttribute(result, "Effort.Kind.Granularity", "FirstBinStart");
+			try {
+				granularityType.setBinSizeM(Double.valueOf(binSize_m));
+			}
+			catch (NumberFormatException e) {
+			}
+			try {
+				granularityType.setEncounterGapM(Double.valueOf(encounterGap_m));
+			}
+			catch (NumberFormatException e) {
+			}
+			
+			kinds.add(kind);
+		}
+//		String 
 
 
 

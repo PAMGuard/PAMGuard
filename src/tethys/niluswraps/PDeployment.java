@@ -3,6 +3,7 @@ package tethys.niluswraps;
 import PamUtils.PamCalendar;
 import nilus.Deployment;
 import nilus.DeploymentRecoveryDetails;
+import nilus.GranularityType;
 import tethys.TethysTimeFuncs;
 import tethys.deployment.RecordingPeriod;
 /**
@@ -59,6 +60,22 @@ public class PDeployment {
 		else {
 			return String.format("%s %s", deployment.getId(), PamCalendar.formatDBDate(getAudioStart()));
 		}
+	}
+	
+	public static String formatGranularity(GranularityType granularity) {
+		if (granularity == null) {
+			return null;
+		}
+		String str = String.format("%s", granularity.getValue());
+		Double bin = granularity.getBinSizeM();
+		if (bin != null) {
+			str += String.format(" (%3.1f s)", bin*60);
+		}
+		Double gap = granularity.getEncounterGapM();
+		if (gap != null) {
+			str += String.format( " (%3.1f s)", gap);
+		}
+		return str;
 	}
 	
 	
