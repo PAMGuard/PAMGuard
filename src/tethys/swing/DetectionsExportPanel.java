@@ -30,7 +30,7 @@ public class DetectionsExportPanel extends TethysGUIPanel implements StreamTable
 		mainPanel = new PamAlignmentPanel(BorderLayout.NORTH);
 		mainPanel.setLayout(new GridBagLayout());
 		mainPanel.setBorder(new TitledBorder("Export"));
-		exportButton = new JButton("Export");
+		exportButton = new JButton("<html>Export<p>>>>></html>");
 		exportButton.setToolTipText("Export PAMGaurd data to Tethys");
 		exportButton.addActionListener(new ActionListener() {
 			@Override
@@ -38,6 +38,7 @@ public class DetectionsExportPanel extends TethysGUIPanel implements StreamTable
 				doExport();
 			}
 		});
+		exportButton.setToolTipText("Select a Data Block on the left to enable export");
 		exportButton.setEnabled(false);
 		GridBagConstraints c = new PamGridBagContraints();
 		mainPanel.add(exportButton, c);

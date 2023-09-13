@@ -1,5 +1,6 @@
 package tethys.niluswraps;
 
+import PamguardMVC.PamDataBlock;
 import nilus.Detections;
 
 public class PDetections {
@@ -10,8 +11,11 @@ public class PDetections {
 	
 	public PDeployment deployment;
 
-	public PDetections(Detections detections, PDeployment deployment, Integer count) {
+	public PamDataBlock dataBlock;
+
+	public PDetections(Detections detections, PamDataBlock dataBlock, PDeployment deployment, Integer count) {
 		super();
+		this.dataBlock = dataBlock;
 		this.detections = detections;
 		this.deployment = deployment;
 		this.count = count;

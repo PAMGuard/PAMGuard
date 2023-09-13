@@ -76,8 +76,10 @@ import PamguardMVC.background.BackgroundDataBlock;
 import PamguardMVC.background.BackgroundManager;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import PamguardMVC.dataOffline.OfflineDataLoading;
+import PamguardMVC.dataSelector.DataSelectParams;
 import PamguardMVC.dataSelector.DataSelector;
 import PamguardMVC.dataSelector.DataSelectorCreator;
+import PamguardMVC.dataSelector.DataSelectorSettings;
 import PamguardMVC.dataSelector.NullDataSelectorCreator;
 import PamguardMVC.datamenus.DataMenuParent;
 import PamguardMVC.nanotime.NanoTimeCalculator;
@@ -2840,7 +2842,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 * @return temporary copy of the data
 	 */
 	public ArrayList<Tunit> getDataCopy(long t1, long t2, boolean assumeOrder, DataSelector dataSelector) {
-		if (dataSelector == null) {
+		if (dataSelector == null || dataSelector.getParams().getCombinationFlag() == DataSelectParams.DATA_SELECT_DISABLE) {
 			return getDataCopy(t1, t2, assumeOrder);
 		}
 		else {

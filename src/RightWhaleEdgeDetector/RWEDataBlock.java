@@ -7,7 +7,10 @@ import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import PamguardMVC.dataSelector.DataSelectorCreator;
 import RightWhaleEdgeDetector.datasel.RWDataSelCreator;
 import RightWhaleEdgeDetector.species.RWSpeciesManager;
+import RightWhaleEdgeDetector.species.RWTethysDataProvider;
 import pamScrollSystem.ViewLoadObserver;
+import tethys.TethysControl;
+import tethys.pamdata.TethysDataProvider;
 import tethys.species.DataBlockSpeciesManager;
 import whistlesAndMoans.AbstractWhistleDataBlock;
 
@@ -19,6 +22,7 @@ public class RWEDataBlock extends AbstractWhistleDataBlock<RWEDataUnit> implemen
 	private RWDataSelCreator dataSelCreator;
 	
 	private RWSpeciesManager rwSpeciesManager;
+	private RWTethysDataProvider rwTethysDataProvider;
 
 	public RWEDataBlock(RWEControl rweControl, String dataName,
 			RWEProcess rweProcess, int channelMap) {
@@ -63,6 +67,14 @@ public class RWEDataBlock extends AbstractWhistleDataBlock<RWEDataUnit> implemen
 			rwSpeciesManager = new RWSpeciesManager(this);
 		}
 		return rwSpeciesManager;
+	}
+
+	@Override
+	public TethysDataProvider getTethysDataProvider(TethysControl tethysControl) {
+		if (rwTethysDataProvider == null) {
+			rwTethysDataProvider = new RWTethysDataProvider(tethysControl, rweProcess.getRweDataBlock());
+		}
+		return rwTethysDataProvider;
 	}
 
 }

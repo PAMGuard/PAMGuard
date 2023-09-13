@@ -516,6 +516,15 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 				count += dbxmlQueries.countData(synchInfo.getDataBlock(), pDepl.deployment.getId());
 			}
 			synchInfo.setDataCount(count);
+			// also count the actual number of Detectoin documents
+			ArrayList<String> someNames = getDbxmlQueries().getDetectionsDocuments(synchInfo.getDataBlock(), null);
+			if (someNames == null) {
+				synchInfo.setDetectionDocumentCount(0);
+			}
+			else {
+				synchInfo.setDetectionDocumentCount(someNames.size());
+			}
+			
 			i++;
 		}
 //		int[] counts = dbxmlQueries.countDataForProject(deplData.getProject(), dataPrefixes);

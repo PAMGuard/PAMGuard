@@ -156,7 +156,7 @@ public class DatablockSynchPanel extends TethysGUIPanel {
 
 	private class SynchTableModel extends AbstractTableModel {
 
-		String[] columnNames = {"Data Stream", "N PAM Datas", "PAMGuard Time", "N Tethys Datas", "Tethys Time", "Options"};
+		String[] columnNames = {"Data Stream", "N PAM Datas", "PAMGuard Time", "Tethys Documents", "Tethys Time", "Options"};
 		
 		@Override
 		public int getRowCount() {
@@ -200,7 +200,7 @@ public class DatablockSynchPanel extends TethysGUIPanel {
 				long stop = synchInfo.getDataBlock().getPrimaryDataMap().getLastDataTime();
 				return String.format("%s - %s", PamCalendar.formatDBDateTime(start), PamCalendar.formatDBDateTime(stop));
 			case 3:
-				return synchInfo.getDataCount();
+				return synchInfo.getDetectionDocumentCount();
 			}
 			return null;
 		}

@@ -52,7 +52,7 @@ public class TethysMainPanel extends TethysGUIPanel {
 		southwestSplit.add(datablockSynchPanel.getComponent());
 		southwestSplit.add(southEastPanel);
 		southEastPanel.add(datablockDetectionsPanel.getComponent(), BorderLayout.CENTER);
-		southEastPanel.add(detectionsExportPanel.getComponent(), BorderLayout.EAST);
+		southEastPanel.add(detectionsExportPanel.getComponent(), BorderLayout.WEST);
 		splitPane.add(southwestSplit);
 		SwingUtilities.invokeLater(new Runnable() {
 			// these only work if called after display is visible

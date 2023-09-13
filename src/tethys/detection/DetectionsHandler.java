@@ -8,6 +8,7 @@ import javax.swing.SwingWorker;
 import PamController.PamControlledUnit;
 import PamController.PamguardVersionInfo;
 import PamModel.PamPluginInterface;
+import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamProcess;
@@ -84,7 +85,7 @@ public class DetectionsHandler {
 			for (String aDoc : someNames) {
 				Detections detections = tethysControl.getDbxmlQueries().getDetectionsDocInfo(aDoc);
 				int count = tethysControl.getDbxmlQueries().countDetections2(aDoc);
-				PDetections pDetections = new PDetections(detections, null, count);
+				PDetections pDetections = new PDetections(detections, dataBlock, aDep, count);
 				detectionsDocs.add(pDetections);
 			}
 		}
@@ -364,6 +365,98 @@ public class DetectionsHandler {
 	 * @param exportObserver
 	 * @return
 	 */
+	private int countDetections(PamDataBlock dataBlock, StreamExportParams streamExportParams, DetectionExportObserver exportObserver) {
+		/*
+		 * This is currently called for the entire dataset, but we will need to loop over specific Deployment documents
+		 * and export the content of each separately.
+		 */
+		TethysExportParams exportParams = tethysControl.getTethysExportParams();
+		DBXMLConnect dbxmlConnect = tethysControl.getDbxmlConnect();
+		DeploymentHandler depHandler = tethysControl.getDeploymentHandler();
+		ArrayList<PDeployment> deployments = depHandler.getMatchedDeployments();
+//		Detections currentDetections = null;
+		OfflineDataMap dataMap = dataBlock.getPrimaryDataMap();
+		DataSelector dataSelector = dataBlock.getDataSelector(tethysControl.getDataSelectName(), false);
+		int totalCount = dataMap.getDataCount();
+		int skipCount = 0;
+		int exportCount = 0;
+		long lastUnitTime = 0;
+		DetectionExportProgress prog;
+		GranularityHandler granularityHandler = GranularityHandler.getHandler(streamExportParams.granularity, tethysControl, dataBlock, exportParams, streamExportParams);
+		for (PDeployment deployment : deployments) {
+			int documentCount = 0;
+			prog = new DetectionExportProgress(deployment, null,
+					lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_GATHERING);
+			exportObserver.update(prog);
+			granularityHandler.prepare(deployment.getAudioStart());
+			// export everything in that deployment.
+			// need to loop through all map points in this interval.
+			List<OfflineDataMapPoint> mapPoints = dataMap.getMapPoints();
+			for (OfflineDataMapPoint mapPoint : mapPoints) {
+				if (!activeExport) {
+					prog = new DetectionExportProgress(deployment, null,
+							lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_CANCELED);
+					exportObserver.update(prog);
+				}
+
+				if (mapPoint.getEndTime() < deployment.getAudioStart()) {
+					continue;
+				}
+				if (mapPoint.getStartTime() >= deployment.getAudioEnd()) {
+					break;
+				}
+				dataBlock.loadViewerData(mapPoint.getStartTime(), mapPoint.getEndTime(), null);
+				ArrayList<PamDataUnit> dataCopy = dataBlock.getDataCopy(deployment.getAudioStart(), deployment.getAudioEnd(), true, dataSelector);
+				skipCount += dataBlock.getUnitsCount() - dataCopy.size();
+				for (PamDataUnit dataUnit : dataCopy) {
+					/*
+					 * Here is where we need to handle the different granularities.
+					 */
+					Detection dets[] = granularityHandler.addDataUnit(dataUnit);
+					if (dets != null) {
+						exportCount+=dets.length;
+						documentCount+=dets.length;
+					}
+//					Detection det = dataProvider.createDetection(dataUnit, exportParams, streamExportParams);
+//					exportCount++;
+//					documentCount++;
+//					onEffort.getDetection().add(det);
+					lastUnitTime = dataUnit.getTimeMilliseconds();
+				}
+
+				prog = new DetectionExportProgress(deployment, null,
+						lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_GATHERING);
+				exportObserver.update(prog);
+
+//				if (documentCount > 500000 && mapPoint != dataMap.getLastMapPoint()) {
+//					prog = new DetectionExportProgress(deployment, currentDetections,
+//							lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_WRITING);
+//					exportObserver.update(prog);
+//					closeDetectionsDocument(currentDetections, mapPoint.getEndTime());
+//					try {
+//						dbxmlConnect.postToTethys(currentDetections);
+//					} catch (TethysException e) {
+//						tethysControl.showException(e);
+//					}
+//					currentDetections = null;
+//				}
+			}
+			
+
+
+		}
+
+		prog = new DetectionExportProgress(null, null,
+				lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_COMPLETE);
+		exportObserver.update(prog);
+		return exportCount;
+	}/**
+	 * Export detections in all deployments for this PAMGuard dataset.
+	 * @param dataBlock
+	 * @param streamExportParams
+	 * @param exportObserver
+	 * @return
+	 */
 	private int exportDetections(PamDataBlock dataBlock, StreamExportParams streamExportParams, DetectionExportObserver exportObserver) {
 		/*
 		 * This is currently called for the entire dataset, but we will need to loop over specific Deployment documents
@@ -559,7 +652,13 @@ public class DetectionsHandler {
 		protected Integer doInBackground() throws Exception {
 			Integer ans = null;
 			try {
-				ans = exportDetections(dataBlock, exportParams, this);
+				int count = countDetections(dataBlock, exportParams, exportObserver);
+				String msg = String.format("Do you want to go ahead and output %d %s detections to Tethys?", 
+						count, exportParams.granularity);
+				int doit = WarnOnce.showWarning("Tethys Detections Export", msg, WarnOnce.OK_CANCEL_OPTION);
+				if (doit == WarnOnce.OK_OPTION) {
+					ans = exportDetections(dataBlock, exportParams, this);
+				}
 			}
 			catch (Exception e) {
 				e.printStackTrace();

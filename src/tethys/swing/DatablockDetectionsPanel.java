@@ -16,6 +16,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.JTableHeader;
 
 import PamView.PamGui;
 import PamView.dialog.warn.WarnOnce;
@@ -26,7 +27,6 @@ import nilus.Detections;
 import nilus.GranularityType;
 import tethys.TethysControl;
 import tethys.TethysState;
-import tethys.TethysState.StateType;
 import tethys.dbxml.TethysException;
 import tethys.detection.StreamDetectionsSummary;
 import tethys.niluswraps.PDeployment;
@@ -61,13 +61,50 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 		mainPanel.setBorder(new TitledBorder("Data stream Tethys Detections documents"));
 		
 		tableModel = new TableModel();
-		table = new JTable(tableModel);
+		table = new JTable(tableModel) {
+			@Override
+			public String getToolTipText(MouseEvent event) {
+				return getToolTip(event);
+			}
+
+		    protected JTableHeader createDefaultTableHeader() {
+		        return new JTableHeader(columnModel) {
+		            public String getToolTipText(MouseEvent e) {
+		            	return getToolTip(e);
+		            }
+		        };
+		    }
+			
+		};
 		JScrollPane scrollPane = new JScrollPane(table);
 		mainPanel.add(BorderLayout.CENTER, scrollPane);
 		
 		new SwingTableColumnWidths(tethysControl.getUnitName() + getClass().getName(), table);
 		
 		table.addMouseListener(new MouseActions());
+	}
+
+	protected String getToolTip(MouseEvent event) {
+        java.awt.Point p = event.getPoint();
+        int rowIndex = table.rowAtPoint(p);
+//        if (rowIndex < 0) {
+//        	return null;
+//        }
+        int colIndex = table.columnAtPoint(p);
+        switch (colIndex) {
+        case 0:
+        	return "Tethys Detections document name";
+        case 1:
+        	return "Name of PAMGuard data stream";
+        case 2:
+        	return "Output granularity";
+        case 3:
+        	return "Number of detection elements in document";
+        case 4:
+        	return "Document abstract";
+        	
+        }
+        return "No tip";
 	}
 
 	@Override
@@ -192,7 +229,7 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 
 	private class TableModel extends AbstractTableModel {
 		
-		private String[] colNames = {"Document", "Granularity", "Count", "Abstract"};
+		private String[] colNames = {"Document", "Detector", "Granularity", "Count", "Abstract"};
 
 		@Override
 		public int getRowCount() {
@@ -230,6 +267,11 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 			case 0:
 				return dets.getId();
 			case 1:
+				if (pDets.dataBlock == null) {
+					return null;
+				}
+				return pDets.dataBlock.getDataName();
+			case 2:
 				List<DetectionEffortKind> kinds = dets.getEffort().getKind();
 				if (kinds == null) {
 					return null;
@@ -244,9 +286,9 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 					}
 				}
 				break;
-			case 2:
-				return pDets.count;
 			case 3:
+				return pDets.count;
+			case 4:
 				return dets.getDescription().getAbstract();
 			}
 			return null;

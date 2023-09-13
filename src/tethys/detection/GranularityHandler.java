@@ -89,7 +89,7 @@ public abstract class GranularityHandler {
 		case CALL:
 			return new CallGranularityHandler(tethysControl, dataBlock, tethysExportParams, streamExportParams);
 		case ENCOUNTER:
-			new EncounterGranularityHandler(tethysControl, dataBlock, tethysExportParams, streamExportParams);
+			return new EncounterGranularityHandler(tethysControl, dataBlock, tethysExportParams, streamExportParams);
 		case GROUPED:
 			return new GroupedGranularityHandler(tethysControl, dataBlock, tethysExportParams, streamExportParams);
 		default:

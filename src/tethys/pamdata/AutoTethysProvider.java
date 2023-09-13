@@ -20,14 +20,17 @@ import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamProcess;
 import PamguardMVC.TFContourData;
 import PamguardMVC.TFContourProvider;
+import binaryFileStorage.DataUnitFileInformation;
 import generalDatabase.DBSchemaWriter;
 import generalDatabase.SQLLogging;
 import nilus.AlgorithmType;
-import nilus.AlgorithmType.Parameters;
 import nilus.Deployment;
 import nilus.DescriptionType;
 import nilus.Detection;
+import nilus.Detection.Parameters;
+import nilus.Detection.Parameters.UserDefined;
 import nilus.DetectionEffortKind;
+import nilus.Helper;
 import nilus.SpeciesIDType;
 import tethys.TethysControl;
 import tethys.TethysTimeFuncs;
@@ -42,6 +45,7 @@ import tethys.species.SpeciesMapItem;
 import whistleClassifier.WhistleContour;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
@@ -54,7 +58,9 @@ import java.net.URISyntaxException;
 
 /**
  * Automatically provides Tethys data based on the SQL database interface 
- * for a data block. 
+ * for a data block. does most of what needs to be done, though individual modules
+ * may want to override this, call the base createDetection function and then add a 
+ * few more bespoke elements. 
  * @author dg50
  *
  */
@@ -119,7 +125,7 @@ public class AutoTethysProvider implements TethysDataProvider {
 //		algorithm.setMethod(this.getAlgorithmMethod());
 //		algorithm.setSoftware("PAMGuard");
 //		algorithm.setVersion(PamguardVersionInfo.version);
-		Parameters algoParameters = this.getAlgorithmParameters();
+		nilus.AlgorithmType.Parameters algoParameters = this.getAlgorithmParameters();
 		if (algoParameters != null) {
 			algorithm.setParameters(algoParameters);
 		}
@@ -128,12 +134,12 @@ public class AutoTethysProvider implements TethysDataProvider {
 	}
 
 	@Override
-	public Parameters getAlgorithmParameters() {
+	public nilus.AlgorithmType.Parameters getAlgorithmParameters() {
 		if (pamControlledUnit instanceof PamSettings == false) {
 			return null;
 		}
 		PamSettings pamSettings = (PamSettings) pamControlledUnit;
-		Parameters parameters = new Parameters();
+		nilus.AlgorithmType.Parameters parameters = new nilus.AlgorithmType.Parameters();
 		List<Element> paramList = parameters.getAny();
 		Object settings = pamSettings.getSettingsReference();
 		TethysParameterPacker paramPacker = null;
@@ -343,8 +349,37 @@ public class AutoTethysProvider implements TethysDataProvider {
 		detParams.setReceivedLevelDB(ampli);
 		//		DataUnitBaseData basicData = dataUnit.getBasicData();
 		gotTonalContour(dataUnit, detParams);
+		
+		String uid = BigInteger.valueOf(dataUnit.getUID()).toString();
+		Element el = addUserDefined(detParams,"PAMGuardUID", uid);
+		DataUnitFileInformation fileInf = dataUnit.getDataUnitFileInformation();
+		if (fileInf != null) {
+			el.setAttribute("BinaryFile", fileInf.getShortFileName(2048));
+			el.setAttribute("FileIndex", Long.valueOf(fileInf.getIndexInFile()).toString());
+		}
 
 		return detection;
+	}
+	
+	private Element addUserDefined(Parameters parameters, String parameterName, String parameterValue) {
+		UserDefined userDefined = parameters.getUserDefined();
+		if (userDefined == null) {
+			userDefined = new UserDefined();
+			parameters.setUserDefined(userDefined);
+		}
+		Helper helper;
+		Element el = null;
+		try {
+			helper = new Helper();
+			el = helper.AddAnyElement(userDefined.getAny(), parameterName, parameterValue);
+		} catch (JAXBException e) {
+			e.printStackTrace();
+			return null;
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+			return null;
+		}
+		return el;
 	}
 
 	/**

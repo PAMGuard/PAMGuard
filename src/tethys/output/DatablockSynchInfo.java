@@ -16,17 +16,27 @@ import tethys.TethysControl;
 public class DatablockSynchInfo {
 
 	private PamDataBlock dataBlock;
-	public PamDataBlock getDataBlock() {
-		return dataBlock;
-	}
 
 	private TethysControl tethysControl;
+	/**
+	 * Count of individual datas in all Detections documents
+	 */
 	private int setDataCount;
+	
+	/**
+	 * Count of the number of Detections documents
+	 */
+	private int detectionDocumentCount;
+	
 
 	public DatablockSynchInfo(TethysControl tethysControl, PamDataBlock dataBlock) {
 		super();
 		this.tethysControl = tethysControl;
 		this.dataBlock = dataBlock;
+	}
+
+	public PamDataBlock getDataBlock() {
+		return dataBlock;
 	}
 	
 	/**
@@ -43,6 +53,20 @@ public class DatablockSynchInfo {
 	
 	public int getDataCount() {
 		return setDataCount;
+	}
+
+	/**
+	 * @return the detectionDocumentCount
+	 */
+	public int getDetectionDocumentCount() {
+		return detectionDocumentCount;
+	}
+
+	/**
+	 * @param detectionDocumentCount the detectionDocumentCount to set
+	 */
+	public void setDetectionDocumentCount(int detectionDocumentCount) {
+		this.detectionDocumentCount = detectionDocumentCount;
 	}
 	
 }

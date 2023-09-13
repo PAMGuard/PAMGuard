@@ -751,7 +751,16 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 			} else if (endTimeArrow != null && endTimeArrow.contains(me.getPoint())) {
 				tipText = "Data End: " + PamCalendar.formatDateTime(dataBlock.getCurrentViewDataEnd(), false);
 			} else {
-				tipText = "Cursor: " + PamCalendar.formatDateTime(tm, true);
+				OfflineDataMap dMap = dataBlock.getPrimaryDataMap();
+				if (dMap != null) {
+					tipText = String.format("%s Data from<p>%s to %s<p>Cursor: %s", dataBlock.getDataName(), 
+							PamCalendar.formatDateTime(dMap.getFirstDataTime(), false),
+							PamCalendar.formatDateTime(dMap.getLastDataTime(), false),
+							PamCalendar.formatDateTime(tm, true));
+				}
+				else {
+					tipText = "Cursor: " + PamCalendar.formatDateTime(tm, true);
+				}
 			}
 
 //			tipText += "<br>Panel height = " + getHeight();

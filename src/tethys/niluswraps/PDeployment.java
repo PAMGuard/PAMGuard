@@ -73,7 +73,7 @@ public class PDeployment {
 		}
 		Double gap = granularity.getEncounterGapM();
 		if (gap != null) {
-			str += String.format( " (%3.1f s)", gap);
+			str += String.format( " (%3.1f s)", gap*60.);
 		}
 		return str;
 	}
