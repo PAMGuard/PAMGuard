@@ -151,7 +151,7 @@ public class TethysExportDialog extends PamDialog {
 		}
 		int nSel = 0;
 		for (DataStreamSet streamSet : dataStreamSets) {
-			StreamExportParams streamOpts = new StreamExportParams(streamSet.dataBlock.getLongDataName(), streamSet.checkBox.isSelected());
+			StreamExportParams streamOpts = new StreamExportParams(tethysControl, streamSet.dataBlock, streamSet.checkBox.isSelected());
 			exportParams.setStreamParams(streamSet.dataBlock, streamOpts);
 			nSel++;
 		}

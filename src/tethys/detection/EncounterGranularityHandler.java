@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
@@ -54,8 +55,8 @@ public class EncounterGranularityHandler extends GranularityHandler {
 	public Detection[] addDataUnit(PamDataUnit dataUnit) {
 		Detection[] completeDetections = checkCurrentEncounters(dataUnit.getTimeMilliseconds());
 		// now look for new ones. First get the species of the dataUnit and find it in the hashmap
-		String speciesCode = speciesManager.getSpeciesCode(dataUnit);
-		Detection det = currentDetections.get(speciesCode);
+		String groupName = getCallGroupName(dataUnit);
+		Detection det = currentDetections.get(groupName);
 		if (det == null) {
 			// need to make a new one. 
 			det = new Detection();
@@ -73,7 +74,7 @@ public class EncounterGranularityHandler extends GranularityHandler {
 			if (speciesStuff.getCallType() != null) {
 				det.getCall().add(speciesStuff.getCallType());
 			}
-			currentDetections.put(speciesCode, det);
+			currentDetections.put(groupName, det);
 		}
 		else {
 			// add to current detection. Set new end time and increment count
@@ -98,16 +99,18 @@ public class EncounterGranularityHandler extends GranularityHandler {
 		Set<String> keys = currentDetections.keySet();
 		int nGood = 0;
 		Detection[] newDetections = new Detection[currentDetections.size()];
-		for (String aKey : keys) {
-			Detection aDet = currentDetections.get(aKey);
-			Long detEnd = TethysTimeFuncs.millisFromGregorianXML(aDet.getEnd());
+		Iterator<Entry<String, Detection>> iter = currentDetections.entrySet().iterator();
+		while (iter.hasNext()) {
+			Entry<String, Detection> entry = iter.next();
+			Detection aDet = entry.getValue();
+			long detEnd = TethysTimeFuncs.millisFromGregorianXML(aDet.getEnd());
 			if (timeMilliseconds-detEnd > maxGapMillis) {
 				// only keep if it's got a min number of calls. 
 				if (aDet.getCount().intValue() >= streamExportParams.minBinCount) {
 					newDetections[nGood++] = aDet;
 				}
 				// remove from set. A new one will be created only when required. 
-				currentDetections.remove(aKey);
+				iter.remove();
 			}
 		}
 

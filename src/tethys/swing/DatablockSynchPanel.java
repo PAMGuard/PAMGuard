@@ -156,7 +156,7 @@ public class DatablockSynchPanel extends TethysGUIPanel {
 
 	private class SynchTableModel extends AbstractTableModel {
 
-		String[] columnNames = {"Data Stream", "N PAM Datas", "PAMGuard Time", "Tethys Documents", "Tethys Time", "Options"};
+		String[] columnNames = {"Data Stream", "N PAM Datas", "PAMGuard Time", "Tethys Documents"};//, "Tethys Time", "Options"};
 		
 		@Override
 		public int getRowCount() {

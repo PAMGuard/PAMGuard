@@ -7,6 +7,7 @@ import nilus.GranularityEnumType;
 import tethys.TethysControl;
 import tethys.output.StreamExportParams;
 import tethys.output.TethysExportParams;
+import tethys.species.DataBlockSpeciesManager;
 
 public abstract class GranularityHandler {
 
@@ -17,6 +18,8 @@ public abstract class GranularityHandler {
 	protected TethysExportParams tethysExportParams;
 	
 	protected StreamExportParams streamExportParams;
+
+	private DataBlockSpeciesManager speciesManager;
 
 	/**
 	 * @param tethysControl
@@ -30,6 +33,7 @@ public abstract class GranularityHandler {
 		this.dataBlock = dataBlock;
 		this.tethysExportParams = tethysExportParams;
 		this.streamExportParams = streamExportParams;
+		speciesManager = dataBlock.getDatablockSpeciesManager();
 	}
 	
 	/**
@@ -48,6 +52,23 @@ public abstract class GranularityHandler {
 	 */
 	public abstract Detection[] addDataUnit(PamDataUnit dataUnit);
 	
+	/**
+	 * Get a grouping name for the call. This may just be the calls species code, 
+	 * or it may be appended with the channel number. This is used to find bin and 
+	 * encounter data in HashMaps in 
+	 * @param dataUnit
+	 * @return
+	 */
+	public String getCallGroupName(PamDataUnit dataUnit) {
+		String groupName = speciesManager.getSpeciesCode(dataUnit);
+		if (groupName == null) {
+			groupName = "NullSpecies";
+		}
+		if (streamExportParams.separateChannels) {
+			groupName += String.format("Chan%d", dataUnit.getChannelBitmap());
+		}
+		return groupName;
+	}
 	/**
 	 * Called after end end of all data units to get the last bin / encounter. <p>
 	 * 

@@ -14,6 +14,7 @@ import PamController.PamSettings;
 import PamController.PamguardVersionInfo;
 import PamController.settings.output.xml.PamguardXMLWriter;
 import PamUtils.XMLUtils;
+import PamguardMVC.DataAutomationInfo;
 import PamguardMVC.DataUnitBaseData;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
@@ -30,6 +31,7 @@ import nilus.Detection;
 import nilus.Detection.Parameters;
 import nilus.Detection.Parameters.UserDefined;
 import nilus.DetectionEffortKind;
+import nilus.GranularityEnumType;
 import nilus.Helper;
 import nilus.SpeciesIDType;
 import tethys.TethysControl;
@@ -90,11 +92,11 @@ public class AutoTethysProvider implements TethysDataProvider {
 		return schema;
 	}
 
-	@Override
-	public TethysDataPoint getDataPoint(PamDataUnit pamDataUnit) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//	@Override
+//	public TethysDataPoint getDataPoint(PamDataUnit pamDataUnit) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 	@Override
 	public DescriptionType getDescription(Deployment deployment, TethysExportParams tethysExportParams) {
@@ -486,6 +488,51 @@ public class AutoTethysProvider implements TethysDataProvider {
 
 		}
 		
+	}
+
+	@Override
+	public String getDetectionsMethod() {
+		/*
+		 *  could really do with knowing what type of detector we're dealing with, i.e. if it's
+		 *  automatic or manual. For most blocks this is fixed, though some may have a mixture of both ! 
+		 */
+		DataAutomationInfo dataAutomation = pamDataBlock.getDataAutomationInfo();
+		String method;
+		PamControlledUnit pcu = pamDataBlock.getParentProcess().getPamControlledUnit();
+		if (dataAutomation == null) {
+			method = String.format("Processing using the PAMGuard %s", pcu.getUnitType());
+		}
+		else {
+			method = String.format("%s processing using the PAMGuard %s", dataAutomation.getAutomation(), pcu.getUnitType());
+		}
+		
+		return method;
+	}
+
+	@Override
+	public GranularityEnumType[] getAllowedGranularities() {
+		GranularityEnumType[] allowed = {GranularityEnumType.CALL, GranularityEnumType.BINNED, GranularityEnumType.ENCOUNTER};
+		return allowed;
+	}
+
+	@Override
+	public String getDetectionsName() {
+		PamProcess process = pamDataBlock.getParentProcess();
+		PamControlledUnit pcu = process.getPamControlledUnit();
+		String pcuName = pcu.getUnitName();
+		String blockName = pamDataBlock.getDataName();
+		String documentName;
+		/**
+		 * If the datablock name is the same as the unit name, no need to repeat onesself. 
+		 */
+		if (pcuName.equals(blockName)) {
+			documentName = new String(pcuName); // copy it, since we're about to modify it!
+		}
+		else {
+			documentName = pcuName + " " + blockName;
+		}
+		documentName = documentName.replace(' ', '_');
+		return documentName;
 	}
 
 }

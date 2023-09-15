@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
 
 import PamController.PamController;
@@ -57,7 +58,9 @@ public class TethysDocumentTable implements PamDialogPanel {
 		mainPanel.add(BorderLayout.CENTER, scrollPane);
 		new SwingTableColumnWidths(tethysControl.getUnitName()+"TethysDocumentsTable", mainTable);
 		this.setCollectionName(collectionName);
-		mainTable.addMouseListener(new TableMouse());		
+		mainTable.addMouseListener(new TableMouse());
+		mainTable.setRowSelectionAllowed(true);
+		mainTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 	}
 	
 	public void updateTableData() {
@@ -94,6 +97,7 @@ public class TethysDocumentTable implements PamDialogPanel {
 		if (row < 0|| row >= documentNames.size()) {
 			return;
 		}
+		
 		String docName = documentNames.get(row);
 		JPopupMenu popMenu = new JPopupMenu();
 		JMenuItem menuItem = new JMenuItem("Show document " + docName);
@@ -104,14 +108,31 @@ public class TethysDocumentTable implements PamDialogPanel {
 			}
 		});
 		popMenu.add(menuItem);
-		menuItem = new JMenuItem("Delete document " + docName);
-		menuItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				deleteDocument(docName);
-			}
-		});
-		popMenu.add(menuItem);
+		
+
+		int[] rows = mainTable.getSelectedRows();
+		if (rows != null && rows.length == 1) {
+//			docName = documentNames.get(rows[0]);
+			menuItem = new JMenuItem("Delete document " + docName);
+			menuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					deleteDocument(docName);
+				}
+			});
+			popMenu.add(menuItem);
+		}
+		else if (rows != null && rows.length > 1) {
+			String mt = String.format("Delete multiple (%d) documents", rows.length);
+			menuItem = new JMenuItem(mt);
+			menuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					deleteDocuments(rows);
+				}
+			});
+			popMenu.add(menuItem);
+		}
 		
 		popMenu.show(e.getComponent(), e.getX(), e.getY());
 	}
@@ -134,6 +155,32 @@ public class TethysDocumentTable implements PamDialogPanel {
 		updateTableData();
 	}
 	
+	private void deleteDocuments(int[] rows) {
+		int ans = WarnOnce.showNamedWarning("deletedoc"+collectionName, PamController.getMainFrame(), "Delete documents", 
+				"Are you sure you want to delete multiple documents ", WarnOnce.OK_CANCEL_OPTION);
+		if (ans != WarnOnce.OK_OPTION) {
+			return;
+		}
+		/*
+		 *  make a new list before anything is deleted since the
+		 *  man list will get updated during deletion and be out of date.  
+		 */
+		String[] docNames = new String[rows.length];
+		for (int i = 0; i < rows.length; i++) {
+			 docNames[i] = documentNames.get(rows[i]);
+		}
+		// now it's safe to delete them. 
+		for (int i = 0; i < docNames.length; i++) {
+			try {
+				tethysControl.getDbxmlConnect().removeDocument(collectionName, docNames[i]);
+			} catch (TethysException e) {
+				System.out.println("Failed to delete " + docNames[i]);
+				System.out.println(e.getMessage());
+			}
+		}
+		updateTableData();
+	}
+
 	private class TableModel extends AbstractTableModel {
 		
 		private String[] columnNames = {"", "Document Id/Name"};

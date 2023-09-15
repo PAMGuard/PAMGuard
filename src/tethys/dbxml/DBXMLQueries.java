@@ -846,6 +846,11 @@ public class DBXMLQueries {
 		description.setMethod(getElementData(result, "Description.Method"));
 		description.setObjectives(getElementData(result, "Description.Objectives"));
 
+		// get the effort start an end
+		String effStart = getElementData(result, "Effort.Start");
+		String effEnd = getElementData(result, "Effort.End");
+		detections.getEffort().setStart(TethysTimeFuncs.fromGregorianXML(effStart));
+		detections.getEffort().setEnd(TethysTimeFuncs.fromGregorianXML(effEnd));
 		// try to find the granularity. 
 		String granularityString = getElementData(result, "Effort.Kind.Granularity");
 		GranularityEnumType granularity = null;

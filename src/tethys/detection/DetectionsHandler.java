@@ -349,9 +349,9 @@ public class DetectionsHandler {
 	/**
 	 * Round a bin start so that it's aligned correctly with
 	 * day starts. 
-	 * @param binStart
-	 * @param binInterval
-	 * @return
+	 * @param binStart in milliseconds
+	 * @param binInterval in milliseconds
+	 * @return rounded time. 
 	 */
 	public static long roundDownBinStart(long binStart, long binInterval) {
 		binStart/=binInterval;
@@ -440,6 +440,10 @@ public class DetectionsHandler {
 //					}
 //					currentDetections = null;
 //				}
+			}
+			Detection dets[] = granularityHandler.cleanup(deployment.getAudioEnd());
+			if (dets != null) {
+				exportCount += dets.length;
 			}
 			
 
@@ -578,8 +582,9 @@ public class DetectionsHandler {
 			e.printStackTrace();
 			return null;
 		}
+		TethysDataProvider dataProvider = dataBlock.getTethysDataProvider(tethysControl);
 
-		String prefix = deployment.deployment.getId();
+		String prefix = deployment.deployment.getId() + "_" + dataProvider.getDetectionsName();
 		String fullId = "";
 		/*
 		 * Check the document name isn't already used and increment id as necessary.
@@ -599,7 +604,6 @@ public class DetectionsHandler {
 		detections.setDataSource(dataSource);
 		AlgorithmType algorithm = detections.getAlgorithm();
 
-		TethysDataProvider dataProvider = dataBlock.getTethysDataProvider(tethysControl);
 		if (dataProvider != null) {
 			algorithm = dataProvider.getAlgorithm();
 //			detections.setAlgorithm(algorithm);

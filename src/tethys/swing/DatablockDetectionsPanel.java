@@ -17,6 +17,7 @@ import javax.swing.JTable;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.JTableHeader;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import PamView.PamGui;
 import PamView.dialog.warn.WarnOnce;
@@ -97,10 +98,12 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
         case 1:
         	return "Name of PAMGuard data stream";
         case 2:
-        	return "Output granularity";
+        	return "Effort period";
         case 3:
-        	return "Number of detection elements in document";
+        	return "Output granularity";
         case 4:
+        	return "Number of detection elements in document";
+        case 5:
         	return "Document abstract";
         	
         }
@@ -229,7 +232,7 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 
 	private class TableModel extends AbstractTableModel {
 		
-		private String[] colNames = {"Document", "Detector", "Granularity", "Count", "Abstract"};
+		private String[] colNames = {"Document", "Detector", "Effort", "Granularity", "Count", "Abstract"};
 
 		@Override
 		public int getRowCount() {
@@ -272,6 +275,10 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 				}
 				return pDets.dataBlock.getDataName();
 			case 2:
+				XMLGregorianCalendar start = dets.getEffort().getStart();
+				XMLGregorianCalendar stop = dets.getEffort().getEnd();
+				return start + " to " + stop;
+			case 3:
 				List<DetectionEffortKind> kinds = dets.getEffort().getKind();
 				if (kinds == null) {
 					return null;
@@ -286,9 +293,9 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 					}
 				}
 				break;
-			case 3:
-				return pDets.count;
 			case 4:
+				return pDets.count;
+			case 5:
 				return dets.getDescription().getAbstract();
 			}
 			return null;

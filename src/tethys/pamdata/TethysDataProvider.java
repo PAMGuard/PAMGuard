@@ -9,6 +9,7 @@ import nilus.Deployment;
 import nilus.DescriptionType;
 import nilus.Detection;
 import nilus.DetectionEffortKind;
+import nilus.GranularityEnumType;
 import tethys.niluswraps.PDeployment;
 import tethys.output.StreamExportParams;
 import tethys.output.TethysExportParams;
@@ -38,8 +39,14 @@ public interface TethysDataProvider {
 	 * @param pamDataUnit
 	 * @return
 	 */
-	public TethysDataPoint getDataPoint(PamDataUnit pamDataUnit);
+//	public TethysDataPoint getDataPoint(PamDataUnit pamDataUnit);
 
+	/**
+	 * Get a standard Method string for each detector. This can be a bit 
+	 * verbose and might even have a reference to a paper ? Is this the best place for this ? 
+	 * @return
+	 */
+	public String getDetectionsMethod();
 
 	/**
 	 * Get DescriptionType object to include in a Tethys Detections document. 
@@ -55,6 +62,22 @@ public interface TethysDataProvider {
 	 * @return Algorithm information
 	 */
 	public AlgorithmType getAlgorithm();
+	
+	/**
+	 * Get a list of allowed granularity types for this output 
+	 * @return list of granularities. 
+	 */
+	public GranularityEnumType[] getAllowedGranularities();
+	
+	/**
+	 * Get a name for the detections documents. This will be appended
+	 * to the Deployment name and may also have a number after it. <br>
+	 * Note that the name isn't really important since all the matching between 
+	 * different documents is done internally, but it helps to make everything 
+	 * human readable. 
+	 * @return A name, similar to datablock.getLongDataName(), but no spaces. 
+	 */
+	public String getDetectionsName();
 
 
 	/**

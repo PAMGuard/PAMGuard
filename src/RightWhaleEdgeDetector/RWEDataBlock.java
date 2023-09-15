@@ -2,6 +2,8 @@ package RightWhaleEdgeDetector;
 
 import PamView.GroupedDataSource;
 import PamView.GroupedSourceParameters;
+import PamguardMVC.DataAutomation;
+import PamguardMVC.DataAutomationInfo;
 import PamguardMVC.PamProcess;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import PamguardMVC.dataSelector.DataSelectorCreator;
@@ -75,6 +77,11 @@ public class RWEDataBlock extends AbstractWhistleDataBlock<RWEDataUnit> implemen
 			rwTethysDataProvider = new RWTethysDataProvider(tethysControl, rweProcess.getRweDataBlock());
 		}
 		return rwTethysDataProvider;
+	}
+
+	@Override
+	public DataAutomationInfo getDataAutomationInfo() {
+		return new DataAutomationInfo(DataAutomation.AUTOMATIC);
 	}
 
 }

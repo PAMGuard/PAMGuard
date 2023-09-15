@@ -39,6 +39,13 @@ public class DescriptionTypePanel {
 	
 	private static final int ctrlWidth = 40;
 	
+	public static final String objectivesTip = "What are the objectives of this effort?  Examples:\r\n"
+			+ "Beamform to increase SNR for detection.\r\n"
+			+ "Detect every click of a rare species.\r\n"
+			+ "Verify data quality.";
+	public static final String abstractTip = "Overview of effort.";
+	public static final String methodTip = "High-level description of the method used.";
+	
 	public DescriptionTypePanel(String bordertitle, boolean requireObjective, boolean requireAbstract, boolean requireMethod) {
 		this.requireObjective = requireObjective;
 		this.requireAbstract = requireAbstract;
@@ -51,6 +58,16 @@ public class DescriptionTypePanel {
 		tObjectives = new JTextArea(12, ctrlWidth);
 		tAbstract = new JTextArea(8, ctrlWidth);
 		tMethod = new JTextArea(9, ctrlWidth);
+		tObjectives.setLineWrap(true);
+		tObjectives.setWrapStyleWord(true);
+		tAbstract.setLineWrap(true);
+		tAbstract.setWrapStyleWord(true);
+		tMethod.setLineWrap(true);
+		tMethod.setWrapStyleWord(true);
+		
+		tObjectives.setToolTipText(objectivesTip);
+		tAbstract.setToolTipText(abstractTip);
+		tMethod.setToolTipText(methodTip);
 		
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 		addScrollablePanel(tObjectives, "Objectives");
@@ -77,6 +94,11 @@ public class DescriptionTypePanel {
 			tObjectives.setText(null);
 			tAbstract.setText(null);
 			tMethod.setText(null);
+		}
+		else {
+			tObjectives.setText(description.getObjectives());
+			tAbstract.setText(description.getAbstract());
+			tMethod.setText(description.getMethod());
 		}
 	}
 	

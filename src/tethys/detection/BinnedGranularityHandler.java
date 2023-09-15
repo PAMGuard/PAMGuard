@@ -4,6 +4,8 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import PamguardMVC.PamDataBlock;
@@ -29,10 +31,8 @@ import tethys.species.SpeciesMapItem;
  */
 public class BinnedGranularityHandler extends GranularityHandler {
 
-	private double binDurationSeconds;
+	private long binDurationMillis;
 	
-	private long binStartMillis, binEndMillis;
-
 	private TethysDataProvider dataProvider;
 
 	private DataBlockSpeciesManager speciesManager;
@@ -43,7 +43,7 @@ public class BinnedGranularityHandler extends GranularityHandler {
 			TethysExportParams tethysExportParams, StreamExportParams streamExportParams) {
 		super(tethysControl, dataBlock, tethysExportParams, streamExportParams);
 		
-		binDurationSeconds = streamExportParams.binDurationS;
+		binDurationMillis = (long) (streamExportParams.binDurationS*1000.);
 		dataProvider = dataBlock.getTethysDataProvider(tethysControl);
 		speciesManager = dataBlock.getDatablockSpeciesManager();
 		
@@ -52,61 +52,74 @@ public class BinnedGranularityHandler extends GranularityHandler {
 
 	@Override
 	public void prepare(long timeMillis) {
-		long binStart = DetectionsHandler.roundDownBinStart(timeMillis, (long) (binDurationSeconds*1000));
-		startBin(binStart);
+//		long binStart = DetectionsHandler.roundDownBinStart(timeMillis, binDurationMillis);
+//		startBin(binStart);
 	}
 	
-	private void startBin(long timeMillis) {
-		binStartMillis = timeMillis;
-		binEndMillis = binStartMillis + (long) (binDurationSeconds*1000.);
-		/*
-		 *  now make a Detection object for every possible species that
-		 *  this might throw out. 
-		 */
-		ArrayList<String> speciesCodes = speciesManager.getAllSpeciesCodes();
-		String defaultCode = speciesManager.getDefaultSpeciesCode();
-		Detection det;
-		currentDetections.put(defaultCode, det = new Detection());
-		det.setStart(TethysTimeFuncs.xmlGregCalFromMillis(binStartMillis));
-		det.setEnd(TethysTimeFuncs.xmlGregCalFromMillis(binEndMillis));
-		det.setCount(BigInteger.ZERO);
-		det.setChannel(BigInteger.ZERO);
-		// add codes at end, just before output. 
-		if (speciesCodes != null) {
-			for (String code : speciesCodes) {
-				currentDetections.put(code, det = new Detection());
-				det.setStart(TethysTimeFuncs.xmlGregCalFromMillis(binStartMillis));
-				det.setEnd(TethysTimeFuncs.xmlGregCalFromMillis(binEndMillis));
-				det.setCount(BigInteger.ZERO);
-				det.setChannel(BigInteger.ZERO);
-			}
-		}
-	}
+//	private void startBin(long timeMillis) {
+//		binStartMillis = timeMillis;
+//		binEndMillis = binStartMillis + binDurationMillis;
+//		/*
+//		 *  now make a Detection object for every possible species that
+//		 *  this might throw out. 
+//		 */
+//		ArrayList<String> speciesCodes = speciesManager.getAllSpeciesCodes();
+//		String defaultCode = speciesManager.getDefaultSpeciesCode();
+//		Detection det;
+//		currentDetections.put(defaultCode, det = new Detection());
+//		det.setStart(TethysTimeFuncs.xmlGregCalFromMillis(binStartMillis));
+//		det.setEnd(TethysTimeFuncs.xmlGregCalFromMillis(binEndMillis));
+//		det.setCount(BigInteger.ZERO);
+//		det.setChannel(BigInteger.ZERO);
+//		// add codes at end, just before output. 
+//		if (speciesCodes != null) {
+//			for (String code : speciesCodes) {
+//				currentDetections.put(code, det = new Detection());
+//				det.setStart(TethysTimeFuncs.xmlGregCalFromMillis(binStartMillis));
+//				det.setEnd(TethysTimeFuncs.xmlGregCalFromMillis(binEndMillis));
+//				det.setCount(BigInteger.ZERO);
+//				det.setChannel(BigInteger.ZERO);
+//			}
+//		}
+//	}
 
 	@Override
 	public Detection[] addDataUnit(PamDataUnit dataUnit) {
-		Detection[] detections = null;
-		if (dataUnit.getTimeMilliseconds() >= binEndMillis) {
-			detections = closeBins(dataUnit.getTimeMilliseconds());
-			prepare(dataUnit.getTimeMilliseconds());
+		Detection[] completeDetections = closeBins(dataUnit.getTimeMilliseconds());
+		// now look for new ones. First get the species of the dataUnit and find it in the hashmap
+		String groupName = getCallGroupName(dataUnit);
+		Detection det = currentDetections.get(groupName);
+		if (det == null) {
+			// need to make a new one. 
+			det = new Detection();
+			long binStart = DetectionsHandler.roundDownBinStart(dataUnit.getTimeMilliseconds(), binDurationMillis);
+			det.setStart(TethysTimeFuncs.xmlGregCalFromMillis(binStart));
+			det.setEnd(TethysTimeFuncs.xmlGregCalFromMillis(binStart + binDurationMillis));
+			det.setCount(BigInteger.ONE);
+			det.setChannel(BigInteger.valueOf(dataUnit.getChannelBitmap()));
+			// this should always return something, so am going to crash if it doesn't. 
+			// may revisit this later on if we've unassigned things we don't want to label
+			// in which case they should be rejected earlier than this. 
+			SpeciesMapItem speciesStuff = speciesManager.getSpeciesItem(dataUnit);
+			SpeciesIDType species = new SpeciesIDType();
+			species.setValue(BigInteger.valueOf(speciesStuff.getItisCode()));
+			det.setSpeciesId(species);
+			if (speciesStuff.getCallType() != null) {
+				det.getCall().add(speciesStuff.getCallType());
+			}
+			currentDetections.put(groupName, det);
 		}
-		String speciesCode = speciesManager.getSpeciesCode(dataUnit);
-		Detection det = currentDetections.get(speciesCode);
-		if (det != null) {
-			/*
-			 * Increase the detection count
-			 */
-			int count = det.getCount().intValue();
-			count++;
+		else {
+			// add to current detection. Set new end time and increment count
+			int count = det.getCount().intValue() + 1;
 			det.setCount(BigInteger.valueOf(count));
-			/*
-			 * Add to the channel map too ... 
-			 */
-			int channel = det.getChannel().intValue();
-			channel |= dataUnit.getChannelBitmap();
-			det.setChannel(BigInteger.valueOf(channel));
+			int chan = det.getChannel().intValue();
+			chan |= dataUnit.getChannelBitmap();
+			det.setChannel(BigInteger.valueOf(chan));
 		}
-		return detections;
+
+
+		return completeDetections;
 	}
 
 	/**
@@ -115,32 +128,31 @@ public class BinnedGranularityHandler extends GranularityHandler {
 	 * @param timeMilliseconds
 	 * @return
 	 */
-	private Detection[] closeBins(long timeMilliseconds) {
+	private synchronized Detection[] closeBins(long timeMilliseconds) {
 		Set<String> speciesKeys = currentDetections.keySet();
 		int n = speciesKeys.size();
 		int nGood = 0;
 		DataBlockSpeciesMap speciesMap = speciesManager.getDatablockSpeciesMap();
 		Detection detections[] = new Detection[n];
-		for (String key : speciesKeys) {
-			Detection det = currentDetections.get(key);
+		Iterator<Entry<String, Detection>> iter = currentDetections.entrySet().iterator();
+		while (iter.hasNext()) {
+			Entry<String, Detection> entry = iter.next();
+			Detection det = entry.getValue();
+			long detEnd = TethysTimeFuncs.millisFromGregorianXML(det.getEnd());
+			if (timeMilliseconds < detEnd) {
+				// we're not at the end of the bin, so carry on. 
+				continue;
+			}
+			// we've reached the end of the bin, so remove it from the map
+			iter.remove();
+			// now decide if we want to keep it or not. 
 			int callCount = det.getCount().intValue();
 			if (callCount < Math.max(streamExportParams.minBinCount,1)) {
-				continue;
+				continue; // won't add to output list
 			}
-			SpeciesMapItem speciesStuff = speciesMap.getItem(key); // should be non null!
-			if (speciesStuff == null) {
-				continue;
-			}
-			SpeciesIDType species = new SpeciesIDType();
-			species.setValue(BigInteger.valueOf(speciesStuff.getItisCode()));
-			det.setSpeciesId(species);
-			if (speciesStuff.getCallType() != null) {
-				det.getCall().add(speciesStuff.getCallType());
-			}
+
 			detections[nGood++] = det;
 		}
-		
-		
 		
 		/*
 		 * Clean up the end of the array and return detections that have enough calls.  

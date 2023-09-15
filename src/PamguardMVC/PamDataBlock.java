@@ -3100,11 +3100,12 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	}
 
 	/**
-	 * Set a data provider for Tethys.
-	 * @param tethysDataProvider the tethysDataProvider to set
+	 * Get the level of automation employed by the generation of these data. 
+	 * Should ideally be completed for everything providing data to Tethys. 
+	 * @return level of automation for this data block. 
 	 */
-	public void setTethysDataProvider(TethysDataProvider tethysDataProvider) {
-		this.tethysDataProvider = tethysDataProvider;
+	public DataAutomationInfo getDataAutomationInfo() {
+		return null;
 	}
 	
 	/**

@@ -39,7 +39,7 @@ public class DetectionsExportWizard extends PamDialog {
 		
 		streamExportParams = tethysControl.getTethysExportParams().getStreamParams(dataBlock);
 		if (streamExportParams == null) {
-			streamExportParams = new StreamExportParams(dataBlock.getLongDataName(), false);
+			streamExportParams = new StreamExportParams(tethysControl, dataBlock, false);
 		}
 		
 		cardLayout = new CardLayout();
