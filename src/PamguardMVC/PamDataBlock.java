@@ -2872,8 +2872,6 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	private Vector<OfflineDataMap> offlineDataMaps = null;
 
 	private SQLLogging logging;
-	
-	private TethysDataProvider tethysDataProvider;
 
 	private JSONObjectDataSource jsonDataSource;
 	
@@ -3093,10 +3091,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 * @return the tethysDataProvider
 	 */
 	public TethysDataProvider getTethysDataProvider(TethysControl tethysControl) {
-		if (tethysDataProvider == null && PamDetection.class.isAssignableFrom(unitClass) && getLogging() != null) {
-			tethysDataProvider = new AutoTethysProvider(tethysControl, this);
-		}
-		return tethysDataProvider;
+		return null;
 	}
 
 	/**

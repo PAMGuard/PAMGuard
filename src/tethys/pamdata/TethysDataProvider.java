@@ -69,6 +69,8 @@ public interface TethysDataProvider {
 	 */
 	public GranularityEnumType[] getAllowedGranularities();
 	
+//	public String getGranularityName GranularityEnumType);
+	
 	/**
 	 * Get a name for the detections documents. This will be appended
 	 * to the Deployment name and may also have a number after it. <br>

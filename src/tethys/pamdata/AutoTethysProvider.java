@@ -66,7 +66,7 @@ import java.net.URISyntaxException;
  * @author dg50
  *
  */
-public class AutoTethysProvider implements TethysDataProvider {
+abstract public class AutoTethysProvider implements TethysDataProvider {
 
 	private PamDataBlock pamDataBlock;
 	private PamProcess pamProcess;
@@ -92,11 +92,11 @@ public class AutoTethysProvider implements TethysDataProvider {
 		return schema;
 	}
 
-//	@Override
-//	public TethysDataPoint getDataPoint(PamDataUnit pamDataUnit) {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
+	//	@Override
+	//	public TethysDataPoint getDataPoint(PamDataUnit pamDataUnit) {
+	//		// TODO Auto-generated method stub
+	//		return null;
+	//	}
 
 	@Override
 	public DescriptionType getDescription(Deployment deployment, TethysExportParams tethysExportParams) {
@@ -124,14 +124,14 @@ public class AutoTethysProvider implements TethysDataProvider {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-//		algorithm.setMethod(this.getAlgorithmMethod());
-//		algorithm.setSoftware("PAMGuard");
-//		algorithm.setVersion(PamguardVersionInfo.version);
+		//		algorithm.setMethod(this.getAlgorithmMethod());
+		//		algorithm.setSoftware("PAMGuard");
+		//		algorithm.setVersion(PamguardVersionInfo.version);
 		nilus.AlgorithmType.Parameters algoParameters = this.getAlgorithmParameters();
 		if (algoParameters != null) {
 			algorithm.setParameters(algoParameters);
 		}
-		
+
 		return algorithm;
 	}
 
@@ -156,67 +156,67 @@ public class AutoTethysProvider implements TethysDataProvider {
 			return null;
 		}
 		paramList.addAll(genList);
-		
-//		Document doc = XMLUtils.createBlankDoc();
-//		PamguardXMLWriter pamXMLWriter = PamguardXMLWriter.getXMLWriter();
-//		Element dummyEl = doc.createElement("MODULES");
-//		doc.appendChild(dummyEl);
-//		PamSettings[] settingsObjs = getSettingsObjects();
-//		if (settingsObjs == null) {
-//			return null;
-//		}
-////				pamXMLWriter.setStaticNameSpace(TethysControl.xmlNameSpace);
-//		Element settingsEl = pamXMLWriter.writeUnitSettings(doc, dummyEl, pamSettings, settingsObjs);
-//		if (settingsEl == null) {
-//			return null;
-//		}
-//
-////		settingsEl = addNameSpaceToElements(doc, settingsEl, TethysControl.xmlNameSpace);
-//
-//
-//		dummyEl.appendChild(settingsEl);
-//		NodeList childs = settingsEl.getChildNodes();
-//		for (int i = 0; i < childs.getLength(); i++) {
-//			Node el = childs.item(i);
-//			//			System.out.println(el.getNodeName());
-//			if (el instanceof Element) {
-//				paramList.add((Element) el);
-//			}
-//		}
-//
-//		//		Document doc = pamXMLWriter.writeOneModule((PamSettings) pamControlledUnit, System.currentTimeMillis());
-//		//		String moduleXML = null;
-//		if (doc != null) {
-//			// this string should be XML of all the settings for the module controlling this
-//			// datablock.
-//			//			moduleXML = pamXMLWriter.getAsString(doc, true); // change to false to get smaller xml
-//			//			System.out.printf("Module settings for datablock %s are:\n", moduleXML);
-//			//			System.out.println(moduleXML);
-//			//			Element pamguard = doc.get("PAMGUARD");
-//			//			Element modules = (Element) pamguard.getElementsByTagName("MODULES");
-//			//			doc.get
-//			//			NodeList childs = doc.getChildNodes();
-//			//			for (int i = 0; i < childs.getLength(); i++) {
-//			//				Node el = childs.item(i);
-//			//				System.out.println(el.getNodeName());
-//			//				if (el instanceof Element) {
-//			//					paramList.add((Element) el);
-//			//				}
-//			//			}
-//			//			String moduleXML = pamXMLWriter.getAsString(doc, true); // change to false to get smaller xml
-//			//			System.out.printf("Module settings for datablock %s are:\n%s", this.pamDataBlock.getDataName(), moduleXML);
-//		}
-//
-//		//		// try the old say
-//		//		Document doc2 = pamXMLWriter.writeOneModule((PamSettings) pamControlledUnit, System.currentTimeMillis());
-//		//		String moduleXML = null;
-//		//		if (doc2 != null) {
-//		//			// this string should be XML of all the settings for the module controlling this
-//		//			// datablock.
-//		//			moduleXML = pamXMLWriter.getAsString(doc2, true); // change to false to get smaller xml
-//		//			System.out.printf("Module settings for datablock %s are:\n%s", pamDataBlock.getDataName(),moduleXML);
-//		//		}
-//		//		
+
+		//		Document doc = XMLUtils.createBlankDoc();
+		//		PamguardXMLWriter pamXMLWriter = PamguardXMLWriter.getXMLWriter();
+		//		Element dummyEl = doc.createElement("MODULES");
+		//		doc.appendChild(dummyEl);
+		//		PamSettings[] settingsObjs = getSettingsObjects();
+		//		if (settingsObjs == null) {
+		//			return null;
+		//		}
+		////				pamXMLWriter.setStaticNameSpace(TethysControl.xmlNameSpace);
+		//		Element settingsEl = pamXMLWriter.writeUnitSettings(doc, dummyEl, pamSettings, settingsObjs);
+		//		if (settingsEl == null) {
+		//			return null;
+		//		}
+		//
+		////		settingsEl = addNameSpaceToElements(doc, settingsEl, TethysControl.xmlNameSpace);
+		//
+		//
+		//		dummyEl.appendChild(settingsEl);
+		//		NodeList childs = settingsEl.getChildNodes();
+		//		for (int i = 0; i < childs.getLength(); i++) {
+		//			Node el = childs.item(i);
+		//			//			System.out.println(el.getNodeName());
+		//			if (el instanceof Element) {
+		//				paramList.add((Element) el);
+		//			}
+		//		}
+		//
+		//		//		Document doc = pamXMLWriter.writeOneModule((PamSettings) pamControlledUnit, System.currentTimeMillis());
+		//		//		String moduleXML = null;
+		//		if (doc != null) {
+		//			// this string should be XML of all the settings for the module controlling this
+		//			// datablock.
+		//			//			moduleXML = pamXMLWriter.getAsString(doc, true); // change to false to get smaller xml
+		//			//			System.out.printf("Module settings for datablock %s are:\n", moduleXML);
+		//			//			System.out.println(moduleXML);
+		//			//			Element pamguard = doc.get("PAMGUARD");
+		//			//			Element modules = (Element) pamguard.getElementsByTagName("MODULES");
+		//			//			doc.get
+		//			//			NodeList childs = doc.getChildNodes();
+		//			//			for (int i = 0; i < childs.getLength(); i++) {
+		//			//				Node el = childs.item(i);
+		//			//				System.out.println(el.getNodeName());
+		//			//				if (el instanceof Element) {
+		//			//					paramList.add((Element) el);
+		//			//				}
+		//			//			}
+		//			//			String moduleXML = pamXMLWriter.getAsString(doc, true); // change to false to get smaller xml
+		//			//			System.out.printf("Module settings for datablock %s are:\n%s", this.pamDataBlock.getDataName(), moduleXML);
+		//		}
+		//
+		//		//		// try the old say
+		//		//		Document doc2 = pamXMLWriter.writeOneModule((PamSettings) pamControlledUnit, System.currentTimeMillis());
+		//		//		String moduleXML = null;
+		//		//		if (doc2 != null) {
+		//		//			// this string should be XML of all the settings for the module controlling this
+		//		//			// datablock.
+		//		//			moduleXML = pamXMLWriter.getAsString(doc2, true); // change to false to get smaller xml
+		//		//			System.out.printf("Module settings for datablock %s are:\n%s", pamDataBlock.getDataName(),moduleXML);
+		//		//		}
+		//		//		
 
 		return parameters;
 	}
@@ -224,26 +224,26 @@ public class AutoTethysProvider implements TethysDataProvider {
 	private Element addNameSpaceToElements(Document doc, Element settingsEl, String xmlNameSpace) {
 
 
-//		String xsltString = "<xsl:stylesheet version=\"1.0\" \r\n"
-//				+ "  xmlns:xsl=http://www.w3.org/1999/XSL/Transform\r\n"
-//				+ "  xmlns:ns0=http://mydata.com/H2H/Automation\r\n"
-//				+ "  exclude-result-prefixes=\"ns0\">\r\n"
-//				+ "  <xsl:output method=\"xml\" version=\"1.0\" encoding=\"UTF-8\" indent=\"yes\"/>\r\n"
-//				+ "  <xsl:strip-space elements=\"*\"/>\r\n"
-//				+ "  \r\n"
-//				+ "  <xsl:template match=\"*\">\r\n"
-//				+ "    <xsl:element name=\"{local-name()}\" namespace=http://tethys.sdsu.edu/schema/1.0>\r\n"
-//				+ "      <xsl:apply-templates/>\r\n"
-//				+ "    </xsl:element>\r\n"
-//				+ "  </xsl:template>\r\n"
-//				+ "  \r\n"
-//				+ "  <xsl:template match=\"/ns0:Document\">\r\n"
-//				+ "    <Document xmlns=http://tethys.sdsu.edu/schema/1.0 xmlns:xsi=http://www.w3.org/2001/XMLSchema-instance>  \r\n"
-//				+ "      <xsl:apply-templates/>\r\n"
-//				+ "    </Document>\r\n"
-//				+ "  </xsl:template>\r\n"
-//				+ "  \r\n"
-//				+ "</xsl:stylesheet>\r\n";
+		//		String xsltString = "<xsl:stylesheet version=\"1.0\" \r\n"
+		//				+ "  xmlns:xsl=http://www.w3.org/1999/XSL/Transform\r\n"
+		//				+ "  xmlns:ns0=http://mydata.com/H2H/Automation\r\n"
+		//				+ "  exclude-result-prefixes=\"ns0\">\r\n"
+		//				+ "  <xsl:output method=\"xml\" version=\"1.0\" encoding=\"UTF-8\" indent=\"yes\"/>\r\n"
+		//				+ "  <xsl:strip-space elements=\"*\"/>\r\n"
+		//				+ "  \r\n"
+		//				+ "  <xsl:template match=\"*\">\r\n"
+		//				+ "    <xsl:element name=\"{local-name()}\" namespace=http://tethys.sdsu.edu/schema/1.0>\r\n"
+		//				+ "      <xsl:apply-templates/>\r\n"
+		//				+ "    </xsl:element>\r\n"
+		//				+ "  </xsl:template>\r\n"
+		//				+ "  \r\n"
+		//				+ "  <xsl:template match=\"/ns0:Document\">\r\n"
+		//				+ "    <Document xmlns=http://tethys.sdsu.edu/schema/1.0 xmlns:xsi=http://www.w3.org/2001/XMLSchema-instance>  \r\n"
+		//				+ "      <xsl:apply-templates/>\r\n"
+		//				+ "    </Document>\r\n"
+		//				+ "  </xsl:template>\r\n"
+		//				+ "  \r\n"
+		//				+ "</xsl:stylesheet>\r\n";
 		String xsltString = "<xsl:stylesheet version=\"1.0\" \n"
 				+ "  xmlns:xsl=http://www.w3.org/1999/XSL/Transform\n"
 				+ "  xmlns:ns0=http://mydata.com/H2H/Automation\n"
@@ -266,19 +266,19 @@ public class AutoTethysProvider implements TethysDataProvider {
 				+ "</xsl:stylesheet>\n";
 		try {
 			TransformerFactory factory = TransformerFactory.newInstance();
-//			Source xslt = new StreamSource(new File("transform.xslt"));
+			//			Source xslt = new StreamSource(new File("transform.xslt"));
 			StringReader reader = new StringReader(xmlNameSpace);
 			Source xslt = new StreamSource(reader);
-			
+
 			Transformer transformer = factory.newTransformer(xslt);
 
-            DOMSource source = new DOMSource(doc);
-           
-//            Result 
-//			Source text = new StreamSource(new File("input.xml"));
-            DOMResult result = new DOMResult();
+			DOMSource source = new DOMSource(doc);
+
+			//            Result 
+			//			Source text = new StreamSource(new File("input.xml"));
+			DOMResult result = new DOMResult();
 			transformer.transform(source, result);
-			
+
 			System.out.println(result.toString());
 		}
 		catch (Exception e) {
@@ -312,13 +312,13 @@ public class AutoTethysProvider implements TethysDataProvider {
 		Detection detection = new Detection();
 		detection.setStart(TethysTimeFuncs.xmlGregCalFromMillis(dataUnit.getTimeMilliseconds()));
 		detection.setEnd(TethysTimeFuncs.xmlGregCalFromMillis(dataUnit.getEndTimeInMilliseconds()));
-		
+
 		DataBlockSpeciesManager speciesManager = pamDataBlock.getDatablockSpeciesManager();
 		SpeciesMapItem speciesItem = null;
 		if (speciesManager != null) {
 			speciesItem = speciesManager.getSpeciesItem(dataUnit);
-//			detection.setSpeciesId(new Species);
-//			detection.setSpeciesId(getSpeciesIdType());
+			//			detection.setSpeciesId(new Species);
+			//			detection.setSpeciesId(getSpeciesIdType());
 		}
 		else {
 		}
@@ -351,7 +351,7 @@ public class AutoTethysProvider implements TethysDataProvider {
 		detParams.setReceivedLevelDB(ampli);
 		//		DataUnitBaseData basicData = dataUnit.getBasicData();
 		gotTonalContour(dataUnit, detParams);
-		
+
 		String uid = BigInteger.valueOf(dataUnit.getUID()).toString();
 		Element el = addUserDefined(detParams,"PAMGuardUID", uid);
 		DataUnitFileInformation fileInf = dataUnit.getDataUnitFileInformation();
@@ -362,7 +362,7 @@ public class AutoTethysProvider implements TethysDataProvider {
 
 		return detection;
 	}
-	
+
 	private Element addUserDefined(Parameters parameters, String parameterName, String parameterValue) {
 		UserDefined userDefined = parameters.getUserDefined();
 		if (userDefined == null) {
@@ -465,7 +465,7 @@ public class AutoTethysProvider implements TethysDataProvider {
 
 			kind.getSpeciesId().setValue(BigInteger.valueOf(mapItem.getItisCode()));
 			kind.getGranularity().setValue(exportParams.granularity);
-//			nilus.DetectionEffortKind.Parameters granularityParams = kind.getParameters();
+			//			nilus.DetectionEffortKind.Parameters granularityParams = kind.getParameters();
 			switch (exportParams.granularity) {
 			case BINNED:
 				kind.getGranularity().setBinSizeM(exportParams.binDurationS/60.);
@@ -479,7 +479,7 @@ public class AutoTethysProvider implements TethysDataProvider {
 				break;
 			case GROUPED:
 				break;
-			
+
 			}
 			kind.setCall(mapItem.getCallType());
 
@@ -487,7 +487,7 @@ public class AutoTethysProvider implements TethysDataProvider {
 			effortKinds.add(kind);		
 
 		}
-		
+
 	}
 
 	@Override
@@ -505,7 +505,7 @@ public class AutoTethysProvider implements TethysDataProvider {
 		else {
 			method = String.format("%s processing using the PAMGuard %s", dataAutomation.getAutomation(), pcu.getUnitType());
 		}
-		
+
 		return method;
 	}
 
@@ -534,5 +534,24 @@ public class AutoTethysProvider implements TethysDataProvider {
 		documentName = documentName.replace(' ', '_');
 		return documentName;
 	}
+
+	public static double roundDecimalPlaces(double value, int decPlaces) {
+		double scale = Math.pow(10, decPlaces);
+		long longVal = Math.round(value*scale);
+		return (double) longVal/scale;
+	}
+
+	public static double roundSignificantFigures(double value, int sigFigs) {
+		if (value == 0) {
+			return 0;
+		}
+		double sign = Math.signum(value);
+		value = Math.abs(value);
+		double scale = sigFigs-Math.floor(Math.log10(value));
+		scale = Math.pow(10, scale);
+		long longVal = Math.round(value*scale);
+		return sign*(double) longVal/scale;
+	}
+
 
 }

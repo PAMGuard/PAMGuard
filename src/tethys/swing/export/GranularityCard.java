@@ -64,6 +64,10 @@ public class GranularityCard extends ExportWizardCard {
 		granPanel.setBorder(new TitledBorder("Granularity"));
 		ButtonGroup granGroup = new ButtonGroup();
 		GranularityChange gc = new GranularityChange();
+		binLength = new JTextField(5);
+		minBinnedCalls = new JTextField(5);
+		encounterGap = new JTextField(5);
+		minEncounterCalls = new JTextField(5);
 		for (int i = 0; i < allowedGranularities.length; i++) {
 			c.gridx = 0;
 			granularities[i] = new JRadioButton(PGranularityType.prettyString(allowedGranularities[i]));
@@ -76,11 +80,11 @@ public class GranularityCard extends ExportWizardCard {
 				c.gridx++;
 				granPanel.add(new JLabel(" Bin duration ", JLabel.RIGHT), c);
 				c.gridx++;
-				granPanel.add(binLength = new JTextField(5), c);
+				granPanel.add(binLength, c);
 				c.gridx++;
 				granPanel.add(new JLabel("(s), Min Calls", JLabel.LEFT), c);
 				c.gridx++;
-				granPanel.add(minBinnedCalls = new JTextField(5), c);			
+				granPanel.add(minBinnedCalls, c);			
 				binLength.setToolTipText("Time bin duration in seconds");
 				minBinnedCalls.setToolTipText("Minimum number of calls for a bin to be output");	
 			}
@@ -89,11 +93,11 @@ public class GranularityCard extends ExportWizardCard {
 				c.gridx++;
 				granPanel.add(new JLabel(" Minimum gap ", JLabel.RIGHT), c);
 				c.gridx++;
-				granPanel.add(encounterGap = new JTextField(5), c);
+				granPanel.add(encounterGap, c);
 				c.gridx++;
 				granPanel.add(new JLabel("(s), Min Calls", JLabel.LEFT), c);
 				c.gridx++;
-				granPanel.add(minEncounterCalls = new JTextField(5), c);			
+				granPanel.add(minEncounterCalls, c);			
 				encounterGap.setToolTipText("Minimum gap between separate encounters");
 				minEncounterCalls.setToolTipText("Minimum number of calls for an encounter to be output");	
 			}
