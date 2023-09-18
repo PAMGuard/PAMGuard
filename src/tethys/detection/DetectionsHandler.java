@@ -8,6 +8,7 @@ import javax.swing.SwingWorker;
 import PamController.PamControlledUnit;
 import PamController.PamguardVersionInfo;
 import PamModel.PamPluginInterface;
+import PamUtils.PamCalendar;
 import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
@@ -371,7 +372,6 @@ public class DetectionsHandler {
 		 * and export the content of each separately.
 		 */
 		TethysExportParams exportParams = tethysControl.getTethysExportParams();
-		DBXMLConnect dbxmlConnect = tethysControl.getDbxmlConnect();
 		DeploymentHandler depHandler = tethysControl.getDeploymentHandler();
 		ArrayList<PDeployment> deployments = depHandler.getMatchedDeployments();
 //		Detections currentDetections = null;
@@ -386,7 +386,7 @@ public class DetectionsHandler {
 		for (PDeployment deployment : deployments) {
 			int documentCount = 0;
 			prog = new DetectionExportProgress(deployment, null,
-					lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_GATHERING);
+					lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_COUNTING);
 			exportObserver.update(prog);
 			granularityHandler.prepare(deployment.getAudioStart());
 			// export everything in that deployment.
@@ -407,6 +407,8 @@ public class DetectionsHandler {
 				}
 				dataBlock.loadViewerData(mapPoint.getStartTime(), mapPoint.getEndTime(), null);
 				ArrayList<PamDataUnit> dataCopy = dataBlock.getDataCopy(deployment.getAudioStart(), deployment.getAudioEnd(), true, dataSelector);
+//				System.out.printf("%d loaded from %s to %s %d kept\n", dataBlock.getUnitsCount(), PamCalendar.formatDateTime(mapPoint.getStartTime()),
+//						PamCalendar.formatDateTime(mapPoint.getEndTime()), dataCopy.size());
 				skipCount += dataBlock.getUnitsCount() - dataCopy.size();
 				for (PamDataUnit dataUnit : dataCopy) {
 					/*
@@ -425,7 +427,7 @@ public class DetectionsHandler {
 				}
 
 				prog = new DetectionExportProgress(deployment, null,
-						lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_GATHERING);
+						lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_COUNTING);
 				exportObserver.update(prog);
 
 //				if (documentCount > 500000 && mapPoint != dataMap.getLastMapPoint()) {
@@ -450,9 +452,9 @@ public class DetectionsHandler {
 
 		}
 
-		prog = new DetectionExportProgress(null, null,
-				lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_COMPLETE);
-		exportObserver.update(prog);
+//		prog = new DetectionExportProgress(null, null,
+//				lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_GATHERING);
+//		exportObserver.update(prog);
 		return exportCount;
 	}/**
 	 * Export detections in all deployments for this PAMGuard dataset.

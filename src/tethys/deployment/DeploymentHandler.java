@@ -27,7 +27,6 @@ import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamUtils.LatLong;
 import PamUtils.PamUtils;
-import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamRawDataBlock;
 import binaryFileStorage.BinaryStore;
@@ -87,10 +86,17 @@ public class DeploymentHandler implements TethysStateObserver {
 	
 	private ArrayList<PDeployment> projectDeployments;
 
+	private Helper nilusHelper;
+
 	public DeploymentHandler(TethysControl tethysControl) {
 		super();
 		this.tethysControl = tethysControl;
-		tethysControl.addStateObserver(this);
+		tethysControl.addStateObserver(this);		
+		try {
+			nilusHelper = new Helper();
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -973,12 +979,7 @@ public class DeploymentHandler implements TethysStateObserver {
 		ArrayList<Hydrophone> phones = array.getHydrophoneArray();
 		int iPhone = 0;
 		long timeMillis = TethysTimeFuncs.millisFromGregorianXML(deployment.getDeploymentDetails().getAudioTimeStamp());
-		Helper nilusHelper = null;
-		try {
-			nilusHelper = new Helper();
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		}
+
 		for (Hydrophone aPhone : phones) {
 			PamVector hydLocs = array.getAbsHydrophoneVector(iPhone, timeMillis);
 			Audio audio = new Audio();

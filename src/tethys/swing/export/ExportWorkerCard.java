@@ -144,6 +144,9 @@ public class ExportWorkerCard extends ExportWizardCard implements DetectionExpor
 		case DetectionExportProgress.STATE_GATHERING:
 			progressText.setText("Running export");
 			break;
+		case DetectionExportProgress.STATE_COUNTING:
+			progressText.setText("Counting data");
+			break;
 		case DetectionExportProgress.STATE_CANCELED:
 			progressText.setText("Export cancelled");
 			break;

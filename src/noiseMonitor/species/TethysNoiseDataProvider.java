@@ -17,6 +17,8 @@ import tethys.niluswraps.PDeployment;
 import tethys.output.StreamExportParams;
 import tethys.output.TethysExportParams;
 import tethys.pamdata.AutoTethysProvider;
+import tethys.swing.export.ExportWizardCard;
+import tethys.swing.export.GranularityCard;
 
 public class TethysNoiseDataProvider extends AutoTethysProvider {
 
@@ -39,7 +41,7 @@ public class TethysNoiseDataProvider extends AutoTethysProvider {
 		Detection detection = super.createDetection(dataUnit, tethysExportParams, streamExportParams);
 		NoiseDataUnit noiseDataUnit = (NoiseDataUnit) dataUnit;
 		/*
-		 * Now all the noise measurements, noting thre may be several types. 
+		 * Now all the noise measurements, noting there may be several types. 
 		 */
 		int statTypes = noiseDataBlock.getStatisticTypes();
 		int nTypes = PamUtils.getNumChannels(statTypes);
@@ -90,6 +92,14 @@ public class TethysNoiseDataProvider extends AutoTethysProvider {
 		for (int i = 0; i < loEdges.length; i++) {
 			fMeasures.add(roundSignificantFigures(Math.sqrt(loEdges[i]*hiEdges[i]), 4));
 		}
+	}
+
+	@Override
+	public boolean wantExportDialogCard(ExportWizardCard wizPanel) {
+		if (wizPanel.getClass() == GranularityCard.class) {
+			return false;
+		}
+		return super.wantExportDialogCard(wizPanel);
 	}
 
 }

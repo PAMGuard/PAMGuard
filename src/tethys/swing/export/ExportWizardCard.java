@@ -12,7 +12,9 @@ import tethys.output.StreamExportParams;
  * @author dg50
  *
  */
-abstract class ExportWizardCard extends JPanel {
+abstract public class ExportWizardCard extends JPanel {
+
+	private static final long serialVersionUID = 1L;
 
 	private String title;
 	private PamDataBlock dataBlock;

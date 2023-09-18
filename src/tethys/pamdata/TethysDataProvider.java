@@ -13,6 +13,7 @@ import nilus.GranularityEnumType;
 import tethys.niluswraps.PDeployment;
 import tethys.output.StreamExportParams;
 import tethys.output.TethysExportParams;
+import tethys.swing.export.ExportWizardCard;
 
 /**
  * Any PAMGuard data stream which can provide Detection data to PAMGuard will 
@@ -24,13 +25,13 @@ import tethys.output.TethysExportParams;
  */
 public interface TethysDataProvider {
 
-	/**
-	 * This gets the Tethys schema for this type of data in whatever
-	 * form we decide it's best stored in, an XML string, or what ? 
-	 * @return
-	 */
-	public TethysSchema getSchema();
-	
+//	/**
+//	 * This gets the Tethys schema for this type of data in whatever
+//	 * form we decide it's best stored in, an XML string, or what ? 
+//	 * @return
+//	 */
+//	public TethysSchema getSchema();
+//	
 
 	/**
 	 * This will convert a data unit for this provider into whatever format we need the 
@@ -110,6 +111,14 @@ public interface TethysDataProvider {
 	 * @param exportParams 
 	 */
 	public void getEffortKinds(PDeployment pDeployment, List<DetectionEffortKind> effortKinds, StreamExportParams exportParams);
+
+	/**
+	 * See if a particular card should be used in the export wizard. This may
+	 * not be the best way of doing this, but will do for now. 
+	 * @param wizPanel
+	 * @return
+	 */
+	public boolean wantExportDialogCard(ExportWizardCard wizPanel);
 	
 	
 }

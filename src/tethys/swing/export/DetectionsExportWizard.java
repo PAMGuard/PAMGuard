@@ -18,6 +18,7 @@ import PamView.dialog.PamDialog;
 import PamguardMVC.PamDataBlock;
 import tethys.TethysControl;
 import tethys.output.StreamExportParams;
+import tethys.pamdata.TethysDataProvider;
 
 public class DetectionsExportWizard extends PamDialog {
 
@@ -32,6 +33,7 @@ public class DetectionsExportWizard extends PamDialog {
 	private ArrayList<ExportWizardCard> wizardCards = new ArrayList();
 	private AlgorithmCard algorithmCard;
 	private ExportWorkerCard exportWorkerCard;
+	private TethysDataProvider tethysDataProvider;
 	
 	private DetectionsExportWizard(Window parentFrame,  TethysControl tethysControl, PamDataBlock dataBlock) {
 		super(parentFrame, "Detections Export", false);
@@ -41,6 +43,7 @@ public class DetectionsExportWizard extends PamDialog {
 		if (streamExportParams == null) {
 			streamExportParams = new StreamExportParams(tethysControl, dataBlock, false);
 		}
+		tethysDataProvider = dataBlock.getTethysDataProvider(tethysControl);
 		
 		cardLayout = new CardLayout();
 		JPanel mainPanel = new JPanel(new BorderLayout());
@@ -73,8 +76,10 @@ public class DetectionsExportWizard extends PamDialog {
 	}
 	
 	private void addCard(ExportWizardCard wizPanel) {
+		if (tethysDataProvider.wantExportDialogCard(wizPanel)) {
 		cardPanel.add(wizPanel, wizPanel.getTitle());
 		wizardCards.add(wizPanel);
+		}
 	}
 
 	public static void showDilaog(Window parentFrame, TethysControl tethysControl, PamDataBlock dataBlock) {

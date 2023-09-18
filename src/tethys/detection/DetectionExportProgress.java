@@ -9,6 +9,7 @@ public class DetectionExportProgress {
 	public static final int STATE_CANCELED = 2;
 	public static final int STATE_COMPLETE = 3;
 	public static final int STATE_WRITING = 4;
+	public static final int STATE_COUNTING = 5;
 	public PDeployment currentDeployment;
 	public Detections currentDetections;
 	public long lastUnitTime;

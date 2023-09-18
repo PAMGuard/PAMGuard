@@ -44,6 +44,7 @@ import tethys.species.DataBlockSpeciesManager;
 import tethys.species.DataBlockSpeciesMap;
 import tethys.species.ITISTypes;
 import tethys.species.SpeciesMapItem;
+import tethys.swing.export.ExportWizardCard;
 import whistleClassifier.WhistleContour;
 
 import javax.xml.bind.JAXBException;
@@ -72,25 +73,31 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 	private PamProcess pamProcess;
 	private PamControlledUnit pamControlledUnit;
 	private TethysControl tethysControl;
+	private Helper helper;
 
 	public AutoTethysProvider(TethysControl tethysControl, PamDataBlock pamDataBlock) {
 		this.tethysControl = tethysControl;
 		this.pamDataBlock = pamDataBlock;
 		pamProcess = pamDataBlock.getParentProcess();
 		pamControlledUnit = pamProcess.getPamControlledUnit();
-	}
-
-	@Override
-	public TethysSchema getSchema() {
-		SQLLogging logging = pamDataBlock.getLogging();
-		if (logging == null) {
-			return null;
+		try {
+			helper = new Helper();
+		} catch (JAXBException e) {
+			e.printStackTrace();
 		}
-		DBSchemaWriter schemaWriter = new DBSchemaWriter();
-		Document doc = schemaWriter.generateDatabaseSchema(pamDataBlock, logging, logging.getTableDefinition());
-		TethysSchema schema = new TethysSchema(doc);
-		return schema;
 	}
+//
+//	@Override
+//	public TethysSchema getSchema() {
+//		SQLLogging logging = pamDataBlock.getLogging();
+//		if (logging == null) {
+//			return null;
+//		}
+//		DBSchemaWriter schemaWriter = new DBSchemaWriter();
+//		Document doc = schemaWriter.generateDatabaseSchema(pamDataBlock, logging, logging.getTableDefinition());
+//		TethysSchema schema = new TethysSchema(doc);
+//		return schema;
+//	}
 
 	//	@Override
 	//	public TethysDataPoint getDataPoint(PamDataUnit pamDataUnit) {
@@ -369,10 +376,8 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 			userDefined = new UserDefined();
 			parameters.setUserDefined(userDefined);
 		}
-		Helper helper;
 		Element el = null;
 		try {
-			helper = new Helper();
 			el = helper.AddAnyElement(userDefined.getAny(), parameterName, parameterValue);
 		} catch (JAXBException e) {
 			e.printStackTrace();
@@ -401,8 +406,8 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 				List<Double> offsetS = tonal.getOffsetS();
 				List<Double> hz = tonal.getHz();
 				for (int i = 0; i < tMillis.length; i++) {
-					offsetS.add((double) (tMillis[i]-tMillis[0]) / 1000.);
-					hz.add(fHz[i]);
+					offsetS.add(roundSignificantFigures((double) (tMillis[i]-tMillis[0]) / 1000., 4));
+					hz.add(roundSignificantFigures(fHz[i], 4));
 				}
 				detParams.setTonal(tonal);
 				return true;
@@ -417,8 +422,8 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 				List<Double> offsetS = tonal.getOffsetS();
 				List<Double> hz = tonal.getHz();
 				for (int i = 0; i < t.length; i++) {
-					offsetS.add(t[i]-t[0]);
-					hz.add(f[i]);
+					offsetS.add(roundSignificantFigures(t[i]-t[0],4));
+					hz.add(roundSignificantFigures(f[i],4));
 				}
 				detParams.setTonal(tonal);
 				return true;
@@ -551,6 +556,11 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 		scale = Math.pow(10, scale);
 		long longVal = Math.round(value*scale);
 		return sign*(double) longVal/scale;
+	}
+
+	@Override
+	public boolean wantExportDialogCard(ExportWizardCard wizPanel) {
+		return true;
 	}
 
 
