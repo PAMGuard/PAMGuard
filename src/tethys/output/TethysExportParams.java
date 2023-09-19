@@ -17,7 +17,7 @@ public class TethysExportParams implements Serializable, Cloneable{
 	public static final long serialVersionUID = 1L;
 	
 	/*
-	 * Need to add lots of other parameters here, such as the connection detils
+	 * Need to add lots of other parameters here, such as the connection details
 	 * for the tethys database. 
 	 */
 	public String serverName = "http://localhost";

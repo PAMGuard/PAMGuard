@@ -63,8 +63,8 @@ public class TethysExportDialog extends PamDialog {
 		setResizable(true);
 		
 	}
-	
-	public static TethysExportParams showDialog(Window parentFrame, TethysControl tethysControl) {
+	@Deprecated
+	private static TethysExportParams showDialog(Window parentFrame, TethysControl tethysControl) {
 		if (singleInstance == null || singleInstance.getOwner() != parentFrame || singleInstance.tethysControl != tethysControl) {
 			singleInstance = new TethysExportDialog(parentFrame, tethysControl);
 		}

@@ -82,7 +82,7 @@ public class DetectionsExportWizard extends PamDialog {
 		}
 	}
 
-	public static void showDilaog(Window parentFrame, TethysControl tethysControl, PamDataBlock dataBlock) {
+	public static void showDialog(Window parentFrame, TethysControl tethysControl, PamDataBlock dataBlock) {
 		DetectionsExportWizard wiz = new DetectionsExportWizard(parentFrame, tethysControl, dataBlock);
 		wiz.setParams();
 		wiz.setVisible(true);

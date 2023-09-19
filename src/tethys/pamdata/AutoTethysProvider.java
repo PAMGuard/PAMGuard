@@ -350,7 +350,7 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 		nilus.Detection.Parameters detParams = new nilus.Detection.Parameters();
 		detection.setParameters(detParams);
 		double[] freqs = dataUnit.getFrequency();
-		if (freqs != null) {
+		if (freqs != null && freqs[1] != 0) {
 			detParams.setMinFreqHz(freqs[0]);
 			detParams.setMaxFreqHz(freqs[1]);
 		}
@@ -366,11 +366,14 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 			el.setAttribute("BinaryFile", fileInf.getShortFileName(2048));
 			el.setAttribute("FileIndex", Long.valueOf(fileInf.getIndexInFile()).toString());
 		}
+		if (dataUnit.getDatabaseIndex() >= 0) {
+			addUserDefined(detParams, "DatabaseId", String.format("%d", dataUnit.getDatabaseIndex()));
+		}
 
 		return detection;
 	}
 
-	private Element addUserDefined(Parameters parameters, String parameterName, String parameterValue) {
+	public Element addUserDefined(Parameters parameters, String parameterName, String parameterValue) {
 		UserDefined userDefined = parameters.getUserDefined();
 		if (userDefined == null) {
 			userDefined = new UserDefined();

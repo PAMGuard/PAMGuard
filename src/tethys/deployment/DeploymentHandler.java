@@ -2,6 +2,7 @@ package tethys.deployment;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -302,7 +303,7 @@ public class DeploymentHandler implements TethysStateObserver {
 		// do the lot, whatever ...
 		selectedDeployments = getDeploymentOverview().getRecordingPeriods();
 		int freeId = getTethysControl().getDeploymentHandler().getFirstFreeDeploymentId();
-		RecordingPeriod onePeriod = new RecordingPeriod(selectedDeployments.get(freeId).getRecordStart(), 
+		RecordingPeriod onePeriod = new RecordingPeriod(selectedDeployments.get(0).getRecordStart(), 
 				selectedDeployments.get(selectedDeployments.size()-1).getRecordStop());
 		Deployment deployment = createDeploymentDocument(freeId, onePeriod);
 		// fill in a few things from here
@@ -487,7 +488,15 @@ public class DeploymentHandler implements TethysStateObserver {
 			ons[i] = tempPeriods.get(i).getDuration()/1000.;
 			gaps[i] = (tempPeriods.get(i+1).getRecordStart()-tempPeriods.get(i).getRecordStop())/1000.;
 		}
-		// now look at how consistent those values are
+		/* now look at how consistent those values are
+		 * But some data gets messed by small gaps, so want to 
+		 * remove outliers and concentrate on say 80% of the data. 
+		 */
+		ons = getDistributionCentre(ons, 80);
+		gaps = getDistributionCentre(gaps, 80);
+		Arrays.sort(gaps);
+		
+		
 		STD std = new STD();
 		double onsMean = std.getMean(ons);
 		double onsSTD = std.getSTD(ons);
@@ -496,6 +505,27 @@ public class DeploymentHandler implements TethysStateObserver {
 		boolean dutyCycle = onsSTD/onsMean < .05 && gapsSTD/gapsMean < 0.05;
 		DutyCycleInfo cycleInfo = new DutyCycleInfo(dutyCycle, onsMean, gapsMean, tempPeriods.size());
 		return cycleInfo;
+	}
+	
+	/**
+	 * Get the central part of a distribution without any outliers so 
+	 * that we can get a better assessment of duty cycle. 
+	 * @param data unsorted distribution data. 
+	 * @param percent percentage to include (half this removed from top and bottom)
+	 * @return
+	 */
+	private double[] getDistributionCentre(double[] data, double percent) {
+		if (data == null) {
+			return null;
+		}
+		Arrays.sort(data);
+		int nRem = (int) Math.round(data.length * (100-percent)/200);
+		int newLen = data.length-nRem*2;
+		double[] subdata = Arrays.copyOfRange(data, nRem, data.length-2*nRem);
+		if (subdata.length < 2) {
+			return data;
+		}
+		return subdata;
 	}
 
 	private ArrayList<RecordingPeriod> extractTimesFromStatus(ArrayList<DaqStatusDataUnit> allStatusData) {

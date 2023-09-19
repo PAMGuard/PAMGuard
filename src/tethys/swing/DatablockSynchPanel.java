@@ -183,7 +183,7 @@ public class DatablockSynchPanel extends TethysGUIPanel {
 			OfflineDataMap dataMap = synchInfo.getDataBlock().getPrimaryDataMap();
 			switch (columnIndex) {
 			case 0:
-				return synchInfo.getDataBlock().getDataName();
+				return synchInfo.getDataBlock().getLongDataName();
 			case 1:
 				if (dataMap == null) {
 					return null;

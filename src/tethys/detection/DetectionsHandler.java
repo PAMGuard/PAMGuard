@@ -14,6 +14,8 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamProcess;
 import PamguardMVC.dataSelector.DataSelector;
+import PamguardMVC.superdet.SuperDetDataBlock;
+import PamguardMVC.superdet.SuperDetDataBlock.ViewerLoadPolicy;
 import dataMap.OfflineDataMap;
 import dataMap.OfflineDataMapPoint;
 import nilus.AlgorithmType;
@@ -25,6 +27,7 @@ import nilus.DetectionEffort;
 import nilus.DetectionEffortKind;
 import nilus.DetectionGroup;
 import nilus.Detections;
+import nilus.GranularityEnumType;
 import nilus.Helper;
 import tethys.TethysControl;
 import tethys.TethysTimeFuncs;
@@ -337,11 +340,41 @@ public class DetectionsHandler {
 	 * @param exportWorkerCard
 	 */
 	public void startExportThread(PamDataBlock pamDataBlock, StreamExportParams streamExportParams, DetectionExportObserver exportObserver) {
+		checkGranularity(pamDataBlock, streamExportParams);
 		tethysControl.getTethysExportParams().setStreamParams(pamDataBlock, streamExportParams);
 		activeExport = true;
 		exportWorker = new ExportWorker(pamDataBlock, streamExportParams, exportObserver);
 		exportWorker.execute();
 	}
+
+	/**
+	 * Fudge because some outputs don't show the granularity card, but need to 
+	 * make sure that it's set to the correct only option ..
+	 * @param pamDataBlock
+	 * @param streamExportParams
+	 */
+	private void checkGranularity(PamDataBlock pamDataBlock, StreamExportParams streamExportParams) {
+		if (streamExportParams == null) {
+			return;
+		}
+		TethysDataProvider tethysProvider = pamDataBlock.getTethysDataProvider(tethysControl);
+		if (tethysProvider == null) return;
+		GranularityEnumType[] allowed = tethysProvider.getAllowedGranularities();
+		if (allowed == null || allowed.length == 0) {
+			return;
+		}
+		for (int i = 0; i < allowed.length; i++) {
+			if (allowed[i] == streamExportParams.granularity) {
+				return; // matches allowed value, so OK
+			}
+		}
+		/*
+		 *  if we get here, it's all wrong, so set to the first allowed value
+		 *  which will be the only one if the card wasn't shown
+		 */
+		streamExportParams.granularity = allowed[0];
+	}
+
 
 	public void cancelExport() {
 		activeExport = false;
@@ -382,6 +415,14 @@ public class DetectionsHandler {
 		int exportCount = 0;
 		long lastUnitTime = 0;
 		DetectionExportProgress prog;
+		ViewerLoadPolicy viewerLoadPolicy = ViewerLoadPolicy.LOAD_UTCNORMAL;
+		if (dataBlock instanceof SuperDetDataBlock) {
+			SuperDetDataBlock superDataBlock = (SuperDetDataBlock) dataBlock;
+			viewerLoadPolicy = superDataBlock.getViewerLoadPolicy();
+		}
+		if (viewerLoadPolicy == null) {
+			viewerLoadPolicy = ViewerLoadPolicy.LOAD_UTCNORMAL;
+		}
 		GranularityHandler granularityHandler = GranularityHandler.getHandler(streamExportParams.granularity, tethysControl, dataBlock, exportParams, streamExportParams);
 		for (PDeployment deployment : deployments) {
 			int documentCount = 0;
@@ -392,6 +433,7 @@ public class DetectionsHandler {
 			// export everything in that deployment.
 			// need to loop through all map points in this interval.
 			List<OfflineDataMapPoint> mapPoints = dataMap.getMapPoints();
+			
 			for (OfflineDataMapPoint mapPoint : mapPoints) {
 				if (!activeExport) {
 					prog = new DetectionExportProgress(deployment, null,
@@ -418,6 +460,12 @@ public class DetectionsHandler {
 					if (dets != null) {
 						exportCount+=dets.length;
 						documentCount+=dets.length;
+						
+						if (exportCount % 100 == 0) {
+							prog = new DetectionExportProgress(deployment, null,
+									lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_COUNTING);
+							exportObserver.update(prog);
+						}
 					}
 //					Detection det = dataProvider.createDetection(dataUnit, exportParams, streamExportParams);
 //					exportCount++;
@@ -429,6 +477,10 @@ public class DetectionsHandler {
 				prog = new DetectionExportProgress(deployment, null,
 						lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_COUNTING);
 				exportObserver.update(prog);
+				
+				if (viewerLoadPolicy == ViewerLoadPolicy.LOAD_ALWAYS_EVERYTHING) {
+					break;
+				}
 
 //				if (documentCount > 500000 && mapPoint != dataMap.getLastMapPoint()) {
 //					prog = new DetectionExportProgress(deployment, currentDetections,
@@ -480,11 +532,19 @@ public class DetectionsHandler {
 		int exportCount = 0;
 		long lastUnitTime = 0;
 		DetectionExportProgress prog;
+		ViewerLoadPolicy viewerLoadPolicy = ViewerLoadPolicy.LOAD_UTCNORMAL;
+		if (dataBlock instanceof SuperDetDataBlock) {
+			SuperDetDataBlock superDataBlock = (SuperDetDataBlock) dataBlock;
+			viewerLoadPolicy = superDataBlock.getViewerLoadPolicy();
+		}
+		if (viewerLoadPolicy == null) {
+			viewerLoadPolicy = ViewerLoadPolicy.LOAD_UTCNORMAL;
+		}
 		GranularityHandler granularityHandler = GranularityHandler.getHandler(streamExportParams.granularity, tethysControl, dataBlock, exportParams, streamExportParams);
 		for (PDeployment deployment : deployments) {
 			int documentCount = 0;
 			prog = new DetectionExportProgress(deployment, null,
-					lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_GATHERING);
+					lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_COUNTING);
 			exportObserver.update(prog);
 			granularityHandler.prepare(deployment.getAudioStart());
 			// export everything in that deployment.
@@ -523,10 +583,11 @@ public class DetectionsHandler {
 							onEffort.getDetection().add(dets[dd]);
 						}
 					}
-//					Detection det = dataProvider.createDetection(dataUnit, exportParams, streamExportParams);
-//					exportCount++;
-//					documentCount++;
-//					onEffort.getDetection().add(det);
+					if (exportCount % 100 == 0) {
+						prog = new DetectionExportProgress(deployment, null,
+								lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_GATHERING);
+						exportObserver.update(prog);
+					}
 					lastUnitTime = dataUnit.getTimeMilliseconds();
 				}
 
@@ -545,6 +606,10 @@ public class DetectionsHandler {
 						tethysControl.showException(e);
 					}
 					currentDetections = null;
+				}
+
+				if (viewerLoadPolicy == ViewerLoadPolicy.LOAD_ALWAYS_EVERYTHING) {
+					break;
 				}
 			}
 			

@@ -259,6 +259,7 @@ public class StreamerDialog extends PamDialog {
 		//		}
 		singleInstance.currentArray = currentArray;
 		singleInstance.defaultStreamer = streamer;//.clone();
+//		singleInstance.st
 		singleInstance.setParams();
 		singleInstance.setVisible(true);
 		return singleInstance.defaultStreamer;
@@ -549,6 +550,17 @@ public class StreamerDialog extends PamDialog {
 				pack();
 			}
 		}
+
+		try {
+			OriginSettings os = defaultStreamer.getOriginSettings(currentOriginMethod.getClass());
+			if (os != null) {
+				currentOriginMethod.setOriginSettings(os);
+			}
+		}
+		catch (Exception e) {
+			// will throw if it tries to set the wrong type of settings. 
+		}
+		
 		enableControls();
 	}
 

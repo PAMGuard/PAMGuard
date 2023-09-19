@@ -103,6 +103,7 @@ public class ExportWorkerCard extends ExportWizardCard implements DetectionExpor
 
 	protected void exportData() {
 		DetectionsHandler detHandler = getTethysControl().getDetectionsHandler();
+		
 		detHandler.startExportThread(getDataBlock(), streamExportParams, this);
 		enableControls(DetectionExportProgress.STATE_GATHERING);
 	}
@@ -128,7 +129,14 @@ public class ExportWorkerCard extends ExportWizardCard implements DetectionExpor
 		if (progress == null) {
 			return;
 		}
-		if (progress.totalUnits > 0) {
+		if (progress.state == DetectionExportProgress.STATE_COUNTING) {
+			itemCount.setText("0");
+			projectedCount.setText(String.format("%d", progress.exportCount));
+			skipCount.setText(String.format("%d", progress.skipCount));
+			long perc = (progress.exportCount+progress.skipCount) * 100 / progress.totalUnits;
+			progressBar.setValue((int) perc);
+		}
+		else if (progress.totalUnits > 0) {
 			itemCount.setText(String.format("%d", progress.exportCount));
 			skipCount.setText(String.format("%d", progress.skipCount));
 			long totExpected = progress.totalUnits;
@@ -136,7 +144,6 @@ public class ExportWorkerCard extends ExportWizardCard implements DetectionExpor
 				totExpected *= progress.exportCount/(progress.exportCount+progress.skipCount);
 			}
 			projectedCount.setText(String.format("%d",  totExpected));
-			itemCount.setText(String.format("%d", totExpected));
 			long perc = (progress.exportCount+progress.skipCount) * 100 / progress.totalUnits;
 			progressBar.setValue((int) perc);
 		}

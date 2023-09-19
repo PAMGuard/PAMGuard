@@ -3,6 +3,8 @@ package clickDetector;
 import java.util.ListIterator;
 
 import pamScrollSystem.ViewLoadObserver;
+import tethys.TethysControl;
+import tethys.pamdata.TethysDataProvider;
 import tethys.species.DataBlockSpeciesManager;
 //import staticLocaliser.StaticLocaliserControl;
 //import staticLocaliser.StaticLocaliserProvider;
@@ -14,6 +16,7 @@ import binaryFileStorage.BinaryStore;
 import clickDetector.ClickClassifiers.ClickBlockSpeciesManager;
 import clickDetector.dataSelector.ClickDataSelectCreator;
 import clickDetector.offlineFuncs.OfflineClickLogging;
+import clickDetector.tethys.ClickTethysDataProvider;
 import clickDetector.toad.ClickTOADCalculator;
 import dataMap.OfflineDataMap;
 import fftManager.fftorganiser.FFTDataOrganiser;
@@ -26,6 +29,8 @@ import PamUtils.PamUtils;
 import PamView.GroupedDataSource;
 import PamView.GroupedSourceParameters;
 import PamguardMVC.AcousticDataBlock;
+import PamguardMVC.DataAutomation;
+import PamguardMVC.DataAutomationInfo;
 import PamguardMVC.FFTDataHolderBlock;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
@@ -68,6 +73,8 @@ public class ClickDataBlock extends AcousticDataBlock<ClickDetection>  implement
 	private ClickDataSelectCreator clickDataSelectCreator;
 
 	private ClickTOADCalculator clickTOADCalculator;
+
+	private ClickTethysDataProvider clickTethysDataProvider;
 
 	/**
 	 * Click detector loading has to be a bit different to normal - first 
@@ -314,6 +321,19 @@ public class ClickDataBlock extends AcousticDataBlock<ClickDetection>  implement
 			clickBlockSpeciesManager = new ClickBlockSpeciesManager(clickControl, this);
 		}
 		return clickBlockSpeciesManager;
+	}
+
+	@Override
+	public TethysDataProvider getTethysDataProvider(TethysControl tethysControl) {
+		if (clickTethysDataProvider == null) {
+			clickTethysDataProvider = new ClickTethysDataProvider(tethysControl, this);
+		}
+		return clickTethysDataProvider;
+	}
+
+	@Override
+	public DataAutomationInfo getDataAutomationInfo() {
+		return new DataAutomationInfo(DataAutomation.AUTOMATIC);
 	}
 
 
