@@ -41,8 +41,14 @@ import tethys.output.StreamExportParams;
 import tethys.output.TethysExportParams;
 import tethys.pamdata.TethysDataProvider;
 
+/**
+ * Functions for handling output of Detections documents. 
+ * Works closely with a TethysDataProvider and DataBlockSpeciesManager
+ * to generate Detections elements for an xml doc to export to Tethys. 
+ * @author dg50
+ *
+ */
 public class DetectionsHandler {
-
 
 	private TethysControl tethysControl;
 
@@ -53,6 +59,10 @@ public class DetectionsHandler {
 
 	private ExportWorker exportWorker;
 
+	/**
+	 * 
+	 * @param tethysControl
+	 */
 	public DetectionsHandler(TethysControl tethysControl) {
 		super();
 		this.tethysControl = tethysControl;
@@ -96,159 +106,13 @@ public class DetectionsHandler {
 		return new StreamDetectionsSummary(detectionsDocs);
 	}
 
-
-//	/**
-//	 * Here is where we export data for a specific data stream to Tethys.
-//	 *
-//	 * @param aDataBlock
-//	 * @param aDeployment
-//	 * @param tethysExportParams
-//	 * @param streamExportParams
-//	 */
-//	public boolean exportDetections(PamDataBlock aDataBlock, Deployment deployment, DetectionGranularity granularity, TethysExportParams tethysExportParams,
-//			StreamExportParams streamExportParams) {
-//		if (granularity == null || granularity.granularity == null) {
-//			granularity = new DetectionGranularity(GRANULARITY.TIME, 3600);
-//		}
-//		switch (granularity.granularity) {
-//		case BINARYFILE:
-//			return exportByBinaryFile(aDataBlock, deployment, tethysExportParams, streamExportParams);
-//		case NONE:
-//			return exportEverything(aDataBlock, deployment, tethysExportParams, streamExportParams);
-//		case TIME:
-//			return exportByTimeChunk(aDataBlock, deployment, granularity.granularityIntervalSeconds, tethysExportParams, streamExportParams);
-//		default:
-//			break;
-//		}
-//
-//		return false;
-//
-//
-//	}
-//
-//	private boolean exportByBinaryFile(PamDataBlock dataBlock, Deployment deployment,
-//			TethysExportParams tethysExportParams, StreamExportParams streamExportParams) {
-//		long deploymentStart = TethysTimeFuncs.millisFromGregorianXML(deployment.getDeploymentDetails().getAudioTimeStamp());
-//		long deploymentStop = TethysTimeFuncs.millisFromGregorianXML(deployment.getRecoveryDetails().getAudioTimeStamp());
-//		/*
-//		 *  there should be a pretty good correspondence between the start of a binary file and the deploymentStart
-//		 *  since they all derived from the same start clock.
-//		 */
-//		OfflineDataMap dataMap = dataBlock.getPrimaryDataMap();
-//		if (dataMap == null) {
-//			return false;
-//		}
-//		List<OfflineDataMapPoint> mapPoints = dataMap.getMapPoints();
-//		boolean ok = true;
-//		for (OfflineDataMapPoint mapPoint : mapPoints) {
-//			if (mapPoint.getEndTime() < deploymentStart) {
-//				continue;
-//			}
-//			if (mapPoint.getStartTime() >= deploymentStop) {
-//				continue;
-//			}
-//			ok &= loadAndExport(dataBlock, deployment, Math.max(deploymentStart, mapPoint.getStartTime()),
-//					Math.min(deploymentStop, mapPoint.getEndTime()), tethysExportParams, streamExportParams);
-//		}
-//
-//
-//		return ok;
-//	}
-//
-//	private boolean exportEverything(PamDataBlock dataBlock, Deployment deployment,
-//			TethysExportParams tethysExportParams, StreamExportParams streamExportParams) {
-//		long deploymentStart = TethysTimeFuncs.millisFromGregorianXML(deployment.getDeploymentDetails().getAudioTimeStamp());
-//		long deploymentStop = TethysTimeFuncs.millisFromGregorianXML(deployment.getRecoveryDetails().getAudioTimeStamp());
-//		return loadAndExport(dataBlock, deployment, deploymentStart, deploymentStop, tethysExportParams, streamExportParams);
-//	}
-//
-//	private boolean exportByTimeChunk(PamDataBlock dataBlock, Deployment deployment, long granularityIntervalSeconds,
-//			TethysExportParams tethysExportParams, StreamExportParams streamExportParams) {
-//
-//		long deploymentStart = TethysTimeFuncs.millisFromGregorianXML(deployment.getDeploymentDetails().getAudioTimeStamp());
-//		long deploymentStop = TethysTimeFuncs.millisFromGregorianXML(deployment.getRecoveryDetails().getAudioTimeStamp());
-//		long chunkMillis = granularityIntervalSeconds*1000;
-//		long exportStart = deploymentStart / chunkMillis;
-//		exportStart *= chunkMillis;
-//		boolean ok = true;
-//		while (exportStart < deploymentStop) {
-//			ok &= loadAndExport(dataBlock, deployment, Math.max(deploymentStart, exportStart),
-//					Math.min(deploymentStop, exportStart + chunkMillis), tethysExportParams, streamExportParams);
-//			exportStart += chunkMillis;
-//		}
-//
-//		return ok;
-//	}
-//
-///**
-//	 * Load and export data for a given time period. This may be a complete deployment, it may be a short section. Do as told !
-//	 * Hopefully data interval is small enough to hold all in memory - it needs to be if the document will fit in mempory, so should be OK
-//	 * @param dataBlock
-//	 * @param deployment
-//	 * @param max
-//	 * @param min
-//	 * @param tethysExportParams
-//	 * @param streamExportParams
-//	 */
-//	private boolean loadAndExport(PamDataBlock dataBlock, Deployment deployment, long startTimeMillis, long endTimeMillis,
-//			TethysExportParams tethysExportParams, StreamExportParams streamExportParams) {
-//		// load the data
-//		dataBlock.loadViewerData(startTimeMillis, endTimeMillis, null);
-//		DataSelector dataSelector = dataBlock.getDataSelector(tethysControl.getDataSelectName(), false);
-//		/*
-//		 *  for easier synching, get a copy of the data and also apply the data selector right away so that
-//		 *  we've a list of exactly the right data.
-//		 */
-//		ArrayList<PamDataUnit> data = dataBlock.getDataCopy(startTimeMillis, endTimeMillis, true, dataSelector);
-//		/*
-//		 * Here, make Detection object and add the DetectionEffort data.
-//		 */
-//		DeploymentData globalDeplData = tethysControl.getGlobalDeplopymentData();
-//		TethysDataProvider dataProvider = dataBlock.getTethysDataProvider();
-//		Detections detections = new Detections();
-////		String prefix = getDetectionsDocIdPrefix(globalDeplData.getProject(), dataBlock);
-//		String prefix = deployment.getId();
-//		detections.setId(String.format("%s_%d", prefix, uniqueDetectionsId++));
-//		detections.setDescription(dataProvider.getDescription(deployment, tethysExportParams));
-//		DataSourceType dataSource = new DataSourceType();
-//		dataSource.setDeploymentId(deployment.getId());
-////		dataSource.setEnsembleId(""); ToDo
-//		detections.setDataSource(dataSource);
-//		detections.setAlgorithm(dataProvider.getAlgorithm());
-//		detections.setUserId("Unknown user");
-//		detections.setEffort(getDetectorEffort(deployment, startTimeMillis, endTimeMillis));
-//		DetectionGroup detectionGroup = new DetectionGroup();
-//		detections.setOnEffort(detectionGroup);
-//		List<Detection> detectionList = detectionGroup.getDetection();
-//		for (int i = 0; i < data.size(); i++) {
-//			PamDataUnit dataUnit = data.get(i);
-//			Detection detection = dataProvider.createDetection(dataUnit, tethysExportParams, streamExportParams);
-//			if (detection != null) {
-//				detectionList.add(detection);
-//			}
-//		}
-//		System.out.printf("Exporting %d %s detections for time period %s to %s\n", detectionList.size(), dataBlock.getDataName(),
-//				detections.getEffort().getStart().toString(), detections.getEffort().getEnd().toString());
-//		/*
-//		 * We should now have a fully populated Detections object, so write it to the database
-//		 * using functions in DBXMLConnect
-//		 */
-//		ArrayList<Detections> detectionDocuments = new ArrayList();
-//		detectionDocuments.add(detections);
-//
-////		tethysControl.getDbxmlConnect().postToTethys(detectionDocuments); // call whatever you need to call in here to write the Detections.
-//
-//
-//		return true;
-//
-//	}
-
-//	private boolean exportByTimeChunk(PamDataBlock aDataBlock, Deployment deployment, long granularityIntervalSeconds,
-//			TethysExportParams tethysExportParams, StreamExportParams streamExportParams) {
-//		// TODO Auto-generated method stub
-//		return false;
-//	}
-
+	/**
+	 * Get the Detection Effort part of a Detections document
+	 * @param pDeployment
+	 * @param dataBlock
+	 * @param exportParams
+	 * @return
+	 */
 	private DetectionEffort getDetectorEffort(PDeployment pDeployment, PamDataBlock dataBlock, StreamExportParams exportParams) {
 		DetectionEffort effort = new DetectionEffort();
 		Deployment deployment = pDeployment.deployment;
@@ -312,25 +176,24 @@ public class DetectionsHandler {
 		}
 	}
 
+	/**
+	 * 
+	 * @param dataBlock
+	 * @return default value is PAMGuard
+	 */
 	public String getSupportSoftware(PamDataBlock dataBlock) {
 		return "PAMGuard";
 	}
 
+	/**
+	 * 
+	 * @param dataBlock
+	 * @return PAMGuard version
+	 */
 	public String getSupportSoftwareVersion(PamDataBlock dataBlock) {
 //		should try to dig into the binary store and get the version from there.
 		return PamguardVersionInfo.version;
 	}
-//	/**
-//	 * Get a prefix for a id for a Detections document. This is just the project name
-//	 * and the datablock name. Something may need to be added to allow for multiple
-//	 * analysis going into one database.
-//	 * @param project
-//	 * @param dataBlock
-//	 * @return Detections document prefix.
-//	 */
-//	public static final String getDetectionsDocIdPrefix(String project, PamDataBlock dataBlock) {
-//		return project + "_" + dataBlock.getDataName();
-//	}
 
 	/**
 	 * Detections will be exported in a separate worker thread since export may take some time and
@@ -375,7 +238,9 @@ public class DetectionsHandler {
 		streamExportParams.granularity = allowed[0];
 	}
 
-
+	/**
+	 * send a cancel command to export thread if it's running
+	 */
 	public void cancelExport() {
 		activeExport = false;
 	}
@@ -482,18 +347,6 @@ public class DetectionsHandler {
 					break;
 				}
 
-//				if (documentCount > 500000 && mapPoint != dataMap.getLastMapPoint()) {
-//					prog = new DetectionExportProgress(deployment, currentDetections,
-//							lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_WRITING);
-//					exportObserver.update(prog);
-//					closeDetectionsDocument(currentDetections, mapPoint.getEndTime());
-//					try {
-//						dbxmlConnect.postToTethys(currentDetections);
-//					} catch (TethysException e) {
-//						tethysControl.showException(e);
-//					}
-//					currentDetections = null;
-//				}
 			}
 			Detection dets[] = granularityHandler.cleanup(deployment.getAudioEnd());
 			if (dets != null) {
@@ -504,9 +357,6 @@ public class DetectionsHandler {
 
 		}
 
-//		prog = new DetectionExportProgress(null, null,
-//				lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_GATHERING);
-//		exportObserver.update(prog);
 		return exportCount;
 	}/**
 	 * Export detections in all deployments for this PAMGuard dataset.
@@ -601,7 +451,7 @@ public class DetectionsHandler {
 					exportObserver.update(prog);
 					closeDetectionsDocument(currentDetections, mapPoint.getEndTime());
 					try {
-						dbxmlConnect.postToTethys(currentDetections);
+						dbxmlConnect.postAndLog(currentDetections);
 					} catch (TethysException e) {
 						tethysControl.showException(e);
 					}
@@ -627,7 +477,7 @@ public class DetectionsHandler {
 						lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_WRITING);
 				closeDetectionsDocument(currentDetections, deployment.getAudioEnd());
 				try {
-					dbxmlConnect.postToTethys(currentDetections);
+					dbxmlConnect.postAndLog(currentDetections);
 				} catch (TethysException e) {
 					tethysControl.showException(e);
 				}
@@ -640,6 +490,15 @@ public class DetectionsHandler {
 		exportObserver.update(prog);
 		return DetectionExportProgress.STATE_COMPLETE;
 	}
+	
+	/**
+	 * Start a new detections document for the deployment and datablock. <br>
+	 * Add all the standard information to the top of the Document
+	 * @param deployment
+	 * @param dataBlock
+	 * @param exportParams
+	 * @return new Detections document
+	 */
 	private Detections startDetectionsDocument(PDeployment deployment, PamDataBlock dataBlock,
 			StreamExportParams exportParams) {
 		Detections detections = new Detections();
@@ -701,6 +560,14 @@ public class DetectionsHandler {
 		detections.getEffort().setEnd(TethysTimeFuncs.xmlGregCalFromMillis(audioEnd));
 	}
 
+	/**
+	 * Worker thread for exporting detections. 
+	 * Currently, it counts them first, then checks the user wants to export 
+	 * This requires going through the data twice, but may be sensible to avoid
+	 * people outputting stupidly large documents. 
+	 * @author dg50
+	 *
+	 */
 	private class ExportWorker extends SwingWorker<Integer, DetectionExportProgress> implements DetectionExportObserver {
 
 		private PamDataBlock dataBlock;

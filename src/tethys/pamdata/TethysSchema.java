@@ -7,6 +7,7 @@ import org.w3c.dom.Document;
  * wrapper around an XML string, or a JAXB object or something, 
  * but may get more sophisticated. TBD in discussions with SDSU
  */
+@Deprecated
 public class TethysSchema {
 
 	private Document schemaDoc;

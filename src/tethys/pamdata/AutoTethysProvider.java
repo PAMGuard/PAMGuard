@@ -60,9 +60,9 @@ import java.io.StringReader;
 import java.net.URISyntaxException;
 
 /**
- * Automatically provides Tethys data based on the SQL database interface 
- * for a data block. does most of what needs to be done, though individual modules
- * may want to override this, call the base createDetection function and then add a 
+ * Automatically provides Tethys data for a PAMGuard datablock. 
+ * Does most of what needs to be done, though individual modules
+ * will want to override this, call the base createDetection function and then add a 
  * few more bespoke elements. 
  * @author dg50
  *
@@ -86,25 +86,7 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 			e.printStackTrace();
 		}
 	}
-//
-//	@Override
-//	public TethysSchema getSchema() {
-//		SQLLogging logging = pamDataBlock.getLogging();
-//		if (logging == null) {
-//			return null;
-//		}
-//		DBSchemaWriter schemaWriter = new DBSchemaWriter();
-//		Document doc = schemaWriter.generateDatabaseSchema(pamDataBlock, logging, logging.getTableDefinition());
-//		TethysSchema schema = new TethysSchema(doc);
-//		return schema;
-//	}
-
-	//	@Override
-	//	public TethysDataPoint getDataPoint(PamDataUnit pamDataUnit) {
-	//		// TODO Auto-generated method stub
-	//		return null;
-	//	}
-
+	
 	@Override
 	public DescriptionType getDescription(Deployment deployment, TethysExportParams tethysExportParams) {
 		DescriptionType description = new DescriptionType();
@@ -155,7 +137,6 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 		try {
 			paramPacker = new TethysParameterPacker(tethysControl);
 		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		List<Element> genList = paramPacker.packParameters(pamDataBlock);
@@ -164,70 +145,17 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 		}
 		paramList.addAll(genList);
 
-		//		Document doc = XMLUtils.createBlankDoc();
-		//		PamguardXMLWriter pamXMLWriter = PamguardXMLWriter.getXMLWriter();
-		//		Element dummyEl = doc.createElement("MODULES");
-		//		doc.appendChild(dummyEl);
-		//		PamSettings[] settingsObjs = getSettingsObjects();
-		//		if (settingsObjs == null) {
-		//			return null;
-		//		}
-		////				pamXMLWriter.setStaticNameSpace(TethysControl.xmlNameSpace);
-		//		Element settingsEl = pamXMLWriter.writeUnitSettings(doc, dummyEl, pamSettings, settingsObjs);
-		//		if (settingsEl == null) {
-		//			return null;
-		//		}
-		//
-		////		settingsEl = addNameSpaceToElements(doc, settingsEl, TethysControl.xmlNameSpace);
-		//
-		//
-		//		dummyEl.appendChild(settingsEl);
-		//		NodeList childs = settingsEl.getChildNodes();
-		//		for (int i = 0; i < childs.getLength(); i++) {
-		//			Node el = childs.item(i);
-		//			//			System.out.println(el.getNodeName());
-		//			if (el instanceof Element) {
-		//				paramList.add((Element) el);
-		//			}
-		//		}
-		//
-		//		//		Document doc = pamXMLWriter.writeOneModule((PamSettings) pamControlledUnit, System.currentTimeMillis());
-		//		//		String moduleXML = null;
-		//		if (doc != null) {
-		//			// this string should be XML of all the settings for the module controlling this
-		//			// datablock.
-		//			//			moduleXML = pamXMLWriter.getAsString(doc, true); // change to false to get smaller xml
-		//			//			System.out.printf("Module settings for datablock %s are:\n", moduleXML);
-		//			//			System.out.println(moduleXML);
-		//			//			Element pamguard = doc.get("PAMGUARD");
-		//			//			Element modules = (Element) pamguard.getElementsByTagName("MODULES");
-		//			//			doc.get
-		//			//			NodeList childs = doc.getChildNodes();
-		//			//			for (int i = 0; i < childs.getLength(); i++) {
-		//			//				Node el = childs.item(i);
-		//			//				System.out.println(el.getNodeName());
-		//			//				if (el instanceof Element) {
-		//			//					paramList.add((Element) el);
-		//			//				}
-		//			//			}
-		//			//			String moduleXML = pamXMLWriter.getAsString(doc, true); // change to false to get smaller xml
-		//			//			System.out.printf("Module settings for datablock %s are:\n%s", this.pamDataBlock.getDataName(), moduleXML);
-		//		}
-		//
-		//		//		// try the old say
-		//		//		Document doc2 = pamXMLWriter.writeOneModule((PamSettings) pamControlledUnit, System.currentTimeMillis());
-		//		//		String moduleXML = null;
-		//		//		if (doc2 != null) {
-		//		//			// this string should be XML of all the settings for the module controlling this
-		//		//			// datablock.
-		//		//			moduleXML = pamXMLWriter.getAsString(doc2, true); // change to false to get smaller xml
-		//		//			System.out.printf("Module settings for datablock %s are:\n%s", pamDataBlock.getDataName(),moduleXML);
-		//		//		}
-		//		//		
-
 		return parameters;
 	}
 
+	/**
+	 * Not used. Was an attempt to automatically add name spaces to the PAMGuard settings
+	 * XML I generate, but we found a better way. 
+	 * @param doc
+	 * @param settingsEl
+	 * @param xmlNameSpace
+	 * @return
+	 */
 	private Element addNameSpaceToElements(Document doc, Element settingsEl, String xmlNameSpace) {
 
 

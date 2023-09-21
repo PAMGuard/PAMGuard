@@ -288,6 +288,23 @@ public class DBXMLQueries {
 	}
 
 	/**
+	 * Get project deployments that use a specific instrument id. More use than the call without this 
+	 * extra clause since it can handle overlapping deployments. 
+	 * @param projectName
+	 * @param instrumentId
+	 * @return
+	 */
+	public ArrayList<nilus.Deployment> getProjectDeployments(String projectName, String instrumentId) {
+		if (projectName == null) {
+			return null;
+		}
+		String qBase = "{\"return\":[\"Deployment\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Deployment/Project\",\"%s\"],\"optype\":\"binary\"},{\"op\":\"=\","
+				+ "\"operands\":[\"Deployment/Instrument/InstrumentId\",\"%s\"],\"optype\":\"binary\"}],\"enclose\":1}";
+		String qStr = String.format(qBase, projectName, instrumentId);
+		
+		return runProjectDeploymentsQuery(projectName, qStr);
+	}
+	/**
 	 * Get some basic (not all) data for deployments associated with a project. Note that
 	 * this may include deployments which are NOT part of the current dataset. That requires
 	 * a search on Instrument as well.
@@ -300,7 +317,16 @@ public class DBXMLQueries {
 		}
 		String qBase = "{\"return\":[\"Deployment\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Deployment/Project\",\"%s\"],\"optype\":\"binary\"}],\"enclose\":1}";
 		String qStr = String.format(qBase, projectName);
+		return runProjectDeploymentsQuery(projectName, qStr);
+	}
 
+	/**
+	 * Run the actual projects query from either of the two above functions. 
+	 * @param projectName
+	 * @param qStr
+	 * @return
+	 */
+	private ArrayList<nilus.Deployment> runProjectDeploymentsQuery(String projectName, String qStr) {
 		DBQueryResult result = null;
 		try {
 			result = executeQuery(qStr);

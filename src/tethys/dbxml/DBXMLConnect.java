@@ -19,6 +19,8 @@ import dbxml.Queries;
 import dbxml.uploader.Importer;
 import nilus.MarshalXML;
 import tethys.TethysControl;
+import tethys.database.TethysActions;
+import tethys.database.TethysLogger;
 import tethys.output.TethysExportParams;
 
 /**
@@ -123,6 +125,28 @@ public class DBXMLConnect {
 		return retFile;
 	}
 	
+	
+	public boolean postAndLog(Object nilusObject) throws TethysException
+	{
+		TethysException e = null;
+		boolean success = false;
+		try {
+			success = postToTethys(nilusObject);
+		}
+		catch (TethysException ex) {
+			e = ex;
+		}
+		TethysLogger logger = TethysLogger.getTethysLogger(tethysControl);
+		Class objClass = nilusObject.getClass();
+		String collection = getTethysCollection(objClass.getName());
+		String documentId = getDocumentId(nilusObject);
+		logger.logAction(collection, documentId, TethysActions.ADDDOCUMENT, success, "");
+		if (e != null) {
+			throw (e);
+		}
+		return success;
+	}
+	
 	/**
 	 * take a nilus object loaded with PamGuard data and post it to the Tethys database
 	 *
@@ -130,7 +154,7 @@ public class DBXMLConnect {
 	 * @return error string, null string means there are no errors
 	 * @throws TethysException 
 	 */
-	public boolean postToTethys(Object nilusObject) throws TethysException
+	private boolean postToTethys(Object nilusObject) throws TethysException
 	{
 		Class objClass = nilusObject.getClass();
 		String collection = getTethysCollection(objClass.getName());

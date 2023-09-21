@@ -40,40 +40,6 @@ import tethys.TethysControl;
  */
 public class TethysParameterPacker {
 
-//	/**
-//	 * Parameters should look something like below. however, only packing them with a long 
-//	schema name seems to work. 
-//	 * 
-//<Algorithm>
-//<Method>Analyst detections</Method>
-//<Software>Triton</Software>
-//<Version>unknown</Version>
-//<Parameters>
-//<LTSA_plot_time_h>0.75</LTSA_plot_time_h>
-//<LTSA_low_Hz>0.0</LTSA_low_Hz>
-//<LTSA_high_Hz>5000.0</LTSA_high_Hz>
-//<LTSA_brightness>30.0</LTSA_brightness>
-//</Parameters>
-//</Algorithm>
-	/*
-	 * 
-//			// this works. Can look at the source to see how it's done. 
-//			// may have fun making this work for more complex structures. 
-//			try {
-//				Helper helper = new Helper();
-//				helper.AddAnyElement(paramList, "Threshold", "3.5");
-//				
-//				 *  and see Matlab code for dbStruct2DOM at C:\Users\dg50\source\repos\TethysMatlab\db
-//				 *  for more complex structures
-//				 *  This looks like it may be possible to rewrite my functions for 
-//				 *  writing structures to XML using the helper.AddAnyElement function as 
-//				 *  an example and I should be able to output my complex structures. 
-//				 
-//			} catch (JAXBException | ParserConfigurationException e) {
-//				e.printStackTrace();
-//			}
-	 */
-
 	private MarshalXML marshaller;
 	
 	private PamguardXMLWriter xmlWriter;
@@ -94,6 +60,12 @@ public class TethysParameterPacker {
 		xmlWriter = PamguardXMLWriter.getXMLWriter();
 	}
 
+	/**
+	 * Get a list of elements of parameters for all modules feeding 
+	 * the given datablock. These are given in reverse order. 
+	 * @param pamDataBlock output datablock
+	 * @return parameters of all modules feeding that datablock. 
+	 */
 	public List<Element> packParameters(PamDataBlock pamDataBlock) {
 		PamProcess pamProcess = pamDataBlock.getParentProcess();
 		PamControlledUnit pamControlledUnit = pamProcess.getPamControlledUnit();

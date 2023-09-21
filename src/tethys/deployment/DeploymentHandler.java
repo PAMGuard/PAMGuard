@@ -123,7 +123,7 @@ public class DeploymentHandler implements TethysStateObserver {
 	 */
 	public boolean updateProjectDeployments() {
 		DeploymentData projData = tethysControl.getGlobalDeplopymentData();
-		ArrayList<Deployment> tethysDocs = tethysControl.getDbxmlQueries().getProjectDeployments(projData.getProject());
+		ArrayList<Deployment> tethysDocs = tethysControl.getDbxmlQueries().getProjectDeployments(projData.getProject(), getInstrumentId());
 		if (tethysDocs == null) {
 			return false;
 		}
@@ -326,7 +326,7 @@ public class DeploymentHandler implements TethysStateObserver {
 				dbxmlConnect.updateDocument(deployment);
 			}
 			else {
-				dbxmlConnect.postToTethys(deployment);
+				dbxmlConnect.postAndLog(deployment);
 			}
 		}
 		catch (TethysException e) {
@@ -363,7 +363,7 @@ public class DeploymentHandler implements TethysStateObserver {
 					dbxmlConnect.updateDocument(deployment);
 				}
 				else {
-					dbxmlConnect.postToTethys(deployment);
+					dbxmlConnect.postAndLog(deployment);
 				}
 			}
 			catch (TethysException e) {

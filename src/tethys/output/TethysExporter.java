@@ -174,7 +174,7 @@ public class TethysExporter {
 //			System.out.println(deployment.toString());
 			deploymentDocs.add(deployment);
 			try {
-				tethysControl.getDbxmlConnect().postToTethys(deployment);
+				tethysControl.getDbxmlConnect().postAndLog(deployment);
 			} catch (TethysException e) {
 				tethysControl.showException(e);
 			}
