@@ -6,9 +6,11 @@ import java.util.List;
 import javax.swing.SwingWorker;
 
 import PamController.PamControlledUnit;
+import PamController.PamController;
 import PamController.PamguardVersionInfo;
 import PamModel.PamPluginInterface;
 import PamUtils.PamCalendar;
+import PamView.dialog.PamDialog;
 import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
@@ -40,6 +42,7 @@ import tethys.niluswraps.TethysCollections;
 import tethys.output.StreamExportParams;
 import tethys.output.TethysExportParams;
 import tethys.pamdata.TethysDataProvider;
+import tethys.species.DataBlockSpeciesManager;
 
 /**
  * Functions for handling output of Detections documents. 
@@ -203,6 +206,7 @@ public class DetectionsHandler {
 	 * @param exportWorkerCard
 	 */
 	public void startExportThread(PamDataBlock pamDataBlock, StreamExportParams streamExportParams, DetectionExportObserver exportObserver) {
+
 		checkGranularity(pamDataBlock, streamExportParams);
 		tethysControl.getTethysExportParams().setStreamParams(pamDataBlock, streamExportParams);
 		activeExport = true;

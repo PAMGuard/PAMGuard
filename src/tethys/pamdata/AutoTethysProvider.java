@@ -247,6 +247,9 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 		Detection detection = new Detection();
 		detection.setStart(TethysTimeFuncs.xmlGregCalFromMillis(dataUnit.getTimeMilliseconds()));
 		detection.setEnd(TethysTimeFuncs.xmlGregCalFromMillis(dataUnit.getEndTimeInMilliseconds()));
+		if (dataUnit.getEndTimeInMilliseconds() < dataUnit.getTimeMilliseconds()) {
+			System.out.printf("Error UID %d, end %s before start %s\n", dataUnit.getUID(), detection.getEnd(), detection.getStart());
+		}
 
 		DataBlockSpeciesManager speciesManager = pamDataBlock.getDatablockSpeciesManager();
 		SpeciesMapItem speciesItem = null;

@@ -51,6 +51,7 @@ import tethys.output.TethysExportParams;
 import tethys.output.TethysExporter;
 import tethys.output.swing.TethysExportDialog;
 import tethys.species.ITISFunctions;
+import tethys.species.SpeciesMapManager;
 import tethys.swing.ProjectDeploymentsDialog;
 import tethys.swing.TethysTabPanel;
 import tethys.swing.XMLStringView;
@@ -200,6 +201,18 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 			}
 		});
 		tethysMenu.add(showDeps);
+		
+		tethysMenu.addSeparator();
+		JMenuItem mapItem = new JMenuItem("Export species maps ...");
+		mapItem.setToolTipText("Export all species maps (PAMGuard codes to ITIS codes to file for import into other configurations");
+				mapItem.addActionListener(SpeciesMapManager.getInstance().getExportAction(parentFrame));
+		tethysMenu.add(mapItem);
+		
+		mapItem = new JMenuItem("Import species maps ...");
+		mapItem.setToolTipText("Import species maps (PAMGuard codes to ITIS codes to file for import into other configurations");
+		mapItem.addActionListener(SpeciesMapManager.getInstance().getImportAction(parentFrame));
+		tethysMenu.add(mapItem);
+		
 		return tethysMenu;
 	}
 

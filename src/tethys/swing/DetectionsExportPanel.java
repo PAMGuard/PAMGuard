@@ -11,10 +11,13 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
+import PamController.PamController;
+import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamView.panel.PamAlignmentPanel;
 import PamguardMVC.PamDataBlock;
 import tethys.TethysControl;
+import tethys.species.DataBlockSpeciesManager;
 import tethys.swing.export.DetectionsExportWizard;
 
 public class DetectionsExportPanel extends TethysGUIPanel implements StreamTableObserver {
@@ -53,6 +56,20 @@ public class DetectionsExportPanel extends TethysGUIPanel implements StreamTable
 		if (selectedDataBlock == null) {
 			return;
 		}
+		
+		/**
+		 * Check the species map is OK before doing anything. 
+		 */
+		DataBlockSpeciesManager spManager = selectedDataBlock.getDatablockSpeciesManager();
+		if (spManager != null) {
+			String error = spManager.checkSpeciesMapError();
+			if (error != null) {
+				PamDialog.showWarning(PamController.getMainFrame(), "Datablock species manager error", error);
+				spManager.showSpeciesDialog();
+				return;
+			}
+		}
+		
 		DetectionsExportWizard.showDialog(getTethysControl().getGuiFrame(), getTethysControl(), selectedDataBlock);
 	}
 

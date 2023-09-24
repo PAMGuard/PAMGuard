@@ -1,17 +1,32 @@
 package tethys.species;
 
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import javax.swing.JFileChooser;
+
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
+import PamController.PamFolders;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import PamUtils.PamFileFilter;
+import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
 
 /**
  * Master manager for species maps which will eventually allow for export and import from XML
- * documents, databases and other things ...
+ * documents, databases and other things ...<br>
+ * (Perhaps not as XML, will simply output the serialized map - easier. 
  * @author dg50
  *
  */
@@ -19,9 +34,22 @@ public class SpeciesMapManager implements PamSettings {
 	
 	private static SpeciesMapManager singleInstance = null;
 	
+	/**
+	 * Synch object to survive multithreading. 
+	 */
 	private static Object synch = new Object(); 
 	
+	/**
+	 * Map of all species maps. 
+	 */
 	private GlobalSpeciesMap globalSpeciesMap;
+
+	private JFileChooser ioFileChooser;
+	
+	/**
+	 * file end type for map files 
+	 */
+	public static final String mapFileEnd = ".spmap";
 
 	private SpeciesMapManager() {
 		PamSettingManager.getInstance().registerSettings(this);
@@ -100,5 +128,125 @@ public class SpeciesMapManager implements PamSettings {
 		else {
 			return false;
 		}
+	}
+	
+	public ActionListener getExportAction(Window parentFrame) {
+		return new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				exportSpeciesMaps(parentFrame);
+			}
+		};
+	}
+
+	public ActionListener getImportAction(Window parentFrame) {
+		return new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				importSpeciesMaps(parentFrame);
+			}
+		};
+	}
+	
+	/**
+	 * Export all species maps to a serialized object file. 
+	 * @param parentFrame 
+	 * @return
+	 */
+	public boolean exportSpeciesMaps(Window parentFrame) {
+		JFileChooser chooser = getFileChooser();
+		int ans = chooser.showSaveDialog(parentFrame);
+		if (ans != JFileChooser.APPROVE_OPTION) {
+			return false;
+		}
+		File opFile = chooser.getSelectedFile();
+		opFile = PamFileFilter.checkFileEnd(opFile, mapFileEnd, true);
+		// write it. 
+		try {
+			ObjectOutputStream op = new ObjectOutputStream(new FileOutputStream(opFile));
+			op.writeObject(getSettingsReference());
+			op.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		
+		return true;
+	}
+	
+	/**
+	 * Get a file chooser, which will remember folders, etc. while PAMGuard is open 
+	 * @return file chooser. 
+	 */
+	private JFileChooser getFileChooser() {
+		if (ioFileChooser != null) {
+			return ioFileChooser;
+		}
+		PamFileFilter fileFilter = new PamFileFilter("Species map files", mapFileEnd);
+		ioFileChooser = new JFileChooser();
+		ioFileChooser.setFileFilter(fileFilter);
+		ioFileChooser.setCurrentDirectory(new File(PamFolders.getDefaultProjectFolder()));
+		return ioFileChooser;
+	}
+	
+	/**
+	 * Import global species maps from selected file. 
+	 * @param parentFrame
+	 * @return
+	 */
+	public boolean importSpeciesMaps(Window parentFrame) {
+		JFileChooser chooser = getFileChooser();
+		int ans = chooser.showOpenDialog(parentFrame);
+		if (ans != JFileChooser.APPROVE_OPTION) {
+			return false;
+		}
+		File ipFile = chooser.getSelectedFile();
+		ipFile = PamFileFilter.checkFileEnd(ipFile, mapFileEnd, true);
+		GlobalSpeciesMap readSpeciesMap = null;
+		// read it. 
+		try {
+			ObjectInputStream ip = new ObjectInputStream(new FileInputStream(ipFile));
+			readSpeciesMap = (GlobalSpeciesMap) ip.readObject();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			return false;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		return handleNewSpeciesMap(readSpeciesMap);
+	}
+
+	private boolean handleNewSpeciesMap(GlobalSpeciesMap readSpeciesMap) {
+		if (readSpeciesMap == null) {
+			return false;
+		}
+		// could put in a dialog to only select parts of the map if we wanted to ? 
+		int ans = WarnOnce.showWarning("Global Species Map", 
+				"Do you want to overwrite ALL PAMGaurd species maps with the imported data ?",
+				WarnOnce.YES_NO_OPTION);
+		if (ans == WarnOnce.CANCEL_OPTION) {
+			return false;
+		}
+		globalSpeciesMap = readSpeciesMap;
+		// no wupdate all datablock maps since they keep their own copies. 
+		ArrayList<PamDataBlock> allDatablocks = PamController.getInstance().getDataBlocks();
+		for (PamDataBlock aBlock : allDatablocks) {
+			DataBlockSpeciesManager spManager = aBlock.getDatablockSpeciesManager();
+			if (spManager == null) {
+				continue;
+			}
+			DataBlockSpeciesMap blockMap = globalSpeciesMap.get(aBlock);
+			if (blockMap != null) {
+				spManager.setDatablockSpeciesMap(blockMap);
+			}
+		}
+		
+		return true;
 	}
 }

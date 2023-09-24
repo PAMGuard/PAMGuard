@@ -27,6 +27,7 @@ abstract public class DataBlockSpeciesManager<T extends PamDataUnit> {
 	/**
 	 * The serialised bit. Always exists (or should be created) even if there
 	 * are no real species, via a defaultdefaultSpecies. 
+	 * Don't keep a local copy though since it may have been 
 	 */
 	private DataBlockSpeciesMap datablockSpeciesMap;
 	
@@ -193,5 +194,29 @@ abstract public class DataBlockSpeciesManager<T extends PamDataUnit> {
 	 */
 	public void setDefaultSpeciesCode(String defaultName) {
 		this.defaultSpeciesCode = defaultName;
+	}
+	
+	/**
+	 * Check the species map. Only return true if every species code
+	 * has a map item. Otherwise it's not safe to export. 
+	 * @return null if all codes have a lookup, otherwise some sort of useful error information
+	 */
+	public String checkSpeciesMapError() {
+		ArrayList<String> codes = getAllSpeciesCodes();
+		if (codes == null || codes.size() == 0) {
+			return "No defined species codes"; // I guess that's OK ? 
+		}
+		DataBlockSpeciesMap spMap = getDatablockSpeciesMap();
+		if (spMap == null) {
+			return "No species map";
+		}
+		
+		for (String aCode : codes) {
+			SpeciesMapItem item = spMap.getItem(aCode);
+			if (item == null) {
+				return "No Species item for species code " + aCode;
+			}
+		}
+		return null;
 	}
 }

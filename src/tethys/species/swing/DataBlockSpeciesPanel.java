@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.border.TitledBorder;
 
 import PamView.dialog.PamDialogPanel;
@@ -30,7 +31,8 @@ public class DataBlockSpeciesPanel implements PamDialogPanel {
 		this.dataBlock = dataBlock;
 		mainPanel = new JPanel(new BorderLayout());
 		speciesPanel = new JPanel();
-		mainPanel.add(speciesPanel, BorderLayout.CENTER);
+		JScrollPane scrollPane = new JScrollPane(speciesPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		mainPanel.add(scrollPane, BorderLayout.CENTER);
 		mainPanel.setBorder(new TitledBorder(dataBlock.getDataName()));
 	}
 
