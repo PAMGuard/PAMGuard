@@ -18,6 +18,7 @@ import dbxml.JerseyClient;
 import dbxml.Queries;
 import dbxml.uploader.Importer;
 import nilus.MarshalXML;
+import tethys.Collection;
 import tethys.TethysControl;
 import tethys.database.TethysActions;
 import tethys.database.TethysLogger;
@@ -40,7 +41,7 @@ public class DBXMLConnect {
 
 	private String currentSiteURL;
 
-	public static String[] collections = {"Deployments", "Detections", "Localizations", "Calibrations", "SpeciesAbbreviations"};
+//	public static String[] collections = {"Deployments", "Detections", "Localizations", "Calibrations", "SpeciesAbbreviations"};
 
 	public DBXMLConnect(TethysControl tethysControl) {
 		this.tethysControl = tethysControl;
@@ -128,19 +129,32 @@ public class DBXMLConnect {
 	
 	public boolean postAndLog(Object nilusObject) throws TethysException
 	{
+		return postAndLog(nilusObject, null);
+	}
+	
+	/**
+	 * I don't think this should ever be used since everything goes a bit pear
+	 * shaped if the documentName isn't the same as the Id. 
+	 * @param nilusObject
+	 * @param documentName
+	 * @return
+	 * @throws TethysException
+	 */
+	private boolean postAndLog(Object nilusObject, String documentName) throws TethysException 
+	{	
 		TethysException e = null;
 		boolean success = false;
 		try {
-			success = postToTethys(nilusObject);
+			success = postToTethys(nilusObject, documentName);
 		}
 		catch (TethysException ex) {
 			e = ex;
 		}
 		TethysLogger logger = TethysLogger.getTethysLogger(tethysControl);
 		Class objClass = nilusObject.getClass();
-		String collection = getTethysCollection(objClass.getName());
+		Collection collection = Collection.fromClass(objClass);
 		String documentId = getDocumentId(nilusObject);
-		logger.logAction(collection, documentId, TethysActions.ADDDOCUMENT, success, "");
+		logger.logAction(collection.collectionName(), documentId, TethysActions.ADDDOCUMENT, success, "");
 		if (e != null) {
 			throw (e);
 		}
@@ -154,22 +168,24 @@ public class DBXMLConnect {
 	 * @return error string, null string means there are no errors
 	 * @throws TethysException 
 	 */
-	private boolean postToTethys(Object nilusObject) throws TethysException
+	private boolean postToTethys(Object nilusObject, String documentName) throws TethysException
 	{
 		Class objClass = nilusObject.getClass();
-		String collection = getTethysCollection(objClass.getName());
+		Collection collection = Collection.fromClass(nilusObject.getClass());
 		TethysExportParams params = new TethysExportParams();
 		String importReturn = null;
-		String tempName = getTempFileName(nilusObject);
-		tempName = tempDirectory.getAbsolutePath() + File.separator + tempName + ".xml";
-		File tempFile = new File(tempName);
-		String bodgeName = tempName;//"C:\\Users\\dg50\\AppData\\Local\\Temp\\PAMGuardTethys\\Meygen2022_10a.xml";
+		if (documentName == null) {
+			documentName = getTempFileName(nilusObject);
+		}
+		documentName = tempDirectory.getAbsolutePath() + File.separator + documentName + ".xml";
+		File tempFile = new File(documentName);
+		String bodgeName = documentName;//"C:\\Users\\dg50\\AppData\\Local\\Temp\\PAMGuardTethys\\Meygen2022_10a.xml";
 		try {
 			MarshalXML marshal = new MarshalXML();
 			marshal.createInstance(objClass);
 			marshal.marshal(nilusObject, tempFile.toString());
 			//				tempFile = stripXMLHeader(tempFile);
-			importReturn = Importer.ImportFiles(params.getFullServerName(), collection,
+			importReturn = Importer.ImportFiles(params.getFullServerName(), collection.collectionName(),
 					new String[] { bodgeName }, "", "", false);
 
 
@@ -207,7 +223,7 @@ public class DBXMLConnect {
 	 */
 	public boolean updateDocument(Object nilusDocument) throws TethysException {
 		deleteDocument(nilusDocument);
-		return postToTethys(nilusDocument);
+		return postToTethys(nilusDocument, null);
 	}
 
 	/**
@@ -221,11 +237,11 @@ public class DBXMLConnect {
 	public boolean deleteDocument(Object nilusDocument) throws TethysException {
 
 		Class objClass = nilusDocument.getClass();
-		String collection = getTethysCollection(objClass.getName());
+		Collection collection = Collection.fromClass(objClass);
 		String docId = getDocumentId(nilusDocument);
 		String result = null;
 		try {
-			result = jerseyClient.removeDocument(collection, docId );
+			result = jerseyClient.removeDocument(collection.collectionName(), docId );
 			/**
 			 * Return from a sucessful delete is something like
 			 *
@@ -274,6 +290,7 @@ An error will throw an exception.
 	 */
 	public boolean removeDocument(String collection, String docId) throws TethysException {
 		try {
+//			docId = "SoundTrap_600_HF_7129_ch00";
 			Object result = jerseyClient.removeDocument(collection, docId );
 			/**
 			 * Return from a sucessful delete is something like
@@ -459,35 +476,7 @@ C:\Users\dg50\AppData\Local\Temp\PAMGuardTethys\20080311_2DSimplex_0.xmlnot: 0 b
 	}
 
 
-	/**
-	 * get Tethys collection name from nilus collection objects
-	 * @param className nilus object Class Name
-	 * @return name of Tethys collection
-	 */
-	public String getTethysCollection(String className) {
-		switch(className) {
-		case "nilus.Deployment":
-			return "Deployments";
-		case "nilus.Detections":
-			return "Detections";
-		case "nilus.Calibration":
-			return "Calibrations";
-		case "nilus.Ensemble":
-			return "Ensembles";
-		case "nilus.Localization":
-			return "Localizations";
-		case "nilus.SpeciesAbbreviation":
-			return "SpeciesAbbreviations";
-		case "nilus.SourceMap":
-			return "SourceMaps";
-		case "nilus.ITIS":
-			return "ITIS";
-		case "nilus.ranks":
-			return "ITIS_ranks";
-		default:
-			return "";
-		}
-	}
+
 
 	public synchronized boolean openConnections() {
 		TethysExportParams params = tethysControl.getTethysExportParams();

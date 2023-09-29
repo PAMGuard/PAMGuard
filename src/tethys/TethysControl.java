@@ -1,6 +1,7 @@
 package tethys;
 
 import java.awt.Desktop;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedOutputStream;
@@ -37,6 +38,7 @@ import PamguardMVC.PamDataBlock;
 import metadata.MetaDataContol;
 import metadata.deployment.DeploymentData;
 import tethys.TethysState.StateType;
+import tethys.calibration.CalibrationHandler;
 import tethys.dbxml.DBXMLConnect;
 import tethys.dbxml.DBXMLQueries;
 import tethys.dbxml.ServerStatus;
@@ -88,6 +90,7 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 
 	private DeploymentHandler deploymentHandler;
 	private DetectionsHandler detectionsHandler;
+	private CalibrationHandler calibrationHandler;
 	
 	private ITISFunctions itisFunctions;
 
@@ -98,6 +101,8 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		dbxmlQueries = new DBXMLQueries(this, dbxmlConnect);
 		deploymentHandler = new DeploymentHandler(this);
 		detectionsHandler = new DetectionsHandler(this);
+		calibrationHandler = new CalibrationHandler(this);
+		
 		serverCheckTimer = new Timer(10000, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -127,9 +132,23 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	public DBXMLConnect getDbxmlConnect() {
 		return dbxmlConnect;
 	}
+	@Override
+	public JMenuItem createDetectionMenu(Frame parentFrame) {
+		return createTethysMenu(parentFrame);
+	}
 
 	@Override
 	public JMenuItem createFileMenu(JFrame parentFrame) {
+		// TODO Auto-generated method stub
+		return super.createFileMenu(parentFrame);
+	}
+
+	/**
+	 * Make a menu. Can go either in File or Settings. TBD.
+	 * @param parentFrame
+	 * @return
+	 */
+	public JMenuItem createTethysMenu(Frame parentFrame) {
 		JMenu tethysMenu = new JMenu("Tethys");
 //		JMenuItem tethysExport = new JMenuItem("Export ...");
 //		tethysMenu.add(tethysExport);
@@ -150,47 +169,19 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		tethysMenu.add(menuItem);
 		
 		JMenuItem collections = new JMenu("Collections");
+		Collection[] mainCollections = Collection.mainList();
+		for (int i = 0; i < mainCollections.length; i++) {
+			Collection col = mainCollections[i];
+			menuItem = new JMenuItem("Open " + col.collectionName() + " collection in browser");
+			menuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					openTethysCollection(col);
+				}
+			});
+			collections.add(menuItem);
+		}
 		
-		menuItem = new JMenuItem("Open Deployments collection in browser");
-		menuItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				openTethysCollection("Deployments");
-			}
-		});
-		collections.add(menuItem);
-		menuItem = new JMenuItem("Open Detections collection in browser");
-		menuItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				openTethysCollection("Detections");
-			}
-		});
-		collections.add(menuItem);
-		menuItem = new JMenuItem("Open Localizations collection in browser");
-		menuItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				openTethysCollection("Localizations");
-			}
-		});
-		collections.add(menuItem);
-		menuItem = new JMenuItem("Open Calibrations collection in browser");
-		menuItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				openTethysCollection("Calibrations");
-			}
-		});
-		collections.add(menuItem);
-		menuItem = new JMenuItem("Open Species Abbreviations collection in browser");
-		menuItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				openTethysCollection("SpeciesAbbreviations");
-			}
-		});
-		collections.add(menuItem);
 		tethysMenu.add(collections);
 		tethysMenu.addSeparator();
 		JMenuItem showDeps = new JMenuItem("Show project deployments");
@@ -201,6 +192,16 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 			}
 		});
 		tethysMenu.add(showDeps);
+		
+		JMenuItem cals = new JMenuItem("Export calibrations");
+		cals.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				calibrationHandler.exportAllCalibrations();
+			}
+		});
+		tethysMenu.add(cals);
 		
 		tethysMenu.addSeparator();
 		JMenuItem mapItem = new JMenuItem("Export species maps ...");
@@ -292,24 +293,24 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 //		} catch (URISyntaxException e) {
 //			e.printStackTrace();
 //		}
-		openTethysCollection("Client");
+		openCollectionInBrowser("Client");
 	}
 	/**
 	 * open client in the default web browser
 	 */
-	public void openTethysCollection(String collectionName) {
-		if (collectionName == null) {
+	public void openTethysCollection(Collection collection) {
+		if (collection == null) {
 			return;
 		}
-		if (getTethysExportParams().listDocsInPamguard && collectionName.equals("Client") == false) {
-			openCollectionInPAMGuard(collectionName);
+		if (getTethysExportParams().listDocsInPamguard) {
+			openCollectionInPAMGuard(collection);
 		}
 		else {
-			openCollectionInBrowser(collectionName);
+			openCollectionInBrowser(collection.collectionName());
 		}
 	}
-	public void openCollectionInPAMGuard(String collectionName) {
-		TethysDocumentsFrame.showTable(getGuiFrame(), this, collectionName);
+	public void openCollectionInPAMGuard(Collection collection) {
+		TethysDocumentsFrame.showTable(getGuiFrame(), this, collection);
 	}
 	
 	public void openCollectionInBrowser(String collectionName) {
@@ -524,19 +525,17 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		ArrayList<PDeployment> matchedDeployments = deploymentHandler.getMatchedDeployments();
 		for (DatablockSynchInfo synchInfo : dataBlockSynchInfos) {
 //			dataPrefixes[i] = DetectionsHandler.getDetectionsDocIdPrefix(deplData.getProject(), synchInfo.getDataBlock());
-			int count = 0;
+			int detectionCount = 0;
+			int documentCount = 0;
 			for (PDeployment pDepl : matchedDeployments) {
-				count += dbxmlQueries.countData(synchInfo.getDataBlock(), pDepl.deployment.getId());
+				detectionCount += dbxmlQueries.countData(synchInfo.getDataBlock(), pDepl.deployment.getId());
+				ArrayList<String> detectionsNames = getDbxmlQueries().getDetectionsDocuments(synchInfo.getDataBlock(), pDepl.deployment.getId());
+				if (detectionsNames != null) {
+					documentCount += detectionsNames.size();
+				}
 			}
-			synchInfo.setDataCount(count);
-			// also count the actual number of Detectoin documents
-			ArrayList<String> someNames = getDbxmlQueries().getDetectionsDocuments(synchInfo.getDataBlock(), null);
-			if (someNames == null) {
-				synchInfo.setDetectionDocumentCount(0);
-			}
-			else {
-				synchInfo.setDetectionDocumentCount(someNames.size());
-			}
+			synchInfo.setDataCount(detectionCount);
+			synchInfo.setDetectionDocumentCount(documentCount);
 			
 			i++;
 		}
@@ -590,6 +589,11 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		WarnOnce.showWarning(title, msg, WarnOnce.WARNING_MESSAGE);
 	}
 
+	public void displayDocument(DocumentInfo docInfo) {
+		String collectionName = docInfo.getCollection().collectionName();
+		String docId = docInfo.getDocumentId();
+		displayDocument(collectionName, docId);
+	}
 	/**
 	 * Load a document from the database and display it in a popup window
 	 * @param collection
@@ -678,5 +682,13 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		countProjectDetections();
 		sendStateUpdate(new TethysState(StateType.NEWPAMGUARDSELECTION));
 	}
+
+	/**
+	 * @return the calibrationHandler
+	 */
+	public CalibrationHandler getCalibrationHandler() {
+		return calibrationHandler;
+	}
+
 
 }

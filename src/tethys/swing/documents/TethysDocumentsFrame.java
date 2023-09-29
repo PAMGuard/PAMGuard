@@ -3,6 +3,7 @@ package tethys.swing.documents;
 import java.awt.Window;
 
 import PamView.dialog.PamDialog;
+import tethys.Collection;
 import tethys.TethysControl;
 
 public class TethysDocumentsFrame extends PamDialog {
@@ -23,12 +24,12 @@ public class TethysDocumentsFrame extends PamDialog {
 		getCancelButton().setText("Close");
 	}
 	
-	public static void showTable(Window parentFrame, TethysControl tethysControl, String collectionName) {
+	public static void showTable(Window parentFrame, TethysControl tethysControl, Collection collection) {
 		if (singleInstance == null) {
 			singleInstance = new TethysDocumentsFrame(parentFrame, tethysControl);
 		}
-		singleInstance.documentsTable.setCollectionName(collectionName);
-		singleInstance.setTitle(collectionName + " Documents");
+		singleInstance.documentsTable.setCollection(collection);
+		singleInstance.setTitle(collection.collectionName() + " Documents");
 		singleInstance.setVisible(true);
 	}
 	

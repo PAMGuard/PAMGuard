@@ -31,6 +31,8 @@ import nilus.Detections;
 import nilus.GranularityEnumType;
 import nilus.GranularityType;
 import nilus.Helper;
+import tethys.Collection;
+import tethys.DocumentInfo;
 import tethys.TethysControl;
 import tethys.TethysTimeFuncs;
 import tethys.output.TethysExportParams;
@@ -139,7 +141,7 @@ public class DBXMLQueries {
 			//			Queries queries = new Queries(jerseyClient);
 
 			queryResult = jerseyClient.queryJSON(jsonQueryString, 0);
-			schemaPlan = jerseyClient.queryJSON(jsonQueryString, 1);
+//			schemaPlan = jerseyClient.queryJSON(jsonQueryString, 1);
 
 		}
 		catch (Exception e) {
@@ -149,75 +151,138 @@ public class DBXMLQueries {
 		return new DBQueryResult(System.currentTimeMillis()-t1, queryResult, schemaPlan);
 	}
 
-	/**
-	 * Check whether or not to strip of the s of one of the collection names. 
-	 * This is caused by some daft thing whereby the Deployments colleciton is called Deployments
-	 * byt the Detections collection is called Detection
-	 * @param collection
-	 * @return
-	 */
-	public String checkCollectionPlural(String collection) {
-		switch (collection) {
-		case "Deployments":
-			return "Deployment";
-		case "Localizations":
-			return "Localize";
-		case "Calibrations":
-			return "Calibration";
-		case "SpeciesAbbreviations":
-			return "SpeciesAbbreviations";
-		}
-		return collection;
-	}
+//	/**
+//	 * Check whether or not to strip of the s of one of the collection names. 
+//	 * This is caused by some daft thing whereby the Deployments colleciton is called Deployments
+//	 * byt the Detections collection is called Detection
+//	 * @param collection
+//	 * @return
+//	 */
+//	public String checkCollectionPlural(String collection) {
+//		switch (collection) {
+//		case "Deployments":
+//			return "Deployment";
+//		case "Localizations":
+//			return "Localize";
+//		case "Calibrations":
+//			return "Calibration";
+//		case "SpeciesAbbreviations":
+//			return "SpeciesAbbreviations";
+//		}
+//		return collection;
+//	}
 
 	/**
 	 * Get a list of all documents in a collection. 
 	 * @param collection
 	 * @return list of all documents in a collection, or null if no collection. 
 	 */
-	public ArrayList<String> getCollectionDocumentList(String collection) {
+	public ArrayList<DocumentInfo> getCollectionDocumentList(Collection collection) {
 		if (collection == null) {
 			return null;
 		}
-		collection = checkCollectionPlural(collection);
-		//		if (collection.endsWith("s")) {
-		//			collection = collection.substring(0, collection.length()-1);
-		//		}
-		String baseQuery = "{\"return\":[\"COLLECTIONNAME/Id\"],\"select\":[],\"enclose\":1}";
-		baseQuery = baseQuery.replace("COLLECTIONNAME", collection);
-		String tagName = "Id";
-
-		if (collection.equals("SpeciesAbbreviations")) {
-			baseQuery = "{\"return\":[\"Abbreviations/Name\"],\"select\":[],\"enclose\":1}";
-			tagName = "Name";
-		}
-
-		DBQueryResult result;
+		
+		/**
+		 * xQuery string based on examples in email from MR on 27/9/2023
+		 */
+//		String baseQuery = "<documents> {\r\n"
+		String baseQuery = "<documents xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"> {\r\n"
+				+ "  for $doc in collection(\"COLLECTIONAME\")/DOCUMENTNAME\r\n"
+				+ "  return\r\n"
+				+ "  <doc> {\r\n"
+				+ "      base-uri($doc),  \r\n"
+				+ "      $doc/Id\r\n"
+				+ "   }\r\n"
+				+ "  </doc>\r\n"
+				+ "} </documents>\r\n"
+				+ "";
+		String xQuery = baseQuery.replace("COLLECTIONAME", collection.collectionName());
+		xQuery = xQuery.replace("DOCUMENTNAME", collection.documentName());
+		
+		Queries queries = dbXMLConnect.getTethysQueries();
+		String result = null;
 		try {
-			result = executeQuery(baseQuery);
-		} catch (TethysQueryException e) {
-			System.out.println("Error with query: " + baseQuery);
-			tethysControl.showException(e);
+			result = queries.QueryTethys(xQuery);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		if (result == null) {
 			return null;
 		}
+//		System.out.println(result);
+		ArrayList<DocumentInfo> documentInfos = new ArrayList<>();
 
-		if (result == null || result.queryResult == null) {
-			return null;
-		}
-		Document doc = convertStringToXMLDocument(result.queryResult);
+		Document doc = convertStringToXMLDocument(result);
 		if (doc == null) {
 			return null;
 		}
-		NodeList returns = doc.getElementsByTagName(tagName);
-		ArrayList<String> docIds = new ArrayList<>();
+//		PamguardXMLWriter pamXMLWriter = PamguardXMLWriter.getXMLWriter();
+//		System.out.println(pamXMLWriter.getAsString(doc));
+		/**
+		 * lots of elements along lines of
+		 *     <doc>dbxml:///Deployments/Meygen20229<Id>Meygen20229</Id></doc>
+		 */
+		NodeList returns = doc.getElementsByTagName("doc");
 		int n = returns.getLength();
+		String toStrip = "dbxml:///"+collection.collectionName()+"/";
 		for (int i = 0; i < n; i++) {
 			Node aNode = returns.item(i);
-			String docId = aNode.getTextContent();
-			docIds.add(docId);
+			// this is the doc name with a load of stuff in front, 
+			// e.g. dbxml:///Deployments/1705_Array-2017-09-261705_Array-2017-09-26
+			String nameStr = aNode.getTextContent();
+			nameStr = nameStr.replaceFirst(toStrip, "");
+			String id = null;
+			if (aNode instanceof Element) {
+				id = getElementData((Element) aNode, "Id");
+			}
+			
+			DocumentInfo docInfo = new DocumentInfo(collection, nameStr, id);
+			documentInfos.add(docInfo);
+//			System.out.println(nameStr + "    : " + id);
 		}
-
-		return docIds;
+		return documentInfos;
+		
+		
+		
+		//		if (collection.endsWith("s")) {
+		//			collection = collection.substring(0, collection.length()-1);
+		//		}
+//		String baseQuery = "{\"return\":[\"COLLECTIONNAME/Id\"],\"select\":[],\"enclose\":1}";
+//		baseQuery = baseQuery.replace("COLLECTIONNAME", collection);
+//		String tagName = "Id";
+//
+//		if (collection.equals("SpeciesAbbreviations")) {
+//			baseQuery = "{\"return\":[\"Abbreviations/Name\"],\"select\":[],\"enclose\":1}";
+//			tagName = "Name";
+//		}
+//
+//		DBQueryResult result;
+//		try {
+//			result = executeQuery(baseQuery);
+//		} catch (TethysQueryException e) {
+//			System.out.println("Error with query: " + baseQuery);
+//			tethysControl.showException(e);
+//			return null;
+//		}
+//
+//		if (result == null || result.queryResult == null) {
+//			return null;
+//		}
+//		Document doc = convertStringToXMLDocument(result.queryResult);
+//		if (doc == null) {
+//			return null;
+//		}
+//		NodeList returns = doc.getElementsByTagName(tagName);
+//		ArrayList<String> docIds = new ArrayList<>();
+//		int n = returns.getLength();
+//		for (int i = 0; i < n; i++) {
+//			Node aNode = returns.item(i);
+//			String docId = aNode.getTextContent();
+//			docIds.add(docId);
+//		}
+//
+//		return docIds;
 	}
 
 	public ArrayList<String> getProjectNames() {

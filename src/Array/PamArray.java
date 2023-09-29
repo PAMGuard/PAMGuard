@@ -97,6 +97,11 @@ public class PamArray implements Serializable, Cloneable, ManagedParameters {
 	 */
 	private String instrumentType;
 	
+	/**
+	 * Array Id. Can be anything. Compulsory for Tethys. 
+	 */
+	private String instrumentId;
+	
 	public String getInstrumentType() {
 		return instrumentType;
 	}
@@ -113,10 +118,6 @@ public class PamArray implements Serializable, Cloneable, ManagedParameters {
 		this.instrumentId = instrumentId;
 	}
 
-	/**
-	 * Array Id. Can be anything. Compulsory for Tethys. 
-	 */
-	private String instrumentId;
 
 	//	private int originInterpolation = ORIGIN_USE_LATEST;
 	private int originInterpolation = ORIGIN_USE_PRECEEDING;

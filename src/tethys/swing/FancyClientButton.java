@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.border.EmptyBorder;
 
+import tethys.Collection;
 import tethys.TethysControl;
 import tethys.dbxml.DBXMLConnect;
 
@@ -71,7 +72,7 @@ public class FancyClientButton extends JPanel {
 			dropButton.setBorder(new EmptyBorder(dInsets));
 		}
 
-		String[] collections = DBXMLConnect.collections;
+		Collection[] collections = Collection.mainList();
 		collectionsMenu = new JPopupMenu();
 		boolean isP = tethysControl.getTethysExportParams().listDocsInPamguard;
 		showBrowser = new JCheckBoxMenuItem("Show in Browser", isP == false);
@@ -100,7 +101,7 @@ public class FancyClientButton extends JPanel {
 		collectionsMenu.addSeparator();
 		
 		for (int i = 0; i < collections.length; i++) {
-			JMenuItem menuItem = new JMenuItem(collections[i]);
+			JMenuItem menuItem = new JMenuItem(collections[i].collectionName());
 			menuItem.addActionListener(new OpenCollection(collections[i]));
 			collectionsMenu.add(menuItem);
 		}
@@ -128,9 +129,9 @@ public class FancyClientButton extends JPanel {
 
 	private class OpenCollection implements ActionListener {
 
-		private String collection;
+		private Collection collection;
 
-		public OpenCollection(String collection) {
+		public OpenCollection(Collection collection) {
 			super();
 			this.collection = collection;
 		}

@@ -11,6 +11,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.swing.JFileChooser;
 
@@ -22,6 +25,7 @@ import PamController.PamSettings;
 import PamUtils.PamFileFilter;
 import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
+import tethys.species.swing.SpeciesMapIODialog;
 
 /**
  * Master manager for species maps which will eventually allow for export and import from XML
@@ -154,6 +158,17 @@ public class SpeciesMapManager implements PamSettings {
 	 * @return
 	 */
 	public boolean exportSpeciesMaps(Window parentFrame) {
+		// gather the species maps from the data blocks...
+		gatherSpeciesMaps();
+		GlobalSpeciesMap toExport = SpeciesMapIODialog.showDialog(parentFrame, globalSpeciesMap, true);
+		if (toExport == null) {
+			return false;
+		}
+		if (toExport.getDatablockMaps().size() == 0) {
+			return false;
+		}
+		
+		
 		JFileChooser chooser = getFileChooser();
 		int ans = chooser.showSaveDialog(parentFrame);
 		if (ans != JFileChooser.APPROVE_OPTION) {
@@ -164,7 +179,7 @@ public class SpeciesMapManager implements PamSettings {
 		// write it. 
 		try {
 			ObjectOutputStream op = new ObjectOutputStream(new FileOutputStream(opFile));
-			op.writeObject(getSettingsReference());
+			op.writeObject(toExport);
 			op.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -218,34 +233,66 @@ public class SpeciesMapManager implements PamSettings {
 			e.printStackTrace();
 			return false;
 		}
+
+		GlobalSpeciesMap keptMaps = SpeciesMapIODialog.showDialog(parentFrame, readSpeciesMap, false);
+		if (keptMaps == null) {
+			return false;
+		}
+		if (keptMaps.getDatablockMaps().size() == 0) {
+			return false;
+		}
 		
-		return handleNewSpeciesMap(readSpeciesMap);
+		return handleNewSpeciesMap(keptMaps);
 	}
 
 	private boolean handleNewSpeciesMap(GlobalSpeciesMap readSpeciesMap) {
 		if (readSpeciesMap == null) {
 			return false;
 		}
+		
+		
 		// could put in a dialog to only select parts of the map if we wanted to ? 
 		int ans = WarnOnce.showWarning("Global Species Map", 
-				"Do you want to overwrite ALL PAMGaurd species maps with the imported data ?",
+				"Do you want to overwrite PAMGaurd species maps with the imported data ?",
 				WarnOnce.YES_NO_OPTION);
 		if (ans == WarnOnce.CANCEL_OPTION) {
 			return false;
 		}
-		globalSpeciesMap = readSpeciesMap;
-		// no wupdate all datablock maps since they keep their own copies. 
-		ArrayList<PamDataBlock> allDatablocks = PamController.getInstance().getDataBlocks();
-		for (PamDataBlock aBlock : allDatablocks) {
-			DataBlockSpeciesManager spManager = aBlock.getDatablockSpeciesManager();
-			if (spManager == null) {
+		
+		Set<Entry<String, DataBlockSpeciesMap>> mapSet = readSpeciesMap.getDatablockMaps().entrySet();
+		Iterator<Entry<String, DataBlockSpeciesMap>> iter = mapSet.iterator();
+		while (iter.hasNext()) {
+			Entry<String, DataBlockSpeciesMap> entry = iter.next();
+			PamDataBlock dataBlock = PamController.getInstance().getDataBlockByLongName(entry.getKey());
+			if (dataBlock == null) {
+				String err = String.format("Data block %s does not exist in the current configuration", entry.getKey());
+				WarnOnce.showWarning("Missing data block", err, WarnOnce.WARNING_MESSAGE);
 				continue;
 			}
-			DataBlockSpeciesMap blockMap = globalSpeciesMap.get(aBlock);
-			if (blockMap != null) {
-				spManager.setDatablockSpeciesMap(blockMap);
+			globalSpeciesMap.put(dataBlock, entry.getValue());
+			DataBlockSpeciesManager spManager = dataBlock.getDatablockSpeciesManager();
+			if (spManager == null) {
+				String err = String.format("Data block %s does not have a species manager", entry.getKey());
+				WarnOnce.showWarning("Missing species manager", err, WarnOnce.WARNING_MESSAGE);
+				continue;
 			}
+			spManager.setDatablockSpeciesMap(entry.getValue());
 		}
+		
+		
+//		globalSpeciesMap = readSpeciesMap;
+//		// no wupdate all datablock maps since they keep their own copies. 
+//		ArrayList<PamDataBlock> allDatablocks = PamController.getInstance().getDataBlocks();
+//		for (PamDataBlock aBlock : allDatablocks) {
+//			DataBlockSpeciesManager spManager = aBlock.getDatablockSpeciesManager();
+//			if (spManager == null) {
+//				continue;
+//			}
+//			DataBlockSpeciesMap blockMap = globalSpeciesMap.get(aBlock);
+//			if (blockMap != null) {
+//				spManager.setDatablockSpeciesMap(blockMap);
+//			}
+//		}
 		
 		return true;
 	}

@@ -58,6 +58,7 @@ import tethys.TethysLocationFuncs;
 import tethys.TethysState;
 import tethys.TethysStateObserver;
 import tethys.TethysTimeFuncs;
+import tethys.calibration.CalibrationHandler;
 import tethys.TethysState.StateType;
 import tethys.dbxml.DBXMLConnect;
 import tethys.dbxml.TethysException;
@@ -979,6 +980,7 @@ public class DeploymentHandler implements TethysStateObserver {
 	private String getInstrumentType() {
 		return ArrayManager.getArrayManager().getCurrentArray().getInstrumentType();
 	}
+	
 	/**
 	 * Get a geometry type string for Tethys based on information in the array manager. 
 	 * @return
@@ -1009,12 +1011,15 @@ public class DeploymentHandler implements TethysStateObserver {
 		ArrayList<Hydrophone> phones = array.getHydrophoneArray();
 		int iPhone = 0;
 		long timeMillis = TethysTimeFuncs.millisFromGregorianXML(deployment.getDeploymentDetails().getAudioTimeStamp());
-
+		CalibrationHandler calibrationHandler = tethysControl.getCalibrationHandler();
+		
 		for (Hydrophone aPhone : phones) {
 			PamVector hydLocs = array.getAbsHydrophoneVector(iPhone, timeMillis);
 			Audio audio = new Audio();
 			audio.setNumber(BigInteger.valueOf(iPhone));
-			audio.setSensorId(String.format("Hydrophone %d", iPhone)); // shold replace with serial number if it exists.
+			String id = calibrationHandler.getHydrophoneId(iPhone);
+//			audio.setSensorId(String.format("Hydrophone %d", iPhone)); // should replace with serial number if it exists.
+			audio.setSensorId(id);
 			GeometryTypeM geom = new GeometryTypeM();
 			geom.setXM(hydLocs.getCoordinate(0));
 			geom.setYM(hydLocs.getCoordinate(1));

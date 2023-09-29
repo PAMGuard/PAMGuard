@@ -21,6 +21,8 @@ import PamController.PamController;
 import PamView.dialog.PamDialogPanel;
 import PamView.dialog.warn.WarnOnce;
 import PamView.tables.SwingTableColumnWidths;
+import tethys.Collection;
+import tethys.DocumentInfo;
 import tethys.TethysControl;
 import tethys.dbxml.TethysException;
 
@@ -33,13 +35,13 @@ public class TethysDocumentTable implements PamDialogPanel {
 
 	private TethysControl tethysControl;
 	
-	private String collectionName;
+	private Collection collection;
 	
 	private JTable mainTable;
 	
 	private TableModel tableModel;
 	
-	private ArrayList<String> documentNames;
+	private ArrayList<DocumentInfo> documentInfos;
 	
 	private JPanel mainPanel;
 	
@@ -49,24 +51,24 @@ public class TethysDocumentTable implements PamDialogPanel {
 	 * @param tethysControl
 	 * @param collectionName
 	 */
-	public TethysDocumentTable(TethysControl tethysControl, String collectionName) {
+	public TethysDocumentTable(TethysControl tethysControl, Collection collection) {
 		this.tethysControl = tethysControl;
+		this.collection = collection;
 		mainPanel = new JPanel(new BorderLayout());
 		tableModel = new TableModel();
 		mainTable = new JTable(tableModel);
 		scrollPane = new JScrollPane(mainTable);
 		mainPanel.add(BorderLayout.CENTER, scrollPane);
 		new SwingTableColumnWidths(tethysControl.getUnitName()+"TethysDocumentsTable", mainTable);
-		this.setCollectionName(collectionName);
 		mainTable.addMouseListener(new TableMouse());
 		mainTable.setRowSelectionAllowed(true);
 		mainTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 	}
 	
 	public void updateTableData() {
-		documentNames = tethysControl.getDbxmlQueries().getCollectionDocumentList(collectionName);
-		if (documentNames != null) {
-			Collections.sort(documentNames);
+		documentInfos = tethysControl.getDbxmlQueries().getCollectionDocumentList(collection);
+		if (documentInfos != null) {
+			Collections.sort(documentInfos);
 		}
 		tableModel.fireTableDataChanged();
 	}
@@ -90,21 +92,21 @@ public class TethysDocumentTable implements PamDialogPanel {
 	}
 
 	public void showPopupMenu(MouseEvent e) {
-		if (documentNames == null) {
+		if (documentInfos == null) {
 			return;
 		}
 		int row = mainTable.getSelectedRow();
-		if (row < 0|| row >= documentNames.size()) {
+		if (row < 0|| row >= documentInfos.size()) {
 			return;
 		}
 		
-		String docName = documentNames.get(row);
+		DocumentInfo docInfo = documentInfos.get(row);
 		JPopupMenu popMenu = new JPopupMenu();
-		JMenuItem menuItem = new JMenuItem("Show document " + docName);
+		JMenuItem menuItem = new JMenuItem("Show document " + docInfo);
 		menuItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				showDocument(docName);
+				showDocument(docInfo);
 			}
 		});
 		popMenu.add(menuItem);
@@ -113,11 +115,11 @@ public class TethysDocumentTable implements PamDialogPanel {
 		int[] rows = mainTable.getSelectedRows();
 		if (rows != null && rows.length == 1) {
 //			docName = documentNames.get(rows[0]);
-			menuItem = new JMenuItem("Delete document " + docName);
+			menuItem = new JMenuItem("Delete document " + docInfo);
 			menuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					deleteDocument(docName);
+					deleteDocument(docInfo);
 				}
 			});
 			popMenu.add(menuItem);
@@ -137,18 +139,18 @@ public class TethysDocumentTable implements PamDialogPanel {
 		popMenu.show(e.getComponent(), e.getX(), e.getY());
 	}
 	
-	private void showDocument(String docName) {
-		tethysControl.displayDocument(collectionName, docName);
+	private void showDocument(DocumentInfo docInfo) {
+		tethysControl.displayDocument(docInfo);
 	}
 
-	private void deleteDocument(String docName) {
-		int ans = WarnOnce.showNamedWarning("deletedoc"+collectionName, PamController.getMainFrame(), "Delete document", 
-				"Are you sure you want to delete the document " + docName, WarnOnce.OK_CANCEL_OPTION);
+	private void deleteDocument(DocumentInfo docInfo) {
+		int ans = WarnOnce.showNamedWarning("deletedoc "+ collection.collectionName(), PamController.getMainFrame(), "Delete document", 
+				"Are you sure you want to delete the document " + docInfo, WarnOnce.OK_CANCEL_OPTION);
 		if (ans == WarnOnce.OK_OPTION) {
 			try {
-				tethysControl.getDbxmlConnect().removeDocument(collectionName, docName);
+				tethysControl.getDbxmlConnect().removeDocument(docInfo.getCollection().collectionName(), docInfo.getDocumentId());
 			} catch (TethysException e) {
-				System.out.println("Failed to delete " + docName);
+				System.out.println("Failed to delete " + docInfo);
 				System.out.println(e.getMessage());
 			}
 		}
@@ -156,7 +158,7 @@ public class TethysDocumentTable implements PamDialogPanel {
 	}
 	
 	private void deleteDocuments(int[] rows) {
-		int ans = WarnOnce.showNamedWarning("deletedoc"+collectionName, PamController.getMainFrame(), "Delete documents", 
+		int ans = WarnOnce.showNamedWarning("deletedoc "+collection.collectionName(), PamController.getMainFrame(), "Delete documents", 
 				"Are you sure you want to delete multiple documents ", WarnOnce.OK_CANCEL_OPTION);
 		if (ans != WarnOnce.OK_OPTION) {
 			return;
@@ -165,16 +167,16 @@ public class TethysDocumentTable implements PamDialogPanel {
 		 *  make a new list before anything is deleted since the
 		 *  man list will get updated during deletion and be out of date.  
 		 */
-		String[] docNames = new String[rows.length];
+		DocumentInfo[] docInfos = new DocumentInfo[rows.length];
 		for (int i = 0; i < rows.length; i++) {
-			 docNames[i] = documentNames.get(rows[i]);
+			 docInfos[i] = documentInfos.get(rows[i]);
 		}
 		// now it's safe to delete them. 
-		for (int i = 0; i < docNames.length; i++) {
+		for (int i = 0; i < docInfos.length; i++) {
 			try {
-				tethysControl.getDbxmlConnect().removeDocument(collectionName, docNames[i]);
+				tethysControl.getDbxmlConnect().removeDocument(docInfos[i].getCollection().collectionName(), docInfos[i].getDocumentId());
 			} catch (TethysException e) {
-				System.out.println("Failed to delete " + docNames[i]);
+				System.out.println("Failed to delete " + docInfos[i]);
 				System.out.println(e.getMessage());
 			}
 		}
@@ -183,14 +185,14 @@ public class TethysDocumentTable implements PamDialogPanel {
 
 	private class TableModel extends AbstractTableModel {
 		
-		private String[] columnNames = {"", "Document Id/Name"};
+		private String[] columnNames = {"", "Document Name", "Document Id"};
 
 		@Override
 		public int getRowCount() {
-			if (documentNames == null) {
+			if (documentInfos == null) {
 				return 0;
 			}
-			return documentNames.size();
+			return documentInfos.size();
 		}
 
 		@Override
@@ -200,14 +202,17 @@ public class TethysDocumentTable implements PamDialogPanel {
 
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
-			if (documentNames == null) {
+			if (documentInfos == null) {
 				return null;
 			}
+			DocumentInfo docInfo = documentInfos.get(rowIndex);
 			switch (columnIndex) {
 			case 0:
-				return rowIndex+1;
+				return rowIndex;
 			case 1:
-				return documentNames.get(rowIndex);
+				return docInfo.getDocumentName();
+			case 2:
+				return docInfo.getDocumentId();
 			}
 			return null;
 		}
@@ -241,15 +246,13 @@ public class TethysDocumentTable implements PamDialogPanel {
 	/**
 	 * @return the collectionName
 	 */
-	public String getCollectionName() {
-		return collectionName;
+	public Collection getCollection() {
+		return collection;
 	}
 
-	/**
-	 * @param collectionName the collectionName to set
-	 */
-	public void setCollectionName(String collectionName) {
-		this.collectionName = collectionName;
+	public void setCollection(Collection collection) {
+		this.collection = collection;
 		updateTableData();
 	}
+
 }
