@@ -242,7 +242,7 @@ public class DetectionGrouper {
 	/**
 	 * Close the existing group and make a new one. 
 	 */
-	private synchronized void closeMotherGroup() {
+	public synchronized void closeMotherGroup() {
 		processFirstGroup(motherGroup);
 		motherGroup = new FirstGrouping(maxInterGroupSamples.length, 0, null);
 	
@@ -422,7 +422,7 @@ public class DetectionGrouper {
 			}
 		}
 		if (nAccepted > 0) {
-//			System.out.printf("Accepted %d of %d data combinations\n", detectionGroupedSet.getNumGroups(), totalCombinations);
+			System.out.printf("Accepted %d of %d data combinations\n", detectionGroupedSet.getNumGroups(), totalCombinations);
 			detectionGroupMonitor.newGroupedDataSet(detectionGroupedSet);
 		}
 

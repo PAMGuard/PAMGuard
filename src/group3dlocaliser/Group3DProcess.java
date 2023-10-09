@@ -118,6 +118,9 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 
 	@Override
 	public void pamStop() {
+		
+		///need this here to close the group
+		this.detectionGrouper.closeMotherGroup();
 		String prf = String.format("%s %s ", group3DControl.getUnitName(), localiserAlgorithm3D.getName());
 		System.out.println(cpuMonitor.getSummary(prf));
 	}
@@ -236,19 +239,14 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 					groupLocalisation.sortLocResults();
 					GroupLocResult locResult = groupLocalisation.getGroupLocaResult(0);
 					
-					System.out.println("TEST groupLoc " + locResult);
-
 					if (locResult == null) {
-						System.out.println("TEST localisation 1");
 						continue;
 					}
 					if (bestResult == null) {
-						System.out.println("TEST localisation 2");
 						bestResult = locResult;
 						bestLocalisation = groupLocalisation;
 						bestSet = i;
 					} else if (isBetter(groupSet, detectionGroupedSet.getGroup(bestSet), locResult, bestResult)) {
-						System.out.println("TEST localisation 3");
 						bestResult = locResult;
 						bestLocalisation = groupLocalisation;
 						bestSet = i;
@@ -271,9 +269,6 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 				//note it is important here to make sure bestLoclaisation is null. If we have an array which has a linear
 				//compenent than a set of time delays of only the linear system may return a linear loclaisation in which case, without a
 				// null check, this will always override a group loclaisation. 
-				
-				System.out.println("WHAT _test!" + abstractLocalisation);
-
 				bestLocalisation = abstractLocalisation;
 				bestSet = i;
 			}
