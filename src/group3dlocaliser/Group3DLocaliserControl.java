@@ -19,6 +19,7 @@ import group3dlocaliser.algorithm.crossedbearing.CrossedBearingGroupLocaliser;
 import group3dlocaliser.algorithm.gridsearch.TOADGridSearch;
 import group3dlocaliser.algorithm.hyperbolic.HyperbolicLocaliser;
 import group3dlocaliser.algorithm.toadmcmc.ToadMCMCLocaliser;
+import group3dlocaliser.algorithm.toadmimplex.ToadMimplexLocaliser;
 import group3dlocaliser.algorithm.toadsimplex.ToadSimplexLocaliser;
 import group3dlocaliser.dialog.GroupLocSettingPaneFX;
 import group3dlocaliser.offline.Group3DOfflineTask;
@@ -48,6 +49,7 @@ public class Group3DLocaliserControl extends PamControlledUnit implements PamSet
 		algorithms3D.add(new ToadSimplexLocaliser(this, 2));
 		algorithms3D.add(new ToadSimplexLocaliser(this, 3));
 		algorithms3D.add(new ToadMCMCLocaliser(this));
+		algorithms3D.add(new ToadMimplexLocaliser(this));
 
 //		algorithms3D.add(new TOADGridSearch(this));
 		

@@ -156,9 +156,9 @@ public class VRDisplayFX extends PamBorderPane implements VRPane {
 
 		this.setCenter(holder); 
 
-		//need to open image file here because the FX stuff takes a bit of time to load 
-		//on the FX thread. If this is attempted in control constructor the FX GUI has not 
-		//loaded and so a null pointer exception is thrown. 
+//		//need to open image file here because the FX stuff takes a bit of time to load 
+//		//on the FX thread. If this is attempted in control constructor the FX GUI has not 
+//		//loaded and so a null pointer exception is thrown. 
 		if (this.vrControl.getVRParams().currentImageFile!=null && vrControl.getVRParams().currentImageFile.exists()) {
 
 			vrImagePane.openNewFile(this.vrControl.getVRParams().currentImageFile);
@@ -411,6 +411,11 @@ public class VRDisplayFX extends PamBorderPane implements VRPane {
 	 */
 	public VRSettingsPane getVrSettingsPane() {
 		return vrSettingsPane;
+	}
+
+
+	public VRMetaDataPaneFX getInfoPane() {
+		return getImagePane().getInfoPane();
 	}
 
 

@@ -510,8 +510,9 @@ public class VRImagePane extends PamBorderPane {
 			break;
 		}
 		stackHolder.getChildren().add(vrImage.getNode()); 
+		
 		vrImage.setMedia(currentFile);
-
+		
 		//set the meta data. 
 		infoPane.setMetaText(vrImage.getMetaData());
 		//set the image edit pane. 
@@ -522,6 +523,8 @@ public class VRImagePane extends PamBorderPane {
 
 		//set the control pane. 
 		hidingBottomHolder.setCenter(vrImage.getControlPane());
+		
+
 	}
 
 	/**
@@ -756,6 +759,10 @@ public class VRImagePane extends PamBorderPane {
 	 */
 	private String getDarkStyle() {
 		return PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS();
+	}
+
+	public VRMetaDataPaneFX getInfoPane() {
+		return infoPane;
 	}
 
 
