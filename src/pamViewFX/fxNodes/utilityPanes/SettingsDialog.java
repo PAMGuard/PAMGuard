@@ -2,6 +2,7 @@ package pamViewFX.fxNodes.utilityPanes;
 
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
 import PamController.PamController;
 import PamController.SettingsPane;
@@ -19,7 +20,7 @@ public class SettingsDialog<T> extends PamDialogFX<T>{
 	private SettingsPane<T> settingsPane;
 
 	public SettingsDialog(SettingsPane<T> settingsPane){
-		super(null, settingsPane.getName(), StageStyle.DECORATED);
+		super(PamGuiManagerFX.getInstance().getPrimaryStage() /*TODO - add stage*/, settingsPane.getName(), StageStyle.DECORATED);
 		this.setResizable(true);
 		this.settingsPane=settingsPane;
 		this.setContent(settingsPane.getContentNode());

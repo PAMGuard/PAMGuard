@@ -13,9 +13,11 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.Pane;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxNodes.PamVBox;
+import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamGridPane;
 import pamViewFX.fxNodes.PamSpinner;
 import pamViewFX.validator.PamValidator;
@@ -27,6 +29,8 @@ import pamViewFX.validator.PamValidator;
  *
  */
 public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
+
+	private static final double COLUMN_0_WIDTH = 100;
 
 	/**
 	 * 
@@ -89,7 +93,7 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 	/**
 	 * The main holder pane. 
 	 */
-	private PamVBox mainPane;
+	private PamBorderPane mainPane;
 
 	private InterpSettingsPane interpPane;
 
@@ -99,8 +103,8 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 	public HydrophoneSettingsPane() {
 		super(null); 
 
-		mainPane = new PamVBox(); 
-		mainPane.setSpacing(5);
+		PamVBox holderPane = new PamVBox(); 
+		holderPane.setSpacing(5);
 
 
 		recieverIDLabel = new Label("General");
@@ -114,7 +118,10 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 
 		interpPane = new InterpSettingsPane();
 
-		mainPane.getChildren().addAll(recieverIDLabel, createGeneralPane(), coOrdLabel, createPositionPane(), interpLabel, interpPane); 
+		holderPane.getChildren().addAll(recieverIDLabel, createGeneralPane(), coOrdLabel, createPositionPane(), interpLabel, interpPane); 
+		
+		mainPane = new PamBorderPane(); 
+		mainPane.setCenter(holderPane);
 	}
 
 	//	
@@ -181,7 +188,7 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 
 		recieverIDLabel.setText(recieverString+ " ID Info"); 
 		recieverTypeLabel.setText(recieverString + " type "); 
-		recieverSensLabel.setText(recieverString + " sensitivity ");
+		recieverSensLabel.setText(recieverString + " sens ");
 		dBSensLabel.setText(dbSens); 
 	}
 
@@ -216,17 +223,18 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 		PamGridPane mainControls=new PamGridPane(); 
 		mainControls.setHgap(5);
 		mainControls.setVgap(5);
+	
 
 		int gridy = 0; 
 		Label parentArrayLabel = new Label("Parent Array");
-		parentArrayLabel.setAlignment(Pos.CENTER_RIGHT);
+		parentArrayLabel.setAlignment(Pos.CENTER_LEFT);
 		mainControls.add(parentArrayLabel, 0, gridy);
 		streamers = new ComboBox<String>(); 
 		mainControls.add(streamers, 1, gridy);
 
 		gridy++;
 		mainControls.add(recieverTypeLabel = new Label(""), 0, gridy);
-		recieverTypeLabel.setAlignment(Pos.CENTER_RIGHT);
+		recieverTypeLabel.setAlignment(Pos.CENTER_LEFT);
 		defaultHydro = new ComboBox<String>(); 
 		
 		for (int i=0; i<DefaultHydrophone.values().length; i++) {
@@ -251,7 +259,7 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 
 		gridy++;
 		mainControls.add(recieverSensLabel = new Label(""), 0, gridy);
-		recieverSensLabel.setAlignment(Pos.CENTER_RIGHT);
+		recieverSensLabel.setAlignment(Pos.CENTER_LEFT);
 		hSens = new PamSpinner<Double>(-Double.MAX_VALUE, Double.MAX_VALUE, -200., 1.); 
 		hSens.setEditable(true);
 		
@@ -269,7 +277,7 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 		gridy++;
 		Label preAmpLabel = new Label("Preamplifier gain");
 		mainControls.add(preAmpLabel, 0, gridy);
-		preAmpLabel.setAlignment(Pos.CENTER_RIGHT);
+		preAmpLabel.setAlignment(Pos.CENTER_LEFT);
 		preampGain =new PamSpinner<Double>(-Double.MAX_VALUE, Double.MAX_VALUE, 0., 1.); 
 		preampGain.valueProperty().addListener((obs, oldval, newVal)->{
 			if (ressetHydrophoneType) return;
@@ -283,6 +291,11 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 		mainControls.add(preampGain, 1, gridy);
 		mainControls.add(new Label("dB"), 2, gridy);
 
+	    ColumnConstraints col1 = new ColumnConstraints();
+	    col1.setMinWidth(COLUMN_0_WIDTH);
+	    col1.setMaxWidth(COLUMN_0_WIDTH);
+	    mainControls.getColumnConstraints().addAll(col1);
+		
 		setGeneralInfoLabelText();
 
 
@@ -292,7 +305,7 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 	/**
 	 * Create the pane to allow users to change the position of hydrophones
 	 */
-	private Pane createPositionPane( ){
+	private Pane createPositionPane(){
 
 		double sectionPadding=15; 
 
@@ -313,6 +326,7 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 		PamGridPane positionPane = new PamGridPane(); 
 		positionPane.setHgap(5);
 		positionPane.setVgap(5);
+	
 
 		double maxWidth =10; 
 
@@ -326,7 +340,7 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 		zPos.setMaxWidth(maxWidth);
 		addTextValidator(zPos, "z position"); 
 		depthLabel = new Label("Depth"); 
-		depthLabel.setAlignment(Pos.CENTER_RIGHT);
+		depthLabel.setAlignment(Pos.CENTER);
 
 		xPosErr=new TextField();
 		xPosErr.setMaxWidth(50);
@@ -337,33 +351,64 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 		zPosErr=new TextField();
 		zPosErr.setMaxWidth(50);
 		depthLabel2 = new Label(""); //changes with air or water mode. 
+		depthLabel2.setAlignment(Pos.CENTER);
 		addTextValidator(zPosErr, "z error"); 
 
-		int y=0; 
+		int col=0; 
+		int row =0; 
+		
 		Label xLabel = new Label("x"); 
-		xLabel.setAlignment(Pos.CENTER_RIGHT);
-		positionPane.add(xLabel, 0, y);
-		positionPane.add(xPos, 1, y);
-		positionPane.add(new Label("\u00B1"), 2, y);
-		positionPane.add(xPosErr, 3, y);
-		positionPane.add(new Label("m (right of streamer)"), 4, y);
-		y++; 
-
+		xLabel.setAlignment(Pos.CENTER);
+		
 		Label yLabel = new Label("y"); 
-		yLabel.setAlignment(Pos.CENTER_RIGHT);
-		positionPane.add(yLabel, 0, y);
-		positionPane.add(yPos, 1, y);
-		positionPane.add(new Label("\u00B1"), 2, y);
-		positionPane.add(yPosErr, 3, y);
-		positionPane.add(new Label("m (ahead of streamer)"), 4, y);
-		y++;
+		yLabel.setAlignment(Pos.CENTER);
 
+		col=1;
+		positionPane.add(xLabel, col++, row);
+		positionPane.add(yLabel, col++, row);
+		positionPane.add(depthLabel, col++, row);
 
-		positionPane.add(depthLabel, 0, y);
-		positionPane.add(zPos, 1, y);
-		positionPane.add(new Label("\u00B1"), 2, y);
-		positionPane.add(zPosErr, 3, y);
-		positionPane.add(depthLabel2, 4, y);
+		col=0; 
+		row++; 
+		
+		Label positionLabel = new Label("Position"); 
+		positionPane.add(positionLabel, col++, row);
+		positionPane.add(xPos, col++, row);
+		positionPane.add(yPos, col++, row);
+		positionPane.add(zPos, col++, row);
+		positionPane.add(new Label("(m)"), col++, row);
+
+		col=0;
+		row++;
+		
+		Label errLabel = new Label("Error"); 
+		positionPane.add(errLabel, col++, row);
+		positionPane.add(xPosErr, col++, row);
+		positionPane.add(yPosErr, col++, row);
+		positionPane.add(zPosErr, col++, row);
+		positionPane.add(new Label("(m)"), col++, row);
+
+//		positionPane.add(new Label("\u00B1"), col, 2);
+//		positionPane.add(xPosErr, col, 3);
+//		positionPane.add(new Label("m (right of streamer)"), col, 5);
+		
+		col++; 
+
+//		Label yLabel = new Label("y"); 
+//		yLabel.setAlignment(Pos.CENTER);
+//		positionPane.add(yLabel, col, 0);
+//		positionPane.add(yPos, col, 1);
+//		positionPane.add(new Label("\u00B1"), col, 2);
+//		positionPane.add(yPosErr, col, 3);
+//		positionPane.add(new Label("m (ahead of streamer)"), col, 4);
+//		col++;
+//
+//
+//		positionPane.add(depthLabel, col, 0);
+//		positionPane.add(zPos, col, 1);
+//		positionPane.add(new Label("\u00B1"), col, 2);
+//		positionPane.add(zPosErr, col, 3);
+//		positionPane.add(depthLabel2, col, 4);
 
 		//	    ColumnConstraints col1 = new ColumnConstraints();
 		//	    col1.setHgrow(Priority.ALWAYS);
@@ -373,6 +418,12 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 		//		PamGuiManagerFX.titleFont2style(positionLabel);
 
 		mainControls.getChildren().addAll(positionPane); 
+		
+	    ColumnConstraints col1 = new ColumnConstraints();
+	    col1.setMinWidth(COLUMN_0_WIDTH);
+	    col1.setMaxWidth(COLUMN_0_WIDTH);
+	    positionPane.getColumnConstraints().addAll(col1);
+		
 
 		setCoordsText(); 
 
@@ -469,6 +520,8 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 			hydrophone.setdX(Double.valueOf(xPosErr.getText()));
 			hydrophone.setdY(Double.valueOf(yPosErr.getText()));
 			hydrophone.setdZ(Double.valueOf(zPosErr.getText()));
+
+			
 		}
 		catch (Exception Ex) {
 			System.err.println("There is a problem with one of the parameters in the Coordinates panel");

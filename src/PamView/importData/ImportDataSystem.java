@@ -288,7 +288,7 @@ public class ImportDataSystem<T>  {
 		}
 		
 		public void setSaveProgress(int prog){
-			System.out.println("prog "+prog);
+			//System.out.println("prog "+prog);
 			setProgress(prog);
 		}
 		

@@ -51,6 +51,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 
 /**
@@ -136,10 +137,10 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 
 	private Scene scene; 
 
+	private static PamGuiManagerFX instance; 
 
 	public PamGuiManagerFX(PamController pamController, Object stage) {
 
-		
 		this.pamController=pamController; 
 		pamGuiSettings= new PAMGuiFXSettings(); 
 				
@@ -151,7 +152,16 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 		
 		start(primaryStage);
 		
+		instance=this;
 				
+	}
+	
+	/**
+	 * Get the instance of the PAMGuiManager
+	 * @return the instance; 
+	 */
+	public static PamGuiManagerFX getInstance() {
+		return instance; 
 	}
 	
 	
@@ -577,7 +587,6 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 
 
 	public Stage getMainScene() {
-		// TODO Auto-generated method stub
 		return primaryStage;
 	}
 
@@ -1020,6 +1029,10 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 
 		//TODO
 		
+	}
+
+	public Window getPrimaryStage() {
+		return this.primaryStage;
 	}
 
 

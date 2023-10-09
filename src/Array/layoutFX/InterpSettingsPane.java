@@ -4,6 +4,7 @@ import Array.PamArray;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamGridPane;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.ToggleGroup;
@@ -12,15 +13,21 @@ import javafx.scene.control.ToggleGroup;
 
 /**
  * Dialog component used by both the streamer and the hydrophone dialogs
+ * 
  * @author Doug Gillespie
  *
  */
 public class InterpSettingsPane extends PamBorderPane {
 	
 	private RadioButton useLatest, usePrevious, useInterpolate;
+	
+	
 	private int allowedValues = 0xFF; // bitmap of banned values !
+	
+	ChoiceBox<String> interpBox; 
 
 	public InterpSettingsPane() {
+		
 		PamGridPane gridPane = new PamGridPane(); 
 		gridPane.setVgap(5);
 		

@@ -950,6 +950,68 @@ public class PamArrayUtils {
 		return true; 
 	}
 
+	/**
+	 * Convert primitive long array to Long object array. 
+	 * @param arr - primitive long array
+	 * @return a Long array 
+	 */
+	public static Long[] primitive2Object(long[] arr) {
+		if (arr==null) return null; 
+		
+		Long[] arrL = new Long[arr.length];
+		for (int i=0; i<arr.length; i++) {
+			arrL[i]=arr[i];
+		}
+		return arrL;
+	}
+	
+	
+
+	/**
+	 * Convert primitive double array to Double object array. 
+	 * @param arr - primitive double array
+	 * @return a Double array 
+	 */
+	public static Double[] primitive2Object(double[] arr) {
+		if (arr==null) return null; 
+		
+		Double[] arrL = new Double[arr.length];
+		for (int i=0; i<arr.length; i++) {
+			arrL[i]=arr[i];
+		}
+		return arrL;
+	}
+	
+
+	/**
+	 * Convert primitive int array to Integer object array. 
+	 * @param arr - primitive int array
+	 * @return a Ineteger array 
+	 */
+	public static Integer[] primitive2Object(int[] arr) {
+		if (arr==null) return null; 
+		
+		Integer[] arrL = new Integer[arr.length];
+		for (int i=0; i<arr.length; i++) {
+			arrL[i]=arr[i];
+		}
+		return arrL;
+	}
+
+
+	public static long[] object2Primitve(Long[] arr) {
+		if (arr==null) return null; 
+		
+		long[] arrL = new long[arr.length];
+		for (int i=0; i<arr.length; i++) {
+			arrL[i]=arr[i].longValue();
+		}
+		return arrL;
+	}
+	
+	
+	
+
 
 
 

@@ -147,7 +147,12 @@ public class CheckWavHeadersPane extends PamBorderPane {
 		else {
 			folderName.setText(folderInputSystem.getCurrentFolder());
 		}
-		folder = new File(folderInputSystem.getCurrentFolder());
+		
+		if (folderInputSystem.getCurrentFolder()!=null){
+			folder = new File(folderInputSystem.getCurrentFolder());
+		}
+		else folder = null; 
+			
 		textArea.setText(" ");
 		allFiles.clear();
 		nFiles = countFiles(folder);

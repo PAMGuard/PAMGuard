@@ -1832,23 +1832,16 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * Updates the entire datamap. 
 	 */
 	public void updateDataMap(){
-		System.out.println("updateDataMap:"); 
 
 		if (DBControlUnit.findDatabaseControl()==null) return;
-		
-		System.out.println("updateDataMap: 1"); 
 
 		ArrayList<PamDataBlock> datablocks=getDataBlocks() ;
 		
-		System.out.println("updateDataMap: 2"); 
-
 		DBControlUnit.findDatabaseControl().updateDataMap(datablocks);
 		
-		System.out.println("updateDataMap: 3"); 
-
-		BinaryStore.findBinaryStoreControl().getDatagramManager().updateDatagrams();
-		
-		System.out.println("updateDataMap: 4"); 
+		if (BinaryStore.findBinaryStoreControl()!=null) {
+			BinaryStore.findBinaryStoreControl().getDatagramManager().updateDatagrams();
+		}
 
 		notifyModelChanged(PamControllerInterface.EXTERNAL_DATA_IMPORTED);
 	}

@@ -9,6 +9,7 @@ import clickDetector.layoutFX.clickClassifiers.ClickClassifyPaneFX;
 import javafx.geometry.HPos;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -176,7 +177,7 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 	/**
 	 * The default pane width
 	 */
-	public static double PREF_PANE_WIDTH=560;
+	public static double PREF_PANE_WIDTH=600;
 	
 	
 	/**
@@ -230,6 +231,7 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 		//trigger pane 
 		triggerFilter=new FilterPaneFX(Orientation.VERTICAL); 
 		pamTabbedPane.getTabs().add(new Tab("Trigger Filter", triggerFilter.getContentNode()));
+		
 
 		//		//echo detection pane. 
 		//		echoDetection= new ClickEchoPane(clickControl); 

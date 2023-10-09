@@ -45,7 +45,9 @@ public class ModuleIconFactory {
 	public  Node getModuleNode(ModuleIcon icon){
 		switch (icon){
 		case ARRAY:
-			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/array_manager.png")));
+//			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/array_manager.png")));
+			return getSVGIcon("/Resources/modules/Array Icon2.svg",Color.BLACK, 3);
+
 		case BINARY:
 //			return PamGlyphDude.createModuleGlyph(OctIcon.FILE_BINARY); 
 			return PamGlyphDude.createModuleIcon("mdi2f-file-star-outline"); 

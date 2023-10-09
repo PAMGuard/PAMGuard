@@ -68,7 +68,7 @@ public class HydrophonesPane extends PamBorderPane {
 			pamFlipePane = new PamFlipPane(); 
 			pamFlipePane.getAdvLabel().setText("Hydrophone Settings");
 			
-			((Pane) hydrophonePane.getContentNode()).setPadding(new Insets(5,5,5,5)); 
+			((Pane) hydrophonePane.getContentNode()).setPadding(new Insets(5,5,5,15)); 
 			
 			pamFlipePane.setAdvPaneContent(hydrophonePane.getContentNode()); 
 			pamFlipePane.setFrontContent(tableArrayPane);
@@ -78,11 +78,21 @@ public class HydrophonesPane extends PamBorderPane {
 			pamFlipePane.flipFrontProperty().addListener((obsval, oldVal, newVal)->{
 				//the flip pane
 				if (newVal) {
+					
 					Hydrophone hydro = hydrophonePane.getParams(currentHydrophoneData.getHydrophone());
+					
+//					System.out.println("Hydro: " + currentHydrophoneData.getX().get()+ " "  + currentHydrophoneData.getY().get() + "  " + currentHydrophoneData.getZ().get() + " ID: " +hydro.getID()); 
+//					System.out.println("Hydro err: " + currentHydrophoneData.getXErr().get()+ " "  + currentHydrophoneData.getYErr().get() + "  " + currentHydrophoneData.getZErr().get()); 
+
 					currentHydrophoneData.setHydrophone(hydro);
 
 					//need to refresh table to show symbol. 
 					tableArrayPane.getTableView().refresh();
+//					
+//					System.out.println("Table size: " + tableArrayPane.getTableView().getItems().size()); 
+//					for (int i=0; i<tableArrayPane.getTableView().getItems().size(); i++) {
+//						System.out.println("Item : " + tableArrayPane.getTableView().getItems().get(i) + "  " + currentHydrophoneData);
+//					}
 				}
 			});
 		
@@ -98,38 +108,45 @@ public class HydrophonesPane extends PamBorderPane {
 
 		public HydrophoneTable(ObservableList<HydrophoneProperty> hydrophoneData) {
 			super(hydrophoneData);
+			
 			//need to set up all the rows.
-			TableColumn<HydrophoneProperty,Number>  streamerID = new TableColumn<HydrophoneProperty,Number>("ID");
-			streamerID.setCellValueFactory(cellData -> cellData.getValue().getID());
-			streamerID.setEditable(false);
+			TableColumn<HydrophoneProperty,Number>  hydroID = new TableColumn<HydrophoneProperty,Number>("ID");
+			hydroID.setCellValueFactory(cellData -> cellData.getValue().getID());
+			hydroID.setEditable(false);
 			
 			
-			TableColumn<HydrophoneProperty,Number>  x = new TableColumn<HydrophoneProperty,Number>("x (m)");
+			TableColumn<HydrophoneProperty,Number>  x = new TableColumn<HydrophoneProperty,Number>("x");
 			x.setCellValueFactory(cellData -> cellData.getValue().getX());
 			x.setEditable(false);
 			
-			TableColumn<HydrophoneProperty,Number>  y = new TableColumn<HydrophoneProperty,Number>("y (m)");
+			TableColumn<HydrophoneProperty,Number>  y = new TableColumn<HydrophoneProperty,Number>("y");
 			y.setCellValueFactory(cellData -> cellData.getValue().getY());
 			y.setEditable(false);
 			
-			TableColumn<HydrophoneProperty,Number>  z = new TableColumn<HydrophoneProperty,Number>("depth (m)");
+			TableColumn<HydrophoneProperty,Number>  z = new TableColumn<HydrophoneProperty,Number>("depth");
 			z.setCellValueFactory(cellData -> cellData.getValue().getZ());
 			z.setEditable(false);
 
 			
-			TableColumn<HydrophoneProperty,Number>  xErr = new TableColumn<HydrophoneProperty,Number>("x error (m)");
-			x.setCellValueFactory(cellData -> cellData.getValue().getX());
-			x.setEditable(false);
+			TableColumn posColumn=new TableColumn("Position (m)"); 
+			posColumn.getColumns().addAll(x, y, z);
 			
-			TableColumn<HydrophoneProperty,Number>  yErr = new TableColumn<HydrophoneProperty,Number>("y error (m)");
-			y.setCellValueFactory(cellData -> cellData.getValue().getY());
-			y.setEditable(false);
+			TableColumn<HydrophoneProperty,Number>  xErr = new TableColumn<HydrophoneProperty,Number>("x");
+			xErr.setCellValueFactory(cellData -> cellData.getValue().getXErr());
+			xErr.setEditable(false);
 			
-			TableColumn<HydrophoneProperty,Number>  zErr = new TableColumn<HydrophoneProperty,Number>("z error (m)");
-			z.setCellValueFactory(cellData -> cellData.getValue().getZ());
-			z.setEditable(false);
+			TableColumn<HydrophoneProperty,Number>  yErr = new TableColumn<HydrophoneProperty,Number>("y");
+			yErr.setCellValueFactory(cellData -> cellData.getValue().getYErr());
+			yErr.setEditable(false);
+			
+			TableColumn<HydrophoneProperty,Number>  zErr = new TableColumn<HydrophoneProperty,Number>("z");
+			zErr.setCellValueFactory(cellData -> cellData.getValue().getZErr());
+			zErr.setEditable(false);
+			
+			TableColumn errorColumn=new TableColumn("Errors (m)"); 
+			errorColumn.getColumns().addAll(xErr, yErr, zErr);
 
-			getTableView().getColumns().addAll(streamerID, x, y, z, xErr, yErr, zErr);
+			getTableView().getColumns().addAll(hydroID, posColumn, errorColumn);
 
 		}
 
@@ -156,8 +173,7 @@ public class HydrophonesPane extends PamBorderPane {
 			
 			hydrophonePane.setCurrentArray(currentArray);
 			hydrophonePane.setParams(data.getHydrophone());
-			
-			
+		
 			currentHydrophoneData = data; 
 			
 			pamFlipePane.flipToBack();	
@@ -179,7 +195,6 @@ public class HydrophonesPane extends PamBorderPane {
 		@Override
 		public void createNewData(){
 			//create a new classifier. 
-//			this.getDa
 			hydrophoneList.add(createDefaultHydrophoneProperty(hydrophoneList.size())); 
 		}
 

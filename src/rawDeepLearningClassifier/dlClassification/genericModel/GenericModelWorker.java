@@ -36,14 +36,14 @@ public class GenericModelWorker extends DLModelWorker<GenericPrediction> {
 		//System.out.println("RUN GENERIC MODEL: " + transformedDataStack[0][0][0]);
 		float[]  results; 
 		if (freqTransform)
-			results =  genericModel.runModel2(transformedDataStack);
+			results =  genericModel.runModel(transformedDataStack);
 		else {
 			//run a model if it is waveform info. 
 			float[][] waveStack = new float[transformedDataStack.length][]; 
 			for (int i=0; i<waveStack.length; i++) {
 				waveStack[i] = transformedDataStack[i][0]; 
 			}
-			results =  genericModel.runModel1(waveStack);
+			results =  genericModel.runModel(waveStack);
 		}
 		//System.out.println("GENERIC MODEL RESULTS: " + results== null ? null : results.length);
 		return results;

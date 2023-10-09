@@ -114,6 +114,8 @@ public class PamFlipPane extends FlipPane {
 			this.flipToFront(); 
 		});
 		
+		backButton.setStyle("-fx-background-radius: 0 5 5 0; -fx-border-radius: 0 5 5 0;");
+
 		//backButton.setPrefWidth(150);
 		
 		PamBorderPane advPane = new PamBorderPane(); 

@@ -35,10 +35,17 @@ public class HydrophoneProperty {
 	
 	public void setHydrophone(Hydrophone hydrophone) {
 		this.hydrophone = hydrophone;
+		
+		
 		x .set(hydrophone.getX());
 		y .set(hydrophone.getY());
 		z .set(hydrophone.getZ());
-		id.set(hydrophone.getStreamerId());
+		
+		xErr .set(hydrophone.getdX());
+		yErr .set(hydrophone.getdY());
+		zErr .set(hydrophone.getdZ());
+		
+		id.set(hydrophone.getID());
 	}
 
 	/**
@@ -71,6 +78,30 @@ public class HydrophoneProperty {
 
 	public Hydrophone getHydrophone() {
 		return hydrophone;
+	}
+
+	/**
+	 * The x-coordinate property.
+	 * @return the x coordintae property. 
+	 */
+	public SimpleDoubleProperty getXErr() {
+		return xErr;
+	}
+	
+	/**
+	 * The y-coordinate property.
+	 * @return the y coordintae property. 
+	 */
+	public SimpleDoubleProperty getYErr() {
+		return yErr;
+	}
+	
+	/**
+	 * The z-coordinate property.
+	 * @return the z coordintae property. 
+	 */
+	public SimpleDoubleProperty getZErr() {
+		return zErr;
 	}
 
 }
