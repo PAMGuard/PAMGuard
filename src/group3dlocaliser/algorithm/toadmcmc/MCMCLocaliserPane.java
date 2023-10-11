@@ -8,11 +8,11 @@ import javafx.scene.layout.Pane;
 import javafx.geometry.Insets;
 
 
-public class MCMCLoclaiserPane extends LocaliserPane<MCMCParams2> {
+public class MCMCLocaliserPane extends LocaliserPane<MCMCParams2> {
 
 	private MCMCPane mainPane;
 
-	public MCMCLoclaiserPane() {
+	public MCMCLocaliserPane() {
 		mainPane = new MCMCPane(); 
 		((Pane) mainPane.getContentNode()).setPadding(new Insets(5,5,5,5)); 
 	}

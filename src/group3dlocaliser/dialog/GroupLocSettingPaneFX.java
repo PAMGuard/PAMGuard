@@ -464,7 +464,7 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 			if (algoProvider.getAlgorithmSettingsPane()!=null)  {
 				
 				//note that if params are null but a pane exists the algorithm needs to make a new set of params. 
-				algoProvider.getAlgorithmSettingsPane().setParams(params.getAlgorithmParameters());
+				algoProvider.getAlgorithmSettingsPane().setParams(params == null? null : params.getAlgorithmParameters());
 			}
 			
 			if (algoProvider.getSourceSettingsPane(null, currSource)!=null) {

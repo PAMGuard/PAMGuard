@@ -42,7 +42,7 @@ public class ToadMCMCLocaliser extends TOADBaseAlgorithm {
 	 */
 	private CPUMonitor cpuMCMC;
 
-	private MCMCLoclaiserPane mcmcSettingsPane; 
+	private MCMCLocaliserPane mcmcSettingsPane; 
 
 	public ToadMCMCLocaliser(Group3DLocaliserControl group3dLocaliser) {
 		super(group3dLocaliser);
@@ -76,7 +76,7 @@ public class ToadMCMCLocaliser extends TOADBaseAlgorithm {
 	@Override
 	public LocaliserPane getAlgorithmSettingsPane() {
 		if (mcmcSettingsPane==null) {
-			mcmcSettingsPane = new MCMCLoclaiserPane(); 
+			mcmcSettingsPane = new MCMCLocaliserPane(); 
 		}
 		return mcmcSettingsPane;
 	}

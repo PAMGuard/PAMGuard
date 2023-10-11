@@ -1,5 +1,6 @@
 package Array.layoutFX;
 
+import Array.Hydrophone;
 import Array.PamArray;
 import Array.Streamer;
 import javafx.collections.FXCollections;
@@ -124,7 +125,8 @@ public class StreamerPane extends PamBorderPane {
 
 		@Override
 		public void dialogClosed(StreamerProperty data) {
-			// TODO Auto-generated method stub	
+			Streamer hydro = streamerPane.getParams(data.getStreamer());
+			data.setStreamer(hydro);
 		}
 
 		@Override
@@ -132,13 +134,21 @@ public class StreamerPane extends PamBorderPane {
 			//we do not use dialogs here- sliding pane instead. 
 			//			setClassifierPane(data);
 			//			showFlipPane(true);		
+			pamFlipePane.flipToBack();	
 			return null;
 		}
 
 		@Override
 		public void editData(StreamerProperty data){
-			//			setClassifierPane(data);
-			//showFlipPane(true);		
+
+			pamFlipePane.getAdvLabel().setText("Streamer " +  data.getID().get() + " Settings");
+			
+//			streamerPane.setCurrentArray(currentArray);
+			streamerPane.setParams(data.getStreamer());
+		
+			currentStreamerData = data; 
+			
+			pamFlipePane.flipToBack();					
 		}
 
 		@Override

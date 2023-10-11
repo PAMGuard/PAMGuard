@@ -63,7 +63,7 @@ public class TOADSettingsPaneWithChannels<T> extends ToadManagedSettingsPane<T> 
 
 	@Override
 	public T findParams() {
-		System.out.println("CHANNELS: Get channel map: " +  toadBaseAlgorithm.getToadBaseParams().getChannelBitmap() + "  " +  PamUtils.getNumChannels(toadBaseAlgorithm.getToadBaseParams().getChannelBitmap()));
+		//System.out.println("CHANNELS: Get channel map: " +  toadBaseAlgorithm.getToadBaseParams().getChannelBitmap() + "  " +  PamUtils.getNumChannels(toadBaseAlgorithm.getToadBaseParams().getChannelBitmap()));
 		channelPanel.setChannelMap(toadBaseAlgorithm.getToadBaseParams().getChannelBitmap());
 		toadOptionsPane.setParams(toadBaseAlgorithm.getToadBaseParams());
 		return null;

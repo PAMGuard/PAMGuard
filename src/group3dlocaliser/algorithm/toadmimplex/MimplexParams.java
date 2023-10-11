@@ -12,6 +12,6 @@ public class MimplexParams extends MCMCParams2 {
 	/**
 	 * Always use the first combination
 	 */
-	public static boolean useFirstCombination; 
+	public  boolean useFirstCombination = true;
 
 }

@@ -103,6 +103,7 @@ abstract public class TOADBaseAlgorithm extends LocaliserAlgorithm3D {
 		}
 		double sampleRate = 0;
 		for (PamDataUnit aDataUnit:subDetections) {
+			//System.out.println("Channels: " + aDataUnit.getChannelBitmap());
 			allChannels |= aDataUnit.getChannelBitmap();
 			sampleRate = aDataUnit.getParentDataBlock().getSampleRate();
 		}
@@ -131,6 +132,9 @@ abstract public class TOADBaseAlgorithm extends LocaliserAlgorithm3D {
 		TOADInformation toadInformation = toadCalculator.getTOADInformation(superDetection.getSubDetections(), sampleRate, allChannels, geometry);
 
 		boolean toadOK = checkTOADInformation(toadInformation);
+		
+		System.out.println("ToadOK: " + toadOK + " toadInformation: " + toadInformation + " allChannels: " + allChannels + " geometry: " + geometry);
+
 		if (!toadOK) {
 			return null;
 		}
