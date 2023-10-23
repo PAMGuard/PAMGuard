@@ -62,7 +62,7 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 		group3dDataBlock.setPamSymbolManager(new Group3DSymbolManager(group3DControl, group3dDataBlock,
 				Group3DOverlayDraw.defaultSymbol.getSymbolData()));
 		group3dLogging = new Group3DLogging(group3DControl, group3dDataBlock);
-		group3dDataBlock.SetLogging(group3dLogging);
+		group3dDataBlock.SetLogging(group3dLogging);		
 	}
 
 	/*
@@ -234,6 +234,7 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 
 			if (abstractLocalisation instanceof GroupLocalisation) {
 				groupLocalisation = (GroupLocalisation) abstractLocalisation;
+				
 				cpuMonitor.stop();
 				if (groupLocalisation != null) {
 					groupLocalisation.sortLocResults();

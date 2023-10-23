@@ -122,7 +122,7 @@ public class ToadMimplexLocaliser extends ToadMCMCLocaliser {
 			group3dDataUnits[i] = new Group3DDataUnit(preGroups.getGroup(i));
 
 
-			GroupLocalisation preAbstractLocalisation; 
+			GroupLocalisation preAbstractLocalisation = null;
 			double minChi2 = Double.MAX_VALUE;
 
 			GroupLocResult locResult = null;
@@ -130,8 +130,14 @@ public class ToadMimplexLocaliser extends ToadMCMCLocaliser {
 
 				locResult = null; 
 				minChi2=Double.MAX_VALUE;
-
-				preAbstractLocalisation = (GroupLocalisation) model.runModel(group3dDataUnits[i], null, false);
+				 preAbstractLocalisation = null; //must reset this. 
+				try {
+					preAbstractLocalisation = (GroupLocalisation) model.runModel(group3dDataUnits[i], null, false);
+				}
+				catch (Exception e) {
+					System.out.println("Mimplex pre filter loclaisation failed"); 
+					e.printStackTrace();
+				}
 				
 //				System.out.println("Pre-localisation result: " + locResult + "  " + model.getName() + "N units: " + preGroups.getGroup(i).size());
 				

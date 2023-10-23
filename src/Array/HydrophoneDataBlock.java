@@ -103,6 +103,7 @@ public class HydrophoneDataBlock extends PamDataBlock<HydrophoneDataUnit> {
 			}
 			unit = listIterator.previous();
 			difference = Math.abs(startTime	- unit.getTimeMilliseconds());
+			
 			while (listIterator.hasPrevious()) {
 				preceedingUnit = listIterator.previous();
 				if (preceedingUnit.getHydrophone().getID()!=ihydrophone) {
@@ -110,6 +111,7 @@ public class HydrophoneDataBlock extends PamDataBlock<HydrophoneDataUnit> {
 				}
 				newdifference = Math.abs(startTime- preceedingUnit.getTimeMilliseconds());
 				if (newdifference > difference) {
+//					System.out.println("Hydrophone datablock: newDifference: " + newdifference + " " + unit.getHydrophone().getZ()); 
 					return unit;
 				}
 				else {

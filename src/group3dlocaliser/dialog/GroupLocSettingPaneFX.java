@@ -59,9 +59,10 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 	
 	public GroupLocSettingPaneFX(Group3DLocaliserControl group3dLocaliserControl, Object ownerWindow) {
 		super(ownerWindow);		
+
 		this.ownerWindow = ownerWindow;
 		this.group3dLocaliserControl = group3dLocaliserControl;
-		
+
 		PamTabPane tabPane = new PamTabPane();
 		tabPane.setAddTabButton(false);
 		tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
@@ -91,12 +92,11 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 		borderPane.setCenter(gsp);
 		tabPane.getTabs().add(new Tab("Detection source", borderPane));
 		
-		
-		
 		algorithms = new ChoiceBox<>();
 		setAlgorithmList(); // call here so that box gets correct size. 
 		
 		PamBorderPane algoGrid = new PamBorderPane();
+		
 //		HBox.setHgrow(algoGrid, Priority.ALWAYS);
 		algoGrid.setCenter(algorithms);
 		algorithms.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -116,6 +116,7 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 		algoMainPane.setCenter(algoSourceHolder);
 		tabPane.getTabs().add(new Tab("Localisation", algoMainPane));
 		
+		
 //		algoOptsButton.setOnAction(new EventHandler<ActionEvent>() {
 //			@Override
 //			public void handle(ActionEvent event) {
@@ -131,6 +132,7 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 		});
 		
 		mainPane.setCenter(tabPane);
+		
 	}
 
 	/**
@@ -155,7 +157,7 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 			return;
 		}
 		LocaliserAlgorithm3D localiserAlgorithm = group3dLocaliserControl.findAlgorithm(algoName);
-		System.out.println(" selectAlgorithm: object " + localiserAlgorithm);
+		//System.out.println(" selectAlgorithm: object " + localiserAlgorithm);
 
 		if (localiserAlgorithm == null) {
 			//algoOptsButton.setDisable(true);
@@ -285,6 +287,8 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 
 	@Override
 	public Group3DParams getParams(Group3DParams currParams) {
+		if (currParams==null) currParams = new Group3DParams();
+		
 		PamDataBlock<?> currSource = sourcePanel.getSource();
 		if (currSource == null) {
 			SwingFXDialogWarning.showWarning(this.getOwnerWindow(), "Invalid DataBlock", "You must select a data source");
@@ -347,8 +351,6 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 			
 			
 			System.out.println("Get params" + algoProvider.getName() + "  " + currParams.getAlgorithmParams(algoProvider)); 
-
-
 		
 		}
 		
@@ -378,6 +380,8 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 		
 		return currParams;
 	}
+	
+	
 	private LocaliserAlgorithm3D getSelectedAlgorithm() {
 		String algoName  = algorithms.getSelectionModel().getSelectedItem();
 		if (algoName == null) {
@@ -388,6 +392,7 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 
 	@Override
 	public void setParams(Group3DParams input) {
+		
 		sourcePanel.setSourceList();
 		sourcePanel.setSource(input.getSourceName());
 //		sourcePanel.setChannelList(input.getGroupedSourceParams().getChanOrSeqBitmap());
@@ -400,7 +405,6 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 		currentParams = input;
 		newDataBlockSelection(sourcePanel.getSource());
 	
-
 	}
 	
 	/**
@@ -413,22 +417,32 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 		PamDataBlock inputDataBlock = sourcePanel.getSource();
 		algorithms.getItems().clear();
 		ArrayList<LocaliserAlgorithm3D> algoList = group3dLocaliserControl.getAlgorithmProviders();
+		
+		int shape = 0;
+		
+		//Note that, if there is a lot of data in the hydrophone data block this next chunk can take a second or so to prcoess. 
+		//Must keep it outside the for loop or there is a long freeze. 
+		if (inputDataBlock != null) {
+			int phones = inputDataBlock.getHydrophoneMap();
+			shape = ArrayManager.getArrayManager().getArrayType(phones);
+		}
+
 		for (int i = 0; i < algoList.size(); i++) {
 			LocaliserAlgorithm3D algo = algoList.get(i);
 			if (inputDataBlock != null && algo.canLocalise(inputDataBlock) == false) {
 				continue;
 			}
+			
 			if (inputDataBlock != null) {
-				int phones = inputDataBlock.getHydrophoneMap();
-				int shape = ArrayManager.getArrayManager().getArrayType(phones);
-				ArrayManager.getArrayManager().getArrayType(phones);
 				if (algo.canArrayShape(shape) == false) {
 					continue;
 				}
 			}
+			
 			if (algo == currAlgo) {
 				currentIndex = algorithms.getItems().size();
 			}
+			
 			algorithms.getItems().add(algo.getName());
 		}
 		if (currentIndex >= 0) {

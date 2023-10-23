@@ -1,16 +1,13 @@
 package group3dlocaliser.algorithm.toadmimplex;
 
 import Localiser.LocaliserPane;
-import Localiser.algorithms.genericLocaliser.MCMC.MCMCParams2;
 import Localiser.controls.MCMCPane;
-import group3dlocaliser.algorithm.toadmcmc.MCMCLocaliserPane;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.utilityPanes.PamToggleSwitch;
 

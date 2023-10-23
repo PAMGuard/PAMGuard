@@ -1047,12 +1047,17 @@ public class ArrayManager extends PamControlledUnit implements PamSettings, PamO
 			/**
 			 * Rotate the hydrophone about the centre of it's streamer. 
 			 */
-			Hydrophone hydrophone = currentArray.getHiddenHydrophone(i);
+//			Hydrophone hydrophone = currentArray.getHiddenHydrophone(i);
+			Hydrophone hydrophone = currentArray.getHydrophone(i, timeMillis);
+			
+			
+			
 			if (hydrophone == null) {
 				continue;
 			}
 			PamVector hydrophoneVec = hydrophone.getVector();
 			PamVector hydrophoneErrorVec = hydrophone.getErrorVector();
+						
 			if (streamerQuaternion != null) {
 				hydrophoneVec = PamVector.rotateVector(hydrophoneVec, streamerQuaternion);
 				hydrophoneErrorVec = PamVector.rotateVector(hydrophoneErrorVec, streamerQuaternion);

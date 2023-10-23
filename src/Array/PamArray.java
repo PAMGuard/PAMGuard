@@ -38,6 +38,7 @@ import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
 import PamUtils.LatLong;
 import PamUtils.PamArrayUtils;
+import PamUtils.PamCalendar;
 import PamView.PamSymbol;
 import PamguardMVC.ChannelIterator;
 import PamguardMVC.PamConstants;
@@ -237,7 +238,9 @@ public class PamArray implements Serializable, Cloneable, ManagedParameters {
 	}
 
 	protected Hydrophone getHydrophone(int iPhone, long timeMilliseconds) {
-		//		Debug.println("PAMArray: Get hydrophone coords: " + timeMilliseconds + " iPhone: " + iPhone);
+//		System.out.println("PAMArray: Get hydrophone coords: " + PamCalendar.formatDateTime(timeMilliseconds) + " iPhone: " + iPhone);
+		
+
 		if (hydrophoneInterpolation == ORIGIN_USE_LATEST) {
 			return getHydrophone(iPhone);
 		}
@@ -247,12 +250,14 @@ public class PamArray implements Serializable, Cloneable, ManagedParameters {
 
 		//FIXME - for some reason the above lines were always returning the first hydrophone in the datablock ^
 		HydrophoneDataUnit hdu = ArrayManager.getArrayManager().getHydrophoneDataBlock().getClosestHydrophone(timeMilliseconds, iPhone); 
+		
+//		System.out.println("PAMArray: hdu: " + hdu + " " + (hdu==null? null: PamCalendar.formatDateTime(hdu.getTimeMilliseconds()) + " Z" + hdu.getHydrophone().getdZ()));
 
 		if (hdu != null) {
-			//			Debug.println("PAMArray: found unit: " + hdu.getTimeMilliseconds());
-			//			long firstTime = ArrayManager.getArrayManager().getHydrophoneDataBlock().getFirstUnit().getTimeMilliseconds();
-			//			long lastTime = ArrayManager.getArrayManager().getHydrophoneDataBlock().getLastUnit().getTimeMilliseconds(); 
-			//			Debug.println("PAMArray: found unit: " + firstTime + " " + lastTime + " no: units: " + ArrayManager.getArrayManager().getHydrophoneDataBlock().getUnitsCount()); 
+//						System.out.println("PAMArray: found unit: " + hdu.getTimeMilliseconds());
+//						long firstTime = ArrayManager.getArrayManager().getHydrophoneDataBlock().getFirstUnit().getTimeMilliseconds();
+//						long lastTime = ArrayManager.getArrayManager().getHydrophoneDataBlock().getLastUnit().getTimeMilliseconds(); 
+//						System.out.println("PAMArray: found unit: " + firstTime + " " + lastTime + " no: units: " + ArrayManager.getArrayManager().getHydrophoneDataBlock().getUnitsCount()); 
 			// TODO should maybe do something here to average out two hydrophones if interpolation option is selected. 
 			return hdu.getHydrophone();
 		}

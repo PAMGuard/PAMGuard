@@ -124,6 +124,10 @@ abstract public class TOADBaseAlgorithm extends LocaliserAlgorithm3D {
 
 		SnapshotGeometry geometry = ArrayManager.getArrayManager().getSnapshotGeometry(hydrophoneMap, 
 				groupDataUnit.getTimeMilliseconds());
+		
+		
+		System.out.println("HYDROPHONE 0 POSITION: "+  groupDataUnit.getTimeMilliseconds() + "  " + geometry.getGeometry()[0]);
+
 
 		//		if (groupDataUnit.getSubDetection(0).getUID() == 9035003222L) {
 		//		if (superDetection.getSubDetection(0).getUID() == 9035004477L) {
@@ -133,7 +137,7 @@ abstract public class TOADBaseAlgorithm extends LocaliserAlgorithm3D {
 
 		boolean toadOK = checkTOADInformation(toadInformation);
 		
-		System.out.println("ToadOK: " + toadOK + " toadInformation: " + toadInformation + " allChannels: " + allChannels + " geometry: " + geometry);
+//		System.out.println("ToadOK: " + toadOK + " toadInformation: " + toadInformation + " allChannels: " + allChannels + " geometry: " + geometry);
 
 		if (!toadOK) {
 			return null;
@@ -789,7 +793,7 @@ abstract public class TOADBaseAlgorithm extends LocaliserAlgorithm3D {
 		//		return new TOADSourcePane(parent);
 		//		return toadCalculator.getSettingsPane();
 		
-		System.out.println("Get source settings pane: " +toadCalculator + "  " + tspwc); 
+		//System.out.println("Get source settings pane: " +toadCalculator + "  " + tspwc); 
 
 		if (toadCalculator != null && tspwc == null) {
 			/*
