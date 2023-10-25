@@ -91,13 +91,12 @@ public class ErrorEllipse {
 	 * The dimensions of the ellipse/ellipsoid. This is generally a,b for 2D and a, b, c for 3D 
 	 * the ellipse/ellipsoid is described by x^2/a + y^2/b+ z^2/c =1. c is -1 if a 2D ellipse. 
 	 */
-	private double[] ellipseDim; 
+	private double[] ellipseDim = new double[]{0,0,0};
 
 	/**
 	 * The angle of the ellipsoid in RADIANS. Angles are euler angles and in order heading pitch and roll.  
 	 */
-	private double[] angles; 
-
+	private double[] angles = new double[]{0,0,0};
 
 	/**
 	 * Generate an error ellipse from a set of points. The dimensions of the error ellipse is by
@@ -165,6 +164,10 @@ public class ErrorEllipse {
 	public void calcErrorEllipse(double[][] points){
 		if (points==null){
 			return; 
+		}
+		
+		if (points.length<3) {
+			return;
 		}
 
 		Covariance cov= new Covariance(points, false); 

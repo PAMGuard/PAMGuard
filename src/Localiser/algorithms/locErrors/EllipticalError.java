@@ -113,6 +113,9 @@ public class EllipticalError implements LocaliserError {
 	@Override
 	public String getStringResult() {
 		String description=""; 
+		if (errorEllipse==null) {
+			return "Elliptical error is null";
+		}
 		if (!errorEllipse.is3D()){
 			description+=String.format("<i>&ensp 2D Elliptical error: <br>&ensp Radii: ");
 			for (int i=0; i<errorEllipse.getEllipseDim().length; i++){
