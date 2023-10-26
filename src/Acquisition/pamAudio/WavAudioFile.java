@@ -14,6 +14,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import org.codehaus.plexus.util.FileUtils;
 import Acquisition.offlineFuncs.AquisitionLoadPoint;
 import PamDetection.RawDataUnit;
+//import PamUtils.CPUMonitor;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import dataMap.OfflineDataMap;
@@ -70,9 +71,13 @@ public class WavAudioFile implements PamAudioFileLoader {
 		FileDataMapPoint mapPoint = offlineFileServer.findFirstMapPoint(mapIt, offlineDataLoadInfo.getStartMillis(), offlineDataLoadInfo.getEndMillis());
 
 		if (openSoundFile(mapPoint.getSoundFile()) == false) {
-			System.out.println("Could not open .wav sound file " + mapPoint.getSoundFile().getAbsolutePath());
+			System.out.println("Could not open sound file " + mapPoint.getSoundFile().getAbsolutePath());
 			return false;
 		}
+		if (offlineDataLoadInfo.cancel) {
+			return false;
+		}
+		
 		File soundFile;
 
 		ByteConverter byteConverter = ByteConverter.createByteConverter(audioFormat);
@@ -106,7 +111,11 @@ public class WavAudioFile implements PamAudioFileLoader {
 			try {
 
 				//System.out.println("Skipped " + skipped+  " " + skipBytes + " " + audioInputStream.available());
+//				CPUMonitor cpuMonitor = new CPUMonitor();
+//				cpuMonitor.start();
 				skipped = audioInputStream.skip(skipBytes);
+//				cpuMonitor.stop();
+//				System.out.println(cpuMonitor.getSummary("Sound skip: " + skipBytes + " bytes "));
 				//System.out.println("Offline " + (offlineDataLoadInfo.getStartMillis()-currentTime) + " ms : frame size: " + audioFormat.getFrameSize());
 
 			} catch (IOException e) {
