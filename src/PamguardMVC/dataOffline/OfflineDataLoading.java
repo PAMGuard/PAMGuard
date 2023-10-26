@@ -129,8 +129,8 @@ public class OfflineDataLoading<T extends PamDataUnit> {
 		this.orderOfflineData(offlineDataInfo);
 
 	}
-	
-	
+
+
 	/**
 	 * Clears all raw and FFT data blocks prior to a new load. 
 	 */
@@ -140,7 +140,7 @@ public class OfflineDataLoading<T extends PamDataUnit> {
 			datablocks.get(i).clearAll();
 			datablocks.get(i).clearDeletedList();
 		}
-		
+
 		datablocks = PamController.getInstance().getRawDataBlocks();
 		for (int i=0; i<datablocks.size(); i++) {
 			datablocks.get(i).clearAll();
@@ -175,61 +175,61 @@ public class OfflineDataLoading<T extends PamDataUnit> {
 			long t4 = t2;
 			//			String orderDates = String.format(" %s to %s", 
 			//					PamCalendar.formatDateTime(startMillis), PamCalendar.formatDateTime(endMillis));
-//			System.out.printf("Offline data order in %s %s from %s to %s\n", pamDataBlock.getDataName(), offlineDataInfo.toString(),
-//					PamCalendar.formatDBDateTime(offlineDataInfo.getStartMillis()), 
-//					PamCalendar.formatDBDateTime(offlineDataInfo.getEndMillis()));
-//			if (offlineDataInfo.getEndMillis()-offlineDataInfo.getStartMillis() > 3600000L) {
-//				System.out.printf("Stupid long load time !");
-//				return;
-//			}
+			//			System.out.printf("Offline data order in %s %s from %s to %s\n", pamDataBlock.getDataName(), offlineDataInfo.toString(),
+			//					PamCalendar.formatDBDateTime(offlineDataInfo.getStartMillis()), 
+			//					PamCalendar.formatDBDateTime(offlineDataInfo.getEndMillis()));
+			//			if (offlineDataInfo.getEndMillis()-offlineDataInfo.getStartMillis() > 3600000L) {
+			//				System.out.printf("Stupid long load time !");
+			//				return;
+			//			}
 			try {
-			if (orderData != null) {
-				//				System.out.println("order Data is not null");
-				if (orderData.isDone() == false) {
-					switch (offlineDataInfo.getInterrupt()) {
-					case OFFLINE_DATA_INTERRUPT:
-						//						System.out.println("Request order cancelling");
+				if (orderData != null) {
+					//				System.out.println("order Data is not null");
+					if (orderData.isDone() == false) {
+						switch (offlineDataInfo.getInterrupt()) {
+						case OFFLINE_DATA_INTERRUPT:
+							//						System.out.println("Request order cancelling");
 
 
-						if (orderData.cancelOrder()) {			
+							if (orderData.cancelOrder()) {			
 
-							while (orderData!=null || !orderData.isDone()) {
-								try {
-									Thread.sleep(10);
-								} catch (InterruptedException e) {
-									e.printStackTrace();
-									return;
+								while (orderData!=null || !orderData.isDone()) {
+									try {
+										Thread.sleep(10);
+									} catch (InterruptedException e) {
+										e.printStackTrace();
+										return;
+									}
 								}
 							}
+							else {
+								//							System.out.println("Old order could not be cancelled");
+							}
+							break;
+						case OFFLINE_DATA_CANCEL:
+							//						System.out.println("Don't order new data " + orderDates);
+							return;
+						case OFFLINE_DATA_WAIT:
+							int waitCount = 0;
+							t3 = System.currentTimeMillis();
+							waitingDataLoads.add(offlineDataInfo);
+							return;
+							//						//						System.out.println("Wait for old lot to complete " + orderDates);
+							//						while (true) {
+							//							if (orderData==null || orderData.isDone() || orderData.isCancelled()) {
+							//								break;
+							//							}
+							//							waitCount++;
+							//							try {
+							//								Thread.sleep(10, 0);
+							//							} catch (InterruptedException e) {
+							//								e.printStackTrace();
+							//							}
+							//						}
 						}
-						else {
-							//							System.out.println("Old order could not be cancelled");
-						}
-						break;
-					case OFFLINE_DATA_CANCEL:
-						//						System.out.println("Don't order new data " + orderDates);
-						return;
-					case OFFLINE_DATA_WAIT:
-						int waitCount = 0;
-						t3 = System.currentTimeMillis();
-						waitingDataLoads.add(offlineDataInfo);
-						return;
-//						//						System.out.println("Wait for old lot to complete " + orderDates);
-//						while (true) {
-//							if (orderData==null || orderData.isDone() || orderData.isCancelled()) {
-//								break;
-//							}
-//							waitCount++;
-//							try {
-//								Thread.sleep(10, 0);
-//							} catch (InterruptedException e) {
-//								e.printStackTrace();
-//							}
-//						}
+						t4 = System.currentTimeMillis() - t3;
 					}
-					t4 = System.currentTimeMillis() - t3;
 				}
-			}
 			}
 			catch (NullPointerException e) {
 				// happens when orderData is set null in a different thread. 
@@ -244,8 +244,8 @@ public class OfflineDataLoading<T extends PamDataUnit> {
 			//t = new Timer(1000, new StartOrderOnTimer(orderData));
 		} // end of order lock
 	}
-	
-	
+
+
 	/**
 	 * Cancels the current order. 
 	 */
@@ -259,16 +259,19 @@ public class OfflineDataLoading<T extends PamDataUnit> {
 	 * @param que
 	 */
 	public void cancelDataOrder(boolean que) {
-				synchronized (orderLock) {
-		if (orderData != null) {
-			try {
-				orderData.cancelOrder();
-			}
-			catch (NullPointerException e) {
-				System.err.println("Null pointer in Cancel data order " + e.getMessage());
+//		threadMessage("Calling cancelDataOrder");
+		synchronized (orderLock) {
+//			threadMessage("cancelDataOrder is in synchronized oderLock");
+			if (orderData != null) {
+				try {
+					boolean isCancelled = orderData.cancelOrder();
+//					threadMessage("candelDataOrder returned: isCancelled = " + isCancelled);
+				}
+				catch (NullPointerException e) {
+					System.err.println("Null pointer in Cancel data order " + e.getMessage());
+				}
 			}
 		}
-				}
 		if (que) this.waitingDataLoads.clear(); 
 	}
 	/**
@@ -319,16 +322,19 @@ public class OfflineDataLoading<T extends PamDataUnit> {
 
 		@Override
 		protected Integer doInBackground()  {
+//			threadMessage("Start background");
 			try {
-//								System.out.println("Enter get offline data " + pamDataBlock.getDataName() + " Thread " + Thread.currentThread().getName());
-				
+				//								System.out.println("Enter get offline data " + pamDataBlock.getDataName() + " Thread " + Thread.currentThread().getName());
+
 				clearAllFFTBlocks();
+//				threadMessage("Called clearAllFTBlocks");
 				int ans = getOfflineData(offlineDataInfo);
-//								System.out.println("Leave get offline data " + pamDataBlock.getDataName());
+				//								System.out.println("Leave get offline data " + pamDataBlock.getDataName());
 
 				if (this == orderData) {
 					orderData = null;
 				}
+//				threadMessage("End background exit code " + ans);
 				return ans;
 			}
 			catch (Exception e) {
@@ -338,8 +344,8 @@ public class OfflineDataLoading<T extends PamDataUnit> {
 				}
 				return 0;
 			}
-
 		}
+		
 
 		@Override
 		protected void done() {
@@ -354,7 +360,7 @@ public class OfflineDataLoading<T extends PamDataUnit> {
 				if (isCancelled()) {
 					status = REQUEST_INTERRUPTED;
 					//check whether the cancelled thread should be saved for later loading. 
-//					System.out.println("The load has been cancelled: " + offlineDataInfo.getCurrentObserver().getObserverName());
+					//					System.out.println("The load has been cancelled: " + offlineDataInfo.getCurrentObserver().getObserverName());
 					checkDataReloadQue(offlineDataInfo);
 				}
 				else {
@@ -376,11 +382,11 @@ public class OfflineDataLoading<T extends PamDataUnit> {
 			}
 
 
-//			System.out.println("WAITING DATA LOAD");
+			//			System.out.println("WAITING DATA LOAD");
 			for (int i=0; i<waitingDataLoads.size(); i++){
-//				System.out.println("OfflineDataLoading.Done(): " + waitingDataLoads.get(i).getCurrentObserver().getObserverName());
+				//				System.out.println("OfflineDataLoading.Done(): " + waitingDataLoads.get(i).getCurrentObserver().getObserverName());
 			}
-//			System.out.println("WAITING DATA END");
+			//			System.out.println("WAITING DATA END");
 
 			if (!isCancelled()) launchQuedReloadThread();
 
@@ -394,11 +400,17 @@ public class OfflineDataLoading<T extends PamDataUnit> {
 
 	}
 
+//	private void threadMessage(String message) {
+//		String name = Thread.currentThread().getName();
+//		String now = PamCalendar.formatDBDateTime(System.currentTimeMillis(), true);
+//		System.out.printf("Thread %s load for %s at %s: %s\n", name, pamDataBlock.getDataName(), now, message);
+//	}
+
 	private void launchQuedReloadThread(){
-//		System.out.println(" launchQuedReloadThread(): ");
+		//		System.out.println(" launchQuedReloadThread(): ");
 		if (waitingDataLoads.size()>=1){
 			OfflineDataLoadInfo offlineDataInfo=waitingDataLoads.get(0);
-//			System.out.println("Removing: " + offlineDataInfo.getCurrentObserver().getObserverName());
+			//			System.out.println("Removing: " + offlineDataInfo.getCurrentObserver().getObserverName());
 			waitingDataLoads.remove(0);
 			this.orderOfflineData(offlineDataInfo);
 		}
@@ -470,15 +482,15 @@ public class OfflineDataLoading<T extends PamDataUnit> {
 
 		pamDataBlock.clearAll();
 
-//		System.out.println("Start loading some offline data: from  " + PamCalendar.formatDateTime(offlineDataInfo.getStartMillis() ) +" to "+ 
-//				PamCalendar.formatDateTime(offlineDataInfo.getEndMillis() ) + " "+offlineDataInfo.getCurrentObserver().getObserverName() + 
-//				" "+offlineDataInfo.getLoadKeepLayers());
+		//		System.out.println("Start loading some offline data: from  " + PamCalendar.formatDateTime(offlineDataInfo.getStartMillis() ) +" to "+ 
+		//				PamCalendar.formatDateTime(offlineDataInfo.getEndMillis() ) + " "+offlineDataInfo.getCurrentObserver().getObserverName() + 
+		//				" "+offlineDataInfo.getLoadKeepLayers());
 
 		lastRequestAnswer = pamDataBlock.getParentProcess().getOfflineData(offlineDataInfo);
 		//		System.out.println(String.format("getOfflineData %s has %d units ",
 		//				getDataName(), getUnitsCount()));
 
-//		System.out.println("Orderring done: " + offlineDataInfo.getCurrentObserver().getObserverName() + " " + offlineDataInfo.getLoadKeepLayers());
+		//		System.out.println("Orderring done: " + offlineDataInfo.getCurrentObserver().getObserverName() + " " + offlineDataInfo.getLoadKeepLayers());
 
 		//reset some of the changeable variables in offline data info. 
 		offlineDataInfo.reset(); 
