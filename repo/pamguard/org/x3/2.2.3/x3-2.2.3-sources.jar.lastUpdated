@@ -1,0 +1,14 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Thu Oct 26 15:50:39 BST 2023
+@default-talan-https\://nexus.talanlabs.com/content/repositories/releases/.lastUpdated=1698327461349
+file\://C\:\\Users\\dg50\\source\\repos\\PAMGuardPAMGuard/repo/.lastUpdated=1698327459306
+https\://repo1.maven.org/maven2/.error=
+file\://C\:\\Users\\dg50\\source\\repos\\PAMGuardDG/repo/.error=
+https\://nexus.bedatadriven.com/content/groups/public/.error=
+https\://artifacts.unidata.ucar.edu/repository/unidata-all/.error=
+https\://artifacts.unidata.ucar.edu/repository/unidata-all/.lastUpdated=1698327460817
+https\://repo1.maven.org/maven2/.lastUpdated=1698327461652
+https\://nexus.talanlabs.com/content/repositories/releases/.error=Could not transfer artifact pamguard.org\:x3\:jar\:sources\:2.2.3 from/to talan (https\://nexus.talanlabs.com/content/repositories/releases/)\: nexus.talanlabs.com
+file\://C\:\\Users\\dg50\\source\\repos\\PAMGuardDG/repo/.lastUpdated=1698331839687
+file\://C\:\\Users\\dg50\\source\\repos\\PAMGuardPAMGuard/repo/.error=
+https\://nexus.bedatadriven.com/content/groups/public/.lastUpdated=1698327461288
