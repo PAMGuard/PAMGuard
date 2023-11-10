@@ -22,6 +22,7 @@ public class BLOfflineTask extends OfflineTask {
 		this.bearingLocaliserControl = bearingLocaliserControl;
 		bearingProcess = bearingLocaliserControl.getBearingProcess();
 		this.addRequiredDataBlock(rawOrFFTBlock = bearingProcess.getParentDataBlock());
+		addAffectedDataBlock(detectionBlock);
 //		PamDataBlock detectionSource = bearingLocaliserControl.getDetectionMonitor().getParentDataBlock();
 //		this.setParentDataBlock(detectionSource);
 //		setParentDataBlock(bearingProcess.getParentDataBlock());
