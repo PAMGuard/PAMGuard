@@ -1041,6 +1041,9 @@ public abstract class SQLLogging {
 	 * @return a result set 
 	 */
 	protected ResultSet createViewResultSet(PamConnection con, PamViewParameters pamViewParameters) {
+		if (con == null) {
+			return null;
+		}
 		String viewerClause = getViewerLoadClause(con.getSqlTypes(), pamViewParameters);
 		return createViewResultSet(con, viewerClause);
 	}

@@ -90,7 +90,7 @@ public class EchoDetectionTask extends OfflineTask<ClickDetection> {
 		if (echoDetectionSystem == null) {
 			return false;
 		}
-		return EchoDialog.showDialog(clickControl.getPamView().getGuiFrame(), echoDetectionSystem);
+		return EchoDialog.showDialog(clickControl.getGuiFrame(), echoDetectionSystem);
 	}
 
 	/* (non-Javadoc)
