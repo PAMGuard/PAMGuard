@@ -33,7 +33,7 @@ import pamViewFX.fxNodes.PamHBox;
  */
 public class ArraySettingsPane extends SettingsPane<PamArray >{
 	
-	private StreamerPane streamerPane; 
+	private StreamersPane streamerPane; 
 	
 	private PamFlipPane mainPane;
 	
@@ -88,9 +88,9 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 		arrayLabel.setPadding(new Insets(5,5,5,5));
 		PamGuiManagerFX.titleFont1style(arrayLabel);
 		
-		streamerPane = new StreamerPane(); 
+		streamerPane = new StreamersPane(); 
 		
-		Label hydrophoneLabel = new Label("Hydrophone"); 
+		Label hydrophoneLabel = new Label("Hydrophones"); 
 		PamGuiManagerFX.titleFont1style(hydrophoneLabel);
 		hydrophoneLabel.setPadding(new Insets(5,5,5,5));
 
@@ -103,16 +103,16 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 		});
 		advancedButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-cog")); 
 
-		PamHBox advancedPane = new PamHBox(); 
-		advancedPane.setSpacing(5);
-		advancedPane.setAlignment(Pos.CENTER_RIGHT);
-		advancedPane.getChildren().addAll(new Label("Advanced"), advancedButton);
+//		PamHBox advancedPane = new PamHBox(); 
+//		advancedPane.setSpacing(5);
+//		advancedPane.setAlignment(Pos.CENTER_RIGHT);
+//		advancedPane.getChildren().addAll(new Label("Advanced"), advancedButton);
 		
 		PamVBox vBox = new PamVBox(); 
 		
 		vBox.setSpacing(5);
 		vBox.getChildren().addAll(arrayLabel, streamerPane, hydrophoneLabel,
-				hydrophonePane, advancedPane); 
+				hydrophonePane); 
 
 		return vBox; 
 	}

@@ -226,6 +226,4 @@ public class HydrophonesPane extends PamBorderPane {
 		this.hydrophoneList = hydrophoneList;
 	}
 
-
-
 }

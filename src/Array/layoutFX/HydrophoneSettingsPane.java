@@ -15,6 +15,7 @@ import javafx.scene.control.Labeled;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.Pane;
+import net.synedra.validatorfx.Validator;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.PamBorderPane;
@@ -30,7 +31,7 @@ import pamViewFX.validator.PamValidator;
  */
 public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 
-	private static final double COLUMN_0_WIDTH = 100;
+	private static final double COLUMN_0_WIDTH = 120;
 
 	/**
 	 * 
@@ -332,27 +333,27 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 
 		xPos=new TextField();
 		xPos.setMaxWidth(maxWidth);
-		addTextValidator(xPos, "x position"); 
+		addTextValidator(xPos, "x position", validator); 
 		yPos=new TextField();
 		yPos.setMaxWidth(maxWidth);
-		addTextValidator(yPos, "y position"); 
+		addTextValidator(yPos, "y position", validator); 
 		zPos=new TextField();
 		zPos.setMaxWidth(maxWidth);
-		addTextValidator(zPos, "z position"); 
+		addTextValidator(zPos, "z position", validator); 
 		depthLabel = new Label("Depth"); 
 		depthLabel.setAlignment(Pos.CENTER);
 
 		xPosErr=new TextField();
 		xPosErr.setMaxWidth(50);
-		addTextValidator(xPosErr, "x error"); 
+		addTextValidator(xPosErr, "x error",validator); 
 		yPosErr=new TextField();
 		yPosErr.setMaxWidth(50);
-		addTextValidator(yPosErr, "y error"); 
+		addTextValidator(yPosErr, "y error",validator); 
 		zPosErr=new TextField();
 		zPosErr.setMaxWidth(50);
 		depthLabel2 = new Label(""); //changes with air or water mode. 
 		depthLabel2.setAlignment(Pos.CENTER);
-		addTextValidator(zPosErr, "z error"); 
+		addTextValidator(zPosErr, "z error", validator); 
 
 		int col=0; 
 		int row =0; 
@@ -437,7 +438,7 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 	 * Creates a text filed and adds a validator to check that the input is OK.
 	 * @return
 	 */
-	private void addTextValidator(TextField userTextField, String description) {
+	protected static void addTextValidator(TextField userTextField, String description, Validator validator) {
 		userTextField.setPrefColumnCount(8);
 
 		validator.createCheck()

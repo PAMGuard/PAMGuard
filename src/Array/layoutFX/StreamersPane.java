@@ -20,7 +20,7 @@ import javafx.geometry.Insets;
  * @author Jamie Macaulay
  *
  */
-public class StreamerPane extends PamBorderPane {
+public class StreamersPane extends PamBorderPane {
 
 	BasicArrayTable tableArrayPane;
 
@@ -46,7 +46,7 @@ public class StreamerPane extends PamBorderPane {
 	 */
 	private StreamerSettingsPane streamerPane = new StreamerSettingsPane(); 
 
-	public StreamerPane() {
+	public StreamersPane() {
 
 		tableArrayPane = new BasicArrayTable(streamerData); 
 
@@ -96,19 +96,22 @@ public class StreamerPane extends PamBorderPane {
 			name.setCellValueFactory(cellData -> cellData.getValue().getName());
 			name.setEditable(false);
 
+	
 
-			TableColumn<StreamerProperty,Number>  x = new TableColumn<StreamerProperty,Number>("x (m)");
+			TableColumn<StreamerProperty,Number>  x = new TableColumn<StreamerProperty,Number>("x");
 			x.setCellValueFactory(cellData -> cellData.getValue().getX());
 			x.setEditable(false);
 
-			TableColumn<StreamerProperty,Number>  y = new TableColumn<StreamerProperty,Number>("y (m)");
+			TableColumn<StreamerProperty,Number>  y = new TableColumn<StreamerProperty,Number>("y");
 			y.setCellValueFactory(cellData -> cellData.getValue().getY());
 			y.setEditable(false);
 
-			TableColumn<StreamerProperty,Number>  z = new TableColumn<StreamerProperty,Number>("z (m)");
+			TableColumn<StreamerProperty,Number>  z = new TableColumn<StreamerProperty,Number>("z");
 			z.setCellValueFactory(cellData -> cellData.getValue().getZ());
 			z.setEditable(false);
-
+			
+			TableColumn posColumn=new TableColumn("Position (m)"); 
+			posColumn.getColumns().addAll(x, y, z);
 
 			TableColumn<StreamerProperty,String>  reference = new TableColumn<StreamerProperty,String>("Reference");
 			reference.setCellValueFactory(cellData -> cellData.getValue().getHydrophineLocator());
@@ -117,9 +120,12 @@ public class StreamerPane extends PamBorderPane {
 			TableColumn<StreamerProperty,String>  locator = new TableColumn<StreamerProperty,String>("Locator");
 			locator.setCellValueFactory(cellData -> cellData.getValue().getHydrophineLocator());
 			locator.setEditable(true);
+			
+			TableColumn geoColumn=new TableColumn("Geo-reference"); 
+			geoColumn.getColumns().addAll(reference, locator);
 
 
-			getTableView().getColumns().addAll(streamerID, name, x, y, z, reference, locator);
+			getTableView().getColumns().addAll(streamerID, name, posColumn, geoColumn);
 
 		}
 

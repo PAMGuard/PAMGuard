@@ -345,6 +345,8 @@ public class ErrorEllipse {
 	}
 	
 	/**
+	 * 
+	 *FIXME - this needs work to make sure roll works
 	 * Get the ellipse projected onto a 3D plane. 
 	 * @return an array. array [0] is the first radii. array[1] is the second radii. array[2] is the rotation relative to the plane in RADIANS. 
 	 */

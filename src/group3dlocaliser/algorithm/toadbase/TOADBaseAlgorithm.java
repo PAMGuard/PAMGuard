@@ -37,7 +37,6 @@ import pamMaths.PamVector;
 import pamViewFX.fxNodes.pamDialogFX.ManagedSettingsPane;
 
 
-
 abstract public class TOADBaseAlgorithm extends LocaliserAlgorithm3D {
 	
 	public enum MultiVariateType {
