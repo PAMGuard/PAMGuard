@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.EnumMap;
 
 import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import PamUtils.PamCalendar;
 
@@ -126,31 +127,34 @@ public class RoccaClassifyThis {
     /** the field in the RoccaContourStats object which contains all the stats measures */
     private EnumMap<RoccaContourStats.ParamIndx, Double> contourStats;
 
-	private String dirIn;
-
-	/** the input filename */
-	private String csvIn;
-	
-	/** the input file */
-	private File statsFileIn;
-	
-	/** the output filename */
-	private String csvOut;
-
-	/** the output file */
-	private File statsFileOut;
-	
-	/** Constructor */	
+	/** 
+	 * Constructor used when allowing user to select training dataset
+	 * */	
 	public RoccaClassifyThis(RoccaProcess roccaProcess) {
-		
-		// initialize the BufferedReader
-		BufferedReader inputFile = null;
-		
+		File statsFileIn = getTheFile();
+		if (statsFileIn!=null) {
+			runTheClassifier(statsFileIn, roccaProcess);
+		}
+	}
+
+	/**
+	 * Constructor when we pass in the training dataset
+	 */
+	public RoccaClassifyThis() {
+	}
+
+
+	/**
+	 * Ask the user to select the file containing the testing dataset
+	 * 
+	 * @return File the csv file containing the testing dataset
+	 */
+	public File getTheFile() {
 		// set the directory
 //		this.dirIn = new String("C:\\Users\\Mike\\Documents\\Work\\Java\\EclipseWorkspace\\testing\\RoccaClassifyThis_testing");
 //		this.dirIn = new String("C:\\Users\\Mike\\Documents\\Work\\Tom\\Atlantic Classifier\\manual 2-stage data");
 //		this.dirIn = new String("C:\\Users\\Mike\\Documents\\Work\\Tom\\Hawaii dataset problems");
-		this.dirIn = new String("C:\\Users\\SCANS\\Documents\\Work\\Biowaves\\ONR classifier");
+//		this.dirIn = new String("C:\\Users\\SCANS\\Documents\\Work\\Biowaves\\ONR classifier");
 		
 		// Define the input and output filenames
 		// Hard-coded for now.  To Do: query the user for the filename
@@ -158,35 +162,54 @@ public class RoccaClassifyThis {
 //		this.csvIn = new String("Manual_5sp_April 9 2013.csv");
 //		this.csvIn = new String("CombinedContourStats-fixed.csv");
 //		this.csvOut = new String("RoccaContourStatsReclassified.csv");
-		this.csvIn = new String("Atl_TestDFNoTrain_Call_W_160831.csv");
-		statsFileIn = new File(dirIn, csvIn);
-		this.csvOut = new String("Atl_TestDFNoTrain_Call_W_160829-classified.csv");
-		statsFileOut = new File(dirIn, csvOut);
+//		this.csvIn = new String("Atl_TestDFNoTrain_Call_W_160831.csv");
+//		statsFileIn = new File(dirIn, csvIn);
+//		this.csvOut = new String("Atl_TestDFNoTrain_Call_W_160829-classified.csv");
+//		statsFileOut = new File(dirIn, csvOut);
 
+        // let the user select the arff file
+		JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Select spreadsheet to recalculate...");
+        fileChooser.setFileHidingEnabled(true);
+        fileChooser.setApproveButtonText("Select");
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        FileNameExtensionFilter restrict = new FileNameExtensionFilter("Only .csv files", "csv");
+        fileChooser.addChoosableFileFilter(restrict);
+
+		int state = fileChooser.showOpenDialog(null);
+		File statsFileIn = null;
+		if (state == JFileChooser.APPROVE_OPTION) {
+
+		    // load the file
+			statsFileIn = fileChooser.getSelectedFile();
+			return statsFileIn;
+			
+		} else {
+			return null;
+		}
+	}
+	
+	
+	/**
+	 * Run the classifier
+	 * @param statsFileIn the File containing the testing dataset
+	 * @param roccaProcess the RoccaProcess instance
+	 */
+	public void runTheClassifier(File statsFileIn, RoccaProcess roccaProcess) {
 		
-//		JFileChooser fileChooser = new JFileChooser();
-//        fileChooser.setDialogTitle("Select spreadsheet to recalculate...");
-//        fileChooser.setFileHidingEnabled(true);
-//        fileChooser.setApproveButtonText("Select");
-//        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-//
-//		int state = fileChooser.showOpenDialog(this.dirIn);
-//		if (state == JFileChooser.APPROVE_OPTION) {
-		
-		
-		
-		
-		
-		
-		
-		
-		
+		int index = statsFileIn.getAbsolutePath().lastIndexOf(".");
+        String csvOut = statsFileIn.getAbsolutePath().substring(0,index) + "-classified.csv";
+		File statsFileOut = new File(csvOut);
+				
 		
 		// load the classifier
 		System.out.println("Loading classifier...");
         roccaProcess.setClassifierLoaded
         (roccaProcess.roccaClassifier.setUpClassifier());
 			
+		// initialize the BufferedReader
+		BufferedReader inputFile = null;
+		
 		// open the input file
 		try {
 			System.out.println("Opening input file "+statsFileIn);
@@ -263,12 +286,45 @@ public class RoccaClassifyThis {
 			contourStats.put(RoccaContourStats.ParamIndx.FREQPOSSLOPEMEAN, Double.parseDouble(dataArray[34]));
 			contourStats.put(RoccaContourStats.ParamIndx.FREQNEGSLOPEMEAN, Double.parseDouble(dataArray[35]));
 			contourStats.put(RoccaContourStats.ParamIndx.FREQSLOPERATIO, Double.parseDouble(dataArray[36]));
-			contourStats.put(RoccaContourStats.ParamIndx.FREQBEGSWEEP, Double.parseDouble(dataArray[37]));
-			//contourStats.put(RoccaContourStats.ParamIndx.FREQBEGUP, Double.parseDouble(dataArray[38]));
-			//contourStats.put(RoccaContourStats.ParamIndx.FREQBEGDWN, Double.parseDouble(dataArray[39]));
-			contourStats.put(RoccaContourStats.ParamIndx.FREQENDSWEEP, Double.parseDouble(dataArray[40]));
-			//contourStats.put(RoccaContourStats.ParamIndx.FREQENDUP, Double.parseDouble(dataArray[41]));
-			//contourStats.put(RoccaContourStats.ParamIndx.FREQENDDWN, Double.parseDouble(dataArray[42]));
+			
+			// Note that we have to modify the FREQBEGSWEEP value.  Weka is trained with the FREQBEGSWEEP param
+			// as -1=down, 0=flat and 1=up, and that would be how the test data comes through as well.  HOWEVER,
+			// Weka assumes that for nominal parameters, the value is the index location (0,1 or 2) and NOT the actual trained
+			// value (-1,0 or 1).  So if the whistle has a down sweep, Weka needs the FREQBEGSWEEP value to be 0 indicating the 
+			// first location in the array (which was 'down').  If it was up, the value would need to be 2 indicating the third 
+			// location in the array (which was 'up').
+			// Ideally we would map the values in the test data to the positions in the training array, but as a quick and
+			// dirty hack we'll simply add 1 to the value since the difference between the nominal values (-1,0,1) and the
+			/// index positions (0,1,2) is an offset of 1
+			// Note also that we don't have to do the same thing for FREQBEGUP and FREQBEGDWN since, by coincidence, the training
+			// values of 0 and 1 happen to match the index locations of 0 and 1
+			//contourStats.put(RoccaContourStats.ParamIndx.FREQBEGSWEEP, Double.parseDouble(dataArray[37]));
+			double tempVal = Double.parseDouble(dataArray[37]);
+			tempVal++;
+			contourStats.put(RoccaContourStats.ParamIndx.FREQBEGSWEEP, tempVal);
+			contourStats.put(RoccaContourStats.ParamIndx.FREQBEGUP, Double.parseDouble(dataArray[38]));
+			contourStats.put(RoccaContourStats.ParamIndx.FREQBEGDWN, Double.parseDouble(dataArray[39]));
+			
+			// Note that we have to modify the FREQENDSWEEP value.  Weka is trained with the FREQENDSWEEP param
+			// as -1=down, 0=flat and 1=up, and that would be how the test data comes through as well.  HOWEVER,
+			// Weka assumes that for nominal parameters, the value is the index location (0,1 or 2) and NOT the actual trained
+			// value (-1,0 or 1).  So if the whistle has a down sweep, Weka needs the FREQENDSWEEP value to be 0 indicating the 
+			// first location in the array (which was 'down').  If it was up, the value would need to be 2 indicating the third 
+			// location in the array (which was 'up').
+			// Ideally we would map the values in the test data to the positions in the training array, but as a quick and
+			// dirty hack we'll simply add 1 to the value since the difference between the nominal values (-1,0,1) and the
+			/// index positions (0,1,2) is an offset of 1
+			// Note also that we don't have to do the same thing for FREQENDUP and FREQENDDWN since, by coincidence, the training
+			// values of 0 and 1 happen to match the index locations of 0 and 1
+			//contourStats.put(RoccaContourStats.ParamIndx.FREQENDSWEEP, Double.parseDouble(dataArray[40]));
+			tempVal = Double.parseDouble(dataArray[40]);
+			tempVal++;
+			contourStats.put(RoccaContourStats.ParamIndx.FREQENDSWEEP, tempVal);
+			contourStats.put(RoccaContourStats.ParamIndx.FREQENDUP, Double.parseDouble(dataArray[41]));
+			contourStats.put(RoccaContourStats.ParamIndx.FREQENDDWN, Double.parseDouble(dataArray[42]));
+			// end of hack
+			
+			
 			contourStats.put(RoccaContourStats.ParamIndx.NUMSWEEPSUPDWN, Double.parseDouble(dataArray[43]));
 			contourStats.put(RoccaContourStats.ParamIndx.NUMSWEEPSDWNUP, Double.parseDouble(dataArray[44]));
 			contourStats.put(RoccaContourStats.ParamIndx.NUMSWEEPSUPFLAT, Double.parseDouble(dataArray[45]));
@@ -285,8 +341,8 @@ public class RoccaClassifyThis {
 			contourStats.put(RoccaContourStats.ParamIndx.INFLMEANDELTA, Double.parseDouble(dataArray[56]));
 			contourStats.put(RoccaContourStats.ParamIndx.INFLSTDDEVDELTA, Double.parseDouble(dataArray[57]));
 			contourStats.put(RoccaContourStats.ParamIndx.INFLMEDIANDELTA, Double.parseDouble(dataArray[58]));
-			contourStats.put(RoccaContourStats.ParamIndx.INFLDUR, Double.parseDouble(dataArray[59]));
-			contourStats.put(RoccaContourStats.ParamIndx.STEPDUR, Double.parseDouble(dataArray[60]));	
+			//contourStats.put(RoccaContourStats.ParamIndx.INFLDUR, Double.parseDouble(dataArray[59]));
+			//contourStats.put(RoccaContourStats.ParamIndx.STEPDUR, Double.parseDouble(dataArray[60]));	
 			
 			// Run the classifier
 	        roccaProcess.roccaClassifier.classifyContour2(rcdb);
