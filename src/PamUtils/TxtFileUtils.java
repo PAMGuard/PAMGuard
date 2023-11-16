@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -90,20 +89,10 @@ public class TxtFileUtils {
 						//5/08/2022 - there was a bug here where there is some sort of invisible character that does not appear on the 
 						//print screen - the only way you can tell is the char array is greater than the number of digits - removed all non numeric
 						//characters. 
-						
-//						if (recordsOnLine[i].contains("e") || recordsOnLine[i].contains("E")) {
-//							//need to check whether scientific notation might be used here
-////							dat = new BigDecimal(recordsOnLine[i]).doubleValue();
-//							dat =  Double.valueOf(recordsOnLine[i]);
-//						}
-//						else {
-							//note that this gets rid of numbers like 3.84e+05
-							// updated again on 15/11/23 to include - signs, or you end up with the abs(of every number!)
-							//also added E and e to neglected characters to ensure scientific notation can be used, 
-							String number = new String(recordsOnLine[i].strip().replaceAll("[^Ee\\d.-]", ""));
-							dat = Double.valueOf(number);
-							//dat = DecimalFormat.getNumberInstance().parse(new String(recordsOnLine[i].strip().toCharArray())).doubleValue();
-//						}
+						// updated again on 15/11/23 to include - signs, or you end up with the abs(of every number!)
+						String number = new String(recordsOnLine[i].strip().replaceAll("[^\\d.-]", ""));
+						dat = Double.valueOf(number);
+						//dat = DecimalFormat.getNumberInstance().parse(new String(recordsOnLine[i].strip().toCharArray())).doubleValue();
 					}
 				catch (Exception e){
 					e.printStackTrace();
