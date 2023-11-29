@@ -56,7 +56,7 @@ public class StreamersPane extends PamBorderPane {
 		pamFlipePane = new PamFlipPane(); 
 		pamFlipePane.getAdvLabel().setText("Hydrophone Settings");
 
-		((Pane) streamerPane.getContentNode()).setPadding(new Insets(5,5,5,5)); 
+		((Pane) streamerPane.getContentNode()).setPadding(new Insets(5,5,5,15)); 
 
 		pamFlipePane.setAdvPaneContent(streamerPane.getContentNode()); 
 		pamFlipePane.setFrontContent(tableArrayPane);
@@ -94,9 +94,8 @@ public class StreamersPane extends PamBorderPane {
 
 			TableColumn<StreamerProperty,String>  name = new TableColumn<StreamerProperty,String>("Name");
 			name.setCellValueFactory(cellData -> cellData.getValue().getName());
-			name.setEditable(false);
+			name.setEditable(true);
 
-	
 
 			TableColumn<StreamerProperty,Number>  x = new TableColumn<StreamerProperty,Number>("x");
 			x.setCellValueFactory(cellData -> cellData.getValue().getX());

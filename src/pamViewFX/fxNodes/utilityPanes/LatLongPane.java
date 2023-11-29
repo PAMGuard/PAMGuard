@@ -1,11 +1,14 @@
 package pamViewFX.fxNodes.utilityPanes;
 
+import org.controlsfx.control.SegmentedButton;
+
 import PamController.SettingsPane;
 import PamUtils.LatLong;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamHBox;
@@ -27,12 +30,12 @@ public class LatLongPane extends SettingsPane<LatLong>{
 	/**
 	 * The radio button to select decimal minutes 
 	 */
-	private RadioButton decimalMinutes;
+	private ToggleButton decimalMinutes;
 
 	/**
 	 * Radio button to input minutes and seconds. 
 	 */
-	private RadioButton minutesSeconds;
+	private ToggleButton minutesSeconds;
 
 	/**
 	 * Lat long strip
@@ -40,6 +43,8 @@ public class LatLongPane extends SettingsPane<LatLong>{
 	private LatLongStrip latStrip, longStrip;
 
 	private PamBorderPane mainPane;
+
+	private ToggleButton decimal;
 
 
 	public LatLongPane(String title) {
@@ -52,18 +57,29 @@ public class LatLongPane extends SettingsPane<LatLong>{
 		PamHBox top = new PamHBox();
 		top.setSpacing(5);
 		top.getChildren().add(new Label("Unit type :"));
-		top.getChildren().add(decimalMinutes = new RadioButton("Degrees, Decimal minutes"));
-		top.getChildren().add(minutesSeconds = new RadioButton("Degrees, Minutes, Seconds"));
+		
+		decimalMinutes = new ToggleButton("Degrees, Decimal minutes");
+		minutesSeconds = new ToggleButton("Degrees, Minutes, Seconds");
+		decimal = new ToggleButton("Decimal");
+		
+		 SegmentedButton segmentedButton = new SegmentedButton();    
+		 segmentedButton.getButtons().addAll(decimalMinutes, minutesSeconds, decimal);
+		 top.getChildren().add(segmentedButton);
 
-		ToggleGroup bg = new ToggleGroup();
-		decimalMinutes.setToggleGroup(bg);
-		minutesSeconds.setToggleGroup(bg);
+//		ToggleGroup bg = new ToggleGroup();
+//		decimalMinutes.setToggleGroup(bg);
+//		minutesSeconds.setToggleGroup(bg);
+//		decimal.setToggleGroup(bg);
 
 		decimalMinutes.setOnAction((action)->{
 			actionPerformed(action);
 		});
 
 		minutesSeconds.setOnAction((action)->{
+			actionPerformed(action);
+		});
+		
+		decimal.setOnAction((action)->{
 			actionPerformed(action);
 		});
 		mainPane.setTop(top);

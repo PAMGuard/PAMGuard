@@ -140,7 +140,7 @@ public class StaticOriginMethod extends HydrophoneOriginMethod {
 		@Override
 		public Pane getSettingsPane() {
 			if (staticHydrophonePane==null) {
-				staticHydrophonePane = new StaticHydrophonePane(); 
+				staticHydrophonePane = new StaticHydrophonePane(StaticOriginMethod.this); 
 			}
 			return staticHydrophonePane;
 		}

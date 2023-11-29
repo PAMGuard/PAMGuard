@@ -44,16 +44,22 @@ public class SettingsFileDialogFX  {
 
 		singleInstance.settingsFilePane.setParams(settingsFileData);
 		singleInstance.settingsDialog.setOnShown((value)->{
+			
+//			singleInstance.settingsFilePane.getProgressBar().setVisible(startup);
+//			singleInstance.settingsFilePane.getProgressBar().setProgress(-1);;
+
 			singleInstance.settingsFilePane.paneInitialized();
 			//fix to make sure the dialog appearsa in pre PG GUI FX insitialisation i.e. when selecting viewer database 
 			//on PG start up/. 
 			((Stage) singleInstance.settingsDialog.getDialogPane().getScene().getWindow()).setAlwaysOnTop(true);
 		});
+		
+		
 
 
 		Optional<?> result=singleInstance.settingsDialog.showAndWait();	
 		
-		System.out.println("Hello FX result: ");
+		//System.out.println("Hello FX result: ");
 
 		if (result==null || !result.isPresent()) {
 			if (startup) {
@@ -62,6 +68,7 @@ public class SettingsFileDialogFX  {
 			}
 			else return null;
 		}
+		
 		SettingsFileData settings=(SettingsFileData) result.get();
 
 		return settings;

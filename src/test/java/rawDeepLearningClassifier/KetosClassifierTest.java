@@ -6,24 +6,23 @@ import rawDeepLearningClassifier.dlClassification.ketos.KetosClassifier;
 
 import org.junit.jupiter.api.Test;
 
-import PamController.PamController;
-import PamController.PamGUIManager;
 
 public class KetosClassifierTest {
 	
-	/**
-	 * Reference to the DL Control
-	 * 
-	 */
-	private DLControl testDLControl;
-	
-	
-	private KetosClassifier ketosClassifier_test;
-	
+//	/**
+//	 * Reference to the DL Control
+//	 * 
+//	 */
+//	private DLControl testDLControl;
+//	
+//	
+//	private KetosClassifier ketosClassifier_test;
+//	
 	
 
+//	public KetosClassifierTest()  {
+//		 System.out.println("hello unit test start"); 
 
-	public KetosClassifierTest()  {
 //		try {
 //			
 //		 if (PamController.getInstance()==null || PamController.getInstance().getRunMode() != PamController.RUN_NORMAL) {
@@ -37,18 +36,22 @@ public class KetosClassifierTest {
 //		 
 //		 //set the ketos model as the correct model in the test. 
 //		 testDLControl.getDLParams().modelSelection= testDLControl.getDLModels().indexOf(ketosClassifier_test); 
+//		 
+//		 System.out.println("hello unit test complete"); 
 //		}
 //		catch (Exception e) {
 //			e.printStackTrace();
 //		}
-	}
+//	}
 
 	/**
 	 * Test the ketos classifier and tests are working properly. 
 	 */
 	@Test
 	public void ketosClassifierTest() {
-		//this.ketosClassifier_test.checkModelOK(); 
+		 System.out.println("hello unit test complete b"); 
+
+//		this.ketosClassifier_test.checkModelOK(); 
         assertEquals(2, 1+1);
 	}
 
@@ -58,6 +61,8 @@ public class KetosClassifierTest {
 	 */
 	@Test
 	public void ketosProcessTest() {
+		 System.out.println("hello unit test complete"); 
+
         assertEquals(2, 1+1);
 	}
 }

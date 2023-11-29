@@ -136,6 +136,7 @@ public class StandardAdvModelPane extends SettingsPane<StandardModelParams> {
 			BorderPane.setMargin(defaultTogglePane, new Insets(5));
 			transfromPane.setDisable(params.useDefaultTransfroms);
 			toggleSwitch.setSelected(params.useDefaultTransfroms);
+			
 			transfromPane.setTransforms(params.dlTransfroms); 
 			//set the image 
 			mainPane.setBottom(dlImage);

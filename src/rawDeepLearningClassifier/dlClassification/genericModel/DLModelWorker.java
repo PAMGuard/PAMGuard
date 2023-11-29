@@ -102,7 +102,7 @@ public abstract class DLModelWorker<T> {
 				}
 				else {
 					//add wavefrom to the stack = we make the 2nd dimesnion 1. 
-					transformedData1 = ((WaveTransform) transform).getWaveData().getScaledSampleAmpliudes(); 
+					transformedData1 = ((WaveTransform) transform).getWaveData().getScaledSampleAmplitudes(); 
 					transformedDataStack[j] = new float[1][transformedData1.length];
 					transformedDataStack[j][0] = DLUtils.toFloatArray(transformedData1); 
 				}
@@ -142,7 +142,7 @@ public abstract class DLModelWorker<T> {
 						//pred = int(prob >= ARGS.threshold)		    	
 						//softmax function
 						prob[j] = (float) DLUtils.softmax(classOut[j], classOut); 
-						//System.out.println("The probability is: " + j + ": " + prob[j]); 
+						System.out.println("The probability is: " + j + ": " + prob[j]); 
 					}
 				}
 				else {

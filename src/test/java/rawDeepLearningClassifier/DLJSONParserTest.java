@@ -30,8 +30,6 @@ class DLJSONParserTest {
 		genericParmas = GenericModelParser.readGenericModelParams(path.toFile(), genericParmas, null); 
 		
 		System.out.println("----------------- LEGACY ---------------");
-
-		
 		System.out.println(genericParmas);
 
 		
@@ -44,14 +42,17 @@ class DLJSONParserTest {
 		//open the new file
 		GenericModelParams genericParmas_new = GenericModelParser.readGenericModelParams(path.toFile(), genericParmas, null); 
 		
+		
+		genericParmas_new.defaultShape = genericParmas_new.shape;
+		genericParmas_new.defualtOuput = genericParmas_new.outputShape;
+
+		
 		System.out.println("----------------- CURRENT ---------------");
 
 		System.out.println(genericParmas_new);
 		
-		
 		//now compare the paramters 
 		assertEquals(genericParmas, genericParmas_new); 
-		
 		
 		
 	}

@@ -263,7 +263,7 @@ public abstract class DLTransformImage extends PamBorderPane{
 		else {
 			WaveTransform waveTransform = ((WaveTransform) transforms.get(transforms.size()-1)); 
 			
-			double[] data = waveTransform.getWaveData().getScaledSampleAmpliudes(); 
+			double[] data = waveTransform.getWaveData().getScaledSampleAmplitudes(); 
 			
 			shape = new long[] {data.length};
 		}
@@ -347,7 +347,8 @@ public abstract class DLTransformImage extends PamBorderPane{
 		((WaveTransform)  getDLTransforms().get(0)).setWaveData(soundData); 
 
 		DLTransform currentTransform =  getDLTransforms().get(0); 
-		for (int i=0; i<transformschoiceBox.getSelectionModel().getSelectedIndex()+1; i++) {
+		
+		for (int i=1; i<transformschoiceBox.getSelectionModel().getSelectedIndex(); i++) {
 			currentTransform = getDLTransforms().get(i).transformData(currentTransform); 
 		}
 
@@ -399,7 +400,7 @@ public abstract class DLTransformImage extends PamBorderPane{
 
 				colRangeSlider.setDisable(true);
 
-				data1D = ((WaveTransform) currentTransform).getWaveData().getScaledSampleAmpliudes(); 
+				data1D = ((WaveTransform) currentTransform).getWaveData().getScaledSampleAmplitudes(); 
 				data1DminMax= PamArrayUtils.minmax(data1D); 
 
 				plotPane.getAxis(Side.LEFT).setMinVal(data1DminMax[0]);

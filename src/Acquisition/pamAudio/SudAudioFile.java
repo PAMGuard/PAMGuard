@@ -79,7 +79,7 @@ public class SudAudioFile extends WavAudioFile {
 				System.out.println("----MAP SUD FILE ON OTHER THREAD-----" + soundFile); 
 
 				/**
-				 * We need to map the sud file. But we don't want this o just freeze the current GUI thread. Therefore
+				 * We need to map the sud file. But we don't want this to just freeze the current GUI thread. Therefore
 				 * add a listener to the mapping process and show a blocking dialog to indicate that something is happening. 
 				 * The mapping is put on a separate thread and blocks stuff from happening until the mapping process has completed. 
 				 */

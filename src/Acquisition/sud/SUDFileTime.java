@@ -50,6 +50,7 @@ public class SUDFileTime {
 //			long t = sudMap.getFirstChunkTimeMillis();
 		
 			long t = SudAudioInputStream.quickFileTime(file);
+			
 			t=t/1000; //turn to milliseconds. 
 			if (t != 0) {
 				sudTime = t;

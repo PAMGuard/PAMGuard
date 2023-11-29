@@ -26,6 +26,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import pamViewFX.PAMGuiFXSettings;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
@@ -489,6 +490,7 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 
 		sourcePane.setParams(currParams.groupedSourceParams);
 		sourcePane.sourceChanged();
+	
 		
 		dlControl.createDataSelector(sourcePane.getSource());
 		
@@ -514,12 +516,15 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 		setSegInfoLabel();
 		
 		
-		//set up the model and the custom pane if necessary.  
+//		//set up the model and the custom pane if necessary.  
+//
+	
 		this.modelSelectPane.loadNewModel(currParams.modelURI); 
 		//this.modelSelectPane.updatePathLabel(); 
 		this.setClassifierPane();
 		
-		sourcePane.getChannelValidator().validate();
+		//For some reason, in the FX GUI, this causes a root used in multiple scenes exceptions...not sure why. 
+		//sourcePane.getChannelValidator().validate();
 
 	}
 
@@ -538,7 +543,10 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 
 	@Override
 	public void paneInitialized() {
-		// TODO Auto-generated method stub
+		//don't know why this is required but causes a root used in multiple scenes exceptions...really not sure why.
+		Platform.runLater(()->{
+			sourcePane.getChannelValidator().validate();
+		});
 	}
 
 	/**

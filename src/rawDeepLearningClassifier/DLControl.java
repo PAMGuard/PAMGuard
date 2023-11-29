@@ -384,6 +384,8 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 		if (this.settingsPane == null) {
 			settingsPane = new RawDLSettingsPane(this);
 		}
+		
+		System.out.println("Get DL raw settings pane...");
 		return settingsPane;
 	}
 
@@ -398,6 +400,8 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	 * @param parentFrame - the frame.
 	 */
 	public void showSettingsDialog(Frame parentFrame) {
+		System.out.println("Get DL raw settings pane BAD...");
+
 		if (settingsDialog == null || parentFrame != settingsDialog.getOwner()) {
 			SettingsPane<RawDLParams> setPane = (SettingsPane<RawDLParams>) getSettingsPane();
 			setPane.setParams(this.rawDLParmas);

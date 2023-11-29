@@ -15,6 +15,7 @@ import javafx.scene.control.Labeled;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import net.synedra.validatorfx.Validator;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxNodes.PamVBox;
@@ -32,6 +33,9 @@ import pamViewFX.validator.PamValidator;
 public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 
 	private static final double COLUMN_0_WIDTH = 120;
+	
+	
+	private final static double MAX_TEXTFIELD_WIDTH = 80; 
 
 	/**
 	 * 
@@ -328,7 +332,12 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 		positionPane.setHgap(5);
 		positionPane.setVgap(5);
 	
-
+		ColumnConstraints rc = new ColumnConstraints(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE, MAX_TEXTFIELD_WIDTH);
+		//this sets all text fields to the correct width - but of naff hack but what grid pane needs to work. 
+		for (int i=1; i<5; i++) {
+			positionPane.getColumnConstraints().add(rc);
+		}
+		
 		double maxWidth =10; 
 
 		xPos=new TextField();

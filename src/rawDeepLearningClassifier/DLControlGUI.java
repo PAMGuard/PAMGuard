@@ -12,6 +12,8 @@ import pamViewFX.PamControlledGUIFX;
  */
 public class DLControlGUI extends PamControlledGUIFX {
 	
+
+	
 	/**
 	 * The dl control. 
 	 */

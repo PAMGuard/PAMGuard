@@ -137,7 +137,7 @@ public class KetosWorker extends DLModelWorker<GenericPrediction> {
 			}
 
 			//ketosDLParams.dlTransfroms = transforms; //this is done after prep model in the settings pane. 
-			ketosDLParams.defaultSegmentLen = ketosParams.seglen*1000.; //the segment length in microseconds. 
+			ketosDLParams.defaultSegmentLen = ketosParams.segLen*1000.; //the segment length in microseconds. 
 			//ketosParams.classNames = new String[] {"Noise", "Right Whale"}; // FIXME; 
 			
 									

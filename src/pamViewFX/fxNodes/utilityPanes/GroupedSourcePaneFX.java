@@ -144,7 +144,7 @@ public class GroupedSourcePaneFX extends SourcePaneFX {
 		
 		//create check to show at least some check boxes need to be selected.
 		channelValidator.createCheck()
-        .dependsOn(("select all"), selectAll.selectedProperty())
+        .dependsOn(("select_all_" + this), selectAll.selectedProperty())
         .withMethod(c -> {
           if (!isAChannelSelected() ) {
 	              c.error("At least one channel needs to be selected for the module to work");
@@ -158,7 +158,7 @@ public class GroupedSourcePaneFX extends SourcePaneFX {
 			for (int i = 0; i < PamConstants.MAX_CHANNELS; i++){
 				channelBoxes[i] = new CheckBox("Channel " + i);
 				 channelValidator.createCheck()
-		          .dependsOn(("channel " + i), channelBoxes[i].selectedProperty())
+		          .dependsOn(("channel_" + i +  "_" + this), channelBoxes[i].selectedProperty())
 		          .withMethod(c -> {
 		            if (!isAChannelSelected() ) {
 			              c.error("At least one channel needs to be selected for the module to work");

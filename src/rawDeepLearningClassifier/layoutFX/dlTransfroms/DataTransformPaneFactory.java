@@ -36,6 +36,8 @@ public class DataTransformPaneFactory {
 	 * @return the DlTransfrom Settings Pane. 
 	 */
 	public static DLTransformPane getSettingsPane(DLTransform dlTransfrom) {
+		
+//		System.out.println("Gte transform pane for 1: " + dlTransfrom.getDLTransformType());
 
 		DLTransformPane settingsPane = null;
 		switch (dlTransfrom.getDLTransformType()) {
@@ -55,6 +57,9 @@ public class DataTransformPaneFactory {
 			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Factor "}); 
 			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 0.0, 1.0,   0.01);
 			break;
+		case NORMALISE_WAV:
+			settingsPane = new LabelTransfromPane(dlTransfrom, DLTransformType.NORMALISE_WAV.toString()); 
+			settingsPane.setPadding(new Insets(0,0,0,20));
 		case SPEC2DB:
 //			settingsPane = new LabelTransfromPane(dlTransfrom, DLTransformType.SPEC2DB.toString()); 
 //			settingsPane.setPadding(new Insets(0,0,0,20));
@@ -98,6 +103,14 @@ public class DataTransformPaneFactory {
 //			((SimpleTransformPane) settingsPane).getSpinners().get(0).getValueFactory().setValue(4);
 //			((SimpleTransformPane) settingsPane).getSpinners().get(1).setValueFactory(new SpinnerValueFactory.ListSpinnerValueFactory<>(createStepList()));
 			break;
+		case SPECTROGRAMKETOS:
+			
+			settingsPane = new FFTTransformPane((SimpleTransform) dlTransfrom, new String[]{"FFT Length ", "FFT Hop", "Window_Length"},  new String[]{"", "", "s"}); 
+			
+			((FFTTransformPane) settingsPane).setSpinnerMinMaxValues(1, 4, Integer.MAX_VALUE,   4);
+
+			break;
+
 		case TRIM:
 			settingsPane = new SimpleTransformPane((SimpleTransform) dlTransfrom, new String[]{"Start", "End"},  new String[]{"samples ", "samples"}); 
 			((SimpleTransformPane) settingsPane).setSpinnerMinMaxValues(0, 0, Integer.MAX_VALUE,   500);
@@ -139,6 +152,9 @@ public class DataTransformPaneFactory {
 			break;
 	
 		}
+		
+//		System.out.println("Get transform pane for 2: " + settingsPane);
+
 		return settingsPane;	
 
 	}
