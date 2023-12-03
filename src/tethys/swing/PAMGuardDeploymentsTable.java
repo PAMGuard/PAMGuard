@@ -25,6 +25,7 @@ import PamView.dialog.warn.WarnOnce;
 import PamView.panel.PamPanel;
 import PamView.tables.SwingTableColumnWidths;
 import nilus.Deployment;
+import tethys.Collection;
 import tethys.TethysControl;
 import tethys.TethysState;
 import tethys.TethysState.StateType;
@@ -33,7 +34,6 @@ import tethys.deployment.DeploymentHandler;
 import tethys.deployment.DeploymentOverview;
 import tethys.deployment.RecordingPeriod;
 import tethys.niluswraps.PDeployment;
-import tethys.niluswraps.TethysCollections;
 
 /**
  * Table view of PAMGuard deployments. For a really simple deployment, this may have only
@@ -174,11 +174,11 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 	}
 	
 	protected void exportDeployment(PDeployment pDeployment) {
-		getTethysControl().exportDocument(TethysCollections.Deployments.toString(), pDeployment.deployment.getId());
+		getTethysControl().exportDocument(Collection.Deployments.collectionName(), pDeployment.deployment.getId());
 	}
 
 	protected void displayDeployment(PDeployment pDeployment) {
-		getTethysControl().displayDocument(TethysCollections.Deployments.toString(), pDeployment.deployment.getId());
+		getTethysControl().displayDocument(Collection.Deployments.collectionName(), pDeployment.deployment.getId());
 	}
 
 	protected void deleteDeployment(PDeployment pDeployment) {

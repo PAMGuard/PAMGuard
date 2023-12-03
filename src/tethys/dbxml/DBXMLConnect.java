@@ -134,13 +134,15 @@ public class DBXMLConnect {
 	
 	/**
 	 * I don't think this should ever be used since everything goes a bit pear
-	 * shaped if the documentName isn't the same as the Id. 
+	 * shaped if the documentName isn't the same as the Id. However, for Calibration 
+	 * documents this is no longer the case, since a Calibration can have multiple
+	 * entries on different dates, so allow it !
 	 * @param nilusObject
 	 * @param documentName
 	 * @return
 	 * @throws TethysException
 	 */
-	private boolean postAndLog(Object nilusObject, String documentName) throws TethysException 
+	public boolean postAndLog(Object nilusObject, String documentName) throws TethysException 
 	{	
 		TethysException e = null;
 		boolean success = false;
@@ -283,15 +285,15 @@ An error will throw an exception.
 	
 	/**
 	 * Remove a document based on a collection name and a cdocument Id. 
-	 * @param collection
-	 * @param docId
+	 * @param collection collection name. 
+	 * @param documentName document name (not the internal Document Id)
 	 * @return
 	 * @throws TethysException
 	 */
-	public boolean removeDocument(String collection, String docId) throws TethysException {
+	public boolean removeDocument(String collection, String documentName) throws TethysException {
 		try {
 //			docId = "SoundTrap_600_HF_7129_ch00";
-			Object result = jerseyClient.removeDocument(collection, docId );
+			Object result = jerseyClient.removeDocument(collection, documentName );
 			/**
 			 * Return from a sucessful delete is something like
 			 *
@@ -304,7 +306,7 @@ An error will throw an exception.
 		}
 		catch (Exception e) {
 //			System.out.printf("Error deleting %s %s: %s\n", collection, docId, e.getMessage());
-			String msg = String.format("Error deleting %s:%s", collection, docId);
+			String msg = String.format("Error deleting %s:%s", collection, documentName);
 			throw new TethysException(msg, e.getLocalizedMessage());
 		}
 		return true;
@@ -419,7 +421,7 @@ C:\Users\dg50\AppData\Local\Temp\PAMGuardTethys\20080311_2DSimplex_0.xmlnot: 0 b
 	 * temp folder + /PAMGuardTethys. Files will be left here until PAMGUard
 	 * exits then should delete automatically
 	 */
-	private void checkTempFolder() {
+	public File checkTempFolder() {
 		String javaTmpDirs = System.getProperty("java.io.tmpdir") + File.separator + "PAMGuardTethys";
 
 		File tempDir = new File(javaTmpDirs);
@@ -432,7 +434,7 @@ C:\Users\dg50\AppData\Local\Temp\PAMGuardTethys\20080311_2DSimplex_0.xmlnot: 0 b
 		if (tempDirectory == null) {
 			tempDirectory = new File(System.getProperty("java.io.tmpdir"));
 		}
-
+		return tempDirectory;
 	}
 
 	/**

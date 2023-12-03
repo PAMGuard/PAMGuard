@@ -407,14 +407,14 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 			//			nilus.DetectionEffortKind.Parameters granularityParams = kind.getParameters();
 			switch (exportParams.granularity) {
 			case BINNED:
-				kind.getGranularity().setBinSizeM(exportParams.binDurationS/60.);
+				kind.getGranularity().setBinSizeMin(exportParams.binDurationS/60.);
 				long firstBin = DetectionsHandler.roundDownBinStart(pDeployment.getAudioStart(), (long) (exportParams.binDurationS*1000));
 				kind.getGranularity().setFirstBinStart(TethysTimeFuncs.xmlGregCalFromMillis(firstBin));
 				break;
 			case CALL:
 				break;
 			case ENCOUNTER:
-				kind.getGranularity().setEncounterGapM(exportParams.encounterGapS/60.);
+				kind.getGranularity().setEncounterGapMin(exportParams.encounterGapS/60.);
 				break;
 			case GROUPED:
 				break;

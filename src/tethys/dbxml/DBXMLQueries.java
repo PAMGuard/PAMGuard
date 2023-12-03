@@ -228,15 +228,45 @@ public class DBXMLQueries {
 		String toStrip = "dbxml:///"+collection.collectionName()+"/";
 		for (int i = 0; i < n; i++) {
 			Node aNode = returns.item(i);
+			String nameStr = null;
+			String id = null;
+			NodeList kids = aNode.getChildNodes();
+			for (int k = 0; k < kids.getLength(); k++) {
+				Node kidNode = kids.item(k);
+				String name = kidNode.getNodeName();
+				String cont = kidNode.getTextContent();
+				switch(name) {
+				case "#text":
+					nameStr = cont;
+					  nameStr = nameStr.replaceFirst(toStrip, "");
+					break;
+				case "Id":
+					id = kidNode.getTextContent();
+					break;
+				default:
+					System.out.printf("Uknonwn node in Collection list %s item %d, Node %d name %s content %s\n", 
+							collection, i, k, name, cont);
+				}
+			}
+//			if (i > 428) {
+//				System.out.println("MARU cal doc");
+//			}
 			// this is the doc name with a load of stuff in front, 
 			// e.g. dbxml:///Deployments/1705_Array-2017-09-261705_Array-2017-09-26
-			String nameStr = aNode.getTextContent();
-			nameStr = nameStr.replaceFirst(toStrip, "");
-			String id = null;
-			if (aNode instanceof Element) {
-				id = getElementData((Element) aNode, "Id");
+			if (nameStr == null) {
+			  nameStr = aNode.getTextContent();
+			  nameStr = nameStr.replaceFirst(toStrip, "");
 			}
-			
+//			if (aNode instanceof Element) {
+			//				nameStr = getElementData((Element) aNode, "#text");
+			//			}
+
+			if (id == null) {
+				if (aNode instanceof Element) {
+					id = getElementData((Element) aNode, "Id");
+				}
+			}
+
 			DocumentInfo docInfo = new DocumentInfo(collection, nameStr, id);
 			documentInfos.add(docInfo);
 //			System.out.println(nameStr + "    : " + id);
@@ -285,6 +315,10 @@ public class DBXMLQueries {
 //		return docIds;
 	}
 
+	/**
+	 * Get a list of project names. 
+	 * @return
+	 */
 	public ArrayList<String> getProjectNames() {
 
 		String projectQuery = "{\"return\":[\"Deployment/Project\"],\"select\":[],\"enclose\":1}";
@@ -957,12 +991,12 @@ public class DBXMLQueries {
 			String encounterGap_m = getElementAttribute(result, "Effort.Kind.Granularity", "EncounterGap_m");
 			String firstBinStart = getElementAttribute(result, "Effort.Kind.Granularity", "FirstBinStart");
 			try {
-				granularityType.setBinSizeM(Double.valueOf(binSize_m));
+				granularityType.setBinSizeMin(Double.valueOf(binSize_m));
 			}
 			catch (NumberFormatException e) {
 			}
 			try {
-				granularityType.setEncounterGapM(Double.valueOf(encounterGap_m));
+				granularityType.setEncounterGapMin(Double.valueOf(encounterGap_m));
 			}
 			catch (NumberFormatException e) {
 			}

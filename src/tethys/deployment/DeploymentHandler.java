@@ -48,6 +48,7 @@ import nilus.Deployment.Instrument;
 import nilus.Deployment.SamplingDetails;
 import nilus.Deployment.Sensors;
 import nilus.DeploymentRecoveryDetails;
+import nilus.DescriptionType;
 import nilus.GeometryTypeM;
 import nilus.Helper;
 import nilus.UnknownSensor;
@@ -764,6 +765,16 @@ public class DeploymentHandler implements TethysStateObserver {
 		TethysLocationFuncs.getTrackAndPositionData(deployment);			
 
 		getProjectData(deployment);
+		
+		DescriptionType description = deployment.getDescription();
+		if (description == null ) {
+			description = new DescriptionType();
+			deployment.setDescription(description);
+			description.setAbstract("No abstract");
+			description.setMethod("no methods");
+			description.setObjectives("No objectives");
+		}
+//		description.set
 
 		addSamplingDetails(deployment, recordingPeriod);
 

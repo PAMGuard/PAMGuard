@@ -31,6 +31,7 @@ import nilus.DetectionGroup;
 import nilus.Detections;
 import nilus.GranularityEnumType;
 import nilus.Helper;
+import tethys.Collection;
 import tethys.TethysControl;
 import tethys.TethysTimeFuncs;
 import tethys.dbxml.DBXMLConnect;
@@ -38,7 +39,6 @@ import tethys.dbxml.TethysException;
 import tethys.deployment.DeploymentHandler;
 import tethys.niluswraps.PDeployment;
 import tethys.niluswraps.PDetections;
-import tethys.niluswraps.TethysCollections;
 import tethys.output.StreamExportParams;
 import tethys.output.TethysExportParams;
 import tethys.pamdata.TethysDataProvider;
@@ -521,7 +521,7 @@ public class DetectionsHandler {
 		 */
 		while (true) {
 			fullId = String.format("%s_%d", prefix, uniqueDetectionsId++);
-			if (!tethysControl.getDbxmlQueries().documentExists(TethysCollections.Detections.toString(), fullId)) {
+			if (!tethysControl.getDbxmlQueries().documentExists(Collection.Detections.toString(), fullId)) {
 				break;
 			}
 		}

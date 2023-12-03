@@ -67,11 +67,11 @@ public class PDeployment {
 			return null;
 		}
 		String str = String.format("%s", granularity.getValue());
-		Double bin = granularity.getBinSizeM();
+		Double bin = granularity.getBinSizeMin();
 		if (bin != null) {
 			str += String.format(" (%3.1f s)", bin*60);
 		}
-		Double gap = granularity.getEncounterGapM();
+		Double gap = granularity.getEncounterGapMin();
 		if (gap != null) {
 			str += String.format( " (%3.1f s)", gap*60.);
 		}

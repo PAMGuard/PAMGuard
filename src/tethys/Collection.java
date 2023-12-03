@@ -33,7 +33,7 @@ public enum Collection {
 		case Detections:
 			return "Detections"; // this one is plural !
 		case Localizations:
-			return "Localization";
+			return "Localize";
 		case SpeciesAbbreviations:
 			return "SpeciesAbbreviation";
 		case Ensembles:

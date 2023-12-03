@@ -26,13 +26,13 @@ import PamguardMVC.PamDataBlock;
 import nilus.DetectionEffortKind;
 import nilus.Detections;
 import nilus.GranularityType;
+import tethys.Collection;
 import tethys.TethysControl;
 import tethys.TethysState;
 import tethys.dbxml.TethysException;
 import tethys.detection.StreamDetectionsSummary;
 import tethys.niluswraps.PDeployment;
 import tethys.niluswraps.PDetections;
-import tethys.niluswraps.TethysCollections;
 
 /**
  * Table of Detections documents for a single PAMGuard datablock. 
@@ -211,12 +211,12 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 	}
 
 	private void displayDocument(PDetections pDets) {
-		getTethysControl().displayDocument(TethysCollections.Detections.toString(), pDets.detections.getId());
+		getTethysControl().displayDocument(Collection.Detections.collectionName(), pDets.detections.getId());
 		
 	}
 
 	private void exportDocument(PDetections pDets) {
-		getTethysControl().exportDocument(TethysCollections.Detections.toString(), pDets.detections.getId());
+		getTethysControl().exportDocument(Collection.Detections.toString(), pDets.detections.getId());
 		
 	}
 

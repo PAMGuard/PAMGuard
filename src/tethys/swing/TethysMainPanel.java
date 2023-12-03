@@ -8,6 +8,7 @@ import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
 
 import tethys.TethysControl;
+import tethys.calibration.swing.CalibrationsPanel;
 
 public class TethysMainPanel extends TethysGUIPanel {
 
@@ -24,6 +25,8 @@ public class TethysMainPanel extends TethysGUIPanel {
 	private DatablockDetectionsPanel datablockDetectionsPanel;
 	
 	private DetectionsExportPanel detectionsExportPanel;
+
+	private CalibrationsPanel calibrationPanel;
 	
 	public TethysMainPanel(TethysControl tethysControl) {
 		super(tethysControl);
@@ -36,6 +39,7 @@ public class TethysMainPanel extends TethysGUIPanel {
 		detectionsExportPanel = new DetectionsExportPanel(tethysControl);
 		datablockSynchPanel.addTableObserver(detectionsExportPanel);
 		datablockSynchPanel.addTableObserver(datablockDetectionsPanel);
+		calibrationPanel = new CalibrationsPanel(tethysControl, tethysControl.getCalibrationHandler());
 		
 		JSplitPane southwestSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		JPanel southEastPanel = new JPanel(new BorderLayout());
@@ -48,7 +52,10 @@ public class TethysMainPanel extends TethysGUIPanel {
 //		splitPane.set
 		mainPanel.add(BorderLayout.CENTER, splitPane);
 //		mainPanel.add(BorderLayout.CENTER, datablockSynchPanel.getComponent());
-		splitPane.add(deploymentsPanel.getComponent());
+		JPanel splitNorth = new JPanel(new BorderLayout());
+		splitNorth.add(BorderLayout.WEST, calibrationPanel.getComponent());
+		splitNorth.add(deploymentsPanel.getComponent());
+		splitPane.add(splitNorth);
 		southwestSplit.add(datablockSynchPanel.getComponent());
 		southwestSplit.add(southEastPanel);
 		southEastPanel.add(datablockDetectionsPanel.getComponent(), BorderLayout.CENTER);

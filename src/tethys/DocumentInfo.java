@@ -11,6 +11,7 @@ public class DocumentInfo implements Comparable<DocumentInfo> {
 	private Collection collection;
 	private String documentName;
 	private String documentId;
+
 	/**
 	 * @param collection
 	 * @param documentName

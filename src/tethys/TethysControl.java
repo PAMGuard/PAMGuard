@@ -166,7 +166,17 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 				openTethysClient();
 			}
 		});
+		
 		tethysMenu.add(menuItem);
+		menuItem = new JMenuItem("Open temp document folder");
+		menuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				openTempDocuments();
+			}
+		});
+		tethysMenu.add(menuItem);
+		
 		
 		JMenuItem collections = new JMenu("Collections");
 		Collection[] mainCollections = Collection.mainList();
@@ -215,6 +225,22 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		tethysMenu.add(mapItem);
 		
 		return tethysMenu;
+	}
+
+	protected void openTempDocuments() {
+		File tempFolder = dbxmlConnect.checkTempFolder();
+		if (tempFolder == null) {
+			WarnOnce.showWarning("Tethys Error", "Unable to obtain a temporary folder name", WarnOnce.WARNING_MESSAGE);
+			return;
+		}
+		try {
+//			String cmd = "explorer.exe /select," + tempFolder.getAbsolutePath() + File.separator;
+//			Runtime.getRuntime().exec(cmd);
+			Desktop.getDesktop().open(tempFolder);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void showProjectDeploymentsDialog() {
@@ -591,7 +617,7 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 
 	public void displayDocument(DocumentInfo docInfo) {
 		String collectionName = docInfo.getCollection().collectionName();
-		String docId = docInfo.getDocumentId();
+		String docId = docInfo.getDocumentName();
 		displayDocument(collectionName, docId);
 	}
 	/**

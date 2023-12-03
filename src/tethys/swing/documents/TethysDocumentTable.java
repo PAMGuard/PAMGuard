@@ -148,7 +148,7 @@ public class TethysDocumentTable implements PamDialogPanel {
 				"Are you sure you want to delete the document " + docInfo, WarnOnce.OK_CANCEL_OPTION);
 		if (ans == WarnOnce.OK_OPTION) {
 			try {
-				tethysControl.getDbxmlConnect().removeDocument(docInfo.getCollection().collectionName(), docInfo.getDocumentId());
+				tethysControl.getDbxmlConnect().removeDocument(docInfo.getCollection().collectionName(), docInfo.getDocumentName());
 			} catch (TethysException e) {
 				System.out.println("Failed to delete " + docInfo);
 				System.out.println(e.getMessage());
