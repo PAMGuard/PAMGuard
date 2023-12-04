@@ -704,9 +704,9 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	 * @param dataBlock
 	 */
 	public void exportedDetections(PamDataBlock dataBlock) {
-		sendStateUpdate(new TethysState(StateType.TRANSFERDATA));
+		sendStateUpdate(new TethysState(StateType.EXPORTRDATA, Collection.Detections));
 		countProjectDetections();
-		sendStateUpdate(new TethysState(StateType.NEWPAMGUARDSELECTION));
+		sendStateUpdate(new TethysState(StateType.NEWPAMGUARDSELECTION, Collection.Detections));
 	}
 
 	/**

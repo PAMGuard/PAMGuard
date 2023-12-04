@@ -8,21 +8,27 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import javax.xml.bind.JAXBException;
 import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 
 import Acquisition.AcquisitionControl;
+import Acquisition.AcquisitionParameters;
 import Acquisition.AcquisitionProcess;
 import Array.ArrayManager;
 import Array.Hydrophone;
 import Array.PamArray;
+import Array.Preamplifier;
 import PamController.PamController;
 import PamController.soundMedium.GlobalMedium;
 import PamController.soundMedium.GlobalMedium.SoundMedium;
 import PamUtils.PamCalendar;
+import PamView.dialog.warn.WarnOnce;
 import dbxml.Queries;
 import PamController.soundMedium.GlobalMediumManager;
+import nilus.AlgorithmType.Parameters;
 import nilus.Calibration;
 import nilus.Calibration.FrequencyResponse;
 import nilus.Calibration.QualityAssurance;
@@ -37,6 +43,7 @@ import tethys.TethysControl;
 import tethys.TethysState;
 import tethys.TethysStateObserver;
 import tethys.TethysTimeFuncs;
+import tethys.calibration.swing.CalibrationsExportWizard;
 import tethys.dbxml.DBXMLConnect;
 import tethys.dbxml.TethysException;
 import tethys.niluswraps.NilusUnpacker;
@@ -46,15 +53,26 @@ public class CalibrationHandler implements TethysStateObserver {
 
 	private TethysControl tethysControl;
 	
-	private ArrayList<DocumentNilusObject<Calibration>> calibrationDataBlock;
+	private ArrayList<DocumentNilusObject<Calibration>> calibrationsList;
 	
+	public static final String[] updateOptions = {"as-needed", "unplanned", "yearly"};
+	
+	public static final String[] calibrationMethods = {"Reference hydrophone", "Manufacturers specification", "Piston phone", "Other calibrated source", "Unknown"};
+	
+	public static final String[] qaTypes = {"unverified", "valid", "invalid"};
+	
+	private Helper nilusHelper;
 	/**
 	 * @param tethysControl
 	 */
 	public CalibrationHandler(TethysControl tethysControl) {
 		this.tethysControl = tethysControl;
-		calibrationDataBlock = new ArrayList();
-		tethysControl.addStateObserver(this);
+		calibrationsList = new ArrayList();
+		tethysControl.addStateObserver(this);		try {
+			nilusHelper = new Helper();
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -64,20 +82,43 @@ public class CalibrationHandler implements TethysStateObserver {
 			break;
 		case NEWPAMGUARDSELECTION:
 		case NEWPROJECTSELECTION:
-		case TRANSFERDATA:
+		case EXPORTRDATA:
+		case DELETEDATA:
 		case UPDATEMETADATA:
 		case UPDATESERVER:
-			updateDocumentsList();
+			if (isWantedState(tethysState)) {
+				updateDocumentsList();
+			}
 		default:
 			break;
 		
 		}
 	}
+	
+	/**
+	 * Is it a state notification we want to respond to 
+	 * @param state
+	 * @return true if worth it. 
+	 */
+	protected boolean isWantedState(TethysState state) {
+		if (state.collection == null) {
+			return true;
+		}
+		switch (state.collection) {
+		case OTHER:
+		case Calibrations:
+			return true;
+		}
+		return false;
+	}
 
+	/**
+	 * Update the list of documents associated with the selected instrument.  
+	 */
 	private void updateDocumentsList() {
 		ArrayList<DocumentInfo> docsList = getArrayCalibrations();
 		// now immediately read the calibrations in again. 
-		calibrationDataBlock.clear();;
+		calibrationsList.clear();;
 		NilusUnpacker unpacker = new NilusUnpacker();
 		for (DocumentInfo aDoc : docsList) {
 			Queries queries = tethysControl.getDbxmlConnect().getTethysQueries();
@@ -109,7 +150,7 @@ public class CalibrationHandler implements TethysStateObserver {
 					
 				}
 				DocumentNilusObject<Calibration> calDataUnit = new DocumentNilusObject(Collection.Calibrations, aDoc.getDocumentName(), calObj.getId(), calObj);
-				calibrationDataBlock.add(calDataUnit);
+				calibrationsList.add(calDataUnit);
 //				System.out.println(result);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -119,47 +160,105 @@ public class CalibrationHandler implements TethysStateObserver {
 	}
 
 	public int exportAllCalibrations() {
+		
+		Calibration sampleCal = new Calibration();
+		try {
+			Helper.createRequiredElements(sampleCal);
+		} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e1) {
+			e1.printStackTrace();
+		}
+		sampleCal = CalibrationsExportWizard.showWizard(tethysControl.getGuiFrame(), sampleCal);
+		if (sampleCal == null) {
+			return 0;
+		}
+		
 		PamArray array = ArrayManager.getArrayManager().getCurrentArray();
 		int nPhone = array.getHydrophoneCount();
 		DBXMLConnect dbxml = tethysControl.getDbxmlConnect();
 		int nExport = 0;
+		boolean overwrite = false;
+		boolean exists;
 		for (int i = 0; i < nPhone; i++) {
 //			String docName = getHydrophoneId(i);
 			Calibration calDoc = createCalibrationDocument(i);
-			String calDocName = getDocumentName(calDoc, i);
+			if (sampleCal != null) {
+				calDoc.setMetadataInfo(sampleCal.getMetadataInfo());
+				MetadataInfo oldMeta = calDoc.getMetadataInfo();
+				MetadataInfo newMeta = sampleCal.getMetadataInfo();
+				
+				
+				calDoc.setProcess(sampleCal.getProcess());
+				calDoc.setQualityAssurance(sampleCal.getQualityAssurance());
+				calDoc.setResponsibleParty(sampleCal.getResponsibleParty());
+				calDoc.setTimeStamp(sampleCal.getTimeStamp());
+			}
+			
+			addParameterDetails(calDoc, i);
+			
+			String calDocName = createDocumentName(calDoc, i);
+			exists = calDocumentExists(calDocName);
+			if (exists && overwrite == false) {
+				String msg = String.format("Calibration document %s already exists. Do you want to overwrite it and other documents from this date?", calDocName);
+				int ans = WarnOnce.showWarning("Calibration Export", msg, WarnOnce.OK_CANCEL_OPTION);
+				if (ans == WarnOnce.OK_OPTION) {
+					overwrite = true;
+				}
+				else {
+					return nExport;
+				}
+			}
 			boolean ok = false;
+			if (exists == true && overwrite == false) {
+				continue;
+			}
 			try {
+				if (exists) {
+					ok = dbxml.removeDocument(Collection.Calibrations, calDocName);
+				}
 				ok = dbxml.postAndLog(calDoc, calDocName);
 			} catch (TethysException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				tethysControl.showException(e);
 				ok = false;
+				break;
 			}
 			if (ok) {
 				nExport++;
 			}
 		}
+		tethysControl.sendStateUpdate(new TethysState(TethysState.StateType.EXPORTRDATA, Collection.Calibrations));
 		return nExport;
 	}
 	
 	/**
-	 * Get a name for the document, which is  a bit like the id within
-	 * the document, but also contain a yymmdd data string. 
+	 * Add the separate pamguard parameters to the document which are used
+	 * to make up the overall calibration. 
 	 * @param calDoc
-	 * @param i channel
-	 * @return document name
+	 * @param i
 	 */
-	private String getDocumentName(Calibration calDoc, int iChan) {
-		long docDate = System.currentTimeMillis();
-		XMLGregorianCalendar date = calDoc.getMetadataInfo().getDate();
-		if (date != null) {
-			docDate = TethysTimeFuncs.millisFromGregorianXML(date);
+	private void addParameterDetails(Calibration calDoc, int i) {
+		Parameters params = calDoc.getProcess().getParameters();
+		PamArray array = ArrayManager.getArrayManager().getCurrentArray();
+		AcquisitionControl daqControl = (AcquisitionControl) PamController.getInstance().findControlledUnit(AcquisitionControl.unitType);
+		AcquisitionParameters daqParams = daqControl.getAcquisitionParameters();
+		Hydrophone phone = array.getHydrophoneArray().get(i);
+		try {
+			nilusHelper.AddAnyElement(params.getAny(), "HydrophoneType", phone.getType());
+			nilusHelper.AddAnyElement(params.getAny(), "Sensitivity", String.format("%3.1f", phone.getSensitivity()));
+			nilusHelper.AddAnyElement(params.getAny(), "PreampGain", String.format("%3.1f", phone.getPreampGain()));
+			nilusHelper.AddAnyElement(params.getAny(), "ADCp-p", String.format("%3.2fV", daqParams.getVoltsPeak2Peak()));
+			Preamplifier preamp = daqParams.preamplifier;
+			if (preamp != null) {
+				nilusHelper.AddAnyElement(params.getAny(), "ADCAmplifier", String.format("%3.2fdB", preamp.getGain()));
+			}
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
 		}
-		String dateStr = formatDate(docDate);
-		String name = String.format("%s_%s_ch%d", getCalibrationDocumentRoot(), dateStr, iChan);
-		return name;
+		
 	}
+
 	/**
 	 * Format the data in the dd MMMM yyyy format
 	 * @param timeInMillis time in milliseconds
@@ -177,11 +276,29 @@ public class CalibrationHandler implements TethysStateObserver {
 
 
 	/**
+	 * Get a name for the document, which is  a bit like the id within
+	 * the document, but also contain a yymmdd data string. 
+	 * @param calDoc
+	 * @param i channel
+	 * @return document name
+	 */
+	private String createDocumentName(Calibration calDoc, int iChan) {
+		long docDate = System.currentTimeMillis();
+		XMLGregorianCalendar date = calDoc.getMetadataInfo().getDate();
+		if (date != null) {
+			docDate = TethysTimeFuncs.millisFromGregorianXML(date);
+		}
+		String dateStr = formatDate(docDate);
+		String name = String.format("%s_%s_ch%d", createCalibrationDocumentRoot(), dateStr, iChan);
+		return name;
+	}
+
+	/**
 	 * Get a start of name for a calibration document. This will be used in the document name
 	 * with a date and a channel, and the document Id just of the root and the channel. 
 	 * @return root string for document names and document id's. 
 	 */
-	public String getCalibrationDocumentRoot() {
+	public String createCalibrationDocumentRoot() {
 		PamArray array = ArrayManager.getArrayManager().getCurrentArray();
 		if (array == null) {
 			return null;
@@ -308,6 +425,59 @@ public class CalibrationHandler implements TethysStateObserver {
 		
 		return calibration;
 	}
+	
+	/**
+	 * See if a document already exists. This should only occur if you 
+	 * try to export the same document twice with the same calibration date. 
+	 * @param documentName
+	 * @return true if a document already exists. 
+	 */
+	public boolean calDocumentExists(String documentName) {
+		if (calibrationsList == null) {
+			return false;
+		}
+		for (int i = 0; i < calibrationsList.size(); i++) {
+			if (calibrationsList.get(i).getDocumentName().equalsIgnoreCase(documentName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Return if we have at least one document for every channel. 
+	 * @return true if all cal documents exist. 
+	 */
+	public boolean haveAllChannelCalibrations() {
+		PamArray array = ArrayManager.getArrayManager().getCurrentArray();
+		int nPhone = array.getHydrophoneCount();
+		for (int i = 0; i < nPhone; i++) {
+			if (haveChannelCalibration(i) == false) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	/**
+	 * Find whether we have a document for this instrument and channel. 
+	 * @param iChan
+	 * @return true if we have an appropriate doc. 
+	 */
+	public boolean haveChannelCalibration(int iChan) {
+		if (calibrationsList == null) {
+			return false;
+		}
+		String seachPattern = makeChannelNamePart(iChan);
+		for (int i = 0; i < calibrationsList.size(); i++) {
+			String docName = calibrationsList.get(i).getDocumentName();
+			if (docName.endsWith(seachPattern)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
 
 	/**
 	 * Get an id based on the instrument identifiers and channel number. 
@@ -321,21 +491,34 @@ public class CalibrationHandler implements TethysStateObserver {
 		if (array == null) {
 			return null;
 		}
-		String id = String.format("%s_ch%02d", getCalibrationDocumentRoot(), channelIndex);
+		String id = String.format("%s_%s", createCalibrationDocumentRoot(), makeChannelNamePart(channelIndex));
 		id = id.replace(" ", "_");
 		return id;
+	}
+	
+	/**
+	 * Make the final part of the document name / id which is the channel number. 
+	 * @param channelIndex channel index
+	 * @return string in the form ch%02d (e.g. ch03) 
+	 */
+	public String makeChannelNamePart(int channelIndex) {
+		return String.format("ch%02d", channelIndex);
 	}
 
 	/**
 	 * @return the calibrationDataBlock
 	 */
 	public ArrayList<DocumentNilusObject<Calibration>> getCalibrationDataList() {
-		return calibrationDataBlock;
+		return calibrationsList;
 	}
 	
+	/**
+	 * Make a list of document names associated with this instrument. 
+	 * @return list of calibration documents using this instrument, based on the start of the document name. 
+	 */
 	private ArrayList<DocumentInfo> getArrayCalibrations() {
 		ArrayList<DocumentInfo> allCals = tethysControl.getDbxmlQueries().getCollectionDocumentList(Collection.Calibrations);
-		String prefix = getCalibrationDocumentRoot();
+		String prefix = createCalibrationDocumentRoot();
 		// find doc names that have that root. 
 		ArrayList<DocumentInfo> theseCals = new ArrayList<>();
 		for (DocumentInfo aDoc : allCals) {

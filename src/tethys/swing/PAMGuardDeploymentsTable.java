@@ -196,7 +196,7 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 		} catch (TethysException e) {
 			getTethysControl().showException(e);
 		}
-		getTethysControl().sendStateUpdate(new TethysState(StateType.UPDATESERVER));
+		getTethysControl().sendStateUpdate(new TethysState(StateType.UPDATESERVER, Collection.Deployments));
 	}
 
 	/**

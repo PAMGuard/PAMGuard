@@ -2,6 +2,8 @@ package tethys.swing.export;
 
 import javax.swing.JPanel;
 
+import PamView.wizard.PamWizard;
+import PamView.wizard.PamWizardCard;
 import PamguardMVC.PamDataBlock;
 import tethys.TethysControl;
 import tethys.output.StreamExportParams;
@@ -12,7 +14,7 @@ import tethys.output.StreamExportParams;
  * @author dg50
  *
  */
-abstract public class ExportWizardCard extends JPanel {
+abstract public class ExportWizardCard extends PamWizardCard<StreamExportParams> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -20,9 +22,9 @@ abstract public class ExportWizardCard extends JPanel {
 	private PamDataBlock dataBlock;
 	private TethysControl tethysControl;
 	
-	public ExportWizardCard(TethysControl tethysControl, String title, PamDataBlock dataBlock) {
+	public ExportWizardCard(TethysControl tethysControl, PamWizard pamWizard, String title, PamDataBlock dataBlock) {
+		super(pamWizard, title);
 		this.tethysControl = tethysControl;
-		this.title = title;
 		this.dataBlock = dataBlock;
 	}
 	
@@ -32,14 +34,6 @@ abstract public class ExportWizardCard extends JPanel {
 
 	public TethysControl getTethysControl() {
 		return tethysControl;
-	}
-
-	public abstract boolean getParams(StreamExportParams streamExportParams);
-	
-	public abstract void setParams(StreamExportParams streamExportParams);
-
-	public String getTitle() {
-		return title;
 	}
 	
 }

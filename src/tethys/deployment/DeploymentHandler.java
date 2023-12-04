@@ -54,6 +54,7 @@ import nilus.Helper;
 import nilus.UnknownSensor;
 import pamMaths.PamVector;
 import pamMaths.STD;
+import tethys.Collection;
 import tethys.TethysControl;
 import tethys.TethysLocationFuncs;
 import tethys.TethysState;
@@ -108,7 +109,7 @@ public class DeploymentHandler implements TethysStateObserver {
 		case NEWPROJECTSELECTION:
 			updateProjectDeployments();
 			break;
-		case TRANSFERDATA:
+		case EXPORTRDATA:
 			updateProjectDeployments();
 			break;
 		case UPDATESERVER:
@@ -334,7 +335,7 @@ public class DeploymentHandler implements TethysStateObserver {
 		catch (TethysException e) {
 			getTethysControl().showException(e);
 		}
-		getTethysControl().sendStateUpdate(new TethysState(StateType.UPDATESERVER));
+		getTethysControl().sendStateUpdate(new TethysState(StateType.UPDATESERVER, Collection.Deployments));
 	}
 	
 	/**
@@ -372,7 +373,7 @@ public class DeploymentHandler implements TethysStateObserver {
 				getTethysControl().showException(e);
 			}
 		}
-		getTethysControl().sendStateUpdate(new TethysState(StateType.UPDATESERVER));
+		getTethysControl().sendStateUpdate(new TethysState(StateType.UPDATESERVER, Collection.Deployments));
 	}
 
 	/**

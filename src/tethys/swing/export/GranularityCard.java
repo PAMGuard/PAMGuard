@@ -51,7 +51,7 @@ public class GranularityCard extends ExportWizardCard {
 	private GranularityEnumType[] allowedGranularities;
 
 	public GranularityCard(DetectionsExportWizard detectionsExportWizard, TethysControl tethysControl, PamDataBlock dataBlock) {
-		super(tethysControl, "Granularity", dataBlock);
+		super(tethysControl, detectionsExportWizard, "Granularity", dataBlock);
 		this.detectionsExportWizard = detectionsExportWizard;
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 

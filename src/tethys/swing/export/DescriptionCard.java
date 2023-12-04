@@ -11,7 +11,7 @@ public class DescriptionCard extends ExportWizardCard {
 	private DescriptionTypePanel descriptionPanel;
 	
 	public DescriptionCard(DetectionsExportWizard detectionsExportWizard, TethysControl tethysControl, PamDataBlock dataBlock) {
-		super(tethysControl, "Description", dataBlock);
+		super(tethysControl, detectionsExportWizard, "Description", dataBlock);
 		this.setLayout(new BorderLayout());
 		descriptionPanel = new DescriptionTypePanel("Description data", true, true, true);
 		this.add(BorderLayout.CENTER, descriptionPanel.getMainPanel());

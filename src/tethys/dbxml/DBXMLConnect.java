@@ -282,7 +282,7 @@ An error will throw an exception.
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Remove a document based on a collection name and a cdocument Id. 
 	 * @param collection collection name. 
@@ -290,23 +290,32 @@ An error will throw an exception.
 	 * @return
 	 * @throws TethysException
 	 */
-	public boolean removeDocument(String collection, String documentName) throws TethysException {
+	public boolean removeDocument(Collection collection, String documentName) throws TethysException {
+		return removeDocument(collection.collectionName(), documentName);
+	}
+
+	/**
+	 * Remove a document based on a collection name and a document namw. 
+	 * @param collectionName collection name. 
+	 * @param documentName document name (not the internal Document Id)
+	 * @return
+	 * @throws TethysException
+	 */
+	public boolean removeDocument(String collectionName, String documentName) throws TethysException {
 		try {
-//			docId = "SoundTrap_600_HF_7129_ch00";
-			Object result = jerseyClient.removeDocument(collection, documentName );
+			Object result = jerseyClient.removeDocument(collectionName, documentName );
 			/**
 			 * Return from a sucessful delete is something like
 			 *
 				deployment = getTethysControl().getDeploymentHandler().createDeploymentDocument(freeId++, recordPeriod);
 				<DELETE>
-  <ITEM> ['ECoastNARW0'] </ITEM>
-</DELETE>
-An error will throw an exception. 
+  					<ITEM> ['ECoastNARW0'] </ITEM>
+				</DELETE>
+			An error will throw an exception. 
 			 */
 		}
 		catch (Exception e) {
-//			System.out.printf("Error deleting %s %s: %s\n", collection, docId, e.getMessage());
-			String msg = String.format("Error deleting %s:%s", collection, documentName);
+			String msg = String.format("Error deleting %s:%s", collectionName, documentName);
 			throw new TethysException(msg, e.getLocalizedMessage());
 		}
 		return true;

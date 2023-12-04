@@ -8,7 +8,7 @@ package tethys;
  */
 public enum Collection {
 
-	Deployments, Detections, Calibrations, Localizations, SpeciesAbbreviations, Ensembles, SourceMaps, ITIS, ITIS_ranks;
+	Deployments, Detections, Calibrations, Localizations, SpeciesAbbreviations, Ensembles, SourceMaps, ITIS, ITIS_ranks, OTHER;
 	
 	/**
 	 * A list of the main collections in the database, i.e. ones the user will 

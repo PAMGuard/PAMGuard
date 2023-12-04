@@ -39,7 +39,7 @@ public class ExportWorkerCard extends ExportWizardCard implements DetectionExpor
 	private DetectionsExportWizard detectionsExportWizard;
 
 	public ExportWorkerCard(DetectionsExportWizard detectionsExportWizard, TethysControl tethysControl, PamDataBlock dataBlock) {
-		super(tethysControl, "Export", dataBlock);
+		super(tethysControl, detectionsExportWizard, "Export", dataBlock);
 		this.detectionsExportWizard = detectionsExportWizard;
 		setLayout(new BorderLayout());
 		setBorder(new TitledBorder("Export data"));

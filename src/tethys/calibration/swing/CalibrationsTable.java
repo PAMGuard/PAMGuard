@@ -33,7 +33,7 @@ import tethys.calibration.CalibrationHandler;
 import tethys.dbxml.TethysException;
 import tethys.swing.TethysGUIPanel;
 
-public class CalibrationsPanel extends TethysGUIPanel {
+public class CalibrationsTable extends TethysGUIPanel {
 
 	private CalibrationHandler calibrationHandler;
 	
@@ -48,7 +48,7 @@ public class CalibrationsPanel extends TethysGUIPanel {
 	/**
 	 * @param calibrationHandler
 	 */
-	public CalibrationsPanel(TethysControl tethysControl, CalibrationHandler calibrationHandler) {
+	public CalibrationsTable(TethysControl tethysControl, CalibrationHandler calibrationHandler) {
 		super(tethysControl);
 		this.tethysControl = tethysControl;
 		this.calibrationHandler = calibrationHandler;
@@ -60,7 +60,6 @@ public class CalibrationsPanel extends TethysGUIPanel {
 		JScrollPane scrollPane = new JScrollPane(calTable);
 		
 		mainPanel = new PamPanel(new BorderLayout());
-		mainPanel.setBorder(new TitledBorder("Instrument calibration information"));
 		mainPanel.add(BorderLayout.CENTER, scrollPane);
 
 		calTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -177,7 +176,7 @@ public class CalibrationsPanel extends TethysGUIPanel {
 			try {
 				DocumentNilusObject<Calibration> doc = calibrationHandler.getCalibrationDataList().get(rows[i]);
 				docName = doc.getDocumentName();
-				tethysControl.getDbxmlConnect().removeDocument(Collection.Calibrations.collectionName(), docName);
+				tethysControl.getDbxmlConnect().removeDocument(Collection.Calibrations, docName);
 			} catch (TethysException e) {
 				System.out.println("Failed to delete " + docName);
 				System.out.println(e.getMessage());
@@ -189,7 +188,7 @@ public class CalibrationsPanel extends TethysGUIPanel {
 	}
 
 	private void updateEverything() {
-		calibrationHandler.updateState(new TethysState(StateType.TRANSFERDATA));
+		getTethysControl().sendStateUpdate(new TethysState(StateType.DELETEDATA, Collection.Calibrations));
 	}
 
 	class CalibrationsTableModel extends AbstractTableModel {

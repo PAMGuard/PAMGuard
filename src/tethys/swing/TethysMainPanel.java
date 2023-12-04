@@ -8,7 +8,8 @@ import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
 
 import tethys.TethysControl;
-import tethys.calibration.swing.CalibrationsPanel;
+import tethys.calibration.swing.CalibrationsMainPanel;
+import tethys.calibration.swing.CalibrationsTable;
 
 public class TethysMainPanel extends TethysGUIPanel {
 
@@ -26,7 +27,7 @@ public class TethysMainPanel extends TethysGUIPanel {
 	
 	private DetectionsExportPanel detectionsExportPanel;
 
-	private CalibrationsPanel calibrationPanel;
+	private CalibrationsMainPanel calibrationPanel;
 	
 	public TethysMainPanel(TethysControl tethysControl) {
 		super(tethysControl);
@@ -39,7 +40,7 @@ public class TethysMainPanel extends TethysGUIPanel {
 		detectionsExportPanel = new DetectionsExportPanel(tethysControl);
 		datablockSynchPanel.addTableObserver(detectionsExportPanel);
 		datablockSynchPanel.addTableObserver(datablockDetectionsPanel);
-		calibrationPanel = new CalibrationsPanel(tethysControl, tethysControl.getCalibrationHandler());
+		calibrationPanel = new CalibrationsMainPanel(tethysControl, tethysControl.getCalibrationHandler());
 		
 		JSplitPane southwestSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		JPanel southEastPanel = new JPanel(new BorderLayout());
