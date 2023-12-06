@@ -92,7 +92,7 @@ public abstract class SQLLogging {
 	 * Reference to the table definition object.
 	 * This MUST be set from within the concrete logging class.  
 	 */
-	private EmptyTableDefinition pamTableDefinition;
+	private PamTableDefinition pamTableDefinition;
 	
 	/**
 	 * More and more data blocks are starting to use annotations, which require
@@ -102,7 +102,7 @@ public abstract class SQLLogging {
 	 * table definition is set, so that it can be got and modified by the 
 	 * annotation handler shortly after the main table is created.  
 	 */
-	private EmptyTableDefinition baseTableDefinition;
+	private PamTableDefinition baseTableDefinition;
 
 	//	private long selectT1, selectT2;
 	private PamViewParameters currentViewParameters;
@@ -234,7 +234,7 @@ public abstract class SQLLogging {
 	 * @return a Pamguard database table definition object
 	 * @see PamTableDefinition
 	 */
-	public final EmptyTableDefinition getTableDefinition() {
+	public final PamTableDefinition getTableDefinition() {
 		return pamTableDefinition;
 	}
 
@@ -243,7 +243,7 @@ public abstract class SQLLogging {
 	 * 
 	 * @param pamTableDefinition PamTableDefinition to set
 	 */
-	public void setTableDefinition(EmptyTableDefinition pamTableDefinition) {
+	public void setTableDefinition(PamTableDefinition pamTableDefinition) {
 		this.pamTableDefinition = pamTableDefinition;
 		if (baseTableDefinition == null && pamTableDefinition != null) {
 			baseTableDefinition = pamTableDefinition.clone();
@@ -1827,7 +1827,7 @@ public abstract class SQLLogging {
 	 * annotation handler shortly after the main table is created.  
 	 * @return the baseTableDefinition
 	 */
-	public EmptyTableDefinition getBaseTableDefinition() {
+	public PamTableDefinition getBaseTableDefinition() {
 		return baseTableDefinition;
 	}
 

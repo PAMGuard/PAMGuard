@@ -34,14 +34,14 @@ public class TowedArray3DSQLLogging extends PamDetectionLogging {
 		this.towedArray3DController = towedArray3DController;
 		
 		// create the table definition. 
-		EmptyTableDefinition tableDefinition = createTableDefinition();
+		PamTableDefinition tableDefinition = createTableDefinition();
 	}
 	
-	public EmptyTableDefinition createTableDefinition() {
+	public PamTableDefinition createTableDefinition() {
 		
 		
 //		PamTableDefinition tableDef = new PamTableDefinition(towedArray3DController.getUnitName(), getUpdatePolicy());
-		EmptyTableDefinition tableDef = super.getTableDefinition();
+		PamTableDefinition tableDef = super.getTableDefinition();
 		tableDef.setUpdatePolicy(SQLLogging.UPDATE_POLICY_WRITENEW);
 		
 //		PamTableItem tableItem;

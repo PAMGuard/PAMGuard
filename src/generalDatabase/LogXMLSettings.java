@@ -13,7 +13,7 @@ import PamController.settings.output.xml.PamguardXMLWriter;
 import PamUtils.PamCalendar;
 import PamguardMVC.PamDataUnit;
 /**
- * 2022 Additional say of saving settings for each module into the database in more human readable 
+ * 2022 Additional way of saving settings for each module into the database in more human readable 
  * XML format. <p>
  * In other ways, similar to LogSettings which saves serialised Java. This will write a line
  * per module. A main difference is that on pamStop it will update the end time for each line, so 

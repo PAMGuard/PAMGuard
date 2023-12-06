@@ -127,7 +127,7 @@ public abstract class OneStopAnnotationHandler extends AnnotationChoiceHandler i
 			return;
 		}
 		// get, modify and set the modified tabelDef
-		EmptyTableDefinition tableDef = logging.getBaseTableDefinition();
+		PamTableDefinition tableDef = logging.getBaseTableDefinition();
 		logging.setTableDefinition(tableDef);
 		addAnnotationSqlAddons(logging); // this will add the additional columns. 
 		DBControlUnit dbc = DBControlUnit.findDatabaseControl();

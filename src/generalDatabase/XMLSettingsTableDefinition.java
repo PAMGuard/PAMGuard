@@ -4,7 +4,7 @@ import java.sql.Types;
 
 import PamguardMVC.PamConstants;
 
-public class XMLSettingsTableDefinition extends EmptyTableDefinition {
+public class XMLSettingsTableDefinition extends PamTableDefinition {
 	
 	private PamTableItem dataStart, dataEnd, processStart, processEnd, type, name, pamGuardVersion, settingsVersion, xmlSettings;
 	
