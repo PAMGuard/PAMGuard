@@ -11,7 +11,8 @@ import PamUtils.LatLong;
 /**
  * Class to hold Deployment data in a form consistent with the ANSI PAM
  * Standard. This has been keep separate from the Tethys Interface to keep it
- * easy to benefit from these data without using Tethys itself.
+ * easy to benefit from these data without using Tethys itself. Is also serilaisable
+ * which is important for storage into PAMGuard settings. 
  * 
  * @author dg50
  *
@@ -108,15 +109,17 @@ public class DeploymentData implements Serializable, Cloneable, ManagedParameter
 		this.recoveryMillis = recoveryMillis;
 	}
 
-//	/**
-//	 * Instrument type, e.g. HARP, EAR, Popup, DMON, etc.
-//	 */
-//	private String instrumentType;
-//
-//	/**
-//	 * Instrument identifier, e.g. serial number
-//	 */
-//	private String instrumentId;
+	/**
+	 * Set data from a nilus deployment class
+	 * @param nilusDeployment
+	 */
+	public void setData(nilus.Deployment nilusDeployment) {
+		
+	}
+	
+	public void getData(nilus.Deployment nilusDeployment) {
+		
+	}
 
 	public DeploymentData() {
 	}
@@ -151,103 +154,103 @@ public class DeploymentData implements Serializable, Cloneable, ManagedParameter
 		return ps;
 	}
 
-	/**
-	 * @return the id
-	 */
-	public String getId() {
-		return id;
-	}
-
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	/**
-	 * @return the project
-	 */
-	public String getProject() {
-		return project;
-	}
-
-	/**
-	 * @param project the project to set
-	 */
-	public void setProject(String project) {
-		this.project = project;
-	}
-
-	/**
-	 * @return the deploymentId
-	 */
-	public int getDeploymentId() {
-		return deploymentId;
-	}
-
-	/**
-	 * @param deploymentId the deploymentId to set
-	 */
-	public void setDeploymentId(int deploymentId) {
-		this.deploymentId = deploymentId;
-	}
-
-	/**
-	 * @return the deplomentAlias
-	 */
-	public String getDeploymentAlias() {
-		return deploymentAlias;
-	}
-
-	/**
-	 * @param deplomentAlias the deplomentAlias to set
-	 */
-	public void setDeploymentAlias(String deplomentAlias) {
-		this.deploymentAlias = deplomentAlias;
-	}
-
-	/**
-	 * @return the site
-	 */
-	public String getSite() {
-		return site;
-	}
-
-	/**
-	 * @param site the site to set
-	 */
-	public void setSite(String site) {
-		this.site = site;
-	}
-
-	/**
-	 * @return the siteAliases
-	 */
-	public String getSiteAliases() {
-		return siteAliases;
-	}
-
-	/**
-	 * @param siteAliases the siteAliases to set
-	 */
-	public void setSiteAliases(String siteAliases) {
-		this.siteAliases = siteAliases;
-	}
-
-	/**
-	 * @return the cruise
-	 */
-	public String getCruise() {
-		return cruise;
-	}
-
-	/**
-	 * @param cruise the cruise to set
-	 */
-	public void setCruise(String cruise) {
-		this.cruise = cruise;
-	}
+//	/**
+//	 * @return the id
+//	 */
+//	public String getId() {
+//		return id;
+//	}
+//
+//	/**
+//	 * @param id the id to set
+//	 */
+//	public void setId(String id) {
+//		this.id = id;
+//	}
+//
+//	/**
+//	 * @return the project
+//	 */
+//	public String getProject() {
+//		return project;
+//	}
+//
+//	/**
+//	 * @param project the project to set
+//	 */
+//	public void setProject(String project) {
+//		this.project = project;
+//	}
+//
+//	/**
+//	 * @return the deploymentId
+//	 */
+//	public int getDeploymentId() {
+//		return deploymentId;
+//	}
+//
+//	/**
+//	 * @param deploymentId the deploymentId to set
+//	 */
+//	public void setDeploymentId(int deploymentId) {
+//		this.deploymentId = deploymentId;
+//	}
+//
+//	/**
+//	 * @return the deplomentAlias
+//	 */
+//	public String getDeploymentAlias() {
+//		return deploymentAlias;
+//	}
+//
+//	/**
+//	 * @param deplomentAlias the deplomentAlias to set
+//	 */
+//	public void setDeploymentAlias(String deplomentAlias) {
+//		this.deploymentAlias = deplomentAlias;
+//	}
+//
+//	/**
+//	 * @return the site
+//	 */
+//	public String getSite() {
+//		return site;
+//	}
+//
+//	/**
+//	 * @param site the site to set
+//	 */
+//	public void setSite(String site) {
+//		this.site = site;
+//	}
+//
+//	/**
+//	 * @return the siteAliases
+//	 */
+//	public String getSiteAliases() {
+//		return siteAliases;
+//	}
+//
+//	/**
+//	 * @param siteAliases the siteAliases to set
+//	 */
+//	public void setSiteAliases(String siteAliases) {
+//		this.siteAliases = siteAliases;
+//	}
+//
+//	/**
+//	 * @return the cruise
+//	 */
+//	public String getCruise() {
+//		return cruise;
+//	}
+//
+//	/**
+//	 * @param cruise the cruise to set
+//	 */
+//	public void setCruise(String cruise) {
+//		this.cruise = cruise;
+//	}
 
 //	/**
 //	 * @return the platform

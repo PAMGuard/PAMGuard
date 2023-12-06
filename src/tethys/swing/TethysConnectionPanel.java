@@ -22,6 +22,8 @@ import PamView.dialog.ScrollingPamLabel;
 import PamView.dialog.SettingsButton;
 import PamView.panel.PamPanel;
 import PamView.panel.WestAlignedPanel;
+import metadata.MetaDataContol;
+import metadata.PamguardMetaData;
 import metadata.deployment.DeploymentData;
 import nilus.Deployment;
 import pamViewFX.fxNodes.PamComboBox;
@@ -185,9 +187,10 @@ public class TethysConnectionPanel extends TethysGUIPanel {
 	 * Action from new project button
 	 */
 	protected void createNewProject() {
-		DeploymentData pamDeploymentData = getTethysControl().getGlobalDeplopymentData();
+		PamguardMetaData pamDeploymentData = MetaDataContol.getMetaDataControl().getMetaData();
 		pamDeploymentData = NewProjectDialog.showDialog(getTethysControl().getGuiFrame(), getTethysControl(), pamDeploymentData);
 		if (pamDeploymentData != null) {
+			MetaDataContol.getMetaDataControl().setMetaData(pamDeploymentData);
 			updateProjectList();
 		}
 	}
@@ -197,8 +200,10 @@ public class TethysConnectionPanel extends TethysGUIPanel {
 		if (project == null) {
 			return;
 		}
-		DeploymentData globData = getTethysControl().getGlobalDeplopymentData();
-		globData.setProject(project);
+		PamguardMetaData pamMetaData = MetaDataContol.getMetaDataControl().getMetaData();
+		Deployment globDeployment = pamMetaData.getDeployment();
+//		DeploymentData globData = getTethysControl().getGlobalDeplopymentData();
+		globDeployment.setProject(project);
 		getTethysControl().getDeploymentHandler().updateProjectDeployments();
 		/*
 		 *  if there are existing deployment data, then copy the info to the
@@ -207,8 +212,8 @@ public class TethysConnectionPanel extends TethysGUIPanel {
 		ArrayList<PDeployment> projectDeployments = getTethysControl().getDeploymentHandler().getProjectDeployments();
 		if (projectDeployments != null && projectDeployments.size() > 0) {
 			Deployment dep = projectDeployments.get(0).deployment;
-			globData.setProject(dep.getProject());
-			globData.setRegion(dep.getRegion());
+			globDeployment.setProject(dep.getProject());
+			globDeployment.setRegion(dep.getRegion());
 			getTethysControl().sendStateUpdate(new TethysState(TethysState.StateType.NEWPROJECTSELECTION));
 		}
 		
@@ -271,9 +276,10 @@ public class TethysConnectionPanel extends TethysGUIPanel {
 		 *  list.  
 		 */
 		String localProjName = null;
-		DeploymentData pamDeploymentData = getTethysControl().getGlobalDeplopymentData();
-		if (pamDeploymentData != null && pamDeploymentData.getProject() != null) {
-			localProjName = pamDeploymentData.getProject();
+		PamguardMetaData pamMetaData = MetaDataContol.getMetaDataControl().getMetaData();
+		Deployment globDeployment = pamMetaData.getDeployment();
+		if (globDeployment != null && globDeployment.getProject() != null) {
+			localProjName = globDeployment.getProject();
 			if (localProjName.length() == 0) {
 				localProjName = null;
 			}

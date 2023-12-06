@@ -132,7 +132,7 @@ public class DeploymentExportPanel extends TethysGUIPanel implements DeploymentT
 	}
 
 	private void copyDeploymentData(Deployment deployment) {
-		DeploymentData globalMeta = getTethysControl().getGlobalDeplopymentData();
+		Deployment globalMeta = getTethysControl().getGlobalDeplopymentData();
 		globalMeta.setSite(deployment.getSite());
 		globalMeta.setCruise(deployment.getCruise());
 		globalMeta.setRegion(deployment.getRegion());
@@ -189,7 +189,7 @@ public class DeploymentExportPanel extends TethysGUIPanel implements DeploymentT
 	 * Set the parms from internally stored data. 
 	 */
 	private void setInternal() {
-		DeploymentData globalMeta = getTethysControl().getGlobalDeplopymentData();
+		Deployment globalMeta = getTethysControl().getGlobalDeplopymentData();
 		site.setText(globalMeta.getSite());
 		cruise.setText(globalMeta.getCruise());
 //		region.setText(globalMeta.getRegion());

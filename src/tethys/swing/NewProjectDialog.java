@@ -10,7 +10,9 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import PamView.dialog.PamGridBagContraints;
+import metadata.PamguardMetaData;
 import metadata.deployment.DeploymentData;
+import nilus.Deployment;
 import tethys.TethysControl;
 
 public class NewProjectDialog extends PamView.dialog.PamDialog {
@@ -23,7 +25,7 @@ public class NewProjectDialog extends PamView.dialog.PamDialog {
 	
 	private JTextField projectRegion;	
 		
-	private DeploymentData deploymentData;
+	private PamguardMetaData metaData;
 	
 	private NewProjectDialog(Window parentFrame, TethysControl tethysControl) {
 		super(parentFrame, "New Project", false);
@@ -45,32 +47,33 @@ public class NewProjectDialog extends PamView.dialog.PamDialog {
 		setDialogComponent(mainPanel);
 	}
 	
-	public static DeploymentData showDialog(Window parent, TethysControl tethysControl, DeploymentData deploymentData) {
+	public static PamguardMetaData showDialog(Window parent, TethysControl tethysControl, PamguardMetaData metaData) {
 		if (singleInstance == null) {
 			singleInstance = new NewProjectDialog(parent, tethysControl);
 		}
-		singleInstance.setParams(deploymentData);
+		singleInstance.setParams(metaData);
 		singleInstance.setVisible(true);
-		return singleInstance.deploymentData;
+		return singleInstance.metaData;
 	}
 
-	private void setParams(DeploymentData deploymentData) {
+	private void setParams(PamguardMetaData deploymentData) {
 		if (deploymentData == null) {
 			return;
 		}
-		this.deploymentData = deploymentData;
-		projectName.setText(deploymentData.getProject());
-		projectRegion.setText(deploymentData.getRegion());
+		this.metaData = deploymentData;
+		projectName.setText(deploymentData.getDeployment().getProject());
+		projectRegion.setText(deploymentData.getDeployment().getRegion());
 	}
 
 	@Override
 	public boolean getParams() {
-		if (deploymentData == null) {
+		if (metaData == null) {
 			return false;
 		}
-		deploymentData.setProject(projectName.getText());
-		deploymentData.setRegion(projectRegion.getText());
-		if (deploymentData.getProject() == null || deploymentData.getProject().length() == 0) {
+		Deployment deployment = metaData.getDeployment();
+		deployment.setProject(projectName.getText());
+		deployment.setRegion(projectRegion.getText());
+		if (deployment.getProject() == null || deployment.getProject().length() == 0) {
 			return showWarning("you must specify a project name");
 		}
 		
@@ -79,7 +82,7 @@ public class NewProjectDialog extends PamView.dialog.PamDialog {
 
 	@Override
 	public void cancelButtonPressed() {
-		deploymentData = null;
+		metaData = null;
 	}
 
 	@Override

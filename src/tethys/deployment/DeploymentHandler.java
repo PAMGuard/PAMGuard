@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.commons.beanutils.converters.BigIntegerConverter;
 
@@ -34,6 +35,8 @@ import binaryFileStorage.BinaryStore;
 import dataMap.OfflineDataMap;
 import dataMap.OfflineDataMapPoint;
 import generalDatabase.DBControlUnit;
+import metadata.MetaDataContol;
+import metadata.PamguardMetaData;
 import metadata.deployment.DeploymentData;
 import nilus.Audio;
 import nilus.ChannelInfo;
@@ -125,7 +128,7 @@ public class DeploymentHandler implements TethysStateObserver {
 	 * @return true if OK
 	 */
 	public boolean updateProjectDeployments() {
-		DeploymentData projData = tethysControl.getGlobalDeplopymentData();
+		Deployment projData = tethysControl.getGlobalDeplopymentData();
 		ArrayList<Deployment> tethysDocs = tethysControl.getDbxmlQueries().getProjectDeployments(projData.getProject(), getInstrumentId());
 		if (tethysDocs == null) {
 			return false;
@@ -310,7 +313,7 @@ public class DeploymentHandler implements TethysStateObserver {
 				selectedDeployments.get(selectedDeployments.size()-1).getRecordStop());
 		Deployment deployment = createDeploymentDocument(freeId, onePeriod);
 		// fill in a few things from here
-		DeploymentData globalMeta = getTethysControl().getGlobalDeplopymentData();
+		Deployment globalMeta = getTethysControl().getGlobalDeplopymentData();
 		deployment.setCruise(globalMeta.getCruise());
 		deployment.setSite(globalMeta.getSite());
 		if (selectedDeployments.size() > 1) {
@@ -344,6 +347,8 @@ public class DeploymentHandler implements TethysStateObserver {
 	private void exportSeparateDeployments(ArrayList<RecordingPeriod> selectedDeployments) {
 		
 		int freeId = getTethysControl().getDeploymentHandler().getFirstFreeDeploymentId();
+		// fill in a few things from here
+		Deployment globalMeta = getTethysControl().getGlobalDeplopymentData();
 		for (int i = 0; i < selectedDeployments.size(); i++) {
 			RecordingPeriod recordPeriod = selectedDeployments.get(i);
 			PDeployment exDeploymnet = recordPeriod.getMatchedTethysDeployment();
@@ -355,8 +360,6 @@ public class DeploymentHandler implements TethysStateObserver {
 			if (deployment == null) {
 				deployment = createDeploymentDocument(freeId++, recordPeriod);
 			}
-			// fill in a few things from here
-			DeploymentData globalMeta = getTethysControl().getGlobalDeplopymentData();
 			deployment.setCruise(globalMeta.getCruise());
 			deployment.setSite(globalMeta.getSite());
 			// also need to sort out track data here, etc.
@@ -740,7 +743,7 @@ public class DeploymentHandler implements TethysStateObserver {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		DeploymentData globalDeplData = tethysControl.getGlobalDeplopymentData();
+//		Deployment globalDeplData = tethysControl.getGlobalDeplopymentData();
 		TethysExportParams exportParams = tethysControl.getTethysExportParams();
 		String id = String.format("%s_%d", exportParams.getDatasetName(), i);
 		deployment.setId(id);
@@ -903,7 +906,8 @@ public class DeploymentHandler implements TethysStateObserver {
 //		}
 //		
 //		MetaDataContol metaControl = (MetaDataContol) aUnit;
-		DeploymentData deploymentData = tethysControl.getGlobalDeplopymentData();
+		PamguardMetaData metaData = MetaDataContol.getMetaDataControl().getMetaData();
+		Deployment deploymentData = tethysControl.getGlobalDeplopymentData();
 		deployment.setProject(deploymentData.getProject());
 		deployment.setDeploymentAlias(deploymentData.getDeploymentAlias());
 		deployment.setSite(deploymentData.getSite());
@@ -919,18 +923,19 @@ public class DeploymentHandler implements TethysStateObserver {
 		deployment.setInstrument(instrument);
 		
 		// overwrite the default deployment and recovery times if there is non null data
-		Long depMillis = deploymentData.getDeploymentMillis();
-		if (depMillis != null) {
-			deployment.getDeploymentDetails().setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(depMillis));
+		XMLGregorianCalendar depTime = deploymentData.getDeploymentDetails().getTimeStamp();
+		if (depTime != null) {
+			deployment.getDeploymentDetails().setTimeStamp(depTime);
 		}
-		Long recMillis = deploymentData.getRecoveryMillis();
+		XMLGregorianCalendar recMillis = deploymentData.getRecoveryDetails().getTimeStamp();
 		if (recMillis != null) {
-			deployment.getRecoveryDetails().setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(recMillis));
+			deployment.getRecoveryDetails().setTimeStamp(recMillis);
 		}
-		LatLong recLatLong = deploymentData.getRecoverLatLong();
-		if (recLatLong != null) {
-			deployment.getRecoveryDetails().setLatitude(recLatLong.getLatitude());
-			deployment.getRecoveryDetails().setLongitude(PamUtils.constrainedAngle(recLatLong.getLongitude()));
+		double recLat = deploymentData.getRecoveryDetails().getLatitude();
+		double recLong = deploymentData.getRecoveryDetails().getLongitude();
+		if (recLat != 0 & recLong != 0.) {
+			deployment.getRecoveryDetails().setLatitude(recLat);
+			deployment.getRecoveryDetails().setLongitude(PamUtils.constrainedAngle(recLong));
 		}
 		
 		return true;
@@ -951,7 +956,7 @@ public class DeploymentHandler implements TethysStateObserver {
 	 */
 	public String canExportDeployments() {
 
-		DeploymentData globalDeplData = tethysControl.getGlobalDeplopymentData();
+		Deployment globalDeplData = tethysControl.getGlobalDeplopymentData();
 		if (globalDeplData.getProject() == null) {
 			return "You must set a project name";
 		}

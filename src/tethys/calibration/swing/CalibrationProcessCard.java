@@ -78,9 +78,11 @@ public class CalibrationProcessCard extends CalibrationsCard {
 		c.gridwidth = 1;
 		processPanel.add(new JLabel("Serial number ", JLabel.RIGHT), c);
 		c.gridx++;
+		c.gridwidth = 2;
 		processPanel.add(version, c);
 		c.gridx = 0;
 		c.gridy++;
+		c.gridwidth = 1;
 		processPanel.add(new JLabel("Quality ", JLabel.RIGHT), c);
 		c.gridx++;
 		processPanel.add(qaQuality, c);
@@ -88,6 +90,7 @@ public class CalibrationProcessCard extends CalibrationsCard {
 		c.gridy++;
 		processPanel.add(new JLabel("QA Comment ", JLabel.RIGHT), c);
 		c.gridx++;
+		c.gridwidth = 2;
 		processPanel.add(qaComment, c);
 
 		this.add(BorderLayout.CENTER, makeScrollablePanel(software, "Calibration method"));

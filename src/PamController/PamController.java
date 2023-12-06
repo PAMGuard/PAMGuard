@@ -54,6 +54,7 @@ import fftManager.FFTDataUnit;
 import generalDatabase.DBControlUnit;
 import javafx.application.Platform;
 import javafx.stage.Stage;
+import metadata.MetaDataContol;
 import Array.ArrayManager;
 import PamController.command.MulticastController;
 import PamController.command.NetworkController;
@@ -450,6 +451,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 		System.out.println("");
 		System.out.println("Note - ignore the following SLF4J warn/error messages, they are not applicable to this application");
 		ArrayManager.getArrayManager(); // create the array manager so that it get's it's settings
+		MetaDataContol.getMetaDataControl();
 
 		/**
 		 * Check for archived files and unpack automatically. 

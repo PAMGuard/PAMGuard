@@ -461,10 +461,10 @@ final public class PamModel implements PamModelInterface, PamSettings {
 		mi.setMaxNumber(1);
 
 
-		mi = PamModuleInfo.registerControlledUnit(MetaDataContol.class.getName(), MetaDataContol.unitType);
-		mi.setToolTipText("Project Meta Data");
-		mi.setModulesMenuGroup(utilitiesGroup);
-		mi.setMaxNumber(1); 
+//		mi = PamModuleInfo.registerControlledUnit(MetaDataContol.class.getName(), MetaDataContol.unitType);
+//		mi.setToolTipText("Project Meta Data");
+//		mi.setModulesMenuGroup(utilitiesGroup);
+//		mi.setMaxNumber(1); 
 		
 		if (isViewer) {
 			mi = PamModuleInfo.registerControlledUnit(TethysControl.class.getName(), TethysControl.defaultName);

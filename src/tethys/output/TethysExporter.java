@@ -210,26 +210,26 @@ public class TethysExporter {
 		return true;
 	}
 
-	/**
-	 * find Deployment data. This is stored in a separate PAMGuard module, which may
-	 * not be present.
-	 *
-	 * @return
-	 */
-	public DeploymentData findDeploymentData() {
-		/**
-		 * What to do if this isn't present or is incomplete ? Should we be showing this
-		 * in the main export dialog at some point ? More a Q for when we make a nicer
-		 * UI later in the project.
-		 */
-		MetaDataContol metaControl = (MetaDataContol) PamController.getInstance()
-				.findControlledUnit(MetaDataContol.unitType);
-		if (metaControl == null) {
-			return null;
-		} else {
-			return metaControl.getDeploymentData();
-		}
-	}
+//	/**
+//	 * find Deployment data. This is stored in a separate PAMGuard module, which may
+//	 * not be present.
+//	 *
+//	 * @return
+//	 */
+//	public DeploymentData findDeploymentData() {
+//		/**
+//		 * What to do if this isn't present or is incomplete ? Should we be showing this
+//		 * in the main export dialog at some point ? More a Q for when we make a nicer
+//		 * UI later in the project.
+//		 */
+//		MetaDataContol metaControl = (MetaDataContol) PamController.getInstance()
+//				.findControlledUnit(MetaDataContol.unitType);
+//		if (metaControl == null) {
+//			return null;
+//		} else {
+//			return metaControl.getDeploymentData();
+//		}
+//	}
 
 	public SnapshotGeometry findArrayGeometrey() {
 		/*

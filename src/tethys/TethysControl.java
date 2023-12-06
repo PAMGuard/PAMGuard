@@ -36,7 +36,9 @@ import PamView.PamTabPanel;
 import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
 import metadata.MetaDataContol;
+import metadata.PamguardMetaData;
 import metadata.deployment.DeploymentData;
+import nilus.Deployment;
 import tethys.TethysState.StateType;
 import tethys.calibration.CalibrationHandler;
 import tethys.dbxml.DBXMLConnect;
@@ -406,31 +408,23 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	 * so that the rest of PAMGuard can use it, but creating the
 	 * @return
 	 */
-	public DeploymentData getGlobalDeplopymentData() {
-		PamControlledUnit aUnit = PamController.getInstance().findControlledUnit(MetaDataContol.class, null);
-//		if (aUnit instanceof MetaDataContol == false || true) {
-//			deployment.setProject("thisIsAProject");
-//			deployment.setPlatform("Yay a platform");
-//			Instrument instrument = new Instrument();
-//			instrument.setType("machiney");
-//			instrument.setInstrumentId("12345555");
-//			deployment.setInstrument(instrument);
-//			return false;
-//		}
+	public Deployment getGlobalDeplopymentData() {
 
-		MetaDataContol metaControl = (MetaDataContol) aUnit;
-		DeploymentData deploymentData = metaControl != null ? metaControl.getDeploymentData() : getTethysProjectData();
-
-//		deploymentData.setProject("thisIsAProject");
-////		deploymentData.setPlatform("Yay a platform");
-//		deploymentData.setCruise("cruisey");
-//		deploymentData.setDeploymentId(142536);
-////		deploymentData.setInstrumentId("super instrument");
-//		deploymentData.setSite("in the ocean somewhere");
-//		deploymentData.setRegion("ocean water");
-////		deploymentData.setInstrumentType("sensor of sorts");
-
-		return deploymentData;
+		MetaDataContol metaControl = MetaDataContol.getMetaDataControl();
+		PamguardMetaData metaData = metaControl.getMetaData();
+		return metaData.getDeployment();
+//		Deployment deploymentData = metaControl != null ? metaData.getDeployment() : getTethysProjectData();
+//
+////		deploymentData.setProject("thisIsAProject");
+//////		deploymentData.setPlatform("Yay a platform");
+////		deploymentData.setCruise("cruisey");
+////		deploymentData.setDeploymentId(142536);
+//////		deploymentData.setInstrumentId("super instrument");
+////		deploymentData.setSite("in the ocean somewhere");
+////		deploymentData.setRegion("ocean water");
+//////		deploymentData.setInstrumentType("sensor of sorts");
+//
+//		return deploymentData;
 	}
 
 	/**
@@ -545,7 +539,7 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		if (dataBlockSynchInfos == null) {
 			return;
 		}
-		DeploymentData deplData = getGlobalDeplopymentData();
+		Deployment deplData = getGlobalDeplopymentData();
 		String[] dataPrefixes = new String[dataBlockSynchInfos.size()];
 		int i = 0;
 		ArrayList<PDeployment> matchedDeployments = deploymentHandler.getMatchedDeployments();

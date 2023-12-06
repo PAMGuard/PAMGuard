@@ -4,7 +4,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -116,9 +115,14 @@ public class CalibrationHandler implements TethysStateObserver {
 	 * Update the list of documents associated with the selected instrument.  
 	 */
 	private void updateDocumentsList() {
+		
+		calibrationsList.clear();
+		
 		ArrayList<DocumentInfo> docsList = getArrayCalibrations();
 		// now immediately read the calibrations in again. 
-		calibrationsList.clear();;
+		if (docsList == null) {
+			return;
+		}
 		NilusUnpacker unpacker = new NilusUnpacker();
 		for (DocumentInfo aDoc : docsList) {
 			Queries queries = tethysControl.getDbxmlConnect().getTethysQueries();
@@ -182,11 +186,7 @@ public class CalibrationHandler implements TethysStateObserver {
 //			String docName = getHydrophoneId(i);
 			Calibration calDoc = createCalibrationDocument(i);
 			if (sampleCal != null) {
-				calDoc.setMetadataInfo(sampleCal.getMetadataInfo());
-				MetadataInfo oldMeta = calDoc.getMetadataInfo();
-				MetadataInfo newMeta = sampleCal.getMetadataInfo();
-				
-				
+				calDoc.setMetadataInfo(sampleCal.getMetadataInfo());				
 				calDoc.setProcess(sampleCal.getProcess());
 				calDoc.setQualityAssurance(sampleCal.getQualityAssurance());
 				calDoc.setResponsibleParty(sampleCal.getResponsibleParty());
@@ -234,7 +234,7 @@ public class CalibrationHandler implements TethysStateObserver {
 	 * Add the separate pamguard parameters to the document which are used
 	 * to make up the overall calibration. 
 	 * @param calDoc
-	 * @param i
+	 * @param i hydrophone number
 	 */
 	private void addParameterDetails(Calibration calDoc, int i) {
 		Parameters params = calDoc.getProcess().getParameters();
@@ -518,8 +518,10 @@ public class CalibrationHandler implements TethysStateObserver {
 	 */
 	private ArrayList<DocumentInfo> getArrayCalibrations() {
 		ArrayList<DocumentInfo> allCals = tethysControl.getDbxmlQueries().getCollectionDocumentList(Collection.Calibrations);
-		String prefix = createCalibrationDocumentRoot();
-		// find doc names that have that root. 
+		if (allCals == null) {
+			return null;
+		}
+		String prefix = createCalibrationDocumentRoot(); // find doc names that have that root. 
 		ArrayList<DocumentInfo> theseCals = new ArrayList<>();
 		for (DocumentInfo aDoc : allCals) {
 			if (aDoc.getDocumentName().startsWith(prefix)) {
