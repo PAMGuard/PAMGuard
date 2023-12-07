@@ -45,6 +45,7 @@ import tethys.TethysTimeFuncs;
 import tethys.calibration.swing.CalibrationsExportWizard;
 import tethys.dbxml.DBXMLConnect;
 import tethys.dbxml.TethysException;
+import tethys.niluswraps.NilusSettingsWrapper;
 import tethys.niluswraps.NilusUnpacker;
 import tethys.pamdata.AutoTethysProvider;
 
@@ -176,6 +177,9 @@ public class CalibrationHandler implements TethysStateObserver {
 			return 0;
 		}
 		
+		NilusSettingsWrapper<Calibration> wrappedSample = new NilusSettingsWrapper<Calibration>();
+		wrappedSample.setNilusObject(sampleCal);
+		
 		PamArray array = ArrayManager.getArrayManager().getCurrentArray();
 		int nPhone = array.getHydrophoneCount();
 		DBXMLConnect dbxml = tethysControl.getDbxmlConnect();
@@ -184,6 +188,8 @@ public class CalibrationHandler implements TethysStateObserver {
 		boolean exists;
 		for (int i = 0; i < nPhone; i++) {
 //			String docName = getHydrophoneId(i);
+			NilusSettingsWrapper<Calibration> clonedWrap = wrappedSample.clone();
+			sampleCal = clonedWrap.getNilusObject(Calibration.class);
 			Calibration calDoc = createCalibrationDocument(i);
 			if (sampleCal != null) {
 				calDoc.setMetadataInfo(sampleCal.getMetadataInfo());				

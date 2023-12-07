@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Date;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -19,6 +20,7 @@ import org.jdesktop.swingx.JXDatePicker;
 
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
+import PamView.panel.WestAlignedPanel;
 import PamView.wizard.PamWizard;
 import nilus.Calibration;
 import nilus.ContactInfo;
@@ -26,20 +28,25 @@ import nilus.MetadataInfo;
 import nilus.ResponsibleParty;
 import tethys.TethysTimeFuncs;
 import tethys.calibration.CalibrationHandler;
+import tethys.swing.export.ResponsiblePartyPanel;
 
 public class CalibrationsContactCard extends CalibrationsCard {
 
 	private JXDatePicker datePicker;
 	
-	private JTextField individual, organisation, position, email;
+	private ResponsiblePartyPanel calibrator, dataManager;
 	
 	private JComboBox<String> updateInterval;
+
+	private MetadataInfo metaData;
+	
+	private JButton copyDown, copyUp;
 	
 	public CalibrationsContactCard(PamWizard pamWizard) {
 		super(pamWizard, "Contact Details");
 		// TODO Auto-generated constructor stub
 //		setBorder(new TitledBorder("Contact"));
-		setLayout(new BorderLayout());
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		
 		updateInterval = new JComboBox<>();
 		String[] vals = CalibrationHandler.updateOptions;
@@ -48,8 +55,8 @@ public class CalibrationsContactCard extends CalibrationsCard {
 		}
 		
 		JPanel datePanel = new JPanel(new GridBagLayout());
-		datePanel.setBorder(new TitledBorder("Calibration date"));
-		add(BorderLayout.NORTH, datePanel);
+		JPanel lp = new WestAlignedPanel(datePanel);
+		lp.setBorder(new TitledBorder("Calibration date"));
 		GridBagConstraints c = new PamGridBagContraints();
 		datePanel.add(new JLabel("Calibration date: ", JLabel.RIGHT), c);
 		datePicker = new JXDatePicker();
@@ -61,67 +68,66 @@ public class CalibrationsContactCard extends CalibrationsCard {
 		c.gridx++;
 		datePanel.add(updateInterval, c);
 		
+		calibrator = new ResponsiblePartyPanel("Technical Person");
+		dataManager = new ResponsiblePartyPanel("Data Manager");
 		
-		JPanel contactPanel = new JPanel(new GridBagLayout());
-		contactPanel.setBorder(new TitledBorder("Contact"));
-		this.add(BorderLayout.CENTER, contactPanel);
+		JPanel copyPanel = new JPanel(new GridBagLayout());
 		c = new PamGridBagContraints();
-		contactPanel.add(new JLabel("Individual Name "), c);
+		copyPanel.add(copyDown = new JButton("Copy down"),c);
 		c.gridx++;
-		contactPanel.add(individual = new JTextField(15), c);
-		c.gridx = 0;
-		c.gridy++;
-		contactPanel.add(new JLabel("Organisation "), c);
-		c.gridx++;
-		contactPanel.add(organisation = new JTextField(15), c);
-		c.gridx = 0;
-		c.gridy++;
-		contactPanel.add(new JLabel("Position "), c);
-		c.gridx++;
-		contactPanel.add(position = new JTextField(15), c);
-		c.gridx = 0;
-		c.gridy++;
-		contactPanel.add(new JLabel("Email "), c);
-		c.gridx++;
-		contactPanel.add(email = new JTextField(15), c);
-		c.gridx = 0;
-		c.gridy++;
+		copyPanel.add(copyUp = new JButton("Copy up"), c);
+
+		add(lp);
+		add(calibrator.getMainPanel());
+		add(copyPanel);
+		add(dataManager.getMainPanel());
 		
+		copyDown.setToolTipText("Copy technical person to data manager");
+		copyUp.setToolTipText("Copy data manager to technical person");
+		copyDown.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				copyRPDown();
+			}
+		});
+		copyUp.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				copyRPUp();
+			}
+
+		});
+	}
+
+	protected void copyRPDown() {
+		copyRPData(calibrator, dataManager);
+	}
+	private void copyRPUp() {
+		copyRPData(dataManager, calibrator);
+	}
+
+	private void copyRPData(ResponsiblePartyPanel rFrom, ResponsiblePartyPanel rTo) {
+		ResponsibleParty rp = checkRPChildren(null);
+		rFrom.getParams(rp);
+		rTo.setParams(rp);
 	}
 
 	@Override
 	public boolean getParams(Calibration cardParams) {
-		if (cardParams == null) {
-			return false;
-		}
-		MetadataInfo metaInf = cardParams.getMetadataInfo();
-		if (metaInf == null) {
-			metaInf = new MetadataInfo();
-			cardParams.setMetadataInfo(metaInf);
-		}
-		ResponsibleParty contact = metaInf.getContact();
-		if (contact == null) {
-			contact = new ResponsibleParty();
-			metaInf.setContact(contact);
-		}
-		ContactInfo contactInfo = contact.getContactInfo();
-		if (contactInfo == null) {
-			contactInfo = new ContactInfo();
-			contact.setContactInfo(contactInfo);
-		}
+		ResponsibleParty rp = checkRPChildren(cardParams.getResponsibleParty());
+		cardParams.setResponsibleParty(rp);
+		calibrator.getParams(rp);
 		
-		// so far as I'm aware, the meta info contains the time we create this record
-		// and the other timestamp is the data the calibration was donw. 
-		metaInf.setDate(TethysTimeFuncs.xmlGregCalFromMillis(System.currentTimeMillis()));
-		metaInf.setUpdateFrequency((String) updateInterval.getSelectedItem());
+		metaData = cardParams.getMetadataInfo();
+		if (metaData == null) {
+			metaData = new MetadataInfo();
+			cardParams.setMetadataInfo(metaData);
+		}
+		metaData.setContact(checkRPChildren(metaData.getContact()));
+		dataManager.getParams(metaData.getContact());
 		
-		contact.setIndividualName(individual.getText());
-		contact.setOrganizationName(organisation.getText());
-		contact.setPositionName(position.getText());
-		contactInfo.setContactInstructions(email.getText());
-		
-		// and set this both as the RepsonsiblePArty and in the metadata. 
-		cardParams.setResponsibleParty(contact);
+		metaData.setUpdateFrequency((String) updateInterval.getSelectedItem());
+		metaData.setDate(TethysTimeFuncs.xmlGregCalFromMillis(System.currentTimeMillis()));
 		
 		Date date = datePicker.getDate();
 		if (date == null) {
@@ -131,6 +137,19 @@ public class CalibrationsContactCard extends CalibrationsCard {
 		cardParams.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(millis));
 		
 		return true;
+	}
+	
+	private ResponsibleParty checkRPChildren(ResponsibleParty rp) {
+		if (rp == null) {
+			rp = new ResponsibleParty();
+		}
+		if (rp.getContactInfo() == null) {
+			rp.setContactInfo(new ContactInfo());
+		}
+		if (rp.getContactInfo().getAddress() == null) {
+//			rp.getContactInfo().setAddress(new Address());
+		}
+		return rp;
 	}
 	
 	private ResponsibleParty findResponsibleParty(Calibration cal) {
@@ -151,19 +170,17 @@ public class CalibrationsContactCard extends CalibrationsCard {
 	@Override
 	public void setParams(Calibration cardParams) {
 		// fill in as much as possible from the existing Calibration
-		ResponsibleParty resp = findResponsibleParty(cardParams);
+		ResponsibleParty resp = cardParams.getResponsibleParty();
 		if (resp != null) {
-			individual.setText(resp.getIndividualName());
-			organisation.setText(resp.getOrganizationName());
-			position.setText(resp.getPositionName());
-			ContactInfo cInf = resp.getContactInfo();
-			if (cInf != null) {
-				email.setText(cInf.getContactInstructions());
-			}
+			calibrator.setParams(resp);
 		}
 		
 		MetadataInfo metaInf = cardParams.getMetadataInfo();
 		if (metaInf != null) {
+			resp = metaInf.getContact();
+			if (resp != null) {
+				dataManager.getParams(resp);
+			}
 			String uf = metaInf.getUpdateFrequency();
 			if (uf != null) {
 				updateInterval.setSelectedItem(uf);

@@ -9,6 +9,7 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import PamView.dialog.PamGridBagContraints;
+import nilus.ContactInfo.Address;
 import nilus.ResponsibleParty;
 
 /**
@@ -21,14 +22,18 @@ public class ResponsiblePartyPanel {
 	private JTextField name, organisation, position, email;
 	
 	private JPanel mainPanel;
-	
+
+	public ResponsiblePartyPanel() {
+		this(null);
+	}
 	/**
 	 * 
 	 */
-	public ResponsiblePartyPanel() {
+	public ResponsiblePartyPanel(String borderTitle) {
 		super();
 		mainPanel = new JPanel(new GridBagLayout());
-//		mainPanel.setBorder(new TitledBorder("Responsible party"));
+		if (borderTitle != null)
+		mainPanel.setBorder(new TitledBorder(borderTitle));
 		GridBagConstraints c = new PamGridBagContraints();
 		mainPanel.add(new JLabel("Name ", JLabel.RIGHT), c);
 		c.gridx++;
@@ -64,14 +69,26 @@ public class ResponsiblePartyPanel {
 		name.setText(responsibleParty.getIndividualName());
 		organisation.setText(responsibleParty.getOrganizationName());
 		position.setText(responsibleParty.getPositionName());
-		email.setText(responsibleParty.getContactInfo().getContactInstructions());
+
+		Address addr = responsibleParty.getContactInfo().getAddress();
+		if (addr != null) {
+			email.setText(addr.getElectronicMailAddress());
+		}
+		
 	}
+	
 	
 	public boolean getParams(ResponsibleParty responsibleParty) {
 		responsibleParty.setIndividualName(name.getText());
 		responsibleParty.setOrganizationName(organisation.getText());
 		responsibleParty.setPositionName(position.getText());
-		responsibleParty.getContactInfo().setContactInstructions(email.getText());
+
+		Address addr = responsibleParty.getContactInfo().getAddress();
+		if (addr == null) {
+			addr = new Address();
+			responsibleParty.getContactInfo().setAddress(addr);
+		}
+		addr.setElectronicMailAddress(email.getText());
 		return true;
 	}
 }

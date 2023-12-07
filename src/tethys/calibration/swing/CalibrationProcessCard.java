@@ -16,6 +16,7 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import PamView.dialog.PamGridBagContraints;
+import PamView.panel.WestAlignedPanel;
 import PamView.wizard.PamWizard;
 import nilus.AlgorithmType;
 import nilus.AlgorithmType.Parameters;
@@ -43,8 +44,10 @@ public class CalibrationProcessCard extends CalibrationsCard {
 		super(pamWizard, "Calibration Process");
 		this.setLayout(new BorderLayout());
 		processPanel = new JPanel(new GridBagLayout());
-		processPanel.setBorder(new TitledBorder("Calibration Process"));
-		this.add(BorderLayout.NORTH, processPanel);
+		WestAlignedPanel wp;
+		this.add(BorderLayout.NORTH, wp = new WestAlignedPanel(processPanel));
+		wp.setBorder(new TitledBorder("Calibration Process"));
+		
 		GridBagConstraints c = new PamGridBagContraints();
 		
 		calMethod = new JComboBox<String>();

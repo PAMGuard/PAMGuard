@@ -102,7 +102,8 @@ public class NilusSettingsWrapper<T extends Object> implements Serializable, Clo
 	}
 	
 	/**
-	 * Repack the object. May want to do this before serializing. 
+	 * Repack the object.i.e. write the xml text string.
+	 * May want to do this before serializing or cloning. 
 	 * @return
 	 */
 	public boolean repackNilusObject() {
@@ -148,6 +149,25 @@ public class NilusSettingsWrapper<T extends Object> implements Serializable, Clo
 	 */
 	public void reSerialise() {
 		packNilusObject(nilusObject);
+	}
+
+	@Override
+	public NilusSettingsWrapper<T> clone() {
+		/**
+		 * Clone the underlying data, then force it to re-read the string into a new object. 
+		 */
+		this.repackNilusObject();
+		NilusSettingsWrapper<T> clone = null;
+		try {
+			clone = (NilusSettingsWrapper<T>) super.clone();
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+			return null;
+		}
+		if (nilusObject != null) {
+			clone.nilusObject = clone.unpackNilusObject(nilusObject.getClass());
+		}
+		return clone;
 	}
 	
 
