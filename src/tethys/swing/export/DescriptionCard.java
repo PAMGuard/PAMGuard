@@ -19,12 +19,12 @@ public class DescriptionCard extends ExportWizardCard {
 
 	@Override
 	public boolean getParams(StreamExportParams streamExportParams) {
-		return descriptionPanel.getParams(streamExportParams.getDetectionDescription());
+		return descriptionPanel.getParams(streamExportParams.getDetectionDescription().getDescription());
 	}
 
 	@Override
 	public void setParams(StreamExportParams streamExportParams) {
-		descriptionPanel.setParams(streamExportParams.getDetectionDescription());
+		descriptionPanel.setParams(streamExportParams.getDetectionDescription().getDescription());
 	}
 
 }

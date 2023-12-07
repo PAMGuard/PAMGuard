@@ -8,7 +8,7 @@ import PamguardMVC.PamDataBlock;
 import nilus.DescriptionType;
 import nilus.GranularityEnumType;
 import tethys.TethysControl;
-import tethys.niluswraps.PDescriptionType;
+import tethys.niluswraps.WrappedDescriptionType;
 import tethys.pamdata.TethysDataProvider;
 
 /**
@@ -65,11 +65,11 @@ public class StreamExportParams implements Serializable {
 	/*
 	 * Can't have this here since it isn't serializable. 
 	 */
-	public PDescriptionType detectionDescription;
+	public WrappedDescriptionType detectionDescription;
 
-	public PDescriptionType getDetectionDescription() {
+	public WrappedDescriptionType getDetectionDescription() {
 		if (detectionDescription == null) {
-			detectionDescription = new PDescriptionType();
+			detectionDescription = new WrappedDescriptionType();
 		}
 		return detectionDescription;
 	}
@@ -89,7 +89,7 @@ public class StreamExportParams implements Serializable {
 	private void autoFill(TethysControl tethysControl, PamDataBlock dataBlock) {
 		// there should always be a data provider or we'd never have got this far. 
 		TethysDataProvider dataProvider = dataBlock.getTethysDataProvider(tethysControl);
-		PDescriptionType desc = getDetectionDescription();
+		WrappedDescriptionType desc = getDetectionDescription();
 		desc.setMethod(dataProvider.getDetectionsMethod());
 	}
 	

@@ -27,7 +27,6 @@ import PamView.panel.PamAlignmentPanel;
 import PamView.panel.WestAlignedPanel;
 import binaryFileStorage.BinaryStore;
 import generalDatabase.DBControlUnit;
-import metadata.deployment.DeploymentData;
 import nilus.Deployment;
 import nilus.Deployment.Data;
 import tethys.TethysControl;

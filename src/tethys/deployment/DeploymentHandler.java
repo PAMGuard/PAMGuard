@@ -37,7 +37,6 @@ import dataMap.OfflineDataMapPoint;
 import generalDatabase.DBControlUnit;
 import metadata.MetaDataContol;
 import metadata.PamguardMetaData;
-import metadata.deployment.DeploymentData;
 import nilus.Audio;
 import nilus.ChannelInfo;
 import nilus.ChannelInfo.DutyCycle;

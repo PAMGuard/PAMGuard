@@ -3,8 +3,12 @@ package metadata;
 import java.io.Serializable;
 
 import PamUtils.LatLong;
+import nilus.ContactInfo;
 import nilus.Deployment;
+import nilus.DescriptionType;
 import nilus.Helper;
+import nilus.MetadataInfo;
+import nilus.ResponsibleParty;
 import tethys.niluswraps.NilusSettingsWrapper;
 
 /**
@@ -43,12 +47,24 @@ public class PamguardMetaData implements Serializable {
 			try {
 				Helper.createRequiredElements(deployment);
 			} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			deploymentWrapper.setNilusObject(deployment);
 		}
-		return deploymentWrapper.getNilusObject(Deployment.class);
+		// check some fields we know we'll need that the Helper may not have managed. 
+		if (deployment.getDescription() == null) {
+			deployment.setDescription(new DescriptionType());
+		}
+		if (deployment.getMetadataInfo() == null) {
+			deployment.setMetadataInfo(new MetadataInfo());
+		}
+		if (deployment.getMetadataInfo().getContact() == null) {
+			deployment.getMetadataInfo().setContact(new ResponsibleParty());
+		}
+		if (deployment.getMetadataInfo().getContact().getContactInfo() == null) {
+			deployment.getMetadataInfo().getContact().setContactInfo(new ContactInfo());
+		}
+		return deployment;
 	}
 	
 	/**

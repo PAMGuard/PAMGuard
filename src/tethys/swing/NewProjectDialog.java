@@ -11,7 +11,6 @@ import javax.swing.border.TitledBorder;
 
 import PamView.dialog.PamGridBagContraints;
 import metadata.PamguardMetaData;
-import metadata.deployment.DeploymentData;
 import nilus.Deployment;
 import tethys.TethysControl;
 

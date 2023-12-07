@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import PamguardMVC.PamDataBlock;
 import generalDatabase.DBControlUnit;
-import metadata.deployment.DeploymentData;
 
 
 /**
@@ -30,7 +29,6 @@ public class TethysExportParams implements Serializable, Cloneable{
 	
 	private HashMap<String, StreamExportParams> streamParamsMap = new HashMap();
 
-	private DeploymentData deploymentData;
 	
 	/**
 	 * PAMGuard HAS to have a dataset name to link to data in Tethys, or it all gets
@@ -114,11 +112,6 @@ public class TethysExportParams implements Serializable, Cloneable{
 		return streamParamsMap.get(longDataName);
 	}
 
-	public DeploymentData getProjectData() {
-		if (deploymentData == null) {
-			deploymentData = new DeploymentData();
-		}
-		return deploymentData;
-	}
+
 
 }

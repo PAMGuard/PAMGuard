@@ -39,6 +39,20 @@ import tethys.TethysTimeFuncs;
  */
 public class NilusUnpacker {
 
+
+	private boolean verbose = false;
+	
+	/**
+	 * @param verbose
+	 */
+	public NilusUnpacker(boolean verbose) {
+		this.verbose = verbose;
+	}
+
+	public NilusUnpacker() {
+		super();
+	}
+
 	public Object unpackDocument(Document doc, Class nilusClass) throws SecurityException {
 		
 		Object nilusObject = null;
@@ -155,7 +169,7 @@ public class NilusUnpacker {
 			 * it's possible that they are simply not there. 
 			 */
 			if (child == null) {
-				if (required) {
+				if (required & verbose) {
 					System.out.printf("Field %s in class %s is required but cannot be found\n", fieldName, nilusClass.getName());
 				}
 				continue;
@@ -171,7 +185,7 @@ public class NilusUnpacker {
 				// find a setter for it. 
 				Method setter = findSetter(nilusClass, fieldName);
 				//			System.out.printf("Field %s with element %s and setter %s\n", fieldName, childName, setter);
-				if (setter == null) {
+				if (setter == null & verbose) {
 					System.out.printf("No setter available for field %s and element %s\n", fieldName, elementName);
 					continue;  // eventually do something more intelligent here. 
 				} 

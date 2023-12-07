@@ -74,6 +74,7 @@ import javax.swing.event.MenuListener;
 
 import Acquisition.DaqSystemInterface;
 import annotation.tasks.AnnotationManager;
+import metadata.MetaDataContol;
 import performanceTests.PerformanceDialog;
 import tipOfTheDay.TipOfTheDayManager;
 import Array.ArrayManager;
@@ -760,6 +761,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		//for changing "hydrophones" to "microphone" and vice versa if medium changes. 
 		menu.addMenuListener(new SettingsMenuListener());
 		
+		menu.add(MetaDataContol.getMetaDataControl().createMenu(frame));
 		
 		menu.addSeparator();
 

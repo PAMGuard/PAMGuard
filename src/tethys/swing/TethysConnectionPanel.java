@@ -24,7 +24,6 @@ import PamView.panel.PamPanel;
 import PamView.panel.WestAlignedPanel;
 import metadata.MetaDataContol;
 import metadata.PamguardMetaData;
-import metadata.deployment.DeploymentData;
 import nilus.Deployment;
 import pamViewFX.fxNodes.PamComboBox;
 import tethys.TethysControl;

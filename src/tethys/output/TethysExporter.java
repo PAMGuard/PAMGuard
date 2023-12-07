@@ -12,7 +12,6 @@ import PamController.PamController;
 import PamUtils.PamCalendar;
 import PamguardMVC.PamDataBlock;
 import metadata.MetaDataContol;
-import metadata.deployment.DeploymentData;
 import nilus.Deployment;
 import tethys.TethysControl;
 import tethys.dbxml.DBXMLConnect;

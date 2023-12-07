@@ -37,7 +37,6 @@ import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
 import metadata.MetaDataContol;
 import metadata.PamguardMetaData;
-import metadata.deployment.DeploymentData;
 import nilus.Deployment;
 import tethys.TethysState.StateType;
 import tethys.calibration.CalibrationHandler;
@@ -425,15 +424,6 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 //////		deploymentData.setInstrumentType("sensor of sorts");
 //
 //		return deploymentData;
-	}
-
-	/**
-	 * Gets a copy of Deployment data stored with other Tethys params when the more
-	 * general meta data provider is not present.
-	 * @return
-	 */
-	private DeploymentData getTethysProjectData() {
-		return tethysExportParams.getProjectData();
 	}
 
 	/**

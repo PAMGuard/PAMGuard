@@ -1,5 +1,7 @@
 package metadata;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.Serializable;
 
 import javax.swing.JFrame;
@@ -10,9 +12,7 @@ import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
-import PamModel.parametermanager.ParameterSetManager;
-import generalDatabase.parameterstore.ParameterDatabaseStore;
-import metadata.deployment.DeploymentData;
+import metadata.swing.MetaDataDialog;
 
 /**
  * Class to handle Project MetaData. Am making this a PAMControlledUnit, but may never
@@ -89,10 +89,25 @@ public class MetaDataContol extends PamControlledUnit implements PamSettings {
 	}
 
 //	@Override
-//	public JMenuItem createFileMenu(JFrame parentFrame) {
-//		return deploymentSetManager.getMenuItem(parentFrame);
-////		return null;
-//	}
+	public JMenuItem createMenu(JFrame parentFrame) {
+		JMenuItem menuItem = new JMenuItem("Project information ...");
+		menuItem.setToolTipText("General project objectives, region, etc.");
+		menuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				showDialog(parentFrame);
+			}
+		});
+		return menuItem;
+	}
+
+	protected void showDialog(JFrame parentFrame) {
+		PamguardMetaData newData = MetaDataDialog.showDialog(parentFrame, pamguardMetaData);
+		if (newData != null) {
+			this.pamguardMetaData = newData;
+			// send around a notification ? 
+		}
+	}
 
 
 
