@@ -61,7 +61,6 @@ public class PamAtlantaStyle extends PamDefaultStyle {
 		super.guiCSS = primerGuiCSS;
 		super.dialogCSS = primerDialogCSS;
 		super.slidingDialogCSS = primerSlidingDialogCSS;
-
 	}
 	
 

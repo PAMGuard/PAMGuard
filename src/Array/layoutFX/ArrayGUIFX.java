@@ -7,6 +7,7 @@ import pamViewFX.PamControlledGUIFX;
 
 /**
  * JavaFX UI bits of the Array Manager. 
+ * 
  * @author Jamie Macaulay 
  *
  */

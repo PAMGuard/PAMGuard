@@ -1,6 +1,5 @@
 package pamViewFX.fxNodes;
 
-import clickTrainDetector.ClickTrainParams;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;

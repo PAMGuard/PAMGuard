@@ -1,6 +1,7 @@
 package Array.layoutFX;
 
 import Array.PamArray;
+import PamController.PamController;
 import PamController.SettingsPane;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -39,7 +40,9 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 	
 	private HydrophonesPane hydrophonePane;
 
-	private Pane holder; 
+	private Pane holder;
+
+	private Label hydrophoneLabel; 
 
 	public ArraySettingsPane() {
 		super(null);
@@ -90,7 +93,7 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 		
 		streamerPane = new StreamersPane(); 
 		
-		Label hydrophoneLabel = new Label("Hydrophones"); 
+		hydrophoneLabel = new Label("Hydrophones"); 
 		PamGuiManagerFX.titleFont1style(hydrophoneLabel);
 		hydrophoneLabel.setPadding(new Insets(5,5,5,5));
 
@@ -117,6 +120,20 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 		return vBox; 
 	}
 	
+	/**
+	 * Set correct text for the receiver in the current medium (e.g. air or water); 
+	 */
+	private void setReceieverLabels() {
+		hydrophonePane.setRecieverLabels();
+		streamerPane.setRecieverLabels();
+		
+		hydrophoneLabel.setText(PamController.getInstance().getGlobalMediumManager().getRecieverString(true) + "s");
+
+//		if (singleInstance!=null) {
+//			singleInstance.setTitle("Pamguard "+ PamController.getInstance().getGlobalMediumManager().getRecieverString(false) +" array");
+//		}
+	}
+	
 	
 	@Override
 	public PamArray  getParams(PamArray  currParams) {
@@ -128,6 +145,7 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 	@Override
 	public void setParams(PamArray  input) {
 		System.out.println("Hydrophone array is: "+ input); 
+		setReceieverLabels();
 		hydrophonePane.setParams(input); 
 		streamerPane.setParams(input); 
 	}

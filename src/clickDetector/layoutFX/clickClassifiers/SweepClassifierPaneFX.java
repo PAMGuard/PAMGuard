@@ -47,7 +47,7 @@ public class SweepClassifierPaneFX extends BasicIdentifierPaneFX {
 		getFlipPane().getAdvLabel().textProperty().unbind();
 		
 		getFlipPane().getAdvLabel().textProperty().bind(sweepPane.getNameTextProperty());
-		getFlipPane().getAdvLabel().graphicProperty().bind(sweepPane.getNameGraphicProperty());
+		getFlipPane().getPreAdvLabel().graphicProperty().bind(sweepPane.getNameGraphicProperty());
 
 		
 		sweepPane.classifierItemRow = sweepClickClassifier.getSweepClassifierParams().getSetRow((SweepClassifierSet) clickTypeProperty.getClickType());

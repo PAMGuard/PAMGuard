@@ -24,6 +24,7 @@ import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
 import PamController.PamController;
+import PamController.PamGUIManager;
 import PamDetection.LocalisationInfo;
 import PamUtils.PamUtils;
 import PamView.dialog.SourcePanelMonitor;
@@ -310,6 +311,7 @@ public class SourcePaneFX extends PamBorderPane {
 	 * @param channelsMap bitmap of used channels. 
 	 */
 	protected void rePackOwner(int channelsMap) {
+		if (PamGUIManager.isSwing()) {
 //		if (currentNShown != PamUtils.getNumChannels(channelsMap)) {
 			try {
 //				Stage stage = (Stage) this.getScene().getWindow();
@@ -358,7 +360,9 @@ public class SourcePaneFX extends PamBorderPane {
 				System.err.println("SourcePaneFX: Problems packing SourcePanel owner window " + e.getLocalizedMessage());
 			}
 //		}
+		}
 		currentNShown = PamUtils.getNumChannels(channelsMap);
+		
 	}
 	
 	/**

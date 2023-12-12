@@ -91,16 +91,17 @@ public class PamSettingsMenuPane extends PamVBox {
 		toggleButton1.setPrefWidth(60);
 		toggleButton1.setTooltip(new Tooltip(GlobalMedium.getToolTip(SoundMedium.Water))); 
 		toggleButton1.setOnAction((action)->{
-			if (PamController.getInstance().getGlobalMediumManager().getGlobalMediumParameters().currentMedium==SoundMedium.Air) return; //do nothing. 
-			int goAhead = WarnOnce.showWarning("Changing Medium", warning , WarnOnce.OK_CANCEL_OPTION); 
-//			System.out.println("WarnOnce: " +  goAhead); 
-			if (goAhead==WarnOnce.OK_OPTION || goAhead<0) PamController.getInstance().getGlobalMediumManager().setCurrentMedium(SoundMedium.Air);
+			if (PamController.getInstance().getGlobalMediumManager().getGlobalMediumParameters().currentMedium==SoundMedium.Water) return; //do nothing. 
+				PamController.getInstance().getGlobalMediumManager().setCurrentMedium(SoundMedium.Water);
 		});
 
 	    ToggleButton toggleButton2 = new ToggleButton("Air");
 	    toggleButton2.setPrefWidth(60);
-		toggleButton1.setTooltip(new Tooltip(GlobalMedium.getToolTip(SoundMedium.Air))); 
-
+	    toggleButton2.setTooltip(new Tooltip(GlobalMedium.getToolTip(SoundMedium.Air))); 
+	    toggleButton2.setOnAction((action)->{
+			if (PamController.getInstance().getGlobalMediumManager().getGlobalMediumParameters().currentMedium==SoundMedium.Air) return; //do nothing. 
+			PamController.getInstance().getGlobalMediumManager().setCurrentMedium(SoundMedium.Air);
+		});
 
 	    ToggleGroup toggleGroup = new ToggleGroup();
 	    toggleButton1.setToggleGroup(toggleGroup);
@@ -123,7 +124,8 @@ public class PamSettingsMenuPane extends PamVBox {
 	    PamHBox.setHgrow(toggleButtonBox, Priority.ALWAYS);
 	    mediumToggleBox.setAlignment(Pos.CENTER_LEFT);
 	    mediumToggleBox.setSpacing(5);
-		
+	    mediumToggleBox.setPadding(new Insets(0,5,0,0));
+
 		
 		PamButton generalSettings=new PamButton("General Settings..."); 
 		styleButton(generalSettings);

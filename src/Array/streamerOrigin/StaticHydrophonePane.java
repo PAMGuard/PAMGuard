@@ -23,7 +23,7 @@ public class StaticHydrophonePane extends PamBorderPane  {
 		
 		this.staticOriginMethod=staticOriginMethod; 
 		
-		latLongPane = new LatLongPane("Hello");
+		latLongPane = new LatLongPane("Static streamer position");
 		this.setCenter(latLongPane.getContentNode()); 
 		
 	}

@@ -1,8 +1,8 @@
 package Array.layoutFX;
 
-import Array.Hydrophone;
 import Array.PamArray;
 import Array.Streamer;
+import PamController.PamController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Dialog;
@@ -40,12 +40,13 @@ public class StreamersPane extends PamBorderPane {
 	 * The current streamer data. 
 	 */
 	private StreamerProperty currentStreamerData;
-
+	
 	/**
 	 * Settings pane for a single hydrophone. 
 	 */
 	private StreamerSettingsPane streamerPane = new StreamerSettingsPane(); 
-
+	
+	
 	public StreamersPane() {
 
 		tableArrayPane = new BasicArrayTable(streamerData); 
@@ -62,12 +63,22 @@ public class StreamersPane extends PamBorderPane {
 		pamFlipePane.setFrontContent(tableArrayPane);
 
 		pamFlipePane.getFront().setPadding(new Insets(5,5,5,10));
+		pamFlipePane.setAdvLabelEditable(true); 
+		pamFlipePane.getPostAdvLabel().setText("Settings");
 
 		pamFlipePane.flipFrontProperty().addListener((obsval, oldVal, newVal)->{
 			//the flip pane
 			if (newVal) {
-				Streamer hydro = streamerPane.getParams(currentStreamerData.getStreamer());
-				currentStreamerData.setStreamer(hydro);
+				Streamer streamer = streamerPane.getParams(currentStreamerData.getStreamer());
+				
+				if (streamer==null) {
+					//the warning dialog is shown in the streamer settings pane
+					return;
+				}
+				
+				streamer.setStreamerName(pamFlipePane.getAdvLabel().getText()); 
+				
+				currentStreamerData.setStreamer(streamer);
 
 				//need to refresh table to show symbol. 
 				tableArrayPane.getTableView().refresh();
@@ -84,6 +95,9 @@ public class StreamersPane extends PamBorderPane {
 	 *
 	 */
 	class BasicArrayTable extends TableSettingsPane<StreamerProperty> {
+		
+		private TableColumn<StreamerProperty, Number> z;
+
 
 		public BasicArrayTable(ObservableList<StreamerProperty> data) {
 			super(data);
@@ -105,7 +119,7 @@ public class StreamersPane extends PamBorderPane {
 			y.setCellValueFactory(cellData -> cellData.getValue().getY());
 			y.setEditable(false);
 
-			TableColumn<StreamerProperty,Number>  z = new TableColumn<StreamerProperty,Number>("z");
+			z = new TableColumn<StreamerProperty,Number>("depth");
 			z.setCellValueFactory(cellData -> cellData.getValue().getZ());
 			z.setEditable(false);
 			
@@ -145,10 +159,13 @@ public class StreamersPane extends PamBorderPane {
 
 		@Override
 		public void editData(StreamerProperty data){
-
-			pamFlipePane.getAdvLabel().setText("Streamer " +  data.getID().get() + " Settings");
 			
-//			streamerPane.setCurrentArray(currentArray);
+			if (data.getName() == null){
+			pamFlipePane.getAdvLabel().setText("Streamer " +  data.getID().get());
+			
+			}
+			
+			streamerPane.setCurrentArray(currentArray);
 			streamerPane.setParams(data.getStreamer());
 		
 			currentStreamerData = data; 
@@ -163,8 +180,14 @@ public class StreamersPane extends PamBorderPane {
 		}
 
 		private StreamerProperty createDefaultStreamerProperty() {
-			return new StreamerProperty(new Streamer(1, 0.,0.,0.,0.,0.,0.));
+			Streamer streamer = new Streamer(1, 0.,0.,0.,0.,0.,0.);
+			return new StreamerProperty(streamer);
 		}
+		
+		public TableColumn<StreamerProperty, Number> getZColumn() {
+			return z;
+		}
+
 
 	}
 
@@ -173,8 +196,12 @@ public class StreamersPane extends PamBorderPane {
 	}
 
 	public PamArray getParams(PamArray currParams) {
-		// TODO Auto-generated method stub
-		return null;
+		return currParams;
+	}
+
+	public void setRecieverLabels() {
+		tableArrayPane.getZColumn().setText(PamController.getInstance().getGlobalMediumManager().getZString());
+		streamerPane.setRecieverLabels();
 	}
 
 

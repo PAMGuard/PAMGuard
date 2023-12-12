@@ -2,6 +2,7 @@ package Array.layoutFX;
 
 import Array.Hydrophone;
 import Array.PamArray;
+import PamController.PamController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -40,6 +41,7 @@ public class HydrophonesPane extends PamBorderPane {
 	 * The current hydrophone data. 
 	 */
 	private HydrophoneProperty currentHydrophoneData;
+
 
 	/**
 	 * A list of all the current hydrophones. 
@@ -105,10 +107,20 @@ public class HydrophonesPane extends PamBorderPane {
 	 *
 	 */
 	class HydrophoneTable extends TableSettingsPane<HydrophoneProperty> {
-
+		
+		
+		/**
+		 * The z table
+		 */
+		private TableColumn<HydrophoneProperty, Number>    z;
+		
 		public HydrophoneTable(ObservableList<HydrophoneProperty> hydrophoneData) {
 			super(hydrophoneData);
 			
+		    z = new TableColumn<HydrophoneProperty,Number>("depth");
+			z.setCellValueFactory(cellData -> cellData.getValue().getZ());
+			z.setEditable(false);
+
 			//need to set up all the rows.
 			TableColumn<HydrophoneProperty,Number>  hydroID = new TableColumn<HydrophoneProperty,Number>("ID");
 			hydroID.setCellValueFactory(cellData -> cellData.getValue().getID());
@@ -123,10 +135,6 @@ public class HydrophonesPane extends PamBorderPane {
 			y.setCellValueFactory(cellData -> cellData.getValue().getY());
 			y.setEditable(false);
 			
-			TableColumn<HydrophoneProperty,Number>  z = new TableColumn<HydrophoneProperty,Number>("depth");
-			z.setCellValueFactory(cellData -> cellData.getValue().getZ());
-			z.setEditable(false);
-
 			
 			TableColumn posColumn=new TableColumn("Position (m)"); 
 			posColumn.getColumns().addAll(x, y, z);
@@ -202,14 +210,22 @@ public class HydrophonesPane extends PamBorderPane {
 			return new HydrophoneProperty(new  Hydrophone(id,  defaultx, defaulty,defaultz, defaultxErr, defaultyErr, defaultzErr,  defaulttype, defaultsensitivity,
 			null, 0. ));
 		}
+		
+
+		public TableColumn<HydrophoneProperty, Number> getZColumn() {
+			return z;
+		}
+
 
 	}
 	
 	public void setParams(PamArray currentArray) {
+		//TODO
 		this.currentArray=currentArray;
 	}
 
 	public PamArray getParams(PamArray currParams) {
+		//TODO
 		return currParams;
 	}
 	
@@ -224,6 +240,11 @@ public class HydrophonesPane extends PamBorderPane {
 
 	public void setHydrophoneList(ObservableList<HydrophoneProperty> hydrophoneList) {
 		this.hydrophoneList = hydrophoneList;
+	}
+
+	public void setRecieverLabels() {
+		tableArrayPane.getZColumn().setText(PamController.getInstance().getGlobalMediumManager().getZString());
+		hydrophonePane.setRecieverLabels();
 	}
 
 }

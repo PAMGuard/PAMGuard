@@ -4,6 +4,8 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.Labeled;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
@@ -32,9 +34,24 @@ public class PamFlipPane extends FlipPane {
 	
 	private PamBorderPane frontPane;
 	
-	private Label advLabel;
 
 	private PamButton backButton;
+
+	/**
+	 * Text field in the title of the advanced pane. This can be used to change settings. 
+	 */
+	private TextField advLabel;
+
+	/**
+	 * Label which sits before the text field in the advanced settings pane title
+	 */
+	private Label preLabel;
+
+	/**
+	 * Label after the the text field in the advanced pane label - this can be set to say "settings" for example with the text field
+	 * then editable to change the name of a parameter. 
+	 */
+	private Label postLabel;
 	
 
 	public PamFlipPane() {
@@ -107,6 +124,7 @@ public class PamFlipPane extends FlipPane {
 		
 		backButton = new PamButton(); 
 		backButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-left", Color.WHITE, PamGuiManagerFX.iconSize));
+//		backButton.setStyle("-fx-background-color: -color-base-6"); 
 		//backButton.setStyle("-fx-padding: 0,0,0,0");
 		
 		backButton.setOnAction((action)->{
@@ -114,24 +132,34 @@ public class PamFlipPane extends FlipPane {
 			this.flipToFront(); 
 		});
 		
-		backButton.setStyle("-fx-background-radius: 0 5 5 0; -fx-border-radius: 0 5 5 0;");
+		//make the back button blue so users can easily see the button. 
+		backButton.setStyle("-fx-background-radius: 0 5 5 0; -fx-border-radius: 0 5 5 0; -fx-background-color: -color-accent-6");
 
 		//backButton.setPrefWidth(150);
-		
 		PamBorderPane advPane = new PamBorderPane(); 
 		//advPane.setPadding(new Insets(5,5,5,5));
 		
-		PamHBox buttonHolder = new PamHBox(); 
 		
+		// holds the title of the advanced pane. This consists of a label for a graphic,
+		// an editable text field and a label after the editable settings field
+		PamHBox titleHolder = new PamHBox(); 
+		titleHolder.getChildren().addAll(preLabel = new Label(), advLabel = new TextField("Adv. "), postLabel = new Label("Settings"));
+		preLabel.setId("label-title2");
+		postLabel.setId("label-title2");
+
+		//holds the back button and the title pane. 
+		PamHBox buttonHolder = new PamHBox(); 
 		buttonHolder.setBackground(null);
 		//buttonHolder.setStyle("-fx-background-color: red;");
 		buttonHolder.setAlignment(Pos.CENTER_LEFT);
-		buttonHolder.getChildren().addAll(backButton, advLabel = new Label("Adv. Settings")); 
+		buttonHolder.getChildren().addAll(backButton, advLabel = new TextField("Adv. Settings")); 
 
 		advLabel.setAlignment(Pos.CENTER);
 		advLabel.setMaxWidth(Double.MAX_VALUE); //need to make sure label is in center. 
-		PamGuiManagerFX.titleFont2style(advLabel);
-		
+//		PamGuiManagerFX.titleFont2style(advLabel);
+		advLabel.setId("label-title2");
+		advLabel.setStyle("-fx-background-color: transparent");
+
 		advLabel.setAlignment(Pos.CENTER);
 		HBox.setHgrow(advLabel, Priority.ALWAYS);
 		
@@ -142,7 +170,7 @@ public class PamFlipPane extends FlipPane {
 	}
 	
 
-	public Label getAdvLabel() {
+	public TextField getAdvLabel() {
 		return advLabel;
 	}
 
@@ -153,6 +181,22 @@ public class PamFlipPane extends FlipPane {
 	public PamButton getBackButton() {
 		return backButton;
 	}
+	
+	/**
+	 * Get the label located before the editable label in the title
+	 * @return the label before the editable label
+	 */
+	public Label getPreAdvLabel() {
+		return preLabel;
+	}
+	
+	/**
+	 * Get the label located after the editable label in the title
+	 * @return the label after the editable label
+	 */
+	public Label getPostAdvLabel() {
+		return postLabel;
+	}
 
 	/**
 	 * True if the flip pane is showing the front. 
@@ -160,4 +204,11 @@ public class PamFlipPane extends FlipPane {
 	public boolean isShowingFront() {
 		return super.flipFrontProperty().get();
 	}
+
+	public void setAdvLabelEditable(boolean b) {
+		this.advLabel.setEditable(b); 
+		
+	}
+
+
 }

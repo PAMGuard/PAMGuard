@@ -1,5 +1,7 @@
 package Array.layoutFX;
 
+import javax.swing.JTextField;
+
 import Array.Hydrophone;
 import PamController.SettingsPane;
 import javafx.scene.Node;
@@ -534,7 +536,7 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 			
 		}
 		catch (Exception Ex) {
-			System.err.println("There is a problem with one of the parameters in the Coordinates panel");
+			System.err.println("There is a problem with one of the parameters in the hydrophone panel");
 			return null;
 		}
 		return hydrophone;
@@ -548,6 +550,14 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 		this.currentArray= currentArray; 
 		
 	}
+
+	public void setRecieverLabels() {
+		 setGeneralInfoLabelText();
+		
+	}
+	
+	
+
 
 
 

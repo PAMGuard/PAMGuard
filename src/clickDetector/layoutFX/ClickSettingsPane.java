@@ -7,21 +7,18 @@ import clickDetector.ClickControl;
 import clickDetector.ClickParameters;
 import clickDetector.layoutFX.clickClassifiers.ClickClassifyPaneFX;
 import javafx.geometry.HPos;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
-import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
+import javafx.scene.layout.Region;
 import javafx.util.StringConverter;
 import net.synedra.validatorfx.Validator;
 import PamController.PamController;
@@ -32,12 +29,12 @@ import PamguardMVC.PamConstants;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamRawDataBlock;
 import pamViewFX.PamGuiManagerFX;
-import pamViewFX.fxNodes.PamBorderPane;
+import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamGridPane;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamSpinner;
-import pamViewFX.fxNodes.PamTabPane;
 import pamViewFX.fxNodes.PamVBox;
+import pamViewFX.fxNodes.navigationDrawer.NavigationDrawer;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
 import pamViewFX.fxNodes.utilityPanes.FilterPaneFX;
 import pamViewFX.fxNodes.utilityPanes.GroupedSourcePaneFX;
@@ -69,7 +66,7 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 	/**
 	 * The main tab pane. 
 	 */
-	private PamTabPane pamTabbedPane;
+	private NavigationDrawer pamTabbedPane;
 
 	/**
 	 * Pane for the pre-filter. The acoustic data detected click waveforms are extracted from but not
@@ -164,10 +161,6 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 	 */
 	private Tab tdoaTab;
 
-	/**
-	 * The main holder pane. 
-	 */
-	private PamBorderPane mainPane;
 
 	/**
 	 * The default pane height. 
@@ -177,7 +170,7 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 	/**
 	 * The default pane width
 	 */
-	public static double PREF_PANE_WIDTH=600;
+	public static double PREF_PANE_WIDTH=750;
 	
 	
 	/**
@@ -189,14 +182,14 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 
 	public ClickSettingsPane(ClickControl clickControl){
 		super(null);
-		this.clickControl=clickControl; 
-		mainPane= new PamBorderPane(); 
+		this.clickControl=clickControl; 		
 		
 		clickValidator = new PamValidator(); 
 
-		pamTabbedPane=new PamTabPane();
-		pamTabbedPane.setAddTabButton(false);
-		pamTabbedPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+		pamTabbedPane=new NavigationDrawer();
+//		pamTabbedPane.setAddTabButton(false);
+//		pamTabbedPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+//		pamTabbedPane.setStyle("-fx-background-color: blue;"); 
 
 		//create a combined detection and length pane
 		PamVBox detectionPane=new PamVBox();
@@ -212,9 +205,18 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 		detectionPane.getChildren().add(createTriggerGraph()); 
 
 		//add everything to tabs.
-		pamTabbedPane.getTabs().add(new Tab("Click Detection", detectionPane));
+		Tab clickDetectionTabe =new Tab("Click Detection", detectionPane);
+		clickDetectionTabe.setGraphic(PamGlyphDude.createPamIcon("mdi2w-waveform")); 
+		detectionPane.setPadding(new Insets(5,5,5,5));
+		pamTabbedPane.getTabs().add(clickDetectionTabe);
+		
+		
 		clickDelayPane=createDelayPane();
-		pamTabbedPane.getTabs().add(tdoaTab=new Tab("TDOA and Echoes", clickDelayPane.getContentNode()));
+		((Region) clickDelayPane.getContentNode()).setPadding(new Insets(5,5,5,5));
+		tdoaTab=new Tab("TDOA and Echoes", clickDelayPane.getContentNode());
+		tdoaTab.setGraphic(PamGlyphDude.createPamIcon("mdi2a-av-timer")); 
+		pamTabbedPane.getTabs().add(tdoaTab);
+		
 		tdoaTab.setOnSelectionChanged((event)->{
 			if (pamTabbedPane.getSelectionModel().getSelectedItem()==tdoaTab){
 				//System.out.println("clickDelayPane: "+clickDelayPane);
@@ -226,11 +228,19 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 
 		//pre filter pane.
 		preFilter=new FilterPaneFX(Orientation.VERTICAL); 
-		pamTabbedPane.getTabs().add(new Tab("Pre Filter", preFilter.getContentNode()));
+		((Region) preFilter.getContentNode()).setPadding(new Insets(5,5,5,5));
+		Tab preFilterTab =new Tab("Pre Filter", preFilter.getContentNode());
+		preFilterTab.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chart-bell-curve-cumulative")); 
+		pamTabbedPane.getTabs().add(preFilterTab);
 
 		//trigger pane 
 		triggerFilter=new FilterPaneFX(Orientation.VERTICAL); 
-		pamTabbedPane.getTabs().add(new Tab("Trigger Filter", triggerFilter.getContentNode()));
+		((Region) triggerFilter.getContentNode()).setPadding(new Insets(5,5,5,5));
+		Tab triggerFilterTab =new Tab("Trigger Filter", triggerFilter.getContentNode());
+		triggerFilterTab.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chart-bell-curve")); 
+		pamTabbedPane.getTabs().add(triggerFilterTab);
+		
+
 		
 
 		//		//echo detection pane. 
@@ -240,15 +250,20 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 		/***Note: FX does not implment click train detection in click detector****/
 
 		//classifiaction pane. 
-		pamTabbedPane.getTabs().add(new Tab("Classification", clickClassificationPane=new ClickClassifyPaneFX(clickControl)));
+		Tab classifierTab =new Tab("Classification", clickClassificationPane=new ClickClassifyPaneFX(clickControl)); 
+		classifierTab.setGraphic(PamGlyphDude.createPamIcon("mdi2g-graph")); 
+		pamTabbedPane.getTabs().add(classifierTab);
 
-		//want a slightly bigger pane as a lot going on in this dialog. 
-		//Note JavaFX 8u61 + has auto DPI scaling so this is really the size of a dialog on a standard HD monitor of 
-		//reasonable size, rather than actual pixels 
-		mainPane.setPrefSize(PREF_PANE_WIDTH, PREF_PANE_HEIGHT);
+//		//want a slightly bigger pane as a lot going on in this dialog. 
+//		//Note JavaFX 8u61 + has auto DPI scaling so this is really the size of a dialog on a standard HD monitor of 
+//		//reasonable size, rather than actual pixels 
+		pamTabbedPane.setMinSize(PREF_PANE_WIDTH, PREF_PANE_HEIGHT);
 
 		//addTabListeners();
-		mainPane.setCenter(new PamBorderPane(pamTabbedPane));
+		pamTabbedPane.setPadding(new Insets(0,0,0,0));
+		
+		
+	
 	}
 
 	//	private void addTabListeners(){
@@ -892,7 +907,7 @@ public class ClickSettingsPane extends SettingsPane<ClickParameters>{
 
 	@Override
 	public Node getContentNode() {
-		return mainPane;
+		return pamTabbedPane;
 	}
 
 	@Override

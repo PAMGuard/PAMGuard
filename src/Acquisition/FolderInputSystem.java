@@ -318,9 +318,13 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			}
 			selection = folderInputParameters.getSelectedFiles();
 		}
-		if (selection.length > 0) {
+		
+		if (selection!=null && selection.length > 0) {
 			System.out.println("FolderInputSystem.makeSelFileList(): Searching for sound files in " + selection[0]);
 		}
+		
+		if (selection==null) return 0; //sometimes happens
+		
 		return makeSelFileList(selection);
 	}
 	
