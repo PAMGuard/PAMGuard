@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.pamguard</groupId>
   <artifactId>Pamguard</artifactId>
-  <version>2.02.09e</version>
+  <version>2.02.09d</version>
   <name>Pamguard Java12+</name>
   <description>Pamguard for Java 12+, using Maven to control dependcies</description>
 	<url>www.pamguard.org</url>
@@ -15,9 +15,9 @@
 
 
     <properties>
-        <javafx.version>17</javafx.version>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <javafx.version>16</javafx.version>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
     </properties>
 
   <build>
@@ -49,10 +49,11 @@
 		-->      
 		<groupId>org.apache.maven.plugins</groupId>
 		<artifactId>maven-compiler-plugin</artifactId>
-        <version>3.11.0</version>
+        <version>3.8.1</version>
 		<configuration>
+		
 			<!--  set compiler to use Java version 11 API https://docs.oracle.com/javase/9/tools/javac.htm#JSWOR627 -->
-			<release>17</release>
+			<release>11</release>
 			<compilerId>jdt</compilerId>
             <compilerArguments>
                <properties>.settings/org.eclipse.jdt.core.prefs</properties> <!--  make sure to use same params as what Eclipse uses -->
@@ -64,7 +65,7 @@
 			<dependency>
 			    <groupId>org.eclipse.tycho</groupId>
 			    <artifactId>tycho-compiler-jdt</artifactId>
-			    <version>4.0.3</version>
+			    <version>1.5.1</version>
 			</dependency>
 		</dependencies>		 	
 		
@@ -73,7 +74,12 @@
       <plugin>
       	<groupId>org.openjfx</groupId>
 		<artifactId>javafx-maven-plugin</artifactId>
-		<version>0.0.8</version>
+		<version>0.0.6</version>
+		<configuration>
+        	<source>17</source>
+        	<target>17</target>
+        	<release>17</release>
+        </configuration>
 	  </plugin>
 	  
 	  <!--  Maven Shade plugin - for creating the uberjar / fatjar -->
@@ -81,7 +87,7 @@
       <plugin>
       	<groupId>org.apache.maven.plugins</groupId>
       	<artifactId>maven-shade-plugin</artifactId>
-      	<version>3.5.1</version>
+      	<version>3.2.1</version>
 		<configuration>
 			<transformers>
 				<transformer
@@ -312,7 +318,7 @@
 	<dependency>
 		<groupId>io.github.macster110</groupId>
 		<artifactId>jpamutils</artifactId>
-		<version>0.0.57</version>
+		<version>0.0.56</version>
 	</dependency>
 
 	<!--jpam project - Deep learning java library 
@@ -323,7 +329,7 @@
 	<dependency>
 		<groupId>io.github.macster110</groupId>
 		<artifactId>jdl4pam</artifactId>
-		<version>0.0.97</version>
+		<version>0.0.94</version>
 	</dependency> 
 			
 	<!-- https://mvnrepository.com/artifact/gov.nist.math/jama -->
@@ -389,7 +395,7 @@
 	<dependency>
 		<groupId>net.synedra</groupId>
 		<artifactId>validatorfx</artifactId>
-		<version>0.4.2</version>
+		<version>0.4.0</version>
 	</dependency>
 	
 	<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-compress -->
@@ -776,13 +782,13 @@
 
 	<!-- not in Maven repository  
 you may need to copy files from your downloaded PAMGuard source code, e.g. C:\Users\*yourreposfolder*\source\repos\PAMGuardPAMGuard\repo\pamguard\org\x3\2.2.2 to 
-C:\Users\*yourusername*\.m2\repository\pamguard\org\x3\2.2.2
--->
+C:\Users\*yourusername*\.m2\repository\pamguard\org\x3\2.2.2-->
  	<dependency>
-	    <groupId>org.pamguard</groupId>
+	    <groupId>pamguard.org</groupId>
 	    <artifactId>x3</artifactId>
 	    <version>2.2.6</version>
 	</dependency>
+
 	
 		<!-- https://mvnrepository.com/artifact/it.sauronsoftware/jave -->
  	<dependency>

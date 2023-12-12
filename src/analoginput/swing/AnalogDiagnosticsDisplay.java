@@ -221,7 +221,7 @@ public class AnalogDiagnosticsDisplay extends UserDisplayComponentAdapter implem
 				break;
 			case 3:
 				if (lastUpdate[rowIndex] > 0) {
-					return PamCalendar.formatTime(lastUpdate[rowIndex]);
+					return PamCalendar.formatTime(lastUpdate[rowIndex], true);
 				}
 				break;
 			case 4:

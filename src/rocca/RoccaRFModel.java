@@ -145,6 +145,7 @@ public class RoccaRFModel implements java.io.Serializable {
             
         } catch (Exception ex) {
             System.err.println("1st Classification failed: " + ex.getMessage());
+            ex.printStackTrace();
             rcdb.setClassifiedAs("Err");
         }
  	}

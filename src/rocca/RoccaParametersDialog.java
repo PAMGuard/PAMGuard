@@ -169,6 +169,7 @@ public class RoccaParametersDialog extends PamDialog implements ActionListener, 
     JButton classifier2Button;
     JButton recalcButton;
     JButton reclassifyButton;
+    JButton trainThenTestButton;
     JButton clearClassifier;
     JComboBox<DefaultComboBoxModel<Vector<String>>> stage1Classes;
     DefaultComboBoxModel<Vector<String>> stage1ClassModel;
@@ -513,6 +514,10 @@ public class RoccaParametersDialog extends PamDialog implements ActionListener, 
         reclassifyButton.addActionListener(this);
         reclassifyButton.setToolTipText("Load the whistle data from the contour stats output file, and run it through the current Classifier");
         reclassifyButton.setVisible(true);
+        trainThenTestButton = new JButton("Train then Test");
+        trainThenTestButton.addActionListener(this);
+        trainThenTestButton.setToolTipText("Train a classifier on a set of training data, then test it with a set of testing data");
+        trainThenTestButton.setVisible(true);
         
         // ******** THIS LINES CONTROLS THE VISIBILITY ********
         if (RoccaDev.isEnabled()) {
@@ -528,13 +533,15 @@ public class RoccaParametersDialog extends PamDialog implements ActionListener, 
         		extraPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
         		.addGroup(extraPanelLayout.createSequentialGroup()
         				.addComponent(recalcButton)
-        				.addComponent(reclassifyButton))
+        				.addComponent(reclassifyButton)
+        				.addComponent(trainThenTestButton))
         		);
         extraPanelLayout.setVerticalGroup(
         		extraPanelLayout.createSequentialGroup()
         		.addGroup(extraPanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
         				.addComponent(recalcButton)
-        				.addComponent(reclassifyButton))
+        				.addComponent(reclassifyButton)
+        				.addComponent(trainThenTestButton))
         		);
 		classifierPanel.add(extraButtonsSubPanel);
 		        
@@ -892,7 +899,9 @@ public class RoccaParametersDialog extends PamDialog implements ActionListener, 
         } else if (e.getSource() == recalcButton) {
         	RoccaFixParams recalc = new RoccaFixParams(roccaControl.roccaProcess);
         } else if (e.getSource() == reclassifyButton) {
-        	RoccaClassifyThisEvent reclassify = new RoccaClassifyThisEvent(roccaControl.roccaProcess);
+        	RoccaClassifyThis reclassify = new RoccaClassifyThis(roccaControl.roccaProcess);
+        } else if (e.getSource() == trainThenTestButton) {
+        	RoccaTrainThenTest trainThenTest = new RoccaTrainThenTest(roccaControl.roccaProcess);
         } else if (e.getSource() == fftButton) {
         	roccaParameters.setUseFFT(true);
         	this.enableTheCorrectSource();

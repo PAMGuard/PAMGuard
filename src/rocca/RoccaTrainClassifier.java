@@ -24,9 +24,13 @@
 package rocca;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.util.Date;
 import java.util.Enumeration;
+
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
@@ -42,13 +46,64 @@ import weka.core.SerializationHelper;
  */
 public class RoccaTrainClassifier {
 
+	
+	/**
+	 * Standalone implementation
+	 * 
+	 * @param args
+	 */
     public static void main(String[] args) {
+    	
+    	RoccaTrainClassifier rtc = new RoccaTrainClassifier();
+    	File arffFile = rtc.getArff();
+    	if (arffFile!=null) {
+    		String modelName = rtc.trainClassifier(arffFile);
+    	}
+    }
+    
+    
+    /**
+     * Let user choose arff file training dataset
+     * 
+     * @return File the arff file containing the training dataset
+     */
+    public File getArff() {
+//        String arffFile = "C:\\Users\\SCANS\\Documents\\Work\\Biowaves\\ONR classifier\\TP_TrainEvtDF_170408";
+        
+        // let the user select the arff file
+		JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Select arff file containing training data");
+        fileChooser.setFileHidingEnabled(true);
+        fileChooser.setApproveButtonText("Select");
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        FileNameExtensionFilter restrict = new FileNameExtensionFilter("Only .arff files", "arff");
+        fileChooser.addChoosableFileFilter(restrict);
+        File arffFile;
+
+ 		int state = fileChooser.showOpenDialog(null);
+		if (state == JFileChooser.APPROVE_OPTION) {
+
+		    // load the file
+            arffFile = fileChooser.getSelectedFile();
+            return arffFile;
+            
+		} else {
+			return null;
+		}
+    }
+
+    
+    /**
+     * Actual code to train the classifier
+     * 
+     */
+    public String trainClassifier(File arffFile) {
+
         RandomForest model = new RandomForest ();
         Instances trainData = null;
-        String arffFile = "C:\\Users\\SCANS\\Documents\\Work\\Biowaves\\ONR classifier\\TP_TrainEvtDF_170408";
 
         // load the ARFF file containing the training set
-        System.out.println("Loading data...");
+        System.out.println("Loading data..." + arffFile.getAbsolutePath());
         try {
             trainData = new Instances
                     (new BufferedReader
@@ -56,10 +111,13 @@ public class RoccaTrainClassifier {
 //                    ("C:\\Users\\Mike\\Documents\\Work\\Java\\WEKA\\allwhists 12 vars 8sp update 1-28-10.arff")));
 //                    ("C:\\Users\\Mike\\Documents\\Work\\Java\\WEKA\\weka vs R\\ETP_orcawale_whists2 modified-subset110perspecies-no_harm_ratios.arff")));
 //                      ("C:\\Users\\SCANS\\Documents\\Work\\Biowaves\\ONR classifier\\Atl_TrainDF_Event_160829.arff")));
-                      (arffFile + ".arff")));
+//                      (arffFile + ".arff")));
+                    	(arffFile)));
             trainData.setClassIndex(trainData.numAttributes()-1);
         } catch (Exception ex) {
             System.out.println("Error Loading...");
+    		ex.printStackTrace();
+    		return null;
         }
         
         // set the classifier parameters
@@ -78,6 +136,8 @@ public class RoccaTrainClassifier {
             model.setOptions(options);
         } catch (Exception ex) {
             System.out.println("Error setting options...");
+    		ex.printStackTrace();
+    		return null;
         }
 
         // train the classifier
@@ -90,23 +150,29 @@ public class RoccaTrainClassifier {
                     new Date());
         } catch (Exception ex) {
             System.out.println("Error training classifier...");
+    		ex.printStackTrace();
+    		return null;
         }
 
         // save the classifier
-        String[] curOptions = model.getOptions();
-        Enumeration test = model.listOptions();
-        System.out.println("Saving Classifier...");
+//        String[] curOptions = model.getOptions();
+//        Enumeration test = model.listOptions();
         Instances header = new Instances(trainData,0);
+        int index = arffFile.getAbsolutePath().lastIndexOf(".");
+        String modelName = arffFile.getAbsolutePath().substring(0,index) + ".model";
+        System.out.println("Saving Classifier..." + modelName);
         try {
             SerializationHelper.writeAll
 //                ("C:\\Users\\Mike\\Documents\\Work\\Java\\WEKA\\weka vs R\\RF_8sp_54att_110whistle-subset.model",
-                  (arffFile + ".model",
+//                  (arffFile + ".model",
+            	(modelName,
                 new Object[]{model,header});
+            System.out.println("Finished!");
+            return modelName;
         } catch (Exception ex) {
             System.out.println("Error saving classifier...");
+    		ex.printStackTrace();
         }
-        
-        System.out.println("Finished!");
+        return null;
     }
-
 }

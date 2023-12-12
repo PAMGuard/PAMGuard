@@ -4,7 +4,7 @@
   <groupId>org.pamguard</groupId>
   <artifactId>Pamguard</artifactId>
   <name>Pamguard Java12+</name>
-  <version>2.02.09e</version>
+  <version>2.02.09c</version>
   <description>Pamguard for Java 12+, using Maven to control dependcies</description>
   <url>www.pamguard.org</url>
   <organization>
@@ -53,16 +53,16 @@
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.11.0</version>
+        <version>3.8.1</version>
         <dependencies>
           <dependency>
             <groupId>org.eclipse.tycho</groupId>
             <artifactId>tycho-compiler-jdt</artifactId>
-            <version>4.0.3</version>
+            <version>1.5.1</version>
           </dependency>
         </dependencies>
         <configuration>
-          <release>17</release>
+          <release>11</release>
           <compilerId>jdt</compilerId>
           <compilerArguments>
             <properties>.settings/org.eclipse.jdt.core.prefs</properties>
@@ -72,11 +72,16 @@
       <plugin>
         <groupId>org.openjfx</groupId>
         <artifactId>javafx-maven-plugin</artifactId>
-        <version>0.0.8</version>
+        <version>0.0.6</version>
+        <configuration>
+          <source>17</source>
+          <target>17</target>
+          <release>17</release>
+        </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>3.5.1</version>
+        <version>3.2.1</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -189,8 +194,8 @@
     </plugins>
   </reporting>
   <properties>
-    <maven.compiler.target>17</maven.compiler.target>
-    <maven.compiler.source>17</maven.compiler.source>
-    <javafx.version>17</javafx.version>
+    <maven.compiler.target>11</maven.compiler.target>
+    <maven.compiler.source>11</maven.compiler.source>
+    <javafx.version>16</javafx.version>
   </properties>
 </project>
