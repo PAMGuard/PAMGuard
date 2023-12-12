@@ -248,6 +248,8 @@ public class ToadSimplexLocaliser extends TOADBaseAlgorithm {
 		 */
 		LatLong pos = geometry.getReferenceGPS().addDistanceMeters(new PamVector(posVec).add(centre));
 		
+		
+		
 
 		//		TargetMotionResult tmResult = new TargetMotionResult(geometry.getTimeMilliseconds(), null, pos, 0, 0);
 		
