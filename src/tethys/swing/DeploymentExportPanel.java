@@ -231,7 +231,6 @@ public class DeploymentExportPanel extends TethysGUIPanel implements DeploymentT
 
 	@Override
 	public void selectionChanged() {
-		selectedDeployments = pamDeploymentsTable.getSelectedDeployments();
 		enableControls();
 	}
 

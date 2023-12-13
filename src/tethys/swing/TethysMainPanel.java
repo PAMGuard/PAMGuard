@@ -53,10 +53,12 @@ public class TethysMainPanel extends TethysGUIPanel {
 //		splitPane.set
 		mainPanel.add(BorderLayout.CENTER, splitPane);
 //		mainPanel.add(BorderLayout.CENTER, datablockSynchPanel.getComponent());
-		JPanel splitNorth = new JPanel(new BorderLayout());
-		splitNorth.add(BorderLayout.WEST, calibrationPanel.getComponent());
-		splitNorth.add(deploymentsPanel.getComponent());
-		splitPane.add(splitNorth);
+//		JPanel splitNorth = new JPanel(new BorderLayout());
+		JSplitPane northSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		northSplit.add(calibrationPanel.getComponent());
+		northSplit.add(deploymentsPanel.getComponent());
+		
+		splitPane.add(northSplit);
 		southwestSplit.add(datablockSynchPanel.getComponent());
 		southwestSplit.add(southEastPanel);
 		southEastPanel.add(datablockDetectionsPanel.getComponent(), BorderLayout.CENTER);
@@ -68,6 +70,7 @@ public class TethysMainPanel extends TethysGUIPanel {
 			public void run() {
 				splitPane.setDividerLocation(0.5);
 				southwestSplit.setDividerLocation(0.5);
+				northSplit.setDividerLocation(0.27);
 			}
 		});
 	}

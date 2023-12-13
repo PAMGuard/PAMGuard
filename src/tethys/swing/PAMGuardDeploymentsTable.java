@@ -51,7 +51,7 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 
 	private DeploymentOverview deploymentOverview;
 	
-	private boolean[] selection = new boolean[0];
+//	private boolean[] selection = new boolean[0];
 	
 	private ArrayList<DeploymentTableObserver> observers = new ArrayList<>();
 
@@ -95,16 +95,15 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 		public void mouseClicked(MouseEvent e) {
 			int aRow = table.getSelectedRow();
 			int col = table.getSelectedColumn();
-			if (aRow >= 0 && aRow < selection.length && col == TableModel.SELECTCOLUMN) {
-				selection[aRow] = !selection[aRow];
-				for (DeploymentTableObserver obs : observers) {
-					obs.selectionChanged();
-				}
+			ArrayList<RecordingPeriod> periods = deploymentOverview.getRecordingPeriods();
+			if (aRow >= 0 && aRow < periods.size() && col == TableModel.SELECTCOLUMN) {
+				periods.get(aRow).toggleSelected();
+				notifyObservers();
 			}
 		}
 
 	}
-
+	
 	public void showPopup(MouseEvent e) {
 		int aRow = table.getSelectedRow();
 		int[] selRows = table.getSelectedRows();
@@ -132,9 +131,31 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 				}
 			}
 		}
+		JPopupMenu popMenu = new JPopupMenu();
+		
+		JMenuItem menuItem = new JMenuItem("Select all");
+		menuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				selectAll(true);
+			}
+		});
+		popMenu.add(menuItem);
+		menuItem = new JMenuItem("Select none");
+		menuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				selectAll(false);
+			}
+		});
+		popMenu.add(menuItem);
+		
+		if (matchedDeployments.size() > 0) {
+			popMenu.addSeparator();
+		}
+		
 		if (matchedDeployments.size() == 1) {
-			JPopupMenu popMenu = new JPopupMenu();
-			JMenuItem menuItem = new JMenuItem("Delete deployment document " + matchedDeployments.get(0));
+			menuItem = new JMenuItem("Delete deployment document " + matchedDeployments.get(0));
 			menuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -160,19 +181,55 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 			popMenu.add(menuItem);
 			
 			
-			popMenu.show(e.getComponent(), e.getX(), e.getY());
 		}
-//		if (newPeriods.size() == 0) {
-//			return;
-//		}
-//		/*
-//		 *  if we get here, we've one or more rows without a Tethys output, so can have
-//		 *  a menu to create them. 
-//		 */
-		
+		else if (matchedDeployments.size() > 1){
+			menuItem = new JMenuItem(String.format("Delete %d deployment documents", matchedDeployments.size()));
+			menuItem.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					deleteMultipleDeployments(matchedDeployments);
+				}
+			});
+			popMenu.add(menuItem);
+		}
+
+		popMenu.show(e.getComponent(), e.getX(), e.getY());
+				
 		
 	}
 	
+	protected void selectAll(boolean select) {
+		ArrayList<RecordingPeriod> recordingPeriods = deploymentOverview.getRecordingPeriods();
+		for (int i = 0; i < recordingPeriods.size(); i++) {
+			recordingPeriods.get(i).setSelected(select);
+		}
+		
+		tableModel.fireTableDataChanged();
+
+		notifyObservers();
+		
+	}
+
+	protected void deleteMultipleDeployments(ArrayList<PDeployment> matchedDeployments) {
+		int ans = WarnOnce.showWarning(getTethysControl().getGuiFrame(), "Delete Deployment document", 
+				"Are you sure you want to delete multiple deployment documents ", WarnOnce.OK_CANCEL_OPTION);
+		if (ans == WarnOnce.CANCEL_OPTION) {
+			return;
+		}
+		for (PDeployment depl : matchedDeployments) {
+			if (depl.deployment == null) {
+				continue;
+			}
+			try {
+				boolean gone = getTethysControl().getDbxmlConnect().deleteDocument(depl.deployment);
+			} catch (TethysException e) {
+				getTethysControl().showException(e);
+			}
+		}
+		getTethysControl().sendStateUpdate(new TethysState(StateType.UPDATESERVER, Collection.Deployments));
+	}
+
 	protected void exportDeployment(PDeployment pDeployment) {
 		getTethysControl().exportDocument(Collection.Deployments.collectionName(), pDeployment.deployment.getId());
 	}
@@ -197,24 +254,6 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 			getTethysControl().showException(e);
 		}
 		getTethysControl().sendStateUpdate(new TethysState(StateType.UPDATESERVER, Collection.Deployments));
-	}
-
-	/**
-	 * Get a list of selected recording periods. 
-	 * @return list of selected periods. 
-	 */
-	public ArrayList<RecordingPeriod> getSelectedDeployments() {
-		if (deploymentOverview == null) {
-			return null;
-		}
-		ArrayList<RecordingPeriod> selDeps = new ArrayList<>();
-		int n = Math.min(selection.length, deploymentOverview.getRecordingPeriods().size());
-		for (int i = 0; i < n; i++) {
-			if (selection[i]) {
-				selDeps.add(deploymentOverview.getRecordingPeriods().get(i));
-			}
-		}
-		return selDeps;
 	}
 
 	@Override
@@ -242,20 +281,32 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 		}
 	}
 
+	/**
+	 * Get a list of selected periods irrespective of whether they have an existing deployment document. 
+	 * @return
+	 */
+	public ArrayList<RecordingPeriod> getSelectedPeriods() {
+		ArrayList<RecordingPeriod> allPeriods = deploymentOverview.getRecordingPeriods();
+		ArrayList<RecordingPeriod> selPeriods = new ArrayList();
+		int n = allPeriods.size();
+		for (int i = 0; i < n; i++) {
+			if (allPeriods.get(i).isSelected()) {
+				selPeriods.add(allPeriods.get(i));
+			}
+		}
+		return selPeriods;
+	}
+	private void notifyObservers() {
+		for (DeploymentTableObserver obs : observers) {
+			obs.selectionChanged();
+		}
+	}
+
 	private void updateDeployments() {
 		DeploymentHandler deploymentHandler = getTethysControl().getDeploymentHandler();
 		deploymentOverview = deploymentHandler.getDeploymentOverview();
 		if (deploymentOverview == null) {
 			return;
-		}
-		int n = deploymentOverview.getRecordingPeriods().size();
-		if (selection.length < n) {
-			selection = Arrays.copyOf(selection, n);
-//			for (int i = 0; i < setDefaultStores.length; i++) {
-//				if (selectBoxes[i] == null) {
-//					selectBoxes[i] = new JCheckBox();
-//				}
-//			}
 		}
 		tableModel.fireTableDataChanged();
 //		DeploymentData deplData = getTethysControl().getGlobalDeplopymentData();
@@ -269,9 +320,9 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 
 	private class TableModel extends AbstractTableModel {
 
-		private String[] columnNames = {"Id", "Start", "Stop", "Gap", "Duration", "Cycle", "Tethys Deployment", "Select"};
+		private String[] columnNames = {"Id", "Select", "Start", "Stop", "Gap", "Duration", "Cycle", "Tethys Deployment"};
 		
-		private static final int SELECTCOLUMN = 7;
+		private static final int SELECTCOLUMN = 1;
 
 		@Override
 		public int getRowCount() {
@@ -306,10 +357,10 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			RecordingPeriod period = deploymentOverview.getRecordingPeriods().get(rowIndex);
 //			DeploymentRecoveryPair deplInfo = deploymentInfo.get(rowIndex);
-			if (columnIndex == 5) {
+			if (columnIndex == 6) {
 				return deploymentOverview.getDutyCycleInfo();
 			}
-			if (columnIndex == 3 && rowIndex > 0) {
+			if (columnIndex == 4 && rowIndex > 0) {
 				RecordingPeriod prevPeriod = deploymentOverview.getRecordingPeriods().get(rowIndex-1);
 				long gap = period.getRecordStart() - prevPeriod.getRecordStop();
 				return PamCalendar.formatDuration(gap);
@@ -321,22 +372,22 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 					switch (columnIndex) {
 					case 0:
 						return rowIndex;
-					case 1:
+					case 2:
 						return PamCalendar.formatDBDateTime(period.getRecordStart());
 		//				return TethysTimeFuncs.formatGregorianTime(deplInfo.deploymentDetails.getAudioTimeStamp());
-					case 2:
+					case 3:
 						return PamCalendar.formatDBDateTime(period.getRecordStop());
 		//				return TethysTimeFuncs.formatGregorianTime(deplInfo.recoveryDetails.getAudioTimeStamp());
-					case 4:
+					case 5:
 		//				long t1 = TethysTimeFuncs.millisFromGregorianXML(deplInfo.deploymentDetails.getAudioTimeStamp());
 		//				long t2 = TethysTimeFuncs.millisFromGregorianXML(deplInfo.recoveryDetails.getAudioTimeStamp());
 						return PamCalendar.formatDuration(period.getRecordStop()-period.getRecordStart());
-					case 6:
+					case 7:
 						PDeployment deployment = period.getMatchedTethysDeployment();
 						return makeDeplString(period, deployment);
 					case SELECTCOLUMN:
 		//				return selectBoxes[rowIndex];
-						return selection[rowIndex];
+						return period.isSelected();
 					}
 		
 					return null;
@@ -357,7 +408,8 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 			long start = period.getRecordStart();
 			long stop = period.getRecordStop();
 			double percOverlap = (overlap*100.) / (stop-start);
-			return String.format("%s : %3.1f%% overlap", deployment.toString(), percOverlap);
+//			return String.format("%s : %3.1f%% overlap", deployment.toString(), percOverlap);
+			return deployment.toString();
 		}
 
 	}

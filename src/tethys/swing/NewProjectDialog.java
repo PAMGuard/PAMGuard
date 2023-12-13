@@ -24,7 +24,7 @@ public class NewProjectDialog extends PamView.dialog.PamDialog {
 	
 	private JTextField projectRegion;	
 		
-	private PamguardMetaData metaData;
+	private Deployment deployment;
 	
 	private NewProjectDialog(Window parentFrame, TethysControl tethysControl) {
 		super(parentFrame, "New Project", false);
@@ -46,30 +46,29 @@ public class NewProjectDialog extends PamView.dialog.PamDialog {
 		setDialogComponent(mainPanel);
 	}
 	
-	public static PamguardMetaData showDialog(Window parent, TethysControl tethysControl, PamguardMetaData metaData) {
+	public static Deployment showDialog(Window parent, TethysControl tethysControl, Deployment deployment) {
 		if (singleInstance == null) {
 			singleInstance = new NewProjectDialog(parent, tethysControl);
 		}
-		singleInstance.setParams(metaData);
+		singleInstance.setParams(deployment);
 		singleInstance.setVisible(true);
-		return singleInstance.metaData;
+		return singleInstance.deployment;
 	}
 
-	private void setParams(PamguardMetaData deploymentData) {
+	private void setParams(Deployment deploymentData) {
 		if (deploymentData == null) {
 			return;
 		}
-		this.metaData = deploymentData;
-		projectName.setText(deploymentData.getDeployment().getProject());
-		projectRegion.setText(deploymentData.getDeployment().getRegion());
+		this.deployment = deploymentData;
+		projectName.setText(deploymentData.getProject());
+		projectRegion.setText(deploymentData.getRegion());
 	}
 
 	@Override
 	public boolean getParams() {
-		if (metaData == null) {
+		if (deployment == null) {
 			return false;
 		}
-		Deployment deployment = metaData.getDeployment();
 		deployment.setProject(projectName.getText());
 		deployment.setRegion(projectRegion.getText());
 		if (deployment.getProject() == null || deployment.getProject().length() == 0) {
@@ -81,7 +80,7 @@ public class NewProjectDialog extends PamView.dialog.PamDialog {
 
 	@Override
 	public void cancelButtonPressed() {
-		metaData = null;
+		deployment = null;
 	}
 
 	@Override

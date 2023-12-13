@@ -187,8 +187,9 @@ public class TethysConnectionPanel extends TethysGUIPanel {
 	 */
 	protected void createNewProject() {
 		PamguardMetaData pamDeploymentData = MetaDataContol.getMetaDataControl().getMetaData();
-		pamDeploymentData = NewProjectDialog.showDialog(getTethysControl().getGuiFrame(), getTethysControl(), pamDeploymentData);
-		if (pamDeploymentData != null) {
+		Deployment newDep = NewProjectDialog.showDialog(getTethysControl().getGuiFrame(), getTethysControl(), pamDeploymentData.getDeployment());
+		if (newDep != null) {
+//			oldDep
 			MetaDataContol.getMetaDataControl().setMetaData(pamDeploymentData);
 			updateProjectList();
 		}
@@ -265,7 +266,9 @@ public class TethysConnectionPanel extends TethysGUIPanel {
 			fillServerControl();
 			updateProjectList();
 		}
-		
+		if (tethysState.stateType == StateType.NEWPROJECTSELECTION) {
+			updateProjectList();
+		}
 	}
 
 	private void updateProjectList() {

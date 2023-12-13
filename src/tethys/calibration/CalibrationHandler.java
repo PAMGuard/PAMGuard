@@ -523,7 +523,13 @@ public class CalibrationHandler implements TethysStateObserver {
 	 * @return list of calibration documents using this instrument, based on the start of the document name. 
 	 */
 	private ArrayList<DocumentInfo> getArrayCalibrations() {
-		ArrayList<DocumentInfo> allCals = tethysControl.getDbxmlQueries().getCollectionDocumentList(Collection.Calibrations);
+		ArrayList<DocumentInfo> allCals = null;
+		try {
+			allCals = tethysControl.getDbxmlQueries().getCollectionDocumentList(Collection.Calibrations);
+		}
+		catch (Exception e) {
+			
+		}
 		if (allCals == null) {
 			return null;
 		}

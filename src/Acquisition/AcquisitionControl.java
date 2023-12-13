@@ -283,6 +283,16 @@ public class AcquisitionControl extends RawInputControlledUnit implements PamSet
 		return daqControllers;
 	}
 
+	@Override
+	public String getDataLocation() {
+		if (offlineFileServer == null) {
+			return null;
+		}
+		else {
+			return offlineFileServer.getDataLocation();
+		}
+	}
+
 	public AcquisitionProcess getDaqProcess() {
 		return acquisitionProcess;
 	}

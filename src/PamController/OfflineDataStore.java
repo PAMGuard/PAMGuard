@@ -34,6 +34,13 @@ public interface OfflineDataStore {
 	public String getDataSourceName();
 	
 	/**
+	 * Get the data location. This may be a specific file, or might be a folder
+	 * if data are in many files, a URI, etc. 
+	 * @return store locations
+	 */
+	public String getDataLocation();
+	
+	/**
 	 * Load data for a given datablock between two time limits. 
 	 * @param dataBlock datablock owner of the data
 	 * @param dataStart start time in milliseconds

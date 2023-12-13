@@ -23,6 +23,8 @@ public class XMLStringView extends PamDialog {
 		setDialogComponent(mainPanel);
 		setResizable(true);
 		textArea.setText(xmlString);
+		textArea.setEditable(false);
+		textArea.setCaretPosition(0);
 		
 		getCancelButton().setVisible(false);
 	}
@@ -35,7 +37,6 @@ public class XMLStringView extends PamDialog {
 
 	@Override
 	public boolean getParams() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 

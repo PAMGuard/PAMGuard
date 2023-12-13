@@ -2553,5 +2553,9 @@ PamSettingsSource, DataOutputStore {
 		BinaryStoreDeleter storeDeleter = new BinaryStoreDeleter(this);
 		return storeDeleter.deleteDataFrom(timeMillis);
 	}
+	@Override
+	public String getDataLocation() {
+		return binaryStoreSettings.getStoreLocation();
+	}
 	
 }

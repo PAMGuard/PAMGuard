@@ -185,8 +185,10 @@ public class NilusUnpacker {
 				// find a setter for it. 
 				Method setter = findSetter(nilusClass, fieldName);
 				//			System.out.printf("Field %s with element %s and setter %s\n", fieldName, childName, setter);
-				if (setter == null & verbose) {
-					System.out.printf("No setter available for field %s and element %s\n", fieldName, elementName);
+				if (setter == null) {
+					if (verbose) {
+						System.out.printf("No setter available for field %s and element %s\n", fieldName, elementName);
+					}
 					continue;  // eventually do something more intelligent here. 
 				} 
 				Parameter[] params = setter.getParameters();

@@ -47,7 +47,7 @@ public class DetectionsExportWizard extends PamWizard {
 		
 		addCard(algorithmCard = new AlgorithmCard(this, tethysControl, dataBlock));
 		addCard(granularityCard = new GranularityCard(this, tethysControl, dataBlock));
-		addCard(descriptionCard = new DescriptionCard(this, tethysControl, dataBlock));
+		addCard(descriptionCard = new DescriptionCard(this, tethysControl));
 		addCard(exportWorkerCard = new ExportWorkerCard(this, tethysControl, dataBlock));
 		
 		moveFirst();

@@ -1,5 +1,7 @@
 package tethys.deployment;
 
+import java.awt.Window;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,10 +26,16 @@ import Array.HydrophoneLocator;
 import Array.PamArray;
 import Array.Streamer;
 import Array.ThreadingHydrophoneLocator;
+import GPS.GPSControl;
+import GPS.GPSDataBlock;
+import GPS.GpsData;
+import GPS.GpsDataUnit;
 import PamController.PamSensor;
+import PamController.PamSettingManager;
+import PamController.PamSettings;
 import PamController.PamControlledUnit;
+import PamController.PamControlledUnitSettings;
 import PamController.PamController;
-import PamUtils.LatLong;
 import PamUtils.PamUtils;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamRawDataBlock;
@@ -46,6 +54,10 @@ import nilus.ChannelInfo.Sampling;
 import nilus.ChannelInfo.Sampling.Regimen;
 import nilus.Deployment;
 import nilus.Deployment.Data;
+import nilus.Deployment.Data.Tracks;
+import nilus.Deployment.Data.Tracks.Track;
+import nilus.Deployment.Data.Tracks.Track.Point;
+import nilus.Deployment.Data.Tracks.Track.Point.BearingDegN;
 import nilus.Deployment.Instrument;
 import nilus.Deployment.SamplingDetails;
 import nilus.Deployment.Sensors;
@@ -66,8 +78,12 @@ import tethys.calibration.CalibrationHandler;
 import tethys.TethysState.StateType;
 import tethys.dbxml.DBXMLConnect;
 import tethys.dbxml.TethysException;
+import tethys.deployment.swing.DeploymentWizard;
+import tethys.deployment.swing.RecordingGapDialog;
 import tethys.niluswraps.PDeployment;
 import tethys.output.TethysExportParams;
+import tethys.pamdata.AutoTethysProvider;
+import tethys.swing.DeploymentTableObserver;
 
 /**
  * Functions to gather data for the deployment document from all around PAMGuard.
@@ -77,7 +93,7 @@ import tethys.output.TethysExportParams;
  * @author dg50
  *
  */
-public class DeploymentHandler implements TethysStateObserver {
+public class DeploymentHandler implements TethysStateObserver, DeploymentTableObserver {
 	
 	private TethysControl tethysControl;
 	
@@ -93,6 +109,8 @@ public class DeploymentHandler implements TethysStateObserver {
 	private ArrayList<PDeployment> projectDeployments;
 
 	private Helper nilusHelper;
+	
+	private DeploymentExportOpts exportOptions = new DeploymentExportOpts();
 
 	public DeploymentHandler(TethysControl tethysControl) {
 		super();
@@ -103,6 +121,32 @@ public class DeploymentHandler implements TethysStateObserver {
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		}
+		PamSettingManager.getInstance().registerSettings(new SettingsHandler());
+	}
+	
+	/**
+	 * Gather up all track information both from the GPS module (if it exists) and 
+	 * the type of hydrophone array (or many!)
+	 * @return
+	 */
+	public TrackInformation getTrackInformation() {
+		PamArray array = ArrayManager.getArrayManager().getCurrentArray();
+		int nStreamers = array.getStreamerCount();
+		HydrophoneLocator locator = null;
+		for (int i = 0; i < nStreamers; i++) {
+			Streamer aStreamer = array.getStreamer(i);
+			locator = aStreamer.getHydrophoneLocator();
+//			locator.getLocatorSettings().
+		}
+		// try to find a GPS datablock and see what's in it's datamap.
+		OfflineDataMap gpsDataMap = null;
+		GPSControl gpsControl = (GPSControl) PamController.getInstance().findControlledUnit(GPSControl.gpsUnitType);
+		if (gpsControl != null) {
+			GPSDataBlock gpsDataBlock = gpsControl.getGpsDataBlock();
+			gpsDataMap = gpsDataBlock.getPrimaryDataMap();
+		}
+		TrackInformation trackInformation = new TrackInformation(gpsDataMap, locator);
+		return trackInformation;
 	}
 
 	@Override
@@ -137,6 +181,7 @@ public class DeploymentHandler implements TethysStateObserver {
 			projectDeployments.add(new PDeployment(deployment));
 		}
 		matchPamguard2Tethys(deploymentOverview, projectDeployments);
+		tethysControl.sendStateUpdate(new TethysState(TethysState.StateType.NEWPAMGUARDSELECTION));
 		return true;
 	}
 	
@@ -240,7 +285,7 @@ public class DeploymentHandler implements TethysStateObserver {
 			if (prevPeriod != null) {
 				long gap = nextPeriod.getRecordStart() - prevPeriod.getRecordStop();
 				long prevDur = prevPeriod.getRecordStop()-prevPeriod.getRecordStart();
-				if (gap < 3000 || gap < prevDur/50) {
+				if (gap < exportOptions.maxGapSeconds*1000) {
 					// ignoring up to 3s gap or a sample error < 2%.Dunno if this is sensible or not.
 					prevPeriod.setRecordStop(nextPeriod.getRecordStop());
 					iterator.remove();
@@ -248,6 +293,15 @@ public class DeploymentHandler implements TethysStateObserver {
 				}
 			}
 			prevPeriod = nextPeriod;
+		}
+		// now remove ones which are too short even after merging. 
+		iterator = tempPeriods.listIterator();
+		while (iterator.hasNext()) {
+			RecordingPeriod nextPeriod = iterator.next();
+			long duration = nextPeriod.getDuration();
+			if (duration < exportOptions.minLengthSeconds*1000L) {
+				iterator.remove();
+			}
 		}
 //		i = 0;
 //		for (RecordingPeriod aP : tempPeriods) {
@@ -288,12 +342,38 @@ public class DeploymentHandler implements TethysStateObserver {
 
 	}
 	
+	public void showOptions(Window parent) {
+		if (parent == null) {
+			parent = tethysControl.getGuiFrame();
+		}
+		DeploymentExportOpts newOpts = RecordingGapDialog.showDiloag(parent, exportOptions);
+		if (newOpts != null) {
+			exportOptions = newOpts;
+			deploymentOverview = createPamguardOverview();
+			updateProjectDeployments();
+		}
+	}
+	
 	/**
-	 * Exprt deployments docs. Playing with a couple of different ways of doing this. 
+	 * Export button pressed on GUI. Run wizard....
+	 */
+	public void exportDeployments() {
+		Deployment deployment = MetaDataContol.getMetaDataControl().getMetaData().getDeployment();
+		DeploymentExportOpts exportOptions = DeploymentWizard.showWizard(getTethysControl().getGuiFrame(), tethysControl, deployment, this.exportOptions);
+		if (exportOptions != null) {
+			this.exportOptions = exportOptions;
+			deploymentOverview = getDeploymentOverview();
+			ArrayList<RecordingPeriod> allPeriods = deploymentOverview.getRecordingPeriods();
+			exportDeployments(allPeriods);
+		}
+	}
+
+	/**
+	 * Export deployments docs. Playing with a couple of different ways of doing this. 
 	 * @param selectedDeployments
 	 */
 	public void exportDeployments(ArrayList<RecordingPeriod> selectedDeployments) {
-		if (false) {
+		if (exportOptions.separateDeployments) {
 			exportSeparateDeployments(selectedDeployments);
 		}
 		else {
@@ -765,9 +845,11 @@ public class DeploymentHandler implements TethysStateObserver {
 		deployment.setDeploymentDetails(deploymentDetails);
 		deployment.setRecoveryDetails(recoveryDetails);
 
-		TethysLocationFuncs.getTrackAndPositionData(deployment);			
-
 		getProjectData(deployment);
+
+		TethysLocationFuncs.getTrackAndPositionData(deployment);	
+		
+		getTrackDetails(deployment);		
 		
 		DescriptionType description = deployment.getDescription();
 		if (description == null ) {
@@ -795,6 +877,67 @@ public class DeploymentHandler implements TethysStateObserver {
 
 
 		return deployment;
+	}
+
+	/**
+	 * Add the track to the deployment, if there is one (i.e. not for 
+	 * a fixed sensor). 
+	 * @param deployment
+	 */
+	private void getTrackDetails(Deployment deployment) {
+		TrackInformation trackInfo = getTrackInformation();
+		if (trackInfo.haveGPSTrack() == false) {
+			return;
+		}
+		GPSDataBlock gpsDataBlock = (GPSDataBlock) trackInfo.getGpsDataMap().getParentDataBlock();
+		if (gpsDataBlock == null) {
+			return;
+		}
+		/*
+		 *  should have some track information. Do a load from the
+		 *  database for the whole deployment. this may be the entire GPS record, but
+		 *  we should be able to cope with that.  
+		 */
+		long trackStart = TethysTimeFuncs.millisFromGregorianXML(deployment.getDeploymentDetails().getTimeStamp());
+		long trackEnd = TethysTimeFuncs.millisFromGregorianXML(deployment.getRecoveryDetails().getTimeStamp());
+		long dataWin =(long)  (Math.max(1./trackInfo.getGPSDataRate(), exportOptions.trackPointInterval));
+		
+		// get the tracks object. 
+		Tracks tracks = deployment.getData().getTracks();
+		if (tracks == null) {
+			tracks = new Tracks();
+			deployment.getData().setTracks(tracks);
+		}
+		List<Track> trackList = tracks.getTrack(); // lists are usually there. 
+		
+		Track aTrack = new Track();
+		trackList.add(aTrack);
+		List<Point> points = aTrack.getPoint();
+		
+		gpsDataBlock.loadViewerData(trackStart-dataWin, trackEnd+dataWin, null);
+		long lastPointTime = 0;
+		ListIterator<GpsDataUnit> it = gpsDataBlock.getListIterator(0);
+		while (it.hasNext()) {
+			GpsDataUnit gpsDataUnit = it.next();
+			if (gpsDataUnit.getTimeMilliseconds()-lastPointTime < exportOptions.trackPointInterval*1000) {
+				continue;
+			}
+			GpsData gpsData = gpsDataUnit.getGpsData();
+			Point gpsPoint = new Point();
+			gpsPoint.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(gpsDataUnit.getTimeMilliseconds()));
+			gpsPoint.setLatitude(gpsData.getLatitude());
+			gpsPoint.setLongitude(PamUtils.constrainedAngle(gpsData.getLongitude()));
+			BearingDegN bdn = gpsPoint.getBearingDegN();
+			if (bdn == null) {
+				bdn = new BearingDegN();
+				gpsPoint.setBearingDegN(bdn);
+			}
+			bdn.setValue(AutoTethysProvider.roundDecimalPlaces(PamUtils.constrainedAngle(gpsData.getHeading()),1));
+			gpsPoint.setSpeedKn(AutoTethysProvider.roundDecimalPlaces(gpsData.getSpeed(),2));
+			
+			points.add(gpsPoint);
+			lastPointTime = gpsDataUnit.getTimeMilliseconds();
+		}
 	}
 
 	public String getBinaryDataURI() {
@@ -926,15 +1069,17 @@ public class DeploymentHandler implements TethysStateObserver {
 		if (depTime != null) {
 			deployment.getDeploymentDetails().setTimeStamp(depTime);
 		}
-		XMLGregorianCalendar recMillis = deploymentData.getRecoveryDetails().getTimeStamp();
-		if (recMillis != null) {
-			deployment.getRecoveryDetails().setTimeStamp(recMillis);
-		}
-		double recLat = deploymentData.getRecoveryDetails().getLatitude();
-		double recLong = deploymentData.getRecoveryDetails().getLongitude();
-		if (recLat != 0 & recLong != 0.) {
-			deployment.getRecoveryDetails().setLatitude(recLat);
-			deployment.getRecoveryDetails().setLongitude(PamUtils.constrainedAngle(recLong));
+		if (deploymentData.getRecoveryDetails() != null) {
+			XMLGregorianCalendar recMillis = deploymentData.getRecoveryDetails().getTimeStamp();
+			if (recMillis != null) {
+				deployment.getRecoveryDetails().setTimeStamp(recMillis);
+			}
+			double recLat = deploymentData.getRecoveryDetails().getLatitude();
+			double recLong = deploymentData.getRecoveryDetails().getLongitude();
+			if (recLat != 0 & recLong != 0.) {
+				deployment.getRecoveryDetails().setLatitude(recLat);
+				deployment.getRecoveryDetails().setLongitude(PamUtils.constrainedAngle(recLong));
+			}
 		}
 		
 		return true;
@@ -1162,6 +1307,42 @@ public class DeploymentHandler implements TethysStateObserver {
 			 */
 		}
 		return true;
+	}
+
+	@Override
+	public void selectionChanged() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	private class SettingsHandler implements PamSettings {
+
+		@Override
+		public String getUnitName() {
+			return tethysControl.getUnitName();
+		}
+
+		@Override
+		public String getUnitType() {
+			return "Tethys Deployment Handler";
+		}
+
+		@Override
+		public Serializable getSettingsReference() {
+			return exportOptions;
+		}
+
+		@Override
+		public long getSettingsVersion() {
+			return DeploymentExportOpts.serialVersionUID;
+		}
+
+		@Override
+		public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
+			exportOptions = (DeploymentExportOpts) pamControlledUnitSettings.getSettings();
+			return true;
+		}
+		
 	}
 
 }

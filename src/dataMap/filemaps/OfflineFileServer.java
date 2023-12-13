@@ -341,6 +341,12 @@ public abstract class OfflineFileServer<TmapPoint extends FileDataMapPoint> impl
 		// TODO Auto-generated method stub
 		return "Sound Files";
 	}
+
+	@Override
+	public String getDataLocation() {
+		getOfflineFileParameters();
+		return offlineFileParameters.folderName;
+	}
 	
 	public TmapPoint findFirstMapPoint(Iterator<TmapPoint> mapIterator, long startMillis, long endMillis) {
 		TmapPoint mapPoint, prevMapPoint = null;
