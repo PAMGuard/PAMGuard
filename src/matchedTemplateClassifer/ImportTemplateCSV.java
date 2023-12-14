@@ -2,7 +2,9 @@ package matchedTemplateClassifer
 ;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 
 import PamUtils.PamArrayUtils;
 import PamUtils.TxtFileUtils;
@@ -44,16 +46,21 @@ public class ImportTemplateCSV implements TemplateImport {
 			//System.out.println("i: " + i + " : " +  data.get(0).get(i));
 			waveform[i]=data.get(0).get(i); 
 		}
+//		System.out.println("String sR = " +  data.get(1).get(0)); 
+
+
+		//used big decimal here because String.,floatValue did not handle numbers like 3.85e05
+		float sR = new BigDecimal(data.get(1).get(0)).floatValue();
 		
-		float sR=data.get(1).get(0).floatValue();
+//		float sR=data.get(1).get(0).floatValue();
 		
 		//System.out.println("imported waveform"); 
 		//PamArrayUtils.printArrayRaw(waveform);
 		
 		
 		//now create waveform
-//		System.out.println("Create a waveform with " + waveform.length + " samples with a sample rate of "
-//				+ sR + " Hz");
+		System.out.println("Import a waveform with " + waveform.length + " samples with a sample rate of "
+				+ sR + " Hz ");
 		MatchTemplate matchedTemplate = new MatchTemplate(filePath.getName(), waveform, sR);
 		//TODO		
 		return matchedTemplate; 
