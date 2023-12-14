@@ -26,7 +26,7 @@ import offlineProcessing.OfflineTaskGroup;
  * them, but for some of the batch processing control, we need to be able to load and
  * manipulate a second set of modules, which do nothing within the running 
  * configuration, but are there to allow us to set up a configuration to send to 
- * other batch processes in viewer mode. This is also being used in an improved module import system. 
+ * other batch processes in viewer mode. 
  * @author dg50
  *
  */
