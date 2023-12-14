@@ -421,7 +421,7 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 		//set the stored sR
 		currentSr=sR;
 		
-		System.out.println("Waveform click: len: " + click.length()); 
+//		System.out.println("Waveform click: len: " + click.length()); 
 
 		//System.out.println("Waveform Reject max: " + PamArrayUtils.max(this.inteprWaveformReject)+ " len " + interpWaveformMatch.length); 
 
@@ -445,7 +445,7 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 //		System.out.println("matchTemplate: len: " + waveformMatch.waveform.length+ " max: " +  PamArrayUtils.max(waveformMatch.waveform)); 
 //		System.out.println("matchTemplate interp: len: " + interpWaveformMatch.length+ " max: " +  PamArrayUtils.max(interpWaveformMatch)); 
 
-		System.out.println("matchTemplate len: " + matchTemplate.length() + " click.length(): "  +click.length()); 
+//		System.out.println("matchTemplate len: " + matchTemplate.length() + " click.length(): "  +click.length()); 
 		for (int i=0; i<Math.min(matchTemplate.length(), click.length()); i++) {
 			matchResult.set(i, click.get(i).times(matchTemplate.get(i)));
 		}
@@ -456,8 +456,8 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 			rejectResult.set(i, click.get(i).times(rejectTemplate.get(i)));
 		}
 		
-		System.out.println("Waveform Match max: " + PamArrayUtils.max(this.interpWaveformMatch)); 
-		System.out.println("Waveform Reject max: " + PamArrayUtils.max(this.inteprWaveformReject)); 
+//		System.out.println("Waveform Match max: " + PamArrayUtils.max(this.interpWaveformMatch)); 
+//		System.out.println("Waveform Reject max: " + PamArrayUtils.max(this.inteprWaveformReject)); 
 		
 		//System.out.println("Click input: " + click.length() + " click template: " + matchTemplate.length());
 
@@ -508,7 +508,7 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 			result = PamArrayUtils.max(matchReal)-maxreject; 
 		}
 
-		System.out.println("Match corr " + maxmatch + " Reject Corr: " + maxreject);
+//		System.out.println("Match corr " + maxmatch + " Reject Corr: " + maxreject);
 
 		MatchedTemplateResult matchTmpResult = new MatchedTemplateResult(); 
 		matchTmpResult.threshold=result; 
