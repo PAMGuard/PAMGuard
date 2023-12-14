@@ -24,7 +24,7 @@ public class EchoDetectionTask extends OfflineTask<ClickDetection> {
 		this.clickControl = clickControl;
 		echoDetectionSystem = clickControl.getEchoDetectionSystem();
 		setParentDataBlock(clickControl.getClickDataBlock());
-//		addAffectedDataBlock(clickControl.getClickDataBlock());
+		addAffectedDataBlock(clickControl.getClickDataBlock());
 	}
 
 	@Override
