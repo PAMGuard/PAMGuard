@@ -1444,6 +1444,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 */
 	private void saveEndSettings(long timeNow) {
 //		System.out.printf("Updating settings with end time %s\n", PamCalendar.formatDBDateTime(timeNow));
+		ArrayList<PamControlledUnit> pamControlledUnits = pamConfiguration.getPamControlledUnits();
 		PamControlledUnit pcu;
 		PamSettingsSource settingsSource;
 		for (int iU = 0; iU < pamControlledUnits.size(); iU++) {

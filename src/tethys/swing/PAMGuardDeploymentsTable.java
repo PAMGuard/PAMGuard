@@ -59,7 +59,7 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 		super(tethysControl);
 //		deploymentHandler = new DeploymentHandler(getTethysControl());
 		mainPanel = new PamPanel(new BorderLayout());
-		mainPanel.setBorder(new TitledBorder("PAMGuard recording periods"));
+//		mainPanel.setBorder(new TitledBorder("PAMGuard recording periods"));
 		tableModel = new TableModel();
 		table = new JTable(tableModel);
 //		table.setRowSelectionAllowed(true);

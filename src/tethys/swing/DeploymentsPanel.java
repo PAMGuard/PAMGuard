@@ -38,7 +38,7 @@ public class DeploymentsPanel extends TethysGUIPanel implements DeploymentTableO
 		pamDeploymentsTable.addObserver(exportPanel);
 //		tethysDeploymentsTable = new TethysDeploymentsTable(tethysControl);
 		mainPanel = new PamPanel(new BorderLayout());
-		mainPanel.setBorder(new TitledBorder("Deployment information"));
+		mainPanel.setBorder(new TitledBorder("Recording periods and deployment information"));
 		pamDeploymentsTable.addObserver(this);
 		pamDeploymentsTable.addObserver(deploymentHandler);
 //		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
