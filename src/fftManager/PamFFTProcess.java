@@ -144,10 +144,10 @@ public class PamFFTProcess extends PamProcess {
 		 * name has not been set, so if there isn't a name, use the number !
 		 */
 		if (fftParameters.dataSourceName != null) {
-			rawDataBlock = (PamRawDataBlock) PamController.getInstance().getDataBlock(RawDataUnit.class, fftParameters.dataSourceName);
+			rawDataBlock = (PamRawDataBlock) fftControl.getPamConfiguration().getDataBlock(RawDataUnit.class, fftParameters.dataSourceName);
 		}
 		else {
-			rawDataBlock = PamController.getInstance().getRawDataBlock(fftParameters.dataSource);
+			rawDataBlock = fftControl.getPamConfiguration().getRawDataBlock(fftParameters.dataSource);
 			if (rawDataBlock != null) {
 				fftParameters.dataSourceName = rawDataBlock.getDataName();
 			}

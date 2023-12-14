@@ -126,7 +126,7 @@ public class OneBandControl extends PamControlledUnit implements PamSettings {
 			offlineTaskGroup.addTask(task);
 		}
 		if (olProcessDialog == null) {
-			olProcessDialog = new OLProcessDialog(getPamView().getGuiFrame(), offlineTaskGroup, "Noise Data Export");
+			olProcessDialog = new OLProcessDialog(getGuiFrame(), offlineTaskGroup, "Noise Data Export");
 		}
 		olProcessDialog.setVisible(true);
 	}

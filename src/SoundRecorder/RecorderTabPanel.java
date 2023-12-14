@@ -343,7 +343,7 @@ public class RecorderTabPanel implements PamTabPanel, RecorderView {
 		class SettingsButtonListener implements ActionListener {
 
 			public void actionPerformed(ActionEvent e) {
-				recorderControl.recordSettingsDialog(recorderControl.getPamView().getGuiFrame());
+				recorderControl.recordSettingsDialog(recorderControl.getGuiFrame());
 			}
 			
 		}

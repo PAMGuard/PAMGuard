@@ -11,7 +11,7 @@ public class ArraySensorParams implements Serializable, Cloneable, ManagedParame
 
 	public static final long serialVersionUID = 1L;
 	
-	public int readIntervalMillis = 1000;
+	public volatile int readIntervalMillis = 1000;
 	
 	private ArrayDisplayParameters arrayDisplayParameters;
 	

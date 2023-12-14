@@ -91,7 +91,7 @@ public class IMUImportDialog extends PamDialog{
 		}
 		else dir=null;
 			
-		String newFile=PamFileBrowser.csvFileBrowser(imuControl.getPamView().getGuiFrame(),dir,PamFileBrowser.OPEN_FILE);
+		String newFile=PamFileBrowser.csvFileBrowser(imuControl.getGuiFrame(),dir,PamFileBrowser.OPEN_FILE);
 		
 		addNewFileToList( newFile);
 

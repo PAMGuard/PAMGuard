@@ -34,6 +34,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.ToolTipManager;
 
+import com.jcraft.jsch.ConfigRepository.Config;
+import com.sun.xml.bind.v2.TODO;
+
 import Acquisition.AcquisitionProcess;
 
 //import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
@@ -68,7 +71,6 @@ import PamController.soundMedium.GlobalMediumManager;
 import PamDetection.PamDetection;
 import PamDetection.RawDataUnit;
 import PamModel.PamModel;
-import PamModel.PamModelInterface;
 import PamModel.PamModelSettings;
 import PamModel.PamModuleInfo;
 import PamModel.SMRUEnable;
@@ -145,11 +147,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 */
 	private PamModel pamModelInterface;
 
-	/**
-	 * List of the current controlled units (PAMGuard modules)
-	 */
-	private ArrayList<PamControlledUnit> pamControlledUnits;
-
+	private PamConfiguration pamConfiguration;
 	/**
 	 * The current PAM status
 	 */
@@ -236,6 +234,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 	private PamController(int runMode, Object object) {
 
 		uniqueController = this;
+		
+		pamConfiguration = new PamConfiguration();
 
 		this.runMode = runMode;
 
@@ -353,10 +353,6 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * Setup the PAMController. 
 	 */
 	public void setupPamguard() {
-
-
-		// create the array list to hold multiple views
-		pamControlledUnits = new ArrayList<PamControlledUnit>();
 
 		/**
 		 * Set Locale to English so that formated writes to text fields
@@ -663,9 +659,10 @@ public class PamController implements PamControllerInterface, PamSettings {
 	//	}
 
 	void setupProcesses() {
-		for (int i = 0; i < pamControlledUnits.size(); i++) {
-			pamControlledUnits.get(i).setupControlledUnit();
-		}
+//		for (int i = 0; i < pamControlledUnits.size(); i++) {
+//			pamControlledUnits.get(i).setupControlledUnit();
+//		}
+		pamConfiguration.setupProcesses();
 	}
 
 	/**
@@ -677,12 +674,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * without corrupting or losing data. 
 	 */
 	public boolean canClose() {
-		for (int i = 0; i < pamControlledUnits.size(); i++) {
-			if (pamControlledUnits.get(i).canClose() == false) {
-				return false;
-			}
-		}
-		return true;
+		return pamConfiguration.canClose();
 	}
 
 
@@ -696,9 +688,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 
 		getUidManager().runShutDownOps();
 		
-		for (int i = 0; i < pamControlledUnits.size(); i++) {
-			pamControlledUnits.get(i).pamClose();
-		}
+		pamConfiguration.pamClose();
 	}
 
 	/**
@@ -718,6 +708,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * it to be easy to override this for specific modules / processes / data blocks. 
 	 */
 	public void saveViewerData() {
+		ArrayList<PamControlledUnit> pamControlledUnits = pamConfiguration.getPamControlledUnits();
 		for (int i = 0; i < pamControlledUnits.size(); i++) {
 			pamControlledUnits.get(i).saveViewerData();
 		}
@@ -730,7 +721,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 
 	@Override
 	public void addControlledUnit(PamControlledUnit controlledUnit) {
-		pamControlledUnits.add(controlledUnit);
+		
+		pamConfiguration.addControlledUnit(controlledUnit);
 
 		guiFrameManager.addControlledUnit(controlledUnit);
 
@@ -856,8 +848,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 
 		guiFrameManager.removeControlledUnit(controlledUnit);
 
-		while (pamControlledUnits.contains(controlledUnit)) {
-			pamControlledUnits.remove(controlledUnit);
+		boolean removed = pamConfiguration.removeControlledUnt(controlledUnit);
+		if (removed) {
 			notifyModelChanged(PamControllerInterface.REMOVE_CONTROLLEDUNIT);
 		}
 		//		getMainFrame().revalidate(); //handled inside the GUIFrameManager by notify model changed. The controller should have 
@@ -873,7 +865,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 		int[] newOrder = ModuleOrderDialog.showDialog(this, parentFrame); 
 		if (newOrder != null) {
 			// re-order the modules according the new list.
-			reOrderModules(newOrder);
+			pamConfiguration.reOrderModules(newOrder);
 
 			notifyModelChanged(PamControllerInterface.REORDER_CONTROLLEDUNITS);
 
@@ -883,22 +875,22 @@ public class PamController implements PamControllerInterface, PamSettings {
 		return false;
 	}
 
-	private boolean reOrderModules(int[] newOrder) {
-
-		if (pamControlledUnits.size() != newOrder.length) return false;
-
-		ArrayList<PamControlledUnit> newList = new ArrayList<PamControlledUnit>();
-
-		for (int i = 0; i < newOrder.length; i++) {
-
-			newList.add(pamControlledUnits.get(newOrder[i]));
-
-		}
-
-		pamControlledUnits = newList;
-
-		return true;
-	}
+//	private boolean reOrderModules(int[] newOrder) {
+//
+//		if (pamControlledUnits.size() != newOrder.length) return false;
+//
+//		ArrayList<PamControlledUnit> newList = new ArrayList<PamControlledUnit>();
+//
+//		for (int i = 0; i < newOrder.length; i++) {
+//
+//			newList.add(pamControlledUnits.get(newOrder[i]));
+//
+//		}
+//
+//		pamControlledUnits = newList;
+//
+//		return true;
+//	}
 
 	/**
 	 * Swaps the positions of two modules in the main list of modules and 
@@ -924,20 +916,12 @@ public class PamController implements PamControllerInterface, PamSettings {
 
 	@Override
 	public PamControlledUnit getControlledUnit(int iUnit) {
-		if (iUnit < getNumControlledUnits()) {
-			return pamControlledUnits.get(iUnit);
-		}
-		return null;
+		return pamConfiguration.getControlledUnit(iUnit);
 	}
 
 	@Override
 	public PamControlledUnit findControlledUnit(String unitType) {
-		for (int i = 0; i < getNumControlledUnits(); i++) {
-			if (pamControlledUnits.get(i).getUnitType().equalsIgnoreCase(unitType)) {
-				return pamControlledUnits.get(i);
-			}
-		}
-		return null;
+		return pamConfiguration.findControlledUnit(unitType);
 	}
 
 	/**
@@ -946,17 +930,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * @return list of units. 
 	 */
 	public ArrayList<PamControlledUnit> findControlledUnits(String unitType) {
-		ArrayList<PamControlledUnit> l = new ArrayList<PamControlledUnit>();
-		int n = getNumControlledUnits();
-		PamControlledUnit pcu;
-		for (int i = 0; i < n; i++) {
-			pcu = getControlledUnit(i);
-			if (pcu.getUnitType().equals(unitType)) {
-				l.add(pcu);
-			}
-		}
-
-		return l;
+		return pamConfiguration.findControlledUnits(unitType);
 	}
 	/**
 	 * Get a list of PamControlledUnit units of a given type and name, allowing for nulls. 
@@ -965,32 +939,12 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * @return list of units. 
 	 */
 	public ArrayList<PamControlledUnit> findControlledUnits(String unitType, String unitName) {
-		ArrayList<PamControlledUnit> l = new ArrayList<PamControlledUnit>();
-		int n = getNumControlledUnits();
-		PamControlledUnit pcu;
-		for (int i = 0; i < n; i++) {
-			pcu = getControlledUnit(i);
-			if (unitType != null && !unitType.equals(pcu.getUnitType())) {
-				continue;
-			}
-			if (unitName != null && !unitName.equals(pcu.getUnitName())) {
-				continue;
-			}
-			l.add(pcu);
-		}
-
-		return l;
+		return pamConfiguration.findControlledUnits(unitType, unitName);
 	}
 
 	@Override
 	public PamControlledUnit findControlledUnit(String unitType, String unitName) {
-		for (int i = 0; i < getNumControlledUnits(); i++) {
-			if (pamControlledUnits.get(i).getUnitType().equalsIgnoreCase(unitType) &&
-					pamControlledUnits.get(i).getUnitName().equalsIgnoreCase(unitName)) {
-				return pamControlledUnits.get(i);
-			}
-		}
-		return null;
+		return pamConfiguration.findControlledUnit(unitType, unitName);
 	}
 
 	/**
@@ -1002,13 +956,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * @return Existing module with that class and name. 
 	 */
 	public PamControlledUnit findControlledUnit(Class unitClass, String unitName) {
-		for (int i = 0; i < getNumControlledUnits(); i++) {
-			if (pamControlledUnits.get(i).getClass() == unitClass && (unitName == null ||
-					pamControlledUnits.get(i).getUnitName().equalsIgnoreCase(unitName))) {
-				return pamControlledUnits.get(i);
-			}
-		}
-		return null;
+		return pamConfiguration.findControlledUnit(unitClass, unitName);
 	}
 
 	/**
@@ -1017,13 +965,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * @return List of current instances of this class. 
 	 */
 	public ArrayList<PamControlledUnit> findControlledUnits(Class unitClass) {
-		ArrayList<PamControlledUnit> foundUnits = new ArrayList<>();
-		for (int i = 0; i < getNumControlledUnits(); i++) {
-			if (pamControlledUnits.get(i).getClass() == unitClass) {
-				foundUnits.add(pamControlledUnits.get(i));
-			}
-		}
-		return foundUnits;
+		return pamConfiguration.findControlledUnits(unitClass);
 	}
 	
 	/**
@@ -1032,16 +974,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * @return List of current instances of this class. 
 	 */
 	public ArrayList<PamControlledUnit> findControlledUnits(Class unitClass, boolean includeSubClasses) {
-		if (includeSubClasses == false) {
-			return findControlledUnits(unitClass);
-		}
-		ArrayList<PamControlledUnit> foundUnits = new ArrayList<>();
-		for (int i = 0; i < getNumControlledUnits(); i++) {
-			if (unitClass.isAssignableFrom(pamControlledUnits.get(i).getClass())) {
-				foundUnits.add(pamControlledUnits.get(i));
-			}
-		}
-		return foundUnits;
+		return pamConfiguration.findControlledUnits(unitClass, includeSubClasses);
 	}
 
 	/**
@@ -1049,28 +982,19 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * @param the controlled unit name e.g. "my crazy click detector", not the default name. 
 	 */
 	public boolean isControlledUnit(String controlName) {
-		for (int i = 0; i < getNumControlledUnits(); i++) {
-			if (pamControlledUnits.get(i).getUnitName().equalsIgnoreCase(controlName)) {
-				return true;
-			}
-		}
-		return false;
+		return pamConfiguration.isControlledUnit(controlName);
 	}
 
 	@Override
 	public int getNumControlledUnits() {
-		if (pamControlledUnits == null) {
-			return 0;
-		}
-		return pamControlledUnits.size();
+		return pamConfiguration.getNumControlledUnits();
 	}
 
 	static public PamController getInstance() {
 		return uniqueController;
 	}
 
-	@Override
-	public PamModelInterface getModelInterface() {
+	public PamModel getModelInterface() {
 		return pamModelInterface;
 	}
 
@@ -1187,6 +1111,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 				globalTimeManager.getGlobalTimeParameters().getStartupDelay());
 
 		manualStop = false;
+		
+		ArrayList<PamControlledUnit> pamControlledUnits = pamConfiguration.getPamControlledUnits();
 
 		PamCalendar.setSessionStartTime(startTime);
 		setPamStatus(PAM_RUNNING);
@@ -1287,6 +1213,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 		// actually stopped
 //		statusCheckThread = new Thread(new StatusTimer());
 //		statusCheckThread.start();
+		ArrayList<PamControlledUnit> pamControlledUnits = pamConfiguration.getPamControlledUnits();
 
 		// tell all controlled units to stop
 		for (int iU = 0; iU < pamControlledUnits.size(); iU++) {
@@ -1362,6 +1289,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 		 * it is necessary to make sure that all internal datablock 
 		 * buffers have had time to empty.
 		 */
+		ArrayList<PamControlledUnit> pamControlledUnits = pamConfiguration.getPamControlledUnits();
+		
 		if (PamModel.getPamModel().isMultiThread()) {
 			for (int iU = 0; iU < pamControlledUnits.size(); iU++) {
 				pamControlledUnits.get(iU).flushDataBlockBuffers(2000);
@@ -1482,6 +1411,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 //		}
 //		Debug.out.println("   Are we finished? " + areWeFinished);
 //		return areWeFinished;
+		ArrayList<PamControlledUnit> pamControlledUnits = pamConfiguration.getPamControlledUnits();
+		
 		boolean running = false;
 		for (PamControlledUnit aUnit : pamControlledUnits) {
 			int numProcesses = aUnit.getNumPamProcesses();
@@ -1504,16 +1435,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * PAMGUARD settings via the database and binary storage modules. 
 	 */
 	private void saveSettings(long timeNow) {
-		PamControlledUnit pcu;
-		PamSettingsSource settingsSource;
-		for (int iU = 0; iU < pamControlledUnits.size(); iU++) {
-			pcu = pamControlledUnits.get(iU);
-			if (PamSettingsSource.class.isAssignableFrom(pcu.getClass())) {
-				settingsSource = (PamSettingsSource) pcu;
-				settingsSource.saveStartSettings(timeNow);
-			}
-		}
-		PamguardXMLWriter.getXMLWriter().writeStartSettings(timeNow);
+		pamConfiguration.saveSettings(timeNow);
 	}
 
 	/**
@@ -1549,18 +1471,20 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * @return path to the binary store. 
 	 */
 	public String findBinaryStorePath() {
-		BinaryStore binaryControl = BinaryStore.findBinaryStoreControl();
-		if (binaryControl == null) {
-			return null;
-		}
-		String storeLoc = binaryControl.getBinaryStoreSettings().getStoreLocation();
-		if (storeLoc == null) {
-			return "";
-		}
-		if (storeLoc.endsWith(File.separator) == false) {
-			storeLoc += File.separator;
-		}
-		return storeLoc;
+//		TODO get rid of the singleton binary store control and do from the Config.class 
+//		BinaryStore binaryControl = BinaryStore.findBinaryStoreControl();
+//		if (binaryControl == null) {
+//			return null;
+//		}
+//		String storeLoc = binaryControl.getBinaryStoreSettings().getStoreLocation();
+//		if (storeLoc == null) {
+//			return "";
+//		}
+//		if (storeLoc.endsWith(File.separator) == false) {
+//			storeLoc += File.separator;
+//		}
+//		return storeLoc;
+		return pamConfiguration.findBinaryStorePath();
 	}
 
 	/**
@@ -1570,15 +1494,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * @see PamSettingsSource
 	 */
 	public ArrayList<PamSettingsSource> findSettingsSources() {
-		ArrayList<PamSettingsSource> settingsSources = new ArrayList<PamSettingsSource>();
-		PamControlledUnit pcu;
-		for (int iU = 0; iU < pamControlledUnits.size(); iU++) {
-			pcu = pamControlledUnits.get(iU);
-			if (PamSettingsSource.class.isAssignableFrom(pcu.getClass())) {
-				settingsSources.add((PamSettingsSource) pcu);
-			}
-		}
-		return settingsSources;
+		return pamConfiguration.findSettingsSources();
 	}
 
 	@Override
@@ -1607,37 +1523,37 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 */
 	@Override
 	public ArrayList<PamDataBlock> getFFTDataBlocks() {
-		return makeDataBlockList(FFTDataUnit.class, true);
+		return pamConfiguration.getFFTDataBlocks();
 	}
 
 	@Override
 	public PamDataBlock getFFTDataBlock(int id) {
-		return getDataBlock(FFTDataUnit.class, id);
+		return pamConfiguration.getDataBlock(FFTDataUnit.class, id);
 	}
 
 	@Override
 	public PamDataBlock getFFTDataBlock(String name) {
-		return getDataBlock(FFTDataUnit.class, name);
+		return pamConfiguration.getDataBlock(FFTDataUnit.class, name);
 	}
 
 	@Override
 	public ArrayList<PamDataBlock> getRawDataBlocks() {
-		return makeDataBlockList(RawDataUnit.class, true);
+		return pamConfiguration.makeDataBlockList(RawDataUnit.class, true);
 	}
 
 	@Override
 	public PamRawDataBlock getRawDataBlock(int id) {
-		return (PamRawDataBlock) getDataBlock(RawDataUnit.class, id);
+		return (PamRawDataBlock) pamConfiguration.getDataBlock(RawDataUnit.class, id);
 	}
 
 	@Override
 	public PamRawDataBlock getRawDataBlock(String name) {
-		return (PamRawDataBlock) getDataBlock(RawDataUnit.class, name);
+		return pamConfiguration.getRawDataBlock(name);
 	}
 
 	@Override
 	public ArrayList<PamDataBlock> getDetectorDataBlocks() {
-		return makeDataBlockList(PamDetection.class, true);
+		return pamConfiguration.getDetectorDataBlocks();
 	}
 
 	@Override
@@ -1675,33 +1591,16 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * true.
 	 */
 	public ArrayList<PamDataBlock> getDataBlocks(Class blockType, boolean includeSubClasses) {
-		return makeDataBlockList(blockType, includeSubClasses);
+		return pamConfiguration.getDataBlocks(blockType, includeSubClasses);
 	}
 
 	@Override
 	public ArrayList<PamDataBlock> getDataBlocks() {
-		return makeDataBlockList(PamDataUnit.class, true);
+		return pamConfiguration.getDataBlocks();
 	}
 
 	public ArrayList<PamDataBlock> getPlottableDataBlocks(GeneralProjector generalProjector) {
-
-		ArrayList<PamDataBlock> blockList = new ArrayList<PamDataBlock>();
-		PamProcess pP;
-		Class unitClass;
-		PanelOverlayDraw panelOverlayDraw;
-
-		for (int iU = 0; iU < pamControlledUnits.size(); iU++) {
-			for (int iP = 0; iP < pamControlledUnits.get(iU)
-					.getNumPamProcesses(); iP++) {
-				pP = pamControlledUnits.get(iU).getPamProcess(iP);
-				for (int j = 0; j < pP.getNumOutputDataBlocks(); j++) {
-					if(pP.getOutputDataBlock(j).canDraw(generalProjector)) {
-						blockList.add(pP.getOutputDataBlock(j));
-					}
-				}
-			}
-		}
-		return blockList;
+		return pamConfiguration.getPlottableDataBlocks(generalProjector);
 	}
 
 	/**
@@ -1728,38 +1627,9 @@ public class PamController implements PamControllerInterface, PamSettings {
 	//				}
 	//			}
 	//		}
-	private ArrayList<PamDataBlock> makeDataBlockList(Class classType, boolean includSubClasses) {
-
-		ArrayList<PamDataBlock> blockList = new ArrayList<PamDataBlock>();
-		PamProcess pP;
-		Class unitClass;
-
-		for (int iU = 0; iU < pamControlledUnits.size(); iU++) {
-			for (int iP = 0; iP < pamControlledUnits.get(iU)
-					.getNumPamProcesses(); iP++) {
-				pP = pamControlledUnits.get(iU).getPamProcess(iP);
-				for (int j = 0; j < pP.getNumOutputDataBlocks(); j++) {
-					//System.out.println("Comparing "+pP.getOutputDataBlock(j).getUnitClass().getCanonicalName()+" to "+classType.getCanonicalName());
-					if ((unitClass = pP.getOutputDataBlock(j).getUnitClass()) == classType) {
-						blockList.add(pP.getOutputDataBlock(j));
-					}
-					else if (includSubClasses) {
-						if (classType != null && classType.isAssignableFrom(unitClass)) {
-							blockList.add(pP.getOutputDataBlock(j));
-						}
-						//						while ((unitClass = unitClass.getSuperclass()) != null) {
-						//							if (unitClass == classType) {
-						//								blockList.add(pP.getOutputDataBlock(j));
-						//								break;
-						//							}
-						//						}
-					}
-				}
-			}
-		}
-
-		return blockList;
-	}
+//	private ArrayList<PamDataBlock> makeDataBlockList(Class classType, boolean includSubClasses) {
+//		return pamConfiguration.makeDataBlockList(classType, includSubClasses);
+//	}
 
 	/** 
 	 * Find a block of a given type with the id number, or null if the number
@@ -1771,10 +1641,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 */
 	@Override
 	public PamDataBlock getDataBlock(Class blockType, int id) {
-
-		ArrayList<PamDataBlock> blocks = getDataBlocks(blockType, true);
-		if (id >= 0 && id < blocks.size()) return blocks.get(id);
-		return null;
+		return pamConfiguration.getDataBlock(blockType, id);
 	}
 
 	/** 
@@ -1786,23 +1653,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 */
 	@Override
 	public PamDataBlock getDataBlock(Class blockType, String name) {
-		if (name == null) return null;
-		ArrayList<PamDataBlock> blocks = getDataBlocks(blockType, true);
-		for (PamDataBlock dataBlock:blocks) {
-			if (name.equals(dataBlock.getLongDataName())) { // check for a long name match first 
-				return dataBlock;
-			}
-			if (dataBlock instanceof FFTDataBlock) {
-				FFTDataBlock fb = (FFTDataBlock) dataBlock;
-				if (name.equals(fb.getOldLongDataName())) {
-					return dataBlock;
-				}
-			}
-			if (name.equals(dataBlock.toString())) {
-				return dataBlock;
-			}
-		}
-		return null;
+		return pamConfiguration.getDataBlock(blockType, name);
 	}
 
 	/**
@@ -1811,20 +1662,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * @return block
 	 */
 	public PamDataBlock getDataBlockByLongName(String longName) {
-		if (longName == null) return null;
-		ArrayList<PamDataBlock> allBlocks = getDataBlocks();
-		for (PamDataBlock dataBlock:allBlocks) {
-			if (longName.equals(dataBlock.getLongDataName())) {
-				return dataBlock;
-			}
-			if (dataBlock instanceof FFTDataBlock) {
-				FFTDataBlock fb = (FFTDataBlock) dataBlock;
-				if (longName.equals(fb.getOldLongDataName())) {
-					return dataBlock;
-				}
-			}
-		}
-		return null;
+		return pamConfiguration.getDataBlockByLongName(longName);
 	}
 
 	/**
@@ -1911,11 +1749,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 
 		MasterReferencePoint.notifyModelChanged(changeType);
 
-		// also tell all PamControlledUnits since they may want to find their data source 
-		// it that was created after they were - i.e. dependencies have got all muddled
-		for (int i = 0; i < pamControlledUnits.size(); i++) {
-			pamControlledUnits.get(i).notifyModelChanged(changeType);
-		}
+		pamConfiguration.notifyModelChanged(changeType);
 
 		PamSettingManager.getInstance().notifyModelChanged(changeType);
 
@@ -1986,6 +1820,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	private void changedThreading() {
 		PamProcess pamProcess;
 		int nP;
+		ArrayList<PamControlledUnit> pamControlledUnits = pamConfiguration.getPamControlledUnits();
 		for (int i = 0; i < pamControlledUnits.size(); i++) {
 			nP = pamControlledUnits.get(i).getNumPamProcesses();
 			for (int iP = 0; iP < nP; iP++) {
@@ -2019,13 +1854,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 
 	@Override
 	public Serializable getSettingsReference() {
-		ArrayList<UsedModuleInfo> usedModules = new ArrayList<UsedModuleInfo>();
-		for (int i = 0; i < pamControlledUnits.size(); i++) {
-			usedModules.add(new UsedModuleInfo(pamControlledUnits.get(i).getClass().getName(), 
-					pamControlledUnits.get(i).getUnitType(),
-					pamControlledUnits.get(i).getUnitName()));
-		}
-		return usedModules;
+		return pamConfiguration.getSettingsReference();
 	}
 
 	@Override
@@ -2067,10 +1896,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 
 		// also tell all PamControlledUnits since they may want to find their data source 
 		// it that was created after they were - i.e. dependencies have got all muddled
-		for (int i = 0; i < pamControlledUnits.size(); i++) {
-			pamControlledUnits.get(i).notifyModelChanged(DESTROY_EVERYTHING);
-		}
-		pamControlledUnits = null;
+		pamConfiguration.destroyModel();
 
 		PamSettingManager.getInstance().reset();
 
@@ -2395,6 +2221,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	public void loadOldSettings(PamSettingsGroup settingsGroup) {
 		loadOldSettings(settingsGroup, true);
 	}
+	
 	/**
 	 * Called to load a specific set of PAMGUARD settings in 
 	 * viewer mode, which were previously loaded in from a 
@@ -2499,7 +2326,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 				continue;
 			}
 			aUnit = findControlledUnit(moduleClass, aModuleInfo.unitName);
-			currentPos = pamControlledUnits.indexOf(aUnit);
+			currentPos = pamConfiguration.getControlledUnitIndex(aUnit);
 			if (currentPos >= 0) {
 				temp = orderLUT[nFound];
 				orderLUT[nFound] = currentPos;
@@ -2863,6 +2690,14 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 */
 	public GlobalMediumManager getGlobalMediumManager() {
 		return this.globalMediumManager;
+	}
+
+	/**
+	 * Gt the main PAMGuard configuration (list of connected modules). 
+	 * @return the pamConfiguration
+	 */
+	public PamConfiguration getPamConfiguration() {
+		return pamConfiguration;
 	}
 
 }

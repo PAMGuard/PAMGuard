@@ -62,7 +62,7 @@ public class AlarmOfflineTask extends OfflineTask<PamDataUnit> {
 
 	@Override
 	public boolean callSettings() {
-		Frame frame = alarmControl.getPamView().getGuiFrame();
+		Frame frame = alarmControl.getGuiFrame();
 		boolean ok = alarmControl.showAlarmDialog(frame);
 		if (ok) {
 			setParentDataBlock(alarmProcess.getSourceDataBlock());

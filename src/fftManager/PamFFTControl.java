@@ -37,6 +37,7 @@ import fftManager.layoutFX.FFTGuiFX;
 //import fftManager.layoutFX.FFTGuiFX;
 import fftManager.newSpectrogram.SpectrogramPlotProvider;
 import spectrogramNoiseReduction.SpectrogramNoiseProcess;
+import PamController.PamConfiguration;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitGUI;
 import PamController.PamControlledUnitSettings;
@@ -70,7 +71,11 @@ public class PamFFTControl extends PamControlledUnit implements PamSettings {
 	private PamControlledGUISwing fftGUISwing;
 
 	public PamFFTControl(String unitName) {
-		super("FFT Engine", unitName);
+		this(null, unitName);
+	}
+	
+	public PamFFTControl(PamConfiguration pamConfiguration, String unitName) {
+		super(pamConfiguration, "FFT Engine", unitName);
 
 		PamRawDataBlock rawDataBlock = PamController.getInstance().
 		getRawDataBlock(fftParameters.dataSource);

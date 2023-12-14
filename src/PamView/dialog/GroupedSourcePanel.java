@@ -154,8 +154,12 @@ public class GroupedSourcePanel extends SourcePanel {
 	
 	public void setChannelGroups(int[] channelGroups) {
 		if (channelGroups == null) return;
-		for (int i = 0; i < Math.min(channelGroups.length, PamConstants.MAX_CHANNELS); i++) {
+		for (int i = 0; i < Math.min(channelGroups.length, PamConstants.MAX_CHANNELS); i++) {			try {
 			groupList[i].setSelectedIndex(channelGroups[i]);
+		}
+		catch (Exception e) {
+			
+		}
 		}
 	}
 

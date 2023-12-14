@@ -45,7 +45,8 @@ public class ArraySensorProcess extends PamProcess {
 			while(true) {
 				readData();
 				try {
-					Thread.sleep(analogSensorControl.getAnalogSensorParams().readIntervalMillis);
+					int slptime = analogSensorControl.getAnalogSensorParams().readIntervalMillis;
+					Thread.sleep(slptime);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}

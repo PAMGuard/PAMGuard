@@ -122,7 +122,7 @@ public class DbHtControl extends PamControlledUnit implements PamSettings {
 			offlineTaskGroup.addTask(task);
 		}
 		if (olProcessDialog == null) {
-			olProcessDialog = new OLProcessDialog(getPamView().getGuiFrame(), offlineTaskGroup, "dBHt Data Export");
+			olProcessDialog = new OLProcessDialog(getGuiFrame(), offlineTaskGroup, "dBHt Data Export");
 		}
 		olProcessDialog.setVisible(true);
 	}

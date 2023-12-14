@@ -455,7 +455,7 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 //			offlineTaskGroup.addTask(task);
 		}
 		OLProcessDialog olProcessDialog;
-		olProcessDialog = new OLProcessDialog(getPamView().getGuiFrame(), offlineTaskGroup, "DIFAR Data Export");
+		olProcessDialog = new OLProcessDialog(getGuiFrame(), offlineTaskGroup, "DIFAR Data Export");
 		olProcessDialog.setVisible(true);
 	}
 	
