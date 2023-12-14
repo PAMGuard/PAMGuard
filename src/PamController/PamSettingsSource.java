@@ -21,6 +21,14 @@ public interface PamSettingsSource {
 	public boolean saveStartSettings(long timeNow);
 	
 	/**
+	 * Save settings when processing ends.
+	 * This may just be an update of the settings saves with saveStartSettings, e.g. an end time.  
+	 * @param timeNow
+	 * @return true if saved correctly. 
+	 */
+	public boolean saveEndSettings(long timeNow);
+	
+	/**
 	 * Get the number of different settings
 	 * within the settings source. 
 	 * @return the number of PamSettingsGroups.

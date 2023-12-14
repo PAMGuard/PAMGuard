@@ -7,6 +7,7 @@ import PamDetection.AcousticSQLLogging;
 import PamUtils.PamUtils;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import generalDatabase.EmptyTableDefinition;
 import generalDatabase.PamTableDefinition;
 import generalDatabase.PamTableItem;
 import generalDatabase.SQLTypes;
@@ -26,7 +27,7 @@ public class RWESQLLogging extends AcousticSQLLogging {
 		angles = new PamTableItem[maxAngles];
 		angleErrors = new PamTableItem[maxAngles];
 		
-		PamTableDefinition tableDef = getTableDefinition();
+		EmptyTableDefinition tableDef = getTableDefinition();
 		tableDef.addTableItem(score = new PamTableItem("score", Types.INTEGER)); 
 		tableDef.addTableItem(signal = new PamTableItem("signal", Types.DOUBLE)); 
 		tableDef.addTableItem(noise = new PamTableItem("noise", Types.DOUBLE));

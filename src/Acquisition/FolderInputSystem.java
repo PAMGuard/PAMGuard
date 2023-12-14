@@ -697,7 +697,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		if (currentFile > 0 && currentFile >= allFiles.size()) {
 			fileListComplete();
 		}
-//		System.out.println("FolderinputSytem: daqHasEnded");
+		System.out.println("FolderinputSytem: daqHasEnded");
 	}
 
 	private void setFolderProgress() {

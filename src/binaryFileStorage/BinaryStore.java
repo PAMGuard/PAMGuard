@@ -541,6 +541,12 @@ PamSettingsSource, DataOutputStore {
 	}
 
 	@Override
+	public boolean saveEndSettings(long timeNow) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	@Override
 	public int getNumSettings() {
 		if (binarySettingsStorage == null) {
 			return 0;

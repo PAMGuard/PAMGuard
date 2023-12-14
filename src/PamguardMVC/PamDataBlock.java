@@ -44,10 +44,14 @@ import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 
 import org.springframework.core.GenericTypeResolver;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionProcess;
 import pamScrollSystem.ViewLoadObserver;
+import tethys.pamdata.AutoTethysProvider;
+import tethys.pamdata.TethysDataProvider;
 import dataGram.DatagramProvider;
 import dataMap.BespokeDataMapGraphic;
 import dataMap.OfflineDataMap;
@@ -62,6 +66,7 @@ import PamController.PamController;
 import PamController.PamControllerInterface;
 import PamDetection.LocContents;
 import PamDetection.LocalisationInfo;
+import PamDetection.PamDetection;
 import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamView.symbol.PamSymbolManager;
@@ -2863,8 +2868,11 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	private Vector<OfflineDataMap> offlineDataMaps = null;
 
 	private SQLLogging logging;
+	
+	private TethysDataProvider tethysDataProvider;
 
 	private JSONObjectDataSource jsonDataSource;
+	
 
 	public Vector<ProcessAnnotation> getProcessAnnotations() {
 		return processAannotations;
@@ -3073,6 +3081,26 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 
 	public SQLLogging getLogging() {
 		return logging;
+	}
+	
+	/**
+	 * Gets a data provider for Tethys. These will probably need
+	 * to be bespoke, but for now will autogenerate based on the SALLogging information. 
+	 * @return the tethysDataProvider
+	 */
+	public TethysDataProvider getTethysDataProvider() {
+		if (tethysDataProvider == null && PamDetection.class.isAssignableFrom(unitClass) && getLogging() != null) {
+			tethysDataProvider = new AutoTethysProvider(this);
+		}
+		return tethysDataProvider;
+	}
+
+	/**
+	 * Set a data provider for Tethys.
+	 * @param tethysDataProvider the tethysDataProvider to set
+	 */
+	public void setTethysDataProvider(TethysDataProvider tethysDataProvider) {
+		this.tethysDataProvider = tethysDataProvider;
 	}
 
 	final public boolean getCanLog() {
@@ -4228,5 +4256,24 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 */
 	public void setBackgroundManager(BackgroundManager backgroundManager) {
 		this.backgroundManager = backgroundManager;
+	}
+
+	/**
+	 * Get a brief summary of datablock to include in XML descriptions. 
+	 * Basic output is very simple. Expect other datablock to extend this by 
+	 * adding additional attributes. 
+	 * @param doc
+	 * @return XML element with description of data. 
+	 */
+	public Element getDataBlockXML(Document doc) {
+		Element inputEl = doc.createElement("Input");
+		if (getParentProcess() != null && getParentProcess().getPamControlledUnit() != null) {
+			PamControlledUnit pcu = getParentProcess().getPamControlledUnit();
+			inputEl.setAttribute("ModuleType", pcu.getUnitType());
+			inputEl.setAttribute("ModuleName", pcu.getUnitName());
+		}
+		inputEl.setAttribute("Name", getLongDataName());
+		inputEl.setAttribute("Channels", String.format("0x%X", getChannelMap()));
+		return inputEl;
 	}
 }

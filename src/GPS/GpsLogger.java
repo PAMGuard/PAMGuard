@@ -295,7 +295,8 @@ public class GpsLogger extends SQLLogging {
 		 * time from the UTC column which is NOT the GpsData time which was the real GPS time. 
 		 */
 		int gpsIntTimeVal = gpsTime.getIntegerValue();
-		Object ts = getTableDefinition().getTimeStampItem().getValue();
+		PamTableDefinition pamTableDef = (PamTableDefinition) getTableDefinition();
+		Object ts = pamTableDef.getTimeStampItem().getValue();
 		long gpsDate = sqlTypes.millisFromTimeStamp(ts);
 		if (gpsDate%1000 == 0) {
 			// some databases may have stored the milliseconds, in which 
