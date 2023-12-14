@@ -328,7 +328,7 @@ public class MTSettingsPane extends SettingsPane<MatchedTemplateParams> {
 	private Node createClassifierPane(){
 
 		//with just one classifier.
-		pamTabPane = new PamTabPane(); 
+		pamTabPane = new PamTabPane(); 		
 		pamTabPane.setAddTabButton(true);
 //		pamTabPane.getAddTabButton().setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.ADD, PamGuiManagerFX.iconSize));
 		pamTabPane.getAddTabButton().setGraphic(PamGlyphDude.createPamIcon("mdi2p-plus", PamGuiManagerFX.iconSize));

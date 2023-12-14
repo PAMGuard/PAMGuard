@@ -75,17 +75,22 @@ public class LatLongStrip extends PamBorderPane {
 		//		title.setFont(PamGuiManagerFX.titleFontSize2);
 
 		degrees = new TextField();
+		degrees.setEditable(true);
 		degrees.setPrefColumnCount(4);
 		minutes = new TextField();
 		minutes.setPrefColumnCount(3);
+		minutes.setEditable(true);
 
 		seconds = new TextField();
 		seconds.setPrefColumnCount(6);
+		seconds.setEditable(true);
 		decminutes = new TextField();
 		decminutes.setPrefColumnCount(6);
+		decminutes.setEditable(true);
 
 		decimal=new TextField(); 
 		decimal.setPrefColumnCount(9);
+		decimal.setEditable(true);
 
 		nsew = new ComboBox<String>();
 		nsew.setOnAction((action)->{
@@ -152,25 +157,35 @@ public class LatLongStrip extends PamBorderPane {
 
 	private void newTypedValues(KeyEvent e) {
 		double v = getValue();
-		// now need to put that into the fields that
-		// are not currently shown so that they are
-		// ready if needed. 
-
-		if (e != null) {
-			setValue(v, true);
-		}
+		
+		
+//		// now need to put that into the fields that
+//		// are not currently shown so that they are
+//		// ready if needed. 
+//
+//		if (e != null) {
+//			setValue(v, true);
+//		}
 
 		// and say the formated version
 		sayFormattedValue(v);
 	}
 
 	public void showControls(int formatStyle) {
+		
+		if (formatType==formatStyle) {
+			return;
+		}
+		
+		//important this comes before setting format style. 
+		double currentValue = getValue(); 
 
 		this.formatType = formatStyle; 
 
 		degHBox.getChildren().clear(); 
+				
+		System.out.println("FORMATSTYLE: " + formatStyle + " val " + currentValue); 
 		
-		System.out.println("FORMATSTYLE: " + formatStyle); 
 		switch (formatType) {
 		case LatLong.FORMAT_DECIMALMINUTES:
 			degHBox.getChildren().add(dl); 
@@ -192,7 +207,9 @@ public class LatLongStrip extends PamBorderPane {
 			break;
 
 		}
-
+		
+		setValue(currentValue);
+		
 		sayFormattedValue(getValue());
 	}
 
@@ -205,6 +222,8 @@ public class LatLongStrip extends PamBorderPane {
 	}
 
 	public void setValue(double value, boolean hiddenOnly) {
+		
+		System.out.println("Set value: " + value);
 		if (value >= 0) {
 			nsew.getSelectionModel().select(0);
 		}
@@ -249,18 +268,20 @@ public class LatLongStrip extends PamBorderPane {
 	}
 
 	/**
-	 * Get the value for the latitude and longitude 
-	 * @return the value. 
+	 * Get the value for the latitude or longitude in decimal
+	 * @return the value - the value in decimal
 	 */
 	public double getValue() {
+		
 		double deg = 0;
 		double min = 0;
 		double sec = 0;
 		double sin = 1.;
+		
 		if (nsew.getSelectionModel().getSelectedIndex() == 1) sin = -1.;
 
 
-		if (LatLong.getFormatStyle() == LatLong.FORMAT_DECIMAL){
+		if (formatType == LatLong.FORMAT_DECIMAL){
 			try {
 				deg = Double.valueOf(decimal.getText());
 				return deg; 
@@ -278,7 +299,7 @@ public class LatLongStrip extends PamBorderPane {
 		}
 
 
-		if (LatLong.getFormatStyle() == LatLong.FORMAT_DECIMALMINUTES){
+		if (formatType == LatLong.FORMAT_DECIMALMINUTES){
 			try {
 				min = Double.valueOf(decminutes.getText());
 			}
@@ -355,4 +376,6 @@ public class LatLongStrip extends PamBorderPane {
 	public Label getTitleLabel() {
 		return titleLabel;
 	}
+
+
 }

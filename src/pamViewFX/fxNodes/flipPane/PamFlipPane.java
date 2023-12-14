@@ -1,5 +1,8 @@
 package pamViewFX.fxNodes.flipPane;
 
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -8,12 +11,16 @@ import javafx.scene.control.Labeled;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamHBox;
+import pamViewFX.fxNodes.utilsFX.TextUtilsFX;
 
 /**
  * Flip pane which has is supposed to be used for advanced settings. The front
@@ -146,22 +153,48 @@ public class PamFlipPane extends FlipPane {
 		titleHolder.getChildren().addAll(preLabel = new Label(), advLabel = new TextField("Adv. "), postLabel = new Label("Settings"));
 		preLabel.setId("label-title2");
 		postLabel.setId("label-title2");
+		titleHolder.setAlignment(Pos.CENTER);
+		postLabel.setTextAlignment(TextAlignment.LEFT);
+		postLabel.setAlignment(Pos.CENTER_LEFT);
+
+		advLabel.setAlignment(Pos.CENTER);
+//		advLabel.prefColumnCountProperty().bind(advLabel.textProperty().length().subtract(3));
+		// Set Max and Min Width to PREF_SIZE so that the TextField is always PREF
+		advLabel.setMinWidth(Region.USE_PREF_SIZE);
+		advLabel.setMaxWidth(Region.USE_PREF_SIZE);
+		
+		//pretty complicated to make sure the text field is the same size as the text that is being typed. 
+		advLabel.textProperty().addListener((ov, prevText, currText) -> {
+		    // Do this in a Platform.runLater because of Textfield has no padding at first time and so on
+		    Platform.runLater(() -> {
+		        Text text = new Text(currText);
+		        text.setFont(advLabel.getFont()); // Set the same font, so the size is the same
+		        double width = text.getLayoutBounds().getWidth() // This big is the Text in the TextField
+		                + advLabel.getPadding().getLeft() + advLabel.getPadding().getRight() // Add the padding of the TextField
+		                + 2d; // Add some spacing
+		        advLabel.setPrefWidth(width); // Set the width
+		        advLabel.positionCaret(advLabel.getCaretPosition()); // If you remove this line, it flashes a little bit
+		    });
+		});
+		advLabel.setId("label-title2");
+		advLabel.setStyle("-fx-background-color: transparent");
+		
+		titleHolder.setMaxWidth(Double.MAX_VALUE); //need to make sure label is in center. 
 
 		//holds the back button and the title pane. 
 		PamHBox buttonHolder = new PamHBox(); 
 		buttonHolder.setBackground(null);
 		//buttonHolder.setStyle("-fx-background-color: red;");
 		buttonHolder.setAlignment(Pos.CENTER_LEFT);
-		buttonHolder.getChildren().addAll(backButton, advLabel = new TextField("Adv. Settings")); 
+		buttonHolder.getChildren().addAll(backButton, titleHolder); 
 
 		advLabel.setAlignment(Pos.CENTER);
 		advLabel.setMaxWidth(Double.MAX_VALUE); //need to make sure label is in center. 
 //		PamGuiManagerFX.titleFont2style(advLabel);
-		advLabel.setId("label-title2");
-		advLabel.setStyle("-fx-background-color: transparent");
+
 
 		advLabel.setAlignment(Pos.CENTER);
-		HBox.setHgrow(advLabel, Priority.ALWAYS);
+		HBox.setHgrow(titleHolder, Priority.ALWAYS);
 		
 		advPane.setTop(buttonHolder);
 		

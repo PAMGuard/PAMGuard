@@ -40,19 +40,31 @@ public class MTClassifierOfflineTask extends OfflineTask<PamDataUnit<?,?>> {
 	@Override
 	public boolean processDataUnit(PamDataUnit dataUnit) {
 
-		count++;
-		mtClassifierControl.getMTProcess().newClickData(dataUnit); 
+		try {
+//			System.out.println("MT new data unit: " + dataUnit); 
 
-		//since an annotation has been added might need to do this so that the data unit is actually saved. 
-		DataUnitFileInformation fileInfo = dataUnit.getDataUnitFileInformation();
-		
-		//System.out.println("file info: " + fileInfo); 
-		if (fileInfo != null) {
-			fileInfo.setNeedsUpdate(true);
+
+			count++;
+			mtClassifierControl.getMTProcess().newClickData(dataUnit); 
+
+			//since an annotation has been added might need to do this so that the data unit is actually saved. 
+			DataUnitFileInformation fileInfo = dataUnit.getDataUnitFileInformation();
+
+//			System.out.println("file info: " + fileInfo); 
+			if (fileInfo != null) {
+				fileInfo.setNeedsUpdate(true);
+			}
+			dataUnit.updateDataUnit(System.currentTimeMillis());	
+
+
+			return true;
+
 		}
-		dataUnit.updateDataUnit(System.currentTimeMillis());		
-		
-		return true;
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+
 	}
 
 

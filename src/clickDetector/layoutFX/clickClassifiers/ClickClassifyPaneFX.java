@@ -110,7 +110,7 @@ public class ClickClassifyPaneFX extends PamStackPane {
 
 		//create the main pane. 
 		PamVBox holderPane=new PamVBox();
-	//	holderPane.setPadding(new Insets(5,5,5,5));
+		holderPane.setPadding(new Insets(5,5,5,5));
 		holderPane.setSpacing(5);
 
 		//create label

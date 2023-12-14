@@ -8,6 +8,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.text.TextAlignment;
 import pamViewFX.PamGuiManagerFX;
@@ -47,6 +48,11 @@ public class LatLongPane extends SettingsPane<LatLong>{
 
 	private ToggleButton decimal;
 
+	/**
+	 * Segmented button that also selection of the latitude and longitude format type. 
+	 */
+	private SegmentedButton segmentedButton;
+
 
 	public LatLongPane(String title) {
 		super(null); 
@@ -71,7 +77,7 @@ public class LatLongPane extends SettingsPane<LatLong>{
 		minutesSeconds = new ToggleButton("Degrees, Minutes, Seconds");
 		decimal = new ToggleButton("Decimal");
 
-		SegmentedButton segmentedButton = new SegmentedButton();    
+		segmentedButton = new SegmentedButton();    
 		segmentedButton.getButtons().addAll(decimalMinutes, minutesSeconds, decimal);
 
 		PamHBox top = new PamHBox();
@@ -109,6 +115,7 @@ public class LatLongPane extends SettingsPane<LatLong>{
 
 		mainPane.getChildren().add(cent); 
 
+		decimal.setSelected(true);
 	}
 
 
@@ -144,18 +151,20 @@ public class LatLongPane extends SettingsPane<LatLong>{
 			longStrip.showControls(LatLong.FORMAT_DECIMAL);
 		}
 
-
 	}
 
 
 
 	private void showLatLong() {
-		decimalMinutes.setSelected(LatLong.getFormatStyle() == LatLong.FORMAT_DECIMALMINUTES);
-		minutesSeconds.setSelected(LatLong.getFormatStyle() == LatLong.FORMAT_MINUTESSECONDS);
-		latStrip.showControls(LatLong.getFormatStyle() );
-		longStrip.showControls(LatLong.getFormatStyle() );
-		latStrip.setValue(latLong.getLatitude());
-		longStrip.setValue(latLong.getLongitude());
+		
+		decimalMinutes	.setSelected(LatLong.getFormatStyle() == LatLong.FORMAT_DECIMALMINUTES);
+		minutesSeconds	.setSelected(LatLong.getFormatStyle() == LatLong.FORMAT_MINUTESSECONDS);
+		decimal			.setSelected(LatLong.getFormatStyle() == LatLong.FORMAT_DECIMAL);
+
+		latStrip		.showControls(LatLong.getFormatStyle() );
+		longStrip		.showControls(LatLong.getFormatStyle() );
+		latStrip		.setValue(latLong.getLatitude());
+		longStrip		.setValue(latLong.getLongitude());
 	}
 
 
@@ -165,6 +174,21 @@ public class LatLongPane extends SettingsPane<LatLong>{
 	 */
 	@Override
 	public LatLong getParams(LatLong currentParams) {
+		
+		Toggle selectedButton = this.segmentedButton.getToggleGroup().getSelectedToggle();
+		
+		if (selectedButton == decimalMinutes) {
+			LatLong.setFormatStyle(LatLong.FORMAT_DECIMALMINUTES);
+
+		}
+		else if  (selectedButton == minutesSeconds){
+			LatLong.setFormatStyle(LatLong.FORMAT_MINUTESSECONDS);
+	
+		}
+		else if (selectedButton == decimal){
+			LatLong.setFormatStyle(LatLong.FORMAT_DECIMAL);
+		}
+		
 		latLong = new LatLong(latStrip.getValue(), longStrip.getValue());
 		if (Double.isNaN(latLong.getLatitude()) || Double.isNaN(latLong.getLongitude())) {
 			return null;

@@ -449,19 +449,6 @@ public class PamArrayUtils {
 		return new int[] {min, max};
 	}
 
-	/**
-	 * Calculate the maximum value in an array 
-	 * @param arr - the array to find the maximum value of. 
-	 * @return the maximum value in the array
-	 */
-	public static double max(double[] arr) {
-		double max = Double.NEGATIVE_INFINITY;
-
-		for(double cur: arr)
-			max = Math.max(max, cur);
-
-		return max;
-	}
 
 	/**
 	 * Calculate the maximum value in an array 
@@ -469,6 +456,20 @@ public class PamArrayUtils {
 	 * @return the maximum value in the array
 	 */
 	public static double max(float[] arr) {
+		double max = Double.NEGATIVE_INFINITY;
+
+		for(double cur: arr)
+			max = Math.max(max, cur);
+
+		return max;
+	}
+	
+	/**
+	 * Calculate the maximum value in an array 
+	 * @param arr - the array to find the maximum value of. 
+	 * @return the maximum value in the array
+	 */
+	public static double max(double[] arr) {
 		double max = Double.NEGATIVE_INFINITY;
 
 		for(double cur: arr)
@@ -490,6 +491,50 @@ public class PamArrayUtils {
 
 		return max;
 	}
+	
+	/**
+	 * Get the index of the maximum value in an array 
+	 * @param arr  - the array to find the position of the maximum value. 
+	 * m value of. 
+	 * @return the index of the maximum value
+	 */
+	public static int maxPos(double[] arr) {
+		double max = Double.NEGATIVE_INFINITY;
+		int index = -1; 
+		
+		int count = 0; 
+		for(double cur: arr) {
+			if (cur>max) {
+				index = count; 
+				max=cur;
+			}
+			count++; 
+		}
+		
+
+		return index;
+	}
+	
+	/**
+	 * Get the minimum index of an array
+	 * @param arr  - the array to find the position of the maximum value. 
+	 * m value of. 
+	 * @return the index of the minimum value
+	 */
+	public static int minPos(double[] arr) {
+		double max = Double.POSITIVE_INFINITY;
+		int index = -1; 
+		
+		int count = 0; 
+		for(double cur: arr) {
+			if (cur<max) {
+				index = count; 
+				max=cur;
+			}
+			count++; 
+		}
+		return index;
+	}
 
 	/**
 	 * Get the minimum value in an array 
@@ -505,6 +550,8 @@ public class PamArrayUtils {
 
 		return min;
 	}
+	
+
 
 	/**
 	 * Get the minimum value in an array 
@@ -1008,6 +1055,9 @@ public class PamArrayUtils {
 		}
 		return arrL;
 	}
+
+
+
 	
 	
 	

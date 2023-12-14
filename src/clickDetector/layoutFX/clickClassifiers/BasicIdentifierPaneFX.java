@@ -6,6 +6,7 @@ import pamViewFX.fxNodes.flipPane.PamFlipPane;
 import pamViewFX.fxNodes.table.TableSettingsPane;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
@@ -108,6 +109,7 @@ public class BasicIdentifierPaneFX implements ClassifyPaneFX {
 	protected Node createSettingsPane(){
 
 		mainHolderPane=new PamBorderPane();
+		mainHolderPane.setPadding(new Insets(5,5,5,5));
 		mainHolderPane.setCenter(clickTypesTable=new ClickClassifierTable(clickClassifiers));
 
 		clickTypeHolder=new PamBorderPane();

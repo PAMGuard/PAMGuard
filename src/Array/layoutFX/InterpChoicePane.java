@@ -23,7 +23,7 @@ public class InterpChoicePane extends InterpSettingsPane {
 
 		interpChoiceBox = new ChoiceBox<Integer>(); 
 		interpChoiceBox.getItems().addAll(interpChoice); 
-		
+		interpChoiceBox.setMaxWidth(Double.MAX_VALUE);
 		
 		interpChoiceBox.setConverter(new StringConverter<>() {
             @Override

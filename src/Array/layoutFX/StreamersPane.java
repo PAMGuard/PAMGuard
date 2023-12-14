@@ -55,7 +55,7 @@ public class StreamersPane extends PamBorderPane {
 		this.setCenter(tableArrayPane);
 
 		pamFlipePane = new PamFlipPane(); 
-		pamFlipePane.getAdvLabel().setText("Hydrophone Settings");
+		pamFlipePane.getAdvLabel().setText("Streamer");
 
 		((Pane) streamerPane.getContentNode()).setPadding(new Insets(5,5,5,15)); 
 

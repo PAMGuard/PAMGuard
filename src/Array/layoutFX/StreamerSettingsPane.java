@@ -490,14 +490,14 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 			defaultStreamer.setDz(Double.valueOf(zPosErr.getText()));		
 		}
 		catch (NumberFormatException e) {
-			System.err.println("There is a problem with one of the position parameters in the streamer panel");
+			System.err.println("Streamer getParams: There is a problem with one of the position parameters in the streamer panel");
 			return null;
 		}
 
 		defaultStreamer.setStreamerName(currParams.getStreamerName());
 		int im = interpPane.getSelection();
 		if (im < 0) {
-			System.err.println("There is a problem with the interpolation selection streamer panel");
+			System.err.println("Streamer getParams: There is an index problem with the interpolation selection streamer panel: index = " + im);
 		}
 		currentArray.setOriginInterpolation(im);
 		//			try {
@@ -516,7 +516,7 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 			//			}
 			//			masterLocator.setHydrophoneLocator(streamerIndex, locator);
 			if (currentOriginMethod == null) {
-				System.err.println("No hydrophoneorigin method selected in streamer panel");
+				System.err.println("Streamer getParams: No hydrophoneorigin method selected in streamer panel");
 			}
 		OriginDialogComponent mthDialogComponent = currentOriginMethod.getDialogComponent();
 		if (mthDialogComponent != null) {
@@ -532,13 +532,13 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 		defaultStreamer.setRoll(getDoubleValue(roll));
 		//			}
 		if (!heading.isDisable() && defaultStreamer.getHeading() == null) {
-			System.err.println("You must enter a fixed value for the streamer heading");
+			System.err.println("Streamer getParams: You must enter a fixed value for the streamer heading");
 		}
 		if (!pitch.isDisable() && defaultStreamer.getPitch() == null) {
-			System.err.println("You must enter a fixed value for the streamer pitch");
+			System.err.println("Streamer getParams: You must enter a fixed value for the streamer pitch");
 		}
 		if (!roll.isDisable() && defaultStreamer.getRoll() == null) {
-			System.err.println("You must enter a fixed value for the streamer roll");
+			System.err.println("Streamer getParams: You must enter a fixed value for the streamer roll");
 		}
 
 
@@ -563,13 +563,13 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 			}
 		}
 
-		return currParams;
+		return defaultStreamer;
 	}
 
 	@Override
 	public void setParams(Streamer input) {
 		if (input==null) {
-			System.out.print("The input streamer is null");
+			System.out.print("Streamer setParams: The input streamer is null");
 		}
 		this.defaultStreamer=input;
 		// origin methods
@@ -616,21 +616,24 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 		
 		OriginDialogComponent mthDialogComponent = mth.getDialogComponent();
 		if (mthDialogComponent != null) {
+			System.out.println("Streamer setParams: Set origin component: "); 
 			mthDialogComponent.setParams();
 		}
 
-		System.out.println("Set orientation: " + defaultStreamer.getHeading() +  "  " + defaultStreamer.getPitch() +  "  " + defaultStreamer.getRoll()); 
+		System.out.println("Streamer setParams: Set orientation: " + defaultStreamer.getHeading() +  "  " + defaultStreamer.getPitch() +  "  " + defaultStreamer.getRoll()); 
 		
 		heading	.setText(orientation2Text(defaultStreamer.getHeading()));
 		pitch	.setText(orientation2Text(defaultStreamer.getPitch()));
 		roll	.setText(orientation2Text(defaultStreamer.getRoll()));
 		
-		System.out.println("Origin interpolator: " + currentArray.getOriginInterpolation()); 
+		System.out.println("Streamer setParams: Origin interpolator: " + currentArray.getOriginInterpolation()); 
 
 		if (currentArray.getOriginInterpolation()<0) {
 			interpPane.setSelection(0);
 		}
-		else interpPane.setSelection(currentArray.getOriginInterpolation());
+		else {
+			interpPane.setSelection(currentArray.getOriginInterpolation());
+		}
 
 		ArraySensorFieldType[] sensorFields = ArraySensorFieldType.values();
 		for (int i = 0; i < sensorFields.length; i++) {
