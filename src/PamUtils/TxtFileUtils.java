@@ -89,7 +89,8 @@ public class TxtFileUtils {
 						//5/08/2022 - there was a bug here where there is some sort of invisible character that does not appear on the 
 						//print screen - the only way you can tell is the char array is greater than the number of digits - removed all non numeric
 						//characters. 
-						String number = new String(recordsOnLine[i].strip().replaceAll("[^\\d.]", ""));
+						// updated again on 15/11/23 to include - signs, or you end up with the abs(of every number!)
+						String number = new String(recordsOnLine[i].strip().replaceAll("[^\\d.-]", ""));
 						dat = Double.valueOf(number);
 						//dat = DecimalFormat.getNumberInstance().parse(new String(recordsOnLine[i].strip().toCharArray())).doubleValue();
 					}
