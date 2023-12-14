@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 /**
  * Parameters for the MHT algorithm, contains two serializable parameter
@@ -47,7 +48,7 @@ public class MHTParams implements Serializable, Cloneable, ManagedParameters {
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
 	}
 

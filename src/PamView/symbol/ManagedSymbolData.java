@@ -3,7 +3,11 @@ package PamView.symbol;
 import java.io.Serializable;
 import java.util.Hashtable;
 
-public class ManagedSymbolData implements Cloneable, Serializable {
+import PamModel.parametermanager.ManagedParameters;
+import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
+
+public class ManagedSymbolData implements Cloneable, Serializable, ManagedParameters {
 
 	public static final long serialVersionUID = 1L;
 	
@@ -32,6 +36,11 @@ public class ManagedSymbolData implements Cloneable, Serializable {
 			symbolOptions = new Hashtable<>();
 		}
 		return symbolOptions;
+	}
+
+	@Override
+	public PamParameterSet getParameterSet() {
+		return PamParameterSet.autoGenerate(this, ParameterSetType.DISPLAY);
 	}
 
 	

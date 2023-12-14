@@ -10,6 +10,7 @@ import Jama.Matrix;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 /**
  * Parameters class for fragmented whistle classification. 
@@ -250,7 +251,7 @@ public class FragmentClassifierParams implements Serializable, Cloneable, Manage
 	 */
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("confusionMatrix");
 			ps.put(new PrivatePamParameterData(this, field) {

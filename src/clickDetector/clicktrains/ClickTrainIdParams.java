@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
 
 /**
@@ -59,7 +60,7 @@ public class ClickTrainIdParams implements Serializable, Cloneable, ManagedParam
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("dataVersion");
 			ps.put(new PrivatePamParameterData(this, field) {

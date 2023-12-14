@@ -193,6 +193,15 @@ public class DecimatorControl extends PamControlledUnit implements PamSettings, 
 		}
 		return offlineFileServer.getDataSourceName();
 	}
+	
+	@Override
+	public String getDataLocation() {
+		if (offlineFileServer == null) {
+			return getUnitName();
+		}
+		return offlineFileServer.getDataLocation();
+	}
+
 	@Override
 	public boolean loadData(PamDataBlock dataBlock, OfflineDataLoadInfo offlineDataLoadInfo, ViewLoadObserver loadObserver) {
 		if (offlineFileServer == null) {

@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
 import fileOfflineData.OfflineFileMapPoint;
 
@@ -30,7 +31,7 @@ public class D3DataMapPoint extends OfflineFileMapPoint implements ManagedParame
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("fileOffsetStart");
 			ps.put(new PrivatePamParameterData(this, field) {

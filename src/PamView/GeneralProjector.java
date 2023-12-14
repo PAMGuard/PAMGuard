@@ -265,6 +265,11 @@ public abstract class GeneralProjector<T extends PamCoordinate> {
 
 	JComponent toolTipComponent;
 
+	/**
+	 * Gets an adapter that can provide tooltips automatically based on plotted data units. 
+	 * @param component
+	 * @return
+	 */
 	public MouseHoverAdapter getMouseHoverAdapter(JComponent component) {
 		ToolTipManager tt = ToolTipManager.sharedInstance();
 		tt.registerComponent(component);
@@ -384,7 +389,9 @@ public abstract class GeneralProjector<T extends PamCoordinate> {
 		}
 		String hintText = dataBlock.getHoverText(this, hoveredDataUnit, hoverData.get(unitIndex).getAmbiguity());
 
-		if (hintText == null) return null;
+		if (hintText == null) {
+			return null;
+		}
 		//			System.out.println(hintText);
 		return hintText;
 	}

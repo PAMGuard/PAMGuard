@@ -61,6 +61,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -73,6 +74,7 @@ import javax.swing.event.MenuListener;
 
 import Acquisition.DaqSystemInterface;
 import annotation.tasks.AnnotationManager;
+import metadata.MetaDataContol;
 import performanceTests.PerformanceDialog;
 import tipOfTheDay.TipOfTheDayManager;
 import Array.ArrayManager;
@@ -761,6 +763,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		//for changing "hydrophones" to "microphone" and vice versa if medium changes. 
 		menu.addMenuListener(new SettingsMenuListener());
 		
+		menu.add(MetaDataContol.getMetaDataControl().createMenu(frame));
 		
 		menu.addSeparator();
 
@@ -1666,10 +1669,10 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	protected void getGuiParameters() {
 		guiParameters.extendedState = frame.getExtendedState();
 		guiParameters.state = frame.getState();
-		if (guiParameters.state != Frame.MAXIMIZED_BOTH) {
+//		if (guiParameters.state != Frame.MAXIMIZED_BOTH) {
 			guiParameters.size = frame.getSize();
 			guiParameters.bounds = frame.getBounds();
-		}
+//		}
 	}
 
 	/**
@@ -1983,6 +1986,30 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	 */
 	public PamTabbedPane getTabbedPane() {
 		return this.mainTab;
+	}
+	
+	/**
+	 * find a parent window for a JComponent. This can be useful in 
+	 * finding windows to open child dialogs when the object holding 
+	 * the component may not have a direct reference back to it's dialog. 
+	 * @param component any Swing component
+	 * @return parent Window (or frame) if it can be found
+	 */
+	public static Window findComponentWindow(JComponent component) {
+		if (component == null) {
+			return null;
+		}
+		JRootPane root = component.getRootPane();
+		if (root == null) {
+			return null;
+		}
+		Container rootP = root.getParent();
+		if (rootP instanceof Window) {
+			return (Window) rootP;
+		}
+		else {
+			return null;
+		}
 	}
 
 

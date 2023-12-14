@@ -6,6 +6,7 @@ import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionDialog;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 public class PPSParameters implements Cloneable, Serializable, ManagedParameters {
 
@@ -36,7 +37,7 @@ public class PPSParameters implements Cloneable, Serializable, ManagedParameters
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
 	}
 

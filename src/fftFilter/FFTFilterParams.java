@@ -8,6 +8,7 @@ import org.w3c.dom.Element;
 import Filters.FilterBand;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamUtils.FrequencyFormat;
 
 public class FFTFilterParams implements Serializable, Cloneable, ManagedParameters {
@@ -62,7 +63,7 @@ public class FFTFilterParams implements Serializable, Cloneable, ManagedParamete
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
 	}
 }

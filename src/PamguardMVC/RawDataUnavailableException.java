@@ -61,7 +61,7 @@ public class RawDataUnavailableException extends Exception {
 			return String.format("Samples %d length %d  requested from %s have not yet arrived", 
 					startSample, duration, rawDataBlock.getDataName());
 		case INVALID_CHANNEL_LIST:
-			return String.format("Samples %d length %d  requested from %s do not contain the reqeusted channels %s", 
+			return String.format("Samples %d length %d  requested from %s do not contain the reqeusted channels", 
 					startSample, duration, rawDataBlock.getDataName());
 		case NEGATIVE_DURATION:
 			return String.format("Negative data duration request for %d samples" , duration);

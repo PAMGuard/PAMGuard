@@ -2,19 +2,29 @@ package RightWhaleEdgeDetector;
 
 import PamView.GroupedDataSource;
 import PamView.GroupedSourceParameters;
+import PamguardMVC.DataAutomation;
+import PamguardMVC.DataAutomationInfo;
 import PamguardMVC.PamProcess;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import PamguardMVC.dataSelector.DataSelectorCreator;
 import RightWhaleEdgeDetector.datasel.RWDataSelCreator;
+import RightWhaleEdgeDetector.species.RWSpeciesManager;
+import RightWhaleEdgeDetector.species.RWTethysDataProvider;
 import pamScrollSystem.ViewLoadObserver;
+import tethys.TethysControl;
+import tethys.pamdata.TethysDataProvider;
+import tethys.species.DataBlockSpeciesManager;
 import whistlesAndMoans.AbstractWhistleDataBlock;
 
-public class RWEDataBlock extends AbstractWhistleDataBlock implements GroupedDataSource {
+public class RWEDataBlock extends AbstractWhistleDataBlock<RWEDataUnit> implements GroupedDataSource {
 	
 	private double[] rwFreqRange = {50., 250.};
 	private RWEControl rweControl;
 	private RWEProcess rweProcess;
 	private RWDataSelCreator dataSelCreator;
+	
+	private RWSpeciesManager rwSpeciesManager;
+	private RWTethysDataProvider rwTethysDataProvider;
 
 	public RWEDataBlock(RWEControl rweControl, String dataName,
 			RWEProcess rweProcess, int channelMap) {
@@ -51,6 +61,27 @@ public class RWEDataBlock extends AbstractWhistleDataBlock implements GroupedDat
 			dataSelCreator = new RWDataSelCreator(this);
 		}
 		return dataSelCreator;
+	}
+
+	@Override
+	public DataBlockSpeciesManager<RWEDataUnit> getDatablockSpeciesManager() {
+		if (rwSpeciesManager == null) {
+			rwSpeciesManager = new RWSpeciesManager(this);
+		}
+		return rwSpeciesManager;
+	}
+
+	@Override
+	public TethysDataProvider getTethysDataProvider(TethysControl tethysControl) {
+		if (rwTethysDataProvider == null) {
+			rwTethysDataProvider = new RWTethysDataProvider(tethysControl, rweProcess.getRweDataBlock());
+		}
+		return rwTethysDataProvider;
+	}
+
+	@Override
+	public DataAutomationInfo getDataAutomationInfo() {
+		return new DataAutomationInfo(DataAutomation.AUTOMATIC);
 	}
 
 }

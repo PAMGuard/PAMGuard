@@ -38,6 +38,7 @@ import javax.swing.JPanel;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamView.PamColors.PamColor;
 import PamView.symbol.SymbolData;
 
@@ -808,7 +809,7 @@ public class PamSymbol extends PamSymbolBase implements Serializable, Icon, Clon
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DISPLAY);
 		return ps;
 	}
 

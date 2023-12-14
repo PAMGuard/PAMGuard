@@ -92,7 +92,7 @@ public abstract class SQLLogging {
 	 * Reference to the table definition object.
 	 * This MUST be set from within the concrete logging class.  
 	 */
-	private EmptyTableDefinition pamTableDefinition;
+	private PamTableDefinition pamTableDefinition;
 	
 	/**
 	 * More and more data blocks are starting to use annotations, which require
@@ -102,7 +102,7 @@ public abstract class SQLLogging {
 	 * table definition is set, so that it can be got and modified by the 
 	 * annotation handler shortly after the main table is created.  
 	 */
-	private EmptyTableDefinition baseTableDefinition;
+	private PamTableDefinition baseTableDefinition;
 
 	//	private long selectT1, selectT2;
 	private PamViewParameters currentViewParameters;
@@ -234,7 +234,7 @@ public abstract class SQLLogging {
 	 * @return a Pamguard database table definition object
 	 * @see PamTableDefinition
 	 */
-	public final EmptyTableDefinition getTableDefinition() {
+	public final PamTableDefinition getTableDefinition() {
 		return pamTableDefinition;
 	}
 
@@ -243,7 +243,7 @@ public abstract class SQLLogging {
 	 * 
 	 * @param pamTableDefinition PamTableDefinition to set
 	 */
-	public void setTableDefinition(EmptyTableDefinition pamTableDefinition) {
+	public void setTableDefinition(PamTableDefinition pamTableDefinition) {
 		this.pamTableDefinition = pamTableDefinition;
 		if (baseTableDefinition == null && pamTableDefinition != null) {
 			baseTableDefinition = pamTableDefinition.clone();
@@ -550,6 +550,71 @@ public abstract class SQLLogging {
 		//		}
 		//		}
 		return resultSet;
+	}
+	
+	/**
+	 * Find the data point which is closest in time to that given, or null 
+	 * returning whatever type of data unit this deals with. 
+	 * @param timeMillis
+	 * @return
+	 */
+	public PamDataUnit findClosestDataPoint(PamConnection con, long timeMillis) {
+
+		PamCursor pamCursor = loggingCursorFinder.getCursor(con, pamTableDefinition);
+
+		// can't really do any math with the string based dates, so will have to query from 
+		// a few s before the time we want. 
+		PamDataUnit[] beforeNafter = new PamDataUnit[2];
+		
+		SQLTypes sqlTypes = con.getSqlTypes();
+		
+		for (int i = 0; i < 2; i++) {
+			String clause;
+		
+			if (i == 0) {
+				clause = String.format("WHERE UTC <= %s ORDER BY UTC DESC", sqlTypes.formatDBDateTimeQueryString(timeMillis));
+			}
+			else {
+				clause = String.format("WHERE UTC >= %s ORDER BY UTC ASC", sqlTypes.formatDBDateTimeQueryString(timeMillis));
+			}
+
+			ResultSet result = pamCursor.openReadOnlyCursor(con, clause);
+			if (result==null) {
+				return null;
+			}
+
+			PamTableItem tableItem;
+			try {
+				if (result.next()) {
+					//				for (int i = 0; i < pamTableDefinition.getTableItemCount(); i++) {
+					//					tableItem = pamTableDefinition.getTableItem(i);
+					//					tableItem.setValue(result.getObject(i + 1));
+					//				}
+					//				return true;
+					boolean ok = transferDataFromResult(con.getSqlTypes(), result);
+					result.close();
+					beforeNafter[i] = createDataUnit(sqlTypes, lastTime, lastLoadIndex);
+				}
+			} catch (SQLException ex) {
+				ex.printStackTrace();
+				continue;
+			}
+		}
+		// now pick the closest
+		if (beforeNafter[0] == null) {
+			return beforeNafter[1];
+		}
+		if (beforeNafter[1] == null) {
+			return beforeNafter[0];
+		}
+		long t1 = timeMillis-beforeNafter[0].getTimeMilliseconds();
+		long t2 = beforeNafter[1].getTimeMilliseconds()-timeMillis;
+		if (t1 < t2) {
+			return beforeNafter[0];
+		}
+		else {
+			return beforeNafter[1];
+		}
 	}
 
 	/**
@@ -1765,7 +1830,7 @@ public abstract class SQLLogging {
 	 * annotation handler shortly after the main table is created.  
 	 * @return the baseTableDefinition
 	 */
-	public EmptyTableDefinition getBaseTableDefinition() {
+	public PamTableDefinition getBaseTableDefinition() {
 		return baseTableDefinition;
 	}
 

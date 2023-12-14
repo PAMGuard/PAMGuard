@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamguardMVC.dataSelector.DataSelectParams;
 
 public class Group3DDataSelectParams extends DataSelectParams implements Serializable, Cloneable, ManagedParameters {
@@ -28,7 +29,7 @@ public class Group3DDataSelectParams extends DataSelectParams implements Seriali
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
 	}
 

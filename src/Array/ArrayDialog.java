@@ -44,6 +44,8 @@ public class ArrayDialog extends PamDialog implements ActionListener {
 	private EnvironmentPanel environmentPanel;
 
 	private HydrophoneDiagram hydrophoneDiagram;
+	
+	private InstrumentIdentityPanel instrumentIdentityPanel;
 
 	private JButton okButton, cancelButton;
 
@@ -69,11 +71,14 @@ public class ArrayDialog extends PamDialog implements ActionListener {
 		eastPanel.add(channelPanel.getChannelPanel());
 
 		environmentPanel = new EnvironmentPanel(this);
+		instrumentIdentityPanel = new InstrumentIdentityPanel();
+		//		eastPanel.add(environmentPanel.getEnvironmentPanel());
 
 		hydrophoneDiagram = new HydrophoneDiagram(this);
 		JPanel westPanel = new JPanel(new BorderLayout());
 		westPanel.add(BorderLayout.CENTER, hydrophoneDiagram.getPlotPanel());
 		westPanel.add(BorderLayout.SOUTH, environmentPanel.getEnvironmentPanel());
+		westPanel.add(BorderLayout.NORTH, instrumentIdentityPanel.getComponent());
 		
 
 		splitPanel.add(westPanel);
@@ -144,6 +149,7 @@ public class ArrayDialog extends PamDialog implements ActionListener {
 		hydrophoneDialogPanel.setParams(selArray);
 		channelPanel.setParams();
 		hydrophoneDiagram.rePaint();
+		instrumentIdentityPanel.setParams(selArray);
 		if (selArray != null) {
 			environmentPanel.setNewSpeed(selArray.getSpeedOfSound());
 		}
@@ -171,6 +177,7 @@ public class ArrayDialog extends PamDialog implements ActionListener {
 		array.setSpeedOfSound(environmentPanel.getNewSpeed());
 		array.setSpeedOfSoundError(environmentPanel.getNewError());
 		hydrophoneDialogPanel.getParams();
+		instrumentIdentityPanel.getParams(array);
 
 		if (checkDaqChannels(array) == false) {
 			return false;
@@ -250,6 +257,7 @@ public class ArrayDialog extends PamDialog implements ActionListener {
 			environmentPanel.setNewSpeed(currentArray.getSpeedOfSound());
 			environmentPanel.setNewError(currentArray.getSpeedOfSoundError());
 		}
+		instrumentIdentityPanel.setParams(currentArray);
 	}
 
 	void newChannelSelection() {

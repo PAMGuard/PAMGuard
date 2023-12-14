@@ -1628,7 +1628,6 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		
 			p.setLayout(new GridBagLayout());
 			GridBagConstraints c = new PamGridBagContraints();
-	
 //			c.gridx = 0;
 //			addComponent(p, enableBearings, c);
 //			c.gridx += c.gridwidth;
@@ -1735,8 +1734,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 //				}
 //			}
 //		}
-//		else multiChan = true;
-////		Debug.out.println("Check multi-channel: " + multiChan);
+//		Debug.out.println("Check multi-channel: " + multiChan);
 		
 		return multiChan; 
 	}

@@ -7,6 +7,7 @@ import org.w3c.dom.Element;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 /**
  * FilterPArameters for use when the filter is on it's own (within a FilterController)
@@ -39,7 +40,7 @@ public class FilterParameters_2 implements Serializable, Cloneable, ManagedParam
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
 	}
 

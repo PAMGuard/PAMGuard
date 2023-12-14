@@ -63,8 +63,8 @@ public class TethysExportDialog extends PamDialog {
 		setResizable(true);
 		
 	}
-	
-	public static TethysExportParams showDialog(Window parentFrame, TethysControl tethysControl) {
+	@Deprecated
+	private static TethysExportParams showDialog(Window parentFrame, TethysControl tethysControl) {
 		if (singleInstance == null || singleInstance.getOwner() != parentFrame || singleInstance.tethysControl != tethysControl) {
 			singleInstance = new TethysExportDialog(parentFrame, tethysControl);
 		}
@@ -112,7 +112,7 @@ public class TethysExportDialog extends PamDialog {
 		ArrayList<DataStreamSet> sets = new ArrayList<>();
 		ArrayList<PamDataBlock> allDataBlocks = PamController.getInstance().getDataBlocks();
 		for (PamDataBlock aDataBlock : allDataBlocks) {
-			if (aDataBlock.getTethysDataProvider() != null) {
+			if (aDataBlock.getTethysDataProvider(tethysControl) != null) {
 				sets.add(new DataStreamSet(aDataBlock));
 			}
 		}
@@ -151,7 +151,7 @@ public class TethysExportDialog extends PamDialog {
 		}
 		int nSel = 0;
 		for (DataStreamSet streamSet : dataStreamSets) {
-			StreamExportParams streamOpts = new StreamExportParams(streamSet.dataBlock.getLongDataName(), streamSet.checkBox.isSelected());
+			StreamExportParams streamOpts = new StreamExportParams(tethysControl, streamSet.dataBlock, streamSet.checkBox.isSelected());
 			exportParams.setStreamParams(streamSet.dataBlock, streamOpts);
 			nSel++;
 		}

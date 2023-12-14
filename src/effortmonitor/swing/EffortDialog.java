@@ -43,7 +43,7 @@ public class EffortDialog extends PamDialog {
 		mainPanel.add(new JLabel("Observer name or initials"), c);
 		c.gridx++;
 		mainPanel.add(observer = new JComboBox<String>(), c);
-		outerOnly = new JRadioButton("Log uter scroll only");
+		outerOnly = new JRadioButton("Log outer scroll only");
 		allActions = new JRadioButton("Log all scroll actions");
 		ButtonGroup bg = new ButtonGroup();
 		bg.add(allActions);
