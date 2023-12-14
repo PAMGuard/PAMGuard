@@ -18,7 +18,7 @@ public class DBControlSettings extends DBControl {
 
 	public DBControlSettings(String unitName) {
 
-		super(unitName, PamSettingManager.LIST_DATABASESTUFF, false);
+		super(null, unitName, PamSettingManager.LIST_DATABASESTUFF, false);
 
 		//		logSettings = new LogSettings(this);
 

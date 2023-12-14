@@ -56,7 +56,7 @@ public class DLOfflineProcess {
 		
 		//if null open the dialog- also create a new offlineTask group if the datablock has changed. 
 		if (mtOfflineDialog == null) {
-			mtOfflineDialog = new OLProcessDialog(this.dlControl.getPamView().getGuiFrame(), 
+			mtOfflineDialog = new OLProcessDialog(this.dlControl.getGuiFrame(), 
 					dlOfflineGroup, "Deep Learning Classifier");
 			//batchLocaliseDialog.setModalityType(Dialog.ModalityType.MODELESS);
 		}

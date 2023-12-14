@@ -153,7 +153,7 @@ public class TargetMotionLocaliser<T extends GroupDetection> extends AbstractLoc
 
 	public boolean showTMDialog(T dataUnit) {
 		if (targetMotionDialog == null) {
-			targetMotionDialog = new TargetMotionDialog<T>(pamControlledUnit.getPamView().getGuiFrame(), this);
+			targetMotionDialog = new TargetMotionDialog<T>(pamControlledUnit.getGuiFrame(), this);
 		}
 		targetMotionDialog.updateEventList();
 		targetMotionDialog.setDataUnit(dataUnit);

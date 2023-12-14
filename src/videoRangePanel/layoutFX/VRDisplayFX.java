@@ -221,7 +221,7 @@ public class VRDisplayFX extends PamBorderPane implements VRPane {
 		}
 
 		if (vrControl.getVRParams().currentImageFile==null) {
-			PamDialog.showWarning(vrControl.getPamView().getGuiFrame(), "No image found", "The folder selected did not contain any compatible images");
+			PamDialog.showWarning(vrControl.getGuiFrame(), "No image found", "The folder selected did not contain any compatible images");
 			return;
 		}
 		//go back up a few levels to load file as update flags etc need to be triggerred. 

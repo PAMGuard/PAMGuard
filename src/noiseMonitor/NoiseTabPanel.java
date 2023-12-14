@@ -1189,7 +1189,7 @@ private void setAxisLabels() {
 		if (mouseMenu == null) {
 			mouseMenu = new JPopupMenu();
 			JMenuItem menuItem = new JMenuItem("Display Options ...");
-			menuItem.addActionListener(new DisplayOptions(pamControlledUnit.getPamView().getGuiFrame()));
+			menuItem.addActionListener(new DisplayOptions(pamControlledUnit.getGuiFrame()));
 			mouseMenu.add(menuItem);
 
 		}

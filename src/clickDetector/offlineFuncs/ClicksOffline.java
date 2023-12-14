@@ -61,8 +61,6 @@ public class ClicksOffline {
 	private OfflineParameters offlineParameters = new OfflineParameters();
 
 	private OLProcessDialog clickOfflineDialog;
-
-	private OfflineTaskGroup offlineTaskGroup;
 	
 	public static final String ClickTypeLookupName = "OfflineRCEvents";
 
@@ -545,8 +543,8 @@ public class ClicksOffline {
 	 */
 	public void reAnalyseClicks() {
 		if (clickOfflineDialog == null) {
-			clickOfflineDialog = new OLProcessDialog(clickControl.getPamView().getGuiFrame(), 
-					getOfflineTaskGroup(), "Click Reprocessing");
+			clickOfflineDialog = new OLProcessDialog(clickControl.getGuiFrame(), 
+					getOfflineTaskGroup(clickControl), "Click Reprocessing");
 		}
 		clickOfflineDialog.setVisible(true);
 	}
@@ -576,8 +574,9 @@ public class ClicksOffline {
 	 * Get / Create an offline task group for click re-processing. 
 	 * @return offline task group. Create if necessary
 	 */
-	private OfflineTaskGroup getOfflineTaskGroup() {
-		offlineTaskGroup = new OfflineTaskGroup(clickControl, "Click Reprocessing");
+	public static OfflineTaskGroup getOfflineTaskGroup(ClickControl clickControl) {
+		
+		OfflineTaskGroup offlineTaskGroup = new OfflineTaskGroup(clickControl, "Click Reprocessing");
 		
 		/**
 		 * These tasks are not registered - gets too complicated since some of them 
@@ -607,7 +606,7 @@ public class ClicksOffline {
 	}
 
 	public void labelClicks(OverlayMark overlayMark, List<PamDataUnit> dataList) {
-		Window win = clickControl.getPamView().getGuiFrame();
+		Window win = clickControl.getGuiFrame();
 		OfflineEventDataUnit event = LabelClicksDialog.showDialog(win, clickControl, overlayMark, dataList);
 		if (event != null) {
 			notifyEventChanges(event);
@@ -625,7 +624,7 @@ public class ClicksOffline {
 	}
 
 	public void newEvent(OverlayMark overlayMark, List<PamDataUnit> markedClicks) {
-		Window win = clickControl.getPamView().getGuiFrame();
+		Window win = clickControl.getGuiFrame();
 		OfflineEventDataBlock offlineEventDataBlock = clickControl.getClickDetector().getOfflineEventDataBlock();
 		if (markedClicks == null) {
 			return;
@@ -692,7 +691,7 @@ public class ClicksOffline {
 	}
 
 	public void labelClick(OverlayMark overlayMark, PamDataUnit singleClick) {
-		Window win = clickControl.getPamView().getGuiFrame();
+		Window win = clickControl.getGuiFrame();
 		OfflineEventDataUnit event = LabelClicksDialog.showDialog(win, clickControl, overlayMark, singleClick);
 		if (event != null) {
 			notifyEventChanges(event);
