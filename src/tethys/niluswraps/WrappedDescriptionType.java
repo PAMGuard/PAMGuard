@@ -3,6 +3,7 @@ package tethys.niluswraps;
 import java.io.Serializable;
 
 import nilus.DescriptionType;
+import nilus.Helper;
 
 /**
  * Because we want to save DescriptionType objects in serialised
@@ -32,7 +33,17 @@ public class WrappedDescriptionType extends NilusSettingsWrapper<DescriptionType
 	}
 	
 	public DescriptionType getDescription() {
-		return getNilusObject(DescriptionType.class);
+		DescriptionType description = getNilusObject(DescriptionType.class);
+		if (description == null) {
+			description = new DescriptionType();
+			try {
+				Helper.createRequiredElements(description);
+			} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
+				e.printStackTrace();
+			}
+			setNilusObject(description);
+		}
+		return description;
 	}
 	
 	public void setDescription(DescriptionType description) {
@@ -79,6 +90,10 @@ public class WrappedDescriptionType extends NilusSettingsWrapper<DescriptionType
 	 * @param method the method to set
 	 */
 	public void setMethod(String method) {
+		DescriptionType description = getDescription();
+		if (description == null) {
+			return;
+		}
 		getDescription().setMethod(method);
 	}
 

@@ -127,6 +127,9 @@ public class ProjectInformationPanel {
 	}
 	
 	public boolean getParams(Deployment deployment) {
+		if (deployment == null) {
+			return false;
+		}
 		deployment.setCruise(cruise.getText());
 		deployment.setRegion(region.getText());
 		deployment.setSite(site.getText());

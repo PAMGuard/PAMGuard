@@ -29,18 +29,30 @@ public class SpeciesSubPanel {
 	private JButton searchButton;
 
 	public SpeciesSubPanel(String aSpecies) {
+		
+		callType = new JTextField(15);
+		pamguardName = new JLabel(aSpecies);
+		itisCode = new JTextField(6);
+		searchButton = new JButton("Find");
+		latinName = new JTextField(15);
+		commonName = new JTextField(15);
+		
 		mainPanel = new JPanel(new GridBagLayout());
 		mainPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
 		GridBagConstraints c = new PamGridBagContraints();
 		mainPanel.add(new JLabel("Name ", JLabel.RIGHT), c);
 		c.gridx++;
-		mainPanel.add(pamguardName = new JLabel(aSpecies), c);
+		mainPanel.add(pamguardName, c);
 		c.gridx++;
 		mainPanel.add(new JLabel(" ITIS code ", JLabel.RIGHT), c);
 		c.gridx++;
-		mainPanel.add(itisCode = new JTextField(6), c);
+		mainPanel.add(itisCode, c);
 		c.gridx ++;
-		mainPanel.add(searchButton = new JButton("Find"));
+		mainPanel.add(searchButton, c);
+		
+		c.gridx ++;
+		c.gridwidth = 1;
+		mainPanel.add(latinName);
 		
 		int w1 = 2;
 		int w2 = 3;
@@ -50,21 +62,26 @@ public class SpeciesSubPanel {
 		mainPanel.add(new JLabel("Call / sound type ", JLabel.RIGHT), c);
 		c.gridx+= c.gridwidth;
 		c.gridwidth = w2;
-		mainPanel.add(callType = new JTextField(15), c);
-		c.gridx = 0;
-		c.gridy++;
-		c.gridwidth = w1;
-		mainPanel.add(new JLabel("Scientific name ", JLabel.RIGHT), c);
-		c.gridx+= c.gridwidth;
-		c.gridwidth = w2;
-		mainPanel.add(latinName = new JTextField(15), c);
-		c.gridx = 0;
-		c.gridy++;
-		c.gridwidth = w1;
-		mainPanel.add(new JLabel("Common name ", JLabel.RIGHT), c);
-		c.gridx+= c.gridwidth;
-		c.gridwidth = w2;
-		mainPanel.add(commonName = new JTextField(15), c);
+		mainPanel.add(callType, c);
+		c.gridx += c.gridwidth;
+		c.gridwidth = 1;
+		mainPanel.add(commonName, c);
+//		c.gridx = 0;
+//		c.gridy++;
+//		c.gridwidth = w1;
+//		mainPanel.add(new JLabel("Scientific name ", JLabel.RIGHT), c);
+//		c.gridx+= c.gridwidth;
+//		c.gridwidth = w2;
+//		mainPanel.add(latinName, c);
+//		c.gridx = 0;
+//		c.gridy++;
+//		c.gridwidth = w1;
+//		mainPanel.add(new JLabel("Common name ", JLabel.RIGHT), c);
+//		c.gridx+= c.gridwidth;
+//		c.gridwidth = w2;
+//		mainPanel.add(commonName = new JTextField(15), c);
+		
+		callType.setText(aSpecies); // will get overwritten if the user choses something else. 
 		
 		pamguardName.setToolTipText("Internal name within PAMGuard module");
 		itisCode.setToolTipText("ITIS species code");
@@ -72,6 +89,9 @@ public class SpeciesSubPanel {
 		callType.setToolTipText("Descriptive name for call type or measurement");
 		latinName.setToolTipText("Scientific name");
 		commonName.setToolTipText("Common name");
+		commonName.setEditable(false);
+//		commonName.setEnabled(false);
+		latinName.setEditable(false);
 		
 		searchButton.addActionListener(new ActionListener() {
 			@Override
@@ -119,14 +139,20 @@ public class SpeciesSubPanel {
 	public void setParams(SpeciesMapItem speciesMapItem) {
 		if (speciesMapItem == null) {
 			itisCode.setText(null);
-			callType.setText(null);
+//			callType.setText(null);
 			latinName.setText(null);
 			commonName.setText(null);
 			return;
 		}
 		pamguardName.setText("\"" + speciesMapItem.getPamguardName() + "\"");
 		itisCode.setText(String.format("%d", speciesMapItem.getItisCode()));
-		callType.setText(speciesMapItem.getCallType());
+		String callT = speciesMapItem.getCallType();
+		if (callT != null && callT.length()>0) {
+			callType.setText(speciesMapItem.getCallType());
+		}
+		else {
+			callType.setText(speciesMapItem.getPamguardName());
+		}
 		latinName.setText(speciesMapItem.getLatinName());
 		commonName.setText(speciesMapItem.getCommonName());
 	}

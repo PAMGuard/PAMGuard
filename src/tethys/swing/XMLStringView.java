@@ -27,6 +27,7 @@ public class XMLStringView extends PamDialog {
 		textArea.setCaretPosition(0);
 		
 		getCancelButton().setVisible(false);
+		setModal(false);
 	}
 	
 	public static void showDialog(Window parent, String collection, String documentId, String xmlString) {

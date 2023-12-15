@@ -25,7 +25,7 @@ public class TethysMainPanel extends TethysGUIPanel {
 	
 	private DatablockDetectionsPanel datablockDetectionsPanel;
 	
-	private DetectionsExportPanel detectionsExportPanel;
+//	private DetectionsExportPanel detectionsExportPanel;
 
 	private CalibrationsMainPanel calibrationPanel;
 	
@@ -37,8 +37,8 @@ public class TethysMainPanel extends TethysGUIPanel {
 		datablockDetectionsPanel = new DatablockDetectionsPanel(tethysControl);
 		datablockSynchPanel = new DatablockSynchPanel(tethysControl);
 		deploymentsPanel = new DeploymentsPanel(tethysControl);
-		detectionsExportPanel = new DetectionsExportPanel(tethysControl);
-		datablockSynchPanel.addTableObserver(detectionsExportPanel);
+//		detectionsExportPanel = new DetectionsExportPanel(tethysControl);
+//		datablockSynchPanel.addTableObserver(detectionsExportPanel);
 		datablockSynchPanel.addTableObserver(datablockDetectionsPanel);
 		calibrationPanel = new CalibrationsMainPanel(tethysControl, tethysControl.getCalibrationHandler());
 		
@@ -62,7 +62,7 @@ public class TethysMainPanel extends TethysGUIPanel {
 		southwestSplit.add(datablockSynchPanel.getComponent());
 		southwestSplit.add(southEastPanel);
 		southEastPanel.add(datablockDetectionsPanel.getComponent(), BorderLayout.CENTER);
-		southEastPanel.add(detectionsExportPanel.getComponent(), BorderLayout.WEST);
+//		southEastPanel.add(detectionsExportPanel.getComponent(), BorderLayout.WEST);
 		splitPane.add(southwestSplit);
 		SwingUtilities.invokeLater(new Runnable() {
 			// these only work if called after display is visible

@@ -49,10 +49,7 @@ import tethys.deployment.DeploymentHandler;
 import tethys.detection.DetectionsHandler;
 import tethys.niluswraps.PDeployment;
 import tethys.output.DatablockSynchInfo;
-//import nilus.Deployment;
 import tethys.output.TethysExportParams;
-import tethys.output.TethysExporter;
-import tethys.output.swing.TethysExportDialog;
 import tethys.species.ITISFunctions;
 import tethys.species.SpeciesMapManager;
 import tethys.swing.ProjectDeploymentsDialog;
@@ -520,6 +517,8 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	public void updateState(TethysState tethysState) {
 		switch (tethysState.stateType) {
 		case NEWPROJECTSELECTION:
+		case EXPORTRDATA:
+		case DELETEDATA:
 			countProjectDetections();
 			break;
 		}

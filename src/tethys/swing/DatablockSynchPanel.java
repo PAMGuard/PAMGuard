@@ -11,6 +11,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -22,13 +23,16 @@ import javax.swing.table.AbstractTableModel;
 
 
 import PamUtils.PamCalendar;
+import PamView.dialog.warn.WarnOnce;
 import PamView.panel.PamPanel;
+import PamView.panel.WestAlignedPanel;
 import PamView.tables.SwingTableColumnWidths;
 import PamguardMVC.PamDataBlock;
 import dataMap.OfflineDataMap;
 import tethys.TethysControl;
 import tethys.TethysState;
 import tethys.TethysStateObserver;
+import tethys.niluswraps.PDeployment;
 import tethys.output.DatablockSynchInfo;
 import tethys.species.DataBlockSpeciesManager;
 
@@ -43,6 +47,8 @@ public class DatablockSynchPanel extends TethysGUIPanel {
 	private ArrayList<DatablockSynchInfo> dataBlockSynchInfo;
 	
 	private ArrayList<StreamTableObserver> tableObservers = new ArrayList<>();
+	
+	private JButton exportButton;
 
 	public DatablockSynchPanel(TethysControl tethysControl) {
 		super(tethysControl);
@@ -53,8 +59,22 @@ public class DatablockSynchPanel extends TethysGUIPanel {
 		new SwingTableColumnWidths(tethysControl.getUnitName()+"SynchTable", synchTable);
 		JScrollPane scrollPane = new JScrollPane(synchTable);
 		mainPanel.add(BorderLayout.CENTER, scrollPane);
+		PamPanel ctrlPanel = new PamPanel(new BorderLayout());
+		exportButton = new JButton("Export ...");
+		ctrlPanel.add(BorderLayout.WEST, exportButton);
+		mainPanel.add(BorderLayout.NORTH, ctrlPanel);
+
+		
 		synchTable.addMouseListener(new MouseActions());
 		synchTable.addKeyListener(new KeyActions());
+		
+		exportButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				exportData();
+			}
+		});
+		enableExportButton();
 	}
 
 	@Override
@@ -106,9 +126,30 @@ public class DatablockSynchPanel extends TethysGUIPanel {
 		DatablockSynchInfo synchInfo = dataBlockSynchInfo.get(row);
 //		datablockDetectionsPanel.setDataBlock(synchInfo.getDataBlock());
 		notifyObservers(synchInfo.getDataBlock());
+		enableExportButton();
 		return row;
 	}
 	
+	protected void exportData() {
+		int[] rows = synchTable.getSelectedRows();
+		if (rows == null || rows.length != 1) {
+			WarnOnce.showWarning("Data selection", "you must select a single data block for export", WarnOnce.WARNING_MESSAGE);
+			return;
+		}
+		PamDataBlock dataBlock = dataBlockSynchInfo.get(rows[0]).getDataBlock();
+		getTethysControl().getDetectionsHandler().exportDataBlock(dataBlock);
+	}
+
+	private void enableExportButton() {
+		int[] rows = synchTable.getSelectedRows();
+		boolean en = rows != null && rows.length == 1;
+		ArrayList<PDeployment> deployments = getTethysControl().getDeploymentHandler().getMatchedDeployments();
+		if (deployments == null || deployments.size() == 0) {
+			en = false;
+		}
+		exportButton.setEnabled(en);
+	}
+
 	public void showPopup(MouseEvent e, int row) {
 		DatablockSynchInfo synchInfo = dataBlockSynchInfo.get(row);
 		if (synchInfo == null) {
@@ -133,6 +174,15 @@ public class DatablockSynchPanel extends TethysGUIPanel {
 
 	@Override
 	public void updateState(TethysState tethysState) {
+		switch (tethysState.stateType) {
+		case DELETEDATA:
+		case EXPORTRDATA:
+		case NEWPROJECTSELECTION:
+//			dataBlockSynchInfo = null;
+//			getSychInfos();
+//			getTethysControl().coun
+		}
+		
 		synchTableModel.fireTableDataChanged();
 		selectRow();
 	}

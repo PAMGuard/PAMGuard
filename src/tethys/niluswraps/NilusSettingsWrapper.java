@@ -169,48 +169,5 @@ public class NilusSettingsWrapper<T extends Object> implements Serializable, Clo
 		}
 		return clone;
 	}
-	
-
-//	private Class<?> getNilusClass() throws NoSuchMethodException, SecurityException {
-//		Method method = this.getClass().getMethod("getNilusObject", null);
-//		Class<?> retClass = GenericTypeResolver.resolveReturnType(method, this.getClass());
-//		
-//		return retClass;
-//	}
-	
-//
-//	public static void main(String[] args) {
-//		
-//		Deployment deployment = new Deployment();
-//		try {
-//			Helper.createRequiredElements(deployment);
-//		} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
-//			e.printStackTrace();
-//		}
-//		deployment.setCruise("Test cruise");
-//		deployment.setDeploymentId(111);
-//		deployment.setProject("Tethys Development");
-//		DescriptionType desc = deployment.getDescription();
-//		if (desc == null) {
-//			desc = new DescriptionType();
-//			deployment.setDescription(desc);
-//		}
-//		desc.setAbstract("Deployment Abstract");
-//		
-//		NilusSettingsWrapper<Deployment> wrapper = new NilusSettingsWrapper<>();
-//		
-//		wrapper.setNilusObject(deployment);
-//		
-//		System.out.println(wrapper.xmlString);
-//		
-//		Deployment newDeployment = wrapper.getNilusObject(Deployment.class);
-//		
-//		// now warp the new object again and print that.
-//		newDeployment.setDeploymentId(newDeployment.getDeploymentId()*2);
-//		wrapper.setNilusObject(newDeployment);
-//		System.out.println("********************************************");
-//		System.out.println(wrapper.xmlString);
-//		
-//	}
 
 }

@@ -20,6 +20,7 @@ import tethys.TethysControl;
 import tethys.species.DataBlockSpeciesManager;
 import tethys.swing.export.DetectionsExportWizard;
 
+@Deprecated
 public class DetectionsExportPanel extends TethysGUIPanel implements StreamTableObserver {
 	
 	private JPanel mainPanel;
@@ -28,7 +29,7 @@ public class DetectionsExportPanel extends TethysGUIPanel implements StreamTable
 
 	private PamDataBlock selectedDataBlock;
 
-	public DetectionsExportPanel(TethysControl tethysControl) {
+	private DetectionsExportPanel(TethysControl tethysControl) {
 		super(tethysControl);
 		mainPanel = new PamAlignmentPanel(BorderLayout.NORTH);
 		mainPanel.setLayout(new GridBagLayout());

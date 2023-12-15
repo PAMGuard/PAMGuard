@@ -30,6 +30,7 @@ import PamguardMVC.dataSelector.DataSelectParams;
 import PamguardMVC.dataSelector.DataSelector;
 import nilus.MarshalXML;
 import tethys.TethysControl;
+import tethys.output.TethysExportParams;
 
 /**
  * Functions to pack up a PAMGuard parameters object into the correct format
@@ -64,6 +65,7 @@ public class TethysParameterPacker {
 	 * Get a list of elements of parameters for all modules feeding 
 	 * the given datablock. These are given in reverse order. 
 	 * @param pamDataBlock output datablock
+	 * @param fullChain 
 	 * @return parameters of all modules feeding that datablock. 
 	 */
 	public List<Element> packParameters(PamDataBlock pamDataBlock) {
@@ -72,11 +74,14 @@ public class TethysParameterPacker {
 		if (pamControlledUnit == null || pamControlledUnit instanceof PamSettings == false) {
 			return null;
 		}
+
+		int paramOption = tethysControl.getTethysExportParams().detectorParameterOutput;
+		if (paramOption == TethysExportParams.DETECTORE_PARAMS_NONE) {
+			return null;
+		}
+		
 		PamSettings pamSettings = (PamSettings) pamControlledUnit;
-//		return null;
-//	}
-//
-//	public List<Element> packParameters(Object data) {
+		
 		List<Element> elList = new ArrayList<Element>();
 		Object data = pamSettings.getSettingsReference();
 
@@ -132,9 +137,9 @@ public class TethysParameterPacker {
 //				}
 			}
 		}
-
-		
-		
+		if (paramOption == TethysExportParams.DETECTOR_DATASELECTOR) {
+			return elList;
+		}		
 		
 		QName qname = new QName(MarshalXML.schema, "parameters", "ty");
 		JAXBElement<String> jaxel = new JAXBElement<String>(
@@ -164,6 +169,9 @@ public class TethysParameterPacker {
 			if (pgEl != null) {
 				el.appendChild(pgEl);
 				//			elList.add(pgEl);
+			}
+			if (paramOption == TethysExportParams.DETECTORE_PARAMS_MODULE) {
+				break;
 			}
 		}
 		return elList;

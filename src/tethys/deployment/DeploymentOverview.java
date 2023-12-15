@@ -1,6 +1,16 @@
 package tethys.deployment;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.ListIterator;
+
+import Acquisition.AcquisitionControl;
+import Acquisition.AcquisitionParameters;
+import Acquisition.DaqStatusDataUnit;
+import PamController.PamControlledUnit;
+import PamController.PamController;
+import PamguardMVC.PamDataBlock;
 
 /**
  * Class to give a general overview of all the effort in PAMGuard which will form the
@@ -25,7 +35,8 @@ public class DeploymentOverview {
 		this.dutyCycleInfo = dutyCycleInfo;
 		this.recordingPeriods = tempPeriods;
 	}
-
+	
+	
 	public void addRecordingPeriod(long start, long stop) {
 		addRecordingPeriod(new RecordingPeriod(start, stop));
 	}

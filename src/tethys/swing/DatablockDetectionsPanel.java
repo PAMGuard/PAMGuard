@@ -23,6 +23,7 @@ import PamView.PamGui;
 import PamView.dialog.warn.WarnOnce;
 import PamView.tables.SwingTableColumnWidths;
 import PamguardMVC.PamDataBlock;
+import nilus.DataSourceType;
 import nilus.DetectionEffortKind;
 import nilus.Detections;
 import nilus.GranularityType;
@@ -42,25 +43,25 @@ import tethys.niluswraps.PDetections;
  *
  */
 public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTableObserver {
-	
+
 	private JPanel mainPanel;
-	
+
 	private JLabel dataBlockName;
 
 	private TableModel tableModel;
-	
+
 	private JTable table;
 
 	private PamDataBlock dataBlock;
-	
+
 	private StreamDetectionsSummary streamDetectionsSummary;
-	
+
 	public DatablockDetectionsPanel(TethysControl tethysControl) {
 		super(tethysControl);
 		mainPanel = new JPanel(new BorderLayout());
 		mainPanel.add(BorderLayout.NORTH, dataBlockName = new JLabel("PAMGUard data stream", JLabel.LEFT));
 		mainPanel.setBorder(new TitledBorder("Data stream Tethys Detections documents"));
-		
+
 		tableModel = new TableModel();
 		table = new JTable(tableModel) {
 			@Override
@@ -68,46 +69,46 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 				return getToolTip(event);
 			}
 
-		    protected JTableHeader createDefaultTableHeader() {
-		        return new JTableHeader(columnModel) {
-		            public String getToolTipText(MouseEvent e) {
-		            	return getToolTip(e);
-		            }
-		        };
-		    }
-			
+			protected JTableHeader createDefaultTableHeader() {
+				return new JTableHeader(columnModel) {
+					public String getToolTipText(MouseEvent e) {
+						return getToolTip(e);
+					}
+				};
+			}
+
 		};
 		JScrollPane scrollPane = new JScrollPane(table);
 		mainPanel.add(BorderLayout.CENTER, scrollPane);
-		
+
 		new SwingTableColumnWidths(tethysControl.getUnitName() + getClass().getName(), table);
-		
+
 		table.addMouseListener(new MouseActions());
 	}
 
 	protected String getToolTip(MouseEvent event) {
-        java.awt.Point p = event.getPoint();
-        int rowIndex = table.rowAtPoint(p);
-//        if (rowIndex < 0) {
-//        	return null;
-//        }
-        int colIndex = table.columnAtPoint(p);
-        switch (colIndex) {
-        case 0:
-        	return "Tethys Detections document name";
-        case 1:
-        	return "Name of PAMGuard data stream";
-        case 2:
-        	return "Effort period";
-        case 3:
-        	return "Output granularity";
-        case 4:
-        	return "Number of detection elements in document";
-        case 5:
-        	return "Document abstract";
-        	
-        }
-        return "No tip";
+		java.awt.Point p = event.getPoint();
+		int rowIndex = table.rowAtPoint(p);
+		//        if (rowIndex < 0) {
+		//        	return null;
+		//        }
+		int colIndex = table.columnAtPoint(p);
+		switch (colIndex) {
+		case 0:
+			return "Tethys Detections document name";
+		case 1:
+			return "Name of PAMGuard data stream";
+		case 2:
+			return "Effort period";
+		case 3:
+			return "Output granularity";
+		case 4:
+			return "Number of detection elements in document";
+		case 5:
+			return "Document abstract";
+
+		}
+		return "No tip";
 	}
 
 	@Override
@@ -122,7 +123,7 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 		streamDetectionsSummary = getTethysControl().getDetectionsHandler().getStreamDetections(dataBlock);
 		tableModel.fireTableDataChanged();
 	}
-	
+
 	@Override
 	public void updateState(TethysState tethysState) {
 		if (dataBlock != null) {
@@ -146,55 +147,92 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 			}
 		}
 
-		
+
 	}
-	
+
 	public void showPopupMenu(MouseEvent e) {
 		int row = table.getSelectedRow();
 		if (row < 0) {
 			return;
 		}
-		
+		int[] rows = table.getSelectedRows();
+
 		PDetections pDets = detectionsForRow(row);
 		if (pDets == null) {
 			return;
 		}
 
 		JPopupMenu popMenu = new JPopupMenu();
-		
-		JMenuItem menuItem = new JMenuItem("Delete document " + pDets.detections.getId());
-		menuItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				deleteDocument(pDets);
-			}
-		});
-		popMenu.add(menuItem);
-		
-		menuItem = new JMenuItem("Display document " + pDets.detections.getId());
-		menuItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				displayDocument(pDets);
-			}
-		});
-		popMenu.add(menuItem);
-		
-		menuItem = new JMenuItem("Export document " + pDets.detections.getId());
-		menuItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				exportDocument(pDets);
-			}
-		});
-		popMenu.add(menuItem);
-		
-		
-		
+
+		if (rows.length == 1) {
+			JMenuItem menuItem = new JMenuItem("Delete document " + pDets.detections.getId());
+			menuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					deleteDocument(pDets);
+				}
+			});
+			popMenu.add(menuItem);
+
+			menuItem = new JMenuItem("Display document " + pDets.detections.getId());
+			menuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					displayDocument(pDets);
+				}
+			});
+			popMenu.add(menuItem);
+
+			menuItem = new JMenuItem("Export document " + pDets.detections.getId());
+			menuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					exportDocument(pDets);
+				}
+			});
+			popMenu.add(menuItem);
+		}
+		else if (rows.length > 0){
+			JMenuItem menuItem = new JMenuItem("Delete multiple Detections documents");
+			menuItem.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					deleteDocuments(rows);
+				}
+
+			});
+			popMenu.add(menuItem);
+		}
+
+
 		popMenu.show(e.getComponent(), e.getX(), e.getY());
-		
+
 	}
-	
+
+	private void deleteDocuments(int[] rows) {
+		String msg = String.format("Are you sure you want to delete %d Detections documents ?", rows.length);
+
+		int ans = WarnOnce.showWarning(PamGui.findComponentWindow(mainPanel), "Delete Document", msg, WarnOnce.OK_CANCEL_OPTION);
+		if (ans != WarnOnce.OK_OPTION) {
+			return;
+		}
+		for (int i = 0; i < rows.length; i++) {
+			int row = rows[i];
+			PDetections pDets = detectionsForRow(row);
+			if (pDets == null) {
+				continue;
+			}
+			try {
+				getTethysControl().getDbxmlConnect().deleteDocument(pDets.detections);
+			} catch (TethysException e) {
+				getTethysControl().showException(e);
+			}
+		}
+		getTethysControl().exportedDetections(dataBlock);
+		selectDataBlock(dataBlock); // force table update. 
+	}
+
 	protected void deleteDocument(PDetections pDets) {
 		String msg = String.format("Are you sure you want to delete the Detections document %s ?", pDets.detections.getId());
 		int ans = WarnOnce.showWarning(PamGui.findComponentWindow(mainPanel), "Delete Document", msg, WarnOnce.OK_CANCEL_OPTION);
@@ -212,12 +250,12 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 
 	private void displayDocument(PDetections pDets) {
 		getTethysControl().displayDocument(Collection.Detections.collectionName(), pDets.detections.getId());
-		
+
 	}
 
 	private void exportDocument(PDetections pDets) {
 		getTethysControl().exportDocument(Collection.Detections.toString(), pDets.detections.getId());
-		
+
 	}
 
 	private PDetections detectionsForRow(int iRow) {
@@ -231,8 +269,8 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 	}
 
 	private class TableModel extends AbstractTableModel {
-		
-		private String[] colNames = {"Document", "Detector", "Effort", "Granularity", "Count", "Abstract"};
+
+		private String[] colNames = {"Document", "Detector", "Deployment", "Effort", "Granularity", "Count", "Abstract"};
 
 		@Override
 		public int getRowCount() {
@@ -275,10 +313,18 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 				}
 				return pDets.dataBlock.getDataName();
 			case 2:
+				DataSourceType dataSource = dets.getDataSource();
+				if (dataSource == null) {
+					return null;
+				}
+				else {
+					return dataSource.getDeploymentId();
+				}
+			case 3:
 				XMLGregorianCalendar start = dets.getEffort().getStart();
 				XMLGregorianCalendar stop = dets.getEffort().getEnd();
 				return start + " to " + stop;
-			case 3:
+			case 4:
 				List<DetectionEffortKind> kinds = dets.getEffort().getKind();
 				if (kinds == null) {
 					return null;
@@ -287,19 +333,19 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 					if (kind.getGranularity() != null) {
 						GranularityType granularity = kind.getGranularity();
 						return PDeployment.formatGranularity(granularity);
-//						if (granularity != null) {
-//							return granularity.getValue();
-//						}
+						//						if (granularity != null) {
+						//							return granularity.getValue();
+						//						}
 					}
 				}
 				break;
-			case 4:
-				return pDets.count;
 			case 5:
+				return pDets.count;
+			case 6:
 				return dets.getDescription().getAbstract();
 			}
 			return null;
 		}
-		
+
 	}
 }

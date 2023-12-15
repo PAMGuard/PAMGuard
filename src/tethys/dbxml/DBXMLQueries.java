@@ -22,6 +22,7 @@ import PamController.settings.output.xml.PamguardXMLWriter;
 import PamguardMVC.PamDataBlock;
 import dbxml.JerseyClient;
 import dbxml.Queries;
+import nilus.DataSourceType;
 import nilus.Deployment;
 import nilus.Deployment.Instrument;
 import nilus.DeploymentRecoveryDetails;
@@ -587,9 +588,9 @@ public class DBXMLQueries {
 
 		ArrayList<String> detectionDocs = new ArrayList<>();
 
-		NodeList returns = doc.getElementsByTagName("Return");
+		NodeList returns = doc.getElementsByTagName("Record");
 		if (returns.getLength() == 0) {
-			returns = doc.getElementsByTagName("Result");
+			returns = doc.getElementsByTagName("Record");
 		}
 		for (int i = 0; i < returns.getLength(); i++) {
 			Node aNode = returns.item(i);
@@ -925,7 +926,7 @@ public class DBXMLQueries {
 	 * @return
 	 */
 	public Detections getDetectionsDocInfo(String detectionsDocName) {
-		String oldqueryBase = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/Id\",\"Detections/Description\",\"Detections/DataSource\",\"Detections/Algorithm\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Id\",\"DetectionsDocName\"],\"optype\":\"binary\"}],\"enclose\":1}";
+//		String oldqueryBase = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/Id\",\"Detections/Description\",\"Detections/DataSource\",\"Detections/Algorithm\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Id\",\"DetectionsDocName\"],\"optype\":\"binary\"}],\"enclose\":1}";
 		// updated May 23
 		String queryBase = "{\"species\":{\"query\":{\"op\":\"lib:completename2tsn\",\"optype\":\"function\",\"operands\":[\"%s\"]},\"return\":{\"op\":\"lib:tsn2completename\",\"optype\":\"function\",\"operands\":[\"%s\"]}},\"return\":[\"Detections/Id\",\"Detections/Description\",\"Detections/DataSource\",\"Detections/Algorithm\",\"Detections/QualityAssurance\",\"Detections/UserId\",\"Detections/MetadataInfo\",\"Detections/Effort\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Id\",\"DetectionsDocName\"],\"optype\":\"binary\"}],\"enclose\":1}";
 		String query = queryBase.replace("DetectionsDocName", detectionsDocName);
@@ -970,6 +971,16 @@ public class DBXMLQueries {
 		description.setAbstract(getElementData(result, "Description.Abstract"));
 		description.setMethod(getElementData(result, "Description.Method"));
 		description.setObjectives(getElementData(result, "Description.Objectives"));
+
+		String deployment = getElementData(result, "DataSource.DeploymentId");
+		if (deployment != null) {
+			DataSourceType dataSource = detections.getDataSource();
+			if (dataSource == null) {
+				dataSource = new DataSourceType();
+				detections.setDataSource(dataSource);
+			}
+			dataSource.setDeploymentId(deployment);
+		}
 
 		// get the effort start an end
 		String effStart = getElementData(result, "Effort.Start");

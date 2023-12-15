@@ -65,6 +65,7 @@ import nilus.DeploymentRecoveryDetails;
 import nilus.DescriptionType;
 import nilus.GeometryTypeM;
 import nilus.Helper;
+import nilus.MetadataInfo;
 import nilus.UnknownSensor;
 import pamMaths.PamVector;
 import pamMaths.STD;
@@ -103,6 +104,8 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 	public TethysControl getTethysControl() {
 		return tethysControl;
 	}
+	
+	private EffortFunctions effortFunctions;
 
 	private DeploymentOverview deploymentOverview;
 	
@@ -110,17 +113,22 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 
 	private Helper nilusHelper;
 	
-	private DeploymentExportOpts exportOptions = new DeploymentExportOpts();
+	private DeploymentExportOpts deploymentExportOptions = new DeploymentExportOpts();
 
 	public DeploymentHandler(TethysControl tethysControl) {
 		super();
+		
 		this.tethysControl = tethysControl;
+		
+		this.effortFunctions = new EffortFunctions(tethysControl);
+		
 		tethysControl.addStateObserver(this);		
 		try {
 			nilusHelper = new Helper();
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		}
+	
 		PamSettingManager.getInstance().registerSettings(new SettingsHandler());
 	}
 	
@@ -156,6 +164,7 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 			updateProjectDeployments();
 			break;
 		case EXPORTRDATA:
+		case DELETEDATA:
 			updateProjectDeployments();
 			break;
 		case UPDATESERVER:
@@ -198,170 +207,175 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 		return projectDeployments;
 	}
 	
-	/**
-	 * Get an overview of all the deployments.
-	 * @return
-	 */
-	public DeploymentOverview createPamguardOverview() {
-		// first find an acquisition module.
-		PamControlledUnit aModule = PamController.getInstance().findControlledUnit(AcquisitionControl.class, null);
-		if (!(aModule instanceof AcquisitionControl)) {
-			// will return if it's null. Impossible for it to be the wrong type.
-			// but it's good practice to check anyway before casting.
-			return null;
-		}
-		// cast it to the right type.
-		AcquisitionControl daqControl = (AcquisitionControl) aModule;
-		AcquisitionParameters daqParams = daqControl.getAcquisitionParameters();
-		/**
-		 * The daqParams class has most of what we need about the set up in terms of sample rate,
-		 * number of channels, instrument type, ADC input range (part of calibration), etc.
-		 * It also has a hydrophone list, which maps the input channel numbers to the hydrophon numbers.
-		 * Realistically, this list is always 0,1,2,etc or it goes horribly wrong !
-		 */
-		// so write functions here to get information from the daqParams.
-//		System.out.printf("Sample regime: %s input with rate %3.1fHz, %d channels, gain %3.1fdB, ADCp-p %3.1fV\n", daqParams.getDaqSystemType(),
-//				daqParams.getSampleRate(), daqParams.getNChannels(), daqParams.preamplifier.getGain(), daqParams.voltsPeak2Peak);
-		/**
-		 * then there is the actual sampling. This is a bit harder to find. I thought it would be in the data map
-		 * but the datamap is a simple count of what's in the databasase which is not quite what we want.
-		 * we're going to have to query the database to get more detailed informatoin I think.
-		 * I'll do that here for now, but we may want to move this when we better organise the code.
-		 * It also seems that there are 'bad' dates in the database when it starts new files, which are the date
-		 * data were analysed at. So we really need to check the start and stop records only.
-		 */
-		PamDataBlock<DaqStatusDataUnit> daqInfoDataBlock = daqControl.getAcquisitionProcess().getDaqStatusDataBlock();
-		// just load everything. Probably OK for the acqusition, but will bring down
-		daqInfoDataBlock.loadViewerData(0, Long.MAX_VALUE, null);
-		ArrayList<DaqStatusDataUnit> allStatusData = daqInfoDataBlock.getDataCopy();
-		/**
-		 * Due to seird file overlaps we need to resort this by id if we can.
-		 * 
-		 */
-		Collections.sort(allStatusData, new Comparator<DaqStatusDataUnit>() {
-
-			@Override
-			public int compare(DaqStatusDataUnit o1, DaqStatusDataUnit o2) {
-				if (o1.getDatabaseIndex() == 0) {
-					return (int) (o1.getTimeMilliseconds()-o2.getTimeMilliseconds());
-				}
-				return o1.getDatabaseIndex()-o2.getDatabaseIndex();
-			}
-		});
-
-		ArrayList<RecordingPeriod> tempPeriods = null;
-
-		if (allStatusData == null || allStatusData.size() == 0) {
-			System.out.println("Data appear to have no logged recording periods. Try to extract from raw audio ...");
-			tempPeriods = extractTimesFromFiles(daqControl);
-		}
-		else {
-			tempPeriods = extractTimesFromStatus(allStatusData);
-		}
-		if (tempPeriods == null || tempPeriods.size() == 0) {
-			System.out.println("Data appear to have no logged recording periods available either from the database or the raw recordings.");
-			tempPeriods = extractTimesFromOutputMaps();
-		}
-		if (tempPeriods == null || tempPeriods.size() == 0) {
-			System.out.println("Data appear to have no logged recording periods available either from the database or the raw recordings.");
-			return null;
-		}
-
-		int nPeriods = tempPeriods.size();
-//		int i = 0;
-//		for (RecordingPeriod aP : tempPeriods) {
-//			System.out.printf("Pre merge %d : %s to %s\n", i++, PamCalendar.formatDBDateTime(aP.getRecordStart()), 
-//					PamCalendar.formatDBDateTime(aP.getRecordStop()));
+//	/**
+//	 * Get an overview of all the deployments.
+//	 * @return
+//	 */
+//	public DeploymentOverview createPamguardOverview() {
+//		// first find an acquisition module.
+//		PamControlledUnit aModule = PamController.getInstance().findControlledUnit(AcquisitionControl.class, null);
+//		if (!(aModule instanceof AcquisitionControl)) {
+//			// will return if it's null. Impossible for it to be the wrong type.
+//			// but it's good practice to check anyway before casting.
+//			return null;
 //		}
-		// now go through those and merge into longer periods where there is no gap between files.
-		ListIterator<RecordingPeriod> iterator = tempPeriods.listIterator();
-		RecordingPeriod prevPeriod = null;
-		while (iterator.hasNext()) {
-			RecordingPeriod nextPeriod = iterator.next();
-			long nextDur = nextPeriod.getRecordStop()-nextPeriod.getRecordStart();
-			if (nextDur == 0) {
-				continue;
-			}
-			if (prevPeriod != null) {
-				long gap = nextPeriod.getRecordStart() - prevPeriod.getRecordStop();
-				long prevDur = prevPeriod.getRecordStop()-prevPeriod.getRecordStart();
-				if (gap < exportOptions.maxGapSeconds*1000) {
-					// ignoring up to 3s gap or a sample error < 2%.Dunno if this is sensible or not.
-					prevPeriod.setRecordStop(nextPeriod.getRecordStop());
-					iterator.remove();
-					nextPeriod = prevPeriod;
-				}
-			}
-			prevPeriod = nextPeriod;
-		}
-		// now remove ones which are too short even after merging. 
-		iterator = tempPeriods.listIterator();
-		while (iterator.hasNext()) {
-			RecordingPeriod nextPeriod = iterator.next();
-			long duration = nextPeriod.getDuration();
-			if (duration < exportOptions.minLengthSeconds*1000L) {
-				iterator.remove();
-			}
-		}
-//		i = 0;
-//		for (RecordingPeriod aP : tempPeriods) {
-//			System.out.printf("Post merge %d : %s to %s\n", i++, PamCalendar.formatDBDateTime(aP.getRecordStart()), 
-//					PamCalendar.formatDBDateTime(aP.getRecordStop()));
+//		// cast it to the right type.
+//		AcquisitionControl daqControl = (AcquisitionControl) aModule;
+//		AcquisitionParameters daqParams = daqControl.getAcquisitionParameters();
+//		/**
+//		 * The daqParams class has most of what we need about the set up in terms of sample rate,
+//		 * number of channels, instrument type, ADC input range (part of calibration), etc.
+//		 * It also has a hydrophone list, which maps the input channel numbers to the hydrophon numbers.
+//		 * Realistically, this list is always 0,1,2,etc or it goes horribly wrong !
+//		 */
+//		// so write functions here to get information from the daqParams.
+////		System.out.printf("Sample regime: %s input with rate %3.1fHz, %d channels, gain %3.1fdB, ADCp-p %3.1fV\n", daqParams.getDaqSystemType(),
+////				daqParams.getSampleRate(), daqParams.getNChannels(), daqParams.preamplifier.getGain(), daqParams.voltsPeak2Peak);
+//		/**
+//		 * then there is the actual sampling. This is a bit harder to find. I thought it would be in the data map
+//		 * but the datamap is a simple count of what's in the databasase which is not quite what we want.
+//		 * we're going to have to query the database to get more detailed informatoin I think.
+//		 * I'll do that here for now, but we may want to move this when we better organise the code.
+//		 * It also seems that there are 'bad' dates in the database when it starts new files, which are the date
+//		 * data were analysed at. So we really need to check the start and stop records only.
+//		 */
+//		PamDataBlock<DaqStatusDataUnit> daqInfoDataBlock = daqControl.getAcquisitionProcess().getDaqStatusDataBlock();
+//		// just load everything. Probably OK for the acqusition, but will bring down
+//		daqInfoDataBlock.loadViewerData(0, Long.MAX_VALUE, null);
+//		ArrayList<DaqStatusDataUnit> allStatusData = daqInfoDataBlock.getDataCopy();
+//		/**
+//		 * Due to seird file overlaps we need to resort this by id if we can.
+//		 * 
+//		 */
+//		Collections.sort(allStatusData, new Comparator<DaqStatusDataUnit>() {
+//
+//			@Override
+//			public int compare(DaqStatusDataUnit o1, DaqStatusDataUnit o2) {
+//				if (o1.getDatabaseIndex() == 0) {
+//					return (int) (o1.getTimeMilliseconds()-o2.getTimeMilliseconds());
+//				}
+//				return o1.getDatabaseIndex()-o2.getDatabaseIndex();
+//			}
+//		});
+//
+//		ArrayList<RecordingPeriod> tempPeriods = null;
+//
+//		if (allStatusData == null || allStatusData.size() == 0) {
+//			System.out.println("Data appear to have no logged recording periods. Try to extract from raw audio ...");
+//			tempPeriods = extractTimesFromFiles(daqControl);
 //		}
-//		System.out.printf("Data have %d distinct files, but only %d distinct recording periods\n", nPeriods, tempPeriods.size());
-		DutyCycleInfo dutyCycleinfo = assessDutyCycle(tempPeriods);
-		// if it's duty cycles, then we only want a single entry. 
-		ArrayList<RecordingPeriod> deploymentPeriods;
-		if (dutyCycleinfo.isDutyCycled == false) {
-			deploymentPeriods = tempPeriods;
-		}
-		else {
-			deploymentPeriods = new ArrayList<>();
-			deploymentPeriods.add(new RecordingPeriod(tempPeriods.get(0).getRecordStart(), tempPeriods.get(tempPeriods.size()-1).getRecordStop()));
-		}
-		/*
-		 * do another sort of the deploymentPeriods. The start stops were in the order they went into the 
-		 * database in the hope that pairs were the right way round. Now check all data are/
-		 */
-		Collections.sort(deploymentPeriods, new Comparator<RecordingPeriod>() {
-			@Override
-			public int compare(RecordingPeriod o1, RecordingPeriod o2) {
-				return (int) (o1.getRecordStart()-o2.getRecordStart());
-			}
-		});
-		
-		DeploymentOverview deploymentOverview = new DeploymentOverview(dutyCycleinfo, deploymentPeriods);
-		matchPamguard2Tethys(deploymentOverview, projectDeployments);
-		this.deploymentOverview = deploymentOverview;
-		return deploymentOverview;
-		// find the number of times it started and stopped ....
-//		System.out.printf("Input map of sound data indicates data from %s to %s with %d starts and %d stops over %d files\n",
-//				PamCalendar.formatDateTime(dataStart), PamCalendar.formatDateTime(dataEnd), nStart, nStop, nFile+1);
-		// now work out where there are genuine gaps and make up a revised list of recording periods.
-
-
-	}
+//		else {
+//			tempPeriods = extractTimesFromStatus(allStatusData);
+//		}
+//		if (tempPeriods == null || tempPeriods.size() == 0) {
+//			System.out.println("Data appear to have no logged recording periods available either from the database or the raw recordings.");
+//			tempPeriods = extractTimesFromOutputMaps();
+//		}
+//		if (tempPeriods == null || tempPeriods.size() == 0) {
+//			System.out.println("Data appear to have no logged recording periods available either from the database or the raw recordings.");
+//			return null;
+//		}
+//
+//		int nPeriods = tempPeriods.size();
+////		int i = 0;
+////		for (RecordingPeriod aP : tempPeriods) {
+////			System.out.printf("Pre merge %d : %s to %s\n", i++, PamCalendar.formatDBDateTime(aP.getRecordStart()), 
+////					PamCalendar.formatDBDateTime(aP.getRecordStop()));
+////		}
+//		// now go through those and merge into longer periods where there is no gap between files.
+//		ListIterator<RecordingPeriod> iterator = tempPeriods.listIterator();
+//		RecordingPeriod prevPeriod = null;
+//		while (iterator.hasNext()) {
+//			RecordingPeriod nextPeriod = iterator.next();
+//			long nextDur = nextPeriod.getRecordStop()-nextPeriod.getRecordStart();
+//			if (nextDur == 0) {
+//				continue;
+//			}
+//			if (prevPeriod != null) {
+//				long gap = nextPeriod.getRecordStart() - prevPeriod.getRecordStop();
+//				long prevDur = prevPeriod.getRecordStop()-prevPeriod.getRecordStart();
+//				if (gap < exportOptions.maxGapSeconds*1000) {
+//					// ignoring up to 3s gap or a sample error < 2%.Dunno if this is sensible or not.
+//					prevPeriod.setRecordStop(nextPeriod.getRecordStop());
+//					iterator.remove();
+//					nextPeriod = prevPeriod;
+//				}
+//			}
+//			prevPeriod = nextPeriod;
+//		}
+//		// now remove ones which are too short even after merging. 
+//		iterator = tempPeriods.listIterator();
+//		while (iterator.hasNext()) {
+//			RecordingPeriod nextPeriod = iterator.next();
+//			long duration = nextPeriod.getDuration();
+//			if (duration < exportOptions.minLengthSeconds*1000L) {
+//				iterator.remove();
+//			}
+//		}
+////		i = 0;
+////		for (RecordingPeriod aP : tempPeriods) {
+////			System.out.printf("Post merge %d : %s to %s\n", i++, PamCalendar.formatDBDateTime(aP.getRecordStart()), 
+////					PamCalendar.formatDBDateTime(aP.getRecordStop()));
+////		}
+////		System.out.printf("Data have %d distinct files, but only %d distinct recording periods\n", nPeriods, tempPeriods.size());
+//		DutyCycleInfo dutyCycleinfo = assessDutyCycle(tempPeriods);
+//		// if it's duty cycles, then we only want a single entry. 
+//		ArrayList<RecordingPeriod> deploymentPeriods;
+//		if (dutyCycleinfo.isDutyCycled == false) {
+//			deploymentPeriods = tempPeriods;
+//		}
+//		else {
+//			deploymentPeriods = new ArrayList<>();
+//			deploymentPeriods.add(new RecordingPeriod(tempPeriods.get(0).getRecordStart(), tempPeriods.get(tempPeriods.size()-1).getRecordStop()));
+//		}
+//		/*
+//		 * do another sort of the deploymentPeriods. The start stops were in the order they went into the 
+//		 * database in the hope that pairs were the right way round. Now check all data are/
+//		 */
+//		Collections.sort(deploymentPeriods, new Comparator<RecordingPeriod>() {
+//			@Override
+//			public int compare(RecordingPeriod o1, RecordingPeriod o2) {
+//				return (int) (o1.getRecordStart()-o2.getRecordStart());
+//			}
+//		});
+//		
+//		DeploymentOverview deploymentOverview = new DeploymentOverview(dutyCycleinfo, deploymentPeriods);
+//		matchPamguard2Tethys(deploymentOverview, projectDeployments);
+//		this.deploymentOverview = deploymentOverview;
+//		return deploymentOverview;
+//		// find the number of times it started and stopped ....
+////		System.out.printf("Input map of sound data indicates data from %s to %s with %d starts and %d stops over %d files\n",
+////				PamCalendar.formatDateTime(dataStart), PamCalendar.formatDateTime(dataEnd), nStart, nStop, nFile+1);
+//		// now work out where there are genuine gaps and make up a revised list of recording periods.
+//
+//
+//	}
 	
 	public void showOptions(Window parent) {
 		if (parent == null) {
 			parent = tethysControl.getGuiFrame();
 		}
-		DeploymentExportOpts newOpts = RecordingGapDialog.showDiloag(parent, exportOptions);
+		DeploymentExportOpts newOpts = RecordingGapDialog.showDiloag(parent, deploymentExportOptions);
 		if (newOpts != null) {
-			exportOptions = newOpts;
-			deploymentOverview = createPamguardOverview();
-			updateProjectDeployments();
+			deploymentExportOptions = newOpts;
+			createPamguardOverview();
 		}
 	}
-	
+
+	public void createPamguardOverview() {
+		deploymentOverview = effortFunctions.makeRecordingOverview();
+		updateProjectDeployments();
+		matchPamguard2Tethys(deploymentOverview, projectDeployments);
+	}
+
 	/**
 	 * Export button pressed on GUI. Run wizard....
 	 */
 	public void exportDeployments() {
 		Deployment deployment = MetaDataContol.getMetaDataControl().getMetaData().getDeployment();
-		DeploymentExportOpts exportOptions = DeploymentWizard.showWizard(getTethysControl().getGuiFrame(), tethysControl, deployment, this.exportOptions);
+		DeploymentExportOpts exportOptions = DeploymentWizard.showWizard(getTethysControl().getGuiFrame(), tethysControl, deployment, this.deploymentExportOptions);
 		if (exportOptions != null) {
-			this.exportOptions = exportOptions;
+			this.deploymentExportOptions = exportOptions;
 			deploymentOverview = getDeploymentOverview();
 			ArrayList<RecordingPeriod> allPeriods = deploymentOverview.getRecordingPeriods();
 			exportDeployments(allPeriods);
@@ -373,14 +387,14 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 	 * @param selectedDeployments
 	 */
 	public void exportDeployments(ArrayList<RecordingPeriod> selectedDeployments) {
-		if (exportOptions.separateDeployments) {
+		if (deploymentExportOptions.separateDeployments) {
 			exportSeparateDeployments(selectedDeployments);
 		}
 		else {
 			exportOneDeploymnet(selectedDeployments);
 		}
-		
 	}
+	
 	/**
 	 * Make one big deployment document with all the recording periods in it. 
 	 */
@@ -390,7 +404,9 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 		int freeId = getTethysControl().getDeploymentHandler().getFirstFreeDeploymentId();
 		RecordingPeriod onePeriod = new RecordingPeriod(selectedDeployments.get(0).getRecordStart(), 
 				selectedDeployments.get(selectedDeployments.size()-1).getRecordStop());
-		Deployment deployment = createDeploymentDocument(freeId, onePeriod);
+		TethysExportParams exportParams = tethysControl.getTethysExportParams();
+		String id = String.format("%s_%s", exportParams.getDatasetName(), "all");
+		Deployment deployment = createDeploymentDocument(freeId, onePeriod, id);
 		// fill in a few things from here
 		Deployment globalMeta = getTethysControl().getGlobalDeplopymentData();
 		deployment.setCruise(globalMeta.getCruise());
@@ -428,16 +444,18 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 		int freeId = getTethysControl().getDeploymentHandler().getFirstFreeDeploymentId();
 		// fill in a few things from here
 		Deployment globalMeta = getTethysControl().getGlobalDeplopymentData();
+		TethysExportParams exportParams = tethysControl.getTethysExportParams();
 		for (int i = 0; i < selectedDeployments.size(); i++) {
 			RecordingPeriod recordPeriod = selectedDeployments.get(i);
 			PDeployment exDeploymnet = recordPeriod.getMatchedTethysDeployment();
 			Deployment deployment = null;
+			String id = String.format("%s_%d", exportParams.getDatasetName(), i);
 			if (exDeploymnet != null) {
-				deployment = createDeploymentDocument(freeId, recordPeriod);
+				deployment = createDeploymentDocument(freeId, recordPeriod, id);
 				deployment.setId(exDeploymnet.deployment.getId());
 			}
 			if (deployment == null) {
-				deployment = createDeploymentDocument(freeId++, recordPeriod);
+				deployment = createDeploymentDocument(freeId++, recordPeriod, id);
 			}
 			deployment.setCruise(globalMeta.getCruise());
 			deployment.setSite(globalMeta.getSite());
@@ -458,42 +476,7 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 		getTethysControl().sendStateUpdate(new TethysState(StateType.UPDATESERVER, Collection.Deployments));
 	}
 
-	/**
-	 * Get data times from any other datamap, since this will generally match the acquisition anyway
-	 * @return
-	 */
-	private ArrayList<RecordingPeriod> extractTimesFromOutputMaps() {
-		OfflineDataMap bestMap = null;
-		PamDataBlock bestBlock = null;
-		long firstStart = Long.MAX_VALUE;
-		long lastEnd = Long.MIN_VALUE;
-		ArrayList<PamDataBlock> dataBlocks = PamController.getInstance().getDetectorDataBlocks();
-		for (PamDataBlock aBlock : dataBlocks) {
-			if (aBlock instanceof PamRawDataBlock) {
-				continue; // don't want acquisition !
-			}
-			OfflineDataMap dataMap = aBlock.getPrimaryDataMap();
-			if (dataMap == null) {
-				continue;
-			}
-			if (dataMap.getFirstDataTime() < firstStart && dataMap.getLastDataTime() > lastEnd) {
-				bestMap = dataMap;
-				bestBlock = aBlock;
-				firstStart = dataMap.getFirstDataTime();
-				lastEnd = dataMap.getLastDataTime();
-			}
-		}
-		if (bestMap == null) {
-			return null;
-		}
-		// get the times out of it. 
-		ArrayList<RecordingPeriod> recPeriods = new ArrayList<>();
-		List<OfflineDataMapPoint> mapPoints = bestMap.getMapPoints();
-		for (OfflineDataMapPoint mapPoint : mapPoints) {
-			recPeriods.add(new RecordingPeriod(mapPoint.getStartTime(), mapPoint.getEndTime()));
-		}
-		return recPeriods;
-	}
+	
 
 	public DeploymentOverview getDeploymentOverview() {
 		return deploymentOverview;
@@ -556,108 +539,12 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 		return overlap;
 	}
 
-	/**
-	 * Work out whether or not the data are evenly duty cycled by testing the
-	 * distributions of on and off times.
-	 * @param tempPeriods
-	 * @return
-	 */
-	private DutyCycleInfo assessDutyCycle(ArrayList<RecordingPeriod> tempPeriods) {
-		int n = tempPeriods.size();
-		if (n < 2) {
-			return new DutyCycleInfo(false, 0,0,n);
-		}
-		double[] ons = new double[n-1]; // ignore the last one since it may be artificially shortened which is OK
-		double[] gaps = new double[n-1];
-		for (int i = 0; i < n-1; i++) {
-			ons[i] = tempPeriods.get(i).getDuration()/1000.;
-			gaps[i] = (tempPeriods.get(i+1).getRecordStart()-tempPeriods.get(i).getRecordStop())/1000.;
-		}
-		/* now look at how consistent those values are
-		 * But some data gets messed by small gaps, so want to 
-		 * remove outliers and concentrate on say 80% of the data. 
-		 */
-		ons = getDistributionCentre(ons, 80);
-		gaps = getDistributionCentre(gaps, 80);
-		Arrays.sort(gaps);
-		
-		
-		STD std = new STD();
-		double onsMean = std.getMean(ons);
-		double onsSTD = std.getSTD(ons);
-		double gapsMean = std.getMean(gaps);
-		double gapsSTD = std.getSTD(gaps);
-		boolean dutyCycle = onsSTD/onsMean < .05 && gapsSTD/gapsMean < 0.05;
-		DutyCycleInfo cycleInfo = new DutyCycleInfo(dutyCycle, onsMean, gapsMean, tempPeriods.size());
-		return cycleInfo;
-	}
+	
+
 	
 	/**
-	 * Get the central part of a distribution without any outliers so 
-	 * that we can get a better assessment of duty cycle. 
-	 * @param data unsorted distribution data. 
-	 * @param percent percentage to include (half this removed from top and bottom)
-	 * @return
-	 */
-	private double[] getDistributionCentre(double[] data, double percent) {
-		if (data == null) {
-			return null;
-		}
-		Arrays.sort(data);
-		int nRem = (int) Math.round(data.length * (100-percent)/200);
-		int newLen = data.length-nRem*2;
-		double[] subdata = Arrays.copyOfRange(data, nRem, data.length-2*nRem);
-		if (subdata.length < 2) {
-			return data;
-		}
-		return subdata;
-	}
-
-	private ArrayList<RecordingPeriod> extractTimesFromStatus(ArrayList<DaqStatusDataUnit> allStatusData) {
-		ArrayList<RecordingPeriod> tempPeriods = new ArrayList<>();
-		long dataStart = Long.MAX_VALUE;
-		long dataEnd = Long.MIN_VALUE;
-		Long lastStart = null;
-		int nStart = 0;
-		int nStop = 0;
-		int nFile = 0;
-		for (DaqStatusDataUnit daqStatus : allStatusData) {
-			switch (daqStatus.getStatus()) {
-			case "Start":
-				nStart++;
-				dataStart = Math.min(dataStart, daqStatus.getTimeMilliseconds());
-				lastStart = daqStatus.getTimeMilliseconds();
-//				System.out.println("Start at " + PamCalendar.formatDBDateTime(lastStart));
-				break;
-			case "Stop":
-				nStop++;
-				dataEnd = Math.max(dataEnd, daqStatus.getEndTimeInMilliseconds());
-				long lastEnd = daqStatus.getEndTimeInMilliseconds();
-				if (lastStart != null) {
-//					System.out.printf("Adding period %s to %s\n", PamCalendar.formatDBDateTime(lastStart), 
-//							PamCalendar.formatDBDateTime(lastEnd));
-					tempPeriods.add(new RecordingPeriod(lastStart, lastEnd));
-				}
-				else {
-//					System.out.println("Skipping stop at " + PamCalendar.formatDBDateTime(lastEnd));
-				}
-				lastStart = null;
-				break;
-			case "NextFile":
-				nFile++;
-				break;
-			}
-		}
-		return tempPeriods;
-	}
-
-	private ArrayList<RecordingPeriod> extractTimesFromFiles(AcquisitionControl daqControl) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	/**
-	 * Get a list of Tethys Deployment docs that match the current PAMGuard data. 
+	 * Get a list of Tethys Deployment docs that match the current PAMGuard data. Watch for repeats
+	 * if a single deployment doc covers many perdiods. 
 	 * @return
 	 */
 	public ArrayList<PDeployment> getMatchedDeployments() {
@@ -666,8 +553,11 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 			return matched;
 		}
 		for (RecordingPeriod period : deploymentOverview.getRecordingPeriods()) {
-			if (period.getMatchedTethysDeployment() != null) {
-				matched.add(period.getMatchedTethysDeployment());
+			PDeployment deployment = period.getMatchedTethysDeployment();
+			if (deployment != null) {
+				if (matched.contains(deployment) == false) {
+					matched.add(period.getMatchedTethysDeployment());
+				}
 			}
 		}
 		return matched;
@@ -808,7 +698,7 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 		return firstFree;
 	}
 
-	public Deployment createDeploymentDocument(int i, RecordingPeriod recordingPeriod) {
+	public Deployment createDeploymentDocument(int i, RecordingPeriod recordingPeriod, String deploymentId) {
 		Deployment deployment = new Deployment();
 		try {
 			nilus.Helper.createRequiredElements(deployment);
@@ -822,10 +712,11 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		PamguardMetaData pamguardMetaData = MetaDataContol.getMetaDataControl().getMetaData();
+		Deployment templateDeployment = pamguardMetaData.getDeployment();
+		
 //		Deployment globalDeplData = tethysControl.getGlobalDeplopymentData();
-		TethysExportParams exportParams = tethysControl.getTethysExportParams();
-		String id = String.format("%s_%d", exportParams.getDatasetName(), i);
-		deployment.setId(id);
+		deployment.setId(deploymentId);
 		deployment.setDeploymentId(i);
 
 		DeploymentRecoveryDetails deploymentDetails = deployment.getDeploymentDetails();
@@ -836,11 +727,21 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 		if (recoveryDetails == null) {
 			recoveryDetails = new DeploymentRecoveryDetails();
 		}
-		deploymentDetails.setAudioTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(recordingPeriod.getRecordStart()));
-		recoveryDetails.setAudioTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(recordingPeriod.getRecordStop()));
 
 		deploymentDetails.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(recordingPeriod.getRecordStart()));
 		recoveryDetails.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(recordingPeriod.getRecordStop()));
+		// handle situation where deployment and recovery times are not the same as the audio times. 
+		if (pamguardMetaData.useAudioForDeploymentTimes == false) {
+			if (templateDeployment.getDeploymentDetails().getAudioTimeStamp() != null) {
+				deploymentDetails.setTimeStamp(templateDeployment.getDeploymentDetails().getAudioTimeStamp());
+			}
+			if (templateDeployment.getRecoveryDetails().getAudioTimeStamp() != null) {
+				recoveryDetails.setTimeStamp(templateDeployment.getRecoveryDetails().getAudioTimeStamp());
+			}
+		}
+		
+		deploymentDetails.setAudioTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(recordingPeriod.getRecordStart()));
+		recoveryDetails.setAudioTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(recordingPeriod.getRecordStop()));
 		
 		deployment.setDeploymentDetails(deploymentDetails);
 		deployment.setRecoveryDetails(recoveryDetails);
@@ -849,16 +750,25 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 
 		TethysLocationFuncs.getTrackAndPositionData(deployment);	
 		
-		getTrackDetails(deployment);		
+		getTrackDetails(deployment);	
 		
-		DescriptionType description = deployment.getDescription();
-		if (description == null ) {
-			description = new DescriptionType();
-			deployment.setDescription(description);
-			description.setAbstract("No abstract");
-			description.setMethod("no methods");
-			description.setObjectives("No objectives");
-		}
+		/**
+		 * Get some of the meta data from the centralised source. 
+		 */
+		MetadataInfo metaData = templateDeployment.getMetadataInfo();
+		metaData.setDate(TethysTimeFuncs.xmlGregCalFromMillis(System.currentTimeMillis()));
+		metaData.setUpdateFrequency("as-needed");
+		deployment.setMetadataInfo(metaData);
+		
+		deployment.setDescription(templateDeployment.getDescription());
+//		DescriptionType description = deployment.getDescription();
+//		if (description == null ) {
+//			description = new DescriptionType();
+//			deployment.setDescription(description);
+//			description.setAbstract("No abstract");
+//			description.setMethod("no methods");
+//			description.setObjectives("No objectives");
+//		}
 //		description.set
 
 		addSamplingDetails(deployment, recordingPeriod);
@@ -900,7 +810,7 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 		 */
 		long trackStart = TethysTimeFuncs.millisFromGregorianXML(deployment.getDeploymentDetails().getTimeStamp());
 		long trackEnd = TethysTimeFuncs.millisFromGregorianXML(deployment.getRecoveryDetails().getTimeStamp());
-		long dataWin =(long)  (Math.max(1./trackInfo.getGPSDataRate(), exportOptions.trackPointInterval));
+		long dataWin =(long)  (Math.max(1./trackInfo.getGPSDataRate(), deploymentExportOptions.trackPointInterval));
 		
 		// get the tracks object. 
 		Tracks tracks = deployment.getData().getTracks();
@@ -919,7 +829,7 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 		ListIterator<GpsDataUnit> it = gpsDataBlock.getListIterator(0);
 		while (it.hasNext()) {
 			GpsDataUnit gpsDataUnit = it.next();
-			if (gpsDataUnit.getTimeMilliseconds()-lastPointTime < exportOptions.trackPointInterval*1000) {
+			if (gpsDataUnit.getTimeMilliseconds()-lastPointTime < deploymentExportOptions.trackPointInterval*1000) {
 				continue;
 			}
 			GpsData gpsData = gpsDataUnit.getGpsData();
@@ -1248,8 +1158,8 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 		List<ChannelInfo> channelInfos = samplingDetails.getChannel();
 		for (int i = 0; i < nChan; i++) {
 			ChannelInfo channelInfo = new ChannelInfo();
-			channelInfo.setStart(deployment.getDeploymentDetails().getAudioTimeStamp());
-			channelInfo.setEnd(deployment.getRecoveryDetails().getAudioTimeStamp());
+			channelInfo.setStart(TethysTimeFuncs.xmlGregCalFromMillis(recordingPeriod.getRecordStart()));
+			channelInfo.setEnd(TethysTimeFuncs.xmlGregCalFromMillis(recordingPeriod.getRecordStop()));
 
 			BigIntegerConverter biCon = new BigIntegerConverter();
 			BigInteger chanNum = BigInteger.valueOf(i);
@@ -1273,7 +1183,7 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 			Sampling sampling = new Sampling();
 			List<Regimen> regimens = sampling.getRegimen();
 			Sampling.Regimen regimen = new Sampling.Regimen();
-			regimen.setTimeStamp(deployment.getDeploymentDetails().getAudioTimeStamp());
+			regimen.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(recordingPeriod.getRecordStart()));
 			regimen.setSampleRateKHz(fs/1000.);
 			if (system != null) {
 				regimen.setSampleBits(system.getSampleBits());
@@ -1288,10 +1198,15 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 				nilus.ChannelInfo.DutyCycle.Regimen dsr = new nilus.ChannelInfo.DutyCycle.Regimen();
 				reg.add(dsr);
 				RecordingDurationS ssss = new RecordingDurationS();
-				ssss.setValue(dutyCycleInf.meanOnTimeS);
+				// round to a second ... or .1s if short duty cycle. 
+				int dp = 1;
+				if (dutyCycleInf.meanOnTimeS > 59) {
+					dp = 0;
+				}
+				ssss.setValue(AutoTethysProvider.roundDecimalPlaces(dutyCycleInf.meanOnTimeS,dp));
 				dsr.setRecordingDurationS(ssss);
 				RecordingIntervalS ris = new RecordingIntervalS();
-				ris.setValue(dutyCycleInf.meanOnTimeS + dutyCycleInf.meanGapS);
+				ris.setValue(AutoTethysProvider.roundDecimalPlaces(dutyCycleInf.meanOnTimeS + dutyCycleInf.meanGapS,dp));
 				dsr.setRecordingIntervalS(ris);
 				dsr.setTimeStamp(deployment.getDeploymentDetails().getAudioTimeStamp());
 				channelInfo.setDutyCycle(dutyCycle);
@@ -1329,7 +1244,7 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 
 		@Override
 		public Serializable getSettingsReference() {
-			return exportOptions;
+			return deploymentExportOptions;
 		}
 
 		@Override
@@ -1339,10 +1254,17 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 
 		@Override
 		public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
-			exportOptions = (DeploymentExportOpts) pamControlledUnitSettings.getSettings();
+			deploymentExportOptions = (DeploymentExportOpts) pamControlledUnitSettings.getSettings();
 			return true;
 		}
 		
+	}
+
+	/**
+	 * @return the deploymentExportOptions
+	 */
+	public DeploymentExportOpts getDeploymentExportOptions() {
+		return deploymentExportOptions;
 	}
 
 }

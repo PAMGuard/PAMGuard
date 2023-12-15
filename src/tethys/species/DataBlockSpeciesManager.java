@@ -121,7 +121,7 @@ abstract public class DataBlockSpeciesManager<T extends PamDataUnit> {
 			allCodes.add(defaultDefaultSpecies.getPamguardName());
 		}
 		DataBlockSpeciesCodes codeList = getSpeciesCodes();
-		if (codeList != null) {
+		if (codeList != null && codeList.getSpeciesNames() != null) {
 			allCodes.addAll(codeList.getSpeciesNames());
 		}
 		if (allCodes.size() == 0) {

@@ -133,7 +133,10 @@ public class ExportWorkerCard extends ExportWizardCard implements DetectionExpor
 			itemCount.setText("0");
 			projectedCount.setText(String.format("%d", progress.exportCount));
 			skipCount.setText(String.format("%d", progress.skipCount));
-			long perc = (progress.exportCount+progress.skipCount) * 100 / progress.totalUnits;
+			long perc = 100;
+			if (progress.totalUnits>0) {
+				perc = (progress.exportCount+progress.skipCount) * 100 / progress.totalUnits;
+			}
 			progressBar.setValue((int) perc);
 		}
 		else if (progress.totalUnits > 0) {

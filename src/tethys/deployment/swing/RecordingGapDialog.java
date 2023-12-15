@@ -51,20 +51,20 @@ public class RecordingGapDialog extends PamDialog {
 
 	private void setParams(DeploymentExportOpts exportOpts) {
 		this.exportOpts = exportOpts;
-		maxGap.setText(String.format("%d", exportOpts.maxGapSeconds));
-		minLength.setText(String.format("%d", exportOpts.minLengthSeconds));
+		maxGap.setText(String.format("%d", exportOpts.maxRecordingGapSeconds));
+		minLength.setText(String.format("%d", exportOpts.minRecordingLengthSeconds));
 	}
 
 	@Override
 	public boolean getParams() {
 		try {
-			exportOpts.maxGapSeconds = Integer.valueOf(maxGap.getText());
+			exportOpts.maxRecordingGapSeconds = Integer.valueOf(maxGap.getText());
 		}
 		catch (NumberFormatException e) {
 			return showWarning("Invalid inter recording interval");
 		}
 		try {
-			exportOpts.minLengthSeconds = Integer.valueOf(minLength.getText());
+			exportOpts.minRecordingLengthSeconds = Integer.valueOf(minLength.getText());
 		}
 		catch (NumberFormatException e) {
 			return showWarning("Invalid minimum recording length");

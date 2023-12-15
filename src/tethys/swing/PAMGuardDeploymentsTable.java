@@ -222,20 +222,49 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 				continue;
 			}
 			try {
+				if (checkDetections(depl.deployment) == false) {
+					continue;
+				}
 				boolean gone = getTethysControl().getDbxmlConnect().deleteDocument(depl.deployment);
 			} catch (TethysException e) {
 				getTethysControl().showException(e);
 			}
 		}
-		getTethysControl().sendStateUpdate(new TethysState(StateType.UPDATESERVER, Collection.Deployments));
+		getTethysControl().sendStateUpdate(new TethysState(StateType.DELETEDATA, Collection.Deployments));
 	}
 
-	protected void exportDeployment(PDeployment pDeployment) {
-		getTethysControl().exportDocument(Collection.Deployments.collectionName(), pDeployment.deployment.getId());
-	}
-
-	protected void displayDeployment(PDeployment pDeployment) {
-		getTethysControl().displayDocument(Collection.Deployments.collectionName(), pDeployment.deployment.getId());
+	/**
+	 * Check for detections associated with this deployment. they must be deleted first. 
+	 * @param deployment
+	 * @return true if there are no Detections or if they are sucessfully removed as well. 
+	 */
+	private boolean checkDetections(Deployment deployment) {
+		// get any deployment documents that associate with this deployment. 
+		ArrayList<String> detectionDocs = getTethysControl().getDbxmlQueries().getDetectionsDocuments(deployment.getId());
+		if (detectionDocs == null || detectionDocs.size() == 0) {
+			return true;
+		}
+		String msg = String.format("<html>One or more Detections documents are associated with Deployment %s<br>", deployment.getId());
+		for (String str : detectionDocs) {
+			msg += String.format("<br>%s", str);
+		}
+		msg += String.format("<br><br>You must delete these prior to deleting the Deploymen. Go ahead and delete ?");
+		int ans = WarnOnce.showWarning(getTethysControl().getGuiFrame(), "Existing Detections documents !" , msg, WarnOnce.OK_CANCEL_OPTION);
+		if (ans == WarnOnce.CANCEL_OPTION) {
+			return false;
+		}
+		// OK, so delete all the Detections too !!!
+		boolean errors = false;
+		for (String str : detectionDocs) {
+			try {
+				boolean gone = getTethysControl().getDbxmlConnect().removeDocument(Collection.Detections, str);
+			} catch (TethysException e) {
+				getTethysControl().showException(e);
+				errors = true;
+			}
+		}
+		
+		return !errors;
 	}
 
 	protected void deleteDeployment(PDeployment pDeployment) {
@@ -248,12 +277,23 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 		if (ans == WarnOnce.CANCEL_OPTION) {
 			return;
 		}
+		if (checkDetections(dep) == false) {
+			return;
+		}
 		try {
 			boolean gone = getTethysControl().getDbxmlConnect().deleteDocument(dep);
 		} catch (TethysException e) {
 			getTethysControl().showException(e);
 		}
-		getTethysControl().sendStateUpdate(new TethysState(StateType.UPDATESERVER, Collection.Deployments));
+		getTethysControl().sendStateUpdate(new TethysState(StateType.DELETEDATA, Collection.Deployments));
+	}
+
+	protected void exportDeployment(PDeployment pDeployment) {
+		getTethysControl().exportDocument(Collection.Deployments.collectionName(), pDeployment.deployment.getId());
+	}
+
+	protected void displayDeployment(PDeployment pDeployment) {
+		getTethysControl().displayDocument(Collection.Deployments.collectionName(), pDeployment.deployment.getId());
 	}
 
 	@Override
@@ -320,7 +360,7 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 
 	private class TableModel extends AbstractTableModel {
 
-		private String[] columnNames = {"Id", "Select", "Start", "Stop", "Gap", "Duration", "Cycle", "Tethys Deployment"};
+		private String[] columnNames = {"Id", "Select", "Start", "Stop", "Gap", "Duration", "Cycle", "Tethys Deployment", "Deployment Effort"};
 		
 		private static final int SELECTCOLUMN = 1;
 
@@ -369,6 +409,7 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 		}
 
 		private Object getValueAt(RecordingPeriod period, int rowIndex, int columnIndex) {
+			PDeployment deployment = period.getMatchedTethysDeployment();
 					switch (columnIndex) {
 					case 0:
 						return rowIndex;
@@ -383,8 +424,18 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 		//				long t2 = TethysTimeFuncs.millisFromGregorianXML(deplInfo.recoveryDetails.getAudioTimeStamp());
 						return PamCalendar.formatDuration(period.getRecordStop()-period.getRecordStart());
 					case 7:
-						PDeployment deployment = period.getMatchedTethysDeployment();
-						return makeDeplString(period, deployment);
+						if (deployment == null) {
+							return null;
+						}
+						return deployment.deployment.getId();
+//						return makeDeplString(period, deployment);
+					case 8:
+						if (deployment == null) {
+							return null;
+						}
+						return String.format("%s to %s", PamCalendar.formatDBDateTime(deployment.getAudioStart()), 
+								PamCalendar.formatDBDateTime(deployment.getAudioEnd()));
+						
 					case SELECTCOLUMN:
 		//				return selectBoxes[rowIndex];
 						return period.isSelected();

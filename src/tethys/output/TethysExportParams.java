@@ -15,6 +15,14 @@ public class TethysExportParams implements Serializable, Cloneable{
 
 	public static final long serialVersionUID = 1L;
 	
+	public static final int DETECTORE_PARAMS_NONE = 0;
+	public static final int DETECTOR_DATASELECTOR = 1;
+	public static final int DETECTORE_PARAMS_MODULE = 2;
+	public static final int DETECTORE_PARAMS_CHAIN = 3;
+	public static final String[] paramsOptNames = {"None", "Data Selector only", "Module only", "Full process chain"};
+	
+	public int detectorParameterOutput = DETECTORE_PARAMS_CHAIN;
+	
 	/*
 	 * Need to add lots of other parameters here, such as the connection details
 	 * for the tethys database. 
@@ -37,6 +45,7 @@ public class TethysExportParams implements Serializable, Cloneable{
 	private String datasetName;
 
 	public boolean listDocsInPamguard;
+	
 
 	/**
 	 * @return the datasetName

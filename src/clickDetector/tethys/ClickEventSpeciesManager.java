@@ -47,7 +47,11 @@ public class ClickEventSpeciesManager extends DataBlockSpeciesManager {
 	@Override
 	public String getSpeciesCode(PamDataUnit dataUnit) {
 		OfflineEventDataUnit eventDataUnit = (OfflineEventDataUnit) dataUnit;
-		return eventDataUnit.getEventType();
+		String eventType = eventDataUnit.getEventType();
+		if (eventType == null) {
+			eventType = "Unknown";
+		}
+		return eventType;
 	}
 
 }

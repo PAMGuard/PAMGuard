@@ -39,10 +39,12 @@ import tethys.dbxml.TethysException;
 import tethys.deployment.DeploymentHandler;
 import tethys.niluswraps.PDeployment;
 import tethys.niluswraps.PDetections;
+import tethys.output.DatablockSynchInfo;
 import tethys.output.StreamExportParams;
 import tethys.output.TethysExportParams;
 import tethys.pamdata.TethysDataProvider;
 import tethys.species.DataBlockSpeciesManager;
+import tethys.swing.export.DetectionsExportWizard;
 
 /**
  * Functions for handling output of Detections documents. 
@@ -401,6 +403,11 @@ public class DetectionsHandler {
 					lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_COUNTING);
 			exportObserver.update(prog);
 			granularityHandler.prepare(deployment.getAudioStart());
+
+			if (currentDetections == null) {
+				currentDetections = startDetectionsDocument(deployment, dataBlock, streamExportParams);
+				currentDetections.getEffort().setStart(TethysTimeFuncs.xmlGregCalFromMillis(deployment.getAudioStart()));
+			}
 			// export everything in that deployment.
 			// need to loop through all map points in this interval.
 			List<OfflineDataMapPoint> mapPoints = dataMap.getMapPoints();
@@ -411,10 +418,6 @@ public class DetectionsHandler {
 					exportObserver.update(prog);
 				}
 
-				if (currentDetections == null) {
-					currentDetections = startDetectionsDocument(deployment, dataBlock, streamExportParams);
-					currentDetections.getEffort().setStart(TethysTimeFuncs.xmlGregCalFromMillis(mapPoint.getStartTime()));
-				}
 				if (mapPoint.getEndTime() < deployment.getAudioStart()) {
 					continue;
 				}
@@ -627,6 +630,32 @@ public class DetectionsHandler {
 		public void update(DetectionExportProgress progress) {
 			publish(progress);
 		}
+
+	}
+
+	/**
+	 * Export data from given block, using appropriate species checks and other dialogs. 
+	 * @param dataBlock
+	 */
+	public void exportDataBlock(PamDataBlock dataBlock) {
+		if (dataBlock == null) {
+			return;
+		}
+
+		/**
+		 * Check the species map is OK before doing anything. 
+		 */
+		DataBlockSpeciesManager spManager = dataBlock.getDatablockSpeciesManager();
+		if (spManager != null) {
+			String error = spManager.checkSpeciesMapError();
+			if (error != null) {
+				PamDialog.showWarning(PamController.getMainFrame(), "Datablock species manager error", error);
+				spManager.showSpeciesDialog();
+				return;
+			}
+		}
+
+		DetectionsExportWizard.showDialog(tethysControl.getGuiFrame(), tethysControl, dataBlock);
 
 	}
 }

@@ -5,6 +5,7 @@ import java.io.Serializable;
 import PamUtils.LatLong;
 import nilus.ContactInfo;
 import nilus.Deployment;
+import nilus.DeploymentRecoveryDetails;
 import nilus.DescriptionType;
 import nilus.Helper;
 import nilus.MetadataInfo;
@@ -23,6 +24,8 @@ public class PamguardMetaData implements Serializable {
 	public static final long serialVersionUID = 1L;
 	
 	private NilusSettingsWrapper<Deployment> deploymentWrapper;
+	
+	public boolean useAudioForDeploymentTimes = true;
 	
 //	/**
 //	 * Deployment time (used if different 
@@ -63,6 +66,13 @@ public class PamguardMetaData implements Serializable {
 		}
 		if (deployment.getMetadataInfo().getContact().getContactInfo() == null) {
 			deployment.getMetadataInfo().getContact().setContactInfo(new ContactInfo());
+		}
+		
+		if (deployment.getDeploymentDetails() == null) {
+			deployment.setDeploymentDetails(new DeploymentRecoveryDetails());
+		}
+		if (deployment.getRecoveryDetails() == null) {
+			deployment.setRecoveryDetails(new DeploymentRecoveryDetails());
 		}
 		return deployment;
 	}

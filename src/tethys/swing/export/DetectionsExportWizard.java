@@ -24,6 +24,7 @@ import tethys.pamdata.TethysDataProvider;
 
 public class DetectionsExportWizard extends PamWizard {
 
+	private static final long serialVersionUID = 1L;
 	private PamDataBlock dataBlock;
 	private CardLayout cardLayout;
 	private GranularityCard granularityCard;
@@ -33,6 +34,7 @@ public class DetectionsExportWizard extends PamWizard {
 	private AlgorithmCard algorithmCard;
 	private ExportWorkerCard exportWorkerCard;
 	private TethysDataProvider tethysDataProvider;
+	private ParameterCard parameterCard;
 	
 	private DetectionsExportWizard(Window parentFrame,  TethysControl tethysControl, PamDataBlock dataBlock) {
 		super(parentFrame, "Detections Export");
@@ -48,6 +50,7 @@ public class DetectionsExportWizard extends PamWizard {
 		addCard(algorithmCard = new AlgorithmCard(this, tethysControl, dataBlock));
 		addCard(granularityCard = new GranularityCard(this, tethysControl, dataBlock));
 		addCard(descriptionCard = new DescriptionCard(this, tethysControl));
+		addCard(parameterCard = new ParameterCard(tethysControl, this, dataBlock));
 		addCard(exportWorkerCard = new ExportWorkerCard(this, tethysControl, dataBlock));
 		
 		moveFirst();
@@ -73,13 +76,45 @@ public class DetectionsExportWizard extends PamWizard {
 
 	@Override
 	public void setCardParams(PamWizardCard wizardCard) {
-		wizardCard.setParams(streamExportParams);
+//		return wizardCard.getParams(streamExportParams);
+		if (wizardCard == granularityCard) {
+			granularityCard.setParams(streamExportParams);
+		}
+		if (wizardCard == descriptionCard) {
+			 descriptionCard.setParams(streamExportParams.getNilusDetectionDescription());
+		}
+		if (wizardCard == algorithmCard) {
+			algorithmCard.setParams(streamExportParams);
+		}
+		if (wizardCard == exportWorkerCard) {
+			exportWorkerCard.setParams(streamExportParams);
+		}
+		try {
+			wizardCard.setParams(streamExportParams);
+		}
+		catch (Exception e) {
+			
+		}
 	}
 
 	@Override
 	public boolean getCardParams(PamWizardCard wizardCard) {
+//		return wizardCard.getParams(streamExportParams);
+		if (wizardCard == granularityCard) {
+			return granularityCard.getParams(streamExportParams);
+		}
+		if (wizardCard == descriptionCard) {
+			return descriptionCard.getParams(streamExportParams.getNilusDetectionDescription());
+		}
+		if (wizardCard == algorithmCard) {
+			return algorithmCard.getParams(streamExportParams);
+		}
+		if (wizardCard == exportWorkerCard) {
+			return exportWorkerCard.getParams(streamExportParams);
+		}
 		return wizardCard.getParams(streamExportParams);
 	}
+
 
 
 	@Override

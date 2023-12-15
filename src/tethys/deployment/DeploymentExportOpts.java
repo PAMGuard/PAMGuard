@@ -13,19 +13,22 @@ public class DeploymentExportOpts implements Serializable, Cloneable {
 
 	public boolean separateDeployments;
 	
+	/**
+	 * Minimum number of seconds between GPS points in a track. 
+	 */
 	public double trackPointInterval;
 	
 	/**
 	 * Max gap before recording periods are separated, potentially into 
 	 * separate Deployment documents
 	 */
-	public int maxGapSeconds = 60;
+	public int maxRecordingGapSeconds = 60;
 	
 	/**
 	 * A recording section after joining with max gap parameter is too short
 	 * to be worth keeping. 
 	 */
-	public int minLengthSeconds = 10;
+	public int minRecordingLengthSeconds = 10;
 
 	@Override
 	protected DeploymentExportOpts clone() {
