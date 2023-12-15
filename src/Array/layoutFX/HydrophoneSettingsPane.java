@@ -126,7 +126,7 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 		interpPane = new InterpSettingsPane();
 
 		holderPane.getChildren().addAll(recieverIDLabel, createGeneralPane(), coOrdLabel, createPositionPane(), interpLabel, interpPane); 
-		
+
 		mainPane = new PamBorderPane(); 
 		mainPane.setCenter(holderPane);
 	}
@@ -450,24 +450,28 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 	 * @return
 	 */
 	protected static void addTextValidator(TextField userTextField, String description, Validator validator) {
-		userTextField.setPrefColumnCount(8);
+		//userTextField.setPrefColumnCount(8);
 
 		validator.createCheck()
 		.dependsOn(description, userTextField.textProperty())
 		.withMethod(c -> {
 			String posVal = c.get(description);
-			try {
-				if (Double.valueOf(posVal)==null) {
-					c.error("The input for " + description + " is invalid");
+			
+			/**
+			 * Ok, this is weird. So if the c.error is called then somehow it messes up
+			 * the sizing of the pane i.e. it does not resize..
+			 */
+			
+//			try {
+				if (posVal.isEmpty() || Double.valueOf(posVal)==null) {
+					//c.error("The input for " + description + " is invalid");
 				}
-			}
-			catch (Exception e) {
-				c.error("The input for " + description + " is invalid");
-			}
+//			}
+//			catch (Exception e) {
+//				c.error("The input for " + description + " is invalid");
+//			}
 		})
-		.decorates(userTextField)
-		.immediate();
-		;
+		.decorates(userTextField).immediate();
 	}
 
 

@@ -1282,7 +1282,6 @@ public class PamArray implements Serializable, Cloneable, ManagedParameters {
 	 * @return
 	 */
 	public int addStreamer(Streamer streamer) {
-
 		synchronized (streamers) {
 			streamers.add(streamer);
 			checkStreamerIndexes();

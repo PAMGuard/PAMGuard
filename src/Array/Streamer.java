@@ -570,7 +570,7 @@ public class Streamer implements Serializable, Cloneable, ManagedParameters {
 	/**
 	 * Make a streamer data unit and add it to the data block. 
 	 */
-	protected void makeStreamerDataUnit() {
+	public void makeStreamerDataUnit() {
 		StreamerDataUnit sdu = new StreamerDataUnit(PamCalendar.getTimeInMillis(), this);
 		ArrayManager.getArrayManager().getStreamerDatabBlock().addPamData(sdu);
 	}

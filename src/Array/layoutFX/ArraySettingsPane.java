@@ -36,21 +36,27 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 	
 	private StreamersPane streamerPane; 
 	
-	private PamFlipPane mainPane;
+	private Pane mainPane;
 	
 	private HydrophonesPane hydrophonePane;
 
-	private Pane holder;
+//	private Pane holder;
 
 	private Label hydrophoneLabel; 
 
 	public ArraySettingsPane() {
 		super(null);
-		mainPane = new PamFlipPane();
-		
-		mainPane.setFrontContent(createArrayPane());
-		
-		mainPane.getAdvPane().setCenter(new Label("Advanced Settings"));
+		mainPane = createArrayPane();
+//		mainPane.setStyle("-fx-background-color: red;");
+		mainPane.setMaxWidth(Double.MAX_VALUE);
+		mainPane.setPrefWidth(800);
+		mainPane.setStyle("-fx-padding: 0,0,0,0");
+
+//		mainPane.setMinWidth(800);
+
+//		mainPane.setCenter(createArrayPane());
+//		
+//		mainPane.getAdvPane().setCenter(new Label("Advanced Settings"));
 		
 		
 //		//mainPane.getFront().setStyle("-fx-background-color: grey;");
@@ -75,9 +81,9 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 //		mainPane.setPadding(new Insets(0,0,0,0));
 		
 		
-		holder = new StackPane(); 
-		holder.getChildren().add(mainPane);
-		holder.setStyle("-fx-padding: 0,0,0,0");
+//		holder = new StackPane(); 
+//		holder.getChildren().add(mainPane);
+//		holder.setStyle("-fx-padding: 0,0,0,0");
 
 	}
 
@@ -92,6 +98,7 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 		PamGuiManagerFX.titleFont1style(arrayLabel);
 		
 		streamerPane = new StreamersPane(); 
+		streamerPane.setMaxWidth(Double.MAX_VALUE);
 		
 		hydrophoneLabel = new Label("Hydrophones"); 
 		PamGuiManagerFX.titleFont1style(hydrophoneLabel);
@@ -99,12 +106,13 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 
 		
 		hydrophonePane = new HydrophonesPane(); 
-			
-		PamButton advancedButton = new PamButton(); 
-		advancedButton.setOnAction((action)->{
-			mainPane.flipToBack();
-		});
-		advancedButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-cog")); 
+		hydrophonePane.setMaxWidth(Double.MAX_VALUE);
+
+//		PamButton advancedButton = new PamButton(); 
+//		advancedButton.setOnAction((action)->{
+//			mainPane.flipToBack();
+//		});
+//		advancedButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-cog")); 
 
 //		PamHBox advancedPane = new PamHBox(); 
 //		advancedPane.setSpacing(5);
@@ -112,10 +120,13 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 //		advancedPane.getChildren().addAll(new Label("Advanced"), advancedButton);
 		
 		PamVBox vBox = new PamVBox(); 
-		
+
 		vBox.setSpacing(5);
 		vBox.getChildren().addAll(arrayLabel, streamerPane, hydrophoneLabel,
 				hydrophonePane); 
+		
+
+
 
 		return vBox; 
 	}
@@ -139,6 +150,8 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 	public PamArray  getParams(PamArray  currParams) {
 		currParams = hydrophonePane.getParams(currParams); 
 		currParams = streamerPane.getParams(currParams); 
+		
+		System.out.println("Array settings pane: No. streamers: " + currParams.getStreamerCount());
 		return currParams;
 	}
 
@@ -158,7 +171,7 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 	@Override
 	public Node getContentNode() {
 
-		return holder;
+		return mainPane;
 	}
 
 	@Override

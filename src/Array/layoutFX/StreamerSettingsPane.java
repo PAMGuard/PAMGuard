@@ -51,11 +51,15 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 
 	public PamBorderPane mainPane;
 
-
+	/**
+	 * Combo Box which shows which origin methods are available. 
+	 */
 	private ComboBox<HydrophoneOriginSystem> originMethod;
 
-
-	private PamBorderPane originPanel; 
+	/**
+	 * The origin pane;
+	 */
+	private PamBorderPane originPane; 
 
 	/**
 	 * The default streamer
@@ -130,7 +134,7 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 
 
 	/**
-	 * Button for extra origin params. 
+	 * Button for extra origin parameters. 
 	 */
 	private PamButton originButton;
 
@@ -156,9 +160,9 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 		PamGuiManagerFX.titleFont2style(label);
 
 		//holds advanced setings for new origin methods. 
-		originPanel = new PamBorderPane();
+		originPane = new PamBorderPane();
 		PopOver popOver = new PopOver();
-		popOver.setContentNode(originPanel);
+		popOver.setContentNode(originPane);
 
 		originMethod = new ComboBox<HydrophoneOriginSystem>();		
 		originButton = new PamButton();
@@ -219,15 +223,6 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 	 */
 	public Pane createLocatorPane() {
 
-		//craet data sources for sensors. 
-		ArraySensorFieldType[] sensorFields = ArraySensorFieldType.values();
-		sensorComponents = new SensorSourcePane[sensorFields.length];
-		//EnableOrientation eo = new EnableOrientation();
-		for (int i = 0; i < sensorFields.length; i++) {
-			sensorComponents[i] = new SensorSourcePane(sensorFields[i], true, sensorFields[i] != ArraySensorFieldType.HEIGHT);
-			//sensorComponents[i].addActionListenr(eo);
-		}
-
 		localiserMethod = new ComboBox<>();
 		int n = HydrophoneLocators.getInstance().getCount();
 		for (int i = 0; i < n; i++) {
@@ -250,6 +245,27 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 		positionPane.setVgap(5);
 
 		ColumnConstraints rc = new ColumnConstraints(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE, MAX_TEXTFIELD_WIDTH);
+		
+		//Orientation pane. 
+		//create data sources for sensors. 
+		ArraySensorFieldType[] sensorFields = ArraySensorFieldType.values();
+		sensorComponents = new SensorSourcePane[sensorFields.length];
+		//EnableOrientation eo = new EnableOrientation();
+		for (int i = 0; i < sensorFields.length; i++) {
+			sensorComponents[i] = new SensorSourcePane(sensorFields[i], true, sensorFields[i] != ArraySensorFieldType.HEIGHT);
+			sensorComponents[i].setOnAction((e)->{
+				enableOrientationPane(); 
+			});
+		}
+		PamButton button = new PamButton("Sensors");
+		button.setGraphic(PamGlyphDude.createPamIcon("mdi2c-compass-outline", PamGuiManagerFX.iconSize));
+
+		PopOver popOver = new PopOver(createSensorPane()); 
+		popOver.setDetachable(true);
+
+		button.setOnAction((a)->{
+			popOver.show(button);
+		});
 
 
 		//this sets all text fields to the correct width - but of naff hack but what grid pane needs to work. 
@@ -361,10 +377,8 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 		roll = new TextField(); 
 		roll.setMaxWidth(MAX_TEXTFIELD_WIDTH);
 		HydrophoneSettingsPane.addTextValidator(roll, "roll", validator); 
-
 		
 		col=0;
-
 
 		Label orientation = new Label("Orientation"); 
 		positionPane.add(orientation, col++, row);
@@ -372,16 +386,7 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 		positionPane.add(pitch, col++, row);
 		positionPane.add(roll, col++, row);
 		positionPane.add(new Label(degsLab), col++, row);
-
-		PamButton button = new PamButton("Sensors");
-		button.setGraphic(PamGlyphDude.createPamIcon("mdi2c-compass-outline", PamGuiManagerFX.iconSize));
-
-		PopOver popOver = new PopOver(createSensorPane()); 
-		popOver.setDetachable(true);
-
-		button.setOnAction((a)->{
-			popOver.show(button);
-		});
+		
 
 		positionPane.add(button,  col++, row);
 
@@ -390,6 +395,31 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 		holder.getChildren().addAll(loclaiserMethodHolder, positionPane); 
 
 		return holder; 
+	}
+
+	/**
+	 * Enables or disables controls in the orientation pane.
+	 */
+	private void enableOrientationPane() {
+		for (int i=0; i<sensorComponents.length; i++) {
+			if (sensorComponents[i]==null || sensorComponents[i].getParameterType()==null) continue;
+			boolean enable = sensorComponents[i].getParameterType().equals(ArrayParameterType.FIXED);
+			switch (sensorComponents[i].getSensorType()) {
+			case HEADING:
+				heading.setDisable(!enable);
+				break;
+			case HEIGHT:
+				break;
+			case PITCH:
+				pitch.setDisable(!enable);
+				break;
+			case ROLL:
+				roll.setDisable(!enable);
+				break;
+			default:
+				break;
+			}
+		}
 	}
 
 	/**
@@ -454,7 +484,7 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 		OriginDialogComponent mthDialogComponent = currentOriginMethod.getDialogComponent(); 
 
 		if (mthDialogComponent == null) {
-			originPanel.getChildren().clear();
+			originPane.getChildren().clear();
 			currentOriginComponent = null;
 			this.originButton.setDisable(true);
 		}
@@ -462,11 +492,12 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 			this.originButton.setDisable(false);
 			Pane newComponent = mthDialogComponent.getSettingsPane();
 			if (currentOriginComponent != newComponent) {
-				originPanel.setCenter(newComponent);
+				originPane.setCenter(newComponent);
 				currentOriginComponent = newComponent;
 				mthDialogComponent.setParams();
 			}
 		}
+		
 		enableControls();
 	}
 
@@ -475,11 +506,16 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 	private void enableControls() {
 		if (currentOriginMethod != null) {
 			interpPane.setAllowedValues(currentOriginMethod.getAllowedInterpolationMethods());
+			if (interpPane.getSelectedInterpType()<0) {
+				interpPane.setSelection(0);
+			}
 		}
+		 enableOrientationPane();
 	}
 
 	@Override
 	public Streamer getParams(Streamer currParams) {
+		System.out.println("GETPARAMS: "	 + currParams); 
 
 		try {
 			defaultStreamer.setX(Double.valueOf(xPos.getText()));
@@ -495,7 +531,7 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 		}
 
 		defaultStreamer.setStreamerName(currParams.getStreamerName());
-		int im = interpPane.getSelection();
+		int im = interpPane.getSelectedInterpType();
 		if (im < 0) {
 			System.err.println("Streamer getParams: There is an index problem with the interpolation selection streamer panel: index = " + im);
 		}
@@ -508,7 +544,7 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 		//			}
 		HydrophoneLocator locator = HydrophoneLocators.getInstance().
 				getSystem(localiserMethod.getSelectionModel().getSelectedIndex()).getLocator(currentArray, defaultStreamer);
-		if (originPanel != null) 
+		if (originPane != null) {
 			//			MasterLocator masterLocator = currentArray.getMasterLocator();
 			//			int streamerIndex = currentArray.indexOfStreamer(streamer);
 			//			if (streamerIndex < 0) {
@@ -518,6 +554,8 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 			if (currentOriginMethod == null) {
 				System.err.println("Streamer getParams: No hydrophoneorigin method selected in streamer panel");
 			}
+		}
+		
 		OriginDialogComponent mthDialogComponent = currentOriginMethod.getDialogComponent();
 		if (mthDialogComponent != null) {
 			if (mthDialogComponent.getParams() == false) {
@@ -531,6 +569,7 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 		defaultStreamer.setPitch(getDoubleValue(pitch));
 		defaultStreamer.setRoll(getDoubleValue(roll));
 		//			}
+		
 		if (!heading.isDisable() && defaultStreamer.getHeading() == null) {
 			System.err.println("Streamer getParams: You must enter a fixed value for the streamer heading");
 		}
@@ -541,12 +580,13 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 			System.err.println("Streamer getParams: You must enter a fixed value for the streamer roll");
 		}
 
-
 		/**
-		 * We may have large lists of the streamers which we mwant to use the orientation data from or not. The enable orientation check box will
-		 * enable or disable orientation for ALL streamers which are loaded into memory. 
+		 * We may have large lists of the streamers which we meant to use the
+		 * orientation data from or not. The enable orientation check box will enable or
+		 * disable orientation for ALL streamers which are loaded into memory.
 		 */
-		//			setEnableRotation(enableOrientation.isSelected(), defaultStreamer.getStreamerIndex());
+		System.out.println("CURRENTORIGINMETHOD: "	 + currentOriginMethod); 
+		System.out.println("LOCATORMETHOD: "		 + locator); 
 
 		defaultStreamer.setHydrophoneOrigin(currentOriginMethod);
 		defaultStreamer.setHydrophoneLocator(locator);
@@ -590,8 +630,7 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 			localiserMethod.getSelectionModel().select(0);
 		}
 
-		//				streamerName.setText(defaultStreamer.getStreamerName());
-
+		//streamerName.setText(defaultStreamer.getStreamerName());
 		xPos.setText(String.valueOf(defaultStreamer.getX()));
 		yPos.setText(String.valueOf(defaultStreamer.getY()));
 		zPos.setText(String.valueOf(PamController.getInstance().getGlobalMediumManager().getZCoeff()*defaultStreamer.getZ()));
@@ -628,7 +667,7 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 		
 		System.out.println("Streamer setParams: Origin interpolator: " + currentArray.getOriginInterpolation()); 
 
-		if (currentArray.getOriginInterpolation()<0) {
+		if (currentArray.getOriginInterpolation()<0 || currentArray.getOriginInterpolation()>=currentOriginMethod.getAllowedInterpolationMethods()) {
 			interpPane.setSelection(0);
 		}
 		else {

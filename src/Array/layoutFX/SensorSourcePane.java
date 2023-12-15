@@ -1,15 +1,6 @@
 package Array.layoutFX;
 
-/**
- * JavaFX component with a dropdown for selecting array sensor choices. 
- * @author Doug Gillespie, Jamie Macaulay
- *
- */
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
-
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
 
 import Array.sensors.ArrayParameterType;
 import Array.sensors.ArraySensorDataBlock;
@@ -48,6 +39,14 @@ public class SensorSourcePane {
 		sensorDropDown.setTooltip(new Tooltip("Sensor updates for " + sensorType.toString()));
 	}
 	
+	/**
+	 * Get the type of sensor. 
+	 * @return the type of sensor. 
+	 */
+	public ArraySensorFieldType getSensorType() {
+		return sensorType;
+	}
+
 	public void setOnAction(EventHandler<ActionEvent> e) {
 		sensorDropDown.setOnAction(e);
 	}

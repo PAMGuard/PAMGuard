@@ -56,6 +56,7 @@ public class StreamersPane extends PamBorderPane {
 
 		pamFlipePane = new PamFlipPane(); 
 		pamFlipePane.getAdvLabel().setText("Streamer");
+		pamFlipePane.setMaxWidth(Double.MAX_VALUE);
 
 		((Pane) streamerPane.getContentNode()).setPadding(new Insets(5,5,5,15)); 
 
@@ -69,7 +70,10 @@ public class StreamersPane extends PamBorderPane {
 		pamFlipePane.flipFrontProperty().addListener((obsval, oldVal, newVal)->{
 			//the flip pane
 			if (newVal) {
+				
 				Streamer streamer = streamerPane.getParams(currentStreamerData.getStreamer());
+				
+				System.out.println("NEW STREAMER: " + streamer);
 				
 				if (streamer==null) {
 					//the warning dialog is shown in the streamer settings pane
@@ -82,6 +86,14 @@ public class StreamersPane extends PamBorderPane {
 
 				//need to refresh table to show symbol. 
 				tableArrayPane.getTableView().refresh();
+				
+				if (streamer != null) {
+					streamer.setupLocator(currentArray);
+					streamer.makeStreamerDataUnit();
+					//update the streamer in the current array
+//					System.out.println("Update streamer: " + tableArrayPane.getStreamers().indexOf(currentStreamerData) + " no. streamers: " + currentArray.getNumStreamers());
+				}
+
 			}
 		});
 
@@ -142,6 +154,14 @@ public class StreamersPane extends PamBorderPane {
 
 		}
 
+		/**
+		 * Get the current streamers. 
+		 * @return the current streamers. 
+		 */
+		public ObservableList<StreamerProperty> getStreamers() {
+			return getData();
+		}
+
 		@Override
 		public void dialogClosed(StreamerProperty data) {
 			Streamer hydro = streamerPane.getParams(data.getStreamer());
@@ -159,10 +179,9 @@ public class StreamersPane extends PamBorderPane {
 
 		@Override
 		public void editData(StreamerProperty data){
-			
+			//edit streamer data. 
 			if (data.getName() == null){
-			pamFlipePane.getAdvLabel().setText("Streamer " +  data.getID().get());
-			
+				pamFlipePane.getAdvLabel().setText("Streamer " +  data.getID().get());
 			}
 			
 			streamerPane.setCurrentArray(currentArray);
@@ -175,8 +194,12 @@ public class StreamersPane extends PamBorderPane {
 
 		@Override
 		public void createNewData(){
+			StreamerProperty newStreamer = createDefaultStreamerProperty();
 			//create a new classifier. 
-			streamerData.add(createDefaultStreamerProperty()); 
+			streamerData.add(newStreamer); 
+			//add to the current array.
+			currentArray.addStreamer(newStreamer.getStreamer()); 
+			System.out.println("Create new streamer: " + currentArray.getNumStreamers());
 		}
 
 		private StreamerProperty createDefaultStreamerProperty() {
@@ -191,12 +214,49 @@ public class StreamersPane extends PamBorderPane {
 
 	}
 
+	/**
+	 * Set the paramters for the streamer pane. 
+	 * @param currentArray - the current array. 
+	 */
 	public void setParams(PamArray currentArray) {
-		this.currentArray=currentArray;
-	}
+		
+		this.currentArray=currentArray.clone();
+		
+		System.out.println("Set params streamer: " + currentArray.getNumStreamers());
+		
+		tableArrayPane.getStreamers().clear();
 
+		for (int i=0; i<currentArray.getStreamerCount(); i++) {
+			tableArrayPane.getStreamers().add(new StreamerProperty(currentArray.getStreamer(i))); 
+		}
+	}
+	
+	/**
+	 * Get the parameters from the streamer pane. 
+	 * @param currParams - the current parameters. 
+	 * @return the PamArray with updated streamers. 
+	 */
 	public PamArray getParams(PamArray currParams) {
-		return currParams;
+		
+		//add all new streamers - bit weird because the PamArray requires that at least one streamer exists.
+		for (int i=0; i<tableArrayPane.getStreamers().size(); i++) {
+			
+			if (i<currentArray.getStreamerCount()) {
+				currentArray.updateStreamer(i,tableArrayPane.getStreamers().get(i).getStreamer());
+			}
+			else {
+				currentArray.addStreamer(tableArrayPane.getStreamers().get(i).getStreamer());
+			}
+		}
+		
+		while (currentArray.getStreamerCount()>tableArrayPane.getStreamers().size()) {
+			currentArray.removeStreamer(currentArray.getStreamerCount()-1);
+		}
+		
+//		currentArray.updateStreamer(tableArrayPane.getStreamers().indexOf(currentStreamerData), streamer);
+		System.out.println("Get params streamer: " + currentArray.getNumStreamers());
+		
+		return currentArray;
 	}
 
 	public void setRecieverLabels() {

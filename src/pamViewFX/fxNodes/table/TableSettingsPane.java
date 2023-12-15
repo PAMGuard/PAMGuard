@@ -72,6 +72,7 @@ public abstract class TableSettingsPane<T> extends PamBorderPane {
 
 	    //create pane holding add, edit and remove controls
         buttonPane=new TableButtonPane(Orientation.VERTICAL); 
+        
         buttonPane.getAddButton().setOnAction((event)->{
         	createNewData();
         });
@@ -147,6 +148,11 @@ public abstract class TableSettingsPane<T> extends PamBorderPane {
 	 */
 	public TableButtonPane getButtonPane() {
 		return buttonPane;
+	}
+	
+
+	public ObservableList<T> getData() {
+		return data;
 	}
 
 		
