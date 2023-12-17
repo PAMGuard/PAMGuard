@@ -142,6 +142,12 @@ public class PamController implements PamControllerInterface, PamSettings {
 	public static final String AUTOEXIT = "-autoexit";
 
 	/**
+	 * Never changed. Needed to identify settings for list of modules in prfx files. 
+	 */
+	public static final String unitName = "Pamguard Controller";
+	public static final String unitType = "PamController";
+
+	/**
 	 * The pam model. 
 	 */
 	private PamModel pamModelInterface;
@@ -1835,15 +1841,15 @@ public class PamController implements PamControllerInterface, PamSettings {
 	public long getSettingsVersion() {
 		return 0;
 	}
-
+	
 	@Override
 	public String getUnitName() {
-		return "Pamguard Controller";
+		return unitName;
 	}
 
 	@Override
 	public String getUnitType() {
-		return "PamController";
+		return unitType;
 	}
 
 	@Override
