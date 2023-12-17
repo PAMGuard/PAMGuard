@@ -20,6 +20,7 @@ import Array.PamArray;
 import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.ScrollingPamLabel;
 import PamView.dialog.SettingsButton;
+import PamView.help.PamHelp;
 import PamView.panel.PamPanel;
 import PamView.panel.WestAlignedPanel;
 import metadata.MetaDataContol;
@@ -72,6 +73,7 @@ public class TethysConnectionPanel extends TethysGUIPanel {
 		serverName = new JTextField(SERVERNAMELENGTH);
 		serverSelButton = new SettingsButton();
 		serverSelButton.setToolTipText("Select server");
+		JButton helpButton = new JButton("Help...");
 		serverStatus = new ScrollingPamLabel(SERVERSTATUSLENGTH);
 		serverName.setEditable(false);
 		openClient = new FancyClientButton(tethysControl);
@@ -105,6 +107,12 @@ public class TethysConnectionPanel extends TethysGUIPanel {
 				newProjectSelect();
 			}
 		});
+		helpButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				showHelp(e);
+			}
+		});
 		projectInstruments = new JComboBox<PInstrument>();
 		newInstrument = new JButton("New / Edit");
 		projectInstruments.setToolTipText("Instruments currently listed within all deployments of the current project");
@@ -135,6 +143,8 @@ public class TethysConnectionPanel extends TethysGUIPanel {
 		c.gridx += c.gridwidth;
 		c.gridwidth = 1;
 		mainPanel.add(openClient, c);
+		c.gridx++;
+		mainPanel.add(helpButton, c);
 		
 		c.gridx =0;
 		c.gridy++;
@@ -162,6 +172,11 @@ public class TethysConnectionPanel extends TethysGUIPanel {
 //		mainPanel.add(deploymentList, c);
 		
 //		fillServerControl(); // no need Will get set from TethysControl as soon as all initialised. 
+	}
+
+	protected void showHelp(ActionEvent e) {
+		String helpPoint = "utilities.tethys.docs.tethys_overview";
+		PamHelp.getInstance().displayContextSensitiveHelp(helpPoint);
 	}
 
 	protected void newInstrumentSelect() {
