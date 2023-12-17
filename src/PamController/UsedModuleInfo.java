@@ -8,7 +8,8 @@ import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 /**
  * Very simple class used in an ArrayList of used modules that 
- * get's saved between runs.
+ * get's saved between runs. This forms the core of the settings system
+ * so don't f*** with it !
  * @author Doug
  *
  */
