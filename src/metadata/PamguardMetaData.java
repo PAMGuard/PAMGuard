@@ -92,11 +92,17 @@ public class PamguardMetaData implements Serializable {
 	 * @return the deploymentWrapper
 	 */
 	public NilusSettingsWrapper<Deployment> getDeploymentWrapper() {
+		if (deploymentWrapper == null) {
+			deploymentWrapper = new NilusSettingsWrapper<>();
+		}
 		return deploymentWrapper;
 	}
 
 	public void checkSerialisation() {
 		// check that all wrappers have their xml up to date. 
+		if (deploymentWrapper == null) {
+			deploymentWrapper = new NilusSettingsWrapper<>();
+		}
 		deploymentWrapper.reSerialise();
 	}
 	

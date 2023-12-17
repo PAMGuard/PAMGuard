@@ -206,7 +206,7 @@ public class DBXMLQueries {
 			result = queries.QueryTethys(xQuery);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 		if (result == null) {
 			return null;

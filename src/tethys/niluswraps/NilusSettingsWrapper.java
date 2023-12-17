@@ -74,7 +74,7 @@ public class NilusSettingsWrapper<T extends Object> implements Serializable, Clo
 	}
 	/**
 	 * Set the nilus object. This marshals the nilus object 
-	 * into xml and saves the data as an intetnal xml string which
+	 * into xml and saves the data as an internal xml string which
 	 * can be safely serialized. 
 	 * @param nilusObject nilus object.
 	 * @return true if it was marshalled OK. 
