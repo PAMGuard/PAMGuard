@@ -383,6 +383,9 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 		}
 
 		for (PamDataBlock aBlock:affectedDataBlocks) {
+			if (aBlock == parentDataBlock) {
+				continue;
+			}
 			deleteOldData(aBlock, taskGroupParams);
 		}
 	}
