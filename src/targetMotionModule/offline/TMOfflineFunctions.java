@@ -54,7 +54,7 @@ public class TMOfflineFunctions {
 		//when we change datablock the taks group is going to stay the same- need to make sure it changes
 		
 		if (batchLocaliseDialog == null || currentDataBlock!=targetMotionControl.getCurrentDataBlock()) {
-			batchLocaliseDialog = new TMOLProcessDialog(targetMotionControl.getPamView().getGuiFrame(), 
+			batchLocaliseDialog = new TMOLProcessDialog(targetMotionControl.getGuiFrame(), 
 					getOfflineTaskGroup(), "Batch Localise");
 			//batchLocaliseDialog.setModalityType(Dialog.ModalityType.MODELESS);
 		}

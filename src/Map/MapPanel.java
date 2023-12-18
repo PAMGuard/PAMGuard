@@ -23,6 +23,7 @@ package Map;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.MouseInfo;
@@ -1636,9 +1637,9 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 	class OverlayOptions implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
-			JFrame frame = (JFrame) PamController.getMainFrame();
+			Frame frame = (JFrame) PamController.getMainFrame();
 			if (mapController.getPamView() != null) {
-				frame = mapController.getPamView().getGuiFrame();
+				frame = mapController.getGuiFrame();
 			}
 
 			MapDetectionsParameters newParams = MapDetectionsDialog.showDialog(frame,

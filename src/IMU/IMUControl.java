@@ -73,7 +73,7 @@ public class IMUControl  extends PamControlledUnit implements PamSettings {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			IMUSettingsDialog.showDialog(getPamView().getGuiFrame(),THIS);
+			IMUSettingsDialog.showDialog(getGuiFrame(),THIS);
 		}
 	}
 	
@@ -89,7 +89,7 @@ public class IMUControl  extends PamControlledUnit implements PamSettings {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			IMUParams newIMUParams=IMUImportDialog.showDialog(getPamView().getGuiFrame(),THIS, importCSV);
+			IMUParams newIMUParams=IMUImportDialog.showDialog(getGuiFrame(),THIS, importCSV);
 			//if params are not null try and load data 
 			if (newIMUParams!=null){
 				imuParams=newIMUParams; 
@@ -115,7 +115,7 @@ public class IMUControl  extends PamControlledUnit implements PamSettings {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			IMUParams newIMUParams=IMUCalibrationDialog.showDialog(getPamView().getGuiFrame(),imuParams);
+			IMUParams newIMUParams=IMUCalibrationDialog.showDialog(getGuiFrame(),imuParams);
 			if (newIMUParams!=null) imuParams=newIMUParams; 
 			updateProcesses(CAL_VALUES_CHANGED);
 		}
