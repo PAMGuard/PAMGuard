@@ -1,19 +1,24 @@
 package pamViewFX.fxNodes.utilityPanes;
 
+import org.controlsfx.control.SegmentedButton;
+
 import PamController.SettingsPane;
 import PamUtils.LatLong;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ToggleGroup;
-import pamViewFX.fxNodes.PamBorderPane;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.text.TextAlignment;
+import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamVBox;
 
 /**
  * Pane with controls to to set the values for a Latitude and Longitude. The pane allows users to
  * change the Latitude and Longitude in both Degrees, Decimal minutes and Degrees, Minutes, Seconds
+ * 
  * @author Jamie Macaulay 
  *
  */
@@ -27,37 +32,62 @@ public class LatLongPane extends SettingsPane<LatLong>{
 	/**
 	 * The radio button to select decimal minutes 
 	 */
-	private RadioButton decimalMinutes;
+	private ToggleButton decimalMinutes;
 
 	/**
 	 * Radio button to input minutes and seconds. 
 	 */
-	private RadioButton minutesSeconds;
+	private ToggleButton minutesSeconds;
 
 	/**
 	 * Lat long strip
 	 */
 	private LatLongStrip latStrip, longStrip;
 
-	private PamBorderPane mainPane;
+	private PamVBox mainPane;
+
+	private ToggleButton decimal;
+
+	/**
+	 * Segmented button that also selection of the latitude and longitude format type. 
+	 */
+	private SegmentedButton segmentedButton;
 
 
 	public LatLongPane(String title) {
 		super(null); 
+		
+		
+		mainPane = new PamVBox(); 
+		mainPane.setSpacing(5);
+		mainPane.setAlignment(Pos.CENTER);
+
+		
+		Label titleLabel = new Label(title); 
+		titleLabel.maxWidth(Double.MAX_VALUE);
+		titleLabel.setTextAlignment(TextAlignment.LEFT);
+		PamGuiManagerFX.titleFont2style(titleLabel);
+		mainPane.getChildren().add(titleLabel); 
+
 
 		latLong= new LatLong(); 
 
-		mainPane = new PamBorderPane(); 
+
+		decimalMinutes = new ToggleButton("Degrees, Decimal minutes");
+		minutesSeconds = new ToggleButton("Degrees, Minutes, Seconds");
+		decimal = new ToggleButton("Decimal");
+
+		segmentedButton = new SegmentedButton();    
+		segmentedButton.getButtons().addAll(decimalMinutes, minutesSeconds, decimal);
 
 		PamHBox top = new PamHBox();
 		top.setSpacing(5);
-		top.getChildren().add(new Label("Unit type :"));
-		top.getChildren().add(decimalMinutes = new RadioButton("Degrees, Decimal minutes"));
-		top.getChildren().add(minutesSeconds = new RadioButton("Degrees, Minutes, Seconds"));
+		top.getChildren().add(segmentedButton);
 
-		ToggleGroup bg = new ToggleGroup();
-		decimalMinutes.setToggleGroup(bg);
-		minutesSeconds.setToggleGroup(bg);
+		//		ToggleGroup bg = new ToggleGroup();
+		//		decimalMinutes.setToggleGroup(bg);
+		//		minutesSeconds.setToggleGroup(bg);
+		//		decimal.setToggleGroup(bg);
 
 		decimalMinutes.setOnAction((action)->{
 			actionPerformed(action);
@@ -66,7 +96,12 @@ public class LatLongPane extends SettingsPane<LatLong>{
 		minutesSeconds.setOnAction((action)->{
 			actionPerformed(action);
 		});
-		mainPane.setTop(top);
+
+		decimal.setOnAction((action)->{
+			actionPerformed(action);
+		});
+
+		mainPane.getChildren().add(top); 
 
 		PamVBox cent = new PamVBox();
 		cent.setSpacing(5);
@@ -75,8 +110,12 @@ public class LatLongPane extends SettingsPane<LatLong>{
 		cent.getChildren().add(latStrip = new LatLongStrip(true));
 		cent.getChildren().add(longStrip = new LatLongStrip(false));
 		
-		mainPane.setCenter(cent);
+		//bit of a hack that makes sure controls are aligned for the latitude and longitude. 
+		latStrip.getTitleLabel().prefWidthProperty().bind(longStrip.getTitleLabel().widthProperty());
 
+		mainPane.getChildren().add(cent); 
+
+		decimal.setSelected(true);
 	}
 
 
@@ -85,16 +124,17 @@ public class LatLongPane extends SettingsPane<LatLong>{
 	 */
 	public void actionPerformed(javafx.event.ActionEvent action) {
 
+
 		if (action.getSource() == decimalMinutes) {
 			LatLong.setFormatStyle(LatLong.FORMAT_DECIMALMINUTES);
-			//			if (latStrip != null) {
-			//				latStrip.setDecimalMinutes(true);
-			//				longStrip.setDecimalMinutes(true);
-			//			}
+		//			if (latStrip != null) {
+		//				latStrip.setDecimalMinutes(true);
+		//				longStrip.setDecimalMinutes(true);
+		//			}
 			latStrip.showControls(LatLong.FORMAT_DECIMALMINUTES);
 			longStrip.showControls(LatLong.FORMAT_DECIMALMINUTES);
 		}
-		else if (action.getSource() == minutesSeconds) {
+		else if  (action.getSource() == minutesSeconds){
 			LatLong.setFormatStyle(LatLong.FORMAT_MINUTESSECONDS);
 			//			if (latStrip != null) {
 			//				latStrip.setDecimalMinutes(false);
@@ -105,19 +145,26 @@ public class LatLongPane extends SettingsPane<LatLong>{
 			latStrip.showControls(LatLong.FORMAT_MINUTESSECONDS);
 			longStrip.showControls(LatLong.FORMAT_MINUTESSECONDS);
 		}
-
+		else if (action.getSource() == decimal){
+			LatLong.setFormatStyle(LatLong.FORMAT_DECIMAL);
+			latStrip.showControls(LatLong.FORMAT_DECIMAL);
+			longStrip.showControls(LatLong.FORMAT_DECIMAL);
+		}
 
 	}
 
 
 
 	private void showLatLong() {
-		decimalMinutes.setSelected(LatLong.getFormatStyle() == LatLong.FORMAT_DECIMALMINUTES);
-		minutesSeconds.setSelected(LatLong.getFormatStyle() == LatLong.FORMAT_MINUTESSECONDS);
-		latStrip.showControls(LatLong.getFormatStyle() );
-		longStrip.showControls(LatLong.getFormatStyle() );
-		latStrip.sayValue(latLong.getLatitude());
-		longStrip.sayValue(latLong.getLongitude());
+		
+		decimalMinutes	.setSelected(LatLong.getFormatStyle() == LatLong.FORMAT_DECIMALMINUTES);
+		minutesSeconds	.setSelected(LatLong.getFormatStyle() == LatLong.FORMAT_MINUTESSECONDS);
+		decimal			.setSelected(LatLong.getFormatStyle() == LatLong.FORMAT_DECIMAL);
+
+		latStrip		.showControls(LatLong.getFormatStyle() );
+		longStrip		.showControls(LatLong.getFormatStyle() );
+		latStrip		.setValue(latLong.getLatitude());
+		longStrip		.setValue(latLong.getLongitude());
 	}
 
 
@@ -127,6 +174,21 @@ public class LatLongPane extends SettingsPane<LatLong>{
 	 */
 	@Override
 	public LatLong getParams(LatLong currentParams) {
+		
+		Toggle selectedButton = this.segmentedButton.getToggleGroup().getSelectedToggle();
+		
+		if (selectedButton == decimalMinutes) {
+			LatLong.setFormatStyle(LatLong.FORMAT_DECIMALMINUTES);
+
+		}
+		else if  (selectedButton == minutesSeconds){
+			LatLong.setFormatStyle(LatLong.FORMAT_MINUTESSECONDS);
+	
+		}
+		else if (selectedButton == decimal){
+			LatLong.setFormatStyle(LatLong.FORMAT_DECIMAL);
+		}
+		
 		latLong = new LatLong(latStrip.getValue(), longStrip.getValue());
 		if (Double.isNaN(latLong.getLatitude()) || Double.isNaN(latLong.getLongitude())) {
 			return null;
