@@ -601,17 +601,15 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 			fileMenu.add(menuItem);
 		}
 
-		if (SMRUEnable.isEnable()) {
-			menuItem = new JMenuItem("Import PAMGuard Modules");
-			menuItem.setToolTipText("Import module settings from a different PAMGuard configuration (psfx files only");
-			menuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					importSettings();
-				}
-			});
-			fileMenu.add(menuItem);
-		}
+		menuItem = new JMenuItem("Import PAMGuard Modules");
+		menuItem.setToolTipText("Import module settings from a different PAMGuard configuration (psfx files only");
+		menuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				importSettings();
+			}
+		});
+		fileMenu.add(menuItem);
 
 		fileMenu.addSeparator();
 

@@ -82,7 +82,13 @@ public class StubRemover {
 	private int searchStubSize(List<SliceData> sliceData, int currentSlice, int peakInd, int searchDir, int diagGap, int currentSize) {
 		int nSlice = sliceData.size();
 		int nextSliceInd = currentSlice + searchDir;
-		if (nextSliceInd < 0 || nextSliceInd >= nSlice-1) {
+		/**
+		 * This function is only every used to throw away very small stubs, so there is no need to get the full size 
+		 * of every one. It's OK to return as soon as the size is bigger than the minimum required to make
+		 * something worth keeping. This reduces the time spent tracing down every little alley which was 
+		 * severely impacting performance for larger whistles. 
+		 */
+		if (nextSliceInd < 0 || nextSliceInd >= nSlice-1 || currentSize > whistleControl.getWhistleToneParameters().minPixels) {
 			return currentSize;
 		}
 		SliceData nextSlice = sliceData.get(nextSliceInd);
