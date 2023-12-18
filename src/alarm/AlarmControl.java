@@ -17,6 +17,7 @@ import alarm.actions.AlarmAction;
 import alarm.actions.email.SendEmailAction;
 import alarm.actions.serial.AlarmSerialAction;
 import alarm.actions.sound.PlaySound;
+import alarm.actions.tast.TastAction;
 import alarm.actions.udp.AlarmUDPAction;
 import userDisplay.UserDisplayComponent;
 import userDisplay.UserDisplayControl;
@@ -54,6 +55,7 @@ public class AlarmControl extends PamControlledUnit implements PamSettings {
 		alarmActions.add(new AlarmSerialAction(this));
 		alarmActions.add(new SendEmailAction(this));
 		alarmActions.add(new AlarmUDPAction(this));
+//		alarmActions.add(new TastAction(this)); // uncomment when alarm action string ready
 	}
 
 	/* (non-Javadoc)

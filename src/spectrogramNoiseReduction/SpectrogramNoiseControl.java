@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.io.Serializable;
 import javax.swing.JMenuItem;
 
+import PamController.PamConfiguration;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamControllerInterface;
@@ -22,7 +23,10 @@ public class SpectrogramNoiseControl extends PamControlledUnit implements PamSet
 	protected SpectrogramNoiseProcess spectrogramNoiseProcess;
 	
 	public SpectrogramNoiseControl(String unitName) {
-		super("Spectrogram Noise Reduction", unitName);
+		this(null, unitName);
+	}
+	public SpectrogramNoiseControl(PamConfiguration pamConfiguration, String unitName) {
+		super(pamConfiguration, "Spectrogram Noise Reduction", unitName);
 		
 		spectrogramNoiseProcess = new SpectrogramNoiseProcess(this);
 		addPamProcess(spectrogramNoiseProcess);

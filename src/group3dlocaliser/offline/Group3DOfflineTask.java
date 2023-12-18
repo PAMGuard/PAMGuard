@@ -2,8 +2,6 @@ package group3dlocaliser.offline;
 
 import java.util.ArrayList;
 
-import Array.ArrayManager;
-import GPS.GPSControl;
 import PamController.PamController;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
@@ -28,7 +26,10 @@ public class Group3DOfflineTask extends OfflineTask<PamDataUnit>{
 		this.group3DControl = group3DControl;
 		group3DProcess = group3DControl.getGroup3dProcess();
 		addAffectedDataBlock(group3DProcess.getGroup3dDataBlock());
-
+		PamDataBlock parentData = group3DProcess.getParentDataBlock();
+		if (parentData != null) {
+			this.addRequiredDataBlock(parentData);
+		}
 	}
 
 	@Override
@@ -99,11 +100,6 @@ public class Group3DOfflineTask extends OfflineTask<PamDataUnit>{
 			OfflineEventDataBlock evDataBlock = clickDataBlock.getClickControl().getClickDetector().getOfflineEventDataBlock();
 			addRequiredDataBlock(evDataBlock);
 		}
-		addRequiredDataBlock(ArrayManager.getArrayManager().getHydrophoneDataBlock()); 
-		if (GPSControl.getGpsControl()!=null) {
-			addRequiredDataBlock(GPSControl.getGpsControl().getGpsDataBlock()); 
-		}
-
 	}
 
 	@Override

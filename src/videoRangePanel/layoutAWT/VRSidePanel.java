@@ -179,7 +179,7 @@ public class VRSidePanel implements PamSidePanel {
 			}
 			
 			if (vrControl.getVRParams().currentImageFile==null) {
-				PamDialog.showWarning(vrControl.getPamView().getGuiFrame(), "No image found", "The folder selected did not contain any compatible images");
+				PamDialog.showWarning(vrControl.getGuiFrame(), "No image found", "The folder selected did not contain any compatible images");
 				return;
 			}
 			vrControl.loadFile(vrControl.getVRParams().currentImageFile);
