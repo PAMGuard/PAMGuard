@@ -1,0 +1,4 @@
+#NOTE: This is an Aether internal implementation file, its format can be changed without prior notice.
+#Mon Dec 18 18:10:14 GMT 2023
+javaclient-3.0.jar>=
+javaclient-3.0.pom>=
