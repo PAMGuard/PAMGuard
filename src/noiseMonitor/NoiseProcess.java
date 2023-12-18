@@ -129,7 +129,7 @@ public class NoiseProcess extends PamProcess {
 	}
 
 	private void findDataSource() {
-		PamDataBlock source = PamController.getInstance().getDataBlock(FFTDataUnit.class, 
+		PamDataBlock source = noiseControl.getPamConfiguration().getDataBlock(FFTDataUnit.class, 
 				noiseControl.noiseSettings.dataSource);
 		daqProcess = null;
 		

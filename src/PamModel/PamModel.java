@@ -74,7 +74,7 @@ import PamUtils.FileFinder;
  * PamController.
  * 
  */
-final public class PamModel implements PamModelInterface, PamSettings {
+final public class PamModel implements PamSettings {
 
 	private PamController pamController;
 
@@ -982,7 +982,6 @@ final public class PamModel implements PamModelInterface, PamSettings {
 
 	}
 
-	@Override
 	public boolean modelSettings(JFrame frame) {
 		PamModelSettings newSettings = ThreadingDialog.showDialog(frame, pamModelSettings);
 		if (newSettings != null) {

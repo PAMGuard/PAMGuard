@@ -403,7 +403,7 @@ public class ClickDetector extends PamProcess {
 			// try to connect automatically to the acquisition module ...
 			// ArrayList<PamDataBlock> rawBlocks =
 			// PamController.getInstance().getDataBlocks(RawDataUnit.class, false);
-			AcquisitionControl daq = (AcquisitionControl) PamController.getInstance()
+			AcquisitionControl daq = (AcquisitionControl) clickControl.getPamConfiguration()
 					.findControlledUnit(AcquisitionControl.unitType);
 			if (daq != null) {
 				rawDataSource = daq.getRawDataBlock();

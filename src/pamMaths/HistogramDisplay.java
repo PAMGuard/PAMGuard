@@ -407,9 +407,6 @@ public class HistogramDisplay extends Object implements Observer {
 		public void updateWindow() {
 			int nRows = rowLabels.length;
 			int iRow;
-			if (numbers == null || numbers.length == 0) {
-				return;
-			}
 			// check all the controls are there and lay them out
 			if (numbers == null || numbers.length != pamHistograms.size() || 
 					numbers[0].length != rowLabels.length || selectedStats != oldStatsSelection) {

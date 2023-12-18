@@ -10,6 +10,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
+import PamController.PamConfiguration;
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamController.PamControllerInterface;
@@ -33,6 +34,9 @@ public class PamModuleInfo implements PamDependent{
 	private String defaultName;
 	private Class moduleClass;
 	private String toolTipText;
+	
+	private static final Class[] constrParams1 = {PamConfiguration.class, String.class};
+	private static final Class[] constrParams2 = {String.class};
 	
 	/**
 	 * A list of possible GUI types the module can have. These are received from flags in PAMGuiManager();
@@ -209,7 +213,7 @@ public class PamModuleInfo implements PamDependent{
 			  dependencyManager.checkDependency(parentFrame, moduleInfo, true);
 			}
 			// create a new PamControlledUnit and add it to PamGuard ...
-			PamControllerInterface pamController = PamController.getInstance();
+			PamController pamController = PamController.getInstance();
 		
 			pamController.addModule(parentFrame, moduleInfo);
 		}
@@ -219,36 +223,61 @@ public class PamModuleInfo implements PamDependent{
 	public AddModuleMenuAction getMenuAction(Frame parentFrame) {
 		return new AddModuleMenuAction(parentFrame, this);
 	}
-	
+
 	public PamControlledUnit create(String unitName) {
+		return create(null, unitName);
+	}
+	
+	public PamControlledUnit create(PamConfiguration pamConfiguration, String unitName) {
 		
 		PamControlledUnit newUnit = null;
-		Class[] paramList = new Class[1];
-		paramList[0] = unitName.getClass();
+//		Class[] paramList = new Class[1];
+//		paramList[0] = unitName.getClass();
+		boolean error = false;
 		try {
-			Constructor constructor = moduleClass.getConstructor(paramList);
-//			Debug.out.println("unitName:"+ unitName);
-			newUnit = (PamControlledUnit) constructor.newInstance(unitName);
+			Constructor constructor = moduleClass.getConstructor(constrParams1);
+			newUnit = (PamControlledUnit) constructor.newInstance(pamConfiguration, unitName);
 			newUnit.setPamModuleInfo(this);
 		}
 		catch (Exception Ex) {
-			String title = "Error loading module";
-			String msg = "There was an error trying to load " + unitName + ".<p>" +
-					"If this is a core Pamguard module, please copy the error message text and email to " +
-					"support@pamguard.org.<p>" +
-					"If this is a plug-in, the error may have been caused by an incompatibility between " +
-					"it and this version of PAMGuard, or a problem with the code.  Please check the developer's website for help.<p>" +
-					"This module will not be loaded.";
-			String help = null;
-			int ans = WarnOnce.showWarning(title, msg, WarnOnce.WARNING_MESSAGE, help, Ex);
-			System.err.println("Exception while loading " +	Ex.getMessage());
-			Ex.printStackTrace();
-			return null;
 		}
-		
+		if (newUnit == null) {
+			try {
+				Constructor constructor = moduleClass.getConstructor(constrParams2);
+				newUnit = (PamControlledUnit) constructor.newInstance(unitName);
+				newUnit.setPamModuleInfo(this);
+			}
+			catch (Exception Ex) {
+				String title = "Error loading module";
+				String msg = "There was an error trying to load " + unitName + ".<p>" +
+						"If this is a core Pamguard module, please copy the error message text and email to " +
+						"support@pamguard.org.<p>" +
+						"If this is a plug-in, the error may have been caused by an incompatibility between " +
+						"it and this version of PAMGuard, or a problem with the code.  Please check the developer's website for help.<p>" +
+						"This module will not be loaded.";
+				String help = null;
+				int ans = WarnOnce.showWarning(title, msg, WarnOnce.WARNING_MESSAGE, help, Ex);
+				System.err.println("Exception while loading " +	Ex.getMessage());
+				Ex.printStackTrace();
+				return null;
+			}
+		}
+
 		setNInstances(nInstances + 1);
 				
 		return newUnit;
+	}
+	
+	private Constructor findConstructor() throws NoSuchMethodException, SecurityException {
+		Constructor constructor = null;
+		try {
+			constructor = moduleClass.getConstructor(constrParams1);
+			return constructor;
+		} catch (NoSuchMethodException | SecurityException e1) {
+		}
+
+		constructor = moduleClass.getConstructor(constrParams2);
+		return constructor;
 	}
 	
 	private void moduleRemoved(PamControlledUnit controlledUnit) {
@@ -376,7 +405,7 @@ public class PamModuleInfo implements PamDependent{
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			int ans = JOptionPane.showConfirmDialog(pamControlledUnit.getPamView().getGuiFrame(),
+			int ans = JOptionPane.showConfirmDialog(pamControlledUnit.getGuiFrame(),
 					"Do you really want to remove the module " 
 					+ pamControlledUnit.getUnitName());
 			if (ans == JOptionPane.YES_OPTION) {

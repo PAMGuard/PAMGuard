@@ -84,7 +84,7 @@ public class ClickTrainOfflineProcess {
 		
 		//if null open the dialog- also create a new offlineTask group if the datablock has changed. 
 		if (clickTrainDialog == null) {
-			clickTrainDialog = new CTProcessDialog(this.clickTrainControl.getPamView().getGuiFrame(), 
+			clickTrainDialog = new CTProcessDialog(this.clickTrainControl.getGuiFrame(), 
 					clickTrainOfflineGroup, "Click Train Detection");
 			//batchLocaliseDialog.setModalityType(Dialog.ModalityType.MODELESS);
 		}

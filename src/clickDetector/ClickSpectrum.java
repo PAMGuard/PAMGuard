@@ -841,7 +841,7 @@ public class ClickSpectrum extends ClickDisplay implements PamObserver , PamSett
 		pt.x += 10;
 		pt.y += 20;
 		ClickSpectrumParams newParams = ClickSpectrumDialog.showDialog(
-				clickControl.getPamView().getGuiFrame(), pt, this, clickSpectrumParams);
+				clickControl.getGuiFrame(), pt, this, clickSpectrumParams);
 		if (newParams != null) {
 			if (newParams.plotCepstrum) {
 				newParams.logScale = false;
@@ -859,7 +859,7 @@ public class ClickSpectrum extends ClickDisplay implements PamObserver , PamSett
 		pt.x += 10;
 		pt.y += 20;
 		ClickSpectrumTemplateParams newTempParams = ClickSpectrumTemplateEditDialog.showDialog(
-				clickControl.getPamView().getGuiFrame(), pt, this, clickTemplateParams,clickControl);
+				clickControl.getGuiFrame(), pt, this, clickTemplateParams,clickControl);
 		if (newTempParams!=null){
 			clickTemplateParams = newTempParams.clone();
 			sortWestAxis();
@@ -873,7 +873,7 @@ public class ClickSpectrum extends ClickDisplay implements PamObserver , PamSett
 		pt.x += 10;
 		pt.y += 20;
 		ClickSpectrumTemplateParams newTempParams = ClickSpectrumTemplateDialog.showDialog(
-				clickControl.getPamView().getGuiFrame(), pt, this, clickTemplateParams);
+				clickControl.getGuiFrame(), pt, this, clickTemplateParams);
 		if (newTempParams!=null){
 			clickTemplateParams = newTempParams.clone();
 			sortWestAxis();

@@ -975,7 +975,7 @@ public class IDI_Display extends ClickDisplay implements PamObserver, PamSetting
 			pt.y -= 10;
 			pt.x += 10;
 			IDI_DisplayParams newParams = IDI_DisplayDialog.showDialog(
-					clickControl.getPamView().getGuiFrame(), pt, idiParams);
+					clickControl.getGuiFrame(), pt, idiParams);
 			if (newParams != null) {
 				idiParams = newParams.clone();
                 setParameters();
