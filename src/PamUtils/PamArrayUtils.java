@@ -22,19 +22,19 @@ public class PamArrayUtils {
 	/**
 	 * Calculate the mean of one dimension within a list of points. <i>e.g.</i> the points might be a list of [x y z] co-ordinates in 
 	 * which case the dim=0 would return the mean of all x points. 
-	 * @param array - a list of points
+	 * @param successJump - a list of points
 	 * @param InitialtoIgnorePercentage: ignore the first percentage of results
 	 * @param dim - the dimension of the point to calculate the average for
 	 * @return the mean of one dimension of the list of the points. 
 	 */
-	public static double mean(ArrayList<float[]> array, double InitialtoIgnorePercentage, int dim){
+	public static double mean(ArrayList<double[]> successJump, double InitialtoIgnorePercentage, int dim){
 
 		double meanTotal=0;
 		int n=0;
-		int forStart=(int) Math.round((InitialtoIgnorePercentage)*array.size());
+		int forStart=(int) Math.round((InitialtoIgnorePercentage)*successJump.size());
 
-		for (int i=forStart; i<array.size();i++){
-			meanTotal+= array.get(i)[dim];
+		for (int i=forStart; i<successJump.size();i++){
+			meanTotal+= successJump.get(i)[dim];
 			n++;
 		}
 
@@ -46,21 +46,21 @@ public class PamArrayUtils {
 
 	/**
 	 * Calculate the standard deviation of an array of doubles, ignoring an 'initialtoIgnorePercentage' percentage of jumps
-	 * @param array
+	 * @param successJump
 	 * @param initialtoIgnorePercentage- percentage of initial values to ignore.
 	 * @return standard deviation of array. 
 	 */
-	public static double std(ArrayList<float[]> array, double initialtoIgnorePercentage, int dim){
+	public static double std(ArrayList<double[]> successJump, double initialtoIgnorePercentage, int dim){
 		double std=0.0;
 
 		int n=0;
-		int forStart=(int) Math.round((initialtoIgnorePercentage)*array.size());
+		int forStart=(int) Math.round((initialtoIgnorePercentage)*successJump.size());
 
-		double meanTotal= mean(array,  initialtoIgnorePercentage,  dim);
+		double meanTotal= mean(successJump,  initialtoIgnorePercentage,  dim);
 
 		//calculate standard deviation
-		for (int k=forStart;k<array.size(); k++){
-			std+=Math.pow((array.get(k)[dim]-meanTotal),2);
+		for (int k=forStart;k<successJump.size(); k++){
+			std+=Math.pow((successJump.get(k)[dim]-meanTotal),2);
 		}
 
 		//standard deviation
@@ -1058,6 +1058,8 @@ public class PamArrayUtils {
 
 
 
+
+
 	
 	
 	
@@ -1071,4 +1073,3 @@ public class PamArrayUtils {
 
 
 }
-
