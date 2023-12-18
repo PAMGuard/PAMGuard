@@ -70,7 +70,7 @@ public class MTOfflineProcess {
 		
 		//if null open the dialog- also create a new offlineTask group if the datablock has changed. 
 		if (mtOfflineDialog == null) {
-			mtOfflineDialog = new OLProcessDialog(this.mtContorl.getGuiFrame(), 
+			mtOfflineDialog = new OLProcessDialog(this.mtContorl.getPamView().getGuiFrame(), 
 					mtOfflineGroup, "Match Template Classifier");
 			//batchLocaliseDialog.setModalityType(Dialog.ModalityType.MODELESS);
 		}

@@ -15,7 +15,6 @@ import spectrogramNoiseReduction.threshold.ThresholdParams;
 
 import fftManager.FFTDataBlock;
 import fftManager.FFTDataUnit;
-import PamController.PamConfiguration;
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamUtils.complex.ComplexArray;
@@ -65,11 +64,7 @@ public class SpectrogramNoiseProcess extends PamProcess {
 	@Override
 	public void setupProcess() {
 		super.setupProcess();
-		
-		PamConfiguration mainConfig = PamController.getInstance().getPamConfiguration();
-		PamConfiguration localConfig = getPamControlledUnit().getPamConfiguration();
-		
-		sourceData = (FFTDataBlock) getPamControlledUnit().getPamConfiguration().getDataBlock(FFTDataUnit.class, 
+		sourceData = (FFTDataBlock) PamController.getInstance().getDataBlock(FFTDataUnit.class, 
 				getNoiseSettings().dataSource);
 		setParentDataBlock(sourceData);
 		

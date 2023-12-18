@@ -64,7 +64,7 @@ public class TargetMotionLocaliser<T extends PamDataUnit> extends AbstractLocali
 
 //	public boolean showTMDialog(T dataUnit) {
 //		if (targetMotionMainPanel == null) {
-////targetMotionDialog = new TargetMotionMainPanel<T>(pamControlledUnit.getGuiFrame(), this);
+////targetMotionDialog = new TargetMotionMainPanel<T>(pamControlledUnit.getPamView().getGuiFrame(), this);
 //		}
 //		targetMotionMainPanel.updateCurrentControlPanel();
 //		return true;

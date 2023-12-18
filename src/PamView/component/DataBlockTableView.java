@@ -11,7 +11,6 @@ import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
@@ -130,14 +129,6 @@ public abstract class DataBlockTableView<T extends PamDataUnit> {
 	}
 	
 	/**
-	 * Get table. Allows adding of more menu handlers, etc. 
-	 * @return the table object. 
-	 */
-	public JTable getTable() {
-		return testTable;
-	}
-	
-	/**
 	 * Set allowing of multiple row selection. 
 	 * @param allow
 	 */
@@ -237,7 +228,7 @@ public abstract class DataBlockTableView<T extends PamDataUnit> {
 	 * @param tableRow
 	 * @return data unit for the table row. 
 	 */
-	protected final T getDataUnit(int tableRow) {
+	private final T getDataUnit(int tableRow) {
 		synchronized (copySynch) {
 			int rowIndex = getDataIndexForRow(tableRow);
 			if (rowIndex < 0) return null;
@@ -386,7 +377,7 @@ public abstract class DataBlockTableView<T extends PamDataUnit> {
 	 * so consider changing the row selection
 	 * @param e
 	 */
-	protected void checkRowSelection(MouseEvent e) {
+	private void checkRowSelection(MouseEvent e) {
 		int tableRow = testTable.rowAtPoint(e.getPoint());
 		int currentRow = testTable.getSelectedRow();
 		if (tableRow != currentRow) {
@@ -396,16 +387,6 @@ public abstract class DataBlockTableView<T extends PamDataUnit> {
 				testTable.setRowSelectionInterval(tableRow, tableRow);
 			}
 		}
-	}
-
-	/**
-	 * Put the getColumnName function out here, so that subclasses can 
-	 * more easily override it than if it's buried in the table model 
-	 * @param column
-	 * @return colum name
-	 */
-	public String getColumnName(int column) {
-		return getColumnNames()[column];
 	}
 
 	private class ViewScrollObserver implements PamScrollObserver {
@@ -467,7 +448,7 @@ public abstract class DataBlockTableView<T extends PamDataUnit> {
 		 */
 		@Override
 		public String getColumnName(int column) {
-			return DataBlockTableView.this.getColumnName(column);
+			return getColumnNames()[column];
 		}
 
 		/* (non-Javadoc)

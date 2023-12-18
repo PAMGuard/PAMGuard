@@ -25,7 +25,7 @@ import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
-import PamModel.PamModel;
+import PamModel.PamModelInterface;
 import PamModel.PamModuleInfo;
 import PamView.GuiFrameManager;
 import PamView.PamViewInterface;
@@ -102,7 +102,7 @@ public interface PamControllerInterface {
 	 * 
 	 * @return Reference to the PamGuard model
 	 */
-	public PamModel getModelInterface();
+	public PamModelInterface getModelInterface();
 
 	/**
 	 * Instruction to the controller (probably from a menu command inthe view)

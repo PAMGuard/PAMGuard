@@ -22,7 +22,7 @@ public class AutecPhonesControl extends PamControlledUnit {
 	}
 
 	public Frame getGuiFrame() {
-		return super.getGuiFrame();
+		return super.getPamView().getGuiFrame();
 	}
 	class AutecProcess extends PamProcess {
 

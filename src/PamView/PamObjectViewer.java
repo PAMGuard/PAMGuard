@@ -42,7 +42,6 @@ import javax.swing.Timer;
 import javax.swing.WindowConstants;
 
 import PamController.NewModuleDialog;
-import PamController.PamConfiguration;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
@@ -115,11 +114,9 @@ public class PamObjectViewer implements PamViewInterface, ComponentListener,
 	
 	private Stroke arrowStroke, instantArrowStroke;
 
-	private PamConfiguration pamConfiguration;
-
 	// Font controllerFont, processFont, datablockFont;
 
-	private PamObjectViewer(Frame frame) {
+	private PamObjectViewer(JFrame frame) {
 		
 		arrowStroke = new BasicStroke(1.5f);
 		instantArrowStroke = new BasicStroke(1.5f);
@@ -128,26 +125,22 @@ public class PamObjectViewer implements PamViewInterface, ComponentListener,
 
 		objectFrame = new ObjectFrame(frame);
 
-//		MakeDiagram();
+		MakeDiagram();
 
 		PamController.getInstance().addView(this);
 
 		PamSettingManager.getInstance().registerSettings(this);
 	}
 
-	static public PamObjectViewer getObjectViewer(Frame frame) {
+	static public PamObjectViewer getObjectViewer(JFrame frame) {
 		if (singleInstance == null) {
 			singleInstance = new PamObjectViewer(frame);
 		}
 		return singleInstance;
 	}
 
-	static public void Show(Frame frame, PamConfiguration pamConfiguration) {
-
-		getObjectViewer(frame).setConfiguration(pamConfiguration);
+	static public void Show(JFrame frame) {
 		getObjectViewer(frame).objectFrame.setVisible(true);
-		
-		singleInstance.MakeDiagram();
 		
 		// Go through all of the processes/datablocks in every view and update button/tooltip text.
 		// Mostly done for the FFT Engine process because it includes the FFT size in the
@@ -171,10 +164,6 @@ public class PamObjectViewer implements PamViewInterface, ComponentListener,
 		}
 	}
 
-	private void setConfiguration(PamConfiguration pamConfiguration) {
-		this.pamConfiguration = pamConfiguration;
-	}
-
 	void MakeDiagram() {
 
 		if (pamObjectViewerSettings.viewStyle == PamObjectViewerSettings.VIEWBYPROCESS) {
@@ -191,16 +180,12 @@ public class PamObjectViewer implements PamViewInterface, ComponentListener,
 	private void makeControllerDiagram() {
 
 		clearDiagram();
-		
-		if (pamConfiguration == null) {
-			return;
-		}
-		
+		PamControllerInterface pamController = PamController.getInstance();
 		PamControlledUnit pamControlledUnit;
 		PamControllerView pamControllerView;
 		controllerList = new ArrayList<PamControllerView>();
-		for (int iUnit = 0; iUnit < pamConfiguration.getNumControlledUnits(); iUnit++) {
-			pamControlledUnit = pamConfiguration.getControlledUnit(iUnit);
+		for (int iUnit = 0; iUnit < pamController.getNumControlledUnits(); iUnit++) {
+			pamControlledUnit = pamController.getControlledUnit(iUnit);
 			if (pamControlledUnit.getNumPamProcesses() == 0
 					&& pamObjectViewerSettings.showProcesslessModules == false) {
 				continue;
@@ -213,6 +198,25 @@ public class PamObjectViewer implements PamViewInterface, ComponentListener,
 
 	}
 
+	// private void makeProcesslessModules() {
+	// PamControllerInterface pamController = PamController.getInstance();
+	// PamControlledUnit pamControlledUnit;
+	// PamControllerView pamControllerView;
+	// if (controllerList == null)
+	// controllerList = new ArrayList<PamControllerView>();
+	// for (int iUnit = 0; iUnit < pamController.getNumControlledUnits();
+	// iUnit++) {
+	// pamControlledUnit = pamController.getControlledUnit(iUnit);
+	// if (pamControlledUnit.getNumPamProcesses() > 0) {
+	// continue;
+	// }
+	// pamControllerView = new PamControllerView(pamControlledUnit);
+	// controllerList.add(pamControllerView);
+	// layoutPanel.add(pamControllerView);
+	// pamControllerView.addComponentListener(this);
+	// }
+	//		
+	// }
 	private void layoutControllerDiagram() {
 		if (controllerList == null) {
 			return;
@@ -281,10 +285,11 @@ public class PamObjectViewer implements PamViewInterface, ComponentListener,
 		int x = xStart;
 		int y = yStart;
 
+		PamControllerInterface pamController = PamController.getInstance();
 		PamControlledUnit pamControlledUnit;
 		PamProcess pamProcess;
-		for (int iUnit = 0; iUnit < pamConfiguration.getNumControlledUnits(); iUnit++) {
-			pamControlledUnit = pamConfiguration.getControlledUnit(iUnit);
+		for (int iUnit = 0; iUnit < pamController.getNumControlledUnits(); iUnit++) {
+			pamControlledUnit = pamController.getControlledUnit(iUnit);
 			for (int iP = 0; iP < pamControlledUnit.getNumPamProcesses(); iP++) {
 				pamProcess = pamControlledUnit.getPamProcess(iP);
 				pamProcessView = new PamProcessView(pamControlledUnit,
@@ -412,7 +417,7 @@ public class PamObjectViewer implements PamViewInterface, ComponentListener,
 
 	class ObjectFrame extends JFrame implements ActionListener {
 
-		ObjectFrame(Frame frame) {
+		ObjectFrame(JFrame frame) {
 			setTitle("Pamguard Data Model");
 
 			// fixed case of Resources 17/8/08 DG.
@@ -594,9 +599,6 @@ public class PamObjectViewer implements PamViewInterface, ComponentListener,
 			int bestYGap;
 			Rectangle sourceBounds, destBounds;
 			hasInstant = false;
-			if (controllerList == null) {
-				return;
-			}
 			for (int i = 0; i < controllerList.size(); i++) {
 				pamControllerView = controllerList.get(i);
 				pamControlledUnit = pamControllerView.pamControlledUnit;

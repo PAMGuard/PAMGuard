@@ -44,7 +44,6 @@ import binaryFileStorage.BinaryStore;
 import Filters.FilterDialog;
 import Filters.FilterParams;
 import Localiser.detectionGroupLocaliser.GroupDetection;
-import PamController.PamConfiguration;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitGUI;
 import PamController.PamControlledUnitSettings;
@@ -98,7 +97,6 @@ import dataPlotsFX.data.TDDataProviderRegisterFX;
 import detectionPlotFX.data.DDPlotRegister;
 import detectionPlotFX.rawDDPlot.ClickDDPlotProvider;
 import fftManager.fftorganiser.FFTDataOrganiser;
-import offlineProcessing.OfflineTaskGroup;
 
 /**
  * Main Controller for click detection.
@@ -209,22 +207,9 @@ public class ClickControl extends PamControlledUnit implements PamSettings {
 
 	public static final String UNITTYPE = "Click Detector";
 
-	/**
-	 * Old style constructor which only gets a name
-	 * @param name
-	 */
 	public ClickControl(String name) {
-		this(null, name);
-	}
-	
-	/**
-	 * New style constructor which get a configuraiton and a name. 
-	 * @param pamConfiguration
-	 * @param name
-	 */
-	public ClickControl(PamConfiguration pamConfiguration, String name) {
 
-		super(pamConfiguration, UNITTYPE, name);
+		super(UNITTYPE, name);
 
 		sortDataBlockPrefix();
 
@@ -234,6 +219,7 @@ public class ClickControl extends PamControlledUnit implements PamSettings {
 		//			rawDataBlock = (PamRawDataBlock) inputControl.getPamProcess(0).getOutputDataBlock(0);
 		//		}
 		clickControl = this;
+
 
 		angleVetoes = new AngleVetoes(this);
 
@@ -301,9 +287,6 @@ public class ClickControl extends PamControlledUnit implements PamSettings {
 			// check if a Rocca module is loaded.
 			roccaControl = (RoccaControl) PamController.getInstance().findControlledUnit(RoccaControl.unitType);
 
-		}
-		else {
-			ClicksOffline.getOfflineTaskGroup(this);
 		}
 
 		if (PamGUIManager.isSwing()) {
@@ -1005,19 +988,6 @@ public class ClickControl extends PamControlledUnit implements PamSettings {
 		return clicksOffline;
 	}
 
-//	/**
-//	 * @return the number of offlineTaskGroups
-//	 */
-//	public int getNumOfflineTaskGroups() {
-//		return 1;
-//	}
-//	
-//	/**
-//	 * @return the iTH offlineTaskGroup
-//	 */
-//	public OfflineTaskGroup getOfflineTaskGroup(int i) {
-//		return offlineTaskGroups.get(i);
-//	}
 
 	/**
 	 * @return the latestOfflineEvent
@@ -1217,8 +1187,7 @@ public class ClickControl extends PamControlledUnit implements PamSettings {
 	 * @return
 	 */
 	public PamRawDataBlock findRawDataBlock() {
-		return getPamConfiguration().getRawDataBlock(clickParameters.getRawDataSource());
-//		return (PamController.getInstance().getRawDataBlock(clickParameters.getRawDataSource()));
+		return (PamController.getInstance().getRawDataBlock(clickParameters.getRawDataSource()));
 	}
 
 

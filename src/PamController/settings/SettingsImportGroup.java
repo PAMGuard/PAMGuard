@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
-import PamController.UsedModuleInfo;
 import PamModel.PamModuleInfo;
 
 /**
@@ -21,26 +20,19 @@ public class SettingsImportGroup {
 	
 	private ArrayList<PamControlledUnitSettings> subSettings = new ArrayList<>();
 
-	private UsedModuleInfo usedModuleInfo;
+	private PamModuleInfo moduleInfo;
 
 	private ArrayList<ImportChoice> importChoices;
 	
 	private ImportChoice importChoice;
-
-
-	public SettingsImportGroup(UsedModuleInfo moduleInfo) {
-		super();
-		this.usedModuleInfo = moduleInfo;
-	}
-	
 	/**
 	 * Constructor takes the main settings
 	 * @param mainSettings
 	 * @param moduleInfo 
 	 */
-	public SettingsImportGroup(PamControlledUnitSettings mainSettings, UsedModuleInfo moduleInfo) {
+	public SettingsImportGroup(PamControlledUnitSettings mainSettings, PamModuleInfo moduleInfo) {
 		this.mainSettings = mainSettings;
-		this.usedModuleInfo = moduleInfo;
+		this.moduleInfo = moduleInfo;
 	}
 
 	/**
@@ -80,7 +72,7 @@ public class SettingsImportGroup {
 		importChoices.add(importChoice = new ImportChoice(ImportChoice.DONT_IMPORT, null));
 		Class ownerClass = null;
 		try {
-			ownerClass = Class.forName(usedModuleInfo.className);
+			ownerClass = Class.forName(mainSettings.getOwnerClassName());
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -88,9 +80,8 @@ public class SettingsImportGroup {
 		ArrayList<PamControlledUnit> existingModules = 
 				PamController.getInstance().findControlledUnits(ownerClass);
 		int maxnumber = 1; // this will only ever be used by the Array Manager which doesn't have a moduleInfo. 
-		PamModuleInfo pamModuleInfo = getPamModuleInfo();
-		if (pamModuleInfo != null) {
-			maxnumber = pamModuleInfo.getMaxNumber();
+		if (this.moduleInfo != null) {
+			maxnumber = moduleInfo.getMaxNumber();
 		}
 		if (existingModules != null) {
 			for (int i = 0; i < existingModules.size(); i++) {
@@ -120,29 +111,10 @@ public class SettingsImportGroup {
 	}
 
 	/**
-	 * This is the information from an existing module, which may not
-	 * have the full class name, but does have the type and name of the 
-	 * module being imported. 
 	 * @return the moduleInfo
 	 */
-	public UsedModuleInfo getUsedModuleInfo() {
-		return usedModuleInfo;
-	}
-	
-	/**
-	 * this is the module information held in the PamModel which 
-	 * is used to create a module. 
-	 * @return
-	 */
-	public PamModuleInfo getPamModuleInfo() {
-		return PamModuleInfo.findModuleInfo(usedModuleInfo.className);
-	}
-
-	/**
-	 * @param mainSettings the mainSettings to set
-	 */
-	public void setMainSettings(PamControlledUnitSettings mainSettings) {
-		this.mainSettings = mainSettings;
+	public PamModuleInfo getModuleInfo() {
+		return moduleInfo;
 	}
 	
 	

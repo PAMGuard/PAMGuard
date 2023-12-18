@@ -123,7 +123,7 @@ public class RadarDisplay extends UserFramePlots implements PamObserver, PamSett
 		if (this.radarParameters == null) {
 			this.radarParameters = new RadarParameters();
 			RadarParameters newParams = RadarParametersDialog.showDialog(RadarDisplay.this,
-					userDisplayControl.getGuiFrame(), this.radarParameters, radarProjector);
+					userDisplayControl.getPamView().getGuiFrame(), this.radarParameters, radarProjector);
 			if (newParams != null) {
 				this.radarParameters = newParams.clone();
 			}
@@ -697,7 +697,7 @@ public class RadarDisplay extends UserFramePlots implements PamObserver, PamSett
 		public void actionPerformed(ActionEvent e) {
 
 			RadarParameters newParams = RadarParametersDialog.showDialog(RadarDisplay.this,
-					userDisplayControl.getGuiFrame(), radarParameters, radarProjector);
+					userDisplayControl.getPamView().getGuiFrame(), radarParameters, radarProjector);
 			if (newParams != null) {
 				radarParameters = newParams.clone();
 				newSettings();

@@ -198,7 +198,6 @@ public class PSFXReadWriter {
 		BinaryHeader bh = new BinaryHeader();
 		bh.readHeader(dis);
 		PamSettingsGroup psg = new PamSettingsGroup(bh.getDataDate());
-		ArrayList<ModuleNameObject> moduleNames = new ArrayList<ModuleNameObject>();
 		/*
 		 * 
 			dos.writeInt(totalLen);
@@ -218,7 +217,6 @@ public class PSFXReadWriter {
 				dis.read(data);
 				if (objectId == ModuleNameObject.typeId) {
 					ModuleNameObject mno = new ModuleNameObject(data);
-					moduleNames.add(mno);
 				}
 				else if (objectId == 2) {
 					PamControlledUnitSettings pcsu = PamControlledUnitSettings.createFromNamedByteArray(data);

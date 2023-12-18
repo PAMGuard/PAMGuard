@@ -765,7 +765,7 @@ public class ClickWaveform extends ClickDisplay implements PamObserver {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 
-			ClickParameters newParams = WaveDisplayDialog.showDialog(clickControl.getGuiFrame(),
+			ClickParameters newParams = WaveDisplayDialog.showDialog(clickControl.getPamView().getGuiFrame(),
 					clickWaveform, clickControl.clickParameters);
 			if (newParams != null) {
 				clickControl.clickParameters = newParams.clone();

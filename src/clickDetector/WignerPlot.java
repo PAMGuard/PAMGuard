@@ -248,7 +248,7 @@ public class WignerPlot extends ClickDisplay implements PamSettings {
 			pt.y -= 10;
 			pt.x += 10;
 			WignerPlotOptions newoptions = WignerPlotdialog.showDialog(
-					clickControl.getGuiFrame(), pt, wignerPlotOptions);
+					clickControl.getPamView().getGuiFrame(), pt, wignerPlotOptions);
 			if (newoptions != null) {
 				wignerPlotOptions = newoptions.clone();
 				clickedOnClick(lastClick);

@@ -19,7 +19,6 @@ import detectionPlotFX.whistleDDPlot.WhistleDDPlotProvider;
 import spectrogramNoiseReduction.SpectrogramNoiseProcess;
 import whistlesAndMoans.layoutFX.WhistleMoanGUIFX;
 import whistlesAndMoans.plots.WhistlePlotProvider;
-import PamController.PamConfiguration;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitGUI;
 import PamController.PamControlledUnitSettings;
@@ -56,10 +55,7 @@ public class WhistleMoanControl extends PamControlledUnit implements PamSettings
 	public static final String UNITTYPE = "WhistlesMoans";
 
 	public WhistleMoanControl(String unitName) {
-		this(null, unitName);
-	}
-	public WhistleMoanControl(PamConfiguration pamConfiguration, String unitName) {
-		super(pamConfiguration, UNITTYPE, unitName);
+		super(UNITTYPE, unitName);
 
 		spectrogramNoiseProcess = new SpectrogramNoiseProcess(this);
 		addPamProcess(spectrogramNoiseProcess);

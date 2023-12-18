@@ -29,7 +29,6 @@ import javax.swing.JFrame;
  *         order that the PamController and the PamView can interface with the
  *         model.
  */
-@Deprecated
 public interface PamModelInterface {
 
 	/**

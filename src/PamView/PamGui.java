@@ -87,6 +87,7 @@ import PamController.PamguardVersionInfo;
 import PamController.settings.SettingsImport;
 import PamModel.CommonPluginInterface;
 import PamModel.PamModel;
+import PamModel.PamModelInterface;
 import PamModel.PamModuleInfo;
 import PamModel.PamPluginInterface;
 import PamModel.AboutPluginDisplay;
@@ -132,14 +133,11 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	 * Outer layered pane which allows things to be added the GUI. 
 	 */
 	private JLayeredPane layeredPane;
-	private PamController pamController;
 
-	public PamGui(PamController pamControllerInterface, 
-			PamModel pamModelInterface, int frameNumber)
+	public PamGui(PamControllerInterface pamControllerInterface, 
+			PamModelInterface pamModelInterface, int frameNumber)
 	{
 		super(pamControllerInterface, pamModelInterface, frameNumber);
-		
-		this.pamController = pamControllerInterface;
 
 		startMenuEnabler = new MenuItemEnabler();
 		stopMenuEnabler = new MenuItemEnabler();
@@ -1200,7 +1198,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 
 	class menuShowObjectDiagram implements ActionListener {
 		public void actionPerformed(ActionEvent ev){
-			PamObjectViewer.Show(getGuiFrame(), pamController.getPamConfiguration());
+			PamObjectViewer.Show(getGuiFrame());
 		}
 	}
 

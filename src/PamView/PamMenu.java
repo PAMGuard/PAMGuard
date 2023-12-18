@@ -26,7 +26,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
-import PamModel.PamModel;
+import PamModel.PamModelInterface;
 
 /**
  * @author dgillespie
@@ -39,7 +39,7 @@ import PamModel.PamModel;
  * 
  */
 public class PamMenu {
-	static public JMenuBar createBasicMenu(PamModel pamModelInterface,
+	static public JMenuBar createBasicMenu(PamModelInterface pamModelInterface,
 			ActionListener actionListener) {
 
 		JMenuBar menuBar = new JMenuBar();
@@ -52,7 +52,7 @@ public class PamMenu {
 		return menuBar;
 	}
 
-	static public JMenu fileMenu(PamModel pamModelInterface,
+	static public JMenu fileMenu(PamModelInterface pamModelInterface,
 			ActionListener actionListener) {
 		JMenuItem menuItem;
 		JMenu menu = new JMenu("File");
@@ -64,7 +64,7 @@ public class PamMenu {
 		return menu;
 	}
 
-	static public JMenu loggingMenu(PamModel pamModelInterface,
+	static public JMenu loggingMenu(PamModelInterface pamModelInterface,
 			ActionListener actionListener) {
 		JMenuItem menuItem;
 		JMenu menu = new JMenu("Logging");
@@ -76,7 +76,7 @@ public class PamMenu {
 		return menu;
 	}
 
-	static public JMenu detectionMenu(PamModel pamModelInterface,
+	static public JMenu detectionMenu(PamModelInterface pamModelInterface,
 			ActionListener actionListener) {
 		JMenu menu = new JMenu("Detection");
 		JMenuItem menuItem;
@@ -108,7 +108,7 @@ public class PamMenu {
 		return menu;
 	}
 
-	static public JMenu displayMenu(PamModel pamModelInterface,
+	static public JMenu displayMenu(PamModelInterface pamModelInterface,
 			ActionListener actionListener) {
 		JMenu menu = new JMenu("Display");
 		JMenuItem menuItem;

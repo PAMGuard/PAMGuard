@@ -107,7 +107,6 @@ import PamView.GeneralProjector;
 import PamView.ColourArray.ColourArrayType;
 import PamView.dialog.PamLabel;
 import PamView.PamColors;
-import PamView.PamView;
 import PamView.hidingpanel.HidingDialogPanel;
 import PamView.panel.CornerLayout;
 import PamView.panel.CornerLayoutContraint;
@@ -276,13 +275,11 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 		//		}
 		if (spectrogramParameters == null) {
 			this.spectrogramParameters = new SpectrogramParameters();
-			PamView view = userDisplayControl.getPamView();
-			if (view != null) {
-				SpectrogramParameters newParams = SpectrogramParamsDialog
-						.showDialog(userDisplayControl.getGuiFrame(), spectrogramPanels, spectrogramParameters);
-				if (newParams != null) {
-					this.spectrogramParameters = newParams;
-				}
+			//			setSettings(); // force up the dialog. 
+			SpectrogramParameters newParams = SpectrogramParamsDialog
+					.showDialog(userDisplayControl.getPamView().getGuiFrame(), spectrogramPanels, spectrogramParameters);
+			if (newParams != null) {
+				this.spectrogramParameters = newParams;
 			}
 		}
 
@@ -1187,7 +1184,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 		//		SpectrogramParameters newParams = SpectrogramParamsDialog
 		//				.showDialog(userDisplayControl.getPamView().getGuiFrame(), this.getOverlayMarker(), spectrogramParameters);
 		SpectrogramParameters newParams = SpectrogramParamsDialog
-				.showDialog(userDisplayControl.getGuiFrame(), spectrogramPanels, spectrogramParameters);
+				.showDialog(userDisplayControl.getPamView().getGuiFrame(), spectrogramPanels, spectrogramParameters);
 
 
 		if (newParams == null) return;

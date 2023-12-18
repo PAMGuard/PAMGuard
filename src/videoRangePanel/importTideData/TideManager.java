@@ -105,7 +105,7 @@ public class TideManager extends  DataImport<String>   {
 //		}
 //		else dir=null;
 //			
-//		String newFile=PamFileBrowser.fileBrowser(vrControl.getGuiFrame(),dir,PamFileBrowser.OPEN_FILE,"txt");
+//		String newFile=PamFileBrowser.fileBrowser(vrControl.getPamView().getGuiFrame(),dir,PamFileBrowser.OPEN_FILE,"txt");
 //		
 //		return newFile;
 //	}

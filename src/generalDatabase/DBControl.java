@@ -32,7 +32,6 @@ import offlineProcessing.OLProcessDialog;
 import offlineProcessing.OfflineTaskGroup;
 import warnings.PamWarning;
 import warnings.WarningSystem;
-import PamController.PamConfiguration;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitGUI;
 import PamController.PamControlledUnitSettings;
@@ -110,8 +109,8 @@ PamSettingsSource {
 
 	private int lastErrorCount;
 
-	public DBControl(PamConfiguration pamconfiguration, String unitName, int settingsStore, boolean openImmediately) {
-		super(pamconfiguration, dbUnitType, unitName);
+	public DBControl(String unitName, int settingsStore, boolean openImmediately) {
+		super(dbUnitType, unitName);
 		THIS = this;
 
 		databaseWarning = new PamWarning(getUnitName(), "Database error", 2);
@@ -158,9 +157,6 @@ PamSettingsSource {
 
 		//		selectDatabase(null);
 
-		if (isInMainConfiguration() == false) {
-			openImmediately = false;
-		}
 		if (databaseSystem == null){
 			selectSystem(dbParameters.getDatabaseSystem(), openImmediately);
 		}
@@ -533,7 +529,7 @@ PamSettingsSource {
 				//				offlineTaskGroup.addTask(task);
 			}
 			if (olProcessDialog == null) {
-				olProcessDialog = new OLProcessDialog(getGuiFrame(), offlineTaskGroup, 
+				olProcessDialog = new OLProcessDialog(getPamView().getGuiFrame(), offlineTaskGroup, 
 						dataBlock.getDataName() + " Export");
 			}
 			olProcessDialog.setVisible(true);

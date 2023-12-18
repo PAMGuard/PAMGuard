@@ -75,7 +75,7 @@ public class ClickReClassifyTask extends OfflineTask<ClickDetection> {
 
 	@Override
 	public boolean callSettings() {
-		return clickControl.classificationDialog(clickControl.getGuiFrame());
+		return clickControl.classificationDialog(clickControl.getPamView().getGuiFrame());
 	}
 
 

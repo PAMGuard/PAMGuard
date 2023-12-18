@@ -923,7 +923,7 @@ PamSettingsSource, DataOutputStore {
 		protected void process(List<BinaryMapMakeProgress> chunks) {
 			if (PamGUIManager.isSwing()) {
 				if (binaryMapDialog == null) {
-					binaryMapDialog = BinaryMapMakingDialog.showDialog(PamController.getMainFrame());
+					binaryMapDialog = BinaryMapMakingDialog.showDialog(getPamView().getGuiFrame());
 				}
 				super.process(chunks);
 				for (int i = 0; i < chunks.size(); i++) {
@@ -2370,7 +2370,7 @@ PamSettingsSource, DataOutputStore {
 	 * Get the unit type for the binary store. 
 	 * @return the binary store unit type. 
 	 */
-	public static String getBinaryUnitType() {
+	private static String getBinaryUnitType() {
 		return defUnitType;
 	}
 

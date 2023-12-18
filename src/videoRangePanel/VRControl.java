@@ -1,7 +1,6 @@
 package videoRangePanel;
 
 import java.util.List;
-import java.awt.Frame;
 import java.awt.Point;
 import java.io.File;
 import java.io.Serializable;
@@ -362,9 +361,9 @@ public class VRControl extends PamControlledUnit implements PamSettings {
 	 * @param frame
 	 * @param tab- the tab to open the settings dialog on. 
 	 */
-	public void settingsButtonAWT(Frame frame, int tab) {
+	public void settingsButtonAWT(JFrame frame, int tab) {
 		if (frame == null) {
-			frame = getGuiFrame();
+			frame = getPamView().getGuiFrame();
 		}
 		VRParameters newParams = VRParametersDialog.showDialog(frame, this, tab);
 		if (newParams != null) {

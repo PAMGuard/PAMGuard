@@ -123,7 +123,7 @@ public class ClickDelayTask extends OfflineTask<ClickDetection> {
 //			clickControl.getClickParameters().setDelayMeasurementParams(0, newParams.clone());
 //			return true;
 //		}
-		ClickParameters newParams = ClickDelayDialog.showDialog(clickControl.getGuiFrame(), clickControl);
+		ClickParameters newParams = ClickDelayDialog.showDialog(clickControl.getPamView().getGuiFrame(), clickControl);
 		if (newParams != null) {
 			clickControl.setClickParameters(newParams);
 			return true;

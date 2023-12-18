@@ -388,7 +388,7 @@ public class AcquisitionControl extends RawInputControlledUnit implements PamSet
 		message += "\n\nFailure to do so may result in PAMGUARD crashing or features not working correctly";
 		int ans = JOptionPane.showConfirmDialog(parentFrame, message, getArrayErrorMessage(error), JOptionPane.YES_NO_OPTION);
 		if (ans == JOptionPane.YES_OPTION) {
-			ArrayManager.getArrayManager().showArrayDialog(getGuiFrame());
+			ArrayManager.getArrayManager().showArrayDialog(getPamView().getGuiFrame());
 			return checkArrayChannels(parentFrame);
 		}
 

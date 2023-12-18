@@ -24,7 +24,7 @@ public class EchoDetectionTask extends OfflineTask<ClickDetection> {
 		this.clickControl = clickControl;
 		echoDetectionSystem = clickControl.getEchoDetectionSystem();
 		setParentDataBlock(clickControl.getClickDataBlock());
-		addAffectedDataBlock(clickControl.getClickDataBlock());
+//		addAffectedDataBlock(clickControl.getClickDataBlock());
 	}
 
 	@Override
@@ -90,7 +90,7 @@ public class EchoDetectionTask extends OfflineTask<ClickDetection> {
 		if (echoDetectionSystem == null) {
 			return false;
 		}
-		return EchoDialog.showDialog(clickControl.getGuiFrame(), echoDetectionSystem);
+		return EchoDialog.showDialog(clickControl.getPamView().getGuiFrame(), echoDetectionSystem);
 	}
 
 	/* (non-Javadoc)

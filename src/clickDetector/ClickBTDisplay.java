@@ -2771,7 +2771,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 
 			BTDisplayParameters newParameters = 
 					ClickDisplayDialog.showDialog(clickControl, 
-							clickControl.getGuiFrame(), btDisplayParameters);
+							clickControl.getPamView().getGuiFrame(), btDisplayParameters);
 			if (newParameters != null){
 				btDisplayParameters = newParameters.clone();
 				if (getVScaleManager() != null) {

@@ -301,21 +301,6 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 	public PamDataBlock getAffectedDataBlock(int iBlock) {
 		return affectedDataBlocks.get(iBlock);
 	}
-	
-	/**
-	 * Get a formatted string list of affected data blocks  
-	 * @return
-	 */
-	public String getAffectedBlocksList() {
-		if (affectedDataBlocks == null || affectedDataBlocks.size() == 0) {
-			return null;
-		}
-		String blocks = affectedDataBlocks.get(0).getDataName();
-		for (int i = 1; i < affectedDataBlocks.size(); i++) {
-			blocks += "; " + affectedDataBlocks.get(i).getDataName();
-		}
-		return blocks;
-	}
 
 	/**
 	 * Return whether or not the task SHOULD be run - i.e. if it is selected in 

@@ -136,9 +136,7 @@ public class UserInputLogger extends SQLLogging {
 		if (dataUnit != null && dataUnit.getDatabaseIndex() != databaseIndex) {
 			dataUnit.setDatabaseIndex(databaseIndex);
 			dataUnit.setUserString(dataUnit.getUserString() + " " + txt);
-			// don't call this next line, it causes the unit to get relogged. 
-//			getPamDataBlock().updatePamData(dataUnit, timeMilliseconds);
-			dataUnit.clearUpdateCount();
+			getPamDataBlock().updatePamData(dataUnit, timeMilliseconds);
 		}
 		else {
 			dataUnit = new UserInputDataUnit(timeMilliseconds, txt);

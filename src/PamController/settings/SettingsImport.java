@@ -15,12 +15,10 @@ import PamController.PamController;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamController.PamSettingsGroup;
-import PamController.UsedModuleInfo;
 import PamModel.PamModel;
 import PamModel.PamModuleInfo;
 import PamModel.SMRUEnable;
 import PamView.dialog.PamFileBrowser;
-import PamView.dialog.warn.WarnOnce;
 
 /**
  * Class to handle the import of settings from other psf files. 
@@ -182,16 +180,9 @@ public class SettingsImport {
 		/**
 		 * Now make a new Pamcontrolled unit with the given name ...
 		 */
-		// need to find the module information in the PamModel
-//		PamModel pamModel = PamModel.getPamModel();
-//		pamModel.
-		PamModuleInfo moduleInfo = PamModuleInfo.findModuleInfo(importGroup.getUsedModuleInfo().className);
 		// find the module info for this one
-//		PamModuleInfo moduleInfo = importGroup.getUsedModuleInfo();
+		PamModuleInfo moduleInfo = importGroup.getModuleInfo();
 		if (moduleInfo == null) {
-			String msg = String.format("Unable to find module information for type %s main class %s in model",
-					importGroup.getUsedModuleInfo().getUnitType(), importGroup.getUsedModuleInfo().className);
-			WarnOnce.showWarning("Module creating error!", msg, WarnOnce.WARNING_MESSAGE);
 			return null;
 		}
 
@@ -215,7 +206,6 @@ public class SettingsImport {
 			}
 		}
 		loadSubUnitSettings(importGroup, unit.getUnitName());
-		unit.setupControlledUnit();
 		return unit;
 	}
 
@@ -225,64 +215,45 @@ public class SettingsImport {
 	 * @return
 	 */
 	ArrayList<SettingsImportGroup> organiseSettingsGroups(ArrayList<PamControlledUnitSettings> settings) {
-		/**
-		 * this needs rewriting for psfx files which are organised differently. first we need to find 
-		 * a list of PAMGuard modules by finding the settings group of the PAMController. 
-		 */	
-		
 		ArrayList<SettingsImportGroup> groupedSettings = new ArrayList<>();
-		ArrayList<UsedModuleInfo> usedModules = findPamControllerSettings(settings);
-		// make the group list based on the list of modules. 
-		for (UsedModuleInfo usedModule : usedModules) {
-			groupedSettings.add(new SettingsImportGroup(usedModule));
-		}
-			
-		
-//		// first pull out the settings for PamControlledNnits. 
+		// first pull out the settings for PamControlledNnits. 
 		boolean[] used = new boolean[settings.size()];
-//		for (int i = 0; i < settings.size(); i++) {
-//			PamControlledUnitSettings aSet = settings.get(i);
-//			if (aSet.getOwnerClassName() == null) {
-//				continue;
-//			}
-//			Class ownerClass = null;
-//			try {
-//				ownerClass = Class.forName(aSet.getOwnerClassName());
-//			} catch (ClassNotFoundException e) {
-//				// TODO Auto-generated catch block
-////				e.printStackTrace();
-//				// this is happening since the ownerclassname is not set correctly in psfx files
-//				// so we have to deserialise the data to find the class. 
-////				ownerClass = getClassFromData(aSet.getSerialisedByteArray());
-////				ownerClass = PamModuleInfo.findModuleClass(aSet.getUnitType());
-//			}
-//			if (ownerClass == null) {
-//				continue;
-//			}
-//			if (PamControlledUnit.class.isAssignableFrom(ownerClass)) {
-//				PamModuleInfo moduleInfo = PamModuleInfo.findModuleInfo(aSet.getOwnerClassName());
-//				groupedSettings.add(new SettingsImportGroup(moduleInfo));
-//				used[i] = true;
-//			}
-//		}
+		for (int i = 0; i < settings.size(); i++) {
+			PamControlledUnitSettings aSet = settings.get(i);
+			if (aSet.getOwnerClassName() == null) {
+				continue;
+			}
+			Class ownerClass = null;
+			try {
+				ownerClass = Class.forName(aSet.getOwnerClassName());
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+//				e.printStackTrace();
+				// this is happening since the ownerclassname is not set correctly in psfx files
+				// so we have to deserialise the data to find the class. 
+//				ownerClass = getClassFromData(aSet.getSerialisedByteArray());
+//				ownerClass = PamModuleInfo.findModuleClass(aSet.getUnitType());
+			}
+			if (ownerClass == null) {
+				continue;
+			}
+			if (PamControlledUnit.class.isAssignableFrom(ownerClass)) {
+				PamModuleInfo moduleInfo = PamModuleInfo.findModuleInfo(aSet.getOwnerClassName());
+				groupedSettings.add(new SettingsImportGroup(aSet, moduleInfo));
+				used[i] = true;
+			}
+		}
 
 		// now match all the remaining settings into the first set based on ModuleName. 
 		for (int i = 0; i < settings.size(); i++) {
 			PamControlledUnitSettings aSet = settings.get(i);
-//			if (used[i]) continue;
+			if (used[i]) continue;
 			SettingsImportGroup mainGroup = findGroup(groupedSettings, aSet.getUnitName());
 			if (mainGroup != null) {
-				// main settings will have same type as well as same name. 
-				boolean mainType = isMainType(mainGroup, aSet);
-				if (mainType) {
-					mainGroup.setMainSettings(aSet);
-				}
-				else {
-					mainGroup.addSubSettings(aSet);
-				}
+				mainGroup.addSubSettings(aSet);
 				used[i] = true;
-//				System.out.println(String.format("Adding %s-%s to %s-%s group", aSet.getUnitType(), aSet.getUnitName(), 
-//						mainGroup.getMainSettings().getUnitType(), mainGroup.getMainSettings().getUnitName()));
+				System.out.println(String.format("Adding %s-%s to %s-%s group", aSet.getUnitType(), aSet.getUnitName(), 
+						mainGroup.getMainSettings().getUnitType(), mainGroup.getMainSettings().getUnitName()));
 			}
 		}
 		
@@ -301,34 +272,6 @@ public class SettingsImport {
 		return groupedSettings;
 	}
 	
-	/**
-	 * IS this the main settings group for this module ? If it is, it should have the same 
-	 * type as well as the same name. 
-	 * @param mainGroup
-	 * @param aSet
-	 * @return
-	 */
-	private boolean isMainType(SettingsImportGroup mainGroup, PamControlledUnitSettings aSet) {
-		boolean isMain = mainGroup.getUsedModuleInfo().getUnitType().equals(aSet.getUnitType());
-		return isMain;
-	}
-
-	private ArrayList<UsedModuleInfo> findPamControllerSettings(ArrayList<PamControlledUnitSettings> settings) {
-		if (settings == null) {
-			return null;
-		}
-		for (PamControlledUnitSettings aSet : settings) {
-			if (aSet.getUnitName().equals(PamController.unitName) && 
-					aSet.getUnitType().equals(PamController.unitType)) {
-				Object sets = aSet.getSettings();
-				if (sets instanceof ArrayList) {
-					return (ArrayList<UsedModuleInfo>) sets;
-				}
-			}
-		}
-		return null;
-	}
-
 	private Class getClassFromData(byte[] data) {
 		try {
 			ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data));
@@ -342,7 +285,7 @@ public class SettingsImport {
 
 	private SettingsImportGroup findGroup(ArrayList<SettingsImportGroup> groupedSettings, String unitName) {
 		for (SettingsImportGroup iG:groupedSettings) {
-			if (iG.getUsedModuleInfo().unitName.equals(unitName)) {
+			if (iG.getMainSettings().getUnitName().equals(unitName)) {
 				return iG;
 			}
 		}

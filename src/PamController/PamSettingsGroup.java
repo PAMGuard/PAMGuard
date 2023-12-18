@@ -33,7 +33,9 @@ public class PamSettingsGroup implements Comparable<PamSettingsGroup> {
 	 * @param settingsTime settings time in milliseconds. 
 	 */
 	public PamSettingsGroup(long settingsTime) {
-		this(settingsTime, new ArrayList<PamControlledUnitSettings>());
+		super();
+		this.settingsTime = settingsTime;
+		unitSettings = new ArrayList<PamControlledUnitSettings>();
 	}
 	
 	/**

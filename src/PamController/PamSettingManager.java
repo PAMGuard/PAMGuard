@@ -293,7 +293,7 @@ public class PamSettingManager {
 	 * call this for at least one set of settings. Often the PamSettings
 	 * is implemented by the class that extends PamControlledunit, but
 	 * it's also possible to have multiple sub modules, processes or displays
-	 * implement PamSettings so that different settings for different bits of
+	 * implemnt PamSettings so that different settings for different bits of
 	 * a PamControlledUnit are stored separately.
 	 * @see PamSettings
 	 * @see PamControlledUnit

@@ -201,20 +201,36 @@ public class WhistleToneConnectProcess extends PamProcess {
 	@Override
 	public void setupProcess() {
 		super.setupProcess();
-		
 		SpectrogramNoiseProcess snp = whistleMoanControl.getSpectrogramNoiseProcess();
 		setParentDataBlock(snp.getOutputDataBlock());
 		if (whistleMoanControl.whistleToneParameters.getDataSource() == null) {
 			return;
 		}
-
+		//		sourceData = (FFTDataBlock) PamController.getInstance().getDataBlock(FFTDataUnit.class, 
+		//				whistleMoanControl.whistleToneParameters.getDataSource());
+		//		snp.setParentDataBlock(sourceData);
 		sourceData = (FFTDataBlock) getParentDataBlock(); // our source should always be the output of the SpectrogramNoiseProcess
 		SpectrogramNoiseSettings specnoiseSettings = whistleMoanControl.whistleToneParameters.getSpecNoiseSettings();
 		specnoiseSettings.dataSource = whistleMoanControl.whistleToneParameters.getDataSource();
 		snp.setNoiseSettings(specnoiseSettings);
 
 		chanOrSeqMap = whistleMoanControl.whistleToneParameters.getChanOrSeqBitmap();	// the channelMap in WhistleToneParameters object may be a sequence map or a channel map, depending on source
-
+		//		if (sourceData != null) {
+		////			chanOrSeqMap = getParentDataBlock().getChannelMap() & 
+		//			chanOrSeqMap = getParentDataBlock().getSequenceMap() & // use the sequence bitmap instead of the channel bitmap, in case this is beamformer output 
+		//					whistleMoanControl.whistleToneParameters.getChanOrSeqBitmap();
+		//			outputData.sortOutputMaps(getParentDataBlock().getChannelMap(), getParentDataBlock().getSequenceMapObject(), chanOrSeqMap);
+		//			outputData.setFftHop(sourceData.getFftHop());
+		//			outputData.setFftLength(sourceData.getFftLength());
+		//			
+		//			// 2017/11/30 set the whistleLocations channelMap properly
+		//			whistleLocations.sortOutputMaps(getParentDataBlock().getChannelMap(), getParentDataBlock().getSequenceMapObject(), chanOrSeqMap);
+		//			
+		//			//			smoothingChannelProcessList = new SmoothingChannelProcess[PamUtils.getHighestChannel(chanOrSeqMap)+1];
+		//			//			for (int i = 0; i < PamUtils.getHighestChannel(chanOrSeqMap)+1; i++) {
+		//			//				smoothingChannelProcessList[i] = new SmoothingChannelProcess();
+		//			//			}
+		//		}
 		// set the localisation information in the two output datablocks. If the source is using sequence numbers, then we cannot localise
 		boolean mayBearings = whistleMoanControl.whistleToneParameters.mayHaveBearings();
 		boolean mayRange = whistleMoanControl.whistleToneParameters.mayHaveRange();

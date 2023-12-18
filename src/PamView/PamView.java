@@ -24,7 +24,7 @@ import javax.swing.JFrame;
 
 import PamController.PamControlledUnit;
 import PamController.PamControllerInterface;
-import PamModel.PamModel;
+import PamModel.PamModelInterface;
 import javafx.application.Platform;
 
 /**
@@ -36,7 +36,7 @@ abstract public class PamView implements PamViewInterface {
 
 	protected PamControllerInterface pamControllerInterface;
 
-	protected PamModel pamModelInterface;
+	protected PamModelInterface pamModelInterface;
 
 	/** 
 	 * Frame for main window associated with this view (i.e a PamGUI).
@@ -47,7 +47,7 @@ abstract public class PamView implements PamViewInterface {
 		
 
 	public PamView(PamControllerInterface pamControllerInterface,
-			PamModel pamModelInterface, int frameNumber) {
+			PamModelInterface pamModelInterface, int frameNumber) {
 		this.pamControllerInterface = pamControllerInterface;
 		this.pamModelInterface = pamModelInterface;
 		this.frameNumber = frameNumber;

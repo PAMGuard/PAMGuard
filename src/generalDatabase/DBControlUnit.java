@@ -20,7 +20,6 @@ import pamViewFX.pamTask.PamTaskUpdate;
 import PamController.AWTScheduler;
 import PamController.DataOutputStore;
 import PamController.OfflineDataStore;
-import PamController.PamConfiguration;
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamController.PamControllerInterface;
@@ -52,10 +51,7 @@ public class DBControlUnit extends DBControl implements DataOutputStore {
 	private BackupInformation backupInformation;
 
 	public DBControlUnit(String unitName) {
-		this(null, unitName);
-	}
-	public DBControlUnit(PamConfiguration pamConfiguration, String unitName) {
-		super(pamConfiguration, unitName, whichStore(), true);
+		super(unitName, whichStore(), true);
 		THIS = this;
 		setFullTablesCheck(true);
 		//		int runMode = PamController.getInstance().getRunMode();
