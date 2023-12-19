@@ -104,7 +104,7 @@ public class LoggerForm{
 	private CounterControl counter;
 	
 
-	private HydrophoneOriginMethods origins = HydrophoneOriginMethods.getInstance();
+//	private HydrophoneOriginMethods origins = HydrophoneOriginMethods.getInstance();
 	
 	/**
 	 * @return the hasCounter
@@ -911,30 +911,30 @@ public class LoggerForm{
 		return saveButton;
 	}
 	
-	public GpsData getOriginLatLong(FormsDataUnit formsDataUnit) {
-		GpsData gps = getOrigin(GPSOriginSystem.class, formsDataUnit);
-		if (gps != null) {
-			return gps;
-		}
-		gps = getOrigin(StaticOriginSystem.class, formsDataUnit);
-		return gps;
-	}
-	
-	private GpsData getOrigin(Class originClass, FormsDataUnit formsDataUnit) {
-		HydrophoneOriginMethod origin = origins.getMethod(GPSOriginMethod.class, null, null);
-		if (origin == null) {
-			return null;
-		}
-		OriginIterator gpsIter = origin.getGpsDataIterator(PamDataBlock.ITERATOR_END);
-		GpsData prev = null;
-		while (gpsIter.hasPrevious()) {
-			prev = gpsIter.previous();
-			if (prev.getTimeInMillis() < formsDataUnit.getTimeMilliseconds()) {
-				break;
-			}
-		}
-		return prev;		
-	}
+//	public GpsData getOriginLatLong(FormsDataUnit formsDataUnit) {
+//		GpsData gps = getOrigin(GPSOriginSystem.class, formsDataUnit);
+//		if (gps != null) {
+//			return gps;
+//		}
+//		gps = getOrigin(StaticOriginSystem.class, formsDataUnit);
+//		return gps;
+//	}
+//	
+//	private GpsData getOrigin(Class originClass, FormsDataUnit formsDataUnit) {
+//		HydrophoneOriginMethod origin = origins.getMethod(GPSOriginMethod.class, null, null);
+//		if (origin == null) {
+//			return null;
+//		}
+//		OriginIterator gpsIter = origin.getGpsDataIterator(PamDataBlock.ITERATOR_END);
+//		GpsData prev = null;
+//		while (gpsIter.hasPrevious()) {
+//			prev = gpsIter.previous();
+//			if (prev.getTimeInMillis() < formsDataUnit.getTimeMilliseconds()) {
+//				break;
+//			}
+//		}
+//		return prev;		
+//	}
 	
 
 	//	/**
