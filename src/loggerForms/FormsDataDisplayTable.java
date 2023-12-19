@@ -208,7 +208,15 @@ public class FormsDataDisplayTable {
 					Object[] fd = pamDataUnit.getFormData();
 					int ctIndex = columnIndex-extraColumns.length;
 					ControlDescription ctrlDescription = formDescription.getInputControlDescriptions().get(ctIndex);
-					return ctrlDescription.formatDataItem(fd[ctIndex]);
+					Object value = ctrlDescription.formatDataItem(fd[ctIndex]);
+					if (value == null) return null;
+					if (getColumnClass(columnIndex) == Boolean.class) {
+						if (value instanceof Boolean == false) {
+//							System.out.println("Bad boolean value: " + value);
+							return interpretBadBoolean(value);
+						}
+					}
+					return value;
 //					return fd[ctIndex];
 				}
 				catch (Exception e) {
@@ -249,6 +257,24 @@ public class FormsDataDisplayTable {
 	public JPanel getMainPanel() {
 		// TODO Auto-generated method stub
 		return mainPanel;
+	}
+
+
+	public Boolean interpretBadBoolean(Object value) {
+		if (value == null) {
+			return null;
+		}
+		if (value instanceof String) {
+			String str = (String) value;
+			str = str.strip();
+			return str.equals("1") || str.toLowerCase().equals("false");
+		}
+		if (value instanceof Integer) {
+			int val = (Integer) value;
+			return val != 0;
+		}
+		
+		return null;
 	}
 
 
