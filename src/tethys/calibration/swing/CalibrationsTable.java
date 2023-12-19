@@ -18,6 +18,8 @@ import javax.swing.table.AbstractTableModel;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import PamController.PamController;
+import PamController.soundMedium.GlobalMedium;
+import PamController.soundMedium.GlobalMediumManager;
 import PamUtils.PamCalendar;
 import PamView.dialog.warn.WarnOnce;
 import PamView.panel.PamPanel;
@@ -195,7 +197,7 @@ public class CalibrationsTable extends TethysGUIPanel {
 
 		private static final long serialVersionUID = 1L;
 		
-		private String[] columnNames = {"Document", "Id", "Date", "End to End", "Hydrophone", "Preamp"};
+		private String[] columnNames = {"Document", "Id", "Date", "End to End", "Hydrophone"};
 
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
@@ -223,9 +225,9 @@ public class CalibrationsTable extends TethysGUIPanel {
 				long ms = TethysTimeFuncs.millisFromGregorianXML(ts);
 				return PamCalendar.formatDBDate(ms);
 			case 3:
-				return cal.getSensitivityDBFS();
+				return getFSString(cal);
 			case 4:
-				return cal.getType();
+				return getPhoneString(cal);
 //				return String.format("%3.1fdB %s", cal.getSensitivityV(), cal.getType());
 			}
 			return null;
@@ -243,9 +245,41 @@ public class CalibrationsTable extends TethysGUIPanel {
 
 		@Override
 		public String getColumnName(int column) {
-			return columnNames[column];
+			if (column == 4) {
+				return  PamController.getInstance().getGlobalMediumManager().getRecieverString();
+			}
+			else {
+				return columnNames[column];
+			}
 		}
+	}
 
-		
+	public String getFSString(Calibration cal) {
+		Double fs = cal.getSensitivityDBFS();
+		if (fs == null) {
+			return null;
+		}
+		double ir = cal.getIntensityReferenceUPa();
+		String str = String.format("%3.1fdB", fs);
+		if (ir != 0) {
+			str += String.format(" re%.0f\u00B5Pa", ir); 
+		}
+		return str;
+	}
+
+	public Object getPhoneString(Calibration cal) {
+		Double dbV = cal.getSensitivityV();
+		if (dbV == null) {
+			dbV = cal.getSensitivityDBV();
+		}
+		if (dbV == null) {
+			return null;
+		}
+		double ir = cal.getIntensityReferenceUPa();
+		String str = String.format("%3.1fdB", dbV);
+		if (ir != 0) {
+			str += String.format(" re%.0fV/\u00B5Pa", ir); 
+		}
+		return str;
 	}
 }
