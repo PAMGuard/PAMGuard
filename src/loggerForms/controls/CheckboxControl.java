@@ -9,6 +9,7 @@ import NMEA.NMEADataBlock;
 import NMEA.NMEADataUnit;
 import PamView.dialog.PamCheckBox;
 import PamView.dialog.PamLabel;
+import loggerForms.FormsControl;
 import loggerForms.LoggerForm;
 import loggerForms.controlDescriptions.ControlDescription;
 
@@ -41,7 +42,7 @@ public class CheckboxControl extends LoggerControl {
 			return;
 		}
 		try {
-			checkBox.setSelected((Boolean) data);
+			checkBox.setSelected(FormsControl.checkBadBoolean(data));
 		}
 		catch(ClassCastException e) {
 			e.printStackTrace();
