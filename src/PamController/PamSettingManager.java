@@ -476,7 +476,7 @@ public class PamSettingManager {
 	 */
 	public PamSettings findSettingsOwner(String unitType, String unitName, String unitClassName) {
 		for (PamSettings owner:owners) {
-			if (owner.getClass() != null) {
+			if (owner.getClass() != null && unitClassName != null) {
 				if (owner.getClass().getName().equals(unitClassName) == false) {
 					continue;
 				}
