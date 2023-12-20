@@ -195,12 +195,14 @@ public class SettingsImportDialog extends PamDialog {
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			SettingsImportGroup set = groupedSettings.get(rowIndex);
-			PamControlledUnitSettings mainSet = set.getMainSettings();
+//			PamControlledUnitSettings mainSet = set.getMainSettings();
 			switch (columnIndex) {
 			case 0:
-				return mainSet.getUnitType();
+				return set.getUsedModuleInfo().getUnitType();
+//				return mainSet.getUnitType();
 			case 1:
-				return mainSet.getUnitName();
+				return set.getUsedModuleInfo().unitName;
+//				return mainSet.getUnitName();
 			case 2:
 				//				return choiceBoxes[rowIndex].getSelectedItem().toString();
 				return set.getImportChoice().toString();

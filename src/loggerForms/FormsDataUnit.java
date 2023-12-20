@@ -87,7 +87,9 @@ public class FormsDataUnit extends PamDataUnit {
 		 * we want to as a reference, etc. 
 		 */
 		if (recalculate || formOriginLatLong == null) {
-			formOriginLatLong = loggerForm.getOriginLatLong(this);
+			if (formDescription != null) {
+				formOriginLatLong = formDescription.getOriginLatLong(this);
+			}
 		}
 		return formOriginLatLong;
 	}
