@@ -888,13 +888,13 @@ e.g. C:\Users\dg50\source\repos\**your projectfolder**\repo\tethys\org
 to C:\Users\dg50\.m2\repository\tethys\org -->
 
 		<dependency>
-			<groupId>pamguard.org</groupId>
+			<groupId>tethys.org</groupId>
 			<artifactId>nilus</artifactId>
 			<version>3.0</version>
 		</dependency>
 
 		<dependency>
-			<groupId>pamguard.org</groupId>
+			<groupId>tethys.org</groupId>
 			<artifactId>javaclient</artifactId>
 			<version>3.0</version>
 		</dependency>
