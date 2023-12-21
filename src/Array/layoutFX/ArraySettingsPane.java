@@ -6,8 +6,10 @@ import PamController.SettingsPane;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.scene.layout.StackPane;
 import javafx.scene.control.Button;
@@ -34,23 +36,43 @@ import pamViewFX.fxNodes.PamHBox;
  */
 public class ArraySettingsPane extends SettingsPane<PamArray >{
 	
+	/**
+	 * Minimum size of the 3D pane
+	 */
+	private static final double MIN_3D_WIDTH = 450;
+
 	private StreamersPane streamerPane; 
 	
-	private Pane mainPane;
+	private PamBorderPane mainPane;
 	
 	private HydrophonesPane hydrophonePane;
 
 //	private Pane holder;
 
-	private Label hydrophoneLabel; 
+	private Label hydrophoneLabel;
+
+	/**
+	 * Pane which shows a 3D representation of the hydrophone array. 
+	 */
+	private Array3DPane array3DPane; 
 
 	public ArraySettingsPane() {
 		super(null);
-		mainPane = createArrayPane();
+		mainPane=new PamBorderPane(); 
+		
+		mainPane.setCenter(createArrayPane());
 //		mainPane.setStyle("-fx-background-color: red;");
 		mainPane.setMaxWidth(Double.MAX_VALUE);
-		mainPane.setPrefWidth(800);
+		mainPane.setMinWidth(1100);
 		mainPane.setStyle("-fx-padding: 0,0,0,0");
+		
+		mainPane.setRight(create3DPane());
+		
+		streamerPane.getStreamerTable().getItems().addListener((ListChangeListener<? super StreamerProperty>) c->{
+			//the streamer table has changed and so the streamer needs changed
+			System.out.println("Streamer Changed!!!");
+		});
+		
 
 //		mainPane.setMinWidth(800);
 
@@ -85,6 +107,14 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 //		holder.getChildren().add(mainPane);
 //		holder.setStyle("-fx-padding: 0,0,0,0");
 
+	}
+
+	private Pane create3DPane() {
+		this.array3DPane = new Array3DPane();
+		
+		//important because the 3D pane has not default size
+		array3DPane.setMinWidth(MIN_3D_WIDTH);
+		return array3DPane;
 	}
 
 	/**

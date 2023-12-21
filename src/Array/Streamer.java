@@ -666,8 +666,8 @@ public class Streamer implements Serializable, Cloneable, ManagedParameters {
 	 */
 	@Override
 	public String toString() {
-		return super.toString() + "; OriginSettings: " + getOriginSettings().toString() + "," + getHydrophoneOrigin().getOriginSettings().toString() + 
-				"; Locator " + getLocatorSettings().toString();
+		return super.toString() + "; OriginSettings: " + getOriginSettings()==null ? "null" : getOriginSettings().toString() + "," + getHydrophoneOrigin().getOriginSettings().toString() + 
+				"; Locator " + getLocatorSettings()==null ? "null" : getLocatorSettings().toString();
 	}
 
 	public static Streamer getAverage(Streamer sd1,

@@ -505,7 +505,10 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 
 	private void enableControls() {
 		if (currentOriginMethod != null) {
+			System.out.println("Enable: selected interp: "  + interpPane.getSelectedInterpType());
+
 			interpPane.setAllowedValues(currentOriginMethod.getAllowedInterpolationMethods());
+			System.out.println("Enable controls: "  + interpPane.getSelectedInterpType());
 			if (interpPane.getSelectedInterpType()<0) {
 				interpPane.setSelection(0);
 			}
@@ -515,7 +518,7 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 
 	@Override
 	public Streamer getParams(Streamer currParams) {
-		System.out.println("GETPARAMS: "	 + currParams); 
+//		System.out.println("GETPARAMS: "	 + currParams); 
 
 		try {
 			defaultStreamer.setX(Double.valueOf(xPos.getText()));
@@ -532,6 +535,8 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 
 		defaultStreamer.setStreamerName(currParams.getStreamerName());
 		int im = interpPane.getSelectedInterpType();
+		System.out.println("Streamer gwetParams: Origin interpolator: " + interpPane.getSelectedInterpType()); 
+
 		if (im < 0) {
 			System.err.println("Streamer getParams: There is an index problem with the interpolation selection streamer panel: index = " + im);
 		}
@@ -559,6 +564,7 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 		OriginDialogComponent mthDialogComponent = currentOriginMethod.getDialogComponent();
 		if (mthDialogComponent != null) {
 			if (mthDialogComponent.getParams() == false) {
+				System.err.println("Streamer: The origin settings pane returned false suggesting paramters are not correct.");
 				return null;
 			}
 		}
@@ -585,8 +591,8 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 		 * orientation data from or not. The enable orientation check box will enable or
 		 * disable orientation for ALL streamers which are loaded into memory.
 		 */
-		System.out.println("CURRENTORIGINMETHOD: "	 + currentOriginMethod); 
-		System.out.println("LOCATORMETHOD: "		 + locator); 
+//		System.out.println("CURRENTORIGINMETHOD: "	 + currentOriginMethod); 
+//		System.out.println("LOCATORMETHOD: "		 + locator); 
 
 		defaultStreamer.setHydrophoneOrigin(currentOriginMethod);
 		defaultStreamer.setHydrophoneLocator(locator);
@@ -659,20 +665,25 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 			mthDialogComponent.setParams();
 		}
 
-		System.out.println("Streamer setParams: Set orientation: " + defaultStreamer.getHeading() +  "  " + defaultStreamer.getPitch() +  "  " + defaultStreamer.getRoll()); 
+//		System.out.println("Streamer setParams: Set orientation: " + defaultStreamer.getHeading() +  "  " + defaultStreamer.getPitch() +  "  " + defaultStreamer.getRoll()); 
 		
 		heading	.setText(orientation2Text(defaultStreamer.getHeading()));
 		pitch	.setText(orientation2Text(defaultStreamer.getPitch()));
 		roll	.setText(orientation2Text(defaultStreamer.getRoll()));
 		
-		System.out.println("Streamer setParams: Origin interpolator: " + currentArray.getOriginInterpolation()); 
+		System.out.println("Streamer setParams: Origin interpolator: " + currentArray.getOriginInterpolation() + "  " + currentOriginMethod.getAllowedInterpolationMethods()); 
+		
 
 		if (currentArray.getOriginInterpolation()<0 || currentArray.getOriginInterpolation()>=currentOriginMethod.getAllowedInterpolationMethods()) {
-			interpPane.setSelection(0);
+			System.err.println("Streamer setParams: Origin interpolator value of " +  currentArray.getOriginInterpolation() + " not allowed for origin method - setting to first allowed method:"); 
+			interpPane.setSelection(0); 
 		}
 		else {
 			interpPane.setSelection(currentArray.getOriginInterpolation());
 		}
+		
+		System.out.println("Streamer setParams: selected interp: "  + interpPane.getSelectedInterpType());
+
 
 		ArraySensorFieldType[] sensorFields = ArraySensorFieldType.values();
 		for (int i = 0; i < sensorFields.length; i++) {
@@ -691,7 +702,7 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 	
 	private String orientation2Text(Double ang) {
 		if (ang == null) return String.valueOf(0.0); 
-		else return String.format("%3.1f", defaultStreamer.getHeading()); 
+		else return String.format("%3.1f", ang); 
 	}
 
 	@Override

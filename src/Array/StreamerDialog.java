@@ -317,7 +317,7 @@ public class StreamerDialog extends PamDialog {
 		PamDialog.setDoubleValue(heading, defaultStreamer.getHeading(), "%3.1f");
 		PamDialog.setDoubleValue(pitch, defaultStreamer.getPitch(), "%3.1f");
 		PamDialog.setDoubleValue(roll, defaultStreamer.getRoll(), "%3.1f");
-
+		
 		interpolationPanel.setSelection(currentArray.getOriginInterpolation());
 
 		ArraySensorFieldType[] sensorFields = ArraySensorFieldType.values();
@@ -375,6 +375,9 @@ public class StreamerDialog extends PamDialog {
 
 		defaultStreamer.setStreamerName(streamerName.getText());
 		int im = interpolationPanel.getSelection();
+		
+		System.out.println("GetParams: INTERPOLATION SELECTION: " + currentArray.getOriginInterpolation());
+
 		if (im < 0) {
 			return showWarning("Invalid interpolation selection");
 		}

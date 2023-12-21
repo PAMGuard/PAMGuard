@@ -587,10 +587,10 @@ public class ClicksOffline {
 		offlineTaskGroup.addTask(new EchoDetectionTask(clickControl));
 		offlineTaskGroup.addTask(new ClickDelayTask(clickControl));
 		offlineTaskGroup.addTask(new ClickBearingTask(clickControl));
-		if (JamieDev.isEnabled()) {
-			//re import waveform data from raw wave files. 
-			offlineTaskGroup.addTask(new ClickWaveTask(clickControl));
-		}
+//		if (JamieDev.isEnabled()) {
+//			//re import waveform data from raw wave files. 
+//			offlineTaskGroup.addTask(new ClickWaveTask(clickControl));
+//		}
 		
 		/*
 		 * Add the click detector tasks first since these will need to operate

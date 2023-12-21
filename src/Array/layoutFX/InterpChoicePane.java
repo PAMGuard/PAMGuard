@@ -43,6 +43,8 @@ public class InterpChoicePane extends InterpSettingsPane {
 	}
 
 	public void setSelection(int option) {
+		
+		System.out.println("Select interp option: "  + option);
 
 		interpChoiceBox.getSelectionModel().select(Integer.valueOf(option));
 
@@ -64,8 +66,13 @@ public class InterpChoicePane extends InterpSettingsPane {
 	
 	@Override
 	protected void enableControls() {
+		//get the current selection
+		Integer item = interpChoiceBox.getSelectionModel().getSelectedItem();
+		
+		//clear items
 		interpChoiceBox.getItems().clear();
-	
+
+		//set allowed values
 		for (int i=0; i<interpChoice.length ; i++) {
 		
 			if ((allowedValues & (1<<interpChoice[i])) != 0){
@@ -73,6 +80,15 @@ public class InterpChoicePane extends InterpSettingsPane {
 			}
 		
 		}
+		
+		//reselect the previously selected item if possible. 
+		if (interpChoiceBox.getItems().contains(item)) {
+			interpChoiceBox.getSelectionModel().select(item);
+		} 
+		else {
+			interpChoiceBox.getSelectionModel().select(0);
+		}
+		
 	}
 
 	@Override

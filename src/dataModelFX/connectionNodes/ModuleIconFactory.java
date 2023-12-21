@@ -55,16 +55,19 @@ public class ModuleIconFactory {
 //			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/click.png")));
 			return getSVGIcon("/Resources/modules/Click Detector Icon.svg", Color.BLACK, 2);
 		case CLICK_TRAIN:
-			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/clicktrain.png")));
+//			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/clicktrain.png")));
+			return getSVGIcon("/Resources/modules/clicktrain.svg",Color.BLACK, 2);
 		case DATABASE:
 //			return PamGlyphDude.createModuleGlyph(FontAwesomeIcon.DATABASE);
 			return PamGlyphDude.createModuleIcon("mdi2d-database");
 		case DATAMAP:
 			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/dataMap.png")));
 		case FFT:
-			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/fft.png")));
+//			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/fft.png")));
+			return getSVGIcon("/Resources/modules/fft.svg",Color.BLACK, 2);
 		case FILTER:
-			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/filters.png")));
+//			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/filters.png")));
+			return getSVGIcon("/Resources/modules/filters.svg",Color.BLACK, 2);
 		case GPS:
 //			return PamGlyphDude.createModuleGlyph(MaterialIcon.GPS_FIXED); 
 			return PamGlyphDude.createModuleIcon("mdi2c-crosshairs-gps"); 
@@ -126,8 +129,8 @@ public class ModuleIconFactory {
 			
 			PamSVGIcon iconMaker= new PamSVGIcon(); 
 			PamSVGIcon svgsprite = iconMaker.create(getClass().getResource(resourcePath).toURI().toURL(), colour, lineWidth);
-			svgsprite.getSpriteNode().setStyle("-fx-text-color: black");				
-			svgsprite.getSpriteNode().setStyle("-fx-fill: black");
+//			svgsprite.getSpriteNode().setStyle("-fx-text-color: black");				
+//			svgsprite.getSpriteNode().setStyle("-fx-fill: black");
 			svgsprite.setFitHeight(DataModelStyle.iconSize-10);
 			svgsprite.setFitWidth(DataModelStyle.iconSize-10);
 		

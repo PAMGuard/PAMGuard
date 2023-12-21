@@ -56,16 +56,17 @@ public class LatLongPane extends SettingsPane<LatLong>{
 
 	public LatLongPane(String title) {
 		super(null); 
-		
-		
+
+
 		mainPane = new PamVBox(); 
 		mainPane.setSpacing(5);
 		mainPane.setAlignment(Pos.CENTER);
 
-		
+
 		Label titleLabel = new Label(title); 
 		titleLabel.maxWidth(Double.MAX_VALUE);
 		titleLabel.setTextAlignment(TextAlignment.LEFT);
+		titleLabel.setAlignment(Pos.CENTER_LEFT);
 		PamGuiManagerFX.titleFont2style(titleLabel);
 		mainPane.getChildren().add(titleLabel); 
 
@@ -109,7 +110,7 @@ public class LatLongPane extends SettingsPane<LatLong>{
 
 		cent.getChildren().add(latStrip = new LatLongStrip(true));
 		cent.getChildren().add(longStrip = new LatLongStrip(false));
-		
+
 		//bit of a hack that makes sure controls are aligned for the latitude and longitude. 
 		latStrip.getTitleLabel().prefWidthProperty().bind(longStrip.getTitleLabel().widthProperty());
 
@@ -123,46 +124,24 @@ public class LatLongPane extends SettingsPane<LatLong>{
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	public void actionPerformed(javafx.event.ActionEvent action) {
-
-
-		if (action.getSource() == decimalMinutes) {
-			LatLong.setFormatStyle(LatLong.FORMAT_DECIMALMINUTES);
-		//			if (latStrip != null) {
-		//				latStrip.setDecimalMinutes(true);
-		//				longStrip.setDecimalMinutes(true);
-		//			}
-			latStrip.showControls(LatLong.FORMAT_DECIMALMINUTES);
-			longStrip.showControls(LatLong.FORMAT_DECIMALMINUTES);
-		}
-		else if  (action.getSource() == minutesSeconds){
-			LatLong.setFormatStyle(LatLong.FORMAT_MINUTESSECONDS);
-			//			if (latStrip != null) {
-			//				latStrip.setDecimalMinutes(false);
-			//				longStrip.setDecimalMinutes(false);
-			////				latStrip.showControls();
-			////				longStrip.showControls();
-			//			}
-			latStrip.showControls(LatLong.FORMAT_MINUTESSECONDS);
-			longStrip.showControls(LatLong.FORMAT_MINUTESSECONDS);
-		}
-		else if (action.getSource() == decimal){
-			LatLong.setFormatStyle(LatLong.FORMAT_DECIMAL);
-			latStrip.showControls(LatLong.FORMAT_DECIMAL);
-			longStrip.showControls(LatLong.FORMAT_DECIMAL);
-		}
-
+		
+		int format = getSelectedLatLongFormat(); 
+		
+		LatLong.setFormatStyle(format);
+		latStrip.showControls(format);
+		longStrip.showControls(format);
 	}
 
 
 
 	private void showLatLong() {
-		
+
 		decimalMinutes	.setSelected(LatLong.getFormatStyle() == LatLong.FORMAT_DECIMALMINUTES);
 		minutesSeconds	.setSelected(LatLong.getFormatStyle() == LatLong.FORMAT_MINUTESSECONDS);
 		decimal			.setSelected(LatLong.getFormatStyle() == LatLong.FORMAT_DECIMAL);
 
-		latStrip		.showControls(LatLong.getFormatStyle() );
-		longStrip		.showControls(LatLong.getFormatStyle() );
+		latStrip		.showControls(LatLong.getFormatStyle());
+		longStrip		.showControls(LatLong.getFormatStyle());
 		latStrip		.setValue(latLong.getLatitude());
 		longStrip		.setValue(latLong.getLongitude());
 	}
@@ -174,26 +153,36 @@ public class LatLongPane extends SettingsPane<LatLong>{
 	 */
 	@Override
 	public LatLong getParams(LatLong currentParams) {
-		
-		Toggle selectedButton = this.segmentedButton.getToggleGroup().getSelectedToggle();
-		
-		if (selectedButton == decimalMinutes) {
-			LatLong.setFormatStyle(LatLong.FORMAT_DECIMALMINUTES);
 
-		}
-		else if  (selectedButton == minutesSeconds){
-			LatLong.setFormatStyle(LatLong.FORMAT_MINUTESSECONDS);
-	
-		}
-		else if (selectedButton == decimal){
-			LatLong.setFormatStyle(LatLong.FORMAT_DECIMAL);
-		}
-		
+		int format = getSelectedLatLongFormat(); 
+
+		LatLong.setFormatStyle(format);
+
 		latLong = new LatLong(latStrip.getValue(), longStrip.getValue());
 		if (Double.isNaN(latLong.getLatitude()) || Double.isNaN(latLong.getLongitude())) {
 			return null;
 		}
 		return latLong;
+	}
+
+	/**
+	 * Get the selected format for showing latitude and longitude values. 
+	 * @return the selected format flag or -1 if no format is selected. 
+	 */
+	private int getSelectedLatLongFormat() {
+		Toggle selectedButton = this.segmentedButton.getToggleGroup().getSelectedToggle();
+		if (selectedButton == decimalMinutes) {
+			return LatLong.FORMAT_DECIMALMINUTES;
+
+		}
+		else if  (selectedButton == minutesSeconds){
+			return LatLong.FORMAT_MINUTESSECONDS;
+
+		}
+		else if (selectedButton == decimal){
+			return LatLong.FORMAT_DECIMAL;
+		}
+		return -1; 
 	}
 
 	@Override

@@ -208,17 +208,20 @@ public class PamSettingsMenuPane extends PamVBox {
 		PamButton about=new PamButton("About..."); 
 		styleButton(about);
 		
-		PamButton tip=new PamButton("Tip of the day..."); 
-		styleButton(tip);
+//		PamButton tip=new PamButton("Tip of the day..."); 
+//		styleButton(tip);
 		
 		PamButton website=new PamButton("Website"); 
 		styleButton(website);
 		
-		PamButton contact=new PamButton("Contact and Support"); 
+		PamButton contact=new PamButton("Found a bug?"); 
+		styleButton(contact);
+		
+		PamButton checkForUpdates=new PamButton("Check for updates"); 
 		styleButton(contact);
 		
 		this.getChildren().addAll(settingsLabel,saveConfig,saveConfigAs, new Separator(),  mediumToggleBox, generalSettings, settings, new Separator(), 
-				storageManager, database, binaryStorage, new Separator(), help, about, tip, website, contact);
+				storageManager, database, binaryStorage, new Separator(), help, checkForUpdates, website, contact, about);
 
 	}
 	

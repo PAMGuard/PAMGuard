@@ -32,15 +32,19 @@ public class StaticHydrophonePane extends PamBorderPane  {
 	public void setParams() {
 		GpsDataUnit dataUnit = getStaticOriginSettings().getStaticPosition();
 		if (dataUnit == null) {
-			return;
-		}
-		GpsData gpsData = dataUnit.getGpsData();
-		if (gpsData == null) {
-			return;
+			setLatLong(null);
 		}
 		else {
+			GpsData gpsData = dataUnit.getGpsData();
 			setLatLong(gpsData);
 		}
+		
+//		if (gpsData == null) {
+//			return;
+//		}
+//		else {
+//			setLatLong(gpsData);
+//		}
 		
 	}
 	
@@ -50,8 +54,29 @@ public class StaticHydrophonePane extends PamBorderPane  {
 	
 
 	public boolean getParams() {
-		boolean ok =  getStaticOriginSettings()!= null && getStaticOriginSettings() .getStaticPosition() != null;
-		return ok;
+		
+		LatLong latLong = latLongPane.getParams(null);
+		
+		if (latLong==null) {
+			System.err.println("StaticHydrophonePane: latitude and longitude is null"); 
+			return false;
+		}
+		
+		if (getStaticOriginSettings()==null) {
+			System.err.println("StaticHydrophonePane: static origin is null"); 
+			return false;
+		}
+		
+		//set
+		getStaticOriginSettings().setStaticPosition(staticOriginMethod.getStreamer(), new GpsData(latLong));	
+//		
+//		boolean ok =  getStaticOriginSettings()!= null && getStaticOriginSettings() .getStaticPosition() != null;
+//		
+//		System.out.println("StaticHydrophonePane: Get params from static origin 1 : " + getStaticOriginSettings()); 
+//		
+//		System.out.println("StaticHydrophonePane: Get params from static origin 2: " + getStaticOriginSettings() .getStaticPosition()); 
+
+		return true;
 	}
 
 	/**
@@ -59,7 +84,14 @@ public class StaticHydrophonePane extends PamBorderPane  {
 	 * @param latLong
 	 */
 	private void setLatLong(LatLong latLong) {		
-		latLongPane.setParams(latLong);
+		if (latLong==null) {
+			//create a default latitude and longitude - Rockall (why not).
+			LatLong latLongdefault = new LatLong(); 
+			latLongdefault.setLatitude(57.595833333333);
+			latLongdefault.setLongitude(-13.686944444444);
+			latLongPane.setParams(latLongdefault);
+		}
+		else latLongPane.setParams(latLong);
 	}
 
 }

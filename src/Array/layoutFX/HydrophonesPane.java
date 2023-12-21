@@ -1,5 +1,7 @@
 package Array.layoutFX;
 
+import java.util.ArrayList;
+
 import Array.Hydrophone;
 import Array.PamArray;
 import PamController.PamController;
@@ -59,7 +61,12 @@ public class HydrophonesPane extends PamBorderPane {
 	/**
 	 * Settings pane for a single hydrophone. 
 	 */
-	private HydrophoneSettingsPane hydrophonePane = new HydrophoneSettingsPane(); 
+	private HydrophoneSettingsPane hydrophonePane = new HydrophoneSettingsPane();
+	
+	/**
+	 * A list of listeners which are called whenever a hydrophone is added removed or changed. 
+	 */
+	public ArrayList<ArrayChangeListener> hydrophoneChangeListeners = new ArrayList<ArrayChangeListener>();
 
 	public HydrophonesPane() {
 		
@@ -90,6 +97,8 @@ public class HydrophonesPane extends PamBorderPane {
 //					System.out.println("Hydro err: " + currentHydrophoneData.getXErr().get()+ " "  + currentHydrophoneData.getYErr().get() + "  " + currentHydrophoneData.getZErr().get()); 
 
 					currentHydrophoneData.setHydrophone(hydro);
+					
+					notifyHydrophoneListeners(currentHydrophoneData);
 
 					//need to refresh table to show symbol. 
 					tableArrayPane.getTableView().refresh();
@@ -102,6 +111,16 @@ public class HydrophonesPane extends PamBorderPane {
 			});
 		
 			this.setCenter(pamFlipePane);
+	}
+	
+	/**
+	 * Notify the hydrophone listeners of a change
+	 * @param streamer - the changed streamer
+	 */
+	public void notifyHydrophoneListeners(HydrophoneProperty hydrophone) {
+		for (ArrayChangeListener listener: hydrophoneChangeListeners) {
+			listener.arrayChanged(ArrayChangeListener.HYDROPHONE_CHANGE, hydrophone);
+		}
 	}
 	
 	/**
