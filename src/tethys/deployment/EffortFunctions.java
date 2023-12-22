@@ -44,6 +44,9 @@ public class EffortFunctions {
 	private DeploymentOverview createOverview(RecordingList tempPeriods) {
 
 		DutyCycleInfo dutyCycleinfo = assessDutyCycle(tempPeriods);
+		if (dutyCycleinfo == null) {
+			return null;
+		}
 
 		// if it's duty cycles, then we only want a single entry. 
 		RecordingList deploymentPeriods;
@@ -274,6 +277,9 @@ public class EffortFunctions {
 	 * @return
 	 */
 	private DutyCycleInfo assessDutyCycle(RecordingList tempPeriods) {
+		if (tempPeriods == null) {
+			return null;
+		}
 		int n = tempPeriods.size();
 		if (n < 2) {
 			return new DutyCycleInfo(false, 0,0,n);
