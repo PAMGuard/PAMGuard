@@ -30,6 +30,7 @@ import org.apache.commons.io.FilenameUtils;
 import offlineProcessing.DataCopyTask;
 import offlineProcessing.OLProcessDialog;
 import offlineProcessing.OfflineTaskGroup;
+import pamguard.GlobalArguments;
 import warnings.PamWarning;
 import warnings.WarningSystem;
 import PamController.PamConfiguration;
@@ -698,9 +699,17 @@ PamSettingsSource {
 	 */
 	public boolean selectDatabase(Frame frame, String selectTitle) {
 
+		
 		//this is a bit messy but difficult to figure this out in controller framework because
 		//this is called before the controller has initialised properly. 
-		if (PamGUIManager.getGUIType()==PamGUIManager.FX) {
+		// also have to allow for the database being passed as a command line option, in which case 
+		// we don't want to open the dialog. 
+		String currentDB = null;
+		DBParameters newParams = checkPassedDatabase();
+		if (newParams != null) {
+			
+		}
+		else if (PamGUIManager.getGUIType()==PamGUIManager.FX) {
 			//open FX
 			return ((DBGuiFX) getGUI(PamGUIManager.FX)).selectDatabase(PamController.getMainStage(), selectTitle, true); 
 		}
@@ -711,12 +720,13 @@ PamSettingsSource {
 			// object and retrieving the name of the first database in the recently-used list.  Double-check the connection
 			// field - if it's null, it means we don't actually have the database loaded so just clear the name and continue
 			// (this happens when starting Viewer mode)
-			String currentDB = databaseSystems.get(dbParameters.getDatabaseSystem()).getDatabaseName();
+			currentDB = databaseSystems.get(dbParameters.getDatabaseSystem()).getDatabaseName();
 			if (connection==null) {
 				currentDB = null;
 			}
 
-			DBParameters newParams = DBDialog.showDialog(this, frame, dbParameters, selectTitle);
+			newParams = DBDialog.showDialog(this, frame, dbParameters, selectTitle);
+		}
 			if (newParams != null) {
 				// first, check if there is a Lookup table.  If so, make sure to copy the contents over before
 				// we lose the reference to the old database
@@ -757,8 +767,28 @@ PamSettingsSource {
 				PamController.getInstance().getUidManager().runStartupChecks();	// if we've loaded a new database, synch the datablocks with the UID info
 				return true;
 			}
-		}
 		return false;
+	}
+	
+	/**
+	 * Check to see if a database has been passed to PAMGuard as a parameter from the command line. 
+	 * @return 
+	 */
+	DBParameters checkPassedDatabase() {
+		String passedDatabase = GlobalArguments.getParam(DBControl.GlobalDatabaseNameArg);
+		if (passedDatabase != null) {
+			/*
+			 * assume it's a file based database. Anything else is going to get more complicated and will require
+			 * a fair amount of type checing, connecint to servers, etc. 
+			 */
+			if (passedDatabase.endsWith(".sqlite3")) {
+				DBParameters newParams = dbParameters;
+				newParams.setDatabaseName(passedDatabase);
+				newParams.setDatabaseSystem(0);
+				return newParams;
+			}
+		}
+		return null;
 	}
 
 	/**
