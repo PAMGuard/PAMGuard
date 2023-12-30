@@ -7,6 +7,7 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
 
+import PamView.panel.SplitPanePositioner;
 import tethys.TethysControl;
 import tethys.calibration.swing.CalibrationsMainPanel;
 import tethys.calibration.swing.CalibrationsTable;
@@ -68,9 +69,12 @@ public class TethysMainPanel extends TethysGUIPanel {
 			// these only work if called after display is visible
 			@Override
 			public void run() {
-				splitPane.setDividerLocation(0.5);
-				southwestSplit.setDividerLocation(0.5);
-				northSplit.setDividerLocation(0.27);
+				new SplitPanePositioner("Tethys HorizontalSplit", splitPane, 0.5);
+				new SplitPanePositioner("Tethys southwestSplit", southwestSplit, 0.5);
+				new SplitPanePositioner("Tethys northSplit", northSplit, 0.27);
+//				splitPane.setDividerLocation(0.5);
+//				southwestSplit.setDividerLocation(0.5);
+//				northSplit.setDividerLocation(0.27);
 			}
 		});
 	}
