@@ -409,6 +409,11 @@ public class DBControlUnit extends DBControl implements DataOutputStore {
 	}
 
 	@Override
+	public String getDataLocation() {
+		return getDatabaseName();
+	}
+
+	@Override
 	public boolean loadData(PamDataBlock dataBlock, OfflineDataLoadInfo offlineDataLoadInfo, ViewLoadObserver loadObserver) {
 		SQLLogging logging = dataBlock.getLogging();
 		if (logging == null) {

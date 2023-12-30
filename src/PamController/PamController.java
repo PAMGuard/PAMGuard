@@ -57,6 +57,7 @@ import fftManager.FFTDataUnit;
 import generalDatabase.DBControlUnit;
 import javafx.application.Platform;
 import javafx.stage.Stage;
+import metadata.MetaDataContol;
 import Array.ArrayManager;
 import PamController.command.MulticastController;
 import PamController.command.NetworkController;
@@ -452,6 +453,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 		System.out.println("");
 		System.out.println("Note - ignore the following SLF4J warn/error messages, they are not applicable to this application");
 		ArrayManager.getArrayManager(); // create the array manager so that it get's it's settings
+		MetaDataContol.getMetaDataControl();
 
 		/**
 		 * Check for archived files and unpack automatically. 
@@ -1161,6 +1163,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 		}
 
 		if (saveSettings) {
+			startTime = PamCalendar.getSessionStartTime();
+//			System.out.printf("Saving settings for start time %s\n", PamCalendar.formatDBDateTime(startTime));
 			saveSettings(PamCalendar.getSessionStartTime());
 		}
 
@@ -1319,6 +1323,9 @@ public class PamController implements PamControllerInterface, PamSettings {
 		}
 		guiFrameManager.pamEnded();
 		
+		long stopTime = PamCalendar.getTimeInMillis();
+		saveEndSettings(stopTime);
+		
 		// no good having this here since it get's called at the end of every file. 
 //		if (GlobalArguments.getParam(PamController.AUTOEXIT) != null) {
 ////			can exit here, since we've auto started, can auto exit.
@@ -1436,6 +1443,26 @@ public class PamController implements PamControllerInterface, PamSettings {
 	private void saveSettings(long timeNow) {
 		pamConfiguration.saveSettings(timeNow);
 	}
+
+	/**
+	 * Gets called in pamStart and may / will attempt to store all
+	 * PAMGUARD settings via the database and binary storage modules. 
+	 */
+	private void saveEndSettings(long timeNow) {
+//		System.out.printf("Updating settings with end time %s\n", PamCalendar.formatDBDateTime(timeNow));
+		ArrayList<PamControlledUnit> pamControlledUnits = pamConfiguration.getPamControlledUnits();
+		PamControlledUnit pcu;
+		PamSettingsSource settingsSource;
+		for (int iU = 0; iU < pamControlledUnits.size(); iU++) {
+			pcu = pamControlledUnits.get(iU);
+			if (PamSettingsSource.class.isAssignableFrom(pcu.getClass())) {
+				settingsSource = (PamSettingsSource) pcu;
+				settingsSource.saveEndSettings(timeNow);
+			}
+		}
+	}
+	
+	
 
 	/**
 	 * Export configuration into an XML file
@@ -2407,7 +2434,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 			if (dbc == null) {
 				return null;
 			}
-			return dbc.getDatabaseName();
+			return dbc.getLongDatabaseName();
 		}
 		return null;
 	}

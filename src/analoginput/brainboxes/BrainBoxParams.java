@@ -5,6 +5,7 @@ import java.util.Hashtable;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import analoginput.AnalogDeviceParams;
 import analoginput.AnalogRangeData;
 
@@ -36,7 +37,7 @@ public class BrainBoxParams implements Serializable, Cloneable, ManagedParameter
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
 	}
 

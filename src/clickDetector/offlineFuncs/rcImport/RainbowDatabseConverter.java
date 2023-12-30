@@ -148,7 +148,7 @@ public class RainbowDatabseConverter {
 		
 		ClickDataBlock clickDataBlock = clickControl.getClickDataBlock();
 		clickLogging = new ClickImportLogging(clickControl);
-		PamTableDefinition tableDef = clickLogging.getTableDefinition();
+		PamTableDefinition tableDef = (PamTableDefinition) clickLogging.getTableDefinition();
 		boolean ok = checkTable(pamConnection, tableDef);
 		if (!ok) {
 			System.out.println("Error in Pamguard clicks table");
@@ -156,7 +156,7 @@ public class RainbowDatabseConverter {
 		}
 		
 		eventLogging = new OfflineEventLogging(clickControl, clickControl.getClickDetector().getOfflineEventDataBlock());
-		tableDef = eventLogging.getTableDefinition();
+		tableDef = (PamTableDefinition) eventLogging.getTableDefinition();
 		ok = checkTable(pamConnection, tableDef);
 		if (!ok) {
 			System.out.println("Error in Pamguard events table");

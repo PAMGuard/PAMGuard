@@ -5,6 +5,7 @@ import java.io.Serializable;
 import Acquisition.DaqSystemXMLManager;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import analoginput.AnalogRangeData;
 import simulatedAcquisition.SimProcess;
 
@@ -51,7 +52,7 @@ public class MCCDaqParams implements Serializable, Cloneable, ManagedParameters 
 			return null;
 		}
 
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
 	}
 

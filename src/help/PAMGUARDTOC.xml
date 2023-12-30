@@ -195,6 +195,12 @@
    <tocitem text="Overview " target="utilities.backupmanager.docs.backupmanager" image="topic"/>
 
   </tocitem>
+  <tocitem text="Tethys Interface ">
+   <tocitem text="Tethys Overview " target="utilities.tethys.docs.tethys_overview" image="topic"/>
+
+   <tocitem text="Tethys Server " target="utilities.tethys.docs.tethys_server" image="topic"/>
+
+  </tocitem>
  </tocitem>
  <tocitem text="Sensors ">
   <tocitem text="Analog Array Sensors ">

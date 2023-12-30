@@ -82,8 +82,10 @@ public class SettingsImportGroup {
 		try {
 			ownerClass = Class.forName(usedModuleInfo.className);
 		} catch (ClassNotFoundException e) {
+
+			System.out.println("Unknown class in loaded settings: " + usedModuleInfo.className);
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 		ArrayList<PamControlledUnit> existingModules = 
 				PamController.getInstance().findControlledUnits(ownerClass);

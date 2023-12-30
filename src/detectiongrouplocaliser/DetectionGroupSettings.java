@@ -6,6 +6,7 @@ import java.util.Hashtable;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
 import PamView.paneloverlay.overlaymark.OverlayMarkDataInfo;
 import annotation.handler.AnnotationChoices;
@@ -109,7 +110,7 @@ public class DetectionGroupSettings implements Serializable, Cloneable, ManagedP
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("overlayMarkInfo");
 			ps.put(new PrivatePamParameterData(this, field) {

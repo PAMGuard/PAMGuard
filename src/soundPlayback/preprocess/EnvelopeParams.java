@@ -7,6 +7,7 @@ import Filters.FilterParams;
 import Filters.FilterType;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 public class EnvelopeParams implements Cloneable, Serializable, ManagedParameters {
 
@@ -87,7 +88,7 @@ public class EnvelopeParams implements Cloneable, Serializable, ManagedParameter
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DISPLAY);
 		return ps;
 	}
 

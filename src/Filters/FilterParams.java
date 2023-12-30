@@ -30,6 +30,7 @@ import org.w3c.dom.Element;
 import PamController.PamControlledUnit;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamUtils.FrequencyFormat;
 
 /**
@@ -358,7 +359,7 @@ public class FilterParams implements Serializable, Cloneable, ManagedParameters 
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
 	}
 

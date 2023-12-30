@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamguardMVC.dataSelector.DataSelectParams;
 
 public class WMAlarmParameters extends DataSelectParams implements Cloneable, Serializable, ManagedParameters {
@@ -27,7 +28,7 @@ public class WMAlarmParameters extends DataSelectParams implements Cloneable, Se
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
 	}
 

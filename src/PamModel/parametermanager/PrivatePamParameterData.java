@@ -1,6 +1,7 @@
 package PamModel.parametermanager;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 
 /**
  * Abstract instance of PamParameterDataInterface which implements everything 
@@ -36,9 +37,48 @@ public abstract class PrivatePamParameterData extends PamParameterData {
 		 * This should really be implemented in every concrete class, but no time to do that now. Aim to delete 
 		 * this function here, then go through and implement everywhere ...
 		 */
-		return false;
+//		return false;
+		Object convData = convertStringType(data);
+		getField().set(this, convData);
+		
+		return true;
 	}
 	
+	/**
+	 * convert a string type to a different type appropriate for the field in
+	 * question. 
+	 * @param value
+	 * @return
+	 */
+	public Object convertStringType(Object value) {
+		if (value == null) {
+			return null;
+		}
+		if (value instanceof String == false) {
+			return value;
+		}
+		String str = (String) value;
+		Type type = getField().getGenericType();
+		Class<?> cls = getField().getType();
+		String clsName = cls.getName();
+		switch (clsName) {
+		case "int":
+		case "Integer":
+			return Integer.valueOf(str);
+		case "double":
+		case "Double":
+			return Double.valueOf(str);
+		case "float":
+		case "Float":
+			return Float.valueOf(str);
+		case "short":
+		case "Short":
+			return Short.valueOf(str);
+			
+		}
+		
+		return value;
+	}
 
 
 }

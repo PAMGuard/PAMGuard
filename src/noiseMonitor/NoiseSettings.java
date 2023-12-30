@@ -8,6 +8,7 @@ import java.util.ListIterator;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 public class NoiseSettings implements Serializable, Cloneable, ManagedParameters {
 
@@ -160,7 +161,7 @@ public class NoiseSettings implements Serializable, Cloneable, ManagedParameters
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("measurementBands");
 			ps.put(new PrivatePamParameterData(this, field) {

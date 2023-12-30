@@ -3,6 +3,7 @@ package annotation.calcs.spl;
 import java.sql.Types;
 
 import PamguardMVC.PamDataUnit;
+import generalDatabase.EmptyTableDefinition;
 import generalDatabase.PamTableDefinition;
 import generalDatabase.PamTableItem;
 import generalDatabase.SQLLoggingAddon;
@@ -25,7 +26,7 @@ public class SPLSqlAddon implements SQLLoggingAddon {
 	}
 
 	@Override
-	public void addTableItems(PamTableDefinition pamTableDefinition) {
+	public void addTableItems(EmptyTableDefinition pamTableDefinition) {
 		pamTableDefinition.addTableItem(rms);
 		pamTableDefinition.addTableItem(zeroPeak);
 		pamTableDefinition.addTableItem(peakPeak);
@@ -33,7 +34,7 @@ public class SPLSqlAddon implements SQLLoggingAddon {
 	}
 
 	@Override
-	public boolean saveData(SQLTypes sqlTypes, PamTableDefinition pamTableDefinition,
+	public boolean saveData(SQLTypes sqlTypes, EmptyTableDefinition pamTableDefinition,
 			PamDataUnit pamDataUnit) {
 		SPLAnnotation splAnnotation = (SPLAnnotation) pamDataUnit.findDataAnnotation(SPLAnnotation.class);
 		if (splAnnotation == null) {
@@ -52,7 +53,7 @@ public class SPLSqlAddon implements SQLLoggingAddon {
 	}
 
 	@Override
-	public boolean loadData(SQLTypes sqlTypes, PamTableDefinition pamTableDefinition,
+	public boolean loadData(SQLTypes sqlTypes, EmptyTableDefinition pamTableDefinition,
 			PamDataUnit pamDataUnit) {
 		SPLAnnotation splAnnotation = new SPLAnnotation(splAnnotationType);
 		if (splAnnotation != null) {

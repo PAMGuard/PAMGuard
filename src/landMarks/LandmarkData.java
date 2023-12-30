@@ -5,6 +5,7 @@ import java.io.Serializable;
 import PamController.masterReference.MasterReferencePoint;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamUtils.LatLong;
 import PamView.PamSymbol;
 
@@ -49,7 +50,7 @@ public class LandmarkData extends Object implements Serializable, Cloneable, Man
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
 	}
 

@@ -277,13 +277,14 @@ public class OfflineClickLogging extends SQLLogging {
 		Integer millis;
 		Object ts;
 		SQLTypes sqlTypes = dbControl.getConnection().getSqlTypes();
+		PamTableDefinition tableDef = (PamTableDefinition) getTableDefinition();
 		try {
 			while (resultSet.next()) {
 				transferDataFromResult(sqlTypes, resultSet);
-				ts = getTableDefinition().getTimeStampItem().getValue();
+				ts = tableDef.getTimeStampItem().getValue();
 				long m = SQLTypes.millisFromTimeStamp(ts); 
 				if (m%1000 == 0) {
-					millis = (Integer) getTableDefinition().getTimeStampMillis().getValue();
+					millis = (Integer) tableDef.getTimeStampMillis().getValue();
 					if (millis != null) {
 						m += millis;
 					}

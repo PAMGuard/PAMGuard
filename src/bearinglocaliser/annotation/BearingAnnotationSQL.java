@@ -4,6 +4,7 @@ import java.sql.Types;
 
 import PamguardMVC.PamDataUnit;
 import bearinglocaliser.BearingLocalisation;
+import generalDatabase.EmptyTableDefinition;
 import generalDatabase.PamTableDefinition;
 import generalDatabase.PamTableItem;
 import generalDatabase.SQLLoggingAddon;
@@ -34,7 +35,7 @@ public class BearingAnnotationSQL implements SQLLoggingAddon {
 	}
 
 	@Override
-	public void addTableItems(PamTableDefinition pamTableDefinition) {
+	public void addTableItems(EmptyTableDefinition pamTableDefinition) {
 		pamTableDefinition.addTableItem(algoName);
 		pamTableDefinition.addTableItem(bfPhones);
 		pamTableDefinition.addTableItem(bfArrayType);
@@ -48,7 +49,7 @@ public class BearingAnnotationSQL implements SQLLoggingAddon {
 	}
 
 	@Override
-	public boolean saveData(SQLTypes sqlTypes, PamTableDefinition pamTableDefinition, PamDataUnit pamDataUnit) {
+	public boolean saveData(SQLTypes sqlTypes, EmptyTableDefinition pamTableDefinition, PamDataUnit pamDataUnit) {
 		algoName.setValue(null);
 		bfPhones.setValue(null);
 		bfArrayType.setValue(null);
@@ -96,7 +97,7 @@ public class BearingAnnotationSQL implements SQLLoggingAddon {
 	}
 
 	@Override
-	public boolean loadData(SQLTypes sqlTypes, PamTableDefinition pamTableDefinition, PamDataUnit pamDataUnit) {
+	public boolean loadData(SQLTypes sqlTypes, EmptyTableDefinition pamTableDefinition, PamDataUnit pamDataUnit) {
 		Float[] Angles = new Float[2];
 		int nNans = 0;
 		for (int i = 0; i < 2; i++) {
