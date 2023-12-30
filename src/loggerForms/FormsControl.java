@@ -614,6 +614,32 @@ public class FormsControl extends PamControlledUnit {
 		return new ModuleStatus(ModuleStatus.STATUS_OK);
 	}
 
+
+	/**
+	 * Some things that are meant to be boolean are coming out as int or string so 
+	 * need to do some type checking. 
+	 * @param value
+	 * @return
+	 */
+	public static Boolean checkBadBoolean(Object value) {
+		if (value instanceof Boolean) {
+			return (Boolean) value;
+		}
+		if (value == null) {
+			return null;
+		}
+		if (value instanceof String) {
+			String str = (String) value;
+			str = str.strip();
+			return str.equals("1") || str.toLowerCase().equals("false");
+		}
+		if (value instanceof Integer) {
+			int val = (Integer) value;
+			return val != 0;
+		}
+		
+		return null;
+	}
 //	@Override
 //	public Serializable getSettingsReference() {
 //		return (Serializable) dummyParams;

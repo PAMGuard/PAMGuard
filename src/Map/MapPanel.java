@@ -1096,6 +1096,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 					return;
 				}
 				ds = dataBlock.getDataSelector(simpleMapRef.getUnitName(), false, DATASELECTNAME);
+//				ds = null;
 				ArrayList<PamDataUnit> dataCopy = dataBlock.getDataCopy(earliestToPlot, now, true, ds);
 				duIterator = dataCopy.listIterator();
 				while (duIterator.hasNext()) {

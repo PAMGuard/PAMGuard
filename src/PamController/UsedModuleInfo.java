@@ -59,4 +59,12 @@ public class UsedModuleInfo implements Serializable, ManagedParameters {
 		return ps;
 	}
 
+	/**
+	 * Get the unit name of the module being imported. 
+	 * @return
+	 */
+	public String getUnitName() {
+		return unitName;
+	}
+
 }
