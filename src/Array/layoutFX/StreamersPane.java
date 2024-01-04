@@ -75,10 +75,13 @@ public class StreamersPane extends PamBorderPane {
 		pamFlipePane.setAdvLabelEditable(true); 
 		pamFlipePane.getPostAdvLabel().setText("Settings");
 		
+		
+		pamFlipePane.backButtonProperty().addListener((obsval, oldVal, newVal)->{
+			
+//			System.out.println("Hello back button pressed: " +  newVal.intValue());
 
-		pamFlipePane.flipFrontProperty().addListener((obsval, oldVal, newVal)->{
 			//the flip pane
-			if (newVal) {
+			if (newVal.intValue()==PamFlipPane.OK_BACK_BUTTON) {
 				
 				Streamer streamer = streamerPane.getParams(currentStreamerData.getStreamer());
 								
@@ -284,6 +287,14 @@ public class StreamersPane extends PamBorderPane {
 
 	public TableView<StreamerProperty> getStreamerTable() {
 		return tableArrayPane.getTableView();
+	}
+
+	/**
+	 * Add a listener which is called whenever a streamer is added, removed or changed. 
+	 * @param e - the listener to add
+	 */
+	public void addStreamerListener(ArrayChangeListener e) {
+		this.streamerChangeListeners.add(e); 
 	}
 
 

@@ -5,6 +5,7 @@ import pamViewFX.fxNodes.PamBorderPane;
 
 import java.util.ArrayList;
 
+import Array.PamArray;
 import javafx.event.EventHandler;
 import javafx.scene.AmbientLight;
 import javafx.scene.DepthTest;
@@ -287,6 +288,16 @@ public class Array3DPane extends PamBorderPane {
 
 			}
 		});
+	}
+
+	/**
+	 * Draw the hydrophone array. 
+	 * @param array - the hydrophone array to draw. 
+	 */
+	public void drawArray(PamArray array) {
+		
+		System.out.println("Draw array: " + array); 
+		
 	}
 
 

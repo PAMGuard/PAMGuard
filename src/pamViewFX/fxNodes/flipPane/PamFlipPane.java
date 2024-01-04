@@ -43,14 +43,21 @@ public class PamFlipPane extends FlipPane {
 	/**
 	 * The back is pressed- equivelent to an OK.
 	 */
-	private static final int OK_BACK_BUTTON = 0;
+	public static final int OK_BACK_BUTTON = 0;
+	
+	/**
+	 * The back is pressed- equivelent to an OK.
+	 */
+	public static final int NORESPONE_BACK_BUTTON = -1;
 
 	/**
 	 * The back button is cancelled
 	 */
-	private static final int CANCEL_BACK_BUTTON = 0;
+	public static final int CANCEL_BACK_BUTTON = 1;
 
-
+	/**
+	 * Advanced pane.
+	 */
 	private PamBorderPane advPane;
 
 	private PamBorderPane frontPane;
@@ -79,19 +86,11 @@ public class PamFlipPane extends FlipPane {
 	 */
 	private SimpleIntegerProperty backButtonResponse = new SimpleIntegerProperty();
 
-
+	
 	public PamFlipPane() {
-		super();
-		this.advPane = createAdvSettingsPane();
-		this.getFront().getChildren().add(frontPane = new PamBorderPane()); 
-
-		//		this.getFront().setStyle("-fx-background-color: grey;");
-		//		this.getBack().setStyle("-fx-background-color: grey;");
-
-		this.getBack().getChildren().add(advPane); 
-		this.setFlipTime(FLIP_TIME);
-
+		this(Orientation.HORIZONTAL);
 	}
+
 
 	public PamFlipPane(Orientation FLIP_DIRECTION) {
 		super(FLIP_DIRECTION);
@@ -99,6 +98,14 @@ public class PamFlipPane extends FlipPane {
 		this.getFront().getChildren().add(frontPane = new PamBorderPane()); 
 		this.getBack().getChildren().add(advPane); 
 		this.setFlipTime(FLIP_TIME);
+		
+		this.flipFrontProperty().addListener((obsVal, oldval, newVal)->{
+			if (!newVal.booleanValue()) {
+				//need to set the back button so that listeners are triggered whenever the back 
+				//button is pressed. 
+				this.backButtonResponse.set(NORESPONE_BACK_BUTTON);
+			}
+		});
 	}
 
 	/**
@@ -157,7 +164,7 @@ public class PamFlipPane extends FlipPane {
 		backButton.setStyle("-fx-background-radius: 0 5 5 0; -fx-border-radius: 0 5 5 0; -fx-background-color: -color-accent-6");
 
 		backButton.setOnAction((action)->{
-			//	System.out.println("FLIP BACK TO FRONT"); 
+			System.out.println("FLIP BACK TO FRONT"); 
 			this.backButtonResponse.setValue(OK_BACK_BUTTON); 
 			this.flipToFront(); 
 		});
@@ -166,8 +173,9 @@ public class PamFlipPane extends FlipPane {
 		ContextMenu contextMenu = new ContextMenu();
 		//Creating the menu Items for the context menu
 		MenuItem item1 = new MenuItem("Cancel");
-		item1.setStyle("-fx-background-color: red");
-		contextMenu.setStyle("-fx-background-color: red");
+		
+//		item1.setStyle("-fx-highlight-color: red");
+		
 		item1.setOnAction((action)->{
 			//	System.out.println("FLIP BACK TO FRONT"); 
 			this.backButtonResponse.setValue(CANCEL_BACK_BUTTON); 
@@ -275,7 +283,14 @@ public class PamFlipPane extends FlipPane {
 
 	public void setAdvLabelEditable(boolean b) {
 		this.advLabel.setEditable(b); 
-
+	}
+	
+	/**
+	 * The back button property. Called whenever the back button is pressed. 
+	 * @return the back button integer proeprty. 
+	 */
+	public SimpleIntegerProperty backButtonProperty(){
+		return this.backButtonResponse;
 	}
 
 

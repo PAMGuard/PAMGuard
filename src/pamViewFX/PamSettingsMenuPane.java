@@ -218,7 +218,7 @@ public class PamSettingsMenuPane extends PamVBox {
 		styleButton(contact);
 		
 		PamButton checkForUpdates=new PamButton("Check for updates"); 
-		styleButton(contact);
+		styleButton(checkForUpdates);
 		
 		this.getChildren().addAll(settingsLabel,saveConfig,saveConfigAs, new Separator(),  mediumToggleBox, generalSettings, settings, new Separator(), 
 				storageManager, database, binaryStorage, new Separator(), help, checkForUpdates, website, contact, about);

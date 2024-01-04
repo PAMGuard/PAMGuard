@@ -462,14 +462,14 @@ public class HydrophoneSettingsPane extends SettingsPane<Hydrophone> {
 			 * the sizing of the pane i.e. it does not resize..
 			 */
 			
-//			try {
+			try {
 				if (posVal.isEmpty() || Double.valueOf(posVal)==null) {
-					//c.error("The input for " + description + " is invalid");
+					c.error("The input for " + description + " is invalid");
 				}
-//			}
-//			catch (Exception e) {
-//				c.error("The input for " + description + " is invalid");
-//			}
+			}
+			catch (Exception e) {
+				c.error("The input for " + description + " is invalid");
+			}
 		})
 		.decorates(userTextField).immediate();
 	}

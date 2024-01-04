@@ -87,11 +87,18 @@ public class HydrophonesPane extends PamBorderPane {
 			
 			pamFlipePane.getFront().setPadding(new Insets(5,5,5,10));
 			
-			pamFlipePane.flipFrontProperty().addListener((obsval, oldVal, newVal)->{
+			pamFlipePane.backButtonProperty().addListener((obsval, oldVal, newVal)->{
+				
+//				System.out.println("Hello back button pressed: " +  newVal.intValue());
 				//the flip pane
-				if (newVal) {
+				if (newVal.intValue()==PamFlipPane.OK_BACK_BUTTON) {
 					
 					Hydrophone hydro = hydrophonePane.getParams(currentHydrophoneData.getHydrophone());
+					
+					if (hydro==null) {
+						//the warning dialog is shown in the streamer settings pane
+						return;
+					}
 					
 //					System.out.println("Hydro: " + currentHydrophoneData.getX().get()+ " "  + currentHydrophoneData.getY().get() + "  " + currentHydrophoneData.getZ().get() + " ID: " +hydro.getID()); 
 //					System.out.println("Hydro err: " + currentHydrophoneData.getXErr().get()+ " "  + currentHydrophoneData.getYErr().get() + "  " + currentHydrophoneData.getZErr().get()); 
@@ -267,6 +274,15 @@ public class HydrophonesPane extends PamBorderPane {
 	public void setRecieverLabels() {
 		tableArrayPane.getZColumn().setText(PamController.getInstance().getGlobalMediumManager().getZString());
 		hydrophonePane.setRecieverLabels();
+	}
+	
+	/**
+	 * Add a listener which is called whenever a hydrophone is added, removed or changed. 
+	 * @param e - the listener to add
+	 */
+	public void addStreamerListener(ArrayChangeListener e) {
+		hydrophoneChangeListeners.add(e); 
+		
 	}
 
 }
