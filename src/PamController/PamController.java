@@ -2407,7 +2407,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 			if (dbc == null) {
 				return null;
 			}
-			return dbc.getDatabaseName();
+			return dbc.getLongDatabaseName();
 		}
 		return null;
 	}
