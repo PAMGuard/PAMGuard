@@ -198,6 +198,8 @@
   <tocitem text="Tethys Interface ">
    <tocitem text="Tethys Overview " target="utilities.tethys.docs.tethys_overview" image="topic"/>
 
+   <tocitem text="Quick Start " target="utilities.tethys.docs.tethys_quickstart" image="topic"/>
+
    <tocitem text="Tethys Server " target="utilities.tethys.docs.tethys_server" image="topic"/>
 
   </tocitem>

@@ -276,6 +276,8 @@
 
 <mapID target="detectors.clickDetectorHelp.docs.offline_Tools_AmplSel" url="detectors/clickDetectorHelp/docs/offline_Tools.html#AmplSel"/>
 
+<mapID target="utilities.tethys.docs.tethys_quickstart" url="utilities/tethys/docs/tethys_quickstart.html"/>
+
 <mapID target="displays.spectrogramDisplayHelp.docs.UserDisplay_Spectrogram_Overlays" url="displays/spectrogramDisplayHelp/docs/UserDisplay_Spectrogram_Overlays.html"/>
 
 <mapID target="displays.radarDisplayHelp.docs.UserDisplay_Radar_Creating" url="displays/radarDisplayHelp/docs/UserDisplay_Radar_Creating.html"/>
