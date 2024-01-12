@@ -4,6 +4,6 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>pamguard.org</groupId>
   <artifactId>x3</artifactId>
-  <version>2.2.2</version>
+  <version>2.2.7</version>
   <description>POM was created from install:install-file</description>
 </project>
