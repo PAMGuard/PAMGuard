@@ -154,6 +154,7 @@ public class Pamguard {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		boolean showSplash = true;
 		if (args != null) {
 			int nArgs = args.length;
 			int iArg = 0;
@@ -171,6 +172,9 @@ public class Pamguard {
 				else if (anArg.equalsIgnoreCase("-nr")) {
 					runMode = PamController.RUN_NETWORKRECEIVER;
 					System.out.println("PAMGUARD Network Reciever Mode");
+				}
+				else if (anArg.equalsIgnoreCase("-nosplash")) {
+					showSplash = false;
 				}
 
 				//	removed SEICHE switch when the two SEICHE modules were converted to plugins				
@@ -383,7 +387,7 @@ public class Pamguard {
 		if(runMode == PamController.RUN_REMOTE) {
 			spashTime = 0;
 		}
-		if (spashTime > 0 && (PamGUIManager.getGUIType() != PamGUIManager.NOGUI)) {
+		if (showSplash && spashTime > 0 && (PamGUIManager.getGUIType() != PamGUIManager.NOGUI)) {
 			new Splash(spashTime, chosenRunMode);
 		}
 		//		
