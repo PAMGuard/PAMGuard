@@ -466,9 +466,9 @@ name="_Version_2.02.10_January"></a>Version 2.02.10 January 2024</h1>
 <h2><span lang=EN-US>New Features</span></h2>
 
 <p class=MsoNormal><b><span lang=EN-US>Importing modules</span></b><span
-lang=EN-US> from other configurations: New options from file menu allowing
-import of specific modules, or module settings from other configurations. E.g.
-if you had three similar configurations and had set one of them up with a new
+lang=EN-US> from other configurations: New options from file menu allowing import
+of specific modules, or module settings from other configurations. E.g. if you
+had three similar configurations and had set one of them up with a new
 detector, or got the click classifier settings set up just right in one of
 those configurations, you can import the additional modules or the click
 detector settings easily into the other configurations. </span></p>
@@ -476,6 +476,10 @@ detector settings easily into the other configurations. </span></p>
 <p class=MsoNormal><b><span lang=EN-US>Improved SUD (soundtrap compressed
 files) file performance</span></b><span lang=EN-US> when scrolling through
 audio data in Viewer mode. </span></p>
+
+<p class=MsoNormal><b><span lang=EN-US>Viewer Launch</span></b><span
+lang=EN-US> by right clicking on sqlite database and selecting �open with / Pamguard
+ViewerMode launcher� menu option.</span></p>
 
 <h2><span lang=EN-US>Bug Fixes</span></h2>
 
@@ -492,9 +496,9 @@ correctly saving updated bearings to the database. Now fixed. </span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>ROCCA Classifier fixes</span></b></p>
 
-<p class=MsoNormal><span lang=EN-US>Allow Rocca to run without classifiers: Fixed
-bug that threw an error if no classifier files were �specified in Rocca Params
-dialog</span></p>
+<p class=MsoNormal><span lang=EN-US>Allow Rocca to run without classifiers:
+Fixed bug that threw an error if no classifier files were &nbsp;specified in
+Rocca Params dialog</span></p>
 
 <p class=MsoNormal><span lang=EN-US>Fix memory issue with
 RoccaContourDataBlocks not being released for garbage collection</span></p>
@@ -506,9 +510,9 @@ and stop PamObserver Timer to</span></p>
 
 <p class=MsoNormal><span lang=EN-US>Fix problem tracing whistles in Rocca
 spectrogram pop-up: Whistle and raw data were being cleared before the user had
-time to trace out the whistle, causing PAMGuard to throw an exception.� Both
-were already being cleared when the pop-up window is closed, so no need to do
-it here.</span></p>
+time to trace out the whistle, causing PAMGuard to throw an exception.&nbsp;
+Both were already being cleared when the pop-up window is closed, so no need to
+do it here.</span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>DIFAR Module</span></b><span lang=EN-US>:
 Bug crashing the module with null pointer errors fixed.</span></p>
@@ -516,6 +520,10 @@ Bug crashing the module with null pointer errors fixed.</span></p>
 <p class=MsoNormal><b><span lang=EN-US>Whistle Detector</span></b><span
 lang=EN-US>: Fixed bug which caused the detector to slow to almost zero speed
 when large complex sounds with many branches were detected. </span></p>
+
+<p class=MsoNormal><b><span lang=EN-US>Click Detector Offline Event Marking</span></b><span
+lang=EN-US>: Fixed problem of events not being correctly deleted and also of
+clicks not being correctly reassigned to different events. </span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>Screen Position</span></b><span
 lang=EN-US>: When using multiple monitors, if you move a configuration to a
@@ -555,9 +563,9 @@ handlers to handle corrupt map files. </span></p>
 <h2><span lang=EN-US>New Features</span></h2>
 
 <p class=MsoNormal><span lang=EN-US>Restart Options: When you restart
-processing of offline files, if output data already exist (binary data of within
-database tables) you will be asked if you want to overwrite the data, cancel,
-or try to continue from where to left off. </span></p>
+processing of offline files, if output data already exist (binary data of
+within database tables) you will be asked if you want to overwrite the data,
+cancel, or try to continue from where to left off. </span></p>
 
 <p class=MsoNormal><span lang=EN-US>Updated SoundTrap sud file interface so
 that PAMGuard now extracts and stores the Click Detector settings from the sud
@@ -751,8 +759,9 @@ the TF FX display to crash if no data were displayed.</span></p>
 <p class=MsoNormal><span lang=EN-US>See major release notes for V 2.02.01
 below. </span></p>
 
-<p class=MsoNormal><span lang=EN-US>Bug 495: TD FX display throws NullPointerException
-if user has removed all data units and then moves mouse over display area.</span></p>
+<p class=MsoNormal><span lang=EN-US>Bug 495: TD FX display throws
+NullPointerException if user has removed all data units and then moves mouse
+over display area.</span></p>
 
 <h1><a name="_Latest_Version_2.02.01"></a><span lang=EN-US>Version 2.02.01
 October 2021</span></h1>
@@ -787,12 +796,11 @@ font-family:"Times New Roman",serif'>&nbsp;</span></p>
 <p class=MsoNormal><b><span lang=EN-US>Localisation Modules</span></b><span
 lang=EN-US> </span></p>
 
-<p class=MsoNormal>Bearing and Group 3D localization modules have been
-thoroughly tested and a number of bugs rectified. Documentation has been
-developed and is available in the online help. Further, a number of example
-configurations have been generated, configuration files for these are available
-in the PAMGuard downloads area <a
-href="http://www.pamguard.org/downloads.php?cat_id=3">here</a>.</p>
+<p class=MsoNormal>Bearing and Group 3D localization modules have been thoroughly
+tested and a number of bugs rectified. Documentation has been developed and is
+available in the online help. Further, a number of example configurations have
+been generated, configuration files for these are available in the PAMGuard
+downloads area <a href="http://www.pamguard.org/downloads.php?cat_id=3">here</a>.</p>
 
 <p class=MsoNormal><b><span lang=EN-US>Detection Group Localiser</span></b><span
 lang=EN-US> </span></p>
@@ -919,10 +927,10 @@ included in a future release. </p>
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>17. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
 lang=EN-US> </span>An implementation of the Generalized Power Law Detector,
-developed by Tyler Helble ([Helble et al., ÂA generalized power-law
-detection algorithm for humpback whale vocalizationsÂ, The Journal of the
-Acoustical Society of America, vol. 131, no. 4, pp. 2682Â2699, 2012) is now
-available. For details, see the online help </p>
+developed by Tyler Helble ([Helble et al., ÂA generalized power-law detection
+algorithm for humpback whale vocalizationsÂ, The Journal of the Acoustical
+Society of America, vol. 131, no. 4, pp. 2682Â2699, 2012) is now available.
+For details, see the online help </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>18. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
@@ -1050,11 +1058,11 @@ understand the notes listed for <a href="#_Latest_Beta_Version_2.00.10">Beta
 Version 2.00.10</a> before proceeding with installation and use of this
 version.</b></p>
 
-<p class=MsoNormal>This version of PAMGuard has been bundled with Java 13
-(release 13.0.1). PSFX files generated in previous beta releases (2.xx.xx)
-should be compatible with this version, and vice-versa. PSF files generated in
-core releases (1.15.xx) can be loaded in this version, but will be converted to
-PSFX files when PAMGuard exits.</p>
+<p class=MsoNormal>This version of PAMGuard has been bundled with Java 13 (release
+13.0.1). PSFX files generated in previous beta releases (2.xx.xx) should be
+compatible with this version, and vice-versa. PSF files generated in core
+releases (1.15.xx) can be loaded in this version, but will be converted to PSFX
+files when PAMGuard exits.</p>
 
 <p class=MsoNormal><b><span lang=EN-US>Bug Fixes</span></b></p>
 
@@ -1187,8 +1195,8 @@ lang=EN-US> </span>Add option to alarm module to attach screenshots of all
 frames to email alerts. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>7. </span><span
-lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-Add Beamformer and Bearing Localiser modules </p>
+lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
+lang=EN-US> </span>Add Beamformer and Bearing Localiser modules </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>8. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
@@ -1311,9 +1319,9 @@ Bug 446. Multiple PamDataBlocks with same name turn on/off together in
 Spectrogram display.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>15. </span><span
-lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-Bug 447. Viewer mode throws exception when trying to load beamformer
-localisations</p>
+lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
+lang=EN-US> </span>Bug 447. Viewer mode throws exception when trying to load
+beamformer localisations</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>16. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
@@ -1362,8 +1370,8 @@ Implemented a simple UDP output for PAMGuard alarms. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>7. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-Changes to Spectrogram Mark Observers, to allow individual channels to be selected
-instead of the spectrogram panel as a whole. </p>
+Changes to Spectrogram Mark Observers, to allow individual channels to be
+selected instead of the spectrogram panel as a whole. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>8. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
@@ -1398,9 +1406,9 @@ be compatible with this version, and vice-versa.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-Java 12 is better at handling Windows scaling issues on high-DPI displays. Beyond
-that, users should not notice much of a difference between this version and
-previous beta releases.</p>
+Java 12 is better at handling Windows scaling issues on high-DPI displays.
+Beyond that, users should not notice much of a difference between this version
+and previous beta releases.</p>
 
 <!-- ************************************************************************************************************************** --><!-- ************************************************************************************************************************** -->
 
@@ -1465,8 +1473,8 @@ lang=EN-US> </span>Updates to the Ishmael detectors.</p>
 <h1><a name="_Latest_Beta_Version_2.00.16"></a><span lang=EN-US>Beta Version
 2.00.16 May 2019</span></h1>
 
-<p class=MsoNormal><span lang=EN-US>PAMGuard Version 2 contains major updates. You
-should read and understand the notes listed for <a
+<p class=MsoNormal><span lang=EN-US>PAMGuard Version 2 contains major updates.
+You should read and understand the notes listed for <a
 href="#_Latest_Beta_Version_2.00.10">Beta Version 2.00.10</a> before proceeding
 with installation and use of this version.</span></p>
 
@@ -1765,10 +1773,10 @@ settings even when user tries to cancel or discard changes</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>6. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 387. Map was stopping displaying data based on the start time of data
-units. Have changed this to last updated time so that click events will display
-if they have been recently modified. Otherwise, long events get lost from the
-display.</p>
+</span>Bug 387. Map was stopping displaying data based on the start time of
+data units. Have changed this to last updated time so that click events will
+display if they have been recently modified. Otherwise, long events get lost
+from the display.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>7. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -1816,9 +1824,9 @@ see new options in main menu.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
-lang=EN-US> </span>Added Matched Template Click Classifier. Classifies clicks
-based on an ideal template to match and a template to reject. An example of
-this is to classify beaked whale clicks in an environment with dolphin clicks.</p>
+lang=EN-US> </span>Added Matched Template Click Classifier. Classifies clicks based
+on an ideal template to match and a template to reject. An example of this is
+to classify beaked whale clicks in an environment with dolphin clicks.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>3. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -1933,12 +1941,12 @@ A number of upgrades and fixes to the Localiser algorithms, including expanding
 to work with whistles.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>3. </span><span
-lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-Added option to export all settings and parameters as an XML-formatted file.
-Note that this required changes to the structure of the Array Manager, and as
-such any settings (psf) files created with this version of Pamguard cannot be
-used in older versions. Older psf files can be loaded with this version, but
-will be converted.</p>
+lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
+lang=EN-US> </span>Added option to export all settings and parameters as an
+XML-formatted file. Note that this required changes to the structure of the
+Array Manager, and as such any settings (psf) files created with this version
+of Pamguard cannot be used in older versions. Older psf files can be loaded
+with this version, but will be converted.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>4. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
@@ -2090,8 +2098,8 @@ lang=EN-US> </span>User is now able to specify Soundtrap date/time format</p>
 <h1><a name="_Latest_Beta_Version_2.00.11"></a><span lang=EN-US>Beta Version
 2.00.11 October 2017</span></h1>
 
-<p class=MsoNormal><span lang=EN-US>PAMGuard Version 2 contains major updates.
-You should read and understand the notes listed for <a
+<p class=MsoNormal><span lang=EN-US>PAMGuard Version 2 contains major updates. You
+should read and understand the notes listed for <a
 href="#_Latest_Beta_Version_2.00.10">Beta Version 2.00.10</a> before proceeding
 with installation and use of this version.</span></p>
 
@@ -2104,9 +2112,9 @@ showing. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span><span lang=EN-US>Bug 323. Difar module.</span> Fixed a couple of small bugs
-in the DIFAR system which caused it to not work if old configuratins were used.
-</p>
+</span><span lang=EN-US>Bug 323. Difar module.</span> Fixed a couple of small
+bugs in the DIFAR system which caused it to not work if old configuratins were
+used. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>3.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2255,10 +2263,10 @@ so they will no longer work with older PAMGuard versions.</span></p>
 
 <p class=MsoListParagraph style='margin-left:54.0pt;text-indent:-36.0pt'><span
 lang=EN-US>2.</span><span lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span><span lang=EN-US>Display colour options will be lost and most data displayed
-on the map may default to black. This is due to the above changes to how
-colours are managed. Changing back to the colours of your choice is relatively
-simple through the PAMGuard GUI. </span></p>
+</span><span lang=EN-US>Display colour options will be lost and most data
+displayed on the map may default to black. This is due to the above changes to
+how colours are managed. Changing back to the colours of your choice is
+relatively simple through the PAMGuard GUI. </span></p>
 
 <p class=MsoListParagraph style='margin-left:54.0pt;text-indent:-36.0pt'><span
 lang=EN-US>&nbsp;</span></p>
@@ -2350,10 +2358,9 @@ happens when the user selects save as new configuration. This has been fixed.</p
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>6.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 315. code searched for file in working folder, which is the
-installation folder when starting PAMGuard using a shortcut link. But when
-double-clicking on a psf, the working folder is the location of the psf. This
-has been fixed.</p>
+</span>Bug 315. code searched for file in working folder, which is the installation
+folder when starting PAMGuard using a shortcut link. But when double-clicking
+on a psf, the working folder is the location of the psf. This has been fixed.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>7.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
@@ -2413,9 +2420,9 @@ dependencies)</span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>Other Changes</span></b></p>
 
-<p class=MsoNormal><span lang=EN-US>The installer has been updated to handle
-both 64 bit and 32 bit installations. PAMGuard psf files are now registered in
-the Windows Registry, so double-clicking on a psf file should run PAMGuard in
+<p class=MsoNormal><span lang=EN-US>The installer has been updated to handle both
+64 bit and 32 bit installations. PAMGuard psf files are now registered in the
+Windows Registry, so double-clicking on a psf file should run PAMGuard in
 normal mode (as opposed to Viewer or Mixed modes). Note that the Windows
 Registry can only hold a single executable reference for psf files; therefore,
 for users with multiple installations of PAMGuard, double-clicking on a psf
@@ -2691,11 +2698,11 @@ planned file format changes and that this is purely a future proofing exercise.<
 
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'>7.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 279. GUI Resizing: The whole PAMGuard GUI would suddenly resize to something
-very small when a dialog is opened. This has been traced to improper use of a
-common dialog component SourcePanel which tries to repack its parent Window.
-Some programmers had inadvertently set it to repack the main PAMGuard GUI
-instead. This has been Fixed.</p>
+</span>Bug 279. GUI Resizing: The whole PAMGuard GUI would suddenly resize to
+something very small when a dialog is opened. This has been traced to improper
+use of a common dialog component SourcePanel which tries to repack its parent
+Window. Some programmers had inadvertently set it to repack the main PAMGuard
+GUI instead. This has been Fixed.</p>
 
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'>8.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -3250,10 +3257,11 @@ sonobuoys. See online help for details.&nbsp; </p>
 <p class=MsoNormal><i>MEAL Localiser</i> (Localisation Group)</p>
 
 <p class=MsoNormal>This module, developed by Jamie Macaulay of St Andrews
-University estimates the 3D localisation of clicks using a variety of algorithms.
-It's primarily been developed to track harbour porpoise in three dimensions
-over scales of 10's of metres. While currently only working with output from
-the click detector, we hope eventually to extend its use to whistles as well. </p>
+University estimates the 3D localisation of clicks using a variety of
+algorithms. It's primarily been developed to track harbour porpoise in three
+dimensions over scales of 10's of metres. While currently only working with
+output from the click detector, we hope eventually to extend its use to
+whistles as well. </p>
 
 <p class=MsoNormal><i>Accelerometer Readout</i> (Sensors group)</p>
 
@@ -3395,8 +3403,8 @@ whistle.</p>
  <li class=MsoNormal style='margin-bottom:0cm'>Airgun display. If this was
      included in the PAMGuard model before the GPS module it would hang
      PAMGuard. This has been rectified. </li>
- <li class=MsoNormal style='margin-bottom:0cm'>Fixed occasional exceptions in
-     the sound output modules when playing back from files. </li>
+ <li class=MsoNormal style='margin-bottom:0cm'>Fixed occasional exceptions in the
+     sound output modules when playing back from files. </li>
  <li class=MsoNormal style='margin-bottom:0cm'>Fixed exceptions in spectrogram
      user interface. </li>
  <li class=MsoNormal style='margin-bottom:0cm'>Fixed National Instruments sound
@@ -3436,9 +3444,9 @@ whistle.</p>
 
 <p class=MsoNormal><b>New Modules</b></p>
 
-<p class=MsoNormal style='margin-left:36.0pt'>Clip Generator: Saves and displays
-short waveform clips around detections. Can work with any detector (or indeed
-any other data stream within PAMGuard). &nbsp;</p>
+<p class=MsoNormal style='margin-left:36.0pt'>Clip Generator: Saves and
+displays short waveform clips around detections. Can work with any detector (or
+indeed any other data stream within PAMGuard). &nbsp;</p>
 
 <p class=MsoNormal style='margin-left:36.0pt'>Local time display: displays the
 computers local time on the main display panel. </p>
@@ -3478,8 +3486,8 @@ other data sources for the PAMGuard viewer. </p>
 storage to the database offline for any module having both binary and database
 storage. </p>
 
-<p class=MsoNormal style='margin-left:36.0pt'>Can create a blank MS Access
-database (2007 and later *.accdb formats only).</p>
+<p class=MsoNormal style='margin-left:36.0pt'>Can create a blank MS Access database
+(2007 and later *.accdb formats only).</p>
 
 <p class=MsoNormal style='margin-left:36.0pt'>Can open MS Access from within
 PAMGuard to make it easier to view database content. </p>
@@ -3514,9 +3522,9 @@ information correctly in the binary files. </p>
 
 <p class=MsoNormal style='margin-left:36.0pt'><i>Logger Forms</i></p>
 
-<p class=MsoNormal style='margin-left:36.0pt'>A substantial amount of work has been
-carried out on Logger forms, funded by the South West fisheries Science Center.
-</p>
+<p class=MsoNormal style='margin-left:36.0pt'>A substantial amount of work has
+been carried out on Logger forms, funded by the South West fisheries Science
+Center. </p>
 
 <p class=MsoNormal style='margin-left:36.0pt'><i>Click Detector</i></p>
 
@@ -3798,10 +3806,10 @@ source, even if that data source is loaded after the FFT module is created.</p>
 
 <p class=MsoNormal>1. Binary storage module. </p>
 
-<p class=MsoNormal>Performs a parallel role to the PAMGAURD database but uses
-binary files in a proprietary format which is considerably more efficient for
-data of unknown length such as whistle contours or small clips of click
-waveform. This feature is currently implemented in the following modules:</p>
+<p class=MsoNormal>Performs a parallel role to the PAMGAURD database but uses binary
+files in a proprietary format which is considerably more efficient for data of
+unknown length such as whistle contours or small clips of click waveform. This
+feature is currently implemented in the following modules:</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -3967,9 +3975,9 @@ more displays are set up for offline data viewing in future releases. </p>
 
 <p class=MsoNormal>Viewer data map</p>
 
-<p class=MsoNormal>When using the PAMGUARD viewer an additional panel will be displayed
-showing an overview of data quantity (per hour) from the various database
-tables connected to PAMGUARD. </p>
+<p class=MsoNormal>When using the PAMGUARD viewer an additional panel will be
+displayed showing an overview of data quantity (per hour) from the various
+database tables connected to PAMGUARD. </p>
 
 <p class=MsoNormal>Spectrogram Display overlays</p>
 
@@ -4010,8 +4018,8 @@ column was setting to zero. This is now fixed</p>
 
 <p class=MsoNormal>Ishmael Detectors</p>
 
-<p class=MsoNormal>Better rendering of detection boxes on spectrogram display
-and more meaningful names in spectrogram display menu.</p>
+<p class=MsoNormal>Better rendering of detection boxes on spectrogram display and
+more meaningful names in spectrogram display menu.</p>
 
 <p class=MsoNormal>Sound acquisition</p>
 
@@ -4179,9 +4187,9 @@ display correctly and amplitude scale updates after scale parameter changes. </p
 
 <p class=MsoNormal><b>Speed improvement</b>. </p>
 
-<p class=MsoNormal>PAMGAURD FFT calculations now use the JTransforms FFT library
-which gives a factor 2 speed improvement compared to previous FFT methods used
-in PAMGUARD</p>
+<p class=MsoNormal>PAMGAURD FFT calculations now use the JTransforms FFT
+library which gives a factor 2 speed improvement compared to previous FFT
+methods used in PAMGUARD</p>
 
 <p class=MsoNormal><b>New Modules</b></p>
 
@@ -4537,9 +4545,9 @@ localiser (affects stability of click train localiser and whistle localiser in <
 
 <h2>1.2.0 Beta December 2008</h2>
 
-<p class=MsoNormal>This release contains many bug fixes from the PAMGUARD industry
-field trial which took place in the Gulf of Mexico on the RV New Venture in
-November 2008.</p>
+<p class=MsoNormal>This release contains many bug fixes from the PAMGUARD
+industry field trial which took place in the Gulf of Mexico on the RV New
+Venture in November 2008.</p>
 
 <p class=MsoNormal><b>Bug Fixes</b></p>
 
@@ -4644,8 +4652,8 @@ mouse is moved over the display. Choice of colour maps for display. </p>
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span>Sound playback. Now supported in ASIO sound cards, so you can have sound
-coming in through the ASIO card and back out through its headphone socket (after
-passing through PAMGUARD filters and other modules) at the same time.</p>
+coming in through the ASIO card and back out through its headphone socket
+(after passing through PAMGUARD filters and other modules) at the same time.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -4665,11 +4673,11 @@ Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif
 
 <p class=MsoNormal><b>Multithreading</b></p>
 
-<p class=MsoNormal>PAMGUARD now processes data in each module in a different processing
-thread. This allows PAMGUARD to use both processor cores on dual or multi core
-processor machines. However, multithreading may still cause instability in some
-modules. An option is therefore accessible from the main Detection menu to
-enable and disable multithreading. </p>
+<p class=MsoNormal>PAMGUARD now processes data in each module in a different
+processing thread. This allows PAMGUARD to use both processor cores on dual or
+multi core processor machines. However, multithreading may still cause
+instability in some modules. An option is therefore accessible from the main
+Detection menu to enable and disable multithreading. </p>
 
 <p class=MsoNormal><b>New Modules</b></p>
 

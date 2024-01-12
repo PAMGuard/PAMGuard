@@ -1,10 +1,13 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.pamguard</groupId>
-	<artifactId>Pamguard</artifactId>
-	<version>2.02.09f</version>
-	<name>Pamguard Java12+</name>
-	<description>Pamguard for Java 12+, using Maven to control dependcies</description>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.pamguard</groupId>
+  <artifactId>Pamguard</artifactId>
+  <version>2.02.09aa</version>
+  <name>Pamguard Java12+</name>
+  <description>Pamguard for Java 12+, using Maven to control dependcies</description>
 	<url>www.pamguard.org</url>
 	<organization>
 		<name>Sea Mammal Research Unit, University of St. Andrews</name>
@@ -882,11 +885,11 @@
 		<!-- not in Maven repository  
 you may need to copy files from your downloaded PAMGuard source code, e.g. C:\Users\*yourreposfolder*\source\repos\PAMGuardPAMGuard\repo\pamguard\org\x3\2.2.2 to 
 C:\Users\*yourusername*\.m2\repository\pamguard\org\x3\2.2.2-->
-		<dependency>
-			<groupId>pamguard.org</groupId>
-			<artifactId>x3</artifactId>
-			<version>2.2.6</version>
-		</dependency>
+ 	<dependency>
+	    <groupId>pamguard.org</groupId>
+	    <artifactId>x3</artifactId>
+	    <version>2.2.7</version>
+	</dependency>
 
 		<!-- Also not in Maven, so you may need to copy the javaclient and nilus folders from 
 e.g. C:\Users\dg50\source\repos\**your projectfolder**\repo\tethys\org
