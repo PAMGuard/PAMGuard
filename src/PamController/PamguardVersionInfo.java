@@ -31,12 +31,12 @@ public class PamguardVersionInfo {
 	 * Version number, major version.minorversion.sub-release.
 	 * Note: can't go higher than sub-release 'f'
 	 */
-	static public final String version = "2.02.09f";
+	static public final String version = "2.02.09aa";
 	
 	/**
 	 * Release date
 	 */
-	static public final String date = "28 December 2023";
+	static public final String date = "12 January 20242";
 	
 //	/**
 //	 * Release type - Beta or Core

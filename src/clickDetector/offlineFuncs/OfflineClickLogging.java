@@ -51,7 +51,7 @@ public class OfflineClickLogging extends SQLLogging {
 		tableDef.addTableItem(clickNumber = new PamTableItem("ClickNo", Types.INTEGER));
 		tableDef.addTableItem(amplitude = new PamTableItem("Amplitude", Types.DOUBLE));
 		tableDef.addTableItem(channelNumbers = new PamTableItem("Channels", Types.INTEGER));
-		tableDef.setUseCheatIndexing(true);
+		tableDef.setUseCheatIndexing(false);
 
 		setTableDefinition(tableDef);
 	}
