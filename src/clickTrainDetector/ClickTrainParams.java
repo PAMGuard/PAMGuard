@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamUtils.PamUtils;
 import clickTrainDetector.classification.CTClassifierParams;
 import clickTrainDetector.classification.simplechi2classifier.Chi2ThresholdParams;
@@ -127,7 +128,7 @@ public class ClickTrainParams implements Serializable, Cloneable, ManagedParamet
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
 	}
 

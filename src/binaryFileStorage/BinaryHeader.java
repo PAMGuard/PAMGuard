@@ -9,6 +9,7 @@ import java.lang.reflect.Field;
 import PamController.PamguardVersionInfo;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
 import PamUtils.PamCalendar;
 
@@ -289,7 +290,7 @@ public class BinaryHeader implements Serializable, ManagedParameters {
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("pamguard");
 			ps.put(new PrivatePamParameterData(this, field) {

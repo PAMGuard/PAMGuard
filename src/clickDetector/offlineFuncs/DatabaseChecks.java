@@ -102,16 +102,17 @@ public class DatabaseChecks {
 		long resultTime;
 		long firstTime = Long.MAX_VALUE;
 		long lastTime = Long.MIN_VALUE;
+		PamTableDefinition pamTableDef = (PamTableDefinition) clickLogging.getTableDefinition();
 		try {
 			Statement stmt = con.getConnection().createStatement();
 			ResultSet result = stmt.executeQuery(sqlStr);
 			while (result.next()) {
 				nClicks++;
 				clickLogging.transferDataFromResult(sqlTypes, result);			
-				ts = clickLogging.getTableDefinition().getTimeStampItem().getValue();
+				ts = pamTableDef.getTimeStampItem().getValue();
 				resultTime = sqlTypes.millisFromTimeStamp(ts);
 				if (resultTime%1000 == 0) {
-					resultTime += clickLogging.getTableDefinition().getTimeStampMillis().getIntegerValue();
+					resultTime += pamTableDef.getTimeStampMillis().getIntegerValue();
 				}
 				firstTime = Math.min(firstTime, resultTime);
 				lastTime = Math.max(lastTime, resultTime);
@@ -188,7 +189,7 @@ public class DatabaseChecks {
 		eventDataBlock.addPamData(event);
 		PamConnection con = DBControlUnit.findConnection();
 		// now find a cursor and save it. 
-		PamTableDefinition eventTableDef = eventDataBlock.getLogging().getTableDefinition();
+		PamTableDefinition eventTableDef = (PamTableDefinition) eventDataBlock.getLogging().getTableDefinition();
 		PamCursor cursor = eventDataBlock.getLogging().getViewerCursorFinder().getCursor(con, eventTableDef);
 		cursor.immediateInsert(con);
 		int newId = event.getDatabaseIndex();

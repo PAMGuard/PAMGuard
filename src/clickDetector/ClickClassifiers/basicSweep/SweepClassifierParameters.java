@@ -7,6 +7,7 @@ import java.util.Vector;
 import PamModel.SMRUEnable;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
 
 public class SweepClassifierParameters implements Serializable, Cloneable, ManagedParameters {
@@ -72,7 +73,7 @@ public class SweepClassifierParameters implements Serializable, Cloneable, Manag
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("classifierSets");
 			ps.put(new PrivatePamParameterData(this, field) {

@@ -6,6 +6,7 @@ import java.util.Calendar;
 import NMEA.NMEABitArray;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamUtils.PamCalendar;
 
 public class AISStaticData extends AISReport implements Serializable, ManagedParameters{
@@ -393,7 +394,7 @@ public class AISStaticData extends AISReport implements Serializable, ManagedPar
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DISPLAY);
 		return ps;
 	}
 

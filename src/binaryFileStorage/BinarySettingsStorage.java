@@ -110,6 +110,12 @@ public class BinarySettingsStorage implements PamSettingsSource {
 		return false;*/
 	}
 
+	@Override
+	public boolean saveEndSettings(long timeNow) {
+		// do nothing at the end of a run with binary store. 
+		return true;
+	}
+
 //	private boolean writeData(DataOutputStream dos, int objectId, byte[] data) {
 //		int totalLen = data.length + 16;
 //		int dataLen = data.length;

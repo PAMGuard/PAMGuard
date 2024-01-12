@@ -116,5 +116,27 @@ public class NoiseLogging extends SQLLogging {
 			}
 		}
 	}
+	
+	private long lastTime;
+
+	@Override
+	protected PamDataUnit createDataUnit(SQLTypes sqlTypes, long timeMilliseconds, int databaseIndex) {
+		int chan = channelNumber.getIntegerValue();
+		int nBands = noiseDataBlock.getBandLoEdges().length;
+		int nMeasures = noiseDataBlock.getUsedMeasureNames().length;
+		if (nMeasures * nBands != bandItems.length) {
+			return null;
+		}
+		double[][] bandData = new double[nBands][nMeasures];
+		for (int iBand = 0, iCol = 0; iBand < nBands; iBand++) {
+			for (int iMeasure = 0; iMeasure < nMeasures; iMeasure++, iCol++) {
+				bandData[iBand][iMeasure] = bandItems[iCol].getDoubleValue();
+			}
+		}
+
+		NoiseDataUnit noiseDataUnit = new NoiseDataUnit(timeMilliseconds, 1<<chan, 0, 0);
+		noiseDataUnit.setNoiseBandData(bandData);
+		return noiseDataUnit;
+	}
 
 }

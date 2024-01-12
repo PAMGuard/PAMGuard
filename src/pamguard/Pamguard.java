@@ -721,6 +721,47 @@ public class Pamguard {
 			}
 		}
 	}
+	/*
+	 * Some bits that need added to Maven POM. 
+	 * 
+<!-- From NilusXMLGenerator POM at https://bitbucket.org/tethysacousticmetadata/nilusxmlgenerator/src/master/-->
+    <dependency>
+        <groupId>org.eclipse.persistence</groupId>
+        <artifactId>org.eclipse.persistence.moxy</artifactId>
+        <version>2.5.0</version>
+    </dependency>
+	<dependency>
+	    <groupId>javax.xml.bind</groupId>
+	    <artifactId>jaxb-api</artifactId>
+	    <version>2.4.0-b180830.0359</version> 
+	</dependency>
+	<dependency>
+	    <groupId>org.glassfish.jaxb</groupId>
+	    <artifactId>jaxb-runtime</artifactId>
+	    <version>2.4.0-b180830.0438</version> 
+	</dependency>
+	<dependency>
+        <groupId>org.glassfish.jaxb</groupId>
+        <artifactId>jaxb-xjc</artifactId>
+        <version>2.4.0-b180830.0438</version>
+    </dependency>
+	 
+	 <!-- Also not in Maven, so you may need to copy the javaclient and nilus folders from 
+e.g. C:\Users\dg50\source\repos\**your projectfolder**\repo\tethys\org
+to C:\Users\dg50\.m2\repository\tethys\org
+
+ 	<dependency>
+	    <groupId>tethys.org</groupId>
+	    <artifactId>nilus</artifactId>
+	    <version>3.0</version>
+	</dependency>
+
+ 	<dependency>
+	    <groupId>tethys.org</groupId>
+	    <artifactId>javaclient</artifactId>
+	    <version>3.0</version>
+	</dependency>-->
+	 */
 
 
 }

@@ -125,7 +125,7 @@ public class TrackedGroupSqlLogging extends SQLLogging {
 	 */
 	protected void updateData(SQLTypes sqlTypes, PamDataUnit pamDataUnit) {
 
-		PamTableDefinition tableDef = getTableDefinition();
+		PamTableDefinition tableDef = (PamTableDefinition) getTableDefinition();
 		PamTableItem tableItem;
 
 		tableDef.getIndexItem().setValue(pamDataUnit.getDatabaseIndex());

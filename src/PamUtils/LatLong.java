@@ -15,6 +15,7 @@ import java.text.NumberFormat;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamguardMVC.PamConstants;
 import net.sf.geographiclib.Geodesic;
 import net.sf.geographiclib.PolygonArea;
@@ -833,7 +834,7 @@ public class LatLong implements Serializable, Cloneable, Transferable, PamCoordi
 	 */
 	@Override
 	public PamParameterSet getParameterSet() {
-	PamParameterSet ps = PamParameterSet.autoGenerate(this);
+	PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 	try {
 		Field field = this.getClass().getDeclaredField("height");
 		ps.put(new PrivatePamParameterData(this, field) {

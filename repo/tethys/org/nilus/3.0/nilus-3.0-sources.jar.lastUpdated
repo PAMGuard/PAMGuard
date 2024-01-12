@@ -1,0 +1,12 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Thu Dec 21 11:15:24 GMT 2023
+@default-talan-https\://nexus.talanlabs.com/content/repositories/releases/.lastUpdated=1703157323819
+https\://repo1.maven.org/maven2/.error=
+file\://C\:\\Users\\dg50\\source\\repos\\PAMGuardDG_2/repo/.error=
+file\://C\:\\Users\\dg50\\source\\repos\\PAMGuardDG_2/repo/.lastUpdated=1703157322932
+https\://artifacts.unidata.ucar.edu/repository/unidata-all/.error=
+https\://nexus.bedatadriven.com/content/groups/public/.error=
+https\://nexus.bedatadriven.com/content/groups/public/.lastUpdated=1703157323770
+https\://artifacts.unidata.ucar.edu/repository/unidata-all/.lastUpdated=1703157323508
+https\://repo1.maven.org/maven2/.lastUpdated=1703157324237
+https\://nexus.talanlabs.com/content/repositories/releases/.error=Could not transfer artifact tethys.org\:nilus\:jar\:sources\:3.0 from/to talan (https\://nexus.talanlabs.com/content/repositories/releases/)\: nexus.talanlabs.com

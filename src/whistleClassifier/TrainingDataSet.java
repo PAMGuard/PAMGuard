@@ -17,7 +17,7 @@ import PamModel.parametermanager.PamParameterSet;
  * @author Doug Gillespie
  *	@see TrainingDataGroup
  */
-public class TrainingDataSet implements Serializable, ManagedParameters {
+public class TrainingDataSet implements Serializable {
 	
 	static public final long serialVersionUID = 0;
 
@@ -162,10 +162,4 @@ public class TrainingDataSet implements Serializable, ManagedParameters {
 //		nContours = contours;
 //	}
 	
-	@Override
-	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
-		return ps;
-	}
-
 }

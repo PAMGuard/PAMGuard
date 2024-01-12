@@ -541,6 +541,12 @@ PamSettingsSource, DataOutputStore {
 	}
 
 	@Override
+	public boolean saveEndSettings(long timeNow) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	@Override
 	public int getNumSettings() {
 		if (binarySettingsStorage == null) {
 			return 0;
@@ -2546,6 +2552,10 @@ PamSettingsSource, DataOutputStore {
 	public boolean deleteDataFrom(long timeMillis) {
 		BinaryStoreDeleter storeDeleter = new BinaryStoreDeleter(this);
 		return storeDeleter.deleteDataFrom(timeMillis);
+	}
+	@Override
+	public String getDataLocation() {
+		return binaryStoreSettings.getStoreLocation();
 	}
 	
 }

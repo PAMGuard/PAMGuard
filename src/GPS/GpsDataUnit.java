@@ -1,5 +1,6 @@
 package GPS;
 
+import PamUtils.PamCalendar;
 import PamguardMVC.PamDataUnit;
 
 public class GpsDataUnit extends PamDataUnit {
@@ -52,12 +53,18 @@ public class GpsDataUnit extends PamDataUnit {
 	 */
 	@Override
 	public String getSummaryString() {
-		// TODO Auto-generated method stub
-		String str = super.getSummaryString();
+//		String str = super.getSummaryString();
+		String str = String.format("<html>%s<br>UID:%d, Database: %d<br>%s<br>", 
+				"GPS Data", getUID(), getDatabaseIndex(), PamCalendar.formatDBDateTime(getTimeMilliseconds(), true));
 		if (gpsData != null) {
 			str +=  gpsData.summaryString();
 		}
 		return str;
+	}
+
+	@Override
+	public double[] getFrequency() {
+		return null;
 	}
 
 }

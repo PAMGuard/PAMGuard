@@ -7,6 +7,7 @@ import java.util.Hashtable;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 public class DataSelectorSettings implements Serializable, ManagedParameters {
 
@@ -42,7 +43,7 @@ public class DataSelectorSettings implements Serializable, ManagedParameters {
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("selectorParams");
 			ps.put(new PrivatePamParameterData(this, field) {

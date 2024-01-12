@@ -6,6 +6,7 @@ import java.util.Hashtable;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
 import PamView.GroupedSourceParameters;
 import group3dlocaliser.algorithm.LocaliserAlgorithm3D;
@@ -126,7 +127,7 @@ public class Group3DParams implements Serializable, Cloneable, ManagedParameters
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("algorithmSpecificParams");
 			ps.put(new PrivatePamParameterData(this, field) {

@@ -29,6 +29,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 
 import com.sun.javafx.runtime.VersionInfo;
 
@@ -42,12 +43,14 @@ import PamController.PamguardVersionInfo;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterData;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamUtils.PamCalendar;
 import PamUtils.XMLUtils;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamProcess;
 import binaryFileStorage.BinaryStore;
+import tethys.TethysControl;
 
 /**
  * Class for writing XML configuration output to a file. 
@@ -62,6 +65,8 @@ public class PamguardXMLWriter implements PamSettings {
 	private static final Set<Class<?>> WRAPPER_TYPES = getWrapperTypes();
 	
 	private XMLWriterSettings writerSettings = new XMLWriterSettings();
+	private boolean excludeDisplaySettings;
+//	private String xmlNameSpace;
 	
 	private static PamguardXMLWriter singleInstance;
 
@@ -82,6 +87,19 @@ public class PamguardXMLWriter implements PamSettings {
 			singleInstance = new PamguardXMLWriter();
 		}
 		return singleInstance;
+	}
+	
+	/**
+	 * Recursively walk the tree and add a namespace to every
+	 * single element. 
+	 * @param doc 
+	 * @param nameSpace
+	 * @return
+	 */
+	public boolean addNameSpaceToElements(Document doc, Element el, String nameSpace) {
+//		el.setAttributeNS(nameSpace, nameSpace, nameSpace);
+		NamedNodeMap attributes = el.getAttributes();
+		return true;
 	}
 
 	/**
@@ -371,6 +389,32 @@ public class PamguardXMLWriter implements PamSettings {
 	 * @return xml content as a a string. 
 	 */
 	public String getAsString(Document doc) {
+		return getAsString(doc, true);
+//		try {
+//			DOMSource domSource = new DOMSource(doc);
+//			StringWriter writer = new StringWriter();
+//			StreamResult result = new StreamResult(writer);
+//			TransformerFactory tf = TransformerFactory.newInstance();
+//			Transformer transformer = tf.newTransformer();
+//			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+//			transformer.setOutputProperty(OutputKeys.ENCODING, "ISO-8859-1");
+////			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+//			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+//			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+//			transformer.transform(domSource, result);
+//			return writer.toString();
+//		} catch (TransformerException e) {
+//			e.printStackTrace();
+//			return null;
+//		}
+	}
+	/**
+	 * Get the xml document as a String.
+	 * @param doc xml document
+	 * @param indent Indent / format the document. 
+	 * @return xml content as a a string. 
+	 */
+	public String getAsString(Document doc, boolean indent) {
 		try {
 			DOMSource domSource = new DOMSource(doc);
 			StringWriter writer = new StringWriter();
@@ -380,7 +424,7 @@ public class PamguardXMLWriter implements PamSettings {
 			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
 			transformer.setOutputProperty(OutputKeys.ENCODING, "ISO-8859-1");
 //			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			transformer.setOutputProperty(OutputKeys.INDENT, indent ? "yes" : "no");
 			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 			transformer.transform(domSource, result);
 			return writer.toString();
@@ -411,8 +455,7 @@ public class PamguardXMLWriter implements PamSettings {
 	 * @param pamSettingsUnit 
 	 * @return xml element
 	 */
-	private Element writeUnitSettings(Document doc, Element parent, PamSettings pamSettingsUnit) {
-
+	public Element writeUnitSettings(Document doc, Element parent, PamSettings pamSettingsUnit) {
 		int[] settingInds = findSettings(null, pamSettingsUnit.getUnitName());
 		PamSettings[] settingsObjects = null;
 		if (settingInds != null) {
@@ -436,7 +479,7 @@ public class PamguardXMLWriter implements PamSettings {
 	 * can be temporary settings objects when writing temporary settings from dialogs. 
 	 * @return new XML element. 
 	 */
-	private Element writeUnitSettings(Document doc, Element parent, PamSettings pamSettingsUnit, PamSettings[] toWrite) {
+	public Element writeUnitSettings(Document doc, Element parent, PamSettings pamSettingsUnit, PamSettings[] toWrite) {
 		Element moduleData = doc.createElement("MODULE");
 		moduleData.setAttribute("Java.class", pamSettingsUnit.getClass().getName());
 		moduleData.setAttribute("UnitType", pamSettingsUnit.getUnitType());
@@ -457,6 +500,9 @@ public class PamguardXMLWriter implements PamSettings {
 			Element settingEl = doc.createElement("CONFIGURATION");
 			moduleData.appendChild(settingEl);
 			for (int i = 0; i < toWrite.length; i++) {
+				if (wantObject(toWrite[i]) == false) {
+					continue;
+				}
 				Element setEl = writeSettings(doc, toWrite[i], new ArrayList<Object>());
 				if (setEl != null) {
 					settingEl.appendChild(setEl);
@@ -465,6 +511,32 @@ public class PamguardXMLWriter implements PamSettings {
 		}
 
 		return moduleData;
+	}
+
+	/**
+	 * USed by the Tethys writer to avoid writing display settings. 
+	 * @param pamSettings
+	 * @return
+	 */
+	private boolean wantObject(PamSettings pamSettings) {
+		if (excludeDisplaySettings == false) {
+			return true;
+		}
+		Object obj = pamSettings.getSettingsReference();
+		if (obj == null) {
+			return false;
+		}
+		if (obj instanceof ManagedParameters) {
+			ManagedParameters managedParams = (ManagedParameters) obj;
+			PamParameterSet paramSet = managedParams.getParameterSet();
+			if (paramSet == null) {
+				return false;
+			}
+			if (paramSet.getParameterSetType() == ParameterSetType.DISPLAY && excludeDisplaySettings) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -478,6 +550,14 @@ public class PamguardXMLWriter implements PamSettings {
 	private Element writeSettings(Document doc, PamSettings pamSettings, ArrayList<Object> objectHierarchy) {
 		return writeSettings(doc, pamSettings, pamSettings.getSettingsReference(), objectHierarchy);
 	}
+	
+	public Document writeOneObject(Object data) {
+		Document doc = XMLUtils.createBlankDoc();
+		Element el = doc.createElement("Settings");
+		Element newel = writeObjectData(doc, el, data, new ArrayList<Object>());
+		doc.appendChild(newel);
+		return doc;
+	}
 
 	/**
 	 * Write settings using an object of choice instead of the standard one from PamSettings. 
@@ -489,6 +569,7 @@ public class PamguardXMLWriter implements PamSettings {
 	 * @return
 	 */
 	private Element writeSettings(Document doc, PamSettings pamSettings, Object data, ArrayList<Object> objectHierarchy) {
+		
 		Element el = doc.createElement("SETTINGS");
 		el.setAttribute("Type", pamSettings.getUnitType());
 		el.setAttribute("Name", pamSettings.getUnitName());
@@ -500,9 +581,12 @@ public class PamguardXMLWriter implements PamSettings {
 		return el;
 	}
 
-	private Element writeObjectData(Document doc, Element el, Object data, ArrayList<Object> objectHierarchy) {
+	public Element writeObjectData(Document doc, Element el, Object data, ArrayList<Object> objectHierarchy) {
 		if (data == null) {
 			return null;
+		}
+		if (objectHierarchy == null) {
+			objectHierarchy = new ArrayList<>();
 		}
 		if (objectHierarchy.contains(data)) {
 			// just write the reference, but nothing else or we'll end up in an infinite loop of objects. 
@@ -525,8 +609,10 @@ public class PamguardXMLWriter implements PamSettings {
 		if (parameterSet == null) {
 			return null;
 		}
-
-		objectHierarchy.add(data);
+		
+		if (objectHierarchy != null) {
+			objectHierarchy.add(data);
+		}
 		for (PamParameterData pamParam:parameterSet.getParameterCollection()) {
 			try {
 				Object paramData = pamParam.getData();
@@ -765,9 +851,10 @@ public class PamguardXMLWriter implements PamSettings {
 		processData.setAttribute("Name", process.getProcessName());
 		PamDataBlock source = process.getParentDataBlock();
 		if (source != null) {
-			Element inputEl = doc.createElement("Input");
-			inputEl.setAttribute("Name", source.getLongDataName());
-			inputEl.setAttribute("Channels", String.format("0x%X", source.getChannelMap()));
+			Element inputEl = source.getDataBlockXML(doc);
+//			Element inputEl = doc.createElement("Input");
+//			inputEl.setAttribute("Name", source.getLongDataName());
+//			inputEl.setAttribute("Channels", String.format("0x%X", source.getChannelMap()));
 			processData.appendChild(inputEl);
 		}
 		int nOut = process.getNumOutputDataBlocks();
@@ -798,7 +885,16 @@ public class PamguardXMLWriter implements PamSettings {
 	 */
 	private int[] findSettings(String type, String name) {
 		if (settingsSets == null) {
-			return null;
+			makeSettingsList();
+			if (settingsSets == null) {
+				return null;
+			}
+		}
+		if (usedSettingsSets == null) {
+			usedSettingsSets = new boolean[settingsSets.size()];
+		}
+		else if (usedSettingsSets.length < settingsSets.size()) {
+			usedSettingsSets = Arrays.copyOf(usedSettingsSets, settingsSets.size());
 		}
 		int[] found = new int[settingsSets.size()];
 		int nFound = 0;
@@ -818,7 +914,7 @@ public class PamguardXMLWriter implements PamSettings {
 		return Arrays.copyOf(found, nFound);
 	}
 
-	private ArrayList<PamSettings> makeSettingsList() {
+	public ArrayList<PamSettings> makeSettingsList() {
 		PamSettingManager settingsManager = PamSettingManager.getInstance();
 		settingsSets = settingsManager.getOwners();
 		if (settingsSets == null) {
@@ -850,6 +946,14 @@ public class PamguardXMLWriter implements PamSettings {
 		return doc;
 	}
 
+	/**
+	 * Is this element a writable type ? Basically, this means 
+	 * that it's a primitive of some sort. Otherwise it's 
+	 * probably an object and may even be a list in which case
+	 * it will need treating differently. 
+	 * @param clazz
+	 * @return
+	 */
 	public static boolean isWritableType(Class<?> clazz)
 	{
 		if (clazz.isEnum()) return true;
@@ -939,6 +1043,24 @@ public class PamguardXMLWriter implements PamSettings {
 		writerSettings = ((XMLWriterSettings) pamControlledUnitSettings.getSettings()).clone();
 		return true;
 	}
+
+	/**
+	 * @return the excludeDisplaySettings
+	 */
+	public boolean isExcludeDisplaySettings() {
+		return excludeDisplaySettings;
+	}
+
+	/**
+	 * @param excludeDisplaySettings the excludeDisplaySettings to set
+	 */
+	public void setExcludeDisplaySettings(boolean excludeDisplaySettings) {
+		this.excludeDisplaySettings = excludeDisplaySettings;
+	}
+
+//	public void setStaticNameSpace(String xmlNameSpace) {
+//		this.xmlNameSpace = xmlNameSpace;
+//	}
 
 	
 }
