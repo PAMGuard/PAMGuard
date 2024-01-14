@@ -293,7 +293,7 @@ public class PamSettingManager {
 	 * call this for at least one set of settings. Often the PamSettings
 	 * is implemented by the class that extends PamControlledunit, but
 	 * it's also possible to have multiple sub modules, processes or displays
-	 * implemnt PamSettings so that different settings for different bits of
+	 * implement PamSettings so that different settings for different bits of
 	 * a PamControlledUnit are stored separately.
 	 * @see PamSettings
 	 * @see PamControlledUnit
@@ -476,7 +476,7 @@ public class PamSettingManager {
 	 */
 	public PamSettings findSettingsOwner(String unitType, String unitName, String unitClassName) {
 		for (PamSettings owner:owners) {
-			if (owner.getClass() != null) {
+			if (owner.getClass() != null && unitClassName != null) {
 				if (owner.getClass().getName().equals(unitClassName) == false) {
 					continue;
 				}

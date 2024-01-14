@@ -6,6 +6,7 @@ import Localiser.DelayMeasurementParams;
 import Localiser.controls.RawOrFFTParams;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 /**
  * General parameters for detection TOAD measurement. Is split 
@@ -67,7 +68,7 @@ public class GenericTOADSourceParams implements Cloneable, Serializable, Managed
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
 	}
 

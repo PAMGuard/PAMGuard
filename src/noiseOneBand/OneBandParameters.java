@@ -10,6 +10,7 @@ import Filters.FilterType;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 public class OneBandParameters implements Serializable, Cloneable, ManagedParameters {
 
@@ -235,7 +236,7 @@ public class OneBandParameters implements Serializable, Cloneable, ManagedParame
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("filterParams");
 			ps.put(new PrivatePamParameterData(this, field) {

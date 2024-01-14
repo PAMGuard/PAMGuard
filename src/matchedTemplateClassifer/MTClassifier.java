@@ -15,6 +15,7 @@ import Localiser.DelayMeasurementParams;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamUtils.PamArrayUtils;
 import PamUtils.PamInterp;
 import PamUtils.complex.ComplexArray;
@@ -129,7 +130,7 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 			if (fft==null) fft=new FastFFT();
 			
 			
-			//System.out.println("interpWaveform: " + waveformMatch.waveform.length + " sR " + waveformMatch.sR);
+//			System.out.println("interpWaveform: " + waveformMatch.waveform.length + " sR " + waveformMatch.sR);
 
 			//re-sample the waveform if the sample rate is different
 			this.interpWaveformMatch=interpWaveform(this.waveformMatch, sR); 
@@ -145,7 +146,12 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 //			System.out.println("MatchNorm: MATCH");
 //			MTClassifierTest.normalizeTest(interpWaveformMatch);
 			
-			waveformMatchFFT = fft.rfft(interpWaveformMatch, length); 
+			/**
+			 * There is an issue here because, if we have a long template waveform, then it
+			 * will become truncated and the actual waveform may be missed. This means we
+			 * have to use the peak of the template
+			 */
+			waveformMatchFFT = calcTemplateFFT(interpWaveformMatch,  length); 
 			
 			//need to calculate the complex conjugate - note that originally I was flipping the array but this means 
 			//the max value does not equal one with identical waveforms...doh. 
@@ -155,6 +161,42 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 
 		}
 		return waveformMatchFFT; 
+	}
+	
+	
+	/**
+	 * Calculate the FFT of an interpolate match template. 
+	 * @param interpTemplateWaveform - the waveform interpolated to the correct sample rate. 
+	 * @param length - the length of the FFT. 
+	 * @return the FFT of the waveform as a complex array. 
+	 */
+	private ComplexArray calcTemplateFFT(double[] interpTemplateWaveform, int length) {
+		
+		ComplexArray fftTemplate;
+		/**
+		 * There is an issue here because, if we have a long template waveform, then it
+		 * will become truncated and the actual waveform may be missed. This means we
+		 * have to use the peak of the template
+		 */
+		if (interpTemplateWaveform.length>length) {
+			//If the template is long then need to find the peak, otherwise we will end up cross correlating with noise at the
+			//start of the template. 
+			//because this is a template and not a random click we don't need to be so clever with how we find peaks. Find 
+			//the maximum and use around that. 
+			int pos = PamArrayUtils.maxPos(interpTemplateWaveform); 
+			
+			int startind = Math.max(0, pos-length/2);
+			int endind = startind+length-1;
+
+			double[] peakTemplate = ArrayUtils.subarray(interpTemplateWaveform, startind, endind); 
+			fftTemplate = fft.rfft(peakTemplate, length);
+		}
+		else {
+			//template waveform is padded by fft function
+			fftTemplate = fft.rfft(interpTemplateWaveform, length); 
+		}
+		
+		return fftTemplate; 
 	}
 	
 
@@ -181,13 +223,17 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 //			this.inteprWaveformReject=PamArrayUtils.divide(inteprWaveformReject, PamArrayUtils.max(inteprWaveformReject));
 			this.inteprWaveformReject = normaliseWaveform(inteprWaveformReject, this.normalisation);
 
-			
 //			System.out.println("MatchNorm: REJECT ");
 //			MTClassifierTest.normalizeTest(inteprWaveformReject);
 //			MTClassifierTest.printWaveform(inteprWaveformReject);
 			
-			//System.out.println("waveformReject: " +inteprWaveformReject.length +  " fftLength: " +  getFFTLength(sR)); 
-			waveformRejectFFT = fft.rfft(inteprWaveformReject, length); 
+			/**
+			 * There is an issue here because, if we have a long template waveform, then it
+			 * will become truncated and the actual waveform may be missed. This means we
+			 * have to use the peak of the template
+			 */
+			waveformRejectFFT = calcTemplateFFT(inteprWaveformReject,  length); 
+
 			
 			//need to calculate the complex conjugate - note that originally I was flipping the array but this means 
 			//the max value does not equal one with identical waveforms...doh. 
@@ -293,7 +339,7 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 		
 		ComplexArray matchTemplate = getWaveformMatchFFT(sR, matchResult.length()); 
 		
-		//System.out.println("Match template length: " + matchTemplate.length() + "Click : " + click.length()); 
+//		System.out.println("Match template length: " + matchTemplate.length() + "Click : " + click.length()); 
 		
 		for (int i=0; i<matchTemplate.length(); i++) {
 			matchResult.set(i, click.get(i).times(matchTemplate.get(i)));
@@ -376,7 +422,7 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 		//set the stored sR
 		currentSr=sR;
 		
-		//System.out.println("Waveform click: len: " + click.length()); 
+		System.out.println("Waveform click: len: " + click.length()); 
 
 		//System.out.println("Waveform Reject max: " + PamArrayUtils.max(this.inteprWaveformReject)+ " len " + interpWaveformMatch.length); 
 
@@ -396,9 +442,11 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 		ComplexArray matchResult= new ComplexArray(fftLength); 
 		ComplexArray matchTemplate = getWaveformMatchFFT(sR,fftLength); //remember this is the  complex conjugate
 		
-		//System.out.println("matchTemplate interp: len: " + interpWaveformMatch.length+ " max: " +  PamArrayUtils.max(interpWaveformMatch)); 
-		//System.out.println("matchTemplate: len: " + waveformMatch.waveform.length+ " max: " +  PamArrayUtils.max(waveformMatch.waveform)); 
+//		System.out.println("matchTemplate interp: len: " + interpWaveformMatch.length+ " max: " +  PamArrayUtils.max(interpWaveformMatch)); 
+//		System.out.println("matchTemplate: len: " + waveformMatch.waveform.length+ " max: " +  PamArrayUtils.max(waveformMatch.waveform)); 
+//		System.out.println("matchTemplate interp: len: " + interpWaveformMatch.length+ " max: " +  PamArrayUtils.max(interpWaveformMatch)); 
 
+		System.out.println("matchTemplate len: " + matchTemplate.length() + " click.length(): "  +click.length()); 
 		for (int i=0; i<Math.min(matchTemplate.length(), click.length()); i++) {
 			matchResult.set(i, click.get(i).times(matchTemplate.get(i)));
 		}
@@ -409,13 +457,10 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 			rejectResult.set(i, click.get(i).times(rejectTemplate.get(i)));
 		}
 		
-//		System.out.println("Waveform Match max: " + PamArrayUtils.max(this.interpWaveformMatch)); 
-//		System.out.println("Waveform Reject max: " + PamArrayUtils.max(this.inteprWaveformReject)); 
+		System.out.println("Waveform Match max: " + PamArrayUtils.max(this.interpWaveformMatch)); 
+		System.out.println("Waveform Reject max: " + PamArrayUtils.max(this.inteprWaveformReject)); 
 		
 		//System.out.println("Click input: " + click.length() + " click template: " + matchTemplate.length());
-		
-	
-
 
 		//must use scaling to get the same result as MATLAB 
 		if (fft==null) fft= new FastFFT();
@@ -453,17 +498,18 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 		
 //		//TEST
 		
-		//if set to "none" then reject template will return a NaN - TODO bit messy and inefficient. 
+		//if the reject template is set to "none" then reject template will return a NaN 
+		//TODO bit messy and inefficient. 
 		double result; 
-		double maxReject = PamArrayUtils.max(rejectReal); 
-		if (Double.isNaN(maxReject)) {
+//		double maxReject = PamArrayUtils.max(rejectReal); 
+		if (Double.isNaN(maxreject)) {
 			result = PamArrayUtils.max(matchReal);
 		}
 		else {
-			result = PamArrayUtils.max(matchReal)-maxReject; 
+			result = PamArrayUtils.max(matchReal)-maxreject; 
 		}
 
-		//System.out.println("Match corr " + maxmatch + " Reject Corr: " + maxreject);
+		System.out.println("Match corr " + maxmatch + " Reject Corr: " + maxreject);
 
 		MatchedTemplateResult matchTmpResult = new MatchedTemplateResult(); 
 		matchTmpResult.threshold=result; 
@@ -476,17 +522,19 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 	
 	/**
 	 * Get the match waveform for the sample rate 
-	 * @param sR - the sample rate in samples per second
+	 * @param waveformMatch - the template to interpolate or decimate. 
+	 * @param sR - the target sample rate in samples per second
 	 */
 	private double[] interpWaveform(MatchTemplate waveformMatch, double sR) {
-		//System.out.println("Interp waveform: " + " old: " + waveformMatch.sR + " new: " +  sR);
+//		System.out.println("Interp waveform: " + " old: " + waveformMatch.sR + " new: " +  sR);
 		
-		if ( waveformMatch.sR>sR) {
+		if (waveformMatch.sR<sR) {
 			//up sample
 			double[] interpWaveformMatch=reSampleWaveform(waveformMatch.waveform, waveformMatch.sR, sR);
 			return interpWaveformMatch; 
 		}
-		else if (waveformMatch.sR<sR){
+		else if (waveformMatch.sR>sR){
+			//decimate
 //			//TODO - make a better decimator?
 //			double[] interpWaveformMatch=reSampleWaveform(waveformMatch.waveform, waveformMatch.sR, sR);
 //			return interpWaveformMatch; 
@@ -494,11 +542,9 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 			return wavInterpolator.decimate(waveformMatch.waveform, waveformMatch.sR, (float) sR); 
 		}
 		else {
-			//nothing needed/ 
+			//nothing needed
 			return waveformMatch.waveform;
-		}
-		
-			
+		}		
 	}
 	
 	
@@ -529,7 +575,8 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 //		// TODO Auto-generated method stub
 //		return PamInterp.interpLinear(x, waveform, xi);
 		
-		return PamInterp.interpWaveform(waveform, 1/binSize); 
+//		System.out.println("Interp waveform: " + binSize); 
+		return PamInterp.interpWaveform(waveform, 1./binSize); 
 		
 	}
 	
@@ -583,7 +630,7 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 	 */
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("inteprWaveformReject");
 			ps.put(new PrivatePamParameterData(this, field) {

@@ -139,7 +139,7 @@ public class BrainBoxDevices  implements AnalogDeviceType, PamSettings{
 			double sensData = BBED549.hexToEngineering(bbRanges[item], sensInts);
 			double paramValue = calibration.rawToValue(sensData, calibrationData[item]);
 			analogDevicesManager.notifyData(new ItemAllData(item, sensInts, sensData, paramValue));
-//			System.out.printf("Read item %d, chan %d, int %d, real %3.5f, param %3.5f\n", iChan, chan, sensInts, sensData, paramValue);
+//			System.out.printf("Read item %d, chan %d, int %d, real %3.5f, param %3.5f\n", 0, chan, sensInts, sensData, paramValue);
 			sayError(null);
 			return new AnalogSensorData(sensData, paramValue);
 			

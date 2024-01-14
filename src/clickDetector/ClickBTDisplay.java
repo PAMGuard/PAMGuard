@@ -395,7 +395,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			int subDetInd = superDet.findSubdetectionInfo(clickDetection);
 			for (int i = subDetInd-1; i >= 0; i--) {
 				PamDataUnit subDet = superDet.getSubDetection(i);
-				if (subDet.getChannelBitmap() == clickDetection.getChannelBitmap()) {
+				if (subDet!=null && subDet.getChannelBitmap() == clickDetection.getChannelBitmap()) {
 					double ici = (double) (clickDetection.getTimeMilliseconds() - subDet.getTimeMilliseconds())/1000.;
 					clickDetection.setTempICI(ici);
 					break;
@@ -2771,7 +2771,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 
 			BTDisplayParameters newParameters = 
 					ClickDisplayDialog.showDialog(clickControl, 
-							clickControl.getPamView().getGuiFrame(), btDisplayParameters);
+							clickControl.getGuiFrame(), btDisplayParameters);
 			if (newParameters != null){
 				btDisplayParameters = newParameters.clone();
 				if (getVScaleManager() != null) {

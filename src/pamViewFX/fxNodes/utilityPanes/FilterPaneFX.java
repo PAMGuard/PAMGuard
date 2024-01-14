@@ -143,7 +143,7 @@ public class FilterPaneFX extends SettingsPane<FilterParams> {
 		}
 		else {
 			mainPane.setTop(createFilterPane());
-			mainPane.setBottom(createBodeGraph()); 
+			mainPane.setCenter(createBodeGraph()); 
 		}
 	}
 

@@ -16,6 +16,7 @@ import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterData;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamUtils.PamUtils;
 import PamguardMVC.PamRawDataBlock;
 import SoundRecorder.trigger.RecorderTrigger;
@@ -443,7 +444,7 @@ public class RecorderSettings implements Serializable, Cloneable, ManagedParamet
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("channelBitmap");
 			ps.put(new PrivatePamParameterData(this, field) {

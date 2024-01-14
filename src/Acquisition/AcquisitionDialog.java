@@ -151,6 +151,7 @@ public class AcquisitionDialog extends PamDialog {
 		acquisitionParameters = oldParams.clone();
 				
 		acquisitionControl = daqControl;
+//		singleInstance = null;
 		
 		if (singleInstance == null || singleInstance.getOwner() != parentFrame) {
 			singleInstance = new AcquisitionDialog(parentFrame);

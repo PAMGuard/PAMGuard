@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import dataPlots.layout.GraphParameters;
 import pamScrollSystem.PamScroller;
 
@@ -45,7 +46,7 @@ public class TDParameters implements Serializable, Cloneable, ManagedParameters 
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DISPLAY);
 		return ps;
 	}
 

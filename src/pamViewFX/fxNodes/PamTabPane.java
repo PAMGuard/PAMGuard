@@ -96,10 +96,12 @@ public class PamTabPane extends TabPane {
 	}
 
 	/**
+	 * TODO - the button is removed and then added again it does not seem to appear....
 	 * Set whether a button shows to add tabs to the TabPane
 	 * @param addTabButton - true to show a button next to the last tab which allows new tabs to be added. 
 	 */
 	public void setAddTabButton(boolean addTabButton) {
+		if (this.addTabButton==addTabButton) return;
 		this.addTabButton = addTabButton;
 	}
 	

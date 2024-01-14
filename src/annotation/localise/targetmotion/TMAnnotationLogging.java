@@ -3,6 +3,7 @@ package annotation.localise.targetmotion;
 import Localiser.detectionGroupLocaliser.GroupLocalisation;
 import PamDetection.AbstractLocalisation;
 import PamguardMVC.PamDataUnit;
+import generalDatabase.EmptyTableDefinition;
 import generalDatabase.PamTableDefinition;
 import generalDatabase.SQLTypes;
 import targetMotionOld.TargetMotionSQLLogging;
@@ -17,7 +18,7 @@ public class TMAnnotationLogging extends TargetMotionSQLLogging {
 	}
 
 	@Override
-	public boolean loadData(SQLTypes sqlTypes, PamTableDefinition pamTableDefinition, PamDataUnit pamDataUnit) {
+	public boolean loadData(SQLTypes sqlTypes, EmptyTableDefinition pamTableDefinition, PamDataUnit pamDataUnit) {
 		boolean ans = super.loadData(sqlTypes, pamTableDefinition, pamDataUnit);
 		if (ans == false) return false;
 		AbstractLocalisation loc = pamDataUnit.getLocalisation();

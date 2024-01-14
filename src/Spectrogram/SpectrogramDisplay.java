@@ -107,6 +107,7 @@ import PamView.GeneralProjector;
 import PamView.ColourArray.ColourArrayType;
 import PamView.dialog.PamLabel;
 import PamView.PamColors;
+import PamView.PamView;
 import PamView.hidingpanel.HidingDialogPanel;
 import PamView.panel.CornerLayout;
 import PamView.panel.CornerLayoutContraint;
@@ -275,11 +276,13 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 		//		}
 		if (spectrogramParameters == null) {
 			this.spectrogramParameters = new SpectrogramParameters();
-			//			setSettings(); // force up the dialog. 
-			SpectrogramParameters newParams = SpectrogramParamsDialog
-					.showDialog(userDisplayControl.getPamView().getGuiFrame(), spectrogramPanels, spectrogramParameters);
-			if (newParams != null) {
-				this.spectrogramParameters = newParams;
+			PamView view = userDisplayControl.getPamView();
+			if (view != null) {
+				SpectrogramParameters newParams = SpectrogramParamsDialog
+						.showDialog(userDisplayControl.getGuiFrame(), spectrogramPanels, spectrogramParameters);
+				if (newParams != null) {
+					this.spectrogramParameters = newParams;
+				}
 			}
 		}
 
@@ -1184,7 +1187,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 		//		SpectrogramParameters newParams = SpectrogramParamsDialog
 		//				.showDialog(userDisplayControl.getPamView().getGuiFrame(), this.getOverlayMarker(), spectrogramParameters);
 		SpectrogramParameters newParams = SpectrogramParamsDialog
-				.showDialog(userDisplayControl.getPamView().getGuiFrame(), spectrogramPanels, spectrogramParameters);
+				.showDialog(userDisplayControl.getGuiFrame(), spectrogramPanels, spectrogramParameters);
 
 
 		if (newParams == null) return;
@@ -1639,6 +1642,9 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 				return;
 			}
 			long t1 = dataUnit.getTimeMilliseconds()-viewerScroller.getValueMillis();
+			if (timeAxis == null) {
+				return;
+			}
 			int x1 = (int) Math.floor(timeAxis.getPosition(t1/1000));
 			int x2 = x1;
 			if (dataUnit.getDurationInMilliseconds() != null) {

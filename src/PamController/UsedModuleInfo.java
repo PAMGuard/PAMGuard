@@ -4,10 +4,12 @@ import java.io.Serializable;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 /**
  * Very simple class used in an ArrayList of used modules that 
- * get's saved between runs.
+ * get's saved between runs. This forms the core of the settings system
+ * so don't f*** with it !
  * @author Doug
  *
  */
@@ -53,8 +55,16 @@ public class UsedModuleInfo implements Serializable, ManagedParameters {
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
+	}
+
+	/**
+	 * Get the unit name of the module being imported. 
+	 * @return
+	 */
+	public String getUnitName() {
+		return unitName;
 	}
 
 }

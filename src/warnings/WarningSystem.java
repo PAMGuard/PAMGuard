@@ -149,7 +149,7 @@ public class WarningSystem {
 	 * Remove old warnings. 
 	 */
 	private synchronized void removeOldWarnings() {
-		long now = PamCalendar.getTimeInMillis();
+		long now = System.currentTimeMillis();
 		ListIterator<PamWarning> it = warnings.listIterator();
 		int removals = 0;
 		while (it.hasNext()) {

@@ -387,6 +387,7 @@ public class SQLTypes {
 			return timestamp.getTime() + tz.getOffset(timestamp.getTime());
 		}
 		else if (timeValue instanceof String) {
+			timeValue = ((String) timeValue).replace("'", "");
 			return PamCalendar.millisFromDateString((String) timeValue, false);
 		}
 		if (timeValue instanceof Long) {

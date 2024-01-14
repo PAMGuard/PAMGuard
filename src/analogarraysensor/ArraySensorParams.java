@@ -5,12 +5,13 @@ import java.io.Serializable;
 import Array.sensors.ArrayDisplayParameters;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 public class ArraySensorParams implements Serializable, Cloneable, ManagedParameters {
 
 	public static final long serialVersionUID = 1L;
 	
-	public int readIntervalMillis = 1000;
+	public volatile int readIntervalMillis = 1000;
 	
 	private ArrayDisplayParameters arrayDisplayParameters;
 	
@@ -47,7 +48,7 @@ public class ArraySensorParams implements Serializable, Cloneable, ManagedParame
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
 	}
 

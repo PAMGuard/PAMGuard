@@ -22,19 +22,19 @@ public class PamArrayUtils {
 	/**
 	 * Calculate the mean of one dimension within a list of points. <i>e.g.</i> the points might be a list of [x y z] co-ordinates in 
 	 * which case the dim=0 would return the mean of all x points. 
-	 * @param array - a list of points
+	 * @param successJump - a list of points
 	 * @param InitialtoIgnorePercentage: ignore the first percentage of results
 	 * @param dim - the dimension of the point to calculate the average for
 	 * @return the mean of one dimension of the list of the points. 
 	 */
-	public static double mean(ArrayList<double[]> array, double InitialtoIgnorePercentage, int dim){
+	public static double mean(ArrayList<double[]> successJump, double InitialtoIgnorePercentage, int dim){
 
 		double meanTotal=0;
 		int n=0;
-		int forStart=(int) Math.round((InitialtoIgnorePercentage)*array.size());
+		int forStart=(int) Math.round((InitialtoIgnorePercentage)*successJump.size());
 
-		for (int i=forStart; i<array.size();i++){
-			meanTotal+= array.get(i)[dim];
+		for (int i=forStart; i<successJump.size();i++){
+			meanTotal+= successJump.get(i)[dim];
 			n++;
 		}
 
@@ -42,24 +42,25 @@ public class PamArrayUtils {
 		double mean=meanTotal/n;
 		return mean;
 	}
+	
 
 	/**
 	 * Calculate the standard deviation of an array of doubles, ignoring an 'initialtoIgnorePercentage' percentage of jumps
-	 * @param array
+	 * @param successJump
 	 * @param initialtoIgnorePercentage- percentage of initial values to ignore.
 	 * @return standard deviation of array. 
 	 */
-	public static double std(ArrayList<double[]> array, double initialtoIgnorePercentage, int dim){
+	public static double std(ArrayList<double[]> successJump, double initialtoIgnorePercentage, int dim){
 		double std=0.0;
 
 		int n=0;
-		int forStart=(int) Math.round((initialtoIgnorePercentage)*array.size());
+		int forStart=(int) Math.round((initialtoIgnorePercentage)*successJump.size());
 
-		double meanTotal= mean(array,  initialtoIgnorePercentage,  dim);
+		double meanTotal= mean(successJump,  initialtoIgnorePercentage,  dim);
 
 		//calculate standard deviation
-		for (int k=forStart;k<array.size(); k++){
-			std+=Math.pow((array.get(k)[dim]-meanTotal),2);
+		for (int k=forStart;k<successJump.size(); k++){
+			std+=Math.pow((successJump.get(k)[dim]-meanTotal),2);
 		}
 
 		//standard deviation
@@ -448,19 +449,6 @@ public class PamArrayUtils {
 		return new int[] {min, max};
 	}
 
-	/**
-	 * Calculate the maximum value in an array 
-	 * @param arr - the array to find the maximum value of. 
-	 * @return the maximum value in the array
-	 */
-	public static double max(double[] arr) {
-		double max = Double.NEGATIVE_INFINITY;
-
-		for(double cur: arr)
-			max = Math.max(max, cur);
-
-		return max;
-	}
 
 	/**
 	 * Calculate the maximum value in an array 
@@ -468,6 +456,20 @@ public class PamArrayUtils {
 	 * @return the maximum value in the array
 	 */
 	public static double max(float[] arr) {
+		double max = Double.NEGATIVE_INFINITY;
+
+		for(double cur: arr)
+			max = Math.max(max, cur);
+
+		return max;
+	}
+	
+	/**
+	 * Calculate the maximum value in an array 
+	 * @param arr - the array to find the maximum value of. 
+	 * @return the maximum value in the array
+	 */
+	public static double max(double[] arr) {
 		double max = Double.NEGATIVE_INFINITY;
 
 		for(double cur: arr)
@@ -489,6 +491,50 @@ public class PamArrayUtils {
 
 		return max;
 	}
+	
+	/**
+	 * Get the index of the maximum value in an array 
+	 * @param arr  - the array to find the position of the maximum value. 
+	 * m value of. 
+	 * @return the index of the maximum value
+	 */
+	public static int maxPos(double[] arr) {
+		double max = Double.NEGATIVE_INFINITY;
+		int index = -1; 
+		
+		int count = 0; 
+		for(double cur: arr) {
+			if (cur>max) {
+				index = count; 
+				max=cur;
+			}
+			count++; 
+		}
+		
+
+		return index;
+	}
+	
+	/**
+	 * Get the minimum index of an array
+	 * @param arr  - the array to find the position of the maximum value. 
+	 * m value of. 
+	 * @return the index of the minimum value
+	 */
+	public static int minPos(double[] arr) {
+		double max = Double.POSITIVE_INFINITY;
+		int index = -1; 
+		
+		int count = 0; 
+		for(double cur: arr) {
+			if (cur<max) {
+				index = count; 
+				max=cur;
+			}
+			count++; 
+		}
+		return index;
+	}
 
 	/**
 	 * Get the minimum value in an array 
@@ -504,6 +550,8 @@ public class PamArrayUtils {
 
 		return min;
 	}
+	
+
 
 	/**
 	 * Get the minimum value in an array 
@@ -578,6 +626,27 @@ public class PamArrayUtils {
 		ArrayUtils.reverse(clone);
 		return clone; 
 	}
+	
+	/**
+	 * Split an array based on start index and end index. A new array with index 0
+	 * as start and the last index at end is created and data from the input array
+	 * copied to it.
+	 * 
+	 * @param arr   - the array to split
+	 * @param start - the start index
+	 * @param end   - the end index
+	 * @return the split array.
+	 */
+	public static double[][] split(double[][] arr, int start, int end) {
+		double[][] newArr = new double[end - start][];
+		int n = 0;
+		for (int i = start; i < end; i++) {
+			newArr[n] = arr[i];
+			n++;
+		}
+		return newArr;
+	}
+
 
 	/**
 	 * Sum the elements in an array 
@@ -855,5 +924,152 @@ public class PamArrayUtils {
 		return arr;
 	}
 
-}
+	/**
+	 * Convert a 2D float array to a 2D double array. 
+	 * @param arrf - the float array
+	 * @return a double array containing the same numbers as arrf. 
+	 */
+	public static double[][] float2Double(float[][] arrf) {
+		double[][] newArray = new double[arrf.length][];
+		for (int i=0; i<arrf.length; i++) {
+			newArray[i] = float2Double(arrf[i]); 
+		}
+		
+		return newArray; 
+	}
+	
+	/**
+	 * Convert a float array to a double array. 
+	 * @param arrd - the double array
+	 * @return a double array containing the same numbers as arrf. 
+	 */
+	public static float[] double2Float(double[] arrd) {
+		float[] arr = new float[arrd.length]; 
+		for (int i=0; i<arr.length; i++) {
+			arr[i] = (float) arrd[i]; 
+		}
+		return arr;
+	}
+	
+	/**
+	 * Convert a 2D float array to a 2D double array. 
+	 * @param arrd - the double array
+	 * @return a double array containing the same numbers as arrf. 
+	 */
+	public static float[][] double2Float(double[][] arrd) {
+		float[][] newArray = new float[arrd.length][];
+		for (int i=0; i<arrd.length; i++) {
+			newArray[i] = double2Float(arrd[i]); 
+		}
+		
+		return newArray; 
+	}
 
+
+	
+	/**
+	 * Check if two int arrays contain the same elements
+	 * @param arr1 - the array to compare to. 
+	 * @param arr2 - the array to be compared. 
+	 */
+	public static boolean arrEquals(int[] arr1, int[] arr2) {
+		if (arr1.length!=arr2.length) return false; 
+		
+		for (int i =0 ;i<arr1.length; i++) {
+			if (arr1[i]!=arr2[i]) return false; 
+		}
+		
+		return true; 
+	}
+	
+	/**
+	 * Check if two double arrays contain the same elements
+	 * @param arr1 - the array to compare to. 
+	 * @param arr2 - the array to be compared. 
+	 */
+	public static boolean arrEquals(double[] arr1, double[] arr2) {
+		if (arr1.length!=arr2.length) return false; 
+		
+		for (int i =0 ;i<arr1.length; i++) {
+			if (arr1[i]!=arr2[i]) return false; 
+		}
+		
+		return true; 
+	}
+
+	/**
+	 * Convert primitive long array to Long object array. 
+	 * @param arr - primitive long array
+	 * @return a Long array 
+	 */
+	public static Long[] primitive2Object(long[] arr) {
+		if (arr==null) return null; 
+		
+		Long[] arrL = new Long[arr.length];
+		for (int i=0; i<arr.length; i++) {
+			arrL[i]=arr[i];
+		}
+		return arrL;
+	}
+	
+	
+
+	/**
+	 * Convert primitive double array to Double object array. 
+	 * @param arr - primitive double array
+	 * @return a Double array 
+	 */
+	public static Double[] primitive2Object(double[] arr) {
+		if (arr==null) return null; 
+		
+		Double[] arrL = new Double[arr.length];
+		for (int i=0; i<arr.length; i++) {
+			arrL[i]=arr[i];
+		}
+		return arrL;
+	}
+	
+
+	/**
+	 * Convert primitive int array to Integer object array. 
+	 * @param arr - primitive int array
+	 * @return a Ineteger array 
+	 */
+	public static Integer[] primitive2Object(int[] arr) {
+		if (arr==null) return null; 
+		
+		Integer[] arrL = new Integer[arr.length];
+		for (int i=0; i<arr.length; i++) {
+			arrL[i]=arr[i];
+		}
+		return arrL;
+	}
+
+
+	public static long[] object2Primitve(Long[] arr) {
+		if (arr==null) return null; 
+		
+		long[] arrL = new long[arr.length];
+		for (int i=0; i<arr.length; i++) {
+			arrL[i]=arr[i].longValue();
+		}
+		return arrL;
+	}
+
+
+
+
+
+	
+	
+	
+
+
+
+
+
+
+
+
+
+}

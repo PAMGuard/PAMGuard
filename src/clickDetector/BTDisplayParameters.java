@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
 import clickDetector.tdPlots.ClickSymbolOptions;
 
@@ -137,7 +138,7 @@ public class BTDisplayParameters implements Serializable, Cloneable, ManagedPara
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("showSpeciesList");
 			ps.put(new PrivatePamParameterData(this, field) {

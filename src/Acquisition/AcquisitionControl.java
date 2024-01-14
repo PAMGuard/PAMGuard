@@ -283,6 +283,16 @@ public class AcquisitionControl extends RawInputControlledUnit implements PamSet
 		return daqControllers;
 	}
 
+	@Override
+	public String getDataLocation() {
+		if (offlineFileServer == null) {
+			return null;
+		}
+		else {
+			return offlineFileServer.getDataLocation();
+		}
+	}
+
 	public AcquisitionProcess getDaqProcess() {
 		return acquisitionProcess;
 	}
@@ -388,7 +398,7 @@ public class AcquisitionControl extends RawInputControlledUnit implements PamSet
 		message += "\n\nFailure to do so may result in PAMGUARD crashing or features not working correctly";
 		int ans = JOptionPane.showConfirmDialog(parentFrame, message, getArrayErrorMessage(error), JOptionPane.YES_NO_OPTION);
 		if (ans == JOptionPane.YES_OPTION) {
-			ArrayManager.getArrayManager().showArrayDialog(getPamView().getGuiFrame());
+			ArrayManager.getArrayManager().showArrayDialog(getGuiFrame());
 			return checkArrayChannels(parentFrame);
 		}
 

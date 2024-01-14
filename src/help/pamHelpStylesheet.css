@@ -52,7 +52,9 @@ ol {
 	FONT-SIZE: 14;
 
 }
+
 img.wrap {float: left}
+img.wrapright {float: right}
 
 table, th, td {
   border: 1px solid black;

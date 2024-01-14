@@ -26,6 +26,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ListIterator;
 
 import javax.swing.JMenu;
@@ -44,6 +45,7 @@ import binaryFileStorage.BinaryStore;
 import Filters.FilterDialog;
 import Filters.FilterParams;
 import Localiser.detectionGroupLocaliser.GroupDetection;
+import PamController.PamConfiguration;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitGUI;
 import PamController.PamControlledUnitSettings;
@@ -97,6 +99,7 @@ import dataPlotsFX.data.TDDataProviderRegisterFX;
 import detectionPlotFX.data.DDPlotRegister;
 import detectionPlotFX.rawDDPlot.ClickDDPlotProvider;
 import fftManager.fftorganiser.FFTDataOrganiser;
+import offlineProcessing.OfflineTaskGroup;
 
 /**
  * Main Controller for click detection.
@@ -207,9 +210,22 @@ public class ClickControl extends PamControlledUnit implements PamSettings {
 
 	public static final String UNITTYPE = "Click Detector";
 
+	/**
+	 * Old style constructor which only gets a name
+	 * @param name
+	 */
 	public ClickControl(String name) {
+		this(null, name);
+	}
+	
+	/**
+	 * New style constructor which get a configuraiton and a name. 
+	 * @param pamConfiguration
+	 * @param name
+	 */
+	public ClickControl(PamConfiguration pamConfiguration, String name) {
 
-		super(UNITTYPE, name);
+		super(pamConfiguration, UNITTYPE, name);
 
 		sortDataBlockPrefix();
 
@@ -219,7 +235,6 @@ public class ClickControl extends PamControlledUnit implements PamSettings {
 		//			rawDataBlock = (PamRawDataBlock) inputControl.getPamProcess(0).getOutputDataBlock(0);
 		//		}
 		clickControl = this;
-
 
 		angleVetoes = new AngleVetoes(this);
 
@@ -287,6 +302,9 @@ public class ClickControl extends PamControlledUnit implements PamSettings {
 			// check if a Rocca module is loaded.
 			roccaControl = (RoccaControl) PamController.getInstance().findControlledUnit(RoccaControl.unitType);
 
+		}
+		else {
+			ClicksOffline.getOfflineTaskGroup(this);
 		}
 
 		if (PamGUIManager.isSwing()) {
@@ -988,6 +1006,19 @@ public class ClickControl extends PamControlledUnit implements PamSettings {
 		return clicksOffline;
 	}
 
+//	/**
+//	 * @return the number of offlineTaskGroups
+//	 */
+//	public int getNumOfflineTaskGroups() {
+//		return 1;
+//	}
+//	
+//	/**
+//	 * @return the iTH offlineTaskGroup
+//	 */
+//	public OfflineTaskGroup getOfflineTaskGroup(int i) {
+//		return offlineTaskGroups.get(i);
+//	}
 
 	/**
 	 * @return the latestOfflineEvent
@@ -1041,7 +1072,7 @@ public class ClickControl extends PamControlledUnit implements PamSettings {
 				subDet.removeSuperDetection(event);
 			}
 		}
-		clickDetector.getOfflineEventDataBlock().remove(event);
+		clickDetector.getOfflineEventDataBlock().remove(event, true);
 	}
 
 	@Override
@@ -1138,6 +1169,31 @@ public class ClickControl extends PamControlledUnit implements PamSettings {
 		return targetMotionLocaliser;
 	}
 
+	/**
+	 * Remove clicks from existing events, if they have any. They may not. 
+	 * This is called whenever clicks are assigned to a new event to make 
+	 * sure that they don't end up in two events. 
+	 * @param markedClicks
+	 */
+	public void removeFromEvents(List<PamDataUnit> markedClicks) {
+		if (markedClicks == null) {
+			return;
+		}
+		for (PamDataUnit dataUnit : markedClicks) {
+			OfflineEventDataUnit anEvent = (OfflineEventDataUnit) dataUnit.getSuperDetection(OfflineEventDataUnit.class);
+			if (anEvent == null) {
+				continue;
+			}
+			anEvent.removeSubDetection(dataUnit);
+			if (anEvent.getSubDetectionsCount() == 0) {
+				deleteEvent(anEvent);
+			}
+			else  {
+				anEvent.updateDataUnit(System.currentTimeMillis());
+			}
+		}
+		
+	}
 
 	/**
 	 * Reassign all the clicks on one event to a different event 
@@ -1169,7 +1225,7 @@ public class ClickControl extends PamControlledUnit implements PamSettings {
 			}
 			clickEvent.setComment(clickEvent.getComment() + " Clicks reassigned to event " + reassignEvent.getEventId());
 			offlineEventDataBlock.updatePamData(clickEvent, PamCalendar.getTimeInMillis());
-			offlineEventDataBlock.remove(clickEvent);
+			offlineEventDataBlock.remove(clickEvent, true);
 			reassignEvent.sortSubDetections();
 			offlineEventDataBlock.updatePamData(reassignEvent, now);
 			if (ClickTrainDetection.class.isAssignableFrom(reassignEvent.getClass())) {
@@ -1187,7 +1243,8 @@ public class ClickControl extends PamControlledUnit implements PamSettings {
 	 * @return
 	 */
 	public PamRawDataBlock findRawDataBlock() {
-		return (PamController.getInstance().getRawDataBlock(clickParameters.getRawDataSource()));
+		return getPamConfiguration().getRawDataBlock(clickParameters.getRawDataSource());
+//		return (PamController.getInstance().getRawDataBlock(clickParameters.getRawDataSource()));
 	}
 
 

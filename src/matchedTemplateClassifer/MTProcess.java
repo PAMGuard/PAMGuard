@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import PamController.PamController;
 import PamDetection.RawDataUnit;
+import PamUtils.PamArrayUtils;
 import PamUtils.complex.ComplexArray;
 import PamView.symbol.PamSymbolManager;
 import PamguardMVC.PamDataBlock;
@@ -288,6 +289,7 @@ public class MTProcess extends PamInstantProcess {
 	@SuppressWarnings("unused")
 	private double[] getWaveData(RawDataHolder clickDetection, int i) {
 		double[] waveform; 
+		
 		if (this.getMTParams().peakSearch) {
 			waveform = createRestrictedLenghtWave(clickDetection,  i, lengthData[i],
 					this.getMTParams().restrictedBins); 
@@ -377,7 +379,14 @@ public class MTProcess extends PamInstantProcess {
 	 */
 	private double[] createRestrictedLenghtWave(RawDataHolder click, int chan, int[] lengthPoints,
 			int restrictedBins) {
-		return createRestrictedLenghtWave(click, chan, lengthPoints, restrictedBins,  getWindow(restrictedBins)); 
+//		System.out.println("Create restricted length wave: " + lengthPoints[0] + " to " + lengthPoints[1]); 
+//		System.out.println("Max before restrict: " + PamArrayUtils.max(click.getWaveData()[chan])); 
+
+		double[] wave = createRestrictedLenghtWave(click, chan, lengthPoints, restrictedBins,  getWindow(restrictedBins)); 
+		
+//		System.out.println("Max after restrict: " + PamArrayUtils.max(click.getWaveData()[chan])); 
+
+		return wave; 
 	}
 
 
@@ -412,7 +421,7 @@ public class MTProcess extends PamInstantProcess {
 
 		ArrayList<MatchedTemplateResult> results = new ArrayList<MatchedTemplateResult>();
 		
-		//System.out.println("Click waveform max: " + PamArrayUtils.max(clickWaveform) + " sample rate: " + sR); 
+		System.out.println("Click waveform max: " + PamArrayUtils.max(clickWaveform) + " sample rate: " + sR); 
 		
 		//normalisation and picking peak has already been performed
 

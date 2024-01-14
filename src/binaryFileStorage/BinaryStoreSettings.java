@@ -6,6 +6,7 @@ import java.io.Serializable;
 import PamController.PamFolders;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 public class BinaryStoreSettings implements Serializable, Cloneable, ManagedParameters {
 	
@@ -90,7 +91,7 @@ public class BinaryStoreSettings implements Serializable, Cloneable, ManagedPara
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
 	}
 

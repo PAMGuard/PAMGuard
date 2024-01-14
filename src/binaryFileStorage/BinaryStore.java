@@ -541,6 +541,12 @@ PamSettingsSource, DataOutputStore {
 	}
 
 	@Override
+	public boolean saveEndSettings(long timeNow) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	@Override
 	public int getNumSettings() {
 		if (binarySettingsStorage == null) {
 			return 0;
@@ -923,7 +929,7 @@ PamSettingsSource, DataOutputStore {
 		protected void process(List<BinaryMapMakeProgress> chunks) {
 			if (PamGUIManager.isSwing()) {
 				if (binaryMapDialog == null) {
-					binaryMapDialog = BinaryMapMakingDialog.showDialog(getPamView().getGuiFrame());
+					binaryMapDialog = BinaryMapMakingDialog.showDialog(PamController.getMainFrame());
 				}
 				super.process(chunks);
 				for (int i = 0; i < chunks.size(); i++) {
@@ -2370,7 +2376,7 @@ PamSettingsSource, DataOutputStore {
 	 * Get the unit type for the binary store. 
 	 * @return the binary store unit type. 
 	 */
-	private static String getBinaryUnitType() {
+	public static String getBinaryUnitType() {
 		return defUnitType;
 	}
 
@@ -2546,6 +2552,10 @@ PamSettingsSource, DataOutputStore {
 	public boolean deleteDataFrom(long timeMillis) {
 		BinaryStoreDeleter storeDeleter = new BinaryStoreDeleter(this);
 		return storeDeleter.deleteDataFrom(timeMillis);
+	}
+	@Override
+	public String getDataLocation() {
+		return binaryStoreSettings.getStoreLocation();
 	}
 	
 }

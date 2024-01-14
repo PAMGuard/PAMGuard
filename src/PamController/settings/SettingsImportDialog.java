@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
@@ -66,6 +67,7 @@ public class SettingsImportDialog extends PamDialog {
 		moduleTable.getColumnModel().getColumn(2).setPreferredWidth(200);
 
 		JPanel mainPanel = new JPanel(new BorderLayout());
+		mainPanel.setBorder(new TitledBorder("Module import selection"));
 		JScrollPane scrollPanel = new JScrollPane(moduleTable);
 		mainPanel.add(BorderLayout.CENTER, scrollPanel);
 		mainPanel.setPreferredSize(new Dimension(600,  250));
@@ -193,12 +195,14 @@ public class SettingsImportDialog extends PamDialog {
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			SettingsImportGroup set = groupedSettings.get(rowIndex);
-			PamControlledUnitSettings mainSet = set.getMainSettings();
+//			PamControlledUnitSettings mainSet = set.getMainSettings();
 			switch (columnIndex) {
 			case 0:
-				return mainSet.getUnitType();
+				return set.getUsedModuleInfo().getUnitType();
+//				return mainSet.getUnitType();
 			case 1:
-				return mainSet.getUnitName();
+				return set.getUsedModuleInfo().unitName;
+//				return mainSet.getUnitName();
 			case 2:
 				//				return choiceBoxes[rowIndex].getSelectedItem().toString();
 				return set.getImportChoice().toString();

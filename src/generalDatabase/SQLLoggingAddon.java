@@ -15,7 +15,7 @@ public interface SQLLoggingAddon {
 	 * Add a load of columns to an existing table definition
 	 * @param pamTableDefinition
 	 */
-	public void addTableItems(PamTableDefinition pamTableDefinition);
+	public void addTableItems(EmptyTableDefinition pamTableDefinition);
 	
 	/**
 	 * Save data - that is transfer data from the pamDataUnit to the data objects
@@ -24,7 +24,7 @@ public interface SQLLoggingAddon {
 	 * @param pamDataUnit data unit
 	 * @return true if successful
 	 */
-	public boolean saveData(SQLTypes sqlTypes, PamTableDefinition pamTableDefinition, PamDataUnit pamDataUnit);
+	public boolean saveData(SQLTypes sqlTypes, EmptyTableDefinition pamTableDefinition, PamDataUnit pamDataUnit);
 	
 	/**
 	 * Load data - that is read data from the table definition and turn it into something sensible
@@ -33,7 +33,7 @@ public interface SQLLoggingAddon {
 	 * @param pamDataUnit data unit
 	 * @return true if successful
 	 */
-	public boolean loadData(SQLTypes sqlTypes, PamTableDefinition pamTableDefinition, PamDataUnit pamDataUnit);
+	public boolean loadData(SQLTypes sqlTypes, EmptyTableDefinition pamTableDefinition, PamDataUnit pamDataUnit);
 	
 	/**
 	 * Get a name for the SQLLogging Addon. this is used

@@ -528,6 +528,8 @@
 
 <mapID target="visual_methods.loggerFormsHelp.docs.INTEGER" url="visual_methods/loggerFormsHelp/docs/INTEGER.html"/>
 
+<mapID target="utilities.tethys.docs.tethys_server" url="utilities/tethys/docs/tethys_server.html"/>
+
 <mapID target="classifiers.roccaHelp.docs.rocca_Sidebar_SaveNow" url="classifiers/roccaHelp/docs/rocca_Sidebar.html#SaveNow"/>
 
 <mapID target="visual_methods.loggerFormsHelp.docs.AUTOALERT" url="visual_methods/loggerFormsHelp/docs/AUTOALERT.html"/>
@@ -643,6 +645,8 @@
 <mapID target="utilities.SIDEModule.docs.SIDE_TestParams" url="utilities/SIDEModule/docs/SIDE_TestParams.html"/>
 
 <mapID target="overview.annotations.docs.textannotation" url="overview/annotations/docs/textannotation.html"/>
+
+<mapID target="utilities.tethys.docs.tethys_overview" url="utilities/tethys/docs/tethys_overview.html"/>
 
 <mapID target="mapping.AirgunDisplay.docs.AirgunConfiguration" url="mapping/AirgunDisplay/docs/AirgunConfiguration.html"/>
 

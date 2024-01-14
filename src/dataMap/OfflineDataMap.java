@@ -84,6 +84,8 @@ abstract public class OfflineDataMap<TmapPoint extends OfflineDataMapPoint> {
 	public static final int POINT_END = 0x8;      // 8
 	public static final int IN_DATA = 0x10;       // 16
 	public static final int NO_DATA = 0x20;       // 32
+	
+	private static final long oneDayInMillis = 3600L*24L*1000L;
 
 	public OfflineDataMap(OfflineDataStore offlineDataStore, PamDataBlock parentDataBlock) {
 		super();
@@ -145,10 +147,10 @@ abstract public class OfflineDataMap<TmapPoint extends OfflineDataMapPoint> {
 	 */
 	synchronized public void addDataPoint(TmapPoint mapPoint) {
 		boolean first = (mapPoints.size() == 0);
-		if (mapPoint.getStartTime() > 0) {
+		if (mapPoint.getStartTime() > oneDayInMillis) {
 			firstDataTime = Math.min(firstDataTime, mapPoint.getStartTime());
 		}
-		if (mapPoint.getEndTime() > 0) {
+		if (mapPoint.getEndTime() > oneDayInMillis) {
 			lastDataTime = Math.max(lastDataTime, mapPoint.getEndTime());
 //			if (mapPoint.getEndTime() > System.currentTimeMillis()) {
 //				System.out.println("Stupid large data time in " + mapPoint.getName());
@@ -273,10 +275,10 @@ abstract public class OfflineDataMap<TmapPoint extends OfflineDataMapPoint> {
 
 		while (it.hasNext()) {
 			aPoint = it.next();
-			if (aPoint.getStartTime() > 0) {
+			if (aPoint.getStartTime() > oneDayInMillis) {
 				firstDataTime = Math.min(firstDataTime, aPoint.getStartTime());
 			}
-			if (aPoint.getEndTime() > 0) {
+			if (aPoint.getEndTime() > oneDayInMillis) {
 				lastDataTime = Math.max(lastDataTime, aPoint.getEndTime());
 			}
 			n = aPoint.getNDatas();
@@ -359,6 +361,28 @@ abstract public class OfflineDataMap<TmapPoint extends OfflineDataMapPoint> {
 				return hp;
 			}
 		}
+	}
+	
+	/**
+	 * Get the start time of the first datamap point or Long.minval
+	 * @return
+	 */
+	public long getMapStartTime() {
+		if (mapPoints == null || mapPoints.size() == 0) {
+			return Long.MIN_VALUE;
+		}
+		return mapPoints.get(0).getStartTime();
+	}
+	
+	/**
+	 * Get the start time of the first datamap point or Long.minval
+	 * @return
+	 */
+	public long getMapEndTime() {
+		if (mapPoints == null || mapPoints.size() == 0) {
+			return Long.MIN_VALUE;
+		}
+		return mapPoints.get(mapPoints.size()-1).getEndTime();
 	}
 	
 	/**

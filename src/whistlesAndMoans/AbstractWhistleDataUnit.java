@@ -7,9 +7,8 @@ import PamguardMVC.DataUnitBaseData;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.TFContourProvider;;
 
-public abstract class AbstractWhistleDataUnit 
-	extends PamDataUnit<PamDataUnit, PamDataUnit> 
-	implements WhistleContour, PamDetection{
+public abstract class AbstractWhistleDataUnit extends PamDataUnit<PamDataUnit, PamDataUnit> 
+	implements WhistleContour, PamDetection {
 
 	public AbstractWhistleDataUnit(long timeMilliseconds, int channelBitmap,
 			long startSample, long duration) {

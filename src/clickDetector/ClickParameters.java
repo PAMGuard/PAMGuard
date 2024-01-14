@@ -38,6 +38,7 @@ import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterData;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamView.GroupedSourceParameters;
 import PamView.dialog.GroupedSourcePanel;
 import PamView.paneloverlay.overlaymark.MarkDataSelectorParams;
@@ -441,7 +442,7 @@ public class ClickParameters implements Serializable, Cloneable, ManagedParamete
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			PamParameterData param = ps.findParameterData("dbThreshold");
 			param.setShortName("Detection Threshold");

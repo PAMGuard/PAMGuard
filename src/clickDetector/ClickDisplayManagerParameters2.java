@@ -9,6 +9,7 @@ import PamController.PamController;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 public class ClickDisplayManagerParameters2 implements Cloneable, Serializable, ManagedParameters {
 
@@ -181,7 +182,7 @@ public class ClickDisplayManagerParameters2 implements Cloneable, Serializable, 
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DISPLAY);
 		try {
 			Field field = this.getClass().getDeclaredField("initialised");
 			ps.put(new PrivatePamParameterData(this, field) {

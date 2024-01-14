@@ -318,6 +318,9 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			}
 			selection = folderInputParameters.getSelectedFiles();
 		}
+		if (selection == null) {
+			return 0;
+		}
 		if (selection.length > 0) {
 			System.out.println("FolderInputSystem.makeSelFileList(): Searching for sound files in " + selection[0]);
 		}
@@ -697,7 +700,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		if (currentFile > 0 && currentFile >= allFiles.size()) {
 			fileListComplete();
 		}
-//		System.out.println("FolderinputSytem: daqHasEnded");
+		System.out.println("FolderinputSytem: daqHasEnded");
 	}
 
 	private void setFolderProgress() {

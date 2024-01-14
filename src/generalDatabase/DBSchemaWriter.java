@@ -48,7 +48,7 @@ public class DBSchemaWriter {
 		}
 
 
-		PamTableDefinition tableDef = logging.getTableDefinition();
+		EmptyTableDefinition tableDef = logging.getTableDefinition();
 		tableDef = logging.getBaseTableDefinition();
 
 		if (tableDef instanceof PamTableDefinition) {
@@ -63,13 +63,14 @@ public class DBSchemaWriter {
 		return true;
 	}
 
-	private void exportDatabaseSchema(File outputFolder, PamDataBlock dataBlock, SQLLogging logging, PamTableDefinition tableDef) {
-
-		/**
-		 * write a parent item, e.g. if tableDef is a sub class of PamTableDefinition
-		 */
-		//		String parentName = writeParentTableSchema(outputFolder, dataBlock, tableDef);
-
+	/**
+	 * Generate an xml schema for a datablock.  
+	 * @param dataBlock
+	 * @param logging
+	 * @param tableDef
+	 * @return
+	 */
+	public Document generateDatabaseSchema(PamDataBlock dataBlock, SQLLogging logging, EmptyTableDefinition tableDef) {
 		String tableName = tableDef.getTableName();
 		Document doc = PamUtils.XMLUtils.createBlankDoc();
 		Element schemaEl = doc.createElement("xs:schema");
@@ -95,7 +96,20 @@ public class DBSchemaWriter {
 				}
 			}
 		}
+		return doc;
+	}
+	
+	private void exportDatabaseSchema(File outputFolder, PamDataBlock dataBlock, SQLLogging logging, EmptyTableDefinition tableDef) {
 
+		/**
+		 * write a parent item, e.g. if tableDef is a sub class of PamTableDefinition
+		 */
+		//		String parentName = writeParentTableSchema(outputFolder, dataBlock, tableDef);
+
+		Document doc = generateDatabaseSchema(dataBlock, logging, tableDef);
+		
+		String tableName = tableDef.getTableName();
+		
 		try {
 			File outputFile = new File(outputFolder, tableName+".xsd");
 			XMLUtils.writeToFile(doc, outputFile);

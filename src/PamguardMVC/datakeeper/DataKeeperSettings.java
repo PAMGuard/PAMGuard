@@ -7,6 +7,7 @@ import java.util.Hashtable;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 public class DataKeeperSettings implements Serializable, Cloneable, ManagedParameters {
 
@@ -51,7 +52,7 @@ public class DataKeeperSettings implements Serializable, Cloneable, ManagedParam
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("keepTimeData");
 			ps.put(new PrivatePamParameterData(this, field) {
