@@ -51,6 +51,7 @@ public class PamSubtableDefinition extends PamTableDefinition {
 		addTableItem(parentUID = new PamTableItem(PARENTUIDNAME, Types.BIGINT));
 		addTableItem(longName = new PamTableItem(LONGDATANAME, Types.CHAR, DATANAME_LENGTH));
 		addTableItem(binaryFilename = new PamTableItem(BINARYFILE, Types.CHAR, BINARY_FILE_NAME_LENGTH));
+		setUseCheatIndexing(false);
 	}
 
 	public PamTableItem getParentID() {

@@ -5,6 +5,7 @@ import java.io.Serializable;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 abstract public class UserFrameParameters implements Cloneable, Serializable, ManagedParameters {
 
@@ -28,7 +29,7 @@ abstract public class UserFrameParameters implements Cloneable, Serializable, Ma
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DISPLAY);
 		return ps;
 	}
 

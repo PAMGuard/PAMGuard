@@ -7,6 +7,7 @@ import java.util.Hashtable;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamguardMVC.dataSelector.DataSelectParams;
 
 public class FormsSelectorParams extends DataSelectParams implements Cloneable, Serializable, ManagedParameters {
@@ -30,7 +31,7 @@ public class FormsSelectorParams extends DataSelectParams implements Cloneable, 
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("formSelection");
 			ps.put(new PrivatePamParameterData(this, field) {

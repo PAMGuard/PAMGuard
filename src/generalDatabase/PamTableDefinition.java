@@ -192,14 +192,7 @@ public class PamTableDefinition extends EmptyTableDefinition implements Cloneabl
 	public PamTableItem getUidItem() {
 		return uid;
 	}
-	public PamConnection getCheckedConnection() {
-		return checkedConnection;
-	}
-
-	public void setCheckedConnection(PamConnection checkedConnection) {
-		this.checkedConnection = checkedConnection;
-	}
-
+	
 	public PamTableItem getUpdateReference() {
 		return updateReference;
 	}

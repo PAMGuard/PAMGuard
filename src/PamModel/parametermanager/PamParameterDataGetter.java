@@ -59,9 +59,12 @@ public class PamParameterDataGetter extends PrivatePamParameterData {
 		if (setter == null) {
 			return false;
 		}
+		// need to convert the type
+		Object convObj = convertStringType(data);
 		try {
-			setter.invoke(getParentObject(), data);
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			Object parentObj = getParentObject();
+			setter.invoke(parentObj, convObj);
+		} catch (InvocationTargetException e) {
 			e.printStackTrace();
 			return false;
 		}

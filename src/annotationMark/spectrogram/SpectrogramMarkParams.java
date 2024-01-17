@@ -5,6 +5,7 @@ import java.util.List;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import annotation.DataAnnotationType;
 import annotation.handler.AnnotationChoices;
 
@@ -31,7 +32,7 @@ public class SpectrogramMarkParams implements Serializable, ManagedParameters {
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DISPLAY);
 		return ps;
 	}
 

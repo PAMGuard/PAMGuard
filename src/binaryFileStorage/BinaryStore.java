@@ -562,6 +562,12 @@ PamSettingsSource, DataOutputStore {
 	}
 
 	@Override
+	public boolean saveEndSettings(long timeNow) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	@Override
 	public int getNumSettings() {
 		if (binarySettingsStorage == null) {
 			return 0;
@@ -2582,6 +2588,10 @@ PamSettingsSource, DataOutputStore {
 			System.out.println("Binary store is creating datagram");
 		}
 		return state;
+	}
+		
+	public String getDataLocation() {
+		return binaryStoreSettings.getStoreLocation();
 	}
 	
 }

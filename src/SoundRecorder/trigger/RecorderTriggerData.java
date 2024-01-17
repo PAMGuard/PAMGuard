@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 /**
  * Information for triggered recordings to tell each recorder how long
@@ -271,7 +272,7 @@ public class RecorderTriggerData implements Serializable, Cloneable, ManagedPara
 	 */
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("lastTriggerStart");
 			ps.put(new PrivatePamParameterData(this, field) {

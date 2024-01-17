@@ -8,6 +8,7 @@ import java.util.HashMap;
 import Localiser.controls.RawOrFFTParamsInterface;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
 import PamView.GroupedSourceParameters;
 import bearinglocaliser.algorithms.BearingAlgorithmParams;
@@ -188,7 +189,7 @@ public class BearingLocaliserParams implements Serializable, Cloneable, RawOrFFT
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("algorithmParamsTable");
 			ps.put(new PrivatePamParameterData(this, field) {

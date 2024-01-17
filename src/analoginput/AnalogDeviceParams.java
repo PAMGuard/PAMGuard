@@ -6,6 +6,7 @@ import java.util.Hashtable;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
 import analoginput.calibration.CalibrationData;
 
@@ -63,7 +64,7 @@ public class AnalogDeviceParams implements Serializable, Cloneable, ManagedParam
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("calibrationTable");
 			ps.put(new PrivatePamParameterData(this, field) {

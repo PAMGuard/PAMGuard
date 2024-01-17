@@ -54,6 +54,11 @@ public abstract class OfflineFileControl extends PamControlledUnit implements Of
 
 	}
 
+	@Override
+	public String getDataLocation() {
+		return fileParams.offlineFolder;
+	}
+
 	/* (non-Javadoc)
 	 * @see PamController.PamControlledUnit#notifyModelChanged(int)
 	 */

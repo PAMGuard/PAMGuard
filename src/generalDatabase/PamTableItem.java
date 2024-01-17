@@ -377,7 +377,7 @@ public class PamTableItem implements Cloneable {
 	 * column for use in cross referencing. 
 	 */
 	public static PamTableItem findTableItem(String tableName, String columnName) {
-		PamTableDefinition tableDef = EmptyTableDefinition.
+		EmptyTableDefinition tableDef = EmptyTableDefinition.
 			findTableDefinition(EmptyTableDefinition.deblankString(tableName));
 		if (tableDef == null) return null;
 		return tableDef.findTableItem(EmptyTableDefinition.deblankString(columnName));

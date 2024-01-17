@@ -5,6 +5,7 @@ import java.sql.Types;
 import PamDetection.AcousticSQLLogging;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import generalDatabase.EmptyTableDefinition;
 import generalDatabase.PamTableDefinition;
 import generalDatabase.PamTableItem;
 import generalDatabase.SQLTypes;
@@ -22,7 +23,7 @@ public class GPLLogging extends AcousticSQLLogging {
 		super(gplDetectionBlock, gplControlledUnit.getUnitName() + " Detections");
 		this.gplControlledUnit = gplControlledUnit;
 		
-		PamTableDefinition pamTable = getTableDefinition();
+		EmptyTableDefinition pamTable = getTableDefinition();
 		pamTable.addTableItem(peakValue = new PamTableItem("PeakValue", Types.REAL));
 		pamTable.addTableItem(contourArea = new PamTableItem("ContourArea", Types.REAL));
 	}

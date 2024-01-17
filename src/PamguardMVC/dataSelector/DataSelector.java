@@ -9,7 +9,10 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
 
+import org.w3c.dom.Document;
+
 import PamController.PamController;
+import PamController.settings.output.xml.PamguardXMLWriter;
 import PamView.dialog.PamDialogPanel;
 import PamView.dialog.SettingsButton;
 import PamguardMVC.PamDataBlock;
@@ -39,7 +42,7 @@ public abstract class DataSelector {
 	private String selectorTitle;
 	
 	private boolean allowScores;
-	
+		
 	/**
 	 * Create a data selector for a DataBlock. If allowScores is 
 	 * true, then the selector MAY (but may not) offer a more complicated
@@ -104,18 +107,8 @@ public abstract class DataSelector {
 		if (parentFrame == null) {
 			parentFrame = PamController.getMainFrame();
 		}
-		Window localWin = parentFrame;
-		DataSelectorChangeListener localChangeListener = changeListener;
 		JMenuItem menuItem = new JMenuItem("Data selection ...");
-		menuItem.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				boolean ok = showSelectDialog(localWin);
-				if (ok && changeListener != null) {
-					changeListener.selectorChange(DataSelector.this);
-				}
-			}
-		});
+		menuItem.addActionListener(new ShowSettingsButton(parentFrame, changeListener));
 		return menuItem;
 	}
 
@@ -129,6 +122,24 @@ public abstract class DataSelector {
 		return ok;
 	}
 	
+	/**
+	 * Get descriptive text about the data selector which can be
+	 * added to dialogs and other information panels. 
+	 * @return descriptive text. Default is a xml dump of params. 
+	 */
+	public String getDescription() {
+		if (getParams() == null) {
+			return null;
+		}
+		PamguardXMLWriter xmlWriter = PamguardXMLWriter.getXMLWriter();
+		Document doc = xmlWriter.writeOneObject(getParams());
+		if (doc != null) {
+			String str = xmlWriter.getAsString(doc, true);
+			return str;
+		}
+		return null;
+	}
+		
 	/**
 	 * Score a PAMDataUnit. this is used in preference 
 	 * to a boolean select function so that the user can add different
@@ -228,25 +239,40 @@ public abstract class DataSelector {
 	 * @param parentWindow
 	 */
 	public JButton getDialogButton(Window parentWindow) {
+		return getDialogButton(parentWindow, null);
+	}
+	/**
+	 * Create a settings type button that can be inserted into a
+	 * larger dialog. 
+	 * @param parentWindow
+	 */
+
+	public JButton getDialogButton(Window parentWindow, DataSelectorChangeListener changeListener) {
 		JButton button = new SettingsButton();
-		button.addActionListener(new ShowSettingsButton(parentWindow));
+		button.addActionListener(new ShowSettingsButton(parentWindow, changeListener));
 		button.setToolTipText("Data selection options for " + getSelectorTitle());
 		return button;
 	}
 	
 	private class ShowSettingsButton implements ActionListener {
 		private Window parentWindow;
+		private DataSelectorChangeListener changeListener;
 		/**
 		 * @param parentWindow
+		 * @param changeListener 
 		 */
-		public ShowSettingsButton(Window parentWindow) {
+		public ShowSettingsButton(Window parentWindow, DataSelectorChangeListener changeListener) {
 			super();
 			this.parentWindow = parentWindow;
+			this.changeListener = changeListener;
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			showSelectDialog(parentWindow);
+			boolean ok = showSelectDialog(parentWindow);
+			if (ok && changeListener != null) {
+				changeListener.selectorChange(DataSelector.this);
+			}
 		}
 		
 	}

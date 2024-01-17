@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import alarm.AlarmParameters;
 
 public class PlaySoundParams implements Cloneable, Serializable, ManagedParameters {
@@ -33,7 +34,7 @@ public class PlaySoundParams implements Cloneable, Serializable, ManagedParamete
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
 	}
 	

@@ -5,6 +5,7 @@ import java.io.Serializable;
 import PamController.PamController;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import pamViewFX.fxNodes.utilsFX.ColourArray.ColourArrayType;
 
 public class FFTPlotParams  implements Serializable, Cloneable, ManagedParameters  {
@@ -98,7 +99,7 @@ public class FFTPlotParams  implements Serializable, Cloneable, ManagedParameter
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DISPLAY);
 		return ps;
 	}
 	

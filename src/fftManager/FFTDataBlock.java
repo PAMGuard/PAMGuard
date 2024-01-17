@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Vector;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import PamView.GeneralProjector.ParameterType;
 import PamView.GeneralProjector.ParameterUnits;
 import PamguardMVC.DataBlock2D;
@@ -185,6 +188,13 @@ public class FFTDataBlock extends DataBlock2D<FFTDataUnit> {
 	@Override
 	public DataTypeInfo getScaleInfo() {
 		return dataTypeInfo;
+	}
+	@Override
+	public Element getDataBlockXML(Document doc) {
+		Element el = super.getDataBlockXML(doc);
+		el.setAttribute("FFTLength", String.format("%d", getFftLength()));
+		el.setAttribute("FFTHop", String.format("%d", getFftHop()));
+		return el;
 	}
 
 

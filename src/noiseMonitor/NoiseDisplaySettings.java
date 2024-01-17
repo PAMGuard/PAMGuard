@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
 
 public class NoiseDisplaySettings implements Serializable, Cloneable, ManagedParameters {
@@ -70,7 +71,7 @@ public class NoiseDisplaySettings implements Serializable, Cloneable, ManagedPar
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DISPLAY);
 		try {
 			Field field = this.getClass().getDeclaredField("displayLengthSeconds");
 			ps.put(new PrivatePamParameterData(this, field) {
