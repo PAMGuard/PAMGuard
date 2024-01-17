@@ -1652,6 +1652,9 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 				return;
 			}
 			long t1 = dataUnit.getTimeMilliseconds()-viewerScroller.getValueMillis();
+			if (timeAxis == null) {
+				return;
+			}
 			int x1 = (int) Math.floor(timeAxis.getPosition(t1/1000));
 			int x2 = x1;
 			if (dataUnit.getDurationInMilliseconds() != null) {

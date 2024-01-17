@@ -82,7 +82,7 @@ public class ClickTrainDataSelector2 extends DataSelector {
 		}
 		SQLLogging logging = getPamDataBlock().getLogging();
 		if (logging == null) return null; //cannot happen!
-		PamTableDefinition tableDef = logging.getTableDefinition();
+		EmptyTableDefinition tableDef = logging.getTableDefinition();
 		if (params.isIncludeUnclassified()) {
 			return null;
 		}

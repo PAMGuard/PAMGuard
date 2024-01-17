@@ -3,6 +3,7 @@ package annotation.userforms;
 import java.util.ArrayList;
 
 import PamguardMVC.PamDataUnit;
+import generalDatabase.EmptyTableDefinition;
 import generalDatabase.PamTableDefinition;
 import generalDatabase.PamTableItem;
 import generalDatabase.SQLLoggingAddon;
@@ -32,7 +33,7 @@ public class UserFormSQLAddon implements SQLLoggingAddon {
 
 
 	@Override
-	public void addTableItems(PamTableDefinition pamTableDefinition) {
+	public void addTableItems(EmptyTableDefinition pamTableDefinition) {
 		loggerTableItems.clear();
 		FormDescription formDescription = userFormAnnotationType.findFormDescription();
 		if (formDescription == null) {
@@ -58,7 +59,7 @@ public class UserFormSQLAddon implements SQLLoggingAddon {
 	}
 
 	@Override
-	public boolean saveData(SQLTypes sqlTypes, PamTableDefinition pamTableDefinition, PamDataUnit pamDataUnit) {
+	public boolean saveData(SQLTypes sqlTypes, EmptyTableDefinition pamTableDefinition, PamDataUnit pamDataUnit) {
 		if (pamDataUnit == null) {
 			clearTableItems();
 			return false;
@@ -103,7 +104,7 @@ public class UserFormSQLAddon implements SQLLoggingAddon {
 	}
 
 	@Override
-	public boolean loadData(SQLTypes sqlTypes, PamTableDefinition pamTableDefinition, PamDataUnit pamDataUnit) {
+	public boolean loadData(SQLTypes sqlTypes, EmptyTableDefinition pamTableDefinition, PamDataUnit pamDataUnit) {
 		FormDescription formDescription = userFormAnnotationType.findFormDescription();
 		if (formDescription == null) {
 			return false;

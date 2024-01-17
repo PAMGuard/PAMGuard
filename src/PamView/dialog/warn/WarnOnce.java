@@ -48,6 +48,7 @@ public class WarnOnce implements PamSettings {
 		int ans = showWarning(parent, "Warning Messages", "Show all PAMGuard warning messages", WarnOnce.OK_CANCEL_OPTION);
 		if (ans == WarnOnce.CANCEL_OPTION) return;
 		singleInstance.warnOnceList.clearList();
+		singleInstance.showThisSess.clear();
 	}
 	
 	@Override

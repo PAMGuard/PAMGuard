@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 public class BatchTrainingParams implements Serializable, Cloneable, ManagedParameters {
 
@@ -27,7 +28,7 @@ public class BatchTrainingParams implements Serializable, Cloneable, ManagedPara
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("fragmentLength");
 			ps.put(new PrivatePamParameterData(this, field) {

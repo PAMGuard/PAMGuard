@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 /**
  * The Class ConfigurationDialogSettings holds parameters about the
@@ -28,7 +29,7 @@ public class ConfigurationDialogSettings implements Serializable, ManagedParamet
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("expandedState");
 			ps.put(new PrivatePamParameterData(this, field) {

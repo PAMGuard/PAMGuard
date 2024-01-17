@@ -146,12 +146,22 @@ public class LabelClicksDialog extends PamDialog {
 	 * @param thenClose option to close dialog
 	 */
 	private void addClicksToEvent(OfflineEventDataUnit event, boolean thenClose) {
+		removeFromOldEvent(markedClicks);
 		event.addSubDetections(markedClicks);
 		offlineEventListPanel.tableDataChanged();
 		clickControl.setLatestOfflineEvent(event);
 		if (thenClose) {
 			setVisible(false);
 		}		
+	}
+
+	/**
+	 * clicks may have already been part of an event, so need to remove them from that 
+	 * event first, and if there is nothing left in that event, delete the event. 
+	 * @param markedClicks2
+	 */
+	private void removeFromOldEvent(List<PamDataUnit> markedClicks) {
+		clickControl.removeFromEvents(markedClicks);
 	}
 
 	@Override

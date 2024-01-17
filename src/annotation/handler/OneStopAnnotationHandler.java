@@ -15,6 +15,7 @@ import PamView.dialog.GenericSwingDialog;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import generalDatabase.DBControlUnit;
+import generalDatabase.EmptyTableDefinition;
 import generalDatabase.PamTableDefinition;
 import generalDatabase.SQLLogging;
 

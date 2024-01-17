@@ -15,6 +15,7 @@ import Filters.FilterType;
 import PamController.PamController;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
 import PamUtils.PamCalendar;
 import PamView.PamGui;
@@ -588,7 +589,7 @@ public class DifarParameters implements Serializable, Cloneable, ManagedParamete
 		
 		@Override
 		public PamParameterSet getParameterSet() {
-			PamParameterSet ps = PamParameterSet.autoGenerate(this);
+			PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 			return ps;
 		}
 
@@ -659,7 +660,7 @@ public class DifarParameters implements Serializable, Cloneable, ManagedParamete
 		
 		@Override
 		public PamParameterSet getParameterSet() {
-			PamParameterSet ps = PamParameterSet.autoGenerate(this);
+			PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 			return ps;
 		}
 
@@ -773,7 +774,7 @@ public class DifarParameters implements Serializable, Cloneable, ManagedParamete
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("groupList");
 			ps.put(new PrivatePamParameterData(this, field) {

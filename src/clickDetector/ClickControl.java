@@ -26,6 +26,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ListIterator;
 
 import javax.swing.JMenu;
@@ -1071,7 +1072,7 @@ public class ClickControl extends PamControlledUnit implements PamSettings {
 				subDet.removeSuperDetection(event);
 			}
 		}
-		clickDetector.getOfflineEventDataBlock().remove(event);
+		clickDetector.getOfflineEventDataBlock().remove(event, true);
 	}
 
 	@Override
@@ -1168,6 +1169,31 @@ public class ClickControl extends PamControlledUnit implements PamSettings {
 		return targetMotionLocaliser;
 	}
 
+	/**
+	 * Remove clicks from existing events, if they have any. They may not. 
+	 * This is called whenever clicks are assigned to a new event to make 
+	 * sure that they don't end up in two events. 
+	 * @param markedClicks
+	 */
+	public void removeFromEvents(List<PamDataUnit> markedClicks) {
+		if (markedClicks == null) {
+			return;
+		}
+		for (PamDataUnit dataUnit : markedClicks) {
+			OfflineEventDataUnit anEvent = (OfflineEventDataUnit) dataUnit.getSuperDetection(OfflineEventDataUnit.class);
+			if (anEvent == null) {
+				continue;
+			}
+			anEvent.removeSubDetection(dataUnit);
+			if (anEvent.getSubDetectionsCount() == 0) {
+				deleteEvent(anEvent);
+			}
+			else  {
+				anEvent.updateDataUnit(System.currentTimeMillis());
+			}
+		}
+		
+	}
 
 	/**
 	 * Reassign all the clicks on one event to a different event 
@@ -1199,7 +1225,7 @@ public class ClickControl extends PamControlledUnit implements PamSettings {
 			}
 			clickEvent.setComment(clickEvent.getComment() + " Clicks reassigned to event " + reassignEvent.getEventId());
 			offlineEventDataBlock.updatePamData(clickEvent, PamCalendar.getTimeInMillis());
-			offlineEventDataBlock.remove(clickEvent);
+			offlineEventDataBlock.remove(clickEvent, true);
 			reassignEvent.sortSubDetections();
 			offlineEventDataBlock.updatePamData(reassignEvent, now);
 			if (ClickTrainDetection.class.isAssignableFrom(reassignEvent.getClass())) {

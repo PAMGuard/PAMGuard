@@ -10,7 +10,7 @@ import PamUtils.PamCalendar;
 
 public class SqliteSQLTypes extends SQLTypes {
 	
-	protected static final SQLiteConfig.DateClass dateClass = SQLiteConfig.DateClass.TEXT;
+	public static final SQLiteConfig.DateClass dateClass = SQLiteConfig.DateClass.TEXT;
 
 	@Override
 	public String typeToString(int sqlType, int length, boolean counter) {

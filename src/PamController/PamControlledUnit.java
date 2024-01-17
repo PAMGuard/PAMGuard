@@ -23,6 +23,7 @@ package PamController;
 import java.awt.Component;
 import java.awt.Frame;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -35,7 +36,9 @@ import offlineProcessing.OfflineTaskGroup;
 import PamController.status.ModuleStatus;
 import PamController.status.ModuleStatusManager;
 import PamController.status.ProcessCheck;
+import PamModel.PamModel;
 import PamModel.PamModuleInfo;
+import PamModel.PamPluginInterface;
 import PamView.ClipboardCopier;
 import PamView.PamGui;
 import PamView.PamSidePanel;
@@ -885,6 +888,23 @@ public abstract class PamControlledUnit implements SettingsNameProvider {
 	 */
 	public int getInstanceIndex() {
 		return instanceIndex;
+	}
+	
+	/**
+	 * Get detail if this is a plugin. 
+	 * @return plugin detail, or null if it's not a plugin. 
+	 */
+	public PamPluginInterface getPlugin() {
+		List<PamPluginInterface> pluginList = ((PamModel) PamController.getInstance().getModelInterface()).getPluginList();
+		if (pluginList == null) {
+			return null;
+		}
+		for (PamPluginInterface plugin : pluginList) {
+			if (plugin.getClassName().equals(this.getClass().getName())) {
+				return plugin;
+			}
+		}
+		return null;
 	}
 
 	/**

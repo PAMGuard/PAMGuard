@@ -44,11 +44,15 @@ import whistlesAndMoans.AbstractWhistleDataUnit;
 import fftManager.FFTDataUnit;
 import fftManager.PamFFTControl;
 import group3dlocaliser.Group3DLocaliserControl;
+import metadata.MetaDataContol;
 import meygenturbine.MeygenTurbine;
 import printscreen.PrintScreenControl;
 import rockBlock.RockBlockControl;
+import tethys.TethysControl;
 import turbineops.TurbineOperationControl;
 import GPS.GpsDataUnit;
+import Map.MapController;
+import Map.gridbaselayer.GridbaseControl;
 import NMEA.NMEADataUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
@@ -62,6 +66,7 @@ import PamguardMVC.PamDataBlock;
 import analogarraysensor.ArraySensorControl;
 import backupmanager.BackupManager;
 import beamformer.continuous.BeamFormerControl;
+import beamformer.localiser.BeamFormLocaliserControl;
 import bearinglocaliser.BearingLocaliserControl;
 import binaryFileStorage.SecondaryBinaryStore;
 import cepstrum.CepstrumControl;
@@ -454,6 +459,19 @@ final public class PamModel implements PamSettings {
 		mi.setToolTipText("Manage automated data backups");
 		mi.setModulesMenuGroup(utilitiesGroup);
 		mi.setMaxNumber(1);
+
+
+//		mi = PamModuleInfo.registerControlledUnit(MetaDataContol.class.getName(), MetaDataContol.unitType);
+//		mi.setToolTipText("Project Meta Data");
+//		mi.setModulesMenuGroup(utilitiesGroup);
+//		mi.setMaxNumber(1); 
+		
+		if (isViewer) {
+			mi = PamModuleInfo.registerControlledUnit(TethysControl.class.getName(), TethysControl.defaultName);
+			mi.setToolTipText("Interface to Tethys Database");
+			mi.setModulesMenuGroup(utilitiesGroup);
+			mi.setMaxNumber(1);
+		}		
 		
 		/*
 		 * ************* End Utilities  Group *******************
@@ -1064,7 +1082,7 @@ final public class PamModel implements PamSettings {
 		// clear the current list
 		pluginList.clear();
 		daqList.clear();
-
+		
 		/*
 		 * If developing a new PAMPlugin in eclipse, the easiest way to do it is to make a new
 		 * Eclipse project for your plugin code. Within that project, copy this PamModel class 
@@ -1079,6 +1097,8 @@ final public class PamModel implements PamSettings {
 		 * When you export the code for your plugin to a jar file, remember to NOT inlcude the copy of 
 		 * PamModel !
 		 */
+		
+//		pluginList.add(new MorlaisWP1aPlugin());
 
 		// Load up whatever default classloader was used to create this class.  Must use the same classloader
 		// for all plugins, or else we will not be able to create proper dependencies between them or be able
@@ -1146,11 +1166,30 @@ final public class PamModel implements PamSettings {
 					    // to add that URL to the default classloader path.
 					    URL newURL = jarList.get(i).toURI().toURL();
 					    
+					    // original method
+//					    Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+//					    method.setAccessible(true);
+//					    method.invoke(cl, newURL);
+					    
+					    // first fix attempt - create a brand new URLClassLoader. As expected, we get a ClassCastException when trying
+					    // to load the parameters so we can't save params using this method
+//					    URL[] newURLArray = new URL[1];
+//					    newURLArray[0] = newURL;
+//						cl = new URLClassLoader(newURLArray);
 						
 					    // second attempt - custom class loader with the system app loader specified as the parent.  Loads controlled unit, but
 					    // as before it doesn't load the parameters
 					    classLoader.addURL(newURL);
 
+					    // third attempt
+//					    Class<?> genericClass = cl.getClass();
+//					    Method method = genericClass.getSuperclass().getDeclaredMethod("addURL", new Class[] {URL.class});
+//					    method.setAccessible(true);
+//					    method.invoke(cl, new Object[] {newURL});
+
+					    
+					    
+					    
 					    // Save the name of the class to the global pluginBeingLoaded variable, and load the class.
 					    this.setPluginBeingLoaded(className);
 //						Class c = cl.loadClass(className);
@@ -1231,8 +1270,9 @@ final public class PamModel implements PamSettings {
 										"for help.<p>" +
 										"This plug-in will not be available for loading";
 								String help = null;
-								int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help, e1);
+								int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help, e1);
 								System.err.println("Exception while loading " +	className);
+								System.err.println(e1.getMessage());								
 								continue;
 							}
 						}						
@@ -1245,7 +1285,7 @@ final public class PamModel implements PamSettings {
 							"for help.<p>" +
 							"This plug-in will not be available for loading";
 					String help = null;
-					int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help, ex);
+					int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help, ex);
 					System.err.println("Exception while loading " +	jarList.get(i).getName());
 					continue;
 				}
@@ -1270,7 +1310,7 @@ final public class PamModel implements PamSettings {
 						
 						// instantiate the plugin control class using the custom class loader
 						try {
-//							File classFile = new File(pf.getJarFile());		
+							File classFile = new File(pf.getJarFile());		
 							//URLClassLoader cl = new URLClassLoader(new URL[]{classFile.toURI().toURL()});
 //							mi = PamModuleInfo.registerControlledUnit(pf.getClassName(), pf.getDescription(),cl);
 							mi = PamModuleInfo.registerControlledUnit(pf.getClassName(), pf.getDescription(),classLoader);
@@ -1336,7 +1376,7 @@ final public class PamModel implements PamSettings {
 								"for help.<p>" +
 								"This plug-in will not be available for loading";
 						String help = null;
-						int ans = WarnOnce.showWarning(PamController.getInstance().getGuiFrameManager().getFrame(0), title, msg, WarnOnce.WARNING_MESSAGE, help, e1);
+						int ans = WarnOnce.showWarning(PamController.getMainFrame(), title, msg, WarnOnce.WARNING_MESSAGE, help, e1);
 						System.err.println("Exception while loading " +	pf.getDefaultName());
 						pluginList.remove(pf);
 						continue;

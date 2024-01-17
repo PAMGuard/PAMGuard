@@ -218,7 +218,7 @@ public class RWEBinaryDataSource extends BinaryDataSource {
 		binaryObjectData.getDataUnitBaseData().setSampleDuration(duration);
 //		rweDataUnit = new RWEDataUnit(aSound.timeMilliseconds, channelMap, 
 //				startSample, duration, aSound);
-		rweDataUnit = new RWEDataUnit(binaryObjectData.getDataUnitBaseData(), aSound);
+		rweDataUnit = new RWEDataUnit(rweProcess, binaryObjectData.getDataUnitBaseData(), aSound);
 		rweDataUnit.setSequenceBitmap(sequenceMap);
 		double f[] = new double[2];
 		f[0] = aSound.minFreq * rweDataBlock.getSampleRate()/rweDataBlock.getFftLength();

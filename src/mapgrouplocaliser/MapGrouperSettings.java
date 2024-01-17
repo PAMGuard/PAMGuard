@@ -7,6 +7,7 @@ import java.util.Hashtable;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamView.paneloverlay.OverlayDataInfo;
 import PamView.paneloverlay.overlaymark.MarkDataSelectorParams;
 import PamView.paneloverlay.overlaymark.OverlayMarkDataInfo;
@@ -64,7 +65,7 @@ public class MapGrouperSettings implements Serializable, Cloneable, ManagedParam
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("markDataSelectorParams");
 			ps.put(new PrivatePamParameterData(this, field) {

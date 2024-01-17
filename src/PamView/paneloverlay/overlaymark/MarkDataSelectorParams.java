@@ -6,6 +6,7 @@ import java.util.Hashtable;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
 import PamguardMVC.PamDataBlock;
 
@@ -73,7 +74,7 @@ public class MarkDataSelectorParams implements Serializable, Cloneable, ManagedP
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DISPLAY);
 		try {
 			Field field = this.getClass().getDeclaredField("overlayChoices");
 			ps.put(new PrivatePamParameterData(this, field) {

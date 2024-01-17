@@ -300,7 +300,7 @@ public class EmptyTableDefinition implements Cloneable {
 	 * @param tableName
 	 * @return reference to the database deinition if it exists, or null 
 	 */
-	static PamTableDefinition findTableDefinition(String tableName) {
+	static EmptyTableDefinition findTableDefinition(String tableName) {
 		String searchName = EmptyTableDefinition.deblankString(tableName);
 		SQLLogging log = SQLLogging.findLogger(searchName);
 		if (log == null) return null;
@@ -388,6 +388,15 @@ public class EmptyTableDefinition implements Cloneable {
 	public void setUpdatePolicy(int updatePolicy) {
 		this.updatePolicy = updatePolicy;
 	}
+
+	public PamConnection getCheckedConnection() {
+		return checkedConnection;
+	}
+
+	public void setCheckedConnection(PamConnection checkedConnection) {
+		this.checkedConnection = checkedConnection;
+	}
+
 
 	@Override
 	protected EmptyTableDefinition clone() {
