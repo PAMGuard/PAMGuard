@@ -44,6 +44,7 @@ import binaryFileStorage.BinaryStore;
 import dataPlotsFX.JamieDev;
 import generalDatabase.DBControl;
 import networkTransfer.send.NetworkSender;
+import offlineProcessing.OfflineTaskManager;
 import rocca.RoccaDev;
 
 import java.io.BufferedReader;
@@ -176,6 +177,11 @@ public class Pamguard {
 				else if (anArg.equalsIgnoreCase("-nosplash")) {
 					showSplash = false;
 				}
+				else if (anArg.equalsIgnoreCase(GlobalArguments.BATCHFLAG)) {
+					// flag to say we're in batch processing mode. Can be used
+					// to avoid one or two dialogs that pop up in Viewer mode. 
+					GlobalArguments.setParam(GlobalArguments.BATCHFLAG, Boolean.TRUE.toString());
+				}
 
 				//	removed SEICHE switch when the two SEICHE modules were converted to plugins				
 				//				else if (anArg.equalsIgnoreCase("-seiche")) {
@@ -243,6 +249,10 @@ public class Pamguard {
 					int mPort = Integer.parseInt(args[iArg++]);
 					pamBuoyGlobals.setMultiportConfig(mAddr, mPort);
 					System.out.printf("Setting multicast control addr %s port %d\n", mAddr, mPort);
+				}
+				else if (anArg.equalsIgnoreCase(OfflineTaskManager.commandFlag)) {
+					String taskName = args[iArg++];
+					OfflineTaskManager.getManager().addCommandLineTask(taskName);
 				}
 				else if (anArg.equalsIgnoreCase("-nolog")) {
 					System.out.println("Disabling log file from command line switch...");

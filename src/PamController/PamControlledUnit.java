@@ -30,11 +30,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
-import offlineProcessing.OfflineTask;
 import offlineProcessing.OfflineTaskGroup;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import PamController.status.ModuleStatus;
 import PamController.status.ModuleStatusManager;
@@ -844,6 +840,16 @@ public abstract class PamControlledUnit implements SettingsNameProvider {
 			}
 		}
 		return worstStatus;
+	}
+	
+	/**
+	 * Get the offline state of this module. This can generally
+	 * be idle, but can be a higher state when map making at startup
+	 * and when running an offline task. 
+	 * @return
+	 */
+	public int getOfflineState() {
+		return PamController.PAM_IDLE;
 	}
 
 //	/**
