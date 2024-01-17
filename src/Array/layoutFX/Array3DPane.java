@@ -4,24 +4,24 @@ import pamViewFX.fxNodes.PamBorderPane;
 
 
 import java.util.ArrayList;
+import org.fxyz3d.geometry.Point3D;
+import org.fxyz3d.shapes.composites.PolyLine3D;
 
+import Array.Hydrophone;
 import Array.PamArray;
+import Array.Streamer;
 import javafx.event.EventHandler;
 import javafx.scene.AmbientLight;
 import javafx.scene.DepthTest;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
-import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
-import javafx.geometry.Point3D;
 
 import javafx.scene.shape.Sphere;
 import javafx.scene.text.Text;
@@ -60,6 +60,7 @@ public class Array3DPane extends PamBorderPane {
 
 
 	private double scaleFactor=20; 
+
 	private double axisSize=10*scaleFactor; 
 
 	//keep track of mouse positions
@@ -92,7 +93,10 @@ public class Array3DPane extends PamBorderPane {
 	private Rotate rotateX;
 	private Translate translate;
 
-	
+	/**
+	 *  The size of the hydrophone for the 3D display. 
+	 */
+	private double hydrophoneSize = 0.5;
 
 	public Array3DPane(){
 
@@ -113,13 +117,13 @@ public class Array3DPane extends PamBorderPane {
 
 		root3D.getChildren().add(arrayGroup);
 		root3D.getChildren().add(axisGroup);
-		
-		
-	    AmbientLight light = new AmbientLight();	
-	    light.setColor(Color.WHITE);
-	    Group lightGroup = new Group();
-	    lightGroup.getChildren().add(light);
-	    root3D.getChildren().add(lightGroup);
+
+
+		AmbientLight light = new AmbientLight();	
+		light.setColor(Color.WHITE);
+		Group lightGroup = new Group();
+		lightGroup.getChildren().add(light);
+		root3D.getChildren().add(lightGroup);
 
 		//Use a SubScene to mix 3D and 2D stuff.        
 		//note- make sure depth buffer in sub scene is enabled. 
@@ -136,7 +140,7 @@ public class Array3DPane extends PamBorderPane {
 		//handle mouse events for sub scene
 		handleMouse(subScene); 
 
-	    
+
 
 		//create new group to add sub scene to 
 		Group group = new Group();
@@ -230,8 +234,8 @@ public class Array3DPane extends PamBorderPane {
 		axisGroup.getChildren().addAll(xAxis, yAxis, zAxis);
 		axisGroup.getChildren().addAll(xText, yText, zText);
 		axisGroup.getChildren().addAll(xSphere, ySphere, zSphere);
-		
-		
+
+
 		return axisGroup;
 	}
 
@@ -295,98 +299,146 @@ public class Array3DPane extends PamBorderPane {
 	 * @param array - the hydrophone array to draw. 
 	 */
 	public void drawArray(PamArray array) {
-		
-		System.out.println("Draw array: " + array); 
-		
+
+		System.out.println("DRAW ARRAY: " + array); 
+
+		//clear the array
+		arrayGroup.getChildren().removeAll(arrayGroup.getChildren()); 
+
+		ArrayList<Hydrophone> hydrophones = array.getHydrophoneArray();
+
+		//draw hydrophones
+		Sphere sphere;
+		Streamer streamer;
+		for (int i=0; i<hydrophones.size(); i++){
+			
+			//get the streamer for the hydrophone
+			streamer = array.getStreamer(hydrophones.get(i).getStreamerId());
+
+			double x  = hydrophones.get(i).getX() + hydrophones.get(i).getStreamerId();
+			double y  = hydrophones.get(i).getY() + hydrophones.get(i).getStreamerId();
+			double z  = hydrophones.get(i).getZ() + hydrophones.get(i).getStreamerId();
+
+			sphere=new Sphere(hydrophoneSize*scaleFactor);
+			sphere.setTranslateX(x*scaleFactor);
+			sphere.setTranslateY(z*scaleFactor);
+			sphere.setTranslateZ(y*scaleFactor);
+
+			Color col = Color.RED;
+
+			final PhongMaterial aMaterial = new PhongMaterial();
+			aMaterial.setDiffuseColor(col);
+			aMaterial.setSpecularColor(col.brighter());
+			sphere.setMaterial(aMaterial);
+
+//			System.out.println("Add hydrophone: " + x + " " + y + " " +z); 
+
+			arrayGroup.getChildren().add(sphere);
+			
+			ArrayList<Point3D> streamerPoints=new ArrayList<Point3D>(); 
+			//now plot a line from the streamer to the hydrophone
+			Point3D newPoint;
+			
+			newPoint=new Point3D(x*scaleFactor, z*scaleFactor, y*scaleFactor);
+			streamerPoints.add(newPoint);
+			
+			newPoint =new Point3D(streamer.getCoordinate(0)*scaleFactor, streamer.getCoordinate(2)*scaleFactor,  streamer.getCoordinate(1)*scaleFactor);
+			streamerPoints.add(newPoint);
+			
+			System.out.println("Streamer points: " + streamerPoints.size()); 
+
+			PolyLine3D polyLine3D=new PolyLine3D(streamerPoints, 4f, Color.DODGERBLUE); 
+			arrayGroup.getChildren().add(polyLine3D);
+		}
 	}
 
 
 
-//	/**
-//	 * Draw the entire array 
-//	 * @param pos - hydrophone and streamer positions in the same co-ordinate frame as the reference frame. 
-//	 */
-//	public void drawArrays(ArrayList<ArrayList<ArrayPos>> pos){
-//
-//		arrayGroup.getChildren().removeAll(arrayGroup.getChildren()); 
-//
-//		if (pos==null){
-//			System.err.println("Array3DPane: Hydrophone positions are null");
-//			return; 
-//		}
-//
-//		for (int i=0; i< pos.size(); i++){
-//			for (int j=0; j<pos.get(i).size(); j++){
-//				drawArray(pos.get(i).get(j)); 
-//			}
-//		}
-//
-//		//System.out.println("Draw 3D hydrophone array");
-//	}
+	//	/**
+	//	 * Draw the entire array 
+	//	 * @param pos - hydrophone and streamer positions in the same co-ordinate frame as the reference frame. 
+	//	 */
+	//	public void drawArrays(ArrayList<ArrayList<ArrayPos>> pos){
+	//
+	//		arrayGroup.getChildren().removeAll(arrayGroup.getChildren()); 
+	//
+	//		if (pos==null){
+	//			System.err.println("Array3DPane: Hydrophone positions are null");
+	//			return; 
+	//		}
+	//
+	//		for (int i=0; i< pos.size(); i++){
+	//			for (int j=0; j<pos.get(i).size(); j++){
+	//				drawArray(pos.get(i).get(j)); 
+	//			}
+	//		}
+	//
+	//		//System.out.println("Draw 3D hydrophone array");
+	//	}
 
-//	/**
-//	 * Draw an array.
-//	 * @param arrayPos - hydrophone and streamer positions in the same co-ordinate frame as the reference frame. 
-//	 */
-//	private void drawArray(ArrayPos arrayPos){
-//
-//		final PhongMaterial redMaterial = new PhongMaterial();
-//		redMaterial.setDiffuseColor(DEFAULT_HYDRO_COL);
-//		redMaterial.setSpecularColor(DEFAULT_HYDRO_COL.brighter());
-//
-//		final PhongMaterial greenMaterial = new PhongMaterial();
-//		greenMaterial.setDiffuseColor(DEFAULT_SENSOR_COL);
-//		greenMaterial.setSpecularColor(DEFAULT_SENSOR_COL.brighter());
-//
-//		//draw hydrophones
-//		Sphere sphere;
-//		for (int i=0; i<arrayPos.getTransformHydrophonePos().size(); i++){
-//			sphere=new Sphere(settings.hydrophoneSize*scaleFactor);
-//			sphere.setTranslateX(arrayPos.getTransformHydrophonePos().get(i)[0]*scaleFactor);
-//			sphere.setTranslateY(-arrayPos.getTransformHydrophonePos().get(i)[2]*scaleFactor);
-//			sphere.setTranslateZ(arrayPos.getTransformHydrophonePos().get(i)[1]*scaleFactor);
-//
-//			Color hydroCol = settings.hydrophoneColours[arrayPos.getHArray().getHydrophones().get(i).channel.get()]; 
-//
-//			if (hydroCol == null) {
-//				sphere.setMaterial(redMaterial);
-//			}
-//			else {
-//				final PhongMaterial aMaterial = new PhongMaterial();
-//				aMaterial.setDiffuseColor(hydroCol);
-//				aMaterial.setSpecularColor(hydroCol.brighter());
-//				sphere.setMaterial(aMaterial);
-//
-//			}
-//			arrayGroup.getChildren().add(sphere);
-//
-//		}
-//
-//
-//
-//		//draw streamer
-//		PolyLine3D polyLine3D;
-//		ArrayList<Point3D> streamerPoints;
-//
-//		for (int i=0; i<arrayPos.getTransformStreamerPositions().size(); i++){
-//			if (arrayPos.getTransformStreamerPositions().get(i)==null) return; 
-//			streamerPoints=new ArrayList<Point3D>(); 
-//			for (int j=0; j<arrayPos.getTransformStreamerPositions().get(i).size(); j++){
-//
-//				//TODO- use cylinder for line
-//				//					 Cylinder cylinder=createConnection(arrayPos.getTransformStreamerPositions().get(i).get(j).multiply(scaleFactor),  arrayPos.getTransformStreamerPositions().get(i).get(j+1).multiply(scaleFactor),0.2*scaleFactor); 
-//				//					 arrayGroup.getChildren().add(cylinder);
-//
-//				//need to convert to fxyz 3D point - stupid but no work around. 
-//				Point3D newPoint=new Point3D((float) (arrayPos.getTransformStreamerPositions().get(i).get(j).getX()*scaleFactor),
-//						(float) (-arrayPos.getTransformStreamerPositions().get(i).get(j).getZ()*scaleFactor), (float) (arrayPos.getTransformStreamerPositions().get(i).get(j).getY()*scaleFactor));
-//				streamerPoints.add(newPoint);
-//			}
-//			polyLine3D=new PolyLine3D(streamerPoints, 4, Color.BLUE); 
-//			arrayGroup.getChildren().add(polyLine3D);
-//		}
-//
-//	}
+	//	/**
+	//	 * Draw an array.
+	//	 * @param arrayPos - hydrophone and streamer positions in the same co-ordinate frame as the reference frame. 
+	//	 */
+	//	private void drawArray(ArrayPos arrayPos){
+	//
+	//		final PhongMaterial redMaterial = new PhongMaterial();
+	//		redMaterial.setDiffuseColor(DEFAULT_HYDRO_COL);
+	//		redMaterial.setSpecularColor(DEFAULT_HYDRO_COL.brighter());
+	//
+	//		final PhongMaterial greenMaterial = new PhongMaterial();
+	//		greenMaterial.setDiffuseColor(DEFAULT_SENSOR_COL);
+	//		greenMaterial.setSpecularColor(DEFAULT_SENSOR_COL.brighter());
+	//
+	//		//draw hydrophones
+	//		Sphere sphere;
+	//		for (int i=0; i<arrayPos.getTransformHydrophonePos().size(); i++){
+	//			sphere=new Sphere(settings.hydrophoneSize*scaleFactor);
+	//			sphere.setTranslateX(arrayPos.getTransformHydrophonePos().get(i)[0]*scaleFactor);
+	//			sphere.setTranslateY(-arrayPos.getTransformHydrophonePos().get(i)[2]*scaleFactor);
+	//			sphere.setTranslateZ(arrayPos.getTransformHydrophonePos().get(i)[1]*scaleFactor);
+	//
+	//			Color hydroCol = settings.hydrophoneColours[arrayPos.getHArray().getHydrophones().get(i).channel.get()]; 
+	//
+	//			if (hydroCol == null) {
+	//				sphere.setMaterial(redMaterial);
+	//			}
+	//			else {
+	//				final PhongMaterial aMaterial = new PhongMaterial();
+	//				aMaterial.setDiffuseColor(hydroCol);
+	//				aMaterial.setSpecularColor(hydroCol.brighter());
+	//				sphere.setMaterial(aMaterial);
+	//
+	//			}
+	//			arrayGroup.getChildren().add(sphere);
+	//
+	//		}
+	//
+	//
+	//
+	//		//draw streamer
+	//		PolyLine3D polyLine3D;
+	//		ArrayList<Point3D> streamerPoints;
+	//
+	//		for (int i=0; i<arrayPos.getTransformStreamerPositions().size(); i++){
+	//			if (arrayPos.getTransformStreamerPositions().get(i)==null) return; 
+	//			streamerPoints=new ArrayList<Point3D>(); 
+	//			for (int j=0; j<arrayPos.getTransformStreamerPositions().get(i).size(); j++){
+	//
+	//				//TODO- use cylinder for line
+	//				//					 Cylinder cylinder=createConnection(arrayPos.getTransformStreamerPositions().get(i).get(j).multiply(scaleFactor),  arrayPos.getTransformStreamerPositions().get(i).get(j+1).multiply(scaleFactor),0.2*scaleFactor); 
+	//				//					 arrayGroup.getChildren().add(cylinder);
+	//
+	//				//need to convert to fxyz 3D point - stupid but no work around. 
+	//				Point3D newPoint=new Point3D((float) (arrayPos.getTransformStreamerPositions().get(i).get(j).getX()*scaleFactor),
+	//						(float) (-arrayPos.getTransformStreamerPositions().get(i).get(j).getZ()*scaleFactor), (float) (arrayPos.getTransformStreamerPositions().get(i).get(j).getY()*scaleFactor));
+	//				streamerPoints.add(newPoint);
+	//			}
+	//			polyLine3D=new PolyLine3D(streamerPoints, 4, Color.BLUE); 
+	//			arrayGroup.getChildren().add(polyLine3D);
+	//		}
+	//
+	//	}
 
 
 

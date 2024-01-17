@@ -113,10 +113,10 @@ public class GenericModelWorker extends DLModelWorker<GenericPrediction> {
 				this.setEnableSoftMax(true);
 			}
 						
-			GenericModelParams genericModelParams = new GenericModelParams(); 
+//			GenericModelParams genericModelParams = new GenericModelParams(); 
 			
-			genericModelParams.defaultShape = longArr2Long(genericModel.getInputShape().getShape()); 
-			genericModelParams.defualtOuput = longArr2Long(genericModel.getOutShape().getShape()); 
+			((GenericModelParams) genericParams).defaultShape = longArr2Long(genericModel.getInputShape().getShape()); 
+			((GenericModelParams) genericParams).defualtOuput = longArr2Long(genericModel.getOutShape().getShape()); 
 			
 
 		}

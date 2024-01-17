@@ -749,6 +749,16 @@ public class PamArrayUtils {
 		}
 		System.out.println("");
 	}
+	
+	/**
+	 * Print a Long array
+	 * @param array - the array to print.
+	 */
+	public static void printArray(Long[] array) {
+		for (int i=0; i<array.length; i++) {
+			System.out.println(i + ": " + array[i]);
+		}
+	}
 
 
 	/**
@@ -1055,6 +1065,8 @@ public class PamArrayUtils {
 		}
 		return arrL;
 	}
+
+
 
 
 

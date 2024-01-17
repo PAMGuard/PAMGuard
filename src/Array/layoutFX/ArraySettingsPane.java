@@ -5,14 +5,19 @@ import PamController.PamController;
 import PamController.SettingsPane;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.layout.VBox;
 import pamViewFX.PamGuiManagerFX;
-
+import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.PamBorderPane;
+import pamViewFX.fxNodes.PamButton;
+import pamViewFX.fxNodes.PamHBox;
 
 /**
  * The main settings pane for settings up a hydrophone array. 
@@ -98,14 +103,14 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 //		});
 		
 		streamerPane.addStreamerListener((x,y)->{
-			System.out.println("Streamer changed!"); 
 			PamArray  array = getParams(new PamArray("temp_array: ", null)) ;
+			System.out.println("Streamer changed!"); 
 			array3DPane.drawArray(array);
 		});
 		
 		hydrophonePane.addStreamerListener((x,y)->{
-			System.out.println("Hydrophone changed!"); 
 			PamArray  array = getParams(new PamArray("temp_array: ", null)) ;
+			System.out.println("Hydrophone changed!" + array.getHydrophoneCount()); 
 			array3DPane.drawArray(array);
 		});
 
@@ -173,6 +178,37 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 		arrayLabel.setPadding(new Insets(5,5,5,5));
 		PamGuiManagerFX.titleFont1style(arrayLabel);
 		
+		//holds the array label and also some button for import and export. 
+		PamHBox arrayImportExportBox = new PamHBox();
+		arrayImportExportBox.setSpacing(5);
+		arrayImportExportBox.setAlignment(Pos.CENTER_LEFT);
+		arrayImportExportBox.setPadding(new Insets(5,0,0,0));
+		
+		PamButton importButton = new PamButton("Import..."); 
+		importButton.setOnAction((action)->{
+			importArray();
+		});
+		importButton.setGraphic(PamGlyphDude.createPamIcon("mdi2f-file-import", PamGuiManagerFX.iconSize)); 
+		importButton.setTooltip(new Tooltip("Import array settings from a .pgaf file"));
+
+		PamButton exportButton = new PamButton("Export..."); 
+		exportButton.setOnAction((action)->{
+			exportArray();
+		});
+		exportButton.setGraphic(PamGlyphDude.createPamIcon("mdi2f-file-export", PamGuiManagerFX.iconSize)); 
+		exportButton.setTooltip(new Tooltip("Export array settings to a .pgaf file"));
+		
+		//balnk region to make it look nicer
+		Region blank = new Region();
+		blank.setPrefWidth(70);
+		
+		arrayImportExportBox.getChildren().addAll(importButton, exportButton, blank); 
+		
+		PamBorderPane titleHolder = new PamBorderPane();
+		titleHolder.setLeft(arrayLabel);
+		titleHolder.setRight(arrayImportExportBox);
+
+		//the streamer pane for changing streamer settings. 
 		streamerPane = new StreamersPane(); 
 		streamerPane.setMaxWidth(Double.MAX_VALUE);
 		
@@ -196,12 +232,28 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 		
 		PamVBox vBox = new PamVBox(); 
 		vBox.setSpacing(5);
-		vBox.getChildren().addAll(arrayLabel, streamerPane, hydrophoneLabel,
+		vBox.getChildren().addAll(titleHolder, streamerPane, hydrophoneLabel,
 				hydrophonePane); 
 
 		return vBox; 
 	}
-	
+
+	/**
+	 * Select a file to export array settings to. 
+	 */
+	private void exportArray() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
+	 * Select a file to import array settings
+	 */
+	private void importArray() {
+		// TODO Auto-generated method stub
+		
+	}
+
 	/**
 	 * Set correct text for the receiver in the current medium (e.g. air or water); 
 	 */
@@ -233,6 +285,9 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 		hydrophonePane.setParams(input); 
 		streamerPane.setParams(input); 
 		environmentalPane.setParams(input);
+		
+		//draw the array
+		array3DPane.drawArray(input);
 	}
 
 	@Override

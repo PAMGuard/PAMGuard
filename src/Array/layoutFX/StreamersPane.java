@@ -221,6 +221,15 @@ public class StreamersPane extends PamBorderPane {
 			//add to the current array.
 			currentArray.addStreamer(newStreamer.getStreamer()); 
 			System.out.println("Create new streamer: " + currentArray.getNumStreamers());
+			
+			notifyStreamerListeners(newStreamer);
+
+		}
+		
+		@Override
+		public void deleteData(StreamerProperty data){
+			super.deleteData(data);
+			notifyStreamerListeners(data);
 		}
 
 		private StreamerProperty createDefaultStreamerProperty() {
@@ -263,21 +272,21 @@ public class StreamersPane extends PamBorderPane {
 		for (int i=0; i<tableArrayPane.getStreamers().size(); i++) {
 			
 			if (i<currentArray.getStreamerCount()) {
-				currentArray.updateStreamer(i,tableArrayPane.getStreamers().get(i).getStreamer());
+				currParams.updateStreamer(i,tableArrayPane.getStreamers().get(i).getStreamer());
 			}
 			else {
-				currentArray.addStreamer(tableArrayPane.getStreamers().get(i).getStreamer());
+				currParams.addStreamer(tableArrayPane.getStreamers().get(i).getStreamer());
 			}
 		}
 		
 		while (currentArray.getStreamerCount()>tableArrayPane.getStreamers().size()) {
-			currentArray.removeStreamer(currentArray.getStreamerCount()-1);
+			currParams.removeStreamer(currParams.getStreamerCount()-1);
 		}
 		
 //		currentArray.updateStreamer(tableArrayPane.getStreamers().indexOf(currentStreamerData), streamer);
 		System.out.println("Get params streamer: " + currentArray.getNumStreamers());
 		
-		return currentArray;
+		return currParams;
 	}
 
 	public void setRecieverLabels() {

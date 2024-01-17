@@ -60,6 +60,11 @@ public class DataTransformPaneFactory {
 		case NORMALISE_WAV:
 			settingsPane = new LabelTransfromPane(dlTransfrom, DLTransformType.NORMALISE_WAV.toString()); 
 			settingsPane.setPadding(new Insets(0,0,0,20));
+			break;
+		case FILTER:
+			settingsPane = new FilterTransformPane(dlTransfrom); 
+			settingsPane.setParams(dlTransfrom);
+			break;
 		case SPEC2DB:
 //			settingsPane = new LabelTransfromPane(dlTransfrom, DLTransformType.SPEC2DB.toString()); 
 //			settingsPane.setPadding(new Insets(0,0,0,20));

@@ -41,10 +41,15 @@ public class PropogationPane extends SettingsPane<PamArray> {
 		validator.createCheck()
 		.dependsOn("speed_of_sound", speedOfSound.textProperty())
 		.withMethod(c -> {
+			try {
 			String posVal = c.get("speed_of_sound");
 				if (posVal.isEmpty() || Double.valueOf(posVal)==null) {
 					c.error("The input for speed of sound is invalid");
 				}
+			}
+			catch (Exception e) {
+				c.error("The input for speed of sound is invalid");
+			}
 		})
 		.decorates(speedOfSound).immediate();
 	
@@ -55,10 +60,15 @@ public class PropogationPane extends SettingsPane<PamArray> {
 		validator.createCheck()
 		.dependsOn("speed_of_sound_error", speedOfSoundError.textProperty())
 		.withMethod(c -> {
+			try {
 			String posVal = c.get("speed_of_sound_error");
 				if (posVal.isEmpty() || Double.valueOf(posVal)==null) {
 					c.error("The input for speed of sound error is invalid");
 				}
+		}
+		catch (Exception e) {
+			c.error("The input for speed of sound is invalid");
+		}
 		})
 		.decorates(speedOfSoundError).immediate();
 		

@@ -71,7 +71,7 @@ public class GenericModelParser {
 		
 //			System.out.println(jsonObject); 
 
-			writeJSONToFile(file, jsonObject.toString(), false); 
+			writeJSONToFile(file, jsonObject.toString(1), false); 
 			
 			return true;
 		}

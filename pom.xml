@@ -842,6 +842,13 @@ C:\Users\*yourusername*\.m2\repository\pamguard\org\x3\2.2.2-->
 		<artifactId>atlantafx-base</artifactId>
 		<version>1.0.0</version>
 	</dependency>
+	
+	<!--  Extra 3D bits for JavaFX -->
+	<dependency>
+	    <groupId>org.fxyz3d</groupId>
+	    <artifactId>fxyz3d</artifactId>
+	    <version>0.6.0</version>
+	</dependency>
 
   </dependencies>
 </project>

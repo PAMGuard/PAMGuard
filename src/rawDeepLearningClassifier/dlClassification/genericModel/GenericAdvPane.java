@@ -1,6 +1,7 @@
 package rawDeepLearningClassifier.dlClassification.genericModel;
 
 import PamController.SettingsPane;
+import PamUtils.PamArrayUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -51,10 +52,10 @@ public class GenericAdvPane extends SettingsPane<GenericModelParams> {
 	 */
 	private GridPane classNameHolder; 
 
-//	/**
-//	 * The text field names.  
-//	 */
-//	private TextField[] classNameFields;
+	//	/**
+	//	 * The text field names.  
+	//	 */
+	//	private TextField[] classNameFields;
 
 	/**
 	 * The DL transform pane. 
@@ -182,14 +183,35 @@ public class GenericAdvPane extends SettingsPane<GenericModelParams> {
 
 		defualtShapeSwitch = new PamToggleSwitch("Use model default shape"); 
 		defualtShapeSwitch.selectedProperty().addListener((obsval, oldval, newval)->{
+
+			System.out.println("Hello: deafult shape: " + newval);
+			PamArrayUtils.printArray( currentInput.defaultShape);
+
+			if (newval) {
 			//set the correct model shape. 
 			if (currentInput!=null && currentInput.defaultShape!=null) {
-				for (int i=0; i<currentInput.defaultShape.length; i++) {
-					shapeSpinners[i].getValueFactory().setValue(currentInput.defaultShape[i].intValue());
+				for (int i=0; i<shapeSpinners.length; i++) {
+					//the spinner lengths.
+					if (i<currentInput.defaultShape.length) {
+						shapeSpinners[i].setDisable(true);
+						shapeSpinners[i].setVisible(true);
+						shapeSpinners[i].getValueFactory().setValue(currentInput.defaultShape[i].intValue());
+					}
+					else {
+						shapeSpinners[i].setVisible(false);
+						shapeSpinners[i].getValueFactory().setValue(1);
+					}
 				}
 			}
-			//disable the shapes. 
-			shapeHolder.setDisable(newval);
+			}
+			else {
+				//reset for user input
+				for (int i=0; i<shapeSpinners.length; i++) {
+					shapeSpinners[i].setVisible(true);
+					shapeSpinners[i].setDisable(false);
+				}
+			}
+
 		});
 
 
@@ -200,7 +222,7 @@ public class GenericAdvPane extends SettingsPane<GenericModelParams> {
 		outShapeSpinners= new Spinner[2]; //set at  for now but could be different in future?
 
 		for (int i=0; i<outShapeSpinners.length; i++) {
-			
+
 			outShapeSpinners[i] =  new Spinner<Integer>(-1, Integer.MAX_VALUE, 10,  1); 
 			outShapeSpinners[i] .setPrefWidth(80);
 			outShapeSpinners[i] .getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
@@ -211,25 +233,25 @@ public class GenericAdvPane extends SettingsPane<GenericModelParams> {
 
 		defualtOutSwitch = new PamToggleSwitch("Use model default out"); 
 		defualtOutSwitch.selectedProperty().addListener((obsval, oldval, newval)->{
-			
+
 			if (!newval) {
 				PamDialogFX.showWarning("This is generally a very bad idea. If the output shape is not that specified by the model then PAMGuard may through an index out of bounds exception");
 			}
-//			System.out.println("DEFAULT OUTPUT" + currentInput);
+			//			System.out.println("DEFAULT OUTPUT" + currentInput);
 			//set the correct model shape. 
 			if (currentInput!=null && currentInput.defualtOuput!=null) {
-				
+
 				///just use the max number?
 				for (int i=0; i<currentInput.defualtOuput.length; i++) {
 					outShapeSpinners[i].getValueFactory().setValue(currentInput.defualtOuput[i].intValue());
 				}
 				//settings the numbr of classes is not a good idea becuase it's difficult to know how output shape tranlsates to class number. 
-//				System.out.println("Set the class number default to " + currentInput.defualtOuput[1].intValue());
-//				classNumber.getValueFactory().setValue(currentInput.defualtOuput[1].intValue());
+				//				System.out.println("Set the class number default to " + currentInput.defualtOuput[1].intValue());
+				//				classNumber.getValueFactory().setValue(currentInput.defualtOuput[1].intValue());
 			}
 			//disable the shapes. 
 			outShapeHolder.setDisable(newval);
-			
+
 			//classNumber.setDisable(newval);
 		});
 		//defualtOutSwitch.setSelected(true);
@@ -277,7 +299,7 @@ public class GenericAdvPane extends SettingsPane<GenericModelParams> {
 		if (setParams) return; 
 		genericClassifier.getModelUI().getSettingsPane().setParams(this.getParams(currentInput));
 	}
-	
+
 	/**
 	 * Populate the class name fields. 
 	 */
@@ -304,8 +326,8 @@ public class GenericAdvPane extends SettingsPane<GenericModelParams> {
 			else {
 				textFields[i].setText(("Class " + i)); 
 			}
-			
-			
+
+
 			classNameHolder.add(new Label(("Class " + i)), 0, i);
 			classNameHolder.add(textFields[i], 1, i);
 		}
@@ -321,7 +343,7 @@ public class GenericAdvPane extends SettingsPane<GenericModelParams> {
 	@Override
 	public GenericModelParams getParams(GenericModelParams currParams) {
 
-//		System.out.println("Generic Adv Pane GET PARAMS:");
+		//		System.out.println("Generic Adv Pane GET PARAMS:");
 
 		if (setParams) return null; 
 
@@ -336,11 +358,11 @@ public class GenericAdvPane extends SettingsPane<GenericModelParams> {
 		String[] classNames= new String[textFields.length]; 
 
 		boolean[] binaryClassification = new boolean[currParams.numClasses]; 
-		
-//		if (currParams.binaryClassification!=null) {
-//			System.out.println("Current classification: " + currParams.binaryClassification.length
-//					+  " new: " + binaryClassification.length) ;
-//		}
+
+		//		if (currParams.binaryClassification!=null) {
+		//			System.out.println("Current classification: " + currParams.binaryClassification.length
+		//					+  " new: " + binaryClassification.length) ;
+		//		}
 
 		for (int i=0; i<textFields.length; i++) {
 			classNames[i]=textFields[i].getText(); 
@@ -353,8 +375,15 @@ public class GenericAdvPane extends SettingsPane<GenericModelParams> {
 
 		}
 		
+		int nSpinner=0;
+		for (int i =0; i<outShapeSpinners.length; i++) {
+			if (outShapeSpinners[i].isVisible()) nSpinner++;
+		}
+
 		//set the model shape
-		Long[] outShape = new Long[outShapeSpinners.length]; 
+		Long[] outShape = new Long[nSpinner]; 
+		
+		
 		for (int i=0; i<outShape.length; i++) {
 			//				System.out.println("Input shape: " + currentInput.shape[i].intValue()); 	
 			outShape[i]=Long.valueOf(outShapeSpinners[i].getValue()); 
@@ -368,17 +397,17 @@ public class GenericAdvPane extends SettingsPane<GenericModelParams> {
 			//System.out.println("Input shape: V " + shapeSpinners[i].getValue().intValue()); 
 		}
 
-		
+
 		currParams.outputShape = outShape;
 		currParams.shape = inShape;
 
 
 		currParams.classNames = this.getDLControl().getClassNameManager().makeClassNames(classNames); 
-		
-//		System.out.println("GenericAdvPane: Class names");
-//		for (int i=0; i<currParams.classNames.length; i++) {
-//			System.out.println("Class " + i + " " + currParams.classNames[i].className);
-//		}
+
+		//		System.out.println("GenericAdvPane: Class names");
+		//		for (int i=0; i<currParams.classNames.length; i++) {
+		//			System.out.println("Class " + i + " " + currParams.classNames[i].className);
+		//		}
 
 		currParams.binaryClassification = binaryClassification; 
 
@@ -395,11 +424,11 @@ public class GenericAdvPane extends SettingsPane<GenericModelParams> {
 		this.currentInput = input.clone(); 
 
 		//System.out.println("Generic Adv Pane SET PARAMS: " +currentInput ); 
-		
-//		System.out.println("GenericAdvPane: Class names  " + currentInput.numClasses);
-//		for (int i=0; i<currentInput.classNames.length; i++) {
-//			System.out.println("Class " + i + " " +currentInput.classNames[i].className);
-//		}
+
+		//		System.out.println("GenericAdvPane: Class names  " + currentInput.numClasses);
+		//		for (int i=0; i<currentInput.classNames.length; i++) {
+		//			System.out.println("Class " + i + " " +currentInput.classNames[i].className);
+		//		}
 
 		if (input.defaultShape==null) {
 			defualtShapeSwitch.setSelected(false);
@@ -411,15 +440,15 @@ public class GenericAdvPane extends SettingsPane<GenericModelParams> {
 
 		//
 		classNumber.getValueFactory().setValue(currentInput.numClasses);
-		
+
 		//populate the class names field. 
 		populateClassNameFields(currentInput.numClasses, input); 
-		
+
 
 		//set the model shape
 		if (currentInput.shape!=null) {
 			for (int i=0; i<currentInput.shape.length; i++) {
-//				System.out.println("Input shape: " + currentInput.shape[i].intValue()); 			
+				//				System.out.println("Input shape: " + currentInput.shape[i].intValue()); 			
 				shapeSpinners[i].getValueFactory().setValue(currentInput.shape[i].intValue());
 				//System.out.println("Input shape: V " + shapeSpinners[i].getValue().intValue()); 
 
@@ -428,7 +457,7 @@ public class GenericAdvPane extends SettingsPane<GenericModelParams> {
 
 		if (currentInput.outputShape!=null) {
 			for (int i=0; i<currentInput.outputShape.length; i++) {
-//				System.out.println("Output shape: " + currentInput.outputShape[i].intValue()); 
+				//				System.out.println("Output shape: " + currentInput.outputShape[i].intValue()); 
 				outShapeSpinners[i].getValueFactory().setValue(currentInput.outputShape[i].intValue());
 			}
 		}
@@ -437,10 +466,10 @@ public class GenericAdvPane extends SettingsPane<GenericModelParams> {
 		//System.out.println("Set transforms: " + currentInput.dlTransfroms.size()); 
 		transfromPane.setExampleSoundIndex(currentInput.exampleSoundIndex); 
 		transfromPane.setTransforms(currentInput.dlTransfroms);
-		
-//		for (int i=0; i<currentInput.classNames.length; i++) {
-//			System.out.println("Textfield: Class " + i + " " +textFields[i].getText());
-//		}
+
+		//		for (int i=0; i<currentInput.classNames.length; i++) {
+		//			System.out.println("Textfield: Class " + i + " " +textFields[i].getText());
+		//		}
 
 		setParams=false; 
 

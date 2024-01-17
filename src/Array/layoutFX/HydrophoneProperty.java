@@ -77,6 +77,15 @@ public class HydrophoneProperty {
 	}
 
 	public Hydrophone getHydrophone() {
+		//incase table data changes. 
+		this.hydrophone.setID(this.id.get());
+		this.hydrophone.setX(x.get());
+		this.hydrophone.setY(y.get());
+		this.hydrophone.setZ(z.get());
+		this.hydrophone.setdX(xErr.get());
+		this.hydrophone.setdY(yErr.get());
+		this.hydrophone.setdZ(xErr.get());
+
 		return hydrophone;
 	}
 
