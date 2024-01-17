@@ -3,6 +3,7 @@ package annotation.timestamp;
 import java.sql.Types;
 
 import PamguardMVC.PamDataUnit;
+import generalDatabase.EmptyTableDefinition;
 import generalDatabase.PamTableDefinition;
 import generalDatabase.PamTableItem;
 import generalDatabase.SQLLoggingAddon;
@@ -22,12 +23,12 @@ public class TimestampSQLLogging implements SQLLoggingAddon {
 	}
 
 	@Override
-	public void addTableItems(PamTableDefinition pamTableDefinition) {
+	public void addTableItems(EmptyTableDefinition pamTableDefinition) {
 		pamTableDefinition.addTableItem(timestamp); 
 	}
 
 	@Override
-	public boolean saveData(SQLTypes sqlTypes, PamTableDefinition pamTableDefinition, PamDataUnit pamDataUnit) {
+	public boolean saveData(SQLTypes sqlTypes, EmptyTableDefinition pamTableDefinition, PamDataUnit pamDataUnit) {
 		TimestampAnnotation timestampAnnotation = (TimestampAnnotation) pamDataUnit.findDataAnnotation(TimestampAnnotation.class, 
 				timestampAnnotationType.getAnnotationName());
 		if (timestampAnnotation == null) {
@@ -40,7 +41,7 @@ public class TimestampSQLLogging implements SQLLoggingAddon {
 	}
 
 	@Override
-	public boolean loadData(SQLTypes sqlTypes, PamTableDefinition pamTableDefinition, PamDataUnit pamDataUnit) {
+	public boolean loadData(SQLTypes sqlTypes, EmptyTableDefinition pamTableDefinition, PamDataUnit pamDataUnit) {
 		try {
 			TimestampAnnotation timestampAnnotation = new TimestampAnnotation(timestampAnnotationType);
 			Long note = sqlTypes.millisFromTimeStamp(timestamp.getValue());

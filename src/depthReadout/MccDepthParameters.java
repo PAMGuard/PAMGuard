@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
 import mcc.MccJniInterface;
 import mcc.mccjna.MCCConstants;
@@ -44,7 +45,7 @@ public class MccDepthParameters implements Serializable, Cloneable, ManagedParam
 		
 		@Override
 		public PamParameterSet getParameterSet() {
-			PamParameterSet ps = PamParameterSet.autoGenerate(this);
+			PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 			return ps;
 		}
 	}
@@ -62,7 +63,7 @@ public class MccDepthParameters implements Serializable, Cloneable, ManagedParam
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("mccSensorParameters");
 			ps.put(new PrivatePamParameterData(this, field) {

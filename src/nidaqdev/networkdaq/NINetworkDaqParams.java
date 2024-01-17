@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import Acquisition.DaqSystemXMLManager;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 public class NINetworkDaqParams implements Serializable, Cloneable, ManagedParameters {
 
@@ -169,7 +170,7 @@ public class NINetworkDaqParams implements Serializable, Cloneable, ManagedParam
 	@Override
 	public PamParameterSet getParameterSet() {
 		if (DaqSystemXMLManager.isSelected(NINetworkDaq.systemName)) {
-			return PamParameterSet.autoGenerate(this);
+			return PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		}
 		return null;
 	}

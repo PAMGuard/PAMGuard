@@ -44,10 +44,16 @@ import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 
 import org.springframework.core.GenericTypeResolver;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionProcess;
 import pamScrollSystem.ViewLoadObserver;
+import tethys.TethysControl;
+import tethys.pamdata.AutoTethysProvider;
+import tethys.pamdata.TethysDataProvider;
+import tethys.species.DataBlockSpeciesManager;
 import dataGram.DatagramProvider;
 import dataMap.BespokeDataMapGraphic;
 import dataMap.OfflineDataMap;
@@ -62,6 +68,7 @@ import PamController.PamController;
 import PamController.PamControllerInterface;
 import PamDetection.LocContents;
 import PamDetection.LocalisationInfo;
+import PamDetection.PamDetection;
 import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamView.symbol.PamSymbolManager;
@@ -69,8 +76,10 @@ import PamguardMVC.background.BackgroundDataBlock;
 import PamguardMVC.background.BackgroundManager;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import PamguardMVC.dataOffline.OfflineDataLoading;
+import PamguardMVC.dataSelector.DataSelectParams;
 import PamguardMVC.dataSelector.DataSelector;
 import PamguardMVC.dataSelector.DataSelectorCreator;
+import PamguardMVC.dataSelector.DataSelectorSettings;
 import PamguardMVC.dataSelector.NullDataSelectorCreator;
 import PamguardMVC.datamenus.DataMenuParent;
 import PamguardMVC.nanotime.NanoTimeCalculator;
@@ -2833,7 +2842,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 * @return temporary copy of the data
 	 */
 	public ArrayList<Tunit> getDataCopy(long t1, long t2, boolean assumeOrder, DataSelector dataSelector) {
-		if (dataSelector == null) {
+		if (dataSelector == null || dataSelector.getParams().getCombinationFlag() == DataSelectParams.DATA_SELECT_DISABLE) {
 			return getDataCopy(t1, t2, assumeOrder);
 		}
 		else {
@@ -2865,6 +2874,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	private SQLLogging logging;
 
 	private JSONObjectDataSource jsonDataSource;
+	
 
 	public Vector<ProcessAnnotation> getProcessAnnotations() {
 		return processAannotations;
@@ -3073,6 +3083,34 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 
 	public SQLLogging getLogging() {
 		return logging;
+	}
+	
+	/**
+	 * Gets a data provider for Tethys. These will probably need
+	 * to be bespoke, but for now will autogenerate based on the SQLLogging information. 
+	 * @return the tethysDataProvider
+	 */
+	public TethysDataProvider getTethysDataProvider(TethysControl tethysControl) {
+		return null;
+	}
+
+	/**
+	 * Get the level of automation employed by the generation of these data. 
+	 * Should ideally be completed for everything providing data to Tethys. 
+	 * @return level of automation for this data block. 
+	 */
+	public DataAutomationInfo getDataAutomationInfo() {
+		return null;
+	}
+	
+	/**
+	 * Get information about species types that may occur within this data 
+	 * block.  Primarily for conversion into Tethys compatible data, but may 
+	 * prove to have other uses. 
+	 * @return Types of species information available within this datablock. 
+	 */
+	public DataBlockSpeciesManager<Tunit> getDatablockSpeciesManager() {
+		return null;
 	}
 
 	final public boolean getCanLog() {
@@ -4228,5 +4266,24 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 */
 	public void setBackgroundManager(BackgroundManager backgroundManager) {
 		this.backgroundManager = backgroundManager;
+	}
+
+	/**
+	 * Get a brief summary of datablock to include in XML descriptions. 
+	 * Basic output is very simple. Expect other datablock to extend this by 
+	 * adding additional attributes. 
+	 * @param doc
+	 * @return XML element with description of data. 
+	 */
+	public Element getDataBlockXML(Document doc) {
+		Element inputEl = doc.createElement("Input");
+		if (getParentProcess() != null && getParentProcess().getPamControlledUnit() != null) {
+			PamControlledUnit pcu = getParentProcess().getPamControlledUnit();
+			inputEl.setAttribute("ModuleType", pcu.getUnitType());
+			inputEl.setAttribute("ModuleName", pcu.getUnitName());
+		}
+		inputEl.setAttribute("Name", getLongDataName());
+		inputEl.setAttribute("Channels", String.format("0x%X", getChannelMap()));
+		return inputEl;
 	}
 }

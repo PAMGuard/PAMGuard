@@ -14,14 +14,13 @@ import IshmaelDetector.IshDetection;
 import PamUtils.LatLong;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
-
+import generalDatabase.EmptyTableDefinition;
 //import pamDatabase.SQLLogging;
 //import PamguardMVC.RecyclingDataBlock;
 import generalDatabase.PamDetectionLogging;
 
 public class IshLocSqlLogging extends PamDetectionLogging {
 	IshLocControl ishLocControl;
-	PamTableDefinition tableDefinition;
 	PamTableItem systemDate, durationSecs, secSinceStart, peakHeight;
 	private PamTableItem latitude, longitude, refLatitude, refLongitude, x, y, z;
 	
@@ -30,7 +29,7 @@ public class IshLocSqlLogging extends PamDetectionLogging {
 		super(pamDataBlock, UPDATE_POLICY_WRITENEW);
 		this.ishLocControl = ishDetControl;
 		
-		tableDefinition = getTableDefinition();
+		EmptyTableDefinition tableDefinition = getTableDefinition();
 		tableDefinition.addTableItem(latitude = new PamTableItem("Latitude", Types.DOUBLE)); 
 		tableDefinition.addTableItem(longitude = new PamTableItem("Longitude", Types.DOUBLE));
 		tableDefinition.addTableItem(refLatitude = new PamTableItem("ReferenceLatitude", Types.DOUBLE)); 

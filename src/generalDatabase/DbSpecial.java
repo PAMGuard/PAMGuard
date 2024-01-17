@@ -9,7 +9,7 @@ import PamguardMVC.PamDataUnit;
  * @author Doug Gillespie
  *
  */
-abstract public class DbSpecial extends SQLLogging{
+abstract public class DbSpecial extends SQLLogging {
 
 	private DBControl dbControl;
 	

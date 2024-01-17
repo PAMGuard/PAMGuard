@@ -29,6 +29,7 @@ import com.fazecast.jSerialComm.SerialPort;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 /**
  * @author David McLaren, Paul Redmond
@@ -166,7 +167,7 @@ public class SerialPortParameters implements Serializable, Cloneable, ManagedPar
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
 	}
 

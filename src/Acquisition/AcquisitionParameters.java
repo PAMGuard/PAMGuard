@@ -10,6 +10,7 @@ import Array.Preamplifier;
 import PamController.PamController;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
 import PamguardMVC.PamConstants;
 
@@ -320,7 +321,7 @@ public class AcquisitionParameters implements Serializable, Cloneable, ManagedPa
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("channelList");
 			ps.put(new PrivatePamParameterData(this, field) {

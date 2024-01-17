@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import PamController.PamControlledUnit;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
 
 /**
@@ -55,7 +56,7 @@ public class GuiFrameSettings implements Serializable, Cloneable, ManagedParamet
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DISPLAY);
 		try {
 			Field field = this.getClass().getDeclaredField("unitFrameInfo");
 			ps.put(new PrivatePamParameterData(this, field) {
@@ -89,7 +90,7 @@ public class GuiFrameSettings implements Serializable, Cloneable, ManagedParamet
 		
 		@Override
 		public PamParameterSet getParameterSet() {
-			PamParameterSet ps = PamParameterSet.autoGenerate(this);
+			PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DISPLAY);
 			try {
 				Field field = this.getClass().getDeclaredField("guiFrame");
 				ps.put(new PrivatePamParameterData(this, field) {
