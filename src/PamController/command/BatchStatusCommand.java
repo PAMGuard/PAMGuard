@@ -2,6 +2,7 @@ package PamController.command;
 
 import Acquisition.AcquisitionControl;
 import PamController.PamController;
+import offlineProcessing.OfflineTaskManager;
 import pamViewFX.PamControlledGUIFX;
 
 /**
@@ -21,6 +22,19 @@ public class BatchStatusCommand extends ExtCommand {
 
 	@Override
 	public String execute(String command) {
+		if (PamController.getInstance().getRunMode() == PamController.RUN_NORMAL) {
+			return getNormalModeStatus(command);
+		}
+		else {
+			return getViewerModeStatus(command);
+		}
+	}
+
+	private String getViewerModeStatus(String command) {
+		return OfflineTaskManager.getManager().getBatchStatus();
+	}
+
+	private String getNormalModeStatus(String command) {
 		AcquisitionControl daqControl = (AcquisitionControl) PamController.getInstance().findControlledUnit(AcquisitionControl.class, null);
 		if (daqControl == null) {
 			return null;

@@ -124,6 +124,16 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 	}
 
 	/**
+	 * Get a uniquely identifyng name for the task which consists of the 
+	 * pamControlledUnit type and name as well as the tasks shorter name from getName();
+	 * @return a long name which should be unique within a configuration. 
+	 */
+	public String getLongName() {
+		PamControlledUnit tcu = getTaskControlledUnit();
+		String str = String.format("%s:%s:%s", tcu.getUnitType(), tcu.getUnitName(), getName());
+		return str;
+	}
+	/**
 	 * 
 	 * @return a name for the task, to be displayed in the dialog. 
 	 */

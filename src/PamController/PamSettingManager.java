@@ -44,6 +44,7 @@ import javax.swing.plaf.FontUIResource;
 
 import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
 import pamViewFX.fxSettingsPanes.SettingsFileDialogFX;
+import pamguard.GlobalArguments;
 
 //XMLSettings
 //import org.jdom.Document;
@@ -492,7 +493,7 @@ public class PamSettingManager {
 	/**
 	 * Call just before PAMGUARD exits to save the settings
 	 * either to psf and / or database tables.
-	 * @return true if settings saved sucessfully.
+	 * @return true if settings saved successfully.
 	 */
 	public boolean saveFinalSettings() {
 		int runMode = PamController.getInstance().getRunMode();
@@ -1029,8 +1030,9 @@ public class PamSettingManager {
 		loadingLocalSettings = true;
 
 		loadSettingsFileData();
+		
 
-		if (PamSettingManager.RUN_REMOTE == false) {
+		if (PamSettingManager.RUN_REMOTE == false && GlobalArguments.isBatch() == false) {
 			if (settingsFileData != null) {
 				TipOfTheDayManager.getInstance().setShowAtStart(settingsFileData.showTipAtStartup);
 				if (settingsFileData.showTipAtStartup) {
