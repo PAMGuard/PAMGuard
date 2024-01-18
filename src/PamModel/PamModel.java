@@ -945,14 +945,17 @@ final public class PamModel implements PamSettings {
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see PamModel.PamModelInterface#startModel()
+
+
+	/**
+	 * Add any remaining REQUIRED modules.<br>
+	 * this get's called after the PamController has loaded it's main settings. 
+	 * So at this point, go through all the PamModuleInfo's and check that 
+	 * all have at least the minimum number required 
+	 * @return true
 	 */
 	public synchronized boolean startModel() {
 		/*
-		 * this get's called after the PamController has loaded it's main settings. 
-		 * So at this point, go through all the PamModuleInfo's and check that 
-		 * all have at least the minimum number required 
 		 */
 
 		PamSettingManager.getInstance().registerSettings(this);
@@ -969,11 +972,11 @@ final public class PamModel implements PamSettings {
 		
 //		writeModuleList();
 		
-		return false;
+		return true;
 	}
 
 	/**
-	 * Really just debu goutput to make a list of all modules ...
+	 * Really just debug output to make a list of all modules ...
 	 */
 	private void writeModuleList() {
 		ArrayList<PamModuleInfo> moduleInfoList = PamModuleInfo.getModuleList();

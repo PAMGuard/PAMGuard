@@ -77,6 +77,7 @@ import pamScrollSystem.PamScrollerData;
 import pamScrollSystem.RangeSpinner;
 import pamScrollSystem.RangeSpinnerListener;
 import pamScrollSystem.jumping.ScrollJumper;
+import pamguard.GlobalArguments;
 import soundPlayback.PlaybackControl;
 import soundPlayback.PlaybackProgressMonitor;
 import userDisplay.UserDisplayControl;
@@ -274,7 +275,8 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 		// this should result in settings being loaded if they exist. 
 		PamSettingManager.getInstance().registerSettings(this); // always need to register, even if we're using old parameters
 		//		}
-		if (spectrogramParameters == null) {
+		boolean isBatch = GlobalArguments.getParam("-batch") != null;
+		if (spectrogramParameters == null && isBatch == false) {
 			this.spectrogramParameters = new SpectrogramParameters();
 			PamView view = userDisplayControl.getPamView();
 			if (view != null) {
@@ -284,6 +286,14 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 					this.spectrogramParameters = newParams;
 				}
 			}
+		}
+		if (spectrogramParameters == null) {
+			/*
+			 *  this can happen in batch mode if a display was added.
+			 *  Hopefully not a problem, but may need to set some parameters to 
+			 *  set display up correctly.  
+			 */
+			spectrogramParameters = new SpectrogramParameters();
 		}
 
 		spectrogramDisplay = this;
