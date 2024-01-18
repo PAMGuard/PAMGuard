@@ -2589,7 +2589,7 @@ PamSettingsSource, DataOutputStore {
 		}
 		return state;
 	}
-		
+	
 	public String getDataLocation() {
 		return binaryStoreSettings.getStoreLocation();
 	}
