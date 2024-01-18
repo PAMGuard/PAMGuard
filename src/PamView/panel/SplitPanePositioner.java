@@ -61,7 +61,7 @@ public class SplitPanePositioner implements PamSettings {
 
 	@Override
 	public Serializable getSettingsReference() {
-		System.out.printf("Save split position %s as %d out of %d\n", unitName, splitPane.getDividerLocation(), splitPane.getHeight());
+//		System.out.printf("Save split position %s as %d out of %d\n", unitName, splitPane.getDividerLocation(), splitPane.getHeight());
 		double propPosition = (double) splitPane.getDividerLocation() / (double) splitPane.getHeight();
 		SplitPanePositionData posData = new SplitPanePositionData(splitPane.getDividerLocation(), propPosition, splitPane.getHeight());
 		return posData;
