@@ -45,6 +45,7 @@ import tethys.TethysTimeFuncs;
 import tethys.calibration.swing.CalibrationsExportWizard;
 import tethys.dbxml.DBXMLConnect;
 import tethys.dbxml.TethysException;
+import tethys.niluswraps.NilusChecker;
 import tethys.niluswraps.NilusSettingsWrapper;
 import tethys.niluswraps.NilusUnpacker;
 import tethys.pamdata.AutoTethysProvider;
@@ -197,9 +198,20 @@ public class CalibrationHandler implements TethysStateObserver {
 				calDoc.setMetadataInfo(sampleCal.getMetadataInfo());				
 				calDoc.setProcess(sampleCal.getProcess());
 				calDoc.setQualityAssurance(sampleCal.getQualityAssurance());
-				calDoc.setResponsibleParty(sampleCal.getResponsibleParty());
+				if (NilusChecker.isEmpty(sampleCal.getResponsibleParty()) == false) {
+					calDoc.setResponsibleParty(sampleCal.getResponsibleParty());
+				}
 				calDoc.setTimeStamp(sampleCal.getTimeStamp());
 			}
+			// check the contact info in the metadata. 
+			// can't so because it's required. 
+//			MetadataInfo metaData = calDoc.getMetadataInfo();
+//			if (metaData != null) {
+//				if (NilusChecker.isEmpty(metaData.getContact())) {
+//					metaData.setContact(null);
+//				}
+//			}
+			
 			
 			addParameterDetails(calDoc, i);
 			
@@ -408,6 +420,10 @@ public class CalibrationHandler implements TethysStateObserver {
 		hz.add(Double.valueOf(0));
 		db.add(Double.valueOf(hSens+preampGain));
 		
+		if (NilusChecker.isEmpty(calibration.getResponsibleParty())) {
+			calibration.setResponsibleParty(null);
+		}
+		
 		MetadataInfo metaInf = calibration.getMetadataInfo();
 		if (metaInf == null) {
 			metaInf = new MetadataInfo();
@@ -419,6 +435,12 @@ public class CalibrationHandler implements TethysStateObserver {
 		if (contact == null) {
 			contact = new ResponsibleParty();
 			metaInf.setContact(contact);
+		}
+		if (NilusChecker.isEmpty(metaInf.getContact())) {
+			metaInf.setContact(null);
+		}
+		if (NilusChecker.isEmpty(metaInf)) {
+			calibration.setMetadataInfo(null);
 		}
 		contact.setIndividualName("Unknown");
 		contact.setOrganizationName("unknown");
