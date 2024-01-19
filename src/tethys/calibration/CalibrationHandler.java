@@ -48,6 +48,7 @@ import tethys.dbxml.TethysException;
 import tethys.niluswraps.NilusSettingsWrapper;
 import tethys.niluswraps.NilusUnpacker;
 import tethys.pamdata.AutoTethysProvider;
+import tethys.reporter.TethysReporter;
 
 public class CalibrationHandler implements TethysStateObserver {
 
@@ -186,6 +187,7 @@ public class CalibrationHandler implements TethysStateObserver {
 		int nExport = 0;
 		boolean overwrite = false;
 		boolean exists;
+		TethysReporter.getTethysReporter().clear();
 		for (int i = 0; i < nPhone; i++) {
 //			String docName = getHydrophoneId(i);
 			NilusSettingsWrapper<Calibration> clonedWrap = wrappedSample.clone();
@@ -233,6 +235,7 @@ public class CalibrationHandler implements TethysStateObserver {
 			}
 		}
 		tethysControl.sendStateUpdate(new TethysState(TethysState.StateType.EXPORTRDATA, Collection.Calibrations));
+		TethysReporter.getTethysReporter().showReport(true);
 		return nExport;
 	}
 	

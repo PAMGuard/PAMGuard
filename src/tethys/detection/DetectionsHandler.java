@@ -43,6 +43,7 @@ import tethys.output.DatablockSynchInfo;
 import tethys.output.StreamExportParams;
 import tethys.output.TethysExportParams;
 import tethys.pamdata.TethysDataProvider;
+import tethys.reporter.TethysReporter;
 import tethys.species.DataBlockSpeciesManager;
 import tethys.swing.export.DetectionsExportWizard;
 
@@ -587,6 +588,7 @@ public class DetectionsHandler {
 			this.dataBlock = dataBlock;
 			this.exportParams = exportParams;
 			this.exportObserver = exportObserver;
+			TethysReporter.getTethysReporter().clear();
 		}
 
 		public void publish(DetectionExportProgress exportProgress) {
@@ -617,6 +619,7 @@ public class DetectionsHandler {
 			DetectionExportProgress prog = new DetectionExportProgress(null, null, 0, 0, 0, 0, DetectionExportProgress.STATE_COMPLETE);
 			tethysControl.exportedDetections(dataBlock);
 			exportObserver.update(prog);
+			TethysReporter.getTethysReporter().showReport(tethysControl.getGuiFrame(), true);
 		}
 
 		@Override
