@@ -25,28 +25,232 @@
     export to Tethys. </p>
     
     
+    <h3> Connection and Project Details </h3>
     
-    <h3>Tethys Server</h3>
-    <p>Make sure you have a <a href = "tethys_server.html">Tethys Server</a> running.  The PAMGuard interface will 
-    only work with <a href="https://tethys.sdsu.edu/tethys3/">Tethys 3.</a> </p>
-    <p>Check the server connection. If PAMGuard has correctly connected to the Tethys server, the top panel of the display will be a normal
-    grey colour. If the connection cannot be made, the panel will be orange.</p>
-    <p>If required, change the server settings using the "Select Sever" button</p>
+    <p>
+      Make sure you have a <a href = "tethys_server.html">Tethys Server</a> running.  The PAMGuard interface will 
+      only work with <a href="https://tethys.sdsu.edu/tethys3/">Tethys
+      3</a> or later.  The section below specifies how to set the
+      address of Tethys server address as well as determine if
+      PAMGuard can communicate successfully with Tethys.  (The top
+      panel will be orange if communication is not working.
+    </p>
     
+    <h4>Tethys Server</h4>
+    
+
+    <p>
+      The Tethys Server field next to the picture of the goddess Tethys
+      indicates the address of the Tehtys server. To change this field,
+      click on the gear icon. You will be prompted to provide a computer
+      address (URL) and a port. The address should start with http://
+      followed by the machine name or internet protocol address unless
+      the Tethys server has been configured to use an encrypted
+      connection. In this case, start the address with https://.
+    </p>
+
+    <p>
+      By default, PAMGuard will use http://localhost:9779 which
+      assumes that your Tethys server is running on the same computer as
+      PAMGuard and that it expects communication on port 9779, the
+      default port (administrators may change this).
+    </p>
+
+    <p>
+      If PAMGuard can communicate with the Tethys server, the
+      Connection and Project panel will be light grey. If
+      communication is not possible, the panel will be colored
+      orange. Likely causes for communication failure are:
+    </p>
+    <ul>
+      <li>
+	The server address or port is incorrect.
+      </li>
+      
+      <li>
+	Tethys has not been started on the server machine. One of the
+	main reasons that we see this is when the administrator has
+	not configured Tethys to run automatically as a service. In
+	that case, when a machine reboots (e.g., for automatic
+	operaing system updates) the server will not start
+	automatically. The Tethys manual explains how to configure
+	Tethys as a service that starts automatically when the machine
+	boots.
+      </li>
+      
+      <li>
+	Firewall rules do not permit traffic between the machine
+	executing PAMGuard and the one hosting Tethys on the selected
+	port. If you do not have adminstrative privileges, you will
+	need to contact your support team for help.
+      </li>
+    </ul>
     
     <h4>Project and Instrument Information</h4>
-    <p>Either select an existing "Project", or create a new one.</p>
-    <p>You also need to give Tethys more information about the instrument(s) or arrays you've deployed than in previous PAMGuard versions. Again, select an 
-    existing instrument, or set up a new one. You'll notice that this information is held with the rest of the PAMGuard array management information.</p>
+
+    <p>
+      Projects are names used by Tethys to help track work that should
+      be considered together, such as a series of deployments designed
+      to answer a specific question or funded under a specific
+      grant. If you do not already have a project defined in your
+      PAMGuard database, you can click the "New Project" button in the
+      "Connection and Project details" section of the Tethys
+      module. This will start a dialog that asks for a case-sensitive
+      project name and a geographic region. The geographic region is
+      for convenience, PAMGuard and Tethys track information by
+      longitude and latitude, but sometimes it is helpful to query for
+      information with respect to a geographic name such as Channel
+      Islands National Marine Sanctuary.
+    </p>
+
+    <p>
+      The array instrumentation is selected from a drop-down menu next
+      to the Instruments label.  A dropdown menu next to the label
+      “Instruments” shows the list of hydrophone arrays.  These are
+      likely to have been previously established prior to starting
+      analysis of your data by using the menu Settings -> Hydrophone
+      Array.
+
+    </p>
+    
+    <p>
+      If you are a long-time user of PAMGuard, you will notice  
+      additional fields are required for instrumentation: Instrument
+      Type and Instrument Id.  The type indicates what type of
+      instrument is being used and may be generic such as a mooring or
+      array or denote a specific instrument such as a HARP, Rock
+      Hopper, SoundTrap, etc.  The Id is a unique identifier for the
+      instrument such as a serial number.  Note that if you are using
+      an older PAMGuard database, you may see a blank entry in the
+      instruments list as these new fields will not have been
+      populated.  Press new/edit to access the instrument settings
+      from the Tethys module page.
+    </p>
     
     <h3>Data Export</h3>
-    <p>It's best to export data in the sequence the panels are laid out in on the PAMGuard display, i.e. Calibrations, then Deployments, and finally Detections.</p>
 
-    <h4>Calibrations</h4>
-    <p>To export the calibration data, press the "Export..." button at the top of the "Instrument Calibration Information" panel. 
-    <p>Most of the calibration data is taken from the array manager and from the sound acquisition module. However, PAMGuard will ask a few questions about
-    HOW the instrument was calibrated, when it was done and who is responsible. Fill in as much information as you can! 
-    IF the export is successful, a record will show for each hydrophone (or sensor) in your instrument array in the calibration information table:</p>
+    <p>
+      It is best to export data in the sequence the panels are laid out in on the PAMGuard display:      
+    </p>
+
+    <ol>
+      <li>
+	Instrument calibration information:  exports to the Tethys Calibrations
+      </li>
+
+      <li>
+	Recording periods and deployment information:  exports to Tethys Deployments
+      </li>
+
+      <li>
+	PAMGuard data blocks:  exports to Tethys Detections and/or Localizations.
+      </li>
+    </ol>
+    
+
+    <h4>Instrument calibration information</h4>
+
+    <p>
+      Most of the calibration data is taken from the array manager and
+      from the sound acquisition module. However, PAMGuard will ask a
+      few questions about HOW the instrument was calibrated, when it
+      was done and who is responsible.
+    </p>
+    <p>
+      There are two dialogs associated with calibration.  The first
+      asks for a calibration method and has the following fields:
+    </p>
+    <ul>
+      <li>
+	Method:  Must be one of the following options:
+	<ul>
+	  <li>Reference hydrophone</li>
+	  <li>Manufacturer’s specification</li>
+	  <li>Piston phone</li>
+	  <li>Other calibrated source</li>
+	  <li>Unknown</li>
+	</ul>
+      </li>
+
+      <li>
+	Serial number:  Hydrophone serial number
+      </li>
+
+      <li>
+	Quality:  Quality assurance value:
+	<ul>
+	  <li> unverified:  The calibration has not been verified </li>
+	  <li> valid:  The calibration has been validated as per the quality assurance process </li>
+	  <li> invalid:  The calibration was found to be invalid during quality assurance </li>
+	</ul>
+      </li>
+
+      <li>
+	QA Comment:  Textual description of the quality assurance
+	process.
+      </li>
+
+      
+      <li>
+	Calibration method:  Textual description of the Method.
+      </li>
+    </ul>
+    
+    <p>
+      The second calibrations dialog asks for:
+    </p>
+
+    <ul>
+      <li>
+	Calibration date:  Date the calibration was performed.
+      </li>
+      
+      <li>
+	Update frequency:  Must be one of the following:
+	<ul>
+	  <li>
+	    as-needed:  No updates are planned, but if a change is needed the calibration will be updated (defaul)t
+	  </li>
+	  <li>
+	    unplanned:  There are no plans to ever update the record.
+	  </li>
+	  <li>
+	    yearly:  A yearly review will be conducted to ensure that the record is valid.
+	  </li>
+	</ul>
+      </li>
+      
+      <li>
+	Technical Person / Data Manager: These two types of data have
+	the same fields and detail who was responsible for the
+	calibration and who is responsible for maintaining the record
+	of the calibration.  In many cases, this may be the same
+	person and copy buttons allow the fields to be duplicated.
+
+	<ul>
+	  <li>
+	    Name:  Responsible party’s naem
+	  </li>
+	  <li>
+	    Organisation:  Organisation to which the party reports
+	  </li>
+	  <li>
+	    Position:  Responsible party’s title
+	  </li>
+	  <li>
+	    Email:  Email contact information 
+	  </li>
+	</ul>
+      </li>
+      
+    </ul>
+
+    <p>
+      Fill in as much information as you can! 
+      If the export is successful, a record will show for each
+      hydrophone (or sensor) in your instrument array in the
+      calibration information table:
+    </p>
     
     <center><img src="./images/calibration_information.png"></center>
     
@@ -55,7 +259,7 @@
 	<a href="../../generalDatabaseHelp/docs/database_database.html">PAMGuard database</a> and    
    	<a href= "../../BinaryStore/docs/binarystore_overview.html">binary Store</a>. Where data were collected on a regular duty 
    	cycle, or continuously, there should be a single record in the table of recording periods. If data were collected on a more
-   	"ad-hoc" basis, for instance during a boat based survey, there might be many different records in the table.
+   	"ad-hoc" basis, for instance during a boat-based survey, there might be many different records in the table.
    	Occasionally, there may be short recording periods (e.g. while you were testing kit on deck) that you don't want to export. Either select
    	individual rows that you want to export, or right click on the table and "Select All".</p>
  
