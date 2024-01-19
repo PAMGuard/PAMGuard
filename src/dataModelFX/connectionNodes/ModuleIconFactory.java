@@ -43,69 +43,94 @@ public class ModuleIconFactory {
 	 * @return the icon for the controlled unit
 	 */
 	public  Node getModuleNode(ModuleIcon icon){
+		long time1 = System.currentTimeMillis();
+		Node iconNode =null;
+		
 		switch (icon){
 		case ARRAY:
 //			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/array_manager.png")));
-			return getSVGIcon("/Resources/modules/Array Icon2.svg",Color.BLACK, 3);
-
+			iconNode = getSVGIcon("/Resources/modules/Array Icon2.svg",Color.BLACK, 3);
+			break;
 		case BINARY:
 //			return PamGlyphDude.createModuleGlyph(OctIcon.FILE_BINARY); 
-			return PamGlyphDude.createModuleIcon("mdi2f-file-star-outline"); 
+			iconNode = PamGlyphDude.createModuleIcon("mdi2f-file-star-outline"); 
+			break;
 		case CLICK:
 //			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/click.png")));
-			return getSVGIcon("/Resources/modules/Click Detector Icon.svg", Color.BLACK, 2);
+			iconNode = getSVGIcon("/Resources/modules/Click Detector Icon.svg", Color.BLACK, 2);
+			break;
 		case CLICK_TRAIN:
 //			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/clicktrain.png")));
-			return getSVGIcon("/Resources/modules/clicktrain.svg",Color.BLACK, 2);
+			iconNode = getSVGIcon("/Resources/modules/clicktrain.svg",Color.BLACK, 2);
+			break;
 		case DATABASE:
 //			return PamGlyphDude.createModuleGlyph(FontAwesomeIcon.DATABASE);
-			return PamGlyphDude.createModuleIcon("mdi2d-database");
+			iconNode = PamGlyphDude.createModuleIcon("mdi2d-database");
+			break;
 		case DATAMAP:
-			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/dataMap.png")));
+			iconNode = new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/dataMap.png")));
+			break;
 		case FFT:
 //			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/fft.png")));
-			return getSVGIcon("/Resources/modules/fft.svg",Color.BLACK, 2);
+			iconNode = getSVGIcon("/Resources/modules/fft.svg",Color.BLACK, 2);
+			break;
 		case FILTER:
 //			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/filters.png")));
-			return getSVGIcon("/Resources/modules/filters.svg",Color.BLACK, 2);
+			iconNode = getSVGIcon("/Resources/modules/filters.svg",Color.BLACK, 2);
+			break;
 		case GPS:
 //			return PamGlyphDude.createModuleGlyph(MaterialIcon.GPS_FIXED); 
-			return PamGlyphDude.createModuleIcon("mdi2c-crosshairs-gps"); 
+			iconNode = PamGlyphDude.createModuleIcon("mdi2c-crosshairs-gps"); 
+			break;
 		case MAP:
 //			return PamGlyphDude.createModuleGlyph(MaterialIcon.MAP);
-			return PamGlyphDude.createModuleIcon("mdi2m-map");
+			iconNode = PamGlyphDude.createModuleIcon("mdi2m-map");
+			break;
 		case NMEA:
-			return createNMEASymbol();
+			iconNode = createNMEASymbol();
 		case NOISE_BAND:
-			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/filterdNoiseMeasurementBank.png")));
+			iconNode = new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/filterdNoiseMeasurementBank.png")));
+			break;
 		case NOISE_FILT:
-			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/filterdNoiseMeasurement.png")));
+			iconNode = new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/filterdNoiseMeasurement.png")));
+			break;
 		case RECORDER:
-			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/recorder.png")));
+			iconNode = new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/recorder.png")));
+			break;
 		case SOUND_AQ:
-			return getSVGIcon("/Resources/modules/noun_Soundwave_1786340.svg");
+			iconNode = getSVGIcon("/Resources/modules/noun_Soundwave_1786340.svg");
+			break;
 		case MATCHED_CLICK_CLASSIFIER:
-			return getSVGIcon("/Resources/modules/matched_click_classifier.svg",Color.BLACK, 2);
+			iconNode = getSVGIcon("/Resources/modules/matched_click_classifier.svg",Color.BLACK, 2);
+			break;
 			//return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/aquisition.png")));
 		case SOUND_OUTPUT:
 //			return PamGlyphDude.createModuleGlyph(MaterialDesignIcon.HEADPHONES); 
-			return PamGlyphDude.createModuleIcon("mdi2h-headphones"); 
-			//return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/playback.png")));
+			iconNode = PamGlyphDude.createModuleIcon("mdi2h-headphones"); 
+			break;
+//return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/playback.png")));
 		case WHISTLE_MOAN:
-			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/whistles.png")));
+			iconNode = new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/whistles.png")));
+			break;
 		case TIME_DISPLAY:
-			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/timeDisplay.png"))); 
+			iconNode = new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/timeDisplay.png"))); 
+			break;
 		case DETECTION_DISPLAY: 
-			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/detectionDisplay.png")));
+			iconNode = new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/detectionDisplay.png")));
+			break;
 		case DEEP_LEARNING:
-			
 			//System.out.println("------GET THE SVG ICON FOR DEEP LEARNING--------");
-			return getSVGIcon("/Resources/modules/noun_Deep Learning_2486374.svg"); 
+			iconNode = getSVGIcon("/Resources/modules/noun_Deep Learning_2486374.svg"); 
+			break;
 		default:
 			break;
-
 		}
-		return null;
+		
+		long time2 = System.currentTimeMillis();
+
+		System.out.println("GET MODULE ICON: " + icon + " load time: " + (time2-time1));
+
+		return iconNode;
 	}; 
 	
 	/**
@@ -182,7 +207,6 @@ public class ModuleIconFactory {
 	 * @return the module icon enum
 	 */
 	public ModuleIcon getModuleIcon(String className) {
-		System.out.println("CLASS NAME: " + className);
 		ModuleIcon icon = null; 
 		switch (className) {
 		case "Acquisition.AcquisitionControl":

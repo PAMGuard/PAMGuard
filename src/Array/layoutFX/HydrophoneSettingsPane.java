@@ -126,7 +126,7 @@ public class HydrophoneSettingsPane extends DynamicSettingsPane<Hydrophone> {
 		
 		PamHBox interpHolder = new PamHBox(); 
 		interpHolder.setSpacing(5);
-		interpHolder.setAlignment(Pos.CENTER);
+		interpHolder.setAlignment(Pos.CENTER_LEFT);
 		interpHolder.getChildren().addAll(new Label("Method"), interpPane); 
 
 		holderPane.getChildren().addAll(recieverIDLabel, createGeneralPane(), coOrdLabel, createPositionPane(), interpLabel, interpHolder); 
@@ -520,6 +520,8 @@ public class HydrophoneSettingsPane extends DynamicSettingsPane<Hydrophone> {
 		
 		double zCoeff = PamController.getInstance().getGlobalMediumManager().getZCoeff(); 
 		setCoordsText(); 
+		
+		interpPane.setSelection(currentArray.getHydrophoneInterpolation());
 
 		xPos.setText(Double.toString(hydrophone.getX()));
 		yPos.setText(Double.toString(hydrophone.getY()));
@@ -552,8 +554,11 @@ public class HydrophoneSettingsPane extends DynamicSettingsPane<Hydrophone> {
 			hydrophone.setdX(Double.valueOf(xPosErr.getText()));
 			hydrophone.setdY(Double.valueOf(yPosErr.getText()));
 			hydrophone.setdZ(Double.valueOf(zPosErr.getText()));
-
 			
+			int hi = interpPane.getSelection();
+			if (hi >= 0) {
+				this.currentArray.setHydrophoneInterpolation(interpPane.getSelectedInterpType());
+			}			
 		}
 		catch (Exception Ex) {
 			System.err.println("There is a problem with one of the parameters in the hydrophone panel");

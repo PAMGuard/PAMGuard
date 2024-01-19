@@ -35,6 +35,7 @@ import rawDeepLearningClassifier.dlClassification.DLClassifyProcess;
 import rawDeepLearningClassifier.dlClassification.animalSpot.SoundSpotClassifier;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericDLClassifier;
 import rawDeepLearningClassifier.dlClassification.ketos.KetosClassifier;
+import rawDeepLearningClassifier.layoutFX.DLModelSelectPane;
 import rawDeepLearningClassifier.layoutFX.DLSidePanelSwing;
 import rawDeepLearningClassifier.layoutFX.DLSymbolManager;
 import rawDeepLearningClassifier.layoutFX.PredictionSymbolManager;
@@ -187,6 +188,8 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	 */
 	private DLClassifierChooser dlClassifierChooser;
 
+	private DLDownloadManager modelDownloadManager;
+
 
 
 	/**
@@ -215,7 +218,11 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 		// classify the raw data segments.
 		addPamProcess(dlClassifyProcess = new DLClassifyProcess(this, segmenterProcess.getSegmenterDataBlock()));
 
+		//manages the names assigned to different output classes. 
 		dlClassNameManager = new DLClassNameManager(this);
+		
+		//manages downloading models
+		modelDownloadManager = new DLDownloadManager(); 
 
 		// add storage options etc.
 		dlBinaryDataSource = new DLResultBinarySource(dlClassifyProcess);
@@ -267,7 +274,7 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 		
 		//create the classiifer chooser. 
 		dlClassifierChooser = new DLClassifierChooser(this); 
-
+		
 		// ensure everything is updated.
 		updateParams(rawDLParmas);
 	}
@@ -574,6 +581,14 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	 */
 	public DLClassifierChooser getDlClassifierChooser() {
 		return dlClassifierChooser;
+	}
+
+	/**
+	 * Get the download manager for downloading models offline. 
+	 * @return the download manager. 
+	 */
+	public DLDownloadManager getDownloadManager() {
+		return modelDownloadManager;
 	}
 
 

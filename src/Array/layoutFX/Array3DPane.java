@@ -18,6 +18,7 @@ import javafx.scene.PerspectiveCamera;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.PickResult;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
@@ -56,8 +57,7 @@ public class Array3DPane extends PamBorderPane {
 
 	public static final Color DEFAULT_HYDRO_COL = Color.RED;
 
-	private static final Color DEFAULT_SENSOR_COL = Color.LIMEGREEN;
-
+//	private static final Color DEFAULT_SENSOR_COL = Color.LIMEGREEN;
 
 	private double scaleFactor=20; 
 
@@ -97,6 +97,11 @@ public class Array3DPane extends PamBorderPane {
 	 *  The size of the hydrophone for the 3D display. 
 	 */
 	private double hydrophoneSize = 0.5;
+	
+	/**
+	 * Holds a list of hydrophone spheres
+	 */
+	private ArrayList<HydrophoneSphere> hydrophonesSpheres = new ArrayList<HydrophoneSphere>();
 
 	public Array3DPane(){
 
@@ -131,6 +136,33 @@ public class Array3DPane extends PamBorderPane {
 		subScene.widthProperty().bind(this.widthProperty());
 		subScene.heightProperty().bind(this.heightProperty());
 		subScene.setDepthTest(DepthTest.ENABLE);
+		
+		subScene.setOnMouseClicked((MouseEvent me) -> {
+	            mousePosX = me.getSceneX();
+	            mousePosY = me.getSceneY();
+	            PickResult pr = me.getPickResult();
+//            	System.out.println("Picked something sphere: " + pr); 
+
+	           	//clear selected radius
+            	for (HydrophoneSphere sphere : hydrophonesSpheres) {
+            		sphere.setRadius(hydrophoneSize*scaleFactor);
+            	}
+            	
+	            if(pr!=null && pr.getIntersectedNode() != null && pr.getIntersectedNode() instanceof Sphere){
+	            	
+	            	//make the selected sphere slightly larger
+	            	HydrophoneSphere  s = (HydrophoneSphere) pr.getIntersectedNode();
+	            	s.setRadius(hydrophoneSize*scaleFactor*1.2);
+	            	
+	            	hydrophoneSelected(s.getHydrophone());
+	            	
+//	            	System.out.println("Picked a sphere: " + pr); 
+//	                distance=pr.getIntersectedDistance();
+//	                s = (Sphere) pr.getIntersectedNode();
+//	                isPicking=true;
+//	                vecIni = unProjectDirection(mousePosX, mousePosY, scene.getWidth(),scene.getHeight());
+	            }
+	        });
 
 		//note the fill is actually quite important because if you don't have it mouse rotations etc
 		//onyl work if you select a 3D shape
@@ -150,6 +182,14 @@ public class Array3DPane extends PamBorderPane {
 		this.setCenter(group);
 		this.setDepthTest(DepthTest.ENABLE);
 
+	}
+
+	/**
+	 * Called whenever a hydrophone is selected. 
+	 * @param hydrophone - the selected hydrophone. 
+	 */
+	public void hydrophoneSelected(Hydrophone hydrophone) {
+		// TODO Auto-generated method stub
 	}
 
 	/**
@@ -300,7 +340,7 @@ public class Array3DPane extends PamBorderPane {
 	 */
 	public void drawArray(PamArray array) {
 
-		System.out.println("DRAW ARRAY: " + array); 
+//		System.out.println("DRAW ARRAY: " + array); 
 
 		//clear the array
 		arrayGroup.getChildren().removeAll(arrayGroup.getChildren()); 
@@ -308,8 +348,9 @@ public class Array3DPane extends PamBorderPane {
 		ArrayList<Hydrophone> hydrophones = array.getHydrophoneArray();
 
 		//draw hydrophones
-		Sphere sphere;
+		HydrophoneSphere sphere;
 		Streamer streamer;
+		hydrophonesSpheres.clear();
 		for (int i=0; i<hydrophones.size(); i++){
 			
 			//get the streamer for the hydrophone
@@ -319,7 +360,7 @@ public class Array3DPane extends PamBorderPane {
 			double y  = hydrophones.get(i).getY() + hydrophones.get(i).getStreamerId();
 			double z  = hydrophones.get(i).getZ() + hydrophones.get(i).getStreamerId();
 
-			sphere=new Sphere(hydrophoneSize*scaleFactor);
+			sphere=new HydrophoneSphere(hydrophoneSize*scaleFactor);
 			sphere.setTranslateX(x*scaleFactor);
 			sphere.setTranslateY(z*scaleFactor);
 			sphere.setTranslateZ(y*scaleFactor);
@@ -330,9 +371,11 @@ public class Array3DPane extends PamBorderPane {
 			aMaterial.setDiffuseColor(col);
 			aMaterial.setSpecularColor(col.brighter());
 			sphere.setMaterial(aMaterial);
+			sphere.setHydrophone(hydrophones.get(i));
 
 //			System.out.println("Add hydrophone: " + x + " " + y + " " +z); 
 
+			hydrophonesSpheres.add(sphere);
 			arrayGroup.getChildren().add(sphere);
 			
 			ArrayList<Point3D> streamerPoints=new ArrayList<Point3D>(); 
@@ -353,7 +396,30 @@ public class Array3DPane extends PamBorderPane {
 	}
 
 
+	private class HydrophoneSphere extends Sphere {
+		
+		Hydrophone hydrophone; 
+		
+		public Hydrophone getHydrophone() {
+			return hydrophone;
+		}
+		
 
+
+		public void setHydrophone(Hydrophone hydrophone) {
+			this.hydrophone = hydrophone;
+		}
+
+		public HydrophoneSphere() {
+			super();
+		}
+		
+		public HydrophoneSphere(double radius) {
+			super(radius);
+		}
+		
+	}
+	
 	//	/**
 	//	 * Draw the entire array 
 	//	 * @param pos - hydrophone and streamer positions in the same co-ordinate frame as the reference frame. 

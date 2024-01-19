@@ -247,8 +247,10 @@ public class DLModelSelectPane extends PamBorderPane {
 					// runnable for that thread
 					public void run() {
 						try {
-							newModelSelected(uri); 
-							currentSelectedFile = uri;
+							URI modelPath = dlControl.getDownloadManager().downloadModel(uri); 
+							
+							newModelSelected(modelPath); 
+							currentSelectedFile = modelPath;
 							Thread.sleep(1000); //just show the user something happened if model loading is rapid. 
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
@@ -281,6 +283,8 @@ public class DLModelSelectPane extends PamBorderPane {
 		if (file == null) {
 			return;
 		}
+		
+		
 		
 		this.currentClassifierModel = this.dlControl.getDlClassifierChooser().selectClassiferModel(file); 
 		

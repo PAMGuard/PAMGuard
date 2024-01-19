@@ -397,6 +397,8 @@ public class HydrophoneElementDialog extends PamDialog {
 				dz.setText(null);		
 			}
 		}
+		
+		
 		boolean getParams() {
 			
 			double zCoeff = PamController.getInstance().getGlobalMediumManager().getZCoeff(); 

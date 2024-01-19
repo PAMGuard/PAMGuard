@@ -721,7 +721,10 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 	}
 
 	public void setRecieverLabels() {
-		// TODO Auto-generated method stub
+		String recieverDepthString = PamController.getInstance().getGlobalMediumManager().getZString(); 
+
+		depthLabel.setText(recieverDepthString ); 
+		depthSensorLabel.setText(recieverDepthString + " Sensor"); 
 
 	}
 

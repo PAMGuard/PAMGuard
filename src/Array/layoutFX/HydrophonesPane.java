@@ -19,6 +19,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.IntegerStringConverter;
 import pamViewFX.fxNodes.PamBorderPane;
+import pamViewFX.fxNodes.PamColorsFX;
 import pamViewFX.fxNodes.flipPane.PamFlipPane;
 import pamViewFX.fxNodes.table.TableSettingsPane;
 
@@ -153,7 +154,7 @@ public class HydrophonesPane extends PamBorderPane {
 			super(hydrophoneData);
 
 			z = new TableColumn<HydrophoneProperty,Number>("depth");
-			z.setCellValueFactory(cellData -> cellData.getValue().getZ());
+			z.setCellValueFactory(cellData -> cellData.getValue().getZ().multiply(PamController.getInstance().getGlobalMediumManager().getZCoeff()));
 			z.setEditable(true);
 
 			//need to set up all the rows.
@@ -170,8 +171,7 @@ public class HydrophonesPane extends PamBorderPane {
 	        Callback<TableColumn<HydrophoneProperty, Integer>, TableCell<HydrophoneProperty, Integer>> cellFactory = col -> {
 	            TableCell<HydrophoneProperty, Integer> cell = defaultCellFactory.call(col);
 	            cell.itemProperty().addListener((obs, oldValue, newValue) -> {
-                	System.out.println("Hello set colour: " + newValue); 
-
+//                	System.out.println("Hello set colour: " + newValue); 
 	                if (newValue == null) {
 	                    cell.setStyle("cell-selection-color: -fx-selection-bar ;");
 	                } else {
@@ -180,9 +180,7 @@ public class HydrophonesPane extends PamBorderPane {
 //	                    cell.setStyle("cell-selection-color: "+ formattedColor + " ;");
 	                    cell.setStyle("-fx-background: "+ formattedColor + " ;");
 	                    cell.setStyle("-fx-background-color: "+ formattedColor + " ;");
-
-	                	System.out.println("Hello set style: " + formattedColor); 
-
+//	                	System.out.println("Hello set style: " + formattedColor); 
 	                }
 	            });
 	            return cell;
@@ -224,8 +222,11 @@ public class HydrophonesPane extends PamBorderPane {
 		
 
 	    // Create color based on int value. Just use value as hue, full saturation and brightness:
-	    private Color createColor(int x) {
-	        return Color.hsb(x, 1.0, 1.0);
+	    private Color createColor(int i) {
+	    	//get channel colour and add a bit of transparancy to make less abnoxious
+           return  PamColorsFX.getInstance().getChannelColor(i).deriveColor(1, 1, 1, 0.5); 
+
+//	        return Color.hsb(x, 1.0, 1.0);
 	    }
 
 	    // Format color as string for CSS (#rrggbb format, values in hex).
@@ -382,6 +383,29 @@ public class HydrophonesPane extends PamBorderPane {
 	public void addStreamerListener(ArrayChangeListener e) {
 		hydrophoneChangeListeners.add(e); 
 
+	}
+
+	/**
+	 * Select the current hydrophone in table. 
+	 */
+	public void selectHydrophone(Hydrophone hydrophone) {
+		//select the current hydrophone in the table 
+		tableArrayPane.getTableView().getSelectionModel().select(hydrophone.getID());
+	}
+
+	public void setCurrentArray(PamArray currentArray) {
+		this.currentArray=currentArray;
+		
+	}
+
+	/**
+	 * Get the hydrophone interpolation. Note that this is stored in the
+	 * currentArray because the interpolator must be the same for all hydrophones.
+	 * 
+	 * @return the inteprolation selection.
+	 */
+	public int getHydrophoneInterp() {
+		return currentArray.getHydrophoneInterpolation();
 	}
 
 }

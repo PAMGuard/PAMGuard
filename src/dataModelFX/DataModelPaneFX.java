@@ -529,7 +529,7 @@ public class DataModelPaneFX extends PamBorderPane {
 						continue;
 					}
 					
-					System.out.println("Checking: child: " + childNode + " parent: " +  potentialParent); 
+//					System.out.println("Checking: child: " + childNode + " parent: " +  potentialParent); 
 					if (ConnectionPane.isNodeConnected(childNode, potentialParent, true, true)) {
 						// everything is fine. Connected;
 						// System.out.println("The module "+
@@ -545,10 +545,10 @@ public class DataModelPaneFX extends PamBorderPane {
 //						 " should be connected to " +
 //						 potentialParent.getPamControlledUnit().getUnitName());
 						if (useNodeConnection) {
-							 System.out.println("DataModelPaneFX: CONNECTING TWO NODES: childNode: "
-							 +childNode.getPamControlledUnit().getUnitName() +" to parentNode "
-							 +potentialParent.getPamControlledUnit().getUnitName()+ " "
-							 +potentialParent.isEnableConnectListeners());
+//							 System.out.println("DataModelPaneFX: CONNECTING TWO NODES: childNode: "
+//							 +childNode.getPamControlledUnit().getUnitName() +" to parentNode "
+//							 +potentialParent.getPamControlledUnit().getUnitName()+ " "
+//							 +potentialParent.isEnableConnectListeners());
 							childNode.connectNode(potentialParent);
 						} else {
 							// System.out.println("DataModelPaneFX: DISCONNECTING TWO NODES: childNode: "

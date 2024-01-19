@@ -153,7 +153,7 @@ public class StreamersPane extends PamBorderPane {
 			y.setEditable(false);
 
 			z = new TableColumn<StreamerProperty,Number>("depth");
-			z.setCellValueFactory(cellData -> cellData.getValue().getZ());
+			z.setCellValueFactory(cellData -> cellData.getValue().getZ().multiply(PamController.getInstance().getGlobalMediumManager().getZCoeff()));
 			z.setEditable(false);
 			
 			TableColumn posColumn=new TableColumn("Position (m)"); 
@@ -229,7 +229,7 @@ public class StreamersPane extends PamBorderPane {
 		@Override
 		public void deleteData(StreamerProperty data){
 			super.deleteData(data);
-			notifyStreamerListeners(data);
+			notifyStreamerListeners(null);
 		}
 
 		private StreamerProperty createDefaultStreamerProperty() {
@@ -269,6 +269,7 @@ public class StreamersPane extends PamBorderPane {
 	public PamArray getParams(PamArray currParams) {
 		
 		//add all new streamers - bit weird because the PamArray requires that at least one streamer exists.
+				
 		for (int i=0; i<tableArrayPane.getStreamers().size(); i++) {
 			
 			if (i<currentArray.getStreamerCount()) {
@@ -279,12 +280,11 @@ public class StreamersPane extends PamBorderPane {
 			}
 		}
 		
-		while (currentArray.getStreamerCount()>tableArrayPane.getStreamers().size()) {
+		while (currParams.getStreamerCount()>tableArrayPane.getStreamers().size()) {
 			currParams.removeStreamer(currParams.getStreamerCount()-1);
 		}
 		
 //		currentArray.updateStreamer(tableArrayPane.getStreamers().indexOf(currentStreamerData), streamer);
-		System.out.println("Get params streamer: " + currentArray.getNumStreamers());
 		
 		return currParams;
 	}
@@ -304,6 +304,11 @@ public class StreamersPane extends PamBorderPane {
 	 */
 	public void addStreamerListener(ArrayChangeListener e) {
 		this.streamerChangeListeners.add(e); 
+	}
+
+	public void setCurrentArray(PamArray currentArray) {
+		this.currentArray=currentArray;
+		
 	}
 
 

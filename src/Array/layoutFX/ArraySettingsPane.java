@@ -1,5 +1,9 @@
 package Array.layoutFX;
 
+import java.io.File;
+
+import Array.ArrayManager;
+import Array.Hydrophone;
 import Array.PamArray;
 import PamController.PamController;
 import PamController.SettingsPane;
@@ -12,9 +16,12 @@ import javafx.scene.layout.Region;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamVBox;
+import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamHBox;
@@ -67,10 +74,16 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 	/**
 	 * Pane with controls to change speed of sound. 
 	 */
-	private SettingsPane<PamArray> environmentalPane; 
+	private SettingsPane<PamArray> environmentalPane;
+
+	private FileChooser fileChooser;
+
+	//a copy of the current array
+	private PamArray currentArray; 
 
 	public ArraySettingsPane() {
 		super(null);
+		
 		mainPane=new PamBorderPane(); 
 		
 		mainPane.setCenter(createArrayPane());
@@ -150,7 +163,7 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 	}
 
 	private Pane create3DPane() {
-		this.array3DPane = new Array3DPane();
+		this.array3DPane = new HydrophoneArray3DPane();
 		
 		//important because the 3D pane has not default size
 		array3DPane.setMinWidth(MIN_3D_WIDTH);
@@ -183,6 +196,11 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 		arrayImportExportBox.setSpacing(5);
 		arrayImportExportBox.setAlignment(Pos.CENTER_LEFT);
 		arrayImportExportBox.setPadding(new Insets(5,0,0,0));
+		
+		  fileChooser = new FileChooser();
+		 fileChooser.setTitle("Open Resource File");
+		 fileChooser.getExtensionFilters().addAll(
+		         new ExtensionFilter("PAMNGuard Array Files", "*.paf"));
 		
 		PamButton importButton = new PamButton("Import..."); 
 		importButton.setOnAction((action)->{
@@ -242,16 +260,23 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 	 * Select a file to export array settings to. 
 	 */
 	private void exportArray() {
-		// TODO Auto-generated method stub
-		
+		File file = fileChooser.showSaveDialog(getFXWindow());
+		if (file==null) return;
+		PamArray pamArray = getParams(new PamArray("saved_array: ", null)); 
+		boolean isSaved = ArrayManager.saveArrayToFile(pamArray); 
+		if (isSaved==false) {
+			PamDialogFX.showError("Unable to save the array file to \n" + file.toString());
+		}
 	}
 
 	/**
 	 * Select a file to import array settings
 	 */
 	private void importArray() {
-		// TODO Auto-generated method stub
-		
+		File file = fileChooser.showOpenDialog(getFXWindow());
+		if (file==null) return;
+		PamArray pamArray = ArrayManager.loadArrayFromFile(file.getPath()); 
+		this.setParams(pamArray);	
 	}
 
 	/**
@@ -271,8 +296,9 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 	
 	@Override
 	public PamArray  getParams(PamArray  currParams) {
-		currParams = hydrophonePane.getParams(currParams); 
 		currParams = streamerPane.getParams(currParams); 
+		currParams = hydrophonePane.getParams(currParams); 
+		currParams.setHydrophoneInterpolation(hydrophonePane.getHydrophoneInterp());
 		currParams = environmentalPane.getParams(currParams);
 //		System.out.println("Array settings pane: No. streamers: " + currParams.getStreamerCount());
 		return currParams;
@@ -280,6 +306,7 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 
 	@Override
 	public void setParams(PamArray  input) {
+		this.currentArray = input.clone();
 //		System.out.println("Hydrophone array is: "+ input); 
 		setReceieverLabels();
 		hydrophonePane.setParams(input); 
@@ -304,6 +331,15 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 	@Override
 	public void paneInitialized() {
 		// TODO Auto-generated method stub
+		
+	}
+	
+	private class HydrophoneArray3DPane extends Array3DPane {
+		
+		@Override
+		public void hydrophoneSelected(Hydrophone hydrophone) {
+			hydrophonePane.selectHydrophone(hydrophone); 
+		}
 		
 	}
 

@@ -102,8 +102,6 @@ public interface DLClassiferModel {
 	 */
 	public boolean checkModelOK();
 	
-
-	
 	/**
 	 * Get warnings for the classifier model. This is called when the user confirms settings and 
 	 * used to return a warning dialog. 
