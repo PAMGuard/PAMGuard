@@ -39,8 +39,8 @@ public class DeploymentDataCard extends PamWizardCard {
 		this.tethysControl = tethysControl;
 		deploymentHandler = tethysControl.getDeploymentHandler();
 		ButtonGroup bg = new ButtonGroup();
-		exportOne = new JRadioButton("Export a single detection document for all data");
-		exportMany = new JRadioButton("Export separate documents for each ad-hoc recording period");
+		exportOne = new JRadioButton("Export a single deployment document for all data");
+		exportMany = new JRadioButton("Export separate deployment documents for each ad-hoc recording period");
 		bg.add(exportOne);
 		bg.add(exportMany);
 		
