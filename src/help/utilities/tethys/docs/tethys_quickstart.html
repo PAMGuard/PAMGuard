@@ -14,7 +14,7 @@
     centralised database. 
     It is NOT a replacement for the existing <a href="../../generalDatabaseHelp/docs/database_database.html">PAMGuard database</a>.</p>
      
-    <h3>PAMGuard Tethys Module</h3>
+    <h1>PAMGuard Tethys Module</h1>
     <p>Launch PAMGuard in Viewer Mode with an existing set of data.</p> 
     <p>Add a Tethys module to PAMGuard from the File / Add Modules / Utilities menu. </p>
     <p>A new tab panel will show the Tethys interface</p>
@@ -25,7 +25,7 @@
     export to Tethys. </p>
     
     
-    <h3> Connection and Project Details </h3>
+    <h2> Connection and Project Details </h2>
     
     <p>
       Make sure you have a <a href = "tethys_server.html">Tethys Server</a> running.  The PAMGuard interface will 
@@ -36,7 +36,7 @@
       panel will be orange if communication is not working.
     </p>
     
-    <h4>Tethys Server</h4>
+    <h3>Tethys Server</h3>
     
 
     <p>
@@ -86,7 +86,7 @@
       </li>
     </ul>
     
-    <h4>Project and Instrument Information</h4>
+    <h3>Project and Instrument Information</h3>
 
     <p>
       Projects are names used by Tethys to help track work that should
@@ -127,7 +127,7 @@
       from the Tethys module page.
     </p>
     
-    <h3>Data Export</h3>
+    <h2>Data Export</h2>
 
     <p>
       It is best to export data in the sequence the panels are laid out in on the PAMGuard display:      
@@ -148,7 +148,7 @@
     </ol>
     
 
-    <h4>Instrument calibration information</h4>
+    <h3>Instrument calibration information</h3>
 
     <p>
       Most of the calibration data is taken from the array manager and
@@ -252,9 +252,12 @@
       calibration information table:
     </p>
     
-    <center><img src="./images/calibration_information.png"></center>
+    <div>
+      <img src="./images/calibration_information.png" class=".center"
+	   alt="Panel with information about instrument calibration"/>
+    </div>
     
-    <h4>Deployments</h4>
+    <h3>Deployments</h3>
 
     <p>
       Tethys uses deployment records to register information about
@@ -287,7 +290,10 @@
       The figure below shows an example of ad-hoc recording periods
       identified by PAMGuard:
     </p>
-       	<center><img src="./images/deploymentspanel.png"></center> 
+    <div>
+      <img src="./images/deploymentspanel.png" class=".center"
+	   alt="Panel showing recording times/deployments for this PAMGuard database"/>
+    </div> 
 
     <p>
       Occasionally, there may be short recording periods (e.g. while
@@ -355,7 +361,7 @@
       Tethys Deployment column.
     </p>
 	  
-    <h4>PAMGuard data blocks</h4>
+    <h3>PAMGuard data blocks</h3>
     
     <p>
       The bottom left panel shows a list of different types of
@@ -367,41 +373,108 @@
       help for an example of how PAMGuard might be configured.
     </p> 
 
+    <h4>Species information</h4>
     <p>
-    In the sample data blocks image below, four modules have been
+      Some of these data represent detections of specific species or
+      phenomena that must be translated to Tethys.  A context menu
+      (right-click on most computers) will show the option "Species
+      info..." that will allow you to specify the
+      <a href="./tethys_speciescodes.html">translation of events</a>
+      to species identifiers and call/sound types.  If you try to export
+      without having done this, the species info dialog will be started
+      automatically prior to export.
+    </p>
+
+    <h4>Selecting data blocks for import</h4>
+    <p>
+    In the sample data blocks below, four modules have been
     configured, but only one of them has been run.  Column "N Pam
     Data" indicates the number of data records that have been
     produced, and "PAMGuard Time" tells us when the data were
     processed.  "Tethys Documents" indicates how many Tethys records
     have been produced, and should be 0 until the data are exported.
     </p>
-
     
     <div>
-      <img src="./images/data_blocks.png" class=".center"/>
+      <img src="./images/data_blocks.png" class=".center"
+	   alt="List of results showing detections and other module processing events"/>
     </div>
 
+    <p>
     Select the data blocks to be exported by clicking on them.
     Multiple lines can be selected by using keyboard modifiers such as
     holding the shift while clicking to select all data blocks between
     the last clicked block and where you click.  Holding the alternate
     (ALT) key will allow selection or de-selection of a single item
     without affecting the selection state of other blocks.
-    
+    <p>
+    <p>
     <em>
     SUGGESTION:  It looks like we have to highlight these by clicking
     on them.  As we use select boxes for recording periods, we might
     want to do the same thing here...  We might want to rename
     N PAM Datas to N PAM Data as data are already plural.
-      </em>
+    </em>
     </p>
 
-      and should also show the total
-    numbers of each type of data that are available within the
-    PAMGuard storage systems. Select the datablock you want to export
-    from and press "Export...". </p>
-    <p><strong>You really don't want to try to export zillions of data to Tethys</strong> , in the options that will appear you can opt to just export certain types of detections
-    or summary counts.</p>
+<h4> Exporting data blocks </h4>
+
+    <p>
+      Once the data blocks have been selected, press export.  A series
+      of dialogs will guide you through the export process.  The first
+      set of dialogs simply display a summary of information about what 
+      will be exported.
+    </p>
+
+    <div>
+      <img src="./images/stream_algo_info.png" class=".center"
+	   alt="List of details describing the mechanism, parameters, and version of modules used in processing"/>
+    </div>
+    
+    <p>
+    There is nothing to change in this summary.  Press Next once you
+    have reviewed it.  The second panel allows specification of your
+    objectives, abstract, and method.  Many modules will have
+    pre-populated the method for you.  While it is recommended to populate
+    the objectives and abstract, these fields are optional.
+    <strong> Need to make them optional, currently mandatory. </strong>
+    </p>
+    
+    <p>
+      Press Next to proceed to the next step of the dialog.  You will be asked
+      what details you wish to store within the parameters that were used to
+      produce these data.  Your must select one of the following:
+    </p>
+
+    <ul>
+      <li> None - Do not report any of parameters used to produce these detections (not recommended) </li>
+      <li> Data selector only - <strong>not sure what this is</strong> </li>
+      <li>
+	Module only - Report the parameters that were set with this
+	module.  Only parameters associated with the specific module
+	will be reported.  Examples include score and duration thresholds
+	as well as any other type of criterion used to determine whether
+	or not an event is associated with a specific phenomenon or species.
+      </li>
+      <li>
+	Full process chain (default) - This is the most verbose option.  It includes the module
+	parameters as well as anything else that is part of the signal processing chain that leads
+	to the module.  As an example, a module only setting would not report the parameters that were
+	used to generate a spectrogram that was presented to a module for classification, but the
+	full process chain would record these details as well.  Use this option will dramatically
+	increase the potential to reproduce your results, but it will generate a large amount of data
+	about the signal processing chain, much of which might not be useful.
+      </li>
+    </ul>
+
+    <p>
+      The final page of the dialog has an "Export data" button.  Press
+      this to export the data.  The system will begin generating the
+      Tethys document and the "Export data" button will be relabeled "Export complete"
+      once it is done.  At this point, you can press "Finish" to close the dialog.
+    </p>
+    
+    <strong>We'll need to have a conversation about exporting, I don't see the summaries and my attempt to export 613 events wrote out an XML document with the effort specified, but no detections.  </strong>
     
     <br>
     <br>
