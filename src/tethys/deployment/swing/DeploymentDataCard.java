@@ -44,6 +44,7 @@ public class DeploymentDataCard extends PamWizardCard {
 		bg.add(exportOne);
 		bg.add(exportMany);
 		
+		
 		JPanel optsPanel = new JPanel(new GridBagLayout());
 		optsPanel.setBorder(new TitledBorder("Number of documents"));
 		GridBagConstraints c = new PamGridBagContraints();
@@ -95,6 +96,15 @@ public class DeploymentDataCard extends PamWizardCard {
 	}
 
 	public void setParams(DeploymentExportOpts exportOptions, Deployment deployment) {
+
+		/* 
+		 * temp code to only allow export of multiple documents. 
+		 */
+		exportOptions.separateDeployments = true;
+		exportOne.setEnabled(false);
+		exportOne.setToolTipText("Feature not yet enabled");
+		
+		
 		exportOne.setSelected(exportOptions.separateDeployments == false);
 		exportMany.setSelected(exportOptions.separateDeployments == true);
 		setParams(deployment);
