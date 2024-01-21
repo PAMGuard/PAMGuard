@@ -255,21 +255,151 @@
     <center><img src="./images/calibration_information.png"></center>
     
     <h4>Deployments</h4>
-    <p>PAMGuard will have done it's best to work out the temporal extent of your data by looking in the 
-	<a href="../../generalDatabaseHelp/docs/database_database.html">PAMGuard database</a> and    
-   	<a href= "../../BinaryStore/docs/binarystore_overview.html">binary Store</a>. Where data were collected on a regular duty 
-   	cycle, or continuously, there should be a single record in the table of recording periods. If data were collected on a more
-   	"ad-hoc" basis, for instance during a boat-based survey, there might be many different records in the table.
-   	Occasionally, there may be short recording periods (e.g. while you were testing kit on deck) that you don't want to export. Either select
-   	individual rows that you want to export, or right click on the table and "Select All".</p>
- 
-   	<p>Press the "Export..." button and work through the questions to provide additional information about your data, why it was collected, etc. </p>
-   	<p>Once the document(s) have been exported, the document names will be shown alongside each PAMGuard deployment period</p>
-   	<center><img src="./images/deploymentspanel.png"></center> 
+
+    <p>
+      Tethys uses deployment records to register information about
+    when instruments have been deployed as well as their
+    characteristics.  Examples of characteristics that are recorded
+    include sample rate and the number of quantization bits,
+    description of duty cycles (if applicable), hydrophone geometry,
+    and enough details to be able find calibration data for specific
+    hydrophones.
+    </p>
+
+    <p>
+      PAMGuard will examine the       
+    <a href="../../generalDatabaseHelp/docs/database_database.html">PAMGuard
+    database</a>
+    and <a href="../../BinaryStore/docs/binarystore_overview.html">
+    binary Store</a> to determine what records should be generated for
+    your instrumentation.
+    </p>
     
-    <h4>Detections</h4>
-    <p>The bottom left panel shows a list of different types of PAMGuard data that can be exported and should also show the total numbers of each type of data that are available
-    within the PAMGuard storage systems. Select the datablock you want to export from and press "Export...". </p>
+    <p>
+      Where data were collected continuously or on a regular duty
+    cycle, PAMGuard will create a single deployment record.  If data
+    were collected on a more "ad-hoc" basis, where the instrument has
+    been deployed multiple times or has irregular recording, PAMGuard
+    will generate a deployment record for each period of recording.
+    </p>
+
+    <p>
+      The figure below shows an example of ad-hoc recording periods
+      identified by PAMGuard:
+    </p>
+       	<center><img src="./images/deploymentspanel.png"></center> 
+
+    <p>
+      Occasionally, there may be short recording periods (e.g. while
+    you were testing kit on deck) that you do not want to export. Use
+    the select checkbox to pick all of the rows that you wish to
+    export, or right click on the table and "Select All."
+    </p>
+
+    <p>
+      When one or more deployment records are selected, the
+    "Export..."  button will become available.  Selecting the export
+    button will start a dialog that asks for additional information
+    about the deployments and then write records to Tethys.
+    </p>
+    <p>
+      The first page of the dialog asks for the project and geographic
+      region which will be automatically populated if they have been
+      previously specified. In addition, the following fields are
+      requested:
+    </p>
+    <ul>
+      <li>Cruise name - Optional name of the deployment cruise</li>
+      <li>Site - Case-sensitive name for the deployment site,
+	e.g. "Tanner Banks" or a letter designation "T".  This can
+	provide a simple way to identify multiple deployments at the
+	same general location.
+      </li>
+      <li>Responsible Party - A set of fields describing who was
+	responsible for the deployment and how they may be
+	contacted.
+      </li>
+    </ul>
+
+    <p>
+      The next page of the dialog asks whether you would like to
+      export a single deployment document or multiple deployments.
+      <strong>todo:  add more detail here</strong>
+    </p>
+    
+
+    <p>
+      Finally, you are prompted to provide optional textual descriptions of:
+      <ul>
+	<li> Objectives - What were your objectives when deploying the
+	  instrument?  Example: Determine population estimates for
+	  critically endangered populations of vaquita (<em>Phocoena
+	  sinus</em>).
+	</li>
+	<li> Abstract - A textual description of the deployment.
+	  Example:  A set of high frequency recorders  were deployed across the
+	  northern portion of the Sea of Cortez in the historical range
+	  of the vaquita (<em>Phocoena sinus</em>).  These recordings will
+	  support detection and density estimation efforts.	  
+	</li>
+	<li>
+	  Method - A description of the methods used.  Example:
+	  Small boat deployment of bottom moored SoundTrap recorders
+	  with acoustic releases.  
+	</li>
+      </ul>
+
+      Press Finish to export the records.  Once the
+      document(s) have been successuflly exported, the document name
+      associated with each recording period will be shown in the
+      Tethys Deployment column.
+    </p>
+	  
+    <h4>PAMGuard data blocks</h4>
+    
+    <p>
+      The bottom left panel shows a list of different types of
+      PAMGuard data that can be exported.  The data in this list
+      correspond to the various PAMGuard modules that have been
+      configured.  See the
+      <a href="../../../overview/PamMasterHelp/docs/modelViewer.html">
+	data model viewer</a>
+      help for an example of how PAMGuard might be configured.
+    </p> 
+
+    <p>
+    In the sample data blocks image below, four modules have been
+    configured, but only one of them has been run.  Column "N Pam
+    Data" indicates the number of data records that have been
+    produced, and "PAMGuard Time" tells us when the data were
+    processed.  "Tethys Documents" indicates how many Tethys records
+    have been produced, and should be 0 until the data are exported.
+    </p>
+
+    
+    <div>
+      <img src="./images/data_blocks.png" class=".center"/>
+    </div>
+
+    Select the data blocks to be exported by clicking on them.
+    Multiple lines can be selected by using keyboard modifiers such as
+    holding the shift while clicking to select all data blocks between
+    the last clicked block and where you click.  Holding the alternate
+    (ALT) key will allow selection or de-selection of a single item
+    without affecting the selection state of other blocks.
+    
+    <em>
+    SUGGESTION:  It looks like we have to highlight these by clicking
+    on them.  As we use select boxes for recording periods, we might
+    want to do the same thing here...  We might want to rename
+    N PAM Datas to N PAM Data as data are already plural.
+      </em>
+    </p>
+
+      and should also show the total
+    numbers of each type of data that are available within the
+    PAMGuard storage systems. Select the datablock you want to export
+    from and press "Export...". </p>
     <p><strong>You really don't want to try to export zillions of data to Tethys</strong> , in the options that will appear you can opt to just export certain types of detections
     or summary counts.</p>
     
