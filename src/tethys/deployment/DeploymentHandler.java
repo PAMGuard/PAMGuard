@@ -84,6 +84,7 @@ import tethys.deployment.swing.RecordingGapDialog;
 import tethys.niluswraps.PDeployment;
 import tethys.output.TethysExportParams;
 import tethys.pamdata.AutoTethysProvider;
+import tethys.reporter.TethysReporter;
 import tethys.swing.DeploymentTableObserver;
 
 /**
@@ -387,12 +388,14 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 	 * @param selectedDeployments
 	 */
 	public void exportDeployments(ArrayList<RecordingPeriod> selectedDeployments) {
+		TethysReporter.getTethysReporter().clear();
 		if (deploymentExportOptions.separateDeployments) {
 			exportSeparateDeployments(selectedDeployments);
 		}
 		else {
 			exportOneDeploymnet(selectedDeployments);
 		}
+		TethysReporter.getTethysReporter().showReport(tethysControl.getGuiFrame(), true);
 	}
 	
 	/**
