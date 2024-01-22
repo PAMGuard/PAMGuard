@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -16,11 +17,16 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
 
+import PamUtils.worker.PamWorkDialog;
+import PamUtils.worker.PamWorkProgressMessage;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
+import PamView.dialog.warn.WarnOnce;
 import PamView.tables.SwingTableColumnWidths;
 import PamView.tables.TableColumnWidthData;
 import tethys.TethysControl;
@@ -47,8 +53,10 @@ public class SpeciesSearchDialog extends PamDialog {
 
 	private DataModel tableModel;
 	
-	private int selectedRow = -1;
+	private volatile PamWorkDialog workDialog;
 	
+	private Object synch = new Object();
+		
 
 	private SpeciesSearchDialog(Window parentFrame, TethysControl tethysControl) {
 		super(parentFrame, "Species search", false);
@@ -74,19 +82,26 @@ public class SpeciesSearchDialog extends PamDialog {
 		tableModel = new DataModel();
 		resultTable = new JTable(tableModel);
 		JPanel centPanel = new JPanel(new BorderLayout());
-		centPanel.add(BorderLayout.NORTH, new JLabel("Possible matches", JLabel.LEFT));
+		centPanel.add(BorderLayout.NORTH, new JLabel("Possible matches (select one)", JLabel.LEFT));
 		JScrollPane scrollPane = new JScrollPane(resultTable);
 		centPanel.add(BorderLayout.CENTER, scrollPane);
 		mainPanel.add(BorderLayout.CENTER, centPanel);
 		
 		resultTable.addMouseListener(new TableMouse());
-		new SwingTableColumnWidths("Species Search Dialog Table", resultTable);
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				new SwingTableColumnWidths("Species Search Dialog Table", resultTable);				
+			}
+		});
 		
 		setResizable(true);
 		setDialogComponent(mainPanel);
 	}
 	public static SpeciesMapItem showDialog(Window parentFrame, TethysControl tethysControl) {
-		singleInstance = new SpeciesSearchDialog(parentFrame, tethysControl);
+		if (singleInstance == null) {
+			singleInstance = new SpeciesSearchDialog(parentFrame, tethysControl);
+		}
 		singleInstance.setParams();
 		singleInstance.setVisible(true);
 		return singleInstance.selectedItem;
@@ -99,9 +114,72 @@ public class SpeciesSearchDialog extends PamDialog {
 		if (str == null || str.length() == 0) {
 			return;
 		}
-		ITISFunctions itisFunctions = tethysControl.getItisFunctions();
-		speciesMapItems = itisFunctions.searchSpecies(str);
+		SearchWorker searchWorker = new SearchWorker(str);
+		searchWorker.execute();
+		// then open the dialog to block this thread. 
+		synchronized (synch) {
+			workDialog = new PamWorkDialog(getOwner(), 1, "Searching Tethys Database");
+			workDialog.setVisible(true);
+		}
+	}
+	
+	public void setMapItems(ArrayList<SpeciesMapItem> newMapItems) {
+		this.speciesMapItems = newMapItems;
 		tableModel.fireTableDataChanged();
+	}
+
+	private class SearchWorker extends SwingWorker<Integer, PamWorkProgressMessage> {
+
+		private String searchString;
+		private ArrayList<SpeciesMapItem> newMapItems;
+
+		public SearchWorker(String searchString) {
+			this.searchString = searchString;
+		}
+
+		@Override
+		protected Integer doInBackground() throws Exception {
+			String msg = String.format("Searching database for names containing \"%s\"", searchString);
+			PamWorkProgressMessage pm = new PamWorkProgressMessage(null, msg);
+			publish(pm);
+			try {
+				ITISFunctions itisFunctions = tethysControl.getItisFunctions();
+				this.newMapItems = itisFunctions.searchSpecies(searchString);
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+			if (newMapItems == null) {
+				return 0;
+			}
+			if (workDialog != null) {
+				workDialog.setVisible(false);
+				workDialog.dispose();
+			}
+			return newMapItems.size();
+		}
+
+		@Override
+		protected void done() {
+			if (newMapItems == null || newMapItems.size() == 0) {
+				String msg = String.format("No matching ITIS types for search term %s", searchString);
+				WarnOnce.showNamedWarning("ITIS Lookup failure", getOwner(), "ITIS Code search", msg, WarnOnce.WARNING_MESSAGE);
+				
+			}
+			setMapItems(newMapItems);
+		}
+
+		@Override
+		protected void process(List<PamWorkProgressMessage> chunks) {
+			for (PamWorkProgressMessage msg : chunks) {
+				synchronized (synch) {
+					if (workDialog != null) {
+						workDialog.update(msg);
+					}
+				}				
+			}
+		}
+		
 	}
 	
 	private void setParams() {
@@ -110,7 +188,6 @@ public class SpeciesSearchDialog extends PamDialog {
 	}
 
 	private void clearResults() {
-		selectedRow = -1;
 		speciesMapItems = null;
 		selectedItem = null;
 	}
@@ -137,8 +214,11 @@ public class SpeciesSearchDialog extends PamDialog {
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			selectedRow = resultTable.getSelectedRow();
-			if (selectedRow >= 0) {
+			if (speciesMapItems == null) {
+				return;
+			}
+			int selectedRow = resultTable.getSelectedRow();
+			if (selectedRow >= 0 && selectedRow < speciesMapItems.size()) {
 				selectedItem = speciesMapItems.get(selectedRow);
 			}
 			tableModel.fireTableDataChanged();
@@ -167,7 +247,7 @@ public class SpeciesSearchDialog extends PamDialog {
 			SpeciesMapItem mapItem = speciesMapItems.get(rowIndex);
 			switch (columnIndex) {
 			case 0:
-				return rowIndex == selectedRow;
+				return mapItem == selectedItem;
 			case 1:
 				return mapItem.getItisCode();
 			case 2:

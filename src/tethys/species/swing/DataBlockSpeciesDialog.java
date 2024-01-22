@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
@@ -39,6 +40,8 @@ public class DataBlockSpeciesDialog extends PamDialog {
 		JPanel nPanel = new JPanel(new BorderLayout());
 		nPanel.setBorder(new TitledBorder("Code management"));
 		nPanel.add(BorderLayout.EAST, itisButton);
+		String otherMsg = "<html>Use a valid ITIS species code, Or for Noise Measurements <br>and \"Other Phenomena\" use code -10</html>";
+		nPanel.add(BorderLayout.CENTER, new JLabel(otherMsg , JLabel.LEFT));
 //		JPanel nwBit = new JPanel(new FlowLayout());
 //		JButton exportButton = new JButton("Export");
 //		exportButton.addActionListener(SpeciesMapManager.getInstance().getExportAction(parentFrame));
