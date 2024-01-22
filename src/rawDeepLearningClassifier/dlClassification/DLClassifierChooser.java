@@ -28,7 +28,7 @@ public class DLClassifierChooser {
 		}
 		
 		//return the generic model. 
-		return dlControl.getDLModels().get(0); 
+		return dlControl.getDLModels().get(dlControl.getDLModels().size()-1); 
 	}
 
 }

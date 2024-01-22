@@ -519,11 +519,12 @@ public class StreamerSettingsPane extends SettingsPane<Streamer> {
 	@Override
 	public Streamer getParams(Streamer currParams) {
 //		System.out.println("GETPARAMS: "	 + currParams); 
+		double zCoeff = PamController.getInstance().getGlobalMediumManager().getZCoeff(); 
 
 		try {
 			defaultStreamer.setX(Double.valueOf(xPos.getText()));
 			defaultStreamer.setY(Double.valueOf(yPos.getText()));
-			defaultStreamer.setZ(-Double.valueOf(zPos.getText()));
+			defaultStreamer.setZ(zCoeff*Double.valueOf(zPos.getText()));
 			defaultStreamer.setDx(Double.valueOf(xPosErr.getText()));
 			defaultStreamer.setDy(Double.valueOf(yPosErr.getText()));
 			defaultStreamer.setDz(Double.valueOf(zPosErr.getText()));		
