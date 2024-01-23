@@ -290,6 +290,8 @@
 
 <mapID target="classifiers.roccaHelp.docs.rocca_Spectrogram_rocca_RecalcContour" url="classifiers/roccaHelp/docs/rocca_Spectrogram.html#rocca_RecalcContour"/>
 
+<mapID target="utilities.tethys.docs.tethys_speciescodes" url="utilities/tethys/docs/tethys_speciescodes.html"/>
+
 <mapID target="overview.PamMasterHelp.docs.performanceTests" url="overview/PamMasterHelp/docs/performanceTests.html"/>
 
 <mapID target="overview.PamMasterHelp.docs.xmloutput" url="overview/PamMasterHelp/docs/xmloutput.html"/>

@@ -202,6 +202,8 @@
 
    <tocitem text="Tethys Server " target="utilities.tethys.docs.tethys_server" image="topic"/>
 
+   <tocitem text="ITIS Species Codes " target="utilities.tethys.docs.tethys_speciescodes" image="topic"/>
+
   </tocitem>
  </tocitem>
  <tocitem text="Sensors ">
