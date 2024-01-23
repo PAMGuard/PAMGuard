@@ -100,7 +100,7 @@
     PAMGuard events typically are a short name that represents the
     species and/or potentially a call.  Knowledge of the PAMGuard
     modules that were run and the data on which they executed will let
-    a user infer what she be recorded.
+    a user infer what should be recorded.
     
     The dialog below shows a sample set of events produced by one or more PAMGuard modules
     using the names:  HP, DO, SON, KW, UNK, and PHP:
@@ -123,18 +123,23 @@
     </li>
 
     <li>
-      ITIS code - The TSN that should be associated with the PAMGuard
-      event name.  Currently, these must be looked up at the ITIS web
-      site although future releases may remove this restriction.
-      Pressing the Find button will look up the name associated with
-      the ITIS code.  In the example above, the user typed 180473 and
-      then pressed Find.
+      ITIS code -This is the ITIS TSN that is associated with PAMGuard
+      event code.  Click on Find to inovke the TSN
+      search dialog whose behavior is described in the <a href="#TSNLookup">next
+	section</a>.
+      <p>
+	If you happen to know the TSN, you
+	can enter it directly.  Pressing Find after typing the TNS will
+	populate the Latin and English vernauclar names so that you may
+	verify your TSN was entered correctly.
+      </p>
     </li>
 
     <li> Call / sound type - This will default to the code provided by
       the module but should be updated to specify an appropriate call
       type or left blank to indicate that the detection is not related
-      to a specific call type.
+      to a specific call type.  In the case of a porpoise detector,
+      the likely call type would be "Clicks".
       <strong>We should double check that no Call element is generated when this is blank.</strong>
     </li>
   </ul>
@@ -142,5 +147,35 @@
   <p>
   Once all species names and call/sound types have been identified, press the Okay button.
   </p>
-    
+
+
+  
+  <h2 name="TSNLookup"> Searching for ITIS Taxonomic Serial Numbers (TSNs) </h2>
+
+  <p>
+    As noted above, pressing Find without typing a TSN will bring up a
+    search dialog:
+  </p>
+
+  <div>
+    <image src="./images/species_search.png" class=".center"/>
+  </div>
+  
+  <p>
+    The top of this dialog has a search box where one can enter either
+    a Latin name or the common name for a species.  The Tethys server
+    will search for all species that match the search-box contents.
+    For many species, there are common name entries in languages
+    other than English, and these are searched as well.
+  </p>
+  <p>
+    Once you press the search button, a list will appear with all
+    matches for your search term.  If there are too many, a scroll bar
+    will permit you to look through the list.  Select the entry that
+    you wish and press OK.  The TSN on the species dialog will be
+    populated along with the Latin name and common names from the ITIS
+    database.
+  </p>
+
+  
 </body>

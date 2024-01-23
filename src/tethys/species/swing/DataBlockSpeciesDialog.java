@@ -40,7 +40,14 @@ public class DataBlockSpeciesDialog extends PamDialog {
 		JPanel nPanel = new JPanel(new BorderLayout());
 		nPanel.setBorder(new TitledBorder("Code management"));
 		nPanel.add(BorderLayout.EAST, itisButton);
-		String otherMsg = "<html>Use a valid ITIS species code, Or for Noise Measurements <br>and \"Other Phenomena\" use code -10</html>";
+		String otherMsg = 
+				"<html>Specify an ITIS taxonomic serial number (coding)."
+				+ "<br>Press the Find button to look up TSNs by Latin or common name.  "
+				+ "Anthropogenic signals should be coded as Homo sapiens (180092). "
+				+ "<br>Noise Measurements and geophonic sounds should be coded as " 
+				+ "\"Other Phenomena\" (-10).  "
+				+ "<br>When known, a call or sound type should "
+				+ "be specified (see help for more information).</html>";
 		nPanel.add(BorderLayout.CENTER, new JLabel(otherMsg , JLabel.LEFT));
 //		JPanel nwBit = new JPanel(new FlowLayout());
 //		JButton exportButton = new JButton("Export");
