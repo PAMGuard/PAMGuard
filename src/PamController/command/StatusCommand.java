@@ -31,33 +31,7 @@ public class StatusCommand extends ExtCommand {
 	
 	private int getRealStatus() {
 		PamController pamController = PamController.getInstance();
-		if (pamController.isInitializationComplete() == false) {
-			return PamController.PAM_INITIALISING;
-		}
-		int runMode = PamController.getInstance().getRunMode();
-		if (runMode == PamController.RUN_NETWORKRECEIVER) {
-			return PamController.PAM_RUNNING;
-		}
-		int status = pamController.getPamStatus();
-		if (status == PamController.PAM_IDLE) {
-			status = PamController.PAM_IDLE;
-		}
-		else {
-			ArrayList<PamControlledUnit> daqs = PamController.getInstance().findControlledUnits(AcquisitionControl.unitType);
-			if (daqs != null) for (int i = 0; i < daqs.size(); i++) {
-				try {
-					AcquisitionControl daq = (AcquisitionControl) daqs.get(i);
-					if (daq.isStalled()) {
-						status = PamController.PAM_STALLED;
-					}
-				}
-				catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		WatchdogComms watchdogComms = PamController.getInstance().getWatchdogComms();
-		return watchdogComms.getModifiedWatchdogState(status);
+		return pamController.getRealStatus();
 	}
 
 

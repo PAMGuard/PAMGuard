@@ -37,6 +37,7 @@ import javax.swing.ToolTipManager;
 import com.jcraft.jsch.ConfigRepository.Config;
 import com.sun.xml.bind.v2.TODO;
 
+import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionProcess;
 
 //import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
@@ -65,6 +66,7 @@ import PamController.command.TerminalController;
 import PamController.command.WatchdogComms;
 import PamController.fileprocessing.ReprocessManager;
 import PamController.masterReference.MasterReferencePoint;
+import PamController.settings.BatchViewSettingsImport;
 import PamController.settings.output.xml.PamguardXMLWriter;
 import PamController.settings.output.xml.XMLWriterDialog;
 import PamController.soundMedium.GlobalMediumManager;
@@ -124,6 +126,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 	public static final int PAM_INITIALISING = 4;
 	public static final int PAM_STOPPING = 5;
 	public static final int PAM_COMPLETE = 6;
+	public static final int PAM_MAPMAKING = 7;
+	public static final int PAM_OFFLINETASK = 8;
 
 	// status' for RunMode = RUN_PAMVIEW
 	public static final int PAM_LOADINGDATA = 2;
@@ -235,6 +239,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 */
 	private Thread statusCheckThread;
 	private WaitDetectorThread detectorEndThread;
+	private boolean firstDataLoadComplete;
 
 
 	private PamController(int runMode, Object object) {
@@ -437,7 +442,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 		//			addModule(mi, "Temporary Database");	
 		//		}
 
-		// Add a note to the putput console for the user to ignore the SLF4J warning (see http://www.slf4j.org/codes.html#StaticLoggerBinder
+		// Add a note to the output console for the user to ignore the SLF4J warning (see http://www.slf4j.org/codes.html#StaticLoggerBinder
 		// for details).  I spent a few hours trying to get rid of this warning, but without any luck.  If you do a google search
 		// there are a lot of forum suggestions on how to fix, but none seemed to work for me.  Added both slf4j-nop and
 		// slf4j-simple to dependency list, neither made a difference.  Changed order of dependencies, ran purges and updates,
@@ -492,16 +497,30 @@ public class PamController implements PamControllerInterface, PamSettings {
 			addView(guiFrameManager.initPrimaryView(this, pamModelInterface)); 
 		}
 
+		/**
+		 * Calling this will cause a callback to this.restoreSettings which 
+		 * includes a list of modules which will then get created, and in turn
+		 * load all of their own settings from the settings manager. 
+		 */
 		PamSettingManager.getInstance().registerSettings(this);
+		
+		/**
+		 * For offline batch processing a few funnies happen here. We'll be open 
+		 * in viewer mode, but it's likely a psf will have been passed as an input argument. 
+		 * We will therefore have to extract all the modules from that psfx as well and either 
+		 * add them as new modules, or get their settings and use those to update existing settings 
+		 * That should probably be done here before the final calls to setup processes, etc. 
+		 */
+		if (getRunMode() == RUN_PAMVIEW && PamSettingManager.remote_psf != null) {
+			loadOtherSettings(PamSettingManager.remote_psf);
+		}
 
+		/*
+		 * Get any other required modules for this run mode. 
+		 */
 		pamModelInterface.startModel();
 
 		setupProcesses();
-
-		//				if (getRunMode() == RUN_PAMVIEW) {
-		//					createViewerStatusBar();			
-		//					pamControlledUnits.add(new OfflineProcessingControlledUnit("OfflineProcessing"));
-		//				}
 
 		/*
 		 * We are running as a remote application, start process straight away!
@@ -573,6 +592,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 		//		});
 	}
 	
+
 	/**
 	 * Clear all data selectors and symbol managers. Required since some of these will have loaded as various modules were created, 
 	 * but may also require additional data selectors and symbol managers from super detections which were not availble. 
@@ -585,6 +605,11 @@ public class PamController implements PamControllerInterface, PamSettings {
 		
 	}
 
+	/**
+	 * This gets called after other data initialisation tasks (such as data mapping). 
+	 * @author dg50
+	 *
+	 */
 	class DataInitialised implements Runnable {
 		@Override
 		public void run() {
@@ -1792,6 +1817,10 @@ public class PamController implements PamControllerInterface, PamSettings {
 		if (moduleChange(changeType)) {
 			clearSelectorsAndSymbols();
 		}
+		
+		if (changeType == DATA_LOAD_COMPLETE) {
+			firstDataLoadComplete = true;
+		}
 
 	}
 	
@@ -1928,11 +1957,74 @@ public class PamController implements PamControllerInterface, PamSettings {
 
 	public void setPamStatus(int pamStatus) {
 		this.pamStatus = pamStatus;
+		/*
+		 * This only get's called once when set idle at viewer mode startup. 
+		 */
+//		System.out.printf("*******   PamController.setPamStatus to %d, real status is %d\n",  pamStatus, getRealStatus());
 		if (getRunMode() != RUN_PAMVIEW) {
 			TopToolBar.enableStartButton(pamStatus == PAM_IDLE);
 			TopToolBar.enableStopButton(pamStatus == PAM_RUNNING);
 		}
 		showStatusWarning(pamStatus);
+	}
+
+	/**
+	 * This was within the StatusCommand class, but useful to have it here since it's needed
+	 * in more than one place. In viewer mode at startup there are a number of things going on 
+	 * in different threads, such as the creation of datamaps, and this can (hopefully) handle those bespoke
+	 * goings on. 
+	 * @return program status for multithreaded statup tasks. 
+	 */
+	public int getRealStatus() {
+		PamController pamController = PamController.getInstance();
+		if (pamController.isInitializationComplete() == false) {
+			return PamController.PAM_INITIALISING;
+		}
+		int runMode = PamController.getInstance().getRunMode();
+		if (runMode == PamController.RUN_NETWORKRECEIVER) {
+			return PamController.PAM_RUNNING;
+		}
+		int status = pamController.getPamStatus();
+		if (status == PamController.PAM_IDLE) {
+			status = PamController.PAM_IDLE;
+		}
+		else {
+			ArrayList<PamControlledUnit> daqs = PamController.getInstance().findControlledUnits(AcquisitionControl.unitType);
+			if (daqs != null) for (int i = 0; i < daqs.size(); i++) {
+				try {
+					AcquisitionControl daq = (AcquisitionControl) daqs.get(i);
+					if (daq.isStalled()) {
+						status = PamController.PAM_STALLED;
+					}
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		WatchdogComms watchdogComms = PamController.getInstance().getWatchdogComms();
+		status = watchdogComms.getModifiedWatchdogState(status);
+		/*
+		 * This function is now being used in batch processing of offline data, where it may be necessary
+		 * to get status information from many different modules, for example when executing offline tasks
+		 * or just at startup while generating datamaps and datagrams. 
+		 * So go through all modules and get the highest state of any of them. 
+		 */
+		if (getRunMode() == RUN_PAMVIEW) {
+			if (firstDataLoadComplete == false) {
+				status = PAM_INITIALISING;
+			}
+			try {
+				for (PamControlledUnit aUnit : pamConfiguration.getPamControlledUnits()) {
+					status = Math.max(status, aUnit.getOfflineState());
+				}
+			}
+			catch (Exception e) {
+				//just incase there is a concurrent modification at startup. 
+			}
+		}
+		
+		return status;
 	}
 	
 	/**
@@ -2218,6 +2310,31 @@ public class PamController implements PamControllerInterface, PamSettings {
 	private boolean manualStop;
 
 
+	/**
+	 * Used when in viewer mode and planning batch processing with a modified
+	 * configuration, i.e. the command line has been supplied a normal viewer mode
+	 * database and also a psfx file. The settings from the database will already have 
+	 * been loaded, this will load any modules that weren't there and will override all the 
+	 * settings in other modules with these ones (except some specials such as data storage locations)
+	 * @param psfxFile Name of additional psfx file. 
+	 */
+	private boolean loadOtherSettings(String psfxName) {
+		
+		File psfxFile = new File(psfxName);
+		if (psfxFile.exists() == false) {
+			return false;
+		}
+
+		PamSettingsGroup settingsGroup = PSFXReadWriter.getInstance().loadFileSettings(psfxFile);
+		if (settingsGroup == null) {
+			return false;
+		}
+		
+		BatchViewSettingsImport importer = new BatchViewSettingsImport(this, settingsGroup);
+		importer.importSettings();
+		return true;
+	}
+	
 	/**
 	 * Called to load a specific set of PAMGUARD settings in 
 	 * viewer mode, which were previously loaded in from a 

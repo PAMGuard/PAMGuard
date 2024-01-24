@@ -789,7 +789,7 @@ private void setAxisLabels() {
 			double[][] noiseData, lastNoisedata = null;
 			int chan;
 			int nMeasures = noiseDataBlock.getNumMeasurementBands();
-			int x1, x2=0, y1, y2;
+			int x1, x2=0, y1=0, y2;
 			int xWin = getWidth() / 10;
 			synchronized (noiseDataBlock.getSynchLock()) {
 				noiseIterator = noiseDataBlock.getListIterator(0);
@@ -812,15 +812,22 @@ private void setAxisLabels() {
 						lastNoisedata = lastUnit.getNoiseBandData();
 					}
 					nMeasures = noiseData.length;
+					
 					for (int i = 0; i < nMeasures; i++) {
 						if (noiseDisplaySettings.isSelectData(i) == false) {
 							continue;
 						}
+						nStats = noiseData[i].length;
 						for (int m = 0; m < nStats; m++) {
 							if ((noiseDisplaySettings.selectedStats & noiseDataBlock.statIndexToBit(m)) == 0) {
 								continue;
 							}
+							try {
 							y1 = dBToYPix(noiseData[i][m]+bandCorrection[i]);
+							}
+							catch (Exception e) {
+								e.printStackTrace();
+							}
 							setSymbol(symbol, chan, i, m);
 							symbol.draw(g, new Point(x1, y1));
 							if (lastNoisedata != null && lastNoisedata.length > i) {

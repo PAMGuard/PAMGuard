@@ -17,6 +17,10 @@ public class OfflineTaskManager {
 	
 	private ArrayList<OfflineTask> globalTaskList = new ArrayList();
 	
+	public static final String commandFlag = "-offlinetask";
+	
+	public ArrayList<String> commandLineTasks = new ArrayList();
+	
 	public static OfflineTaskManager getManager() {
 		if (singleInstance == null) {
 			singleInstance = new OfflineTaskManager();
@@ -116,8 +120,9 @@ public class OfflineTaskManager {
 	 * @param offlineTask
 	 * @return matching task or null. 
 	 */
+	@SuppressWarnings("rawtypes")
 	public OfflineTask findOfflineTask(OfflineTask offlineTask) {
-		return findOfflineTask(offlineTask.getUnitType(), offlineTask.getUnitName(), offlineTask.getName());
+		return findOfflineTask(offlineTask.getLongName());
 	}
 	
 	/**
@@ -128,6 +133,7 @@ public class OfflineTaskManager {
 	 * @param taskName
 	 * @return matching task or null. 
 	 */
+	@SuppressWarnings("rawtypes")
 	public OfflineTask findOfflineTask(String unitType, String unitName, String taskName) {
 		// could possibly also do a check on class type ????
 		for (OfflineTask aTask : globalTaskList) {
@@ -142,5 +148,52 @@ public class OfflineTaskManager {
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * Another way of finding offline tasks based on their long name. This is basically
+	 * the three names unitType, unitName and taskName concatenated together. Get's used
+	 * for some task management such as passing batch processing instructions. 
+	 * @param taskLongName 
+	 * @return matching task or null. 
+	 */
+	@SuppressWarnings("rawtypes")
+	public OfflineTask findOfflineTask(String taskLongName) {
+		for (OfflineTask aTask : globalTaskList) {
+			if (aTask.getLongName().equals(taskLongName)) {
+				return aTask;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Add a task listed in the command line when PAMGuard was started. 
+	 * @param taskLongName
+	 */
+	public void addCommandLineTask(String taskLongName) {
+		commandLineTasks.add(taskLongName);
+	}
+
+	/**
+	 * The list of tasks from the command line. 
+	 * @return the commandLineTasks
+	 */
+	public ArrayList<String> getCommandLineTasks() {
+		return commandLineTasks;
+	}
+
+	/**
+	 * Get the status of jobs to pass back to the batch process controller. 
+	 * @return
+	 */
+	public String getBatchStatus() {
+		/**
+		 * this needs to largely follow the format of the data in folderinputsystem:
+		 * String bs = String.format("%d,%d,%d,%s", nFiles,currentFile,generalStatus,currFile);
+		 */
+		int generalStatus = PamController.getInstance().getRealStatus();
+		String bs = String.format("%d,%d,%d,%s", commandLineTasks.size(), 0, generalStatus, "Processing");
+		return bs;
 	}
 }
