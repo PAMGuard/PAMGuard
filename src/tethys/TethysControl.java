@@ -53,6 +53,7 @@ import tethys.output.TethysExportParams;
 import tethys.species.ITISFunctions;
 import tethys.species.SpeciesMapManager;
 import tethys.swing.ProjectDeploymentsDialog;
+import tethys.swing.TethysEnabler;
 import tethys.swing.TethysTabPanel;
 import tethys.swing.XMLStringView;
 import tethys.swing.documents.TethysDocumentsFrame;
@@ -91,10 +92,12 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	private CalibrationHandler calibrationHandler;
 	
 	private ITISFunctions itisFunctions;
+	private TethysEnabler tethysEnabler;
 
 	public TethysControl(String unitName) {
 		super(unitType, unitName);
 		stateObservers = new ArrayList();
+		tethysEnabler = new TethysEnabler(this);
 		dbxmlConnect = new DBXMLConnect(this);
 		dbxmlQueries = new DBXMLQueries(this, dbxmlConnect);
 		deploymentHandler = new DeploymentHandler(this);
@@ -494,6 +497,7 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 			sendStateUpdate(new TethysState(StateType.UPDATESERVER));
 		}
 		lastServerStatus = serverState;
+		tethysEnabler.enableControls(serverState.ok);
 		return serverState;
 	}
 
@@ -699,5 +703,12 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		return calibrationHandler;
 	}
 
+	/**
+	 * Get a utility class that enables / disables controls depending on server state. 
+	 * @return
+	 */
+	public TethysEnabler getEnabler() {
+		return tethysEnabler;
+	}
 
 }

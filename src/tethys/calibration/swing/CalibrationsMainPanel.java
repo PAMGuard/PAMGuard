@@ -41,6 +41,7 @@ public class CalibrationsMainPanel extends TethysGUIPanel {
 		
 		ctrlPanel = new PamPanel(new BorderLayout());
 		exportButton = new JButton("Export ...");
+		tethysControl.getEnabler().addComponent(exportButton);
 		ctrlPanel.add(BorderLayout.WEST, exportButton);
 		warning = new JLabel();
 		ctrlPanel.add(BorderLayout.CENTER, warning);

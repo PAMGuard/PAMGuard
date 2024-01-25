@@ -61,6 +61,7 @@ public class DatablockSynchPanel extends TethysGUIPanel {
 		mainPanel.add(BorderLayout.CENTER, scrollPane);
 		PamPanel ctrlPanel = new PamPanel(new BorderLayout());
 		exportButton = new JButton("Export ...");
+		tethysControl.getEnabler().addComponent(exportButton);
 		ctrlPanel.add(BorderLayout.WEST, exportButton);
 		mainPanel.add(BorderLayout.NORTH, ctrlPanel);
 

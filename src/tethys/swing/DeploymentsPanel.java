@@ -57,6 +57,7 @@ public class DeploymentsPanel extends TethysGUIPanel implements DeploymentTableO
 		ctrlButtons.setLayout(new BoxLayout(ctrlButtons, BoxLayout.X_AXIS));
 		optionsButton = new JButton("Options ...");
 		exportButton = new JButton("Export ...");
+		tethysControl.getEnabler().addComponent(exportButton);
 		ctrlButtons.add(optionsButton);
 		ctrlButtons.add(exportButton);
 		ctrlPanel.add(BorderLayout.WEST, ctrlButtons);

@@ -1,5 +1,6 @@
 package tethys.calibration;
 
+import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -212,8 +213,10 @@ public class CalibrationHandler implements TethysStateObserver {
 //				}
 //			}
 			
-			
 			addParameterDetails(calDoc, i);
+			// run some checks of completeness of the data
+			NilusChecker.removeEmptyFields(calDoc);
+//			ArrayList<Field> emptyFields = NilusChecker.checkEmptyFields(calDoc);
 			
 			String calDocName = createDocumentName(calDoc, i);
 			exists = calDocumentExists(calDocName);

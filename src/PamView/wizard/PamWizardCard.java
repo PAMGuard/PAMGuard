@@ -1,7 +1,5 @@
 package PamView.wizard;
 
-import java.io.Serializable;
-
 import javax.swing.JPanel;
 
 

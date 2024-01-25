@@ -22,6 +22,7 @@ import tethys.Collection;
 import tethys.TethysControl;
 import tethys.database.TethysActions;
 import tethys.database.TethysLogger;
+import tethys.niluswraps.NilusChecker;
 import tethys.output.TethysExportParams;
 import tethys.reporter.TethysReport;
 import tethys.reporter.TethysReporter;
@@ -146,6 +147,9 @@ public class DBXMLConnect {
 	 */
 	public boolean postAndLog(Object nilusObject, String documentName) throws TethysException 
 	{	
+		boolean ok = NilusChecker.warnEmptyFields(tethysControl.getGuiFrame(), nilusObject);
+		
+		
 		TethysException e = null;
 		boolean success = false;
 		try {

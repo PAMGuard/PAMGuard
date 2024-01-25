@@ -78,6 +78,12 @@ public class SpeciesSearchDialog extends PamDialog {
 			}
 
 		});
+		searchText.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				searchTethys();
+			}
+		});
 		
 		tableModel = new DataModel();
 		resultTable = new JTable(tableModel);

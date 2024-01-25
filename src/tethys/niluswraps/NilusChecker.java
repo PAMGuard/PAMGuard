@@ -1,5 +1,6 @@
 package tethys.niluswraps;
 
+import java.awt.Window;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -9,6 +10,7 @@ import java.util.List;
 
 import org.renjin.methods.Methods;
 
+import PamView.dialog.warn.WarnOnce;
 import nilus.Calibration;
 import nilus.Calibration.QualityAssurance;
 import nilus.Helper;
@@ -45,11 +47,32 @@ public class NilusChecker {
 		}
 	}
 	
-	public static ArrayList<Field> findEmptyFields(Object nilusObject) {
-		return findEmptyFields(nilusObject, new ArrayList<Field>());
+	public static boolean warnEmptyFields(Window owner, Object nilusObject) {
+		ArrayList<Field> emptyFields = findEmptyFields(nilusObject, true);
+		if (emptyFields == null || emptyFields.size() == 0) {
+			return true;
+		}
+		String msg = String.format("<html>One or more fields in the nilus object %s are required but empty:<br>", nilusObject.getClass().getName());
+		for (Field f : emptyFields) {
+			msg += String.format("<br>Field %s in object %s", f.getName(), f.getDeclaringClass().getName());
+		}
+		msg += "<br><br>It is likely that this document will fail to write to the Tethys database.</html>";
+		String tit = "Incomplete Tethys data";
+		WarnOnce.showWarning(owner, tit, msg, WarnOnce.WARNING_MESSAGE);
+		return false;
 	}
 	
-	public static ArrayList<Field> findEmptyFields(Object nilusObject, ArrayList<Field> found) {
+	/**
+	 * Find empty fields
+	 * @param nilusObject object to search
+	 * @param onlyRequired only list required fields. 
+	 * @return list of empty, and optionally also required, fields. 
+	 */
+	public static ArrayList<Field> findEmptyFields(Object nilusObject, boolean onlyRequired) {
+		return findEmptyFields(nilusObject, new ArrayList<Field>(), onlyRequired);
+	}
+	
+	private static ArrayList<Field> findEmptyFields(Object nilusObject, ArrayList<Field> found, boolean onlyRequired) {
 		if (nilusObject == null) {
 			return found;
 		}
@@ -64,26 +87,26 @@ public class NilusChecker {
 		for (int i = 0; i < fields.length; i++) {
 			Method getter = findGetter(fields[i], methods);
 			if (getter == null) {
-				System.out.printf("Unable to find getter for field %s in %s\n", fields[i].getName(), nilusClass.getName());
+//				System.out.printf("Unable to find getter for field %s in %s\n", fields[i].getName(), nilusClass.getName());
+				continue;
 			}
-//			if (setter == null) {
-//				System.out.printf("Unable to find setter for field %s in %s\n", fields[i].getName(), nilusClass.getName());
-//			}
 			boolean required = isRequired(fields[i]);
 //			System.out.printf("Field %30s is %s required\n", fields[i].getName(), required ? "   " : "NOT");
 			Object gotObj = null;
 			try {
 				gotObj = getter.invoke(nilusObject, new Object[0]);
 			} catch (IllegalAccessException | InvocationTargetException e) {
-				System.out.printf("Unable to invoce getter %s on %s\n", getter.getName(), nilusObject);
+//				System.out.printf("Unable to invoce getter %s on %s\n", getter.getName(), nilusObject);
 				continue;
 			}
 			boolean empty = isEmpty(gotObj);
 			if (empty) {
-				found.add(fields[i]);
+				if (required || !onlyRequired) {
+					found.add(fields[i]);
+				}
 			}
 			else {
-				found = findEmptyFields(gotObj, found);
+				found = findEmptyFields(gotObj, found, onlyRequired);
 			}
 		}
 		return found;		
@@ -113,10 +136,12 @@ public class NilusChecker {
 			Method getter = findGetter(fields[i], methods);
 			Method setter = findSetter(fields[i], methods);
 			if (getter == null) {
-				System.out.printf("Unable to find getter for field %s in %s\n", fields[i].getName(), nilusClass.getName());
+//				System.out.printf("Unable to find getter for field %s in %s\n", fields[i].getName(), nilusClass.getName());
+				continue;
 			}
 			if (setter == null) {
-				System.out.printf("Unable to find setter for field %s in %s\n", fields[i].getName(), nilusClass.getName());
+//				System.out.printf("Unable to find setter for field %s in %s\n", fields[i].getName(), nilusClass.getName());
+				continue;
 			}
 			boolean required = isRequired(fields[i]);
 //			System.out.printf("Field %30s is %s required\n", fields[i].getName(), required ? "   " : "NOT");
@@ -124,13 +149,13 @@ public class NilusChecker {
 			try {
 				gotObj = getter.invoke(nilusObject, null);
 			} catch (IllegalAccessException | InvocationTargetException e) {
-				System.out.printf("Unable to invoce getter %s on %s\n", getter.getName(), nilusObject);
+//				System.out.printf("Unable to invoce getter %s on %s\n", getter.getName(), nilusObject);
 				continue;
 			}
 			boolean empty = isEmpty(gotObj);
-			if (empty && gotObj != null) {
+			if (empty && gotObj != null && canRemove(fields[i])) {
 				try {
-					System.out.printf("Removing empty field %s in object %s\n", fields[i].getName(), nilusObject);
+//					System.out.printf("Removing empty field %s in object %s\n", fields[i].getName(), nilusObject);
 //					Object args = new Object[1];
 					setter.invoke(nilusObject, new Object[1]);
 					removed++;
@@ -144,6 +169,32 @@ public class NilusChecker {
 			}
 		}
 		return removed;		
+	}
+	
+	/**
+	 * Fields that can be removed. 
+	 * @param field
+	 * @return
+	 */
+	private static boolean canRemove(Field field) {
+		if (field == null) {
+			return true;
+		}
+		Class fClass = field.getType();
+		if (fClass == String.class) {
+			return true;
+		}
+		if (List.class.isAssignableFrom(fClass)) {
+			return false;
+		}
+		if (fClass.isPrimitive()) {
+			return false;
+		}
+		String className = fClass.getCanonicalName();
+		if (className.contains("nilus.")) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -179,10 +230,12 @@ public class NilusChecker {
 			Method getter = findGetter(fields[i], methods);
 			Method setter = findSetter(fields[i], methods);
 			if (getter == null) {
-				System.out.printf("Unable to find getter for field %s in %s\n", fields[i].getName(), nilusClass.getName());
+//				System.out.printf("Unable to find getter for field %s in %s\n", fields[i].getName(), nilusClass.getName());
+				continue;
 			}
 			if (setter == null) {
-				System.out.printf("Unable to find setter for field %s in %s\n", fields[i].getName(), nilusClass.getName());
+//				System.out.printf("Unable to find setter for field %s in %s\n", fields[i].getName(), nilusClass.getName());
+				continue;
 			}
 			boolean required = isRequired(fields[i]);
 //			System.out.printf("Field %30s is %s required\n", fields[i].getName(), required ? "   " : "NOT");
@@ -190,7 +243,7 @@ public class NilusChecker {
 			try {
 				gotObj = getter.invoke(nilusObject, null);
 			} catch (IllegalAccessException | InvocationTargetException e) {
-				System.out.printf("Unable to invoce getter %s on %s\n", getter.getName(), nilusObject);
+//				System.out.printf("Unable to invoce getter %s on %s\n", getter.getName(), nilusObject);
 				continue;
 			}
 			boolean empty = isEmpty(gotObj);
@@ -210,7 +263,7 @@ public class NilusChecker {
 	}
 	
 	/**
-	 * See if  afield has an annotation that indicates it's required. 
+	 * See if a field has an annotation that indicates it's required. 
 	 * @param field field
 	 * @return required
 	 */

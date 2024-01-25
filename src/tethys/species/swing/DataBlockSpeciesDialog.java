@@ -14,6 +14,7 @@ import javax.swing.border.TitledBorder;
 import PamController.PamController;
 import PamView.PamGui;
 import PamView.dialog.PamDialog;
+import PamView.panel.PamNorthPanel;
 import PamguardMVC.PamDataBlock;
 import tethys.species.SpeciesMapManager;
 
@@ -39,11 +40,11 @@ public class DataBlockSpeciesDialog extends PamDialog {
 		});
 		JPanel nPanel = new JPanel(new BorderLayout());
 		nPanel.setBorder(new TitledBorder("Code management"));
-		nPanel.add(BorderLayout.EAST, itisButton);
+		nPanel.add(BorderLayout.EAST, new PamNorthPanel(itisButton));
 		String otherMsg = 
 				"<html>Specify an ITIS taxonomic serial number (coding)."
 				+ "<br>Press the Find button to look up TSNs by Latin or common name.  "
-				+ "Anthropogenic signals should be coded as Homo sapiens (180092). "
+				+ "<br>Anthropogenic signals should be coded as Homo sapiens (180092). "
 				+ "<br>Noise Measurements and geophonic sounds should be coded as " 
 				+ "\"Other Phenomena\" (-10).  "
 				+ "<br>When known, a call or sound type should "
@@ -62,6 +63,7 @@ public class DataBlockSpeciesDialog extends PamDialog {
 		mainPanel.add(BorderLayout.NORTH, nPanel);
 		setDialogComponent(mainPanel);
 		setResizable(true);
+		setHelpPoint("utilities.tethys.docs.tethys_speciescodes");
 	}
 	
 	protected void gotoITIS() {
