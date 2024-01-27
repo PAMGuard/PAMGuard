@@ -21,48 +21,67 @@ img {
 </style>
 </head>
 <body>
-	<h1>Tethys Interface</h1>
-	<h2>Overview</h2>
+  <h1>Tethys Interface</h1>
+  <p></p>
+  <h2>Overview</h2>
 
-	<div>
-	  <img SRC="images/Tethys-200.png" alt="Tethys mosaic"
-	  style="float: right; margin 10px;" 
-	</div>
-		<p>
-		
-		<a	href="https://tethys.sdsu.edu/">Tethys</a> is a freely
-		available open source temporal-spatial database for metadata related
-		to acoustic recordings. The database is intended to house the metadata
-		from marine mammal detection and localization studies, allowing the
-		user to perform meta analyses or to aggregate data from many
-		experimental efforts based on a common attribute. This resulting
-		database can then be queried based on time, space, or any desired
-		attribute and the results can be integrated with external datasets
-		such as NASA's Ocean Color, lunar illumination, etc. in a consistent
-		manner. While Tethys is designed primarily for acoustic metadata from
-		marine mammals, the design is general enough to permit use in other
-		areas as well.
-		
-	</p>
-	<p>PAMGuard is compatible with <a href="https://tethys.sdsu.edu/tethys3/">Tethys 3.0</a> or above, released early in 2024. </p>
-	<p>The Tethys database is not a replacement for the existing 	
-	<a href="../../generalDatabaseHelp/docs/database_database.html">PAMGuard Database.</a> 
-	Where the PAMGuard database only contains data from a single instrument or cruise, the Tethys
-	database contains data from many cruises and projects and can be used to hold a summary of all data 
-	from a lab or organisation.
-	</p>
+  <div>
+    <img SRC="images/Tethys-200.png" alt="Tethys mosaic"
+	 style="float: right; margin 10px;"/>
+  </div>
+  
+  <p>
+    PAMGuard is compatible
+    with <a href="https://tethys.sdsu.edu/tethys3/">Tethys 3.0</a> or
+    later.
+    <a href="https://tethys.sdsu.edu/">Tethys</a> is a freely
+    available open source temporal-spatial database for metadata
+    related to acoustic recordings. The database is intended to house
+    the metadata from marine mammal detection and localization
+    studies, allowing the user to perform meta analyses or to
+    aggregate data from many experimental efforts based on a common
+    attribute. This resulting database can then be queried based on
+    time, space, or any desired attribute and the results can be
+    integrated with external datasets such as NASA's Ocean Color,
+    lunar illumination, etc. in a consistent manner. While Tethys is
+    designed primarily for acoustic metadata from marine mammals, the
+    design is general enough to permit use in other areas as well.
+  </p>
+
+
+  <p>
+    The Tethys database is not a replacement for the existing
+    <a href="../../generalDatabaseHelp/docs/database_database.html">PAMGuard
+    Database.</a>  Where the PAMGuard database only contains data from
+    a single instrument or cruise, the Tethys database contains data
+    from many cruises and projects and can be used to hold a summary
+    of all data from a lab or organisation.  PAMGuard's Tethys module
+    provides an interface for exporting detailed or summary
+    information about acoustic detections to the Tethys database.
+  </p>
 	
-	<p>Before using the module in PAMGuard, you should install the Tethys Server, which runs under 
-	Windows. <a href="https://tethys.sdsu.edu/install/">
-	Instructions for installing the Tethys Server can be found here.</a></p>
-		
+  <p>
+    Before using the module in PAMGuard, you should install the Tethys
+    Server.  While clients that communicate with Tethys can run on a
+    variety of computer operating systems, there are a small number of
+    dependencies on Microsoft technologies that require the server to
+    be installed on a Microsoft Windows machine.
+    <a href="https://tethys.sdsu.edu/install/"> Instructions
+    for installing the Tethys Server can be found here.</a></p>
+
+  <br><br>
 	
-	<br><br>
-	
-	
-		<a href="tethys_quickstart.html">Next: Quick Start</a>
-	</p>
-	<br>
+  <p>
+    Module help:
+  </p>
+  <ol>
+    <li> The <a href="tethys_module.html">Tethys module</a> (start here)</li>
+    <li> The <a href="connection.html">Connecting to Tethys</a> </li>
+    <li> The <a href="calibrations.html">Instrument calibrations</a> </li>
+    <li> The <a href="deployments.html">Instrument deployments</a> </li>
+    <li> The <a href="detect_localize.html">Detections & Localizations</a> </li>
+    <li> Guide to specifying <a href="tethys_speciescodes.html">species names</li>
+  </ol>
 
 
 </body>

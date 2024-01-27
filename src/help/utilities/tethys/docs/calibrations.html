@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+
+<link href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Instrument Calibration Information</title>
+<style type="text/css">
+img.wrap {
+	float: left
+}
+
+img.wrapright {
+	float: right
+}
+
+img {
+	float: right;
+}
+</style>
+</head>
+
+<body>
+      
+
+  <h1>Instrument calibration information</h1>
+
+  <p>
+    Most of the calibration data is taken from the array manager and
+    from the sound acquisition module. However, PAMGuard will ask a
+    few questions about HOW the instrument was calibrated, when it was
+    done and who is responsible.
+  </p>
+  <p>
+    There are two dialogs associated with calibration.  The first
+    asks for a calibration method and has the following fields:
+  </p>
+
+  <ul>
+    <li>
+      Method:  Must be one of the following options:
+      <ul>
+	<li>Reference hydrophone</li>
+	<li>Manufacturer’s specification</li>
+	<li>Piston phone</li>
+	<li>Other calibrated source</li>
+	<li>Unknown</li>
+      </ul>
+    </li>
+    
+    <li>
+      Serial number:  Hydrophone serial number
+    </li>
+
+    <li>
+      Quality:  Quality assurance value:
+      <ul>
+	<li> unverified:  The calibration has not been verified </li>
+	<li> valid:  The calibration has been validated as per the quality assurance process </li>
+	<li> invalid:  The calibration was found to be invalid during quality assurance </li>
+      </ul>
+    </li>
+    
+    <li>
+      QA Comment:  Textual description of the quality assurance
+      process.
+    </li>
+    
+    
+    <li>
+      Calibration method:  Textual description of the Method.
+    </li>
+  </ul>
+  
+  <p>
+    The second calibrations dialog asks for:
+  </p>
+  
+  <ul>
+    <li>
+      Calibration date:  Date the calibration was performed.
+    </li>
+    
+    <li>
+	Update frequency:  Must be one of the following:
+	<ul>
+	  <li>
+	    as-needed:  No updates are planned, but if a change is needed the calibration will be updated (defaul)t
+	  </li>
+	  <li>
+	    unplanned:  There are no plans to ever update the record.
+	  </li>
+	  <li>
+	    yearly:  A yearly review will be conducted to ensure that the record is valid.
+	  </li>
+	</ul>
+      </li>
+      
+      <li>
+	Technical Person / Data Manager: These two types of data have
+	the same fields and detail who was responsible for the
+	calibration and who is responsible for maintaining the record
+	of the calibration.  In many cases, this may be the same
+	person and copy buttons allow the fields to be duplicated.
+
+	<ul>
+	  <li>
+	    Name:  Responsible party’s naem
+	  </li>
+	  <li>
+	    Organisation:  Organisation to which the party reports
+	  </li>
+	  <li>
+	    Position:  Responsible party’s title
+	  </li>
+	  <li>
+	    Email:  Email contact information 
+	  </li>
+	</ul>
+      </li>
+      
+    </ul>
+
+    <p>
+      Fill in as much information as you can! 
+      If the export is successful, a record will show for each
+      hydrophone (or sensor) in your instrument array in the
+      calibration information table:
+    </p>
+    
+    <div>
+      <img src="./images/calibration_information.png" class=".center"
+	   alt="Panel with information about instrument calibration"/>
+    </div>
+
+
+    <br>
+    <br>
+    <p class="prevLink"><a href="tethys_module.html">Previous: Module overview
+    <p class="nextLink"><a href="deployments.html">Next: Instrument deployments
+    </a></p>
+    <br>
+
+
+</body>
+</html>
