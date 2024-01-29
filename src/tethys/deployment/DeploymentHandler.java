@@ -45,6 +45,9 @@ import dataMap.OfflineDataMapPoint;
 import generalDatabase.DBControlUnit;
 import metadata.MetaDataContol;
 import metadata.PamguardMetaData;
+import nilus.AcousticDataQAType;
+import nilus.AcousticDataQAType.Quality;
+import nilus.AcousticDataQAType.Quality.FrequencyRange;
 import nilus.Audio;
 import nilus.ChannelInfo;
 import nilus.ChannelInfo.DutyCycle;
@@ -403,6 +406,14 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 	 */
 	private void exportOneDeploymnet(ArrayList<RecordingPeriod> selectedDeployments) {
 		// do the lot, whatever ...
+		Float sampleRate = null;
+		AcquisitionControl daq = (AcquisitionControl) PamController.getInstance().findControlledUnit(AcquisitionControl.class, null);
+		if (daq != null) {
+			DaqSystem system = daq.findDaqSystem(null);
+			AcquisitionParameters daqParams = daq.acquisitionParameters;
+			sampleRate = daqParams.sampleRate;
+		}
+		
 		selectedDeployments = getDeploymentOverview().getRecordingPeriods();
 		int freeId = getTethysControl().getDeploymentHandler().getFirstFreeDeploymentId();
 		RecordingPeriod onePeriod = new RecordingPeriod(selectedDeployments.get(0).getRecordStart(), 
@@ -415,11 +426,37 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 		deployment.setCruise(globalMeta.getCruise());
 		deployment.setSite(globalMeta.getSite());
 		if (selectedDeployments.size() > 1) {
-			// now need to remove the 
-			SamplingDetails samplingDetails = deployment.getSamplingDetails();
-			samplingDetails.getChannel().clear();
-			for (int i = 0; i < selectedDeployments.size(); i++) {
-				addSamplingDetails(deployment, selectedDeployments.get(i));
+//			// now need to remove the sampling details - don't though, add invalid periods instead. 
+//			SamplingDetails samplingDetails = deployment.getSamplingDetails();
+//			samplingDetails.getChannel().clear();
+//			for (int i = 0; i < selectedDeployments.size(); i++) {
+//				addSamplingDetails(deployment, selectedDeployments.get(i));
+//			}
+			/*
+			 * Instead, we're putting invalid periods into the QA section. 
+			 */
+			AcousticDataQAType qa = deployment.getQualityAssurance();
+			if (qa == null) {
+				deployment.setQualityAssurance(qa = new AcousticDataQAType());
+			}
+			List<Quality> qualityList = qa.getQuality();
+			for (int i = 1; i < selectedDeployments.size(); i++) {
+				long end = selectedDeployments.get(i-1).getRecordStop();
+				long start = selectedDeployments.get(i).getRecordStart();
+				Quality q = new Quality();
+				q.setStart(TethysTimeFuncs.xmlGregCalFromMillis(end));
+				q.setEnd(TethysTimeFuncs.xmlGregCalFromMillis(start));
+				q.setCategory("unusable");
+				if (sampleRate != null) {
+					FrequencyRange f = q.getFrequencyRange();
+					if (f == null) {
+						q.setFrequencyRange(f = new FrequencyRange());
+					}
+					f.setLowHz(0);
+					f.setHighHz(sampleRate/2);
+				}
+				q.setComment("No data (probably off or out of water)");
+				qualityList.add(q);
 			}
 		}
 		DBXMLConnect dbxmlConnect = getTethysControl().getDbxmlConnect();

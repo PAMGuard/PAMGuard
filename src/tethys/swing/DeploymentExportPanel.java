@@ -100,7 +100,6 @@ public class DeploymentExportPanel extends TethysGUIPanel implements DeploymentT
 		addPair("Set from ", projectDeployments, c);
 		
 		bigExportButton = new JButton("Export selection");
-		tethysControl.getEnabler().addComponent(bigExportButton);
 		bigExportButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -154,6 +153,9 @@ public class DeploymentExportPanel extends TethysGUIPanel implements DeploymentT
 			break;
 		case UPDATEMETADATA:
 			setInternal();
+			break;
+		case UPDATESERVER:
+			enableControls();
 			break;
 		}
 	}
@@ -245,7 +247,7 @@ public class DeploymentExportPanel extends TethysGUIPanel implements DeploymentT
 
 	private void enableControls() {
 		boolean enable = selectedDeployments != null && selectedDeployments.size() > 0;
-		bigExportButton.setEnabled(enable);
+		bigExportButton.setEnabled(getTethysControl().isServerOk() & enable);
 	}
 
 }

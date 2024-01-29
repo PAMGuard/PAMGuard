@@ -100,9 +100,9 @@ public class DeploymentDataCard extends PamWizardCard {
 		/* 
 		 * temp code to only allow export of multiple documents. 
 		 */
-		exportOptions.separateDeployments = true;
-		exportOne.setEnabled(false);
-		exportOne.setToolTipText("Feature not yet enabled");
+//		exportOptions.separateDeployments = true;
+//		exportOne.setEnabled(false);
+//		exportOne.setToolTipText("Feature not yet enabled");
 		
 		
 		exportOne.setSelected(exportOptions.separateDeployments == false);

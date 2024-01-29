@@ -61,7 +61,6 @@ public class DatablockSynchPanel extends TethysGUIPanel {
 		mainPanel.add(BorderLayout.CENTER, scrollPane);
 		PamPanel ctrlPanel = new PamPanel(new BorderLayout());
 		exportButton = new JButton("Export ...");
-		tethysControl.getEnabler().addComponent(exportButton);
 		ctrlPanel.add(BorderLayout.WEST, exportButton);
 		mainPanel.add(BorderLayout.NORTH, ctrlPanel);
 
@@ -148,7 +147,7 @@ public class DatablockSynchPanel extends TethysGUIPanel {
 		if (deployments == null || deployments.size() == 0) {
 			en = false;
 		}
-		exportButton.setEnabled(en);
+		exportButton.setEnabled(getTethysControl().isServerOk() & en);
 	}
 
 	public void showPopup(MouseEvent e, int row) {
@@ -182,6 +181,9 @@ public class DatablockSynchPanel extends TethysGUIPanel {
 //			dataBlockSynchInfo = null;
 //			getSychInfos();
 //			getTethysControl().coun
+			break;
+		case UPDATESERVER:
+			enableExportButton();
 		}
 		
 		synchTableModel.fireTableDataChanged();

@@ -326,6 +326,9 @@ public class PAMGuardDeploymentsTable extends TethysGUIPanel {
 	 * @return
 	 */
 	public ArrayList<RecordingPeriod> getSelectedPeriods() {
+		if (deploymentOverview == null) {
+			return null;
+		}
 		ArrayList<RecordingPeriod> allPeriods = deploymentOverview.getRecordingPeriods();
 		ArrayList<RecordingPeriod> selPeriods = new ArrayList();
 		int n = allPeriods.size();

@@ -53,7 +53,6 @@ import tethys.output.TethysExportParams;
 import tethys.species.ITISFunctions;
 import tethys.species.SpeciesMapManager;
 import tethys.swing.ProjectDeploymentsDialog;
-import tethys.swing.TethysEnabler;
 import tethys.swing.TethysTabPanel;
 import tethys.swing.XMLStringView;
 import tethys.swing.documents.TethysDocumentsFrame;
@@ -92,12 +91,10 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	private CalibrationHandler calibrationHandler;
 	
 	private ITISFunctions itisFunctions;
-	private TethysEnabler tethysEnabler;
 
 	public TethysControl(String unitName) {
 		super(unitType, unitName);
 		stateObservers = new ArrayList();
-		tethysEnabler = new TethysEnabler(this);
 		dbxmlConnect = new DBXMLConnect(this);
 		dbxmlQueries = new DBXMLQueries(this, dbxmlConnect);
 		deploymentHandler = new DeploymentHandler(this);
@@ -494,10 +491,10 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	public ServerStatus checkServer() {
 		ServerStatus serverState = dbxmlConnect.pingServer();
 		if (lastServerStatus == null || lastServerStatus.ok != serverState.ok) {
+			lastServerStatus = serverState; // set before sending notification!
 			sendStateUpdate(new TethysState(StateType.UPDATESERVER));
 		}
-		lastServerStatus = serverState;
-		tethysEnabler.enableControls(serverState.ok);
+//		lastServerStatus = serverState;
 		return serverState;
 	}
 
@@ -704,11 +701,22 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	}
 
 	/**
-	 * Get a utility class that enables / disables controls depending on server state. 
-	 * @return
+	 * @return the lastServerStatus
 	 */
-	public TethysEnabler getEnabler() {
-		return tethysEnabler;
+	public ServerStatus getLastServerStatus() {
+		return lastServerStatus;
+	}
+	
+	/**
+	 * Quick way for any controls to see that the server is probably OK
+	 * without actually pinging it. 
+	 * @return true if last ping of server was OK
+	 */
+	public boolean isServerOk() {
+		if (lastServerStatus == null) {
+			return false;
+		}
+		return lastServerStatus.ok;
 	}
 
 }

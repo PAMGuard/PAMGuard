@@ -15,6 +15,7 @@ import javax.swing.border.TitledBorder;
 
 import PamView.panel.PamPanel;
 import tethys.TethysControl;
+import tethys.TethysState;
 import tethys.deployment.DeploymentHandler;
 import tethys.deployment.RecordingPeriod;
 
@@ -57,7 +58,6 @@ public class DeploymentsPanel extends TethysGUIPanel implements DeploymentTableO
 		ctrlButtons.setLayout(new BoxLayout(ctrlButtons, BoxLayout.X_AXIS));
 		optionsButton = new JButton("Options ...");
 		exportButton = new JButton("Export ...");
-		tethysControl.getEnabler().addComponent(exportButton);
 		ctrlButtons.add(optionsButton);
 		ctrlButtons.add(exportButton);
 		ctrlPanel.add(BorderLayout.WEST, ctrlButtons);
@@ -97,15 +97,23 @@ public class DeploymentsPanel extends TethysGUIPanel implements DeploymentTableO
 	public void selectionChanged() {
 		enableExportButton();
 	}
+	
+	
 
 	private void enableExportButton() {
 		ArrayList<RecordingPeriod> selected = pamDeploymentsTable.getSelectedPeriods();
-		// and see if any warnings are needed: basically if anything selected has an output.
+		if (selected == null) {
+			exportButton.setEnabled(false);
+			return;
+		}
 		boolean existing = false;
-		for (RecordingPeriod aPeriod: selected) {
-			if (aPeriod.getMatchedTethysDeployment() != null) {
-				existing = true;
-				break;
+		if (selected != null) {
+			// and see if any warnings are needed: basically if anything selected has an output.
+			for (RecordingPeriod aPeriod: selected) {
+				if (aPeriod.getMatchedTethysDeployment() != null) {
+					existing = true;
+					break;
+				}
 			}
 		}
 		String warning = null;
@@ -114,7 +122,13 @@ public class DeploymentsPanel extends TethysGUIPanel implements DeploymentTableO
 			exportWarning.setText(warning);
 		}
 
-		exportButton.setEnabled(selected.size()>0 & existing == false);
+		exportButton.setEnabled(selected.size()>0 & existing == false && getTethysControl().isServerOk());
+	}
+
+	@Override
+	public void updateState(TethysState tethysState) {
+		super.updateState(tethysState);
+		enableExportButton();
 	}
 
 
