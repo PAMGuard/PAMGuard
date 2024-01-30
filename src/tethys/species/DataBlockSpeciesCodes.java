@@ -21,7 +21,7 @@ public class DataBlockSpeciesCodes {
 	/**
 	 * Probably only to be used when there are no defined names, but helpful if it's set. 
 	 */
-	private int itisDefault = ITISTypes.UNKNOWN;
+	private int itisDefault = ITISTypes.OTHER;
 	
 	/**
 	 * A default sound type, which can be used for all 'species', but can get 

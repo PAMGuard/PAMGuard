@@ -28,6 +28,7 @@ import nilus.MetadataInfo;
 import nilus.ResponsibleParty;
 import tethys.TethysTimeFuncs;
 import tethys.calibration.CalibrationHandler;
+import tethys.niluswraps.NilusChecker;
 import tethys.swing.export.ResponsiblePartyPanel;
 
 public class CalibrationsContactCard extends CalibrationsCard {
@@ -125,6 +126,11 @@ public class CalibrationsContactCard extends CalibrationsCard {
 		}
 		metaData.setContact(checkRPChildren(metaData.getContact()));
 		dataManager.getParams(metaData.getContact());
+		ResponsibleParty metaContact = metaData.getContact();
+		NilusChecker.removeEmptyFields(metaData);
+		if (metaData.getContact() == null) {
+			return PamDialog.showWarning(getPamWizard(), "Missing data", "The Data Manager fields must be completed");
+		}		
 		
 		metaData.setUpdateFrequency((String) updateInterval.getSelectedItem());
 		metaData.setDate(TethysTimeFuncs.xmlGregCalFromMillis(System.currentTimeMillis()));
@@ -135,6 +141,10 @@ public class CalibrationsContactCard extends CalibrationsCard {
 		}
 		long millis = date.getTime();
 		cardParams.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(millis));
+		
+		
+		checkEmptyFields(rp);
+		checkEmptyFields(metaData);
 		
 		return true;
 	}

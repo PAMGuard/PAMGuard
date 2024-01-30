@@ -22,7 +22,10 @@ import tethys.Collection;
 import tethys.TethysControl;
 import tethys.database.TethysActions;
 import tethys.database.TethysLogger;
+import tethys.niluswraps.NilusChecker;
 import tethys.output.TethysExportParams;
+import tethys.reporter.TethysReport;
+import tethys.reporter.TethysReporter;
 
 /**
  * Class containing functions for managing the database connection. Opening, closing,
@@ -144,6 +147,9 @@ public class DBXMLConnect {
 	 */
 	public boolean postAndLog(Object nilusObject, String documentName) throws TethysException 
 	{	
+		boolean ok = NilusChecker.warnEmptyFields(tethysControl.getGuiFrame(), nilusObject);
+		
+		
 		TethysException e = null;
 		boolean success = false;
 		try {
@@ -207,6 +213,8 @@ public class DBXMLConnect {
 		 */
 		boolean error = importReturn.contains("<Error");
 		boolean success = importReturn.contains("<Success>");
+		String name = tempFile.getName();
+		TethysReporter.getTethysReporter().addReport(new TethysReport(success, collection, name, name));
 //		error = !success; might be a better options. 
 		if (error) {
 			throw new TethysException("Error posting to Tethys", importReturn);

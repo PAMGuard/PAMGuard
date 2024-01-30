@@ -54,6 +54,8 @@
 
 <mapID target="classifiers.whistleClassifierHelp.docs.whistleClassifier_Output" url="classifiers/whistleClassifierHelp/docs/whistleClassifier_Output.html"/>
 
+<mapID target="utilities.tethys.docs.calibrations" url="utilities/tethys/docs/calibrations.html"/>
+
 <mapID target="utilities.hydrophoneArrayManagerHelp.docs.Array_Configuration_sec1" url="utilities/hydrophoneArrayManagerHelp/docs/Array_Configuration.html#sec1"/>
 
 <mapID target="sound_processing.fftManagerHelp.docs.noise_removal_medianfilter" url="sound_processing/fftManagerHelp/docs/noise_removal.html#medianfilter"/>
@@ -138,6 +140,8 @@
 
 <mapID target="sound_processing.NoiseBands.Docs.NoiseBands" url="sound_processing/NoiseBands/Docs/NoiseBands.html"/>
 
+<mapID target="utilities.tethys.docs.detect_localize" url="utilities/tethys/docs/detect_localize.html"/>
+
 <mapID target="visual_methods.videoRangeHelp.docs.videoRange_Calibrating" url="visual_methods/videoRangeHelp/docs/videoRange_Calibrating.html"/>
 
 <mapID target="detectors.gpl.docs.detection" url="detectors/gpl/docs/detection.html"/>
@@ -197,6 +201,8 @@
 <mapID target="classifiers.roccaHelp.docs.rocca_Spectrogram" url="classifiers/roccaHelp/docs/rocca_Spectrogram.html"/>
 
 <mapID target="displays.userDisplayHelp.docs.userDisplayPanel" url="displays/userDisplayHelp/docs/userDisplayPanel.html"/>
+
+<mapID target="utilities.tethys.docs.tethys_speciescodes_TSNLookup" url="utilities/tethys/docs/tethys_speciescodes.html#TSNLookup"/>
 
 <mapID target="classifiers.roccaHelp.docs.rocca_Configure_SchoolStats" url="classifiers/roccaHelp/docs/rocca_Configure.html#SchoolStats"/>
 
@@ -276,8 +282,6 @@
 
 <mapID target="detectors.clickDetectorHelp.docs.offline_Tools_AmplSel" url="detectors/clickDetectorHelp/docs/offline_Tools.html#AmplSel"/>
 
-<mapID target="utilities.tethys.docs.tethys_quickstart" url="utilities/tethys/docs/tethys_quickstart.html"/>
-
 <mapID target="displays.spectrogramDisplayHelp.docs.UserDisplay_Spectrogram_Overlays" url="displays/spectrogramDisplayHelp/docs/UserDisplay_Spectrogram_Overlays.html"/>
 
 <mapID target="displays.radarDisplayHelp.docs.UserDisplay_Radar_Creating" url="displays/radarDisplayHelp/docs/UserDisplay_Radar_Creating.html"/>
@@ -289,6 +293,8 @@
 <mapID target="classifiers.whistleClassifierHelp.docs.whistleClassifier_Training" url="classifiers/whistleClassifierHelp/docs/whistleClassifier_Training.html"/>
 
 <mapID target="classifiers.roccaHelp.docs.rocca_Spectrogram_rocca_RecalcContour" url="classifiers/roccaHelp/docs/rocca_Spectrogram.html#rocca_RecalcContour"/>
+
+<mapID target="utilities.tethys.docs.tethys_speciescodes" url="utilities/tethys/docs/tethys_speciescodes.html"/>
 
 <mapID target="overview.PamMasterHelp.docs.performanceTests" url="overview/PamMasterHelp/docs/performanceTests.html"/>
 
@@ -388,6 +394,8 @@
 
 <mapID target="localisation.group3d.docs.3dsimplex" url="localisation/group3d/docs/3dsimplex.html"/>
 
+<mapID target="utilities.tethys.docs.connection" url="utilities/tethys/docs/connection.html"/>
+
 <mapID target="visual_methods.loggerFormsHelp.docs.NOCLEAR" url="visual_methods/loggerFormsHelp/docs/NOCLEAR.html"/>
 
 <mapID target="sound_processing.beamformer.docs.Beamformer_Settings_BF_SourceTab" url="sound_processing/beamformer/docs/Beamformer_Settings.html#BF_SourceTab"/>
@@ -455,6 +463,8 @@
 <mapID target="sound_processing.soundPlaybackHelp.docs.soundPlayback_Control" url="sound_processing/soundPlaybackHelp/docs/soundPlayback_Control.html"/>
 
 <mapID target="sound_processing.seismicveto.docs.veto_configuration" url="sound_processing/seismicveto/docs/veto_configuration.html"/>
+
+<mapID target="utilities.tethys.docs.deployments" url="utilities/tethys/docs/deployments.html"/>
 
 <mapID target="detectors.whistleMoanHelp.docs.whistleMoan_ConfigNoise_averagesubtraction" url="detectors/whistleMoanHelp/docs/whistleMoan_ConfigNoise.html#averagesubtraction"/>
 
@@ -591,6 +601,8 @@
 <mapID target="localisation.group3d.docs.3doutput" url="localisation/group3d/docs/3doutput.html"/>
 
 <mapID target="detectors.gpl.docs.notes" url="detectors/gpl/docs/notes.html"/>
+
+<mapID target="utilities.tethys.docs.tethys_module" url="utilities/tethys/docs/tethys_module.html"/>
 
 <mapID target="sound_processing.fftManagerHelp.docs.FFTEngine_Creating" url="sound_processing/fftManagerHelp/docs/FFTEngine_Creating.html"/>
 

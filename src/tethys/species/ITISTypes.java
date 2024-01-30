@@ -7,12 +7,12 @@ package tethys.species;
  */
 public class ITISTypes {
 
-	public static final int UNKNOWN = 0;
+	public static final int OTHER = 0;
 	public static final int ANTHROPOGENIC = 1;
 	
 	public static final String getName(int code) {
 		switch (code) {
-		case UNKNOWN:
+		case OTHER:
 			return "Unknown";
 		case ANTHROPOGENIC:
 			return "Anthropogenic";

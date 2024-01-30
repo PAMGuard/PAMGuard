@@ -198,9 +198,19 @@
   <tocitem text="Tethys Interface ">
    <tocitem text="Tethys Overview " target="utilities.tethys.docs.tethys_overview" image="topic"/>
 
-   <tocitem text="Quick Start " target="utilities.tethys.docs.tethys_quickstart" image="topic"/>
+   <tocitem text="Tethys Module " target="utilities.tethys.docs.tethys_module" image="topic"/>
 
    <tocitem text="Tethys Server " target="utilities.tethys.docs.tethys_server" image="topic"/>
+
+   <tocitem text="Connecting to Tethys " target="utilities.tethys.docs.connection" image="topic"/>
+
+   <tocitem text="Instrument Calibrations " target="utilities.tethys.docs.calibrations" image="topic"/>
+
+   <tocitem text="Instrument Deployments " target="utilities.tethys.docs.deployments" image="topic"/>
+
+   <tocitem text="Detections and Localizations " target="utilities.tethys.docs.detect_localize" image="topic"/>
+
+   <tocitem text="ITIS Species Codes " target="utilities.tethys.docs.tethys_speciescodes" image="topic"/>
 
   </tocitem>
  </tocitem>

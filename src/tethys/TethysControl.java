@@ -491,9 +491,10 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	public ServerStatus checkServer() {
 		ServerStatus serverState = dbxmlConnect.pingServer();
 		if (lastServerStatus == null || lastServerStatus.ok != serverState.ok) {
+			lastServerStatus = serverState; // set before sending notification!
 			sendStateUpdate(new TethysState(StateType.UPDATESERVER));
 		}
-		lastServerStatus = serverState;
+//		lastServerStatus = serverState;
 		return serverState;
 	}
 
@@ -699,5 +700,23 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		return calibrationHandler;
 	}
 
+	/**
+	 * @return the lastServerStatus
+	 */
+	public ServerStatus getLastServerStatus() {
+		return lastServerStatus;
+	}
+	
+	/**
+	 * Quick way for any controls to see that the server is probably OK
+	 * without actually pinging it. 
+	 * @return true if last ping of server was OK
+	 */
+	public boolean isServerOk() {
+		if (lastServerStatus == null) {
+			return false;
+		}
+		return lastServerStatus.ok;
+	}
 
 }

@@ -154,6 +154,9 @@ public class DeploymentExportPanel extends TethysGUIPanel implements DeploymentT
 		case UPDATEMETADATA:
 			setInternal();
 			break;
+		case UPDATESERVER:
+			enableControls();
+			break;
 		}
 	}
 
@@ -244,7 +247,7 @@ public class DeploymentExportPanel extends TethysGUIPanel implements DeploymentT
 
 	private void enableControls() {
 		boolean enable = selectedDeployments != null && selectedDeployments.size() > 0;
-		bigExportButton.setEnabled(enable);
+		bigExportButton.setEnabled(getTethysControl().isServerOk() & enable);
 	}
 
 }
