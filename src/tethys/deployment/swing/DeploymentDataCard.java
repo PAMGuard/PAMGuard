@@ -39,10 +39,11 @@ public class DeploymentDataCard extends PamWizardCard {
 		this.tethysControl = tethysControl;
 		deploymentHandler = tethysControl.getDeploymentHandler();
 		ButtonGroup bg = new ButtonGroup();
-		exportOne = new JRadioButton("Export a single detection document for all data");
-		exportMany = new JRadioButton("Export separate documents for each ad-hoc recording period");
+		exportOne = new JRadioButton("Export a single deployment document for all data");
+		exportMany = new JRadioButton("Export separate deployment documents for each ad-hoc recording period");
 		bg.add(exportOne);
 		bg.add(exportMany);
+		
 		
 		JPanel optsPanel = new JPanel(new GridBagLayout());
 		optsPanel.setBorder(new TitledBorder("Number of documents"));
@@ -95,6 +96,15 @@ public class DeploymentDataCard extends PamWizardCard {
 	}
 
 	public void setParams(DeploymentExportOpts exportOptions, Deployment deployment) {
+
+		/* 
+		 * temp code to only allow export of multiple documents. 
+		 */
+//		exportOptions.separateDeployments = true;
+//		exportOne.setEnabled(false);
+//		exportOne.setToolTipText("Feature not yet enabled");
+		
+		
 		exportOne.setSelected(exportOptions.separateDeployments == false);
 		exportMany.setSelected(exportOptions.separateDeployments == true);
 		setParams(deployment);

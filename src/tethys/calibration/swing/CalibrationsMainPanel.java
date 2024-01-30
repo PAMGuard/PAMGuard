@@ -13,6 +13,7 @@ import javax.swing.border.TitledBorder;
 
 import PamView.panel.PamPanel;
 import tethys.TethysControl;
+import tethys.TethysState;
 import tethys.calibration.CalibrationHandler;
 import tethys.swing.TethysGUIPanel;
 
@@ -61,6 +62,16 @@ public class CalibrationsMainPanel extends TethysGUIPanel {
 	@Override
 	public JComponent getComponent() {
 		return mainPanel;
+	}
+
+	@Override
+	public void updateState(TethysState tethysState) {
+		super.updateState(tethysState);
+		enableControls();
+	}
+
+	private void enableControls() {
+		exportButton.setEnabled(getTethysControl().isServerOk());
 	}
 
 }
