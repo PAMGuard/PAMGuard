@@ -14,6 +14,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import org.codehaus.plexus.util.FileUtils;
 import Acquisition.offlineFuncs.AquisitionLoadPoint;
 import PamDetection.RawDataUnit;
+import PamguardMVC.PamConstants;
 //import PamUtils.CPUMonitor;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
@@ -47,6 +48,8 @@ public class WavAudioFile implements PamAudioFileLoader {
 	 * Get the file extensions associated with loading these data. 
 	 */
 	protected ArrayList<String> fileExtensions; 
+	
+	private double[] channelBackground = new double[PamConstants.MAX_CHANNELS];
 
 	public WavAudioFile() {
 		fileExtensions = new ArrayList<String>(Arrays.asList(new String[]{".wav", ".aif", ".aiff"})); 
@@ -190,6 +193,9 @@ public class WavAudioFile implements PamAudioFileLoader {
 
 				newDataUnit = new RawDataUnit(ms, 1 << ichan, totalSamples, newSamples);
 				newDataUnit.setFileSamples(totalSamples + skipped / frameSize); //set the number samples into the wav file. 
+				
+				removeDCComponent(doubleData[ichan], ichan, audioFormat);
+				
 				newDataUnit.setRawData(doubleData[ichan], true);
 
 				//System.out.println("New wav data: " + PamCalendar.formatDateTime(newDataUnit.getTimeMilliseconds()));
@@ -210,6 +216,26 @@ public class WavAudioFile implements PamAudioFileLoader {
 		return false;
 	}
 
+
+	private void removeDCComponent(double[] ds, int channel, AudioFormat audioFormat) {
+		/*
+		 *  do a simple background subtraction with about a 1s time constant. 
+		 *  If the background is currently zero initialise it to the mean data value.  
+		 */
+		double alpha = 1./audioFormat.getSampleRate();
+		double alpha_1 = 1.-alpha;
+		double bg = channelBackground[channel];
+		if (bg == 0.) {
+			for (int i = 0; i < ds.length; i++) {
+				bg += ds[i];
+			}
+			bg /= ds.length;
+		}
+		for (int i = 0; i < ds.length; i++) {
+			ds[i] -= bg;
+			bg = bg*alpha_1 + ds[i]*alpha;
+		}
+	}
 
 	/**
 	 * Open a sound file. 

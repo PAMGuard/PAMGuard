@@ -228,6 +228,7 @@ public abstract class FileListWorker<T extends File> implements PamWorkWrapper<F
 	@Override
 	public final void taskFinished(FileListData<T> result) {
 		oldFileList = result;
+		sortFiles(result);
 		fileListUser.newFileList(result);
 	}
 
