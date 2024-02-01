@@ -1,4 +1,4 @@
-package test.java.rawDeepLearningClassifier;
+package test.rawDeepLearningClassifier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -18,11 +18,14 @@ import rawDeepLearningClassifier.dlClassification.genericModel.GenericModelParse
 class DLJSONParserTest {
 
 	@Test
-	void test() {
+	public void test() {
+		
 		
 		//load an old file 
 		String relJSONpath = 	"./src/test/resources/rawDeepLearningClassifier/Generic/right_whale/legacy_format/right_whale_DL_settings.pdtf";
 		
+		System.out.println("Path: " + relJSONpath);
+
 		Path path = Paths.get(relJSONpath);
 		
 		GenericModelParams genericParmas = new GenericModelParams(); 

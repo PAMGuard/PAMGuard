@@ -82,7 +82,7 @@ public class HydrophonesPane extends PamBorderPane {
 		tableArrayPane.setPadding(new Insets(5,5,5,5));
 
 		pamFlipePane = new PamFlipPane(); 
-		pamFlipePane.getAdvLabel().setText("Hydrophone Settings");
+		pamFlipePane.getAdvLabel().setText(PamController.getInstance().getGlobalMediumManager().getRecieverString());
 		//			pamFlipePane.minWidthProperty().bind(this.widthProperty());
 		//			pamFlipePane.setStyle("-fx-background-color: green;");
 

@@ -14,6 +14,7 @@ import javafx.event.EventHandler;
 import javafx.scene.AmbientLight;
 import javafx.scene.DepthTest;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.SubScene;
@@ -23,7 +24,7 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
-
+import javafx.scene.shape.Shape3D;
 import javafx.scene.shape.Sphere;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
@@ -57,7 +58,7 @@ public class Array3DPane extends PamBorderPane {
 
 	public static final Color DEFAULT_HYDRO_COL = Color.RED;
 
-//	private static final Color DEFAULT_SENSOR_COL = Color.LIMEGREEN;
+	//	private static final Color DEFAULT_SENSOR_COL = Color.LIMEGREEN;
 
 	private double scaleFactor=20; 
 
@@ -97,11 +98,27 @@ public class Array3DPane extends PamBorderPane {
 	 *  The size of the hydrophone for the 3D display. 
 	 */
 	private double hydrophoneSize = 0.5;
-	
+
 	/**
 	 * Holds a list of hydrophone spheres
 	 */
 	private ArrayList<HydrophoneSphere> hydrophonesSpheres = new ArrayList<HydrophoneSphere>();
+
+	/**
+	 * Allow rotation
+	 */
+	private boolean allowRotate = true;
+
+	private Text xText;
+
+	private Text yText;
+
+	private Text zText;
+
+	private Box yAxis;
+
+	private Shape3D ySphere;
+
 
 	public Array3DPane(){
 
@@ -109,11 +126,11 @@ public class Array3DPane extends PamBorderPane {
 		PerspectiveCamera camera = new PerspectiveCamera(true);
 		camera.setFarClip(20000);
 		camera.setNearClip(0.1);
-		camera.setDepthTest(DepthTest.ENABLE);
+//		camera.setDepthTest(DepthTest.ENABLE);
 		camera.getTransforms().addAll (
 				rotateY=new Rotate(-45, Rotate.Y_AXIS),
 				rotateX=new Rotate(-45, Rotate.X_AXIS),
-				translate=new Translate(0, 200, -2000));
+				translate=new Translate(0, 0, -2000));
 
 		//create main 3D group 
 		root3D=new Group();
@@ -136,33 +153,33 @@ public class Array3DPane extends PamBorderPane {
 		subScene.widthProperty().bind(this.widthProperty());
 		subScene.heightProperty().bind(this.heightProperty());
 		subScene.setDepthTest(DepthTest.ENABLE);
-		
-		subScene.setOnMouseClicked((MouseEvent me) -> {
-	            mousePosX = me.getSceneX();
-	            mousePosY = me.getSceneY();
-	            PickResult pr = me.getPickResult();
-//            	System.out.println("Picked something sphere: " + pr); 
 
-	           	//clear selected radius
-            	for (HydrophoneSphere sphere : hydrophonesSpheres) {
-            		sphere.setRadius(hydrophoneSize*scaleFactor);
-            	}
-            	
-	            if(pr!=null && pr.getIntersectedNode() != null && pr.getIntersectedNode() instanceof Sphere){
-	            	
-	            	//make the selected sphere slightly larger
-	            	HydrophoneSphere  s = (HydrophoneSphere) pr.getIntersectedNode();
-	            	s.setRadius(hydrophoneSize*scaleFactor*1.2);
-	            	
-	            	hydrophoneSelected(s.getHydrophone());
-	            	
-//	            	System.out.println("Picked a sphere: " + pr); 
-//	                distance=pr.getIntersectedDistance();
-//	                s = (Sphere) pr.getIntersectedNode();
-//	                isPicking=true;
-//	                vecIni = unProjectDirection(mousePosX, mousePosY, scene.getWidth(),scene.getHeight());
-	            }
-	        });
+		subScene.setOnMouseClicked((MouseEvent me) -> {
+			mousePosX = me.getSceneX();
+			mousePosY = me.getSceneY();
+			PickResult pr = me.getPickResult();
+			//            	System.out.println("Picked something sphere: " + pr); 
+
+			//clear selected radius
+			for (HydrophoneSphere sphere : hydrophonesSpheres) {
+				sphere.setRadius(hydrophoneSize*scaleFactor);
+			}
+
+			if(pr!=null && pr.getIntersectedNode() != null && pr.getIntersectedNode() instanceof Sphere){
+
+				//make the selected sphere slightly larger
+				HydrophoneSphere  s = (HydrophoneSphere) pr.getIntersectedNode();
+				s.setRadius(hydrophoneSize*scaleFactor*1.2);
+
+				hydrophoneSelected(s.getHydrophone());
+
+				//	            	System.out.println("Picked a sphere: " + pr); 
+				//	                distance=pr.getIntersectedDistance();
+				//	                s = (Sphere) pr.getIntersectedNode();
+				//	                isPicking=true;
+				//	                vecIni = unProjectDirection(mousePosX, mousePosY, scene.getWidth(),scene.getHeight());
+			}
+		});
 
 		//note the fill is actually quite important because if you don't have it mouse rotations etc
 		//onyl work if you select a 3D shape
@@ -172,7 +189,7 @@ public class Array3DPane extends PamBorderPane {
 		//handle mouse events for sub scene
 		handleMouse(subScene); 
 
-
+		 resetView();
 
 		//create new group to add sub scene to 
 		Group group = new Group();
@@ -208,7 +225,7 @@ public class Array3DPane extends PamBorderPane {
 	 * Create a 3D axis. 
 	 * @param- size of the axis
 	 */
-	public static Group buildAxes(double axisSize, Color xAxisDiffuse, Color xAxisSpectacular,
+	public Group buildAxes(double axisSize, Color xAxisDiffuse, Color xAxisSpectacular,
 			Color yAxisDiffuse, Color yAxisSpectacular,
 			Color zAxisDiffuse, Color zAxisSpectacular,
 			Color textColour) {
@@ -230,18 +247,18 @@ public class Array3DPane extends PamBorderPane {
 		blueMaterial.setDiffuseColor(zAxisDiffuse);
 		blueMaterial.setSpecularColor(zAxisSpectacular);
 
-		Text xText=new Text("x"); 
-		xText.setStyle("-fx-font: 20px Tahoma;");
+		xText=new Text("x"); 
+		xText.setStyle("-fx-font: 20px Tahoma; -fx-fill: white;");
 		xText.setFill(textColour);
 		xText.setStroke(textColour);
 
-		Text yText=new Text("z"); 
-		yText.setStyle("-fx-font: 20px Tahoma; ");
+		yText=new Text("z"); 
+		yText.setStyle("-fx-font: 20px Tahoma; -fx-fill: white;");
 		yText.setFill(textColour);
 		yText.setStroke(textColour);
 
-		Text zText=new Text("y"); 
-		zText.setStyle("-fx-font: 20px Tahoma; ");
+		zText=new Text("y"); 
+		zText.setStyle("-fx-font: 20px Tahoma; -fx-fill: white;");
 		zText.setFill(textColour);
 		zText.setStroke(textColour);
 
@@ -254,7 +271,7 @@ public class Array3DPane extends PamBorderPane {
 		zText.setTranslateZ(axisSize+5);
 
 		Sphere xSphere = new Sphere(radius);
-		Sphere ySphere = new Sphere(radius);
+		 ySphere = new Sphere(radius);
 		Sphere zSphere = new Sphere(radius);
 		xSphere.setMaterial(redMaterial);
 		ySphere.setMaterial(greenMaterial);
@@ -265,7 +282,7 @@ public class Array3DPane extends PamBorderPane {
 		zSphere.setTranslateZ(axisSize);
 
 		Box xAxis = new Box(length, width, width);
-		Box yAxis = new Box(width, length, width);
+		yAxis = new Box(width, length, width);
 		Box zAxis = new Box(width, width, length);
 		xAxis.setMaterial(redMaterial);
 		yAxis.setMaterial(greenMaterial);
@@ -302,6 +319,7 @@ public class Array3DPane extends PamBorderPane {
 
 		scene.setOnMouseDragged(new EventHandler<MouseEvent>() {
 
+
 			@Override
 			public void handle(MouseEvent me) {
 				mouseOldX = mousePosX;
@@ -320,9 +338,11 @@ public class Array3DPane extends PamBorderPane {
 				if (me.isShiftDown()) {
 					modifier = 10.0;
 				}
-				if (me.isPrimaryButtonDown()) {
+				if (me.isPrimaryButtonDown() && allowRotate) {
 					rotateY.setAngle(rotateY.getAngle() + mouseDeltaX * modifierFactor * modifier * 2.0);  // +
 					rotateX.setAngle(rotateX.getAngle() - mouseDeltaY * modifierFactor * modifier * 2.0);  // -
+					
+//					System.out.println("Rotation: x: " + rotateX.getAngle() +  " y: " + rotateY.getAngle());
 				}
 				if (me.isSecondaryButtonDown()) {
 					translate.setX(translate.getX() -mouseDeltaX * modifierFactor * modifier * 5);
@@ -340,7 +360,7 @@ public class Array3DPane extends PamBorderPane {
 	 */
 	public void drawArray(PamArray array) {
 
-//		System.out.println("DRAW ARRAY: " + array); 
+		//		System.out.println("DRAW ARRAY: " + array); 
 
 		//clear the array
 		arrayGroup.getChildren().removeAll(arrayGroup.getChildren()); 
@@ -352,13 +372,13 @@ public class Array3DPane extends PamBorderPane {
 		Streamer streamer;
 		hydrophonesSpheres.clear();
 		for (int i=0; i<hydrophones.size(); i++){
-			
+
 			//get the streamer for the hydrophone
 			streamer = array.getStreamer(hydrophones.get(i).getStreamerId());
 
-			double x  = hydrophones.get(i).getX() + hydrophones.get(i).getStreamerId();
-			double y  = hydrophones.get(i).getY() + hydrophones.get(i).getStreamerId();
-			double z  = hydrophones.get(i).getZ() + hydrophones.get(i).getStreamerId();
+			double x  = (hydrophones.get(i).getX() +	streamer.getCoordinate(0));
+			double y  = (hydrophones.get(i).getY() + streamer.getCoordinate(1));
+			double z  = -(hydrophones.get(i).getZ() + streamer.getCoordinate(2));
 
 			sphere=new HydrophoneSphere(hydrophoneSize*scaleFactor);
 			sphere.setTranslateX(x*scaleFactor);
@@ -373,21 +393,21 @@ public class Array3DPane extends PamBorderPane {
 			sphere.setMaterial(aMaterial);
 			sphere.setHydrophone(hydrophones.get(i));
 
-//			System.out.println("Add hydrophone: " + x + " " + y + " " +z); 
+			//			System.out.println("Add hydrophone: " + x + " " + y + " " +z); 
 
 			hydrophonesSpheres.add(sphere);
 			arrayGroup.getChildren().add(sphere);
-			
+
 			ArrayList<Point3D> streamerPoints=new ArrayList<Point3D>(); 
 			//now plot a line from the streamer to the hydrophone
 			Point3D newPoint;
-			
+
 			newPoint=new Point3D(x*scaleFactor, z*scaleFactor, y*scaleFactor);
 			streamerPoints.add(newPoint);
-			
-			newPoint =new Point3D(streamer.getCoordinate(0)*scaleFactor, streamer.getCoordinate(2)*scaleFactor,  streamer.getCoordinate(1)*scaleFactor);
+
+			newPoint =new Point3D(streamer.getCoordinate(0)*scaleFactor, -streamer.getCoordinate(2)*scaleFactor,  streamer.getCoordinate(1)*scaleFactor);
 			streamerPoints.add(newPoint);
-			
+
 			System.out.println("Streamer points: " + streamerPoints.size()); 
 
 			PolyLine3D polyLine3D=new PolyLine3D(streamerPoints, 4f, Color.DODGERBLUE); 
@@ -397,13 +417,13 @@ public class Array3DPane extends PamBorderPane {
 
 
 	private class HydrophoneSphere extends Sphere {
-		
+
 		Hydrophone hydrophone; 
-		
+
 		public Hydrophone getHydrophone() {
 			return hydrophone;
 		}
-		
+
 
 
 		public void setHydrophone(Hydrophone hydrophone) {
@@ -413,13 +433,67 @@ public class Array3DPane extends PamBorderPane {
 		public HydrophoneSphere() {
 			super();
 		}
-		
+
 		public HydrophoneSphere(double radius) {
 			super(radius);
 		}
-		
+
 	}
-	
+
+	/**
+	 * Sets the pane to show hydrophones in 2D or 3D.
+	 * @param set3D - true to set to 3D
+	 */
+	public void set3D(boolean set3D) {
+		
+		double textRotation =0; 
+
+		if (set3D) {
+			allowRotate=true;
+			xText.setRotate(0);
+			rotateY.setAngle(-45);
+			rotateX.setAngle(-45);
+		}
+		else {
+			allowRotate=false;
+			rotateY.setAngle(0);  
+			rotateX.setAngle(270); 
+			textRotation=-90;
+		}
+		
+		//confusing because the yaxis is the z axis in JavaFX...
+		yText.setVisible(set3D);
+		yAxis.setVisible(set3D);
+		ySphere.setVisible(set3D);
+
+		
+		xText.setRotate(textRotation);
+		xText.setRotationAxis(new javafx.geometry.Point3D(1,0,0));
+
+		yText.setRotationAxis(new javafx.geometry.Point3D(1,0,0));
+		yText.setRotate(textRotation);
+		
+		zText.setRotationAxis(new javafx.geometry.Point3D(1,0,0));
+		zText.setRotate(textRotation);
+
+
+	}
+
+	/**
+	 * Reset to the defulat view. 
+	 */
+	public void resetView() {
+		
+		translate.setX(0);
+		translate.setY(0);  
+		translate.setZ( -2000);  
+
+		if (allowRotate) {
+			rotateY.setAngle(-45);
+			rotateX.setAngle(-45);
+		}
+	}
+
 	//	/**
 	//	 * Draw the entire array 
 	//	 * @param pos - hydrophone and streamer positions in the same co-ordinate frame as the reference frame. 

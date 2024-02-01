@@ -1,11 +1,10 @@
-package test.java.rawDeepLearningClassifier;
+package test.rawDeepLearningClassifier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dlClassification.ketos.KetosClassifier;
 
 import org.junit.jupiter.api.Test;
-
 
 public class KetosClassifierTest {
 	
@@ -63,6 +62,6 @@ public class KetosClassifierTest {
 	public void ketosProcessTest() {
 		 System.out.println("hello unit test complete"); 
 
-        assertEquals(2, 1+1);
+        assertEquals(2, 2);
 	}
 }

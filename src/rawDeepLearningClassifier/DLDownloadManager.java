@@ -153,6 +153,8 @@ public class DLDownloadManager {
 						
 						System.out.println("DOWNLOADED MODEL: " + file.getPath() );
 
+						notifyDownLoadListeners(DLStatus.DECOMPRESSING_MODEL, -1);
+
 						file = decompressFile(file);
 
 						if (file.isDirectory()) {
@@ -373,7 +375,7 @@ public class DLDownloadManager {
         Files.copy(input, outFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         
 		while ((n = input.read(buffer)) != -1) {
-//			System.out.println("Chunk: " + n); 
+			System.out.println("Chunk: " + count); 
 			count=count+n; //total bytes
 			notifyDownLoadListeners(DLStatus.DOWNLOADING, count);
 			output.write( buffer, 0, n );
@@ -421,6 +423,11 @@ public class DLDownloadManager {
 		System.out.println("Test downloading a model: "); 
 
 		URI path = dlDefaultModelManager.downloadModel(new RightWhaleModel1().getModelURI(), new RightWhaleModel1().getModelName()); 	
+	}
+
+	public void clearDownloadListeners() {
+		this.downLoadListeners.clear();
+		
 	}
 
 }

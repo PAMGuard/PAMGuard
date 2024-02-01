@@ -64,7 +64,8 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 	/**
 	 * The extension filter. Holds the types of files that can be imported. 
 	 */
-	private ExtensionFilter extensionFilter;
+	private FileChooser.ExtensionFilter extensionFilterCPOD;
+//	private FileChooser.ExtensionFilter extensionFilterFPOD;
 
 
 	/**
@@ -110,6 +111,10 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 		super(null);
 		this.cpodControl = cpodControl2;
 
+		
+		//define the types of files to be imported ("Note:  add FP1 and FP3 here)
+		extensionFilterCPOD = new ExtensionFilter("CPOD file", "*.cp1", "*.cp3", "*.fp1", "*.fp3"); 
+		
 		//file chooser
 		fileChooser = new FileChooser(); 
 		fileChooser.getExtensionFilters().addAll(getExtensionFilters()); 
@@ -117,8 +122,6 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 		//folder chooser
 		folderChooser = new DirectoryChooser(); 
 
-		//define the types of files to be imported ("Note:  add FP1 and FP3 here)
-		extensionFilter = new ExtensionFilter("CPOD file", "*.cp1", "*.cp3"); 
 
 
 		pathLabel = new TextField("No classifier file selected"); 
@@ -130,7 +133,7 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 		//		PamButton browsFileButton = new PamButton("", PamGlyphDude.createPamGlyph(MaterialDesignIcon.FILE_MULTIPLE, PamGuiManagerFX.iconSize)); 
 		PamButton browsFileButton = new PamButton("", PamGlyphDude.createPamIcon("mdi2f-file-multiple", PamGuiManagerFX.iconSize)); 
 		browsFileButton.setMinWidth(30);
-		browsFileButton.setTooltip(new Tooltip("Browse to select a CP1 or CP3 file"));
+		browsFileButton.setTooltip(new Tooltip("Browse to select individual or mutliple CP1 or CP3 files or FP1 or FP3 files"));
 		browsFileButton.setOnAction((action)->{
 
 			List<File> files = fileChooser.showOpenMultipleDialog(this.getFXWindow());
@@ -145,7 +148,7 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 		//		PamButton browsFolderButton = new PamButton("", PamGlyphDude.createPamGlyph(MaterialDesignIcon.FOLDER, PamGuiManagerFX.iconSize)); 
 		PamButton browsFolderButton = new PamButton("", PamGlyphDude.createPamIcon("mdi2f-folder", PamGuiManagerFX.iconSize)); 
 		browsFolderButton.setMinWidth(30);
-		browsFolderButton.setTooltip(new Tooltip("Browse to a folder containg CP1 and CP3 files"));
+		browsFolderButton.setTooltip(new Tooltip("Browse to a folder contaning CP1 and CP3 or FP1 and FP3 files"));
 		browsFolderButton.setOnAction((action)->{
 
 			File file = folderChooser.showDialog(this.getFXWindow());
@@ -168,7 +171,7 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 		pathLabel.setMaxWidth(Double.MAX_VALUE);
 		pathLabel.prefHeightProperty().bind(browsFolderButton.heightProperty());
 
-		filesPane.getChildren().addAll(pathLabel, browsFolderButton); 
+		filesPane.getChildren().addAll(pathLabel, browsFileButton, browsFolderButton); 
 
 		//time offset pane. 
 		startOffset = new PamSpinner<Double>(); 
@@ -296,7 +299,8 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 		System.out.println("Import CPOD data: " + files.size());
 
 		//begins the import
-		this.tasks = this.cpodControl.getCpodImporter().importCPODData(files);
+//		this.tasks = this.cpodControl.getCpodImporter().importCPODData(files);
+		this.tasks = this.cpodControl.importPODData(files);
 
 		if (tasks ==null) return false; 
 
@@ -428,8 +432,13 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 	 * new ExtensionFilter("Pytorch Model", "*.pk")
 	 * @return a list of extension fitlers for the file dialog. 
 	 */
-	public ExtensionFilter getExtensionFilters(){
-		return extensionFilter;
+	public ArrayList<FileChooser.ExtensionFilter> getExtensionFilters(){
+		ArrayList<FileChooser.ExtensionFilter> filters = new ArrayList<FileChooser.ExtensionFilter>();
+		filters.add(extensionFilterCPOD); 
+		//don't add an exstra filter - just have all as one - otherwise the user has to change the 
+		//file dialog to FPODs to get it to work. 
+//		filters.add(extensionFilterFPOD); 
+		return filters;
 	}
 
 

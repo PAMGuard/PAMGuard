@@ -1,5 +1,6 @@
 package rawDeepLearningClassifier.defaultModels;
 
+import java.io.Serializable;
 import java.net.URI;
 
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
@@ -32,11 +33,7 @@ public interface DLModel {
 	 * @return the model URI. 
 	 */
 	public URI getModelURI();
-	
-	/**
-	 * Get the model settings - these are used to ensure the model is set up correctly once loaded.  
-	 */
-	public StandardModelParams getModelSettings(); 
+
 	
 	/**
 	 * The model name. This is used if, for example, a model is downloaded as a zip file and the model
@@ -44,6 +41,18 @@ public interface DLModel {
 	 * @return the model name; 
 	 */
 	public String getModelName();
+
+	/**
+	 * Get the link to the paper for the model
+	 * @return the citation link. 
+	 */
+	public URI getCitationLink();
+
+	/**
+	 * Set the model settings once it has loaded. 
+	 * @param dlModelSettings - the model settings. 
+	 */
+	public void setParams(Serializable dlModelSettings);
 	
 	
 

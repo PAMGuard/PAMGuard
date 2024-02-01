@@ -180,16 +180,6 @@ public class GenericDLClassifier extends StandardClassifierModel {
 		this.genericModelParams=(GenericModelParams) clone;	
 	}
 
-
-
-
-	@Override
-	public boolean checkModelOK() {
-		return genericModelWorker.getModel()!=null;
-	}
-
-
-	
 	/**
 	 * Send a new result form the thread queue to the process. 
 	 * @param modelResult - the model result;
@@ -230,10 +220,10 @@ public class GenericDLClassifier extends StandardClassifierModel {
 	}
 
 
-	@Override
-	public ArrayList<PamWarning> checkSettingsOK() {
-		return checkSettingsOK(genericModelParams, dlControl);
-	}
+//	@Override
+//	public ArrayList<PamWarning> checkSettingsOK() {
+//		return checkSettingsOK(genericModelParams, dlControl);
+//	}
 	
 
 

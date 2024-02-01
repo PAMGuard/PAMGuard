@@ -45,7 +45,7 @@ public class GenericModelWorker extends DLModelWorker<GenericPrediction> {
 			}
 			results =  genericModel.runModel(waveStack);
 		}
-		//System.out.println("GENERIC MODEL RESULTS: " + results== null ? null : results.length);
+		System.out.println("GENERIC MODEL RESULTS: " + results== null ? null : results.length);
 		return results;
 	}
 

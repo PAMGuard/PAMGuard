@@ -91,7 +91,7 @@ public class CPODControl extends OfflineFileControl implements PamSettings {
 	 * @return milliseconds. 
 	 */
 	public static long podTimeToMillis(long podTime) {
-		return podTime * 60L * 1000L - (25569L*3600L*24000L);
+		return CPODUtils.podTimeToMillis(podTime);
 	}
 
 	public long stretchClicktime(long rawTime) {

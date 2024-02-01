@@ -418,7 +418,7 @@ public class GenericAdvPane extends SettingsPane<GenericModelParams> {
 
 	@Override
 	public void setParams(GenericModelParams input) {
-
+	
 		setParams= true; 
 
 		this.currentInput = input.clone(); 

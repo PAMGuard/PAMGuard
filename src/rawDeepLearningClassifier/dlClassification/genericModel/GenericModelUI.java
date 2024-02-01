@@ -72,7 +72,7 @@ public class GenericModelUI  implements DLCLassiferModelUI {
 
 	@Override
 	public void setParams() {
-		//		System.out.println("Set model params: " + genericModelClassifier.getGenericDLParams().dlTransfromParams.size()); 
+//		System.out.println("SE MODEL UI PARAMS: " + genericModelClassifier.getGenericDLParams().dlTransfromParams.size()); 
 		getSettingsPane().setParams(genericModelClassifier.getGenericDLParams());
 	}
 

@@ -3,6 +3,7 @@ package cpod;
 import java.awt.Frame;
 import java.io.File;
 import java.io.Serializable;
+import java.util.List;
 
 import javax.swing.JMenuItem;
 
@@ -21,10 +22,11 @@ import cpod.fx.CPODGUIFX;
 import cpod.fx.CPODSettingsPane;
 import dataPlotsFX.data.TDDataProviderRegisterFX;
 import fileOfflineData.OfflineFileParams;
+import javafx.concurrent.Task;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
 
 /**
- * CPOD control. Loads and manages CPOD (and hopefully soon FPOD) data into 
+ * CPOD control. Loads and manages CPOD and FPOD data into 
  * PAMGaurd. 
  * <p>
  * Note that this module (CPODControl) originally used a folder of CP1 files as it's file store but
@@ -83,7 +85,7 @@ public class CPODControl2 extends PamControlledUnit implements PamSettings {
 	 * CPOD importer. 
 	 */
 	private CPODImporter cpodImporter;
-
+	
 
 	public CPODControl2(String unitName) {
 		super("CPOD", unitName);
@@ -101,6 +103,7 @@ public class CPODControl2 extends PamControlledUnit implements PamSettings {
 		// add the CP3 data block
 		cpodProcess.addOutputDataBlock(cp3DataBlock = new CPODClickDataBlock("CP3 Data", 
 				cpodProcess, CPODMap.FILE_CP3));
+		
 		cp3DataBlock.setPamSymbolManager(new CPODSymbolManager(this, 	cp3DataBlock));
 		cp3DataBlock.setDatagramProvider(cpodDataGramProvider[1] = new CPODDataGramProvider(this));
 		cp3DataBlock.setBinaryDataSource(new CPODBinaryStore(this, cp1DataBlock));
@@ -111,7 +114,6 @@ public class CPODControl2 extends PamControlledUnit implements PamSettings {
 		cpodProcess.setSampleRate(CPOD_SAMPLE_RATE, false);
 
 		cpodImporter = new CPODImporter(this); 
-		
 		
 		//FX display data providers
 		CPODPlotProviderFX cpodPlotProviderFX = new CPODPlotProviderFX(this, cp1DataBlock);
@@ -145,19 +147,6 @@ public class CPODControl2 extends PamControlledUnit implements PamSettings {
 		return cp3File;
 	}
 
-
-
-
-	/**
-	 * Convert POD time to JAVA millis - POD time is 
-	 * integer minutes past the same epoc as Windows uses
-	 * i.e. 0th January 1900.
-	 * @param podTime
-	 * @return milliseconds. 
-	 */
-	public static long podTimeToMillis(long podTime) {
-		return podTime * 60L * 1000L - (25569L*3600L*24000L);
-	}
 
 	public long stretchClicktime(long rawTime) {		
 		if (cp1DataBlock.getDatagrammedMap() == null) {
@@ -212,9 +201,6 @@ public class CPODControl2 extends PamControlledUnit implements PamSettings {
 	}
 
 	/****	GUI  ****/
-
-
-
 
 	/**
 	 * Get the settings pane.
@@ -300,6 +286,15 @@ public class CPODControl2 extends PamControlledUnit implements PamSettings {
 	 */
 	public CPODImporter getCpodImporter() {
 		return cpodImporter;
+	}
+
+	/**
+	 * Import POD data. This will either be a list of CPOD or FPOD files. 
+	 * @param files - the files to import. 
+	 * @return a list of import Tasks. 
+	 */
+	public List<Task<Integer>> importPODData(List<File> files) {
+		return cpodImporter.importCPODData(files);
 	}
 
 }

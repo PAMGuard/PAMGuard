@@ -1,4 +1,4 @@
-package test.java.rawDeepLearningClassifier;
+package test.rawDeepLearningClassifier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

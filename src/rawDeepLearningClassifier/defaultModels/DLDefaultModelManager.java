@@ -1,20 +1,6 @@
 package rawDeepLearningClassifier.defaultModels;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import PamUtils.FileFunctions;
-
-import java.io.OutputStream;
-import java.io.InputStream;
-
 import rawDeepLearningClassifier.DLControl;
 
 /**
@@ -38,7 +24,11 @@ public class DLDefaultModelManager {
 	 */
 	public DLDefaultModelManager(DLControl dlControl) {
 		this.dlControl = dlControl; 
+		defaultModels.add(new RightWhaleModel1());
+		defaultModels.add(new HumpbackWhaleGoogle());
+		defaultModels.add(new HumpbackWhaleAtlantic());
 	}
+
 	
 	/**
 	 * Get a default model at index i
@@ -56,8 +46,5 @@ public class DLDefaultModelManager {
 	public int getNumDefaultModels() {
 		return defaultModels.size();
 	}
-
-
 	
-
 }

@@ -1,11 +1,10 @@
 package rawDeepLearningClassifier.layoutFX;
 
-import java.net.URI;
 import java.util.ArrayList;
 
 import org.controlsfx.control.PopOver;
 
-import PamController.FlipSettingsPane;
+import PamController.PamGUIManager;
 import PamController.SettingsPane;
 import PamDetection.RawDataUnit;
 import PamView.dialog.warn.WarnOnce;
@@ -17,16 +16,12 @@ import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.PopupControl;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.stage.Stage;
-import pamViewFX.PAMGuiFXSettings;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
@@ -39,8 +34,8 @@ import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
 import pamViewFX.fxNodes.utilityPanes.GroupedSourcePaneFX;
 import pamViewFX.fxNodes.utilityPanes.PamToggleSwitch;
 import rawDeepLearningClassifier.DLControl;
+import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.RawDLParams;
-import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
 import warnings.PamWarning;
 
 /**
@@ -49,7 +44,7 @@ import warnings.PamWarning;
  * @author Jamie Macaulay
  *
  */
-public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
+public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 
 	public static double MAX_WIDTH = 270; 
@@ -116,15 +111,11 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 
 	private Label infoLabel;
 
-	private Object flipPane;
-
-	private PopupControl advLabel;
-
 	private DLModelSelectPane modelSelectPane;
 	
 
 	
-	public RawDLSettingsPane(DLControl dlControl){
+	public DLSettingsPane(DLControl dlControl){
 		super(null); 
 		this.dlControl=dlControl; 
 		//		Button newButton=new Button("Test");
@@ -140,9 +131,12 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 		mainPane=new PamBorderPane(); 
 		mainPane.setCenter(createDLPane());
 		mainPane.setPadding(new Insets(5,5,5,5));
-		mainPane.setMinHeight(430);
-		mainPane.setMaxWidth(MAX_WIDTH);
-		mainPane.setPrefWidth(MAX_WIDTH);
+		
+		if (!PamGUIManager.isFX()){
+			mainPane.setMinHeight(430);
+			mainPane.setMaxWidth(MAX_WIDTH);
+			mainPane.setPrefWidth(MAX_WIDTH);
+		}
 		//this.getAdvPane().setMaxWidth(MAX_WIDTH);
 		
 
@@ -377,8 +371,16 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 		System.out.println("Set CLASSIFIER PANE: " + modelSelectPane.currentClassifierModel); 
 
 		if (modelSelectPane.currentClassifierModel!=null && modelSelectPane.currentClassifierModel.getModelUI()!=null) {
+			
 			classifierPane.setCenter(modelSelectPane.currentClassifierModel.getModelUI().getSettingsPane().getContentNode()); 
-			modelSelectPane.currentClassifierModel.getModelUI().setParams(); 
+			
+			if (modelSelectPane.currentClassifierModel!=null) {
+				modelSelectPane.currentClassifierModel.getModelUI().setParams(); 
+			}
+			else {
+				classifierPane.setCenter(null); 
+			}
+
 		}
 		else {
 			classifierPane.setCenter(null); 
@@ -391,6 +393,7 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 
 		if (currParams==null ) currParams = new RawDLParams(); 
 
+		@SuppressWarnings("rawtypes")
 		PamDataBlock rawDataBlock = sourcePane.getSource();
 		if (rawDataBlock == null){
 			Platform.runLater(()->{
@@ -451,17 +454,44 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 				this.modelSelectPane.currentClassifierModel.getModelUI().getParams();
 			}
 		}
-	
 
 		currParams.modelURI = this.modelSelectPane.currentSelectedFile; 
 		
 		return currParams;
 	}
+	
+	
+	public static PamWarning statusToWarnings(DLStatus dlStatus) {
+		PamWarning pamWarning = new PamWarning(dlStatus.getName(), dlStatus.getDescription(), dlStatus.isError() ? 2 : 1);
+		return pamWarning;
+	}
+	
+	/**
+	 * Show a warning dialog for the status
+	 * @param the status to show
+	 */
+	public void showWarning(DLStatus dlWarning) {
+		ArrayList<PamWarning> dlWarnings = new ArrayList<PamWarning>();
+		dlWarnings.add(statusToWarnings(dlWarning)); 
+		showWarning(dlWarnings); 
+	}
+	
+	/**
+	 * Show a warning dialog. 
+	 * @param the warning to show.
+	 */
+	public void showWarning(PamWarning dlWarning) {
+		ArrayList<PamWarning> dlWarnings = new ArrayList<PamWarning>();
+		dlWarnings.add(dlWarning); 
+		showWarning(dlWarnings); 
+	}
+
 
 	/**
 	 * Show a warning dialog. 
+	 * @param dlWarnings - list of warnings - the most important will be shown. 
 	 */
-	public void showWarnings(ArrayList<PamWarning> dlWarnings) {
+	public void showWarning(ArrayList<PamWarning> dlWarnings) {
 		
 		if (dlWarnings==null || dlWarnings.size()<1) return; 
 		
@@ -480,6 +510,7 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 		final boolean errorF = error; 
 		Platform.runLater(()->{
 			WarnOnce.showWarningFX(null,  "Deep Learning Settings Warning",  warningsF , errorF ? AlertType.ERROR : AlertType.WARNING);
+//			WarnOnce.showWarning( "Deep Learning Settings Warning",  warningsF , WarnOnce.WARNING_MESSAGE);
 		});
 		
 		//user presses OK - these warnings are just a message - they do not prevent running the module.
@@ -500,7 +531,6 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 		}
 
 //		dlModelBox.getSelectionModel().select(currParams.modelSelection);
-
 		windowLength.getValueFactory().setValue(currParams.rawSampleSize);
 
 		hopLength.getValueFactory().setValue(currParams.sampleHop);
@@ -514,17 +544,16 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 		enableControls(); 
 		
 		setSegInfoLabel();
-		
-		
-//		//set up the model and the custom pane if necessary.  
-//
 	
+//		//set up the model and the custom pane if necessary.  
 		this.modelSelectPane.loadNewModel(currParams.modelURI); 
 		//this.modelSelectPane.updatePathLabel(); 
 		this.setClassifierPane();
 		
 		//For some reason, in the FX GUI, this causes a root used in multiple scenes exceptions...not sure why. 
-		//sourcePane.getChannelValidator().validate();
+		Platform.runLater(()->{
+			sourcePane.getChannelValidator().validate();
+		});
 
 	}
 
@@ -553,6 +582,7 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 	 * Get the data block currently selected in the pane. 
 	 * @return the data block currently selected in the pane. 
 	 */
+	@SuppressWarnings("rawtypes")
 	public PamDataBlock getSelectedParentDataBlock() {
 		return sourcePane.getSource();
 	}
@@ -563,6 +593,34 @@ public class RawDLSettingsPane  extends SettingsPane<RawDLParams>{
 	 */
 	public DLControl getDLControl() {
 		return  dlControl;
+	}
+
+	/**
+	 * Convenience class to set the segment length in samples from milliseconds
+	 * @param defaultSegmentLen - the segment length in milliseconds. 
+	 */
+	public void setSegmentLength(Double defaultSegmentLen) {
+		if (defaultSegmentLen==null) return;
+		
+		
+		double sR = getDLControl().getSettingsPane().getSelectedParentDataBlock().getSampleRate(); 
+		
+		System.out.println("Set the segment length: " + defaultSegmentLen + " sR " + sR);
+
+		//automatically set the default segment length. 
+		getDLControl().getSettingsPane().getSegmentLenSpinner().getValueFactory().setValue((int) (sR*defaultSegmentLen/1000.));
+	}
+	
+	/**
+	 * Convenience class to set the hop length in samples from milliseconds
+	 * @param defaultSegmentLen - the segment length in milliseconds. 
+	 */
+	public void setHopLength(Double hopLength) {
+		if (hopLength==null) return;
+		
+		double sR = getDLControl().getSettingsPane().getSelectedParentDataBlock().getSampleRate(); 
+		//automatically set the default segment length. 
+		getDLControl().getSettingsPane().getHopLenSpinner().getValueFactory().setValue((int) (sR*hopLength/1000.));
 	}
 
 

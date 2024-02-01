@@ -109,10 +109,13 @@ public class CPODBinaryStore extends BinaryDataSource {
 
 
 	private void writeCPODData(DataOutputStream dos2, CPODClick cd) throws IOException {
+		
+		//CPOD has 8 bytes - FPOD has more
 		dos.writeInt(cd.getRawData().length);
 		for (int i=0; i<cd.getRawData().length; i++) {
 			dos.writeShort(cd.getRawData()[i]);
 		};
+		
 	}
 
 	@Override

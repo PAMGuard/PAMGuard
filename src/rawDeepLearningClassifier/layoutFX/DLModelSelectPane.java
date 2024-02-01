@@ -13,14 +13,15 @@ import org.controlsfx.control.PopOver;
 import ai.djl.Device;
 import javafx.concurrent.Task;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
+
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.FileChooser;
@@ -38,7 +39,8 @@ import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
 import rawDeepLearningClassifier.dlClassification.DefaultModels;
-import rawDeepLearningClassifier.dlClassification.DefaultModels.DefualtModel;
+import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
+import rawDeepLearningClassifier.layoutFX.defaultModels.DefaultModelPane;
 
 
 /**
@@ -103,10 +105,12 @@ public class DLModelSelectPane extends PamBorderPane {
 
 	private TextField uriTextField;
 
-	private RawDLSettingsPane rawDLSettingsPane; 
+	private DLSettingsPane rawDLSettingsPane;
+
+	private DefaultModelPane defaultModelPane; 
 
 
-	public DLModelSelectPane(RawDLSettingsPane rawDLSettingsPane) {
+	public DLModelSelectPane(DLSettingsPane rawDLSettingsPane) {
 		this.rawDLSettingsPane=rawDLSettingsPane; 
 		this.dlControl=rawDLSettingsPane.getDLControl(); 
 		this.setCenter(createDLSelectPane());
@@ -118,8 +122,6 @@ public class DLModelSelectPane extends PamBorderPane {
 
 	public Pane createDLSelectPane() {
 
-		defaultModels = new DefaultModels(dlControl); 
-
 
 		classiferInfoLabel = new Label(" Classifier"); 
 		//PamGuiManagerFX.titleFont2style(classiferInfoLabel);
@@ -130,13 +132,14 @@ public class DLModelSelectPane extends PamBorderPane {
 		pathLabel = new Label("No classifier file selected"); 
 		//		PamButton pamButton = new PamButton("", PamGlyphDude.createPamGlyph(MaterialDesignIcon.FILE, PamGuiManagerFX.iconSize)); 
 		PamButton pamButton = new PamButton("", PamGlyphDude.createPamIcon("mdi2f-file", PamGuiManagerFX.iconSize));
+		pathLabel.setPrefWidth(100);
 
 		modelLoadIndicator = new ProgressIndicator(-1);
 		modelLoadIndicator.setVisible(false);
 		modelLoadIndicator.prefHeightProperty().bind(pamButton.heightProperty().subtract(3));
 
 		pamButton.setMinWidth(30);
-		pamButton.setTooltip(new Tooltip("Browse to select a model file"));
+		pamButton.setTooltip(new Tooltip("Load a model from a file"));
 
 
 		pamButton.setOnAction((action)->{
@@ -220,16 +223,59 @@ public class DLModelSelectPane extends PamBorderPane {
 		});
 
 
-		MenuButton defaults = new MenuButton(); 
+		PamButton defaults = new PamButton(); 
 		defaults.setTooltip(new Tooltip("Default models"));
 		defaults.setGraphic(PamGlyphDude.createPamIcon("mdi2d-dots-vertical", PamGuiManagerFX.iconSize)); 
 		defaults.setTooltip(new Tooltip("Load a default model"));
 
-		for (DefualtModel defaultmodel: defaultModels.getDefaultModels()) {
-			defaults.getItems().add(new MenuItem(defaultmodel.name)); 
-		}		
-		defaults.prefHeightProperty().bind(urlButton.heightProperty());
-
+//		for (DefualtModel defaultmodel: defaultModels.getDefaultModels()) {
+//			defaults.getItems().add(new MenuItem(defaultmodel.name)); 
+//		}		
+//		defaults.prefHeightProperty().bind(urlButton.heightProperty());
+		
+		defaultModelPane = new DefaultModelPane(this.dlControl.getDefaultModelManager()); 
+		defaultModelPane.setPadding(new Insets(5,5,5,5));
+		defaultModelPane.defaultModelProperty().addListener((obsVal, oldVal, newVal)->{
+			if (newVal!=oldVal) {
+				//a default model needs to be loaded. 
+				Task<DLStatus> task = loadNewModel(newVal.getModelURI());
+				
+				task.setOnSucceeded((val)->{
+					if (currentClassifierModel!=null) {
+						
+						//set the parameters from the classifer model to have correct
+						//transfroms etc. 
+						newVal.setParams(currentClassifierModel.getDLModelSettings());
+						
+						//set the correct classifier pane. 
+						rawDLSettingsPane.setClassifierPane(); 
+						
+						//need to make sure the classifier pane is updated
+						currentClassifierModel.getModelUI().setParams();
+						
+						//need to update the segment length...
+						if (currentClassifierModel.getDLModelSettings() instanceof StandardModelParams) {
+							double segLen = ((StandardModelParams) currentClassifierModel.getDLModelSettings()).defaultSegmentLen;
+							this.rawDLSettingsPane.setSegmentLength(segLen);
+							//set to half the hop size too
+							this.rawDLSettingsPane.setHopLength(segLen/2);
+						}
+						
+					}
+					else {
+						//this should never happen unless there is no internet
+						System.err.println("Default model failed ot load: "+ newVal);
+					}
+				});
+			}
+		});
+		
+		PopOver defualtModelPopOver = new PopOver();
+		defualtModelPopOver.setContentNode(defaultModelPane);
+		
+		defaults.setOnAction((action)->{
+			defualtModelPopOver.show(defaults);
+		});
 
 		PamHBox hBox = new PamHBox(); 
 		hBox.setSpacing(5);
@@ -244,21 +290,21 @@ public class DLModelSelectPane extends PamBorderPane {
 	 * Load a new model on a seperate thread. 
 	 * @param uri - the uri to the model. 
 	 */
-	public void loadNewModel(URI uri) {
+	public Task<DLStatus> loadNewModel(URI uri) {
 		// separate non-FX thread - load the model 
 		//on a separate thread so we can show a moving load 
 		//bar on the FX thread. Otherwise the GUI locks up  
 		//whilst stuff is loaded. 
-		if (uri==null) return; 
+		if (uri==null) return null; 
 
 //		pathLabel.setText("Loading model...");
 		modelLoadIndicator.setVisible(true);
 
-
-
 		Task<DLStatus> task = new LoadTask(uri);
-
+		
 		modelLoadIndicator.progressProperty().bind(task.progressProperty());
+		
+		pathLabel.setGraphic(null); //remove error icon if there is one. 
 		pathLabel.textProperty().bind(task.messageProperty());
 
 
@@ -266,6 +312,8 @@ public class DLModelSelectPane extends PamBorderPane {
 		Thread th = new Thread(task);
 		th.setDaemon(true);
 		th.start();
+		
+		return task;
 
 
 
@@ -310,7 +358,7 @@ public class DLModelSelectPane extends PamBorderPane {
 
 	/**
 	 * A new model has been selected 
-	 * @param 
+	 * @param the load status of the model. 
 	 */
 	private DLStatus newModelSelected(URI file) {
 
@@ -328,7 +376,8 @@ public class DLModelSelectPane extends PamBorderPane {
 				//we are loading model from a file - anything can happen so put in a try catch. 
 				currentClassifierModel.setModel(file);
 				
-				if (!currentClassifierModel.checkModelOK()) {
+				if (currentClassifierModel.getModelStatus().isError()) {
+					System.err.println("Model load failed: " + currentClassifierModel.getModelStatus());
 					currentClassifierModel=null;
 					return DLStatus.MODEL_LOAD_FAILED;
 				}
@@ -348,36 +397,73 @@ public class DLModelSelectPane extends PamBorderPane {
 	}
 	
 	private void showWarningDialog(DLStatus status) {
-		 PamDialogFX.showError(status.getName(), status.getDescription()); 
+		this.rawDLSettingsPane.showWarning(status);
+//		 PamDialogFX.showError(status.getName(), status.getDescription()); 
 	}
 
+	
+	/**
+	 * Create an error icon based on the status message. 
+	 * @param status - the status
+	 * @return error icon or null of the status is not an error. 
+	 */
+	private Node createErrorIcon(DLStatus status) {
+		Node decoration = null; 
+		if (status.isError()){
+			 decoration = PamGlyphDude.createPamIcon("mdi2c-close-circle-outline", Color.RED, 10);
+		}
+		else if (status.isWarning()) {
+			 decoration = PamGlyphDude.createPamIcon("mdi2c-close-circle-outline", Color.ORANGE, 10);			
+		}
+		return decoration;
+	}
 
 	/**
-	 * Update the path label and tool tip text; 
+	 * Update the path label and tool tip text
 	 */
-	protected void updatePathLabel() {
-		//System.out.println("Update path label: " + currentClassifierModel.checkModelOK()); 
+	protected void updatePathLabel(DLStatus status) {
+		
+		/**
+		 * This a bit complicated. We want the label to show errors if they have occured and warning to prompt the 
+		 * user to do things. The sequence of this is quite important to get right. 
+		 */
+		
+		pathLabel.setGraphic(null);
+
 		if (currentClassifierModel == null) {
+			//no frameowrk could be selected for the model. 
+			pathLabel.setGraphic(createErrorIcon(DLStatus.NO_MODEL_LOADED));
 			pathLabel.setText("No classifier model loaded: Select model");
 			pathLabel.setTooltip(new Tooltip("Use the browse button/ URI botton to select a model or select a default model"));
 		}
-
-		else if (!currentClassifierModel.checkModelOK()) {
-			pathLabel.setText("The model could not be loaded?");
-			pathLabel.setTooltip(new Tooltip("Use the browse button/ URI botton to select a model or select a default model"));
-
+		if (currentClassifierModel.getModelStatus().isError()) {
+			pathLabel.setGraphic(createErrorIcon(currentClassifierModel.getModelStatus()));
+			pathLabel.setText(currentClassifierModel.getModelStatus().getName());
+			pathLabel.setTooltip(new Tooltip(currentClassifierModel.getModelStatus().getDescription()));
+		}
+		else if (status.isError()) {
+			pathLabel.setGraphic(createErrorIcon(status));
+			pathLabel.setText(status.getName());
+			pathLabel.setTooltip(new Tooltip(status.getDescription()));
 		}
 		else {
 			pathLabel .setText(new File(this.currentSelectedFile).getName()); 
+			//show a warning icon if needed. 
+			String tooltip = "";
 			try {
-				pathLabel.setTooltip(new Tooltip(this.currentSelectedFile.getPath() 
-						+ "\n" +" Processor CPU " + Device.cpu() + "  " +  Device.gpu()));
+				tooltip += (this.currentSelectedFile.getPath() 
+						+ "\n" +" Processor CPU " + Device.cpu() + "  " +  Device.gpu());
+				tooltip+="\n";
 			}
 			catch (Exception e) {
 				//sometimes get an error here for some reason
 				//does not make a difference other than tooltip. 
 				System.err.println("StandardModelPane: Error getting the default device!");
 			}
+			if (status.isWarning()) {
+				tooltip+="Warning: " + status.getDescription(); 
+			}
+			pathLabel.setTooltip(new Tooltip(tooltip));
 		}
 
 	}
@@ -418,15 +504,38 @@ public class DLModelSelectPane extends PamBorderPane {
 
 		public LoadTask(URI uri) {
 			this.uri=uri; 
+			
+			
+			//TODO - not the best as some other part of the program could be using download listeners...
+			dlControl.getDownloadManager().clearDownloadListeners();
 
 			dlControl.getDownloadManager().addDownloadListener((status, bytesDownLoaded)->{
-				
-				this.updateProgress(-1, 1); //set to intermedaite
-				this.updateMessage(String.format("Download %.2f MB", ((double) bytesDownLoaded)/1024./1024.));
-				
-
+				 updateMessage( status,  bytesDownLoaded); 
 			}); 
 
+		}
+		
+		private void updateMessage(DLStatus status, long bytesDownLoaded) {
+			//the updates have their own messages but let's take some more control here. 
+			this.updateProgress(-1, 1); //set to intermediate
+			System.out.println("Status: " + status);
+			switch (status) {
+			case CONNECTION_TO_URL:
+				this.updateMessage("Checking URL");
+				break;
+			case DOWNLOADING:
+				this.updateMessage(String.format("Download %.2f MB", ((double) bytesDownLoaded)/1024./1024.));
+				break;
+			case DOWNLOAD_FINISHED:
+				this.updateMessage("Download complete");
+				break;
+			case DOWNLOAD_STARTING:
+				this.updateMessage("Download starting");
+				break;
+			default:
+				this.updateMessage(status.getDescription());
+				break;
+		}
 		}
 
 
@@ -474,7 +583,7 @@ public class DLModelSelectPane extends PamBorderPane {
 			pathLabel.textProperty().unbind();
 			modelLoadIndicator.progressProperty().unbind();
 
-			updatePathLabel(); 
+			updatePathLabel(this.getValue()); 
 		}
 
 		@Override protected void succeeded() {

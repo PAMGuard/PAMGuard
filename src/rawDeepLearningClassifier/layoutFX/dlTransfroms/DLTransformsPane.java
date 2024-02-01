@@ -150,10 +150,10 @@ public class DLTransformsPane extends PamBorderPane {
 		ArrayList<DLTransformPane> dlTransformPanes = new ArrayList<DLTransformPane>(); 
 
 		sampleRate=-1; 
-
-		//		for (int i=0; i<dlTransforms.size() ; i++) {
-		//			System.out.println("Set DL transfroms: " + dlTransforms.get(i).getDLTransformType() + " " + ((SimpleTransform) dlTransforms.get(i)).getParams()); 
-		//		}
+//
+//				for (int i=0; i<dlTransforms.size() ; i++) {
+//					System.out.println("Set DL transfroms: " + dlTransforms.get(i).getDLTransformType() + " " + ((SimpleTransform) dlTransforms.get(i)).getParams()); 
+//				}
 
 		DLTransformPane transformPane;
 		//create a pane for each transform
@@ -164,6 +164,10 @@ public class DLTransformsPane extends PamBorderPane {
 			}
 
 			transformPane = DataTransformPaneFactory.getSettingsPane(dlTransforms.get(i)); 
+			
+			
+			System.out.println("Set DL transfroms: " + dlTransforms.get(i).getDLTransformType() + " " + ((SimpleTransform) dlTransforms.get(i)).getParams()); 
+
 
 			//there must be a transform pane or else this will break. 
 			dlTransformPanes.add(transformPane); 

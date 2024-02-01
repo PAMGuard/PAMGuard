@@ -2,17 +2,23 @@ package Array.layoutFX;
 
 import java.io.File;
 
+import org.controlsfx.control.SegmentedButton;
+
 import Array.ArrayManager;
 import Array.Hydrophone;
 import Array.PamArray;
 import PamController.PamController;
 import PamController.SettingsPane;
 import javafx.scene.Node;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.VBox;
@@ -35,7 +41,7 @@ import pamViewFX.fxNodes.PamHBox;
  *
  */
 public class ArraySettingsPane extends SettingsPane<PamArray >{
-	
+
 	/**
 	 * Minimum size of the 3D pane.
 	 */
@@ -50,15 +56,15 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 	 * Pane for adding or removing streamers. 
 	 */
 	private StreamersPane streamerPane; 
-	
+
 	private PamBorderPane mainPane;
-	
+
 	/**
 	 * Pane for adding or removing hydrophones. 
 	 */
 	private HydrophonesPane hydrophonePane;
 
-//	private Pane holder;
+	//	private Pane holder;
 
 	private Label hydrophoneLabel;
 
@@ -83,16 +89,16 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 
 	public ArraySettingsPane() {
 		super(null);
-		
+
 		mainPane=new PamBorderPane(); 
-		
+
 		mainPane.setCenter(createArrayPane());
-//		mainPane.setStyle("-fx-background-color: red;");
+		//		mainPane.setStyle("-fx-background-color: red;");
 		mainPane.setMaxWidth(Double.MAX_VALUE);
 		mainPane.setMinWidth(1100);
 		mainPane.setStyle("-fx-padding: 0,0,0,0");
-		
-		
+
+
 		recivierDiagramLabel = new Label("Hydrophone Diagram"); 
 		PamGuiManagerFX.titleFont1style(recivierDiagramLabel);
 		recivierDiagramLabel.setPadding(new Insets(5,5,5,5));
@@ -100,78 +106,123 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 		Label environmentLabel = new Label("Environment"); 
 		PamGuiManagerFX.titleFont1style(environmentLabel);
 		environmentLabel.setPadding(new Insets(0,0,5,0)); //little more space under this label
-		
+
 		environmentalPane = createEnvironmentPane();
-		
+
 		PamVBox rightPane = new PamVBox();
 		rightPane.setSpacing(5);
-		rightPane.getChildren().addAll(recivierDiagramLabel, create3DPane(), environmentLabel, new PamBorderPane(environmentalPane.getContentNode()));
-		VBox.setVgrow(array3DPane, Priority.ALWAYS);
-		
+
+		Pane hydrophone3DPane = create3DPane();
+		rightPane.getChildren().addAll(recivierDiagramLabel, hydrophone3DPane, environmentLabel, new PamBorderPane(environmentalPane.getContentNode()));
+		VBox.setVgrow(hydrophone3DPane, Priority.ALWAYS);
+
 		mainPane.setRight(rightPane);
-		
-//		streamerPane.getStreamerTable().getItems().addListener((ListChangeListener<? super StreamerProperty>) c->{
-//			//the streamer table has changed and so the streamer needs changed
-//			System.out.println("Streamer Changed!!!");
-//		});
-		
+
+		//		streamerPane.getStreamerTable().getItems().addListener((ListChangeListener<? super StreamerProperty>) c->{
+		//			//the streamer table has changed and so the streamer needs changed
+		//			System.out.println("Streamer Changed!!!");
+		//		});
+
 		streamerPane.addStreamerListener((x,y)->{
 			PamArray  array = getParams(new PamArray("temp_array: ", null)) ;
 			System.out.println("Streamer changed!"); 
 			array3DPane.drawArray(array);
 		});
-		
+
 		hydrophonePane.addStreamerListener((x,y)->{
 			PamArray  array = getParams(new PamArray("temp_array: ", null)) ;
 			System.out.println("Hydrophone changed!" + array.getHydrophoneCount()); 
 			array3DPane.drawArray(array);
 		});
 
-//		mainPane.setMinWidth(800);
+		//		mainPane.setMinWidth(800);
 
-//		mainPane.setCenter(createArrayPane());
-//		
-//		mainPane.getAdvPane().setCenter(new Label("Advanced Settings"));
-		
-		
-//		//mainPane.getFront().setStyle("-fx-background-color: grey;");
-//		mainPane.setStyle("-fx-background-color: red;");
-//		
-//		FlipPane aflipPane = new FlipPane(); 
-//		aflipPane.setStyle("-fx-background-color: red;");
-//		
-//		PamHBox stackPane = new PamHBox(); 
-//		stackPane.setStyle("-fx-background-color: red;");
-//		
-//		Button button = new Button(); 
-//		button.setOnAction((action)->{
-//			System.out.println(" 1 " + stackPane.getPadding());
-//			System.out.println(" 2 " +PamBorderPane.getMargin(stackPane));
-//			System.out.println(" 3 " + holder.getPadding());
-//		});
-//		
-//		stackPane.getChildren().add(button);
-//
-//		
-//		mainPane.setPadding(new Insets(0,0,0,0));
-		
-		
-//		holder = new StackPane(); 
-//		holder.getChildren().add(mainPane);
-//		holder.setStyle("-fx-padding: 0,0,0,0");
+		//		mainPane.setCenter(createArrayPane());
+		//		
+		//		mainPane.getAdvPane().setCenter(new Label("Advanced Settings"));
+
+
+		//		//mainPane.getFront().setStyle("-fx-background-color: grey;");
+		//		mainPane.setStyle("-fx-background-color: red;");
+		//		
+		//		FlipPane aflipPane = new FlipPane(); 
+		//		aflipPane.setStyle("-fx-background-color: red;");
+		//		
+		//		PamHBox stackPane = new PamHBox(); 
+		//		stackPane.setStyle("-fx-background-color: red;");
+		//		
+		//		Button button = new Button(); 
+		//		button.setOnAction((action)->{
+		//			System.out.println(" 1 " + stackPane.getPadding());
+		//			System.out.println(" 2 " +PamBorderPane.getMargin(stackPane));
+		//			System.out.println(" 3 " + holder.getPadding());
+		//		});
+		//		
+		//		stackPane.getChildren().add(button);
+		//
+		//		
+		//		mainPane.setPadding(new Insets(0,0,0,0));
+
+
+		//		holder = new StackPane(); 
+		//		holder.getChildren().add(mainPane);
+		//		holder.setStyle("-fx-padding: 0,0,0,0");
 
 	}
 
 	private Pane create3DPane() {
-		this.array3DPane = new HydrophoneArray3DPane();
-		
-		//important because the 3D pane has not default size
-		array3DPane.setMinWidth(MIN_3D_WIDTH);
-		array3DPane.setMinHeight(MIN_3D_HEIGHT);
 
-		return array3DPane;
+		StackPane stackPane = new StackPane(); 
+		this.array3DPane = new HydrophoneArray3DPane();
+
+		//important because the 3D pane has not default size
+		stackPane.setMinWidth(MIN_3D_WIDTH);
+		stackPane.setMinHeight(MIN_3D_HEIGHT);
+
+		//		stackPane.prefHeightProperty().bind(mainPane.heightProperty().subtract(100));
+
+		stackPane.getChildren().add(array3DPane);
+
+
+		//add buttons
+		ToggleButton b1 = new ToggleButton("2D");
+		ToggleButton b2 = new ToggleButton("3D");
+
+		b1.setOnAction((action)->{
+			array3DPane.set3D(false);
+		});
+
+		b2.setOnAction((action)->{
+			array3DPane.set3D(true);
+		});
+		
+
+		SegmentedButton segmentedButton = new SegmentedButton();    
+		segmentedButton.getButtons().addAll(b1, b2);
+		segmentedButton.setPadding(new Insets(5,5,5,5));
+		segmentedButton.setMinWidth(100);
+
+		StackPane.setAlignment(segmentedButton, Pos.TOP_RIGHT);
+		stackPane.getChildren().add(segmentedButton);
+		
+		
+		final ContextMenu contextMenu = new ContextMenu();
+		final MenuItem item1 = new MenuItem("Reset");
+		item1.setOnAction((action)->{
+			array3DPane.resetView();
+		});
+		contextMenu.getItems().add(item1);
+		segmentedButton.setContextMenu(contextMenu);
+
+//		stackPane.setOnContextMenuRequested(e -> 
+//		contextMenu.show(stackPane, e.getScreenX(), e.getScreenY()));
+
+
+		b2.setSelected(true);
+
+		return stackPane;
 	}
-	
+
 	/**
 	 * Create the environment pane. 
 	 * @return the environment pane. 
@@ -186,22 +237,22 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 	 * @return the main array pane. 
 	 */
 	private Pane createArrayPane() {
-		
+
 		Label arrayLabel = new Label("Array"); 
 		arrayLabel.setPadding(new Insets(5,5,5,5));
 		PamGuiManagerFX.titleFont1style(arrayLabel);
-		
+
 		//holds the array label and also some button for import and export. 
 		PamHBox arrayImportExportBox = new PamHBox();
 		arrayImportExportBox.setSpacing(5);
 		arrayImportExportBox.setAlignment(Pos.CENTER_LEFT);
 		arrayImportExportBox.setPadding(new Insets(5,0,0,0));
-		
-		  fileChooser = new FileChooser();
-		 fileChooser.setTitle("Open Resource File");
-		 fileChooser.getExtensionFilters().addAll(
-		         new ExtensionFilter("PAMNGuard Array Files", "*.paf"));
-		
+
+		fileChooser = new FileChooser();
+		fileChooser.setTitle("Open Resource File");
+		fileChooser.getExtensionFilters().addAll(
+				new ExtensionFilter("PAMNGuard Array Files", "*.paf"));
+
 		PamButton importButton = new PamButton("Import..."); 
 		importButton.setOnAction((action)->{
 			importArray();
@@ -215,13 +266,13 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 		});
 		exportButton.setGraphic(PamGlyphDude.createPamIcon("mdi2f-file-export", PamGuiManagerFX.iconSize)); 
 		exportButton.setTooltip(new Tooltip("Export array settings to a .pgaf file"));
-		
+
 		//balnk region to make it look nicer
 		Region blank = new Region();
 		blank.setPrefWidth(70);
-		
+
 		arrayImportExportBox.getChildren().addAll(importButton, exportButton, blank); 
-		
+
 		PamBorderPane titleHolder = new PamBorderPane();
 		titleHolder.setLeft(arrayLabel);
 		titleHolder.setRight(arrayImportExportBox);
@@ -229,25 +280,25 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 		//the streamer pane for changing streamer settings. 
 		streamerPane = new StreamersPane(); 
 		streamerPane.setMaxWidth(Double.MAX_VALUE);
-		
+
 		hydrophoneLabel = new Label("Hydrophones"); 
 		PamGuiManagerFX.titleFont1style(hydrophoneLabel);
 		hydrophoneLabel.setPadding(new Insets(5,5,5,5));
-		
+
 		hydrophonePane = new HydrophonesPane(); 
 		hydrophonePane.setMaxWidth(Double.MAX_VALUE);
 
-//		PamButton advancedButton = new PamButton(); 
-//		advancedButton.setOnAction((action)->{
-//			mainPane.flipToBack();
-//		});
-//		advancedButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-cog")); 
+		//		PamButton advancedButton = new PamButton(); 
+		//		advancedButton.setOnAction((action)->{
+		//			mainPane.flipToBack();
+		//		});
+		//		advancedButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-cog")); 
 
-//		PamHBox advancedPane = new PamHBox(); 
-//		advancedPane.setSpacing(5);
-//		advancedPane.setAlignment(Pos.CENTER_RIGHT);
-//		advancedPane.getChildren().addAll(new Label("Advanced"), advancedButton);
-		
+		//		PamHBox advancedPane = new PamHBox(); 
+		//		advancedPane.setSpacing(5);
+		//		advancedPane.setAlignment(Pos.CENTER_RIGHT);
+		//		advancedPane.getChildren().addAll(new Label("Advanced"), advancedButton);
+
 		PamVBox vBox = new PamVBox(); 
 		vBox.setSpacing(5);
 		vBox.getChildren().addAll(titleHolder, streamerPane, hydrophoneLabel,
@@ -285,34 +336,34 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 	private void setReceieverLabels() {
 		hydrophonePane.setRecieverLabels();
 		streamerPane.setRecieverLabels();
-		
+
 		hydrophoneLabel.setText(PamController.getInstance().getGlobalMediumManager().getRecieverString(true) + "s");
 		recivierDiagramLabel.setText(PamController.getInstance().getGlobalMediumManager().getRecieverString(true) + " diagram"); 
-//		if (singleInstance!=null) {
-//			singleInstance.setTitle("Pamguard "+ PamController.getInstance().getGlobalMediumManager().getRecieverString(false) +" array");
-//		}
+		//		if (singleInstance!=null) {
+		//			singleInstance.setTitle("Pamguard "+ PamController.getInstance().getGlobalMediumManager().getRecieverString(false) +" array");
+		//		}
 	}
-	
-	
+
+
 	@Override
 	public PamArray  getParams(PamArray  currParams) {
 		currParams = streamerPane.getParams(currParams); 
 		currParams = hydrophonePane.getParams(currParams); 
 		currParams.setHydrophoneInterpolation(hydrophonePane.getHydrophoneInterp());
 		currParams = environmentalPane.getParams(currParams);
-//		System.out.println("Array settings pane: No. streamers: " + currParams.getStreamerCount());
+		//		System.out.println("Array settings pane: No. streamers: " + currParams.getStreamerCount());
 		return currParams;
 	}
 
 	@Override
 	public void setParams(PamArray  input) {
 		this.currentArray = input.clone();
-//		System.out.println("Hydrophone array is: "+ input); 
+		//		System.out.println("Hydrophone array is: "+ input); 
 		setReceieverLabels();
 		hydrophonePane.setParams(input); 
 		streamerPane.setParams(input); 
 		environmentalPane.setParams(input);
-		
+
 		//draw the array
 		array3DPane.drawArray(input);
 	}
@@ -331,16 +382,16 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 	@Override
 	public void paneInitialized() {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	private class HydrophoneArray3DPane extends Array3DPane {
-		
+
 		@Override
 		public void hydrophoneSelected(Hydrophone hydrophone) {
 			hydrophonePane.selectHydrophone(hydrophone); 
 		}
-		
+
 	}
 
 }

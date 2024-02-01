@@ -7,6 +7,9 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.superdet.SuperDetection;
 
+/**
+ * CPOD click. 
+ */
 public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implements AcousticDataUnit {
 
 	private short nCyc;
@@ -57,6 +60,7 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 		int t = shortData[0]<<16 | 
 				shortData[1]<<8 |
 				shortData[2]; // 5 microsec intervals !
+		
 		long tMillis = minuteMillis + t/200;
 		// now a bit of time stretching. Need to get the start time and see how
 		// different this is, then it's a linear stretch. 
@@ -90,6 +94,7 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 				shortData[1]<<8 |
 				shortData[2]; // 5 microsec intervals !
 		long tMillis = minuteMillis + t/200;
+		
 		// now a bit of time stretching. Need to get the start time and see how
 		// different this is, then it's a linear stretch. 
 		tMillis = cpodControl.stretchClicktime(tMillis);
@@ -137,8 +142,11 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 		//estimate the duration in millis - not accurate but gives an idea.
 		double duration = (nCyc/(double) kHz);
 		this.setDurationInMilliseconds(duration);
-		
-		this.rawData = shortData.clone();
+	
+		if (shortData!=null) {
+			//only CPOD
+			this.rawData = shortData.clone();
+		}
 	}
 
 	/**

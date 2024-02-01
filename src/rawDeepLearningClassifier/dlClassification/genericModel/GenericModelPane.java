@@ -71,6 +71,8 @@ public class GenericModelPane extends StandardModelPane  {
 
 	@Override
 	public void setParams(StandardModelParams currParams) {
+//		System.out.println("SET PARAMS GENERIC PANE: " + currParams);
+
 		super.setParams(currParams);
 	}
 

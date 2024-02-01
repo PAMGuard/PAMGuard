@@ -10,6 +10,7 @@ import org.jamdev.jdl4pam.transforms.DLTransform;
 import org.jamdev.jdl4pam.transforms.DLTransfromParams;
 
 import rawDeepLearningClassifier.dlClassification.DLClassName;
+import rawDeepLearningClassifier.layoutFX.exampleSounds.ExampleSoundFactory.ExampleSoundType;
 
 /**
  * Parameters for the SoundSpot model. 
@@ -99,6 +100,21 @@ public class StandardModelParams implements Serializable, Cloneable {
 	 * params class somehow and gets very complicated. 
 	 */
 	public int exampleSoundIndex = 0; 
+	
+	
+	/**
+	 * Set the example sound that should be associated with parameters. 
+	 * @param soundType - the example sound type. 
+	 */
+	public void setExampleSound(ExampleSoundType soundType) {
+		ExampleSoundType[] values = ExampleSoundType.values();
+		for (int i=0; i<values.length; i++) {
+			if (values[i].equals(soundType)) {
+				exampleSoundIndex = i;
+				return;
+			}
+		}
+	}
 	
 	
 	/**

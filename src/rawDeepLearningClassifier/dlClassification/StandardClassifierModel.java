@@ -14,11 +14,12 @@ import PamUtils.PamArrayUtils;
 import PamUtils.PamCalendar;
 import javafx.stage.FileChooser.ExtensionFilter;
 import rawDeepLearningClassifier.DLControl;
+import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericDLClassifier;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
-import rawDeepLearningClassifier.layoutFX.RawDLSettingsPane;
+import rawDeepLearningClassifier.layoutFX.DLSettingsPane;
 import rawDeepLearningClassifier.segmenter.SegmenterProcess.GroupedRawData;
 import warnings.PamWarning;
 import warnings.WarningSystem;
@@ -153,8 +154,30 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 	}
 	
 	@Override
-	public boolean checkModelOK() {
-		return !getDLWorker().isModelNull(); 
+	public DLStatus getModelStatus() {
+		if (getDLWorker().isModelNull()) {
+			return DLStatus.MODEL_LOAD_FAILED;
+		}
+		
+		File file = new File(getDLParams().modelPath);
+		if (getDLParams().modelPath == null || !file.isFile()) {
+			return DLStatus.NO_MODEL_LOADED;
+		}
+		
+		// if continous data is selected and all classes are false then this is a
+		// potential mistake...
+		if (dlControl.getSettingsPane().getSelectedParentDataBlock().getUnitClass() == RawDataUnit.class
+				&& (getDLParams().binaryClassification==null || PamArrayUtils.isAllFalse(getDLParams().binaryClassification))){
+			return DLStatus.NO_BINARY_CLASSIFICATION;
+//			warnings.add(new PamWarning("Generic classifier",
+//					"There are no prediction classes selected for classification. "
+//							+ "Predicitons for each segment will be saved but there will be no detections generated",
+//					1));
+		}
+
+
+		
+		return DLStatus.MODEL_LOAD_SUCCESS;
 	}
 	
 	@Override
@@ -201,11 +224,11 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 	protected void newResult(GenericPrediction modelResult, GroupedRawData groupedRawData) {
 		this.dlControl.getDLClassifyProcess().newModelResult(modelResult, groupedRawData);
 	}
-	
-	@Override
-	public ArrayList<PamWarning> checkSettingsOK() {
-		return checkSettingsOK(getDLParams(), dlControl); 
-	}
+//	
+//	@Override
+//	public ArrayList<PamWarning> checkSettingsOK() {
+//		return checkSettingsOK(getDLParams(), dlControl); 
+//	}
 	
 	
 	/**
@@ -221,7 +244,7 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 	 * Get raw settings pane
 	 * @return the setting pane. 
 	 */
-	public RawDLSettingsPane getRawSettingsPane() {
+	public DLSettingsPane getRawSettingsPane() {
 		return this.dlControl.getSettingsPane();
 	}
 	

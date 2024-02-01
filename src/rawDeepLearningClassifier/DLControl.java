@@ -27,6 +27,7 @@ import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
 import rawDeepLearningClassifier.dataPlotFX.DLDetectionPlotProvider;
 import rawDeepLearningClassifier.dataPlotFX.DLPredictionProvider;
 import rawDeepLearningClassifier.ddPlotFX.RawDLDDPlotProvider;
+import rawDeepLearningClassifier.defaultModels.DLDefaultModelManager;
 import rawDeepLearningClassifier.dlClassification.DLClassName;
 import rawDeepLearningClassifier.dlClassification.DLClassNameManager;
 import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
@@ -39,7 +40,7 @@ import rawDeepLearningClassifier.layoutFX.DLModelSelectPane;
 import rawDeepLearningClassifier.layoutFX.DLSidePanelSwing;
 import rawDeepLearningClassifier.layoutFX.DLSymbolManager;
 import rawDeepLearningClassifier.layoutFX.PredictionSymbolManager;
-import rawDeepLearningClassifier.layoutFX.RawDLSettingsPane;
+import rawDeepLearningClassifier.layoutFX.DLSettingsPane;
 import rawDeepLearningClassifier.logging.DLAnnotationType;
 import rawDeepLearningClassifier.logging.DLDataUnitDatagram;
 import rawDeepLearningClassifier.logging.DLDetectionBinarySource;
@@ -124,7 +125,7 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	/**
 	 * The settings pane.
 	 */
-	private RawDLSettingsPane settingsPane;
+	private DLSettingsPane settingsPane;
 
 	/**
 	 * The settings dialog
@@ -188,10 +189,18 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	 */
 	private DLClassifierChooser dlClassifierChooser;
 
+	/**
+	 * Handles downloading models from the internet
+	 */
 	private DLDownloadManager modelDownloadManager;
 
 
-
+	/**
+	 * Handles downloading models from the internet
+	 */
+	private DLDefaultModelManager defaultModelManager;
+	
+	
 	/**
 	 * Constructor for the DL Control.
 	 * 
@@ -220,6 +229,9 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 
 		//manages the names assigned to different output classes. 
 		dlClassNameManager = new DLClassNameManager(this);
+		
+		//manages default models
+		defaultModelManager = new DLDefaultModelManager(this);
 		
 		//manages downloading models
 		modelDownloadManager = new DLDownloadManager(); 
@@ -386,10 +398,10 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	 * 
 	 * @return the settings pane.
 	 */
-	public RawDLSettingsPane getSettingsPane() {
+	public DLSettingsPane getSettingsPane() {
 
 		if (this.settingsPane == null) {
-			settingsPane = new RawDLSettingsPane(this);
+			settingsPane = new DLSettingsPane(this);
 		}
 		
 		System.out.println("Get DL raw settings pane...");
@@ -589,6 +601,14 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	 */
 	public DLDownloadManager getDownloadManager() {
 		return modelDownloadManager;
+	}
+
+	/**
+	 * Get the default model manager. This handles the default models that can be downloaded. 
+	 * @return the default model manager. 
+	 */
+	public DLDefaultModelManager getDefaultModelManager() {
+		return this.defaultModelManager;
 	}
 
 

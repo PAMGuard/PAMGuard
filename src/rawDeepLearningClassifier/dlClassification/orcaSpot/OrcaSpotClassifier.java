@@ -11,6 +11,7 @@ import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import rawDeepLearningClassifier.DLControl;
+import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.dlClassification.DLClassName;
 import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
 import rawDeepLearningClassifier.dlClassification.DLDataUnit;
@@ -340,15 +341,15 @@ public class OrcaSpotClassifier implements DLClassiferModel, PamSettings {
 	}
 
 	@Override
-	public boolean checkModelOK() {
-		return true;
-	}
-
-	@Override
-	public ArrayList<PamWarning> checkSettingsOK() {
-		// TODO Auto-generated method stub
+	public DLStatus getModelStatus() {
 		return null;
 	}
+
+//	@Override
+//	public ArrayList<PamWarning> checkSettingsOK() {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 	@Override
 	public boolean isModelType(URI uri) {

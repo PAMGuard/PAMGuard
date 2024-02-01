@@ -6,6 +6,7 @@ import org.jamdev.jdl4pam.transforms.DLTransform.DLTransformType;
 import org.json.JSONArray;
 
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
+import rawDeepLearningClassifier.layoutFX.exampleSounds.ExampleSoundFactory.ExampleSoundType;
 
 import org.jamdev.jdl4pam.transforms.DLTransformsFactory;
 import org.jamdev.jdl4pam.transforms.DLTransfromParams;
@@ -183,6 +184,8 @@ public class GenericModelParams extends StandardModelParams implements Cloneable
 		
 		return info; 
 	}
+
+
 
 
 

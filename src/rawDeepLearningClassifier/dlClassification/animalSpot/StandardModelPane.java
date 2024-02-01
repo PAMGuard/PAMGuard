@@ -327,13 +327,18 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 
 	@Override
 	public void setParams(StandardModelParams currParams) {
-		this.paramsClone = currParams.clone(); 
+		try {
 
+		this.paramsClone = currParams.clone(); 
+		
 		//pathLabel .setText(this.currentSelectedFile.getPath()); 
 
 		detectionSpinner.getValueFactory().setValue(Double.valueOf(currParams.threshold));
 
+
 		//set the params on the advanced pane. 
+//		System.out.println("SET PARAMS ADV PANE: " + (paramsClone.classNames == null ? null : paramsClone.classNames.length));
+		
 		this.getAdvSettingsPane().setParams(paramsClone);
 		//System.out.println("SET advanced params: " + paramsClone.dlTransfroms); 
 
@@ -346,6 +351,12 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 
 		usedefaultSeg.setSelected(currParams.useDefaultSegLen); 
 		defaultSegmentLenChanged();
+		
+		}
+		
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		//updatePathLabel(); 
 

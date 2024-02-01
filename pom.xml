@@ -5,8 +5,8 @@
   <groupId>org.pamguard</groupId>
   <artifactId>Pamguard</artifactId>
   <version>2.02.09d</version>
-  <name>Pamguard Java12+</name>
-  <description>Pamguard for Java 12+, using Maven to control dependcies</description>
+  <name>Pamguard</name>
+  <description>Pamguard using Maven to control dependencies</description>
 	<url>www.pamguard.org</url>
 	<organization>
 		<name>Sea Mammal Research Unit, University of St. Andrews</name>
@@ -14,225 +14,219 @@
 	</organization>
 
 
-    <properties>
-        <javafx.version>16</javafx.version>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-    </properties>
+   <properties>
+    	<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>	   
+     	<javafx.version>17</javafx.version>
+	    <maven.compiler.source>11</maven.compiler.source>
+	    <maven.compiler.target>11</maven.compiler.target>
+   </properties>
 
-  <build>
-    <sourceDirectory>src</sourceDirectory>
-    <resources>
-      <resource>
-        <directory>src</directory>
-        <excludes>
-          <exclude>**/*.java</exclude> <!--  don't include any source files -->
-          <exclude>jars/*.*</exclude> <!--  don't include files in the jars folder -->
-        </excludes>
-      </resource>
-    </resources>
-    <plugins>
-      <plugin>
-      
-      <!-- original maven compiler definition - uses the JRE's javac compiler, not the one Eclipse uses 
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.0</version>
-        <configuration>
-          <release>13</release>
-        </configuration>
-      -->
-
-		<!--  attempt to use the Eclipse JDT compiler, so that the errors match when building
-		https://stackoverflow.com/questions/38070326/java-generics-compiler-error-not-shown-in-eclipse
-		https://wiki.eclipse.org/JDT/FAQ#Can_I_use_JDT_outside_Eclipse_to_compile_Java_code.3F
-		https://wiki.eclipse.org/Tycho/FAQ#Can_I_use_the_Tycho_compiler_support_in_non-OSGi_projects.2C_too.3F
-		-->      
-		<groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
-		<configuration>
-		
-			<!--  set compiler to use Java version 11 API https://docs.oracle.com/javase/9/tools/javac.htm#JSWOR627 -->
-			<release>11</release>
-			<compilerId>jdt</compilerId>
-            <compilerArguments>
-               <properties>.settings/org.eclipse.jdt.core.prefs</properties> <!--  make sure to use same params as what Eclipse uses -->
-            </compilerArguments>
-		</configuration>
-		
-		<dependencies>
-			<!-- https://mvnrepository.com/artifact/org.eclipse.tycho/tycho-compiler-jdt -->
-			<dependency>
-			    <groupId>org.eclipse.tycho</groupId>
-			    <artifactId>tycho-compiler-jdt</artifactId>
-			    <version>1.5.1</version>
-			</dependency>
-		</dependencies>		 	
-		
-      </plugin>
-      
-      <plugin>
-      	<groupId>org.openjfx</groupId>
-		<artifactId>javafx-maven-plugin</artifactId>
-		<version>0.0.6</version>
-		<configuration>
-        	<source>17</source>
-        	<target>17</target>
-        	<release>17</release>
-        </configuration>
-	  </plugin>
+   <build>
 	  
-	  <!--  Maven Shade plugin - for creating the uberjar / fatjar -->
-	  <!--  see http://maven.apache.org/plugins/maven-shade-plugin/index.html for details -->
-      <plugin>
-      	<groupId>org.apache.maven.plugins</groupId>
-      	<artifactId>maven-shade-plugin</artifactId>
-      	<version>3.2.1</version>
-		<configuration>
-			<transformers>
-				<transformer
-					implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-			</transformers>
-		</configuration>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <transformers>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <manifestEntries>
-                    <Main-Class>pamguard.Pamguard</Main-Class>
-                    <Class-Path>.</Class-Path> <!--  this is from the orig ant build file -->
-                    <SplashScreen-Image>Resources/pgBlankSplash.png</SplashScreen-Image> <!--  this is from the orig ant build file -->
-                  </manifestEntries>
-                </transformer>
- 				<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-              </transformers>
-              <filters>
-                <filter>
-                  <artifact>*:*</artifact>
-                  <excludes>
-                    <exclude>META-INF/*.SF</exclude> <!--  get rid of manifests from library jars - also done in orig ant build file -->
-                    <exclude>META-INF/*.DSA</exclude>
-                    <exclude>META-INF/*.RSA</exclude>
-                  </excludes>
-                </filter>
-              </filters>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-	  <!--  The Maven-JDEPS plugin, to analyze necessary JDK dependencies.  See
-	  		this site for details: https://maven.apache.org/plugins/maven-jdeps-plugin/index.html -->	
-      <plugin>
-        <groupId>com.github.marschall</groupId>
-        <artifactId>jdeps-maven-plugin</artifactId>
-        <version>0.5.1</version>
-      </plugin>
-
-	  <!-- The Maven dependency plugin, which can copy all dependencies into a temp folder for jdeps analysis -->      
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>3.1.1</version>
-        <executions>
-          <execution>
-            <id>copy-dependencies</id>
-            <phase>package</phase>
-            <goals>
-              <goal>copy-dependencies</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/tempDependencies</outputDirectory>
-              <overWriteReleases>false</overWriteReleases>
-              <overWriteSnapshots>false</overWriteSnapshots>
-              <overWriteIfNewer>true</overWriteIfNewer>
-            </configuration>
-          </execution>
-          
-          <!--  this deletes all the dependencies in the local repository and downloads them again.  
-          Run a Maven > Update after doing this in order to properly reset the dependencies.  Also, you
-          will need to add the 3 jar files (x3, JasioHost and jave) back into the local repository after
-          running this command -->
-          
-    	<!-- I'm not sure why, but every time I try to run the shade:shade build to create a
-		fatjar it first runs this, which deletes all of the dependencies and completely fails.
-		I think it has something to do with the lifecycle mapping, but that's beyond my Maven
-		abilities right now.
-		I can't even remember why I added this in the first place, so I'm going to comment
-		it out 
-          <execution>
-            <id>purge-local-dependencies</id>
-            <phase>process-sources</phase>
-            <goals>
-              <goal>purge-local-repository</goal>
-            </goals>
-            <configuration>
-            </configuration>
-          </execution>
-          -->
-        </executions>
-      </plugin>
-      
+	   <!-- Define where the source and test directories are -->
+	    <sourceDirectory>${basedir}/src</sourceDirectory>
+	    <testSourceDirectory>${basedir}/src/test</testSourceDirectory> <!-- where the Unit tets are located -->
+	    <resources>
+	      <resource>
+	        <directory>src</directory>
+	        <excludes>
+	          <exclude>**/*.java</exclude> <!--  don't include any source files -->
+	          <exclude>jars/*.*</exclude> <!--  don't include files in the jars folder -->
+	        </excludes>
+	      </resource>
+	    </resources>
+    
+   
+	    <plugins>
+			<!-- original maven compiler definition - uses the JRE's javac compiler, not the one Eclipse uses 
+	        <artifactId>maven-compiler-plugin</artifactId>
+	        <version>3.8.0</version>
+	        <configuration>
+	          <release>13</release>
+	        </configuration>
+	      -->
+	
+			<!--  attempt to use the Eclipse JDT compiler, so that the errors match when building
+			https://stackoverflow.com/questions/38070326/java-generics-compiler-error-not-shown-in-eclipse
+			https://wiki.eclipse.org/JDT/FAQ#Can_I_use_JDT_outside_Eclipse_to_compile_Java_code.3F
+			https://wiki.eclipse.org/Tycho/FAQ#Can_I_use_the_Tycho_compiler_support_in_non-OSGi_projects.2C_too.3F
+			-->     
+		  <plugin> 
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-compiler-plugin</artifactId>
+	        <version>3.12.1</version>
+			<configuration>
+				<!--  set compiler to use Java version 11 API https://docs.oracle.com/javase/9/tools/javac.htm#JSWOR627 -->
+				<release>17</release>
+				<compilerId>jdt</compilerId>
+			</configuration>
+			<dependencies>
+						<!-- https://mvnrepository.com/artifact/org.eclipse.tycho/tycho-compiler-jdt -->
+				<dependency>
+				    <groupId>org.eclipse.tycho</groupId>
+				    <artifactId>tycho-compiler-jdt</artifactId>
+				    <version>1.5.1</version>
+				</dependency>
+			</dependencies>		 	
+	      </plugin>
+	
+				<!-- Set up javafx properly.  -->
+	      <plugin>
+	      	<groupId>org.openjfx</groupId>
+			<artifactId>javafx-maven-plugin</artifactId>
+			<version>0.0.8</version>
+		  </plugin>
+	
+				<!--  Maven Shade plugin - for creating the uberjar / fatjar -->
+				<!--  see http://maven.apache.org/plugins/maven-shade-plugin/index.html for details -->
+	      <plugin>
+	      	<groupId>org.apache.maven.plugins</groupId>
+	      	<artifactId>maven-shade-plugin</artifactId>
+	      	<version>3.2.1</version>
+			<configuration>
+				<transformers>
+					<transformer
+						implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+				</transformers>
+			</configuration>
+	        <executions>
+	          <execution>
+	            <phase>package</phase>
+	            <goals>
+	              <goal>shade</goal>
+	            </goals>
+	            <configuration>
+	              <transformers>
+	                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+	                  <manifestEntries>
+	                    <Main-Class>pamguard.Pamguard</Main-Class>
+	                    <Class-Path>.</Class-Path> <!--  this is from the orig ant build file -->
+	                    <SplashScreen-Image>Resources/pgBlankSplash.png</SplashScreen-Image> <!--  this is from the orig ant build file -->
+	                  </manifestEntries>
+	                </transformer>
+	 				<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+	              </transformers>
+	              <filters>
+	                <filter>
+	                  <artifact>*:*</artifact>
+	                  <excludes>
+	                    <exclude>META-INF/*.SF</exclude> <!--  get rid of manifests from library jars - also done in orig ant build file -->
+	                    <exclude>META-INF/*.DSA</exclude>
+	                    <exclude>META-INF/*.RSA</exclude>
+	                  </excludes>
+	                </filter>
+	              </filters>
+	            </configuration>
+	          </execution>
+	        </executions>
+	      </plugin>
+	
+				<!--  The Maven-JDEPS plugin, to analyze necessary JDK dependencies.  See
+		  		this site for details: https://maven.apache.org/plugins/maven-jdeps-plugin/index.html -->	
+	      <plugin>
+	        <groupId>com.github.marschall</groupId>
+	        <artifactId>jdeps-maven-plugin</artifactId>
+	        <version>0.5.1</version>
+	      </plugin>
+	
+				<!-- The Maven dependency plugin, which can copy all dependencies into a temp folder for jdeps analysis -->      
+	      <plugin>
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-dependency-plugin</artifactId>
+	        <version>3.1.1</version>
+	        <executions>
+	          <execution>
+	            <id>copy-dependencies</id>
+	            <phase>package</phase>
+	            <goals>
+	              <goal>copy-dependencies</goal>
+	            </goals>
+	            <configuration>
+	              <outputDirectory>${project.build.directory}/tempDependencies</outputDirectory>
+	              <overWriteReleases>false</overWriteReleases>
+	              <overWriteSnapshots>false</overWriteSnapshots>
+	              <overWriteIfNewer>true</overWriteIfNewer>
+	            </configuration>
+	          </execution>
+						<!--  this deletes all the dependencies in the local repository and downloads them again.  
+	          Run a Maven > Update after doing this in order to properly reset the dependencies.  Also, you
+	          will need to add the 3 jar files (x3, JasioHost and jave) back into the local repository after
+	          running this command -->
+	
+						<!-- I'm not sure why, but every time I try to run the shade:shade build to create a
+			fatjar it first runs this, which deletes all of the dependencies and completely fails.
+			I think it has something to do with the lifecycle mapping, but that's beyond my Maven
+			abilities right now.
+			I can't even remember why I added this in the first place, so I'm going to comment
+			it out 
+	          <execution>
+	            <id>purge-local-dependencies</id>
+	            <phase>process-sources</phase>
+	            <goals>
+	              <goal>purge-local-repository</goal>
+	            </goals>
+	            <configuration>
+	            </configuration>
+	          </execution>
+	          -->
+	        </executions>
+	      </plugin>
+	      
+	    </plugins>
+    
+    
+	    <pluginManagement>
+	    	<plugins>
+			<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+	    		<plugin>
+	    			<groupId>org.eclipse.m2e</groupId>
+	    			<artifactId>lifecycle-mapping</artifactId>
+	    			<version>1.0.0</version>
+	    			<configuration>
+	    				<lifecycleMappingMetadata>
+	    					<pluginExecutions>
+	    						<pluginExecution>
+	    							<pluginExecutionFilter>
+	    								<groupId>
+	    									org.apache.maven.plugins
+	    								</groupId>
+	    								<artifactId>
+	    									maven-dependency-plugin
+	    								</artifactId>
+	    								<versionRange>
+	    									[3.1.1,)
+	    								</versionRange>
+	    								<goals>
+	    									<goal>
+	    										purge-local-repository
+	    									</goal>
+	    								</goals>
+	    							</pluginExecutionFilter>
+	    							<action>
+	    								<ignore></ignore>
+	    							</action>
+	    						</pluginExecution>
+	    					</pluginExecutions>
+	    				</lifecycleMappingMetadata>
+	    			</configuration>
+	    		</plugin>
+	    	</plugins>
+	    </pluginManagement>
+    </build>
  
-    </plugins>
-    <pluginManagement>
-    	<plugins>
-    		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-    		<plugin>
-    			<groupId>org.eclipse.m2e</groupId>
-    			<artifactId>lifecycle-mapping</artifactId>
-    			<version>1.0.0</version>
-    			<configuration>
-    				<lifecycleMappingMetadata>
-    					<pluginExecutions>
-    						<pluginExecution>
-    							<pluginExecutionFilter>
-    								<groupId>
-    									org.apache.maven.plugins
-    								</groupId>
-    								<artifactId>
-    									maven-dependency-plugin
-    								</artifactId>
-    								<versionRange>
-    									[3.1.1,)
-    								</versionRange>
-    								<goals>
-    									<goal>
-    										purge-local-repository
-    									</goal>
-    								</goals>
-    							</pluginExecutionFilter>
-    							<action>
-    								<ignore></ignore>
-    							</action>
-    						</pluginExecution>
-    					</pluginExecutions>
-    				</lifecycleMappingMetadata>
-    			</configuration>
-    		</plugin>
-    	</plugins>
-    </pluginManagement>
-  </build>
- 
- <reporting>
-    <plugins>
-      <plugin>
-        <groupId>com.github.marschall</groupId>
-        <artifactId>jdeps-maven-plugin</artifactId>
-        <version>0.5.1</version>
-      </plugin>
-    </plugins>
-  </reporting>
+ 	<reporting>
+	    <plugins>
+	      <plugin>
+	        <groupId>com.github.marschall</groupId>
+	        <artifactId>jdeps-maven-plugin</artifactId>
+	        <version>0.5.1</version>
+	      </plugin>
+	    </plugins>
+  	</reporting>
   
   
   <!--  ************************* Extra Repositories ************************************* -->
-	  <repositories>
-	  
+  <repositories>
 		<!--  Project repo to hold the custom jar files that are not available in Maven.  Do
 		this so that we don't have to do the extra step of manually installing jar files in the local repo -->
 		<repository>
@@ -308,12 +302,12 @@
           <url>https://repo1.maven.org/maven2</url>
         </repository>
         
-	</repositories>
+  </repositories>
 
 
   <!--  ************************* Dependencies ************************************* -->
   <dependencies>
-
+	  
 	<!--jpam project - utilities -->
 	<dependency>
 		<groupId>io.github.macster110</groupId>
@@ -836,12 +830,6 @@ C:\Users\*yourusername*\.m2\repository\pamguard\org\x3\2.2.2-->
 	    <version>1.6.5-1</version>
 	</dependency>
 
-	<!--  Theme for JavaFX -->
-	<dependency>
-		<groupId>io.github.mkpaz</groupId>
-		<artifactId>atlantafx-base</artifactId>
-		<version>1.0.0</version>
-	</dependency>
 	
 	<!--  Extra 3D bits for JavaFX -->
 	<dependency>

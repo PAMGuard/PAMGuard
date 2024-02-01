@@ -29,6 +29,7 @@ public class CPODMap {
 	
 	public static final int FILE_CP1 = 1;
 	public static final int FILE_CP3 = 3;
+	
 	int cpFileType = 0; 
 	
 

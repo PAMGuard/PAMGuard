@@ -10,6 +10,7 @@ import org.jamdev.jdl4pam.transforms.SimpleTransform;
 import org.jamdev.jdl4pam.transforms.SimpleTransformParams;
 
 import rawDeepLearningClassifier.DLControl;
+import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
 import rawDeepLearningClassifier.segmenter.SegmenterProcess.GroupedRawData;
 import warnings.PamWarning;
@@ -100,14 +101,14 @@ public interface DLClassiferModel {
 	/**
 	 * Check whether a model has been selected and can be loaded successfully. 
 	 */
-	public boolean checkModelOK();
+	public DLStatus getModelStatus();
 	
-	/**
-	 * Get warnings for the classifier model. This is called when the user confirms settings and 
-	 * used to return a warning dialog. 
-	 * @return a list of warnings. If the list is null or size() is zero then settings are OK. 
-	 */
-	public ArrayList<PamWarning> checkSettingsOK();
+//	/**
+//	 * Get warnings for the classifier model. This is called when the user confirms settings and 
+//	 * used to return a warning dialog. 
+//	 * @return a list of warnings. If the list is null or size() is zero then settings are OK. 
+//	 */
+//	public ArrayList<PamWarning> checkSettingsOK();
 	
 	
 	/**

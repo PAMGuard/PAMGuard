@@ -179,6 +179,7 @@ public class KetosWorker extends DLModelWorker<GenericPrediction> {
 
 	@Override
 	public float[] runModel(float[][][] transformedDataStack) {
+		System.out.println("Model input: " + transformedDataStack.length + "  " + transformedDataStack[0].length + " " + transformedDataStack[0][0].length);
 		return ketosModel.runModel(transformedDataStack);
 	}
 

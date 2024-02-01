@@ -20,8 +20,6 @@ import userDisplayFX.UserDisplayNodeFX;
 import PamModel.PamModel;
 import PamModel.PamModuleInfo;
 import PamView.PamViewInterface;
-import atlantafx.base.theme.PrimerDark;
-import atlantafx.base.theme.PrimerLight;
 import dataMap.layoutFX.DataMapPaneFX;
 import PamController.PAMControllerGUI;
 import PamController.PamControlledUnit;

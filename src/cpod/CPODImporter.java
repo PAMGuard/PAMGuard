@@ -24,10 +24,11 @@ import binaryFileStorage.BinaryFooter;
 import binaryFileStorage.BinaryObjectData;
 import binaryFileStorage.BinaryOutputStream;
 import binaryFileStorage.BinaryStore;
+import cpod.FPODReader.FPODdata;
 import javafx.concurrent.Task;
 
 /**
- * Imports data CPOD data and converts into binary files. 
+ * Imports FPOD and CPOD data and converts into binary files. 
  * 
  * @author Jamie Macaulay
  *
@@ -61,7 +62,7 @@ public class CPODImporter {
 	CPODFileType cpFileType = CPODFileType.CP1; 
 
 	/**
-	 * Hnadles the queue for importing files tasks 
+	 * Handles the queue for importing files tasks 
 	 */
 	private ExecutorService exec = Executors.newSingleThreadExecutor(r -> {
 		Thread t = new Thread(r);
@@ -76,9 +77,9 @@ public class CPODImporter {
 	 */
 	public enum CPODFileType {
 		CP1("CP1"),
-		CP3("CP3");
-		//	    FP1("fp1"),
-		//	    FP3("fp3");
+		CP3("CP3"),
+		FP1("FP1"),
+		FP3("FP3");
 
 		private String text;
 
@@ -110,7 +111,7 @@ public class CPODImporter {
 
 	public static CPODFileType getFileType(File cpFile) {
 		for (int i=0; i<CPODFileType.values().length; i++) {
-			if (cpFile.getAbsolutePath().toLowerCase().endsWith(CPODFileType.values()[i].getText())) {
+			if (cpFile.getAbsolutePath().toLowerCase().endsWith(CPODFileType.values()[i].getText().toLowerCase())) {
 				return CPODFileType.values()[i];
 			}
 		}
@@ -124,6 +125,10 @@ public class CPODImporter {
 			return 360;
 		case CP3:
 			return 720;
+		case FP1:
+			return 1024;
+		case FP3:
+			return 1024;
 		}
 		return 0;
 	}
@@ -134,6 +139,10 @@ public class CPODImporter {
 			return 10;
 		case CP3:
 			return 40;
+		case FP1:
+			return 16;
+		case FP3:
+			return 32;
 		}
 		return 0;
 	}
@@ -154,15 +163,113 @@ public class CPODImporter {
 	protected int importFile(File cpFile, CPODClickDataBlock dataBlock) {
 		return	importFile( cpFile, dataBlock, -1, Integer.MAX_VALUE); 
 	}
+	
+	
 
 	/**
-	 * Import a file. 
-	 * @param cpFile - the CP1 file. 
+	 * Import a CPOD or FPOD file. 
+	 * @param cpFile - the CP1/FP1 or CP3/FP3 file. 
 	 * @param from - the click index to save from. e.g. 100 means that only click 100 + in the file is saved
-	 * @param maxNum
-	 * @return the total number of clicks int he file. 
+	 * @param maxNum - the maximum number to import
+	 * @return the total number of clicks in  the file. 
 	 */
 	protected int importFile(File cpFile, 	CPODClickDataBlock dataBlock, int from, int maxNum) {
+		CPODFileType fileType = getFileType( cpFile); 
+		
+		switch (fileType) {
+		case CP1:
+		case CP3:
+			return importCPODFile(cpFile, dataBlock, from, maxNum);
+		case FP1:
+		case FP3:
+			return importFPODFile(cpFile, dataBlock, from, maxNum);
+		}
+		
+		return 0;
+		
+	}		
+
+
+	/**
+	 * Import a FPOD file. 
+	 * @param cpFile - the FP1 or FP3 file. 
+	 * @param from - the click index to save from. e.g. 100 means that only click 100 + in the file is saved
+	 * @param maxNum - the maximum number to import
+	 * @return the total number of clicks in  the file. 
+	 */
+	protected int importFPODFile(File cpFile, 	CPODClickDataBlock dataBlock, int from, int maxNum) {
+		
+		ArrayList<FPODdata> fpodData = new ArrayList<FPODdata>();
+		
+		try {
+			FPODReader.importFile(cpFile, fpodData, from, maxNum);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+		
+		
+//		fileStart + nMinutes * 60000L; 
+		
+		
+		int nClicks = 0;
+		for (int i=0; i<fpodData.size(); i++) {
+			//System.out.println("Create a new CPOD click: ");
+			CPODClick cpodClick = processClick(fpodData.get(i));
+			dataBlock.addPamData(cpodClick);
+			nClicks++;
+		}
+		
+		fpodData=null; //trigger garbage collector if needed
+		
+		return  nClicks;
+	}
+
+	/**
+	 * Process the click. 
+	 * @param FPODData - an FPOD data object
+	 * @return
+	 */
+	private CPODClick processClick(FPODdata fpoDdata) {
+
+		//how many samples are we into the clicks
+		
+		long fileSamples = (long) (((fpoDdata.minute*60) +  (fpoDdata.FiveMusec*5/1000000.))*CPODClickDataBlock.CPOD_SR);
+		
+		short[] data = new short[9];
+		
+		short nCyc = (short) fpoDdata.Ncyc;
+		short bw = (short) fpoDdata.BW;
+		short kHz =  (short) FPODReader.IPItoKhz(fpoDdata.IPIatMax);
+		short endF =  (short) FPODReader.IPItoKhz(fpoDdata.EndIPI);
+		short spl = (short)  fpoDdata.MaxPkExtnd;
+		short slope = 0;
+		
+		data[3]=nCyc;
+		data[4]=bw;
+		data[5]=kHz;
+		data[6]=endF;
+		data[7]=spl;
+		data[8]=slope;
+
+
+		CPODClick cpodClick = new CPODClick(fpoDdata.getTimeMillis(),	
+				fileSamples, nCyc, bw,
+				kHz,  endF,   spl,  slope, data); 
+		 
+		 
+		 
+		return cpodClick;
+	}
+
+	/**
+	 * Import a CPOD file. 
+	 * @param cpFile - the CP1 or CP3 file. 
+	 * @param from - the click index to save from. e.g. 100 means that only click 100 + in the file is saved
+	 * @param maxNum - the maximum number to import
+	 * @return the total number of clicks in  the file. 
+	 */
+	protected int importCPODFile(File cpFile, 	CPODClickDataBlock dataBlock, int from, int maxNum) {		
+		
 		BufferedInputStream bis = null;
 		int bytesRead;
 		FileInputStream fileInputStream = null;
@@ -190,7 +297,7 @@ public class CPODImporter {
 			while (true) {
 				bytesRead = bis.read(byteData);
 				for (int i = 0; i < bytesRead; i++) {
-					shortData[i] = toUnsigned(byteData[i]);
+					shortData[i] = CPODUtils.toUnsigned(byteData[i]);
 				}
 				if (isFileEnd(byteData)) {
 					fileEnds++;
@@ -215,7 +322,7 @@ public class CPODImporter {
 
 					}
 
-					//					// now remove the data unit from the data block in order to clear up memory.  Note that the remove method
+//					// now remove the data unit from the data block in order to clear up memory.  Note that the remove method
 					//					// saves the data unit to the Deleted-Items list, so clear that as well (otherwise we'll just be using
 					//					// up all the memory with that one)
 					//					dataBlock.remove(cpodClick);
@@ -235,6 +342,15 @@ public class CPODImporter {
 
 		return nClicks;
 	}
+	
+	
+	private CPODClick processClick(int nMinutes, short[] shortData) {
+		/*
+		 * 
+		 */
+		return CPODClick.makeClick(cpodControl, fileStart + nMinutes * 60000L, shortData);
+	}
+
 
 	/**
 	 * A new minute. Don;t think we need to do anything here.?
@@ -245,26 +361,7 @@ public class CPODImporter {
 
 	}
 
-	private CPODClick processClick(int nMinutes, short[] shortData) {
-		/*
-		 * 
-		 */
-		return CPODClick.makeClick(cpodControl, fileStart + nMinutes * 60000L, shortData);
-	}
 
-	/**
-	 * Java will only have read signed bytes. Nick clearly
-	 * uses a lot of unsigned data, so convert and inflate to int16. 
-	 * @param signedByte
-	 * @return unsigned version as int16. 
-	 */
-	static short toUnsigned(byte signedByte) {
-		short ans = signedByte;
-		if (ans < 0) {
-			ans += 256;
-		}
-		return ans;
-	}
 
 	/**
 	 * Is it the end of the file ? 
@@ -363,8 +460,10 @@ public class CPODImporter {
 	public CPODClickDataBlock getDataBlock(CPODFileType type) {
 		switch (type) {
 		case CP1:
+		case FP1:
 			return this.cpodControl.getCP1DataBlock();
 		case CP3:
+		case FP3:
 			return this.cpodControl.getCP3DataBlock();
 		}
 		return null;
