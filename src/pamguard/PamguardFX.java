@@ -61,11 +61,15 @@ public class PamguardFX extends Application {
 
 
 
+	private static int runMode;
+
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		//this is called from launch(args)
 		try {
-			PamController.create(PamController.RUN_NORMAL, primaryStage);
+				PamController.create(runMode, primaryStage);
+			
+			
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -89,7 +93,7 @@ public class PamguardFX extends Application {
 
 		Debug.setPrintDebug(false); // make sure the class instantiates static members. 
 
-		int runMode = PamController.RUN_NORMAL;
+		runMode = PamController.RUN_NORMAL;
 		String InputPsf = "NULL";
 
 
@@ -273,6 +277,7 @@ public class PamguardFX extends Application {
 		//that kicked off from with the EDT CJB 2009-06-16 
 
 		PamGUIManager.setType(PamGUIManager.FX);
+		
 		launch(args);
 
 	}

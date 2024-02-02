@@ -1,32 +1,20 @@
-package rawDeepLearningClassifier.dlClassification.ketos;
+package rawDeepLearningClassifier.dlClassification.archiveModel;
 
 import java.io.File;
-import java.util.ArrayList;
 
-import javafx.stage.FileChooser.ExtensionFilter;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelPane;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
+import rawDeepLearningClassifier.dlClassification.ketos.KetosDLParams;
 
+public class ArchiveModelPane extends StandardModelPane {
 
-/**
- * Settings pane for a Ketos classifier. 
- * @author Jamie Macaulay 
- *
- */
-public class KetosModelPane extends StandardModelPane {
+	private ArchiveModelClassifier archiveModelClassifier;
 
-//	private ArrayList<ExtensionFilter> extensionFilters;
-	
-	
-	private KetosClassifier ketosClassifier;
+	public ArchiveModelPane(ArchiveModelClassifier archiveModelClassifier) {
+		super(archiveModelClassifier);
+		this.archiveModelClassifier = archiveModelClassifier; 
 
-	public KetosModelPane(KetosClassifier soundSpotClassifier) {
-		super(soundSpotClassifier);
-		this.ketosClassifier = soundSpotClassifier; 
-		
 	}
-
-
 
 	@Override
 	public void newModelSelected(File file) {
@@ -55,10 +43,10 @@ public class KetosModelPane extends StandardModelPane {
 		 * Note that the model prep will determine whether new transforms need to be loaded from the 
 		 * model or to use the existing transforms in the settings. 
 		 */
-		ketosClassifier.getKetosWorker().prepModel(params, ketosClassifier.getDLControl());
+		archiveModelClassifier.getDLWorker().prepModel(params, archiveModelClassifier.getDLControl());
 		//get the model transforms calculated from the model by SoundSpoyWorker and apply them to our temporary params clone. 
 //		System.out.println("Ketos transforms 1: " +  this.ketosClassifier.getKetosWorker().getModelTransforms());
-		getParamsClone().dlTransfroms = this.ketosClassifier.getKetosWorker().getModelTransforms(); 
+		getParamsClone().dlTransfroms = this.archiveModelClassifier.getDLWorker().getModelTransforms(); 
 		
 //		if (getParamsClone().defaultSegmentLen!=null) {
 //			usedefaultSeg.setSelected(true);

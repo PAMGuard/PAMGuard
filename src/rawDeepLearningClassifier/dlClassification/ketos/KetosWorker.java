@@ -50,7 +50,7 @@ public class KetosWorker extends DLModelWorker<GenericPrediction> {
 	 * Prepare the model 
 	 */
 	public void prepModel(StandardModelParams ketosDLParams, DLControl dlControl) {
-		ClassLoader origCL = Thread.currentThread().getContextClassLoader();
+		//ClassLoader origCL = Thread.currentThread().getContextClassLoader();
 		try {
 
 			// get the plugin class loader and set it as the context class loader
