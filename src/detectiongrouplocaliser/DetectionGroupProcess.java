@@ -458,6 +458,7 @@ public class DetectionGroupProcess extends PamProcess {
 		detectionGroupDataBlock.saveViewerData();
 		int nUpdates = 0;
 		int nOK = 0;
+		int consecutiveOK = 0;
 		System.out.printf("Checking %d data units in %s ", detectionGroupDataBlock.getUnitsCount(), detectionGroupDataBlock.getDataName());
 		synchronized (detectionGroupDataBlock.getSynchLock()) {
 			ListIterator<DetectionGroupDataUnit> it = detectionGroupDataBlock.getListIterator(0);
@@ -466,11 +467,16 @@ public class DetectionGroupProcess extends PamProcess {
 				boolean ok = checkDataIntegrity(du, false);
 				if (ok) {
 					nUpdates++;
+					consecutiveOK = 0;
 				}
 				else {
 					nOK++;
+					consecutiveOK++;
 				}
 				System.out.printf(".");
+				if (consecutiveOK % 80 == 0) {
+					System.out.printf("\n");
+				}
 			}
 		}
 		System.out.printf("\n%s: %d out of %d data units required corrections\n", detectionGroupDataBlock.getDataName(), nUpdates, nUpdates+nOK);
@@ -486,7 +492,7 @@ public class DetectionGroupProcess extends PamProcess {
 		subTabLogging = detectionGroupLogging.getSubLogging();
 		PamConnection con = DBControlUnit.findConnection();
 		String desc = String.format("Detection group UID %d at %s", du.getUID(), PamCalendar.formatDBDateTime(du.getTimeMilliseconds()));
-		String idList = "( " + du.getUID() + " )";
+		String idList = "( " + du.getDatabaseIndex() + " )";
 		ArrayList<PamSubtableData> stData = subTabLogging.loadSubtableData(con, detectionGroupLogging, idList, null);
 		if (stData == null) {
 			System.out.println("Error loading sub table data for event uid " + du.getUID());

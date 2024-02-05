@@ -2002,7 +2002,7 @@ public abstract class SQLLogging {
 	 * 
 	 * @param con database connection
 	 * @param parentLogging super detection logging instance.
-	 * @param uidList list of UID's in the parent data that have been loaded. 
+	 * @param idList list of ID's in the parent data that have been loaded. Note Id, NOT UID 
 	 * @return list of all PamSubtableData items
 	 */
 	public ArrayList<PamSubtableData> loadSubtableData(PamConnection con, SQLLogging parentLogging, String idList, ViewLoadObserver loadObserver) {
@@ -2034,6 +2034,13 @@ public abstract class SQLLogging {
 		return loadSubtableData(con, subtableResults, loadObserver);
 	}
 
+	/**
+	 * Get a sub table result set. Note that this is based on ID, not UID
+	 * @param con connection
+	 * @param parentLogging parent logging system
+	 * @param parentIdList ParentID list. Note that this is ID, not UID, <br>i.e. the query is  WHERE ParentID IN ...
+	 * @return child table result set
+	 */
 	private ResultSet createSubTableResultSet(PamConnection con, SQLLogging parentLogging,
 			String parentIdList) {
 		String clause = String.format(" WHERE ParentID IN %s ORDER BY UTC, UTCMilliseconds", parentIdList);
