@@ -17,6 +17,7 @@ import java.util.concurrent.Executors;
 import org.apache.commons.io.FilenameUtils;
 
 import PamController.PamController;
+import PamUtils.PamArrayUtils;
 import PamUtils.PamCalendar;
 import PamView.dialog.warn.WarnOnce;
 import binaryFileStorage.BinaryDataSource;
@@ -251,12 +252,22 @@ public class CPODImporter {
 		data[7]=spl;
 		data[8]=slope;
 
-
+		//these are the basic data
 		CPODClick cpodClick = new CPODClick(fpoDdata.getTimeMillis(),	
 				fileSamples, nCyc, bw,
 				kHz,  endF,   spl,  slope, data); 
+		
+		if (fpoDdata.HasWave) {
+			int[] waveform = FPODReader.makeResampledWaveform(fpoDdata);
+			System.out.println("FPOD click waveform: " + kHz); 
+			PamArrayUtils.printArray(waveform);
+		}
+		
+//		cpodClick.setDurationInMilliseconds((fpoDdata.duration*5.)/1000.); 
 		 
-		 
+		//does the click have a waveform?
+		//TODO
+		
 		 
 		return cpodClick;
 	}
@@ -345,10 +356,25 @@ public class CPODImporter {
 	
 	
 	private CPODClick processClick(int nMinutes, short[] shortData) {
+		
+		long minuteMillis = fileStart + nMinutes * 60000L;
+		int t = shortData[0]<<16 | 
+				shortData[1]<<8 |
+				shortData[2]; // 5 microsec intervals !
+		long tMillis = minuteMillis + t/200;
+		
+		// now a bit of time stretching. Need to get the start time and see how
+		// different this is, then it's a linear stretch. 
+		tMillis = cpodControl.stretchClicktime(tMillis);
+		
+		
+		// do a sample number within the file as 5us intervals
+		long fileSamples = t + minuteMillis * 200;
+		
 		/*
 		 * 
 		 */
-		return CPODClick.makeClick(cpodControl, fileStart + nMinutes * 60000L, shortData);
+		return CPODClick.makeCPODClick(tMillis, fileSamples, shortData);
 	}
 
 

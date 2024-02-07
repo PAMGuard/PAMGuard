@@ -44,7 +44,8 @@ import rawDeepLearningClassifier.layoutFX.defaultModels.DefaultModelPane;
 
 
 /**
- * A pane which allows users to select a model. 
+ * A pane which allows users to select a model and then loads the model on 
+ * on a different thread, showing a progress indicator. 
  * 
  * Models could be potentially selected from 
  * 1) A file (implemented)
@@ -479,8 +480,11 @@ public class DLModelSelectPane extends PamBorderPane {
 		ArrayList<String> extensionFilters  = new  ArrayList<String>(); 
 
 		for (DLClassiferModel dlModel: dlControl.getDLModels()) {
+			//System.out.println("Model: " + dlModel.getModelUI());
+
 			if (dlModel.getModelUI()!=null) {
 				for (ExtensionFilter extFilter: dlModel.getModelUI().getModelFileExtensions()){
+					//System.out.println("Extensions: " + extFilter.getExtensions());
 					extensionFilters.addAll(extFilter.getExtensions()); 
 				}
 			}

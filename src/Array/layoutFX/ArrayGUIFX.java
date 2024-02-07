@@ -38,7 +38,10 @@ public class ArrayGUIFX extends PamControlledGUIFX {
 	
 	@Override
 	public void updateParams() {
+		System.out.println("The current array is "+ arrayManager.getCurrentArray()); 
+
 		PamArray newParams=arraySettingsPane.getParams(arrayManager.getCurrentArray());
+		
 		if (newParams!=null) arrayManager.setCurrentArray(newParams);
 		//setup the controlled unit. 
 		arrayManager.setupControlledUnit(); 

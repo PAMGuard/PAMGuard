@@ -6,6 +6,7 @@ import org.controlsfx.control.PopOver;
 import org.controlsfx.control.ToggleSwitch;
 
 import PamController.SettingsPane;
+import PamUtils.PamArrayUtils;
 import PamView.dialog.warn.WarnOnce;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -143,6 +144,10 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 		usedefaultSeg = new ToggleSwitch (); 
 		usedefaultSeg.selectedProperty().addListener((obsval, oldval, newval)->{
 			defaultSegmentLenChanged(); 
+			//only set the hop if the user physically changes the toggle switch. This is not included in defaultSegmentLenChanged
+			//becuase defaultSegmentLenChanged can be called from elsewhere
+			int defaultsamples =  getDefaultSamples();
+			dlClassifierModel.getDLControl().getSettingsPane().getHopLenSpinner().getValueFactory().setValue((int) defaultsamples/2);
 		});
 		usedefaultSeg.setPadding(new Insets(0,0,0,0));
 		//there is an issue with the toggle switch which means that it has dead space to the left if
@@ -212,19 +217,25 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 			//			int defaultsamples = (int) this.soundSpotClassifier.millis2Samples(paramsClone.defaultSegmentLen); 
 
 
-			float sR = dlClassifierModel.getDLControl().getSettingsPane().getSelectedParentDataBlock().getSampleRate(); 
+//			float sR = dlClassifierModel.getDLControl().getSettingsPane().getSelectedParentDataBlock().getSampleRate(); 
 
-			int defaultsamples =  (int) (paramsClone.defaultSegmentLen.doubleValue()*sR/1000.0);
+			int defaultsamples =  getDefaultSamples();
 
 			//work out the window length in samples
 			dlClassifierModel.getDLControl().getSettingsPane().getSegmentLenSpinner().getValueFactory().setValue(defaultsamples);
-			dlClassifierModel.getDLControl().getSettingsPane().getHopLenSpinner().getValueFactory().setValue((int) defaultsamples/2);
+//			dlClassifierModel.getDLControl().getSettingsPane().getHopLenSpinner().getValueFactory().setValue((int) defaultsamples/2);
 
 			dlClassifierModel.getDLControl().getSettingsPane().getSegmentLenSpinner().setDisable(true); 
 		}
 		else {
 			dlClassifierModel.getDLControl().getSettingsPane().getSegmentLenSpinner().setDisable(false); 
 		}
+	}
+	
+	private int getDefaultSamples() {
+		float sR = dlClassifierModel.getDLControl().getSettingsPane().getSelectedParentDataBlock().getSampleRate(); 
+		int defaultsamples =  (int) (paramsClone.defaultSegmentLen.doubleValue()*sR/1000.0);
+		return defaultsamples;
 	}
 
 	/**
@@ -325,6 +336,7 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 		return currParams;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void setParams(StandardModelParams currParams) {
 		try {
@@ -338,18 +350,19 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 
 		//set the params on the advanced pane. 
 //		System.out.println("SET PARAMS ADV PANE: " + (paramsClone.classNames == null ? null : paramsClone.classNames.length));
-		
 		this.getAdvSettingsPane().setParams(paramsClone);
-		//System.out.println("SET advanced params: " + paramsClone.dlTransfroms); 
-
+		
 		if (paramsClone.modelPath!=null) {
+			//this might 
 			currentSelectedFile = new File(paramsClone.modelPath);
+			
+			//this might change the paramsClone values if the model contains pamguard compatible metadata
 			newModelSelected(currentSelectedFile); 
 		}
+		
+		setClassNames(paramsClone);
 
-		setClassNames(currParams);
-
-		usedefaultSeg.setSelected(currParams.useDefaultSegLen); 
+		usedefaultSeg.setSelected(paramsClone.useDefaultSegLen); 
 		defaultSegmentLenChanged();
 		
 		}
@@ -357,7 +370,6 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		//updatePathLabel(); 
 
 	}
@@ -369,7 +381,7 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 	private void setClassNames(StandardModelParams currParams) {
 		speciesIDBox.getItems().clear();
 
-		System.out.println("SET CLASS NAMES: currParams.classNames: " + currParams.classNames + " " +  (currParams.classNames!=null ? currParams.classNames.length: 0) + " " + currParams.numClasses); 
+//		System.out.println("SET CLASS NAMES: currParams.classNames: " + currParams.classNames + " " +  (currParams.classNames!=null ? currParams.classNames.length: 0) + " " + currParams.numClasses); 
 
 		int classNamesLen = 0; 
 
@@ -384,7 +396,9 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 				speciesIDBox.getItems().add("Class: " + i); 
 			}
 		}
-
+		
+//		System.out.println("Binary classification: set: " + speciesIDBox.getItems().size());
+//		PamArrayUtils.printArray(currParams.binaryClassification);
 
 		for (int i=0; i<speciesIDBox.getItems().size(); i++) {
 			if (currParams.binaryClassification!=null && i<currParams.binaryClassification.length) {
@@ -392,7 +406,6 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 			}
 			else {
 				speciesIDBox.getItemBooleanProperty(i).set(true);
-
 			}
 		}
 	}

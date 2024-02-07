@@ -8,12 +8,15 @@ import org.jamdev.jdl4pam.transforms.DLTransformsFactory;
 import org.jamdev.jdl4pam.transforms.DLTransfromParams;
 
 import PamController.PamControlledUnitSettings;
+import PamController.PamSettingManager;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
 import rawDeepLearningClassifier.dlClassification.StandardClassifierModel;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
+import rawDeepLearningClassifier.dlClassification.ketos.KetosDLParams;
+import rawDeepLearningClassifier.dlClassification.ketos.KetosUI;
 import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
 
 /**
@@ -31,7 +34,7 @@ public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 	/**
 	 * The file extensions
 	 */
-	private String[] fileExtensions = new String[] {"zip"};
+	private String[] fileExtensions = new String[] {"*.zip"};
 		
 	/**
 	 * Parameters for a Ketos classifier. 
@@ -51,7 +54,13 @@ public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 
 	public ArchiveModelClassifier(DLControl dlControl) {
 		super(dlControl);
-		// TODO Auto-generated constructor stub
+		this.standardDLParams = makeParams(); 
+
+		this.archiveModelUI= new ArchiveModelUI(this); 
+		
+		//load the previous settings
+		PamSettingManager.getInstance().registerSettings(this);
+
 	}
 
 
@@ -73,7 +82,7 @@ public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 
 	@Override
 	public DLModelWorker<GenericPrediction> getDLWorker() {
-		return getKetosWorker();
+		return getModelWorker();
 	}
 
 
@@ -100,7 +109,7 @@ public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 	 * Get the KetosWorker. this handles loading and running the Ketos model. 
 	 * @return the Ketos worker. 
 	 */
-	public ArchiveModelWorker getKetosWorker() {
+	public ArchiveModelWorker getModelWorker() {
 		if (archiveModelWorker==null) {
 			archiveModelWorker= new ArchiveModelWorker(); 
 		}
@@ -123,7 +132,7 @@ public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 	@Override
 	public Serializable getSettingsReference() {
 		if (standardDLParams==null) {
-			standardDLParams = new StandardModelParams(); 
+			standardDLParams = makeParams();
 		}
 		
 		ArrayList<DLTransfromParams> dlTransformParams = DLClassiferModel.getDLTransformParams(standardDLParams.dlTransfroms);
@@ -153,8 +162,17 @@ public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 						.makeDLTransforms((ArrayList<DLTransfromParams>) standardDLParams.dlTransfromParams);
 			}
 		} else
-			standardDLParams = new StandardModelParams();
+			standardDLParams = makeParams();
 		return true;
+	}
+	
+	/**
+	 * Create the parameters class for the model. This can be overridden for bespoke parameters. 
+	 *classes. 
+	 * @return a new parameters class object. 
+	 */
+	public StandardModelParams makeParams() {
+		return new StandardModelParams();
 	}
 
 	@Override

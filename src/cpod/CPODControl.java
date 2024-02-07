@@ -30,7 +30,8 @@ import PamguardMVC.dataOffline.OfflineDataLoadInfo;
  * @author Doug Gillespie
  * @author Jamie Macaulay
  *
- */
+ */	
+@Deprecated
 public class CPODControl extends OfflineFileControl implements PamSettings {
 
 	private CPODClickDataBlock cp1DataBlock, cp3DataBlock;

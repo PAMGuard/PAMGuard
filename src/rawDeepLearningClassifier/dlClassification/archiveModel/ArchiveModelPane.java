@@ -18,6 +18,8 @@ public class ArchiveModelPane extends StandardModelPane {
 
 	@Override
 	public void newModelSelected(File file) {
+		
+		//the model has to set some of the parameters for the UI . 
 			
 		//A ketos model contains information on the transforms, duration and the class names. 
 		this.setCurrentSelectedFile(file);
@@ -27,7 +29,7 @@ public class ArchiveModelPane extends StandardModelPane {
 		}
 		
 			
-		StandardModelParams params  = getParams(getParamsClone()); 
+		StandardModelParams params  = getParamsClone(); 
 		
 		
 //		if (params.dlTransfromParams!=null) {
@@ -44,19 +46,16 @@ public class ArchiveModelPane extends StandardModelPane {
 		 * model or to use the existing transforms in the settings. 
 		 */
 		archiveModelClassifier.getDLWorker().prepModel(params, archiveModelClassifier.getDLControl());
-		//get the model transforms calculated from the model by SoundSpoyWorker and apply them to our temporary params clone. 
-//		System.out.println("Ketos transforms 1: " +  this.ketosClassifier.getKetosWorker().getModelTransforms());
+		
+		//get the model transforms calculated from the model by the worker and apply them to our temporary params clone. 
 		getParamsClone().dlTransfroms = this.archiveModelClassifier.getDLWorker().getModelTransforms(); 
 		
 //		if (getParamsClone().defaultSegmentLen!=null) {
 //			usedefaultSeg.setSelected(true);
 //		}
-				
-//		System.out.println("Ketos: new model selected " + getParamsClone().dlTransfroms.size());
+		
 		///set the advanced pane parameters. 
 		getAdvSettingsPane().setParams(getParamsClone());
-		
-		
 		
 	}
 

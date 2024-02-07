@@ -100,7 +100,7 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 	
 	@Override
 	public void prepModel() {
-		//System.out.println("PrepModel! !!!");
+//		System.out.println("STANDARD CLASSIFIER MODEL PREP MODEL! !!!");
 		StandardModelParams oldParams = getDLParams().clone();
 		
 		getDLWorker().prepModel(getDLParams(), dlControl);

@@ -123,7 +123,7 @@ public class KetosWorker extends DLModelWorker<GenericPrediction> {
 			
 			//only load new transforms if defaults are selected
 			if (getModelTransforms()==null || ketosDLParams.dlTransfroms==null || ketosDLParams.useDefaultTransfroms) {
-				System.out.println("  " + transforms); 
+				//System.out.println("  " + transforms); 
 				//System.out.println("SET MODEL TRANSFORMS: " + ketosDLParams.dlTransfroms + "  " +  ketosDLParams.useDefaultTransfroms); 
 
 				//only set the transforms if they are null - otherwise handled elsewhere. 
@@ -152,7 +152,13 @@ public class KetosWorker extends DLModelWorker<GenericPrediction> {
 			
 			if (ketosParams.classNames!=null) {
 				ketosDLParams.classNames = dlControl.getClassNameManager().makeClassNames(ketosParams.classNames); 
+				ketosDLParams.numClasses = ketosDLParams.classNames.length;
 			}
+			else {
+				//set the number of class names from the default output shape
+				ketosDLParams.numClasses = (int) ketosParams.defaultOutputShape.get(1);
+			}
+
 
 //						if (dlParams.classNames!=null) {
 //							for (int i = 0; i<dlParams.classNames.length; i++) {

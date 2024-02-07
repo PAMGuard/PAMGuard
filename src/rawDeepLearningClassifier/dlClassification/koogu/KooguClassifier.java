@@ -2,6 +2,9 @@ package rawDeepLearningClassifier.dlClassification.koogu;
 
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dlClassification.archiveModel.ArchiveModelClassifier;
+import rawDeepLearningClassifier.dlClassification.archiveModel.ArchiveModelWorker;
+import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
+import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
 
 /**
  * Classifier which uses deep learning models from Koogus' framework.
@@ -23,7 +26,9 @@ public class KooguClassifier extends ArchiveModelClassifier {
 	/**
 	 * The file extensions
 	 */
-	private String[] fileExtensions = new String[] {"kgu"};
+	private String[] fileExtensions = new String[] {"*.kgu"};
+
+	private KooguModelWorker kooguWorker;
 
 
 	public KooguClassifier(DLControl dlControl) {
@@ -39,4 +44,15 @@ public class KooguClassifier extends ArchiveModelClassifier {
 	public String getName() {
 		return MODEL_NAME;
 	}
+	
+	@Override
+	public ArchiveModelWorker getModelWorker() {
+		if (kooguWorker==null) {
+			kooguWorker= new KooguModelWorker(); 
+		}
+		return kooguWorker;
+	}
+
+
+
 }

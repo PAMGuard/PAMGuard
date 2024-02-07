@@ -17,6 +17,7 @@ import fileOfflineData.OfflineFileMapPoint;
  * @author Doug Gillespie
  *
  */
+@Deprecated
 public class CPODLoader {
 
 	private CPODControl cpodControl;

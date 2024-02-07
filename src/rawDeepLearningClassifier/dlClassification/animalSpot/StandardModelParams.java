@@ -150,6 +150,7 @@ public class StandardModelParams implements Serializable, Cloneable {
 	
 	@Override
 	public String toString() {
+		super.toString();
 		String string = "-------Transforms------\n";
 		if (dlTransfromParams==null) {
 			string+="There are no transform params\n"; 

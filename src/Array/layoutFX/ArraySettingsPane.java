@@ -346,7 +346,10 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 
 
 	@Override
-	public PamArray  getParams(PamArray  currParams) {
+	public PamArray getParams(PamArray  currParams) {
+		
+		if (currParams==null) currParams = this.currentArray;
+		
 		currParams = streamerPane.getParams(currParams); 
 		currParams = hydrophonePane.getParams(currParams); 
 		currParams.setHydrophoneInterpolation(hydrophonePane.getHydrophoneInterp());

@@ -476,25 +476,23 @@
 	<dependency>
 		<groupId>org.kordamp.ikonli</groupId>
 		<artifactId>ikonli-javafx</artifactId>
-		<version>12.2.0</version>
+		<version>12.3.1</version>
 	</dependency> 
 	
-	<!-- Ikonli FontAwesome5 font pack https://kordamp.org/ikonli/cheat-sheet-fontawesome5.html -->
-	<!--
-	<dependency>
-	    <groupId>org.kordamp.ikonli</groupId>
-		<artifactId>ikonli-fontawesome5-pack</artifactId>
-		<version>12.2.0</version>
-	</dependency>
-	 -->
-	 
 	<!-- Ikonli MaterialDesign2 (Latest) font pack https://kordamp.org/ikonli/cheat-sheet-materialdesign2.html -->
 	<dependency>
 	    <groupId>org.kordamp.ikonli</groupId>
 	    <artifactId>ikonli-materialdesign2-pack</artifactId>
-	    <version>12.2.0</version>
+	    <version>12.3.1</version>
 	</dependency>
-	 
+	
+	<!-- Ikonli File Icons (Latest) font pack https://kordamp.org/ikonli/cheat-sheet-materialdesign2.html -->
+	<dependency>
+	    <groupId>org.kordamp.ikonli</groupId>
+	    <artifactId>ikonli-fileicons-pack</artifactId>
+	    <version>12.3.1</version>
+	</dependency>
+
 	<!-- https://mvnrepository.com/artifact/net.sf.geographiclib/GeographicLib-Java -->
 	<dependency>
 		<groupId>net.sf.geographiclib</groupId>

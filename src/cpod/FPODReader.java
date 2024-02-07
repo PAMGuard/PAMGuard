@@ -9,17 +9,38 @@ import java.util.ArrayList;
 
 
 /**
- * Functions for importing FPOD files. Noe this class is independent of any PAMGuard functionality. 
+ * Functions for importing FPOD files.
+ * <p>
+ * Note this class should be independent of any PAMGuard functionality. 
+ * <p>
+ * Although some anming has changed a lot of the variable names are consistent with Pascal code
+ * used in FPOD.exe software from whihc this is absed. 
  * 
  * @author Jamie Macaulay
  */
 public class FPODReader {
 	
+	/**
+	 * Look up array to convert byte values to linear sound level
+	 */
 	private static int[] LinearPkValsArr;
 
+	/**
+	 * Look up array to convert byte values to linear sound level if using extended amps. 
+	 */
 	private static int[][] ClippedPkArr;
+	
 
-
+	/**
+	 * Look up sine array fro reconstructing waveforms. 
+	 */
+	private static double[] SineArr = new double[2000];
+	
+	/**
+	 * Look up sine array for converting IPI (inter-pulse-interval) to kHz values
+	 */
+	private static int[] IPItoKHZ = new int[257];
+	
 	/**
 	 * Length of the FPOD header in bytes. 
 	 */
@@ -37,6 +58,7 @@ public class FPODReader {
 	 */
 	private static final int FP3_FPOD_DATA_LEN = 32;
 	
+	
 	/**
 	 * Import an FPOD file. 
 	 * @param cpFile - the FP1 file. 
@@ -48,6 +70,7 @@ public class FPODReader {
 	public static int importFile(File cpFile, ArrayList<FPODdata> fpodData, int from, int maxNum ) throws IOException {
 		
 		populateRawToRealPkArrays();
+		populateIPIArray();
 
 		BufferedInputStream bis = null;
 		int bytesRead;
@@ -175,7 +198,8 @@ public class FPODReader {
 								fpodClick.EndIPI = bufPosN[15] & 254 + 1; // + 1 on all IPIs because counts from the POD start at
 							}
 
-							fpodClick.duration = ((bufPosN[13] & 240) << 4 | bufPosN[14]);
+							//the duration is in 5us units. 
+							fpodClick.duration =  ((bufPosN[13] & 240)*16 + toUnsigned(bufPosN[14]));
 							
 							///rm...can't exactly explain this but it's translated from FPOD Pascal code - calculates bandwidth
 							int ampDfSum = Math.abs(fpodClick.Pkminus1Extnd - fpodClick.MaxPkRaw);
@@ -233,7 +257,7 @@ public class FPODReader {
 							
 							
 							if (nClicks%100000==0) {
-								System.out.println("Pod data: " + nClicks + "  " +fpodClick.getTimeMillis() + "  " +fpodClick.dataString());
+								System.out.println("Pod data: " + nClicks + "  " +fpodClick.getTimeMillis() + "  " +fpodClick.dataString() + "  "  +toUnsigned(bufPosN[13]) + "  "  + toUnsigned(bufPosN[14]));
 							}
 							
 							
@@ -377,7 +401,24 @@ public class FPODReader {
 	 * @return the kHz value
 	 */
 	public static int IPItoKhz(int IPI) {
-		return 4000/IPI;
+		return IPItoKHZ[IPI];
+	}
+	
+	/**
+	 * Ppulate the IPI array 
+	 */
+	public static void populateIPIArray() {
+		
+		for (int count = 0; count < 16; count++) {
+		    IPItoKHZ[count] = 255;
+		}
+
+		for (int count = 16; count < 256; count++) {
+		    IPItoKHZ[count] = Math.round(4000 / count);
+		}
+
+		IPItoKHZ[64] = 63; // Smoothes an uncomfortable step here
+		IPItoKHZ[256] = 1; // An 'indicative' value
 	}
 
 
@@ -883,7 +924,7 @@ public class FPODReader {
 
 	/**
 	 * Holds FPOD wav data. Note this is not actually wav data 
-	 * but the amplitue and inter pule interval of successive peaks 
+	 * but the amplitude and inter pulse interval of successive peaks 
 	 * in the waveform. 
 	 */
 	public static class FPODWavData {
@@ -1068,14 +1109,92 @@ public class FPODReader {
 
 	}
 	
+	
+
+	    public static void BuildSineArray() {
+	    	
+	        final double constPiFrac = Math.PI / 1000;
+	        double S;
+	        for (int count = 0; count < 2000; count++) {
+	            S = Math.sin(constPiFrac * count);
+	            SineArr[count] = S;
+	        }
+	    }
+
+	    /**
+	     * Reconstructs sinusoidal waveform from the peaks which have been sampled at 4MHz 
+	     * 
+	     * @param click - FPOD click with waveform information. 
+	     */
+	    public static int[] makeResampledWaveform(FPODdata click) {
+	    	
+	    	if (SineArr==null) {
+	    		BuildSineArray();
+	    	}
+	    	
+	    	int[] MhzSampledArr = new int[23]; 
+	    	
+	        int count, cyc, SinePtsPerUs, SinePtr, FirstClkCyc, IPIsum, NewIPIx, OldIPIx;
+
+	        // MhzSampledArr initialization (assuming it's an array)
+
+	        // Read back from end of WavIPIarr to find start of continuous sound data
+	        int RawStartPtr = 21;
+	        
+	      
+	        while (RawStartPtr > 0 &&   click.getWavData().getWavValsIPI()[RawStartPtr] < 255) {
+	        	click.getWavData().getWavValsSPL()[RawStartPtr] = (short) LinearPkValsArr[click.getWavData().getWavValsSPL()[RawStartPtr]];
+	            RawStartPtr--;
+	        }
+	        RawStartPtr = Math.min(21, RawStartPtr + 1);
+	        FirstClkCyc = 21 - click.Ncyc;
+
+	        // Construct each cycle in MhzSampledArr
+	        SinePtr = 0;
+	        int MHzArrPtr = 0;
+	        int MaxSPLval = 0;
+	        IPIsum = 0;
+
+	        cyc = RawStartPtr;
+
+	        do {
+	            // Populate MhzSampledArr
+	            SinePtsPerUs = Math.round(4000 / click.getWavData().getWavValsIPI()[cyc]);
+	            do {
+	                MhzSampledArr[MHzArrPtr] = (int) Math.round(SineArr[SinePtr] * click.getWavData().getWavValsSPL()[cyc]);
+	                MHzArrPtr++;
+	                SinePtr += SinePtsPerUs;
+	            } while (SinePtr <= 1999 && MHzArrPtr < MhzSampledArr.length);
+
+	            if (MHzArrPtr >= MhzSampledArr.length) {
+	                break; // Fix: extend this array if needed
+	            }
+	            SinePtr -= 2000;
+	            if (cyc == FirstClkCyc) {
+	                int StartOfClickHighRes = MHzArrPtr;
+	            }
+	            IPIsum += click.getWavData().getWavValsIPI()[cyc];
+	            cyc++;
+	        } while (cyc < 22);
+
+	        // Bring line up to zero
+	        if (MHzArrPtr < MhzSampledArr.length) {
+	            MhzSampledArr[MHzArrPtr] = 0;
+	        }
+	        
+	        return MhzSampledArr;
+	    }
+	
 
 	/**
 	 * Test the program
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String filePath = "/Users/au671271/Library/CloudStorage/GoogleDrive-macster110@gmail.com/My Drive/PAMGuard_dev/CPOD/FPOD_NunBank/0866 NunBankB 2023 06 27 FPOD_6480 file0.FP1";
+//		String filePath = "/Users/au671271/Library/CloudStorage/GoogleDrive-macster110@gmail.com/My Drive/PAMGuard_dev/CPOD/FPOD_NunBank/0866 NunBankB 2023 06 27 FPOD_6480 file0.FP1";
 
+		String filePath = "D:\\My Drive\\PAMGuard_dev\\CPOD\\FPOD_NunBank\\0866 NunBankB 2023 06 27 FPOD_6480 file0.FP1";
+		
 		File fpfile = new File(filePath); 
 
 		ArrayList<FPODdata> fpodData = new ArrayList<FPODdata>();
