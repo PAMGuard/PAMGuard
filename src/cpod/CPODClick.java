@@ -8,7 +8,7 @@ import PamguardMVC.PamDataUnit;
 import PamguardMVC.superdet.SuperDetection;
 
 /**
- * CPOD click. 
+ * CPOD or FPOD click. 
  */
 public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implements AcousticDataUnit {
 
@@ -21,6 +21,7 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 	private long iciSamples;
 	private short[] rawData;
 	
+
 	/**
 	 * The amplitude in dB. 
 	 */
@@ -44,6 +45,7 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 		short slope = shortData[8];
 		CPODClick cpodClick = new CPODClick(baseData.getTimeMilliseconds(), baseData.getStartSample(), 
 				nCyc, bw, kHz, endF, spl, slope, shortData);
+//		cpodClick.setDurationInMilliseconds(baseData.getMillisecondDuration());
 		return cpodClick;
 	}
 	
@@ -55,6 +57,7 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 	 * @param shortData
 	 * @return
 	 */
+	@Deprecated
 	public static CPODClick makeClick(CPODControl cpodControl, long minuteMillis, short[] shortData) {
 
 		int t = shortData[0]<<16 | 
@@ -76,33 +79,25 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 		short endF = shortData[6];
 		short spl = shortData[7];
 		short slope = shortData[8];
+		
 		CPODClick cpodClick = new CPODClick(tMillis, fileSamples, nCyc, bw, kHz, endF, spl, slope, shortData);
+		
+//		//estimate the duration in millis - not accurate but gives an idea.
+//		double duration = (nCyc/(double) kHz);
+//		cpodClick.setDurationInMilliseconds(duration);
+		
 		return cpodClick;
 	}
 	
 	/**
-	 * Create a CPOD click. This is usually called whenever the CPOD click is imported from a CSV file. 
-	 * 
-	 * @param minuteMillis The time in milliseconds of the minute block preceding the
-	 * current click. 
-	 * @param shortData
-	 * @return
+	 * Make a FPOD click. This called whenever click has been imported from a FP1 or FP3 file
+	 * @param tMillis - the time in milliseconds datenum.
+	 * @param fileSamples - the number of samples into the file the CPOD click is at - this is calculated from CPODClickDataBlock.CPOD_SR
+	 * @param shortData - the raw data from the CPOD click. This can be 8 bytes or 30 bytes if a click train clcik
+	 * @return a CPODClick object. 
 	 */
-	public static CPODClick makeClick(CPODControl2 cpodControl, long minuteMillis, short[] shortData) {
-
-		int t = shortData[0]<<16 | 
-				shortData[1]<<8 |
-				shortData[2]; // 5 microsec intervals !
-		long tMillis = minuteMillis + t/200;
+	public static CPODClick makeFPODClick(long tMillis, long fileSamples, short[] shortData) {
 		
-		// now a bit of time stretching. Need to get the start time and see how
-		// different this is, then it's a linear stretch. 
-		tMillis = cpodControl.stretchClicktime(tMillis);
-		
-		
-		// do a sample number within the file as 5us intervals
-		long fileSamples = t + minuteMillis * 200;
-//		int micros = t%200;
 		short nCyc = shortData[3];
 		short bw = shortData[4];
 		short kHz = shortData[5];
@@ -110,11 +105,42 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 		short spl = shortData[7];
 		short slope = shortData[8];
 		CPODClick cpodClick = new CPODClick(tMillis, fileSamples, nCyc, bw, kHz, endF, spl, slope, shortData);
+		
+		
+		
+		return cpodClick;
+	}
+	
+	/**
+	 * Make a CPOD click. This called whenever click has been imported from a CP1 or CP3 file
+	 * @param tMillis - the time in milliseconds datenum.
+	 * @param fileSamples - the number of samples into the file the CPOD click is at - this is calculated from CPODClickDataBlock.CPOD_SR
+	 * @param shortData - the raw data from the CPOD click. This can be 8 bytes or 40 bytes if a click train clcik
+	 * @return a CPODClick object. 
+	 */
+	public static CPODClick makeCPODClick(long tMillis, long fileSamples, short[] shortData) {
+		
+		short nCyc = shortData[3];
+		short bw = shortData[4];
+		short kHz = shortData[5];
+		short endF = shortData[6];
+		short spl = shortData[7];
+		short slope = shortData[8];
+		CPODClick cpodClick = new CPODClick(tMillis, fileSamples, nCyc, bw, kHz, endF, spl, slope, shortData);
+		
+//		//estimate the duration in millis - not accurate but gives an idea.
+		double duration = (nCyc/(double) kHz);
+		cpodClick.setDurationInMilliseconds(duration);
+		
+
+		//TODO
+		//add classification info. 
+		
 		return cpodClick;
 	}
 
 	/**
-	 * Constructor for a CPOD click. 
+	 * Constructor for a CPOD click. This adds all basic information that is required for a CPOD or FPOD click
 	 * @param tMillis - the time in millis. 
 	 * @param fileSamples - the file samples
 	 * @param nCyc - the number of cycles
@@ -135,13 +161,14 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 		this.spl = spl;
 		this.slope = slope;
 		double[] f = new double[2];
-		f[0] = Math.min(kHz, endF)*1000;
-		f[1] = Math.max(kHz, endF)*1000;
+		
+		f[0] = (kHz - bw/2.)*1000.;
+		f[1] = (kHz + bw/2.)*1000.;
+		
 		setFrequency(f);
 		
-		//estimate the duration in millis - not accurate but gives an idea.
 		double duration = (nCyc/(double) kHz);
-		this.setDurationInMilliseconds(duration);
+		setDurationInMilliseconds(duration);
 	
 		if (shortData!=null) {
 			//only CPOD
@@ -260,6 +287,7 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 		}
 		return amplitudedB;
 	}
+	
 
 	/* (non-Javadoc)
 	 * @see PamDetection.AcousticDataUnit#getSummaryString()

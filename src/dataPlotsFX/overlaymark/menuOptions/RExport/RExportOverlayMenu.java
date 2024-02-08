@@ -22,6 +22,8 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
+import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxGlyphs.PamSVGIcon;
 import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
@@ -65,29 +67,31 @@ public class RExportOverlayMenu extends ExportOverlayMenu {
 //		return button; 
 		
 		PamButton button = new PamButton(); 
+		Text matlabIcon=PamGlyphDude.createPamIcon("file-r", standardIconSize+7);
+		button.setGraphic(matlabIcon);
 
-		PamSVGIcon svgsprite;
-		try {
-			
-//			System.out.println("START SVG load R"); 
-
-			PamSVGIcon svgIconMaker = new PamSVGIcon();
-
-			svgsprite = svgIconMaker.create(getClass().getResource("/Resources/r-project.svg").toURI().toURL(), Color.WHITE, 1);
-
-//			svgsprite = PamSVGIcon.create(new File(getClass().getResource("/Resources/r-project.svg").toURI()), 
-//					 "-fx-fill: white; -fx-stroke-width: 2;");
-			svgsprite.setFitHeight(standardIconSize+7);
-			svgsprite.setFitWidth(standardIconSize+7);		
-			button.setGraphic(svgsprite.getSpriteNode());
-			
-//			System.out.println("END SVG load R"); 
-
-
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		PamSVGIcon svgsprite;
+//		try {
+//			
+////			System.out.println("START SVG load R"); 
+//
+//			PamSVGIcon svgIconMaker = new PamSVGIcon();
+//
+//			svgsprite = svgIconMaker.create(getClass().getResource("/Resources/r-project.svg").toURI().toURL(), Color.WHITE, 1);
+//
+////			svgsprite = PamSVGIcon.create(new File(getClass().getResource("/Resources/r-project.svg").toURI()), 
+////					 "-fx-fill: white; -fx-stroke-width: 2;");
+//			svgsprite.setFitHeight(standardIconSize+7);
+//			svgsprite.setFitWidth(standardIconSize+7);		
+//			button.setGraphic(svgsprite.getSpriteNode());
+//			
+////			System.out.println("END SVG load R"); 
+//
+//
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		return button;
 	}
 	

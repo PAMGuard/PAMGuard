@@ -15,7 +15,7 @@ import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams
  */
 public class KetosModelPane extends StandardModelPane {
 
-	private ArrayList<ExtensionFilter> extensionFilters;
+//	private ArrayList<ExtensionFilter> extensionFilters;
 	
 	
 	private KetosClassifier ketosClassifier;
@@ -38,7 +38,7 @@ public class KetosModelPane extends StandardModelPane {
 			this.setParamsClone(new KetosDLParams()); 
 		}
 		
-			
+		//set the current paramters for the clone
 		StandardModelParams params  = getParams(getParamsClone()); 
 		
 		
@@ -59,16 +59,16 @@ public class KetosModelPane extends StandardModelPane {
 		//get the model transforms calculated from the model by SoundSpoyWorker and apply them to our temporary params clone. 
 //		System.out.println("Ketos transforms 1: " +  this.ketosClassifier.getKetosWorker().getModelTransforms());
 		getParamsClone().dlTransfroms = this.ketosClassifier.getKetosWorker().getModelTransforms(); 
-		
+				
 //		if (getParamsClone().defaultSegmentLen!=null) {
 //			usedefaultSeg.setSelected(true);
 //		}
+		
+//		System.out.println("---------------------------- ");
+//		System.out.println("KETOS: new model selected " +getParamsClone().dlTransfromParams.size() +  " \n " + getParamsClone());
 				
-//		System.out.println("Ketos: new model selected " + getParamsClone().dlTransfroms.size());
 		///set the advanced pane parameters. 
 		getAdvSettingsPane().setParams(getParamsClone());
-		
-		
 		
 	}
 

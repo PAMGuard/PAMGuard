@@ -533,6 +533,7 @@ public class DLClassifyProcess extends PamInstantProcess {
 	@Override
 	public void pamStart() {
 		// TODO Auto-generated method stub
+		System.out.println("PREP MODEL:");
 		this.dlControl.getDLModel().prepModel(); 
 	}
 

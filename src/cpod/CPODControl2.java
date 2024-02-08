@@ -27,7 +27,7 @@ import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
 
 /**
  * CPOD control. Loads and manages CPOD and FPOD data into 
- * PAMGaurd. 
+ *PAMGaurd. 
  * <p>
  * Note that this module (CPODControl) originally used a folder of CP1 files as it's file store but
  * this version now converts CP1/CP3 etc. into binary files instead in order to integrate into PAMGuard's 
@@ -37,8 +37,6 @@ import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
  *
  */
 public class CPODControl2 extends PamControlledUnit implements PamSettings {
-
-	private static final float CPOD_SAMPLE_RATE = 200000;
 
 	private CPODClickDataBlock cp1DataBlock, cp3DataBlock;
 
@@ -111,7 +109,7 @@ public class CPODControl2 extends PamControlledUnit implements PamSettings {
 		cp3DataBlock.setOverlayDraw(new PamDetectionOverlayGraphics(cp3DataBlock, new PamSymbol())); 
 
 		PamSettingManager.getInstance().registerSettings(this);
-		cpodProcess.setSampleRate(CPOD_SAMPLE_RATE, false);
+		cpodProcess.setSampleRate(CPODClickDataBlock.CPOD_SR, false);
 
 		cpodImporter = new CPODImporter(this); 
 		

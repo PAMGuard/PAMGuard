@@ -367,9 +367,6 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	 */
 	protected void setClassifierPane() {
 		//set the classifier Pane.class 
-		
-		System.out.println("Set CLASSIFIER PANE: " + modelSelectPane.currentClassifierModel); 
-
 		if (modelSelectPane.currentClassifierModel!=null && modelSelectPane.currentClassifierModel.getModelUI()!=null) {
 			
 			classifierPane.setCenter(modelSelectPane.currentClassifierModel.getModelUI().getSettingsPane().getContentNode()); 

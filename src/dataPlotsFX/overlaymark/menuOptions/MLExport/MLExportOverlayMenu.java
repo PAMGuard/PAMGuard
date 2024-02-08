@@ -8,6 +8,8 @@ import javafx.scene.control.Labeled;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
+import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxGlyphs.PamSVGIcon;
 import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
@@ -70,9 +72,8 @@ public class MLExportOverlayMenu extends ExportOverlayMenu {
 	private PamButton createButton() {		
 		PamButton button = new PamButton("");
 
-		if (svgsprite==null) {
-			try {
-				
+//		if (svgsprite==null) {
+//			try {
 //
 //				// load the svg file
 //			    InputStream svgFile = 
@@ -84,20 +85,21 @@ public class MLExportOverlayMenu extends ExportOverlayMenu {
 //			    
 //				button.setGraphic(svgImage);
 				
-				PamSVGIcon svgIconMaker = new PamSVGIcon();
+//				PamSVGIcon svgIconMaker = new PamSVGIcon();
+//				svgsprite = svgIconMaker.create(getClass().getResource("/Resources/matlab_icon2.svg").toURI().toURL(), Color.WHITE, 1);
+////						"-fx-fill: white; -fx-stroke-width: 2;");
+//				svgsprite.setFitHeight(standardIconSize+7);
+//				svgsprite.setFitWidth(standardIconSize+7);		
+				
+				Text matlabIcon=PamGlyphDude.createPamIcon("file-matlab", standardIconSize+7);
 
-			    
-				svgsprite = svgIconMaker.create(getClass().getResource("/Resources/matlab_icon2.svg").toURI().toURL(), Color.WHITE, 1);
-//						"-fx-fill: white; -fx-stroke-width: 2;");
-				svgsprite.setFitHeight(standardIconSize+7);
-				svgsprite.setFitWidth(standardIconSize+7);		
-				button.setGraphic(svgsprite.getSpriteNode());
+				button.setGraphic(matlabIcon);
 
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+//			} catch (Exception e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
 		return button; 
 	}
 

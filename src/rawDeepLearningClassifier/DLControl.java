@@ -34,9 +34,10 @@ import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
 import rawDeepLearningClassifier.dlClassification.DLClassifierChooser;
 import rawDeepLearningClassifier.dlClassification.DLClassifyProcess;
 import rawDeepLearningClassifier.dlClassification.animalSpot.SoundSpotClassifier;
+import rawDeepLearningClassifier.dlClassification.archiveModel.ZipModelClassifier;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericDLClassifier;
-import rawDeepLearningClassifier.dlClassification.ketos.KetosClassifier;
-import rawDeepLearningClassifier.layoutFX.DLModelSelectPane;
+import rawDeepLearningClassifier.dlClassification.ketos.KetosClassifier2;
+import rawDeepLearningClassifier.dlClassification.koogu.KooguClassifier;
 import rawDeepLearningClassifier.layoutFX.DLSidePanelSwing;
 import rawDeepLearningClassifier.layoutFX.DLSymbolManager;
 import rawDeepLearningClassifier.layoutFX.PredictionSymbolManager;
@@ -253,7 +254,9 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 		/***** Add new deep learning models here ****/
 
 		dlModels.add(new SoundSpotClassifier(this));
-		dlModels.add(new KetosClassifier(this));
+		dlModels.add(new KetosClassifier2(this));
+		dlModels.add(new KooguClassifier(this));
+		dlModels.add(new ZipModelClassifier(this));
 		//it is important the Generic Model is last because we need to check 
 		//for PG metadata in all other models before resorting to manually 
 		//setting up a model. 
@@ -404,7 +407,6 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 			settingsPane = new DLSettingsPane(this);
 		}
 		
-		System.out.println("Get DL raw settings pane...");
 		return settingsPane;
 	}
 
@@ -419,8 +421,6 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	 * @param parentFrame - the frame.
 	 */
 	public void showSettingsDialog(Frame parentFrame) {
-		System.out.println("Get DL raw settings pane BAD...");
-
 		if (settingsDialog == null || parentFrame != settingsDialog.getOwner()) {
 			SettingsPane<RawDLParams> setPane = (SettingsPane<RawDLParams>) getSettingsPane();
 			setPane.setParams(this.rawDLParmas);

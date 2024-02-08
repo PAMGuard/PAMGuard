@@ -309,8 +309,9 @@ public class HydrophonesPane extends PamBorderPane {
 		}
 
 		private HydrophoneProperty createDefaultHydrophoneProperty(int id) {
-			return new HydrophoneProperty(new  Hydrophone(id,  defaultx, defaulty,defaultz, defaultxErr, defaultyErr, defaultzErr,  defaulttype, defaultsensitivity,
-					null, 0. ));
+			Hydrophone hydrophone = new  Hydrophone(id,  defaultx, defaulty,defaultz, defaultxErr, defaultyErr, defaultzErr,  defaulttype, defaultsensitivity,
+					null, 0. );
+			return new HydrophoneProperty(hydrophone);
 		}
 
 

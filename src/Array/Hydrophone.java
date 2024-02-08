@@ -315,7 +315,7 @@ public class Hydrophone implements Serializable, Cloneable, ManagedParameters {
 			// need to explicity create a new copy of the double[3] coordinate 
 			// and the double[2] bandwidth
 			Hydrophone h = (Hydrophone) super.clone();
-			h.setBandwidth(Arrays.copyOf(getBandwidth(), h.getBandwidth().length));
+			h.setBandwidth(getBandwidth() == null ? null : Arrays.copyOf(getBandwidth(), h.getBandwidth().length));
 			h.setCoordinate(Arrays.copyOf(getCoordinates(), 3));
 			h.setCoordinateErrors(Arrays.copyOf(getCoordinateErrors(), 3));
 			h.checkDepthInversion();

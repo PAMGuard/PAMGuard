@@ -121,7 +121,7 @@ public class StandardAdvModelPane extends SettingsPane<StandardModelParams> {
 
 	@Override
 	public void setParams(StandardModelParams params) {
-		//System.out.println("Set advanced pane params: " + params.useDefaultTransfroms);
+//		System.out.println("Set advanced pane params: " + params.dlTransfroms.size());
 		if (params.dlTransfroms==null) {
 			mainPane.setTop(null);
 			mainPane.setCenter(new Label("A model must be loaded before \n "

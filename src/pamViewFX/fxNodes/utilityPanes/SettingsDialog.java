@@ -4,6 +4,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
+import pamViewFX.fxStyles.PamStylesManagerFX;
 import PamController.PamController;
 import PamController.SettingsPane;
 
@@ -21,11 +22,11 @@ public class SettingsDialog<T> extends PamDialogFX<T>{
 
 	public SettingsDialog(SettingsPane<T> settingsPane){
 		super(PamGuiManagerFX.getInstance().getPrimaryStage() /*TODO - add stage*/, settingsPane.getName(), StageStyle.DECORATED);
+		this.getDialogPane().getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getDialogCSS());
 		this.setResizable(true);
 		this.settingsPane=settingsPane;
 		this.setContent(settingsPane.getContentNode());
 //		this.getDialogPane().getStylesheets().add(PamController.getInstance().getGuiManagerFX().getPamSettingsCSS());
-		this.getDialogPane().getStylesheets().addAll(PamController.getInstance().getGuiManagerFX().getPamDialogCSS());
 
 		Stage stage = (Stage) this.getDialogPane().getScene().getWindow();
 		stage.toFront();

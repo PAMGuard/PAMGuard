@@ -23,7 +23,7 @@ public class GenericModelWorker extends DLModelWorker<GenericPrediction> {
 	/**
 	 * The generic model 
 	 */
-	private PamGenericModel genericModel;
+	private GenericModel genericModel;
 	
 	/**
 	 * Frequency transform. 
@@ -86,7 +86,9 @@ public class GenericModelWorker extends DLModelWorker<GenericPrediction> {
 					genericModel.getModel().close();
 				}
 				//System.out.println(Paths.get(genericParams.modelPath)); 
-				genericModel = new PamGenericModel(genericParams.modelPath); 
+				
+				//create a new model.
+				genericModel = new GenericModel(genericParams.modelPath); 
 
 				//System.out.println("LOAD A NEW MODEL: "); 
 				//System.out.println(genericModel.getModel().getModelPath().getFileName()); 
@@ -156,7 +158,7 @@ public class GenericModelWorker extends DLModelWorker<GenericPrediction> {
 	 * Generic model. 
 	 * @return the generic model. 
 	 */
-	public PamGenericModel getModel() {
+	public GenericModel getModel() {
 		return genericModel;
 	}
 

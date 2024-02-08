@@ -682,6 +682,7 @@ public class PamArrayUtils {
 	 * @return the summation of all the elements in the array.
 	 */
 	public static double sum(double[][] array2) {
+		if (array2==null) System.out.println("null"); 
 		double sum=0; 
 		double[] array; 
 		for (int i=0; i<array2.length; i++) {
@@ -698,6 +699,7 @@ public class PamArrayUtils {
 	 * @param array to print
 	 */
 	public static void printArray(double[] array) {
+		if (array==null) System.out.println("null"); 
 		for (int i=0; i<array.length; i++) {
 			System.out.println(i + ": " + array[i]);
 		}
@@ -709,12 +711,14 @@ public class PamArrayUtils {
 	 * @param array to print
 	 */
 	public static void printArrayRaw(double[] array) {
+		if (array==null) System.out.println("null"); 
 		for (int i=0; i<array.length; i++) {
 			System.out.println(array[i]);
 		}
 	}
 
 	public static void printArray(int[] array) {
+		if (array==null) System.out.println("null"); 
 		for (int i=0; i<array.length; i++) {
 			System.out.println(i + ": " + array[i]);
 		}
@@ -725,6 +729,7 @@ public class PamArrayUtils {
 	 * @param array - the array 
 	 */
 	public static void printArray(double[][] array) {
+		if (array==null) System.out.println("null"); 
 		for (int j=0; j<array.length; j++) {
 			System.out.println("");
 			for (int i=0; i<array[j].length; i++) {
@@ -741,6 +746,7 @@ public class PamArrayUtils {
 	 * @param array - the array 
 	 */
 	public static void printArray(int[][] array) {
+		if (array==null) System.out.println("null"); 
 		for (int j=0; j<array.length; j++) {
 			System.out.println("");
 			for (int i=0; i<array[j].length; i++) {
@@ -750,11 +756,20 @@ public class PamArrayUtils {
 		System.out.println("");
 	}
 	
+	
+	public static void printArray(boolean[] boolArray) {
+		if (boolArray==null) System.out.println("null"); 
+		for (int i=0; i<boolArray.length; i++) {
+			System.out.println(i + ": " + boolArray[i]);
+		}
+	}
+	
 	/**
 	 * Print a Long array
 	 * @param array - the array to print.
 	 */
 	public static void printArray(Long[] array) {
+		if (array==null) System.out.println("null"); 
 		for (int i=0; i<array.length; i++) {
 			System.out.println(i + ": " + array[i]);
 		}
@@ -1065,6 +1080,9 @@ public class PamArrayUtils {
 		}
 		return arrL;
 	}
+
+
+
 
 
 
