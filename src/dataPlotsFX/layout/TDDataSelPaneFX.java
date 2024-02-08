@@ -531,7 +531,7 @@ public class TDDataSelPaneFX extends PamVBox {
 
 		//makes the arrow black
 		((Parent) popOver.getSkin().getNode()).getStylesheets()
-		.add(tdGraph.getTDDisplay().getCSSSettingsResource());
+		.addAll(tdGraph.getTDDisplay().getCSSSettingsResource());
 
 		// show the graph add and remove menu
 		//		this.showingProperty().addListener(new ShowTDGraphMenu(this));

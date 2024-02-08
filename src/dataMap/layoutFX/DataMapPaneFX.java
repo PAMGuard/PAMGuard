@@ -99,7 +99,7 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX {
 		hidingSummaryPane.getStyleClass().add("pane");
 		hidingSummaryPane.setVisibleImmediatly(false); 
 		hidingSummaryPane.showHidePane(true);
-		hidingSummaryPane.getStylesheets().add(PamController.getInstance().getGuiManagerFX().getPamSettingsCSS()); //style as a settings pane.
+		hidingSummaryPane.getStylesheets().addAll(PamController.getInstance().getGuiManagerFX().getPamSettingsCSS()); //style as a settings pane.
 		
 		//style the show button. 
 		showButton=hidingSummaryPane.getShowButton();

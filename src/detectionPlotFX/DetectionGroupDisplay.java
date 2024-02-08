@@ -157,9 +157,9 @@ public class DetectionGroupDisplay extends PamBorderPane {
 		//create the hiding pane to show advanced settings. 
 		hidingPane = new HidingPane(Side.RIGHT, detectionDisplay.getSettingsHolder(), detectionDisplayHolder, false, 0);
 		
-		detectionDisplay.getSettingsHolder().getStylesheets().add(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
+		detectionDisplay.getSettingsHolder().getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
 		detectionDisplay.getSettingsHolder().setStyle("-fx-background-color: -fx-darkbackground");
-		hidingPane.getStylesheets().add(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
+		hidingPane.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
 
 		arrowPane.getChildren().add(hidingPane.getShowButton()); 
 		

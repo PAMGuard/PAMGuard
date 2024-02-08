@@ -3,6 +3,7 @@ package videoRangePanel.layoutFX;
 import java.awt.Point;
 import java.io.File;
 import java.net.URLConnection;
+import java.util.ArrayList;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -205,7 +206,7 @@ public class VRImagePane extends PamBorderPane {
 
 		scrollPane = new VRZoomScrollPane(stackHolder); 
 		scrollPane.setPannable(true);
-		scrollPane.getStylesheets().add(getDarkStyle() );
+		scrollPane.getStylesheets().addAll(getDarkStyle() );
 
 		scrollPane.setVbarPolicy(ScrollBarPolicy.ALWAYS);
 		scrollPane.setHbarPolicy(ScrollBarPolicy.ALWAYS);
@@ -218,7 +219,7 @@ public class VRImagePane extends PamBorderPane {
 		hidingBottomHolder.setStyle("-fx-background-color:  -fx-darkbackground-trans"); //from dark stylesheet
 		//Bit of a hack here. Have set the offset to 15 pixels so that the hiding pane does not cover the scroll bar. 
 		hiddenControlPane = new HidingPane(Side.BOTTOM , hidingBottomHolder , mainHolder, true, 15); 
-		hiddenControlPane.getStylesheets().add(getDarkStyle() );
+		hiddenControlPane.getStylesheets().addAll(getDarkStyle() );
 		hiddenControlPane.showHidePane(true);
 		hiddenControlPane.getChildren().remove( hiddenControlPane.getHideButton()); 
 
@@ -227,7 +228,7 @@ public class VRImagePane extends PamBorderPane {
 		hidingRightHolder.setCenter(null); 
 		hidingRightHolder.setStyle("-fx-background-color:  -fx-darkbackground-trans"); //from dark stylesheet
 		hiddenRightPane = new HidingPane(Side.RIGHT , hidingRightHolder , mainHolder, true); 
-		hiddenRightPane.getStylesheets().add(getDarkStyle() );
+		hiddenRightPane.getStylesheets().addAll(getDarkStyle() );
 
 		//****add main image pane to stack pane****//
 		mainHolder.getChildren().add(scrollPane); 
@@ -249,7 +250,7 @@ public class VRImagePane extends PamBorderPane {
 		imageControls.setPadding(new Insets(10,10,10,10));
 		imageControls.setMaxWidth(300);
 		imageControls.setMaxHeight(35);
-		imageControls.getStylesheets().add(getDarkStyle() );
+		imageControls.getStylesheets().addAll(getDarkStyle() );
 		imageControls.setStyle("-fx-background-color:  -fx-darkbackground-trans"); //from dark stylesheet
 
 		
@@ -352,7 +353,7 @@ public class VRImagePane extends PamBorderPane {
 		StackPane.setAlignment(ribbonHolder, Pos.TOP_LEFT);
 		ribbonHolder.setMaxHeight(35);
 		ribbonHolder.maxWidthProperty().bind(stackPane.widthProperty().subtract(imageControls.widthProperty()));
-		ribbonHolder.getStylesheets().add(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getDialogCSS());
+		ribbonHolder.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getDialogCSS());
 		//ribbonHolder.setStyle("-fx-background-color:  -fx-darkbackground-trans"); //from dark stylesheet
 		mainHolder.getChildren().add(ribbonHolder);
 
@@ -757,7 +758,7 @@ public class VRImagePane extends PamBorderPane {
 	 * Get dark style CSS. 
 	 * @return dark style CSS. 
 	 */
-	private String getDarkStyle() {
+	private ArrayList<String> getDarkStyle() {
 		return PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS();
 	}
 

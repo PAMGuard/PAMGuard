@@ -82,11 +82,7 @@ public class DetectionPlotDisplay extends PamBorderPane implements UserDisplayNo
 	 */
 	private boolean enableSettingsButton = true; 
 
-	/**
-	 * Convenience reference to the settings css style
-	 */
-	String cssSettingsResource=PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS();
-
+	
 	/**
 	 * The pane which allows users to settings specific to the type of display
 	 */

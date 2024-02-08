@@ -242,7 +242,7 @@ public class TDDisplayFX extends PamBorderPane {
 
 		hidingControlPane=new HidingPane(Side.TOP, controlPane, this, false );
 		hidingControlPane.showHidePane(tdParametersFX.showControl);
-		hidingControlPane.getStylesheets().add(this.getCSSSettingsResource()); //style as a settings pane. 
+		hidingControlPane.getStylesheets().addAll(this.getCSSSettingsResource()); //style as a settings pane. 
 		hidingControlPane.showingProperty().addListener((valProp, oldVal, newVal)->{
 			//set correct showing property.
 			tdParametersFX.showControl=newVal; 
@@ -1027,7 +1027,7 @@ public class TDDisplayFX extends PamBorderPane {
 		return tdGraphs;
 	}
 
-	public String getCSSSettingsResource() {
+	public ArrayList<String> getCSSSettingsResource() {
 		return PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS();
 	}
 

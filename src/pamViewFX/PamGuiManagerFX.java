@@ -29,7 +29,6 @@ import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import dataModelFX.DataModelPaneFX;
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
@@ -179,7 +178,7 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 		dataModelFX=stages.get(0).addDataModelTab();
 		
 		scene = new Scene(stages.get(0));
-		scene.getStylesheets().add(getPamCSS());
+		scene.getStylesheets().addAll(getPamCSS());
 
 		
 //		Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
@@ -473,7 +472,7 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 			TabSelectionPane tabSelectionPane=new TabSelectionPane(stages.get(0));
 
 			PamSettingsDialogFX<?> settingsDialog=new PamSettingsDialogFX(tabSelectionPane); 
-			settingsDialog.getDialogPane().getStylesheets().add(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getDialogCSS());
+			settingsDialog.getDialogPane().getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getDialogCSS());
 			settingsDialog.initStyle(StageStyle.UNDECORATED);
 
 			//			ChoiceDialog<String> dialog = new ChoiceDialog<>(tabStrings.get(1), tabStrings);
@@ -500,7 +499,7 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 	 * Get CSS for PAMGUARD setting 'look and feel' for sliding dialogs
 	 * @return the CSS for settings feels. 
 	 */
-	public String getPamSettingsCSS() {//return new PrimerDark().getUserAgentStylesheet();
+	public ArrayList<String> getPamSettingsCSS() {//return new PrimerDark().getUserAgentStylesheet();
 		//		return getClass().getResource("/Resources/css/pamSettingsCSS.css").toExternalForm();
 		return PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS();
 	}
@@ -509,7 +508,7 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 	 * Get CSS for PAMGUARD GUI standard 'look and feel'
 	 * @return the standard CSS fro PAMGUARD. 
 	 */
-	public String getPamCSS() {
+	public ArrayList<String> getPamCSS() {
 		//return new PrimerLight().getUserAgentStylesheet();
 		//		return getClass().getResource("/Resources/css/pamCSS.css").toExternalForm();
 		return PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getGUICSS();
@@ -519,7 +518,7 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 	 * Get CSS for PAMGUARD GUI standard 'look and feel' for regular dialogs
 	 * @return the standard CSS fro PAMGUARD. 
 	 */
-	public String getPamDialogCSS() {//return new PrimerDark().getUserAgentStylesheet();
+	public ArrayList<String> getPamDialogCSS() {//return new PrimerDark().getUserAgentStylesheet();
 
 		return PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getDialogCSS();
 	}
@@ -660,7 +659,7 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 		mainPane.getChildren().addAll(title, namePane);
 
 		dialog.getDialogPane().setContent(mainPane);
-		dialog.getDialogPane().getStylesheets().add(this.getPamDialogCSS());
+		dialog.getDialogPane().getStylesheets().addAll(this.getPamDialogCSS());
 
 		//add listener to prevent close request if the dialog
 		final Button btOk = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);

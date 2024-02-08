@@ -267,7 +267,7 @@ public class TDMenuPane extends PamBorderPane {
 	private Pane createMenuPane(){
 
 		PamVBox menuPane = new PamVBox(); 
-		menuPane.getStylesheets().add(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
+		menuPane.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
 		menuPane.setStyle("-fx-background-color: -fx-darkbackground");
 
 		//create info and toggle detection buttons that always sit at the top of the display

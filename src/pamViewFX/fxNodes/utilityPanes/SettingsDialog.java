@@ -25,7 +25,7 @@ public class SettingsDialog<T> extends PamDialogFX<T>{
 		this.settingsPane=settingsPane;
 		this.setContent(settingsPane.getContentNode());
 //		this.getDialogPane().getStylesheets().add(PamController.getInstance().getGuiManagerFX().getPamSettingsCSS());
-		this.getDialogPane().getStylesheets().add(PamController.getInstance().getGuiManagerFX().getPamDialogCSS());
+		this.getDialogPane().getStylesheets().addAll(PamController.getInstance().getGuiManagerFX().getPamDialogCSS());
 
 		Stage stage = (Stage) this.getDialogPane().getScene().getWindow();
 		stage.toFront();

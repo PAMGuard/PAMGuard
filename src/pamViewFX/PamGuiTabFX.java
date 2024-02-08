@@ -165,7 +165,7 @@ public class PamGuiTabFX extends PamTabFX {
 	public Pane createNewPane(Tab tab, PamTabPane tabPane, Stage newStage){
 		//create a new GUI frame. 
 		PamGuiFX pamGUIFX=new PamGuiFX(tabPane, newStage, pamGui.getPamGuiManagerFX()); 
-		pamGUIFX.getStylesheets().add(pamGui.getPamGuiManagerFX().getPamCSS());
+		pamGUIFX.getStylesheets().addAll(pamGui.getPamGuiManagerFX().getPamCSS());
 		
 		
 		//need to add PamGUIFX to list in PamGUIManagerFX. 

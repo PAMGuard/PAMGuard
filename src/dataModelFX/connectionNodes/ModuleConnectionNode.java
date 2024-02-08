@@ -422,7 +422,7 @@ public class ModuleConnectionNode extends StandardConnectionNode implements PAMC
 			this.holderPane = HolderPane; 
 			this.top= top; 
 
-			this.getStylesheets().add(PamController.getInstance().getGuiManagerFX().getPamSettingsCSS());
+			this.getStylesheets().addAll(PamController.getInstance().getGuiManagerFX().getPamSettingsCSS());
 
 			showButton=new PamButton(); 
 			showButton.setMaxWidth(Double.MAX_VALUE);
