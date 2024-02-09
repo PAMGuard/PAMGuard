@@ -3,6 +3,7 @@ package Array;
 import pamScrollSystem.AbstractScrollManager;
 import PamUtils.PamCalendar;
 import PamView.symbol.StandardSymbolManager;
+import PamguardMVC.PamConstants;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
 
@@ -42,7 +43,7 @@ public class HydrophoneProcess extends PamProcess{
 		
 		@Override
 		public void addOutputDataBlock(PamDataBlock outputDataBlock){
-			AbstractScrollManager.getScrollManager().addToSpecialDatablock(outputDataBlock);
+			AbstractScrollManager.getScrollManager().addToSpecialDatablock(outputDataBlock, 60000, 0);
 			super.addOutputDataBlock(outputDataBlock);
 		}
 		
