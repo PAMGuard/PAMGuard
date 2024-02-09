@@ -40,7 +40,7 @@ public class PamGuiTabFX extends PamTabFX {
     /**
      * List of internal panes within the tab content pane. 
      */
-    ArrayList<PamGuiInternalPane> internalPanes=new ArrayList<PamGuiInternalPane>();
+    private ArrayList<PamGuiInternalPane> internalPanes=new ArrayList<PamGuiInternalPane>();
     
     /**
      * True if panes are editable. 
@@ -210,7 +210,17 @@ public class PamGuiTabFX extends PamTabFX {
 	 * @return the internal pane which has been added
 	 */
 	public PamGuiInternalPane addInternalPane(UserDisplayNodeFX userDisplayNodeFX){
+		System.out.println("UserDisplayNodeFX: " + userDisplayNodeFX);
 		if (userDisplayNodeFX==null || userDisplayNodeFX.getNode()==null) return null;
+		
+		for (PamGuiInternalPane internalPane: this.internalPanes) {
+			if (userDisplayNodeFX == internalPane.getUserDisplayNode()) {
+				System.err.println("UserDisplayNodeFX is laready in pane");
+				return null;
+			}
+		}
+		
+		
 		PamGuiInternalPane newInternalPane=new PamGuiInternalPane(userDisplayNodeFX, holder);
 		if (!userDisplayNodeFX.isResizeableDisplay()) newInternalPane.showResizeControls(false);
 		holder.getChildren().add(newInternalPane);

@@ -260,7 +260,9 @@ public class CPODPlotInfoFX extends GenericDataPlotInfo {
 		int[] chanClick=PamUtils.getChannelArray(pamDataUnit.getChannelBitmap());
 		int[] chanPlot=PamUtils.getChannelArray(getTDGraph().getCurrentScaleInfo().getPlotChannels()[plotNumber]); 
 
-		Path2D path2D = new Path2D.Double(0,1); 
+		Path2D path2D = new Path2D.Double(0,1);
+		
+		CPODClick clk = ((CPODClick) pamDataUnit);
 
 		double x1 = 0, y1 = 0, x2 = 0, y2 = 0; 
 		for (int i=0; i<chanClick.length; i++){
@@ -277,7 +279,7 @@ public class CPODPlotInfoFX extends GenericDataPlotInfo {
 				
 			case AMPLITUDE_LIN:
 				
-				double spl = ((CPODClick) pamDataUnit).getSpl()/255.0; 
+				double spl = clk.getSpl()/255.0; 
 				x1=tC; 
 				y1=tdProjector.getYPix(-spl);
 				x2=tC; 
@@ -295,7 +297,7 @@ public class CPODPlotInfoFX extends GenericDataPlotInfo {
 				
 			case NCYCLES:
 			case BANDWIDTH:
-				double nycl = ((CPODClick) pamDataUnit).getnCyc(); 
+				double nycl = clk.getnCyc(); 
 
 				x1=tC;
 				y1=tdProjector.getYPix(nycl);
@@ -319,6 +321,14 @@ public class CPODPlotInfoFX extends GenericDataPlotInfo {
 			g.strokeLine(x1,y1,x2,y2);
 			path2D.moveTo(x1,y1);
 			path2D.lineTo(x2,y2);
+			
+			//now we need to inform he user if a detectrion has waveform info
+			if (clk.getWaveData()!=null) {
+				System.out.print("Time millis: " + pamDataUnit.getTimeMilliseconds());
+				g.setFill(ffColor);
+				g.fillOval(x1-5, Math.abs(y2-y1)/2, 10,10);
+				path2D.lineTo(x1-5, Math.abs(y2-y1)/2);
+			}
 
 			return path2D;
 		}

@@ -78,7 +78,7 @@ public class DatagramProgress extends PamTaskUpdate {
 
 	@Override
 	public double getProgress() {
-//		System.out.println("DatagramProgress: " + processedUnits + " tot: " + totalUnits); 
+		System.out.println("DatagramProgress: " + processedUnits + " tot: " + totalUnits); 
 		double progress= ProgressIndicator.INDETERMINATE_PROGRESS;
 		switch(getStatus()) {
 		case DatagramProgress.STATUS_BLOCKCOUNT:

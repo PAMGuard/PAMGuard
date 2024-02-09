@@ -85,9 +85,13 @@ public class RawSpectrumPlot extends SpectrumPlot<PamDataUnit> {
 	 */
 	private void newClick(PamDataUnit newClick, int bin1, int bin2, boolean forceRecalc){
 		
-		//System.out.println("Hello: RawSpectrumPlot"); 
+		//System.out.println("Hello: RawSpectrumPlot");
+		
 		
 		RawDataHolder rawDataHolder = (RawDataHolder) newClick; 
+		
+		if (rawDataHolder.getDataTransforms()==null) return;
+
 		
 		int nChan = PamUtils.getNumChannels(newClick.getChannelBitmap()); 
 		
@@ -170,7 +174,11 @@ public class RawSpectrumPlot extends SpectrumPlot<PamDataUnit> {
 //		this.lastDataUnit=data;
 		//System.out.println("Paint plot projector: "+ projector);
 		if (flag== DetectionPlot.SCROLLPANE_DRAW) {
+			
+			
 			double[][] waveformTemp =  ((RawDataHolder) data).getWaveData();
+			
+			if (waveformTemp==null) return;
 			
 //			System.out.println("Spectrum plot: " +  "  "  + projector.getMinScrollLimit()  + "  " 
 //			+ projector.getMaxScrollLimit() + "  " + projector.getAxis(Side.TOP).getMaxVal() + "  wvfrm: " + WaveformPlot.getYScale(waveformTemp));

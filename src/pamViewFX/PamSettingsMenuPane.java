@@ -24,6 +24,7 @@ import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
 import pamViewFX.fxNodes.pamDialogFX.PamSettingsDialogFX;
 import pamViewFX.fxNodes.utilityPanes.SettingsDialog;
 import pamViewFX.fxSettingsPanes.StorageOptionsPane;
+import pamViewFX.fxStyles.PamStylesManagerFX;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
@@ -65,6 +66,8 @@ public class PamSettingsMenuPane extends PamVBox {
 		this.setPrefWidth(250);
 		
 		this.setStyle("-fx-background-color: -fx-darkbackground");
+		
+		this.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
 
 		Label settingsLabel=new Label("Settings");
 		settingsLabel.setPadding(new Insets(14,0,10,0));

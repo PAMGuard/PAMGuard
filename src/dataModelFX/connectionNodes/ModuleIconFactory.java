@@ -258,6 +258,9 @@ public class ModuleIconFactory {
 		case "matchedTemplateClassifer.MTClassifierControl":
 			icon=ModuleIcon.MATCHED_CLICK_CLASSIFIER; 
 			break; 
+		case "decimator.DecimatorControl":
+			icon=ModuleIcon.DECIMATOR; 
+			break; 
 		}
 		return icon;
 	}

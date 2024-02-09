@@ -17,6 +17,7 @@ import dataPlotsFX.layout.AxisPane;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
@@ -31,7 +32,9 @@ import PamController.PamController;
 import PamUtils.PamCalendar;
 import PamguardMVC.PamDataBlock;
 import pamViewFX.fxNodes.PamBorderPane;
+import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.pamAxis.PamAxisFX;
+import pamViewFX.fxNodes.pamAxis.PamAxisPane;
 import pamViewFX.fxNodes.utilsFX.ColourArray;
 
 public class DataStreamPaneFX extends PamBorderPane {
@@ -140,9 +143,10 @@ public class DataStreamPaneFX extends PamBorderPane {
 	 * Create pane which holds datasream label and allows the split pane to collapse
 	 */
 	private Pane createTopPane(){
-		Pane topPane=new Pane();
-		topPane.getStyleClass().add("pane");
+		PamHBox topPane=new PamHBox();
+		topPane.getStyleClass().add("pane-opaque");
 		topPane.getChildren().add(new Label(this.dataBlock.getDataName()));
+		topPane.setAlignment(Pos.CENTER);
 		return topPane;
 	}
 	
@@ -210,7 +214,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 		/**
 		 * Pane which holds the axis. 
 		 */
-		private AxisPane axisPane;
+		private PamAxisPane axisPane;
 
 		/**
 		 * Pane which holds the plot canvas.
@@ -342,7 +346,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 			datastreamAxis.setFractionalScale(true);
 			datastreamAxis.setLogScale(false); 
 
-			axisPane=new AxisPane(datastreamAxis); 
+			axisPane=new PamAxisPane(datastreamAxis, Orientation.VERTICAL); 
 			axisPane.getStyleClass().add("pane");
 			axisPane.setOrientation(Orientation.VERTICAL);
 			axisPane.setPrefWidth(DataStreamPaneFX.axisPrefWidth);

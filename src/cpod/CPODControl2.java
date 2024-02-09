@@ -17,13 +17,16 @@ import PamController.SettingsPane;
 import PamView.PamDetectionOverlayGraphics;
 import PamView.PamSymbol;
 import PamView.WrapperControlledGUISwing;
+import cpod.dataPlotFX.CPODDPlotProvider;
 import cpod.dataPlotFX.CPODPlotProviderFX;
 import cpod.fx.CPODGUIFX;
 import cpod.fx.CPODSettingsPane;
 import dataPlotsFX.data.TDDataProviderRegisterFX;
+import detectionPlotFX.data.DDPlotRegister;
 import fileOfflineData.OfflineFileParams;
 import javafx.concurrent.Task;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
+import rawDeepLearningClassifier.ddPlotFX.RawDLDDPlotProvider;
 
 /**
  * CPOD control. Loads and manages CPOD and FPOD data into 
@@ -78,12 +81,12 @@ public class CPODControl2 extends PamControlledUnit implements PamSettings {
 	 * The JavaFX settings pane for the cpod
 	 */
 	private CPODSettingsPane settingsPane;
-	
+
 	/**
 	 * CPOD importer. 
 	 */
 	private CPODImporter cpodImporter;
-	
+
 
 	public CPODControl2(String unitName) {
 		super("CPOD", unitName);
@@ -101,7 +104,7 @@ public class CPODControl2 extends PamControlledUnit implements PamSettings {
 		// add the CP3 data block
 		cpodProcess.addOutputDataBlock(cp3DataBlock = new CPODClickDataBlock("CP3 Data", 
 				cpodProcess, CPODMap.FILE_CP3));
-		
+
 		cp3DataBlock.setPamSymbolManager(new CPODSymbolManager(this, 	cp3DataBlock));
 		cp3DataBlock.setDatagramProvider(cpodDataGramProvider[1] = new CPODDataGramProvider(this));
 		cp3DataBlock.setBinaryDataSource(new CPODBinaryStore(this, cp1DataBlock));
@@ -112,15 +115,17 @@ public class CPODControl2 extends PamControlledUnit implements PamSettings {
 		cpodProcess.setSampleRate(CPODClickDataBlock.CPOD_SR, false);
 
 		cpodImporter = new CPODImporter(this); 
-		
+
 		//FX display data providers
 		CPODPlotProviderFX cpodPlotProviderFX = new CPODPlotProviderFX(this, cp1DataBlock);
 		TDDataProviderRegisterFX.getInstance().registerDataInfo(cpodPlotProviderFX);
-		
+
 		cpodPlotProviderFX = new CPODPlotProviderFX(this, cp3DataBlock);
 		TDDataProviderRegisterFX.getInstance().registerDataInfo(cpodPlotProviderFX);
+		// register the DD display
+		DDPlotRegister.getInstance().registerDataInfo(new CPODDPlotProvider(this, cp1DataBlock));
+		DDPlotRegister.getInstance().registerDataInfo(new CPODDPlotProvider(this, cp3DataBlock));
 
-		
 
 		//		//swing time display data providers. 
 		//		CPODPlotProvider cpodPlotProvider = new CPODPlotProvider(this, cp1DataBlock);

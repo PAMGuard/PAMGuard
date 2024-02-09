@@ -204,7 +204,7 @@ public class CPODImporter {
 		
 		try {
 			FPODReader.importFile(cpFile, fpodData, from, maxNum);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		} 
 		
@@ -215,7 +215,7 @@ public class CPODImporter {
 		int nClicks = 0;
 		for (int i=0; i<fpodData.size(); i++) {
 			//System.out.println("Create a new CPOD click: ");
-			CPODClick cpodClick = processClick(fpodData.get(i));
+			CPODClick cpodClick = processFPODClick(fpodData.get(i));
 			dataBlock.addPamData(cpodClick);
 			nClicks++;
 		}
@@ -230,38 +230,48 @@ public class CPODImporter {
 	 * @param FPODData - an FPOD data object
 	 * @return
 	 */
-	private CPODClick processClick(FPODdata fpoDdata) {
+	private CPODClick processFPODClick(FPODdata fpoDdata) {
+		
+		
 
 		//how many samples are we into the clicks
 		
 		long fileSamples = (long) (((fpoDdata.minute*60) +  (fpoDdata.FiveMusec*5/1000000.))*CPODClickDataBlock.CPOD_SR);
 		
-		short[] data = new short[9];
 		
-		short nCyc = (short) fpoDdata.Ncyc;
-		short bw = (short) fpoDdata.BW;
-		short kHz =  (short) FPODReader.IPItoKhz(fpoDdata.IPIatMax);
-		short endF =  (short) FPODReader.IPItoKhz(fpoDdata.EndIPI);
-		short spl = (short)  fpoDdata.MaxPkExtnd;
-		short slope = 0;
+		// now a bit of time stretching. Need to get the start time and see how
+		// different this is, then it's a linear stretch. 
+		long tMillis = cpodControl.stretchClicktime(fpoDdata.getTimeMillis());
 		
-		data[3]=nCyc;
-		data[4]=bw;
-		data[5]=kHz;
-		data[6]=endF;
-		data[7]=spl;
-		data[8]=slope;
+		CPODClick cpodClick = CPODClick.makeFPODClick(tMillis, fileSamples, fpoDdata);
 
-		//these are the basic data
-		CPODClick cpodClick = new CPODClick(fpoDdata.getTimeMillis(),	
-				fileSamples, nCyc, bw,
-				kHz,  endF,   spl,  slope, data); 
 		
-		if (fpoDdata.HasWave) {
-			int[] waveform = FPODReader.makeResampledWaveform(fpoDdata);
-			System.out.println("FPOD click waveform: " + kHz); 
-			PamArrayUtils.printArray(waveform);
-		}
+//		short[] data = new short[9];
+//		
+//		short nCyc = (short) fpoDdata.Ncyc;
+//		short bw = (short) fpoDdata.BW;
+//		short kHz =  (short) FPODReader.IPItoKhz(fpoDdata.IPIatMax);
+//		short endF =  (short) FPODReader.IPItoKhz(fpoDdata.EndIPI);
+//		short spl = (short)  fpoDdata.MaxPkExtnd;
+//		short slope = 0;
+//		
+//		data[3]=nCyc;
+//		data[4]=bw;
+//		data[5]=kHz;
+//		data[6]=endF;
+//		data[7]=spl;
+//		data[8]=slope;
+//
+//		//these are the basic data
+//		CPODClick cpodClick = new CPODClick(fpoDdata.getTimeMillis(),	
+//				fileSamples, nCyc, bw,
+//				kHz,  endF,   spl,  slope, data); 
+		
+//		if (fpoDdata.HasWave) {
+//			int[] waveform = FPODReader.makeResampledWaveform(fpoDdata);
+//			System.out.println("FPOD click waveform: " + kHz); 
+//			PamArrayUtils.printArray(waveform);
+//		}
 		
 //		cpodClick.setDurationInMilliseconds((fpoDdata.duration*5.)/1000.); 
 		 
@@ -327,7 +337,7 @@ public class CPODImporter {
 					if (from<0 || (nClicks>from && nClicks<(from+maxNum))) {
 
 						//System.out.println("Create a new CPOD click: ");
-						CPODClick cpodClick = processClick(nMinutes, shortData);
+						CPODClick cpodClick = processCPODClick(nMinutes, shortData);
 
 						dataBlock.addPamData(cpodClick);
 
@@ -355,7 +365,7 @@ public class CPODImporter {
 	}
 	
 	
-	private CPODClick processClick(int nMinutes, short[] shortData) {
+	private CPODClick processCPODClick(int nMinutes, short[] shortData) {
 		
 		long minuteMillis = fileStart + nMinutes * 60000L;
 		int t = shortData[0]<<16 | 

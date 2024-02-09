@@ -573,14 +573,21 @@ public class RawDataTransforms {
 	 */
 	public FFTFilter getFFTFilter(FFTFilterParams fftFilterParams) {
 		if (fftFilter == null) {
-			fftFilter = new FFTFilter(fftFilterParams, this.dataUnit.getParentDataBlock().getSampleRate());
+			fftFilter = new FFTFilter(fftFilterParams,getSampleRate());
 		}
 		else {
-			fftFilter.setParams(fftFilterParams, this.dataUnit.getParentDataBlock().getSampleRate());
+			fftFilter.setParams(fftFilterParams, getSampleRate());
 		}
 		return fftFilter;
 	}
 
+	/**
+	 * Get the sample rate to use for transforms. 
+	 * @return the sample rate. 
+	 */
+	public float getSampleRate() {
+		return this.dataUnit.getParentDataBlock().getSampleRate();
+	}
 
 	/**
 	 * Get a correction based on the slope of the waveform which 

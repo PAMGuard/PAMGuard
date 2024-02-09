@@ -571,6 +571,7 @@ final public class PamModel implements PamSettings {
 		mi.addDependency(new PamDependency(RawDataUnit.class, "Acquisition.AcquisitionControl"));	
 		mi.setToolTipText("Decimates (reduces the frequency of) audio data");
 		mi.setModulesMenuGroup(processingGroup);
+		mi.addGUICompatabilityFlag(PamGUIManager.FX); //has FX enabled GUI.
 
 		mi = PamModuleInfo.registerControlledUnit(CepstrumControl.class.getName(), CepstrumControl.unitType);	
 		mi.addDependency(new PamDependency(FFTDataUnit.class, PamFFTControl.class.getName()));	

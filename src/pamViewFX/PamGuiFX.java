@@ -251,13 +251,13 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 		//now have a holder - add the loading pane. 
 		/**create left hiding pane**/
 		loadPane=new PamLoadingPane(this.pamGuiManagerFX);
-		loadPane.setPrefWidth(250);
-		hidingLoadPane=new HidingPane(Side.LEFT, loadPane, this, false);
+		hidingLoadPane=new HidingPane(Side.TOP, loadPane, this, false);
+		hidingLoadPane.setPrefHeight(90);
 		hidingLoadPane.removeHideButton();
 		hidingLoadPane.showHidePane(false);
 		
 		PamBorderPane layoutHolder=new PamBorderPane(layout);
-		layoutHolder.setLeft(hidingLoadPane);
+		layoutHolder.setTop(hidingLoadPane);
 		
 
 	    return  layoutHolder; 
@@ -307,7 +307,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
         }
         
         newTab.setDetachable(detachable);
-        
+   
         //add tab
         mainTabPane.getTabs().add(newTab);
         
@@ -538,7 +538,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 			centerHBox=new PamHBox();
 			centerHBox.setSpacing(10);
 			//need to set this style to prevent the pane form being transparent. 
-			centerHBox.getStyleClass().add("pane-opaque");
+			//centerHBox.getStyleClass().add("pane-opaque");
 			centerHBox.setPrefHeight(prefHeight);
 			
 			this.setCenter(centerHBox);

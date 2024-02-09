@@ -1,5 +1,8 @@
 package decimator;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import Filters.FilterBand;
 import Filters.FilterParams;
 import Filters.FilterType;
@@ -134,6 +137,11 @@ public class DecimatorProcessW extends PamProcess {
 
 	public PamRawDataBlock getOutputDataBlock() {
 		return outputDataBlock;
+	}
+	
+	@Override
+	public ArrayList getCompatibleDataUnits(){
+		return new ArrayList<Class<? extends PamDataUnit>>(Arrays.asList(RawDataUnit.class));
 	}
 
 }

@@ -42,7 +42,7 @@ public class DisplayConnectionNode extends ModuleConnectionNode {
 	protected void connectionListenerTriggered(ConnectorNode shape, ConnectorNode foundShape, int type){
 		switch(type){
 		case ConnectorNode.NO_CONNECTION:
-			System.out.println(" DisplayConnectionNode. NO_CONNECTION " +this.getPamControlledUnit()+" "+shape+"  " +foundShape ); 
+			//System.out.println(" DisplayConnectionNode. NO_CONNECTION " +this.getPamControlledUnit()+" "+shape+"  " +foundShape ); 
 			if (lastConnectedPlug!=null && lastConnectedPlug.getConnectedShape()==null){
 				//want to remove any branch sockets which currently exist -otherwise have sockets which connect to nothing. 
 				setLineDisplayColor(lastConnectedPlug, DataModelStyle.moduleLines);
@@ -51,10 +51,10 @@ public class DisplayConnectionNode extends ModuleConnectionNode {
 			}
 			break; 
 		case ConnectorNode.POSSIBLE_CONNECTION:
-			System.out.println(" DisplayConnectionNode. POSSIBLE_CONNECTION " +shape+"  " +foundShape ); 
+			//System.out.println(" DisplayConnectionNode. POSSIBLE_CONNECTION " +shape+"  " +foundShape ); 
 			break; 
 		case ConnectorNode.CONNECTED:
-			System.out.println("DisplayConnectionNode. CONNECTED " +shape+"  " +foundShape ); 
+			//System.out.println("DisplayConnectionNode. CONNECTED " +shape+"  " +foundShape ); 
 			if (shape instanceof StandardConnectionSocket){
 				if (!((StandardConnectionSocket) shape).isBranch()){
 					lastConnectedPlug=(StandardConnectionPlug) shape.getConnectedShape();

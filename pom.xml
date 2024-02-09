@@ -15,8 +15,8 @@
 
 
    <properties>
-    	<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>	   
-     	<javafx.version>17</javafx.version>
+    	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>	   
+     	<javafx.version>21</javafx.version>
 	    <maven.compiler.source>11</maven.compiler.source>
 	    <maven.compiler.target>11</maven.compiler.target>
    </properties>

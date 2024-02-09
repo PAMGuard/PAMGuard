@@ -5,13 +5,18 @@ import PamguardMVC.AcousticDataUnit;
 import PamguardMVC.DataUnitBaseData;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import PamguardMVC.RawDataHolder;
+import PamguardMVC.RawDataTransforms;
 import PamguardMVC.superdet.SuperDetection;
+import cpod.FPODReader.FPODdata;
 
 /**
  * CPOD or FPOD click. 
  */
-public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implements AcousticDataUnit {
+public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implements RawDataHolder {
 
+	private double[][] wavData;
+	
 	private short nCyc;
 	private short bw;
 	private short kHz;
@@ -26,6 +31,11 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 	 * The amplitude in dB. 
 	 */
 	private Double amplitudedB;
+	
+	/**
+	 * The raw data transforms for the CPOD click
+	 */
+	private RawDataTransforms rawDataTransforms = null;
 	
 	/**
 	 * Create a CPOD click. (This is used to load CPOD clicks from the binary store)
@@ -96,21 +106,35 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 	 * @param shortData - the raw data from the CPOD click. This can be 8 bytes or 30 bytes if a click train clcik
 	 * @return a CPODClick object. 
 	 */
-	public static CPODClick makeFPODClick(long tMillis, long fileSamples, short[] shortData) {
-		
-		short nCyc = shortData[3];
-		short bw = shortData[4];
-		short kHz = shortData[5];
-		short endF = shortData[6];
-		short spl = shortData[7];
-		short slope = shortData[8];
-		CPODClick cpodClick = new CPODClick(tMillis, fileSamples, nCyc, bw, kHz, endF, spl, slope, shortData);
+	public static CPODClick makeFPODClick(long tMillis, long fileSamples, FPODdata fpodData) {
 		
 		
+		CPODClick cpodClick = new CPODClick(tMillis, fileSamples, (short) fpodData.Ncyc, (short) fpodData.BW, 
+				(short) FPODReader.IPItoKhz(fpodData.IPIatMax),  (short) FPODReader.IPItoKhz(fpodData.EndIPI), 
+				(short) fpodData.MaxPkExtnd, (short) 0, null);
+		
+		//durartion is measured more accurately in FPOD data
+		cpodClick.setDurationInMilliseconds((fpodData.duration*5.)/1000.);
+		cpodClick.setSampleDuration((long) ((fpodData.duration*5./1e6)*CPODClickDataBlock.CPOD_SR));
+		
+		//some FPOD clicks have raw wave data - some do not. 
+		if (fpodData.getWavData()!=null) {	
+			
+			int[] waveData = FPODReader.makeResampledWaveform(fpodData);
+			
+			//now need to scale the data so it fits as a raw data holder. 
+			double[] waveDataD = FPODReader.scaleWavData(waveData);
+			
+			cpodClick.wavData = new double[1][];//create a 2D array
+			cpodClick.wavData[0]=waveDataD;
+			
+			cpodClick.setRawDataTransfroms(new CPODWaveTransforms(cpodClick));
+		}
 		
 		return cpodClick;
 	}
 	
+
 	/**
 	 * Make a CPOD click. This called whenever click has been imported from a CP1 or CP3 file
 	 * @param tMillis - the time in milliseconds datenum.
@@ -132,9 +156,6 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 		double duration = (nCyc/(double) kHz);
 		cpodClick.setDurationInMilliseconds(duration);
 		
-
-		//TODO
-		//add classification info. 
 		
 		return cpodClick;
 	}
@@ -167,8 +188,8 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 		
 		setFrequency(f);
 		
-		double duration = (nCyc/(double) kHz);
-		setDurationInMilliseconds(duration);
+//		double duration = (nCyc/(double) kHz);
+//		setDurationInMilliseconds(duration);
 	
 		if (shortData!=null) {
 			//only CPOD
@@ -342,4 +363,37 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 		data &= bitMap;
 		return (short) (data>>firstBit);
 	}
+
+	@Override
+	public double[][] getWaveData() {
+		return this.wavData;
+	}
+
+	@Override
+	public RawDataTransforms getDataTransforms() {
+		return rawDataTransforms;
+	}
+	
+	public void setRawDataTransfroms(RawDataTransforms rawDataTransforms) {
+		this.rawDataTransforms = rawDataTransforms;
+		
+	}
+
+	public void setWavData(double[][] ds) {
+		this.wavData=ds;
+	}
+	
+	static class  CPODWaveTransforms extends RawDataTransforms {
+
+		public CPODWaveTransforms(PamDataUnit rawDataHolder) {
+			super(rawDataHolder);
+		}
+		
+		public float getSampleRate() {
+			return FPODReader.FPOD_WAV_SAMPLERATE;
+		}
+		
+	}
+
+
 }

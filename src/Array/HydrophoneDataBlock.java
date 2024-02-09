@@ -5,6 +5,7 @@ import java.util.ListIterator;
 import GPS.NavDataSynchronisation;
 import pamScrollSystem.ViewLoadObserver;
 import PamController.PamController;
+import PamUtils.PamCalendar;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
@@ -68,6 +69,11 @@ public class HydrophoneDataBlock extends PamDataBlock<HydrophoneDataUnit> {
 	@Override
 	public boolean loadViewerData(OfflineDataLoadInfo offlineDataLoadInfo,
 			ViewLoadObserver loadObserver) {
+		
+		if (offlineDataLoadInfo!=null) {
+		System.out.print("Load Hydrophones: " + ((offlineDataLoadInfo.getEndMillis() - offlineDataLoadInfo.getStartMillis())/1000/60/60 + " hours"));
+		System.out.print("From: " +PamCalendar.formatDateTime(offlineDataLoadInfo.getStartMillis()) + " to " +  PamCalendar.formatDateTime(offlineDataLoadInfo.getEndMillis()));
+		}
 		/**
 		 * Always put in default data units at time zero. 
 		 */

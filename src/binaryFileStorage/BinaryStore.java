@@ -839,7 +839,7 @@ PamSettingsSource, DataOutputStore {
 					return null;
 				}
 				int nFiles = fileList.size();
-				int updateAt = Math.max(nFiles/100,1);
+				int updateAt = Math.max(nFiles/1000,1);
 				int fileIndex;
 				int nNew = 0;
 				for (int i = 0; i < nFiles; i++) {

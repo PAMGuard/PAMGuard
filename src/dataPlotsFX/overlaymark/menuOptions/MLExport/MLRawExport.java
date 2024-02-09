@@ -11,7 +11,7 @@ import PamguardMVC.RawDataHolder;
 
 /**
  * Export data for any data unit which implements raw data holder. 
- * @author au671271
+ * @author Jamie Macaulay
  *
  */
 public class MLRawExport extends MLDataUnitExport<PamDataUnit>{

@@ -22,6 +22,7 @@ import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamColorsFX;
 import pamViewFX.fxNodes.PamScrollPane;
+import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.sashPane.SashPane;
 
 public class ScrollingDataPaneFX extends PamBorderPane {
@@ -30,6 +31,11 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	 * Standard millis to wait for repaint. 
 	 */
 	public static final long REPAINTMILLIS = 200;
+
+	/**
+	 * The default expanded hieght for each pane. 
+	 */
+	private static final int DATASTREAMPANE_HEIGHT = 400;
 
 	/**
 	 * Reference to the DataMapControl.
@@ -54,7 +60,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	/**
 	 * Split pane whihc holds different graphs. 
 	 */
-	private SashPane dataPanePanes;
+	private PamVBox dataPanePanes;
 
 	private ArrayList<OfflineDataStore> offlineDataStores;
 	
@@ -94,16 +100,6 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 
 
 
-	/**
-	 * Height at which a DataStreamPaneFX is considered to be 'collapsed'
-	 */
-	private double collapseHeight=15;
-	
-	/*
-	 * Height to expand a split to if the 'expand' button action is used.  
-	 */
-	private double expandHeight=200; 
-
 
 	/**
 	 * Constructor for the ScrollingDataPaneFX
@@ -131,15 +127,14 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 		
 		
 		//create the split pane to hold the graphs. 
-		dataPanePanes=new SashPane(); 
-		dataPanePanes.setHorizontal(false);
+		dataPanePanes=new PamVBox(); 
 		//dataPanePanes.setOrientation(Orientation.VERTICAL);
 		dataPanePanes.prefWidthProperty().bind(mainScrollPane.widthProperty());
-		dataPanePanes.prefHeightProperty().bind(mainScrollPane.heightProperty());
+		//dataPanePanes.prefHeightProperty().bind(mainScrollPane.heightProperty());
 
 		mainScrollPane.setContent(dataPanePanes);
 		//we have a custom scroll bar for horizontal stuff. 
-		mainScrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
+//		mainScrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
 		
 //		///TEMP///
 //		Button buttonTest=new Button("Test Map"); 
@@ -152,11 +147,11 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 		holder.setCenter(mainScrollPane);
 		holder.setBottom(createScrollBar());
 		
-		PamButton test = new PamButton("Test");
-		test.setOnAction((action)->{
-			updateScrollBar();
-		});
-		holder.setLeft(test);
+//		PamButton test = new PamButton("Test");
+//		test.setOnAction((action)->{
+//			updateScrollBar();
+//		});
+//		holder.setLeft(test);
 
 
 		setupScrollBar();		
@@ -274,7 +269,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	public synchronized int createDataGraphs() {
 			//clear the panes from list and split pane. 
 			dataStreamPanels.clear();
-			dataPanePanes.getItems().clear(); 
+			dataPanePanes.getChildren().clear(); 
 			
 			//now create new set of data stream panes. 
 			ArrayList<PamDataBlock> dataBlocks = dataMapControl.getMappedDataBlocks();
@@ -285,65 +280,18 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 			DataStreamPaneFX aStreamPanel;
 			for (int i = 0; i < dataBlocks.size(); i++) {
 				aStreamPanel = new DataStreamPaneFX(dataMapControl, this, dataBlocks.get(i));
-				addCollapseButton(aStreamPanel);
 				dataStreamPanels.add(aStreamPanel);
+				dataStreamPanels.get(i).setPrefHeight(DATASTREAMPANE_HEIGHT);
 				//now add to a split pane. 
 				//SplitPane.setResizableWithParent(aStreamPanel, true);
-				dataPanePanes.getItems().add(aStreamPanel);
+				dataPanePanes.getChildren().add(aStreamPanel);
 				//dataPanePanes.setDividerPosition(0,1.0/dataBlocks.size());
 			}
 
 			return dataBlocks.size();
 	}
 	
-	/**
-	 * Add a button to the top of a DataStreamPaneFX which allows the pane to collapse inside the split pane. 
-	 * @param datastreamPane- the DataStreamPaneFX to add the button to. 
-	 */
-	private void addCollapseButton(DataStreamPaneFX datastreamPane){
-		final CollapseButton collapseButton=new CollapseButton();
-		collapseButton.getStyleClass().add("close-button-bottom");
 
-		collapseButton.setOnAction((action)->{
-			int index= dataStreamPanels.indexOf(datastreamPane);
-			if (index>=0){
-				if (datastreamPane.getDataGraph().getHeight()<=collapseHeight) {
-					expandSPlitPane(datastreamPane, true);
-				}
-				else {
-					expandSPlitPane(datastreamPane, false); 
-				}
-			}
-		});
-		
-		datastreamPane.getTopPane().getChildren().add(collapseButton);
-		//set button on the center of the pane.
-		collapseButton.layoutXProperty().bind(datastreamPane.getTopPane().widthProperty().divide(2));
-	
-		
-//		PamButton testButton=new PamButton("Test");
-//		testButton.setOnAction(	(action)->{
-//			double[] dividersPos=dataPanePanes.getDividerPositions();
-//			for (int i=0; i<dividersPos.length; i++){
-//				System.out.println("Divider Pos Real: "+dividersPos[i]);
-//			}
-//		});
-		//datastreamPane.getTopPane().setRight(testButton);
-
-		
-		datastreamPane.getDataGraph().heightProperty().addListener((obsval, oldVal, newVal)->{
-			collapseButton.setCollapseButtonGraphic(collapseButton, newVal.doubleValue());
-			//make sure collapse flag is changed if the pane is dragged.
-			//System.out.println("datastreamPane: " + newVal.doubleValue() + " "+datastreamPane);
-			if (newVal.doubleValue()>collapseHeight+1){
-				datastreamPane.setCollapsed(false);
-			}
-			else {
-				datastreamPane.setCollapsed(true);
-			}
-		});
-	}
-	
 	/***
 	 * Get the number of panes which are expanded. 
 	 * @return the number of expanded panes. 
@@ -356,113 +304,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 		}
 		return nExpanded; 
 	} 
-	
-	/**
-	 * Expanding a split pane is a little involved. You have to resize all the other panes too. 
-	 */
-	private void expandSPlitPane(DataStreamPaneFX datastreamPane, boolean expand){
-		//System.out.println("---------------------");
-		
-		//work out the number of expanded dividers
-		int nexpanded=getNExpandedPanes();
-		if (nexpanded<=1 && !expand) {
-			//cannot collapse the last pane.
-			return;
-		}
-		
-		int[] formerWeights=dataPanePanes.getWeights(); 
-		
-//		for (int i=0; i<formerWeights.length; i++) {
-//			System.out.println("Old weights: "+ formerWeights[i] + " expandHeight: "+expandHeight+ " "+dataStreamPanels.get(i).isCollapsed() + " " + dataStreamPanels.get(i));
-//		}
-		
-		datastreamPane.setCollapsed(!expand);
-		
-		
-		int streamIndex=dataStreamPanels.indexOf(datastreamPane); 
-		
-		//work out the number of expanded dividers
-		nexpanded=getNExpandedPanes();
-		
-		int formerWeight=formerWeights[streamIndex]; 
-		int newWeight = (int) (expand? dataPanePanes.getHeight()/(nexpanded): this.collapseHeight);
-				
-		//the weight to add to other dividers, note only the ones which are expanded
-		int addWeight=(newWeight-formerWeight)/(nexpanded); 
-		
-		//now need to do anything; 
-		if (newWeight==formerWeight) return;
-		
-		int[] newWeights= new int[formerWeights.length]; 
-		for (int i=0; i<newWeights.length; i++) {
-			if (streamIndex==i) {
-				newWeights[i]=newWeight; 
-			}
-			else if (!dataStreamPanels.get(i).isCollapsed()){
-				newWeights[i]=formerWeights[i]-addWeight; 
-			}
-			else newWeights[i]=(int) this.collapseHeight;
-			//System.out.println("New weights: "+ newWeights[i] + " addWeight: "+addWeight + dataStreamPanels.get(i).isCollapsed());
-		}
-		
-		
-//		nexpanded=getNExpandedPanes();
-//		//now lets make sure the weights is the same as the height of the pane. 
-//		int heightdiff=(int) ((dataPanePanes.getHeight()-PamArrayUtils.sum(newWeights))/nexpanded);
-//		for (int i=0; i<newWeights.length; i++) {
-//			 if (streamIndex!=i && !dataStreamPanels.get(i).isCollapsed()){
-//				newWeights[i]=newWeights[i]+heightdiff; 
-//				System.out.println("New new weights: " + newWeights[i] +" "+heightdiff);
-//			}
-//		}
 
-		
-		
-		//now divide the weights be the total size 
-//		System.out.println("Old Height: " + dataPanePanes.getHeight() + " new "+PamArrayUtils.sum(newWeights));
-
-		//now set the split pane to those divider positions. 
-		dataPanePanes.setWeights(newWeights);
-	}
-
-
-	/**
-	 * Simple extension of button to hold two images. Means the images don;t have to be created all the time. 
-	 * @author jamie
-	 *
-	 */
-	private class CollapseButton extends PamButton {
-		
-		/**
-		 * Glyph for DataStreamPaneFX show button
-		 */
-//		Text imageUp=PamGlyphDude.createPamGlyph(MaterialDesignIcon.CHEVRON_UP, 12);		
-		Text imageUp=PamGlyphDude.createPamIcon("mdi2c-chevron-up", 12);		
-		/*
-		 * Glyph for DataStreamPaneFX hide button
-		 */
-//		Text imageDown=PamGlyphDude.createPamGlyph(MaterialDesignIcon.CHEVRON_DOWN, 12);
-		Text imageDown=PamGlyphDude.createPamIcon("mdi2c-chevron-down", 12);
-		
-		public CollapseButton(){
-			super(); 
-		}
-		
-		public void setCollapseButtonGraphic(PamButton collapseButton, double height){
-			Text graphic;
-			if (height>collapseHeight){
-				//collapse graphic
-				graphic=imageDown;
-			}
-			else {
-				//expand graphic
-				graphic=imageUp;
-			}
-			if (collapseButton.getGraphic()!=graphic) collapseButton.setGraphic(graphic);
-
-		}
-	}
-	
 
 	/**
 	 * Called whenever new data sources are added. 
