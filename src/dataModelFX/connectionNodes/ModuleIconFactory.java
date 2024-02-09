@@ -34,7 +34,8 @@ public class ModuleIconFactory {
 	 */
 	public enum ModuleIcon {
 		DATAMAP, NMEA, GPS, MAP, SOUND_AQ, SOUND_OUTPUT, FFT, FILTER, CLICK, CLICK_TRAIN, RECORDER, WHISTLE_MOAN,
-		NOISE_BAND, NOISE_FILT, DATABASE, BINARY, TIME_DISPLAY, DETECTION_DISPLAY, ARRAY, DEEP_LEARNING, MATCHED_CLICK_CLASSIFIER
+		NOISE_BAND, NOISE_FILT, DATABASE, BINARY, TIME_DISPLAY, DETECTION_DISPLAY, ARRAY, DEEP_LEARNING, MATCHED_CLICK_CLASSIFIER,
+		DECIMATOR
 	}
 
 	/**
@@ -121,6 +122,9 @@ public class ModuleIconFactory {
 		case DEEP_LEARNING:
 			//System.out.println("------GET THE SVG ICON FOR DEEP LEARNING--------");
 			iconNode = getSVGIcon("/Resources/modules/noun_Deep Learning_2486374.svg"); 
+			break;
+		case DECIMATOR:
+			iconNode = getSVGIcon("/Resources/modules/decimator.svg"); 
 			break;
 		default:
 			break;
