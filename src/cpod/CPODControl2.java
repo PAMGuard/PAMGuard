@@ -17,16 +17,19 @@ import PamController.SettingsPane;
 import PamView.PamDetectionOverlayGraphics;
 import PamView.PamSymbol;
 import PamView.WrapperControlledGUISwing;
+import clickTrainDetector.logging.ClickTrainDetSubLogging;
 import cpod.dataPlotFX.CPODDPlotProvider;
 import cpod.dataPlotFX.CPODPlotProviderFX;
 import cpod.fx.CPODGUIFX;
 import cpod.fx.CPODSettingsPane;
+import cpod.logging.CPODClickTrainLogging;
+import cpod.logging.CPODSubDetLogging;
 import dataPlotsFX.data.TDDataProviderRegisterFX;
 import detectionPlotFX.data.DDPlotRegister;
 import fileOfflineData.OfflineFileParams;
 import javafx.concurrent.Task;
+import pamScrollSystem.AbstractScrollManager;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
-import rawDeepLearningClassifier.ddPlotFX.RawDLDDPlotProvider;
 
 /**
  * CPOD control. Loads and manages CPOD and FPOD data into 
@@ -41,7 +44,10 @@ import rawDeepLearningClassifier.ddPlotFX.RawDLDDPlotProvider;
  */
 public class CPODControl2 extends PamControlledUnit implements PamSettings {
 
-	private CPODClickDataBlock cp1DataBlock, cp3DataBlock;
+	/**
+	 * The  CPOD detection datablock
+	 */
+	private CPODClickDataBlock cp1DataBlock;
 
 	/**
 	 * The CPOD paramters. 
@@ -87,13 +93,17 @@ public class CPODControl2 extends PamControlledUnit implements PamSettings {
 	 */
 	private CPODImporter cpodImporter;
 
+	private CPODClickTrainDataBlock clickTrainDataBlock;
+
+	private CPODClickTrainLogging clickTrainDetLogging;
+
 
 	public CPODControl2(String unitName) {
 		super("CPOD", unitName);
 
 		addPamProcess(cpodProcess = new CPODProcess(this));		
 
-		cpodProcess.addOutputDataBlock(cp1DataBlock = new CPODClickDataBlock("CP1 Data", 
+		cpodProcess.addOutputDataBlock(cp1DataBlock = new CPODClickDataBlock("CPOD Detections", 
 				cpodProcess, CPODMap.FILE_CP1));
 		cp1DataBlock.setDatagramProvider(cpodDataGramProvider[0] = new CPODDataGramProvider(this));
 		cp1DataBlock.setPamSymbolManager(new CPODSymbolManager(this, 	cp1DataBlock));
@@ -101,15 +111,25 @@ public class CPODControl2 extends PamControlledUnit implements PamSettings {
 		//must set overlay draw so that hover text can be extracted from general projector and thus plotted on TDGraphFX . This is a HACK and should be sorted. 
 		cp1DataBlock.setOverlayDraw(new PamDetectionOverlayGraphics(cp1DataBlock, new PamSymbol())); 
 
-		// add the CP3 data block
-		cpodProcess.addOutputDataBlock(cp3DataBlock = new CPODClickDataBlock("CP3 Data", 
-				cpodProcess, CPODMap.FILE_CP3));
+		//		// add the CP3 data block
+		//		cpodProcess.addOutputDataBlock(cp3DataBlock = new CPODClickDataBlock("CP3 Data", 
+		//				cpodProcess, CPODMap.FILE_CP3));
+		//
+		//		cp3DataBlock.setPamSymbolManager(new CPODSymbolManager(this, 	cp3DataBlock));
+		//		cp3DataBlock.setDatagramProvider(cpodDataGramProvider[1] = new CPODDataGramProvider(this));
+		//		cp3DataBlock.setBinaryDataSource(new CPODBinaryStore(this, cp1DataBlock));
+		//		//must set overlay draw so that hover text can be extracted from general projector and thus plotted on TDGraphFX . This is a HACK and should be sorted. 
+		//		cp3DataBlock.setOverlayDraw(new PamDetectionOverlayGraphics(cp3DataBlock, new PamSymbol())); 
 
-		cp3DataBlock.setPamSymbolManager(new CPODSymbolManager(this, 	cp3DataBlock));
-		cp3DataBlock.setDatagramProvider(cpodDataGramProvider[1] = new CPODDataGramProvider(this));
-		cp3DataBlock.setBinaryDataSource(new CPODBinaryStore(this, cp1DataBlock));
-		//must set overlay draw so that hover text can be extracted from general projector and thus plotted on TDGraphFX . This is a HACK and should be sorted. 
-		cp3DataBlock.setOverlayDraw(new PamDetectionOverlayGraphics(cp3DataBlock, new PamSymbol())); 
+
+		clickTrainDataBlock=  new CPODClickTrainDataBlock(this, cpodProcess, "CPOD Click Trains", 0); 
+		clickTrainDataBlock.SetLogging(clickTrainDetLogging = new CPODClickTrainLogging(this, clickTrainDataBlock));
+		clickTrainDetLogging.setSubLogging(new CPODSubDetLogging(clickTrainDetLogging, clickTrainDataBlock));
+		//makes sure the click trains are loaded
+		int maxndays = 5; //maximum days to load. 
+		AbstractScrollManager.getScrollManager().addToSpecialDatablock(clickTrainDataBlock, maxndays*24*60*60*1000L , maxndays*24*60*60*1000L);
+
+		cpodProcess.addOutputDataBlock(clickTrainDataBlock);
 
 		PamSettingManager.getInstance().registerSettings(this);
 		cpodProcess.setSampleRate(CPODClickDataBlock.CPOD_SR, false);
@@ -120,11 +140,11 @@ public class CPODControl2 extends PamControlledUnit implements PamSettings {
 		CPODPlotProviderFX cpodPlotProviderFX = new CPODPlotProviderFX(this, cp1DataBlock);
 		TDDataProviderRegisterFX.getInstance().registerDataInfo(cpodPlotProviderFX);
 
-		cpodPlotProviderFX = new CPODPlotProviderFX(this, cp3DataBlock);
+		//		cpodPlotProviderFX = new CPODPlotProviderFX(this, cp3DataBlock);
 		TDDataProviderRegisterFX.getInstance().registerDataInfo(cpodPlotProviderFX);
 		// register the DD display
 		DDPlotRegister.getInstance().registerDataInfo(new CPODDPlotProvider(this, cp1DataBlock));
-		DDPlotRegister.getInstance().registerDataInfo(new CPODDPlotProvider(this, cp3DataBlock));
+		//		DDPlotRegister.getInstance().registerDataInfo(new CPODDPlotProvider(this, cp3DataBlock));
 
 
 		//		//swing time display data providers. 
@@ -141,13 +161,6 @@ public class CPODControl2 extends PamControlledUnit implements PamSettings {
 		//		TDDataProviderRegisterFX.getInstance().registerDataInfo(cpodPlotProviderFX);
 
 
-	}
-
-	protected static File getCP3File(File cp1File) {
-		String newName = cp1File.getAbsolutePath();
-		newName = newName.substring(0, newName.length()-4) + ".CP3";
-		File cp3File = new File(newName);
-		return cp3File;
 	}
 
 
@@ -183,8 +196,16 @@ public class CPODControl2 extends PamControlledUnit implements PamSettings {
 		return cp1DataBlock;
 	}
 
-	public CPODClickDataBlock getCP3DataBlock() {
-		return cp3DataBlock;
+	//	public CPODClickDataBlock getCP3DataBlock() {
+	//		return cp3DataBlock;
+	//	}
+
+	/**
+	 * Get the CPOD click train data block. 
+	 * @return the CPOD click train data block. 
+	 */
+	public CPODClickTrainDataBlock getClickTrainDataBlock() {
+		return this.clickTrainDataBlock;
 	}
 
 	/**
@@ -299,5 +320,7 @@ public class CPODControl2 extends PamControlledUnit implements PamSettings {
 	public List<Task<Integer>> importPODData(List<File> files) {
 		return cpodImporter.importCPODData(files);
 	}
+
+
 
 }

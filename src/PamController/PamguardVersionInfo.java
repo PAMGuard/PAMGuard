@@ -24,7 +24,7 @@ public class PamguardVersionInfo {
 	 * PAMGuard can work with. 
 	 */
 	static public final String minJavaVersion = "11.0.0";
-	static public final String maxJavaVersion = "19.99.99";
+	static public final String maxJavaVersion = "21.99.99";
 	
 
 	/**

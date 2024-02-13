@@ -15,6 +15,7 @@ import PamUtils.SelectFolder;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 
+@Deprecated
 public class CPODDialog extends PamDialog {
 
 	private CPODControl cpodControl;

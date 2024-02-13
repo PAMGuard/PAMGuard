@@ -616,13 +616,25 @@ public class PamArrayUtils {
 	}
 
 	/**
-	 * Flip an array so that it is in the reverse order. Note the array is 
+	 * Flip a double array so that it is in the reverse order. Note the array is 
 	 * cloned. 
 	 * @param flipArray - the waveform to flip
 	 * @return the array with elements reversed.
 	 */
 	public static double[] flip(double[] flipArray) {
 		double[] clone=ArrayUtils.clone(flipArray); 
+		ArrayUtils.reverse(clone);
+		return clone; 
+	}
+	
+	/**
+	 * Flip an int array so that it is in the reverse order. Note the array is 
+	 * cloned. 
+	 * @param flipArray - the waveform to flip
+	 * @return the array with elements reversed.
+	 */
+	public static int[] flip(int[] flipArray) {
+		int[] clone=ArrayUtils.clone(flipArray); 
 		ArrayUtils.reverse(clone);
 		return clone; 
 	}
@@ -1080,6 +1092,7 @@ public class PamArrayUtils {
 		}
 		return arrL;
 	}
+
 
 
 

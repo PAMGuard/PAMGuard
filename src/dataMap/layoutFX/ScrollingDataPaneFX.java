@@ -35,7 +35,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	/**
 	 * The default expanded hieght for each pane. 
 	 */
-	private static final int DATASTREAMPANE_HEIGHT = 400;
+	private static final int DATASTREAMPANE_HEIGHT = 200;
 
 	/**
 	 * Reference to the DataMapControl.

@@ -7,6 +7,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+
+import PamUtils.PamArrayUtils;
+import PamUtils.PamCalendar;
 
 
 /**
@@ -20,7 +24,7 @@ import java.util.Arrays;
  * @author Jamie Macaulay
  */
 public class FPODReader {
-	
+
 	/**
 	 * Look up array to convert byte values to linear sound level
 	 */
@@ -30,24 +34,24 @@ public class FPODReader {
 	 * Look up array to convert byte values to linear sound level if using extended amps. 
 	 */
 	private static int[][] ClippedPkArr;
-	
+
 
 	/**
 	 * Look up sine array fro reconstructing waveforms. 
 	 */
 	private static double[] SineArr;
-	
+
 	/**
 	 * Look up sine array for converting IPI (inter-pulse-interval) to kHz values
 	 */
 	private static int[] IPItoKHZ = new int[257];
-	
+
 	/**
 	 * Length of the FPOD header in bytes. 
 	 */
 	public static final int FPOD_HEADER = 1024;
 
-	
+
 	/**
 	 * The length of a standard FPOD entry
 	 */
@@ -64,10 +68,10 @@ public class FPODReader {
 	 */
 	public static final double WAV_SCALE_FACTOR = 255.;
 
-	
+
 	public static final float FPOD_WAV_SAMPLERATE = 1000000;
-	
-	
+
+
 	/**
 	 * Import an FPOD file. 
 	 * @param cpFile - the FP1 file. 
@@ -77,7 +81,7 @@ public class FPODReader {
 	 * @throws IOException 
 	 */
 	public static int importFile(File cpFile, ArrayList<FPODdata> fpodData, int from, int maxNum ) throws IOException {
-		
+
 		populateRawToRealPkArrays();
 		populateIPIArray();
 
@@ -103,9 +107,16 @@ public class FPODReader {
 		// at -1 to avoid being skipped forward one minute.
 		int nClicks = 0, nMinutes = -1;
 		int nWavClicks = 0;
-		
+
 		//keep track of wav data
 		FPODWavData wavData = null;
+		
+		//holds a map of the click train detections. 
+		HashMap<Integer, CPODClassification> clickTrains = new 	HashMap<Integer, CPODClassification>();
+		
+		//the click train of the current data unit. 
+		CPODClassification cpodClassification =  null;
+		
 		int wavbufpos = 0;
 		try {
 			while (true) {
@@ -184,7 +195,7 @@ public class FPODReader {
 							}
 
 							fpodClick.MaxPkRaw = (short) Math.max(2, toUnsigned(bufPosN[10]));
-//							fpodClick.MaxPkLinear = RawToLinearPk(toUnsigned(bufPosN[10]));
+							//							fpodClick.MaxPkLinear = RawToLinearPk(toUnsigned(bufPosN[10]));
 							fpodClick.MaxPkExtnd = RawToRealPk(toUnsigned(bufPosN[10]), localIPIatMax,
 									header.HasExtendedAmps);
 
@@ -209,39 +220,38 @@ public class FPODReader {
 
 							//the duration is in 5us units. 
 							fpodClick.duration =  ((bufPosN[13] & 240)*16 + toUnsigned(bufPosN[14]));
-							
+
 							///rm...can't exactly explain this but it's translated from FPOD Pascal code - calculates bandwidth
 							int ampDfSum = Math.abs(fpodClick.Pkminus1Extnd - fpodClick.MaxPkRaw);
-					        int ampSum = Math.round((fpodClick.Pkminus1Extnd + fpodClick.MaxPkRaw) / 2);
-					        int ipIdfSum = Math.abs(fpodClick.IPIpreMax - fpodClick.IPIatMax);
-					        int ipISum = fpodClick.IPIatMax;
+							int ampSum = Math.round((fpodClick.Pkminus1Extnd + fpodClick.MaxPkRaw) / 2);
+							int ipIdfSum = Math.abs(fpodClick.IPIpreMax - fpodClick.IPIatMax);
+							int ipISum = fpodClick.IPIatMax;
 
-					        if (fpodClick.Pkplus1Extnd > 0) {
-					            ampDfSum += Math.abs(fpodClick.Pkplus1Extnd - fpodClick.MaxPkRaw);
-					            ampSum += Math.round((fpodClick.Pkplus1Extnd + fpodClick.MaxPkRaw) / 2);
-					            ipIdfSum += Math.abs(fpodClick.IPIatMax - fpodClick.Pkplus1Extnd);
-					            ipISum += fpodClick.Pkplus1Extnd;
-					        }
+							if (fpodClick.Pkplus1Extnd > 0) {
+								ampDfSum += Math.abs(fpodClick.Pkplus1Extnd - fpodClick.MaxPkRaw);
+								ampSum += Math.round((fpodClick.Pkplus1Extnd + fpodClick.MaxPkRaw) / 2);
+								ipIdfSum += Math.abs(fpodClick.IPIatMax - fpodClick.Pkplus1Extnd);
+								ipISum += fpodClick.Pkplus1Extnd;
+							}
 
-					        //set the nadwidth
-					        fpodClick.BW = Math.max(0, Math.min(11, Math.round(ipIdfSum << 4 / ipISum)) + Math.min(20, Math.round((ampDfSum + (ampDfSum >> 1)) << 3 / ampSum) - 1));
+							//set the nadwidth
+							fpodClick.BW = Math.max(0, Math.min(11, Math.round(ipIdfSum << 4 / ipISum)) + Math.min(20, Math.round((ampDfSum + (ampDfSum >> 1)) << 3 / ampSum) - 1));
 
-							nClicks++;
 
-//							if (fpodClick.HasWave) {
-//								System.err.println("Pod data: " + nClicks + "  " + fpodClick.FiveMusec + "  hasWav: " + fpodClick.HasWave);
-//							}
-							
+							//							if (fpodClick.HasWave) {
+							//								System.err.println("Pod data: " + nClicks + "  " + fpodClick.FiveMusec + "  hasWav: " + fpodClick.HasWave);
+							//							}
+
 							//set the time in millis. 
-							
+
 							long timeMillis = (long) (CPODUtils.podTimeToMillis(header.FirstLoggedMin) + (nMinutes*60*1000.) + fpodClick.FiveMusec/200);
 							fpodClick.setTimeMillis(timeMillis);
 							fpodClick.HasWave = false;
 
-							
+
 							/**
 							 * 
-							 * Set the raw (sort of - actuall ypeak positions and IPI) waveform data 
+							 * Set the raw (sort of - actually peak positions and IPI) waveform data 
 							 * 
 							 * Note that the wav data is recorded before the click - this is why this 
 							 * section of code is here. A non null wavData object indicates that wav data has been processed
@@ -249,63 +259,73 @@ public class FPODReader {
 							 * until the wavData is again present. 
 							 */
 							if (wavData!=null) {
-								
+
 								fpodClick.HasWave = true;
-//							fpodClick.setNWavRecs(0);
+								//							fpodClick.setNWavRecs(0);
 								wavData.setClickCyclesStartAt(21 - fpodClick.Ncyc);
-								
+
 								for (int count = wavData.getWavPtr(); count >= 1; count--) {
 									wavData.setWavValsIPI((short) 255, count);
 									wavData.setWavValsSPL((short) 0, count);
 								}
-								
-								fpodClick.setWavData(wavData); 
-//								int[] wave = makeResampledWaveform(fpodClick);
-								
-								//Test clicks
-//								if (fpodClick.getTimeMillis()==1689706702252L) {//porpoise click
-//								if (fpodClick.getTimeMillis()==	1689615091621L) {
-//								int[] wave = makeResampledWaveform(fpodClick);
-//								System.out.println("WAV DATA " + nClicks + "  " + fpodClick.getWavData().getNWavRecs() + "  " + wavData.getWavPtr());
-//								
-//								System.out.println(" Peaks: ");
-//								for (int i = 0; i< wavData.getWavValsSPL().length; i++) {
-//									System.out.print(" " + wavData.getWavValsSPL()[i]);
-//								}
-//								
-//								System.out.println();
-//
-//								System.out.println(" Waveform: ");
-//								for (int i = 0; i< wave.length; i++) {
-//									System.out.print(" " + wave[i]);
-//								}
-//								return 0;
-//								}
 
-//								fpodClick.getWavData();
-								
+								fpodClick.setWavData(wavData); 
+								//								int[] wave = makeResampledWaveform(fpodClick);
+
+								//Test clicks
+								//								if (fpodClick.getTimeMillis()==1689706702252L) {//porpoise click
+								//								if (fpodClick.getTimeMillis()==	1689615091621L) {
+								//								int[] wave = makeResampledWaveform(fpodClick);
+								//								System.out.println("WAV DATA " + nClicks + "  " + fpodClick.getWavData().getNWavRecs() + "  " + wavData.getWavPtr());
+								//								
+								//								System.out.println(" Peaks: ");
+								//								for (int i = 0; i< wavData.getWavValsSPL().length; i++) {
+								//									System.out.print(" " + wavData.getWavValsSPL()[i]);
+								//								}
+								//								
+								//								System.out.println();
+								//
+								//								System.out.println(" Waveform: ");
+								//								for (int i = 0; i< wave.length; i++) {
+								//									System.out.print(" " + wave[i]);
+								//								}
+								//								return 0;
+								//								}
+
+								//								fpodClick.getWavData();
+
 
 								//does this set the reference to null - NOPE;
 								wavData = null;
 
 							}
+							
+							/**
+							 * Set the classification (if FP3 file)
+							 */
+							if (clickTrains!=null) {
+								fpodClick.setClassification(cpodClassification);
+							}
 
 							fpodClick.setMinute(nMinutes);
-						
+
 							if (from<0 || (nClicks>from && nClicks<(from+maxNum))) {
 								//add the click to the FPODdata.
 								fpodData.add(fpodClick);
 							}
-							
-							
-							if (nClicks%100000==0) {
-								System.out.println("Pod data: " + nClicks + "  " +fpodClick.getTimeMillis() + "  " +fpodClick.dataString() + "  "  +toUnsigned(bufPosN[13]) + "  "  + toUnsigned(bufPosN[14]));
+
+
+							if (nClicks%400000==0) {
+								System.out.println("Pod data: " + nClicks + "  " + PamCalendar.formatDateTime(fpodClick.getTimeMillis()) + "  " +fpodClick.dataString() + "  "  +toUnsigned(bufPosN[13]) + "  "  + toUnsigned(bufPosN[14]));
 							}
-							
-							
-							
+
+							nClicks++;
+
+
 				}
 				else if (toUnsigned(bufPosN[0])==250) {
+					
+					//wav data preceedes the next click
 
 					if (wavData==null) {
 						//starting a new wav record
@@ -337,11 +357,51 @@ public class FPODReader {
 					//wav data
 					nWavClicks++;
 				}
+				
 				else if(toUnsigned(bufPosN[0])==249) {
 					//click train data - this is not included - for now
+					//click train data precedes the next click
+					
+					//the train ID is unique to the minute, 
+					short trainID = toUnsigned(bufPosN[15]);
+										
+					//1 is NBHF
+					//2 is dolphin
+					//3 is uncalssified
+					//4 is sonar?
+					short species = (short) ((bufPosN[14] >>> 2) & 3);
+		
+					//quality level for the click train
+					short qualitylevel = (short) ((bufPosN[14]) & 3);
+
+					boolean echo = false;
+					if ((bufPosN[14] & 32) == 32) {
+					    echo = true;
+					}
+					
+	
+					//generate a unique train ID within the file			
+					int trainUID = Integer.valueOf(String.format("%06d", nMinutes) + String.format("%d", trainID));
+					
+					//find the click train from the hash map - if it is not there, create a new one. 
+					 cpodClassification = clickTrains.get(trainUID);
+					
+					if (cpodClassification==null) {
+						cpodClassification = new CPODClassification();
+						cpodClassification.isEcho = echo;
+						cpodClassification.clicktrainID = trainUID;
+						cpodClassification.species = CPODUtils.getSpecies(species); 
+						
+
+						clickTrains.put(trainUID, cpodClassification); 
+						
+						//System.out.println("Click train ID: " + trainUID + " minutes: " + nMinutes + " species: " + species + " quality level: " + qualitylevel);
+
+					}
+
 					
 				}
-				else {
+				else if(toUnsigned(bufPosN[0])==254){
 					nMinutes ++;
 				}
 
@@ -356,8 +416,8 @@ public class FPODReader {
 			return totalBytes;
 		}
 	}
-	
-	
+
+
 	/**
 	 * Convert a raw binary peak to true linear peak. 
 	 * @param Pk - the raw maximum peak
@@ -366,74 +426,74 @@ public class FPODReader {
 	 * @return the real linear peak of he wave
 	 */
 	public static int RawToRealPk(int Pk, int IPI, boolean UseExtendedAmps) {
-	    if (Pk == 0) {
-	        return 1;
-	    }
+		if (Pk == 0) {
+			return 1;
+		}
 		if (IPI < 10) { // or (IPI > 256)
-	        return LinearPkValsArr[Pk];
-	    }
-	    return UseExtendedAmps && (Pk > 222) ? ClippedPkArr[Pk][IPI - 1] : LinearPkValsArr[Pk];
+			return LinearPkValsArr[Pk];
+		}
+		return UseExtendedAmps && (Pk > 222) ? ClippedPkArr[Pk][IPI - 1] : LinearPkValsArr[Pk];
 	}
 
-	
+
 	/**
 	 * Populate the arrays used for calculatung true peaks
 	 */
 	private static void populateRawToRealPkArrays() {
-	    final int constMaxAmpKHZScaler = 50;
-	    final int constMinPkampAllowed = 384;  // (224 - 128) shl 2;
+		final int constMaxAmpKHZScaler = 50;
+		final int constMinPkampAllowed = 384;  // (224 - 128) shl 2;
 
-	    int count, IPI, val, MaxPkampAllowed, Pk;
-	    boolean MaxExceeded;
-	    int[] RiseTimeConversionArr = new int[256 - 223 + 1];  // Initialized for indices 223 to 255
-	    
-	    LinearPkValsArr = new int[256];
+		int count, IPI, val, MaxPkampAllowed, Pk;
+		boolean MaxExceeded;
+		int[] RiseTimeConversionArr = new int[256 - 223 + 1];  // Initialized for indices 223 to 255
 
-	    // Populate LinearPkValsArr
-	    for (count = 0; count <= 127; count++) {
-	        LinearPkValsArr[count] = count;
-	    }
-	    for (count = 128; count <= 191; count++) {
-	        LinearPkValsArr[count] = (count - 64) << 1;
-	    }
-	    for (count = 192; count <= 255; count++) {
-	        LinearPkValsArr[count] = (count - 128) << 2;
-	    }
-	    
+		LinearPkValsArr = new int[256];
+
+		// Populate LinearPkValsArr
+		for (count = 0; count <= 127; count++) {
+			LinearPkValsArr[count] = count;
+		}
+		for (count = 128; count <= 191; count++) {
+			LinearPkValsArr[count] = (count - 64) << 1;
+		}
+		for (count = 192; count <= 255; count++) {
+			LinearPkValsArr[count] = (count - 128) << 2;
+		}
 
 
-	    // Populate RiseTimeConversionArr
-	    for (Pk = 223; Pk <= 255; Pk++) {
-	        if (Pk < 232) {
-	            RiseTimeConversionArr[Pk - 223] = 32 + (231 - Pk) * 4;
-	        } else if (Pk < 240) {
-	            RiseTimeConversionArr[Pk - 223] = 16 + (239 - Pk) * 2;
-	        } else {
-	            RiseTimeConversionArr[Pk - 223] = 255 - Pk;
-	        }
-	    }
 
-	    ClippedPkArr = new int[256][256];
-	    
-	    // Populate ClippedPkArr
-	    for (IPI = 10; IPI <= 256; IPI++) {
-	        MaxExceeded = false;
-	        MaxPkampAllowed = IPI * constMaxAmpKHZScaler;
-	        for (Pk = 223; Pk <= 255; Pk++) {
-	            if (!MaxExceeded) {
-	                val = (int) Math.round(Math.pow(4000.0 / IPI, -0.75) * Math.pow(10, 5.24 * Math.pow(RiseTimeConversionArr[Pk - 223], -0.11)));
-	            } else {
-	                val = MaxPkampAllowed;
-	            }
-	            if (val > MaxPkampAllowed) {
-	                val = MaxPkampAllowed;
-	                MaxExceeded = true;
-	            } else {
-	                val = Math.max(val, constMinPkampAllowed);
-	            }
-	            ClippedPkArr[Pk][IPI - 1] = Math.min(IPI * constMaxAmpKHZScaler, Math.max(384, val));
-	        }
-	    }
+		// Populate RiseTimeConversionArr
+		for (Pk = 223; Pk <= 255; Pk++) {
+			if (Pk < 232) {
+				RiseTimeConversionArr[Pk - 223] = 32 + (231 - Pk) * 4;
+			} else if (Pk < 240) {
+				RiseTimeConversionArr[Pk - 223] = 16 + (239 - Pk) * 2;
+			} else {
+				RiseTimeConversionArr[Pk - 223] = 255 - Pk;
+			}
+		}
+
+		ClippedPkArr = new int[256][256];
+
+		// Populate ClippedPkArr
+		for (IPI = 10; IPI <= 256; IPI++) {
+			MaxExceeded = false;
+			MaxPkampAllowed = IPI * constMaxAmpKHZScaler;
+			for (Pk = 223; Pk <= 255; Pk++) {
+				if (!MaxExceeded) {
+					val = (int) Math.round(Math.pow(4000.0 / IPI, -0.75) * Math.pow(10, 5.24 * Math.pow(RiseTimeConversionArr[Pk - 223], -0.11)));
+				} else {
+					val = MaxPkampAllowed;
+				}
+				if (val > MaxPkampAllowed) {
+					val = MaxPkampAllowed;
+					MaxExceeded = true;
+				} else {
+					val = Math.max(val, constMinPkampAllowed);
+				}
+				ClippedPkArr[Pk][IPI - 1] = Math.min(IPI * constMaxAmpKHZScaler, Math.max(384, val));
+			}
+		}
 	}
 
 
@@ -445,18 +505,18 @@ public class FPODReader {
 	public static int IPItoKhz(int IPI) {
 		return IPItoKHZ[IPI];
 	}
-	
+
 	/**
 	 * Ppulate the IPI array 
 	 */
 	public static void populateIPIArray() {
-		
+
 		for (int count = 0; count < 16; count++) {
-		    IPItoKHZ[count] = 255;
+			IPItoKHZ[count] = 255;
 		}
 
 		for (int count = 16; count < 256; count++) {
-		    IPItoKHZ[count] = Math.round(4000 / count);
+			IPItoKHZ[count] = Math.round(4000 / count);
 		}
 
 		IPItoKHZ[64] = 63; // Smoothes an uncomfortable step here
@@ -756,8 +816,8 @@ public class FPODReader {
 		// These are same positions as CPOD files
 		PODset.FirstLoggedMin = Math.max(Int32FromBytes(HdrBuf, 256, 4), 1); // MoveFilePosToMin exits if it gets a zero
 		PODset.LastLoggedMin = 	Math.max(Int32FromBytes(HdrBuf, 260, 4), PODset.FirstLoggedMin);
-		
-		
+
+
 		if (PODset.LastLoggedMin == 0 || PODset.LastLoggedMin < PODset.FirstLoggedMin) {
 			// ShowTimedMessage(5000, 'PODset.LastLoggedMin = 0) or (PODset.LastLoggedMin < PODset.FirstLoggedMin'); // Adjust for Java
 		}
@@ -790,7 +850,7 @@ public class FPODReader {
 			ret <<= 8;
 			ret |= (int) hdrBuf[i] & 0xFF;
 		}
-//		System.out.println("HELLO TIME: " + ret);
+		//		System.out.println("HELLO TIME: " + ret);
 		return ret;
 	}
 
@@ -828,45 +888,45 @@ public class FPODReader {
 		public int BW;
 
 		/**
-		* 	0	time within minute in 5 microsecond units, MSB
-		*	1	time in 5 microsecond units
-		*	2	time in 5 microsecond units, LSB
-		*	3	N of cycles in the click - up to 255cycles
-		*	4	Wavenumber of loudest cycle; range of IPIs in click
-		*	5	IPI  of Pk-1
-		*	6	IPI of  Pk  this is the loudest cycle in the click
-		*	7	IPI of  Pk+1
-		*	8	IPI of  Pk+2
-		*	9	Amplitude of  P-1
-		*	10	Amplitude of  Pmax,  the loudest cycle in the click
-		*	11	Amplitude of  P+1
-		*	12	IPI before click start
-		*	13	N of Amplitude Reversals in click envelope; Duration of click (MSB)
-		*	14	Duration of click (LSB)
-		*	15	IPI of last cycle, compressed; flag if boat sonar found
-		*/
-				
+		 * 	0	time within minute in 5 microsecond units, MSB
+		 *	1	time in 5 microsecond units
+		 *	2	time in 5 microsecond units, LSB
+		 *	3	N of cycles in the click - up to 255cycles
+		 *	4	Wavenumber of loudest cycle; range of IPIs in click
+		 *	5	IPI  of Pk-1
+		 *	6	IPI of  Pk  this is the loudest cycle in the click
+		 *	7	IPI of  Pk+1
+		 *	8	IPI of  Pk+2
+		 *	9	Amplitude of  P-1
+		 *	10	Amplitude of  Pmax,  the loudest cycle in the click
+		 *	11	Amplitude of  P+1
+		 *	12	IPI before click start
+		 *	13	N of Amplitude Reversals in click envelope; Duration of click (MSB)
+		 *	14	Duration of click (LSB)
+		 *	15	IPI of last cycle, compressed; flag if boat sonar found
+		 */
+
 		//time
 
 		/**
 		 * The time in 5us chunks from the start of the current minute
 		 */
 		public int FiveMusec;
-		
+
 		/**
 		 * The time in Java millis
 		 */
 		private long timeMillis;
-		
+
 
 		/**
 		 * N of cycles in the click - up to 255cycles
 		 */
 		public short Ncyc;
-		
+
 		//Wave number of loudest cycle; range of IPIs in click
 		public int PkAt;
-		
+
 		//TODO - no idea what amp reversals is...
 		public int AmpReversals;
 
@@ -877,13 +937,13 @@ public class FPODReader {
 
 
 		//amplitude peaks
-		
+
 		public int MaxPkExtnd;
 
-//		public short MaxPkLinear;
+		//		public short MaxPkLinear;
 
 		public short MaxPkRaw;
-		
+
 		public int Pkplus1Extnd;
 
 		public short RawPkplus1;
@@ -891,10 +951,10 @@ public class FPODReader {
 		public int Pkminus1Extnd;
 
 		public int RawPkminus1;
-		
-		
+
+
 		//*****Inter pulse intervals*****//
-		
+
 		public int IPIplus2;
 
 		public int IPIplus1;
@@ -902,40 +962,60 @@ public class FPODReader {
 		public int IPIatMax;
 
 		public int IPIpreMax;
-		
+
 		public int EndIPI;
-		
+
 		public int IPIbefore;
-		
+
 		public int ClkIPIrange;
-		
+
 		//******Waveform******//
-		
+
 		/**
 		 * True if the click has a waveform
 		 */
 		public boolean HasWave;
-		
+
 		/**
 		 * The minute from the strat of the file. 
 		 */
 		public int minute;
 
 		private FPODWavData wavData;
+		
+		//******Click Train Info******//
 
-	
+
+		/**
+		 * Clasisifcation  of the click i.e. which clicks train it belongs to. Can be null. 
+		 */
+		private CPODClassification cpodClassification;
+
+
 		public void setMinute(int nMinutes) {
 			this.minute = nMinutes;
-			
+
+		}
+
+		public void setClassification(CPODClassification cpodClassification) {
+			this.cpodClassification=cpodClassification;
 		}
 		
+		/**
+		 * Get the species classification i.e. which click train the click belongs to.
+		 * @return the species classification object. 
+		 */
+		public CPODClassification getClassification( ) {
+			return cpodClassification;
+		}
+
 		public FPODWavData getWavData() {
 			return this.wavData;
 		}
 
 		public void setWavData(FPODWavData wavData) {
 			this.wavData=wavData;
-			
+
 		}
 
 		public long getTimeMillis() {
@@ -944,12 +1024,12 @@ public class FPODReader {
 
 		public void setTimeMillis(long timeMillis) {
 			this.timeMillis=timeMillis;
-			
+
 		}
-		
+
 		public String dataString() {
 			String data = "";
-			
+
 			data += " 5usTime: " + FiveMusec;
 			data += " Ncyc: " + Ncyc;
 			data += " MaxPkExtnd: " + MaxPkExtnd;
@@ -957,12 +1037,13 @@ public class FPODReader {
 			data += " BW: " + BW;
 			data += " Duration: " + duration;
 
-			
+
 			return data;
 		}
 
 
 	}
+
 
 	/**
 	 * Holds FPOD wav data. Note this is not actually wav data 
@@ -970,12 +1051,12 @@ public class FPODReader {
 	 * in the waveform. 
 	 */
 	public static class FPODWavData {
-		
+
 		private static final int WAV_LEN = 22;
-		
+
 		public int clickCyclesStart ;
 
-		
+
 		/**
 		 * The inter pulse intervals of the waveform
 		 */
@@ -995,7 +1076,7 @@ public class FPODReader {
 		 * Number of wav amplitudes. 
 		 */
 		public int nWavRecs;
-		
+
 		/*** Wav file functions****/
 
 		public int getWavPtr() {
@@ -1013,11 +1094,11 @@ public class FPODReader {
 		public void setNWavRecs(int i) {
 			this.nWavRecs = i;
 		}
-		
+
 		public short[] getWavValsSPL() {
 			return WavValsSPL;
 		}
-		
+
 		public short[] getWavValsIPI() {
 			return WavValsIPI;
 		}
@@ -1028,14 +1109,14 @@ public class FPODReader {
 			}
 			WavValsIPI[posn] = unsigned;
 		}
-		
+
 		public void setWavValsSPL(short unsigned, int posn) {
 			if (WavValsSPL==null) {
 				WavValsSPL = new short[WAV_LEN];
 			}
 			WavValsSPL[posn] = unsigned;
 		}
-		
+
 		public void setClickCyclesStartAt(int i) {
 			this.clickCyclesStart = i;
 		}
@@ -1150,112 +1231,117 @@ public class FPODReader {
 		public String DateOfCalibrationStr;
 
 	}
-	
-	
 
-	    public static void BuildSineArray() {
-	    	SineArr = new double[2001];
-	        final double constPiFrac = Math.PI / 1000;
-	        double S;
-	        for (int count = 0; count < 2000; count++) {
-	            S = Math.sin(constPiFrac * count);
-	            SineArr[count] = S;
-	        }
-	    }
-	    
-	    /**
-	     * Scale wave data so it is returned as a double
-	     * @param wavData - the wavdata
-	     * @return the scaled wav data between -1 and 1; 
-	     */
-		public static double[] scaleWavData(int[] wavData) {
-			double[] wavArr = new double[wavData.length];
-			for (int i=0; i<wavData.length; i++) {
-				wavArr[i] = wavData[i]/WAV_SCALE_FACTOR;
-			}
-			return wavArr;
+
+
+	public static void BuildSineArray() {
+		SineArr = new double[2001];
+		final double constPiFrac = Math.PI / 1000;
+		double S;
+		for (int count = 0; count < 2000; count++) {
+			S = Math.sin(constPiFrac * count);
+			SineArr[count] = S;
+		}
+	}
+
+	/**
+	 * Scale wave data so it is returned as a double
+	 * @param wavData - the wavdata
+	 * @return the scaled wav data between -1 and 1; 
+	 */
+	public static double[] scaleWavData(int[] wavData) {
+		double[] wavArr = new double[wavData.length];
+		for (int i=0; i<wavData.length; i++) {
+			wavArr[i] = wavData[i]/WAV_SCALE_FACTOR;
+		}
+		return wavArr;
+	}
+
+	/**
+	 * Reconstructs sinusoidal waveform from the peaks which have been sampled at 4MHz 
+	 * 
+	 * @param click - FPOD click with waveform information. 
+	 */
+	public static int[] makeResampledWaveform(FPODdata click) {
+
+		if (SineArr==null) {
+			BuildSineArray();
 		}
 
-	    /**
-	     * Reconstructs sinusoidal waveform from the peaks which have been sampled at 4MHz 
-	     * 
-	     * @param click - FPOD click with waveform information. 
-	     */
-	    public static int[] makeResampledWaveform(FPODdata click) {
-	    	
-	    	if (SineArr==null) {
-	    		BuildSineArray();
-	    	}
-	    	
-	    	int[] MhzSampledArr = new int[2000]; 
-	    	
-	        int count, cyc, SinePtsPerUs, SinePtr, FirstClkCyc, IPIsum, NewIPIx, OldIPIx;
+		int[] MhzSampledArr = new int[2000]; 
 
-	        // MhzSampledArr initialization (assuming it's an array)
+		int count, cyc, SinePtsPerUs, SinePtr, FirstClkCyc, IPIsum, NewIPIx, OldIPIx;
 
-	        // Read back from end of WavIPIarr to find start of continuous sound data
-	        int RawStartPtr = 21;
-	        
-	      
-	        while (RawStartPtr > 0 &&   click.getWavData().getWavValsIPI()[RawStartPtr] < 255) {
-	        	click.getWavData().getWavValsSPL()[RawStartPtr] = (short) LinearPkValsArr[click.getWavData().getWavValsSPL()[RawStartPtr]];
-	            RawStartPtr--;
-	        }
-	        
-	        RawStartPtr = Math.min(21, RawStartPtr + 1);
-	        FirstClkCyc = 21 - click.Ncyc;
+		// MhzSampledArr initialization (assuming it's an array)
 
-	        // Construct each cycle in MhzSampledArr
-	        SinePtr = 0;
-	        int MHzArrPtr = 0;
-	        int MaxSPLval = 0;
-	        IPIsum = 0;
+		// Read back from end of WavIPIarr to find start of continuous sound data
+		int RawStartPtr = 21;
 
-	        cyc = 21;
 
-	        do {
-	            // Populate MhzSampledArr
-	            SinePtsPerUs = Math.round(4000 / click.getWavData().getWavValsIPI()[cyc]);
-	            while (SinePtr <= 1999 && MHzArrPtr < MhzSampledArr.length) {
-	                MhzSampledArr[MHzArrPtr] = (int) Math.round(SineArr[SinePtr]
-	                		* click.getWavData().getWavValsSPL()[cyc]);
+		while (RawStartPtr > 0 &&   click.getWavData().getWavValsIPI()[RawStartPtr] < 255) {
+			click.getWavData().getWavValsSPL()[RawStartPtr] = (short) LinearPkValsArr[click.getWavData().getWavValsSPL()[RawStartPtr]];
+			RawStartPtr--;
+		}
 
-//	                System.out.println( MhzSampledArr[MHzArrPtr] +" index: " + MHzArrPtr + " SinePtr " + SinePtr + " cyc " + cyc);
-	                MHzArrPtr++;
-	                SinePtr += SinePtsPerUs;
-	            } 
+		RawStartPtr = Math.min(21, RawStartPtr + 1);
+		FirstClkCyc = 21 - click.Ncyc;
 
-	            if (MHzArrPtr >= MhzSampledArr.length) {
-	            	//System.err.println("FPOD Waveform index greater than len? " + MhzSampledArr.length);
-	                break; // Fix: extend this array if needed
-	            }
-	            
-	            SinePtr -= 2000;
-	            if (cyc == FirstClkCyc) {
-	                int StartOfClickHighRes = MHzArrPtr;
-	            }
-	            IPIsum += click.getWavData().getWavValsIPI()[cyc];
-	            cyc--;
-	        } while (cyc > click.wavData.WavPtr);
+		// Construct each cycle in MhzSampledArr
+		SinePtr = 0;
+		int MHzArrPtr = 0;
+		int MaxSPLval = 0;
+		IPIsum = 0;
 
-	        // Bring line up to zero
-	        if (MHzArrPtr < MhzSampledArr.length) {
-	            MhzSampledArr[MHzArrPtr] = 0;
-	        }
-	        
-	        return Arrays.copyOf(MhzSampledArr, MHzArrPtr);
-	    }
-	
+		cyc = 21;
+
+		do {
+			// Populate MhzSampledArr
+			SinePtsPerUs = Math.round(4000 / click.getWavData().getWavValsIPI()[cyc]);
+			while (SinePtr <= 1999 && MHzArrPtr < MhzSampledArr.length) {
+				MhzSampledArr[MHzArrPtr] = (int) Math.round(SineArr[SinePtr]
+						* click.getWavData().getWavValsSPL()[cyc]);
+
+				//	                System.out.println( MhzSampledArr[MHzArrPtr] +" index: " + MHzArrPtr + " SinePtr " + SinePtr + " cyc " + cyc);
+				MHzArrPtr++;
+				SinePtr += SinePtsPerUs;
+			} 
+
+			if (MHzArrPtr >= MhzSampledArr.length) {
+				//System.err.println("FPOD Waveform index greater than len? " + MhzSampledArr.length);
+				break; // Fix: extend this array if needed
+			}
+
+			SinePtr -= 2000;
+			if (cyc == FirstClkCyc) {
+				int StartOfClickHighRes = MHzArrPtr;
+			}
+			IPIsum += click.getWavData().getWavValsIPI()[cyc];
+			cyc--;
+		} while (cyc > click.wavData.WavPtr);
+
+		// Bring line up to zero
+		if (MHzArrPtr < MhzSampledArr.length) {
+			MhzSampledArr[MHzArrPtr] = 0;
+		}
+		
+		
+
+		int[] waveform = Arrays.copyOf(MhzSampledArr, MHzArrPtr);
+		//waveform is backwards so flip it. 
+		return PamArrayUtils.flip(waveform);
+	}
+
 
 	/**
 	 * Test the program
 	 * @param args
 	 */
 	public static void main(String[] args) {
-//		String filePath = "/Users/au671271/Library/CloudStorage/GoogleDrive-macster110@gmail.com/My Drive/PAMGuard_dev/CPOD/FPOD_NunBank/0866 NunBankB 2023 06 27 FPOD_6480 file0.FP1";
+		//		String filePath = "/Users/au671271/Library/CloudStorage/GoogleDrive-macster110@gmail.com/My Drive/PAMGuard_dev/CPOD/FPOD_NunBank/0866 NunBankB 2023 06 27 FPOD_6480 file0.FP1";
 
-		String filePath = "D:\\My Drive\\PAMGuard_dev\\CPOD\\FPOD_NunBank\\0866 NunBankB 2023 06 27 FPOD_6480 file0.FP1";
-		
+		String filePath = "D:\\DropBox\\PAMGuard_dev\\CPOD\\FPOD_NunBank\\0866 NunBankB 2023 06 27 FPOD_6480 file0.FP1";
+//		String filePath = "D:\\DropBox\\PAMGuard_dev\\CPOD\\FPOD_NunBank\\0866 NunBankB 2023 06 27 FPOD_6480 file0.FP3";
+
 		File fpfile = new File(filePath); 
 
 		ArrayList<FPODdata> fpodData = new ArrayList<FPODdata>();

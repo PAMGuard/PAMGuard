@@ -11,8 +11,8 @@ import org.apache.commons.io.FileUtils;
 import PamController.PamGUIManager;
 import PamController.SettingsPane;
 import cpod.CPODControl2;
-import cpod.CPODImporter.CPODFileType;
 import cpod.CPODParams;
+import cpod.CPODUtils.CPODFileType;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
@@ -65,7 +65,7 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 	 * The extension filter. Holds the types of files that can be imported. 
 	 */
 	private FileChooser.ExtensionFilter extensionFilterCPOD;
-//	private FileChooser.ExtensionFilter extensionFilterFPOD;
+	//	private FileChooser.ExtensionFilter extensionFilterFPOD;
 
 
 	/**
@@ -111,10 +111,10 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 		super(null);
 		this.cpodControl = cpodControl2;
 
-		
+
 		//define the types of files to be imported ("Note:  add FP1 and FP3 here)
 		extensionFilterCPOD = new ExtensionFilter("CPOD file", "*.cp1", "*.cp3", "*.fp1", "*.fp3"); 
-		
+
 		//file chooser
 		fileChooser = new FileChooser(); 
 		fileChooser.getExtensionFilters().addAll(getExtensionFilters()); 
@@ -126,7 +126,7 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 
 		pathLabel = new TextField("No classifier file selected"); 
 		pathLabel.setEditable(false);
-		
+
 		filesInfoLabel = new Label(); 
 
 
@@ -137,14 +137,11 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 		browsFileButton.setOnAction((action)->{
 
 			List<File> files = fileChooser.showOpenMultipleDialog(this.getFXWindow());
-			setFileList(files); 
+			setNewFiles(files); 
 
-			if (this.files.size()>0) {
-				importButton.setDisable(false);
-			}
 		});
-		
-		
+
+
 		//		PamButton browsFolderButton = new PamButton("", PamGlyphDude.createPamGlyph(MaterialDesignIcon.FOLDER, PamGuiManagerFX.iconSize)); 
 		PamButton browsFolderButton = new PamButton("", PamGlyphDude.createPamIcon("mdi2f-folder", PamGuiManagerFX.iconSize)); 
 		browsFolderButton.setMinWidth(30);
@@ -153,7 +150,7 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 
 			File file = folderChooser.showDialog(this.getFXWindow());
 
-			setNewFile(file); 
+			setNewFolder(file); 
 		});
 
 
@@ -225,7 +222,7 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 		});
 		progressPane.setCenter(progressBar);
 		progressPane.setRight(importButton);
-		progressPane.setBottom(progressLabel = new Label(""));
+		progressPane.setBottom(progressLabel = new Label("Hello"));
 
 
 		PamVBox mainHolder = new PamVBox(); 
@@ -296,53 +293,54 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 	private boolean importCPODData() {
 		if (files==null) return false; 
 
-		System.out.println("Import CPOD data: " + files.size());
 
 		//begins the import
-//		this.tasks = this.cpodControl.getCpodImporter().importCPODData(files);
+		//		this.tasks = this.cpodControl.getCpodImporter().importCPODData(files);
 		this.tasks = this.cpodControl.importPODData(files);
 
 		if (tasks ==null) return false; 
 
+		this.progressBar.setProgress(-1.);
 
 		this.progressBar.progressProperty().bind(tasks.get(0).progressProperty());
 		this.progressLabel.textProperty().bind(tasks.get(0).messageProperty());
 
+
 		//binds the progress bar - imports are 
-		for (int i=0; i<tasks.size(); i++) {
+		for (int i=0; i<tasks.size()-1; i++) {
 			final int ii = i; 
 			//Will be called if the tasks are cancelled or succeed. 
-			tasks.get(tasks.size()-1).setOnCancelled((worker)->{
-				this.progressBar.progressProperty().bind(tasks.get(ii).progressProperty());
-				this.progressLabel.textProperty().bind(tasks.get(ii).messageProperty());
+			tasks.get(ii).setOnCancelled((worker)->{
+				this.progressBar.progressProperty().bind(tasks.get(ii+1).progressProperty());
+				this.progressLabel.textProperty().bind(tasks.get(ii+1).messageProperty());
 			});
 
-			tasks.get(tasks.size()-1).setOnSucceeded((worker)->{
-				this.progressBar.progressProperty().bind(tasks.get(ii).progressProperty());
-				this.progressLabel.textProperty().bind(tasks.get(ii).messageProperty());
+			tasks.get(ii).setOnSucceeded((worker)->{
+				System.out.println("IMPORT FINISHED: " + ii); 
+				this.progressBar.progressProperty().bind(tasks.get(ii+1).progressProperty());
+				this.progressLabel.textProperty().bind(tasks.get(ii+1).messageProperty());
 			});
 
+			tasks.get(ii).setOnFailed((worker)->{
+				this.progressBar.progressProperty().bind(tasks.get(ii+1).progressProperty());
+				this.progressLabel.textProperty().bind(tasks.get(ii+1).messageProperty());
+			});
 		}
 
-
-		//Will be called if the tasks are cancelled or succeed. 
 		tasks.get(tasks.size()-1).setOnCancelled((worker)->{
-			System.out.println("Importing cancelled:"); 
-
 			importingFinished();
 		});
 
 		tasks.get(tasks.size()-1).setOnSucceeded((worker)->{
-			System.out.println("Importing succeeeded:"); 
-
 			importingFinished();
 		});
+
 
 		tasks.get(tasks.size()-1).setOnFailed((worker)->{
-			System.out.println("Importing failed:"); 
-
 			importingFinished();
 		});
+
+
 
 		//run the tasks
 		this.cpodControl.getCpodImporter().runTasks(tasks);
@@ -354,6 +352,7 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 	 * Called whenever the importing is finished.  
 	 */
 	private void importingFinished() {
+		System.out.println("IMPORT FINISHED: MEH~!"); 
 
 		if (PamGUIManager.isSwing())
 			//important to put this here or , if a swing dialog pop ups, then there is thread lock. 
@@ -407,10 +406,10 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 		//have a look through the files and check that there are some files to import. 		
 		for (int i=0; i<CPODFileType.values().length; i++) {
 			try {
-			List<File> cp1 = (List<File>) FileUtils.listFiles(folder, 
-					new String[]{CPODFileType.values()[i].getText()}, this.subFolder.isSelected());
-			System.out.println("Files out: " + cp1);
-			files.addAll(cp1); 
+				List<File> cp1 = (List<File>) FileUtils.listFiles(folder, 
+						new String[]{CPODFileType.values()[i].getText()}, this.subFolder.isSelected());
+				System.out.println("Files out: " + cp1);
+				files.addAll(cp1); 
 			}
 			catch (Exception e) {
 				System.err.println("Current directory does not exist: " + folder ); 
@@ -437,7 +436,7 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 		filters.add(extensionFilterCPOD); 
 		//don't add an exstra filter - just have all as one - otherwise the user has to change the 
 		//file dialog to FPODs to get it to work. 
-//		filters.add(extensionFilterFPOD); 
+		//		filters.add(extensionFilterFPOD); 
 		return filters;
 	}
 
@@ -473,14 +472,14 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 		timeStretch.getValueFactory().setValue(cpodParams.timeStretch);
 
 
-		setNewFile(cpodParams.offlineFolder==null ? null : new File(cpodParams.offlineFolder)); 
+		setNewFolder(cpodParams.offlineFolder==null ? null : new File(cpodParams.offlineFolder)); 
 	}
 
 	/**
 	 * Called whenever there is a new selected file or folder. 
 	 * @param file - the file label to set. 
 	 */
-	private void setNewFile(File file) {
+	private void setNewFolder(File file) {
 
 		if (file==null) {
 			this.pathLabel.setText("No folder or file selected"); 
@@ -489,17 +488,40 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 			this.pathLabel.setText(file.getAbsolutePath());
 			setFileList(file); 
 
-			if (files.size()>1) {
-				this.filesInfoLabel.setText(files.size() + " CPOD files to import"); 
-			}
-			else {
-				this.filesInfoLabel.setText(files.size() + " CPOD file to import"); 
-			}
+			setFileInfoLabel();
 		}
 
 		importButton.setDisable(this.files==null || this.files.size()<1);
 	}
 
+	/**
+	 * Called whenever there is a new selected file or folder. 
+	 * @param file - the file label to set. 
+	 */
+	private void setNewFiles(List<File> files) {
+
+		if (files==null || files.size()==0) {
+			this.pathLabel.setText("No folder or file selected"); 
+		}
+		else {
+			this.pathLabel.setText(files.get(0).getAbsolutePath());
+
+			this.files = files;
+
+			setFileInfoLabel();
+		}
+
+		importButton.setDisable(this.files==null || this.files.size()<1);
+	}
+
+	private void setFileInfoLabel() {
+		if (files.size()>=1) {
+			this.filesInfoLabel.setText(files.size() + " CPOD files to import"); 
+		}
+		else {
+			this.filesInfoLabel.setText(files.size() + " CPOD file to import"); 
+		}
+	}
 
 	private CPODParams showWarning(String string) {
 		// TODO Auto-generated method stub

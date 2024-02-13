@@ -25,7 +25,9 @@ public class CPODClickDataBlock extends AcousticDataBlock<CPODClick> {
 		super(CPODClick.class, dataName, parentProcess, 1);
 		this.clikcType = clikcType;
 		
+		if (parentProcess!=null) {
 		this.setDataSelectCreator(new CPODDataSelectorCreator(parentProcess.getPamControlledUnit(), this));
+		}
 	}
 
 	/* (non-Javadoc)
@@ -33,11 +35,15 @@ public class CPODClickDataBlock extends AcousticDataBlock<CPODClick> {
 	 */
 	@Override
 	public String getDataName() {
-		PamControlledUnit cpodControl = getParentProcess().getPamControlledUnit();
-		if (cpodControl == null) {
-			return super.getDataName();
+		if (getParentProcess()!=null) {
+			PamControlledUnit cpodControl = getParentProcess().getPamControlledUnit();
+			if (cpodControl == null) {
+				return super.getDataName();
+			}
+			return cpodControl.getUnitName() + "_" + getDataTypeString();
 		}
-		return cpodControl.getUnitName() + "_" + getDataTypeString();
+		return "CPOD_temporaty";
+	
 	}
 
 	private String getDataTypeString() {

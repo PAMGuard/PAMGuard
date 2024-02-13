@@ -26,6 +26,8 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 	private long iciSamples;
 	private short[] rawData;
 	
+	
+	
 
 	/**
 	 * The amplitude in dB. 
@@ -348,6 +350,14 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 				}
 			}
 		}
+		
+		if (this.getSuperDetection(0)!=null) {
+			str += String.format("I am part of a click train!!!: <p>");
+		}
+		else {
+			str += String.format("I am not part of a click train :-(: <p>");
+		}
+		
 //		str += "<\html>";
 		return str;
 	}

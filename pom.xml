@@ -57,7 +57,7 @@
 	        <version>3.12.1</version>
 			<configuration>
 				<!--  set compiler to use Java version 11 API https://docs.oracle.com/javase/9/tools/javac.htm#JSWOR627 -->
-				<release>17</release>
+				<release>21</release>
 				<compilerId>jdt</compilerId>
 			</configuration>
 			<dependencies>
