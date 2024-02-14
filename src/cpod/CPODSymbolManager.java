@@ -50,6 +50,9 @@ public class CPODSymbolManager extends StandardSymbolManager {
 		//add the peak frequency modifier that allows clicks to be coloured by peak frequency. 
 		psc.addSymbolModifier(new PeakFreqModifier(psc));
 		
+		//add the peak frequency modifier that allows clicks to be coloured by peak frequency. 
+		psc.addSymbolModifier(new CPODClickTrainModifier(psc));
+		
 		// we can also add some default behaviour here to match the old behaviour
 		// these will get overridden once user options are set, but it's good to give defaults. 
 //		SymbolModifier eventMod = psc.hasSymbolModifier(SuperDetSymbolModifier.class);

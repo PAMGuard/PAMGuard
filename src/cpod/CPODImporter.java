@@ -537,17 +537,12 @@ public class CPODImporter {
 			int count =0;
 			for (Integer key: cpodClickTrains.keySet()) {
 				
-				if (count%100 ==0) {
+				if (count%100 == 0) {
 					this.updateMessage(("Add click train data to datablock: " + count +  "  of " + cpodClickTrains.keySet().size()));
 					this.updateProgress(count, cpodClickTrains.keySet().size());
-
 //					System.out.println("Add click train data to datablock: " + count +  "  " + cpodClickTrains.keySet().size());
 				}
-				
-				if (count ==3000) {
-					//temp
-					break;
-				}
+
 				
 				clickTrainDataBlock.addPamData(cpodClickTrains.get(key));
 				count++;

@@ -1,17 +1,11 @@
 package clickDetector.tdPlots;
 
-import java.awt.Color;
-
 import PamView.GeneralProjector;
-import PamView.PamColors;
 import PamView.symbol.StandardSymbolChooser;
 import PamView.symbol.StandardSymbolManager;
 import PamView.symbol.StandardSymbolOptions;
 import PamView.symbol.SymbolData;
 import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamDataUnit;
-import clickDetector.ClickTrainDetection;
-import clickDetector.offlineFuncs.OfflineEventDataUnit;
 
 public class ClickEventSymbolChooser extends StandardSymbolChooser {
 

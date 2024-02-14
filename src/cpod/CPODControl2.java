@@ -17,7 +17,6 @@ import PamController.SettingsPane;
 import PamView.PamDetectionOverlayGraphics;
 import PamView.PamSymbol;
 import PamView.WrapperControlledGUISwing;
-import clickTrainDetector.logging.ClickTrainDetSubLogging;
 import cpod.dataPlotFX.CPODDPlotProvider;
 import cpod.dataPlotFX.CPODPlotProviderFX;
 import cpod.fx.CPODGUIFX;
@@ -111,6 +110,8 @@ public class CPODControl2 extends PamControlledUnit implements PamSettings {
 		//must set overlay draw so that hover text can be extracted from general projector and thus plotted on TDGraphFX . This is a HACK and should be sorted. 
 		cp1DataBlock.setOverlayDraw(new PamDetectionOverlayGraphics(cp1DataBlock, new PamSymbol())); 
 
+		
+
 		//		// add the CP3 data block
 		//		cpodProcess.addOutputDataBlock(cp3DataBlock = new CPODClickDataBlock("CP3 Data", 
 		//				cpodProcess, CPODMap.FILE_CP3));
@@ -125,6 +126,9 @@ public class CPODControl2 extends PamControlledUnit implements PamSettings {
 		clickTrainDataBlock=  new CPODClickTrainDataBlock(this, cpodProcess, "CPOD Click Trains", 0); 
 		clickTrainDataBlock.SetLogging(clickTrainDetLogging = new CPODClickTrainLogging(this, clickTrainDataBlock));
 		clickTrainDetLogging.setSubLogging(new CPODSubDetLogging(clickTrainDetLogging, clickTrainDataBlock));
+		//create symbols for clicks trains
+		clickTrainDataBlock.setPamSymbolManager(new CPODTrainSymbolManager(clickTrainDataBlock));
+		
 		//makes sure the click trains are loaded
 		int maxndays = 5; //maximum days to load. 
 		AbstractScrollManager.getScrollManager().addToSpecialDatablock(clickTrainDataBlock, maxndays*24*60*60*1000L , maxndays*24*60*60*1000L);

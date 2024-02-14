@@ -1,12 +1,6 @@
 package clickDetector.tdPlots;
 
-import PamView.GeneralProjector;
-import PamView.symbol.StandardSymbolChooser;
-import PamView.symbol.StandardSymbolManager;
 import PamView.symbol.SymbolData;
-import PamView.symbol.modifier.SuperDetSymbolModifier;
-import PamguardMVC.PamDataBlock;
-import PamguardMVC.superdet.SuperDetDataBlock;
 import PamguardMVC.superdet.swing.SuperDetectionSymbolManager;
 import clickDetector.offlineFuncs.OfflineEventDataBlock;
 
