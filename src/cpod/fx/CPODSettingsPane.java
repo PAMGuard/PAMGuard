@@ -352,7 +352,6 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 	 * Called whenever the importing is finished.  
 	 */
 	private void importingFinished() {
-		System.out.println("IMPORT FINISHED: MEH~!"); 
 
 		if (PamGUIManager.isSwing())
 			//important to put this here or , if a swing dialog pop ups, then there is thread lock. 
@@ -450,7 +449,7 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 
 	@Override
 	public CPODParams getParams(CPODParams currParams) {
-		currParams.offlineFolder = currentFolder.getAbsolutePath(); 
+		currParams.offlineFolder = currentFolder==null? null:currentFolder.getAbsolutePath(); 
 		currParams.subFolders = subFolder.selectedProperty().get();
 		try {
 			currParams.startOffset = startOffset.getValue();

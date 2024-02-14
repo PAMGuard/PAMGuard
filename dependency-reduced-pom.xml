@@ -3,9 +3,9 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.pamguard</groupId>
   <artifactId>Pamguard</artifactId>
-  <name>Pamguard Java12+</name>
-  <version>2.02.09d</version>
-  <description>Pamguard for Java 12+, using Maven to control dependcies</description>
+  <name>Pamguard</name>
+  <version>2.02.11a</version>
+  <description>Pamguard using Maven to control dependencies</description>
   <url>www.pamguard.org</url>
   <organization>
     <name>Sea Mammal Research Unit, University of St. Andrews</name>
@@ -13,6 +13,7 @@
   </organization>
   <build>
     <sourceDirectory>${basedir}/src</sourceDirectory>
+    <testSourceDirectory>${basedir}/src/test</testSourceDirectory>
     <resources>
       <resource>
         <directory>src</directory>
@@ -62,7 +63,7 @@
           </dependency>
         </dependencies>
         <configuration>
-          <release>17</release>
+          <release>21</release>
           <compilerId>jdt</compilerId>
         </configuration>
       </plugin>
@@ -188,6 +189,7 @@
   <properties>
     <maven.compiler.target>11</maven.compiler.target>
     <maven.compiler.source>11</maven.compiler.source>
-    <javafx.version>16</javafx.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <javafx.version>21</javafx.version>
   </properties>
 </project>

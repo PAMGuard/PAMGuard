@@ -7,7 +7,7 @@ public class CPODTrainSymbolManager extends SuperDetectionSymbolManager {
 
 	public CPODTrainSymbolManager(CPODClickTrainDataBlock pamDataBlock) {
 		super(pamDataBlock, new SymbolData());
-		super.setSpecialColourName("Event Colour");
+		super.setSpecialColourName("Click Train");
 	}
 
 

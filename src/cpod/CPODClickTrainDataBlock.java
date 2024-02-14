@@ -62,7 +62,7 @@ public class CPODClickTrainDataBlock extends SuperDetDataBlock<CPODClickTrainDat
 	@Override
 	public void addPamData(CPODClickTrainDataUnit pamDataUnit) {
 		super.addPamData(pamDataUnit);
-		this.sortData();
+		//this.sortData();
 	}
 
 	/* (non-Javadoc)
@@ -71,7 +71,7 @@ public class CPODClickTrainDataBlock extends SuperDetDataBlock<CPODClickTrainDat
 	@Override
 	public void addPamData(CPODClickTrainDataUnit pamDataUnit, Long uid) {
 		super.addPamData(pamDataUnit, uid);
-		this.sortData();
+		//this.sortData();
 	}
 
 	/* (non-Javadoc)
@@ -80,7 +80,7 @@ public class CPODClickTrainDataBlock extends SuperDetDataBlock<CPODClickTrainDat
 	@Override
 	public void updatePamData(CPODClickTrainDataUnit pamDataUnit, long updateTimeMillis) {
 		super.updatePamData(pamDataUnit, updateTimeMillis);
-		this.sortData();
+		//this.sortData();
 	}
 	
 	@Override

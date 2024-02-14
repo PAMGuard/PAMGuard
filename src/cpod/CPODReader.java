@@ -8,8 +8,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
+import PamUtils.PamCalendar;
 import cpod.CPODUtils.CPODFileType;
+import cpod.FPODReader.FPODdata;
 
 /**
  * Read CPOD data.
@@ -21,8 +24,8 @@ import cpod.CPODUtils.CPODFileType;
  *
  */
 public class CPODReader  {
-	
-	
+
+
 	/**
 	 * A new minute. Don;t think we need to do anything here.?
 	 * @param byteData
@@ -32,7 +35,24 @@ public class CPODReader  {
 
 	}
 
-	
+	public static CPODHeader readHeader(File cpFile) {
+
+		BufferedInputStream bis = null;
+		FileInputStream fileInputStream = null;
+
+		try {
+			bis = new BufferedInputStream(fileInputStream = new FileInputStream(cpFile));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
+
+		return readHeader( bis,  CPODUtils.getFileType(cpFile));
+
+	}
+
+
+
 	public static CPODHeader readHeader(BufferedInputStream bis, CPODFileType cpFileType) {
 		int bytesRead;
 		byte[] headData = new byte[getHeadSize(cpFileType)];
@@ -53,7 +73,7 @@ public class CPODReader  {
 			try {
 				shortData[i] = dis.readShort();
 				if (shortData[i] == 414) {
-//					System.out.println("Found id at %d" + i);
+					//					System.out.println("Found id at %d" + i);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -79,19 +99,19 @@ public class CPODReader  {
 				intData[i] = dis.readInt();
 				int bOff = i*4;
 				int sOff = i*2;
-//				if (intData[i] > 0)
-//					System.out.println(String.format("%d, Int = %d, Float = %3.5f, Short = %d,%d, bytes = %d,%d,%d,%d", i, intData[i],
-//							floatData[i],
-//							shortData[sOff], shortData[sOff+1],
-//							headData[bOff], headData[bOff+1], headData[bOff+2], headData[bOff+3]));
+				//				if (intData[i] > 0)
+				//					System.out.println(String.format("%d, Int = %d, Float = %3.5f, Short = %d,%d, bytes = %d,%d,%d,%d", i, intData[i],
+				//							floatData[i],
+				//							shortData[sOff], shortData[sOff+1],
+				//							headData[bOff], headData[bOff+1], headData[bOff+2], headData[bOff+3]));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		
+
 		CPODHeader header = new CPODHeader(); 
-		
+
 		header.fileStart = CPODUtils.podTimeToMillis(intData[64]);
 		header.fileEnd = CPODUtils.podTimeToMillis(intData[65]);
 		// other times seem to be packed in ints 66 - 69. 
@@ -100,7 +120,7 @@ public class CPODReader  {
 
 		return header;
 	}
-	
+
 
 	/**
 	 * Import a CPOD file. 
@@ -110,22 +130,27 @@ public class CPODReader  {
 	 * @return the total number of clicks in  the file. 
 	 */
 	protected static ArrayList<CPODClick> importCPODFile(File cpFile, int from, int maxNum) {		
-		
+
+		//holds a map of the click train detections. 
+		HashMap<Integer, CPODClassification> clickTrains = new 	HashMap<Integer, CPODClassification>();
+		//the current classification
+		CPODClassification cpodClassification;
+
 		ArrayList<CPODClick> clicks = new ArrayList<CPODClick>();
 		BufferedInputStream bis = null;
 		int bytesRead;
 		FileInputStream fileInputStream = null;
 		long totalBytes = 0;
-		
+
 		CPODFileType cpFileType = CPODUtils.getFileType(cpFile); 
-		
+
 		try {
 			bis = new BufferedInputStream(fileInputStream = new FileInputStream(cpFile));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return null;
 		}
-		
+
 		CPODHeader header = readHeader(bis, cpFileType); 
 		if (header == null) {
 			return null;
@@ -158,24 +183,67 @@ public class CPODReader  {
 
 				isClick = byteData[dataSize-1] != -2;
 				if (isClick) {
-					nClicks++;
 
 					if (from<0 || (nClicks>from && nClicks<(from+maxNum))) {
 
 						//System.out.println("Create a new CPOD click: ");
 						CPODClick cpodClick = processCPODClick(nMinutes, shortData, header);
 
+
+						if (cpFileType.equals(CPODFileType.CP3)) {
+
+							short trainID = shortData[20];
+
+							short species =  (short) (shortData[36]  & (112 >> 4));
+
+							short quality =  (short) (shortData[36]  & 3);
+
+							//							short species =  (short) ((shortData[19]  >> 2)  & 7);
+							//							
+							//							short quality =  (short) (shortData[19]  & 3);
+
+							//generate a unique train ID within the file			
+							int trainUID = Integer.valueOf(String.format("%06d", nMinutes) + String.format("%d", trainID));
+
+							//find the click train from the hash map - if it is not there, create a new one. 
+							cpodClassification = clickTrains.get(trainUID);
+
+							if (cpodClassification==null) {
+								cpodClassification = new CPODClassification();
+								cpodClassification.isEcho = false;
+								cpodClassification.clicktrainID = trainUID;
+								cpodClassification.species = CPODUtils.getSpecies(species); 
+								cpodClassification.qualitylevel = quality;
+
+								clickTrains.put(trainUID, cpodClassification); 
+								System.out.println("Click train ID: " + trainUID + " minutes: " + nMinutes + " species: " + species + " quality level: " + quality);
+
+							}
+
+							cpodClick.setClassification(cpodClassification);
+
+						}
+
 						clicks.add(cpodClick);
+
+						if (nClicks%100000==0) {
+							System.out.println("CPOD data: " + nClicks + "  " + PamCalendar.formatDateTime(cpodClick.getTimeMilliseconds()) + "  " +cpodClick.getBw() + "  " +shortData[4] );
+//							if (nClicks>0)return clicks; //FIXME
+						}
+
 
 					}
 
-//					// now remove the data unit from the data block in order to clear up memory.  Note that the remove method
+					nClicks++;
+
+
+					//					// now remove the data unit from the data block in order to clear up memory.  Note that the remove method
 					//					// saves the data unit to the Deleted-Items list, so clear that as well (otherwise we'll just be using
 					//					// up all the memory with that one)
 					//					dataBlock.remove(cpodClick);
 					//					dataBlock.clearDeletedList();
-					
-					
+
+
 				}
 				else {
 					nMinutes ++;
@@ -191,7 +259,7 @@ public class CPODReader  {
 
 		return clicks;
 	}
-	
+
 	public static int getHeadSize(CPODFileType fileType) {
 		switch (fileType) {
 		case CP1:
@@ -219,7 +287,7 @@ public class CPODReader  {
 		}
 		return 0;
 	}
-	
+
 	/**
 	 * Holds an CPOD header information
 	 * <p>
@@ -231,9 +299,9 @@ public class CPODReader  {
 		public short podId;
 		public long fileEnd;
 		public long fileStart;
-		
+
 	}
-	
+
 	/**
 	 * Is it the end of the file ? 
 	 * @param byteData
@@ -250,7 +318,7 @@ public class CPODReader  {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Create a CPOD click object from CPOD data. 
 	 * @param nMinutes
@@ -259,25 +327,41 @@ public class CPODReader  {
 	 * @return
 	 */
 	private static CPODClick processCPODClick(int nMinutes, short[] shortData, CPODHeader header) {
-		
+
 		long minuteMillis = header.fileStart + nMinutes * 60000L;
-		
+
 		int t = shortData[0]<<16 | 
 				shortData[1]<<8 |
 				shortData[2]; // 5 microsec intervals !
 		long tMillis = minuteMillis + t/200;
 
-		
-		
+
+
 		// do a sample number within the file as 5us intervals
 		long fileSamples = t + minuteMillis * 200;
-		
+
 		/*
 		 * 
 		 */
 		return CPODClick.makeCPODClick(tMillis, fileSamples, shortData);
 	}
-	
 
+	/**
+	 * Test the program
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		//		String filePath = "/Users/au671271/Library/CloudStorage/GoogleDrive-macster110@gmail.com/My Drive/PAMGuard_dev/CPOD/FPOD_NunBank/0866 NunBankB 2023 06 27 FPOD_6480 file0.FP1";
+
+		String filePath = "D:\\Dropbox\\PAMGuard_dev\\tutorials\\CPOD_wav\\data\\Hyskeir\\CPOD\\0740 Hyskeir 2022 12 02 POD1655 file01.CP3";
+		//		String filePath = "D:\\DropBox\\PAMGuard_dev\\CPOD\\FPOD_NunBank\\0866 NunBankB 2023 06 27 FPOD_6480 file0.FP3";
+
+		File fpfile = new File(filePath); 
+
+
+		importCPODFile( fpfile, 0, Integer.MAX_VALUE);
+
+
+	}
 
 }

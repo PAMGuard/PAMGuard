@@ -35,5 +35,15 @@ public class CPODClickTrainDataUnit extends DetectionGroupDataUnit implements Pa
 	public boolean isEcho() {
 		return cpodClassification.isEcho;
 	}
+
+	/**
+	 * Gte information on the click train
+	 * @return
+	 */
+	public String getStringInfo() {
+		
+		
+		return String.format("Species: %s Confidence %d is echo? %b", getSpecies(), getConfidence(), isEcho());
+	}
 	
 }

@@ -144,8 +144,6 @@ public class CPODControl2 extends PamControlledUnit implements PamSettings {
 		CPODPlotProviderFX cpodPlotProviderFX = new CPODPlotProviderFX(this, cp1DataBlock);
 		TDDataProviderRegisterFX.getInstance().registerDataInfo(cpodPlotProviderFX);
 
-		//		cpodPlotProviderFX = new CPODPlotProviderFX(this, cp3DataBlock);
-		TDDataProviderRegisterFX.getInstance().registerDataInfo(cpodPlotProviderFX);
 		// register the DD display
 		DDPlotRegister.getInstance().registerDataInfo(new CPODDPlotProvider(this, cp1DataBlock));
 		//		DDPlotRegister.getInstance().registerDataInfo(new CPODDPlotProvider(this, cp3DataBlock));

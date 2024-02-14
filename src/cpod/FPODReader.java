@@ -419,6 +419,7 @@ public class FPODReader {
 						cpodClassification.isEcho = echo;
 						cpodClassification.clicktrainID = trainUID;
 						cpodClassification.species = CPODUtils.getSpecies(species); 
+						cpodClassification.qualitylevel = qualitylevel;
 
 
 						clickTrains.put(trainUID, cpodClassification); 

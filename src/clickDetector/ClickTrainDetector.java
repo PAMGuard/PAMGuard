@@ -58,7 +58,6 @@ public class ClickTrainDetector extends PamProcess implements PamSettings {
 
 		this.clickDataBlock = clickDataBlock;
 
-
 		PamSettingManager.getInstance().registerSettings(this);
 
 		clickDataBlock.addObserver(this);

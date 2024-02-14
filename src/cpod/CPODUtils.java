@@ -111,5 +111,17 @@ public class CPODUtils {
 	public static CPODSpeciesType getSpecies(String species) {
 		return CPODSpeciesType.valueOf(species);
 	}
+	
+	public static short getBits(short data, short bitMap) {
+		short firstBit = 0;
+		for (int i = 0; i < 8; i++) {
+			if ((bitMap & (1<<i)) != 0) {
+				break;
+			}
+			firstBit++;
+		}
+		data &= bitMap;
+		return (short) (data>>firstBit);
+	}
 
 }

@@ -27,8 +27,6 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 	private short[] rawData;
 	
 	
-	
-
 	/**
 	 * The amplitude in dB. 
 	 */
@@ -38,6 +36,8 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 	 * The raw data transforms for the CPOD click
 	 */
 	private RawDataTransforms rawDataTransforms = null;
+
+	private CPODClassification cpodClassification;
 	
 	/**
 	 * Create a CPOD click. (This is used to load CPOD clicks from the binary store)
@@ -147,7 +147,8 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 	public static CPODClick makeCPODClick(long tMillis, long fileSamples, short[] shortData) {
 		
 		short nCyc = shortData[3];
-		short bw = shortData[4];
+		short bw = shortData[4]; //bandwidth is an arbitary scale between 0 and 31; 
+		bw = (short) ((255./31.) * (bw+1)); //make some attempt to convert to kHz
 		short kHz = shortData[5];
 		short endF = shortData[6];
 		short spl = shortData[7];
@@ -326,6 +327,7 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 		}
 		long tm = getTimeMilliseconds();
 		str += PamCalendar.formatDate(tm) + " " + PamCalendar.formatTime(tm, 3) + "<p>";
+		str += String.format("UID: %dkHz<p>", this.getUID());
 		str += String.format("Start Freq: %dkHz<p>", getkHz());
 		str += String.format("N Cycles: %d<p>", getnCyc());
 		str += String.format("BandWidth: %dkHz<p>", getBw());
@@ -333,12 +335,12 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 		str += String.format("Slope: %d<p>", getSlope());
 		str += String.format("SPL: %d", getSpl());
 		if (rawData.length == 40) {
-			str += String.format("<p>QClass %d, SpClass %d", getBits(rawData[19], (short) 0x3), 
-					getBits(rawData[19], (short) 0b11100));
+			str += String.format("<p>QClass %d, SpClass %d", CPODUtils.getBits(rawData[19], (short) 0x3), 
+					CPODUtils.getBits(rawData[19], (short) 0b11100));
 			str += String.format("<p>Train %d, %d click", rawData[20], rawData[23]);
 			str += String.format("<p>Qn %d, RateGood %d, SpGood %d, SpClass %d",
-					getBits(rawData[36], (short)3), getBits(rawData[36], (short) 4),
-					getBits(rawData[36], (short)8), getBits(rawData[36], (short) 240));
+					CPODUtils.getBits(rawData[36], (short)3), CPODUtils.getBits(rawData[36], (short) 4),
+					CPODUtils.getBits(rawData[36], (short)8), CPODUtils.getBits(rawData[36], (short) 240));
 		}
 		if (rawData != null) {
 			int nRaw = rawData.length;
@@ -350,29 +352,18 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 				}
 			}
 		}
-		
-		if (this.getSuperDetection(0)!=null) {
-			str += String.format("I am part of a click train!!!: <p>");
+		CPODClickTrainDataUnit clicktrain = getCPODClickTrain();
+		if (clicktrain!=null) {
+			str += "<p>" + clicktrain.getStringInfo() + "<p>";
 		}
 		else {
-			str += String.format("I am not part of a click train :-(: <p>");
+			str += "<p>" + String.format("No click train info <p>");
 		}
 		
 //		str += "<\html>";
 		return str;
 	}
 
-	short getBits(short data, short bitMap) {
-		short firstBit = 0;
-		for (int i = 0; i < 8; i++) {
-			if ((bitMap & (1<<i)) != 0) {
-				break;
-			}
-			firstBit++;
-		}
-		data &= bitMap;
-		return (short) (data>>firstBit);
-	}
 
 	@Override
 	public double[][] getWaveData() {
@@ -403,6 +394,29 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 			return FPODReader.FPOD_WAV_SAMPLERATE;
 		}
 		
+	}
+
+	/**
+	 * Get the click train detection from the click detection
+	 * @return the click train detection
+	 */
+	public CPODClickTrainDataUnit getCPODClickTrain() {
+		for (int i=0; i<this.getSuperDetectionsCount(); i++) {
+			if (this.getSuperDetection(i) instanceof CPODClickTrainDataUnit) {
+				return (CPODClickTrainDataUnit) this.getSuperDetection(i);
+			}
+		}
+		return null;
+		
+	}
+
+	public void setClassification(CPODClassification cpodClassification) {
+		this.cpodClassification = cpodClassification;
+	}
+
+	
+	public CPODClassification getClassification() {
+		return this.cpodClassification;
 	}
 
 
