@@ -3,6 +3,8 @@ package cpod;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +23,7 @@ import binaryFileStorage.BinaryObjectData;
 import binaryFileStorage.BinaryOutputStream;
 import binaryFileStorage.BinaryStore;
 import cpod.CPODUtils.CPODFileType;
+import cpod.FPODReader.FPODHeader;
 import cpod.FPODReader.FPODdata;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -62,7 +65,7 @@ public class CPODImporter {
 		return t ;
 	});
 
-	
+
 
 
 	public CPODImporter(CPODControl2 cpodControl) {
@@ -81,8 +84,8 @@ public class CPODImporter {
 	//		dataBlock = cpodControl.getCP3DataBlock(); 
 	//
 	//	}
-	
-	
+
+
 
 	/**
 	 * Import the CPOD file. 
@@ -94,18 +97,18 @@ public class CPODImporter {
 	 */
 	private int importCPODFile(File cpFile2, CPODClickDataBlock dataBlock, CPODClickTrainDataBlock clickTrainDataBlock, int from, int maxNum) {
 		ArrayList<CPODClick> cpodData = null; 
-		
+
 		try {
 			cpodData = CPODReader.importCPODFile(cpFile, from, maxNum);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return 0;
 		} 
-		
-		
-//		fileStart + nMinutes * 60000L; 
-		
-		
+
+
+		//		fileStart + nMinutes * 60000L; 
+
+
 		int nClicks = 0;
 		for (int i=0; i<cpodData.size(); i++) {
 			//System.out.println("Create a new CPOD click: ");
@@ -113,31 +116,31 @@ public class CPODImporter {
 			dataBlock.addPamData(cpodClick);
 			nClicks++;
 		}
-		
+
 		cpodData=null; //trigger garbage collector if needed
-		
+
 		return  nClicks;
-	
+
 	}
-	
+
 	/**
 	 * Process a CPOD click. 
 	 * @param FPODData - an FPOD data object
 	 * @return an CPODClick data unit. 
 	 */
 	private CPODClick processCPODClick(CPODClick cpodClick) {
-		
+
 		// now a bit of time stretching. Need to get the start time and see how
 		// different this is, then it's a linear stretch. 
 		long tMillis = cpodControl.stretchClicktime(cpodClick.getTimeMilliseconds());
-		
+
 		cpodClick.setTimeMilliseconds(tMillis);
 
 		return cpodClick;
 	}
 
 
-	
+
 
 	/**
 	 * Process the click. 
@@ -145,54 +148,15 @@ public class CPODImporter {
 	 * @return an CPODClick data unit. 
 	 */
 	private CPODClick processFPODClick(FPODdata fpoDdata) {
-		
-		
-
 		//how many samples are we into the clicks
-
-
 		long fileSamples = (long) (((fpoDdata.minute*60) +  (fpoDdata.FiveMusec*5/1000000.))*CPODClickDataBlock.CPOD_SR);
-		
-		
+
 		// now a bit of time stretching. Need to get the start time and see how
 		// different this is, then it's a linear stretch. 
 		long tMillis = cpodControl.stretchClicktime(fpoDdata.getTimeMillis());
-		
+
 		CPODClick cpodClick = CPODClick.makeFPODClick(tMillis, fileSamples, fpoDdata);
-		
-//		short[] data = new short[9];
-//		
-//		short nCyc = (short) fpoDdata.Ncyc;
-//		short bw = (short) fpoDdata.BW;
-//		short kHz =  (short) FPODReader.IPItoKhz(fpoDdata.IPIatMax);
-//		short endF =  (short) FPODReader.IPItoKhz(fpoDdata.EndIPI);
-//		short spl = (short)  fpoDdata.MaxPkExtnd;
-//		short slope = 0;
-//		
-//		data[3]=nCyc;
-//		data[4]=bw;
-//		data[5]=kHz;
-//		data[6]=endF;
-//		data[7]=spl;
-//		data[8]=slope;
-//
-//		//these are the basic data
-//		CPODClick cpodClick = new CPODClick(fpoDdata.getTimeMillis(),	
-//				fileSamples, nCyc, bw,
-//				kHz,  endF,   spl,  slope, data); 
-		
-//		if (fpoDdata.HasWave) {
-//			int[] waveform = FPODReader.makeResampledWaveform(fpoDdata);
-//			System.out.println("FPOD click waveform: " + kHz); 
-//			PamArrayUtils.printArray(waveform);
-//		}
-		
-//		cpodClick.setDurationInMilliseconds((fpoDdata.duration*5.)/1000.); 
-		 
-		//does the click have a waveform?
-		//TODO
-		
-		 
+
 		return cpodClick;
 	}
 
@@ -204,22 +168,22 @@ public class CPODImporter {
 		return fileStart;
 	}
 
-//	/**
-//	 * Get the data 
-//	 * @param type
-//	 * @return
-//	 */
-//	public CPODClickDataBlock getDataBlock(CPODFileType type) {
-//		switch (type) {
-//		case CP1:
-//		case FP1:
-//			return this.cpodControl.getCP1DataBlock();
-//		case CP3:
-//		case FP3:
-//			return this.cpodControl.getCP3DataBlock();
-//		}
-//		return null;
-//	}
+	//	/**
+	//	 * Get the data 
+	//	 * @param type
+	//	 * @return
+	//	 */
+	//	public CPODClickDataBlock getDataBlock(CPODFileType type) {
+	//		switch (type) {
+	//		case CP1:
+	//		case FP1:
+	//			return this.cpodControl.getCP1DataBlock();
+	//		case CP3:
+	//		case FP3:
+	//			return this.cpodControl.getCP3DataBlock();
+	//		}
+	//		return null;
+	//	}
 
 	/**
 	 * Run the import task. 
@@ -264,7 +228,7 @@ public class CPODImporter {
 	 * @return a list of tasks whihc imports each file type. 
 	 */
 	public List<Task<Integer>> importCPODData(List<File> files) {
-		
+
 		List<Task<Integer>>  tasks  = new ArrayList<Task<Integer>>(); 
 
 		for (int i=0; i<CPODFileType.values().length; i++) {
@@ -324,7 +288,9 @@ public class CPODImporter {
 		/**
 		 * Reference to the CPOD click train datablock. 
 		 */
-		private CPODClickTrainDataBlock clickTrainDataBlock; 
+		private CPODClickTrainDataBlock clickTrainDataBlock;
+
+		private ArrayList<CPODClick> cpodTrainList; 
 
 		/**
 		 * 
@@ -343,6 +309,9 @@ public class CPODImporter {
 		protected Integer call() throws Exception {
 			try {
 				
+				System.out.println(("HELLO IMPORT THREAD: " ));
+
+
 				BinaryDataSource binarySource = cpodDataBlock.getBinaryDataSource();
 				binaryStore = (BinaryStore) PamController.getInstance().findControlledUnit(BinaryStore.defUnitType);
 				if (binaryStore == null) {
@@ -370,27 +339,32 @@ public class CPODImporter {
 					int importedClicks = -1;
 
 					this.updateProgress(-1, 1);
-					
+
 					CPODClickDataBlock tempCPODDataBlock = new CPODClickDataBlock("Temp CPOD Detections", 
 							null, 0);
 
+					long[] fileStartEnd = getFileStartEnd(cpxFile.get(i));
+
 					while (importedClicks>0 || importedClicks==-1) {
 
-				
+
 						CPODFileType fileType = CPODUtils.getFileType(cpxFile.get(i));
-						
-						this.updateMessage(("Importing from " + fileType +  " " +  i + " of " + cpxFile.size()));
+
+						System.out.println(("Importing from " + fileType +  " " +  i + " of " + cpxFile.size() + " from detection " + nClicks));
+
+						this.updateMessage(("Importing from " + fileType +  " " +  i + " of " + cpxFile.size() + " from detection " + nClicks));
 
 						//import the CPOD or FPOD data
+						this.updateProgress(-1, 1);
 						importedClicks = importFile(cpxFile.get(i), tempCPODDataBlock, clickTrainDataBlock, nClicks, MAX_SAVE); 
-						
+
 						System.out.println("Number of CPOD data units in the data block: " + tempCPODDataBlock.getUnitsCount() + " progress: " +  (i+1) + " " + cpxFile.size() );
-						
+
 						ListIterator<CPODClick> iterator = tempCPODDataBlock.getListIterator(0);
-						
+
 						//save the click trains to the database
 						clickTrainDataBlock.saveViewerData();
-						
+
 						//save the raw clicks to the binary file.s 
 						CPODClick  click; 
 						double day = -1; 
@@ -400,48 +374,67 @@ public class CPODImporter {
 						while (iterator.hasNext()) {
 							if (this.isCancelled()) return -1; 
 							click = iterator.next(); 
-							count++;
 
-							//System.out.println("Saving click: " + 	click.getUID());
+							System.out.println("Saving click: " + 	click.getUID());
 
 							//new binary file every daya; 
 							cal.setTimeInMillis(click.getTimeMilliseconds());
 							int dayYear = cal.get(Calendar.DAY_OF_YEAR);
-							
-							if (day!=dayYear) {
-								this.updateProgress(i+(count/(double) importedClicks), cpxFile.size());
 
+							if (day!=dayYear) {
+
+								//set the progress
+								double progress=(((double) click.getTimeMilliseconds()-fileStartEnd[0]))/(fileStartEnd[1]-fileStartEnd[0]);
+								this.updateProgress(i+(progress), cpxFile.size());
+
+								
 								if (day>-1) {
+									
+									//save left over CP1 data
+									if (cpodTrainList!=null) {
+										//all duplicate clicks will have been removed. Save the data now 
+										for (int j=0; j<cpodTrainList.size(); j++) {
+											data =  cpodDataBlock.getBinaryDataSource().getPackedData(cpodTrainList.get(j));
+											this.binaryStream.storeData(data.getObjectType(), click.getBasicData(), data);
+										}
+										System.out.println("HAVE REMOVED " + count + " CP1 detections: " + cpodTrainList.size());
+										count = 0;
+									}
+
 									//close current file
 									binaryStream.writeModuleFooter();
 									binaryStream.writeFooter(click.getTimeMilliseconds(), System.currentTimeMillis(), BinaryFooter.END_UNKNOWN);
 									binaryStream.closeFile();
 									binaryStream.createIndexFile();
-									
+
 								}
 
 								System.out.println("Open new binary file: " + 	PamCalendar.formatDBDateTime(click.getTimeMilliseconds()));
-								
+
+								//send an update message
 								final String timeMillisStr = PamCalendar.formatDBDateTime(click.getTimeMilliseconds());
 								Platform.runLater(()->{
 									this.updateMessage(("Saving file: " + 	timeMillisStr));
 								});
-								
+
+								//get a list of the currently loaded click data if this is CP3 data 
 								if (fileType.equals(CPODFileType.CP3) || fileType.equals(CPODFileType.FP3)) {
-								
-								cpodDataBlock.clearAll();
-								
-								//load the view from the data block for that day.
-								long millisDayStart = roundToDay(click.getTimeMilliseconds());
-								cpodDataBlock.loadViewerData(millisDayStart, millisDayStart+24*60*60*1000L-1, null);
-								
+
+									cpodDataBlock.clearAll();
+
+									//load the view from the data block for that day.
+									long millisDayStart = roundToDay(click.getTimeMilliseconds());
+									cpodDataBlock.loadViewerData(millisDayStart, millisDayStart+24*60*60*1000L-1, null);
+
 									//now the tricky bit - if we are loading viewer files we want to save the data from the CP3 on top of the 
 									//CP1 file but we DO NOT want to add in duplicate clicks. 
 									if (cpodDataBlock.getUnitsCount()>0) {
 										System.out.println("There are already data units from CP1 or FP1 files " + cpodDataBlock.getUnitsCount());
-										//TODO
+										cpodTrainList = cpodDataBlock.getDataCopy();
+										Collections.sort(cpodTrainList,  new CPODClickOmparator());
+										cpodDataBlock.clearAll(); //just incase
 									}
-								
+
 								}
 
 								//write the module head
@@ -452,31 +445,70 @@ public class CPODImporter {
 								day=dayYear; 
 							}
 
+							if (cpodTrainList!=null && cpodTrainList.size()>0) {
+								// index of the target 
+								int index = Collections.binarySearch( 
+										cpodTrainList, click, new CPODClickOmparator()); 
+
+								if (index>-1) {
+									//the click in the cp3 file is present in the CP1 file. Save this click as it has a super detection. DO NOT save the
+									//CP1 click;
+									cpodTrainList.remove(index);
+									count++;
+								}
+
+							}
+
 							data =  cpodDataBlock.getBinaryDataSource().getPackedData(click);
 							this.binaryStream.storeData(data.getObjectType(), click.getBasicData(), data);
 						}
-						
+
 						cpodDataBlock.clearAll(); 
 						tempCPODDataBlock.clearAll();
-						
 
-						
+
+
 						//update number of clicks. 
 						nClicks=nClicks+MAX_SAVE+1; 
 					}
-	
+
 				}
 			} 
 			catch (Exception e) {
 				e.printStackTrace();
 			}
-			
-			this.updateMessage("Finished saving data units: ");
+
+			this.updateMessage("Finished saving detections");
 			System.out.println("CPOD import thread finished: " + this);
 
 			return 1;
 		}
-		
+
+		private long[] getFileStartEnd(File file) {
+			CPODFileType fileType = CPODUtils.getFileType(file);
+
+			long[] timelims = null;
+			switch (fileType){
+			case CP1:
+			case CP3:
+				//TODO
+				break;
+			case FP1:
+			case FP3:
+				FPODHeader header =FPODReader.readHeader(file);
+				if (header==null) return null; 
+				timelims=new long[] {CPODUtils.podTimeToMillis(header.FirstLoggedMin), CPODUtils.podTimeToMillis(header.LastLoggedMin)};
+				break;
+			default:
+				break;
+
+			}
+
+			return timelims;
+		}
+
+
+
 		/**
 		 * Rounds millis to start of da=y
 		 * @param millis
@@ -484,16 +516,16 @@ public class CPODImporter {
 		 */
 		long roundToDay(long millis) {
 			Date date = new Date(millis);
-		    Calendar calendar = Calendar.getInstance();
-		    calendar.setTime(date);
-		    calendar.set(Calendar.HOUR_OF_DAY, 0);
-		    calendar.set(Calendar.MINUTE, 0);
-		    calendar.set(Calendar.SECOND, 0);
-		    calendar.set(Calendar.MILLISECOND, 0);
-		    return calendar.getTimeInMillis();
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(date);
+			calendar.set(Calendar.HOUR_OF_DAY, 0);
+			calendar.set(Calendar.MINUTE, 0);
+			calendar.set(Calendar.SECOND, 0);
+			calendar.set(Calendar.MILLISECOND, 0);
+			return calendar.getTimeInMillis();
 		}
-		
-		
+
+
 		/**
 		 * Import a FPOD file. 
 		 * @param cpFile - the FP1 or FP3 file. 
@@ -502,65 +534,65 @@ public class CPODImporter {
 		 * @return the total number of clicks in  the file. 
 		 */
 		protected int importFPODFile(File cpFile, CPODClickDataBlock dataBlock, CPODClickTrainDataBlock clickTrainDataBlock, int from, int maxNum) {
-			
+
 			ArrayList<FPODdata> fpodData = new ArrayList<FPODdata>();
-			
+
 			try {
 				FPODReader.importFile(cpFile, fpodData, from, maxNum);
-		
-//			fileStart + nMinutes * 60000L; 
-			
-			HashMap<Integer, CPODClickTrainDataUnit> cpodClickTrains = new HashMap<Integer, CPODClickTrainDataUnit>();
-			
-			int nClicks = 0;
-			for (int i=0; i<fpodData.size(); i++) {
-				if (i%40000 ==0) {
-					System.out.println("Create a new CPOD click: " + i + " of " + fpodData.size() + PamCalendar.formatDateTime(fpodData.get(i).getTimeMillis()));
-				}
-				CPODClick cpodClick = processFPODClick(fpodData.get(i));
-				dataBlock.addPamData(cpodClick);
-				
-				if (fpodData.get(i).getClassification()!=null) {
-					CPODClickTrainDataUnit clickTrain = cpodClickTrains.get(fpodData.get(i).getClassification().clicktrainID);
-					if (clickTrain==null) {
-						clickTrain= new CPODClickTrainDataUnit(cpodClick.getTimeMilliseconds(), null, fpodData.get(i).getClassification());
-						cpodClickTrains.put(fpodData.get(i).getClassification().clicktrainID, clickTrain);
+
+				//			fileStart + nMinutes * 60000L; 
+
+				HashMap<Integer, CPODClickTrainDataUnit> cpodClickTrains = new HashMap<Integer, CPODClickTrainDataUnit>();
+
+				int nClicks = 0;
+				for (int i=0; i<fpodData.size(); i++) {
+					if (i%40000 ==0) {
+						System.out.println("Create a new CPOD click: " + i + " of " + fpodData.size() + PamCalendar.formatDateTime(fpodData.get(i).getTimeMillis()));
 					}
-					clickTrain.addSubDetection(cpodClick);				
+					CPODClick cpodClick = processFPODClick(fpodData.get(i));
+					dataBlock.addPamData(cpodClick);
+					
+					if (fpodData.get(i).getClassification()!=null) {
+						CPODClickTrainDataUnit clickTrain = cpodClickTrains.get(fpodData.get(i).getClassification().clicktrainID);
+						if (clickTrain==null) {
+							clickTrain= new CPODClickTrainDataUnit(cpodClick.getTimeMilliseconds(), null, fpodData.get(i).getClassification());
+							cpodClickTrains.put(fpodData.get(i).getClassification().clicktrainID, clickTrain);
+						}
+						clickTrain.addSubDetection(cpodClick);				
+					}
+					nClicks++;
 				}
-				nClicks++;
-			}
-			
-			System.out.println("Add click train to datablock: ");
-
-			//add all the click trains with sub detections ot the datablock. 
-			int count =0;
-			for (Integer key: cpodClickTrains.keySet()) {
 				
-				if (count%100 == 0) {
-					this.updateMessage(("Add click train data to datablock: " + count +  "  of " + cpodClickTrains.keySet().size()));
-					this.updateProgress(count, cpodClickTrains.keySet().size());
-//					System.out.println("Add click train data to datablock: " + count +  "  " + cpodClickTrains.keySet().size());
+				System.out.println("Add click train to datablock: ");
+
+				//add all the click trains with sub detections ot the datablock. 
+				int count =0;
+				for (Integer key: cpodClickTrains.keySet()) {
+
+					if (count%100 ==0) {
+						this.updateMessage(("Add click train data to datablock: " + count +  "  of " + cpodClickTrains.keySet().size()));
+						this.updateProgress(count, cpodClickTrains.keySet().size());
+
+						//					System.out.println("Add click train data to datablock: " + count +  "  " + cpodClickTrains.keySet().size());
+					}
+					
+					clickTrainDataBlock.addPamData(cpodClickTrains.get(key));
+					count++;
 				}
 
-				
-				clickTrainDataBlock.addPamData(cpodClickTrains.get(key));
-				count++;
-			}
-			
-			System.out.println("Finished adding click train to datablock: ");
+				System.out.println("Finished adding click train to datablock: ");
 
-			
-			fpodData=null; //trigger garbage collector if needed
-			
-			return  nClicks;
+
+				fpodData=null; //trigger garbage collector if needed
+
+				return  nClicks;
 
 			} catch (Exception e) {
 				e.printStackTrace();
 				return 0;
 			} 
 		}
-		
+
 		/**
 		 * Import a CPOD or FPOD file. 
 		 * @param cpFile - the CP1/FP1 or CP3/FP3 file. 
@@ -570,7 +602,7 @@ public class CPODImporter {
 		 */
 		protected int importFile(File cpFile, CPODClickDataBlock dataBlock, CPODClickTrainDataBlock clickTrainDataBlock, int from, int maxNum) {
 			CPODFileType fileType = CPODUtils.getFileType( cpFile); 
-			
+
 			switch (fileType) {
 			case CP1:
 			case CP3:
@@ -579,11 +611,11 @@ public class CPODImporter {
 			case FP3:
 				return importFPODFile(cpFile, dataBlock, clickTrainDataBlock, from, maxNum);
 			}
-			
+
 			return 0;
-			
+
 		}		
-		
+
 		/**
 		 * Import a file. 
 		 * @param cpFile - the CP1 file. 
@@ -593,9 +625,29 @@ public class CPODImporter {
 			return	importFile( cpFile, dataBlock, clickTrainDataBlock, -1, Integer.MAX_VALUE); 
 		}
 
-		
+
 
 	}
+
+	// Comparator to sort a list 
+	class CPODClickOmparator implements Comparator<CPODClick> { 
+		@Override public int compare(CPODClick s1, CPODClick s2) 
+		{ 
+			if (s1.getTimeMilliseconds() > s2.getTimeMilliseconds()) { 
+				return 1; 
+			} 
+			else if (s1.getTimeMilliseconds() < s2.getTimeMilliseconds()) { 
+				return -1; 
+			} 
+			else if (s1.getTimeMilliseconds() == s2.getTimeMilliseconds()) { 
+
+				if (s1.getStartSample()>s2.getStartSample()) return 1;
+				else if (s1.getStartSample()<s2.getStartSample()) return -1;
+				else return 0;
+			} 
+			return -1; 
+		} 
+	} 
 
 }
 

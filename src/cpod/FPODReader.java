@@ -71,6 +71,34 @@ public class FPODReader {
 
 	public static final float FPOD_WAV_SAMPLERATE = 1000000;
 
+	public static FPODHeader readHeader(File cpFile) {
+
+		BufferedInputStream bis = null;
+		int bytesRead;
+		FileInputStream fileInputStream = null;
+		int totalBytes = 0;
+		try {
+			bis = new BufferedInputStream(fileInputStream = new FileInputStream(cpFile));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
+
+		FPODHeader header = new FPODHeader();
+		try {
+			if (readHeader(bis, header) != FPOD_HEADER) {
+				return null;
+			}
+			bis.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return header;
+
+	}
+
 
 	/**
 	 * Import an FPOD file. 
@@ -110,13 +138,13 @@ public class FPODReader {
 
 		//keep track of wav data
 		FPODWavData wavData = null;
-		
+
 		//holds a map of the click train detections. 
 		HashMap<Integer, CPODClassification> clickTrains = new 	HashMap<Integer, CPODClassification>();
-		
+
 		//the click train of the current data unit. 
 		CPODClassification cpodClassification =  null;
-		
+
 		int wavbufpos = 0;
 		try {
 			while (true) {
@@ -299,7 +327,7 @@ public class FPODReader {
 								wavData = null;
 
 							}
-							
+
 							/**
 							 * Set the classification (if FP3 file)
 							 */
@@ -324,7 +352,7 @@ public class FPODReader {
 
 				}
 				else if (toUnsigned(bufPosN[0])==250) {
-					
+
 					//wav data preceedes the next click
 
 					if (wavData==null) {
@@ -357,49 +385,49 @@ public class FPODReader {
 					//wav data
 					nWavClicks++;
 				}
-				
+
 				else if(toUnsigned(bufPosN[0])==249) {
 					//click train data - this is not included - for now
 					//click train data precedes the next click
-					
+
 					//the train ID is unique to the minute, 
 					short trainID = toUnsigned(bufPosN[15]);
-										
+
 					//1 is NBHF
 					//2 is dolphin
 					//3 is uncalssified
 					//4 is sonar?
 					short species = (short) ((bufPosN[14] >>> 2) & 3);
-		
+
 					//quality level for the click train
 					short qualitylevel = (short) ((bufPosN[14]) & 3);
 
 					boolean echo = false;
 					if ((bufPosN[14] & 32) == 32) {
-					    echo = true;
+						echo = true;
 					}
-					
-	
+
+
 					//generate a unique train ID within the file			
 					int trainUID = Integer.valueOf(String.format("%06d", nMinutes) + String.format("%d", trainID));
-					
+
 					//find the click train from the hash map - if it is not there, create a new one. 
-					 cpodClassification = clickTrains.get(trainUID);
-					
+					cpodClassification = clickTrains.get(trainUID);
+
 					if (cpodClassification==null) {
 						cpodClassification = new CPODClassification();
 						cpodClassification.isEcho = echo;
 						cpodClassification.clicktrainID = trainUID;
 						cpodClassification.species = CPODUtils.getSpecies(species); 
-						
+
 
 						clickTrains.put(trainUID, cpodClassification); 
-						
+
 						//System.out.println("Click train ID: " + trainUID + " minutes: " + nMinutes + " species: " + species + " quality level: " + qualitylevel);
 
 					}
 
-					
+
 				}
 				else if(toUnsigned(bufPosN[0])==254){
 					nMinutes ++;
@@ -982,7 +1010,7 @@ public class FPODReader {
 		public int minute;
 
 		private FPODWavData wavData;
-		
+
 		//******Click Train Info******//
 
 
@@ -1000,7 +1028,7 @@ public class FPODReader {
 		public void setClassification(CPODClassification cpodClassification) {
 			this.cpodClassification=cpodClassification;
 		}
-		
+
 		/**
 		 * Get the species classification i.e. which click train the click belongs to.
 		 * @return the species classification object. 
@@ -1323,8 +1351,8 @@ public class FPODReader {
 		if (MHzArrPtr < MhzSampledArr.length) {
 			MhzSampledArr[MHzArrPtr] = 0;
 		}
-		
-		
+
+
 
 		int[] waveform = Arrays.copyOf(MhzSampledArr, MHzArrPtr);
 		//waveform is backwards so flip it. 
@@ -1340,7 +1368,7 @@ public class FPODReader {
 		//		String filePath = "/Users/au671271/Library/CloudStorage/GoogleDrive-macster110@gmail.com/My Drive/PAMGuard_dev/CPOD/FPOD_NunBank/0866 NunBankB 2023 06 27 FPOD_6480 file0.FP1";
 
 		String filePath = "D:\\DropBox\\PAMGuard_dev\\CPOD\\FPOD_NunBank\\0866 NunBankB 2023 06 27 FPOD_6480 file0.FP1";
-//		String filePath = "D:\\DropBox\\PAMGuard_dev\\CPOD\\FPOD_NunBank\\0866 NunBankB 2023 06 27 FPOD_6480 file0.FP3";
+		//		String filePath = "D:\\DropBox\\PAMGuard_dev\\CPOD\\FPOD_NunBank\\0866 NunBankB 2023 06 27 FPOD_6480 file0.FP3";
 
 		File fpfile = new File(filePath); 
 
