@@ -11,6 +11,7 @@ import java.util.HashMap;
 
 import PamUtils.PamArrayUtils;
 import PamUtils.PamCalendar;
+import cpod.FPODReader.FPODdata;
 
 
 /**
@@ -98,6 +99,35 @@ public class FPODReader {
 		return header;
 
 	}
+
+	/**
+	 * Import FPOD data and return a structure of CPOD clicks. 
+	 * @param cpFile - the FP1 file. 
+	 * @param from - the click index to save from. e.g. 100 means that only click 100 + in the file is saved
+	 * @param maxNum - the maximum number of data units to import. 
+	 * @return an array of CPOD clicks. 
+	 * @throws IOException 
+	 */
+	public static ArrayList<CPODClick> importFPODFile(File cpFile, int from, int maxNum ) throws IOException {
+		if (cpFile==null) return null;
+		ArrayList<FPODdata> fpodData = new ArrayList<FPODdata>();
+		FPODReader.importFile(cpFile, fpodData, from, maxNum);
+
+		ArrayList<CPODClick> cpodClickData = new ArrayList<CPODClick>();
+
+		CPODClick cpodClick;
+		for (int i=0; i<fpodData.size(); i++) {
+			//how many samples are we into the clicks
+			long fileSamples = (long) (((fpodData.get(i).minute*60) +  (fpodData.get(i).FiveMusec*5/1000000.))*CPODClickDataBlock.CPOD_SR);
+
+			cpodClick = CPODClick.makeFPODClick(fpodData.get(i).getTimeMillis(), fileSamples, fpodData.get(i));
+
+			cpodClickData.add(cpodClick);
+		}
+		
+		return cpodClickData;
+	}
+
 
 
 	/**

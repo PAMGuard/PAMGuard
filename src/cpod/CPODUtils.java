@@ -124,4 +124,5 @@ public class CPODUtils {
 		return (short) (data>>firstBit);
 	}
 
+
 }

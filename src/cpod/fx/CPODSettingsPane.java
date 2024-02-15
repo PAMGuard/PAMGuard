@@ -2,6 +2,7 @@ package cpod.fx;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.SwingUtilities;
@@ -98,7 +99,7 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 	private PamButton importButton;
 
 
-	private List<Task<Integer>> tasks;
+	private Task<Integer> task;
 
 	private boolean running = false;
 
@@ -136,7 +137,7 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 		browsFileButton.setTooltip(new Tooltip("Browse to select individual or mutliple CP1 or CP3 files or FP1 or FP3 files"));
 		browsFileButton.setOnAction((action)->{
 
-			List<File> files = fileChooser.showOpenMultipleDialog(this.getFXWindow());
+			List<File> files = new LinkedList<File>(fileChooser.showOpenMultipleDialog(this.getFXWindow()));
 			setNewFiles(files); 
 
 		});
@@ -296,54 +297,17 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 
 		//begins the import
 		//		this.tasks = this.cpodControl.getCpodImporter().importCPODData(files);
-		this.tasks = this.cpodControl.importPODData(files);
+		this.task = this.cpodControl.importPODData(files);
 
-		if (tasks ==null) return false; 
+		if (task ==null) return false; 
 
 		this.progressBar.setProgress(-1.);
 
-		this.progressBar.progressProperty().bind(tasks.get(0).progressProperty());
-		this.progressLabel.textProperty().bind(tasks.get(0).messageProperty());
-
-
-		//binds the progress bar - imports are 
-		for (int i=0; i<tasks.size()-1; i++) {
-			final int ii = i; 
-			//Will be called if the tasks are cancelled or succeed. 
-			tasks.get(ii).setOnCancelled((worker)->{
-				this.progressBar.progressProperty().bind(tasks.get(ii+1).progressProperty());
-				this.progressLabel.textProperty().bind(tasks.get(ii+1).messageProperty());
-			});
-
-			tasks.get(ii).setOnSucceeded((worker)->{
-				System.out.println("IMPORT FINISHED: " + ii); 
-				this.progressBar.progressProperty().bind(tasks.get(ii+1).progressProperty());
-				this.progressLabel.textProperty().bind(tasks.get(ii+1).messageProperty());
-			});
-
-			tasks.get(ii).setOnFailed((worker)->{
-				this.progressBar.progressProperty().bind(tasks.get(ii+1).progressProperty());
-				this.progressLabel.textProperty().bind(tasks.get(ii+1).messageProperty());
-			});
-		}
-
-		tasks.get(tasks.size()-1).setOnCancelled((worker)->{
-			importingFinished();
-		});
-
-		tasks.get(tasks.size()-1).setOnSucceeded((worker)->{
-			importingFinished();
-		});
-
-
-		tasks.get(tasks.size()-1).setOnFailed((worker)->{
-			importingFinished();
-		});
-
-
+		this.progressBar.progressProperty().bind(task.progressProperty());
+		this.progressLabel.textProperty().bind(task.messageProperty());
 
 		//run the tasks
-		this.cpodControl.getCpodImporter().runTasks(tasks);
+		this.cpodControl.getCpodImporter().runTasks(task);
 
 		return true; 
 	}
@@ -383,11 +347,7 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 	 * Stop the import. 
 	 */
 	private void stopImport() {
-		if (tasks!=null) {
-			for (int i=0; i<tasks.size(); i++) {
-				tasks.get(i).cancel(); 
-			}
-		}
+		task.cancel(); 
 	}
 
 	/**

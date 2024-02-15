@@ -319,7 +319,7 @@ public class CPODControl2 extends PamControlledUnit implements PamSettings {
 	 * @param files - the files to import. 
 	 * @return a list of import Tasks. 
 	 */
-	public List<Task<Integer>> importPODData(List<File> files) {
+	public Task<Integer> importPODData(List<File> files) {
 		return cpodImporter.importCPODData(files);
 	}
 

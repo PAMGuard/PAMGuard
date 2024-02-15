@@ -129,7 +129,9 @@ public class CPODReader  {
 	 * @param maxNum - the maximum number to import
 	 * @return the total number of clicks in  the file. 
 	 */
-	protected static ArrayList<CPODClick> importCPODFile(File cpFile, int from, int maxNum) {		
+	protected static ArrayList<CPODClick> importCPODFile(File cpFile, int from, int maxNum) {	
+		
+		if (cpFile==null) return null;
 
 		//holds a map of the click train detections. 
 		HashMap<Integer, CPODClassification> clickTrains = new 	HashMap<Integer, CPODClassification>();
