@@ -72,9 +72,19 @@ public class ClickTabPanel extends JDesktopPane implements ComponentListener {
 	public void componentMoved(ComponentEvent e) {
 	}
 	
+	/**
+	 * This get's called during startup when the window is created and will 
+	 * automatically resize everything. IT may get called 2 or 3 times at startup
+	 * as components such as the side bar sort themselves out. 
+	 */
 	public void componentResized(ComponentEvent e) {
 		// if (++resizeCount < 5) {
-		arrangeWindows();
+		if (clickTabPanelControl.clickDisplayManager.cdmp.isManualWindowSizes() == false) {
+			arrangeWindows();
+		}
+		else {
+			clickTabPanelControl.clickDisplayManager.restoreWindowSizes();
+		}
 		// }
 	}
 	
