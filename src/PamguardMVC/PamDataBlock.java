@@ -4286,4 +4286,23 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 		inputEl.setAttribute("Channels", String.format("0x%X", getChannelMap()));
 		return inputEl;
 	}
+
+	/**
+	 * Look in every data block, particularly threaded ones, and dump
+	 * the buffer status. This will have to go via PamProcess so that 
+	 * additional information can be added from any processes that 
+	 * hold additional data in other internal buffers. 
+	 * @param message Message to print prior to dumping buffers for debug. 
+	 * @param sayEmpties dump info even if a buffer is empty (otherwise, only ones that have stuff still)
+	 */
+	public void dumpBufferStatus(String message, boolean sayEmpties) {
+		int nObs = countObservers();
+		for (int i = 0; i < nObs; i++) {
+			PamObserver obs = getPamObserver(i);
+			if (obs instanceof ThreadedObserver) {
+				ThreadedObserver tObs = (ThreadedObserver) obs;
+				tObs.dumpBufferStatus(message, sayEmpties);
+			}
+		}
+	}
 }

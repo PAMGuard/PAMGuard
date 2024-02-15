@@ -285,28 +285,34 @@ public class MHTKernel<T> {
 			BitSet currentBitSet;
 			MHTChi2<T> mhtChi2;
 			int index; 
-			for (int i=0; i<possibleTracks.size(); i++) {
+			synchronized(trackSynchronisation) {
+				for (int i=0; i<possibleTracks.size(); i++) {
 
-				currentBitSet=possibleTracks.get(i).trackBitSet;
+					currentBitSet=possibleTracks.get(i).trackBitSet;
 
-				//index is the total detection count-1; 
-				index=kcount-1; 
+					//index is the total detection count-1; 
+					index=kcount-1; 
 
-				//now add both a true and false for the data unit to be in this possibility. 
-				currentBitSet.set(index, true);
-				mhtChi2=possibleTracks.get(i).chi2Track.cloneMHTChi2(); 
+					//now add both a true and false for the data unit to be in this possibility. 
+					currentBitSet.set(index, true);
+					mhtChi2=possibleTracks.get(i).chi2Track.cloneMHTChi2(); 
 
-				newPossibilities.add(new TrackBitSet(currentBitSet, mhtChi2)); 
+					newPossibilities.add(new TrackBitSet(currentBitSet, mhtChi2)); 
 
-				//add a coast to the possibility
-				currentBitSet=(BitSet) currentBitSet.clone(); 
-				currentBitSet.set(index, false);
-				//currentBitSet.set(currentBitSet.size(), true);
-				//add new chi2 value -  need to clone this time. 
-				mhtChi2=possibleTracks.get(i).chi2Track.cloneMHTChi2(); 
+					//add a coast to the possibility
+					currentBitSet=(BitSet) currentBitSet.clone(); 
+					currentBitSet.set(index, false);
+					//currentBitSet.set(currentBitSet.size(), true);
+					//add new chi2 value -  need to clone this time. 
+					/*
+					 * This line can throw an error due to poor sunchronisation if 
+					 * the list is emptied from a different thread. 
+					 */
+					mhtChi2=possibleTracks.get(i).chi2Track.cloneMHTChi2(); 
 
-				//added the cloned bitset to not mess up references 
-				newPossibilities.add(new TrackBitSet(currentBitSet, mhtChi2)); 
+					//added the cloned bitset to not mess up references 
+					newPossibilities.add(new TrackBitSet(currentBitSet, mhtChi2)); 
+				}
 			}
 		}
 

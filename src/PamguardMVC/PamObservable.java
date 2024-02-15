@@ -208,6 +208,14 @@ public class PamObservable {//extends PanelOverlayDraw {
 			if (System.currentTimeMillis() - startTime > timeOutms) {
 				// have taken too long, so return that we've failed. 
 				System.out.println("Wait timeout in threaded observer");
+				// and clear everything that's left. 
+				for (int i = 0; i < pamObservers.size(); i++) {
+					pamObserver = pamObservers.get(i);
+					if (pamObserver.getClass() == ThreadedObserver.class) {
+						threadedObserver = (ThreadedObserver) pamObserver;
+						threadedObserver.clearEverything();
+					}
+				}
 				return false;
 			}
 			try {

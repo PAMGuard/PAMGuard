@@ -211,10 +211,10 @@ public class AcquisitionProcess extends PamProcess implements DataInputStore {
 
 		if (systemPrepared == false) return;
 
+		newDataQueue.clearList(); // clear this first to make sure nothing new comes in. 
+
 		//		before starting, clear all old data
 		rawDataBlock.clearAll();
-
-		newDataQueue.clearList();
 		
 		sampleRateErrorFilter.prepareFilter();
 		totalExtraSamples = 0;
@@ -302,6 +302,7 @@ public class AcquisitionProcess extends PamProcess implements DataInputStore {
 		// called by PamController.
 		// stop the running system - not the selected system since
 		// this may have changed
+				
 		restartTimer.stop();
 //		stallCheckTimer.stop();
 		pamStop("");
@@ -471,6 +472,9 @@ public class AcquisitionProcess extends PamProcess implements DataInputStore {
 	 * have been emptied and processing has stopped
 	 */
 	protected void pamHasStopped() {
+		
+		newDataQueue.clearList(); // clear this first to make sure nothing new comes in. 
+		
 		if (runningSystem == null){
 			runningSystem = acquisitionControl.findDaqSystem(null);
 		}
@@ -650,9 +654,10 @@ public class AcquisitionProcess extends PamProcess implements DataInputStore {
 
 			restartTimer.stop();
 
-			PamController.getInstance().pamStop();
-
-			PamController.getInstance().pamStart(false);
+			PamController.getInstance().restartPamguard();
+//			PamController.getInstance().pamStop();
+//
+//			PamController.getInstance().pamStart(false);
 
 		}
 

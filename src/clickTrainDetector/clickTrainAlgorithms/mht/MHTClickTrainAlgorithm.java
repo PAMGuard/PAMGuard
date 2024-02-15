@@ -415,12 +415,19 @@ public class MHTClickTrainAlgorithm implements ClickTrainAlgorithm, PamSettings 
 		return mhtGUI;
 	}
 
+	Thread previousThread = null;
 	/**
 	 * Update the algorithm
 	 * @param flag- flag indicating the update type. 
 	 */
 	public void update(int flag, Object info) {
 
+		if (Thread.currentThread() != previousThread) {
+			// see flag id constants in ClickTrianControl
+			System.out.printf("Thread change to %s in MHTClicktrainAlgorithm.update flag %d, object %s\n", 
+					Thread.currentThread().toString(), flag, info);
+			previousThread = Thread.currentThread();
+		}
 		switch (flag) {
 		case ClickTrainControl.PROCESSING_START:
 			//make sure the kernel is cleared before processing
