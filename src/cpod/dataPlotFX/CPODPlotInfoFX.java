@@ -140,7 +140,7 @@ public class CPODPlotInfoFX extends GenericDataPlotInfo {
 			path2D = drawStemClick( plotNumber,  pamDataUnit,g ,  scrollStart,  tdProjector,  type, paramType);
 			break;
 		default:
-			return super.drawDataUnit(plotNumber, pamDataUnit, g, scrollStart, tdProjector, type);
+			return super.drawDataUnit(plotNumber, pamDataUnit, g, scrollStart, tdProjector, type);			
 		}
 
 		//add to hover list if special data units. 
@@ -272,9 +272,9 @@ public class CPODPlotInfoFX extends GenericDataPlotInfo {
 				//						System.out.println("Draw amplitude: min y : " +  tdProjector.getYPix(1) + " max y: "
 				//					+tdProjector.getYPix(pamDataUnit.getAmplitudeDB()) + " tC: " + tC +  " true amplitude: " + pamDataUnit.getAmplitudeDB());
 				x1=tC; 
-				y1=tdProjector.getYPix(1);
+				y2=tdProjector.getYPix(pamDataUnit.getAmplitudeDB());
 				x2=tC; 
-				y2= tdProjector.getYPix(pamDataUnit.getAmplitudeDB()); 
+				y1= tdProjector.getHeight();//always draw from bottom of graph
 				break;
 				
 			case AMPLITUDE_LIN:
@@ -324,10 +324,14 @@ public class CPODPlotInfoFX extends GenericDataPlotInfo {
 			
 			//now we need to inform he user if a detectrion has waveform info
 			if (clk.getWaveData()!=null) {
-				System.out.print("Time millis: " + pamDataUnit.getTimeMilliseconds());
+				//System.out.print("Time millis: " + pamDataUnit.getTimeMilliseconds());
 				g.setFill(ffColor);
-				g.fillOval(x1-5, Math.abs(y2-y1)/2, 10,10);
-				path2D.lineTo(x1-5, Math.abs(y2-y1)/2);
+
+				//set the location of the circle which indicates which detectins have waveforms. 
+				double ypath = y2;
+
+				g.fillOval(x1-5,ypath + Math.abs(y2-y1)/2, 10,10);
+				path2D.lineTo(x1-5, ypath + Math.abs(y2-y1)/2);
 			}
 
 			return path2D;

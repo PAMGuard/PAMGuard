@@ -99,6 +99,7 @@ public class GenericDataPlotInfo extends TDDataInfoFX {
 		}
 		else {
 			return super.drawDataUnit(plotNumber, pamDataUnit, g, scrollStart, tdProjector, type);
+			
 		}
 	}
 

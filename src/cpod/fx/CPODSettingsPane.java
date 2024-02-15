@@ -222,7 +222,7 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 		});
 		progressPane.setCenter(progressBar);
 		progressPane.setRight(importButton);
-		progressPane.setBottom(progressLabel = new Label("Hello"));
+		progressPane.setBottom(progressLabel = new Label(""));
 
 
 		PamVBox mainHolder = new PamVBox(); 

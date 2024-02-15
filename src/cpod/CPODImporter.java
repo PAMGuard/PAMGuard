@@ -382,6 +382,8 @@ public class CPODImporter {
 
 									cpodDataBlock.clearAll();
 
+									System.err.println("There are already data units from CP1 or FP1 files " + cpodDataBlock.getUnitsCount());
+
 									//load the view from the data block for that day.
 									long millisDayStart = roundToDay(click.getTimeMilliseconds());
 									cpodDataBlock.loadViewerData(millisDayStart, millisDayStart+24*60*60*1000L-1, null);

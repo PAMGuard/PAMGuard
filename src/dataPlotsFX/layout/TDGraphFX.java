@@ -349,6 +349,7 @@ public class TDGraphFX extends PamBorderPane {
 		// set the default overlay style.
 		setOverlayColour(LIGHT_TD_DISPLAY);
 		
+		
 		//show the left hiding pane byu default. 
 		stackPane.getLeftHidingPane().showHidePane(true);
 	}
@@ -417,6 +418,8 @@ public class TDGraphFX extends PamBorderPane {
 		Text chevronRight = null;
 		Text settingsRight = null;
 		switch (displayCol) {
+		//Note that this is now redundant as the buttons have a dark background - keeping for now just incase. 
+		case LIGHT_TD_DISPLAY:
 		case DARK_TD_DISPLAY:
 		//	System.out.println("SET DARK THEME FOR HIDING BUTTONS");
 //			chevronRight = PamGlyphDude.createPamGlyph(FontAwesomeIcon.CHEVRON_RIGHT, Color.WHITE,
@@ -424,13 +427,13 @@ public class TDGraphFX extends PamBorderPane {
 //			settingsRight = PamGlyphDude.createPamGlyph(MaterialIcon.SETTINGS, Color.WHITE, PamGuiManagerFX.iconSize);
 			settingsRight = PamGlyphDude.createPamIcon("mdi2c-cog", Color.WHITE, PamGuiManagerFX.iconSize);
 			break;
-		case LIGHT_TD_DISPLAY:
-			//System.out.println("SET LIGHT THEME FOR HIDING BUTTONS");
-//			chevronRight = PamGlyphDude.createPamGlyph(FontAwesomeIcon.CHEVRON_RIGHT, PamGuiManagerFX.iconColor,
-			chevronRight = PamGlyphDude.createPamIcon("mdi2c-chevron-right", PamGuiManagerFX.iconColor,	PamGuiManagerFX.iconSize);
-//			settingsRight = PamGlyphDude.createPamGlyph(MaterialIcon.SETTINGS, PamGuiManagerFX.iconColor,
-			settingsRight = PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconColor, PamGuiManagerFX.iconSize);
-			break;
+//		case LIGHT_TD_DISPLAY:
+//			//System.out.println("SET LIGHT THEME FOR HIDING BUTTONS");
+////			chevronRight = PamGlyphDude.createPamGlyph(FontAwesomeIcon.CHEVRON_RIGHT, PamGuiManagerFX.iconColor,
+//			chevronRight = PamGlyphDude.createPamIcon("mdi2c-chevron-right", PamGuiManagerFX.iconColor,	PamGuiManagerFX.iconSize);
+////			settingsRight = PamGlyphDude.createPamGlyph(MaterialIcon.SETTINGS, PamGuiManagerFX.iconColor,
+//			settingsRight = PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconColor, PamGuiManagerFX.iconSize);
+//			break;
 		default:
 			setOverlayColour(LIGHT_TD_DISPLAY);
 			break;
