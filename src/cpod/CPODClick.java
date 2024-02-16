@@ -1,6 +1,7 @@
 package cpod;
 
 import PamUtils.PamCalendar;
+import PamUtils.PamUtils;
 import PamguardMVC.AcousticDataUnit;
 import PamguardMVC.DataUnitBaseData;
 import PamguardMVC.PamDataBlock;
@@ -384,14 +385,25 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 		this.wavData=ds;
 	}
 	
-	static class  CPODWaveTransforms extends RawDataTransforms {
+	static class CPODWaveTransforms extends RawDataTransforms {
 
+		CPODClick rawDataHolder;
+		
 		public CPODWaveTransforms(PamDataUnit rawDataHolder) {
 			super(rawDataHolder);
+			this.rawDataHolder = (CPODClick) rawDataHolder;
+
 		}
 		
+		@Override
 		public float getSampleRate() {
 			return FPODReader.FPOD_WAV_SAMPLERATE;
+		}
+		
+		@Override
+		public int getCurrentSpectrumLength() {
+			//note that the waveform has a higher sample rate than the CPODclicks. 
+			return PamUtils.getMinFftLength(rawDataHolder.getWaveData()[0].length);
 		}
 		
 	}

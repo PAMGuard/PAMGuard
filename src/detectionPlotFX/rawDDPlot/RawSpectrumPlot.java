@@ -86,8 +86,7 @@ public class RawSpectrumPlot extends SpectrumPlot<PamDataUnit> {
 	private void newClick(PamDataUnit newClick, int bin1, int bin2, boolean forceRecalc){
 		
 		//System.out.println("Hello: RawSpectrumPlot");
-		
-		
+	
 		RawDataHolder rawDataHolder = (RawDataHolder) newClick; 
 		
 		if (rawDataHolder.getDataTransforms()==null) return;
@@ -157,7 +156,6 @@ public class RawSpectrumPlot extends SpectrumPlot<PamDataUnit> {
 //
 	@Override
 	public double[][] getPowerSpectrum(PamDataUnit newClick, int min, int max) {
-		//System.out.println("Get power spectrum: min: " + min + " max: " + max); 
 		newClick(newClick,min, max, true); 
 		return spectrum; 
 	}

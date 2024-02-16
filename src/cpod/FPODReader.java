@@ -70,7 +70,7 @@ public class FPODReader {
 	public static final double WAV_SCALE_FACTOR = 255.;
 
 
-	public static final float FPOD_WAV_SAMPLERATE = 1000000;
+	public static final float FPOD_WAV_SAMPLERATE = 2000000;
 
 	public static FPODHeader readHeader(File cpFile) {
 
@@ -122,7 +122,12 @@ public class FPODReader {
 
 			cpodClick = CPODClick.makeFPODClick(fpodData.get(i).getTimeMillis(), fileSamples, fpodData.get(i));
 
+			if (fpodData.get(i).getClassification()!=null) {
+				cpodClick.setClassification(fpodData.get(i).getClassification());
+			}
+			
 			cpodClickData.add(cpodClick);
+
 		}
 		
 		return cpodClickData;
@@ -174,7 +179,7 @@ public class FPODReader {
 
 		//the click train of the current data unit. 
 		CPODClassification cpodClassification =  null;
-
+		short lastSpecies = 0;
 		int wavbufpos = 0;
 		try {
 			while (true) {
@@ -363,6 +368,14 @@ public class FPODReader {
 							 */
 							if (clickTrains!=null) {
 								fpodClick.setClassification(cpodClassification);
+								
+								//TEST
+//								long timeMillis2 = PamCalendar.msFromDate(2023, 8, 31, 2, 52, 46, 200); //NBHF
+//								//long timeMillis2 = PamCalendar.msFromDate(2023, 7, 17, 16, 33, 2, 200); //DOLPH
+//								if (fpodClick.getTimeMillis()>timeMillis2 && fpodClick.getTimeMillis()<(timeMillis2+5000)) {
+//									System.out.println("Click train ID: " + cpodClassification.clicktrainID + " minutes: " + nMinutes + " species: " + cpodClassification.species + " species code: " + lastSpecies + " quality level: " + cpodClassification.qualitylevel);
+//								}
+
 							}
 
 							fpodClick.setMinute(nMinutes);
@@ -423,11 +436,12 @@ public class FPODReader {
 					//the train ID is unique to the minute, 
 					short trainID = toUnsigned(bufPosN[15]);
 
-					//1 is NBHF
-					//2 is dolphin
-					//3 is uncalssified
-					//4 is sonar?
+					//0 is NBHF
+					//1 is dolphin
+					//2 spUnclassiifed?
+					//4 sonar?
 					short species = (short) ((bufPosN[14] >>> 2) & 3);
+					lastSpecies = species;
 
 					//quality level for the click train
 					short qualitylevel = (short) ((bufPosN[14]) & 3);
@@ -448,13 +462,12 @@ public class FPODReader {
 						cpodClassification = new CPODClassification();
 						cpodClassification.isEcho = echo;
 						cpodClassification.clicktrainID = trainUID;
-						cpodClassification.species = CPODUtils.getSpecies(species); 
+						cpodClassification.species = CPODUtils.getFPODSpecies(species); //add onme to make same format as CPOD...? 
 						cpodClassification.qualitylevel = qualitylevel;
 
-
 						clickTrains.put(trainUID, cpodClassification); 
-
-						//System.out.println("Click train ID: " + trainUID + " minutes: " + nMinutes + " species: " + species + " quality level: " + qualitylevel);
+						
+//						System.out.println(PamCalendar.formatDateTime2(fpodClick.getTimeMillis()) + "Click train ID: " + trainUID + " minutes: " + nMinutes + " species: " + species + " quality level: " + qualitylevel);
 
 					}
 
@@ -1398,8 +1411,8 @@ public class FPODReader {
 	public static void main(String[] args) {
 		//		String filePath = "/Users/au671271/Library/CloudStorage/GoogleDrive-macster110@gmail.com/My Drive/PAMGuard_dev/CPOD/FPOD_NunBank/0866 NunBankB 2023 06 27 FPOD_6480 file0.FP1";
 
-		String filePath = "D:\\DropBox\\PAMGuard_dev\\CPOD\\FPOD_NunBank\\0866 NunBankB 2023 06 27 FPOD_6480 file0.FP1";
-		//		String filePath = "D:\\DropBox\\PAMGuard_dev\\CPOD\\FPOD_NunBank\\0866 NunBankB 2023 06 27 FPOD_6480 file0.FP3";
+//		String filePath = "D:\\DropBox\\PAMGuard_dev\\CPOD\\FPOD_NunBank\\0866 NunBankB 2023 06 27 FPOD_6480 file0.FP1";
+				String filePath = "D:\\DropBox\\PAMGuard_dev\\CPOD\\FPOD_NunBank\\0866 NunBankB 2023 06 27 FPOD_6480 file0.FP3";
 
 		File fpfile = new File(filePath); 
 

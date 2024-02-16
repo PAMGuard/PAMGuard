@@ -15,6 +15,7 @@ import binaryFileStorage.BinaryHeader;
 import binaryFileStorage.BinaryObjectData;
 import binaryFileStorage.ModuleFooter;
 import binaryFileStorage.ModuleHeader;
+import cpod.CPODClick.CPODWaveTransforms;
 
 /**
  * Binary storage for CPOD data. 
@@ -218,7 +219,7 @@ public class CPODBinaryStore extends BinaryDataSource {
 					double[] wavData = FPODReader.scaleWavData(arr);
 					
 					click.setWavData(new double[][] {wavData});
-					click.setRawDataTransfroms(new RawDataTransforms(click)); 
+					click.setRawDataTransfroms(new CPODWaveTransforms(click)); 
 				}
 				
 			

@@ -159,10 +159,12 @@ public class CPODImporter {
 					case CP1:
 					case FP1:
 						cpodFile.cp3File= files.get(i);
+						files.remove(files.get(i));
 						break;
 					case CP3:
 					case FP3:
 						cpodFile.cp1File= files.get(i);
+						files.remove(files.get(i));
 						break;
 					default:
 						break;
@@ -171,11 +173,9 @@ public class CPODImporter {
 					break;//break out of the for loop
 				}
 			}
-			
 			cpodFiles.add(cpodFile);
-			
-		}
-		
+		}	
+				
 		return new CPODImportTask(cpodFiles, this.cpodControl.getCP1DataBlock(), this.cpodControl.getClickTrainDataBlock());
 	} 
 	
@@ -273,30 +273,38 @@ public class CPODImporter {
 				for (int i=0; i<cpxFile.size(); i++) {
 					int count=0; 
 
-					if (this.isCancelled()) return -1; 
+					if (this.isCancelled()) {
+						return -1; 
+					}
 
 					final int ii = i;
 
-					System.out.println(("Importing CPOD file: " + (ii+1)) + "  " +cpxFile.get(i));
-					this.updateMessage(("Importing CPOD file: " + (ii+1)) + "  " +cpxFile.get(i).getName());
+					System.out.println(("Importing CPOD file: " + (ii+1) + "  " +cpxFile.get(i)));
+					this.updateMessage(("Importing CPOD file: " + (ii+1) + "  " +cpxFile.get(i).getName()));
 
 					int nClicks = 0; 
-					int importedClicks = -1;
 
 					this.updateProgress(-1, 1);
+					
+					boolean importClicks = true;
 
 					//get the start and end of the file. 
 					long[] fileStartEnd = getFileStartEnd(cpxFile.get(i).cp1File !=null ? cpxFile.get(i).cp1File :  cpxFile.get(i).cp3File);
 
-					while (importedClicks>0 || importedClicks==-1) {
+					while (importClicks) {
 
-						System.out.println(("Importing file " + i + " of " + cpxFile.size() + " from detection " + nClicks));
+						System.out.println(("Importing file " + (i+1) + " of " + cpxFile.size() + " from detection " + nClicks));
 
-						this.updateMessage(("Importing file " + i + " of " + cpxFile.size() + " from detection " + nClicks));
+						this.updateMessage(("Importing file " + (i+1) + " of " + cpxFile.size() + " from detection " + nClicks));
 
 						//import the CPOD or FPOD data
 						this.updateProgress(-1, 1);
-						importedClicks = importCPODFile(cpxFile.get(i), cpodDataBlock, clickTrainDataBlock, nClicks, MAX_SAVE); 
+						int importClicksN = importCPODFile(cpxFile.get(i), cpodDataBlock, clickTrainDataBlock, nClicks, MAX_SAVE); 
+						
+						//if there are no more clicks imported OR there is only a CP3 or FP3 file then we have finished importing
+						//This is because CP3 files are always loaded completely (because they hold a lot less data than CP1)
+						if (importClicksN==0 || cpxFile.get(i).cp1File==null) importClicks=false;
+						
 						this.updateProgress(-1, 1);
 
 						System.out.println("Number of CPOD data units in the data block: " + cpodDataBlock.getUnitsCount() + " progress: " +  (i+1) + " " + cpxFile.size() );
@@ -354,12 +362,12 @@ public class CPODImporter {
 
 							data =  cpodDataBlock.getBinaryDataSource().getPackedData(click);
 							this.binaryStream.storeData(data.getObjectType(), click.getBasicData(), data);
+							nClicks++;
 						}
 
+						nClicks=nClicks+1; //so we start at the right click. 
 						cpodDataBlock.clearAll();
 
-						//update number of clicks. 
-						nClicks=nClicks+importedClicks+1; 
 					}
 
 				}
@@ -448,16 +456,17 @@ public class CPODImporter {
 			else if (cpodCP3Data != null) cpodData= cpodCP3Data; //only CP3 data imported
 
 
-
 			HashMap<Integer, CPODClickTrainDataUnit> cpodClickTrains = new HashMap<Integer, CPODClickTrainDataUnit>();
 
 			//		fileStart + nMinutes * 60000L; 
 
 			int nClicks = 0;
 			for (int i=0; i<cpodData.size(); i++) {
+				
 				//System.out.println("Create a new CPOD click: ");
 				CPODClick cpodClick = processCPODClick(cpodData.get(i));
 				dataBlock.addPamData(cpodClick);
+				
 				if (cpodData.get(i).getClassification()!=null) {
 					CPODClickTrainDataUnit clickTrain = cpodClickTrains.get(cpodData.get(i).getClassification().clicktrainID);
 
@@ -472,6 +481,8 @@ public class CPODImporter {
 				}
 				nClicks++;
 			}
+			
+//			System.out.println("CPOD CLICK TRAINS: " +cpodClickTrains.size());
 
 			//add all the click trains with sub detections ot the datablock. 
 			int count =0;

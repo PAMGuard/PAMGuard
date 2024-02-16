@@ -149,6 +149,7 @@ public class TDMenuPane extends PamBorderPane {
 		this.setCenter(holder);
 
 		groupDetectionDisplay = new OverlayGroupDisplay(); 
+		
 		groupDetectionDisplay.addDisplayListener((oldDataUnit, newDataUnit)->{
 			//listener for changing data units 
 			setCurrentDataUnit(newDataUnit);
@@ -235,7 +236,6 @@ public class TDMenuPane extends PamBorderPane {
 	 */
 	private void setSummaryText() {
 		
-		//System.out.println(""); 
 		if (currentDataUnit==null || detectionSummary==null) return; 
 
 		String text; 
@@ -244,11 +244,13 @@ public class TDMenuPane extends PamBorderPane {
 			
 			text=currentDataUnit.getParentDataBlock().
 					getHoverText(tdGraphFX.getGraphProjector(), currentDataUnit, 0);
+			if (text==null) return; //do not clear as usually this is because a super unit has been set
 		}
 		else {
 			//selected an area with no data units. 
 			text= new String("No data units selected"); 
 		}
+
 		this.infoTextLabel.setText(PamUtilsFX.htmlToNormal(text));
 	}
 
@@ -491,6 +493,7 @@ public class TDMenuPane extends PamBorderPane {
 	 * @param pamDataUnit - the current data unit. 
 	 */
 	private void setCurrentDataUnit(PamDataUnit pamDataUnit) {
+		
 		currentDataUnit = pamDataUnit; 
 		setSummaryText();
 	}
@@ -528,9 +531,7 @@ public class TDMenuPane extends PamBorderPane {
 		this.groupDetectionDisplay.clearDisplay();
 		this.infoTextLabel.setText("");
 
-
 		this.groupDetectionDisplay.setDetectionGroup(detectionSummary!=null ? detectionSummary.getDataList() : null); 
-
 
 		//show the detection display. 
 		boolean showDetDisplay = toggle.isSelected(); 
@@ -545,12 +546,9 @@ public class TDMenuPane extends PamBorderPane {
 			PamRawDataBlock pamRawBlock =  findRawSourceBlock(); 
 			//			System.out.println("Pam raw data block: " +  pamRawBlock); 
 			
-			
 			if (WavFileExportManager.haveRawData(pamRawBlock, (long) overlayMarker.getCurrentMark().getLimits()[0], (long) overlayMarker.getCurrentMark().getLimits()[1])) {
-	
 				//System.out.println("Overaly Marker start X: " +  overlayMarker.getCurrentMark().getLimits()[0] + "  end: " +  overlayMarker.getCurrentMark().getLimits()[1]);
 				//System.out.println("Overlay Marker start Y: " +  overlayMarker.getCurrentMark().getLimits()[2] + "  end: " +  overlayMarker.getCurrentMark().getLimits()[3]);
-
 				groupDetectionDisplay.showRawData(pamRawBlock, overlayMarker.getCurrentMark().getLimits(), overlayMarker.getCurrentMark().getMarkChannels());
 			}
 			else {

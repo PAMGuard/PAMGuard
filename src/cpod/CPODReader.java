@@ -196,13 +196,14 @@ public class CPODReader  {
 
 							short trainID = shortData[20];
 
-							short species =  (short) (shortData[36]  & (112 >> 4));
+//							short species =  (short) (shortData[36]  & (112 >> 4));
 
 							short quality =  (short) (shortData[36]  & 3);
-
-							//							short species =  (short) ((shortData[19]  >> 2)  & 7);
-							//							
-							//							short quality =  (short) (shortData[19]  & 3);
+							
+							short species =  (short) (shortData[36]  >> 3);
+							
+//														short species =  (short) ((shortData[19]  >> 2)  & 7);
+//														short quality =  (short) (shortData[19]  & 3);
 
 							//generate a unique train ID within the file			
 							int trainUID = Integer.valueOf(String.format("%06d", nMinutes) + String.format("%d", trainID));
@@ -214,16 +215,18 @@ public class CPODReader  {
 								cpodClassification = new CPODClassification();
 								cpodClassification.isEcho = false;
 								cpodClassification.clicktrainID = trainUID;
-								cpodClassification.species = CPODUtils.getSpecies(species); 
+								cpodClassification.species = CPODUtils.getCPODSpecies(species); 
 								cpodClassification.qualitylevel = quality;
 
 								clickTrains.put(trainUID, cpodClassification); 
-								System.out.println("Click train ID: " + trainUID + " minutes: " + nMinutes + " species: " + species + " quality level: " + quality);
-
+//								long timeMillis = PamCalendar.msFromDate(2023, 1, 6, 22, 32, 41, 200);
+//								if (cpodClick.getTimeMilliseconds()>timeMillis && cpodClick.getTimeMilliseconds()<(timeMillis+20000)) {
+//									System.out.println("Click train ID: " + trainUID + " minutes: " + nMinutes + " species: " + species + " quality level: " + quality);
+//									System.out.println(String.format("<p>QClass %d, SpClass %d", CPODUtils.getBits(shortData[19], (short) 0x3), 
+//											CPODUtils.getBits(shortData[19], (short) 0b11100)));
+//								}
 							}
-
 							cpodClick.setClassification(cpodClassification);
-
 						}
 
 						clicks.add(cpodClick);
@@ -232,20 +235,14 @@ public class CPODReader  {
 							System.out.println("CPOD data: " + nClicks + "  " + PamCalendar.formatDateTime(cpodClick.getTimeMilliseconds()) + "  " +cpodClick.getBw() + "  " +shortData[4] );
 //							if (nClicks>0)return clicks; //FIXME
 						}
-
-
 					}
 
 					nClicks++;
-
-
 					//					// now remove the data unit from the data block in order to clear up memory.  Note that the remove method
 					//					// saves the data unit to the Deleted-Items list, so clear that as well (otherwise we'll just be using
 					//					// up all the memory with that one)
 					//					dataBlock.remove(cpodClick);
 					//					dataBlock.clearDeletedList();
-
-
 				}
 				else {
 					nMinutes ++;

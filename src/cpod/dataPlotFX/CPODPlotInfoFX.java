@@ -5,14 +5,19 @@ import java.awt.geom.Path2D;
 import PamController.PamControlledUnit;
 import PamUtils.PamArrayUtils;
 import PamUtils.PamUtils;
+import PamView.GeneralProjector;
 import PamView.HoverData;
 import PamView.GeneralProjector.ParameterType;
 import PamView.GeneralProjector.ParameterUnits;
+import PamView.symbol.PamSymbolChooser;
+import PamView.symbol.PamSymbolManager;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataSelector.DataSelector;
 import cpod.CPODClick;
 import cpod.CPODClickDataBlock;
+import dataPlotsFX.TDManagedSymbolChooserFX;
 import dataPlotsFX.TDSymbolChooserFX;
+import dataPlotsFX.data.TDDataInfoFX;
 import dataPlotsFX.data.TDScaleInfo;
 import dataPlotsFX.data.generic.GenericDataPlotInfo;
 import dataPlotsFX.data.generic.GenericScaleInfo;
@@ -23,6 +28,7 @@ import javafx.geometry.Orientation;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
+import pamViewFX.fxNodes.PamSymbolFX;
 
 /**
  * CPOD plot info. 
@@ -94,6 +100,17 @@ public class CPODPlotInfoFX extends GenericDataPlotInfo {
 			cpodSettingsPane = new CPODTDSettingsPane(this); 
 		}
 		return cpodSettingsPane; 
+	}
+	
+	@Override
+	public TDSymbolChooserFX createSymbolChooser() {
+		PamSymbolManager symbolManager = getDataBlock().getPamSymbolManager();
+		if (symbolManager == null) {
+			return null;
+		}
+		GeneralProjector p = this.getTDGraph().getGraphProjector();
+		PamSymbolChooser sc = symbolManager.getSymbolChooser(getTDGraph().getUniqueName(), p);
+		return new CPODSymbolChooserFX(this, sc, TDSymbolChooserFX.DRAW_SYMBOLS);
 	}
 
 
@@ -346,6 +363,34 @@ public class CPODPlotInfoFX extends GenericDataPlotInfo {
 		if (score==0) return false;
 
 		return true; 
+	}
+	
+	/**
+	 * Default symbol chooser for the display. This based on the data blocks symbol chooser. 
+	 * 
+	 * @author Jamie Maaulay 
+	 *
+	 */
+	public class CPODSymbolChooserFX extends TDManagedSymbolChooserFX{
+
+		
+		public CPODSymbolChooserFX(TDDataInfoFX dataInfoFX, PamSymbolChooser pamSymbolChooser, int drawTypes) {
+			super(dataInfoFX, pamSymbolChooser, drawTypes);
+		}
+
+		@Override
+		public PamSymbolFX getPamSymbol(PamDataUnit dataUnit, int type) {
+			PamSymbolFX symbol =  super.getPamSymbol(dataUnit, type);
+			if (((CPODClick) dataUnit).getWaveData()!=null && type!=TDSymbolChooserFX.HIGHLIGHT_SYMBOL) {
+				symbol.setLineColor(symbol.getFillColor().darker());
+				symbol.setHeight(symbol.getHeight()*1.5);
+				symbol.setWidth(symbol.getWidth()*1.5);
+			}
+			
+			return symbol;
+
+		}
+		
 	}
 
 }

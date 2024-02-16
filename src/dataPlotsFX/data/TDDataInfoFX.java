@@ -645,8 +645,8 @@ public abstract class TDDataInfoFX {
 		drawCalls++;
 		if ((symbolchoser.getDrawTypes(pamDataUnit) & TDSymbolChooserFX.DRAW_LINES) != 0) {
 			//WARNING<- the getPreviousDataUnit function is currently very slow and caused serious issue
-			//in display speed. Onyl use draw lines with super detections if data units are very sparse. 
-			// For example not suitbale for the the click detector. 
+			//in display speed. Only use draw lines with super detections if data units are very sparse. 
+			// For example not suitable for the the click detector. 
 			Point2D lastDrawPoint=getPreviousDataUnit(tdProjector, pamDataUnit); 
 			if (lastDrawPoint!= null)
 			g.setFill(symbolchoser.getPamSymbol(pamDataUnit,type).getLineColor());

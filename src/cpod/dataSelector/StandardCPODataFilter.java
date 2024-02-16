@@ -44,7 +44,7 @@ public class StandardCPODataFilter implements CPODDataFilter {
 			return 1; 
 		}
 		else {
-			System.out.println("Do not plot data: " +cpodClick.getTimeMilliseconds());
+//			System.out.println("Do not plot data: " +cpodClick.getTimeMilliseconds());
 			return 0; 
 		}
 

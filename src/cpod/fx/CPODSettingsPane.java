@@ -309,6 +309,17 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 		//run the tasks
 		this.cpodControl.getCpodImporter().runTasks(task);
 
+		task.setOnCancelled((a)->{
+			importingFinished();
+		});
+
+		task.setOnSucceeded((a)->{
+			importingFinished();
+		});
+
+		task.setOnFailed((a)->{
+			importingFinished();
+		});
 		return true; 
 	}
 
@@ -338,8 +349,6 @@ public class CPODSettingsPane extends SettingsPane<CPODParams> {
 
 			progressBar.setProgress(1.);
 		}); 
-
-		System.out.println("Importing finished 3:"); 
 
 	}
 

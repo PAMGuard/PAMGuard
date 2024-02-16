@@ -267,7 +267,7 @@ public class GenericDataPlotInfo extends TDDataInfoFX {
 		return managedSymbolChooser;
 	}
 
-	private TDSymbolChooserFX createSymbolChooser() {
+	public TDSymbolChooserFX createSymbolChooser() {
 		PamSymbolManager symbolManager = getDataBlock().getPamSymbolManager();
 		if (symbolManager == null) {
 			return null;

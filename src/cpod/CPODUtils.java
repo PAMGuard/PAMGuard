@@ -85,7 +85,7 @@ public class CPODUtils {
 	 * @param species - integer flag representing the species
 	 * @return the ENUM species type. 
 	 */
-	public static CPODSpeciesType getSpecies(short species) {
+	public static CPODSpeciesType getCPODSpecies(short species) {
 		CPODSpeciesType type= CPODSpeciesType.UNKNOWN;
 		switch (species) {
 		case 1:
@@ -122,6 +122,30 @@ public class CPODUtils {
 		}
 		data &= bitMap;
 		return (short) (data>>firstBit);
+	}
+	
+	/**
+	 * Get the FPOD species from an int flag 
+	 * @param species - integer flag representing the species
+	 * @return the ENUM species type. 
+	 */
+	public static CPODSpeciesType getFPODSpecies(short species) {
+		CPODSpeciesType type= CPODSpeciesType.UNKNOWN;
+		switch (species) {
+		case 0:
+			type = CPODSpeciesType.NBHF;
+			break;
+		case 1:
+			type = CPODSpeciesType.DOLPHIN;
+			break;
+		case 2:
+			type = CPODSpeciesType.UNKNOWN;
+			break;
+		case 4:
+			type = CPODSpeciesType.SONAR;
+			break;
+		}
+		return type;
 	}
 
 
