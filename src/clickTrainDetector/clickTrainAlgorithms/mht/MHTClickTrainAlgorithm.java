@@ -420,7 +420,7 @@ public class MHTClickTrainAlgorithm implements ClickTrainAlgorithm, PamSettings 
 	 * Update the algorithm
 	 * @param flag- flag indicating the update type. 
 	 */
-	public void update(int flag, Object info) {
+	public synchronized void update(int flag, Object info) {
 
 		if (Thread.currentThread() != previousThread) {
 			// see flag id constants in ClickTrianControl
