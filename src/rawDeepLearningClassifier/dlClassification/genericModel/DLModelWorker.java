@@ -142,7 +142,7 @@ public abstract class DLModelWorker<T> {
 						//pred = int(prob >= ARGS.threshold)		    	
 						//softmax function
 						prob[j] = (float) DLUtils.softmax(classOut[j], classOut); 
-						System.out.println("The probability is: " + j + ": " + prob[j]); 
+						//System.out.println("The probability is: " + j + ": " + prob[j]); 
 					}
 				}
 				else {

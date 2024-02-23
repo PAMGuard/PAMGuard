@@ -469,6 +469,9 @@ public class OfflineTaskGroup implements PamSettings {
 			OfflineDataMap dataMap = primaryDataBlock.getPrimaryDataMap();
 			int nMapPoints = dataMap.getNumMapPoints(startTime, endTime);
 			int iMapPoint = 0;
+			
+			System.out.println("N MAP POINTS: "+ nMapPoints + "  dataMap: " + dataMap.getParentDataBlock() + " start: " + PamCalendar.formatDateTime(startTime) + "  "  +PamCalendar.formatDateTime(endTime));
+			
 			publish(new TaskMonitorData(TaskStatus.RUNNING, TaskActivity.PROCESSING, nMapPoints, 0, "",  
 					taskGroupParams.startRedoDataTime));
 			OfflineDataStore dataSource = dataMap.getOfflineDataSource();
