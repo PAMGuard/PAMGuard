@@ -290,7 +290,7 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 		//custom pane for each aquisition system. 
 		systemPane=new PamBorderPane(); 
 
-		offlineDAQPaneFX= new OfflineDAQPane(acquisitionControl, this);
+		offlineDAQPaneFX= new OfflineDAQPane(acquisitionControl);
 
 		//the main pane is for reference only in viewer mode. 
 		Pane samplingPane=createSamplingPane();

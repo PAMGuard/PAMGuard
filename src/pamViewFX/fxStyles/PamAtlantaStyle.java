@@ -101,6 +101,7 @@ public class PamAtlantaStyle extends PamDefaultStyle {
 			cssStyles.add(getClass().getResource(primerdark).toExternalForm());
 		}
 		cssStyles.add(getClass().getResource(primerPAMGuard).toExternalForm());
+		cssStyles.add(getClass().getResource(primerPAMGuardDark).toExternalForm());
 		return cssStyles;
 	}
 

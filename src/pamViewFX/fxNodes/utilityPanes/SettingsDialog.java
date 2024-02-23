@@ -5,7 +5,6 @@ import javafx.stage.StageStyle;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
 import pamViewFX.fxStyles.PamStylesManagerFX;
-import PamController.PamController;
 import PamController.SettingsPane;
 
 /**
@@ -22,23 +21,22 @@ public class SettingsDialog<T> extends PamDialogFX<T>{
 
 	public SettingsDialog(SettingsPane<T> settingsPane){
 		super(PamGuiManagerFX.getInstance().getPrimaryStage() /*TODO - add stage*/, settingsPane.getName(), StageStyle.DECORATED);
-		this.getDialogPane().getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getDialogCSS());
 		this.setResizable(true);
 		this.settingsPane=settingsPane;
+	
+		
 		this.setContent(settingsPane.getContentNode());
-//		this.getDialogPane().getStylesheets().add(PamController.getInstance().getGuiManagerFX().getPamSettingsCSS());
+	
 
 		Stage stage = (Stage) this.getDialogPane().getScene().getWindow();
 		stage.toFront();
 		
-//		//set results converter
-//		this.setResultConverter(dialogButton -> {
-//		    if (dialogButton == ButtonType.OK) {
-//		        T params = getParams();
-//		        if (params!=null) pamControlledUnit.setParams(params); 
-//		    }
-//		    return null;
-//		});
+		this.getDialogPane().getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getDialogCSS());
+		
+//		System.out.println("SettingsPane: DIALOG " + 	this.getDialogPane().getStylesheets().size());
+//		for (int i=0;i<this.getDialogPane().getStylesheets().size();i++) {
+//			System.out.println(this.getDialogPane().getStylesheets().get(i));
+//		}
 	}
 	
 	@Override

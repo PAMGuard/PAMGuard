@@ -408,7 +408,7 @@ public class Array3DPane extends PamBorderPane {
 			newPoint =new Point3D(streamer.getCoordinate(0)*scaleFactor, -streamer.getCoordinate(2)*scaleFactor,  streamer.getCoordinate(1)*scaleFactor);
 			streamerPoints.add(newPoint);
 
-			System.out.println("Streamer points: " + streamerPoints.size()); 
+			//System.out.println("Streamer points: " + streamerPoints.size()); 
 
 			PolyLine3D polyLine3D=new PolyLine3D(streamerPoints, 4f, Color.DODGERBLUE); 
 			arrayGroup.getChildren().add(polyLine3D);

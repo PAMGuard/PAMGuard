@@ -466,7 +466,7 @@ public class FilterPaneFX extends SettingsPane<FilterParams> {
 			public void changed(ObservableValue<? extends Number> observable,
 					Number oldValue, Number newValue) {
 				if (axisInitialised) {
-					updateBodeGraph(); 
+					if (filterMethod!=null) updateBodeGraph(); 
 					axisInitialised=false; 
 				}
 			}
@@ -689,6 +689,8 @@ public class FilterPaneFX extends SettingsPane<FilterParams> {
 	 * @return a data series to add to the line chart
 	 */
 	private Series<Number, Number> createFilterPoints(ValueAxis<Number> axis){
+		
+		if (filterMethod==null) return null;
 
 		Series<Number, Number> series = new Series<Number, Number>();
 		/*

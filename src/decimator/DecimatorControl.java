@@ -290,5 +290,13 @@ public class DecimatorControl extends PamControlledUnit implements PamSettings, 
 		
 	}
 
+	/**
+	 * Get the decimator process. 
+	 * @return the decimator process. 
+	 */
+	public DecimatorProcessW getDecimatorProcess() {
+		return this.decimatorProcess;
+	}
+
 	
 }
