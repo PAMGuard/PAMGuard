@@ -1,6 +1,7 @@
 package cpod;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -210,7 +211,7 @@ public class CPODImporter {
 	 * @author Jamie Macaulay
 	 *
 	 */
-	class CPODImportTask extends Task<Integer> {
+	 class CPODImportTask extends Task<Integer> {
 
 
 		/**
@@ -403,17 +404,17 @@ public class CPODImporter {
 		/**
 		 * Import the CPOD file. 
 		 * @param cpFile2 - the cp1 file
-		 * @param dataBlock - the datablock
+		 * @param dataBlock - the data block
 		 * @param from - the click index to save from. e.g. 100 means that only click 100 + in the file is saved
 		 * @param maxNum - the maximum number to import
 		 * @return the total number of clicks in  the file. 
 		 */
 		private int importCPODFile(CPODFile cpFile, CPODClickDataBlock dataBlock, CPODClickTrainDataBlock clickTrainDataBlock, int from, int maxNum) {
+			
 			ArrayList<CPODClick> cpodCP1Data = null; 
 			ArrayList<CPODClick> cpodCP3Data = null; 
 
 			try {
-
 				if (cpFile.isFPOD()) {
 					//load a chunk of FP1 data
 					cpodCP1Data = FPODReader.importFPODFile(cpFile.cp1File, from, maxNum);
@@ -426,21 +427,20 @@ public class CPODImporter {
 					//load all CP3 data
 					cpodCP3Data = CPODReader.importCPODFile(cpFile.cp3File, 0, Integer.MAX_VALUE);
 				}
-
-
-
 			} catch (Exception e) {
 				e.printStackTrace();
 				return 0;
 			} 
 
-			//create an arraylist 
+			//create an ArrayList 
 			ArrayList<CPODClick> cpodData = new ArrayList<CPODClick>(); 
 
-
+			int repcount = 0;
 			//now we get rid if duplicate clicks
 			if (cpodCP1Data != null && cpodCP3Data != null) {
 				CPODClickOmparator cpodComparator =  new CPODClickOmparator();
+				
+				//make sure to sort the list. 
 				Collections.sort(cpodCP3Data, cpodComparator);;
 				//here we need to replace the CP1 detection in the CP1 file with the CP3 detections in the CP3 file
 				for (int j=0; j<cpodCP1Data.size(); j++) {
@@ -448,17 +448,17 @@ public class CPODImporter {
 					//replace
 					if (index>=0) {
 						cpodCP1Data.set(j, cpodCP3Data.get(index));
+						repcount++;
 					}
 				}
 				cpodData= cpodCP1Data; //cp1 data now contains CP3 clicks. 
 			}
 			else if (cpodCP1Data != null) cpodData= cpodCP1Data; //only CP1 data imported
 			else if (cpodCP3Data != null) cpodData= cpodCP3Data; //only CP3 data imported
-
+			
+			//now iterate through the detections and grab the click classiifcations. 
 
 			HashMap<Integer, CPODClickTrainDataUnit> cpodClickTrains = new HashMap<Integer, CPODClickTrainDataUnit>();
-
-			//		fileStart + nMinutes * 60000L; 
 
 			int nClicks = 0;
 			for (int i=0; i<cpodData.size(); i++) {
@@ -469,22 +469,20 @@ public class CPODImporter {
 				
 				if (cpodData.get(i).getClassification()!=null) {
 					CPODClickTrainDataUnit clickTrain = cpodClickTrains.get(cpodData.get(i).getClassification().clicktrainID);
-
 					//add the click train to the hash map
 					if (clickTrain==null) {
 						clickTrain= new CPODClickTrainDataUnit(cpodClick.getTimeMilliseconds(), null, cpodData.get(i).getClassification());
 						cpodClickTrains.put(cpodData.get(i).getClassification().clicktrainID, clickTrain);
 					}
-
 					//add the cpos click as a sub detection
 					clickTrain.addSubDetection(cpodClick);				
 				}
 				nClicks++;
 			}
 			
-//			System.out.println("CPOD CLICK TRAINS: " +cpodClickTrains.size());
+			System.out.println("CPOD CLICK TRAINS: " +cpodClickTrains.size() + " n det replaced: " + repcount);
 
-			//add all the click trains with sub detections ot the datablock. 
+			//add all the click trains with sub detections to the data block. 
 			int count =0;
 			for (Integer key: cpodClickTrains.keySet()) {
 
@@ -512,8 +510,6 @@ public class CPODImporter {
 		protected int importCPODFile(CPODFile cpFile, CPODClickDataBlock dataBlock, CPODClickTrainDataBlock clickTrainDataBlock) {
 			return	importCPODFile( cpFile, dataBlock, clickTrainDataBlock, -1, Integer.MAX_VALUE); 
 		}
-
-
 
 	}
 
@@ -544,7 +540,7 @@ public class CPODImporter {
 	}
 
 	// Comparator to sort a list 
-	class CPODClickOmparator implements Comparator<CPODClick> { 
+	static class CPODClickOmparator implements Comparator<CPODClick> { 
 		@Override public int compare(CPODClick s1, CPODClick s2) 
 		{ 
 			if (s1.getTimeMilliseconds() > s2.getTimeMilliseconds()) { 
@@ -554,15 +550,100 @@ public class CPODImporter {
 				return -1; 
 			} 
 			else if (s1.getTimeMilliseconds() == s2.getTimeMilliseconds()) { 
-
-				if (s1.getStartSample()>s2.getStartSample()) return 1;
-				else if (s1.getStartSample()<s2.getStartSample()) return -1;
+				
+//				return 0;
+				if (s1.getStartSample()>(s2.getStartSample())) return 1;
+				else if (s1.getStartSample()<(s2.getStartSample())) return -1;
 				else return 0;
 			} 
 			return -1; 
 		} 
 	}
 
+	
+	public static void main(String[] args) {
+		
+		
+		CPODFile cpFile = new CPODFile();
+		try {
+
+		//CPOD
+		cpFile.cp1File = new File("D:\\Dropbox\\PAMGuard_dev\\tutorials\\CPOD_wav\\data\\Hyskeir\\CPOD\\0740 Hyskeir 2022 12 02 POD1655 file01.CP1");
+		cpFile.cp3File = new File("D:\\Dropbox\\PAMGuard_dev\\tutorials\\CPOD_wav\\data\\Hyskeir\\CPOD\\0740 Hyskeir 2022 12 02 POD1655 file01.CP3");
+		
+//		//FPOD
+//		cpFile.cp1File = new File("D:\\Dropbox\\PAMGuard_dev\\tutorials\\CPOD_wav\\data\\NunBank\\FPOD\\0866 NunBankB 2023 06 27 FPOD_6480 file0.FP1");
+//		cpFile.cp3File = new File("D:\\Dropbox\\PAMGuard_dev\\tutorials\\CPOD_wav\\data\\NunBank\\FPOD\\0866 NunBankB 2023 06 27 FPOD_6480 file0.FP3");
+//	
+
+		ArrayList<CPODClick> cpodCP1Data;
+		ArrayList<CPODClick> cpodCP3Data;
+		if (cpFile.isFPOD()) {
+			//load a chunk of FP1 data
+				cpodCP1Data = FPODReader.importFPODFile(cpFile.cp1File, 0, MAX_SAVE);
+		
+			//load all FP3 data
+			cpodCP3Data = FPODReader.importFPODFile(cpFile.cp3File, 0, Integer.MAX_VALUE);
+		}
+		else {
+			//load a chunk of CP1 data
+			cpodCP1Data = CPODReader.importCPODFile(cpFile.cp1File, 0, MAX_SAVE);
+			//load all CP3 data
+			cpodCP3Data = CPODReader.importCPODFile(cpFile.cp3File, 0, Integer.MAX_VALUE);
+		}
+		
+		//create an ArrayList 
+		ArrayList<CPODClick> cpodData = new ArrayList<CPODClick>(); 
+
+		int repcount = 0;
+		int lastCP1=-1;
+		//now we get rid if duplicate clicks
+		if (cpodCP1Data != null && cpodCP3Data != null) {
+			CPODClickOmparator cpodComparator =  new CPODClickOmparator();
+			//make sure to sort the list. 
+			Collections.sort(cpodCP3Data, cpodComparator);
+			Collections.sort(cpodCP1Data, cpodComparator);
+			
+			long lastCP1Date = cpodCP1Data.get(cpodCP1Data.size()-1).getTimeMilliseconds();
+
+
+			for (int j=0; j<cpodCP3Data.size(); j++) {
+				if (cpodCP3Data.get(j).getTimeMilliseconds()>lastCP1Date) {
+					lastCP1 = j;
+					break;
+				}
+			}
+
+			//here we need to replace the CP1 detection in the CP1 file with the CP3 detections in the CP3 file
+			for (int j=0; j<cpodCP3Data.size(); j++) {
+				if (j>lastCP1) {
+					break;
+				}
+				
+				int index = Collections.binarySearch(cpodCP1Data, cpodCP3Data.get(j),  cpodComparator );
+				//replace
+				if (index>=0) {
+					repcount++;
+					if (j%1000==0) {
+					System.out.println("Match: cp1 " +  cpodCP1Data.get(index).getStartSample() + " " + cpodCP3Data.get(j).getStartSample() 
+							+" diff " + (cpodCP1Data.get(index).getStartSample() - cpodCP3Data.get(j).getStartSample()));
+					}
+				}
+			}
+			cpodData= cpodCP1Data; //cp1 data now contains CP3 clicks. 
+		}
+		else if (cpodCP1Data != null) cpodData= cpodCP1Data; //only CP1 data imported
+		else if (cpodCP3Data != null) cpodData= cpodCP3Data; //only CP3 data imported
+		
+		
+		System.out.println("CPOD data: n CP1: "  + cpodCP1Data.size() + " n CP3: " + cpodCP3Data.size()  + " n matches " + repcount + " of " + lastCP1);
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
 
 }
 

@@ -24,6 +24,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Region;
 import pamViewFX.PamGuiManagerFX;
+import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamGridPane;
@@ -139,14 +140,15 @@ public class DecimatorSettingsPane extends SettingsPane<DecimatorParams> {
 		filterButton.setOnAction((action)->{
 			selectFilters(filterButton);
 		});
-		
-		
+		PamGridPane.setColumnSpan(filterButton, 4);
+
 //		filterButton.addActionListener(new FilterButton());
 		gridx = 1;
 //		gridwidth = 2;
 		
 		
-		decimatorPane.add(defaultFilterButton = new PamButton("Default Filter"),  gridx, gridy);
+		decimatorPane.add(defaultFilterButton = new PamButton(),  gridx, gridy);
+		defaultFilterButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-cog-refresh",PamGuiManagerFX.iconSize));
 		defaultFilterButton.setOnAction((action)->{
 			 restoreDefaultSettings();
 		});

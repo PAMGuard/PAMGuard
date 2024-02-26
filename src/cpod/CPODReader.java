@@ -244,9 +244,12 @@ public class CPODReader  {
 					//					dataBlock.remove(cpodClick);
 					//					dataBlock.clearDeletedList();
 				}
-				else {
+//				else {
+//					nMinutes ++;
+//					processMinute(byteData);
+//				}
+				else if(CPODUtils.toUnsigned(byteData[dataSize-1])==254){
 					nMinutes ++;
-					processMinute(byteData);
 				}
 				totalBytes += dataSize;
 			}
@@ -337,7 +340,7 @@ public class CPODReader  {
 
 
 		// do a sample number within the file as 5us intervals
-		long fileSamples = t + minuteMillis * 200;
+		long fileSamples = (long) (((minuteMillis*60) +  (t*5/1000000.))*CPODClickDataBlock.CPOD_SR);
 
 		/*
 		 * 
