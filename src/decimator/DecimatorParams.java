@@ -85,7 +85,7 @@ public class DecimatorParams implements Serializable, Cloneable, ManagedParamete
 	 * @see java.lang.Object#clone()
 	 */
 	@Override
-	protected DecimatorParams clone() {
+	public DecimatorParams clone() {
 		try {
 			DecimatorParams dp = (DecimatorParams) super.clone();
 			dp.filterParams = filterParams.clone();

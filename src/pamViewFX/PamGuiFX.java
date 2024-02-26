@@ -174,7 +174,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 //		showButtonRight.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.CHEVRON_LEFT, PamGuiManagerFX.iconColor, PamGuiManagerFX.iconSize));
 		showButtonRight.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-left", PamGuiManagerFX.iconColor, PamGuiManagerFX.iconSize));
 		//showLeftButton.setText(PamFontAwesome.ICON_CHEVRON_LEFT);
-		showButtonRight.getStyleClass().add("close-button-left");
+		showButtonRight.getStyleClass().add("close-button-left-trans");
 		showButtonRight.setStyle("-fx-background-radius: 0 0 0 0;");
 
 		//alter animations to remove/add showButton to tab pane. 
@@ -199,8 +199,8 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 		});
 
 		PamButton closeButtonLeft=hidingSidePane.getHideButton();
+		closeButtonLeft.getStyleClass().add("close-button-right-trans");
 //		closeButtonLeft.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.CHEVRON_RIGHT, Color.DARKGRAY.darker(), PamGuiManagerFX.iconSize));
-		closeButtonLeft.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-right", Color.DARKGRAY.darker(), PamGuiManagerFX.iconSize));
 		closeButtonLeft.prefHeightProperty().bind(mainTabPane.getHeaderHeightProperty());
 		
 		//add hiding pane to main pane. 
@@ -217,7 +217,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 		PamButton showButtonLeft=hidingPaneLeft.getShowButton();
 //		showButtonLeft.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.BARS, Color.LIGHTGRAY, PamGuiManagerFX.iconSize));
 		showButtonLeft.setGraphic(PamGlyphDude.createPamIcon("mdi2m-menu", Color.LIGHTGRAY, PamGuiManagerFX.iconSize));
-		showButtonLeft.getStyleClass().add("close-button-right");
+		showButtonLeft.getStyleClass().add("close-button-right-trans");
 		showButtonLeft.setStyle(" -fx-background-radius: 0 0 0 0;");
 		
 		PamButton closeRightButton=hidingPaneLeft.getHideButton();
@@ -546,6 +546,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 			this.setRight(rightHBox);
 			
 			this.setPrefHeight(prefHeight);
+			this.getStyleClass().add("pane-opaque");
 
 
 			//this.setPadding(new Insets(0,0,0,0));

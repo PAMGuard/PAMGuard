@@ -132,7 +132,7 @@ public class ModuleIconFactory {
 		
 		long time2 = System.currentTimeMillis();
 
-		System.out.println("GET MODULE ICON: " + icon + " load time: " + (time2-time1));
+		//System.out.println("GET MODULE ICON: " + icon + " load time: " + (time2-time1));
 
 		return iconNode;
 	}; 

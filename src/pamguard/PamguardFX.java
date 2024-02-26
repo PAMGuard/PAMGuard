@@ -67,9 +67,8 @@ public class PamguardFX extends Application {
 	public void start(Stage primaryStage) throws Exception {
 		//this is called from launch(args)
 		try {
-				PamController.create(runMode, primaryStage);
-			
-			
+		    System.out.println("javafx.runtime.version: " + System.getProperty("javafx.runtime.version"));
+			PamController.create(runMode, primaryStage);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
