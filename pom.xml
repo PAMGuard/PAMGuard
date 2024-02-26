@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.pamguard</groupId>
   <artifactId>Pamguard</artifactId>
-  <version>2.02.11a</version>
+  <version>2.02.11b</version>
   <name>Pamguard</name>
   <description>Pamguard using Maven to control dependencies</description>
 	<url>www.pamguard.org</url>
@@ -22,7 +22,6 @@
    </properties>
 
    <build>
-	  
 	   <!-- Define where the source and test directories are -->
 	    <sourceDirectory>${basedir}/src</sourceDirectory>
 	    <testSourceDirectory>${basedir}/src/test</testSourceDirectory> <!-- where the Unit tets are located -->
@@ -772,9 +771,12 @@
 	</dependency>
 	 -->
 
-	<!-- not in Maven repository  
-you may need to copy files from your downloaded PAMGuard source code, e.g. C:\Users\*yourreposfolder*\source\repos\PAMGuardPAMGuard\repo\pamguard\org\x3\2.2.2 to 
-C:\Users\*yourusername*\.m2\repository\pamguard\org\x3\2.2.2-->
+	<!-- 
+	X3 library for decompressing sud files. Not in Maven repository  
+	you may need to copy files from your downloaded PAMGuard source code, 
+	e.g. C:\Users\*yourreposfolder*\source\repos\PAMGuardPAMGuard\repo\pamguard\org\x3\2.2.2 to 
+	C:\Users\*yourusername*\.m2\repository\pamguard\org\x3\2.2.2
+	-->
  	<dependency>
 	    <groupId>pamguard.org</groupId>
 	    <artifactId>x3</artifactId>
