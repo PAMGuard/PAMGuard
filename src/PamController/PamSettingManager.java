@@ -384,6 +384,8 @@ public class PamSettingManager {
 			boolean[] usedSettings,	PamSettings user) {
 		if (settingsList == null) return null;
 		// go through the list and see if any match this module. Avoid repeats.
+//		String unitName = user.getUnitName();
+//		String unitType = user.getUnitType();
 		for (int i = 0; i < settingsList.size(); i++) {
 			if (usedSettings != null && usedSettings[i]) continue;
 			if (isSettingsUnit(user, settingsList.get(i))) {
@@ -393,6 +395,7 @@ public class PamSettingManager {
 				return settingsList.get(i);
 			}
 		}
+		
 		/*
 		 * To improve complex module loading where settings may be saved by multiple sub-modules, in
 		 * July 2015 many modules which had fixed settings had their settings names and types changed !
@@ -1482,11 +1485,20 @@ public class PamSettingManager {
 		if (settings.getUnitName() == null || settingsUser.getUnitName() == null) return false;
 		if (settings.getUnitType() == null || settingsUser.getUnitType() == null) return false;
 
-
-		if (settings.getUnitName().equals(settingsUser.getUnitName())
-				&& settings.getUnitType().equals(settingsUser.getUnitType())
-				&& settings.versionNo == settingsUser.getSettingsVersion()){
-			return true;
+		/*
+		 *  some of the settings names used in Viewer mode have become too long, notably
+		 *  in some data selectors which are using a datablocks long data name. This 
+		 *  screws things up, so moving to a begins with rather than equals for the name. 
+		 */
+		String name = settingsUser.getUnitName();
+		String type = settingsUser.getUnitType();
+		long version = settingsUser.getSettingsVersion();
+		
+		if (settings.getUnitType().equals(type)
+				&& settings.versionNo == version){
+			if (name.startsWith(settings.getUnitName())) {
+				return true;
+			}
 		}
 
 		return false;

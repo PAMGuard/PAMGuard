@@ -201,10 +201,11 @@ public abstract class DataSelectorCreator implements PamSettings {
 		}
 		else {
 			CompoundDataSelector selector = new CompoundDataSelector(pamDataBlock, allSelectors, selectorName, allowScores, selectorType);
-			DataSelectParams params = dataSelectorSettings.getParams(selectorName);
-			if (params instanceof CompoundParams) {
-				selector.setParams(params);
-			}
+			// not needed since it get's done after this call anyway. 
+//			DataSelectParams params = dataSelectorSettings.getParams(selectorName);
+//			if (params instanceof CompoundParams) {
+//				selector.setParams(params);
+//			}
 			
 			return selector;
 		}
