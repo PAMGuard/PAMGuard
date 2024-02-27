@@ -153,7 +153,7 @@ public class UCanAccessSystem extends BaseAccessSystem implements PamSettings {
 			String conStr = "jdbc:ucanaccess://"
 					+ fl.getAbsolutePath() + passwordEntry+noMem;
 			System.out.println("UCanAccess connection string = " + conStr);
-			conn = DriverManager.getConnection(conStr);
+			conn = DriverManager.getConnection(conStr,"","");
 			conn.setAutoCommit(false);
 		} catch (Exception e) {
 			e.printStackTrace();
