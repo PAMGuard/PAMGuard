@@ -36,7 +36,9 @@ public enum DLStatus {
 			" There are no prediction classes selected for classification. Predicitons for each segment will be saved but there will be no detections generated",
 			ErrorLevel.WARNING), 
 	
-	DECOMPRESSING_MODEL("Decompressing model", "Decompressing the model file", ErrorLevel.NO_ERROR), ;
+	DECOMPRESSING_MODEL("Decompressing model", "Decompressing the model file", ErrorLevel.NO_ERROR), 
+
+	INCOMPATIBLE_ZIP("Incorrect Zip format", "The zip format is incorrect. The zip file should have a *.pgdl file in the parent directory along with either a Tensorflow or PyTorch model.", ErrorLevel.ERROR), ;
 
 
 	/**

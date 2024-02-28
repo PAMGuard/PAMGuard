@@ -28,6 +28,8 @@ public class ArchiveModelUI  implements DLCLassiferModelUI {
 	 */
 	private ArrayList<ExtensionFilter> extensionFilters;
 
+
+
 	/**
 	 * SondSpot classifier. 
 	 * @param soundSpotClassifier
@@ -78,6 +80,14 @@ public class ArchiveModelUI  implements DLCLassiferModelUI {
 			extensionFilters.add(new ExtensionFilter(archiveModel.getName(), archiveModel.getFileExtensions())); 
 		} 
 		return extensionFilters;
+	}
+	
+	/**
+	 * Set the extension filters. 
+	 * @param extensionFilters
+	 */
+	public void setExtensionFilters(ArrayList<ExtensionFilter> extensionFilters) {
+		this.extensionFilters = extensionFilters;
 	}
 
 

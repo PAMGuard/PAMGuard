@@ -101,7 +101,7 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 	@Override
 	public void prepModel() {
 //		System.out.println("STANDARD CLASSIFIER MODEL PREP MODEL! !!!");
-		StandardModelParams oldParams = getDLParams().clone();
+//		StandardModelParams oldParams = getDLParams().clone();
 		
 		getDLWorker().prepModel(getDLParams(), dlControl);
 
@@ -174,17 +174,15 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 //							+ "Predicitons for each segment will be saved but there will be no detections generated",
 //					1));
 		}
-
-
-		
 		return DLStatus.MODEL_LOAD_SUCCESS;
 	}
 	
 	@Override
-	public void setModel(URI uri) {
+	public DLStatus setModel(URI uri) {
 		//will change the params if we do not clone. 
 		StandardModelParams.setModel(uri, this.getDLParams()); 
 		this.prepModel();
+		return getModelStatus();
 	}
 	
 	

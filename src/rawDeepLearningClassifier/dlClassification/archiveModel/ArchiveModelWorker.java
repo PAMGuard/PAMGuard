@@ -2,8 +2,13 @@ package rawDeepLearningClassifier.dlClassification.archiveModel;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
 
 import org.jamdev.jdl4pam.ArchiveModel;
 import org.jamdev.jdl4pam.genericmodel.GenericModelParams;
@@ -190,6 +195,13 @@ public class ArchiveModelWorker extends DLModelWorker<GenericPrediction> {
 	 * @throws IOException
 	 */
 	public ArchiveModel loadModel(String currentPath2) throws MalformedModelException, IOException {
+		//note the the model should have been check for compatibility beforehand
+		File file = new File(currentPath2);
+		
+		String model = getZipFilePath(file, ".py");  
+		if (model==null) model = getZipFilePath(file, ".pb"); 
+		String settings = getZipFilePath(file, ".pdtf");  
+
 		return new SimpleArchiveModel(new File(currentPath2)); 
 	}
 
@@ -247,6 +259,33 @@ public class ArchiveModelWorker extends DLModelWorker<GenericPrediction> {
 	@Override
 	public boolean isModelNull() {
 		return dlModel==null;
+	}
+	
+	/**
+	 * Find the first file within a zip folder that matches a pattern. 
+	 * @param zipFile - uri to the zip file
+	 * @param filePattern - the file pattern to match - the file must contain this string. 
+	 * @return null if no file found and the file pqth if the file is founf
+	 * @throws ZipException
+	 * @throws IOException
+	 */
+	static String getZipFilePath(File zipFileIn, String filePattern) throws ZipException, IOException {
+			
+		try (ZipFile zipFile = new ZipFile(zipFileIn)) {
+		    Enumeration<? extends ZipEntry> entries = zipFile.entries();
+		    //this iterates through all files, including in sub folders. 
+		    while (entries.hasMoreElements()) {
+		        ZipEntry entry = entries.nextElement();
+		        // Check if entry is a directory
+		        if (!entry.isDirectory()) {
+		           //System.out.println(entry); 
+		           if (entry.getName().contains(filePattern)) {
+		        	   return entry.getName();
+		           }
+		        }
+		    }
+		}
+		return null;
 	}
 
 

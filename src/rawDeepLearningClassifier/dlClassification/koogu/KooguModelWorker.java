@@ -9,6 +9,12 @@ import org.jamdev.jdl4pam.koogu.KooguModel;
 import ai.djl.MalformedModelException;
 import rawDeepLearningClassifier.dlClassification.archiveModel.ArchiveModelWorker;
 
+/**
+ * The Koogu model worker. 
+ * 
+ * @author Jamie Macaulay
+ *
+ */
 public class KooguModelWorker extends ArchiveModelWorker {
 
 	

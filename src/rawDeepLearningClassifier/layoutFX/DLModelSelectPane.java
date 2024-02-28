@@ -375,12 +375,12 @@ public class DLModelSelectPane extends PamBorderPane {
 			
 			try {
 				//we are loading model from a file - anything can happen so put in a try catch. 
-				currentClassifierModel.setModel(file);
-				
-				if (currentClassifierModel.getModelStatus().isError()) {
+				DLStatus status = currentClassifierModel.setModel(file);
+			
+				if (status.isError()) {
 					System.err.println("Model load failed: " + currentClassifierModel.getModelStatus());
 					currentClassifierModel=null;
-					return DLStatus.MODEL_LOAD_FAILED;
+					return status;
 				}
 				
 				return DLStatus.MODEL_LOAD_SUCCESS;

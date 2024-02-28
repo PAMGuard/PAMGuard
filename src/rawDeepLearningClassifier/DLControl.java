@@ -34,7 +34,7 @@ import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
 import rawDeepLearningClassifier.dlClassification.DLClassifierChooser;
 import rawDeepLearningClassifier.dlClassification.DLClassifyProcess;
 import rawDeepLearningClassifier.dlClassification.animalSpot.SoundSpotClassifier;
-import rawDeepLearningClassifier.dlClassification.archiveModel.ZipModelClassifier;
+import rawDeepLearningClassifier.dlClassification.archiveModel.PamZipModelClassifier;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericDLClassifier;
 import rawDeepLearningClassifier.dlClassification.ketos.KetosClassifier2;
 import rawDeepLearningClassifier.dlClassification.koogu.KooguClassifier;
@@ -256,7 +256,8 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 		dlModels.add(new SoundSpotClassifier(this));
 		dlModels.add(new KetosClassifier2(this));
 		dlModels.add(new KooguClassifier(this));
-		dlModels.add(new ZipModelClassifier(this));
+		dlModels.add(new PamZipModelClassifier(this));
+		
 		//it is important the Generic Model is last because we need to check 
 		//for PG metadata in all other models before resorting to manually 
 		//setting up a model. 

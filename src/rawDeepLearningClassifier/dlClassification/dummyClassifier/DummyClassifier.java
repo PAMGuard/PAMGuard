@@ -94,9 +94,9 @@ public class DummyClassifier implements DLClassiferModel{
 	}
 
 	@Override
-	public void setModel(URI model) {
+	public DLStatus setModel(URI model) {
 		// TODO Auto-generated method stub
-		
+		return null;
 	}
 
 }

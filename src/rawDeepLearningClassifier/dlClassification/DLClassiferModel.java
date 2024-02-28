@@ -42,8 +42,9 @@ public interface DLClassiferModel {
 	
 	/**
 	 * Called whenever PAMGuard stops.
+	 * @return 
 	 */
-	public void setModel(URI model);
+	public DLStatus setModel(URI model);
 	
 	/**
 	 * Check whether a URI is compatible with a classification framework 

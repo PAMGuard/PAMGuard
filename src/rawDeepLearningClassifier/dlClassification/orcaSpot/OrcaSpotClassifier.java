@@ -358,9 +358,9 @@ public class OrcaSpotClassifier implements DLClassiferModel, PamSettings {
 	}
 
 	@Override
-	public void setModel(URI model) {
+	public DLStatus setModel(URI model) {
 		// TODO Auto-generated method stub
-		
+		return null;
 	}
 
 }
