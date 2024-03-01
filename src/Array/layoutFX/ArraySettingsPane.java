@@ -251,7 +251,7 @@ public class ArraySettingsPane extends SettingsPane<PamArray >{
 		fileChooser = new FileChooser();
 		fileChooser.setTitle("Open Resource File");
 		fileChooser.getExtensionFilters().addAll(
-				new ExtensionFilter("PAMNGuard Array Files", "*.paf"));
+				new ExtensionFilter("PAMGuard Array Files", "*.paf"));
 
 		PamButton importButton = new PamButton("Import..."); 
 		importButton.setOnAction((action)->{

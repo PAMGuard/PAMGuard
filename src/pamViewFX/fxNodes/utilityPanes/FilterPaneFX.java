@@ -242,13 +242,17 @@ public class FilterPaneFX extends SettingsPane<FilterParams> {
 		//			freqList.add(defaultFrequencyVals[i]); 
 		//		}
 
-		highCut=new PamSpinner<Double>(10.,500000.,2000.,2000.);
+		highCut=new PamSpinner<Double>(2.,500000.,2000.,2000.);
 		highCut.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 		highCut.getValueFactory().valueProperty().addListener((obs, before, after)->{
-			if (after>=lowPass.getValue()) highCut.getValueFactory().setValue(Math.max(10,lowPass.getValue()-100)); 
+			
+			if (after>=lowPass.getValue() && !lowPass.isDisable()) highCut.getValueFactory().setValue(Math.max(10,lowPass.getValue()-100)); 
 			if (after>sampleRate/2.) highCut.getValueFactory().setValue(sampleRate/2.); 
+			
 			filterParams.highPassFreq=highCut.getValue().floatValue();
-			this.updateBodeGraph();
+			
+			enableControls();
+			updateBodeGraph();
 		});
 		highCut.setEditable(true);
 		//highCut.setPrefColumnCount(6);
@@ -256,15 +260,20 @@ public class FilterPaneFX extends SettingsPane<FilterParams> {
 		gridPaneFreq.add(highCut, 1, 0);
 		gridPaneFreq.add(new Label("Hz"), 2, 0);
 
-		lowPass=new PamSpinner<Double>(10.,500000.,2000.,2000.);
+		lowPass=new PamSpinner<Double>(1.,500000.,2000.,2000.);
 		lowPass.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
+		
 		lowPass.getValueFactory().valueProperty().addListener((obs, before, after)->{
-			if (after<=highCut.getValue()) lowPass.getValueFactory().setValue(Math.min(sampleRate/2.,highCut.getValue()+100));
+			
+			if (after<=highCut.getValue() && !highCut.isDisable()) lowPass.getValueFactory().setValue(Math.min(sampleRate/2.,highCut.getValue()+100));
 			if (after>sampleRate/2.) lowPass.getValueFactory().setValue(sampleRate/2.); 
-			filterParams.lowPassFreq=lowPass.getValue().floatValue();
+			
+			filterParams.lowPassFreq=after.floatValue();
+			
 			enableControls();
-			this.updateBodeGraph();
+			updateBodeGraph();
 		});
+		
 		lowPass.setEditable(true);
 		//lowCut.setPrefColumnCount(6);
 		gridPaneFreq.add(new Label("Low Pass"), 0, 1);
@@ -416,12 +425,15 @@ public class FilterPaneFX extends SettingsPane<FilterParams> {
 		logScale = new PamRadioButton("Log Scale");
 		logScale.setOnAction((action)->{
 			setGraphLogAxis(logScale.isSelected());
+			updateBodeGraph();
 		});
+		
 		logScale.setToggleGroup(group);
 		linScale  = new PamRadioButton("Linear Scale");
 		linScale.setToggleGroup(group);
 		linScale.setOnAction((action)->{
 			setGraphLogAxis(!linScale.isSelected());
+			updateBodeGraph();
 		});
 
 		final PamHBox scalePane=new PamHBox(); 
@@ -482,7 +494,6 @@ public class FilterPaneFX extends SettingsPane<FilterParams> {
 	@Override
 	public void setParams(FilterParams filterParams) {
 		this.filterParams=filterParams.clone();
-
 		setSettings();
 	}
 
@@ -490,7 +501,7 @@ public class FilterPaneFX extends SettingsPane<FilterParams> {
 	 * Set controls to input params.
 	 */
 	private void setSettings() {
-
+		
 		if (filterParams == null) {
 			filterParams = new FilterParams();
 		}
@@ -529,11 +540,11 @@ public class FilterPaneFX extends SettingsPane<FilterParams> {
 			break;
 		}
 
-
 		//		highCut.setText(String.format("%1.1f", filterParams.highPassFreq));
-		highCut.getValueFactory().setValue(Double.valueOf(Float.valueOf(filterParams.highPassFreq).doubleValue()));
+		highCut.getValueFactory().setValue(Double.valueOf(filterParams.highPassFreq));
 		//		lowCut.setText(String.format("%1.1f", filterParams.lowPassFreq));
-		lowPass.getValueFactory().setValue(Double.valueOf(Float.valueOf(filterParams.lowPassFreq).doubleValue()));
+		lowPass.getValueFactory().setValue(Double.valueOf(filterParams.lowPassFreq));
+		
 
 		filterOrder.getValueFactory().setValue(filterParams.filterOrder);
 		setRippleParam();

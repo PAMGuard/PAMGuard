@@ -16,12 +16,14 @@ import PamguardMVC.PamRawDataBlock;
 import dataMap.filemaps.OfflineFileParameters;
 import decimator.DecimatorControl;
 import decimator.DecimatorParams;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Region;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
@@ -32,7 +34,7 @@ import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
 import pamViewFX.fxNodes.utilityPanes.FilterPaneFX;
 import pamViewFX.fxNodes.utilityPanes.SourcePaneFX;
-import pamViewFX.fxStyles.PamStylesManagerFX;
+import pamViewFX.validator.PamValidator;
 
 /**
  * 
@@ -43,9 +45,9 @@ import pamViewFX.fxStyles.PamStylesManagerFX;
  * 
  */
 public class DecimatorSettingsPane extends SettingsPane<DecimatorParams> {
-	
+
 	private DecimatorParams decimatorParams;
-	
+
 	private PamBorderPane mainPane;
 
 	/**
@@ -81,37 +83,44 @@ public class DecimatorSettingsPane extends SettingsPane<DecimatorParams> {
 
 	private OfflineDAQPane offlineDAQPaneFX;
 
+	private PamValidator validator = new PamValidator();
+
 	public DecimatorSettingsPane(DecimatorControl aquisitionControl) {
 		super(null);
-		
+
 		mainPane= new PamBorderPane();
 		this.decimatorControl = aquisitionControl;
 
 		mainPane.setCenter(createPane() );
-		
+
 	}
-	
+
 	private Region createPane() {
-		
+
 		PamVBox holder = new PamVBox();
 		holder.setSpacing(5);
-		
+
 		//		insets = new Insets(2,2,2,2);
-		
+
 		Label srcLabel = new Label("Decimator settings");
-		
+
 		PamGuiManagerFX.titleFont2style(srcLabel);
 		holder.getChildren().add(srcLabel);		
-			
+
 		sourcePanel = new SourcePaneFX( RawDataUnit.class, true, true);
 		sourcePanel.addSelectionListener((obsval, oldVal, newVal)->{
 			newDataSource();
+			//need to validate the interpolate too as this depends on the input sample rate. 
+			//validator.validate();
 		});
-		
-//		sourcePanel.addSourcePanelMonitor(new SPMonitor());
+		PamGuiManagerFX.titleFont2style(sourcePanel.getChannelLabel());
+
+		//		sourcePanel.addSourcePanelMonitor(new SPMonitor());
 		holder.getChildren().addAll(sourcePanel);		
-		
+
 		PamGridPane decimatorPane = new PamGridPane();
+		decimatorPane.setVgap(5);
+		decimatorPane.setHgap(5);
 
 		//Decimator Settings
 		Label label = new Label("Decimator settings");
@@ -123,63 +132,115 @@ public class DecimatorSettingsPane extends SettingsPane<DecimatorParams> {
 		decimatorPane.add(new Label("Source sample rate "), gridx, gridy);
 		gridx++;
 		decimatorPane.add(sourceSampleRate = new Label(" - Hz"),  gridx, gridy);
+		sourceSampleRate.setPadding(new Insets(0,0,0,5));
 		gridx = 0;
 		gridy ++;
-		
+
 		decimatorPane.add(new Label("Output sample rate "),  gridx, gridy);
 		gridx ++;
 		decimatorPane.add(newSampleRate = new TextField(),  gridx, gridy);
 		gridx ++;
 		decimatorPane.add(new Label(" Hz"),  gridx, gridy);
+
+		validator.createCheck()
+		.dependsOn("new_sample_rate", newSampleRate.textProperty())
+		.withMethod(c -> {
+			try {
+				String posVal = c.get("new_sample_rate");
+				if (posVal.isEmpty() || Double.valueOf(posVal)==null) {
+					c.error("The input for output sample rate is invalid");
+				}
+			}
+			catch (Exception e) {
+				c.error("The input for output sample rate is invalid");
+			}
+		})
+		.decorates(newSampleRate).immediate();
+
+		newSampleRate.textProperty().addListener((obsVal, oldVal, newval)->{
+			//need to validate the interpolate too as this depends on the sample rate. 
+			validator.validate();
+		});
+
+
 		gridy ++;
 		gridx = 0;
-//		gridwidth = 1;
-		
+		//		gridwidth = 1;
+
 		filterPaneFX = new FilterPaneFX();
-		decimatorPane.add(filterButton = new PamButton("Filter settings"),  gridx, gridy);
+		decimatorPane.add(new Label("Anti-aliasing filter"),  gridx, gridy);
+
+		gridx++;
+		decimatorPane.add(filterButton = new PamButton("Settings"),  gridx, gridy);
+		filterButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chart-bell-curve-cumulative"));
+
+
+		filterButton.setTooltip(new Tooltip("Set a custom anti-aliasing filter"));
 		filterButton.setOnAction((action)->{
 			selectFilters(filterButton);
 		});
-		PamGridPane.setColumnSpan(filterButton, 4);
 
-//		filterButton.addActionListener(new FilterButton());
-		gridx = 1;
-//		gridwidth = 2;
-		
-		
+		//		filterButton.addActionListener(new FilterButton());
+		gridx = 2;
+		//		gridwidth = 2;
+
+
 		decimatorPane.add(defaultFilterButton = new PamButton(),  gridx, gridy);
 		defaultFilterButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-cog-refresh",PamGuiManagerFX.iconSize));
+		defaultFilterButton.setTooltip(new Tooltip("Set the default anti-aliasing filter"));
 		defaultFilterButton.setOnAction((action)->{
-			 restoreDefaultSettings();
+			restoreDefaultSettings();
 		});
-		
-		gridx = 0;
+
+		gridx = 1;
 		gridy++;
-		decimatorPane.add(filterInfo = new Label("Filter: "),  gridx, gridy);
+		decimatorPane.add(filterInfo = new Label(""),  gridx, gridy);
 		PamGridPane.setColumnSpan(filterInfo, 3);
 
 		gridx = 0;
-//		gridwidth = 1;
+		//		gridwidth = 1;
 		gridy++;
-		
-		Label interpLabel = new  Label("Interpolation: "); 
+
+		Label interpLabel = new  Label("Interpolation"); 
 
 		decimatorPane.add(interpLabel,  gridx, gridy);
 		gridx++;
-//		gridx += gridwidth;
-//		gridwidth = 2;
+		//		gridx += gridwidth;
+		//		gridwidth = 2;
 		decimatorPane.add(interpolator = new ComboBox<String>(),  gridx, gridy);
 		interpolator.getItems().add("None");
 		interpolator.getItems().add("Linear");
 		interpolator.getItems().add("Quadratic");
-		
+
+		validator.createCheck()
+		.dependsOn("new_sample_rate", interpolator.getSelectionModel().selectedIndexProperty())
+		.withMethod(c -> {
+			//the selected index
+			int selectedIndex = c.get("new_sample_rate");
+			try {
+				float sampleRate = java.lang.Float.valueOf(newSampleRate.getText());
+				String warning = decimatorInterpWarning(selectedIndex,  sampleRate);
+
+				if (warning!=null) {
+					c.warn(warning);
+				}
+
+			}
+			catch (Exception e) {
+				return;
+			}
+		})
+		.decorates(interpolator).immediate();
+
 		holder.getChildren().add(decimatorPane); 
-//
+
+
+		//the viewer mode. 
 		isViewer = PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW;
 		Region mainPane;
 		if (isViewer) {
 			TabPane tabbedPane = new TabPane();
-			
+
 			offlineDAQPaneFX= new OfflineDAQPane(decimatorControl);
 
 			tabbedPane.getTabs().add(new Tab("Offline Files",offlineDAQPaneFX.getContentNode()));
@@ -189,44 +250,48 @@ public class DecimatorSettingsPane extends SettingsPane<DecimatorParams> {
 		else {
 			mainPane = holder;
 		}
-//		
-//		setHelpPoint("sound_processing.decimatorHelp.docs.decimator_decimator");
-//		filterButton.setToolTipText("Manual adjustment of filter settings");
-//		defaultFilterButton.setToolTipText("Set a default filter (6th order Butterworth low pass at Decimator Nyquist frequency)");
-//		interpolator.setToolTipText("If Decimation / upsampling is not by an integer value, you should use interpolation to improve waveform reconstruction");
-		
+
+		//		
+		//		setHelpPoint("sound_processing.decimatorHelp.docs.decimator_decimator");
+		//		filterButton.setToolTipText("Manual adjustment of filter settings");
+		//		defaultFilterButton.setToolTipText("Set a default filter (6th order Butterworth low pass at Decimator Nyquist frequency)");
+		//		interpolator.setToolTipText("If Decimation / upsampling is not by an integer value, you should use interpolation to improve waveform reconstruction");
+
 		return mainPane;
 	}
-	
+
 	private void selectFilters(PamButton button) {
-		float filtSampleRate = Math.max(inputSampleRate, getOutputSampleRate());
 		
+		float filtSampleRate = Math.max(inputSampleRate, getOutputSampleRate());
+
 		PopOver popOver = new PopOver(); 
 
 		popOver.setContentNode(filterPaneFX.getContentNode());
-		
-		filterPaneFX.setParams(decimatorParams.filterParams);
+
 		filterPaneFX.setSampleRate(filtSampleRate);
-		
+
+		if (decimatorParams.filterParams==null) {
+			restoreDefaultSettings();
+		}
+
 		popOver.setOnHidden((e)->{
-			if (decimatorParams.filterParams==null) {
-				restoreDefaultSettings();
-			}
-			
+
 			FilterParams newFP = filterPaneFX.getParams(decimatorParams.filterParams);
-		
+
 			if (newFP != null) {
 				decimatorParams.filterParams = newFP.clone();
 			}
-			
+
 			sayFilter();
 
 		});
 
+		filterPaneFX.setParams(decimatorParams.filterParams);
+		//show the filter paramters
 		popOver.show(button);
 	}
 
-	
+
 	/**
 	 * display filter information
 	 */
@@ -235,11 +300,11 @@ public class DecimatorSettingsPane extends SettingsPane<DecimatorParams> {
 			filterInfo.setText("No filter");
 		}
 		else {
-			filterInfo.setText("Filter: " + decimatorParams.filterParams.toString());
+			filterInfo.setText(decimatorParams.filterParams.toString());
 		}		
 	}
-	
-	
+
+
 	private float getOutputSampleRate() {
 		try {
 			float fs = Float.valueOf(newSampleRate.getText());
@@ -249,8 +314,8 @@ public class DecimatorSettingsPane extends SettingsPane<DecimatorParams> {
 			return inputSampleRate;
 		}
 	}
-	
-	
+
+
 	public void restoreDefaultSettings() {
 		/*
 		 *  does not set the output sample rate, but does set sensible values for the 
@@ -274,7 +339,7 @@ public class DecimatorSettingsPane extends SettingsPane<DecimatorParams> {
 		decimatorParams.filterParams.filterType = FilterType.BUTTERWORTH;
 		decimatorParams.filterParams.filterOrder = 6;
 		decimatorParams.filterParams.filterBand = FilterBand.LOWPASS;
-		
+
 		sayFilter();
 	}
 
@@ -282,7 +347,7 @@ public class DecimatorSettingsPane extends SettingsPane<DecimatorParams> {
 	@Override
 	public DecimatorParams getParams(DecimatorParams currParams) {
 		try {
-//			ArrayList<PamDataBlock> rawBlocks = PamController.getInstance().getRawDataBlocks();
+			//			ArrayList<PamDataBlock> rawBlocks = PamController.getInstance().getRawDataBlocks();
 			decimatorParams.rawDataSource =  sourcePanel.getSource().getDataName();
 			decimatorParams.channelMap = sourcePanel.getChannelList();
 			decimatorParams.newSampleRate = java.lang.Float.valueOf(newSampleRate.getText());
@@ -291,15 +356,15 @@ public class DecimatorSettingsPane extends SettingsPane<DecimatorParams> {
 			PamDialogFX.showWarning("There is an unknown error - get in touch with PMAGuard support. ");
 			return null;
 		}
-		
+
 		if (decimatorParams.rawDataSource == null) {
-			 PamDialogFX.showWarning("You must select a raw data source");
-			 return null;
+			PamDialogFX.showWarning("You must select a raw data source");
+			return null;
 		}
-		
+
 		if (decimatorParams.channelMap == 0) {
-			 PamDialogFX.showWarning("You must select at least one channel for decimation");
-			 return null;
+			PamDialogFX.showWarning("You must select at least one channel for decimation");
+			return null;
 		}
 
 		if (offlineDAQPaneFX != null) {
@@ -309,36 +374,58 @@ public class DecimatorSettingsPane extends SettingsPane<DecimatorParams> {
 			}
 			decimatorControl.getOfflineFileServer().setOfflineFileParameters(ofp);
 		}
-		
+
 		decimatorParams.interpolation = interpolator.getSelectionModel().getSelectedIndex();
-		boolean isInt = decimatorControl.isIntegerDecimation(sourcePanel.getSource().getSampleRate(), decimatorParams.newSampleRate);
-		if (isInt && decimatorParams.interpolation > 0) {
-			int ans = WarnOnce.showWarning("Decimator", "With in / out sample rate ratio equal to a whole number, there is no need to interpolate", WarnOnce.OK_CANCEL_OPTION);
-			if (ans == WarnOnce.CANCEL_OPTION) {
-				return null;
-			}
-			else {
-				decimatorParams.interpolation = 0;
-			}
-		}
-		if (!isInt && decimatorParams.interpolation == 0) {
-			int ans = WarnOnce.showWarning("Decimator", "With in / out sample rate ratio NOT equal to a whole number, it is recommended that you use linear or quadratic interpolation", 
-					WarnOnce.OK_CANCEL_OPTION);
-			if (ans == WarnOnce.CANCEL_OPTION) {
-				return null;
-			}
-			else {
-//				decimatorParams.interpolation = 0;
-			}
-		}
-		
+
+		//		boolean isInt = decimatorControl.isIntegerDecimation(sourcePanel.getSource().getSampleRate(), decimatorParams.newSampleRate);
+		//		if (isInt && decimatorParams.interpolation > 0) {
+		//			int ans = WarnOnce.showWarning("Decimator", "With in / out sample rate ratio equal to a whole number, there is no need to interpolate", WarnOnce.OK_CANCEL_OPTION);
+		//			if (ans == WarnOnce.CANCEL_OPTION) {
+		//				return null;
+		//			}
+		//			else {
+		//				decimatorParams.interpolation = 0;
+		//			}
+		//		}
+		//		if (!isInt && decimatorParams.interpolation == 0) {
+		//			int ans = WarnOnce.showWarning("Decimator", "With in / out sample rate ratio NOT equal to a whole number, it is recommended that you use linear or quadratic interpolation", 
+		//					WarnOnce.OK_CANCEL_OPTION);
+		//			if (ans == WarnOnce.CANCEL_OPTION) {
+		//				return null;
+		//			}
+		//			else {
+		////				decimatorParams.interpolation = 0;
+		//			}
+		//		}
+
 		return decimatorParams;
+	}
+
+
+	/**
+	 * Check if the selected interpolator should be used. If not, returning a warning string. 
+	 * @param interpSelection - the interpolator selection
+	 * @param sampleRate - the sample rate. 
+	 * @return a warning if one is needed. Null if not. 
+	 */
+	private String decimatorInterpWarning(int interpSelection, float sampleRate) {
+		boolean isInt = decimatorControl.isIntegerDecimation(sourcePanel.getSource().getSampleRate(), sampleRate);
+		String warningString = null;
+		if (isInt && interpSelection > 0) {
+			warningString = "With in / out sample rate ratio equal to a whole number, there is no need to interpolate";
+
+		}
+		if (!isInt && interpSelection == 0) {
+			warningString = "With in / out sample rate ratio NOT equal to a whole number, it is recommended that you use linear or quadratic interpolation";
+
+		}
+		return warningString;
 	}
 
 	@Override
 	public void setParams(DecimatorParams input) {
 		this.decimatorParams = input.clone();
-		
+
 		sourcePanel.excludeDataBlock(decimatorControl.getDecimatorProcess().getOutputDataBlock(0), true);
 		sourcePanel.setSourceList();
 		PamRawDataBlock currentBlock = PamController.getInstance().getRawDataBlock(decimatorParams.rawDataSource);
@@ -351,7 +438,8 @@ public class DecimatorSettingsPane extends SettingsPane<DecimatorParams> {
 		}
 		interpolator.getSelectionModel().select(decimatorParams.interpolation);
 		sayFilter();
-		
+		validator.validate();
+
 	}
 
 	@Override
@@ -367,9 +455,9 @@ public class DecimatorSettingsPane extends SettingsPane<DecimatorParams> {
 	@Override
 	public void paneInitialized() {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	private void newDataSource() {
 		PamDataBlock block = sourcePanel.getSource();
 		if (block != null) {
