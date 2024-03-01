@@ -65,7 +65,7 @@ public class PamZipModelClassifier extends ArchiveModelClassifier {
 	}
 	
 	/**
-	 * Find the first file within a zip folder that matches a pattern. 
+	 * Find the first file within a zip folder that matches a pattern. This peaks into the zip file instead of decompressing it. 
 	 * @param zipUri - uri to the zip file
 	 * @param filePattern - the file pattern to match - the file must contain this string. 
 	 * @return null if no file found and the file pqth if the file is founf

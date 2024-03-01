@@ -33,19 +33,21 @@ public class GenericModelWorker extends DLModelWorker<GenericPrediction> {
 	@Override
 	public float[] runModel(float[][][] transformedDataStack) {
 		//System.out.println("RUN GENERIC MODEL: " + transformedDataStack.length +  "  " + transformedDataStack[0].length +  "  " + transformedDataStack[0][0].length);
-		//System.out.println("RUN GENERIC MODEL: " + transformedDataStack[0][0][0]);
+//		System.out.println("RUN GENERIC MODEL: " + transformedDataStack[0][0][0]);
 		float[]  results; 
 		if (freqTransform)
-			results =  genericModel.runModel(transformedDataStack);
+			results =  getModel().runModel(transformedDataStack);
 		else {
 			//run a model if it is waveform info. 
 			float[][] waveStack = new float[transformedDataStack.length][]; 
 			for (int i=0; i<waveStack.length; i++) {
 				waveStack[i] = transformedDataStack[i][0]; 
 			}
-			results =  genericModel.runModel(waveStack);
+			
+			//System.out.println("RUN GENERIC MODEL WAVE: " + transformedDataStack.length +  "  " + transformedDataStack[0].length);
+			results =  getModel().runModel(waveStack);
 		}
-		System.out.println("GENERIC MODEL RESULTS: " + results== null ? null : results.length);
+		//System.out.println("GENERIC MODEL RESULTS: " + results== null ? null : results.length);
 		return results;
 	}
 
@@ -97,13 +99,7 @@ public class GenericModelWorker extends DLModelWorker<GenericPrediction> {
 			setModelTransforms(genericParams.dlTransfroms); 
 
 			//is this a waveform or a spectrogram model?
-			DLTransform transform = genericParams.dlTransfroms.get(genericParams.dlTransfroms.size()-1); 
-			if (transform instanceof FreqTransform) {
-				freqTransform = true; 
-			}
-			else {
-				freqTransform = false; 
-			}
+			setWaveFreqModel(genericParams);
 			
 			//use softmax or not?
 			String extension = FilenameUtils.getExtension(genericParams.modelPath);
@@ -129,6 +125,18 @@ public class GenericModelWorker extends DLModelWorker<GenericPrediction> {
 		}
 		
 		//Thread.currentThread().setContextClassLoader(origCL);
+	}
+	
+	
+	protected void setWaveFreqModel(StandardModelParams genericParams) {
+		//is this a waveform or a spectrogram model?
+		DLTransform transform = genericParams.dlTransfroms.get(genericParams.dlTransfroms.size()-1); 
+		if (transform instanceof FreqTransform) {
+			freqTransform = true; 
+		}
+		else {
+			freqTransform = false; 
+		}	
 	}
 	
 	/**

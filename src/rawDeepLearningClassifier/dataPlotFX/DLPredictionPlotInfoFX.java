@@ -94,7 +94,7 @@ public class DLPredictionPlotInfoFX extends GenericLinePlotInfo {
 		if (getDlControl().getDLModel()!=null) {
 			DLClassName[] classNames = getDlControl().getDLModel().getClassNames();
 
-			System.out.println("Class names are: !!! " + (classNames == null ? "null" : classNames.length)); 
+//			System.out.println("Class names are: !!! " + (classNames == null ? "null" : classNames.length)); 
 
 			if (classNames!=null) {
 
@@ -357,8 +357,8 @@ public class DLPredictionPlotInfoFX extends GenericLinePlotInfo {
 			updateClassNames();
 			break;
 		}
-		
-		
+
 	}
+	
 
 }

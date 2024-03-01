@@ -240,23 +240,6 @@
 			<url>file://${project.basedir}/repo</url>
 		</repository>
 		
-	  	<!-- Repo for Jamie's code -->
-	  	<!-- IMPORTANT: SOMEHOW THIS REPO INTERFERES WITH THE
-	  		JAVAFX DEPENDENCIES.  Don't understand how, but it
-	  		does.  If Maven is not downloading the JavaFX dependencies
-	  		and is instead throwing errors, try commenting out this
-	  		repository.  Let Maven download the JavaFX files, and
-	  		then uncomment this repo again.
-	  		Same thing seems to be occurring if I try to update the postgresql library. -->
-<!-- 		<repository> -->
-<!-- 			<snapshots> -->
-<!-- 				<enabled>false</enabled> -->
-<!-- 			</snapshots> -->
-<!-- 	        <id>central</id> -->
-<!--             <name>a0u0ltozdsehx-artifactory-primary-0-releases</name> -->
-<!--             <url>https://jmachund.jfrog.io/artifactory/jpam2</url> -->
-<!-- 		</repository>  -->
-		
 	    <!-- Repo for netCDF -->
 	    <repository>
 	        <snapshots>

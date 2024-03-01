@@ -2,12 +2,16 @@ package rawDeepLearningClassifier.dlClassification.animalSpot;
 
 import java.io.File;
 import org.controlsfx.control.CheckComboBox;
+import org.controlsfx.control.IndexedCheckModel;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.ToggleSwitch;
 
 import PamController.SettingsPane;
 import PamUtils.PamArrayUtils;
 import PamView.dialog.warn.WarnOnce;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener.Change;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -25,6 +29,7 @@ import pamViewFX.fxNodes.PamGridPane;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamSpinner;
 import pamViewFX.fxNodes.PamVBox;
+import pamViewFX.validator.PamValidator;
 import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
 
 /**
@@ -101,6 +106,8 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 	 * Model indicator. 
 	 */
 	private ProgressIndicator modelLoadIndicator;
+	
+	PamValidator validator;
 
 
 
@@ -191,9 +198,35 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 		gridPane.add(new Label(""), 2, 0);
 		speciesIDBox = new CheckComboBox<String>(); 
 		gridPane.add(speciesIDBox, 3, 0);
-		speciesIDBox.setMaxWidth(100);
-		speciesIDBox.setPrefWidth(100);
+		//speciesIDBox.setMaxWidth(100);
+//		speciesIDBox.setPrefWidth(100);
 		speciesIDBox.prefHeightProperty().bind(detectionSpinner.heightProperty());
+		
+		validator = new PamValidator();
+		
+		final SimpleIntegerProperty checkItemsCount = new SimpleIntegerProperty(); 
+		
+		speciesIDBox.getCheckModel().getCheckedItems().addListener((Change<? extends String> c)->{
+			checkItemsCount.set(speciesIDBox.getCheckModel().getCheckedItems().size());
+		});
+		
+
+        validator.createCheck()
+          .dependsOn("species_box",checkItemsCount)
+          .withMethod(c -> {
+        	int nChecked = c.get("species_box");
+        	
+        	if (nChecked==speciesIDBox.getItems().size()) {
+                c.warn("All output class are checked. If one of these classes is noise then PAMGuard will continually detect all sound data...");
+        	}
+        	
+            if (nChecked==0) {
+              c.warn("No output classes are checked for binary classification. PAMGuard will save all prediction values but no detections will be generated");
+            }
+          })
+          .decorates(speciesIDBox)
+          .immediate();
+        ;
 
 		vBoxHolder = new PamVBox(); 
 		vBoxHolder.setSpacing(5);

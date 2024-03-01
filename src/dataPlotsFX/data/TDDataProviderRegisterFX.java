@@ -80,6 +80,7 @@ public class TDDataProviderRegisterFX {
 	 */
 	synchronized public TDDataProviderFX findDataProvider(PamDataBlock pamDataBlock) {
 		for (TDDataProviderFX aProvider:dataProviders) {
+//			System.out.println("Data providers: " + aProvider.getName() + " | " + aProvider.getDataBlock() +  " | "  +pamDataBlock);
 			if (aProvider.getDataBlock()==pamDataBlock) {
 				return aProvider;
 			}

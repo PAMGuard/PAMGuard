@@ -732,13 +732,6 @@ public abstract class TDDataInfoFX {
 	}
 
 	/**
-	 * @return the pamDataBlock
-	 */
-	protected PamDataBlock getPamDataBlock() {
-		return pamDataBlock;
-	}
-
-	/**
 	 * @return the tdDataProvider
 	 */
 	protected TDDataProviderFX getTdDataProvider() {

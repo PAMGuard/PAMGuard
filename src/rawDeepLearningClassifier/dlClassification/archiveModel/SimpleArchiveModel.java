@@ -28,7 +28,7 @@ public class SimpleArchiveModel extends ArchiveModel {
 	@Override
 	public String getAudioReprRelPath(String zipFolder) {
 		try {
-			System.out.println("SETTINGS PATH: " + getRelFilePath(zipFolder, ".pdtf"));
+			//System.out.println("SETTINGS PATH: " + getRelFilePath(zipFolder, ".pdtf"));
 			return  getRelFilePath(zipFolder, ".pdtf");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -43,7 +43,7 @@ public class SimpleArchiveModel extends ArchiveModel {
 			String model = null;
 			model = getRelFilePath(zipFolder, ".pb");
 			if (model==null) model = getRelFilePath(zipFolder, ".py");
-			System.out.println("MODEL PATH: " +model);
+			//System.out.println("MODEL PATH: " +model);
 			return model;
 
 		} catch (IOException e) {
@@ -64,14 +64,16 @@ public class SimpleArchiveModel extends ArchiveModel {
 		  try (Stream<Path> walk = Files.walk(Paths.get(zipFolder))) {
 		      List<String> result = walk
 		              .filter(p -> !Files.isDirectory(p))   // not a directory
-		              .map(p -> p.toString().toLowerCase()) // convert path to string
+		              .map(p -> p.toString()) // convert path to string
 		              .filter(f -> f.endsWith(fileEnd))       // check end with
 		              .collect(Collectors.toList());        // collect all matched to a List
 		      
 		      if (result.size()>0) {
 		      String firstFile = result.get(0); 
 		      
-		      String relative = new File(zipFolder).toURI().relativize(new File(firstFile).toURI()).getPath();
+		     //System.out.println("First file: " +firstFile);
+		      
+		      String relative = firstFile.replace(zipFolder, "");
 		      
 		      return relative;
 		      }

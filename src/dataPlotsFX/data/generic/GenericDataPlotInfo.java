@@ -294,7 +294,7 @@ public class GenericDataPlotInfo extends TDDataInfoFX {
 	 * do some which may be associated with other annotations ? 
 	 */
 	protected void updateAvailability() {
-		LocalisationInfo locInfo = getPamDataBlock().getLocalisationContents();
+		LocalisationInfo locInfo = getDataBlock().getLocalisationContents();
 		bearingScaleInfo.setAvailable(locInfo.hasLocContent(LocContents.HAS_BEARING));
 		slantScaleInfo.setAvailable(locInfo.hasLocContent(LocContents.HAS_BEARING));
 	}

@@ -275,7 +275,7 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 		TDDataProviderRegisterFX.getInstance()
 				.registerDataInfo(new DLDetectionPlotProvider(this, dlClassifyProcess.getDLDetectionDatablock()));
 		TDDataProviderRegisterFX.getInstance()
-				.registerDataInfo(new DLPredictionProvider(this, dlClassifyProcess.getDLDetectionDatablock()));
+				.registerDataInfo(new DLPredictionProvider(this, dlClassifyProcess.getDLPredictionDataBlock()));
 
 		// register the DD display
 		DDPlotRegister.getInstance()

@@ -32,6 +32,8 @@ public class KetosWorker2 extends ArchiveModelWorker {
 	public GenericModelParams makeModelParams(String jsonString) {
 		//ketos parameters are non standard and need a bit of extra work to get right. 
 		//This also deal with legacy paramters. 
-		return new KetosParams(jsonString); 
+		KetosParams params =  new KetosParams(jsonString); 
+//		System.out.println(params); 
+		return params;
 	}
 }

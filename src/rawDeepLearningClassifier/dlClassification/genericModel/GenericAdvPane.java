@@ -184,7 +184,6 @@ public class GenericAdvPane extends SettingsPane<GenericModelParams> {
 		defualtShapeSwitch = new PamToggleSwitch("Use model default shape"); 
 		defualtShapeSwitch.selectedProperty().addListener((obsval, oldval, newval)->{
 
-			System.out.println("Hello: deafult shape: " + newval);
 			PamArrayUtils.printArray( currentInput.defaultShape);
 
 			if (newval) {

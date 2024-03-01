@@ -20,8 +20,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
@@ -48,7 +50,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 
 	public static double MAX_WIDTH = 270; 
-	
+
 	/**
 	 * The source for the FFT data source.  
 	 */
@@ -64,10 +66,10 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	 */
 	private PamBorderPane mainPane;
 
-//	/**
-//	 * Combo box which allows users to select model. 
-//	 */
-//	private ComboBox<String> dlModelBox;
+	//	/**
+	//	 * Combo box which allows users to select model. 
+	//	 */
+	//	private ComboBox<String> dlModelBox;
 
 	/**
 	 * The window length spinner for the segmenter process
@@ -112,9 +114,9 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	private Label infoLabel;
 
 	private DLModelSelectPane modelSelectPane;
-	
 
-	
+
+
 	public DLSettingsPane(DLControl dlControl){
 		super(null); 
 		this.dlControl=dlControl; 
@@ -126,19 +128,19 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		//			stage.sizeToScene();
 		//		});
 		//		this.setTop(newButton);
-		
-		
+
+
 		mainPane=new PamBorderPane(); 
 		mainPane.setCenter(createDLPane());
 		mainPane.setPadding(new Insets(5,5,5,5));
-		
+
 		if (!PamGUIManager.isFX()){
 			mainPane.setMinHeight(430);
 			mainPane.setMaxWidth(MAX_WIDTH);
 			mainPane.setPrefWidth(MAX_WIDTH);
 		}
 		//this.getAdvPane().setMaxWidth(MAX_WIDTH);
-		
+
 
 		//mainPane.getStylesheets().add(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getDialogCSS()); 
 
@@ -162,14 +164,14 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		vBox.getChildren().add(sourcePane);
 		sourcePane.prefWidthProperty().bind(vBox.widthProperty());
 		sourcePane.setMaxWidth(Double.MAX_VALUE);
-		
+
 		sourcePane.getDataBlockBox().setOnAction((action)->{
 			//need to create a data selector if one exists. 
 			this.dlControl.createDataSelector(getSelectedParentDataBlock()); 
 			//enable the controls to show a data selector or not. 
 			enableControls(); 
 		});
-		
+
 		//create the detection
 		vBox.getChildren().add(createDataSelectorPane());
 
@@ -193,14 +195,14 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		hopLength.valueProperty().addListener((obsVal, oldVal, newVal)->{
 			setSegInfoLabel(); 
 		});
-		
+
 		reMergeSeg =    new PamSpinner<Integer>(0, Integer.MAX_VALUE, 1,  1); 
 		reMergeSeg.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 		reMergeSeg.setEditable(true);
 
 		//button to set default hop size
 		Button defaultButton = new Button();
-//		defaultButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.REFRESH, PamGuiManagerFX.iconSize-3));
+		//		defaultButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.REFRESH, PamGuiManagerFX.iconSize-3));
 		defaultButton.setGraphic(PamGlyphDude.createPamIcon("mdi2r-refresh", PamGuiManagerFX.iconSize-3));
 		defaultButton.setTooltip(new Tooltip("Set default hop size"));
 		defaultButton.setOnAction((action)->{
@@ -208,6 +210,14 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		});
 
 		PamGridPane segmenterGridPane = new PamGridPane(); 
+		segmenterGridPane.setHgap(5);
+
+		ColumnConstraints col1 = new ColumnConstraints();
+		col1.setHgrow( Priority.SOMETIMES );
+		ColumnConstraints col2 = new ColumnConstraints();
+		col2.setHgrow( Priority.ALWAYS );
+		segmenterGridPane.getColumnConstraints().addAll(col1, col2 );
+
 		segmenterGridPane.add(new Label("Window length"), 0, 0);
 		segmenterGridPane.add(windowLength, 1, 0);
 		segmenterGridPane.add(new Label("samples"), 2, 0);
@@ -222,40 +232,40 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		segmenterGridPane.add(new Label("segments"), 2, 2);
 
 		vBox.getChildren().add(segmenterGridPane);
-		
+
 		vBox.getChildren().add(infoLabel = new Label());
 
 
 		Label label2 = new Label("Deep Learning Model"); 
 		label2.setPadding(new Insets(5,0,0,0));
 		PamGuiManagerFX.titleFont2style(label2);
-		
+
 		vBox.getChildren().add(label2);
-		
+
 		/**
 		 * Pane which allows users to select a model type. 
 		 */
-		 modelSelectPane = new DLModelSelectPane(this); 
+		modelSelectPane = new DLModelSelectPane(this); 
 
-//		//add the possible deep learning models. 
-//		dlModelBox= new ComboBox<String>();
-//		for (int i=0; i<dlControl.getDLModels().size(); i++) {
-//			dlModelBox.getItems().add(dlControl.getDLModels().get(i).getName()); 
-//		}
-//		dlModelBox.prefWidthProperty().bind(vBox.widthProperty());
-//
-//		dlModelBox.setOnAction((action)->{
-//			setClassifierPane(); 
-//			if (mainPane!=null) {
-//				if (mainPane.getScene().getWindow() instanceof Stage) {
-//					Stage stage = (Stage) mainPane.getScene().getWindow();
-//					stage.sizeToScene();
-//				}
-//			}
-//			//this.dlControl.getAnnotationType().getSymbolModifier(symbolChooser).
-//		});
-//
-//		vBox.getChildren().add(dlModelBox);
+		//		//add the possible deep learning models. 
+		//		dlModelBox= new ComboBox<String>();
+		//		for (int i=0; i<dlControl.getDLModels().size(); i++) {
+		//			dlModelBox.getItems().add(dlControl.getDLModels().get(i).getName()); 
+		//		}
+		//		dlModelBox.prefWidthProperty().bind(vBox.widthProperty());
+		//
+		//		dlModelBox.setOnAction((action)->{
+		//			setClassifierPane(); 
+		//			if (mainPane!=null) {
+		//				if (mainPane.getScene().getWindow() instanceof Stage) {
+		//					Stage stage = (Stage) mainPane.getScene().getWindow();
+		//					stage.sizeToScene();
+		//				}
+		//			}
+		//			//this.dlControl.getAnnotationType().getSymbolModifier(symbolChooser).
+		//		});
+		//
+		//		vBox.getChildren().add(dlModelBox);
 
 		classifierPane = new PamBorderPane(); 
 
@@ -265,7 +275,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		return vBox; 
 	}
 
-	
+
 	/**
 	 * Create the data selector. 
 	 * @return the data selector. 
@@ -274,13 +284,13 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		dataSelectorPane = new PamHBox();
 		dataSelectorPane.setSpacing(5);
 		dataSelectorPane.setAlignment(Pos.CENTER_LEFT);
-		
+
 		dataSelectorCheckBox = new PamToggleSwitch("Detection Selector"); 
 		dataSelectorCheckBox.selectedProperty().addListener((obsval, oldval, newval)->{
 			enableControls(); 
 		});
 		dataSelectorButton = new PamButton();
-//		dataSelectorButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.SETTINGS, PamGuiManagerFX.iconSize));
+		//		dataSelectorButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.SETTINGS, PamGuiManagerFX.iconSize));
 		dataSelectorButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconSize));
 		dataSelectorButton.setOnAction((action)->{
 			showAdvPane();
@@ -288,7 +298,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		dataSelectorPane.getChildren().addAll(dataSelectorCheckBox, dataSelectorButton);
 		return dataSelectorPane; 
 	}
-	
+
 	/**
 	 * Set extra information in the info label. 
 	 */
@@ -306,7 +316,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		}
 		infoLabel.setText(text);
 	}
-	
+
 	/**
 	 * Creates pane allowing the user to change fine scale things such as error limits. 
 	 * @return the pop over pane. 
@@ -327,7 +337,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 		popOver.show(dataSelectorButton);
 	} 
-	
+
 	/**
 	 * Enable the controls. 
 	 */
@@ -338,10 +348,10 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 			//^bit messy but cannot think of a better way to do it. 
 			this.dataSelectorPane.setVisible(false);
 		}
-		
+
 		dataSelectorButton.setDisable(!dataSelectorCheckBox.isSelected());
 	}
-	
+
 
 
 	/**
@@ -368,9 +378,9 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	protected void setClassifierPane() {
 		//set the classifier Pane.class 
 		if (modelSelectPane.currentClassifierModel!=null && modelSelectPane.currentClassifierModel.getModelUI()!=null) {
-			
+
 			classifierPane.setCenter(modelSelectPane.currentClassifierModel.getModelUI().getSettingsPane().getContentNode()); 
-			
+
 			if (modelSelectPane.currentClassifierModel!=null) {
 				modelSelectPane.currentClassifierModel.getModelUI().setParams(); 
 			}
@@ -400,8 +410,8 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		}
 
 		sourcePane.getParams(currParams.groupedSourceParams);
-		
-//		currParams.modelSelection = dlModelBox.getSelectionModel().getSelectedIndex(); 
+
+		//		currParams.modelSelection = dlModelBox.getSelectionModel().getSelectedIndex(); 
 
 		if (windowLength.getValue() == 0 || hopLength.getValue()==0){
 			Platform.runLater(()->{
@@ -413,8 +423,8 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		currParams.rawSampleSize = windowLength.getValue(); 
 		currParams.sampleHop = hopLength.getValue(); 
 		currParams.maxMergeHops = reMergeSeg.getValue(); 
-		
-		
+
+
 		if (modelSelectPane.currentClassifierModel == null) {
 			currParams.modelSelection = -1; 
 		}
@@ -423,28 +433,28 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		}
 
 
-//		//update any changes
-//		if (this.dlControl.getDLModels().get(dlModelBox.getSelectionModel().getSelectedIndex()).getModelUI()!=null){
-//			this.dlControl.getDLModels().get(dlModelBox.getSelectionModel().getSelectedIndex()).getModelUI().getParams(); 
-//			
-//			//display any warnings from the settings. 
-//			ArrayList<PamWarning> warnings = this.dlControl.getDLModels().get(dlModelBox.getSelectionModel().getSelectedIndex()).checkSettingsOK();
-//			showWarnings(warnings); 
-//			
-//			for (int i=0; i<warnings.size(); i++) {
-//				if (warnings.get(i).getWarnignLevel()>1) {
-//					//Serious error. Do not close dialog. 
-//					return null; 
-//				}
-//			}
-//		}
-		
+		//		//update any changes
+		//		if (this.dlControl.getDLModels().get(dlModelBox.getSelectionModel().getSelectedIndex()).getModelUI()!=null){
+		//			this.dlControl.getDLModels().get(dlModelBox.getSelectionModel().getSelectedIndex()).getModelUI().getParams(); 
+		//			
+		//			//display any warnings from the settings. 
+		//			ArrayList<PamWarning> warnings = this.dlControl.getDLModels().get(dlModelBox.getSelectionModel().getSelectedIndex()).checkSettingsOK();
+		//			showWarnings(warnings); 
+		//			
+		//			for (int i=0; i<warnings.size(); i++) {
+		//				if (warnings.get(i).getWarnignLevel()>1) {
+		//					//Serious error. Do not close dialog. 
+		//					return null; 
+		//				}
+		//			}
+		//		}
+
 		currParams.useDataSelector = dataSelectorCheckBox.isSelected(); 
 		if (dlControl.getDataSelector()!=null) {
 			dlControl.getDataSelector().getDialogPaneFX().getParams(true); 
 		}
-		
-		
+
+
 		//need to make sure we call get params for the current model when the oK button is pressed. 
 		if (this.modelSelectPane.currentClassifierModel!=null) {
 			if (this.modelSelectPane.currentClassifierModel.getModelUI()!=null) {
@@ -453,16 +463,16 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		}
 
 		currParams.modelURI = this.modelSelectPane.currentSelectedFile; 
-		
+
 		return currParams;
 	}
-	
-	
+
+
 	public static PamWarning statusToWarnings(DLStatus dlStatus) {
 		PamWarning pamWarning = new PamWarning(dlStatus.getName(), dlStatus.getDescription(), dlStatus.isError() ? 2 : 1);
 		return pamWarning;
 	}
-	
+
 	/**
 	 * Show a warning dialog for the status
 	 * @param the status to show
@@ -472,7 +482,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		dlWarnings.add(statusToWarnings(dlWarning)); 
 		showWarning(dlWarnings); 
 	}
-	
+
 	/**
 	 * Show a warning dialog. 
 	 * @param the warning to show.
@@ -489,12 +499,12 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	 * @param dlWarnings - list of warnings - the most important will be shown. 
 	 */
 	public void showWarning(ArrayList<PamWarning> dlWarnings) {
-		
+
 		if (dlWarnings==null || dlWarnings.size()<1) return; 
-		
+
 		String warnings ="";
-	
-		
+
+
 		boolean error = false; 
 		for (int i=0; i<dlWarnings.size(); i++) {
 			warnings += dlWarnings.get(i).getWarningMessage() + "\n\n";
@@ -502,14 +512,14 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 				error=true; 
 			}
 		}
-		
+
 		final String warningsF = warnings; 
 		final boolean errorF = error; 
 		Platform.runLater(()->{
 			WarnOnce.showWarningFX(null,  "Deep Learning Settings Warning",  warningsF , errorF ? AlertType.ERROR : AlertType.WARNING);
-//			WarnOnce.showWarning( "Deep Learning Settings Warning",  warningsF , WarnOnce.WARNING_MESSAGE);
+			//			WarnOnce.showWarning( "Deep Learning Settings Warning",  warningsF , WarnOnce.WARNING_MESSAGE);
 		});
-		
+
 		//user presses OK - these warnings are just a message - they do not prevent running the module.
 	}
 
@@ -518,35 +528,35 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 		sourcePane.setParams(currParams.groupedSourceParams);
 		sourcePane.sourceChanged();
-	
-		
+
+
 		dlControl.createDataSelector(sourcePane.getSource());
-		
+
 		//set the classifier model. 
 		if (currParams.modelURI  !=null) {
 			modelSelectPane.currentClassifierModel = dlControl.getDLModel(); 
 		}
 
-//		dlModelBox.getSelectionModel().select(currParams.modelSelection);
+		//		dlModelBox.getSelectionModel().select(currParams.modelSelection);
 		windowLength.getValueFactory().setValue(currParams.rawSampleSize);
 
 		hopLength.getValueFactory().setValue(currParams.sampleHop);
 
 		reMergeSeg.getValueFactory().setValue(currParams.maxMergeHops);
-		
+
 		dataSelectorCheckBox.setSelected(currParams.useDataSelector);
 
 		setClassifierPane(); 
-		
+
 		enableControls(); 
-		
+
 		setSegInfoLabel();
-	
-//		//set up the model and the custom pane if necessary.  
+
+		//		//set up the model and the custom pane if necessary.  
 		this.modelSelectPane.loadNewModel(currParams.modelURI); 
 		//this.modelSelectPane.updatePathLabel(); 
 		this.setClassifierPane();
-		
+
 		//For some reason, in the FX GUI, this causes a root used in multiple scenes exceptions...not sure why. 
 		Platform.runLater(()->{
 			sourcePane.getChannelValidator().validate();
@@ -598,23 +608,23 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	 */
 	public void setSegmentLength(Double defaultSegmentLen) {
 		if (defaultSegmentLen==null) return;
-		
-		
+
+
 		double sR = getDLControl().getSettingsPane().getSelectedParentDataBlock().getSampleRate(); 
-		
+
 		System.out.println("Set the segment length: " + defaultSegmentLen + " sR " + sR);
 
 		//automatically set the default segment length. 
 		getDLControl().getSettingsPane().getSegmentLenSpinner().getValueFactory().setValue((int) (sR*defaultSegmentLen/1000.));
 	}
-	
+
 	/**
 	 * Convenience class to set the hop length in samples from milliseconds
 	 * @param defaultSegmentLen - the segment length in milliseconds. 
 	 */
 	public void setHopLength(Double hopLength) {
 		if (hopLength==null) return;
-		
+
 		double sR = getDLControl().getSettingsPane().getSelectedParentDataBlock().getSampleRate(); 
 		//automatically set the default segment length. 
 		getDLControl().getSettingsPane().getHopLenSpinner().getValueFactory().setValue((int) (sR*hopLength/1000.));

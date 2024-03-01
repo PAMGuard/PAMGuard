@@ -377,6 +377,7 @@ public class DLModelSelectPane extends PamBorderPane {
 				//we are loading model from a file - anything can happen so put in a try catch. 
 				DLStatus status = currentClassifierModel.setModel(file);
 			
+
 				if (status.isError()) {
 					System.err.println("Model load failed: " + currentClassifierModel.getModelStatus());
 					currentClassifierModel=null;
@@ -437,7 +438,7 @@ public class DLModelSelectPane extends PamBorderPane {
 			pathLabel.setText("No classifier model loaded: Select model");
 			pathLabel.setTooltip(new Tooltip("Use the browse button/ URI botton to select a model or select a default model"));
 		}
-		if (currentClassifierModel.getModelStatus().isError()) {
+		else if (currentClassifierModel.getModelStatus().isError()) {
 			pathLabel.setGraphic(createErrorIcon(currentClassifierModel.getModelStatus()));
 			pathLabel.setText(currentClassifierModel.getModelStatus().getName());
 			pathLabel.setTooltip(new Tooltip(currentClassifierModel.getModelStatus().getDescription()));

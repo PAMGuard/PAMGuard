@@ -121,13 +121,12 @@ public class GenericDLClassifier extends StandardClassifierModel {
 		
 		genericModelParams.dlTransfromParams=dlTransformParams; 
 		
-		if (genericModelParams.dlTransfromParams!=null) {
-			System.out.println("Generic settings have been saved. : " + genericModelParams.dlTransfromParams.size()); 
-		}		
-		else {
-			System.out.println("Generic settings have been saved. : " + null); 
-
-		}
+//		if (genericModelParams.dlTransfromParams!=null) {
+//			System.out.println("Generic settings have been saved. : " + genericModelParams.dlTransfromParams.size()); 
+//		}		
+//		else {
+//			System.out.println("Generic settings have been saved. : " + null); 
+//		}
 		
 		return genericModelParams;
 	}
@@ -211,6 +210,8 @@ public class GenericDLClassifier extends StandardClassifierModel {
 	 */
 	public static boolean isBinaryResult(GenericPrediction modelResult, StandardModelParams genericModelParams) {
 		for (int i=0; i<modelResult.getPrediction().length; i++) {
+						//System.out.println("Binary Classification: "  + genericModelParams.binaryClassification.length); 
+
 			if (modelResult.getPrediction()[i]>genericModelParams.threshold && genericModelParams.binaryClassification[i]) {
 				//				System.out.println("SoundSpotClassifier: prediciton: " + i + " passed threshold with val: " + modelResult.getPrediction()[i]); 
 				return true; 

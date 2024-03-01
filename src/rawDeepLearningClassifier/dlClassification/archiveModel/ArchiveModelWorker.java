@@ -14,15 +14,18 @@ import org.jamdev.jdl4pam.ArchiveModel;
 import org.jamdev.jdl4pam.genericmodel.GenericModelParams;
 import org.jamdev.jdl4pam.transforms.DLTransform;
 import org.jamdev.jdl4pam.transforms.DLTransformsFactory;
+import org.jamdev.jdl4pam.transforms.FreqTransform;
 import org.jamdev.jdl4pam.transforms.jsonfile.DLTransformParser2;
 import org.jamdev.jdl4pam.transforms.jsonfile.DLTransformsParser;
 import org.json.JSONObject;
 
+import PamUtils.PamArrayUtils;
 import PamView.dialog.warn.WarnOnce;
 import ai.djl.MalformedModelException;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
+import rawDeepLearningClassifier.dlClassification.genericModel.GenericModelWorker;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
 
 /**
@@ -33,7 +36,7 @@ import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction
  * @author Jamie Macaulay 
  *
  */
-public class ArchiveModelWorker extends DLModelWorker<GenericPrediction> {
+public class ArchiveModelWorker extends GenericModelWorker {
 
 
 	/**
@@ -57,6 +60,7 @@ public class ArchiveModelWorker extends DLModelWorker<GenericPrediction> {
 	/**
 	 * Prepare the model 
 	 */
+	@Override
 	public void prepModel(StandardModelParams dlParams, DLControl dlControl) {
 		//ClassLoader origCL = Thread.currentThread().getContextClassLoader();
 		try {
@@ -96,10 +100,11 @@ public class ArchiveModelWorker extends DLModelWorker<GenericPrediction> {
 
 			//read the JSON string from the the file. 
 			String jsonString  = DLTransformsParser.readJSONString(new File(dlModel.getAudioReprFile()));
+			
 
 			//convert the JSON string to a parameters object. 
 			GenericModelParams modelParams = makeModelParams( jsonString);
-
+			
 			//important to add this for Ketos models because the JSON string does not necessarily contain and output shape. 
 			//System.out.println("----Default output shape: " + ketosParams.defaultOutputShape + "  " + ketosModel.getOutShape()); 
 			if (modelParams.defaultOutputShape==null) {
@@ -108,6 +113,7 @@ public class ArchiveModelWorker extends DLModelWorker<GenericPrediction> {
 
 			//HACK there seems to be some sort of bug in ketos where the params input shape is correct but the model input shape is wrong. 
 			if (dlModel.getInputShape()==null || !dlModel.getInputShape().equals(modelParams.defaultInputShape)) {
+				System.out.println("Model input shape: " + modelParams.defaultInputShape);
 				WarnOnce.showWarning("Model shape", "The model shape does not match the model metadata. \n Metadata shape will be used used.", WarnOnce.OK_OPTION);
 				dlModel.setInputShape(modelParams.defaultInputShape);
 			}
@@ -131,26 +137,35 @@ public class ArchiveModelWorker extends DLModelWorker<GenericPrediction> {
 
 			//only load new transforms if defaults are selected
 			if (getModelTransforms()==null || dlParams.dlTransfroms==null || dlParams.useDefaultTransfroms) {
-				System.out.println("  " + transforms); 
-				//System.out.println("SET MODEL TRANSFORMS: " + ketosDLParams.dlTransfroms + "  " +  ketosDLParams.useDefaultTransfroms); 
-
 				//only set the transforms if they are null - otherwise handled elsewhere. 
 				setModelTransforms(transforms); 
 				dlParams.useDefaultTransfroms = true; 
+				dlParams.dlTransfroms=transforms;
 			}
 			else {
-				//System.out.println("SET CURRENT TRANSFORMS: " + ketosDLParams.dlTransfroms + "  " +  ketosDLParams.useDefaultTransfroms); 
 				//use the old transforms. 
 				setModelTransforms(dlParams.dlTransfroms); 
 			}
+			
+			//set whether a wave or spectrogram model 
+			//this is important for setting the input stack into the model.
+			 setWaveFreqModel(dlParams);
+			
+//			//enable softmax? - TODO
+//			this.setEnableSoftMax(true);
 
 			//ketosDLParams.dlTransfroms = transforms; //this is done after prep model in the settings pane. 
-			dlParams.defaultSegmentLen = modelParams.segLen*1000.; //the segment length in microseconds. 
-			//ketosParams.classNames = new String[] {"Noise", "Right Whale"}; // FIXME; 
-
+			dlParams.defaultSegmentLen = modelParams.segLen; //the segment length in microseconds. 
+			
+			if (modelParams.classNames!=null) {
+				dlParams.numClasses =  modelParams.classNames.length;
+			}
+			else {
+				dlParams.numClasses = (int) modelParams.defaultOutputShape.get(1);
+			}
 
 			//ok 0 the other values are not user selectable but this is. If we relaod the same model we probably want to keep it....
-			//So this is a little bt of a hack but will probably be OK in most cases. 
+			//So this is a little bit of a hack but will probably be OK in most cases. 
 			if (dlParams.binaryClassification==null || dlParams.binaryClassification.length!=dlParams.numClasses) {
 				dlParams.binaryClassification = new boolean[dlParams.numClasses]; 
 				for (int i=0; i<dlParams.binaryClassification.length; i++) {
@@ -165,19 +180,6 @@ public class ArchiveModelWorker extends DLModelWorker<GenericPrediction> {
 				//set the number of class names from the default output shape
 				dlParams.numClasses = (int) modelParams.defaultOutputShape.get(1);
 			}
-
-			//							if (dlParams.classNames!=null) {
-			//								for (int i = 0; i<dlParams.classNames.length; i++) {
-			//									System.out.println("Class name " + i + "  "  + dlParams.classNames[i]); 
-			//								}
-			//							}
-			//				ketosDLParams.classNames = dlControl.getClassNameManager().makeClassNames(ketosParams.classNames); 
-			//										if (ketosParams.classNames!=null) {
-			//											for (int i = 0; i<ketosDLParams.classNames.length; i++) {
-			//												System.out.println("Class name " + i + "  "  + ketosDLParams.classNames[i].className + " ID " + ketosDLParams.classNames[i].ID ); 
-			//											}
-			//										}
-
 		}
 		catch (Exception e) {
 			dlModel=null; 
@@ -195,13 +197,6 @@ public class ArchiveModelWorker extends DLModelWorker<GenericPrediction> {
 	 * @throws IOException
 	 */
 	public ArchiveModel loadModel(String currentPath2) throws MalformedModelException, IOException {
-		//note the the model should have been check for compatibility beforehand
-		File file = new File(currentPath2);
-		
-		String model = getZipFilePath(file, ".py");  
-		if (model==null) model = getZipFilePath(file, ".pb"); 
-		String settings = getZipFilePath(file, ".pdtf");  
-
 		return new SimpleArchiveModel(new File(currentPath2)); 
 	}
 
@@ -225,11 +220,11 @@ public class ArchiveModelWorker extends DLModelWorker<GenericPrediction> {
 
 
 
-	@Override
-	public float[] runModel(float[][][] transformedDataStack) {
-		System.out.println("Model input: " + transformedDataStack.length + "  " + transformedDataStack[0].length + " " + transformedDataStack[0][0].length);
-		return dlModel.runModel(transformedDataStack);
-	}
+//	@Override
+//	public float[] runModel(float[][][] transformedDataStack) {
+//		System.out.println("Model input: " + transformedDataStack.length + "  " + transformedDataStack[0].length + " " + transformedDataStack[0][0].length);
+//		return dlModel.runModel(transformedDataStack);
+//	}
 
 
 	@Override
@@ -252,6 +247,7 @@ public class ArchiveModelWorker extends DLModelWorker<GenericPrediction> {
 	 * Get the currently loaded mode. 
 	 * @return - the currently loaded mode. 
 	 */
+	@Override
 	public ArchiveModel getModel() {
 		return dlModel;
 	}

@@ -167,7 +167,7 @@ public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 	}
 	
 	/**
-	 * Create the parameters class for the model. This can be overridden for bespoke parameters. 
+	 *Create the parameters class for the model. This can be overridden for bespoke parameters. 
 	 *classes. 
 	 * @return a new parameters class object. 
 	 */

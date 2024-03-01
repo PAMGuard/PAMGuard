@@ -23,8 +23,9 @@ import rawDeepLearningClassifier.dataPlotFX.LineInfo;
 
 
 /**
- * A Data Info which plots 1D line data i.e. usually used to plot continuous 1D data e.g. deep learning predictions, 
- * Ishmael data, click trigger data. 
+ * A Data Info which plots 1D line data i.e. usually used to plot continuous 1D
+ * data e.g. deep learning predictions, Ishmael data, click trigger data.
+ * 
  * @author Jamie Macaulay
  *
  */
@@ -94,7 +95,7 @@ public abstract class GenericLinePlotInfo extends TDDataInfoFX {
 		}
 
 		//use the center of the window for plotting
-		double timeMillis = pamDataUnit.getTimeMilliseconds(); 
+		double timeMillis = pamDataUnit.getTimeMilliseconds()+pamDataUnit.getDurationInMilliseconds()/2; 
 		double tC=tdProjector.getTimePix(timeMillis-scrollStart);
 
 
