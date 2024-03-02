@@ -165,7 +165,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	/**
 	 * The current PAM status
 	 */
-	private transient int pamStatus = PAM_IDLE;
+	private volatile int pamStatus = PAM_IDLE;
 
 	/**
 	 * PamGuard view params. 
@@ -1382,6 +1382,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * @param sayEmpties dump info even if a buffer is empty (otherwise, only ones that have stuff still)
 	 */
 	public void dumpBufferStatus(String message, boolean sayEmpties) {
+		if (2 >1) return;
 		System.out.println("**** Dumping process buffer status: " + message);
 		ArrayList<PamControlledUnit> pamControlledUnits = pamConfiguration.getPamControlledUnits();
 		for (PamControlledUnit aUnit : pamControlledUnits) {
@@ -1430,7 +1431,6 @@ public class PamController implements PamControllerInterface, PamSettings {
 				pamControlledUnits.get(iU).flushDataBlockBuffers(2000);
 			}
 		}
-		setPamStatus(PAM_IDLE);
 		dumpBufferStatus("In pamStopped, now idle", true);
 
 		// wait here until the status has changed to Pam_Idle, so that we know
@@ -1454,6 +1454,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 		
 		long stopTime = PamCalendar.getTimeInMillis();
 		saveEndSettings(stopTime);
+
+		setPamStatus(PAM_IDLE);
 		
 		// no good having this here since it get's called at the end of every file. 
 //		if (GlobalArguments.getParam(PamController.AUTOEXIT) != null) {
@@ -2064,7 +2066,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 		/*
 		 * This only get's called once when set idle at viewer mode startup. 
 		 */
-//		System.out.printf("*******   PamController.setPamStatus to %d, real status is %d\n",  pamStatus, getRealStatus());
+		System.out.printf("*******   PamController.setPamStatus to %d, real status is %d set in thread %s\n",  
+				pamStatus, getRealStatus(), Thread.currentThread().toString());
 		if (getRunMode() != RUN_PAMVIEW) {
 			TopToolBar.enableStartButton(pamStatus == PAM_IDLE);
 			TopToolBar.enableStopButton(pamStatus == PAM_RUNNING);
