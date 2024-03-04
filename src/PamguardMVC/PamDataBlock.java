@@ -2164,7 +2164,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 */
 	@Override
 	public String toString() {
-		return getDataName();
+		return getLongDataName();
 	}
 
 	/**
