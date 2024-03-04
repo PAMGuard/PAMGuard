@@ -367,7 +367,7 @@ public class MHTKernel<T> {
 			});
 			}
 			catch (Exception e) {
-				System.out.printf("*******  MHTKernel Exception %s in pruneProbMatrix: %s\n", e.getClass().getSimpleName(), e.getMessage());
+				System.out.printf("Handled  MHTKernel Exception %s in pruneProbMatrix: %s\n", e.getClass().getSimpleName(), e.getMessage());
 			}
 
 			//			for (int i=0; i<newPossibleTracks.size(); i++) {

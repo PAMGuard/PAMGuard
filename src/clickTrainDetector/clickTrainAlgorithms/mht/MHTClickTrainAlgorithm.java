@@ -45,6 +45,7 @@ public class MHTClickTrainAlgorithm implements ClickTrainAlgorithm, PamSettings 
 	
 	public static final String MHT_NAME = "MHT detector"; 
 	
+	
 	/**
 	 * Reference to the click train control. 
 	 */
@@ -382,7 +383,7 @@ public class MHTClickTrainAlgorithm implements ClickTrainAlgorithm, PamSettings 
 		}
 		}
 		catch (Exception e) {
-			System.out.printf("*******  MHTClickTrainAlgorithm Exception %s in grabDoneTrains: %s\n", e.getClass().getSimpleName(), e.getMessage());
+			System.out.printf("Handled MHTClickTrainAlgorithm Exception %s in grabDoneTrains: %s\n", e.getClass().getSimpleName(), e.getMessage());
 		}
 		
 		if (nTracks>0) Debug.out.println("-------------------------------------------------");
