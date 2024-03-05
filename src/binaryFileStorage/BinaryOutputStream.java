@@ -451,7 +451,7 @@ public class BinaryOutputStream {
 		footer.setHighestUID(parentDataBlock.getUidHandler().getCurrentUID());
 		boolean ok = footer.writeFooter(dataOutputStream, BinaryStore.getCurrentFileFormat());
 		if (noiseOutputStream != null) {
-			footer.setnObjects(storedNoiseCount);
+//			footer.setnObjects(storedNoiseCount);
 			ok &= footer.writeFooter(noiseOutputStream, BinaryStore.getCurrentFileFormat());
 		}
 		lastObjectType = BinaryTypes.FILE_FOOTER;
