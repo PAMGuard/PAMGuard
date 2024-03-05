@@ -1,4 +1,4 @@
-package dataPlotsFX.overlaymark.menuOptions.RExport;
+package export.RExport;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +44,6 @@ public class RExportManager {
 //				System.out.println(" dataUnits.get(j).getClass(): " + dataUnits.get(j).getClass());
 //				System.out.println(" mlDataUnitsExport.get(i).getUnitClass(): " + mlDataUnitsExport.get(i).getUnitClass());
 				if (mlDataUnitsExport.get(i).getUnitClass().isAssignableFrom(dataUnits.get(j).getClass())) {
-					
 					return true; 
 				}
 			}

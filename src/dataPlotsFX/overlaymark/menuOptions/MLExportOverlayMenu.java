@@ -1,29 +1,28 @@
-package dataPlotsFX.overlaymark.menuOptions.MLExport;
+package dataPlotsFX.overlaymark.menuOptions;
 
 import java.io.File;
 import java.util.ArrayList;
 
 import detectiongrouplocaliser.DetectionGroupSummary;
+import export.MLExport.MLDetectionsManager;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxGlyphs.PamSVGIcon;
 import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
+import us.hebi.matlab.mat.format.Mat5;
+import us.hebi.matlab.mat.format.Mat5File;
+import us.hebi.matlab.mat.types.Struct;
 
 import java.io.IOException;
 import javax.swing.filechooser.FileSystemView;
 
-import com.jmatio.io.MatFileWriter;
-import com.jmatio.types.MLArray;
-
 import PamUtils.PamCalendar;
 import PamView.paneloverlay.overlaymark.OverlayMark;
 import PamguardMVC.PamDataUnit;
-import dataPlotsFX.overlaymark.menuOptions.ExportOverlayMenu;
 
 /**
  * Export to MATLAB .mat files menu. 
@@ -121,8 +120,8 @@ public class MLExportOverlayMenu extends ExportOverlayMenu {
 			dataUnits.add(fnDataUnit);
 		}
 
-		ArrayList<MLArray> mlData=mlDetectionsManager.dataUnits2MAT(dataUnits);
-		if (mlData==null || mlData.size()==0){
+		Struct mlData=mlDetectionsManager.dataUnits2MAT(dataUnits);
+		if (mlData==null || mlData.getNumRows()==0){
 			//do nothing
 			System.out.println("MLExportOverlayMenu: no data units were converted to structs");
 		}
@@ -142,8 +141,8 @@ public class MLExportOverlayMenu extends ExportOverlayMenu {
 			long millisStart=foundDataUnits.getFirstTimeMillis();
 			String currentPath = PamCalendar.formatFileDateTime(millisStart, false);
 			//add data types to the filename
-			for (int i=0 ;i<mlData.size(); i=i+2 ){//bit of a hack but every second name is the samplerate so leave that out of filename.  
-				currentPath=currentPath + "_" + mlData.get(i).getName(); 
+			for (int i=0 ;i<mlData.getFieldNames().size(); i=i+2 ){//bit of a hack but every second name is the samplerate so leave that out of filename.  
+				currentPath=currentPath + "_" + mlData.getFieldNames().get(i); 
 			}
 			//add correct file type.	
 			currentPath = currentPath + ".mat";
@@ -159,7 +158,11 @@ public class MLExportOverlayMenu extends ExportOverlayMenu {
 				//				}
 				//				System.out.println("--------------");
 
-				MatFileWriter filewrite=new MatFileWriter(currentPath, mlData);
+				Mat5File matFile = Mat5.newMatFile();
+				matFile.addArray("pam_data", mlData);
+				
+				Mat5.writeToFile(matFile, currentPath);
+				
 				super.showConfirmOverlay(currentPath, "MATLAB");
 
 			} catch (IOException e1) {

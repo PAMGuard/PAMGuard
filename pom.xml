@@ -588,12 +588,6 @@
 	    <version>1.6.2</version>
 	</dependency>
 
-	<!-- https://mvnrepository.com/artifact/com.diffplug.matsim/matfilerw -->
-	<dependency>
-	    <groupId>com.diffplug.matsim</groupId>
-	    <artifactId>matfilerw</artifactId>
-	    <version>3.1.1</version>
-	</dependency>
 
 	<!-- https://mvnrepository.com/artifact/com.drewnoakes/metadata-extractor -->
 	<dependency>

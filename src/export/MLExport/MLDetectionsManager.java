@@ -1,13 +1,17 @@
-package dataPlotsFX.overlaymark.menuOptions.MLExport;
+package export.MLExport;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.protobuf.compiler.PluginProtos.CodeGeneratorResponse.File;
 import com.jmatio.types.MLArray;
 import com.jmatio.types.MLDouble;
 import com.jmatio.types.MLStructure;
 
 import PamguardMVC.PamDataUnit;
+import export.PamExportManager;
+import us.hebi.matlab.mat.format.Mat5;
+import us.hebi.matlab.mat.types.Struct;
 
 
 /**
@@ -15,7 +19,9 @@ import PamguardMVC.PamDataUnit;
  * @author Jamie Macaulay 
  *
  */
-public class MLDetectionsManager {
+public class MLDetectionsManager implements PamExportManager {
+	
+	public static final String extension = "mat";
 
 	/**
 	 * 
@@ -28,7 +34,17 @@ public class MLDetectionsManager {
 		mlDataUnitsExport.add(new MLClickExport()); 
 		mlDataUnitsExport.add(new MLWhistleMoanExport()); 
 		mlDataUnitsExport.add(new MLRawExport()); 
+	}
+	
+	@Override
+	public boolean hasCompatibleUnits(Class dataUnitType) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
+	@Override
+	public boolean exportData(File fileName, List<PamDataUnit> dataUnits) {
+		return false;
 	}
 
 	/**
@@ -57,13 +73,13 @@ public class MLDetectionsManager {
 	 * @param dataUnits - a list of data units to convert to matlab structures. 
 	 * @return list of list of MATLAB strucutures ready for saving to .mat file. 
 	 */
-	public ArrayList<MLArray> dataUnits2MAT(ArrayList<PamDataUnit> dataUnits){
+	public Struct dataUnits2MAT(List<PamDataUnit> dataUnits){
 
 		//ArrayList<ArrayList<PamDataUnit>> struct = new ArrayList<ArrayList<PamDataUnit>>(); 		
 		//if there's a mixed bunch of data units then we want separate arrays of structures. So a structure of arrays of structures.
 		//so, need to sort compatible data units.  		
-
-		ArrayList<MLArray> list = new ArrayList<MLArray>();
+	
+		Struct list = Mat5.newStruct();
 
 		//keep a track of the data units that have been transcribed. This means data units that are multiple types
 		//(e.g. a raw data holder and click) are not added to two different list of structures. 
@@ -85,15 +101,19 @@ public class MLDetectionsManager {
 			if (n==0) continue; //no need to do anything else. There are no data units of this type. 
 
 			//create a structure for each type of data unit. 
-			MLStructure mlStructure= new MLStructure(mlDataUnitsExport.get(i).getName(), new int[]{n, 1}); 
+			Struct mlStructure= Mat5.newStruct(new int[]{n, 1});
+					
 			float sampleRate = -1;
+			
 
 			n=0; 
 			//allocate the class now. 
 			for (int j=0; j<dataUnits.size(); j++){
 				//check whether the same. 
 				if (mlDataUnitsExport.get(i).getUnitClass().isAssignableFrom(dataUnits.get(j).getClass()) && !alreadyStruct[j]) {
+					
 					mlStructure=mlDataUnitsExport.get(i).detectionToStruct(mlStructure, dataUnits.get(j), n); 
+					
 					sampleRate = dataUnits.get(j).getParentDataBlock().getSampleRate(); 
 					n++; 
 					alreadyStruct[j] = true;
@@ -103,19 +123,24 @@ public class MLDetectionsManager {
 			}
 
 			if (n>=1) {
-				list.add(mlStructure);
-				list.add(new MLDouble((mlDataUnitsExport.get(i).getName()+"_sR"), new double[] {sampleRate}, 1)); 
+				list.set(mlDataUnitsExport.get(i).getName(),mlStructure);
+				list.set(mlDataUnitsExport.get(i).getName()+"_sR", Mat5.newScalar(sampleRate)); 
 			}
 
 
 		}
 
-
-
 		//now ready to save. 
 		return list; 
 
 	}
+
+	@Override
+	public String getFileExtension() {
+		return extension;
+	}
+
+	
 
 
 }

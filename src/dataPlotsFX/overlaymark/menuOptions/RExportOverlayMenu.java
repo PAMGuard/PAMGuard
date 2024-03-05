@@ -1,4 +1,4 @@
-package dataPlotsFX.overlaymark.menuOptions.RExport;
+package dataPlotsFX.overlaymark.menuOptions;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,9 +14,9 @@ import PamUtils.PamCalendar;
 
 import PamView.paneloverlay.overlaymark.OverlayMark;
 import PamguardMVC.PamDataUnit;
-import dataPlotsFX.overlaymark.menuOptions.ExportOverlayMenu;
-import dataPlotsFX.overlaymark.menuOptions.RExport.RExportManager.RData;
 import detectiongrouplocaliser.DetectionGroupSummary;
+import export.RExport.RExportManager;
+import export.RExport.RExportManager.RData;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;

@@ -1,45 +1,45 @@
-package dataPlotsFX.overlaymark.menuOptions.MLExport;
+package export.MLExport;
 
-import com.jmatio.types.MLDouble;
-import com.jmatio.types.MLInt32;
-import com.jmatio.types.MLInt64;
-import com.jmatio.types.MLStructure;
+import org.jamdev.jdl4pam.utils.DLMatFile;
 
 import PamUtils.PamArrayUtils;
+import us.hebi.matlab.mat.format.Mat5;
+import us.hebi.matlab.mat.types.Matrix;
+import us.hebi.matlab.mat.types.Struct;
 import whistlesAndMoans.ConnectedRegionDataUnit;
 import whistlesAndMoans.SliceData;
 
 public class MLWhistleMoanExport extends MLDataUnitExport<ConnectedRegionDataUnit> {
 
 	@Override
-	public MLStructure addDetectionSpecificFields(MLStructure mlStruct, ConnectedRegionDataUnit dataUnit, int index) {
+	public Struct addDetectionSpecificFields(Struct mlStruct, int index, ConnectedRegionDataUnit dataUnit) {
 		
 		//date
 		//MLInt64 date = new MLInt64(null, new Long[]{dataUnit.getTimeMilliseconds()}, 1);
 
 		//nSlices int
-		MLInt32 nSlices = new MLInt32(null, new Integer[]{dataUnit.getConnectedRegion().getNumSlices()}, 1);
+		Matrix nSlices = Mat5.newScalar(dataUnit.getConnectedRegion().getNumSlices());
 		
 		//list of structures: sliceNumber int, nPeaks int, peakData
-		MLStructure sliceDataStruct = createSliceStruct(dataUnit); 
+		Struct sliceDataStruct = createSliceStruct(dataUnit); 
 		
 		int[][] contourData = calcPeakContourWidths( dataUnit); 
 
 		//contour int[]
-		MLInt32 contour = new MLInt32(null, new int[][]{contourData[0]}); 
+		Matrix contour = DLMatFile.array2Matrix(new int[][]{contourData[0]}); 
 
 		//contour width double[]		
-		MLInt32 contourWidth = new MLInt32(null,  new int[][]{contourData[1]}); 
+		Matrix contourWidth =  DLMatFile.array2Matrix(new int[][]{contourData[1]}); 
 
 		//mean width 
-		MLDouble meanWidth = new MLDouble(null, new Double[]{PamArrayUtils.mean(contourData[0])}, 1); 
+		Matrix meanWidth =  DLMatFile.array2Matrix(new double[]{PamArrayUtils.mean(contourData[0])}); 
 
 		
-		mlStruct.setField("nSlices", nSlices, index);
-		mlStruct.setField("sliceData", sliceDataStruct, index);
-		mlStruct.setField("contour", contour, index);
-		mlStruct.setField("contourWidth", contourWidth, index);
-		mlStruct.setField("meanWidth", meanWidth, index);
+		mlStruct.set("nSlices", index, nSlices);
+		mlStruct.set("sliceData",  index, sliceDataStruct);
+		mlStruct.set("contour",  index, contour);
+		mlStruct.set("contourWidth", index, contourWidth);
+		mlStruct.set("meanWidth",  index, meanWidth);
 		
 		return mlStruct;
 	}
@@ -78,14 +78,16 @@ public class MLWhistleMoanExport extends MLDataUnitExport<ConnectedRegionDataUni
 	 * @param dataUnit
 	 * @return
 	 */
-	private MLStructure createSliceStruct(ConnectedRegionDataUnit dataUnit){
+	private Struct createSliceStruct(ConnectedRegionDataUnit dataUnit){
 		
-		MLStructure mlStructure= new MLStructure("sliceData", new int[]{dataUnit.getConnectedRegion().getSliceData().size(), 1}); 
+//		Struct mlStructure= new MLStructure("sliceData", new int[]{dataUnit.getConnectedRegion().getSliceData().size(), 1}); 
+
+		Struct mlStructure= Mat5.newStruct();
 
 		//the start sample.
-		MLInt32 sliceNumber;
-		MLInt32 nPeaks;
-		MLInt32 peakData;
+		Matrix sliceNumber;
+		Matrix nPeaks;
+		Matrix peakData;
 		SliceData sliceData; 
 		for (int i=0; i<dataUnit.getConnectedRegion().getSliceData().size(); i++){
 
@@ -93,17 +95,17 @@ public class MLWhistleMoanExport extends MLDataUnitExport<ConnectedRegionDataUni
 			sliceData= dataUnit.getConnectedRegion().getSliceData().get(i); 
 
 			//the start sample.
-			sliceNumber = new MLInt32(null, new Integer[]{sliceData.getSliceNumber()}, 1); 
+			sliceNumber =  Mat5.newScalar(sliceData.getSliceNumber()); 
 
 			//the duration of the detection in samples.
-			nPeaks = new MLInt32(null, new Integer[]{sliceData.getnPeaks()}, 1); 
+			nPeaks =  Mat5.newScalar(sliceData.getnPeaks()); 
 
 			//the frequency limits.
-			peakData = new MLInt32(null, sliceData.getPeakInfo()); 
+			peakData = DLMatFile.array2Matrix(sliceData.getPeakInfo()); 
 			
-			mlStructure.setField("sliceNumber", sliceNumber, i);
-			mlStructure.setField("nPeaks", nPeaks, i);
-			mlStructure.setField("peakData", peakData, i);
+			mlStructure.set("sliceNumber", i, sliceNumber);
+			mlStructure.set("nPeaks", i, nPeaks);
+			mlStructure.set("peakData", i, peakData);
 		}
 		
 		return mlStructure;

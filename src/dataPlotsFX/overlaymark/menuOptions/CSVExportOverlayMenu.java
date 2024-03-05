@@ -1,8 +1,6 @@
-package dataPlotsFX.overlaymark.menuOptions.CSVExport;
+package dataPlotsFX.overlaymark.menuOptions;
 
 import PamView.paneloverlay.overlaymark.OverlayMark;
-import dataPlotsFX.overlaymark.menuOptions.ExportOverlayMenu;
-import dataPlotsFX.overlaymark.menuOptions.OverlayMenuItem;
 import detectiongrouplocaliser.DetectionGroupSummary;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.Tooltip;

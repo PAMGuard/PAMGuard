@@ -1,4 +1,4 @@
-package dataPlotsFX.overlaymark.menuOptions.wavExport;
+package export.wavExport;
 
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.RawDataHolder;
