@@ -45,6 +45,7 @@ public class MHTClickTrainAlgorithm implements ClickTrainAlgorithm, PamSettings 
 	
 	public static final String MHT_NAME = "MHT detector"; 
 	
+	
 	/**
 	 * Reference to the click train control. 
 	 */
@@ -354,6 +355,7 @@ public class MHTClickTrainAlgorithm implements ClickTrainAlgorithm, PamSettings 
 		TrackBitSet trackBitSet;
 		TrackDataUnits trackUnits;
 		if (nTracks>0) Debug.out.println("-------------------Grab Done Trains---------------");
+		try {
 		for (int i =0; i<nTracks; i++) {
 			trackBitSet=mhtKernal.getConfirmedTrack(i);
 			Debug.out.println("MHTAlgorithm: Confirmed Track Grab: No. " + MHTKernel.getTrueBitCount(trackBitSet.trackBitSet)  + " flag: " + trackBitSet.flag + "  chi2: " +trackBitSet.chi2Track.getChi2()); 
@@ -378,6 +380,10 @@ public class MHTClickTrainAlgorithm implements ClickTrainAlgorithm, PamSettings 
 			//save the click train
 			trackCount++;
 			saveClickTrain(trackUnits, trackBitSet.chi2Track.getMHTChi2Info());
+		}
+		}
+		catch (Exception e) {
+			System.out.printf("Handled MHTClickTrainAlgorithm Exception %s in grabDoneTrains: %s\n", e.getClass().getSimpleName(), e.getMessage());
 		}
 		
 		if (nTracks>0) Debug.out.println("-------------------------------------------------");

@@ -1382,7 +1382,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * @param sayEmpties dump info even if a buffer is empty (otherwise, only ones that have stuff still)
 	 */
 	public void dumpBufferStatus(String message, boolean sayEmpties) {
-		if (2 >1) return;
+		//if (2 >1) return;
 		System.out.println("**** Dumping process buffer status: " + message);
 		ArrayList<PamControlledUnit> pamControlledUnits = pamConfiguration.getPamControlledUnits();
 		for (PamControlledUnit aUnit : pamControlledUnits) {
