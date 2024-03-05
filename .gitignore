@@ -99,3 +99,6 @@ settings.xml
 .metadata/.plugins/org.eclipse.core.resources/.root/.indexes/properties.version
 .metadata/.plugins/org.eclipse.core.resources/.root/.indexes/properties.index
 .metadata/.plugins/org.eclipse.core.resources/.root/.indexes/history.version
+.settings/org.eclipse.jdt.core.prefs
+.settings/org.eclipse.core.resources.prefs
+.classpath

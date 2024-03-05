@@ -87,6 +87,7 @@ public class SourcePaneFX extends PamBorderPane {
 	 * Validator for channels 
 	 */
     protected PamValidator channelValidator;
+	private Label channelLabel;
 
 	/**
 	 * Construct a panel with a titles border
@@ -190,7 +191,7 @@ public class SourcePaneFX extends PamBorderPane {
 		channelPanel.setSpacing(5);
 		
 		if (isHasChannels()) {
-			Label channelLabel = new Label("Channel");
+			channelLabel = new Label("ChannelS");
 			//PamGuiManagerFX.titleFont2style(channelLabel);
 //			channelLabel.setFont(PamGuiManagerFX.titleFontSize2);
 			comboBoxPane.getChildren().add(channelLabel);
@@ -241,6 +242,10 @@ public class SourcePaneFX extends PamBorderPane {
 		
 	}
 	
+
+	public Label getChannelLabel() {
+		return channelLabel;
+	}
 
 	/**
 	 * Check if a single channel is selected. 
