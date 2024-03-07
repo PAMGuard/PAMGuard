@@ -23,6 +23,7 @@ package PamModel;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -1212,13 +1213,15 @@ final public class PamModel implements PamSettings {
 								if (intf[j].getName().equals("PamModel.PamPluginInterface")) {
 									
 									// create an instance of the interface class.  
-									PamPluginInterface pf = (PamPluginInterface) c.newInstance();
+									Constructor constructor = c.getDeclaredConstructor(null);
+									PamPluginInterface pf = (PamPluginInterface) constructor.newInstance(null);
 									if (getPluginBeingLoaded()==null) {
 										continue;
 									}
 
 									// Let the user know which valid plugins have been found
-									System.out.println("   Creating instance of " + pf.getDefaultName() + ": "  + pf.getClassName());
+									System.out.printf("   Loading plugin interface for %s : %s version %s\n",
+											pf.getDefaultName(), pf.getClassName(), pf.getVersion());
 									if (getPluginBeingLoaded()==null) {
 										continue;
 									}
@@ -1234,7 +1237,7 @@ final public class PamModel implements PamSettings {
 
 										pluginList.add(pf); // add it to the list
 									} else {
-										System.out.println("     Error: "+pf.getDefaultName()+" cannot run in this mode.  Skipping module.");									
+										System.out.println("     Error: " + pf.getDefaultName()+" cannot run in this mode.  Skipping module.");									
 									}
 									if (getPluginBeingLoaded()==null) {
 										continue;
@@ -1243,12 +1246,16 @@ final public class PamModel implements PamSettings {
 								
 								// now check for interfaces that implement DaqSystemInterface
 								if (intf[j].getName().equals("Acquisition.DaqSystemInterface")) {
-									DaqSystemInterface pf = (DaqSystemInterface) c.newInstance(); // create an instance of the interface class
+									Constructor constructor = c.getDeclaredConstructor(null);
+									DaqSystemInterface pf = (DaqSystemInterface) constructor.newInstance(null);
+//									DaqSystemInterface pf = (DaqSystemInterface) c.newInstance(); // create an instance of the interface class
 									if (getPluginBeingLoaded()==null) {
 										continue;
 									}
-									
-									System.out.println("   Creating instance of " + pf.getDefaultName() + ": "  + className);
+
+									System.out.printf("   Loading daq plugin interface for %s version %s\n",
+											pf.getDefaultName(), pf.getVersion());
+//									System.out.println("   Creating instance of " + pf.getDefaultName() + ": "  + className);
 									if (getPluginBeingLoaded()==null) {
 										continue;
 									}

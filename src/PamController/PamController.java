@@ -195,6 +195,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 	private static PamController uniqueController;
 
 	private Timer diagnosticTimer;
+	
+	private boolean debugDumpBufferAtRestart = false;
 
 	private NetworkController networkController;
 	private int nNetPrepared;
@@ -1263,7 +1265,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 			saveSettings(PamCalendar.getSessionStartTime());
 		}
 
-		if (++nStarts > 1) {
+		if (++nStarts > 1 && debugDumpBufferAtRestart) {
 			// do this here - all processses should have reset buffers to start again by now. 
 			String msg = String.format("Starting PAMGuard go %d", nStarts);
 			dumpBufferStatus(msg, false);
@@ -1382,7 +1384,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * @param sayEmpties dump info even if a buffer is empty (otherwise, only ones that have stuff still)
 	 */
 	public void dumpBufferStatus(String message, boolean sayEmpties) {
-		//if (2 >1) return;
+		if (debugDumpBufferAtRestart == false) return;
+		
 		System.out.println("**** Dumping process buffer status: " + message);
 		ArrayList<PamControlledUnit> pamControlledUnits = pamConfiguration.getPamControlledUnits();
 		for (PamControlledUnit aUnit : pamControlledUnits) {
@@ -2066,8 +2069,10 @@ public class PamController implements PamControllerInterface, PamSettings {
 		/*
 		 * This only get's called once when set idle at viewer mode startup. 
 		 */
-		System.out.printf("*******   PamController.setPamStatus to %d, real status is %d set in thread %s\n",  
-				pamStatus, getRealStatus(), Thread.currentThread().toString());
+		if (debugDumpBufferAtRestart) {
+			System.out.printf("*******   PamController.setPamStatus to %d, real status is %d set in thread %s\n",  
+					pamStatus, getRealStatus(), Thread.currentThread().toString());
+		}
 		if (getRunMode() != RUN_PAMVIEW) {
 			TopToolBar.enableStartButton(pamStatus == PAM_IDLE);
 			TopToolBar.enableStopButton(pamStatus == PAM_RUNNING);
