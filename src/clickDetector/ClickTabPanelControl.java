@@ -26,6 +26,7 @@ import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -117,11 +118,29 @@ public class ClickTabPanelControl implements PamTabPanel {
 		
 		menu.add(clickDisplayManager.getModulesMenu());
 		
-		menuItem = new JMenuItem("Arrange Windows ...");
+		menu.add(clickControl.angleVetoes.getDisplayMenuItem(parentFrame));
+		
+		menu.addSeparator();
+		
+		JCheckBoxMenuItem autoArrange = new JCheckBoxMenuItem("Auto arrange windows");
+		autoArrange.setSelected(clickDisplayManager.cdmp.isManualWindowSizes() == false);
+		autoArrange.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				clickDisplayManager.cdmp.setManualWindowSizes(autoArrange.isSelected() == false);
+				if (autoArrange.isSelected()) {
+					clickPanel.arrangeWindows();
+				}
+			}
+		});
+		autoArrange.setToolTipText("Automatically arrange windows in a standard layout whenever the display dimensions change");
+		menu.add(autoArrange);
+		
+		menuItem = new JMenuItem("Arrange Windows Now");
 		menuItem.addActionListener(new ArrangeWindows(parentFrame));
+		menuItem.setToolTipText("Automatically arrange windows in a standard layout");
 		menu.add(menuItem);
 		
-		menu.add(clickControl.angleVetoes.getDisplayMenuItem(parentFrame));
 
 		return menu;
 	}

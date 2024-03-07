@@ -53,7 +53,7 @@ public class HydrophoneDataBlock extends PamDataBlock<HydrophoneDataUnit> {
 	 */
 	@Override
 	public int getNumRequiredBeforeLoadTime() {
-		return ArrayManager.getArrayManager().getCurrentArray().getHydrophoneCount();
+		return ArrayManager.getArrayManager().getCurrentArray().getHydrophoneCount()*2;
 	}
 
 
