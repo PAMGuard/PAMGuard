@@ -21,6 +21,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.Timer;
@@ -529,7 +530,10 @@ public class LoggerForm{
 				innerCenterPanel.add(currentRow);
 				currentRow = new LoggerFormPanel(this, new FlowLayout(FlowLayout.LEFT));
 			}else{
-				currentRow.add(c.makeComponent(this));
+				JPanel component = c.makeComponent(this);
+				if (component != null) {
+					currentRow.add(component);
+				}
 			}
 
 		}
