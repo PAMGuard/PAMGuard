@@ -1,5 +1,6 @@
 package pamScrollSystem;
 
+import PamUtils.PamCalendar;
 import PamguardMVC.PamDataBlock;
 
 /**
@@ -67,6 +68,14 @@ public class DataLoadQueData {
 	 */
 	public void setDataEnd(long dataEnd) {
 		this.dataEnd = dataEnd;
+	}
+
+
+	@Override
+	public String toString() {
+		String str = String.format("%s %s - %s", pamDataBlock.getLongDataName(),
+				PamCalendar.formatDBDateTime(dataStart),PamCalendar.formatDBDateTime(dataEnd));
+		return str;
 	}
 	
 	

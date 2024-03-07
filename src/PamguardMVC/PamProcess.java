@@ -767,7 +767,7 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 		}
 	});
 
-	private int lastSourceNotificationType;
+	private volatile int lastSourceNotificationType;
 
 	private Object lastSourceNotificationObject;
 	
@@ -1063,6 +1063,26 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 	 */
 	public Object getLastSourceNotificationObject() {
 		return lastSourceNotificationObject;
+	}
+
+	/**
+	 * Say the status of any buffers, particularly in output buffers of 
+	 * data blocks, but can add bespoke info for other internal buffers
+	 * for some processes. 
+	 * @param message
+	 * @param sayEmpties include info even if a buffer is empty. 
+	 */
+	public void dumpBufferStatus(String message, boolean sayEmpties) {
+		ArrayList<PamDataBlock> outputs = getOutputDataBlocks();
+		try {
+			for (PamDataBlock output : outputs) {
+				output.dumpBufferStatus(message, sayEmpties);
+			}
+		}
+		catch (Exception e) {
+			System.err.println("Error dumping buffer data from process " + getProcessName());
+			e.printStackTrace();
+		}
 	}
 
 }

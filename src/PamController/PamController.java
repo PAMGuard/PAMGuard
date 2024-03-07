@@ -128,6 +128,10 @@ public class PamController implements PamControllerInterface, PamSettings {
 	public static final int PAM_COMPLETE = 6;
 	public static final int PAM_MAPMAKING = 7;
 	public static final int PAM_OFFLINETASK = 8;
+	
+	public static final int BUTTON_START = 1;
+	public static final int BUTTON_STOP = 2;
+	private volatile int lastStartStopButton = 0;
 
 	// status' for RunMode = RUN_PAMVIEW
 	public static final int PAM_LOADINGDATA = 2;
@@ -161,7 +165,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	/**
 	 * The current PAM status
 	 */
-	private transient int pamStatus = PAM_IDLE;
+	private volatile int pamStatus = PAM_IDLE;
 
 	/**
 	 * PamGuard view params. 
@@ -240,6 +244,9 @@ public class PamController implements PamControllerInterface, PamSettings {
 	private Thread statusCheckThread;
 	private WaitDetectorThread detectorEndThread;
 	private boolean firstDataLoadComplete;
+	// keep a track of the total number of times PAMGuard is started for debug purposes. 
+	private int nStarts;
+	private RestartRunnable restartRunnable;
 
 
 	private PamController(int runMode, Object object) {
@@ -1045,8 +1052,45 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 */
 	public void restartPamguard() {
 		pamStop();
-		startLater();		
+		
+		/*
+		 *  launch a restart thread, that won't do ANYTHING until
+		 *  PAMGuard is really idle and buffers are cleared. Can only
+		 *  have one of these at a time ! 
+		 */
+		if (restartRunnable != null) {
+			System.out.println("Warning !!!! PAMGuard is already trying to restart!");
+			return;
+		}
+		restartRunnable = new RestartRunnable();
+		Thread restartThread = new Thread(restartRunnable, "RestartPAMGuard Thread");
+		restartThread.run();
 	}
+	
+	private class RestartRunnable implements Runnable {
+
+		@Override
+		public void run() {
+			long t1 = System.currentTimeMillis();
+			while (getPamStatus() != PAM_IDLE) {
+				try {
+					Thread.sleep(200);
+				} catch (InterruptedException e) {
+
+				}
+			}
+			long t2 = System.currentTimeMillis();
+			restartRunnable = null;
+			System.out.printf("PAMGuard safe to restart after %d milliseconds\n", t2-t1);
+			startLater(false);	
+			
+		}
+		
+	}
+	
+	
+	
+	
 	/**
 	 * calls pamStart using the SwingUtilities
 	 * invokeLater command to start PAMGAURD 
@@ -1078,7 +1122,13 @@ public class PamController implements PamControllerInterface, PamSettings {
 
 		@Override
 		public void run() {
-			pamStart(saveSettings);
+			/*
+			 *  do a final check that the stop button hasn't been pressed - can arrive a bit
+			 *  late if the system was continually restarting.  
+			 */
+			if (lastStartStopButton != BUTTON_STOP) {
+				pamStart(saveSettings);
+			}
 		}
 	}
 
@@ -1103,6 +1153,26 @@ public class PamController implements PamControllerInterface, PamSettings {
 		}
 	}
 
+	/**
+	 * Called from the start button. A little book keeping 
+	 * to distinguish this from automatic starts / restarts
+	 * @return true if started.
+	 */
+	@Override
+	public boolean manualStart() {
+		lastStartStopButton = BUTTON_START;
+		return pamStart();
+	}
+	
+	/**
+	 * Called from the stop button. A little book keeping 
+	 * to distinguish this from automatic starts / restarts
+	 */
+	@Override
+	public void manualStop() {
+		lastStartStopButton = BUTTON_STOP;
+		pamStop();
+	}
 
 	/**
 	 * Start PAMGUARD. This function also gets called from the 
@@ -1193,6 +1263,12 @@ public class PamController implements PamControllerInterface, PamSettings {
 			saveSettings(PamCalendar.getSessionStartTime());
 		}
 
+		if (++nStarts > 1) {
+			// do this here - all processses should have reset buffers to start again by now. 
+			String msg = String.format("Starting PAMGuard go %d", nStarts);
+			dumpBufferStatus(msg, false);
+		}
+
 		StorageOptions.getInstance().setBlockOptions();
 
 		t1 = System.currentTimeMillis();
@@ -1254,6 +1330,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 			}
 		}
 		
+		dumpBufferStatus("In stopping", false);
 		/*
 		 *  now launch another thread to wait for everything to have stopped, but
 		 *  leave this function so that AWT is released and graphics can update, the
@@ -1281,9 +1358,11 @@ public class PamController implements PamControllerInterface, PamSettings {
 				long t2 = System.currentTimeMillis();
 				if (t2 - t1 > 5000) {
 					System.out.printf("Stopping, but stuck in loop for CheckRunStatus for %3.1fs\n", (double) (t2-t1)/1000.);
+					dumpBufferStatus("Stopping stuck in loop", false);
+					break; // crap out anyway.
 				}
 				try {
-					Thread.sleep(10);
+					Thread.sleep(100);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -1295,18 +1374,41 @@ public class PamController implements PamControllerInterface, PamSettings {
 	}
 	
 	/**
+	 * Look in every data block, particularly threaded ones, and dump
+	 * the buffer status. This will have to go via PamProcess so that 
+	 * additional information can be added from any processes that 
+	 * hold additional data in other internal buffers. 
+	 * @param message Message to print prior to dumping buffers for debug. 
+	 * @param sayEmpties dump info even if a buffer is empty (otherwise, only ones that have stuff still)
+	 */
+	public void dumpBufferStatus(String message, boolean sayEmpties) {
+		//if (2 >1) return;
+		System.out.println("**** Dumping process buffer status: " + message);
+		ArrayList<PamControlledUnit> pamControlledUnits = pamConfiguration.getPamControlledUnits();
+		for (PamControlledUnit aUnit : pamControlledUnits) {
+			int numProcesses = aUnit.getNumPamProcesses();
+			for (int i=0; i<numProcesses; i++) {
+				PamProcess aProcess = aUnit.getPamProcess(i);
+				aProcess.dumpBufferStatus(message, sayEmpties);
+			}
+		}
+		System.out.println("**** End of process buffer dump: " + message);
+	}
+	
+	/**
 	 * Called once the detectors have actually stopped and puts a few finalising 
 	 * functions into the AWT thread. 
 	 */
 	private void finishStopping() {
 		detectorEndThread = null;
-		SwingUtilities.invokeLater(new Runnable() {
-			
-			@Override
-			public void run() {
+		// this was never getting invoked for some reason. 
+//		SwingUtilities.invokeLater(new Runnable() {
+//			
+//			@Override
+//			public void run() {
 				pamStopped();
-			}
-		});
+//			}
+//		});
 	}
 		
 	
@@ -1320,6 +1422,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 		 * it is necessary to make sure that all internal datablock 
 		 * buffers have had time to empty.
 		 */
+		System.out.println("Arrived in PamStopped() in thread " + Thread.currentThread().toString());
+		
 		ArrayList<PamControlledUnit> pamControlledUnits = pamConfiguration.getPamControlledUnits();
 		
 		if (PamModel.getPamModel().isMultiThread()) {
@@ -1327,7 +1431,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 				pamControlledUnits.get(iU).flushDataBlockBuffers(2000);
 			}
 		}
-		setPamStatus(PAM_IDLE);
+		dumpBufferStatus("In pamStopped, now idle", true);
 
 		// wait here until the status has changed to Pam_Idle, so that we know
 		// that we've really finished processing all data
@@ -1350,6 +1454,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 		
 		long stopTime = PamCalendar.getTimeInMillis();
 		saveEndSettings(stopTime);
+
+		setPamStatus(PAM_IDLE);
 		
 		// no good having this here since it get's called at the end of every file. 
 //		if (GlobalArguments.getParam(PamController.AUTOEXIT) != null) {
@@ -1960,7 +2066,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 		/*
 		 * This only get's called once when set idle at viewer mode startup. 
 		 */
-//		System.out.printf("*******   PamController.setPamStatus to %d, real status is %d\n",  pamStatus, getRealStatus());
+		System.out.printf("*******   PamController.setPamStatus to %d, real status is %d set in thread %s\n",  
+				pamStatus, getRealStatus(), Thread.currentThread().toString());
 		if (getRunMode() != RUN_PAMVIEW) {
 			TopToolBar.enableStartButton(pamStatus == PAM_IDLE);
 			TopToolBar.enableStopButton(pamStatus == PAM_RUNNING);
@@ -2054,6 +2161,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 			statusWarning.setWarningMessage(warningMessage);
 			statusWarning.setWarnignLevel(1);
 			warningSystem.addWarning(statusWarning);
+//			System.out.println(warningMessage);
 		}
 	}
 

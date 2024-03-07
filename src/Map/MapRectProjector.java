@@ -404,7 +404,7 @@ public class MapRectProjector extends MapProjector {
 
 	private String findGpsTrackText(Point mousePoint, int ploNumberMatch) {
 		GPSControl gpsControl = GPSControl.getGpsControl();
-		if (gpsControl == null) {
+		if (gpsControl == null || mousePoint == null) {
 			return null;
 		}
 		LatLong currentPos = getDataPosition(new Coordinate3d(mousePoint.x, mousePoint.y));
