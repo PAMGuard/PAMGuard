@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.protobuf.compiler.PluginProtos.CodeGeneratorResponse.File;
-import com.jmatio.types.MLArray;
-import com.jmatio.types.MLDouble;
-import com.jmatio.types.MLStructure;
 
 import PamguardMVC.PamDataUnit;
 import export.PamExportManager;

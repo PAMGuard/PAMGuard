@@ -4,11 +4,8 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.jamdev.jdl4pam.utils.DLMatFile;
 import org.jamdev.jpamutils.wavFiles.WavInterpolator;
-
-import com.jmatio.types.MLArray;
-import com.jmatio.types.MLDouble;
-import com.jmatio.types.MLStructure;
 
 import Filters.SmoothingFilter;
 import Localiser.DelayMeasurementParams;
@@ -19,6 +16,9 @@ import PamUtils.PamArrayUtils;
 import PamUtils.PamInterp;
 import PamUtils.complex.ComplexArray;
 import fftManager.FastFFT;
+import us.hebi.matlab.mat.format.Mat5;
+import us.hebi.matlab.mat.types.Matrix;
+import us.hebi.matlab.mat.types.Struct;
 
 /**
  * Parameters and useful functions for a single MT classifier. 
@@ -304,8 +304,8 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 	 * @param value - the value  
 	 * @return
 	 */
-	private MLDouble mlDouble(double value) {
-		return new MLDouble(null, new double[]{value}, 1);
+	private Matrix mlDouble(double value) {
+		return Mat5.newScalar(value);
 	} 
 	
 	
@@ -321,10 +321,11 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 
 	 * @return an ML Structure with results of all stuff. 
 	 */
-	public MLStructure calcCorrelationMatchTest(ComplexArray click, float sR) {
+	public Struct calcCorrelationMatchTest(ComplexArray click, float sR) {
 	
-		MLStructure mlStruct = new MLStructure("matchdata", new int[] {1,1});
-		mlStruct.setField("waveform_fft",  complexArray2MLArray(click));
+//		Struct mlStruct = new MLStructure("matchdata", new int[] {1,1});
+		Struct mlStruct = Mat5.newStruct();
+		mlStruct.set("waveform_fft",  complexArray2MLArray(click));
 	
 		
 		//set the stored sR
@@ -353,14 +354,14 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 		}
 		
 		//add data to struct her ebecause some arrays get overwritten
-		mlStruct.setField("match_template_waveform",  new MLDouble(null, new double[][] {this.interpWaveformMatch}));
-		mlStruct.setField("reject_template_waveform", new MLDouble(null, new double[][] {this.inteprWaveformReject}));
+		mlStruct.set("match_template_waveform", DLMatFile.array2Matrix(this.interpWaveformMatch));
+		mlStruct.set("reject_template_waveform", DLMatFile.array2Matrix(this.inteprWaveformReject));
 
 		//add data to struct her ebecause some arrays get overwritten
-		mlStruct.setField("match_template_fft",  complexArray2MLArray(matchTemplate));
-		mlStruct.setField("reject_template_fft",  complexArray2MLArray(rejectTemplate));
-		mlStruct.setField("match_result_corr",  complexArray2MLArray(matchResult));
-		mlStruct.setField("reject_result_corr",  complexArray2MLArray(rejectResult));
+		mlStruct.set("match_template_fft",  complexArray2MLArray(matchTemplate));
+		mlStruct.set("reject_template_fft",  complexArray2MLArray(rejectTemplate));
+		mlStruct.set("match_result_corr",  complexArray2MLArray(matchResult));
+		mlStruct.set("reject_result_corr",  complexArray2MLArray(rejectResult));
 		
 		//must use scaling to get the same result as MATLAB 
 		if (fft==null) fft= new FastFFT();
@@ -379,10 +380,10 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 
 		double result = 2*(PamArrayUtils.max(matchReal)-PamArrayUtils.max(rejectReal)); 
 		
-		mlStruct.setField("match_result_ifft",  complexArray2MLArray(matchResult));
-		mlStruct.setField("reject_result_ifft",  complexArray2MLArray(rejectResult));
-		mlStruct.setField("result", mlDouble(result));
-		mlStruct.setField("sR",   mlDouble(sR));
+		mlStruct.set("match_result_ifft",  complexArray2MLArray(matchResult));
+		mlStruct.set("reject_result_ifft",  complexArray2MLArray(rejectResult));
+		mlStruct.set("result", mlDouble(result));
+		mlStruct.set("sR",   mlDouble(sR));
 
 
 		return mlStruct;
@@ -394,13 +395,14 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 	 * @param complexArray the complex array to export. 
 	 * @return the ML array. 
 	 */
-	private MLDouble complexArray2MLArray(ComplexArray complexArray) {
-		MLDouble matchTemplateML = new MLDouble(null, new int[]{complexArray.length(),1}, MLArray.mxDOUBLE_CLASS, MLArray.mtFLAG_COMPLEX ); 
+	private Matrix complexArray2MLArray(ComplexArray complexArray) {
+		
+		Matrix matchTemplateML = Mat5.newComplex(complexArray.length(),1);
+//		MLDouble matchTemplateML = new MLDouble(null, new int[]{complexArray.length(),1}, MLArray.mxDOUBLE_CLASS, MLArray.mtFLAG_COMPLEX ); 
 		
 		for (int i=0; i<complexArray.length(); i++) {
-			matchTemplateML.setReal(complexArray.getReal(i), i);
-			matchTemplateML.setImaginary(complexArray.getImag(i), i);
-
+			matchTemplateML.setDouble(i, complexArray.getReal(i));
+			matchTemplateML.setImaginaryDouble(i, complexArray.getImag(i));
 		}
 		return matchTemplateML;
 	}

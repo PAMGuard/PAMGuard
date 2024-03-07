@@ -3,19 +3,17 @@ package matchedTemplateClassifer;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import com.jmatio.io.MatFileReader;
-import com.jmatio.io.MatFileWriter;
-import com.jmatio.types.MLArray;
-import com.jmatio.types.MLDouble;
-import com.jmatio.types.MLInt64;
-import com.jmatio.types.MLStructure;
+import org.jamdev.jdl4pam.utils.DLMatFile;
 
 import PamUtils.PamArrayUtils;
 import PamUtils.complex.ComplexArray;
-import PamguardMVC.RawDataHolder;
 import Spectrogram.WindowFunction;
 import clickDetector.ClickLength;
 import fftManager.FastFFT;
+import us.hebi.matlab.mat.format.Mat5;
+import us.hebi.matlab.mat.format.Mat5File;
+import us.hebi.matlab.mat.types.Matrix;
+import us.hebi.matlab.mat.types.Struct;
 
 /**
  * Test for the MTClassifier. Specifically testing comparisons to MATLAB to make 
@@ -35,9 +33,13 @@ public class MTClassifierTest {
 
 
 	/**
-	 * Test the classifier using some imported data. 
+	 * Test a waveforms and some match and reject templates. 
+	 * @param testWaveform - the test waveform
+	 * @param sR - the sample rate of the test waveform
+	 * @param templates - the templates to test against
+	 * @return struct containing output results
 	 */
-	private static MLStructure testClassifier(double[] testWaveform, float sR, ArrayList<MatchTemplate> templates) {
+	private static Struct testClassifier(double[] testWaveform, float sR, ArrayList<MatchTemplate> templates) {
 
 		//create the classifier object 
 		MTClassifier mtclassifier = new MTClassifier(); 
@@ -63,11 +65,11 @@ public class MTClassifierTest {
 
 		System.out.println("Click waveform length: " + testWaveform.length +  "  FFT bins: " + complexArray.length() + " FFT Length: " + fftSize);
 
-		MLStructure struct = mtclassifier.calcCorrelationMatchTest(complexArray, sR);
+		Struct struct = mtclassifier.calcCorrelationMatchTest(complexArray, sR);
 		
-		struct.setField("waveform",  new MLDouble(null, new double[][] {testWaveform}));
-	
-		System.out.println("Match: " + ((MLDouble) struct.getField("result")).get(0)); 
+		struct.set("waveform",  DLMatFile.array2Matrix(testWaveform));
+		
+		System.out.println("Match: " + struct.getMatrix("result").getDouble(0)); 
 		
 		return struct; 
 	}
@@ -185,18 +187,18 @@ public class MTClassifierTest {
 	 */
 	public static ArrayList<MatchTemplate> importClicks(String filePath, float sR) {
 
-		MatFileReader mfr;
 		try {
-			mfr = new MatFileReader(filePath);
-			//		//get array of a name "my_array" from file
-			MLStructure mlArrayRetrived = (MLStructure) mfr.getMLArray( "clicks" );
+			 Mat5File mfr = Mat5.readFromFile(filePath);
 
-			int numClicks= mlArrayRetrived.getN();
+			//		//get array of a name "my_array" from file
+			Struct mlArrayRetrived = mfr.getStruct( "clicks" );
+
+			int numClicks= mlArrayRetrived.getNumCols();
 			ArrayList<MatchTemplate> clicks = new ArrayList<MatchTemplate>(numClicks); 
 
 			for (int i=0; i<numClicks; i++) {
-				MLDouble clickWav=(MLDouble) mlArrayRetrived.getField("wave", i);
-				double[][] click= clickWav.getArray(); 
+				Matrix clickWav= mlArrayRetrived.get("wave", i);
+				double[][] click= PamArrayUtils.matrix2array(clickWav);
 				//System.out.println("click: " + click[0].length + " num: " + numClicks);
 				
 				double[] waveform = new double[click.length];
@@ -204,14 +206,13 @@ public class MTClassifierTest {
 					waveform[j] = click[j][0]; 
 				}
 				
-				MLDouble clickUID=(MLDouble) mlArrayRetrived.getField("UID", i);
+				Matrix clickUID= mlArrayRetrived.get("UID", i);
 
-				
-				clicks.add(new MatchTemplate(Long.toString(clickUID.get(0).longValue()), waveform, 288000)); 
+				clicks.add(new MatchTemplate(Long.toString(clickUID.getLong(0)), waveform, 288000)); 
 			}
 			return clicks; 
 		} 
-		catch (IOException e) {
+		catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null; 
@@ -224,23 +225,23 @@ public class MTClassifierTest {
 	 * Import a multiple templates. These are just waveforms and a sample rtae. 
 	 */
 	public static ArrayList<MatchTemplate> importTemplates(String filePath) {
-		MatFileReader mfr;
+		Mat5File mfr;
 		try {
-			mfr = new MatFileReader(filePath);
+			mfr =  Mat5.readFromFile(filePath);
 			//		//get array of a name "my_array" from file
-			MLStructure mlArrayMatch = 	(MLStructure) mfr.getMLArray( "templates" );
+			Struct mlArrayMatch =  mfr.getStruct( "templates" );
 			//System.out.println(mlArrayMatch.getType()); 
 
 			ArrayList<MatchTemplate> templates = new ArrayList<MatchTemplate>(); 
 
-			int numTemplates= mlArrayMatch.getN();
+			int numTemplates= mlArrayMatch.getNumElements();
 
 			for (int i=0; i<numTemplates; i++) {
-				MLDouble templateWav=(MLDouble) mlArrayMatch.getField("wave", i);
-				double[][] wave= templateWav.getArray(); 
 				
-				MLDouble templatesr=(MLDouble) mlArrayMatch.getField("sr", i);
-				double sr= templatesr.get(0, 0);
+				double[][] wave = PamArrayUtils.matrix2array(mlArrayMatch.get("wave", i));
+				
+				Matrix templatesr= mlArrayMatch.get("sr", i);
+				double sr= templatesr.getDouble(0);
 				
 				System.out.println("template wave: " + wave[0].length + " num: " + numTemplates);
 				
@@ -260,14 +261,14 @@ public class MTClassifierTest {
 	 * Import a bunch of clicks from a .mat file
 	 */
 	public static ArrayList<MatchTemplate> importTemplate(String filePath) {
-		MatFileReader mfr;
+		Mat5File mfr;
 		try {
-			mfr = new MatFileReader(filePath);
+			mfr = Mat5.readFromFile(filePath);
 			//		//get array of a name "my_array" from file
-			MLDouble mlArrayMatch = 	(MLDouble) mfr.getMLArray( "matchtemplate" );
-			double[][] mlMatch= mlArrayMatch.getArray();  
-			MLDouble mlArrayReject = 	(MLDouble) mfr.getMLArray( "rejectemplate" );
-			double[][] mlReject= mlArrayReject.getArray();  
+			Matrix mlArrayMatch = 	mfr.getArray( "matchtemplate" );
+			double[][] mlMatch= PamArrayUtils.matrix2array(mlArrayMatch); 
+			Matrix mlArrayReject = 	mfr.getArray( "rejectemplate" );
+			double[][] mlReject= PamArrayUtils.matrix2array(mlArrayReject);
 
 			ArrayList<MatchTemplate> templates = new ArrayList<MatchTemplate>(2); 
 
@@ -314,18 +315,19 @@ public class MTClassifierTest {
 		System.out.println("");
 		System.out.println("Testing the classifier");
 		
-		ArrayList<MLArray> mlResults = new ArrayList<MLArray>(); 
-		MLStructure strcut; 
+		Struct mlResults = Mat5.newStruct();
+		Struct strcut; 
 		int N = 3; 
 //		templates.remove(1);
 //		templates.add(clicks.get(0)); 
 		for (int i=0; i<N; i++) {
 			strcut= testClassifier(clicks.get(i).waveform, clicks.get(i).sR, templates);
-			mlResults.add(strcut);
+			mlResults.set("results", i, strcut);
 		}
 
 		try {
-			MatFileWriter filewrite=new MatFileWriter(mlExportPath, mlResults);
+			//writ ethe results to file
+			Mat5.writeToFile(null, mlExportPath);
 		} catch (IOException e) {
 			System.err.println("The MATLAB file did not write properly");
 			e.printStackTrace();

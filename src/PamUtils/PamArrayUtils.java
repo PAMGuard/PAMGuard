@@ -10,6 +10,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import org.apache.commons.math.linear.RealMatrix;
 
+import us.hebi.matlab.mat.types.Matrix;
+
 /**
  * Some math and utility functions for arrays and Lists. 
  * 
@@ -1091,6 +1093,25 @@ public class PamArrayUtils {
 			arrL[i]=arr[i].longValue();
 		}
 		return arrL;
+	}
+
+	/**
+	 * Convert a matrix to a 
+	 * @param matrix - the MAT file matrix
+	 * @return double[][] array of results
+	 */
+	public static double[][] matrix2array(Matrix matrix) {
+		if (matrix==null) return null;
+		
+		double[][] arrayOut = new double[matrix.getNumRows()][];
+		double[] arrayRow;
+		for (int i=0; i<matrix.getNumRows(); i++) {
+			arrayRow=new double[matrix.getNumCols()];
+			for (int j=0; j<matrix.getNumCols(); j++) {
+				arrayRow[j] = matrix.getDouble(i, j);
+			}
+		}
+		return null;
 	}
 
 

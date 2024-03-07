@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.renjin.sexp.ListVector;
 import org.renjin.sexp.PairList;
-import com.jmatio.types.MLArray;
 import PamguardMVC.PamDataUnit;
 
 /**
@@ -65,7 +64,6 @@ public class RExportManager {
 		PairList.Builder allData = new PairList.Builder();
 		ArrayList<String> dataUnitTypes = new ArrayList<String>(); 
 		
-		ArrayList<MLArray> list = new ArrayList<MLArray>();
 		//iterate through possible export functions. 
 		for (int i=0; i<mlDataUnitsExport.size(); i++){
 			
