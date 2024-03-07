@@ -19,4 +19,10 @@ public class CompoundParams extends DataSelectParams {
 	public DataSelectParams getSelectorParams(DataSelector dataSelector) {
 		return selectorParams.get(dataSelector.getLongSelectorName());
 	}
+
+	@Override
+	public int getCombinationFlag() {
+		return DATA_SELECT_AND;
+	}
+	
 }

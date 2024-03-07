@@ -515,7 +515,9 @@ public class BinaryOutputStream {
 	 */
 	public synchronized boolean storeData(DataOutputStream outputStream, int objectId, DataUnitBaseData baseData, BinaryObjectData binaryObjectData) {
 		if (lastObjectType == BinaryTypes.MODULE_FOOTER) {
-			System.out.printf("Storing binary object type %d in file %s with no module header\n", objectId, outputStream == null ? null : outputStream.toString());
+			System.out.printf("Storing binary object at %s from %s in file %s with no module header\n", 
+					PamCalendar.formatDBDateTime(baseData.getTimeMilliseconds()),
+					parentDataBlock.getDataName(), outputStream == null ? null : outputStream.toString());
 		}
 		byte[] data = binaryObjectData.getData();
 		int objectLength = binaryObjectData.getDataLength();
