@@ -39,6 +39,12 @@ public class GenericPrediction implements PredictionResult {
 	public double analysisTime=0; 
 	
 
+	/**
+	 * Constructor for a typical generic prediciton. 
+	 * @param prob - the probability for each class. 
+	 * @param classNameID - the ID's of the class names.
+	 * @param isBinary - true if the model result passed a binary test (usually one species above a threshold)
+	 */
 	public GenericPrediction(float[] prob, short[] classNameID, boolean isBinary) {
 		this.prob=prob; 
 		this.classNameID = classNameID;

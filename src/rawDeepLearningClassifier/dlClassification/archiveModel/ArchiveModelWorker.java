@@ -113,8 +113,8 @@ public class ArchiveModelWorker extends GenericModelWorker {
 
 			//HACK there seems to be some sort of bug in ketos where the params input shape is correct but the model input shape is wrong. 
 			if (dlModel.getInputShape()==null || !dlModel.getInputShape().equals(modelParams.defaultInputShape)) {
-				System.out.println("Model input shape: " + modelParams.defaultInputShape);
-				WarnOnce.showWarning("Model shape", "The model shape does not match the model metadata. \n Metadata shape will be used used.", WarnOnce.OK_OPTION);
+				System.err.println("Model input shape does not match: params: " + modelParams.defaultInputShape + " model: " + dlModel.getInputShape());
+				//WarnOnce.showWarning("Model shape", "The model shape does not match the model metadata. \n Metadata shape will be used used.", WarnOnce.OK_OPTION);
 				dlModel.setInputShape(modelParams.defaultInputShape);
 			}
 

@@ -539,6 +539,8 @@ public class DatagramManager {
 			else {
 				PamController.getInstance().notifyTaskProgress(
 						new SimplePamTaskUpdate("Finished Datagram Mapping", PamTaskUpdate.STATUS_DONE));
+				publish(new DatagramProgress(PamTaskUpdate.STATUS_DONE, 1, 1));
+
 			}
 		}
 

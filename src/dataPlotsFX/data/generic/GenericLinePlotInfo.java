@@ -2,6 +2,7 @@ package dataPlotsFX.data.generic;
 
 import PamController.PamController;
 import PamUtils.Coordinate3d;
+import PamUtils.PamCalendar;
 import PamView.GeneralProjector;
 import PamView.HoverData;
 import PamView.symbol.PamSymbolChooser;
@@ -47,21 +48,18 @@ public abstract class GenericLinePlotInfo extends TDDataInfoFX {
 	}
 
 
-	
-
 	/* (non-Javadoc)
 	 * @see dataPlotsFX.data.TDDataInfoFX#drawDataUnit(int, PamguardMVC.PamDataUnit, javafx.scene.canvas.GraphicsContext, long, dataPlotsFX.projector.TDProjectorFX, int)
 	 */
 	@Override
 	public Polygon drawDataUnit(int plotNumber, PamDataUnit pamDataUnit, GraphicsContext g, double scrollStart,
 			TDProjectorFX tdProjector, int type) {
-
 			return drawPredicition(plotNumber, pamDataUnit, g, scrollStart, tdProjector, type);
-
 	}
 
+	
 	/**
-	 * Get the line data. Each double[] is a seperate line with N evenly spaced data points. 
+	 * Get the line data. Each double[] is a separate line with N evenly spaced data points. 
 	 * @param pamDataUnit - the pam data unit containing the data. 
 	 * @return the line data. 
 	 */
@@ -98,14 +96,11 @@ public abstract class GenericLinePlotInfo extends TDDataInfoFX {
 		double timeMillis = pamDataUnit.getTimeMilliseconds()+pamDataUnit.getDurationInMilliseconds()/2; 
 		double tC=tdProjector.getTimePix(timeMillis-scrollStart);
 
-
 		//draws lines so tc should be some slop in pixels. 
 		if (tC < -1000 || tC>tdProjector.getWidth()+1000) {
+			//System.out.println("Line is outside display " + tC);
 			return null;
 		}
-
-		//TODO -must sort out wrap
-		//dlControl.getDLParams().sampleHop; 
 
 		double dataPixel; 
 		Coordinate3d c; 
@@ -128,15 +123,12 @@ public abstract class GenericLinePlotInfo extends TDDataInfoFX {
 				
 					//brighten the colour up. 
 					//color = Color.color(color.getRed()*0.8, color.getGreen()*0.8, color.getBlue()*0.8); 
-	
-					//System.out.println("TDDataInfoFX: tc: "+tC+ " dataUnitTime: "+PamCalendar.formatTime(timeMillis)+" scrollStart: "
-					//+PamCalendar.formatTime((long) scrollStart)+" (timeMillis-scrollStart)/1000. "+((timeMillis-scrollStart)/1000.));
-					
-	
+//					System.out.println("TDDataInfoFX: tc: "+tC+ " dataUnitTime: "+PamCalendar.formatTime((long) timeMillis)+" scrollStart: "
+//					+PamCalendar.formatTime((long) scrollStart)+" (timeMillis-scrollStart)/1000. "+((timeMillis-scrollStart)/1000.));
+				
 					c = tdProjector.getCoord3d(timeMillis, detData[i][j], 0);
 	
 					dataPixel = tdProjector.getYPix(detData[i][j]);
-	
 	
 					if (lastUnits[chan][i]==null) {
 						lastUnits[chan][i] = new Point2D(tC, dataPixel); 
@@ -147,7 +139,6 @@ public abstract class GenericLinePlotInfo extends TDDataInfoFX {
 						if (tC>lastUnits[chan][i].getX() && (!this.getTDGraph().isWrap() || 
 								(tC<tdProjector.getWidth()) && tC>=0 && lastUnits[chan][i].getX()<tdProjector.getWidth() && lastUnits[chan][i].getX()>0)) {
 							//in wrap mode we can get some weird effects with tC co-ordintates. Still have not quite cracked this...
-							
 //							if (Math.abs(tC - lastUnits[chan][i].getX())>100) {
 //								System.out.println("tC: " + tC + " lastUnits[i].getX(): " + lastUnits[chan][i].getX() 
 //										+ "  " + tdProjector. getTimeAxis().getPosition((timeMillis-scrollStart)/1000.) + "  " + tdProjector.getWidth());
@@ -155,12 +146,9 @@ public abstract class GenericLinePlotInfo extends TDDataInfoFX {
 							g.strokeLine(tC, dataPixel, lastUnits[chan][i].getX(), lastUnits[chan][i].getY());		
 						}
 						lastUnits[chan][i] = new Point2D(tC, dataPixel); 
-
 					}
 					tdProjector.addHoverData(new HoverData(c , pamDataUnit, 0, plotNumber));
-
 				}
-
 				//getSymbolChooser().getPamSymbol(pamDataUnit,type).draw(g, new Point2D(tC, dataPixel));
 			}
 		}
@@ -192,7 +180,8 @@ public abstract class GenericLinePlotInfo extends TDDataInfoFX {
 	 * @return the color for that prediciton
 	 */
 	public abstract LineInfo getColor(int i);
-
+	
+	
 	@Override
 	public Double getDataValue(PamDataUnit pamDataUnit) {
 		//this is not used because we have overridden the super drawing class. 
@@ -206,15 +195,13 @@ public abstract class GenericLinePlotInfo extends TDDataInfoFX {
 	 * @param changeType - notification flag.
 	 */
 	public void notifyChange(int changeType) {
-		//System.out.println("Prediction NOTIFYMODELCHANGED: "); 
+//	System.out.println("Prediction NOTIFYMODELCHANGED: " + changeType); 
 		switch (changeType) {
 		case PamController.CHANGED_PROCESS_SETTINGS:
 			lastUnits  = new Point2D[PamConstants.MAX_CHANNELS][];
-; 
 			break;
 		case PamController.RUN_NORMAL:
 			lastUnits  = new Point2D[PamConstants.MAX_CHANNELS][];
-
 			break;
 		case PamController.PAM_STOPPING:
 			lastUnits = new Point2D[PamConstants.MAX_CHANNELS][];

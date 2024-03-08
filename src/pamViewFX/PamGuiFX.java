@@ -252,7 +252,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 		/**create left hiding pane**/
 		loadPane=new PamLoadingPane(this.pamGuiManagerFX);
 		hidingLoadPane=new HidingPane(Side.TOP, loadPane, this, false);
-		hidingLoadPane.setPrefHeight(90);
+		hidingLoadPane.setPrefHeight(110);
 		hidingLoadPane.removeHideButton();
 		hidingLoadPane.showHidePane(false);
 		

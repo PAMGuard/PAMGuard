@@ -1124,7 +1124,7 @@ public class TDGraphFX extends PamBorderPane {
 		 * 
 		 */
 		public synchronized void repaint(long tm, int flag) {
-
+			
 			// clear the current canvas's
 			if (hasCanvas(flag, BASE_CANVAS)) {
 				baseCanvas.getGraphicsContext2D().clearRect(0, 0, baseCanvas.getWidth(), baseCanvas.getHeight());
@@ -1151,16 +1151,18 @@ public class TDGraphFX extends PamBorderPane {
 			boolean hasBase = false; 
 			synchronized (dataList) {
 				for (TDDataInfoFX dataInfo : dataList) {
+					
 					base = false;
+					
 					if (!dataInfo.isShowing()) {
-						// System.out.println("dataInfo.isShowing(): " + dataInfo.getDataName());
+						System.out.println("!dataInfo.isShowing(): " + dataInfo.getDataName());
 						continue;
 					}
 
 					scaleInfo = dataInfo.getScaleInfo();
 					if (scaleInfo == null) {
-						// System.out.println("scale info null " + dataInfo.getDataName() + "index:
-						// "+dataInfo.getScaleInfoIndex());
+//						 System.out.println("scale info null " + dataInfo.getDataName() + "index:
+//						 "+dataInfo.getScaleInfoIndex());
 						continue;
 					}
 
@@ -1183,7 +1185,7 @@ public class TDGraphFX extends PamBorderPane {
 					}
 					;
 
-					// ok so only repaint if we have the right CANVAS
+					// OK so only repaint if we have the right CANVAS
 					if (base && hasCanvas(flag, BASE_CANVAS)) {
 						paintDataUnits(gc, dataInfo, false);
 					} else if (!base && hasCanvas(flag, FRONT_CANVAS)) {
@@ -1287,6 +1289,7 @@ public class TDGraphFX extends PamBorderPane {
 			// PamDataBlock<PamDataUnit> dataBlock = dataInfo.getDataBlock();
 
 			// scroll start is the end of the display i.e. the last visible time in the past
+			
 			// in real time mode.
 			scrollStart = tdDisplay.getTimeScroller().getValueMillisD();
 
@@ -1524,7 +1527,7 @@ public class TDGraphFX extends PamBorderPane {
 	 * @param tm- if within millis of last repaint don't repaint
 	 */
 	public synchronized void repaint(long tm, int flag) {
-
+				
 		// Start of block moved over from the panel repaint(tm) function.
 		long currentTime = System.currentTimeMillis();
 		if (currentTime - lastTime < tm) {

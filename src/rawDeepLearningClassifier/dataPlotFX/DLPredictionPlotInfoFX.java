@@ -210,7 +210,7 @@ public class DLPredictionPlotInfoFX extends GenericLinePlotInfo {
 	public Polygon drawDataUnit(int plotNumber, PamDataUnit pamDataUnit, GraphicsContext g, double scrollStart,
 			TDProjectorFX tdProjector, int type) {
 
-		//System.out.println("Get data type: " + getScaleInfo().getDataType()); 
+//		System.out.println("Get prediciton data type: " + getScaleInfo().getDataType()); 
 		if (getScaleInfo().getDataType().equals(ParameterType.FREQUENCY)) { // frequency data !
 			return drawFrequencyData(plotNumber, pamDataUnit, g, scrollStart, tdProjector, type);
 		}

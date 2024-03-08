@@ -54,30 +54,7 @@ public class RawSpectrumPlot extends SpectrumPlot<PamDataUnit> {
 		plotProjector.setEnableScrollBar(true);
 	}
 
-
-//	@Override
-//	public double[][] getPowerSpectrum(PamDataUnit data) {
-//		return ((RawDataHolder) data).getDataTransforms().getPowerSpectrum(((RawDataHolder) data).getWaveData()[0].length); 
-//	}
-//	@Override
-//	public double[][] getCepstrum(PamDataUnit data) {
-//		return ((RawDataHolder) data).getDataTransforms().getCepstrum(((RawDataHolder) data).getWaveData()[0].length); 
-//		//return data.getRawDataTransforms().getCepstrum(channel, cepLength)
-//	}
-
-
-
-//
-//	public ClickSpectrumPlot(DetectionPlotDisplay displayPlot) {
-//		super(displayPlot);
-//	}
-//	
-//	
-//	@Override
-//	public String getName() {
-//		return "Spectrum";
-//	}
-//	
+	
 	/**
 	 * New click added to the display. 
 	 * @param newClick
@@ -169,17 +146,15 @@ public class RawSpectrumPlot extends SpectrumPlot<PamDataUnit> {
 	
 	@Override
 	public void paintPlot(PamDataUnit data, GraphicsContext gc, Rectangle rectangle, DetectionPlotProjector projector, int flag) {
-//		this.lastDataUnit=data;
-		//System.out.println("Paint plot projector: "+ projector);
+		
+		if (((RawDataHolder) data).getWaveData()==null) {
+			gc.clearRect(0, 0, rectangle.getWidth(), rectangle.getHeight());
+			return;
+		}
+		
 		if (flag== DetectionPlot.SCROLLPANE_DRAW) {
 			
-			
 			double[][] waveformTemp =  ((RawDataHolder) data).getWaveData();
-			
-			if (waveformTemp==null) return;
-			
-//			System.out.println("Spectrum plot: " +  "  "  + projector.getMinScrollLimit()  + "  " 
-//			+ projector.getMaxScrollLimit() + "  " + projector.getAxis(Side.TOP).getMaxVal() + "  wvfrm: " + WaveformPlot.getYScale(waveformTemp));
 			
 			WaveformPlot.paintWaveform(waveformTemp, data.getSequenceBitmap(),  gc,  rectangle,  0, waveformTemp[0].length,
 					WaveformPlot.getYScale(waveformTemp), null, true,  false);	

@@ -234,7 +234,8 @@
 .popover > .content {
     -fx-background-color: -fx-darkbackground;     
     -fx-background-radius: 5;
-    -fx-border-radius: 5;                   
+    -fx-border-radius: 5;       
+    -fx-padding: 0 0 0 0;               
 }
 
 .popover > .arrow {

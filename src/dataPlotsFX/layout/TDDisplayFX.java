@@ -615,9 +615,10 @@ public class TDDisplayFX extends PamBorderPane {
 	 * @param milliSeconds - the master clock position. 
 	 */
 	public void scrollDisplayEnd(long milliSeconds) {
+		
 
-		if (!isViewer() && milliSeconds <= lastUpdate && milliSeconds > lastUpdate - tdParametersFX.visibleTimeRange) {
-			//System.out.println("milliSeconds <= lastUpdate && milliSeconds > lastUpdate - visibleRange");
+		if (!isViewer() && lastUpdate>0 && milliSeconds <= lastUpdate && milliSeconds > lastUpdate - tdParametersFX.visibleTimeRange) {
+//			System.out.println("milliSeconds <= lastUpdate && milliSeconds > lastUpdate - visibleRange");
 			return;
 		}
 
@@ -849,7 +850,6 @@ public class TDDisplayFX extends PamBorderPane {
 
 		@Override
 		public void scrollValueChanged(AbstractPamScroller pamScroller) {
-			//			System.out.println("TDDisplayFX: Scroll Value changed: " +  System.currentTimeMillis());
 			//			System.out.println(String.format("Scroller value changed get start %s, End %s, pos %s", PamCalendar.formatTime(timeScrollerFX.getMinimumMillis()),
 			//					PamCalendar.formatTime(timeScrollerFX.getMaximumMillis()),PamCalendar.formatTime(timeScrollerFX.getValueMillis())));
 			//have to set the repaint wait millis param to zero or else when scroll bar is moved quickly painting does not occur correctly. 
@@ -1183,11 +1183,15 @@ public class TDDisplayFX extends PamBorderPane {
 			break;
 		}
 
+		//forces a repaint after any changes. 
+		lastUpdate=-1;
+		
 		if (tdGraphs != null) {
 			for (TDGraphFX tdg:tdGraphs) {
 				tdg.notifyModelChanged(changeType);
 			}
 		}
+		
 	}
 
 	/**

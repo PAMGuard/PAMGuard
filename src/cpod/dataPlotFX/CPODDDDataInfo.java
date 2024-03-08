@@ -60,14 +60,18 @@ public class CPODDDDataInfo extends DDDataInfo<CPODClick> {
 		public void setupAxis(PamDataUnit data, double sR, DetectionPlotProjector plotProjector) {
 			super.setupAxis(data, sR, plotProjector);
 			
+
 			CPODClick click = (CPODClick) data;
+			if (click.getWaveData()==null) {
+				return;
+			}
+			
 			double lenMS = (1000.*click.getWaveData()[0].length)/FPODReader.FPOD_WAV_SAMPLERATE;
 			//set the scroller minimum and maximum 
 			plotProjector.setMinScrollLimit(0);
 			//need this othewriwse the multiple sample rates relaly screw things up. 
 			plotProjector.setMaxScrollLimit(lenMS);
 			plotProjector.setEnableScrollBar(true);
-			
 			
 			plotProjector.setAxisMinMax(0, 250, Side.BOTTOM);
 		}
@@ -89,7 +93,6 @@ public class CPODDDDataInfo extends DDDataInfo<CPODClick> {
 
 		public CPODWaveformPlot(DetectionPlotDisplay detectionPlotDisplay) {
 			super(detectionPlotDisplay);
-			// TODO Auto-generated constructor stub
 		}
 
 		@Override

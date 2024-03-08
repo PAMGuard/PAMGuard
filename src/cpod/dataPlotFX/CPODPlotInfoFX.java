@@ -325,7 +325,6 @@ public class CPODPlotInfoFX extends GenericDataPlotInfo {
 				y2= tdProjector.getYPix(nycl); 
 
 				break; 
-
 			}
 
 			if (tdProjector.getOrientation()==Orientation.VERTICAL){
@@ -381,12 +380,14 @@ public class CPODPlotInfoFX extends GenericDataPlotInfo {
 		@Override
 		public PamSymbolFX getPamSymbol(PamDataUnit dataUnit, int type) {
 			PamSymbolFX symbol =  super.getPamSymbol(dataUnit, type);
+			
 			if (((CPODClick) dataUnit).getWaveData()!=null && type!=TDSymbolChooserFX.HIGHLIGHT_SYMBOL) {
 				symbol.setLineColor(symbol.getFillColor().darker());
 				symbol.setHeight(symbol.getHeight()*1.5);
 				symbol.setWidth(symbol.getWidth()*1.5);
+				return symbol;
 			}
-			
+						
 			return symbol;
 
 		}

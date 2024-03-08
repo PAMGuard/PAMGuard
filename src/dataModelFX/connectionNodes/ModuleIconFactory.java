@@ -2,6 +2,7 @@ package dataModelFX.connectionNodes;
 
 import dataModelFX.DataModelStyle;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
@@ -35,7 +36,7 @@ public class ModuleIconFactory {
 	public enum ModuleIcon {
 		DATAMAP, NMEA, GPS, MAP, SOUND_AQ, SOUND_OUTPUT, FFT, FILTER, CLICK, CLICK_TRAIN, RECORDER, WHISTLE_MOAN,
 		NOISE_BAND, NOISE_FILT, DATABASE, BINARY, TIME_DISPLAY, DETECTION_DISPLAY, ARRAY, DEEP_LEARNING, MATCHED_CLICK_CLASSIFIER,
-		DECIMATOR
+		DECIMATOR, CPOD
 	}
 
 	/**
@@ -125,6 +126,9 @@ public class ModuleIconFactory {
 			break;
 		case DECIMATOR:
 			iconNode = getSVGIcon("/Resources/modules/decimator.svg"); 
+			break;
+		case CPOD:
+			iconNode = new Label("CPOD"); //TEMP
 			break;
 		default:
 			break;
@@ -260,6 +264,9 @@ public class ModuleIconFactory {
 			break; 
 		case "decimator.DecimatorControl":
 			icon=ModuleIcon.DECIMATOR; 
+			break; 
+		case "cpod.CPODControl2":
+			icon=ModuleIcon.CPOD; 
 			break; 
 		}
 		return icon;
