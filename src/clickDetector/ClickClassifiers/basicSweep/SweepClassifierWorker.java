@@ -629,7 +629,8 @@ public class SweepClassifierWorker {
 	 * @return true if bearing limits are passed
 	 */
 	private boolean testBearings(ClickDetection click, SweepClassifierSet scs) {
-
+		if (click.getLocalisation()==null) return true;
+		
 		if (click.getLocalisation().getAngles()==null) return true; //passes the test if there is no bearing info. 
 
 		double bearing = click.getLocalisation().getAngles()[0]; 
