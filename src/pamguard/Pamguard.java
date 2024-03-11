@@ -44,6 +44,7 @@ import binaryFileStorage.BinaryStore;
 import dataPlotsFX.JamieDev;
 import generalDatabase.DBControl;
 import networkTransfer.send.NetworkSender;
+import offlineProcessing.OfflineTaskManager;
 import rocca.RoccaDev;
 
 import java.io.BufferedReader;
@@ -154,6 +155,7 @@ public class Pamguard {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		boolean showSplash = true;
 		if (args != null) {
 			int nArgs = args.length;
 			int iArg = 0;
@@ -171,6 +173,14 @@ public class Pamguard {
 				else if (anArg.equalsIgnoreCase("-nr")) {
 					runMode = PamController.RUN_NETWORKRECEIVER;
 					System.out.println("PAMGUARD Network Reciever Mode");
+				}
+				else if (anArg.equalsIgnoreCase("-nosplash")) {
+					showSplash = false;
+				}
+				else if (anArg.equalsIgnoreCase(GlobalArguments.BATCHFLAG)) {
+					// flag to say we're in batch processing mode. Can be used
+					// to avoid one or two dialogs that pop up in Viewer mode. 
+					GlobalArguments.setParam(GlobalArguments.BATCHFLAG, Boolean.TRUE.toString());
 				}
 
 				//	removed SEICHE switch when the two SEICHE modules were converted to plugins				
@@ -239,6 +249,10 @@ public class Pamguard {
 					int mPort = Integer.parseInt(args[iArg++]);
 					pamBuoyGlobals.setMultiportConfig(mAddr, mPort);
 					System.out.printf("Setting multicast control addr %s port %d\n", mAddr, mPort);
+				}
+				else if (anArg.equalsIgnoreCase(OfflineTaskManager.commandFlag)) {
+					String taskName = args[iArg++];
+					OfflineTaskManager.getManager().addCommandLineTask(taskName);
 				}
 				else if (anArg.equalsIgnoreCase("-nolog")) {
 					System.out.println("Disabling log file from command line switch...");
@@ -383,7 +397,7 @@ public class Pamguard {
 		if(runMode == PamController.RUN_REMOTE) {
 			spashTime = 0;
 		}
-		if (spashTime > 0 && (PamGUIManager.getGUIType() != PamGUIManager.NOGUI)) {
+		if (showSplash && spashTime > 0 && (PamGUIManager.getGUIType() != PamGUIManager.NOGUI)) {
 			new Splash(spashTime, chosenRunMode);
 		}
 		//		
@@ -717,6 +731,47 @@ public class Pamguard {
 			}
 		}
 	}
+	/*
+	 * Some bits that need added to Maven POM. 
+	 * 
+<!-- From NilusXMLGenerator POM at https://bitbucket.org/tethysacousticmetadata/nilusxmlgenerator/src/master/-->
+    <dependency>
+        <groupId>org.eclipse.persistence</groupId>
+        <artifactId>org.eclipse.persistence.moxy</artifactId>
+        <version>2.5.0</version>
+    </dependency>
+	<dependency>
+	    <groupId>javax.xml.bind</groupId>
+	    <artifactId>jaxb-api</artifactId>
+	    <version>2.4.0-b180830.0359</version> 
+	</dependency>
+	<dependency>
+	    <groupId>org.glassfish.jaxb</groupId>
+	    <artifactId>jaxb-runtime</artifactId>
+	    <version>2.4.0-b180830.0438</version> 
+	</dependency>
+	<dependency>
+        <groupId>org.glassfish.jaxb</groupId>
+        <artifactId>jaxb-xjc</artifactId>
+        <version>2.4.0-b180830.0438</version>
+    </dependency>
+	 
+	 <!-- Also not in Maven, so you may need to copy the javaclient and nilus folders from 
+e.g. C:\Users\dg50\source\repos\**your projectfolder**\repo\tethys\org
+to C:\Users\dg50\.m2\repository\tethys\org
+
+ 	<dependency>
+	    <groupId>tethys.org</groupId>
+	    <artifactId>nilus</artifactId>
+	    <version>3.0</version>
+	</dependency>
+
+ 	<dependency>
+	    <groupId>tethys.org</groupId>
+	    <artifactId>javaclient</artifactId>
+	    <version>3.0</version>
+	</dependency>-->
+	 */
 
 
 }

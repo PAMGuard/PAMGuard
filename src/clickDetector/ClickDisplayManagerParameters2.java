@@ -1,14 +1,20 @@
 package clickDetector;
 
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 
+import Layout.PamInternalFrame;
 import clickDetector.IDI_Display.IDIHistogramImage;
 
 import PamController.PamController;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 public class ClickDisplayManagerParameters2 implements Cloneable, Serializable, ManagedParameters {
 
@@ -33,6 +39,10 @@ public class ClickDisplayManagerParameters2 implements Cloneable, Serializable, 
 	private int lastMode;
 	
 	private boolean initialised = false;
+	
+	private boolean manualWindowSizes = false;
+	
+	private ArrayList<WindowSizeData> windowSizes = new ArrayList();
 	
 	public ClickDisplayManagerParameters2() {
 		setDefaults();
@@ -158,6 +168,11 @@ public class ClickDisplayManagerParameters2 implements Cloneable, Serializable, 
 		return null;
 	}
 
+	/**
+	 * This populates the serialised settings with lists of how many displays of 
+	 * each type there are. 
+	 * @param clickDisplayManager
+	 */
 	public void countEverything(ClickDisplayManager clickDisplayManager) {
 		lastMode = PamController.getInstance().getRunMode();
 		if (lastMode >= NMODES) lastMode = 0;
@@ -181,7 +196,7 @@ public class ClickDisplayManagerParameters2 implements Cloneable, Serializable, 
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DISPLAY);
 		try {
 			Field field = this.getClass().getDeclaredField("initialised");
 			ps.put(new PrivatePamParameterData(this, field) {
@@ -205,6 +220,103 @@ public class ClickDisplayManagerParameters2 implements Cloneable, Serializable, 
 			e.printStackTrace();
 		}
 		return ps;
+	}
+
+	/**
+	 * Save windows sizes in an array list. 
+	 * @param windowList
+	 */
+	public void saveDisplayLocations(ArrayList<ClickDisplay> windowList) {
+		if (windowList == null) {
+			return;
+		}
+		getWindowSizes(); // make sure the array is created
+		windowSizes.clear();
+		for (ClickDisplay disp : windowList) {
+			Point loc = disp.getFrame().getLocation();
+			Dimension sz = disp.getFrame().getSize();
+			String cls = disp.getClass().toString();
+			windowSizes.add(new WindowSizeData(cls, loc, sz));
+		}
+	}
+	
+	/**
+	 * Try to restore window locations and sizes from a stored list. 
+	 * @param windowList
+	 * @return
+	 */
+	public boolean restoreWindowSizes(ArrayList<ClickDisplay> windowList){
+		if (windowSizes == null || windowList == null) {
+			return false;
+		}
+		int resized = 0;
+		for (ClickDisplay disp : windowList) {
+			PamInternalFrame frame = disp.getFrame();
+			String cls = disp.getClass().toString();
+			// find an element in the list with that class.
+			WindowSizeData sizeData = null;
+			for (int i = 0; i < windowSizes.size(); i++) {
+				if (windowSizes.get(i).windowClass.equals(cls)) {
+					sizeData = windowSizes.remove(i);
+					break;
+				}
+			}
+			if (sizeData != null) {
+				frame.setLocation(sizeData.location);
+				frame.setSize(sizeData.size);
+				resized ++;
+			}
+		}
+		return resized > 0;
+	}
+	
+	
+	
+	/**
+	 * @return the windowSizes
+	 */
+	public ArrayList<WindowSizeData> getWindowSizes() {
+		if (windowSizes == null) {
+			windowSizes = new ArrayList<>();
+		}
+		return windowSizes;
+	}
+
+
+
+	/**
+	 * @return the manualWindowSizes
+	 */
+	public boolean isManualWindowSizes() {
+		return manualWindowSizes;
+	}
+
+	/**
+	 * @param manualWindowSizes the manualWindowSizes to set
+	 */
+	public void setManualWindowSizes(boolean manualWindowSizes) {
+		this.manualWindowSizes = manualWindowSizes;
+	}
+
+
+
+	private class WindowSizeData implements Serializable {
+		
+		static public final long serialVersionUID = 1;
+		
+		protected String windowClass;
+		
+		public WindowSizeData(String windowClass, Point location, Dimension size) {
+			super();
+			this.windowClass = windowClass;
+			this.location = location;
+			this.size = size;
+		}
+
+		protected Point location;
+		
+		protected Dimension size;
+		
 	}
 
 }

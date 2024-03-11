@@ -56,7 +56,8 @@ public class ArraySensorLogging extends SQLLogging {
 			AnalogSensorData aData = new AnalogSensorData(rawValue, calValue);
 			sensorData[i] = aData;
 		}
-		int chanMap = getTableDefinition().getChannelBitmap().getIntegerValue();
+		PamTableDefinition pamTableDef = (PamTableDefinition) getTableDefinition();
+		int chanMap = pamTableDef.getChannelBitmap().getIntegerValue();
 		int streamer = PamUtils.getSingleChannel(chanMap);
 		if (streamer < 0) streamer = 0;
 		AnalogArraySensorDataUnit asdu = new AnalogArraySensorDataUnit(timeMilliseconds, streamer, sensorData);

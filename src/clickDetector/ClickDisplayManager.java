@@ -28,6 +28,7 @@ import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
 import PamView.MenuItemEnabler;
 
@@ -302,7 +303,7 @@ public class ClickDisplayManager implements PamSettings {
 		
 		@Override
 		public PamParameterSet getParameterSet() {
-			PamParameterSet ps = PamParameterSet.autoGenerate(this);
+			PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DISPLAY);
 			try {
 				Field field = this.getClass().getDeclaredField("className");
 				ps.put(new PrivatePamParameterData(this, field) {
@@ -406,7 +407,12 @@ public class ClickDisplayManager implements PamSettings {
 
 	public Serializable getSettingsReference() {
 		cdmp.countEverything(this);
+		cdmp.saveDisplayLocations(getWindowList());
 		return cdmp;
+	}
+	
+	public void restoreWindowSizes() {
+		cdmp.restoreWindowSizes(getWindowList());
 	}
 
 	public int countDisplays(Class displayType) {

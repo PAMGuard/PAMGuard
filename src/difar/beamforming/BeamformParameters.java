@@ -5,6 +5,8 @@ import Filters.FilterParams;
 import Filters.FilterType;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
+import PamUtils.DeepCloner;
 import PamUtils.PamUtils;
 
 public class BeamformParameters implements Serializable, Cloneable, ManagedParameters {
@@ -110,7 +112,7 @@ public class BeamformParameters implements Serializable, Cloneable, ManagedParam
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
 	}
 

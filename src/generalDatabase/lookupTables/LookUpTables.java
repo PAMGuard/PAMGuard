@@ -3,10 +3,13 @@ package generalDatabase.lookupTables;
 import java.awt.Color;
 import java.awt.Window;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.ListIterator;
+import java.util.Vector;
 
 import PamController.PamController;
 import PamView.dialog.warn.WarnOnce;
@@ -101,9 +104,101 @@ public class LookUpTables {
 		checkedTableConnection = null;
 		if (dbControlUnit.getDbProcess().checkTable(lutTableDef)) {
 			checkedTableConnection = con;
-			return true;
 		}
-		return false;
+		
+		checkTableRepeats(con, lutTableDef);
+		
+		return checkedTableConnection != null;
+	}
+
+	/**
+	 * for some reason some repeats have got into the LUT and need to be removed
+	 * or it really messes stuff up. So check it automatically. 
+	 * @param con
+	 * @param lutTableDef2
+	 */
+	private boolean checkTableRepeats(PamConnection con, EmptyTableDefinition lutTableDef) {
+		/*
+		 * first get a list of unique topics, then check them one at a time. 
+		 */
+		ArrayList<String> topics = getTopicList(con, lutTableDef);
+		if (topics == null) {
+			return false;
+		}
+		
+		for (String topic : topics) {
+			checkTopicRepeats(con, lutTableDef, topic);
+		}
+		return true;
+	}
+	
+	private void checkTopicRepeats(PamConnection con, EmptyTableDefinition lutTableDef2, String topic) {
+		LookupList lutList = getLookupList(topic);
+		Vector<LookupItem> list = lutList.getList();
+		int n = list.size();
+		boolean[] isRepeat = new boolean[n];
+		int nRepeat = 0;
+		// search for repeats.
+		for (int i = 0; i < n-1; i++) {
+			String code = list.get(i).getCode().trim();
+			for (int j = i+1; j < n; j++) {
+				String code2 = list.get(j).getCode().trim();
+				if (code.equals(code2)) {
+					isRepeat[j] = true;
+					nRepeat++;
+				}
+			}
+		}
+		if (nRepeat == 0) {
+			return;
+		}
+		// make a clause to delete the repeats. 
+		String sql = null;
+		for (int i = 0; i < n; i++) {
+			if (isRepeat[i] == false) {
+				continue;
+			}
+			if (sql == null) {
+				sql = String.format("DELETE FROM %s WHERE Id IN (%d", lutTableDef.getTableName(), list.get(i).getDatabaseId());
+			}
+			else {
+				sql = sql + String.format(",%d", list.get(i).getDatabaseId());
+			}
+		}
+		sql += ")";
+		boolean ok = false;
+		try {
+			Statement stmt = con.getConnection().createStatement();
+			ok = stmt.execute(sql);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private ArrayList<String> getTopicList(PamConnection con, EmptyTableDefinition lutTableDef) {
+		if (con == null) {
+			return null;
+		}
+		ArrayList<String> topics = new ArrayList<>();
+		String qStr = "SELECT DISTINCT Topic FROM  " + lutTableDef.getTableName();
+		try {
+			Statement stmt = con.getConnection().createStatement();
+			boolean ok = stmt.execute(qStr);
+			if (ok == false) {
+				return null;
+			}
+			ResultSet results = stmt.getResultSet();
+			while (results.next()) {
+				String topic = results.getString(1);
+				topics.add(topic);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+		return topics;
 	}
 
 	public LookupList createLookupList(PamCursor resultSet, String topic) {

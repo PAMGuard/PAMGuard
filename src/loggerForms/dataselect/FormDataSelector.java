@@ -70,7 +70,7 @@ public class FormDataSelector extends DataSelector {
 	@Override
 	public double scoreData(PamDataUnit pamDataUnit) {
 		if (controlDataSelector == null) {
-			return 0;
+			return 1;
 		}
 		Object[] formData = null;
 		if (pamDataUnit instanceof FormsDataUnit) {

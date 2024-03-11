@@ -21,6 +21,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.Timer;
@@ -104,7 +105,7 @@ public class LoggerForm{
 	private CounterControl counter;
 	
 
-	private HydrophoneOriginMethods origins = HydrophoneOriginMethods.getInstance();
+//	private HydrophoneOriginMethods origins = HydrophoneOriginMethods.getInstance();
 	
 	/**
 	 * @return the hasCounter
@@ -529,7 +530,10 @@ public class LoggerForm{
 				innerCenterPanel.add(currentRow);
 				currentRow = new LoggerFormPanel(this, new FlowLayout(FlowLayout.LEFT));
 			}else{
-				currentRow.add(c.makeComponent(this));
+				JPanel component = c.makeComponent(this);
+				if (component != null) {
+					currentRow.add(component);
+				}
 			}
 
 		}
@@ -911,30 +915,30 @@ public class LoggerForm{
 		return saveButton;
 	}
 	
-	public GpsData getOriginLatLong(FormsDataUnit formsDataUnit) {
-		GpsData gps = getOrigin(GPSOriginSystem.class, formsDataUnit);
-		if (gps != null) {
-			return gps;
-		}
-		gps = getOrigin(StaticOriginSystem.class, formsDataUnit);
-		return gps;
-	}
-	
-	private GpsData getOrigin(Class originClass, FormsDataUnit formsDataUnit) {
-		HydrophoneOriginMethod origin = origins.getMethod(GPSOriginMethod.class, null, null);
-		if (origin == null) {
-			return null;
-		}
-		OriginIterator gpsIter = origin.getGpsDataIterator(PamDataBlock.ITERATOR_END);
-		GpsData prev = null;
-		while (gpsIter.hasPrevious()) {
-			prev = gpsIter.previous();
-			if (prev.getTimeInMillis() < formsDataUnit.getTimeMilliseconds()) {
-				break;
-			}
-		}
-		return prev;		
-	}
+//	public GpsData getOriginLatLong(FormsDataUnit formsDataUnit) {
+//		GpsData gps = getOrigin(GPSOriginSystem.class, formsDataUnit);
+//		if (gps != null) {
+//			return gps;
+//		}
+//		gps = getOrigin(StaticOriginSystem.class, formsDataUnit);
+//		return gps;
+//	}
+//	
+//	private GpsData getOrigin(Class originClass, FormsDataUnit formsDataUnit) {
+//		HydrophoneOriginMethod origin = origins.getMethod(GPSOriginMethod.class, null, null);
+//		if (origin == null) {
+//			return null;
+//		}
+//		OriginIterator gpsIter = origin.getGpsDataIterator(PamDataBlock.ITERATOR_END);
+//		GpsData prev = null;
+//		while (gpsIter.hasPrevious()) {
+//			prev = gpsIter.previous();
+//			if (prev.getTimeInMillis() < formsDataUnit.getTimeMilliseconds()) {
+//				break;
+//			}
+//		}
+//		return prev;		
+//	}
 	
 
 	//	/**

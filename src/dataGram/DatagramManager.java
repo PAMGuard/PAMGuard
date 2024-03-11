@@ -12,6 +12,7 @@ import javax.swing.SwingWorker;
 import javafx.concurrent.Task;
 import pamViewFX.pamTask.PamTaskUpdate;
 import pamViewFX.pamTask.SimplePamTaskUpdate;
+import pamguard.GlobalArguments;
 import dataMap.OfflineDataMap;
 import dataMap.OfflineDataMapPoint;
 import binaryFileStorage.BinaryOfflineDataMap;
@@ -68,10 +69,11 @@ public class DatagramManager {
 	public ArrayList<PamDataBlock> checkAllDatagrams() {
 		ArrayList<PamDataBlock> grammedDataBlocks = getDataBlocks();
 		ArrayList<PamDataBlock> updateBlocks = new ArrayList<PamDataBlock>();
+		boolean isBatch = GlobalArguments.getParam("-batch") != null;
 		/**
 		 * Check to see if any of the blocks have an existing datagram
 		 */
-		if (datagramSettings.validDatagramSettings == false) {
+		if (datagramSettings.validDatagramSettings == false && isBatch == false) {
 			/*
 			 *  this is the first time this has been run, so ask
 			 *  the user what datagram size they want.  
@@ -169,6 +171,8 @@ public class DatagramManager {
 
 	private volatile DatagramProgressDialog datagramProgressDialog;
 
+	private volatile DatagramCreator datagramCreator;
+
 
 	/**
 	 * update a list of datagrams. This should be done in a 
@@ -176,8 +180,16 @@ public class DatagramManager {
 	 * @param updateList
 	 */
 	public void updateDatagrams(ArrayList<PamDataBlock> updateList) {
-		DatagramCreator datagramCreator = new DatagramCreator(updateList);
+		datagramCreator = new DatagramCreator(updateList);
 		AWTScheduler.getInstance().scheduleTask(datagramCreator);
+	}
+	
+	/**
+	 * Get true if the datagram worker is running. 
+	 * @return
+	 */
+	public boolean getStatus() {
+		return datagramCreator != null;
 	}
 
 
@@ -542,6 +554,7 @@ public class DatagramManager {
 				publish(new DatagramProgress(PamTaskUpdate.STATUS_DONE, 1, 1));
 
 			}
+			datagramCreator = null;
 		}
 
 		@Override

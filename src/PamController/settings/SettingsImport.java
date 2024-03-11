@@ -29,7 +29,10 @@ import PamView.dialog.warn.WarnOnce;
  */
 public class SettingsImport {
 
+	private PamController pamController;
+
 	public SettingsImport(PamController pamController) {
+		this.pamController = pamController;
 	}
 
 	/**
@@ -116,14 +119,16 @@ public class SettingsImport {
 	 */
 	private PamControlledUnit importReplace(SettingsImportGroup importGroup, String replaceModule) {
 		PamControlledUnitSettings mainSet = importGroup.getMainSettings();
-		PamControlledUnit unit = PamController.getInstance().findControlledUnit(mainSet.getUnitType(), replaceModule);
+		UsedModuleInfo importInfo = importGroup.getUsedModuleInfo();
+		PamControlledUnit unit = PamController.getInstance().findControlledUnit(importInfo.getUnitType(), replaceModule);
 		if (unit == null) {
-			System.out.println("Unable to find " + mainSet.getUnitType() + " " + mainSet.getUnitName() + " for settings replacement");
+			System.out.println("Unable to find " + importInfo.getUnitType() + " " + importInfo.getUnitName() + " for settings replacement");
 			return null; 
 		}
 		// check we can cast it to PamSettings
-		if (PamSettings.class.isAssignableFrom(unit.getClass())) {
+		if (PamSettings.class.isAssignableFrom(unit.getClass()) && mainSet != null) {
 			try {
+				mainSet.setUnitName(replaceModule);
 				((PamSettings) unit).restoreSettings(mainSet);
 			}
 			catch (Exception e) {
@@ -132,7 +137,7 @@ public class SettingsImport {
 				System.err.println(e.getMessage());
 			}
 		}
-		loadSubUnitSettings(importGroup, mainSet.getUnitName());
+		loadSubUnitSettings(importGroup, replaceModule);
 		return unit;
 	}
 
@@ -149,7 +154,15 @@ public class SettingsImport {
 		}
 		PamSettingManager setManager = PamSettingManager.getInstance();
 		for (PamControlledUnitSettings pamSettings:subSets) {
-			PamSettings owner = setManager.findSettingsOwner(pamSettings.getUnitType(), unitName, pamSettings.getOwnerClassName());
+			/*
+			 *  class name in pamSettings is no longer correct, so cannot use pamSettings.getOwnerClassName().
+			 *  but the classnames of all the sub modules are unknown (and will be different form the unit class name
+			 *  which can be got from importGroup.getPamModuleInfo().getClassName
+			 *  so will have to do this only on the unit type and name and hope for no conflicts (catch exception).  
+			 */
+//			PamModuleInfo moduleInfo = importGroup.getPamModuleInfo();
+//			String className = moduleInfo.getClassName();
+			PamSettings owner = setManager.findSettingsOwner(pamSettings.getUnitType(), unitName, null);
 			if (owner == null) {
 				System.out.println(String.format("Cannot find settings owner for %s %s in current model", pamSettings.getUnitType(), unitName));
 				continue;
@@ -168,7 +181,8 @@ public class SettingsImport {
 
 	private PamControlledUnit importNew(SettingsImportGroup importGroup) {
 		PamControlledUnitSettings mainSet = importGroup.getMainSettings();
-		String moduleName = mainSet.getUnitName();
+		UsedModuleInfo importInfo = importGroup.getUsedModuleInfo();
+		String moduleName = importInfo.unitName;
 
 		// check we've got a name that doesnt' exist and replace it if if does. 
 		//		int startChar = 0;
@@ -199,11 +213,11 @@ public class SettingsImport {
 		
 		PamControlledUnit unit = PamController.getInstance().addModule(PamController.getMainFrame(), moduleInfo);
 		if (unit == null) {
-			System.out.println("Unable to find " + mainSet.getUnitType() + " " + mainSet.getUnitName() + " for settings replacement");
+			System.out.println("Unable to find " + importInfo.getUnitType() + " " + importInfo.getUnitName() + " for settings replacement");
 			return null; 
 		}
 		// check we can cast it to PamSettings
-		if (PamSettings.class.isAssignableFrom(unit.getClass())) {
+		if (PamSettings.class.isAssignableFrom(unit.getClass()) && mainSet != null) {
 			try {
 				mainSet.setUnitName(unit.getUnitName()); // need to force the unit name for some modules. 
 				((PamSettings) unit).restoreSettings(mainSet);
@@ -224,7 +238,7 @@ public class SettingsImport {
 	 * @param settings
 	 * @return
 	 */
-	ArrayList<SettingsImportGroup> organiseSettingsGroups(ArrayList<PamControlledUnitSettings> settings) {
+	public ArrayList<SettingsImportGroup> organiseSettingsGroups(ArrayList<PamControlledUnitSettings> settings) {
 		/**
 		 * this needs rewriting for psfx files which are organised differently. first we need to find 
 		 * a list of PAMGuard modules by finding the settings group of the PAMController. 

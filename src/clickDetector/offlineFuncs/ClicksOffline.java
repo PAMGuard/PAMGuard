@@ -632,6 +632,7 @@ public class ClicksOffline {
 		OfflineEventDataUnit newUnit = new OfflineEventDataUnit(null, getNextEventColourIndex(), null);
 		newUnit = OfflineEventDialog.showDialog(win, clickControl, newUnit);
 		if (newUnit != null) {
+			clickControl.removeFromEvents(markedClicks);
 			newUnit.addSubDetections(markedClicks);
 			offlineEventDataBlock.addPamData(newUnit);
 			clickControl.setLatestOfflineEvent(newUnit);

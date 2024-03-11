@@ -1,0 +1,192 @@
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Species coding</title>
+</head>
+
+<body>
+
+  <h1> Species and Call Type Names </h1>
+
+  When exporting data from PAMGuard to Tethys, some PAMGuard records
+  will require additional information indicating what type of animal
+  or phenomena were detected.  If a specific call-type was detected,
+  e.g. "Clicks" or "Whistles", these should be noted as well.
+  
+  <h2> Species Names </h2>
+  <p>
+    Tethys uses the <a href="https:itis.gov">Integrated Taxonomic
+    Information System</a> (ITIS) to encode species names as taxonomic
+    serial numbers (TSNs), unique numeric identifiers for species.
+    These data conform with several international coding systems which
+    are described on the <a href="https://itis.gov/standard.html">ITIS
+    standards</a> page.  
+  </p>
+
+  <p>
+    It is not uncommon to be unable to describe a call to the genus
+    level.  In such cases, one can use a higher taxonomic level.  For
+    example, beaked whale echolocation clicks are distinctive from the
+    clicks of other toothed whales as their pulses have a
+    frequency-modulated component.  While they can frequently be
+    associated with the family Hyperodontidae, it is not always
+    possible to associate a click to a specific species as many of the
+    at least twenty-two species remain understudied.  In such a case,
+    we would use the TSN for Hyperodontidae, 770799.  While not
+    currently supported by PAMGuard, each species identifier has an
+    optional Group attribute that can be used in an ad-hoc manner to
+    provide additional information.  This can be used to add
+    population markers, tentative genus groups, etc.
+  </p>
+
+  <p>
+    ITIS does not describe abiotic sounds, Tethys records such sounds as follows:
+    <ol>
+      <li>
+	For anthropogenic signals, the Tethys convention is to
+	use <em>Homo sapiens</em>, TSN 180092, for the species code
+	and describe the human-generated signal via a call type,
+	e.g. ship, mid-frequency active sonar, etc.
+      </li>
+      <li>
+	Tethys reserves the TSN -10 for geophonic signals.
+	The call type is used to describe the source.  Examples
+	include ambient sound, earthquake, rain, etc.  Note that negative TSNs
+	are not part of the ITIS standard.
+      </li>
+    </ol>
+  </p>
+
+  Note that in general, you do not have to worry about remembering
+  TSNs.  Tethys uses TSNs internally, but will translate TSNs to/from
+  Latin names or user-defined abbreviations both when querying and
+  presenting results.
+
+  <h2> Call types </h2>
+
+  <p>
+    Some detectors identify specific call types.  When this is the
+    case, users will need to specify the call type name.  While
+    species names are standardized in Tethys, call names do not have a
+    well-defined standard and experts frequently use different names
+    for the same type of call.  Consequently, Tethys does not provide a
+    standard coding for call types and users are free to choose the call
+    type names with which they feel most comfortable.
+  </p>
+
+  <p>
+    That said, the authors of Tethys do however provide a list of recommend call
+    types for many species.  These recommendations can be accessed in the
+    <a href="https://ars.els-cdn.com/content/image/1-s2.0-S1574954115001983-mmc1.docx">
+    supplemental information</a> of the open access article "Management of acoustic metadata
+    for bioacoustics," Roch et al. (2016),
+    (<a href="https://doi.org/10.1016/j.ecoinf.2015.12.002">DOI:10.1016/j.ecoinf.2015.12.002</a>).
+  </p>
+  
+  <h2>
+    Export dialog
+  </h2>
+
+  <p>
+    During export of records that are species-specific, a dialog will
+    appear that lists the types of events that were found by PAMGuard
+    modules.  This dialog permits users to specify how the ad-hoc species
+    species/call encoding scheme used by PAMGuard modules can be systematically
+    translated to the TSNs and call types are stored in Tethys.
+  </p>
+
+  <p>
+    PAMGuard events typically are a short name that represents the
+    species and/or potentially a call.  Knowledge of the PAMGuard
+    modules that were run and the data on which they executed will let
+    a user infer what should be recorded.
+    
+    The dialog below shows a sample set of events produced by one or more PAMGuard modules
+    using the names:  HP, DO, SON, KW, UNK, and PHP:
+
+  <div>
+      <img src="./images/species_codes.png" class=".center"/>
+  </div>
+
+  The dialog above was produced from detections on data that were
+  recorded near the mouth of the River Tay in Scotland.  Consequently,
+  we can infer that the harbour porpoise that is denoted by "HP" is
+  <em>Phocena phocena</em>, the only harbour porpoise endemic to
+  Scottish waters.
+  </p>
+  
+  An ITIS code and call/sound type can be associated with each event.  The dialog lists:
+  <ul>
+    <li>
+      Name - The ad-hoc name given by the PAMGuard module.  This may not be changed.
+    </li>
+
+    <li>
+      ITIS code -This is the ITIS TSN that is associated with PAMGuard
+      event code.  Click on Find to inovke the TSN
+      search dialog whose behavior is described in the <a href="#TSNLookup">next
+	section</a>.
+      <p>
+	If you happen to know the TSN, you
+	can enter it directly.  Pressing Find after typing the TNS will
+	populate the Latin and English vernauclar names so that you may
+	verify your TSN was entered correctly.
+      </p>
+    </li>
+
+    <li> Call / sound type - This will default to the code provided by
+      the module but should be updated to specify an appropriate call
+      type or left blank to indicate that the detection is not related
+      to a specific call type.  In the case of a porpoise detector,
+      the likely call type would be "Clicks".
+      <strong>We should double check that no Call element is generated when this is blank.</strong>
+    </li>
+  </ul>
+
+  <p>
+  Once all species names and call/sound types have been identified, press the Okay button.
+  </p>
+
+
+  
+  <a name="TSNLookup"></a>
+  <h2> Searching for ITIS Taxonomic Serial Numbers (TSNs) </h2>
+
+  <p>
+    As noted above, pressing Find without typing a TSN will bring up a
+    search dialog:
+  </p>
+
+  <div>
+    <image src="./images/species_search.png" class=".center"/>
+  </div>
+  
+  <p>
+    The top of this dialog has a search box where one can enter either
+    a Latin name or the common name for a species.  The Tethys server
+    will search for all species that match the search-box contents.
+    For many species, there are common name entries in languages
+    other than English, and these are searched as well.
+  </p>
+  <p>
+    Once you press the search button, a list will appear with all
+    matches for your search term.  If there are too many, a scroll bar
+    will permit you to look through the list.  Select the entry that
+    you wish and press OK.  The TSN on the species dialog will be
+    populated along with the Latin name and common names from the ITIS
+    database.
+  </p>
+
+
+    <br></br>
+    <br></br>
+
+  <p class="prevLink">
+    <a href="detect_localize.html">Previous: Detections & Localizations</a>
+  </p>
+  <p class="nextLink">
+    <a href="tethys_overview.html">Returrn to overview</a>
+  </p>
+  
+</body>

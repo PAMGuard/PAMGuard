@@ -30,6 +30,7 @@ import java.lang.reflect.Field;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 /**
  * Parameters for Rocca<br>
@@ -856,7 +857,7 @@ public class RoccaParameters implements Serializable, Cloneable, ManagedParamete
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("runAncCalcs4Clicks");
 			ps.put(new PrivatePamParameterData(this, field) {

@@ -6,6 +6,7 @@ import java.util.ListIterator;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import whistleClassifier.WhistleContour;
 import whistleClassifier.WhistleFragmenter;
 
@@ -200,7 +201,7 @@ public class TrainingDataSet implements Serializable, ManagedParameters {
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
 	}
 

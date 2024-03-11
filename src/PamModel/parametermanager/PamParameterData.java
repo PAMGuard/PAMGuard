@@ -34,6 +34,11 @@ abstract public class PamParameterData {
 	 */
 	private String postTitle;
 	
+	/**
+	 * field length for automatic dialogs. 
+	 */
+	private int fieldLength;
+	
 
 	/**
 	 * @param parentObject
@@ -50,6 +55,21 @@ abstract public class PamParameterData {
 	 * @param field
 	 * @param shortName
 	 * @param toolTip
+	 * @param fieldLength length of text in automatic dialogs. 
+	 */
+	public PamParameterData(Object parentObject, Field field, String shortName, String toolTip, int fieldLength) {
+		super();
+		this.field = field;
+		this.shortName = shortName;
+		this.toolTip = toolTip;
+		this.fieldLength = fieldLength;
+	}
+
+	/**
+	 * @param parentObject
+	 * @param field
+	 * @param shortName
+	 * @param toolTip
 	 */
 	public PamParameterData(Object parentObject, Field field, String shortName, String toolTip) {
 		super();
@@ -58,12 +78,25 @@ abstract public class PamParameterData {
 		this.toolTip = toolTip;
 	}
 
-
 	/**
 	 * @param shortName the shortName to set
 	 */
 	public void setShortName(String shortName) {
 		this.shortName = shortName;
+	}
+	
+	/**
+	 * Set info about a parameter
+	 * @param shortName short name, e.g. to use in a dialog
+	 * @param postTitle post title, e.g. text coming after a data entry field in a dialog
+	 * @param toolTip tool tip to display over the component in a dialog. 
+	 * @param fieldLength length of text in automatic dialogs. 
+	 */
+	public void setInfo(String shortName, String postTitle, String toolTip, int fieldLength) {
+		this.shortName = shortName;
+		this.postTitle = postTitle;
+		this.toolTip = toolTip;
+		this.fieldLength = fieldLength;
 	}
 	
 	/**
@@ -136,6 +169,9 @@ abstract public class PamParameterData {
 	 * @return a short name for the field, suitable for use in dialogs.
 	 */
 	public String getShortName() {
+		if (shortName == null) {
+			return getFieldName();
+		}
 		return shortName;
 	}
 	
@@ -164,6 +200,20 @@ abstract public class PamParameterData {
 	@Override
 	public String toString() {
 		return String.format("Param %s class %s", getFieldName(), getDataClass());
+	}
+
+	/**
+	 * @return the fieldLength
+	 */
+	public int getFieldLength() {
+		return fieldLength;
+	}
+
+	/**
+	 * @param fieldLength the fieldLength to set
+	 */
+	public void setFieldLength(int fieldLength) {
+		this.fieldLength = fieldLength;
 	}
 
 	

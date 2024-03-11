@@ -3,6 +3,7 @@ package annotation.string;
 import java.sql.Types;
 
 import PamguardMVC.PamDataUnit;
+import generalDatabase.EmptyTableDefinition;
 import generalDatabase.PamTableDefinition;
 import generalDatabase.PamTableItem;
 import generalDatabase.SQLLoggingAddon;
@@ -24,12 +25,12 @@ public class StringSQLLogging implements SQLLoggingAddon {
 	}
 
 	@Override
-	public void addTableItems(PamTableDefinition pamTableDefinition) {
+	public void addTableItems(EmptyTableDefinition pamTableDefinition) {
 		pamTableDefinition.addTableItem(notes); 
 	}
 
 	@Override
-	public boolean saveData(SQLTypes sqlTypes, PamTableDefinition pamTableDefinition, PamDataUnit pamDataUnit) {
+	public boolean saveData(SQLTypes sqlTypes, EmptyTableDefinition pamTableDefinition, PamDataUnit pamDataUnit) {
 		StringAnnotation stringAnnotation = (StringAnnotation) pamDataUnit.findDataAnnotation(StringAnnotation.class, 
 				stringAnnotationType.getAnnotationName());
 		if (stringAnnotation == null) {
@@ -42,7 +43,7 @@ public class StringSQLLogging implements SQLLoggingAddon {
 	}
 
 	@Override
-	public boolean loadData(SQLTypes sqlTypes, PamTableDefinition pamTableDefinition, PamDataUnit pamDataUnit) {
+	public boolean loadData(SQLTypes sqlTypes, EmptyTableDefinition pamTableDefinition, PamDataUnit pamDataUnit) {
 		try {
 			String note = notes.getDeblankedStringValue();
 			if (note != null && note.length() > 0) {

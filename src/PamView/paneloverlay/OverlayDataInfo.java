@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 public class OverlayDataInfo implements Serializable, Cloneable, ManagedParameters {
 	
@@ -31,7 +32,7 @@ public class OverlayDataInfo implements Serializable, Cloneable, ManagedParamete
 	 */
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DISPLAY);
 		return ps;
 	}
 

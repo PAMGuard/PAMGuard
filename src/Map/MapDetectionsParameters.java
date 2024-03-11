@@ -7,6 +7,7 @@ import java.util.ListIterator;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 /**
  * PArameters for MapDetectionsManager which 
@@ -65,7 +66,7 @@ public class MapDetectionsParameters implements Serializable, Cloneable, Managed
 		
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DISPLAY);
 		return ps;
 	}
 

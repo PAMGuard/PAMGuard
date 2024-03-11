@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamUtils.PamUtils;
 import PamView.dialog.GroupedSourcePanel;
 
@@ -210,7 +211,7 @@ public class GroupedSourceParameters implements Serializable, Cloneable, Managed
 	 */
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
 	}
 

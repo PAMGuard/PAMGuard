@@ -52,7 +52,17 @@ ol {
 	FONT-SIZE: 14;
 
 }
+
 img.wrap {float: left}
+img.wrapright {float: right}
+img.wrapcenter {float: center}
+
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 85%;
+}
 
 table, th, td {
   border: 1px solid black;

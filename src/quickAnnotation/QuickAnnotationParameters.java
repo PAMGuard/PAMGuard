@@ -9,6 +9,7 @@ import PamController.PamSettingManager;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import difar.DifarControl;
 import difar.DifarParameters;
 import generalDatabase.lookupTables.LookupItem;
@@ -96,7 +97,7 @@ public class QuickAnnotationParameters implements Serializable, Cloneable, Manag
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("exportClips");
 			ps.put(new PrivatePamParameterData(this, field) {

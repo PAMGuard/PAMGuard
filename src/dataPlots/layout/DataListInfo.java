@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 /**
  * TDDataInfo objects can't be serialised since they contain 
@@ -44,7 +45,7 @@ public class DataListInfo implements Serializable, Cloneable, ManagedParameters 
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DISPLAY);
 		return ps;
 	}
 

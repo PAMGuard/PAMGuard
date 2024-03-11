@@ -2,11 +2,18 @@ package noiseMonitor;
 
 import noiseMonitor.alarm.NoiseAlarmCounter;
 import noiseMonitor.alarm.NoiseAlarmProvider;
+import noiseMonitor.species.TethysNoiseDataProvider;
+import tethys.TethysControl;
+import tethys.pamdata.TethysDataProvider;
+import tethys.species.DataBlockSpeciesManager;
+import tethys.species.FixedSpeciesManager;
 import alarm.AlarmCounter;
 import alarm.AlarmCounterProvider;
 import alarm.AlarmDataSource;
 import PamUtils.FrequencyFormat;
 import PamUtils.PamUtils;
+import PamguardMVC.DataAutomation;
+import PamguardMVC.DataAutomationInfo;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
 
@@ -32,13 +39,15 @@ public class NoiseDataBlock extends PamDataBlock<NoiseDataUnit> implements Alarm
 
 	private NoiseAlarmProvider noiseAlarmCounter;
 	/**
-	 * These are the names used in the database columns, so dont' change them on pain of 
+	 * These are the names used in the database columns, so don't change them on pain of 
 	 * nothing ever working ever again !
 	 */
 	public static final String[] measureNames = {"mean", "median", "low95", "high95", "Min", "Max", "Peak"};
 	public static final String[] displayNames = {"Mean", "Median", "Lower 95%", "Upper 95%", "Minimum", "Maximim", "Peak"};
 	
 	private int statisticTypes;
+	private TethysNoiseDataProvider tethysNoiseDataProvider;
+	private FixedSpeciesManager fixedSpeciesManager;
 	
 	public NoiseDataBlock(String dataName,
 			PamProcess parentProcess, int channelMap) {
@@ -243,6 +252,27 @@ public class NoiseDataBlock extends PamDataBlock<NoiseDataUnit> implements Alarm
 			noiseAlarmCounter = new NoiseAlarmProvider(this);
 		}
 		return noiseAlarmCounter;
+	}
+
+	@Override
+	public DataAutomationInfo getDataAutomationInfo() {
+		return new DataAutomationInfo(DataAutomation.AUTOMATIC);
+	}
+
+	@Override
+	public TethysDataProvider getTethysDataProvider(TethysControl tethysControl) {
+		if (tethysNoiseDataProvider == null) {
+			tethysNoiseDataProvider = new TethysNoiseDataProvider(tethysControl, this);
+		}
+		return tethysNoiseDataProvider;
+	}
+
+	@Override
+	public DataBlockSpeciesManager<NoiseDataUnit> getDatablockSpeciesManager() {
+		if (fixedSpeciesManager == null) {
+			fixedSpeciesManager = new FixedSpeciesManager<NoiseDataUnit>(this, -10, "anthropogenic", "noise");
+		}
+		return fixedSpeciesManager;
 	}
 	
 

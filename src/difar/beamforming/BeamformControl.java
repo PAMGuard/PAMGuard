@@ -89,6 +89,16 @@ public class BeamformControl extends PamControlledUnit implements PamSettings, O
 	}
 
 	@Override
+	public String getDataLocation() {
+		if (offlineFileServer != null) {
+			return offlineFileServer.getDataLocation();
+		}
+		else {
+			return null;
+		}
+	}
+
+	@Override
 	public boolean restoreSettings(
 			PamControlledUnitSettings pamControlledUnitSettings) {
 		beamformParameters = ((BeamformParameters) pamControlledUnitSettings.getSettings()).clone();

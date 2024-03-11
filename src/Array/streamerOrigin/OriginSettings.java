@@ -3,6 +3,7 @@ package Array.streamerOrigin;
 import PamController.SettingsObject;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 /**
  * Class to hold settings for the different origin methods. 
@@ -47,7 +48,7 @@ public abstract class OriginSettings implements SettingsObject, Cloneable, Manag
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
 	}
 

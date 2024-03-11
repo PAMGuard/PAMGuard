@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
 
-import binaryFileStorage.BinaryStoreSettings;
 
 /**
  * Description of the parameters within a class. Primarily holds a list
@@ -29,6 +28,9 @@ public class PamParameterSet {
 	
 	private static boolean printDebug = false;
 	
+	public enum ParameterSetType {DETECTOR, DISPLAY};
+	
+	private ParameterSetType parameterSetType;
 	/**
 	 * Standard modifiers to exclude. This is important for many classes which will tend to 
 	 * do crazy things such as incorporate ALL of their final fields, e.g. when a Color 
@@ -55,8 +57,21 @@ public class PamParameterSet {
 	 * in the STANDARD_MODIFIER_EXCLUSIONS list (FINAL or STATIC).
 	 * @return Created parameter set. 
 	 */
+	@Deprecated 
 	public static PamParameterSet autoGenerate(Object parentObject) {
-		return autoGenerate(parentObject, STANDARD_MODIFIER_EXCLUSIONS);
+		return autoGenerate(parentObject, ParameterSetType.DETECTOR);
+	}
+	/**
+	 * Automatically generate a parameter set for a class. Will include all public fields and 
+	 * any private or protected fields for which a getter can be found that has a similar enough name
+	 * @param parentObject class to generate description for. Exception is anything that's listed 
+	 * in the STANDARD_MODIFIER_EXCLUSIONS list (FINAL or STATIC).
+	 * @return Created parameter set. 
+	 */
+	public static PamParameterSet autoGenerate(Object parentObject, ParameterSetType parameterSetType) {
+		PamParameterSet paramSet = autoGenerate(parentObject, STANDARD_MODIFIER_EXCLUSIONS);
+		paramSet.setParameterSetType(parameterSetType);
+		return paramSet;
 	}
 	
 	/**
@@ -286,4 +301,19 @@ public class PamParameterSet {
 	public PamParameterData removeParameterData(String paramName) {
 		return parameterDatas.remove(paramName);
 	}
+
+	/**
+	 * @return the parameterSetType
+	 */
+	public ParameterSetType getParameterSetType() {
+		return parameterSetType;
+	}
+
+	/**
+	 * @param parameterSetType the parameterSetType to set
+	 */
+	public void setParameterSetType(ParameterSetType parameterSetType) {
+		this.parameterSetType = parameterSetType;
+	}
+
 }

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 public class LandmarkDatas implements Serializable, Cloneable, ManagedParameters {
 
@@ -76,7 +77,7 @@ public class LandmarkDatas implements Serializable, Cloneable, ManagedParameters
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
 	}
 

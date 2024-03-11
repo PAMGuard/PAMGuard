@@ -5,6 +5,7 @@ import java.util.TimeZone;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 public class TimeDisplayParameters implements Serializable, Cloneable, ManagedParameters {
 
@@ -34,7 +35,7 @@ public class TimeDisplayParameters implements Serializable, Cloneable, ManagedPa
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DISPLAY);
 		return ps;
 	}
 

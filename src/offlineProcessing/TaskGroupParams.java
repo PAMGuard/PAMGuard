@@ -8,6 +8,7 @@ import java.util.Arrays;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 /**
  * Parameter control for offline task groups. 
@@ -137,7 +138,7 @@ public class TaskGroupParams implements Cloneable, Serializable, ManagedParamete
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("taskSelection");
 			ps.put(new PrivatePamParameterData(this, field) {

@@ -318,13 +318,12 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			}
 			selection = folderInputParameters.getSelectedFiles();
 		}
-		
-		if (selection!=null && selection.length > 0) {
+		if (selection == null) {
+			return 0;
+		}
+		if (selection.length > 0) {
 			System.out.println("FolderInputSystem.makeSelFileList(): Searching for sound files in " + selection[0]);
 		}
-		
-		if (selection==null) return 0; //sometimes happens
-		
 		return makeSelFileList(selection);
 	}
 	
@@ -519,8 +518,8 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 	 */
 	public  void newFileList(FileListData<WavFileType> fileListData) {
 		
-		System.out.printf("Wav list recieved with %d files after %d millis\n", 
-				fileListData.getFileCount(), System.currentTimeMillis() - wavListStart);
+//		System.out.printf("Wav list recieved with %d files after %d millis\n", 
+//				fileListData.getFileCount(), System.currentTimeMillis() - wavListStart);
 		allFiles = fileListData.getListCopy();
 		
 		List<WavFileType> asList = allFiles;
@@ -539,8 +538,6 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		if (file.isFile() && !file.isHidden() && acquisitionDialog != null) {
 			//Hidden files should not be used in analysis...
 			try {
-				
-				System.out.println("FolderInputSystem - newFileList"); 
 				audioStream = PamAudioFileManager.getInstance().getAudioInputStream(file);
 				AudioFormat audioFormat = audioStream.getFormat();
 				fileSamples = audioStream.getFrameLength();
@@ -703,7 +700,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		if (currentFile > 0 && currentFile >= allFiles.size()) {
 			fileListComplete();
 		}
-//		System.out.println("FolderinputSytem: daqHasEnded");
+		System.out.println("FolderinputSytem: daqHasEnded");
 	}
 
 	private void setFolderProgress() {
@@ -923,7 +920,6 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			return true;
 		}
 		for (int i = 0; i < allFiles.size(); i++) {
-			System.out.println("Get file start time"); 
 			long fileStart = getFileStartTime(allFiles.get(i).getAbsoluteFile());
 			if (fileStart >= startTime) {
 				currentFile = i;

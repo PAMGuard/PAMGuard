@@ -16,5 +16,10 @@ abstract public class MovingHydrophoneLocator extends SimpleHydrophoneLocator {
 		super(pamArray, streamer);
 	}
 
+	@Override
+	public boolean isChangeable() {
+		return true;
+	}
+
 
 }

@@ -6,6 +6,7 @@ import java.util.TimeZone;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import soundtrap.STXMLFile;
 
 public class StandardFileDateSettings implements Serializable, Cloneable, ManagedParameters {
@@ -150,7 +151,7 @@ public class StandardFileDateSettings implements Serializable, Cloneable, Manage
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DISPLAY);
 		return ps;
 	}
 }

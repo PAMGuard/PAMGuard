@@ -5,6 +5,7 @@ import java.io.Serializable;
 import PamController.soundMedium.GlobalMedium.SoundMedium;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
 /**
  * Stores parameters for the current medium. 
@@ -41,7 +42,7 @@ public class GlobalMediumParams implements Serializable, Cloneable, ManagedParam
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DISPLAY);
 		return ps;
 	}
 

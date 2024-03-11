@@ -28,6 +28,7 @@ import java.io.Serializable;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import alarm.actions.serial.AlarmSerialSettings;
 
 /**
@@ -158,7 +159,7 @@ public class SendEmailSettings implements Serializable, Cloneable, ManagedParame
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
 	}
 

@@ -35,6 +35,7 @@ import Array.streamerOrigin.StreamerDataIterator;
 import GPS.GpsData;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
 import PamUtils.LatLong;
 import PamUtils.PamArrayUtils;
@@ -91,6 +92,33 @@ public class PamArray implements Serializable, Cloneable, ManagedParameters {
 	private String arrayName;
 
 	private String arrayFile;
+	
+	/**
+	 * Type, used for Tethys and other meta data control 
+	 */
+	private String instrumentType;
+	
+	/**
+	 * Array Id. Can be anything. Compulsory for Tethys. 
+	 */
+	private String instrumentId;
+	
+	public String getInstrumentType() {
+		return instrumentType;
+	}
+
+	public void setInstrumentType(String instrumentType) {
+		this.instrumentType = instrumentType;
+	}
+
+	public String getInstrumentId() {
+		return instrumentId;
+	}
+
+	public void setInstrumentId(String instrumentId) {
+		this.instrumentId = instrumentId;
+	}
+
 
 	//	private int originInterpolation = ORIGIN_USE_LATEST;
 	private int originInterpolation = ORIGIN_USE_PRECEEDING;
@@ -1578,7 +1606,7 @@ public class PamArray implements Serializable, Cloneable, ManagedParameters {
 
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("streamers");
 			ps.put(new PrivatePamParameterData(this, field) {

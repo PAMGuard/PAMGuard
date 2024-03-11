@@ -3,6 +3,7 @@ package annotation.calcs.snr;
 import java.sql.Types;
 
 import PamguardMVC.PamDataUnit;
+import generalDatabase.EmptyTableDefinition;
 import generalDatabase.PamTableDefinition;
 import generalDatabase.PamTableItem;
 import generalDatabase.SQLLoggingAddon;
@@ -21,13 +22,13 @@ public class SnrSqlAddon implements SQLLoggingAddon {
 	}
 
 	@Override
-	public void addTableItems(PamTableDefinition pamTableDefinition) {
+	public void addTableItems(EmptyTableDefinition pamTableDefinition) {
 		pamTableDefinition.addTableItem(snr);
 		
 	}
 
 	@Override
-	public boolean saveData(SQLTypes sqlTypes, PamTableDefinition pamTableDefinition,
+	public boolean saveData(SQLTypes sqlTypes, EmptyTableDefinition pamTableDefinition,
 			PamDataUnit pamDataUnit) {
 		SNRAnnotation snrAnnotation = (SNRAnnotation) pamDataUnit.findDataAnnotation(SNRAnnotation.class);
 		if (snrAnnotation == null) {
@@ -40,7 +41,7 @@ public class SnrSqlAddon implements SQLLoggingAddon {
 	}
 
 	@Override
-	public boolean loadData(SQLTypes sqlTypes, PamTableDefinition pamTableDefinition,
+	public boolean loadData(SQLTypes sqlTypes, EmptyTableDefinition pamTableDefinition,
 			PamDataUnit pamDataUnit) {
 		Double snrVal = (Double) snr.getValue();
 		if (snrVal != null) {

@@ -36,6 +36,7 @@ import org.apache.commons.io.input.ClassLoaderObjectInputStream;
 import PamModel.PamModel;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamView.dialog.warn.WarnOnce;
 
 
@@ -398,8 +399,13 @@ public class PamControlledUnitSettings implements Serializable, ManagedParameter
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		return ps;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("Type %s; Name %s, Data ", getUnitType(), getUnitName()) + getSettings();
 	}
 
 }

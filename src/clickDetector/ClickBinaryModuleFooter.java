@@ -12,6 +12,7 @@ import PamController.PamController;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
+import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import binaryFileStorage.BinaryHeader;
 import binaryFileStorage.BinaryObjectData;
 import binaryFileStorage.ModuleFooter;
@@ -128,7 +129,7 @@ public class ClickBinaryModuleFooter extends ModuleFooter implements ManagedPara
 	
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
 		try {
 			Field field = this.getClass().getDeclaredField("clickDetectorName");
 			ps.put(new PrivatePamParameterData(this, field) {
