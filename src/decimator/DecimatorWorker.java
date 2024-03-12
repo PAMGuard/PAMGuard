@@ -78,6 +78,13 @@ public class DecimatorWorker {
 	}
 	
 	/**
+	 * Reset all counters and output buffers. 
+	 */
+	public void reset() {
+		createFilters();
+	}
+	
+	/**
 	 * Make the decimator filters. If reducing frequency, then the filter
 	 * is applied before decimation (obviously!) so is set up based on the 
 	 * input sample rate. If however the 'decimator' is being used to upsample, 

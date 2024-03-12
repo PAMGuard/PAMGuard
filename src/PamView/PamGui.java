@@ -1268,7 +1268,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 
 	class menuPamStart implements ActionListener {
 		public void actionPerformed(ActionEvent ev){
-			pamControllerInterface.pamStart();
+			pamControllerInterface.manualStart();
 
 		}
 	}
@@ -1285,7 +1285,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 
 	class menuPamStop implements ActionListener {
 		public void actionPerformed(ActionEvent ev){
-			pamControllerInterface.pamStop();
+			pamControllerInterface.manualStop();
 			//			enableLoggingMenu();		
 		}
 	}

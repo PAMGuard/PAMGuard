@@ -49,7 +49,7 @@ public class BinaryOutputStream {
 	
 	private DataOutputStream noiseOutputStream;
 
-	private int storedObjects;
+	private int storedObjects, storedNoiseCount;
 
 	private String mainFileName, indexFileName;
 
@@ -219,6 +219,7 @@ public class BinaryOutputStream {
 		else {
 			noiseOutputStream = null;
 		}
+		storedNoiseCount = 0;
 		return true;
 	}
 
@@ -450,6 +451,7 @@ public class BinaryOutputStream {
 		footer.setHighestUID(parentDataBlock.getUidHandler().getCurrentUID());
 		boolean ok = footer.writeFooter(dataOutputStream, BinaryStore.getCurrentFileFormat());
 		if (noiseOutputStream != null) {
+//			footer.setnObjects(storedNoiseCount);
 			ok &= footer.writeFooter(noiseOutputStream, BinaryStore.getCurrentFileFormat());
 		}
 		lastObjectType = BinaryTypes.FILE_FOOTER;
@@ -487,12 +489,20 @@ public class BinaryOutputStream {
 //	}
 	
 	public synchronized boolean storeData(int objectId, DataUnitBaseData baseData, BinaryObjectData binaryObjectData) {
+		boolean ok;
 		if (objectId == BinaryTypes.BACKGROUND_DATA & noiseOutputStream != null) {
-			return storeData(noiseOutputStream, objectId, baseData, binaryObjectData);
+			ok = storeData(noiseOutputStream, objectId, baseData, binaryObjectData);
+			if (ok) {
+				storedNoiseCount++;
+			}
 		}
 		else {
-			return storeData(dataOutputStream, objectId, baseData, binaryObjectData);
+			ok = storeData(dataOutputStream, objectId, baseData, binaryObjectData);
+			if (ok) {
+				storedObjects++;
+			}
 		}
+		return ok;
 	}
 	/**
 	 * Writes data to a file. Note that the length of data may be greater than
@@ -564,7 +574,6 @@ public class BinaryOutputStream {
 			return false;
 		}
 
-		storedObjects++;
 
 
 		return true;
