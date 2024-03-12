@@ -124,6 +124,7 @@ public class PamFFTProcess extends PamProcess {
 
 	public synchronized void setupFFT() {
 		
+		System.out.println("In call to setupFFT in " + getProcessName());
 		// need to find the existing source data block and remove from observing it.
 		// then find the new one and subscribe to that instead. 
 		channelCounts = new int[PamConstants.MAX_CHANNELS];
@@ -390,28 +391,32 @@ public class PamFFTProcess extends PamProcess {
 				}
 			}
 		}
+		TempOutputStore[] oldStores = tempStores;
 		if (iChan == PamUtils.getHighestChannel(fftParameters.channelMap)) {
 			// time to empty the stores - assume they all have the same
 			// amount of data 
 			int[] chanList = PamUtils.getChannelArray(fftParameters.channelMap);
 			try {
-			int n = tempStores[iChan].getN();
-			for (int iF = 0; iF < n; iF++) {
-				for (int iC = 0; iC < chanList.length; iC++) {
-//					pu = tempStores[chanList[iC]].get(iF);
-					try {
-					outputData.addPamData(tempStores[chanList[iC]].get(iF));
+				int n = tempStores[iChan].getN();
+				for (int iF = 0; iF < n; iF++) {
+					for (int iC = 0; iC < chanList.length; iC++) {
+						//					pu = tempStores[chanList[iC]].get(iF);
+						try {
+							outputData.addPamData(tempStores[chanList[iC]].get(iF));
+						}
+						catch (ArrayIndexOutOfBoundsException e) {
+							//						e.printStackTrace();
+							System.err.printf("%s.newData: %s Store %s (was %s) iC: %d of %d iF: %d of %d\n", 
+									this.getPamControlledUnit().getUnitName(), e.getMessage(), 
+									tempStores[chanList[iC]], oldStores[chanList[iC]],
+									iC, chanList.length, iF, n);
+						}
+						//					outputData.addPamData(null);
 					}
-					catch (ArrayIndexOutOfBoundsException e) {
-//						e.printStackTrace();
-						System.err.println("PAMFFTProcess.newData: " + e.getMessage() + " " + this.getPamControlledUnit().getUnitName() + " iC: " + iC +  " iF: " + iF);
-					}
-//					outputData.addPamData(null);
 				}
-			}
-			for (int iC = 0; iC < chanList.length; iC++) {
-				tempStores[chanList[iC]].clearStore();
-			}
+				for (int iC = 0; iC < chanList.length; iC++) {
+					tempStores[chanList[iC]].clearStore();
+				}
 			}
 			catch (Exception e) {
 				e.printStackTrace();
@@ -537,6 +542,25 @@ public class PamFFTProcess extends PamProcess {
 	@Override
 	public ArrayList getCompatibleDataUnits(){
 		return new ArrayList<Class<? extends PamDataUnit>>(Arrays.asList(RawDataUnit.class));
+	}
+
+	@Override
+	public synchronized void dumpBufferStatus(String message, boolean sayEmpties) {
+		
+		super.dumpBufferStatus(message, sayEmpties);
+		int nTemp = 0;
+		if (tempStores != null) {
+			nTemp = tempStores.length;
+		}
+		for (int i = 0; i < nTemp; i++) {
+			if (tempStores[i] == null) {
+				continue;
+			}
+			int n = tempStores[i].tempUnits.size();
+			if (n > 0 || sayEmpties) {
+				System.out.printf("FFT %s temp store %d has %d datas\n", getProcessName(), i, n);
+			}
+		}
 	}
 
 //	@Override

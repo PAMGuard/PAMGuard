@@ -28,4 +28,11 @@ public interface DataInputStore {
 	 */
 	public boolean setAnalysisStartTime(long startTime);
 
+	/**
+	 * Very specific command handler for batch status which will only work 
+	 * with the acquisition folderinputSystem or the tritech file processing. 
+	 * @return
+	 */
+	public String getBatchStatus();
+
 }

@@ -16,7 +16,7 @@ public class PamguardVersionInfo {
 	 * @return release type 
 	 */
 	static public ReleaseType getReleaseType() {
-		return ReleaseType.CORE; 
+		return ReleaseType.OTHER; 
 	}
 	
 	/**
@@ -36,7 +36,7 @@ public class PamguardVersionInfo {
 	/**
 	 * Release date
 	 */
-	static public final String date = "30 January 2024";
+	static public final String date = "2 March 2024";
 	
 //	/**
 //	 * Release type - Beta or Core
