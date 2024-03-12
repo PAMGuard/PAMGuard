@@ -18,7 +18,7 @@ import rawDeepLearningClassifier.dlClassification.genericModel.GenericModelParse
 class DLJSONParserTest {
 
 	@Test
-	public void test() {
+	public void testDLJsonParser() {
 		
 		
 		//load an old file 

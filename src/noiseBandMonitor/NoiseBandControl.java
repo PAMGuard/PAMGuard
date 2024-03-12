@@ -236,6 +236,9 @@ public class NoiseBandControl extends PamControlledUnit implements PamSettings {
 	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		noiseBandSettings = ((NoiseBandSettings)pamControlledUnitSettings.getSettings()).clone();
+		System.out.println("********************************************************");
+		System.out.println("NOISE BAND SETTINGS: " + noiseBandSettings.rawDataSource);
+		System.out.println("********************************************************");
 		return true;
 	}
 

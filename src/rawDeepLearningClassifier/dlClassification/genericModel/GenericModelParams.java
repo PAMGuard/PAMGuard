@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.jamdev.jdl4pam.transforms.DLTransform.DLTransformType;
 import org.json.JSONArray;
 
+import PamUtils.PamArrayUtils;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.layoutFX.exampleSounds.ExampleSoundFactory.ExampleSoundType;
 
@@ -116,15 +117,21 @@ public class GenericModelParams extends StandardModelParams implements Cloneable
 			//both transforms must be null and so can still be equal
 		}
 		
-//		System.out.println("TRANSFORMS ARE EQUAL");
 		//check the rest. 
 		
 		boolean isEqual = 
 				this.useDefaultSegLen == params.useDefaultSegLen &&
 				this.defaultSegmentLen.equals(params.defaultSegmentLen) && 
-				this.shape.equals(params.shape) &&
-				this.outputShape.equals(params.outputShape);
+				PamArrayUtils.arrEquals(this.shape, params.shape) &&
+				PamArrayUtils.arrEquals(this.outputShape, params.outputShape);
 				//Arrays.equals(	this.classNames, params.classNames); 
+				
+//		System.out.println("Other bits are equal:?" + isEqual 
+//				+ " use defult seg len " + (this.useDefaultSegLen == params.useDefaultSegLen) 
+//				+ " defaultSegmentLen " + (this.defaultSegmentLen.equals(params.defaultSegmentLen)
+//				+ " input shape " + this.shape.equals(params.shape)
+//				+ " output shape " + this.shape.equals(params.shape)));
+		
 		
 		
 		return isEqual; 

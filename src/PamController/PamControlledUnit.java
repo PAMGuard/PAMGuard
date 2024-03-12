@@ -937,34 +937,4 @@ public abstract class PamControlledUnit implements SettingsNameProvider {
 		this.pamConfiguration = pamConfiguration;
 	}
 
-	/**
-	 * The PamConfiguration holds the master list of modules which form part of a
-	 * configuration. It should be accessed to find list of datablocks, etc. rather than 
-	 * doing everything through PAMController whenever possible.  
-	 * @return the pamConfiguration
-	 */
-	public PamConfiguration getPamConfiguration() {
-		if (pamConfiguration == null) {
-			pamConfiguration = PamController.getInstance().getPamConfiguration();
-		}
-		return pamConfiguration;
-	}
-	
-	/**
-	 * Is this module in the main configuration. If it isn't then it's probably a dummy config
-	 * used in the batch processor or for importing  / exporting configs, so it should be stopped from 
-	 * doing too much !
-	 * @return
-	 */
-	public boolean isInMainConfiguration() {
-		return pamConfiguration == PamController.getInstance().getPamConfiguration();
-	}
-
-	/**
-	 * @param pamConfiguration the pamConfiguration to set
-	 */
-	public void setPamConfiguration(PamConfiguration pamConfiguration) {
-		this.pamConfiguration = pamConfiguration;
-	}
-
 }

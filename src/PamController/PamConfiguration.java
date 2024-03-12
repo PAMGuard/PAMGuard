@@ -170,7 +170,12 @@ public class PamConfiguration {
 	public PamDataBlock getDataBlock(Class blockType, String name) {
 		if (name == null) return null;
 		ArrayList<PamDataBlock> blocks = getDataBlocks(blockType, true);
+		
+		System.out.println(name);
+
 		for (PamDataBlock dataBlock:blocks) {
+//			System.out.println(dataBlock.getLongDataName() +  " |||  " + dataBlock.toString());
+
 			if (name.equals(dataBlock.getLongDataName())) { // check for a long name match first 
 				return dataBlock;
 			}
@@ -181,6 +186,27 @@ public class PamConfiguration {
 				}
 			}
 			if (name.equals(dataBlock.toString())) {
+				return dataBlock;
+			}
+		}
+		return tryShortDataName(blockType, name);
+	}
+	
+	/**
+	 * For when the function calling with longdataname fails!
+	 * @param blockType
+	 * @param name
+	 * @return
+	 */
+	private PamDataBlock tryShortDataName(Class blockType, String name) {
+		if (name == null) return null;
+		ArrayList<PamDataBlock> blocks = getDataBlocks(blockType, true);
+		
+		System.out.println(name);
+
+		for (PamDataBlock dataBlock:blocks) {
+
+			if (name.equals(dataBlock.getDataName())) { // check for a long name match first 
 				return dataBlock;
 			}
 		}

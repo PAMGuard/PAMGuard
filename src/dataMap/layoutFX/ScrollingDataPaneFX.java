@@ -29,8 +29,9 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	
 	/**
 	 * Standard millis to wait for repaint. 
+	 * Do not ake this too high i.e. above 50 or the display gets very jerky
 	 */
-	public static final long REPAINTMILLIS = 200;
+	public static final long REPAINTMILLIS = 50;
 
 	/**
 	 * The default expanded hieght for each pane. 

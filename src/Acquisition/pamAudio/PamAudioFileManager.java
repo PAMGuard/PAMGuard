@@ -135,7 +135,7 @@ public class PamAudioFileManager {
 		}
 
 		if (stream == null) {
-			System.err.println("PamAudioFileManager: unable to open an AudioStream for " + file.getName());
+			System.err.println("PamAudioFileManager: unable to open an AudioStream for " + file.getName() + " size: " + file.length());
 		}
 
 		return stream;

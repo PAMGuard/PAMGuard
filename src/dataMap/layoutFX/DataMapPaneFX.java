@@ -20,8 +20,10 @@ import userDisplayFX.UserDisplayNodeFX;
 import userDisplayFX.UserDisplayNodeParams;
 
 /**
- * Pane which shows users all data currently stored in binary files and databases within PAMGuard. Also allows for navigation to
- * different part of the data time series. 
+ * Pane which shows users all data currently stored in binary files and
+ * databases within PAMGuard. Also allows for navigation to different part of
+ * the data time series.
+ * 
  * @author Jamie Macaulay
  *
  */

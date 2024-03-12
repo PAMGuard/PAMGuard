@@ -377,6 +377,7 @@ public class SegmenterProcess extends PamProcess {
 					//create a new data unit - should only be called once after initial start.  
 					currentRawChunks[i] = new GroupedRawData(timeMilliseconds, getSourceParams().getGroupChannels(i), 
 							startSampleTime, dlControl.getDLParams().rawSampleSize, dlControl.getDLParams().rawSampleSize); 
+					
 					currentRawChunks[i].setParentDataUnit(unit);; 
 				}
 
@@ -653,7 +654,7 @@ public class SegmenterProcess extends PamProcess {
 	 * @author Jamie Macaulay 
 	 *
 	 */
-	public class GroupedRawData extends PamDataUnit implements PamDetection, Cloneable {
+	public static class GroupedRawData extends PamDataUnit implements PamDetection, Cloneable {
 
 
 		/*

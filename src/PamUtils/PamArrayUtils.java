@@ -1003,19 +1003,48 @@ public class PamArrayUtils {
 		
 		return newArray; 
 	}
-
-
 	
 	/**
-	 * Check if two int arrays contain the same elements
-	 * @param arr1 - the array to compare to. 
-	 * @param arr2 - the array to be compared. 
+	 * Check if two Long arrays contain the same elements
+	 * @param shape - the array to compare to. 
+	 * @param shape2 - the array to be compared. 
 	 */
-	public static boolean arrEquals(int[] arr1, int[] arr2) {
-		if (arr1.length!=arr2.length) return false; 
+	public static boolean arrEquals(Long[] shape, Long[] shape2) {
+		if (shape.length!=shape2.length) return false; 
 		
-		for (int i =0 ;i<arr1.length; i++) {
-			if (arr1[i]!=arr2[i]) return false; 
+		for (int i =0 ;i<shape.length; i++) {
+			if (shape[i]!=shape2[i]) return false; 
+		}
+		
+		return true; 
+	}
+
+	/**
+	 * Check if two int arrays contain the same elements
+	 * @param shape - the array to compare to. 
+	 * @param shape2 - the array to be compared. 
+	 */
+	public static boolean arrEquals(int[] shape, int[] shape2) {
+		if (shape.length!=shape2.length) return false; 
+		
+		for (int i =0 ;i<shape.length; i++) {
+			if (shape[i]!=shape2[i]) return false; 
+		}
+		
+		return true; 
+	}
+	
+	
+	/**
+	 * Check if two long arrays contain the same elements
+	 * @param shape - the array to compare to. 
+	 * @param shape2 - the array to be compared. 
+	 */
+	public static boolean arrEquals(long[] shape, long[] shape2) {
+		if (shape.length!=shape2.length) return false; 
+		
+		for (int i =0 ;i<shape.length; i++) {
+			if (shape[i]!=shape2[i]) return false; 
 		}
 		
 		return true; 
@@ -1113,6 +1142,7 @@ public class PamArrayUtils {
 		}
 		return null;
 	}
+
 
 
 

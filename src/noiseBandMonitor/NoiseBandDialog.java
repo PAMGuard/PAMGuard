@@ -231,6 +231,9 @@ public class NoiseBandDialog extends PamDialog {
 			singleInstance = new NoiseBandDialog(parentFrame, noiseBandControl);
 		}
 		singleInstance.setupComplete = false;
+//		System.out.println("********************************************************");
+//		System.out.println("NOISE BAND DIALOG: " + 	singleInstance.noiseBandSettings.rawDataSource);
+//		System.out.println("********************************************************");
 		singleInstance.noiseBandSettings = noiseBandControl.noiseBandSettings.clone();
 		singleInstance.setParams();
 		singleInstance.setVisible(true);
@@ -287,7 +290,7 @@ public class NoiseBandDialog extends PamDialog {
 		if (dataBlock == null) {
 			return showWarning("You must select a source of raw audio data");
 		}
-		noiseBandSettings.rawDataSource = dataBlock.getDataName();
+		noiseBandSettings.rawDataSource = dataBlock.getLongDataName();
 		noiseBandSettings.channelMap = sourcePanel.getChannelList();
 		if (noiseBandSettings.channelMap == 0) {
 			return showWarning("You must select at least one data channel");

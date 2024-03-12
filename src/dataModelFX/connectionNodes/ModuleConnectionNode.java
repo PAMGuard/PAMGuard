@@ -237,7 +237,7 @@ public class ModuleConnectionNode extends StandardConnectionNode implements PAMC
 		removeButton.setGraphic(PamGlyphDude.createPamIcon("mdi2m-minus", Color.WHITE, PamGuiManagerFX.iconSize));
 		removeButton.setMaxSize(Double.MAX_VALUE,Double.MAX_VALUE);
 		removeButton.setOnAction((change)->{
-			if (this.pamControlledUnit.getPamModuleInfo().canRemove()){
+			if (this.pamControlledUnit.getPamModuleInfo()== null || this.pamControlledUnit.getPamModuleInfo().canRemove()){
 				connectionPane.removeModuleNode(this);
 			}
 		});
@@ -620,7 +620,7 @@ public class ModuleConnectionNode extends StandardConnectionNode implements PAMC
 		//add tool tip
 		if (pamControlledUnit!=null){
 			
-			//sometimes seems to cause an issue woith dialogs disappearing. 
+			//sometimes seems to cause an issue with dialogs disappearing. 
 //			Tooltip tp = new Tooltip(pamControlledUnit.getUnitType());
 //			tp.getStyleClass().removeAll(tp.getStyleClass());
 //			Tooltip.install(this, tp);
@@ -637,18 +637,18 @@ public class ModuleConnectionNode extends StandardConnectionNode implements PAMC
 					removeConnectionPlug(getConnectionPlugs().get(i),false); 
 				}
 			}
-			
-			
 		}
 		
-		Node icon = ModuleIconFactory.getInstance().
-				getModuleNode(pamControlledUnit.getPamModuleInfo().getClassName());
-		if (pamControlledUnit.getPamModuleInfo()!=null && icon!=null){
-			StackPane iconPane = new StackPane(icon);
-			iconPane.setPrefSize(DataModelStyle.iconSize, DataModelStyle.iconSize);
-			iconPane.setAlignment(Pos.CENTER);
-			StackPane.setAlignment(iconPane, Pos.CENTER); //make sure the image or node is centered.
-			this.getConnectionNodeBody().getChildren().add(iconPane);
+		if (pamControlledUnit.getPamModuleInfo()!=null) {
+			Node icon = ModuleIconFactory.getInstance().
+					getModuleNode(pamControlledUnit.getPamModuleInfo().getClassName());
+			if (icon!=null){
+				StackPane iconPane = new StackPane(icon);
+				iconPane.setPrefSize(DataModelStyle.iconSize, DataModelStyle.iconSize);
+				iconPane.setAlignment(Pos.CENTER);
+				StackPane.setAlignment(iconPane, Pos.CENTER); //make sure the image or node is centered.
+				this.getConnectionNodeBody().getChildren().add(iconPane);
+			}
 		}
 		
 		
