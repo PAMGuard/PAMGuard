@@ -65,7 +65,7 @@ import pamScrollSystem.ViewLoadObserver;
  * @see PamguardMVC.PamDataUnit
  *
  */
-public class AcquisitionProcess extends PamProcess implements DataInputStore {
+public class AcquisitionProcess extends PamProcess {
 	
 	public static final int LASTDATA = 2; // don't use zero since need to see if no notification has been received. 
 	
@@ -1240,7 +1240,6 @@ public class AcquisitionProcess extends PamProcess implements DataInputStore {
 		return daqStatusDataBlock;
 	}
 
-	@Override
 	public InputStoreInfo getStoreInfo(boolean detail) {
 		if (runningSystem instanceof DataInputStore) {
 			return ((DataInputStore) runningSystem).getStoreInfo(detail);
@@ -1250,7 +1249,6 @@ public class AcquisitionProcess extends PamProcess implements DataInputStore {
 		}
 	}
 
-	@Override
 	public boolean setAnalysisStartTime(long startTime) {
 		if (runningSystem instanceof DataInputStore) {
 			return ((DataInputStore) runningSystem).setAnalysisStartTime(startTime);
