@@ -444,6 +444,7 @@ public class ThreadedObserver implements PamObserver {
 				else {
 					emptyRead = false;
 					int lc=0;
+					ObservedObject observedObject;
 					while (!toDoList.isEmpty()) {
 
 //						if (stopFlag) {
@@ -458,11 +459,21 @@ public class ThreadedObserver implements PamObserver {
 						
 
 						// get the first object, send it for processing and then remove from the list
-						ObservedObject observedObject = toDoList.get(0);
-						performAction(observedObject);
 						synchronized(synchLock) {
-							toDoList.remove(0);
+							if (toDoList.size() > 0) { 
+								observedObject = toDoList.remove(0);
+							}
+							else {
+								break;
+							}
 						}
+						// need to do this bit outside of the synch block. 
+						performAction(observedObject);
+//						synchronized(synchLock) {
+//							if (toDoList.size() > 0) { // list may have been cleared during a shut down. 
+//								toDoList.remove(0);
+//							}
+//						}
 					}
 				}
 			}			
@@ -523,6 +534,23 @@ public class ThreadedObserver implements PamObserver {
 				throw new IllegalArgumentException("Unexpected value: " + action);
 			}
 		}
+	}
+
+
+	public void clearEverything() {
+		synchronized (synchLock) { 
+			System.out.printf("Clearing %d objects from todo list in %s\n", toDoList.size(), singleThreadObserver.getObserverName());
+			toDoList.clear();
+		}		
+	}
+
+	public void dumpBufferStatus(String message, boolean sayEmpties) {
+		int n = toDoList.size();
+		if (sayEmpties == false && n == 0) {
+			return;
+		}
+		String name = singleThreadObserver.getObserverName();
+		System.out.printf("Threaded observer %s has %d objects in queue\n", name, n);
 	}
 
 }
