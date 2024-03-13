@@ -2,6 +2,7 @@ package matchedTemplateClassifer;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.jamdev.jdl4pam.utils.DLMatFile;
 
@@ -25,7 +26,7 @@ import us.hebi.matlab.mat.types.Struct;
 public class MTClassifierTest {
 	
 	/**
-	 * Test the classifier using some imported data with defaul templates. 
+	 * Test the classifier using some imported data with default templates. 
 	 */
 	private static void testClassifier(double[] testWaveform, float sR) {
 		testClassifier(testWaveform,  sR, null); 
@@ -80,8 +81,8 @@ public class MTClassifierTest {
 	 * @param sR - the sample rate of the waveform. 
 	 * @param templates - the match templates to test. 
 	 */
-	private static void testCorrelation(double[] testWaveform, float sR, ArrayList<MatchTemplate> templates) {
-		testCorrelation(testWaveform,  sR,  templates, MatchedTemplateParams.NORMALIZATION_RMS); 
+	public static List<MatchedTemplateResult> testCorrelation(double[] testWaveform, float sR, ArrayList<MatchTemplate> templates) {
+		return testCorrelation(testWaveform,  sR,  templates, MatchedTemplateParams.NORMALIZATION_RMS); 
 	}
 
 	
@@ -93,13 +94,16 @@ public class MTClassifierTest {
 	 * @param sR - the sample rate of the waveform. 
 	 * @param templates - the match templates to test. 
 	 * @param normalisation - the normalisation type to use e.g.  MatchedTemplateParams.NORMALIZATION_RMS
+	 * @return a list of the correlation results. 
 	 */
-	private static void testCorrelation(double[] testWaveform, float sR, ArrayList<MatchTemplate> templates, int normalisation) {
+	public static List<MatchedTemplateResult> testCorrelation(double[] testWaveform, float sR, ArrayList<MatchTemplate> templates, int normalisation) {
 
+		
+		List<MatchedTemplateResult> matchedTemplateResult = new ArrayList<MatchedTemplateResult>();
 		//create the classifier object 
 		for (int i=0; i<templates.size(); i++){
 			MTClassifier mtclassifier = new MTClassifier(); 
-			mtclassifier.normalisation = normalisation; 
+			mtclassifier.normalisation = normalisation; //set the normalisation
 			
 			//System.out.println("Template " + i + " " + templates.get(i));
 			//add templates if inpout 
@@ -113,11 +117,11 @@ public class MTClassifierTest {
 			//System.out.println("Waveform len: " +testWaveform.length + " min: " + PamArrayUtils.min(testWaveform) +  " max: " + PamArrayUtils.max(testWaveform)); 
 
 		
-			testWaveform=PamArrayUtils.divide(testWaveform, PamUtils.PamArrayUtils.max(testWaveform));
+			//testWaveform=PamArrayUtils.divide(testWaveform, PamUtils.PamArrayUtils.max(testWaveform));
 			
-			testWaveform = MTClassifier.normaliseWaveform(testWaveform, MatchedTemplateParams.NORMALIZATION_RMS);
+			testWaveform = MTClassifier.normaliseWaveform(testWaveform, normalisation);
 			
-			//System.out.println("Waveform max: " + PamArrayUtils.max(testWaveform) + " len: " + testWaveform.length); 
+//			System.out.println("Waveform max: " + PamArrayUtils.max(testWaveform) + " len: " + testWaveform.length); 
 
 			
 			//calculate the click FFT. 
@@ -135,6 +139,7 @@ public class MTClassifierTest {
 			//calculate the correlation coefficient.
 			MatchedTemplateResult matchResult = mtclassifier.calcCorrelationMatch(matchClick, sR);
 						
+			matchedTemplateResult.add(matchResult);
 			
 			System.out.println(String.format("The match correlation for %d is %.5f", i, matchResult.matchCorr));
 //			
@@ -148,7 +153,7 @@ public class MTClassifierTest {
 
 
 		}
-
+		return matchedTemplateResult;
 	}
 	
 	public static void printFFt(ComplexArray complexArray) {
@@ -230,7 +235,7 @@ public class MTClassifierTest {
 			mfr =  Mat5.readFromFile(filePath);
 			//		//get array of a name "my_array" from file
 			Struct mlArrayMatch =  mfr.getStruct( "templates" );
-			//System.out.println(mlArrayMatch.getType()); 
+//			System.out.println(mlArrayMatch.getType() +  "  " + mlArrayMatch.getNumElements()); 
 
 			ArrayList<MatchTemplate> templates = new ArrayList<MatchTemplate>(); 
 
@@ -238,12 +243,14 @@ public class MTClassifierTest {
 
 			for (int i=0; i<numTemplates; i++) {
 				
-				double[][] wave = PamArrayUtils.matrix2array(mlArrayMatch.get("wave", i));
+				Matrix waveM  = mlArrayMatch.get("wave", i);
+
+				double[][] wave = PamArrayUtils.matrix2array(waveM);
 				
 				Matrix templatesr= mlArrayMatch.get("sr", i);
 				double sr= templatesr.getDouble(0);
 				
-				System.out.println("template wave: " + wave[0].length + " num: " + numTemplates);
+//				System.out.println("template wave: " + wave[0].length + " num: " + numTemplates);
 				
 				templates.add(new MatchTemplate(null, wave[0], (float) sr)); 
 			}
@@ -373,7 +380,7 @@ public class MTClassifierTest {
 	 */
 	public static void testMatchCorr() {
 		
-		String templteFilePath= "/Users/au671271/MATLAB-Drive/MATLAB/PAMGUARD/matchedclickclassifer/DS2templates_test.mat";
+		String templteFilePath= "/Users/au671271/MATLAB-Drive/MATLAB/PAMGUARD/matchedclickclassifer/_test/DS2templates_test.mat";
 		//float sR = 288000; //sample rate in samples per second. 
 
 		ArrayList<MatchTemplate> templates = importTemplates(templteFilePath); 
@@ -384,7 +391,8 @@ public class MTClassifierTest {
 	
 	
 	public static void main(String args[]) {
-		testMatchCorrLen(); 
+//		testMatchCorrLen(); 
+		testMatchCorr();
 	}
 	
 

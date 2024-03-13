@@ -13,6 +13,7 @@ import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.layout.Pane;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxNodes.PamBorderPane;
@@ -24,6 +25,7 @@ import pamViewFX.fxNodes.sliders.PamSlider;
 
 /**
  * Allows uses to change the horizontal and vertical scales on the data map. 
+ * 
  * @author Jamie Macaulay
  *
  */
@@ -42,7 +44,7 @@ public class ScalePaneFX extends PamBorderPane {
 	/**
 	 * The slider which determines time scale. 
 	 */
-	private PamSlider timeSlider;
+	private Slider timeSlider;
 
 	/**
 	 * Shows the time scale in pix/hour
@@ -74,7 +76,7 @@ public class ScalePaneFX extends PamBorderPane {
 	/**
 	 * Holds everything. 
 	 */
-	private PamHBox holder; 
+	private PamVBox holder; 
 
 
 
@@ -82,7 +84,7 @@ public class ScalePaneFX extends PamBorderPane {
 		this.dataMapControl = dataMapControl;
 		this.dataMapPane = dataMapPane;
 		
-		holder=new PamHBox(); 
+		holder=new PamVBox(); 
 		holder.setSpacing(20);
 		holder.getChildren().add(createScalePane());
 		
@@ -192,7 +194,10 @@ public class ScalePaneFX extends PamBorderPane {
 		controlPane.add(new Label("Time"),0,1);
 		
 		//create time slider 
-		timeSlider=new PamSlider(0, timeScaleChoices.length-1, 1); 
+		timeSlider=new Slider(0, timeScaleChoices.length-1, 1); 
+		timeSlider.setShowTickLabels(true);
+		timeSlider.setShowTickMarks(true);
+
 		controlPane.add(timeSlider,1,1);
 		//add listener to time slider to change datamap. 
 		timeSlider.valueProperty().addListener((ov, oldVal, newVal)->{

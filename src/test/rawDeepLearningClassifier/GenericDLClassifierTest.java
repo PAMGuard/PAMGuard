@@ -88,5 +88,17 @@ public class GenericDLClassifierTest {
 		}
 	}
 	
+	
+	
+	/**
+	 * Test the ketos classifier and tests are working properly. This tests loading the ketos model and also using
+	 * functions in KetosWorker.
+	 */
+	@Test
+	public void humpbackWhaleTest() {
+		
+		
+	}
+	
 
 }

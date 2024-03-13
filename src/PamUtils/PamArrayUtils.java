@@ -1139,8 +1139,9 @@ public class PamArrayUtils {
 			for (int j=0; j<matrix.getNumCols(); j++) {
 				arrayRow[j] = matrix.getDouble(i, j);
 			}
+			arrayOut[i]=arrayRow;
 		}
-		return null;
+		return arrayOut;
 	}
 
 

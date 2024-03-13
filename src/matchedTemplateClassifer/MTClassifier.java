@@ -134,7 +134,6 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 			//re-sample the waveform if the sample rate is different
 			this.interpWaveformMatch=interpWaveform(this.waveformMatch, sR); 
 			
-			//System.out.println("interpWaveformMatch: " + interpWaveformMatch.length + " sR " + sR);
 			
 			//normalise
 			//this.interpWaveformMatch=PamArrayUtils.normalise(interpWaveformMatch);
@@ -142,8 +141,7 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 			//this.inteprWaveformReject=PamArrayUtils.divide(interpWaveformMatch, PamArrayUtils.max(interpWaveformMatch));
 			this.interpWaveformMatch = normaliseWaveform(interpWaveformMatch, this.normalisation);
 			
-//			System.out.println("MatchNorm: MATCH");
-//			MTClassifierTest.normalizeTest(interpWaveformMatch);
+			//System.out.println("interpWaveformMatch: " + interpWaveformMatch.length + " sR " + sR + " max: " + PamArrayUtils.max(interpWaveformMatch));
 			
 			/**
 			 * There is an issue here because, if we have a long template waveform, then it
@@ -248,13 +246,15 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 	 * @return
 	 */
 	public static double[] normaliseWaveform(double[] waveform, int normeType) {
+//		System.out.println("Normalise waveform: " + normeType);
 		double[] newWaveform = null;
 		switch(normeType) {
 		case MatchedTemplateParams.NORMALIZATION_NONE:
 			newWaveform = waveform;
 			break; 
 		case MatchedTemplateParams.NORMALIZATION_PEAK:
-			newWaveform =PamUtils.PamArrayUtils.divide(waveform, PamUtils.PamArrayUtils.max(waveform));
+			//important to clone here or the template waveforms are normalised!
+			newWaveform =PamUtils.PamArrayUtils.divide(waveform.clone(), PamUtils.PamArrayUtils.max(waveform));
 			break;
 		case MatchedTemplateParams.NORMALIZATION_RMS:
 			newWaveform =PamUtils.PamArrayUtils.normalise(waveform);

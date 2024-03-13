@@ -21,49 +21,50 @@ import rawDeepLearningClassifier.segmenter.SegmenterProcess.GroupedRawData;
 import org.junit.jupiter.api.Test;
 
 public class KetosDLClassifierTest {
-	
-//	/**
-//	 * Reference to the DL Control
-//	 * 
-//	 */
-//	private DLControl testDLControl;
-//	
-//	
-//	private KetosClassifier ketosClassifier_test;
-//	
-	
 
-//	public KetosClassifierTest()  {
-//		 System.out.println("hello unit test start"); 
+	//	/**
+	//	 * Reference to the DL Control
+	//	 * 
+	//	 */
+	//	private DLControl testDLControl;
+	//	
+	//	
+	//	private KetosClassifier ketosClassifier_test;
+	//	
 
-//		try {
-//			
-//		 if (PamController.getInstance()==null || PamController.getInstance().getRunMode() != PamController.RUN_NORMAL) {
-//			 PamGUIManager.setType(PamGUIManager.NOGUI);
-//			 PamController.create(PamController.RUN_NORMAL, null);
-//		 }
-//			
-//		 testDLControl = new DLControl("Test_deep_learning");  
-//		 
-//		 ketosClassifier_test = (KetosClassifier) testDLControl.getDLModel(KetosClassifier.MODEL_NAME); 
-//		 
-//		 //set the ketos model as the correct model in the test. 
-//		 testDLControl.getDLParams().modelSelection= testDLControl.getDLModels().indexOf(ketosClassifier_test); 
-//		 
-//		 System.out.println("hello unit test complete"); 
-//		}
-//		catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
+
+	//	public KetosClassifierTest()  {
+	//		 System.out.println("hello unit test start"); 
+
+	//		try {
+	//			
+	//		 if (PamController.getInstance()==null || PamController.getInstance().getRunMode() != PamController.RUN_NORMAL) {
+	//			 PamGUIManager.setType(PamGUIManager.NOGUI);
+	//			 PamController.create(PamController.RUN_NORMAL, null);
+	//		 }
+	//			
+	//		 testDLControl = new DLControl("Test_deep_learning");  
+	//		 
+	//		 ketosClassifier_test = (KetosClassifier) testDLControl.getDLModel(KetosClassifier.MODEL_NAME); 
+	//		 
+	//		 //set the ketos model as the correct model in the test. 
+	//		 testDLControl.getDLParams().modelSelection= testDLControl.getDLModels().indexOf(ketosClassifier_test); 
+	//		 
+	//		 System.out.println("hello unit test complete"); 
+	//		}
+	//		catch (Exception e) {
+	//			e.printStackTrace();
+	//		}
+	//	}
 
 	/**
-	 * Test the ketos classifier and tests are working properly. 
+	 * Test the ketos classifier and tests are working properly. This tests loading the ketos model and also using
+	 * functions in KetosWorker.
 	 */
 	@Test
 	public void ketosClassifierTest() {
-		
-		
+
+
 		/**
 		 * List of the predicitons
 		 * Start time (seconds), Length of the segment (seconds), prediciton
@@ -88,67 +89,78 @@ public class KetosDLClassifierTest {
 				{80,	5.0176,	0.20126265},
 				{85,	5.0176,	0.9797412},
 				{90,	5.0176,	1}}; 
-	
-			//relative paths to the resource folders.
-			String relModelPath  =	"./src/test/resources/rawDeepLearningClassifier/Ketos/hallo-kw-det_v1/hallo-kw-det_v1.ktpb";
-			String relWavPath  =	"./src/test/resources/rawDeepLearningClassifier/Ketos/hallo-kw-det_v1/jasco_reduced.wav";
 
-			Path path = Paths.get(relModelPath);
+		//relative paths to the resource folders.
+		String relModelPath  =	"./src/test/resources/rawDeepLearningClassifier/Ketos/hallo-kw-det_v1/hallo-kw-det_v1.ktpb";
+		String relWavPath  =	"./src/test/resources/rawDeepLearningClassifier/Ketos/hallo-kw-det_v1/jasco_reduced.wav";
 
-			KetosWorker2 ketosWorker2 = new KetosWorker2(); 
+		Path path = Paths.get(relModelPath);
 
-			KetosDLParams genericModelParams = new KetosDLParams(); 
-			genericModelParams.modelPath =  path.toAbsolutePath().normalize().toString();
+		KetosWorker2 ketosWorker2 = new KetosWorker2(); 
 
-			//prep the model - all setting are included within the model
-			ketosWorker2.prepModel(genericModelParams, null);
-			System.out.println("seglen: " +  genericModelParams.defaultSegmentLen);
+		KetosDLParams genericModelParams = new KetosDLParams(); 
+		genericModelParams.modelPath =  path.toAbsolutePath().normalize().toString();
 
-			/****Now run a file ***/
-			path = Paths.get(relWavPath);
-			String wavFilePath = path.toAbsolutePath().normalize().toString();
+		//prep the model - all setting are included within the model
+		ketosWorker2.prepModel(genericModelParams, null);
+		System.out.println("seglen: " +  genericModelParams.defaultSegmentLen);
 
-			try {
+		/****Now run a file ***/
+		path = Paths.get(relWavPath);
+		String wavFilePath = path.toAbsolutePath().normalize().toString();
+
+		try {
+
+
+			AudioData soundData = DLUtils.loadWavFile(wavFilePath);
+			double[] soundDataD = soundData.getScaledSampleAmplitudes();
+
+
+			long duration = (long) Math.ceil((genericModelParams.defaultSegmentLen/1000)*soundData.sampleRate);
+			System.out.println("duration: " + duration + " " + soundData.sampleRate + "  " + genericModelParams.defaultSegmentLen);
+
+			//dont't use the first and last because these are edge cases with zero padding
+			for (int i=1; i<ketosPredicitons.length-1; i++) {
 				
-				
-				AudioData soundData = DLUtils.loadWavFile(wavFilePath);
-				double[] soundDataD = soundData.getScaledSampleAmplitudes();
-				
-				long duration = (long) Math.ceil((genericModelParams.defaultSegmentLen/1000)*soundData.sampleRate);
-				System.out.println("duration: " + duration + " " + soundData.sampleRate + "  " + genericModelParams.defaultSegmentLen);
-
-				//dont't 
-				for (int i=1; i<ketosPredicitons.length; i++) {
-
-
 				GroupedRawData groupedRawData = new GroupedRawData(0, 1, 0, duration, (int) duration);
-				int startChunk =(int) (ketosPredicitons[i][0]*soundData.sampleRate);
 
-				
+				/**
+				 * This is super weird but Ketos has some sort of very strange system of
+				 * grabbing chunks of data from a sound file - seems like it grabs a little more
+				 * data pre the official start time. Whatever the reason this does not matter
+				 * for PG usually because segments simply start at the start of the wav file.
+				 * However for testing we have to get this right to compare results and so
+				 * 0.0157 is subtract from the sound chunk
+				 */
+				int startChunk =(int) ((ketosPredicitons[i][0]-0.0157)*soundData.sampleRate);
+
+
 				groupedRawData.copyRawData(soundDataD, startChunk, (int) duration, 0);
-				
+
 				ArrayList<GroupedRawData> groupedData = new ArrayList<GroupedRawData>();
 				groupedData.add(groupedRawData);
 
 				ArrayList<GenericPrediction> genericPrediciton = ketosWorker2.runModel(groupedData, soundData.sampleRate, 0);		
 				float[] output =  genericPrediciton.get(0).getPrediction();
-				
+
 				boolean testPassed= output[1]> ketosPredicitons[i][2]-0.1 && output[1]< ketosPredicitons[i][2]+0.1;
 				System.out.println( i+ " : Ketos whale network output: " + output[0] + "  " + output[1] + " " + testPassed);
-				
-				//assertTrue(output[1]> ketosPredicitons[i][2]-0.1 && output[1]< ketosPredicitons[i][2]+0.1); 
-				
-				}
 
-				ketosWorker2.closeModel();
+				assertTrue(testPassed); 
 
-			} catch (IOException | UnsupportedAudioFileException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				assertEquals(false, true);
 			}
-	}
 
+			ketosWorker2.closeModel();
+
+		} catch (IOException | UnsupportedAudioFileException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			assertEquals(false, true);
+		}
+	}
 	
+
+
+
 
 }
