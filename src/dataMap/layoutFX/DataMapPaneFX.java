@@ -1,8 +1,5 @@
 package dataMap.layoutFX;
 
-import java.awt.Dimension;
-
-import PamController.PamController;
 import PamController.PamControllerInterface;
 import dataMap.DataMapControl;
 import javafx.application.Platform;
@@ -34,7 +31,7 @@ import userDisplayFX.UserDisplayNodeParams;
  */
 public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX {
 	
-	private static final double HIDE_PANE_WIDTH = 400;
+	private static final double HIDE_PANE_WIDTH = 500;
 
 	/**
 	 * Reference to the data map control. 
@@ -45,9 +42,6 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX {
 	 * Reference to the scrolling pane
 	 */
 	public ScrollingDataPaneFX scrollingDataPanel;
-
-	
-	private Dimension graphDimension;
 
 	private SummaryPaneFX summaryPane;
 
@@ -66,12 +60,10 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX {
 	 */
 	private ScalePaneFX scalePane;
 
-	private PamVBox settingsPane;
-
 	/**
-	 * Axis which shows the current dates
+	 * The settings pane. 
 	 */
-	private PamDateAxis dateAxis;
+	private PamVBox settingsPane;
 
 	public DataMapPaneFX(DataMapControl dataMapControl){
 		this.dataMapControl=dataMapControl; 
@@ -127,12 +119,7 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX {
 		
 		StackPane stackPane = new StackPane();
 		stackPane.getChildren().addAll(scrollingDataPanel, hidingSummaryPane, showButton);
-		
-		dateAxis = new PamDateAxis();
-		dateAxis.setMinHeight(50);
-		dateAxis.prefWidthProperty().bind(scrollingDataPanel.widthProperty());
-		 
-		this.setTop(dateAxis);
+
 		this.setCenter(stackPane);
 	}
 
@@ -159,7 +146,7 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX {
 	 */
 	private void setGraphDimensions() {
 		long totalLength = dataMapControl.getLastTime() - dataMapControl.getFirstTime();
-		graphDimension = new Dimension(2000, 100);
+		//graphDimension = new Dimension(2000, 100);
 	}
 
 	public void repaintAll() {
@@ -276,8 +263,6 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX {
 	public void selectedDataTime(Long timeStart, Long timeEnd) {
 		System.out.println("SELECTED DATA TIME:  " + timeStart + "  " + timeEnd);
 		summaryPane.setSelectedDataTime(timeStart, timeEnd);
-		dateAxis.setUpperBound(timeEnd);
-		dateAxis.setLowerBound(timeStart);
 	}
 
 

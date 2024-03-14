@@ -386,7 +386,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 			
 			long time2 = System.currentTimeMillis();
 
-			System.out.println("Paint Canvas: " + this + "   " + System.currentTimeMillis() + "  " + (time2-time1));
+			//System.out.println("Paint Canvas: " + this + "   " + System.currentTimeMillis() + "  " + (time2-time1));
 
 		}
 		
