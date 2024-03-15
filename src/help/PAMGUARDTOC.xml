@@ -557,6 +557,10 @@
    <tocitem text="Common Mistakes and Bugs " target="classifiers.rawDeepLearningHelp.docs.rawDeepLearning_Bugs" image="topic"/>
 
   </tocitem>
+  <tocitem text="Matched Template Classifier ">
+   <tocitem text="Matched Template Classifier " target="classifiers.matchedtemplate.mathchedtemplate" image="topic"/>
+
+  </tocitem>
  </tocitem>
  <tocitem text="Localisation ">
   <tocitem text="Overview " target="localisation.docs.localisation_overview" image="topic"/>

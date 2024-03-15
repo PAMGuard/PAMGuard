@@ -878,6 +878,7 @@ public class AcquisitionControl extends RawInputControlledUnit implements PamSet
 	public InputStoreInfo getStoreInfo(boolean detail) {
 		return getDaqProcess().getStoreInfo(detail);
 	}
+	
 	@Override
 	public boolean setAnalysisStartTime(long startTime) {
 		return getDaqProcess().setAnalysisStartTime(startTime);

@@ -236,9 +236,12 @@ public class SerialPortPanel extends Object {
 		}
 	}
 	
-
 	public String getPort() {
 		if (portList == null) return null;
+		Object selItem = portList.getSelectedItem();
+		if (selItem == null) {
+			return null;
+		}
 		return portList.getSelectedItem().toString();
 	}
 

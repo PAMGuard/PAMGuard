@@ -686,6 +686,8 @@
 
 <mapID target="detectors.clickDetectorHelp.docs.ClickDetector_clickSidePanel" url="detectors/clickDetectorHelp/docs/ClickDetector_clickSidePanel.html"/>
 
+<mapID target="classifiers.matchedtemplate.mathchedtemplate" url="classifiers/matchedtemplate/mathchedtemplate.html"/>
+
 <mapID target="localisation.detectiongroup.docs.dglocaliser" url="localisation/detectiongroup/docs/dglocaliser.html"/>
 
 <mapID target="visual_methods.loggerFormsHelp.docs.SHORT" url="visual_methods/loggerFormsHelp/docs/SHORT.html"/>
