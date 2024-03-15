@@ -196,7 +196,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 
 	private Timer diagnosticTimer;
 	
-	private boolean debugDumpBufferAtRestart = false;
+	private boolean debugDumpBufferAtRestart = true;
 
 	private NetworkController networkController;
 	private int nNetPrepared;
@@ -1434,7 +1434,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 				pamControlledUnits.get(iU).flushDataBlockBuffers(2000);
 			}
 		}
-		dumpBufferStatus("In pamStopped, now idle", true);
+		dumpBufferStatus("In pamStopped, now idle", false);
 
 		// wait here until the status has changed to Pam_Idle, so that we know
 		// that we've really finished processing all data

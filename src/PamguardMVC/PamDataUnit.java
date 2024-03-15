@@ -564,7 +564,8 @@ abstract public class PamDataUnit<T extends PamDataUnit, U extends PamDataUnit> 
 	
 	/**
 	 * Get the latlong of the mean hydrophone position at the time of 
-	 * this detection. 
+	 * this detection. If the data unit has a channel bitmap of zero, then 
+	 * get the GPS position of the vessel at that time. 
 	 * @param recalculate
 	 * @return Lat long of detection origin (usually the position of the reference hydrophone at time of detection)
 	 */

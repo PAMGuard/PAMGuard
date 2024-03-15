@@ -184,6 +184,23 @@ public class PamConfiguration {
 				return dataBlock;
 			}
 		}
+		return tryShortName(blockType, name);
+	}
+	
+	/**
+	 * For backwards compatibility, some blocks may still use the short name.
+	 * @param blockType
+	 * @param name
+	 * @return
+	 */
+	private PamDataBlock tryShortName(Class blockType, String name) {
+		if (name == null) return null;
+		ArrayList<PamDataBlock> blocks = getDataBlocks(blockType, true);
+		for (PamDataBlock dataBlock:blocks) {
+			if (name.equals(dataBlock.getDataName())) { // check for a long name match first 
+				return dataBlock;
+			}
+		}
 		return null;
 	}
 
