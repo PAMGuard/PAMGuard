@@ -22,6 +22,7 @@ import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.dataOffline.OfflineDataLoading;
 import dataMap.OfflineDataMapPoint;
 import detectiongrouplocaliser.DetectionGroupSummary;
+import export.PamDataUnitExporter;
 import wavFiles.Wav16AudioFormat;
 import wavFiles.WavFileWriter;
 
@@ -30,7 +31,7 @@ import wavFiles.WavFileWriter;
  * @author Jamie Macaulay
  *
  */
-public class WavFileExportManager {
+public class WavFileExportManager implements PamDataUnitExporter  {
 
 	/**
 	 * Successful writing of .wav file. 
@@ -416,6 +417,38 @@ public class WavFileExportManager {
 	 */
 	public void setOnWavSaved(WavSaveCallback saveCallback) {
 		this.saveCallback=saveCallback; 
+	}
+
+
+
+	@Override
+	public boolean hasCompatibleUnits(Class dataUnitType) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+
+	@Override
+	public boolean exportData(File fileName,
+			List<PamDataUnit> dataUnits) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+
+	@Override
+	public String getFileExtension() {
+		return "wav";
+	}
+
+
+
+	@Override
+	public String getIconString() {
+		// TODO Auto-generated method stub
+		return "mdi2f-file-music";
 	}
 
 

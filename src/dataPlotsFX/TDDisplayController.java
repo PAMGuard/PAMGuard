@@ -9,10 +9,12 @@ import userDisplayFX.UserDisplayControlFX;
 import userDisplayFX.UserDisplayNodeFX;
 import PamController.PamController;
 import PamController.PamControllerInterface;
+import PamguardMVC.PamDataBlock;
+import PamguardMVC.PamDataUnit;
 
 /**
- * The controller for the TD display. This is only used in the FX Gui where displays
- * tend to have equality with modules. 
+ * The controller for the TD display. This is only used in the FX GUI where displays
+ * tend to have equal parity with modules. 
  * 
  * @author Jamie Macaulay 
  *
@@ -30,6 +32,8 @@ public class TDDisplayController extends UserDisplayControlFX {
 	 */
 	private TDControlFX tdControlFX;
 	
+	private PamDataBlock selectedDataUnits;
+	
 	
 
 	public TDDisplayController(String unitName) {
@@ -37,13 +41,18 @@ public class TDDisplayController extends UserDisplayControlFX {
 		//set the compatible data units. 
 		 //indicate that this display can accept multiple parent data blocks at the same time. 
 		this.setMultiParent(true);
-		//set which PamDataUnits the display can show and therefore which datablocks it can accept as parents.
+		
+		//set which PamDataUnits the display can show and therefore which data blocks it can accept as parents.
 		setCompatibleDataUnits();
+		
+		selectedDataUnits = new PamDataBlock(PamDataUnit.class, "Selected Data Units", getUserDisplayProcess() , Integer.MAX_VALUE); //TODO
+		
+		getUserDisplayProcess().addOutputDataBlock(selectedDataUnits);
 	}
 	
 	/**
-	 * Set compatible data units in the process for this display. This allows the data model to determine if connections can
-	 * be made to the display. 
+	 * Set compatible data units in the process for this display. This allows the
+	 * data model to determine if connections can be made to the display.
 	 */
 	private void setCompatibleDataUnits(){
 		super.removeCompatibleDataUnits();
@@ -61,7 +70,6 @@ public class TDDisplayController extends UserDisplayControlFX {
 	 * @param dataBlocks - the parent datablocks to set. 
 	 */
 	protected void setParentDataBlocks(ArrayList<TDDataInfoFX> dataBlocks){
-//		System.out.println("Set parent datablocks: " + dataBlocks.size()); 
 		allowProcessNotify=false; 
 		
 		while (getUserDisplayProcess().getNumMuiltiplexDataBlocks()>0){
@@ -80,6 +88,7 @@ public class TDDisplayController extends UserDisplayControlFX {
 	
 	//disables notifications. 
 	boolean allowProcessNotify=true;
+	
 	@Override
 	public void notifyModelChanged(int type){
 //		System.out.println("---------------------------------" ); 

@@ -36,8 +36,8 @@ public class HumpbackWhaleGoogle implements DLModel {
 	@Override
 	public URI getModelURI() {
 		try {
-			return new URL("https://github.com/PAMGuard/deeplearningmodels/raw/master/humpback_whale_1/humpback_whale_1.zip").toURI();
-		} catch (MalformedURLException | URISyntaxException e) {
+			return new URI("https://github.com/PAMGuard/deeplearningmodels/raw/master/humpback_whale_1/humpback_whale_1.zip");
+		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -52,8 +52,8 @@ public class HumpbackWhaleGoogle implements DLModel {
 	@Override
 	public URI getCitationLink() {
 		try {
-			return new URL("https://doi.org/10.3389/fmars.2021.607321").toURI();
-		} catch (MalformedURLException | URISyntaxException e) {
+			return new URI("https://doi.org/10.3389/fmars.2021.607321");
+		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
@@ -70,7 +70,7 @@ public class HumpbackWhaleGoogle implements DLModel {
 		//create the transforms. 
 		ArrayList<DLTransfromParams> dlTransformParamsArr = new ArrayList<DLTransfromParams>();
 
-		dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.DECIMATE, sr)); 
+		dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.DECIMATE_SCIPY, sr)); 
 
 		genericModelParams.dlTransfromParams = dlTransformParamsArr;
 		

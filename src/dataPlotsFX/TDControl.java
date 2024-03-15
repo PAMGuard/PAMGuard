@@ -13,6 +13,7 @@ import dataPlots.TDParameters;
 import dataPlotsFX.data.TDDataInfoFX;
 import dataPlotsFX.layout.TDDisplayFX;
 import dataPlotsFX.layout.TDGraphFX;
+import detectiongrouplocaliser.DetectionGroupSummary;
 
 /**
  * The main class for the TDDisplay. 
@@ -220,6 +221,14 @@ public abstract class TDControl implements PamSettings {
 
 	public void setUniqueName(String uniqueName) {
 		this.uniqueDisplayName = uniqueName;
+	}
+
+	/**
+	 * A new detection group has been selected. 
+	 * @param detectionGroup - the detection group that has been selected
+	 */
+	public void newSelectedDetectionGroup(DetectionGroupSummary detectionGroup, TDGraphFX tdGraph) {
+		
 	}
 
 

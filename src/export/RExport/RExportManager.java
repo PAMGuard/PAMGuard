@@ -1,11 +1,14 @@
 package export.RExport;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.renjin.sexp.ListVector;
 import org.renjin.sexp.PairList;
+
 import PamguardMVC.PamDataUnit;
+import export.PamDataUnitExporter;
 
 /**
  * Handles exporting pam data units into an rdata. 
@@ -13,7 +16,7 @@ import PamguardMVC.PamDataUnit;
  *
  */
 @SuppressWarnings("rawtypes")
-public class RExportManager {
+public class RExportManager implements PamDataUnitExporter {
 
 	/**
 	 * 
@@ -27,29 +30,34 @@ public class RExportManager {
 		mlDataUnitsExport.add(new RClickExport()); 
 		mlDataUnitsExport.add(new RWhistleExport()); 
 		mlDataUnitsExport.add(new RRawExport()); //should be last in case raw data holders have specific exporters
-
 	}
-	
+
 	/**
 	 * Check whether there are compatible data units to be exported. 
 	 * @param dataUnits - the data unit list
-	 * @return true if MATLAB export is possible for the current data units. 
+	 * @return true if r export is possible for the current data units. 
 	 */
 	public boolean hasCompatibleUnits(List<PamDataUnit> dataUnits) {
-		for (int i=0; i<mlDataUnitsExport.size(); i++){
-			//first need to figure out how many data units there are. 
-			for (int j=0; j<dataUnits.size(); j++){
-				//check whether the same. ;
-//				System.out.println(" dataUnits.get(j).getClass(): " + dataUnits.get(j).getClass());
-//				System.out.println(" mlDataUnitsExport.get(i).getUnitClass(): " + mlDataUnitsExport.get(i).getUnitClass());
-				if (mlDataUnitsExport.get(i).getUnitClass().isAssignableFrom(dataUnits.get(j).getClass())) {
-					return true; 
-				}
-			}
+		//first need to figure out how many data units there are. 
+		for (int j=0; j<dataUnits.size(); j++){
+			if (hasCompatibleUnits(dataUnits.get(j).getClass())) return true;
 		}
 		return false; 
 	}
 	
+	@Override
+	public boolean hasCompatibleUnits(Class dataUnitType) {
+		for (int i=0; i<mlDataUnitsExport.size(); i++){
+			//check whether the same. ;
+			//System.out.println(" dataUnits.get(j).getClass(): " + dataUnits.get(j).getClass());
+			//System.out.println(" mlDataUnitsExport.get(i).getUnitClass(): " + mlDataUnitsExport.get(i).getUnitClass());
+			if (mlDataUnitsExport.get(i).getUnitClass().isAssignableFrom(dataUnitType)) {
+				//System.out.println("FOUND THE DATA UNIT!");
+				return true; 
+			}
+		}
+		return false;
+	}
 	
 	/**
 	 * Sort a list of data units into lists of the same type of units. Convert to a list of structures. 
@@ -124,6 +132,24 @@ public class RExportManager {
 		 * List of the names of the types of data units whihc were saved. 
 		 */
 		public ArrayList<String> dataUnitTypes; 
+	}
+
+
+
+	@Override
+	public boolean exportData(File fileName, List<PamDataUnit> dataUnits) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public String getFileExtension() {
+		return ".RData";
+	}
+
+	@Override
+	public String getIconString() {
+		return "file-r";
 	}
 
 	

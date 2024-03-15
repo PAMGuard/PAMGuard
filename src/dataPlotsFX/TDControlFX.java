@@ -12,6 +12,8 @@ import dataPlotsFX.data.TDDataInfoFX;
 import dataPlotsFX.data.TDDataProviderFX;
 import dataPlotsFX.data.TDDataProviderRegisterFX;
 import dataPlotsFX.layout.TDDisplayFX;
+import dataPlotsFX.layout.TDGraphFX;
+import detectiongrouplocaliser.DetectionGroupSummary;
 import PamController.PamController;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
@@ -393,5 +395,11 @@ public class TDControlFX extends TDControl implements UserDisplayNodeFX {
 	@Override
 	public void setFrameHolder(PamInternalPane internalFrame) {
 		this.internalFrame=internalFrame; 
+	}
+	
+
+	@Override
+	public void newSelectedDetectionGroup(DetectionGroupSummary detectionGroup, TDGraphFX tdGraph) {
+		System.out.println("New selected detection group: " + detectionGroup);
 	}
 }
