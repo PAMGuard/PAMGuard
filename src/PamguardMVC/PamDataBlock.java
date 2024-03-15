@@ -4296,6 +4296,9 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 * @param sayEmpties dump info even if a buffer is empty (otherwise, only ones that have stuff still)
 	 */
 	public void dumpBufferStatus(String message, boolean sayEmpties) {
+		if (sayEmpties || unitsAdded > 0) {
+			System.out.printf("Datablock %s: Added %d data units\n", getLongDataName(), unitsAdded);
+		}
 		int nObs = countObservers();
 		for (int i = 0; i < nObs; i++) {
 			PamObserver obs = getPamObserver(i);
