@@ -12,20 +12,15 @@ import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollBar;
-import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 import javafx.util.Duration;
 import PamguardMVC.PamDataBlock;
 import dataMap.DataMapControl;
-import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
-import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamColorsFX;
 import pamViewFX.fxNodes.PamScrollPane;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.pamAxis.PamDateAxis;
-import pamViewFX.fxNodes.sashPane.SashPane;
 
 public class ScrollingDataPaneFX extends PamBorderPane {
 	

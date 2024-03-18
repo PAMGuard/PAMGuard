@@ -45,7 +45,6 @@ import whistlesAndMoans.AbstractWhistleDataUnit;
 import fftManager.FFTDataUnit;
 import fftManager.PamFFTControl;
 import group3dlocaliser.Group3DLocaliserControl;
-import metadata.MetaDataContol;
 import meygenturbine.MeygenTurbine;
 import printscreen.PrintScreenControl;
 import rockBlock.RockBlockControl;
@@ -472,6 +471,7 @@ final public class PamModel implements PamSettings {
 			mi.setToolTipText("Interface to Tethys Database");
 			mi.setModulesMenuGroup(utilitiesGroup);
 			mi.setMaxNumber(1);
+			//mi.addGUICompatabilityFlag(PamGUIManager.FX); //has FX enabled GUI.
 			mi.setHidden(SMRUEnable.isEnable() == false);
 		}		
 		

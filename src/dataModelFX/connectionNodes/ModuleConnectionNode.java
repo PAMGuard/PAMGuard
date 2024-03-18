@@ -637,6 +637,14 @@ public class ModuleConnectionNode extends StandardConnectionNode implements PAMC
 					removeConnectionPlug(getConnectionPlugs().get(i),false); 
 				}
 			}
+			
+			
+			Tooltip tooltip = ModuleToolTipFactory.getToolTip(pamControlledUnit);
+			
+			if (tooltip!=null) {
+			Tooltip. install(this, tooltip);
+			}
+			
 		}
 		
 		if (pamControlledUnit.getPamModuleInfo()!=null) {
