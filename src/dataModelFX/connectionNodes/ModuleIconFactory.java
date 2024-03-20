@@ -36,7 +36,7 @@ public class ModuleIconFactory {
 	public enum ModuleIcon {
 		DATAMAP, NMEA, GPS, MAP, SOUND_AQ, SOUND_OUTPUT, FFT, FILTER, CLICK, CLICK_TRAIN, RECORDER, WHISTLE_MOAN,
 		NOISE_BAND, NOISE_FILT, DATABASE, BINARY, TIME_DISPLAY, DETECTION_DISPLAY, ARRAY, DEEP_LEARNING, MATCHED_CLICK_CLASSIFIER,
-		DECIMATOR, CPOD
+		DECIMATOR, CPOD, TETHYS
 	}
 
 	/**
@@ -130,14 +130,14 @@ public class ModuleIconFactory {
 		case CPOD:
 			iconNode = new Label("CPOD"); //TEMP
 			break;
+		case TETHYS:
+			iconNode = PamGlyphDude.createModuleIcon("file-codemeta"); 
+			break;
 		default:
 			break;
 		}
 		
 		long time2 = System.currentTimeMillis();
-
-		//System.out.println("GET MODULE ICON: " + icon + " load time: " + (time2-time1));
-
 		return iconNode;
 	}; 
 	
@@ -215,6 +215,7 @@ public class ModuleIconFactory {
 	 * @return the module icon enum
 	 */
 	public ModuleIcon getModuleIcon(String className) {
+		System.out.println("Get module icon: " + className);
 		ModuleIcon icon = null; 
 		switch (className) {
 		case "Acquisition.AcquisitionControl":
@@ -268,6 +269,9 @@ public class ModuleIconFactory {
 		case "cpod.CPODControl2":
 			icon=ModuleIcon.CPOD; 
 			break; 
+		case "MetaDataControl":
+			icon = ModuleIcon.TETHYS;
+			break;
 		}
 		return icon;
 	}

@@ -5,8 +5,17 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 
+import org.jamdev.jdl4pam.transforms.DLTransformsFactory;
+import org.jamdev.jdl4pam.transforms.DLTransfromParams;
+import org.jamdev.jdl4pam.transforms.SimpleTransformParams;
+import org.jamdev.jdl4pam.transforms.DLTransform.DLTransformType;
+
+import rawDeepLearningClassifier.dlClassification.DLClassName;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
+import rawDeepLearningClassifier.dlClassification.genericModel.GenericModelParams;
+import rawDeepLearningClassifier.layoutFX.exampleSounds.ExampleSoundFactory.ExampleSoundType;
 
 /**
  *
@@ -57,7 +66,31 @@ public class HumpbackWhaleAtlantic implements DLModel {
 
 	@Override
 	public void setParams(Serializable dlModelSettings) {
-		// TODO Auto-generated method stub
+		GenericModelParams genericModelParams = (GenericModelParams) dlModelSettings;
+		
+		//decimation value
+		float sr = 2000; 
+
+		//create the transforms. 
+		ArrayList<DLTransfromParams> dlTransformParamsArr = new ArrayList<DLTransfromParams>();
+
+		dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.DECIMATE_SCIPY, sr)); 
+
+		genericModelParams.dlTransfromParams = dlTransformParamsArr;
+		
+		genericModelParams.defaultSegmentLen =   3.8775*1000;
+		genericModelParams.binaryClassification = new boolean[] {true};
+		genericModelParams.classNames= new DLClassName[] {new DLClassName("Humpback whale", (short) 1)};
+		genericModelParams.numClasses = 1; 
+		
+		
+		genericModelParams.defaultShape= new Long[] {-1L,-1L,-1L,1L};
+		genericModelParams.shape= new Long[] {-1L,-1L,-1L,1L};
+
+		//create the transforms. 
+		genericModelParams.dlTransfroms = DLTransformsFactory.makeDLTransforms((ArrayList<DLTransfromParams>)genericModelParams.dlTransfromParams); 
+		
+		genericModelParams.setExampleSound(ExampleSoundType.HUMPBACK_WHALE);
 		
 	}
 	

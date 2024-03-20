@@ -9,12 +9,15 @@ import PamUtils.PamCalendar;
 import binaryFileStorage.BinaryStore;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.util.StringConverter;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamGridPane;
@@ -22,6 +25,7 @@ import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
 import pamViewFX.fxNodes.sliders.PamSlider;
+import pamViewFX.fxNodes.utilityPanes.PamToggleSwitch;
 
 /**
  * Allows uses to change the horizontal and vertical scales on the data map. 
@@ -59,14 +63,17 @@ public class ScalePaneFX extends PamBorderPane {
 	/**
 	 * Check box for log vertical scale. 
 	 */
-	private CheckBox logScaleBox;
+	private PamToggleSwitch logScaleBox;
 	
 	/**
 	 * The chosen time values. 
 	 */
 	private double[] timeScaleChoices = DataMapParameters.hScaleChoices;
 	
-	private Pane datagramPane;
+	/**
+	 * Combo box holding options to channge the datargam bin size
+	 */
+	private ComboBox<String> datagramBox;
 
 	/**
 	 * Holds a list of times for the datagram bin size. 
@@ -76,7 +83,14 @@ public class ScalePaneFX extends PamBorderPane {
 	/**
 	 * Holds everything. 
 	 */
-	private PamVBox holder; 
+	private PamVBox holder;
+
+	/**
+	 * Grid pane with settings for the data scales
+	 */
+	private PamGridPane scaleSettingsPane;
+
+	private Label dataGramLabel; 
 
 
 
@@ -84,9 +98,16 @@ public class ScalePaneFX extends PamBorderPane {
 		this.dataMapControl = dataMapControl;
 		this.dataMapPane = dataMapPane;
 		
+//		//create the holder pane. 
+//		PamVBox vBoxHolder=new PamVBox(); 
+//		vBoxHolder.setSpacing(5);
+//		Label title=new Label("Scales"); 
+//		PamGuiManagerFX.titleFont2style(title);
+//		vBoxHolder.getChildren().addAll(title, controlPane);
+		
 		holder=new PamVBox(); 
 		holder.setSpacing(20);
-		holder.getChildren().add(createScalePane());
+		holder.getChildren().add(scaleSettingsPane = createScalePane());
 		
 		this.setCenter(holder); 
 		
@@ -103,31 +124,28 @@ public class ScalePaneFX extends PamBorderPane {
 	public void checkDataGramPane(){
 		if (BinaryStore.findBinaryStoreControl()!=null){
 			DatagramManager dataGramManager=BinaryStore.findBinaryStoreControl().getDatagramManager();
-			if (dataGramManager!=null && datagramPane==null) {
-				datagramPane=createDatagramPane(dataGramManager);
-				holder.getChildren().add(datagramPane);
+			if (dataGramManager!=null && datagramBox==null) {
+				datagramBox=createDatagramPane(dataGramManager);
+				scaleSettingsPane.add(dataGramLabel= new Label("Datagram bin size"), 0, 2);
+				scaleSettingsPane.add(dataGramComboBox, 1, 2);
 			}
 		}
 		else {
-			holder.getChildren().remove(datagramPane);
-			datagramPane=null; 
+			scaleSettingsPane.getChildren().remove(dataGramLabel);
+			scaleSettingsPane.getChildren().remove(dataGramComboBox);
+
+			datagramBox=null; 
 		}
 	}
 
 	
 	/**
-	 * Create the pane to reset the datagram pane bin size. 
+	 * Create the a datagram combo box to change the size of the datagram
 	 * @param dataGramManager - the datagram manager for the current biinary store. 
-	 * @return
+	 * @return a combo box with datagram bin sizes. 
 	 */
-	private Pane createDatagramPane(DatagramManager dataGramManager){
+	private ComboBox<String> createDatagramPane(DatagramManager dataGramManager){
 
-		
-		PamGridPane dataGramOptions=new PamGridPane(); 
-		dataGramOptions.setHgap(5);
-		dataGramOptions.setVgap(5);
-		
-		dataGramOptions.add(new Label("Datagram Bin Size"),0,0);
 		dataGramComboBox=new ComboBox<String>(createDurationList(dataGramManager)); 
 		
 		dataGramComboBox.getSelectionModel().select(durationToString(dataGramManager.getDatagramSettings().datagramSeconds*1000L));
@@ -147,19 +165,7 @@ public class ScalePaneFX extends PamBorderPane {
 			}
 	     });
 		
-		dataGramOptions.add(dataGramComboBox,1,0);
-
-		//create the holder pane. 
-		PamVBox vBoxHolder=new PamVBox(); 
-		vBoxHolder.setSpacing(5);
-		Label title=new Label("Datagram"); 
-//		title.setFont(PamGuiManagerFX.titleFontSize2);
-		PamGuiManagerFX.titleFont2style(title);
-
-		vBoxHolder.getChildren().addAll(title, dataGramOptions);
-
-		
-		return vBoxHolder;
+		return dataGramComboBox;
 		
 	}
 	
@@ -184,19 +190,24 @@ public class ScalePaneFX extends PamBorderPane {
 	}
 
 	
-	private Node createScalePane() {
+	private PamGridPane createScalePane() {
 	
 		PamGridPane controlPane=new PamGridPane(); 
 		controlPane.setHgap(5);
 		controlPane.setVgap(5);
 		
 		//create time scale controls
-		controlPane.add(new Label("Time"),0,1);
+		controlPane.add(new Label("Time window"),0,1);
 		
 		//create time slider 
 		timeSlider=new Slider(0, timeScaleChoices.length-1, 1); 
 		timeSlider.setShowTickLabels(true);
 		timeSlider.setShowTickMarks(true);
+		timeSlider.setMajorTickUnit(1);
+		
+		timeSlider.setLabelFormatter(new ScaleStringConverter());
+		
+//		PamGridPane.setHalignment(timeSlider, Pos.BOTTOM_CENTER);
 
 		controlPane.add(timeSlider,1,1);
 		//add listener to time slider to change datamap. 
@@ -205,10 +216,11 @@ public class ScalePaneFX extends PamBorderPane {
 			dataMapPane.scaleChanged();
 		}); 
 		 
-		controlPane.add(timeScaleLabel=new Label(""),2,1);
+		controlPane.add(timeScaleLabel=new Label(""),3,1);
 		
 		//create vertical scale controls
-		controlPane.add(new Label("Data Counts"),0,0);
+		controlPane.add(new Label("Data counts"),0,0);
+		
 
 		scaleBox=new ComboBox<String> (); 
 		scaleBox.getItems().add("No Scaling");
@@ -217,28 +229,37 @@ public class ScalePaneFX extends PamBorderPane {
 		scaleBox.getItems().add("per Hour");
 		scaleBox.getItems().add("per Day");
 		controlPane.add(scaleBox,1,0);
+		scaleBox.setPrefWidth(200);
 
 		scaleBox.valueProperty().addListener((ov, oldVal, newVal)->{
 			dataMapPane.scaleChanged();
 		}); 
 
 		 
-		logScaleBox=new CheckBox("Log Scale"); 
-		logScaleBox.setOnAction((action)->{
+		logScaleBox=new PamToggleSwitch("Log Scale"); 
+		logScaleBox.selectedProperty().addListener((obsVal, oldVal, newVal)->{
 			dataMapPane.scaleChanged();
-		});;
-		controlPane.add(logScaleBox,2,0);
+		});
 		
-		//create the holder pane. 
-		PamVBox vBoxHolder=new PamVBox(); 
-		vBoxHolder.setSpacing(5);
-		Label title=new Label("Scales"); 
-		PamGuiManagerFX.titleFont2style(title);
-		vBoxHolder.getChildren().addAll(title, controlPane);
+		
+		controlPane.add(logScaleBox,3,0);
 			
 
+		return controlPane;
+	}
+	
+	class ScaleStringConverter extends StringConverter<Double> {
+
+		@Override
+		public String toString(Double object) {
+			return String.valueOf(timeScaleChoices[object.intValue()]);
+		}
+
+		@Override
+		public Double fromString(String string) {
+			return Double.valueOf(string);
+		}
 		
-		return vBoxHolder;
 	}
 	
 	/**

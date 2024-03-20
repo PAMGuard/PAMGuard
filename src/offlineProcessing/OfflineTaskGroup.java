@@ -66,6 +66,7 @@ public class OfflineTaskGroup implements PamSettings {
 	private DataTimeLimits dataTimeLimits;
 
 	private volatile TaskStatus completionStatus = TaskStatus.IDLE;
+	
 	/**
 	 * PamControlledunit required in constructor since some bookkeeping will
 	 * be going on in the background which will need the unit type and name. 
@@ -76,7 +77,7 @@ public class OfflineTaskGroup implements PamSettings {
 	public OfflineTaskGroup(PamControlledUnit pamControlledUnit, String settingsName) {
 		super();
 		this.pamControlledUnit = pamControlledUnit;
-		pamControlledUnit.addOfflineTaskGroup(this);
+		if (pamControlledUnit!=null) pamControlledUnit.addOfflineTaskGroup(this);
 		this.settingsName = settingsName;
 		PamSettingManager.getInstance().registerSettings(this);
 	}
@@ -964,5 +965,15 @@ public class OfflineTaskGroup implements PamSettings {
 	 */
 	public OfflineSuperDetFilter getSuperDetectionFilter() {
 		return superDetectionFilter;
+	}
+
+	/**
+	 * Clear all task from the task group. This also clears affected and required datablocks. 
+	 */
+	public void clearTasks() {
+		requiredDataBlocks.clear();
+		affectedDataBlocks.clear();
+		offlineTasks.clear();
+		
 	}
 }

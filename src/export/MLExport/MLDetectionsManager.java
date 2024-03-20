@@ -1,12 +1,11 @@
 package export.MLExport;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.protobuf.compiler.PluginProtos.CodeGeneratorResponse.File;
-
 import PamguardMVC.PamDataUnit;
-import export.PamExportManager;
+import export.PamDataUnitExporter;
 import us.hebi.matlab.mat.format.Mat5;
 import us.hebi.matlab.mat.types.Struct;
 
@@ -16,7 +15,7 @@ import us.hebi.matlab.mat.types.Struct;
  * @author Jamie Macaulay 
  *
  */
-public class MLDetectionsManager implements PamExportManager {
+public class MLDetectionsManager implements PamDataUnitExporter {
 	
 	public static final String extension = "mat";
 
@@ -35,7 +34,15 @@ public class MLDetectionsManager implements PamExportManager {
 	
 	@Override
 	public boolean hasCompatibleUnits(Class dataUnitType) {
-		// TODO Auto-generated method stub
+		for (int i=0; i<mlDataUnitsExport.size(); i++){
+			//check whether the same. ;
+			//System.out.println(" dataUnits.get(j).getClass(): " + dataUnits.get(j).getClass());
+			//System.out.println(" mlDataUnitsExport.get(i).getUnitClass(): " + mlDataUnitsExport.get(i).getUnitClass());
+			if (mlDataUnitsExport.get(i).getUnitClass().isAssignableFrom(dataUnitType)) {
+				//System.out.println("FOUND THE DATA UNIT!");
+				return true; 
+			}
+		}
 		return false;
 	}
 
@@ -52,15 +59,7 @@ public class MLDetectionsManager implements PamExportManager {
 	public boolean hasCompatibleUnits(List<PamDataUnit> dataUnits) {
 		//first need to figure out how many data units there are. 
 		for (int j=0; j<dataUnits.size(); j++){
-			for (int i=0; i<mlDataUnitsExport.size(); i++){
-				//check whether the same. ;
-				//System.out.println(" dataUnits.get(j).getClass(): " + dataUnits.get(j).getClass());
-				//System.out.println(" mlDataUnitsExport.get(i).getUnitClass(): " + mlDataUnitsExport.get(i).getUnitClass());
-				if (mlDataUnitsExport.get(i).getUnitClass().isAssignableFrom(dataUnits.get(j).getClass())) {
-					//System.out.println("FOUND THE DATA UNIT!");
-					return true; 
-				}
-			}
+			if (hasCompatibleUnits(dataUnits.get(j).getClass())) return true;
 		}
 		return false; 
 	}
@@ -115,16 +114,12 @@ public class MLDetectionsManager implements PamExportManager {
 					n++; 
 					alreadyStruct[j] = true;
 				}
-
-
 			}
 
 			if (n>=1) {
 				list.set(mlDataUnitsExport.get(i).getName(),mlStructure);
 				list.set(mlDataUnitsExport.get(i).getName()+"_sR", Mat5.newScalar(sampleRate)); 
 			}
-
-
 		}
 
 		//now ready to save. 
@@ -135,6 +130,11 @@ public class MLDetectionsManager implements PamExportManager {
 	@Override
 	public String getFileExtension() {
 		return extension;
+	}
+
+	@Override
+	public String getIconString() {
+		return "file-matlab"; 
 	}
 
 	

@@ -274,10 +274,7 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX {
 	 * @param timeEnd - the end of loaded data in millis. 
 	 */
 	public void selectedDataTime(Long timeStart, Long timeEnd) {
-		System.out.println("SELECTED DATA TIME:  " + timeStart + "  " + timeEnd);
 		summaryPane.setSelectedDataTime(timeStart, timeEnd);
-		dateAxis.setUpperBound(timeEnd);
-		dateAxis.setLowerBound(timeStart);
 	}
 
 

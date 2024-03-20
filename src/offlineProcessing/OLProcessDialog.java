@@ -93,13 +93,18 @@ public class OLProcessDialog extends PamDialog {
 
 	TaskStatus currentStatus = TaskStatus.IDLE;
 
+	/**
+	 * Reference to the main panel
+	 */
+	private JPanel mainPanel;
+
 
 	public OLProcessDialog(Window parentFrame, OfflineTaskGroup taskGroup, String title) {
 		super(parentFrame, title, false);
 		this.taskGroup = taskGroup;
 		taskGroup.setTaskMonitor(new OLMonitor());
 
-		JPanel mainPanel = new JPanel();
+		mainPanel = new JPanel();
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
 		JPanel dataSelectPanel = new PamAlignmentPanel(BorderLayout.WEST);
@@ -206,6 +211,14 @@ public class OLProcessDialog extends PamDialog {
 		
 		setResizable(true);
 
+	}
+	
+	/**
+	 * Get the main panel. This can be used to add additional controls if needed. 
+	 * @return the main panel. 
+	 */
+	public JPanel getMainPanel() {
+		return mainPanel;
 	}
 
 	/**

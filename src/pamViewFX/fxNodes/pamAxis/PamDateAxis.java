@@ -217,7 +217,7 @@ public class PamDateAxis extends ValueAxis<Long> {
         };
     }
 
-    private double[] recalculateTicks()
+    public double[] recalculateTicks()
     {
         final Side side = getSide();
         final boolean vertical = Side.LEFT.equals(side) || Side.RIGHT.equals(side);

@@ -8,22 +8,19 @@ import PamUtils.PamCalendar;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.geometry.Insets;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollBar;
-import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 import javafx.util.Duration;
 import PamguardMVC.PamDataBlock;
 import dataMap.DataMapControl;
-import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
-import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamColorsFX;
 import pamViewFX.fxNodes.PamScrollPane;
 import pamViewFX.fxNodes.PamVBox;
-import pamViewFX.fxNodes.sashPane.SashPane;
+import pamViewFX.fxNodes.pamAxis.PamDateAxis;
 
 public class ScrollingDataPaneFX extends PamBorderPane {
 	
@@ -99,8 +96,10 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 
 	private PamBorderPane holder;
 
-
-
+	/**
+	 * Axis which shows the current dates
+	 */
+	private PamDateAxis dateAxis;
 
 	/**
 	 * Constructor for the ScrollingDataPaneFX
@@ -162,6 +161,18 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 			notifyScrollChange(300);
 		});
 		
+		
+		dateAxis = new PamDateAxis();
+		dateAxis.setAutoRanging(false);
+		dateAxis.setLabel("Time");
+		dateAxis.setSide(Side.TOP);
+		dateAxis.setAnimated(false);
+		dateAxis.setMinHeight(50);
+//		dateAxis.prefWidthProperty().bind(scrollingDataPanel.widthProperty());
+//		dateAxis.setStyle("-fx-background-color: ORANGE;");		 
+		dateAxis.setForceZeroInRange(false);
+		holder.setTop(dateAxis);
+		
 		return holder;
 	}
 	
@@ -204,6 +215,8 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 			notifyScrollChange();
 		});
 		
+		timeScrollBar.setPrefHeight(20);
+		
 		holder.setCenter(timeScrollBar);
 		holder.setBottom(timeLabelPane);
 		
@@ -236,10 +249,13 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 			dataStreamPanels.get(i).scrollChanged();
 		}
 		settingsStrip.scrollChanged();
+		
+		updateDateAxis();
 	}
 	
 	Timeline timeline; 
 	long lastTime = 0; 
+	
 	/**
 	 * Notify all panels and the settings strip that the scroll bar moved - but have a timer to wait to not call too often. 
 	 */
@@ -259,9 +275,19 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 		}
 		
 		lastTime=currentTime;
+		
+		updateDateAxis();
 	
 	}
 
+	private void updateDateAxis() {
+		calcStartEndMillis();
+		dateAxis.setUpperBound(screenEndMillis);
+		dateAxis.setLowerBound(screenStartMillis);
+		double[] ticks = dateAxis.recalculateTicks();
+		System.out.println("Ticks: " + (ticks[3]/1000/3600) +  "hours");
+		dateAxis.setTickUnit(ticks[3]);	
+	}
 
 	/**
 	 * Create the data graphs to go into the pane. 
@@ -282,7 +308,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 			for (int i = 0; i < dataBlocks.size(); i++) {
 				aStreamPanel = new DataStreamPaneFX(dataMapControl, this, dataBlocks.get(i));
 				dataStreamPanels.add(aStreamPanel);
-				dataStreamPanels.get(i).setPrefHeight(DATASTREAMPANE_HEIGHT);
+				dataStreamPanels.get(i).setMinHeight(DATASTREAMPANE_HEIGHT);
 				//now add to a split pane. 
 				//SplitPane.setResizableWithParent(aStreamPanel, true);
 				dataPanePanes.getChildren().add(aStreamPanel);

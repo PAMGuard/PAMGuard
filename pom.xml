@@ -302,11 +302,7 @@
 		<version>0.0.57</version>
 	</dependency>
 
-	<!--jpam project - Deep learning java library 
-	DG has commented this out since there are problems with access to the maven repo
-	on JDJM's Github. For now a jar file is included in the build and we'll go back to 
-	Maven when we can ... DG 15 Jan 2022.
-	 	   Repo for jpam code- this used for deep learning [15:17] Jamie MacAulay-->
+	<!--jpam project - Deep learning java library -->
 	<dependency>
 		<groupId>io.github.macster110</groupId>
 		<artifactId>jdl4pam</artifactId>
@@ -372,7 +368,7 @@
            <version>${javafx.version}</version>
 	</dependency>
 	
-	<!-- Decorates JavaFX components-->
+	<!-- Decorates JavaFX components with error icons if inputs are incorrect-->
 	<dependency>
 		<groupId>net.synedra</groupId>
 		<artifactId>validatorfx</artifactId>
@@ -466,6 +462,13 @@
 		<version>12.3.1</version>
 	</dependency> 
 	
+	<!-- Icon symbol pack for swing icons . -->
+    <dependency>
+        <groupId>org.kordamp.ikonli</groupId>
+        <artifactId>ikonli-swing</artifactId>
+        <version>12.3.1</version>
+    </dependency>
+	
 	<!-- Ikonli MaterialDesign2 (Latest) font pack https://kordamp.org/ikonli/cheat-sheet-materialdesign2.html -->
 	<dependency>
 	    <groupId>org.kordamp.ikonli</groupId>
@@ -480,30 +483,28 @@
 	    <version>12.3.1</version>
 	</dependency>
 
-	<!-- https://mvnrepository.com/artifact/net.sf.geographiclib/GeographicLib-Java -->
+	<!-- https://mvnrepository.com/artifact/net.sf.geographiclib/GeographicLib-Java 
+	 Used in the video range module-->
 	<dependency>
 		<groupId>net.sf.geographiclib</groupId>
 		<artifactId>GeographicLib-Java</artifactId>
 		<version>1.50</version>
 	</dependency>
 	
-	<!-- https://mvnrepository.com/artifact/org.jogamp.gluegen/gluegen -->
+	<!-- https://mvnrepository.com/artifact/org.jogamp.gluegen/gluegen
 	<dependency>
 		<groupId>org.jogamp.gluegen</groupId>
 		<artifactId>gluegen-rt-main</artifactId>
 		<version>2.3.2</version>
-	</dependency>
-	
-	<!-- https://mvnrepository.com/artifact/java3d/j3dutils -->
-	
-	<!-- https://mvnrepository.com/artifact/java3d/j3dcore -->
+	</dependency>-->
+		
 
-	<!-- https://mvnrepository.com/artifact/com.healthmarketscience.jackcess/jackcess -->
+	<!-- https://mvnrepository.com/artifact/com.healthmarketscience.jackcess/jackcess
 	<dependency>
 		<groupId>com.healthmarketscience.jackcess</groupId>
 		<artifactId>jackcess</artifactId>
 		<version>3.0.1</version>
-	</dependency>
+	</dependency>-->
 	
 	<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
 	<dependency>
@@ -512,12 +513,12 @@
 		<version>2.10.1</version>
 	</dependency>
 	
-	<!-- https://mvnrepository.com/artifact/org.jogamp.jogl/jogl-all-main -->
+	<!-- https://mvnrepository.com/artifact/org.jogamp.jogl/jogl-all-main 
 	<dependency>
 		<groupId>org.jogamp.jogl</groupId>
 		<artifactId>jogl-all-main</artifactId>
 		<version>2.3.2</version>
-	</dependency>
+	</dependency>-->
 	
 	<!-- NOT SURE IF WE NEED THE JAXB LIBRARIES HERE - NO ERRORS WHEN REMOVED
 	<dependency>
@@ -654,7 +655,8 @@
 	    <version>42.2.24</version>
 	</dependency>
 
-	<!-- https://mvnrepository.com/artifact/org.renjin/renjin-script-engine -->
+	<!-- https://mvnrepository.com/artifact/org.renjin/renjin-script-engine
+	Used to export data to R structures-->
 	<dependency>
 	    <groupId>org.renjin</groupId>
 	    <artifactId>renjin-script-engine</artifactId>
@@ -669,8 +671,7 @@
 	    <version>1.8.0-beta4</version>
 	</dependency>
  	 
-	
-	
+ 	 
 	<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-nop
 	this one is only needed to get rid of an annoying warning that shows up during startup -->
 	<dependency>
@@ -906,7 +907,7 @@
 	</dependency>
 
 	
-		<!-- https://mvnrepository.com/artifact/it.sauronsoftware/jave -->
+	<!-- https://mvnrepository.com/artifact/it.sauronsoftware/jave -->
  	<dependency>
 	    <groupId>it.sauronsoftware</groupId>
 	    <artifactId>jave</artifactId>
