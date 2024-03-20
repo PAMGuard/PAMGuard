@@ -19,6 +19,8 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.JTableHeader;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import PamUtils.worker.PamWorkWrapper;
+import PamUtils.worker.PamWorker;
 import PamView.PamGui;
 import PamView.dialog.warn.WarnOnce;
 import PamView.tables.SwingTableColumnWidths;
@@ -42,7 +44,7 @@ import tethys.niluswraps.PDetections;
  * @author dg50
  *
  */
-public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTableObserver {
+public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTableObserver, PamWorkWrapper<String> {
 
 	private JPanel mainPanel;
 
@@ -118,15 +120,37 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 
 	@Override
 	public void selectDataBlock(PamDataBlock dataBlock) {
+		if (this.dataBlock == dataBlock) {
+			return; // stops lots of requerying, which matters when database is large. 
+		}
 		this.dataBlock = dataBlock;
-		dataBlockName.setText(dataBlock.getLongDataName());
-		streamDetectionsSummary = getTethysControl().getDetectionsHandler().getStreamDetections(dataBlock);
+		if (dataBlock == null) {
+			dataBlockName.setText("Select data in panel on the left");
+		}
+		else {
+			dataBlockName.setText(dataBlock.getLongDataName());
+		}
+		// need to re-thread this to stop user panicing that nothing is happening. 
+		PamWorker w = new PamWorker<String>(this, getTethysControl().getGuiFrame(), 0, "Searching database");
+		w.start();
+	}
+
+	@Override
+	public void taskFinished(String result) {
 		tableModel.fireTableDataChanged();
+	}
+
+	@Override
+	public String runBackgroundTask(PamWorker<String> pamWorker) {
+		streamDetectionsSummary = getTethysControl().getDetectionsHandler().getStreamDetections(dataBlock);
+		return null;
 	}
 
 	@Override
 	public void updateState(TethysState tethysState) {
 		if (dataBlock != null) {
+			PamDataBlock currBlock = dataBlock;
+			selectDataBlock(null);
 			selectDataBlock(dataBlock);
 		}
 	}

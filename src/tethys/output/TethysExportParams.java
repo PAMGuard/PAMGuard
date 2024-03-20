@@ -45,6 +45,8 @@ public class TethysExportParams implements Serializable, Cloneable{
 	private String datasetName;
 
 	public boolean listDocsInPamguard;
+
+	private String effortSourceName;
 	
 
 	/**
@@ -119,6 +121,22 @@ public class TethysExportParams implements Serializable, Cloneable{
 
 	private StreamExportParams getStreamParams(String longDataName) {
 		return streamParamsMap.get(longDataName);
+	}
+
+	/**
+	 * Source name for type of effort. 
+	 * @param sourceName
+	 */
+	public void setEffortSourceName(String sourceName) {
+		this.effortSourceName = sourceName;
+	}
+
+	/**
+	 * Source name for type of effort. 
+	 * @return the effortSourceName
+	 */
+	public String getEffortSourceName() {
+		return effortSourceName;
 	}
 
 

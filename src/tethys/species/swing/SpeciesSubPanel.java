@@ -114,12 +114,12 @@ public class SpeciesSubPanel {
 		}
 		ITISFunctions itisFunctions = tethysControl.getItisFunctions();
 		String itisString = this.itisCode.getText();
-		if (itisString == null || itisString.length() == 0) {
+//		if (itisString == null || itisString.length() == 0) {
 			searchForCode(tethysControl, itisFunctions);
-		}
-		else {
-			getCodeInformation(tethysControl, itisFunctions, itisString);
-		}
+//		}
+//		else {
+//			getCodeInformation(tethysControl, itisFunctions, itisString);
+//		}
 //		System.out.println(itisInfo);
 	}
 
@@ -144,7 +144,15 @@ public class SpeciesSubPanel {
 	}
 
 	private void searchForCode(TethysControl tethysControl, ITISFunctions itisFunctions) {
-		SpeciesMapItem speciesItem = SpeciesSearchDialog.showDialog(tethysControl.getGuiFrame(), tethysControl);
+		Integer currentCode = null;
+		try {
+			currentCode = Integer.valueOf(itisCode.getText());
+		}
+		catch (NumberFormatException e) {
+			
+		}
+		
+		SpeciesMapItem speciesItem = SpeciesSearchDialog.showDialog(tethysControl.getGuiFrame(), tethysControl, currentCode);
 		if (speciesItem != null) {
 			itisCode.setText(String.format("%d", speciesItem.getItisCode()));
 			latinName.setText(speciesItem.getLatinName());

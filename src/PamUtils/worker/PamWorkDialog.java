@@ -1,5 +1,6 @@
 package PamUtils.worker;
 
+import java.awt.Dimension;
 import java.awt.Window;
 
 import javax.swing.BoxLayout;
@@ -23,6 +24,9 @@ public class PamWorkDialog extends PamDialog {
 		mainPanel.setBorder(new TitledBorder("Task Progress"));
 //		GridBagConstraints c = new PamGridBagContraints();
 		mainPanel.add(progressBar = new JProgressBar(0, 100));
+		Dimension sz = progressBar.getPreferredSize();
+		sz.width = 300;
+		progressBar.setPreferredSize(sz);
 		textRows = new PamTextDisplay[nTextRows];
 		for (int i = 0; i < nTextRows; i++) {
 //			c.gridy++;

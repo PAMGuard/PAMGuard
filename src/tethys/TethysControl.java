@@ -469,6 +469,8 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 //		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			initializationStuff();
 			break;
+		case PamControllerInterface.HYDROPHONE_ARRAY_CHANGED:
+			sendStateUpdate(new TethysState(StateType.UPDATEMETADATA));
 		}
 	}
 

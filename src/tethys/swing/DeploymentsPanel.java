@@ -16,81 +16,38 @@ import javax.swing.border.TitledBorder;
 import PamView.panel.PamPanel;
 import tethys.TethysControl;
 import tethys.TethysState;
+import tethys.calibration.CalibrationHandler;
 import tethys.deployment.DeploymentHandler;
+import tethys.deployment.RecordingList;
 import tethys.deployment.RecordingPeriod;
 
-public class DeploymentsPanel extends TethysGUIPanel implements DeploymentTableObserver {
+public class DeploymentsPanel extends TethysExportPanel implements DeploymentTableObserver {
 	
-	private JPanel mainPanel;
+//	private JPanel mainPanel;
 	
 	private PAMGuardDeploymentsTable pamDeploymentsTable;
 	
 	private DeploymentExportPanel exportPanel;
 	
-	private JButton exportButton, optionsButton;
-//	private TethysDeploymentsTable tethysDeploymentsTable;
-	private JLabel exportWarning;
+	private JLabel effortName;
 
 	public DeploymentsPanel(TethysControl tethysControl) {
-		super(tethysControl);
+		super(tethysControl, tethysControl.getDeploymentHandler(), true);
 		DeploymentHandler deploymentHandler = tethysControl.getDeploymentHandler();
 		pamDeploymentsTable = new PAMGuardDeploymentsTable(tethysControl);
 		exportPanel = new DeploymentExportPanel(tethysControl, pamDeploymentsTable);
 		pamDeploymentsTable.addObserver(exportPanel);
-//		tethysDeploymentsTable = new TethysDeploymentsTable(tethysControl);
-		mainPanel = new PamPanel(new BorderLayout());
+		
+		JPanel mainPanel = getMainPanel();
 		mainPanel.setBorder(new TitledBorder("Recording periods and deployment information"));
 		pamDeploymentsTable.addObserver(this);
 		pamDeploymentsTable.addObserver(deploymentHandler);
-//		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-//		splitPane.add(pamDeploymentsTable.getComponent());
-//		splitPane.add(tethysDeploymentsTable.getComponent());
-//		mainPanel.add(splitPane,BorderLayout.CENTER);
-//		SwingUtilities.invokeLater(new Runnable() {
-//			
-//			@Override
-//			public void run() {
-//				splitPane.setDividerLocation(0.6);
-//			}
-//		});
-		JPanel ctrlPanel = new PamPanel(new BorderLayout());
-		JPanel ctrlButtons = new JPanel();
-		ctrlButtons.setLayout(new BoxLayout(ctrlButtons, BoxLayout.X_AXIS));
-		optionsButton = new JButton("Options ...");
-		exportButton = new JButton("Export ...");
-		ctrlButtons.add(optionsButton);
-		ctrlButtons.add(exportButton);
-		ctrlPanel.add(BorderLayout.WEST, ctrlButtons);
 		
-		optionsButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				getTethysControl().getDeploymentHandler().showOptions(null);
-			}
-		});
-		
-		exportButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				exportDeployments();
-			}
-		});
-		exportWarning = new JLabel(" ");
-		ctrlPanel.add(BorderLayout.CENTER, exportWarning);
-		
-		mainPanel.add(BorderLayout.CENTER, pamDeploymentsTable.getComponent());
-		mainPanel.add(BorderLayout.NORTH, ctrlPanel);
-//		mainPanel.add(BorderLayout.EAST, exportPanel.getComponent());
-		exportButton.setEnabled(false);
-	}
-
-	protected void exportDeployments() {
-		getTethysControl().getDeploymentHandler().exportDeployments();
-	}
-
-	@Override
-	public JComponent getComponent() {
-		return mainPanel;
+		effortName = new JLabel("   ");
+		JPanel centralPanel = new JPanel(new BorderLayout());
+		centralPanel.add(BorderLayout.NORTH, effortName);
+		centralPanel.add(BorderLayout.CENTER,pamDeploymentsTable.getComponent());
+		mainPanel.add(BorderLayout.CENTER, centralPanel);
 	}
 
 	@Override
@@ -98,12 +55,21 @@ public class DeploymentsPanel extends TethysGUIPanel implements DeploymentTableO
 		enableExportButton();
 	}
 	
-	
-
 	private void enableExportButton() {
+		if (!getTethysControl().isServerOk()) {
+			disableExport("Tethys server not running");
+			return;
+		}
+		
+		CalibrationHandler calHandler = getTethysControl().getCalibrationHandler();
+		if (calHandler.haveAllChannelCalibrations() == false) {
+			disableExport("Calibration data for each channel must be exported before creating Deployment documents");
+			return;
+		}
+		
 		ArrayList<RecordingPeriod> selected = pamDeploymentsTable.getSelectedPeriods();
-		if (selected == null) {
-			exportButton.setEnabled(false);
+		if (selected == null || selected.size() == 0) {
+			disableExport("You must select one or more deployment periods to export");
 			return;
 		}
 		boolean existing = false;
@@ -118,17 +84,35 @@ public class DeploymentsPanel extends TethysGUIPanel implements DeploymentTableO
 		}
 		String warning = null;
 		if (existing) {
-			warning = "  One or more deployment documents already exist. These must be deleted prior to exporting new documents";
-			exportWarning.setText(warning);
+			warning = "One or more deployment documents already exist. These must be deleted prior to exporting new documents";
+			disableExport(warning);
+			return;
 		}
-
-		exportButton.setEnabled(selected.size()>0 & existing == false && getTethysControl().isServerOk());
+		
+		enableExport(true);
 	}
 
 	@Override
 	public void updateState(TethysState tethysState) {
 		super.updateState(tethysState);
 		enableExportButton();
+		RecordingList recordingList = pamDeploymentsTable.getMasterList();
+		if (recordingList == null) {
+			effortName.setText("  No available effort data");
+		}
+		else {
+			effortName.setText("  Effort from " + recordingList.getSourceName());
+		}
+	}
+
+	@Override
+	protected void exportButtonPressed(ActionEvent e) {
+		getTethysControl().getDeploymentHandler().exportDeployments();
+	}
+
+	@Override
+	protected void optionsButtonPressed(ActionEvent e) {
+		getTethysControl().getDeploymentHandler().showOptions(null);
 	}
 
 

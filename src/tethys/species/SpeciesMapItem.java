@@ -41,6 +41,14 @@ public class SpeciesMapItem implements Serializable, Cloneable {
 	 */
 	private String callType;
 
+	/**
+	 * 
+	 * @param itisCode
+	 * @param callType
+	 * @param pamguardName
+	 * @param latinName
+	 * @param commonName
+	 */
 	public SpeciesMapItem(int itisCode, String callType, String pamguardName, String latinName, String commonName) {
 		super();
 		this.itisCode = itisCode;
@@ -50,6 +58,12 @@ public class SpeciesMapItem implements Serializable, Cloneable {
 		this.commonName = commonName;
 	}
 
+	/**
+	 * 
+	 * @param itisCode
+	 * @param callType
+	 * @param pamguardName
+	 */
 	public SpeciesMapItem(int itisCode, String callType, String pamguardName) {
 		super();
 		this.itisCode = itisCode;

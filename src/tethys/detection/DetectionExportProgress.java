@@ -17,6 +17,7 @@ public class DetectionExportProgress {
 	public int exportCount;
 	public int skipCount;
 	public int state;
+	public int totalDeployments, deploymentsDone;
 	
 	public DetectionExportProgress(PDeployment currentDeployment, Detections currentDetections, long lastUnitTime,
 			long totalUnits, int exportCount, int skipCount, int state) {
