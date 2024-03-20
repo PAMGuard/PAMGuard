@@ -35,6 +35,7 @@ import PamView.panel.PamAlignmentPanel;
 import PamView.panel.PamPanel;
 import PamView.panel.PamProgressBar;
 import PamguardMVC.PamDataBlock;
+import export.layoutFX.ExportParams;
 import offlineProcessing.logging.OldTaskData;
 import offlineProcessing.logging.TaskLogging;
 import offlineProcessing.superdet.OfflineSuperDetFilter;
@@ -835,5 +836,6 @@ public class OLProcessDialog extends PamDialog {
 	public OfflineTaskGroup getTaskGroup() {
 		return this.taskGroup;
 	}
+
 
 }

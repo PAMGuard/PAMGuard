@@ -39,5 +39,11 @@ public interface PamDataUnitExporter {
 	 */
 	public String getIconString();
 
+	/**
+	 * Get the name of the exporter
+	 * @return
+	 */
+	public String getName();
+
 
 }

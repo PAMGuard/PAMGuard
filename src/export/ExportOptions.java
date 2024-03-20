@@ -1,4 +1,4 @@
-package export.layoutFX;
+package export;
 
 import java.io.Serializable;
 import javax.swing.JFrame;
@@ -7,11 +7,11 @@ import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamController.StorageParameters;
-import export.PamExporterManager;
+import export.layoutFX.ExportParams;
 import export.swing.ExportProcessDialog;
 
 /**
- * Manages opening settings dialog and saving settings. 
+ * Manages opening settings dialog and saving settings for both FX and Swing GUI's
  * 
  * @author Jamie Macaulay
  *
@@ -57,7 +57,8 @@ public class ExportOptions implements PamSettings {
 		if (exportProcessDialog==null) {
 			exportProcessDialog= new ExportProcessDialog(exportManager); 
 		}
-		this.exportProcessDialog.showOfflineDialog(parentFrame);
+		
+		this.exportProcessDialog.showOfflineDialog(parentFrame, this.storageParameters);
 		
 //		ExportParams newParams = StorageOptionsDialog.showDialog(parentFrame, storageParameters);
 //		if (newParams != null) {

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import dataPlotsFX.data.TDDataInfoFX;
 import dataPlotsFX.data.TDDataProviderFX;
 import dataPlotsFX.data.TDDataProviderRegisterFX;
+import detectionPlotFX.data.DDPlotRegister;
+import detectionPlotFX.rawDDPlot.ClickDDPlotProvider;
 import pamViewFX.PamControlledGUIFX;
 import userDisplayFX.UserDisplayControlFX;
 import userDisplayFX.UserDisplayNodeFX;
@@ -48,6 +50,8 @@ public class TDDisplayController extends UserDisplayControlFX {
 		selectedDataUnits = new PamDataBlock(PamDataUnit.class, "Selected Data Units", getUserDisplayProcess() , Integer.MAX_VALUE); //TODO
 		
 		getUserDisplayProcess().addOutputDataBlock(selectedDataUnits);
+		
+
 	}
 	
 	/**
@@ -153,6 +157,14 @@ public class TDDisplayController extends UserDisplayControlFX {
 		for (int i=0; i<tdPlotProviders.size(); i++){
 			System.out.println(tdPlotProviders.get(i).getDataBlock().getUnitClass());
 		}
+	}
+
+	/**
+	 * Get the datablock for selected data units from the display. 
+	 * @return datablock for selected data units. 
+	 */
+	public PamDataBlock getDisplayDataBlock() {
+		return selectedDataUnits; 
 	}
 	
 

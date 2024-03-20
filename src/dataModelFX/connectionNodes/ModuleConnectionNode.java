@@ -237,7 +237,7 @@ public class ModuleConnectionNode extends StandardConnectionNode implements PAMC
 		removeButton.setGraphic(PamGlyphDude.createPamIcon("mdi2m-minus", Color.WHITE, PamGuiManagerFX.iconSize));
 		removeButton.setMaxSize(Double.MAX_VALUE,Double.MAX_VALUE);
 		removeButton.setOnAction((change)->{
-			if (this.pamControlledUnit.getPamModuleInfo()== null || this.pamControlledUnit.getPamModuleInfo().canRemove()){
+			if (this.pamControlledUnit==null || this.pamControlledUnit.getPamModuleInfo()== null || this.pamControlledUnit.getPamModuleInfo().canRemove()){
 				connectionPane.removeModuleNode(this);
 			}
 		});

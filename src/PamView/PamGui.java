@@ -74,7 +74,7 @@ import javax.swing.event.MenuListener;
 
 import Acquisition.DaqSystemInterface;
 import annotation.tasks.AnnotationManager;
-import export.layoutFX.ExportOptions;
+import export.ExportOptions;
 import metadata.MetaDataContol;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
 import performanceTests.PerformanceDialog;

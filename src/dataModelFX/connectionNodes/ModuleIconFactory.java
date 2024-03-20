@@ -249,6 +249,7 @@ public class ModuleIconFactory {
 			icon=ModuleIcon.TIME_DISPLAY; 
 			break; 
 		case "detectionPlotFX.DetectionDisplayControl":
+		case "detectionPlotFX.DetectionDisplayControl2":
 			icon=ModuleIcon.DETECTION_DISPLAY; 
 			break; 
 		case "dataMap.DataMapControl":

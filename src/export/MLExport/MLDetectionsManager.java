@@ -137,6 +137,11 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 		return "file-matlab"; 
 	}
 
+	@Override
+	public String getName() {
+		return "MATLAB";
+	}
+
 	
 
 

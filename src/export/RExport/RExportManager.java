@@ -144,12 +144,17 @@ public class RExportManager implements PamDataUnitExporter {
 
 	@Override
 	public String getFileExtension() {
-		return ".RData";
+		return "RData";
 	}
 
 	@Override
 	public String getIconString() {
 		return "file-r";
+	}
+
+	@Override
+	public String getName() {
+		return "R data";
 	}
 
 	

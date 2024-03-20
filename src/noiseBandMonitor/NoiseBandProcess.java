@@ -64,9 +64,9 @@ public class NoiseBandProcess extends PamProcess {
 		super.setupProcess();
 		PamDataBlock sourceData = noiseBandControl.getPamConfiguration().getDataBlock(RawDataUnit.class, noiseBandControl.noiseBandSettings.rawDataSource);
 		
-		System.out.println("********************************************************");
-		System.out.println("NOISE BAND PROCESS: " + sourceData + "  " + noiseBandControl.noiseBandSettings.rawDataSource);
-		System.out.println("********************************************************");
+//		System.out.println("********************************************************");
+//		System.out.println("NOISE BAND PROCESS: " + sourceData + "  " + noiseBandControl.noiseBandSettings.rawDataSource);
+//		System.out.println("********************************************************");
 		if (sourceData == null) {
 			return;
 		}

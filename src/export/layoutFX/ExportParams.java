@@ -9,13 +9,16 @@ import java.io.Serializable;
  *
  */
 public class ExportParams implements Serializable, Cloneable {
-
+	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public int exportChoice;
+	/**
+	 * The index of the ex;port choice. 
+	 */
+	public int exportChoice = 0; 
 	
 	
 	@Override

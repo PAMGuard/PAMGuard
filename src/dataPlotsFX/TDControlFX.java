@@ -233,8 +233,6 @@ public class TDControlFX extends TDControl implements UserDisplayNodeFX {
 	}
 
 
-
-
 	/**
 	 * The data observer monitors only the raw data source in real time
 	 * so that scrolling can take place. Need to set up a different
@@ -401,5 +399,9 @@ public class TDControlFX extends TDControl implements UserDisplayNodeFX {
 	@Override
 	public void newSelectedDetectionGroup(DetectionGroupSummary detectionGroup, TDGraphFX tdGraph) {
 		System.out.println("New selected detection group: " + detectionGroup);
+		
+		tdDisplayController.getDisplayDataBlock().clearAll();
+		if (detectionGroup==null || detectionGroup.getDataList().size()<=0) return;
+		tdDisplayController.getDisplayDataBlock().addPamData(detectionGroup.getDataList().get(detectionGroup.getFocusedIndex()));
 	}
 }

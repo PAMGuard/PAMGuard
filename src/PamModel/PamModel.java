@@ -877,7 +877,7 @@ final public class PamModel implements PamSettings {
 			mi.setModulesMenuGroup(displaysGroup);
 			mi.addGUICompatabilityFlag(PamGUIManager.FX);
 
-			mi = PamModuleInfo.registerControlledUnit("detectionPlotFX.DetectionDisplayControl", "Detection Display" );
+			mi = PamModuleInfo.registerControlledUnit("detectionPlotFX.DetectionDisplayControl2", "Detection Display" );
 			mi.setToolTipText("Display detection data");
 			mi.setModulesMenuGroup(displaysGroup);
 			mi.addGUICompatabilityFlag(PamGUIManager.FX);

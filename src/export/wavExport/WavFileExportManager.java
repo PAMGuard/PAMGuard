@@ -79,7 +79,7 @@ public class WavFileExportManager implements PamDataUnitExporter  {
 
 
 	/**
-	 * Get a list of ecporters that can export wav files from a data unit. 
+	 * Get a list of exporters that can export wav files from a data unit. 
 	 * @return the wav file exporters. 
 	 */
 	public ArrayList<WavDataUnitExport> getWavDataUnitExporters() {
@@ -449,6 +449,13 @@ public class WavFileExportManager implements PamDataUnitExporter  {
 	public String getIconString() {
 		// TODO Auto-generated method stub
 		return "mdi2f-file-music";
+	}
+
+
+
+	@Override
+	public String getName() {
+		return "raw sound";
 	}
 
 

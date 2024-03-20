@@ -18,6 +18,7 @@ import javafx.geometry.Side;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
@@ -25,7 +26,10 @@ import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.hidingPane.HidingPane;
+import pamViewFX.fxNodes.internalNode.PamInternalPane;
 import pamViewFX.fxStyles.PamStylesManagerFX;
+import userDisplayFX.UserDisplayNodeFX;
+import userDisplayFX.UserDisplayNodeParams;
 
 /**
  * 
@@ -35,7 +39,7 @@ import pamViewFX.fxStyles.PamStylesManagerFX;
  * @author Jamie Macaulay
  *
  */
-public class DetectionGroupDisplay extends PamBorderPane {
+public class DetectionGroupDisplay extends PamBorderPane implements UserDisplayNodeFX {
 
 	/**
 	 * Index of the current normal unit with the detection summary. 
@@ -97,12 +101,19 @@ public class DetectionGroupDisplay extends PamBorderPane {
 	 * Hiding pane for the plot settings. 
 	 */
 	private HidingPane hidingPane; 
+	
+	/**
+	 * The detection pot paramters. 
+	 */
+	DetectionPlotParams detectionPlotParams;
 
 	public DetectionGroupDisplay() {
 		//create hash map to map DDDataInfos to datablocks for quick access. 
 		dDataInfoHashMap = new HashMap<PamDataBlock, DDDataInfo>(); 
+		detectionPlotParams=new DetectionPlotParams();
 		createDetectionDisplay();
 		this.setCenter(detectionDisplayHolder);
+		
 	}
 
 	/**
@@ -425,5 +436,67 @@ public class DetectionGroupDisplay extends PamBorderPane {
 		if (detectionGroup==null) return null;
 		return detectionGroup.get(currentUnitIndex);
 	}
+
+	@Override
+	public String getName() {
+		return "Detection Dsiplay";
+	}
+
+	@Override
+	public Region getNode() {
+		// TODO Auto-generated method stub
+		return this;
+	}
+
+	@Override
+	public void openNode() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isStaticDisplay() {
+		return false;
+	}
+
+	@Override
+	public boolean isResizeableDisplay() {
+		return true;
+	}
+
+	@Override
+	public boolean isMinorDisplay() {
+		return true;
+	}
+
+	@Override
+	public boolean requestNodeSettingsPane() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void closeNode() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void notifyModelChanged(int changeType) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public UserDisplayNodeParams getDisplayParams() {
+		return 	 detectionPlotParams;
+	}
+
+	@Override
+	public void setFrameHolder(PamInternalPane internalFrame) {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }

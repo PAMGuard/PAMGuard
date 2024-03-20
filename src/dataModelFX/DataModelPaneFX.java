@@ -313,7 +313,7 @@ public class DataModelPaneFX extends PamBorderPane {
 	 * data is changed in external dialogs.
 	 */
 	protected void dataModeltoPamModel() {
-		// System.out.println("************DATAMODELTOPAMMODEL*************");
+		 System.out.println("************DATAMODELTOPAMMODEL*************");
 
 		if (disableNotification)
 			return;
@@ -328,8 +328,8 @@ public class DataModelPaneFX extends PamBorderPane {
 			childNode = (ModuleConnectionNode) dataModelPane.getConnectionNodes().get(i);
 			if (childNode.getPamControlledUnit() == null)
 				continue;
-			// System.out.println("Children of " + ((ModuleConnectionNode)
-			// dataModelPane.getConnectionNodes().get(i)).getPamControlledUnit().getUnitType());
+			 System.out.println("Children of " + ((ModuleConnectionNode)
+			 dataModelPane.getConnectionNodes().get(i)).getPamControlledUnit().getUnitType());
 			checkParentChildConnections(childNode, true);
 		}
 		enableConectionListerner(true);
@@ -356,7 +356,7 @@ public class DataModelPaneFX extends PamBorderPane {
 	 *                   modules with dependencies are added.
 	 */
 	protected void pamModeltoDataModel(boolean disconnect) {
-		// System.out.println("************PAMMODELTODATAMODEL*************");
+		 System.out.println("************PAMMODELTODATAMODEL*************");
 		if (disableNotification)
 			return;
 		disableNotification = true;
@@ -367,10 +367,13 @@ public class DataModelPaneFX extends PamBorderPane {
 		 */
 		for (int i = 0; i < this.dataModelPane.getConnectionNodes().size(); i++) {
 			childNode = (ModuleConnectionNode) dataModelPane.getConnectionNodes().get(i);
+			 System.out.println("Node " + i);
+
 			if (childNode.getPamControlledUnit() == null)
 				continue;
-			// System.out.println("Children of " + ((ModuleConnectionNode)
-			// dataModelPane.getConnectionNodes().get(i)).getPamControlledUnit().getUnitType());
+			 System.out.println("Children of " + ((ModuleConnectionNode)
+			 dataModelPane.getConnectionNodes().get(i)).getPamControlledUnit().getUnitType());
+			 
 			checkModuleConnection(childNode);
 			checkParentChildConnections(childNode, !disconnect);
 		}
@@ -396,7 +399,7 @@ public class DataModelPaneFX extends PamBorderPane {
 	 *         error.
 	 */
 	private boolean checkModuleConnection(ModuleConnectionNode childNode) {
-
+		
 		// find all parent nodes.
 		ArrayList<ConnectionNode> parentNodesS = dataModelPane.getParentConnectionNodes(childNode);
 
@@ -413,13 +416,13 @@ public class DataModelPaneFX extends PamBorderPane {
 		} 
 		else {
 
-			// System.out.println(" CHILD NODE: "
-			// +childNode.getPamControlledUnit().getUnitName());
-			// for (int i=0; i<parentNodes.size() ;i++){
-			// System.out.println(" PARENTS NODE: "
-			// +parentNodes.get(i).getPamControlledUnit().getUnitName());
-			// }
-			// System.out.println(" ------------------------------------------");
+//			 System.out.println(" CHILD NODE: "
+//			 +childNode.getPamControlledUnit().getUnitName());
+//			 for (int i=0; i<parentNodesS.size() ;i++){
+//			 System.out.println(" PARENTS NODE: "
+//			 + parentNodesS.get(i).getPamControlledUnit().getUnitName());
+//			 }
+//			 System.out.println(" ------------------------------------------");
 
 			ModuleConnectionNode parentModuleNode;
 
@@ -696,8 +699,8 @@ public class DataModelPaneFX extends PamBorderPane {
 
 		boolean connected = false;
 
-		// System.out.println("Attempting to connect: " + parentUnit.getUnitName() + "
-		// to " + childUnit.getUnitName());
+		 System.out.println("Attempting to connect: " + parentUnit.getUnitName() + 
+		 " to "  + childUnit.getUnitName());
 
 		// First, are these modules already connected.
 		if (modulesConnected(childNode, parentNode)) {
