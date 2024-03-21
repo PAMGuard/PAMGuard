@@ -24,6 +24,7 @@ import userDisplayFX.UserDisplayNodeFX;
  * @author Jamie Macaulay
  *
  */
+@Deprecated
 public class DetectionDisplayControl extends UserDisplayControlFX  {
 
 	/**
@@ -49,7 +50,8 @@ public class DetectionDisplayControl extends UserDisplayControlFX  {
 		//create the observer for the parent data block. 
 		detectionDataObserver=new DetectionDataObserver();
 		setMultiParent(false);
-
+		
+	
 	}
 	
 	/**
@@ -83,7 +85,7 @@ public class DetectionDisplayControl extends UserDisplayControlFX  {
 			displayToDataModel(this.getUserDisplayProcess().getParentDataBlock());
 			break;
 		}
-		this.detectionDisplay.notifyModelChanged(type);
+		//this.detectionDisplay.notifyModelChanged(type);
 	}
 	
 	/**
@@ -159,9 +161,9 @@ public class DetectionDisplayControl extends UserDisplayControlFX  {
 	@Override
 	public ArrayList<UserDisplayNodeFX> getDisplays(){
 		if (displays==null){
-			detectionDisplay=new DetectionPlotDisplay(this);
+			detectionDisplay=new DetectionPlotDisplay();
 			displays=new ArrayList<UserDisplayNodeFX>();
-			displays.add(detectionDisplay);
+			//displays.add(detectionDisplay);
 		}
 		return displays;
 	}

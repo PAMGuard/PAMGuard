@@ -285,7 +285,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 		dateAxis.setUpperBound(screenEndMillis);
 		dateAxis.setLowerBound(screenStartMillis);
 		double[] ticks = dateAxis.recalculateTicks();
-		System.out.println("Ticks: " + (ticks[3]/1000/3600) +  "hours");
+//		System.out.println("Ticks: " + (ticks[3]/1000/3600) +  "hours");
 		dateAxis.setTickUnit(ticks[3]);	
 	}
 

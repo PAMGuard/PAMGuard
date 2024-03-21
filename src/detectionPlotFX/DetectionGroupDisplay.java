@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import PamController.PamSettingManager;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.superdet.SuperDetection;
@@ -39,7 +40,7 @@ import userDisplayFX.UserDisplayNodeParams;
  * @author Jamie Macaulay
  *
  */
-public class DetectionGroupDisplay extends PamBorderPane implements UserDisplayNodeFX {
+public class DetectionGroupDisplay extends PamBorderPane {
 
 	/**
 	 * Index of the current normal unit with the detection summary. 
@@ -102,17 +103,14 @@ public class DetectionGroupDisplay extends PamBorderPane implements UserDisplayN
 	 */
 	private HidingPane hidingPane; 
 	
-	/**
-	 * The detection pot paramters. 
-	 */
-	DetectionPlotParams detectionPlotParams;
+	
 
 	public DetectionGroupDisplay() {
 		//create hash map to map DDDataInfos to datablocks for quick access. 
 		dDataInfoHashMap = new HashMap<PamDataBlock, DDDataInfo>(); 
-		detectionPlotParams=new DetectionPlotParams();
 		createDetectionDisplay();
 		this.setCenter(detectionDisplayHolder);
+
 		
 	}
 
@@ -437,66 +435,15 @@ public class DetectionGroupDisplay extends PamBorderPane implements UserDisplayN
 		return detectionGroup.get(currentUnitIndex);
 	}
 
-	@Override
-	public String getName() {
-		return "Detection Dsiplay";
-	}
 
-	@Override
-	public Region getNode() {
-		// TODO Auto-generated method stub
-		return this;
-	}
 
-	@Override
-	public void openNode() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean isStaticDisplay() {
-		return false;
-	}
-
-	@Override
-	public boolean isResizeableDisplay() {
-		return true;
-	}
-
-	@Override
-	public boolean isMinorDisplay() {
-		return true;
-	}
-
-	@Override
-	public boolean requestNodeSettingsPane() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void closeNode() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void notifyModelChanged(int changeType) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public UserDisplayNodeParams getDisplayParams() {
-		return 	 detectionPlotParams;
-	}
-
-	@Override
-	public void setFrameHolder(PamInternalPane internalFrame) {
-		// TODO Auto-generated method stub
-		
-	}
+	
+//	@Override
+//	public boolean requestNodeSettingsPane() {
+//		if (dDPlotPane.getHidePane(Side.RIGHT)!=null) dDPlotPane.getHidePane(Side.RIGHT).showHidePane(true);
+//		if (dDPlotPane.getHidePane(Side.LEFT)!=null) dDPlotPane.getHidePane(Side.LEFT).showHidePane(true);
+//		return true;
+//	}
 
 
 }

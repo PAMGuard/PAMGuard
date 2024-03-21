@@ -169,7 +169,7 @@ public class ModuleConnectionNode extends StandardConnectionNode implements PAMC
 	 * Create the module. 
 	 */
 	private void initModuleNode(){
-		
+				
 		//create the top hiding pane
 		this.getChildren().add(0,topHidingPane=createTopControls()); 
 		
@@ -196,7 +196,9 @@ public class ModuleConnectionNode extends StandardConnectionNode implements PAMC
 	 * @param type - the type of connection. 
 	 */
 	protected void connectionListenerTriggered(ConnectorNode shape, ConnectorNode foundShape, int type){
-		//System.out.println(" ModuleConnectionNode. listener triggered " + this.getPamControlledUnit().getUnitName()+ " "+type ); 		
+		
+		//System.out.println(" ModuleConnectionNode. listener triggered " + this.getPamControlledUnit()+ " "+type ); 		
+		
 		if (lastConnectionStatus==ConnectorNode.NO_CONNECTION && type==ConnectorNode.NO_CONNECTION) return;
 		switch(type){
 		case ConnectorNode.NO_CONNECTION:
@@ -973,7 +975,9 @@ public class ModuleConnectionNode extends StandardConnectionNode implements PAMC
 	}
 	
 	
-	
+	public DataModelConnectPane getDataModelConnectionPane() {
+		return this.connectionPane;
+	}
 	
 
 }

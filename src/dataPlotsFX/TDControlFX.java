@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import javafx.application.Platform;
 import javafx.scene.layout.Region;
 import pamViewFX.fxNodes.internalNode.PamInternalPane;
+import userDisplayFX.UserDisplayControlFX;
 import userDisplayFX.UserDisplayNodeFX;
 import userDisplayFX.UserDisplayNodeParams;
 import dataPlotsFX.data.TDDataInfoFX;
@@ -293,8 +294,6 @@ public class TDControlFX extends TDControl implements UserDisplayNodeFX {
 
 	@Override
 	public void closeNode() {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -375,7 +374,7 @@ public class TDControlFX extends TDControl implements UserDisplayNodeFX {
 //		 System.out.println("TDControlFX: Saving the position of the display: "
 //				 + internalFrame.getInternalRegion().getLayoutX() + "  " + internalFrame.getInternalRegion().getLayoutY()); 
 		 
-		 //need to use the parent node because insode an internal pane. 
+		 //need to use the parent node because inside an internal pane. 
 		 this.getTdParameters().displayProviderParams.positionX=internalFrame.getInternalRegion().getLayoutX();
 		 this.getTdParameters().displayProviderParams.positionY=internalFrame.getInternalRegion().getLayoutY();
 		 this.getTdParameters().displayProviderParams.sizeX=internalFrame.getInternalRegion().getWidth();
@@ -402,6 +401,19 @@ public class TDControlFX extends TDControl implements UserDisplayNodeFX {
 		
 		tdDisplayController.getDisplayDataBlock().clearAll();
 		if (detectionGroup==null || detectionGroup.getDataList().size()<=0) return;
+		
+		System.out.println("Add pam data: " + detectionGroup + " " + tdDisplayController.getDisplayDataBlock().countObservers());
+		for (int i=0; i<tdDisplayController.getDisplayDataBlock().countObservers() ; i++) {
+			System.out.println("Observer : " + tdDisplayController.getDisplayDataBlock().getPamObserver(i));
+		}
+
 		tdDisplayController.getDisplayDataBlock().addPamData(detectionGroup.getDataList().get(detectionGroup.getFocusedIndex()));
+		if (isViewer()) tdDisplayController.getDisplayDataBlock().notifyNornalObservers(detectionGroup.getDataList().get(detectionGroup.getFocusedIndex()));
+		
+	}
+
+	@Override
+	public UserDisplayControlFX getUserDisplayControl() {
+		return this.tdDisplayController;
 	}
 }

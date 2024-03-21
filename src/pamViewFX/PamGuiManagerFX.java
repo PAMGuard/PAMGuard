@@ -296,14 +296,14 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 	}
 
 	/**
-	 * Add a controlled unit from the scene. The controlled unit may have a graphical component or no graphical component at all. 
+	 * Remove a controlled unit from the scene. The controlled unit may have a graphical component or no graphical component at all. 
 	 * @param controlledUnit - the controlled unit to remove (here we're removing all it's displays)
 	 */
 	@Override
 	public void removeControlledUnit(PamControlledUnit controlledUnit){
 		//now set the content for the tab.
 		if (controlledUnit.getGUI(PamGUIManager.FX)!=null){
-			//System.out.println("PAMGuiMangerFX: Remove module (PamControlledUnit) added" +controlledUnit.getUnitName()); 
+			System.out.println("PAMGuiMangerFX: Remove module (PamControlledUnit)" +controlledUnit.getUnitName()); 
 			//if FX content then is handles as an FX Node within GUI manager. 
 			PamControlledGUIFX pamControlledUnitFX=(PamControlledGUIFX) controlledUnit.getGUI(PamGUIManager.FX);
 			//figure out which tab the display should be added to. 
@@ -416,7 +416,9 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 			});
 		}
 		else {
-			
+			if (newDisplay.getDisplayParams()!=null) {
+				newDisplay.getDisplayParams().tabName=tab.getName(); 
+			}
 		}
 	}
 

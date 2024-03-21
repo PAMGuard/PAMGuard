@@ -306,6 +306,21 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
         	}
         }
         
+        newTab.setOnClosed((action)->{
+        	//when a tab is closer. 
+        	for (int i=0; i<newTab.getInternalPanes().size(); i++) {
+        		System.out.println("REMOVE TAB: " + newTab.getInternalPanes().size());
+
+	        	newTab.getInternalPanes().get(i).getUserDisplayNode().closeNode();
+	        	if (newTab.getInternalPanes().get(i).getUserDisplayNode().getUserDisplayControl()!=null) {
+	        		System.out.println("REMOVE CONTROLLED DISPLAY UNIT: " + newTab.getInternalPanes().get(i).getUserDisplayNode().getUserDisplayControl());
+	        		//the display is a standalone display and so remove the tab means the controlled unit should be removed from the data model 
+	        		PamController.getInstance().removeControlledUnt(newTab.getInternalPanes().get(i).getUserDisplayNode().getUserDisplayControl());
+	        		PamGuiManagerFX.getInstance().getDataModelFX().dataModeltoPamModel();
+	        	}
+        	}
+        });
+        
         newTab.setDetachable(detachable);
    
         //add tab

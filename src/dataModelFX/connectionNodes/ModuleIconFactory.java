@@ -215,7 +215,7 @@ public class ModuleIconFactory {
 	 * @return the module icon enum
 	 */
 	public ModuleIcon getModuleIcon(String className) {
-		System.out.println("Get module icon: " + className);
+//		System.out.println("Get module icon: " + className);
 		ModuleIcon icon = null; 
 		switch (className) {
 		case "Acquisition.AcquisitionControl":

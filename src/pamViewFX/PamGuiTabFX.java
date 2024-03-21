@@ -423,7 +423,7 @@ public class PamGuiTabFX extends PamTabFX {
 	 * @author Jamie Macaulay
 	 *
 	 */
-	private class PamGuiInternalPane extends PamInternalPane {
+	class PamGuiInternalPane extends PamInternalPane {
 		
 
 		private UserDisplayNodeFX mainPane;

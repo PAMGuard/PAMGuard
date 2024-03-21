@@ -21,6 +21,7 @@ import pamViewFX.fxNodes.hidingPane.HidingPane;
 import pamViewFX.fxNodes.internalNode.PamInternalPane;
 import pamViewFX.fxNodes.pamAxis.PamDateAxis;
 import pamViewFX.fxStyles.PamStylesManagerFX;
+import userDisplayFX.UserDisplayControlFX;
 import userDisplayFX.UserDisplayNodeFX;
 import userDisplayFX.UserDisplayNodeParams;
 
@@ -294,6 +295,12 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX {
 	public void setFrameHolder(PamInternalPane internalFrame) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public UserDisplayControlFX getUserDisplayControl() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
