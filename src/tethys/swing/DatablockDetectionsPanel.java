@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JComponent;
@@ -131,7 +132,7 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 			dataBlockName.setText(dataBlock.getLongDataName());
 		}
 		// need to re-thread this to stop user panicing that nothing is happening. 
-		PamWorker w = new PamWorker<String>(this, getTethysControl().getGuiFrame(), 0, "Searching database");
+		PamWorker w = new PamWorker<String>(this, getTethysControl().getGuiFrame(), 0, "Searching database for " + dataBlock.getDataName());
 		w.start();
 	}
 
@@ -241,20 +242,50 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 		if (ans != WarnOnce.OK_OPTION) {
 			return;
 		}
+
+		ArrayList<Detections> toDelete = new ArrayList();
+
 		for (int i = 0; i < rows.length; i++) {
 			int row = rows[i];
 			PDetections pDets = detectionsForRow(row);
 			if (pDets == null) {
 				continue;
 			}
-			try {
-				getTethysControl().getDbxmlConnect().deleteDocument(pDets.detections);
-			} catch (TethysException e) {
-				getTethysControl().showException(e);
-			}
+			toDelete.add(pDets.detections);
 		}
-		getTethysControl().exportedDetections(dataBlock);
-		selectDataBlock(dataBlock); // force table update. 
+		DeleteDocs dd = new DeleteDocs(toDelete);
+		PamWorker<Integer> worker = new PamWorker(dd, getTethysControl().getGuiFrame(), 1, "Deleting Detections documents");
+		worker.start();
+
+	}
+
+	private class DeleteDocs implements PamWorkWrapper<Integer> {
+
+		private ArrayList<Detections> toDelete;
+
+		public DeleteDocs(ArrayList<Detections> toDelete) {
+			this.toDelete = toDelete;
+		}
+
+		@Override
+		public Integer runBackgroundTask(PamWorker<Integer> pamWorker) {
+			for (Detections dets : toDelete) {
+				try {
+					
+					getTethysControl().getDbxmlConnect().deleteDocument(dets);
+				} catch (TethysException e) {
+					getTethysControl().showException(e);
+				}
+			}
+			return toDelete.size();
+		}
+
+		@Override
+		public void taskFinished(Integer result) {
+			getTethysControl().exportedDetections(dataBlock);
+			selectDataBlock(dataBlock); // force table update. 			
+		}
+
 	}
 
 	protected void deleteDocument(PDetections pDets) {

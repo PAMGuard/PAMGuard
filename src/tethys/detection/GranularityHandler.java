@@ -1,8 +1,16 @@
 package tethys.detection;
 
+import java.util.List;
+import java.util.ListIterator;
+
+import javax.xml.datatype.DatatypeConstants;
+import javax.xml.datatype.XMLGregorianCalendar;
+
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import nilus.Detection;
+import nilus.DetectionGroup;
+import nilus.Detections;
 import nilus.GranularityEnumType;
 import tethys.TethysControl;
 import tethys.output.StreamExportParams;
@@ -117,5 +125,94 @@ public abstract class GranularityHandler {
 			break;
 		}
 		return null;
+	}
+
+	/**
+	 * Automatically fix mismatches between effort and detections. This will be called if a 
+	 * detection or part of a detection is outside of the start and end defined by the effort. If it's a 
+	 * small difference, i.e. if the detection at least overlaps the effort then it can be automatically 
+	 * fixed by truncating the detection (for binned types) or by a small extension to the effort (for encounter
+	 * and call types).  
+	 * @param detections nilus Detections object 
+	 * @param det a single detection
+	 * @return true if it was fixed automatically. False otherwise. 
+	 */
+	protected abstract boolean autoEffortFix(Detections detections, Detection det);
+	
+	/**
+	 * Check that the detection at least overlaps the effort period. 
+	 * @param detections nilus Detections object 
+	 * @param det a single detection
+	 * @return true if the overlap
+	 */
+	protected boolean effortOverlap(Detections detections, Detection det) {
+		XMLGregorianCalendar effStart = detections.getEffort().getStart();
+		XMLGregorianCalendar effEnd = detections.getEffort().getEnd();
+		XMLGregorianCalendar detStart = det.getStart();
+		XMLGregorianCalendar detEnd = det.getEnd();
+		if (effStart.compare(detEnd) == DatatypeConstants.GREATER) {
+			return false;
+		}
+		if (effEnd.compare(detStart) == DatatypeConstants.LESSER) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Fix effort / detection problem but contracting the start / end times of the detection
+	 * @param detections nilus Detections object 
+	 * @param det a single detection
+	 * @return true if fixed automatically
+	 */
+	protected boolean contractDetection(Detections detections, Detection det) {
+		if (effortOverlap(detections, det) == false) {
+			return false;
+		}
+		// at least some overlap, so fix it.
+		// going to fix it my shortening the detection, and leave the effort alone. 
+		XMLGregorianCalendar effStart = detections.getEffort().getStart();
+		XMLGregorianCalendar effEnd = detections.getEffort().getEnd();
+		XMLGregorianCalendar detStart = det.getStart();
+		XMLGregorianCalendar detEnd = det.getEnd();
+		
+
+		if (effStart.compare(detStart) == DatatypeConstants.GREATER) {
+			System.out.printf("Fix Detections change detection start from %s to %s\n", detStart, effStart);
+			det.setStart(effStart);
+		}
+		if (effEnd.compare(detEnd) == DatatypeConstants.LESSER) {
+			System.out.printf("Fix Detections change detection end from %s to %s\n", detEnd, effEnd);
+			det.setEnd(effEnd);
+		}
+		return true;
+	}
+
+	/**
+	 * Fix effort / detection problem but expanding the start / end times of the effort
+	 * @param detections nilus Detections object 
+	 * @param det a single detection
+	 * @return true if fixed automatically
+	 */
+	protected boolean expandEffort(Detections detections, Detection det) {
+		if (effortOverlap(detections, det) == false) {
+			return false;
+		}
+		// at least some overlap, so fix it.
+		// going to fix it my shortening the detection, and leave the effort alone. 
+		XMLGregorianCalendar effStart = detections.getEffort().getStart();
+		XMLGregorianCalendar effEnd = detections.getEffort().getEnd();
+		XMLGregorianCalendar detStart = det.getStart();
+		XMLGregorianCalendar detEnd = det.getEnd();
+		
+		if (effStart.compare(detStart) == DatatypeConstants.GREATER) {
+			System.out.printf("Fix Detections change effort start from %s to %s\n", effStart, detStart);
+			detections.getEffort().setStart(detStart);
+		}
+		if (effEnd.compare(detEnd) == DatatypeConstants.LESSER) {
+			System.out.printf("Fix Detections change effort end from %s to %s\n", effEnd, detEnd);
+			detections.getEffort().setEnd(detEnd);
+		}
+		return true;
 	}
 }

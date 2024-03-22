@@ -10,6 +10,7 @@ import javax.swing.border.TitledBorder;
 
 import PamView.dialog.PamGridBagContraints;
 import nilus.ContactInfo.Address;
+import tethys.tooltips.TethysTips;
 import nilus.ResponsibleParty;
 
 /**
@@ -55,6 +56,11 @@ public class ResponsiblePartyPanel {
 		mainPanel.add(email = new JTextField(30), c);
 		c.gridx = 0;
 		c.gridy++;
+		
+		name.setToolTipText("Person responsible for data");
+		organisation.setToolTipText("Responsible organization");
+		position.setToolTipText("Persons role in organization");
+		email.setToolTipText("email address or other contact details");
 		
 	}
 

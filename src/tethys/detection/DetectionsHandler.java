@@ -1,9 +1,13 @@
 package tethys.detection;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 
 import javax.swing.SwingWorker;
+import javax.xml.datatype.DatatypeConstants;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import PamController.PamControlledUnit;
 import PamController.PamController;
@@ -11,6 +15,7 @@ import PamController.PamguardVersionInfo;
 import PamModel.PamPluginInterface;
 import PamUtils.PamCalendar;
 import PamView.dialog.PamDialog;
+import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamProcess;
@@ -438,6 +443,7 @@ public class DetectionsHandler extends CollectionHandler {
 				}
 				dataBlock.loadViewerData(mapPoint.getStartTime(), mapPoint.getEndTime(), null);
 				ArrayList<PamDataUnit> dataCopy = dataBlock.getDataCopy(deployment.getAudioStart(), deployment.getAudioEnd(), true, dataSelector);
+				Collections.sort(dataCopy);
 				skipCount += dataBlock.getUnitsCount() - dataCopy.size();
 				DetectionGroup onEffort = currentDetections.getOnEffort();
 				for (PamDataUnit dataUnit : dataCopy) {
@@ -470,7 +476,9 @@ public class DetectionsHandler extends CollectionHandler {
 					exportObserver.update(prog);
 					closeDetectionsDocument(currentDetections, mapPoint.getEndTime());
 					try {
-						dbxmlConnect.postAndLog(currentDetections);
+						if (checkDetectionsDocument(currentDetections, granularityHandler)) {
+							dbxmlConnect.postAndLog(currentDetections);
+						}
 					} catch (TethysException e) {
 						tethysControl.showException(e);
 					}
@@ -502,7 +510,9 @@ public class DetectionsHandler extends CollectionHandler {
 						lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_WRITING);
 				closeDetectionsDocument(currentDetections, deployment.getAudioEnd());
 				try {
-					dbxmlConnect.postAndLog(currentDetections);
+					if (checkDetectionsDocument(currentDetections, granularityHandler)) {
+						dbxmlConnect.postAndLog(currentDetections);
+					}
 				} catch (TethysException e) {
 					tethysControl.showException(e);
 				}
@@ -583,6 +593,50 @@ public class DetectionsHandler extends CollectionHandler {
 	 */
 	private void closeDetectionsDocument(Detections detections, Long audioEnd) {
 		detections.getEffort().setEnd(TethysTimeFuncs.xmlGregCalFromMillis(audioEnd));
+	}
+	
+	/**
+	 * Run some checks on the Detections document prior to submission. <br>
+	 * Currently, is is just a check that the detections are within the effort times.   
+	 * @param detections Detections document
+	 * @return false if there is an outstanding problem. 
+	 */
+	private boolean checkDetectionsDocument(Detections detections, GranularityHandler granularityHandler) {
+		XMLGregorianCalendar effStart = detections.getEffort().getStart();
+		XMLGregorianCalendar effEnd = detections.getEffort().getEnd();
+		DetectionGroup dets = detections.getOnEffort();
+		List<Detection> detList = dets.getDetection();
+		ListIterator<Detection> detIt = detList.listIterator();
+		while (detIt.hasNext()) {
+			Detection det = detIt.next();
+			XMLGregorianCalendar detS = det.getStart();
+			XMLGregorianCalendar detE = det.getEnd();
+			if (effStart.compare(detS) == DatatypeConstants.GREATER) {
+				if (granularityHandler.autoEffortFix(detections, det)) {
+					continue;
+				}
+				String str = String.format("<html>A Detection at %s starts before the document effort start at %s<br>"
+						+ "Do you want to adjust the effort start time or abort export ?</html>", detS, effStart);
+				int ans = WarnOnce.showNamedWarning("TETHYSDETNOTINEFFORT", tethysControl.getGuiFrame(), "Detection Document Warning", str, WarnOnce.OK_CANCEL_OPTION);
+				if (ans == WarnOnce.CANCEL_OPTION) {
+					return false;
+				}
+				detections.getEffort().setStart(detS);
+			}
+			if (effEnd.compare(detE) == DatatypeConstants.LESSER) {
+				if (granularityHandler.autoEffortFix(detections, det)) {
+					continue;
+				}
+				String str = String.format("<html>A Detection at %s-%s ends <br>after the document effort end at %s<br>"
+						+ "Do you want to adjust the effort end time or abort export ?</html>", detS, detE, effStart);
+				int ans = WarnOnce.showNamedWarning("TETHYSDETNOTINEFFORT", tethysControl.getGuiFrame(), "Detection Document Warning", str, WarnOnce.OK_CANCEL_OPTION);
+				if (ans == WarnOnce.CANCEL_OPTION) {
+					return false;
+				}
+				detections.getEffort().setEnd(detE);
+			}
+		}
+		return true;
 	}
 
 	/**

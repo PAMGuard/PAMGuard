@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import nilus.Detection;
+import nilus.Detections;
 import nilus.SpeciesIDType;
 import tethys.TethysControl;
 import tethys.TethysTimeFuncs;
@@ -48,7 +49,7 @@ public class EncounterGranularityHandler extends GranularityHandler {
 
 	@Override
 	public void prepare(long timeMillis) {
-
+		currentDetections.clear();
 	}
 
 	@Override
@@ -77,6 +78,7 @@ public class EncounterGranularityHandler extends GranularityHandler {
 			currentDetections.put(groupName, det);
 		}
 		else {
+			
 			// add to current detection. Set new end time and increment count
 			det.setEnd(TethysTimeFuncs.xmlGregCalFromMillis(dataUnit.getEndTimeInMilliseconds()));
 			int count = det.getCount().intValue() + 1;
@@ -122,34 +124,17 @@ public class EncounterGranularityHandler extends GranularityHandler {
 		}
 	}
 
-	//	private Detection[] checkCurrentEncounters(long timeMilliseconds) {
-	//		if (currentDetections == null || currentDetections.size() == 0) {
-	//			return null;
-	//		}
-	//		int nGood = 0;
-	//		Detection[] newDetections = new Detection[currentDetections.size()];
-	//		Iterator<Detection> detIt = currentDetections.iterator();
-	//		while (detIt.hasNext()) {
-	//			Detection aDet = detIt.next();
-	//			Long detEnd = TethysTimeFuncs.millisFromGregorianXML(aDet.getEnd());
-	//			if (timeMilliseconds-detEnd > maxGapMillis) {
-	//				detIt.remove();
-	//				newDetections[nGood++] = aDet;
-	//			}
-	//		}
-	//		
-	//		if (nGood == 0) {
-	//			return null;
-	//		}
-	//		else {
-	//			return Arrays.copyOf(newDetections, nGood);
-	//		}
-	//	}
 
 	@Override
 	public Detection[] cleanup(long timeMillis) {
 		// get everything still on the go. 
-		return checkCurrentEncounters(timeMillis + maxGapMillis);
+		return checkCurrentEncounters(timeMillis + maxGapMillis*10);
 	}
+
+	@Override
+	protected boolean autoEffortFix(Detections detections, Detection det) {
+		return expandEffort(detections, det);
+	}
+
 
 }

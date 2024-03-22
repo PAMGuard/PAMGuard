@@ -1,6 +1,7 @@
 package PamUtils.worker;
 
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.Window;
 
 import javax.swing.BoxLayout;
@@ -39,6 +40,18 @@ public class PamWorkDialog extends PamDialog {
 		getButtonPanel().setVisible(false);
 		setDialogComponent(mainPanel);
 		setResizable(true);
+		
+		if (parentFrame != null) {
+			Dimension prefSize = this.getPreferredSize();
+			Point screenLoc = parentFrame.getLocationOnScreen();
+			int x = (parentFrame.getWidth()-prefSize.width)/2;
+			int y = (parentFrame.getHeight()-prefSize.height)/2;
+			if (screenLoc != null) {
+				x += screenLoc.x;
+				y += screenLoc.y;
+			}
+			setLocation(x, y);
+		}
 	}
 	
 	public void update(PamWorkProgressMessage progressMsg) {

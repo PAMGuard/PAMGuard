@@ -18,6 +18,7 @@ import generalDatabase.backup.DatabaseBackupStream;
 import pamScrollSystem.ViewLoadObserver;
 import pamViewFX.pamTask.PamTaskUpdate;
 import PamController.AWTScheduler;
+import PamController.DataIntegrityChecker;
 import PamController.DataOutputStore;
 import PamController.OfflineDataStore;
 import PamController.PamConfiguration;
@@ -523,6 +524,11 @@ public class DBControlUnit extends DBControl implements DataOutputStore {
 			state = Math.max(state, PamController.PAM_MAPMAKING);
 		}
 		return state;
+	}
+	@Override
+	public DataIntegrityChecker getInegrityChecker() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
