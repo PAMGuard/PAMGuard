@@ -16,7 +16,11 @@ import detectionPlotFX.layout.DetectionPlotDisplay;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
@@ -26,6 +30,7 @@ import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamHBox;
+import pamViewFX.fxNodes.PamStackPane;
 import pamViewFX.fxNodes.hidingPane.HidingPane;
 import pamViewFX.fxNodes.internalNode.PamInternalPane;
 import pamViewFX.fxStyles.PamStylesManagerFX;
@@ -41,6 +46,10 @@ import userDisplayFX.UserDisplayNodeParams;
  *
  */
 public class DetectionGroupDisplay extends PamBorderPane {
+	
+	public static final int DISPLAY_COMPACT = 0;
+	
+	public static final int DISPLAY_EXTENDED = 1;
 
 	/**
 	 * Index of the current normal unit with the detection summary. 
@@ -60,7 +69,7 @@ public class DetectionGroupDisplay extends PamBorderPane {
 	/**
 	 * Label for the top holder. 
 	 */
-	private Label label;
+	private Label dataLabel;
 
 	/**
 	 * Holds the arrow pane and hiding pane. 
@@ -86,7 +95,7 @@ public class DetectionGroupDisplay extends PamBorderPane {
 	/**
 	 * Holds the detection display and controls for viewing standard detections. 
 	 */
-	public PamBorderPane detectionDisplayHolder;
+	public Pane detectionDisplayHolder;
 
 	/**
 	 * The group detection listeners. 
@@ -104,22 +113,33 @@ public class DetectionGroupDisplay extends PamBorderPane {
 	private HidingPane hidingPane; 
 	
 	
-
+	/**
+	 * Constructor for the detection group display. 
+	 */
 	public DetectionGroupDisplay() {
 		//create hash map to map DDDataInfos to datablocks for quick access. 
 		dDataInfoHashMap = new HashMap<PamDataBlock, DDDataInfo>(); 
-		createDetectionDisplay();
+		createDetectionDisplay(DISPLAY_EXTENDED);
 		this.setCenter(detectionDisplayHolder);
-
-		
+	}
+	
+	/**
+	 * Constructor for the detection group display. 
+	 * @param layoutType - the layout of the display - e.g. DetectionGroupDisplay.DISPLAY_COMPACT
+	 */
+	public DetectionGroupDisplay(int layoutType) {
+		//create hash map to map DDDataInfos to datablocks for quick access. 
+		dDataInfoHashMap = new HashMap<PamDataBlock, DDDataInfo>(); 
+		createDetectionDisplay(DISPLAY_COMPACT);
+		this.setCenter(detectionDisplayHolder);
 	}
 
 	/**
 	 * Create the detection display. 
 	 * @return the detection display
 	 */
-	private Pane createDetectionDisplay(){
-
+	private Pane createDetectionDisplay(int layoutType){
+		
 		detectionDisplay= new DetectionPlotDisplay();
 
 		arrowLeft= new PamButton();
@@ -145,43 +165,83 @@ public class DetectionGroupDisplay extends PamBorderPane {
 
 		arrowPane.getChildren().addAll(arrowLeft, arrowRight);
 		BorderPane.setAlignment(arrowPane, Pos.CENTER_RIGHT);
+		
 
-		topHolder=new PamBorderPane();
-		topHolder.setRight(arrowPane);
 
-		topHolder.setCenter(label = new Label());
-		topHolder.setLeft(detectionDisplay.getDataTypePane());
 		
-		//whenever the detection plot selection box e.g. from waveform to wigner then check there is a settings pane. If not
-		//then get rid of the settings button. 
-		detectionDisplay.getDataTypePane().getDetectionPlotBox().valueProperty().addListener((obsVal, oldVal, newVal)->{
-			enableControls(); 
-		});
+		//a label to show information of the data unit
+		dataLabel = new Label();
+		
+		if (layoutType==DISPLAY_EXTENDED) {
+			//the display has controls above the axis and a hiding pane that increases the width of the display. 
+			
+			//the holder for the detection display. 
+			PamBorderPane detectionDisplayHolder= new PamBorderPane();
+			
+			//create the hiding pane to show advanced settings. 
+			hidingPane = new HidingPane(Side.RIGHT, detectionDisplay.getSettingsHolder(), detectionDisplayHolder, layoutType==DISPLAY_COMPACT, 0);
+	
+			topHolder=new PamBorderPane();
+			topHolder.setRight(arrowPane);
+	
+			topHolder.setCenter(dataLabel);
+			topHolder.setLeft(detectionDisplay.getDataTypePane());
+			
+			//whenever the detection plot selection box e.g. from waveform to wigner then check there is a settings pane. If not
+			//then get rid of the settings button. 
+			detectionDisplay.getDataTypePane().getDetectionPlotBox().valueProperty().addListener((obsVal, oldVal, newVal)->{
+				enableControls(); 
+			});
+	
+			detectionDisplayHolder.setTop(topHolder);
+			detectionDisplayHolder.setCenter(detectionDisplay);
+			this.detectionDisplayHolder = detectionDisplayHolder;
+	
+			arrowPane.getChildren().add(hidingPane.getShowButton()); 
+			
+			hidingPane.getShowButton().setGraphic(PamGlyphDude.createPamIcon("mdi2c-cog", 
+					PamGuiManagerFX.iconColor, PamGuiManagerFX.iconSize)); 
+			this.setRight(hidingPane); //bit of a hack but works. 
+			hidingPane.showHidePane(false);
+			
+			 //this makes the hide button appear top right which is nicer for closing the pane. 
+			StackPane.setAlignment(hidingPane.getHideButton(),  Pos.TOP_RIGHT);
+			//hidingPane.removeHideButton();
+			hidingPane.styleHideButton(hidingPane.getHideButton(), Side.LEFT);
+			
+		}
+		else {
+			//the display is compact with all controls within an internal hiding pane. 
+			
+			detectionDisplayHolder = new PamStackPane(); 
+			
+			TabPane settingsPane = new TabPane(); 
+			settingsPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
+//			settingsPane.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
+			
+			settingsPane.getTabs().add(new Tab("Data",detectionDisplay.getDataTypePane()));
+			settingsPane.getTabs().add(new Tab("Settings",detectionDisplay.getSettingsHolder()));
+			
+			hidingPane = new HidingPane(Side.RIGHT, settingsPane, detectionDisplayHolder, layoutType==DISPLAY_COMPACT, 0);
 
-		detectionDisplayHolder= new PamBorderPane();
-		detectionDisplayHolder.setTop(topHolder);
-		detectionDisplayHolder.setCenter(detectionDisplay);
+			//now everything to pane. 
+			detectionDisplayHolder.getChildren().add(detectionDisplay);
+			StackPane.setAlignment(detectionDisplay, Pos.CENTER);
+			
+			settingsPane.setPadding(new Insets(35,0,0,0));
+			
+			Node icon = PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconSize); 
+			detectionDisplay.getPlotPane().setHidePane(new PamBorderPane(settingsPane), icon,  Side.RIGHT);
+			hidingPane.getShowButton().setPrefHeight(30);
+
+		}
 		
-		
-		//create the hiding pane to show advanced settings. 
-		hidingPane = new HidingPane(Side.RIGHT, detectionDisplay.getSettingsHolder(), detectionDisplayHolder, false, 0);
-		
-		detectionDisplay.getSettingsHolder().getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
-		detectionDisplay.getSettingsHolder().setStyle("-fx-background-color: -fx-darkbackground");
+		//set styles
+//		detectionDisplay.getSettingsHolder().getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
+//		detectionDisplay.getSettingsHolder().setStyle("-fx-background-color: -fx-darkbackground");
 		hidingPane.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
 
-		arrowPane.getChildren().add(hidingPane.getShowButton()); 
-		
-		hidingPane.getShowButton().setGraphic(PamGlyphDude.createPamIcon("mdi2c-cog", 
-				PamGuiManagerFX.iconColor, PamGuiManagerFX.iconSize)); 
-		this.setRight(hidingPane); //bit of a hack but works. 
-		hidingPane.showHidePane(false);
-		
-		 //this makes the hide button appear top right which is nicer for closing the pane. 
-		StackPane.setAlignment(hidingPane.getHideButton(),  Pos.TOP_RIGHT);
-		//hidingPane.removeHideButton();
-		hidingPane.styleHideButton(hidingPane.getHideButton(), Side.LEFT);
-		
+		//set default size
 		detectionDisplayHolder.setPrefSize(500, 400);
 		detectionDisplayHolder.setPadding(new Insets(0,10,0,0));
 		
@@ -243,15 +303,15 @@ public class DetectionGroupDisplay extends PamBorderPane {
 	 */
 	private void setLabelText(){
 		if (detectionGroup.size()>1){
-			label.setText(detectionGroup.get(currentUnitIndex).getParentDataBlock().getDataName() + " UID: " + detectionGroup.get(currentUnitIndex).getUID() +
+			dataLabel.setText(detectionGroup.get(currentUnitIndex).getParentDataBlock().getDataName() + " UID: " + detectionGroup.get(currentUnitIndex).getUID() +
 					": " + (currentUnitIndex+1) + " of " + detectionGroup.size());
 		}
 		else if (detectionGroup.size()==1){
-			label.setText(detectionGroup.get(currentUnitIndex).getParentDataBlock().getDataName() + " UID: " + detectionGroup.get(currentUnitIndex).getUID());
+			dataLabel.setText(detectionGroup.get(currentUnitIndex).getParentDataBlock().getDataName() + " UID: " + detectionGroup.get(currentUnitIndex).getUID());
 		}
 		else {
 			//selected area with data units. 
-			label.setText("No data units in area");
+			dataLabel.setText("No data units in area");
 		}
 		
 		//add sub detection count if there are sub detections. 
@@ -259,7 +319,7 @@ public class DetectionGroupDisplay extends PamBorderPane {
 			SuperDetection superDet = (SuperDetection) detectionGroup.get(currentUnitIndex);
 			int subCount = superDet.getSubDetectionsCount(); 
 			if (subCount>0) {
-				label.setText(label.getText()+ " : " + superDet.getSubDetectionsCount() + " sub detection" + (subCount>1 ? "s":"")); 
+				dataLabel.setText(dataLabel.getText()+ " : " + superDet.getSubDetectionsCount() + " sub detection" + (subCount>1 ? "s":"")); 
 			}
 		}
 	}
@@ -298,7 +358,7 @@ public class DetectionGroupDisplay extends PamBorderPane {
 	public void clearDisplay() {
 		setDataUnit(null);
 		detectionDisplay.clearPane();
-		this.label.setText("");
+		this.dataLabel.setText("");
 	}
 
 

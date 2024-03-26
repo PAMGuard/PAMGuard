@@ -31,6 +31,7 @@ public class DetectionGroupDisplayFX extends DetectionGroupDisplay  implements U
 	private DetectionDisplayControl2 displayControl; 
 	
 	public DetectionGroupDisplayFX(DetectionDisplayControl2 displayControl){
+		super(DetectionGroupDisplay.DISPLAY_COMPACT);
 		this.displayControl = displayControl; 
 		//register the settings. 
 		PamSettingManager.getInstance().registerSettings(this);		
