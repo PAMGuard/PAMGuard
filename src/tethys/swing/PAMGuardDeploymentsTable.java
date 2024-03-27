@@ -163,14 +163,6 @@ private RecordingList masterList;
 		}
 		
 		if (matchedDeployments.size() == 1) {
-			menuItem = new JMenuItem("Delete deployment document " + matchedDeployments.get(0));
-			menuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					deleteDeployment(matchedDeployments.get(0));
-				}
-			});
-			popMenu.add(menuItem);
 			menuItem = new JMenuItem("Display deployment document " + matchedDeployments.get(0));
 			menuItem.addActionListener(new ActionListener() {
 				@Override
@@ -187,7 +179,17 @@ private RecordingList masterList;
 				}
 			});
 			popMenu.add(menuItem);
+
+			popMenu.addSeparator();
 			
+			menuItem = new JMenuItem("Delete deployment document " + matchedDeployments.get(0));
+			menuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					deleteDeployment(matchedDeployments.get(0));
+				}
+			});
+			popMenu.add(menuItem);
 			
 		}
 		else if (matchedDeployments.size() > 1){

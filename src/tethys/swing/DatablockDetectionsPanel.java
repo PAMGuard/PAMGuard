@@ -190,16 +190,9 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 
 		JPopupMenu popMenu = new JPopupMenu();
 
+		JMenuItem menuItem;
 		if (rows.length == 1) {
-			JMenuItem menuItem = new JMenuItem("Delete document " + pDets.detections.getId());
-			menuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					deleteDocument(pDets);
-				}
-			});
-			popMenu.add(menuItem);
-
+			
 			menuItem = new JMenuItem("Display document " + pDets.detections.getId());
 			menuItem.addActionListener(new ActionListener() {
 				@Override
@@ -217,9 +210,19 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 				}
 			});
 			popMenu.add(menuItem);
+			
+			popMenu.addSeparator();
+			menuItem = new JMenuItem("Delete document " + pDets.detections.getId());
+			menuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					deleteDocument(pDets);
+				}
+			});
+			popMenu.add(menuItem);
 		}
 		else if (rows.length > 0){
-			JMenuItem menuItem = new JMenuItem("Delete multiple Detections documents");
+			menuItem = new JMenuItem("Delete multiple Detections documents");
 			menuItem.addActionListener(new ActionListener() {
 
 				@Override

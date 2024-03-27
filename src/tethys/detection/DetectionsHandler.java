@@ -303,9 +303,11 @@ public class DetectionsHandler extends CollectionHandler {
 		int totalMaps = 0;
 		int totalMappedPoints = 0;
 		int totalLoadedDatas = 0;
+		int totalMapPoints = dataMap.getNumMapPoints();
+		int doneMapPoints = 0;
 		for (PDeployment deployment : deployments) {
 			int documentCount = 0;
-			prog = new DetectionExportProgress(deployment, null,
+			prog = new DetectionExportProgress(deployment, null, totalMapPoints, doneMapPoints,
 					lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_COUNTING);
 			exportObserver.update(prog);
 			granularityHandler.prepare(deployment.getAudioStart());
@@ -315,7 +317,7 @@ public class DetectionsHandler extends CollectionHandler {
 			
 			for (OfflineDataMapPoint mapPoint : mapPoints) {
 				if (!activeExport) {
-					prog = new DetectionExportProgress(deployment, null,
+					prog = new DetectionExportProgress(deployment, null,totalMapPoints, doneMapPoints,
 							lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_CANCELED);
 					exportObserver.update(prog);
 					break;
@@ -345,7 +347,7 @@ public class DetectionsHandler extends CollectionHandler {
 						documentCount+=dets.length;
 						
 						if (exportCount % 100 == 0) {
-							prog = new DetectionExportProgress(deployment, null,
+							prog = new DetectionExportProgress(deployment, null,totalMapPoints, doneMapPoints,
 									lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_COUNTING);
 							exportObserver.update(prog);
 						}
@@ -356,8 +358,8 @@ public class DetectionsHandler extends CollectionHandler {
 //					onEffort.getDetection().add(det);
 					lastUnitTime = dataUnit.getTimeMilliseconds();
 				}
-
-				prog = new DetectionExportProgress(deployment, null,
+				doneMapPoints++;
+				prog = new DetectionExportProgress(deployment, null,totalMapPoints, doneMapPoints,
 						lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_COUNTING);
 				exportObserver.update(prog);
 				
@@ -410,10 +412,12 @@ public class DetectionsHandler extends CollectionHandler {
 		if (viewerLoadPolicy == null) {
 			viewerLoadPolicy = ViewerLoadPolicy.LOAD_UTCNORMAL;
 		}
+		int totalMapPoints = dataMap.getNumMapPoints();
+		int doneMapPoints = 0;
 		GranularityHandler granularityHandler = GranularityHandler.getHandler(streamExportParams.granularity, tethysControl, dataBlock, exportParams, streamExportParams);
 		for (PDeployment deployment : deployments) {
 			int documentCount = 0;
-			prog = new DetectionExportProgress(deployment, null,
+			prog = new DetectionExportProgress(deployment, null,totalMapPoints, doneMapPoints,
 					lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_COUNTING);
 			exportObserver.update(prog);
 			granularityHandler.prepare(deployment.getAudioStart());
@@ -423,7 +427,7 @@ public class DetectionsHandler extends CollectionHandler {
 			List<OfflineDataMapPoint> mapPoints = dataMap.getMapPoints();
 			for (OfflineDataMapPoint mapPoint : mapPoints) {
 				if (!activeExport) {
-					prog = new DetectionExportProgress(deployment, currentDetections,
+					prog = new DetectionExportProgress(deployment, currentDetections,totalMapPoints, doneMapPoints,
 							lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_CANCELED);
 					exportObserver.update(prog);
 					break;
@@ -459,19 +463,20 @@ public class DetectionsHandler extends CollectionHandler {
 						}
 					}
 					if (exportCount % 100 == 0) {
-						prog = new DetectionExportProgress(deployment, null,
+						prog = new DetectionExportProgress(deployment, currentDetections, totalMapPoints, doneMapPoints,
 								lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_GATHERING);
 						exportObserver.update(prog);
 					}
 					lastUnitTime = dataUnit.getTimeMilliseconds();
 				}
 
-				prog = new DetectionExportProgress(deployment, currentDetections,
+				doneMapPoints ++;
+				prog = new DetectionExportProgress(deployment, currentDetections,totalMapPoints, doneMapPoints,
 						lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_GATHERING);
 				exportObserver.update(prog);
 
 				if (documentCount > 50000000 && mapPoint != dataMap.getLastMapPoint()) {
-					prog = new DetectionExportProgress(deployment, currentDetections,
+					prog = new DetectionExportProgress(deployment, currentDetections,totalMapPoints, doneMapPoints,
 							lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_WRITING);
 					exportObserver.update(prog);
 					closeDetectionsDocument(currentDetections, mapPoint.getEndTime());
@@ -506,7 +511,7 @@ public class DetectionsHandler extends CollectionHandler {
 						currentDetections.getOnEffort().getDetection().add(dets[dd]);
 					}
 				}
-				prog = new DetectionExportProgress(deployment, currentDetections,
+				prog = new DetectionExportProgress(deployment, currentDetections,totalMapPoints, doneMapPoints,
 						lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_WRITING);
 				closeDetectionsDocument(currentDetections, deployment.getAudioEnd());
 				try {
@@ -520,7 +525,7 @@ public class DetectionsHandler extends CollectionHandler {
 			}
 		}
 
-		prog = new DetectionExportProgress(null, null,
+		prog = new DetectionExportProgress(null, null,totalMapPoints, totalMapPoints,
 				lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_COMPLETE);
 		exportObserver.update(prog);
 		return DetectionExportProgress.STATE_COMPLETE;
@@ -690,7 +695,7 @@ public class DetectionsHandler extends CollectionHandler {
 		@Override
 		protected void done() {
 //			this.
-			DetectionExportProgress prog = new DetectionExportProgress(null, null, 0, 0, 0, 0, DetectionExportProgress.STATE_COMPLETE);
+			DetectionExportProgress prog = new DetectionExportProgress(null, null, 0, 0,  0, 0, 0, 0, DetectionExportProgress.STATE_COMPLETE);
 			tethysControl.exportedDetections(dataBlock);
 			exportObserver.update(prog);
 			TethysReporter.getTethysReporter().showReport(tethysControl.getGuiFrame(), true);
