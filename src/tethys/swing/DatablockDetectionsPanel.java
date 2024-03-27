@@ -127,6 +127,7 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 		this.dataBlock = dataBlock;
 		if (dataBlock == null) {
 			dataBlockName.setText("Select data in panel on the left");
+			return;
 		}
 		else {
 			dataBlockName.setText(dataBlock.getLongDataName());
