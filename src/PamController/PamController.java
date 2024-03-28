@@ -196,7 +196,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 
 	private Timer diagnosticTimer;
 	
-	private boolean debugDumpBufferAtRestart = true;
+	private boolean debugDumpBufferAtRestart = false;
 
 	private NetworkController networkController;
 	private int nNetPrepared;
