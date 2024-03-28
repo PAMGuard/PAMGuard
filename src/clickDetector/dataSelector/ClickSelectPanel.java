@@ -30,6 +30,8 @@ import PamView.dialog.PamDialog;
 import PamView.dialog.PamDialogPanel;
 import PamView.dialog.PamGridBagContraints;
 import PamView.panel.PamAlignmentPanel;
+import PamView.panel.SeparatorBorder;
+import PamView.panel.WestAlignedPanel;
 
 public class ClickSelectPanel implements PamDialogPanel {
 	
@@ -40,6 +42,8 @@ public class ClickSelectPanel implements PamDialogPanel {
 	private ClickDataSelector clickDataSelector;
 	private JPanel mainPanel;
 	private boolean isViewer;
+	
+	public static final String mainTip = "You should select options in both the Click Type and the Event Type panels";
 
 	public ClickSelectPanel(ClickDataSelector clickDataSelector, boolean allowScores, boolean useEventTypes) {
 		this.clickDataSelector = clickDataSelector;
@@ -79,7 +83,9 @@ public class ClickSelectPanel implements PamDialogPanel {
 		private LookupList lutList;
 		
 		public EventTypePanel() {
-			setBorder(new TitledBorder("Event Type Selection"));
+			setBorder(new SeparatorBorder("Event Type Selection"));
+
+			setToolTipText(mainTip);
 		}
 		
 		void setParams() {
@@ -102,16 +108,24 @@ public class ClickSelectPanel implements PamDialogPanel {
 			boxPanel.add(onlineAuto = new JCheckBox("Automatically detected click trains"), c);
 			onlineAuto.setSelected(clickAlarmParameters.onlineAutoEvents);
 			
+			useUnassigned.setToolTipText("Clicks that are NOT part of a manual or automatic click train");
+			onlineManual.setToolTipText("Clicks that are part of a manually marked click train");
+			onlineAuto.setToolTipText("Clicks that are part of an automatically detected click train");
+			
 			
 			lutList = LookUpTables.getLookUpTables().getLookupList(ClicksOffline.ClickTypeLookupName);
 			if (lutList == null) {
 				return;
 			}
+			c.gridy++;
+			boxPanel.add(new JLabel("OR the following click train types ...", JLabel.LEFT), c);
 			useType = new JCheckBox[lutList.getList().size()];
 			for (int i = 0; i < useType.length; i++) {
 				c.gridy++;
 				boxPanel.add(useType[i] = new JCheckBox(lutList.getList().get(i).getText()), c);
 				useType[i].setSelected(clickAlarmParameters.isUseEventType(lutList.getList().get(i).getCode()));
+				String tip = String.format("Clicks that are part of a click train labelled as %s", lutList.getList().get(i).getText());
+				useType[i].setToolTipText(tip);
 			}
 		}
 		
@@ -158,10 +172,9 @@ public class ClickSelectPanel implements PamDialogPanel {
 			northPanel = new JPanel();
 			northPanel.setLayout(new GridBagLayout());
 			GridBagConstraints c = new PamGridBagContraints();
-			northPanel.setBorder(new TitledBorder("Echoes"));
 			c.gridwidth = 3;
 			c.anchor = GridBagConstraints.WEST;
-			northPanel.add(useEchoes = new JCheckBox("Use Echoes"), c);
+			northPanel.add(new PamAlignmentPanel(useEchoes = new JCheckBox("Use Echoes"), BorderLayout.WEST), c);
 			c.gridwidth = 1;
 			c.gridy++;
 			c.gridx = 0;
@@ -178,11 +191,13 @@ public class ClickSelectPanel implements PamDialogPanel {
 			northPanel.add(scoreByAmplitude = new JCheckBox("Score by amplitude"), c);
 			scoreByAmplitude.setVisible(allowScores);
 			scoreByAmplitude.addActionListener(new AllSpeciesListener());
-			add(BorderLayout.NORTH, northPanel);
+			WestAlignedPanel walpn;
+			add(BorderLayout.NORTH, walpn = new WestAlignedPanel(northPanel));
+			walpn.setBorder(new SeparatorBorder("Echoes"));
 			
 			JPanel centralOuterPanel = new JPanel(new BorderLayout());
 			centralPanel.setLayout(new GridBagLayout());
-			centralOuterPanel.setBorder(new TitledBorder("Click Type Selection"));
+			centralOuterPanel.setBorder(new SeparatorBorder("Click Type Selection"));
 			
 			add(BorderLayout.CENTER, centralOuterPanel);
 			JScrollPane scrollPane = new DialogScrollPane(new PamAlignmentPanel(centralPanel, BorderLayout.WEST), 10);
@@ -197,6 +212,9 @@ public class ClickSelectPanel implements PamDialogPanel {
 			clearAll.addActionListener(new AutoSelect(false));
 			centralOuterPanel.add(BorderLayout.SOUTH, new PamAlignmentPanel(centralEastPanel, BorderLayout.WEST));
 			
+			centralOuterPanel.setToolTipText(mainTip);
+			
+			setToolTipText(mainTip);
 		}
 		
 		void setParams() {

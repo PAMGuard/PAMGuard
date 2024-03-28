@@ -41,36 +41,40 @@ public class EffortFunctions {
 		this.tethysControl = tethysControl;
 	}
 
-	private DeploymentOverview createOverview(RecordingList tempPeriods) {
-
-		DutyCycleInfo dutyCycleinfo = assessDutyCycle(tempPeriods);
-		if (dutyCycleinfo == null) {
-			return null;
-		}
-
-		// if it's duty cycles, then we only want a single entry. 
-		RecordingList deploymentPeriods;
-		if (dutyCycleinfo.isDutyCycled == false) {
-			deploymentPeriods = tempPeriods;
-		}
-		else {
-			deploymentPeriods = new RecordingList();
-			deploymentPeriods.add(new RecordingPeriod(tempPeriods.get(0).getRecordStart(), tempPeriods.get(tempPeriods.size()-1).getRecordStop()));
-		}
-		/*
-		 * do another sort of the deploymentPeriods. The start stops were in the order they went into the 
-		 * database in the hope that pairs were the right way round. Now check all data are/
-		 */
-		Collections.sort(deploymentPeriods, new Comparator<RecordingPeriod>() {
-			@Override
-			public int compare(RecordingPeriod o1, RecordingPeriod o2) {
-				return (int) (o1.getRecordStart()-o2.getRecordStart());
-			}
-		});
-
-		DeploymentOverview deploymentOverview = new DeploymentOverview(dutyCycleinfo, deploymentPeriods);
-		return deploymentOverview;
-	}
+//	private DeploymentOverview createOverview(RecordingList tempPeriods) {
+//
+//		tempPeriods.sort();
+//		
+//		DutyCycleInfo dutyCycleinfo = assessDutyCycle(tempPeriods);
+//		if (dutyCycleinfo == null) {
+//			return null;
+//		}
+//		
+//
+//		// if it's duty cycles, then we only want a single entry. 
+//		RecordingList deploymentPeriods;
+//		if (dutyCycleinfo.isDutyCycled == false) {
+//			deploymentPeriods = tempPeriods;
+//		}
+//		else {
+//			deploymentPeriods = new RecordingList(tempPeriods.getSourceName());
+//			deploymentPeriods.add(new RecordingPeriod(tempPeriods.get(0).getRecordStart(), tempPeriods.get(tempPeriods.size()-1).getRecordStop()));
+//		}
+//		/*
+//		 * do another sort of the deploymentPeriods. The start stops were in the order they went into the 
+//		 * database in the hope that pairs were the right way round. Now check all data are/
+//		 */
+//		deploymentPeriods.sort();
+////		Collections.sort(deploymentPeriods, new Comparator<RecordingPeriod>() {
+////			@Override
+////			public int compare(RecordingPeriod o1, RecordingPeriod o2) {
+////				return (int) (o1.getRecordStart()-o2.getRecordStart());
+////			}
+////		});
+//
+//		DeploymentOverview deploymentOverview = new DeploymentOverview(dutyCycleinfo, deploymentPeriods);
+//		return deploymentOverview;
+//	}
 
 
 	public DeploymentOverview makeRecordingOverview() {
@@ -79,13 +83,18 @@ public class EffortFunctions {
 		
 		RecordingList binaryPeriods = listBinaryFiles();
 		
-		long l1 = listDuration(recordingPeriods);
-		long l2 = listDuration(binaryPeriods);
-		if (listDuration(binaryPeriods) > listDuration(recordingPeriods)) {
-			recordingPeriods = binaryPeriods;
-		}
+		// see what the similarity is between them
+//		double sim = recordingPeriods.getSimilarity(binaryPeriods);
+//		double testSim = recordingPeriods.getSimilarity(recordingPeriods);
 		
-		DeploymentOverview deploymentOverview = createOverview(recordingPeriods);
+//		long l1 = listDuration(recordingPeriods);
+//		long l2 = listDuration(binaryPeriods);
+//		if (listDuration(binaryPeriods) > listDuration(recordingPeriods)) {
+//			recordingPeriods = binaryPeriods;
+//		}
+//		
+//		DeploymentOverview deploymentOverview = createOverview(recordingPeriods);
+		DeploymentOverview deploymentOverview = new DeploymentOverview(null, recordingPeriods, binaryPeriods);
 		
 		return deploymentOverview;
 	}
@@ -128,7 +137,8 @@ public class EffortFunctions {
 				}
 			}
 		}
-		bestList = mergeRecordings(bestList);
+		DeploymentExportOpts exportOptions = tethysControl.getDeploymentHandler().getDeploymentExportOptions();
+		bestList.mergeRecordingPeriods(exportOptions.maxRecordingGapSeconds*1000);
 		return bestList;
 	}
 	
@@ -138,7 +148,7 @@ public class EffortFunctions {
 		if (mapPoints == null) {
 			return null;
 		}
-		RecordingList periods = new RecordingList();
+		RecordingList periods = new RecordingList(dataMap.getDataMapName());
 		for (OfflineDataMapPoint mapPoint : mapPoints) {
 			periods.add(new RecordingPeriod(mapPoint.getStartTime(), mapPoint.getEndTime()));
 		}
@@ -219,116 +229,59 @@ public class EffortFunctions {
 		//							PamCalendar.formatDBDateTime(aP.getRecordStop()));
 		//				}
 
-		tempPeriods = mergeRecordings(tempPeriods);
-
-		return tempPeriods;
-	}
-
-	/**
-	 * Merge close recordings and discard ones that are too short. 
-	 * @param tempPeriods all recording periods, may be from consecutive files. 
-	 * @return merged list. 
-	 */
-	private RecordingList mergeRecordings(RecordingList tempPeriods) {
-		// now go through those and merge into longer periods where there is no gap between files.
-		if (tempPeriods == null) {
-			return null;
-		}
-
+		tempPeriods.sort();
 		DeploymentExportOpts exportOptions = tethysControl.getDeploymentHandler().getDeploymentExportOptions();
-
-		ListIterator<RecordingPeriod> iterator = tempPeriods.listIterator();
-		RecordingPeriod prevPeriod = null;
-		while (iterator.hasNext()) {
-			RecordingPeriod nextPeriod = iterator.next();
-			long nextDur = nextPeriod.getRecordStop()-nextPeriod.getRecordStart();
-			if (nextDur == 0) {
-				continue;
-			}
-			if (prevPeriod != null) {
-				long gap = nextPeriod.getRecordStart() - prevPeriod.getRecordStop();
-				long prevDur = prevPeriod.getRecordStop()-prevPeriod.getRecordStart();
-				if (gap < exportOptions.maxRecordingGapSeconds*1000) {
-					// ignoring up to 3s gap or a sample error < 2%.Dunno if this is sensible or not.
-					prevPeriod.setRecordStop(nextPeriod.getRecordStop());
-					iterator.remove();
-					nextPeriod = prevPeriod;
-				}
-			}
-			prevPeriod = nextPeriod;
-		}
-		// now remove ones which are too short even after merging. 
-		iterator = tempPeriods.listIterator();
-		while (iterator.hasNext()) {
-			RecordingPeriod nextPeriod = iterator.next();
-			long duration = nextPeriod.getDuration();
-			if (duration < exportOptions.minRecordingLengthSeconds*1000L) {
-				iterator.remove();
-			}
-		}
+		tempPeriods.mergeRecordingPeriods(exportOptions.maxRecordingGapSeconds*1000);
 
 		return tempPeriods;
 	}
 
-	/**
-	 * Work out whether or not the data are evenly duty cycled by testing the
-	 * distributions of on and off times.
-	 * @param tempPeriods
-	 * @return
-	 */
-	private DutyCycleInfo assessDutyCycle(RecordingList tempPeriods) {
-		if (tempPeriods == null) {
-			return null;
-		}
-		int n = tempPeriods.size();
-		if (n < 2) {
-			return new DutyCycleInfo(false, 0,0,n);
-		}
-		double[] ons = new double[n-1]; // ignore the last one since it may be artificially shortened which is OK
-		double[] gaps = new double[n-1];
-		for (int i = 0; i < n-1; i++) {
-			ons[i] = tempPeriods.get(i).getDuration()/1000.;
-			gaps[i] = (tempPeriods.get(i+1).getRecordStart()-tempPeriods.get(i).getRecordStop())/1000.;
-		}
-		/* now look at how consistent those values are
-		 * But some data gets messed by small gaps, so want to 
-		 * remove outliers and concentrate on say 80% of the data. 
-		 */
-		ons = getDistributionCentre(ons, 80);
-		gaps = getDistributionCentre(gaps, 80);
-		Arrays.sort(gaps);
+//	/**
+//	 * Merge close recordings and discard ones that are too short. 
+//	 * @param tempPeriods all recording periods, may be from consecutive files. 
+//	 * @return merged list. 
+//	 */
+//	private RecordingList mergeRecordings(RecordingList tempPeriods) {
+//		// now go through those and merge into longer periods where there is no gap between files.
+//		if (tempPeriods == null) {
+//			return null;
+//		}
+//
+//		DeploymentExportOpts exportOptions = tethysControl.getDeploymentHandler().getDeploymentExportOptions();
+//
+//		ListIterator<RecordingPeriod> iterator = tempPeriods.listIterator();
+//		RecordingPeriod prevPeriod = null;
+//		while (iterator.hasNext()) {
+//			RecordingPeriod nextPeriod = iterator.next();
+//			long nextDur = nextPeriod.getRecordStop()-nextPeriod.getRecordStart();
+//			if (nextDur == 0) {
+//				continue;
+//			}
+//			if (prevPeriod != null) {
+//				long gap = nextPeriod.getRecordStart() - prevPeriod.getRecordStop();
+//				long prevDur = prevPeriod.getRecordStop()-prevPeriod.getRecordStart();
+//				if (gap < exportOptions.maxRecordingGapSeconds*1000) {
+//					// ignoring up to 3s gap or a sample error < 2%.Dunno if this is sensible or not.
+//					prevPeriod.setRecordStop(nextPeriod.getRecordStop());
+//					iterator.remove();
+//					nextPeriod = prevPeriod;
+//				}
+//			}
+//			prevPeriod = nextPeriod;
+//		}
+//		// now remove ones which are too short even after merging. 
+//		iterator = tempPeriods.listIterator();
+//		while (iterator.hasNext()) {
+//			RecordingPeriod nextPeriod = iterator.next();
+//			long duration = nextPeriod.getDuration();
+//			if (duration < exportOptions.minRecordingLengthSeconds*1000L) {
+//				iterator.remove();
+//			}
+//		}
+//
+//		return tempPeriods;
+//	}
 
-
-		STD std = new STD();
-		double onsMean = std.getMean(ons);
-		double onsSTD = std.getSTD(ons);
-		double gapsMean = std.getMean(gaps);
-		double gapsSTD = std.getSTD(gaps);
-		boolean dutyCycle = onsSTD/onsMean < .05 && gapsSTD/gapsMean < 0.05;
-		DutyCycleInfo cycleInfo = new DutyCycleInfo(dutyCycle, onsMean, gapsMean, tempPeriods.size());
-		return cycleInfo;
-	}
-
-	/**
-	 * Get the central part of a distribution without any outliers so 
-	 * that we can get a better assessment of duty cycle. 
-	 * @param data unsorted distribution data. 
-	 * @param percent percentage to include (half this removed from top and bottom)
-	 * @return
-	 */
-	private double[] getDistributionCentre(double[] data, double percent) {
-		if (data == null) {
-			return null;
-		}
-		Arrays.sort(data);
-		int nRem = (int) Math.round(data.length * (100-percent)/200);
-		int newLen = data.length-nRem*2;
-		double[] subdata = Arrays.copyOfRange(data, nRem, data.length-2*nRem);
-		if (subdata.length < 2) {
-			return data;
-		}
-		return subdata;
-	}
 
 
 	/**
@@ -360,16 +313,17 @@ public class EffortFunctions {
 			return null;
 		}
 		// get the times out of it. 
-		RecordingList recPeriods = new RecordingList();
+		RecordingList recPeriods = new RecordingList(bestMap.getDataMapName());
 		List<OfflineDataMapPoint> mapPoints = bestMap.getMapPoints();
 		for (OfflineDataMapPoint mapPoint : mapPoints) {
 			recPeriods.add(new RecordingPeriod(mapPoint.getStartTime(), mapPoint.getEndTime()));
+			recPeriods.add(mapPoint.getStartTime(), mapPoint.getEndTime());
 		}
 		return recPeriods;
 	}
 
 	private RecordingList extractTimesFromStatus(ArrayList<DaqStatusDataUnit> allStatusData) {
-		RecordingList tempPeriods = new RecordingList();
+		RecordingList tempPeriods = new RecordingList("Data acquisition status");
 		long dataStart = Long.MAX_VALUE;
 		long dataEnd = Long.MIN_VALUE;
 		Long lastStart = null;

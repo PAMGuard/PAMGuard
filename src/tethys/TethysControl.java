@@ -32,6 +32,8 @@ import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamUtils.PamFileChooser;
 import PamUtils.PamFileFilter;
+import PamUtils.worker.PamWorkWrapper;
+import PamUtils.worker.PamWorker;
 import PamView.PamTabPanel;
 import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
@@ -104,7 +106,9 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		serverCheckTimer = new Timer(10000, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				checkServer();
+				ServerStatus serverState = checkServer();
+				// check less often when it's OK to generate less debug output. 
+				serverCheckTimer.setDelay(serverState.ok ? 600000 : 5000);
 			}
 		});
 		serverCheckTimer.setInitialDelay(0);
@@ -469,6 +473,8 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 //		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			initializationStuff();
 			break;
+		case PamControllerInterface.HYDROPHONE_ARRAY_CHANGED:
+			sendStateUpdate(new TethysState(StateType.UPDATEMETADATA));
 		}
 	}
 
@@ -525,7 +531,32 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		}
 	}
 
-	private void countProjectDetections() {
+//	/**
+//	 * Count project detections in a worker thread;
+//	 */
+//	public void countProjectDetectionsT() {
+//		sendStateUpdate(new TethysState(StateType.EXPORTRDATA, Collection.Detections));
+//		PamWorker<String> worker = new PamWorker<String>(new PamWorkWrapper<String>() {
+//	
+//			@Override
+//			public String runBackgroundTask(PamWorker<String> pamWorker) {
+//				countProjectDetections();
+//				return null;
+//			}
+//	
+//			@Override
+//			public void taskFinished(String result) {
+//				sendStateUpdate(new TethysState(StateType.NEWPAMGUARDSELECTION, Collection.Detections));
+//	
+//			}
+//		}, getGuiFrame(), 0, "Updating detections counts");
+//		worker.start();
+//	}
+
+	/**
+	 * Count project detections in the current thread. 
+	 */
+	private synchronized void countProjectDetections() {
 		if (dataBlockSynchInfos == null) {
 			return;
 		}
@@ -549,12 +580,6 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 			
 			i++;
 		}
-//		int[] counts = dbxmlQueries.countDataForProject(deplData.getProject(), dataPrefixes);
-//		if (counts != null) {
-//			for ( i = 0; i < counts.length; i++ ) {
-//				dataBlockSynchInfos.get(i).setDataCount(counts[i]);
-//			}
-//		}
 	}
 
 	/**
@@ -688,11 +713,9 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	 * @param dataBlock
 	 */
 	public void exportedDetections(PamDataBlock dataBlock) {
-		sendStateUpdate(new TethysState(StateType.EXPORTRDATA, Collection.Detections));
 		countProjectDetections();
-		sendStateUpdate(new TethysState(StateType.NEWPAMGUARDSELECTION, Collection.Detections));
+//		sendStateUpdate(new TethysState(StateType.NEWPAMGUARDSELECTION, Collection.Detections));
 	}
-
 	/**
 	 * @return the calibrationHandler
 	 */

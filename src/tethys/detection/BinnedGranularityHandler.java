@@ -6,11 +6,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
+
+import javax.xml.datatype.DatatypeConstants;
+import javax.xml.datatype.XMLGregorianCalendar;
+
 import java.util.Set;
 
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import nilus.Detection;
+import nilus.Detections;
 import nilus.SpeciesIDType;
 import tethys.TethysControl;
 import tethys.TethysTimeFuncs;
@@ -54,6 +59,8 @@ public class BinnedGranularityHandler extends GranularityHandler {
 	public void prepare(long timeMillis) {
 //		long binStart = DetectionsHandler.roundDownBinStart(timeMillis, binDurationMillis);
 //		startBin(binStart);
+//		startBin(timeMillis);
+		currentDetections.clear();
 	}
 	
 //	private void startBin(long timeMillis) {
@@ -167,6 +174,11 @@ public class BinnedGranularityHandler extends GranularityHandler {
 	@Override
 	public Detection[] cleanup(long timeMillis) {
 		return closeBins(timeMillis);
+	}
+
+	@Override
+	protected boolean autoEffortFix(Detections detections, Detection det) {
+		return contractDetection(detections, det);
 	}
 
 }

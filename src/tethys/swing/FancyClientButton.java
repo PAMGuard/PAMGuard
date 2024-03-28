@@ -1,12 +1,15 @@
 package tethys.swing;
 
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 
 import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
@@ -30,13 +33,13 @@ import tethys.dbxml.DBXMLConnect;
  */
 public class FancyClientButton extends JPanel {
 
+	private TethysControl tethysControl;
+	
 	private JButton clientButton;
 	private JButton dropButton;
 	private JPopupMenu collectionsMenu;
-	private TethysControl tethysControl;
 	private JCheckBoxMenuItem showBrowser;
 	private AbstractButton showPAMGuard;
-
 
 	public FancyClientButton(TethysControl tethysControl) {
 		this.tethysControl = tethysControl;
@@ -105,6 +108,16 @@ public class FancyClientButton extends JPanel {
 			menuItem.addActionListener(new OpenCollection(collections[i]));
 			collectionsMenu.add(menuItem);
 		}
+		collectionsMenu.addSeparator();
+		JMenuItem tmpItem = new JMenuItem("Open temp folder");
+		collectionsMenu.add(tmpItem);
+		tmpItem.setToolTipText("Open folder used for temporary document files during export in Windows Explorer");
+		tmpItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				openTempFolder();
+			}
+		});
 
 		dropButton.addActionListener(new ActionListener() {
 			@Override
@@ -113,6 +126,19 @@ public class FancyClientButton extends JPanel {
 			}
 		});
 		enableItems();
+	}
+
+	protected void openTempFolder() {
+		File tempFolder = tethysControl.getDbxmlConnect().checkTempFolder();
+		if (tempFolder == null) {
+			return;
+		}
+		try {
+			Desktop.getDesktop().open(tempFolder);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	protected void enableItems() {

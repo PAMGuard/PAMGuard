@@ -286,6 +286,7 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 			detParams.setMaxFreqHz(freqs[1]);
 		}
 		double ampli = dataUnit.getAmplitudeDB();
+		ampli = roundDecimalPlaces(ampli, 1);
 		detParams.setReceivedLevelDB(ampli);
 		//		DataUnitBaseData basicData = dataUnit.getBasicData();
 		gotTonalContour(dataUnit, detParams);

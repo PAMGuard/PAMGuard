@@ -70,7 +70,7 @@ public class ITISFunctions {
 //		PAMGuardXMLPreview xmlPreview = new PAMGuardXMLPreview(null, "returned", qResult.queryResult)
 		PamguardXMLWriter pamXMLWriter = PamguardXMLWriter.getXMLWriter();
 		String fDoc = pamXMLWriter.getAsString(doc, true);
-		System.out.println(fDoc);
+//		System.out.println(fDoc);
 		
 		String tsn = dbQueries.getElementData(docEl, "tsn");
 		if (tsn == null) {
@@ -91,7 +91,46 @@ public class ITISFunctions {
 		return new TethysITISResult(itisCode, taxunit, latin, vernacular);
 	}
 	
+	/**
+	 * Search species codes. If the search term is a valid Integer number
+	 * then it's assumed to be an ITIS code and the function should
+	 * return a single map item. If it's non-integer, it's assumed to 
+	 * be a common or latin name search
+	 * @param searchTerm
+	 * @return array list of possible matches. 
+	 */
 	public ArrayList<SpeciesMapItem> searchSpecies(String searchTerm) {
+		Integer intVal = null;
+		try {
+			intVal = Integer.valueOf(searchTerm);
+		}
+		catch (NumberFormatException e) {
+			intVal = null;
+		}
+		if (intVal != null) {
+			return searchCodes(intVal);
+		}
+		else { // assume name search
+			return searchNames(searchTerm);
+		}
+	}
+	
+	private ArrayList<SpeciesMapItem> searchCodes(Integer intCode) {
+		ArrayList<SpeciesMapItem> mapItems = new ArrayList();
+		TethysITISResult result = getITISInformation(intCode);
+		if (result != null) {
+			mapItems.add(new SpeciesMapItem(intCode, "", "", result.getLatin(), result.getVernacular()));
+		}
+		return mapItems;
+	}
+
+	/**
+	 * Search common and latin names for partial matched of the search term
+	 * and return an array list of all possible matches. 
+	 * @param searchTerm
+	 * @return
+	 */
+	public ArrayList<SpeciesMapItem> searchNames(String searchTerm) {
 		ArrayList<SpeciesMapItem> items = new ArrayList<SpeciesMapItem>();		
 		String xQ = "let $target := \"thespeciessearchterm\" \r\n"
 				+ "return\r\n"

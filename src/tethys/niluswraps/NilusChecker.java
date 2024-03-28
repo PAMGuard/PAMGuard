@@ -56,7 +56,7 @@ public class NilusChecker {
 		for (Field f : emptyFields) {
 			msg += String.format("<br>Field %s in object %s", f.getName(), f.getDeclaringClass().getName());
 		}
-		msg += "<br><br>It is likely that this document will fail to write to the Tethys database.</html>";
+		msg += "<br><br>It is possible that this document will fail to write to the Tethys database.</html>";
 		String tit = "Incomplete Tethys data";
 		WarnOnce.showWarning(owner, tit, msg, WarnOnce.WARNING_MESSAGE);
 		return false;
