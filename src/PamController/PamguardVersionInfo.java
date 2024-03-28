@@ -16,7 +16,7 @@ public class PamguardVersionInfo {
 	 * @return release type 
 	 */
 	static public ReleaseType getReleaseType() {
-		return ReleaseType.OTHER; 
+		return ReleaseType.BETA; 
 	}
 	
 	/**
