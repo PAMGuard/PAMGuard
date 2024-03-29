@@ -166,9 +166,6 @@ public class DetectionGroupDisplay extends PamBorderPane {
 		arrowPane.getChildren().addAll(arrowLeft, arrowRight);
 		BorderPane.setAlignment(arrowPane, Pos.CENTER_RIGHT);
 		
-
-
-		
 		//a label to show information of the data unit
 		dataLabel = new Label();
 		

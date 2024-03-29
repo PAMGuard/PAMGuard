@@ -23,6 +23,7 @@ import PamguardMVC.PamObserverAdapter;
 import PamguardMVC.PamRawDataBlock;
 
 /**
+ * 
  * The controller for the display if the main PAMGuard GUI is in JavaFX mode. 
  * 
  * @author Jamie Macaulay 

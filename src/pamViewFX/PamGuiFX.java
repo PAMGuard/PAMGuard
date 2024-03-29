@@ -244,7 +244,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 		mainTabPane.setTabStartRegion(showButtonLeft);
 
 		mainTabPane.getAddTabButton().setOnAction((value)->{
-		    addPamTab(new TabInfo("Display " + this.getNumTabs()+1), null ,true); 
+		    addPamTab(new TabInfo("Display " + (this.getNumTabs()+1)), null ,true); 
 		    mainTabPane.layout();
 		});
 		

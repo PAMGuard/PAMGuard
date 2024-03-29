@@ -7,6 +7,7 @@ import PamController.PamController;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamguardMVC.PamDataBlock;
+import javafx.geometry.Side;
 import javafx.scene.layout.Region;
 import pamViewFX.fxNodes.internalNode.PamInternalPane;
 import userDisplayFX.UserDisplayControlFX;
@@ -101,10 +102,16 @@ public class DetectionGroupDisplayFX extends DetectionGroupDisplay  implements U
 
 	@Override
 	public boolean requestNodeSettingsPane() {
-		// TODO Auto-generated method stub
-		return false;
+		this.showSettingsPane(true);
+		
+		return true;
 	}
 	
+
+	private void showSettingsPane(boolean b) {
+		this.detectionDisplay.getHidingPane(Side.RIGHT).showHidePane(b);;
+		
+	}
 
 	@Override
 	public void notifyModelChanged(int changeType) {
@@ -175,8 +182,8 @@ public class DetectionGroupDisplayFX extends DetectionGroupDisplay  implements U
 			return false;
 		}
 		
-		System.out.println("DETECTION DISPLAY DATA SOURCE: " + settings.dataSource);
-		System.out.println("DETECTION DISPLAY DATA SOURCE: " + settings.tabName);
+		System.out.println("LOAD DETECTION DISPLAY DATA SOURCE: " + settings.dataSource);
+		System.out.println("LOAD DETECTION DISPLAY DATA SOURCE: " + settings.tabName);
 
 		
 		this.detectionPlotParams = settings.clone();	

@@ -164,6 +164,7 @@ public class CheckWavHeadersPane extends PamBorderPane {
 	
 	
 	private int countFiles(File folder) {
+		if (folder == null) return 0;
 		int nF = 0;
 		File[] files = folder.listFiles(new PamAudioFileFilter());
 		if (files == null) return 0;

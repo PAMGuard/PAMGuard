@@ -87,33 +87,24 @@ public class PamGuiTabFX extends PamTabFX {
 	
 	/**
 	 * Constructor for a new tab
-	 * @param text. Name of tab
+	 * @param tabInfo - info on the tab such as name
+	 * @param pamGui - reference to the PamGuiFX the pane belongs to.
 	 */
 	public PamGuiTabFX(TabInfo tabInfo, PamGuiFX pamGui) {
-		super(tabInfo.tabName);
-		this.pamGui=pamGui; 
-		this.tabInfo=tabInfo; 
-
-		contentHolder=new PamBorderPane(); 
-		
-		//needs to be in this order so toolbar pane sits on top of center pane. 
-		holder=new Pane();
-		contentHolder.setCenter(holder);
-		
-		super.setContent(contentHolder);
-		setPanesEditable(editable);
+		this(tabInfo, null, pamGui);
 	}
 
 	/**
 	 * Constructor for a new tab
-	 * @param text - Name of tab
-	 * @param toolbar - pane which sits just below tab
-	 * @param content - content for tab pane. 
+	 * @param tabInfo - info on the tab such as name
+	 * @param newContent - content to display
+	 * @param pamGui - reference to the PamGuiFX the pane belongs to.
 	 */
 	public PamGuiTabFX(TabInfo tabInfo, UserDisplayNodeFX newContent, PamGuiFX pamGui) {
 		super(tabInfo.tabName);
 		this.pamGui=pamGui; 
 		this.tabInfo=tabInfo; 
+		
 		
 		contentHolder=new PamBorderPane(); 
 		
@@ -414,7 +405,9 @@ public class PamGuiTabFX extends PamTabFX {
 	 * @return name of tabs. 
 	 */
 	public String getName() {
-		return this.getText();
+		//note that this should not be getText() because 
+		//this is not set in the parent class constructor. 
+		return this.tabInfo.tabName;
 	}
 	
 	/**

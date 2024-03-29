@@ -359,7 +359,7 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 				//add the display to the current set of tabs. 
 				ArrayList<PamGuiTabFX> allTabs = getAllTabs(); 
 				for (int i=0; i<allTabs.size(); i++) {
-					if (allTabs.get(i).getText().equals(newDisplay.getDisplayParams().tabName)){
+					if (allTabs.get(i).getName().equals(newDisplay.getDisplayParams().tabName)){
 						return allTabs.get(i); 
 					}
 				}
@@ -383,6 +383,8 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 	private void addDisplay(UserDisplayNodeFX newDisplay){
 		PamGuiTabFX tab;
 		
+		System.out.println("ADD USER DISPLAY");
+		
 		if (!newDisplay.isStaticDisplay()){
 			//if a non static display then add to a selected tab. 
 			tab=getDisplayTab(newDisplay); 
@@ -405,6 +407,7 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 //					+ newDisplay.getDisplayParams().sizeY);
 
 			newDisplay.getDisplayParams().tabName=tab.getName(); 
+			System.out.println("ADD USER DISPLAY 2a " + newDisplay.getDisplayParams().tabName + " " + tab.getName() + " " + tab.getTabInfo().tabName);
 			newDisplay.setFrameHolder(internalFrame); 
 
 			//Have to platform later this as needs some time to intitialise? 11/08/2018
@@ -418,8 +421,11 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 		else {
 			if (newDisplay.getDisplayParams()!=null) {
 				newDisplay.getDisplayParams().tabName=tab.getName(); 
+				System.out.println("ADD USER DISPLAY 2b " + newDisplay.getDisplayParams().tabName);
 			}
 		}
+		
+
 	}
 
 
