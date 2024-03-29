@@ -1,16 +1,6 @@
 package tethys.deployment;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.ListIterator;
-
-import Acquisition.AcquisitionControl;
-import Acquisition.AcquisitionParameters;
-import Acquisition.DaqStatusDataUnit;
-import PamController.PamControlledUnit;
-import PamController.PamController;
-import PamguardMVC.PamDataBlock;
+import tethys.TethysControl;
 
 /**
  * Class to give a general overview of all the effort in PAMGuard which will form the
@@ -22,59 +12,83 @@ import PamguardMVC.PamDataBlock;
  */
 public class DeploymentOverview {
 	
-	private ArrayList<RecordingPeriod> recordingPeriods = new ArrayList<>();
+	private RecordingList rawDataList;
 	
-	private DutyCycleInfo dutyCycleInfo;
+	private RecordingList binaryDataList;
+	
+//	private DutyCycleInfo dutyCycleInfo;
 
-	public DeploymentOverview(DutyCycleInfo dutyCycleInfo) {
-		super();
-		this.dutyCycleInfo = dutyCycleInfo;
-	}
+//	public DeploymentOverview(DutyCycleInfo dutyCycleInfo) {
+//		super();
+//		this.dutyCycleInfo = dutyCycleInfo;
+//	}
 	
-	public DeploymentOverview(DutyCycleInfo dutyCycleInfo, ArrayList<RecordingPeriod> tempPeriods) {
-		this.dutyCycleInfo = dutyCycleInfo;
-		this.recordingPeriods = tempPeriods;
-	}
-	
-	
-	public void addRecordingPeriod(long start, long stop) {
-		addRecordingPeriod(new RecordingPeriod(start, stop));
+	public DeploymentOverview(DutyCycleInfo dutyCycleInfo, RecordingList rawDataList, RecordingList binaryDataList) {
+//		this.dutyCycleInfo = dutyCycleInfo;
+		this.rawDataList = rawDataList;
+		this.binaryDataList = binaryDataList;
 	}
 
-	private void addRecordingPeriod(RecordingPeriod recordingPeriod) {
-		recordingPeriods.add(recordingPeriod);
+	/**
+	 * @return the rawDataList
+	 */
+	public RecordingList getRawDataList() {
+		return rawDataList;
 	}
 
-	public ArrayList<RecordingPeriod> getRecordingPeriods() {
-		return recordingPeriods;
+	/**
+	 * @return the binaryDataList
+	 */
+	public RecordingList getBinaryDataList() {
+		return binaryDataList;
 	}
 
-	public DutyCycleInfo getDutyCycleInfo() {
-		return dutyCycleInfo;
+//	/**
+//	 * @return the dutyCycleInfo
+//	 */
+//	public DutyCycleInfo getDutyCycleInfo() {
+//		return dutyCycleInfo;
+//	}
+	
+	public RecordingList getMasterList(TethysControl tethysControl) {
+		return getMasterList(tethysControl.getTethysExportParams().getEffortSourceName());
+	}
+
+	public RecordingList getMasterList(String effortSourceName) {
+		if (effortSourceName == null) {
+			return getLongestList();
+		}
+		if (binaryDataList != null & binaryDataList.getSourceName().equals(effortSourceName)) {
+			return binaryDataList;
+		}
+		if (rawDataList != null & rawDataList.getSourceName().equals(effortSourceName)) {
+			return rawDataList;
+		}
+		return getLongestList();
 	}
 	
 	/**
-	 * Get the start time of the first recording
+	 * Get the recording list with the greatest duration (start to end)
+	 * not looking at coverage between those times. 
 	 * @return
 	 */
-	public Long getFirstStart() {
-		if (recordingPeriods.size() > 0) {
-			return recordingPeriods.get(0).getRecordStart();
+	public RecordingList getLongestList() {
+		if (binaryDataList == null) {
+			return rawDataList;
 		}
-		return null;
-	}
-	
-	/**
-	 * Get the end time of the last recording
-	 * @return
-	 */
-	public Long getLastEnd() {
-		if (recordingPeriods.size() > 0) {
-			return recordingPeriods.get(recordingPeriods.size()-1).getRecordStop();
+		if (rawDataList == null) {
+			return binaryDataList;
 		}
-		return null;
+		long lRaw = rawDataList.duration();
+		long lBin = binaryDataList.duration();
+		
+		if (lRaw > lBin) {
+			return rawDataList;
+		}
+		else {
+			return binaryDataList;
+		}
 	}
-	
-	
+
 
 }

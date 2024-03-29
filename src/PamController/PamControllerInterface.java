@@ -458,6 +458,17 @@ public interface PamControllerInterface {
 	 * Close all modules and free up resources. 
 	 */
 	public void pamClose();
+
+	/**
+	 * Start function called from button to do a bit of extra book keeping
+	 * @return
+	 */
+	public boolean manualStart();
+
+	/**
+	 * Stop function called from button to do a bit of extra book keeping
+	 */
+	public void manualStop();
 	
 	//public void controllerAddFileMenuItem();
 

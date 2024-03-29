@@ -145,6 +145,17 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 		}
 	}
 	
+	/**
+	 * Reset data integrity checking counters. 
+	 */
+	public void reset() {
+		prevChannelSample = new long[PamConstants.MAX_CHANNELS];
+		summaryTotals = new double[PamConstants.MAX_CHANNELS];
+		summaryTotals2 = new double[PamConstants.MAX_CHANNELS];
+		summaryMaxVal = new double[PamConstants.MAX_CHANNELS];
+		summaryCount = new int[PamConstants.MAX_CHANNELS];
+	}
+	
 	@Override
 	public void addPamData(RawDataUnit pamDataUnit) {
 		/*

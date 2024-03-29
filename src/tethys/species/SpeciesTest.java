@@ -21,11 +21,11 @@ public class SpeciesTest {
 	public static void main(String[] args) {
 		
 		SpeciesTest st = new SpeciesTest();
-		st.runJson();
+//		st.runJson();
 		
 //		int spermWhale = 180488;
 //		st.getCodeInfo(spermWhale);
-//		st.runXQuery();
+		st.runXQuery();
 
 	}
 	private  void getCodeInfo(int itisCode) {
@@ -86,15 +86,32 @@ public class SpeciesTest {
 //				+ "    }</Deployment>\r\n"
 //				+ "} </Result>";
 
-		String xQ = "<Result xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"> {\r\n"
-				+ "  for $rank0 in collection(\"ITIS_ranks\")/rank[tsn = \"180488\"]\r\n"
-				+ "  return\r\n"
-				+ "    <rank>{\r\n"
-				+ "      $rank0/completename\r\n"
-				+ "    }</rank>\r\n"
-				+ "} </Result>";
+//		String xQ = "<Result xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"> {\r\n"
+//				+ "  for $rank0 in collection(\"ITIS_ranks\")/rank[tsn = \"180488\"]\r\n"
+//				+ "  return\r\n"
+//				+ "    <rank>{\r\n"
+//				+ "      $rank0/completename\r\n"
+//				+ "    }</rank>\r\n"
+//				+ "} </Result>";
+		String xQ = "let $target := \"physeter\" \r\n"
+				+ "return\r\n"
+				+ "<Result xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"> {\r\n"
+				+ "\r\n"
+				+ "  for $ranks0 in collection(\"ITIS_ranks\")/ranks/rank[\r\n"
+				+ "          dbxml:contains(completename, $target) or \r\n"
+				+ "                 vernacular[dbxml:contains(name,$target)]]\r\n"
+				+ "return\r\n"
+				+ "  <Record> {\r\n"
+				+ "    $ranks0/tsn,\r\n"
+				+ "            $ranks0/completename,\r\n"
+				+ "            <vernacular>\r\n"
+				+ "              {string-join($ranks0/vernacular/name, \", \")}\r\n"
+				+ "            </vernacular>\r\n"
+				+ "  } </Record>\r\n"
+				+ "} </Result>\r\n"
+				+ "";
+		System.out.println(xQ);
 		
-
 		JerseyClient jerseyClient = new JerseyClient(uri);
 		Queries queries = new Queries(jerseyClient);
 		

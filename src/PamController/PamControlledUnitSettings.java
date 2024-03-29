@@ -403,4 +403,9 @@ public class PamControlledUnitSettings implements Serializable, ManagedParameter
 		return ps;
 	}
 
+	@Override
+	public String toString() {
+		return String.format("Type %s; Name %s, Data ", getUnitType(), getUnitName()) + getSettings();
+	}
+
 }

@@ -34,6 +34,7 @@ import tethys.TethysState;
 import tethys.TethysState.StateType;
 import tethys.dbxml.DBXMLConnect;
 import tethys.deployment.DeploymentHandler;
+import tethys.deployment.RecordingList;
 import tethys.deployment.RecordingPeriod;
 import tethys.niluswraps.PDeployment;
 
@@ -154,6 +155,9 @@ public class DeploymentExportPanel extends TethysGUIPanel implements DeploymentT
 		case UPDATEMETADATA:
 			setInternal();
 			break;
+		case UPDATESERVER:
+			enableControls();
+			break;
 		}
 	}
 
@@ -238,13 +242,15 @@ public class DeploymentExportPanel extends TethysGUIPanel implements DeploymentT
 		if (selectedDeployments == null || selectedDeployments.size() == 0) {
 			return;
 		};
-		getTethysControl().getDeploymentHandler().exportDeployments(selectedDeployments);
+		// need to turn that list back into a RecordingList object. 
+		RecordingList tempList = new RecordingList("eport list", selectedDeployments);
+		getTethysControl().getDeploymentHandler().exportDeployments(tempList);
 	}
 	
 
 	private void enableControls() {
 		boolean enable = selectedDeployments != null && selectedDeployments.size() > 0;
-		bigExportButton.setEnabled(enable);
+		bigExportButton.setEnabled(getTethysControl().isServerOk() & enable);
 	}
 
 }

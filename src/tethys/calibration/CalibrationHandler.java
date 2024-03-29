@@ -36,6 +36,7 @@ import nilus.MetadataInfo;
 import nilus.QualityValueBasic;
 import nilus.ResponsibleParty;
 import tethys.Collection;
+import tethys.CollectionHandler;
 import tethys.DocumentInfo;
 import tethys.DocumentNilusObject;
 import tethys.TethysControl;
@@ -45,13 +46,13 @@ import tethys.TethysTimeFuncs;
 import tethys.calibration.swing.CalibrationsExportWizard;
 import tethys.dbxml.DBXMLConnect;
 import tethys.dbxml.TethysException;
+import tethys.niluswraps.NilusChecker;
 import tethys.niluswraps.NilusSettingsWrapper;
 import tethys.niluswraps.NilusUnpacker;
 import tethys.pamdata.AutoTethysProvider;
+import tethys.reporter.TethysReporter;
 
-public class CalibrationHandler implements TethysStateObserver {
-
-	private TethysControl tethysControl;
+public class CalibrationHandler extends CollectionHandler implements TethysStateObserver {
 	
 	private ArrayList<DocumentNilusObject<Calibration>> calibrationsList;
 	
@@ -62,10 +63,14 @@ public class CalibrationHandler implements TethysStateObserver {
 	public static final String[] qaTypes = {"unverified", "valid", "invalid"};
 	
 	private Helper nilusHelper;
+
+	public static final String helpPoint = "utilities.tethys.docs.calibrations";
+	
 	/**
 	 * @param tethysControl
 	 */
 	public CalibrationHandler(TethysControl tethysControl) {
+		super(tethysControl, Collection.Calibrations);
 		this.tethysControl = tethysControl;
 		calibrationsList = new ArrayList();
 		tethysControl.addStateObserver(this);		try {
@@ -186,6 +191,7 @@ public class CalibrationHandler implements TethysStateObserver {
 		int nExport = 0;
 		boolean overwrite = false;
 		boolean exists;
+		TethysReporter.getTethysReporter().clear();
 		for (int i = 0; i < nPhone; i++) {
 //			String docName = getHydrophoneId(i);
 			NilusSettingsWrapper<Calibration> clonedWrap = wrappedSample.clone();
@@ -195,11 +201,24 @@ public class CalibrationHandler implements TethysStateObserver {
 				calDoc.setMetadataInfo(sampleCal.getMetadataInfo());				
 				calDoc.setProcess(sampleCal.getProcess());
 				calDoc.setQualityAssurance(sampleCal.getQualityAssurance());
-				calDoc.setResponsibleParty(sampleCal.getResponsibleParty());
+				if (NilusChecker.isEmpty(sampleCal.getResponsibleParty()) == false) {
+					calDoc.setResponsibleParty(sampleCal.getResponsibleParty());
+				}
 				calDoc.setTimeStamp(sampleCal.getTimeStamp());
 			}
+			// check the contact info in the metadata. 
+			// can't so because it's required. 
+//			MetadataInfo metaData = calDoc.getMetadataInfo();
+//			if (metaData != null) {
+//				if (NilusChecker.isEmpty(metaData.getContact())) {
+//					metaData.setContact(null);
+//				}
+//			}
 			
 			addParameterDetails(calDoc, i);
+			// run some checks of completeness of the data
+			NilusChecker.removeEmptyFields(calDoc);
+//			ArrayList<Field> emptyFields = NilusChecker.checkEmptyFields(calDoc);
 			
 			String calDocName = createDocumentName(calDoc, i);
 			exists = calDocumentExists(calDocName);
@@ -233,6 +252,7 @@ public class CalibrationHandler implements TethysStateObserver {
 			}
 		}
 		tethysControl.sendStateUpdate(new TethysState(TethysState.StateType.EXPORTRDATA, Collection.Calibrations));
+		TethysReporter.getTethysReporter().showReport(true);
 		return nExport;
 	}
 	
@@ -405,6 +425,10 @@ public class CalibrationHandler implements TethysStateObserver {
 		hz.add(Double.valueOf(0));
 		db.add(Double.valueOf(hSens+preampGain));
 		
+		if (NilusChecker.isEmpty(calibration.getResponsibleParty())) {
+			calibration.setResponsibleParty(null);
+		}
+		
 		MetadataInfo metaInf = calibration.getMetadataInfo();
 		if (metaInf == null) {
 			metaInf = new MetadataInfo();
@@ -416,6 +440,12 @@ public class CalibrationHandler implements TethysStateObserver {
 		if (contact == null) {
 			contact = new ResponsibleParty();
 			metaInf.setContact(contact);
+		}
+		if (NilusChecker.isEmpty(metaInf.getContact())) {
+			metaInf.setContact(null);
+		}
+		if (NilusChecker.isEmpty(metaInf)) {
+			calibration.setMetadataInfo(null);
 		}
 		contact.setIndividualName("Unknown");
 		contact.setOrganizationName("unknown");
@@ -476,7 +506,7 @@ public class CalibrationHandler implements TethysStateObserver {
 		}
 		String seachPattern = makeChannelNamePart(iChan);
 		for (int i = 0; i < calibrationsList.size(); i++) {
-			String docName = calibrationsList.get(i).getDocumentName();
+			String docName = calibrationsList.get(i).getDocumentId();
 			if (docName.endsWith(seachPattern)) {
 				return true;
 			}
@@ -541,5 +571,10 @@ public class CalibrationHandler implements TethysStateObserver {
 			}
 		}
 		return theseCals;
+	}
+
+	@Override
+	public String getHelpPoint() {
+		return helpPoint;
 	}
 }

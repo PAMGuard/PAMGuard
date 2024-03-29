@@ -126,6 +126,8 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 	private long cpuUsage;
 	private long lastCPUCheckTime = System.currentTimeMillis();
 	private double cpuPercent;
+	private double totalCPU, peakCPU;
+	private int nCPU;
 	
 	/**
 	 * Flag for the process to say whether or not it's primary data connection
@@ -140,6 +142,11 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 	 * Last received data unit - used for working out timing offsets. 
 	 */
 	private PamDataUnit lastAcousticDataunit;
+
+	/*
+	 * diagnostic count of all data processed
+	 */
+	private int nDataProcessed;
 	// some flags and variables needed to deal with conversion from
 	// milliseconds to samples and back
 //	private boolean acousticDataSource = false;
@@ -742,6 +749,7 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 		}
 //		long cpuStart = SystemTiming.getProcessCPUTime();
 		long threadId = Thread.currentThread().getId();
+		nDataProcessed++;
 		long cpuStart = tmxb.getThreadCpuTime(threadId);
 			newData(o, arg);
 			if (processCheck != null) {
@@ -762,12 +770,18 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 			 * get percent. Total is -9+3+2 = /!0^4 !  
 			 */
 			cpuPercent = (double) cpuUsage / (now - lastCPUCheckTime) / 10000.;
+			// these next two allow us to take an average cpu. 
+			totalCPU += cpuPercent;
+			nCPU++;
+			// and hte max cpu (may always go to 100 at end ?)
+			peakCPU = Math.max(cpuPercent, peakCPU);
+			
 			lastCPUCheckTime = now;
 			cpuUsage = 0;
 		}
 	});
 
-	private int lastSourceNotificationType;
+	private volatile int lastSourceNotificationType;
 
 	private Object lastSourceNotificationObject;
 	
@@ -1063,6 +1077,29 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 	 */
 	public Object getLastSourceNotificationObject() {
 		return lastSourceNotificationObject;
+	}
+
+	/**
+	 * Say the status of any buffers, particularly in output buffers of 
+	 * data blocks, but can add bespoke info for other internal buffers
+	 * for some processes. 
+	 * @param message
+	 * @param sayEmpties include info even if a buffer is empty. 
+	 */
+	public void dumpBufferStatus(String message, boolean sayEmpties) {
+		if (sayEmpties || nDataProcessed > 0) {
+			System.out.printf("Process %s: ran %d datas, peak CPU %3.1f%%, mean CPU %3.1f%%\n", this.getProcessName(), nDataProcessed, peakCPU, totalCPU/nCPU);
+		}
+		ArrayList<PamDataBlock> outputs = getOutputDataBlocks();
+		try {
+			for (PamDataBlock output : outputs) {
+				output.dumpBufferStatus(message, sayEmpties);
+			}
+		}
+		catch (Exception e) {
+			System.err.println("Error dumping buffer data from process " + getProcessName());
+			e.printStackTrace();
+		}
 	}
 
 }

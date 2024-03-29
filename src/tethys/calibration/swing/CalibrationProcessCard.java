@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JComboBox;
@@ -15,6 +17,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
+import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamView.panel.WestAlignedPanel;
 import PamView.wizard.PamWizard;
@@ -23,9 +26,17 @@ import nilus.AlgorithmType.Parameters;
 import nilus.AlgorithmType.SupportSoftware;
 import nilus.Calibration;
 import nilus.Calibration.QualityAssurance;
+import nilus.Helper;
 import nilus.QualityValueBasic;
 import tethys.calibration.CalibrationHandler;
+import tethys.niluswraps.NilusChecker;
 
+/**
+ * Calibrations Process card attempts to fill in the 
+ * calibration data for the Quality Assurance and Process fields. 
+ * @author dg50
+ *
+ */
 public class CalibrationProcessCard extends CalibrationsCard {
 	
 	private JPanel processPanel;
@@ -123,9 +134,13 @@ public class CalibrationProcessCard extends CalibrationsCard {
 		}
 		process.setMethod((String) calMethod.getSelectedItem());
 		process.setVersion(version.getText());
-		process.setSoftware(software.getText());
+		String soft = warnNotNull(getPamWizard(), software, "Calibration Method");
+		if (soft == null) {
+			return false;
+		}
+		process.setSoftware(soft);
 		if (software.getText() == null) {
-			getPamWizard().showWarning("You must specify the calibratin method used");
+			getPamWizard().showWarning("You must specify the calibration method used");
 		}
 		
 		QualityAssurance qa = calibration.getQualityAssurance();
@@ -133,7 +148,11 @@ public class CalibrationProcessCard extends CalibrationsCard {
 			qa = new QualityAssurance();
 			calibration.setQualityAssurance(qa);
 		}
-		qa.setComment(qaComment.getText());
+		String t = warnNotNull(getPamWizard(), qaComment, "QA Comment");
+		if (t == null) {
+			return false;
+		}
+		qa.setComment(t);
 		qa.setQuality(QualityValueBasic.fromValue((String) qaQuality.getSelectedItem()));
 		
 		// need to add a few fixed things for this to work...
@@ -142,10 +161,26 @@ public class CalibrationProcessCard extends CalibrationsCard {
 		if (params == null) {
 			params = new Parameters();
 			process.setParameters(params);
+//			params.getAny().
 		}
+		try {
+			Helper.createRequiredElements(params);
+		} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+//		if (checkEmptyFields(qa) == false) {
+//			return false;
+//		}
+//		if (checkEmptyFields(process) == false) {
+////			return false;
+//		}
 		
 		return true;
 	}
+	
+
 
 	@Override
 	public void setParams(Calibration calibration) {

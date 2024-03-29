@@ -844,4 +844,23 @@ abstract public class OfflineDataMap<TmapPoint extends OfflineDataMapPoint> {
 			obs.updateDataMap(this, mapPoint);
 		}
 	}
+
+	/**
+	 * Check to see if any data maps overlap in time. 
+	 * @return largest overlap between maps. 0 or -ve means no overlap. 
+	 */
+	public long checkOverlaps() {
+		long bigLap = Long.MIN_VALUE;
+		TmapPoint prevPoint = null;
+		for (TmapPoint mapPoint : mapPoints) {
+			if (prevPoint != null) {
+				long olap = prevPoint.getEndTime() - mapPoint.getStartTime();
+//				if (mapPoint.getStartTime() < prevPoint.getEndTime()) {
+					bigLap = Math.max(olap, bigLap);
+//				}
+			}
+			prevPoint = mapPoint;
+		}
+		return bigLap;
+	}
 }

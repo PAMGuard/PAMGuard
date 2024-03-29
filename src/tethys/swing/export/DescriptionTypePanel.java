@@ -19,6 +19,7 @@ import PamView.PamGui;
 import PamView.dialog.PamDialog;
 import nilus.DescriptionType;
 import tethys.niluswraps.WrappedDescriptionType;
+import tethys.tooltips.TethysTips;
 
 /**
  * Panel containing the three test entry fields for nilus.DescriptionType
@@ -73,6 +74,10 @@ public class DescriptionTypePanel {
 		addScrollablePanel(tObjectives, "Objectives");
 		addScrollablePanel(tAbstract, "Abstract");
 		addScrollablePanel(tMethod, "Method");
+		
+		tObjectives.setToolTipText(TethysTips.Detections_Description_Objectives);
+		tAbstract.setToolTipText(TethysTips.Detections_Description_Abstract);
+		tMethod.setToolTipText(TethysTips.Detections_Description_Method);
 	}
 
 	private void addScrollablePanel(JTextArea textArea, String title) {

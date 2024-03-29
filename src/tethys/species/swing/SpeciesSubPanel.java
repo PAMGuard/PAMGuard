@@ -85,7 +85,8 @@ public class SpeciesSubPanel {
 		
 		pamguardName.setToolTipText("Internal name within PAMGuard module");
 		itisCode.setToolTipText("ITIS species code");
-		searchButton.setToolTipText("Search for species code");
+		searchButton.setToolTipText("<html>Either enter a code manually and press \"Find\" for additional information,<br>"
+				+ "or leave the code empty and press \"Find\" to search the Tethys database using common or scientific names.</html>" );
 		callType.setToolTipText("Descriptive name for call type or measurement");
 		latinName.setToolTipText("Scientific name");
 		commonName.setToolTipText("Common name");
@@ -112,6 +113,17 @@ public class SpeciesSubPanel {
 			return;
 		}
 		ITISFunctions itisFunctions = tethysControl.getItisFunctions();
+		String itisString = this.itisCode.getText();
+//		if (itisString == null || itisString.length() == 0) {
+			searchForCode(tethysControl, itisFunctions);
+//		}
+//		else {
+//			getCodeInformation(tethysControl, itisFunctions, itisString);
+//		}
+//		System.out.println(itisInfo);
+	}
+
+	private void getCodeInformation(TethysControl tethysControl, ITISFunctions itisFunctions, String itisString) {
 		int itisCode = 0;
 		try {
 			itisCode = Integer.valueOf(this.itisCode.getText());
@@ -128,8 +140,24 @@ public class SpeciesSubPanel {
 			if (itisInfo.getVernacular() != null) {
 				commonName.setText(itisInfo.getVernacular());
 			}
+		}		
+	}
+
+	private void searchForCode(TethysControl tethysControl, ITISFunctions itisFunctions) {
+		Integer currentCode = null;
+		try {
+			currentCode = Integer.valueOf(itisCode.getText());
 		}
-//		System.out.println(itisInfo);
+		catch (NumberFormatException e) {
+			
+		}
+		
+		SpeciesMapItem speciesItem = SpeciesSearchDialog.showDialog(tethysControl.getGuiFrame(), tethysControl, currentCode);
+		if (speciesItem != null) {
+			itisCode.setText(String.format("%d", speciesItem.getItisCode()));
+			latinName.setText(speciesItem.getLatinName());
+			commonName.setText(speciesItem.getCommonName());
+		}
 	}
 
 	public JComponent getDialogComponent() {

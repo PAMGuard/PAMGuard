@@ -12,6 +12,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import PamUtils.PamCalendar;
+import nilus.Helper;
 
 public class TethysTimeFuncs {
 
@@ -54,6 +55,18 @@ public class TethysTimeFuncs {
 	 * @return
 	 */
 	public static XMLGregorianCalendar fromGregorianXML(String gregorianString) {
+		
+		try {
+			XMLGregorianCalendar xmlCal = Helper.timestamp(gregorianString);
+			return xmlCal;
+		} catch (DatatypeConfigurationException e1) {
+			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+		}
+		/**
+		 * Above should work just fine. If it doesn't use my own code below...
+		 */
+		
 		// typical string is 2018-10-20T00:00:00Z
 		if (gregorianString == null) {
 			return null;

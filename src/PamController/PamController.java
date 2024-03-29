@@ -37,6 +37,7 @@ import javax.swing.ToolTipManager;
 import com.jcraft.jsch.ConfigRepository.Config;
 import com.sun.xml.bind.v2.TODO;
 
+import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionProcess;
 
 //import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
@@ -65,6 +66,7 @@ import PamController.command.TerminalController;
 import PamController.command.WatchdogComms;
 import PamController.fileprocessing.ReprocessManager;
 import PamController.masterReference.MasterReferencePoint;
+import PamController.settings.BatchViewSettingsImport;
 import PamController.settings.output.xml.PamguardXMLWriter;
 import PamController.settings.output.xml.XMLWriterDialog;
 import PamController.soundMedium.GlobalMediumManager;
@@ -124,6 +126,12 @@ public class PamController implements PamControllerInterface, PamSettings {
 	public static final int PAM_INITIALISING = 4;
 	public static final int PAM_STOPPING = 5;
 	public static final int PAM_COMPLETE = 6;
+	public static final int PAM_MAPMAKING = 7;
+	public static final int PAM_OFFLINETASK = 8;
+	
+	public static final int BUTTON_START = 1;
+	public static final int BUTTON_STOP = 2;
+	private volatile int lastStartStopButton = 0;
 
 	// status' for RunMode = RUN_PAMVIEW
 	public static final int PAM_LOADINGDATA = 2;
@@ -157,7 +165,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	/**
 	 * The current PAM status
 	 */
-	private transient int pamStatus = PAM_IDLE;
+	private volatile int pamStatus = PAM_IDLE;
 
 	/**
 	 * PamGuard view params. 
@@ -187,6 +195,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 	private static PamController uniqueController;
 
 	private Timer diagnosticTimer;
+	
+	private boolean debugDumpBufferAtRestart = false;
 
 	private NetworkController networkController;
 	private int nNetPrepared;
@@ -235,6 +245,10 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 */
 	private Thread statusCheckThread;
 	private WaitDetectorThread detectorEndThread;
+	private boolean firstDataLoadComplete;
+	// keep a track of the total number of times PAMGuard is started for debug purposes. 
+	private int nStarts;
+	private RestartRunnable restartRunnable;
 
 
 	private PamController(int runMode, Object object) {
@@ -437,7 +451,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 		//			addModule(mi, "Temporary Database");	
 		//		}
 
-		// Add a note to the putput console for the user to ignore the SLF4J warning (see http://www.slf4j.org/codes.html#StaticLoggerBinder
+		// Add a note to the output console for the user to ignore the SLF4J warning (see http://www.slf4j.org/codes.html#StaticLoggerBinder
 		// for details).  I spent a few hours trying to get rid of this warning, but without any luck.  If you do a google search
 		// there are a lot of forum suggestions on how to fix, but none seemed to work for me.  Added both slf4j-nop and
 		// slf4j-simple to dependency list, neither made a difference.  Changed order of dependencies, ran purges and updates,
@@ -492,16 +506,30 @@ public class PamController implements PamControllerInterface, PamSettings {
 			addView(guiFrameManager.initPrimaryView(this, pamModelInterface)); 
 		}
 
+		/**
+		 * Calling this will cause a callback to this.restoreSettings which 
+		 * includes a list of modules which will then get created, and in turn
+		 * load all of their own settings from the settings manager. 
+		 */
 		PamSettingManager.getInstance().registerSettings(this);
+		
+		/**
+		 * For offline batch processing a few funnies happen here. We'll be open 
+		 * in viewer mode, but it's likely a psf will have been passed as an input argument. 
+		 * We will therefore have to extract all the modules from that psfx as well and either 
+		 * add them as new modules, or get their settings and use those to update existing settings 
+		 * That should probably be done here before the final calls to setup processes, etc. 
+		 */
+		if (getRunMode() == RUN_PAMVIEW && PamSettingManager.remote_psf != null) {
+			loadOtherSettings(PamSettingManager.remote_psf);
+		}
 
+		/*
+		 * Get any other required modules for this run mode. 
+		 */
 		pamModelInterface.startModel();
 
 		setupProcesses();
-
-		//				if (getRunMode() == RUN_PAMVIEW) {
-		//					createViewerStatusBar();			
-		//					pamControlledUnits.add(new OfflineProcessingControlledUnit("OfflineProcessing"));
-		//				}
 
 		/*
 		 * We are running as a remote application, start process straight away!
@@ -573,6 +601,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 		//		});
 	}
 	
+
 	/**
 	 * Clear all data selectors and symbol managers. Required since some of these will have loaded as various modules were created, 
 	 * but may also require additional data selectors and symbol managers from super detections which were not availble. 
@@ -585,6 +614,11 @@ public class PamController implements PamControllerInterface, PamSettings {
 		
 	}
 
+	/**
+	 * This gets called after other data initialisation tasks (such as data mapping). 
+	 * @author dg50
+	 *
+	 */
 	class DataInitialised implements Runnable {
 		@Override
 		public void run() {
@@ -1020,8 +1054,45 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 */
 	public void restartPamguard() {
 		pamStop();
-		startLater();		
+		
+		/*
+		 *  launch a restart thread, that won't do ANYTHING until
+		 *  PAMGuard is really idle and buffers are cleared. Can only
+		 *  have one of these at a time ! 
+		 */
+		if (restartRunnable != null) {
+			System.out.println("Warning !!!! PAMGuard is already trying to restart!");
+			return;
+		}
+		restartRunnable = new RestartRunnable();
+		Thread restartThread = new Thread(restartRunnable, "RestartPAMGuard Thread");
+		restartThread.run();
 	}
+	
+	private class RestartRunnable implements Runnable {
+
+		@Override
+		public void run() {
+			long t1 = System.currentTimeMillis();
+			while (getPamStatus() != PAM_IDLE) {
+				try {
+					Thread.sleep(200);
+				} catch (InterruptedException e) {
+
+				}
+			}
+			long t2 = System.currentTimeMillis();
+			restartRunnable = null;
+			System.out.printf("PAMGuard safe to restart after %d milliseconds\n", t2-t1);
+			startLater(false);	
+			
+		}
+		
+	}
+	
+	
+	
+	
 	/**
 	 * calls pamStart using the SwingUtilities
 	 * invokeLater command to start PAMGAURD 
@@ -1053,7 +1124,13 @@ public class PamController implements PamControllerInterface, PamSettings {
 
 		@Override
 		public void run() {
-			pamStart(saveSettings);
+			/*
+			 *  do a final check that the stop button hasn't been pressed - can arrive a bit
+			 *  late if the system was continually restarting.  
+			 */
+			if (lastStartStopButton != BUTTON_STOP) {
+				pamStart(saveSettings);
+			}
 		}
 	}
 
@@ -1078,6 +1155,26 @@ public class PamController implements PamControllerInterface, PamSettings {
 		}
 	}
 
+	/**
+	 * Called from the start button. A little book keeping 
+	 * to distinguish this from automatic starts / restarts
+	 * @return true if started.
+	 */
+	@Override
+	public boolean manualStart() {
+		lastStartStopButton = BUTTON_START;
+		return pamStart();
+	}
+	
+	/**
+	 * Called from the stop button. A little book keeping 
+	 * to distinguish this from automatic starts / restarts
+	 */
+	@Override
+	public void manualStop() {
+		lastStartStopButton = BUTTON_STOP;
+		pamStop();
+	}
 
 	/**
 	 * Start PAMGUARD. This function also gets called from the 
@@ -1168,6 +1265,12 @@ public class PamController implements PamControllerInterface, PamSettings {
 			saveSettings(PamCalendar.getSessionStartTime());
 		}
 
+		if (++nStarts > 1 && debugDumpBufferAtRestart) {
+			// do this here - all processses should have reset buffers to start again by now. 
+			String msg = String.format("Starting PAMGuard go %d", nStarts);
+			dumpBufferStatus(msg, false);
+		}
+
 		StorageOptions.getInstance().setBlockOptions();
 
 		t1 = System.currentTimeMillis();
@@ -1229,6 +1332,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 			}
 		}
 		
+		dumpBufferStatus("In stopping", false);
 		/*
 		 *  now launch another thread to wait for everything to have stopped, but
 		 *  leave this function so that AWT is released and graphics can update, the
@@ -1256,9 +1360,11 @@ public class PamController implements PamControllerInterface, PamSettings {
 				long t2 = System.currentTimeMillis();
 				if (t2 - t1 > 5000) {
 					System.out.printf("Stopping, but stuck in loop for CheckRunStatus for %3.1fs\n", (double) (t2-t1)/1000.);
+					dumpBufferStatus("Stopping stuck in loop", false);
+					break; // crap out anyway.
 				}
 				try {
-					Thread.sleep(10);
+					Thread.sleep(100);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -1270,18 +1376,42 @@ public class PamController implements PamControllerInterface, PamSettings {
 	}
 	
 	/**
+	 * Look in every data block, particularly threaded ones, and dump
+	 * the buffer status. This will have to go via PamProcess so that 
+	 * additional information can be added from any processes that 
+	 * hold additional data in other internal buffers. 
+	 * @param message Message to print prior to dumping buffers for debug. 
+	 * @param sayEmpties dump info even if a buffer is empty (otherwise, only ones that have stuff still)
+	 */
+	public void dumpBufferStatus(String message, boolean sayEmpties) {
+		if (debugDumpBufferAtRestart == false) return;
+		
+		System.out.println("**** Dumping process buffer status: " + message);
+		ArrayList<PamControlledUnit> pamControlledUnits = pamConfiguration.getPamControlledUnits();
+		for (PamControlledUnit aUnit : pamControlledUnits) {
+			int numProcesses = aUnit.getNumPamProcesses();
+			for (int i=0; i<numProcesses; i++) {
+				PamProcess aProcess = aUnit.getPamProcess(i);
+				aProcess.dumpBufferStatus(message, sayEmpties);
+			}
+		}
+		System.out.println("**** End of process buffer dump: " + message);
+	}
+	
+	/**
 	 * Called once the detectors have actually stopped and puts a few finalising 
 	 * functions into the AWT thread. 
 	 */
 	private void finishStopping() {
 		detectorEndThread = null;
-		SwingUtilities.invokeLater(new Runnable() {
-			
-			@Override
-			public void run() {
+		// this was never getting invoked for some reason. 
+//		SwingUtilities.invokeLater(new Runnable() {
+//			
+//			@Override
+//			public void run() {
 				pamStopped();
-			}
-		});
+//			}
+//		});
 	}
 		
 	
@@ -1295,6 +1425,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 		 * it is necessary to make sure that all internal datablock 
 		 * buffers have had time to empty.
 		 */
+		System.out.println("Arrived in PamStopped() in thread " + Thread.currentThread().toString());
+		
 		ArrayList<PamControlledUnit> pamControlledUnits = pamConfiguration.getPamControlledUnits();
 		
 		if (PamModel.getPamModel().isMultiThread()) {
@@ -1302,7 +1434,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 				pamControlledUnits.get(iU).flushDataBlockBuffers(2000);
 			}
 		}
-		setPamStatus(PAM_IDLE);
+		dumpBufferStatus("In pamStopped, now idle", false);
 
 		// wait here until the status has changed to Pam_Idle, so that we know
 		// that we've really finished processing all data
@@ -1325,6 +1457,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 		
 		long stopTime = PamCalendar.getTimeInMillis();
 		saveEndSettings(stopTime);
+
+		setPamStatus(PAM_IDLE);
 		
 		// no good having this here since it get's called at the end of every file. 
 //		if (GlobalArguments.getParam(PamController.AUTOEXIT) != null) {
@@ -1792,6 +1926,10 @@ public class PamController implements PamControllerInterface, PamSettings {
 		if (moduleChange(changeType)) {
 			clearSelectorsAndSymbols();
 		}
+		
+		if (changeType == DATA_LOAD_COMPLETE) {
+			firstDataLoadComplete = true;
+		}
 
 	}
 	
@@ -1928,11 +2066,77 @@ public class PamController implements PamControllerInterface, PamSettings {
 
 	public void setPamStatus(int pamStatus) {
 		this.pamStatus = pamStatus;
+		/*
+		 * This only get's called once when set idle at viewer mode startup. 
+		 */
+		if (debugDumpBufferAtRestart) {
+			System.out.printf("*******   PamController.setPamStatus to %d, real status is %d set in thread %s\n",  
+					pamStatus, getRealStatus(), Thread.currentThread().toString());
+		}
 		if (getRunMode() != RUN_PAMVIEW) {
 			TopToolBar.enableStartButton(pamStatus == PAM_IDLE);
 			TopToolBar.enableStopButton(pamStatus == PAM_RUNNING);
 		}
 		showStatusWarning(pamStatus);
+	}
+
+	/**
+	 * This was within the StatusCommand class, but useful to have it here since it's needed
+	 * in more than one place. In viewer mode at startup there are a number of things going on 
+	 * in different threads, such as the creation of datamaps, and this can (hopefully) handle those bespoke
+	 * goings on. 
+	 * @return program status for multithreaded statup tasks. 
+	 */
+	public int getRealStatus() {
+		PamController pamController = PamController.getInstance();
+		if (pamController.isInitializationComplete() == false) {
+			return PamController.PAM_INITIALISING;
+		}
+		int runMode = PamController.getInstance().getRunMode();
+		if (runMode == PamController.RUN_NETWORKRECEIVER) {
+			return PamController.PAM_RUNNING;
+		}
+		int status = pamController.getPamStatus();
+		if (status == PamController.PAM_IDLE) {
+			status = PamController.PAM_IDLE;
+		}
+		else {
+			ArrayList<PamControlledUnit> daqs = PamController.getInstance().findControlledUnits(AcquisitionControl.unitType);
+			if (daqs != null) for (int i = 0; i < daqs.size(); i++) {
+				try {
+					AcquisitionControl daq = (AcquisitionControl) daqs.get(i);
+					if (daq.isStalled()) {
+						status = PamController.PAM_STALLED;
+					}
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		WatchdogComms watchdogComms = PamController.getInstance().getWatchdogComms();
+		status = watchdogComms.getModifiedWatchdogState(status);
+		/*
+		 * This function is now being used in batch processing of offline data, where it may be necessary
+		 * to get status information from many different modules, for example when executing offline tasks
+		 * or just at startup while generating datamaps and datagrams. 
+		 * So go through all modules and get the highest state of any of them. 
+		 */
+		if (getRunMode() == RUN_PAMVIEW) {
+			if (firstDataLoadComplete == false) {
+				status = PAM_INITIALISING;
+			}
+			try {
+				for (PamControlledUnit aUnit : pamConfiguration.getPamControlledUnits()) {
+					status = Math.max(status, aUnit.getOfflineState());
+				}
+			}
+			catch (Exception e) {
+				//just incase there is a concurrent modification at startup. 
+			}
+		}
+		
+		return status;
 	}
 	
 	/**
@@ -1962,6 +2166,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 			statusWarning.setWarningMessage(warningMessage);
 			statusWarning.setWarnignLevel(1);
 			warningSystem.addWarning(statusWarning);
+//			System.out.println(warningMessage);
 		}
 	}
 
@@ -2218,6 +2423,31 @@ public class PamController implements PamControllerInterface, PamSettings {
 	private boolean manualStop;
 
 
+	/**
+	 * Used when in viewer mode and planning batch processing with a modified
+	 * configuration, i.e. the command line has been supplied a normal viewer mode
+	 * database and also a psfx file. The settings from the database will already have 
+	 * been loaded, this will load any modules that weren't there and will override all the 
+	 * settings in other modules with these ones (except some specials such as data storage locations)
+	 * @param psfxFile Name of additional psfx file. 
+	 */
+	private boolean loadOtherSettings(String psfxName) {
+		
+		File psfxFile = new File(psfxName);
+		if (psfxFile.exists() == false) {
+			return false;
+		}
+
+		PamSettingsGroup settingsGroup = PSFXReadWriter.getInstance().loadFileSettings(psfxFile);
+		if (settingsGroup == null) {
+			return false;
+		}
+		
+		BatchViewSettingsImport importer = new BatchViewSettingsImport(this, settingsGroup);
+		importer.importSettings();
+		return true;
+	}
+	
 	/**
 	 * Called to load a specific set of PAMGUARD settings in 
 	 * viewer mode, which were previously loaded in from a 

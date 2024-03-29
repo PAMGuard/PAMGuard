@@ -5,6 +5,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.swing.BoxLayout;
@@ -18,6 +19,9 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.jdesktop.swingx.JXDatePicker;
 
+import Array.ArrayManager;
+import Array.Hydrophone;
+import Array.PamArray;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamView.panel.WestAlignedPanel;
@@ -28,6 +32,7 @@ import nilus.MetadataInfo;
 import nilus.ResponsibleParty;
 import tethys.TethysTimeFuncs;
 import tethys.calibration.CalibrationHandler;
+import tethys.niluswraps.NilusChecker;
 import tethys.swing.export.ResponsiblePartyPanel;
 
 public class CalibrationsContactCard extends CalibrationsCard {
@@ -41,6 +46,8 @@ public class CalibrationsContactCard extends CalibrationsCard {
 	private MetadataInfo metaData;
 	
 	private JButton copyDown, copyUp;
+	
+	private JComboBox<String> hydrophoneSelection;
 	
 	public CalibrationsContactCard(PamWizard pamWizard) {
 		super(pamWizard, "Contact Details");
@@ -56,17 +63,26 @@ public class CalibrationsContactCard extends CalibrationsCard {
 		
 		JPanel datePanel = new JPanel(new GridBagLayout());
 		JPanel lp = new WestAlignedPanel(datePanel);
-		lp.setBorder(new TitledBorder("Calibration date"));
+		lp.setBorder(new TitledBorder("Date and hydrophones"));
 		GridBagConstraints c = new PamGridBagContraints();
 		datePanel.add(new JLabel("Calibration date: ", JLabel.RIGHT), c);
 		datePicker = new JXDatePicker();
 		c.gridx++;
 		datePanel.add(datePicker, c);
-		c.gridx = 0;
-		c.gridy++;
-		datePanel.add(new JLabel("Update Frequency", JLabel.RIGHT), c);
+//		c.gridx = 0;
+		c.gridx++;
+		datePanel.add(new JLabel("  Update Frequency ", JLabel.RIGHT), c);
 		c.gridx++;
 		datePanel.add(updateInterval, c);
+		c.gridx = 0;
+		c.gridy++;
+		datePanel.add(new JLabel("  Hydrophones ", JLabel.RIGHT), c);
+		c.gridwidth = 5;
+		c.gridx++;
+		hydrophoneSelection = new JComboBox<>();
+		datePanel.add(hydrophoneSelection, c);
+		hydrophoneSelection.setToolTipText("Select which hydrophone calibrations to export");
+		
 		
 		calibrator = new ResponsiblePartyPanel("Technical Person");
 		dataManager = new ResponsiblePartyPanel("Data Manager");
@@ -125,6 +141,11 @@ public class CalibrationsContactCard extends CalibrationsCard {
 		}
 		metaData.setContact(checkRPChildren(metaData.getContact()));
 		dataManager.getParams(metaData.getContact());
+		ResponsibleParty metaContact = metaData.getContact();
+		NilusChecker.removeEmptyFields(metaData);
+		if (metaData.getContact() == null) {
+			return PamDialog.showWarning(getPamWizard(), "Missing data", "The Data Manager fields must be completed");
+		}		
 		
 		metaData.setUpdateFrequency((String) updateInterval.getSelectedItem());
 		metaData.setDate(TethysTimeFuncs.xmlGregCalFromMillis(System.currentTimeMillis()));
@@ -135,6 +156,10 @@ public class CalibrationsContactCard extends CalibrationsCard {
 		}
 		long millis = date.getTime();
 		cardParams.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(millis));
+		
+		
+		checkEmptyFields(rp);
+		checkEmptyFields(metaData);
 		
 		return true;
 	}
@@ -192,6 +217,16 @@ public class CalibrationsContactCard extends CalibrationsCard {
 			datePicker.setDate(new Date(TethysTimeFuncs.millisFromGregorianXML(ts)));
 		}
 		
+		hydrophoneSelection.removeAllItems();
+		hydrophoneSelection.addItem("All hydrophones");
+		PamArray array = ArrayManager.getArrayManager().getCurrentArray();
+		ArrayList<Hydrophone> phones = array.getHydrophoneArray();
+		int i = 0;
+		for (Hydrophone phone : phones) {
+			String txt = String.format("Hydrophone %d, %s, %3.1f dBre1\u00B5Pa", i, phone.getType(), phone.getSensitivity());
+			hydrophoneSelection.addItem(txt);
+			i++;
+		}
 
 	}
 

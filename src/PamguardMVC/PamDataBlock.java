@@ -636,7 +636,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 
 	/**
 	 * Find a dataunit based on it's database index. If there have been no updates,
-	 * then database indexes should be in order and a fast find canbe used. If
+	 * then database indexes should be in order and a fast find can be used. If
 	 * however, there have been updates, then things will not be in order so it's
 	 * necessary to go through everything from start to end.
 	 * 
@@ -2164,7 +2164,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 */
 	@Override
 	public String toString() {
-		return getDataName();
+		return getLongDataName();
 	}
 
 	/**
@@ -4285,5 +4285,27 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 		inputEl.setAttribute("Name", getLongDataName());
 		inputEl.setAttribute("Channels", String.format("0x%X", getChannelMap()));
 		return inputEl;
+	}
+
+	/**
+	 * Look in every data block, particularly threaded ones, and dump
+	 * the buffer status. This will have to go via PamProcess so that 
+	 * additional information can be added from any processes that 
+	 * hold additional data in other internal buffers. 
+	 * @param message Message to print prior to dumping buffers for debug. 
+	 * @param sayEmpties dump info even if a buffer is empty (otherwise, only ones that have stuff still)
+	 */
+	public void dumpBufferStatus(String message, boolean sayEmpties) {
+		if (sayEmpties || unitsAdded > 0) {
+			System.out.printf("Datablock %s: Added %d data units\n", getLongDataName(), unitsAdded);
+		}
+		int nObs = countObservers();
+		for (int i = 0; i < nObs; i++) {
+			PamObserver obs = getPamObserver(i);
+			if (obs instanceof ThreadedObserver) {
+				ThreadedObserver tObs = (ThreadedObserver) obs;
+				tObs.dumpBufferStatus(message, sayEmpties);
+			}
+		}
 	}
 }

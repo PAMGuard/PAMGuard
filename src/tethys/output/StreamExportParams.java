@@ -98,7 +98,11 @@ public class StreamExportParams implements Serializable {
 	 * @return
 	 */
 	public DescriptionType getNilusDetectionDescription() {
-		return getDetectionDescription().getDescription();
+		WrappedDescriptionType desc = getDetectionDescription();
+		if (desc == null) {
+			return null;
+		}
+		return desc.getDescription();
 	}
 
 }

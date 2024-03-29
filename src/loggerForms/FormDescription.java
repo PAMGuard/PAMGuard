@@ -1598,7 +1598,9 @@ public class FormDescription implements Cloneable, Comparable<FormDescription> {
 			normalForm.destroyForm();
 		}
 		if (hiddenForm != null) {
-			normalForm.destroyForm();
+			if (normalForm != null) {
+				normalForm.destroyForm();
+			}
 		}
 		if (subtabForms != null) {
 			for (LoggerForm aForm:subtabForms) {

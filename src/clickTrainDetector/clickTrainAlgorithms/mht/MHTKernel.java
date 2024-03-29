@@ -3,6 +3,7 @@ package clickTrainDetector.clickTrainAlgorithms.mht;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
+import java.util.Comparator;
 
 import PamUtils.PamArrayUtils;
 import PamguardMVC.debug.Debug;
@@ -285,28 +286,39 @@ public class MHTKernel<T> {
 			BitSet currentBitSet;
 			MHTChi2<T> mhtChi2;
 			int index; 
-			for (int i=0; i<possibleTracks.size(); i++) {
+			synchronized(trackSynchronisation) {
+				try {
+				for (int i=0; i<possibleTracks.size(); i++) {
 
-				currentBitSet=possibleTracks.get(i).trackBitSet;
+					currentBitSet=possibleTracks.get(i).trackBitSet;
 
-				//index is the total detection count-1; 
-				index=kcount-1; 
+					//index is the total detection count-1; 
+					index=kcount-1; 
 
-				//now add both a true and false for the data unit to be in this possibility. 
-				currentBitSet.set(index, true);
-				mhtChi2=possibleTracks.get(i).chi2Track.cloneMHTChi2(); 
+					//now add both a true and false for the data unit to be in this possibility. 
+					currentBitSet.set(index, true);
+					mhtChi2=possibleTracks.get(i).chi2Track.cloneMHTChi2(); 
 
-				newPossibilities.add(new TrackBitSet(currentBitSet, mhtChi2)); 
+					newPossibilities.add(new TrackBitSet(currentBitSet, mhtChi2)); 
 
-				//add a coast to the possibility
-				currentBitSet=(BitSet) currentBitSet.clone(); 
-				currentBitSet.set(index, false);
-				//currentBitSet.set(currentBitSet.size(), true);
-				//add new chi2 value -  need to clone this time. 
-				mhtChi2=possibleTracks.get(i).chi2Track.cloneMHTChi2(); 
+					//add a coast to the possibility
+					currentBitSet=(BitSet) currentBitSet.clone(); 
+					currentBitSet.set(index, false);
+					//currentBitSet.set(currentBitSet.size(), true);
+					//add new chi2 value -  need to clone this time. 
+					/*
+					 * This line can throw an error due to poor sunchronisation if 
+					 * the list is emptied from a different thread. 
+					 */
+					mhtChi2=possibleTracks.get(i).chi2Track.cloneMHTChi2(); 
 
-				//added the cloned bitset to not mess up references 
-				newPossibilities.add(new TrackBitSet(currentBitSet, mhtChi2)); 
+					//added the cloned bitset to not mess up references 
+					newPossibilities.add(new TrackBitSet(currentBitSet, mhtChi2)); 
+				}
+				}
+				catch (Exception e) {
+					System.out.printf("*******  MHTKernel Exception %s in growProbMatrix: %s\n", e.getClass().getSimpleName(), e.getMessage());
+				}
 			}
 		}
 
@@ -342,10 +354,21 @@ public class MHTKernel<T> {
 			//first sort the tracks by increasing chi2 values. 
 			//sort the possible tracks by chi2 values
 			//now sort the chi2 values so they correspond to the track list.  
-			Collections.sort(newPossibleTracks, (left, right)->{
-				//Note- this is definitely in the correct order
-				return Double.compare(left.chi2Track.getChi2(), right.chi2Track.getChi2());
-			});		
+//			Collections.sort(newPossibleTracks, (left, right)->{
+//				//Note- this is definitely in the correct order
+//				return Double.compare(left.chi2Track.getChi2(), right.chi2Track.getChi2());
+//			});		
+			try {
+			Collections.sort(newPossibleTracks, new Comparator<TrackBitSet>() {
+				@Override
+				public int compare(TrackBitSet left, TrackBitSet right) {
+					return Double.compare(left.chi2Track.getChi2(), right.chi2Track.getChi2());
+				}
+			});
+			}
+			catch (Exception e) {
+				System.out.printf("Handled  MHTKernel Exception %s in pruneProbMatrix: %s\n", e.getClass().getSimpleName(), e.getMessage());
+			}
 
 			//			for (int i=0; i<newPossibleTracks.size(); i++) {
 			//				System.out.print("Possibility chi2: " + i +  "  " + String.format("%.3f", newPossibleTracks.get(i).chi2Track.getChi2()));

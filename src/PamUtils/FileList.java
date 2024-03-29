@@ -60,17 +60,19 @@ public class FileList {
 //		System.out.println("Adding files from folder " + folder.getAbsolutePath());
 		// first go through all the files in this folder
 		File[] newFiles = folder.listFiles(fileFilter);
+		if (newFiles == null) {
+			return fileList; // nothing to do here. 
+		}
 		for (int i = 0; i < newFiles.length; i++) {
 			if (!newFiles[i].isDirectory()) {
 				fileList.add(newFiles[i]);
-//				System.out.println("  adding file " + newFiles[i].getName());
+				//				System.out.println("  adding file " + newFiles[i].getName());
 			}
 			else if (includeSubFolders) {
 				fileList = addFiles(newFiles[i], fileList, fileFilter, includeSubFolders);
 			}
 		}
-		
-		
+
 		return fileList;
 	}
 }

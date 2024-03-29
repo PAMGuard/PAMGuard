@@ -97,7 +97,10 @@ abstract public class DataBlockSpeciesManager<T extends PamDataUnit> {
 	public SpeciesMapItem getSpeciesItem(T dataUnit) {
 		String speciesString = getSpeciesCode(dataUnit);
 		if (speciesString == null) {
-			return getDefaultDefaultSpecies();
+			SpeciesMapItem def = getDefaultDefaultSpecies();
+			if (def != null) {
+				speciesString = def.getPamguardName();
+			}
 		}
 		DataBlockSpeciesMap speciesMap = getDatablockSpeciesMap();
 		if (speciesMap == null) {
@@ -127,7 +130,26 @@ abstract public class DataBlockSpeciesManager<T extends PamDataUnit> {
 		if (allCodes.size() == 0) {
 			allCodes.add("Unknown");
 		}
-		return allCodes;
+		return makeUniqueList(allCodes);
+	}
+	
+	/**
+	 * Make sure all entries in an array list are unique. 
+	 * @param list
+	 * @return updated list. 
+	 */
+	public ArrayList<String> makeUniqueList(ArrayList<String> list) {
+		if (list == null) {
+			return null;
+		}
+		ArrayList<String> newList = new ArrayList();
+		for (String aStr : list) {
+			if (newList.contains(aStr)) {
+				continue;
+			}
+			newList.add(aStr);
+		}
+		return newList;
 	}
 	
 	public DataBlockSpeciesMap getDatablockSpeciesMap() {

@@ -38,8 +38,10 @@ public class DecimatorProcessW extends PamProcess {
 
 	@Override
 	public void pamStart() {
-		// TODO Auto-generated method stub
-
+		outputDataBlock.reset();
+		if (decimatorWorker != null) {
+			decimatorWorker.reset();
+		}
 	}
 
 	@Override

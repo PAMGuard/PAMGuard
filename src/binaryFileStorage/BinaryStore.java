@@ -37,6 +37,7 @@ import dataMap.OfflineDataMap;
 import dataMap.OfflineDataMapPoint;
 import PamController.AWTScheduler;
 import PamController.DataInputStore;
+import PamController.DataIntegrityChecker;
 import PamController.DataOutputStore;
 import PamController.OfflineDataStore;
 import PamController.PamControlledUnit;
@@ -74,6 +75,7 @@ import annotation.binary.AnnotationBinaryData;
 import annotation.handler.AnnotationHandler;
 import backupmanager.BackupInformation;
 import binaryFileStorage.backup.BinaryBackupStream;
+import binaryFileStorage.checker.BinaryIntegrityChecker;
 import binaryFileStorage.layoutFX.BinaryStoreGUIFX;
 
 /**
@@ -155,6 +157,8 @@ PamSettingsSource, DataOutputStore {
 	private PamControlledGUISwing binaryStoreGUISwing;
 
 	private BackupInformation backupInformation;
+
+	private BinaryDataMapMaker dataMapMaker;
 	
 	public static int getCurrentFileFormat() { 
 		return CURRENT_FORMAT;
@@ -424,6 +428,25 @@ PamSettingsSource, DataOutputStore {
 		}
 		return true;
 	}
+	
+	public boolean checkCommandLine() {
+		/*
+		 * check to see if there is a command line override of the currently stored folder name. 
+		 */
+		String globFolder = GlobalArguments.getParam(GlobalFolderArg);
+		if (globFolder == null) {
+			return false;
+		}
+		boolean ok = checkGlobFolder(globFolder);
+		if (ok) {
+			binaryStoreSettings.setStoreLocation(globFolder); // remember it. 
+			return true;
+		}
+		else {
+			System.err.println("Unable to set binary storage folder " + globFolder);
+			return false;
+		}
+	}
 
 	/**
 	 * Set and create if necessary the global folder. 
@@ -601,7 +624,8 @@ PamSettingsSource, DataOutputStore {
 
 		// this first operation should be fast enough that it doesn't
 		// need rethreading. 
-		if (isViewer()) {
+		boolean hasCommandLine = checkCommandLine();
+		if (isViewer() && !hasCommandLine) {
 			BinaryStoreSettings newSettings = null;
 			if (PamGUIManager.isSwing()) {
 				//open the swing dialog.
@@ -790,8 +814,8 @@ PamSettingsSource, DataOutputStore {
 		 *  updates to the dialog to display progress, then close the 
 		 *  dialog. 
 		 */
-		BinaryDataMapMaker bdmm = new BinaryDataMapMaker(this);
-		AWTScheduler.getInstance().scheduleTask(bdmm);
+		dataMapMaker = new BinaryDataMapMaker(this);
+		AWTScheduler.getInstance().scheduleTask(dataMapMaker);
 
 	}
 
@@ -923,6 +947,9 @@ PamSettingsSource, DataOutputStore {
 			}
 			PamController.getInstance().notifyModelChanged(PamControllerInterface.CHANGED_OFFLINE_DATASTORE);
 //			System.out.println("BinaryDataMapMaker really done " + this);
+			dataMapMaker = null;
+			
+			getInegrityChecker().checkDataStore();
 		}
 
 		@Override
@@ -2554,8 +2581,25 @@ PamSettingsSource, DataOutputStore {
 		return storeDeleter.deleteDataFrom(timeMillis);
 	}
 	@Override
+	public int getOfflineState() {
+		int state = super.getOfflineState();
+		if (dataMapMaker != null) {
+			System.out.println("Binary store is map making");
+			state = Math.max(state, PamController.PAM_MAPMAKING);
+		}
+		if (datagramManager != null & datagramManager.getStatus()) {
+			state = Math.max(state, PamController.PAM_MAPMAKING);
+			System.out.println("Binary store is creating datagram");
+		}
+		return state;
+	}
+  
 	public String getDataLocation() {
 		return binaryStoreSettings.getStoreLocation();
+	}
+	@Override
+	public DataIntegrityChecker getInegrityChecker() {
+		return new BinaryIntegrityChecker(this);
 	}
 	
 }

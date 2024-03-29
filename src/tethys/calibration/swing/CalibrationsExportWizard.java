@@ -5,6 +5,7 @@ import java.awt.Window;
 import PamView.wizard.PamWizard;
 import PamView.wizard.PamWizardCard;
 import nilus.Calibration;
+import tethys.calibration.CalibrationHandler;
 
 public class CalibrationsExportWizard extends PamWizard {
 
@@ -13,8 +14,9 @@ public class CalibrationsExportWizard extends PamWizard {
 	private CalibrationsExportWizard(Window parentFrame, Calibration sampleDocument) {
 		super(parentFrame, "Calibrations Export");
 		this.sampleDocument = sampleDocument;
-		addCard(new CalibrationProcessCard(this));
 		addCard(new CalibrationsContactCard(this));
+		addCard(new CalibrationProcessCard(this));
+		setHelpPoint(CalibrationHandler.helpPoint);
 	}
 	
 	public static Calibration showWizard(Window parentFrame, Calibration sampleDocument) {

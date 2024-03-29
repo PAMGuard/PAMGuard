@@ -407,7 +407,12 @@ public class ClickDisplayManager implements PamSettings {
 
 	public Serializable getSettingsReference() {
 		cdmp.countEverything(this);
+		cdmp.saveDisplayLocations(getWindowList());
 		return cdmp;
+	}
+	
+	public void restoreWindowSizes() {
+		cdmp.restoreWindowSizes(getWindowList());
 	}
 
 	public int countDisplays(Class displayType) {
