@@ -256,33 +256,6 @@ public class ArchiveModelWorker extends GenericModelWorker {
 	public boolean isModelNull() {
 		return dlModel==null;
 	}
-	
-	/**
-	 * Find the first file within a zip folder that matches a pattern. 
-	 * @param zipFile - uri to the zip file
-	 * @param filePattern - the file pattern to match - the file must contain this string. 
-	 * @return null if no file found and the file pqth if the file is founf
-	 * @throws ZipException
-	 * @throws IOException
-	 */
-	static String getZipFilePath(File zipFileIn, String filePattern) throws ZipException, IOException {
-			
-		try (ZipFile zipFile = new ZipFile(zipFileIn)) {
-		    Enumeration<? extends ZipEntry> entries = zipFile.entries();
-		    //this iterates through all files, including in sub folders. 
-		    while (entries.hasMoreElements()) {
-		        ZipEntry entry = entries.nextElement();
-		        // Check if entry is a directory
-		        if (!entry.isDirectory()) {
-		           //System.out.println(entry); 
-		           if (entry.getName().contains(filePattern)) {
-		        	   return entry.getName();
-		           }
-		        }
-		    }
-		}
-		return null;
-	}
 
 
 }

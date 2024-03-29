@@ -39,6 +39,7 @@ import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.RawDLParams;
 import warnings.PamWarning;
+import whistlesAndMoans.ConnectedRegionDataUnit;
 
 /**
  * The settings pane. 
@@ -159,6 +160,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		sourcePane = new GroupedSourcePaneFX("Raw Sound Data", RawDataUnit.class, true, false, true);
 		sourcePane.addSourceType(ClickDetection.class, false);
 		sourcePane.addSourceType(ClipDataUnit.class, false);
+		sourcePane.addSourceType(ConnectedRegionDataUnit.class, false);
 
 
 		vBox.getChildren().add(sourcePane);

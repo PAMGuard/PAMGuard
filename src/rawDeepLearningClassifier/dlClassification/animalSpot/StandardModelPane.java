@@ -201,6 +201,7 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 		//speciesIDBox.setMaxWidth(100);
 //		speciesIDBox.setPrefWidth(100);
 		speciesIDBox.prefHeightProperty().bind(detectionSpinner.heightProperty());
+		speciesIDBox.setMaxWidth(200); //otherwise expands too much if multiple classes selected
 		
 		validator = new PamValidator();
 		

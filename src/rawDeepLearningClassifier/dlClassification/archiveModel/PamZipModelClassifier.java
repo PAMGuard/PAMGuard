@@ -6,6 +6,7 @@ import java.net.URI;
 import java.util.zip.ZipException;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.DLStatus;
+import rawDeepLearningClassifier.DLZipUtils;
 
 /**
  * Loads a zip file and checks for a saved model alongside a pamguard settings file
@@ -72,8 +73,8 @@ public class PamZipModelClassifier extends ArchiveModelClassifier {
 	 * @throws ZipException
 	 * @throws IOException
 	 */
-	private static String getZipFilePath(URI zipUri, String filePattern) throws ZipException, IOException {
-		return ArchiveModelWorker.getZipFilePath(new File(zipUri),  filePattern);
+	public  static String getZipFilePath(URI zipUri, String filePattern) throws ZipException, IOException {
+		return DLZipUtils.getZipFilePath(new File(zipUri),  filePattern);
 	}
 	
 	/**

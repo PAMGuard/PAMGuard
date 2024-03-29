@@ -58,9 +58,14 @@ public class SimpleArchiveModel extends ArchiveModel {
 		return "zip_model";
 	}
 
-	
+	/**
+	 * Gte the relative path of file within a zip folder. 
+	 * @param zipFolder
+	 * @param fileEnd
+	 * @return
+	 * @throws IOException
+	 */
 	private static String getRelFilePath(String zipFolder, String fileEnd) throws IOException {
-		  // find files matched `png` file extension from folder C:\\test
 		  try (Stream<Path> walk = Files.walk(Paths.get(zipFolder))) {
 		      List<String> result = walk
 		              .filter(p -> !Files.isDirectory(p))   // not a directory

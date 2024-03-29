@@ -177,7 +177,6 @@ public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 
 	@Override
 	public boolean isModelType(URI uri) {
-		//Ketos is easy because there are not many files with a .ktpb extension. 
 		return super.isModelExtensions(uri);
 	}
 

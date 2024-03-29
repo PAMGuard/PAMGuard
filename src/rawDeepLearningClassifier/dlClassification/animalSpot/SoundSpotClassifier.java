@@ -62,9 +62,7 @@ public class SoundSpotClassifier extends StandardClassifierModel {
 		this.soundSpotUI= new SoundSpotUI(this); 
 		//load the previous settings
 		PamSettingManager.getInstance().registerSettings(this);
-
 //		System.out.println("LOADED CLASS NAMES: currParams.classNames: " + soundSpotParmas.classNames); 
-
 	}
 
 

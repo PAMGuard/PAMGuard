@@ -12,7 +12,7 @@ public enum DLStatus {
 			" The model failed to load - this could be because it is incompatible with PAMGuard or an uknown file format.",
 			ErrorLevel.ERROR),
 
-	MODEL_LOAD_SUCCESS("The model loaded", " The model successfully load", ErrorLevel.NO_ERROR),
+	MODEL_LOAD_SUCCESS("The model loaded", " The model successfully loaded", ErrorLevel.NO_ERROR),
 
 	DOWNLOAD_STARTING("Download starting", "The model is downloading", ErrorLevel.NO_ERROR),
 

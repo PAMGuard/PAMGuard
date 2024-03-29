@@ -21,6 +21,7 @@ import PamguardMVC.debug.Debug;
 import clickDetector.ClickDetection;
 import clipgenerator.ClipDataUnit;
 import rawDeepLearningClassifier.DLControl;
+import whistlesAndMoans.ConnectedRegionDataUnit;
 import PamUtils.PamCalendar;
 
 
@@ -58,7 +59,12 @@ public class SegmenterProcess extends PamProcess {
 	private SegmenterDataBlock segmenterDataBlock;
 
 	PamSymbol defaultSymbol = new PamSymbol(PamSymbolType.SYMBOL_DIAMOND, 10, 12, false,
-			Color.CYAN, Color.CYAN); 
+			Color.CYAN, Color.CYAN);
+
+	/**
+	 * Holds groups of data units which are within a defined segment. 
+	 */
+	private SegmenterGroupDataBlock segmenterGroupDataBlock; 
 
 
 	public SegmenterProcess(DLControl pamControlledUnit, PamDataBlock parentDataBlock) {
@@ -76,7 +82,12 @@ public class SegmenterProcess extends PamProcess {
 
 		segmenterDataBlock = new SegmenterDataBlock("Segmented Raw Data", this,
 				dlControl.getDLParams().groupedSourceParams.getChanOrSeqBitmap());
+		
+		segmenterGroupDataBlock = new SegmenterGroupDataBlock("Segmented Raw Data", this,
+				dlControl.getDLParams().groupedSourceParams.getChanOrSeqBitmap());
+		
 		addOutputDataBlock(segmenterDataBlock);
+		addOutputDataBlock(segmenterGroupDataBlock);
 
 		setProcessName("Segmenter");  
 
@@ -208,8 +219,22 @@ public class SegmenterProcess extends PamProcess {
 			else if (pamRawData instanceof ClipDataUnit)  {
 				newClipData(pamRawData);
 			}
+			else if (pamRawData instanceof ConnectedRegionDataUnit)  {
+				newWhistleData(pamRawData);
+			}
 		}
 
+	}
+
+
+	/**
+	 * A new whistle data unit. 
+	 * @param dataUnit - the whistle data unit. 
+	 */
+	private void newWhistleData(PamDataUnit dataUnit) {
+		ConnectedRegionDataUnit rawDataUnit = (ConnectedRegionDataUnit) dataUnit;
+
+		
 	}
 
 
@@ -344,7 +369,7 @@ public class SegmenterProcess extends PamProcess {
 	 * 
 	 * @param unit         - the data unit which contains relevant metadata on time
 	 *                     etc.
-	 * @param rawDataChunk - the sound chunk to segment extracted form the data
+	 * @param rawDataChunk - the sound chunk to segment extracted from the data
 	 *                     unit.
 	 * @param iChan        - the channel that is being segmented
 	 * @param forceSave    - make sure that all data is passed into the buffers and
