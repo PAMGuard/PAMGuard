@@ -354,6 +354,9 @@ public class PamUtils {
 	  * @return output angle (degrees)
 	  */
 	static public double constrainedAngle(double angle) {
+		if (Double.isInfinite(angle) || Double.isNaN(angle)) {
+			return angle;
+		}
 		while (angle >= 360) {
 			angle -= 360;
 		}
@@ -369,6 +372,9 @@ public class PamUtils {
 	  * @return output angle (radians)
 	  */
 	static public double constrainedAngleR(double angle) {
+		if (Double.isInfinite(angle) || Double.isNaN(angle)) {
+			return angle;
+		}
 		while (angle >= 2*Math.PI) {
 			angle -= 2*Math.PI;
 		}
@@ -384,6 +390,9 @@ public class PamUtils {
 	  * @return output angle (degrees)
 	  */
 	static public double constrainedAngle(double angle, double maxAngle) {
+		if (Double.isInfinite(angle) || Double.isNaN(angle)) {
+			return angle;
+		}
 		while (angle >= maxAngle) {
 			angle -= 360;
 		}
@@ -401,6 +410,9 @@ public class PamUtils {
 	  * @return output angle (radians)
 	  */
 	static public double constrainedAngleR(double angle, double maxAngle) {
+		if (Double.isInfinite(angle) || Double.isNaN(angle)) {
+			return angle;
+		}
 		while (angle > maxAngle) {
 			angle -= 2*Math.PI;
 		}

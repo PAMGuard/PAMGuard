@@ -129,7 +129,9 @@ public class NilusSettingsWrapper<T extends Object> implements Serializable, Clo
 			Document doc = builder.parse(new InputSource(new StringReader(xmlString)));
 			return doc;
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
+			System.out.println("Nilus Settings wrapper - Error parsing string\n" + xmlString);
+//			e.printStackTrace();
 		}
 		return null;
 	}

@@ -28,6 +28,9 @@ public class XMLStringView extends PamDialog {
 		
 		getCancelButton().setVisible(false);
 		setModal(false);
+		
+		getOkButton().setText("Close");
+		getOkButton().setToolTipText("Close window");
 	}
 	
 	public static void showDialog(Window parent, String collection, String documentId, String xmlString) {
@@ -38,7 +41,7 @@ public class XMLStringView extends PamDialog {
 
 	@Override
 	public boolean getParams() {
-		return false;
+		return true;
 	}
 
 	@Override

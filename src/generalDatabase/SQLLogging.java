@@ -2077,8 +2077,9 @@ public abstract class SQLLogging {
 		ArrayList<PamSubtableData> tableList = new ArrayList<PamSubtableData>();
 		int n = 0;
 		try {
+			PamSubtableDefinition subtableTableDef = (PamSubtableDefinition) getTableDefinition();
+			PamTableItem clickNoItem = subtableTableDef.findTableItem("ClickNo");
 			while (subtableResults.next()) {
-				PamSubtableDefinition subtableTableDef = (PamSubtableDefinition) getTableDefinition();
 				PamTableItem tableItem;
 //				transferDataFromResult(con.getSqlTypes(), subtableResults);
 				for (int i = 0; i < subtableTableDef.getTableItemCount(); i++) {
@@ -2102,6 +2103,9 @@ public abstract class SQLLogging {
 				subtableData.setLongName(subtableTableDef.getLongName().getStringValue());
 				subtableData.setBinaryFilename(subtableTableDef.getBinaryfile().getStringValue());
 				subtableData.setDbIndex(subtableTableDef.getIndexItem().getIntegerValue());
+				if (clickNoItem != null) {
+					subtableData.setClickNumber(clickNoItem.getIntegerValue());
+				}
 				try {
 					subtableData.setChildUID(subtableTableDef.getUidItem().getLongObject());
 				}

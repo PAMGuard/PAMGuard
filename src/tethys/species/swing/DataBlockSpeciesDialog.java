@@ -49,16 +49,7 @@ public class DataBlockSpeciesDialog extends PamDialog {
 				+ "\"Other Phenomena\" (-10).  "
 				+ "<br>When known, a call or sound type should "
 				+ "be specified (see help for more information).</html>";
-		nPanel.add(BorderLayout.CENTER, new JLabel(otherMsg , JLabel.LEFT));
-//		JPanel nwBit = new JPanel(new FlowLayout());
-//		JButton exportButton = new JButton("Export");
-//		exportButton.addActionListener(SpeciesMapManager.getInstance().getExportAction(parentFrame));
-//		nwBit.add(exportButton);
-//		JButton importButton = new JButton("Import");
-//		importButton.addActionListener(SpeciesMapManager.getInstance().getImportAction(parentFrame));
-//		nwBit.add(importButton);
-//		nPanel.add(BorderLayout.WEST, nwBit);
-		
+		nPanel.add(BorderLayout.CENTER, new JLabel(otherMsg , JLabel.LEFT));		
 		
 		mainPanel.add(BorderLayout.NORTH, nPanel);
 		setDialogComponent(mainPanel);
