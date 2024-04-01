@@ -102,8 +102,8 @@ public class RightWhaleModel1 implements DLModel {
 	@Override
 	public URI getCitationLink() {
 		try {
-			return new URL("https://doi.org/10.1038/s41598-020-57549-y").toURI();
-		} catch (MalformedURLException | URISyntaxException e) {
+			return new URI("https://doi.org/10.1038/s41598-020-57549-y");
+		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;

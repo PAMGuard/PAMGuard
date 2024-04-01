@@ -217,7 +217,7 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
           .withMethod(c -> {
         	int nChecked = c.get("species_box");
         	
-        	if (nChecked==speciesIDBox.getItems().size()) {
+        	if (nChecked==speciesIDBox.getItems().size() && speciesIDBox.getItems().size()>1) {
                 c.warn("All output class are checked. If one of these classes is noise then PAMGuard will continually detect all sound data...");
         	}
         	

@@ -295,4 +295,26 @@
   -fx-background-color: -color-cell-border, -color-cell-bg-selected;
 }
 
+/*******************************************************************************
+ *                                                                             *
+ *  For some reason the table background is white and so this needs fixed. 
+ *                                                                             *
+ ******************************************************************************/
+
+
+.table-view {
+  -color-cell-bg: -color-bg-default;
+  -color-cell-fg: -color-fg-default;
+  -color-cell-bg-selected: -color-base-6;
+  -color-cell-fg-selected: -color-fg-default;
+  -color-cell-bg-odd: -color-bg-subtle;
+  -color-cell-border: -color-border-default;
+  -fx-border-color: -color-cell-border;
+  -fx-control-inner-background: -color-bg-default;
+  -fx-border-width: 1px;
+  -fx-border-radius: 0;
+  -color-header-bg: -color-bg-subtle;
+  -color-header-fg: -color-fg-default;
+}
+
 

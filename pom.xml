@@ -960,6 +960,13 @@
 	    <artifactId>fxyz3d</artifactId>
 	    <version>0.6.0</version>
 	</dependency>
+	
+	<!--  Atlanta style for JavaFX -->
+	<dependency>
+	    <groupId>io.github.mkpaz</groupId>
+	    <artifactId>atlantafx-base</artifactId>
+	    <version>2.0.1</version>
+	</dependency>
 
   </dependencies>
 </project>

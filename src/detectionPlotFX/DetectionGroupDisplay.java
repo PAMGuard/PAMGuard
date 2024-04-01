@@ -8,6 +8,7 @@ import PamController.PamSettingManager;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.superdet.SuperDetection;
+import atlantafx.base.theme.Styles;
 import detectionPlotFX.data.DDDataInfo;
 import detectionPlotFX.data.DDDataProvider;
 import detectionPlotFX.data.DDPlotRegister;
@@ -206,6 +207,9 @@ public class DetectionGroupDisplay extends PamBorderPane {
 			//hidingPane.removeHideButton();
 			hidingPane.styleHideButton(hidingPane.getHideButton(), Side.LEFT);
 			
+			//make the background dark for settings pane. 
+			detectionDisplay.getSettingsHolder().setStyle("-fx-background-color: -fx-darkbackground");
+			
 		}
 		else {
 			//the display is compact with all controls within an internal hiding pane. 
@@ -213,6 +217,7 @@ public class DetectionGroupDisplay extends PamBorderPane {
 			detectionDisplayHolder = new PamStackPane(); 
 			
 			TabPane settingsPane = new TabPane(); 
+			settingsPane.setStyle(Styles.TABS_FLOATING);
 			settingsPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
 //			settingsPane.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
 			

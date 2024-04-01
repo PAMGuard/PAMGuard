@@ -133,7 +133,7 @@ public class DLModelSelectPane extends PamBorderPane {
 		pathLabel = new Label("No classifier file selected"); 
 		//		PamButton pamButton = new PamButton("", PamGlyphDude.createPamGlyph(MaterialDesignIcon.FILE, PamGuiManagerFX.iconSize)); 
 		PamButton pamButton = new PamButton("", PamGlyphDude.createPamIcon("mdi2f-file", PamGuiManagerFX.iconSize));
-		pathLabel.setPrefWidth(100);
+		pathLabel.setMinWidth(100);
 
 		modelLoadIndicator = new ProgressIndicator(-1);
 		modelLoadIndicator.setVisible(false);
@@ -523,7 +523,7 @@ public class DLModelSelectPane extends PamBorderPane {
 		private void updateMessage(DLStatus status, long bytesDownLoaded) {
 			//the updates have their own messages but let's take some more control here. 
 			this.updateProgress(-1, 1); //set to intermediate
-			System.out.println("Status: " + status);
+			//System.out.println("Status: " + status);
 			switch (status) {
 			case CONNECTION_TO_URL:
 				this.updateMessage("Checking URL");

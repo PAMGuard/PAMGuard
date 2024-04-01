@@ -18,7 +18,7 @@ import rawDeepLearningClassifier.dlClassification.genericModel.GenericModelParam
 import rawDeepLearningClassifier.layoutFX.exampleSounds.ExampleSoundFactory.ExampleSoundType;
 
 /**
- *
+ * Atlantic version of Google's humpback whale network. 
  */
 public class HumpbackWhaleAtlantic implements DLModel {
 
@@ -34,14 +34,14 @@ public class HumpbackWhaleAtlantic implements DLModel {
 
 	@Override
 	public String getCitation() {
-		return "A. N. Allen et al., ‘A Convolutional Neural Network for Automated Detection of Humpback Whale Song in a Diverse, Long-Term Passive Acoustic Dataset’, Front. Mar. Sci., vol. 8, p. 607321, Mar. 2021";
+		return "Vincent Kather, Fabian Seipel, Benoit Berges, Genevieve Davis, Catherine Gibson, Matt Harvey, Lea-Anne Henry, Andrew Stevenson, Denise Risch; Development of a machine learning detector for North Atlantic humpback whale song. J. Acoust. Soc. Am. 1 March 2024; 155 (3): 2050–2064.";
 	}
 
 	@Override
 	public URI getModelURI() {
 		try {
-			return new URL("https://github.com/PAMGuard/deeplearningmodels/raw/master/right_whale_1/model_lenet_dropout_input_conv_all.zip").toURI();
-		} catch (MalformedURLException | URISyntaxException e) {
+			return new URI("https://github.com/PAMGuard/deeplearningmodels/raw/master/humpback_whale_2/humpback_whale_2.zip");
+		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -56,9 +56,8 @@ public class HumpbackWhaleAtlantic implements DLModel {
 	@Override
 	public URI getCitationLink() {
 		try {
-			return new URL("https://doi.org/10.3389/fmars.2021.607321").toURI();
-		} catch (MalformedURLException | URISyntaxException e) {
-			// TODO Auto-generated catch block
+			return new URI("https://doi.org/10.1121/10.0025275");
+		} catch (URISyntaxException e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -83,7 +82,6 @@ public class HumpbackWhaleAtlantic implements DLModel {
 		genericModelParams.classNames= new DLClassName[] {new DLClassName("Humpback whale", (short) 1)};
 		genericModelParams.numClasses = 1; 
 		
-		
 		genericModelParams.defaultShape= new Long[] {-1L,-1L,-1L,1L};
 		genericModelParams.shape= new Long[] {-1L,-1L,-1L,1L};
 
@@ -91,7 +89,6 @@ public class HumpbackWhaleAtlantic implements DLModel {
 		genericModelParams.dlTransfroms = DLTransformsFactory.makeDLTransforms((ArrayList<DLTransfromParams>)genericModelParams.dlTransfromParams); 
 		
 		genericModelParams.setExampleSound(ExampleSoundType.HUMPBACK_WHALE);
-		
 	}
 	
 	

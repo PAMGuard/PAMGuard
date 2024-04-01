@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import PamView.ColourScheme;
 import PamView.PamColors;
+import atlantafx.base.theme.PrimerDark;
+import atlantafx.base.theme.PrimerLight;
 
 /*
  *  PAMGUARD - Passive Acoustic Monitoring GUARDianship.
@@ -49,7 +51,8 @@ public class PamAtlantaStyle extends PamDefaultStyle {
 	 */
 	// private String guiCSS = "/Resources/css/pamCSS.css";
 	// private String guiCSS = new NordDark().getUserAgentStylesheet();
-	protected String primerlight = "/Resources/css/primer-light.css";
+//	protected String primerlight = "/Resources/css/primer-light.css";
+	protected String primerlight = new PrimerLight().getUserAgentStylesheet();
 
 	/**
 	 * Relative location of the CSS style sheet to be used for the Pamguard standard
@@ -57,7 +60,8 @@ public class PamAtlantaStyle extends PamDefaultStyle {
 	 */
 	// private String dialogCSS = "/Resources/css/pamSettingsCSS.css";
 	// private String dialogCSS = new PrimerDark().getUserAgentStylesheet();
-	protected String primerdark = "/Resources/css/primer-dark.css";
+//	protected String primerdark = "/Resources/css/primer-dark.css";
+	protected String primerdark = new PrimerDark().getUserAgentStylesheet();
 
 	
 	/**

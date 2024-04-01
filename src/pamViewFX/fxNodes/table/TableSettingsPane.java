@@ -1,6 +1,7 @@
 package pamViewFX.fxNodes.table;
 
 import pamViewFX.fxNodes.PamBorderPane;
+import atlantafx.base.theme.Styles;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
@@ -35,6 +36,7 @@ public abstract class TableSettingsPane<T> extends PamBorderPane {
 	public TableSettingsPane(ObservableList<T> data){
    		this.data=data; 
 		table = new TableView<T>();
+		
         this.setCenter(createPane());
 	}
 	
@@ -90,7 +92,7 @@ public abstract class TableSettingsPane<T> extends PamBorderPane {
         
     	
         //make sure table resized with pane to stop blank column
-        getTableView().setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        getTableView().setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
                 
     	getButtonPane().getSettingsButton().setDisable(table.getItems().size()<=0);
 		getButtonPane().getDeleteButton().setDisable(table.getItems().size()<=0);

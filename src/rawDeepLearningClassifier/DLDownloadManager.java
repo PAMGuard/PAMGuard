@@ -372,16 +372,17 @@ public class DLDownloadManager {
 		OutputStream output = new FileOutputStream(outFile);
 		long count = 0;
 		
-        Files.copy(input, outFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		
+        //Files.copy(input, outFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         
 		while ((n = input.read(buffer)) != -1) {
-			System.out.println("Chunk: " + count); 
+//			System.out.println("Chunk: " + count); 
 			count=count+n; //total bytes
 			notifyDownLoadListeners(DLStatus.DOWNLOADING, count);
 			output.write( buffer, 0, n );
 		}
 		
-		System.out.println("Chunk: " + n); 
+//		System.out.println("Chunk: " + n); 
 
 		output.close();
 

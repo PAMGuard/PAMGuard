@@ -38,7 +38,6 @@ public class HumpbackWhaleGoogle implements DLModel {
 		try {
 			return new URI("https://github.com/PAMGuard/deeplearningmodels/raw/master/humpback_whale_1/humpback_whale_1.zip");
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -54,7 +53,6 @@ public class HumpbackWhaleGoogle implements DLModel {
 		try {
 			return new URI("https://doi.org/10.3389/fmars.2021.607321");
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
@@ -79,7 +77,6 @@ public class HumpbackWhaleGoogle implements DLModel {
 		genericModelParams.classNames= new DLClassName[] {new DLClassName("Humpback whale", (short) 1)};
 		genericModelParams.numClasses = 1; 
 		
-		
 		genericModelParams.defaultShape= new Long[] {-1L,-1L,-1L,1L};
 		genericModelParams.shape= new Long[] {-1L,-1L,-1L,1L};
 
@@ -87,8 +84,6 @@ public class HumpbackWhaleGoogle implements DLModel {
 		genericModelParams.dlTransfroms = DLTransformsFactory.makeDLTransforms((ArrayList<DLTransfromParams>)genericModelParams.dlTransfromParams); 
 		
 		genericModelParams.setExampleSound(ExampleSoundType.HUMPBACK_WHALE);
-
-		
 	}
 	
 

@@ -39,7 +39,6 @@ public class GenericDLClassifierTest {
 	 */
 	@Test
 	public void rightWhaleDLWorker() {
-
 		System.out.println("*****Generic DL: Right whale test*****"); 
 
 		//relative paths to the resource folders.
@@ -100,8 +99,7 @@ public class GenericDLClassifierTest {
 
 
 	/**
-	 * Test the ketos classifier and tests are working properly. This tests loading
-	 * the ketos model and also using functions in KetosWorker.
+	 * Test Google's humpback whale model. 
 	 */
 	@Test
 	public void humpbackWhaleTest() {
@@ -146,7 +144,6 @@ public class GenericDLClassifierTest {
 			
 			while((line = br.readLine()) != null){
 				if (ind>0) {
-
 					//read the data from the text file
 					String[] data = line.split("\t");
 					int chunkID = Integer.valueOf(data[0]);
@@ -177,8 +174,6 @@ public class GenericDLClassifierTest {
 
 					//allow 10% scrumph to take account of slight differences in Java input. 
 					assertEquals(output[0], prediction, 0.1); //humpback whale detection
-
-
 				}
 				  ind++;
 				}

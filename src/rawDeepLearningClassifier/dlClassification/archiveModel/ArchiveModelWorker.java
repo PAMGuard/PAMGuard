@@ -173,8 +173,8 @@ public class ArchiveModelWorker extends GenericModelWorker {
 				}
 			}
 
-			if (modelParams.classNames!=null) {
-				dlParams.classNames = dlControl.getClassNameManager().makeClassNames(modelParams.classNames); 
+			if (modelParams.classNames!=null && dlControl!=null) {
+				 dlParams.classNames = dlControl.getClassNameManager().makeClassNames(modelParams.classNames); 
 			}
 			else {
 				//set the number of class names from the default output shape
