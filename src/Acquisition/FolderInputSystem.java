@@ -602,6 +602,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 	@Override
 	public File getCurrentFile() {
 		//System.out.println("All files: " +  allFiles);
+//		System.out.printf("Folder: getCurrentfile. on %d of %d\n", currentFile, allFiles.size());
 		if (allFiles != null && allFiles.size() > currentFile) {
 			return allFiles.get(currentFile);
 		}
