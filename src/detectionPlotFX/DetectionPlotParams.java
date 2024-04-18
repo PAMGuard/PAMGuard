@@ -1,5 +1,7 @@
 package detectionPlotFX;
 
+import java.util.HashMap;
+
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
@@ -13,17 +15,25 @@ import userDisplayFX.UserDisplayNodeParams;
  *
  */
 public class DetectionPlotParams extends UserDisplayNodeParams implements Cloneable, ManagedParameters  {
+
+
+	/**
+	 * 
+	 */
+	static final long serialVersionUID = 2L;
 	
 	/**
 	 * The data source for the detection plot. 
 	 */
 	public String dataSource = null;
 
-
+	
 	/**
-	 * 
+	 * Saves which data axis is used for which data block. The key is the data block long name and the 
+	 * result is the name of the plot e.g. waveform. In this way users can set how they want the data plots to display
+	 * different types of data units and the dispay types are saved on PAMGuard opne and close. 
 	 */
-	static final long serialVersionUID = 1L;
+	public HashMap<String , String > dataAxisMap = new HashMap<String , String >();
 
 
 	/* (non-Javadoc)

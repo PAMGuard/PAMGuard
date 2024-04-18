@@ -431,7 +431,7 @@ public class WavFileExportManager implements PamDataUnitExporter  {
 
 	@Override
 	public boolean exportData(File fileName,
-			List<PamDataUnit> dataUnits) {
+			List<PamDataUnit> dataUnits, boolean append) {
 		// TODO Auto-generated method stub
 		return false;
 	}

@@ -73,8 +73,7 @@ public class DetectionPlotDisplay extends PamBorderPane  {
 	/**
 	 * Pane which sits on the right hand side and 
 	 */
-	private PamBorderPane settingsHolder; 
-
+	private PamBorderPane settingsHolder;
 
 
 	/**

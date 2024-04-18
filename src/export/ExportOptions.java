@@ -57,7 +57,6 @@ public class ExportOptions implements PamSettings {
 		if (exportProcessDialog==null) {
 			exportProcessDialog= new ExportProcessDialog(exportManager); 
 		}
-		
 		this.exportProcessDialog.showOfflineDialog(parentFrame, this.storageParameters);
 		
 //		ExportParams newParams = StorageOptionsDialog.showDialog(parentFrame, storageParameters);

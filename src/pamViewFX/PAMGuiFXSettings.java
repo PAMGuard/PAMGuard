@@ -36,7 +36,7 @@ public class PAMGuiFXSettings implements Serializable, Cloneable {
 	/**
 	 * True if PG is in fullscreen on startup
 	 */
-	public boolean fullscreen = true;
+	public boolean fullscreen = false;
 	
 	
 	/* (non-Javadoc)

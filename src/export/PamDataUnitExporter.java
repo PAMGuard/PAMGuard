@@ -23,9 +23,10 @@ public interface PamDataUnitExporter {
 	 * @param fileName - the file to export to
 	 * @param prefix - file prefix for filenames. 
 	 * @param dataUnits - the data units to export. 
+	 * @param true to append the data to the current file - otherwise a new file is written. 
 	 * @return true if exported successfully. 
 	 */
-	public boolean exportData(File fileName, List<PamDataUnit> dataUnits);
+	public boolean exportData(File fileName, List<PamDataUnit> dataUnits, boolean append);
 	
 	/**
 	 * Get the extension for the output file type

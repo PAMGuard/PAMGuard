@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import PamController.PamSettingManager;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.superdet.SuperDetection;
@@ -24,7 +23,6 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
@@ -33,19 +31,16 @@ import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamStackPane;
 import pamViewFX.fxNodes.hidingPane.HidingPane;
-import pamViewFX.fxNodes.internalNode.PamInternalPane;
 import pamViewFX.fxStyles.PamStylesManagerFX;
-import userDisplayFX.UserDisplayNodeFX;
-import userDisplayFX.UserDisplayNodeParams;
 
 /**
  * 
- * A display which shows a list of data units with arrows allowing the user to 
- * navigate through the different data units. 
+ * A detection plot display with convenience functions to set any type of data unit. 
  * 
  * @author Jamie Macaulay
  *
  */
+@SuppressWarnings("rawtypes")
 public class DetectionGroupDisplay extends PamBorderPane {
 	
 	public static final int DISPLAY_COMPACT = 0;
@@ -368,14 +363,15 @@ public class DetectionGroupDisplay extends PamBorderPane {
 	 * Sets the current in the display. 
 	 * @param pamDataUnit - the current data unit to set. 
 	 * @param detectionDisplay- the detection display plot to set the data unit for. 
+	 * @return true of a new data info has been added - usually means a different type of detection to display compared to the last detection.
 	 */
-	public void setDataUnit(PamDataUnit<?, ?> dataUnit){
+	public boolean setDataUnit(PamDataUnit<?, ?> dataUnit){
 
 		detectionDisplay.clearPane();
 		
 		if (dataUnit==null) {
 			detectionDisplay.removeDataInfo();
-			return; 
+			return true; 
 		}
 
 		//		TDDataInfoFX dataInfo = this.tdGraphFX.findDataInfo(dataUnit);
@@ -407,7 +403,7 @@ public class DetectionGroupDisplay extends PamBorderPane {
 			dDataInfoHashMap.put(dataUnit.getParentDataBlock(), dDataInfo); 
 		}
 
-		if (dDataInfo==null) return; 
+		if (dDataInfo==null) return true; 
 
 		//only change the dDataInfo if it's different,. 
 		boolean newDataInfo = false; 
@@ -435,6 +431,25 @@ public class DetectionGroupDisplay extends PamBorderPane {
 		//		clearSingleType();
 
 		//TODO....highlight data unit. 
+		
+		return newDataInfo;
+	}
+	
+
+	/**
+	 * Attempts to set the detectionPlot
+	 * @param plotName
+	 * @return
+	 */
+	public boolean setDetectionPlot(String plotName) {
+	
+		//set the current detection plot based in the name
+		boolean setOk = currentDataInfo.setCurrentDetectionPlot(plotName);
+		
+		//update the detection settings pane so it shows the correct plot names etc. 
+		detectionDisplay.getDataTypePane().notifyDataChange(); 
+
+		return setOk;
 	}
 
 
@@ -445,7 +460,7 @@ public class DetectionGroupDisplay extends PamBorderPane {
 	 */
 	public void triggerListeners(PamDataUnit oldDataUnit, PamDataUnit newDataUnit) {
 		for (GroupDisplayListener aListener : displayListeners) {
-			aListener.newDataUnitSlected(oldDataUnit, newDataUnit);
+			aListener.newDataUnitSelected(oldDataUnit, newDataUnit);
 		}
 	}
 
@@ -497,6 +512,14 @@ public class DetectionGroupDisplay extends PamBorderPane {
 		return detectionGroup.get(currentUnitIndex);
 	}
 
+	
+	/**
+	 * Show the scroll bar which allows the user to chnage time limits. 
+	 * @param enableScrollBarPane - true to enable the time scroll bar. 
+	 */
+	public void setEnableScrollBar(boolean enableScrollBarPane) {
+		this.detectionDisplay.setEnableScrollBar(enableScrollBarPane);
+	}
 
 
 	

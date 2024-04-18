@@ -137,7 +137,7 @@ public class RExportManager implements PamDataUnitExporter {
 
 
 	@Override
-	public boolean exportData(File fileName, List<PamDataUnit> dataUnits) {
+	public boolean exportData(File fileName, List<PamDataUnit> dataUnits, boolean append) {
 		// TODO Auto-generated method stub
 		return false;
 	}

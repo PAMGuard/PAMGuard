@@ -140,6 +140,12 @@ public class ExportProcessDialog {
 		 */
 		private JSpinner spinner;
 
+		private ButtonGroup buttonGroup;
+
+		/**
+		 * A list of the export buttons so they are easy to select. 
+		 */
+		private JToggleButton[] exportButtons;
 
 
 		public ExportOLDialog(Window parentFrame, OfflineTaskGroup taskGroup, String title) {
@@ -150,24 +156,30 @@ public class ExportProcessDialog {
 			mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
 			mainPanel.setBorder(new TitledBorder("Export Settings"));
 
-			ButtonGroup buttonGroup = new ButtonGroup();
+			buttonGroup = new ButtonGroup();
 
 			PamPanel buttonPanel = new PamPanel();
+			
 			ActionListener listener = actionEvent -> {
 				System.out.println(actionEvent.getActionCommand() + " Selected");
+				//TODO set the buttons to be disabled or enabled. 
+				
 			};
 
+			exportButtons = new JToggleButton[exportManager.getNumExporters()];
 			for (int i = 0; i < exportManager.getNumExporters(); i++) {
 				JToggleButton b = new JToggleButton();
 				b.setToolTipText("Export to " + exportManager.getExporter(i).getName() + " file ("  + exportManager.getExporter(i).getFileExtension() + ")");
 
 				FontIcon icon = FontIcon.of(getIconFromString(exportManager.getExporter(i).getIconString()));
 				icon.setIconSize(25);
-				icon.setIconColor(Color.GRAY);
+				icon.setIconColor(Color.DARK_GRAY);
 
 				b.setIcon(icon);
 
 				b.addActionListener(listener);
+				
+				exportButtons[i]=b;
 				buttonGroup.add(b);
 				buttonPanel.add(b);
 			}
@@ -267,12 +279,13 @@ public class ExportProcessDialog {
 			return super.getParams();
 		}
 
-		
 
 		public void setParams(ExportParams params) {
 			if (params ==null) currentParams = new ExportParams(); 
 			currentParams = params.clone(); 
 
+			buttonGroup.clearSelection();
+			exportButtons[params.exportChoice].setSelected(true);
 		}
 
 	}

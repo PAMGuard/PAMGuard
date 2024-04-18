@@ -1,7 +1,10 @@
 package export.swing;
 
+import PamController.PamController;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import PamguardMVC.dataSelector.DataSelectDialog;
+import PamguardMVC.dataSelector.DataSelector;
 import dataMap.OfflineDataMapPoint;
 import export.PamExporterManager;
 import offlineProcessing.OfflineTask;
@@ -14,12 +17,21 @@ import offlineProcessing.OfflineTask;
  */
 public class ExportTask extends OfflineTask<PamDataUnit<?,?>>{
 	
-	PamExporterManager exporter; 
+	/**
+	 * Reference to the data exporter which manages exporting of data. 
+	 */
+	private PamExporterManager exporter;
+	
+	/**
+	 * The data selector for the data block
+	 */
+	private DataSelector dataSelector; 
 
 	public ExportTask(PamDataBlock<PamDataUnit<?, ?>> parentDataBlock, PamExporterManager exporter) {
 		super(parentDataBlock);
 		this.exporter = exporter; 
-		// TODO Auto-generated constructor stub
+		dataSelector=parentDataBlock.getDataSelectCreator().getDataSelector(this.getUnitName() +"_clicks", false, null);
+
 	}
 
 	@Override
@@ -41,7 +53,29 @@ public class ExportTask extends OfflineTask<PamDataUnit<?,?>>{
 
 	@Override
 	public void loadedDataComplete() {
-		// TODO Auto-generated method stub
+		//force the exporter so save any remaning data units in the buffer
+		exporter.exportDataUnit(null);
+		
+	}
+	/**
+	 * task has settings which can be called
+	 * @return true or false
+	 */
+	public boolean hasSettings() {
+		return dataSelector!=null;
+	}
+
+	/**
+	 * Call any task specific settings
+	 * @return true if settings may have changed. 
+	 */
+	public boolean callSettings() {
+		
+		dataSelector.getDialogPanel().setParams();
+		
+		DataSelectDialog dataSelectDialog = new DataSelectDialog(PamController.getMainFrame(),
+				this.getDataBlock(), dataSelector, null);
+		return dataSelectDialog.showDialog();
 		
 	}
 

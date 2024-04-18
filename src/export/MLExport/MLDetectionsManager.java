@@ -1,13 +1,19 @@
 package export.MLExport;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import PamguardMVC.PamDataUnit;
 import export.PamDataUnitExporter;
 import us.hebi.matlab.mat.format.Mat5;
+import us.hebi.matlab.mat.format.Mat5File;
+import us.hebi.matlab.mat.types.Matrix;
+import us.hebi.matlab.mat.types.Sink;
+import us.hebi.matlab.mat.types.Sinks;
 import us.hebi.matlab.mat.types.Struct;
+import us.hebi.matlab.mat.util.Casts;
 
 
 /**
@@ -47,7 +53,21 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 	}
 
 	@Override
-	public boolean exportData(File fileName, List<PamDataUnit> dataUnits) {
+	public boolean exportData(File fileName, List<PamDataUnit> dataUnits, boolean append) {
+		
+		
+		try {
+			Mat5File matFile = Mat5.newMatFile();
+			Sink sink = Sinks.newMappedFile(fileName,  Casts.sint32(1000000));
+
+			matFile.writeTo(sink);//Streams the data into a MAT file?
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+		
 		return false;
 	}
 
@@ -140,6 +160,39 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 	@Override
 	public String getName() {
 		return "MATLAB";
+	}
+	
+	public static void main(String args[]) {
+		
+		String fileName = "/Users/au671271/MATLAB-Drive/MATLAB/PAMGUARD/_test/export_test.mat";
+		
+		try {
+			Mat5File matFile = Mat5.newMatFile();
+					
+			
+			Struct mlStruct = Mat5.newStruct(3, 1);
+			Matrix triggerMap = Mat5.newScalar(Math.random()); 
+
+			mlStruct.set("triggerMap", 0, triggerMap);
+			mlStruct.set("triggerMap", 1, triggerMap);
+			mlStruct.set("triggerMap", 2, triggerMap);
+
+			matFile.addArray("test_struct", mlStruct);
+
+			//basic method to write to a file
+			Mat5.writeToFile(matFile, fileName);
+			
+
+//			Sink sink = Sinks.newMappedFile(new File(fileName),  Casts.sint32(1000000));
+//			
+//			matFile.writeTo(sink);
+//
+//			sink.close();
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	

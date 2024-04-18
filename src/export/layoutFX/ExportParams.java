@@ -16,10 +16,14 @@ public class ExportParams implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 	
 	/**
-	 * The index of the ex;port choice. 
+	 * The index of the export choice. 
 	 */
 	public int exportChoice = 0; 
 	
+	/**
+	 * The folder to save to. 
+	 */
+	public String folder = System.getProperty("user.home");
 	
 	@Override
 	public ExportParams clone()  {

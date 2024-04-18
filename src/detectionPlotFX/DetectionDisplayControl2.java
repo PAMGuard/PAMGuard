@@ -104,7 +104,7 @@ public class DetectionDisplayControl2 extends UserDisplayControlFX {
 	 */
 	public boolean newDataBlockAdded(PamDataBlock pamDataBlock){
 
-		System.out.println("NEW DATA BLOCK DETECTION DISPLAY: " + pamDataBlock); 
+		//System.out.println("NEW DATA BLOCK DETECTION DISPLAY: " + pamDataBlock); 
 
 		//if null then no parent- simply set the DDataInfo to null; 
 		if (pamDataBlock==null) {
@@ -127,6 +127,8 @@ public class DetectionDisplayControl2 extends UserDisplayControlFX {
 			//set the paramters. 
 			displays=new ArrayList<UserDisplayNodeFX>();
 			displays.add(detectionDisplay);
+			//TODO
+//			detectionDisplay.setEnableScrollBar(false); //make this an option
 		}
 		return displays;
 	}
@@ -148,7 +150,7 @@ public class DetectionDisplayControl2 extends UserDisplayControlFX {
 
 		@Override
 		public void addData(PamObservable o, PamDataUnit arg) {
-			System.out.println("DetectionDisplay: INCOMING data unit: "+ arg);
+			//System.out.println("DetectionDisplay: INCOMING data unit: "+ arg);
 			//send the data unit to the display. 
 			detectionDisplay.setDataUnit(arg);
 		}

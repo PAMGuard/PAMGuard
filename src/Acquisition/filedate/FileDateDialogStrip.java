@@ -1,6 +1,7 @@
 package Acquisition.filedate;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -14,6 +15,9 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
+import org.kordamp.ikonli.swing.FontIcon;
 
 import PamUtils.PamCalendar;
 import PamView.dialog.PamGridBagContraints;
@@ -35,7 +39,9 @@ public class FileDateDialogStrip {
 
 	private JButton settingsButton;
 
-	private ImageIcon settingsIcon = new ImageIcon(ClassLoader.getSystemResource("Resources/SettingsButtonSmall2.png"));
+//	private ImageIcon settingsIcon = new ImageIcon(ClassLoader.getSystemResource("Resources/SettingsButtonSmall2.png"));
+	public static FontIcon settingsIcon =  FontIcon.of(MaterialDesignC.COG, 20, Color.DARK_GRAY);
+
 	
 	private Window parent;	
 	

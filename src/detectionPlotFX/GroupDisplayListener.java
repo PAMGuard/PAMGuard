@@ -16,5 +16,5 @@ public interface GroupDisplayListener {
 	 * @param oldDataUnit - the old data unit. 
 	 * @param newDataUnit - the new selected data unit.
 	 */
-	public void newDataUnitSlected(PamDataUnit oldDataUnit, PamDataUnit newDataUnit);
+	public void newDataUnitSelected(PamDataUnit oldDataUnit, PamDataUnit newDataUnit);
 }

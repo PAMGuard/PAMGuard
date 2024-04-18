@@ -1,6 +1,7 @@
 package targetMotionModule.panels;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
@@ -13,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -23,6 +23,9 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
+
+import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
+import org.kordamp.ikonli.swing.FontIcon;
 
 import targetMotionModule.TargetMotionControl;
 import targetMotionModule.TargetMotionInformation;
@@ -74,8 +77,9 @@ public class TargetMotionMainPanel<T extends PamDataUnit> implements PamTabPanel
 	public JTextField comment;
 	private PamPanel southPanel;
 	
-	public ImageIcon settings = new ImageIcon(ClassLoader
-			.getSystemResource("Resources/SettingsButtonSmall2.png"));
+//	public ImageIcon settings = new ImageIcon(ClassLoader
+//			.getSystemResource("Resources/SettingsButtonSmall2.png"));
+	public static FontIcon settings =  FontIcon.of(MaterialDesignC.COG, 20, Color.DARK_GRAY);
 
 
 	public TargetMotionMainPanel(TargetMotionLocaliser<T> targetMotionLocaliser) {

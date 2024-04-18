@@ -7,6 +7,7 @@ import PamController.PamController;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamguardMVC.PamDataBlock;
+import PamguardMVC.PamDataUnit;
 import javafx.geometry.Side;
 import javafx.scene.layout.Region;
 import pamViewFX.fxNodes.internalNode.PamInternalPane;
@@ -29,7 +30,9 @@ public class DetectionGroupDisplayFX extends DetectionGroupDisplay  implements U
 	 */
 	private PamInternalPane internalFrame;
 
-	private DetectionDisplayControl2 displayControl; 
+	private DetectionDisplayControl2 displayControl;
+
+	private PamDataUnit<?, ?> currentDetection; 
 	
 	public DetectionGroupDisplayFX(DetectionDisplayControl2 displayControl){
 		super(DetectionGroupDisplay.DISPLAY_COMPACT);
@@ -152,9 +155,9 @@ public class DetectionGroupDisplayFX extends DetectionGroupDisplay  implements U
 		prepareDisplayParams();
 		detectionPlotParams = getDisplayParams();
 		
-		System.out.println("SAVE DETECTION DISPLAY DATA SOURCE: " + detectionPlotParams.dataSource);
-		System.out.println("SAVE DETECTION DISPLAY TAB NAME: " + detectionPlotParams.tabName);
-		
+//		System.out.println("SAVE DETECTION DISPLAY DATA SOURCE: " + detectionPlotParams.dataSource);
+//		System.out.println("SAVE DETECTION DISPLAY TAB NAME: " + detectionPlotParams.tabName);
+	
 		return detectionPlotParams;	
 	}
 	
@@ -182,9 +185,8 @@ public class DetectionGroupDisplayFX extends DetectionGroupDisplay  implements U
 			return false;
 		}
 		
-		System.out.println("LOAD DETECTION DISPLAY DATA SOURCE: " + settings.dataSource);
-		System.out.println("LOAD DETECTION DISPLAY DATA SOURCE: " + settings.tabName);
-
+//		System.out.println("LOAD DETECTION DISPLAY DATA SOURCE: " + settings.dataSource);
+//		System.out.println("LOAD DETECTION DISPLAY DATA SOURCE: " + settings.tabName);
 		
 		this.detectionPlotParams = settings.clone();	
 		return true;
@@ -203,6 +205,38 @@ public class DetectionGroupDisplayFX extends DetectionGroupDisplay  implements U
 	@Override
 	public UserDisplayControlFX getUserDisplayControl() {
 		return displayControl;
+	}
+	
+	@Override
+	public boolean setDataUnit(PamDataUnit<?, ?> dataUnit){
+		
+		/**
+		 * The extra stuff here is to make sure that the plot types for a specific detectin are saved. So for example 
+		 * if viewing click spectrum then the spectrum plot is selected whenever 1) PAMGuard is opned again or 2) switching from
+		 * one type of detection ot another e.g. whistle to click, then the click does nto revert to shwoing a waveform instead 
+		 * of spectrum. 
+		 */
+				
+		if (currentDetection!=null) {
+			//save the current selected detection plot for the particular type of data unit.
+			String detectionPlotName = 	this.getDetectionDisplay().getCurrentDataInfo().getCurrentDetectionPlot().getName();
+//			System.out.println("SET CURRENT DETECTION PLOT TO USE IS: " + detectionPlotName);
+			detectionPlotParams.dataAxisMap.put(currentDetection.getParentDataBlock().getLongDataName(), detectionPlotName);
+		}
+		
+		this.currentDetection = dataUnit;
+
+		//setup the new data unit
+		boolean newDataInfo = super.setDataUnit(dataUnit);
+		
+		if (newDataInfo && dataUnit!=null) {
+		//if there's a new data info we may want to set the detection back to it's most recent selection
+			String detectionPlotName = 	detectionPlotParams.dataAxisMap.get(dataUnit.getParentDataBlock().getLongDataName());
+//			System.out.println("THE CURRENT DETECTION PLOT TO USE IS: " + detectionPlotName);
+			setDetectionPlot(detectionPlotName);
+		}
+		
+		return newDataInfo;
 	}
 
 }
