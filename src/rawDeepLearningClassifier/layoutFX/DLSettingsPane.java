@@ -454,6 +454,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		//		}
 
 		currParams.useDataSelector = dataSelectorCheckBox.isSelected(); 
+		
 		if (dlControl.getDataSelector()!=null) {
 			dlControl.getDataSelector().getDialogPaneFX().getParams(true); 
 		}

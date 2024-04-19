@@ -75,17 +75,26 @@ public class GenericModelPane extends StandardModelPane  {
 
 		super.setParams(currParams);
 	}
+	
+	@Override
+	public StandardModelParams getParams(StandardModelParams currParams) {
+//		System.out.println("GET GENERIC PARAMS: " + currParams);
+
+		return super.getParams(currParams);
+	}
 
 	@Override
 	public void newModelSelected(File file) {
 		this.setCurrentSelectedFile(file);
-
+		
 		//this.setParamsClone(new GenericModelParams()); 
+		
 		//prep the model with current parameters; 
-		genericDLClassifier.getGenericDLWorker().prepModel(getParams(getParamsClone()), genericDLClassifier.getDLControl());
-		//get the model transforms calculated from the model by SoundSpoyWorker and apply them to our temporary paramters clone. 
-		//getParamsClone().dlTransfroms = this.genericDLClassifier.getGenericDLWorker().getModelTransforms(); 
-		///set the advanced pane parameters. 
+		
+//		genericDLClassifier.getGenericDLWorker().prepModel(getParams(getParamsClone()), genericDLClassifier.getDLControl());
+		//do not have getParam here as it resets some of the setting before set params has been called.
+		genericDLClassifier.getGenericDLWorker().prepModel(getParamsClone(), genericDLClassifier.getDLControl());
+
 
 		//now new parameters have been set in the prepModel functions so need to set new params now. 
 		getAdvSettingsPane().setParams(getParamsClone());

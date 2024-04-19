@@ -1155,7 +1155,7 @@ public class TDGraphFX extends PamBorderPane {
 					base = false;
 					
 					if (!dataInfo.isShowing()) {
-						System.out.println("!dataInfo.isShowing(): " + dataInfo.getDataName());
+						//System.out.println("!dataInfo.isShowing(): " + dataInfo.getDataName());
 						continue;
 					}
 

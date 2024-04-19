@@ -18,6 +18,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Spinner;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -191,9 +192,12 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 
 		gridPane.add(new Label("Min. prediction"), 0, 0);
 		gridPane.add(detectionSpinner = new PamSpinner<Double>(0.0, 1.0, 0.9, 0.1), 1, 0);
-		detectionSpinner.setPrefWidth(80);
+		detectionSpinner.setPrefWidth(70);
 		detectionSpinner.setEditable(true);
 		detectionSpinner.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
+		detectionSpinner.setTooltip(new Tooltip("Set the minimum prediciton value for selected classes. If a prediction exceeds this value "
+				+ "a detection will be saved."));
+
 
 		gridPane.add(new Label(""), 2, 0);
 		speciesIDBox = new CheckComboBox<String>(); 
@@ -201,8 +205,9 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 		//speciesIDBox.setMaxWidth(100);
 //		speciesIDBox.setPrefWidth(100);
 		speciesIDBox.prefHeightProperty().bind(detectionSpinner.heightProperty());
-		speciesIDBox.setMaxWidth(200); //otherwise expands too much if multiple classes selected
-		
+		speciesIDBox.setMaxWidth(150); //otherwise expands too much if multiple classes selected
+		speciesIDBox.setTooltip(new Tooltip("Select output classes to use for binary classification. "
+				+ "If the prediction value of a selected class exceeds the minimum prediction threshold then a detection is saved. "));
 		validator = new PamValidator();
 		
 		final SimpleIntegerProperty checkItemsCount = new SimpleIntegerProperty(); 
@@ -330,7 +335,7 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 		currParams.threshold = detectionSpinner.getValue(); 
 		//		currParams.useCUDA = useCuda.isSelected(); 
 
-//		System.out.println("StandardModelParams : this.paramsClone.numClasses " + this.paramsClone.numClasses); 
+//		System.out.println("GET PARAMS: StandardModelParams : this.paramsClone.numClasses " + this.paramsClone.numClasses); 
 	
 		
 		boolean[] speciesClass = new boolean[this.paramsClone.numClasses]; 
@@ -362,7 +367,6 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 		
 //		System.out.println("GET CLASS NAMES: currParams.classNames: " + currParams.classNames + " " +   
 //		(currParams.classNames!=null?  currParams.classNames.length: 0 + " " + currParams.numClasses)); 
-
 
 		currParams.useDefaultSegLen = usedefaultSeg.isSelected(); 
 		

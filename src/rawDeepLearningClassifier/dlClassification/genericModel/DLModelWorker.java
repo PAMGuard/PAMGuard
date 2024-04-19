@@ -11,7 +11,6 @@ import org.jamdev.jdl4pam.transforms.DLTransformsFactory;
 import org.jamdev.jdl4pam.utils.DLUtils;
 import org.jamdev.jpamutils.wavFiles.AudioData;
 
-import PamUtils.PamArrayUtils;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.segmenter.SegmenterProcess.GroupedRawData;
@@ -126,7 +125,7 @@ public abstract class DLModelWorker<T> {
 			float[] classOut; 
 			for (int i=0; i<transformedDataStack.length; i++) {
 				/**
-				 * This is super weird. Reading the documentation for copeOfRange the index from and index to are enclusive. So 
+				 * This is super weird. Reading the documentation for copyOfRange the index from and index to are inclusive. So 
 				 * to copy the first two elements indexfrom =0 and indexto = 1. But actually it seems that this should be indexfrom =0 and indexto =2. 
 				 * So do not minus one form (i+1)*numclasses. This works but I'm confused as to why?
 				 */

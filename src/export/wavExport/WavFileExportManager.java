@@ -146,7 +146,7 @@ public class WavFileExportManager implements PamDataUnitExporter  {
 
 		//add correct file type.	
 		currentPath = currentPath + ".wav";
-		currentPath = currentFolder+"/"+currentPath;
+		currentPath = currentFolder + File.pathSeparator + currentPath;
 
 		return currentPath;
 
@@ -197,7 +197,7 @@ public class WavFileExportManager implements PamDataUnitExporter  {
 		if (foundDataUnits!=null) {
 			//check whether the wav file has all data raw data units. 
 			int n =  getNWavDataUnits(foundDataUnits); 
-			hasAllWavClips = n ==  foundDataUnits.getNumDataUnits(); 
+			hasAllWavClips = (n ==  foundDataUnits.getNumDataUnits() && n!=0); //make sure to do a zero check here or raw wav data won't save
 			System.out.println("N raw data units: " + n + " N found data units: " + foundDataUnits.getNumDataUnits()); 
 		}
 
@@ -233,7 +233,6 @@ public class WavFileExportManager implements PamDataUnitExporter  {
 
 		rawDataBlock.orderOfflineData(new RawObserver(wavWrite, rawDataBlock.getChannelMap()), new RawLoadObserver(wavWrite),
 				start, end, 1, OfflineDataLoading.OFFLINE_DATA_INTERRUPT);
-
 
 		return 0; 
 	}
@@ -292,7 +291,7 @@ public class WavFileExportManager implements PamDataUnitExporter  {
 		 * @param dataUnit
 		 */
 		private void newRawData(RawDataUnit dataUnit) {
-			//			System.out.println(" Time millis:   "+ dataUnit.getTimeMilliseconds()+ " channel: " + PamUtils.getSingleChannel(dataUnit.getChannelBitmap()) );
+//						System.out.println("Write wav data: Time millis:   "+ dataUnit.getTimeMilliseconds()+ " channel: " + PamUtils.getSingleChannel(dataUnit.getChannelBitmap()) );
 			if (currentTimeMillis!=dataUnit.getTimeMilliseconds()) {
 				currentTimeMillis=dataUnit.getTimeMilliseconds(); 
 				if (wavArray!=null) {

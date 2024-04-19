@@ -277,7 +277,7 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 	}
 	
 	
-	
+	@Deprecated 
 	public static ArrayList<PamWarning> checkSettingsOK(StandardModelParams genericModelParams, DLControl dlControl) {
 
 		// TODO - check if model is null.
