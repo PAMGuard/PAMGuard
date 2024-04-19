@@ -30,7 +30,7 @@ A generic model allows a user to load any model compatible with the [djl](https:
 
 ### Koogu
 
-[Koogu ]([Koogu &mdash; Koogu documentation](https://shyamblast.github.io/Koogu/en/stable/)) is a Python package whihc allows users to train a deep learning model. Koogu helps users by integrating with some frequency used annotation programs and provides tools to train and test classifiers. Imported Koogu models (.kgu) will automatically set up their own data transforms and output classes.
+[Koogu ](https://shyamblast.github.io/Koogu/en/stable/) is a Python package which allows users to train a deep learning model. Koogu helps users by integrating with some frequency used annotation programs and provides tools to train and test classifiers. Imported Koogu models (.kgu) will automatically set up their own data transforms and output classes.
 
 ### PAMGuardZip
 
@@ -114,7 +114,7 @@ Default models are selectable from the menu button in the Deep Learning Pane. De
   <img width="550" height="700" src = "resources/default_settings_humpback_1.png">
 </p>
 
-_Default models can be downloaded. Defautl models are models which are published, open and have been known to work well. More will be added to PAMGaurd over time_
+_Default models can be downloaded. Default models are models which are published, open and have been known to work well amongst the bioacoustics community. More will be added to PAMGaurd over time. If you you would like your model to become a defualt model then drop PAMGuard support an email._
 
 ## Running
 
