@@ -690,7 +690,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		}
 		if (currentFile < allFiles.size()) {
 			// only restart if the file ended - not if it stopped
-			if (getStreamStatus() == STREAM_ENDED) {
+			if (getStreamStatus() == STREAM_ENDED && PamController.getInstance().isManualStop() == false) {
 //				System.out.println(String.format("Start new file timer (file %d/%d)",currentFile+1,allFiles.size()));
 				newFileTimer.start();
 			}

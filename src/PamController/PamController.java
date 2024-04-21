@@ -1099,7 +1099,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * later in the AWT event queue. 
 	 */
 	public void startLater() {
-		SwingUtilities.invokeLater(new StartLater(true));
+//		SwingUtilities.invokeLater(new StartLater(true));
+		startLater(true);
 	}
 
 	public void startLater(boolean saveSettings) {
@@ -1173,6 +1174,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	@Override
 	public void manualStop() {
 		lastStartStopButton = BUTTON_STOP;
+		setManualStop(true);
 		pamStop();
 	}
 
@@ -1186,6 +1188,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	@Override
 	public boolean pamStart() {
 		//		Debug.println("PAMController: pamStart");
+		setManualStop(false);
 		return pamStart(true);
 	}
 
