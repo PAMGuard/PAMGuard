@@ -338,7 +338,16 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 			
 			if (algoProvider.getSourceSettingsPane(null, currSource)!=null) {
 				
-				//get the source pane paramters
+				//set only the selected algorithm to show the user warning sif settings are wrong
+				if  (algorithms.getSelectionModel().getSelectedIndex()==i) {
+					//this is the currently selected algorithm
+					algoProvider.getSourceSettingsPane(null, currSource).setErrorWarn(true);
+				}
+				else {
+					algoProvider.getSourceSettingsPane(null, currSource).setErrorWarn(false);
+				}
+				
+				//get the source pane paramters.
 				Serializable newSourceParams = algoProvider.getSourceSettingsPane(null, currSource).getParams(); 
 				
 				if (locAlgorithmParams==null) locAlgorithmParams = new LocaliserAlgorithmParams(); 
@@ -350,7 +359,7 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 			currParams.setAlgorithmParams(algoProvider, locAlgorithmParams);
 			
 			
-			System.out.println("Get params" + algoProvider.getName() + "  " + currParams.getAlgorithmParams(algoProvider)); 
+			//System.out.println("Get params" + algoProvider.getName() + "  " + currParams.getAlgorithmParams(algoProvider)); 
 		
 		}
 		

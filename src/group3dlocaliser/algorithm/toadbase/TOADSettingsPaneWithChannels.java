@@ -34,6 +34,8 @@ public class TOADSettingsPaneWithChannels<T> extends ToadManagedSettingsPane<T> 
 	private Object parent;
 	private TOADOptionsPane toadOptionsPane;
 	
+	private boolean warnError = true;
+	
 
 	public TOADSettingsPaneWithChannels(Object parent, TOADBaseAlgorithm toadBaseAlgorithm, ManagedSettingsPane<T> toadSettingsPane) {
 		this.parent = parent;
@@ -54,7 +56,11 @@ public class TOADSettingsPaneWithChannels<T> extends ToadManagedSettingsPane<T> 
 		int chMap = channelPanel.getChannelMap();
 		toadBaseAlgorithm.getToadBaseParams().setChannelBitmap(chMap);
 		int nSelChannels = PamUtils.getNumChannels(chMap);
-		if (nSelChannels < 3) {
+		if (nSelChannels < 3 && warnError) {
+			/**
+			 * TODO - This is a nasty way of doing this. There should be a validator in this pane which is checked before getParams is called ]
+			 * but that would require a lot of restructuring. 
+			 */
 			return SwingFXDialogWarning.showWarning(parent, "Channel selection", "Not enough channels selected");
 		}
 		TOADBaseParams ans = toadOptionsPane.getParams(toadBaseAlgorithm.getToadBaseParams());
@@ -137,5 +143,11 @@ public class TOADSettingsPaneWithChannels<T> extends ToadManagedSettingsPane<T> 
 	 */
 	public ChannelPanelFX getChannelPanel() {
 		return channelPanel;
+	}
+
+	@Override
+	public void setErrorWarn(boolean warn) {
+		this.warnError = warn;
+		
 	}
 }
