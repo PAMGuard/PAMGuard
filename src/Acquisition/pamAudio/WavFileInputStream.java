@@ -59,7 +59,7 @@ public class WavFileInputStream extends AudioInputStream {
 		//wav files (this is in fact tha standard emthod for calculated  blockalign)
 		int blockAlign = wavHeader.getNChannels() * (wavHeader.getBitsPerSample() / 8);
 				
-		System.out.println("NFRAMES: " + nFrames + " "+ wavHeader.getDataSize() + " " + wavHeader.getBlockAlign() + " "+blockAlign ); 
+//		System.out.println("NFRAMES: " + nFrames + " "+ wavHeader.getDataSize() + " " + wavHeader.getBlockAlign() + " "+blockAlign ); 
 		
 		Encoding encoding = getEncoding(wavHeader.getFmtTag());
 		if (encoding == null) {

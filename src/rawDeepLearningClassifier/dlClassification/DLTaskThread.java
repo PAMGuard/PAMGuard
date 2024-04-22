@@ -5,14 +5,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import rawDeepLearningClassifier.dlClassification.animalSpot.SoundSpotResult;
+import PamguardMVC.PamDataUnit;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
-import rawDeepLearningClassifier.segmenter.SegmenterProcess.GroupedRawData;
+import rawDeepLearningClassifier.segmenter.GroupedRawData;
 
 /**
  * Creates a que for grouped data units for classiifcation. 
- * @author au671271
+ * @author Jamie Macaulay
  *
  */
 public abstract class DLTaskThread extends Thread {
@@ -28,7 +28,7 @@ public abstract class DLTaskThread extends Thread {
 	/**
 	 * Holds a list of segmented raw data units which need to be classified. 
 	 */
-	private List<ArrayList<GroupedRawData>> queue = Collections.synchronizedList(new ArrayList<ArrayList<GroupedRawData>>());
+	private List<ArrayList<? extends PamDataUnit>> queue = Collections.synchronizedList(new ArrayList<ArrayList<? extends PamDataUnit>>());
 
 
 	public DLTaskThread(DLModelWorker soundSpotWorker) {
@@ -50,7 +50,7 @@ public abstract class DLTaskThread extends Thread {
 			try {
 				if (queue.size()>0) {
 					System.out.println("DL TASK THREAD: " + "The queue size is " + queue.size()); 
-					ArrayList<GroupedRawData> groupedRawData = queue.remove(0);
+					ArrayList<? extends PamDataUnit> groupedRawData = queue.remove(0);
 
 					ArrayList<GenericPrediction> modelResult = dlModelWorker.runModel(groupedRawData, 
 							groupedRawData.get(0).getParentDataBlock().getSampleRate(), 0); //TODO channel?
@@ -79,17 +79,17 @@ public abstract class DLTaskThread extends Thread {
 	 * @param soundSpotResult - the new result.
 	 * @param groupedRawData - the grouped data unit. 
 	 */
-	public abstract void newDLResult(GenericPrediction soundSpotResult, GroupedRawData groupedRawData); 
+	public abstract void newDLResult(GenericPrediction soundSpotResult, PamDataUnit groupedRawData); 
 
 	/**
 	 * Get the grouped data queue
 	 * @return
 	 */
-	public List<ArrayList<GroupedRawData>> getQueue() {
+	public List<ArrayList<? extends PamDataUnit>> getQueue() {
 		return queue;
 	}
 
-	public void setQueue(List<ArrayList<GroupedRawData>> queue) {
+	public void setQueue(List<ArrayList<? extends PamDataUnit>> queue) {
 		this.queue = queue;
 	}
 

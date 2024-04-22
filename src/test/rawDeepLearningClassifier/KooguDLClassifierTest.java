@@ -17,10 +17,8 @@ import org.junit.jupiter.api.Test;
 
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
-import rawDeepLearningClassifier.dlClassification.ketos.KetosDLParams;
-import rawDeepLearningClassifier.dlClassification.ketos.KetosWorker2;
 import rawDeepLearningClassifier.dlClassification.koogu.KooguModelWorker;
-import rawDeepLearningClassifier.segmenter.SegmenterProcess.GroupedRawData;
+import rawDeepLearningClassifier.segmenter.GroupedRawData;
 import us.hebi.matlab.mat.format.Mat5;
 import us.hebi.matlab.mat.format.Mat5File;
 import us.hebi.matlab.mat.types.Matrix;

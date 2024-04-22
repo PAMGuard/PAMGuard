@@ -12,7 +12,7 @@ import rawDeepLearningClassifier.dlClassification.DLClassName;
 import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
 import rawDeepLearningClassifier.dlClassification.StandardClassifierModel;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
-import rawDeepLearningClassifier.segmenter.SegmenterProcess.GroupedRawData;
+import rawDeepLearningClassifier.segmenter.GroupedRawData;
 import warnings.PamWarning;
 
 

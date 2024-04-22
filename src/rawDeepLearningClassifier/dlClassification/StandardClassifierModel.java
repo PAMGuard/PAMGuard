@@ -12,6 +12,7 @@ import PamController.PamSettings;
 import PamDetection.RawDataUnit;
 import PamUtils.PamArrayUtils;
 import PamUtils.PamCalendar;
+import PamguardMVC.PamDataUnit;
 import javafx.stage.FileChooser.ExtensionFilter;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.DLStatus;
@@ -20,13 +21,13 @@ import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericDLClassifier;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
 import rawDeepLearningClassifier.layoutFX.DLSettingsPane;
-import rawDeepLearningClassifier.segmenter.SegmenterProcess.GroupedRawData;
+import rawDeepLearningClassifier.segmenter.GroupedRawData;
 import warnings.PamWarning;
 import warnings.WarningSystem;
 
 /**
  * A useful abstract class for standard models which are a file or URL that is loaded, have a UI and 
- * utilise PAMSettings to save settings state. 
+ * utilise PAMSettings to save settings state. These models only accept raw sound data segments. 
  */
 public abstract class StandardClassifierModel implements DLClassiferModel, PamSettings {
 	
@@ -56,11 +57,14 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 	
 	
 	@Override
-	public ArrayList<? extends PredictionResult> runModel(ArrayList<GroupedRawData> groupedRawData) {
+	@SuppressWarnings("rawtypes")
+	public ArrayList<? extends PredictionResult> runModel( ArrayList<? extends PamDataUnit> groupedRawData) {
 		if (getDLWorker().isModelNull()) return null; 
 
 		//		System.out.println("SoundSpotClassifier: PamCalendar.isSoundFile(): " 
 		//		+ PamCalendar.isSoundFile() + "   " + (PamCalendar.isSoundFile() && !forceQueue));
+		
+
 		
 		/**
 		 * If a sound file is being analysed then Ketos can go as slow as it wants. if used in real time
@@ -165,7 +169,7 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 			return DLStatus.NO_MODEL_LOADED;
 		}
 		
-		// if continous data is selected and all classes are false then this is a
+		// if continuous data is selected and all classes are false then this is a
 		// potential mistake...
 		if (dlControl.getSettingsPane().getSelectedParentDataBlock().getUnitClass() == RawDataUnit.class
 				&& (getDLParams().binaryClassification==null || PamArrayUtils.isAllFalse(getDLParams().binaryClassification))){
@@ -200,7 +204,7 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 		}
 
 		@Override
-		public void newDLResult(GenericPrediction soundSpotResult, GroupedRawData groupedRawData) {
+		public void newDLResult(GenericPrediction soundSpotResult, PamDataUnit groupedRawData) {
 			soundSpotResult.setClassNameID(GenericDLClassifier.getClassNameIDs(getDLParams())); 
 			soundSpotResult.setBinaryClassification(GenericDLClassifier.isBinaryResult(soundSpotResult, getDLParams())); 
 			newResult(soundSpotResult, groupedRawData);
@@ -220,8 +224,10 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 	 * @param modelResult - the model result;
 	 * @param groupedRawData - the grouped raw data. 
 	 */
-	protected void newResult(GenericPrediction modelResult, GroupedRawData groupedRawData) {
-		this.dlControl.getDLClassifyProcess().newModelResult(modelResult, groupedRawData);
+	protected void newResult(GenericPrediction modelResult, PamDataUnit groupedRawData) {
+		if (groupedRawData instanceof GroupedRawData) {
+			this.dlControl.getDLClassifyProcess().newModelResult(modelResult, (GroupedRawData) groupedRawData);
+		}
 	}
 //	
 //	@Override

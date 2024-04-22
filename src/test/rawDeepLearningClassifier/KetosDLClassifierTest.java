@@ -16,7 +16,7 @@ import org.jamdev.jpamutils.wavFiles.AudioData;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
 import rawDeepLearningClassifier.dlClassification.ketos.KetosDLParams;
 import rawDeepLearningClassifier.dlClassification.ketos.KetosWorker2;
-import rawDeepLearningClassifier.segmenter.SegmenterProcess.GroupedRawData;
+import rawDeepLearningClassifier.segmenter.GroupedRawData;
 
 import org.junit.jupiter.api.Test;
 

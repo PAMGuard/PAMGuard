@@ -11,16 +11,16 @@ import org.jamdev.jdl4pam.transforms.DLTransformsFactory;
 import org.jamdev.jdl4pam.utils.DLUtils;
 import org.jamdev.jpamutils.wavFiles.AudioData;
 
+import PamguardMVC.PamDataUnit;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
-import rawDeepLearningClassifier.segmenter.SegmenterProcess.GroupedRawData;
+import rawDeepLearningClassifier.segmenter.GroupedRawData;
 
 
 /**
  * 
  * Runs the deep learning model and performs feature extraction.
  * <p>
- *  
  * 
  * @author Jamie Macaulay 
  *
@@ -41,71 +41,83 @@ public abstract class DLModelWorker<T> {
 	 * True to enable normalisation of results using softmax; 
 	 */
 	private boolean enableSoftMax = true;
+	
+	
+	/**
+	 * Convert a list of data units to a stack if images. 
+	 * @param dataUnits - the data units. 
+	 * @param sampleRate - the sample rate
+	 * @param iChan - the channels
+	 * @return a stack of images for input into a deep learning model. 
+	 */
+	public float[][][] dataUnits2ModelInput(ArrayList<? extends PamDataUnit> dataUnits, float sampleRate, int iChan){
+		
+		@SuppressWarnings("unchecked")
+		ArrayList<GroupedRawData> rawDataUnits = ( ArrayList<GroupedRawData>) dataUnits;
+		 
+		//the number of chunks. 
+		int numChunks = rawDataUnits.size(); 
+
+		//data input into the model - a stack of spectrogram images. 
+		float[][][] transformedDataStack = new float[numChunks][][]; 
+		
+		//generate the spectrogram stack. 
+		AudioData soundData; 
+		double[][] transformedData2; //spec data
+		double[] transformedData1;  //waveform data
+		for (int j=0; j<numChunks; j++) {
+		
+			soundData  = new AudioData(rawDataUnits.get(j).getRawData()[iChan], sampleRate); 
+			
+			//			for (int i=0; i<modelTransforms.size(); i++) {
+			//				System.out.println("Transfrom type: " + modelTransforms.get(i).getDLTransformType()); 
+			//			}
+			//set the sound in the first transform. 
+			((WaveTransform) modelTransforms.get(0)).setWaveData(soundData); 
+
+//			System.out.println("Model transforms:no. " + modelTransforms.size()+ "  input sounds len: " + soundData.getLengthInSeconds() 
+//			+ " Decimate Params: " + ((WaveTransform) modelTransforms.get(0)).getParams()[0] + "max amplitude sound: " + PamArrayUtils.max(soundData.samples));
+
+			DLTransform transform = modelTransforms.get(0); 
+			for (int i =0; i<modelTransforms.size(); i++) {
+				transform = modelTransforms.get(i).transformData(transform); 
+//				//TEMP
+//				if (transform instanceof FreqTransform) {
+//					transformedData = ((FreqTransform) transform).getSpecTransfrom().getTransformedData(); 
+//					System.out.println("DLModelWorker: transform : " + modelTransforms.get(i).getDLTransformType() + " "+ i + transformedData.length + "  " + transformedData[0].length + " minmax: " + PamArrayUtils.minmax(transformedData)[0] + " " + PamArrayUtils.minmax(transformedData)[1]);
+//				}
+			}
+
+			if (transform instanceof FreqTransform) {
+				//add a spectrogram to the stacl
+				transformedData2 = ((FreqTransform) transform).getSpecTransfrom().getTransformedData(); 
+				transformedDataStack[j] = DLUtils.toFloatArray(transformedData2); 
+			}
+			else {
+				//add wavefrom to the stack = we make the 2nd dimesnion 1. 
+				transformedData1 = ((WaveTransform) transform).getWaveData().getScaledSampleAmplitudes(); 
+				transformedDataStack[j] = new float[1][transformedData1.length];
+				transformedDataStack[j][0] = DLUtils.toFloatArray(transformedData1); 
+			}
+		}
+		return transformedDataStack;
+	} 
 
 
 	/**
 	 * Run the initial data feature extraction and the model
-	 * @param rawDataUnit - the raw data unit. 
+	 * @param rawDataUnit - the raw data unit. This is a stack of data units to be classified either together or seperately.  
 	 * @param iChan - the channel to run the data on. 
 	 * @return the model to run. 
 	 */
-	public synchronized ArrayList<T> runModel(ArrayList<GroupedRawData> rawDataUnits, float sampleRate, int iChan) {
+	public synchronized ArrayList<T> runModel(ArrayList<? extends PamDataUnit> dataUnits, float sampleRate, int iChan) {
 
 		try {
-			//the number of chunks. 
-			int numChunks = rawDataUnits.size(); 
-
 			//PamCalendar.isSoundFile(); 
 			//create an audio data object from the raw data chunk
 			long timeStart = System.nanoTime(); 
-
-			//data input into the model - a stack of spectrogram images. 
-			float[][][] transformedDataStack = new float[numChunks][][]; 
-
-			//generate the spectrogram stack. 
-			AudioData soundData; 
-			double[][] transformedData2; //spec data
-			double[] transformedData1;  //waveform data
-			for (int j=0; j<numChunks; j++) {
 			
-				
-				soundData  = new AudioData(rawDataUnits.get(j).getRawData()[iChan], sampleRate); 
-				
-				
-				
-				//			for (int i=0; i<modelTransforms.size(); i++) {
-				//				System.out.println("Transfrom type: " + modelTransforms.get(i).getDLTransformType()); 
-				//			}
-
-				//set the sound in the first transform. 
-				((WaveTransform) modelTransforms.get(0)).setWaveData(soundData); 
-
-//				System.out.println("Model transforms:no. " + modelTransforms.size()+ "  input sounds len: " + soundData.getLengthInSeconds() 
-//				+ " Decimate Params: " + ((WaveTransform) modelTransforms.get(0)).getParams()[0] + "max amplitude sound: " + PamArrayUtils.max(soundData.samples));
-
-				DLTransform transform = modelTransforms.get(0); 
-				for (int i =0; i<modelTransforms.size(); i++) {
-					transform = modelTransforms.get(i).transformData(transform); 
-//					//TEMP
-//					if (transform instanceof FreqTransform) {
-//						transformedData = ((FreqTransform) transform).getSpecTransfrom().getTransformedData(); 
-//						System.out.println("DLModelWorker: transform : " + modelTransforms.get(i).getDLTransformType() + " "+ i + transformedData.length + "  " + transformedData[0].length + " minmax: " + PamArrayUtils.minmax(transformedData)[0] + " " + PamArrayUtils.minmax(transformedData)[1]);
-//					}
-				}
-
-				if (transform instanceof FreqTransform) {
-					//add a spectrogram to the stacl
-					transformedData2 = ((FreqTransform) transform).getSpecTransfrom().getTransformedData(); 
-					transformedDataStack[j] = DLUtils.toFloatArray(transformedData2); 
-
-				}
-				else {
-					//add wavefrom to the stack = we make the 2nd dimesnion 1. 
-					transformedData1 = ((WaveTransform) transform).getWaveData().getScaledSampleAmplitudes(); 
-					transformedDataStack[j] = new float[1][transformedData1.length];
-					transformedDataStack[j][0] = DLUtils.toFloatArray(transformedData1); 
-				}
-			}
+			float[][][] transformedDataStack  = dataUnits2ModelInput(dataUnits,  sampleRate,  iChan);
 
 			//run the model. 
 			float[] output = null; 

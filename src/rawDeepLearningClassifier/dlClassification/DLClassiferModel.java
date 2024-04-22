@@ -9,10 +9,10 @@ import org.jamdev.jdl4pam.transforms.DLTransfromParams;
 import org.jamdev.jdl4pam.transforms.SimpleTransform;
 import org.jamdev.jdl4pam.transforms.SimpleTransformParams;
 
+import PamguardMVC.PamDataUnit;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
-import rawDeepLearningClassifier.segmenter.SegmenterProcess.GroupedRawData;
 import warnings.PamWarning;
 
 /**
@@ -32,7 +32,7 @@ public interface DLClassiferModel {
 	 * 
 	 * @return the deep learning model.
 	 */
-	public ArrayList<? extends PredictionResult> runModel(ArrayList<GroupedRawData> rawDataUnit);
+	public ArrayList<? extends PredictionResult> runModel(ArrayList<? extends PamDataUnit> rawDataUnit);
 
 	/**
 	 * Prepare the model. This is called on PAMGuard start up.

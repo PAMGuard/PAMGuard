@@ -23,7 +23,7 @@ import rawDeepLearningClassifier.defaultModels.RightWhaleModel1;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericModelWorker;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
-import rawDeepLearningClassifier.segmenter.SegmenterProcess.GroupedRawData;
+import rawDeepLearningClassifier.segmenter.GroupedRawData;
 
 /**
  * Test the generic classifier.
