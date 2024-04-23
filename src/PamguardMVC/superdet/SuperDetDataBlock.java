@@ -450,8 +450,8 @@ public class SuperDetDataBlock<Tunit extends SuperDetection, TSubDet extends Pam
 			int iDone = 0;
 			while (duIt.hasNext()) {
 				Tunit aData = duIt.next(); // looping through superdetections.
-//				if (aData.getDatabaseIndex() == 131) {
-//					System.out.println("On event 131");
+//				if (aData.getDatabaseIndex() == 566) {
+//					System.out.println("On event 566");
 //				}
 				if (viewLoadObserver != null) {
 					viewLoadObserver.sayProgress(1, aData.getTimeMilliseconds(), firstTime, lastTime, iDone++);

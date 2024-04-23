@@ -1111,7 +1111,7 @@ public class ArrayManager extends PamControlledUnit implements PamSettings, PamO
 				referencePoint = shipPos.getGpsData();
 			}
 		}
-		if (referencePoint == null) {
+		if (referencePoint == null && MasterReferencePoint.getFixTime() != null && MasterReferencePoint.getLatLong() != null) {
 			// running out of options, so fall back to the master reference point, interpolated (probably has zero speeed)
 			referencePoint = new GpsData(MasterReferencePoint.getFixTime(), MasterReferencePoint.getLatLong()).getPredictedGPSData(timeMillis);
 		}
