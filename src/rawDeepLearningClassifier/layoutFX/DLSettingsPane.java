@@ -348,7 +348,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		//only show the data selector box for detec tion data. 
 		if (sourcePane.getSource() == null) this.dataSelectorPane.setVisible(false);
 
-		if (sourcePane.getSource().getDataSelectCreator() instanceof NullDataSelectorCreator) {
+		else if (sourcePane.getSource().getDataSelectCreator() instanceof NullDataSelectorCreator) {
 			//^bit messy but cannot think of a better way to do it. 
 			this.dataSelectorPane.setVisible(false);
 		}

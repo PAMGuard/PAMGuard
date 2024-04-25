@@ -178,7 +178,9 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 
 
 		/**Classification thresholds etc to set.**/
-		Label classiferInfoLabel2 = new Label("Binary Classification Threshold"); 
+		Label classiferInfoLabel2 = new Label("Decision Threshold"); 
+		classiferInfoLabel2.setTooltip(new Tooltip("Set the minimum prediciton value for selected classes. If a prediction exceeds this value "
+				+ "a detection will be saved."));
 		classiferInfoLabel2.setFont(font);
 
 		//PamGuiManagerFX.titleFont2style(classiferInfoLabel2);

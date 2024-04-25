@@ -4,14 +4,21 @@ import Localiser.detectionGroupLocaliser.GroupDetection;
 import PamguardMVC.PamDataUnit;
 
 /**
- * A group of detection which are within a particular segment. This is used to pass detection groups straight to
- * 
- *  
- *  * @author Jamie Macaulay
+ * A group of detection which are within a particular segment. This is used to pass detection groups straight to a classifier.
+ * @author Jamie Macaulay
  *
  */
 public class SegmenterDetectionGroup extends GroupDetection<PamDataUnit> {
 
+	/**
+	 * Constructor for a group of detections within a detection. Note that some
+	 * longer detections (e.g. whistles) may have sections outside the segment.
+	 * 
+	 * @param timeMilliseconds - this is the start of the SEGMENT - Note that the
+	 * @param channelBitmap    - channels of all detections
+	 * @param startSample      - the stratSample of the SEGMENT.
+	 * @param duration         - the duration of the SEGMENT.
+	 */
 	public SegmenterDetectionGroup(long timeMilliseconds, int channelBitmap, long startSample, long duration) {
 		super(timeMilliseconds, channelBitmap, startSample, duration);
 		// TODO Auto-generated constructor stub

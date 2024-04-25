@@ -1,5 +1,8 @@
 package rawDeepLearningClassifier.dlClassification.delphinID;
 
+import java.util.ArrayList;
+
+import PamguardMVC.PamDataUnit;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
@@ -33,6 +36,17 @@ public class DelphinIDWorker extends  DLModelWorker<DelphinIDPrediction>{
 	public void closeModel() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+
+	@Override
+	public float[][][] dataUnits2ModelInput(ArrayList<? extends PamDataUnit> dataUnits, float sampleRate, int iChan){
+		//Our data units are groups of whistles. 
+		
+		
+		
+		
+		return null;
 	}
 
 	
