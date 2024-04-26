@@ -20,7 +20,7 @@ public class DetectionPlotParams extends UserDisplayNodeParams implements Clonea
 	/**
 	 * 
 	 */
-	static final long serialVersionUID = 2L;
+	static final long serialVersionUID = 3L;
 	
 	/**
 	 * The data source for the detection plot. 

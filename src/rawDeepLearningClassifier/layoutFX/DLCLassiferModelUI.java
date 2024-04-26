@@ -3,6 +3,8 @@ package rawDeepLearningClassifier.layoutFX;
 import java.util.List;
 
 import javax.swing.JPanel;
+
+import javafx.scene.Node;
 import javafx.stage.FileChooser.ExtensionFilter;
 import PamController.SettingsPane;
 
@@ -41,6 +43,13 @@ public interface DLCLassiferModelUI {
 	 * @return the side panel. 
 	 */
 	public JPanel getSidePanel(); 
+	
+	/**
+	 * Get an icon for the model. Note that this can be null in 
+	 * which case the icon in the UI will be a label with the mdoel name.
+	 * @return teh model icon. 
+	 */
+	public Node getIcon();
 	
 	
 }

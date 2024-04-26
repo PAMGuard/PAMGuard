@@ -128,11 +128,20 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 	private PamBorderPane createPane() {
 		PamBorderPane mainPane = new PamBorderPane(); 
 
-
-		Label classiferInfoLabel = new Label(dlClassifierModel.getName() + " Classifier"); 
-		//PamGuiManagerFX.titleFont2style(classiferInfoLabel);
+		//font to use for title labels. 
 		Font font= Font.font(null, FontWeight.BOLD, 11);
-		classiferInfoLabel.setFont(font);
+
+		Node classifierIcon;
+		if (dlClassifierModel.getModelUI()!=null && dlClassifierModel.getModelUI().getIcon()!=null) {
+			classifierIcon = dlClassifierModel.getModelUI().getIcon();
+		}
+		else {
+			Label classiferInfoLabel = new Label(dlClassifierModel.getName() + " Classifier"); 
+			//PamGuiManagerFX.titleFont2style(classiferInfoLabel);
+			classiferInfoLabel.setFont(font);
+			classifierIcon=classiferInfoLabel;
+		}
+		
 
 //		PamButton advButton = new PamButton("", PamGlyphDude.createPamGlyph(MaterialDesignIcon.SETTINGS, PamGuiManagerFX.iconSize)); 
 		PamButton advButton = new PamButton("", PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconSize)); 
@@ -238,7 +247,7 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 
 		vBoxHolder = new PamVBox(); 
 		vBoxHolder.setSpacing(5);
-		vBoxHolder.getChildren().addAll(classiferInfoLabel, advSettings, classiferInfoLabel2, gridPane); 
+		vBoxHolder.getChildren().addAll(classifierIcon, advSettings, classiferInfoLabel2, gridPane); 
 		
 		mainPane.setCenter(vBoxHolder);
 
@@ -322,7 +331,7 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 		
 		if (currentSelectedFile==null) {
 			//uuurgh need to sort this out with FX stuff
-			WarnOnce.showWarningFX(null,  "No Model File",  "There is no model file selected in the path: Please select a compatible model" , AlertType.ERROR);
+			WarnOnce.showWarningFX(null, "No Model File",  "There is no model file selected in the path: Please select a compatible model" , AlertType.ERROR);
 
 		}
 		else {

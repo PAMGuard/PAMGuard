@@ -30,6 +30,7 @@ import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamStackPane;
+import pamViewFX.fxNodes.PamTabPane;
 import pamViewFX.fxNodes.hidingPane.HidingPane;
 import pamViewFX.fxStyles.PamStylesManagerFX;
 
@@ -43,8 +44,14 @@ import pamViewFX.fxStyles.PamStylesManagerFX;
 @SuppressWarnings("rawtypes")
 public class DetectionGroupDisplay extends PamBorderPane {
 	
+	/**
+	 * Show the settings within hiding panes within the display. 
+	 */
 	public static final int DISPLAY_COMPACT = 0;
 	
+	/**
+	 * Show settings on top and to the right of the display
+	 */
 	public static final int DISPLAY_EXTENDED = 1;
 
 	/**
@@ -211,21 +218,32 @@ public class DetectionGroupDisplay extends PamBorderPane {
 			
 			detectionDisplayHolder = new PamStackPane(); 
 			
-			TabPane settingsPane = new TabPane(); 
-			settingsPane.setStyle(Styles.TABS_FLOATING);
-			settingsPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
-//			settingsPane.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
+			PamTabPane settingsPane = new PamTabPane(); 
+			settingsPane.setTabMinHeight(60);
+			settingsPane.setMinHeight(60);
+//			settingsPane.repackTabs();
 			
-			settingsPane.getTabs().add(new Tab("Data",detectionDisplay.getDataTypePane()));
-			settingsPane.getTabs().add(new Tab("Settings",detectionDisplay.getSettingsHolder()));
+			settingsPane.setAddTabButton(false);
+//			settingsPane.getStyleClass().add(Styles.TABS_FLOATING);
+			settingsPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
+			//settingsPane.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
+			
+			Tab dataTab = new Tab("Data",detectionDisplay.getDataTypePane());
+			Tab settingsTab = new Tab("Settings -BLAH",detectionDisplay.getSettingsHolder());
+
+			settingsPane.getTabs().add(dataTab);
+			settingsPane.getTabs().add(settingsTab);
 			
 			hidingPane = new HidingPane(Side.RIGHT, settingsPane, detectionDisplayHolder, layoutType==DISPLAY_COMPACT, 0);
-
+			hidingPane.removeHideButton();
+			hidingPane.getHideButton().setMinWidth(40);
+			settingsPane.setTabStartRegion(hidingPane.getHideButton());
+			
 			//now everything to pane. 
 			detectionDisplayHolder.getChildren().add(detectionDisplay);
 			StackPane.setAlignment(detectionDisplay, Pos.CENTER);
 			
-			settingsPane.setPadding(new Insets(35,0,0,0));
+			//settingsPane.setPadding(new Insets(35,0,0,0));
 			
 			Node icon = PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconSize); 
 			detectionDisplay.getPlotPane().setHidePane(new PamBorderPane(settingsPane), icon,  Side.RIGHT);

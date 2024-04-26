@@ -5,6 +5,7 @@ import java.util.List;
 import javax.swing.SwingUtilities;
 
 import PamController.SettingsPane;
+import javafx.scene.Node;
 import javafx.stage.FileChooser.ExtensionFilter;
 import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
 
@@ -75,6 +76,12 @@ public class OrcaSpotClassifierUI implements DLCLassiferModelUI {
 
 	@Override
 	public List<ExtensionFilter> getModelFileExtensions() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Node getIcon() {
 		// TODO Auto-generated method stub
 		return null;
 	}

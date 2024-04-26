@@ -72,7 +72,8 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 		 */
 		if ((PamCalendar.isSoundFile() && !forceQueue) || dlControl.isViewer()) {
 			//run the model 
-			ArrayList<GenericPrediction> modelResult = getDLWorker().runModel(groupedRawData, 
+			@SuppressWarnings("unchecked")
+			ArrayList<GenericPrediction> modelResult = (ArrayList<GenericPrediction>) getDLWorker().runModel(groupedRawData, 
 					groupedRawData.get(0).getParentDataBlock().getSampleRate(), 0); 
 			
 			if (modelResult==null) {
@@ -134,7 +135,7 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 	 * Get the sound spot worker. 
 	 * @return the sound spot worker. 
 	 */
-	public abstract  DLModelWorker<GenericPrediction> getDLWorker(); 
+	public abstract  DLModelWorker<? extends PredictionResult> getDLWorker(); 
 	
 	/**
 	 * Get the sound spot worker. 

@@ -63,8 +63,14 @@ public class PamSVGIcon {
 		}
 		return instance;
 	}
-
+	
+	@Deprecated
 	public PamSVGIcon create(URL path, Color color, double lineWidth) throws Exception {
+		return create(path);
+	}
+
+
+	public PamSVGIcon create(URL path) throws Exception {
 
 		//		System.out.println("Create icon start");
 
@@ -145,7 +151,7 @@ public class PamSVGIcon {
 
 		for (int ii=0; ii<map.getLength(); ii++) {
 			String col;
-//			System.out.println(map.item(ii).getNodeName() +  "  " + map.item(ii).getFirstChild().getNodeValue());
+			//System.out.println(map.item(ii).getNodeName() +  "  " + map.item(ii).getFirstChild().getNodeValue());
 			switch (map.item(ii).getNodeName()) {
 			
 			case "fill":

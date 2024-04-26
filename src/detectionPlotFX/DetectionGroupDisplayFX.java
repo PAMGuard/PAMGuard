@@ -16,7 +16,7 @@ import userDisplayFX.UserDisplayNodeFX;
 
 /**
  * A group detection display with all the bits added to allow the display to be used in the FX GUI as
- * a stand alone user display. 
+ * a stand-alone user display. 
  * 
  * @author Jamie Macaulay
  *
@@ -211,8 +211,8 @@ public class DetectionGroupDisplayFX extends DetectionGroupDisplay  implements U
 	public boolean setDataUnit(PamDataUnit<?, ?> dataUnit){
 		
 		/**
-		 * The extra stuff here is to make sure that the plot types for a specific detectin are saved. So for example 
-		 * if viewing click spectrum then the spectrum plot is selected whenever 1) PAMGuard is opned again or 2) switching from
+		 * The extra stuff here is to make sure that the plot types for a specific detection are saved. So for example 
+		 * if viewing click spectrum then the spectrum plot is selected whenever 1) PAMGuard is opened again or 2) switching from
 		 * one type of detection ot another e.g. whistle to click, then the click does nto revert to shwoing a waveform instead 
 		 * of spectrum. 
 		 */
@@ -220,7 +220,7 @@ public class DetectionGroupDisplayFX extends DetectionGroupDisplay  implements U
 		if (currentDetection!=null) {
 			//save the current selected detection plot for the particular type of data unit.
 			String detectionPlotName = 	this.getDetectionDisplay().getCurrentDataInfo().getCurrentDetectionPlot().getName();
-//			System.out.println("SET CURRENT DETECTION PLOT TO USE IS: " + detectionPlotName);
+			//System.out.println("SET CURRENT DETECTION PLOT TO USE IS: " + detectionPlotName);
 			detectionPlotParams.dataAxisMap.put(currentDetection.getParentDataBlock().getLongDataName(), detectionPlotName);
 		}
 		

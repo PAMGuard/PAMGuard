@@ -59,10 +59,10 @@ public class DLClassifierChooser {
 						String frameworkString = frameworkObject.getString("framework");
 
 						for (DLClassiferModel model: dlControl.getDLModels()) {
-							//System.out.println("frameworkString: " + frameworkString + "  " + model.getName());
+							System.out.println("frameworkString: " + frameworkString + "  " + model.getName());
 							if (model.getName().toLowerCase().equals(frameworkString.trim().toLowerCase())) return model;
 						}
-
+						
 					} 
 					else {
 						System.err.println("DLClassifierChooser: Unable to extract the metadata file even though it exists in the zip archive:??"); 
@@ -86,7 +86,7 @@ public class DLClassifierChooser {
 			if (model.isModelType(modelURI)) return model; 
 		}
 
-		//return the generic model. 
+		//return the generic model as default
 		return dlControl.getDLModels().get(dlControl.getDLModels().size()-1); 
 	}
 

@@ -398,15 +398,15 @@ public class TDControlFX extends TDControl implements UserDisplayNodeFX {
 
 	@Override
 	public void newSelectedDetectionGroup(DetectionGroupSummary detectionGroup, TDGraphFX tdGraph) {
-		System.out.println("New selected detection group: " + detectionGroup);
+//		System.out.println("New selected detection group: " + detectionGroup);
 		
 		tdDisplayController.getDisplayDataBlock().clearAll();
 		if (detectionGroup==null || detectionGroup.getDataList().size()<=0) return;
 		
-		System.out.println("Add pam data: " + detectionGroup + " " + tdDisplayController.getDisplayDataBlock().countObservers());
-		for (int i=0; i<tdDisplayController.getDisplayDataBlock().countObservers() ; i++) {
-			System.out.println("Observer : " + tdDisplayController.getDisplayDataBlock().getPamObserver(i));
-		}
+//		System.out.println("Add pam data: " + detectionGroup + " " + tdDisplayController.getDisplayDataBlock().countObservers());
+//		for (int i=0; i<tdDisplayController.getDisplayDataBlock().countObservers() ; i++) {
+//			System.out.println("Observer : " + tdDisplayController.getDisplayDataBlock().getPamObserver(i));
+//		}
 
 		tdDisplayController.getDisplayDataBlock().addPamData(detectionGroup.getDataList().get(detectionGroup.getFocusedIndex()));
 		if (isViewer()) tdDisplayController.getDisplayDataBlock().notifyNornalObservers(detectionGroup.getDataList().get(detectionGroup.getFocusedIndex()));

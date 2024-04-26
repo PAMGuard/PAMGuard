@@ -9,6 +9,7 @@ import PamController.SettingsPane;
 import PamView.dialog.warn.WarnOnce;
 import PamView.dialog.warn.WarnOnceDialog;
 import javafx.application.Platform;
+import javafx.scene.Node;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.FileChooser.ExtensionFilter;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
@@ -87,5 +88,11 @@ public class GenericModelUI  implements DLCLassiferModelUI {
 	@Override
 	public List<ExtensionFilter> getModelFileExtensions() {
 		return extensionFilters;
+	}
+
+	@Override
+	public Node getIcon() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

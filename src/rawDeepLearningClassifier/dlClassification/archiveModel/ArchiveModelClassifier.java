@@ -138,9 +138,7 @@ public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 		ArrayList<DLTransfromParams> dlTransformParams = DLClassiferModel.getDLTransformParams(standardDLParams.dlTransfroms);
 		
 		standardDLParams.dlTransfromParams=dlTransformParams; 
-		
 //		System.out.println("KetosParams have been saved. : " + standardDLParams.dlTransfromParams); 
-		
 		return standardDLParams;
 	}
 
@@ -161,8 +159,10 @@ public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 				standardDLParams.dlTransfroms = DLTransformsFactory
 						.makeDLTransforms((ArrayList<DLTransfromParams>) standardDLParams.dlTransfromParams);
 			}
-		} else
+		} 
+		else {
 			standardDLParams = makeParams();
+		}
 		return true;
 	}
 	

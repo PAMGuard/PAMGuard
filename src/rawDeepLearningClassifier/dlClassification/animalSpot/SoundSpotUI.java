@@ -6,6 +6,7 @@ import java.util.List;
 import javax.swing.JPanel;
 
 import PamController.SettingsPane;
+import javafx.scene.Node;
 import javafx.stage.FileChooser.ExtensionFilter;
 import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
 
@@ -81,6 +82,12 @@ public class SoundSpotUI implements DLCLassiferModelUI {
 	@Override
 	public List<ExtensionFilter> getModelFileExtensions() {
 		return extensionFilters;
+	}
+
+	@Override
+	public Node getIcon() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

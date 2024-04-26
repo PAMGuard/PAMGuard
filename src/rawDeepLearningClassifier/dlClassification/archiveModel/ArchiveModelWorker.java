@@ -229,9 +229,9 @@ public class ArchiveModelWorker extends GenericModelWorker {
 
 	@Override
 	public GenericPrediction makeModelResult(float[]  prob, double time) {
-		GenericPrediction soundSpotResult =  new GenericPrediction(prob); 
-		soundSpotResult.setAnalysisTime(time);
-		return soundSpotResult;
+		GenericPrediction prediction =  new GenericPrediction(prob); 
+		prediction.setAnalysisTime(time);
+		return prediction;
 	}
 
 

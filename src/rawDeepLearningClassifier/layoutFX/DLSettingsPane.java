@@ -380,9 +380,11 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	 * Set the classifier pane. 
 	 */
 	protected void setClassifierPane() {
+		
+		
 		//set the classifier Pane.class 
 		if (modelSelectPane.currentClassifierModel!=null && modelSelectPane.currentClassifierModel.getModelUI()!=null) {
-
+			
 			classifierPane.setCenter(modelSelectPane.currentClassifierModel.getModelUI().getSettingsPane().getContentNode()); 
 
 			if (modelSelectPane.currentClassifierModel!=null) {

@@ -10,6 +10,7 @@ import org.jamdev.jdl4pam.transforms.SimpleTransform;
 import org.jamdev.jdl4pam.transforms.SimpleTransformParams;
 
 import PamguardMVC.PamDataUnit;
+import javafx.scene.Node;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
@@ -126,6 +127,7 @@ public interface DLClassiferModel {
 		}
 		return dlTransformParams;
 	}
+
 
 	
 	
