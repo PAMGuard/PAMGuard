@@ -6,6 +6,7 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamInstantProcess;
 import PamguardMVC.PamObservable;
+import PamguardMVC.PamProcess;
 import clickDetector.ClickDetection;
 import clickTrainDetector.layout.CTDataUnitGraphics;
 import clickTrainDetector.layout.UnconfirmedCTSymbolManager;
@@ -19,7 +20,7 @@ import pamScrollSystem.AbstractScrollManager;
  * @author Jamie Macaulay 
  *
  */
-public class ClickTrainProcess extends PamInstantProcess {
+public class ClickTrainProcess extends PamProcess {
 
 	/**
 	 * The source data block 
@@ -47,7 +48,7 @@ public class ClickTrainProcess extends PamInstantProcess {
 	private CTProcessCheck processCheck;
 
 	public ClickTrainProcess(ClickTrainControl pamControlledUnit) {
-		super(pamControlledUnit);
+		super(pamControlledUnit, null);
 		this.clickTrainControl=pamControlledUnit; 
 
 		this.processCheck=new CTProcessCheck(this);

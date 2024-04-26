@@ -810,6 +810,10 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	protected void collectFlacData() {
 		FileInputStream fileStream;
 		try {
+			File currFile = getCurrentFile();
+			if (currFile == null) {
+				return;
+			}
 			fileStream = new FileInputStream(getCurrentFile());
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

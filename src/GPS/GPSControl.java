@@ -267,6 +267,9 @@ public class GPSControl extends PamControlledUnit implements PamSettings, Positi
 		GpsDataUnit pointBefore = null, pointAfter = null;
 		synchronized (getGpsDataBlock().getSynchLock()) {
 			ListIterator<GpsDataUnit> iter = getGpsDataBlock().getListIterator(timeMilliseconds, 0, PamDataBlock.MATCH_BEFORE, PamDataBlock.POSITION_BEFORE);
+			if (iter == null) {
+				return null;
+			}
 			if (iter.hasNext()) {
 				pointBefore = iter.next();
 			}
