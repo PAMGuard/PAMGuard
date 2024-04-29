@@ -10,8 +10,10 @@ import java.awt.geom.Point2D;
 
 import PamUtils.Coordinate3d;
 import PamUtils.LatLong;
+import PamUtils.PamArrayUtils;
 import PamView.TransformShape;
 import PamView.GeneralProjector;
+import PamguardMVC.PamConstants;
 import PamguardMVC.PamDataUnit;
 import pamMaths.PamVector;
 
@@ -28,15 +30,20 @@ public class EllipseLocErrorDraw implements LocErrorGraphics {
 	 */
 	private EllipticalError ellipticalError;
 
+	public EllipticalError getEllipticalError() {
+		return ellipticalError;
+	}
+
 	public static final int DRAW_LINES = 1;
 	public static final int DRAW_OVALS = 2;
 	private int drawType = DRAW_OVALS;
+
 
 	/**
 	 * Constructor for drawing an ellipsoid. 
 	 * @param ellipticalError
 	 */
-	EllipseLocErrorDraw(EllipticalError ellipticalError){
+	protected EllipseLocErrorDraw(EllipticalError ellipticalError){
 		this.ellipticalError=ellipticalError;
 	}
 
@@ -55,6 +62,8 @@ public class EllipseLocErrorDraw implements LocErrorGraphics {
 		}
 		return null;
 	}
+	
+	
 	public TransformShape drawLinesOnMap(Graphics g, PamDataUnit pamDetection, LatLong errorOrigin, 
 			GeneralProjector generalProjector, Color ellipseColor) {
 		Graphics2D g2d = (Graphics2D) g;
@@ -102,19 +111,26 @@ public class EllipseLocErrorDraw implements LocErrorGraphics {
 		
 		return null;
 	}
+	
 	public TransformShape drawOvalsOnMap(Graphics g, PamDataUnit pamDetection, LatLong errorOrigin, 
 			GeneralProjector generalProjector, Color ellipseColor) {
+		
 
 		//this is 2D- need to make a slice through the ellipse and get the localisation points. 
 		double[] errors2D=ellipticalError.getErrorEllipse2D(ErrorEllipse.PLANE_XY_PROJ);
 		//		if (1>0) return null;
+		
+		if (errors2D==null) return null; 
 
-		//System.out.println("EllipseLocErrorDraw: draw ellipse:"+errors2D[0]+" "+errors2D[1]+" "+Math.toDegrees(errors2D[2]));
+
+		if (errors2D[0] > PamConstants.EARTH_RADIUS_METERS || errors2D[1] > PamConstants.EARTH_RADIUS_METERS) {
+			return null; //don't draw infintie stuff - causes nasty errors. 
+		}
+//		System.out.println("Draw ovals on map"); 
+//		System.out.println("EllipseLocErrorDraw: draw ellipse:"+errors2D[0]+" "+errors2D[1]+" "+Math.toDegrees(errors2D[2]));
 
 		//System.out.println("Plot errors:  perp: "+ perpError+  " horz: "+horzError+ " " + errorDirection); 
 		Graphics2D g2d = (Graphics2D)g;
-
-		if (errors2D==null) return null; 
 
 		//draw oval
 		//		//need to work out the size of the horizontal error. 
@@ -140,7 +156,7 @@ public class EllipseLocErrorDraw implements LocErrorGraphics {
 		
 		//draw the ellipse and rotate. 
 		Ellipse2D oval=new Ellipse2D.Double(errorOriginXY.getX()-horzErrPix/2, errorOriginXY.getY()-perpErrPix/2, horzErrPix, perpErrPix);
-		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 5 * 0.1f));
+		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 5 * 0.05f));
 		g2d.setPaint(ellipseColor.brighter());
 
 		if (!Double.isNaN(errorDirection)) g2d.rotate(-paintAngle, errorOriginXY.getX(), errorOriginXY.getY());
@@ -156,6 +172,10 @@ public class EllipseLocErrorDraw implements LocErrorGraphics {
 
 		return new TransformShape(oval, paintAngle, new Point2D.Double(errorOriginXY.getX(), errorOriginXY.getY()));
 
+	}
+
+	public int getDrawType() {
+		return drawType;
 	}
 
 }

@@ -30,20 +30,26 @@ public class KetosModelTest {
 	public static void main(String[] args) {
 
 		//test on a right whale. 
-		//File file = new File("/Volumes/GoogleDrive/My Drive/PAMGuard_dev/Deep_Learning/Meridian/right_whales/for_pamguard/narw.ktpb"); 
+//		File file = new File("/Users/au671271/Library/CloudStorage/GoogleDrive-macster110@gmail.com/My Drive/PAMGuard_dev/Deep_Learning/Ketos/right_whales/for_pamguard/narw.ktpb"); 
 //		File file = new File("/Volumes/GoogleDrive-108005893101854397430/My Drive/PAMGuard_dev/Deep_Learning/Meridian/humpback_whales/SOCAL_Mn_Network.ktpb");
 		//File file = new File("/Volumes/GoogleDrive-108005893101854397430/My Drive/PAMGuard_dev/Deep_Learning/Meridian/orca/kw_detector_v11_5s.ktpb"); 
 
 		//the wav file to test.
-		//String wavFilePath = "/Volumes/GoogleDrive/My Drive/PAMGuard_dev/Deep_Learning/Meridian/right_whales/for_pamguard/input.wav"; 
+//		String wavFilePath = "/Users/au671271/Library/CloudStorage/GoogleDrive-macster110@gmail.com/My Drive/PAMGuard_dev/Deep_Learning/Ketos/right_whales/for_pamguard/input.wav"; 
 //		String wavFilePath = "/Volumes/GoogleDrive-108005893101854397430/My Drive/PAMGuard_dev/Deep_Learning/Meridian/humpback_whales/wav/5353.210403161502.wav";
-//		double windowSize = 3.52; 
+//		double[] window = new double[]{0., 3.0}; 
 		
+//		//Minke model
+//		File file = new File("/Users/au671271/Desktop/Minke_test/Minke_Network_12s.ktpb");
+//		String wavFilePath = "/Users/au671271/Desktop/Minke_test/1705_FLAC_1705_20171106_185953_253.wav";
+//		double windowSize = 12; 
 		
-		//Minke model
-		File file = new File("/Users/au671271/Desktop/Minke_test/Minke_Network_12s.ktpb");
-		String wavFilePath = "/Users/au671271/Desktop/Minke_test/1705_FLAC_1705_20171106_185953_253.wav";
-		double windowSize = 12; 
+//		
+		File file = new File("/Users/au671271/Library/CloudStorage/GoogleDrive-macster110@gmail.com/My Drive/PAMGuard_dev/Deep_Learning/Ketos/narw_2/hallo-kw-det_v1_test/hallo-kw-det_v1.ktpb");
+		String wavFilePath = "/Users/au671271/Library/CloudStorage/GoogleDrive-macster110@gmail.com/My Drive/PAMGuard_dev/Deep_Learning/Ketos/narw_2/hallo-kw-det_v1_test/audio/jasco_reduced.wav";
+//		double[] window = new double[]{10., 15.0176}; 
+		double[] window = new double[]{45, 50.0176}; 
+
 		
 		try {
 			//the ketos model. 
@@ -58,22 +64,38 @@ public class KetosModelTest {
 
 			//System.out.println(ketosParams.toString());
 			System.out.println("Output shape" + ketosParams.defaultOutputShape);
+			
+			System.out.println("Input shape" + ketosParams.defaultInputShape);
+			
+			
+			//28-04-2023 seems like there is a BUG in ketos where the input shape reported by the model is incorrect. 
+			ketosModel.setInputShape(ketosParams.defaultInputShape); 
+
 
 			//Open wav files. 
 			AudioData soundData = DLUtils.loadWavFile(wavFilePath);
-			soundData = soundData.trim(0, (int) (soundData.getSampleRate()*windowSize)); 
-
+			soundData = soundData.trim((int) (soundData.getSampleRate()*window[0]), (int) (soundData.getSampleRate()*window[1])); 
+			System.out.println("Input sample rate is " + soundData.getSampleRate());
+			
+					
 			//generate the transforms. 
 			ArrayList<DLTransform> transforms =	DLTransformsFactory.makeDLTransforms(ketosParams.dlTransforms); 
-
-
+			
+			
 			((WaveTransform) transforms.get(0)).setWaveData(soundData); 
 			
-			
 			DLTransform transform = transforms.get(0); 
-			for (int i=0; i<transforms.size(); i++) {
-				//				System.out.println(transforms); 
+			for (int i=0; i<ketosParams.dlTransforms.size(); i++) {
+				
+//				try {
+//				System.out.println("Transform: " +  ketosParams.dlTransforms.get(i));
+//				}
+//				catch(Exception e) {
+//					e.printStackTrace();
+//				}
+
 				transform = transforms.get(i).transformData(transform); 
+				
 				//				if (i==1) {
 				//					 transfromedData =  DLMatFile.array2Matrix(((FreqTransform) transform).getSpecTransfrom().getTransformedData());
 				//				}

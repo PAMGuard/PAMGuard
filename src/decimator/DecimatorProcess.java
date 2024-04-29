@@ -20,6 +20,7 @@
  */
 package decimator;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import Filters.Filter;
@@ -39,6 +40,8 @@ import PamguardMVC.PamProcess;
 import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.RequestCancellationObject;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
+import clickDetector.ClickDetection;
+import clipgenerator.ClipDataUnit;
 
 /**
  * Decimates data - i.e. reduces it's frequency by 
@@ -339,5 +342,11 @@ public class DecimatorProcess extends PamProcess {
 		else {
 			return PamDataBlock.REQUEST_NO_DATA;
 		}
+	}
+	
+	
+	@Override
+	public ArrayList getCompatibleDataUnits(){
+		return new ArrayList<Class<? extends PamDataUnit>>(Arrays.asList(RawDataUnit.class));
 	}
 }

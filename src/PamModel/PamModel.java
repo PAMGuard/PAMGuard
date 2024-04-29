@@ -45,7 +45,6 @@ import whistlesAndMoans.AbstractWhistleDataUnit;
 import fftManager.FFTDataUnit;
 import fftManager.PamFFTControl;
 import group3dlocaliser.Group3DLocaliserControl;
-import metadata.MetaDataContol;
 import meygenturbine.MeygenTurbine;
 import printscreen.PrintScreenControl;
 import rockBlock.RockBlockControl;
@@ -472,6 +471,7 @@ final public class PamModel implements PamSettings {
 			mi.setToolTipText("Interface to Tethys Database");
 			mi.setModulesMenuGroup(utilitiesGroup);
 			mi.setMaxNumber(1);
+			//mi.addGUICompatabilityFlag(PamGUIManager.FX); //has FX enabled GUI.
 			mi.setHidden(SMRUEnable.isEnable() == false);
 		}		
 		
@@ -522,7 +522,8 @@ final public class PamModel implements PamSettings {
 		mi.setModulesMenuGroup(sensorsGroup);
 		mi.setToolTipText("Imports CPOD data");
 		mi.setHidden(SMRUEnable.isEnable() == false);
-		
+		mi.addGUICompatabilityFlag(PamGUIManager.FX); //has FX enabled GUI.
+
 		/*
 		 * ************* Start Displays  Group *******************
 		 */
@@ -591,6 +592,7 @@ final public class PamModel implements PamSettings {
 		mi.addDependency(new PamDependency(RawDataUnit.class, "Acquisition.AcquisitionControl"));	
 		mi.setToolTipText("Decimates (reduces the frequency of) audio data");
 		mi.setModulesMenuGroup(processingGroup);
+		mi.addGUICompatabilityFlag(PamGUIManager.FX); //has FX enabled GUI.
 
 		mi = PamModuleInfo.registerControlledUnit(CepstrumControl.class.getName(), CepstrumControl.unitType);	
 		mi.addDependency(new PamDependency(FFTDataUnit.class, PamFFTControl.class.getName()));	
@@ -875,7 +877,7 @@ final public class PamModel implements PamSettings {
 			mi.setModulesMenuGroup(displaysGroup);
 			mi.addGUICompatabilityFlag(PamGUIManager.FX);
 
-			mi = PamModuleInfo.registerControlledUnit("detectionPlotFX.DetectionDisplayControl", "Detection Display" );
+			mi = PamModuleInfo.registerControlledUnit("detectionPlotFX.DetectionDisplayControl2", "Detection Display" );
 			mi.setToolTipText("Display detection data");
 			mi.setModulesMenuGroup(displaysGroup);
 			mi.addGUICompatabilityFlag(PamGUIManager.FX);

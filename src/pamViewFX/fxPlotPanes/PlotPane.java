@@ -156,7 +156,9 @@ public class PlotPane extends PamBorderPane {
 		
 		//create the plot pane. 
 		canvasHolder=new PamBorderPane();
-		
+		canvasHolder.setMaxWidth(4000);
+		canvasHolder.setMaxHeight(4000);
+
         canvas = new Canvas(50, 50);
         canvas.heightProperty().bind(canvasHolder.heightProperty());
         canvas.widthProperty().bind(canvasHolder.widthProperty());

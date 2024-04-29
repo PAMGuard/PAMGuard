@@ -27,17 +27,22 @@ import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
 import rawDeepLearningClassifier.dataPlotFX.DLDetectionPlotProvider;
 import rawDeepLearningClassifier.dataPlotFX.DLPredictionProvider;
 import rawDeepLearningClassifier.ddPlotFX.RawDLDDPlotProvider;
+import rawDeepLearningClassifier.defaultModels.DLDefaultModelManager;
 import rawDeepLearningClassifier.dlClassification.DLClassName;
 import rawDeepLearningClassifier.dlClassification.DLClassNameManager;
 import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
+import rawDeepLearningClassifier.dlClassification.DLClassifierChooser;
 import rawDeepLearningClassifier.dlClassification.DLClassifyProcess;
 import rawDeepLearningClassifier.dlClassification.animalSpot.SoundSpotClassifier;
+import rawDeepLearningClassifier.dlClassification.archiveModel.PamZipModelClassifier;
+import rawDeepLearningClassifier.dlClassification.delphinID.DelphinIDClassifier;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericDLClassifier;
-import rawDeepLearningClassifier.dlClassification.ketos.KetosClassifier;
+import rawDeepLearningClassifier.dlClassification.ketos.KetosClassifier2;
+import rawDeepLearningClassifier.dlClassification.koogu.KooguClassifier;
 import rawDeepLearningClassifier.layoutFX.DLSidePanelSwing;
 import rawDeepLearningClassifier.layoutFX.DLSymbolManager;
 import rawDeepLearningClassifier.layoutFX.PredictionSymbolManager;
-import rawDeepLearningClassifier.layoutFX.RawDLSettingsPane;
+import rawDeepLearningClassifier.layoutFX.DLSettingsPane;
 import rawDeepLearningClassifier.logging.DLAnnotationType;
 import rawDeepLearningClassifier.logging.DLDataUnitDatagram;
 import rawDeepLearningClassifier.logging.DLDetectionBinarySource;
@@ -76,7 +81,7 @@ import rawDeepLearningClassifier.segmenter.SegmenterProcess;
  * AnimalSpot is a framework for training acoustic deep learning
  * models using Pytorch. Users can load a .py model which contains embedded
  * metadata so that PMAGuard knows the exact transforms required for the model
- * input. This makes deployin models in PAMGuard very easy - users require little
+ * input. This makes deploying models in PAMGuard very easy - users require little
  * or no experience to get this working.
  * <p>
  * <li>Ketos</li>
@@ -117,11 +122,12 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	 * List of different deep learning models that are available.
 	 */
 	private ArrayList<DLClassiferModel> dlModels = new ArrayList<DLClassiferModel>();
+	
 
 	/**
 	 * The settings pane.
 	 */
-	private RawDLSettingsPane settingsPane;
+	private DLSettingsPane settingsPane;
 
 	/**
 	 * The settings dialog
@@ -179,7 +185,24 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	 * The current data selector. 
 	 */
 	private DataSelector dataSelector;
+	
+	/**
+	 * Figure out which model type has been imported. 
+	 */
+	private DLClassifierChooser dlClassifierChooser;
 
+	/**
+	 * Handles downloading models from the internet
+	 */
+	private DLDownloadManager modelDownloadManager;
+
+
+	/**
+	 * Handles downloading models from the internet
+	 */
+	private DLDefaultModelManager defaultModelManager;
+	
+	
 	/**
 	 * Constructor for the DL Control.
 	 * 
@@ -190,6 +213,7 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 
 		PamRawDataBlock rawDataBlock = PamController.getInstance()
 				.getRawDataBlock(rawDLParmas.groupedSourceParams.getDataSource());
+		
 		
 		/**
 		 * In the latest release of djl (0.11.0) there is a bug with the dll's of tensorflow and 
@@ -205,7 +229,14 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 		// classify the raw data segments.
 		addPamProcess(dlClassifyProcess = new DLClassifyProcess(this, segmenterProcess.getSegmenterDataBlock()));
 
+		//manages the names assigned to different output classes. 
 		dlClassNameManager = new DLClassNameManager(this);
+		
+		//manages default models
+		defaultModelManager = new DLDefaultModelManager(this);
+		
+		//manages downloading models
+		modelDownloadManager = new DLDownloadManager(); 
 
 		// add storage options etc.
 		dlBinaryDataSource = new DLResultBinarySource(dlClassifyProcess);
@@ -223,9 +254,16 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 
 		/***** Add new deep learning models here ****/
 
-		dlModels.add(new GenericDLClassifier(this));
 		dlModels.add(new SoundSpotClassifier(this));
-		dlModels.add(new KetosClassifier(this));
+		dlModels.add(new KetosClassifier2(this));
+		dlModels.add(new KooguClassifier(this));
+		dlModels.add(new PamZipModelClassifier(this));
+		dlModels.add(new DelphinIDClassifier(this));
+		
+		//it is important the Generic Model is last because we need to check 
+		//for PG metadata in all other models before resorting to manually 
+		//setting up a model. 
+		dlModels.add(new GenericDLClassifier(this));
 
 		// dlModels.add(new DummyClassifier());
 		// dlModels.add(new OrcaSpotClassifier(this)); //removed soon.
@@ -239,7 +277,7 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 		TDDataProviderRegisterFX.getInstance()
 				.registerDataInfo(new DLDetectionPlotProvider(this, dlClassifyProcess.getDLDetectionDatablock()));
 		TDDataProviderRegisterFX.getInstance()
-				.registerDataInfo(new DLPredictionProvider(this, dlClassifyProcess.getDLDetectionDatablock()));
+				.registerDataInfo(new DLPredictionProvider(this, dlClassifyProcess.getDLPredictionDataBlock()));
 
 		// register the DD display
 		DDPlotRegister.getInstance()
@@ -251,7 +289,10 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 		// serialized
 		if (rawDLParmas.classNameMap == null)
 			rawDLParmas.classNameMap = new ArrayList<DLClassName>();
-
+		
+		//create the classiifer chooser. 
+		dlClassifierChooser = new DLClassifierChooser(this); 
+		
 		// ensure everything is updated.
 		updateParams(rawDLParmas);
 	}
@@ -264,6 +305,22 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	public ArrayList<DLClassiferModel> getDLModels() {
 		return dlModels;
 	}
+	
+	
+	/**
+	 * Get a model by it's name. 
+	 * @param the name the model. 
+	 * @return the corresponding model object or null if no model with the name exists.  
+	 */
+	public DLClassiferModel getDLModel(String string) {
+		for (int i=0; i< this.dlModels.size(); i++) {
+			if (dlModels.get(i).getName().equals(string)) {
+				return dlModels.get(i); 
+			}
+		}
+		return null;
+	}
+
 
 	/**
 	 * Get the current deep learning model.
@@ -271,7 +328,12 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	 * @return the current deep learning model.
 	 */
 	public DLClassiferModel getDLModel() {
-		return dlModels.get(rawDLParmas.modelSelection);
+		if (this.rawDLParmas.modelSelection<0 || this.rawDLParmas.modelSelection>=dlModels.size()) {
+			return null;
+		}
+		else {
+			return dlModels.get(this.rawDLParmas.modelSelection);
+		}
 	}
 
 	/**
@@ -342,11 +404,12 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	 * 
 	 * @return the settings pane.
 	 */
-	public RawDLSettingsPane getSettingsPane() {
+	public DLSettingsPane getSettingsPane() {
 
 		if (this.settingsPane == null) {
-			settingsPane = new RawDLSettingsPane(this);
+			settingsPane = new DLSettingsPane(this);
 		}
+		
 		return settingsPane;
 	}
 
@@ -526,6 +589,31 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 			}
 		}
 	}
+	
+	/**
+	 * Get the classifier chooser. 
+	 * @return the classifier chooser.Take it
+	 */
+	public DLClassifierChooser getDlClassifierChooser() {
+		return dlClassifierChooser;
+	}
+
+	/**
+	 * Get the download manager for downloading models offline. 
+	 * @return the download manager. 
+	 */
+	public DLDownloadManager getDownloadManager() {
+		return modelDownloadManager;
+	}
+
+	/**
+	 * Get the default model manager. This handles the default models that can be downloaded. 
+	 * @return the default model manager. 
+	 */
+	public DLDefaultModelManager getDefaultModelManager() {
+		return this.defaultModelManager;
+	}
+
 
 
 }

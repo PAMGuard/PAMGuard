@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Vectornator (http://vectornator.io/) -->
+
+<svg
+   height="100%"
+   stroke-miterlimit="10"
+   style="fill-rule:nonzero;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;"
+   version="1.1"
+   viewBox="0 0 100 100"
+   width="100%"
+   xml:space="preserve"
+   id="svg42"
+   sodipodi:docname="decimator.svg"
+   inkscape:version="1.3.2 (091e20e, 2023-11-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:vectornator="http://vectornator.io"><sodipodi:namedview
+   id="namedview42"
+   pagecolor="#ffffff"
+   bordercolor="#666666"
+   borderopacity="1.0"
+   inkscape:showpageshadow="2"
+   inkscape:pageopacity="0.0"
+   inkscape:pagecheckerboard="0"
+   inkscape:deskcolor="#d1d1d1"
+   inkscape:zoom="2.36"
+   inkscape:cx="49.788136"
+   inkscape:cy="49.788136"
+   inkscape:window-width="1792"
+   inkscape:window-height="1012"
+   inkscape:window-x="0"
+   inkscape:window-y="25"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="svg42" />
+<defs
+   id="defs1">
+
+
+
+
+
+</defs>
+<g
+   opacity="1"
+   vectornator:layerName="Group 1"
+   id="g12">
+<path
+   d="M 24.8316,3.25863 25.102,45.3757"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="Line"
+   id="path1" />
+<path
+   d="m 28.4549,10.4372 0.328,29.8509"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path2" />
+<path
+   d="M 21.1978,11.8074 21.1965,35.4759"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path3" />
+<path
+   d="m 32.0727,15.3402 0.2051,17.6539"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path4" />
+<path
+   d="m 35.7188,18.907 0.0833,10.0137"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path5" />
+<path
+   d="m 39.4183,17.3515 0.1908,13.9313"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path6" />
+<path
+   d="M 17.5159,17.2161 17.484,28.9877"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path7" />
+<path
+   d="m 13.7081,21.0242 v 4.5433"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path8" />
+<path
+   d="M 9.64888,22.2902 9.64609,23.8051"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path9" />
+<path
+   d="M 43.1503,27.5928 43.1024,21.0415"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path10" />
+<path
+   d="m 2.60583,23.0066 0.02582,-0.064"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path11" />
+<path
+   d="m 5.96432,22.6774 5.1e-4,0.7034"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path12" />
+</g><g
+   opacity="1"
+   vectornator:layerName="Group 2"
+   id="g27">
+<path
+   d="M 68.4016,4.02751 68.5538,46.8741"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="Line"
+   id="path13" />
+<path
+   d="m 71.9812,11.1625 0.3279,29.8509"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path14" />
+<path
+   d="M 64.724,12.5327 64.7228,36.2012"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path15" />
+<path
+   d="M 75.5989,16.0655 75.804,33.7194"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path16" />
+<path
+   d="M 79.245,19.6323 79.3284,29.646"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path17" />
+<path
+   d="m 82.9888,22.3088 0.0155,2.8641"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path18" />
+<path
+   d="M 90.1665,17.1197 90.2309,30.362"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path 1"
+   id="path19" />
+<path
+   d="m 93.8777,22.2952 0.0218,2.8913"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path 2"
+   id="path20" />
+<path
+   d="m 97.3942,23.7853 -0.0026,0.1841"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.36423"
+   vectornator:layerName="path 3"
+   id="path21" />
+<path
+   d="M 61.0421,17.9414 61.0102,29.713"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path22" />
+<path
+   d="m 57.2951,20.2877 v 8.0589"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path23" />
+<path
+   d="M 53.6397,17.6026 53.6118,31.0317"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path24" />
+<path
+   d="M 86.6526,28.316 V 19.1658"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path25" />
+<path
+   d="m 46.5,26.8171 0.0258,-5"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path26" />
+<path
+   d="M 50,34.5565 49.9611,14.0778"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path27" />
+</g><g
+   opacity="1"
+   vectornator:layerName="Group 3"
+   id="g33">
+<path
+   d="m 24.8316,52.5743 0.2704,42.117"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="Line"
+   id="path28" />
+<path
+   d="m 32.0727,64.6558 0.2051,17.6539"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path29" />
+<path
+   d="m 39.4697,66.8838 0.2001,13.9311"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path30" />
+<path
+   d="M 17.5159,66.5318 17.484,78.3034"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path31" />
+<path
+   d="m 9.64888,71.6058 -0.00279,1.515"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path32" />
+<path
+   d="M 2.60583,72.3222 2.63165,72.2583"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path33" />
+</g><g
+   opacity="1"
+   vectornator:layerName="Group 4"
+   id="g41">
+<path
+   d="m 68.4016,53.3432 0.1522,42.8465"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="Line"
+   id="path34" />
+<path
+   d="M 75.5989,65.3811 75.804,83.035"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path35" />
+<path
+   d="m 82.9888,71.6245 0.0155,2.8641"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path36" />
+<path
+   d="m 90.1665,66.4354 0.0644,13.2422"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path 1"
+   id="path37" />
+<path
+   d="M 97.3942,73.1009 97.3916,73.285"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.36423"
+   vectornator:layerName="path 3"
+   id="path38" />
+<path
+   d="M 61.0421,67.2571 61.0102,79.0287"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path39" />
+<path
+   d="m 53.2003,66.96 -0.028,13.4291"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path40" />
+<path
+   d="m 46.1063,75.5565 0.0258,-5"
+   fill="none"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="2.38065"
+   vectornator:layerName="path"
+   id="path41" />
+</g><path
+   d="m 46.8,41.4555 6.8365,0.0309 0.0118,4.2879 5.6212,-0.0067 L 50,57.3895 40.7305,45.8009 46.8,45.77 Z"
+   fill="#000000"
+   fill-rule="nonzero"
+   opacity="1"
+   stroke="#000000"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   stroke-width="1"
+   vectornator:layerName="Curve 1"
+   id="path42" />
+</svg>

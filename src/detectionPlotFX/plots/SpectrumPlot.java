@@ -1,6 +1,7 @@
 package detectionPlotFX.plots;
 
 import Layout.PamAxis;
+import PamUtils.Coordinate3d;
 import PamguardMVC.PamDataUnit;
 import detectionPlotFX.layout.DetectionPlot;
 import detectionPlotFX.layout.DetectionPlotDisplay;
@@ -131,7 +132,7 @@ public abstract class  SpectrumPlot <D extends PamDataUnit> implements Detection
 		
 		if (data ==null) return;
 
-		this.sR=sR;  
+		this.sR=sR; 
 
 		int[] minmax = getAxisMinMaxSamples(plotProjector);
 	
@@ -155,19 +156,23 @@ public abstract class  SpectrumPlot <D extends PamDataUnit> implements Detection
 
 	/**
 	 * Get the minimum and maximum samples currently shown in the plot projector
-	 * @param plotProjector - the pot projector. 
+	 * @param plotProjector - the plot projector. 
 	 * @return the minimum and maximum samples
 	 */
 	private int[] getAxisMinMaxSamples(DetectionPlotProjector plotProjector) {
 		int[] minmax = new int[2]; 
 		
 //		System.out.println("Plot projector: " + plotProjector.getAxis(Side.TOP).getMinVal() + "  " +
-//				plotProjector.getAxis(Side.TOP).getMaxVal());
+//				plotProjector.getAxis(Side.TOP).getMaxVal() + " sR: " + getSampleRate());
 
-		minmax[0] = (int) ((plotProjector.getAxis(Side.TOP).getMinVal()/1000.)*sR); //this is in milliseconds
-		minmax[1] = (int) ((plotProjector.getAxis(Side.TOP).getMaxVal()/1000.)*sR); 
-
+		minmax[0] = (int) ((plotProjector.getAxis(Side.TOP).getMinVal()/1000.)*getSampleRate()); //this is in milliseconds
+		minmax[1] = (int) ((plotProjector.getAxis(Side.TOP).getMaxVal()/1000.)*getSampleRate()); 
+		
 		return minmax; 
+	}
+
+	private double getSampleRate() {
+		return sR;
 	}
 
 	@Override
@@ -293,13 +298,13 @@ public abstract class  SpectrumPlot <D extends PamDataUnit> implements Detection
 	 */
 	private void drawSpectrum(GraphicsContext g2, Rectangle clipRect, double[][] clickLineData, DetectionPlotProjector projector){
 
-		double xScale, yScale;
+		double yScale;
 		double x0, y0, x1, y1;
 		Rectangle r = clipRect;
 
 		double scale = 1./(maxVal*1.1);
 
-		xScale = r.getWidth() /  (clickLineData[0].length - 1);
+//		xScale = r.getWidth() /  (clickLineData[0].length - 1);
 		yScale = r.getHeight() / (maxVal * 1.1);
 
 		double[] scaledDataX;
@@ -315,12 +320,15 @@ public abstract class  SpectrumPlot <D extends PamDataUnit> implements Detection
 			scaledDataX = new double[clickLineData[iChan].length+2];
 			scaledDataY = new double[clickLineData[iChan].length+2];
 			scaledDataY[0]= r.getHeight() ;
+			Coordinate3d coord;
 			for (int i = 1; i < clickLineData[iChan].length+1; i++) {
-				x1 = (i * xScale);
-				//				y1 = r.height - (int) (yScale * clickLineData[iChan][i]);
-				//System.out.println("Hello Projector: " +projector);
-				y1 =  projector.getCoord3d(0,clickLineData[iChan][i-1]*scale,0).y;
+//				x1 = (i * xScale);
+//				System.out.println("Freq: " + ((i-1)*1./clickLineData[iChan].length+1)*(getSampleRate()/2./1000.) + " " + (getSampleRate()/2./1000.) + "  " + ((i-1)*1./clickLineData[iChan].length));
+	
+				coord =  projector.getCoord3d(((i-1)*1./clickLineData[iChan].length)*(getSampleRate()/2./1000.) ,clickLineData[iChan][i-1]*scale,0);
 				//				g2.strokeLine(x0, y0, x1, y1);
+				x1 = coord.x;
+				y1=coord.y;
 
 				scaledDataX[i]=x1;
 				scaledDataY[i]=y1;
@@ -400,7 +408,7 @@ public abstract class  SpectrumPlot <D extends PamDataUnit> implements Detection
 			}
 			lastCepChoice = spectrumPlotParams.plotCepstrum;
 			//drawLogSpectrum(g,clipRect,clickLineData, eventLineData);
-			drawLogSpectrum(g,clipRect,clickLineData); 
+			drawLogSpectrum(g,clipRect,clickLineData, projector); 
 		}
 	}
 
@@ -412,11 +420,11 @@ public abstract class  SpectrumPlot <D extends PamDataUnit> implements Detection
 	 * @param eventLineData 
 	 * @param clickLineData 
 	 */
-	public void drawLogSpectrum(GraphicsContext g2, Rectangle clipRect, double[][] clickLineData){
+	public void drawLogSpectrum(GraphicsContext g2, Rectangle clipRect, double[][] clickLineData, DetectionPlotProjector projector){
 
 		Rectangle r = clipRect;
 		double xScale, yScale, scaleLim;
-		int x0, y0, x1, y1;
+		double x0, y0, x1, y1;
 		Color channelColour;
 
 		//		if (eventLineData!=null && isViewer==true && clickSpectrumParams.showEventInfo==true){
@@ -457,12 +465,16 @@ public abstract class  SpectrumPlot <D extends PamDataUnit> implements Detection
 		scaleLim = Math.abs(spectrumPlotParams.logRange);
 		yScale = r.getHeight() / Math.abs(scaleLim);
 
+		Coordinate3d coord;
 		for (int iChan = 0; iChan < logSpectrum.length; iChan++) {
 			g2.setStroke(PamColorsFX.getInstance().getChannelColor(iChan));
 			x0 = 0;
 			y0 = (int) (yScale * (maxLogVal-logSpectrum[iChan][0]));
 			for (int i = 1; i < logSpectrum[iChan].length; i++) {
 				x1 = (int) (i * xScale);
+				
+				coord =  projector.getCoord3d(((i-1)*1./clickLineData[iChan].length)*(getSampleRate()/2./1000.) ,0,0);
+				x1 = coord.x;
 				y1 = (int) (yScale * (maxLogVal-logSpectrum[iChan][i]));
 				g2.strokeLine(x0, y0, x1, y1);
 				x0 = x1;

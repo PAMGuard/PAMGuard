@@ -1,11 +1,19 @@
 package rawDeepLearningClassifier.dlClassification;
 
 import java.io.Serializable;
+import java.net.URI;
 import java.util.ArrayList;
 
+import org.jamdev.jdl4pam.transforms.DLTransform;
+import org.jamdev.jdl4pam.transforms.DLTransfromParams;
+import org.jamdev.jdl4pam.transforms.SimpleTransform;
+import org.jamdev.jdl4pam.transforms.SimpleTransformParams;
+
+import PamguardMVC.PamDataUnit;
+import javafx.scene.Node;
 import rawDeepLearningClassifier.DLControl;
+import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
-import rawDeepLearningClassifier.segmenter.SegmenterProcess.GroupedRawData;
 import warnings.PamWarning;
 
 /**
@@ -25,12 +33,26 @@ public interface DLClassiferModel {
 	 * 
 	 * @return the deep learning model.
 	 */
-	public ArrayList<? extends PredictionResult> runModel(ArrayList<GroupedRawData> rawDataUnit);
+	public ArrayList<? extends PredictionResult> runModel(ArrayList<? extends PamDataUnit> rawDataUnit);
 
 	/**
 	 * Prepare the model. This is called on PAMGuard start up.
+	 * @param file 
 	 */
 	public void prepModel();
+	
+	/**
+	 * Called whenever PAMGuard stops.
+	 * @return 
+	 */
+	public DLStatus setModel(URI model);
+	
+	/**
+	 * Check whether a URI is compatible with a classification framework 
+	 * @param model - the URI to the model 
+	 * @return true if the model is compatible. 
+	 */
+	public boolean isModelType(URI model); 
 
 	/**
 	 * Called whenever PAMGuard stops.
@@ -81,14 +103,32 @@ public interface DLClassiferModel {
 	/**
 	 * Check whether a model has been selected and can be loaded successfully. 
 	 */
-	public boolean checkModelOK();
+	public DLStatus getModelStatus();
+	
+//	/**
+//	 * Get warnings for the classifier model. This is called when the user confirms settings and 
+//	 * used to return a warning dialog. 
+//	 * @return a list of warnings. If the list is null or size() is zero then settings are OK. 
+//	 */
+//	public ArrayList<PamWarning> checkSettingsOK();
+	
 	
 	/**
-	 * Get warnings for the classifier model. This is called when the user confirms settings and 
-	 * used to return a warning dialog. 
-	 * @return a list of warnings. If the list is null or size() is zero then settings are OK. 
+	 * Get the parameters which can be serialized  from  transforms. 
+	 * @param dlTransfroms- the dl transforms. 
 	 */
-	public ArrayList<PamWarning> checkSettingsOK();
+	public static ArrayList<DLTransfromParams> getDLTransformParams(ArrayList<DLTransform> dlTransfroms) {
+		ArrayList<DLTransfromParams> dlTransformParams = new ArrayList<DLTransfromParams>(); 
+		
+		if (dlTransfroms==null) return null; 
+		//need to set the generic model params. 
+		for (int i=0; i<dlTransfroms.size(); i++) {
+			dlTransformParams.add(new SimpleTransformParams(dlTransfroms.get(i).getDLTransformType(), ((SimpleTransform) dlTransfroms.get(i)).getParams())); 
+		}
+		return dlTransformParams;
+	}
+
+
 	
 	
 

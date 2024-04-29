@@ -384,6 +384,7 @@ public class PamVector implements Serializable, Cloneable, PamCoordinate, Manage
 	public double norm(int nDim) {
 		return Math.sqrt(normSquared(nDim));
 	}
+	
 	/**
 	 * 
 	 * @param vec a PamVector

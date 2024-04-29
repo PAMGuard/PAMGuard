@@ -131,8 +131,11 @@ public class ClickWaveTask extends OfflineTask<ClickDetection> {
 //		setParentDataBlock(clickControl.getClickDataBlock());
 		addAffectedDataBlock(clickControl.getClickDataBlock());
 		
-		rawDataSource = (PamRawDataBlock) clickDetector.getRawSourceDataBlock(clickDetector.getSampleRate());
-		daqStatusDataBlock = ((AcquisitionProcess) rawDataSource.getParentProcess()).getDaqStatusDataBlock(); 
+		rawDataSource = (PamRawDataBlock) clickDetector.getRawSourceDataBlock();
+		
+		if (rawDataSource!=null) {
+			daqStatusDataBlock = ((AcquisitionProcess) rawDataSource.getParentProcess()).getDaqStatusDataBlock();
+		}
 	
 		//TODO- Should not hard wire these but this is not going to be used very often. 
 		filterParams = new FilterParams(FilterType.BUTTERWORTH, FilterBand.HIGHPASS, 250000, 5000, 4); 
@@ -154,6 +157,12 @@ public class ClickWaveTask extends OfflineTask<ClickDetection> {
 	@Override
 	public void prepareTask() {
 		Debug.out.println("Load data units from: daqStatusDataBlock: " + daqStatusDataBlock.getUnitsCount()); 
+		
+		if (daqStatusDataBlock==null) {
+			if (rawDataSource!=null) {
+				daqStatusDataBlock = ((AcquisitionProcess) rawDataSource.getParentProcess()).getDaqStatusDataBlock();
+			}
+		}
 		
 		filterMethod = FilterMethod.createFilterMethod(clickDetector.getSampleRate(), filterParams);
 

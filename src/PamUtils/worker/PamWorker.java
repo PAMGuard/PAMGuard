@@ -33,6 +33,7 @@ public class PamWorker<T> {
 
 	private BackgroundWorker backgroundWorker;
 
+
 	private volatile boolean running = false;
 
 	/**
@@ -82,11 +83,11 @@ public class PamWorker<T> {
 	 */
 	public boolean start() {
 		if (backgroundWorker.isCancelled() || backgroundWorker.isDone() || running) return false; 
-		backgroundWorker.execute();
+		backgroundWorker.execute();		
 		return true; 
 	}
 
-	protected class BackgroundWorker extends SwingWorker<T, PamWorkProgressMessage> {
+	public class BackgroundWorker extends SwingWorker<T, PamWorkProgressMessage> {
 
 		@Override
 		protected T doInBackground() throws Exception {
@@ -139,6 +140,12 @@ public class PamWorker<T> {
 		}
 
 	}
+	
+
+	public BackgroundWorker getBackgroundWorker() {
+		return backgroundWorker;
+	}
+
 
 
 

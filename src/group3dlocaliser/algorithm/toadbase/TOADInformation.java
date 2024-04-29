@@ -1,11 +1,13 @@
 package group3dlocaliser.algorithm.toadbase;
 
+import group3dlocaliser.algorithm.hyperbolic.HyperbolicParams;
+
 /**
  * Class holding information about TOAD delays, channels, etc. 
  * @author dg50
  *
  */
-public class TOADInformation {
+public class TOADInformation implements Cloneable {
 
 	private double[][] toadSeconds;
 
@@ -154,5 +156,17 @@ public class TOADInformation {
 	public void setToadScores(double[][] toadScores) {
 		this.toadScores = toadScores;
 	}
+	
+	 
+	 @Override
+	 public TOADInformation clone()  {
+		 try {
+
+			 return (TOADInformation) super.clone();
+		 } catch (CloneNotSupportedException e) {
+			 e.printStackTrace();
+			 return null;
+		 }
+	 }
 
 }

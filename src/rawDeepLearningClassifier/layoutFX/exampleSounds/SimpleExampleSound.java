@@ -57,7 +57,7 @@ public class SimpleExampleSound implements ExampleSound{
 
 	@Override
 	public double[] getWave() {
-		return data.getScaledSampleAmpliudes();
+		return data.getScaledSampleAmplitudes();
 	}
 
 	@Override

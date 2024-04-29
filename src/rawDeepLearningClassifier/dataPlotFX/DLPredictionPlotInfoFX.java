@@ -3,12 +3,14 @@ package rawDeepLearningClassifier.dataPlotFX;
 
 import java.io.Serializable;
 
+import PamController.PamController;
 import PamUtils.PamArrayUtils;
 import PamView.GeneralProjector;
 import PamView.GeneralProjector.ParameterType;
 import PamView.GeneralProjector.ParameterUnits;
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.PamSymbolManager;
+import PamguardMVC.PamConstants;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import dataPlotsFX.TDManagedSymbolChooserFX;
@@ -18,6 +20,7 @@ import dataPlotsFX.data.generic.GenericLinePlotInfo;
 import dataPlotsFX.data.generic.GenericScaleInfo;
 import dataPlotsFX.layout.TDGraphFX;
 import dataPlotsFX.projector.TDProjectorFX;
+import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
@@ -81,18 +84,30 @@ public class DLPredictionPlotInfoFX extends GenericLinePlotInfo {
 
 		frequencyInfo = new GenericScaleInfo(0, 1, ParameterType.FREQUENCY, ParameterUnits.HZ);
 		
-		DLClassName[] classNames = getDlControl().getDLModel().getClassNames();
-
-		//make sure this is initialised otherwise the plot won't work when first created. 
-		if (dlPredParams.lineInfos==null ) dlPredParams.lineInfos = new LineInfo[classNames.length];
-		for (int i=0; i<classNames.length; i++) {
-			if (dlPredParams.lineInfos[i]==null) {
-				dlPredParams.lineInfos[i] = new LineInfo(true, Color.rgb(0, 0, 255%(i*30 + 50)));
-			}
-		}
-
+		updateClassNames();
+		
 		addScaleInfo(probabilityScaleInfo);
 		addScaleInfo(frequencyInfo);
+	}
+	
+	private void updateClassNames() {
+		if (getDlControl().getDLModel()!=null) {
+			DLClassName[] classNames = getDlControl().getDLModel().getClassNames();
+
+//			System.out.println("Class names are: !!! " + (classNames == null ? "null" : classNames.length)); 
+
+			if (classNames!=null) {
+
+				//make sure this is initialised otherwise the plot won't work when first created. 
+				if (dlPredParams.lineInfos==null ) dlPredParams.lineInfos = new LineInfo[classNames.length];
+				for (int i=0; i<classNames.length; i++) {
+					if (dlPredParams.lineInfos[i]==null) {
+						dlPredParams.lineInfos[i] = new LineInfo(true, Color.rgb(0, 0, 255%(i*30 + 50)));
+					}
+				}
+
+			}
+		}
 	}
 
 
@@ -195,7 +210,7 @@ public class DLPredictionPlotInfoFX extends GenericLinePlotInfo {
 	public Polygon drawDataUnit(int plotNumber, PamDataUnit pamDataUnit, GraphicsContext g, double scrollStart,
 			TDProjectorFX tdProjector, int type) {
 
-		//System.out.println("Get data type: " + getScaleInfo().getDataType()); 
+//		System.out.println("Get prediciton data type: " + getScaleInfo().getDataType()); 
 		if (getScaleInfo().getDataType().equals(ParameterType.FREQUENCY)) { // frequency data !
 			return drawFrequencyData(plotNumber, pamDataUnit, g, scrollStart, tdProjector, type);
 		}
@@ -328,5 +343,22 @@ public class DLPredictionPlotInfoFX extends GenericLinePlotInfo {
 		
 		return dataD;
 	}
+	
+	/**
+	 * Notifications from the PamController are passed to this function.
+	 * 
+	 * @param changeType - notification flag.
+	 */
+	public void notifyChange(int changeType) {
+		super.notifyChange(changeType);
+		
+		switch (changeType) {
+		case PamController.CHANGED_PROCESS_SETTINGS:
+			updateClassNames();
+			break;
+		}
+
+	}
+	
 
 }

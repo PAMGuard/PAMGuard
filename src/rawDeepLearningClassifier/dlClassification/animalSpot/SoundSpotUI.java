@@ -1,8 +1,13 @@
 package rawDeepLearningClassifier.dlClassification.animalSpot;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.JPanel;
 
 import PamController.SettingsPane;
+import javafx.scene.Node;
+import javafx.stage.FileChooser.ExtensionFilter;
 import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
 
 
@@ -24,12 +29,21 @@ public class SoundSpotUI implements DLCLassiferModelUI {
 	 */
 	private SoundSpotClassifier soundSpotClassifier;
 	
+	
+	/**
+	 * The extension filter for sound spot models. 
+	 */
+	private ArrayList<ExtensionFilter> extensionFilters; 
+	
 	/**
 	 * SondSpot classifier. 
 	 * @param soundSpotClassifier
 	 */
 	public SoundSpotUI(SoundSpotClassifier soundSpotClassifier) {
 		this.soundSpotClassifier=soundSpotClassifier; 
+		
+		extensionFilters = new  ArrayList<ExtensionFilter> (); 
+		extensionFilters.add(new ExtensionFilter("Pytorch Model", "*.pk")); 
 	}
 
 	@Override
@@ -55,6 +69,23 @@ public class SoundSpotUI implements DLCLassiferModelUI {
 
 	@Override
 	public JPanel getSidePanel() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * Get a list of extension fitlers for the file dialog. 
+	 * e.g. 
+	 * new ExtensionFilter("Pytorch Model", "*.pk")
+	 * @return a list of extension fitlers for the file dialog. 
+	 */
+	@Override
+	public List<ExtensionFilter> getModelFileExtensions() {
+		return extensionFilters;
+	}
+
+	@Override
+	public Node getIcon() {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -11,7 +11,6 @@ import PamguardMVC.DataUnitBaseData;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamInstantProcess;
 import PamguardMVC.PamObservable;
-import PamguardMVC.PamProcess;
 import binaryFileStorage.DataUnitFileInformation;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.RawDLParams;
@@ -19,8 +18,8 @@ import rawDeepLearningClassifier.layoutFX.DLDetectionGraphics;
 import rawDeepLearningClassifier.layoutFX.DLGraphics;
 import rawDeepLearningClassifier.logging.DLAnnotation;
 import rawDeepLearningClassifier.logging.DLAnnotationType;
+import rawDeepLearningClassifier.segmenter.GroupedRawData;
 import rawDeepLearningClassifier.segmenter.SegmenterDataBlock;
-import rawDeepLearningClassifier.segmenter.SegmenterProcess.GroupedRawData;
 
 /**
  * The deep learning classification process. This takes a segment of raw data from the segmenter. 
@@ -534,6 +533,7 @@ public class DLClassifyProcess extends PamInstantProcess {
 	@Override
 	public void pamStart() {
 		// TODO Auto-generated method stub
+		System.out.println("PREP MODEL:");
 		this.dlControl.getDLModel().prepModel(); 
 	}
 

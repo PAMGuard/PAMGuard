@@ -191,6 +191,7 @@ public class SimpleTransformPane extends DLTransformPane {
 		//Set the new numbers
 		Number[] params = new Number[spinners.size()]; 
 		for (int i=0; i<spinners.size(); i++) {
+			//System.out.println("Get params" + spinners.get(i).getValue()); 
 			params[i] = spinners.get(i).getValue(); 
 		}
 
@@ -213,20 +214,18 @@ public class SimpleTransformPane extends DLTransformPane {
 		}
 		
 		//System.out.println("Transform type: " + simpleTransform.getDLTransformType() + " " + simpleTransform.getParams().length + "  " + spinners.size());
-		
 		for (int i=0; i<spinners.size(); i++) {
-			
 			//spinners.get(i).getValueFactory().setValue(simpleTransform.getParams()[i] ); 
-			
 			//System.out.println("Set params: " + input.getDLTransformType() + " param val: " + simpleTransform.getParams()[i] + "  " + (simpleTransform.getParams()[i] instanceof Float)); 
 			if (simpleTransform.getParams()[i] instanceof Float || simpleTransform.getParams()[i] instanceof Double) {
 				//System.out.println("Double: simpleTransform.getParams()[i]: " + simpleTransform.getParams()[i] + "  " +spinners.get(i).getValueFactory());
 				spinners.get(i).getValueFactory().setValue(simpleTransform.getParams()[i].doubleValue());
-
+				spinners.get(i).increment(0); //this is needed to commit values that are not multiples of 2, i.e. in the list
 			}
 			else {
 				//System.out.println("Double: simpleTransform.getParams()[i]: " + simpleTransform.getParams()[i] + "  " +spinners.get(i).getValueFactory());
 				spinners.get(i).getValueFactory().setValue(simpleTransform.getParams()[i].intValue());
+				spinners.get(i).increment(0); //this is needed to commit values that are not multiples of 2, i.e. in the list
 			}
 		}
 

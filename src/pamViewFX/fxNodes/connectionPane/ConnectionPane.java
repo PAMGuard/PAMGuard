@@ -411,26 +411,29 @@ public class ConnectionPane extends Pane {
 		if (includeBranch) {
 			StandardConnectionSocket socket;
 			for (int i = 0; i < parentNode.getConnectionPlugs().size(); i++) {
-				socket = (StandardConnectionSocket) parentNode.getConnectionPlugs().get(i).getConnectedShape();
-				if (socket == null || !socket.isBranch())
-					continue;
-				// is this socket connected to child node?
-				if (socket.getParentConnectionPlug().getConnectedShape() != null) {
+				if (parentNode.getConnectionPlugs().get(i).getConnectedShape() instanceof StandardConnectionSocket) {
+					socket = (StandardConnectionSocket) parentNode.getConnectionPlugs().get(i).getConnectedShape();
+					if (socket == null || !socket.isBranch())
+						continue;
+					// is this socket connected to child node?
+					if (socket.getParentConnectionPlug().getConnectedShape() != null) {
 
-					if (socket.getParentConnectionPlug().getConnectedShape().getConnectionNode() == childNode) {
-						// return socket.getParentConnectionPlug();
-						node = socket.getConnectedShape();
-					} 
-					else if (bypassStructure && socket.getParentConnectionPlug().getConnectedShape()
-							.getConnectionNode() instanceof ConnectionStructure) {
-						// go down another level
-						node = getConnectionPlug(parentNode,
-								socket.getParentConnectionPlug().getConnectedShape().getConnectionNode(), includeBranch,
-								bypassStructure);
+						if (socket.getParentConnectionPlug().getConnectedShape().getConnectionNode() == childNode) {
+							// return socket.getParentConnectionPlug();
+							node = socket.getConnectedShape();
+						} 
+						else if (bypassStructure && socket.getParentConnectionPlug().getConnectedShape()
+								.getConnectionNode() instanceof ConnectionStructure) {
+							// go down another level
+							node = getConnectionPlug(parentNode,
+									socket.getParentConnectionPlug().getConnectedShape().getConnectionNode(), includeBranch,
+									bypassStructure);
+						}
 					}
+
+					if (node != null)
+						return node;
 				}
-				if (node != null)
-					return node;
 
 			}
 		}

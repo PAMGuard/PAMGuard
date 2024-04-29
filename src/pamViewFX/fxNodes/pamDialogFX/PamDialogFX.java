@@ -20,6 +20,7 @@ import javafx.stage.Window;
 
 /**
  * Creates a dialog with some useful PAMGUARD customisation.
+ * 
  * @author Jamie Macaulay
  *
  */
@@ -252,6 +253,14 @@ public abstract class PamDialogFX<T> extends Dialog<T> {
 	 */
 	public static boolean showError(String content) {
 		return showMessageDialog(null, "Error", content, AlertType.ERROR); 
+	}
+	
+	/**
+	 * Show error dialog with default OK and CANCEL. 
+	 * @param content - the error message. 
+	 */
+	public static boolean showError(String title, String content) {
+		return showMessageDialog(null, title, content, AlertType.ERROR); 
 	}
 
 	public static boolean showMessageDialog(Window owner, String string, String string2, ButtonType yes,

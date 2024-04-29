@@ -10,12 +10,12 @@ import pamViewFX.PamControlledGUIFX;
 public class CPODGUIFX extends PamControlledGUIFX {
 	
 	/**
-	 * The dl control. 
+	 * Reference to the CPOD control. 
 	 */
-	private CPODControl2 dlControl;
+	private CPODControl2 cpodControl;
 
 	public CPODGUIFX(CPODControl2 cpodControl2) {
-		// TODO Auto-generated constructor stub
+		cpodControl = cpodControl2; 
 	}
 
 	
@@ -27,19 +27,19 @@ public class CPODGUIFX extends PamControlledGUIFX {
 	 * @return a Pane containing controls to change settings for module.
 	 */
 	public SettingsPane<?> getSettingsPane(){
-		dlControl.getSettingsPane().setParams(dlControl.getCPODParam());
-		return dlControl.getSettingsPane();
+		cpodControl.getSettingsPane().setParams(cpodControl.getCPODParam());
+		return cpodControl.getSettingsPane();
 	}
 	
 	
 	@Override
 	public void updateParams() {
-		CPODParams newParams=dlControl.getSettingsPane().getParams(dlControl.getCPODParam()); 
+		CPODParams newParams=cpodControl.getSettingsPane().getParams(cpodControl.getCPODParam()); 
 		if (newParams!=null) {
-			dlControl.setCPODParams(newParams);
+			cpodControl.setCPODParams(newParams);
 		}
 		//setup the controlled unit. 
-		dlControl.setupControlledUnit(); 
+		cpodControl.setupControlledUnit(); 
 	}
 	
 	@Override

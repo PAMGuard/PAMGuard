@@ -95,7 +95,7 @@ public class TDScrollerSettingsPane extends DynamicSettingsPane<TDAcousticScroll
 		
 
 		mainPane.setCenter(settingsBox); 
-		mainPane.getStylesheets().add(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
+		mainPane.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
 		mainPane.getStyleClass().add("pane-trans");
 
 

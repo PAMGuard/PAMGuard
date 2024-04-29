@@ -76,9 +76,7 @@ public class GenericImportExportPane extends ImportExportPane {
 
 			//set the default segment length if available.
 			if (genericModelParams.defaultSegmentLen!=null) {
-				double sR = genericAdvPane.getDLControl().getSettingsPane().getSelectedParentDataBlock().getSampleRate(); 
-				//automatically set the default segment length. 
-				genericAdvPane.getDLControl().getSettingsPane().getSegmentLenSpinner().getValueFactory().setValue((int) (sR*genericModelParams.defaultSegmentLen/1000.));
+				genericAdvPane.getDLControl().getSettingsPane().setSegmentLength(genericModelParams.defaultSegmentLen);
 			}
 
 			if (genericModelParams==null) {

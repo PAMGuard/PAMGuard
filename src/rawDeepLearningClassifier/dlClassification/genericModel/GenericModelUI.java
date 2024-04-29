@@ -1,12 +1,17 @@
 package rawDeepLearningClassifier.dlClassification.genericModel;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.JPanel;
 
 import PamController.SettingsPane;
 import PamView.dialog.warn.WarnOnce;
 import PamView.dialog.warn.WarnOnceDialog;
 import javafx.application.Platform;
+import javafx.scene.Node;
 import javafx.scene.control.Alert.AlertType;
+import javafx.stage.FileChooser.ExtensionFilter;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
 
@@ -28,6 +33,11 @@ public class GenericModelUI  implements DLCLassiferModelUI {
 	 * The sound spot classifier. 
 	 */
 	private GenericDLClassifier genericModelClassifier;
+	
+	/**
+	 * The extension filter for sound spot models. 
+	 */
+	private ArrayList<ExtensionFilter> extensionFilters;
 
 	/**
 	 * SondSpot classifier. 
@@ -35,6 +45,13 @@ public class GenericModelUI  implements DLCLassiferModelUI {
 	 */
 	public GenericModelUI(GenericDLClassifier soundSpotClassifier) {
 		this.genericModelClassifier=soundSpotClassifier; 
+		
+		//must add an additional import settings button. 
+		extensionFilters = new ArrayList<ExtensionFilter>(); 
+
+		//import the settings holder
+		extensionFilters.add(new ExtensionFilter("TensorFlow Model", "*.pb")); 
+		extensionFilters.add(new ExtensionFilter("Pytorch Model", 	"*.pk"));
 	}
 
 	@Override
@@ -56,7 +73,7 @@ public class GenericModelUI  implements DLCLassiferModelUI {
 
 	@Override
 	public void setParams() {
-		//		System.out.println("Set model params: " + genericModelClassifier.getGenericDLParams().dlTransfromParams.size()); 
+//		System.out.println("SE MODEL UI PARAMS: " + genericModelClassifier.getGenericDLParams().dlTransfromParams.size()); 
 		getSettingsPane().setParams(genericModelClassifier.getGenericDLParams());
 	}
 
@@ -68,4 +85,14 @@ public class GenericModelUI  implements DLCLassiferModelUI {
 	}
 	
 
+	@Override
+	public List<ExtensionFilter> getModelFileExtensions() {
+		return extensionFilters;
+	}
+
+	@Override
+	public Node getIcon() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

@@ -6,6 +6,7 @@ import javax.vecmath.Point3f;
 
 import Localiser.algorithms.genericLocaliser.MCMC.MCMC.ChainResult;
 import Localiser.algorithms.locErrors.EllipticalError;
+import PamUtils.PamArrayUtils;
 
 public class MCMCResult {
 
@@ -122,17 +123,89 @@ public class MCMCResult {
 	public ArrayList<ArrayList<Point3f>> getJumps() {
 		ArrayList<ArrayList<Point3f>>  jumps=new ArrayList<ArrayList<Point3f>>(); 
 		ArrayList<Point3f> chainJumps; 
-		double[] ajump; 
+		float[] ajump; 
 		for (int i=0; i<this.data.size(); i++) {
 			chainJumps= new ArrayList<Point3f>(); 
 			for (int j=0; j<this.data.get(i).successJump.size(); j++) {
 				ajump= this.data.get(i).successJump.get(j); 
-				chainJumps.add(new Point3f((float) ajump[0], (float) ajump[1], (float) ajump[2])); 
+				chainJumps.add(new Point3f(ajump[0],  ajump[1],  ajump[2])); 
 			}
 			jumps.add(chainJumps); 
 		}
 		return jumps;
 	}
+	
+	
+	public double[][] getJumpsd() {
+		return  getJumpsd(1); 
+	}
+	
+	public double[][] getJumpsf() {
+		return  getJumpsd(1); 
+	}
+
+	
+	/**
+	 * Get the jumps for the MCMC algorithm in double[][] format. This is for legacy code. 
+	 * @param div - reduce the data by div times (e.g. for plotting).
+	 * @return the MCMC jumps from all chains. 
+	 */
+	public double[][] getJumpsd(int div) {
+		
+		if (div<1) div = 1; 
+		
+//		int nJumps = 0; 
+//		for (int i=0; i<this.data.size(); i++) {
+//			nJumps = (int) (nJumps + Math.floor(this.data.get(i).successJump.size()/div)+1); 
+//		}
+//		
+		int nJumps = 0; 
+		for (int i=0; i<this.data.size(); i++) {
+			for (int j=0; j<this.data.get(i).successJump.size(); j=j+div) {
+				nJumps++; 
+			}
+		}
+		double[][] jumps = new double[nJumps][]; 
+		
+		double[] ajump; 
+		int n=0; 
+		for (int i=0; i<this.data.size(); i++) {
+			for (int j=0; j<this.data.get(i).successJump.size(); j=j+div) {
+				ajump= PamArrayUtils.float2Double(this.data.get(i).successJump.get(j)); 
+				jumps[n] = ajump; 
+				n++; 
+			}
+		}
+		return jumps;
+	}
+	
+	/**
+	 * Get the jumps for the MCMC algorithm in double[][] format. This is for legacy code. 
+	 * @param div - reduce the data by div times (e.g. for plotting).
+	 * @return the MCMC jumps from all chains. 
+	 */
+	public float[][] getJumpsf(int div) {
+		
+		if (div<1) div =1; 
+		
+		int nJumps = 0; 
+		for (int i=0; i<this.data.size(); i++) {
+			nJumps = nJumps + this.data.get(i).successJump.size(); 
+		}
+		float[][] jumps = new float[(int) Math.floor(nJumps/div)][]; 
+
+		float[] ajump; 
+		int n=0; 
+		for (int i=0; i<this.data.size(); i=i++) {
+			for (int j=0; j<this.data.get(i).successJump.size(); j=j+div) {
+				ajump= this.data.get(i).successJump.get(j); 
+				jumps[n] = ajump; 
+				n++; 
+			}
+		}
+		return jumps;
+	}
+
 
 }
 

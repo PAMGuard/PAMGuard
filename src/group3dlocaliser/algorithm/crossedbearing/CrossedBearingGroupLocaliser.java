@@ -1,12 +1,11 @@
 package group3dlocaliser.algorithm.crossedbearing;
 
 import java.awt.Window;
-import java.util.List;
+import java.io.Serializable;
 
 import Array.ArrayManager;
 import Localiser.LocaliserPane;
 import Localiser.detectionGroupLocaliser.DetectionGroupOptions;
-import Localiser.detectionGroupLocaliser.GroupLocalisation;
 import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamDetection.LocalisationInfo;
@@ -17,11 +16,21 @@ import annotation.localise.targetmotion.TMAnnotation;
 import annotation.localise.targetmotion.TMAnnotationOptions;
 import annotation.localise.targetmotion.TMAnnotationType;
 import generalDatabase.SQLLoggingAddon;
-import group3dlocaliser.GroupLocDataUnit;
+import group3dlocaliser.Group3DLocaliserControl;
 import group3dlocaliser.algorithm.LocaliserAlgorithm3D;
 import group3dlocaliser.algorithm.LocaliserAlgorithmParams;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
+import pamViewFX.PamGuiManagerFX;
+import pamViewFX.fxGlyphs.PamGlyphDude;
+import pamViewFX.fxNodes.PamBorderPane;
+import pamViewFX.fxNodes.PamButton;
+import pamViewFX.fxNodes.PamHBox;
 
-public class CrossedBearingGroupLocaliser extends LocaliserAlgorithm3D{
+public class CrossedBearingGroupLocaliser extends LocaliserAlgorithm3D {
 
 	private double sampleRate;
 	
@@ -29,7 +38,12 @@ public class CrossedBearingGroupLocaliser extends LocaliserAlgorithm3D{
 	
 	private LocContents locContents = new LocContents(LocContents.HAS_BEARING);
 
-	public CrossedBearingGroupLocaliser() {
+	private CrossedBearingPane crossedBearingPane;
+
+	private Group3DLocaliserControl group3dLocaliserControl;
+
+	public CrossedBearingGroupLocaliser(Group3DLocaliserControl group3dLocaliserControl) {
+		this.group3dLocaliserControl = group3dLocaliserControl; 
 		tmAnnotationType = new TMAnnotationType();
 		TMAnnotationOptions tmAnnotationOptions = new TMAnnotationOptions("CrossedBearingGroupLocaliser");
 		tmAnnotationOptions.getLocalisationParams().setIsSelected(0, false);
@@ -124,9 +138,11 @@ public class CrossedBearingGroupLocaliser extends LocaliserAlgorithm3D{
 	 * @see Localiser.LocaliserModel#getSettingsPane()
 	 */
 	@Override
-	public LocaliserPane<?> getSettingsPane() {
-		// TODO Auto-generated method stub
-		return null;
+	public LocaliserPane<Serializable> getAlgorithmSettingsPane() {
+		if (crossedBearingPane == null) {
+			crossedBearingPane = new CrossedBearingPane(); 
+		}
+		return crossedBearingPane;
 	}
 
 	/* (non-Javadoc)
@@ -145,27 +161,120 @@ public class CrossedBearingGroupLocaliser extends LocaliserAlgorithm3D{
 		// TODO Auto-generated method stub
 		
 	}
-
-	/* (non-Javadoc)
-	 * @see group3dlocaliser.algorithm.LocaliserAlgorithmProvider#showAlgorithmDialog(java.awt.Window, group3dlocaliser.algorithm.LocaliserAlgorithmParams)
+	
+	//TODO - make this full FX 
+	/**
+	 * Settings pane for the crossed bearing loclaiser. Note that this just shows a settings button which open a swing dialog.. 
+	 * @author Jamie Macaulay
+	 *
 	 */
-	@Override
-	public LocaliserAlgorithmParams showAlgorithmDialog(Window parent, LocaliserAlgorithmParams currentParams) {
+	public class CrossedBearingPane extends LocaliserPane<Serializable> {
+
+		private PamBorderPane mainPane;
 		
-		if (currentParams != null && currentParams.getAlgorithmParameters() instanceof TMAnnotationOptions) {
-			TMAnnotationOptions p = (TMAnnotationOptions) currentParams.getAlgorithmParameters();
-			this.setTmAnnotationOptions(p);
+		private LocaliserAlgorithmParams algorithmPaams;
+
+		public CrossedBearingPane() {
+				PamHBox hBox = new PamHBox(); 
+				hBox.setSpacing(5);
+				hBox.setAlignment(Pos.CENTER);
+				hBox.setPadding(new Insets(5,5,5,5));
+				
+				PamButton algoOptsButton = new PamButton("",PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconSize));
+				algoOptsButton.setOnAction((action)->{
+					moreAlgorithmOptions() ;
+				});
+				algoOptsButton.setTooltip(new Tooltip("More Algorithm Options ..."));
+				
+				hBox.getChildren().addAll(new Label(getName() + " settings"), algoOptsButton); 
+				
+				
+				mainPane = new PamBorderPane(); 
+				mainPane.setCenter(hBox); 
 		}
 		
-//		AnnotationSettingsPanel settingsPanel = cbLocaliser.getTmAnnotationType().getSettingsPanel();
-		boolean asd = AnnotationSettingsDialog.showDialog(parent, this.getTmAnnotationType());
-		if (asd) {
-			return new LocaliserAlgorithmParams(this.getTmAnnotationOptions());
+		/**
+		 * Handle algorithm options ...
+		 */
+		protected void moreAlgorithmOptions() {
+			String algoName  = getName();
+			if (algoName == null) {
+				return;
+			}
+			LocaliserAlgorithm3D localiserAlgorithm = group3dLocaliserControl.findAlgorithm(algoName);
+			if (localiserAlgorithm == null) {
+				return;
+			}
+			if (localiserAlgorithm.hasParams() == false) {
+				return;
+			}
+			
+			LocaliserAlgorithmParams algorithmPaams = group3dLocaliserControl.getLocaliserAlgorithmParams(localiserAlgorithm);
+			
+			
+			this.algorithmPaams  = showAlgorithmDialog(getAWTWindow(), algorithmPaams);
+			
+			
+//			if (algorithmPaams != null) {
+//				group3dLocaliserControl.setAlgorithmParams(localiserAlgorithm, algorithmPaams);
+//			}
 		}
-		else {
-			return null;
+		
+		
+		/* (non-Javadoc)
+		 * @see group3dlocaliser.algorithm.LocaliserAlgorithmProvider#showAlgorithmDialog(java.awt.Window, group3dlocaliser.algorithm.LocaliserAlgorithmParams)
+		 */
+		public LocaliserAlgorithmParams showAlgorithmDialog(Window parent, LocaliserAlgorithmParams currentParams) {
+			
+			if (currentParams != null && currentParams.getAlgorithmParameters() instanceof TMAnnotationOptions) {
+				TMAnnotationOptions p = (TMAnnotationOptions) currentParams.getAlgorithmParameters();
+				setTmAnnotationOptions(p);
+			}
+			
+//			AnnotationSettingsPanel settingsPanel = cbLocaliser.getTmAnnotationType().getSettingsPanel();
+			boolean asd = AnnotationSettingsDialog.showDialog(parent, getTmAnnotationType());
+			
+			
+			if (asd) {
+				return new LocaliserAlgorithmParams(getTmAnnotationOptions());
+			}
+			else {
+				return null;
+			}
 		}
+
+		@Override
+		public Serializable getParams(Serializable currParams) {
+			if (algorithmPaams!=null) {
+				return this.algorithmPaams ; 
+			}
+			return currParams;
+		}
+
+		@Override
+		public void setParams(Serializable input) {
+			this.algorithmPaams = (LocaliserAlgorithmParams) input;
+		}
+
+		@Override
+		public String getName() {
+			return "Crossed Bearing Settings";
+		}
+
+		@Override
+		public Node getContentNode() {
+			return mainPane;
+		}
+
+		@Override
+		public void paneInitialized() {
+			// TODO Auto-generated method stub
+			
+		}
+		
 	}
+
+	
 
 	@Override
 	public boolean canLocalise(PamDataBlock pamDataBlock) {

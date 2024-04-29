@@ -517,7 +517,7 @@ public class ClickPlotInfoFX extends TDDataInfoFX {
 
 		if (pamDataUnit.getSuperDetectionsCount()==0) return null;
 
-		ListIterator<PamDataUnit> iterator = this.getPamDataBlock().getListIterator(PamDataBlock.ITERATOR_END); 
+		ListIterator<PamDataUnit> iterator = this.getDataBlock().getListIterator(PamDataBlock.ITERATOR_END); 
 		PamDataUnit testDataUnit; 
 
 		while (iterator.hasPrevious()) {

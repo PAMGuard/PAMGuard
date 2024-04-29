@@ -1,11 +1,13 @@
 package cpod;
 
+import java.awt.Color;
+
 import PamController.PamControlledUnit;
+import PamView.PamSymbolType;
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.StandardSymbolManager;
 import PamView.symbol.SymbolData;
 import PamView.symbol.modifier.PeakFreqModifier;
-import PamView.symbol.modifier.SuperDetSymbolModifier;
 import PamguardMVC.PamDataBlock;
 
 public class CPODSymbolManager extends StandardSymbolManager {
@@ -15,6 +17,9 @@ public class CPODSymbolManager extends StandardSymbolManager {
 	 */
 	private PamControlledUnit cpodControl;
 	
+	
+	private static SymbolData defaultSymbol = new SymbolData(PamSymbolType.SYMBOL_CIRCLE, 10, 10, true, Color.BLACK, Color.BLACK);
+	
 //	/**
 //	 * Flag to colour clicks by their frequency. It has to be one higher than the other options. 
 //	 * 
@@ -22,7 +27,7 @@ public class CPODSymbolManager extends StandardSymbolManager {
 //	public static final int COLOUR_BY_FREQ= 6;
 
 	public CPODSymbolManager(PamControlledUnit cpodControl, PamDataBlock pamDataBlock) {
-		super(pamDataBlock, new SymbolData());
+		super(pamDataBlock, defaultSymbol);
 		this.cpodControl = cpodControl;
 		addSymbolOption(HAS_SYMBOL);
 	}
@@ -44,13 +49,15 @@ public class CPODSymbolManager extends StandardSymbolManager {
 	@Override
 	public void addSymbolModifiers(PamSymbolChooser psc) {
 	
-		
 		super.addSymbolModifiers(psc);
 		
 		//add the peak frequency modifier that allows clicks to be coloured by peak frequency. 
 		psc.addSymbolModifier(new PeakFreqModifier(psc));
 		
-		// we can also add some default behaviour here to match the old behaviour
+		//add the peak frequency modifier that allows clicks to be coloured by peak frequency. 
+		psc.addSymbolModifier(new CPODSpeciesModifier(psc));
+		
+		// we can also add some default behaviour here to match the old behaviours
 		// these will get overridden once user options are set, but it's good to give defaults. 
 //		SymbolModifier eventMod = psc.hasSymbolModifier(SuperDetSymbolModifier.class);
 //		if (eventMod != null) {

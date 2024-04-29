@@ -86,7 +86,7 @@ abstract public class GeneralGroupLocaliser implements LocaliserModel<PamDataUni
 
 
 	@Override
-	public LocaliserPane<?> getSettingsPane() {
+	public LocaliserPane<?> getAlgorithmSettingsPane() {
 		// no settings pane for this. Settings come from click control params 
 		//and so are never called here. 
 		return null;

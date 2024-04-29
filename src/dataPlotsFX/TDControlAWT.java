@@ -85,7 +85,7 @@ public class TDControlAWT  extends TDControl implements UserDisplayComponent {
 				Group root=  new  Group();
 				Scene scene  =  new  Scene(root, Color.GRAY);
 				scene.getStylesheets().clear();
-				scene.getStylesheets().add(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getGUICSS());    
+				scene.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getGUICSS());    
 
 				setTDDisplay(new TDDisplayFX(tdControlfx));
 				root.getChildren().add(getTDDisplay());

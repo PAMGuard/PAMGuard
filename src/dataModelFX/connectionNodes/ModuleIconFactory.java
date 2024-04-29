@@ -2,6 +2,7 @@ package dataModelFX.connectionNodes;
 
 import dataModelFX.DataModelStyle;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
@@ -34,7 +35,8 @@ public class ModuleIconFactory {
 	 */
 	public enum ModuleIcon {
 		DATAMAP, NMEA, GPS, MAP, SOUND_AQ, SOUND_OUTPUT, FFT, FILTER, CLICK, CLICK_TRAIN, RECORDER, WHISTLE_MOAN,
-		NOISE_BAND, NOISE_FILT, DATABASE, BINARY, TIME_DISPLAY, DETECTION_DISPLAY, ARRAY, DEEP_LEARNING
+		NOISE_BAND, NOISE_FILT, DATABASE, BINARY, TIME_DISPLAY, DETECTION_DISPLAY, ARRAY, DEEP_LEARNING, MATCHED_CLICK_CLASSIFIER,
+		DECIMATOR, CPOD, TETHYS
 	}
 
 	/**
@@ -43,77 +45,128 @@ public class ModuleIconFactory {
 	 * @return the icon for the controlled unit
 	 */
 	public  Node getModuleNode(ModuleIcon icon){
+		long time1 = System.currentTimeMillis();
+		Node iconNode =null;
+		
 		switch (icon){
 		case ARRAY:
-			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/array_manager.png")));
+//			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/array_manager.png")));
+			iconNode = getSVGIcon("/Resources/modules/Array Icon2.svg",Color.BLACK, 3);
+			break;
 		case BINARY:
 //			return PamGlyphDude.createModuleGlyph(OctIcon.FILE_BINARY); 
-			return PamGlyphDude.createModuleIcon("mdi2f-file-star-outline"); 
+			iconNode = PamGlyphDude.createModuleIcon("mdi2f-file-star-outline"); 
+			break;
 		case CLICK:
-			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/click.png")));
+//			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/click.png")));
+			iconNode = getSVGIcon("/Resources/modules/Click Detector Icon.svg", Color.BLACK, 2);
+			break;
 		case CLICK_TRAIN:
-			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/clicktrain.png")));
+//			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/clicktrain.png")));
+			iconNode = getSVGIcon("/Resources/modules/clicktrain.svg",Color.BLACK, 2);
+			break;
 		case DATABASE:
 //			return PamGlyphDude.createModuleGlyph(FontAwesomeIcon.DATABASE);
-			return PamGlyphDude.createModuleIcon("mdi2d-database");
+			iconNode = PamGlyphDude.createModuleIcon("mdi2d-database");
+			break;
 		case DATAMAP:
-			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/dataMap.png")));
+			iconNode = new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/dataMap.png")));
+			break;
 		case FFT:
-			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/fft.png")));
+//			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/fft.png")));
+			iconNode = getSVGIcon("/Resources/modules/fft.svg",Color.BLACK, 2);
+			break;
 		case FILTER:
-			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/filters.png")));
+//			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/filters.png")));
+			iconNode = getSVGIcon("/Resources/modules/filters.svg",Color.BLACK, 2);
+			break;
 		case GPS:
 //			return PamGlyphDude.createModuleGlyph(MaterialIcon.GPS_FIXED); 
-			return PamGlyphDude.createModuleIcon("mdi2c-crosshairs-gps"); 
+			iconNode = PamGlyphDude.createModuleIcon("mdi2c-crosshairs-gps"); 
+			break;
 		case MAP:
 //			return PamGlyphDude.createModuleGlyph(MaterialIcon.MAP);
-			return PamGlyphDude.createModuleIcon("mdi2m-map");
+			iconNode = PamGlyphDude.createModuleIcon("mdi2m-map");
+			break;
 		case NMEA:
-			return createNMEASymbol();
+			iconNode = createNMEASymbol();
 		case NOISE_BAND:
-			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/filterdNoiseMeasurementBank.png")));
+			iconNode = new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/filterdNoiseMeasurementBank.png")));
+			break;
 		case NOISE_FILT:
-			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/filterdNoiseMeasurement.png")));
+			iconNode = new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/filterdNoiseMeasurement.png")));
+			break;
 		case RECORDER:
-			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/recorder.png")));
+			iconNode = new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/recorder.png")));
+			break;
 		case SOUND_AQ:
-			return getSVGIcon("/Resources/modules/noun_Soundwave_1786340.svg");
+			iconNode = getSVGIcon("/Resources/modules/noun_Soundwave_1786340.svg");
+			break;
+		case MATCHED_CLICK_CLASSIFIER:
+			iconNode = getSVGIcon("/Resources/modules/matched_click_classifier.svg",Color.BLACK, 2);
+			break;
 			//return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/aquisition.png")));
 		case SOUND_OUTPUT:
 //			return PamGlyphDude.createModuleGlyph(MaterialDesignIcon.HEADPHONES); 
-			return PamGlyphDude.createModuleIcon("mdi2h-headphones"); 
-			//return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/playback.png")));
+			iconNode = PamGlyphDude.createModuleIcon("mdi2h-headphones"); 
+			break;
+//return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/playback.png")));
 		case WHISTLE_MOAN:
-			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/whistles.png")));
+			iconNode = new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/whistles.png")));
+			break;
 		case TIME_DISPLAY:
-			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/timeDisplay.png"))); 
+			iconNode = new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/timeDisplay.png"))); 
+			break;
 		case DETECTION_DISPLAY: 
-			return new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/detectionDisplay.png")));
+			iconNode = new ImageView(new Image(getClass().getResourceAsStream("/Resources/modules/detectionDisplay.png")));
+			break;
 		case DEEP_LEARNING:
-			
 			//System.out.println("------GET THE SVG ICON FOR DEEP LEARNING--------");
-			return getSVGIcon("/Resources/modules/noun_Deep Learning_2486374.svg"); 
+			iconNode = getSVGIcon("/Resources/modules/noun_Deep Learning_2486374.svg"); 
+			break;
+		case DECIMATOR:
+			iconNode = getSVGIcon("/Resources/modules/decimator.svg"); 
+			break;
+		case CPOD:
+			iconNode = new Label("CPOD"); //TEMP
+			break;
+		case TETHYS:
+			iconNode = PamGlyphDude.createModuleIcon("file-codemeta"); 
+			break;
 		default:
 			break;
-
 		}
-		return null;
+		
+		long time2 = System.currentTimeMillis();
+		return iconNode;
 	}; 
-
+	
 	/**
 	 * Get an SVG icon.
 	 * @param resourcePath - the path from the src folder
 	 * @return a node for the SVG icon. 
 	 */
 	private Node getSVGIcon(String resourcePath) {
+		return getSVGIcon( resourcePath, Color.BLACK, 1);
+	}
+
+	
+
+	/**
+	 * Get an SVG icon.
+	 * @param resourcePath - the path from the src folder
+	 * @return a node for the SVG icon. 
+	 */
+	private Node getSVGIcon(String resourcePath, Color colour, double lineWidth) {
 		try {
 			
 			PamSVGIcon iconMaker= new PamSVGIcon(); 
-			PamSVGIcon svgsprite = iconMaker.create(getClass().getResource(resourcePath).toURI().toURL(), Color.BLACK);
-			svgsprite.getSpriteNode().setStyle("-fx-text-color: black");				
-			svgsprite.getSpriteNode().setStyle("-fx-fill: black");
+			PamSVGIcon svgsprite = iconMaker.create(getClass().getResource(resourcePath).toURI().toURL(), colour, lineWidth);
+//			svgsprite.getSpriteNode().setStyle("-fx-text-color: black");				
+//			svgsprite.getSpriteNode().setStyle("-fx-fill: black");
 			svgsprite.setFitHeight(DataModelStyle.iconSize-10);
 			svgsprite.setFitWidth(DataModelStyle.iconSize-10);
+		
 			return svgsprite.getSpriteNode(); 
 		}
 		catch (Exception e) {
@@ -162,7 +215,7 @@ public class ModuleIconFactory {
 	 * @return the module icon enum
 	 */
 	public ModuleIcon getModuleIcon(String className) {
-		//System.out.println("CLASS NAME: " + className);
+//		System.out.println("Get module icon: " + className);
 		ModuleIcon icon = null; 
 		switch (className) {
 		case "Acquisition.AcquisitionControl":
@@ -196,6 +249,7 @@ public class ModuleIconFactory {
 			icon=ModuleIcon.TIME_DISPLAY; 
 			break; 
 		case "detectionPlotFX.DetectionDisplayControl":
+		case "detectionPlotFX.DetectionDisplayControl2":
 			icon=ModuleIcon.DETECTION_DISPLAY; 
 			break; 
 		case "dataMap.DataMapControl":
@@ -207,6 +261,18 @@ public class ModuleIconFactory {
 		case "rawDeepLearningClassifier.DLControl":
 			icon=ModuleIcon.DEEP_LEARNING; 
 			break; 
+		case "matchedTemplateClassifer.MTClassifierControl":
+			icon=ModuleIcon.MATCHED_CLICK_CLASSIFIER; 
+			break; 
+		case "decimator.DecimatorControl":
+			icon=ModuleIcon.DECIMATOR; 
+			break; 
+		case "cpod.CPODControl2":
+			icon=ModuleIcon.CPOD; 
+			break; 
+		case "MetaDataControl":
+			icon = ModuleIcon.TETHYS;
+			break;
 		}
 		return icon;
 	}

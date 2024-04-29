@@ -10,6 +10,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import org.apache.commons.math.linear.RealMatrix;
 
+import us.hebi.matlab.mat.types.Matrix;
+
 /**
  * Some math and utility functions for arrays and Lists. 
  * 
@@ -22,19 +24,19 @@ public class PamArrayUtils {
 	/**
 	 * Calculate the mean of one dimension within a list of points. <i>e.g.</i> the points might be a list of [x y z] co-ordinates in 
 	 * which case the dim=0 would return the mean of all x points. 
-	 * @param successJump - a list of points
+	 * @param array - a list of points
 	 * @param InitialtoIgnorePercentage: ignore the first percentage of results
 	 * @param dim - the dimension of the point to calculate the average for
 	 * @return the mean of one dimension of the list of the points. 
 	 */
-	public static double mean(ArrayList<double[]> successJump, double InitialtoIgnorePercentage, int dim){
+	public static double mean(ArrayList<float[]> array, double InitialtoIgnorePercentage, int dim){
 
 		double meanTotal=0;
 		int n=0;
-		int forStart=(int) Math.round((InitialtoIgnorePercentage)*successJump.size());
+		int forStart=(int) Math.round((InitialtoIgnorePercentage)*array.size());
 
-		for (int i=forStart; i<successJump.size();i++){
-			meanTotal+= successJump.get(i)[dim];
+		for (int i=forStart; i<array.size();i++){
+			meanTotal+= array.get(i)[dim];
 			n++;
 		}
 
@@ -46,21 +48,21 @@ public class PamArrayUtils {
 
 	/**
 	 * Calculate the standard deviation of an array of doubles, ignoring an 'initialtoIgnorePercentage' percentage of jumps
-	 * @param successJump
+	 * @param array
 	 * @param initialtoIgnorePercentage- percentage of initial values to ignore.
 	 * @return standard deviation of array. 
 	 */
-	public static double std(ArrayList<double[]> successJump, double initialtoIgnorePercentage, int dim){
+	public static double std(ArrayList<float[]> array, double initialtoIgnorePercentage, int dim){
 		double std=0.0;
 
 		int n=0;
-		int forStart=(int) Math.round((initialtoIgnorePercentage)*successJump.size());
+		int forStart=(int) Math.round((initialtoIgnorePercentage)*array.size());
 
-		double meanTotal= mean(successJump,  initialtoIgnorePercentage,  dim);
+		double meanTotal= mean(array,  initialtoIgnorePercentage,  dim);
 
 		//calculate standard deviation
-		for (int k=forStart;k<successJump.size(); k++){
-			std+=Math.pow((successJump.get(k)[dim]-meanTotal),2);
+		for (int k=forStart;k<array.size(); k++){
+			std+=Math.pow((array.get(k)[dim]-meanTotal),2);
 		}
 
 		//standard deviation
@@ -616,13 +618,25 @@ public class PamArrayUtils {
 	}
 
 	/**
-	 * Flip an array so that it is in the reverse order. Note the array is 
+	 * Flip a double array so that it is in the reverse order. Note the array is 
 	 * cloned. 
 	 * @param flipArray - the waveform to flip
 	 * @return the array with elements reversed.
 	 */
 	public static double[] flip(double[] flipArray) {
 		double[] clone=ArrayUtils.clone(flipArray); 
+		ArrayUtils.reverse(clone);
+		return clone; 
+	}
+	
+	/**
+	 * Flip an int array so that it is in the reverse order. Note the array is 
+	 * cloned. 
+	 * @param flipArray - the waveform to flip
+	 * @return the array with elements reversed.
+	 */
+	public static int[] flip(int[] flipArray) {
+		int[] clone=ArrayUtils.clone(flipArray); 
 		ArrayUtils.reverse(clone);
 		return clone; 
 	}
@@ -682,6 +696,7 @@ public class PamArrayUtils {
 	 * @return the summation of all the elements in the array.
 	 */
 	public static double sum(double[][] array2) {
+		if (array2==null) System.out.println("null"); 
 		double sum=0; 
 		double[] array; 
 		for (int i=0; i<array2.length; i++) {
@@ -698,6 +713,7 @@ public class PamArrayUtils {
 	 * @param array to print
 	 */
 	public static void printArray(double[] array) {
+		if (array==null) System.out.println("null"); 
 		for (int i=0; i<array.length; i++) {
 			System.out.println(i + ": " + array[i]);
 		}
@@ -709,12 +725,14 @@ public class PamArrayUtils {
 	 * @param array to print
 	 */
 	public static void printArrayRaw(double[] array) {
+		if (array==null) System.out.println("null"); 
 		for (int i=0; i<array.length; i++) {
 			System.out.println(array[i]);
 		}
 	}
 
 	public static void printArray(int[] array) {
+		if (array==null) System.out.println("null"); 
 		for (int i=0; i<array.length; i++) {
 			System.out.println(i + ": " + array[i]);
 		}
@@ -725,6 +743,7 @@ public class PamArrayUtils {
 	 * @param array - the array 
 	 */
 	public static void printArray(double[][] array) {
+		if (array==null) System.out.println("null"); 
 		for (int j=0; j<array.length; j++) {
 			System.out.println("");
 			for (int i=0; i<array[j].length; i++) {
@@ -741,6 +760,7 @@ public class PamArrayUtils {
 	 * @param array - the array 
 	 */
 	public static void printArray(int[][] array) {
+		if (array==null) System.out.println("null"); 
 		for (int j=0; j<array.length; j++) {
 			System.out.println("");
 			for (int i=0; i<array[j].length; i++) {
@@ -748,6 +768,25 @@ public class PamArrayUtils {
 			}
 		}
 		System.out.println("");
+	}
+	
+	
+	public static void printArray(boolean[] boolArray) {
+		if (boolArray==null) System.out.println("null"); 
+		for (int i=0; i<boolArray.length; i++) {
+			System.out.println(i + ": " + boolArray[i]);
+		}
+	}
+	
+	/**
+	 * Print a Long array
+	 * @param array - the array to print.
+	 */
+	public static void printArray(Long[] array) {
+		if (array==null) System.out.println("null"); 
+		for (int i=0; i<array.length; i++) {
+			System.out.println(i + ": " + array[i]);
+		}
 	}
 
 
@@ -964,19 +1003,48 @@ public class PamArrayUtils {
 		
 		return newArray; 
 	}
-
-
 	
 	/**
-	 * Check if two int arrays contain the same elements
-	 * @param arr1 - the array to compare to. 
-	 * @param arr2 - the array to be compared. 
+	 * Check if two Long arrays contain the same elements
+	 * @param shape - the array to compare to. 
+	 * @param shape2 - the array to be compared. 
 	 */
-	public static boolean arrEquals(int[] arr1, int[] arr2) {
-		if (arr1.length!=arr2.length) return false; 
+	public static boolean arrEquals(Long[] shape, Long[] shape2) {
+		if (shape.length!=shape2.length) return false; 
 		
-		for (int i =0 ;i<arr1.length; i++) {
-			if (arr1[i]!=arr2[i]) return false; 
+		for (int i =0 ;i<shape.length; i++) {
+			if (shape[i]!=shape2[i]) return false; 
+		}
+		
+		return true; 
+	}
+
+	/**
+	 * Check if two int arrays contain the same elements
+	 * @param shape - the array to compare to. 
+	 * @param shape2 - the array to be compared. 
+	 */
+	public static boolean arrEquals(int[] shape, int[] shape2) {
+		if (shape.length!=shape2.length) return false; 
+		
+		for (int i =0 ;i<shape.length; i++) {
+			if (shape[i]!=shape2[i]) return false; 
+		}
+		
+		return true; 
+	}
+	
+	
+	/**
+	 * Check if two long arrays contain the same elements
+	 * @param shape - the array to compare to. 
+	 * @param shape2 - the array to be compared. 
+	 */
+	public static boolean arrEquals(long[] shape, long[] shape2) {
+		if (shape.length!=shape2.length) return false; 
+		
+		for (int i =0 ;i<shape.length; i++) {
+			if (shape[i]!=shape2[i]) return false; 
 		}
 		
 		return true; 
@@ -1056,6 +1124,31 @@ public class PamArrayUtils {
 		return arrL;
 	}
 
+	/**
+	 * Convert a matrix to a 
+	 * @param matrix - the MAT file matrix
+	 * @return double[][] array of results
+	 */
+	public static double[][] matrix2array(Matrix matrix) {
+		if (matrix==null) return null;
+		
+		double[][] arrayOut = new double[matrix.getNumRows()][];
+		double[] arrayRow;
+		for (int i=0; i<matrix.getNumRows(); i++) {
+			arrayRow=new double[matrix.getNumCols()];
+			for (int j=0; j<matrix.getNumCols(); j++) {
+				arrayRow[j] = matrix.getDouble(i, j);
+			}
+			arrayOut[i]=arrayRow;
+		}
+		return arrayOut;
+	}
+
+
+
+
+
+
 
 
 
@@ -1073,3 +1166,4 @@ public class PamArrayUtils {
 
 
 }
+

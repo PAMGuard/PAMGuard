@@ -57,12 +57,16 @@ public class DataLoadingPane extends PamBorderPane {
 		PamVBox holderPane=new PamVBox();
 		holderPane.setSpacing(5);
 		
+		holderPane.getChildren().add(allProgress);
 		
+		holderPane.getChildren().add(streamProgress);
+
 		return holderPane;
 		
 	}
 	
 	public void setData(LoadQueueProgressData progressData) {
+		streamProgress.setProgress(-1);
 		if (progressData.getStreamName() != null) {
 			allProgress.setProgress(progressData.getTotalStreams()/progressData.getIStream());
 //			storeName.setText(progressData.getStoreType());

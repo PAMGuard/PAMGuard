@@ -10,12 +10,17 @@ import java.util.ArrayList;
 import org.jamdev.jdl4pam.transforms.DLTransform.DLTransformType;
 import org.jamdev.jdl4pam.transforms.DLTransfromParams;
 import org.jamdev.jdl4pam.transforms.SimpleTransformParams;
+import org.jamdev.jdl4pam.transforms.jsonfile.DLTransformParser2;
 import org.jamdev.jdl4pam.transforms.jsonfile.DLTransformsParser;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import PamUtils.PamArrayUtils;
 import rawDeepLearningClassifier.dlClassification.DLClassName;
 import rawDeepLearningClassifier.dlClassification.DLClassNameManager;
+
+import ai.djl.ndarray.types.Shape;
+
 
 /**
  * Functions for saving and loading generic model metadata information. Note this 
@@ -43,23 +48,30 @@ public class GenericModelParser {
 	public static boolean writeGenericModelParams(File file, GenericModelParams params) {
 
 		try {
+			
+			org.jamdev.jdl4pam.genericmodel.GenericModelParams paramsjpam =  pgParams2JpamParams(params); 
 
-			//this writes a new string - with the transforms in order. . 
-			String jsOnObject = DLTransformsParser.writeJSONString(params.dlTransfromParams); 
+			//wriote the JSON string using jdl4pam library. 
+			JSONObject jsonObject = DLTransformParser2.writeJSONParams(paramsjpam); 
 			
-			//Now make a second JSON object with a load of the parameters that might be required by the model. 
-			//'class_info': '{num_class : 2,name_class : noise,bat}', 'seg_size': '{size_ms : 4}'}
-
-			//set the class names. 
-			JSONObject paramsObject = getJSonParamsObject(params); 
 			
-			String jsonString = paramsObject.toString().substring(0, paramsObject.toString().length()-1) 
-					+ "," +  jsOnObject.toString().substring(1, jsOnObject.toString().length()) ;
-			
+			//2023/08/25 2.02.09a old format is now disabled 
+//			//this writes a new string - with the transforms in order. . 
+//			String jsOnObject = DLTransformsParser.writeJSONString(params.dlTransfromParams);
+//			
+//			//Now make a second JSON object with a load of the parameters that might be required by the model. 
+//			//'class_info': '{num_class : 2,name_class : noise,bat}', 'seg_size': '{size_ms : 4}'}
+//
+//			//set the class names. 
+//			JSONObject paramsObject = getJSonParamsObject(params); 
+//			
+//			String jsonString = paramsObject.toString().substring(0, paramsObject.toString().length()-1) 
+//					+ "," +  jsOnObject.toString().substring(1, jsOnObject.toString().length()) ;
+//			
 		
-			System.out.println(jsonString); 
+//			System.out.println(jsonObject); 
 
-			writeJSONToFile(file, jsonString, false); 
+			writeJSONToFile(file, jsonObject.toString(1), false); 
 			
 			return true;
 		}
@@ -68,6 +80,82 @@ public class GenericModelParser {
 		}
 
 		return false; 
+	}
+
+	/**
+	 * Convert a generic params object from the jdl4pam library to a PAMGuard serializable params object. 
+	 * @param params - the jdl4pam params object. 
+	 * @param classNameManager - the class name manager for the PAMGuard params. 
+	 * @return PAMGuard equivalent params. 
+	 */
+	private static GenericModelParams jpamParams2PGParmas(
+			org.jamdev.jdl4pam.genericmodel.GenericModelParams params, DLClassNameManager classNameManager) {
+		GenericModelParams genericParmas = new GenericModelParams(); 
+	
+		
+		genericParmas.shape = PamArrayUtils.primitive2Object(params.defaultInputShape.getShape());
+		
+		
+		genericParmas.outputShape = PamArrayUtils.primitive2Object(params.defaultOutputShape.getShape());
+		
+		genericParmas.dlTransfromParams = params.dlTransforms;
+		genericParmas.defaultSegmentLen = params.segLen;
+		
+		String[] classNames = params.classNames;
+						
+		if (classNames!=null) {
+		
+		genericParmas.numClasses = classNames.length;
+
+		if (classNameManager!=null) {
+			genericParmas.classNames = classNameManager.makeClassNames(classNames); 
+		}
+		else {
+			genericParmas.classNames = new DLClassName[classNames.length];
+			for (int i=0; i<classNames.length; i++) {
+				genericParmas.classNames[i]=new DLClassName(classNames[i], (short) i); 
+			}
+		}
+		
+		}
+
+		return genericParmas;
+	}
+	
+	
+	private static	org.jamdev.jdl4pam.genericmodel.GenericModelParams pgParams2JpamParams(GenericModelParams params) {
+	
+		org.jamdev.jdl4pam.genericmodel.GenericModelParams jpamParams = new org.jamdev.jdl4pam.genericmodel.GenericModelParams(); 
+		
+		jpamParams.classNames = dlClassNames2String(params.classNames);
+		
+		jpamParams.dlTransforms = (ArrayList<DLTransfromParams>) params.dlTransfromParams;
+		
+		if (params.shape!=null) {
+			jpamParams.defaultInputShape = new Shape(PamArrayUtils.object2Primitve(params.shape));
+		}
+		if (params.outputShape!=null) {
+			jpamParams.defaultOutputShape = new Shape(PamArrayUtils.object2Primitve(params.outputShape));
+		}
+		
+		jpamParams.segLen = params.defaultSegmentLen;
+
+		return jpamParams;
+	}
+
+
+	private static String[] dlClassNames2String(DLClassName[] classNames) {
+		if (classNames==null) return null;
+		
+		String[] classNamesS = new String[classNames.length]; 
+		
+		int n =0; 
+		for (DLClassName dlName : classNames) {
+			classNamesS[n] = dlName.className; 
+			n++; 
+		}
+		
+		return classNamesS;
 	}
 
 	/**
@@ -98,6 +186,7 @@ public class GenericModelParser {
 	 * @param params - the parameters object. 
 	 * @return the  JSONObject. 
 	 */
+	@Deprecated
 	public static JSONObject getJSonParamsObject(GenericModelParams params) {
 		return getJSonParamsObject( params, new  JSONObject()); 
 	}
@@ -111,6 +200,7 @@ public class GenericModelParser {
 	 * @param paramsobject - jsonObject to add params to.
 	 * @return the  JSONObject. 
 	 */
+	@Deprecated
 	public static JSONObject getJSonParamsObject(GenericModelParams params, JSONObject paramsObject) {
 		//set the class names. 
 		JSONObject classInfo = new JSONObject(); 
@@ -175,18 +265,34 @@ public class GenericModelParser {
 				fileReader.close();
 				
 				System.out.println(jsonData); 
-
-				//DL transforms
-				ArrayList<DLTransfromParams> dlTransforms = DLTransformsParser.parseTransfromParams(jsonData); 
 				
-				//System.out.println("No. parsed transforms: " + dlTransforms.size()); 
+				
+				//Need to figure out if this is the new or old format. 
+				JSONObject jsonObject = new JSONObject(jsonData);
+				
+				
+				boolean isParamsV2 =false; 
+				
+				//does the object have a version
+				if (jsonObject.has("version_info") ) {
+					JSONObject versionObject = jsonObject.getJSONObject("version_info"); 
+					
+					//lots of JSON metadata might have a version number so to be absolutely sure...
+					if (versionObject.has("version")) {
+						isParamsV2=true;
+					}
+				}
 
-				//DL transforms 
-				params.dlTransfromParams = dlTransforms;
-
-				//parse the data
-				params = parseJSOString(jsonData,  params, classNameManager);
-
+				if (isParamsV2) {
+					params = parseJSONObject( jsonObject,  params, 
+							 classNameManager);
+				}
+				else {
+					params = parseJSONObject_legacy( jsonObject,  params, 
+								 classNameManager);
+				}
+				
+								
 				return params;
 
 			} catch (FileNotFoundException e) {
@@ -211,6 +317,49 @@ public class GenericModelParser {
 
 		return null; 
 	}
+	
+	
+	/**
+	 * Parse legacy JSON format. 
+	 * @param jsonObject - the JSONObject holding data
+	 * @param paramsClone - parameters object to set fields to to set. 
+	 * @param classNameManager  - the class names manager associated with the parameters. 
+	 * @return paramsClone with new settings.
+	 */
+	public static GenericModelParams parseJSONObject_legacy(JSONObject jsonObject, GenericModelParams paramsClone, 
+			DLClassNameManager classNameManager) {
+		
+		//DL transforms
+		ArrayList<DLTransfromParams> dlTransforms = DLTransformsParser.parseTransfromParams(jsonObject.toString()); 
+		
+
+		//DL transforms 
+		paramsClone.dlTransfromParams = dlTransforms;
+		
+		parseJSONMetaData_legacy( jsonObject,  paramsClone,  classNameManager); 
+		
+		//System.out.println("No. parsed transforms: " + dlTransforms.size()); 
+		
+		return paramsClone; 
+	}
+	
+	/**
+	 * Parse JSON data containing transforms and model metadata. 
+	 * @param jsonObject - the JSONObject holding data
+	 * @param paramsClone - parameters object to set fields to to set. 
+	 * @param classNameManager  - the class names manager associated with the parameters. 
+	 * @return paramsClone with new settings.
+	 */
+	public static GenericModelParams parseJSONObject(JSONObject jsonObject, GenericModelParams paramsClone, 
+			DLClassNameManager classNameManager) {		
+		
+		org.jamdev.jdl4pam.genericmodel.GenericModelParams  params = DLTransformParser2.readJSONParams(jsonObject);
+						
+		GenericModelParams pgParams = jpamParams2PGParmas(params, classNameManager);
+		
+		return pgParams;
+		
+	}
 
 
 	/**
@@ -219,13 +368,9 @@ public class GenericModelParser {
 	 * @param params - the parameters. 
 	 * @return the parameters class with new settings set.
 	 */
-	public static GenericModelParams parseJSOString(String jsonParamsString, GenericModelParams paramsClone, 
+	public static GenericModelParams parseJSONMetaData_legacy(JSONObject jsonObject, GenericModelParams paramsClone, 
 			DLClassNameManager classNameManager) {		
 
-		JSONObject jsonObject = new JSONObject(jsonParamsString);
-
-		//the segment length information 
-		System.out.println(jsonParamsString); 
 
 		//System.out.println("SEG SIZE: " + jsonObject.getString(SEG_SIZE_STRING) + "  " + jsonObject.isNull("size_ms")); 
 		

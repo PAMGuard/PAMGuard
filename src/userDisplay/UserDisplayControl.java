@@ -21,7 +21,6 @@
 package userDisplay;
 
 import java.awt.Frame;
-import java.awt.MenuItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
@@ -31,18 +30,14 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
-import clickDetector.ClickClassifiers.UserTypesPanel;
 import dataPlots.TDDisplayProvider;
-import dataPlotsFX.JamieDev;
 import dataPlotsFX.TDDisplayProviderFX;
-import radardisplay.RadarDisplay;
 import radardisplay.RadarDisplayProvider;
 import radardisplay.RadarParameters;
 import radardisplay.RadarParametersDialog;
 import radardisplay.RadarProjector;
 import soundPlayback.PlaybackControl;
 import fftManager.FFTDataUnit;
-import localiserDisplay.LocaliserDisplayProvider;
 import pamScrollSystem.AbstractScrollManager;
 import pamScrollSystem.coupling.ScrollerCoupling;
 //import localiserDisplay.LocaliserDisplayProvider;
@@ -55,8 +50,6 @@ import PamController.PamSettings;
 import PamModel.PamDependency;
 import PamModel.PamDependent;
 import PamModel.PamModel;
-import PamModel.SMRUEnable;
-import PamView.MenuItemEnabler;
 import PamView.PamGui;
 import Spectrogram.SpectrogramDiplayProvider;
 import Spectrogram.SpectrogramParameters;
@@ -95,10 +88,10 @@ public class UserDisplayControl extends PamControlledUnit implements
 		TDDisplayProvider.register();
 		TDDisplayProviderFX.register();
 	
-		//register the localiser display. 
-		if (JamieDev.isEnabled()) {
-			LocaliserDisplayProvider.register(); 
-		}
+//		//register the localiser display. 
+//		if (JamieDev.isEnabled()) {
+//			LocaliserDisplayProvider.register(); 
+//		}
 			
 				
 	}

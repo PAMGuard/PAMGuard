@@ -7,6 +7,7 @@ import pamViewFX.PamControlledGUIFX;
 
 /**
  * JavaFX UI bits of the Array Manager. 
+ * 
  * @author Jamie Macaulay 
  *
  */
@@ -30,12 +31,17 @@ public class ArrayGUIFX extends PamControlledGUIFX {
 		if (arraySettingsPane==null) {
 			arraySettingsPane= new ArraySettingsPane(); 
 		}
+		System.out.println("The current array is "+ arrayManager.getCurrentArray()); 
+		arraySettingsPane.setParams(arrayManager.getCurrentArray());
 		return arraySettingsPane; 
 	}
 	
 	@Override
 	public void updateParams() {
+		System.out.println("The current array is "+ arrayManager.getCurrentArray()); 
+
 		PamArray newParams=arraySettingsPane.getParams(arrayManager.getCurrentArray());
+		
 		if (newParams!=null) arrayManager.setCurrentArray(newParams);
 		//setup the controlled unit. 
 		arrayManager.setupControlledUnit(); 

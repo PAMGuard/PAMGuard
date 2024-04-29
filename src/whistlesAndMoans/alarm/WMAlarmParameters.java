@@ -11,10 +11,11 @@ public class WMAlarmParameters extends DataSelectParams implements Cloneable, Se
 
 	public static final long serialVersionUID = 1L;
 	
-	public double minFreq, maxFreq;
-	public double minAmplitude;
-	public double minLengthMillis;
-	public boolean superDetOnly;
+	public double minFreq = 0.;
+	public double maxFreq = 30000.;
+	public double minAmplitude = 90.;
+	public double minLengthMillis = 0.0;
+	public boolean superDetOnly = false;
 
 	@Override
 	public WMAlarmParameters clone()  {

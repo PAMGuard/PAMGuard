@@ -322,8 +322,7 @@ public class WhistlePlotInfoFX extends TDDataInfoFX {
 				pt1 = new Point2D(prevtC,tdprojector.getCoord3d(0,f1,0).getCoordinate(1));
 
 				if (pt1 != null) {
-//										System.out.println("Draw Whistle: tC " + prevSliceX + "  " + pt1.getY()+ " f1:  " + f1 + "  "+ sliceX + " " + pt2.getY()); 
-
+//					System.out.println("Draw Whistle: tC " + prevSliceX + "  " + pt1.getY()+ " f1:  " + f1 + "  "+ sliceX + " " + pt2.getY()); 
 					drawWhistleSegment( g,  orientation, prevSliceX, pt1.getY(),  sliceX, pt2.getY());
 				}
 
@@ -371,6 +370,7 @@ public class WhistlePlotInfoFX extends TDDataInfoFX {
 			prevSlice = sliceData;
 			prevtC = tC;
 			prevSliceX = sliceX;
+			
 		}
 		return awtPath;	
 	}
@@ -413,7 +413,7 @@ public class WhistlePlotInfoFX extends TDDataInfoFX {
 	 * @param freq - frequency in pixels. 
 	 */
 	private static void drawWhistleSegment(GraphicsContext g, Orientation orientation, double prevtC, double prevFreq, double tC, double freq){
-		if (prevtC<tC){
+		if (prevtC<=tC){
 			if (orientation==Orientation.HORIZONTAL ) g.strokeLine(prevtC, prevFreq, tC, freq);
 			else g.strokeLine(prevFreq, prevtC, freq, tC);
 		}

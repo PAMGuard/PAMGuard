@@ -87,42 +87,30 @@ public class BinaryMapMakeProgress extends PamTaskUpdate {
 	
 	@Override
 	public double getProgress(){
-		//System.out.println("BinaryProgress: " + currentStream + " tot: " + totalStreams); 
+//		System.out.println("BinaryProgress: " + currentStream + " of: " + totalStreams + " status: " + getStatus()); 
 		if (totalStreams==0) return 1.;
 		double progress = 0;
 		switch (getStatus()){
-		case PamTaskUpdate.STATUS_ANALYSING_FILES:
-			if (totalStreams==0) progress=0;
+		case STATUS_ANALYSING_FILES:
+			if (totalStreams==0) progress=-1;
 			else progress=((double) currentStream)/totalStreams;
 			break;
-		case PamTaskUpdate.STATUS_COUNTING_FILES:
-			progress=ProgressIndicator.INDETERMINATE_PROGRESS;
-			break;
-		case PamTaskUpdate.STATUS_DESERIALIZING:
-			progress=ProgressIndicator.INDETERMINATE_PROGRESS;
-			break;
-		case PamTaskUpdate.STATUS_DONE:
-			progress=ProgressIndicator.INDETERMINATE_PROGRESS;
-			break;
-		case PamTaskUpdate.STATUS_DONE_ERROR:
-			progress=ProgressIndicator.INDETERMINATE_PROGRESS;
-			break;
-		case PamTaskUpdate.STATUS_IDLE:
-			progress=ProgressIndicator.INDETERMINATE_PROGRESS;
-			break;
-		case PamTaskUpdate.STATUS_SERIALIZING:
-			progress=ProgressIndicator.INDETERMINATE_PROGRESS;
-			break;
-		case PamTaskUpdate.STATUS_SORTING:
+		default:
 			progress=ProgressIndicator.INDETERMINATE_PROGRESS;
 			break;
 		}
 		return progress;
 	}
 	
+	
 
 	@Override
 	public String getName() {
 		return "Binary Data Map";
+	}
+	
+	@Override
+	public String getProgressString() {
+		return this.streamName;
 	}
 }

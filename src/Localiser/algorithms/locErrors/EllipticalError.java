@@ -51,6 +51,8 @@ public class EllipticalError implements LocaliserError {
 		errorEllipse = new ErrorEllipse(errors, angles);
 	}
 
+	
+	
 	@Override
 	public double getError(PamVector errorDirection) {
 		return errorEllipse.getErrorMagnitude(errorDirection.getUnitVector().getVector());
@@ -78,7 +80,7 @@ public class EllipticalError implements LocaliserError {
 
 	/**
 	 * Get the 2D elliptical error.
-	 * @param planeXy - the plane on whihc to find the ellipse for. 
+	 * @param planeXy - the plane on which to find the ellipse for. 
 	 * @return the elliptical error. 
 	 */
 	public double[] getErrorEllipse2D(int planeXy) {
@@ -111,6 +113,9 @@ public class EllipticalError implements LocaliserError {
 	@Override
 	public String getStringResult() {
 		String description=""; 
+		if (errorEllipse==null) {
+			return "Elliptical error is null";
+		}
 		if (!errorEllipse.is3D()){
 			description+=String.format("<i>&ensp 2D Elliptical error: <br>&ensp Radii: ");
 			for (int i=0; i<errorEllipse.getEllipseDim().length; i++){
