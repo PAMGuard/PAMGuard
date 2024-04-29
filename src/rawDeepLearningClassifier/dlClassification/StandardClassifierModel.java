@@ -19,7 +19,7 @@ import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericDLClassifier;
-import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
+import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 import rawDeepLearningClassifier.layoutFX.DLSettingsPane;
 import rawDeepLearningClassifier.segmenter.GroupedRawData;
 import warnings.PamWarning;
@@ -73,7 +73,7 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 		if ((PamCalendar.isSoundFile() && !forceQueue) || dlControl.isViewer()) {
 			//run the model 
 			@SuppressWarnings("unchecked")
-			ArrayList<GenericPrediction> modelResult = (ArrayList<GenericPrediction>) getDLWorker().runModel(groupedRawData, 
+			ArrayList<StandardPrediction> modelResult = (ArrayList<StandardPrediction>) getDLWorker().runModel(groupedRawData, 
 					groupedRawData.get(0).getParentDataBlock().getSampleRate(), 0); 
 			
 			if (modelResult==null) {
@@ -205,12 +205,56 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 		}
 
 		@Override
-		public void newDLResult(GenericPrediction soundSpotResult, PamDataUnit groupedRawData) {
-			soundSpotResult.setClassNameID(GenericDLClassifier.getClassNameIDs(getDLParams())); 
-			soundSpotResult.setBinaryClassification(GenericDLClassifier.isBinaryResult(soundSpotResult, getDLParams())); 
+		public void newDLResult(StandardPrediction soundSpotResult, PamDataUnit groupedRawData) {
+			soundSpotResult.setClassNameID(getClassNameIDs(getDLParams())); 
+			soundSpotResult.setBinaryClassification(isDecision(soundSpotResult, getDLParams())); 
 			newResult(soundSpotResult, groupedRawData);
 		}
 
+	}
+	
+	/**
+	 * Make a decision on whether a result passed a decision 
+	 * @param modelResult - the model result.
+	 * @param modelParmas - the model parameters. 
+	 * @return true if a threshold has been met. 
+	 */
+	public boolean isDecision(StandardPrediction modelResult, StandardModelParams modelParmas) {
+		return isBinaryResult(modelResult, modelParmas);
+	}
+
+	
+	
+	/**
+	 * Get the class name IDs
+	 * @return an array of class name IDs
+	 */ 
+	public static short[] getClassNameIDs(StandardModelParams standardModelParams) {
+		if (standardModelParams.classNames==null || standardModelParams.classNames.length<=0) return null; 
+		short[] nameIDs = new short[standardModelParams.classNames.length]; 
+		for (int i = 0 ; i<standardModelParams.classNames.length; i++) {
+			nameIDs[i] = standardModelParams.classNames[i].ID; 
+		}
+		return nameIDs; 
+	}
+
+
+
+	/**
+	 * Check whether a model passes a binary test...
+	 * @param modelResult - the model results
+	 * @return the model results. 
+	 */
+	public static boolean isBinaryResult(StandardPrediction modelResult, StandardModelParams genericModelParams) {
+		for (int i=0; i<modelResult.getPrediction().length; i++) {
+						//System.out.println("Binary Classification: "  + genericModelParams.binaryClassification.length); 
+
+			if (modelResult.getPrediction()[i]>genericModelParams.threshold && genericModelParams.binaryClassification[i]) {
+				//				System.out.println("SoundSpotClassifier: prediciton: " + i + " passed threshold with val: " + modelResult.getPrediction()[i]); 
+				return true; 
+			}
+		}
+		return  false;
 	}
 	
 	
@@ -225,7 +269,7 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 	 * @param modelResult - the model result;
 	 * @param groupedRawData - the grouped raw data. 
 	 */
-	protected void newResult(GenericPrediction modelResult, PamDataUnit groupedRawData) {
+	protected void newResult(StandardPrediction modelResult, PamDataUnit groupedRawData) {
 		if (groupedRawData instanceof GroupedRawData) {
 			this.dlControl.getDLClassifyProcess().newModelResult(modelResult, (GroupedRawData) groupedRawData);
 		}

@@ -2,7 +2,7 @@ package rawDeepLearningClassifier.dlClassification;
 
 import PamguardMVC.DataUnitBaseData;
 import PamguardMVC.PamDataUnit;
-import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
+import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 
 /**
  * A data unit created from classification results of DL model. this data unit holds one model results, i.e. 
@@ -37,7 +37,7 @@ public class DLDataUnit extends PamDataUnit {
 	public DLDataUnit(DataUnitBaseData baseData, float[] data) {
 		super(baseData);
 		//System.out.println("DLDataUnit: " + this.getChannelBitmap()); 
-		this.modelResult = new GenericPrediction(data); 
+		this.modelResult = new StandardPrediction(data); 
 	}
 
 	public DLDataUnit(DataUnitBaseData baseData, PredictionResult modelResult) {

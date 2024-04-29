@@ -14,7 +14,7 @@ import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
 import rawDeepLearningClassifier.dlClassification.StandardClassifierModel;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
-import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
+import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
 
 /**
@@ -77,7 +77,7 @@ public class KetosClassifier extends StandardClassifierModel {
 	
 
 	@Override
-	public DLModelWorker<GenericPrediction> getDLWorker() {
+	public DLModelWorker<StandardPrediction> getDLWorker() {
 		return getKetosWorker();
 	}
 

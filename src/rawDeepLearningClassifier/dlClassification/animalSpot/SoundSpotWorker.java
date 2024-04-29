@@ -7,7 +7,7 @@ import org.jamdev.jdl4pam.animalSpot.AnimalSpotParams;
 
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
-import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
+import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 
 
 /**
@@ -19,7 +19,7 @@ import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction
  * @author Jamie Macaulay 
  *
  */
-public class SoundSpotWorker extends DLModelWorker<GenericPrediction> {
+public class SoundSpotWorker extends DLModelWorker<StandardPrediction> {
 
 
 	/**

@@ -18,7 +18,7 @@ import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams
  * @author Jamie Macaulay
  *
  */
-public class GenericModelWorker extends DLModelWorker<GenericPrediction> {
+public class GenericModelWorker extends DLModelWorker<StandardPrediction> {
 
 	/**
 	 * The generic model 
@@ -52,8 +52,8 @@ public class GenericModelWorker extends DLModelWorker<GenericPrediction> {
 	}
 
 	@Override
-	public GenericPrediction makeModelResult(float[] prob, double time) {
-		GenericPrediction model = new  GenericPrediction(prob);
+	public StandardPrediction makeModelResult(float[] prob, double time) {
+		StandardPrediction model = new  StandardPrediction(prob);
 		model.setAnalysisTime(time);
 		return model;
 	}

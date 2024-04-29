@@ -15,7 +15,7 @@ import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
 import rawDeepLearningClassifier.dlClassification.StandardClassifierModel;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
-import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
+import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
 
 /**
@@ -53,7 +53,7 @@ public class SoundSpotClassifier extends StandardClassifierModel {
 	/**
 	 * The deep learning model worker.
 	 */
-	private DLModelWorker<GenericPrediction> soundSpotWorker;
+	private DLModelWorker<StandardPrediction> soundSpotWorker;
 
 
 	public SoundSpotClassifier(DLControl dlControl) {
@@ -171,7 +171,7 @@ public class SoundSpotClassifier extends StandardClassifierModel {
 
 
 	@Override
-	public DLModelWorker<GenericPrediction> getDLWorker() {
+	public DLModelWorker<StandardPrediction> getDLWorker() {
 		if (soundSpotWorker==null) {
 			soundSpotWorker = new SoundSpotWorker(); 
 		}

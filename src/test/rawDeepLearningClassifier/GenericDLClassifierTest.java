@@ -22,7 +22,7 @@ import rawDeepLearningClassifier.defaultModels.HumpbackWhaleAtlantic;
 import rawDeepLearningClassifier.defaultModels.RightWhaleModel1;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericModelWorker;
-import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
+import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 import rawDeepLearningClassifier.segmenter.GroupedRawData;
 
 /**
@@ -77,7 +77,7 @@ public class GenericDLClassifierTest {
 
 			groupedData.add(groupedRawData);
 
-			ArrayList<GenericPrediction> gwenericPrediciton = genericModelWorker.runModel(groupedData, soundData.sampleRate, 0);		
+			ArrayList<StandardPrediction> gwenericPrediciton = genericModelWorker.runModel(groupedData, soundData.sampleRate, 0);		
 
 			float[] output = gwenericPrediciton.get(0).getPrediction();
 
@@ -165,7 +165,7 @@ public class GenericDLClassifierTest {
 
 					groupedData.add(groupedRawData);
 
-					ArrayList<GenericPrediction> genericPrediction = genericModelWorker.runModel(groupedData, soundData.sampleRate, 0);		
+					ArrayList<StandardPrediction> genericPrediction = genericModelWorker.runModel(groupedData, soundData.sampleRate, 0);		
 
 					float[] output = genericPrediction.get(0).getPrediction();
 

@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import PamguardMVC.PamDataUnit;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
-import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
+import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 import rawDeepLearningClassifier.segmenter.GroupedRawData;
 
 /**
@@ -52,7 +52,7 @@ public abstract class DLTaskThread extends Thread {
 					System.out.println("DL TASK THREAD: " + "The queue size is " + queue.size()); 
 					ArrayList<? extends PamDataUnit> groupedRawData = queue.remove(0);
 
-					ArrayList<GenericPrediction> modelResult = dlModelWorker.runModel(groupedRawData, 
+					ArrayList<StandardPrediction> modelResult = dlModelWorker.runModel(groupedRawData, 
 							groupedRawData.get(0).getParentDataBlock().getSampleRate(), 0); //TODO channel?
 
 					for (int i =0; i<modelResult.size(); i++) {
@@ -79,7 +79,7 @@ public abstract class DLTaskThread extends Thread {
 	 * @param soundSpotResult - the new result.
 	 * @param groupedRawData - the grouped data unit. 
 	 */
-	public abstract void newDLResult(GenericPrediction soundSpotResult, PamDataUnit groupedRawData); 
+	public abstract void newDLResult(StandardPrediction soundSpotResult, PamDataUnit groupedRawData); 
 
 	/**
 	 * Get the grouped data queue

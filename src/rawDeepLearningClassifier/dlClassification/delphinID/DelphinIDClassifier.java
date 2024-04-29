@@ -13,7 +13,7 @@ import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
 import rawDeepLearningClassifier.dlClassification.StandardClassifierModel;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
-import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
+import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
 
 /**
@@ -86,6 +86,15 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 		return delphinIDParams;
 
 	}
+	
+	
+	@Override
+	public boolean isDecision(StandardPrediction modelResult, StandardModelParams modelParmas) {
+		//TODO
+		//DelphinID uses a different decision making process to most of the standard classifiers which just pass a binary threhsoild. 
+		return false;
+	}
+
 
 
 	@Override
@@ -111,7 +120,7 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 
 
 	@Override
-	public DLModelWorker<GenericPrediction> getDLWorker() {
+	public DLModelWorker<StandardPrediction> getDLWorker() {
 		if (delphinIDWorker==null) {
 			delphinIDWorker = new DelphinIDWorker();
 		}

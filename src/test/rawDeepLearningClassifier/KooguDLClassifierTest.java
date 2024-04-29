@@ -16,7 +16,7 @@ import org.jamdev.jpamutils.wavFiles.AudioData;
 import org.junit.jupiter.api.Test;
 
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
-import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
+import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 import rawDeepLearningClassifier.dlClassification.koogu.KooguModelWorker;
 import rawDeepLearningClassifier.segmenter.GroupedRawData;
 import us.hebi.matlab.mat.format.Mat5;
@@ -102,7 +102,7 @@ public class KooguDLClassifierTest {
 				groupedData.add(groupedRawData);
 
 				
-				ArrayList<GenericPrediction> genericPrediciton = kooguWorker.runModel(groupedData, soundData.sampleRate, 0);		
+				ArrayList<StandardPrediction> genericPrediciton = kooguWorker.runModel(groupedData, soundData.sampleRate, 0);		
 				float[] output =  genericPrediciton.get(0).getPrediction();
 
 				boolean testPassed= output[1]> kooguPredicitions[i][2]-0.1 && output[1]< kooguPredicitions[i][2]+0.1;

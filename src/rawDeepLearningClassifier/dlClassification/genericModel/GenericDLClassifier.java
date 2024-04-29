@@ -184,41 +184,10 @@ public class GenericDLClassifier extends StandardClassifierModel {
 	 * @param modelResult - the model result;
 	 * @param groupedRawData - the grouped raw data. 
 	 */
-	protected void newResult(GenericPrediction modelResult, GroupedRawData groupedRawData) {
+	protected void newResult(StandardPrediction modelResult, GroupedRawData groupedRawData) {
 		this.dlControl.getDLClassifyProcess().newModelResult(modelResult, groupedRawData);
 	}
-	
-	/**
-	 * Get the class name IDs
-	 * @return an array of class name IDs
-	 */ 
-	public static short[] getClassNameIDs(StandardModelParams standardModelParams) {
-		if (standardModelParams.classNames==null || standardModelParams.classNames.length<=0) return null; 
-		short[] nameIDs = new short[standardModelParams.classNames.length]; 
-		for (int i = 0 ; i<standardModelParams.classNames.length; i++) {
-			nameIDs[i] = standardModelParams.classNames[i].ID; 
-		}
-		return nameIDs; 
-	}
 
-
-
-	/**
-	 * Check whether a model passes a binary test...
-	 * @param modelResult - the model results
-	 * @return the model results. 
-	 */
-	public static boolean isBinaryResult(GenericPrediction modelResult, StandardModelParams genericModelParams) {
-		for (int i=0; i<modelResult.getPrediction().length; i++) {
-						//System.out.println("Binary Classification: "  + genericModelParams.binaryClassification.length); 
-
-			if (modelResult.getPrediction()[i]>genericModelParams.threshold && genericModelParams.binaryClassification[i]) {
-				//				System.out.println("SoundSpotClassifier: prediciton: " + i + " passed threshold with val: " + modelResult.getPrediction()[i]); 
-				return true; 
-			}
-		}
-		return  false;
-	}
 
 
 //	@Override
@@ -234,7 +203,7 @@ public class GenericDLClassifier extends StandardClassifierModel {
 	}
 
 	@Override
-	public DLModelWorker<GenericPrediction> getDLWorker() {
+	public DLModelWorker<StandardPrediction> getDLWorker() {
 		return this.genericModelWorker;
 	}
 

@@ -12,7 +12,7 @@ public class SegmenterGroupDataBlock extends PamDataBlock<SegmenterDetectionGrou
 
 	public SegmenterGroupDataBlock(String dataName, PamProcess parentProcess, int channelMap) {
 		super(SegmenterDetectionGroup.class, dataName, parentProcess, channelMap);
-		// TODO Auto-generated constructor stub
 	}
+	
 
 }

@@ -26,7 +26,7 @@ import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericModelWorker;
-import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
+import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 
 /**
  * 
@@ -228,8 +228,8 @@ public class ArchiveModelWorker extends GenericModelWorker {
 
 
 	@Override
-	public GenericPrediction makeModelResult(float[]  prob, double time) {
-		GenericPrediction prediction =  new GenericPrediction(prob); 
+	public StandardPrediction makeModelResult(float[]  prob, double time) {
+		StandardPrediction prediction =  new StandardPrediction(prob); 
 		prediction.setAnalysisTime(time);
 		return prediction;
 	}
@@ -250,6 +250,10 @@ public class ArchiveModelWorker extends GenericModelWorker {
 	@Override
 	public ArchiveModel getModel() {
 		return dlModel;
+	}
+	
+	protected void setModel(ArchiveModel dlModel) {
+		this.dlModel = dlModel;
 	}
 
 	@Override

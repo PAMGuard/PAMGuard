@@ -14,7 +14,7 @@ import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
 import rawDeepLearningClassifier.dlClassification.StandardClassifierModel;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
-import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
+import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 import rawDeepLearningClassifier.dlClassification.ketos.KetosDLParams;
 import rawDeepLearningClassifier.dlClassification.ketos.KetosUI;
 import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
@@ -81,7 +81,7 @@ public abstract class ArchiveModelClassifier extends StandardClassifierModel {
 	
 
 	@Override
-	public DLModelWorker<GenericPrediction> getDLWorker() {
+	public DLModelWorker<StandardPrediction> getDLWorker() {
 		return getModelWorker();
 	}
 

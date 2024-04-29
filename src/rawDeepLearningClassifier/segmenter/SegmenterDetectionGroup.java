@@ -19,9 +19,16 @@ public class SegmenterDetectionGroup extends GroupDetection<PamDataUnit> {
 	 * @param startSample      - the stratSample of the SEGMENT.
 	 * @param duration         - the duration of the SEGMENT.
 	 */
-	public SegmenterDetectionGroup(long timeMilliseconds, int channelBitmap, long startSample, long duration) {
-		super(timeMilliseconds, channelBitmap, startSample, duration);
-		// TODO Auto-generated constructor stub
+	public SegmenterDetectionGroup(long timeMilliseconds, int channelBitmap, long startSample, double duration) {
+		super(timeMilliseconds, channelBitmap, startSample, (long) duration);
+		this.setDurationInMilliseconds(duration);
 	}
+	
+	@Override
+	public boolean isAllowSubdetectionSharing() {
+		//segmetns share sub detections
+		return true;
+	}
+
 
 }
