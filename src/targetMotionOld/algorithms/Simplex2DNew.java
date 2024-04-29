@@ -66,8 +66,8 @@ public class Simplex2DNew<T extends GroupDetection> extends AbstractTargetMotion
 	}
 
 	@Override
-	public LocaliserPane<?> getSettingsPane() {
-		return detectionGroupLocaliser.getSettingsPane();
+	public LocaliserPane<?> getAlgorithmSettingsPane() {
+		return detectionGroupLocaliser.getAlgorithmSettingsPane();
 	}
 
 	@Override

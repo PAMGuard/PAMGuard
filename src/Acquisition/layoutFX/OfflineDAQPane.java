@@ -30,8 +30,7 @@ public class OfflineDAQPane extends SettingsPane<OfflineFileParameters>{
 	private PamBorderPane mainPane;
 
 
-	public OfflineDAQPane(OfflineFileDataStore acquisitionControl,
-			AcquisitionPaneFX acquisitionPaneFX){
+	public OfflineDAQPane(OfflineFileDataStore acquisitionControl){
 		super(null);
 		this.mainPane= new PamBorderPane();
 		mainPane.setCenter(createOfflinePane());

@@ -4,6 +4,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.FillRule;
 import javafx.scene.shape.SVGPath;
 import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
 
@@ -62,12 +63,18 @@ public class PamSVGIcon {
 		}
 		return instance;
 	}
+	
+	@Deprecated
+	public PamSVGIcon create(URL path, Color color, double lineWidth) throws Exception {
+		return create(path);
+	}
 
-	public PamSVGIcon create(URL path, Color color) throws Exception {
 
-//		System.out.println("Create icon start");
+	public PamSVGIcon create(URL path) throws Exception {
 
-		String col = PamUtilsFX.toRGBCode(color);
+		//		System.out.println("Create icon start");
+
+//		String col = PamUtilsFX.toRGBCode(color);
 
 		//    	System.out.println("Create icon getDocument()");
 
@@ -87,13 +94,27 @@ public class PamSVGIcon {
 		for(int i=0; i<svgPaths.getLength(); i++) {
 			try {
 				SVGPath shape = new SVGPath();
+				shape.setFillRule(FillRule.NON_ZERO);
 				NamedNodeMap map = svgPaths.item(i).getAttributes();
+
+//				System.out.println("Attributes: "  + map.getLength()); 
+//				for (int ii=0; ii<map.getLength(); ii++) {
+//					System.out.println(map.item(ii).getNodeName() +  "  " + map.item(ii).getFirstChild().getNodeValue());
+//				}
+
 				shape.setContent(map.getNamedItem("d").getTextContent());
-				if(map.getNamedItem("style") != null) {
-					shape.setStyle(convertStyle(map.getNamedItem("style").getTextContent()));
-				} else {
-					shape.setStyle("-fx-fill: "+col+"; -fx-stroke-width: 2;");
-				}
+
+				//get the fx style form the svg data. 
+				String style = convertShapeStyle(map); 
+
+				shape.setStyle(style);
+
+				//				if(map.getNamedItem("style") != null) {
+				//					shape.setStyle(convertStyle(map.getNamedItem("style").getTextContent()));
+				//				} else {
+				//					shape.setStyle("-fx-fill: red;" + "-fx-stroke-width: " + lineWidth + ";-fx-stroke: "+col);
+				////					shape.setStyle("-fx-fill: "+col+"-fx-stroke: "+col);
+				//				}
 				shapes.add(shape);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -107,11 +128,51 @@ public class PamSVGIcon {
 		String textStyle = getTextStyle(document);
 
 		//    	System.out.println("Create icon finsihed");
-
-
 		return new PamSVGIcon(shapesPaths, textStyle, margin, path);
+	}
 
+	
+	/*
+	 * Convert SVG properties to an fx css style. 
+	 */
+	private String convertShapeStyle(NamedNodeMap map) {
 
+		//Example of attributes map in SVG. 
+		//		fill  none
+		//		opacity  1
+		//		stroke  #000000
+		//		stroke-linecap  round
+		//		stroke-linejoin  round
+		//		stroke-width  2.0144
+
+		//"-fx-fill: red;" + "-fx-stroke-width: " + lineWidth + ";-fx-stroke: "+col
+
+		String style = "";
+
+		for (int ii=0; ii<map.getLength(); ii++) {
+			String col;
+			//System.out.println(map.item(ii).getNodeName() +  "  " + map.item(ii).getFirstChild().getNodeValue());
+			switch (map.item(ii).getNodeName()) {
+			
+			case "fill":
+				col = map.item(ii).getFirstChild().getNodeValue();
+				style += "-fx-fill: " + col+";";
+				break;
+			case "stroke":
+				col = map.item(ii).getFirstChild().getNodeValue();
+				style += ("-fx-stroke: " + col+";");
+				break;
+			case "stroke-linecap":
+				style += "-fx-stroke-line-cap: "+map.item(ii).getFirstChild().getNodeValue()+";";
+				break;
+			case "stroke-width":
+				style += ("-fx-stroke-width: " +  map.item(ii).getFirstChild().getNodeValue()+";");
+				break;
+
+			}
+		}
+
+		return style;
 	}
 
 	//	/**
@@ -155,7 +216,7 @@ public class PamSVGIcon {
 			DocumentBuilder builder = factory.newDocumentBuilder();
 
 			//        	System.out.println("DocumentBuilderFactory.parse();");
-			
+
 			//this takes a very long time!
 			return builder.parse(path.toString());
 

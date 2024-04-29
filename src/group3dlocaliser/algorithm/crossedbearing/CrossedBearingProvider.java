@@ -19,7 +19,7 @@ public class CrossedBearingProvider extends LocaliserAlgorithmProvider {
 	 */
 	private synchronized CrossedBearingGroupLocaliser getInstance() {
 		if (crossedBearingLocaliser == null) {
-			crossedBearingLocaliser = new CrossedBearingGroupLocaliser();
+			crossedBearingLocaliser = new CrossedBearingGroupLocaliser(null);
 		}
 		return crossedBearingLocaliser;
 	}

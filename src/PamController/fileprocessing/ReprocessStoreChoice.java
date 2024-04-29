@@ -24,7 +24,7 @@ public enum ReprocessStoreChoice {
 		case DONTSSTART:
 			return "Don't start processing";
 		case OVERWRITEALL:
-			return "Overwrite existing output data";
+			return "Overwrite all existing output data";
 		default:
 			break;
 		}
@@ -42,7 +42,7 @@ public enum ReprocessStoreChoice {
 		case DONTSSTART:
 			return "Processing will not start. Select alternative storage locations / databases and try again";
 		case OVERWRITEALL:
-			return "Overwrite existing output data. Existing data will be deleted";
+			return "Overwrite existing output data. All existing data will be deleted";
 		default:
 			break;
 		}

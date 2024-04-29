@@ -115,7 +115,6 @@ public class ModelResultBinaryFactory {
 		try {
 
 			//System.out.println("Make model result: "); 
-
 			int type = dis.readByte(); 
 			boolean isBinary = dis.readBoolean(); 
 			double scale = dis.readFloat();
@@ -150,9 +149,7 @@ public class ModelResultBinaryFactory {
 				result = new GenericPrediction(data, isBinary); 
 				break; 
 			}
-
 			//System.out.println("New model result: "+ type); 
-
 			return result; 
 
 		} catch (IOException e) {

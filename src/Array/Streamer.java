@@ -571,7 +571,7 @@ public class Streamer implements Serializable, Cloneable, ManagedParameters {
 	/**
 	 * Make a streamer data unit and add it to the data block. 
 	 */
-	protected void makeStreamerDataUnit() {
+	public void makeStreamerDataUnit() {
 		StreamerDataUnit sdu = new StreamerDataUnit(PamCalendar.getTimeInMillis(), this);
 		ArrayManager.getArrayManager().getStreamerDatabBlock().addPamData(sdu);
 	}
@@ -667,8 +667,8 @@ public class Streamer implements Serializable, Cloneable, ManagedParameters {
 	 */
 	@Override
 	public String toString() {
-		return super.toString() + "; OriginSettings: " + getOriginSettings().toString() + "," + getHydrophoneOrigin().getOriginSettings().toString() + 
-				"; Locator " + getLocatorSettings().toString();
+		return super.toString() + "; OriginSettings: " + getOriginSettings()==null ? "null" : getOriginSettings().toString() + "," + getHydrophoneOrigin().getOriginSettings().toString() + 
+				"; Locator " + getLocatorSettings()==null ? "null" : getLocatorSettings().toString();
 	}
 
 	public static Streamer getAverage(Streamer sd1,

@@ -5,6 +5,7 @@ import dataPlotsFX.data.TDDataProviderFX;
 import dataPlotsFX.layout.TDGraphFX;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dlClassification.DLDetectionDataBlock;
+import rawDeepLearningClassifier.dlClassification.DLModelDataBlock;
 
 /**
  * The DL detection plot provider. 
@@ -22,10 +23,10 @@ public class DLPredictionProvider extends TDDataProviderFX {
 	/**
 	 * The DL detection plot provider. 
 	 * @param dlControl - reference to DL control. 
-	 * @param dlDetectionDataBlock - the dl detection data block. 
+	 * @param dlModelDataBlock - the dl detection data block. 
 	 */
-	public DLPredictionProvider(DLControl dlControl, DLDetectionDataBlock dlDetectionDataBlock) {
-		super(dlDetectionDataBlock); 
+	public DLPredictionProvider(DLControl dlControl, DLModelDataBlock dlModelDataBlock) {
+		super(dlModelDataBlock); 
 		this.dlControl = dlControl;
 	}
 

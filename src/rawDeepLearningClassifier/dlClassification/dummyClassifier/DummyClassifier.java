@@ -1,15 +1,17 @@
 package rawDeepLearningClassifier.dlClassification.dummyClassifier;
 
 import java.io.Serializable;
+import java.net.URI;
 import java.util.ArrayList;
 
+import PamguardMVC.PamDataUnit;
 import rawDeepLearningClassifier.DLControl;
+import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.dlClassification.DLClassName;
 import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
 import rawDeepLearningClassifier.dlClassification.PredictionResult;
 import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
-import rawDeepLearningClassifier.segmenter.SegmenterProcess.GroupedRawData;
-import warnings.PamWarning;
+import rawDeepLearningClassifier.segmenter.GroupedRawData;
 
 /**
  * Classifier which returns a random results. Used for debugging and testing. 
@@ -60,8 +62,7 @@ public class DummyClassifier implements DLClassiferModel{
 		return null;
 	}
 
-	@Override
-	public ArrayList<PredictionResult> runModel(ArrayList<GroupedRawData> rawDataUnit) {
+	public ArrayList<? extends PredictionResult> runModel(ArrayList<? extends PamDataUnit> rawDataUnit) {
 		ArrayList<PredictionResult> modelResults = new ArrayList<PredictionResult>(); 
 
 		for (int i=0; i<rawDataUnit.size(); i++) {
@@ -79,12 +80,20 @@ public class DummyClassifier implements DLClassiferModel{
 	}
 
 	@Override
-	public boolean checkModelOK() {
-		return true;
+	public DLStatus getModelStatus() {
+		return null;
+	}
+
+
+
+	@Override
+	public boolean isModelType(URI uri) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	@Override
-	public ArrayList<PamWarning> checkSettingsOK() {
+	public DLStatus setModel(URI model) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -132,7 +132,7 @@ public class DetectionGroupLocaliser2<T extends SuperDetection> implements Local
 	}
 
 	@Override
-	public LocaliserPane getSettingsPane() {
+	public LocaliserPane getAlgorithmSettingsPane() {
 		return locAlgorithm.getSettingsPane(); 
 	}
 

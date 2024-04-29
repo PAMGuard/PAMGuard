@@ -30,7 +30,7 @@ public class PamJFXPanel extends JFXPanel {
 		
 		this.scene = new Scene(midBorderPane);
 
-		scene.getStylesheets().add(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getDialogCSS());  
+		scene.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getDialogCSS());  
 
 		setScene(scene);
 		

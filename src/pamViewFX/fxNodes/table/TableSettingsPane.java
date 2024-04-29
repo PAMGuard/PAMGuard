@@ -1,6 +1,7 @@
 package pamViewFX.fxNodes.table;
 
 import pamViewFX.fxNodes.PamBorderPane;
+import atlantafx.base.theme.Styles;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
@@ -9,6 +10,8 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.geometry.Insets;
+
 
 /**
  * Pane which holds data within a table  and has add, settings and delete buttons. 
@@ -33,6 +36,7 @@ public abstract class TableSettingsPane<T> extends PamBorderPane {
 	public TableSettingsPane(ObservableList<T> data){
    		this.data=data; 
 		table = new TableView<T>();
+		
         this.setCenter(createPane());
 	}
 	
@@ -70,6 +74,7 @@ public abstract class TableSettingsPane<T> extends PamBorderPane {
 
 	    //create pane holding add, edit and remove controls
         buttonPane=new TableButtonPane(Orientation.VERTICAL); 
+        
         buttonPane.getAddButton().setOnAction((event)->{
         	createNewData();
         });
@@ -87,8 +92,8 @@ public abstract class TableSettingsPane<T> extends PamBorderPane {
         
     	
         //make sure table resized with pane to stop blank column
-        getTableView().setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        
+        getTableView().setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
+                
     	getButtonPane().getSettingsButton().setDisable(table.getItems().size()<=0);
 		getButtonPane().getDeleteButton().setDisable(table.getItems().size()<=0);
 
@@ -145,6 +150,11 @@ public abstract class TableSettingsPane<T> extends PamBorderPane {
 	 */
 	public TableButtonPane getButtonPane() {
 		return buttonPane;
+	}
+	
+
+	public ObservableList<T> getData() {
+		return data;
 	}
 
 		

@@ -146,6 +146,7 @@ public abstract class WaveformPlot<D extends PamDataUnit> implements DetectionPl
 	public void paintPlot(D pamDetection, GraphicsContext gc, Rectangle rectangle, DetectionPlotProjector plotProjector, int flag){
 		//if (currentDetection == pamDetection) return; 		
 		currentDetection = pamDetection; 
+		
 		if (flag == DetectionPlot.SCROLLPANE_DRAW) {
 			//drawing a datagram in the scroll pane. 
 			//System.out.println("WaveformPlot: Print scroll datagram: " +  pamDetection+ "  " + rectangle); 
@@ -166,6 +167,8 @@ public abstract class WaveformPlot<D extends PamDataUnit> implements DetectionPl
 	private void paintScrollDataGram(D pamDetection, GraphicsContext gc, Rectangle clipRect, DetectionPlotProjector projector) {
 		currentWaveform=getWaveform(pamDetection);
 		
+		if (currentWaveform==null) return;
+		
 		paintWaveform(currentWaveform, currentDetection.getSequenceBitmap(),  gc,  clipRect,  0, currentWaveform[0].length,
 				log2Amplitude, null, true,  false);	
 
@@ -180,6 +183,9 @@ public abstract class WaveformPlot<D extends PamDataUnit> implements DetectionPl
 	 */
 	private void forcePaintPlot(D pamDetection, GraphicsContext gc, Rectangle rectangle, DetectionPlotProjector projector){
 		currentWaveform=getWaveform(pamDetection);
+	
+		if (currentWaveform==null) return;
+
 		waveformPlotParams.invert=false; 
 		setYScale();
 		paintWaveform(currentWaveform, gc,  rectangle, projector, null);

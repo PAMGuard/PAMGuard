@@ -34,15 +34,19 @@ import org.w3c.dom.Element;
 import dataGram.DatagramManager;
 import dataMap.OfflineDataMapPoint;
 import dataMap.filemaps.OfflineFileServer;
+import decimator.layoutFX.DecimatorUIFX;
 import pamScrollSystem.ViewLoadObserver;
 import Acquisition.filedate.FileDate;
 import Acquisition.filedate.StandardFileDate;
+import Acquisition.layoutFX.AquisitionGUIFX;
 import Acquisition.offlineFuncs.OfflineWavFileServer;
 import PamController.OfflineFileDataStore;
 import PamController.PamControlledUnit;
+import PamController.PamControlledUnitGUI;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamControllerInterface;
+import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamController.fileprocessing.StoreStatus;
@@ -70,6 +74,11 @@ public class DecimatorControl extends PamControlledUnit implements PamSettings, 
 	private OfflineFileServer offlineFileServer;
 	
 	private FileDate fileDate;
+
+	/**
+	 * JavaFX GUI components for the decimator.
+	 */
+	private DecimatorUIFX decimatorGUIFX;
 	
 	public DecimatorControl(String name) {
 		
@@ -270,6 +279,32 @@ public class DecimatorControl extends PamControlledUnit implements PamSettings, 
 		double fsmall = Math.min(sourceFS, newSampleRate);
 		double m = fbig % fsmall;
 		return m == 0;
+	}
+	
+	
+	@Override
+	public PamControlledUnitGUI getGUI(int flag) {
+		if (flag==PamGUIManager.FX) {
+			if (decimatorGUIFX ==null) {
+				decimatorGUIFX= new DecimatorUIFX(this);
+			}
+			return decimatorGUIFX;
+		}
+		//TODO swing
+		return null;
+	}
+
+	public void setDecimatorParams(DecimatorParams newParams) {
+		this.decimatorParams=newParams;
+		
+	}
+
+	/**
+	 * Get the decimator process. 
+	 * @return the decimator process. 
+	 */
+	public DecimatorProcessW getDecimatorProcess() {
+		return this.decimatorProcess;
 	}
 
 	

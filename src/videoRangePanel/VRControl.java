@@ -511,7 +511,7 @@ public class VRControl extends PamControlledUnit implements PamSettings {
 		long time1=System.currentTimeMillis();
 		if (vrTabPanelControl.openImageFile(file)) {
 			//now set the scroller to move to to the correct imu or angle data;
-			if (currentImage.getTimeMilliseconds()!=0 && !checkViewLoadTime(currentImage.getTimeMilliseconds())){
+			if (currentImage!=null && currentImage.getTimeMilliseconds()!=0 && !checkViewLoadTime(currentImage.getTimeMilliseconds())){
 				vrScroller.setRangeMillis(currentImage.getTimeMilliseconds()-loadTime, currentImage.getTimeMilliseconds()+loadTime, true);
 			}
 		}

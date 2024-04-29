@@ -169,7 +169,7 @@ public class ModuleConnectionNode extends StandardConnectionNode implements PAMC
 	 * Create the module. 
 	 */
 	private void initModuleNode(){
-		
+				
 		//create the top hiding pane
 		this.getChildren().add(0,topHidingPane=createTopControls()); 
 		
@@ -196,7 +196,9 @@ public class ModuleConnectionNode extends StandardConnectionNode implements PAMC
 	 * @param type - the type of connection. 
 	 */
 	protected void connectionListenerTriggered(ConnectorNode shape, ConnectorNode foundShape, int type){
-		//System.out.println(" ModuleConnectionNode. listener triggered " + this.getPamControlledUnit().getUnitName()+ " "+type ); 		
+		
+		//System.out.println(" ModuleConnectionNode. listener triggered " + this.getPamControlledUnit()+ " "+type ); 		
+		
 		if (lastConnectionStatus==ConnectorNode.NO_CONNECTION && type==ConnectorNode.NO_CONNECTION) return;
 		switch(type){
 		case ConnectorNode.NO_CONNECTION:
@@ -237,7 +239,7 @@ public class ModuleConnectionNode extends StandardConnectionNode implements PAMC
 		removeButton.setGraphic(PamGlyphDude.createPamIcon("mdi2m-minus", Color.WHITE, PamGuiManagerFX.iconSize));
 		removeButton.setMaxSize(Double.MAX_VALUE,Double.MAX_VALUE);
 		removeButton.setOnAction((change)->{
-			if (this.pamControlledUnit.getPamModuleInfo().canRemove()){
+			if (this.pamControlledUnit==null || this.pamControlledUnit.getPamModuleInfo()== null || this.pamControlledUnit.getPamModuleInfo().canRemove()){
 				connectionPane.removeModuleNode(this);
 			}
 		});
@@ -422,7 +424,7 @@ public class ModuleConnectionNode extends StandardConnectionNode implements PAMC
 			this.holderPane = HolderPane; 
 			this.top= top; 
 
-			this.getStylesheets().add(PamController.getInstance().getGuiManagerFX().getPamSettingsCSS());
+			this.getStylesheets().addAll(PamController.getInstance().getGuiManagerFX().getPamSettingsCSS());
 
 			showButton=new PamButton(); 
 			showButton.setMaxWidth(Double.MAX_VALUE);
@@ -620,7 +622,7 @@ public class ModuleConnectionNode extends StandardConnectionNode implements PAMC
 		//add tool tip
 		if (pamControlledUnit!=null){
 			
-			//sometimes seems to cause an issue woith dialogs disappearing. 
+			//sometimes seems to cause an issue with dialogs disappearing. 
 //			Tooltip tp = new Tooltip(pamControlledUnit.getUnitType());
 //			tp.getStyleClass().removeAll(tp.getStyleClass());
 //			Tooltip.install(this, tp);
@@ -639,16 +641,24 @@ public class ModuleConnectionNode extends StandardConnectionNode implements PAMC
 			}
 			
 			
+			Tooltip tooltip = ModuleToolTipFactory.getToolTip(pamControlledUnit);
+			
+			if (tooltip!=null) {
+			Tooltip. install(this, tooltip);
+			}
+			
 		}
 		
-		Node icon = ModuleIconFactory.getInstance().
-				getModuleNode(pamControlledUnit.getPamModuleInfo().getClassName());
-		if (pamControlledUnit.getPamModuleInfo()!=null && icon!=null){
-			StackPane iconPane = new StackPane(icon);
-			iconPane.setPrefSize(DataModelStyle.iconSize, DataModelStyle.iconSize);
-			iconPane.setAlignment(Pos.CENTER);
-			StackPane.setAlignment(iconPane, Pos.CENTER); //make sure the image or node is centered.
-			this.getConnectionNodeBody().getChildren().add(iconPane);
+		if (pamControlledUnit.getPamModuleInfo()!=null) {
+			Node icon = ModuleIconFactory.getInstance().
+					getModuleNode(pamControlledUnit.getPamModuleInfo().getClassName());
+			if (icon!=null){
+				StackPane iconPane = new StackPane(icon);
+				iconPane.setPrefSize(DataModelStyle.iconSize, DataModelStyle.iconSize);
+				iconPane.setAlignment(Pos.CENTER);
+				StackPane.setAlignment(iconPane, Pos.CENTER); //make sure the image or node is centered.
+				this.getConnectionNodeBody().getChildren().add(iconPane);
+			}
 		}
 		
 		
@@ -965,7 +975,9 @@ public class ModuleConnectionNode extends StandardConnectionNode implements PAMC
 	}
 	
 	
-	
+	public DataModelConnectPane getDataModelConnectionPane() {
+		return this.connectionPane;
+	}
 	
 
 }

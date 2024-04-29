@@ -12,12 +12,10 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
-import net.synedra.validatorfx.Validator;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxNodes.PamGridPane;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamVBox;
-import pamViewFX.validator.PamValidator;
 import PamUtils.PamUtils;
 import PamView.GroupedSourceParameters;
 import PamguardMVC.PamConstants;
@@ -29,6 +27,7 @@ import PamguardMVC.PamDataBlock;
  * @author Jamie Macaulay
  *
  */
+@SuppressWarnings("rawtypes")
 public class GroupedSourcePaneFX extends SourcePaneFX {
 
 	
@@ -59,11 +58,6 @@ public class GroupedSourcePaneFX extends SourcePaneFX {
 	 */
 	private PamVBox channelPanel;
 	
-	/**
-	 * Validator for channels 
-	 */
-    private Validator channelValidator;
-
 
 	public GroupedSourcePaneFX(Class sourceType, boolean hasChannels, boolean includeSubClasses, boolean autoGrouping) {
 		super(sourceType, hasChannels, includeSubClasses);
@@ -76,9 +70,7 @@ public class GroupedSourcePaneFX extends SourcePaneFX {
 
 	@Override
 	protected void createPanel() {
-		
-		channelValidator = new PamValidator();
-		
+				
 		sourcePane=new PamGridPane();
 		sourcePane.setVgap(5);
 		sourcePane.setHgap(5);
@@ -144,7 +136,7 @@ public class GroupedSourcePaneFX extends SourcePaneFX {
 		
 		//create check to show at least some check boxes need to be selected.
 		channelValidator.createCheck()
-        .dependsOn(("select all"), selectAll.selectedProperty())
+        .dependsOn(("select_all_" + this), selectAll.selectedProperty())
         .withMethod(c -> {
           if (!isAChannelSelected() ) {
 	              c.error("At least one channel needs to be selected for the module to work");
@@ -158,7 +150,7 @@ public class GroupedSourcePaneFX extends SourcePaneFX {
 			for (int i = 0; i < PamConstants.MAX_CHANNELS; i++){
 				channelBoxes[i] = new CheckBox("Channel " + i);
 				 channelValidator.createCheck()
-		          .dependsOn(("channel " + i), channelBoxes[i].selectedProperty())
+		          .dependsOn(("channel_" + i +  "_" + this), channelBoxes[i].selectedProperty())
 		          .withMethod(c -> {
 		            if (!isAChannelSelected() ) {
 			              c.error("At least one channel needs to be selected for the module to work");
@@ -197,34 +189,6 @@ public class GroupedSourcePaneFX extends SourcePaneFX {
 
 	}
 	
-	/**
-	 * Get the validator for the channel. This can identify errors
-	 * in 
-	 * @return
-	 */
-	public Validator getChannelValidator() {
-		return channelValidator;
-	}
-
-	/**
-	 * Check if 
-	 * @return
-	 */
-	private boolean isAChannelSelected() {
-		int channels = 0;
-		PamDataBlock sb = getSource();
-		if (sb != null) {
-	//		channels = sb.getChannelMap();
-			channels = sb.getSequenceMap();
-		}
-		int n=0; 
-		//remove all channels from vertical box pane. 
-		for (int i = 0; i < Math.min(PamConstants.MAX_CHANNELS, channelBoxes.length); i++) {
-			if ((channels & 1<<i) != 0 && this.channelBoxes[i].isSelected()) n++;
-		} 
-		if (n==0) return false;
-		else return true;
-	}
 	
 	@Override
 	protected void showChannels() {

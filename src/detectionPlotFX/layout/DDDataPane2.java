@@ -87,7 +87,6 @@ public class DDDataPane2 extends PamBorderPane {
 		
 			dataPlots.getItems().add(ddDataInfo.getDetectionPlot(i).getName()); 
 			
-			
 			if (ddDataInfo.getCurrentDetectionPlot()==ddDataInfo.getDetectionPlot(i)) {
 				index=i; 
 			}

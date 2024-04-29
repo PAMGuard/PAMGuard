@@ -1,6 +1,7 @@
 package rawDeepLearningClassifier.dlClassification.orcaSpot;
 
 import java.io.Serializable;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -9,14 +10,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import PamguardMVC.PamDataUnit;
 import rawDeepLearningClassifier.DLControl;
+import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.dlClassification.DLClassName;
 import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
 import rawDeepLearningClassifier.dlClassification.DLDataUnit;
 import rawDeepLearningClassifier.dlClassification.DLDetection;
 import rawDeepLearningClassifier.dlClassification.PredictionResult;
 import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
-import rawDeepLearningClassifier.segmenter.SegmenterProcess.GroupedRawData;
+import rawDeepLearningClassifier.segmenter.GroupedRawData;
 import warnings.PamWarning;
 
 /**
@@ -97,18 +100,18 @@ public class OrcaSpotClassifier implements DLClassiferModel, PamSettings {
 	}
 
 	@Override
-	public ArrayList<PredictionResult> runModel(ArrayList<GroupedRawData> rawDataUnits) {
+	public ArrayList<? extends PredictionResult> runModel(ArrayList<? extends PamDataUnit> rawDataUnits) {
 
-		for (GroupedRawData groupedRawData: rawDataUnits){
-			if (queue.size()>MAX_QUEUE_SIZE) {
-				//we are not doing well - clear the buffer
-				queue.clear();
-			}
-			queue.add(groupedRawData);
-
-
-		}
-		this.orcaSpotUI.notifyUpdate(-1);
+//		for (PamDataUnit groupedRawData: rawDataUnits){
+//			if (queue.size()>MAX_QUEUE_SIZE) {
+//				//we are not doing well - clear the buffer
+//				queue.clear();
+//			}
+//			queue.add(groupedRawData);
+//
+//
+//		}
+//		this.orcaSpotUI.notifyUpdate(-1);
 
 		return null; 
 	}
@@ -339,14 +342,28 @@ public class OrcaSpotClassifier implements DLClassiferModel, PamSettings {
 	}
 
 	@Override
-	public boolean checkModelOK() {
-		return true;
+	public DLStatus getModelStatus() {
+		return null;
+	}
+
+//	@Override
+//	public ArrayList<PamWarning> checkSettingsOK() {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+
+	@Override
+	public boolean isModelType(URI uri) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	@Override
-	public ArrayList<PamWarning> checkSettingsOK() {
+	public DLStatus setModel(URI model) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+
 
 }

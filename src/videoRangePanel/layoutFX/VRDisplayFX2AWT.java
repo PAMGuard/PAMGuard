@@ -3,6 +3,7 @@ package videoRangePanel.layoutFX;
 import java.awt.Point;
 import java.io.File;
 
+import javafx.application.Platform;
 import javafx.scene.layout.Pane;
 import videoRangePanel.VRControl;
 import videoRangePanel.VRPane;
@@ -71,9 +72,11 @@ public class VRDisplayFX2AWT implements VRPane {
 	}
 
 	public void update(int updateType) {
+		Platform.runLater(()->{
 		if (vRDisplayFX!=null) {
 			vRDisplayFX.update(updateType); 
 		}
+		});
 	}
 
 	/**

@@ -253,7 +253,6 @@ public class OverlayGroupDisplay extends PamBorderPane {
 		this.detectionsPane.setDetectionGroup(dataList);
 	
 		
-		
 		if (superDets!=null) {
 			this.superDetectionsDisplay.setDetectionGroup(new ArrayList<PamDataUnit>(superDets));
 		}

@@ -10,13 +10,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import javax.swing.JFrame;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import pamMaths.PamQuaternion;
 import pamMaths.PamVector;
 import userDisplay.UserDisplayControl;
-import depthReadout.DepthControl;
 import Array.importHydrophoneData.HydrophoneImport;
 import Array.importHydrophoneData.StreamerImport;
 import Array.layoutFX.ArrayGUIFX;
@@ -91,7 +87,7 @@ public class ArrayManager extends PamControlledUnit implements PamSettings, PamO
 
 //	private DepthControl depthControl;
 
-	private ImportDataSystem<ArrayList<Double>> hydrophoneImportManager;
+	private ImportDataSystem<Hydrophone> hydrophoneImportManager;
 
 	private ImportDataSystem<ArrayList<Double>> streamerImportManager;
 	
@@ -140,7 +136,7 @@ public class ArrayManager extends PamControlledUnit implements PamSettings, PamO
 
 		//enable importing of time stamped hydrophone and streamer data if in viewer mode. 
 		if (isViewer){
-			hydrophoneImportManager= new ImportDataSystem<ArrayList<Double>>(new HydrophoneImport(hydrophonesProcess.getHydrophoneDataBlock()));
+			hydrophoneImportManager= new ImportDataSystem<Hydrophone>(new HydrophoneImport(hydrophonesProcess.getHydrophoneDataBlock()));
 			hydrophoneImportManager.setName("Hydrophone Data Import");
 			streamerImportManager = new ImportDataSystem<ArrayList<Double>>(new StreamerImport(hydrophonesProcess.getStreamerDataBlock()));
 			streamerImportManager.setName("Streamer Data Import");
@@ -1054,12 +1050,17 @@ public class ArrayManager extends PamControlledUnit implements PamSettings, PamO
 			/**
 			 * Rotate the hydrophone about the centre of it's streamer. 
 			 */
-			Hydrophone hydrophone = currentArray.getHiddenHydrophone(i);
+//			Hydrophone hydrophone = currentArray.getHiddenHydrophone(i);
+			Hydrophone hydrophone = currentArray.getHydrophone(i, timeMillis);
+			
+			
+			
 			if (hydrophone == null) {
 				continue;
 			}
 			PamVector hydrophoneVec = hydrophone.getVector();
 			PamVector hydrophoneErrorVec = hydrophone.getErrorVector();
+						
 			if (streamerQuaternion != null) {
 				hydrophoneVec = PamVector.rotateVector(hydrophoneVec, streamerQuaternion);
 				hydrophoneErrorVec = PamVector.rotateVector(hydrophoneErrorVec, streamerQuaternion);

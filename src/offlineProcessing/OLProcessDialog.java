@@ -1,6 +1,7 @@
 package offlineProcessing;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -24,6 +25,9 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 
+import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
+import org.kordamp.ikonli.swing.FontIcon;
+
 import PamUtils.PamCalendar;
 import PamUtils.TxtFileUtils;
 import PamView.CancelObserver;
@@ -35,6 +39,7 @@ import PamView.panel.PamAlignmentPanel;
 import PamView.panel.PamPanel;
 import PamView.panel.PamProgressBar;
 import PamguardMVC.PamDataBlock;
+import export.layoutFX.ExportParams;
 import offlineProcessing.logging.OldTaskData;
 import offlineProcessing.logging.TaskLogging;
 import offlineProcessing.superdet.OfflineSuperDetFilter;
@@ -89,9 +94,16 @@ public class OLProcessDialog extends PamDialog {
 	private PamPanel timeChunkDataPanel;
 
 
-	public static ImageIcon settings = new ImageIcon(ClassLoader.getSystemResource("Resources/SettingsButtonSmall2.png"));
+//	public static ImageIcon settings = new ImageIcon(ClassLoader.getSystemResource("Resources/SettingsButtonSmall2.png"));
+	public static FontIcon settings =  	FontIcon.of(MaterialDesignC.COG, 20, Color.DARK_GRAY);
+
 
 	TaskStatus currentStatus = TaskStatus.IDLE;
+
+	/**
+	 * Reference to the main panel
+	 */
+	private JPanel mainPanel;
 
 
 	public OLProcessDialog(Window parentFrame, OfflineTaskGroup taskGroup, String title) {
@@ -99,7 +111,7 @@ public class OLProcessDialog extends PamDialog {
 		this.taskGroup = taskGroup;
 		taskGroup.setTaskMonitor(new OLMonitor());
 
-		JPanel mainPanel = new JPanel();
+		mainPanel = new JPanel();
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
 		JPanel dataSelectPanel = new PamAlignmentPanel(BorderLayout.WEST);
@@ -206,6 +218,14 @@ public class OLProcessDialog extends PamDialog {
 		
 		setResizable(true);
 
+	}
+	
+	/**
+	 * Get the main panel. This can be used to add additional controls if needed. 
+	 * @return the main panel. 
+	 */
+	public JPanel getMainPanel() {
+		return mainPanel;
 	}
 
 	/**
@@ -822,5 +842,6 @@ public class OLProcessDialog extends PamDialog {
 	public OfflineTaskGroup getTaskGroup() {
 		return this.taskGroup;
 	}
+
 
 }

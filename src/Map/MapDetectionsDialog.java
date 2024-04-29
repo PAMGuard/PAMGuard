@@ -1,6 +1,7 @@
 package Map;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -15,6 +16,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
+
+import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
+import org.kordamp.ikonli.swing.FontIcon;
 
 import PamController.PamController;
 import PamView.dialog.PamDialog;
@@ -85,7 +89,8 @@ public class MapDetectionsDialog extends PamDialog {
 		
 		
 		MapDetectionData md;
-		ImageIcon settingsIcon = new ImageIcon(ClassLoader.getSystemResource("Resources/SettingsButtonSmall2.png"));
+//		ImageIcon settingsIcon = new ImageIcon(ClassLoader.getSystemResource("Resources/SettingsButtonSmall2.png"));
+		FontIcon settingsIcon =  FontIcon.of(MaterialDesignC.COG, 20, Color.DARK_GRAY);
 
 		for (int i = 0; i < n; i++) {
 			md = mapDetectionsParameters.mapDetectionDatas.get(i);

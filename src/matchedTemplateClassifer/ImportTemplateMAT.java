@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import com.jmatio.io.MatFileReader;
-import com.jmatio.types.MLDouble;
-import com.jmatio.types.MLStructure;
+import PamUtils.PamArrayUtils;
+import us.hebi.matlab.mat.format.Mat5;
+import us.hebi.matlab.mat.format.Mat5File;
+import us.hebi.matlab.mat.types.Matrix;
+import us.hebi.matlab.mat.types.Struct;
 
 
 /**
@@ -22,7 +24,7 @@ public class ImportTemplateMAT implements TemplateImport {
 	/**
 	 * The matlab file rader.
 	 */
-	private MatFileReader mfr;
+	private Mat5File mfr;
 
 	@Override
 	public MatchTemplate importTemplate(File filePath){
@@ -31,7 +33,7 @@ public class ImportTemplateMAT implements TemplateImport {
 			//System.out.println("Import MAT file waveform");
 
 			//the MATLAB file reader. 
-			mfr = new MatFileReader(filePath);
+			mfr =  Mat5.readFromFile(filePath);
 			
 			MatchTemplate matchTemplate;
 			
@@ -72,34 +74,33 @@ public class ImportTemplateMAT implements TemplateImport {
 	 * @param mfr - .mat file reader.
 	 * @return the match template. 
 	 */
-	private MatchTemplate getTemplateStruct(MatFileReader mfr2) {
+	private MatchTemplate getTemplateStruct(Mat5File mfr2) {
 		
 		//the MATLAB file reader. 
-		MLStructure clicksStruct = (MLStructure) mfr.getMLArray("clicks"); 
-		MLDouble sampleRateML = (MLDouble) mfr.getMLArray("clicks_sR");
+		Struct clicksStruct = mfr.getStruct("clicks"); 
+		Double sampleRateML = getDouble(mfr,"clicks_sR");
 
-
-		
-		if (clicksStruct==null) {
-			clicksStruct = (MLStructure) mfr.getMLArray("raw_data_units"); 
-			sampleRateML = (MLDouble) mfr.getMLArray("raw_data_units_sR");
-		}
-		
-
-		
+//		if (clicksStruct==null) {
+//			clicksStruct = (MLStructure) mfr.getMLArray("raw_data_units"); 
+//			sampleRateML = (MLDouble) mfr.getMLArray("raw_data_units_sR");
+//		}
 		if (sampleRateML==null || clicksStruct==null) {
 			return null;
 		}
 		
-		MLDouble waveML = (MLDouble) clicksStruct.getField("wave", 0); 
-		double[][] waveform = waveML.getArray(); 
+		Matrix waveML = clicksStruct.get("wave", 0); 
+		double[][] waveform = PamArrayUtils.matrix2array(waveML);
 		
-
-		MatchTemplate matchedTemplate = new MatchTemplate(null, waveform[0], (float) sampleRateML.get(0).doubleValue());
-		
+		MatchTemplate matchedTemplate = new MatchTemplate(null, waveform[0], (float) sampleRateML.doubleValue());
 
 		return matchedTemplate; 
-		
+	}
+	
+	
+	private Double getDouble(Mat5File mfr, String field) {
+		Matrix data = mfr.getMatrix(field); 
+		if (data==null) return null;
+		return data.getDouble(0);
 	}
 
 
@@ -108,27 +109,25 @@ public class ImportTemplateMAT implements TemplateImport {
 	 * @param mfr - .mat file reader.
 	 * @return the match template. 
 	 */
-	private MatchTemplate getTemplateStandard(MatFileReader mfr) {
+	private MatchTemplate getTemplateStandard(Mat5File mfr) {
 		
 			//System.out.println("Import MAT file waveform");
 		
-
-
 			//the MATLAB file reader. 
-			MLDouble sampleRateML = (MLDouble) mfr.getMLArray("sR");
-			if (sampleRateML==null) sampleRateML = (MLDouble) mfr.getMLArray("sr"); //try a different name for the sample rate
-			if (sampleRateML==null) sampleRateML = (MLDouble) mfr.getMLArray("fs"); //try a different name for the sample rate
-			if (sampleRateML==null) sampleRateML = (MLDouble) mfr.getMLArray("samplerate"); //try a different name for the sample rate
-			if (sampleRateML==null) sampleRateML = (MLDouble) mfr.getMLArray("sample_rate"); //try a different name for the sample rate
-			if (sampleRateML==null) sampleRateML = (MLDouble) mfr.getMLArray("sampleRate"); //try a different name for the sample rate
-			if (sampleRateML==null) sampleRateML = (MLDouble) mfr.getMLArray("clicks_sR"); //try a different name for the sample rate
+			Double sampleRateML =  getDouble(mfr,"sR");
+			if (sampleRateML==null) sampleRateML = getDouble(mfr,"sr"); //try a different name for the sample rate
+			if (sampleRateML==null) sampleRateML = getDouble(mfr,"fs"); //try a different name for the sample rate
+			if (sampleRateML==null) sampleRateML = getDouble(mfr,"samplerate");//try a different name for the sample rate
+			if (sampleRateML==null) sampleRateML = getDouble(mfr,"sample_rate"); //try a different name for the sample rate
+			if (sampleRateML==null) sampleRateML = getDouble(mfr,"sampleRate"); //try a different name for the sample rate
+			if (sampleRateML==null) sampleRateML = getDouble(mfr,"clicks_sR"); //try a different name for the sample rate
 
 			
 			//get the waveform or spectrum
-			MLDouble waveformML = (MLDouble) mfr.getMLArray("waveform");
+			Matrix waveformML = mfr.getMatrix("waveform");
 			
-			if (waveformML==null) waveformML = (MLDouble) mfr.getMLArray("wave"); //try a different name for the waveform
-			if (waveformML==null) waveformML = (MLDouble) mfr.getMLArray("spectrum"); //might be a spectrum
+			if (waveformML==null) waveformML =  mfr.getMatrix("wave"); //try a different name for the waveform
+			if (waveformML==null) waveformML =  mfr.getMatrix("spectrum"); //might be a spectrum
 			
 
 			if (sampleRateML==null || waveformML==null) {
@@ -136,7 +135,7 @@ public class ImportTemplateMAT implements TemplateImport {
 			}
 			
 			//import a wave in column or row dimension
-			int size = Math.max(waveformML.getM(), 	waveformML.getN());
+			int size = Math.max(waveformML.getNumRows(), 	waveformML.getNumCols());
 			double[] waveform = new double[size];
 			
 			if (size<TemplateImport.MIN_WAVEFORM_LENGTH) {
@@ -145,9 +144,9 @@ public class ImportTemplateMAT implements TemplateImport {
 			}
 			
 			for (int i = 0 ; i<size; i++) {
-				waveform[i]= waveformML.getM()>waveformML.getN() ? waveformML.get(i, 0) : waveformML.get(0, i);
+				waveform[i]= waveformML.getNumRows()>waveformML.getNumCols() ? waveformML.getDouble(i, 0): waveformML.getDouble(0, i);
 			}
-			float sR= Float.valueOf((float) sampleRateML.getArray()[0][0]);
+			float sR= (float) sampleRateML.doubleValue();
 			
 			
 			//now create waveform

@@ -99,6 +99,7 @@ public class GenericDataPlotInfo extends TDDataInfoFX {
 		}
 		else {
 			return super.drawDataUnit(plotNumber, pamDataUnit, g, scrollStart, tdProjector, type);
+			
 		}
 	}
 
@@ -266,7 +267,7 @@ public class GenericDataPlotInfo extends TDDataInfoFX {
 		return managedSymbolChooser;
 	}
 
-	private TDSymbolChooserFX createSymbolChooser() {
+	public TDSymbolChooserFX createSymbolChooser() {
 		PamSymbolManager symbolManager = getDataBlock().getPamSymbolManager();
 		if (symbolManager == null) {
 			return null;
@@ -293,7 +294,7 @@ public class GenericDataPlotInfo extends TDDataInfoFX {
 	 * do some which may be associated with other annotations ? 
 	 */
 	protected void updateAvailability() {
-		LocalisationInfo locInfo = getPamDataBlock().getLocalisationContents();
+		LocalisationInfo locInfo = getDataBlock().getLocalisationContents();
 		bearingScaleInfo.setAvailable(locInfo.hasLocContent(LocContents.HAS_BEARING));
 		slantScaleInfo.setAvailable(locInfo.hasLocContent(LocContents.HAS_BEARING));
 	}

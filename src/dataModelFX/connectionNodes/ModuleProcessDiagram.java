@@ -81,7 +81,7 @@ public class ModuleProcessDiagram extends PamBorderPane {
 	private void createControlDataModel(){
 		this.setMinWidth(100);
 		this.setPrefWidth(USE_COMPUTED_SIZE); 
-		//this.setStyle("-fx-background-color: -fx-darkbackground");
+		this.setStyle("-fx-background-color: -fx-darkbackground");
 		this.populateDataModel();
 	}
 	

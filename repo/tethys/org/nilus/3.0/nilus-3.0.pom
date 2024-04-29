@@ -2,8 +2,14 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
+<<<<<<<< HEAD:repo/tethys/org/nilus/3.0/nilus-3.0.pom
   <groupId>tethys.org</groupId>
   <artifactId>nilus</artifactId>
   <version>3.0</version>
+========
+  <groupId>pamguard.org</groupId>
+  <artifactId>x3</artifactId>
+  <version>2.2.7</version>
+>>>>>>>> upstream/main:repo/pamguard/org/x3/2.2.7/x3-2.2.7.pom
   <description>POM was created from install:install-file</description>
 </project>

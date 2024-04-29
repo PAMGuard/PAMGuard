@@ -24,6 +24,7 @@ import userDisplayFX.UserDisplayNodeFX;
  * @author Jamie Macaulay
  *
  */
+@Deprecated
 public class DetectionDisplayControl extends UserDisplayControlFX  {
 
 	/**
@@ -49,7 +50,8 @@ public class DetectionDisplayControl extends UserDisplayControlFX  {
 		//create the observer for the parent data block. 
 		detectionDataObserver=new DetectionDataObserver();
 		setMultiParent(false);
-
+		
+	
 	}
 	
 	/**
@@ -83,7 +85,7 @@ public class DetectionDisplayControl extends UserDisplayControlFX  {
 			displayToDataModel(this.getUserDisplayProcess().getParentDataBlock());
 			break;
 		}
-		this.detectionDisplay.notifyModelChanged(type);
+		//this.detectionDisplay.notifyModelChanged(type);
 	}
 	
 	/**
@@ -119,8 +121,11 @@ public class DetectionDisplayControl extends UserDisplayControlFX  {
 	 */
 	public boolean newDataBlockAdded(PamDataBlock pamDataBlock){
 		
+		System.out.println("New datablock added: " + pamDataBlock.getDataName());
+
 		//now must find the data provider. 
 		//first get the list of dataInfos. 
+		
 		//22/05/206. Need to check we have the correct datablock before doing anything else. The datablock should
 		//be null or of the correct type. If not need to keep the last connection. 
 		DDDataProvider newDataProviderFX=DDPlotRegister.getInstance().findDataProvider(pamDataBlock);
@@ -147,7 +152,7 @@ public class DetectionDisplayControl extends UserDisplayControlFX  {
 		this.detectionDisplay.setDataInfo(newDataProviderFX); 
 		
 		//now add the observer to the data block
-		//System.out.println("DetectionDisplayControl: Adding observer to datablock: "+ pamDataBlock.getDataName());
+		//System.out.println("DetectionDisplayControl: Adding observer to data block: "+ pamDataBlock.getDataName());
 		pamDataBlock.addObserver(this.detectionDataObserver);
 
 		return true; 
@@ -156,9 +161,9 @@ public class DetectionDisplayControl extends UserDisplayControlFX  {
 	@Override
 	public ArrayList<UserDisplayNodeFX> getDisplays(){
 		if (displays==null){
-			detectionDisplay=new DetectionPlotDisplay(this);
+			detectionDisplay=new DetectionPlotDisplay();
 			displays=new ArrayList<UserDisplayNodeFX>();
-			displays.add(detectionDisplay);
+			//displays.add(detectionDisplay);
 		}
 		return displays;
 	}
@@ -181,7 +186,7 @@ public class DetectionDisplayControl extends UserDisplayControlFX  {
 
 		@Override
 		public void addData(PamObservable o, PamDataUnit arg) {
-			//System.out.println("DetectionDisplay: Incoming data unit: "+arg.getParentDataBlock().getDataName());
+			System.out.println("DetectionDisplay: Incoming data unit: "+arg.getParentDataBlock().getDataName());
 			//send the data unit to the display. 
 			//TODO-why?
 			Platform.runLater(()->{

@@ -186,36 +186,37 @@ public class PamHiddenSidePane extends PamStackPane {
 	public HidingPane createHidingPane(Region displayPane, Node icon, Side side){
 		//create the hiding pane
 		HidingPane hidingPane=new HidingPane(side, displayPane,  this, true);
-		hidingPane.getStylesheets().add(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
+		hidingPane.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
 		hidingPane.getStyleClass().add("pane-trans");
 		
 		//the stack pane holds all the different settings panes
 		this.getChildren().add(hidingPane);
 
 		PamButton showButton=hidingPane.getShowButton();
-		showButton.getStylesheets().add(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
+		showButton.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
+		showButton.setPrefHeight(60);
+		
 		//style show button
 		showButton.setGraphic(icon);
 		switch(side){
 		case LEFT: 
 			StackPane.setAlignment(hidingPane, Pos.TOP_LEFT);
 			StackPane.setAlignment(showButton, Pos.TOP_LEFT);
-			showButton.getStyleClass().add("close-button-right-trans");
+			showButton.getStyleClass().add("close-button-right");
 			break; 
 		case RIGHT:
 			StackPane.setAlignment(hidingPane, Pos.TOP_RIGHT);
 			StackPane.setAlignment(showButton, Pos.TOP_RIGHT);
-			showButton.getStyleClass().add("close-button-left-trans");
+			showButton.getStyleClass().add("close-button-left");
 			 break;
 		default:
 			break; 
 		}
 		
 		//make show button same height as hide button
-		showButton.prefHeightProperty().bind(hidingPane.getHideButton().heightProperty());
+//		showButton.prefHeightProperty().bind(hidingPane.getHideButton().heightProperty());
 		//translate it so it sits slightly below the top of the pane. 
-		showButton.translateYProperty().setValue(yPos);
-		showButton.prefHeightProperty().bind(hidingPane.getHideButton().heightProperty());
+		showButton.translateYProperty().bind(displayPane.heightProperty().divide(2).subtract(showButton.heightProperty().divide(2)));
 
 		hidingPane.getHideButton().translateYProperty().setValue(yPos);
 		

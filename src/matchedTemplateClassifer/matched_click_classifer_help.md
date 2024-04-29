@@ -14,7 +14,7 @@ The classifier is based on a matched filter i.e. a candidate click detection is 
 The matched click classifier settings are accessed via **Settings-> Matched click classifier**_. The settings are split into the three sections, general settings, click waveform and click templates. 
 
 <p align="center">
-  <img width="950" height="520" src = "resources/matched_click_dialog_summary.png">
+  <img width="950" height="550" src = "resources/matched_click_dialog_summary.png">
 </p>
 
 _The settings pane of the matched click classifier_
@@ -38,9 +38,9 @@ _Restrict parameter extraction to XX samples_ sets the maximum length of the wav
 _Peak threshold_ and _Smoothing_ are both parameters used to find the click center so that a click can be trimmed to the maximum number of samples. The click length is measured by calculating the waveform envelope using a Hilbert Transform. The envelope is smoothed using a moving average filter (the _Smoothing_ parameter defines the size of the averaging window). The click is trimmed as follows. First the peak of the waveform envelope is found. The length of the click is defined as the point at which the click falls _Peak threshold_ dB below the peak. The center of the click is then the middle of this snippet. The click is then trimmed from the center of the click. 
 
 _Amplitude normalisation_ If there is a very loud click compared to a template it's correlation score will be different to that of a very quiet click of with exactly the same waveform. It is therefore a good idea to normalise the waveform before it is compared the match click classifier. The types of normalisation are 
-* _norm_ - this is the default - the click is divided by it's RMS amplitude. 
+* _norm_ - this is the default - the click is divided by it's RMS amplitude. A waveform correalted with itself will return 1 as the maximum correlation value. 
 * _peak to peak_ this can be useful for some types of shorter click e.g. dolphins - the click is divided by it's peak to peak amplitude.
-* _none_ no normalisation (not recommended).
+* _none_ no normalisation (not recommended). A waveform correlated with itself will return a value dependent on the amplitude and frequency content of the waveform. 
  
 ###  Template settings
 

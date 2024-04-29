@@ -39,22 +39,25 @@ public class DisplayConnectionNode extends ModuleConnectionNode {
 		this.setAutoConnect(false); 
 	}
 	
+	@Override
 	protected void connectionListenerTriggered(ConnectorNode shape, ConnectorNode foundShape, int type){
+//		System.out.println(" DisplayConnectionNode connection listener " +this.getPamControlledUnit()); 
+
 		switch(type){
 		case ConnectorNode.NO_CONNECTION:
-			System.out.println(" DisplayConnectionNode. NO_CONNECTION " +this.getPamControlledUnit()+" "+shape+"  " +foundShape ); 
 			if (lastConnectedPlug!=null && lastConnectedPlug.getConnectedShape()==null){
 				//want to remove any branch sockets which currently exist -otherwise have sockets which connect to nothing. 
 				setLineDisplayColor(lastConnectedPlug, DataModelStyle.moduleLines);
 				setAllowBranchSocket(lastConnectedPlug, false);
 				lastConnectedPlug=null;
 			}
+			pamModeltoDataModel();
 			break; 
 		case ConnectorNode.POSSIBLE_CONNECTION:
-			System.out.println(" DisplayConnectionNode. POSSIBLE_CONNECTION " +shape+"  " +foundShape ); 
+			//System.out.println(" DisplayConnectionNode. POSSIBLE_CONNECTION " +shape+"  " +foundShape ); 
 			break; 
 		case ConnectorNode.CONNECTED:
-			System.out.println("DisplayConnectionNode. CONNECTED " +shape+"  " +foundShape ); 
+			//System.out.println("DisplayConnectionNode. CONNECTED " + this.getPamControlledUnit()); 
 			if (shape instanceof StandardConnectionSocket){
 				if (!((StandardConnectionSocket) shape).isBranch()){
 					lastConnectedPlug=(StandardConnectionPlug) shape.getConnectedShape();
@@ -63,9 +66,15 @@ public class DisplayConnectionNode extends ModuleConnectionNode {
 			}
 			//printCompatibleDataUnits();
 			checkLineColours(DataModelStyle.displayLines);
+			pamModeltoDataModel();
 			break; 
 		}
 		//BUG IN CHECK CONNECTIONS - LINE. 246 (Fixed but keep in mind if 'processor leak' type error occurs)
+	}
+
+	private void pamModeltoDataModel() {
+		super.getDataModelConnectionPane().pamModeltoDataModel();
+		
 	}
 
 	/**

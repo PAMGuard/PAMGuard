@@ -1,15 +1,9 @@
 package whistlesAndMoans.dataSelector;
 
-import java.io.Serializable;
-
-import alarm.AlarmParameters;
 import pamViewFX.fxSettingsPanes.DynamicSettingsPane;
 import whistlesAndMoans.ConnectedRegionDataUnit;
 import whistlesAndMoans.WhistleMoanControl;
 import whistlesAndMoans.alarm.WMAlarmParameters;
-import PamController.PamControlledUnitSettings;
-import PamController.PamSettingManager;
-import PamController.PamSettings;
 import PamView.dialog.PamDialogPanel;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
@@ -23,6 +17,11 @@ public class WMDDataSelector extends DataSelector {
 	private WMDSelectPanel selectPanel;
 	
 	private WMAlarmParameters wmAlarmParameters = new WMAlarmParameters();
+
+	/**
+	 * JavaFX pane.
+	 */
+	private WMDSelectPaneFX wmdSelectPaneFX;
 
 	public WMDDataSelector(WhistleMoanControl wmControl, PamDataBlock pamDataBlock, String selectorName,
 			boolean allowScores) {
@@ -94,8 +93,10 @@ public class WMDDataSelector extends DataSelector {
 
 	@Override
 	public DynamicSettingsPane<Boolean> getDialogPaneFX() {
-		// TODO Auto-generated method stub
-		return null;
+		if (wmdSelectPaneFX == null) {
+			wmdSelectPaneFX = new WMDSelectPaneFX(this);
+		}
+		return wmdSelectPaneFX;
 	}
 
 }

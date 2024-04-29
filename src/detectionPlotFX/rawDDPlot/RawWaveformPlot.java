@@ -32,7 +32,6 @@ public class RawWaveformPlot extends WaveformPlot<PamDataUnit>{
 			return rawDetection.getDataTransforms().getFilteredWaveData(super.getWaveformPlotParams().waveformFilterParams.clone());
 		}
 		else {
-//			System.out.println("Get normal waveform. ");
 			return rawDetection.getWaveData(); 
 		}	
 	}
