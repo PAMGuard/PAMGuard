@@ -4,6 +4,7 @@ import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
+import java.util.ListIterator;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -22,6 +23,7 @@ import PamController.PamSettings;
 import PamController.positionreference.PositionReference;
 import PamUtils.PamCalendar;
 import PamView.dialog.warn.WarnOnce;
+import PamguardMVC.PamDataBlock;
 
 public class GPSControl extends PamControlledUnit implements PamSettings, PositionReference {
 
@@ -242,8 +244,70 @@ public class GPSControl extends PamControlledUnit implements PamSettings, Positi
 		return super.removeUnit();
 	}
 	
+	/**
+	 * Gets the closest position based on time. No interpolation
+	 * @param timeMilliseconds
+	 * @return closest ship position based on time. 
+	 */
 	public GpsDataUnit getShipPosition(long timeMilliseconds) {
 		return getGpsDataBlock().getClosestUnitMillis(timeMilliseconds);
+	}
+
+	/**
+	 * Gets the closest position based on time. 
+	 * @param timeMilliseconds time in milliseconds
+	 * @param interpolate interpolate between the point before and the one after. 
+	 * @return interpolated gps position. 
+	 */
+	public GpsDataUnit getShipPosition(long timeMilliseconds, boolean interpolate) {
+ 		if (interpolate == false) {
+			return getGpsDataBlock().getClosestUnitMillis(timeMilliseconds);
+		}
+		// otherwise try to fine a point either side and weighted mean them or extrapolate. 
+		GpsDataUnit pointBefore = null, pointAfter = null;
+		synchronized (getGpsDataBlock().getSynchLock()) {
+			ListIterator<GpsDataUnit> iter = getGpsDataBlock().getListIterator(timeMilliseconds, 0, PamDataBlock.MATCH_BEFORE, PamDataBlock.POSITION_BEFORE);
+			if (iter == null) {
+				return null;
+			}
+			if (iter.hasNext()) {
+				pointBefore = iter.next();
+			}
+			if (iter.hasNext()) {
+				pointAfter = iter.next();
+			}
+		}
+		if (pointBefore == null && pointAfter == null) {
+			return null;
+		}
+		if (pointBefore != null & pointAfter != null) {
+			// interpolate since we have them both. 
+			double tB = timeMilliseconds-pointBefore.getTimeMilliseconds();
+			double tA = pointAfter.getTimeMilliseconds()-timeMilliseconds;
+			double wB = tA/(tB+tA); // weight for data before
+			double wA = tB/(tB+tA); // wedight for data after
+			double newLat = pointBefore.getGpsData().getLatitude()*wB + pointAfter.getGpsData().getLatitude()*wA;
+			double newLon = pointBefore.getGpsData().getLongitude()*wB + pointAfter.getGpsData().getLongitude()*wA;
+			// interpolating heading is more faff:
+			double hB = pointBefore.getGpsData().getHeading();
+			double hA = pointAfter.getGpsData().getHeading();
+			double hX = Math.sin(Math.toRadians(hB))*wB + Math.sin(Math.toRadians(hB))*wB;
+			double hY = Math.cos(Math.toRadians(hB))*wB + Math.cos(Math.toRadians(hB))*wB;
+			double newHead = Math.toDegrees(Math.atan2(hX, hY));
+			GpsData newData = new GpsData(newLat, newLon, 0, timeMilliseconds);
+			newData.setTrueHeading(newHead);
+			return new GpsDataUnit(timeMilliseconds, newData);
+		}
+		else if (pointBefore != null) {
+			// relatively common if we enter data just after a position was received. 
+			GpsData newPos = pointBefore.getGpsData().getPredictedGPSData(timeMilliseconds);
+			return new GpsDataUnit(timeMilliseconds, newPos);
+		}
+		else if (pointAfter != null) {
+			GpsData newPos = pointAfter.getGpsData().getPredictedGPSData(timeMilliseconds);
+			return new GpsDataUnit(timeMilliseconds, newPos);
+		}
+		return null; // should never happen since one of the above 4 clauses must be met. 
 	}
 	/**
 	 * Do we want this string ? It will be either RMC or GGA and may want wildcarding
@@ -322,6 +386,7 @@ public class GPSControl extends PamControlledUnit implements PamSettings, Positi
 	public GPSDataMatcher getGpsDataMatcher() {
 		return gpsDataMatcher;
 	}
+	
 	@Override
 	public GpsData getReferencePosition(long timeMillis) {
 		GpsDataUnit gpDU = getShipPosition(timeMillis);

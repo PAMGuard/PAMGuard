@@ -29,4 +29,11 @@ public interface DataOutputStore extends OfflineDataStore {
 	 */
 	public boolean deleteDataFrom(long timeMillis);
 	
+	/**
+	 * Get a data integrity checker. This can be called at startup to see if there is  a problem. 
+	 * @return
+	 */
+	public DataIntegrityChecker getInegrityChecker();
+	
+	
 }

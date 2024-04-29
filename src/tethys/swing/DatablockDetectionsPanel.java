@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JComponent;
@@ -19,6 +20,8 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.JTableHeader;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import PamUtils.worker.PamWorkWrapper;
+import PamUtils.worker.PamWorker;
 import PamView.PamGui;
 import PamView.dialog.warn.WarnOnce;
 import PamView.tables.SwingTableColumnWidths;
@@ -42,7 +45,7 @@ import tethys.niluswraps.PDetections;
  * @author dg50
  *
  */
-public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTableObserver {
+public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTableObserver, PamWorkWrapper<String> {
 
 	private JPanel mainPanel;
 
@@ -118,15 +121,38 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 
 	@Override
 	public void selectDataBlock(PamDataBlock dataBlock) {
+		if (this.dataBlock == dataBlock) {
+			return; // stops lots of requerying, which matters when database is large. 
+		}
 		this.dataBlock = dataBlock;
-		dataBlockName.setText(dataBlock.getLongDataName());
-		streamDetectionsSummary = getTethysControl().getDetectionsHandler().getStreamDetections(dataBlock);
+		if (dataBlock == null) {
+			dataBlockName.setText("Select data in panel on the left");
+			return;
+		}
+		else {
+			dataBlockName.setText(dataBlock.getLongDataName());
+		}
+		// need to re-thread this to stop user panicing that nothing is happening. 
+		PamWorker w = new PamWorker<String>(this, getTethysControl().getGuiFrame(), 0, "Searching database for " + dataBlock.getDataName());
+		w.start();
+	}
+
+	@Override
+	public void taskFinished(String result) {
 		tableModel.fireTableDataChanged();
+	}
+
+	@Override
+	public String runBackgroundTask(PamWorker<String> pamWorker) {
+		streamDetectionsSummary = getTethysControl().getDetectionsHandler().getStreamDetections(dataBlock);
+		return null;
 	}
 
 	@Override
 	public void updateState(TethysState tethysState) {
 		if (dataBlock != null) {
+			PamDataBlock currBlock = dataBlock;
+			selectDataBlock(null);
 			selectDataBlock(dataBlock);
 		}
 	}
@@ -164,16 +190,9 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 
 		JPopupMenu popMenu = new JPopupMenu();
 
+		JMenuItem menuItem;
 		if (rows.length == 1) {
-			JMenuItem menuItem = new JMenuItem("Delete document " + pDets.detections.getId());
-			menuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					deleteDocument(pDets);
-				}
-			});
-			popMenu.add(menuItem);
-
+			
 			menuItem = new JMenuItem("Display document " + pDets.detections.getId());
 			menuItem.addActionListener(new ActionListener() {
 				@Override
@@ -191,9 +210,19 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 				}
 			});
 			popMenu.add(menuItem);
+			
+			popMenu.addSeparator();
+			menuItem = new JMenuItem("Delete document " + pDets.detections.getId());
+			menuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					deleteDocument(pDets);
+				}
+			});
+			popMenu.add(menuItem);
 		}
 		else if (rows.length > 0){
-			JMenuItem menuItem = new JMenuItem("Delete multiple Detections documents");
+			menuItem = new JMenuItem("Delete multiple Detections documents");
 			menuItem.addActionListener(new ActionListener() {
 
 				@Override
@@ -217,20 +246,50 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 		if (ans != WarnOnce.OK_OPTION) {
 			return;
 		}
+
+		ArrayList<Detections> toDelete = new ArrayList();
+
 		for (int i = 0; i < rows.length; i++) {
 			int row = rows[i];
 			PDetections pDets = detectionsForRow(row);
 			if (pDets == null) {
 				continue;
 			}
-			try {
-				getTethysControl().getDbxmlConnect().deleteDocument(pDets.detections);
-			} catch (TethysException e) {
-				getTethysControl().showException(e);
-			}
+			toDelete.add(pDets.detections);
 		}
-		getTethysControl().exportedDetections(dataBlock);
-		selectDataBlock(dataBlock); // force table update. 
+		DeleteDocs dd = new DeleteDocs(toDelete);
+		PamWorker<Integer> worker = new PamWorker(dd, getTethysControl().getGuiFrame(), 1, "Deleting Detections documents");
+		worker.start();
+
+	}
+
+	private class DeleteDocs implements PamWorkWrapper<Integer> {
+
+		private ArrayList<Detections> toDelete;
+
+		public DeleteDocs(ArrayList<Detections> toDelete) {
+			this.toDelete = toDelete;
+		}
+
+		@Override
+		public Integer runBackgroundTask(PamWorker<Integer> pamWorker) {
+			for (Detections dets : toDelete) {
+				try {
+					
+					getTethysControl().getDbxmlConnect().deleteDocument(dets);
+				} catch (TethysException e) {
+					getTethysControl().showException(e);
+				}
+			}
+			return toDelete.size();
+		}
+
+		@Override
+		public void taskFinished(Integer result) {
+			getTethysControl().exportedDetections(dataBlock);
+			selectDataBlock(dataBlock); // force table update. 			
+		}
+
 	}
 
 	protected void deleteDocument(PDetections pDets) {

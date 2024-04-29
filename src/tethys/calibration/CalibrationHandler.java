@@ -1,6 +1,5 @@
 package tethys.calibration;
 
-import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -37,6 +36,7 @@ import nilus.MetadataInfo;
 import nilus.QualityValueBasic;
 import nilus.ResponsibleParty;
 import tethys.Collection;
+import tethys.CollectionHandler;
 import tethys.DocumentInfo;
 import tethys.DocumentNilusObject;
 import tethys.TethysControl;
@@ -52,9 +52,7 @@ import tethys.niluswraps.NilusUnpacker;
 import tethys.pamdata.AutoTethysProvider;
 import tethys.reporter.TethysReporter;
 
-public class CalibrationHandler implements TethysStateObserver {
-
-	private TethysControl tethysControl;
+public class CalibrationHandler extends CollectionHandler implements TethysStateObserver {
 	
 	private ArrayList<DocumentNilusObject<Calibration>> calibrationsList;
 	
@@ -65,10 +63,14 @@ public class CalibrationHandler implements TethysStateObserver {
 	public static final String[] qaTypes = {"unverified", "valid", "invalid"};
 	
 	private Helper nilusHelper;
+
+	public static final String helpPoint = "utilities.tethys.docs.calibrations";
+	
 	/**
 	 * @param tethysControl
 	 */
 	public CalibrationHandler(TethysControl tethysControl) {
+		super(tethysControl, Collection.Calibrations);
 		this.tethysControl = tethysControl;
 		calibrationsList = new ArrayList();
 		tethysControl.addStateObserver(this);		try {
@@ -504,7 +506,7 @@ public class CalibrationHandler implements TethysStateObserver {
 		}
 		String seachPattern = makeChannelNamePart(iChan);
 		for (int i = 0; i < calibrationsList.size(); i++) {
-			String docName = calibrationsList.get(i).getDocumentName();
+			String docName = calibrationsList.get(i).getDocumentId();
 			if (docName.endsWith(seachPattern)) {
 				return true;
 			}
@@ -569,5 +571,10 @@ public class CalibrationHandler implements TethysStateObserver {
 			}
 		}
 		return theseCals;
+	}
+
+	@Override
+	public String getHelpPoint() {
+		return helpPoint;
 	}
 }

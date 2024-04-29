@@ -1,6 +1,10 @@
 package PamController.command;
 
+import java.util.ArrayList;
+
 import Acquisition.AcquisitionControl;
+import PamController.DataInputStore;
+import PamController.PamControlledUnit;
 import PamController.PamController;
 import offlineProcessing.OfflineTaskManager;
 import pamViewFX.PamControlledGUIFX;
@@ -35,7 +39,16 @@ public class BatchStatusCommand extends ExtCommand {
 	}
 
 	private String getNormalModeStatus(String command) {
-		AcquisitionControl daqControl = (AcquisitionControl) PamController.getInstance().findControlledUnit(AcquisitionControl.class, null);
+		/**
+		 * find a controlled unit thats a DataInputSource which should either be a sound daq or a Tritech daq module. 
+		 */
+		ArrayList<PamControlledUnit> inputSources = PamController.getInstance().findControlledUnits(DataInputStore.class, true);
+		if (inputSources.size() == 0) {
+			return null;
+		}
+//		DataInputStore daqControl = (DataInputStore) PamController.getInstance().findControlledUnit(DataInputStore.class, null);
+		DataInputStore daqControl = (DataInputStore) inputSources.get(0);
+//		System.out.println("Getting batch status from : " + daqControl);
 		if (daqControl == null) {
 			return null;
 		}

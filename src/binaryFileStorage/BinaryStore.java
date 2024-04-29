@@ -37,6 +37,7 @@ import dataMap.OfflineDataMap;
 import dataMap.OfflineDataMapPoint;
 import PamController.AWTScheduler;
 import PamController.DataInputStore;
+import PamController.DataIntegrityChecker;
 import PamController.DataOutputStore;
 import PamController.OfflineDataStore;
 import PamController.PamControlledUnit;
@@ -74,6 +75,7 @@ import annotation.binary.AnnotationBinaryData;
 import annotation.handler.AnnotationHandler;
 import backupmanager.BackupInformation;
 import binaryFileStorage.backup.BinaryBackupStream;
+import binaryFileStorage.checker.BinaryIntegrityChecker;
 import binaryFileStorage.layoutFX.BinaryStoreGUIFX;
 
 /**
@@ -867,7 +869,7 @@ PamSettingsSource, DataOutputStore {
 					return null;
 				}
 				int nFiles = fileList.size();
-				int updateAt = Math.max(nFiles/1000,1);
+				int updateAt = Math.max(nFiles/100,1);
 				int fileIndex;
 				int nNew = 0;
 				for (int i = 0; i < nFiles; i++) {
@@ -946,6 +948,8 @@ PamSettingsSource, DataOutputStore {
 			PamController.getInstance().notifyModelChanged(PamControllerInterface.CHANGED_OFFLINE_DATASTORE);
 //			System.out.println("BinaryDataMapMaker really done " + this);
 			dataMapMaker = null;
+			
+			getInegrityChecker().checkDataStore();
 		}
 
 		@Override
@@ -2592,6 +2596,10 @@ PamSettingsSource, DataOutputStore {
   
 	public String getDataLocation() {
 		return binaryStoreSettings.getStoreLocation();
+	}
+	@Override
+	public DataIntegrityChecker getInegrityChecker() {
+		return new BinaryIntegrityChecker(this);
 	}
 	
 }

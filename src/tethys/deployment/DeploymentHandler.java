@@ -73,6 +73,7 @@ import nilus.UnknownSensor;
 import pamMaths.PamVector;
 import pamMaths.STD;
 import tethys.Collection;
+import tethys.CollectionHandler;
 import tethys.TethysControl;
 import tethys.TethysLocationFuncs;
 import tethys.TethysState;
@@ -83,6 +84,7 @@ import tethys.TethysState.StateType;
 import tethys.dbxml.DBXMLConnect;
 import tethys.dbxml.TethysException;
 import tethys.deployment.swing.DeploymentWizard;
+import tethys.deployment.swing.EffortProblemDialog;
 import tethys.deployment.swing.RecordingGapDialog;
 import tethys.niluswraps.PDeployment;
 import tethys.output.TethysExportParams;
@@ -98,16 +100,9 @@ import tethys.swing.DeploymentTableObserver;
  * @author dg50
  *
  */
-public class DeploymentHandler implements TethysStateObserver, DeploymentTableObserver {
+public class DeploymentHandler extends CollectionHandler implements TethysStateObserver, DeploymentTableObserver {
 	
-	private TethysControl tethysControl;
-	
-	/**
-	 * @return the tethysControl
-	 */
-	public TethysControl getTethysControl() {
-		return tethysControl;
-	}
+//	private TethysControl tethysControl;
 	
 	private EffortFunctions effortFunctions;
 
@@ -119,8 +114,11 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 	
 	private DeploymentExportOpts deploymentExportOptions = new DeploymentExportOpts();
 
+	public static final String helpPoint = "utilities.tethys.docs.deployments";
+
 	public DeploymentHandler(TethysControl tethysControl) {
-		super();
+		
+		super(tethysControl, Collection.Deployments);
 		
 		this.tethysControl = tethysControl;
 		
@@ -368,8 +366,39 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 
 	public void createPamguardOverview() {
 		deploymentOverview = effortFunctions.makeRecordingOverview();
+		
+		checkDeploymentOverview(deploymentOverview);
+		
 		updateProjectDeployments();
 		matchPamguard2Tethys(deploymentOverview, projectDeployments);
+		
+		tethysControl.sendStateUpdate(new TethysState(StateType.NEWPAMGUARDSELECTION));
+	}
+
+	/**
+	 * Check the deployment overview for consistency.<br>
+	 * Take the raw audio information and the binary information and check they are similar.
+	 * if not, ask the user what to do. 
+	 * @param deploymentOverview
+	 */
+	private void checkDeploymentOverview(DeploymentOverview overview) {
+		RecordingList rawList = overview.getRawDataList();
+		RecordingList binList = overview.getBinaryDataList();
+		if (rawList == null || binList == null) {
+			return; // nothing to do
+		}
+		double similarity = rawList.getSimilarity(binList);
+		if (similarity > 0.95) {
+			return;
+		}
+		/*
+		 *  if we get here, it seems like the two lists are very different, so
+		 *  show a dialog to ask the user what to do. 
+		 */
+		RecordingList selList = EffortProblemDialog.showDialog(tethysControl.getGuiFrame(), overview);
+		if (selList != null) {
+			tethysControl.getTethysExportParams().setEffortSourceName(selList.getSourceName());
+		}
 	}
 
 	/**
@@ -381,22 +410,22 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 		if (exportOptions != null) {
 			this.deploymentExportOptions = exportOptions;
 			deploymentOverview = getDeploymentOverview();
-			ArrayList<RecordingPeriod> allPeriods = deploymentOverview.getRecordingPeriods();
+			RecordingList allPeriods = deploymentOverview.getMasterList(getTethysControl());
 			exportDeployments(allPeriods);
 		}
 	}
 
 	/**
 	 * Export deployments docs. Playing with a couple of different ways of doing this. 
-	 * @param selectedDeployments
+	 * @param allPeriods
 	 */
-	public void exportDeployments(ArrayList<RecordingPeriod> selectedDeployments) {
+	public void exportDeployments(RecordingList allPeriods) {
 		TethysReporter.getTethysReporter().clear();
 		if (deploymentExportOptions.separateDeployments) {
-			exportSeparateDeployments(selectedDeployments);
+			exportSeparateDeployments(allPeriods);
 		}
 		else {
-			exportOneDeploymnet(selectedDeployments);
+			exportOneDeploymnet(allPeriods);
 		}
 		TethysReporter.getTethysReporter().showReport(tethysControl.getGuiFrame(), true);
 	}
@@ -404,7 +433,7 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 	/**
 	 * Make one big deployment document with all the recording periods in it. 
 	 */
-	private void exportOneDeploymnet(ArrayList<RecordingPeriod> selectedDeployments) {
+	private void exportOneDeploymnet(RecordingList recordingList) {
 		// do the lot, whatever ...
 		Float sampleRate = null;
 		AcquisitionControl daq = (AcquisitionControl) PamController.getInstance().findControlledUnit(AcquisitionControl.class, null);
@@ -414,10 +443,9 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 			sampleRate = daqParams.sampleRate;
 		}
 		
-		selectedDeployments = getDeploymentOverview().getRecordingPeriods();
 		int freeId = getTethysControl().getDeploymentHandler().getFirstFreeDeploymentId();
-		RecordingPeriod onePeriod = new RecordingPeriod(selectedDeployments.get(0).getRecordStart(), 
-				selectedDeployments.get(selectedDeployments.size()-1).getRecordStop());
+		RecordingPeriod onePeriod = new RecordingPeriod(recordingList.getStart(), 
+				recordingList.getEnd());
 		TethysExportParams exportParams = tethysControl.getTethysExportParams();
 		String id = String.format("%s_%s", exportParams.getDatasetName(), "all");
 		Deployment deployment = createDeploymentDocument(freeId, onePeriod, id);
@@ -425,7 +453,8 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 		Deployment globalMeta = getTethysControl().getGlobalDeplopymentData();
 		deployment.setCruise(globalMeta.getCruise());
 		deployment.setSite(globalMeta.getSite());
-		if (selectedDeployments.size() > 1) {
+		ArrayList<RecordingPeriod> effortPeriods = recordingList.getEffortPeriods();
+		if (recordingList.size() > 1) {
 //			// now need to remove the sampling details - don't though, add invalid periods instead. 
 //			SamplingDetails samplingDetails = deployment.getSamplingDetails();
 //			samplingDetails.getChannel().clear();
@@ -440,9 +469,9 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 				deployment.setQualityAssurance(qa = new AcousticDataQAType());
 			}
 			List<Quality> qualityList = qa.getQuality();
-			for (int i = 1; i < selectedDeployments.size(); i++) {
-				long end = selectedDeployments.get(i-1).getRecordStop();
-				long start = selectedDeployments.get(i).getRecordStart();
+			for (int i = 1; i < recordingList.size(); i++) {
+				long end = effortPeriods.get(i-1).getRecordStop();
+				long start = effortPeriods.get(i).getRecordStart();
 				Quality q = new Quality();
 				q.setStart(TethysTimeFuncs.xmlGregCalFromMillis(end));
 				q.setEnd(TethysTimeFuncs.xmlGregCalFromMillis(start));
@@ -479,14 +508,15 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 	/**
 	 * Make a separate deployment document for every recording period. 
 	 */
-	private void exportSeparateDeployments(ArrayList<RecordingPeriod> selectedDeployments) {
+	private void exportSeparateDeployments(RecordingList recordingList) {
 		
 		int freeId = getTethysControl().getDeploymentHandler().getFirstFreeDeploymentId();
 		// fill in a few things from here
 		Deployment globalMeta = getTethysControl().getGlobalDeplopymentData();
 		TethysExportParams exportParams = tethysControl.getTethysExportParams();
-		for (int i = 0; i < selectedDeployments.size(); i++) {
-			RecordingPeriod recordPeriod = selectedDeployments.get(i);
+		ArrayList<RecordingPeriod> effortPeriods = recordingList.getEffortPeriods();
+		for (int i = 0; i < recordingList.size(); i++) {
+			RecordingPeriod recordPeriod = effortPeriods.get(i);
 			PDeployment exDeploymnet = recordPeriod.getMatchedTethysDeployment();
 			Deployment deployment = null;
 			String id = String.format("%s_%d", exportParams.getDatasetName(), i);
@@ -532,8 +562,9 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 		if (deployments == null || deploymentOverview == null) {
 			return;
 		}
-		ArrayList<RecordingPeriod> recordingPeriods = deploymentOverview.getRecordingPeriods();
-		for (RecordingPeriod aPeriod : recordingPeriods) {
+		RecordingList recordingList = deploymentOverview.getMasterList(getTethysControl());
+		ArrayList<RecordingPeriod> effortPeriods = recordingList.getEffortPeriods();
+		for (RecordingPeriod aPeriod : effortPeriods) {
 			PDeployment closestDeployment = findClosestDeployment(aPeriod, deployments);
 			aPeriod.setMatchedTethysDeployment(closestDeployment);
 			if (closestDeployment != null) {
@@ -592,7 +623,8 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 		if (deploymentOverview == null) {
 			return matched;
 		}
-		for (RecordingPeriod period : deploymentOverview.getRecordingPeriods()) {
+		ArrayList<RecordingPeriod> effortPeriods = deploymentOverview.getMasterList(getTethysControl()).getEffortPeriods();
+		for (RecordingPeriod period : effortPeriods) {
 			PDeployment deployment = period.getMatchedTethysDeployment();
 			if (deployment != null) {
 				if (matched.contains(deployment) == false) {
@@ -1230,7 +1262,8 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 			}
 			regimens.add(regimen);
 			
-			DutyCycleInfo dutyCycleInf = deploymentOverview.getDutyCycleInfo();
+			RecordingList recordingList = deploymentOverview.getMasterList(getTethysControl());
+			DutyCycleInfo dutyCycleInf = recordingList.assessDutyCycle();
 			boolean isDS = dutyCycleInf != null && dutyCycleInf.isDutyCycled;
 			if (isDS) {
 				DutyCycle dutyCycle = new DutyCycle();
@@ -1305,6 +1338,11 @@ public class DeploymentHandler implements TethysStateObserver, DeploymentTableOb
 	 */
 	public DeploymentExportOpts getDeploymentExportOptions() {
 		return deploymentExportOptions;
+	}
+
+	@Override
+	public String getHelpPoint() {
+		return helpPoint;
 	}
 
 }

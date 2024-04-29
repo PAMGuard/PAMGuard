@@ -120,6 +120,7 @@ public class CalibrationsTable extends TethysGUIPanel {
 			});
 			popMenu.add(menuItem);
 		}
+		popMenu.addSeparator();
 		if (n > 1) {
 			menuItem = new JMenuItem("Delete selected documents");
 			menuItem.addActionListener(new ActionListener() {

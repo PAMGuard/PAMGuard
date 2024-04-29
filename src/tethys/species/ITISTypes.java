@@ -7,8 +7,8 @@ package tethys.species;
  */
 public class ITISTypes {
 
-	public static final int OTHER = 0;
-	public static final int ANTHROPOGENIC = 1;
+	public static final int OTHER = -10;
+	public static final int ANTHROPOGENIC = 1758;
 	
 	public static final String getName(int code) {
 		switch (code) {

@@ -112,14 +112,23 @@ public class ClickDataSelector extends DataSelector {
 		
 		// see if there is a super detection and see if it's got a comment. 
 		String comment = oev.getComment();
+		
+		boolean isAutomatic = false;
 		if (comment != null) {
-			if (clickAlarmParameters.onlineAutoEvents && comment.startsWith("Automatic")) {
-				return true;
-			}
-			if (clickAlarmParameters.onlineManualEvents && comment.startsWith("Manual")) {
-				return true;
-			}
+			isAutomatic = comment.startsWith("Automatic");
 		}
+		if (isAutomatic && clickAlarmParameters.onlineAutoEvents) {
+			return true;
+		}
+		else if (clickAlarmParameters.onlineManualEvents) {
+			return true;
+		}
+//			if (clickAlarmParameters.onlineAutoEvents && comment.startsWith("Automatic")) {
+//				return true;
+//			}
+//			if (clickAlarmParameters.onlineManualEvents && comment.startsWith("Manual")) {
+//				return true;
+//			}
 		/*
 		 * Otherwise need to work out where the hell the event type is in the 
 		 * list of event types and see if it's wanted. 

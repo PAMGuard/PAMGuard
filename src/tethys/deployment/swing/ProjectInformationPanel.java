@@ -23,6 +23,7 @@ import nilus.Deployment;
 import tethys.TethysControl;
 import tethys.swing.NewProjectDialog;
 import tethys.swing.SelectProjectDialog;
+import tethys.tooltips.TethysTips;
 
 /**
  * Panel for entering project information
@@ -108,6 +109,12 @@ public class ProjectInformationPanel {
 				}
 			});
 		}
+		
+		project.setToolTipText(TethysTips.findTip(Deployment.class, "Project"));
+		cruise.setToolTipText(TethysTips.findTip(Deployment.class, "Cruise"));
+		region.setToolTipText(TethysTips.findTip(Deployment.class, "Region"));
+		site.setToolTipText(TethysTips.findTip(Deployment.class, "Site"));
+		
 		
 	}
 

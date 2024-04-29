@@ -21,6 +21,7 @@ import tethys.TethysControl;
 import tethys.TethysMenuActions;
 import tethys.TethysState;
 import tethys.deployment.DeploymentOverview;
+import tethys.deployment.RecordingList;
 import tethys.niluswraps.PDeployment;
 
 public class TethysDeploymentsTable extends TethysGUIPanel {
@@ -121,8 +122,7 @@ public class TethysDeploymentsTable extends TethysGUIPanel {
 		@Override
 		public String getColumnName(int column) {
 			return columnNames[column];
-		}
-		
+		}		
 
 		public String getMatchText(PDeployment deployment) {
 			// TODO Auto-generated method stub
@@ -132,8 +132,9 @@ public class TethysDeploymentsTable extends TethysGUIPanel {
 			if (deploymentOverview == null) {
 				return "No PAMGuard data";
 			}
-			Long depStart = deploymentOverview.getFirstStart();
-			Long depEnd = deploymentOverview.getLastEnd();
+			RecordingList masterList = deploymentOverview.getMasterList(getTethysControl());
+			Long depStart = masterList.getStart();
+			Long depEnd = masterList.getEnd();
 			if (depStart == null) {
 				return "No PAMGuard recordings";
 			}

@@ -74,11 +74,8 @@ import javax.swing.event.MenuListener;
 
 import Acquisition.DaqSystemInterface;
 import annotation.tasks.AnnotationManager;
-import export.ExportOptions;
 import metadata.MetaDataContol;
-import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
 import performanceTests.PerformanceDialog;
-import rawDeepLearningClassifier.RawDLParams;
 import tipOfTheDay.TipOfTheDayManager;
 import Array.ArrayManager;
 //import Logging.LogDataObserver;
@@ -89,7 +86,6 @@ import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamController.PamguardVersionInfo;
-import PamController.SettingsPane;
 import PamController.settings.SettingsImport;
 import PamModel.CommonPluginInterface;
 import PamModel.PamModel;
@@ -672,13 +668,6 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		startMenuEnabler.addMenuItem(menuItem);
 		fileMenu.add(menuItem);
 
-		//export items
-		menuItem = new JMenuItem("Export Data ...");
-		menuItem.addActionListener(new ExportOptionsListener(getGuiFrame()));
-		startMenuEnabler.addMenuItem(menuItem);
-		fileMenu.add(menuItem);
-		
-		
 		for (int i = 0; i < pamControllerInterface.getNumControlledUnits(); i++) {
 
 			menuItem = pamControllerInterface.getControlledUnit(i).createFileMenu(frame);
@@ -986,20 +975,6 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		}
 	}
 	
-	class ExportOptionsListener implements ActionListener {
-		private JFrame parentFrame;
-
-		public ExportOptionsListener(JFrame parentFrame) {
-			super();
-			this.parentFrame = parentFrame;
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			//show the export options dialog. 
-			ExportOptions.getInstance().showDialog(parentFrame);
-		}
-	}
-
 	class MenuGeneralXMLExport implements ActionListener {
 		private JFrame parentFrame;
 		public MenuGeneralXMLExport(JFrame parentFrame) {

@@ -636,7 +636,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 
 	/**
 	 * Find a dataunit based on it's database index. If there have been no updates,
-	 * then database indexes should be in order and a fast find canbe used. If
+	 * then database indexes should be in order and a fast find can be used. If
 	 * however, there have been updates, then things will not be in order so it's
 	 * necessary to go through everything from start to end.
 	 * 
@@ -4296,6 +4296,9 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 * @param sayEmpties dump info even if a buffer is empty (otherwise, only ones that have stuff still)
 	 */
 	public void dumpBufferStatus(String message, boolean sayEmpties) {
+		if (sayEmpties || unitsAdded > 0) {
+			System.out.printf("Datablock %s: Added %d data units\n", getLongDataName(), unitsAdded);
+		}
 		int nObs = countObservers();
 		for (int i = 0; i < nObs; i++) {
 			PamObserver obs = getPamObserver(i);

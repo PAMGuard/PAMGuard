@@ -16,7 +16,7 @@ public class PamguardVersionInfo {
 	 * @return release type 
 	 */
 	static public ReleaseType getReleaseType() {
-		return ReleaseType.OTHER; 
+		return ReleaseType.BETA; 
 	}
 	
 	/**
@@ -31,12 +31,12 @@ public class PamguardVersionInfo {
 	 * Version number, major version.minorversion.sub-release.
 	 * Note: can't go higher than sub-release 'f'
 	 */
-	static public final String version = "2.02.10b";
+	static public final String version = "2.02.10bd";
 	
 	/**
 	 * Release date
 	 */
-	static public final String date = "2 March 2024";
+	static public final String date = "23 April 2024";
 	
 //	/**
 //	 * Release type - Beta or Core
