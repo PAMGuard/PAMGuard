@@ -189,11 +189,11 @@ public class OfflineDataLoading<T extends PamDataUnit> {
 						switch (offlineDataInfo.getInterrupt()) {
 						case OFFLINE_DATA_INTERRUPT:
 							//						System.out.println("Request order cancelling");
-
+							int giveUp = 0;
 
 							if (orderData.cancelOrder()) {			
 
-								while (orderData!=null || !orderData.isDone()) {
+								while ((orderData!=null || !orderData.isDone()) & giveUp++ < 300) {
 									try {
 										Thread.sleep(10);
 									} catch (InterruptedException e) {

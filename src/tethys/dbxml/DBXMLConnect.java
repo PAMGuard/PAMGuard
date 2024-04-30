@@ -197,15 +197,15 @@ public class DBXMLConnect {
 			marshal.marshal(nilusObject, tempFile.toString());
 			// above lines have made a file. Are now going to gzip it before sending to Tethys
 			File zipFile = null;
-			try {
-				zipFile = zipOutputFile(tempFile);
-			}
-			catch (FileNotFoundException e1){
-				System.out.println(e1.getMessage());
-			}
-			catch (IOException e2) {
-				System.out.println(e2.getMessage());
-			}
+//			try {
+//				zipFile = zipOutputFile(tempFile);
+//			}
+//			catch (FileNotFoundException e1){
+//				System.out.println(e1.getMessage());
+//			}
+//			catch (IOException e2) {
+//				System.out.println(e2.getMessage());
+//			}
 			String finalName;
 			if (zipFile == null) {
 				finalName = bodgeName;

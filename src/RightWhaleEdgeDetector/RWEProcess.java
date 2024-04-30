@@ -12,6 +12,7 @@ import Localiser.algorithms.timeDelayLocalisers.bearingLoc.BearingLocaliser;
 import Localiser.algorithms.timeDelayLocalisers.bearingLoc.BearingLocaliserSelector;
 import annotation.calcs.snr.SNRAnnotationType;
 import autecPhones.AutecGraphics;
+import dataPlotsFX.data.TDDataProviderRegisterFX;
 import fftManager.Complex;
 import fftManager.FFTDataBlock;
 import fftManager.FFTDataUnit;
@@ -33,6 +34,7 @@ import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
 import PamguardMVC.debug.Debug;
+import RightWhaleEdgeDetector.graphics.RWEDataPlotProviderFX;
 import RightWhaleEdgeDetector.graphics.RWESymbolManager;
 
 public class RWEProcess extends PamProcess {
@@ -53,6 +55,7 @@ public class RWEProcess extends PamProcess {
 	 */
 	private boolean isPreSmoothed;
 	private KernelSmoothing kernelSmoothing;
+	private RWEDataPlotProviderFX fxPlotProvider;
 	
 	public RWEProcess(RWEControl rweControl) {
 		super(rweControl, null);
@@ -71,6 +74,9 @@ public class RWEProcess extends PamProcess {
 		rweDataBlock.setCanClipGenerate(true);
 		rweDataBlock.SetLogging(new RWESQLLogging(rweControl, rweDataBlock));
 		rweDataBlock.addDataAnnotationType(new SNRAnnotationType());
+
+		fxPlotProvider = new RWEDataPlotProviderFX(this, rweDataBlock);
+		TDDataProviderRegisterFX.getInstance().registerDataInfo(fxPlotProvider);
 	}
 	
 	@Override

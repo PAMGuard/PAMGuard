@@ -472,7 +472,7 @@ final public class PamModel implements PamSettings {
 			mi.setModulesMenuGroup(utilitiesGroup);
 			mi.setMaxNumber(1);
 			//mi.addGUICompatabilityFlag(PamGUIManager.FX); //has FX enabled GUI.
-			mi.setHidden(SMRUEnable.isEnable() == false);
+//			mi.setHidden(SMRUEnable.isEnable() == false);
 		}		
 		
 		/*
