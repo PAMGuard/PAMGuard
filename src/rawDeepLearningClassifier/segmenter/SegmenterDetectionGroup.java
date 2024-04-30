@@ -10,6 +10,17 @@ import PamguardMVC.PamDataUnit;
  */
 public class SegmenterDetectionGroup extends GroupDetection<PamDataUnit> {
 
+	
+	/**
+	 * The duration of the segment in millis. 
+	 */
+	private double segDuration;
+	
+	/**
+	 * The start time fo the segment in millis.
+	 */
+	private long segMillis;
+
 	/**
 	 * Constructor for a group of detections within a detection. Note that some
 	 * longer detections (e.g. whistles) may have sections outside the segment.
@@ -22,12 +33,23 @@ public class SegmenterDetectionGroup extends GroupDetection<PamDataUnit> {
 	public SegmenterDetectionGroup(long timeMilliseconds, int channelBitmap, long startSample, double duration) {
 		super(timeMilliseconds, channelBitmap, startSample, (long) duration);
 		this.setDurationInMilliseconds(duration);
+		this.segMillis =timeMilliseconds;
+		this.segDuration = duration;
 	}
 	
 	@Override
 	public boolean isAllowSubdetectionSharing() {
 		//segmetns share sub detections
 		return true;
+	}
+	
+	
+	public long getSegmentStartMillis() {
+		return segMillis;
+	}
+	
+	public double getSegmentDuration() {
+		return segDuration;
 	}
 
 

@@ -128,6 +128,7 @@ public class ArchiveModelWorker extends GenericModelWorker {
 			//				}
 
 			//generate the transforms from the KetosParams objects. 
+			System.out.println(modelParams.dlTransforms);
 			ArrayList<DLTransform> transforms =	DLTransformsFactory.makeDLTransforms(modelParams.dlTransforms); 
 
 //			///HACK here for now to fix an issue with dB and Ketos transforms having zero length somehow...

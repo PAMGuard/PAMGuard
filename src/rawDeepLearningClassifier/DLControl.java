@@ -234,9 +234,10 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 		
 		//manages default models
 		defaultModelManager = new DLDefaultModelManager(this);
-		
+				
 		//manages downloading models
 		modelDownloadManager = new DLDownloadManager(); 
+		
 
 		// add storage options etc.
 		dlBinaryDataSource = new DLResultBinarySource(dlClassifyProcess);

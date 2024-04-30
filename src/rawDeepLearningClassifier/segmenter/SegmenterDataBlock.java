@@ -21,5 +21,5 @@ public class SegmenterDataBlock extends PamDataBlock<GroupedRawData> {
 		//need this to notify classifier in viewer mode. 
 		return true;
 	}
-
+	
 }

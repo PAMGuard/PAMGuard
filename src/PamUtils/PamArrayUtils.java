@@ -719,6 +719,17 @@ public class PamArrayUtils {
 		}
 	}
 	
+	/**
+	 * Print an array to the console. 
+	 * @param array to print
+	 */
+	public static void printArray(float[] array) {
+		if (array==null) System.out.println("null"); 
+		for (int i=0; i<array.length; i++) {
+			System.out.println(i + ": " + array[i]);
+		}
+	}
+	
 	
 	/**
 	 * Print an array to the console with no index numbers
@@ -806,14 +817,17 @@ public class PamArrayUtils {
 	/**
 	 * Check whether there are duplicates within an array
 	 * @param the array.
-	 * @return true if there are duplicates. 
+	 * @return true if the array is unique
 	 */
 	public static boolean unique(double[] array) {
-		boolean duplicates=false;
+		boolean duplicates=true;
 		for (int j=0;j<array.length;j++)
 			for (int k=j+1;k<array.length;k++)
-				if (k!=j && array[k] == array[j])
-					duplicates=true;
+				if (k!=j && array[k] == array[j]) {
+					//if 
+					duplicates=false;
+					return duplicates;					
+				}
 		return duplicates;
 	}
 

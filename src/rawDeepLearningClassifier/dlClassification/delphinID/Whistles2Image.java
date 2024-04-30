@@ -2,11 +2,13 @@ package rawDeepLearningClassifier.dlClassification.delphinID;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
 import java.util.ArrayList;
 
 import org.jamdev.jdl4pam.transforms.FreqTransform;
 import org.jamdev.jpamutils.spectrogram.SpecTransform;
 
+import PamUtils.PamArrayUtils;
 import rawDeepLearningClassifier.segmenter.SegmenterDetectionGroup;
 import whistlesAndMoans.AbstractWhistleDataUnit;
 
@@ -61,17 +63,21 @@ public class Whistles2Image extends FreqTransform {
 		ArrayList<double[][]> points = whistContours2Points(whistleGroup);
 
 		//does not work becaue it has to be on the AWT thread. 
-		BufferedImage canvas = makeScatterImage(points, size, new double[]{0, whistleGroup.getDurationInMilliseconds()}, freqLimits,  5.);
+		BufferedImage canvas = makeScatterImage(points, size, new double[]{0, whistleGroup.getSegmentDuration()/1000.}, freqLimits,  5.);
 
 		double[][] imaged = new double[(int) size[0]][(int) size[1]];
 
-		int color;
+		float[] color = new float[3];
+		Raster raster = canvas.getData();
 		for (int i=0; i<imaged.length; i++) {
 			for (int j=0; j<imaged[0].length; j++) {
-				color = canvas.getRGB(i, j);
-				imaged[i][j] = color;
+				color = raster.getPixel(i, j, color);
+				imaged[i][j] = color[0]/255.; //normalize
 			}
 		}
+//		
+//		System.out.println("Original image: "); 
+//		PamArrayUtils.printArray(imaged);
 
 		specTransform.setSpecData(imaged);
 		specTransform.setSampleRate((float) (freqLimits[1]*2)); 
@@ -90,15 +96,36 @@ public class Whistles2Image extends FreqTransform {
 
 		AbstractWhistleDataUnit whistleContour;
 
-		long segStart = whistleGroup.getTimeMilliseconds();
+		long segStart = whistleGroup.getSegmentStartMillis();
+		long segEnd = (long) (whistleGroup.getSegmentStartMillis() + whistleGroup.getSegmentDuration());
+
+		
+//		for (int i=0; i<whistleGroup.getSubDetectionsCount(); i++) {
+//			whistleContour = (AbstractWhistleDataUnit) whistleGroup.getSubDetection(i);
+//
+//			long whistleStart = whistleContour.getTimeMilliseconds();
+//			long whistleEnd = (long) (whistleContour.getTimeMilliseconds() + whistleContour.getDurationInMilliseconds());
+//
+//			if ((whistleStart>=segStart && whistleStart<segEnd) || ((whistleEnd>=segStart && whistleEnd<segEnd))){
+//				//some part of the whistle is in the segment. 
+//				System.out.println("Whistle in group?  true");
+//
+//			}
+//			else {
+//				System.out.println("Whistle in group?  false!!!");
+//			}
+//
+//		}
 
 		for (int i=0; i<whistleGroup.getSubDetectionsCount(); i++) {
 
 			whistleContour = (AbstractWhistleDataUnit) whistleGroup.getSubDetection(i);
+//			System.out.println("Whistle start time: " + (segStart - whistleContour.getTimeMilliseconds())/1000. +  " end: " + (segStart - whistleContour.getTimeMilliseconds() + whistleContour.getDurationInMilliseconds())/1000.);
+
 
 			double[][] contourD = new double[whistleContour.getSliceCount()][2];
 			for (int j=0; j<whistleContour.getSliceCount(); j++) {
-				contourD[j][0] = (segStart - whistleContour.getTimeMilliseconds())/1000. + whistleContour.getTimesInSeconds()[i];
+				contourD[j][0] = (whistleContour.getTimeMilliseconds()-segStart)/1000. + whistleContour.getTimesInSeconds()[j];
 				contourD[j][1] = whistleContour.getFreqsHz()[j];
 			}
 			contours.add(contourD);
@@ -158,7 +185,9 @@ public class Whistles2Image extends FreqTransform {
 
 				//Calculate x and y in pixels. 
 				x = ((points.get(j)[i][0]-xlims[0])/(xlims[1]-xlims[0]))*size[0];
-				y = ((points.get(j)[i][0]-xlims[0])/(xlims[1]-xlims[0]))*size[0];
+				y = ((points.get(j)[i][1]-ylims[0])/(ylims[1]-ylims[0]))*size[1];
+				
+//				System.out.println("Fill oval: x" + x + " y: " + y + " time: " + points.get(j)[i][0]);
 
 				canvas.getGraphics().fillOval((int) (x+markerSize/2),(int) (y-markerSize/2), (int) markerSize,(int) markerSize);
 			}

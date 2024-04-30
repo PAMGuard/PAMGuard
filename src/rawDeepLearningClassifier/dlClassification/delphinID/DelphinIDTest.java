@@ -3,16 +3,19 @@ package rawDeepLearningClassifier.dlClassification.delphinID;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.jamdev.jdl4pam.utils.DLMatFile;
+
 import PamUtils.PamArrayUtils;
 import PamguardMVC.DataUnitBaseData;
+import PamguardMVC.PamDataUnit;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 import rawDeepLearningClassifier.segmenter.SegmenterDetectionGroup;
 import us.hebi.matlab.mat.format.Mat5;
 import us.hebi.matlab.mat.format.Mat5File;
+import us.hebi.matlab.mat.types.MatFile;
 import us.hebi.matlab.mat.types.Matrix;
 import us.hebi.matlab.mat.types.Struct;
-import whistleClassifier.WhistleContour;
 import whistlesAndMoans.AbstractWhistleDataUnit;
 
 
@@ -24,10 +27,10 @@ import whistlesAndMoans.AbstractWhistleDataUnit;
  */
 public class DelphinIDTest {
 
-	public static DelphinIDWorker prepDelphinIDModel(String modelPath) {
+	public static DelphinIDWorkerTest prepDelphinIDModel(String modelPath) {
 
 		//create the delphinID worker. 
-		DelphinIDWorker delphinIDWorker = new DelphinIDWorker();
+		DelphinIDWorkerTest delphinIDWorker = new DelphinIDWorkerTest();
 
 		StandardModelParams params = new StandardModelParams();
 		params.modelPath = modelPath;
@@ -134,7 +137,7 @@ public class DelphinIDTest {
 		SegmenterDetectionGroup whistleGroup;
 		while (segStart<endTime){
 
-			whistleGroup = new SegmenterDetectionGroup(segStart, 1, segEnd, segHop);
+			whistleGroup = new SegmenterDetectionGroup(segStart, 1, segEnd, segLen);
 
 			for (AbstractWhistleDataUnit whislte: whistles) {
 				whistleStart = whislte.getTimeMilliseconds();
@@ -148,6 +151,8 @@ public class DelphinIDTest {
 			}
 
 			group.add(whistleGroup);
+			
+//			System.out.println("SegStart: " + (segStart - dataStartMillis));
 
 			segStart = (long) (segStart+segHop);
 			segEnd = (long) (segStart+segLen);
@@ -185,6 +190,27 @@ public class DelphinIDTest {
 
 
 	}
+	
+	
+	public static class DelphinIDWorkerTest extends DelphinIDWorker {
+		
+		private float[][][] lastModelInput;
+
+
+		public float[][][] dataUnits2ModelInput(ArrayList<? extends PamDataUnit> dataUnits, float sampleRate, int iChan){
+			float[][][] data = super.dataUnits2ModelInput(dataUnits, sampleRate, iChan);
+			
+			this.lastModelInput = data;
+		
+			
+			return data;
+		}
+		
+		public float[][][] getLastModelInput() {
+			return lastModelInput;
+		}
+		
+	}
 
 	/**
 	 * Main class for running the test. 
@@ -199,14 +225,19 @@ public class DelphinIDTest {
 		long dataStartMillis = 1340212413000L;
 
 		//path to the .mat containing whistle contours. 
-		String whistleContourPath = "D:\\Dropbox\\PAMGuard_dev\\Deep_Learning\\delphinID\\testencounter415\\whistle_contours.mat";
+		String whistleContourPath = "D:/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/testencounter415/whistle_contours.mat";
 
 		//the path to the model
 		String modelPath = "D:/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/testencounter415/whistle_4s_encounter415.zip";
+		
+		//the path to the model
+		String matImageSave = "C:/Users/Jamie Macaulay/MATLAB Drive/MATLAB/PAMGUARD/deep_learning/delphinID/whistleimages.mat";
+		
+		//create MatFile for saving the image data to. 
+		MatFile matFile = Mat5.newMatFile();
 
 		//get the whislte contours form a .mat file. 
 		ArrayList<AbstractWhistleDataUnit> whistleContours = getWhistleContoursMAT(whistleContourPath);
-
 
 		//segment the whistle detections
 		ArrayList<SegmenterDetectionGroup> segments =  segmentWhsitleData(whistleContours,  dataStartMillis, 
@@ -216,7 +247,13 @@ public class DelphinIDTest {
 			System.out.println("Segment " + i + " contains " + segments.get(i).getSubDetectionsCount() + " whistles"); 
 		}
 
-		DelphinIDWorker model = prepDelphinIDModel(modelPath);
+		//prepare the model - this loads the zip file and loads the correct transforms. 
+		DelphinIDWorkerTest model = prepDelphinIDModel(modelPath);
+		model.setEnableSoftMax(false);
+
+		
+		//initialise strcuture for image data
+		Struct imageStruct = Mat5.newStruct(segments.size(), 1);
 
 		for (int i=0; i<segments.size(); i++) {
 
@@ -228,15 +265,34 @@ public class DelphinIDTest {
 			ArrayList<StandardPrediction> predicition = model.runModel(aSegment, sampleRate, 1);		
 
 			float[] output =  predicition.get(0).getPrediction();
+		
+			System.out.println();
+			System.out.print("Segment: " +(aSegment.get(0).getSegmentStartMillis()-dataStartMillis)/1000.);
+			for (int j=0; j<output.length; j++) {
+				System.out.print("  " + output[j]); 
+			}
+
+			Matrix image = DLMatFile.array2Matrix(PamArrayUtils.float2Double(model.getLastModelInput()[0]));
+			imageStruct.set("image", i, image);
+			imageStruct.set("startmillis", i, Mat5.newScalar(aSegment.get(0).getSegmentStartMillis()));
+			imageStruct.set("startseconds", i, Mat5.newScalar((aSegment.get(0).getSegmentStartMillis()-dataStartMillis)/1000.));
+			imageStruct.set("prediction", i, DLMatFile.array2Matrix(PamArrayUtils.float2Double(output)));
 
 		}
 
+		matFile.addArray("whistle_images", imageStruct);
+		// Serialize to disk using default configurations
+		try {
+			Mat5.writeToFile(matFile,matImageSave);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		//		for (int i=0; i<whistleContours.size(); i++) {
 		//			System.out.println("Whislte: " + i);
 		//			PamArrayUtils.printArray(whistleContours.get(i).getFreqsHz());
 		//		}
-
-
 
 	}
 

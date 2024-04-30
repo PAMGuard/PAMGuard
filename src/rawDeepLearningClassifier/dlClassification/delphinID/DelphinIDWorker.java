@@ -109,8 +109,8 @@ public class DelphinIDWorker extends  ArchiveModelWorker {
 			//contained within the SegmenterDetectionGroup unit. 
 			Whistles2Image whistles2Image = new Whistles2Image(whistleGroups.get(j), whistleImageParams);
 
-			//add the transform to the current list.
-			this.getModelTransforms().add(0, whistles2Image);
+			//set the spec transform
+			((FreqTransform) this.getModelTransforms().get(0)).setSpecTransfrom(whistles2Image.getSpecTransfrom());
 
 			//process all the transforms. 
 			DLTransform transform = modelTransforms.get(0); 
