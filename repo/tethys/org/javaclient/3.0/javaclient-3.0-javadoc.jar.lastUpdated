@@ -1,0 +1,16 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Thu Mar 07 12:09:00 GMT 2024
+@default-talan-https\://nexus.talanlabs.com/content/repositories/releases/.lastUpdated=1705320262317
+file\://C\:\\Users\\dg50\\source\\repos\\PAMGuardPAMGuard/repo/.lastUpdated=1705320259110
+https\://repo1.maven.org/maven2/.error=
+file\://C\:\\Users\\dg50\\source\\repos\\PAMGuardDG/repo/.error=
+https\://artifacts.unidata.ucar.edu/repository/unidata-all/.error=
+https\://nexus.bedatadriven.com/content/groups/public/.error=
+https\://artifacts.unidata.ucar.edu/repository/unidata-all/.lastUpdated=1705320260572
+https\://repo1.maven.org/maven2/.lastUpdated=1705320262598
+https\://nexus.talanlabs.com/content/repositories/releases/.error=Could not transfer artifact tethys.org\:javaclient\:jar\:javadoc\:3.0 from/to talan (https\://nexus.talanlabs.com/content/repositories/releases/)\: nexus.talanlabs.com
+file\://C\:\\Users\\dg50\\source\\repos\\PAMGuardDG/repo/.lastUpdated=1705569305037
+file\://C\:\\Users\\dg50\\source\\repos\\PAMGuardDG_2/repo/.error=
+file\://C\:\\Users\\dg50\\source\\repos\\PAMGuardPAMGuard/repo/.error=
+https\://nexus.bedatadriven.com/content/groups/public/.lastUpdated=1705320262257
+file\://C\:\\Users\\dg50\\source\\repos\\PAMGuardDG_2/repo/.lastUpdated=1709813340827
