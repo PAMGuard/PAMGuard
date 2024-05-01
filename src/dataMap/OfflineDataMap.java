@@ -847,20 +847,22 @@ abstract public class OfflineDataMap<TmapPoint extends OfflineDataMapPoint> {
 
 	/**
 	 * Check to see if any data maps overlap in time. 
-	 * @return largest overlap between maps. 0 or -ve means no overlap. 
+	 * @return list of overlaps. 
 	 */
-	public long checkOverlaps() {
+	public ArrayList<MapOverlap> checkOverlaps() {
 		long bigLap = Long.MIN_VALUE;
 		TmapPoint prevPoint = null;
+		ArrayList<MapOverlap> overlaps = new ArrayList<>();
 		for (TmapPoint mapPoint : mapPoints) {
 			if (prevPoint != null) {
 				long olap = prevPoint.getEndTime() - mapPoint.getStartTime();
-//				if (mapPoint.getStartTime() < prevPoint.getEndTime()) {
+				if (mapPoint.getStartTime() < prevPoint.getEndTime()) {
 					bigLap = Math.max(olap, bigLap);
-//				}
+					overlaps.add(new MapOverlap(prevPoint.getEndTime(), mapPoint.getStartTime()));
+				}
 			}
 			prevPoint = mapPoint;
 		}
-		return bigLap;
+		return overlaps;
 	}
 }

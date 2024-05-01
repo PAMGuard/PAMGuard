@@ -36,7 +36,7 @@ public class PamguardVersionInfo {
 	/**
 	 * Release date
 	 */
-	static public final String date = "23 April 2024";
+	static public final String date = "1 May 2024";
 	
 //	/**
 //	 * Release type - Beta or Core

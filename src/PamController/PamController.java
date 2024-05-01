@@ -1456,12 +1456,12 @@ public class PamController implements PamControllerInterface, PamSettings {
 		for (int iU = 0; iU < pamControlledUnits.size(); iU++) {
 			pamControlledUnits.get(iU).pamHasStopped();
 		}
-		guiFrameManager.pamEnded();
-		
 		long stopTime = PamCalendar.getTimeInMillis();
 		saveEndSettings(stopTime);
 
 		setPamStatus(PAM_IDLE);
+		
+		guiFrameManager.pamEnded();
 		
 		// no good having this here since it get's called at the end of every file. 
 //		if (GlobalArguments.getParam(PamController.AUTOEXIT) != null) {
