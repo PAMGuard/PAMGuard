@@ -48,6 +48,11 @@ public class DelphinIDWorker extends  ArchiveModelWorker {
 			System.err.println("Error: could not find whistle2image transform in DelphinID JSON file. Model will not work.");
 			this.setModel(null); // set model to null to make sure nothing works and errors are thrown
 		}
+		
+		dlParams.binaryClassification = new boolean[dlParams.classNames.length];
+		for (int i=0; i<dlParams.classNames.length; i++) {
+			dlParams.binaryClassification[i]=true;
+		}
 	}
 
 

@@ -60,7 +60,17 @@ public class SegmenterProcess extends PamProcess {
 	/**
 	 * Holds groups of data units which are within a defined segment. 
 	 */
-	private SegmenterGroupDataBlock segmenterGroupDataBlock; 
+	private SegmenterGroupDataBlock segmenterGroupDataBlock;
+
+	/**
+	 * The first clock update - segments for detection groups (not raw sound data) are referenced from this. 
+	 */
+	private long firstClockUpdate; 
+	
+	/**
+	 * The current segmenter detection group.
+	 */
+	private SegmenterDetectionGroup segmenterDetectionGroup = null; 
 
 
 	public SegmenterProcess(DLControl pamControlledUnit, PamDataBlock parentDataBlock) {
@@ -111,7 +121,7 @@ public class SegmenterProcess extends PamProcess {
 	 */
 	@Override
 	public ArrayList getCompatibleDataUnits(){
-		return new ArrayList<Class<? extends PamDataUnit>>(Arrays.asList(RawDataUnit.class, ClickDetection.class, ClipDataUnit.class));
+		return new ArrayList<Class<? extends PamDataUnit>>(Arrays.asList(RawDataUnit.class, ClickDetection.class, ClipDataUnit.class, ConnectedRegionDataUnit.class));
 	}
 
 
@@ -177,6 +187,8 @@ public class SegmenterProcess extends PamProcess {
 		if (rawDataBlock==null) return;
 
 		setParentDataBlock(rawDataBlock);
+		
+		this.firstClockUpdate = -1;
 
 	}
 
@@ -232,10 +244,27 @@ public class SegmenterProcess extends PamProcess {
 
 		//TODO
 		//this contains no raw data so we are branching off on a completely different processing path here.
-		//Whislte data units are saved to a buffer and then fed to the deep learning algorohtm
+		//Whislte data units are saved to a buffer and then fed to the deep learning algorithms
+	
+		if (segmenterDetectionGroup==null) {
+			//iterate until we find the correct time 
+			long segmentStart = firstClockUpdate;
+			while() {
+				
+			}
+		}
 		
 		
 	}
+	
+	
+	public void masterClockUpdate(long milliSeconds, long sampleNumber) {
+		super.masterClockUpdate(milliSeconds, sampleNumber);
+		if (firstClockUpdate<0) {
+			firstClockUpdate = milliSeconds;
+		}
+	}
+
 
 
 	/**
