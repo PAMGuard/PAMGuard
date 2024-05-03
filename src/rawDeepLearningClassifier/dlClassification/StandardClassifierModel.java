@@ -271,7 +271,7 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 	 */
 	protected void newResult(StandardPrediction modelResult, PamDataUnit groupedRawData) {
 		if (groupedRawData instanceof GroupedRawData) {
-			this.dlControl.getDLClassifyProcess().newModelResult(modelResult, (GroupedRawData) groupedRawData);
+			this.dlControl.getDLClassifyProcess().newRawModelResult(modelResult, (GroupedRawData) groupedRawData);
 		}
 	}
 //	

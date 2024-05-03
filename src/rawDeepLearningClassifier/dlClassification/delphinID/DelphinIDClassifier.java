@@ -91,7 +91,7 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 	@Override
 	public boolean isDecision(StandardPrediction modelResult, StandardModelParams modelParmas) {
 		//TODO
-		//DelphinID uses a different decision making process to most of the standard classifiers which just pass a binary threhsoild. 
+		//DelphinID uses a different decision making process to most of the standard classifiers which just pass a binary threshold. 
 		return false;
 	}
 

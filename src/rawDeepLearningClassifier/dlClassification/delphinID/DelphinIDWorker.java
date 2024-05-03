@@ -49,8 +49,8 @@ public class DelphinIDWorker extends  ArchiveModelWorker {
 			this.setModel(null); // set model to null to make sure nothing works and errors are thrown
 		}
 		
-		dlParams.binaryClassification = new boolean[dlParams.classNames.length];
-		for (int i=0; i<dlParams.classNames.length; i++) {
+		dlParams.binaryClassification = new boolean[dlParams.numClasses];
+		for (int i=0; i<dlParams.numClasses; i++) {
 			dlParams.binaryClassification[i]=true;
 		}
 	}
@@ -110,6 +110,7 @@ public class DelphinIDWorker extends  ArchiveModelWorker {
 		double[][] transformedData2; //spectrogram data
 		for (int j=0; j<numChunks; j++) {
 
+			System.out.println("Number of whisltes to process: " + whistleGroups.get(j).getSubDetectionsCount() + "  " + whistleGroups.get(j).getSegmentStartMillis());
 			//create the first transform and set then whistle data. Note that the absolute time limits are
 			//contained within the SegmenterDetectionGroup unit. 
 			Whistles2Image whistles2Image = new Whistles2Image(whistleGroups.get(j), whistleImageParams);
