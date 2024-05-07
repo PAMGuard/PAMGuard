@@ -100,6 +100,8 @@ public class RawDLParams implements Serializable, Cloneable {
 	 */
 	public short classNameIndex = 0;
 
+	private Serializable modelParameters;
+
 	@Override
 	public RawDLParams clone() {
 		RawDLParams newParams = null;
@@ -116,6 +118,24 @@ public class RawDLParams implements Serializable, Cloneable {
 			return null;
 		}
 		return newParams;
+	}
+
+	/**
+	 * Set the model parameters. These aren't really needed in here are aren't really 
+	 * used except when the parameters are serialized to XML for book keeping. 
+	 * @param modelParameters
+	 */
+	public Serializable getModelParameters() {
+		return modelParameters;
+	}
+
+	/**
+	 * Set the model parameters. These aren't really needed in here are aren't really 
+	 * used except when the parameters are serialized to XML for book keeping. 
+	 * @param modelParameters the modelParameters to set
+	 */
+	public void setModelParameters(Serializable modelParameters) {
+		this.modelParameters = modelParameters;
 	}
 
 }

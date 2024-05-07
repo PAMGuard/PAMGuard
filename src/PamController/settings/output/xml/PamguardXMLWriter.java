@@ -583,6 +583,28 @@ public class PamguardXMLWriter implements PamSettings {
 		//		}
 		return el;
 	}
+	
+	/**
+	 * Need to use a modified function here since some of Jamies DL params 
+	 * classes cast to their own type before the have checked type in the 
+	 * equals functoins he's written. 
+	 * @param objectHierarchy
+	 * @return
+	 */
+	private boolean hasData(ArrayList<Object> objectHierarchy, Object object) {
+		if (objectHierarchy == null) {
+			return false;
+		}
+		for (Object o : objectHierarchy) {
+			if (object.getClass() != o.getClass()) {
+				return false;
+			}
+			if (o.equals(object)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	public Element writeObjectData(Document doc, Element el, Object data, ArrayList<Object> objectHierarchy) {
 		if (data == null) {
@@ -591,7 +613,7 @@ public class PamguardXMLWriter implements PamSettings {
 		if (objectHierarchy == null) {
 			objectHierarchy = new ArrayList<>();
 		}
-		if (objectHierarchy.contains(data)) {
+		if (hasData(objectHierarchy, data)) {
 			// just write the reference, but nothing else or we'll end up in an infinite loop of objects. 
 			Element e = doc.createElement("Object");
 			e.setAttribute("Class", data.getClass().getName());
@@ -794,6 +816,8 @@ public class PamguardXMLWriter implements PamSettings {
 		}
 		catch (Exception e) {
 			System.out.println("Error in PamguardXMLWriter.writeObjectArray: " + e.getMessage());
+
+			e.printStackTrace();
 		}
 		return null;
 	}

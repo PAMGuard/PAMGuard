@@ -223,7 +223,7 @@ public class DLClassifyProcess extends PamInstantProcess {
 
 		//run the deep learning algorithm 
 		ArrayList<GroupedRawData> classificationBufferTemp = (ArrayList<GroupedRawData>) classificationBuffer.clone(); 
-		ArrayList<? extends PredictionResult> modelResults = this.dlControl.getDLModel().runModel(classificationBuffer); 
+		ArrayList<? extends PredictionResult> modelResults = this.dlControl.getDLModel().runModel(classificationBufferTemp); 
 
 		if (modelResults==null) {
 			return; //there has been a problem

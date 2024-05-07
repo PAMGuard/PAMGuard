@@ -3,6 +3,7 @@ package rawDeepLearningClassifier.dlClassification;
 import PamView.GroupedDataSource;
 import PamView.GroupedSourceParameters;
 import PamguardMVC.AcousticDataBlock;
+import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.tethys.DLSpeciesManager;
 import rawDeepLearningClassifier.tethys.DLTethysDataProvider;
 import tethys.TethysControl;
@@ -20,10 +21,12 @@ public class DLDetectionDataBlock extends AcousticDataBlock<DLDetection> impleme
 	private DLClassifyProcess dlClassifyProcess;
 	private DLTethysDataProvider dlTethysDataProvider;
 	private DLSpeciesManager dlSpeciesManager;
+	private DLControl dlControl;
 
 	public DLDetectionDataBlock(String dataName, DLClassifyProcess parentProcess, int channelMap) {
 		super(DLDetection.class, dataName, parentProcess, channelMap);
 		this.dlClassifyProcess = parentProcess; 
+		dlControl = dlClassifyProcess.getDLControl();
 	}
 
 	@Override
@@ -34,7 +37,7 @@ public class DLDetectionDataBlock extends AcousticDataBlock<DLDetection> impleme
 	@Override
 	public TethysDataProvider getTethysDataProvider(TethysControl tethysControl) {
 		if (dlTethysDataProvider == null) {
-			dlTethysDataProvider = new DLTethysDataProvider(tethysControl, this);
+			dlTethysDataProvider = new DLTethysDataProvider(tethysControl, dlControl, this);
 		}
 		return dlTethysDataProvider;
 	}

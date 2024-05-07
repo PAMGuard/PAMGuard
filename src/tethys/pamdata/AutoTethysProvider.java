@@ -498,5 +498,12 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 		return true;
 	}
 
+	/**
+	 * @return the tethysControl
+	 */
+	public TethysControl getTethysControl() {
+		return tethysControl;
+	}
+
 
 }

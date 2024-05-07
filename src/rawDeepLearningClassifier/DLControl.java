@@ -346,6 +346,7 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 
 		this.segmenterProcess.setupSegmenter();
 		this.dlClassifyProcess.setupProcess();
+		this.checkModelParams();
 
 		// this is a bit of a hack. Annotations are added to data units but the
 		// datablock knows nothing about them
@@ -512,6 +513,34 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 
 	public void setParams(RawDLParams newParams) {
 		this.rawDLParmas = newParams;
+		checkModelParams();
+	}
+
+	/**
+	 * Called when setParams is called, which should have new model params 
+	 * after the dialog was closed. Puts these into dlParams so they get serialised
+	 * with rest of XML. 
+	 */
+	public void checkModelParams() {
+		RawDLParams dlParams = getDLParams();
+		DLClassiferModel model = getDLModel();
+		Serializable modelParams = null;
+		if (model != null) {
+			modelParams = model.getDLModelSettings();
+		}
+		dlParams.setModelParameters(modelParams);
+		
+		// see what else we can find in the model in terms of metadata. 
+//		if (model == null) {
+//			return;
+//		}
+//		try {
+//			String modelName = model.getName();
+//			System.out.println("Model name: " + modelName);
+//		}
+//		catch (Exception e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	/**
