@@ -3,26 +3,37 @@ package RightWhaleEdgeDetector.graphics;
 import PamUtils.Coordinate3d;
 import PamView.GeneralProjector.ParameterType;
 import PamView.GeneralProjector.ParameterUnits;
+import PamView.symbol.PamSymbolChooser;
 import PamguardMVC.PamDataUnit;
 import RightWhaleEdgeDetector.RWEDataBlock;
 import RightWhaleEdgeDetector.RWEDataUnit;
 import RightWhaleEdgeDetector.RWEProcess;
 import RightWhaleEdgeDetector.RWESound;
+import dataPlots.data.TDSymbolChooser;
+import dataPlotsFX.SimpleSymbolChooserFX;
 import dataPlotsFX.TDSymbolChooserFX;
 import dataPlotsFX.data.TDDataInfoFX;
 import dataPlotsFX.data.TDScaleInfo;
+import dataPlotsFX.data.generic.GenericDataPlotInfo;
+import dataPlotsFX.data.generic.GenericSettingsPane;
 import dataPlotsFX.layout.TDGraphFX;
+import dataPlotsFX.layout.TDSettingsPane;
 import dataPlotsFX.projector.TDProjectorFX;
 import fftManager.FFTDataBlock;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
+import pamViewFX.fxNodes.PamSymbolFX;
 
-public class RWEDataPlotinfoFX extends TDDataInfoFX {
+public class RWEDataPlotinfoFX extends GenericDataPlotInfo {
 
 	private RWEDataBlock rweDataBlock;
 	private TDScaleInfo bearingScaleInfo;
 	private TDScaleInfo frequencyInfo;
 	private RWEProcess rweProcess;
+
+//	private SimpleSymbolChooserFX symbolChooser = new SimpleSymbolChooserFX();
+	private GenericSettingsPane settingsPane;
 
 	public RWEDataPlotinfoFX(RWEDataPlotProviderFX tdDataProvider, RWEProcess rweProcess, TDGraphFX tdGraph, RWEDataBlock rweDataBlock) {
 		super(tdDataProvider, tdGraph, rweDataBlock);
@@ -38,6 +49,10 @@ public class RWEDataPlotinfoFX extends TDDataInfoFX {
 		//set correct frequency range based on nyquist. 
 		frequencyInfo.setMaxVal(rweDataBlock.getSampleRate()/2.);
 		
+
+		settingsPane = new GenericSettingsPane(this);
+		settingsPane.setShowingName("Right Whale");
+//		settingsPane.setIcon(tdGraph)
 	}
 
 	@Override
@@ -66,16 +81,15 @@ public class RWEDataPlotinfoFX extends TDDataInfoFX {
 		return super.getScaleInfo();
 	}
 	
-	@Override
-	public TDSymbolChooserFX getSymbolChooser() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//	@Override
+//	public TDSymbolChooserFX getSymbolChooser() {
+//		return symbolChooser;
+//	}
 
 	@Override
 	public Polygon drawDataUnit(int plotNumber, PamDataUnit pamDataUnit, GraphicsContext g, double scrollStart, TDProjectorFX tdProjector,int type) {
 		// if drawing FFT then need to use slight more complex drawing functions.
-		if (getScaleInfoIndex()==1) {
+		if (getScaleInfoIndex()==3) {
 			return drawRWContour(plotNumber, pamDataUnit, g, scrollStart, tdProjector, type);
 		}
 		else {
@@ -105,6 +119,16 @@ public class RWEDataPlotinfoFX extends TDDataInfoFX {
 		int fftLen = dataSource.getFftLength();
 		int fftHop = dataSource.getFftHop();
 		
+		TDSymbolChooserFX symbols = getSymbolChooser();
+		if (symbols != null) {
+			PamSymbolFX symbFX = symbols.getPamSymbol(rweDataUnit, TDSymbolChooser.NORMAL_SYMBOL);
+			if (symbFX != null) {
+				g.setStroke(symbFX.getLineColor());
+//				g.setStroke(Color.ALICEBLUE);
+			}
+		}
+		
+		
 //		Polygon outer = new Poly
 		int nOut = hf.length*2;
 		double[] outsideX = new double[nOut];
@@ -126,8 +150,19 @@ public class RWEDataPlotinfoFX extends TDDataInfoFX {
 			
 		}
 		g.strokePolygon(outsideX, outsideY, nOut);
+		double topX = outsideX[hf.length];
+		double topY = outsideY[hf.length];
+		String txt = String.format("%d", rweSound.soundType);
+		g.strokeText(txt, topX, topY);
 		
 		
 		return null;
+	}
+
+	@Override
+	public TDSettingsPane getGraphSettingsPane() {
+		if (settingsPane == null) {
+		}
+		return settingsPane;
 	}
 }

@@ -268,7 +268,7 @@ public class RWEProcess extends PamProcess {
 			    	backgroundData[i] += (magData[i]-backgroundData[i])/updateConstant[0];
 			    }
 				if (Double.isNaN(backgroundData[i]) || Double.isInfinite(backgroundData[i])) {
-					System.out.println(String.format("Bad bg data slice %d = %3.5f", i, backgroundData[i]));
+//					System.out.println(String.format("Bad bg data slice %d = %3.5f", i, backgroundData[i]));
 					backgroundData[i] = magData[i] * 10.;
 				}
 			}
