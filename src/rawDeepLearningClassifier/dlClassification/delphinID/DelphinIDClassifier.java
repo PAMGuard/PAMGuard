@@ -8,6 +8,7 @@ import org.jamdev.jdl4pam.transforms.DLTransformsFactory;
 import org.jamdev.jdl4pam.transforms.DLTransfromParams;
 
 import PamController.PamControlledUnitSettings;
+import PamController.PamSettingManager;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
 import rawDeepLearningClassifier.dlClassification.StandardClassifierModel;
@@ -37,6 +38,9 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 
 	public DelphinIDClassifier(DLControl dlControl) {
 		super(dlControl);
+		
+		//load the previous settings
+		PamSettingManager.getInstance().registerSettings(this);
 	}
 
 	@Override
@@ -105,10 +109,11 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 
 	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
+
 		DelphinIDParams newParameters = (DelphinIDParams) pamControlledUnitSettings.getSettings();
 		if (newParameters!=null) {
 			delphinIDParams = (DelphinIDParams) newParameters.clone();
-			//System.out.println("SoundSpot have been restored. : " + soundSpotParmas.classNames); 
+//			System.out.println("DELPHINID have been restored. : " + delphinIDParams.modelPath); 
 			if (delphinIDParams.dlTransfromParams!=null) {
 				delphinIDParams.dlTransfroms = DLTransformsFactory.makeDLTransforms((ArrayList<DLTransfromParams>) delphinIDParams.dlTransfromParams); 
 			}

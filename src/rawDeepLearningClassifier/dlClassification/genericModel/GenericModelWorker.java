@@ -33,7 +33,7 @@ public class GenericModelWorker extends DLModelWorker<StandardPrediction> {
 
 	@Override
 	public float[] runModel(float[][][] transformedDataStack) {
-		System.out.println("RUN GENERIC MODEL: " + transformedDataStack.length +  "  " + transformedDataStack[0].length +  "  " + transformedDataStack[0][0].length);
+//		System.out.println("RUN GENERIC MODEL: " + transformedDataStack.length +  "  " + transformedDataStack[0].length +  "  " + transformedDataStack[0][0].length);
 //		System.out.println("RUN GENERIC MODEL: " + transformedDataStack[0][0][0]);
 		float[]  results; 
 		if (freqTransform)
@@ -48,8 +48,8 @@ public class GenericModelWorker extends DLModelWorker<StandardPrediction> {
 			//System.out.println("RUN GENERIC MODEL WAVE: " + waveStack.length +  "  " + waveStack[0].length +  " " + waveStack[0][0]);
 			results =  getModel().runModel(waveStack);
 		}
-		System.out.println("GENERIC MODEL RESULTS: " + (results== null ? null : results.length));
-		PamArrayUtils.printArray(results);
+//		System.out.println("GENERIC MODEL RESULTS: " + (results== null ? null : results.length));
+//		PamArrayUtils.printArray(results);
 		return results;
 	}
 

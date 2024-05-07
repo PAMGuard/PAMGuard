@@ -197,7 +197,7 @@ public class DLClassifyProcess extends PamInstantProcess {
 
 		if (pamRawData instanceof SegmenterDetectionGroup) {
 			if (classificationBuffer.size()>=1) {
-				System.out.println("RUN THE MODEL FOR WHISTLES: ");
+//				System.out.println("RUN THE MODEL FOR WHISTLES: ");
 				runDetectionGroupModel(); 
 				classificationBuffer.clear(); 
 			}
@@ -232,14 +232,15 @@ public class DLClassifyProcess extends PamInstantProcess {
 	/**
 	 * Run a model for which the input is a detection group. 
 	 */
-	private void runDetectionGroupModel() {
+	private synchronized void runDetectionGroupModel() {
 		if (classificationBuffer.size()<=0) return; 
 		ArrayList<PamDataUnit> classificationBufferTemp = (ArrayList<PamDataUnit>) classificationBuffer.clone(); 
 
 		ArrayList<? extends PredictionResult> modelResults = this.dlControl.getDLModel().runModel(classificationBufferTemp); 
 
 		for (int i=0; i<classificationBufferTemp.size(); i++) {
-			if (modelResults.get(i)!=null) {
+			
+			if (modelResults!=null && modelResults.get(i)!=null) {
 				DLDataUnit dlDataUnit =  predictionToDataUnit(classificationBuffer.get(i),  modelResults.get(i));
 				this.dlModelResultDataBlock.addPamData(dlDataUnit); //here
 			}

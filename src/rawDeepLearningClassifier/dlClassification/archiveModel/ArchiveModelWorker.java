@@ -199,8 +199,7 @@ public class ArchiveModelWorker extends GenericModelWorker {
 	 * @throws IOException
 	 */
 	public ArchiveModel loadModel(String currentPath2) throws MalformedModelException, IOException {
-		
-		System.out.println("HELLO MODEL: " +currentPath2 );
+	
 		return new SimpleArchiveModel(new File(currentPath2)); 
 	}
 

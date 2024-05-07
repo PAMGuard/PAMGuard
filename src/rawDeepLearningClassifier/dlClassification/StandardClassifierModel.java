@@ -106,7 +106,7 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 	
 	@Override
 	public void prepModel() {
-//		System.out.println("STANDARD CLASSIFIER MODEL PREP MODEL! !!!");
+		System.out.println("STANDARD CLASSIFIER MODEL PREP MODEL! !!!: " +  getDLParams().modelPath);
 //		StandardModelParams oldParams = getDLParams().clone();
 		
 		getDLWorker().prepModel(getDLParams(), dlControl);
@@ -115,6 +115,7 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 		if (getDLWorker().isModelNull()) {
 			dlClassifierWarning.setWarningMessage("There is no loaded " + getName() + " classifier model. " + getName() + " disabled.");
 			WarningSystem.getWarningSystem().addWarning(dlClassifierWarning);
+			return;
 		}
 
 
@@ -187,7 +188,7 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 	public DLStatus setModel(URI uri) {
 		//will change the params if we do not clone. 
 		StandardModelParams.setModel(uri, this.getDLParams()); 
-		this.prepModel();
+		this.getDLWorker().prepModel(getDLParams(), dlControl);
 		return getModelStatus();
 	}
 	

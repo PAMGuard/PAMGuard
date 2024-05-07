@@ -2,6 +2,7 @@ package rawDeepLearningClassifier.dlClassification.delphinID;
 
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.jamdev.jdl4pam.transforms.DLTransform;
@@ -9,18 +10,23 @@ import org.jamdev.jdl4pam.transforms.DLTransfromParams;
 import org.jamdev.jdl4pam.transforms.FreqTransform;
 import org.jamdev.jdl4pam.transforms.DLTransform.DLTransformType;
 import org.jamdev.jdl4pam.transforms.jsonfile.DLTransformsParser;
+import org.jamdev.jdl4pam.utils.DLMatFile;
 import org.jamdev.jdl4pam.utils.DLUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import PamUtils.PamArrayUtils;
 import PamguardMVC.PamDataUnit;
 import ai.djl.Model;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.archiveModel.ArchiveModelWorker;
 import rawDeepLearningClassifier.dlClassification.delphinID.Whistles2Image.Whistle2ImageParams;
-import rawDeepLearningClassifier.segmenter.GroupedRawData;
 import rawDeepLearningClassifier.segmenter.SegmenterDetectionGroup;
+import us.hebi.matlab.mat.format.Mat5;
+import us.hebi.matlab.mat.types.MatFile;
+import us.hebi.matlab.mat.types.Matrix;
+import us.hebi.matlab.mat.types.Struct;
 
 /**
  * 
@@ -86,10 +92,49 @@ public class DelphinIDWorker extends  ArchiveModelWorker {
 
 				return whistle2ImageParmas;
 			}
-
 		}
+		
 		//something has gone wrong if we get here. 
 		return null; 
+	}
+	
+	
+	
+	private Struct imageStruct;
+	int count = 0;
+	/**
+	 * Tets by exporting results to a .mat file. 
+	 * @param data
+	 * @param aSegment
+	 */
+	private void addIMage2MatFile(double[][] data, SegmenterDetectionGroup aSegment) {
+		long dataStartMillis = 1340212413000L;
+
+		if (imageStruct==null) {
+			 imageStruct = Mat5.newStruct(100,1);
+		}
+		Matrix image = DLMatFile.array2Matrix(data);
+		imageStruct.set("image", count, image);
+		imageStruct.set("startmillis", count, Mat5.newScalar(aSegment.getSegmentStartMillis()));
+		imageStruct.set("startseconds", count, Mat5.newScalar((aSegment.getSegmentStartMillis()-dataStartMillis)/1000.));
+
+		count++;
+		
+		System.out.println("SAVED " +count + " TO MAT FILE");
+		
+		if (count==10) {
+			//create MatFile for saving the image data to. 
+			MatFile matFile = Mat5.newMatFile();
+			matFile.addArray("whistle_images", imageStruct);
+			//the path to the model
+			String matImageSave = "C:/Users/Jamie Macaulay/MATLAB Drive/MATLAB/PAMGUARD/deep_learning/delphinID/whistleimages_pg.mat";
+			try {
+				Mat5.writeToFile(matFile,matImageSave);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 
@@ -110,7 +155,7 @@ public class DelphinIDWorker extends  ArchiveModelWorker {
 		double[][] transformedData2; //spectrogram data
 		for (int j=0; j<numChunks; j++) {
 
-			System.out.println("Number of whisltes to process: " + whistleGroups.get(j).getSubDetectionsCount() + "  " + whistleGroups.get(j).getSegmentStartMillis());
+//			System.out.println("Number of whistle to process: " + whistleGroups.get(j).getStartSecond() + "s  " +  whistleGroups.get(j).getSubDetectionsCount() + "  " + whistleGroups.get(j).getSegmentStartMillis());
 			//create the first transform and set then whistle data. Note that the absolute time limits are
 			//contained within the SegmenterDetectionGroup unit. 
 			Whistles2Image whistles2Image = new Whistles2Image(whistleGroups.get(j), whistleImageParams);
@@ -126,6 +171,14 @@ public class DelphinIDWorker extends  ArchiveModelWorker {
 			
 			transformedData2 = ((FreqTransform) transform).getSpecTransfrom().getTransformedData(); 
 			transformedDataStack[j] = DLUtils.toFloatArray(transformedData2); 
+			
+//			//TEMP
+//			try {
+//				addIMage2MatFile(transformedData2,  whistleGroups.get(j));
+//			}
+//			catch (Exception e) {
+//				e.printStackTrace();
+//			}
 		}
 
 

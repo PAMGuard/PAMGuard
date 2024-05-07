@@ -71,7 +71,11 @@ public class SegmenterProcess extends PamProcess {
 	/**
 	 * The current segmenter detection group.
 	 */
-	private SegmenterDetectionGroup[] segmenterDetectionGroup = null; 
+	private SegmenterDetectionGroup[] segmenterDetectionGroup = null;
+
+	private long segmentStart=-1;
+
+	private long segmenterEnd=-1; 
 
 
 	public SegmenterProcess(DLControl pamControlledUnit, PamDataBlock parentDataBlock) {
@@ -219,9 +223,10 @@ public class SegmenterProcess extends PamProcess {
 	 */
 	public void newData(PamDataUnit pamRawData) {
 
+//		System.out.println("New data for segmenter: " + pamRawData); 
+
 		if (!dlControl.getDLParams().useDataSelector || dlControl.getDataSelector().scoreData(pamRawData)>0) {	
 
-			//System.out.println("New data for segmenter: " + pamRawData); 
 			if (pamRawData instanceof RawDataUnit) {
 				newRawDataUnit(pamRawData); 
 			}
@@ -243,7 +248,7 @@ public class SegmenterProcess extends PamProcess {
 	 * A new detection data unit i.e. this is only if we have detection data which is being grouped into segments. 
 	 * @param dataUnit - the whistle data unit. 
 	 */
-	private void newWhistleData(PamDataUnit dataUnit) {
+	private synchronized void newWhistleData(PamDataUnit dataUnit) {
 		
 		
 		ConnectedRegionDataUnit whistle = (ConnectedRegionDataUnit) dataUnit;
@@ -256,11 +261,16 @@ public class SegmenterProcess extends PamProcess {
 		
 		int index = -1;
 		for (int i=0; i<chanGroups.length; i++) {
-			if (dlControl.getDLParams().groupedSourceParams.getGroupChannels(chanGroups[i])==dataUnit.getChannelBitmap())
-			index=i;
+			if (dlControl.getDLParams().groupedSourceParams.getGroupChannels(chanGroups[i])==dataUnit.getChannelBitmap()) {
+				index=i;
+				break;
+			}
 		}
 		
-		//System.out.println("Whiste data: " + dataUnit + " " + chanGroups.length +  "  " +  index + "  " + dataUnit.getChannelBitmap());
+		//FIXME - TWEMP
+		index =0;
+		
+//		System.out.println("Whistle data: " + ((dataUnit.getTimeMilliseconds()-firstClockUpdate)/1000.) + "s " + chanGroups.length +  "  " +  index + "  " + dataUnit.getChannelBitmap());
 //		PamArrayUtils.printArray(chanGroups);
 		
 		if (index<0) {
@@ -272,31 +282,61 @@ public class SegmenterProcess extends PamProcess {
 			//System.out.println("Whiste not in segment"); 
 			//iterate until we find the correct time for this detection. This keeps the segments consist no matter 
 			//the data units. What we do not want is the first data unit defining the start of the first segment.
-			long segmentStart = firstClockUpdate;
-			long segmenterEnd = (long) (segmentStart + getSegmentLenMillis());
-
-			while(!detectionInSegment(dataUnit,  segmentStart,  segmenterEnd)) {
-				segmentStart = segmenterEnd;
+			if (segmentStart <0) {
+				segmentStart= firstClockUpdate;
 				segmenterEnd = (long) (segmentStart + getSegmentLenMillis());
 			}
 			
-			long startSample = this.absMillisecondsToSamples(segmenterEnd);
-			
-			//now we need to create a new data unit.
-			if (segmenterDetectionGroup[index]!=null) {
-				System.out.println("SAVE WHISTLE SEGMENT!: " + segmenterDetectionGroup[index]);
-
-				//save the data unit
-				this.segmenterGroupDataBlock.addPamData(segmenterDetectionGroup[index]);
+			while(!detectionInSegment(dataUnit,  segmentStart,  segmenterEnd)) {
+				nextGroupSegment( index);
 			}
-			
-			//TODO There is no good way to get the start sample?
-			segmenterDetectionGroup[index] = new SegmenterDetectionGroup(segmentStart, chanGroups[index], startSample,  getSegmentLenMillis());
 		}
 		
-		//System.out.println("Add whistle to existing segment"); 
 		segmenterDetectionGroup[index].addSubDetection(whistle);
+//		System.out.println("Segment sub detection count: " + 	segmenterDetectionGroup[index].getSubDetectionsCount()); 
 		
+	}
+	
+	/**
+	 * Iterate to the next group segment
+	 * @param index - the group index;
+	 */
+	private void nextGroupSegment(int index) {
+		
+//		System.out.println("----------------------------------");
+
+		segmentStart = (long) (segmentStart+ getSegmentHopMillis());
+		segmenterEnd = (long) (segmentStart + getSegmentLenMillis());
+		
+		int[] chanGroups = dlControl.getDLParams().groupedSourceParams.getChannelGroups();
+
+		long startSample = this.absMillisecondsToSamples(segmentStart);
+
+		//now we need to create a new data unit.
+		SegmenterDetectionGroup aSegment = new SegmenterDetectionGroup(segmentStart, chanGroups[index], startSample,  getSegmentLenMillis());
+		aSegment.setStartSecond((segmentStart-firstClockUpdate)/1000.);
+
+		//save the last segment
+		if (segmenterDetectionGroup[index]!=null) {
+			//add any data units from the previous segment (because segments may overlap);
+			int count =0;
+			for (int i=0; i<segmenterDetectionGroup[index].getSubDetectionsCount() ; i++) {
+				if (detectionInSegment(segmenterDetectionGroup[index].getSubDetection(i), aSegment)){
+					aSegment.addSubDetection(segmenterDetectionGroup[index].getSubDetection(i));
+					count++;
+				}
+			}
+			
+//			System.out.println("SAVE WHISTLE SEGMENT!: " + ((segmenterDetectionGroup[index].getSegmentStartMillis()-firstClockUpdate)/1000.) + "s" + " " + " no. whsitles: " + segmenterDetectionGroup[index].getSubDetectionsCount() + " " + segmenterDetectionGroup[index].getSegmentStartMillis() + "  " + segmenterDetectionGroup[index]);
+			//save the data unit to the data block
+			if (segmenterDetectionGroup[index].getSubDetectionsCount()>0) {
+				this.segmenterGroupDataBlock.addPamData(segmenterDetectionGroup[index]);
+			}
+		}
+		
+		segmenterDetectionGroup[index] = aSegment;
+//		System.out.println("NEW SEGMENT START!: " + (segmentStart-firstClockUpdate)/1000. + "s" + " " + segmenterDetectionGroup[index].getSegmentStartMillis()+ "  " +segmenterDetectionGroup[index]);
+
 	}
 	
 	private boolean detectionInSegment(PamDataUnit dataUnit, SegmenterDetectionGroup segmenterDetectionGroup2) {
@@ -308,11 +348,11 @@ public class SegmenterProcess extends PamProcess {
 	private boolean detectionInSegment(PamDataUnit dataUnit, long segStart, long segEnd) {
 		//TODO - this is going to fail for very small segments. 
 		long whistleStart 	= dataUnit.getTimeMilliseconds();
-		long whistleEnd 	= dataUnit.getDurationInMilliseconds().longValue();
+		long whistleEnd 	= whistleStart + dataUnit.getDurationInMilliseconds().longValue();
 
 		if ((whistleStart>=segStart && whistleStart<segEnd) || ((whistleEnd>=segStart && whistleEnd<segEnd))){
 			//some part of the whistle is in the segment. 
-			System.out.println("Whsitle in segment: " + whistleStart + "  " + whistleEnd);
+//			System.out.println("Whsitle in segment: " + whistleStart + "  " + whistleEnd);
 			return true;
 		}
 		return false;
@@ -323,6 +363,12 @@ public class SegmenterProcess extends PamProcess {
 		return millis;
 	}
 	
+	private double getSegmentHopMillis() {
+		double millis = (dlControl.getDLParams().sampleHop/this.getSampleRate())*1000.;
+		return millis;
+	}
+	
+	
 	
 	int count=0;
 	public void masterClockUpdate(long milliSeconds, long sampleNumber) {
@@ -331,23 +377,13 @@ public class SegmenterProcess extends PamProcess {
 			firstClockUpdate = milliSeconds;
 		}
 		
-		//want to make sure that a segment isn't saved if we suddenly lose 
+		//want to make sure that a segment is saved if we suddenly lose 
 		// a steady stream of data units. This ensure that the segments are saved properly
 		//after the master clock has gone past the end of the current segment. 
 		if (segmenterDetectionGroup!=null && count%20==0) {
 			for (int i=0; i<segmenterDetectionGroup.length; i++) {
 				if (segmenterDetectionGroup[i]!=null && segmenterDetectionGroup[i].getSegmentEndMillis()<milliSeconds) {
-					//add the segment to the datablock
-					this.segmenterGroupDataBlock.addPamData(segmenterDetectionGroup[i]);
-					
-					//create a new segment
-					SegmenterDetectionGroup aSegmenterDetectionGroup = 
-							new SegmenterDetectionGroup(segmenterDetectionGroup[i].getSegmentEndMillis(), 
-									segmenterDetectionGroup[i].getChannelBitmap(), 
-									this.absMillisecondsToSamples(segmenterDetectionGroup[i].getSegmentEndMillis()),  
-									getSegmentLenMillis());
-					segmenterDetectionGroup[i] = aSegmenterDetectionGroup;
-
+					nextGroupSegment(i);
 				}
 			}
 		}

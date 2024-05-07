@@ -9,7 +9,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+import org.jamdev.jdl4pam.transforms.DLTransform;
+import org.jamdev.jdl4pam.transforms.FreqTransform;
+import org.jamdev.jdl4pam.transforms.DLTransform.DLTransformType;
 import org.jamdev.jdl4pam.utils.DLMatFile;
+import org.jamdev.jdl4pam.utils.DLUtils;
 import org.junit.jupiter.api.Test;
 
 import rawDeepLearningClassifier.dlClassification.delphinID.Whistles2Image;
@@ -67,6 +71,24 @@ public class DelphinIDTest {
 					imaged[i][j] = (255-color[0])/255.; //normalize
 				}
 			}
+			
+			ArrayList<DLTransform> transforms = new ArrayList<DLTransform>();
+			transforms.add(new FreqTransform(DLTransformType.SPECRESIZE, new Number[] {Integer.valueOf(64), Integer.valueOf(48)}));
+			
+//			
+//			//set the spec transform
+//			((FreqTransform) transforms.get(0)).setSpecTransfrom(whistles2Image.getSpecTransfrom());
+//
+//			//process all the transforms. 
+//			DLTransform transform = modelTransforms.get(0); 
+//			for (int i =0; i<modelTransforms.size(); i++) {
+//				transform = modelTransforms.get(i).transformData(transform); 
+//			}
+//			
+//			transformedData2 = ((FreqTransform) transform).getSpecTransfrom().getTransformedData(); 
+//			transformedDataStack[j] = DLUtils.toFloatArray(transformedData2); 
+//			
+			
 			
 			//now save this image to a MATFILE
 			// Create MAT file with a scalar in a nested struct
