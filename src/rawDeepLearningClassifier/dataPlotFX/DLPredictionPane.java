@@ -101,6 +101,8 @@ public class DLPredictionPane extends PamBorderPane implements TDSettingsPane {
 		if (dlPredictionPlotInfoFX.getDlControl().getDLModel()!=null) {
 			//populate the prediction pane. 
 			DLClassName[] classNames = dlPredictionPlotInfoFX.getDlControl().getDLModel().getClassNames();
+			
+//			System.out.println("MAKE MY CLASS NAMES: " + dlPredictionPlotInfoFX.getDlControl().getDLModel().getClassNames());
 
 			layoutColourPanes(classNames);
 		}

@@ -58,10 +58,11 @@ public class ArchiveModelWorker extends GenericModelWorker {
 	}
 
 	/**
-	 * Prepare the model 
+	 * Prepare the model.
+	 * Note it is important to put a synchonized here or the model loading can fail. 
 	 */
 	@Override
-	public void prepModel(StandardModelParams dlParams, DLControl dlControl) {
+	public synchronized void prepModel(StandardModelParams dlParams, DLControl dlControl) {
 		//ClassLoader origCL = Thread.currentThread().getContextClassLoader();
 		try {
 
@@ -198,6 +199,7 @@ public class ArchiveModelWorker extends GenericModelWorker {
 	 * @throws IOException
 	 */
 	public ArchiveModel loadModel(String currentPath2) throws MalformedModelException, IOException {
+	
 		return new SimpleArchiveModel(new File(currentPath2)); 
 	}
 

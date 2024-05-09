@@ -1,6 +1,8 @@
 package rawDeepLearningClassifier.dlClassification.delphinID;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.util.ArrayList;
@@ -72,7 +74,7 @@ public class Whistles2Image extends FreqTransform {
 		for (int i=0; i<imaged.length; i++) {
 			for (int j=0; j<imaged[0].length; j++) {
 				color = raster.getPixel(i, j, color);
-				imaged[i][j] = color[0]/255.; //normalize
+				imaged[i][j] = (255-color[0])/255.; //normalize
 			}
 		}
 //		
@@ -116,16 +118,19 @@ public class Whistles2Image extends FreqTransform {
 //			}
 //
 //		}
+//		System.out.println("Whistle group: " + segStart);
 
 		for (int i=0; i<whistleGroup.getSubDetectionsCount(); i++) {
 
 			whistleContour = (AbstractWhistleDataUnit) whistleGroup.getSubDetection(i);
-//			System.out.println("Whistle start time: " + (segStart - whistleContour.getTimeMilliseconds())/1000. +  " end: " + (segStart - whistleContour.getTimeMilliseconds() + whistleContour.getDurationInMilliseconds())/1000.);
-
-
+			
+//			System.out.println("Whistle start time: " + (whistleContour.getTimeMilliseconds()-segStart)/1000. +  " end: " + 
+//			(whistleContour.getTimeMilliseconds() - (segStart + whistleContour.getDurationInMilliseconds()))/1000.  
+//			+ "  millis: " + whistleContour.getTimeMilliseconds() +  " first slice: " + whistleContour.getTimesInSeconds()[0]);
+			
 			double[][] contourD = new double[whistleContour.getSliceCount()][2];
 			for (int j=0; j<whistleContour.getSliceCount(); j++) {
-				contourD[j][0] = (whistleContour.getTimeMilliseconds()-segStart)/1000. + whistleContour.getTimesInSeconds()[j];
+				contourD[j][0] = (whistleContour.getTimeMilliseconds()-segStart)/1000. + (whistleContour.getTimesInSeconds()[j]-whistleContour.getTimesInSeconds()[0]);
 				contourD[j][1] = whistleContour.getFreqsHz()[j];
 			}
 			contours.add(contourD);
@@ -173,7 +178,7 @@ public class Whistles2Image extends FreqTransform {
 	 * @param markerSize - the marker size in pixels
 	 * @return an image with y axis as frequency and x axis as time. 
 	 */
-	private BufferedImage makeScatterImage(ArrayList<double[][]> points, double[] size, double[] xlims, double[] ylims, double markerSize) {
+	public static BufferedImage makeScatterImage(ArrayList<double[][]> points, double[] size, double[] xlims, double[] ylims, double markerSize) {
 
 		BufferedImage canvas = new BufferedImage((int) size[0], (int) size[1], BufferedImage.TYPE_INT_RGB);
 
@@ -187,9 +192,13 @@ public class Whistles2Image extends FreqTransform {
 				x = ((points.get(j)[i][0]-xlims[0])/(xlims[1]-xlims[0]))*size[0];
 				y = ((points.get(j)[i][1]-ylims[0])/(ylims[1]-ylims[0]))*size[1];
 				
-//				System.out.println("Fill oval: x" + x + " y: " + y + " time: " + points.get(j)[i][0]);
+//				System.out.println("Fill oval: x " + x + " y: " + y + " time: " + points.get(j)[i][0]);
+				
+				Graphics2D g2 = (Graphics2D) canvas.getGraphics();
 
-				canvas.getGraphics().fillOval((int) (x+markerSize/2),(int) (y-markerSize/2), (int) markerSize,(int) markerSize);
+		        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+		        g2.fillOval((int) (x+markerSize/2),(int) (y-markerSize/2), (int) markerSize,(int) markerSize);
 			}
 		}
 
@@ -206,6 +215,7 @@ public class Whistles2Image extends FreqTransform {
 		public double[] size;	
 
 	}
+	
 
 
 

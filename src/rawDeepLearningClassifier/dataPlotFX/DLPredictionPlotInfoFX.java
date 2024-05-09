@@ -94,7 +94,7 @@ public class DLPredictionPlotInfoFX extends GenericLinePlotInfo {
 		if (getDlControl().getDLModel()!=null) {
 			DLClassName[] classNames = getDlControl().getDLModel().getClassNames();
 
-//			System.out.println("Class names are: !!! " + (classNames == null ? "null" : classNames.length)); 
+			System.out.println("Class names are: !!! " + (classNames == null ? "null" : classNames.length)); 
 
 			if (classNames!=null) {
 
@@ -105,8 +105,8 @@ public class DLPredictionPlotInfoFX extends GenericLinePlotInfo {
 						dlPredParams.lineInfos[i] = new LineInfo(true, Color.rgb(0, 0, 255%(i*30 + 50)));
 					}
 				}
-
 			}
+			getGraphSettingsPane().setParams();
 		}
 	}
 

@@ -185,7 +185,7 @@ public class GenericDLClassifier extends StandardClassifierModel {
 	 * @param groupedRawData - the grouped raw data. 
 	 */
 	protected void newResult(StandardPrediction modelResult, GroupedRawData groupedRawData) {
-		this.dlControl.getDLClassifyProcess().newModelResult(modelResult, groupedRawData);
+		this.dlControl.getDLClassifyProcess().newRawModelResult(modelResult, groupedRawData);
 	}
 
 
