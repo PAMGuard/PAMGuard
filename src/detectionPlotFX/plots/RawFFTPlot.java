@@ -133,6 +133,7 @@ public abstract class RawFFTPlot<D extends PamDataUnit> extends FFTPlot<D> {
 			reloadImage=true; 
 		}
 		lastData=dataUnit;
+		
 		//three threaded sequences. 1) Load the data
 		//2) generate the image and 3), on the FX thread, paint the image, 
 		if (reloadRaw && detectionPlotDisplay.isViewer()){
@@ -142,19 +143,19 @@ public abstract class RawFFTPlot<D extends PamDataUnit> extends FFTPlot<D> {
 			//Otherwise variables get cleared etc and it;s a mess
 			spectrogram.checkConfig(); 
 			
-			 loadRawData(dataUnit,  fftParams.detPadding,  fftParams.plotChannel); 
+			loadRawData(dataUnit,  fftParams.detPadding,  fftParams.plotChannel); 
 			//rawDataOrder.startRawDataLoad(dataUnit,  fftParams.detPadding,  fftParams.plotChannel);
 			//on a different thread which will call repaint again			
 		}
 		else if (reloadImage && detectionPlotDisplay.isViewer()){
-//			System.out.println("Load IMAGE data: seconds: " + this.rawDataOrder.getRawDataObserver().getRawData().length
-//					+ " for data unit: " + +dataUnit.getUID());
+			System.out.println("Load IMAGE data: seconds: " + this.rawDataOrder.getRawDataObserver().getRawData().length
+					+ " for data unit: " + +dataUnit.getUID());
 			spectrogram.checkConfig(); 
 			startImageLoad(); 
 		}
 		else {
 			//repaint the image!!
-//			System.out.println("PAINT the image for: " +dataUnit.getUID());
+			System.out.println("PAINT the image for: " +dataUnit.getUID());
 			if (detectionPlotDisplay.isViewer()) paintSpecImage(graphicsContext,  rectangle, projector);
 			paintDetections(dataUnit,  graphicsContext,  rectangle, projector) ;
 		}
@@ -177,6 +178,8 @@ public abstract class RawFFTPlot<D extends PamDataUnit> extends FFTPlot<D> {
 		//	if (pamDetection != null) {
 		//		sR = pamDetection.getParentDataBlock().getSampleRate();
 		//	}
+		
+		//TODO - need to get this working
 		projector.setEnableScrollBar(false);
 
 		setupFreqAxis(0, sR/2, projector);
@@ -305,8 +308,8 @@ public abstract class RawFFTPlot<D extends PamDataUnit> extends FFTPlot<D> {
 	 */
 	protected synchronized void loadDataUnitImage(double[] rawData, float sR, int channel, long dataStart, Task task ){
 		
-		System.out.println("RawFFTPlot: Raw data to process: " + rawData.length + " bins:  FFTPlot: hop: " + fftParams.fftLength + " length: " + fftParams.fftHop
-				+ " sampleRate: " + sR);
+//		System.out.println("RawFFTPlot: Raw data to process: " + rawData.length + " bins:  FFTPlot: hop: " + fftParams.fftLength + " length: " + fftParams.fftHop
+//				+ " sampleRate: " + sR);
 
 		this.simpleFFTBlock.setFftHop(fftParams.fftHop);
 		this.simpleFFTBlock.setFftLength(fftParams.fftLength);
@@ -480,11 +483,11 @@ public abstract class RawFFTPlot<D extends PamDataUnit> extends FFTPlot<D> {
 				fftPlotParams.windowFunction!=this.fftParams.windowFunction ||
 				fftPlotParams.normalise!=this.fftParams.normalise) {
 			
-//			Debug.out.println("CheckSettings:  Image needs relaoded: FFTLength: " 
-//					+ (fftPlotParams.fftLength!=this.fftParams.fftLength) + "  FFTHop: "
-//					+ (fftPlotParams.fftHop!=this.fftParams.fftHop)  + "  WindowFunction: "
-//					+ (fftPlotParams.windowFunction!=this.fftParams.windowFunction) + "  Normalise: "
-//					+ (fftPlotParams.normalise!=this.fftParams.normalise) + "  "); 
+			System.out.println("CheckSettings:  Image needs relaoded: FFTLength: " 
+					+ (fftPlotParams.fftLength!=this.fftParams.fftLength) + "  FFTHop: "
+					+ (fftPlotParams.fftHop!=this.fftParams.fftHop)  + "  WindowFunction: "
+					+ (fftPlotParams.windowFunction!=this.fftParams.windowFunction) + "  Normalise: "
+					+ (fftPlotParams.normalise!=this.fftParams.normalise) + "  "); 
 			
 			this.reloadImage=true; 
 		}
@@ -682,6 +685,8 @@ public abstract class RawFFTPlot<D extends PamDataUnit> extends FFTPlot<D> {
 
 		@Override
 		public Coordinate3d getCoord3d(double d1, double d2, double d3) {
+//			PamAxisFX axis = projector.getAxis(Side.LEFT);
+//			System.out.println("d2 : " + d2 + " minmax: " + axis.getMinVal() + "  " + axis.getMaxVal());
 			return projector.getCoord3d(d1,d2,d3); 
 		}
 

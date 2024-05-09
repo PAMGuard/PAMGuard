@@ -7,11 +7,14 @@ import java.io.Serializable;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 
+import Array.ArrayManager;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
+import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import PamModel.PamModuleInfo;
 import metadata.swing.MetaDataDialog;
 
 /**
@@ -44,6 +47,7 @@ public class MetaDataContol extends PamControlledUnit implements PamSettings {
 	public static MetaDataContol getMetaDataControl() {
 		if (singleInstance == null) {
 			singleInstance = new MetaDataContol(unitType);
+			singleInstance.addModuleInfo(); //needed for FX
 			// add this line to add it to the main modules list. Then it will get menu's, etc. 
 			PamController.getInstance().addControlledUnit(singleInstance);	
 		}
@@ -107,6 +111,17 @@ public class MetaDataContol extends PamControlledUnit implements PamSettings {
 			this.pamguardMetaData = newData;
 			// send around a notification ? 
 		}
+	}
+	
+	/**
+	 * Add module info to the array manager. Need to do this to add icon which is used in data model. 
+	 */
+	private void addModuleInfo(){
+		//need to add module info due to fact array manager is a special case
+		PamModuleInfo metaModuleInfo=new PamModuleInfo(unitType, "Handles project metadata", MetaDataContol.class); 
+		metaModuleInfo.setCoreModule(true);
+		metaModuleInfo.addGUICompatabilityFlag(PamGUIManager.FX);
+		this.setPamModuleInfo(metaModuleInfo);
 	}
 
 
