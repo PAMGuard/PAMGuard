@@ -42,7 +42,7 @@ public class Whistles2Image extends FreqTransform {
 		this.setFreqlims(params.freqLimits);
 
 	}
-
+	
 
 	/**
 	 * Convert a group of whistles 
@@ -65,7 +65,7 @@ public class Whistles2Image extends FreqTransform {
 		ArrayList<double[][]> points = whistContours2Points(whistleGroup);
 
 		//does not work becaue it has to be on the AWT thread. 
-		BufferedImage canvas = makeScatterImage(points, size, new double[]{0, whistleGroup.getSegmentDuration()/1000.}, freqLimits,  5.);
+		BufferedImage canvas = makeScatterImage(points, size, new double[]{0, whistleGroup.getSegmentDuration()/1000.}, freqLimits,   10.);
 
 		double[][] imaged = new double[(int) size[0]][(int) size[1]];
 

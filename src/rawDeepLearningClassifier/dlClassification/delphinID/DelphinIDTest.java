@@ -228,7 +228,7 @@ public class DelphinIDTest {
 		String whistleContourPath = "D:/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/testencounter415/whistle_contours.mat";
 
 		//the path to the model
-		String modelPath = "D:/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/testencounter415/whistle_4s_encounter415.zip";
+		String modelPath = "D:/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/testencounter415/whistle_model_2/whistle_4s_415.zip";
 		
 		//the path to the model
 		String matImageSave = "C:/Users/Jamie Macaulay/MATLAB Drive/MATLAB/PAMGUARD/deep_learning/delphinID/whistleimages.mat";
@@ -240,7 +240,7 @@ public class DelphinIDTest {
 		ArrayList<AbstractWhistleDataUnit> whistleContours = getWhistleContoursMAT(whistleContourPath);
 
 		//segment the whistle detections
-		ArrayList<SegmenterDetectionGroup> segments =  segmentWhsitleData(whistleContours,  dataStartMillis, 
+		ArrayList<SegmenterDetectionGroup> segments =  segmentWhsitleData(whistleContours,  (long) (dataStartMillis+(9.565*1000.)), 
 				segLen,  segHop);
 
 		for (int i=0; i<segments.size(); i++) {
@@ -267,11 +267,11 @@ public class DelphinIDTest {
 			float[] output =  predicition.get(0).getPrediction();
 		
 			System.out.println();
-			System.out.print("Segment: " +(aSegment.get(0).getSegmentStartMillis()-dataStartMillis)/1000.);
+			System.out.print("Segment: " + i + " " + (aSegment.get(0).getSegmentStartMillis()-dataStartMillis)/1000. + "s ");
 			for (int j=0; j<output.length; j++) {
 				System.out.print("  " + output[j]); 
 			}
-
+			
 			Matrix image = DLMatFile.array2Matrix(PamArrayUtils.float2Double(model.getLastModelInput()[0]));
 			imageStruct.set("image", i, image);
 			imageStruct.set("startmillis", i, Mat5.newScalar(aSegment.get(0).getSegmentStartMillis()));

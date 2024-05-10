@@ -12,6 +12,7 @@ import org.jamdev.jdl4pam.transforms.DLTransform.DLTransformType;
 import org.jamdev.jdl4pam.transforms.jsonfile.DLTransformsParser;
 import org.jamdev.jdl4pam.utils.DLMatFile;
 import org.jamdev.jdl4pam.utils.DLUtils;
+import org.jamdev.jpamutils.JamArr;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -59,6 +60,7 @@ public class DelphinIDWorker extends  ArchiveModelWorker {
 		for (int i=0; i<dlParams.numClasses; i++) {
 			dlParams.binaryClassification[i]=true;
 		}
+	
 	}
 
 
@@ -93,6 +95,8 @@ public class DelphinIDWorker extends  ArchiveModelWorker {
 				return whistle2ImageParmas;
 			}
 		}
+		
+	
 		
 		//something has gone wrong if we get here. 
 		return null; 
@@ -153,6 +157,8 @@ public class DelphinIDWorker extends  ArchiveModelWorker {
 		float[][][] transformedDataStack = new float[numChunks][][]; 
 
 		double[][] transformedData2; //spectrogram data
+		
+		
 		for (int j=0; j<numChunks; j++) {
 
 //			System.out.println("Number of whistle to process: " + whistleGroups.get(j).getStartSecond() + "s  " +  whistleGroups.get(j).getSubDetectionsCount() + "  " + whistleGroups.get(j).getSegmentStartMillis());
@@ -161,7 +167,7 @@ public class DelphinIDWorker extends  ArchiveModelWorker {
 			Whistles2Image whistles2Image = new Whistles2Image(whistleGroups.get(j), whistleImageParams);
 
 			//set the spec transform
-			((FreqTransform) this.getModelTransforms().get(0)).setSpecTransfrom(whistles2Image.getSpecTransfrom());
+			((FreqTransform) modelTransforms.get(0)).setSpecTransfrom(whistles2Image.getSpecTransfrom());
 
 			//process all the transforms. 
 			DLTransform transform = modelTransforms.get(0); 
@@ -170,6 +176,11 @@ public class DelphinIDWorker extends  ArchiveModelWorker {
 			}
 			
 			transformedData2 = ((FreqTransform) transform).getSpecTransfrom().getTransformedData(); 
+
+			//a bit ugly but works.
+			transformedData2 = JamArr.transposeMatrix(transformedData2);
+
+//			System.out.println("DelphinID input image: " + transformedData2.length + " x " + transformedData2[0].length  );
 			transformedDataStack[j] = DLUtils.toFloatArray(transformedData2); 
 			
 //			//TEMP
