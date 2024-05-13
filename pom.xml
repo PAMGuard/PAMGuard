@@ -711,7 +711,7 @@
 	<dependency>
 	    <groupId>org.xerial</groupId>
 	    <artifactId>sqlite-jdbc</artifactId>
-	    <version>3.28.0</version>
+	    <version>3.45.3.0</version>
 	</dependency>
 
 	<!-- https://mvnrepository.com/artifact/net.sf.ucanaccess/ucanaccess -->
