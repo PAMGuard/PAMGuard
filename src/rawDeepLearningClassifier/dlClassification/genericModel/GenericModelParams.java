@@ -89,6 +89,14 @@ public class GenericModelParams extends StandardModelParams implements Cloneable
 	@Override
 	public boolean equals(Object o) {
 		
+		if (o instanceof GenericModelParams == false) {
+			/* 
+			 * have to add this since the equals function is used in a list comparason
+			 * in the XML output and that list contains objects of different types
+			 * so need to get out HERE or get a classcastexception at the next line
+			 */
+			return false;
+		}
 		GenericModelParams params = (GenericModelParams) o;
 		
 

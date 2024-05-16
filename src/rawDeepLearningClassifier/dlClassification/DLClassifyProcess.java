@@ -537,6 +537,39 @@ public class DLClassifyProcess extends PamInstantProcess {
 
 
 	/**
+	 * Get the result with the highest score. 
+	 * @return model result with the highest score. 
+	 */
+	public PredictionResult getBestModelResult(DLDetection dlDetection) {
+		ArrayList<PredictionResult> results = dlDetection.getModelResults();
+		if (results == null || results.size() == 0) {
+			return null;
+		}
+		/*
+		 *  probably need to improve this function to only look at results
+		 *  that are in a list of used results or something crazy ? 
+		 */
+		
+//		dlControl.getDLModel().;
+		PredictionResult bestResult = null;
+		float bestScore = 0;
+		for (PredictionResult pred : results) {
+			float[] scores = pred.getPrediction();
+			if (scores == null) {
+				continue;
+			}
+			for (int i = 0; i < scores.length; i++) {
+				if (scores[i] > bestScore) {
+					bestScore = scores[i];
+					bestResult = pred;
+				}
+			}
+		}
+		
+		return bestResult;
+	}
+
+	/**
 	 * Clear the data unit buffer. 
 	 */
 	private void clearBuffer(int group) {
@@ -643,6 +676,10 @@ public class DLClassifyProcess extends PamInstantProcess {
 	 */
 	public RawDLParams getDLParams() {
 		return this.dlControl.getDLParams();
+	}
+
+	public DLControl getDLControl() {
+		return dlControl;
 	}
 
 }
