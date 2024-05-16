@@ -6,7 +6,6 @@ import detectionPlotFX.plots.FFTSettingsPane;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
-import pamViewFX.fxNodes.PamSpinner;
 import pamViewFX.fxNodes.PamVBox;
 import whistlesAndMoans.ConnectedRegionDataUnit;
 

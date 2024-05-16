@@ -27,177 +27,14 @@ import whistlesAndMoans.AbstractWhistleDataUnit;
  */
 public class DelphinIDTest {
 
-	public static DelphinIDWorkerTest prepDelphinIDModel(String modelPath) {
 
-		//create the delphinID worker. 
-		DelphinIDWorkerTest delphinIDWorker = new DelphinIDWorkerTest();
-
-		StandardModelParams params = new StandardModelParams();
-		params.modelPath = modelPath;
-
-		//prepare the model
-		delphinIDWorker.prepModel(params, null);
-
-		return delphinIDWorker;
-	}
-
-
-	/**
-	 * Load whistle contours from a MAT file. ()
-	 * 
-	 * @param filePath - the file path. 
-	 * 
-	 * @return a list of whistle contour objects from the mat file. 
-	 */
-	public static ArrayList<AbstractWhistleDataUnit> getWhistleContoursMAT(String filePath){
-
-		ArrayList<AbstractWhistleDataUnit> contours = new ArrayList<AbstractWhistleDataUnit>();
-
-		//		SegmenterDetectionGroup segmenterDetectionGroup = new SegmenterDetectionGroup(0, 0, 0, 0);
-
-		// Read scalar from nested struct
-		try {
-			Mat5File matFile = Mat5.readFromFile(filePath);
-			Struct whistlesStruct = matFile.getStruct("whistles");
-
-			double fftLen = matFile.getMatrix("fftlen").getDouble(0);
-			double fftHop = matFile.getMatrix("ffthop").getDouble(0);
-			double sampleRate = matFile.getMatrix("samplerate").getDouble(0);
-
-			for (int i=0; i< whistlesStruct.getNumElements(); i++) {
-				DataUnitBaseData basicData = new DataUnitBaseData();
-
-				long timeMillis = ((Matrix)whistlesStruct.get("millis", i)).getLong(0);
-				basicData.setTimeMilliseconds(timeMillis);
-
-				long sampleDuration = ((Matrix)whistlesStruct.get("sampleDuration", i)).getLong(0);
-				basicData.setSampleDuration(sampleDuration);
-
-				basicData.setMillisecondDuration(1000.*(sampleDuration/sampleRate));
-
-				int channelMap = ((Matrix)whistlesStruct.get("channelMap", i)).getInt(0);
-				basicData.setChannelBitmap(channelMap);
-
-				long uid = ((Matrix)whistlesStruct.get("UID", i)).getLong(0);
-				basicData.setUID(uid);
-
-				long startSample = ((Matrix)whistlesStruct.get("startSample", i)).getLong(0);
-				basicData.setStartSample(startSample);
-
-				int nSlices = ((Matrix)whistlesStruct.get("nSlices", i)).getInt(0);
-
-				double[] freq = new double[nSlices];
-				double[] times = new double[nSlices];
-
-				Matrix contourStruct = whistlesStruct.getMatrix("contour", i); 
-				for (int j=0; j<nSlices; j++) {
-					freq[j] = contourStruct.getDouble(j)*sampleRate/fftLen; 
-					times[j]  = j * fftHop /sampleRate;
-				}
-
-				contours.add(new WhistleContourMAT(basicData, freq, times)); 
-			}
-
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return contours; 
-	}
-
-
-
-	/**
-	 * Segment the detections into groups. Note that segments are overlaps so each whistle may belong to  multiple segments. 
-	 * @param whistles - a list of whistles - not necessarily sorted by time. 
-	 * @param dataStartMillis - the start time of the data in millis i.e. where the first segment starts. 
-	 * @param segLen - the segment size in milliseconds. 
-	 * @param segHop - the segment hop in milliseconds. 
-	 * @return groups of data units within each segment. 
-	 */
-	public static ArrayList<SegmenterDetectionGroup> segmentWhsitleData(ArrayList<AbstractWhistleDataUnit> whistles, long dataStartMillis, 
-			double segLen, double segHop){
-
-		ArrayList<SegmenterDetectionGroup> group = new ArrayList<SegmenterDetectionGroup>(); 
-
-		//find the maximum whistle time
-		long maxTime = Long.MIN_VALUE;
-		long endTime = 0; 
-		for (AbstractWhistleDataUnit whislte: whistles) {
-			endTime = (long) (whislte.getTimeMilliseconds()+whislte.getDurationInMilliseconds()); 
-			if (endTime>maxTime) maxTime=endTime;
-		}
-
-		long segStart = dataStartMillis;
-		long segEnd = (long) (segStart+segLen);
-
-		long whistleStart; 
-		long whistleEnd;
-		SegmenterDetectionGroup whistleGroup;
-		while (segStart<endTime){
-
-			whistleGroup = new SegmenterDetectionGroup(segStart, 1, segEnd, segLen);
-
-			for (AbstractWhistleDataUnit whislte: whistles) {
-				whistleStart = whislte.getTimeMilliseconds();
-				whistleEnd = (long) (whislte.getTimeMilliseconds() + whislte.getDurationInMilliseconds());
-
-				if ((whistleStart>=segStart && whistleStart<segEnd) || ((whistleEnd>=segStart && whistleEnd<segEnd))){
-					//some part of the whistle is in the segment. 
-					whistleGroup.addSubDetection(whislte);
-				}
-
-			}
-
-			group.add(whistleGroup);
-			
-//			System.out.println("SegStart: " + (segStart - dataStartMillis));
-
-			segStart = (long) (segStart+segHop);
-			segEnd = (long) (segStart+segLen);
-		}
-
-		return group;
-
-	}
-
-	public static class WhistleContourMAT extends AbstractWhistleDataUnit {
-
-		private double[] freq;
-		private double[] times;
-
-		public WhistleContourMAT(DataUnitBaseData basicData, double[] freq, double[] times) {
-			super(basicData);
-			this.freq=freq;
-			this.times=times;
-		}
-
-		@Override
-		public int getSliceCount() {
-			return freq.length;
-		}
-
-		@Override
-		public double[] getTimesInSeconds() {
-			return times;
-		}
-
-		@Override
-		public double[] getFreqsHz() {
-			return freq;
-		}
-
-
-	}
-	
-	
 	public static class DelphinIDWorkerTest extends DelphinIDWorker {
 		
 		private float[][][] lastModelInput;
 
 
 		public float[][][] dataUnits2ModelInput(ArrayList<? extends PamDataUnit> dataUnits, float sampleRate, int iChan){
+			
 			float[][][] data = super.dataUnits2ModelInput(dataUnits, sampleRate, iChan);
 			
 			this.lastModelInput = data;
@@ -237,10 +74,10 @@ public class DelphinIDTest {
 		MatFile matFile = Mat5.newMatFile();
 
 		//get the whislte contours form a .mat file. 
-		ArrayList<AbstractWhistleDataUnit> whistleContours = getWhistleContoursMAT(whistleContourPath);
+		ArrayList<AbstractWhistleDataUnit> whistleContours = DelphinIDUtils.getWhistleContoursMAT(whistleContourPath);
 
 		//segment the whistle detections
-		ArrayList<SegmenterDetectionGroup> segments =  segmentWhsitleData(whistleContours,  (long) (dataStartMillis+(9.565*1000.)), 
+		ArrayList<SegmenterDetectionGroup> segments =  DelphinIDUtils.segmentWhsitleData(whistleContours,  (long) (dataStartMillis+(9.565*1000.)), 
 				segLen,  segHop);
 
 		for (int i=0; i<segments.size(); i++) {
@@ -248,7 +85,7 @@ public class DelphinIDTest {
 		}
 
 		//prepare the model - this loads the zip file and loads the correct transforms. 
-		DelphinIDWorkerTest model = prepDelphinIDModel(modelPath);
+		DelphinIDWorkerTest model = DelphinIDUtils.prepDelphinIDModel(modelPath);
 		model.setEnableSoftMax(false);
 
 		

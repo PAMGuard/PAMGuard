@@ -95,9 +95,7 @@ public class DelphinIDWorker extends  ArchiveModelWorker {
 				return whistle2ImageParmas;
 			}
 		}
-		
-	
-		
+			
 		//something has gone wrong if we get here. 
 		return null; 
 	}

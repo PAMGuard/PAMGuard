@@ -411,6 +411,26 @@ public class PamArrayUtils {
 
 		return new double[] {min, max};
 	}
+	
+	
+	/**
+	 * Calculate the minimum and maximum value of a 2D array. 
+	 * @param arr - the array to find the maximum value of. 
+	 * @return the minimum and maximum value in the array
+	 */
+	public static float[] minmax(float[][] arr) {
+		float max = Float.NEGATIVE_INFINITY;
+		float min = Float.POSITIVE_INFINITY;
+
+		for(int i=0; i<arr.length; i++) {
+			for(int j=0; j<arr[i].length; j++) {
+				max = Math.max(max, arr[i][j]);
+				min = Math.min(min, arr[i][j]);
+			}
+		}
+
+		return new float[] {min, max};
+	}
 
 
 	/**
@@ -1157,6 +1177,7 @@ public class PamArrayUtils {
 		}
 		return arrayOut;
 	}
+
 
 
 

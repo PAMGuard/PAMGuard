@@ -14,7 +14,8 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * A series of classes to load and import data stored in text files (includes .csv files)
+ * Some functions to load and import data stored in text files (includes .csv files)
+ * 
  * @author Jamie Macaulay
  *
  */

@@ -39,13 +39,13 @@ public class PamTabPaneSkin extends TabPaneSkin {
 	 * Button which allows a new tab to be added. 
 	 */
 	private PamButton addTabButton;
-	
+
 	/**
 	 * How many pixels the tab button 'floats' in the header area. 
 	 */
 	public double addButtonInsets=3; 
-	
-	
+
+
 	public PamTabPaneSkin(PamTabPane tabPane) {
 		super(tabPane);
 		this.pamTabPane=tabPane; 
@@ -66,7 +66,7 @@ public class PamTabPaneSkin extends TabPaneSkin {
 
 		//add extra regions to header area
 		headerArea.getChildren().add(addTabButton); 
-	
+
 	}
 
 	/*
@@ -82,7 +82,7 @@ public class PamTabPaneSkin extends TabPaneSkin {
 	public void removeTabEndRegion(Region tabRegion){
 		headerArea.getChildren().remove(tabRegion);
 	}
-	
+
 	/*
 	 * Add the tab start region. This sits in the tab header area, either at the left if the tab pane is horizontal or top if the tab pane is vertical. 
 	 */
@@ -114,23 +114,23 @@ public class PamTabPaneSkin extends TabPaneSkin {
 	 * Set the add button in the correct position
 	 */
 	private void layoutAddButton(){
-		
-			//need to careful here. The width and height of the tab pane don'tr swap on rotation i.e. width of pane remains the axis on which tabs are added. 
-			//Weird but guess the java people decided that would make programming easier. 
-			double insetx=0.; 
-			if (pamTabPane.getSide()==Side.TOP || pamTabPane.getSide()==Side.BOTTOM){
-				addTabButton.layoutXProperty().setValue(tabContentArea.getWidth()+insetx+headerArea.getPadding().getLeft()+addButtonInsets);
-				addTabButton.layoutYProperty().setValue(headerArea.getHeight()-tabContentArea.getHeight()+addButtonInsets);
-				addTabButton.resize(tabContentArea.getHeight()-4, tabContentArea.getHeight()-addButtonInsets*2);	
-			}
-			else{
-				//yep, this makes no sense but works when tabs are vertical. 
-				addTabButton.layoutXProperty().setValue(headerArea.getWidth()-tabContentArea.getWidth()-tabContentArea.getHeight()-headerArea.getPadding().getTop());
-				addTabButton.layoutYProperty().setValue(headerArea.getHeight()-tabContentArea.getHeight());
-				addTabButton.resize(tabContentArea.getHeight(),tabContentArea.getHeight());	
-			}
-			
-//			System.out.println("tab Content area width: " +tabContentArea.getWidth()+" tab Content area height: "+tabContentArea.getHeight()+ " addTabButton.layoutYProperty()" +addTabButton.layoutYProperty().getValue());
+
+		//need to careful here. The width and height of the tab pane don'tr swap on rotation i.e. width of pane remains the axis on which tabs are added. 
+		//Weird but guess the java people decided that would make programming easier. 
+		double insetx=0.; 
+		if (pamTabPane.getSide()==Side.TOP || pamTabPane.getSide()==Side.BOTTOM){
+			addTabButton.layoutXProperty().setValue(tabContentArea.getWidth()+insetx+headerArea.getPadding().getLeft()+addButtonInsets);
+			addTabButton.layoutYProperty().setValue(headerArea.getHeight()-tabContentArea.getHeight()+addButtonInsets);
+			addTabButton.resize(tabContentArea.getHeight()-4, tabContentArea.getHeight()-addButtonInsets*2);	
+		}
+		else{
+			//yep, this makes no sense but works when tabs are vertical. 
+			addTabButton.layoutXProperty().setValue(headerArea.getWidth()-tabContentArea.getWidth()-tabContentArea.getHeight()-headerArea.getPadding().getTop());
+			addTabButton.layoutYProperty().setValue(headerArea.getHeight()-tabContentArea.getHeight());
+			addTabButton.resize(tabContentArea.getHeight(),tabContentArea.getHeight());	
+		}
+
+		//			System.out.println("tab Content area width: " +tabContentArea.getWidth()+" tab Content area height: "+tabContentArea.getHeight()+ " addTabButton.layoutYProperty()" +addTabButton.layoutYProperty().getValue());
 
 	}
 
@@ -153,24 +153,24 @@ public class PamTabPaneSkin extends TabPaneSkin {
 		double startHeaderSize;
 		double endHeadersize;
 		if (pamTabPane.getSide()==Side.TOP || pamTabPane.getSide()==Side.BOTTOM){
-			 startHeaderSize  = (pamTabPane.getTabStartRegion()==null)  ? in.getLeft() : getRegionWidth(pamTabPane.getTabStartRegion()); 
-			 endHeadersize = (pamTabPane.getTabEndRegion()==null) ? in.getRight():  getRegionWidth(pamTabPane.getTabEndRegion()); 
-			 //set padding of tab header to make space for any added buttons
-			 headerArea.setPadding(new Insets(
-					 in.getTop(),
-					 endHeadersize,
-					 in.getBottom(),
-					 startHeaderSize));
+			startHeaderSize  = (pamTabPane.getTabStartRegion()==null)  ? in.getLeft() : getRegionWidth(pamTabPane.getTabStartRegion()); 
+			endHeadersize = (pamTabPane.getTabEndRegion()==null) ? in.getRight():  getRegionWidth(pamTabPane.getTabEndRegion()); 
+			//set padding of tab header to make space for any added buttons
+			headerArea.setPadding(new Insets(
+					in.getTop(),
+					endHeadersize,
+					in.getBottom(),
+					startHeaderSize));
 		}
 		else {
-			 startHeaderSize  = (pamTabPane.getTabStartRegion()==null)  ? in.getTop() :  pamTabPane.getTabStartRegion().getHeight(); 
-			 endHeadersize = (pamTabPane.getTabEndRegion()==null) ? in.getBottom():  pamTabPane.getTabEndRegion().getHeight(); 
-			 //set padding of tab header to make space for any added buttons
-			 headerArea.setPadding(new Insets(
-					 startHeaderSize,
-					 in.getRight(),
-					 endHeadersize,
-					 in.getLeft()));
+			startHeaderSize  = (pamTabPane.getTabStartRegion()==null)  ? in.getTop() :  pamTabPane.getTabStartRegion().getHeight(); 
+			endHeadersize = (pamTabPane.getTabEndRegion()==null) ? in.getBottom():  pamTabPane.getTabEndRegion().getHeight(); 
+			//set padding of tab header to make space for any added buttons
+			headerArea.setPadding(new Insets(
+					startHeaderSize,
+					in.getRight(),
+					endHeadersize,
+					in.getLeft()));
 		}
 
 		//layout additional header regions for start
@@ -210,14 +210,14 @@ public class PamTabPaneSkin extends TabPaneSkin {
 		//System.out.println("Hello "+hello.getWidth()+" "+headerArea.getWidth()+ "  "+tabContentArea.getWidth());	 
 
 	}
-	
+
 	private double getRegionWidth(Region region){
 		double regionWidth=50; 
 		if (region.getMinWidth()>0) regionWidth=region.getMinWidth();
 		if (region.getPrefWidth()>0) regionWidth=region.getPrefWidth();
 		return regionWidth; 
 	}
-	
+
 	private double getRegionHeight(Region region){
 		double regionHeight=50; 
 		if (region.getMinHeight()>0) regionHeight=region.getMinHeight();
@@ -240,7 +240,7 @@ public class PamTabPaneSkin extends TabPaneSkin {
 	public double getHeaderHeight() {
 		return headerArea.getHeight();
 	}
-	
+
 	/**
 	 * Get the height property of the header. 
 	 * @return the height property of the header. 
@@ -248,6 +248,20 @@ public class PamTabPaneSkin extends TabPaneSkin {
 	public ReadOnlyDoubleProperty getHeaderHeightProperty(){
 		return headerArea.heightProperty();
 	}
-	
+
+	public void setAddTabButton(boolean addTabButton2) {
+		if (addTabButton2){
+			if (!headerArea.getChildren().contains(addTabButton)) {
+				headerArea.getChildren().remove(addTabButton); 
+				layoutAddButton();
+			}
+		}
+		else {
+			headerArea.getChildren().remove(addTabButton); 
+		}
+
+
+	}
+
 
 }
