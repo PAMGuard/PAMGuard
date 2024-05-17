@@ -224,28 +224,34 @@ public class DelphinIDUtils {
 
 		//segment the whistle detections
 		ArrayList<SegmenterDetectionGroup> segments =  DelphinIDUtils.segmentWhsitleData(whistles,  whistles.get(0).getTimeMilliseconds(), segLen, segHop);
-
+		
 		float[][][] images = worker.dataUnits2ModelInput(segments,  (float) sampleRate,  0);
 
 		float[][] image;
 		BufferedImage bfImage;
+		double density;
 		for (int k=0; k<images.length; k++) {
+			
+			if (segments.get(k).getSubDetectionsCount()<1) {
+				continue;
+			}
 			image = images[k];
 
-			bfImage = new BufferedImage(image.length, image[0].length, BufferedImage.TYPE_INT_RGB);
-			
-//			System.out.println("Max of image: " + PamArrayUtils.minmax(image)[1]);
+			bfImage = new BufferedImage(image[0].length, image.length, BufferedImage.TYPE_INT_RGB);
+
+			//			System.out.println("Max of image: " + PamArrayUtils.minmax(image)[1]);
 
 			for(int i = 0; i < image.length; i++) {
 				for(int j = 0; j < image[0].length; j++) {
 					Color myRGB = new Color(image[i][j], image[i][j], image[i][j]);
 					int rgb = myRGB.getRGB();
-					bfImage.setRGB(i, j, rgb);
+					bfImage.setRGB(j,i, rgb);
 				}
 			}
 
+			density = getDensity(segments.get(k)); 
 			//now save the image 
-			String outputPath = outName + "_" + k + ".png";
+			String outputPath = String.format("%s_d%.2f_%d.png", outName, density, k);
 
 			File outputfile = new File(outputPath);
 
@@ -255,29 +261,50 @@ public class DelphinIDUtils {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-
 		}
-
-
-
+	}
+	
+	/**
+	 * Calculate the density of whistles for a segmenter group in the absence of a known fft length and hop. 
+	 * @param group - the group
+	 * @return
+	 */
+	private static double getDensity(SegmenterDetectionGroup group) {
+		//number of whistle bins/number of time bins
+		ArrayList<double[][]> contour = Whistles2Image.whistContours2Points(group);
+		
+		//time bin length from the first contour
+		double[] times = new double[contour.get(0).length-1];
+		for (int i=0; i<times.length; i++) {
+			times[i]=1000.*(contour.get(0)[i+1][0] - contour.get(0)[i][0]);
+		}
+		
+		double timebinMillis = PamArrayUtils.mean(times);
+		
+		double nBins = group.getSegmentDuration()/timebinMillis;
+		
+		double nwhistleBins = 0;
+		for (int i=0; i<contour.size(); i++) {
+			nwhistleBins+=contour.get(i).length;
+		}
+		
+//		System.out.println("nwhistleBins: " +nwhistleBins + "nBins: " + nBins + " timebinMillis: " + timebinMillis);
+			
+		return nwhistleBins/nBins;
 	}
 
-	public static void main(String[] args) {
-
-		//the whsitle contours as csv files.
-		String whistlefolder = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/training/WMD";
-
-		//the image folder to save to.
-		String imageFolder = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/training/WMD_Images";
-
-		//the path to the model
-		String modelPath = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/testencounter415/whistle_model_2/whistle_4s_415.zip";
-
-		//prepare the model - this loads the zip file and loads the correct transforms. 
-		DelphinIDWorkerTest model;
-		
-		model = DelphinIDUtils.prepDelphinIDModel(modelPath);
+	/**
+	 * Generate training images for DelphinID
+	 * @param modelPath
+	 * @param whistlefolder
+	 * @param imageFolder
+	 * @param lineWidth - the line width in pixels to use
+	 */
+	private static void generateTrainingData(String modelPath, String whistlefolder, String imageFolder, double lineWidth) {
+		DelphinIDWorkerTest model = DelphinIDUtils.prepDelphinIDModel(modelPath);
 		model.setEnableSoftMax(false);
+
+		model.getWhistleImageParams().lineWidth=lineWidth;
 
 		FileList filelist = new FileList();
 
@@ -291,12 +318,17 @@ public class DelphinIDUtils {
 
 					System.out.println("Directory " + listOfFiles[i].getName());
 
-					File outFolder = new File(imageFolder + File.separator + listOfFiles[i].getName());
-					outFolder.mkdir();//make the out folder directory
+
 
 					try {
 
 						File file  = new File(listOfFiles[i].getPath() + File.separator + "whistles.mat");
+
+						if (!file.exists()) {
+							System.out.println("No whistles.mat for " + listOfFiles[i].getName()); 
+							continue;
+						}
+
 						Mat5File matFile = Mat5.readFromFile(file);
 
 						Struct whistlesStruct = matFile.getStruct("whistles");
@@ -307,11 +339,15 @@ public class DelphinIDUtils {
 
 						List<String> fieldNames = whistlesStruct.getFieldNames();
 
+						File outFolder = new File(imageFolder + File.separator + listOfFiles[i].getName());
+						outFolder.mkdir();//make the out folder directory
+
 						Struct whistecontours;
 						for (String name: fieldNames) {
-							System.out.println("Generating images for recording " + name + " from " + listOfFiles[i].getName());
+							System.out.println("Generating images for recording " + name + " from " + listOfFiles[i].getName() + " " + lineWidth);
 							if (!name.equals("fftlen") && !name.equals("ffthop") && !name.equals("samplerate")) {
 								whistecontours = whistlesStruct.get(name);
+
 								generateImages( whistecontours,  (outFolder + File.separator + name) , model, fftLen, fftHop, sampleRate);
 							}
 						}
@@ -324,6 +360,34 @@ public class DelphinIDUtils {
 
 				}
 			}
+		}
+	}
+
+	public static void main(String[] args) {
+
+		//		double[] density = new double[] {0.15 - 1.5}; 
+
+		//number of whistle bins/number of time bins; either 16 or 21
+		//the e contours as csv files.
+		//		String whistlefolder = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/training/WMD";
+//		String whistlefolder = "D:/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/training/WMD_examples/contours";
+		String whistlefolder = "D:/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/training/WMD/contours";
+
+		//the image folder to save to.
+		//		String imageFolder = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/training/WMD_Images";
+//		String imageFolder = "D:/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/training/WMD_examples/images";
+		String imageFolder = "C:/Users/Jamie Macaulay/Desktop/Tristan_training_images/contour_images";
+
+		//the path to the model
+		//		String modelPath = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/testencounter415/whistle_model_2/whistle_4s_415.zip";
+		String modelPath = "D:/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/testencounter415/whistle_model_2/whistle_4s_415.zip";
+
+		double[] lineWidths = new double[] {6, 7, 10, 15, 20};
+
+		for (double lineWidth:lineWidths) {
+			String imageFolderWidth = (imageFolder + "_"+ String.format("%d",(int)lineWidth));
+			new File(imageFolderWidth).mkdir();
+			generateTrainingData( modelPath,  whistlefolder,  imageFolderWidth, lineWidth);
 		}
 	}
 

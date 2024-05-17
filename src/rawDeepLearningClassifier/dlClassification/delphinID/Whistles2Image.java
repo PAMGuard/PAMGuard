@@ -36,7 +36,7 @@ public class Whistles2Image extends FreqTransform {
 		//		double[] freqLimits = 	new double[] {params[0].doubleValue(), params[1].doubleValue()};
 		//		double[] size =			new double[] {params[2].doubleValue(), params[3].doubleValue()};
 
-		SpecTransform specTransform = whistleGroupToImage( whistleGroup,  params.freqLimits, params.size);
+		SpecTransform specTransform = whistleGroupToImage( whistleGroup,  params.freqLimits, params.size, params.lineWidth);
 
 		this.setSpecTransfrom(specTransform);
 		this.setFreqlims(params.freqLimits);
@@ -50,7 +50,7 @@ public class Whistles2Image extends FreqTransform {
 	 * @param freqLimits - the frequency limits
 	 * @return the spectrogram transform. 
 	 */
-	private SpecTransform whistleGroupToImage(SegmenterDetectionGroup whistleGroup, double[] freqLimits, double[] size) {
+	private SpecTransform whistleGroupToImage(SegmenterDetectionGroup whistleGroup, double[] freqLimits, double[] size, double lineWidth) {
 
 		SpecTransform specTransform = new SpecTransform(); 
 
@@ -65,7 +65,7 @@ public class Whistles2Image extends FreqTransform {
 		ArrayList<double[][]> points = whistContours2Points(whistleGroup);
 
 		//does not work becaue it has to be on the AWT thread. 
-		BufferedImage canvas = makeScatterImage(points, size, new double[]{0, whistleGroup.getSegmentDuration()/1000.}, freqLimits,   10.);
+		BufferedImage canvas = makeScatterImage(points, size, new double[]{0, whistleGroup.getSegmentDuration()/1000.}, freqLimits, lineWidth);
 
 		double[][] imaged = new double[(int) size[0]][(int) size[1]];
 
@@ -90,9 +90,9 @@ public class Whistles2Image extends FreqTransform {
 	/**
 	 * Convert a list of whistle contours to a list of time and frequency points. 
 	 * @param whistleGroup - list of whistle contours within a detection group. 
-	 * @return an array with time (milliseconds from start of group) and frequency (Hz)
+	 * @return an array with time (seconds from start of group) and frequency (Hz)
 	 */
-	private ArrayList<double[][]> whistContours2Points(SegmenterDetectionGroup whistleGroup) {
+	public static ArrayList<double[][]> whistContours2Points(SegmenterDetectionGroup whistleGroup) {
 
 		ArrayList<double[][]> contours = new ArrayList<double[][]>();
 
@@ -212,7 +212,12 @@ public class Whistles2Image extends FreqTransform {
 		 */
 		public double[] freqLimits;
 
-		public double[] size;	
+		public double[] size;
+		
+		/**
+		 * The line width to draw in pixels
+		 */
+		public double lineWidth = 10;
 
 	}
 	

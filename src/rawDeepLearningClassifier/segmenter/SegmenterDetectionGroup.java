@@ -50,6 +50,10 @@ public class SegmenterDetectionGroup extends GroupDetection<PamDataUnit> {
 		return segMillis;
 	}
 	
+	/**
+	 * Get the segment duration in milliseconds. 
+	 * @return the segment duration in millis. 
+	 */
 	public double getSegmentDuration() {
 		return segDuration;
 	}

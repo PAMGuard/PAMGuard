@@ -42,6 +42,15 @@ public class DelphinIDWorker extends  ArchiveModelWorker {
 	 */
 	private Whistle2ImageParams whistleImageParams;
 
+	/**
+	 * Get the whislte to image parameters. 
+	 * 
+	 * @return
+	 */
+	public Whistle2ImageParams getWhistleImageParams() {
+		return whistleImageParams;
+	}
+
 
 	@Override
 	public void prepModel(StandardModelParams dlParams, DLControl dlControl) {
@@ -87,10 +96,12 @@ public class DelphinIDWorker extends  ArchiveModelWorker {
 				freqLimits[1] = jsonObjectParams.getFloat("maxfreq"); 
 				size[0] = jsonObjectParams.getInt("widthpix"); 
 				size[1] = jsonObjectParams.getInt("heightpix"); 
+				double lineWidth = jsonObjectParams.getDouble("linewidthpix"); 
 
 				Whistle2ImageParams whistle2ImageParmas = new Whistle2ImageParams();
 				whistle2ImageParmas.freqLimits = freqLimits;
 				whistle2ImageParmas.size = size;
+				whistle2ImageParmas.lineWidth = lineWidth;
 
 				return whistle2ImageParmas;
 			}
