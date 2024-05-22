@@ -185,10 +185,18 @@ public class PamArrayUtils {
 	public static double median(double[] numArray) {
 		Arrays.sort(numArray);
 		double median;
-		if (numArray.length % 2 == 0)
-			median = ((double)numArray[numArray.length/2] + (double) numArray[numArray.length/2 - 1])/2;
-		else
-			median = (double) numArray[numArray.length/2];
+		int n = numArray.length;
+		if (n == 0) {
+			return 0;
+		}
+		if (n % 2 == 0) {
+			n/=2;
+			median = ((double)numArray[n] + (double) numArray[n - 1])/2;
+		}
+		else {
+			n/=2;
+			median = (double) numArray[n];
+		}
 
 		return median;
 	}
