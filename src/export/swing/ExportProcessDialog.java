@@ -1,6 +1,5 @@
 package export.swing;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -11,14 +10,10 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
-import javax.swing.Icon;
-import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.JTextField;
@@ -29,13 +24,13 @@ import javax.swing.border.TitledBorder;
 
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.fileicons.FileIcons;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import PamController.PamController;
 import PamUtils.PamFileChooser;
 import PamView.dialog.PamButton;
+import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamView.panel.PamPanel;
 import PamguardMVC.PamDataBlock;
@@ -43,6 +38,7 @@ import export.PamExporterManager;
 import export.layoutFX.ExportParams;
 import offlineProcessing.OLProcessDialog;
 import offlineProcessing.OfflineTaskGroup;
+import offlineProcessing.TaskStatus;
 
 /**
  * Handles an offline dialog for processing offline data and exporting to bespoke file types.
@@ -150,20 +146,26 @@ public class ExportProcessDialog {
 
 		public ExportOLDialog(Window parentFrame, OfflineTaskGroup taskGroup, String title) {
 			super(parentFrame, taskGroup, title);
-			// TODO Auto-generated constructor stub
 
+			//remove the notes panel - don't need this for export. 
+			super.removeNotePanel();
+			//remove delete database entried - not used. 
+			super.getDeleteOldDataBox().setVisible(false);
+
+			//construc tthe panel. 
 			PamPanel mainPanel = new PamPanel();
+
 			mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
 			mainPanel.setBorder(new TitledBorder("Export Settings"));
 
 			buttonGroup = new ButtonGroup();
 
 			PamPanel buttonPanel = new PamPanel();
-			
+
 			ActionListener listener = actionEvent -> {
-				System.out.println(actionEvent.getActionCommand() + " Selected");
+//				System.out.println(actionEvent.getActionCommand() + " Selected");
 				//TODO set the buttons to be disabled or enabled. 
-				
+				enableTasks(getExportSelection());
 			};
 
 			exportButtons = new JToggleButton[exportManager.getNumExporters()];
@@ -178,7 +180,7 @@ public class ExportProcessDialog {
 				b.setIcon(icon);
 
 				b.addActionListener(listener);
-				
+
 				exportButtons[i]=b;
 				buttonGroup.add(b);
 				buttonPanel.add(b);
@@ -192,8 +194,8 @@ public class ExportProcessDialog {
 			c.gridy = 0; 
 
 			addComponent(p, exportTo = new JTextField(), c);
-			exportTo.setMinimumSize(new Dimension(170, 25));
-			exportTo.setPreferredSize(new Dimension(170, 25));
+			exportTo.setMinimumSize(new Dimension(180, 25));
+			exportTo.setPreferredSize(new Dimension(180, 25));
 
 			c.gridx +=3;
 			c.gridwidth = 1;
@@ -216,33 +218,50 @@ public class ExportProcessDialog {
 			c.gridx = 1;
 			c.gridy++;
 			c.gridwidth = 2;
-			
+
 			JLabel label = new JLabel("Maximum file size", SwingConstants.RIGHT);
 			addComponent(p, label, c);
 
 			c.gridwidth = 1;
 			c.gridx +=2;
-			
+
 			SpinnerListModel list = new SpinnerListModel(new Double[] {10.,30., 60., 100., 200., 300., 600., 1000.});
-			
+
 			spinner = new JSpinner(list);
 			//don't want the user to to able to set values
 			((DefaultEditor) spinner.getEditor()).getTextField().setEditable(false);
 			spinner.setBounds(50, 80, 70, 100);
 			addComponent(p, spinner, c);
-			
+
 			c.gridx ++;
 			addComponent(p, new JLabel("MB"), c);
 
-		
-			
+
+
 			mainPanel.add(p);
 			mainPanel.add(buttonPanel);
 
 			//add the main panel at a different index. 
 			getMainPanel().add(mainPanel, 1);
+
+			pack();
+
 		}	
 
+
+		/**
+		 * Enable which task are disables and enabled. 
+		 * @param exportSelection
+		 */
+		private void enableTasks(int exportSelection) {
+			this.currentParams = getExportParams();
+			exportManager.setExportParams(currentParams);
+//			ExportTask task;
+//			for (int i=0; i<this.getTaskGroup().getNTasks(); i++) {
+//				task = (ExportTask) this.getTaskGroup().getTask(i);
+//			}
+			enableControls();
+		}
 
 
 		private Ikon getIconFromString(String iconString) {
@@ -262,20 +281,57 @@ public class ExportProcessDialog {
 			case "mdi2f-file-music":
 				icon=MaterialDesignF.FILE_MUSIC;
 				break;
+			case "mdi2f-file-table-outline":
+				icon=MaterialDesignF.FILE_TABLE_OUTLINE;
+				break;
 			}
 			return icon;
 		}
 		
+		private int getExportSelection() {
+			int sel=-1;
+			for (int i=0; i<exportButtons.length; i++) {
+				if (this.exportButtons[i].isSelected()) {
+					sel=i;
+					break;
+				}
+			}
+			return sel;
+		}
+
+		
 		public ExportParams getExportParams() {
+			currentParams.folder = null;
 			
-	
+			if (exportTo.getText().length()>0) {
+
+				File file = new File(exportTo.getText());
+
+				if (!(file.exists() && file.isDirectory())) {
+					currentParams.folder = null;
+				}
+				else {
+					currentParams.folder  = file.getAbsolutePath();
+				}
+			}
+			
+			currentParams.exportChoice =  getExportSelection();
+			currentParams.maximumFileSize = (Double) spinner.getValue();
+			
 			return currentParams;
 		}
-		
+
 		@Override
 		public boolean getParams() {
 			//make sure we update the current paramters before processing starts. 
 			this.currentParams = getExportParams();
+			exportManager.setExportParams(currentParams);
+
+			if (this.currentParams.folder==null) {
+				return PamDialog.showWarning(super.getOwner(), "No folder or file selected", "You must select an output folder");
+			}
+
+
 			return super.getParams();
 		}
 
@@ -286,7 +342,13 @@ public class ExportProcessDialog {
 
 			buttonGroup.clearSelection();
 			exportButtons[params.exportChoice].setSelected(true);
+			
+			exportTo.setText(currentParams.folder);
+			
+			spinner.setValue(currentParams.maximumFileSize);
 		}
+
+
 
 	}
 
@@ -304,6 +366,7 @@ public class ExportProcessDialog {
 			return "Export Data";
 		}
 	}
+	
 
 
 

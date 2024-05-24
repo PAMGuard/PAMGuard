@@ -2,13 +2,20 @@ package export.MLExport;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.zip.Deflater;
 
+import PamUtils.PamCalendar;
 import PamguardMVC.PamDataUnit;
 import export.PamDataUnitExporter;
 import us.hebi.matlab.mat.format.Mat5;
 import us.hebi.matlab.mat.format.Mat5File;
+import us.hebi.matlab.mat.format.Mat5Writer;
 import us.hebi.matlab.mat.types.Matrix;
 import us.hebi.matlab.mat.types.Sink;
 import us.hebi.matlab.mat.types.Sinks;
@@ -24,12 +31,20 @@ import us.hebi.matlab.mat.util.Casts;
 public class MLDetectionsManager implements PamDataUnitExporter {
 	
 	public static final String extension = "mat";
+	
+    // Creating date format
+    public static SimpleDateFormat dataFormat = new SimpleDateFormat(
+        "yyyyMMdd_HHmmss_SSS");
 
 	/**
 	 * 
 	 * All the possible MLDataUnitExport export classes. 
 	 */
-	ArrayList<MLDataUnitExport> mlDataUnitsExport = new ArrayList<MLDataUnitExport>(); 
+	ArrayList<MLDataUnitExport> mlDataUnitsExport = new ArrayList<MLDataUnitExport>();
+
+	private Sink sink;
+
+	private File currentFile; 
 
 
 	public MLDetectionsManager(){
@@ -55,12 +70,60 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 	@Override
 	public boolean exportData(File fileName, List<PamDataUnit> dataUnits, boolean append) {
 		
+		System.out.println("Export: " + dataUnits.size() + " data units " + append);
+		
+		if (dataUnits==null || dataUnits.size()<1) {
+			//nothing to write but no error. 
+			return true;
+		}
 		
 		try {
-			Mat5File matFile = Mat5.newMatFile();
-			Sink sink = Sinks.newMappedFile(fileName,  Casts.sint32(1000000));
+			
+			Struct dataUnitsStruct = dataUnits2MAT(dataUnits);
+			
+		    // then
+			PamDataUnit minByTime = dataUnits
+		      .stream()
+		      .min(Comparator.comparing(PamDataUnit::getTimeMilliseconds))
+		      .orElseThrow(NoSuchElementException::new);
+			
+			//matlab struct must start with a letter. 
+	        Date date = new Date(minByTime.getTimeMilliseconds());
+			String entryName = "det_" + dataFormat.format( date);
+								
+			//is there an existing sink? Is that sink writing to the correct file?
+			if (sink==null || !fileName.equals(currentFile)) {
+				
+				System.out.println("Export: " + dataUnitsStruct.getNumDimensions() + entryName);
+				
+				currentFile = fileName;
 
-			matFile.writeTo(sink);//Streams the data into a MAT file?
+				//create the sink for the next data so it can be appended to the file. 
+				sink = Sinks.newStreamingFile(fileName);
+				
+				//create the Mat File - gets all the headers right etc. 
+				Mat5File matFile = Mat5.newMatFile();
+				matFile.addArray(entryName, dataUnitsStruct);
+//				matFile.addArray("two", Mat5.newScalar(2));
+
+				matFile.writeTo(sink);
+				
+				matFile.close();
+			
+			}
+			else {
+				//write to the mat file without loading all contents into memory. 
+				Mat5Writer writer = Mat5.newWriter(sink);
+				
+				writer
+				.writeArray(entryName, dataUnitsStruct)              
+				.setDeflateLevel(Deflater.NO_COMPRESSION);
+//				.writeArray("three", Mat5.newScalar(2));
+
+				writer.flush();
+			}
+
+			return true;
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -68,7 +131,6 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 			return false;
 		}
 		
-		return false;
 	}
 
 	/**
