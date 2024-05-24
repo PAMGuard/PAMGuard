@@ -75,8 +75,10 @@ public class DetectionGroupDisplayFX extends DetectionGroupDisplay  implements U
 
 	@Override
 	public void closeNode() {};
+	
 	@Override
 	public DetectionPlotParams getDisplayParams() {		
+		
 		return this.detectionPlotParams;
 	}
 	
@@ -85,6 +87,8 @@ public class DetectionGroupDisplayFX extends DetectionGroupDisplay  implements U
 			detectionPlotParams.dataSource = displayControl.getUserDisplayProcess().getParentDataBlock().getLongDataName();
 		}
 		else detectionPlotParams.dataSource = null;
+		
+		detectionPlotParams.showScrollBar = this.isEnableScrollBar();
 		
 		if (this.internalFrame!=null) {
 			 //need to use the parent node because inside an internal pane. 
@@ -189,6 +193,10 @@ public class DetectionGroupDisplayFX extends DetectionGroupDisplay  implements U
 //		System.out.println("LOAD DETECTION DISPLAY DATA SOURCE: " + settings.tabName);
 		
 		this.detectionPlotParams = settings.clone();	
+		
+		
+		this.setEnableScrollBar(detectionPlotParams.showScrollBar);
+		
 		return true;
 	}
 
@@ -213,10 +221,9 @@ public class DetectionGroupDisplayFX extends DetectionGroupDisplay  implements U
 		/**
 		 * The extra stuff here is to make sure that the plot types for a specific detection are saved. So for example 
 		 * if viewing click spectrum then the spectrum plot is selected whenever 1) PAMGuard is opened again or 2) switching from
-		 * one type of detection ot another e.g. whistle to click, then the click does nto revert to shwoing a waveform instead 
+		 * one type of detection to another e.g. whistle to click, then the click does not revert to showing a waveform instead 
 		 * of spectrum. 
 		 */
-				
 		if (currentDetection!=null) {
 			//save the current selected detection plot for the particular type of data unit.
 			String detectionPlotName = 	this.getDetectionDisplay().getCurrentDataInfo().getCurrentDetectionPlot().getName();

@@ -118,8 +118,17 @@ public class DetectionGroupDisplay extends PamBorderPane {
 	/**
 	 * Hiding pane for the plot settings. 
 	 */
-	private HidingPane hidingPane; 
-	
+	private HidingPane hidingPane;
+
+	/**
+	 * Flag for how the deteciton plot is laid out.  
+	 */
+	private int layoutType = DISPLAY_EXTENDED;
+
+	/**
+	 * Toggle switch for showing the scroll pane. 
+	 */
+	private PamToggleSwitch showScrollSwitch;
 	
 	/**
 	 * Constructor for the detection group display. 
@@ -127,6 +136,7 @@ public class DetectionGroupDisplay extends PamBorderPane {
 	public DetectionGroupDisplay() {
 		//create hash map to map DDDataInfos to datablocks for quick access. 
 		dDataInfoHashMap = new HashMap<PamDataBlock, DDDataInfo>(); 
+		this.layoutType = DISPLAY_EXTENDED;
 		createDetectionDisplay(DISPLAY_EXTENDED);
 		this.setCenter(detectionDisplayHolder);
 	}
@@ -136,9 +146,11 @@ public class DetectionGroupDisplay extends PamBorderPane {
 	 * @param layoutType - the layout of the display - e.g. DetectionGroupDisplay.DISPLAY_COMPACT
 	 */
 	public DetectionGroupDisplay(int layoutType) {
+		this.layoutType = layoutType;
+
 		//create hash map to map DDDataInfos to datablocks for quick access. 
 		dDataInfoHashMap = new HashMap<PamDataBlock, DDDataInfo>(); 
-		createDetectionDisplay(DISPLAY_COMPACT);
+		createDetectionDisplay(layoutType);
 		this.setCenter(detectionDisplayHolder);
 	}
 
@@ -241,7 +253,7 @@ public class DetectionGroupDisplay extends PamBorderPane {
 			gridPane.add(new Label("Plot type"), 0, 0);
 			gridPane.add(detectionDisplay.getDataTypePane(), 1, 0);
 			
-			PamToggleSwitch showScrollSwitch = new PamToggleSwitch("Show scroll bar");
+			showScrollSwitch = new PamToggleSwitch("Show scroll bar");
 			showScrollSwitch.selectedProperty().addListener((obsVal, oldVal, newVal)->{
 				//show or hide the scroll bar. 
 				this.setEnableScrollBar(newVal);
@@ -570,11 +582,23 @@ public class DetectionGroupDisplay extends PamBorderPane {
 
 	
 	/**
-	 * Show the scroll bar which allows the user to chnage time limits. 
+	 * Show the scroll bar which allows the user to change time limits. 
 	 * @param enableScrollBarPane - true to enable the time scroll bar. 
 	 */
 	public void setEnableScrollBar(boolean enableScrollBarPane) {
-		this.detectionDisplay.setEnableScrollBar(enableScrollBarPane);
+		if (this.layoutType==DISPLAY_COMPACT) {
+			showScrollSwitch.setSelected(enableScrollBarPane);
+		}
+		detectionDisplay.setEnableScrollBar(enableScrollBarPane);
+		detectionDisplay.setupScrollBar();
+	}
+	
+	/**
+	 * Check whether the scroll bar is changing. The scroll bar allows the user to change time limits. 
+	 * @return true if the scroll bar pane is showing. 
+	 */
+	public boolean isEnableScrollBar() {
+		return this.detectionDisplay.isEnableScrollBar();
 	}
 
 

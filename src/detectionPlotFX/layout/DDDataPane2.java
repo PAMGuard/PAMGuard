@@ -107,6 +107,7 @@ public class DDDataPane2 extends PamBorderPane {
 				detectionPlotDisplay.setMinHidePaneHeight(ddDataInfo.getCurrentDetectionPlot().getSettingsPane().getMinHeight());
 
 			}
+			
 			//don't want the hide button if there's no settings pane. 
 			//detectionPlotDisplay.setEnableSettingsButton(ddDataInfo.getCurrentDetectionPlot().getSettingsPane()!=null); 
 
