@@ -570,6 +570,9 @@ public class PamguardXMLWriter implements PamSettings {
 	 */
 	private Element writeSettings(Document doc, PamSettings pamSettings, Object data, ArrayList<Object> objectHierarchy) {
 		
+		if (data == null) {
+			return null;
+		}
 		Element el = doc.createElement("SETTINGS");
 		el.setAttribute("Type", pamSettings.getUnitType());
 		el.setAttribute("Name", pamSettings.getUnitName());

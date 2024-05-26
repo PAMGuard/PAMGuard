@@ -58,17 +58,23 @@ public class JPanelWithPamKey extends PamPanel implements ColorManaged {
 	}
 	
 	private void replaceKeyPanel(KeyPanel newPanel) {
-		if (keyPanel != null) {
-//			synchronized (keyPanel) {
+		try {
+			if (keyPanel != null) {
+				//			synchronized (keyPanel) {
 				remove(keyPanel.getPanel());
-//			}
+				//			}
+			}
+			if (newPanel != null) {
+				//			synchronized (newPanel) {	
+				add(newPanel.getPanel(), gc);
+				//			}
+			}
+		}
+		catch (Exception e) {
+
 		}
 		keyPanel = newPanel;
-		if (keyPanel != null) {
-//			synchronized (newPanel) {	
-				add(keyPanel.getPanel(), gc);
-//			}
-		}
+		
 		this.invalidate();
 		this.repaint(10);
 		drawKeyOnTop();

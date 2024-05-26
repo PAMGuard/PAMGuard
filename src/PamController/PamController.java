@@ -1099,7 +1099,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * later in the AWT event queue. 
 	 */
 	public void startLater() {
-		SwingUtilities.invokeLater(new StartLater(true));
+//		SwingUtilities.invokeLater(new StartLater(true));
+		startLater(true);
 	}
 
 	public void startLater(boolean saveSettings) {
@@ -1173,6 +1174,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	@Override
 	public void manualStop() {
 		lastStartStopButton = BUTTON_STOP;
+		setManualStop(true);
 		pamStop();
 	}
 
@@ -1186,6 +1188,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	@Override
 	public boolean pamStart() {
 		//		Debug.println("PAMController: pamStart");
+		setManualStop(false);
 		return pamStart(true);
 	}
 
@@ -1453,12 +1456,12 @@ public class PamController implements PamControllerInterface, PamSettings {
 		for (int iU = 0; iU < pamControlledUnits.size(); iU++) {
 			pamControlledUnits.get(iU).pamHasStopped();
 		}
-		guiFrameManager.pamEnded();
-		
 		long stopTime = PamCalendar.getTimeInMillis();
 		saveEndSettings(stopTime);
 
 		setPamStatus(PAM_IDLE);
+		
+		guiFrameManager.pamEnded();
 		
 		// no good having this here since it get's called at the end of every file. 
 //		if (GlobalArguments.getParam(PamController.AUTOEXIT) != null) {
