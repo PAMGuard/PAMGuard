@@ -60,6 +60,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
@@ -138,6 +139,9 @@ public class RoccaParametersDialog extends PamDialog implements ActionListener, 
     JCheckBox ancCalcs4Clicks;	 	// serialVersionUID=22 2015/06/13 added
     JCheckBox ancCalcs4Whistles;	 	// serialVersionUID=22 2015/06/13 added
     JCheckBox trimWav;
+    JRadioButton absStrongThreshold;
+    JRadioButton diffStrongThreshold; 
+    ButtonGroup strongThreshold;
     JLabel outputDirLbl;
     JTextField outputDirTxt;
     JButton outputDirectoryButton;
@@ -558,6 +562,11 @@ public class RoccaParametersDialog extends PamDialog implements ActionListener, 
         sightingThreshold = new JTextField(3);
         sightingThreshold.setMaximumSize(new Dimension(40, sightingThreshold.getHeight()));
         JLabel schoolUnits = new JLabel("%");
+        absStrongThreshold = new JRadioButton("Threshold is absolute value",true);
+        diffStrongThreshold = new JRadioButton("Threshold is difference between highest and 2nd highest votes");
+        strongThreshold = new ButtonGroup();
+        strongThreshold.add(absStrongThreshold);
+        strongThreshold.add(diffStrongThreshold);
         GroupLayout thresholdLayout = new GroupLayout(thresholdSubPanel);
         thresholdSubPanel.setLayout(thresholdLayout);
         thresholdLayout.setAutoCreateGaps(true);
@@ -572,6 +581,10 @@ public class RoccaParametersDialog extends PamDialog implements ActionListener, 
                     .addComponent(schoolLbl)
                     .addComponent(sightingThreshold)
                     .addComponent(schoolUnits))
+                .addGroup(thresholdLayout.createSequentialGroup()
+                		.addComponent(absStrongThreshold))
+                .addGroup(thresholdLayout.createSequentialGroup()
+                		.addComponent(diffStrongThreshold))
         );
         thresholdLayout.setVerticalGroup(
             thresholdLayout.createSequentialGroup()
@@ -583,6 +596,10 @@ public class RoccaParametersDialog extends PamDialog implements ActionListener, 
                     .addComponent(schoolLbl)
                     .addComponent(sightingThreshold)
                     .addComponent(schoolUnits))
+                .addGroup(thresholdLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                		.addComponent(absStrongThreshold))
+                .addGroup(thresholdLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                		.addComponent(diffStrongThreshold))
         );
         thresholdLayout.linkSize(SwingConstants.HORIZONTAL, whistleLbl, schoolLbl);
 		classifierPanel.add(thresholdSubPanel);
@@ -1311,6 +1328,13 @@ public class RoccaParametersDialog extends PamDialog implements ActionListener, 
 		ancCalcs4Clicks.setSelected(roccaParameters.runAncCalcs4Clicks); 	// serialVersionUID=22 2015/06/13 added
 		ancCalcs4Whistles.setSelected(roccaParameters.runAncCalcs4Whistles); 	// serialVersionUID=22 2015/06/13 added
 		trimWav.setSelected(roccaParameters.isTrimWav());
+		if (roccaParameters.isStrongWhistleDiff()) {
+			diffStrongThreshold.setSelected(true);
+			absStrongThreshold.setSelected(false);
+		} else {
+			diffStrongThreshold.setSelected(false);
+			absStrongThreshold.setSelected(true);
+		}
         classificationThreshold.setText(String.format("%d",
                 roccaParameters.getClassificationThreshold()));
         sightingThreshold.setText(String.format("%d",
@@ -1635,6 +1659,12 @@ public class RoccaParametersDialog extends PamDialog implements ActionListener, 
 		
 		if (roccaParameters.weAreUsingGPS()) {
 			roccaParameters.setGpsSource(gpsSourcePanel.getSourceName());
+		}
+		
+		if(diffStrongThreshold.isSelected()) {
+			roccaParameters.setStrongWhistleDiff(true);
+		} else {
+			roccaParameters.setStrongWhistleDiff(false);
 		}
 		
 		

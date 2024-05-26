@@ -26,6 +26,7 @@ package rocca;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.util.Date;
 import java.util.Enumeration;
 
@@ -35,6 +36,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
+import weka.core.TechnicalInformation;
 
 /**
  * Single-stage classifier creation.  Dataset must be a WEKA-formatted arff file, with the correct
@@ -55,10 +57,24 @@ public class RoccaTrainClassifier {
     public static void main(String[] args) {
     	
     	RoccaTrainClassifier rtc = new RoccaTrainClassifier();
+    	
+    	// Get a single file
     	File arffFile = rtc.getArff();
     	if (arffFile!=null) {
     		String modelName = rtc.trainClassifier(arffFile);
     	}
+    	
+    	// Get a folder full of files
+//    	File arffFolder = rtc.getAllArff();
+//    	File[] arffFiles = arffFolder.listFiles(new FilenameFilter() { 
+//    	    public boolean accept(File dirFiles, String filename) {
+//    	        return filename.endsWith(".txt");
+//    	    }
+//    	});
+//    	for (File aFile : arffFiles) {
+//    		String modelName = rtc.trainClassifier(aFile);    		
+//    	}
+//    	
     }
     
     
@@ -86,6 +102,29 @@ public class RoccaTrainClassifier {
 		    // load the file
             arffFile = fileChooser.getSelectedFile();
             return arffFile;
+            
+		} else {
+			return null;
+		}
+    }
+    
+    public File getAllArff() {
+		JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Select directory containing training data");
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fileChooser.setFileHidingEnabled(true);
+        fileChooser.setApproveButtonText("Select");
+        //FileNameExtensionFilter restrict = new FileNameExtensionFilter("Only .arff files", "arff");
+        //FileNameExtensionFilter restrict = new FileNameExtensionFilter("Only .txt files", "txt");
+        //fileChooser.addChoosableFileFilter(restrict);
+        File arffFolder;
+
+ 		int state = fileChooser.showOpenDialog(null);
+		if (state == JFileChooser.APPROVE_OPTION) {
+
+		    // load the folder
+			arffFolder = fileChooser.getSelectedFile();
+            return arffFolder;
             
 		} else {
 			return null;
@@ -126,12 +165,12 @@ public class RoccaTrainClassifier {
         System.out.println("Setting Options...");
         String[] options = new String[6];
         options[0] = "-I";		// number of iterations/trees
-        options[1] = "10000";		// = 750
+        options[1] = "750";		// = 750
         options[2] = "-K";		// number of attributes (aka mtry)
         options[3] = "5";		// = 3
         options[4] = "-S";		// seed for random number generator
         options[5] = "1";		// = 1
-
+ 
         try {
             model.setOptions(options);
         } catch (Exception ex) {
@@ -154,13 +193,33 @@ public class RoccaTrainClassifier {
     		return null;
         }
 
+        Enumeration<?> e = model.enumerateMeasures();
+        System.out.print("Enumeration of classifier:");
+        while (e.hasMoreElements())
+            System.out.println("\nValue is: " + e.nextElement());
+        
+        String globalInfo = model.globalInfo();
+        System.out.print("\n\nGlobal Info of classifier:\n");
+        System.out.print(globalInfo);
+        
+        TechnicalInformation techRef = model.getTechnicalInformation();
+        System.out.print("\n\nGlobal Info of classifier:\n");
+        System.out.print(techRef);
+        
+        String[] modeloptions = model.getOptions();
+        System.out.print("Options");
+        System.out.print(modeloptions);
+        
+        
+        
+        
         // save the classifier
 //        String[] curOptions = model.getOptions();
 //        Enumeration test = model.listOptions();
         Instances header = new Instances(trainData,0);
         int index = arffFile.getAbsolutePath().lastIndexOf(".");
         String modelName = arffFile.getAbsolutePath().substring(0,index) + ".model";
-        System.out.println("Saving Classifier..." + modelName);
+        System.out.println("\nSaving Classifier..." + modelName);
         try {
             SerializationHelper.writeAll
 //                ("C:\\Users\\Mike\\Documents\\Work\\Java\\WEKA\\weka vs R\\RF_8sp_54att_110whistle-subset.model",

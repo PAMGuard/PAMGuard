@@ -503,7 +503,7 @@ public class RoccaProcess extends PamProcess {
 					// classifiers.  Check if the loaded classifier model filename matches one of the classifier
 					// names created for the project.  If so, compare the click to the parameters used to prune
 					// the datasets and exit if the click falls outside of the thresholds
-					if (roccaControl.roccaParameters.roccaClassifierModelFilename.getName().equals("TemPacClick.model") &&
+					if (roccaControl.roccaParameters.roccaClickClassifierModelFilename.getName().equals("TemPacClick.model") &&
 							(rcdb.getContour().get(RoccaContourStats.ParamIndx.SNR) > 35. ||
 							 rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) < 0.005 ||
 							 rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) > 0.6 )) {
@@ -511,7 +511,7 @@ public class RoccaProcess extends PamProcess {
 						rcdb = null;
 						return;
 					}
-					if (roccaControl.roccaParameters.roccaClassifierModelFilename.getName().equals("HIClick.model") &&
+					if (roccaControl.roccaParameters.roccaClickClassifierModelFilename.getName().equals("HIClick.model") &&
 							(rcdb.getContour().get(RoccaContourStats.ParamIndx.SNR) > 40. ||
 							 rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) < 0.01 ||
 							 rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) > 0.6 )) {
@@ -519,7 +519,7 @@ public class RoccaProcess extends PamProcess {
 						rcdb = null;
 						return;
 					}
-					if (roccaControl.roccaParameters.roccaClassifierModelFilename.getName().equals("NWAtlClick.model") &&
+					if (roccaControl.roccaParameters.roccaClickClassifierModelFilename.getName().equals("NWAtlClick.model") &&
 							(rcdb.getContour().get(RoccaContourStats.ParamIndx.SNR) > 35. ||
 							 rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) < 0.005 ||
 							 rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) > 0.6 )) {
