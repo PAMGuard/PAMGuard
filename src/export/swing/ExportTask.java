@@ -60,8 +60,10 @@ public class ExportTask extends OfflineTask<PamDataUnit<?,?>>{
 	@Override
 	public void loadedDataComplete() {
 		System.out.println("EXPORTER: loaded data complete"); 
+		
 		//force the exporter so save any renaming data units in the buffer
-		exporter.exportDataUnit(null, true);
+		exporter.exportDataUnit(null,  true);
+		exporter.close();
 		exporter.setCurrentFile(null); 
 		
 	}

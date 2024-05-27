@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.zip.Deflater;
 
+import PamUtils.PamArrayUtils;
 import PamUtils.PamCalendar;
 import PamguardMVC.PamDataUnit;
 import export.PamDataUnitExporter;
@@ -29,12 +30,12 @@ import us.hebi.matlab.mat.util.Casts;
  *
  */
 public class MLDetectionsManager implements PamDataUnitExporter {
-	
+
 	public static final String extension = "mat";
-	
-    // Creating date format
-    public static SimpleDateFormat dataFormat = new SimpleDateFormat(
-        "yyyyMMdd_HHmmss_SSS");
+
+	// Creating date format
+	public static SimpleDateFormat dataFormat = new SimpleDateFormat(
+			"yyyyMMdd_HHmmss_SSS");
 
 	/**
 	 * 
@@ -52,7 +53,7 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 		mlDataUnitsExport.add(new MLWhistleMoanExport()); 
 		mlDataUnitsExport.add(new MLRawExport()); 
 	}
-	
+
 	@Override
 	public boolean hasCompatibleUnits(Class dataUnitType) {
 		for (int i=0; i<mlDataUnitsExport.size(); i++){
@@ -69,68 +70,65 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 
 	@Override
 	public boolean exportData(File fileName, List<PamDataUnit> dataUnits, boolean append) {
-		
+
 		System.out.println("Export: " + dataUnits.size() + " data units " + append);
-		
+
 		if (dataUnits==null || dataUnits.size()<1) {
 			//nothing to write but no error. 
 			return true;
 		}
-		
+
 		try {
-			
+
 			Struct dataUnitsStruct = dataUnits2MAT(dataUnits);
-			
-		    // then
-			PamDataUnit minByTime = dataUnits
-		      .stream()
-		      .min(Comparator.comparing(PamDataUnit::getTimeMilliseconds))
-		      .orElseThrow(NoSuchElementException::new);
-			
+
+			// then
+			PamDataUnit minByTime = PamArrayUtils.getMinTimeMillis(dataUnits);
+
 			//matlab struct must start with a letter. 
-	        Date date = new Date(minByTime.getTimeMilliseconds());
+			Date date = new Date(minByTime.getTimeMilliseconds());
 			String entryName = "det_" + dataFormat.format( date);
-								
+
 			//is there an existing sink? Is that sink writing to the correct file?
 			if (sink==null || !fileName.equals(currentFile)) {
-				
+
 				System.out.println("Export: " + dataUnitsStruct.getNumDimensions() + entryName);
-				
+
 				currentFile = fileName;
 
 				//create the sink for the next data so it can be appended to the file. 
 				sink = Sinks.newStreamingFile(fileName);
-				
+
 				//create the Mat File - gets all the headers right etc. 
 				Mat5File matFile = Mat5.newMatFile();
 				matFile.addArray(entryName, dataUnitsStruct);
-//				matFile.addArray("two", Mat5.newScalar(2));
+				//				matFile.addArray("two", Mat5.newScalar(2));
 
 				matFile.writeTo(sink);
-				
+
 				matFile.close();
-			
+
 			}
 			else {
 				//write to the mat file without loading all contents into memory. 
 				Mat5Writer writer = Mat5.newWriter(sink);
-				
+
 				writer
 				.writeArray(entryName, dataUnitsStruct)              
 				.setDeflateLevel(Deflater.NO_COMPRESSION);
-//				.writeArray("three", Mat5.newScalar(2));
+				//				.writeArray("three", Mat5.newScalar(2));
 
 				writer.flush();
 			}
 
 			return true;
-			
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}
-		
+
 	}
 
 	/**
@@ -156,7 +154,7 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 		//ArrayList<ArrayList<PamDataUnit>> struct = new ArrayList<ArrayList<PamDataUnit>>(); 		
 		//if there's a mixed bunch of data units then we want separate arrays of structures. So a structure of arrays of structures.
 		//so, need to sort compatible data units.  		
-	
+
 		Struct list = Mat5.newStruct();
 
 		//keep a track of the data units that have been transcribed. This means data units that are multiple types
@@ -180,25 +178,25 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 
 			//create a structure for each type of data unit. 
 			Struct mlStructure= Mat5.newStruct(new int[]{n, 1});
-					
+
 			float sampleRate = -1;
-			
+
 
 			n=0; 
 			//allocate the class now. 
 			for (int j=0; j<dataUnits.size(); j++){
 				//check whether the same. 
 				if (mlDataUnitsExport.get(i).getUnitClass().isAssignableFrom(dataUnits.get(j).getClass()) && !alreadyStruct[j]) {
-					
+
 					mlStructure=mlDataUnitsExport.get(i).detectionToStruct(mlStructure, dataUnits.get(j), n); 
-					
+
 					sampleRate = dataUnits.get(j).getParentDataBlock().getSampleRate(); 
 					n++; 
 					alreadyStruct[j] = true;
 				}
 			}
 
-			if (n>=1) {
+			if (n>0) {
 				list.set(mlDataUnitsExport.get(i).getName(),mlStructure);
 				list.set(mlDataUnitsExport.get(i).getName()+"_sR", Mat5.newScalar(sampleRate)); 
 			}
@@ -223,15 +221,15 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 	public String getName() {
 		return "MATLAB";
 	}
-	
+
 	public static void main(String args[]) {
-		
+
 		String fileName = "/Users/au671271/MATLAB-Drive/MATLAB/PAMGUARD/_test/export_test.mat";
-		
+
 		try {
 			Mat5File matFile = Mat5.newMatFile();
-					
-			
+
+
 			Struct mlStruct = Mat5.newStruct(3, 1);
 			Matrix triggerMap = Mat5.newScalar(Math.random()); 
 
@@ -243,21 +241,35 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 
 			//basic method to write to a file
 			Mat5.writeToFile(matFile, fileName);
-			
 
-//			Sink sink = Sinks.newMappedFile(new File(fileName),  Casts.sint32(1000000));
-//			
-//			matFile.writeTo(sink);
-//
-//			sink.close();
-			
+
+			//			Sink sink = Sinks.newMappedFile(new File(fileName),  Casts.sint32(1000000));
+			//			
+			//			matFile.writeTo(sink);
+			//
+			//			sink.close();
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
-	
+	@Override
+	public void close() {
+		//handled in the mian funtion
+		if (sink!=null) {
+			try {
+				sink.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+
 
 
 }

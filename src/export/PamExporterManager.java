@@ -74,15 +74,15 @@ public class PamExporterManager {
 		
 		if (dataUnit==null) {
 			if (force) {
-				System.out.println("Write data 1!!" + dataUnitBuffer.size()); 
+				System.out.println("Write data 1!!" + dataUnitBuffer.size() ); 
+				//finish off saving any buffered data
 				exportOK = pamExporters.get(exportParams.exportChoice).exportData(currentFile, dataUnitBuffer, true);
 				dataUnitBuffer.clear();
 			}
 			return true;
 		}
 		
-		//if the data unit is null then save everything to the buffer.
-
+		//if file is null or too large create another a file for saving. 
 		if (currentFile == null || isFileSizeMax(currentFile)) {
 			Date date = new Date(dataUnit.getTimeMilliseconds());
 			
@@ -98,17 +98,21 @@ public class PamExporterManager {
 
 		dataUnitBuffer.add(dataUnit);
 
-//		System.out.println("Write data unit " + dataUnitBuffer.size() + " to: "+ currentFile); 
+		System.out.println("Write data unit " + dataUnitBuffer.size() + " to: "+ currentFile); 
 		
 		if (dataUnitBuffer.size()>=BUFFER_SIZE || force) {
 			System.out.println("Write data 2!!" + dataUnitBuffer.size()); 
-
 			exportOK = pamExporters.get(exportParams.exportChoice).exportData(currentFile, dataUnitBuffer, true);
 			dataUnitBuffer.clear();
 		}
 		
 		return exportOK;
 
+	}
+	
+	public void close() {
+		pamExporters.get(exportParams.exportChoice).close();
+		
 	}
 
 	/**
@@ -169,6 +173,8 @@ public class PamExporterManager {
 		exportParams=currentParams;
 		
 	}
+
+
 
 
 }

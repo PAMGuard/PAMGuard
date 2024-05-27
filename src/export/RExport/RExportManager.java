@@ -4,16 +4,22 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
 import org.renjin.eval.Context;
 import org.renjin.primitives.io.serialization.RDataWriter;
+import org.renjin.sexp.DoubleArrayVector;
+import org.renjin.sexp.IntArrayVector;
 import org.renjin.sexp.ListVector;
 import org.renjin.sexp.PairList;
+import org.renjin.sexp.PairList.Builder;
 
+import PamUtils.PamArrayUtils;
 import PamguardMVC.PamDataUnit;
 import export.PamDataUnitExporter;
+import export.MLExport.MLDetectionsManager;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
 
 /**
@@ -28,74 +34,76 @@ public class RExportManager implements PamDataUnitExporter {
 	 * 
 	 * All the possible RDataUnit export classes. 
 	 */
-	ArrayList<RDataUnitExport> mlDataUnitsExport = new ArrayList<RDataUnitExport>();
-
-	private FileOutputStream fos;
-
-	private GZIPOutputStream zos;
+	ArrayList<RDataUnitExport> rDataExport = new ArrayList<RDataUnitExport>();
 
 	private File currentFileName ;
 
-	private RDataWriter writer;
 
-	private Context context; 
+	private Builder allData; 
 
 
 	public RExportManager(){
 		/***Add more options here to export data units****/
-		mlDataUnitsExport.add(new RClickExport()); 
-		mlDataUnitsExport.add(new RWhistleExport()); 
-		mlDataUnitsExport.add(new RRawExport()); //should be last in case raw data holders have specific exporters
+		rDataExport.add(new RClickExport()); 
+		rDataExport.add(new RWhistleExport()); 
+		rDataExport.add(new RRawExport()); //should be last in case raw data holders have specific exporters
 	}
 
 
 	@Override
 	public boolean exportData(File fileName, List<PamDataUnit> dataUnits, boolean append) {
 
-		//convert the data units to 
-		RData dataUnitsR = dataUnits2R(dataUnits);
-		
-//		System.out.println("Export R file!!" + dataUnits.size());
+		/**
+		 * Note - there is no way to save data units to R files wothout loading the file into memory. 
+		 * So everything is stored in memory until saved. 
+		 */
 
-		//now write the file
+		// then
+		PamDataUnit minByTime = PamArrayUtils.getMinTimeMillis(dataUnits);
+
+		//matlab struct must start with a letter. 
+		Date date = new Date(minByTime.getTimeMilliseconds());
+		String entryName = "det_" + MLDetectionsManager.dataFormat.format( date);
+
+		//		System.out.println("Save R data! "+ dataUnits.size());
+
+		//		System.out.println("Export R file!!" + dataUnits.size());
+
+		//is there an existing writer? Is that writer writing to the correct file?
+		if (allData==null || !fileName.equals(currentFileName)) {
+
+			if (allData!=null) {
+				writeRFile();
+			}
+
+			allData = new PairList.Builder();
+			currentFileName = fileName;
+		}
+
+		//convert the data units to R and save to the PairList builder
+		dataUnits2R(dataUnits, entryName, allData);
+
+		return true;
+
+	}
+
+	private void writeRFile() {
+		Context context = Context.newTopLevelContext();
 		try {
 
-			//is there an existing writer? Is that writer writing to the correct file?
-			if (zos==null || fileName.equals(currentFileName)) {
-				
-				if (zos!=null) {
-					zos.close();
-					writer.close();
-				}
-
-				currentFileName = fileName;
-
-				//			System.out.println("MLDATA size: "+ mlData.size());
-				//			System.out.println("---MLArray----");
-				//			for (int i=0; i<mlData.size(); i++) {
-				//				System.out.println(mlData.get(i));
-				//				System.out.println("-------");
-				//			}
-				//			System.out.println("--------------");
-
-
-				context = Context.newTopLevelContext(); 
-
-				fos = new FileOutputStream(fileName);
-				zos = new GZIPOutputStream(fos);
-
-				return true;
-			}
+			FileOutputStream fos = new FileOutputStream(currentFileName);
+			GZIPOutputStream zos = new GZIPOutputStream(fos);
 			
-			writer = new RDataWriter(context, zos);	
-			writer.save(dataUnitsR.rData.build());	
-			
-			return true;
+			RDataWriter writer = new RDataWriter(context, zos);	
+
+			writer.save(allData.build());
+			writer.close();
+			zos.close();
 		}
 		catch (IOException e1) {
 			e1.printStackTrace();
-			return false;
 		}
+
 	}
 
 	/**
@@ -113,11 +121,11 @@ public class RExportManager implements PamDataUnitExporter {
 
 	@Override
 	public boolean hasCompatibleUnits(Class dataUnitType) {
-		for (int i=0; i<mlDataUnitsExport.size(); i++){
+		for (int i=0; i<rDataExport.size(); i++){
 			//check whether the same. ;
 			//System.out.println(" dataUnits.get(j).getClass(): " + dataUnits.get(j).getClass());
 			//System.out.println(" mlDataUnitsExport.get(i).getUnitClass(): " + mlDataUnitsExport.get(i).getUnitClass());
-			if (mlDataUnitsExport.get(i).getUnitClass().isAssignableFrom(dataUnitType)) {
+			if (rDataExport.get(i).getUnitClass().isAssignableFrom(dataUnitType)) {
 				//System.out.println("FOUND THE DATA UNIT!");
 				return true; 
 			}
@@ -131,21 +139,36 @@ public class RExportManager implements PamDataUnitExporter {
 	 * @return list of list of R strucutures ready for saving to .RData file. 
 	 */
 	public RData dataUnits2R(List<PamDataUnit> dataUnits){
+		PairList.Builder allData = new PairList.Builder();
+		return dataUnits2R(dataUnits,  null, allData);
+	}
+
+
+	/**
+	 * Sort a list of data units into lists of the same type of units. Convert to a list of structures. 
+	 * @param dataUnits - a list of data units to convert to matlab structures. 
+	 * @param - a name for the structure. 
+	 * @return list of list of R strucutures ready for saving to .RData file. 
+	 */
+	public RData dataUnits2R(List<PamDataUnit> dataUnits, String name, 	PairList.Builder allData) {
 
 		//if there's a mixed bunch of data units then we want separate arrays of structures. So a structure of arrays of structures.
 		//so, need to sort compatible data units.  		
 
-		PairList.Builder allData = new PairList.Builder();
 		ArrayList<String> dataUnitTypes = new ArrayList<String>(); 
 
+		//keep a track of the data units that have been transcribed. This means data units that are multiple types
+		//(e.g. a raw data holder and click) are not added to two different list of structures. 
+		boolean[] alreadyStruct = new boolean[dataUnits.size()];
+
 		//iterate through possible export functions. 
-		for (int i=0; i<mlDataUnitsExport.size(); i++){
+		for (int i=0; i<rDataExport.size(); i++){
 
 			//first need to figure out how many data units there are. 
 			int n=0; 
 			for (int j=0; j<dataUnits.size(); j++){
 				//check whether the same. 
-				if (mlDataUnitsExport.get(i).getUnitClass().isAssignableFrom(dataUnits.get(j).getClass())) {
+				if (rDataExport.get(i).getUnitClass().isAssignableFrom(dataUnits.get(j).getClass())) {
 					n++;
 				}
 			}
@@ -154,22 +177,35 @@ public class RExportManager implements PamDataUnitExporter {
 			if (n==0) continue; //no need to do anything else. There are no data units of this type. 
 
 			ListVector.NamedBuilder dataListArray = new ListVector.NamedBuilder();
-
 			ListVector.NamedBuilder dataList;
+
 			n=0; 
+			double sampleRate = 0.;
 			//allocate the class now. 
 			for (int j=0; j<dataUnits.size(); j++){
 				//check whether the same. 
-				if (mlDataUnitsExport.get(i).getUnitClass().isAssignableFrom(dataUnits.get(j).getClass())) {
-					dataList=mlDataUnitsExport.get(i).detectionToStruct(dataUnits.get(j), n); 
-					dataListArray.add((mlDataUnitsExport.get(i).getName() + "_" + dataUnits.get(j).getUID()), dataList);	
+				if (rDataExport.get(i).getUnitClass().isAssignableFrom(dataUnits.get(j).getClass()) && !alreadyStruct[j]) {
+					dataList=rDataExport.get(i).detectionToStruct(dataUnits.get(j), n); 
+					dataListArray.add((rDataExport.get(i).getName() + "_" + dataUnits.get(j).getUID()), dataList);	
+
+					sampleRate = dataUnits.get(j).getParentDataBlock().getSampleRate(); 
 					n++; 
+					alreadyStruct[j] = true;
 				}
 			}
 
-			if (n>1) {
-				allData.add(mlDataUnitsExport.get(i).getName(), dataListArray.build());
-				dataUnitTypes.add(mlDataUnitsExport.get(i).getName()); 
+			if (n>0) {
+
+				String dataName; 
+				if (name==null) {
+					dataName = rDataExport.get(i).getName();
+				}
+				else dataName = name + "_" + rDataExport.get(i).getName();
+
+				allData.add(dataName, dataListArray.build());
+				allData.add(rDataExport.get(i).getName()+"_sR",  new DoubleArrayVector(sampleRate));
+
+				dataUnitTypes.add(rDataExport.get(i).getName()); 
 			}
 
 		}
@@ -195,7 +231,7 @@ public class RExportManager implements PamDataUnitExporter {
 		public PairList.Builder rData; 
 
 		/**
-		 * List of the names of the types of data units whihc were saved. 
+		 * List of the names of the types of data units which were saved. 
 		 */
 		public ArrayList<String> dataUnitTypes; 
 	}
@@ -215,6 +251,14 @@ public class RExportManager implements PamDataUnitExporter {
 	@Override
 	public String getName() {
 		return "R data";
+	}
+
+
+	@Override
+	public void close() {
+		if (allData!=null) {
+			writeRFile();
+		}
 	}
 
 

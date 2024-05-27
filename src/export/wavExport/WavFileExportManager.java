@@ -459,6 +459,14 @@ public class WavFileExportManager implements PamDataUnitExporter  {
 
 
 
+	@Override
+	public void close() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
 
 
 	//	hello(){

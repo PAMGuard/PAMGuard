@@ -264,7 +264,7 @@ public class PlotPane extends PamBorderPane {
 		rightPane.prefWidthProperty().bind(yAxisRightPane.widthProperty());
 		rightPane.minWidthProperty().bind(yAxisRightPane.widthProperty());
 
-		horzHolder.getChildren().addAll(leftPane, axisPane);
+		horzHolder.getChildren().addAll(leftPane, axisPane, rightPane);
 		//axisPane.toFront(); this changes the order of children in a PamHBox. 
 		HBox.setHgrow(axisPane, Priority.ALWAYS);
 

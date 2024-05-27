@@ -3,13 +3,16 @@ package PamUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.TreeMap;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import org.apache.commons.math.linear.RealMatrix;
 
+import PamguardMVC.PamDataUnit;
 import us.hebi.matlab.mat.types.Matrix;
 
 /**
@@ -175,6 +178,22 @@ public class PamArrayUtils {
 			median=zSort.get((int) ((size/2)-0.5));
 		}
 		return median;
+	}
+	
+	
+	/**
+	 * Get the data unit with the lowest time in millis from a data unit list. 
+	 * @param dataUnits - a data unit list.
+	 * @return the data unit with the lowest time in millis.
+	 */
+	public static PamDataUnit getMinTimeMillis(List<PamDataUnit> dataUnits) {
+	    // then
+		PamDataUnit minByTime = dataUnits
+	      .stream()
+	      .min(Comparator.comparing(PamDataUnit::getTimeMilliseconds))
+	      .orElseThrow(NoSuchElementException::new);
+		
+		return minByTime;
 	}
 
 	/**

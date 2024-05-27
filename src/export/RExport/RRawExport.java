@@ -73,7 +73,7 @@ public class RRawExport extends RDataUnitExport<PamDataUnit> {
 
 	@Override
 	public String getName() {
-		return "pam_data_units";
+		return "raw_data_units";
 	}
 
 }

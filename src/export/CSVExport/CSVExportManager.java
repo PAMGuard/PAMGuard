@@ -35,4 +35,10 @@ public class CSVExportManager implements PamDataUnitExporter{
 		return "CSV Export";
 	}
 
+	@Override
+	public void close() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
