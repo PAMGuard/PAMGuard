@@ -11,7 +11,6 @@ import java.util.zip.GZIPOutputStream;
 import org.renjin.eval.Context;
 import org.renjin.primitives.io.serialization.RDataWriter;
 import org.renjin.sexp.DoubleArrayVector;
-import org.renjin.sexp.IntArrayVector;
 import org.renjin.sexp.ListVector;
 import org.renjin.sexp.PairList;
 import org.renjin.sexp.PairList.Builder;
@@ -20,7 +19,6 @@ import PamUtils.PamArrayUtils;
 import PamguardMVC.PamDataUnit;
 import export.PamDataUnitExporter;
 import export.MLExport.MLDetectionsManager;
-import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
 
 /**
  * Handles exporting pam data units into an rdata. 
@@ -57,7 +55,6 @@ public class RExportManager implements PamDataUnitExporter {
 		 * Note - there is no way to save data units to R files wothout loading the file into memory. 
 		 * So everything is stored in memory until saved. 
 		 */
-
 		// then
 		PamDataUnit minByTime = PamArrayUtils.getMinTimeMillis(dataUnits);
 

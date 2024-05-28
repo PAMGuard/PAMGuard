@@ -58,7 +58,7 @@ public class MLExportOverlayMenu extends ExportOverlayMenu {
 		buttonNode = createButton();
 
 		defaultPath=FileSystemView.getFileSystemView().getDefaultDirectory().getPath();
-		defaultPath=defaultPath +  "/Pamguard Manual Export";
+		defaultPath=defaultPath +  File.separator + "Pamguard Manual Export";
 
 		currentFolder=defaultPath;
 

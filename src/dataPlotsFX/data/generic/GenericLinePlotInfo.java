@@ -86,7 +86,7 @@ public abstract class GenericLinePlotInfo extends TDDataInfoFX {
 		
 		double[][] detData = getDetData(pamDataUnit); 
 
-		if (lastUnits[chan]==null && detData!=null) {
+		if ((lastUnits[chan]==null || lastUnits[chan].length<1) && detData!=null) {
 			//System.out.println("lastUnits:  " + lastUnits);
 			//create the array of last units. 
 			lastUnits[chan] = new Point2D[detData.length]; 
