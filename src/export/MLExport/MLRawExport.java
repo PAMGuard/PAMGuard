@@ -39,9 +39,9 @@ public class MLRawExport extends MLDataUnitExport<PamDataUnit>{
 		Matrix angleErrors;
 		if (dataUnit.getLocalisation()!=null) {
 			//bearing angles 
-			angles = DLMatFile.array2Matrix(dataUnit.getLocalisation().getAngles()); 
+			angles = DLMatFile.array2Matrix(dataUnit.getLocalisation().getAngles() == null ? new double[] {0.} : dataUnit.getLocalisation().getAngles()); 
 			//angle errors 
-			angleErrors = DLMatFile.array2Matrix(dataUnit.getLocalisation().getAngleErrors()); 
+			angleErrors = DLMatFile.array2Matrix(dataUnit.getLocalisation().getAngleErrors() == null ? new double[] {0.} : dataUnit.getLocalisation().getAngleErrors()); 
 		}
 		else {
 			//bearing angles 

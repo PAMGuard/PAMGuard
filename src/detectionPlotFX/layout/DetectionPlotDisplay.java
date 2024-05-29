@@ -420,7 +420,7 @@ public class DetectionPlotDisplay extends PamBorderPane  {
 				
 			}
 			
-			System.out.println("Axis Width: " + dDPlotPane.getAxisPane(Side.BOTTOM).getWidth() + " canvas width " + dDPlotPane.getPlotCanvas().getWidth());
+//			System.out.println("Axis Width: " + dDPlotPane.getAxisPane(Side.BOTTOM).getWidth() + " canvas width " + dDPlotPane.getPlotCanvas().getWidth());
 
 			
 			currentDataInfo.drawData(dDPlotPane.getPlotCanvas().getGraphicsContext2D(), 
