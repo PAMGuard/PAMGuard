@@ -58,14 +58,19 @@ public class TopToolBar extends PamToolBar implements ColorManaged {
 		pamController = PamController.getInstance();
 		if (pamController.getRunMode() == PamController.RUN_PAMVIEW) {
 			add(startButton = new JButton(FontIcon.of(MaterialDesignP.PLAY, PamSettingsIconButton.NORMAL_SIZE, Color.DARK_GRAY)));
+			startButton.setDisabledIcon(FontIcon.of(MaterialDesignP.PLAY, PamSettingsIconButton.NORMAL_SIZE, Color.LIGHT_GRAY));
 			startButton.setToolTipText("Start sound playback");
 			add(stopButton = new JButton(FontIcon.of(MaterialDesignP.PAUSE, PamSettingsIconButton.NORMAL_SIZE, Color.DARK_GRAY)));
+			stopButton.setDisabledIcon(FontIcon.of(MaterialDesignP.PAUSE, PamSettingsIconButton.NORMAL_SIZE, Color.LIGHT_GRAY));
+
 			stopButton.setToolTipText("Stop sound playback");
 		}
 		else {
 			add(startButton = new JButton(FontIcon.of(MaterialDesignR.RECORD_CIRCLE, PamSettingsIconButton.NORMAL_SIZE, Color.RED)));
+			startButton.setDisabledIcon(FontIcon.of(MaterialDesignR.RECORD_CIRCLE, PamSettingsIconButton.NORMAL_SIZE, Color.LIGHT_GRAY));
 			startButton.setToolTipText("Start PAM processing");
 			add(stopButton = new JButton(FontIcon.of(MaterialDesignP.PAUSE, PamSettingsIconButton.NORMAL_SIZE, Color.DARK_GRAY)));
+			stopButton.setDisabledIcon(FontIcon.of(MaterialDesignP.PAUSE, PamSettingsIconButton.NORMAL_SIZE, Color.LIGHT_GRAY));
 			stopButton.setToolTipText("Stop PAM processing");
 		}
 		startButton.addActionListener(new StartButton());
