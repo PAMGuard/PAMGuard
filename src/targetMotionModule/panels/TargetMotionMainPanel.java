@@ -38,6 +38,7 @@ import targetMotionModule.algorithms.TargetMotionModel;
 import PamDetection.PamDetection;
 import PamView.ColorManaged;
 import PamView.PamColors.PamColor;
+import PamView.component.PamSettingsIconButton;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamView.panel.PamPanel;
@@ -79,7 +80,7 @@ public class TargetMotionMainPanel<T extends PamDataUnit> implements PamTabPanel
 	
 //	public ImageIcon settings = new ImageIcon(ClassLoader
 //			.getSystemResource("Resources/SettingsButtonSmall2.png"));
-	public static FontIcon settings =  FontIcon.of(MaterialDesignC.COG, 20, Color.DARK_GRAY);
+	public static FontIcon settings =  FontIcon.of(PamSettingsIconButton.SETTINGS_IKON, PamSettingsIconButton.NORMAL_SIZE, Color.DARK_GRAY);
 
 
 	public TargetMotionMainPanel(TargetMotionLocaliser<T> targetMotionLocaliser) {

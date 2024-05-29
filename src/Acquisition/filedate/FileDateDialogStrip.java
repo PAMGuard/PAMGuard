@@ -20,6 +20,7 @@ import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import PamUtils.PamCalendar;
+import PamView.component.PamSettingsIconButton;
 import PamView.dialog.PamGridBagContraints;
 
 /**
@@ -40,7 +41,7 @@ public class FileDateDialogStrip {
 	private JButton settingsButton;
 
 //	private ImageIcon settingsIcon = new ImageIcon(ClassLoader.getSystemResource("Resources/SettingsButtonSmall2.png"));
-	public static FontIcon settingsIcon =  FontIcon.of(MaterialDesignC.COG, 20, Color.DARK_GRAY);
+	public static FontIcon settingsIcon =  FontIcon.of(PamSettingsIconButton.SETTINGS_IKON, PamSettingsIconButton.NORMAL_SIZE, Color.DARK_GRAY);
 
 	
 	private Window parent;	

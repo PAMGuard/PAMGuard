@@ -30,7 +30,6 @@ import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -39,17 +38,14 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Vector;
 
-import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import pamScrollSystem.PamScrollSlider;
 import Array.ArrayManager;
 import Array.PamArray;
 import Array.SnapshotGeometry;
@@ -61,7 +57,6 @@ import GPS.GpsData;
 import GPS.GpsDataUnit;
 import Map.gridbaselayer.GridbaseControl;
 import Map.gridbaselayer.MapRasterImage;
-import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamController.PamControllerInterface;
 import PamController.masterReference.MasterReferencePoint;
@@ -83,7 +78,6 @@ import PamView.PamColors.PamColor;
 import PamView.panel.JPanelWithPamKey;
 import PamView.panel.KeyPanel;
 import PamView.paneloverlay.OverlayCheckboxMenuItem;
-import PamView.paneloverlay.overlaymark.MarkDataMatcher;
 import PamView.paneloverlay.overlaymark.MarkDataSelector;
 import PamView.paneloverlay.overlaymark.MarkOverlayDraw;
 import PamView.symbol.PamSymbolChooser;
@@ -1476,9 +1470,9 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 		plotDetectorMenu.add(menuItem);
 		plotDetectorMenu.addSeparator();
 
-		ImageIcon settingsIcon = new ImageIcon(ClassLoader.getSystemResource("Resources/SettingsButtonSmall2.png"));
-		ImageIcon settingsIconNot = new ImageIcon(
-				ClassLoader.getSystemResource("Resources/SettingsButtonSmallWhite.png"));
+//		ImageIcon settingsIcon = new ImageIcon(ClassLoader.getSystemResource("Resources/SettingsButtonSmall2.png"));
+//		ImageIcon settingsIconNot = new ImageIcon(
+//				ClassLoader.getSystemResource("Resources/SettingsButtonSmallWhite.png"));
 
 		ArrayList<MapDetectionData> mddList = simpleMapRef.mapDetectionsManager.getMapDetectionDatas();
 		for (int i = 0; i < mddList.size(); i++) {

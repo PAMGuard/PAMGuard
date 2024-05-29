@@ -31,6 +31,7 @@ import PamUtils.PamCalendar;
 import PamUtils.TxtFileUtils;
 import PamView.CancelObserver;
 import PamView.DBTextArea;
+import PamView.component.PamSettingsIconButton;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamFileBrowser;
 import PamView.dialog.PamGridBagContraints;
@@ -93,7 +94,7 @@ public class OLProcessDialog extends PamDialog {
 
 
 //	public static ImageIcon settings = new ImageIcon(ClassLoader.getSystemResource("Resources/SettingsButtonSmall2.png"));
-	public static FontIcon settings = FontIcon.of(MaterialDesignC.COG, 20, Color.DARK_GRAY);
+	public static FontIcon settings = FontIcon.of(PamSettingsIconButton.SETTINGS_IKON, PamSettingsIconButton.NORMAL_SIZE, Color.DARK_GRAY);
 
 
 	TaskStatus currentStatus = TaskStatus.IDLE;

@@ -22,6 +22,9 @@ import javax.swing.JRadioButton;
 import javax.swing.JToolBar;
 import javax.swing.border.EmptyBorder;
 
+import org.kordamp.ikonli.materialdesign2.MaterialDesignP;
+import org.kordamp.ikonli.swing.FontIcon;
+
 import soundPlayback.PlaybackControl;
 import clickDetector.BTDisplayParameters;
 import clickDetector.ClickBTDisplay;
@@ -29,6 +32,7 @@ import clickDetector.ClickControl;
 import clickDetector.ClickDisplay;
 import clickDetector.ClickClassifiers.ClickIdentifier;
 import PamView.PamToolBar;
+import PamView.component.PamSettingsIconButton;
 import PamView.dialog.PamCheckBox;
 import PamView.dialog.PamLabel;
 import PamView.dialog.PamRadioButton;
@@ -75,14 +79,16 @@ public class OfflineToolbar {
 		toolBar = new PamToolBar("Offline Click Analysis");
 		
 		if (isViewer) {
-			playClicks = new JButton(new ImageIcon(ClassLoader
-					.getSystemResource("Resources/clickPlayStart.png")));
+			
+//			private static final FontIcon settings =  FontIcon.of(PamSettingsIconButton.SETTINGS_IKON, PamSettingsIconButton.SMALL_SIZE, Color.WHITE);
+
+			playClicks = new JButton(FontIcon.of(MaterialDesignP.PLAY_CIRCLE_OUTLINE, PamSettingsIconButton.NORMAL_SIZE, Color.DARK_GRAY));
 			playClicks.addActionListener(new PlayClicks());
 			playClicks.setToolTipText("Play clicks (pack empty space with 0's)");
 			PlaybackControl.registerPlayButton(playClicks);
 
 			reAnalyseClicks = new JButton(new ImageIcon(ClassLoader
-					.getSystemResource("Resources/reanalyseClicks.png")));
+					.getSystemResource("Resources/reanalyseClicks.png")));			
 			reAnalyseClicks.addActionListener(new ReanalyseClicks());
 			reAnalyseClicks.setToolTipText("Re-analyse clicks");
 		}

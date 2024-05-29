@@ -10,6 +10,8 @@ import javax.swing.JButton;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
 import org.kordamp.ikonli.swing.FontIcon;
 
+import PamView.component.PamSettingsIconButton;
+
 /**
  * Standard settings button with the little cogwheel for use throughout Swing components. 
  * @author dg50
@@ -27,7 +29,7 @@ public class SettingsButton extends JButton {
 	}
 	
 	private static Icon makeIcon() {
-		return FontIcon.of(MaterialDesignC.COG, 20, Color.DARK_GRAY);
+		return FontIcon.of(PamSettingsIconButton.SETTINGS_IKON, PamSettingsIconButton.SMALL_SIZE, Color.DARK_GRAY);
 //		return new ImageIcon(ClassLoader.getSystemResource("Resources/SettingsButtonSmall2.png"));
 	}
 

@@ -37,7 +37,7 @@ public class HidingPane extends StackPane {
 	/**
 	 * The opacity of the button when the mouse is outside the show button
 	 */
-	private double showButtonOpacity = 0.25;
+	private double showButtonOpacity = 0.8;
 
 
 	/**
