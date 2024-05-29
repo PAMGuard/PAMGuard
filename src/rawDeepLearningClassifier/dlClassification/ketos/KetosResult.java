@@ -1,6 +1,6 @@
 package rawDeepLearningClassifier.dlClassification.ketos;
 
-import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
+import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 
 
 /**
@@ -8,7 +8,7 @@ import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction
  * @author Jamie Macaulay
  *
  */
-public class KetosResult extends GenericPrediction { 
+public class KetosResult extends StandardPrediction { 
 	
 
 	public KetosResult(float[] prob) {

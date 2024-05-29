@@ -1,11 +1,14 @@
 package export;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import PamUtils.PamCalendar;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import export.CSVExport.CSVExportManager;
 import export.MLExport.MLDetectionsManager;
 import export.RExport.RExportManager;
 import export.layoutFX.ExportParams;
@@ -18,9 +21,9 @@ import export.wavExport.WavFileExportManager;
 public class PamExporterManager {
 
 	/**
-	 * The number of data units to save before saving. 
+	 * The number of data units to save before saving. This prevents too much being stored in memory
 	 */
-	private static int BUFFER_SIZE = 1000; 
+	private static int BUFFER_SIZE = 10000; 
 
 	/**
 	 * Keep the file size to around 1GB per file
@@ -47,6 +50,10 @@ public class PamExporterManager {
 	 * Reference to the current export paramters. 
 	 */
 	private ExportParams exportParams = new ExportParams();
+	
+    // Creating date format
+    public static SimpleDateFormat dataFormat = new SimpleDateFormat(
+        "yyyy_MM_dd_HHmmss");
 
 	public PamExporterManager() {
 		pamExporters = new ArrayList<PamDataUnitExporter>();
@@ -55,19 +62,35 @@ public class PamExporterManager {
 		pamExporters.add(new MLDetectionsManager());
 		pamExporters.add(new RExportManager());
 		pamExporters.add(new WavFileExportManager());
+		pamExporters.add(new CSVExportManager());
 	}
 
 	/** 
 	 * Add a data unit to the export list. 
+	 * @param force - true to force saving of data e.g. at the end of processing. 
 	 */
-	public boolean exportDataUnit(PamDataUnit<?, ?> dataUnit) {
+	public boolean exportDataUnit(PamDataUnit<?, ?> dataUnit, boolean force) {
 		boolean exportOK = true;
-		//if the data unit is null then save everything to the buffer.
-
+		
+		if (dataUnit==null) {
+			if (force) {
+				System.out.println("Write data 1!!" + dataUnitBuffer.size() ); 
+				//finish off saving any buffered data
+				exportOK = pamExporters.get(exportParams.exportChoice).exportData(currentFile, dataUnitBuffer, true);
+				dataUnitBuffer.clear();
+			}
+			return true;
+		}
+		
+		//if file is null or too large create another a file for saving. 
 		if (currentFile == null || isFileSizeMax(currentFile)) {
+			Date date = new Date(dataUnit.getTimeMilliseconds());
+			
+			String newFileName = "PAM_" + dataFormat.format(date);
+			
 			//create a new file - note each exporter is responsible for closing the file after writing
 			//so previous files should already be closed
-			String fileName = (exportParams.folder + File.separator + PamCalendar.formatDate2(dataUnit.getTimeMilliseconds(), false) 
+			String fileName = (exportParams.folder + File.separator + newFileName
 			+ "." + pamExporters.get(exportParams.exportChoice).getFileExtension());
 
 			currentFile = new File(fileName);
@@ -75,13 +98,21 @@ public class PamExporterManager {
 
 		dataUnitBuffer.add(dataUnit);
 
-		if (BUFFER_SIZE>=BUFFER_SIZE) {
+		System.out.println("Write data unit " + dataUnitBuffer.size() + " to: "+ currentFile); 
+		
+		if (dataUnitBuffer.size()>=BUFFER_SIZE || force) {
+			System.out.println("Write data 2!!" + dataUnitBuffer.size()); 
 			exportOK = pamExporters.get(exportParams.exportChoice).exportData(currentFile, dataUnitBuffer, true);
 			dataUnitBuffer.clear();
 		}
 		
 		return exportOK;
 
+	}
+	
+	public void close() {
+		pamExporters.get(exportParams.exportChoice).close();
+		
 	}
 
 	/**
@@ -101,6 +132,8 @@ public class PamExporterManager {
 	private static double getFileSizeMegaBytes(File file) {
 		return (double) file.length() / (1024 * 1024);
 	}
+	
+	
 	public boolean canExportDataBlock(PamDataBlock dataBlock) {
 		for (PamDataUnitExporter exporter:pamExporters) {
 			if (exporter.hasCompatibleUnits(dataBlock.getUnitClass())) return true;
@@ -126,6 +159,22 @@ public class PamExporterManager {
 		return pamExporters.get(i);
 
 	}
+
+	public void setCurrentFile(File file) {
+		this.currentFile=file;
+		
+	}
+
+	public ExportParams getExportParams() {
+		return exportParams;
+	}
+
+	public void setExportParams(ExportParams currentParams) {
+		exportParams=currentParams;
+		
+	}
+
+
 
 
 }

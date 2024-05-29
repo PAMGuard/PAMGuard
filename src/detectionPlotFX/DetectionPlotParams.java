@@ -26,8 +26,12 @@ public class DetectionPlotParams extends UserDisplayNodeParams implements Clonea
 	 * The data source for the detection plot. 
 	 */
 	public String dataSource = null;
-
 	
+	/**
+	 * True to show the scroll bar. 
+	 */
+	public boolean showScrollBar = true;
+
 	/**
 	 * Saves which data axis is used for which data block. The key is the data block long name and the 
 	 * result is the name of the plot e.g. waveform. In this way users can set how they want the data plots to display

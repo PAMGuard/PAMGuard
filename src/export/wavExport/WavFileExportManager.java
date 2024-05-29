@@ -71,7 +71,7 @@ public class WavFileExportManager implements PamDataUnitExporter  {
 
 
 		defaultPath=FileSystemView.getFileSystemView().getDefaultDirectory().getPath();
-		defaultPath=defaultPath +  "/Pamguard Manual Export";
+		defaultPath=defaultPath + File.separator + "Pamguard Manual Export";
 
 		currentFolder=defaultPath;
 	}
@@ -146,7 +146,7 @@ public class WavFileExportManager implements PamDataUnitExporter  {
 
 		//add correct file type.	
 		currentPath = currentPath + ".wav";
-		currentPath = currentFolder + File.pathSeparator + currentPath;
+		currentPath = currentFolder + File.separator + currentPath;
 
 		return currentPath;
 
@@ -353,8 +353,6 @@ public class WavFileExportManager implements PamDataUnitExporter  {
 	 */
 	private int saveDataUnitWav(DetectionGroupSummary foundDataUnits) {
 		//TODO - need to pad the detections...with zeros.
-		
-		
 		//System.out.println("Save data unit wav: " + foundDataUnits.getNumDataUnits()); 
 
 		int n=0; 
@@ -455,6 +453,14 @@ public class WavFileExportManager implements PamDataUnitExporter  {
 	@Override
 	public String getName() {
 		return "raw sound";
+	}
+
+
+
+	@Override
+	public void close() {
+		// TODO Auto-generated method stub
+		
 	}
 
 

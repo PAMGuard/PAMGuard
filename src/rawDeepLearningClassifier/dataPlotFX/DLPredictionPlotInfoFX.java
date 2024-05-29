@@ -105,8 +105,8 @@ public class DLPredictionPlotInfoFX extends GenericLinePlotInfo {
 						dlPredParams.lineInfos[i] = new LineInfo(true, Color.rgb(0, 0, 255%(i*30 + 50)));
 					}
 				}
-
 			}
+			getGraphSettingsPane().setParams();
 		}
 	}
 

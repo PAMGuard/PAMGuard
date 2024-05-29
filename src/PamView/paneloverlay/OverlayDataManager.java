@@ -5,16 +5,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-
 import PamController.PamController;
 import PamView.GeneralProjector;
 import PamView.GeneralProjector.ParameterType;
 import PamView.GeneralProjector.ParameterUnits;
-import PamView.PanelOverlayDraw;
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.PamSymbolManager;
 import PamguardMVC.DataBlockNameComparator;
@@ -33,9 +28,12 @@ import PamguardMVC.dataSelector.DataSelector;
  */
 public abstract class OverlayDataManager<TOverlayInfoType extends OverlayDataInfo> implements OverlayDataObserver {
 
-	private ImageIcon settingsIcon = new ImageIcon(ClassLoader.getSystemResource("Resources/SettingsButtonSmall2.png"));
+//	private ImageIcon settingsIcon = new ImageIcon(ClassLoader.getSystemResource("Resources/SettingsButtonSmall2.png"));
+//	private ImageIcon settingsIconNot = new ImageIcon(ClassLoader.getSystemResource("Resources/SettingsButtonSmallWhite.png"));
+	
+//	private static final FontIcon settingsIcon =  FontIcon.of(MaterialDesignC.COG, 16, Color.DARK_GRAY);
+//	private static final FontIcon settingsIconNot =  FontIcon.of(MaterialDesignC.COG, 16, Color.WHITE);
 
-	private ImageIcon settingsIconNot = new ImageIcon(ClassLoader.getSystemResource("Resources/SettingsButtonSmallWhite.png"));
 
 	private OverlaySwingPanel swingPanel;
 

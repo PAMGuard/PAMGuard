@@ -17,7 +17,7 @@ public class RClickExport extends RRawExport{
 		
 		ClickDetection clickDetection = (ClickDetection) dataUnit; 
   		
-		super.addDetectionSpecificFields(rData, null, index); 
+		super.addDetectionSpecificFields(rData, dataUnit, index); 
 
 		//add some basic click measurements
 		rData.add("triggerMap", new DoubleArrayVector(clickDetection.getTriggerList())); 

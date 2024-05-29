@@ -32,6 +32,7 @@ import pamViewFX.fxNodes.PamSpinner;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.validator.PamValidator;
 import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
+import rawDeepLearningClassifier.dlClassification.StandardClassifierModel;
 
 /**
  * Settings pane for SoundSpot
@@ -163,7 +164,7 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 			defaultSegmentLenChanged(); 
 			//only set the hop if the user physically changes the toggle switch. This is not included in defaultSegmentLenChanged
 			//becuase defaultSegmentLenChanged can be called from elsewhere
-			int defaultsamples =  getDefaultSamples();
+			int defaultsamples =  getDefaultSamples(dlClassifierModel, paramsClone);
 			dlClassifierModel.getDLControl().getSettingsPane().getHopLenSpinner().getValueFactory().setValue((int) defaultsamples/2);
 		});
 		usedefaultSeg.setPadding(new Insets(0,0,0,0));
@@ -269,7 +270,7 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 
 //			float sR = dlClassifierModel.getDLControl().getSettingsPane().getSelectedParentDataBlock().getSampleRate(); 
 
-			int defaultsamples =  getDefaultSamples();
+			int defaultsamples =  getDefaultSamples(dlClassifierModel, paramsClone);
 
 			//work out the window length in samples
 			dlClassifierModel.getDLControl().getSettingsPane().getSegmentLenSpinner().getValueFactory().setValue(defaultsamples);
@@ -282,7 +283,7 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 		}
 	}
 	
-	private int getDefaultSamples() {
+	public static int getDefaultSamples(DLClassiferModel dlClassifierModel, StandardModelParams paramsClone) {
 		float sR = dlClassifierModel.getDLControl().getSettingsPane().getSelectedParentDataBlock().getSampleRate(); 
 		int defaultsamples =  (int) (paramsClone.defaultSegmentLen.doubleValue()*sR/1000.0);
 		return defaultsamples;

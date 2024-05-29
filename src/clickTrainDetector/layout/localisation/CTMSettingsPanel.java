@@ -79,7 +79,7 @@ public class CTMSettingsPanel extends TMSettingsPanel {
 	 */
 	private void setPanelEnabled(boolean enable) {
 		PamAWTUtils.setPanelEnabled(getFilterPanel(), enable);
-	PamAWTUtils.setPanelEnabled(getLocPanel(), enable);
+		PamAWTUtils.setPanelEnabled(getLocPanel(), enable);
 	}
 
 

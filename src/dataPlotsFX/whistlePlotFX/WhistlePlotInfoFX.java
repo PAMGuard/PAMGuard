@@ -184,6 +184,29 @@ public class WhistlePlotInfoFX extends TDDataInfoFX {
 			}
 		}
 	}
+	
+	/**
+	 * Draw a whistle fragment. 
+	 * @param pamDataUnit - the PAM data unit	
+	 * @param g - the graphics handle
+	 * @param windowRect - window describing window pixel dimensions to draw on
+	 * @param orientation - orientation
+	 * @param tdprojector - projector which converts pixels to time, frequency and vice versa. 
+	 * @param scrollStart - the scroll start 
+	 * @param type - type flag for plotting
+	 * @param wmControl
+	 * @param fftLength - the FFT length in samples
+	 * @param fftHop - the FFT hop in samples
+	 * @param sampleRate  - the sample rate in samples per second
+	 * @param fillCol - the fill colour
+	 * @param linCol - the line colour.
+	 * @param useKhz - true to pot with kHz instead of Hz
+	 * @return a 2D path in pixels of the fragment. 
+	 */
+	public static Path2D drawWhistleFragement(PamDataUnit pamDataUnit, WhistleMoanControl wmControl, int fftLength, int fftHop, float sampleRate,
+			GraphicsContext g, TimeProjectorFX tdprojector, double scrollStart, int type,  Color fillCol, Color linCol, Orientation orientation) {
+		return WhistlePlotInfoFX.drawWhistleFragement(pamDataUnit, wmControl, fftLength, fftHop, sampleRate, g, tdprojector, scrollStart, type, fillCol, linCol, false, orientation);
+	}
 
 	/**
 	 * Draw a whistle fragment. 
@@ -200,10 +223,11 @@ public class WhistlePlotInfoFX extends TDDataInfoFX {
 	 * @param sampleRate  - the sample rate in samples per second
 	 * @param fillCol - the fill colour
 	 * @param linCol - the line colour.
+	 * @param useKhz - true to pot with kHz instead of Hz
 	 * @return a 2D path in pixels of the fragment. 
 	 */
 	public static Path2D drawWhistleFragement(PamDataUnit pamDataUnit, WhistleMoanControl wmControl, int fftLength, int fftHop, float sampleRate,
-			GraphicsContext g, TimeProjectorFX tdprojector, double scrollStart, int type,  Color fillCol, Color linCol, Orientation orientation) {
+			GraphicsContext g, TimeProjectorFX tdprojector, double scrollStart, int type,  Color fillCol, Color linCol, boolean useKhz, Orientation orientation) {
 
 		//get position on time axis
 		long timeMillis=pamDataUnit.getTimeMilliseconds();
@@ -275,7 +299,9 @@ public class WhistlePlotInfoFX extends TDDataInfoFX {
 			sliceMillis += timeMillis;
 			slicePeaks = sliceData.getnPeaks();
 
+
 			tC=tdprojector.getTimePix((long) (sliceMillis-scrollStart)); 
+						
 			if (tC < 0 || tC >  tdprojector.getGraphTimePixels()) {
 				return null;
 			}
@@ -305,6 +331,7 @@ public class WhistlePlotInfoFX extends TDDataInfoFX {
 				}
 				lastPeak = prevSlice.getPeakInfo()[lastPeakNum];
 				f2 = thisPeak[1] * sampleRate / fftLength;
+				if (useKhz) f2=f2/1000.;
 
 				pt2 = new Point2D(tC, tdprojector.getCoord3d(0,f2,0).getCoordinate(1));
 
@@ -315,9 +342,10 @@ public class WhistlePlotInfoFX extends TDDataInfoFX {
 					awtPath.lineTo(pt2.getX(), pt2.getY());
 				}
 				pathCount++;
-				//				System.out.println("yAxis: "+ tdprojector.getCoord3d(0,f2,0).getCoordinate(1)+ " f2: " +f2 + " max val: "+yAxis.getMaxVal()+" "+frequencyInfo.getUnitDivisor());
+//				System.out.println("yAxis: "+ tdprojector.getCoord3d(0,f2,0).getCoordinate(1)+ " f2: " +f2 ); //+yAxis.getMaxVal()+" "+frequencyInfo.getUnitDivisor());
 
 				f1=lastPeak[1] * sampleRate / fftLength;
+				if (useKhz) f1=f1/1000.;
 
 				pt1 = new Point2D(prevtC,tdprojector.getCoord3d(0,f1,0).getCoordinate(1));
 
@@ -332,9 +360,10 @@ public class WhistlePlotInfoFX extends TDDataInfoFX {
 					pt2 = new Point2D(tC, tdprojector.getCoord3d(0,f2,0).getCoordinate(1));
 
 					f1=lastPeak[0] * sampleRate / fftLength;
+					if (useKhz) f1=f1/1000.;
 
 					pt1 = new Point2D(prevtC, tdprojector.getCoord3d(0,f1,0).getCoordinate(1));
-
+					
 					drawWhistleSegment( g,  orientation, prevSliceX, pt1.getY(),  sliceX, pt2.getY());
 
 					minX = Math.min(minX, pt1.getX());
@@ -347,10 +376,13 @@ public class WhistlePlotInfoFX extends TDDataInfoFX {
 					maxY = Math.max(maxY, pt2.getY());
 
 					f2=thisPeak[2] * sampleRate / fftLength;
+					if (useKhz) f2=f2/1000.;
 
 					pt2 =  new Point2D(tC, tdprojector.getCoord3d(0,f2,0).getCoordinate(1));
 
 					f1=lastPeak[2] * sampleRate / fftLength;
+					if (useKhz) f1=f1/1000.;
+
 					pt1 =  new Point2D(prevtC, tdprojector.getCoord3d(0,f1,0).getCoordinate(1));
 
 					drawWhistleSegment( g,   orientation, prevSliceX, pt1.getY(),  sliceX, pt2.getY());

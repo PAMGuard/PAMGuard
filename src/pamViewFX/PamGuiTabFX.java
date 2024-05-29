@@ -201,7 +201,7 @@ public class PamGuiTabFX extends PamTabFX {
 	 * @return the internal pane which has been added
 	 */
 	public PamGuiInternalPane addInternalPane(UserDisplayNodeFX userDisplayNodeFX){
-		System.out.println("UserDisplayNodeFX: " + userDisplayNodeFX);
+//		System.out.println("UserDisplayNodeFX: " + userDisplayNodeFX);
 		if (userDisplayNodeFX==null || userDisplayNodeFX.getNode()==null) return null;
 		
 		for (PamGuiInternalPane internalPane: this.internalPanes) {

@@ -213,9 +213,7 @@ public class PamHiddenSidePane extends PamStackPane {
 			break; 
 		}
 		
-		//make show button same height as hide button
-//		showButton.prefHeightProperty().bind(hidingPane.getHideButton().heightProperty());
-		//translate it so it sits slightly below the top of the pane. 
+		//set the location of the show button to be in the middle of the pane
 		showButton.translateYProperty().bind(displayPane.heightProperty().divide(2).subtract(showButton.heightProperty().divide(2)));
 
 		hidingPane.getHideButton().translateYProperty().setValue(yPos);

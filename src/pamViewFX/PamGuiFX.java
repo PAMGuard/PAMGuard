@@ -166,6 +166,8 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 		sidePaneContent.setPadding(new Insets(25,5,5,5)); //give quite  abit of spacing at the top so that there is room for close button
 		sidePaneContent.setMinWidth(0);
 		hidingSidePane=new HidingPane(Side.RIGHT, sidePaneContent, this, false);
+		hidingSidePane.setShowButtonOpacity(1.0);
+
 		hidingSidePane.showHidePane(false);
 
 		//create the button which shows the hiding panel. Although we get this button from the hiding pane, where to place
@@ -242,6 +244,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 
 		mainTabPane.setTabEndRegion(showButtonRight);
 		mainTabPane.setTabStartRegion(showButtonLeft);
+//		mainTabPane.getStyleClass().add(Styles.TABS_FLOATING);
 
 		mainTabPane.getAddTabButton().setOnAction((value)->{
 		    addPamTab(new TabInfo("Display " + (this.getNumTabs()+1)), null ,true); 

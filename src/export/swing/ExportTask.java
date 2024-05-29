@@ -25,12 +25,15 @@ public class ExportTask extends OfflineTask<PamDataUnit<?,?>>{
 	/**
 	 * The data selector for the data block
 	 */
-	private DataSelector dataSelector; 
+	private DataSelector dataSelector;
+
+	private boolean canExport; 
 
 	public ExportTask(PamDataBlock<PamDataUnit<?, ?>> parentDataBlock, PamExporterManager exporter) {
 		super(parentDataBlock);
 		this.exporter = exporter; 
 		dataSelector=parentDataBlock.getDataSelectCreator().getDataSelector(this.getUnitName() +"_clicks", false, null);
+		
 
 	}
 
@@ -41,20 +44,27 @@ public class ExportTask extends OfflineTask<PamDataUnit<?,?>>{
 
 	@Override
 	public boolean processDataUnit(PamDataUnit<?, ?> dataUnit) {
-		exporter.exportDataUnit(dataUnit);
-		return true;
+		if (dataSelector==null)  exporter.exportDataUnit(dataUnit, false);
+		else if (dataSelector.scoreData(dataUnit)>0) {
+			 exporter.exportDataUnit(dataUnit, false);
+		}
+		return false; //we don't need to indicate that anything has changed - we are just exporting. 
 	}
 
 	@Override
 	public void newDataLoad(long startTime, long endTime, OfflineDataMapPoint mapPoint) {
 		// TODO Auto-generated method stub
-		
+//		System.out.println("EXPORTER: new data load"); 
 	}
 
 	@Override
 	public void loadedDataComplete() {
-		//force the exporter so save any remaning data units in the buffer
-		exporter.exportDataUnit(null);
+		System.out.println("EXPORTER: loaded data complete"); 
+		
+		//force the exporter so save any renaming data units in the buffer
+		exporter.exportDataUnit(null,  true);
+		exporter.close();
+		exporter.setCurrentFile(null); 
 		
 	}
 	/**
@@ -77,6 +87,27 @@ public class ExportTask extends OfflineTask<PamDataUnit<?,?>>{
 				this.getDataBlock(), dataSelector, null);
 		return dataSelectDialog.showDialog();
 		
+	}
+
+	/**
+	 * Set whether the task can export based on the current selection
+	 * @param exportSelection - the index of the selected exporter
+	 */
+	public boolean canExport(int exportSelection) {
+		return exporter.getExporter(exportSelection).hasCompatibleUnits(getDataBlock().getUnitClass());
+	}
+	
+	
+	@Override
+	public boolean canRun() {		
+		boolean can = getDataBlock() != null; 
+		
+		if (can) {
+			//check whether we can export based on the export selection
+			can =  canExport(exporter.getExportParams().exportChoice);
+		}
+		
+		return can;
 	}
 
 }

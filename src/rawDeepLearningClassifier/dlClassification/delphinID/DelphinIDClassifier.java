@@ -8,12 +8,13 @@ import org.jamdev.jdl4pam.transforms.DLTransformsFactory;
 import org.jamdev.jdl4pam.transforms.DLTransfromParams;
 
 import PamController.PamControlledUnitSettings;
+import PamController.PamSettingManager;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
 import rawDeepLearningClassifier.dlClassification.StandardClassifierModel;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
-import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
+import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
 
 /**
@@ -37,6 +38,9 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 
 	public DelphinIDClassifier(DLControl dlControl) {
 		super(dlControl);
+		
+		//load the previous settings
+		PamSettingManager.getInstance().registerSettings(this);
 	}
 
 	@Override
@@ -86,6 +90,15 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 		return delphinIDParams;
 
 	}
+	
+	
+	@Override
+	public boolean isDecision(StandardPrediction modelResult, StandardModelParams modelParmas) {
+		//TODO
+		//DelphinID uses a different decision making process to most of the standard classifiers which just pass a binary threshold. 
+		return false;
+	}
+
 
 
 	@Override
@@ -96,10 +109,11 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 
 	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
+
 		DelphinIDParams newParameters = (DelphinIDParams) pamControlledUnitSettings.getSettings();
 		if (newParameters!=null) {
 			delphinIDParams = (DelphinIDParams) newParameters.clone();
-			//System.out.println("SoundSpot have been restored. : " + soundSpotParmas.classNames); 
+//			System.out.println("DELPHINID have been restored. : " + delphinIDParams.modelPath); 
 			if (delphinIDParams.dlTransfromParams!=null) {
 				delphinIDParams.dlTransfroms = DLTransformsFactory.makeDLTransforms((ArrayList<DLTransfromParams>) delphinIDParams.dlTransfromParams); 
 			}
@@ -111,7 +125,7 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 
 
 	@Override
-	public DLModelWorker<GenericPrediction> getDLWorker() {
+	public DLModelWorker<StandardPrediction> getDLWorker() {
 		if (delphinIDWorker==null) {
 			delphinIDWorker = new DelphinIDWorker();
 		}

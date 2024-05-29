@@ -47,20 +47,20 @@ public class FormsTabPanel implements PamTabPanel {
 //		keyManager=KeyboardFocusManager.getCurrentKeyboardFocusManager();
 //		keyManager.addKeyEventDispatcher(new LoggerKeyEventDispatcher());
 		
-		/** Global (OS-level) hotkey manager: 
-		 * jnativehook supported systems: Windows, X11, MacOS
-		 * 
-		 */
-		try {
-			LogManager.getLogManager().reset();
-			GlobalScreen.setEventDispatcher(new SwingDispatchService());
-			GlobalScreen.registerNativeHook();
-			GlobalScreen.addNativeKeyListener(new GlobalKeyListenerExample());
-		}
-		catch (NativeHookException ex) {
-			System.err.println("There was a problem registering the native hook.");
-			System.err.println(ex.getMessage());
-		}
+//		/** Global (OS-level) hotkey manager: 
+//		 * jnativehook supported systems: Windows, X11, MacOS
+//		 * 
+//		 */
+//		try {
+//			LogManager.getLogManager().reset();
+//			GlobalScreen.setEventDispatcher(new SwingDispatchService());
+//			GlobalScreen.registerNativeHook();
+//			GlobalScreen.addNativeKeyListener(new GlobalKeyListenerExample());
+//		}
+//		catch (NativeHookException ex) {
+//			System.err.println("There was a problem registering the native hook.");
+//			System.err.println(ex.getMessage());
+//		}
 	}
 
 	@Override

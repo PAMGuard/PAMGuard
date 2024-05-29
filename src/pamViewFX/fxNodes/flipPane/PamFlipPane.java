@@ -164,7 +164,7 @@ public class PamFlipPane extends FlipPane {
 		backButton.setStyle("-fx-background-radius: 0 5 5 0; -fx-border-radius: 0 5 5 0; -fx-background-color: -color-accent-6");
 
 		backButton.setOnAction((action)->{
-			System.out.println("FLIP BACK TO FRONT"); 
+//			System.out.println("FLIP BACK TO FRONT"); 
 			this.backButtonResponse.setValue(OK_BACK_BUTTON); 
 			this.flipToFront(); 
 		});

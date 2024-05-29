@@ -35,7 +35,7 @@ public class DetectionPlotProjector extends GeneralProjector<Coordinate3d> {
 	/**
 	 * True to enable the scroll bar. 
 	 */
-	public boolean enableScrollBar = false; 
+	public boolean enableScrollBar = true; 
 
 	/**
 	 * Projector for the ddPlotPane. 	

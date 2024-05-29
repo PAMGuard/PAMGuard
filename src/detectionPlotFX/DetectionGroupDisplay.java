@@ -18,20 +18,25 @@ import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamButton;
+import pamViewFX.fxNodes.PamGridPane;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamStackPane;
 import pamViewFX.fxNodes.PamTabPane;
 import pamViewFX.fxNodes.hidingPane.HidingPane;
+import pamViewFX.fxNodes.utilityPanes.PamToggleSwitch;
 import pamViewFX.fxStyles.PamStylesManagerFX;
 
 /**
@@ -113,8 +118,17 @@ public class DetectionGroupDisplay extends PamBorderPane {
 	/**
 	 * Hiding pane for the plot settings. 
 	 */
-	private HidingPane hidingPane; 
-	
+	private HidingPane hidingPane;
+
+	/**
+	 * Flag for how the deteciton plot is laid out.  
+	 */
+	private int layoutType = DISPLAY_EXTENDED;
+
+	/**
+	 * Toggle switch for showing the scroll pane. 
+	 */
+	private PamToggleSwitch showScrollSwitch;
 	
 	/**
 	 * Constructor for the detection group display. 
@@ -122,6 +136,7 @@ public class DetectionGroupDisplay extends PamBorderPane {
 	public DetectionGroupDisplay() {
 		//create hash map to map DDDataInfos to datablocks for quick access. 
 		dDataInfoHashMap = new HashMap<PamDataBlock, DDDataInfo>(); 
+		this.layoutType = DISPLAY_EXTENDED;
 		createDetectionDisplay(DISPLAY_EXTENDED);
 		this.setCenter(detectionDisplayHolder);
 	}
@@ -131,9 +146,11 @@ public class DetectionGroupDisplay extends PamBorderPane {
 	 * @param layoutType - the layout of the display - e.g. DetectionGroupDisplay.DISPLAY_COMPACT
 	 */
 	public DetectionGroupDisplay(int layoutType) {
+		this.layoutType = layoutType;
+
 		//create hash map to map DDDataInfos to datablocks for quick access. 
 		dDataInfoHashMap = new HashMap<PamDataBlock, DDDataInfo>(); 
-		createDetectionDisplay(DISPLAY_COMPACT);
+		createDetectionDisplay(layoutType);
 		this.setCenter(detectionDisplayHolder);
 	}
 
@@ -201,6 +218,7 @@ public class DetectionGroupDisplay extends PamBorderPane {
 			
 			hidingPane.getShowButton().setGraphic(PamGlyphDude.createPamIcon("mdi2c-cog", 
 					PamGuiManagerFX.iconColor, PamGuiManagerFX.iconSize)); 
+			hidingPane.setShowButtonOpacity(1.0); //don't want show button to gray out if mouse not over it
 			this.setRight(hidingPane); //bit of a hack but works. 
 			hidingPane.showHidePane(false);
 			
@@ -219,36 +237,68 @@ public class DetectionGroupDisplay extends PamBorderPane {
 			detectionDisplayHolder = new PamStackPane(); 
 			
 			PamTabPane settingsPane = new PamTabPane(); 
-			settingsPane.setTabMinHeight(60);
-			settingsPane.setMinHeight(60);
-//			settingsPane.repackTabs();
-			
+			//this has to be before removing the heading button
 			settingsPane.setAddTabButton(false);
+			settingsPane.setTabMinHeight(60);
+			settingsPane.setMinHeight(100);
+			
 //			settingsPane.getStyleClass().add(Styles.TABS_FLOATING);
 			settingsPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
-			//settingsPane.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
 			
-			Tab dataTab = new Tab("Data",detectionDisplay.getDataTypePane());
-			Tab settingsTab = new Tab("Settings -BLAH",detectionDisplay.getSettingsHolder());
+			PamGridPane gridPane = new PamGridPane();
+			gridPane.setHgap(5.);
+			gridPane.setVgap(5.);
+			gridPane.setPadding(new Insets(0,0,0,5));
+			
+			gridPane.add(new Label("Plot type"), 0, 0);
+			gridPane.add(detectionDisplay.getDataTypePane(), 1, 0);
+			
+			showScrollSwitch = new PamToggleSwitch("Show scroll bar");
+			showScrollSwitch.selectedProperty().addListener((obsVal, oldVal, newVal)->{
+				//show or hide the scroll bar. 
+				this.setEnableScrollBar(newVal);
+			});
+			showScrollSwitch.setSelected(true);
+			gridPane.add(showScrollSwitch, 0, 1);
+			GridPane.setColumnSpan(showScrollSwitch, GridPane.REMAINING);
 
+
+			Tab dataTab = new Tab("Plot",gridPane);
+			
+			ScrollPane scrollPane = new ScrollPane();
+			scrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
+			scrollPane.setContent(detectionDisplay.getSettingsHolder());
+			Tab settingsTab = new Tab("Settings", scrollPane);
+			
+			//here add the option to show the scroll bar or not. 
 			settingsPane.getTabs().add(dataTab);
 			settingsPane.getTabs().add(settingsTab);
 			
-			hidingPane = new HidingPane(Side.RIGHT, settingsPane, detectionDisplayHolder, layoutType==DISPLAY_COMPACT, 0);
+			//set the hiding pane
+			Node icon = PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconSize); 
+			detectionDisplay.getPlotPane().setHidePane(new PamBorderPane(settingsPane), icon,  Side.RIGHT);
+
+			//move the hiding pane button into the top of the tab pane - this makes best
+			//use of space. 
+			hidingPane = detectionDisplay.getPlotPane().getHidePane(Side.RIGHT);
+			
 			hidingPane.removeHideButton();
-			hidingPane.getHideButton().setMinWidth(40);
+			
 			settingsPane.setTabStartRegion(hidingPane.getHideButton());
+//			hidingPane.getHideButton().getStyleClass().add("close-button-right-trans");
+//			hidingPane.getHideButton().setStyle(" -fx-background-radius: 0 0 0 0;");
+			hidingPane.setPadding(new Insets(0,0,0,0));
+			
+			hidingPane.getHideButton().prefHeightProperty().bind(settingsPane.tabMinHeightProperty());
+			
+			//set the show button to be slight larger
+			hidingPane.getShowButton().setPrefHeight(60.);
 			
 			//now everything to pane. 
 			detectionDisplayHolder.getChildren().add(detectionDisplay);
 			StackPane.setAlignment(detectionDisplay, Pos.CENTER);
 			
 			//settingsPane.setPadding(new Insets(35,0,0,0));
-			
-			Node icon = PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconSize); 
-			detectionDisplay.getPlotPane().setHidePane(new PamBorderPane(settingsPane), icon,  Side.RIGHT);
-			hidingPane.getShowButton().setPrefHeight(30);
-
 		}
 		
 		//set styles
@@ -532,11 +582,23 @@ public class DetectionGroupDisplay extends PamBorderPane {
 
 	
 	/**
-	 * Show the scroll bar which allows the user to chnage time limits. 
+	 * Show the scroll bar which allows the user to change time limits. 
 	 * @param enableScrollBarPane - true to enable the time scroll bar. 
 	 */
 	public void setEnableScrollBar(boolean enableScrollBarPane) {
-		this.detectionDisplay.setEnableScrollBar(enableScrollBarPane);
+		if (this.layoutType==DISPLAY_COMPACT) {
+			showScrollSwitch.setSelected(enableScrollBarPane);
+		}
+		detectionDisplay.setEnableScrollBar(enableScrollBarPane);
+		detectionDisplay.setupScrollBar();
+	}
+	
+	/**
+	 * Check whether the scroll bar is changing. The scroll bar allows the user to change time limits. 
+	 * @return true if the scroll bar pane is showing. 
+	 */
+	public boolean isEnableScrollBar() {
+		return this.detectionDisplay.isEnableScrollBar();
 	}
 
 

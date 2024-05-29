@@ -1,7 +1,5 @@
 package rawDeepLearningClassifier.dlClassification.delphinID;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +8,6 @@ import javax.swing.JPanel;
 import PamController.SettingsPane;
 import javafx.scene.Node;
 import javafx.stage.FileChooser.ExtensionFilter;
-import pamViewFX.fxGlyphs.PamSVGIcon;
 import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
 
 /**
@@ -83,24 +80,25 @@ public class DelphinUI implements DLCLassiferModelUI  {
 
 	@Override
 	public Node getIcon() {
-		if (icon==null) {
-			PamSVGIcon iconMaker= new PamSVGIcon(); 
-			PamSVGIcon svgsprite;
-			try {
-				svgsprite = iconMaker.create(getClass().getResource("/Resources/delphinid_logo01.svg").toURI().toURL());
-				icon = svgsprite.getSpriteNode();
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		return icon;
+//		if (icon==null) {
+//			PamSVGIcon iconMaker= new PamSVGIcon(); 
+//			PamSVGIcon svgsprite;
+//			try {
+//				svgsprite = iconMaker.create(getClass().getResource("/Resources/delphinid_logo01.svg").toURI().toURL());
+//				icon = svgsprite.getSpriteNode();
+//			} catch (MalformedURLException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			} catch (URISyntaxException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			} catch (Exception e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+//		return icon;
+		return null;
 	}
 		
 }

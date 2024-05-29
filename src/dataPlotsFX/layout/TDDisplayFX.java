@@ -252,10 +252,11 @@ public class TDDisplayFX extends PamBorderPane {
 		//create the button which shows the hiding panel. Although we get this button from the hiding pane, where to place
 		//it and what colour it is etc has to be set for whatever pane it is to be located in. 
 		showButton=hidingControlPane.getShowButton();
-		showButton.getStyleClass().add("transparent-button-square");
-		showButton.setStyle("-fx-background-radius: 0 0 10 10;");
+		hidingControlPane.setShowButtonOpacity(1.0);
+//		showButton.getStyleClass().add("transparent-button-square");
+		showButton.setStyle("-fx-background-radius: 0 0 10 0;");
 		showButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-down", PamGuiManagerFX.iconSize));
-		showButton.setPrefWidth(60);
+		showButton.setPrefWidth(30);
 		showButton.setMaxHeight(timeAxisSize-20);
 
 		//create the time axis for the display. 
@@ -276,7 +277,7 @@ public class TDDisplayFX extends PamBorderPane {
 		StackPane mainGraphPane=new StackPane();
 		mainGraphPane.getChildren().add(splitPaneHolder);
 		mainGraphPane.getChildren().add(showButton);
-		StackPane.setAlignment(showButton, Pos.TOP_CENTER);		
+		StackPane.setAlignment(showButton, Pos.TOP_LEFT);		
 
 		this.setCenter(mainGraphPane);
 

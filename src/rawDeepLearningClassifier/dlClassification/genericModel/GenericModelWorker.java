@@ -9,6 +9,7 @@ import org.jamdev.jdl4pam.transforms.FreqTransform;
 
 import PamModel.PamModel;
 import PamModel.PamModel.PluginClassloader;
+import PamUtils.PamArrayUtils;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 
@@ -18,7 +19,7 @@ import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams
  * @author Jamie Macaulay
  *
  */
-public class GenericModelWorker extends DLModelWorker<GenericPrediction> {
+public class GenericModelWorker extends DLModelWorker<StandardPrediction> {
 
 	/**
 	 * The generic model 
@@ -32,7 +33,7 @@ public class GenericModelWorker extends DLModelWorker<GenericPrediction> {
 
 	@Override
 	public float[] runModel(float[][][] transformedDataStack) {
-		//System.out.println("RUN GENERIC MODEL: " + transformedDataStack.length +  "  " + transformedDataStack[0].length +  "  " + transformedDataStack[0][0].length);
+//		System.out.println("RUN GENERIC MODEL: " + transformedDataStack.length +  "  " + transformedDataStack[0].length +  "  " + transformedDataStack[0][0].length);
 //		System.out.println("RUN GENERIC MODEL: " + transformedDataStack[0][0][0]);
 		float[]  results; 
 		if (freqTransform)
@@ -47,13 +48,14 @@ public class GenericModelWorker extends DLModelWorker<GenericPrediction> {
 			//System.out.println("RUN GENERIC MODEL WAVE: " + waveStack.length +  "  " + waveStack[0].length +  " " + waveStack[0][0]);
 			results =  getModel().runModel(waveStack);
 		}
-		//System.out.println("GENERIC MODEL RESULTS: " + results== null ? null : results.length);
+//		System.out.println("GENERIC MODEL RESULTS: " + (results== null ? null : results.length));
+//		PamArrayUtils.printArray(results);
 		return results;
 	}
 
 	@Override
-	public GenericPrediction makeModelResult(float[] prob, double time) {
-		GenericPrediction model = new  GenericPrediction(prob);
+	public StandardPrediction makeModelResult(float[] prob, double time) {
+		StandardPrediction model = new  StandardPrediction(prob);
 		model.setAnalysisTime(time);
 		return model;
 	}

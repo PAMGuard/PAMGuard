@@ -4,7 +4,7 @@ import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dlClassification.archiveModel.ArchiveModelClassifier;
 import rawDeepLearningClassifier.dlClassification.archiveModel.ArchiveModelWorker;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
-import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
+import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 
 /**
  * Classifier which uses deep learning models from Koogus' framework.

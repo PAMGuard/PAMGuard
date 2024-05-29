@@ -52,9 +52,9 @@ public class RRawExport extends RDataUnitExport<PamDataUnit> {
 		//time delay stuff.
 		if (dataUnit.getLocalisation()!=null) {
 			//bearing angles 
-			rData.add("angles", new DoubleArrayVector(dataUnit.getLocalisation().getAngles())); 
+			rData.add("angles", dataUnit.getLocalisation().getAngles() == null ? new DoubleArrayVector(0.) :  new DoubleArrayVector(dataUnit.getLocalisation().getAngles())); 
 			//angle errors 
-			rData.add("angleErrors", new DoubleArrayVector(dataUnit.getLocalisation().getAngleErrors())); 
+			rData.add("angleErrors", dataUnit.getLocalisation().getAngleErrors() == null? new DoubleArrayVector(0.) : new DoubleArrayVector(dataUnit.getLocalisation().getAngleErrors())); 
 		}
 		else {
 			//bearing angles 
@@ -73,7 +73,7 @@ public class RRawExport extends RDataUnitExport<PamDataUnit> {
 
 	@Override
 	public String getName() {
-		return "pam_data_units";
+		return "raw_data_units";
 	}
 
 }

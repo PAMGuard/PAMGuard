@@ -13,7 +13,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import org.jamdev.jdl4pam.utils.DLUtils;
 import org.jamdev.jpamutils.wavFiles.AudioData;
 
-import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
+import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 import rawDeepLearningClassifier.dlClassification.ketos.KetosDLParams;
 import rawDeepLearningClassifier.dlClassification.ketos.KetosWorker2;
 import rawDeepLearningClassifier.segmenter.GroupedRawData;
@@ -140,7 +140,7 @@ public class KetosDLClassifierTest {
 				ArrayList<GroupedRawData> groupedData = new ArrayList<GroupedRawData>();
 				groupedData.add(groupedRawData);
 
-				ArrayList<GenericPrediction> genericPrediciton = ketosWorker2.runModel(groupedData, soundData.sampleRate, 0);		
+				ArrayList<StandardPrediction> genericPrediciton = ketosWorker2.runModel(groupedData, soundData.sampleRate, 0);		
 				float[] output =  genericPrediciton.get(0).getPrediction();
 
 				boolean testPassed= output[1]> ketosPredicitons[i][2]-0.1 && output[1]< ketosPredicitons[i][2]+0.1;

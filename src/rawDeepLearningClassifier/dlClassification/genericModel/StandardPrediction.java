@@ -9,7 +9,7 @@ import rawDeepLearningClassifier.dlClassification.PredictionResult;
  * @author Jamie Macaulay 
  *
  */
-public class GenericPrediction implements PredictionResult {
+public class StandardPrediction implements PredictionResult {
 	
 
 	/**
@@ -45,14 +45,14 @@ public class GenericPrediction implements PredictionResult {
 	 * @param classNameID - the ID's of the class names.
 	 * @param isBinary - true if the model result passed a binary test (usually one species above a threshold)
 	 */
-	public GenericPrediction(float[] prob, short[] classNameID, boolean isBinary) {
+	public StandardPrediction(float[] prob, short[] classNameID, boolean isBinary) {
 		this.prob=prob; 
 		this.classNameID = classNameID;
 		this.binaryPass= isBinary; 
 	}
 
 	
-	public GenericPrediction(float[] prob, boolean isBinary) {
+	public StandardPrediction(float[] prob, boolean isBinary) {
 		this(prob, null, isBinary); 
 	}
 
@@ -60,7 +60,7 @@ public class GenericPrediction implements PredictionResult {
 	 * Create a result for the Sound Spot classifier. 
 	 * @param prob - the probability of each class. 
 	 */
-	public GenericPrediction(float[] prob) {
+	public StandardPrediction(float[] prob) {
 		this(prob, null, false); 
 	}
 

@@ -13,7 +13,7 @@ public class ExportParams implements Serializable, Cloneable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 	
 	/**
 	 * The index of the export choice. 
@@ -24,6 +24,11 @@ public class ExportParams implements Serializable, Cloneable {
 	 * The folder to save to. 
 	 */
 	public String folder = System.getProperty("user.home");
+	
+	/**
+	 * The maximum file size in Megabytes
+	 */
+	public Double maximumFileSize = 1000.0;
 	
 	@Override
 	public ExportParams clone()  {

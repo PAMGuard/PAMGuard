@@ -46,5 +46,10 @@ public interface PamDataUnitExporter {
 	 */
 	public String getName();
 
+	/**
+	 * Clsoe the exporter
+	 */
+	public void close();
+
 
 }

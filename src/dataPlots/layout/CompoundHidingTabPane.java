@@ -10,6 +10,10 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
+import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
+import org.kordamp.ikonli.swing.FontIcon;
+
+import PamView.component.PamSettingsIconButton;
 import PamView.dialog.PamButtonAlpha;
 import PamView.dialog.PamDialog;
 import PamView.hidingpanel.TabbedHidingPane;
@@ -25,8 +29,11 @@ public class CompoundHidingTabPane extends TabbedHidingPane{
 
 	private static final long serialVersionUID = 1L;
 	
-	public static final ImageIcon settingsImage=new ImageIcon(ClassLoader
-			.getSystemResource("Resources/SettingsButtonSmallWhite.png"));
+//	public static final ImageIcon settingsImage=new ImageIcon(ClassLoader
+//			.getSystemResource("Resources/SettingsButtonSmallWhite.png"));
+	
+	public static final FontIcon settingsImage =  FontIcon.of(PamSettingsIconButton.SETTINGS_IKON, PamSettingsIconButton.SMALL_SIZE, Color.WHITE);
+
 
 	
 	public CompoundHidingTabPane() {

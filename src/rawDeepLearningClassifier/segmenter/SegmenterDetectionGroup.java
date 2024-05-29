@@ -10,6 +10,19 @@ import PamguardMVC.PamDataUnit;
  */
 public class SegmenterDetectionGroup extends GroupDetection<PamDataUnit> {
 
+	
+	/**
+	 * The duration of the segment in millis. 
+	 */
+	private double segDuration;
+	
+	/**
+	 * The start time fo the segment in millis.
+	 */
+	private long segMillis;
+
+	private double timeS;
+
 	/**
 	 * Constructor for a group of detections within a detection. Note that some
 	 * longer detections (e.g. whistles) may have sections outside the segment.
@@ -17,11 +30,45 @@ public class SegmenterDetectionGroup extends GroupDetection<PamDataUnit> {
 	 * @param timeMilliseconds - this is the start of the SEGMENT - Note that the
 	 * @param channelBitmap    - channels of all detections
 	 * @param startSample      - the stratSample of the SEGMENT.
-	 * @param duration         - the duration of the SEGMENT.
+	 * @param duration         - the duration of the SEGMENT in milliseconds.
 	 */
-	public SegmenterDetectionGroup(long timeMilliseconds, int channelBitmap, long startSample, long duration) {
-		super(timeMilliseconds, channelBitmap, startSample, duration);
-		// TODO Auto-generated constructor stub
+	public SegmenterDetectionGroup(long timeMilliseconds, int channelBitmap, long startSample, double duration) {
+		super(timeMilliseconds, channelBitmap, startSample, (long) duration);
+		this.setDurationInMilliseconds(duration);
+		this.segMillis = timeMilliseconds;
+		this.segDuration = duration;
 	}
+	
+	@Override
+	public boolean isAllowSubdetectionSharing() {
+		//segmetns share sub detections
+		return true;
+	}
+	
+	
+	public long getSegmentStartMillis() {
+		return segMillis;
+	}
+	
+	/**
+	 * Get the segment duration in milliseconds. 
+	 * @return the segment duration in millis. 
+	 */
+	public double getSegmentDuration() {
+		return segDuration;
+	}
+
+	public long getSegmentEndMillis() {
+		return (long) (segMillis+segDuration);
+	}
+
+	public void setStartSecond(double timeS) {
+		this.timeS = timeS;
+	}
+
+	public double getStartSecond() {
+		return timeS;
+	}
+
 
 }

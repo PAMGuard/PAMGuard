@@ -84,7 +84,7 @@ public abstract class MLDataUnitExport<T extends PamDataUnit<?, ?>> {
 		double datenumMT = PamCalendar.millistoDateNum(dataUnit.getTimeMilliseconds());
 		Matrix date = Mat5.newScalar(datenumMT); 
 
-		mlStruct.set("date", date);
+		mlStruct.set("date", index, date);
 		
 		//add detection specific data 
 		mlStruct= addDetectionSpecificFields(mlStruct, index, dataUnit);

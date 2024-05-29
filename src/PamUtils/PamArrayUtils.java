@@ -3,13 +3,16 @@ package PamUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.TreeMap;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import org.apache.commons.math.linear.RealMatrix;
 
+import PamguardMVC.PamDataUnit;
 import us.hebi.matlab.mat.types.Matrix;
 
 /**
@@ -175,6 +178,22 @@ public class PamArrayUtils {
 			median=zSort.get((int) ((size/2)-0.5));
 		}
 		return median;
+	}
+	
+	
+	/**
+	 * Get the data unit with the lowest time in millis from a data unit list. 
+	 * @param dataUnits - a data unit list.
+	 * @return the data unit with the lowest time in millis.
+	 */
+	public static PamDataUnit getMinTimeMillis(List<PamDataUnit> dataUnits) {
+	    // then
+		PamDataUnit minByTime = dataUnits
+	      .stream()
+	      .min(Comparator.comparing(PamDataUnit::getTimeMilliseconds))
+	      .orElseThrow(NoSuchElementException::new);
+		
+		return minByTime;
 	}
 
 	/**
@@ -418,6 +437,26 @@ public class PamArrayUtils {
 		}
 
 		return new double[] {min, max};
+	}
+	
+	
+	/**
+	 * Calculate the minimum and maximum value of a 2D array. 
+	 * @param arr - the array to find the maximum value of. 
+	 * @return the minimum and maximum value in the array
+	 */
+	public static float[] minmax(float[][] arr) {
+		float max = Float.NEGATIVE_INFINITY;
+		float min = Float.POSITIVE_INFINITY;
+
+		for(int i=0; i<arr.length; i++) {
+			for(int j=0; j<arr[i].length; j++) {
+				max = Math.max(max, arr[i][j]);
+				min = Math.min(min, arr[i][j]);
+			}
+		}
+
+		return new float[] {min, max};
 	}
 
 
@@ -727,6 +766,17 @@ public class PamArrayUtils {
 		}
 	}
 	
+	/**
+	 * Print an array to the console. 
+	 * @param array to print
+	 */
+	public static void printArray(float[] array) {
+		if (array==null) System.out.println("null"); 
+		for (int i=0; i<array.length; i++) {
+			System.out.println(i + ": " + array[i]);
+		}
+	}
+	
 	
 	/**
 	 * Print an array to the console with no index numbers
@@ -814,14 +864,17 @@ public class PamArrayUtils {
 	/**
 	 * Check whether there are duplicates within an array
 	 * @param the array.
-	 * @return true if there are duplicates. 
+	 * @return true if the array is unique
 	 */
 	public static boolean unique(double[] array) {
-		boolean duplicates=false;
+		boolean duplicates=true;
 		for (int j=0;j<array.length;j++)
 			for (int k=j+1;k<array.length;k++)
-				if (k!=j && array[k] == array[j])
-					duplicates=true;
+				if (k!=j && array[k] == array[j]) {
+					//if 
+					duplicates=false;
+					return duplicates;					
+				}
 		return duplicates;
 	}
 
@@ -1151,6 +1204,7 @@ public class PamArrayUtils {
 		}
 		return arrayOut;
 	}
+
 
 
 

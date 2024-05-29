@@ -349,11 +349,20 @@ public class FFTSettingsPane<D extends PamDataUnit> extends DynamicSettingsPane<
 	}
 	
 	/**
-	 * Get the VBox holder. This is the main pane whihc holds the spectrogram colour settings. 
+	 * This is the main pane which holds the spectrogram colour and FFT settings. 
 	 * @return the VBox holder.
 	 */
-	public PamHBox getVBoxHolder() {
+	public PamHBox getHolderPane() {
 		return holder; 
+	}
+	
+	
+	/**
+	 * Get the Pane which holds the FFT Settings e.. length hop etc. 
+	 * @return the pane with controls for FFT settings.
+	 */
+	public Pane getFFTPane() {
+		return fftPane; 
 	}
 
 	/**

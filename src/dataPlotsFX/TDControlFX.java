@@ -114,9 +114,11 @@ public class TDControlFX extends TDControl implements UserDisplayNodeFX {
 		ArrayList<PamDataBlock> dataBlocks=new ArrayList<PamDataBlock>();
 		PamDataBlock dataBlock=this.tdDisplayController.getUserDisplayProcess().getParentDataBlock();
 		if (TDDataProviderRegisterFX.getInstance().findDataProvider(dataBlock)!=null) dataBlocks.add(dataBlock);
-		if (dataBlock!=null) System.out.println("TDControldFX: parent datablock "+dataBlock.getDataName());
+		if (dataBlock!=null) {
+//			System.out.println("TDControldFX: parent datablock "+dataBlock.getDataName());
+		}
 		else{
-			System.out.println("TDControldFX: parent datablock null"); 
+//			System.out.println("TDControldFX: parent datablock null"); 
 			return dataBlocks; 
 		}
 		

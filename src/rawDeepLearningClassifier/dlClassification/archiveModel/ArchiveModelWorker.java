@@ -26,7 +26,7 @@ import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericModelWorker;
-import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
+import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 
 /**
  * 
@@ -58,10 +58,11 @@ public class ArchiveModelWorker extends GenericModelWorker {
 	}
 
 	/**
-	 * Prepare the model 
+	 * Prepare the model.
+	 * Note it is important to put a synchonized here or the model loading can fail. 
 	 */
 	@Override
-	public void prepModel(StandardModelParams dlParams, DLControl dlControl) {
+	public synchronized void prepModel(StandardModelParams dlParams, DLControl dlControl) {
 		//ClassLoader origCL = Thread.currentThread().getContextClassLoader();
 		try {
 
@@ -128,6 +129,7 @@ public class ArchiveModelWorker extends GenericModelWorker {
 			//				}
 
 			//generate the transforms from the KetosParams objects. 
+			System.out.println(modelParams.dlTransforms);
 			ArrayList<DLTransform> transforms =	DLTransformsFactory.makeDLTransforms(modelParams.dlTransforms); 
 
 //			///HACK here for now to fix an issue with dB and Ketos transforms having zero length somehow...
@@ -197,6 +199,7 @@ public class ArchiveModelWorker extends GenericModelWorker {
 	 * @throws IOException
 	 */
 	public ArchiveModel loadModel(String currentPath2) throws MalformedModelException, IOException {
+	
 		return new SimpleArchiveModel(new File(currentPath2)); 
 	}
 
@@ -228,8 +231,8 @@ public class ArchiveModelWorker extends GenericModelWorker {
 
 
 	@Override
-	public GenericPrediction makeModelResult(float[]  prob, double time) {
-		GenericPrediction prediction =  new GenericPrediction(prob); 
+	public StandardPrediction makeModelResult(float[]  prob, double time) {
+		StandardPrediction prediction =  new StandardPrediction(prob); 
 		prediction.setAnalysisTime(time);
 		return prediction;
 	}
@@ -250,6 +253,10 @@ public class ArchiveModelWorker extends GenericModelWorker {
 	@Override
 	public ArchiveModel getModel() {
 		return dlModel;
+	}
+	
+	protected void setModel(ArchiveModel dlModel) {
+		this.dlModel = dlModel;
 	}
 
 	@Override

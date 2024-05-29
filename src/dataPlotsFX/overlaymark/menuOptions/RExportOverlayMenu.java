@@ -49,7 +49,7 @@ public class RExportOverlayMenu extends ExportOverlayMenu {
 		buttonNode = createButton();
 		
 		defaultPath=FileSystemView.getFileSystemView().getDefaultDirectory().getPath();
-		defaultPath=defaultPath +  "/Pamguard Manual Export";
+		defaultPath=defaultPath +  File.separator + "Pamguard Manual Export";
 		
 		currentFolder=defaultPath;
 		
@@ -113,8 +113,8 @@ public class RExportOverlayMenu extends ExportOverlayMenu {
 			dataUnits.add(fnDataUnit);
 		}
 		
-		RData mlData=rExportManger.dataUnits2R(dataUnits);
-		if (mlData==null ){
+		RData rData=rExportManger.dataUnits2R(dataUnits);
+		if (rData==null ){
 			//do nothing
 			System.out.println("rOverlayMenu: no data units were converted to structs");
 		}
@@ -134,12 +134,12 @@ public class RExportOverlayMenu extends ExportOverlayMenu {
 			long millisStart=foundDataUnits.getFirstTimeMillis();
 			String currentPath = PamCalendar.formatFileDateTime(millisStart, false);
 			//add data types to the filen,ae
-			for (int i=0 ;i<mlData.rData.length(); i++ ){
-				currentPath=currentPath + "_" + mlData.dataUnitTypes.get(i); 
+			for (int i=0 ;i<rData.dataUnitTypes.size(); i++ ){
+				currentPath=currentPath + "_" + rData.dataUnitTypes.get(i); 
 			}
 			//add correct file type.	
 			currentPath = currentPath + ".RData";
-			currentPath = currentFolder+"/"+currentPath;
+			currentPath = currentFolder+ File.separator+currentPath;
 							
 			//now write the file
 			try {
@@ -155,7 +155,7 @@ public class RExportOverlayMenu extends ExportOverlayMenu {
 				FileOutputStream fos = new FileOutputStream(currentPath);
 				GZIPOutputStream zos = new GZIPOutputStream(fos);
 				RDataWriter writer = new RDataWriter(context, zos);		
-				writer.save(mlData.rData.build());		
+				writer.save(rData.rData.build());		
 				zos.close();
 				writer.close();
 				super.showConfirmOverlay(currentPath, "R");

@@ -12,7 +12,9 @@ public class SegmenterGroupDataBlock extends PamDataBlock<SegmenterDetectionGrou
 
 	public SegmenterGroupDataBlock(String dataName, PamProcess parentProcess, int channelMap) {
 		super(SegmenterDetectionGroup.class, dataName, parentProcess, channelMap);
-		// TODO Auto-generated constructor stub
+		this.setNaturalLifetimeMillis(15000); //do not want to keep the data for very long  - it's raw data segmnents so memory intensive
+
 	}
+	
 
 }

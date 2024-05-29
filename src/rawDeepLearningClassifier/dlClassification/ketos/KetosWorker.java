@@ -15,7 +15,7 @@ import PamView.dialog.warn.WarnOnce;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
-import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
+import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 
 /**
  * 
@@ -25,7 +25,7 @@ import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction
  * @author Jamie Macaulay 
  *
  */
-public class KetosWorker extends DLModelWorker<GenericPrediction> {
+public class KetosWorker extends DLModelWorker<StandardPrediction> {
 
 
 	/**

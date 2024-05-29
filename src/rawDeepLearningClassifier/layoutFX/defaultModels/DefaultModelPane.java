@@ -35,6 +35,9 @@ import rawDeepLearningClassifier.defaultModels.DLModel;
  */
 public class DefaultModelPane extends PamBorderPane{
 	
+	private static final double PREF_WIDTH = 200;
+
+
 	/**
 	 * Reference to the deafult model manager that contains the default models. 
 	 */
@@ -74,7 +77,7 @@ public class DefaultModelPane extends PamBorderPane{
 //		vBox.setPrefWidth(120);
 
 		hidingPaneContent= new PamBorderPane(); 
-		hidingPaneContent.setPrefWidth(150);
+		hidingPaneContent.setPrefWidth(PREF_WIDTH);
 		 hidingPane = new HidingPane(Side.RIGHT,  hidingPaneContent,  vBox, true, 0); 
 	
 		PamButton button;
@@ -101,11 +104,14 @@ public class DefaultModelPane extends PamBorderPane{
 		}
 				
 		hidingPane.setStyle("-fx-background-color: -fx-base");
+		hidingPane.setPrefWidth(PREF_WIDTH);
 //		this.setStyle("-fx-background-color: -fx-base");
 
 		PamStackPane mainHolder = new PamStackPane(); 
 		mainHolder.getChildren().addAll(vBox, hidingPane); 
 		StackPane.setAlignment(hidingPane, Pos.TOP_RIGHT);
+		
+		mainHolder.setPrefWidth(PREF_WIDTH);
 		
 		return mainHolder;
 		

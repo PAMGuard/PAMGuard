@@ -132,6 +132,7 @@ public class ModuleIconFactory {
 			break;
 		case TETHYS:
 			iconNode = PamGlyphDude.createModuleIcon("file-codemeta"); 
+			System.out.println("Get module Tethys " + iconNode);
 			break;
 		default:
 			break;
@@ -215,7 +216,6 @@ public class ModuleIconFactory {
 	 * @return the module icon enum
 	 */
 	public ModuleIcon getModuleIcon(String className) {
-//		System.out.println("Get module icon: " + className);
 		ModuleIcon icon = null; 
 		switch (className) {
 		case "Acquisition.AcquisitionControl":
@@ -270,10 +270,12 @@ public class ModuleIconFactory {
 		case "cpod.CPODControl2":
 			icon=ModuleIcon.CPOD; 
 			break; 
-		case "MetaDataControl":
+		case "Meta Data":
 			icon = ModuleIcon.TETHYS;
 			break;
 		}
+		System.out.println("Get module icon: " + className + " icon " + icon);
+
 		return icon;
 	}
 

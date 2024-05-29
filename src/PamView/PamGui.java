@@ -667,6 +667,13 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		menuItem.addActionListener(new StorageOptions(getGuiFrame()));
 		startMenuEnabler.addMenuItem(menuItem);
 		fileMenu.add(menuItem);
+		
+		if (isViewer) {
+		menuItem = new JMenuItem("Export Data ...");
+		menuItem.addActionListener(new ExportData(getGuiFrame()));
+		startMenuEnabler.addMenuItem(menuItem);
+		fileMenu.add(menuItem);
+		}
 
 		for (int i = 0; i < pamControllerInterface.getNumControlledUnits(); i++) {
 
@@ -975,6 +982,19 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		}
 	}
 	
+	class ExportData implements ActionListener {
+		private JFrame parentFrame;
+
+		public ExportData(JFrame parentFrame) {
+			super();
+			this.parentFrame = parentFrame;
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			PamController.getInstance().exportData(parentFrame);
+		}
+	}
+	
 	class MenuGeneralXMLExport implements ActionListener {
 		private JFrame parentFrame;
 		public MenuGeneralXMLExport(JFrame parentFrame) {
@@ -1164,6 +1184,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 			pamControllerInterface.orderModules(frame);
 		}
 	}
+	
 	class menuArray implements ActionListener {
 		public void actionPerformed(ActionEvent ev){
 			ArrayManager.getArrayManager().showArrayDialog(getGuiFrame());

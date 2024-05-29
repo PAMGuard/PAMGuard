@@ -20,6 +20,7 @@ import detectionPlotFX.plots.RawFFTPlot.FreqTimeProjector;
 import detectionPlotFX.projector.DetectionPlotProjector;
 import javafx.geometry.Side;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.TextFormatter.Change;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -37,6 +38,12 @@ import javafx.scene.shape.Rectangle;
  * @param <D> - the detection type. 
  */
 public abstract class FFTPlot<D extends PamDataUnit> implements DetectionPlot<D> {
+
+	/**
+	 * Plot kHz instead of 
+	 */
+	private static final double USE_KHZ_FREQ = 2000;
+
 
 	/**
 	 * Reference to the detection plot display. 
@@ -63,7 +70,7 @@ public abstract class FFTPlot<D extends PamDataUnit> implements DetectionPlot<D>
 	/**
 	 * The FFT parameters. 
 	 */
-	protected FFTPlotParams fftParams = new FFTPlotParams();
+	protected FFTPlotParams fftParams = createPlotParams();
 
 
 	private static DataTypeInfo dataTypeInfo = new DataTypeInfo(ParameterType.FREQUENCY, ParameterUnits.HZ);
@@ -79,6 +86,10 @@ public abstract class FFTPlot<D extends PamDataUnit> implements DetectionPlot<D>
 	private FFTWriteableImage writableImage;
 
 
+	/**
+	 * True if plotting as kHz instead of Hz - usually for higher frequency data greater than USE_KHZ_FREQ;
+	 */
+	private boolean useKHz = false;
 
 	public FFTPlot(DetectionPlotDisplay displayPlot, DetectionPlotProjector projector) {
 		this.detectionPlotDisplay=displayPlot; 
@@ -186,10 +197,11 @@ public abstract class FFTPlot<D extends PamDataUnit> implements DetectionPlot<D>
 	 * @param freqAxis
 	 */
 	public void setupFreqAxis(double minFreq, double maxFreq, DetectionPlotProjector projector) {
-		if (maxFreq>2000) {
+		if (maxFreq>USE_KHZ_FREQ) {
 			//use kHz
 			//projector.getAxis(Side.LEFT).setLabelScale(0.001);
-			projector.setAxisMinMax(minFreq, maxFreq/ 1000, Side.LEFT, "Frequency (kHz)");
+			this.useKHz = true;
+			projector.setAxisMinMax(minFreq, maxFreq/1000., Side.LEFT, "Frequency (kHz)");
 		}
 		else {
 			projector.setAxisMinMax(minFreq, maxFreq, Side.LEFT, "Frequency (Hz)");
@@ -407,7 +419,9 @@ public abstract class FFTPlot<D extends PamDataUnit> implements DetectionPlot<D>
 
 			//add settings listener to dynamic settings pane. 
 			setttingsPane.addSettingsListener(()->{
-				settingsChanged(setttingsPane.getParams(new FFTPlotParams())); 
+				//this needs to be a new instance of the the FFTPlotParams or some settings don't 
+				//register a chnage
+				settingsChanged(setttingsPane.getParams(createPlotParams() )); 
 			});
 
 			//					/////////*****Test Pane*******///////////			
@@ -430,6 +444,14 @@ public abstract class FFTPlot<D extends PamDataUnit> implements DetectionPlot<D>
 			//					/////////*****Test Pane*******///////////			
 		}
 		return (Pane) setttingsPane.getContentNode();
+	}
+	
+	/**
+	 * Create plot paramters for the FFT plot params
+	 * @return
+	 */
+	public FFTPlotParams createPlotParams() {
+		return new FFTPlotParams();
 	}
 
 	public class SimpleFFTDataUnit extends DataUnit2D<PamDataUnit,SuperDetection> {
@@ -537,7 +559,6 @@ public abstract class FFTPlot<D extends PamDataUnit> implements DetectionPlot<D>
 		 * The PAM detection used for plotting 
 		 */
 		private D pamDetection;
-	
 
 
 		public FFTWriteableImage(int x, int y, FFTPlotParams fftParams, D pamDetection) {
@@ -546,9 +567,12 @@ public abstract class FFTPlot<D extends PamDataUnit> implements DetectionPlot<D>
 			this.pamDetection=pamDetection; 
 		}
 		
-
 	}
 	
+	public boolean isUseKHz() {
+		return useKHz;
+	}
+
 
 
 }

@@ -1,5 +1,6 @@
 package PamView.paneloverlay;
 
+import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -8,6 +9,10 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 
+import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
+import org.kordamp.ikonli.swing.FontIcon;
+
+import PamView.component.PamSettingsIconButton;
 import PamView.symbol.PamSymbolManager;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.dataSelector.DataSelector;
@@ -23,8 +28,12 @@ import PamguardMVC.dataSelector.DataSelector;
 public class OverlayCheckboxMenuItem  extends JCheckBoxMenuItem {
 
 
-	public static final ImageIcon settingsIcon = new ImageIcon(ClassLoader.getSystemResource("Resources/SettingsButtonSmall2.png"));
-	public static final ImageIcon settingsIconNot = new ImageIcon(ClassLoader.getSystemResource("Resources/SettingsButtonSmallWhite.png"));
+//	public static final ImageIcon settingsIcon = new ImageIcon(ClassLoader.getSystemResource("Resources/SettingsButtonSmall2.png"));
+//	public static final ImageIcon settingsIconNot = new ImageIcon(ClassLoader.getSystemResource("Resources/SettingsButtonSmallWhite.png"));
+	
+	private static final FontIcon settingsIcon =  FontIcon.of(PamSettingsIconButton.SETTINGS_IKON, PamSettingsIconButton.SMALL_SIZE, Color.DARK_GRAY);
+	private static final FontIcon settingsIconNot =  FontIcon.of(PamSettingsIconButton.SETTINGS_IKON, PamSettingsIconButton.SMALL_SIZE, Color.WHITE);
+
 	
 	private static final long serialVersionUID = 1L;
 
