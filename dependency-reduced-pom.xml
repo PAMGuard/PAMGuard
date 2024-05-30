@@ -4,7 +4,7 @@
   <groupId>org.pamguard</groupId>
   <artifactId>Pamguard</artifactId>
   <name>Pamguard</name>
-  <version>2.02.11c</version>
+  <version>2.02.11d</version>
   <description>Pamguard using Maven to control dependencies</description>
   <url>www.pamguard.org</url>
   <organization>
@@ -158,11 +158,8 @@
       <url>https://artifacts.unidata.ucar.edu/repository/unidata-all/</url>
     </repository>
     <repository>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
       <id>bedatadriven</id>
-      <name>bedatadriven_renjin</name>
+      <name>bedatadriven public repo</name>
       <url>https://nexus.bedatadriven.com/content/groups/public/</url>
     </repository>
     <repository>

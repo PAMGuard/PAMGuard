@@ -40,8 +40,6 @@ import java.util.Random;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import org.apache.commons.math3.analysis.function.Signum;
-
 import serialComms.jserialcomm.PJSerialComm;
 import serialComms.jserialcomm.PJSerialException;
 import serialComms.jserialcomm.PJSerialLineListener;

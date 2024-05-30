@@ -70,10 +70,10 @@ public class HydrophoneDataBlock extends PamDataBlock<HydrophoneDataUnit> {
 	public boolean loadViewerData(OfflineDataLoadInfo offlineDataLoadInfo,
 			ViewLoadObserver loadObserver) {
 		
-		if (offlineDataLoadInfo!=null) {
-		System.out.print("Load Hydrophones: " + ((offlineDataLoadInfo.getEndMillis() - offlineDataLoadInfo.getStartMillis())/1000/60/60 + " hours"));
-		System.out.print("From: " +PamCalendar.formatDateTime(offlineDataLoadInfo.getStartMillis()) + " to " +  PamCalendar.formatDateTime(offlineDataLoadInfo.getEndMillis()));
-		}
+//		if (offlineDataLoadInfo!=null) {
+//		System.out.print("Load Hydrophones: " + ((offlineDataLoadInfo.getEndMillis() - offlineDataLoadInfo.getStartMillis())/1000/60/60 + " hours"));
+//		System.out.print("From: " +PamCalendar.formatDateTime(offlineDataLoadInfo.getStartMillis()) + " to " +  PamCalendar.formatDateTime(offlineDataLoadInfo.getEndMillis()));
+//		}
 		/**
 		 * Always put in default data units at time zero. 
 		 */

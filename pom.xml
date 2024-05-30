@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.pamguard</groupId>
   <artifactId>Pamguard</artifactId>
-  <version>2.02.11c</version>
+  <version>2.02.11d</version>
   <name>Pamguard</name>
   <description>Pamguard using Maven to control dependencies</description>
 	<url>www.pamguard.org</url>
@@ -301,14 +301,14 @@
 	<dependency>
 		<groupId>io.github.macster110</groupId>
 		<artifactId>jpamutils</artifactId>
-		<version>0.0.58</version>
+		<version>0.0.59</version>
 	</dependency>
 
 	<!--jpam project - Deep learning java library -->
 	<dependency>
 		<groupId>io.github.macster110</groupId>
 		<artifactId>jdl4pam</artifactId>
-		<version>0.0.99</version>
+		<version>0.0.99a</version>
 	</dependency> 
 			
 	<!-- https://mvnrepository.com/artifact/gov.nist.math/jama -->

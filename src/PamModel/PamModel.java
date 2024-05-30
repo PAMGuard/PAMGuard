@@ -1198,7 +1198,7 @@ final public class PamModel implements PamSettings {
 					    this.setPluginBeingLoaded(className);
 //						Class c = cl.loadClass(className);
 					    /*
-					     * Was Failing here if a plugin is loaded before a plugin that has classes
+					     * Was Failing here  if a plugin is loaded before a plugin that has classes
 					     * this one is dependent on. Seems that if we set the second parameter to 
 					     * false then it doesn't fully initialize the class, so will be OK, get past
 					     * this stage and fully load the class when it's used.  
@@ -1279,6 +1279,7 @@ final public class PamModel implements PamSettings {
 							// if there were any errors while accessing the plugin, let the user know and then move
 							// on to the next plugin.
 							} catch (Throwable e1) {
+								e1.printStackTrace();
 								String title = "Error accessing plug-in module";
 								String msg = "There is an error with the plug-in module " + className + ".<p>" +
 										"This may have been caused by an incompatibility between " +

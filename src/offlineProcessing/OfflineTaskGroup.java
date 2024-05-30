@@ -602,7 +602,7 @@ public class OfflineTaskGroup implements PamSettings {
 
 		/**
 		 * Called to process data currently in memory. i.e. get's called 
-		 * once when processing loaded data, multiple times when pocessing all data. 
+		 * once when processing loaded data, multiple times when processing all data. 
 		 * @param globalProgress
 		 * @param mapPoint
 		 * @param processStartTime
