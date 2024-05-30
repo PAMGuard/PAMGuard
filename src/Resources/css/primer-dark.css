@@ -3666,58 +3666,41 @@ Text {
 }
 
 
-/********************************************
-*                                           *
-*      Spinner                 *
-*                                           *
-*********************************************/
 
 
-.spinner  {
-    -fx-pref-width: 120px;
-}
-
-
-/********************************************
-*                                           *
-*      Chart                                *
-*                                           *
-*********************************************/
-
-
-
-.thin-chart .chart-series-line {    
-    -fx-stroke-width: 1px;
-}
 
 
 /*******************************************************************************
  *                                                                             *
- * Label                                                                      *
+ * Pop over                                                                         *
  *                                                                             *
  ******************************************************************************/
 
-
-#label-title1 {
-    -fx-font: bold 14pt  -fx-font-family;
+.popover {       
+    -fx-background-color:  -color-button-bg;          
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;                    
 }
 
-#label-title2 {
-    -fx-font: bold 13pt  -fx-font-family;
-  }
-
-/*******************************************************************************
- *                                                                             *
- * Label                                                                      *
- *                                                                             *
- ******************************************************************************/
-
-
-.validatorfx-error {
-  -fx-text-fill: rgb(164, 0, 0);  
+.popover > .content {
+    -fx-background-color:  -color-button-bg;     
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;                   
 }
 
-.validatorfx-warning {
-  -fx-text-fill: rgb(196, 160, 0);  
+.popover > .arrow {
+    -fx-background-color:  -color-button-bg;       
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;                 
 }
+
+/*weird way to do it but need this to colour the arrow*/
+.popover > .border {
+    /*-fx-stroke: linear-gradient(to bottom, rgba(0,0,0, .3), rgba(0, 0, 0, .7)) ;*/
+    -fx-stroke-width: 0.5;
+    -fx-fill:  -color-button-bg;  /* instead -fx-background-color */
+    -fx-background-color:  -color-button-bg;       
+
+}
+
 }

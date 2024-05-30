@@ -94,7 +94,7 @@ public class DLOfflineTask extends OfflineTask<PamDataUnit<?,?>>{
 	@Override
 	public void completeTask() {
 		//dlControl.setNotifyProcesses(false);
-		this.dlControl.getDLModel().closeModel();                                                                                                            
+		//this.dlControl.getDLModel().closeModel();                                                                                                            
 		dlControl.update(MTClassifierControl.PROCESSING_END);
 	}
 

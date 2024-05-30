@@ -51,7 +51,7 @@ public class EffortDataBlock extends PamDataBlock<EffortDataUnit> {
 				long origEnd = offlineDataLoadInfo.getEndMillis();
 				long dataStart = Math.min(offlineDataLoadInfo.getStartMillis(), dmc.getFirstTime() - 360000000L);
 				long dataEnd = Math.max(offlineDataLoadInfo.getEndMillis(), dmc.getLastTime() + 360000000L);
-				System.out.printf("Load effort data from %s to %s\n", PamCalendar.formatDBDateTime(dataStart), PamCalendar.formatDBDateTime(dataEnd));
+//				System.out.printf("Load effort data from %s to %s\n", PamCalendar.formatDBDateTime(dataStart), PamCalendar.formatDBDateTime(dataEnd));
 				offlineDataLoadInfo.setStartMillis(dataStart);
 				offlineDataLoadInfo.setEndMillis(dataEnd);
 			}

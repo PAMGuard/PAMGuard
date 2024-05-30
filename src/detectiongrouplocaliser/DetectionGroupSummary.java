@@ -39,7 +39,7 @@ public class DetectionGroupSummary {
 	private OverlayMark overlayMark;
 	
 	/**
-	 * Thye currently selected or focused data unit; 
+	 * The currently selected or focused data unit; 
 	 */
 	private int focusedUnitIndex=0;
 

@@ -9,7 +9,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Tooltip;
 
 /**
- * An overlay adapter essentially allows user mouse and touch interactions with the display. 
+ * An overlay adapter allows user mouse and touch interactions with the display. 
  * 
  * @author Jamie Macaulay
  *

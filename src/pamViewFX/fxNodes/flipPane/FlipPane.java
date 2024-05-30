@@ -48,7 +48,7 @@ public class FlipPane extends StackPane {
     private double      flipTime;
     private Orientation flipDirection;
     
-    private BooleanProperty flippedFrontProperty = new SimpleBooleanProperty(); 
+    protected BooleanProperty flippedFrontProperty = new SimpleBooleanProperty(); 
 
 	// ******************** Constructors **************************************
     public FlipPane() {
@@ -62,7 +62,9 @@ public class FlipPane extends StackPane {
         backRotate = new Rotate(180, Orientation.HORIZONTAL == FLIP_DIRECTION ? Rotate.Y_AXIS : Rotate.X_AXIS);
 
         front = new StackPane();
+        front.setMaxWidth(Double.MAX_VALUE);
         back  = new StackPane();
+        back.setMaxWidth(Double.MAX_VALUE);
 
         back.setVisible(false);
 
@@ -73,7 +75,7 @@ public class FlipPane extends StackPane {
         flipTime      = 700;
         flipDirection = FLIP_DIRECTION;
         flippedFrontProperty.setValue(true);
-
+       
 
         registerListeners();
     }

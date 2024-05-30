@@ -86,7 +86,7 @@ public class VRTabPanelControlFX extends VRTabPane {
 		Group root=  new  Group();
 		Scene scene  =  new  Scene(root, Color.GRAY);
 		scene.getStylesheets().clear();
-		scene.getStylesheets().add(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getGUICSS()); 
+		scene.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getGUICSS()); 
 		
 		vRDisplay = new VRDisplayFX2AWT(vRControl);
 		vRDisplay.createPane(); 

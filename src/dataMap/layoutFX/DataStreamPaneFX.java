@@ -17,6 +17,7 @@ import dataPlotsFX.layout.AxisPane;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
@@ -31,7 +32,9 @@ import PamController.PamController;
 import PamUtils.PamCalendar;
 import PamguardMVC.PamDataBlock;
 import pamViewFX.fxNodes.PamBorderPane;
+import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.pamAxis.PamAxisFX;
+import pamViewFX.fxNodes.pamAxis.PamAxisPane;
 import pamViewFX.fxNodes.utilsFX.ColourArray;
 
 public class DataStreamPaneFX extends PamBorderPane {
@@ -140,9 +143,10 @@ public class DataStreamPaneFX extends PamBorderPane {
 	 * Create pane which holds datasream label and allows the split pane to collapse
 	 */
 	private Pane createTopPane(){
-		Pane topPane=new Pane();
-		topPane.getStyleClass().add("pane");
+		PamHBox topPane=new PamHBox();
+		topPane.getStyleClass().add("pane-opaque");
 		topPane.getChildren().add(new Label(this.dataBlock.getDataName()));
+		topPane.setAlignment(Pos.CENTER);
 		return topPane;
 	}
 	
@@ -200,7 +204,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 		/**
 		 * The wheel scroll factor. 
 		 */
-		private double wheelScrollFactor = 0.2;
+		private double wheelScrollFactor = 0.1;
 		
 		/**
 		 * Writable image for 3D datagram.
@@ -210,7 +214,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 		/**
 		 * Pane which holds the axis. 
 		 */
-		private AxisPane axisPane;
+		private PamAxisPane axisPane;
 
 		/**
 		 * Pane which holds the plot canvas.
@@ -342,7 +346,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 			datastreamAxis.setFractionalScale(true);
 			datastreamAxis.setLogScale(false); 
 
-			axisPane=new AxisPane(datastreamAxis); 
+			axisPane=new PamAxisPane(datastreamAxis, Orientation.VERTICAL); 
 			axisPane.getStyleClass().add("pane");
 			axisPane.setOrientation(Orientation.VERTICAL);
 			axisPane.setPrefWidth(DataStreamPaneFX.axisPrefWidth);
@@ -366,16 +370,24 @@ public class DataStreamPaneFX extends PamBorderPane {
 				if (timeline!=null) timeline.stop();
 				timeline = new Timeline(new KeyFrame(
 						Duration.millis(tm),
-						ae -> paintCanvas(0)));
+						ae -> {
+//							System.out.println("Paint Canvas zero");
+							paintCanvas(0);	
+						}));
 				timeline.play();
 				return;
 			}
 			
 			lastTime=currentTime;
 
+			long time1 = System.currentTimeMillis();
 			paintPlotCanvas(plotCanvas.getGraphicsContext2D()); 
 			paintDrawCanvas(drawCanvas.getGraphicsContext2D()); 
 			
+			long time2 = System.currentTimeMillis();
+
+			//System.out.println("Paint Canvas: " + this + "   " + System.currentTimeMillis() + "  " + (time2-time1));
+
 		}
 		
 		/**
@@ -593,14 +605,16 @@ public class DataStreamPaneFX extends PamBorderPane {
 			}
 			datagramImage = new WritableImage(imageData.length, imageData[0].length);
 			PixelWriter writableRaster = datagramImage.getPixelWriter();
+			g.setFill(Color.LIGHTGRAY);
+			g.fillRect(0, 0, nXPoints, nYPoints);
 			for (int i = 0; i < nXPoints; i++) {
 				for (int j = 0; j < nYPoints; j++) {
 					y = nYPoints-j-1;
 					if (imageData[i][j] < 0) {
-						writableRaster.setColor(i,y,Color.LIGHTGRAY);
+						//writableRaster.setColor(i,y,Color.LIGHTGRAY);
 					}
 					else if (imageData[i][j] == 0) {
-						writableRaster.setColor(i,y, Color.LIGHTGRAY);
+						//writableRaster.setColor(i,y, Color.LIGHTGRAY);
 					}
 					else {
 						iCol = (int) (NCOLOURPOINTS * (Math.log(imageData[i][j]) - minMaxValue[0]) / scaleRange);
@@ -1028,10 +1042,6 @@ public class DataStreamPaneFX extends PamBorderPane {
 		repaint(ScrollingDataPaneFX.REPAINTMILLIS); //update at 10 frames per second
 	}
 	
-	private void repaint() {
-		this.repaint(0);
-	}
-
 	/**
 	 * Get the pane which sits at the top of the datagraph and contains a label showing the datablock being displayed. 
 	 * @return the pane which sits at the top of the datagraph

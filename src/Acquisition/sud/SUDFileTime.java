@@ -45,10 +45,16 @@ public class SUDFileTime {
 //				return Long.MIN_VALUE;
 //			}
 //			long t = sudMap.getFirstChunkTimeMillis();
+			System.out.println("Error getting time from SUD file: " + file==null? null : (file.getName() + " size: " + file.length() / (1024 * 1024) + " MB"));
+
 			long t = SudAudioInputStream.quickFileTime(file);
 			t=t/1000; //turn to milliseconds. 
-			if (t != 0) {
+			if (t > 0) {
 				sudTime = t;
+			}
+			else {
+				//an error has occurred
+				System.err.println("Error getting time from SUD file: " + file==null? null : (file.getName() + " size: " + file.length() / (1024 * 1024) + " MB"));
 			}
 
 //			sudAudioInputStream.addSudFileListener((chunkID, sudChunk)->{

@@ -33,7 +33,7 @@ public class GenericSettingsPane extends PamBorderPane implements TDSettingsPane
 	/*
 	 * The raw clip info. 
 	 */
-	private TDDataInfoFX rawClipDataInfo;
+	private TDDataInfoFX tdDataInfoFX;
 
 	/**
 	 * The icon for the pane. 
@@ -52,8 +52,8 @@ public class GenericSettingsPane extends PamBorderPane implements TDSettingsPane
 	/**
 	 * The clip plot pane. 
 	 */
-	public GenericSettingsPane(TDDataInfoFX rawClipDataInfo){
-		this.rawClipDataInfo = rawClipDataInfo; 
+	public GenericSettingsPane(TDDataInfoFX tdDataInfoFX){
+		this.tdDataInfoFX = tdDataInfoFX; 
 		createPane();
 		this.setPrefWidth(PREF_WIDTH);
 		setParams(); 
@@ -81,7 +81,7 @@ public class GenericSettingsPane extends PamBorderPane implements TDSettingsPane
 	private void newSettings(long milliswait) {
 		getParams();
 
-		this.rawClipDataInfo.getTDGraph().repaint(milliswait);
+		this.tdDataInfoFX.getTDGraph().repaint(milliswait);
 	}
 
 
@@ -112,10 +112,10 @@ public class GenericSettingsPane extends PamBorderPane implements TDSettingsPane
 	 */
 	private StandardSymbolOptionsPane createSymbolOptionsPane(){
 
-		PamSymbolManager<?> pamSymbolManager=  rawClipDataInfo.getDataBlock().getPamSymbolManager();
+		PamSymbolManager<?> pamSymbolManager=  tdDataInfoFX.getDataBlock().getPamSymbolManager();
 
-		symbolOptionsPane= pamSymbolManager.getFXOptionsPane(rawClipDataInfo.getTDGraph().getUniqueName(), 
-				rawClipDataInfo.getTDGraph().getGraphProjector()); 
+		symbolOptionsPane= pamSymbolManager.getFXOptionsPane(tdDataInfoFX.getTDGraph().getUniqueName(), 
+				tdDataInfoFX.getTDGraph().getGraphProjector()); 
 
 		//create a new settings listener
 		symbolOptionsPane.addSettingsListener(()->{

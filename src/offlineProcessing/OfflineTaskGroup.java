@@ -66,6 +66,7 @@ public class OfflineTaskGroup implements PamSettings {
 	private DataTimeLimits dataTimeLimits;
 
 	private volatile TaskStatus completionStatus = TaskStatus.IDLE;
+	
 	/**
 	 * PamControlledunit required in constructor since some bookkeeping will
 	 * be going on in the background which will need the unit type and name. 
@@ -76,7 +77,7 @@ public class OfflineTaskGroup implements PamSettings {
 	public OfflineTaskGroup(PamControlledUnit pamControlledUnit, String settingsName) {
 		super();
 		this.pamControlledUnit = pamControlledUnit;
-		pamControlledUnit.addOfflineTaskGroup(this);
+		if (pamControlledUnit!=null) pamControlledUnit.addOfflineTaskGroup(this);
 		this.settingsName = settingsName;
 		PamSettingManager.getInstance().registerSettings(this);
 	}
@@ -469,6 +470,9 @@ public class OfflineTaskGroup implements PamSettings {
 			OfflineDataMap dataMap = primaryDataBlock.getPrimaryDataMap();
 			int nMapPoints = dataMap.getNumMapPoints(startTime, endTime);
 			int iMapPoint = 0;
+			
+			System.out.println("N MAP POINTS: "+ nMapPoints + "  dataMap: " + dataMap.getParentDataBlock() + " start: " + PamCalendar.formatDateTime(startTime) + "  "  +PamCalendar.formatDateTime(endTime));
+			
 			publish(new TaskMonitorData(TaskStatus.RUNNING, TaskActivity.PROCESSING, nMapPoints, 0, "",  
 					taskGroupParams.startRedoDataTime));
 			OfflineDataStore dataSource = dataMap.getOfflineDataSource();
@@ -598,7 +602,7 @@ public class OfflineTaskGroup implements PamSettings {
 
 		/**
 		 * Called to process data currently in memory. i.e. get's called 
-		 * once when processing loaded data, multiple times when pocessing all data. 
+		 * once when processing loaded data, multiple times when processing all data. 
 		 * @param globalProgress
 		 * @param mapPoint
 		 * @param processStartTime
@@ -961,5 +965,15 @@ public class OfflineTaskGroup implements PamSettings {
 	 */
 	public OfflineSuperDetFilter getSuperDetectionFilter() {
 		return superDetectionFilter;
+	}
+
+	/**
+	 * Clear all task from the task group. This also clears affected and required datablocks. 
+	 */
+	public void clearTasks() {
+		requiredDataBlocks.clear();
+		affectedDataBlocks.clear();
+		offlineTasks.clear();
+		
 	}
 }

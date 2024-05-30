@@ -67,7 +67,7 @@ public abstract class ExportOverlayMenu implements OverlayMenuItem {
 
 
 	/**
-	 * Allows files to be copied ot clipboard. 
+	 * Allows files to be copied to clipboard. 
 	 *
 	 */
 	public static class FileTransferable implements Transferable {

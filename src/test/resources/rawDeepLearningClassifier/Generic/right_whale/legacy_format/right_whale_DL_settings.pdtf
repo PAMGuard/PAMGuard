@@ -1,0 +1,1 @@
+{"model_info":"{\"output_shape\":[-1,2],\"input_shape\":[-1,40,40,1]}","class_info":"{\"name_class\":\"Noise,Right Whale\",\"num_class\":2}","seg_size":"{\"size_ms\":2000}","load_audio":"{\"sr\":2000}","spectrogram":"{\"fft\":256,\"hop\":100}","freq_compression":"{\"bins\":40,\"fmin\":47,\"fmax\":357}","norm_row_sum":"{}"}

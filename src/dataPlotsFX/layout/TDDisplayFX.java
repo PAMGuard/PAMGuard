@@ -242,7 +242,7 @@ public class TDDisplayFX extends PamBorderPane {
 
 		hidingControlPane=new HidingPane(Side.TOP, controlPane, this, false );
 		hidingControlPane.showHidePane(tdParametersFX.showControl);
-		hidingControlPane.getStylesheets().add(this.getCSSSettingsResource()); //style as a settings pane. 
+		hidingControlPane.getStylesheets().addAll(this.getCSSSettingsResource()); //style as a settings pane. 
 		hidingControlPane.showingProperty().addListener((valProp, oldVal, newVal)->{
 			//set correct showing property.
 			tdParametersFX.showControl=newVal; 
@@ -252,10 +252,11 @@ public class TDDisplayFX extends PamBorderPane {
 		//create the button which shows the hiding panel. Although we get this button from the hiding pane, where to place
 		//it and what colour it is etc has to be set for whatever pane it is to be located in. 
 		showButton=hidingControlPane.getShowButton();
-		showButton.getStyleClass().add("transparent-button-square");
-		showButton.setStyle("-fx-background-radius: 0 0 10 10;");
+		hidingControlPane.setShowButtonOpacity(1.0);
+//		showButton.getStyleClass().add("transparent-button-square");
+		showButton.setStyle("-fx-background-radius: 0 0 10 0;");
 		showButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-down", PamGuiManagerFX.iconSize));
-		showButton.setPrefWidth(60);
+		showButton.setPrefWidth(30);
 		showButton.setMaxHeight(timeAxisSize-20);
 
 		//create the time axis for the display. 
@@ -276,7 +277,7 @@ public class TDDisplayFX extends PamBorderPane {
 		StackPane mainGraphPane=new StackPane();
 		mainGraphPane.getChildren().add(splitPaneHolder);
 		mainGraphPane.getChildren().add(showButton);
-		StackPane.setAlignment(showButton, Pos.TOP_CENTER);		
+		StackPane.setAlignment(showButton, Pos.TOP_LEFT);		
 
 		this.setCenter(mainGraphPane);
 
@@ -615,9 +616,10 @@ public class TDDisplayFX extends PamBorderPane {
 	 * @param milliSeconds - the master clock position. 
 	 */
 	public void scrollDisplayEnd(long milliSeconds) {
+		
 
-		if (!isViewer() && milliSeconds <= lastUpdate && milliSeconds > lastUpdate - tdParametersFX.visibleTimeRange) {
-			//System.out.println("milliSeconds <= lastUpdate && milliSeconds > lastUpdate - visibleRange");
+		if (!isViewer() && lastUpdate>0 && milliSeconds <= lastUpdate && milliSeconds > lastUpdate - tdParametersFX.visibleTimeRange) {
+//			System.out.println("milliSeconds <= lastUpdate && milliSeconds > lastUpdate - visibleRange");
 			return;
 		}
 
@@ -849,7 +851,6 @@ public class TDDisplayFX extends PamBorderPane {
 
 		@Override
 		public void scrollValueChanged(AbstractPamScroller pamScroller) {
-			//			System.out.println("TDDisplayFX: Scroll Value changed: " +  System.currentTimeMillis());
 			//			System.out.println(String.format("Scroller value changed get start %s, End %s, pos %s", PamCalendar.formatTime(timeScrollerFX.getMinimumMillis()),
 			//					PamCalendar.formatTime(timeScrollerFX.getMaximumMillis()),PamCalendar.formatTime(timeScrollerFX.getValueMillis())));
 			//have to set the repaint wait millis param to zero or else when scroll bar is moved quickly painting does not occur correctly. 
@@ -1027,7 +1028,7 @@ public class TDDisplayFX extends PamBorderPane {
 		return tdGraphs;
 	}
 
-	public String getCSSSettingsResource() {
+	public ArrayList<String> getCSSSettingsResource() {
 		return PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS();
 	}
 
@@ -1183,11 +1184,15 @@ public class TDDisplayFX extends PamBorderPane {
 			break;
 		}
 
+		//forces a repaint after any changes. 
+		lastUpdate=-1;
+		
 		if (tdGraphs != null) {
 			for (TDGraphFX tdg:tdGraphs) {
 				tdg.notifyModelChanged(changeType);
 			}
 		}
+		
 	}
 
 	/**

@@ -27,6 +27,7 @@ public class SimpleLocErrorDraw implements LocErrorGraphics {
 	@Override
 	public TransformShape drawOnMap(Graphics g, PamDataUnit pamDetection, LatLong errorOrigin,
 			GeneralProjector generalProjector, Color ellipseColor) {
+		
 		g.setColor(ellipseColor);
 		if (simpleError == null) {
 			return null;

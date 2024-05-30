@@ -185,7 +185,7 @@ public class Chi2TimeDelays implements MinimisationFunction {
 	}
 	
 	/**
-	 * Set the time delays. Each row is a set fo delays from N synchronised hydrophones. Different rows
+	 * Set the time delays. Each row is a set for delays from N synchronised hydrophones. Different rows
 	 * can have different numbers of synchronised hydrophones. 
 	 * @param timeDelays - a set of time delays in seconds. 
 	 */

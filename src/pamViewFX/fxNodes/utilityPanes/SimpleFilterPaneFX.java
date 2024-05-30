@@ -255,4 +255,9 @@ public class SimpleFilterPaneFX extends DynamicSettingsPane<FFTFilterParams>{
 		freqPane.setSampleRate(sampleRate);
 	}
 
+	public void addValueChangeListener(Object object) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

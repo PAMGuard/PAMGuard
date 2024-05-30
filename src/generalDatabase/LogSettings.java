@@ -109,9 +109,9 @@ public class LogSettings extends DbSpecial {
 		 * data that will fit into the database. 
 		 */  
 		try {
-		if (pamSettings.getUnitName().equals("User TDDisplay")) {
-			System.out.println("Saving user display data");
-		}
+//		if (pamSettings.getUnitName().equals("User TDDisplay")) {
+//			System.out.println("Saving user display data");
+//		}
 		}
 		catch (NullPointerException e) {
 			e.printStackTrace();

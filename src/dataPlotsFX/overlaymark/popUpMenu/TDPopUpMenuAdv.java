@@ -66,7 +66,8 @@ public class TDPopUpMenuAdv implements ExtPopMenu {
 		}
 		
 		if (PamGUIManager.isFX()) {
-			popOver.show(tdGraphFX.getScene().getWindow(), e.getScreenX(), e.getScreenY()); //FX
+			//TODO - need to shift by the distance to arrow- not arbitrary 40 pixels
+			popOver.show(tdGraphFX.getScene().getWindow(), e.getScreenX(), e.getScreenY()-40); //FX
 		}
 		else {
 			popOver.show(tdGraphFX, e.getScreenX(), e.getScreenY()); //Swing 

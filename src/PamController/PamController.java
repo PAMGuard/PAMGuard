@@ -100,6 +100,7 @@ import PamguardMVC.uid.UIDManager;
 import PamguardMVC.uid.UIDOnlineManager;
 import PamguardMVC.uid.UIDViewerManager;
 import binaryFileStorage.BinaryStore;
+import export.ExportOptions;
 import PamguardMVC.debug.Debug;
 
 /**
@@ -2691,13 +2692,23 @@ public class PamController implements PamControllerInterface, PamSettings {
 	}
 
 	/**
-	 * Respond to storage options dialog. Selects whethere data 
+	 * Respond to storage options dialog. Selects whether data 
 	 * are stored in binary, database or both
 	 * @param parentFrame 
 	 */
 	public void storageOptions(JFrame parentFrame) {
 		StorageOptions.getInstance().showDialog(parentFrame);
 	}
+	
+	/**
+	 * Show export options tp export data to other formats
+	 * @param parentFrame
+	 */
+	public void exportData(JFrame parentFrame) {
+		ExportOptions.getInstance().showDialog(parentFrame); 
+		
+	}
+
 
 	/**
 	 * Return a verbose level for debug output
@@ -2939,5 +2950,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	public PamConfiguration getPamConfiguration() {
 		return pamConfiguration;
 	}
+
+
 
 }

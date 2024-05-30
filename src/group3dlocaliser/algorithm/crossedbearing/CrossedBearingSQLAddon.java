@@ -5,7 +5,7 @@ import targetMotionOld.TargetMotionSQLLogging;
 public class CrossedBearingSQLAddon extends TargetMotionSQLLogging {
 
 	
-	private targetMotionModule.TargetMotionSQLLogging tml;
+//	private targetMotionModule.TargetMotionSQLLogging tml;
 	public CrossedBearingSQLAddon(int nResults) {
 		super(nResults, "");
 //		hideColumns(getBeamLatitude());

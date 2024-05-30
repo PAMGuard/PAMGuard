@@ -12,6 +12,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.shape.Polygon;
 import PamController.PamController;
 import PamUtils.Coordinate3d;
+import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamView.HoverData;
 import PamView.GeneralProjector.ParameterType;
@@ -373,8 +374,8 @@ public abstract class TDDataInfoFX {
 	 */
 	public void drawAllDataUnits(int plotNumber, GraphicsContext g, double scrollStart, TDProjectorFX tdProjector) {
 		
-//		System.out.println("Max double value: " +  PamCalendar.formatDateTime((long)  Double.MAX_EXPONENT)); 
-//		System.out.println("Max long value: " +  PamCalendar.formatDateTime((long)  Long.MAX_VALUE)); 
+//		System.out.println("Max double value: " + this.getDataName() +  PamCalendar.formatDateTime((long)  Double.MAX_EXPONENT)); 
+//		System.out.println("Max long value: " + this.getDataName() + PamCalendar.formatDateTime((long)  Long.MAX_VALUE)); 
 
 		
 		PamDataUnit dataUnit = null;
@@ -391,7 +392,10 @@ public abstract class TDDataInfoFX {
 //			scrollStart = PamCalendar.getTimeInMillis();
 			//work out start and stop times
 			long loopEnd = (long) (scrollStart + (tdProjector.getVisibleTime() * 1.5));
-			long loopStart = (long) (scrollStart - (tdProjector.getVisibleTime() * .5));
+			long loopStart = (long) (scrollStart - (tdProjector.getVisibleTime() * 1.5));
+			
+//			System.out.println("Loop start: " + this.getDataName() +  PamCalendar.formatDateTime((long)  loopStart)); 
+//			System.out.println("Loop end: " + this.getDataName() + PamCalendar.formatDateTime((long)  loopEnd)); 
 
 			//find a number close to the index start, 			
 			ListIterator<PamDataUnit> it = getUnitIterator( loopStart,  plotNumber);
@@ -402,6 +406,7 @@ public abstract class TDDataInfoFX {
 				dataUnit = it.next();
 				count++; 
 				if (dataUnit!=null && shouldDraw(plotNumber, dataUnit)) {
+					
 					if (dataUnit.getEndTimeInMilliseconds() < loopStart) {
 						continue;
 					}
@@ -409,11 +414,13 @@ public abstract class TDDataInfoFX {
 						break;
 					}
 					
+					drawCalls++;
 					drawDataUnit(plotNumber, dataUnit, g,  scrollStart, 
 							tdProjector ,TDSymbolChooserFX.NORMAL_SYMBOL);
 				}
 			}
 			
+//			System.out.println("Found: " + drawCalls + "  " + this.getDataName() + "  to draw"); 
 			lastUnitDrawn(g, scrollStart, tdProjector, plotNumber); 
 		}
 		//System.out.println("Total data units: " + count+ " draw calls: " +drawCalls );
@@ -645,8 +652,8 @@ public abstract class TDDataInfoFX {
 		drawCalls++;
 		if ((symbolchoser.getDrawTypes(pamDataUnit) & TDSymbolChooserFX.DRAW_LINES) != 0) {
 			//WARNING<- the getPreviousDataUnit function is currently very slow and caused serious issue
-			//in display speed. Onyl use draw lines with super detections if data units are very sparse. 
-			// For example not suitbale for the the click detector. 
+			//in display speed. Only use draw lines with super detections if data units are very sparse. 
+			// For example not suitable for the the click detector. 
 			Point2D lastDrawPoint=getPreviousDataUnit(tdProjector, pamDataUnit); 
 			if (lastDrawPoint!= null)
 			g.setFill(symbolchoser.getPamSymbol(pamDataUnit,type).getLineColor());
@@ -729,13 +736,6 @@ public abstract class TDDataInfoFX {
 	 */
 	public boolean editOptions() {
 		return false;
-	}
-
-	/**
-	 * @return the pamDataBlock
-	 */
-	protected PamDataBlock getPamDataBlock() {
-		return pamDataBlock;
 	}
 
 	/**

@@ -51,13 +51,15 @@ public class WavFileInputStream extends AudioInputStream {
 		if (wavHeader.readHeader(windowsFile) == false) {
 			throw new UnsupportedAudioFileException("Unsupprted wav file format in " + file.getName());
 		}
+		
+
 		long nFrames = wavHeader.getDataSize() / wavHeader.getBlockAlign();
 		
 		//29/03/2017 Found that the block align read from header was wrong in SoundTrap. This solves the problem and is still OK for normal 
 		//wav files (this is in fact tha standard emthod for calculated  blockalign)
 		int blockAlign = wavHeader.getNChannels() * (wavHeader.getBitsPerSample() / 8);
 				
-		//System.out.println("NFRAMES: " + nFrames + " "+ wavHeader.getDataSize() + " " + wavHeader.getBlockAlign() + " "+blockAlign ); 
+//		System.out.println("NFRAMES: " + nFrames + " "+ wavHeader.getDataSize() + " " + wavHeader.getBlockAlign() + " "+blockAlign ); 
 		
 		Encoding encoding = getEncoding(wavHeader.getFmtTag());
 		if (encoding == null) {

@@ -1,22 +1,21 @@
 package detectionPlotFX.whistleDDPlot;
 
-import PamguardMVC.debug.Debug;
 import dataPlotsFX.whistlePlotFX.WhistlePlotInfoFX;
 import detectionPlotFX.layout.DetectionPlotDisplay;
-import detectionPlotFX.plots.RawFFTPlot;
+import detectionPlotFX.plots.FFTPlotParams;
 import detectionPlotFX.plots.FFTSettingsPane;
+import detectionPlotFX.plots.RawFFTPlot;
 import detectionPlotFX.projector.DetectionPlotProjector;
 import javafx.geometry.Orientation;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import pamViewFX.fxNodes.pamAxis.PamAxisFX;
 import whistlesAndMoans.ConnectedRegionDataUnit;
 import whistlesAndMoans.WhistleMoanControl;
 
 /**
- * Plots a whistle contour over.  
+ * Plots a whistle contour over a spectrgram if one is available.
  * @author Jamie Macaulay
  *
  */
@@ -27,21 +26,6 @@ public class WhistleFFTPlot extends  RawFFTPlot<ConnectedRegionDataUnit> {
 	 */
 	private WhistleMoanControl whistleMoanControl;
 	
-	/**
-	 * Line colour
-	 */
-	private Color lineColor=Color.BLACK;
-	
-	/**
-	 * The fill colour
-	 */
-	private Color fillColor=Color.BLACK;
-
-	/**
-	 * The whislte settings pane. 
-	 */
-	private WhistleSettingsPane setttingsPane; 
-
 	/**
 	 * The whistle FFT plot
 	 * @param displayPlot - the display plot. 
@@ -56,7 +40,9 @@ public class WhistleFFTPlot extends  RawFFTPlot<ConnectedRegionDataUnit> {
 	public void paintDetections(ConnectedRegionDataUnit whistleDataUnit, 
 			GraphicsContext graphicsContext, Rectangle windowRect, DetectionPlotProjector projector) {
 		
-//		Debug.out.println("Draw whistle fragment: " + whistleDataUnit + " sR: "+ whistleDataUnit.getParentDataBlock().getSampleRate() + " Scroll start: " + getScrollStart());
+		
+//		System.out.println("Draw whistle fragment: " + whistleDataUnit + " sR: "+ whistleDataUnit.getParentDataBlock().getSampleRate() + " Scroll start: " + getScrollStart());
+		
 		WhistlePlotInfoFX.drawWhistleFragement(whistleDataUnit, 
 				whistleMoanControl, 
 				//need to have fft which was used in making the detections 
@@ -64,20 +50,23 @@ public class WhistleFFTPlot extends  RawFFTPlot<ConnectedRegionDataUnit> {
 				whistleMoanControl.getWhistleToneProcess().getOutputData().getFftHop(),
 				whistleDataUnit.getParentDataBlock().getSampleRate(), //need to use this because FFT sample rate can be unreliable  
 				graphicsContext,
-				super.getProjector(), getScrollStart(), 0, fillColor, lineColor, Orientation.HORIZONTAL); 
+				super.getProjector(), getScrollStart(), 0, getContourColor(), getContourColor(), this.isUseKHz(), Orientation.HORIZONTAL); 
 
 	}
 	
-	@Override
-	public Pane getSettingsPane() {
-		return super.getSettingsPane();
-//		if (setttingsPane==null){
-//			setttingsPane= new WhistleSettingsPane(whistleMoanControl, this); 
-//			setttingsPane.setParams(super.getFFTParams()) ;
-//		}
-//		return (Pane) setttingsPane.getContentNode();
+	private Color getContourColor() {
+		return ((WhistlePlotParams) this.getFFTParams()).contourColor;
 	}
 	
+	@Override
+	protected FFTSettingsPane<?> createSettingsPane(){
+		return new WhistleSettingsPane(null, this);
+	}
+	
+	@Override
+	public FFTPlotParams createPlotParams() {
+		return new WhistlePlotParams();
+	}
 	
 	
 }

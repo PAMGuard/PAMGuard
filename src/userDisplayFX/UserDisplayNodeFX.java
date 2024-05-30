@@ -11,6 +11,13 @@ import pamViewFX.fxNodes.internalNode.PamInternalPane;
 public interface UserDisplayNodeFX {
 	
 	/**
+	 * Get a display controller associated with the display. Note that a display does not need a controller
+	 * so this can return null.
+	 * @return the associated control for the display. 
+	 */
+	public UserDisplayControlFX getUserDisplayControl();
+	
+	/**
 	 * The name of display. Used for default tabs etc.
 	 * @return the name of the display
 	 */

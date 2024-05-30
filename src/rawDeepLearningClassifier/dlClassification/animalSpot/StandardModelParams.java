@@ -1,6 +1,8 @@
 package rawDeepLearningClassifier.dlClassification.animalSpot;
 
+import java.io.File;
 import java.io.Serializable;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,6 +10,7 @@ import org.jamdev.jdl4pam.transforms.DLTransform;
 import org.jamdev.jdl4pam.transforms.DLTransfromParams;
 
 import rawDeepLearningClassifier.dlClassification.DLClassName;
+import rawDeepLearningClassifier.layoutFX.exampleSounds.ExampleSoundFactory.ExampleSoundType;
 
 /**
  * Parameters for the SoundSpot model. 
@@ -62,6 +65,7 @@ public class StandardModelParams implements Serializable, Cloneable {
 	 */
 	public List<DLTransfromParams> dlTransfromParams = null; 
 	
+	
 	/**
 	 * The DL custom transforms if the default transforms for the model are not being used. 
 	 */
@@ -97,11 +101,39 @@ public class StandardModelParams implements Serializable, Cloneable {
 	 */
 	public int exampleSoundIndex = 0; 
 	
+	
+	/**
+	 * Set the example sound that should be associated with parameters. 
+	 * @param soundType - the example sound type. 
+	 */
+	public void setExampleSound(ExampleSoundType soundType) {
+		ExampleSoundType[] values = ExampleSoundType.values();
+		for (int i=0; i<values.length; i++) {
+			if (values[i].equals(soundType)) {
+				exampleSoundIndex = i;
+				return;
+			}
+		}
+	}
+	
+	
+	/**
+	 * Set the URI in standard model params. 
+	 * @param uri - the uri to a model
+	 * @param standarModelParams - the standard model params. 
+	 * @return the standard model params. 
+	 */
+	public static StandardModelParams setModel(URI uri, StandardModelParams standarModelParams) {
+		standarModelParams.modelPath = new File(uri).getPath(); 
+		return standarModelParams; 
+	}
+	
 	@Override
 	public StandardModelParams clone() {
 		StandardModelParams newParams = null;
 		try {
 			newParams = (StandardModelParams) super.clone();
+			
 //			if (newParams.spectrogramNoiseSettings == null) {
 //				newParams.spectrogramNoiseSettings = new SpectrogramNoiseSettings();
 //			}
@@ -118,6 +150,7 @@ public class StandardModelParams implements Serializable, Cloneable {
 	
 	@Override
 	public String toString() {
+		super.toString();
 		String string = "-------Transforms------\n";
 		if (dlTransfromParams==null) {
 			string+="There are no transform params\n"; 

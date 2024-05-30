@@ -1,6 +1,5 @@
 package cpod;
 
-import PamController.PamControlledUnit;
 import PamguardMVC.AcousticDataBlock;
 import PamguardMVC.PamProcess;
 import cpod.dataSelector.CPODDataSelectorCreator;
@@ -25,31 +24,27 @@ public class CPODClickDataBlock extends AcousticDataBlock<CPODClick> {
 		super(CPODClick.class, dataName, parentProcess, 1);
 		this.clikcType = clikcType;
 		
+		if (parentProcess!=null) {
 		this.setDataSelectCreator(new CPODDataSelectorCreator(parentProcess.getPamControlledUnit(), this));
+		}
 	}
 
-	/* (non-Javadoc)
-	 * @see PamguardMVC.PamDataBlock#getDataName()
-	 */
-	@Override
-	public String getDataName() {
-		PamControlledUnit cpodControl = getParentProcess().getPamControlledUnit();
-		if (cpodControl == null) {
-			return super.getDataName();
-		}
-		return cpodControl.getUnitName() + "_" + getDataTypeString();
-	}
+//	/* (non-Javadoc)
+//	 * @see PamguardMVC.PamDataBlock#getDataName()
+//	 */
+//	@Override
+//	public String getDataName() {
+//		if (getParentProcess()!=null) {
+//			PamControlledUnit cpodControl = getParentProcess().getPamControlledUnit();
+//			if (cpodControl == null) {
+//				return super.getDataName();
+//			}
+//			return cpodControl.getUnitName() + "_" + getDataTypeString();
+//		}
+//		return "CPOD_temporary";
+//	
+//	}
 
-	private String getDataTypeString() {
-		switch (clikcType) {
-		case CPODMap.FILE_CP1:
-			return "CP1";
-		case CPODMap.FILE_CP3:
-			return "CP3";
-		}
-		return null;
-	}
-	
 	
 	@Override
 	public float getSampleRate() {

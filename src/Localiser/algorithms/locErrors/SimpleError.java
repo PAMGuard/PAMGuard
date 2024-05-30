@@ -42,10 +42,7 @@ public class SimpleError implements LocaliserError {
 	 * @param xyzError - an array of the x/perpindicular y/parallel and z error in meters {x y z}
 	 */
 	public SimpleError(Double xyzError[]) {
-		simpleErrorDraw=new SimpleLocErrorDraw(this); 
-		perpindiuclarError=xyzError[0]; 
-		parallelError=xyzError[1]; 
-		zError=xyzError[2]; 
+		this(xyzError, 0.); 
 	}
 	
 	/**

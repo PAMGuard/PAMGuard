@@ -947,7 +947,8 @@ public class PamCalendar {
 			"yyyy-MM-dd HH_mm_ss", // Avisoft.
 			"yyyy-MM-dd_HH-mm-ss", // y2000 Cornell pop up data
 			"yyyyMMddHHmmss", //Tanzania survey (recorder using 'bul filerename' program)
-			"yyyy-MM-dd HH-mm-ss" // RS Orca recorder. index 32. Must remain at this position !!!!
+			"yyyy-MM-dd HH-mm-ss", // RS Orca recorder. index 32. Must remain at this position !!!!
+			"dd/MM/yyyy HH:ss" //An excel standard
 	};
 
 	public static Long unpackStandardDateTime(String numstr) {

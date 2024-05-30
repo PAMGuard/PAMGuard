@@ -98,7 +98,8 @@ public class MetaDataDialog extends PamDialog {
 	@Override
 	public boolean getParams() {
 		Deployment deployment = pamguardMetaData.getDeployment();
-		boolean ok = descriptionPanel.getParams(deployment.getDescription());
+		boolean ok = projectInformationPanel.getParams(deployment);
+		ok &= descriptionPanel.getParams(deployment.getDescription());
 		ok &= responsiblePanel.getParams(deployment.getMetadataInfo().getContact());
 		ok &= deploymentPeriodPanel.getParams(pamguardMetaData);
 		

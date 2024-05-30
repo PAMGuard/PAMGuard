@@ -421,7 +421,7 @@ public class MTProcess extends PamInstantProcess {
 
 		ArrayList<MatchedTemplateResult> results = new ArrayList<MatchedTemplateResult>();
 		
-		System.out.println("Click waveform max: " + PamArrayUtils.max(clickWaveform) + " sample rate: " + sR); 
+//		System.out.println("Click waveform max: " + PamArrayUtils.max(clickWaveform) + " sample rate: " + sR); 
 		
 		//normalisation and picking peak has already been performed
 

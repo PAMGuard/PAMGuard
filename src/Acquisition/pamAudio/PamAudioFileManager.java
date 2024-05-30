@@ -135,7 +135,7 @@ public class PamAudioFileManager {
 		}
 
 		if (stream == null) {
-			System.err.println("PamAudioFileManager: unable to open an AudioStream for " + file.getName());
+			System.err.println("PamAudioFileManager: unable to open an AudioStream for " + file.getName() + " size: " + file.length());
 		}
 
 		return stream;
@@ -153,7 +153,7 @@ public class PamAudioFileManager {
 	}
 
 	/**
-	 * Get the audio file filter
+	 * Get the audio file filter.
 	 * 
 	 * @return the audio file filter.
 	 */
@@ -164,7 +164,7 @@ public class PamAudioFileManager {
 	/**
 	 * Get the current audio file
 	 * 
-	 * @return a list oif the current audio loaders.
+	 * @return a list of the current audio loaders.
 	 */
 	public ArrayList<PamAudioFileLoader> getAudioFileLoaders() {
 		return this.pamAudioFileTypes;

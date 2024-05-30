@@ -3,16 +3,17 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.pamguard</groupId>
   <artifactId>Pamguard</artifactId>
-  <name>Pamguard Java12+</name>
-  <version>2.02.10bd</version>
-  <description>Pamguard for Java 12+, using Maven to control dependcies</description>
+  <name>Pamguard</name>
+  <version>2.02.11d</version>
+  <description>Pamguard using Maven to control dependencies</description>
   <url>www.pamguard.org</url>
   <organization>
     <name>Sea Mammal Research Unit, University of St. Andrews</name>
     <url>http://www.smru.st-andrews.ac.uk</url>
   </organization>
   <build>
-    <sourceDirectory>src</sourceDirectory>
+    <sourceDirectory>${basedir}/src</sourceDirectory>
+    <testSourceDirectory>${basedir}/src/test</testSourceDirectory>
     <resources>
       <resource>
         <directory>src</directory>
@@ -54,7 +55,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
+        <version>3.12.1</version>
         <dependencies>
           <dependency>
             <groupId>org.eclipse.tycho</groupId>
@@ -63,22 +64,14 @@
           </dependency>
         </dependencies>
         <configuration>
-          <release>11</release>
+          <release>21</release>
           <compilerId>jdt</compilerId>
-          <compilerArguments>
-            <properties>.settings/org.eclipse.jdt.core.prefs</properties>
-          </compilerArguments>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.openjfx</groupId>
         <artifactId>javafx-maven-plugin</artifactId>
-        <version>0.0.6</version>
-        <configuration>
-          <source>17</source>
-          <target>17</target>
-          <release>17</release>
-        </configuration>
+        <version>0.0.8</version>
       </plugin>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
@@ -165,11 +158,8 @@
       <url>https://artifacts.unidata.ucar.edu/repository/unidata-all/</url>
     </repository>
     <repository>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
       <id>bedatadriven</id>
-      <name>bedatadriven_renjin</name>
+      <name>bedatadriven public repo</name>
       <url>https://nexus.bedatadriven.com/content/groups/public/</url>
     </repository>
     <repository>
@@ -198,7 +188,7 @@
     <maven.compiler.target>11</maven.compiler.target>
     <maven.compiler.source>11</maven.compiler.source>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <javafx.version>16</javafx.version>
+    <javafx.version>21</javafx.version>
     <jaxb.runtime.version>2.4.0-b180830.0438</jaxb.runtime.version>
     <jaxb.xjc.version>2.4.0-b180830.0438</jaxb.xjc.version>
     <jaxb.api.version>2.4.0-b180830.0359</jaxb.api.version>

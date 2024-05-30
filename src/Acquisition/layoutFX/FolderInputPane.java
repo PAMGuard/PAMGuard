@@ -193,20 +193,18 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 			//TODO
 		});
 
-		browseFileButton.setGraphic(Glyph.create("FontAwesome|FILES_ALT").
-				size(PamGuiManagerFX.iconSize).color(Color.WHITE.darker()));
+		browseFileButton.setGraphic(PamGlyphDude.createPamIcon("mdi2f-file-multiple", PamGuiManagerFX.iconSize));
 		browseFileButton.prefHeightProperty().bind(fileSelectBox.heightProperty()); //make browse button same height as combo box. 
-		browseFileButton.setMinWidth(35);
+		browseFileButton.setMinWidth(40);
 		browseFileButton.setOnAction( (action) ->{	                
 			selectFolder(false); 
 		});
 		browseFileButton.setTooltip(new Tooltip("Select a folder of files"));
 
 
-		browseFolderButton.setGraphic(Glyph.create("FontAwesome|FOLDER").
-				size(PamGuiManagerFX.iconSize).color(Color.WHITE.darker()));
+		browseFolderButton.setGraphic(PamGlyphDude.createPamIcon("mdi2f-folder", PamGuiManagerFX.iconSize));
 		browseFolderButton.prefHeightProperty().bind(fileSelectBox.heightProperty()); //make browse button same height as combo box. 
-		browseFolderButton.setMinWidth(35);
+		browseFolderButton.setMinWidth(40);
 		browseFolderButton.setOnAction( (action) ->{	                
 			selectFolder(true);
 		});		

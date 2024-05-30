@@ -132,7 +132,6 @@ public class DLDetection extends PamDataUnit implements PamDetection, RawDataHol
 		if (annotation!=null) return annotation.getModelResults(); 
 		else return null; 
 	}
-
 	
 	
 	/**
