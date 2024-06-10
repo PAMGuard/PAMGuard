@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 
 import javax.swing.ButtonGroup;
@@ -64,15 +66,28 @@ public class ReprocessChoiceDialog extends PamDialog {
 		List<ReprocessStoreChoice> userChoices = choiceSummary.getChoices();
 		choiceButtons = new JRadioButton[userChoices.size()];
 		ButtonGroup bg = new ButtonGroup();
+		SelAction selAction = new SelAction();
 		for (int i = 0; i < userChoices.size(); i++) {
 			ReprocessStoreChoice aChoice = userChoices.get(i);
 			choiceButtons[i] = new JRadioButton(aChoice.toString());
 			choiceButtons[i].setToolTipText(aChoice.getToolTip());
+			bg.add(choiceButtons[i]);
+			choiceButtons[i].addActionListener(selAction);
 			choicePanel.add(choiceButtons[i], c);
 			c.gridy++;
 		}
 		setDialogComponent(mainPanel);
 		getCancelButton().setVisible(false);
+		getOkButton().setEnabled(false);
+	}
+	
+	private class SelAction implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			getOkButton().setEnabled(true);
+		}
+		
 	}
 	
 	public static ReprocessStoreChoice showDialog(Window parentFrame, StoreChoiceSummary choices) {
