@@ -2952,6 +2952,23 @@ public class PamController implements PamControllerInterface, PamSettings {
 		return pamConfiguration;
 	}
 
+	/**
+	 * Gets called on a timer when NOT processing from files. 
+	 * OR if processing files, gets called whenever the Calendar session start time or file time millis gets updated. 
+	 * @param timeInMillis
+	 */
+	public void updateMasterClock(long timeInMillis) {
+		/*
+		 *  this needs to notify binary stores that time has changed since the BS doesn't subscribe
+		 *  to anything, so doesn't get other clock updates. 
+		 */
+		ArrayList<PamControlledUnit> bs = findControlledUnits(BinaryStore.class);
+		for (PamControlledUnit aBS : bs) {
+			BinaryStore binStore = (BinaryStore) aBS;
+			binStore.getBinaryStoreProcess().checkFileTime(timeInMillis);
+		}
+	}
+
 
 
 }
