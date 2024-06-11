@@ -8,6 +8,7 @@ import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionProcess;
 import Acquisition.DaqSystem;
 import PamController.PamController;
+import PamModel.PamModel;
 import PamUtils.PamCalendar;
 import PamguardMVC.debug.Debug;
 
@@ -130,6 +131,7 @@ public class ThreadedObserver implements PamObserver {
 				}
 			}
 		}
+		h += PamModel.getPamModel().getPamModelSettings().getThreadingJitterMillis()*2;
 
 		return h;
 	}

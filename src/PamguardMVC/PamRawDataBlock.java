@@ -257,12 +257,13 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 	synchronized public RawDataUnit[] getAvailableSamples(long startMillis, long durationMillis, int channelMap) throws RawDataUnavailableException {
 		RawDataUnit firstUnit = getFirstUnit();
 		if (firstUnit == null) {
-			throw new RawDataUnavailableException(this, RawDataUnavailableException.DATA_NOT_ARRIVED, startMillis, (int) durationMillis);
+			throw new RawDataUnavailableException(this, RawDataUnavailableException.DATA_NOT_ARRIVED, 0,0, startMillis, (int) durationMillis);
 		}
 		long firstMillis = firstUnit.getTimeMilliseconds();
 		long firstSamples = firstUnit.getStartSample();
 		RawDataUnit lastUnit = getLastUnit();
 		long lastMillis = lastUnit.getEndTimeInMilliseconds();
+		long lastSample = lastUnit.getStartSample()+lastUnit.getSampleDuration();
 		
 		
 		long firstAvailableMillis = Math.max(firstMillis, startMillis);
@@ -272,7 +273,8 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 		double[][] data = getSamplesForMillis(firstAvailableMillis, lastAvailableMillis-firstAvailableMillis, channelMap);
 		if (data == null) {
 			// this shouldn't happen. If an exception wasn't thrown from getSamples... then data should no tb enull
-			throw new RawDataUnavailableException(this, RawDataUnavailableException.DATA_NOT_ARRIVED, startMillis, (int) durationMillis);
+			throw new RawDataUnavailableException(this, RawDataUnavailableException.DATA_NOT_ARRIVED,
+					firstSamples, lastSample,	startMillis, (int) durationMillis);
 		}
 		RawDataUnit[] dataUnits = new RawDataUnit[data.length];
 		for (int i = 0; i < data.length; i++) {
@@ -298,7 +300,7 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 	synchronized public double[][] getSamplesForMillis(long startMillis, long durationMillis, int channelMap) throws RawDataUnavailableException {
 		RawDataUnit firstUnit = getFirstUnit();
 		if (firstUnit == null) {
-			throw new RawDataUnavailableException(this, RawDataUnavailableException.DATA_NOT_ARRIVED, startMillis, (int) durationMillis);
+			throw new RawDataUnavailableException(this, RawDataUnavailableException.DATA_NOT_ARRIVED, 0, 0, startMillis, (int) durationMillis);
 		}
 		long firstMillis = firstUnit.getTimeMilliseconds();
 		long firstSamples = firstUnit.getStartSample();
@@ -317,23 +319,28 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 		// run  a few tests ...
 		int chanOverlap = channelMap & getChannelMap();
 		if (chanOverlap != channelMap) {
-			throw new RawDataUnavailableException(this, RawDataUnavailableException.INVALID_CHANNEL_LIST, startSample, duration);
+			throw new RawDataUnavailableException(this, RawDataUnavailableException.INVALID_CHANNEL_LIST, 0,0,startSample, duration);
 		}
 		if (duration < 0) {
-			throw new RawDataUnavailableException(this, RawDataUnavailableException.NEGATIVE_DURATION, startSample, duration);
+			throw new RawDataUnavailableException(this, RawDataUnavailableException.NEGATIVE_DURATION,0,0, startSample, duration);
 		}
 		
 		RawDataUnit dataUnit = getFirstUnit();
 		if (dataUnit == null) {
 			return null;
 		}
-		if (dataUnit.getStartSample() > startSample) {
+		RawDataUnit lastUnit = getLastUnit();
+		long firstSample = dataUnit.getStartSample();
+		long lastSample = lastUnit.getStartSample()+lastUnit.getSampleDuration();
+		if (firstSample > startSample) {
 //			System.out.println("Earliest start sample : " + dataUnit.getStartSample());
-			throw new RawDataUnavailableException(this, RawDataUnavailableException.DATA_ALREADY_DISCARDED, startSample, duration);
+			throw new RawDataUnavailableException(this, RawDataUnavailableException.DATA_ALREADY_DISCARDED, 
+					firstSample, lastSample, startSample, duration);
 		}
 		dataUnit = getLastUnit();
 		if (hasLastSample(dataUnit, startSample+duration, channelMap) == false)  {
-			throw new RawDataUnavailableException(this, RawDataUnavailableException.DATA_NOT_ARRIVED, startSample, duration);
+			throw new RawDataUnavailableException(this, RawDataUnavailableException.DATA_NOT_ARRIVED,
+					firstSample, lastSample, startSample, duration);
 		}
 		
 		int nChan = PamUtils.getNumChannels(channelMap);
