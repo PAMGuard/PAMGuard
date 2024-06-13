@@ -1,14 +1,15 @@
 # PAMGuard
+
+## Introduction
 PAMGuard is a bioacoustics analysis program designed for use in real time research contexts and for the processing of large datasets. PAMGuard provides users access to a suite of state-of-the-art auotmated analysis algorithms alongside displays for visualisation data and a comprehensive data management systems. 
 
-# Why do we need PAMGuard?
+## Why do we need PAMGuard?
 PAMGuard fufills two main requirements within marine bioacoustics
 
-1) **Real time operation** - Almost all PAMGuard features and modules work in real time - this allows scientists and industry to detect, classify and loclaise animals in real time on a standard consumer laptop, enabling mitigations and research survey without expensive bespoke software solutions and the transparncy of open source software.  
+1) **Real time operation**: Almost all PAMGuard features and modules work in real time - this allows scientists and industry to detect, classify and loclaise animals in real time on a standard consumer laptop, enabling mitigations and research survey without expensive bespoke software solutions and the transparncy of open source software.  
 
-2) **Processing and visuslisation of large datasets** - 
+2) **Processing and visuslisation of large datasets**: Off-the-shelf autonomous PAM devices, large scale surveys involving drifters, towed arrays and bottom mounted devices and real time continuous monitoring system all generate huge volumes of data whcih requires automated analysis approaches. PAMGuard allows the processing of very large passive acoustic datasets using automated algorothms and provides visualisation tools for a manual analyst to check the results.
 
- 
 ## Installation
 PAMGuard is available on Windows and can be downloaded from the [PAMGuard website](www.pamguard.org). Note that we are considering MacOS installers but they are not available at this time. 
 
@@ -20,7 +21,6 @@ Upon opening PAMGuard for the first time you are greeted with a blank screen. Yo
 Make sure to add the database and binary file storage modules **_File->Add Modules->Utilities->..._**) to save data then press the run button (red button) and data will process. PAMGuard can handle huge datasets so runing might take hours or even days. Progress is shown on the bottom of the screen. 
 
 ## Features
-
 ### Hardware integration
 PAMGuard connects with hardware such as various GPS and AIS systems and a multitude of different sound cards (e.g. [National Instruments](www.ni.com) devices, [SAIL DAQ cards](www.smruconsulting.com/contact-us), almost all ASIO sound cards and standard computer sound cards) for real time data collection and processing. PAMGuard also works with some very bespoke hardware such as [DIFAR Sonobuoys]();
 
@@ -36,24 +36,26 @@ PAMGuard is designed to collect/process data from large acosutic datasets. PAMGu
 ### Access to detection and classification algorithms
 PAMGuard allows users to inegrate automated detection and classification algorithms directly into their acosutic workflow. There are a multitude of differwent algorothms to choose from, including a basic click detector, whislte and moan detector, GPL detector, click train detectors and many others. The idea behind PAMGuard is allow researchers to access open source state-of-the-art algorithms devleoped within the scientific community - if you want to contribute and get your algorithm into PAMGuard get in touch. 
 
-###Localisation
+### Localisation
 PAMGuard has a mutltude of different options for acoustic loclaisation. There's a comprehesnive beam forming module for beam forming arrays, a large aperture localiser for 3D loclaisation and target motion analysis for towed hydrophone arrays. 
 
-###Soundscape analysis
+### Soundscape analysis
 PAMGuard has a noise band (which supports third octave noise bands) and long term spectral average module for soundscape analysis. 
 
 ### GIS
 Almsot all detection data can be visualised on a map. PAMGaurd also supports plotting GPS and AIS data. 
 
 ### Suite of data visualisation tools
-An important aspect of PAMGuard is the ability for users to explore porcessed data. This is 
+An important aspect of PAMGuard is the ability for users to explore porcessed data. PAMGuard allows users to visualise data at multiple different times scales, from inspecting individual waveforms microseconds long to datagrams showing detector output or soundscape metrics over days, weeks or even years.
 
 ### Advanced manual annotation
-The displays within PAMGuard support a variety of manual annottion tools. A simple spectrogram 
+The displays within PAMGuard support a variety of manual annottion tools.
 
 ### Deep learning integration
+PAMGuard allows users to run their own deep learning models using the deep learning module. AI can therfore be integrated into PAMGuard workflows, allowing for much more efficient analysis of data. 
 
-### Meatadata standard and Tethys compatibility
+### Metadata standard and Tethys compatibility
+PAMGuard Integrates with Tethys
 
 ## Feature roadmap
 There's lots of features we would like to add to PAMGuard. If you want to add a feature you can either code it up yourself in Java and submit a pull request or get in touch with us to discuss how to it might be integrated. Some smaller features might be in our roadmap anyway but larger features usually require funding. Some features we are thinking about (but do not necassarily have time for yet) are;
