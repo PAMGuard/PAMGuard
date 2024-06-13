@@ -37,6 +37,9 @@ import export.PamExporterManager;
 import export.layoutFX.ExportParams;
 import offlineProcessing.OLProcessDialog;
 import offlineProcessing.OfflineTaskGroup;
+import offlineProcessing.TaskMonitor;
+import offlineProcessing.TaskMonitorData;
+import offlineProcessing.TaskStatus;
 
 /**
  * Handles an offline dialog for processing offline data and exporting to bespoke file types.
@@ -352,18 +355,67 @@ public class ExportProcessDialog {
 
 
 	}
+	
+	class ExportTaskMonitor implements TaskMonitor {
+		
+		private int taskIndex;
+		
+		private ExportTaskGroup exportTaskGroup;
+		
+		private boolean started = false;
 
-
-	class ExportTaskGroup extends OfflineTaskGroup {
-
-		public ExportTaskGroup(String settingsName) {
-			super(null, settingsName);
-
+		public ExportTaskMonitor(int i, ExportTaskGroup exportTaskGroup) {
+			this.taskIndex = i;
+			this.exportTaskGroup = exportTaskGroup;
 		}
 
+	
+		@Override
+		public void setTaskStatus(TaskMonitorData taskMonitorData) {
+			if (taskMonitorData.taskStatus== TaskStatus.COMPLETE && !started) {
+				System.out.println(" TASK COMPLETE:");
+				if (taskIndex<exportTaskGroup.getNTasks()) {
+					exportTaskGroup.runTaskFrom(taskIndex+1);
+					started = true;
+				}
+			}
+		}
+
+
+
+		
+	}
+
+
+	/**
+	 * Export taks group. 
+	 */
+	class ExportTaskGroup extends OfflineTaskGroup {
+
+		
+		public ExportTaskGroup(String settingsName) {
+			super(null, settingsName);
+		}
+
+		
 		@Override
 		public String getUnitType() {
 			return "Export Data";
+		}
+		
+		/**
+		 * Runs tasks from a specific task number. 
+		 * @param i - the index
+		 */
+		public void runTaskFrom(int i) {
+			System.out.println("RUN TASK FROM :" + i);
+
+			this.setPrimaryDataBlock(getTask(i).getDataBlock());
+			if (i<getNTasks()-1) {
+				//will start a new thread after this one has finished
+				this.setTaskMonitor(new ExportTaskMonitor(i, this));
+			}
+			super.runTasks();
 		}
 		
 		
@@ -376,159 +428,10 @@ public class ExportProcessDialog {
 		 */
 		@Override
 		public boolean runTasks() {
-			boolean OK = true;
-			for (int i=0; i<getNTasks(); i++) {
-				this.setPrimaryDataBlock(getTask(i).getDataBlock());
-				super.runTasks();
-			}
-			return OK;
+			runTaskFrom(0) ;
+			return true;
 		}
-	
-//			
-//			
-//			int nDatas = primaryDataBlock.getUnitsCount();
-//			int nSay = Math.max(1, nDatas / 100);
-////			int nDone = 0;
-//			int nTasks = getNTasks();
-//			PamDataUnit dataUnit;
-//			OfflineTask aTask;
-//			boolean unitChanged;
-//			DataUnitFileInformation fileInfo;
-//			String dataName;
-//			if (mapPoint != null) {
-//				dataName = mapPoint.getName();
-//			}
-//			else {
-//				dataName = "Loaded Data";
-//			}
-//			/**
-//			 * Make sure that any data from required data blocks is loaded. First check the 
-//			 * start and end times of the primary data units we actually WANT to process
-//			 * Also get a count of found data - may be able to leave without having to do anything at all
-//			 */
-//			ListIterator<PamDataUnit> it = primaryDataBlock.getListIterator(0);
-//			long procDataStart = Long.MAX_VALUE;
-//			long procDataEnd = 0;
-//			int nToProcess = 0;
-//			while (it.hasNext()) {
-//				dataUnit = it.next();
-//				/**
-//				 * Make sure we only process data units within the current time interval. 
-//				 */
-//				if (dataUnit.getTimeMilliseconds() < processStartTime) {
-//					continue;
-//				}
-//				if (dataUnit.getTimeMilliseconds() > processEndTime) {
-//					break;
-//				}
-////				if (shouldProcess(dataUnit) == false) {
-////					continue;
-////				}
-//				procDataStart = Math.min(procDataStart, dataUnit.getTimeMilliseconds());
-//				procDataEnd = Math.max(procDataEnd, dataUnit.getEndTimeInMilliseconds());
-//				// do this one too - just to make sure in case end time returns zero. 
-//				procDataEnd = Math.max(procDataEnd, dataUnit.getTimeMilliseconds());
-//				nToProcess++; // increase toprocess counter
-//			}
-//			if (nToProcess == 0) {
-//				return;
-//			}
-//			PamDataBlock aDataBlock;
-//			RequiredDataBlockInfo blockInfo;
-//			/* 
-//			 * if the data interval is < 1 hour, then load it all now
-//			 * otherwise we'll do it on a data unit basis. 
-//			 */
-//////			long maxSecondaryLoad = 1800L*1000L;
-//////			if (procDataEnd - procDataStart < maxSecondaryLoad) {
-////				loadSecondaryData(procDataStart, procDataEnd);
-//////			}
-//			// remember the end time of the data so we can use the "new data" selection flag. 
-//			taskGroupParams.lastDataTime = Math.min(primaryDataBlock.getCurrentViewDataEnd(),processEndTime);
-//			//			synchronized(primaryDataBlock) {
-//			/*
-//			 * Call newDataLoaded for each task before getting on with processing individual data units. 
-//			 */
-//
-//			/**
-//			 * Now process the data
-//			 */
-//			it = primaryDataBlock.getListIterator(0);
-//			unitChanged = false;
-//			int totalUnits = 0;
-//			int unitsChanged = 0;
-//			boolean doTasks = false;
-//			while (it.hasNext()) {
-//				dataUnit = it.next();
-//				totalUnits++;
-//				doTasks = true;
-//				/**
-//				 * Make sure we only process data units within the current time interval. 
-//				 */
-//				if (dataUnit.getTimeMilliseconds() < processStartTime) {
-//					continue;
-//				}
-//				if (dataUnit.getTimeMilliseconds() > processEndTime) {
-//					break;
-//				}
-//				
-//				if (shouldProcess(dataUnit) == false) {
-//					doTasks = false;
-//				}
-//				
-//				if (doTasks) {
-//					/*
-//					 *  load the secondary datablock data. this can be called even if
-//					 *  it was called earlier on since it wont' reload if data are already
-//					 *  in memory.  
-//					 */
-////					loadSecondaryData(dataUnit.getTimeMilliseconds(), dataUnit.getEndTimeInMilliseconds());
-//
-//					for (int iTask = 0; iTask < nTasks; iTask++) {
-//						aTask = getTask(iTask);
-//						if (aTask.isDoRun() == false ||  !isInTimeChunk(dataUnit, taskGroupParams.timeChunks)) {
-//							continue;
-//						}
-//						cpuMonitor.start();
-//						unitChanged |= aTask.processDataUnit(dataUnit);
-//						cpuMonitor.stop();
-//					}
-//					if (unitChanged) {
-//						fileInfo = dataUnit.getDataUnitFileInformation();
-//						if (fileInfo != null) {
-//							fileInfo.setNeedsUpdate(true);
-//						}
-//						dataUnit.updateDataUnit(System.currentTimeMillis());
-//					}
-//					dataUnit.freeData();
-//				}
-//				if (instantKill) {
-//					break;
-//				}
-//				unitsChanged++;
-//				if (totalUnits%nSay == 0) {
-//					publish(new TaskMonitorData(TaskStatus.RUNNING, TaskActivity.PROCESSING, nToProcess, totalUnits, dataName,
-//							dataUnit.getTimeMilliseconds()));
-//				}
-//			}
-//			for (int iTask = 0; iTask < nTasks; iTask++) {
-//				aTask = getTask(iTask);
-//				if (aTask.isDoRun() == false) {
-//					continue;
-//				}
-//				aTask.loadedDataComplete();
-//			}
-//			//			}
-//			publish(new TaskMonitorData(TaskStatus.RUNNING, TaskActivity.SAVING, nToProcess, totalUnits, dataName,
-//					processEndTime));
-//			for (int i = 0; i < affectedDataBlocks.size(); i++) {
-//				//System.out.println("SAVE VIEWER DATA FOR: " + affectedDataBlocks.get(i) );
-//				aDataBlock = affectedDataBlocks.get(i);
-//				aDataBlock.saveViewerData();
-//			}
-//			Debug.out.printf("Processd %d out of %d data units at " + mapPoint + "\n", unitsChanged, totalUnits);
-//			commitDatabase();
-//		}
+
 	}
 	
 

@@ -73,9 +73,11 @@ public class PamExporterManager {
 	public boolean exportDataUnit(PamDataUnit<?, ?> dataUnit, boolean force) {
 		boolean exportOK = true;
 		
+		System.out.println("Add data unit " + dataUnit + " to: "+ currentFile); 
+		
 		if (dataUnit==null) {
 			if (force) {
-//				System.out.println("Write data 1!!" + dataUnitBuffer.size() ); 
+				System.out.println("Write data 1!!" + dataUnitBuffer.size() ); 
 				//finish off saving any buffered data
 				exportOK = pamExporters.get(exportParams.exportChoice).exportData(currentFile, dataUnitBuffer, true);
 				dataUnitBuffer.clear();
@@ -87,7 +89,7 @@ public class PamExporterManager {
 		if (currentFile == null || isNeedsNewFile(currentFile, pamExporters.get(exportParams.exportChoice))) {
 			Date date = new Date(dataUnit.getTimeMilliseconds());
 			
-			String newFileName = "PAM_" + dataFormat.format(date) + dataUnit.getParentDataBlock().getDataName().replace(" ", "_");
+			String newFileName = "PAM_" + dataFormat.format(date) + "_" + dataUnit.getParentDataBlock().getDataName().replace(" ", "_");
 			
 			//create a new file - note each exporter is responsible for closing the file after writing
 			//so previous files should already be closed
@@ -99,7 +101,7 @@ public class PamExporterManager {
 
 		dataUnitBuffer.add(dataUnit);
 
-//		System.out.println("Write data unit " + dataUnitBuffer.size() + " to: "+ currentFile); 
+		System.out.println("Write data unit " + dataUnitBuffer.size() + " to: "+ currentFile); 
 		
 		if (dataUnitBuffer.size()>=BUFFER_SIZE || force) {
 //			System.out.println("Write data 2!!" + dataUnitBuffer.size()); 
