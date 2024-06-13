@@ -41,15 +41,21 @@ public interface PamDataUnitExporter {
 	public String getIconString();
 
 	/**
-	 * Get the name of the exporter
-	 * @return
+	 * Get the name of the exporter.
+	 * @return the name of the exporter.
 	 */
 	public String getName();
 
 	/**
-	 * Clsoe the exporter
+	 * Close the exporter.
 	 */
 	public void close();
+
+	/**
+	 * Check whether and exporter needs a new file
+	 * @return true if we need a new file. 
+	 */
+	public boolean isNeedsNewFile();
 
 
 }

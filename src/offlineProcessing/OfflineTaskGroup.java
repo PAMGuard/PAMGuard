@@ -142,7 +142,7 @@ public class OfflineTaskGroup implements PamSettings {
 
 	private ArrayList<OfflineTask> offlineTasks = new ArrayList<OfflineTask>();
 
-	private TaskGroupWorker worker;
+	protected TaskGroupWorker worker;
 
 	private OfflineSuperDetFilter superDetectionFilter;
 
@@ -377,7 +377,7 @@ public class OfflineTaskGroup implements PamSettings {
 	 * @author Doug Gillespie
 	 *
 	 */
-	class TaskGroupWorker extends SwingWorker<Integer, TaskMonitorData> implements ViewLoadObserver {
+	public class TaskGroupWorker extends SwingWorker<Integer, TaskMonitorData> implements ViewLoadObserver {
 
 		volatile boolean instantKill = false;
 
@@ -437,6 +437,7 @@ public class OfflineTaskGroup implements PamSettings {
 		/**
 		 * Process all data for a list of time chunks. This is robust to the list
 		 * not being in chronological order. 
+		 * 
 		 * @param timeChunks - the time chunks.
 		 */
 		private void processAllData(ArrayList<long[]> timeChunks){
@@ -976,4 +977,6 @@ public class OfflineTaskGroup implements PamSettings {
 		offlineTasks.clear();
 		
 	}
+
+
 }

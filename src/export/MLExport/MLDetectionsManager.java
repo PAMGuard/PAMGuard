@@ -269,6 +269,12 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 
 	}
 
+	@Override
+	public boolean isNeedsNewFile() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 
 
 
