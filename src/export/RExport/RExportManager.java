@@ -18,6 +18,7 @@ import org.renjin.sexp.PairList.Builder;
 import PamUtils.PamArrayUtils;
 import PamguardMVC.PamDataUnit;
 import export.PamDataUnitExporter;
+import export.PamExporterManager;
 import export.MLExport.MLDetectionsManager;
 
 /**
@@ -29,7 +30,6 @@ import export.MLExport.MLDetectionsManager;
 public class RExportManager implements PamDataUnitExporter {
 
 	/**
-	 * 
 	 * All the possible RDataUnit export classes. 
 	 */
 	ArrayList<RDataUnitExport> rDataExport = new ArrayList<RDataUnitExport>();
@@ -37,10 +37,13 @@ public class RExportManager implements PamDataUnitExporter {
 	private File currentFileName ;
 
 
-	private Builder allData; 
+	private Builder allData;
+
+	private PamExporterManager pamExporterManager; 
 
 
-	public RExportManager(){
+	public RExportManager(PamExporterManager pamExporterManager){
+		this.pamExporterManager=pamExporterManager;
 		/***Add more options here to export data units****/
 		rDataExport.add(new RClickExport()); 
 		rDataExport.add(new RWhistleExport()); 
@@ -55,17 +58,14 @@ public class RExportManager implements PamDataUnitExporter {
 		 * Note - there is no way to save data units to R files wothout loading the file into memory. 
 		 * So everything is stored in memory until saved. 
 		 */
-		// then
 		PamDataUnit minByTime = PamArrayUtils.getMinTimeMillis(dataUnits);
 
-		//matlab struct must start with a letter. 
+		//MATLAB struct must start with a letter. 
 		Date date = new Date(minByTime.getTimeMilliseconds());
 		String entryName = "det_" + MLDetectionsManager.dataFormat.format( date);
 
 		//		System.out.println("Save R data! "+ dataUnits.size());
-
 		//		System.out.println("Export R file!!" + dataUnits.size());
-
 		//is there an existing writer? Is that writer writing to the correct file?
 		if (allData==null || !fileName.equals(currentFileName)) {
 
@@ -256,6 +256,20 @@ public class RExportManager implements PamDataUnitExporter {
 		if (allData!=null) {
 			writeRFile();
 		}
+	}
+
+
+	@Override
+	public boolean isNeedsNewFile() {
+		//Rdata can't be appended to a file so we cannot check file sizes. 
+		
+//		pamExporterManager.getExportParams().maximumFileSize;
+		
+		//TODO 
+		//check file size against the export params. 
+		System.out.println("RData length: " + allData.length());
+		
+		return false;
 	}
 
 

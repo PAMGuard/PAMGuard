@@ -465,6 +465,13 @@ public class WavFileExportManager implements PamDataUnitExporter  {
 
 
 
+	@Override
+	public boolean isNeedsNewFile() {
+		return false;
+	}
+
+
+
 
 
 	//	hello(){

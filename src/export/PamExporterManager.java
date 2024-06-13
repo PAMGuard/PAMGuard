@@ -56,11 +56,12 @@ public class PamExporterManager {
         "yyyy_MM_dd_HHmmss");
 
 	public PamExporterManager() {
+		
 		pamExporters = new ArrayList<PamDataUnitExporter>();
 
 		//add the MATLAB export
 		pamExporters.add(new MLDetectionsManager());
-		pamExporters.add(new RExportManager());
+		pamExporters.add(new RExportManager(this));
 		pamExporters.add(new WavFileExportManager());
 		pamExporters.add(new CSVExportManager());
 	}
@@ -74,7 +75,7 @@ public class PamExporterManager {
 		
 		if (dataUnit==null) {
 			if (force) {
-				System.out.println("Write data 1!!" + dataUnitBuffer.size() ); 
+//				System.out.println("Write data 1!!" + dataUnitBuffer.size() ); 
 				//finish off saving any buffered data
 				exportOK = pamExporters.get(exportParams.exportChoice).exportData(currentFile, dataUnitBuffer, true);
 				dataUnitBuffer.clear();
@@ -83,10 +84,10 @@ public class PamExporterManager {
 		}
 		
 		//if file is null or too large create another a file for saving. 
-		if (currentFile == null || isFileSizeMax(currentFile)) {
+		if (currentFile == null || isNeedsNewFile(currentFile, pamExporters.get(exportParams.exportChoice))) {
 			Date date = new Date(dataUnit.getTimeMilliseconds());
 			
-			String newFileName = "PAM_" + dataFormat.format(date);
+			String newFileName = "PAM_" + dataFormat.format(date) + dataUnit.getParentDataBlock().getDataName().replace(" ", "_");
 			
 			//create a new file - note each exporter is responsible for closing the file after writing
 			//so previous files should already be closed
@@ -98,10 +99,10 @@ public class PamExporterManager {
 
 		dataUnitBuffer.add(dataUnit);
 
-		System.out.println("Write data unit " + dataUnitBuffer.size() + " to: "+ currentFile); 
+//		System.out.println("Write data unit " + dataUnitBuffer.size() + " to: "+ currentFile); 
 		
 		if (dataUnitBuffer.size()>=BUFFER_SIZE || force) {
-			System.out.println("Write data 2!!" + dataUnitBuffer.size()); 
+//			System.out.println("Write data 2!!" + dataUnitBuffer.size()); 
 			exportOK = pamExporters.get(exportParams.exportChoice).exportData(currentFile, dataUnitBuffer, true);
 			dataUnitBuffer.clear();
 		}
@@ -118,10 +119,14 @@ public class PamExporterManager {
 	/**
 	 * Check whether the current file is greater than the maximum allowed file size. 
 	 * @param currentFile2 - the current file
+	 * @param pamDataUnitExporter 
 	 * @return true of greater than or equal to the maximum file size. 
 	 */
-	private boolean isFileSizeMax(File currentFile2) {
-		return getFileSizeMegaBytes(currentFile2) >= MAX_FILE_SIZE_MB;
+	private boolean isNeedsNewFile(File currentFile2, PamDataUnitExporter pamDataUnitExporter) {
+		if( getFileSizeMegaBytes(currentFile2) >= exportParams.maximumFileSize) {
+			return true;
+		};
+		return pamDataUnitExporter.isNeedsNewFile();
 	}
 
 	/**
