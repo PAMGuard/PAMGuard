@@ -329,7 +329,7 @@ public class ClickDetector extends PamProcess {
 		offlineEventLogging.setSubLogging(getClickDataBlock().getOfflineClickLogging());
 
 		triggerBackgroundHandler = new TriggerBackgroundHandler(this);
-		
+
 		clickBackgroundManager = new ClickBackgroundManager(this);
 
 		setProcessCheck(new BaseProcessCheck(this, RawDataUnit.class, 1, 0.0000001));
@@ -1378,7 +1378,7 @@ public class ClickDetector extends PamProcess {
 		private boolean initialiseFilters;
 
 		private long clickStartSample, clickEndSample;
-		
+
 		private double maxSignalExcess;
 
 		private int clickTriggers;
