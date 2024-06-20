@@ -161,7 +161,9 @@ public class RawDataTransforms {
 	 */
 	public double[] getPowerSpectrum(int channel, int minBin, int maxBin, int fftLength) {
 		synchronized (synchObject) {
+
 			if (minBin==0 && maxBin>=this.getWaveData(0).length-1) {
+
 				return getPowerSpectrum(channel,  fftLength); 
 			}		
 			if (fftLength == 0) {
@@ -169,8 +171,8 @@ public class RawDataTransforms {
 			}
 
 			double[] waveformTrim = new double[maxBin-minBin]; 
-
-			//System.out.println("minBin: " +  minBin + " maxBin: " + maxBin + " raw waveform: " + this.getWaveData(channel).length); 
+			
+//			System.out.println("minBin: " +minBin + " maxBin: " + maxBin + "  " + Math.min(this.getWaveData(channel).length, waveformTrim.length) + " " + this.getWaveData(channel).length  + "  " + this.getSampleDuration());
 
 			System.arraycopy(this.getWaveData(channel), minBin, waveformTrim, 0, Math.min(this.getWaveData(channel).length-minBin-1, waveformTrim.length));
 
@@ -305,7 +307,7 @@ public class RawDataTransforms {
 	 * Get the spectrum length
 	 * @return the spectrogram length. 
 	 */
-	private int getCurrentSpectrumLength() {
+	public int getCurrentSpectrumLength() {
 		if (currentSpecLen<=0) {
 			currentSpecLen = PamUtils.getMinFftLength(dataUnit.getSampleDuration());
 		}
@@ -573,14 +575,21 @@ public class RawDataTransforms {
 	 */
 	public FFTFilter getFFTFilter(FFTFilterParams fftFilterParams) {
 		if (fftFilter == null) {
-			fftFilter = new FFTFilter(fftFilterParams, this.dataUnit.getParentDataBlock().getSampleRate());
+			fftFilter = new FFTFilter(fftFilterParams,getSampleRate());
 		}
 		else {
-			fftFilter.setParams(fftFilterParams, this.dataUnit.getParentDataBlock().getSampleRate());
+			fftFilter.setParams(fftFilterParams, getSampleRate());
 		}
 		return fftFilter;
 	}
 
+	/**
+	 * Get the sample rate to use for transforms. 
+	 * @return the sample rate. 
+	 */
+	public float getSampleRate() {
+		return this.dataUnit.getParentDataBlock().getSampleRate();
+	}
 
 	/**
 	 * Get a correction based on the slope of the waveform which 

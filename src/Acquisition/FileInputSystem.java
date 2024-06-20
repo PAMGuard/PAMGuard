@@ -429,6 +429,8 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		//		acquisitionDialog.NotifyChange();
 		if (file.isFile() && !file.isHidden() && acquisitionDialog != null) {
 			try {
+				
+				System.out.println("FileInputSystem - interpretNewFile"); 
 				AudioInputStream audioStream = PamAudioFileManager.getInstance().getAudioInputStream(file);
 
 				//      // Get additional information from the header if it's a wav file. 
@@ -599,6 +601,8 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 			if (audioStream != null) {
 				audioStream.close();
 			}
+
+			System.out.println("FileInputSystem - prepareInputFile"); 
 
 			audioStream = PamAudioFileManager.getInstance().getAudioInputStream(currentFile);
 
@@ -810,6 +814,10 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	protected void collectFlacData() {
 		FileInputStream fileStream;
 		try {
+			File currFile = getCurrentFile();
+			if (currFile == null) {
+				return;
+			}
 			fileStream = new FileInputStream(getCurrentFile());
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

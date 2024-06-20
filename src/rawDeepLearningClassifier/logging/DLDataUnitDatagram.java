@@ -31,6 +31,8 @@ public class DLDataUnitDatagram implements DatagramProvider {
 	public int addDatagramData(PamDataUnit dataUnit, float[] dataGramLine) {
 		DLDataUnit dlDataUnit = (DLDataUnit) dataUnit;
 		
+		if (dataGramLine==null || dataGramLine.length==0) return 0;
+		
 		if (dlDataUnit.getPredicitionResult().getPrediction()!=null) {
 			for (int i=0; i<dlDataUnit.getPredicitionResult().getPrediction().length; i++) {
 				dataGramLine[i] += (float) dlDataUnit.getPredicitionResult().getPrediction()[i]; 

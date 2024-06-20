@@ -515,6 +515,9 @@ public class DBXMLQueries {
 		 * first query for Detections documents associated with this deployment and datablock.
 		 * updated May 23
 		 */
+		if (dataBlock == null) {
+			return null;
+		}
 		String queryNoDepl = "{\"species\":{\"query\":{\"op\":\"lib:completename2tsn\",\"optype\":\"function\",\"operands\":[\"%s\"]},\"return\":{\"op\":\"lib:tsn2completename\",\"optype\":\"function\",\"operands\":[\"%s\"]}},\"return\":[\"Detections/Id\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Algorithm/Software\",\"LongDataName\"],\"optype\":\"binary\"}],\"enclose\":1}";
 		String queryWithDepl = "{\"species\":{\"query\":{\"op\":\"lib:completename2tsn\",\"optype\":\"function\",\"operands\":[\"%s\"]},\"return\":{\"op\":\"lib:tsn2completename\",\"optype\":\"function\",\"operands\":[\"%s\"]}},\"return\":[\"Detections/Id\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/DataSource/DeploymentId\",\"TheDeploymentId\"],\"optype\":\"binary\"},{\"op\":\"=\",\"operands\":[\"Detections/Algorithm/Software\",\"LongDataName\"],\"optype\":\"binary\"}],\"enclose\":1}";
 		String query;

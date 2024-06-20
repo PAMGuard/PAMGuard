@@ -636,7 +636,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 
 	/**
 	 * Find a dataunit based on it's database index. If there have been no updates,
-	 * then database indexes should be in order and a fast find canbe used. If
+	 * then database indexes should be in order and a fast find can be used. If
 	 * however, there have been updates, then things will not be in order so it's
 	 * necessary to go through everything from start to end.
 	 * 

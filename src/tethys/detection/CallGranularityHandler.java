@@ -3,6 +3,7 @@ package tethys.detection;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import nilus.Detection;
+import nilus.Detections;
 import tethys.TethysControl;
 import tethys.output.StreamExportParams;
 import tethys.output.TethysExportParams;
@@ -35,6 +36,11 @@ public class CallGranularityHandler extends GranularityHandler {
 	public Detection[] cleanup(long timeMillis) {
 		// never anything to do here for call level granularity. 
 		return null;
+	}
+
+	@Override
+	protected boolean autoEffortFix(Detections detections, Detection det) {
+		return expandEffort(detections, det);
 	}
 
 }

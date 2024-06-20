@@ -1,47 +1,31 @@
 package group3dlocaliser.dialog;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-
-import javax.swing.JFrame;
 
 import Array.ArrayManager;
 import PamController.SettingsPane;
-import PamDetection.PamDetection;
 import PamView.GroupedDataSource;
-import PamView.symbol.SwingSymbolOptionsPanel;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import group3dlocaliser.Group3DLocaliserControl;
 import group3dlocaliser.Group3DParams;
+import group3dlocaliser.ToadManagedSettingsPane;
 import group3dlocaliser.algorithm.LocaliserAlgorithm3D;
 import group3dlocaliser.algorithm.LocaliserAlgorithmParams;
-import group3dlocaliser.algorithm.LocaliserAlgorithmProvider;
 import group3dlocaliser.grouper.DetectionGrouperParams;
 import group3dlocaliser.grouper.dialog.GrouperSettingsPane;
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.Tooltip;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
-import pamViewFX.fxNodes.PamGridPane;
 import pamViewFX.fxNodes.PamTabPane;
 import pamViewFX.fxNodes.PamTitledBorderPane;
 import pamViewFX.fxNodes.pamDialogFX.ManagedSettingsPane;
@@ -65,7 +49,7 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 	
 	private ManagedSettingsPane<?> algorithmSourcePane;
 
-	private Button algoOptsButton;
+//	private Button algoOptsButton;
 	
 	private PamBorderPane algoSourceHolder;
 
@@ -75,9 +59,10 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 	
 	public GroupLocSettingPaneFX(Group3DLocaliserControl group3dLocaliserControl, Object ownerWindow) {
 		super(ownerWindow);		
+
 		this.ownerWindow = ownerWindow;
 		this.group3dLocaliserControl = group3dLocaliserControl;
-		
+
 		PamTabPane tabPane = new PamTabPane();
 		tabPane.setAddTabButton(false);
 		tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
@@ -89,10 +74,10 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 			public void changed(ObservableValue<? extends PamDataBlock> observable, PamDataBlock oldValue,
 					PamDataBlock newValue) {
 				newDataBlockSelection(newValue);
-				
+//				grouperSettingsPane.newSourceGroup(((GroupedDataSource) newValue).getGroupSourceParameters()); 
 			}
 		});
-		
+				
 		grouperSettingsPane = new GrouperSettingsPane(ownerWindow, "Detection matching options");
 		PamBorderPane gsp = new PamBorderPane();
 		gsp.setTop(grouperSettingsPane.getContentNode());
@@ -107,21 +92,21 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 		borderPane.setCenter(gsp);
 		tabPane.getTabs().add(new Tab("Detection source", borderPane));
 		
-		
-		
 		algorithms = new ChoiceBox<>();
 		setAlgorithmList(); // call here so that box gets correct size. 
 		
 		PamBorderPane algoGrid = new PamBorderPane();
+		
 //		HBox.setHgrow(algoGrid, Priority.ALWAYS);
 		algoGrid.setCenter(algorithms);
 		algorithms.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 		GridPane.setFillWidth(algorithms, true);
 //		algoGrid.add(new Label("Algorithm Options "), 0, 1);
 //		algoOptsButton = new Button("",PamGlyphDude.createPamGlyph(MaterialIcon.SETTINGS,Color.WHITE, PamGuiManagerFX.iconSize));
-		algoOptsButton = new Button("",PamGlyphDude.createPamIcon("mdi2c-cog",Color.WHITE, PamGuiManagerFX.iconSize));
-		algoGrid.setRight(algoOptsButton);
-		algoOptsButton.setTooltip(new Tooltip("More Algorithm Options ..."));
+//		algoOptsButton = new Button("",PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconSize));
+//		algoGrid.setRight(algoOptsButton);
+//		PamBorderPane.setMargin(algoOptsButton, new Insets(0,0,0,5));
+//		algoOptsButton.setTooltip(new Tooltip("More Algorithm Options ..."));
 		algoSourceHolder = new PamBorderPane();
 //		HBox.setHgrow(algoSourceHolder, Priority.ALWAYS);
 //		algoGrid.add(algoSourceHolder, 0, 2, 4, 1);
@@ -129,14 +114,15 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 		PamTitledBorderPane ptb = new PamTitledBorderPane("Select Localisation Algorithm", algoGrid);
 		algoMainPane.setTop(ptb);
 		algoMainPane.setCenter(algoSourceHolder);
-		tabPane.getTabs().add(new Tab("Algorithm", algoMainPane));
+		tabPane.getTabs().add(new Tab("Localisation", algoMainPane));
 		
-		algoOptsButton.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				moreAlgorithmOptions();
-			}
-		});
+		
+//		algoOptsButton.setOnAction(new EventHandler<ActionEvent>() {
+//			@Override
+//			public void handle(ActionEvent event) {
+//				moreAlgorithmOptions();
+//			}
+//		});
 		
 		algorithms.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -145,14 +131,16 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 			}
 		});
 		
-		
 		mainPane.setCenter(tabPane);
+		
 	}
 
 	/**
 	 * Called whenever the algorithm selection is changed. 
 	 */
 	protected void selectAlgorithm() {
+		
+
 		/**
 		 * Algorithm options fall into two separate parts. The first, which primarily involves
 		 * timing measurements is included in the bottom half of the main dialog tab, so 
@@ -165,16 +153,18 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 		 */
 		String algoName  = algorithms.getSelectionModel().getSelectedItem();
 		if (algoName == null) {
-			algoOptsButton.setDisable(true);
+			//algoOptsButton.setDisable(true);
 			return;
 		}
 		LocaliserAlgorithm3D localiserAlgorithm = group3dLocaliserControl.findAlgorithm(algoName);
+		//System.out.println(" selectAlgorithm: object " + localiserAlgorithm);
+
 		if (localiserAlgorithm == null) {
-			algoOptsButton.setDisable(true);
+			//algoOptsButton.setDisable(true);
 			return;
 		}
 		// also enable / disable the more options button ...
-		algoOptsButton.setDisable(localiserAlgorithm.hasParams() == false);
+		//algoOptsButton.setDisable(localiserAlgorithm.hasParams() == false);
 		
 		/**
 		 * Need to immediately tell the algorithm which input we're using so that it can 
@@ -192,13 +182,14 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 		 * what options to display, i.t TOAD options for clicks, whistles and generic
 		 * Time frequency things are NOT the same. 
 		 */
-		ManagedSettingsPane<?> newPane = localiserAlgorithm.getSourceSettingsPane(getAWTWindow(), currSource);
-		if (newPane == algorithmSourcePane) {
-			return;
-		}
-		if (algorithmSourcePane != null) {
-			algoSourceHolder.setCenter(null);
-		}
+		ToadManagedSettingsPane newPane = localiserAlgorithm.getSourceSettingsPane(getAWTWindow(), currSource);
+		
+		//System.out.println(" selectAlgorithm: newPane " + newPane);
+
+
+		algoSourceHolder.setCenter(null);
+		
+		
 		if (newPane != null) {
 //			PamTitledBorderPane p = new PamTitledBorderPane("Algorithm options", newPane.getSettingsPane().getContentNode());
 			PamBorderPane borderPane = new PamBorderPane(newPane.getSettingsPane().getContentNode());
@@ -206,10 +197,67 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 			borderPane.setRightSpace(5);
 			borderPane.setBottomSpace(5);
 			algoSourceHolder.setCenter(borderPane);
-			LocaliserAlgorithmParams locParams = group3dLocaliserControl.getLocaliserAlgorithmParams(localiserAlgorithm);
-			newPane.setParams();
+//			LocaliserAlgorithmParams locParams = group3dLocaliserControl.getLocaliserAlgorithmParams(localiserAlgorithm);
+//			newPane.setParams();
+
 //			newPane.setDetectionSource(sourcePanel.getSource());
 		}
+		
+		//System.out.println(" selectAlgorithm: newPane " + localiserAlgorithm.getAlgorithmSettingsPane());
+
+		/**
+		 * Now set up the advanced settings for the localiser algorothm. If FX add as a tab. If Swing then add a settings button to a new tab. 
+		 */
+		if (localiserAlgorithm.getAlgorithmSettingsPane()!=null) {
+			
+			Node settingsPane = null;
+			
+			if (localiserAlgorithm.getAlgorithmSettingsPane()!=null) {
+				//preferentially select FX pane of one exists. 
+				settingsPane = localiserAlgorithm.getAlgorithmSettingsPane().getContentNode(); 
+			}
+			//there must be a dialog - otherwise what is the point of a settings pane that does nothing - it should be null. 
+//			else  {
+//				PamHBox hBox = new PamHBox(); 
+//				hBox.setSpacing(5);
+//				hBox.setAlignment(Pos.CENTER);
+//				hBox.setPadding(new Insets(5,5,5,5));
+//				
+//				PamButton algoOptsButton = new PamButton("",PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconSize));
+//				algoOptsButton.setOnAction((action)->{
+//					moreAlgorithmOptions() ;
+//				});
+//				algoOptsButton.setTooltip(new Tooltip("More Algorithm Options ..."));
+//				
+//				hBox.getChildren().addAll(new Label(localiserAlgorithm.getName() + " settings"), algoOptsButton); 
+//				
+//				settingsPane = hBox;
+//			}
+//			
+			
+			if (newPane==null) {
+				//System.out.println("Set settings pane: " + settingsPane);
+				algoSourceHolder.setCenter(settingsPane);
+			}
+			else {
+				//clear the tab pane
+				for (int i=0; i<newPane.getTabPane().getTabs().size(); i++) {
+					if (newPane.getTabPane().getTabs().get(i).getText().equals(localiserAlgorithm.getName())) {
+						newPane.getTabPane().getTabs().remove(i); 
+						break; 
+					}
+				}
+				
+				if (settingsPane!=null) {
+					Tab tab = new Tab(localiserAlgorithm.getName()); 
+					tab.setGraphic(PamGlyphDude.createPamIcon("mdi2c-cogs"));
+					tab.setContent(localiserAlgorithm.getAlgorithmSettingsPane().getContentNode());
+					newPane.getTabPane().getTabs().add(tab);
+				}
+				
+			}
+		}
+
 		algorithmSourcePane = newPane;
 				
 		
@@ -234,30 +282,13 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 		BorderPaneFX2AWT.repackSwingDialog(getContentNode());
 	}
 
-	/**
-	 * Handle algorithm options ...
-	 */
-	protected void moreAlgorithmOptions() {
-		String algoName  = algorithms.getSelectionModel().getSelectedItem();
-		if (algoName == null) {
-			return;
-		}
-		LocaliserAlgorithm3D localiserAlgorithm = group3dLocaliserControl.findAlgorithm(algoName);
-		if (localiserAlgorithm == null) {
-			return;
-		}
-		if (localiserAlgorithm.hasParams() == false) {
-			return;
-		}
-		LocaliserAlgorithmParams algorithmPaams = group3dLocaliserControl.getLocaliserAlgorithmParams(localiserAlgorithm);
-		algorithmPaams = localiserAlgorithm.showAlgorithmDialog(getAWTWindow(), algorithmPaams);
-		if (algorithmPaams != null) {
-			group3dLocaliserControl.setAlgorithmParams(localiserAlgorithm, algorithmPaams);
-		}
-	}
+
+	
 
 	@Override
 	public Group3DParams getParams(Group3DParams currParams) {
+		if (currParams==null) currParams = new Group3DParams();
+		
 		PamDataBlock<?> currSource = sourcePanel.getSource();
 		if (currSource == null) {
 			SwingFXDialogWarning.showWarning(this.getOwnerWindow(), "Invalid DataBlock", "You must select a data source");
@@ -279,34 +310,87 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 			SwingFXDialogWarning.showWarning(this.getOwnerWindow(), "Localisation algorithm", "You must select a localisation algorithm");
 			return null;
 		}
-		currParams.setAlgorithmName(algoName);
-		LocaliserAlgorithm3D algoProvider = group3dLocaliserControl.findAlgorithm(algoName);
 		
-		if (algorithmSourcePane != null && currParams != null && algoProvider != null) {
-			LocaliserAlgorithmParams locParams = currParams.getAlgorithmParams(algoProvider);
-			if (algorithmSourcePane != null) {
-				Object ans = algorithmSourcePane.getParams();
-				if (ans == null) {
-					return null;
-				}
-//				else {
-//					locParams.setAlgorithmParams(algoProvider, ans);
-//				}
-//				
-//				if (ans instanceof LocaliserAlgorithmParams) {
-//					currParams.setAlgorithmParams(algoProvider, (LocaliserAlgorithmParams) ans);
-//				}
+		//set the currently select algorithm 
+		currParams.setAlgorithmName(algoName);
+		
+		//now iterate through all the algorithms and save both the algorithm source settings and the save settings. If the user has changed multiple
+		//a settings don't want just the current algorithm settings being saved. 
+		for (int i = 0; i< algorithms.getItems().size(); i++ ) {
+			
+			LocaliserAlgorithm3D algoProvider = group3dLocaliserControl.findAlgorithm(algorithms.getItems().get(i));
+			
+			LocaliserAlgorithmParams locAlgorithmParams = currParams.getAlgorithmParams(algoProvider);
+			
+			
+			if (algoProvider.getAlgorithmSettingsPane()!=null) {
+				
+				//get the algorithm paramters. 
+				Serializable newAlgorithmParams = algoProvider.getAlgorithmSettingsPane().getParams(
+						currParams.getAlgorithmParams(algoProvider) == null? null : currParams.getAlgorithmParams(algoProvider).getAlgorithmParameters());
+				
+				if (locAlgorithmParams==null) locAlgorithmParams = new LocaliserAlgorithmParams(); 
+				locAlgorithmParams.setAlgorithmParameters(newAlgorithmParams);
+				
+				//FIXME - note that, if a swing dialog has been used the algorithms have already been set....not great - want to 
+				//try and get swing out of this if possible. 
 			}
-////			LocaliserAlgorithmParams sourceParams = algorithmSourcePane.getParams(locParams);
-//			if (sourceParams == null) {
-////				SwingFXDialogWarning.showWarning(this.getOwnerWindow(), "Localisation algorithm", "Invalid al");
-//				return null;
-//			}
-//			currParams.setAlgorithmParams(algoProvider, sourceParams);
+			
+			if (algoProvider.getSourceSettingsPane(null, currSource)!=null) {
+				
+				//set only the selected algorithm to show the user warning sif settings are wrong
+				if  (algorithms.getSelectionModel().getSelectedIndex()==i) {
+					//this is the currently selected algorithm
+					algoProvider.getSourceSettingsPane(null, currSource).setErrorWarn(true);
+				}
+				else {
+					algoProvider.getSourceSettingsPane(null, currSource).setErrorWarn(false);
+				}
+				
+				//get the source pane paramters.
+				Serializable newSourceParams = algoProvider.getSourceSettingsPane(null, currSource).getParams(); 
+				
+				if (locAlgorithmParams==null) locAlgorithmParams = new LocaliserAlgorithmParams(); 
+				locAlgorithmParams.setXtraSourceParameters(newSourceParams);
+			}
+			
+
+			//now set the source paramters. 
+			currParams.setAlgorithmParams(algoProvider, locAlgorithmParams);
+			
+			
+			//System.out.println("Get params" + algoProvider.getName() + "  " + currParams.getAlgorithmParams(algoProvider)); 
+		
 		}
+		
+//		if (algorithmSourcePane != null && currParams != null && algoProvider != null) {
+//			LocaliserAlgorithmParams locParams = currParams.getAlgorithmParams(algoProvider);
+//			if (algorithmSourcePane != null) {
+//				Object ans = algorithmSourcePane.getParams();
+//				if (ans == null) {
+//					return null;
+//				}
+////				else {
+////					locParams.setAlgorithmParams(algoProvider, ans);
+////				}
+////				
+////				if (ans instanceof LocaliserAlgorithmParams) {
+////					currParams.setAlgorithmParams(algoProvider, (LocaliserAlgorithmParams) ans);
+////				}
+//			}
+//////			LocaliserAlgorithmParams sourceParams = algorithmSourcePane.getParams(locParams);
+////			if (sourceParams == null) {
+//////				SwingFXDialogWarning.showWarning(this.getOwnerWindow(), "Localisation algorithm", "Invalid al");
+////				return null;
+////			}
+////			currParams.setAlgorithmParams(algoProvider, sourceParams);
+//		}
+		
 		
 		return currParams;
 	}
+	
+	
 	private LocaliserAlgorithm3D getSelectedAlgorithm() {
 		String algoName  = algorithms.getSelectionModel().getSelectedItem();
 		if (algoName == null) {
@@ -317,6 +401,7 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 
 	@Override
 	public void setParams(Group3DParams input) {
+		
 		sourcePanel.setSourceList();
 		sourcePanel.setSource(input.getSourceName());
 //		sourcePanel.setChannelList(input.getGroupedSourceParams().getChanOrSeqBitmap());
@@ -328,6 +413,7 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 //		algorithms.getSelectionModel().select(input.getAlgorithmName());
 		currentParams = input;
 		newDataBlockSelection(sourcePanel.getSource());
+	
 	}
 	
 	/**
@@ -340,22 +426,32 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 		PamDataBlock inputDataBlock = sourcePanel.getSource();
 		algorithms.getItems().clear();
 		ArrayList<LocaliserAlgorithm3D> algoList = group3dLocaliserControl.getAlgorithmProviders();
+		
+		int shape = 0;
+		
+		//Note that, if there is a lot of data in the hydrophone data block this next chunk can take a second or so to prcoess. 
+		//Must keep it outside the for loop or there is a long freeze. 
+		if (inputDataBlock != null) {
+			int phones = inputDataBlock.getHydrophoneMap();
+			shape = ArrayManager.getArrayManager().getArrayType(phones);
+		}
+
 		for (int i = 0; i < algoList.size(); i++) {
 			LocaliserAlgorithm3D algo = algoList.get(i);
 			if (inputDataBlock != null && algo.canLocalise(inputDataBlock) == false) {
 				continue;
 			}
+			
 			if (inputDataBlock != null) {
-				int phones = inputDataBlock.getHydrophoneMap();
-				int shape = ArrayManager.getArrayManager().getArrayType(phones);
-				ArrayManager.getArrayManager().getArrayType(phones);
 				if (algo.canArrayShape(shape) == false) {
 					continue;
 				}
 			}
+			
 			if (algo == currAlgo) {
 				currentIndex = algorithms.getItems().size();
 			}
+			
 			algorithms.getItems().add(algo.getName());
 		}
 		if (currentIndex >= 0) {
@@ -373,10 +469,41 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 		if (algorithmSourcePane == null) {
 			return;
 		}
+		
+		PamDataBlock<?> currSource = sourcePanel.getSource();
+
+		//note that we get the algorithms from the choice box here because these will already have
+		//been filtered for suitability depending on array geometry. 
+		for (int i=0; i<this.algorithms.getItems().size(); i++) {
+			
+			LocaliserAlgorithm3D algoProvider = group3dLocaliserControl.findAlgorithm(this.algorithms.getItems().get(i));
+			
+			LocaliserAlgorithmParams params = currentParams.getAlgorithmParams(algoProvider); 
+			
+//			System.out.println("Set params for: " + algoProvider.getName() + "  " + params); 
+			//need this here so that the source pane is created - otherwise channels 
+			algoProvider.prepare(currSource);
+			
+			if (algoProvider.getAlgorithmSettingsPane()!=null)  {
+				
+				//note that if params are null but a pane exists the algorithm needs to make a new set of params. 
+				algoProvider.getAlgorithmSettingsPane().setParams(params == null? null : params.getAlgorithmParameters());
+			}
+			
+			if (algoProvider.getSourceSettingsPane(null, currSource)!=null) {
+				//get the source pane paramters
+				algoProvider.getSourceSettingsPane(null, currSource).setParams();
+			}
+//			if (algoProvider.getSourceSettingsPane(null, null).useParams(params){
+//				
+//			}
+		}
+		
 		LocaliserAlgorithm3D currAlgo = getSelectedAlgorithm();
 		if (currAlgo == null) {
 			return;
 		}
+
 //		algorithmSourcePane.setDetectionSource(sourcePanel.getSource());
 //		LocaliserAlgorithmParams locParams = currentParams.getAlgorithmParams(currAlgo);
 //		if (locParams != null) {
@@ -410,6 +537,7 @@ public class GroupLocSettingPaneFX extends SettingsPane<Group3DParams>{
 		}
 		setAlgorithmList();
 		setAlgorithmSourceParameters();
+		grouperSettingsPane.newSourceGroup(((GroupedDataSource) pamDataBlock).getGroupSourceParameters()); 
 	}
 
 	@Override

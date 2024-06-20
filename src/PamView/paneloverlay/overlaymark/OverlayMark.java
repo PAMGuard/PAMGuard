@@ -173,10 +173,10 @@ public class OverlayMark {
 
 		//now must find the limits of the zoom. Can be complex shapes so a bit difficult; 
 		double minX=Double.MAX_VALUE; 
-		double maxX=Double.MIN_VALUE; 
+		double maxX=Double.NEGATIVE_INFINITY; 
 
 		double minY=Double.MAX_VALUE; 
-		double maxY=Double.MIN_VALUE; 
+		double maxY=Double.NEGATIVE_INFINITY; 
 
 		//now find those maximum, and minimum values, 
 		for (int i=0; i<coordinates.size(); i++){

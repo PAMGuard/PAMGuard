@@ -63,6 +63,13 @@ public class SubdetectionInfo<T extends PamDataUnit> implements Comparable<Subde
 	 */
 	private int childDatabaseIndex;
 	
+	private int binaryFileIndex;
+
+	/**
+	 * Only exists for click data. 
+	 */
+	private Integer clickNumber;
+	
 	
 	/**
 	 * @param subDetection2
@@ -106,6 +113,7 @@ public class SubdetectionInfo<T extends PamDataUnit> implements Comparable<Subde
 		binaryFilename = subTableData.getBinaryFilename();
 		parentID = subTableData.getParentID();
 		parentUID = subTableData.getParentUID();
+		clickNumber = subTableData.getClickNumber();
 	}
 	
 	public T getSubDetection() {
@@ -208,6 +216,34 @@ public class SubdetectionInfo<T extends PamDataUnit> implements Comparable<Subde
 	 */
 	public void setChildDatabaseIndex(int childDatabaseIndex) {
 		this.childDatabaseIndex = childDatabaseIndex;
+	}
+
+	/**
+	 * @return the binaryFileIndex
+	 */
+	public int getBinaryFileIndex() {
+		return binaryFileIndex;
+	}
+
+	/**
+	 * @param binaryFileIndex the binaryFileIndex to set
+	 */
+	public void setBinaryFileIndex(int binaryFileIndex) {
+		this.binaryFileIndex = binaryFileIndex;
+	}
+
+	/**
+	 * @return the clickNumber
+	 */
+	public Integer getClickNumber() {
+		return clickNumber;
+	}
+
+	/**
+	 * @param childUID the childUID to set
+	 */
+	public void setChildUID(long childUID) {
+		this.childUID = childUID;
 	}
 
 }

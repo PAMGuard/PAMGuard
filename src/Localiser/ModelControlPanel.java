@@ -152,8 +152,7 @@ public class ModelControlPanel {
 		@Override
 		//settings panel
 		public void actionPerformed(ActionEvent arg0) {
-			model.getSettingsPane();
-			
+			model.getAlgorithmSettingsPane();
 			//AWT implementation. 
 		}
 	}

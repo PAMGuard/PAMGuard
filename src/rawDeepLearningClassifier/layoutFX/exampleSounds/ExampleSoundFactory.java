@@ -38,7 +38,9 @@ public class ExampleSoundFactory {
 		
 		MINKE_WHALE("Minke Whale (Balaenoptera spp.)", ExampleSoundCategory.MYSTICETES),
 				
-		HUMPBACK_WHALE("Humpback whale (Megaptera novaeangliae) ", ExampleSoundCategory.MYSTICETES);
+		HUMPBACK_WHALE("Humpback whale (Megaptera novaeangliae) ", ExampleSoundCategory.MYSTICETES),
+
+		BLUE_WHALE("Blue whale (Balaenoptera musculus) ", ExampleSoundCategory.MYSTICETES);
 
 	    private final String text;
 	    
@@ -266,6 +268,10 @@ public class ExampleSoundFactory {
 			break;
 		case DOLPHIN:
 			exampleSound = new SimpleExampleSound(dolphin1, 192000); 
+			break;
+		case BLUE_WHALE:
+			path = getClass().getResource("/Resources/exampleSounds/Blue_whale.wav"); 
+			exampleSound = new SimpleExampleSound(path); 			
 			break;
 		default:
 			break;

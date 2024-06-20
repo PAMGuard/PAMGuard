@@ -2,25 +2,39 @@ package group3dlocaliser.algorithm.toadbase;
 
 import PamController.SettingsPane;
 import PamUtils.PamUtils;
+import group3dlocaliser.ToadManagedSettingsPane;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.layout.BorderPane;
+import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamTitledBorderPane;
 import pamViewFX.fxNodes.pamDialogFX.ManagedSettingsPane;
 import pamViewFX.fxNodes.pamDialogFX.SwingFXDialogWarning;
 import pamViewFX.fxNodes.utilityPanes.ChannelPanelFX;
 
-public class TOADSettingsPaneWithChannels<T> extends ManagedSettingsPane<T> {
+public class TOADSettingsPaneWithChannels<T> extends ToadManagedSettingsPane<T> {
 
 	private ManagedSettingsPane<T> toadSettingsPane;
 	private ChSettingsPane tabbedPane;
 	private TabPane tabPane;
+	
+	/**
+	 * Get the tab pane for the settings. 
+	 * @return the tab pane for the different settings. 
+	 */
+	@Override
+	public TabPane getTabPane() {
+		return tabPane;
+	}
+
 	private ChannelPanelFX channelPanel;
 	private TOADBaseAlgorithm toadBaseAlgorithm;
 	private Object parent;
 	private TOADOptionsPane toadOptionsPane;
+	
+	private boolean warnError = true;
 	
 
 	public TOADSettingsPaneWithChannels(Object parent, TOADBaseAlgorithm toadBaseAlgorithm, ManagedSettingsPane<T> toadSettingsPane) {
@@ -42,7 +56,11 @@ public class TOADSettingsPaneWithChannels<T> extends ManagedSettingsPane<T> {
 		int chMap = channelPanel.getChannelMap();
 		toadBaseAlgorithm.getToadBaseParams().setChannelBitmap(chMap);
 		int nSelChannels = PamUtils.getNumChannels(chMap);
-		if (nSelChannels < 3) {
+		if (nSelChannels < 3 && warnError) {
+			/**
+			 * TODO - This is a nasty way of doing this. There should be a validator in this pane which is checked before getParams is called ]
+			 * but that would require a lot of restructuring. 
+			 */
 			return SwingFXDialogWarning.showWarning(parent, "Channel selection", "Not enough channels selected");
 		}
 		TOADBaseParams ans = toadOptionsPane.getParams(toadBaseAlgorithm.getToadBaseParams());
@@ -51,6 +69,7 @@ public class TOADSettingsPaneWithChannels<T> extends ManagedSettingsPane<T> {
 
 	@Override
 	public T findParams() {
+		//System.out.println("CHANNELS: Get channel map: " +  toadBaseAlgorithm.getToadBaseParams().getChannelBitmap() + "  " +  PamUtils.getNumChannels(toadBaseAlgorithm.getToadBaseParams().getChannelBitmap()));
 		channelPanel.setChannelMap(toadBaseAlgorithm.getToadBaseParams().getChannelBitmap());
 		toadOptionsPane.setParams(toadBaseAlgorithm.getToadBaseParams());
 		return null;
@@ -70,8 +89,17 @@ public class TOADSettingsPaneWithChannels<T> extends ManagedSettingsPane<T> {
 			BorderPane boderPane = new BorderPane();
 			boderPane.setCenter(new PamTitledBorderPane("Timing options", toadOptionsPane.getContentNode()));
 			boderPane.setBottom(toadSettingsPane.getSettingsPane().getContentNode());
-			tabPane.getTabs().add(new Tab("Timing", boderPane));
-			tabPane.getTabs().add(new Tab("Channels", new PamTitledBorderPane("Channel Selection", channelPanel.getContentNode())));
+			
+			Tab timingTab = new Tab("Timing", boderPane);
+			timingTab.setGraphic(PamGlyphDude.createPamIcon("mdi2w-waveform"));
+
+			tabPane.getTabs().add(timingTab );
+			
+	
+			Tab channelsTab = new Tab("Channels", new PamTitledBorderPane("Channel Selection", channelPanel.getContentNode()));
+					channelsTab.setGraphic(PamGlyphDude.createPamIcon("mdi2f-format-list-numbered-rtl"));
+			
+			tabPane.getTabs().add(channelsTab);
 		}
 
 		@Override
@@ -115,5 +143,11 @@ public class TOADSettingsPaneWithChannels<T> extends ManagedSettingsPane<T> {
 	 */
 	public ChannelPanelFX getChannelPanel() {
 		return channelPanel;
+	}
+
+	@Override
+	public void setErrorWarn(boolean warn) {
+		this.warnError = warn;
+		
 	}
 }

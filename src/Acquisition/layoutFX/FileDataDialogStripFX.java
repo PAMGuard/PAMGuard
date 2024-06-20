@@ -215,7 +215,7 @@ public class FileDataDialogStripFX extends PamBorderPane {
 		popOver.show(advSettingsButton);
 
 		((Parent) popOver.getSkin().getNode()).getStylesheets()
-		.add(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
+		.addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
 
 		advDatePane.setParams();
 	}

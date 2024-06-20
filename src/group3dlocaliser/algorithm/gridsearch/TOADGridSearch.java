@@ -1,5 +1,7 @@
 package group3dlocaliser.algorithm.gridsearch;
 
+import java.io.Serializable;
+
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.ChiSquaredDistributionImpl;
 
@@ -15,6 +17,7 @@ import PamguardMVC.PamDataUnit;
 import generalDatabase.SQLLoggingAddon;
 import group3dlocaliser.Group3DLocaliserControl;
 import group3dlocaliser.algorithm.Chi2Data;
+import group3dlocaliser.algorithm.LocaliserAlgorithmParams;
 import group3dlocaliser.algorithm.toadbase.TOADBaseAlgorithm;
 import group3dlocaliser.algorithm.toadbase.TOADInformation;
 import group3dlocaliser.grids.Grid3D;
@@ -50,11 +53,6 @@ public class TOADGridSearch extends TOADBaseAlgorithm {
 		return null;
 	}
 
-	@Override
-	public LocaliserPane<?> getSettingsPane() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public boolean hasParams() {

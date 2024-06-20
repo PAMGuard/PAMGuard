@@ -186,7 +186,6 @@ public abstract class RawDataOrder {
 		 */
 		public boolean resetForLoad(long dataStart, long dataEnd, float sampleRate, int channel) {
 
-			//			System.out.println("RESET FOR LOAD: ");
 			count=0; 
 			this.dataStart=dataStart;
 			this.dataEnd=dataEnd;
@@ -194,6 +193,8 @@ public abstract class RawDataOrder {
 			this.fftSampleRate=sampleRate;
 
 			int dataFrame=(int) (sampleRate*((dataEnd-dataStart)/1000.));
+			
+//			System.out.println("RESET FOR LOAD: " + dataFrame);
 
 			if (dataFrame>=maxMb){
 				System.err.println("The raw data is way too big"); 
@@ -213,12 +214,13 @@ public abstract class RawDataOrder {
 		}
 
 		private int currentIndex=0; 
+		
 		/***
 		 * Called whenever new raw data is acquired
 		 * @param dataUnit
 		 */
 		private void newRawData(RawDataUnit dataUnit) {
-			//			System.out.println("New raw data " +  count);
+//					System.out.println("New raw data " +  count);
 			//			try{
 			if (PamUtils.hasChannel(dataUnit.getChannelBitmap(), channel)){
 

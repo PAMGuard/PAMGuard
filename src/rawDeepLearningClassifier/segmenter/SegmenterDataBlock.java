@@ -3,7 +3,6 @@ package rawDeepLearningClassifier.segmenter;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
 import rawDeepLearningClassifier.dlClassification.ModelResultDataUnit;
-import rawDeepLearningClassifier.segmenter.SegmenterProcess.GroupedRawData;
 
 /**
  * Holds raw data segments which will be classified. 
@@ -22,5 +21,5 @@ public class SegmenterDataBlock extends PamDataBlock<GroupedRawData> {
 		//need this to notify classifier in viewer mode. 
 		return true;
 	}
-
+	
 }

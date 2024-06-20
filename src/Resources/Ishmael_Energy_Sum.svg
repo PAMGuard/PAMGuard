@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Created with Vectornator (http://vectornator.io/) -->
+<svg height="100%" stroke-miterlimit="10" style="fill-rule:nonzero;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;" version="1.1" viewBox="0 0 100 100" width="100%" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:vectornator="http://vectornator.io" xmlns:xlink="http://www.w3.org/1999/xlink">
+<defs/>
+<clipPath id="ArtboardFrame">
+<rect height="100" width="100" x="0" y="0"/>
+</clipPath>
+<g clip-path="url(#ArtboardFrame)" id="Layer-1" vectornator:layerName="Layer 1">
+<g opacity="1" vectornator:layerName="Group 1">
+<path d="M65.625 43.75C64.0625 46.875 64.0625 46.875 62.5 50C69.5794 35.8411 84.4382 23.9373 100 18.75C100 59.375 100 59.375 100 100C79.6875 100 79.6875 100 59.375 100C63.87 73.0301 62.5 87.5862 62.5 56.25C38.8091 53.8809 22.3898 51.9117 0 59.375C0 31.25 0 31.25 0 3.125C2.44565 2.98114 93.4864-12.1045 68.75 25C67.1875 17.1875 67.1875 17.1875 65.625 9.375C56.4287 9.375 60.8481 7.90186 53.125 15.625C57.8125 14.0625 57.8125 14.0625 62.5 12.5C62.5 24.2042 63.8975 19.0799 59.375 28.125C62.5 26.5625 62.5 26.5625 65.625 25C65.625 34.7273 60.683 41.134 56.25 50C60.3067 41.8866 57.0458 43.75 65.625 43.75Z" fill="#0df9fb" fill-rule="nonzero" opacity="1" stroke="#0df9fb" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+<path d="M65.625 40.625C65.625 26.9533 62.8795 26.8303 75 18.75C75 21.875 75 21.875 75 25C82.897 17.103 78.6148 20.0676 87.5 15.625C76.5625 28.125 76.5625 28.125 65.625 40.625Z" fill="#bbfeff" fill-rule="nonzero" opacity="1" stroke="#0df9fb" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+<path d="M75 34.375C84.9006 34.375 88.2998 32.4126 96.875 28.125C91.4116 39.0518 84.6729 35.7886 75 40.625C75 37.5 75 37.5 75 34.375Z" fill="#83feff" fill-rule="nonzero" opacity="1" stroke="#0df9fb" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+<path d="M65.625 9.375C60.9375 10.9375 60.9375 10.9375 56.25 12.5C63.792 23.813 64.1796 18.5157 59.375 28.125C70.2835 22.6708 65.625 27.3292 65.625 9.375Z" fill="#75feff" fill-rule="nonzero" opacity="1" stroke="#0df9fb" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+<path d="M93.75 12.5C87.5 10.9375 87.5 10.9375 81.25 9.375C82.8125 4.6875 82.8125 4.6875 84.375 0C87.5 0 87.5 0 90.625 0C92.1875 6.25 92.1875 6.25 93.75 12.5Z" fill="#befeff" fill-rule="nonzero" opacity="1" stroke="#0df9fb" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+<path d="M81.25 18.75C72.0537 14.1519 75.7366 17.8347 71.875 6.25C73.4375 9.375 73.4375 9.375 75 12.5C78.125 10.9375 78.125 10.9375 81.25 9.375C81.25 14.0625 81.25 14.0625 81.25 18.75Z" fill="#8dfeff" fill-rule="nonzero" opacity="1" stroke="#0df9fb" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+<path d="M81.25 9.375C78.125 10.9375 78.125 10.9375 75 12.5C71.875 7.8125 71.875 7.8125 68.75 3.125C75 6.25 75 6.25 81.25 9.375Z" fill="#91feff" fill-rule="nonzero" opacity="1" stroke="#0df9fb" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+<path d="M100 18.75C95.3125 17.1875 95.3125 17.1875 90.625 15.625C93.75 14.0625 93.75 14.0625 96.875 12.5C98.4375 15.625 98.4375 15.625 100 18.75Z" fill="#b8feff" fill-rule="nonzero" opacity="1" stroke="#0df9fb" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+<path d="M90.625 15.625C87.5 17.1875 87.5 17.1875 84.375 18.75C84.375 14.0625 84.375 14.0625 84.375 9.375C87.5 12.5 87.5 12.5 90.625 15.625Z" fill="#98feff" fill-rule="nonzero" opacity="1" stroke="#0df9fb" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+<path d="M75 25C75 21.875 75 21.875 75 18.75C78.125 18.75 78.125 18.75 81.25 18.75C78.125 21.875 78.125 21.875 75 25Z" fill="#3cfdff" fill-rule="nonzero" opacity="1" stroke="#0df9fb" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+<path d="M68.75 34.375C68.75 35.9375 68.75 35.9375 68.75 37.5C67.1875 37.5 67.1875 37.5 65.625 37.5C67.1875 35.9375 67.1875 35.9375 68.75 34.375Z" fill="#bfffff" fill-rule="nonzero" opacity="1" stroke="#0df9fb" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+<path d="M71.875 28.125C73.4375 26.5625 73.4375 26.5625 75 25C75 26.5625 75 26.5625 75 28.125C73.4375 28.125 73.4375 28.125 71.875 28.125Z" fill="#bfffff" fill-rule="nonzero" opacity="1" stroke="#0df9fb" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+<path d="M56.25 12.5C56.25 14.0625 56.25 14.0625 56.25 15.625C54.6875 15.625 54.6875 15.625 53.125 15.625C54.6875 14.0625 54.6875 14.0625 56.25 12.5Z" fill="#40feff" fill-rule="nonzero" opacity="1" stroke="#0df9fb" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+<path d="M65.625 43.75C65.625 42.1875 65.625 42.1875 65.625 40.625C64.0625 42.1875 64.0625 42.1875 62.5 43.75C64.0625 43.75 64.0625 43.75 65.625 43.75Z" fill="#80feff" fill-rule="nonzero" opacity="1" stroke="#0df9fb" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+</g>
+<path d="M0.701165 59.8273C12.1809 55.9906 29.4985 54.499 29.4985 54.499L47.7599 55.1321L57.1899 55.8429L61.1758 58.2548L62.2461 60.1348L62.4183 63.0732L62.3304 65.5861L62.3761 69.1299L62.1348 74.883L62.0817 80.9884L61.547 89.9043L60.0824 94.5294C60.0824 94.5294 59.102 98.4709 59.102 98.4269C59.102 98.3829 58.93 99.6551 58.93 99.6551L0.187334 99.9489L0.193103 59.9461" fill="#000000" fill-rule="nonzero" opacity="1" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" vectornator:layerName="Curve 2"/>
+<path d="M0.101891 59.6442L0.321679 59.4463" fill="none" opacity="1" stroke="#80feff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" vectornator:layerName="Curve 1"/>
+</g>
+</svg>

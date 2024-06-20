@@ -1,5 +1,6 @@
 package tethys.deployment;
 
+import PamUtils.PamCalendar;
 import tethys.niluswraps.PDeployment;
 
 public class RecordingPeriod {
@@ -70,6 +71,12 @@ public class RecordingPeriod {
 	public boolean toggleSelected() {
 		selected = !selected;
 		return selected;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("%s to %s, %s", PamCalendar.formatDBDateTime(recordStart), 
+				PamCalendar.formatDBDateTime(recordStop), PamCalendar.formatDuration(getDuration()));
 	}
 	
 }

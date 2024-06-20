@@ -29,7 +29,7 @@ import pamViewFX.fxNodes.orderedList.PamDraggableList;
  *
  */
 public class DLTransformsPane extends PamBorderPane {
-	
+
 	/**
 	 * The order of transforms has changed. 
 	 */
@@ -73,7 +73,7 @@ public class DLTransformsPane extends PamBorderPane {
 		Label label = new Label("Add Transform"); 
 
 		MenuButton splitButton = new MenuButton(); 
-//		splitButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.PLUS));
+		//		splitButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.PLUS));
 		splitButton.setGraphic(PamGlyphDude.createPamIcon("mdi2p-plus"));
 
 		DLTransformType[]  dlTransformTypes = DLTransformType.values(); 
@@ -113,10 +113,10 @@ public class DLTransformsPane extends PamBorderPane {
 		transformPane.addSettingsListener(()->{
 			newSettings(TRANSFORM_SETTINGS_CHANGE); 
 		});
-		
+
 		draggablelistPane.addDraggablePane(transformPane); 
 	}
-	
+
 	/*
 	 * Called whenever a transform is remvoed from the pane. 
 	 */
@@ -138,7 +138,7 @@ public class DLTransformsPane extends PamBorderPane {
 	 * @param dlTransforms - the list of transforms (in order) to set
 	 */
 	public void setTransforms(ArrayList<DLTransform> dlTransforms) {
-		
+
 		//System.out.println("Set DL transfroms: " + dlTransforms); 
 
 		if (dlTransforms == null) {
@@ -146,15 +146,16 @@ public class DLTransformsPane extends PamBorderPane {
 			mainPane.getChildren().add(controlPane); 
 			return; 
 		}
-			
+
 		ArrayList<DLTransformPane> dlTransformPanes = new ArrayList<DLTransformPane>(); 
 
 		sampleRate=-1; 
-		
-//		for (int i=0; i<dlTransforms.size() ; i++) {
-//			System.out.println("Set DL transfroms: " + dlTransforms.get(i).getDLTransformType() + " " + ((SimpleTransform) dlTransforms.get(i)).getParams()); 
-//		}
+//
+//				for (int i=0; i<dlTransforms.size() ; i++) {
+//					System.out.println("Set DL transfroms: " + dlTransforms.get(i).getDLTransformType() + " " + ((SimpleTransform) dlTransforms.get(i)).getParams()); 
+//				}
 
+		DLTransformPane transformPane;
 		//create a pane for each transform
 		for (int i=0; i<dlTransforms.size() ; i++) {
 			//bit hackey bit try to set the sample rate...
@@ -162,11 +163,19 @@ public class DLTransformsPane extends PamBorderPane {
 				sampleRate = ((WaveTransform) dlTransforms.get(i)).getWaveData().getSampleRate(); 
 			}
 
-			dlTransformPanes.add(DataTransformPaneFactory.getSettingsPane(dlTransforms.get(i))); 
+			transformPane = DataTransformPaneFactory.getSettingsPane(dlTransforms.get(i)); 
+			
+			
+			//System.out.println("Set DL transfroms: " + dlTransforms.get(i).getDLTransformType() + " " + ((SimpleTransform) dlTransforms.get(i)).getParams()); 
+
+
+			//there must be a transform pane or else this will break. 
+			dlTransformPanes.add(transformPane); 
 			dlTransformPanes.get(i).setParams(dlTransforms.get(i));
 			dlTransformPanes.get(i).addSettingsListener(()->{
 				newSettings(TRANSFORM_SETTINGS_CHANGE); 
 			});
+
 		}
 		draggablelistPane = new DLDraggableList(dlTransformPanes);
 
@@ -212,7 +221,7 @@ public class DLTransformsPane extends PamBorderPane {
 
 		return null; 
 	}
-	
+
 	/**
 	 * Get the transform panes.
 	 * @return the transofrm panes. 
@@ -225,11 +234,11 @@ public class DLTransformsPane extends PamBorderPane {
 			return null;
 		}
 	}
- 
+
 
 
 	class DLDraggableList extends PamDraggableList<DLTransformPane>  {
-		
+
 		public DLDraggableList() {
 			super();
 		}
@@ -239,12 +248,12 @@ public class DLTransformsPane extends PamBorderPane {
 			super(panes);
 			// TODO Auto-generated constructor stub
 		}
-		
+
 		@Override
 		public void paneOrderChanged(boolean success) {
 			newSettings(TRANSFORM_ORDER_CHANGE); 
 		}
-		
+
 		@Override
 		public void removePane(BorderPane pane) {
 			super.removePane(pane);
@@ -255,14 +264,14 @@ public class DLTransformsPane extends PamBorderPane {
 		@Override 
 		public boolean canDrop(DLTransformPane source, int sourceIndex,  int targetIndex) {
 			// if a wave transform has to be before any spectral transforms.
-			
+
 			//generate the new possible list of nodes. 
 			List<DLTransformPane> newPossibleList = getTempSortedList(sourceIndex, targetIndex); 
-		
+
 			if (source.getDLTransform() instanceof WaveTransform) {
 				//System.out.println("Target index: " + targetIndex); 
 				//uuuurgh this is complicated because it depends on whether the transform itself is in the list or not...
-	
+
 				int i=0; 
 				while (i<newPossibleList.indexOf(source)){
 					//System.out.println("Wave i: " + i + " " + newPossibleList.get(i).getDLTransform().getDLTransformType()); 

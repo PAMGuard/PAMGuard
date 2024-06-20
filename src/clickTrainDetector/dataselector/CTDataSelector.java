@@ -1,7 +1,5 @@
 package clickTrainDetector.dataselector;
 
-import java.util.Arrays;
-
 import PamDetection.LocContents;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataSelector.DataSelectParams;

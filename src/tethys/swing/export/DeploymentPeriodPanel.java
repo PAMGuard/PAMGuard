@@ -19,6 +19,7 @@ import metadata.PamguardMetaData;
 import nilus.Deployment;
 import nilus.DeploymentRecoveryDetails;
 import tethys.TethysTimeFuncs;
+import tethys.tooltips.TethysTips;
 
 public class DeploymentPeriodPanel {
 
@@ -68,6 +69,9 @@ public class DeploymentPeriodPanel {
 				enableControls();
 			}
 		});
+
+		deploymentStart.setToolTipText(TethysTips.findTip(DeploymentRecoveryDetails.class, "TimeStamp"));
+		deploymentEnd.setToolTipText(TethysTips.findTip(DeploymentRecoveryDetails.class, "TimeStamp"));
 	}
 
 	protected void enableControls() {

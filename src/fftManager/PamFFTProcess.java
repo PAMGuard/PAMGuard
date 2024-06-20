@@ -124,7 +124,7 @@ public class PamFFTProcess extends PamProcess {
 
 	public synchronized void setupFFT() {
 		
-		System.out.println("In call to setupFFT in " + getProcessName());
+//		System.out.println("In call to setupFFT in " + getProcessName());
 		// need to find the existing source data block and remove from observing it.
 		// then find the new one and subscribe to that instead. 
 		channelCounts = new int[PamConstants.MAX_CHANNELS];

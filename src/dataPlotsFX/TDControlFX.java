@@ -6,12 +6,15 @@ import java.util.ArrayList;
 import javafx.application.Platform;
 import javafx.scene.layout.Region;
 import pamViewFX.fxNodes.internalNode.PamInternalPane;
+import userDisplayFX.UserDisplayControlFX;
 import userDisplayFX.UserDisplayNodeFX;
 import userDisplayFX.UserDisplayNodeParams;
 import dataPlotsFX.data.TDDataInfoFX;
 import dataPlotsFX.data.TDDataProviderFX;
 import dataPlotsFX.data.TDDataProviderRegisterFX;
 import dataPlotsFX.layout.TDDisplayFX;
+import dataPlotsFX.layout.TDGraphFX;
+import detectiongrouplocaliser.DetectionGroupSummary;
 import PamController.PamController;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
@@ -20,6 +23,7 @@ import PamguardMVC.PamObserverAdapter;
 import PamguardMVC.PamRawDataBlock;
 
 /**
+ * 
  * The controller for the display if the main PAMGuard GUI is in JavaFX mode. 
  * 
  * @author Jamie Macaulay 
@@ -110,17 +114,19 @@ public class TDControlFX extends TDControl implements UserDisplayNodeFX {
 		ArrayList<PamDataBlock> dataBlocks=new ArrayList<PamDataBlock>();
 		PamDataBlock dataBlock=this.tdDisplayController.getUserDisplayProcess().getParentDataBlock();
 		if (TDDataProviderRegisterFX.getInstance().findDataProvider(dataBlock)!=null) dataBlocks.add(dataBlock);
-		if (dataBlock!=null) System.out.println("TDControldFX: parent datablock "+dataBlock.getDataName());
+		if (dataBlock!=null) {
+//			System.out.println("TDControldFX: parent datablock "+dataBlock.getDataName());
+		}
 		else{
-			System.out.println("TDControldFX: parent datablock null"); 
+//			System.out.println("TDControldFX: parent datablock null"); 
 			return dataBlocks; 
 		}
+		
 		for (int i=0; i<tdDisplayController.getUserDisplayProcess().getNumMuiltiplexDataBlocks(); i++){
 			dataBlock=this.tdDisplayController.getUserDisplayProcess().getMuiltiplexDataBlock(i); 
 			if (TDDataProviderRegisterFX.getInstance().findDataProvider(dataBlock)!=null){
 				dataBlocks.add(dataBlock);
 			}
-			//			System.out.println("TDControldFX: parent data block "+dataBlock.getDataName());
 		}
 		return dataBlocks;
 	}
@@ -231,8 +237,6 @@ public class TDControlFX extends TDControl implements UserDisplayNodeFX {
 	}
 
 
-
-
 	/**
 	 * The data observer monitors only the raw data source in real time
 	 * so that scrolling can take place. Need to set up a different
@@ -293,8 +297,6 @@ public class TDControlFX extends TDControl implements UserDisplayNodeFX {
 
 	@Override
 	public void closeNode() {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -375,7 +377,7 @@ public class TDControlFX extends TDControl implements UserDisplayNodeFX {
 //		 System.out.println("TDControlFX: Saving the position of the display: "
 //				 + internalFrame.getInternalRegion().getLayoutX() + "  " + internalFrame.getInternalRegion().getLayoutY()); 
 		 
-		 //need to use the parent node because insode an internal pane. 
+		 //need to use the parent node because inside an internal pane. 
 		 this.getTdParameters().displayProviderParams.positionX=internalFrame.getInternalRegion().getLayoutX();
 		 this.getTdParameters().displayProviderParams.positionY=internalFrame.getInternalRegion().getLayoutY();
 		 this.getTdParameters().displayProviderParams.sizeX=internalFrame.getInternalRegion().getWidth();
@@ -393,5 +395,28 @@ public class TDControlFX extends TDControl implements UserDisplayNodeFX {
 	@Override
 	public void setFrameHolder(PamInternalPane internalFrame) {
 		this.internalFrame=internalFrame; 
+	}
+	
+
+	@Override
+	public void newSelectedDetectionGroup(DetectionGroupSummary detectionGroup, TDGraphFX tdGraph) {
+//		System.out.println("New selected detection group: " + detectionGroup);
+		
+		tdDisplayController.getDisplayDataBlock().clearAll();
+		if (detectionGroup==null || detectionGroup.getDataList().size()<=0) return;
+		
+//		System.out.println("Add pam data: " + detectionGroup + " " + tdDisplayController.getDisplayDataBlock().countObservers());
+//		for (int i=0; i<tdDisplayController.getDisplayDataBlock().countObservers() ; i++) {
+//			System.out.println("Observer : " + tdDisplayController.getDisplayDataBlock().getPamObserver(i));
+//		}
+
+		tdDisplayController.getDisplayDataBlock().addPamData(detectionGroup.getDataList().get(detectionGroup.getFocusedIndex()));
+		if (isViewer()) tdDisplayController.getDisplayDataBlock().notifyNornalObservers(detectionGroup.getDataList().get(detectionGroup.getFocusedIndex()));
+		
+	}
+
+	@Override
+	public UserDisplayControlFX getUserDisplayControl() {
+		return this.tdDisplayController;
 	}
 }

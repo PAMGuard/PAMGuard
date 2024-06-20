@@ -13,6 +13,8 @@ import javax.swing.JRadioButton;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
+import PamView.PamAWTUtils;
+import PamView.PamView;
 import PamView.dialog.PamDialogPanel;
 import PamView.dialog.PamGridBagContraints;
 
@@ -130,7 +132,11 @@ public class DataSelectorDialogPanel implements PamDialogPanel {
 
 	public void enableComponent() {
 		boolean enable = !disableButton.isSelected();
-		innerPanel.getDialogComponent().setEnabled(enable);
+//		System.out.println("Disable!!! " + enable);
+		PamAWTUtils.setPanelEnabled(innerPanel.getDialogComponent(), enable);
+		
+		//disable in swing is not recursive
+//		innerPanel.getDialogComponent().setEnabled(enable);
 	}
 
 	@Override

@@ -3,14 +3,17 @@ package tethys.dbxml;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.zip.GZIPOutputStream;
 
 import javax.xml.bind.JAXBException;
 
@@ -67,7 +70,7 @@ public class DBXMLConnect {
 		}
 		return true;
 	}
-	
+
 
 	/**
 	 * Get the client. The client will only be recreated if the url changes
@@ -113,9 +116,9 @@ public class DBXMLConnect {
 		}
 		return file;
 	}
-	
+
 	/**
-	 * Create a temporary nilus file. 
+	 * Create a temporary nilus file.
 	 * @param nilusObject
 	 * @return
 	 * @throws TethysException
@@ -124,20 +127,20 @@ public class DBXMLConnect {
 		String tempName = getTempFileName(nilusObject);
 		tempName = tempDirectory.getAbsolutePath() + File.separator + tempName + ".xml";
 		File tempFile = new File(tempName);
-		File retFile = createXMLDocument(nilusObject, tempFile);	
+		File retFile = createXMLDocument(nilusObject, tempFile);
 		retFile.deleteOnExit();
 		return retFile;
 	}
-	
-	
+
+
 	public boolean postAndLog(Object nilusObject) throws TethysException
 	{
 		return postAndLog(nilusObject, null);
 	}
-	
+
 	/**
 	 * I don't think this should ever be used since everything goes a bit pear
-	 * shaped if the documentName isn't the same as the Id. However, for Calibration 
+	 * shaped if the documentName isn't the same as the Id. However, for Calibration
 	 * documents this is no longer the case, since a Calibration can have multiple
 	 * entries on different dates, so allow it !
 	 * @param nilusObject
@@ -145,11 +148,11 @@ public class DBXMLConnect {
 	 * @return
 	 * @throws TethysException
 	 */
-	public boolean postAndLog(Object nilusObject, String documentName) throws TethysException 
-	{	
+	public boolean postAndLog(Object nilusObject, String documentName) throws TethysException
+	{
 		boolean ok = NilusChecker.warnEmptyFields(tethysControl.getGuiFrame(), nilusObject);
-		
-		
+
+
 		TethysException e = null;
 		boolean success = false;
 		try {
@@ -168,13 +171,13 @@ public class DBXMLConnect {
 		}
 		return success;
 	}
-	
+
 	/**
 	 * take a nilus object loaded with PamGuard data and post it to the Tethys database
 	 *
 	 * @param pamGuardObjs a nilus object loaded with PamGuard data
 	 * @return error string, null string means there are no errors
-	 * @throws TethysException 
+	 * @throws TethysException
 	 */
 	private boolean postToTethys(Object nilusObject, String documentName) throws TethysException
 	{
@@ -192,12 +195,35 @@ public class DBXMLConnect {
 			MarshalXML marshal = new MarshalXML();
 			marshal.createInstance(objClass);
 			marshal.marshal(nilusObject, tempFile.toString());
+			// above lines have made a file. Are now going to gzip it before sending to Tethys
+			File zipFile = null;
+//			try {
+//				zipFile = zipOutputFile(tempFile);
+//			}
+//			catch (FileNotFoundException e1){
+//				System.out.println(e1.getMessage());
+//			}
+//			catch (IOException e2) {
+//				System.out.println(e2.getMessage());
+//			}
+			String finalName;
+			if (zipFile == null) {
+				finalName = bodgeName;
+			}
+			else {
+				finalName = zipFile.toString();
+			}
+
+
 			//				tempFile = stripXMLHeader(tempFile);
 			importReturn = Importer.ImportFiles(params.getFullServerName(), collection.collectionName(),
-					new String[] { bodgeName }, "", "", false);
+					new String[] { finalName }, "", "", false);
 
 
 			tempFile.deleteOnExit();
+			if (zipFile != null) {
+				zipFile.deleteOnExit();
+			}
 		} catch(IllegalArgumentException e) {
 			throw new TethysException("IllegalArgumentException posting to Tethys: " + e.getMessage(), null);
 		} catch (IOException e) {
@@ -207,19 +233,47 @@ public class DBXMLConnect {
 		}
 
 		/*
-		 * The returned string consists of the file name, then an XML report. 
-		 * Quite hard to see much common structure in this, so just look for 
+		 * The returned string consists of the file name, then an XML report.
+		 * Quite hard to see much common structure in this, so just look for
 		 * two words, <Success> and <Error>
 		 */
 		boolean error = importReturn.contains("<Error");
 		boolean success = importReturn.contains("<Success>");
 		String name = tempFile.getName();
 		TethysReporter.getTethysReporter().addReport(new TethysReport(success, collection, name, name));
-//		error = !success; might be a better options. 
+//		error = !success; might be a better options.
 		if (error) {
 			throw new TethysException("Error posting to Tethys", importReturn);
 		}
 		return success;
+	}
+
+	/**
+	 * Zip an xml file (or any file) into a gz file with a new end
+	 * @param xmlFile
+	 * @return
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	private File zipOutputFile(File xmlFile) throws FileNotFoundException, IOException {
+		String zipName = xmlFile.toString() + "-temp-.gz";
+		File zipFile = new File(zipName);
+		GZIPOutputStream opStream = new GZIPOutputStream(new FileOutputStream(zipFile));
+		InputStream fis = new FileInputStream(xmlFile);
+		int chunkSize = 100*1024;
+		byte[] buffer = new byte[chunkSize];
+//		ZipEntry zipEntry = new ZipEntry(xmlFile.getName());
+		int bytesRead;
+		while ((bytesRead = fis.read(buffer)) >= 0) {
+			opStream.write(buffer, 0, bytesRead);
+		}
+
+		opStream.close();
+
+		fis.close();
+
+
+		return zipFile;
 	}
 
 	/**
@@ -229,7 +283,7 @@ public class DBXMLConnect {
 	 * the removedocument function
 	 * @param nilusDocument
 	 * @return
-	 * @throws TethysException 
+	 * @throws TethysException
 	 */
 	public boolean updateDocument(Object nilusDocument) throws TethysException {
 		deleteDocument(nilusDocument);
@@ -242,7 +296,7 @@ public class DBXMLConnect {
 	 * class to identify the correct collection.
 	 * @param nilusDocument
 	 * @return
-	 * @throws TethysException 
+	 * @throws TethysException
 	 */
 	public boolean deleteDocument(Object nilusDocument) throws TethysException {
 
@@ -259,7 +313,7 @@ public class DBXMLConnect {
 				<DELETE>
   <ITEM> ['ECoastNARW0'] </ITEM>
 </DELETE>
-An error will throw an exception. 
+An error will throw an exception.
 			 */
 		}
 		catch (Exception e) {
@@ -275,7 +329,7 @@ An error will throw an exception.
 	 * Delete a Deploymnet and any contained Detections document. Doesn't work !
 	 * @param deploymentId
 	 * @return
-	 * @throws TethysException 
+	 * @throws TethysException
 	 */
 	public boolean deleteDeployment(String deploymentId) throws TethysException {
 		ArrayList<String> detDocNames = tethysControl.getDbxmlQueries().getDetectionsDocuments(deploymentId);
@@ -292,8 +346,8 @@ An error will throw an exception.
 	}
 
 	/**
-	 * Remove a document based on a collection name and a cdocument Id. 
-	 * @param collection collection name. 
+	 * Remove a document based on a collection name and a cdocument Id.
+	 * @param collection collection name.
 	 * @param documentName document name (not the internal Document Id)
 	 * @return
 	 * @throws TethysException
@@ -303,8 +357,8 @@ An error will throw an exception.
 	}
 
 	/**
-	 * Remove a document based on a collection name and a document namw. 
-	 * @param collectionName collection name. 
+	 * Remove a document based on a collection name and a document namw.
+	 * @param collectionName collection name.
 	 * @param documentName document name (not the internal Document Id)
 	 * @return
 	 * @throws TethysException
@@ -319,7 +373,7 @@ An error will throw an exception.
 				<DELETE>
   					<ITEM> ['ECoastNARW0'] </ITEM>
 				</DELETE>
-			An error will throw an exception. 
+			An error will throw an exception.
 			 */
 		}
 		catch (Exception e) {
@@ -330,14 +384,14 @@ An error will throw an exception.
 	}
 
 	/**
-	 *  check the return string from importFiles and if it's an 
-	 *  error, throw an exception. Otherwise do nothing.  
+	 *  check the return string from importFiles and if it's an
+	 *  error, throw an exception. Otherwise do nothing.
 	 * @param fileError
 	 */
 	private void checkReturnString(String fileError) {
 		/**
 		 * Example good string is
-		 * 
+		 *
 C:\Users\dg50\AppData\Local\Temp\PAMGuardTethys\20080311_2DSimplex_0.xml: 7360 bytes
 <?xml version="1.0" encoding="iso-8859-1"?>
 <Import>
@@ -367,7 +421,7 @@ C:\Users\dg50\AppData\Local\Temp\PAMGuardTethys\20080311_2DSimplex_0.xmlnot: 0 b
 
 	/**
 	 * Seems we have to get rid of the line <?xml version="1.0" encoding="UTF-8"?>
-	 * which is being put there by the marshaller ? 
+	 * which is being put there by the marshaller ?
 	 * @param tempFile
 	 */
 	private File stripXMLHeader(File tempFile) {
@@ -377,7 +431,7 @@ C:\Users\dg50\AppData\Local\Temp\PAMGuardTethys\20080311_2DSimplex_0.xmlnot: 0 b
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(tempFile));
 			BufferedWriter writer = new BufferedWriter(new FileWriter(tempTemp));
-			String line = reader.readLine(); 
+			String line = reader.readLine();
 			while (line != null) {
 				// see if the line has any unicode in it
 				int len = line.length();

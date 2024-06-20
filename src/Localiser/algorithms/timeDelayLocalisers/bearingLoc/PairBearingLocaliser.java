@@ -214,7 +214,7 @@ public class PairBearingLocaliser implements BearingLocaliser {
 	private boolean resetArray(long timeMillis){
 		
 		if (this.timeMillis!=timeMillis && currentArray.getHydrophoneLocator().isChangeable()){
-			System.out.println("Reset PairBearingLocaliser");
+//			System.out.println("Reset PairBearingLocaliser");
 			prepare(this.arrayElements,  timeMillis, this.timingError);
 			return true;
 		}

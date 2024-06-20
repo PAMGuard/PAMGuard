@@ -8,7 +8,7 @@ import dataPlotsFX.data.TDDataInfoFX;
 import pamViewFX.fxNodes.PamSymbolFX;
 
 /**
- * Default symbol chooser for the display. 
+ * Default symbol chooser for the display. This based on the data blocks symbol chooser. 
  * 
  * @author Jamie Maaulay 
  *
@@ -55,7 +55,6 @@ public class TDManagedSymbolChooserFX implements TDSymbolChooserFX{
 		}
 		else if (type==TDSymbolChooserFX.HIGHLIGHT_SYMBOL) {
 			symbol=ClickSymbolChooserFX.highLightClick; 
-			
 		}
 		return symbol; 
 	}

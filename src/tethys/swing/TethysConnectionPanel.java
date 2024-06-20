@@ -277,12 +277,17 @@ public class TethysConnectionPanel extends TethysGUIPanel {
 	@Override
 	public void updateState(TethysState tethysState) {
 		super.updateState(tethysState);
-		if (tethysState.stateType == StateType.UPDATESERVER) {
+		switch (tethysState.stateType) {
+		case UPDATESERVER:
 			fillServerControl();
 			updateProjectList();
-		}
-		if (tethysState.stateType == StateType.NEWPROJECTSELECTION) {
+			break;
+		case NEWPROJECTSELECTION:
 			updateProjectList();
+			break;
+		case UPDATEMETADATA:
+			updateInstrumentsList();
+			break;
 		}
 	}
 

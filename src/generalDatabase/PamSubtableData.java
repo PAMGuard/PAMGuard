@@ -81,6 +81,11 @@ public class PamSubtableData {
 	 * subdetection table, and not the index from the Click_Detector_Clicks table)
 	 */
 	private long dbIndex;
+
+	/**
+	 * Click number. only exists for clicks table, but needed for corrupt database. 
+	 */
+	private Integer clickNumber;
 	
 	/**
 	 * 
@@ -158,5 +163,18 @@ public class PamSubtableData {
 		this.childUTC = childUTC;
 	}
 
+	/**
+	 * @return the clickNumber
+	 */
+	public Integer getClickNumber() {
+		return clickNumber;
+	}
+
+	/**
+	 * @param clickNumber the clickNumber to set
+	 */
+	public void setClickNumber(Integer clickNumber) {
+		this.clickNumber = clickNumber;
+	}
 	
 }

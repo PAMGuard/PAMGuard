@@ -59,7 +59,7 @@ public class SUDNotificationManager implements SUDNotificationHandler {
 	@Override
 	public void interpretNewFile(String newFile, SudAudioInputStream sudAudioStream) {
 		for (SUDNotificationHandler handler : handlers) {
-		handler.interpretNewFile(newFile, sudAudioStream);
+			handler.interpretNewFile(newFile, sudAudioStream);
 		}
 	}
 

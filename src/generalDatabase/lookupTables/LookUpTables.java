@@ -141,9 +141,11 @@ public class LookUpTables {
 		// search for repeats.
 		for (int i = 0; i < n-1; i++) {
 			String code = list.get(i).getCode().trim();
+			String topic1 = list.get(i).getTopic().trim();
 			for (int j = i+1; j < n; j++) {
 				String code2 = list.get(j).getCode().trim();
-				if (code.equals(code2)) {
+				String topic2 = list.get(j).getTopic().trim();
+				if (code.equals(code2) && topic1.equals(topic2)) {
 					isRepeat[j] = true;
 					nRepeat++;
 				}

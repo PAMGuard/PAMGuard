@@ -100,6 +100,7 @@ import PamguardMVC.uid.UIDManager;
 import PamguardMVC.uid.UIDOnlineManager;
 import PamguardMVC.uid.UIDViewerManager;
 import binaryFileStorage.BinaryStore;
+import export.ExportOptions;
 import PamguardMVC.debug.Debug;
 
 /**
@@ -1099,7 +1100,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * later in the AWT event queue. 
 	 */
 	public void startLater() {
-		SwingUtilities.invokeLater(new StartLater(true));
+//		SwingUtilities.invokeLater(new StartLater(true));
+		startLater(true);
 	}
 
 	public void startLater(boolean saveSettings) {
@@ -1173,6 +1175,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	@Override
 	public void manualStop() {
 		lastStartStopButton = BUTTON_STOP;
+		setManualStop(true);
 		pamStop();
 	}
 
@@ -1186,6 +1189,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	@Override
 	public boolean pamStart() {
 		//		Debug.println("PAMController: pamStart");
+		setManualStop(false);
 		return pamStart(true);
 	}
 
@@ -1453,12 +1457,12 @@ public class PamController implements PamControllerInterface, PamSettings {
 		for (int iU = 0; iU < pamControlledUnits.size(); iU++) {
 			pamControlledUnits.get(iU).pamHasStopped();
 		}
-		guiFrameManager.pamEnded();
-		
 		long stopTime = PamCalendar.getTimeInMillis();
 		saveEndSettings(stopTime);
 
 		setPamStatus(PAM_IDLE);
+		
+		guiFrameManager.pamEnded();
 		
 		// no good having this here since it get's called at the end of every file. 
 //		if (GlobalArguments.getParam(PamController.AUTOEXIT) != null) {
@@ -2688,13 +2692,23 @@ public class PamController implements PamControllerInterface, PamSettings {
 	}
 
 	/**
-	 * Respond to storage options dialog. Selects whethere data 
+	 * Respond to storage options dialog. Selects whether data 
 	 * are stored in binary, database or both
 	 * @param parentFrame 
 	 */
 	public void storageOptions(JFrame parentFrame) {
 		StorageOptions.getInstance().showDialog(parentFrame);
 	}
+	
+	/**
+	 * Show export options tp export data to other formats
+	 * @param parentFrame
+	 */
+	public void exportData(JFrame parentFrame) {
+		ExportOptions.getInstance().showDialog(parentFrame); 
+		
+	}
+
 
 	/**
 	 * Return a verbose level for debug output
@@ -2936,5 +2950,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	public PamConfiguration getPamConfiguration() {
 		return pamConfiguration;
 	}
+
+
 
 }

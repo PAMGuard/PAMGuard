@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import org.jamdev.jdl4pam.transforms.DLTransform.DLTransformType;
 import org.json.JSONArray;
 
+import PamUtils.PamArrayUtils;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
+import rawDeepLearningClassifier.layoutFX.exampleSounds.ExampleSoundFactory.ExampleSoundType;
 
 import org.jamdev.jdl4pam.transforms.DLTransformsFactory;
 import org.jamdev.jdl4pam.transforms.DLTransfromParams;
@@ -28,7 +30,7 @@ public class GenericModelParams extends StandardModelParams implements Cloneable
 
 		ArrayList<DLTransfromParams> dlTransformParamsArr = new ArrayList<DLTransfromParams>();
 		//waveform transforms. 
-		dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.DECIMATE, 96000.0)); 
+		dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.DECIMATE, 96000.0));
 		//			dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.PREEMPHSIS, preemphases)); 
 		dlTransformParamsArr.add(new SimpleTransformParams(DLTransformType.SPECTROGRAM, 256, 100)); 
 		//in the python code they have an sfft of 129xN where N is the number of chunks. They then
@@ -82,16 +84,76 @@ public class GenericModelParams extends StandardModelParams implements Cloneable
 		//			}
 		return newParams;
 	}
+	
+	
+	@Override
+	public boolean equals(Object o) {
+		
+		if (o instanceof GenericModelParams == false) {
+			/* 
+			 * have to add this since the equals function is used in a list comparason
+			 * in the XML output and that list contains objects of different types
+			 * so need to get out HERE or get a classcastexception at the next line
+			 */
+			return false;
+		}
+		GenericModelParams params = (GenericModelParams) o;
+		
+
+		//check the transforms are the same. 		
+		if (this.dlTransfromParams!=null && params.dlTransfromParams == null) {
+			return false; 
+		}
+		if (params.dlTransfromParams!=null && this.dlTransfromParams == null) {
+			return false; 
+		}
+		
+		//iterate through the transofrms and check each one is equal. 
+		if (this.dlTransfromParams!=null) {
+			
+			if (this.dlTransfromParams.size()!=dlTransfromParams.size()) {
+				return false; 
+			}
+				
+			for (int i=0; i<this.dlTransfromParams.size();i++) {
+				if (!this.dlTransfromParams.get(i).equals(params.dlTransfromParams.get(i))) {
+					return false; 
+				}
+			}
+		}
+		else {
+			//both transforms must be null and so can still be equal
+		}
+		
+		//check the rest. 
+		
+		boolean isEqual = 
+				this.useDefaultSegLen == params.useDefaultSegLen &&
+				this.defaultSegmentLen.equals(params.defaultSegmentLen) && 
+				PamArrayUtils.arrEquals(this.shape, params.shape) &&
+				PamArrayUtils.arrEquals(this.outputShape, params.outputShape);
+				//Arrays.equals(	this.classNames, params.classNames); 
+				
+//		System.out.println("Other bits are equal:?" + isEqual 
+//				+ " use defult seg len " + (this.useDefaultSegLen == params.useDefaultSegLen) 
+//				+ " defaultSegmentLen " + (this.defaultSegmentLen.equals(params.defaultSegmentLen)
+//				+ " input shape " + this.shape.equals(params.shape)
+//				+ " output shape " + this.shape.equals(params.shape)));
+		
+		
+		
+		return isEqual; 
+		
+	}
 
 	@Override
 	public String toString() {
 		String info = super.toString(); 
 
 		info+= "------Model Info------\n";
-
-
+		
 		info+= "Model Input Shape: ";
-		if (this.defaultShape!=null) {
+		if (this.shape!=null) {
 			for (int i=0; i<shape.length; i++) {
 				info+= " " + shape[i]; 
 			}
@@ -102,6 +164,29 @@ public class GenericModelParams extends StandardModelParams implements Cloneable
 		}
 		
 		info+= "Model Output Shape: ";
+		if (this.outputShape!=null) {
+			for (int i=0; i<outputShape.length; i++) {
+				info+= " " + outputShape[i]; 
+			}
+			info+= "\n";
+		}
+		else {
+			info+= "null\n";
+		}
+		
+
+		info+= "Default Model Input Shape: ";
+		if (this.defaultShape!=null) {
+			for (int i=0; i<defaultShape.length; i++) {
+				info+= " " + defaultShape[i]; 
+			}
+			info+= "\n";
+		}
+		else {
+			info+= "null\n";
+		}
+		
+		info+= "Default Model Output Shape: ";
 		if (this.defualtOuput!=null) {
 			for (int i=0; i<defualtOuput.length; i++) {
 				info+= " " + defualtOuput[i]; 
@@ -114,6 +199,8 @@ public class GenericModelParams extends StandardModelParams implements Cloneable
 		
 		return info; 
 	}
+
+
 
 
 

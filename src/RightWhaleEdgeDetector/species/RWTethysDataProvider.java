@@ -29,6 +29,7 @@ public class RWTethysDataProvider extends AutoTethysProvider {
 		Parameters parameters = detection.getParameters();
 		parameters.setScore((double) rweDataUnit.rweSound.soundType);
 		double snr = 20.*Math.log10(rweDataUnit.rweSound.signal/rweDataUnit.rweSound.noise);
+		snr = AutoTethysProvider.roundDecimalPlaces(snr, 1);
 		parameters.setSNRDB(snr);
 		
 		return detection;

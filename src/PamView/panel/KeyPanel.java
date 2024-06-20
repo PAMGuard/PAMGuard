@@ -102,7 +102,10 @@ public class KeyPanel  {
 		
 	}
 	private void fillPanel() {
-		
+		JPanel panel = this.panel;
+		if (panel == null) {
+			return;
+		}
 		panel.removeAll();
 		
 		GridBagConstraints c = new GridBagConstraints();

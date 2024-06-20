@@ -104,11 +104,11 @@ public class SpeciesSearchDialog extends PamDialog {
 		setResizable(true);
 		setDialogComponent(mainPanel);
 	}
-	public static SpeciesMapItem showDialog(Window parentFrame, TethysControl tethysControl) {
+	public static SpeciesMapItem showDialog(Window parentFrame, TethysControl tethysControl, Integer currentCode) {
 		if (singleInstance == null) {
 			singleInstance = new SpeciesSearchDialog(parentFrame, tethysControl);
 		}
-		singleInstance.setParams();
+		singleInstance.setParams(currentCode);
 		singleInstance.setVisible(true);
 		return singleInstance.selectedItem;
 	}
@@ -131,6 +131,9 @@ public class SpeciesSearchDialog extends PamDialog {
 	
 	public void setMapItems(ArrayList<SpeciesMapItem> newMapItems) {
 		this.speciesMapItems = newMapItems;
+		if (newMapItems != null && newMapItems.size() == 1) {
+			setSelectedItem(newMapItems.get(0));
+		}
 		tableModel.fireTableDataChanged();
 	}
 
@@ -188,14 +191,20 @@ public class SpeciesSearchDialog extends PamDialog {
 		
 	}
 	
-	private void setParams() {
-		searchText.setText(null);
-		clearResults();
+	private void setParams(Integer currentCode) {
+		if (currentCode == null) {
+			searchText.setText(null);
+			clearResults();
+		}
+		else {
+			searchText.setText(currentCode.toString());
+			searchTethys();
+		}
 	}
 
 	private void clearResults() {
 		speciesMapItems = null;
-		selectedItem = null;
+		setSelectedItem(null);
 	}
 	@Override
 	public boolean getParams() {
@@ -216,6 +225,10 @@ public class SpeciesSearchDialog extends PamDialog {
 
 	}
 	
+	private void enableControls() {
+		getOkButton().setEnabled(selectedItem != null);
+	}
+	
 	private class TableMouse extends MouseAdapter {
 
 		@Override
@@ -225,12 +238,18 @@ public class SpeciesSearchDialog extends PamDialog {
 			}
 			int selectedRow = resultTable.getSelectedRow();
 			if (selectedRow >= 0 && selectedRow < speciesMapItems.size()) {
-				selectedItem = speciesMapItems.get(selectedRow);
+				setSelectedItem(speciesMapItems.get(selectedRow));
 			}
 			tableModel.fireTableDataChanged();
 		}
 		
 	}
+	
+	private void setSelectedItem(SpeciesMapItem selItem) {
+		this.selectedItem = selItem;
+		enableControls();
+	}
+	
 	private class DataModel extends AbstractTableModel {
 		
 		private String[] colNames = {"Select", "TSN", "Name", "Common Name"};

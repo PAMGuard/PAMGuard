@@ -143,4 +143,10 @@ public class SwingDisplayNodeFX implements UserDisplayNodeFX{
 		
 	}
 
+	@Override
+	public UserDisplayControlFX getUserDisplayControl() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

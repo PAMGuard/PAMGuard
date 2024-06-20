@@ -147,7 +147,7 @@ public class ExportWorkerCard extends ExportWizardCard implements DetectionExpor
 				totExpected *= progress.exportCount/(progress.exportCount+progress.skipCount);
 			}
 			projectedCount.setText(String.format("%d",  totExpected));
-			long perc = (progress.exportCount+progress.skipCount) * 100 / progress.totalUnits;
+			long perc = (progress.doneMapPoints) * 100 / progress.nMapPoints;
 			progressBar.setValue((int) perc);
 		}
 		switch (progress.state) {
@@ -176,6 +176,18 @@ public class ExportWorkerCard extends ExportWizardCard implements DetectionExpor
 		boolean stopped = state == DetectionExportProgress.STATE_CANCELED || state == DetectionExportProgress.STATE_COMPLETE;
 		export.setEnabled(stopped);
 		cancel.setEnabled(!stopped);
+		detectionsExportWizard.getCancelButton().setEnabled(stopped);
+		detectionsExportWizard.getPreviousButton().setEnabled(stopped);
+	}
+
+	@Override
+	public void setVisible(boolean visible) {
+		/**
+		 * setVisible is called by the wizard for each component, so 
+		 * we can see here if we're on this or not. 
+		 */
+		super.setVisible(visible);
+		detectionsExportWizard.getOkButton().setEnabled(!visible);
 	}
 
 }

@@ -158,7 +158,7 @@ public class LandMarkGroupPane extends PamBorderPane {
 		        	
 		        	//make pop over dark 
 		        	((Parent) popOver.getSkin().getNode()).getStylesheets()
-		    	    .add(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
+		    	    .addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
 //		            System.out.println(landMarkTable.getTableView().getSelectionModel().getSelectedItem());                   
 		        }
 		});

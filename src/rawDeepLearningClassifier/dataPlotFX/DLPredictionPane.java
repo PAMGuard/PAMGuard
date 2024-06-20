@@ -101,6 +101,8 @@ public class DLPredictionPane extends PamBorderPane implements TDSettingsPane {
 		if (dlPredictionPlotInfoFX.getDlControl().getDLModel()!=null) {
 			//populate the prediction pane. 
 			DLClassName[] classNames = dlPredictionPlotInfoFX.getDlControl().getDLModel().getClassNames();
+			
+//			System.out.println("MAKE MY CLASS NAMES: " + dlPredictionPlotInfoFX.getDlControl().getDLModel().getClassNames());
 
 			layoutColourPanes(classNames);
 		}
@@ -184,7 +186,7 @@ public class DLPredictionPane extends PamBorderPane implements TDSettingsPane {
 		try {
 			PamSVGIcon iconMaker= new PamSVGIcon(); 
 			//PamSVGIcon svgsprite = iconMaker.create(new File(getClass().getResource(resourcePath).toURI()), Color.WHITE);
-			PamSVGIcon svgsprite = iconMaker.create(getClass().getResource(resourcePath).toURI().toURL(), Color.DODGERBLUE);
+			PamSVGIcon svgsprite = iconMaker.create(getClass().getResource(resourcePath).toURI().toURL(), Color.DODGERBLUE, 1);
 			 
 //			svgsprite.getSpriteNode().setStyle("-fx-text-color: white");				
 //			svgsprite.getSpriteNode().setStyle("-fx-fill: white");

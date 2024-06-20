@@ -36,7 +36,7 @@ public class RecordingGapDialog extends PamDialog {
 		c.gridx++;
 		mainPanel.add(new JLabel(" seconds", JLabel.RIGHT), c);
 		
-		maxGap.setToolTipText("Maximum gap between recording periods. Periods with a gap less than this will be counted as one");
+		maxGap.setToolTipText("Maximum gap between recording periods. Sequential periods with a gap less than this will be counted as one");
 		minLength.setToolTipText("Minimum recording length. Recording sections shorter than this will be ignored");
 		
 		setDialogComponent(mainPanel);
@@ -80,6 +80,7 @@ public class RecordingGapDialog extends PamDialog {
 	@Override
 	public void restoreDefaultSettings() {
 		DeploymentExportOpts defaults = new DeploymentExportOpts();
+		setParams(defaults);
 	}
 
 }

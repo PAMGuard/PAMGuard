@@ -12,6 +12,7 @@ import javafx.scene.shape.Shape;
 
 /**
  * Line which connects a plug or socket to a ConnectionRectangle or other ConnectionLine.
+ * 
  * @author Jamie Macaulay
  *
  */

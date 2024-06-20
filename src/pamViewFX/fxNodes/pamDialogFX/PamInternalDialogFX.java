@@ -54,7 +54,7 @@ public class PamInternalDialogFX extends StackPane {
 		mainPane.setPadding(new Insets(5,5,5,5));
 		
 		PamStylesManagerFX stylesManager = PamStylesManagerFX.getPamStylesManagerFX();
-		this.getStylesheets().add(stylesManager.getCurStyle().getSlidingDialogCSS());
+		this.getStylesheets().addAll(stylesManager.getCurStyle().getSlidingDialogCSS());
 		
 		//title and drag pane 
 		if (title!=null) {

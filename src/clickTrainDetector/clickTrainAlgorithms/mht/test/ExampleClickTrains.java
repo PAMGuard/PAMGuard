@@ -4,12 +4,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import com.jmatio.io.MatFileReader;
-import com.jmatio.types.MLCell;
-import com.jmatio.types.MLDouble;
-import com.jmatio.types.MLInt32;
-
+import PamUtils.PamArrayUtils;
 import clickTrainDetector.clickTrainAlgorithms.mht.mhtMAT.SimpleClick;
+import us.hebi.matlab.mat.format.Mat5;
+import us.hebi.matlab.mat.format.Mat5File;
+import us.hebi.matlab.mat.types.Cell;
 
 /**
  * Simulates some clicks to test the MHT algorithm on. 
@@ -127,7 +126,6 @@ public class ExampleClickTrains {
 	public SimpleClickDataBlock importSimClicks(SimClickImport type) {
 		File file  = getSimClicksFile(type);
 		return importSimClicks(file);
-		 
 	}
 
 	/**
@@ -135,25 +133,29 @@ public class ExampleClickTrains {
 	 * @param file - the file. 
 	 */
 	private ArrayList<SimpleClick> importSimpleClickMAT(File file) {
-		MatFileReader mfr = null; 
+		Mat5File mfr = null; 
 		try {
 			if (file ==null) {
 				System.out.println("The imported file is null");
 				return null;
 			}
-
-			mfr = new MatFileReader(file);
+			
+			
+			mfr = Mat5.readFromFile(file);
+			
+			
+				mfr.getCell("clicksMHT");
 
 			//get array of a name "my_array" from file
-			MLCell mlArrayRetrived = (MLCell) mfr.getMLArray( "clicksMHT" );
-			MLDouble mlSampleRate = (MLDouble) mfr.getMLArray( "sR" );
+			Cell mlArrayRetrived = mfr.getCell("clicksMHT");
+			Double mlSampleRate = mfr.getMatrix( "sR" ).getDouble(0);
 			
 			
 			ArrayList<SimpleClick> simpleClicks= new ArrayList<SimpleClick>();
 			
 			//now the cell array can be anywhere from 2- 6 columns depending on the data contained. 
-			int nColumns = mlArrayRetrived.getN(); 
-			int nClks = mlArrayRetrived.getM(); 
+			int nColumns = mlArrayRetrived.getNumRows();
+			int nClks = mlArrayRetrived.getNumCols();
 
 			SimpleClick simpleClick;
 			
@@ -163,25 +165,27 @@ public class ExampleClickTrains {
 			Double bearing = null;
 			double[][] waveform =null;
 			
-			float sR = mlSampleRate.get(0).floatValue();
+			float sR =(float) mlSampleRate.doubleValue();
 
 			
 			for (int i=0; i<nClks; i++) {
+				
+			
+				
 				//first column is UID (int32)
-				UID = ((MLInt32) mlArrayRetrived.get(i,0)).get(0);
+				UID =  mlArrayRetrived.getCell(i,0).get(0);
 				
 				//second column is time in seconds (double)
-				timeSeconds = ((MLDouble) mlArrayRetrived.get(i,1)).get(0);
+				timeSeconds =  mlArrayRetrived.getCell(i,1).get(0);
 
 				//third column is amplitude in dB (double)
-				if (nColumns>2) amplitude = ((MLDouble) mlArrayRetrived.get(i,2)).get(0);
+				if (nColumns>2) amplitude = mlArrayRetrived.getCell(i,2).get(0);
 
 				//fourth column is bearing in degrees (double)
-				if (nColumns<3) bearing = ((MLDouble) mlArrayRetrived.get(i,3)).get(0);
+				if (nColumns<3) bearing = mlArrayRetrived.getCell(i,3).get(0);
 
 				//fifth column is a waveform array (double[][])
-				if (nColumns>4) waveform = ((MLDouble) mlArrayRetrived.get(i,4)).getArray();
-				
+				if (nColumns>4) waveform = PamArrayUtils.matrix2array(mlArrayRetrived.getCell(i,4).getMatrix(0));
 				
 				//tranpose the waveform
 				waveform = PamUtils.PamArrayUtils.transposeMatrix(waveform); 

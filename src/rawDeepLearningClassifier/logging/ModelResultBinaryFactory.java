@@ -8,7 +8,7 @@ import PamUtils.PamArrayUtils;
 import rawDeepLearningClassifier.dlClassification.PredictionResult;
 import rawDeepLearningClassifier.dlClassification.animalSpot.SoundSpotResult;
 import rawDeepLearningClassifier.dlClassification.dummyClassifier.DummyModelResult;
-import rawDeepLearningClassifier.dlClassification.genericModel.GenericPrediction;
+import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 import rawDeepLearningClassifier.dlClassification.ketos.KetosResult;
 
 /**
@@ -115,7 +115,6 @@ public class ModelResultBinaryFactory {
 		try {
 
 			//System.out.println("Make model result: "); 
-
 			int type = dis.readByte(); 
 			boolean isBinary = dis.readBoolean(); 
 			double scale = dis.readFloat();
@@ -147,12 +146,10 @@ public class ModelResultBinaryFactory {
 				break; 
 			default:
 				//ideally should never be used. 
-				result = new GenericPrediction(data, isBinary); 
+				result = new StandardPrediction(data, isBinary); 
 				break; 
 			}
-
 			//System.out.println("New model result: "+ type); 
-
 			return result; 
 
 		} catch (IOException e) {
@@ -176,7 +173,7 @@ public class ModelResultBinaryFactory {
 			return KETOS; 
 		}
 		//must be last because this is often sub classed
-		if (modelResult instanceof GenericPrediction) {
+		if (modelResult instanceof StandardPrediction) {
 			return GENERIC; 
 		}
 		if (modelResult instanceof DummyModelResult) {

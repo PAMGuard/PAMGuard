@@ -33,7 +33,7 @@ public class PamPopOver extends PopOver {
 	public PamPopOver(Pane content) {
 		super();
 		super.setContentNode(makeResizableContent(content));
-		content.setMaxSize(5000, 5000);
+		content.setMaxSize(2000, 2000);
 	}
 	
 	/**

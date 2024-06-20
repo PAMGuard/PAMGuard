@@ -17,6 +17,7 @@ import PamguardMVC.RequestCancellationObject;
 import dataGram.DatagramDataPoint;
 import fileOfflineData.OfflineFileMapPoint;
 
+@Deprecated
 public class CPODMap {
 
 	private File cpFile;
@@ -29,6 +30,7 @@ public class CPODMap {
 	
 	public static final int FILE_CP1 = 1;
 	public static final int FILE_CP3 = 3;
+	
 	int cpFileType = 0; 
 	
 

@@ -163,7 +163,7 @@
  */
  /** top-left, top-right, bottom-right, and bottom-left corners, in that order. */
 .close-button-right{
- -fx-background-color: transparent;
+ -fx-background-color: -fx-darkbackground-trans;
  -fx-background-radius: 0 10 10 0;
   -fx-border-color: transparent;
  -fx-border-radius: 0 10 10 0;
@@ -171,7 +171,7 @@
 
 
 .close-button-left{
- -fx-background-color: transparent;
+ -fx-background-color: -fx-darkbackground-trans;
  -fx-background-radius: 10 0 0 10;
  -fx-border-color: transparent;
  -fx-border-radius: 10 0 0 10;
@@ -179,17 +179,17 @@
 
 
 .close-button-top{
- -fx-background-color: transparent;
+ -fx-background-color: -fx-darkbackground-trans;
  -fx-background-radius: 10 10 0 0;
-  -fx-border-color: transparent;
+ -fx-border-color: transparent;
  -fx-border-radius: 10 10 0 0;
 }
 
 
 .close-button-bottom{
- -fx-background-color: transparent;
+ -fx-background-color: -fx-darkbackground-trans;
  -fx-background-radius: 0 0 10 10;
-  -fx-border-color: transparent;
+ -fx-border-color: transparent;
  -fx-border-radius: 0 0 10 10;
 }
 

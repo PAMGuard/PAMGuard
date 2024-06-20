@@ -39,6 +39,7 @@ public class PamScrollSlider extends AbstractPamScrollerAWT {
 			panel.add(BorderLayout.CENTER, slider);
 			panel.add(BorderLayout.SOUTH, getButtonPanel());
 		}
+//		slider.setFocusable(false);
 	}
 	
 	class SliderListener implements ChangeListener {
@@ -179,6 +180,12 @@ public class PamScrollSlider extends AbstractPamScrollerAWT {
 	public void setPageStep(int pageStep) {
 		// TODO Auto-generated method stub
 		super.setPageStep(pageStep);
+	}
+	/**
+	 * @return the slider
+	 */
+	public JSlider getSlider() {
+		return slider;
 	}
 
 }

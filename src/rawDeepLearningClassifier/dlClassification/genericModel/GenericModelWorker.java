@@ -9,6 +9,7 @@ import org.jamdev.jdl4pam.transforms.FreqTransform;
 
 import PamModel.PamModel;
 import PamModel.PamModel.PluginClassloader;
+import PamUtils.PamArrayUtils;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 
@@ -18,12 +19,12 @@ import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams
  * @author Jamie Macaulay
  *
  */
-public class GenericModelWorker extends DLModelWorker<GenericPrediction> {
+public class GenericModelWorker extends DLModelWorker<StandardPrediction> {
 
 	/**
 	 * The generic model 
 	 */
-	private PamGenericModel genericModel;
+	private GenericModel genericModel;
 	
 	/**
 	 * Frequency transform. 
@@ -32,26 +33,29 @@ public class GenericModelWorker extends DLModelWorker<GenericPrediction> {
 
 	@Override
 	public float[] runModel(float[][][] transformedDataStack) {
-		//System.out.println("RUN GENERIC MODEL: " + transformedDataStack.length +  "  " + transformedDataStack[0].length +  "  " + transformedDataStack[0][0].length);
-		//System.out.println("RUN GENERIC MODEL: " + transformedDataStack[0][0][0]);
+//		System.out.println("RUN GENERIC MODEL: " + transformedDataStack.length +  "  " + transformedDataStack[0].length +  "  " + transformedDataStack[0][0].length);
+//		System.out.println("RUN GENERIC MODEL: " + transformedDataStack[0][0][0]);
 		float[]  results; 
 		if (freqTransform)
-			results =  genericModel.runModel2(transformedDataStack);
+			results =  getModel().runModel(transformedDataStack);
 		else {
 			//run a model if it is waveform info. 
 			float[][] waveStack = new float[transformedDataStack.length][]; 
 			for (int i=0; i<waveStack.length; i++) {
 				waveStack[i] = transformedDataStack[i][0]; 
 			}
-			results =  genericModel.runModel1(waveStack);
+			
+			//System.out.println("RUN GENERIC MODEL WAVE: " + waveStack.length +  "  " + waveStack[0].length +  " " + waveStack[0][0]);
+			results =  getModel().runModel(waveStack);
 		}
-		//System.out.println("GENERIC MODEL RESULTS: " + results== null ? null : results.length);
+//		System.out.println("GENERIC MODEL RESULTS: " + (results== null ? null : results.length));
+//		PamArrayUtils.printArray(results);
 		return results;
 	}
 
 	@Override
-	public GenericPrediction makeModelResult(float[] prob, double time) {
-		GenericPrediction model = new  GenericPrediction(prob);
+	public StandardPrediction makeModelResult(float[] prob, double time) {
+		StandardPrediction model = new  StandardPrediction(prob);
 		model.setAnalysisTime(time);
 		return model;
 	}
@@ -76,26 +80,28 @@ public class GenericModelWorker extends DLModelWorker<GenericPrediction> {
 //					System.out.println(Paths.get(genericParams.modelPath)); 
 //					System.out.println(Paths.get(genericModel.getModel().getName()).equals(Paths.get(genericParams.modelPath)));
 //			}
-			
+					
 			//first open the model and get the correct parameters.
-			//21/11/2022 - Added a null and filename check here to stop the mdoel reloading everytime PAMGuard hits a new file or 
+			//21/11/2022 - Added a null and filename check here to stop the model reloading everytime PAMGuard hits a new file or 
 			//is stopped or started - this was causing a memory leak. 
 			if (genericModel==null || !Paths.get(genericModel.getModel().getName()).equals(Paths.get(genericParams.modelPath))) {
+				
+				if (genericModel!=null && genericModel.getModel()!=null) {
+					genericModel.getModel().close();
+				}
 				//System.out.println(Paths.get(genericParams.modelPath)); 
-				genericModel = new PamGenericModel(genericParams.modelPath); 
+				
+				//create a new model.
+				genericModel = new GenericModel(genericParams.modelPath); 
 
 				//System.out.println("LOAD A NEW MODEL: "); 
 				//System.out.println(genericModel.getModel().getModelPath().getFileName()); 
 			}
 			
+			setModelTransforms(genericParams.dlTransfroms); 
+
 			//is this a waveform or a spectrogram model?
-			DLTransform transform = genericParams.dlTransfroms.get(genericParams.dlTransfroms.size()-1); 
-			if (transform instanceof FreqTransform) {
-				freqTransform = true; 
-			}
-			else {
-				freqTransform = false; 
-			}
+			setWaveFreqModel(genericParams);
 			
 			//use softmax or not?
 			String extension = FilenameUtils.getExtension(genericParams.modelPath);
@@ -107,10 +113,10 @@ public class GenericModelWorker extends DLModelWorker<GenericPrediction> {
 				this.setEnableSoftMax(true);
 			}
 						
-			GenericModelParams genericModelParams = new GenericModelParams(); 
+//			GenericModelParams genericModelParams = new GenericModelParams(); 
 			
-			genericModelParams.defaultShape = longArr2Long(genericModel.getInputShape().getShape()); 
-			genericModelParams.defualtOuput = longArr2Long(genericModel.getOutShape().getShape()); 
+			((GenericModelParams) genericParams).defaultShape = longArr2Long(genericModel.getInputShape().getShape()); 
+			((GenericModelParams) genericParams).defualtOuput = longArr2Long(genericModel.getOutShape().getShape()); 
 			
 
 		}
@@ -121,6 +127,18 @@ public class GenericModelWorker extends DLModelWorker<GenericPrediction> {
 		}
 		
 		//Thread.currentThread().setContextClassLoader(origCL);
+	}
+	
+	
+	protected void setWaveFreqModel(StandardModelParams genericParams) {
+		//is this a waveform or a spectrogram model?
+		DLTransform transform = genericParams.dlTransfroms.get(genericParams.dlTransfroms.size()-1); 
+		if (transform instanceof FreqTransform) {
+			freqTransform = true; 
+		}
+		else {
+			freqTransform = false; 
+		}	
 	}
 	
 	/**
@@ -140,15 +158,23 @@ public class GenericModelWorker extends DLModelWorker<GenericPrediction> {
 
 	@Override
 	public void closeModel() {
-		genericModel.getModel().close();
+//		can be very important to prevent memory leak for long term processing. 
+		if (genericModel!=null && genericModel.getModel()!=null) {
+			genericModel.getModel().close();
+		}
 	}
 
 	/**
 	 * Generic model. 
 	 * @return the generic model. 
 	 */
-	public PamGenericModel getModel() {
+	public GenericModel getModel() {
 		return genericModel;
+	}
+
+	@Override
+	public boolean isModelNull() {
+		return genericModel==null;
 	}
 
 }

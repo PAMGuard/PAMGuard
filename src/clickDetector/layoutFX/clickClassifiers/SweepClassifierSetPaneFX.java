@@ -4,9 +4,12 @@ package clickDetector.layoutFX.clickClassifiers;
 import fftFilter.FFTFilterParams;
 import fftManager.FFTLengthModeled;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
@@ -19,9 +22,11 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.text.Font;
+import javafx.scene.canvas.Canvas;
 import net.synedra.validatorfx.GraphicDecoration;
 import net.synedra.validatorfx.ValidationMessage;
 import net.synedra.validatorfx.Validator;
@@ -29,6 +34,7 @@ import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamGridPane;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamSpinner;
+import pamViewFX.fxNodes.PamSymbolFX;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
 import pamViewFX.fxNodes.picker.SymbolPicker;
@@ -39,19 +45,6 @@ import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 
-import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
-import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +53,6 @@ import javax.swing.JPanel;
 import PamController.SettingsPane;
 import PamUtils.PamUtils;
 import PamView.PamSymbol;
-import PamView.dialog.PamGridBagContraints;
 import PamView.symbol.SymbolData;
 import clickDetector.ClickControl;
 import clickDetector.ClickClassifiers.basicSweep.CodeHost;
@@ -125,13 +117,17 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 	 */
 	private AmplitudeBlock amplitudeBlock;
 	
-	
 	/**
-	 * Changes the bearing paramters fro clicks. 
+	 * Changes the bearing parameters for clicks. 
 	 */
 	private BearingBlock bearingBox;
+	
+	/**
+	 * Allows classification based on correlation scores.
+	 */
+	private XCorrBlock xCorrBox;
 
-
+	
 	private PamBorderPane mainPane = new PamBorderPane();
 
 
@@ -183,15 +179,17 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		spectrumHolder.setPadding(new Insets(10,0,0,0));
 		spectrumTab.setContent(spectrumHolder);
 		
-		/*********Spectrum Tab****************/
+		/*********Bearing Tab****************/
 		Tab bearingTab=new Tab("Bearing"); 
-		spectrumTab.setGraphic(PamGlyphDude.createPamIcon("mdi2c-compass-outline",	PamGuiManagerFX.iconSize));
+		bearingTab.setGraphic(PamGlyphDude.createPamIcon("mdi2c-compass-outline",	PamGuiManagerFX.iconSize));
+		bearingTab.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
 		
 		PamVBox bearingHolder=new PamVBox(5); 
 
 		bearingBox=new BearingBlock();
-		
-		bearingHolder.getChildren().addAll(bearingBox); 
+		xCorrBox=new XCorrBlock();
+
+		bearingHolder.getChildren().addAll(bearingBox, xCorrBox); 
 		bearingHolder.setPadding(new Insets(10,0,0,0));
 		bearingTab.setContent(bearingHolder);
 
@@ -200,7 +198,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 		TabPane tabPane= new TabPane(); 
 		tabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
-		tabPane.getTabs().addAll(waveformTab, spectrumTab); 
+		tabPane.getTabs().addAll(waveformTab, spectrumTab, bearingTab); 
 
 		holder.getChildren().add(optionBox);
 		holder.getChildren().add(tabPane);
@@ -237,7 +235,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		private Font disableFont;
 
 		private Label label;
-
+		
 
 		SweepBox(String borderTitle, Boolean enableButton) {
 
@@ -279,6 +277,9 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			}
 
 			this.setTop(hBox);
+			//little bit of space between the top and bottom button.m
+			BorderPane.setMargin(hBox, new Insets(0,0,5,0));
+
 
 			/**Don't like this in old swing version*/ 
 			//tP.setCenter( description = new Label("", JLabel.CENTER));
@@ -356,11 +357,18 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 
 	/**
-	 * General options for the sweep classifier set
+	 * General options for the sweep classifier set. This inlcudes, name, symbol, and some basics on
+	 * what part of the click to analyse. 
+	 * 
 	 * @author Jamie Macaulay
 	 *
 	 */
 	private class OptionsBox extends SweepBox implements FFTLengthModeled, CodeHost {
+
+		/**
+		 * The size of the preview symbol to show next to the title
+		 */
+		private static final double TITLE_SYMBOL_SIZE = 20.;
 
 		/**
 		 * Text field to set classifier name.
@@ -396,6 +404,13 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		 * Shows lengths of extraction samples in millis.
 		 */
 		private Label lengthMS;
+		
+		/**
+		 * The property for the PAMSymbol
+		 */
+		private  SimpleObjectProperty<Canvas> pamSymbolProperty = new SimpleObjectProperty<Canvas>(); 
+		
+		private PamSymbolFX currentSymbol = new PamSymbolFX(); 
 
 		private ComboBox<String> lengthTypeBox;
 
@@ -414,6 +429,8 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		//create the general options 
 		private Node createOptionsPane(){
 
+			//set the canvas for the canvas property. 
+			pamSymbolProperty.set(new Canvas(25,25));
 
 			PamGridPane pamGridPane=new PamGridPane();
 			pamGridPane.setHgap(5);
@@ -453,6 +470,9 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 			//create colour picker to allow users to change symbol colour. 
 			symbolPicker=new SymbolPicker(); 
+			symbolPicker.setOnAction((action)->{
+				drawSymbolProperty();
+			});
 			pamGridPane.add(symbolPicker, 3,1);
 
 			pamGridPane.add(new Label("Symbol"), 2,1);
@@ -461,6 +481,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			lineColourPicker.setStyle("-fx-color-label-visible: false ;");
 			lineColourPicker.setOnAction((action)->{
 				symbolPicker.setLineColour(lineColourPicker.getValue());
+				drawSymbolProperty();
 			});
 			pamGridPane.add(lineColourPicker, 4, 1);
 
@@ -469,6 +490,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			fillColourPicker.setStyle("-fx-color-label-visible: false ;");
 			fillColourPicker.setOnAction((action)->{
 				symbolPicker.setFillColour(fillColourPicker.getValue());
+				drawSymbolProperty();
 			});
 			pamGridPane.add(fillColourPicker, 5, 1);
 
@@ -543,6 +565,21 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			return holder; 
 		}
 
+		private void drawSymbolProperty() {
+			
+			this.pamSymbolProperty.get().getGraphicsContext2D().clearRect(0, 0,  TITLE_SYMBOL_SIZE, TITLE_SYMBOL_SIZE);
+			
+			currentSymbol.setSymbol(this.symbolPicker.getValue() == null ? null : this.symbolPicker.getValue().getSymbol());
+			currentSymbol.setLineColor(this.lineColourPicker.getValue());
+			currentSymbol.setFillColor(this.fillColourPicker.getValue());
+			
+			if (currentSymbol.getSymbol()!=null) {
+				currentSymbol.draw(this.pamSymbolProperty.get().getGraphicsContext2D(), new Point2D(TITLE_SYMBOL_SIZE/2,TITLE_SYMBOL_SIZE/2), TITLE_SYMBOL_SIZE, TITLE_SYMBOL_SIZE); 
+			}
+			
+			this.pamSymbolProperty.setValue(this.pamSymbolProperty.get());
+		}
+
 		@Override
 		public int getCode() {
 			return codeSpinner.getValue();
@@ -575,11 +612,13 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 		@Override
 		protected void setParams() {
+			
+			//must have a symbol selected by default or a null symbol will be returned.
+			symbolPicker.getSelectionModel().select(0);
 
 			//set basic data
 			if (sweepClassifierSet == null) {
 				//symbolViewer.setSymbol(null);
-				symbolPicker.getSelectionModel().select(0);
 				nameField.setText("");
 				setCode(sweepClassifier.getNextFreeCode(0));
 			}
@@ -619,6 +658,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			//			//length stuff
 			//			clickLengthSpinner.getValueFactory().setValue(sweepClassifierSet.restrictedBins); 
 
+			drawSymbolProperty();
 
 		}
 
@@ -632,9 +672,9 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 			//get the symbol data.
 			SymbolData symbolData = new SymbolData(this.symbolPicker.getValue().getSymbol(), 10,10,true, 
-					PamUtilsFX.fxToAWTColor(this.lineColourPicker.getValue()), PamUtilsFX.fxToAWTColor(this.fillColourPicker.getValue())); 
+					PamUtilsFX.fxToAWTColor(this.fillColourPicker.getValue()), PamUtilsFX.fxToAWTColor(this.lineColourPicker.getValue())); 
 			sweepClassifierSet.symbol= new PamSymbol(symbolData);
-			if (sweepClassifierSet.getName().length() <= 0) {
+			if (sweepClassifierSet.getName()==null || sweepClassifierSet.getName().length() <= 0) {
 				return showWarning("You must enter a name for this type of click");
 			}
 			sweepClassifierSet.setSpeciesCode(getCode());
@@ -675,6 +715,11 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			return this.nameField;
 		}
 
+		public ObservableValue<? extends Node> getNameGraphicsProperty() {
+			return pamSymbolProperty;
+		}
+	
+
 	}
 
 
@@ -695,9 +740,9 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		//create the general options 
 		private Node createOptionsPane(){
 
-			PamGridPane pamGridPane=new PamGridPane();
-			pamGridPane.setHgap(5);
-			pamGridPane.setVgap(5);
+//			PamGridPane pamGridPane=new PamGridPane();
+//			pamGridPane.setHgap(5);
+//			pamGridPane.setVgap(5);
 
 			simpleFilterPane=new SimpleFilterPaneFX(); 
 
@@ -831,7 +876,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			//			PamGridPane.setFillWidth(clickLengthHolder2, false);
 
 
-			PamVBox vboxholder=new PamVBox();
+			vboxholder=new PamVBox();
 			vboxholder.setSpacing(5);
 			vboxholder.getChildren().addAll(clickLengthHolder1, clickLengthHolder2);
 
@@ -921,7 +966,9 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		/**
 		 * Spinner for the first control band
 		 */
-		private ArrayList<PamSpinner<Double>> thresholdSpinners; 
+		private ArrayList<PamSpinner<Double>> thresholdSpinners;
+
+		private PamGridPane gridPaneHolder; 
 
 
 		EnergyBandBox() {
@@ -933,18 +980,18 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		//create the general options 
 		private Node createOptionsPane(){
 
-			PamGridPane pamGridPane=new PamGridPane();
-			pamGridPane.setHgap(5);
-			pamGridPane.setVgap(5);
+			gridPaneHolder=new PamGridPane();
+			gridPaneHolder.setHgap(5);
+			gridPaneHolder.setVgap(5);
 
 			Label freqLabel=new Label("Frequency (Hz)");
-////			gridPaneHolder.add(freqLabel, 0, 0);
-////			gridPaneHolder.add(new Label("Threshold (dB)"), 2, 0);
-//			PamGridPane.setHalignment(freqLabel, HPos.CENTER);
-//			PamGridPane.setColumnSpan(gridPaneHolder, 2);
-//
-//			//test band
-//			gridPaneHolder.add(new Label("Test Band"), 0, 1);
+			gridPaneHolder.add(freqLabel, 0, 0);
+			gridPaneHolder.add(new Label("Threshold (dB)"), 2, 0);
+			PamGridPane.setHalignment(freqLabel, HPos.CENTER);
+			PamGridPane.setColumnSpan(gridPaneHolder, 2);
+
+			//test band
+			gridPaneHolder.add(new Label("Test Band"), 0, 1);
 
 			testBandFreqPane=new FreqBandPane(Orientation.HORIZONTAL);
 			testBandFreqPane.setBandText("");
@@ -954,7 +1001,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 			
 			
-			pamGridPane.add(testBandFreqPane, 1, 1);
+			gridPaneHolder.add(testBandFreqPane, 1, 1);
 
 
 			contralBandFreqPanes = new ArrayList<FreqBandPane>(); 
@@ -962,13 +1009,13 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 			for (int i=0; i<SweepClassifierSet.nControlBands ; i++) {
 				//control band 1
-				pamGridPane.add(new Label("Control Band"), 0, i+2);
+				gridPaneHolder.add(new Label("Control Band"), 0, i+2);
 				contralBandFreqPanes.add(new FreqBandPane(Orientation.HORIZONTAL));		
 				contralBandFreqPanes.get(i).setBandText("");
-				pamGridPane.add(contralBandFreqPanes.get(i), 1, i+2);
+				gridPaneHolder.add(contralBandFreqPanes.get(i), 1, i+2);
 				thresholdSpinners.add(new PamSpinner<Double>(0,100.,6.,0));
 				thresholdSpinners.get(i).setEditable(true);
-				pamGridPane.add(thresholdSpinners.get(i), 2, i+2);
+				gridPaneHolder.add(thresholdSpinners.get(i), 2, i+2);
 				thresholdSpinners.get(i).getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 				thresholdSpinners.get(i).setMaxWidth(100);			
 
@@ -989,7 +1036,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 			}
 
-			return pamGridPane; 
+			return gridPaneHolder; 
 
 		}
 		
@@ -1073,11 +1120,13 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 		@Override
 		protected void disbleControls(boolean disable) {
-			testBandFreqPane.setDisableFreqPane(disable);
-			for (int j = 0; j < SweepClassifierSet.nControlBands; j++) {
-				contralBandFreqPanes.get(j).setDisableFreqPane(disable);
-				thresholdSpinners.get(j).setDisable(disable);
-			}
+			this.gridPaneHolder.setDisable(disable);
+			
+//			testBandFreqPane.setDisableFreqPane(disable);
+//			for (int j = 0; j < SweepClassifierSet.nControlBands; j++) {
+//				contralBandFreqPanes.get(j).setDisableFreqPane(disable);
+//				thresholdSpinners.get(j).setDisable(disable);
+//			}
 		}
 
 	}
@@ -1116,34 +1165,34 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			
 			int gridy=0; 
 
-			PamGridPane pamGridPane=new PamGridPane();
-			pamGridPane.setHgap(5);
-			pamGridPane.setVgap(5);
+			gridPaneHolder=new PamGridPane();
+			gridPaneHolder.setHgap(5);
+			gridPaneHolder.setVgap(5);
 
 
 			//search and integration range
-			pamGridPane.add(new Label("Search Range"),1,gridy);
+			gridPaneHolder.add(new Label("Search Range"),1,gridy);
 
 			searchRange=new FreqBandPane(Orientation.HORIZONTAL);		
 			searchRange.setBandText("");
-			pamGridPane.add(searchRange,2,gridy);
+			gridPaneHolder.add(searchRange,2,gridy);
 			GridPane.setColumnSpan(searchRange, GridPane.REMAINING);
 
 			
 			gridy++;
 
-			pamGridPane.add(new Label("Smooth"), 1,gridy);
+			gridPaneHolder.add(new Label("Smooth"), 1,gridy);
 
 			smoothing=new PamSpinner<Integer>(3,101,5,2); 
 			smoothing.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 			smoothing.setMaxWidth(100);
-			pamGridPane.add(smoothing, 2,gridy);
+			gridPaneHolder.add(smoothing, 2,gridy);
 
 			GridPane.setMargin(smoothing, new Insets(0,0,0,5)); //bit of a hack to make sure everything lines up nicely with the frequency pane. 
 			
 			//GridPane.setHgrow(smoothing, Priority.NEVER);
 
-			pamGridPane.add(new Label("bins"), 3,gridy);
+			gridPaneHolder.add(new Label("bins"), 3,gridy);
 
 
 			gridy++;
@@ -1153,14 +1202,14 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 				peakFreqPane.setDisableFreqPane(!peakFreqCheckBox.isSelected());
 			});
 
-			pamGridPane.add(peakFreqCheckBox,0,gridy);
+			gridPaneHolder.add(peakFreqCheckBox,0,gridy);
 
-			pamGridPane.add(new Label("Peak Frequency"),1,gridy);
+			gridPaneHolder.add(new Label("Peak Frequency"),1,gridy);
 
 			peakFreqPane=new FreqBandPane(Orientation.HORIZONTAL);		
 			//peakFreqPane.setHgap(0);
 			peakFreqPane.setBandText("");
-			pamGridPane.add(peakFreqPane,2,gridy);
+			gridPaneHolder.add(peakFreqPane,2,gridy);
 			GridPane.setColumnSpan(peakFreqPane, GridPane.REMAINING);
 
 			
@@ -1177,26 +1226,28 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			});
 			
 
-			pamGridPane.add(peakWidthCheckBox,0,gridy);
-			pamGridPane.add(new Label("Peak Width"),1,gridy);
+			gridPaneHolder.add(peakWidthCheckBox,0,gridy);
+			gridPaneHolder.add(new Label("Peak Width"),1,gridy);
 
 			peakWidthPane=new FreqBandPane(Orientation.HORIZONTAL);		
 			peakWidthPane.setBandText("");
-			pamGridPane.add(peakWidthPane,2,gridy);
+			gridPaneHolder.add(peakWidthPane,2,gridy);
 			GridPane.setColumnSpan(peakWidthPane, GridPane.REMAINING);
 			
 			addValidatorFreqCheck(getValidator(), peakWidthPane, "peak width ",  "peak_width");
 
 			gridy++;
-			pamGridPane.add(new Label(""), 1,gridy);
+
+			gridPaneHolder.add(new Label(""), 1,gridy);
 
 			threshold=new PamSpinner<Double>(1., 300., 6.,1.);
 			threshold.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 			threshold.setPrefWidth(100);
 			GridPane.setMargin(threshold, new Insets(0,0,0,5)); //bit of a hack to make sure everything lines up nicely with the frequency pane. 
-			pamGridPane.add(threshold,2,gridy); 
 
-			pamGridPane.add(new Label("dB"), 3,gridy);
+			gridPaneHolder.add(threshold,2,gridy); 
+
+			gridPaneHolder.add(new Label("dB"), 3,gridy);
 
 
 			gridy++;
@@ -1207,19 +1258,19 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 				meanFreq.setDisableFreqPane(!meanFreqCheckBox.isSelected());
 			});
 
-			pamGridPane.add(meanFreqCheckBox,0,gridy);
+			gridPaneHolder.add(meanFreqCheckBox,0,gridy);
 
-			pamGridPane.add(new Label("Mean Frequency"),1,gridy);
+			gridPaneHolder.add(new Label("Mean Frequency"),1,gridy);
 
 			meanFreq=new FreqBandPane(Orientation.HORIZONTAL);		
 			meanFreq.setBandText("");
-			pamGridPane.add(meanFreq,2,gridy);
+			gridPaneHolder.add(meanFreq,2,gridy);
 			GridPane.setColumnSpan(meanFreq, GridPane.REMAINING);
 
 			addValidatorFreqCheck(getValidator(), meanFreq, "mean freq. ",  "mean_freq");
 
 
-			return pamGridPane;
+			return gridPaneHolder;
 
 		}
 
@@ -1235,8 +1286,8 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		}
 
 		@Override
-//		protected void disbleControls(boolean disable) {
-//			this.gridPaneHolder.setDisable(disable);
+		protected void disbleControls(boolean disable) {
+			this.gridPaneHolder.setDisable(disable);
 			
 //			peakFreqCheckBox.setDisable(enable);
 //			peakWidthCheckBox.setDisable(enable);
@@ -1251,20 +1302,6 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 //			threshold.setDisable(enable);
 //			searchRange.setDisable(enable);
 //			meanFreq.setDisable(enable);
-		protected void disbleControls(boolean enable) {
-			peakFreqCheckBox.setDisable(enable);
-			peakWidthCheckBox.setDisable(enable);
-			meanFreqCheckBox.setDisable(enable);
-
-
-			/**
-			 * Pane to set frequency band range		 */
-			peakFreqPane.setDisable(enable);
-			smoothing.setDisable(enable);
-			peakWidthPane.setDisable(enable);
-			threshold.setDisable(enable);
-			searchRange.setDisable(enable);
-			meanFreq.setDisable(enable);
 		}
 
 	}
@@ -1310,27 +1347,27 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 		private Node createZeroCrossPane(){
 
-			PamGridPane pamGridPane=new PamGridPane();
-			pamGridPane.setHgap(5);
-			pamGridPane.setVgap(5);
+			gridPaneHolder=new PamGridPane();
+			gridPaneHolder.setHgap(5);
+			gridPaneHolder.setVgap(5);
 
 			//Number of zeros crossings
 			Label zeroLabel;
-			pamGridPane.add(zeroLabel = new Label("Number of zero crossings"),0,0);
+			gridPaneHolder.add(zeroLabel = new Label("Number of zero crossings"),0,0);
 
 			zeroCrossingsMin=new PamSpinner<Integer>(0,999999,0,1); 
 			zeroCrossingsMin.setEditable(true);
 			zeroCrossingsMin.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 			zeroCrossingsMin.setPrefWidth(100);
-			pamGridPane.add(zeroCrossingsMin, 1,0);
+			gridPaneHolder.add(zeroCrossingsMin, 1,0);
 
-			pamGridPane.add(new Label("to"),2,0);
+			gridPaneHolder.add(new Label("to"),2,0);
 
 			zeroCrossingsMax=new PamSpinner<Integer>(0,999999,0,1); 
 			zeroCrossingsMax.setEditable(true);
 			zeroCrossingsMax.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 			zeroCrossingsMax.setPrefWidth(100);
-			pamGridPane.add(zeroCrossingsMax, 3,0);
+			gridPaneHolder.add(zeroCrossingsMax, 3,0);
 
 			//this.zeroCrossingsMax=zeroCorssingsMax;
 
@@ -1377,13 +1414,13 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 			//zero crossing freuquency sweep 
 
-			pamGridPane.add(new Label("Zero crossing frequency sweep"),0,1);
+			gridPaneHolder.add(new Label("Zero crossing frequency sweep"),0,1);
 
 			freqZeroMin=new PamSpinner<Double>(0.,999999.,0.,1.); 
 			freqZeroMin.setEditable(true);
 			freqZeroMin.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 			freqZeroMin.setPrefWidth(100);
-			pamGridPane.add(freqZeroMin, 1,1);
+			gridPaneHolder.add(freqZeroMin, 1,1);
 
 
 
@@ -1392,13 +1429,13 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			});
 
 
-			pamGridPane.add(new Label("to"),2,1);
+			gridPaneHolder.add(new Label("to"),2,1);
 
 			freqZeroMax=new PamSpinner<Double>(0.,999999.,0,1); 
 			freqZeroMax.setEditable(true);
 			freqZeroMax.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
 			freqZeroMax.setPrefWidth(100);
-			pamGridPane.add(freqZeroMax, 3,1);
+			gridPaneHolder.add(freqZeroMax, 3,1);
 
 			getValidator().createCheck()
 			.dependsOn("minzerofreq", freqZeroMin.valueProperty())
@@ -1434,10 +1471,10 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 			});
 
 
-			pamGridPane.add(new Label("KHz/ms"),4,1);
+			gridPaneHolder.add(new Label("KHz/ms"),4,1);
 
 
-			return pamGridPane;
+			return gridPaneHolder;
 
 		}
 
@@ -1496,10 +1533,11 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 		@Override
 		protected void disbleControls(boolean disable) {
-			zeroCrossingsMin.setDisable(disable);
-			zeroCrossingsMax.setDisable(disable);
-			freqZeroMin.setDisable(disable);
-			freqZeroMax.setDisable(disable);
+			gridPaneHolder.setDisable(disable);
+//			zeroCrossingsMin.setDisable(disable);
+//			zeroCrossingsMax.setDisable(disable);
+//			freqZeroMin.setDisable(disable);
+//			freqZeroMax.setDisable(disable);
 		}
 
 	}
@@ -1513,12 +1551,17 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 
 		private TextField[] ampRange = new TextField[2];
+		
+		/**
+		 * The main holder
+		 */
+		private PamGridPane gridPane;
 
 		public AmplitudeBlock() {
 			super("Amplitude Range", true);
 			setDescription("Set a minimum and maximum click amplitude for this type");
 
-			PamGridPane gridPane= new PamGridPane(); 
+			gridPane= new PamGridPane(); 
 			gridPane.setHgap(5);
 			gridPane.setVgap(5);
 
@@ -1572,13 +1615,16 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 		@Override
 		protected void disbleControls(boolean disable) {
-			for (int i = 0; i < 2; i++) {
-				ampRange[i].setDisable(!getEnableBox());
-			}
+			gridPane.setDisable(disable);
+
+//			for (int i = 0; i < 2; i++) {
+//				ampRange[i].setDisable(!getEnableBox());
+//			}
 
 		}
 	}
-	
+
+
 	/**
 	 * 
 	 * Parameters for testing bearing values. 
@@ -1591,18 +1637,12 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		/**
 		 * The minimum correlation value. 
 		 */
-		private JTextField minBearing;
+		private PamSpinner<Double> minBearing;
 		
 		/**
 		 * The maximum bearing field
 		 */
-		private JTextField maxBearing;
-		
-		/**
-		 * The enable bearings check box. 
-		 */
-		private JCheckBox enableBearings; 
-
+		private PamSpinner<Double> maxBearing;
 		/**
 		 * True if using multi-channel data
 		 */
@@ -1611,55 +1651,100 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		/**
 		 * Combo box to select whetrher bearings should be kept or excluded within limits. 
 		 */
-		private JComboBox<String> bearingsExcludeBox;
+		private ComboBox<String> bearingsExcludeBox;
 
+		private PamHBox bearingHolder;
 
+		
 		BearingBlock() {
-			super("Bearings", false);
+			super("Bearings", true);
 			
 			JPanel p = new JPanel();
 			
-			minBearing = new JTextField(5); 
-			maxBearing = new JTextField(5); 
+			minBearing = new PamSpinner<Double>(-180., 180., 0., 1.); 
+			minBearing.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
+			minBearing.setMaxWidth(110);
+			minBearing.setEditable(true);
+			maxBearing = new PamSpinner<Double>(-180., 180., 0., 1.); 
+			maxBearing.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
+			maxBearing.setMaxWidth(110);
+			maxBearing.setEditable(true);
+
+			bearingsExcludeBox = new ComboBox<String>(); 
+			bearingsExcludeBox.getItems().add("Include only");
+			bearingsExcludeBox.getItems().add("Exclude");
 			
-			bearingsExcludeBox = new JComboBox<String>(); 
-			bearingsExcludeBox.addItem("Include only");
-			bearingsExcludeBox.addItem("Exclude");
+			bearingHolder = new PamHBox(); 
+			bearingHolder.setSpacing(5);
+			bearingHolder.setAlignment(Pos.CENTER_LEFT);
 		
 			p.setLayout(new GridBagLayout());
-			GridBagConstraints c = new PamGridBagContraints();
-//			c.gridx = 0;
-//			addComponent(p, enableBearings, c);
-//			c.gridx += c.gridwidth;
-//			addComponent(p, bearingsExcludeBox, c);
-//			c.gridx += c.gridwidth;
-//			addComponent(p, new JLabel("bearings between ", JLabel.RIGHT), c);
-//			c.gridx += c.gridwidth;
-//			addComponent(p, minBearing, c);
-//			c.gridx += c.gridwidth;
-//			addComponent(p, new JLabel(" and ", JLabel.RIGHT), c);
-//			c.gridx += c.gridwidth;
-//			addComponent(p, maxBearing, c);
-//			c.gridx += c.gridwidth;
-//			addComponent(p, new JLabel("(\u00B0)", JLabel.LEFT), c);
-//
-//			add(BorderLayout.WEST, p);
+			
+			bearingHolder.getChildren().add(bearingsExcludeBox);
+			bearingHolder.getChildren().add(new Label("bearings between "));
+			bearingHolder.getChildren().add(minBearing);
+			bearingHolder.getChildren().add(new Label("\u00B0 and "));
+			bearingHolder.getChildren().add(maxBearing);
+			bearingHolder.getChildren().add(new Label("\u00B0"));
+			
+			
+			getValidator() .createCheck().dependsOn("maxbearing_", maxBearing.valueProperty())
+			.withMethod(c -> {
+				Double maxBearingVal = c.get("maxbearing_"); 
+				if (maxBearingVal<=minBearing.getValue() && isPaneShowing()) {
+					c.error("Maximum bearing must be greater than the minimum bearing");
+				}
+				if (maxBearingVal<-180 || maxBearingVal>180) {
+					c.error("Bearing values must be between -180\u00B0 and 180\u00B0");
+				}
+			})
+			.decorates(maxBearing)
+			.immediate();
+
+			getValidator() .createCheck().dependsOn("minbearing_", minBearing.valueProperty())
+			.withMethod(c -> {
+				Double minBearingVal = c.get("minbearing_"); 
+				if (minBearingVal>maxBearing.getValue() && isPaneShowing()) {
+					c.error("Minimum bearing must be less than the maximum bearing");
+				}
+				if (minBearingVal<-180 || minBearingVal>180) {
+					c.error("Bearing values must be between -180\u00B0 and 180\u00B0");
+				}
+			})
+			.decorates(minBearing)
+			.immediate();
+			
+			
+			maxBearing.valueProperty().addListener((obsVal, oldVal, newVal)->{
+				getValidator().validate();
+			});
+			
+			minBearing.valueProperty().addListener((obsVal, oldVal, newVal)->{
+				getValidator().validate();
+			});
 			
 			this.multiChan = checkMultiChan();
+			
+			this.getHolderPane().setCenter(bearingHolder);
+			
+			//setParams();
 
 		}
 
 		@Override
-		protected void setParams() {
+		protected void setParams() {			
+			
+			this.setEnableBox(sweepClassifierSet.enableBearingLims);
+
 			sweepClassifierSet.checkBearingAllocation();
 //			setEnableBox(sweepClassifierSet.enableZeroCrossings);
-			enableBearings.setSelected(sweepClassifierSet.enableBearingLims);
+			//enableBearings.setSelected(sweepClassifierSet.enableBearingLims);
 			
-			if (sweepClassifierSet.excludeBearingLims) bearingsExcludeBox.setSelectedIndex(1);
-			else  bearingsExcludeBox.setSelectedIndex(0);
+			if (sweepClassifierSet.excludeBearingLims) bearingsExcludeBox.getSelectionModel().select(1);
+			else  bearingsExcludeBox.getSelectionModel().select(0);
 			
-			this.minBearing.setText(String.format("%3.1f", Math.toDegrees(sweepClassifierSet.bearingLims[0])));
-			this.maxBearing.setText(String.format("%3.1f", Math.toDegrees(sweepClassifierSet.bearingLims[1])));
+			this.minBearing.getValueFactory().setValue(Math.toDegrees(sweepClassifierSet.bearingLims[0]));
+			this.maxBearing.getValueFactory().setValue(Math.toDegrees(sweepClassifierSet.bearingLims[1]));
 			
 			this.multiChan = checkMultiChan();
 		}
@@ -1667,46 +1752,31 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 	
 		@Override
 		protected boolean getParams() {
-			if (enableBearings.isSelected()) {
 
-				sweepClassifierSet.enableBearingLims	 = enableBearings.isSelected();
-				sweepClassifierSet.excludeBearingLims	 = bearingsExcludeBox.getSelectedIndex()==1 ? true : false; 
+			sweepClassifierSet.excludeBearingLims	 = bearingsExcludeBox.getSelectionModel().getSelectedIndex()==1 ? true : false; 
 
-				try {
-					sweepClassifierSet.bearingLims[0] = Math.toRadians(Double.valueOf(minBearing.getText()));
-				}
-				catch (NumberFormatException e) {
-					return showWarning("Invalid minimum correlation value");
-				}
-				
-				try {
-					sweepClassifierSet.bearingLims[1] = Math.toRadians(Double.valueOf(maxBearing.getText()));
-				}
-				catch (NumberFormatException e) {
-					return showWarning("Invalid maximum bearing limits value");
-				}
-			}
+			sweepClassifierSet.bearingLims[0] = Math.toRadians(minBearing.getValue());
+
+			sweepClassifierSet.bearingLims[1] = Math.toRadians(maxBearing.getValue());
+		
 			return true;
 		}
 
-		protected void enableControls() {
-				checkMultiChan();
-			
-				enableBearings.setEnabled(multiChan);
-				bearingsExcludeBox.setEnabled(multiChan);
-				minBearing.setEnabled(multiChan);
-				maxBearing.setEnabled(multiChan);
-			
-				if (!multiChan) return;
-				
-				bearingsExcludeBox.setEnabled(enableBearings.isSelected());
-				minBearing.setEnabled(enableBearings.isSelected());
-				maxBearing.setEnabled(enableBearings.isSelected());
-		}
 
 		@Override
 		protected void disbleControls(boolean disable) {
-			// TODO Auto-generated method stub
+			checkMultiChan();
+			
+			bearingHolder.setDisable(!multiChan); 
+//			bearingsExcludeBox.setDisable(!multiChan);
+//			minBearing.setDisable(!multiChan);
+//			maxBearing.setDisable(!multiChan);
+			if (!multiChan) return;
+			bearingHolder.setDisable(disable); 
+
+//			bearingsExcludeBox.setDisable(disable);
+//			minBearing.setDisable(disable);
+//			maxBearing.setDisable(disable);
 			
 		}
 	}
@@ -1719,25 +1789,150 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 	private boolean checkMultiChan() {
 		boolean multiChan = false; 
 		//do we have multi-channel clicks?
-//		if  (clickControl!=null) {
-//			int[] chanGroups = clickControl.getClickParameters().getGroupedSourceParameters().getChannelGroups();
-//			multiChan = false;
-//			
-//			if (chanGroups==null) return multiChan; 
-//			
-//			for (int i=0; i<chanGroups.length; i++) {
-//				int chans = clickControl.getClickParameters().getGroupedSourceParameters().getGroupChannels(i);
-////				Debug.out.println("Check multi-channel: " + chanGroups[i] + "  num: " + PamUtils.getNumChannels(chans));
-//				if (PamUtils.getNumChannels(chans)>1) {
-//					multiChan = true;
-//					break; 
-//				}
-//			}
-//		}
+		if  (this.sweepClassifier.getClickDetector().getClickControl()!=null) {
+			int[] chanGroups = getClickControl().getClickParameters().getGroupedSourceParameters().getChannelGroups();
+			multiChan = false;
+			
+			if (chanGroups==null) return multiChan; 
+			
+			for (int i=0; i<chanGroups.length; i++) {
+				int chans = getClickControl().getClickParameters().getGroupedSourceParameters().getGroupChannels(i);
+//				Debug.out.println("Check multi-channel: " + chanGroups[i] + "  num: " + PamUtils.getNumChannels(chans));
+				if (PamUtils.getNumChannels(chans)>1) {
+					multiChan = true;
+					break; 
+				}
+			}
+		}
+		else multiChan = true;
 //		Debug.out.println("Check multi-channel: " + multiChan);
 		
 		return multiChan; 
 	}
+	
+	/**
+	 * 
+	 * Parameters for testing the cross correlation value. 
+	 * 
+	 * @author Jamie Macaulay
+	 *
+	 */
+	private class XCorrBlock extends SweepBox {
+
+		/**
+		 * The minimum correlation value. 
+		 */
+		private PamSpinner<Double> minCorrelation;
+		
+		private PamSpinner<Double> minPeakTorugh;
+
+		private PamToggleSwitch minXCorrEnable;
+
+		private PamToggleSwitch minPeakTroughEnable;
+
+		private PamSpinner<Double> minPeakFactor;
+		
+		/**
+		 * True if using multi-channel data
+		 */
+		boolean multiChan = false;
+
+		private GridPane gridPane;
+
+
+		XCorrBlock() {
+			super("Cross Correlation", true);
+			
+			minXCorrEnable = new PamToggleSwitch(""); 
+			minXCorrEnable.selectedProperty().addListener((obsVal, oldVal, newVal)->{
+				disbleControls(!newVal);
+			});
+
+			minCorrelation = new PamSpinner<Double>(-Double.MAX_VALUE, Double.MAX_VALUE, 0, 0.1);
+			minCorrelation.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
+
+			minPeakTroughEnable = new PamToggleSwitch(""); 
+			minPeakTroughEnable.selectedProperty().addListener((obsVal, oldVal, newVal)->{
+				disbleControls(!newVal);
+			});
+			
+			minPeakFactor = new PamSpinner<Double>(-Double.MAX_VALUE, Double.MAX_VALUE, 1., 0.1);
+			minPeakFactor.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
+
+			int x = 0;
+			int y = 0;
+			
+			gridPane = new GridPane();
+			gridPane.setHgap(5);
+			gridPane.setVgap(5);
+
+			gridPane.add(minXCorrEnable, x, y);
+			gridPane.add(new Label("Min. xcorr value "), ++x, y);
+			gridPane.add(minCorrelation, ++x, y);
+			
+			y++;
+			x=0; 
+			gridPane.add(minPeakTroughEnable, x, y);
+			gridPane.add(new Label("Max. xcorr value greater than "), ++x, y);
+			gridPane.add(minPeakFactor,++x, y);
+			gridPane.add(new Label("* absolute min. value"),++x, y);
+			
+			this.getHolderPane().setCenter(gridPane);
+
+			this.multiChan = checkMultiChan();
+		}
+
+		@Override
+		protected void setParams() {
+			
+			this.setEnableBox(sweepClassifierSet.enableMinXCrossCorr);
+
+			sweepClassifierSet.checkXCCorrAllocation();
+//			setEnableBox(sweepClassifierSet.enableZeroCrossings);
+			minXCorrEnable.setSelected(sweepClassifierSet.enableMinXCrossCorr);
+			minPeakTroughEnable.setSelected(sweepClassifierSet.enablePeakXCorr);
+			
+			this.minCorrelation.getValueFactory().setValue(sweepClassifierSet.minCorr);
+			this.minPeakFactor.getValueFactory().setValue(sweepClassifierSet.corrFactor);
+			
+			this.multiChan = checkMultiChan();		
+		}
+	
+		@Override
+		protected boolean getParams() {
+			sweepClassifierSet.enableMinXCrossCorr	 = minXCorrEnable.isSelected();
+			sweepClassifierSet.enablePeakXCorr	 = minPeakTroughEnable.isSelected();
+
+			if (minXCorrEnable.isSelected()) {
+					sweepClassifierSet.minCorr = minCorrelation.getValue();
+			}
+			
+			if (minPeakTroughEnable.isSelected()) {
+					sweepClassifierSet.corrFactor = minPeakFactor.getValue();
+			}
+			return true;
+		}
+
+		@Override
+		protected void disbleControls(boolean disable) {
+				this.multiChan = checkMultiChan();
+			
+				minXCorrEnable.setDisable(!multiChan);
+				minCorrelation.setDisable(!multiChan);
+				minPeakTroughEnable.setDisable(!multiChan);
+				minPeakFactor.setDisable(!multiChan);
+			
+				if (!multiChan) return;
+				
+				gridPane.setDisable(disable);
+				
+				minCorrelation.setDisable(!minXCorrEnable.isSelected());
+				minPeakFactor.setDisable(!minPeakTroughEnable.isSelected());
+		}
+
+
+	}
+	
 
 
 	/**~*main set and get params functions***/	
@@ -1753,6 +1948,9 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		freqBox.getParams();
 		zeroCrossingsBox.getParams();
 		amplitudeBlock.getParams();
+		bearingBox.getParams();
+		xCorrBox.getParams();
+
 
 		currentClickProperty.setClickType(sweepClassifierSet);
 
@@ -1772,6 +1970,8 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 		freqBox.setParams();
 		zeroCrossingsBox.setParams();
 		amplitudeBlock.setParams();
+		bearingBox.setParams();
+		xCorrBox.setParams();
 
 	}
 
@@ -1794,6 +1994,12 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 
 	public StringProperty getNameTextProperty() {
 		return optionBox.getNameLabel().textProperty();
+	}
+	
+	
+	public ObservableValue<? extends Node> getNameGraphicProperty() {		// TODO Auto-generated method stub
+		return optionBox.getNameGraphicsProperty(); 
+
 	}
 	
 	
@@ -1859,6 +2065,12 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 	}
 
 
+	/**
+	 * Show a warning. 
+	 * @param string - the 
+	 * @param string2
+	 * @return false usually
+	 */
 	private boolean showWarning(String string, String string2) {
 		//PamController.getInstance();
 		PamDialogFX.showWarning(null, string, string2);
@@ -1896,4 +2108,7 @@ public class SweepClassifierSetPaneFX extends SettingsPane<ClickTypeProperty> {
 	private boolean isPaneShowing() {
 		return sweepClassifier.getClassifierPane().getFlipPane().isBackVisible();
 	}
+
+
+
 }

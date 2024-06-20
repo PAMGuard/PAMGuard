@@ -349,6 +349,7 @@ public class TDGraphFX extends PamBorderPane {
 		// set the default overlay style.
 		setOverlayColour(LIGHT_TD_DISPLAY);
 		
+		
 		//show the left hiding pane byu default. 
 		stackPane.getLeftHidingPane().showHidePane(true);
 	}
@@ -417,6 +418,8 @@ public class TDGraphFX extends PamBorderPane {
 		Text chevronRight = null;
 		Text settingsRight = null;
 		switch (displayCol) {
+		//Note that this is now redundant as the buttons have a dark background - keeping for now just incase. 
+		case LIGHT_TD_DISPLAY:
 		case DARK_TD_DISPLAY:
 		//	System.out.println("SET DARK THEME FOR HIDING BUTTONS");
 //			chevronRight = PamGlyphDude.createPamGlyph(FontAwesomeIcon.CHEVRON_RIGHT, Color.WHITE,
@@ -424,13 +427,13 @@ public class TDGraphFX extends PamBorderPane {
 //			settingsRight = PamGlyphDude.createPamGlyph(MaterialIcon.SETTINGS, Color.WHITE, PamGuiManagerFX.iconSize);
 			settingsRight = PamGlyphDude.createPamIcon("mdi2c-cog", Color.WHITE, PamGuiManagerFX.iconSize);
 			break;
-		case LIGHT_TD_DISPLAY:
-			//System.out.println("SET LIGHT THEME FOR HIDING BUTTONS");
-//			chevronRight = PamGlyphDude.createPamGlyph(FontAwesomeIcon.CHEVRON_RIGHT, PamGuiManagerFX.iconColor,
-			chevronRight = PamGlyphDude.createPamIcon("mdi2c-chevron-right", PamGuiManagerFX.iconColor,	PamGuiManagerFX.iconSize);
-//			settingsRight = PamGlyphDude.createPamGlyph(MaterialIcon.SETTINGS, PamGuiManagerFX.iconColor,
-			settingsRight = PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconColor, PamGuiManagerFX.iconSize);
-			break;
+//		case LIGHT_TD_DISPLAY:
+//			//System.out.println("SET LIGHT THEME FOR HIDING BUTTONS");
+////			chevronRight = PamGlyphDude.createPamGlyph(FontAwesomeIcon.CHEVRON_RIGHT, PamGuiManagerFX.iconColor,
+//			chevronRight = PamGlyphDude.createPamIcon("mdi2c-chevron-right", PamGuiManagerFX.iconColor,	PamGuiManagerFX.iconSize);
+////			settingsRight = PamGlyphDude.createPamGlyph(MaterialIcon.SETTINGS, PamGuiManagerFX.iconColor,
+//			settingsRight = PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconColor, PamGuiManagerFX.iconSize);
+//			break;
 		default:
 			setOverlayColour(LIGHT_TD_DISPLAY);
 			break;
@@ -1121,7 +1124,7 @@ public class TDGraphFX extends PamBorderPane {
 		 * 
 		 */
 		public synchronized void repaint(long tm, int flag) {
-
+			
 			// clear the current canvas's
 			if (hasCanvas(flag, BASE_CANVAS)) {
 				baseCanvas.getGraphicsContext2D().clearRect(0, 0, baseCanvas.getWidth(), baseCanvas.getHeight());
@@ -1148,16 +1151,18 @@ public class TDGraphFX extends PamBorderPane {
 			boolean hasBase = false; 
 			synchronized (dataList) {
 				for (TDDataInfoFX dataInfo : dataList) {
+					
 					base = false;
+					
 					if (!dataInfo.isShowing()) {
-						// System.out.println("dataInfo.isShowing(): " + dataInfo.getDataName());
+						//System.out.println("!dataInfo.isShowing(): " + dataInfo.getDataName());
 						continue;
 					}
 
 					scaleInfo = dataInfo.getScaleInfo();
 					if (scaleInfo == null) {
-						// System.out.println("scale info null " + dataInfo.getDataName() + "index:
-						// "+dataInfo.getScaleInfoIndex());
+//						 System.out.println("scale info null " + dataInfo.getDataName() + "index:
+//						 "+dataInfo.getScaleInfoIndex());
 						continue;
 					}
 
@@ -1180,7 +1185,7 @@ public class TDGraphFX extends PamBorderPane {
 					}
 					;
 
-					// ok so only repaint if we have the right CANVAS
+					// OK so only repaint if we have the right CANVAS
 					if (base && hasCanvas(flag, BASE_CANVAS)) {
 						paintDataUnits(gc, dataInfo, false);
 					} else if (!base && hasCanvas(flag, FRONT_CANVAS)) {
@@ -1284,6 +1289,7 @@ public class TDGraphFX extends PamBorderPane {
 			// PamDataBlock<PamDataUnit> dataBlock = dataInfo.getDataBlock();
 
 			// scroll start is the end of the display i.e. the last visible time in the past
+			
 			// in real time mode.
 			scrollStart = tdDisplay.getTimeScroller().getValueMillisD();
 
@@ -1521,7 +1527,7 @@ public class TDGraphFX extends PamBorderPane {
 	 * @param tm- if within millis of last repaint don't repaint
 	 */
 	public synchronized void repaint(long tm, int flag) {
-
+				
 		// Start of block moved over from the panel repaint(tm) function.
 		long currentTime = System.currentTimeMillis();
 		if (currentTime - lastTime < tm) {
