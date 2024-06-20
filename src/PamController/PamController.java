@@ -197,7 +197,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 
 	private Timer diagnosticTimer;
 	
-	private boolean debugDumpBufferAtRestart = false;
+	private boolean debugDumpBufferAtRestart = true;
 
 	private NetworkController networkController;
 	private int nNetPrepared;
@@ -1457,7 +1457,6 @@ public class PamController implements PamControllerInterface, PamSettings {
 		for (int iU = 0; iU < pamControlledUnits.size(); iU++) {
 			pamControlledUnits.get(iU).pamHasStopped();
 		}
-		
 		long stopTime = PamCalendar.getTimeInMillis();
 		saveEndSettings(stopTime);
 

@@ -4,9 +4,11 @@ import java.util.ArrayList;
 
 import PamController.DataIntegrityChecker;
 import PamController.PamController;
+import PamUtils.PamCalendar;
 import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
 import binaryFileStorage.BinaryStore;
+import dataMap.MapOverlap;
 import dataMap.OfflineDataMap;
 
 public class BinaryIntegrityChecker implements DataIntegrityChecker {
@@ -38,16 +40,16 @@ public class BinaryIntegrityChecker implements DataIntegrityChecker {
 		if (dataMap == null) {
 			return true;
 		}
-		long overlaps = dataMap.checkOverlaps();
-		if (overlaps <= 0) {
+		ArrayList<MapOverlap> overlaps = dataMap.checkOverlaps();
+		if (overlaps == null || overlaps.size() == 0) {
 			return true;
 		}
-		String warn = String.format("<html>Binary data %s has overlapping data files, with a maximum overlap of %3.1fs<br>"
+		String warn = String.format("<html>Binary data %s has %d overlapping data files, the first one at %s to %s<br>"
 				+ "This can occur when data have been reprocessed multiple times offline into "
 				+ "the same folders.<br>Since files sometimes get slightly different names, old files are"
 				+ "not always overwritten. <br>"
 				+ "You should determine which files are 'old' by looking at file creation dates and delete them.",
-				aBlock.getLongDataName(), (double) overlaps / 1000.);
+				aBlock.getLongDataName(), overlaps.size(), PamCalendar.formatDBDateTime(overlaps.get(0).getFile1End()), PamCalendar.formatDBDateTime(overlaps.get(0).getFile2Start()));
 		WarnOnce.showNamedWarning("BINOVERLAPWARNING", PamController.getMainFrame(), "Data Integrity Warning", warn, WarnOnce.WARNING_MESSAGE);
 		return false;
 	}
