@@ -140,10 +140,13 @@ public class ClipProcess extends SpectrogramMarkProcess {
 				clipErr = clipRequest.clipBlockProcess.processClipRequest(clipRequest);
 				switch (clipErr) {
 				case 0: // no error - clip should have been created. 
+					li.remove();
+					break;
 				case RawDataUnavailableException.DATA_ALREADY_DISCARDED:
 				case RawDataUnavailableException.INVALID_CHANNEL_LIST:
-					//					System.out.println("Clip error : " + clipErr);
+//					System.out.println("Clip error : " + clipErr);
 					li.remove();
+					break;
 				case RawDataUnavailableException.DATA_NOT_ARRIVED:
 					continue; // hopefully, will get this next time !
 				}
@@ -230,6 +233,17 @@ public class ClipProcess extends SpectrogramMarkProcess {
 			}
 			minH = Math.max(minH, clipBlockProcesses[i].getRequiredDataHistory(o, arg));
 		}
+		
+		ClipRequest firstClip = null;
+		synchronized(clipRequestSynch) {
+			if (clipRequestQueue.size() > 0) {
+				firstClip = clipRequestQueue.get(0);
+			}
+		}
+		if (firstClip != null) {
+			minH += firstClip.dataUnit.getDurationInMilliseconds();
+		}
+		
 		minH += Math.max(3000, 192000/(long)getSampleRate());
 		if (specMouseDown) {
 			minH = Math.max(minH, masterClockTime-specMouseDowntime);
@@ -453,8 +467,7 @@ public class ClipProcess extends SpectrogramMarkProcess {
 			this.dataBlock = dataBlock;
 			this.clipGenSetting = clipGenSetting;
 			clipBudgetMaker = new StandardClipBudgetMaker(this);
-			dataBlock.addObserver(this, true);
-			
+			dataBlock.addObserver(this, false);
 
 			if (rawDataBlock != null) {
 				int chanMap = decideChannelMap(rawDataBlock.getChannelMap());
@@ -499,6 +512,7 @@ public class ClipProcess extends SpectrogramMarkProcess {
 				rawData = rawDataBlock.getSamples(rawStart, (int) (rawEnd-rawStart), channelMap);
 			}
 			catch (RawDataUnavailableException e) {
+				System.out.println(e.getMessage());
 				return e.getDataCause();
 			}
 			if (rawData==null) {
@@ -583,9 +597,15 @@ public class ClipProcess extends SpectrogramMarkProcess {
 		public PamObserver getObserverObject() {
 			return clipProcess.getObserverObject();
 		}
+	
 		@Override
 		public long getRequiredDataHistory(PamObservable o, Object arg) {
-			return (long) ((clipGenSetting.preSeconds+clipGenSetting.postSeconds) * 1000.);
+			long h = (long) ((clipGenSetting.preSeconds+clipGenSetting.postSeconds) * 1000.);
+//			if (dataBlock != null) {
+			// can't do this since dataBlock is observing this, so will wrap. 
+//				h += dataBlock.getRequiredHistory();
+//			}
+			return h;
 		}
 		
 		
