@@ -467,14 +467,26 @@ name="_Latest_Version_2.02.08"></a><a name="_Version_2.02.09_June"></a><a
 name="_Version_2.02.10_January"></a><a name="_Version_2.02.11_April"></a>Version
 2.02.11 May 2024</h1>
 
-<p class=MsoNormal>&nbsp;</p>
-
 <h2>New Features</h2>
+
+<p class=MsoNormal>Deep Learning Classifier. Major upgrade to support for Deep
+Learning models in PAMGuard. See online help for details.</p>
 
 <p class=MsoNormal>Click detector: Remembers locations of displays and doesn’t
 continually reset them. </p>
 
-<p class=MsoNormal>Help for Matched Click Classifier</p>
+<p class=MsoNormal>Help for Matched Click Classifier.</p>
+
+<p class=MsoNormal>Project information dialog. This allows capture of essential
+project information to store with your data. See menu item Settings/Project
+information.</p>
+
+<h2>Tethys Database</h2>
+
+<p class=MsoNormal>Many users will be aware that we’re integrating an interface
+to the <a href="https://tethys.sdsu.edu/">Tethys Database</a> into PAMGuard.
+Some basic features are available for testing. If interested, please contact
+the PAMGuard support team. </p>
 
 <h2>Bug Fixes</h2>
 
@@ -497,14 +509,32 @@ as PAMGuard stops / restarts. </p>
 function fixed and now inserts correct times of start and ends of events into
 database. </p>
 
+<p class=MsoNormal>Clip generator. Changes to ensure PAMGuard keeps audio data
+long enough to make clips. In some circumstances data were being discarded too
+early so clips could not be created. </p>
+
+<p class=MsoNormal>Acquisition “Skip initial seconds” feature, designed to
+remove high sample levels e.g. from calibration tones at start of a soundtrap
+recording was not working with the click detector. This is fixed but replacing
+all data with 0’s and still sending data. Note that this may lead to
+artificially low noise measures at the start of a file. </p>
+
+<p class=MsoNormal>Data reprocessing options. Updated to ensure that the option
+&quot;Start normally. Note risk of overwriting!&quot; is always available. Also
+improved code naming binary files to attempt to push them to exact times,
+rather than a couple of seconds after the hour. </p>
+
+<p class=MsoNormal>Updated icons to improve display on high definition screens.
+</p>
+
 <h1>Version 2.02.10 January 2024</h1>
 
 <h2><span lang=EN-US>New Features</span></h2>
 
 <p class=MsoNormal><b><span lang=EN-US>Importing modules</span></b><span
-lang=EN-US> from other configurations: New options from file menu allowing
-import of specific modules, or module settings from other configurations. E.g.
-if you had three similar configurations and had set one of them up with a new
+lang=EN-US> from other configurations: New options from file menu allowing import
+of specific modules, or module settings from other configurations. E.g. if you
+had three similar configurations and had set one of them up with a new
 detector, or got the click classifier settings set up just right in one of
 those configurations, you can import the additional modules or the click
 detector settings easily into the other configurations. </span></p>
@@ -593,8 +623,8 @@ were reading local time, even when set to use UTC. </span></p>
 which mostly occurred when processing large datasets of many offline files, has
 been fixed.</span></p>
 
-<p class=MsoNormal><span lang=EN-US>Data Map: “Scroll To Data” pop-up menu, which
-didn’t always scroll to the correct place, is now fixed. </span></p>
+<p class=MsoNormal><span lang=EN-US>Data Map: “Scroll To Data” pop-up menu,
+which didn’t always scroll to the correct place, is now fixed. </span></p>
 
 <p class=MsoNormal><span lang=EN-US>Bearing Localiser offline: If reprocessing
 bearings, the localizer was not correctly loading required raw or FFT data to
@@ -694,8 +724,8 @@ details. &nbsp;&nbsp;</span></p>
 <p class=MsoNormal><span lang=EN-US>Changes to GUI to make dialog shorter for
 low DPI screens. </span></p>
 
-<p class=MsoNormal><span lang=EN-US>Complete rewrite of the classification
-system to have nested classifiers which can be enabled or disabled. </span></p>
+<p class=MsoNormal><span lang=EN-US>Complete rewrite of the classification system
+to have nested classifiers which can be enabled or disabled. </span></p>
 
 <p class=MsoNormal><span lang=EN-US>Changes to classification GUI to
 accommodate the new classification system.</span></p>
@@ -786,9 +816,9 @@ selections from drop down lists within any form.</p>
 
 <p class=MsoNormal>&nbsp;</p>
 
-<p class=MsoNormal>Note that updates have also been made to the Matlab
-interface to PAMGuard binary files, which has now also been migrated to GitHub
-at <a href="https://github.com/PAMGuard/PAMGuardMatlab">https://github.com/PAMGuard/PAMGuardMatlab</a>.
+<p class=MsoNormal>Note that updates have also been made to the Matlab interface
+to PAMGuard binary files, which has now also been migrated to GitHub at <a
+href="https://github.com/PAMGuard/PAMGuardMatlab">https://github.com/PAMGuard/PAMGuardMatlab</a>.
 </p>
 
 <h1>&nbsp;</h1>
@@ -803,8 +833,9 @@ the TF FX display to crash if no data were displayed.</span></p>
 <p class=MsoNormal><span lang=EN-US>See major release notes for V 2.02.01
 below. </span></p>
 
-<p class=MsoNormal><span lang=EN-US>Bug 495: TD FX display throws NullPointerException
-if user has removed all data units and then moves mouse over display area.</span></p>
+<p class=MsoNormal><span lang=EN-US>Bug 495: TD FX display throws
+NullPointerException if user has removed all data units and then moves mouse
+over display area.</span></p>
 
 <h1><a name="_Latest_Version_2.02.01"></a><span lang=EN-US>Version 2.02.01
 October 2021</span></h1>
@@ -992,8 +1023,9 @@ help</a>. </p>
 
 <p class=MsoNormal><b>If you are upgrading from a PAMGuard core release
 (1.15.xx), PAMGuard Version 2 contains major updates. You should read and
-understand the notes listed for <a href="#_Latest_Beta_Version_2.00.10">Beta Version
-2.00.10</a> before proceeding with installation and use of this version.</b></p>
+understand the notes listed for <a href="#_Latest_Beta_Version_2.00.10">Beta
+Version 2.00.10</a> before proceeding with installation and use of this
+version.</b></p>
 
 <p class=MsoNormal>This version of PAMGuard has been bundled with Java 13
 (release 13.0.1). PSFX files generated in previous beta releases (2.xx.xx)
@@ -1102,11 +1134,11 @@ understand the notes listed for <a href="#_Latest_Beta_Version_2.00.10">Beta
 Version 2.00.10</a> before proceeding with installation and use of this
 version.</b></p>
 
-<p class=MsoNormal>This version of PAMGuard has been bundled with Java 13 (release
-13.0.1). PSFX files generated in previous beta releases (2.xx.xx) should be
-compatible with this version, and vice-versa. PSF files generated in core
-releases (1.15.xx) can be loaded in this version, but will be converted to PSFX
-files when PAMGuard exits.</p>
+<p class=MsoNormal>This version of PAMGuard has been bundled with Java 13
+(release 13.0.1). PSFX files generated in previous beta releases (2.xx.xx)
+should be compatible with this version, and vice-versa. PSF files generated in
+core releases (1.15.xx) can be loaded in this version, but will be converted to
+PSFX files when PAMGuard exits.</p>
 
 <p class=MsoNormal><b><span lang=EN-US>Bug Fixes</span></b></p>
 
@@ -1445,9 +1477,9 @@ Detector display. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>1. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
-lang=EN-US> </span>This version of PAMGuard has been upgraded to make it compatible
-with Java 12. psfx files generated in previous beta releases should be
-compatible with this version, and vice-versa.</p>
+lang=EN-US> </span>This version of PAMGuard has been upgraded to make it
+compatible with Java 12. psfx files generated in previous beta releases should
+be compatible with this version, and vice-versa.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -1527,9 +1559,9 @@ with installation and use of this version.</span></p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>1. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 413. Binary file crashing during load, after a system failure. Failure
-could cause the file to become corrupt, which caused a crash during subsequent
-load</p>
+</span>Bug 413. Binary file crashing during load, after a system failure.
+Failure could cause the file to become corrupt, which caused a crash during
+subsequent load</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -1742,8 +1774,8 @@ with installation and use of this version.</span></p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>1. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 338. Problem displaying coastlines and bathymetric contours around the
-dateline (+/- 180 longitude) in the map.</p>
+</span>Bug 338. Problem displaying coastlines and bathymetric contours around
+the dateline (+/- 180 longitude) in the map.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2325,14 +2357,14 @@ lang=EN-US>&nbsp;</span></p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>1.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span><span lang=EN-US>Bug 317. Rocca Module Data Purging. </span>The ROCCA
-module was not performing data purging when using classifiers developed for Hawaii/Temperate
-Pacific/North Atlantic datasets. This has been corrected.</p>
+</span><span lang=EN-US>Bug 317. Rocca Module Data Purging. </span>The ROCCA module
+was not performing data purging when using classifiers developed for
+Hawaii/Temperate Pacific/North Atlantic datasets. This has been corrected.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 320. Pamguard stopped reading Click Detector Event data from database
-when target motion analysis information was encountered. Corrected.</p>
+</span>Bug 320. Pamguard stopped reading Click Detector Event data from
+database when target motion analysis information was encountered. Corrected.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>3.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2437,9 +2469,9 @@ jar file will be required rather than a new bespoke PAMGuard installation.</span
 unchanged, in most cases simply requiring the addition of an interface class.
 &nbsp;Instructions for the development of new modules utilizing the plug-in
 scheme can be found <a href="http://www.pamguard.org/16_HowtomakePlug-Ins.html"
-target="_blank">here</a>. &nbsp;Plug-in modules can be downloaded from the PAMGuard
-website here, but developers are encouraged to host and maintain their own
-modules.</span></p>
+target="_blank">here</a>. &nbsp;Plug-in modules can be downloaded from the
+PAMGuard website here, but developers are encouraged to host and maintain their
+own modules.</span></p>
 
 <p class=MsoNormal><span lang=EN-US>Modules of interest to the general PAM
 community will remain as part of the core PAMGuard installation. However,
@@ -2466,9 +2498,9 @@ dependencies)</span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>Other Changes</span></b></p>
 
-<p class=MsoNormal><span lang=EN-US>The installer has been updated to handle
-both 64 bit and 32 bit installations. PAMGuard psf files are now registered in
-the Windows Registry, so double-clicking on a psf file should run PAMGuard in
+<p class=MsoNormal><span lang=EN-US>The installer has been updated to handle both
+64 bit and 32 bit installations. PAMGuard psf files are now registered in the
+Windows Registry, so double-clicking on a psf file should run PAMGuard in
 normal mode (as opposed to Viewer or Mixed modes). Note that the Windows
 Registry can only hold a single executable reference for psf files; therefore,
 for users with multiple installations of PAMGuard, double-clicking on a psf
@@ -2607,8 +2639,8 @@ lang=EN-US>3.</span><span lang=EN-US style='font-size:7.0pt;font-family:"Times N
 
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'>4.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span><span lang=EN-US>Bug 290. Click bearings on spectrogram display plug in
-were reversed if the first hydrophone was behind the second hydrophone in the
+</span><span lang=EN-US>Bug 290. Click bearings on spectrogram display plug in were
+reversed if the first hydrophone was behind the second hydrophone in the
 configuration. This is now fixed so that it displays the same bearings as the
 main click detector display. </span></p>
 
@@ -2699,10 +2731,10 @@ since V 1.15.03:</p>
 
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'>1.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 272. File types: Some File Open / File Save dialogs were allowing
-selection of all file types. e.g. Save Configuration As, Section of whistle
-classifier training file, Map file Selection, These have now been changed so
-that only the correct type of file can be selected.</p>
+</span>Bug 272. File types: Some File Open / File Save dialogs were allowing selection
+of all file types. e.g. Save Configuration As, Section of whistle classifier
+training file, Map file Selection, These have now been changed so that only the
+correct type of file can be selected.</p>
 
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'>2.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2935,9 +2967,9 @@ See the help file for details.</span></p>
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span><span lang=EN-US>Feature Request 45.</span><span lang=EN-US
 style='font-size:7.0pt'> </span><span lang=EN-US>Click classification settings
-export / import. Click classification settings can be exported individually to files
-and imported into other click detector configurations. See the help file for
-details. </span></p>
+export / import. Click classification settings can be exported individually to
+files and imported into other click detector configurations. See the help file
+for details. </span></p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>3.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -3094,9 +3126,9 @@ option with caution !</p>
 
 <p class=MsoListParagraph style='margin-left:47.25pt;text-indent:-29.25pt'><span
 lang=EN-US>5.</span><span lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>The Open Office Database system has been removed from the list of
-available options since it is not reliable. If you require a free database
-solution we recommend you use the MySql Community Server <a
+</span>The Open Office Database system has been removed from the list of available
+options since it is not reliable. If you require a free database solution we
+recommend you use the MySql Community Server <a
 href="http://dev.mysql.com/downloads/mysql/">http://dev.mysql.com/downloads/mysql/</a></p>
 
 <p class=MsoListParagraph style='margin-left:47.25pt;text-indent:-29.25pt'><span
@@ -3151,9 +3183,9 @@ crash when analyzing click event containing unclassified clicks</span></p>
 
 <p class=MsoListParagraph style='margin-left:47.25pt;text-indent:-29.25pt'><span
 lang=EN-US>8.</span><span lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span><span lang=EN-US>Bug 230. Click Bearing Display. With a two hydrophone system,
-clicks calculated to have a bearing of exactly 180 degrees would be displayed
-at 0 degrees on the bearing time display.</span></p>
+</span><span lang=EN-US>Bug 230. Click Bearing Display. With a two hydrophone
+system, clicks calculated to have a bearing of exactly 180 degrees would be
+displayed at 0 degrees on the bearing time display.</span></p>
 
 <p class=MsoListParagraph style='margin-left:36.75pt;text-indent:-18.75pt'><span
 lang=EN-US>&nbsp;</span></p>
@@ -3205,8 +3237,9 @@ total loss of the PAMGuard configuration in viewer mode and has been rectified.
 7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>Bug
 218. SAIL Acquisition card would hang the system. This has also been fixed. </p>
 
-<p class=MsoListParagraph style='text-indent:-18.0pt'>7.&nbsp;&nbsp;&nbsp; Bug 219.
-Problems displaying Offline Click Events in the Viewer map have been fixed. </p>
+<p class=MsoListParagraph style='text-indent:-18.0pt'>7.&nbsp;&nbsp;&nbsp; Bug
+219. Problems displaying Offline Click Events in the Viewer map have been
+fixed. </p>
 
 <p class=MsoNormal>&nbsp;</p>
 
@@ -3288,8 +3321,8 @@ Visual Methods</p>
 <p class=MsoNormal>'<i>Multi Threading</i>' menu item moved from 'Detection'
 (now 'Settings') to 'File'</p>
 
-<p class=MsoNormal>'<i>Start</i>' and '<i>Stop</i>' menu items removed.
-PAMGuard should be started and stopped using the red and black buttons.</p>
+<p class=MsoNormal>'<i>Start</i>' and '<i>Stop</i>' menu items removed. PAMGuard
+should be started and stopped using the red and black buttons.</p>
 
 <p class=MsoNormal><b>New Modules</b></p>
 
@@ -3357,9 +3390,9 @@ help for details. </p>
 <p class=MsoNormal><i>Echo Detector and Sperm Whale IPI Computation</i> (Beta
 only, Sound Measurements Group)</p>
 
-<p class=MsoNormal>These two modules, developed by Brian Miller of the
-Australian Antarctic Division can be used to estimate the inter pulse interval
-of sperm whale clicks. (No help available)</p>
+<p class=MsoNormal>These two modules, developed by Brian Miller of the Australian
+Antarctic Division can be used to estimate the inter pulse interval of sperm
+whale clicks. (No help available)</p>
 
 <p class=MsoNormal>&nbsp;</p>
 
@@ -3870,11 +3903,11 @@ Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif
 
 <p class=MsoNormal>2. Improved offline viewer functionality. </p>
 
-<p class=MsoNormal>The offline viewer is much improved with better data scrolling
-and the ability to view data either stored in the database or the binary
-storage system. Work has stated on functions which read and use data stored in
-audio files. This is currently limited to re-calculating and displaying
-displaying spectrogram data during viewer mode operation.&nbsp; </p>
+<p class=MsoNormal>The offline viewer is much improved with better data
+scrolling and the ability to view data either stored in the database or the
+binary storage system. Work has stated on functions which read and use data
+stored in audio files. This is currently limited to re-calculating and
+displaying displaying spectrogram data during viewer mode operation.&nbsp; </p>
 
 <p class=MsoNormal>3. Heading sensor readout</p>
 
@@ -4081,13 +4114,13 @@ port is closed. Might prevent a few problems when using a GPS. </p>
 
 <p class=MsoNormal><b>Bug Fixes</b></p>
 
-<p class=MsoNormal>Crashes caused in real time or Mixed Mode if the number of software
-channels exceeds the number of hydrophones configured in the array manager. It
-is of course illogical to have software channels which are not assigned to a
-hydrophone, so rather than entirely prevent PAMGUARD from crashing I have
-inserted additional checks into the hydrophone array dialog which will prevent
-the user from closing that dialog unless all software channels are assigned to
-a hydrophone. </p>
+<p class=MsoNormal>Crashes caused in real time or Mixed Mode if the number of
+software channels exceeds the number of hydrophones configured in the array
+manager. It is of course illogical to have software channels which are not
+assigned to a hydrophone, so rather than entirely prevent PAMGUARD from
+crashing I have inserted additional checks into the hydrophone array dialog
+which will prevent the user from closing that dialog unless all software
+channels are assigned to a hydrophone. </p>
 
 <h2><span style='font-weight:normal'>Version 1.8.01 Beta February 2010</span></h2>
 
@@ -4409,9 +4442,9 @@ now been fixed. </p>
 
 <p class=MsoNormal><b>Sound Recorder</b></p>
 
-<p class=MsoNormal>Level meters are shown for the correct channels (after channel
-numbering has been changed). Occasional crash due to synchronisation problems
-when &nbsp;multi-threading now fixed.</p>
+<p class=MsoNormal>Level meters are shown for the correct channels (after
+channel numbering has been changed). Occasional crash due to synchronisation
+problems when &nbsp;multi-threading now fixed.</p>
 
 <p class=MsoNormal><b>Whistle Detector</b></p>
 
@@ -4685,9 +4718,9 @@ Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Better drawing of held spectrogram when putting mark rectangles on a spectrogram
-display. All panels are now correctly frozen. The rectangle is drawn in red on
-the marked panel and in green on other panels. </p>
+</span>Better drawing of held spectrogram when putting mark rectangles on a
+spectrogram display. All panels are now correctly frozen. The rectangle is
+drawn in red on the marked panel and in green on other panels. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -4703,9 +4736,9 @@ coming in through the ASIO card and back out through its headphone socket
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span>Operation will depend on the configuration of individual sound cards and
-how they are configured to mix incoming data with data from the PC. This is sometimes
-a physical switch on the card and sometimes a software configuration utility
-specific to that sound card. </p>
+how they are configured to mix incoming data with data from the PC. This is
+sometimes a physical switch on the card and sometimes a software configuration
+utility specific to that sound card. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
