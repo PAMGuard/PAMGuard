@@ -21,6 +21,7 @@ public class CounterControl extends SimpleControl {
 	
 	Character suffix;
 	
+	public enum CounterSuffix {NOSUFFIX, CHARSUFFIX};
 	
 	public CounterControl(ControlDescription controlDescription,
 			LoggerForm loggerForm) {
@@ -36,25 +37,19 @@ public class CounterControl extends SimpleControl {
 		
 	}
 	
-	
-	
-	
-
-
-
 	private String calculateCounter() {
 		int num = FormCounterManagement.getInstance().getCounterNumber(this,controlDescription.getFormDescription().getDBTABLENAME());
 		
-		String numSt = Integer.toString(num);
-		int nZeros = 3-numSt.length();
-		
-		String tSt = "";
-		for (int i=0;i<nZeros;i++){
-			tSt+="0";
-//			System.out.println(tSt);
-		}
-		
-		numSt = tSt+numSt;
+		String numSt = String.format("%03d", num);
+//		int nZeros = 3-numSt.length();
+//		
+//		String tSt = "";
+//		for (int i=0;i<nZeros;i++){
+//			tSt+="0";
+////			System.out.println(tSt);
+//		}
+//		
+//		numSt = tSt+numSt;
 //		System.out.println(tSt);
 //		System.out.println(numSt);
 		
@@ -109,21 +104,13 @@ public class CounterControl extends SimpleControl {
 		
 	}
 	
-	
-	
-	
-
 	@Override
 	AbstractFormatter getAbstractformatter() {
 		
 		DefaultFormatter formatter = new DefaultFormatter();
 		return formatter;
 		
-		
-		
 	}
-
-
 
 	public void updateCounter() {
 		if (loggerForm.getNewOrEdit()==LoggerForm.EditDataForm) return;
@@ -131,9 +118,5 @@ public class CounterControl extends SimpleControl {
 		setData(calculateCounter());
 	}
 
-	
-	
-	
-	
 }
 
