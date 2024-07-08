@@ -244,7 +244,6 @@ public class ColourArray implements Cloneable, Serializable{
 			colors[4]=Color.web("#0000ff");
 			colors[5]=Color.web("#ff00ff");
 			colors[6]=Color.web("#ff0000");
-
 			return colors; 
 		case PATRIOTIC:
 			colors=new Color[3];
@@ -254,22 +253,22 @@ public class ColourArray implements Cloneable, Serializable{
 			return colors; 
 		case MATLAB:
 			colors=new Color[7];
-			colors[0]= Color.color( 0,    0.4470,    0.7410);
-			colors[1]= Color.color(0.8500 ,   0.3250   , 0.0980);
-			colors[2]=  Color.color(0.9290 ,   0.6940 ,   0.1250);
-			colors[3]= Color.color( 0.4940 ,   0.1840 ,   0.5560);
-			colors[4]= Color.color(0.4660 ,   0.6740 ,   0.1880);
-			colors[5]= Color.color( 0.3010 ,   0.7450 ,   0.9330);
-			colors[6]= Color.color(   0.6350  ,  0.0780 ,   0.1840);
+			colors[0]= Color.color(0,    	 0.4470,    0.7410);
+			colors[1]= Color.color(0.8500,   0.3250,	0.0980);
+			colors[2]=  Color.color(0.9290,  0.6940,   	0.1250);
+			colors[3]= Color.color(0.4940,   0.1840,   	0.5560);
+			colors[4]= Color.color(0.4660,   0.6740,   	0.1880);
+			colors[5]= Color.color(0.3010,   0.7450,   	0.9330);
+			colors[6]= Color.color(0.6350,   0.0780,   	0.1840);
 			return colors; 
 		case PARULA:
 			colors=new Color[6];
-			colors[0]= Color.color(  0.24220,  0.150400,   0.66030);
-			colors[1]= Color.color(  0.264700 ,0.403000  , 0.993500);
-			colors[2]= Color.color(  0.108500,  0.66690 ,  0.873400);
-			colors[3]= Color.color(  0.280900 , 0.796400,   0.526600);
-			colors[4]= Color.color(  0.918400,  0.73080  , 0.18900);
-			colors[5]= Color.color(  0.9769 , 0.98390   ,0.0805000);
+			colors[0]= Color.color(0.24220,  0.150400, 0.66030);
+			colors[1]= Color.color(0.264700, 0.403000, 0.993500);
+			colors[2]= Color.color(0.108500, 0.66690,  0.873400);
+			colors[3]= Color.color(0.280900, 0.796400, 0.526600);
+			colors[4]= Color.color(0.918400, 0.73080,  0.18900);
+			colors[5]= Color.color(0.9769,   0.98390,  0.0805000);
 			return colors; 
 		case INFERNO:
 			return InfernoColorMap.getInfernoColourMap();

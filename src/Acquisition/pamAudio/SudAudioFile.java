@@ -12,6 +12,7 @@ import javax.swing.SwingUtilities;
 import org.pamguard.x3.sud.ChunkHeader;
 import org.pamguard.x3.sud.SudMapListener;
 
+import Acquisition.sud.SudAudioSettingsPane;
 import PamController.PamController;
 import PamUtils.worker.PamWorkProgressMessage;
 import PamUtils.worker.PamWorkWrapper;
@@ -36,6 +37,11 @@ public class SudAudioFile extends WavAudioFile {
 
 	private volatile PamWorker<AudioInputStream> worker;
 	private volatile SudMapWorker sudMapWorker;
+
+	/**
+	 * Settings pane to allow users to set some additional options.  
+	 */
+	private SudAudioSettingsPane sudAudioSettingsPane;
 
 	public SudAudioFile() {
 		super();
@@ -215,6 +221,14 @@ public class SudAudioFile extends WavAudioFile {
 			return done;
 		}
 
+	}
+	
+	@Override
+	public PamAudioSettingsPane getSettingsPane() {
+		if (sudAudioSettingsPane==null) {
+			sudAudioSettingsPane = new SudAudioSettingsPane(this); 
+		}
+		return sudAudioSettingsPane;
 	}
 
 }

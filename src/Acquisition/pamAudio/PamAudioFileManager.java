@@ -56,7 +56,7 @@ public class PamAudioFileManager {
 	 * @param soundFile - the sound file
 	 * @return the audio file loader.
 	 */
-	public PamAudioFileLoader getAudioLoader(File soundFile) {
+	public PamAudioFileLoader getAudioFileLoader(File soundFile) {
 		for (int i = 0; i < pamAudioFileTypes.size(); i++) {
 			if (isExtension(soundFile, pamAudioFileTypes.get(i))) {
 				return pamAudioFileTypes.get(i);
@@ -168,6 +168,23 @@ public class PamAudioFileManager {
 	 */
 	public ArrayList<PamAudioFileLoader> getAudioFileLoaders() {
 		return this.pamAudioFileTypes;
+	}
+	
+	/**
+	 * Get the loaders which are needed to open a list of files
+	 * @param  files - the files to find audio loaders for. 
+	 * @return a list of the  audio loaders required for the file list
+	 */
+	public ArrayList<PamAudioFileLoader> getAudioFileLoaders(ArrayList<? extends File> files) {
+		ArrayList<PamAudioFileLoader> audioLoaders = new ArrayList<PamAudioFileLoader>(); 
+		PamAudioFileLoader loader;
+		for (int i=0; i<files.size(); i++) {
+			 loader =  getAudioFileLoader(files.get(i)); 
+			 if (!audioLoaders.contains(loader)) {
+				 audioLoaders.add(loader); 
+			 }
+		}
+		return audioLoaders;
 	}
 
 	/**

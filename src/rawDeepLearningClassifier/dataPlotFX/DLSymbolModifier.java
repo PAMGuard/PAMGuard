@@ -2,6 +2,7 @@ package rawDeepLearningClassifier.dataPlotFX;
 
 import java.awt.Color;
 
+import PamUtils.PamArrayUtils;
 import PamView.GeneralProjector;
 import PamView.PamSymbolType;
 import PamView.symbol.PamSymbolChooser;
@@ -20,7 +21,8 @@ import rawDeepLearningClassifier.logging.DLAnnotationType;
 
 
 /**
- * The DL symbol modifier. Colours symbols by prediction.
+ * The DL symbol modifier. Colours symbols by eother the vlaue of the prediction by a user selected class
+ * or by the class with the highest prediction value. 
  * 
  * @author Jamie Macaulay. 
  *
@@ -94,7 +96,70 @@ public class DLSymbolModifier extends SymbolModifier {
 			return null; 
 		}	
 		
-		//System.out.println("Class index: " + dlSymbolOptions.classIndex); 
+		
+		//modify the default symbol
+		if (dlSymbolOptions.colTypeSelection == DLSymbolModifierParams.PREDICITON_COL) {
+			getSymbolDataPred(annotation);
+		}
+		
+		else if (dlSymbolOptions.colTypeSelection == DLSymbolModifierParams.CLASS_COL) {
+			getSymbolDataClass(annotation);
+		}
+		
+		return symbolData;
+	}
+	
+	/**
+	 * Get symbol data for colouring by the species class with the maximum prediction
+	 * @param annotation - the annotation
+	 * @return symbol data for colouring by class maximum. 
+	 */
+	private SymbolData getSymbolDataClass(DLAnnotation annotation ) {
+
+		boolean passed = false; 
+		int colIndex = -1; 
+		
+		float[][] results = new float[ annotation.getModelResults().size()][]; 
+		
+		//A detection might have multiple prediction results, i.e. predictions are a matrix. Need 
+		//to iterate through all the predictions and then work out whihc is the maximum. That index is then then]
+		//class colour. 
+		int i=0;
+		for (PredictionResult modelResult: annotation.getModelResults()) {
+			if (modelResult.isBinaryClassification()) passed = true; 
+			results[i] = modelResult.getPrediction();
+			i++;
+		}
+		
+		int[] indexBest = PamArrayUtils.maxPos(results); 
+		
+		
+		if (passed || !dlSymbolOptions.showOnlyBinary) {
+			//work out the class colour...
+						
+			javafx.scene.paint.Color color = PamUtilsFX.intToColor(dlSymbolOptions.classColors[indexBest[1]]);
+			
+			Color colorAWT = PamUtilsFX.fxToAWTColor(color);
+			
+			symbolData.setFillColor(colorAWT);
+			symbolData.setLineColor(colorAWT);
+
+			return symbolData; 
+		}
+		else {
+			//has data but we have only show binary option selected. 
+			return null; 
+		}
+		
+	}
+	
+	
+	/**
+	 * Get symbol data for colouring by the prediction value for a selected species class. 
+	 * @param annotation - the annotation
+	 * @return symbol data for colouring by prediction value for a selected species class. 
+	 */
+	private SymbolData getSymbolDataPred(DLAnnotation annotation ) {
 		
 		if (dlSymbolOptions.classIndex<0) {
 			dlSymbolOptions.classIndex=0;

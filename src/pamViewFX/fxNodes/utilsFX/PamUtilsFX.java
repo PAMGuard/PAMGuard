@@ -632,13 +632,37 @@ public class PamUtilsFX {
 	 * @param color - the color. 
 	 * @return the color. 
 	 */
-	 public static String toRGBCode( Color color )
-	    {
-	        return String.format( "#%02X%02X%02X",
-	            (int)( color.getRed() * 255 ),
-	            (int)( color.getGreen() * 255 ),
-	            (int)( color.getBlue() * 255 ) );
-	    }
+	public static String toRGBCode( Color color ){
+		return String.format( "#%02X%02X%02X",
+				(int)( color.getRed() * 255 ),
+				(int)( color.getGreen() * 255 ),
+				(int)( color.getBlue() * 255 ) );
+	}
+	 
+	 
+	 /**
+	  * Convert a colour to an int.
+	  * @param c - the colour to change.
+	  * @return the int representation of the colour
+	  */
+	 public static int colorToInt(Color c) {
+		    int r = (int) Math.round(c.getRed() * 255);
+		    int g = (int) Math.round(c.getGreen() * 255);
+		    int b = (int) Math.round(c.getBlue() * 255);
+		    return (r << 16) | (g << 8) | b;
+		}
+	 
+	 /**
+	  * Convert an int encoded with a colour to a Color object. 
+	  * @param value - the int to convert to colour
+	  * @return the Color object for the int
+	  */
+	 public static Color intToColor(int value) {
+		    int r = (value >>> 16) & 0xFF;
+		    int g = (value >>> 8) & 0xFF;
+		    int b = value & 0xFF;
+		    return Color.rgb(r,g,b);
+		}
 	
 
 }

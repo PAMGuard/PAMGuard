@@ -180,7 +180,6 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 
 		this.acquisitionDialog = acquisitionDialog;
 
-
 		return getDialogPanel();
 	}
 
@@ -197,7 +196,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 
 	protected JPanel createDaqDialogPanel() {
 
-		JPanel p = new JPanel();
+		PamPanel p = new PamPanel();
 		p.setBorder(new TitledBorder("Select sound file"));
 		GridBagLayout layout = new GridBagLayout();
 		layout.columnWidths = new int[]{100, 100, 10};
@@ -252,6 +251,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		//		constraints.gridwidth = 2;
 		//		addComponent(p, fileDateText = new JTextField(), constraints);
 		//		fileDateText.setEnabled(false);
+
 		return p;
 
 	}
