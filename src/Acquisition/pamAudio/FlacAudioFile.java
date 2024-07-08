@@ -233,4 +233,10 @@ public class FlacAudioFile implements PamAudioFileLoader {
 		return (end.equals(".flac"));
 	}
 
+	@Override
+	public PamAudioSettingsPane getSettingsPane() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

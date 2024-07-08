@@ -32,6 +32,7 @@ import javafx.application.Platform;
 import pamguard.GlobalArguments;
 import Acquisition.pamAudio.PamAudioFileManager;
 import Acquisition.pamAudio.PamAudioFileFilter;
+import Acquisition.pamAudio.PamAudioFileLoader;
 import Acquisition.pamAudio.PamAudioSystem;
 import PamController.DataInputStore;
 import PamController.InputStoreInfo;
@@ -92,6 +93,12 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 	 * Text field for skipping initial few seconds of a file. 
 	 */
 	private JTextField skipSecondsField;
+	
+	/**
+	 * Panel which shows bespoke settings for certain audio loaders. Contains nothing
+	 * if the audio loader has no settings or no file is selected. 
+	 */
+	protected PamPanel audioLoaderHolder;
 
 	@Override
 	public boolean runFileAnalysis() {
@@ -170,6 +177,8 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		}
 
 	}
+	
+	
 	@Override
 	protected JPanel createDaqDialogPanel() {
 		JPanel p = new JPanel();
@@ -228,6 +237,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		constraints.gridwidth = 2;
 		constraints.fill = GridBagConstraints.NONE;
 		constraints.anchor = GridBagConstraints.WEST;
+
 		addComponent(p, mergeFiles = new JCheckBox("Merge contiguous files"), constraints);
 		if (PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW) {
 			constraints.gridx+=2;
@@ -236,18 +246,28 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			checkFiles.addActionListener(new CheckFiles());
 		}
 
-//		if (SMRUEnable.isEnable()) {
+		//		if (SMRUEnable.isEnable()) {
 		// no reason to hide this option from users. 
-			constraints.gridy++;
-			constraints.gridx = 0;
-			constraints.gridwidth = 1;
-			addComponent(p,  new JLabel("Skip initial :"), constraints);
-			constraints.gridx++;
-			addComponent(p, skipSecondsField = new JTextField(4), constraints);
-			constraints.gridx++;
-			addComponent(p,  new JLabel("seconds"), constraints);
-			constraints.anchor = GridBagConstraints.EAST;
-//		}
+		constraints.gridy++;
+		constraints.gridx = 0;
+		constraints.gridwidth = 1;
+		addComponent(p,  new JLabel("Skip initial :"), constraints);
+		constraints.gridx++;
+		addComponent(p, skipSecondsField = new JTextField(4), constraints);
+		constraints.gridx++;
+		addComponent(p,  new JLabel("seconds"), constraints);
+		constraints.anchor = GridBagConstraints.EAST;
+		//		}
+
+
+		//panel to show bespoke settings for certain audio loaders. 
+		constraints.gridx = 0;
+		constraints.gridy++;
+		constraints.gridwidth = 3;
+		addComponent(p,  audioLoaderHolder = new PamPanel(), constraints);
+
+		GridBagLayout layout2 = new GridBagLayout();
+		audioLoaderHolder.setLayout(layout2);
 
 		return p;
 	}
@@ -525,10 +545,14 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		List<WavFileType> asList = allFiles;
 		setSelectedFileTypes(acquisitionControl.soundFileTypes.getUsedTypes(allFiles));
 
+		//set the date of the first file. 
 		setFileDateText();
+		
+		//set any bespoke options for the files to be laoded. 
+		setFileOptionPanel();
+		
 		// also open up the first file and get the sample rate and number of channels from it
 		// and set these
-
 		File file = getCurrentFile();
 		if (file == null) return;
 		AudioInputStream audioStream;		
@@ -558,7 +582,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		/****FX GUI stuff****/
 		if (folderInputPane!=null) {
 			Platform.runLater(()->{
-			folderInputPane.newFileList(fileListData); 
+				folderInputPane.newFileList(fileListData); 
 			});
 		}
 	}
@@ -572,7 +596,38 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 	protected int fudgeNumChannels(int nChannels) {
 		return nChannels;
 	}
+	
+	/**
+	 * Set bespoke options for certain file types. 
+	 */
+	public void setFileOptionPanel() {
+		getDialogPanel(); // make sure panel is created
 
+		audioLoaderHolder.removeAll();
+
+		if (allFiles.size() > 0) {
+			//Get all the audio file laoders that will be used for this list of files. Usually 
+			//just one but possible that there can be mixed files. 
+			ArrayList<PamAudioFileLoader> loaders = PamAudioFileManager.getInstance().getAudioFileLoaders(allFiles);
+
+			GridBagConstraints constraints = new GridBagConstraints();
+			constraints.gridx = 0;
+			constraints.gridy = 0;
+			for (PamAudioFileLoader loader : loaders) {
+				if (loader.getSettingsPane()!=null) {
+//					System.out.println("ADD AUDIO PANEL: " +loader.getSettingsPane().getAudioLoaderPanel());
+					//gridbag layout
+					addComponent(audioLoaderHolder, loader.getSettingsPane().getAudioLoaderPanel(), constraints);
+					constraints.gridy++;
+				}
+			}
+		}
+
+	}
+
+	/**
+	 * Show the date of the first file in the dialog. 
+	 */
 	public void setFileDateText() {
 		if (allFiles.size() > 0) {
 			long fileTime = getFileStartTime(getCurrentFile());

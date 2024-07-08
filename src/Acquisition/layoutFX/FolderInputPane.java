@@ -48,7 +48,7 @@ import pamViewFX.fxNodes.PamProgressBar;
 import pamViewFX.fxNodes.PamVBox;
 
 /**
- * Pane for the folder input of the sound acquisition. 
+ * JavaFX pane for the folder input of the sound acquisition. 
  * 
  * @author Jamie Macaulay 
  *
