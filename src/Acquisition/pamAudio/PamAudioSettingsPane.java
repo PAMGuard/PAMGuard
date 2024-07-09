@@ -3,6 +3,9 @@ package Acquisition.pamAudio;
 import PamView.panel.PamPanel;
 import javafx.scene.layout.Pane;
 
+/**
+ * User controls to change bespoke settings for audio loaders. 
+ */
 public interface PamAudioSettingsPane {
 	
 	/**
@@ -16,6 +19,16 @@ public interface PamAudioSettingsPane {
 	 * @return
 	 */
 	public PamPanel getAudioLoaderPanel();
+
+	/**
+	 * Get the parameters. This called whenever the settings dialog or pane is closed. 
+	 */
+	public void getParams();
+
+	/**
+	 * Set parameters. This is called when the dialog or pane is opened. 
+	 */
+	public void setParams();
 
 
 }

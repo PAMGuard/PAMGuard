@@ -53,6 +53,7 @@ public interface PamAudioFileLoader {
 	 * @return settings pane for audio loader - can be null. 
 	 */
 	public PamAudioSettingsPane getSettingsPane();
+
 	
 
 }
