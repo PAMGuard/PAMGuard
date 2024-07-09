@@ -1,4 +1,4 @@
-package Acquisition.pamAudio;
+package Acquisition.sud;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,15 +25,32 @@ public class SudAudioFileReader {
 	 */
 	SudParams sudParams; 
 
-
+	/**
+	 * Constructor to create an Sud Audio reader with a
+	 * default true to zeropad sud files. 
+	 * */
 	public SudAudioFileReader() {
+		this(true); 
+	} 
+	
+	
+	/**
+	 * Constructor to create an Sud Audio reader. Allows the option of zero padding.
+	 * Zero padding fills gaps in sud files with zeros - these gaps are usually due
+	 * to errors in the recording hardware.Without zero pad then time drift within a
+	 * file can be difficult to predict, however zero padding means the sample
+	 * numbers in other files e.g. csv sensor files will not align.
+	 * 
+	 * @param zeroPad - true to zero pad sud files.
+	 */
+	public SudAudioFileReader(boolean zeroPad) {
 		 sudParams = new SudParams();
 		 //set up the sud params for default. i.e. just read files and
 		 //don't save any decompressed or meta data.
 //		 sudParams.saveWav = false;
 //		 sudParams.saveMeta = false;
 		 sudParams.setFileSave(false, false, false, false);
-		 sudParams.zeroPad = true;
+		 sudParams.zeroPad = zeroPad;
 	} 
 	
 	/**

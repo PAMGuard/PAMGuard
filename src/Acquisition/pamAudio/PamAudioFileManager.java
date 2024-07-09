@@ -9,6 +9,8 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 import org.codehaus.plexus.util.FileUtils;
 
+import Acquisition.sud.SudAudioFile;
+
 /**
  * Central class for opening sound files.
  * <p>

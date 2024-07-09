@@ -256,11 +256,11 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		addComponent(p, skipSecondsField = new JTextField(4), constraints);
 		constraints.gridx++;
 		addComponent(p,  new JLabel("seconds"), constraints);
-		constraints.anchor = GridBagConstraints.EAST;
 		//		}
 
 
 		//panel to show bespoke settings for certain audio loaders. 
+		constraints.anchor = GridBagConstraints.WEST;
 		constraints.gridx = 0;
 		constraints.gridy++;
 		constraints.gridwidth = 3;
@@ -618,6 +618,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 //					System.out.println("ADD AUDIO PANEL: " +loader.getSettingsPane().getAudioLoaderPanel());
 					//gridbag layout
 					addComponent(audioLoaderHolder, loader.getSettingsPane().getAudioLoaderPanel(), constraints);
+					loader.getSettingsPane().setParams();
 					constraints.gridy++;
 				}
 			}
@@ -823,6 +824,17 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 				return false; 
 			}
 		}
+		
+		//get bespoke paramters from selected audio loaders. 
+		ArrayList<PamAudioFileLoader> loaders = PamAudioFileManager.getInstance().getAudioFileLoaders(allFiles);
+
+	
+		for (PamAudioFileLoader loader : loaders) {
+			if (loader.getSettingsPane()!=null) {
+				loader.getSettingsPane().getParams();
+			}
+		}
+		
 		return super.dialogGetParams();
 	}
 
@@ -1005,6 +1017,8 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		String bs = String.format("%d,%d,%d,%s", nFiles,currentFile,generalStatus,currFile);
 		return bs;
 	}
+	
+	
 
 
 }

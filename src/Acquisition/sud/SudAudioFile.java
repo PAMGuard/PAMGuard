@@ -1,7 +1,8 @@
-package Acquisition.pamAudio;
+package Acquisition.sud;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -12,8 +13,13 @@ import javax.swing.SwingUtilities;
 import org.pamguard.x3.sud.ChunkHeader;
 import org.pamguard.x3.sud.SudMapListener;
 
-import Acquisition.sud.SudAudioSettingsPane;
+import Acquisition.AcquisitionParameters;
+import Acquisition.pamAudio.PamAudioSettingsPane;
+import Acquisition.pamAudio.WavAudioFile;
+import PamController.PamControlledUnitSettings;
 import PamController.PamController;
+import PamController.PamSettingManager;
+import PamController.PamSettings;
 import PamUtils.worker.PamWorkProgressMessage;
 import PamUtils.worker.PamWorkWrapper;
 import PamUtils.worker.PamWorker;
@@ -31,21 +37,32 @@ import PamUtils.worker.PamWorker;
  * @author Jamie Macaulay
  *
  */
-public class SudAudioFile extends WavAudioFile {
+public class SudAudioFile extends WavAudioFile implements PamSettings {
 
 	private Object conditionSync = new Object();
 
 	private volatile PamWorker<AudioInputStream> worker;
+	
 	private volatile SudMapWorker sudMapWorker;
 
 	/**
 	 * Settings pane to allow users to set some additional options.  
 	 */
 	private SudAudioSettingsPane sudAudioSettingsPane;
+	
+	/**
+	 * Parameters for the sud file. TODO Note: PamAudioManager is always a single
+	 * instance referenced globally from PAMGuard. Having parameters is therefore
+	 * slightly problematic because they will apply across SoundAcquisition modules.
+	 * So in the case that someone is using two or more Sound Acquisition modules
+	 * then selecting zero and non -zero pad would be impossible
+	 */
+	private PamSudParams sudParams = new PamSudParams(); 
 
 	public SudAudioFile() {
 		super();
 		fileExtensions = new ArrayList<String>(Arrays.asList(new String[] { ".sud" }));
+		PamSettingManager.getInstance().registerSettings(this);
 	}
 
 	@Override
@@ -69,7 +86,7 @@ public class SudAudioFile extends WavAudioFile {
 				if (new File(soundFile.getAbsolutePath() + "x").exists()) {
 //				System.out.println("----NO NEED TO MAP SUD FILE-----"  + soundFile);
 					try {
-						return new SudAudioFileReader().getAudioInputStream(soundFile);
+						return new SudAudioFileReader(sudParams.zeroPad).getAudioInputStream(soundFile);
 					} catch (UnsupportedAudioFileException | IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -187,7 +204,7 @@ public class SudAudioFile extends WavAudioFile {
 //				System.out.println("START OPEN SUD FILE:");
 
 				this.sudMapListener = new SudMapProgress(pamWorker);
-				stream = new SudAudioFileReader().getAudioInputStream(soundFile, sudMapListener);
+				stream = new SudAudioFileReader(sudParams.zeroPad).getAudioInputStream(soundFile, sudMapListener);
 
 //				System.out.println("END SUD FILE:");
 
@@ -229,6 +246,44 @@ public class SudAudioFile extends WavAudioFile {
 			sudAudioSettingsPane = new SudAudioSettingsPane(this); 
 		}
 		return sudAudioSettingsPane;
+	}
+
+	@Override
+	public String getUnitName() {
+		return "PamAudioManager";
+	}
+
+	@Override
+	public String getUnitType() {
+		return "sud_files";
+	}
+
+	@Override
+	public Serializable getSettingsReference() {
+		return sudParams;
+	}
+
+	@Override
+	public long getSettingsVersion() {
+		return PamSudParams.serialVersionUID;
+	}
+
+
+	@Override
+	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
+			try {
+				sudParams = ((PamSudParams) pamControlledUnitSettings.getSettings()).clone();
+				
+				return true;
+			}
+			catch (ClassCastException e) {
+				e.printStackTrace();
+			}
+			return false;
+	}
+
+	public PamSudParams getSudParams() {
+		return this.sudParams;
 	}
 
 }
