@@ -3,6 +3,7 @@ package Acquisition.pamAudio;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -177,7 +178,7 @@ public class PamAudioFileManager {
 	 * @param  files - the files to find audio loaders for. 
 	 * @return a list of the  audio loaders required for the file list
 	 */
-	public ArrayList<PamAudioFileLoader> getAudioFileLoaders(ArrayList<? extends File> files) {
+	public ArrayList<PamAudioFileLoader> getAudioFileLoaders(List<? extends File> files) {
 		ArrayList<PamAudioFileLoader> audioLoaders = new ArrayList<PamAudioFileLoader>(); 
 		PamAudioFileLoader loader;
 		for (int i=0; i<files.size(); i++) {
