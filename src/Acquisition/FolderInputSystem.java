@@ -853,6 +853,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		if (skipSecondsField!=null) {
 			skipSecondsField.setText(String.format("%.1f", fileInputParameters.skipStartFileTime/1000.));
 		}
+		
 	}
 
 	@Override
