@@ -361,7 +361,7 @@ public class DLSymbolOptionPane extends StandardSymbolModifierPane {
 		classNameBox2.getSelectionModel().select(Math.max(symbolOptions.classIndex2, 0));
 		
 		
-		int index = symbolOptions.classIndex2>=0? symbolOptions.classIndex2 : 0;
+		int index = symbolOptions.classIndex2>=0 ? symbolOptions.classIndex2 : 0;
 		
 		if (symbolOptions.classColors==null) {
 			symbolOptions.setDefaultClassColors(nClass);

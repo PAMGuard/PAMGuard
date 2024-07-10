@@ -415,7 +415,7 @@ public class DLClassifyProcess extends PamInstantProcess {
 				else {
 					/****Add annotation to existing data unit (e.g. click, clip or other RawDataHolder)****/
 					//Need to go by the parent data unit for merging data not the segments. Note that we may still add multiple
-					//predicitions to a single data unit depending on how many segments it contains. 
+					//predictions to a single data unit depending on how many segments it contains. 
 
 					//System.out.println("New model data " + pamRawData.getParentDataUnit().getUID() + " " + groupDataBuffer[i].size() + " " + modelResultDataBuffer[i].size()); 
 

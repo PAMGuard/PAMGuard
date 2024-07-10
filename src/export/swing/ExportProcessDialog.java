@@ -76,7 +76,6 @@ public class ExportProcessDialog {
 
 
 	public void createExportGroup() {
-
 		//clear current tasks. 
 		dlOfflineGroup.clearTasks();
 
@@ -88,7 +87,6 @@ public class ExportProcessDialog {
 				dlOfflineGroup.addTask(new ExportTask(dataBlocks.get(i), exportManager));
 			}
 		}
-		
 	}
 	////---Swing stuff----/// should not be here but this is how PG works. 
 
@@ -388,7 +386,7 @@ public class ExportProcessDialog {
 
 
 	/**
-	 * Export taks group. 
+	 * Export task
 	 */
 	class ExportTaskGroup extends OfflineTaskGroup {
 
