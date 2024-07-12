@@ -173,8 +173,19 @@ public class AcquisitionControl extends RawInputControlledUnit implements PamSet
 		
 		registerDaqSystem(new SoundCardSystem(this));
 		if (PlatformInfo.calculateOS() == OSType.WINDOWS) {
+			long tic = System.currentTimeMillis();
+			long toc = tic;
 			registerDaqSystem(new ASIOSoundSystem(this));
+			toc = System.currentTimeMillis();
+			if (toc-tic>1000) {
+				System.out.printf("Registering ASIOSoundSystem took %3.1fs\n", (double)(toc-tic)/1000.);
+			}
+			tic = System.currentTimeMillis();
 			registerDaqSystem(new NewAsioSoundSystem(this));
+			toc = System.currentTimeMillis();
+			if (toc-tic>1000) {
+				System.out.printf("Registering NewAsioSoundSystem took %3.1fs\n", (double)(toc-tic)/1000.);
+			}
 		}
 		registerDaqSystem(new FileInputSystem(this));
 		registerDaqSystem(folderSystem = new FolderInputSystem(this));

@@ -26,11 +26,19 @@ public class StreamExportParams implements Serializable {
 
 	/**
 	 * Datablock long data name (used instead of datablock
-	 * reference so this object and serialise. 
+	 * reference so this object is serialise. 
 	 */
 	public String longDataName;
 	
-	public boolean selected;
+	/**
+	 * Have selected export of detections. 
+	 */
+	public boolean exportDetections;
+	
+	/**
+	 * Have selected export of localisations. 
+	 */
+	public boolean exportLocalisations;
 	
 	/**
 	 * Granularity type, binned, call, encounter, grouped. 
@@ -74,10 +82,9 @@ public class StreamExportParams implements Serializable {
 		return detectionDescription;
 	}
 
-	public StreamExportParams(TethysControl tethysControl, PamDataBlock dataBlock, boolean selected) {
+	public StreamExportParams(TethysControl tethysControl, PamDataBlock dataBlock) {
 		super();
 		this.longDataName = dataBlock.getLongDataName();
-		this.selected = selected;
 		autoFill(tethysControl, dataBlock);
 	}
 

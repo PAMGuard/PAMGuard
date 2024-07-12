@@ -6,6 +6,7 @@ import Array.ArrayManager;
 import Array.PamArray;
 import Jama.Matrix;
 import Jama.QRDecomposition;
+import PamDetection.LocContents;
 import PamUtils.PamUtils;
 import pamMaths.PamVector;
 
@@ -17,111 +18,111 @@ import pamMaths.PamVector;
  */
 public class PairBearingLocaliser implements BearingLocaliser {
 
-	public class LSQBearingLocaliser implements BearingLocaliser {
-	
-		private int hydrophoneBitMap;
-		private long timeMillis;
-		private double timingError;
-		
-		private Matrix hydrophoneVectors, hydrophoneUnitVectors;
-		private double[] hydrophoneSpacing;
-		private PamArray currentArray;
-		private int arrayType;
-		private PamVector[] arrayAxis;
-	//	private LUDecomposition luHydrophoneUnitMatrix;
-		private QRDecomposition qrHydrophones;
-	
-		public LSQBearingLocaliser(int hydrophoneBitMap, long timeMillis, double timingError) {
-			this.hydrophoneBitMap = hydrophoneBitMap;
-			this.timeMillis = timeMillis;
-			this.timingError = timingError;
-		}
-	
-		@Override
-		public void prepare(int[] arrayElements, long timeMillis, double timingError) {
-			/*
-			 * Set up the matrixes of inter hydrophone vectors. 
-			 */
-	
-			hydrophoneBitMap = PamUtils.makeChannelMap(arrayElements); 
-			ArrayManager arrayManager = ArrayManager.getArrayManager();
-			currentArray = arrayManager.getCurrentArray();
-			arrayType = arrayManager.getArrayShape(currentArray, hydrophoneBitMap);
-	
-			arrayAxis = arrayManager.getArrayDirections(currentArray, hydrophoneBitMap);
-			
-			int nHyd = arrayElements.length;
-			int nDelay = (nHyd*(nHyd-1))/2;
-			hydrophoneVectors = new Matrix(nDelay, 3);
-			hydrophoneUnitVectors = new Matrix(nDelay, 3);
-			hydrophoneSpacing = new double[nDelay];
-			int iRow = 0;
-			for (int i = 0; i < nHyd; i++) {
-				PamVector vi = currentArray.getAbsHydrophoneVector(i, timeMillis);
-				for (int j = i+1; j <nHyd; j++) {
-					PamVector vj = currentArray.getAbsHydrophoneVector(j, timeMillis);
-					PamVector v = vj.sub(vi);
-					hydrophoneSpacing[iRow] = v.norm();
-					PamVector uv = v.getUnitVector();
-					for (int e = 0; e < 3; e++) {
-						hydrophoneVectors.set(iRow, e, v.getElement(e));
-						hydrophoneUnitVectors.set(iRow, e, uv.getElement(e));
-					}
-					iRow++;
-				}
-			}
-	//		luHydrophoneUnitMatrix = new LUDecomposition(hydrophoneUnitVectors);
-			qrHydrophones = new QRDecomposition(hydrophoneUnitVectors);
-		}
-	
-		@Override
-		public int getArrayType() {
-			return arrayType;
-		}
-	
-		@Override
-		public int getHydrophoneMap() {
-			return hydrophoneBitMap;
-		}
-	
-		@Override
-		public PamVector[] getArrayAxis() {
-			return arrayAxis;
-		}	 
-		
-		/* 
-		 * @return true if a new grid needs to be created
-		 */
-		private boolean resetArray(long timeMillis){
-			
-			if (currentArray == null || (this.timeMillis!=timeMillis && currentArray.getHydrophoneLocator().isChangeable())){
-				prepare(PamUtils.getChannelArray(hydrophoneBitMap), timeMillis, 1e-6);
-				this.timeMillis = timeMillis;
-				return true;
-			}
-				
-			return false; 
-		}
-	
-		@Override
-		public double[][] localise(double[] delays, long timeMillis) {
-			resetArray(timeMillis);
-			Matrix normDelays = new Matrix(delays.length, 1);
-			double c = currentArray.getSpeedOfSound();
-			for (int i = 0; i < delays.length; i++) {
-				normDelays.set(i, 0, -delays[i]*c/hydrophoneSpacing[i]);
-			}
-	//		Matrix soln = luHydrophoneUnitMatrix.solve(normDelays);
-			Matrix soln2 = qrHydrophones.solve(normDelays);
-			double[][] angs = new double[2][2];
-			PamVector v = new PamVector(soln2.get(0, 0), soln2.get(1,0), soln2.get(2, 0));
-			double m = v.normalise();
-			angs[0][0] = Math.PI/2. - Math.atan2(v.getElement(0),v.getElement(1));
-			angs[0][1] = Math.asin(v.getElement(2));
-			return angs;
-		}
-	
-	}
+//	public class LSQBearingLocaliser implements BearingLocaliser {
+//	
+//		private int hydrophoneBitMap;
+//		private long timeMillis;
+//		private double timingError;
+//		
+//		private Matrix hydrophoneVectors, hydrophoneUnitVectors;
+//		private double[] hydrophoneSpacing;
+//		private PamArray currentArray;
+//		private int arrayType;
+//		private PamVector[] arrayAxis;
+//	//	private LUDecomposition luHydrophoneUnitMatrix;
+//		private QRDecomposition qrHydrophones;
+//	
+//		public LSQBearingLocaliser(int hydrophoneBitMap, long timeMillis, double timingError) {
+//			this.hydrophoneBitMap = hydrophoneBitMap;
+//			this.timeMillis = timeMillis;
+//			this.timingError = timingError;
+//		}
+//	
+//		@Override
+//		public void prepare(int[] arrayElements, long timeMillis, double timingError) {
+//			/*
+//			 * Set up the matrixes of inter hydrophone vectors. 
+//			 */
+//	
+//			hydrophoneBitMap = PamUtils.makeChannelMap(arrayElements); 
+//			ArrayManager arrayManager = ArrayManager.getArrayManager();
+//			currentArray = arrayManager.getCurrentArray();
+//			arrayType = arrayManager.getArrayShape(currentArray, hydrophoneBitMap);
+//	
+//			arrayAxis = arrayManager.getArrayDirections(currentArray, hydrophoneBitMap);
+//			
+//			int nHyd = arrayElements.length;
+//			int nDelay = (nHyd*(nHyd-1))/2;
+//			hydrophoneVectors = new Matrix(nDelay, 3);
+//			hydrophoneUnitVectors = new Matrix(nDelay, 3);
+//			hydrophoneSpacing = new double[nDelay];
+//			int iRow = 0;
+//			for (int i = 0; i < nHyd; i++) {
+//				PamVector vi = currentArray.getAbsHydrophoneVector(i, timeMillis);
+//				for (int j = i+1; j <nHyd; j++) {
+//					PamVector vj = currentArray.getAbsHydrophoneVector(j, timeMillis);
+//					PamVector v = vj.sub(vi);
+//					hydrophoneSpacing[iRow] = v.norm();
+//					PamVector uv = v.getUnitVector();
+//					for (int e = 0; e < 3; e++) {
+//						hydrophoneVectors.set(iRow, e, v.getElement(e));
+//						hydrophoneUnitVectors.set(iRow, e, uv.getElement(e));
+//					}
+//					iRow++;
+//				}
+//			}
+//	//		luHydrophoneUnitMatrix = new LUDecomposition(hydrophoneUnitVectors);
+//			qrHydrophones = new QRDecomposition(hydrophoneUnitVectors);
+//		}
+//	
+//		@Override
+//		public int getArrayType() {
+//			return arrayType;
+//		}
+//	
+//		@Override
+//		public int getHydrophoneMap() {
+//			return hydrophoneBitMap;
+//		}
+//	
+//		@Override
+//		public PamVector[] getArrayAxis() {
+//			return arrayAxis;
+//		}	 
+//		
+//		/* 
+//		 * @return true if a new grid needs to be created
+//		 */
+//		private boolean resetArray(long timeMillis){
+//			
+//			if (currentArray == null || (this.timeMillis!=timeMillis && currentArray.getHydrophoneLocator().isChangeable())){
+//				prepare(PamUtils.getChannelArray(hydrophoneBitMap), timeMillis, 1e-6);
+//				this.timeMillis = timeMillis;
+//				return true;
+//			}
+//				
+//			return false; 
+//		}
+//	
+//		@Override
+//		public double[][] localise(double[] delays, long timeMillis) {
+//			resetArray(timeMillis);
+//			Matrix normDelays = new Matrix(delays.length, 1);
+//			double c = currentArray.getSpeedOfSound();
+//			for (int i = 0; i < delays.length; i++) {
+//				normDelays.set(i, 0, -delays[i]*c/hydrophoneSpacing[i]);
+//			}
+//	//		Matrix soln = luHydrophoneUnitMatrix.solve(normDelays);
+//			Matrix soln2 = qrHydrophones.solve(normDelays);
+//			double[][] angs = new double[2][2];
+//			PamVector v = new PamVector(soln2.get(0, 0), soln2.get(1,0), soln2.get(2, 0));
+//			double m = v.normalise();
+//			angs[0][0] = Math.PI/2. - Math.atan2(v.getElement(0),v.getElement(1));
+//			angs[0][1] = Math.asin(v.getElement(2));
+//			return angs;
+//		}
+//	
+//	}
 
 	private int[] phoneNumbers;
 	
@@ -206,6 +207,11 @@ public class PairBearingLocaliser implements BearingLocaliser {
 	}
 	
 	
+	@Override
+	public int getLocalisationContents() {
+		return LocContents.HAS_BEARING | LocContents.HAS_AMBIGUITY | LocContents.HAS_AMBIGUITY;
+	}
+
 	/**
 	 * Some hydrophone locators have arrays which change with time. In this case the ML grid localiser will need to recalculate the look up table for localised ppositions
 	 * 

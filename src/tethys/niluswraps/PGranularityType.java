@@ -20,7 +20,7 @@ public class PGranularityType {
 		case BINNED:
 			return "Binned";
 		case CALL:
-			return "Call";
+			return "Call / detection";
 		case ENCOUNTER:
 			return "Encounter";
 		case GROUPED:

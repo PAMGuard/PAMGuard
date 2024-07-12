@@ -14,6 +14,7 @@ import Array.ArrayManager;
 import Array.PamArray;
 import Jama.Matrix;
 import Jama.QRDecomposition;
+import PamDetection.LocContents;
 import PamUtils.PamUtils;
 import pamMaths.PamVector;
 
@@ -37,6 +38,11 @@ public class SimplexBearingLocaliser implements BearingLocaliser {
 		this.hydrophoneBitMap = hydrophoneBitMap;
 		this.timeMillis = timeMillis;
 		this.timingError = timingError;
+	}
+
+	@Override
+	public int getLocalisationContents() {
+		return LocContents.HAS_BEARING | LocContents.HAS_AMBIGUITY;
 	}
 
 	@Override

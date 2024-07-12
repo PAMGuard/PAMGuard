@@ -27,6 +27,7 @@ public class ClickEventTethysDataProvider extends AutoTethysProvider {
 
 	@Override
 	public GranularityEnumType[] getAllowedGranularities() {
+		// these are by definition grouped. 
 		GranularityEnumType[] allowed = {GranularityEnumType.GROUPED};
 		return allowed;
 	}
@@ -59,14 +60,19 @@ public class ClickEventTethysDataProvider extends AutoTethysProvider {
 		addUserDefined(params, numName, number.toString());
 	}
 
+//	@Override
+//	public boolean wantExportDialogCard(ExportWizardCard wizPanel) {
+////		if (wizPanel.getClass() == GranularityCard.class) {
+////			return false;
+////		}
+////		else {
+//			return true;
+////		}
+//	}
+
 	@Override
-	public boolean wantExportDialogCard(ExportWizardCard wizPanel) {
-		if (wizPanel.getClass() == GranularityCard.class) {
-			return false;
-		}
-		else {
-			return true;
-		}
+	public boolean granularityOK(GranularityEnumType granularityType) {
+		return true;
 	}
 
 }
