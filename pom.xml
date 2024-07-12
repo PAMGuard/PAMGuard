@@ -100,7 +100,8 @@
 							<excludes>
 								<exclude>META-INF/*.SF</exclude> <!--  get rid of manifests from library jars - also done in orig ant build file -->
 								<exclude>META-INF/*.DSA</exclude>
-								<exclude>META-INF/*.RSA</exclude>
+								<exclude>META-INF/*.RSA</exclude>								
+								<exclude>test/resources/**</exclude>
 							</excludes>
 						</filter>
 					</filters>
@@ -179,6 +180,24 @@
 	          -->
 	        </executions>
 	      </plugin>
+	      
+	      <!--  Exclude the resource folder from build 
+	      <plugin>
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-resources-plugin</artifactId>
+	        <version>3.2.0</version>
+	        <configuration>
+	          <resources>
+	            <resource>
+	              <directory>src/Resources</directory>  
+	              	<excludes>
+	                	<exclude>src/test/resources/**</exclude>  
+	                </excludes>
+	            </resource>
+	          </resources>
+	        </configuration>
+	      </plugin>-->	
+	      
 	      
 	    </plugins>
     
@@ -308,7 +327,7 @@
 	<dependency>
 		<groupId>io.github.macster110</groupId>
 		<artifactId>jdl4pam</artifactId>
-		<version>0.0.99a</version>
+		<version>0.0.99b</version>
 	</dependency> 
 			
 	<!-- https://mvnrepository.com/artifact/gov.nist.math/jama -->
