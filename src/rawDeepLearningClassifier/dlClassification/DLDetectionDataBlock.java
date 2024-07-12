@@ -74,17 +74,17 @@ public class DLDetectionDataBlock extends AcousticDataBlock<DLDetection> impleme
 	}
 	
 	
-	/* (non-Javadoc)
-	 * @see PamguardMVC.PamDataBlock#getDataSelectCreator()
-	 */
-	@Override
-	public synchronized  DataSelectorCreator getDataSelectCreator() {
-		if (dlDataSelectCreator == null) {
-			dlDataSelectCreator = new DLDataSelectCreator(dlControl, this);
-		}
-		return dlDataSelectCreator;
-	
-	}
+//	/* (non-Javadoc)
+//	 * @see PamguardMVC.PamDataBlock#getDataSelectCreator()
+//	 */
+//	@Override
+//	public synchronized  DataSelectorCreator getDataSelectCreator() {
+//		if (dlDataSelectCreator == null) {
+//			dlDataSelectCreator = new DLDataSelectCreator(dlControl, this);
+//		}
+//		return dlDataSelectCreator;
+//	
+//	}
 
 
 }

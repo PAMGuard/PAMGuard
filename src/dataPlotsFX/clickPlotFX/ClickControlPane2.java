@@ -242,6 +242,7 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 	 * @return the data select pane. 
 	 */
 	private DynamicSettingsPane<Boolean> createDataSelectPane(){		
+		System.out.println("Data selector: " + clickPlotInfo.getClickDataSelector());
 		return clickPlotInfo.getClickDataSelector().getDialogPaneFX();
 	}
 

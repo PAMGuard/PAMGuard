@@ -13,6 +13,8 @@ public class CompoundDataSelector extends DataSelector {
 	
 	private CompoundParams compoundParams = new CompoundParams();
 
+	private CompoundDialogPaneFX compoundPaneFX;
+
 	public CompoundDataSelector(PamDataBlock pamDataBlock, ArrayList<DataSelector> allSelectors,
 			String selectorName, boolean allowScores, String selectorType) {
 		super(pamDataBlock, selectorName, allowScores);
@@ -57,8 +59,10 @@ public class CompoundDataSelector extends DataSelector {
 
 	@Override
 	public DynamicSettingsPane<Boolean> getDialogPaneFX() {
-		// TODO Auto-generated method stub
-		return null;
+		if (compoundPaneFX==null) {
+			compoundPaneFX = new CompoundDialogPaneFX(this);
+		}
+		return compoundPaneFX;
 	}
 
 	@Override
