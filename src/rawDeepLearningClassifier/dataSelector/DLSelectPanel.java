@@ -1,6 +1,7 @@
 package rawDeepLearningClassifier.dataSelector;
 
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 
 import PamView.dialog.PamDialogPanel;
 
@@ -16,7 +17,7 @@ public class DLSelectPanel implements PamDialogPanel {
 	@Override
 	public JComponent getDialogComponent() {
 		// TODO Auto-generated method stub
-		return null;
+		return new JLabel("Hello Annotation DL");
 	}
 
 	@Override
@@ -28,7 +29,7 @@ public class DLSelectPanel implements PamDialogPanel {
 	@Override
 	public boolean getParams() {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 }
