@@ -3,6 +3,7 @@ package rawDeepLearningClassifier.dataSelector;
 
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataSelector.DataSelectParams;
+import pamViewFX.fxSettingsPanes.DynamicSettingsPane;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dlClassification.DLDetection;
 import rawDeepLearningClassifier.dlClassification.PredictionResult;
@@ -79,6 +80,13 @@ public class DLPredictionFilter implements DLDataFilter {
 			}
 
 		}
+	}
+
+
+	@Override
+	public DynamicSettingsPane<DataSelectParams> getSettingsPane() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 //	/**

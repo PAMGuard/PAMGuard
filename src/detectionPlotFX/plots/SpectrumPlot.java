@@ -74,7 +74,7 @@ public abstract class  SpectrumPlot <D extends PamDataUnit> implements Detection
 	private SpectrumSettingsPane spectrumSettingsPane;
 
 
-	private double sR;
+	private double storedsR;
 
 
 	//	//TODO
@@ -132,7 +132,7 @@ public abstract class  SpectrumPlot <D extends PamDataUnit> implements Detection
 		
 		if (data ==null) return;
 
-		this.sR=sR; 
+		this.storedsR=sR; 
 
 		int[] minmax = getAxisMinMaxSamples(plotProjector);
 	
@@ -172,7 +172,7 @@ public abstract class  SpectrumPlot <D extends PamDataUnit> implements Detection
 	}
 
 	private double getSampleRate() {
-		return sR;
+		return storedsR;
 	}
 
 	@Override
@@ -234,6 +234,8 @@ public abstract class  SpectrumPlot <D extends PamDataUnit> implements Detection
 
 		storedSpectrum=this.getPowerSpectrum(data, minmax[0], minmax[1]);
 		storedCepstrum=this.getCepstrum(data, minmax[0], minmax[1]);
+		
+		storedsR = getSampleRate(data);
 
 		if (spectrumPlotParams.logScale) {
 			paintLogSpectrum(gc, clipRect,projector);

@@ -2,6 +2,7 @@ package rawDeepLearningClassifier.dataSelector;
 
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataSelector.DataSelectParams;
+import pamViewFX.fxSettingsPanes.DynamicSettingsPane;
 
 /**
  * Score a data unit with a deep learning annotation. Note that this could be an
@@ -30,6 +31,12 @@ public interface DLDataFilter {
 	 * @param params - the parameters to set. 
 	 */
 	public void setParams(DataSelectParams params); 
+	
+	/**
+	 * Settings controls for this filter. 
+	 * @return the cotnrols for this filter. 
+	 */
+	public DynamicSettingsPane<DataSelectParams> getSettingsPane();
 
 
 }

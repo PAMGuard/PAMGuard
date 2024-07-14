@@ -10,6 +10,7 @@ import PamguardMVC.dataSelector.DataSelectParams;
 import PamguardMVC.dataSelector.DataSelector;
 import annotation.DataAnnotationType;
 import annotation.dataselect.AnnotationDataSelector;
+import javafx.scene.Node;
 import pamViewFX.fxSettingsPanes.DynamicSettingsPane;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.logging.DLAnnotation;
@@ -137,6 +138,14 @@ public class DLDataSelector extends AnnotationDataSelector<DLAnnotation> {
 		//Need to make more simple here as scores in PG are 0 for not passed rather than negative. 
 		
 		return score>=0 ? 1 : 0;
+	}
+
+	public DLDataFilter getCurrentDataSelector() {
+		return dataFilters.get(dlDataSelectParams.dataSelectorIndex);
+	}
+	
+	public  List<DLDataFilter> getDataSelectors() {
+		return dataFilters;
 	}
 
 }

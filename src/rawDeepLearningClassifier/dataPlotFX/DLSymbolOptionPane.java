@@ -95,7 +95,7 @@ public class DLSymbolOptionPane extends StandardSymbolModifierPane {
 
 		b1 = new ToggleButton("Prediction");
 		b1.setPrefWidth(80);
-		b1.setStyle("-fx-border-radius: 5 0 0 5; -fx-background-radius: 5 0 0 5;");
+//		b1.setStyle("-fx-border-radius: 5 0 0 5; -fx-background-radius: 5 0 0 5;");
 		
 		b2 = new ToggleButton("Class");
 		b2.setPrefWidth(80);
@@ -105,7 +105,7 @@ public class DLSymbolOptionPane extends StandardSymbolModifierPane {
 			//change the colour of the colour range slider.     
 			notifySettingsListeners();
 		});
-		b2.setStyle("-fx-border-radius: 0 5 5 0;  -fx-background-radius: 0 5 5 0;");
+//		b2.setStyle("-fx-border-radius: 0 5 5 0;  -fx-background-radius: 0 5 5 0;");
 		
 		
 		b2.setOnAction((a)->{
@@ -116,7 +116,9 @@ public class DLSymbolOptionPane extends StandardSymbolModifierPane {
 		
 		SegmentedButton segmentedButton = new SegmentedButton();    
 		segmentedButton.getButtons().addAll(b1, b2);
-		segmentedButton.setPadding(new Insets(5,0,5,0));
+		segmentedButton.setPadding(new Insets(5,0,5,0));		 
+		segmentedButton.getStyleClass().add(SegmentedButton.STYLE_CLASS_DARK);
+
 		
 		BorderPane.setAlignment(segmentedButton, Pos.CENTER);
 		b1.setSelected(true);
@@ -161,8 +163,10 @@ public class DLSymbolOptionPane extends StandardSymbolModifierPane {
 		});
 		classNameBox2.setMaxWidth(Double.MAX_VALUE);
 		
-		classNameBox2.setOnAction((action)->{                
+		classNameBox2.setOnAction((action)->{      
+			if (classNameBox2.getSelectionModel().getSelectedIndex()>=0){
 			colourPicker.setValue(PamUtilsFX.intToColor(dlSymbolModifier.getSymbolModifierParams().classColors[classNameBox2.getSelectionModel().getSelectedIndex()]));
+			}
 		});
 		
 		classNameBox2.setPrefWidth(CLASS_NAME_BOX_WIDTH);
