@@ -215,6 +215,7 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 		scrollPane2.setHbarPolicy(ScrollBarPolicy.NEVER);
 		scrollPane2.getStyleClass().clear();
 		symbolTab.setContent(scrollPane2);
+		
 		Tab dataView=new Tab("Data");
 		dataView.setContent(dataSelectHolder);
 		dataView.getStyleClass().add("tab-square");
@@ -242,7 +243,7 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 	 * @return the data select pane. 
 	 */
 	private DynamicSettingsPane<Boolean> createDataSelectPane(){		
-		System.out.println("Data selector: " + clickPlotInfo.getClickDataSelector());
+		System.out.println("DATA SELECTOR: " + clickPlotInfo.getClickDataSelector());
 		return clickPlotInfo.getClickDataSelector().getDialogPaneFX();
 	}
 
