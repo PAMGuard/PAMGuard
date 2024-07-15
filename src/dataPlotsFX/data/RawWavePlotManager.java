@@ -318,7 +318,6 @@ public abstract class RawWavePlotManager {
 		//check if we can plot click on this plot pane. 
 		if (!rawClipInfo.shouldDraw(plotNumber, pamDataUnit)) {
 			//System.out.println("Shoudl not draw!");
-
 			return null; 
 		}
 
