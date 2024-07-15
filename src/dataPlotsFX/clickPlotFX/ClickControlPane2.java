@@ -230,7 +230,16 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 		dataSelectPane.addSettingsListener(()->{
 			//dynamic settings pane so have to repaint whenever a control is selected. 
 			getParams();
-			clickPlotInfo.getTDGraph().repaint(0);
+			
+			/**
+			 * If there are raw amplitude or frequency panes that have a buffer of painted units then
+			 * these have to be cleared for the data selector
+			 */
+			clickPlotInfo.getClickRawPlotManager().clear();
+			clickPlotInfo.getClickFFTPlotManager().clear();
+
+			
+			clickPlotInfo.getTDGraph().repaint(50);
 		});
 
 		this.setCenter(tabPane);
@@ -519,7 +528,7 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 		getParams();
 
 		//on a parameter change must clear the FFT plot. 
-		clickPlotInfo.getClickFFTplotManager().clear(); 
+		clickPlotInfo.getClickFFTPlotManager().clear(); 
 		clickPlotInfo.getClickRawPlotManager().clear(); 
 
 		clickPlotInfo.getTDGraph().repaint(milliswait);
@@ -773,7 +782,7 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 		clickPlotInfo.getClickDisplayParams().fftHop = this.fftSpinnerHop.getValue().intValue();
 		clickPlotInfo.getClickDisplayParams().fftLength = this.fftSpinnerLength.getValue().intValue(); 
 		clickPlotInfo.getClickDisplayParams().colourMap = this.spectroControlPane.getColourArrayType(); 
-		clickPlotInfo.getClickFFTplotManager().update(); 
+		clickPlotInfo.getClickFFTPlotManager().update(); 
 		/*** Data select pane****/
 
 		//dynamic settings pane so have to repaint whenever a control is selected. 

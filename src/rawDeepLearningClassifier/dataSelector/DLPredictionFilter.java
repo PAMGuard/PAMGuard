@@ -1,6 +1,7 @@
 package rawDeepLearningClassifier.dataSelector;
 
 
+import PamView.dialog.PamDialogPanel;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataSelector.DataSelectParams;
 import pamViewFX.fxSettingsPanes.DynamicSettingsPane;
@@ -27,7 +28,9 @@ public class DLPredictionFilter implements DLDataFilter {
 	 */
 	private DLPredictionFilterParams filterParams = new DLPredictionFilterParams();
 
-	private DLPredictonPane dlPredictonPane; 
+	private DLPredictonPane dlPredictonPane;
+
+	private DLPredictionPanel dlPredictonPanel; 
 
 	public DLPredictionFilter(DLControl dlcontrol) {
 		this.dlcontrol = dlcontrol; 
@@ -95,6 +98,14 @@ public class DLPredictionFilter implements DLDataFilter {
 			dlPredictonPane = new DLPredictonPane(this);
 		}
 		return dlPredictonPane;
+	}
+	
+	@Override
+	public PamDialogPanel getSettingsPanel() {
+		if (dlPredictonPanel ==null) {
+			dlPredictonPanel = new DLPredictionPanel(this);
+		}
+		return dlPredictonPanel;
 	}
 
 
