@@ -109,6 +109,12 @@ public class DataSelectorDialogPaneFX extends DynamicSettingsPane<Boolean> {
 		dsPane.getChildren().add(contentPane);
 		
 		
+		//need to add a listener for settings changes to these panes so it can be passed to this pane 
+		innerPanel.addSettingsListener(()->{
+			notifySettingsListeners();
+		});
+		
+		
 		orButton.setVisible(setIndex > 0);
 		if (dataSelector instanceof CompoundDataSelector || setIndex < 0) {
 			buttonPane.setVisible(false);

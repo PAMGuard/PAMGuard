@@ -5,7 +5,7 @@ import PamguardMVC.dataSelector.DataSelectParams;
 /**
  * Parameters for filtering by the minimum prediciton value. 
  */
-public class DLPredictionFilterParams extends DataSelectParams {
+public class DLPredictionFilterParams extends DataSelectParams implements Cloneable{
 
 	private static final long serialVersionUID = 1L;
 	
@@ -22,6 +22,7 @@ public class DLPredictionFilterParams extends DataSelectParams {
 	/**
 	 * Clone the parameters. 
 	 */
+	@Override
 	public DLPredictionFilterParams clone() {
 		try {
 			return (DLPredictionFilterParams) super.clone();

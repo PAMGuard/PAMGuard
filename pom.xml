@@ -101,7 +101,7 @@
 								<exclude>META-INF/*.SF</exclude> <!--  get rid of manifests from library jars - also done in orig ant build file -->
 								<exclude>META-INF/*.DSA</exclude>
 								<exclude>META-INF/*.RSA</exclude>
-								<exclude>test/resources/**</exclude>
+								<exclude>test/resources/**</exclude><!--  get rid of deep learning moduels and wav files used for unit tests -->
 							</excludes>
 						</filter>
 					</filters>

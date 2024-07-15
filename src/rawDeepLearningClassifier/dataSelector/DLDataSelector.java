@@ -97,7 +97,7 @@ public class DLDataSelector extends AnnotationDataSelector<DLAnnotation> {
 
 			//set paramters for all data filters. 
 			for (int i=0; i<dlDataSelectParams.dataSelectorParams.length; i++) {
-				dataFilters.get(i).setParams((DLDataSelectorParams) dataSelectParams); 
+				dataFilters.get(i).setParams((DataSelectParams) dlDataSelectParams.dataSelectorParams[i]); 
 			}
 		}
 
@@ -117,7 +117,9 @@ public class DLDataSelector extends AnnotationDataSelector<DLAnnotation> {
 	}
 
 	@Override
-	public DataSelectParams getParams() {
+	public DLDataSelectorParams getParams() {
+		//get the paramters from the pane. 
+		
 		for (int i=0; i<dlDataSelectParams.dataSelectorParams.length; i++) {
 			dlDataSelectParams.dataSelectorParams[i] = dataFilters.get(i).getParams();
 		}
