@@ -106,15 +106,15 @@ If using a deep learning model from a supported framework then all transforms ar
 
 _An AnimalSpot, Ketos or other supported deep learning model will automatically create a list of transforms with the appropriate settings. These is no need to use the advanced pane but it is there in case users wish to change transform settings for some reason_
 
-### Default Models
+### Exanmple Models
 
-Default models are selectable from the menu button in the Deep Learning Pane. Default models are deep learning classifiers which are open source, known to be effective and have have been published in open access academic litrature; they are downloaded directly from a GitHub repository and then all associated settings are automtically applied. The default model selection pane also contains hyperlinks to the papers descirbing each model which will take users directly to the relvent website. 
+Example models are selectable from the menu button in the Deep Learning Pane. Default models are deep learning classifiers which are open source, known to be effective and have have been published in open access academic litrature; they are downloaded directly from a GitHub repository and then all associated settings are automtically applied. The default model selection pane also contains hyperlinks to the papers descirbing each model which will take users directly to the relvent website. 
 
 <p align="center">
   <img width="550" height="700" src = "resources/default_settings_humpback_1.png">
 </p>
 
-_Default models can be downloaded. Default models are models which are published, open and have been known to work well amongst the bioacoustics community. More will be added to PAMGaurd over time. If you you would like your model to become a defualt model then drop PAMGuard support an email._
+_Example models can be downloaded. Example models are models which are published, open and have been known to work well amongst the bioacoustics community. More will be added to PAMGaurd over time. If you you would like your model to become a defualt model then drop PAMGuard support an email._
 
 ## Running
 
@@ -143,6 +143,26 @@ The Time base display FX is best way to view detailed data outputs from the deep
 _An example click detection module output coloured by deep learning annotations. Click detections are annotated with the results from the deep learning module. The symbol manager in the time base display can be used to colour the clicks by the prediction for a selected class_
 
 Other displays also show outputs from the deep learning module. Hovering over data units in the click display will, for example, show deep learning prediction values. The spectrogram will also show deep learning detections as translucent blue boxes (these must be selected in the right click menu). 
+
+### Symbol Manager
+
+The deep learning classifier has a symbol manager that is used throughtout different PAMGuard displays. The symbol manager can either display deep learning detections by the prediction values of a particular class or colour the output class with the highest prediciton class. Colouring by a prediction value requires the user to select which output class they wish to display - all detections are then coloured by the output prediction values for that particular class via a selectable colour map. If colour by class is selected then each detection is coloured by the class with the maximum prediction value. The colours for each class are selectable. 
+
+<p align="center">
+  <img src = "resources/deep_learning_symbol_manager.png">
+</p>
+
+_The options for the deep learning symbol manager_
+
+### Data selector
+
+The deep learning classifier has a data selector which is utilsied thorughout PAMGuard (for example for exporting detections, generating clips, showing on displays). The data selector allows users to filter detections based on a minimum prediciton values for different output classes. Classifiers with multiple classes can have different minimum predicitons values assigned to each class. The user interface allows user to use a slider to dynimically change the minimum prediciton value. The lock button clamps the minimum prediction values of all enabled output classes together.
+
+<p align="center">
+  <img src = "resources/deep_learning_data_selector.png">
+</p>
+
+_The options for the deep learning data selector_
 
 ### MATLAB
 
