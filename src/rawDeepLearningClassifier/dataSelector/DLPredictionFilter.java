@@ -7,6 +7,7 @@ import pamViewFX.fxSettingsPanes.DynamicSettingsPane;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dlClassification.DLDetection;
 import rawDeepLearningClassifier.dlClassification.PredictionResult;
+import rawDeepLearningClassifier.logging.DLAnnotation;
 
 /**
  * A data filter which filters data by the maximum prediction value
@@ -24,7 +25,9 @@ public class DLPredictionFilter implements DLDataFilter {
 	/**
 	 * The filter parameters
 	 */
-	private DLPredictionFilterParams filterParams = new DLPredictionFilterParams(); 
+	private DLPredictionFilterParams filterParams = new DLPredictionFilterParams();
+
+	private DLPredictonPane dlPredictonPane; 
 
 	public DLPredictionFilter(DLControl dlcontrol) {
 		this.dlcontrol = dlcontrol; 
@@ -35,15 +38,18 @@ public class DLPredictionFilter implements DLDataFilter {
 	@Override
 	public int scoreDLData(PamDataUnit dataUnit) {
 
-		DLDetection dlDetection = (DLDetection) dataUnit; 
-	
+		
+		DLAnnotation annotation = (DLAnnotation) dataUnit. findDataAnnotation(DLAnnotation.class) ;
+
+		if (annotation==null) return -1;
+		
 		//iterate through all results and check that at least one class passes data selection. 
 		float[] results;
 		int maxClassIndex = -1; 
 		int maxPred = -1; 
 
 		//get the maximum prediction index which passes the minimum threshold
-		for (PredictionResult modelResult: dlDetection.getModelResults()) {
+		for (PredictionResult modelResult: annotation.getModelResults()) {
 			results = modelResult.getPrediction();
 			for (int j=0; j<results.length; j++) {
 				if (filterParams.classSelect[j] && results[j]>filterParams.minClassPredicton[j]) {
@@ -84,11 +90,19 @@ public class DLPredictionFilter implements DLDataFilter {
 
 
 	@Override
-	public DynamicSettingsPane<DataSelectParams> getSettingsPane() {
-		// TODO Auto-generated method stub
-		return null;
+	public DynamicSettingsPane getSettingsPane() {
+		if (dlPredictonPane ==null) {
+			dlPredictonPane = new DLPredictonPane(this);
+		}
+		return dlPredictonPane;
 	}
-	
+
+
+	public DLControl getDLControl() {
+		return this.dlcontrol;
+	}
+
+
 //	/**
 //	 * Get the index of the highest prediciton value a list of results. 
 //	 * @param predictions - index of the highest prediction within a matrix of predicitons. 

@@ -1,28 +1,30 @@
 package rawDeepLearningClassifier.dataSelector;
 
 import javafx.scene.Node;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import pamViewFX.fxNodes.PamHBox;
-import pamViewFX.fxNodes.PamSpinner;
-import pamViewFX.fxNodes.PamVBox;
+import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxSettingsPanes.DynamicSettingsPane;
 
 /**
  * JavaFX pane for the deep learning data selector. This simply selects the rype
  * of filter to use and sets that as the controls. 
+ * <p>
+ * Note that at the moment this only implements one type of data filter and so 
+ * essentially all controls etc. for changing filters are invisible to the user. 
  * 
  * @author Jamie Macaulay
  */
 public class DLSelectPaneFX extends DynamicSettingsPane<Boolean>{
 	
-	private PamVBox mainPane;
+	private PamBorderPane mainPane;
 	
 	/**
-	 * Refrence to the deep learning data selector. 
+	 * Reference to the deep learning data selector. 
 	 */
 	private DLDataSelector dlDataSelector;
 	
+	/**
+	 * The current index selected by the user - not in the params. 
+	 */
 	private int currentIndex = 0;
 
 	public DLSelectPaneFX(DLDataSelector dlDataSelector) {
@@ -38,23 +40,47 @@ public class DLSelectPaneFX extends DynamicSettingsPane<Boolean>{
 	}
 	
 	private void createPane() {
-		mainPane = new PamVBox();
-		mainPane.setSpacing(5);
+		mainPane = new PamBorderPane();
+		
+		//need to add a settings listener to the filter panes to pass on any notification this settings listener. 
+		for (int i=0; i<dlDataSelector.getDataSelectors().size(); i++) {
+			dlDataSelector.getDataSelectors().get(currentIndex).getSettingsPane().addSettingsListener(()->{
+				//notify any listeners to this pane that a filter pane has changed. 
+				notifySettingsListeners();
+			});
+		}
+		
 	}
 
 	
-	
 	@Override
-	public Boolean getParams(Boolean currParams) {
-		dlDataSelector.getDataSelectors().get(currentIndex).getSettingsPane().getParams(null);
+	public Boolean getParams(Boolean input) {
+//		System.out.println("Get params DL data selector!"); 
+		DLDataSelectorParams currParams = dlDataSelector.getParams();
 		
+		//TODO - maybe should grab settings from all filters or just the selected one?
+		currParams.dataSelectorParams[currentIndex]  = dlDataSelector.getDataSelectors().get(currentIndex).getSettingsPane().getParams(currParams.dataSelectorParams[currentIndex]);
 		
-		return currParams;
+		dlDataSelector.setParams(currParams);
+
+		return true;
 	}
 
 	@Override
 	public void setParams(Boolean input) {
-		dlDataSelector.getDataSelectors().get(currentIndex).getSettingsPane().getParams(null);
+		DLDataSelectorParams currParams = dlDataSelector.getParams();
+
+		this.currentIndex = currParams.dataSelectorIndex; 
+		
+		dlDataSelector.getDataSelectors().get(currentIndex).getSettingsPane().setParams(currParams.dataSelectorParams[currentIndex]);
+		
+		setDataFilterPane(currentIndex);
+		
+	}
+	
+	private void setDataFilterPane(int index) {
+		DLDataFilter dlFilter = dlDataSelector.getDataSelectors().get(index);
+		mainPane.setCenter(dlFilter.getSettingsPane().getContentNode());
 	}
 
 	@Override
@@ -64,7 +90,7 @@ public class DLSelectPaneFX extends DynamicSettingsPane<Boolean>{
 
 	@Override
 	public Node getContentNode() {
-		return new Label("Hello DL data selector");
+		return mainPane; 
 	}
 
 	@Override

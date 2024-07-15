@@ -39,8 +39,16 @@ public class CompoundDialogPaneFX extends DynamicSettingsPane<Boolean> {
 			DataSelectorDialogPaneFX dsp = new DataSelectorDialogPaneFX(ds, panel, ind++);
 			selectorPanels.add(dsp);
 			
+			//need to add a listener for settings changes to these panes so it can be passed to this pane 
+			dsp.addSettingsListener(()->{
+				//notify any listeners to this pane that the sub pane has changed. 
+				notifySettingsListeners();
+			});
+			
 			mainPanel.getChildren().add(dsp.getContentNode());
 		}
+		
+		
 	}
 
 

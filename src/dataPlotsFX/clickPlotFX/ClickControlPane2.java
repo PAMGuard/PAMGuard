@@ -189,11 +189,6 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 		dataSelectHolder.setPadding(new Insets(5,5,5,5));
 
 		dataSelectPane = createDataSelectPane();
-		dataSelectPane.addSettingsListener(()->{
-			//dynamic settings pane so have to repaint whenever a control is selected. 
-			getParams();
-			clickPlotInfo.getTDGraph().repaint(0);
-		});
 		dataSelectPane.setParams(true);
 
 
@@ -231,6 +226,12 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 		enablePane();
 		setFreqType();
 		setParams(); 
+		
+		dataSelectPane.addSettingsListener(()->{
+			//dynamic settings pane so have to repaint whenever a control is selected. 
+			getParams();
+			clickPlotInfo.getTDGraph().repaint(0);
+		});
 
 		this.setCenter(tabPane);
 
