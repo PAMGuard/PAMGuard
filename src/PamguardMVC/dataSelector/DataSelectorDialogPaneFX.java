@@ -91,10 +91,19 @@ public class DataSelectorDialogPaneFX extends DynamicSettingsPane<Boolean> {
 		}
 
 
-		andButton.setOnAction(event -> enableComponent());
-		orButton.setOnAction(event -> enableComponent());
-		disableButton.setOnAction(event -> enableComponent());
-
+		andButton.setOnAction(event -> {
+			enableComponent();
+			notifySettingsListeners();
+		});
+		orButton.setOnAction(event ->{
+			enableComponent();
+			notifySettingsListeners();
+		});
+		disableButton.setOnAction(event ->{
+			enableComponent();
+			notifySettingsListeners();
+		});
+		
 		buttonPane = new HBox(); // Use HBox for horizontal button layout
 		buttonPane.setSpacing(5);
 		buttonPane.setAlignment(Pos.CENTER);

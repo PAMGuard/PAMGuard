@@ -15,10 +15,17 @@ public class ColourRangeSlider extends PamRangeSlider {
 
 	public ColourRangeSlider(){
 		super(JSlider.VERTICAL);
+//		this.orientation = JSlider.VERTICAL;
 	}
 	
 	public ColourRangeSlider(int min, int max){
-		super(min,max, JSlider.VERTICAL);
+		super(JSlider.VERTICAL);
+//		this.orientation = JSlider.HORIZONTAL;
+	}
+	
+	public ColourRangeSlider(int orientation){
+		super(orientation);
+//		this.orientation = JSlider.HORIZONTAL;
 	}
 	
 	public void setColourMap(ColourArrayType colourMap){
