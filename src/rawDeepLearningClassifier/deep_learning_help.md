@@ -149,7 +149,7 @@ Other displays also show outputs from the deep learning module. Hovering over da
 The deep learning classifier has a symbol manager that is used throughtout different PAMGuard displays. The symbol manager can either display deep learning detections by the prediction values of a particular class or colour the output class with the highest prediciton class. Colouring by a prediction value requires the user to select which output class they wish to display - all detections are then coloured by the output prediction values for that particular class via a selectable colour map. If colour by class is selected then each detection is coloured by the class with the maximum prediction value. The colours for each class are selectable. 
 
 <p align="center">
-  <img src = "resources/deep_learning_symbol_manager.png">
+  <img width="429" height="150" src = "resources/deep_learning_symbol_manager.png">
 </p>
 
 _The options for the deep learning symbol manager_
@@ -159,7 +159,7 @@ _The options for the deep learning symbol manager_
 The deep learning classifier has a data selector which is utilsied thorughout PAMGuard (for example for exporting detections, generating clips, showing on displays). The data selector allows users to filter detections based on a minimum prediciton values for different output classes. Classifiers with multiple classes can have different minimum predicitons values assigned to each class. The user interface allows user to use a slider to dynimically change the minimum prediciton value. The lock button clamps the minimum prediction values of all enabled output classes together.
 
 <p align="center">
-  <img src = "resources/deep_learning_data_selector.png">
+  <img width="190" height="170" src = "resources/deep_learning_data_selector.png">
 </p>
 
 _The options for the deep learning data selector_
