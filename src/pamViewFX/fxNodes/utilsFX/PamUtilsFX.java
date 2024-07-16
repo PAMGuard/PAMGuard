@@ -19,7 +19,9 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 
+import PamView.ColourArray.ColourArrayType;
 import PamView.PamSymbol;
+import PamView.PamView;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -54,6 +56,13 @@ import pamViewFX.fxNodes.PamSymbolFX;
  */
 public class PamUtilsFX {
 	
+	
+	public static ColourArrayType fxColArray2Swing(pamViewFX.fxNodes.utilsFX.ColourArray.ColourArrayType arrayFX) {
+		
+		ColourArrayType type = ColourArrayType.valueOf(arrayFX.toString());
+	
+		return type;
+	}
 	/**
 	 * 
 	 * @param awtColor

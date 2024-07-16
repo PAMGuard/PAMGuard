@@ -458,7 +458,7 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 		PamVBox vBox = new PamVBox(); 
 		vBox.setSpacing(5);
 
-		minMaxWidthPane = new DualControlField<Double>("Min", "Max" , "", 2, 100, 1); 
+		minMaxWidthPane = new DualControlField<Double>("", "" , "", 2, 100, 1); 
 		minMaxWidthPane.addChangeListener((obsval, oldval, newval)->{
 			newSettings();
 			//do not allow the min ti be larger than the max. 
@@ -481,7 +481,7 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 
 		
 		//height pane
-		minMaxHeightPane = new DualControlField<Double>("Min", "Max" , "", 2, 100, 1);  
+		minMaxHeightPane = new DualControlField<Double>("", "" , "", 2, 100, 1);  
 		minMaxHeightPane.addChangeListener((obsval, oldval, newval)->{
 			newSettings();
 			//do not allow the min ti be larger than the max. 

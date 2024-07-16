@@ -1,10 +1,14 @@
 package rawDeepLearningClassifier.dataPlotFX;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
 
+import PamController.PamController;
 import PamUtils.PamArrayUtils;
 import PamView.GeneralProjector;
 import PamView.PamSymbolType;
+import PamView.dialog.GenericSwingDialog;
+import PamView.dialog.PamDialogPanel;
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.SymbolData;
 import PamView.symbol.modifier.SymbolModType;
@@ -21,10 +25,10 @@ import rawDeepLearningClassifier.logging.DLAnnotationType;
 
 
 /**
- * The DL symbol modifier. Colours symbols by eother the vlaue of the prediction by a user selected class
- * or by the class with the highest prediction value. 
+ * The DL symbol modifier. Colours symbols by either the value of the prediction
+ * by a user selected class or by the class with the highest prediction value.
  * 
- * @author Jamie Macaulay. 
+ * @author Jamie Macaulay.
  *
  */
 public class DLSymbolModifier extends SymbolModifier {
@@ -38,12 +42,12 @@ public class DLSymbolModifier extends SymbolModifier {
 
 
 	/**
-	 * The symbol options pane.
+	 * JavaFX symbol options pane.
 	 */
 	private DLSymbolOptionPane optionsPane;
 
 	/**
-	 * Rge DL annotation type. 
+	 * The DL annotation type. 
 	 */
 	private DLAnnotationType dlAnnotType;
 	
@@ -56,6 +60,11 @@ public class DLSymbolModifier extends SymbolModifier {
 	private ColourArrayType colourArrayType;
 
 	private ColourArray colourArray;
+
+	/**
+	 * Swing option panel for the symbol chooser. 
+	 */
+	private DLSymbolOptionPanel optionsPanel;
 
 
 
@@ -226,11 +235,29 @@ public class DLSymbolModifier extends SymbolModifier {
 	 * Get the JavaFX symbol options pane that has options for the symbol pane.
 	 * @return the symbol options pane. 
 	 */
+	@Override
 	public SymbolModifierPane getOptionsPane() {
 		if (optionsPane == null) {
 			optionsPane = new DLSymbolOptionPane(this); 
 		}
 		return optionsPane; 
+	}
+	
+	@Override
+	public PamDialogPanel getDialogPanel() {
+		if (optionsPanel == null) {
+			optionsPanel = new DLSymbolOptionPanel(this); 
+		}
+		return optionsPanel; 
+	}
+	
+	/**
+	 * Default behaviour to show the dialog panel.
+	 * @param e
+	 * @param dialogPanel
+	 */
+	protected void showOptionsDialog(ActionEvent e, PamDialogPanel dialogPanel) {
+		GenericSwingDialog.showDialog(PamController.getMainFrame(), getName() + " options", dialogPanel);
 	}
 	
 	

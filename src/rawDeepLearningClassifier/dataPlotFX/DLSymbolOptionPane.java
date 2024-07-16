@@ -29,7 +29,9 @@ import rawDeepLearningClassifier.dlClassification.DLClassName;
 
 
 /*
- * Symbol Options for the annotation pane
+ * Symbol Options for the annotation pane.
+ * 
+ * @author Jamie Macaulay
  */
 public class DLSymbolOptionPane extends StandardSymbolModifierPane {
 	
@@ -390,11 +392,11 @@ public class DLSymbolOptionPane extends StandardSymbolModifierPane {
 //			b1.setSelected(false);
 //			b2.setSelected(false);
 			if (symbolOptions.colTypeSelection == DLSymbolModifierParams.PREDICITON_COL) b1.setSelected(true);
-			if (symbolOptions.colTypeSelection == DLSymbolModifierParams.PREDICITON_COL) b2.setSelected(true);
+			if (symbolOptions.colTypeSelection == DLSymbolModifierParams.CLASS_COL) b2.setSelected(true);
 			
 			setSettingsPane();
 			
-			symbolOptions.colTypeSelection = b1.isSelected() ? DLSymbolModifierParams.PREDICITON_COL : DLSymbolModifierParams.CLASS_COL;
+//			symbolOptions.colTypeSelection = b1.isSelected() ? DLSymbolModifierParams.PREDICITON_COL : DLSymbolModifierParams.CLASS_COL;
 			
 			//set the parameters for colouring by prediction
 			setPredictionColParams(symbolOptions);

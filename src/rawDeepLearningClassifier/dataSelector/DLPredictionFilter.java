@@ -65,7 +65,7 @@ public class DLPredictionFilter implements DLDataFilter {
 	}
 
 	@Override
-	public DataSelectParams getParams() {
+	public DLPredictionFilterParams getParams() {
 		 checkParamsClass() ;
 		return filterParams;
 	}

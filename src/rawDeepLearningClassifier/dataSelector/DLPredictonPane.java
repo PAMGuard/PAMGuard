@@ -9,14 +9,11 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Priority;
-import javafx.scene.text.TextAlignment;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamHBox;
-import pamViewFX.fxNodes.PamSpinner;
 import pamViewFX.fxNodes.PamVBox;
-import pamViewFX.fxNodes.sliders.PamSlider;
 import pamViewFX.fxSettingsPanes.DynamicSettingsPane;
 import rawDeepLearningClassifier.dlClassification.DLClassName;
 
@@ -47,7 +44,7 @@ public class DLPredictonPane extends DynamicSettingsPane<DLPredictionFilterParam
 
 		PamBorderPane topPane = new PamBorderPane(); 
 		
-		Label label = new Label("Select classes to show");
+		Label label = new Label("Show classes above min. prediction");
 		PamBorderPane.setAlignment(label, Pos.BOTTOM_LEFT);
 //		label.setTextAlignment(TextAlignment.LEFT);
 		label.setAlignment(Pos.BOTTOM_LEFT);
@@ -87,6 +84,8 @@ public class DLPredictonPane extends DynamicSettingsPane<DLPredictionFilterParam
 		
 		Label valueLabel;
 
+		private boolean enableListener = true;
+
 		ClassDataSelector(String classType, int index) {
 
 			enable = new CheckBox(classType);
@@ -110,10 +109,13 @@ public class DLPredictonPane extends DynamicSettingsPane<DLPredictionFilterParam
 				
 				//if the lock button has been sleected then change all the sliders
 				//so that they are the same value as this slide (unless the class is disabled)
-				if (toggelButton.isSelected()) {
+				if (toggelButton.isSelected() && enableListener) {
 					for (int i=0; i<classPanes.length; i++) {
 						if (classPanes[i].enable.isSelected() && i!=index) {
+							
+							classPanes[i].enableListener = false; //prevent needless calls to notify settings
 							classPanes[i].slider.setValue(newval.doubleValue());
+							classPanes[i].enableListener = true;
 						}
 					};
 				}
