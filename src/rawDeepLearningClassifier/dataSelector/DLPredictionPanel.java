@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Label;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -100,6 +101,10 @@ public class DLPredictionPanel implements PamDialogPanel {
 		GridBagConstraints c = new PamGridBagContraints();
 		c.ipadx =5;
 
+		c.gridwidth=2;
+		contentPanel.add(new Label("Min. prediciton for each class"), c);
+		c.gridwidth=1;
+		c.gridy++;
 
 
 		for (int i=0; i<input.classSelect.length ; i++) {
@@ -119,10 +124,10 @@ public class DLPredictionPanel implements PamDialogPanel {
 
 
 			spinnerClass[i] = new JSpinner(new SpinnerNumberModel(0., 0., 1., 0.05));
-			
+
 			Dimension prefSize = spinnerClass[i].getPreferredSize();
-		    prefSize = new Dimension(60, prefSize.height);
-		    spinnerClass[i] .setPreferredSize(prefSize);
+			prefSize = new Dimension(60, prefSize.height);
+			spinnerClass[i] .setPreferredSize(prefSize);
 
 			spinnerClass[i].addChangeListener(new ChangeListener() {      
 				@Override
@@ -145,13 +150,13 @@ public class DLPredictionPanel implements PamDialogPanel {
 				//set a lock button to 
 				c.gridx=2; 
 				contentPanel.add(lockButton, c);
-				
+
 				//make the lock button the same height as the spinner
 				Dimension prefSizeB = lockButton.getPreferredSize();
 				lockButton.setPreferredSize(new Dimension(prefSizeB.width, prefSize.height));
 
 			}
-			
+
 			c.gridy++;
 
 
@@ -162,16 +167,16 @@ public class DLPredictionPanel implements PamDialogPanel {
 
 	@Override
 	public boolean getParams() {
-		
+
 		DLPredictionFilterParams currParams = predicitonFilter.getParams(); 
 
 		for (int i=0; i<spinnerClass.length ; i++) {
 			currParams.classSelect[i] = enableClass[i].isSelected();
 			currParams.minClassPredicton[i] = (double) spinnerClass[i].getValue();
 		}
-		
+
 		predicitonFilter.setParams(currParams);
-		
+
 		return true;
 	}
 

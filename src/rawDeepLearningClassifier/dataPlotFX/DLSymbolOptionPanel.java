@@ -9,6 +9,7 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -25,12 +26,15 @@ import javax.swing.JToggleButton;
 import javax.swing.border.TitledBorder;
 
 import PamView.ColourComboBox;
+import PamView.PamAWTUtils;
 import PamView.dialog.GenericSwingDialog;
 import PamView.dialog.PamButton;
 import PamView.dialog.PamDialogPanel;
 import PamView.panel.PamPanel;
+import PamView.symbol.StandardSymbolOptions;
 import PamView.symbol.modifier.SymbolModifier;
 import Spectrogram.ColourRangeSlider;
+import pamViewFX.fxNodes.utilsFX.ColourArray;
 import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
 import rawDeepLearningClassifier.dlClassification.DLClassName;
 
@@ -95,6 +99,10 @@ public class DLSymbolOptionPanel implements PamDialogPanel, ActionListener {
 
 	private PamPanel mainPanel;
 
+	private int[] classColours;
+
+	private AbstractButton colourButton;
+
 
 	public DLSymbolOptionPanel(SymbolModifier symbolModifer) {
 		this.dlSymbolModifier = (DLSymbolModifier) symbolModifer;
@@ -125,14 +133,14 @@ public class DLSymbolOptionPanel implements PamDialogPanel, ActionListener {
 		holder = new PamPanel();
 		holder.setLayout(new BorderLayout());
 		holder.add(new JLabel("Hello"),  BorderLayout.NORTH);
-		
+
 		mainPanel = new PamPanel();
 		mainPanel.setLayout(new BorderLayout());
 
 		mainPanel.add(segmentedButtonPanel, BorderLayout.NORTH);
 		mainPanel.add(holder, BorderLayout.CENTER);
 		mainPanel.add(showOnlyBinary = new JCheckBox("Show only binary classification"), BorderLayout.SOUTH);
-		
+
 		setSettingsPane();
 
 		initialized = true;
@@ -163,7 +171,7 @@ public class DLSymbolOptionPanel implements PamDialogPanel, ActionListener {
 
 		//set the selected. 
 		showOnlyBinary.setSelected(symbolOptions.showOnlyBinary);
-		
+
 		setSettingsPane();
 	} 
 
@@ -222,6 +230,11 @@ public class DLSymbolOptionPanel implements PamDialogPanel, ActionListener {
 	 */
 	private void setClassColParams(DLSymbolModifierParams symbolOptions) {
 
+		//create a temporary array to save different class colours in - this needs to be
+		//before other params are set. 
+		this.classColours = symbolOptions.classColors;
+
+
 		int nClass = checkClassNamesBox( symbolOptions, classNameBox2); 
 
 		symbolOptions.classIndex = Math.min(symbolOptions.classIndex, nClass-1); 
@@ -229,21 +242,81 @@ public class DLSymbolOptionPanel implements PamDialogPanel, ActionListener {
 		classNameBox2.setSelectedIndex(Math.max(symbolOptions.classIndex2, 0));
 
 
-		int index = symbolOptions.classIndex2>=0 ? symbolOptions.classIndex2 : 0;
+//		int index = symbolOptions.classIndex2>=0 ? symbolOptions.classIndex2 : 0;
 
 		if (symbolOptions.classColors==null) {
 			symbolOptions.setDefaultClassColors(nClass);
 		}
+		
+		if (classNameBox2.getSelectedIndex()>=0) {
+			colourButton.setBackground(PamAWTUtils.intToColor(classColours[classNameBox2.getSelectedIndex()]));
+			colourButton.repaint();
+		}
+
 
 		//		//set the correct colour
 		//		colorPicker.setColor(symbolOptions.classColors[index]);
 	}
 
 
+	/**
+	 * get parameters for colouring by class. 
+	 * @param symbolOptions - the symbol options. 
+	 * @return
+	 */
+	public DLSymbolModifierParams getClassColParams(DLSymbolModifierParams symbolOptions ) {
+
+		//		int index = classNameBox2.getSelectedIndex()>=0 ? classNameBox2.getSelectedIndex():0;
+
+		symbolOptions.classColors = classColours;
+
+		symbolOptions.classIndex2 = classNameBox2.getSelectedIndex(); 
+
+		return symbolOptions; 
+	}
+
+	/**
+	 * 
+	 * @param symbolOptions
+	 * @return
+	 */
+	public DLSymbolModifierParams getPredictionColParams(DLSymbolModifierParams symbolOptions ) {
+
+		symbolOptions.clims=new double[] {((double) colorRangeSlider.getValue())/100., ((double) colorRangeSlider.getUpperValue())/100.};
+
+		symbolOptions.colArray = PamUtilsFX.swingColArray2FX(this.colorComboBox.getSelectedColourMap()); 
+
+		symbolOptions.classIndex = classNameBox.getSelectedIndex(); 
+
+		return symbolOptions; 
+	}
+
 	@Override
 	public boolean getParams() {
-		// TODO Auto-generated method stub
-		return false;
+
+		//bit messy but works
+		DLSymbolModifierParams symbolOptions =  dlSymbolModifier.getSymbolModifierParams().clone(); 
+
+		//need to check this here. 
+		//checkClassNamesBox(symbolOptions); 
+
+		if (b1.isSelected()) symbolOptions.colTypeSelection = DLSymbolModifierParams.PREDICITON_COL;
+		if (b2.isSelected()) symbolOptions.colTypeSelection = DLSymbolModifierParams.CLASS_COL;
+
+		//get parameters for colouring 
+		symbolOptions = getClassColParams(symbolOptions);
+
+		//get parameters for colouring by prediction value
+		symbolOptions = getPredictionColParams(symbolOptions) ;
+
+		symbolOptions.showOnlyBinary = showOnlyBinary.isSelected(); 
+
+		dlSymbolModifier.checkColourArray(); 
+
+		//set the paratmers. 
+		dlSymbolModifier.setSymbolModifierParams(symbolOptions);
+
+		return true;
 	}
 
 
@@ -254,18 +327,16 @@ public class DLSymbolOptionPanel implements PamDialogPanel, ActionListener {
 
 		if (b1.isSelected()) {
 			holder.add(probPane, BorderLayout.CENTER);
-			System.out.println("Set probPane pane"); 
 		} else if (b2.isSelected()) {
 			holder.add(classPane, BorderLayout.CENTER);
-			System.out.println("Set class pane"); 
 		}
 
 		holder.validate();
 		mainPanel.validate();
 
 		if (mainPanel.getRootPane()!=null) {
-		//pack the dialog because it is a different size 
-		((GenericSwingDialog) mainPanel.getRootPane().getParent()).pack();
+			//pack the dialog because it is a different size 
+			((GenericSwingDialog) mainPanel.getRootPane().getParent()).pack();
 		}
 	}
 
@@ -273,16 +344,25 @@ public class DLSymbolOptionPanel implements PamDialogPanel, ActionListener {
 	private JPanel createClassPane() {
 
 		classNameBox2 = new JComboBox<>();
-		classNameBox2.addActionListener(this);
+		classNameBox2.addActionListener((action)->{
+			//make sure the setting button shows the colour
+			if (classNameBox2.getSelectedIndex()>=0) {
+				colourButton.setBackground(PamAWTUtils.intToColor(classColours[classNameBox2.getSelectedIndex()]));
+			}
+			setSettingsPane();
+		});
+
 		classNameBox2.setPreferredSize(new Dimension((int) CLASS_NAME_BOX_WIDTH, 25));
 
 		//		colorPicker.setPreferredSize(new Dimension(60, 25));
-
-		PamButton colourButton = new PamButton("Color");
+		colourButton = new PamButton("Color");
 		colourButton.addActionListener((action)->{
-			Color color = JColorChooser.showDialog(colourButton, "Pick colour for class", Color.black); 
-			colourButton.setBackground(color);
-			//			colourButton.setForeground(color);
+			Color color = JColorChooser.showDialog(colourButton, "Pick colour for class", PamAWTUtils.intToColor(classColours[classNameBox2.getSelectedIndex()])); 
+			if (color!=null) {
+				colourButton.setBackground(color);
+				//			colourButton.setForeground(color);
+				classColours[classNameBox2.getSelectedIndex()]=PamAWTUtils.colorToInt(color);
+			}
 		});
 
 		JPanel classHolder = new JPanel();
@@ -318,13 +398,19 @@ public class DLSymbolOptionPanel implements PamDialogPanel, ActionListener {
 
 		c.gridx++;
 		colorComboBox = new ColourComboBox();
+		colorComboBox.addActionListener((action)->{
+			colorRangeSlider.setColourMap(colorComboBox.getSelectedColourMap());
+			colorRangeSlider.repaint();
+		});
+
 		holder.add(colorComboBox, c); 
-		
+
 		c.gridx = 0;
 		c.gridy++;
 		c.gridwidth =2;
-		colorRangeSlider = new ColourRangeSlider(JSlider.HORIZONTAL); // Min 0, Max 1 for probabilities
+		colorRangeSlider = new ColourRangeSlider(0, 100, JSlider.HORIZONTAL); // Min 0, Max 1 for probabilities
 		colorRangeSlider.setPaintTicks(true);
+		colorRangeSlider.setMinorTickSpacing(20);
 		holder.add(colorRangeSlider, c); 
 
 		return holder;
