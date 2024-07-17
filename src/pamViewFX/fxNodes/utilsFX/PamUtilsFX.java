@@ -16,12 +16,10 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JPopupMenu.Separator;
 import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 
 import PamView.ColourArray.ColourArrayType;
 import PamView.PamSymbol;
-import PamView.PamView;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -56,13 +54,26 @@ import pamViewFX.fxNodes.PamSymbolFX;
  */
 public class PamUtilsFX {
 	
-	
+	/**
+	 * Convert an FX based ColourArrayType to Swing. Note that swing options that do not exist in FX and vice versa will return null. 
+	 * @param arrayFX - the FX ColourArrayType. 
+	 * @return the Swing ColourArrayType;
+	 */
 	public static ColourArrayType fxColArray2Swing(pamViewFX.fxNodes.utilsFX.ColourArray.ColourArrayType arrayFX) {
-		
 		ColourArrayType type = ColourArrayType.valueOf(arrayFX.toString());
-	
 		return type;
 	}
+	
+	/**
+	 * Convert an Swing based ColourArrayType to FX. Note that swing options that do not exist in FX and vice versa will return null. 
+	 * @param arraySwing - the Swing ColourArrayType. 
+	 * @return the FX ColourArrayType.
+	 */
+	public static pamViewFX.fxNodes.utilsFX.ColourArray.ColourArrayType swingColArray2FX(ColourArrayType arraySwing) {
+		pamViewFX.fxNodes.utilsFX.ColourArray.ColourArrayType type =  pamViewFX.fxNodes.utilsFX.ColourArray.ColourArrayType.valueOf(arraySwing.toString());
+		return type;
+	}
+	
 	/**
 	 * 
 	 * @param awtColor
@@ -659,7 +670,7 @@ public class PamUtilsFX {
 		    int g = (int) Math.round(c.getGreen() * 255);
 		    int b = (int) Math.round(c.getBlue() * 255);
 		    return (r << 16) | (g << 8) | b;
-		}
+	}
 	 
 	 /**
 	  * Convert an int encoded with a colour to a Color object. 
@@ -672,6 +683,5 @@ public class PamUtilsFX {
 		    int b = value & 0xFF;
 		    return Color.rgb(r,g,b);
 		}
-	
 
 }

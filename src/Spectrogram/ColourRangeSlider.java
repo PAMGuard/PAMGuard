@@ -6,6 +6,11 @@ import PamView.ColourArray;
 import PamView.ColourArray.ColourArrayType;
 import PamView.sliders.PamRangeSlider;
 
+/**
+ * A range slider which shows a colour gradient between two thumbs. 
+ * 
+ * @author Jamie Macaulay
+ */
 public class ColourRangeSlider extends PamRangeSlider {
 	
 	/**
@@ -15,23 +20,32 @@ public class ColourRangeSlider extends PamRangeSlider {
 
 	public ColourRangeSlider(){
 		super(JSlider.VERTICAL);
-//		this.orientation = JSlider.VERTICAL;
 	}
 	
 	public ColourRangeSlider(int min, int max){
-		super(JSlider.VERTICAL);
-//		this.orientation = JSlider.HORIZONTAL;
+		super(min, max,JSlider.VERTICAL);
+	}
+	
+	public ColourRangeSlider(int min, int max, int orientation){
+		super(min, max,orientation);
 	}
 	
 	public ColourRangeSlider(int orientation){
 		super(orientation);
-//		this.orientation = JSlider.HORIZONTAL;
 	}
 	
+	/**
+	 * Set the colour map type to show between the two thumbs. 
+	 * @param colourMap - the colour map to show. 
+	 */
 	public void setColourMap(ColourArrayType colourMap){
 		((ColourRangeSliderUI) getUI()).setColourMap(colourMap);
 	}
 	
+	/**
+	 * Set a custom colour map type to show between the two thumbs. 
+	 * @param colourMap - the colour map to show. 
+	 */
 	public void setColourMap(ColourArray colourMap){
 		((ColourRangeSliderUI) getUI()).setColourMap(colourMap);
 	}
