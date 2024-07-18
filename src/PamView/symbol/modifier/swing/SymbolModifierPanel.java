@@ -137,6 +137,7 @@ public class SymbolModifierPanel implements PamDialogPanel {
 				JMenuItem optsItem = modifier.getModifierOptionsMenu();
 				if (optsItem != null) {
 					popMenu.add(optsItem);
+					popMenu.addSeparator();
 				}
 			}
 			if (nodeInd > 0) {

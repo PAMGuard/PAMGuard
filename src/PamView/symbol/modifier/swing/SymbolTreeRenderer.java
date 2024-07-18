@@ -43,6 +43,10 @@ public class SymbolTreeRenderer extends DefaultTreeCellRenderer {
 		if (value instanceof ChoiceTreeNode) {
 			return checkboxChoice(tree, (ChoiceTreeNode) value, sel, expanded, leaf, row, hasFocus);
 		}
+		
+		if (value instanceof OptionsTreeNode) {
+			return ((OptionsTreeNode) value).optionsButton;
+		}
 				
 		Component component = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 		if (value instanceof ModifierTreeNode) {

@@ -39,6 +39,9 @@ public class WMDDataSelector extends DataSelector {
 
 	@Override
 	public double scoreData(PamDataUnit pamDataUnit) {		
+		if (getParams().getCombinationFlag() == DataSelectParams.DATA_SELECT_DISABLE) {
+			return 1;
+		}
 		ConnectedRegionDataUnit crDataUnit = (ConnectedRegionDataUnit) pamDataUnit;
 		return (wantWhistle(crDataUnit) ? 1: 0);
 	}	
