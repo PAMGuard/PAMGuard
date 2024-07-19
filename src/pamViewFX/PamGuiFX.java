@@ -35,6 +35,7 @@ import dataModelFX.DataModelPaneFX;
 import org.controlsfx.control.ToggleSwitch;
 
 
+
 /**
  * A pane which holds a set of tabs. 
  * 
@@ -125,7 +126,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 		this.pamGuiManagerFX=pamGuiManagerFX; 
         this.mainTabPane = mainTabPane;
 		
-        Pane layout=createMainPane(mainTabPane, stage); 
+        Node layout=createMainPane(mainTabPane, stage); 
 
 		//add main pane to PamGui
 		this.getChildren().add(layout);
@@ -140,7 +141,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 		//create the main tab pane. 
         this.mainTabPane = new PamTabPane();
        		
-        Pane layout=createMainPane(mainTabPane, stage); 
+        Node layout=createMainPane(mainTabPane, stage); 
 	   
 	    //add main pane to PamGui
 	    this.getChildren().add(layout);
@@ -154,7 +155,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 	 * @param stage - the stage holding this GUI.
 	 * @return a pane which sits in the stage. 
 	 */
-	private Pane createMainPane(PamTabPane mainTabPane, Stage stage){
+	private Node createMainPane(PamTabPane mainTabPane, Stage stage){
 
 		//create the pane which holds tab pane
 		final PamBorderPane layout = new PamBorderPane();
@@ -261,7 +262,6 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 		
 		PamBorderPane layoutHolder=new PamBorderPane(layout);
 		layoutHolder.setTop(hidingLoadPane);
-		
 
 	    return  layoutHolder; 
 	    
