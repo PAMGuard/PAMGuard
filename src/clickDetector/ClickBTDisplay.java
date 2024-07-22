@@ -34,6 +34,7 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
@@ -115,9 +116,12 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamObserver;
+import PamguardMVC.dataSelector.DataSelectDialog;
 import PamguardMVC.superdet.SuperDetection;
 import clickDetector.ClickClassifiers.ClickIdInformation;
 import clickDetector.ClickClassifiers.ClickIdentifier;
+import clickDetector.alarm.ClickAlarmParameters;
+import clickDetector.dataSelector.ClickDataSelector;
 import clickDetector.dialogs.ClickDisplayDialog;
 import clickDetector.offlineFuncs.OfflineEventDataBlock;
 import clickDetector.offlineFuncs.OfflineEventDataUnit;
@@ -2244,7 +2248,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			PamDataBlock<ClickDetection> clickData = clickControl.getClickDataBlock();
 			int nAll = clickData.getUnitsCount();
 			String txt = String.format("%d of %d loaded clicks will not be displayed because their amplitude is < %3.1fdB",
-					n, nAll, btDisplayParameters.minAmplitude);
+					n, nAll, getDataSelector().getParams().minimumAmplitude);
 			Insets insets = getInsets();
 			int x = insets.left;
 			int y = getHeight()-5;
@@ -2383,19 +2387,33 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		}
 
 		menuItem = new JMenuItem("Settings ...");
+		menuItem.setToolTipText("Display options");
 		menuItem.addActionListener(new SettingsMenuAction());
 		menu.add(menuItem);
+		menuItem = new JMenuItem("Click data selector ...");
+		menuItem.setToolTipText("Detailed data selection options");
+		menuItem.addActionListener(new DataSelectorAction());
+		menu.add(menuItem);
 		menuItem = new JMenuItem("Show amplitude selector ...");
+		menuItem.setToolTipText("Graphical amplitude selector display");
 		menuItem.addActionListener(new AmplitudeSelector());
 		menu.add(menuItem);
 		menu.addSeparator();
-		ArrayList<JMenuItem> colOptList = getSymbolChooser().getQuickMenuItems(clickControl.getGuiFrame(), this, "Colour by ", SymbolModType.EVERYTHING, true);
+		ArrayList<JMenuItem> colOptList = getSymbolChooser().getQuickMenuItems(clickControl.getGuiFrame(), this, "Colour by ", SymbolModType.EVERYTHING, false);
 		if (colOptList != null) {
 			for (JMenuItem menuIt : colOptList) {
 				menu.add(menuIt);
 			}
-			menu.addSeparator();
 		}
+		menuItem = new JMenuItem("More symbol options ...");
+		menuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				showDataSymbolOptions(1);
+			}
+		});
+		menu.add(menuItem);
+		menu.addSeparator();
 
 		//		menuItem = new JCheckBoxMenuItem("Colour by species id", 
 		//				btDisplayParameters.colourScheme == BTDisplayParameters.COLOUR_BY_SPECIES);
@@ -2470,7 +2488,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 
 		return menu;
 	}
-
+	
 	/**
 	 * Looks through the current modules and finds if there is a target motion or static localiser
 	 */
@@ -2771,7 +2789,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 
 			BTDisplayParameters newParameters = 
 					ClickDisplayDialog.showDialog(clickControl, 
-							clickControl.getGuiFrame(), btDisplayParameters);
+							clickControl.getGuiFrame(), btDisplayParameters, getDataSelector().getClickAlarmParameters());
 			if (newParameters != null){
 				btDisplayParameters = newParameters.clone();
 				if (getVScaleManager() != null) {
@@ -2788,11 +2806,27 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		}
 
 	}
+	
+	
+	/**
+	 * Get a data selector specific to this display. 
+	 * @return click data selector specific to this display. 
+	 */
+	public ClickDataSelector getDataSelector() {
+		return (ClickDataSelector) clickControl.getClickDataBlock().getDataSelector(getUnitName(), false);
+	}
 
 	class AmplitudeSelector implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			showAmplitudeSelector();
+		}
+	}
+	
+	class DataSelectorAction implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			showDataSelector();
 		}
 	}
 
@@ -2812,6 +2846,38 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			btAmplitudeSelector.getFrame().setBounds(b);
 		}
 		//		}
+	}
+
+	/**
+	 * Show a dialog with both data and symbol options, but go to the correct tab. 
+	 * @param selectedTab
+	 * @return
+	 */
+	private boolean showDataSymbolOptions(int selectedTab) {
+		Window javaFrame = clickControl.getGuiFrame();
+		DataSelectDialog dataSelectDialog = new DataSelectDialog(javaFrame, clickControl.getClickDataBlock(), getDataSelector(), symbolChooser);
+		if (javaFrame == null) {
+			dataSelectDialog.moveToMouseLocation();
+		}
+		dataSelectDialog.setTab(selectedTab);
+		boolean ok = dataSelectDialog.showDialog();
+		if (ok) {
+			repaintBoth();
+			if (clickControl.getOfflineToolbar() != null) {
+				clickControl.getOfflineToolbar().displayActivated(clickBTDisplay);
+			}
+		}
+		return ok;
+	}
+
+	public void showDataSelector() {
+//		if (getDataSelector().showSelectDialog(clickControl.getGuiFrame())) {
+//			repaintBoth();
+//			if (clickControl.getOfflineToolbar() != null) {
+//				clickControl.getOfflineToolbar().displayActivated(clickBTDisplay);
+//			}
+//		};
+		showDataSymbolOptions(0);
 	}
 
 	private void checkBTAmplitudeSelectHisto() {
@@ -3036,15 +3102,15 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 				zoomer.paintShape(g, this, true);
 			}
 
-			//			long t1 = System.nanoTime();
-			synchronized (clickData.getSynchLock()) {
-				//				long t2 = System.nanoTime();
-				//				double ms = ((double) (t2-t1)) / 1000000.;
-				//				if (btDisplayParameters.VScale == BTDisplayParameters.DISPLAY_ICI) { 
-				//					sortTempICIs();
-				//				}
+			ArrayList<ClickDetection> clickCopy = clickData.getDataCopy(displayStartMillis, displayStartMillis+displayLengthMillis, true, getDataSelector());
+			if (clickCopy.size() == 0) {
+				return;
+			}
+			ListIterator<ClickDetection> clickIterator = clickCopy.listIterator(clickCopy.size()-1);
 
-				ListIterator<ClickDetection> clickIterator = clickData.getListIterator(PamDataBlock.ITERATOR_END);
+//			synchronized (clickData.getSynchLock()) {
+//
+//				ListIterator<ClickDetection> clickIterator = clickData.getListIterator(PamDataBlock.ITERATOR_END);
 				while (clickIterator.hasPrevious()) {
 					click = clickIterator.previous();
 					if (shouldPlot(prevPlottedClick)){
@@ -3060,11 +3126,6 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 				if (shouldPlot(prevPlottedClick)){ // and draw the last one !
 					drawClick(g, prevPlottedClick, clipRectangle);
 				}
-				//				g.drawString(String.format("Wait synch %3.3fms", ms), 0, 20);
-			}
-			//			long t3 = System.nanoTime();
-			//			g.drawString(String.format("Last draw %3.3fms", lastPaintTime), 0, 20);
-			//			lastPaintTime = ((double) (t3-t0)) / 1000000.;
 		}
 
 		@Override
@@ -3342,7 +3403,9 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			else if (btDisplayParameters.colourScheme == BTDisplayParameters.COLOUR_BY_HYDROPHONE) {
 				keyPanel.add(new TextKeyItem("Colour by hydrophone"));
 			}
-			if (btDisplayParameters.getShowSpecies(0)) {
+			ClickAlarmParameters selectParams = getDataSelector().getParams();
+//			if (btDisplayParameters.getShowSpecies(0)) {
+			if (selectParams.onlineAutoEvents | selectParams.onlineManualEvents) {
 				keyPanel.add(symbolChooser.getDefaultSymbol(true).makeKeyItem("Unidentified species"));
 			}
 
@@ -3354,7 +3417,8 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			PamSymbol[] symbols = clickControl.getClickIdentifier().getSymbols();
 			if (speciesList != null) {
 				for (int i = 0; i < speciesList.length; i++) {
-					if (btDisplayParameters.getShowSpecies(i+1)) {
+					if (selectParams.getUseSpecies(i+1)) {
+//					if (btDisplayParameters.getShowSpecies(i+1)) {
 						if (btDisplayParameters.colourScheme != BTDisplayParameters.COLOUR_BY_TRAIN) {
 							keyPanel.add(symbols[i].makeKeyItem(speciesList[i]));
 						}
@@ -3423,11 +3487,12 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		PamDataBlock<ClickDetection> clickData = clickControl.getClickDataBlock();
 		ClickDetection click;
 		int n = 0;
+		double minAmpli = getDataSelector().getParams().minimumAmplitude;
 		synchronized (clickData.getSynchLock()) {
 			ListIterator<ClickDetection> clickIterator = clickData.getListIterator(0);
 			while (clickIterator.hasNext()) {
 				click = clickIterator.next();
-				if (click.getAmplitudeDB() < btDisplayParameters.minAmplitude) {
+				if (click.getAmplitudeDB() < minAmpli) {
 					n++;
 				}
 			}
@@ -3448,29 +3513,30 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 	 */
 	synchronized boolean shouldPlot(ClickDetection click) {
 		if (click == null) return false;
-		if (!clickInTimeWindow(click)) return false;
-		if (btDisplayParameters.showEchoes == false && click.isEcho()) {
-			return false;
-		}
+//		if (!clickInTimeWindow(click)) return false;
+//		if (btDisplayParameters.showEchoes == false && click.isEcho()) {
+//			return false;
+//		}
 		if (btDisplayParameters.VScale == BTDisplayParameters.DISPLAY_ICI) {
 			//			if (btDisplayParameters.showUnassignedICI == false && click.getICI() < 0) return false;
 			if (btDisplayParameters.showUnassignedICI == false && click.getSuperDetectionsCount() <= 0) return false;
 			// otherwise may be ok, since will estimate all ici's on teh fly. 
 		}
-		if (btDisplayParameters.amplitudeSelect && click.getAmplitudeDB() < btDisplayParameters.minAmplitude) {
-			return false;
-		}
+//		if (btDisplayParameters.amplitudeSelect && click.getAmplitudeDB() < btDisplayParameters.minAmplitude) {
+//			return false;
+//		}
 		if (btDisplayParameters.displayChannels > 0 && (btDisplayParameters.displayChannels & click.getChannelBitmap()) == 0) return false;
 
-		int speciesIndex = clickControl.getClickIdentifier().codeToListIndex(click.getClickType());	
-		boolean showSpecies = btDisplayParameters.getShowSpecies(speciesIndex+1);
-		boolean showEvents = (btDisplayParameters.showEventsOnly == false || click.getSuperDetectionsCount() > 0);
-		if (btDisplayParameters.showANDEvents) {
-			return showSpecies & showEvents;
-		}
-		else {
-			return showSpecies | showEvents;
-		}
+//		int speciesIndex = clickControl.getClickIdentifier().codeToListIndex(click.getClickType());	
+//		boolean showSpecies = btDisplayParameters.getShowSpecies(speciesIndex+1);
+//		boolean showEvents = (btDisplayParameters.showEventsOnly == false || click.getSuperDetectionsCount() > 0);
+//		if (btDisplayParameters.showANDEvents) {
+//			return showSpecies & showEvents;
+//		}
+//		else {
+//			return showSpecies | showEvents;
+//		}
+		return true;
 	}
 
 	/**
@@ -4085,7 +4151,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			amplitudeSelectorLabel.setText("");
 		}
 		else {
-			String txt = String.format("  Amplitude Selector showing clicks > %3.1fdB", btDisplayParameters.minAmplitude);
+			String txt = String.format("  Amplitude Selector showing clicks > %3.1fdB", getDataSelector().getParams().minimumAmplitude);
 			amplitudeSelectorLabel.setText(txt);
 		}
 	}

@@ -31,6 +31,7 @@ import PamView.dialog.warn.WarnOnce;
 import clickDetector.BTDisplayParameters;
 import clickDetector.ClickControl;
 import clickDetector.ClickClassifiers.ClickIdentifier;
+import clickDetector.alarm.ClickAlarmParameters;
 
 /**
  * Dialog for basic click display parameters
@@ -57,6 +58,8 @@ public class ClickDisplayDialog extends PamDialog implements ActionListener {
 	private SizePanel sizePanel;
 	private SpeciesPanel speciesPanel;
 	private JComboBox<String> angleTypes;
+
+	private ClickAlarmParameters clickSelectParams;
 	
 	private ClickDisplayDialog(Window  owner) {
 
@@ -86,12 +89,13 @@ public class ClickDisplayDialog extends PamDialog implements ActionListener {
 
 	}
 
-	public static BTDisplayParameters showDialog(ClickControl clickControl, Window parentFrame, BTDisplayParameters btDisplayParameters) {
+	public static BTDisplayParameters showDialog(ClickControl clickControl, Window parentFrame, BTDisplayParameters btDisplayParameters, ClickAlarmParameters clickSelectParams) {
 		if (singleInstance == null || singleInstance.getOwner() != parentFrame) {
 			singleInstance = new ClickDisplayDialog(parentFrame);
 		}
 		singleInstance.clickControl = clickControl;
 		singleInstance.btDisplayParameters = btDisplayParameters.clone();
+		singleInstance.clickSelectParams = clickSelectParams;
 		singleInstance.setParams(btDisplayParameters);
 		singleInstance.setVisible(true);
 		return singleInstance.btDisplayParameters;
@@ -514,14 +518,16 @@ public class ClickDisplayDialog extends PamDialog implements ActionListener {
 					}
 				}
 			}
-			showEchoes.setSelected(btDisplayParameters.showEchoes);
+			showEchoes.setSelected(clickSelectParams.useEchoes);
 			if (species == null) {
 				showAll.setSelected(true);
 			}
 			else {
-				showAll.setSelected(btDisplayParameters.getShowSpecies(0));
+//				showAll.setSelected(btDisplayParameters.getShowSpecies(0));
+				showAll.setSelected(clickSelectParams.getUseSpecies(0));
 				for (int i = 0; i < species.length; i++) {
-						species[i].setSelected(btDisplayParameters.getShowSpecies(i+1));
+					species[i].setSelected(clickSelectParams.getUseSpecies(i+1));
+//						species[i].setSelected(btDisplayParameters.getShowSpecies(i+1));
 				}
 //				if (btDisplayParameters.showSpeciesList != null) {
 //					for (int i = 0; i < Math.min(species.length, btDisplayParameters.showSpeciesList.length);i++) {
@@ -529,9 +535,10 @@ public class ClickDisplayDialog extends PamDialog implements ActionListener {
 //					}
 //				}
 			}
-
-			clicksInAnEvent.setSelected(btDisplayParameters.showEventsOnly);
-			andOrSelection.setSelectedIndex(btDisplayParameters.showANDEvents ? 0: 1);
+			clicksInAnEvent.setSelected(clickSelectParams.onlineAutoEvents | clickSelectParams.onlineAutoEvents);
+			
+//			clicksInAnEvent.setSelected(btDisplayParameters.showEventsOnly);
+//			andOrSelection.setSelectedIndex(btDisplayParameters.showANDEvents ? 0: 1);
 //			orEvents.setSelected(!btDisplayParameters.showANDEvents);
 //			andEvents.setSelected(btDisplayParameters.showANDEvents);
 //			anyEvents.setSelected(!btDisplayParameters.showEventsOnly);
@@ -540,19 +547,17 @@ public class ClickDisplayDialog extends PamDialog implements ActionListener {
 			enableButtons();
 		}
 		boolean getParams() {
-			btDisplayParameters.showEchoes = showEchoes.isSelected();
-			btDisplayParameters.setShowSpecies(0, showAll.isSelected());
-			if (species != null) {
-				for (int i = 0; i < species.length; i++) {
-					btDisplayParameters.setShowSpecies(i+1, species[i].isSelected());
-				}
-				
-			}
-
-			btDisplayParameters.showEventsOnly = clicksInAnEvent.isSelected();
-			btDisplayParameters.showANDEvents = (andOrSelection.getSelectedIndex() == 0);
-//			btDisplayParameters.showANDEvents = andEvents.isSelected();
-//			btDisplayParameters.showEventsOnly = onlyEvents.isSelected();
+//			clickSelectParams.useEchoes = showEchoes.isSelected();
+//			btDisplayParameters.setShowSpecies(0, showAll.isSelected());
+//			if (species != null) {
+//				for (int i = 0; i < species.length; i++) {
+//					btDisplayParameters.setShowSpecies(i+1, species[i].isSelected());
+//				}
+//				
+//			}
+//
+//			btDisplayParameters.showEventsOnly = clicksInAnEvent.isSelected();
+//			btDisplayParameters.showANDEvents = (andOrSelection.getSelectedIndex() == 0);
 			return true;
 		}
 		class AllSpeciesListener implements ActionListener {

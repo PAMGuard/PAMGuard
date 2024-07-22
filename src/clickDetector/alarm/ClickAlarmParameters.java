@@ -17,10 +17,12 @@ public class ClickAlarmParameters extends DataSelectParams implements Cloneable,
 	public static final long serialVersionUID = 1L;
 	private boolean[] useSpeciesList;
 	private double[] speciesWeightings;
-	public boolean useEchoes;
-	public boolean scoreByAmplitude;
-	public boolean onlineAutoEvents, onlineManualEvents;
+	public boolean useEchoes = true;
+	public boolean scoreByAmplitude; // alarm options, probably not used any more.  
+	public double minimumAmplitude;
+	public boolean onlineAutoEvents = true, onlineManualEvents = true;
 	public int minICIMillis;
+	private boolean clicksOREvents = false;
 	/*
 	 * Which events to use ...
 	 */
@@ -163,6 +165,31 @@ public class ClickAlarmParameters extends DataSelectParams implements Cloneable,
 			e.printStackTrace();
 		}
 		return ps;
+	}
+
+	/**
+	 * @return the clicksOREvents
+	 */
+	public boolean isClicksOREvents() {
+		return clicksOREvents;
+	}
+
+	/**
+	 * @param clicksOREvents the clicksOREvents to set
+	 */
+	public void setClicksOREvents(boolean clicksOREvents) {
+		this.clicksOREvents = clicksOREvents;
+	}
+	/**
+	 * @return the clicksANDEvents
+	 */
+	public boolean isClicksANDEvents() {
+		return !clicksOREvents;
+	}
+
+
+	public void setClicksANDEvents(boolean clicksANDEvents) {
+		this.clicksOREvents = !clicksANDEvents;
 	}
 
 
