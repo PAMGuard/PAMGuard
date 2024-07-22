@@ -44,17 +44,17 @@ public class BTDisplayParameters implements Serializable, Cloneable, ManagedPara
 	public int nBearingGridLines = 1;
 	public int nAmplitudeGridLines = 0;
 	public int nICIGridLines = 0;
-	public boolean showEchoes = true;
+//	public boolean showEchoes = true;
 	public int minClickLength = 2, maxClickLength = 12;
 	public int minClickHeight = 2, maxClickHeight = 12;
 	private double timeRange = 10;
 	public int displayChannels = 0;
 	public boolean view360;
 	public boolean amplitudeSelect = false;
-	public double minAmplitude = 0;
+//	public double minAmplitude = 0;
 	public boolean showUnassignedICI = false;
-	public boolean showEventsOnly = false;
-	public boolean showANDEvents = true;
+//	public boolean showEventsOnly = false;
+//	public boolean showANDEvents = true;
 	public boolean logICIScale;
 	public int angleRotation = ROTATE_TOARRAY;
 	
@@ -65,7 +65,7 @@ public class BTDisplayParameters implements Serializable, Cloneable, ManagedPara
 	/*
 	 * Show identified species
 	 */
-	private boolean[] showSpeciesList;
+//	private boolean[] showSpeciesList;
 	
 	public int colourScheme = COLOUR_BY_TRAIN;
 	
@@ -83,7 +83,7 @@ public class BTDisplayParameters implements Serializable, Cloneable, ManagedPara
 		} catch (CloneNotSupportedException Ex) {
 			Ex.printStackTrace();
 		}
-		showSpeciesList = null;
+//		showSpeciesList = null;
 		return null;
 	}
 
@@ -107,49 +107,49 @@ public class BTDisplayParameters implements Serializable, Cloneable, ManagedPara
 	/**
 	 * @return the showSpeciesList
 	 */
-	public boolean getShowSpecies(int speciesIndex) {
-		if (showSpeciesList != null && showSpeciesList.length > speciesIndex) {
-			return showSpeciesList[speciesIndex];
-		}
-		makeShowSpeciesList(speciesIndex);
-		return true;
-	}
-	private void makeShowSpeciesList(int maxIndex) {
-		if (showSpeciesList == null) {
-			showSpeciesList = new boolean[0];
-		}
-		else if (showSpeciesList.length > maxIndex) {
-			return;
-		}
-		int oldLength = showSpeciesList.length;
-		showSpeciesList = Arrays.copyOf(showSpeciesList, maxIndex + 1);
-		for (int i = oldLength; i <= maxIndex; i++) {
-			showSpeciesList[i] = true;
-		}
-	}
+//	public boolean getShowSpecies(int speciesIndex) {
+//		if (showSpeciesList != null && showSpeciesList.length > speciesIndex) {
+//			return showSpeciesList[speciesIndex];
+//		}
+//		makeShowSpeciesList(speciesIndex);
+//		return true;
+//	}
+//	private void makeShowSpeciesList(int maxIndex) {
+//		if (showSpeciesList == null) {
+//			showSpeciesList = new boolean[0];
+//		}
+//		else if (showSpeciesList.length > maxIndex) {
+//			return;
+//		}
+//		int oldLength = showSpeciesList.length;
+//		showSpeciesList = Arrays.copyOf(showSpeciesList, maxIndex + 1);
+//		for (int i = oldLength; i <= maxIndex; i++) {
+//			showSpeciesList[i] = true;
+//		}
+//	}
 
 	/**
 	 * @param showSpeciesList the showSpeciesList to set
 	 */
-	public void setShowSpecies(int speciesIndex, boolean showSpecies) {
-		makeShowSpeciesList(speciesIndex);
-		showSpeciesList[speciesIndex] = showSpecies;
-	}
+//	public void setShowSpecies(int speciesIndex, boolean showSpecies) {
+//		makeShowSpeciesList(speciesIndex);
+//		showSpeciesList[speciesIndex] = showSpecies;
+//	}
 	
 	@Override
 	public PamParameterSet getParameterSet() {
 		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
-		try {
-			Field field = this.getClass().getDeclaredField("showSpeciesList");
-			ps.put(new PrivatePamParameterData(this, field) {
-				@Override
-				public Object getData() throws IllegalArgumentException, IllegalAccessException {
-					return showSpeciesList;
-				}
-			});
-		} catch (NoSuchFieldException | SecurityException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			Field field = this.getClass().getDeclaredField("showSpeciesList");
+//			ps.put(new PrivatePamParameterData(this, field) {
+//				@Override
+//				public Object getData() throws IllegalArgumentException, IllegalAccessException {
+//					return showSpeciesList;
+//				}
+//			});
+//		} catch (NoSuchFieldException | SecurityException e) {
+//			e.printStackTrace();
+//		}
 		return ps;
 	}
 
