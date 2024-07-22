@@ -382,7 +382,7 @@ public class RawSoundPlotDataFX {
 		
 		if (soundStore.currentRawDataMillis==0){
 			if (++timeErrors < 10) {
-			System.err.println("RawSoundPlotData: Raw sound data has no associated millisecond time: "+ soundStore.currentRawDataMillis);
+//			System.err.println("RawSoundPlotData: Raw sound data has no associated millisecond time: "+ soundStore.currentRawDataMillis);
 			}
 			return;
 		}

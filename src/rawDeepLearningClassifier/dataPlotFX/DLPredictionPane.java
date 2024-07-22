@@ -19,7 +19,9 @@ import pamViewFX.fxNodes.utilityPanes.PamToggleSwitch;
 import rawDeepLearningClassifier.dlClassification.DLClassName;
 
 /*
- * Symbol Options for the annotation pane
+ * Symbol Options for the annotation pane.
+ * 
+ * @author Jamie Macaulay
  */
 public class DLPredictionPane extends PamBorderPane implements TDSettingsPane {
 	

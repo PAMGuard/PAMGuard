@@ -65,6 +65,9 @@ public class StoreChoiceSummary {
 	 * @param choice
 	 */
 	public void addChoice(ReprocessStoreChoice choice) {
+		if (choices.contains(choice)) {
+			return;
+		}
 		choices.add(choice);
 	}
 

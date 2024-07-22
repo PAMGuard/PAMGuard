@@ -31,12 +31,15 @@ import clickDetector.ClickBTDisplay;
 import clickDetector.ClickControl;
 import clickDetector.ClickDisplay;
 import clickDetector.ClickClassifiers.ClickIdentifier;
+import clickDetector.alarm.ClickAlarmParameters;
+import clickDetector.dataSelector.ClickDataSelector;
 import PamView.PamToolBar;
 import PamView.component.PamSettingsIconButton;
 import PamView.dialog.PamCheckBox;
 import PamView.dialog.PamLabel;
 import PamView.dialog.PamRadioButton;
 import PamView.panel.PamPanel;
+import PamguardMVC.dataSelector.DataSelectParams;
 
 public class OfflineToolbar {
 
@@ -252,19 +255,29 @@ public class OfflineToolbar {
 			return;
 		}
 		try {
+			ClickDataSelector clickDataSelector = currentBTDisplay.getDataSelector();
+			ClickAlarmParameters selectParams = clickDataSelector.getParams();
 			BTDisplayParameters btDisplayParameters = currentBTDisplay.getBtDisplayParameters();
-			btDisplayParameters.setShowSpecies(0, showNonSpecies.isSelected());
-			btDisplayParameters.showEchoes = showEchoes.isSelected();
+			
+			selectParams.setUseSpecies(0, showNonSpecies.isSelected());
+//			btDisplayParameters.setShowSpecies(0, showNonSpecies.isSelected());
+//			btDisplayParameters.showEchoes = showEchoes.isSelected();
+			selectParams.useEchoes = showEchoes.isSelected();
+			
 			if (clicksInAnEvent != null) {
-				btDisplayParameters.showEventsOnly = clicksInAnEvent.isSelected();
+//				btDisplayParameters.showEventsOnly = clicksInAnEvent.isSelected();
+//				selectParams.onlineAutoEvents = selectParams.onlineManualEvents = true; 
+						selectParams.unassignedEvents =clicksInAnEvent.isSelected() == false;
 			}
 			if (andOrSelection != null) {
-				btDisplayParameters.showANDEvents = (andOrSelection.getSelectedIndex() == 0);
+				selectParams.setClicksANDEvents(andOrSelection.getSelectedIndex() == 0);
+//				btDisplayParameters.showANDEvents = (andOrSelection.getSelectedIndex() == 0);
 			}
 			if (speciesButtons != null) {
 				int n = speciesButtons.length;
 				for (int i = 0; i < n; i++) {
-					btDisplayParameters.setShowSpecies(i+1, speciesButtons[i].isSelected());
+					selectParams.setUseSpecies(i+1, speciesButtons[i].isSelected());
+//					btDisplayParameters.setShowSpecies(i+1, speciesButtons[i].isSelected());
 				}
 			}
 			currentBTDisplay.repaintTotal();
@@ -275,23 +288,35 @@ public class OfflineToolbar {
 	}
 
 	private void checkButtons(BTDisplayParameters btDisplayParameters) {
-		showEchoes.setSelected(btDisplayParameters.showEchoes);
-		showNonSpecies.setSelected(btDisplayParameters.getShowSpecies(0));
+		ClickDataSelector clickDataSelector = currentBTDisplay.getDataSelector();
+		ClickAlarmParameters selectParams = clickDataSelector.getParams();
+		showEchoes.setSelected(selectParams.useEchoes);
+		showNonSpecies.setSelected(selectParams.getUseSpecies(0));
+//		showNonSpecies.setSelected(btDisplayParameters.getShowSpecies(0));
+		boolean anySel = false;;
 		if (clicksInAnEvent != null) {
-			clicksInAnEvent.setSelected(btDisplayParameters.showEventsOnly);
+			clicksInAnEvent.setSelected(selectParams.unassignedEvents == false);
+			anySel |= clicksInAnEvent.isSelected();
+//			clicksInAnEvent.setSelected(btDisplayParameters.showEventsOnly);
 		}
 		if (speciesButtons != null) {
 			int n = speciesButtons.length;
 			for (int i = 0; i < n; i++) {
-				speciesButtons[i].setSelected(btDisplayParameters.getShowSpecies(i+1));
+				speciesButtons[i].setSelected(selectParams.getUseSpecies(i+1));
+				anySel |= speciesButtons[i].isSelected();
+//				speciesButtons[i].setSelected(btDisplayParameters.getShowSpecies(i+1));
 			}
 		}
 		 // setting combo box fires actionlistener, so we have to make sure that all checkboxes have been properly set first
 		// or else they will get cleared later
 		if (andOrSelection != null) {
-			andOrSelection.setSelectedIndex(btDisplayParameters.showANDEvents ? 0: 1);
+			andOrSelection.setSelectedIndex(selectParams.isClicksANDEvents() ? 0 : 1);
+//			andOrSelection.setSelectedIndex(btDisplayParameters.showANDEvents ? 0: 1);
 		}
 		firstSetup = true;
+		if (anySel) {
+			selectParams.setCombinationFlag(DataSelectParams.DATA_SELECT_AND);
+		}
 	}
 	
 }

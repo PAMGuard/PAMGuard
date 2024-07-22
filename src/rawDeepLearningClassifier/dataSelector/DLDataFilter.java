@@ -1,5 +1,6 @@
 package rawDeepLearningClassifier.dataSelector;
 
+import PamView.dialog.PamDialogPanel;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataSelector.DataSelectParams;
 import pamViewFX.fxSettingsPanes.DynamicSettingsPane;
@@ -33,10 +34,16 @@ public interface DLDataFilter {
 	public void setParams(DataSelectParams params); 
 	
 	/**
-	 * Settings controls for this filter. 
-	 * @return the cotnrols for this filter. 
+	 * Settings controls for the deep learning filter. 
+	 * @return the controls for this filter. 
 	 */
 	public DynamicSettingsPane<DataSelectParams> getSettingsPane();
+
+	/**
+	 * Swing settings controls for the data deep learning filter. 
+	 * @return Swing dialog for the settings
+	 */
+	public PamDialogPanel getSettingsPanel();
 
 
 }

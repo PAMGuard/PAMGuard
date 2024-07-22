@@ -15,6 +15,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.DateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
@@ -602,7 +603,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 				audioStream.close();
 			}
 
-			System.out.println("FileInputSystem - prepareInputFile"); 
+//			System.out.println("FileInputSystem - prepareInputFile"); 
 
 			audioStream = PamAudioFileManager.getInstance().getAudioInputStream(currentFile);
 
@@ -1017,9 +1018,11 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 						newDataUnit = new RawDataUnit(ms, 1 << ichan, totalSamples, newSamples);
 						newDataUnit.setRawData(doubleData[ichan]);
 
-						if (1000*(readFileSamples/sampleRate)>=fileInputParameters.skipStartFileTime) {
-							newDataUnits.addNewData(newDataUnit);
+						if (1000*(readFileSamples/sampleRate)<fileInputParameters.skipStartFileTime) {
+							// zero the data. Skipping it causes all the timing to screw up
+							Arrays.fill(doubleData[ichan], 0.);
 						}
+						newDataUnits.addNewData(newDataUnit);
 
 						// GetOutputDataBlock().addPamData(pamDataUnit);
 					}

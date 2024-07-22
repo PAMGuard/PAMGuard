@@ -9,12 +9,12 @@
 <body>
 	<h1 id="pamguard-s-deep-learning-module">PAMGuard&#39;s Deep
 		Learning Module</h1>
+
+
 	<h2 id="viewing-and-exporting-results">Viewing and exporting
 		results</h2>
-	<br>
 	<p>Output from the deep learning module can be viewed in PAMGuard
 		viewer mode, or extracted from binary files using MATLAB or R.</p>
-	<br>
 	<h3 id="pamguard-viewer-mode">PAMGuard viewer mode</h3>
 	<p>Detections form continuous raw data are shown in the datagram in
 		the same way as all data streams in PAMGuard.</p>
@@ -32,7 +32,7 @@
 		manual analyst can quickly navigate to detections with high prediction
 		values for a certain class. Hovering over or right clicking on a data
 		unit in the time display and selecting the information button, will
-		show the data unit&#39;s metadata, including the prediction values for all
+		show the data unit’s metadata, including the prediction values for all
 		output classes from the deep learning model.</p>
 	<p align="center">
 		<img src="images/bat_time_base_display.png">
@@ -50,7 +50,6 @@
 		deep learning prediction values. The spectrogram will also show deep
 		learning detections as translucent blue boxes (these must be selected
 		in the right click menu).</p>
-	<br>
 	<h3 id="matlab">MATLAB</h3>
 	<p>The easiest way to export to MATLAB is to select the desired
 		units in the time base display, right click and select the MATLAB
@@ -96,7 +95,7 @@ predicitons = dldetections(<span class="hljs-number">1</span>).annotations.dlcla
 		waveform data in each structure;</p>
 	<pre>
 		<code class="lang-matlab">
-<span class="hljs-comment">% plot all the spectrograms.</span>
+			<span class="hljs-comment">% plot all the spectrograms.</span>
 clf
 tiledlayout(<span class="hljs-number">5</span>,<span class="hljs-number">5</span>)
 <span class="hljs-keyword">for</span> <span class="hljs-built_in">i</span>=<span
@@ -155,7 +154,6 @@ tiledlayout(<span class="hljs-number">5</span>,<span class="hljs-number">5</span
 		<em>Right whale detections from a deep learning model imported
 			and then plotted in MATLAB</em>
 	</p>
-	<br>
 	<h3 id="r">R</h3>
 	<p>In the same way as MATLAB export, the PAMGuard time base display
 		and export selected data units directly to an R struct which can be
@@ -165,13 +163,17 @@ tiledlayout(<span class="hljs-number">5</span>,<span class="hljs-number">5</span
 		functions compared to the MATLAB library. The PAMBinaries R library
 		can be found <a href="https://github.com/TaikiSan21/PamBinaries">here</a>.
 	</p>
+
 	<br>
 	<br>
 	<br>
-	<p class="prevLink"><a href="rawDeepLearning_Running.html">Previous:
-	Running the Deep Learning module</a></p>
-	<p class="nextLink"><a href="rawDeepLearning_Bugs.html">Next:
-	Common Bugs and Mistakes</a></p>
+	<p class="prevLink">
+		<a href="rawDeepLearning_Running.html">Previous: Running the Deep
+			Learning module</a>
+	</p>
+	<p class="nextLink">
+		<a href="rawDeepLearning_Bugs.html">Next: Common Bugs and Mistakes</a>
+	</p>
 	<br>
 	<br>
 	<br>

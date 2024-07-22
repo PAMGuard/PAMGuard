@@ -230,7 +230,16 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 		dataSelectPane.addSettingsListener(()->{
 			//dynamic settings pane so have to repaint whenever a control is selected. 
 			getParams();
-			clickPlotInfo.getTDGraph().repaint(0);
+			
+			/**
+			 * If there are raw amplitude or frequency panes that have a buffer of painted units then
+			 * these have to be cleared for the data selector
+			 */
+			clickPlotInfo.getClickRawPlotManager().clear();
+			clickPlotInfo.getClickFFTPlotManager().clear();
+
+			
+			clickPlotInfo.getTDGraph().repaint(50);
 		});
 
 		this.setCenter(tabPane);
@@ -244,7 +253,7 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 	 * @return the data select pane. 
 	 */
 	private DynamicSettingsPane<Boolean> createDataSelectPane(){		
-		System.out.println("DATA SELECTOR: " + clickPlotInfo.getClickDataSelector());
+//		System.out.println("DATA SELECTOR: " + clickPlotInfo.getClickDataSelector());
 		return clickPlotInfo.getClickDataSelector().getDialogPaneFX();
 	}
 
@@ -449,7 +458,7 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 		PamVBox vBox = new PamVBox(); 
 		vBox.setSpacing(5);
 
-		minMaxWidthPane = new DualControlField<Double>("Min", "Max" , "", 2, 100, 1); 
+		minMaxWidthPane = new DualControlField<Double>("", "" , "", 2, 100, 1); 
 		minMaxWidthPane.addChangeListener((obsval, oldval, newval)->{
 			newSettings();
 			//do not allow the min ti be larger than the max. 
@@ -472,7 +481,7 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 
 		
 		//height pane
-		minMaxHeightPane = new DualControlField<Double>("Min", "Max" , "", 2, 100, 1);  
+		minMaxHeightPane = new DualControlField<Double>("", "" , "", 2, 100, 1);  
 		minMaxHeightPane.addChangeListener((obsval, oldval, newval)->{
 			newSettings();
 			//do not allow the min ti be larger than the max. 
@@ -519,7 +528,7 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 		getParams();
 
 		//on a parameter change must clear the FFT plot. 
-		clickPlotInfo.getClickFFTplotManager().clear(); 
+		clickPlotInfo.getClickFFTPlotManager().clear(); 
 		clickPlotInfo.getClickRawPlotManager().clear(); 
 
 		clickPlotInfo.getTDGraph().repaint(milliswait);
@@ -773,7 +782,7 @@ public class ClickControlPane2 extends PamBorderPane implements TDSettingsPane {
 		clickPlotInfo.getClickDisplayParams().fftHop = this.fftSpinnerHop.getValue().intValue();
 		clickPlotInfo.getClickDisplayParams().fftLength = this.fftSpinnerLength.getValue().intValue(); 
 		clickPlotInfo.getClickDisplayParams().colourMap = this.spectroControlPane.getColourArrayType(); 
-		clickPlotInfo.getClickFFTplotManager().update(); 
+		clickPlotInfo.getClickFFTPlotManager().update(); 
 		/*** Data select pane****/
 
 		//dynamic settings pane so have to repaint whenever a control is selected. 

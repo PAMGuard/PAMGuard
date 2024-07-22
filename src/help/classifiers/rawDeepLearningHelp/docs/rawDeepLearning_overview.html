@@ -7,10 +7,11 @@
 
 </head>
 <body>
-	<h1 id="pamguard-s-deep-learning-module">PAMGuard Deep
-		Learning Module</h1>
+	<h1 id="pamguard-s-deep-learning-module">PAMGuard&#39;s deep
+		learning module</h1>
+	<p>Note: this module requires an internet connection upon first use
+		to download correct libraries.</p>
 	<h2 id="overview">Overview</h2>
-
 	<p>PAMGuard&#39;s deep learning module allows users to deploy a
 		large variety of deep learning models natively in PAMGuard. It is core
 		module, fully integrated into PAMGuard&#39;s display and data
@@ -19,9 +20,7 @@
 		signal and can integrate into multiple types of acoustic analysis
 		workflows, for example post analysis of recorder data or used as part
 		of real time localisation workflow.</p>
-		
-	<br>
-	<h3 id="how-it-works">How it works</h3>
+	<h2 id="how-it-works">How it works</h2>
 	<p>The deep learning module accepts raw data from different types
 		of data sources, e.g. from the Sound Acquisition module, clicks and
 		clips. It segments data into equal sized chunks with a specified
@@ -32,8 +31,7 @@
 		learning model, then can be automatically set up by PAMGuard.
 		Currently there are three implemented frameworks</p>
 	<p align="center">
-		<img width="900" height="370"
-			src="images/deep_learning_module_process.png">
+		<img src="images/deep_learning_module_process.png">
 	</p>
 
 	<p>
@@ -44,7 +42,6 @@
 			the model are saved and can be viewed in real time (e.g. mitigation)
 			or in post processing (e.g. data from SoundTraps).</em>
 	</p>
-	<br>
 	<h3 id="generic-model">Generic Model</h3>
 	<p>
 		A generic model allows a user to load any model compatible with the <a
@@ -54,12 +51,11 @@
 		existing framework instead of a generic model as these models will
 		automatically generate the required transforms.
 	</p>
-	<br>
 	<h3 id="animalspot">AnimalSpot</h3>
 	<p>
 		<a href="https://github.com/ChristianBergler/ANIMAL-SPOT">ANIMAL-SPOT</a>
 		is a deep learning based framework which was initially designed for <a
-			href="https://github.com/ChristianBergler/ORCA-SPOT">killer
+			href="(https://github.com/ChristianBergler/ORCA-SPOT">killer
 			whale sound detection</a>) in noise heavy underwater recordings (see <a
 			href="https://www.nature.com/articles/s41598-019-47335-w">Bergler
 			et al. (2019)</a>). It has now been expanded to a be species independent
@@ -68,21 +64,43 @@
 		AnimalSpot models will automatically set up their own data transforms
 		and output classes.
 	</p>
-	<br>
 	<h3 id="ketos">Ketos</h3>
 	<p>
 		<a href="https://meridian.cs.dal.ca/2015/04/12/ketos/">Ketos</a> is an
 		acoustic deep learning framework based on Tensorflow and developed by
 		<a href="https://meridian.cs.dal.ca/">MERIDIAN</a>. It has excellent
 		resources and tutorials and Python libraries can be installed easily
-		via pip. Imported Ketos model will automatically set up their own data
+		via pip. Imported Ketos (.ktpb) models will automatically set up their
+		own data transforms and output classes.
+	</p>
+	<h3 id="koogu">Koogu</h3>
+	<p>
+		<a href="https://shyamblast.github.io/Koogu/en/stable/">Koogu </a> is
+		a Python package which allows users to train a deep learning model.
+		Koogu helps users by integrating with some frequency used annotation
+		programs and provides tools to train and test classifiers. Imported
+		Koogu models (.kgu) will automatically set up their own data
 		transforms and output classes.
 	</p>
+	<h3 id="pamguardzip">PAMGuardZip</h3>
+	<p>
+		PAMGuard zip models consist of a deep learning model (either a
+		Tensorflow saved_model.pb or PyTorch <em>*.py model) alongside a
+			PAMGuard metdata file (</em>.pdtf*) within a zip archive. The metadata
+		file contains all the information needed for PAMGaurd to set up the
+		model. PAMGuard will import the zip file, decompress it and search for
+		the relevent deep learning model and metadata file then set up all
+		settings accordingly. This framework allows users to easily share
+		pre-tested PAMGuard compatible models.
+	</p>
+
 	<br>
 	<br>
 	<br>
-	<p class="nextLink"><a href="rawDeepLearning_CreateAndConfig.html">Next:
-	Creating and Configuring the Deep Learning module</a></p>
+	<p class="nextLink">
+		<a href="rawDeepLearning_CreateAndConfig.html">Next: Creating and
+			Configuring the Deep Learning module</a>
+	</p>
 	<br>
 	<br>
 	<br>

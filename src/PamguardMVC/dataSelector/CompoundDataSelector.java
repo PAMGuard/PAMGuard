@@ -95,6 +95,9 @@ public class CompoundDataSelector extends DataSelector {
 				score = Math.max(score,  score2); // take the largest
 			}
 		}
+		
+//		System.out.println("Hello Compound Data selector: " + score);
+		
 		return score;
 	}
 
