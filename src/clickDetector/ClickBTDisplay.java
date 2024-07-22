@@ -117,6 +117,7 @@ import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamObserver;
 import PamguardMVC.dataSelector.DataSelectDialog;
+import PamguardMVC.dataSelector.DataSelector;
 import PamguardMVC.superdet.SuperDetection;
 import clickDetector.ClickClassifiers.ClickIdInformation;
 import clickDetector.ClickClassifiers.ClickIdentifier;
@@ -2244,11 +2245,15 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			if (btDisplayParameters.amplitudeSelect == false) {
 				return;
 			}
+			ClickDataSelector clickDataSelector = getClickDataSelector();
+			if (clickDataSelector == null) {
+				return;
+			}
 			int n = countAmplitudeDeselected();
 			PamDataBlock<ClickDetection> clickData = clickControl.getClickDataBlock();
 			int nAll = clickData.getUnitsCount();
 			String txt = String.format("%d of %d loaded clicks will not be displayed because their amplitude is < %3.1fdB",
-					n, nAll, getDataSelector().getParams().minimumAmplitude);
+					n, nAll, clickDataSelector.getParams().minimumAmplitude);
 			Insets insets = getInsets();
 			int x = insets.left;
 			int y = getHeight()-5;
@@ -2789,7 +2794,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 
 			BTDisplayParameters newParameters = 
 					ClickDisplayDialog.showDialog(clickControl, 
-							clickControl.getGuiFrame(), btDisplayParameters, getDataSelector().getClickAlarmParameters());
+							clickControl.getGuiFrame(), btDisplayParameters, getClickDataSelector().getClickAlarmParameters());
 			if (newParameters != null){
 				btDisplayParameters = newParameters.clone();
 				if (getVScaleManager() != null) {
@@ -2812,8 +2817,23 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 	 * Get a data selector specific to this display. 
 	 * @return click data selector specific to this display. 
 	 */
-	public ClickDataSelector getDataSelector() {
-		return (ClickDataSelector) clickControl.getClickDataBlock().getDataSelector(getUnitName(), false);
+	public DataSelector getDataSelector() {
+		return clickControl.getClickDataBlock().getDataSelector(getUnitName(), false);
+	}
+	
+	/**
+	 * get the click specific data selector which may now be burried in a 
+	 * CompoundDataSelector if annotations have been used. 
+	 * @return ClickDataSelector. 
+	 */
+	public ClickDataSelector getClickDataSelector() {
+		DataSelector baseSel = getDataSelector();
+		if (baseSel == null) {
+			return null;
+		}
+		else {
+			return (ClickDataSelector) baseSel.findDataSelector(ClickDataSelector.class);
+		}
 	}
 
 	class AmplitudeSelector implements ActionListener {
@@ -3403,7 +3423,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			else if (btDisplayParameters.colourScheme == BTDisplayParameters.COLOUR_BY_HYDROPHONE) {
 				keyPanel.add(new TextKeyItem("Colour by hydrophone"));
 			}
-			ClickAlarmParameters selectParams = getDataSelector().getParams();
+			ClickAlarmParameters selectParams = getClickDataSelector().getParams();
 //			if (btDisplayParameters.getShowSpecies(0)) {
 			if (selectParams.onlineAutoEvents | selectParams.onlineManualEvents) {
 				keyPanel.add(symbolChooser.getDefaultSymbol(true).makeKeyItem("Unidentified species"));
@@ -3487,7 +3507,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		PamDataBlock<ClickDetection> clickData = clickControl.getClickDataBlock();
 		ClickDetection click;
 		int n = 0;
-		double minAmpli = getDataSelector().getParams().minimumAmplitude;
+		double minAmpli = getClickDataSelector().getParams().minimumAmplitude;
 		synchronized (clickData.getSynchLock()) {
 			ListIterator<ClickDetection> clickIterator = clickData.getListIterator(0);
 			while (clickIterator.hasNext()) {
@@ -4151,7 +4171,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			amplitudeSelectorLabel.setText("");
 		}
 		else {
-			String txt = String.format("  Amplitude Selector showing clicks > %3.1fdB", getDataSelector().getParams().minimumAmplitude);
+			String txt = String.format("  Amplitude Selector showing clicks > %3.1fdB", getClickDataSelector().getParams().minimumAmplitude);
 			amplitudeSelectorLabel.setText(txt);
 		}
 	}

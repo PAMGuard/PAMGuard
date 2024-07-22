@@ -68,7 +68,7 @@ public class BTAmplitudeSelector implements PamDialogPanel {
 		super();
 		this.clickControl = clickControl;
 		this.btDisplay = btDisplay;
-		dataSelector = btDisplay.getDataSelector();
+		dataSelector = btDisplay.getClickDataSelector();
 		clickDataBlock = clickControl.getClickDataBlock();
 		histoPlot = new HistogramDisplay();
 		histoPlot.setGraphicsOverLayer(histoOverLayer = new HistoOverLayer());
