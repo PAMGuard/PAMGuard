@@ -44,6 +44,12 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 	 * in real time without slowing down the rest of PAMGaurd. 
 	 */
 	private TaskThread workerThread;
+	
+	/**
+	 * Makes a binary decision on whether a prediction result should go on
+	 * to be part of a data unit. 
+	 */
+	private SimpleDLDecision simpleDLDecision = new SimpleDLDecision();
 
 
 	public StandardClassifierModel(DLControl dlControl) {
@@ -84,7 +90,7 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 			
 			for (int i =0; i<modelResult.size(); i++) {
 				modelResult.get(i).setClassNameID(GenericDLClassifier.getClassNameIDs(getDLParams())); 
-				modelResult.get(i).setBinaryClassification(GenericDLClassifier.isBinaryResult(modelResult.get(i), getDLParams())); 
+				modelResult.get(i).setBinaryClassification(isDecision(modelResult.get(i), getDLParams())); 
 				modelResult.get(i).setTimeMillis(groupedRawData.get(i).getTimeMilliseconds());
 
 			}
@@ -106,7 +112,7 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 	
 	@Override
 	public void prepModel() {
-		System.out.println("STANDARD CLASSIFIER MODEL PREP MODEL! !!!: " +  getDLParams().modelPath);
+//		System.out.println("STANDARD CLASSIFIER MODEL PREP MODEL! !!!: " +  getDLParams().modelPath);
 //		StandardModelParams oldParams = getDLParams().clone();
 		
 		getDLWorker().prepModel(getDLParams(), dlControl);
@@ -221,7 +227,8 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 	 * @return true if a threshold has been met. 
 	 */
 	public boolean isDecision(StandardPrediction modelResult, StandardModelParams modelParmas) {
-		return isBinaryResult(modelResult, modelParmas);
+		simpleDLDecision.setParams(modelParmas);
+		return simpleDLDecision.isBinaryResult(modelResult);
 	}
 
 	
@@ -241,22 +248,22 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 
 
 
-	/**
-	 * Check whether a model passes a binary test...
-	 * @param modelResult - the model results
-	 * @return the model results. 
-	 */
-	public static boolean isBinaryResult(StandardPrediction modelResult, StandardModelParams genericModelParams) {
-		for (int i=0; i<modelResult.getPrediction().length; i++) {
-						//System.out.println("Binary Classification: "  + genericModelParams.binaryClassification.length); 
-
-			if (modelResult.getPrediction()[i]>genericModelParams.threshold && genericModelParams.binaryClassification[i]) {
-				//				System.out.println("SoundSpotClassifier: prediciton: " + i + " passed threshold with val: " + modelResult.getPrediction()[i]); 
-				return true; 
-			}
-		}
-		return  false;
-	}
+//	/**
+//	 * Check whether a model passes a binary test...
+//	 * @param modelResult - the model results
+//	 * @return the model results. 
+//	 */
+//	public static boolean isBinaryResult(StandardPrediction modelResult, StandardModelParams genericModelParams) {
+//		for (int i=0; i<modelResult.getPrediction().length; i++) {
+//						//System.out.println("Binary Classification: "  + genericModelParams.binaryClassification.length); 
+//
+//			if (modelResult.getPrediction()[i]>genericModelParams.threshold && genericModelParams.binaryClassification[i]) {
+//				//				System.out.println("SoundSpotClassifier: prediciton: " + i + " passed threshold with val: " + modelResult.getPrediction()[i]); 
+//				return true; 
+//			}
+//		}
+//		return  false;
+//	}
 	
 	
 	@Override

@@ -48,5 +48,12 @@ public interface PamAudioFileLoader {
 	public boolean loadAudioData(OfflineFileServer offlineFileServer, PamDataBlock dataBlock,
 			OfflineDataLoadInfo offlineDataLoadInfo, ViewLoadObserver loadObserver); 
 	
+	/**
+	 * Get a settings pane for the audio loader
+	 * @return settings pane for audio loader - can be null. 
+	 */
+	public PamAudioSettingsPane getSettingsPane();
+
+	
 
 }

@@ -1,5 +1,6 @@
 package Acquisition.layoutFX;
 
+import java.awt.GridBagConstraints;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,8 @@ import Acquisition.FileInputParameters;
 import Acquisition.FolderInputParameters;
 import Acquisition.FolderInputSystem;
 import Acquisition.pamAudio.PamAudioFileFilter;
+import Acquisition.pamAudio.PamAudioFileLoader;
+import Acquisition.pamAudio.PamAudioFileManager;
 import PamController.PamController;
 import PamController.PamFolders;
 import PamUtils.PamCalendar;
@@ -48,7 +51,7 @@ import pamViewFX.fxNodes.PamProgressBar;
 import pamViewFX.fxNodes.PamVBox;
 
 /**
- * Pane for the folder input of the sound acquisition. 
+ * JavaFX pane for the folder input of the sound acquisition. 
  * 
  * @author Jamie Macaulay 
  *
@@ -146,6 +149,8 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 	 * Toggle button for merging contigious files
 	 */
 	private ToggleButton mergeContigious;
+
+	private PamBorderPane audioHolderloader;
 
 	//	/**
 	//	 * The folder input system. 
@@ -245,8 +250,11 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		Label utilsLabel=new Label("Sound file utilities");
 		PamGuiManagerFX.titleFont2style(utilsLabel);
 		
+		//
+		audioHolderloader = new PamBorderPane(); 
+		
 		pamVBox.getChildren().addAll(fileSelectBox, subFolderPane, progressBar,  createTablePane(), 
-				fileDateText=new Label(), utilsLabel, createUtilsPane());
+				fileDateText=new Label(), audioHolderloader, utilsLabel, createUtilsPane());
 
 		//allow users to check file headers in viewer mode. 
 		//		if (PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW) {
@@ -361,6 +369,7 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		return new PamBorderPane(table); 
 	}
 
+	
 	/**
 	 * Open a dialog to select either a folder or a list of files. 
 	 * @param folderDir - true to use directory chooser, false to use multiple file chooser. 
@@ -594,6 +603,9 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		this.table.getItems().addAll(fileList);
 
 		fileDateStrip.setFileList(fileList); 
+		
+		//set any bespoke options for the files to be laoded. 
+		setFileOptionPane(fileList);
 
 		//need to set the sample rate and channels in the main pane.
 		if (fileList!=null && fileList.size()>0) {
@@ -608,6 +620,34 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 		//		if (selFiles!=null && selFiles.length > 0) {
 		//			fileDateStrip.setDate(folderInputSystem.getFileStartTime(selFiles[0]));
 		//		}
+	}
+	
+	
+	/**
+	 * Set bespoke options for certain file types. 
+	 */
+	public void setFileOptionPane(ObservableList<WavFileType> fileList) {
+		
+		audioHolderloader.setCenter(null);
+
+		if (fileList.size() > 0) {
+			//Get all the audio file laoders that will be used for this list of files. Usually 
+			//just one but possible that there can be mixed files. 
+			ArrayList<PamAudioFileLoader> loaders = PamAudioFileManager.getInstance().getAudioFileLoaders(fileList);
+
+			PamVBox vBox = new PamVBox();
+			vBox.setSpacing(5);
+			for (PamAudioFileLoader loader : loaders) {
+				if (loader.getSettingsPane()!=null) {
+					//add the settings pane to the vbox
+					vBox.getChildren().add(loader.getSettingsPane().getAudioLoaderPane());
+					loader.getSettingsPane().setParams();
+				}
+			}
+			audioHolderloader.setCenter(vBox);
+
+		}
+
 	}
 
 	/**
@@ -637,16 +677,30 @@ public class FolderInputPane extends DAQSettingsPane<FolderInputParameters>{
 	public void setParams() {		
 		//set the parameters for the dialog. 
 		this.setParams(folderInputSystem.getFolderInputParameters());
+		
+		
 	}
 
 	@Override
 	public boolean getParams() {
 		FolderInputParameters params = this.getParams(folderInputSystem.getFolderInputParameters());
+		
+		//get bespoke paramters from selected audio loaders. Note these are global and so are not part
+		//of the folder input system
+		ArrayList<PamAudioFileLoader> loaders = PamAudioFileManager.getInstance().getAudioFileLoaders();
+
+		for (PamAudioFileLoader loader : loaders) {
+			if (loader.getSettingsPane()!=null) {
+				loader.getSettingsPane().getParams();
+			}
+		}
+		
 		if (params == null) return false;
 		else {
 			this.folderInputSystem.setFolderInputParameters(params);
 			return true; 
 		}
+
 	}
 
 

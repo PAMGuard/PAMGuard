@@ -18,12 +18,10 @@ import javax.swing.tree.TreePath;
 
 import PamView.dialog.DialogScrollPane;
 import PamView.dialog.PamDialogPanel;
-import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.StandardSymbolChooser;
 import PamView.symbol.StandardSymbolOptions;
 import PamView.symbol.modifier.SymbolModifier;
 import PamView.symbol.modifier.SymbolModifierParams;
-import PamguardMVC.debug.Debug;
 
 /**
  * Panel to include in a dialog with options to select and activate a variety of symbol modifiers. 

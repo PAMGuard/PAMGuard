@@ -565,6 +565,55 @@ public class PamArrayUtils {
 	}
 	
 	/**
+	 * Get the index of the maximum value in an array 
+	 * @param arr  - the array to find the position of the maximum value. 
+	 * m value of. 
+	 * @return the index of the maximum value
+	 */
+	public static int maxPos(float[] arr) {
+		double max = Double.NEGATIVE_INFINITY;
+		int index = -1; 
+		
+		int count = 0; 
+		for(float cur: arr) {
+			if (cur>max) {
+				index = count; 
+				max=cur;
+			}
+			count++; 
+		}
+		
+
+		return index;
+	}
+	
+	/**
+	 * Get the index of the maximum value within a 2D matrix
+	 * @param arr  - the array to find the position of the maximum value. 
+	 * m value of. 
+	 * @return the index i and j of the maximum value 
+	 */
+	public static int[] maxPos(float[][] arr) {
+		float max = Float.NEGATIVE_INFINITY;
+		int[] index = new int[] {-1,-1};
+
+		//		int count = 0; 
+		float cur;
+		for(int i=0; i<arr.length; i++) {
+			for(int j=0; j<arr.length; j++) {
+				cur = arr[i][j];
+				if (cur>max) {
+					index[0]=i;
+					index[1]=j;
+					max=cur;
+				}
+				//			count++; 
+			}
+		}
+		return index;
+	}
+	
+	/**
 	 * Get the minimum index of an array
 	 * @param arr  - the array to find the position of the maximum value. 
 	 * m value of. 

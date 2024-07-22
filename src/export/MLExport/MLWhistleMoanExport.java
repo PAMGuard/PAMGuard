@@ -82,7 +82,7 @@ public class MLWhistleMoanExport extends MLDataUnitExport<ConnectedRegionDataUni
 		
 //		Struct mlStructure= new MLStructure("sliceData", new int[]{dataUnit.getConnectedRegion().getSliceData().size(), 1}); 
 
-		Struct mlStructure= Mat5.newStruct();
+		Struct mlStructure= Mat5.newStruct(dataUnit.getConnectedRegion().getSliceData().size(), 1);
 
 		//the start sample.
 		Matrix sliceNumber;

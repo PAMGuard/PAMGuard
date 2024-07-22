@@ -901,13 +901,14 @@ public class TDGraphFX extends PamBorderPane {
 	}
 
 	/**
-	 * A tgool tip for detections.
+	 * A Tooltip for showing information about detections. 
 	 * 
 	 * @author Jamie Macaulay
 	 *
 	 */
 	private class TDTooltip extends Tooltip {
 
+		private static final double TOOL_TIP_DELAY = 60; //seconds
 		private TDPlotPane plotPanel;
 
 		/**
@@ -917,6 +918,8 @@ public class TDGraphFX extends PamBorderPane {
 		public TDTooltip(TDPlotPane aPlot) {
 			super("Test tooltip");
 			this.plotPanel = aPlot;
+			//make the Tooltip last a little longer
+			this.setShowDelay(Duration.seconds(TOOL_TIP_DELAY));
 			/*
 			 * See https://bugs.openjdk.java.net/browse/JDK-8090477 fr info about tool tip
 			 * timing on these displys.

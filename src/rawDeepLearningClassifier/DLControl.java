@@ -561,6 +561,7 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	 * @return the number of classes.
 	 */
 	public int getNumClasses() {
+		if (getDLModel()==null) return 0;
 		return getDLModel().getNumClasses();
 
 	}
@@ -622,8 +623,9 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	}
 	
 	/**
-	 * Get the classifier chooser. 
-	 * @return the classifier chooser.Take it
+	 * Get the classifier chooser. The classifier chooser chooses which classifier use
+	 * based on a selected file or URL. 
+	 * @return the classifier chooser.
 	 */
 	public DLClassifierChooser getDlClassifierChooser() {
 		return dlClassifierChooser;

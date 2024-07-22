@@ -44,7 +44,7 @@ public class RExportOverlayMenu extends ExportOverlayMenu {
 	 * Create the export overlay
 	 */
 	public RExportOverlayMenu(){
-		rExportManger= new RExportManager(); 
+		rExportManger= new RExportManager(null); 
 		
 		buttonNode = createButton();
 		

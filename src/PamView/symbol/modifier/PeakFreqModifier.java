@@ -5,6 +5,7 @@ import java.awt.Color;
 import PamUtils.PamUtils;
 import PamView.GeneralProjector;
 import PamView.PamSymbolType;
+import PamView.dialog.PamDialogPanel;
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.SymbolData;
 import PamguardMVC.PamDataUnit;
@@ -45,7 +46,15 @@ public class PeakFreqModifier extends SymbolModifier {
 	 */
 	private ColourArrayType colourArrayType;
 
-	private PeakFreqOptionsPane peakFreqOptions;
+	/**
+	 * JavaFX pane for frequency symbol options. 
+	 */
+	private PeakFreqOptionsPane peakFreqOptionsPaneFX;
+
+	/**
+	 * Swing panel for frequency symbol options
+	 */
+	private PamDialogPanel peakFreqOptionsPanel;
 
 	public PeakFreqModifier(PamSymbolChooser symbolChooser) {
 		super(PEAK_FREQ_MODIFIER_NAME, symbolChooser, SymbolModType.FILLCOLOUR |  SymbolModType.LINECOLOUR );
@@ -130,11 +139,20 @@ public class PeakFreqModifier extends SymbolModifier {
 	@Override
 	public SymbolModifierPane getOptionsPane() {
 		//System.out.println("PEAK FREQ COLOUR ARRAY2: " + peakFreqSymbolOptions.freqColourArray);
-		if (this.peakFreqOptions==null) {
-			peakFreqOptions = new PeakFreqOptionsPane(this); 
-			peakFreqOptions.setParams();
+		if (this.peakFreqOptionsPaneFX==null) {
+			peakFreqOptionsPaneFX = new PeakFreqOptionsPane(this); 
+			peakFreqOptionsPaneFX.setParams();
 		}
-		return peakFreqOptions; 
+		return peakFreqOptionsPaneFX; 
+	}
+	
+	public PamDialogPanel getDialogPanel() {
+		//System.out.println("PEAK FREQ COLOUR ARRAY2: " + peakFreqSymbolOptions.freqColourArray);
+		if (this.peakFreqOptionsPanel==null) {
+			peakFreqOptionsPanel = new PeakFreqOptionsPanel(this); 
+			peakFreqOptionsPanel.setParams();
+		}
+		return peakFreqOptionsPanel; 
 	}
 
 	@Override

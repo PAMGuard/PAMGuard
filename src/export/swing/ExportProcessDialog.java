@@ -9,7 +9,6 @@ import java.awt.Window;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
-
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JFileChooser;
@@ -38,6 +37,8 @@ import export.PamExporterManager;
 import export.layoutFX.ExportParams;
 import offlineProcessing.OLProcessDialog;
 import offlineProcessing.OfflineTaskGroup;
+import offlineProcessing.TaskMonitor;
+import offlineProcessing.TaskMonitorData;
 import offlineProcessing.TaskStatus;
 
 /**
@@ -75,7 +76,6 @@ public class ExportProcessDialog {
 
 
 	public void createExportGroup() {
-
 		//clear current tasks. 
 		dlOfflineGroup.clearTasks();
 
@@ -87,7 +87,6 @@ public class ExportProcessDialog {
 				dlOfflineGroup.addTask(new ExportTask(dataBlocks.get(i), exportManager));
 			}
 		}
-
 	}
 	////---Swing stuff----/// should not be here but this is how PG works. 
 
@@ -129,6 +128,9 @@ public class ExportProcessDialog {
 		 */
 		private JFileChooser fc;
 
+		/**
+		 * S	hows the folder stuff is going to export to. 
+		 */
 		private JTextField exportTo;
 
 		/**
@@ -268,7 +270,7 @@ public class ExportProcessDialog {
 
 			Ikon icon = null;
 			/**
-			 * This is nasty but we won't have many exporters and this is the only
+			 * This is NASTY but we won't have many exporters and this is the only
 			 * good way to get this to work in Swing. 
 			 */
 			switch (iconString) {
@@ -351,20 +353,83 @@ public class ExportProcessDialog {
 
 
 	}
+	
+	class ExportTaskMonitor implements TaskMonitor {
+		
+		private int taskIndex;
+		
+		private ExportTaskGroup exportTaskGroup;
+		
+		private boolean started = false;
 
-
-	class ExportTaskGroup extends OfflineTaskGroup{
-
-		public ExportTaskGroup(String settingsName) {
-			super(null, settingsName);
-			// TODO Auto-generated constructor stub
-
+		public ExportTaskMonitor(int i, ExportTaskGroup exportTaskGroup) {
+			this.taskIndex = i;
+			this.exportTaskGroup = exportTaskGroup;
 		}
 
+	
+		@Override
+		public void setTaskStatus(TaskMonitorData taskMonitorData) {
+			if (taskMonitorData.taskStatus== TaskStatus.COMPLETE && !started) {
+				System.out.println(" TASK COMPLETE:");
+				if (taskIndex<exportTaskGroup.getNTasks()) {
+					exportTaskGroup.runTaskFrom(taskIndex+1);
+					started = true;
+				}
+			}
+		}
+
+
+
+		
+	}
+
+
+	/**
+	 * Export task
+	 */
+	class ExportTaskGroup extends OfflineTaskGroup {
+
+		
+		public ExportTaskGroup(String settingsName) {
+			super(null, settingsName);
+		}
+
+		
 		@Override
 		public String getUnitType() {
 			return "Export Data";
 		}
+		
+		/**
+		 * Runs tasks from a specific task number. 
+		 * @param i - the index
+		 */
+		public void runTaskFrom(int i) {
+			System.out.println("RUN TASK FROM :" + i);
+
+			this.setPrimaryDataBlock(getTask(i).getDataBlock());
+			if (i<getNTasks()-1) {
+				//will start a new thread after this one has finished
+				this.setTaskMonitor(new ExportTaskMonitor(i, this));
+			}
+			super.runTasks();
+		}
+		
+		
+		/**
+		 * Override the tasks o it runs through all tasks for each datablock. Usually
+		 * task groups deal with just one parent datablock but exporters export from
+		 * different data blocks. The only way to deal with this is to let the task run
+		 * again and again through all tasks and letting tasks themselves check the
+		 * correct data units are being exported.
+		 */
+		@Override
+		public boolean runTasks() {
+			runTaskFrom(0) ;
+			return true;
+		}
+
 	}
 	
 

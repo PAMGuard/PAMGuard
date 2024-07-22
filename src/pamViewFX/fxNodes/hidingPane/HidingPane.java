@@ -20,7 +20,6 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 
 /**
  * Hiding pane which can be added to any node. 
@@ -156,7 +155,7 @@ public class HidingPane extends StackPane {
 		//create a button which hides the side panel
 		hideButton=createShowButton(false);
 		styleHideButton(hideButton);
-		hideButton.setOnAction(new HideButtonPressed());
+//		hideButton.setOnAction(new HideButtonPressed());
 		hideButton.setVisible(false);
 		//		hideButton.setStyle("close-button-right");
 
@@ -333,8 +332,6 @@ public class HidingPane extends StackPane {
 	double dragX=0;
 	double dragY=0;
 	double distance=0;
-
-
 	private PamButton createShowButton(final boolean show){
 
 		final PamButton pamButton=new PamButton();
@@ -343,6 +340,7 @@ public class HidingPane extends StackPane {
 
 			@Override public void handle(MouseEvent mouseEvent) {
 				// record a delta distance for the drag and drop operation.
+//				System.out.println("HidingPane.showButton - setOnMousePressed");
 				dragX =mouseEvent.getSceneX();
 				dragY =mouseEvent.getSceneY();
 			}
@@ -350,10 +348,24 @@ public class HidingPane extends StackPane {
 
 		pamButton.setOnMouseReleased(new EventHandler<MouseEvent>() {
 			@Override public void handle(MouseEvent mouseEvent) {
-				if (distance==0) return; 
+//				System.out.println("HidingPane.showButton - setOnMouseReleased");
+				
+				//the mouse has been pressed
+				if (distance==0) {
+					if (isShowing()) {
+						showHidePane(false);
+					}
+					else {
+						showHidePane(true);
+					}
+					return;
+				}
+
+				//the mouse has been dragged dragged
 				distance=sideIndex*distance;
 				//			  System.out.println("Mouse released: HidePanel distance: "+distance);
 				if (!overlay) distance=Math.abs(distance);
+				
 				//need to see where the drag has ended-if greater than 50% then open but if less then close. 
 				if (!isHorizontal()){
 					if (distance<expandedSize/2) showHidePane(overlay? true : false);
@@ -363,6 +375,7 @@ public class HidingPane extends StackPane {
 					if (distance<expandedSize/2) showHidePane(overlay? true : false);
 					if (distance>=expandedSize/2) showHidePane(overlay? false : true);
 				}
+				
 				//reset the distance
 				distance=0;
 			}
@@ -370,12 +383,14 @@ public class HidingPane extends StackPane {
 
 		pamButton.setOnMouseDragged(new EventHandler<MouseEvent>() {
 			@Override public void handle(MouseEvent mouseEvent) {
+//				System.out.println("HidingPane.showButton - setOnMouseDragged");
 				if (visibleImmediatly) hidePane.setVisible(true);
 				else hidePane.setVisible(false);
 				// hideButton.setVisible(true);
 				/**
 				 * Work out the distance the panel is to be dragged; 
 				 */
+				double distance = 0;
 				if (!isHorizontal()){
 					if (!show) distance=(mouseEvent.getSceneX()-dragX);
 					else distance=(mouseEvent.getSceneX()-dragX)+sideIndex*expandedSize;
@@ -387,26 +402,28 @@ public class HidingPane extends StackPane {
 					if (!overlay) distance=expandedSize+sideIndex*distance;
 				}
 				//			  if (show && Math.abs(distance)>expandedSize) return; 
-
+				
 				translatePanel(distance);
+				
+				HidingPane.this.distance = distance ; 
 			}
 		});
 
-		pamButton.setOnMouseEntered(new EventHandler<MouseEvent>() {
-			@Override public void handle(MouseEvent mouseEvent) {
-//				System.out.println("HidingPane.showButton - mouse entered");
-				pamButton.setOpacity(1.0);
-				pamButton.setPadding(new Insets(2.,2.,2.,2.));
-			}
-		});
-
-		pamButton.setOnMouseExited(new EventHandler<MouseEvent>() {
-			@Override public void handle(MouseEvent mouseEvent) {
-//				System.out.println("HidingPane.showButton - mouse exited");
-				if (show) pamButton.setOpacity(showButtonOpacity);
-				pamButton.setPadding(new Insets(0.,0.,0.,0.));
-			}
-		});
+//		pamButton.setOnMouseEntered(new EventHandler<MouseEvent>() {
+//			@Override public void handle(MouseEvent mouseEvent) {
+////				System.out.println("HidingPane.showButton - mouse entered");
+//				pamButton.setOpacity(1.0);
+//				pamButton.setPadding(new Insets(2.,2.,2.,2.));
+//			}
+//		});
+//
+//		pamButton.setOnMouseExited(new EventHandler<MouseEvent>() {
+//			@Override public void handle(MouseEvent mouseEvent) {
+////				System.out.println("HidingPane.showButton - mouse exited");
+//				if (show) pamButton.setOpacity(showButtonOpacity);
+//				pamButton.setPadding(new Insets(0.,0.,0.,0.));
+//			}
+//		});
 
 //		pamButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
 //			@Override public void handle(MouseEvent mouseEvent) {
@@ -415,15 +432,15 @@ public class HidingPane extends StackPane {
 //			}
 //		});
 
-		pamButton.addEventHandler(ActionEvent.ACTION,new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				System.out.println("HidingPane.showButton - action event clicked");
-				showHidePane(show);
-			}
-		});
+//		pamButton.addEventHandler(ActionEvent.ACTION,new EventHandler<ActionEvent>() {
+//			@Override
+//			public void handle(ActionEvent e) {
+//				System.out.println("HidingPane.showButton - action event clicked");
+//				showHidePane(show);
+//			}
+//		});
 
-		if (show) pamButton.setOpacity(showButtonOpacity);
+//		if (show) pamButton.setOpacity(showButtonOpacity);
 		
 		return pamButton;
 	}
@@ -601,7 +618,7 @@ public class HidingPane extends StackPane {
 			showing.setValue(true);
 			if (visibleImmediatly) hidePane.setVisible(true);
 			//hideButton.setVisible(true);
-			//System.out.println("HidingPane: Open Hide Pane");
+//			System.out.println("HidingPane: Open Hide Pane");
 			//open the panel
 			if (timeLineShow.getStatus()==Status.RUNNING) {
 				//stops the issue with the hiding pane freezing.
@@ -613,7 +630,7 @@ public class HidingPane extends StackPane {
 		else{
 			showing.setValue(false);
 			if (!visibleImmediatly) hidePane.setVisible(false);
-			//System.out.println("HidingPane: Close Hide Pane");
+//			System.out.println("HidingPane: Close Hide Pane");
 			//close the panel
 			timeLineHide.play();
 		}
@@ -638,17 +655,17 @@ public class HidingPane extends StackPane {
 		}
 	}
 
-	/**
-	 * Called whenever the pin button is pressed. 
-	 * @author Jamie Macaulay
-	 */
-	class HideButtonPressed implements EventHandler<ActionEvent>{
-
-		@Override
-		public void handle(ActionEvent arg0) {
-			showHidePane(false);
-		}
-	}
+//	/**
+//	 * Called whenever the pin button is pressed. 
+//	 * @author Jamie Macaulay
+//	 */
+//	class HideButtonPressed implements EventHandler<ActionEvent>{
+//
+//		@Override
+//		public void handle(ActionEvent arg0) {
+//			showHidePane(false);
+//		}
+//	}
 
 	/**
 	 * Get the button which hides the pane.
@@ -731,6 +748,15 @@ public class HidingPane extends StackPane {
 	public BooleanProperty showingProperty(){
 		return this.showing; 
 	}
+	
+	/**
+	 * Check whether the hiding pane is showing.
+	 * @return true if showing. 
+	 */
+	public boolean isShowing(){
+		return this.showing.get(); 
+	}
+	
 	
 	/**
 	 * Get the opacity of the show button when the mouse is outside the button. 

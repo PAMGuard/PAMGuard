@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.pamguard</groupId>
   <artifactId>Pamguard</artifactId>
-  <version>2.02.12</version>
+  <version>2.02.11d</version>
   <name>Pamguard</name>
   <description>Pamguard using Maven to control dependencies</description>
 	<url>www.pamguard.org</url>
@@ -100,8 +100,8 @@
 							<excludes>
 								<exclude>META-INF/*.SF</exclude> <!--  get rid of manifests from library jars - also done in orig ant build file -->
 								<exclude>META-INF/*.DSA</exclude>
-								<exclude>META-INF/*.RSA</exclude>								
-								<exclude>test/resources/**</exclude>
+								<exclude>META-INF/*.RSA</exclude>
+								<exclude>test/resources/**</exclude><!--  get rid of deep learning moduels and wav files used for unit tests -->
 							</excludes>
 						</filter>
 					</filters>
@@ -180,25 +180,7 @@
 	          -->
 	        </executions>
 	      </plugin>
-	      
-	      <!--  Exclude the resource folder from build 
-	      <plugin>
-	        <groupId>org.apache.maven.plugins</groupId>
-	        <artifactId>maven-resources-plugin</artifactId>
-	        <version>3.2.0</version>
-	        <configuration>
-	          <resources>
-	            <resource>
-	              <directory>src/Resources</directory>  
-	              	<excludes>
-	                	<exclude>src/test/resources/**</exclude>  
-	                </excludes>
-	            </resource>
-	          </resources>
-	        </configuration>
-	      </plugin>-->	
-	      
-	      
+	     	   
 	    </plugins>
     
     
@@ -598,7 +580,7 @@
 	<dependency>
 	    <groupId>com.fazecast</groupId>
 	    <artifactId>jSerialComm</artifactId>
-	    <version>2.11.0</version>
+	    <version>2.5.3</version>
 	</dependency>
 
 	<!-- https://mvnrepository.com/artifact/edu.emory.mathcs/JTransforms -->

@@ -185,6 +185,7 @@ public class TemplateSpectrumPane  extends PamBorderPane {
 		this.currentSpectrum = new SpectrumTemplateDataUnit(spectrumTemplate); 
 		templateDisplay.setDataUnit(currentSpectrum);
 		
+		
 	}
 	
 	/**
@@ -226,7 +227,6 @@ public class TemplateSpectrumPane  extends PamBorderPane {
 				if (templateImporters.get(i).getExtension()[j].equals(extension)) {
 //					System.out.println("Import using the extensions: " + extension);
 					template=templateImporters.get(i).importTemplate(file);
-
 				}
 			}
 		}
@@ -288,7 +288,7 @@ public class TemplateSpectrumPane  extends PamBorderPane {
 		}
 
 		@Override
-		public double[][] getPowerSpectrum(SpectrumTemplateDataUnit data, int strat, int end) {
+		public double[][] getPowerSpectrum(SpectrumTemplateDataUnit data, int start, int end) {
 			return new double[][]{data.spectrumTemplate.waveform};
 		}
 		
@@ -296,6 +296,7 @@ public class TemplateSpectrumPane  extends PamBorderPane {
 		@Override
 		public double getSampleRate(SpectrumTemplateDataUnit data) {
 			//bit of a hack to get sample rate but works. 
+//			System.out.println("Set sample rate: " + data.spectrumTemplate.sR);
 			return data.spectrumTemplate.sR; 
 		}
 
