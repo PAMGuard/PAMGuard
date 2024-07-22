@@ -108,4 +108,25 @@ public class CompoundDataSelector extends DataSelector {
 		return selectorList;
 	}
 
+	@Override
+	public DataSelector findDataSelector(Class selectorClass) {
+		/**
+		 * Check this, then all in the selector list. Should iterate happily back to 
+		 * a basic data selector as required even if there are multiple Compound ones. 
+		 */
+		if (this.getClass() == selectorClass) {
+			return this;
+		}
+		if (selectorList == null) {
+			return null;
+		}
+		for (DataSelector aSelector : selectorList) {
+			DataSelector subSel = aSelector.findDataSelector(selectorClass);
+			if (subSel != null) {
+				return subSel;
+			}
+		}
+		return null;
+	}
+
 }

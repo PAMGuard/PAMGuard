@@ -255,7 +255,7 @@ public class OfflineToolbar {
 			return;
 		}
 		try {
-			ClickDataSelector clickDataSelector = currentBTDisplay.getDataSelector();
+			ClickDataSelector clickDataSelector = currentBTDisplay.getClickDataSelector();
 			ClickAlarmParameters selectParams = clickDataSelector.getParams();
 			BTDisplayParameters btDisplayParameters = currentBTDisplay.getBtDisplayParameters();
 			
@@ -288,7 +288,7 @@ public class OfflineToolbar {
 	}
 
 	private void checkButtons(BTDisplayParameters btDisplayParameters) {
-		ClickDataSelector clickDataSelector = currentBTDisplay.getDataSelector();
+		ClickDataSelector clickDataSelector = currentBTDisplay.getClickDataSelector();
 		ClickAlarmParameters selectParams = clickDataSelector.getParams();
 		showEchoes.setSelected(selectParams.useEchoes);
 		showNonSpecies.setSelected(selectParams.getUseSpecies(0));
