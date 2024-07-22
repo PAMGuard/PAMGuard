@@ -1,5 +1,6 @@
 package Localiser.algorithms.timeDelayLocalisers.bearingLoc;
 
+import Localiser.LocalisationAlgorithm;
 import pamMaths.PamVector;
 
 /**
@@ -8,7 +9,7 @@ import pamMaths.PamVector;
  * @author Doug Gillespie
  *
  */
-public interface BearingLocaliser {
+public interface BearingLocaliser extends LocalisationAlgorithm {
 
 	/**
 	 * Do any preparation necessary (e.g. creation of look up tables)

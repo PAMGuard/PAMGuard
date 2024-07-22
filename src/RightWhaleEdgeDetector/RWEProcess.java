@@ -62,7 +62,7 @@ public class RWEProcess extends PamProcess {
 		this.rweControl = rweControl;
 		rweDataBlock = new RWEDataBlock(rweControl, rweControl.getUnitName(), this, 0);
 		addOutputDataBlock(rweDataBlock);
-		rweDataBlock.setLocalisationContents(LocContents.HAS_BEARING);
+//		rweDataBlock.setLocalisationContents(LocContents.HAS_BEARING);
 		rweDataBlock.setDatagramProvider(new RWEDatagramProvider());
 		rweDataBlock.setOverlayDraw(new RWEOverlayGraphics(this, rweDataBlock));
 		StandardSymbolManager symbolManager = symbolManager = new RWESymbolManager(rweDataBlock, RWEOverlayGraphics.defaultSymbol, true);
@@ -137,6 +137,11 @@ public class RWEProcess extends PamProcess {
 			if ((channelMap & (1<<i)) != 0) {
 				rweChannelProcesses[i] = new RWEChannelProcess(this, i);
 			}
+		}
+		int nChan = PamUtils.getNumChannels(channelMap);
+		if (nChan > 1) {
+			// really needs properly setting up with channel groups 
+			rweDataBlock.setLocalisationContents(LocContents.HAS_BEARING);
 		}
 //		checkBearingLocaliser(sourceDataBlock.getChannelMap());
 	}
@@ -433,6 +438,7 @@ public class RWEProcess extends PamProcess {
 		int hydrophoneMap = sourceDataBlock.getChannelListManager().channelIndexesToPhones(chanMap);
 		return findBearingLocaliser(hydrophoneMap);
 	}
+	
 	private synchronized BearingLocaliser findBearingLocaliser(int hydrophoneMap) {
 		int nPhones = PamUtils.getNumChannels(hydrophoneMap);
 		if (nPhones < 2) {

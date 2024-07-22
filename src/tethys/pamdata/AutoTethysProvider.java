@@ -13,6 +13,7 @@ import PamController.PamControlledUnit;
 import PamController.PamSettings;
 import PamController.PamguardVersionInfo;
 import PamController.settings.output.xml.PamguardXMLWriter;
+import PamDetection.LocalisationInfo;
 import PamUtils.XMLUtils;
 import PamguardMVC.DataAutomationInfo;
 import PamguardMVC.DataUnitBaseData;
@@ -37,6 +38,7 @@ import nilus.SpeciesIDType;
 import tethys.TethysControl;
 import tethys.TethysTimeFuncs;
 import tethys.detection.DetectionsHandler;
+import tethys.localization.TethysLocalisationInfo;
 import tethys.niluswraps.PDeployment;
 import tethys.output.StreamExportParams;
 import tethys.output.TethysExportParams;
@@ -504,6 +506,42 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 	public TethysControl getTethysControl() {
 		return tethysControl;
 	}
+
+	@Override
+	public boolean hasDetections() {
+		return true;
+	}
+
+	
+	@Override
+	public boolean canExportLocalisations(GranularityEnumType granularityType) {
+		LocalisationInfo locCont = pamDataBlock.getLocalisationContents();
+		if (locCont == null) {
+			return false;
+		}
+		return (locCont.getLocContent() > 0 & granularityOK(granularityType));
+	}
+
+	/**
+	 * Granularity is OK for export. 
+	 * @param granularityType
+	 * @return
+	 */
+	public boolean granularityOK(GranularityEnumType granularityType) {
+		return (granularityType == null || granularityType == GranularityEnumType.CALL);
+	}
+
+	@Override
+	public TethysLocalisationInfo getLocalisationInfo() {
+		LocalisationInfo locCont = pamDataBlock.getLocalisationContents();
+		if (locCont == null || locCont.getLocContent() == 0) {
+			return null;
+		}
+		else {
+			return new TethysLocalisationInfo(pamDataBlock);
+		}
+	}
+	
 
 
 }

@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -17,9 +18,6 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
-import org.w3c.dom.Document;
-
-import PamController.settings.output.xml.PamguardXMLWriter;
 import PamView.dialog.PamGridBagContraints;
 import PamView.panel.WestAlignedPanel;
 import PamguardMVC.PamDataBlock;
@@ -28,6 +26,7 @@ import PamguardMVC.dataSelector.DataSelector;
 import PamguardMVC.dataSelector.DataSelectorChangeListener;
 import nilus.GranularityEnumType;
 import tethys.TethysControl;
+import tethys.localization.TethysLocalisationInfo;
 import tethys.niluswraps.PGranularityType;
 import tethys.output.StreamExportParams;
 import tethys.pamdata.TethysDataProvider;
@@ -40,22 +39,51 @@ public class GranularityCard extends ExportWizardCard {
 
 	private JTextField binLength, minBinnedCalls, encounterGap, minEncounterCalls;
 	
+	private JCheckBox exportDetections, exportLocalisations;
+	
+	private JLabel localisationTypes;
+	
 	private JRadioButton groupChannels, separateChannels;
 
 	private DataSelector dataSelector;
 
 	private DetectionsExportWizard detectionsExportWizard;
 
-	private int encounterIndex, binnedIndex;
+	private int callIndex, encounterIndex, binnedIndex;
 
 	private GranularityEnumType[] allowedGranularities;
 
+	private TethysDataProvider tethysDataProvider;
+	
 	public GranularityCard(DetectionsExportWizard detectionsExportWizard, TethysControl tethysControl, PamDataBlock dataBlock) {
 		super(tethysControl, detectionsExportWizard, "Granularity", dataBlock);
 		this.detectionsExportWizard = detectionsExportWizard;
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-		TethysDataProvider tethysDataProvider = dataBlock.getTethysDataProvider(tethysControl);
+		tethysDataProvider = dataBlock.getTethysDataProvider(tethysControl);
+
+		GranularityChange gc = new GranularityChange();
+		
+		exportDetections = new JCheckBox("Export Detections");
+		exportLocalisations = new JCheckBox("Export Localisations");
+		exportDetections.addActionListener(gc);
+		exportLocalisations.addActionListener(gc);
+		JPanel whatPanel = new JPanel(new GridBagLayout());
+		GridBagConstraints cw = new PamGridBagContraints();
+		cw.gridwidth = 2;
+		whatPanel.add(exportDetections, cw);
+		cw.gridy++;
+		whatPanel.add(exportLocalisations, cw);
+		cw.gridwidth = 1;
+		cw.gridy++;
+		whatPanel.add(new JLabel("Loclisation types: ", JLabel.RIGHT), cw);
+		cw.gridx++;
+		whatPanel.add(localisationTypes = new JLabel("none"), cw);
+		JPanel walPanel = new WestAlignedPanel(whatPanel);
+		walPanel.setBorder(new TitledBorder("What to export"));
+		this.add(walPanel);
+		localisationTypes.setToolTipText("Not all listed localisation types may be present in actual data");
+		
 		// granularity
 		allowedGranularities = tethysDataProvider.getAllowedGranularities();
 		granularities = new JRadioButton[allowedGranularities.length];
@@ -63,7 +91,6 @@ public class GranularityCard extends ExportWizardCard {
 		GridBagConstraints c = new PamGridBagContraints();
 		granPanel.setBorder(new TitledBorder("Granularity"));
 		ButtonGroup granGroup = new ButtonGroup();
-		GranularityChange gc = new GranularityChange();
 		binLength = new JTextField(5);
 		minBinnedCalls = new JTextField(5);
 		encounterGap = new JTextField(5);
@@ -75,6 +102,9 @@ public class GranularityCard extends ExportWizardCard {
 			granularities[i].addActionListener(gc);
 			granPanel.add(granularities[i], c);
 			granGroup.add(granularities[i]);
+			if (allowedGranularities[i] == GranularityEnumType.CALL) {
+				callIndex = i;
+			}
 			if (allowedGranularities[i] == GranularityEnumType.BINNED) {
 				binnedIndex = i;
 				c.gridx++;
@@ -149,16 +179,6 @@ public class GranularityCard extends ExportWizardCard {
 
 	}
 
-	private void enableControls() {
-		binLength.setEnabled(granularities[binnedIndex].isSelected());
-		minBinnedCalls.setEnabled(granularities[binnedIndex].isSelected());
-		encounterGap.setEnabled(granularities[encounterIndex].isSelected());
-		minEncounterCalls.setEnabled(granularities[encounterIndex].isSelected());
-		boolean binOrencount = granularities[binnedIndex].isSelected() | granularities[encounterIndex].isSelected();
-		separateChannels.setEnabled(binOrencount);
-		groupChannels.setEnabled(binOrencount);
-	}
-
 	protected void newDataSelection() {
 		if (dataSelector == null) {
 			return;
@@ -177,12 +197,9 @@ public class GranularityCard extends ExportWizardCard {
 
 	@Override
 	public boolean getParams(StreamExportParams streamExportParams) {
-		for (int i = 0; i < allowedGranularities.length; i++) {
-			if (granularities[i].isSelected()) {
-				streamExportParams.granularity = allowedGranularities[i];
-				break;
-			}
-		}
+
+		streamExportParams.granularity = getCurrentGranularity();
+
 		if (streamExportParams.granularity == GranularityEnumType.BINNED) {
 			try {
 				streamExportParams.binDurationS = Double.valueOf(binLength.getText());
@@ -214,22 +231,87 @@ public class GranularityCard extends ExportWizardCard {
 
 		streamExportParams.separateChannels = separateChannels.isSelected();
 		
+		streamExportParams.exportDetections = exportDetections.isSelected();
+		
+		streamExportParams.exportLocalisations = exportLocalisations.isSelected();
+		
+		if (streamExportParams.exportDetections == false && streamExportParams.exportLocalisations == false) {
+			return detectionsExportWizard.showWarning("You must select Detections or Localisations for export");
+		}
+		
 		return streamExportParams.granularity != null;
 	}
 
-	@Override
-	public void setParams(StreamExportParams streamExportParams) {
-		for (int i = 0; i < granularities.length; i++) {
-			granularities[i].setSelected(streamExportParams.granularity == allowedGranularities[i]);
+	private GranularityEnumType getCurrentGranularity() {
+		for (int i = 0; i < allowedGranularities.length; i++) {
+			if (granularities[i].isSelected()) {
+				return allowedGranularities[i];
+			}
 		}
-		binLength.setText(String.format("%3.1f", streamExportParams.binDurationS));
-		minBinnedCalls.setText(String.format("%d", streamExportParams.minBinCount));
-		encounterGap.setText(String.format("%3.1f", streamExportParams.encounterGapS));
-		minEncounterCalls.setText(String.format("%d", streamExportParams.minEncounterCount));
-		separateChannels.setSelected(streamExportParams.separateChannels);
-		groupChannels.setSelected(streamExportParams.separateChannels == false);
-		newDataSelection();
-		enableControls();
+		return null;
+	}
+
+	@Override
+		public void setParams(StreamExportParams streamExportParams) {
+			for (int i = 0; i < granularities.length; i++) {
+				granularities[i].setSelected(streamExportParams.granularity == allowedGranularities[i]);
+			}
+			binLength.setText(String.format("%3.1f", streamExportParams.binDurationS));
+			minBinnedCalls.setText(String.format("%d", streamExportParams.minBinCount));
+			encounterGap.setText(String.format("%3.1f", streamExportParams.encounterGapS));
+			minEncounterCalls.setText(String.format("%d", streamExportParams.minEncounterCount));
+			separateChannels.setSelected(streamExportParams.separateChannels);
+			groupChannels.setSelected(streamExportParams.separateChannels == false);
+			String locStr = getLocInfString();
+			if (locStr == null) {
+				localisationTypes.setText("none");
+	//			exportDetections.setSelected(true);
+				exportLocalisations.setSelected(false);
+			}
+			else {
+				localisationTypes.setText(locStr);
+			}
+			
+			exportDetections.setSelected(streamExportParams.exportDetections);
+			exportLocalisations.setSelected(streamExportParams.exportLocalisations);
+			
+			newDataSelection();
+			enableControls();
+		}
+
+	private void enableControls() {
+		String locStr = getLocInfString();
+		boolean dets = exportDetections.isSelected();
+		boolean locs = exportLocalisations.isSelected();
+		granularities[binnedIndex].setEnabled(!locs);
+		granularities[encounterIndex].setEnabled(!locs);
+		GranularityEnumType granularity = getCurrentGranularity();
+		boolean canLoc = tethysDataProvider.canExportLocalisations(granularity);
+		exportLocalisations.setEnabled(canLoc);
+		if (canLoc == false) {
+			exportLocalisations.setSelected(false);
+			exportDetections.setSelected(true);
+		}
+		
+		if (granularities.length == 1) {
+			granularities[0].setSelected(true);
+		}
+		
+		binLength.setEnabled(granularities[binnedIndex].isSelected());
+		minBinnedCalls.setEnabled(granularities[binnedIndex].isSelected());
+		encounterGap.setEnabled(granularities[encounterIndex].isSelected());
+		minEncounterCalls.setEnabled(granularities[encounterIndex].isSelected());
+		boolean binOrencount = granularities[binnedIndex].isSelected() | granularities[encounterIndex].isSelected();
+		separateChannels.setEnabled(binOrencount);
+		groupChannels.setEnabled(binOrencount);
+	}
+
+	private String getLocInfString() {
+		TethysLocalisationInfo locInf = getDataBlock().getTethysDataProvider(getTethysControl()).getLocalisationInfo();
+		if (locInf == null) {
+			return null;
+		}
+		return locInf.getLoclisationTypes();
 	}
 
 }

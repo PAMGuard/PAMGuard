@@ -5,6 +5,7 @@ import Array.PamArray;
 import Jama.LUDecomposition;
 import Jama.Matrix;
 import Jama.QRDecomposition;
+import PamDetection.LocContents;
 import PamUtils.PamUtils;
 import pamMaths.PamVector;
 
@@ -30,6 +31,11 @@ public class LSQBearingLocaliser implements BearingLocaliser {
 		this.timingError = timingError;
 	}
 
+	@Override
+	public int getLocalisationContents() {
+		return LocContents.HAS_BEARING | LocContents.HAS_AMBIGUITY;
+	}
+	
 	@Override
 	public void prepare(int[] arrayElements, long timeMillis, double timingError) {
 		/*

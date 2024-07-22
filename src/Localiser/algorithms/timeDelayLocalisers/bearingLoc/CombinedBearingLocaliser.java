@@ -1,5 +1,6 @@
 package Localiser.algorithms.timeDelayLocalisers.bearingLoc;
 
+import PamDetection.LocContents;
 import pamMaths.PamVector;
 
 public class CombinedBearingLocaliser implements BearingLocaliser {
@@ -21,6 +22,11 @@ public class CombinedBearingLocaliser implements BearingLocaliser {
 		firstLocaliser = new LSQBearingLocaliser(hydrophoneBitMap, timeMillis, timingError);
 		simplexBearingLocaliser = new SimplexBearingLocaliser(hydrophoneBitMap, timeMillis, timingError);
 		firstSimplexStep[0] = firstSimplexStep[1] = Math.PI/180.;
+	}
+
+	@Override
+	public int getLocalisationContents() {
+		return LocContents.HAS_BEARING | LocContents.HAS_AMBIGUITY;
 	}
 
 	@Override

@@ -6,6 +6,7 @@ import Array.ArrayManager;
 import Array.PamArray;
 import Jama.Matrix;
 import Localiser.algorithms.Correlations;
+import PamDetection.LocContents;
 import PamUtils.ArrayDump;
 import PamUtils.PamUtils;
 import PamUtils.SystemTiming;
@@ -59,6 +60,11 @@ public class MLGridBearingLocaliser implements BearingLocaliser {
 	@Override
 	public void prepare(int[] arrayElements, long timMillis, double timingError) {
 		prepare(arrayElements, timMillis, timingError, Math.toRadians(1), Math.toRadians(1));
+	}
+
+	@Override
+	public int getLocalisationContents() {
+		return LocContents.HAS_BEARING | LocContents.HAS_AMBIGUITY;
 	}
 	
 	synchronized private void prepare(int[] arrayElements, long timeMillis, double timingError, double thetaStep, double phiStep) {

@@ -8,6 +8,7 @@ import Jama.Matrix;
 import Localiser.algorithms.Correlations;
 import Localiser.algorithms.PeakPosition2D;
 import Localiser.algorithms.PeakSearch;
+import PamDetection.LocContents;
 import PamUtils.ArrayDump;
 import PamUtils.PamUtils;
 import PamUtils.SystemTiming;
@@ -71,6 +72,11 @@ public class MLGridBearingLocaliser2 implements BearingLocaliser {
 	public void prepare(int[] arrayElements, long timMillis, double timingError) {
 		this.useDefaults=true;
 		prepare(arrayElements, timMillis, timingError, Math.toRadians(3), Math.toRadians(3));
+	}
+
+	@Override
+	public int getLocalisationContents() {
+		return LocContents.HAS_BEARING | LocContents.HAS_AMBIGUITY;
 	}
 	
 	synchronized private void prepare(int[] arrayElements, long timeMillis, double timingError, double thetaStep, double phiStep) {
