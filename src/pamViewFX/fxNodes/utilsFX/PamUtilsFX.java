@@ -16,9 +16,9 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JPopupMenu.Separator;
 import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 
+import PamView.ColourArray.ColourArrayType;
 import PamView.PamSymbol;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -53,6 +53,26 @@ import pamViewFX.fxNodes.PamSymbolFX;
  *
  */
 public class PamUtilsFX {
+	
+	/**
+	 * Convert an FX based ColourArrayType to Swing. Note that swing options that do not exist in FX and vice versa will return null. 
+	 * @param arrayFX - the FX ColourArrayType. 
+	 * @return the Swing ColourArrayType;
+	 */
+	public static ColourArrayType fxColArray2Swing(pamViewFX.fxNodes.utilsFX.ColourArray.ColourArrayType arrayFX) {
+		ColourArrayType type = ColourArrayType.valueOf(arrayFX.toString());
+		return type;
+	}
+	
+	/**
+	 * Convert an Swing based ColourArrayType to FX. Note that swing options that do not exist in FX and vice versa will return null. 
+	 * @param arraySwing - the Swing ColourArrayType. 
+	 * @return the FX ColourArrayType.
+	 */
+	public static pamViewFX.fxNodes.utilsFX.ColourArray.ColourArrayType swingColArray2FX(ColourArrayType arraySwing) {
+		pamViewFX.fxNodes.utilsFX.ColourArray.ColourArrayType type =  pamViewFX.fxNodes.utilsFX.ColourArray.ColourArrayType.valueOf(arraySwing.toString());
+		return type;
+	}
 	
 	/**
 	 * 
@@ -632,13 +652,36 @@ public class PamUtilsFX {
 	 * @param color - the color. 
 	 * @return the color. 
 	 */
-	 public static String toRGBCode( Color color )
-	    {
-	        return String.format( "#%02X%02X%02X",
-	            (int)( color.getRed() * 255 ),
-	            (int)( color.getGreen() * 255 ),
-	            (int)( color.getBlue() * 255 ) );
-	    }
-	
+	public static String toRGBCode( Color color ){
+		return String.format( "#%02X%02X%02X",
+				(int)( color.getRed() * 255 ),
+				(int)( color.getGreen() * 255 ),
+				(int)( color.getBlue() * 255 ) );
+	}
+	 
+	 
+	 /**
+	  * Convert a colour to an int.
+	  * @param c - the colour to change.
+	  * @return the int representation of the colour
+	  */
+	 public static int colorToInt(Color c) {
+		    int r = (int) Math.round(c.getRed() * 255);
+		    int g = (int) Math.round(c.getGreen() * 255);
+		    int b = (int) Math.round(c.getBlue() * 255);
+		    return (r << 16) | (g << 8) | b;
+	}
+	 
+	 /**
+	  * Convert an int encoded with a colour to a Color object. 
+	  * @param value - the int to convert to colour
+	  * @return the Color object for the int
+	  */
+	 public static Color intToColor(int value) {
+		    int r = (value >>> 16) & 0xFF;
+		    int g = (value >>> 8) & 0xFF;
+		    int b = value & 0xFF;
+		    return Color.rgb(r,g,b);
+		}
 
 }

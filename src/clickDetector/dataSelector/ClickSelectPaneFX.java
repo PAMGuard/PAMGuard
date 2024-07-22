@@ -95,7 +95,7 @@ public class ClickSelectPaneFX extends DynamicSettingsPane<Boolean>  {
 
 	@Override
 	public String getName() {
-		return "Click Type Selection"; 
+		return "Filter by click type"; 
 	}
 
 	@Override

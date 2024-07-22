@@ -1,6 +1,9 @@
 package pamViewFX.fxPlotPanes;
 
 import Layout.PamAxis;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
@@ -256,13 +259,31 @@ public class PlotPane extends PamBorderPane {
 		PamHBox horzHolder=new PamHBox();
 
 		Pane leftPane=new Pane();
+		
+		//create an observable which is the size of the axis pane if the pane is visible and otherwise 
+		//is zero. 
+		ObservableValue<Number> valLeft = Bindings
+		        .when(yAxisLeftPane.visibleProperty())
+		        .then(yAxisLeftPane.widthProperty())
+		        .otherwise(
+		           new SimpleDoubleProperty(0.)
+		        );
+		
 		//need both min and pref to make binding work properly; 
-		leftPane.prefWidthProperty().bind(yAxisLeftPane.widthProperty());
-		leftPane.minWidthProperty().bind(yAxisLeftPane.widthProperty());
+		leftPane.prefWidthProperty().bind(valLeft);
+		leftPane.minWidthProperty().bind(valLeft);
 
 		Pane rightPane=new Pane();
-		rightPane.prefWidthProperty().bind(yAxisRightPane.widthProperty());
-		rightPane.minWidthProperty().bind(yAxisRightPane.widthProperty());
+		
+		ObservableValue<Number> valRight = Bindings
+        .when(yAxisRightPane.visibleProperty())
+        .then(yAxisRightPane.widthProperty())
+        .otherwise(
+           new SimpleDoubleProperty(0.)
+        );
+		
+		rightPane.prefWidthProperty().bind(valRight);
+		rightPane.minWidthProperty().bind(valRight);
 
 		horzHolder.getChildren().addAll(leftPane, axisPane, rightPane);
 		//axisPane.toFront(); this changes the order of children in a PamHBox. 
@@ -369,8 +390,8 @@ public class PlotPane extends PamBorderPane {
 
 		//holderPane.getChildren().clear();
 
-		//HACK- 05/08/2016 have to do this because there is a bug in switching children postions in a border pane.
-		//casues a duplicate childrne error. 
+		//HACK- 05/08/2016 have to do this because there is a bug in switching children positions in a border pane.
+		//causes duplicate children error
 		holderPane.setRight(null);
 		holderPane.setLeft(null);
 		holderPane.setTop(null);
@@ -385,24 +406,30 @@ public class PlotPane extends PamBorderPane {
 		else if (topBorder > 0) {
 			//			holderPane.setTopSpace(topBorder);
 		}
+		
 		if (bottom) {
 			holderPane.setBottom(bottomHolder); 
 		}
 		else if (bottomBorder > 0) {
 			//			holderPane.setBottomSpace(bottomBorder);
 		}
+		
 		if (right) {
 			holderPane.setRight(yAxisRightPane) ; 
+			yAxisRightPane.setVisible(true); 
 		}
-		else if (rightBorder > 0){
-			//			holderPane.setRightSpace(rightBorder);
+		else {
+			yAxisRightPane.setVisible(false); 
 		}
+		
 		if (left) {
 			holderPane.setLeft(yAxisLeftPane) ;
+			yAxisLeftPane.setVisible(true); 
 		}
-		else if (leftBorder > 0) {
-			//			holderPane.setLeftSpace(leftBorder);
+		else {
+			yAxisLeftPane.setVisible(false); 
 		}
+		
 		holderPane.setCenter(canvasHolder);
 		//bottomHolder.toBack();
 

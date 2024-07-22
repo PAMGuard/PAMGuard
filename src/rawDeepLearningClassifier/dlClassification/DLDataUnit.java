@@ -5,7 +5,7 @@ import PamguardMVC.PamDataUnit;
 import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 
 /**
- * A data unit created from classification results of DL model. this data unit holds one model results, i.e. 
+ * A data unit created from classification results of DL model. This data unit holds one model results, i.e. 
  * corresponds to one segment of raw data. 
  * 
  * @author Jamie Macaulay 

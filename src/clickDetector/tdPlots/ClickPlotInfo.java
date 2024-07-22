@@ -9,6 +9,8 @@ import clickDetector.BTDisplayParameters;
 import clickDetector.ClickControl;
 import clickDetector.ClickDetection;
 import clickDetector.ClickDisplayManagerParameters;
+import clickDetector.alarm.ClickAlarmParameters;
+import clickDetector.dataSelector.ClickDataSelector;
 import clickDetector.dialogs.ClickDisplayDialog;
 import PamView.GeneralProjector.ParameterType;
 import PamView.GeneralProjector.ParameterUnits;
@@ -51,6 +53,10 @@ public class ClickPlotInfo extends TDDataInfo {
 		allScaleInfo[2] = ampScaleInfo;
 		allScaleInfo[3] = slantScaleInfo;
 		clickHidingDialog = new ClickHidingDialog(this);
+	}
+	
+	ClickDataSelector getDataSelector() {
+		return (ClickDataSelector) clickControl.getClickDataBlock().getDataSelector("ClickTDPlots", false);
 	}
 
 	@Override
@@ -110,7 +116,8 @@ public class ClickPlotInfo extends TDDataInfo {
 	private synchronized boolean shouldPlot(ClickDetection click) {
 		
 		if (click == null) return false;
-		if (btDisplayParams.showEchoes == false && click.isEcho()) {
+		boolean showEchoes = getDataSelector().getClickAlarmParameters().useEchoes;
+		if (showEchoes == false && click.isEcho()) {
 			return false;
 		}
 		
@@ -170,7 +177,7 @@ public class ClickPlotInfo extends TDDataInfo {
 	 */
 	@Override
 	public boolean editOptions(Window frame) {
-		BTDisplayParameters newParams = ClickDisplayDialog.showDialog(clickControl, frame, btDisplayParams);
+		BTDisplayParameters newParams = ClickDisplayDialog.showDialog(clickControl, frame, btDisplayParams, getDataSelector().getClickAlarmParameters());
 		if (newParams != null) {
 			btDisplayParams = newParams.clone();
 			updateSettings();

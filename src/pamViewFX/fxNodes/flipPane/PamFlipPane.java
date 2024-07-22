@@ -128,7 +128,7 @@ public class PamFlipPane extends FlipPane {
 	 * Convenience duplicate of getBackPane(). 
 	 * @return the back pane. 
 	 */
-	public PamBorderPane getAdvPane() {
+	public PamBorderPane getAdvContentPane() {
 		return advPane;
 	}
 

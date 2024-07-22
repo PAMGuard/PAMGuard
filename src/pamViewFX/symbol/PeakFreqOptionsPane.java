@@ -179,6 +179,17 @@ public class PeakFreqOptionsPane extends StandardSymbolModifierPane  {
 
 		DoubleSpinnerValueFactory spinnerValFact = (DoubleSpinnerValueFactory) maxFreq.getValueFactory(); 
 		spinnerValFact.maxProperty().set(getSampleRate() /2);
+		
+		//set reasonable step sizes
+		if (getSampleRate()>=10000) {
+			spinnerValFact.amountToStepByProperty().set(1000.);
+		}
+		else if (getSampleRate()>=2000){
+			spinnerValFact.amountToStepByProperty().set(200.);
+		}
+		else {
+			spinnerValFact.amountToStepByProperty().set(50.);
+		}
 
 
 		if (symbolOptions.freqLimts==null) {

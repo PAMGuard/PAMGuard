@@ -115,7 +115,7 @@ public interface DLClassiferModel {
 	
 	/**
 	 * Get the parameters which can be serialized  from  transforms. 
-	 * @param dlTransfroms- the dl transforms. 
+	 * @param dlTransfroms- the DL transforms. 
 	 */
 	public static ArrayList<DLTransfromParams> getDLTransformParams(ArrayList<DLTransform> dlTransfroms) {
 		ArrayList<DLTransfromParams> dlTransformParams = new ArrayList<DLTransfromParams>(); 

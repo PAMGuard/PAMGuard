@@ -6,6 +6,10 @@ import java.util.List;
 import PamguardMVC.PamDataUnit;
 import export.PamDataUnitExporter;
 
+
+/**
+ * Export to CSV files which are RAVEN compatible. 
+ */
 public class CSVExportManager implements PamDataUnitExporter{
 
 	@Override
@@ -39,6 +43,11 @@ public class CSVExportManager implements PamDataUnitExporter{
 	public void close() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public boolean isNeedsNewFile() {
+		return false;
 	}
 
 }

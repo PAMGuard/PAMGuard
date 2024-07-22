@@ -159,4 +159,29 @@ public class PamAWTUtils {
 		return bestPoint; 
 
 	}
+	
+	
+	 /**
+	  * Convert a colour to an int.
+	  * @param c - the colour to change.
+	  * @return the int representation of the colour
+	  */
+	 public static int colorToInt(java.awt.Color c) {
+		    int r = (int) Math.round(c.getRed());
+		    int g = (int) Math.round(c.getGreen());
+		    int b = (int) Math.round(c.getBlue());
+		    return (r << 16) | (g << 8) | b;
+	}
+	 
+	 /**
+	  * Convert an int encoded with a colour to a Color object. 
+	  * @param value - the int to convert to colour
+	  * @return the Color object for the int
+	  */
+	 public static java.awt.Color intToColor(int value) {
+		    int r = (value >>> 16) & 0xFF;
+		    int g = (value >>> 8) & 0xFF;
+		    int b = value & 0xFF;
+		    return new java.awt.Color(r,g,b);
+	 }
 }

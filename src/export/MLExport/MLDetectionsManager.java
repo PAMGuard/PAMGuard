@@ -4,14 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.zip.Deflater;
 
 import PamUtils.PamArrayUtils;
-import PamUtils.PamCalendar;
 import PamguardMVC.PamDataUnit;
 import export.PamDataUnitExporter;
 import us.hebi.matlab.mat.format.Mat5;
@@ -21,7 +18,6 @@ import us.hebi.matlab.mat.types.Matrix;
 import us.hebi.matlab.mat.types.Sink;
 import us.hebi.matlab.mat.types.Sinks;
 import us.hebi.matlab.mat.types.Struct;
-import us.hebi.matlab.mat.util.Casts;
 
 
 /**
@@ -106,10 +102,11 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 
 				matFile.writeTo(sink);
 
-				matFile.close();
+//				matFile.close(); //CAUSES AN EXCEPTION IF WRITING AGAIN
 
 			}
 			else {
+				
 				//write to the mat file without loading all contents into memory. 
 				Mat5Writer writer = Mat5.newWriter(sink);
 
@@ -257,7 +254,7 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 
 	@Override
 	public void close() {
-		//handled in the mian funtion
+		//handled in the main function
 		if (sink!=null) {
 			try {
 				sink.close();
@@ -267,6 +264,12 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 			}
 		}
 
+	}
+
+	@Override
+	public boolean isNeedsNewFile() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 

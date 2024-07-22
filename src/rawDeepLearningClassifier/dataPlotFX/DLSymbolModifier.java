@@ -1,9 +1,14 @@
 package rawDeepLearningClassifier.dataPlotFX;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
 
+import PamController.PamController;
+import PamUtils.PamArrayUtils;
 import PamView.GeneralProjector;
 import PamView.PamSymbolType;
+import PamView.dialog.GenericSwingDialog;
+import PamView.dialog.PamDialogPanel;
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.SymbolData;
 import PamView.symbol.modifier.SymbolModType;
@@ -20,9 +25,10 @@ import rawDeepLearningClassifier.logging.DLAnnotationType;
 
 
 /**
- * The DL symbol modifier. Colours symbols by prediction.
+ * The DL symbol modifier. Colours symbols by either the value of the prediction
+ * by a user selected class or by the class with the highest prediction value.
  * 
- * @author Jamie Macaulay. 
+ * @author Jamie Macaulay.
  *
  */
 public class DLSymbolModifier extends SymbolModifier {
@@ -36,12 +42,12 @@ public class DLSymbolModifier extends SymbolModifier {
 
 
 	/**
-	 * The symbol options pane.
+	 * JavaFX symbol options pane.
 	 */
 	private DLSymbolOptionPane optionsPane;
 
 	/**
-	 * Rge DL annotation type. 
+	 * The DL annotation type. 
 	 */
 	private DLAnnotationType dlAnnotType;
 	
@@ -54,6 +60,11 @@ public class DLSymbolModifier extends SymbolModifier {
 	private ColourArrayType colourArrayType;
 
 	private ColourArray colourArray;
+
+	/**
+	 * Swing option panel for the symbol chooser. 
+	 */
+	private DLSymbolOptionPanel optionsPanel;
 
 
 
@@ -94,7 +105,70 @@ public class DLSymbolModifier extends SymbolModifier {
 			return null; 
 		}	
 		
-		//System.out.println("Class index: " + dlSymbolOptions.classIndex); 
+		
+		//modify the default symbol
+		if (dlSymbolOptions.colTypeSelection == DLSymbolModifierParams.PREDICITON_COL) {
+			getSymbolDataPred(annotation);
+		}
+		
+		else if (dlSymbolOptions.colTypeSelection == DLSymbolModifierParams.CLASS_COL) {
+			getSymbolDataClass(annotation);
+		}
+		
+		return symbolData;
+	}
+	
+	/**
+	 * Get symbol data for colouring by the species class with the maximum prediction
+	 * @param annotation - the annotation
+	 * @return symbol data for colouring by class maximum. 
+	 */
+	private SymbolData getSymbolDataClass(DLAnnotation annotation ) {
+
+		boolean passed = false; 
+		int colIndex = -1; 
+		
+		float[][] results = new float[ annotation.getModelResults().size()][]; 
+		
+		//A detection might have multiple prediction results, i.e. predictions are a matrix. Need 
+		//to iterate through all the predictions and then work out whihc is the maximum. That index is then then]
+		//class colour. 
+		int i=0;
+		for (PredictionResult modelResult: annotation.getModelResults()) {
+			if (modelResult.isBinaryClassification()) passed = true; 
+			results[i] = modelResult.getPrediction();
+			i++;
+		}
+		
+		int[] indexBest = PamArrayUtils.maxPos(results); 
+		
+		
+		if (passed || !dlSymbolOptions.showOnlyBinary) {
+			//work out the class colour...
+						
+			javafx.scene.paint.Color color = PamUtilsFX.intToColor(dlSymbolOptions.classColors[indexBest[1]]);
+			
+			Color colorAWT = PamUtilsFX.fxToAWTColor(color);
+			
+			symbolData.setFillColor(colorAWT);
+			symbolData.setLineColor(colorAWT);
+
+			return symbolData; 
+		}
+		else {
+			//has data but we have only show binary option selected. 
+			return null; 
+		}
+		
+	}
+	
+	
+	/**
+	 * Get symbol data for colouring by the prediction value for a selected species class. 
+	 * @param annotation - the annotation
+	 * @return symbol data for colouring by prediction value for a selected species class. 
+	 */
+	private SymbolData getSymbolDataPred(DLAnnotation annotation ) {
 		
 		if (dlSymbolOptions.classIndex<0) {
 			dlSymbolOptions.classIndex=0;
@@ -161,11 +235,29 @@ public class DLSymbolModifier extends SymbolModifier {
 	 * Get the JavaFX symbol options pane that has options for the symbol pane.
 	 * @return the symbol options pane. 
 	 */
+	@Override
 	public SymbolModifierPane getOptionsPane() {
 		if (optionsPane == null) {
 			optionsPane = new DLSymbolOptionPane(this); 
 		}
 		return optionsPane; 
+	}
+	
+	@Override
+	public PamDialogPanel getDialogPanel() {
+		if (optionsPanel == null) {
+			optionsPanel = new DLSymbolOptionPanel(this); 
+		}
+		return optionsPanel; 
+	}
+	
+	/**
+	 * Default behaviour to show the dialog panel.
+	 * @param e
+	 * @param dialogPanel
+	 */
+	protected void showOptionsDialog(ActionEvent e, PamDialogPanel dialogPanel) {
+		GenericSwingDialog.showDialog(PamController.getMainFrame(), getName() + " options", dialogPanel);
 	}
 	
 	

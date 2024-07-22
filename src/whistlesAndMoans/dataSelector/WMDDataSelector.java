@@ -38,7 +38,7 @@ public class WMDDataSelector extends DataSelector {
 	}
 
 	@Override
-	public double scoreData(PamDataUnit pamDataUnit) {		
+	public double scoreData(PamDataUnit pamDataUnit) {	
 		int combFlag = wmAlarmParameters.getCombinationFlag();
 		if (combFlag == DataSelectParams.DATA_SELECT_DISABLE) {
 			return 1;

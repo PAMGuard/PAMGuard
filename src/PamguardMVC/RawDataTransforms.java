@@ -411,7 +411,15 @@ public class RawDataTransforms {
 				paddedRawData = new double[fftLength];
 				rawData = getWaveData(channel);
 				//double[] rotData = getRotationCorrection(channel);
-				mn = Math.min(fftLength, getSampleDuration().intValue());
+				
+				/**
+				 *FIXME
+				 * 11/07 Changed from getSampleDuration because an error sometimes occurs where the sample duration
+				 * is not the same as the wavefom length...not sure why. 
+				 */
+				//mn = Math.min(fftLength, getSampleDuration().intValue());
+				mn = Math.min(fftLength, rawData.length);
+//				System.out.println("fftLength: " + rawData.length + " " + getSampleDuration().intValue() + " mn " +mn);
 				for (i = 0; i < mn; i++) {
 					paddedRawData[i] = rawData[i];//-rotData[i];
 				}
