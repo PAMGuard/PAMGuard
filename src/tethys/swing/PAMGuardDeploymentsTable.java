@@ -229,14 +229,14 @@ private RecordingList masterList;
 			return;
 		}
 		for (PDeployment depl : matchedDeployments) {
-			if (depl.deployment == null) {
+			if (depl.nilusObject == null) {
 				continue;
 			}
 			try {
-				if (checkDetections(depl.deployment) == false) {
+				if (checkDetections(depl.nilusObject) == false) {
 					continue;
 				}
-				boolean gone = getTethysControl().getDbxmlConnect().deleteDocument(depl.deployment);
+				boolean gone = getTethysControl().getDbxmlConnect().deleteDocument(depl.nilusObject);
 			} catch (TethysException e) {
 				getTethysControl().showException(e);
 			}
@@ -279,7 +279,7 @@ private RecordingList masterList;
 	}
 
 	protected void deleteDeployment(PDeployment pDeployment) {
-		Deployment dep = pDeployment.deployment;
+		Deployment dep = pDeployment.nilusObject;
 		if (dep == null) {
 			return;
 		}
@@ -300,11 +300,11 @@ private RecordingList masterList;
 	}
 
 	protected void exportDeployment(PDeployment pDeployment) {
-		getTethysControl().exportDocument(Collection.Deployments.collectionName(), pDeployment.deployment.getId());
+		getTethysControl().exportDocument(Collection.Deployments.collectionName(), pDeployment.nilusObject.getId());
 	}
 
 	protected void displayDeployment(PDeployment pDeployment) {
-		getTethysControl().displayDocument(Collection.Deployments.collectionName(), pDeployment.deployment.getId());
+		getTethysControl().displayDocument(Collection.Deployments.collectionName(), pDeployment.nilusObject.getId());
 	}
 
 	@Override
@@ -443,7 +443,7 @@ private RecordingList masterList;
 						if (deployment == null) {
 							return null;
 						}
-						return deployment.deployment.getId();
+						return deployment.nilusObject.getId();
 //						return makeDeplString(period, deployment);
 					case 8:
 						if (deployment == null) {

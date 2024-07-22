@@ -89,7 +89,7 @@ public enum Collection {
 			return Calibrations;
 		case "nilus.Ensemble":
 			return Ensembles;
-		case "nilus.Localization":
+		case "nilus.Localize":
 			return Localizations;
 		case "nilus.SpeciesAbbreviation":
 			return SpeciesAbbreviations;

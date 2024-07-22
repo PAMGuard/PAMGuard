@@ -124,10 +124,10 @@ public class DeploymentExportPanel extends TethysGUIPanel implements DeploymentT
 			return;
 		}
 		PDeployment deployment = tethysDeploys.get(row);
-		String msg = "Do you want to copy settings from deploymnet document " + deployment.deployment.getId();
+		String msg = "Do you want to copy settings from deploymnet document " + deployment.nilusObject.getId();
 		int ans = WarnOnce.showWarning("Deployment data", msg, WarnOnce.OK_CANCEL_OPTION);
 		if (ans == WarnOnce.OK_OPTION) {
-			copyDeploymentData(deployment.deployment);
+			copyDeploymentData(deployment.nilusObject);
 		}
 	}
 

@@ -492,7 +492,7 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 		PDeployment exDeploymnet = onePeriod.getMatchedTethysDeployment();
 		try {
 			if (exDeploymnet != null) {
-				deployment.setId(exDeploymnet.deployment.getId());
+				deployment.setId(exDeploymnet.nilusObject.getId());
 				dbxmlConnect.updateDocument(deployment);
 			}
 			else {
@@ -522,7 +522,7 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 			String id = String.format("%s_%d", exportParams.getDatasetName(), i);
 			if (exDeploymnet != null) {
 				deployment = createDeploymentDocument(freeId, recordPeriod, id);
-				deployment.setId(exDeploymnet.deployment.getId());
+				deployment.setId(exDeploymnet.nilusObject.getId());
 			}
 			if (deployment == null) {
 				deployment = createDeploymentDocument(freeId++, recordPeriod, id);
@@ -646,7 +646,7 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 		}
 		ArrayList<PInstrument> instruments = new ArrayList<>();
 		for (PDeployment aDepl : projectDeployments) {
-			Instrument intr = aDepl.deployment.getInstrument();
+			Instrument intr = aDepl.nilusObject.getInstrument();
 			if (intr == null) {
 				continue;
 			}
@@ -764,7 +764,7 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 		int firstFree = 0;
 		if (projectDeployments != null) {
 			for (PDeployment dep : projectDeployments) {
-				firstFree = Math.max(firstFree, dep.deployment.getDeploymentId()+1);
+				firstFree = Math.max(firstFree, dep.nilusObject.getDeploymentId()+1);
 			}
 		}
 		return firstFree;

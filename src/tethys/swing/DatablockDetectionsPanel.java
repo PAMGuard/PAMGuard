@@ -62,7 +62,7 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 	public DatablockDetectionsPanel(TethysControl tethysControl) {
 		super(tethysControl);
 		mainPanel = new JPanel(new BorderLayout());
-		mainPanel.add(BorderLayout.NORTH, dataBlockName = new JLabel("PAMGUard data stream", JLabel.LEFT));
+		mainPanel.add(BorderLayout.NORTH, dataBlockName = new JLabel("PAMGuard data stream", JLabel.LEFT));
 		mainPanel.setBorder(new TitledBorder("Data stream Tethys Detections documents"));
 
 		tableModel = new TableModel();
@@ -193,7 +193,7 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 		JMenuItem menuItem;
 		if (rows.length == 1) {
 			
-			menuItem = new JMenuItem("Display document " + pDets.detections.getId());
+			menuItem = new JMenuItem("Display document " + pDets.getDocumentId());
 			menuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -202,7 +202,7 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 			});
 			popMenu.add(menuItem);
 
-			menuItem = new JMenuItem("Export document " + pDets.detections.getId());
+			menuItem = new JMenuItem("Export document " + pDets.getDocumentId());
 			menuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -212,7 +212,7 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 			popMenu.add(menuItem);
 			
 			popMenu.addSeparator();
-			menuItem = new JMenuItem("Delete document " + pDets.detections.getId());
+			menuItem = new JMenuItem("Delete document " + pDets.getDocumentId());
 			menuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -255,7 +255,7 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 			if (pDets == null) {
 				continue;
 			}
-			toDelete.add(pDets.detections);
+			toDelete.add(pDets.nilusObject);
 		}
 		DeleteDocs dd = new DeleteDocs(toDelete);
 		PamWorker<Integer> worker = new PamWorker(dd, getTethysControl().getGuiFrame(), 1, "Deleting Detections documents");
@@ -293,13 +293,13 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 	}
 
 	protected void deleteDocument(PDetections pDets) {
-		String msg = String.format("Are you sure you want to delete the Detections document %s ?", pDets.detections.getId());
+		String msg = String.format("Are you sure you want to delete the Detections document %s ?", pDets.getDocumentId());
 		int ans = WarnOnce.showWarning(PamGui.findComponentWindow(mainPanel), "Delete Document", msg, WarnOnce.OK_CANCEL_OPTION);
 		if (ans != WarnOnce.OK_OPTION) {
 			return;
 		}
 		try {
-			getTethysControl().getDbxmlConnect().deleteDocument(pDets.detections);
+			getTethysControl().getDbxmlConnect().deleteDocument(pDets.nilusObject);
 		} catch (TethysException e) {
 			getTethysControl().showException(e);
 		}
@@ -308,12 +308,12 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 	}
 
 	private void displayDocument(PDetections pDets) {
-		getTethysControl().displayDocument(Collection.Detections.collectionName(), pDets.detections.getId());
+		getTethysControl().displayDocument(Collection.Detections.collectionName(), pDets.getDocumentId());
 
 	}
 
 	private void exportDocument(PDetections pDets) {
-		getTethysControl().exportDocument(Collection.Detections.toString(), pDets.detections.getId());
+		getTethysControl().exportDocument(Collection.Detections.toString(), pDets.getDocumentId());
 
 	}
 
@@ -359,7 +359,7 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 			if (pDets == null) {
 				return null;
 			}
-			Detections dets = pDets.detections;
+			Detections dets = pDets.nilusObject;
 			if (dets == null) {
 				return "Error in doc";
 			}

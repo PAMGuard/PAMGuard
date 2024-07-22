@@ -561,6 +561,63 @@ public class DBXMLQueries {
 		}
 		return detectionsNames;
 	}
+	/**
+	 * Get a list of Localization documents which associate with a datablock and a deploymentId.
+	 * @param dataBlock
+	 * @param deploymentId can be null to get all docs for data block
+	 * @return
+	 */
+	public ArrayList<String> getLocalizationDocuments(PamDataBlock dataBlock, String deploymentId) {
+		/**
+		 * first query for Detections documents associated with this deployment and datablock.
+		 * updated May 23
+		 */
+		if (dataBlock == null) {
+			return null;
+		}
+		String queryNoDepl = "{\"species\":{\"query\":{\"op\":\"lib:completename2tsn\",\"optype\":\"function\",\"operands\":[\"%s\"]},\"return\":{\"op\":\"lib:tsn2completename\",\"optype\":\"function\",\"operands\":[\"%s\"]}},\"return\":[\"Localize/Id\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Localize/Algorithm/Software\",\"LongDataName\"],\"optype\":\"binary\"}],\"enclose\":1}";
+		String queryWithDepl = "{\"species\":{\"query\":{\"op\":\"lib:completename2tsn\",\"optype\":\"function\",\"operands\":[\"%s\"]},\"return\":{\"op\":\"lib:tsn2completename\",\"optype\":\"function\",\"operands\":[\"%s\"]}},\"return\":[\"Localize/Id\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Localize/DataSource/DeploymentId\",\"TheDeploymentId\"],\"optype\":\"binary\"},{\"op\":\"=\",\"operands\":[\"Localize/Algorithm/Software\",\"LongDataName\"],\"optype\":\"binary\"}],\"enclose\":1}";
+		String query;
+		if (deploymentId == null) {
+			query = queryNoDepl;
+		}
+		else {
+			query = queryWithDepl.replace("TheDeploymentId", deploymentId);
+		}
+		query = query.replace("LongDataName", dataBlock.getLongDataName());
+		DBQueryResult queryResult = null;
+		try {
+			queryResult = executeQuery(query);
+		} catch (TethysQueryException e1) {
+			tethysControl.showException(e1);
+			return null;
+		}
+		if (queryResult ==null) {
+			return null;
+		}
+		Document doc;
+		try {
+			doc = queryResult.getDocument();
+		} catch (ParserConfigurationException | SAXException | IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+		if (doc == null) {
+			return null;
+		}
+		ArrayList<String> detectionsNames = new ArrayList();
+		int count = 0;
+		NodeList returns = doc.getElementsByTagName("Localize");
+		//		if (returns.getLength() == 0) {
+		//			returns = doc.getElementsByTagName("Result");
+		//		}
+		for (int i = 0; i < returns.getLength(); i++) {
+			Node aNode = returns.item(i);
+			String docName = aNode.getTextContent();
+			detectionsNames.add(docName);
+		}
+		return detectionsNames;
+	}
 
 
 	/**

@@ -306,6 +306,9 @@ abstract public class PamDialog extends JDialog {
 	 * put the dialog near the mouse location. 
 	 */
 	public void moveToMouseLocation() {
+		if (MouseInfo.getPointerInfo() == null) {
+			return;
+		}
 		Point mouse = MouseInfo.getPointerInfo().getLocation();
 		moveToLocation(mouse);
 	}
