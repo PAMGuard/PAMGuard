@@ -19,6 +19,9 @@ public class SmruDaqJNI {
 	static public final int SMRU_VAL_SLAVE_MASTERED = 3;
 	
 	static public final int SMRU_RET_OK = 0;
+	
+	static public final int GREEN_LED = 1;
+	static public final int RED_LED = 0;
 
 	/**
 	 * Have rebuilt SAIL Daq interface in 2022, but in principle this was 
@@ -29,11 +32,6 @@ public class SmruDaqJNI {
 	private static final String SILIB = "SailDaqJNI";
 //	private static final String SILIB = "SailDaqV7";
 	
-	/**
-	 * this is the verbose level for the C code part. 
-	 */
-	private static final int verboseLevel = 0;
-
 	private static final String DEVNAME = "/dev/cypress_smru0";
 	
 	private static final int MINJNIVERSION = 5;
@@ -265,7 +263,7 @@ public class SmruDaqJNI {
 		this.smruDaqSystem = smruDaqSystem;
 		loadLibrary();
 		if (haveLibrary()) {
-			setVerbose(verboseLevel);
+			setVerbose(SmruDaqSystem.VERBOSELEVEL);
 
 			/**
 			 * List the devices, but don't do any resetting and 
@@ -492,7 +490,7 @@ public class SmruDaqJNI {
 	public int toggleLED(int board, int led) {
 		board = boardOrder[board];
 		int state = getLED(board, led);
-		System.out.println("state="+state);
+//		System.out.println("LED state="+state);
 		if (state == 0) {
 			state = 1;
 		}
