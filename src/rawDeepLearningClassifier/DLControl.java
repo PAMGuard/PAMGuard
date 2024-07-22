@@ -561,6 +561,7 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	 * @return the number of classes.
 	 */
 	public int getNumClasses() {
+		if (getDLModel()==null) return 0;
 		return getDLModel().getNumClasses();
 
 	}
