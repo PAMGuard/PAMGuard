@@ -595,7 +595,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 			System.out.println("The current file was null");
 			return false;
 		}
-//		System.out.printf("***********************************             Opening file %s\n", currentFile.getName());
+		System.out.printf("***********************************             Opening file %s\n", currentFile.getName());
 
 		try {
 
@@ -639,6 +639,9 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 			fileInputParameters.bitDepth = audioFormat.getSampleSizeInBits();
 
 			loadByteConverter(audioFormat);
+			
+//			System.out.println("FileInputSystem - prepareInputFile done"); 
+
 
 		} catch (UnsupportedAudioFileException ex) {
 			ex.printStackTrace();

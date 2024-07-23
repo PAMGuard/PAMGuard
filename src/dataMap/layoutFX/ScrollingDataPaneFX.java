@@ -21,6 +21,7 @@ import pamViewFX.fxNodes.PamColorsFX;
 import pamViewFX.fxNodes.PamScrollPane;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.pamAxis.PamDateAxis;
+import pamViewFX.fxNodes.pamScrollers.acousticScroller.ScrollBarPane;
 
 public class ScrollingDataPaneFX extends PamBorderPane {
 	
@@ -77,7 +78,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	/**
 	 * Scroll bar for time (horizontal)
 	 */
-	private ScrollBar timeScrollBar;
+	private ScrollBarPane timeScrollBar;
 
 	/**
 	 * Settings strip at top of the display. Shows all sorts of detailed info such cursor position and start and end times. 
@@ -145,7 +146,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 //		//////////
 		
 		holder.setCenter(mainScrollPane);
-		holder.setBottom(createScrollBar());
+		holder.setTop(createScrollBar());
 		
 //		PamButton test = new PamButton("Test");
 //		test.setOnAction((action)->{
@@ -208,12 +209,14 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 
 		
 		//create the scroll bar and listeners. 
-		timeScrollBar=new ScrollBar(); 
-		timeScrollBar.valueProperty().addListener((obs_val, old_val, new_val)->{
+		timeScrollBar=new ScrollBarPane(); 
+		timeScrollBar.addValueListener((obs_val, old_val, new_val)->{
 			calcStartEndMillis();
 			updateScrollBarText();
 			notifyScrollChange();
 		});
+		
+		
 		
 		timeScrollBar.setPrefHeight(20);
 		
@@ -228,7 +231,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	 */
 	private void calcStartEndMillis(){
 		screenStartMillis = (long) (dataMapControl.getFirstTime() + 
-				timeScrollBar.getValue() * 1000L);
+				timeScrollBar.getCurrentValue() * 1000L);
 		screenEndMillis = screenStartMillis + (long) (screenSeconds * 1000);
 	}
 	
@@ -347,7 +350,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 		 * Do scrolling in seconds - will give up to 68 years with a 
 		 * 32 bit integer control of scroll bar. milliseconds would give < 1 year !
 		 */
-		double currentPos = timeScrollBar.getValue();
+		double currentPos = timeScrollBar.getCurrentValue();
 		long dataStart = dataMapControl.getFirstTime();
 		long dataEnd = dataMapControl.getLastTime();
 		double dataSeconds = ((dataEnd-dataStart)/1000) + 1;
@@ -367,12 +370,12 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 		else {
 			//System.out.println("dataSeconds: "+dataSeconds+ " pixsPerHour: " +pixsPerHour+" screenWidth: "+screenWidth+" screenSeconds "+screenSeconds+" holder width: "+holder.getWidth());
 			timeScrollBar.setVisible(true);
-			timeScrollBar.setMax(0);
-			timeScrollBar.setMax(Math.ceil(dataSeconds));
+			timeScrollBar.setMinVal(0);
+			timeScrollBar.setMaxVal(Math.ceil(dataSeconds));
 			timeScrollBar.setBlockIncrement(Math.max(1, screenSeconds * 4/5));
-			timeScrollBar.setUnitIncrement(Math.max(1, screenSeconds / 20));
+//			timeScrollBar.setUnitIncrement(Math.max(1, screenSeconds / 20));
 			timeScrollBar.setVisibleAmount(screenSeconds);
-			timeScrollBar.setValue(currentPos);
+			timeScrollBar.setCurrentValue(currentPos);
 		}
 
 	}
@@ -394,7 +397,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	public void scrollToData(PamDataBlock dataBlock) {
 		long startTime = dataBlock.getCurrentViewDataStart();
 		int val = (int) ((startTime - getScreenStartMillis())/1000 - getScreenSeconds()/5)  ;
-		timeScrollBar.setValue(val);
+		timeScrollBar.setCurrentValue(val);
 	}
 
 	/**
