@@ -79,6 +79,18 @@ public class TDGraphParametersFX implements Serializable, Cloneable, ManagedPara
 	 * Used only when saving as Color (javafx) is not serializable. 
 	 */
 	public String plotFillS = "white";
+	
+	/**
+	 * Show the hide panel on the left on start up. Note only used when first opening 
+	 * saved settings or saving settings. 
+	 */
+	public boolean showHidePaneLeft = true;
+	
+	/**
+	 * Show the hide panel on the right on start up. Note only used when first opening 
+	 * saved settings or saving settings. 
+	 */
+	public boolean showHidePaneRight = false;
 
 
 	/* (non-Javadoc)
