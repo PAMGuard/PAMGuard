@@ -150,7 +150,8 @@ abstract public class SymbolModifier {
 		if (dialogPanel == null) {
 			return null;
 		}
-		JMenuItem menuItem = new JMenuItem("Options ...");
+		JMenuItem menuItem = new JMenuItem("More options ...");
+		menuItem.setToolTipText("More symbol options");
 		menuItem.addActionListener(new ActionListener() {
 			
 			@Override

@@ -25,6 +25,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -32,6 +33,7 @@ import java.util.TimeZone;
 
 import PamController.PamController;
 import PamUtils.time.CalendarControl;
+import binaryFileStorage.BinaryStore;
 
 
 /**
@@ -85,7 +87,7 @@ public class PamCalendar {
 	 * viewPositions which is the number of milliseconds from the sessionsStartTime.
 	 */
 	private static long viewPosition;
-	
+		
 	
 	/**
 	 * If files are being analysed, return the time based on the file
@@ -880,14 +882,18 @@ public class PamCalendar {
 	 */
 	public static void setSessionStartTime(long sessionStartTime) {
 		PamCalendar.sessionStartTime = sessionStartTime;
+		PamController.getInstance().updateMasterClock(getTimeInMillis());
 	}
 
 	/**
 	 * 
-	 * @param soundFileTimeMillis The start time of a sound file
+	 * Relative time within a sound file. This is always just added to sessionStartTime
+	 * to give an absolute time. 
+	 * @param soundFileTimeMillis The relative time of a sound file. 
 	 */
 	public static void setSoundFileTimeInMillis(long soundFileTimeMillis) {
 		PamCalendar.soundFileTimeInMillis = soundFileTimeMillis;
+		PamController.getInstance().updateMasterClock(getTimeInMillis());
 	}
 
 	/**

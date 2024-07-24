@@ -37,6 +37,13 @@ public class RawDLParams implements Serializable, Cloneable {
 	 * Holds channel and grouping information
 	 */
 	public GroupedSourceParameters groupedSourceParams = new GroupedSourceParameters();
+	
+	/**
+	 * True to enable segmentation. If segmentation is disabled then the raw waveform from 
+	 * a data unit is passed directly to the model. Note that this is not an option for raw sound
+	 * data. 
+	 */
+	public boolean enableSegmentation = true;
 
 	/**
 	 * The number of raw samples to send to the classifier.
@@ -85,7 +92,7 @@ public class RawDLParams implements Serializable, Cloneable {
 	 * different class names. If we change model then the class names may change.
 	 * Previously annotated data will then be messed up. But, in a giant dataset
 	 * that may be an issue. Perhaps users wish to run a new model on some chunk of
-	 * data without messing up all the other classified detectionS which have used
+	 * data without messing up all the other classified detections which have used
 	 * that module. So store the data in binary files? That is super inefficient as
 	 * the same string is stored many times. So instead store a short which
 	 * identifies the string that sits in this table. Everytime a new model is added

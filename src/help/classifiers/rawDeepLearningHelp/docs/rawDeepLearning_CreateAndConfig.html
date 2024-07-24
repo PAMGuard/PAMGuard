@@ -7,20 +7,18 @@
 
 </head>
 <body>
-	<h1 id="pamguard-s-deep-learning-module">PAMGuard Deep
-		Learning Module</h1>
-	<h2 id="creation-and-config">Creation and Configuration</h2>
-	<br>
-	<h3 id="creating-an-instance-of-the-module">Creating an instance
-		of the module</h3>
+	<h1 id="pamguard-s-deep-learning-module">PAMGuard Deep Learning
+		Module</h1>
+
+	<h2 id="creating-an-instance-of-the-module">Creating an instance
+		of the module</h2>
 	<p>
 		The module can be added from the <em>File&gt; Add modules &gt;
 			Classifier &gt; Raw deep learning classifier</em> menu or by right
 		clicking in the data model. More than one instance of the module can
 		be added if multiple deep learning models are required.
 	</p>
-	<br>
-	<h3 id="module-settings">Module settings</h3>
+	<h2 id="module-settings">Module settings</h2>
 	<p>
 		The module settings are opened by selecting the <em>Settings &gt;
 			Raw deep learning classifier</em> menu. The main settings pane is shown
@@ -28,18 +26,18 @@
 		and <em>Deep Learning Model</em>
 	</p>
 	<p align="center">
-		<img width="700" height="630"
-			src="images/deep_leanring_module_help.png">
+		<img src="images/deep_leanring_module_help.png">
 	</p>
 
 	<p>
 		<em>The main settings pane for the deep learning module with
 			descriptions</em>
 	</p>
-	<br>
 	<h3 id="raw-sound-data">Raw Sound Data</h3>
 	<p>The deep learning module accepts any raw data source i.e., any
-		data source that contains raw waveform data.</p>
+		data source that contains raw waveform data e.g. clicks, clips and
+		Ishmael detections. Note that the module accepts whislte and moan
+		detections but only if a delphinID classifier has been loaded.</p>
 	<p>If the data is continuous, e.g. from the Sound Acquisition
 		module then deep learning detections are saved to PAMGuard&#39;s data
 		management system if they pass a user defined prediction threshold.
@@ -57,7 +55,6 @@
 		processes. So, for example if channels 0 and 2 are in a group, then
 		the raw waveform data from both channel 0 and 2 will be saved and can
 		be used in downstream processes, e.g., for localisation.</p>
-	<br>
 	<h3 id="segmentation">Segmentation</h3>
 	<p>
 		The segmentation section defines how the raw data is segmented. Some
@@ -72,7 +69,6 @@
 			re-merge</em> is the maximum number of segments that can form a single
 		data unit before a new data unit is automatically created.
 	</p>
-	<br>
 	<h3 id="deep-learning-model">Deep Learning Model</h3>
 	<p>The deep learning model section is used to select the deep
 		learning model. The drop down menu is used to select the framework the
@@ -92,14 +88,12 @@
 	</p>
 	<p>Once the model has loaded there some unique options depending on
 		the currently selected framework.</p>
-	<br>
 	<h4 id="generic-model">Generic Model</h4>
 	<p>
 		A generic model must be set up via the <em>Advanced</em> menu button.
 	</p>
 	<p align="center">
-		<img width="700" height="700"
-			src="images/advanced_settings_generic_1.png">
+		<img src="images/advanced_settings_generic_1.png">
 	</p>
 
 	<p>
@@ -124,8 +118,7 @@
 		including the shape of the input data e.g. a 100x50 image.
 	</p>
 	<p align="center">
-		<img width="700" height="700"
-			src="images/advanced_settings_generic_2.png">
+		<img src="images/advanced_settings_generic_2.png">
 	</p>
 
 	<p>
@@ -146,16 +139,15 @@
 		transforms and input and output data whenever settings up a new
 		PAMGuard data model and allow easier sharing of classifiers amongst
 		researchers.</p>
-	<br>
-	<h4 id="animalspot-and-ketos-models">AnimalSpot and Ketos models</h4>
+	<h4 id="koogu-ketos-animalspot-pamguard-zip-and-delphinid-models">Koogu,
+		Ketos, AnimalSpot, PAMGuard zip and delphinID models</h4>
 	<p>
-		If using an AnimalSpot or Ketos model then all transforms are
-		automatically set up. The transforms can be viewed and altered via the
-		Advanced menu button but in the majority of cases these settings
-		should not be used. It is advisable to select &quot;Use default
-		segment length&quot; to change the <em>Window length</em> to the
-		default for the selected model. Note that this is often necessary for
-		Ketos models but usually not a requirement for AnimalSpot models.
+		If using a deep learning model from a supported framework then all
+		transforms are automatically set up. The transforms can be viewed and
+		altered via the Advanced menu button but in the majority of cases
+		these settings should not be used. For some models, it is advisable to
+		select &quot;Use default segment length&quot; to change the <em>Window
+			length</em> to the default for the selected model.
 	</p>
 	<p align="center">
 		<img width="700" height="700"
@@ -163,18 +155,43 @@
 	</p>
 
 	<p>
-		<em>An AnimalSpot or Ketos model will automatically create a list
-			of transforms with the appropriate settings. These is no need to use
-			the advanced pane but it is there in case users wish to change
-			transform settings for some reason</em>
+		<em>An AnimalSpot, Ketos or other supported deep learning model
+			will automatically create a list of transforms with the appropriate
+			settings. These is no need to use the advanced pane but it is there
+			in case users wish to change transform settings for some reason</em>
 	</p>
+	<h3 id="default-models">Default Models</h3>
+	<p>Default models are selectable from the menu button in the Deep
+		Learning Pane. Default models are deep learning classifiers which are
+		open source, known to be effective and have have been published in
+		open access academic litrature; they are downloaded directly from a
+		GitHub repository and then all associated settings are automtically
+		applied. The default model selection pane also contains hyperlinks to
+		the papers descirbing each model which will take users directly to the
+		relvent website.</p>
+
+	<p align="center">
+		<img src="images/default_settings_humpback_1.png">
+	</p>
+
+	<p>
+		<em>Default models can be downloaded. Default models are models
+			which are published, open and have been known to work well amongst
+			the bioacoustics community. More will be added to PAMGaurd over time.
+			If you you would like your model to become a defualt model then drop
+			PAMGuard support an email.</em>
+	</p>
+
 	<br>
 	<br>
 	<br>
-	<p class="prevLink"><a href="rawDeepLearning_overview.html">Previous:
-	Overview</a></p>
-	<p class="nextLink"><a href="rawDeepLearning_Running.html">Next:
-	Running the Deep Learning module</a></p>
+	<p class="prevLink">
+		<a href="rawDeepLearning_overview.html">Previous: Overview</a>
+	</p>
+	<p class="nextLink">
+		<a href="rawDeepLearning_Running.html">Next: Running the Deep
+			Learning module</a>
+	</p>
 	<br>
 	<br>
 	<br>

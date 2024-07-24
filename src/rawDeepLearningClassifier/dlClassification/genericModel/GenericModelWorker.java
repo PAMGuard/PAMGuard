@@ -117,7 +117,7 @@ public class GenericModelWorker extends DLModelWorker<StandardPrediction> {
 			
 			((GenericModelParams) genericParams).defaultShape = longArr2Long(genericModel.getInputShape().getShape()); 
 			((GenericModelParams) genericParams).defualtOuput = longArr2Long(genericModel.getOutShape().getShape()); 
-			
+					
 
 		}
 		catch (Exception e) {

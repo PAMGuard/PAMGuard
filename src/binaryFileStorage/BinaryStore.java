@@ -228,6 +228,7 @@ PamSettingsSource, DataOutputStore {
 		super.pamToStart();
 		prepareStores();
 		openStores();
+		binaryStoreProcess.checkFileTimer();
 	}
 
 	@Override
@@ -245,9 +246,9 @@ PamSettingsSource, DataOutputStore {
 	 * Called from the process to close and reopen each datastream in 
 	 * a new file. Probably gets called about once an hour on the hour. 
 	 */
-	protected void reOpenStores(int endReason) {
+	protected synchronized void reOpenStores(int endReason, long newFileTime) {
 
-		long dataTime = PamCalendar.getTimeInMillis();
+		long dataTime = newFileTime;//PamCalendar.getTimeInMillis();
 		long analTime = System.currentTimeMillis();
 		BinaryOutputStream dataStream;
 		for (int i = 0; i < storageStreams.size(); i++) {
@@ -536,7 +537,7 @@ PamSettingsSource, DataOutputStore {
 				 */
 				if (immediateChanges) {
 					if (storesOpen) {
-						reOpenStores(BinaryFooter.END_UNKNOWN);
+						reOpenStores(BinaryFooter.END_UNKNOWN, PamCalendar.getTimeInMillis());
 					}
 				}
 				
@@ -2600,6 +2601,12 @@ PamSettingsSource, DataOutputStore {
 	@Override
 	public DataIntegrityChecker getInegrityChecker() {
 		return new BinaryIntegrityChecker(this);
+	}
+	/**
+	 * @return the binaryStoreProcess
+	 */
+	public BinaryStoreProcess getBinaryStoreProcess() {
+		return binaryStoreProcess;
 	}
 	
 }

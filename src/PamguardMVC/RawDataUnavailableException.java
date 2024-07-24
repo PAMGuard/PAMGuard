@@ -21,6 +21,10 @@ public class RawDataUnavailableException extends Exception {
 	private long startSample;
 
 	private int duration;
+
+	private long availableStart;
+
+	private long availableEnd;
 	/**
 	 * @return the dataCause
 	 */
@@ -34,10 +38,12 @@ public class RawDataUnavailableException extends Exception {
 	 * @param startSample 
 	 * @param cause
 	 */
-	public RawDataUnavailableException(PamRawDataBlock rawDataBlock, int dataCause, long startSample, int duration) {
+	public RawDataUnavailableException(PamRawDataBlock rawDataBlock, int dataCause, long availStart, long availEnd, long startSample, int duration) {
 		super();
 		this.rawDataBlock = rawDataBlock;
 		this.dataCause = dataCause;
+		this.availableStart = availStart;
+		this.availableEnd = availEnd;
 		this.startSample = startSample;
 		this.duration = duration;
 	}
@@ -55,8 +61,8 @@ public class RawDataUnavailableException extends Exception {
 	public String getMessage() {
 		switch (dataCause) {
 		case DATA_ALREADY_DISCARDED:
-			return String.format("Samples %d length %d requested from %s have already been discarded", startSample, duration, 
-					rawDataBlock.getDataName());
+			return String.format("Samples %d length %d requested from %s have already been discarded. %d to %d available", startSample, duration, 
+					rawDataBlock.getDataName(), availableStart, availableEnd);
 		case DATA_NOT_ARRIVED:
 			return String.format("Samples %d length %d  requested from %s have not yet arrived", 
 					startSample, duration, rawDataBlock.getDataName());
@@ -69,6 +75,20 @@ public class RawDataUnavailableException extends Exception {
 			return "No raw data available";
 		}
 		return super.getMessage();
+	}
+
+	/**
+	 * @return the availableStart
+	 */
+	public long getAvailableStart() {
+		return availableStart;
+	}
+
+	/**
+	 * @return the availableEnd
+	 */
+	public long getAvailableEnd() {
+		return availableEnd;
 	}
 	
 

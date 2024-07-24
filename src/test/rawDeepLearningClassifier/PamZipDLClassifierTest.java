@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 public class PamZipDLClassifierTest {
 	
 	/**
-	 * Test the koogu classifier and tests are working properly. This tests loading the koogu model and also using
-	 * functions in KooguWorker.
+	 * Test the koogu classifier and tests are working properly for a PAMGuard zip model - i.e. this is a very similar model to Koogu but zipped with a .zip 
+	 * filename instead of .kgu. 
 	 */
 	@Test
 	public void zipClassifierTest() {
@@ -20,5 +20,8 @@ public class PamZipDLClassifierTest {
 		//metadata says it should be used with Koogu classifier.
 		KooguDLClassifierTest.runKooguClassifier( relModelPath,  relWavPath,  relMatPath);
 	}
+	
+	
+	
 
 }

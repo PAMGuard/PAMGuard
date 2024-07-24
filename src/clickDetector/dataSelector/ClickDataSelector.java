@@ -38,9 +38,9 @@ public class ClickDataSelector extends DataSelector {
 
 	@Override
 	public PamDialogPanel getDialogPanel() {
-		if (clickSelectPanel == null) {
+//		if (clickSelectPanel == null) {
 			clickSelectPanel = new ClickSelectPanel(this, allowScores, useEventTypes);
-		}
+//		}
 		return clickSelectPanel;
 	}
 	@Override
@@ -60,19 +60,25 @@ public class ClickDataSelector extends DataSelector {
 		if (clickAlarmParameters.useEchoes == false && click.isEcho()) {
 			return 0;
 		}
-		/**
-		 * First score based on whether the event panel is in use and 
-		 * criteria satisfied. 
-		 */
+		
+		double score = scoreClick(click);
 		if (useEventTypes) {
-			if (wantEventType(click) == false) {
-				return 0;
+			double eventScore = scoreEventType(click);
+			if (clickAlarmParameters.isClicksANDEvents()) {
+				score = Math.min(score, eventScore);
+			}
+			else {
+				score = Math.max(score, eventScore);
 			}
 		}
+		return score;
 		
-		/*
-		 * Now score based on whether or not it's individual click type is wanted. 
-		 */
+	}
+	
+	private double scoreClick(ClickDetection click) {
+		if (click.getAmplitudeDB() < clickAlarmParameters.minimumAmplitude) {
+			return 0;
+		}
 		ClickIdentifier clickIdentifier = clickControl.getClickIdentifier();
 		int code = click.getClickType();
 		if (code > 0 && clickIdentifier != null) {
@@ -81,13 +87,13 @@ public class ClickDataSelector extends DataSelector {
 		boolean enabled = clickAlarmParameters.getUseSpecies(code);
 		if (enabled == false) {
 			return 0;
-		}
-		if (isAllowScores()) {
+		}if (isAllowScores()) {
 			return clickAlarmParameters.getSpeciesWeight(code);
 		}
 		else {
 			return 1;
 		}
+
 	}
 
 	/**
@@ -95,7 +101,7 @@ public class ClickDataSelector extends DataSelector {
 	 * @param click
 	 * @return
 	 */
-	private boolean wantEventType(ClickDetection click) {
+	private double scoreEventType(ClickDetection click) {
 		OfflineEventDataUnit oev = null;
 	
 		try {
@@ -107,7 +113,7 @@ public class ClickDataSelector extends DataSelector {
 		
 		int eventId = click.getOfflineEventID();
 		if (oev == null) {
-			return clickAlarmParameters.unassignedEvents;
+			return clickAlarmParameters.unassignedEvents ? 1 : 0;
 		}
 		
 		// see if there is a super detection and see if it's got a comment. 
@@ -118,10 +124,10 @@ public class ClickDataSelector extends DataSelector {
 			isAutomatic = comment.startsWith("Automatic");
 		}
 		if (isAutomatic && clickAlarmParameters.onlineAutoEvents) {
-			return true;
+			return 1;
 		}
 		else if (clickAlarmParameters.onlineManualEvents) {
-			return true;
+			return 1;
 		}
 //			if (clickAlarmParameters.onlineAutoEvents && comment.startsWith("Automatic")) {
 //				return true;
@@ -134,7 +140,7 @@ public class ClickDataSelector extends DataSelector {
 		 * list of event types and see if it's wanted. 
 		 */	
 		String evType = oev.getEventType();
-		return clickAlarmParameters.isUseEventType(evType);
+		return clickAlarmParameters.isUseEventType(evType) ? 1 : 0;
 	}
 
 
@@ -188,7 +194,7 @@ public class ClickDataSelector extends DataSelector {
 	 * @see PamguardMVC.dataSelector.DataSelector#getParams()
 	 */
 	@Override
-	public DataSelectParams getParams() {
+	public ClickAlarmParameters getParams() {
 		return clickAlarmParameters;
 	}
 

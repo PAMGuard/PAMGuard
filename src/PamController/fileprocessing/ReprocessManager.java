@@ -62,7 +62,7 @@ public class ReprocessManager {
 		 */
 		boolean setupOK = setupInputStream(choiceSummary, choice);
 		
-		if (choice == ReprocessStoreChoice.DONTSSTART) {
+		if (choice == null || choice == ReprocessStoreChoice.DONTSSTART) {
 			return false;
 		}
 		
@@ -172,6 +172,8 @@ public class ReprocessManager {
 			choiceSummary.addChoice(ReprocessStoreChoice.STARTNORMAL);
 			return choiceSummary;
 		}
+				
+		choiceSummary.addChoice(ReprocessStoreChoice.STARTNORMAL);
 		
 		ArrayList<PamControlledUnit> outputStores = PamController.getInstance().findControlledUnits(DataOutputStore.class, true);
 		boolean partStores = false; 

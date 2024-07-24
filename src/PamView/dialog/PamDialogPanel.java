@@ -5,6 +5,7 @@ import javax.swing.JComponent;
 /**
  * General class for dialog panels which will be incorporated into one or 
  * more actual dialogs. 
+ * Can be quickly opened with GenericSwingDialog
  * @author Doug Gillespie
  *
  */

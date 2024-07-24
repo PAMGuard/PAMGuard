@@ -141,11 +141,11 @@ public class DLPredictonPane extends DynamicSettingsPane<DLPredictionFilterParam
 	@Override
 	public DLPredictionFilterParams getParams(DLPredictionFilterParams currParams) {
 		
+		if (classPanes==null) return currParams;
 		for (int i=0; i<classPanes.length ; i++) {
 			currParams.classSelect[i] = classPanes[i].enable.isSelected();
 			currParams.minClassPredicton[i] = classPanes[i].slider.getValue();
 		}
-		
 		
 		return currParams;
 	}

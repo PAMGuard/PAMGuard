@@ -83,8 +83,9 @@ public class MatchedTemplateClassifierTest {
 	}
 	
 	/**
-	 * Test the match correlation algorithm combined with click length algorithm. Here we awant to test that 
-	 * a long waveform 
+	 * Test the match correlation algorithm combined with click length algorithm. Here we want to test that 
+	 * a long waveform can be processed properly - i.e the peak of the click can be found and cross correlation performed
+	 * on a shortened section. 
 	 */
 	@Test
 	public void testMatchCorrLen() {

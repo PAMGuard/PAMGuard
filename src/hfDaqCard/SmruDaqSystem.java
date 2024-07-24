@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -13,6 +14,7 @@ import soundPlayback.PlaybackControl;
 import soundPlayback.PlaybackSystem;
 import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionDialog;
+import Acquisition.AcquisitionProcess;
 import Acquisition.DaqSystem;
 import Acquisition.AudioDataQueue;
 import PamController.PamControlledUnitSettings;
@@ -49,7 +51,8 @@ public class SmruDaqSystem extends DaqSystem implements PamSettings {
 
 	public static final String oldCardName = "SMRU Ltd DAQ Card";
 
-	private static final int VERBOSELEVEL = 0;
+	public static final int VERBOSELEVEL = 0;
+	
 
 	/**
 	 * @param daqControl
@@ -61,6 +64,11 @@ public class SmruDaqSystem extends DaqSystem implements PamSettings {
 		smruDaqJNI = new SmruDaqJNI(this);
 
 		nDaqCards = smruDaqJNI.getnDevices();
+		for (int i = 0; i < nDaqCards; i++) {
+			for (int l = 0; l < 2; l++) {
+				smruDaqJNI.setLED(i, l,	0);
+			}
+		}
 
 		smruDaqDialogPanel = new SmruDaqDialogPanel(this);
 		PamSettingManager.getInstance().registerSettings(this);
@@ -275,6 +283,8 @@ public class SmruDaqSystem extends DaqSystem implements PamSettings {
 	boolean prepareDaqCard(int iBoard, boolean fullReset) {
 		// devices are left closed, so will need to reopen them. 
 		// of course, there is a vile lookup table, so... 
+		smruDaqJNI.setLED(iBoard, SmruDaqJNI.GREEN_LED, 0);
+		smruDaqJNI.setLED(iBoard, SmruDaqJNI.RED_LED, 0);
 		int hardId = smruDaqJNI.getBoardOrder(iBoard);
 		int prepOk = smruDaqJNI.prepareDevice(hardId, fullReset);
 		terminalPrint("Opened daq card returned " + prepOk, 1);		
@@ -313,6 +323,7 @@ public class SmruDaqSystem extends DaqSystem implements PamSettings {
 
 		if (ans) {
 			Thread t = new Thread(new DaqThread());
+			t.setPriority(Thread.MAX_PRIORITY);
 			t.start();
 			keepRunning = true;
 			daqThreadRunning = true;
@@ -371,18 +382,43 @@ public class SmruDaqSystem extends DaqSystem implements PamSettings {
 		boolean first = true;
 		boolean needRestart = false;
 		int iChan;
+		// some flags on checks of incoming data rate
+//		long recentSamples = 0;
+//		long recentCheckTime = System.currentTimeMillis();
+		int loopCount = 0;
+		for (int iBoard = 0; iBoard < nDaqCards; iBoard++) {
+			smruDaqJNI.setLED(iBoard, SmruDaqJNI.GREEN_LED, 1);
+			smruDaqJNI.setLED(iBoard, SmruDaqJNI.RED_LED, 0);
+		}
+		
 		while (keepRunning) {
 			iChan = 0;
 			dataMillis = daqControl.getAcquisitionProcess().absSamplesToMilliseconds(totalSamples);
+			if (isStalled()) {
+				needRestart = true;
+				for (int iBoard = 0; iBoard < nDaqCards; iBoard++) {
+					smruDaqJNI.setLED(iBoard, SmruDaqJNI.GREEN_LED, 0);
+					smruDaqJNI.setLED(iBoard, SmruDaqJNI.RED_LED, 1);
+				}
+				// don't set this false or the shutdown doesn't work properly.
+//				keepRunning = false;
+				break;
+			}
+			loopCount++;
 			for (int iBoard = 0; iBoard < nDaqCards && keepRunning; iBoard++) {
+				if ((loopCount % 10000) == 0) {
+//					toggleLED(iBoard, 0);
+					smruDaqJNI.setLED(iBoard, SmruDaqJNI.GREEN_LED, 1);
+				}
 				for (int i = 0; i < boardChannels[iBoard] && keepRunning; i++) {
 					newData = smruDaqJNI.readSamples(iBoard, i, wantedSamples);
 					if (newData == null) {
+						smruDaqJNI.setLED(iBoard, SmruDaqJNI.RED_LED, 1);
 						System.out.println(String.format("Null data read from smruDaqJNI.readSamples board %d, chan %d, samples %d", 
 								iBoard, i, wantedSamples));
 //						System.out.println("Issue restart ...");
 						needRestart = true;
-						keepRunning = false;
+//						keepRunning = false;
 						break;
 					}
 					readSamples = newData.length;
@@ -409,19 +445,47 @@ public class SmruDaqSystem extends DaqSystem implements PamSettings {
 			if (++dcOffsetCalls == 100) {
 				dcOffsetScale = 100.; // after a bit, increase the time constant. 
 			}
+			
 
 
 			totalSamples += readSamples;
 
-		}
+		};
 		daqThreadRunning = false;
-		if (needRestart) {
-			PamController pamController = PamController.getInstance();
-			pamController.pamStop();
-			PamDialog.showWarning(daqControl.getGuiFrame(), daqControl.getUnitName(), "Problem with one or more SAIL DAQ Cards.\n"
-					+ "Restart PAMGuard, check connections and try again." );
-//			pamController.startLater();
+		
+		for (int iBoard = 0; iBoard < nDaqCards; iBoard++) {
+			smruDaqJNI.setLED(iBoard, SmruDaqJNI.GREEN_LED, 0);
 		}
+		
+		if (needRestart) {
+			SwingUtilities.invokeLater(new Runnable() {
+				
+				@Override
+				public void run() {
+					PamController pamController = PamController.getInstance();
+					pamController.pamStop();
+					System.out.println("Problem with one or more SAIL DAQ Cards. "
+							+ "Restart PAMGuard, check connections and try again." );
+//					PamDialog.showWarning(daqControl.getGuiFrame(), daqControl.getUnitName(), "Problem with one or more SAIL DAQ Cards.\n"
+//							+ "Restart PAMGuard, check connections and try again." );
+					pamController.startLater();					
+				}
+			});
+		}
+	}
+
+//	private long lastFakeStall = 0;
+	private boolean isStalled() {
+//		if (lastFakeStall == 0) {
+//			lastFakeStall = System.currentTimeMillis();
+//		}
+//		long now = System.currentTimeMillis();
+//		if (now-lastFakeStall > 10000) {
+//			System.out.println("Random pretend stalled");
+//			lastFakeStall = 0;
+//			return true;
+//		}
+		return daqControl.getAcquisitionProcess().isStalled();
 	}
 
 	public static short getSample(byte[] buffer, int position) {

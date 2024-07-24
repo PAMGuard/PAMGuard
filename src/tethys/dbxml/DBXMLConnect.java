@@ -150,8 +150,7 @@ public class DBXMLConnect {
 	 */
 	public boolean postAndLog(Object nilusObject, String documentName) throws TethysException
 	{
-		boolean ok = NilusChecker.warnEmptyFields(tethysControl.getGuiFrame(), nilusObject);
-
+//		boolean ok = NilusChecker.warnEmptyFields(tethysControl.getGuiFrame(), nilusObject);
 
 		TethysException e = null;
 		boolean success = false;

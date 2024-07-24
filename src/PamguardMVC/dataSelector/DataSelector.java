@@ -98,6 +98,23 @@ public abstract class DataSelector {
 	abstract public DynamicSettingsPane<Boolean> getDialogPaneFX();
 	
 	/**
+	 * Find a data selector within a data selector. This is primarily for use with 
+	 * ComoundDataSelector objects which may encapsulate multiple other selectors, 
+	 * particularly when annotations are in use. but it's needed here so that it 
+	 * can be called on any DataSelector object. 
+	 * @param selectorClass class to data selector to find. 
+	 * @return DataSelector or null if that class of data selector doesn't exist. 
+	 */
+	public DataSelector findDataSelector(Class selectorClass) {
+		if (this.getClass() == selectorClass) {
+			return this;
+		}
+		else {
+			return null;
+		}
+	}
+	
+	/**
 	 * Get a menu item for the data selector that can be easily added
 	 * to any other menu. 
 	 * @param parentFrame

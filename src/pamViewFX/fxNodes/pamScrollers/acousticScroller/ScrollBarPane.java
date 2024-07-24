@@ -6,6 +6,8 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
@@ -842,6 +844,19 @@ public class ScrollBarPane extends PamBorderPane {
 	 */
 	public void setShowMillis(boolean showMillis) {
 		this.showMillis = showMillis;
+	}
+
+
+	/**
+	 * Convenience function which adds a change listener to the current value and visible amount prooperty. 
+	 * @param val - the change listener to add. 
+	 */
+	public void addValueListener(ChangeListener val) {
+		//add listener to visible amount property.
+		visibleAmountProperty.addListener(val);
+
+		//add listener to current value amount property.
+		currentValueProperty.addListener(val);
 	}
 
 }

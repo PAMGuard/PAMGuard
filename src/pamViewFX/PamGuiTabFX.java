@@ -253,6 +253,10 @@ public class PamGuiTabFX extends PamTabFX {
 			double r1 = 1 - r;
 
 			int smallWindows = 0;
+			
+			
+			//the padding between windows
+			double padding = 10; 
 
 			ArrayList<PamGuiInternalPane> dw = internalPanes;
 
@@ -268,7 +272,9 @@ public class PamGuiTabFX extends PamTabFX {
 
 			//now place windows in correct position
 			//large windows 
-			double x, y, w, h = 0;
+			double x, y, w, h = 0.;
+			double pad =0.;
+			
 			if (largeWindows > 0) {
 				x = 0;
 				y = 0;
@@ -284,7 +290,10 @@ public class PamGuiTabFX extends PamTabFX {
 					if (dw.get(i).getUserDisplayNode().isMinorDisplay()== true) continue;
 
 					dw.get(i).setPaneLayout(x, y);
-					dw.get(i).setPaneSize(w, h);
+					
+					//set the padding if the pane is not the last pane.
+					pad = (i== dw.size()-1) ? 0 : padding;
+					dw.get(i).setPaneSize(w - (horz?  pad:0), h -  (horz?  0:pad));
 					if (horz) x += w;
 					else y += h; 
 				}
@@ -307,7 +316,10 @@ public class PamGuiTabFX extends PamTabFX {
 				for (int i = 0; i < dw.size(); i++) {
 					if (dw.get(i).getUserDisplayNode().isMinorDisplay() == false) continue;
 					dw.get(i).setPaneLayout(x, y);
-					dw.get(i).setPaneSize(w, h);
+					
+					//set the padding if the pane is not the last pane.
+					pad = (i== dw.size()-1) ? 0 : padding;
+					dw.get(i).setPaneSize(w- (horz?  pad:0), h -  (horz?  0:pad));
 					if (horz) x += w;
 					else y +=h;
 				}

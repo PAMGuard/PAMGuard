@@ -269,7 +269,10 @@ public class DataStreamPaneFX extends PamBorderPane {
 			});
 			
 			canvasHolder.setOnScroll(e->{
-				wheelMoved(e);
+				//only change colours of the control key is down. 
+				if (e.isControlDown()) {
+					wheelMoved(e);
+				}
 			});
 			
 		}
