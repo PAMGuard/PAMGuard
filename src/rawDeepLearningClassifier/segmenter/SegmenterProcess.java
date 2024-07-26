@@ -6,7 +6,6 @@ import java.util.Arrays;
 
 import PamController.PamController;
 import PamDetection.RawDataUnit;
-import PamUtils.PamArrayUtils;
 import PamUtils.PamUtils;
 import PamView.GroupedSourceParameters;
 import PamView.PamDetectionOverlayGraphics;
@@ -493,10 +492,13 @@ public class SegmenterProcess extends PamProcess {
 							rawDataChunk[i], chans[i], dlControl.getDLParams().rawSampleSize, dlControl.getDLParams().sampleHop, true);
 				}
 				else {
-					//send the whole data chunk to the deep learning unit
+//					//send the whole data chunk to the deep learning unit
 					newRawData(pamDataUnit,
 							rawDataChunk[i], chans[i], 	rawDataChunk[i].length, rawDataChunk[i].length, true);
+//					currentRawChunks[i] = new GroupedRawData(pamDataUnit.getTimeMilliseconds(), getSourceParams().getGroupChannels(i), 
+//							pamDataUnit.getStartSample(), 	rawDataChunk[i].length, 	rawDataChunk[i].length); 
 				}
+				
 			//the way that the newRawdata works is it waits for the next chunk and copies all relevant bits
 			//from previous chunks into segments. This is fine for continuous data but means that chunks of data
 			//don't get their last hop...
@@ -659,8 +661,8 @@ public class SegmenterProcess extends PamProcess {
 
 						//add the hop from the current grouped raw data unit to the new grouped raw data unit 
 						//					System.out.println("Pointer to copy from: "  + (currentRawChunks[i].rawData[groupChan].length - dlControl.getDLParams().sampleHop )); 
-						int overFlow2 = nextRawChunks[i][j].copyRawData(lastRawDataChunk.rawData[groupChan], lastRawDataChunk.rawData[groupChan].length - getBackSmapleHop()  , 
-								getBackSmapleHop() , groupChan);
+						int overFlow2 = nextRawChunks[i][j].copyRawData(lastRawDataChunk.rawData[groupChan], lastRawDataChunk.rawData[groupChan].length - getBackSmapleHop(rawSampleSize, rawSampleHop)  , 
+								getBackSmapleHop(rawSampleSize, rawSampleHop) , groupChan);
 
 						//					System.arraycopy(currentRawChunks[i].rawData[groupChan], currentRawChunks[i].rawData[groupChan].length - dlControl.getDLParams().sampleHop,
 						//							nextRawChunks[i].rawData[groupChan], 0, dlControl.getDLParams().sampleHop); 
@@ -734,11 +736,12 @@ public class SegmenterProcess extends PamProcess {
 
 		//add some extra metadata to the chunks 
 		packageSegmenterDataUnit(currentRawChunks[i]); 
-		//System.out.println("Segmenter process: Save current segments to datablock: " + currentRawChunks[i].getParentDataUnit().getUID()); 
+		System.out.println("Segmenter process: Save current segments to datablock: " + currentRawChunks[i].getParentDataUnit().getUID() + " " + i + currentRawChunks[i].getRawData()[0][0]); 
 
 		//send the raw data unit off to be classified!
 
 		this.segmenterDataBlock.addPamData(currentRawChunks[i]);
+		
 
 		if (nextRawChunks[i]!=null) {
 			int n = nextRawChunks[i].length-1; 
@@ -771,8 +774,9 @@ public class SegmenterProcess extends PamProcess {
 	}
 
 
-	private int getBackSmapleHop() {
-		return dlControl.getDLParams().rawSampleSize - dlControl.getDLParams().sampleHop; 
+	private int getBackSmapleHop(int segSize, int segHop) {
+		return segSize-segHop;
+//		return dlControl.getDLParams().rawSampleSize - dlControl.getDLParams().sampleHop; 
 	}
 
 	//	/***TODO - hand small windows***/

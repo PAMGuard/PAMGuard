@@ -153,7 +153,7 @@ public class PeakFreqOptionsPane extends StandardSymbolModifierPane  {
 
 			super.setParams();
 			
-			//important to have here because the super.setParams set this bak to false. 
+			//important to have here because the super.setParams set this back to false. 
 			setParams = true; 
 
 //			StandardSymbolOptions standardSymbolOptions = (StandardSymbolOptions) getSymbolModifier().getSymbolChooser().getSymbolOptions();
