@@ -851,7 +851,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 			String help = null;
 			int ans = WarnOnce.showWarning(title, msg, WarnOnce.WARNING_MESSAGE, help, e);
 			System.err.println("Exception while loading " + moduleName);
-			this.removeControlledUnt(unitBeingLoaded);
+			//this.removeControlledUnt(unitBeingLoaded);
 			this.clearLoadedUnit();
 			;
 		}

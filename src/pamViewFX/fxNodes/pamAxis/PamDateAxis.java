@@ -33,8 +33,9 @@ public class PamDateAxis extends ValueAxis<Long> {
 
     /** We use these for auto ranging to pick a user friendly tick unit. (must be increasingly bigger)*/
     private static final double[] TICK_UNIT_DEFAULTS = {
+        3600000,       // 1 hour
         86400000,       // 1 day
-        172800000,      // 2 das
+        172800000,      // 2 days
         259200000,      // 3 days
         345600000,      // 4 days
         432000000,      // 5 days
@@ -63,8 +64,9 @@ public class PamDateAxis extends ValueAxis<Long> {
 
     /** These are matching date formatter strings */
     private static final String[] TICK_UNIT_FORMATTER_DEFAULTS = {
-        "MM/dd/yy",     // 1 day
-        "MM/dd/yy",     // 2 das
+        "HH:mm:SS",     // 1 hour
+        "HH:mm:SS",     // 1 day
+        "MM/dd/yy",     // 2 days
         "MM/dd/yy",     // 3 days
         "MM/dd/yy",     // 4 days
         "MM/dd/yy",     // 5 days

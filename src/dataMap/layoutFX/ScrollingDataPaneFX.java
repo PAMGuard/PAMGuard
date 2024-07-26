@@ -120,7 +120,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	 * @return the scrolling pane. 
 	 */
 	private Node createScrollingDataPane() {
-		
+				
 		holder=new PamBorderPane(); 
 
 		//create the main scroll pane 
@@ -145,8 +145,6 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 //		holder.setTop(buttonTest);
 //		//////////
 		
-		holder.setCenter(mainScrollPane);
-		holder.setTop(createScrollBar());
 		
 //		PamButton test = new PamButton("Test");
 //		test.setOnAction((action)->{
@@ -155,7 +153,6 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 //		holder.setLeft(test);
 
 
-		setupScrollBar();		
 		
 		//finally make sure the scroll bar recalculates stuff when holder changes size
 		holder.widthProperty().addListener((change)->{
@@ -172,8 +169,17 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 //		dateAxis.prefWidthProperty().bind(scrollingDataPanel.widthProperty());
 //		dateAxis.setStyle("-fx-background-color: ORANGE;");		 
 		dateAxis.setForceZeroInRange(false);
-		holder.setTop(dateAxis);
 		
+		
+		PamVBox vBox = new PamVBox();
+		vBox.getChildren().add(createScrollBar());
+		vBox.getChildren().add(dateAxis);
+
+		holder.setTop(vBox);
+		holder.setCenter(mainScrollPane);
+
+		setupScrollBar();		
+
 		return holder;
 	}
 	
@@ -211,14 +217,16 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 		//create the scroll bar and listeners. 
 		timeScrollBar=new ScrollBarPane(); 
 		timeScrollBar.addValueListener((obs_val, old_val, new_val)->{
+			System.out.println("Scroll bar seconds: " + timeScrollBar.getCurrentValue() + " vis amount: " + timeScrollBar.visibleAmountProperty().get());
 			calcStartEndMillis();
 			updateScrollBarText();
 			notifyScrollChange();
 		});
 		
-		
-		
-		timeScrollBar.setPrefHeight(20);
+		timeScrollBar.getTextBox().setPrefColumnCount(15);
+		timeScrollBar.getTextBox().setPrefWidth(100);
+
+		timeScrollBar.setPrefHeight(50);
 		
 		holder.setCenter(timeScrollBar);
 		holder.setBottom(timeLabelPane);
@@ -231,8 +239,10 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	 */
 	private void calcStartEndMillis(){
 		screenStartMillis = (long) (dataMapControl.getFirstTime() + 
-				timeScrollBar.getCurrentValue() * 1000L);
-		screenEndMillis = screenStartMillis + (long) (screenSeconds * 1000);
+				timeScrollBar.getCurrentValue());
+		screenEndMillis = (long) (screenStartMillis + timeScrollBar.getVisibleAmount());
+		
+		getPixelsPerHour();
 	}
 	
 	/**
@@ -354,29 +364,33 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 		long dataStart = dataMapControl.getFirstTime();
 		long dataEnd = dataMapControl.getLastTime();
 		double dataSeconds = ((dataEnd-dataStart)/1000) + 1;
+		
+		
 		double pixsPerHour = getPixelsPerHour(); 
 		double pixsPerSecond = pixsPerHour / 3600;
 		double screenWidth = getPlotWidth();
-		screenSeconds = screenWidth / pixsPerSecond;
-		if (dataStart == Long.MAX_VALUE || screenSeconds >= dataSeconds) {
-			//System.out.println("dataSeconds: "+dataSeconds+ " pixsPerHour: " +pixsPerHour+" screenWidth: "+screenWidth+" screenSeconds "+screenSeconds+ " holder width: "+holder.getWidth());
-			/* 
-			 * hide the scroll bar and stretch the display to fit the window 
-			 */
-			timeScrollBar.setVisible(false);
-			screenStartMillis = dataStart;
-			screenEndMillis = dataEnd;
-		}
-		else {
-			//System.out.println("dataSeconds: "+dataSeconds+ " pixsPerHour: " +pixsPerHour+" screenWidth: "+screenWidth+" screenSeconds "+screenSeconds+" holder width: "+holder.getWidth());
+		screenSeconds =  screenWidth / Math.min(600. / 3600, pixsPerSecond);
+	
+		
+//		if (dataStart == Long.MAX_VALUE || screenSeconds >= dataSeconds) {
+//			System.out.println("dataSeconds1: "+dataSeconds+ " pixsPerHour: " +pixsPerHour+" screenWidth: "+screenWidth+" screenSeconds "+screenSeconds+ " holder width: "+holder.getWidth());
+//			/* 
+//			 * hide the scroll bar and stretch the display to fit the window 
+//			 */
+//			timeScrollBar.setVisible(true);
+//			screenStartMillis = dataStart;
+//			screenEndMillis = dataEnd;
+//		}
+//		else {
+			System.out.println("dataSeconds2: "+dataSeconds+ " pixsPerHour: " +pixsPerHour+" screenWidth: "+screenWidth+" screenSeconds "+screenSeconds+" holder width: "+holder.getWidth());
 			timeScrollBar.setVisible(true);
 			timeScrollBar.setMinVal(0);
-			timeScrollBar.setMaxVal(Math.ceil(dataSeconds));
+			timeScrollBar.setMaxVal(Math.max(dataSeconds, screenSeconds)*1000L);
 			timeScrollBar.setBlockIncrement(Math.max(1, screenSeconds * 4/5));
 //			timeScrollBar.setUnitIncrement(Math.max(1, screenSeconds / 20));
-			timeScrollBar.setVisibleAmount(screenSeconds);
+			timeScrollBar.setVisibleAmount(screenSeconds*1000L);
 			timeScrollBar.setCurrentValue(currentPos);
-		}
+//		}
 
 	}
 
@@ -416,7 +430,11 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	
 	
 	public double getPixelsPerHour() {
-		return dataMapControl.dataMapParameters.getPixeslPerHour();
+		System.out.println("Pixels per hour: " + dataMapControl.dataMapParameters.getPixeslPerHour() + " " + this.getPlotWidth()/(this.timeScrollBar.getVisibleAmount()/1000./3600.));
+		//return dataMapControl.dataMapParameters.getPixeslPerHour();
+		
+		return this.getPlotWidth()/(this.timeScrollBar.getVisibleAmount()/1000./3600.);
+		
 	}
 
 	/**
