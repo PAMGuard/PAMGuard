@@ -206,13 +206,25 @@ public class DLSymbolOptionPanel implements PamDialogPanel, ActionListener {
 	 * @param symbolOptions - the symbol options
 	 */
 	private void setPredictionColParams(DLSymbolModifierParams symbolOptions) {
-
+		
+		
+		//just incasesettings have messed up
+		if (symbolOptions.clims[0]==symbolOptions.clims[1]) {
+			symbolOptions.clims[0]=Math.max(0.,symbolOptions.clims[1]-0.1);
+			symbolOptions.clims[1]=Math.min(1.,symbolOptions.clims[1]+0.1);
+		}
+		
 		//now set frequency parameters 
-		colorRangeSlider.setValue((int) symbolOptions.clims[0]*100);
-		colorRangeSlider.setUpperValue((int) symbolOptions.clims[1]*100);
+//		System.out.println("Set colour limits: " + symbolOptions.clims[0] + "  "  + symbolOptions.clims[1] + "  " + colorRangeSlider.getMaximum());
+		
+		//careful of casting to int here or else end up with setting the two thumbs in the same place. 
+		colorRangeSlider.setColourMap(PamUtilsFX.fxColArray2Swing(symbolOptions.colArray));
+		
+		colorRangeSlider.setValue((int) (symbolOptions.clims[0]*100.));
+
+		colorRangeSlider.setUpperValue((int) (symbolOptions.clims[1]*100.));
 		//		colorRangeSlider.setColourArrayType( symbolOptions.colArray);
 
-		colorRangeSlider.setColourMap(PamUtilsFX.fxColArray2Swing(symbolOptions.colArray));
 
 
 		int nClass = checkClassNamesBox( symbolOptions, classNameBox); 
