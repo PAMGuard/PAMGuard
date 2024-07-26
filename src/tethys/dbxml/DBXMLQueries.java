@@ -32,6 +32,7 @@ import nilus.Detections;
 import nilus.GranularityEnumType;
 import nilus.GranularityType;
 import nilus.Helper;
+import nilus.Localize;
 import tethys.Collection;
 import tethys.DocumentInfo;
 import tethys.TethysControl;
@@ -784,6 +785,38 @@ public class DBXMLQueries {
 		}
 		return count;
 	}
+	
+	/**
+	 * Count on effort detections in a Detections document
+	 * @param docName
+	 * @return
+	 */
+	public int countLocalizations2(String docName) {
+		TethysExportParams params = tethysControl.getTethysExportParams();
+		String queryBase = "count(collection(\"Localizations\")/Localize[Id=\"ReplaceDocumentId\"]/Localizations/Localization)";
+		String query = queryBase.replace("ReplaceDocumentId", docName);
+
+		String result = null;
+		try {
+			Queries queries = dbXMLConnect.getTethysQueries();
+			result = queries.QueryTethys(query);
+			//			System.out.println(result);
+		}
+		catch (Exception e) {
+			System.out.println("Error executing " + query);
+			//			e.printStackTrace();
+			return -1;
+		}
+		int count = 0;
+		try {
+			count = Integer.valueOf(result);
+		}
+		catch (NumberFormatException e) {
+			System.out.println("Unable to interpret count data " + result);
+			return 0;
+		}
+		return count;
+	}
 
 	//	/**
 	//	 * Get a count of the detections in a detections document.
@@ -1080,6 +1113,109 @@ public class DBXMLQueries {
 
 		// TODO Auto-generated method stub
 		return detections;
+	}
+	/**
+	 * Get the basic information about a Detections document. This is basically everything apart from
+	 * the actual detections themselves.
+	 * @param aDoc
+	 * @return
+	 */
+	public Localize getLocalizationDocInfo(String locDocName) {
+//		String oldqueryBase = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/Id\",\"Detections/Description\",\"Detections/DataSource\",\"Detections/Algorithm\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/Id\",\"DetectionsDocName\"],\"optype\":\"binary\"}],\"enclose\":1}";
+		// updated May 23
+//		String queryBase = "{\"species\":{\"query\":{\"op\":\"lib:completename2tsn\",\"optype\":\"function\",\"operands\":[\"%s\"]},\"return\":{\"op\":\"lib:tsn2completename\",\"optype\":\"function\",\"operands\":[\"%s\"]}},\"return\":[\"Localize/Id\",\"Localize/Description\",\"Localize/DataSource\",\"Localize/Algorithm\",\"Localize/QualityAssurance\",\"Localize/UserId\",\"Localize/MetadataInfo\",\"Localize/Effort\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Localize/Id\",\"LocalizationsDocName\"],\"optype\":\"binary\"}],\"enclose\":1}";
+		String queryBase = "{\"species\":{\"query\":{\"op\":\"lib:completename2tsn\",\"optype\":\"function\",\"operands\":[\"%s\"]},\"return\":{\"op\":\"lib:tsn2completename\",\"optype\":\"function\",\"operands\":[\"%s\"]}},\"return\":[\"Localize/Id\",\"Localize/Description\",\"Localize/DataSource\",\"Localize/Algorithm\",\"Localize/QualityAssurance\",\"Localize/UserId\",\"Localize/Effort\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Localize/Id\",\"LocalizationsDocName\"],\"optype\":\"binary\"}],\"enclose\":1}";
+		String query = queryBase.replace("LocalizationsDocName", locDocName);
+		DBQueryResult queryResult;
+		try {
+			queryResult = executeQuery(query);
+		} catch (TethysQueryException e) {
+			tethysControl.showException(e);
+			return null;
+		}
+		Document doc;
+		try {
+			doc = queryResult.getDocument();
+		} catch (ParserConfigurationException | SAXException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+		//		System.out.println(queryResult.queryResult);
+
+		Localize localize = new Localize();
+		try {
+			Helper.createRequiredElements(localize);
+		} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
+			e.printStackTrace();
+		}
+
+		NodeList returns = doc.getElementsByTagName("Result");
+		//		System.out.println("N projects = " + returns.getLength());
+		int n = returns.getLength();
+		if (n == 0) {
+			return null;
+		}
+		Element result = (Element) returns.item(0);
+
+		DescriptionType description = localize.getDescription();
+		if (description == null) {
+			description = new DescriptionType();
+			localize.setDescription(description);
+		}
+		localize.setId(getElementData(result, "Id"));
+		description.setAbstract(getElementData(result, "Description.Abstract"));
+		description.setMethod(getElementData(result, "Description.Method"));
+		description.setObjectives(getElementData(result, "Description.Objectives"));
+
+		String deployment = getElementData(result, "DataSource.DeploymentId");
+		if (deployment != null) {
+			DataSourceType dataSource = localize.getDataSource();
+			if (dataSource == null) {
+				dataSource = new DataSourceType();
+				localize.setDataSource(dataSource);
+			}
+			dataSource.setDeploymentId(deployment);
+		}
+
+		// get the effort start an end
+		String effStart = getElementData(result, "Effort.Start");
+		String effEnd = getElementData(result, "Effort.End");
+		localize.getEffort().setStart(TethysTimeFuncs.fromGregorianXML(effStart));
+		localize.getEffort().setEnd(TethysTimeFuncs.fromGregorianXML(effEnd));
+		// try to find the granularity. 
+//		String granularityString = getElementData(result, "Effort.Kind.Granularity");
+//		GranularityEnumType granularity = null;
+//		if (granularityString != null) {
+//			granularity = GranularityEnumType.fromValue(granularityString);  
+//			List<DetectionEffortKind> kinds = detections.getEffort().getKind();
+//			DetectionEffortKind kind = new DetectionEffortKind();
+//			GranularityType granularityType = new GranularityType();
+//			granularityType.setValue(granularity);
+//			kind.setGranularity(granularityType);
+//			// try to find the rest of the granularity information. 
+//			String binSize_m = getElementAttribute(result, "Effort.Kind.Granularity", "BinSize_m");
+//			String encounterGap_m = getElementAttribute(result, "Effort.Kind.Granularity", "EncounterGap_m");
+//			String firstBinStart = getElementAttribute(result, "Effort.Kind.Granularity", "FirstBinStart");
+//			try {
+//				granularityType.setBinSizeMin(Double.valueOf(binSize_m));
+//			}
+//			catch (NumberFormatException e) {
+//			}
+//			try {
+//				granularityType.setEncounterGapMin(Double.valueOf(encounterGap_m));
+//			}
+//			catch (NumberFormatException e) {
+//			}
+//
+//			kinds.add(kind);
+//		}
+		//		String 
+
+
+
+		// TODO Auto-generated method stub
+		return localize;
 	}
 
 }

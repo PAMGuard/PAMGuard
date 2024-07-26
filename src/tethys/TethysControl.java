@@ -598,6 +598,13 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		return detectionsHandler;
 	}
 
+	/**
+	 * @return the localizationHandler
+	 */
+	public LocalizationHandler getLocalizationHandler() {
+		return localizationHandler;
+	}
+
 	public void showException(TethysException tethysException) {
 		String title = tethysException.getMessage();
 		StackTraceElement[] stack = tethysException.getStackTrace();

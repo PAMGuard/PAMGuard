@@ -1,6 +1,14 @@
 package tethys.niluswraps;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import javax.xml.datatype.XMLGregorianCalendar;
+
 import PamguardMVC.PamDataBlock;
+import nilus.DataSourceType;
+import nilus.DescriptionType;
+import nilus.QualityAssuranceProcessType;
 
 /**
  * Wrapper for Nilus data objects. This means Detections and Localization documents which 
@@ -22,6 +30,27 @@ public class NilusDataWrapper<T> extends NilusDocumentWrapper<T> {
 		this.dataBlock = dataBlock;
 		this.deployment = deployment;
 		this.count = count;
+	}
+	
+	public DescriptionType getDescription() {
+		return (DescriptionType) getGotObject("getDescription");
+	}
+
+	public DataSourceType getDataSource() {
+		return (DataSourceType) getGotObject("getDataSource");
+	}
+
+
+	public QualityAssuranceProcessType getQualityAssurance() {
+		return (QualityAssuranceProcessType) getGotObject("getQualityAssurance");
+	}
+	
+	public XMLGregorianCalendar getEffortStart() {
+		return (XMLGregorianCalendar) getGotObjects("getEffort", "getStart");
+	}
+	
+	public XMLGregorianCalendar getEffortEnd() {
+		return (XMLGregorianCalendar) getGotObjects("getEffort", "getEnd");
 	}
 
 }

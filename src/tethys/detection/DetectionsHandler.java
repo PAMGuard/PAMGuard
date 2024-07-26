@@ -51,6 +51,8 @@ import tethys.deployment.DeploymentHandler;
 import tethys.localization.CoordinateName;
 import tethys.localization.LocalizationSubType;
 import tethys.localization.LocalizationType;
+import tethys.localization.PLocalization;
+import tethys.niluswraps.NilusDataWrapper;
 import tethys.niluswraps.PDeployment;
 import tethys.niluswraps.PDetections;
 import tethys.output.StreamExportParams;
@@ -93,9 +95,8 @@ public class DetectionsHandler extends CollectionHandler {
 	 * this data set (not the entire project).
 	 * @param dataBlock
 	 */
-	public StreamDetectionsSummary getStreamDetections(PamDataBlock dataBlock) {
+	public StreamDetectionsSummary<NilusDataWrapper<PDetections>> getStreamDetections(PamDataBlock dataBlock) {
 		ArrayList<PDeployment> deployments = tethysControl.getDeploymentHandler().getMatchedDeployments();
-//		getStreamLocalizations(dataBlock, deployments);
 		return getStreamDetections(dataBlock, deployments);
 	}
 
@@ -106,7 +107,7 @@ public class DetectionsHandler extends CollectionHandler {
 	 * @param deployments
 	 * @return
 	 */
-	public StreamDetectionsSummary getStreamDetections(PamDataBlock dataBlock, ArrayList<PDeployment> deployments) {
+	public StreamDetectionsSummary<NilusDataWrapper<PDetections>> getStreamDetections(PamDataBlock dataBlock, ArrayList<PDeployment> deployments) {
 		// get the basic data for each document including it's Description.
 
 		ArrayList<PDetections> detectionsDocs = new ArrayList<>();
