@@ -242,6 +242,8 @@ public class DataStreamPaneFX extends PamBorderPane {
 		private DataGraphFX() {
 			createDataGraph();
 			addDataGraphMouse();
+			
+			
 		}
 		
 		
@@ -311,6 +313,8 @@ public class DataStreamPaneFX extends PamBorderPane {
 			//create canvas for overlaid drawings
 			drawCanvas=new Canvas(90,90); 
 
+			plotCanvas. getGraphicsContext2D(). setImageSmoothing(false);
+			
 			Pane pane = new Pane();
 			pane.getChildren().add(plotCanvas);
 			pane.getChildren().add(drawCanvas);

@@ -312,6 +312,7 @@ public class ScrollBarPane extends PamBorderPane {
 		rightDrag.getChildren().add(rightdragLine); 
 		rectangle.getChildren().add(rightDrag); 
 
+		rectangle.setCursor(Cursor.OPEN_HAND); //Change cursor to hand
 
 		//now set behaviours 
 		leftDrag.setOnMousePressed((event)->{
@@ -366,15 +367,17 @@ public class ScrollBarPane extends PamBorderPane {
 		}); 
 
 		//now set behaviours 
-		rightDrag.setOnMousePressed((event)->{
+		rightDrag.setOnMousePressed((event)->{			
 			leftLayoutX=rectangle.getLayoutX();
 			isChanging.set(true);
+			rectangle.setCursor(Cursor.CLOSED_HAND); //Change cursor to hand
 			dragStarted(event, rightDrag);
 		});
 
 		rightDrag.setOnMouseReleased((event)->{
 			currentValueProperty.setValue(calcScrollBarVal(rectangle.getLayoutX()));
 			isChanging.set(false);
+			rectangle.setCursor(Cursor.OPEN_HAND); //Change cursor to hand
 			dragging(event); 
 		});
 
@@ -426,6 +429,7 @@ public class ScrollBarPane extends PamBorderPane {
 		rectangle.setOnMouseDragged((event)->{
 			rectangleDragged(event);
 		});
+	
 
 		return rectangle; 
 	}
