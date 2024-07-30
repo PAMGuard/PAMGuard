@@ -276,7 +276,7 @@ public abstract class DDDataInfo<T extends PamDataUnit> {
 		getCurrentDetectionPlot().setupAxis((PamDataUnit) pamDataUnit, this.getHardSampleRate(), projector);
 
 		getCurrentDetectionPlot().paintPlot((PamDataUnit) pamDataUnit, g, windowRect, projector, flag);
-
+	
 	}
 
 

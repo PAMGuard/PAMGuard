@@ -55,7 +55,7 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX {
 	/**
 	 * The hiding pane which holds the summary pane. 
 	 */
-	private HidingPane hidingSummaryPane;
+	private HidingPane hidingSettingsPane;
 
 	/**
 	 * The buttons which shows the top hiding pane. 
@@ -105,16 +105,16 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX {
 		//topHolder.prefHeightProperty().bind(summaryPane.prefHeightProperty());
 		
 		//hiding summary pane
-		hidingSummaryPane=new HidingPane(Side.RIGHT, settingsPane, this, true);
-		hidingSummaryPane.setVisibleImmediatly(false); 
-		hidingSummaryPane.showHidePane(true);
-		hidingSummaryPane.getStyleClass().add("pane-trans");
-		hidingSummaryPane.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
-		StackPane.setAlignment(hidingSummaryPane, Pos.TOP_RIGHT);
-		hidingSummaryPane.setPrefWidth(HIDE_PANE_WIDTH);
+		hidingSettingsPane=new HidingPane(Side.RIGHT, settingsPane, this, true);
+		hidingSettingsPane.setVisibleImmediatly(false); 
+		hidingSettingsPane.showHidePane(true);
+		hidingSettingsPane.getStyleClass().add("pane-trans");
+		hidingSettingsPane.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
+		StackPane.setAlignment(hidingSettingsPane, Pos.TOP_RIGHT);
+		hidingSettingsPane.setPrefWidth(HIDE_PANE_WIDTH);
 
 		//style the show button. 
-		showButton=hidingSummaryPane.getShowButton();
+		showButton=hidingSettingsPane.getShowButton();
 		showButton.getStyleClass().add("close-button-left");
 		showButton.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
 
@@ -127,7 +127,7 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX {
 		StackPane.setAlignment(showButton, Pos.CENTER_RIGHT);
 		
 		StackPane stackPane = new StackPane();
-		stackPane.getChildren().addAll(scrollingDataPanel, hidingSummaryPane, showButton);
+		stackPane.getChildren().addAll(scrollingDataPanel, hidingSettingsPane, showButton);
 		
 		dateAxis = new PamDateAxis();
 		dateAxis.setMinHeight(50);

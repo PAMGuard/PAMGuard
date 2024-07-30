@@ -13,11 +13,11 @@ import pamViewFX.fxNodes.pamScrollers.acousticScroller.ScrollBarPane;
 /**
  * A scroll bar whihc shows a summary fo the data. 
  */
-public class DataMapScrollPane extends ScrollBarPane {
+public class DataMapScrollBar extends ScrollBarPane {
 
 	private DataMapControl dataMapControl;
 
-	public DataMapScrollPane(DataMapControl dataMapControl) {
+	public DataMapScrollBar(DataMapControl dataMapControl) {
 		super();
 		this.dataMapControl=dataMapControl;
 	}

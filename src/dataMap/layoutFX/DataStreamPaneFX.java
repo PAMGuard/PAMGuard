@@ -1,5 +1,6 @@
 package dataMap.layoutFX;
 
+import java.awt.Insets;
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -13,7 +14,6 @@ import dataMap.DataMapControl;
 import dataMap.DataMapDrawing;
 import dataMap.OfflineDataMap;
 import dataMap.OfflineDataMapPoint;
-import dataPlotsFX.layout.AxisPane;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.geometry.Orientation;
@@ -29,9 +29,10 @@ import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import PamController.OfflineDataStore;
 import PamController.PamController;
-import PamUtils.PamCalendar;
 import PamguardMVC.PamDataBlock;
+import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
+import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.pamAxis.PamAxisFX;
 import pamViewFX.fxNodes.pamAxis.PamAxisPane;
@@ -42,7 +43,9 @@ public class DataStreamPaneFX extends PamBorderPane {
 	/**
 	 * The preferred width of the axis.
 	 */
-	public static double axisPrefWidth=80; 
+	public static double PREF_AXIS_WIDTH=80; 
+	
+	public static double PREF_HEADER_HEIGHT=20; 
 
 	/**
 	 * Reference to the data map control
@@ -119,6 +122,8 @@ public class DataStreamPaneFX extends PamBorderPane {
 	 */
 	private Timeline timeline;
 
+	private PamButton showButton;
+
 	/**
 	 * Constructor for the data stream pane. 
 	 * @param dataMapControl - the DataMapControl control the  DataStreamPaneFX  belongs to 
@@ -147,7 +152,23 @@ public class DataStreamPaneFX extends PamBorderPane {
 		topPane.getStyleClass().add("pane-opaque");
 		topPane.getChildren().add(new Label(this.dataBlock.getDataName()));
 		topPane.setAlignment(Pos.CENTER);
-		return topPane;
+		
+		PamBorderPane pane = new PamBorderPane();
+		
+		pane.setCenter(topPane);
+		
+		showButton = new PamButton();
+		showButton.setStyle("-fx-padding: 0 10 0 10; -fx-border-radius: 0 0 0 0; -fx-background-radius: 0 0 0 0;");
+		showButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-down", 18));
+		showButton.setOnAction((action)->{
+			this.setCollapsed(!this.isCollapsed()); 
+		});
+		
+		pane.setLeft(showButton);
+		
+		pane.setPrefHeight(PREF_HEADER_HEIGHT);
+		
+		return pane;
 	}
 	
 	
@@ -356,7 +377,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 			axisPane=new PamAxisPane(datastreamAxis, Orientation.VERTICAL); 
 			axisPane.getStyleClass().add("pane");
 			axisPane.setOrientation(Orientation.VERTICAL);
-			axisPane.setPrefWidth(DataStreamPaneFX.axisPrefWidth);
+			axisPane.setPrefWidth(DataStreamPaneFX.PREF_AXIS_WIDTH);
 			axisPane.setStrokeColor(Color.BLACK);
 			
 			this.setLeft(axisPane);
@@ -393,7 +414,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 			
 			long time2 = System.currentTimeMillis();
 
-			//System.out.println("Paint Canvas: " + this + "   " + System.currentTimeMillis() + "  " + (time2-time1));
+//			System.out.println("Paint Canvas: " + this + "   " + System.currentTimeMillis() + "  " + (time2-time1));
 
 		}
 		
@@ -543,7 +564,8 @@ public class DataStreamPaneFX extends PamBorderPane {
 			
 		}
 		
-		private void datagramPaint3D(GraphicsContext g) {
+		private synchronized void datagramPaint3D(GraphicsContext g) {
+//			System.out.println("Paint 3D Canvas: " + this + "   " + System.currentTimeMillis());
 			
 			/*
 			 *  hopefully, there will be datagram data for this block, so do a pretty
@@ -1063,6 +1085,16 @@ public class DataStreamPaneFX extends PamBorderPane {
 	 */
 	public void setCollapsed(boolean collapsed) {
 		this.collapsed=collapsed;
+		if (collapsed) {
+			this.setCenter(null);
+			this.setMaxHeight(PREF_HEADER_HEIGHT);
+
+		}
+		else {
+			this.setCenter(dataGraph);
+			this.setMaxHeight(-1);
+
+		}
 	}
 
 	/**

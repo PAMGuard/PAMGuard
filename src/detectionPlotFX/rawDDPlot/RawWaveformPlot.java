@@ -7,7 +7,7 @@ import detectionPlotFX.layout.DetectionPlotDisplay;
 import detectionPlotFX.plots.WaveformPlot;
 
 /**
- * Plot a click waveform. 
+ * Plot for any RawDataHolder to show a waveform.  
  * @author Jamie Macaulay
  *
  */

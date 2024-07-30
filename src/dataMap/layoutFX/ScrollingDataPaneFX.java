@@ -12,6 +12,7 @@ import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollBar;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import PamguardMVC.PamDataBlock;
@@ -34,7 +35,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	/**
 	 * The default expanded hieght for each pane. 
 	 */
-	private static final int DATASTREAMPANE_HEIGHT = 200;
+	private static final int DATASTREAMPANE_HEIGHT = 220;
 
 	/**
 	 * Reference to the DataMapControl.
@@ -78,12 +79,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	/**
 	 * Scroll bar for time (horizontal)
 	 */
-	private DataMapScrollPane timeScrollBar;
-
-	/**
-	 * Settings strip at top of the display. Shows all sorts of detailed info such cursor position and start and end times. 
-	 */
-	private SettingsStripFX settingsStrip;
+	private DataMapScrollBar timeScrollBar;
 
 	/**
 	 * Shows the start time of the scroll position
@@ -111,7 +107,6 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 			DataMapPaneFX dataMapPaneFX) {
 		this.dataMapControl = dataMapControl;
 		this.dataMapPaneFX = dataMapPaneFX;
-		settingsStrip=new SettingsStripFX(this); 
 		this.setCenter(createScrollingDataPane());
 	}
 
@@ -125,6 +120,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 
 		//create the main scroll pane 
 		mainScrollPane = new PamScrollPane();	
+		mainScrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
 
 
 		//create the split pane to hold the graphs. 
@@ -215,9 +211,9 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 
 
 		//create the scroll bar and listeners. 
-		timeScrollBar=new DataMapScrollPane(this.dataMapControl); 
+		timeScrollBar=new DataMapScrollBar(this.dataMapControl); 
 		timeScrollBar.addValueListener((obs_val, old_val, new_val)->{
-			System.out.println("Scroll bar seconds: " + timeScrollBar.getCurrentValue() + " vis amount: " + timeScrollBar.visibleAmountProperty().get());
+//			System.out.println("Scroll bar seconds: " + timeScrollBar.getCurrentValue() + " vis amount: " + timeScrollBar.visibleAmountProperty().get());
 			calcStartEndMillis();
 			updateScrollBarText();
 			notifyScrollChange();
@@ -241,8 +237,12 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 		screenStartMillis = (long) (dataMapControl.getFirstTime() + 
 				timeScrollBar.getCurrentValue());
 		screenEndMillis = (long) (screenStartMillis + timeScrollBar.getVisibleAmount());
+		
+		double pixsPerHour = getPixelsPerHour(); 
+		double pixsPerSecond = pixsPerHour / 3600;
+		double screenWidth = getPlotWidth();
+		screenSeconds =  screenWidth / Math.min(600. / 3600, pixsPerSecond);
 
-		getPixelsPerHour();
 	}
 
 	/**
@@ -261,7 +261,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 		for (int i = 0; i < dataStreamPanels.size(); i++) {
 			dataStreamPanels.get(i).scrollChanged();
 		}
-		settingsStrip.scrollChanged();
+//		settingsStrip.scrollChanged();
 
 		updateDateAxis();
 	}
@@ -321,7 +321,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 		for (int i = 0; i < dataBlocks.size(); i++) {
 			aStreamPanel = new DataStreamPaneFX(dataMapControl, this, dataBlocks.get(i));
 			dataStreamPanels.add(aStreamPanel);
-			dataStreamPanels.get(i).setMinHeight(DATASTREAMPANE_HEIGHT);
+			dataStreamPanels.get(i).setPrefHeight(DATASTREAMPANE_HEIGHT);
 			//now add to a split pane. 
 			//SplitPane.setResizableWithParent(aStreamPanel, true);
 			dataPanePanes.getChildren().add(aStreamPanel);
@@ -356,6 +356,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	}
 
 	private void setupScrollBar() {
+		
 		/**
 		 * Do scrolling in seconds - will give up to 68 years with a 
 		 * 32 bit integer control of scroll bar. milliseconds would give < 1 year !
@@ -365,10 +366,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 		long dataEnd = dataMapControl.getLastTime();
 		double dataSeconds = ((dataEnd-dataStart)/1000) + 1;
 
-		double pixsPerHour = getPixelsPerHour(); 
-		double pixsPerSecond = pixsPerHour / 3600;
-		double screenWidth = getPlotWidth();
-		screenSeconds =  screenWidth / Math.min(600. / 3600, pixsPerSecond);
+		calcStartEndMillis();
 		
 		
 
@@ -383,7 +381,8 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 		//			screenEndMillis = dataEnd;
 		//		}
 		//		else {
-		System.out.println("dataSeconds2: "+dataSeconds+ " pixsPerHour: " +pixsPerHour+" screenWidth: "+screenWidth+" screenSeconds "+screenSeconds+" holder width: "+holder.getWidth());
+//		System.out.println("dataSeconds2: "+dataSeconds+ " pixsPerHour: " +pixsPerHour+" screenWidth: "+screenWidth+" screenSeconds "+screenSeconds+" holder width: "+holder.getWidth());
+		
 		timeScrollBar.setVisible(true);
 		timeScrollBar.setMinVal(0);
 		timeScrollBar.setMaxVal(Math.max(dataSeconds, screenSeconds)*1000L);
@@ -393,12 +392,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 		timeScrollBar.setCurrentValue(currentPos);
 		
 		//now paint the canvas to show the data. 
-		try {
 		timeScrollBar.paintDataSummary();
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
 
 	}
 
@@ -408,7 +402,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	 */
 	private double getPlotWidth() {
 		//HACK- seems like there is a lyout delay in datstream panes. 
-		return this.holder.getWidth()-DataStreamPaneFX.axisPrefWidth;
+		return this.holder.getWidth()-DataStreamPaneFX.PREF_AXIS_WIDTH;
 		//		if (dataStreamPanels.size()>0){
 		//			dataStreamPanels.get(0).layout();
 		//			return dataStreamPanels.get(0).getDataGraph().getPlotWidth();
@@ -438,7 +432,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 
 
 	public double getPixelsPerHour() {
-		System.out.println("Pixels per hour: " + dataMapControl.dataMapParameters.getPixeslPerHour() + " " + this.getPlotWidth()/(this.timeScrollBar.getVisibleAmount()/1000./3600.));
+//		System.out.println("Pixels per hour: " + dataMapControl.dataMapParameters.getPixeslPerHour() + " " + this.getPlotWidth()/(this.timeScrollBar.getVisibleAmount()/1000./3600.));
 		//return dataMapControl.dataMapParameters.getPixeslPerHour();
 
 		return this.getPlotWidth()/(this.timeScrollBar.getVisibleAmount()/1000./3600.);
