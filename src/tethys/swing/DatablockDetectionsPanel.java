@@ -274,7 +274,7 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 			if (pDets == null) {
 				continue;
 			}
-			toDelete.add(pDets.nilusObject);
+			toDelete.add(pDets);
 		}
 		DeleteDocs dd = new DeleteDocs(toDelete);
 		PamWorker<Integer> worker = new PamWorker(dd, getTethysControl().getGuiFrame(), 1, "Deleting Detections documents");
@@ -295,7 +295,7 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 			for (NilusDocumentWrapper dets : toDelete) {
 				try {
 					
-					getTethysControl().getDbxmlConnect().deleteDocument(dets);
+					getTethysControl().getDbxmlConnect().deleteDocument(dets.nilusObject);
 				} catch (TethysException e) {
 					getTethysControl().showException(e);
 				}
