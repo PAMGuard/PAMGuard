@@ -438,12 +438,12 @@ public class DetectionPlotDisplay extends PamBorderPane  {
 					this.detectionPlotProjector, newDataUnit);
 		}
 		
-		//Debug.out.println("DetectionPlotDisplay DrawDataUnit: " +newDataUnit);
-		if (reDrawScroll) {
-			 setupScrollBar(newDataUnit);
-			 reDrawScroll=false; 
-		}
-		
+//		//Debug.out.println("DetectionPlotDisplay DrawDataUnit: " +newDataUnit);
+//		if (reDrawScroll) {
+//			 setupScrollBar(newDataUnit);
+//			 reDrawScroll=false; 
+//		}
+//		
 		//dDPlotPane.repaintAxis(); 
 	}
 
