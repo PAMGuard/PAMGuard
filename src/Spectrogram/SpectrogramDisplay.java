@@ -2929,7 +2929,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 			String name = spectrogramDisplay.getDataSelectorName(panelId);
 			DataSelector dataSelector = usedDataBlock.getDataSelector(name, false);
 			
-			if (dataSelector.getParams().getCombinationFlag() == DataSelectParams.DATA_SELECT_DISABLE) {
+			if (dataSelector != null && dataSelector.getParams().getCombinationFlag() == DataSelectParams.DATA_SELECT_DISABLE) {
 				dataSelector = null;
 			}
 			directDrawProjector.setDataSelector(dataSelector);
