@@ -1,5 +1,6 @@
 package tethys.detection;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,6 +31,8 @@ import nilus.AlgorithmType;
 import nilus.AlgorithmType.SupportSoftware;
 import nilus.Localize.Effort;
 import nilus.Localize.Effort.CoordinateReferenceSystem;
+import nilus.Localize.Effort.ReferencedDocuments;
+import nilus.Localize.Effort.ReferencedDocuments.Document;
 import nilus.Localize.Localizations;
 import nilus.DataSourceType;
 import nilus.Deployment;
@@ -49,6 +52,7 @@ import tethys.dbxml.DBXMLConnect;
 import tethys.dbxml.TethysException;
 import tethys.deployment.DeploymentHandler;
 import tethys.localization.CoordinateName;
+import tethys.localization.LocalizationHandler;
 import tethys.localization.LocalizationSubType;
 import tethys.localization.LocalizationType;
 import tethys.localization.PLocalization;
@@ -411,6 +415,8 @@ public class DetectionsHandler extends CollectionHandler {
 		DeploymentHandler depHandler = tethysControl.getDeploymentHandler();
 		ArrayList<PDeployment> deployments = depHandler.getMatchedDeployments();
 
+		LocalizationHandler localizationHandler = tethysControl.getLocalizationHandler();
+
 		/*
 		 * The main documents for both dets and locs. 
 		 */
@@ -444,7 +450,7 @@ public class DetectionsHandler extends CollectionHandler {
 			exportObserver.update(prog);
 			granularityHandler.prepare(deployment.getAudioStart());
 			
-			List<Detection> detectionList;
+			List<Detection> detectionList = null;
 
 			// export everything in that deployment.
 			// need to loop through all map points in this interval.
@@ -467,19 +473,19 @@ public class DetectionsHandler extends CollectionHandler {
 //						onEffortDetections.
 //					}
 				}
-				else {
-					onEffortDetections = null;
-					detectionList = null;
-				}
+//				else {
+//					onEffortDetections = null;
+//					detectionList = null;
+//				}
 				if (localiseDocument == null && streamExportParams.exportLocalisations) {
-					localiseDocument = startLocalisationDocument(deployment, dataBlock, streamExportParams);
+					localiseDocument = startLocalisationDocument(deployment, detectionsDocument, dataBlock, streamExportParams);
 					Effort eff = localiseDocument.getEffort();
 					localiseDocument.getEffort().setStart(TethysTimeFuncs.xmlGregCalFromMillis(deployment.getAudioStart()));
 					localisations = localiseDocument.getLocalizations();
 				}
-				else {
-					localisations = null;
-				}
+//				else {
+//					localisations = null;
+//				}
 
 				if (mapPoint.getEndTime() < deployment.getAudioStart()) {
 					continue;
@@ -495,17 +501,24 @@ public class DetectionsHandler extends CollectionHandler {
 					/*
 					 * Here is where we need to handle the different granularities.
 					 */
-					Detection dets[] = granularityHandler.addDataUnit(dataUnit);
-					if (dets != null) {
-						for (int dd = 0; dd < dets.length; dd++) {
-							exportCount++;
-							documentCount++;
-							if (streamExportParams.exportDetections) {
+					if (streamExportParams.exportDetections) {
+						Detection dets[] = granularityHandler.addDataUnit(dataUnit);
+						if (dets != null) {
+							for (int dd = 0; dd < dets.length; dd++) {
+								exportCount++;
+								documentCount++;
 								detectionList.add(dets[dd]);
 							}
-							if (streamExportParams.exportLocalisations) {
-								// convert the dets into localisations and add them. 
-							}
+						}
+					}
+					/**
+					 * Localisations don't do granularity, so do all. 
+					 */
+					if (streamExportParams.exportLocalisations) {
+						// convert the dets into localisations and add them. 
+						nilus.LocalizationType localization = localizationHandler.createLocalization(localiseDocument, dataBlock, dataUnit, streamExportParams);
+						if (localization != null) {
+							localisations.getLocalization().add(localization);
 						}
 					}
 
@@ -606,9 +619,9 @@ public class DetectionsHandler extends CollectionHandler {
 			}
 		}
 
-		prog = new DetectionExportProgress(null, null,totalMapPoints, totalMapPoints,
-				lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_COMPLETE);
-		exportObserver.update(prog);
+//		prog = new DetectionExportProgress(null, null,totalMapPoints, totalMapPoints,
+//				lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_COMPLETE);
+//		exportObserver.update(prog);
 		return DetectionExportProgress.STATE_COMPLETE;
 	}
 
@@ -671,7 +684,7 @@ public class DetectionsHandler extends CollectionHandler {
 		return detections;
 	}
 
-	private Localize startLocalisationDocument(PDeployment deployment, PamDataBlock dataBlock,
+	private Localize startLocalisationDocument(PDeployment deployment, Detections detectionsDocument, PamDataBlock dataBlock,
 			StreamExportParams exportParams) {
 		Localize localisations = new Localize();
 		try {
@@ -680,8 +693,9 @@ public class DetectionsHandler extends CollectionHandler {
 			e.printStackTrace();
 			return null;
 		}		
-		if (localisations.getEffort() == null) {
-			Effort eff = new Effort();
+		Effort eff = localisations.getEffort();
+		if (eff == null) {
+			eff = new Effort();
 			try {
 				Helper.createRequiredElements(eff);
 			} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
@@ -690,6 +704,30 @@ public class DetectionsHandler extends CollectionHandler {
 			}		
 			localisations.setEffort(eff);
 		}
+		if (detectionsDocument != null) {
+			/*
+			 *  add the reference document information.
+			 *  Within PAMGuard, this will always be 1:1 with a Detections doc.
+			 */
+			
+			ReferencedDocuments refDocs = eff.getReferencedDocuments();
+			if (refDocs == null) {
+				refDocs = new ReferencedDocuments();
+				try {
+					Helper.createRequiredElements(refDocs);
+				} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
+					e.printStackTrace();
+				}
+				eff.setReferencedDocuments(refDocs);
+			}
+			Document detectsDoc = new Document();
+			detectsDoc.setId(detectionsDocument.getId());
+			detectsDoc.setType(Collection.Detections.collectionName());
+			detectsDoc.setIndex(BigInteger.ZERO);
+			eff.getReferencedDocuments().getDocument().add(detectsDoc);
+		}
+		
+		
 		TethysDataProvider dataProvider = dataBlock.getTethysDataProvider(tethysControl);
 
 		String prefix = deployment.nilusObject.getId() + "_" + dataProvider.getDetectionsName();

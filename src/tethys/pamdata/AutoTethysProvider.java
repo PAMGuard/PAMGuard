@@ -102,22 +102,17 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 
 	@Override
 	public AlgorithmType getAlgorithm() {
+		/**
+		 * Probably need to split this to provide detection algorithm parameters and 
+		 * localisation algorithm parameters, or pass in the document type as a function 
+		 * argument. 
+		 */
 		AlgorithmType algorithm = new AlgorithmType();
 		try {
 			nilus.Helper.createRequiredElements(algorithm);
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
+		} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
 			e.printStackTrace();
 		}
-		//		algorithm.setMethod(this.getAlgorithmMethod());
-		//		algorithm.setSoftware("PAMGuard");
-		//		algorithm.setVersion(PamguardVersionInfo.version);
 		nilus.AlgorithmType.Parameters algoParameters = this.getAlgorithmParameters();
 		if (algoParameters != null) {
 			algorithm.setParameters(algoParameters);

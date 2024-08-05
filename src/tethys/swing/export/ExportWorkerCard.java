@@ -18,6 +18,7 @@ import PamView.panel.PamNorthPanel;
 import PamguardMVC.PamDataBlock;
 import tethys.TethysControl;
 import tethys.TethysState;
+import tethys.TethysState.StateType;
 import tethys.TethysStateObserver;
 import tethys.detection.DetectionExportObserver;
 import tethys.detection.DetectionExportProgress;
@@ -164,6 +165,7 @@ public class ExportWorkerCard extends ExportWizardCard implements DetectionExpor
 			progressText.setText("Export complete");
 			detectionsExportWizard.getCancelButton().setText("Close");
 			detectionsExportWizard.getPreviousButton().setEnabled(false);
+//			getTethysControl().sendStateUpdate(new TethysState(StateType.EXPORTRDATA));
 			break;
 		case DetectionExportProgress.STATE_WRITING:
 			progressText.setText("Writing to Tethys: " + progress.currentDetections.getId());

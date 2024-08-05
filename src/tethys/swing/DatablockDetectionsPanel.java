@@ -129,9 +129,13 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 		return mainPanel;
 	}
 
-	@Override
-	public void selectDataBlock(PamDataBlock dataBlock) {
-		if (this.dataBlock == dataBlock) {
+	/**
+	 * update table for this datablock
+	 * @param dataBlock datablock
+	 * @param always always update, even if datablock hasn't changed. 
+	 */
+	public void selectDataBlock(PamDataBlock dataBlock, boolean always) {
+		if (this.dataBlock == dataBlock && !always) {
 			return; // stops lots of requerying, which matters when database is large. 
 		}
 		this.dataBlock = dataBlock;
@@ -145,6 +149,11 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 		// need to re-thread this to stop user panicing that nothing is happening. 
 		PamWorker w = new PamWorker<String>(this, getTethysControl().getGuiFrame(), 0, "Searching database for " + dataBlock.getDataName());
 		w.start();
+	}
+
+	@Override
+	public void selectDataBlock(PamDataBlock dataBlock) {
+		selectDataBlock(dataBlock, false);
 	}
 
 	@Override
@@ -169,12 +178,18 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 
 	@Override
 	public void updateState(TethysState tethysState) {
+//		boolean fullUpdate = needFullUpdate(tethysState);
 		if (dataBlock != null) {
 			PamDataBlock currBlock = dataBlock;
 			selectDataBlock(null);
-			selectDataBlock(dataBlock);
+			selectDataBlock(currBlock);
 		}
 	}
+
+//	private boolean needFullUpdate(TethysState tethysState) {
+//		// TODO Auto-generated method stub
+//		return false;
+//	}
 
 	private class MouseActions extends MouseAdapter {
 
@@ -235,7 +250,7 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 			menuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-//					deleteDocument(pDets);
+					deleteDocument(pDets);
 				}
 			});
 			popMenu.add(menuItem);
@@ -305,13 +320,13 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 
 		@Override
 		public void taskFinished(Integer result) {
-			getTethysControl().exportedDetections(dataBlock);
-			selectDataBlock(dataBlock); // force table update. 			
+			getTethysControl().deletedDetections(dataBlock);
+			selectDataBlock(dataBlock, true); // force table update. 			
 		}
 
 	}
 
-	protected void deleteDocument(PDetections pDets) {
+	protected void deleteDocument(NilusDataWrapper pDets) {
 		String msg = String.format("Are you sure you want to delete the Detections document %s ?", pDets.getDocumentId());
 		int ans = WarnOnce.showWarning(PamGui.findComponentWindow(mainPanel), "Delete Document", msg, WarnOnce.OK_CANCEL_OPTION);
 		if (ans != WarnOnce.OK_OPTION) {
@@ -322,8 +337,8 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 		} catch (TethysException e) {
 			getTethysControl().showException(e);
 		}
-		getTethysControl().exportedDetections(dataBlock);
-		selectDataBlock(dataBlock); // force table update. 
+		getTethysControl().deletedDetections(dataBlock);
+		selectDataBlock(dataBlock, true); // force table update. 
 	}
 
 	private void displayDocument(NilusDataWrapper pDets) {
