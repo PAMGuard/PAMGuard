@@ -2,8 +2,12 @@ package tethys.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
@@ -25,6 +29,27 @@ public class XMLStringView extends PamDialog {
 		textArea.setText(xmlString);
 		textArea.setEditable(false);
 		textArea.setCaretPosition(0);
+		
+		JPopupMenu popMenu = new JPopupMenu();
+		textArea.setComponentPopupMenu(popMenu);
+		JMenuItem copyItem = new JMenuItem("Copy");
+		copyItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				textArea.copy();
+			}
+		});
+		JMenuItem selItem = new JMenuItem("Select All");
+		selItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				textArea.selectAll();
+			}
+		});
+		
+		popMenu.add(copyItem);
+		popMenu.addSeparator();
+		popMenu.add(selItem);
 		
 		getCancelButton().setVisible(false);
 		setModal(false);

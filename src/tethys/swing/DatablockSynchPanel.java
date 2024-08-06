@@ -299,7 +299,7 @@ public class DatablockSynchPanel extends TethysExportPanel {
 				long stop = synchInfo.getDataBlock().getPrimaryDataMap().getLastDataTime();
 				return String.format("%s - %s", PamCalendar.formatDBDateTime(start), PamCalendar.formatDBDateTime(stop));
 			case 3:
-				return synchInfo.getDetectionDocumentCount();
+				return synchInfo.getDetectionDocumentCount() +  synchInfo.getLocalizationDocumentCount();
 			}
 			return null;
 		}

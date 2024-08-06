@@ -1,7 +1,5 @@
 package tethys.detection;
 
-import java.util.List;
-import java.util.ListIterator;
 
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -9,7 +7,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import nilus.Detection;
-import nilus.DetectionGroup;
 import nilus.Detections;
 import nilus.GranularityEnumType;
 import tethys.TethysControl;

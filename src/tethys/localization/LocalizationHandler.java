@@ -3,6 +3,8 @@ package tethys.localization;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
+import Localiser.detectionGroupLocaliser.GroupLocResult;
+import Localiser.detectionGroupLocaliser.GroupLocalisation;
 import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamUtils.LatLong;
@@ -18,6 +20,7 @@ import nilus.LocalizationType.References;
 import nilus.LocalizationType.References.Reference;
 import nilus.Localize;
 import nilus.SpeciesIDType;
+import pamMaths.PamVector;
 import nilus.Localize.Effort.CoordinateReferenceSystem;
 import tethys.Collection;
 import tethys.CollectionHandler;
@@ -211,7 +214,30 @@ public class LocalizationHandler extends CollectionHandler {
 		coord.setY(latlong.getLatitude());
 		coord.setZ(latlong.getHeight());
 				
+		PamVector planarVec = loc.getPlanarVector();
 		locType.setCoordinate(coord);
+		
+		// see if it's possible to get a beam measurement. 
+		if (loc instanceof GroupLocalisation) {
+			GroupLocalisation groupLoc = (GroupLocalisation) loc;
+			GroupLocResult groupLocResult = groupLoc.getGroupLocaResult(0);
+			Double perpDist = groupLocResult.getPerpendicularDistance();
+			Long beamTime = groupLocResult.getBeamTime();
+			if (perpDist != null && beamTime != null) {
+				AngularCoordinateType acType = new AngularCoordinateType();
+				acType.setAngle1(90);
+				acType.setDistanceM(AutoTethysProvider.roundDecimalPlaces(perpDist,1));
+				locType.setAngularCoordinate(acType);
+				locType.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(beamTime));
+				locType.setCoordinate(null);
+			}
+//			groupLoc.getp
+		}
+		
+		/*
+		 * Try to also add a range loc. 
+		 */
+//		loc.
 		
 		return locType;
 	}
