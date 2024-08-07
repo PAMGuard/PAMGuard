@@ -31,10 +31,10 @@ public class ClickDLTest {
 		
 		float SAMPLE_RATE = 500000;
 		//relative paths to the resource folders.
-		System.out.println("*****Click classification Deep Learning*****"); 
+		System.out.println("*****Click classification Deep Learning C*****"); 
 
 		//relative paths to the resource folders.		
-		String relModelPath  =	"./src/test/resources/rawDeepLearningClassifier/Generic/risso_click/best_model/saved_model.pb";
+		String relModelPath  =	"./src/test/resources/rawDeepLearningClassifier/Generic/risso_click/updated_model/saved_model.pb";
 		String clicksPath  =	"./src/test/resources/rawDeepLearningClassifier/Generic/risso_click/clicks.mat";
 
 		Path path = Paths.get(relModelPath);
@@ -62,7 +62,8 @@ public class ClickDLTest {
 		//prep the model
 		genericModelWorker.prepModel(genericModelParams, null);
 		
-		
+		System.out.println("Model has loaded"); 
+
 		ArrayList<GroupedRawData> groupedData = new ArrayList<GroupedRawData>();
 		
 		int i=0;
@@ -126,7 +127,7 @@ public class ClickDLTest {
 			e.printStackTrace();
 			return null; 
 		}
-
 	}
+	
 	
 }
