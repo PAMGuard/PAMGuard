@@ -1,5 +1,7 @@
 package Localiser;
 
+import java.io.Serializable;
+
 import PamDetection.LocContents;
 import PamDetection.LocalisationInfo;
 
@@ -12,10 +14,9 @@ import PamDetection.LocalisationInfo;
 public interface LocalisationAlgorithm {
 
 	/**
-	 * Get the likely content flags for this localiser. 
-	 * @see LocalisationInfo
-	 * @see LocContents
-	 * @return localisation flags. 
+	 * Get information about the localisation algorithm. 
+	 * @return algorithm information. 
 	 */
-	public int getLocalisationContents();
+	public LocalisationAlgorithmInfo getAlgorithmInfo();
+	
 }

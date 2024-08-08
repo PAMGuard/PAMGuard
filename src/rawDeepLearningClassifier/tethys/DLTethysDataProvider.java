@@ -1,22 +1,20 @@
 package rawDeepLearningClassifier.tethys;
 
-import java.io.Serializable;
+import java.util.ArrayList;
 
-import javax.xml.bind.JAXBException;
 
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import nilus.Detection;
 import nilus.Detection.Parameters;
 import rawDeepLearningClassifier.DLControl;
-import rawDeepLearningClassifier.RawDLParams;
-import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
 import rawDeepLearningClassifier.dlClassification.DLDetection;
+import rawDeepLearningClassifier.dlClassification.PredictionResult;
+import rawDeepLearningClassifier.logging.DLAnnotation;
 import tethys.TethysControl;
 import tethys.output.StreamExportParams;
 import tethys.output.TethysExportParams;
 import tethys.pamdata.AutoTethysProvider;
-import tethys.pamdata.TethysParameterPacker;
 
 public class DLTethysDataProvider extends AutoTethysProvider {
 
@@ -35,6 +33,26 @@ public class DLTethysDataProvider extends AutoTethysProvider {
 			return null;
 		}
 		DLDetection dlDetection = (DLDetection) dataUnit;
+		
+		// try to find the score which is burried in the annotation
+		DLAnnotation annotation = (DLAnnotation) dlDetection.findDataAnnotation(DLAnnotation.class) ;
+		if (annotation != null) {
+			double bestScore = 0;
+			ArrayList<PredictionResult> results = annotation.getModelResults();
+			for (PredictionResult res : results) {
+				float[] resres = res.getPrediction();
+				if (resres != null)  for (int i = 0; i < resres.length; i++) {
+					double aRes = resres[i];
+					if (aRes > bestScore) {
+						bestScore = aRes;
+					}
+				}
+			}
+			bestScore = roundSignificantFigures(bestScore, 4);
+			detection.getParameters().setScore(bestScore);
+		}
+//		ds = getPamDataBlock().
+		
 	
 //		result = 
 		String annotSummary = dlDetection.getAnnotationsSummaryString();

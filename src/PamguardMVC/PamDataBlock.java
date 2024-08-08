@@ -49,6 +49,7 @@ import org.w3c.dom.Element;
 
 import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionProcess;
+import Localiser.LocalisationAlgorithm;
 import pamScrollSystem.ViewLoadObserver;
 import tethys.TethysControl;
 import tethys.pamdata.AutoTethysProvider;
@@ -2529,6 +2530,42 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 */
 	public void addLocalisationContents(int localisationContents) {
 		this.localisationContents.addLocContent(localisationContents);
+	}
+	
+	/**
+	 * Find localisation algorithm for this data. 
+	 * This may be within the owning module, or a downstream algorithm. 
+	 * @return first found localisation algorithm or null;
+	 */
+	public LocalisationAlgorithm getLocalisationAlgorithm() {
+		/*
+		 *  first check downstream modules. If these are in use, they
+		 *  probably override anything internal, so look for these first.  
+		 */
+		List<PamObserver> instObs = getInstantObservers();
+		for (PamObserver obs : instObs) {
+			if (obs instanceof LocalisationAlgorithm) {
+				return (LocalisationAlgorithm) obs;
+			}
+			if (obs instanceof PamProcess) {
+				PamProcess proc = (PamProcess) obs;
+				PamControlledUnit pcu = proc.getPamControlledUnit();
+				if (pcu == null) {
+					continue;
+				}
+				if (pcu instanceof LocalisationAlgorithm) {
+					return (LocalisationAlgorithm) pcu;
+				}
+			}
+		}
+		// if nothing downstream, then check the owning module
+		PamProcess proc = getParentProcess();
+		if (proc == null) return null;
+		PamControlledUnit pcu = proc.getPamControlledUnit();
+		if (pcu instanceof LocalisationAlgorithm) {
+			return (LocalisationAlgorithm) pcu;
+		}		
+		return null;
 	}
 
 	public static final int ITERATOR_END = -1;

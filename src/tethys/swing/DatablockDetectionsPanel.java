@@ -1,5 +1,7 @@
 package tethys.swing;
 
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -105,23 +107,54 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 		//        if (rowIndex < 0) {
 		//        	return null;
 		//        }
+		NilusDataWrapper doc = detectionsForRow(rowIndex);
 		int colIndex = table.columnAtPoint(p);
 		switch (colIndex) {
 		case 0:
-			return "Tethys Detections document name";
+			if (doc != null) {
+				return "Tethys Detections document Id: " + doc.getDocumentId();
+			}
+			return "Tethys Detections document Id";
 		case 1:
+			if (dataBlock != null) {
+				return "Name of PAMGuard data stream: " + dataBlock.getLongDataName();
+			}
 			return "Name of PAMGuard data stream";
 		case 2:
-			return "Effort period";
+			return "Deployment type";
 		case 3:
-			return "Output granularity";
+			return "Output type and granularity ";
 		case 4:
-			return "Number of detection elements in document";
+			return "Effort period";
 		case 5:
-			return "Document abstract";
+			return "Number of detection or localization elements in document";
+		case 6:
+			DescriptionType desc = findDescription(rowIndex);
+			if (desc != null) {
+				String str = "Document abstract: " + desc.getAbstract();
+				return str;
+			}
+			else {
+				return "Document abstract";
+			}
 
 		}
 		return "No tip";
+	}
+	
+	
+	private DescriptionType findDescription(int rowIndex) {
+		NilusDataWrapper doc = detectionsForRow(rowIndex);
+		if (doc == null) {
+			return null;
+		}
+		Object desc = doc.getGotObject("getDescription");
+		if (desc instanceof DescriptionType) {
+			return (DescriptionType) desc;
+		}
+		else {
+			return null;
+		}
 	}
 
 	@Override
@@ -362,7 +395,7 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 
 	private class TableModel extends AbstractTableModel {
 
-		private String[] colNames = {"Document", "Detector", "Deployment", "Type", "Effort", "Granularity", "Count", "Abstract"};
+		private String[] colNames = {"Document", "Detector", "Deployment", "Type (Granularity)", "Effort", "Count", "Abstract"};
 
 		@Override
 		public int getRowCount() {
@@ -413,7 +446,10 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 					return dataSource.getDeploymentId();
 				}
 			case 3:
-				return pDets.getCollection();
+//				String col = pDets.getCollection().collectionName();
+//				
+//				return pDets.getCollection();
+				return getType(pDets);
 			case 4:
 //				XMLGregorianCalendar start = dets.getEffort().getStart();
 //				XMLGregorianCalendar stop = dets.getEffort().getEnd();
@@ -421,27 +457,8 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 				XMLGregorianCalendar stop = pDets.getEffortEnd();
 				return start + " to " + stop;
 			case 5:
-				Object effort = pDets.getGotObjects("getEffort");
-				if (effort instanceof DetectionEffort) {
-					DetectionEffort detectionEffort = (DetectionEffort) effort;
-					List<DetectionEffortKind> kinds = detectionEffort.getKind();
-					if (kinds == null) {
-						return null;
-					}
-					for (DetectionEffortKind kind : kinds) {
-						if (kind.getGranularity() != null) {
-							GranularityType granularity = kind.getGranularity();
-							return PDeployment.formatGranularity(granularity);
-							//						if (granularity != null) {
-							//							return granularity.getValue();
-							//						}
-						}
-					}
-				}
-				break;
-			case 6:
 				return pDets.count;
-			case 7:
+			case 6:
 				DescriptionType desc = pDets.getDescription();
 				if (desc != null) {
 					return desc.getAbstract();
@@ -450,5 +467,32 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 			return null;
 		}
 
+	}
+	
+	private String getType(NilusDataWrapper<PDetections> pDets) {
+		String type;
+		if (pDets == null || pDets.nilusObject == null) {
+			return null;
+		}
+		type = pDets.getCollection().collectionName();
+		
+		// if it's a detection, also get the granularity. 
+		Object effort = pDets.getGotObjects("getEffort");
+		if (effort instanceof DetectionEffort) {
+			DetectionEffort detectionEffort = (DetectionEffort) effort;
+			List<DetectionEffortKind> kinds = detectionEffort.getKind();
+			if (kinds == null) {
+				return type;
+			}
+			for (DetectionEffortKind kind : kinds) {
+				if (kind.getGranularity() != null) {
+					GranularityType granularity = kind.getGranularity();
+					if (granularity != null) {
+						type += " (" + granularity.getValue() + ")";
+					}
+				}
+			}
+		}
+		return type;
 	}
 }

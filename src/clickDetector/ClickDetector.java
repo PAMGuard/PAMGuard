@@ -42,6 +42,7 @@ import Filters.Filter;
 import Filters.FilterMethod;
 import Filters.FilterType;
 import Localiser.DelayMeasurementParams;
+import Localiser.LocalisationAlgorithmInfo;
 import Localiser.algorithms.Correlations;
 import Localiser.algorithms.DelayGroup;
 import Localiser.algorithms.TimeDelayData;
@@ -2108,5 +2109,23 @@ public class ClickDetector extends PamProcess {
 	public void destroyProcess() {
 		super.destroyProcess();
 		newClickMonitor.destroyProcess();
+	}
+
+	/**
+	 * Get information about the internal bearing localiser. Will have to do 
+	 * just for the first sub detector. 
+	 * @return
+	 */
+	public LocalisationAlgorithmInfo getLocaliserInfo() {
+		if (channelGroupDetectors == null || channelGroupDetectors.length == 0) {
+			return null;
+		}
+		BearingLocaliser bl = channelGroupDetectors[0].bearingLocaliser;
+		if (bl == null) {
+			return null;
+		}
+		else {
+			return bl.getAlgorithmInfo();
+		}
 	}
 }

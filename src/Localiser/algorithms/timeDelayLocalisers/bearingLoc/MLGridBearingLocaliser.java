@@ -1,10 +1,12 @@
 package Localiser.algorithms.timeDelayLocalisers.bearingLoc;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 import Array.ArrayManager;
 import Array.PamArray;
 import Jama.Matrix;
+import Localiser.LocalisationAlgorithmInfo;
 import Localiser.algorithms.Correlations;
 import PamDetection.LocContents;
 import PamUtils.ArrayDump;
@@ -635,6 +637,19 @@ public class MLGridBearingLocaliser implements BearingLocaliser {
 	public int getHydrophoneMap() {
 		return hydrophoneMap;
 	}
-	
 
+	@Override
+	public String getAlgorithmName() {
+		return "Maximum likelyhood grid bearing localiser";
+	}
+
+	@Override
+	public Serializable getParameters() {
+		return null;
+	}
+
+	@Override
+	public LocalisationAlgorithmInfo getAlgorithmInfo() {
+		return this;
+	}
 }

@@ -28,6 +28,8 @@ public class DatablockSynchInfo {
 	 */
 	private int detectionDocumentCount;
 	
+	private int localizationDocumentCount;
+	
 
 	public DatablockSynchInfo(TethysControl tethysControl, PamDataBlock dataBlock) {
 		super();
@@ -67,6 +69,20 @@ public class DatablockSynchInfo {
 	 */
 	public void setDetectionDocumentCount(int detectionDocumentCount) {
 		this.detectionDocumentCount = detectionDocumentCount;
+	}
+
+	/**
+	 * @return the localizationDocumentCount
+	 */
+	public int getLocalizationDocumentCount() {
+		return localizationDocumentCount;
+	}
+
+	/**
+	 * @param localizationDocumentCount the localizationDocumentCount to set
+	 */
+	public void setLocalizationDocumentCount(int localizationDocumentCount) {
+		this.localizationDocumentCount = localizationDocumentCount;
 	}
 	
 }

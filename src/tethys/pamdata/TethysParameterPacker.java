@@ -24,6 +24,7 @@ import PamController.settings.output.xml.PamguardXMLWriter;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterData;
 import PamModel.parametermanager.PamParameterSet;
+import PamModel.parametermanager.SimplePamParameterData;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
 import PamguardMVC.dataSelector.DataSelectParams;
@@ -125,16 +126,13 @@ public class TethysParameterPacker {
 						e1.printStackTrace();
 					}  
 					Element elf = docf.getDocumentElement();
-					elList.add(elf);/**
+					elList.add(elf);
+					/**
 					 * Is there a data filter ? If so, write it's 
 					 * XML parameters out here. 
 					 */
 					Element pEl = xmlWriter.writeObjectData(docf, elf, filterParams, null);
 				}
-				//				if (pEl != null) {
-////					filterEl.appendChild(pEl);
-//					elf.appendChild(filterEl);
-//				}
 			}
 		}
 		if (paramOption == TethysExportParams.DETECTOR_DATASELECTOR) {
@@ -177,6 +175,27 @@ public class TethysParameterPacker {
 		return elList;
 	}
 	
+	public Element packObject(Object data) {
+		return packObject(data, "parameters");
+	}
+
+	public Element packObject(Object data, String elementName) {
+		Document doc = null;
+		QName qname = new QName(MarshalXML.schema, elementName, "ty");
+		JAXBElement<String> jaxel = new JAXBElement<String>(
+				qname, String.class, data.getClass().getCanonicalName());
+
+		
+		try {
+			doc = marshaller.marshalToDOM(jaxel);
+		} catch (JAXBException | ParserConfigurationException e1) {
+			e1.printStackTrace();
+		}  
+		Element el = doc.getDocumentElement();
+		Element pEl = xmlWriter.writeObjectData(doc, el, data, null);
+		return pEl;
+	}
+
 	/**
 	 * Get a list of parent modules of the datablock, including it's own. 
 	 * @param dataBlock
@@ -199,7 +218,7 @@ public class TethysParameterPacker {
 		return chain;
 	}
 
-	private boolean createElement(Document document, Element parentEl, Object paramData, PamParameterData pamParam, ArrayList<Object> objectHierarchy) {
+	private Element createElement(Document document, Element parentEl, Object paramData, PamParameterData pamParam, ArrayList<Object> objectHierarchy) {
 		Class<? extends Object> javaClass = paramData.getClass();
 		if (PamguardXMLWriter.isWritableType(javaClass)) {
 			String name = pamParam.getFieldName();
@@ -209,63 +228,20 @@ public class TethysParameterPacker {
 			el.setTextContent(value);
 			parentEl.appendChild(el);
 			
-
-//			QName qname = new QName(MarshalXML.schema, name, "ty");
-//			JAXBElement<String> jaxel = new JAXBElement<String>(
-//					qname, String.class, value);
-//			
-//
-//			try {
-//				jxbm.marshal(jaxel, dom);
-//			} catch (JAXBException e) {
-//				e.printStackTrace();
-//			}
-//			Document doc = null;
-//			try {
-//				doc = marshaller.marshalToDOM(jaxel);
-//			} catch (JAXBException e) {
-//				e.printStackTrace();
-//			} catch (ParserConfigurationException e) {
-//				e.printStackTrace();
-//			}  
-//			Element el = doc.getDocumentElement();
-//			return el;
-			return true;
+			return el;
 		}
 		if (javaClass.isArray()) {
 			return writeArray(document, parentEl, paramData, pamParam, objectHierarchy);
 			
 		}
-		/*
-		 * 
-		if (javaClass.isArray()) {
-			return writeArray(doc, el, data, pamParam, objectHierarchy);
-		}
-		if (List.class.isAssignableFrom(javaClass)){
-			return writeList(doc, el, data, pamParam, objectHierarchy);
-		}
-		if (Map.class.isAssignableFrom(javaClass)){
-			return writeMap(doc, el, data, pamParam, objectHierarchy);
-		}
-		if (File.class.isAssignableFrom(javaClass)) {
-			return writeFile(doc, el, data, pamParam);
-		}
-		
-		else {
-			Element e = makeElement(doc, pamParam.getFieldName(), data.getClass().getName());
-			el.appendChild(e);
-			writeObjectData(doc, e, data, objectHierarchy);
-			return e;
-		}
-		 */
-		return false;
+		return null;
 	}
 
 
-	private boolean writeArray(Document document, Element parentEl, Object paramData, PamParameterData pamParam,
+	private Element writeArray(Document document, Element parentEl, Object paramData, PamParameterData pamParam,
 			ArrayList<Object> objectHierarchy) {
 		if (paramData.getClass().isArray() == false) {
-			return false;
+			return null;
 		}
 		String name = pamParam.getFieldName();
 		Element el = document.createElement(name);
@@ -274,10 +250,10 @@ public class TethysParameterPacker {
 		boolean ok = true;
 		for (int i = 0; i < n; i++) {
 			Object arrayEl = Array.get(paramData, i);
-			ok &= createElement(document, el, arrayEl, pamParam, objectHierarchy);
+			ok &= (createElement(document, el, arrayEl, pamParam, objectHierarchy) != null);
 		}
 		// TODO Auto-generated method stub
-		return ok;
+		return el;
 	}
 
 

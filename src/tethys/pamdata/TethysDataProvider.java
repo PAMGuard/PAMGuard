@@ -11,6 +11,7 @@ import nilus.DescriptionType;
 import nilus.Detection;
 import nilus.DetectionEffortKind;
 import nilus.GranularityEnumType;
+import tethys.Collection;
 import tethys.localization.TethysLocalisationInfo;
 import tethys.niluswraps.PDeployment;
 import tethys.output.StreamExportParams;
@@ -62,9 +63,10 @@ public interface TethysDataProvider {
 
 	/**
 	 * Get Algorithm information for a Tethys Detections document
+	 * @param collection Detections or Localisations may have different parameter sets. 
 	 * @return Algorithm information
 	 */
-	public AlgorithmType getAlgorithm();
+	public AlgorithmType getAlgorithm(Collection collection);
 	
 	/**
 	 * Get a list of allowed granularity types for this output 

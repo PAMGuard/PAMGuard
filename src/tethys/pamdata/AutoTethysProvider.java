@@ -9,6 +9,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import Localiser.LocalisationAlgorithm;
+import Localiser.LocalisationAlgorithmInfo;
 import PamController.PamControlledUnit;
 import PamController.PamSettings;
 import PamController.PamguardVersionInfo;
@@ -35,6 +37,7 @@ import nilus.DetectionEffortKind;
 import nilus.GranularityEnumType;
 import nilus.Helper;
 import nilus.SpeciesIDType;
+import tethys.Collection;
 import tethys.TethysControl;
 import tethys.TethysTimeFuncs;
 import tethys.detection.DetectionsHandler;
@@ -101,7 +104,7 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 	}
 
 	@Override
-	public AlgorithmType getAlgorithm() {
+	public AlgorithmType getAlgorithm(Collection collection) {
 		/**
 		 * Probably need to split this to provide detection algorithm parameters and 
 		 * localisation algorithm parameters, or pass in the document type as a function 
@@ -113,12 +116,62 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 		} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
 			e.printStackTrace();
 		}
+		// do the parameters as normal whether it's dets or locs. 
 		nilus.AlgorithmType.Parameters algoParameters = this.getAlgorithmParameters();
 		if (algoParameters != null) {
 			algorithm.setParameters(algoParameters);
 		}
+		if (collection == Collection.Localizations) {
+			nilus.AlgorithmType.Parameters locParameters = this.getLocalisationParameters();
+			if (algoParameters == null) {
+				algorithm.setParameters(locParameters);
+			}
+			else if (locParameters != null) {
+				// merge the two sets, putting the localisation information first.  
+				List<Element> mainList = algoParameters.getAny();
+				List<Element> locList = locParameters.getAny();
+				if (mainList != null && locList != null) {
+					for (int i = 0; i < locList.size(); i++) {
+						mainList.add(i, locList.get(i));
+					}
+				}
+			}
+		}
+		else {
+		}
 
 		return algorithm;
+	}
+
+	public nilus.AlgorithmType.Parameters getLocalisationParameters() {
+		LocalisationAlgorithm algo = pamDataBlock.getLocalisationAlgorithm();
+		if (algo == null) {
+			return null;
+		}
+		LocalisationAlgorithmInfo algoInfo = algo.getAlgorithmInfo();
+		if (algoInfo == null) {
+			return null;
+		}
+		Object params = algoInfo.getParameters();
+		if (params == null) {
+			return null;
+		}
+		// pack the params object
+		TethysParameterPacker paramPacker = null;
+		try {
+			paramPacker = new TethysParameterPacker(tethysControl);
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		}
+		Element paramEl = paramPacker.packObject(params, "localizer");
+		if (paramEl == null) {
+			return null;
+		}
+		nilus.AlgorithmType.Parameters parameters = new nilus.AlgorithmType.Parameters();
+		List<Element> paramList = parameters.getAny();
+		paramList.add(paramEl);
+		
+		return parameters;
 	}
 
 	@Override
@@ -535,6 +588,13 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 		else {
 			return new TethysLocalisationInfo(pamDataBlock);
 		}
+	}
+
+	/**
+	 * @return the pamDataBlock
+	 */
+	protected PamDataBlock getPamDataBlock() {
+		return pamDataBlock;
 	}
 	
 

@@ -44,6 +44,8 @@ import targetMotionOld.TargetMotionLocaliser;
 import binaryFileStorage.BinaryStore;
 import Filters.FilterDialog;
 import Filters.FilterParams;
+import Localiser.LocalisationAlgorithm;
+import Localiser.LocalisationAlgorithmInfo;
 import Localiser.detectionGroupLocaliser.GroupDetection;
 import PamController.PamConfiguration;
 import PamController.PamControlledUnit;
@@ -112,7 +114,7 @@ import offlineProcessing.OfflineTaskGroup;
  * 
  */
 
-public class ClickControl extends PamControlledUnit implements PamSettings {
+public class ClickControl extends PamControlledUnit implements PamSettings, LocalisationAlgorithm {
 
 	protected ClickDetector clickDetector;
 
@@ -1291,6 +1293,11 @@ public class ClickControl extends PamControlledUnit implements PamSettings {
 			clickFFTDataOrganiser = new ClickFFTOrganiser(this);
 		}
 		return clickFFTDataOrganiser;
+	}
+
+	@Override
+	public LocalisationAlgorithmInfo getAlgorithmInfo() {
+		return clickDetector.getLocaliserInfo();
 	}
 
 

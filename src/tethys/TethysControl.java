@@ -570,16 +570,22 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		for (DatablockSynchInfo synchInfo : dataBlockSynchInfos) {
 //			dataPrefixes[i] = DetectionsHandler.getDetectionsDocIdPrefix(deplData.getProject(), synchInfo.getDataBlock());
 			int detectionCount = 0;
-			int documentCount = 0;
+			int locDocumentCount = 0;
+			int detDocumentCount = 0;
 			for (PDeployment pDepl : matchedDeployments) {
 				detectionCount += dbxmlQueries.countData(synchInfo.getDataBlock(), pDepl.getDocumentId());
 				ArrayList<String> detectionsNames = getDbxmlQueries().getDetectionsDocuments(synchInfo.getDataBlock(), pDepl.getDocumentId());
 				if (detectionsNames != null) {
-					documentCount += detectionsNames.size();
+					detDocumentCount += detectionsNames.size();
+				}
+				ArrayList<String> locDocNames = getDbxmlQueries().getLocalizationDocuments(synchInfo.getDataBlock(), pDepl.getDocumentId());
+				if (locDocNames != null) {
+					locDocumentCount += locDocNames.size();
 				}
 			}
 			synchInfo.setDataCount(detectionCount);
-			synchInfo.setDetectionDocumentCount(documentCount);
+			synchInfo.setDetectionDocumentCount(detDocumentCount);
+			synchInfo.setLocalizationDocumentCount(locDocumentCount);
 			
 			i++;
 		}

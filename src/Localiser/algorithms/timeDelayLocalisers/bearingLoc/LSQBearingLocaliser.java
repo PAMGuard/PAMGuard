@@ -1,10 +1,13 @@
 package Localiser.algorithms.timeDelayLocalisers.bearingLoc;
 
+import java.io.Serializable;
+
 import Array.ArrayManager;
 import Array.PamArray;
 import Jama.LUDecomposition;
 import Jama.Matrix;
 import Jama.QRDecomposition;
+import Localiser.LocalisationAlgorithmInfo;
 import PamDetection.LocContents;
 import PamUtils.PamUtils;
 import pamMaths.PamVector;
@@ -14,7 +17,7 @@ public class LSQBearingLocaliser implements BearingLocaliser {
 	private int hydrophoneBitMap;
 	private long timeMillis;
 	private double timingError;
-	
+
 	private Matrix weightedHydrophoneVectors;
 	private Matrix hydrophoneVectors;
 	private Matrix hydrophoneErrorVectors;
@@ -35,7 +38,7 @@ public class LSQBearingLocaliser implements BearingLocaliser {
 	public int getLocalisationContents() {
 		return LocContents.HAS_BEARING | LocContents.HAS_AMBIGUITY;
 	}
-	
+
 	@Override
 	public void prepare(int[] arrayElements, long timeMillis, double timingError) {
 		/*
@@ -49,7 +52,7 @@ public class LSQBearingLocaliser implements BearingLocaliser {
 		arrayType = arrayManager.getArrayShape(currentArray, hydrophoneBitMap);
 
 		arrayAxis = arrayManager.getArrayDirections(currentArray, hydrophoneBitMap);
-		
+
 		int nHyd = arrayElements.length;
 		int nDelay = (nHyd*(nHyd-1))/2;
 		weightedHydrophoneVectors = new Matrix(nDelay, 3);
@@ -77,12 +80,12 @@ public class LSQBearingLocaliser implements BearingLocaliser {
 					weightedHydrophoneVectors.set(iRow, e, v.getElement(e)/c*fitWeights[iRow]);
 					hydrophoneVectors.set(iRow, e, v.getElement(e)/c);
 					hydrophoneErrorVectors.set(iRow, e, errorVec.getElement(e)/c);
-//					hydrophoneUnitVectors.set(iRow, e, uv.getElement(e));
+					//					hydrophoneUnitVectors.set(iRow, e, uv.getElement(e));
 				}
 				iRow++;
 			}
 		}
-//		luHydrophoneUnitMatrix = new LUDecomposition(hydrophoneUnitVectors);
+		//		luHydrophoneUnitMatrix = new LUDecomposition(hydrophoneUnitVectors);
 		qrHydrophones = new QRDecomposition(weightedHydrophoneVectors);
 	}
 
@@ -100,71 +103,71 @@ public class LSQBearingLocaliser implements BearingLocaliser {
 	public PamVector[] getArrayAxis() {
 		return arrayAxis;
 	}	 
-	
+
 	/* 
 	 * @return true if a new grid needs to be created
 	 */
 	private boolean resetArray(long timeMillis){
-		
+
 		if (currentArray == null || (this.timeMillis!=timeMillis && currentArray.getHydrophoneLocator().isChangeable())){
 			prepare(PamUtils.getChannelArray(hydrophoneBitMap), timeMillis, 1e-6);
 			this.timeMillis = timeMillis;
 			return true;
 		}
-			
+
 		return false; 
 	}
 
 	@Override
 	public double[][] localise(double[] delays, long timeMillis) {
 		resetArray(timeMillis);
-//		qrHydrophones = new QRDecomposition(hydrophoneVectors);
+		//		qrHydrophones = new QRDecomposition(hydrophoneVectors);
 		Matrix normDelays = new Matrix(delays.length, 1);
 		for (int i = 0; i < delays.length; i++) {
 			normDelays.set(i, 0, -delays[i]*fitWeights[i]);
 		}
-//		Matrix soln = luHydrophoneUnitMatrix.solve(normDelays);
+		//		Matrix soln = luHydrophoneUnitMatrix.solve(normDelays);
 		Matrix soln2 = qrHydrophones.solve(normDelays);
 		double[][] angs = new double[2][2];
 		PamVector v = new PamVector(soln2.get(0, 0), soln2.get(1,0), soln2.get(2, 0));
-//		System.out.printf("Vector Norm = %4.3f: ", v.norm());
+		//		System.out.printf("Vector Norm = %4.3f: ", v.norm());
 		double m = v.normalise();
 		angs[0][0] = Math.PI/2. - Math.atan2(v.getElement(0),v.getElement(1));
 		angs[0][1] = Math.asin(v.getElement(2));
-		
-//		timingError = 1e-5;
+
+		//		timingError = 1e-5;
 		// now take a look at angle errors
 		double oneDeg = Math.PI/180.;
-		
+
 		double testDeg = 5;
 		double[][] er = new double[2][20];
 		for (int i = 0; i < 20; i++) {
 			testDeg = 1+i;
-		// pick points testDeg degrees either side of angs and change one at a time
-		double aDiff = testDeg * oneDeg;
-		double a;
-		double l1, l2, l3, l1a, l3a;
-		l1 = logLikelihood(delays, angs[0][0] - aDiff, angs[0][1]);
-		l2 = logLikelihood(delays, angs[0][0], angs[0][1]);
-		l3 = logLikelihood(delays, angs[0][0] + aDiff, angs[0][1]);
-		er[0][i] = angs[1][0] = Math.sqrt(1./(l1+l3-2*l2))*aDiff;
-		l1a = logLikelihood(delays, angs[0][0], angs[0][1] - aDiff);
-//		l2 = logLikelihood(delays, angs[0][0], angs[0][1]);
-		l3a = logLikelihood(delays, angs[0][0], angs[0][1] + aDiff);
-		er[1][i] = angs[1][1] = Math.sqrt(1./(l1a+l3a-2*l2))*aDiff;
+			// pick points testDeg degrees either side of angs and change one at a time
+			double aDiff = testDeg * oneDeg;
+			double a;
+			double l1, l2, l3, l1a, l3a;
+			l1 = logLikelihood(delays, angs[0][0] - aDiff, angs[0][1]);
+			l2 = logLikelihood(delays, angs[0][0], angs[0][1]);
+			l3 = logLikelihood(delays, angs[0][0] + aDiff, angs[0][1]);
+			er[0][i] = angs[1][0] = Math.sqrt(1./(l1+l3-2*l2))*aDiff;
+			l1a = logLikelihood(delays, angs[0][0], angs[0][1] - aDiff);
+			//		l2 = logLikelihood(delays, angs[0][0], angs[0][1]);
+			l3a = logLikelihood(delays, angs[0][0], angs[0][1] + aDiff);
+			er[1][i] = angs[1][1] = Math.sqrt(1./(l1a+l3a-2*l2))*aDiff;
 		}
-		
-		
-		
-		
-//		double ll[] = new double[21];
-//		double a[] = new double[2];
-//		timingError = 1.e-4;
-//		a[1] = angs[0][1];
-//		for (int i = 0; i < ll.length; i++) {
-//			a[0] = angs[0][0] + (-10 + i)*oneDeg;
-//			ll[i] = logLikelihood(delays, a);
-//		}
+
+
+
+
+		//		double ll[] = new double[21];
+		//		double a[] = new double[2];
+		//		timingError = 1.e-4;
+		//		a[1] = angs[0][1];
+		//		for (int i = 0; i < ll.length; i++) {
+		//			a[0] = angs[0][0] + (-10 + i)*oneDeg;
+		//			ll[i] = logLikelihood(delays, a);
+		//		}
 		return angs;
 	}
 	/**
@@ -181,7 +184,7 @@ public class LSQBearingLocaliser implements BearingLocaliser {
 		whaleVec.set(2, 0, Math.sin(angle1));
 		return logLikelihood(delays, whaleVec);
 	}
-	
+
 	/**
 	 * Calculate a log likelihood for a given pair of angles
 	 * @param delays actual delays
@@ -190,11 +193,11 @@ public class LSQBearingLocaliser implements BearingLocaliser {
 	 */
 	public double logLikelihood(double[] delays, double[] angles) {
 		return logLikelihood(delays, angles[0], angles[1]);
-//		Matrix whaleVec = new Matrix(3,1);
-//		whaleVec.set(0, 0, Math.cos(angles[1])*Math.cos(angles[0]));
-//		whaleVec.set(1, 0, Math.cos(angles[1])*Math.sin(angles[0]));
-//		whaleVec.set(2, 0, Math.sin(angles[1]));
-//		return logLikelihood(delays, whaleVec);
+		//		Matrix whaleVec = new Matrix(3,1);
+		//		whaleVec.set(0, 0, Math.cos(angles[1])*Math.cos(angles[0]));
+		//		whaleVec.set(1, 0, Math.cos(angles[1])*Math.sin(angles[0]));
+		//		whaleVec.set(2, 0, Math.sin(angles[1]));
+		//		return logLikelihood(delays, whaleVec);
 	}
 	/**
 	 * Calculate a log likelihood for a given whale vector. 
@@ -215,5 +218,18 @@ public class LSQBearingLocaliser implements BearingLocaliser {
 		}
 		return chi/2;
 	}
+	
+	@Override
+	public String getAlgorithmName() {
+		return "Least Squares bearing localiser";
+	}
 
+	@Override
+	public Serializable getParameters() {
+		return null;
+	}
+	@Override
+	public LocalisationAlgorithmInfo getAlgorithmInfo() {
+		return this;
+	}
 }

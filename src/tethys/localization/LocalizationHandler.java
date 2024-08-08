@@ -3,6 +3,8 @@ package tethys.localization;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
+import Localiser.detectionGroupLocaliser.GroupLocResult;
+import Localiser.detectionGroupLocaliser.GroupLocalisation;
 import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamUtils.LatLong;
@@ -17,7 +19,8 @@ import nilus.LocalizationType;
 import nilus.LocalizationType.References;
 import nilus.LocalizationType.References.Reference;
 import nilus.Localize;
-import nilus.SpeciesIDType
+import nilus.SpeciesIDType;
+import pamMaths.PamVector;
 import nilus.Localize.Effort.CoordinateReferenceSystem;
 import tethys.Collection;
 import tethys.CollectionHandler;
@@ -37,13 +40,13 @@ public class LocalizationHandler extends CollectionHandler {
 		super(tethysControl, Collection.Localizations);
 	}
 
-//	public LocalizationType getLoc() {
-//		LocalizationType lt = new LocalizationType();
-//		CylindricalCoordinateType cct = new CylindricalCoordinateType();
-////		cct.set
-//		CoordinateReferenceSystem cr;
-//		return null;
-//	}
+	//	public LocalizationType getLoc() {
+	//		LocalizationType lt = new LocalizationType();
+	//		CylindricalCoordinateType cct = new CylindricalCoordinateType();
+	////		cct.set
+	//		CoordinateReferenceSystem cr;
+	//		return null;
+	//	}
 
 	/**
 	 * Get a list of Localization documents associated with a particular data block for all deployments
@@ -55,7 +58,7 @@ public class LocalizationHandler extends CollectionHandler {
 		ArrayList<PDeployment> deployments = tethysControl.getDeploymentHandler().getMatchedDeployments();
 		return getStreamLocalizations(dataBlock, deployments);
 	}
-	
+
 	/**
 	 * Get a list of Localization documents associated with a particular data block for the list of deployments
 	 * documents. Group them by abstract or something
@@ -72,14 +75,14 @@ public class LocalizationHandler extends CollectionHandler {
 			if (someNames == null) {
 				continue;
 			}
-//			// no have a list of all the Detections documents of interest for this datablock.
+			//			// no have a list of all the Detections documents of interest for this datablock.
 			for (String aDoc : someNames) {
 				Localize localize = tethysControl.getDbxmlQueries().getLocalizationDocInfo(aDoc);
 				int count = tethysControl.getDbxmlQueries().countLocalizations2(aDoc);
 				PLocalization pLocalize = new PLocalization(localize, dataBlock, aDep, count);
 				localizeDocs.add(pLocalize);
-//				PDetections pDetections = new PDetections(detections, dataBlock, aDep, count);
-//				detectionsDocs.add(pDetections);
+				//				PDetections pDetections = new PDetections(detections, dataBlock, aDep, count);
+				//				detectionsDocs.add(pDetections);
 			}
 		}
 		return new StreamDetectionsSummary(localizeDocs);
@@ -137,7 +140,7 @@ public class LocalizationHandler extends CollectionHandler {
 			break;
 		default:
 			break;
-		
+
 		}
 		return locEl;
 	}
@@ -150,7 +153,7 @@ public class LocalizationHandler extends CollectionHandler {
 			e.printStackTrace();
 		}
 		locType.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(dataUnit.getTimeMilliseconds()));
-		
+
 		DataBlockSpeciesManager spManager = dataBlock.getDatablockSpeciesManager();
 		if (spManager != null) {
 			SpeciesMapItem speciesStuff = spManager.getSpeciesItem(dataUnit);
@@ -160,7 +163,7 @@ public class LocalizationHandler extends CollectionHandler {
 				locType.setSpeciesId(species);
 			}
 		}
-		
+
 		References references = locType.getReferences();
 		if (references == null) {
 			references = new References();
@@ -175,7 +178,7 @@ public class LocalizationHandler extends CollectionHandler {
 		reference.setIndex(BigInteger.valueOf(dataUnit.getUID()));
 		reference.setEventRef("UID");
 		locType.getReferences().getReference().add(reference);
-		
+
 		return locType;
 	}
 
@@ -194,6 +197,22 @@ public class LocalizationHandler extends CollectionHandler {
 		return deg;
 	}
 
+	/**
+	 * Convert a vertical angle from radians to degrees and round. 
+	 * @param radians
+	 * @return
+	 */
+	private double toSlantAngle(double radians) {
+		/*
+		 * these really need to be constrained to -90 to 90, but I don't see what to do if
+		 * they are outside that range.
+		 */
+		double deg = Math.toDegrees(radians);
+		deg= PamUtils.constrainedAngle(deg, 180);
+		deg = AutoTethysProvider.roundDecimalPlaces(deg, 2);
+		return deg;				
+	}
+
 	private LocalizationType createWGS84Loc(Localize localiseDocument, PamDataBlock dataBlock, PamDataUnit dataUnit,
 			StreamExportParams streamExportParams) {
 		AbstractLocalisation loc = dataUnit.getLocalisation();
@@ -209,9 +228,32 @@ public class LocalizationHandler extends CollectionHandler {
 		coord.setX(latlong.getLongitude());
 		coord.setY(latlong.getLatitude());
 		coord.setZ(latlong.getHeight());
-				
+
+		PamVector planarVec = loc.getPlanarVector();
 		locType.setCoordinate(coord);
-		
+
+		// see if it's possible to get a beam measurement. 
+		if (loc instanceof GroupLocalisation) {
+			GroupLocalisation groupLoc = (GroupLocalisation) loc;
+			GroupLocResult groupLocResult = groupLoc.getGroupLocaResult(0);
+			Double perpDist = groupLocResult.getPerpendicularDistance();
+			Long beamTime = groupLocResult.getBeamTime();
+			if (perpDist != null && beamTime != null) {
+				AngularCoordinateType acType = new AngularCoordinateType();
+				acType.setAngle1(90);
+				acType.setDistanceM(AutoTethysProvider.roundDecimalPlaces(perpDist,1));
+				locType.setAngularCoordinate(acType);
+				locType.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(beamTime));
+				locType.setCoordinate(null);
+			}
+			//			groupLoc.getp
+		}
+
+		/*
+		 * Try to also add a range loc. 
+		 */
+		//		loc.
+
 		return locType;
 	}
 
@@ -241,7 +283,10 @@ public class LocalizationHandler extends CollectionHandler {
 		BearingType angType = new BearingType();
 		angType.setAngle1(constrainRadianAngle(angles[0]));
 		if (angles.length >= 2) {
-			angType.setAngle2(constrainRadianAngle(angles[1]));
+			angType.setAngle2(toSlantAngle(angles[1]));
+			//			if (angType.getAngle2() > 360) {
+			//				angType.setAngle2(Math.toDegrees(angles[1]));
+			//			}
 		}
 		locType.setBearing(angType);
 
@@ -254,7 +299,7 @@ public class LocalizationHandler extends CollectionHandler {
 			}
 			locType.setBearingError(angErrType);
 		}
-		
+
 		return locType;
 	}
 	private LocalizationType createPolarLoc(Localize localiseDocument, PamDataBlock dataBlock, PamDataUnit dataUnit,
@@ -264,7 +309,7 @@ public class LocalizationHandler extends CollectionHandler {
 			return null;
 		}
 		if (loc.hasLocContent(LocContents.HAS_RANGE) == false) {
-			
+
 			// do the more basic bearing type instead. 
 			return createBearingLoc(localiseDocument, dataBlock, dataUnit, streamExportParams);
 		}
@@ -277,6 +322,9 @@ public class LocalizationHandler extends CollectionHandler {
 		angType.setAngle1(constrainRadianAngle(angles[0]));
 		if (angles.length >= 2) {
 			angType.setAngle2(constrainRadianAngle(angles[1]));
+			if (angType.getAngle2() > 360) {
+				angType.setAngle2(toSlantAngle(angles[1]));
+			}
 		}
 		if (loc.hasLocContent(LocContents.HAS_RANGE)) {
 			angType.setDistanceM(loc.getRange(0));
@@ -295,10 +343,10 @@ public class LocalizationHandler extends CollectionHandler {
 			}
 			locType.setAngularCoordinateError(angErrType);
 		}
-		
+
 		return locType;
 	}
-	
+
 	private LocalizationType createPerpRange(Localize localiseDocument, PamDataBlock dataBlock, PamDataUnit dataUnit,
 			StreamExportParams streamExportParams) {
 		// TODO Auto-generated method stub
