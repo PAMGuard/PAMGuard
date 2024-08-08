@@ -1,5 +1,7 @@
 package tethys.swing;
 
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -105,23 +107,54 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 		//        if (rowIndex < 0) {
 		//        	return null;
 		//        }
+		NilusDataWrapper doc = detectionsForRow(rowIndex);
 		int colIndex = table.columnAtPoint(p);
 		switch (colIndex) {
 		case 0:
-			return "Tethys Detections document name";
+			if (doc != null) {
+				return "Tethys Detections document Id: " + doc.getDocumentId();
+			}
+			return "Tethys Detections document Id";
 		case 1:
+			if (dataBlock != null) {
+				return "Name of PAMGuard data stream: " + dataBlock.getLongDataName();
+			}
 			return "Name of PAMGuard data stream";
 		case 2:
-			return "Effort period";
+			return "Deployment type";
 		case 3:
-			return "Output granularity";
+			return "Output type and granularity ";
 		case 4:
-			return "Number of detection elements in document";
+			return "Effort period";
 		case 5:
-			return "Document abstract";
+			return "Number of detection or localization elements in document";
+		case 6:
+			DescriptionType desc = findDescription(rowIndex);
+			if (desc != null) {
+				String str = "Document abstract: " + desc.getAbstract();
+				return str;
+			}
+			else {
+				return "Document abstract";
+			}
 
 		}
 		return "No tip";
+	}
+	
+	
+	private DescriptionType findDescription(int rowIndex) {
+		NilusDataWrapper doc = detectionsForRow(rowIndex);
+		if (doc == null) {
+			return null;
+		}
+		Object desc = doc.getGotObject("getDescription");
+		if (desc instanceof DescriptionType) {
+			return (DescriptionType) desc;
+		}
+		else {
+			return null;
+		}
 	}
 
 	@Override

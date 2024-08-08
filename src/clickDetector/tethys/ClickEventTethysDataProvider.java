@@ -31,6 +31,7 @@ public class ClickEventTethysDataProvider extends AutoTethysProvider {
 		GranularityEnumType[] allowed = {GranularityEnumType.GROUPED};
 		return allowed;
 	}
+	
 	@Override
 	public Detection createDetection(PamDataUnit dataUnit, TethysExportParams tethysExportParams,
 			StreamExportParams streamExportParams) {

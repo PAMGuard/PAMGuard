@@ -1,11 +1,13 @@
 package Localiser.algorithms.timeDelayLocalisers.bearingLoc;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 import Array.ArrayManager;
 import Array.PamArray;
 import Jama.Matrix;
 import Jama.QRDecomposition;
+import Localiser.LocalisationAlgorithmInfo;
 import PamDetection.LocContents;
 import PamUtils.PamUtils;
 import pamMaths.PamVector;
@@ -294,4 +296,17 @@ public class PairBearingLocaliser implements BearingLocaliser {
 		return speedOfSound;
 	}
 
+	@Override
+	public String getAlgorithmName() {
+		return "Pair bearing localiser";
+	}
+
+	@Override
+	public Serializable getParameters() {
+		return null;
+	}
+	@Override
+	public LocalisationAlgorithmInfo getAlgorithmInfo() {
+		return this;
+	}
 }

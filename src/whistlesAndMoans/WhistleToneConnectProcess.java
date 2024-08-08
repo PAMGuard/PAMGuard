@@ -15,6 +15,7 @@ import fftManager.FFTDataUnit;
 import generalDatabase.PamDetectionLogging;
 import generalDatabase.SQLLogging;
 import Array.ArrayManager;
+import Localiser.LocalisationAlgorithmInfo;
 import Localiser.algorithms.Correlations;
 import Localiser.algorithms.timeDelayLocalisers.bearingLoc.BearingLocaliser;
 import Localiser.algorithms.timeDelayLocalisers.bearingLoc.BearingLocaliserSelector;
@@ -1086,6 +1087,25 @@ public class WhistleToneConnectProcess extends PamProcess {
 			clearSummaryData();
 		}
 		return sumText;
+	}
+
+
+	/**
+	 * Get info on current localisation algorithm. Grab the BL from the
+	 * first group that has one. 
+	 * @return
+	 */
+	public LocalisationAlgorithmInfo getLocAlgorithmInfo() {
+		if (shapeConnectors == null) {
+			return null;
+		}
+		for (int i = 0; i < shapeConnectors.length; i++) {
+			BearingLocaliser bl = shapeConnectors[i].bearingLocaliser;
+			if (bl != null && bl.getAlgorithmInfo() != null) {
+				return bl.getAlgorithmInfo();
+			}
+		}
+		return null;
 	}
 
 }

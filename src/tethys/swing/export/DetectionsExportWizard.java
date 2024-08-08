@@ -81,6 +81,7 @@ public class DetectionsExportWizard extends PamWizard {
 			granularityCard.setParams(streamExportParams);
 		}
 		if (wizardCard == descriptionCard) {
+			streamExportParams.checkDescription();
 			 descriptionCard.setParams(streamExportParams.getNilusDetectionDescription());
 		}
 		if (wizardCard == algorithmCard) {

@@ -10,6 +10,8 @@ import javax.swing.SwingWorker;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import Localiser.LocalisationAlgorithm;
+import Localiser.LocalisationAlgorithmInfo;
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamController.PamguardVersionInfo;
@@ -665,7 +667,7 @@ public class DetectionsHandler extends CollectionHandler {
 		AlgorithmType algorithm = detections.getAlgorithm();
 
 		if (dataProvider != null) {
-			algorithm = dataProvider.getAlgorithm();
+			algorithm = dataProvider.getAlgorithm(Collection.Detections);
 			//			detections.setAlgorithm(algorithm);
 		}
 		algorithm.setMethod(getMethodString(dataBlock));
@@ -750,10 +752,20 @@ public class DetectionsHandler extends CollectionHandler {
 		AlgorithmType algorithm = localisations.getAlgorithm();
 
 		if (dataProvider != null) {
-			algorithm = dataProvider.getAlgorithm();
+			algorithm = dataProvider.getAlgorithm(Collection.Localizations);
 			//			detections.setAlgorithm(algorithm);
 		}
-		algorithm.setMethod(getMethodString(dataBlock));
+		LocalisationAlgorithm locAlgorithm = dataBlock.getLocalisationAlgorithm();
+		LocalisationAlgorithmInfo locAlgoinfo = null;
+		if (locAlgorithm != null) {
+			locAlgoinfo = locAlgorithm.getAlgorithmInfo();
+		}
+		if (locAlgoinfo != null) {
+			algorithm.setMethod(locAlgoinfo.getAlgorithmName());
+		}
+		else {
+			algorithm.setMethod(getMethodString(dataBlock));
+		}
 		algorithm.setSoftware(getSoftwareString(dataBlock));
 		algorithm.setVersion(getVersionString(dataBlock));
 

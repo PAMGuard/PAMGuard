@@ -10,6 +10,8 @@ import javax.swing.JMenuItem;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import Localiser.LocalisationAlgorithm;
+import Localiser.LocalisationAlgorithmInfo;
 import dataPlots.data.TDDataProviderRegister;
 import dataPlotsFX.data.TDDataProviderRegisterFX;
 import dataPlotsFX.whistlePlotFX.WhistleMoanProviderFX;
@@ -30,7 +32,7 @@ import PamController.PamSettings;
 import PamView.PamSidePanel;
 import PamView.WrapperControlledGUISwing;
 
-public class WhistleMoanControl extends PamControlledUnit implements PamSettings {
+public class WhistleMoanControl extends PamControlledUnit implements PamSettings, LocalisationAlgorithm {
 
 	private WhistleToneConnectProcess whistleToneProcess;
 
@@ -228,5 +230,10 @@ public class WhistleMoanControl extends PamControlledUnit implements PamSettings
 	@Override
 	public String getModuleSummary(boolean clear) {
 		return whistleToneProcess.getModuleSummary(clear);
+	}
+	
+	@Override
+	public LocalisationAlgorithmInfo getAlgorithmInfo() {
+		return whistleToneProcess.getLocAlgorithmInfo();
 	}
 }

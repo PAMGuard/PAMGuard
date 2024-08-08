@@ -1,8 +1,12 @@
 package Localiser.algorithms.timeDelayLocalisers.bearingLoc;
 
+import java.io.Serializable;
+
+import Localiser.LocalisationAlgorithmInfo;
 import PamDetection.LocContents;
 import pamMaths.PamVector;
 
+@Deprecated
 public class CombinedBearingLocaliser implements BearingLocaliser {
 	
 	private BearingLocaliser firstLocaliser;
@@ -65,6 +69,21 @@ public class CombinedBearingLocaliser implements BearingLocaliser {
 //				simplexBearingLocaliser.getChiVal(delays, res[0]), simplexBearingLocaliser.getChiVal(delays, res2[0]),
 //				simplexBearingLocaliser.getChiVal(delays, res[0])- simplexBearingLocaliser.getChiVal(delays, res2[0]));
 		return res2;
+	}
+
+	@Override
+	public String getAlgorithmName() {
+		return "Combined Simplex bearing localiser";
+	}
+
+	@Override
+	public Serializable getParameters() {
+		return null;
+	}
+
+	@Override
+	public LocalisationAlgorithmInfo getAlgorithmInfo() {
+		return this;
 	}
 
 }
