@@ -90,7 +90,6 @@ public class LocalizationHandler extends CollectionHandler {
 
 	@Override
 	public String getHelpPoint() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
