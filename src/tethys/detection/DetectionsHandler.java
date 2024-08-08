@@ -727,7 +727,6 @@ public class DetectionsHandler extends CollectionHandler {
 			eff.getReferencedDocuments().getDocument().add(detectsDoc);
 		}
 		
-		
 		TethysDataProvider dataProvider = dataBlock.getTethysDataProvider(tethysControl);
 
 		String prefix = deployment.nilusObject.getId() + "_" + dataProvider.getDetectionsName();

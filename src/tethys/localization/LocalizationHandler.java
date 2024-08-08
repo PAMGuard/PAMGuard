@@ -17,7 +17,7 @@ import nilus.LocalizationType;
 import nilus.LocalizationType.References;
 import nilus.LocalizationType.References.Reference;
 import nilus.Localize;
-import nilus.SpeciesIDType;
+import nilus.SpeciesIDType
 import nilus.Localize.Effort.CoordinateReferenceSystem;
 import tethys.Collection;
 import tethys.CollectionHandler;
@@ -87,7 +87,6 @@ public class LocalizationHandler extends CollectionHandler {
 
 	@Override
 	public String getHelpPoint() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
