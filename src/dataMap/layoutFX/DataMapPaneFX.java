@@ -178,12 +178,13 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX {
 	 * Called from ScalePanel when anything 
 	 * to do with scaling changes. 
 	 */
+	@Deprecated
 	public void scaleChanged() {
 		if (scalePane == null || scrollingDataPanel == null) {
 			return;
 		}
 		scalePane.getParams(dataMapControl.dataMapParameters);
-		scrollingDataPanel.scaleChange();
+		//scrollingDataPanel.scaleChange();
 	}
 
 	@Override

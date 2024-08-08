@@ -1,6 +1,5 @@
 package dataMap.layoutFX;
 
-import java.awt.Insets;
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -159,11 +158,12 @@ public class DataStreamPaneFX extends PamBorderPane {
 		
 		showButton = new PamButton();
 		showButton.setStyle("-fx-padding: 0 10 0 10; -fx-border-radius: 0 0 0 0; -fx-background-radius: 0 0 0 0;");
-		showButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-down", 18));
 		showButton.setOnAction((action)->{
 			this.setCollapsed(!this.isCollapsed()); 
+			setButtonGraphic();
 		});
-		
+		 setButtonGraphic();
+		 
 		pane.setLeft(showButton);
 		
 		pane.setPrefHeight(PREF_HEADER_HEIGHT);
@@ -172,6 +172,18 @@ public class DataStreamPaneFX extends PamBorderPane {
 	}
 	
 	
+	
+	
+	private void setButtonGraphic() {
+		if (this.isCollapsed()) {
+			showButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-down", (int) PREF_HEADER_HEIGHT-2));
+		}
+		else {
+			showButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-up", (int) PREF_HEADER_HEIGHT-2));
+		}
+		
+	}
+
 	/**
 	 * @return the dataGraph
 	 */

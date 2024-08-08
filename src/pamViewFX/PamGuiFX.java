@@ -476,9 +476,11 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 			PamHBox playControls=new PamHBox();
 			recordButton=new PamButton();
 //			recordButton.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.CIRCLE, Color.LIMEGREEN, PamGuiManagerFX.iconSize));
-			recordButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-checkbox-blank-circle", Color.LIMEGREEN, PamGuiManagerFX.iconSize));
+			recordButton.setGraphic(PamGlyphDude.createPamIcon("mdi2r-record-circle", Color.RED, PamGuiManagerFX.iconSize));
 			recordButton.getStyleClass().add("transparent-button");
-			recordButton.setStyle(" -fx-background-radius: 50;");
+			
+			//recordButton.setStyle(" -fx-background-radius: 50;");
+			
 			recordButton.setOnAction((action)->{
 				if (PamController.getInstance().getPamStatus()==PamController.PAM_RUNNING){
 					PamController.getInstance().pamStop();
@@ -487,6 +489,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 				else {
 					PamController.getInstance().pamStart();
 					pamGuiManagerFX.setPamRunning(true);
+					
 				}
 			});
 
@@ -494,7 +497,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 //			playButton.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.PLAY, Color.BLACK, PamGuiManagerFX.iconSize));
 			playButton.setGraphic(PamGlyphDude.createPamIcon("mdi2p-play", Color.BLACK, PamGuiManagerFX.iconSize));
 			playButton.getStyleClass().add("transparent-button");
-			playButton.setStyle(" -fx-background-radius: 50;");
+			//playButton.setStyle(" -fx-background-radius: 50;");
 			playButton.setOnAction((action)->{
 				//TODO
 				//start pamguard
@@ -505,7 +508,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 			playControls.getChildren().addAll(recordButton,playButton);
 			playControls.setSpacing(10);
 			playControls.setPadding(new Insets(0,10,0,20));
-			playControls.getStyleClass().add("pane-opaque");
+//			playControls.getStyleClass().add("pane-opaque");
 			playControls.setPrefHeight(prefHeight);
 			playControls.setAlignment(Pos.CENTER);
 			
@@ -514,7 +517,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 			rightHBox.setAlignment(Pos.CENTER_LEFT);
 			rightHBox.setPadding(new Insets(0,10,0,20));
 			rightHBox.setSpacing(5);
-			rightHBox.getStyleClass().add("pane-opaque");
+//			rightHBox.getStyleClass().add("pane-opaque");
 			
 			editWindows=new ToggleSwitch("Resize"); 
 			//HACK,

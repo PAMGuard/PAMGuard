@@ -10,10 +10,7 @@ import org.jamdev.jdl4pam.transforms.SimpleTransformParams;
 import org.jamdev.jdl4pam.transforms.DLTransform.DLTransformType;
 import org.junit.jupiter.api.Test;
 
-import PamDetection.RawDataUnit;
 import PamUtils.PamArrayUtils;
-import PamguardMVC.RawDataHolder;
-import matchedTemplateClassifer.MatchTemplate;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericModelWorker;
 import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
@@ -25,7 +22,7 @@ import us.hebi.matlab.mat.types.Struct;
 
 public class ClickDLTest {
 
-	
+
 	@Test
 	public void clickDLTest() {
 		
@@ -38,7 +35,6 @@ public class ClickDLTest {
 		String clicksPath  =	"./src/test/resources/rawDeepLearningClassifier/Generic/risso_click/clicks.mat";
 
 		Path path = Paths.get(relModelPath);
-
 
 		GenericModelWorker genericModelWorker = new GenericModelWorker(); 
 
@@ -53,7 +49,6 @@ public class ClickDLTest {
 				
 		genericModelParams.dlTransfromParams = dlTransformParamsArr;
 		genericModelParams.dlTransfroms = DLTransformsFactory.makeDLTransforms((ArrayList<DLTransfromParams>)genericModelParams.dlTransfromParams); 
-		
 		
 		//create the clicks. 
 		path = Paths.get(clicksPath);

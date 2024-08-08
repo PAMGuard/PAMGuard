@@ -223,6 +223,9 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 		timeScrollBar.getTextBox().setPrefWidth(100);
 
 		timeScrollBar.setPrefHeight(50);
+		
+		//set this to zero just so that we know if it has been set or not
+		timeScrollBar.setVisibleAmount(0.);
 
 		holder.setCenter(timeScrollBar);
 		holder.setBottom(timeLabelPane);
@@ -388,7 +391,12 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 		timeScrollBar.setMaxVal(Math.max(dataSeconds, screenSeconds)*1000L);
 		timeScrollBar.setBlockIncrement(Math.max(1, screenSeconds * 4/5));
 		//			timeScrollBar.setUnitIncrement(Math.max(1, screenSeconds / 20));
-		timeScrollBar.setVisibleAmount(screenSeconds*1000L);
+		
+		//there might already have a visible amount in which case we do not wish to change. This is a bit of a hack 
+		//to figure out whether the visible amount has already been set. 
+		if (timeScrollBar.getVisibleAmount()==0) {
+			timeScrollBar.setVisibleAmount(screenSeconds*1000L);
+		}
 		timeScrollBar.setCurrentValue(currentPos);
 		
 		//now paint the canvas to show the data. 
@@ -479,13 +487,13 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 		return dataMapPaneFX;
 	}
 
-	int lastHScaleChoice=-1; 
-	public void scaleChange() {
-		if (lastHScaleChoice != dataMapControl.dataMapParameters.hScaleChoice) {
-			lastHScaleChoice = dataMapControl.dataMapParameters.hScaleChoice;
-			setupScrollBar();
-		}
-		this.notifyScrollChange();
-	}
+//	int lastHScaleChoice=-1; 
+//	public void scaleChange() {
+//		if (lastHScaleChoice != dataMapControl.dataMapParameters.hScaleChoice) {
+//			lastHScaleChoice = dataMapControl.dataMapParameters.hScaleChoice;
+//			setupScrollBar();
+//		}
+//		this.notifyScrollChange();
+//	}
 
 }
