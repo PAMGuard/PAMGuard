@@ -58,10 +58,13 @@ import tethys.species.DataBlockSpeciesManager;
 import dataGram.DatagramProvider;
 import dataMap.BespokeDataMapGraphic;
 import dataMap.OfflineDataMap;
+import effort.EffortProvider;
+import effort.binary.BinaryEffortProvider;
 import annotation.DataAnnotationType;
 import annotation.handler.AnnotationHandler;
 import binaryFileStorage.BinaryDataSource;
 import binaryFileStorage.BinaryOfflineDataMap;
+import binaryFileStorage.BinaryStore;
 import binaryFileStorage.SecondaryBinaryStore;
 import PamController.OfflineDataStore;
 import PamController.PamControlledUnit;
@@ -3054,7 +3057,16 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 		case PamControllerInterface.HYDROPHONE_ARRAY_CHANGED:
 			clearDataOrigins();
 			break;
+		case PamController.INITIALIZATION_COMPLETE:
+			autoEffortProvider();
+			break;
+		case PamController.ADD_CONTROLLEDUNIT:
+			if (PamController.getInstance().isInitializationComplete()) {
+				autoEffortProvider();
+			}
+			break;
 		}
+		
 	}
 
 	/**
@@ -3657,6 +3669,8 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	private PamSymbolManager pamSymbolManager;
 
 	private DataSelectorCreator dataSelectorCreator;
+
+	private EffortProvider effortProvider;
 
 	public void setRecordingTrigger(RecorderTrigger recorderTrigger) {
 		this.recorderTrigger = recorderTrigger;
@@ -4344,5 +4358,38 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 				tObs.dumpBufferStatus(message, sayEmpties);
 			}
 		}
+	}
+	/**
+	 * @return the effort provider. 
+	 */
+	public EffortProvider getEffortProvider() {
+		return effortProvider;
+	}
+
+	/**
+	 * Auto generate an effort provider. This may get called many times
+	 * for blocks without effort, but that doesn't really matter since its
+	 * only going to happen when opening dialogs, etc. 
+	 * @return
+	 */
+	private EffortProvider autoEffortProvider() {
+		if (effortProvider != null) {
+			// don't change if there already is one. 
+			return effortProvider;
+		}
+		// see if we can do an auto binary one. 
+		BinaryStore binaryStore = BinaryStore.findBinaryStoreControl();
+		if (binaryStore != null && getBinaryDataSource() != null) {
+			return new BinaryEffortProvider(this);
+		}
+		// other options may follow ...
+		return null;
+	}
+
+	/**
+	 * @param effortProvider the effortProvider to set
+	 */
+	protected void setEffortProvider(EffortProvider effortProvider) {
+		this.effortProvider = effortProvider;
 	}
 }
