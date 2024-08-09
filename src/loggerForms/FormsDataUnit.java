@@ -3,6 +3,7 @@ package loggerForms;
 import GPS.GpsData;
 import PamUtils.PamCalendar;
 import PamguardMVC.PamDataUnit;
+import generalDatabase.SQLTypes;
 /**
  * 
  * @author Graham Weatherup
@@ -92,6 +93,63 @@ public class FormsDataUnit extends PamDataUnit {
 			}
 		}
 		return formOriginLatLong;
+	}
+
+	@Override
+	public long getTimeMilliseconds() {
+		Long time = findTimeValue(PropertyTypes.STARTTIME);
+		if (time != null) {
+			return time;
+		}
+		return super.getTimeMilliseconds();
+	}
+
+	/**
+	 * Find one of the time property controls and get its value. 
+	 * @param timeProperty
+	 * @return
+	 */
+	public Long findTimeValue(PropertyTypes timeProperty) {
+		if (formData == null) {
+			return null;
+		}
+		PropertyDescription prop = formDescription.findProperty(timeProperty);
+		if (prop == null) {
+			return null;
+		}
+		String ctrlTitle = prop.getItemInformation().getStringProperty("Title");
+		if (ctrlTitle == null) {
+			return null;
+		}
+		int timeControlIndex = formDescription.findInputControlByName(ctrlTitle);
+		if (timeControlIndex < 0 || timeControlIndex >= formData.length) {
+			return null;
+		}
+		Object timeObj = formData[timeControlIndex];
+		/*
+		 *  this should have found the time contol in the form of a string from the database.
+		 *  try to unpack it.  
+		 */
+		Long timeMillis = SQLTypes.millisFromTimeStamp(timeObj);
+		
+		return timeMillis;
+	}
+	
+	/**
+	 * find a correctly set property value for the end time (if set). 
+	 * @return
+	 */
+	public Long getSetEndTime() {
+		return findTimeValue(PropertyTypes.ENDTIME);
+	}
+
+	@Override
+	public long getEndTimeInMilliseconds() {
+		Long time = findTimeValue(PropertyTypes.ENDTIME);
+		if (time != null) {
+			return time;
+		}
+		return super.getEndTimeInMilliseconds();
 	}
 
 

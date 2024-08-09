@@ -2,10 +2,13 @@ package loggerForms;
 
 import java.util.ArrayList;
 
+import PamController.PamViewParameters;
 import loggerForms.controlDescriptions.ControlDescription;
 import loggerForms.controlDescriptions.InputControlDescription;
+import pamScrollSystem.ViewLoadObserver;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import generalDatabase.PamConnection;
 import generalDatabase.SQLLogging;
 import generalDatabase.SQLTypes;
 
@@ -130,6 +133,17 @@ public class FormsLogging extends SQLLogging {
 		
 //		LoggerForm.
 //		return new FormsDataUnit(null, timeMilliseconds, formDescription, formData);
+	}
+
+
+
+	@Override
+	public boolean loadViewData(PamConnection con, PamViewParameters pamViewParameters, ViewLoadObserver loadObserver) {
+		boolean ans = super.loadViewData(con, pamViewParameters, loadObserver);
+		if (ans) {
+			getPamDataBlock().sortData();
+		}
+		return ans;
 	}
 
 }

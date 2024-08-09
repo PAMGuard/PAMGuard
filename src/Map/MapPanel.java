@@ -38,6 +38,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Vector;
@@ -83,6 +84,7 @@ import PamView.paneloverlay.overlaymark.MarkOverlayDraw;
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.PamSymbolManager;
 import PamView.symbol.SymbolData;
+import PamView.symbol.modifier.SymbolModifier;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
@@ -90,6 +92,8 @@ import PamguardMVC.PamObserver;
 import PamguardMVC.dataSelector.DataSelectDialog;
 import PamguardMVC.dataSelector.DataSelector;
 import PamguardMVC.debug.Debug;
+import effort.EffortDataUnit;
+import effort.EffortProvider;
 import pamMaths.PamVector;
 
 /**
@@ -797,22 +801,67 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 		}
 		return PamCalendar.getTimeInMillis();
 	}
+	
+	private EffortProvider findEffortProvider() {
+		if (simpleMapRef.mapParameters.colourByEffort == false) {
+			return null;
+		}
+		if (simpleMapRef.effortDataBlock == null) {
+			return null;
+		}
+		return simpleMapRef.effortDataBlock.getEffortProvider();
+	}
 
 	private void paintTrack(Graphics g, PamDataUnit lastDrawnUnit) {
 
-		long mapStartTime = getMapStartTime();
-		g.setColor(PamColors.getInstance().getColor(PamColor.GPSTRACK));
+		GPSDataBlock gpsDataBlock = simpleMapRef.getGpsDataBlock();
+		if (gpsDataBlock == null) {
+			return;
+		}
+		PamSymbolChooser symbolModifier = null;
+		List<EffortDataUnit> effortThings = null;
+		EffortDataUnit currentEffortThing = null;
+		EffortProvider effortProvider = findEffortProvider();
+		PamSymbol effortSymbol = null;
+		Iterator<EffortDataUnit> effortIterator = null;
+		if (effortProvider != null) {
+			symbolModifier = effortProvider.getSymbolChooser(simpleMapRef.getSelectorName(), rectProj);
+			effortThings = effortProvider.getAllEffortThings();
+			if (effortThings.size() == 0) {
+				effortThings = null;
+			}
+			else {
+				effortIterator = effortThings.iterator();
+			}
+			if (effortIterator != null && effortIterator.hasNext()) {
+				currentEffortThing = effortIterator.next();
+				if (symbolModifier != null) {
+//					effortSymbol = symbolModifier.getPamSymbol(rectProj, currentEffortThing); 
+					effortSymbol = effortProvider.getPamSymbol(symbolModifier, currentEffortThing);
+				}
+			}
+		}
 		Graphics2D g2d = (Graphics2D) g;
-		g2d.setStroke(new BasicStroke(1));
+		long mapStartTime = getMapStartTime();
+		Color defaultColour = PamColors.getInstance().getColor(PamColor.GPSTRACK);
+		if (effortSymbol != null) {
+			g2d.setStroke(new BasicStroke(effortSymbol.getLineThickness()));
+		}
+		else {
+			g2d.setStroke(new BasicStroke(1));
+		}
+		if (effortSymbol != null && mapStartTime > currentEffortThing.getEffortStart()) {
+			g.setColor(effortSymbol.getLineColor());
+		}
+		else {
+			g.setColor(defaultColour);
+		}
+		
 		// GPSControl gpsControl = GPSControl.getGpsControl();
 		// if (gpsControl == null) {
 		// return;
 		// }
 		// PamDataBlock<GpsDataUnit> gpsDataBlock = gpsControl.getGpsDataBlock();
-		GPSDataBlock gpsDataBlock = simpleMapRef.getGpsDataBlock();
-		if (gpsDataBlock == null) {
-			return;
-		}
 		long t1 = getMapStartTime(), t2 = Long.MAX_VALUE;
 		if (PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW) {
 			t1 = simpleMapRef.getViewerScroller().getMinimumMillis();
@@ -826,13 +875,42 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 			GpsDataUnit dataUnit;
 			synchronized (gpsDataBlock.getSynchLock()) {
 				ListIterator<GpsDataUnit> gpsIterator = gpsDataBlock.getListIterator(0);
+				dataUnit = gpsIterator.next();
+				
 				if (gpsIterator.hasNext()) {
-					dataUnit = gpsIterator.next();
+					
 					gpsData = dataUnit.getGpsData();
 					lastFixTime = dataUnit.getTimeMilliseconds();
+					
+					
+					
 					c1 = rectProj.getCoord3d(gpsData.getLatitude(), gpsData.getLongitude(), 0.);
 					while (gpsIterator.hasNext()) {
 						dataUnit = gpsIterator.next();
+						
+						// sort out effort colours. 
+						if (currentEffortThing != null) {
+							if (dataUnit.getTimeMilliseconds() > currentEffortThing.getEffortEnd()) {
+								// get the next one. then decide if we're in or not. 
+								if (effortIterator.hasNext()) {
+									currentEffortThing = effortIterator.next();
+									if (symbolModifier != null) {
+										effortSymbol = effortProvider.getPamSymbol(symbolModifier, currentEffortThing);
+									}
+								}
+								else {
+									currentEffortThing = null;
+									effortSymbol = null;
+								}
+							}
+						}
+						if (effortSymbol != null && currentEffortThing.inEffort(dataUnit.getTimeMilliseconds())) {
+							g.setColor(effortSymbol.getLineColor());
+						}
+						else {
+							g.setColor(defaultColour);
+						}
+						
 						gpsData = dataUnit.getGpsData();
 						if (gpsData.isDataOk() == false) {
 							continue;
@@ -1055,7 +1133,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 					mapDrawingOptions = null;
 					rectProj.setProjectorDrawingOptions(null);
 				}
-				DataSelector ds = dataBlock.getDataSelector(simpleMapRef.getUnitName(), false, DATASELECTNAME);
+				DataSelector ds = dataBlock.getDataSelector(simpleMapRef.getSelectorName(), false, DATASELECTNAME);
 				rectProj.setDataSelector(ds);
 				// see if the datablock has a symbol manager.
 				PamSymbolManager symbolManager = dataBlock.getPamSymbolManager();
@@ -1850,6 +1928,19 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 
 	public void setMapController(MapController mapController) {
 		this.mapController = mapController;
+	}
+
+	@Override
+	public String getToolTipText(MouseEvent event) {
+		String tip =  super.getToolTipText(event);
+		if (tip == null) {
+			return tip;
+		}
+		if (tip.startsWith("<html>GPS") == false) {
+			return tip;
+		}
+		
+		return tip;
 	}
 
 

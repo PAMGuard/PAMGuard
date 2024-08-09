@@ -75,6 +75,7 @@ import loggerForms.formdesign.FormList;
 import loggerForms.propertyInfos.BEARINGinfo;
 import loggerForms.propertyInfos.HEADINGinfo;
 import loggerForms.propertyInfos.RANGEinfo;
+import loggerForms.symbol.LoggerSymbolManager;
 /**
  * 
  * @author Graham Weatherup - SMRU
@@ -242,7 +243,7 @@ public class FormDescription implements Cloneable, Comparable<FormDescription> {
 		formsDataBlock = new FormsDataBlock(this, getFormName(), formsControl.getFormsProcess(), 0);
 		formsDataBlock.SetLogging(new FormsLogging(this,formsDataBlock));
 		formsDataBlock.setOverlayDraw(new LoggerFormGraphics(formsControl, this));
-		formsDataBlock.setPamSymbolManager(new StandardSymbolManager(formsDataBlock, LoggerFormGraphics.defaultSymbol, false));
+		formsDataBlock.setPamSymbolManager(new LoggerSymbolManager(formsDataBlock));
 
 
 		setTimeOfNextSave();

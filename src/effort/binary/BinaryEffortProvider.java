@@ -11,43 +11,45 @@ import PamguardMVC.dataSelector.DataSelector;
 import binaryFileStorage.BinaryStore;
 import dataMap.OfflineDataMap;
 import dataMap.OfflineDataMapPoint;
-import effort.EffortDataThing;
+import effort.EffortDataUnit;
 import effort.EffortProvider;
 
 public class BinaryEffortProvider extends EffortProvider {
+	
+	private BinarySymbolManager binarySymbolManager;
 
 	public BinaryEffortProvider(PamDataBlock parentDataBlock) {
 		super(parentDataBlock);
-		
+		binarySymbolManager = new BinarySymbolManager(parentDataBlock);
 	}
 
 	@Override
-	public EffortDataThing getEffort(long timeMilliseconds) {
+	public EffortDataUnit getEffort(long timeMilliseconds) {
 		OfflineDataMap dataMap = findBinaryMap();
 		if (dataMap == null) {
 			return null;
 		}
 		OfflineDataMapPoint foundPt = dataMap.findMapPoint(timeMilliseconds);
 		if (foundPt != null) {
-			return new BinaryEffortThing(foundPt.getStartTime(), foundPt.getEndTime());
+			return new BinaryEffortThing(getParentDataBlock(), foundPt.getStartTime(), foundPt.getEndTime());
 		}
 		return null;
 	}
 
 	@Override
-	public List<EffortDataThing> getAllEffortThings() {
+	public List<EffortDataUnit> getAllEffortThings() {
 		// should merge continuous binary data into one big lump or several big lumps if duty cycled. 		
 		OfflineDataMap dataMap = findBinaryMap();
 		if (dataMap == null) {
 			return null;
 		}
-		ArrayList<EffortDataThing> allPoints = new ArrayList<>();
+		ArrayList<EffortDataUnit> allPoints = new ArrayList<>();
 		Iterator<OfflineDataMapPoint> it = dataMap.getListIterator();
 		BinaryEffortThing currentThing = null;
 		while (it.hasNext()) {
 			OfflineDataMapPoint pt = it.next();
 			if (currentThing == null || pt.getStartTime() > currentThing.getEffortEnd()) {
-				currentThing = new BinaryEffortThing(pt.getStartTime(), pt.getEndTime());
+				currentThing = new BinaryEffortThing(getParentDataBlock(), pt.getStartTime(), pt.getEndTime());
 				allPoints.add(currentThing);
 			}
 			else {
@@ -71,8 +73,7 @@ public class BinaryEffortProvider extends EffortProvider {
 
 	@Override
 	public PamSymbolManager getSymbolManager() {
-		// TODO Auto-generated method stub
-		return null;
+		return binarySymbolManager;
 	}
 
 }

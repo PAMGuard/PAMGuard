@@ -201,6 +201,8 @@ public class SimpleMap extends JPanel implements PamObserver, PamScrollObserver,
 
 	private GridbaseControl gridBaseControl;
 
+	protected PamDataBlock effortDataBlock;
+
 	// JToolTip mouseToolTip;
 
 	public SimpleMap(MapController mapController, boolean isMainTab, MapPanel mapPanel) {
@@ -262,6 +264,14 @@ public class SimpleMap extends JPanel implements PamObserver, PamScrollObserver,
 
 	public SimpleMap(MapController mapController, boolean isMainTab) {
 		this(mapController, isMainTab, new MapPanel(mapController, null));
+	}
+	
+	/**
+	 * Name for data selectors and data filters. 
+	 * @return
+	 */
+	public String getSelectorName() {
+		return getUnitName();
 	}
 
 	public String getUnitName() {
@@ -1206,6 +1216,7 @@ public class SimpleMap extends JPanel implements PamObserver, PamScrollObserver,
 				getViewerScroller().reLoad();
 			}
 		}
+		effortDataBlock = PamController.getInstance().getDataBlockByLongName(mapParameters.effortDataSource); 
 	}
 
 	@Override

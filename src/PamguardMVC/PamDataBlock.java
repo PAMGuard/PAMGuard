@@ -3058,11 +3058,11 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			clearDataOrigins();
 			break;
 		case PamController.INITIALIZATION_COMPLETE:
-			autoEffortProvider();
+			effortProvider = autoEffortProvider();
 			break;
 		case PamController.ADD_CONTROLLEDUNIT:
 			if (PamController.getInstance().isInitializationComplete()) {
-				autoEffortProvider();
+				effortProvider = autoEffortProvider();
 			}
 			break;
 		}
@@ -4359,6 +4359,8 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			}
 		}
 	}
+	
+	
 	/**
 	 * @return the effort provider. 
 	 */
@@ -4372,7 +4374,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 * only going to happen when opening dialogs, etc. 
 	 * @return
 	 */
-	private EffortProvider autoEffortProvider() {
+	public EffortProvider autoEffortProvider() {
 		if (effortProvider != null) {
 			// don't change if there already is one. 
 			return effortProvider;

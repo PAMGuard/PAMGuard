@@ -1,12 +1,18 @@
 package effort;
 
+import java.awt.Frame;
+import java.awt.Window;
 import java.util.List;
 
+import Map.MapParametersDialog;
 import PamView.GeneralProjector;
+import PamView.PamSymbol;
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.PamSymbolManager;
+import PamView.symbol.SwingSymbolOptionsPanel;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import PamguardMVC.dataSelector.DataSelectDialog;
 import PamguardMVC.dataSelector.DataSelector;
 
 /**
@@ -31,14 +37,14 @@ public abstract class EffortProvider {
 	 * @param timeMilliseconds 
 	 * @return Effort thing. Can be null if off effort. 
 	 */
-	public abstract EffortDataThing getEffort(long timeMilliseconds);
+	public abstract EffortDataUnit getEffort(long timeMilliseconds);
 	
 	/**
 	 * Get all effort things. e.g. for binary data this is more or less a copy of 
 	 * the datamap (perhaps new units without the gaps). 
 	 * @return
 	 */
-	public abstract List<EffortDataThing> getAllEffortThings();
+	public abstract List<EffortDataUnit> getAllEffortThings();
 
 	/**
 	 * @return the parentDataBlock
@@ -70,6 +76,42 @@ public abstract class EffortProvider {
 			return null;
 		}
 		return symbolManager.getSymbolChooser(chooserName, projector);
+	}
+	
+	public PamSymbol getPamSymbol(String symbolChooserName, PamDataUnit dataUnit, GeneralProjector projector) {
+		PamSymbolChooser chooser = getSymbolChooser(symbolChooserName, projector);
+		return getPamSymbol(chooser, dataUnit);
+	}
+
+	public PamSymbol getPamSymbol(PamSymbolChooser chooser, PamDataUnit dataUnit) {
+		if (chooser == null) {
+			return null;
+		}
+		// possible that the data is an Effort unit that wraps a real data unit. Need to 
+		// probably pass the original. 
+		if (dataUnit instanceof EffortDataUnit) {
+			PamDataUnit refData = ((EffortDataUnit) dataUnit).getReferenceDataUnit();
+			if (refData != null) {
+				dataUnit = refData;
+			}
+		}
+		
+		return chooser.getPamSymbol(chooser.getProjector(), dataUnit);
+	}
+
+	public boolean showOptionsDialog(Window parent, String observerName) {
+		PamSymbolChooser symbolChooser = getSymbolChooser(observerName, null);
+		if (symbolChooser == null) {
+			return false;
+		}
+		SwingSymbolOptionsPanel panel = symbolChooser.getSwingOptionsPanel(null);
+		if (panel == null) {
+			return false;
+		}
+		DataSelectDialog dataSelectDialog = new DataSelectDialog(parent, parentDataBlock, null, symbolChooser);
+		boolean ans = dataSelectDialog.showDialog();
+		
+		return ans;
 	}
 	
 }
