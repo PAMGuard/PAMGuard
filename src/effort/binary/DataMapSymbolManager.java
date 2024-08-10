@@ -6,11 +6,11 @@ import PamView.symbol.SymbolData;
 import PamView.symbol.SymbolOnlyManager;
 import PamguardMVC.PamDataBlock;
 
-public class BinarySymbolManager extends SymbolOnlyManager {
+public class DataMapSymbolManager extends SymbolOnlyManager {
 
 	public static SymbolData defaultSymbol = new SymbolData();
 	
-	public BinarySymbolManager(PamDataBlock pamDataBlock) {
+	public DataMapSymbolManager(PamDataBlock pamDataBlock) {
 		super(pamDataBlock, defaultSymbol);
 	}
 

@@ -27,9 +27,12 @@ public class LoggerEffortProvider extends EffortProvider {
 
 	@Override
 	public EffortDataUnit getEffort(long timeMilliseconds) {
-		ListIterator<FormsDataUnit> iterator = formsDataBlock.getListIterator(timeMilliseconds, 0xFFFFFFFF, PamDataBlock.MATCH_BEFORE, PamDataBlock.POSITION_BEFORE);
+		ListIterator<FormsDataUnit> iterator = formsDataBlock.getListIterator(timeMilliseconds, 0, PamDataBlock.MATCH_BEFORE, PamDataBlock.POSITION_BEFORE);
 		FormsDataUnit currentUnit = null;
 		FormsDataUnit nextUnit = null;
+		if (iterator == null) {
+			return null;
+		}
 				
 		if (iterator.hasNext()) {
 			currentUnit = iterator.next();
@@ -42,7 +45,7 @@ public class LoggerEffortProvider extends EffortProvider {
 		}
 		long endTime = getEndTime(currentUnit, nextUnit);
 		
-		return new FormsEffortUnit(currentUnit, endTime);
+		return new FormsEffortUnit(this, currentUnit, endTime);
 	}
 
 	private long getEndTime(FormsDataUnit currentUnit, FormsDataUnit nextUnit) {
@@ -70,12 +73,12 @@ public class LoggerEffortProvider extends EffortProvider {
 		while (iterator.hasNext()) {
 			nextUnit = iterator.next();
 			long end = getEndTime(currentUnit, nextUnit);
-			allList.add(new FormsEffortUnit(currentUnit, end));
+			allList.add(new FormsEffortUnit(this, currentUnit, end));
 			currentUnit = nextUnit;
 		}
 		if (currentUnit != null) {
 			long end = getEndTime(currentUnit, null);
-			allList.add(new FormsEffortUnit(currentUnit, end));
+			allList.add(new FormsEffortUnit(this, currentUnit, end));
 		}
 		return allList;		
 	}
@@ -106,6 +109,11 @@ public class LoggerEffortProvider extends EffortProvider {
 		}
 		
 		return lastTime;
+	}
+
+	@Override
+	public String getName() {
+		return formsDataBlock.getDataName();
 	}
 
 }

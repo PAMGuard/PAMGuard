@@ -33,6 +33,11 @@ import pamScrollSystem.PamScroller;
 import pamScrollSystem.PamScrollerData;
 import userDisplay.UserDisplayControl;
 
+/**
+ * Record scroll effort. 
+ * @author dg50
+ *
+ */
 public class EffortControl extends PamControlledUnit implements PamSettings{
 
 	public static String unitType = "Scroll Effort";

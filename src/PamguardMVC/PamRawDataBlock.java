@@ -34,6 +34,7 @@ import Acquisition.RawDataBinaryDataSource;
 import PamController.PamController;
 import PamDetection.RawDataUnit;
 import PamUtils.PamUtils;
+import dataMap.OfflineDataMap;
 import effort.EffortProvider;
 
 /**

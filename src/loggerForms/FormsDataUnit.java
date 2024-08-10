@@ -13,9 +13,6 @@ import generalDatabase.SQLTypes;
  * UTCmillisecond
  * PCLocalTime
  * 
- * 
- * 
- * 
  */
 public class FormsDataUnit extends PamDataUnit {
 

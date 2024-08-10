@@ -2,14 +2,15 @@ package effort.binary;
 
 import PamguardMVC.PamDataBlock;
 import effort.EffortDataUnit;
+import effort.EffortProvider;
 
-public class BinaryEffortThing extends EffortDataUnit {
+public class DataMapEffortThing extends EffortDataUnit {
 
 	
 	private PamDataBlock parentDatablock;
 
-	public BinaryEffortThing(PamDataBlock parentDatablock, long effortStart, long effortEnd) {
-		super(null, effortStart, effortEnd);
+	public DataMapEffortThing(EffortProvider effortProvider, PamDataBlock parentDatablock, long effortStart, long effortEnd) {
+		super(effortProvider, null, effortStart, effortEnd);
 		this.parentDatablock = parentDatablock;
 	}
 

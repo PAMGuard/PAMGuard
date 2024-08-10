@@ -34,6 +34,7 @@ import PamUtils.LatLong;
 import PamUtils.PamCoordinate;
 import PamUtils.PamUtils;
 import PamguardMVC.debug.Debug;
+import effort.EffortDataUnit;
 
 /**
  * The Map Rectangle Projector.
@@ -427,7 +428,15 @@ public class MapRectProjector extends MapProjector {
 		if (rPix > 20) {
 			return null;
 		}
-		return closest.getSummaryString();
+		EffortDataUnit effortData = mapPanelRef.findEffortThing(closest.getTimeMilliseconds());
+		if (effortData == null) {
+			return closest.getSummaryString();
+		}
+		else {
+			String effSummary = effortData.toString();
+			String str = closest.getSummaryString() + "Effort: " + effSummary;
+			return str;
+		}
 	}
 
 

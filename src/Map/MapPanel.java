@@ -1943,6 +1943,14 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 		return tip;
 	}
 
+	public EffortDataUnit findEffortThing(long timeMilliseconds) {
+		EffortProvider effortProvider = findEffortProvider();
+		if (effortProvider == null) {
+			return null;
+		}
+		return effortProvider.getEffort(timeMilliseconds);
+	}
+
 
 
 }

@@ -15,7 +15,8 @@ public class LoggerSymbolChooser extends StandardSymbolChooser {
 	public LoggerSymbolChooser(StandardSymbolManager standardSymbolManager, FormsDataBlock pamDataBlock,
 			String displayName, SymbolData defaultSymbol, GeneralProjector projector) {
 		super(standardSymbolManager, pamDataBlock, displayName, defaultSymbol, projector);
-		this.formsDataBlock = pamDataBlock;
+		this.formsDataBlock = pamDataBlock;		
+		
 	}
 
 

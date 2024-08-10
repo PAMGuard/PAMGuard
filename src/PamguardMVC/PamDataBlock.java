@@ -59,7 +59,7 @@ import dataGram.DatagramProvider;
 import dataMap.BespokeDataMapGraphic;
 import dataMap.OfflineDataMap;
 import effort.EffortProvider;
-import effort.binary.BinaryEffortProvider;
+import effort.binary.DataMapEffortProvider;
 import annotation.DataAnnotationType;
 import annotation.handler.AnnotationHandler;
 import binaryFileStorage.BinaryDataSource;
@@ -4382,7 +4382,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 		// see if we can do an auto binary one. 
 		BinaryStore binaryStore = BinaryStore.findBinaryStoreControl();
 		if (binaryStore != null && getBinaryDataSource() != null) {
-			return new BinaryEffortProvider(this);
+			return new DataMapEffortProvider(this, BinaryStore.class);
 		}
 		// other options may follow ...
 		return null;

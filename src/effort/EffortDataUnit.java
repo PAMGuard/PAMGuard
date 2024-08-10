@@ -6,10 +6,12 @@ import PamguardMVC.PamDataUnit;
 public class EffortDataUnit extends PamDataUnit {
 
 	private PamDataUnit referenceDataUnit;
+	private EffortProvider effortProvider;
 
-	public EffortDataUnit(PamDataUnit referenceDataUnit, long effortStart, long effortEnd) {
+	public EffortDataUnit(EffortProvider effortProvider, PamDataUnit referenceDataUnit, long effortStart, long effortEnd) {
 		super(effortStart);
 		getBasicData().setEndTime(effortEnd);
+		this.effortProvider = effortProvider;
 		this.setReferenceDataUnit(referenceDataUnit);
 	}
 
@@ -71,7 +73,7 @@ public class EffortDataUnit extends PamDataUnit {
 
 	@Override
 	public String toString() {
-		return String.format("%s to %s", PamCalendar.formatDBDateTime(getEffortStart()), PamCalendar.formatDBDateTime(getEffortEnd()));
+		return String.format("%s %s to %s",effortProvider.getName(), PamCalendar.formatDBDateTime(getEffortStart()), PamCalendar.formatDBDateTime(getEffortEnd()));
 	}
 
 	@Override

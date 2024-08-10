@@ -49,8 +49,13 @@ public class GpsEffortProvider extends EffortProvider {
 		if (dataMap == null) {
 			return null;
 		}
-		EffortDataUnit effData = new EffortDataUnit(null, dataMap.getFirstDataTime(), dataMap.getLastDataTime());
+		EffortDataUnit effData = new EffortDataUnit(this, null, dataMap.getFirstDataTime(), dataMap.getLastDataTime());
 		return effData;
+	}
+
+	@Override
+	public String getName() {
+		return gpsDataBlock.getDataName();
 	}
 
 }

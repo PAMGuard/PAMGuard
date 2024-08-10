@@ -61,6 +61,11 @@ public abstract class EffortProvider {
 	 * @return 
 	 */
 	public abstract DataSelector getDataSelector(String selectorName);
+	
+	/**
+	 * Get the name of this effort provider. 
+	 */
+	public abstract String getName();
 
 	/**
 	 * Get a symbol manager. For specialist effort modules, this will probably call

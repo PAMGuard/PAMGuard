@@ -7,8 +7,8 @@ public class FormsEffortUnit extends EffortDataUnit {
 
 	private FormsDataUnit parentFormUnit;
 
-	public FormsEffortUnit(FormsDataUnit parentFormUnit, long formEndTime) {
-		super(parentFormUnit, parentFormUnit.getTimeMilliseconds(), formEndTime);
+	public FormsEffortUnit(LoggerEffortProvider loggerEffortProvider, FormsDataUnit parentFormUnit, long formEndTime) {
+		super(loggerEffortProvider, parentFormUnit, parentFormUnit.getTimeMilliseconds(), formEndTime);
 		this.parentFormUnit = parentFormUnit;
 	}
 
