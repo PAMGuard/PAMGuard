@@ -1,6 +1,9 @@
 package PamView.symbol;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.io.Serializable;
 
 import PamView.PamSymbolType;
@@ -163,6 +166,19 @@ public class SymbolData implements Serializable, Cloneable {
 	 */
 	public void setSymbol(PamSymbolType symbol) {
 		this.symbol = symbol;
+	}
+
+	/**
+	 * Set the line properties for the given graphics handle. 
+	 * @param g
+	 */
+	public void setGraphicsProperties(Graphics g) {
+		if (lineColor != null) {
+			g.setColor(lineColor);
+		}
+		if (lineThickness != 1) {
+			((Graphics2D) g).setStroke(new BasicStroke(lineThickness));
+		}
 	}
 
 }

@@ -135,6 +135,8 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 	private AffineTransform baseXform;
 
 	private boolean repaintBase = false;
+	
+	private EffortDataUnit latestEffort;
 
 	public MapPanel(MapController mapController, SimpleMap simpleMap) {
 		this.mapController = mapController;
@@ -790,6 +792,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 
 	private GpsDataUnit lastDrawGpsDataUnit;
 	private Coordinate3d lastGpsCoodinate;
+	private PamSymbol latestSymbol;
 
 	long getMapStartTime() {
 		switch (PamController.getInstance().getRunMode()) {
@@ -802,7 +805,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 		return PamCalendar.getTimeInMillis();
 	}
 	
-	private EffortProvider findEffortProvider() {
+	public EffortProvider findEffortProvider() {
 		if (simpleMapRef.mapParameters.colourByEffort == false) {
 			return null;
 		}
@@ -813,6 +816,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 	}
 
 	private void paintTrack(Graphics g, PamDataUnit lastDrawnUnit) {
+
 
 		GPSDataBlock gpsDataBlock = simpleMapRef.getGpsDataBlock();
 		if (gpsDataBlock == null) {
@@ -827,7 +831,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 		if (effortProvider != null) {
 			symbolModifier = effortProvider.getSymbolChooser(simpleMapRef.getSelectorName(), rectProj);
 			effortThings = effortProvider.getAllEffortThings();
-			if (effortThings.size() == 0) {
+			if (effortThings == null || effortThings.size() == 0) {
 				effortThings = null;
 			}
 			else {
@@ -838,6 +842,8 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 				if (symbolModifier != null) {
 //					effortSymbol = symbolModifier.getPamSymbol(rectProj, currentEffortThing); 
 					effortSymbol = effortProvider.getPamSymbol(symbolModifier, currentEffortThing);
+					latestEffort = currentEffortThing;
+					latestSymbol = effortSymbol;
 				}
 			}
 		}
@@ -889,8 +895,8 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 						dataUnit = gpsIterator.next();
 						
 						// sort out effort colours. 
-						if (currentEffortThing != null) {
-							if (dataUnit.getTimeMilliseconds() > currentEffortThing.getEffortEnd()) {
+//						if (currentEffortThing != null) {
+							while (currentEffortThing != null && dataUnit.getTimeMilliseconds() > currentEffortThing.getEffortEnd()) {
 								// get the next one. then decide if we're in or not. 
 								if (effortIterator.hasNext()) {
 									currentEffortThing = effortIterator.next();
@@ -899,16 +905,22 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 									}
 								}
 								else {
-									currentEffortThing = null;
-									effortSymbol = null;
+									break;
 								}
+//								else {
+//									currentEffortThing = null;
+//									effortSymbol = null;
+//								}
 							}
-						}
+//						}
 						if (effortSymbol != null && currentEffortThing.inEffort(dataUnit.getTimeMilliseconds())) {
 							g.setColor(effortSymbol.getLineColor());
+							latestEffort = currentEffortThing;
+							latestSymbol = effortSymbol;
 						}
 						else {
 							g.setColor(defaultColour);
+//							latestSymbol = null;
 						}
 						
 						gpsData = dataUnit.getGpsData();
@@ -987,7 +999,40 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 	private void paintNewGPSData(Graphics g, GpsDataUnit newGpsDataUnit) {
 
 		Coordinate3d c2;
-		g.setColor(PamColors.getInstance().getColor(PamColor.GPSTRACK));
+//		g.setColor(PamColors.getInstance().getColor(PamColor.GPSTRACK));
+//		if (latestSymbol != null) {
+//			float t = latestSymbol.getLineThickness();
+//			if (t != 1) {
+//				Graphics2D g2d = (Graphics2D) g;
+//				g2d.setStroke(new BasicStroke(t));
+//			}
+//			if (latestEffort != null && latestEffort.inEffort(newGpsDataUnit.getTimeMilliseconds())) {
+//				g.setColor(latestSymbol.getLineColor());
+//			}
+//		}
+//		else {
+		EffortProvider effortProvider = findEffortProvider();
+		boolean effSet = false;
+		if (effortProvider != null) {
+			latestEffort = effortProvider.getLastEffort();
+			if (latestEffort != null) {
+				PamSymbolChooser symbolModifier = effortProvider.getSymbolChooser(simpleMapRef.getSelectorName(), rectProj);
+				if (symbolModifier != null) {
+					PamSymbol symbol = symbolModifier.getPamSymbol(rectProj, latestEffort);
+					if (symbol != null && latestEffort.inEffort(newGpsDataUnit.getTimeMilliseconds())) {
+						symbol.getSymbolData().setGraphicsProperties(g);
+						effSet = true;
+					}
+				}
+			}
+		}
+		if (!effSet) {
+			g.setColor(PamColors.getInstance().getColor(PamColor.GPSTRACK));
+		}
+		/**
+		 * This can get quite long, so need to do the same iterating through the effort data as for normal plotting. 
+		 */
+		
 		GpsData gpsData = newGpsDataUnit.getGpsData();
 		c2 = rectProj.getCoord3d(gpsData.getLatitude(), gpsData.getLongitude(), 0.);
 		if (lastGpsCoodinate != null) {
@@ -1337,6 +1382,10 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 	
 	@Override
 	public void updateData(PamObservable observable, PamDataUnit pamDataUnit) {
+		if (observable == simpleMapRef.effortDataBlock) {
+			System.out.println("Effort update, so repaint base");
+			repaintBaseDrawing();
+		}
 		repaint(250);
 	}
 
@@ -1417,6 +1466,10 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 			for (PamDataBlock aBlock : sensorBlocks) {
 				aBlock.addObserver(this);
 			}
+		}
+		EffortProvider effBlock = findEffortProvider();
+		if (effBlock != null) {
+			effBlock.getParentDataBlock().addObserver(this);
 		}
 	}
 

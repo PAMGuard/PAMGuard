@@ -2,9 +2,12 @@ package effort;
 
 import java.awt.Frame;
 import java.awt.Window;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import Map.MapParametersDialog;
+import PamController.PamController;
 import PamView.GeneralProjector;
 import PamView.PamSymbol;
 import PamView.symbol.PamSymbolChooser;
@@ -19,25 +22,68 @@ import PamguardMVC.dataSelector.DataSelector;
  * Set of functions that can be returned from any datablock which can 
  * give information about effort. For detectors with binary storage, they 
  * will return a standard binary store effort provider. Others, e.g. 
- * logger forms, acquisition, etc. can so something much more bespoke. 
+ * logger forms, acquisition, etc. can so something much more bespoke. <p>
+ * For real time, will need quite different behaviour to offline. Datablocks
+ * with a effortProvider are going to notify this and a local list will be 
+ * kept of starts and ends for the entire operation period. This will be 
+ * overridden for differeing offline scenarios and bespoke cases such as 
+ * logger forms (so need to get a notification in here for every data unit too !)
  * @author dg50
  *
  */
 public abstract class EffortProvider {
 
 	private PamDataBlock parentDataBlock;
+	private boolean isViewer;
 
 	public EffortProvider(PamDataBlock parentDataBlock) {
 		super();
 		this.parentDataBlock = parentDataBlock;
+		this.isViewer = PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW;
 	}
+	
+	/**
+	 * Notified at real time start. 
+	 * @param timeMilliseconds
+	 */
+	public abstract void realTimeStart(long timeMilliseconds);
+	
+	/**
+	 * notified at real time end
+	 * @param timeMilliseconds
+	 */
+	public abstract void realTimeStop(long timeMilliseconds); ;
+	
+	/**
+	 * Notified for real time data. 
+	 * @param pamDataUnit
+	 */
+	public abstract void newData(PamDataUnit pamDataUnit); ;
 	
 	/**
 	 * Get the effort for a specific time. 
 	 * @param timeMilliseconds 
 	 * @return Effort thing. Can be null if off effort. 
 	 */
-	public abstract EffortDataUnit getEffort(long timeMilliseconds);
+	public EffortDataUnit getEffort(long timeMilliseconds) {
+		List<EffortDataUnit> allEfforts = getAllEffortThings();
+		if (allEfforts == null) {
+			return null;
+		}
+		Iterator<EffortDataUnit> it = allEfforts.iterator();
+		while (it.hasNext()) {
+			EffortDataUnit next = it.next();
+			if (timeMilliseconds >= next.getEffortStart() && timeMilliseconds <= next.getEffortEnd()) {
+				return next;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Called when viewer data have been loaded for the parent datablock. 
+	 */
+	public abstract void viewerLoadData();
 	
 	/**
 	 * Get all effort things. e.g. for binary data this is more or less a copy of 
@@ -117,6 +163,21 @@ public abstract class EffortProvider {
 		boolean ans = dataSelectDialog.showDialog();
 		
 		return ans;
+	}
+
+	/**
+	 * @return the isViewer
+	 */
+	public boolean isViewer() {
+		return isViewer;
+	}
+
+	public EffortDataUnit getLastEffort() {
+		List<EffortDataUnit> all = getAllEffortThings();
+		if (all == null || all.size() == 0) {
+			return null;
+		}
+		return all.get(all.size()-1);
 	}
 	
 }

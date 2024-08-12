@@ -1272,6 +1272,10 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			 */
 			if (shouldNotify()) {
 				notifyInstantObservers(pamDataUnit);
+				EffortProvider effProvider = getEffortProvider();
+				if (effProvider != null) {
+					effProvider.newData(pamDataUnit);
+				}
 			}
 
 			if (offlineDataLoading.isCurrentOfflineLoadKeep()) {
@@ -4393,5 +4397,26 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 */
 	protected void setEffortProvider(EffortProvider effortProvider) {
 		this.effortProvider = effortProvider;
+	}
+
+	/**
+	 * Need this notification at startup time to perform a few standard actions. 
+	 * @param startTime
+	 */
+	public void pamStart(long startTime) {
+		EffortProvider effP = getEffortProvider();
+		if (effP != null) {
+			effP.realTimeStart(startTime);
+		}
+	}
+	/**
+	 * Need this notification at stop time to perform a few standard actions. 
+	 * @param startTime
+	 */
+	public void pamStop(long stopTime) {
+		EffortProvider effP = getEffortProvider();
+		if (effP != null) {
+			effP.realTimeStop(stopTime);
+		}
 	}
 }

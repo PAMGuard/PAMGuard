@@ -7,6 +7,7 @@ import java.util.ListIterator;
 import PamController.PamController;
 import PamView.symbol.PamSymbolManager;
 import PamguardMVC.PamDataBlock;
+import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataSelector.DataSelector;
 import dataMap.OfflineDataMap;
 import effort.EffortDataUnit;
@@ -18,6 +19,8 @@ import loggerForms.FormsDataUnit;
 public class LoggerEffortProvider extends EffortProvider {
 
 	private FormsDataBlock formsDataBlock;
+	
+	private ArrayList<EffortDataUnit> onlineEffort;
 
 	public LoggerEffortProvider(FormsDataBlock parentDataBlock) {
 		super(parentDataBlock);
@@ -25,28 +28,28 @@ public class LoggerEffortProvider extends EffortProvider {
 		FormDescription formsDescription = parentDataBlock.getFormDescription();
 	}
 
-	@Override
-	public EffortDataUnit getEffort(long timeMilliseconds) {
-		ListIterator<FormsDataUnit> iterator = formsDataBlock.getListIterator(timeMilliseconds, 0, PamDataBlock.MATCH_BEFORE, PamDataBlock.POSITION_BEFORE);
-		FormsDataUnit currentUnit = null;
-		FormsDataUnit nextUnit = null;
-		if (iterator == null) {
-			return null;
-		}
-				
-		if (iterator.hasNext()) {
-			currentUnit = iterator.next();
-		}
-		if (iterator.hasNext()) {
-			nextUnit = iterator.next();
-		}
-		if (currentUnit == null) {
-			return null;
-		}
-		long endTime = getEndTime(currentUnit, nextUnit);
-		
-		return new FormsEffortUnit(this, currentUnit, endTime);
-	}
+//	@Override
+//	public EffortDataUnit getEffort(long timeMilliseconds) {
+//		ListIterator<FormsDataUnit> iterator = formsDataBlock.getListIterator(timeMilliseconds, 0, PamDataBlock.MATCH_BEFORE, PamDataBlock.POSITION_BEFORE);
+//		FormsDataUnit currentUnit = null;
+//		FormsDataUnit nextUnit = null;
+//		if (iterator == null) {
+//			return null;
+//		}
+//				
+//		if (iterator.hasNext()) {
+//			currentUnit = iterator.next();
+//		}
+//		if (iterator.hasNext()) {
+//			nextUnit = iterator.next();
+//		}
+//		if (currentUnit == null) {
+//			return null;
+//		}
+//		long endTime = getEndTime(currentUnit, nextUnit);
+//		
+//		return new FormsEffortUnit(this, currentUnit, endTime);
+//	}
 
 	private long getEndTime(FormsDataUnit currentUnit, FormsDataUnit nextUnit) {
 		Long end = currentUnit.getSetEndTime();
@@ -63,6 +66,11 @@ public class LoggerEffortProvider extends EffortProvider {
 	
 	@Override
 	public List<EffortDataUnit> getAllEffortThings() {
+			return onlineEffort;
+	}
+	
+	@Override
+	public void viewerLoadData() {
 		ArrayList<EffortDataUnit> allList = new ArrayList();
 		ListIterator<FormsDataUnit> iterator = formsDataBlock.getListIterator(0);
 		FormsDataUnit currentUnit = null;
@@ -80,7 +88,7 @@ public class LoggerEffortProvider extends EffortProvider {
 			long end = getEndTime(currentUnit, null);
 			allList.add(new FormsEffortUnit(this, currentUnit, end));
 		}
-		return allList;		
+		onlineEffort = allList;		
 	}
 
 	@Override
@@ -114,6 +122,44 @@ public class LoggerEffortProvider extends EffortProvider {
 	@Override
 	public String getName() {
 		return formsDataBlock.getDataName();
+	}
+
+	@Override
+	public void realTimeStart(long timeMilliseconds) {
+		// Don't do anything with start and end of processing 
+	}
+
+	@Override
+	public void realTimeStop(long timeMilliseconds) {
+		// Don't do anything with start and end of processing 
+	}
+
+	@Override
+	public void newData(PamDataUnit pamDataUnit) {
+		// generate effort things from incoming form data. 
+		if (onlineEffort == null) {
+			onlineEffort = new ArrayList<>();
+		}
+		FormsEffortUnit lastEffort = null;
+		if (onlineEffort.size() > 0) {
+			lastEffort = (FormsEffortUnit) onlineEffort.get(onlineEffort.size()-1);
+		}
+		FormsDataUnit formDataUnit = (FormsDataUnit) pamDataUnit;
+		long thisStart = formDataUnit.getTimeMilliseconds();
+		Long thisEnd = formDataUnit.getSetEndTime();
+		if (lastEffort != null) {
+			/*
+			 * If the previous effort didn't have a end time, then use this start as that's end. 
+			 */
+			if (lastEffort.getEffortEnd() == EffortDataUnit.ONGOINGEFFORT) {
+				lastEffort.setEffortEnd(thisStart);
+			}
+		}
+		if (thisEnd == null) {
+			thisEnd = EffortDataUnit.ONGOINGEFFORT;
+		}
+		FormsEffortUnit newEffort = new FormsEffortUnit(this, formDataUnit, thisEnd);
+		onlineEffort.add(newEffort);
 	}
 
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import GPS.GPSDataBlock;
 import PamView.symbol.PamSymbolManager;
+import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataSelector.DataSelector;
 import dataMap.OfflineDataMap;
 import effort.EffortDataUnit;
@@ -15,6 +16,8 @@ public class GpsEffortProvider extends EffortProvider {
 	private GPSDataBlock gpsDataBlock;
 	
 	private GpsEffortSymbolManager effortSymbolManager;
+	
+	private EffortDataUnit realTimeData;
 
 	public GpsEffortProvider(GPSDataBlock parentDataBlock) {
 		super(parentDataBlock);
@@ -24,13 +27,16 @@ public class GpsEffortProvider extends EffortProvider {
 
 	@Override
 	public EffortDataUnit getEffort(long timeMilliseconds) {
-		return makeSingleEffort();
+		return getSingleEffort();
 	}
 
 	@Override
 	public List<EffortDataUnit> getAllEffortThings() {
+		EffortDataUnit singleEff = getSingleEffort();
 		ArrayList<EffortDataUnit> effList = new ArrayList<>(1);
-		effList.add(makeSingleEffort());
+		if (singleEff != null) {
+			effList.add(singleEff);
+		}
 		return effList;
 	}
 
@@ -44,7 +50,10 @@ public class GpsEffortProvider extends EffortProvider {
 		return effortSymbolManager;
 	}
 	
-	private EffortDataUnit makeSingleEffort() {
+	private EffortDataUnit getSingleEffort() {
+		if (!isViewer()) {
+			return realTimeData;
+		}
 		OfflineDataMap dataMap = gpsDataBlock.getPrimaryDataMap();
 		if (dataMap == null) {
 			return null;
@@ -56,6 +65,32 @@ public class GpsEffortProvider extends EffortProvider {
 	@Override
 	public String getName() {
 		return gpsDataBlock.getDataName();
+	}
+
+	@Override
+	public void realTimeStart(long timeMilliseconds) {
+		// Do nothing
+	}
+
+	@Override
+	public void realTimeStop(long timeMilliseconds) {
+		// Do nothing
+	}
+
+	@Override
+	public void newData(PamDataUnit pamDataUnit) {
+		if (realTimeData == null) {
+			realTimeData = new EffortDataUnit(this,null,pamDataUnit.getTimeMilliseconds(), pamDataUnit.getTimeMilliseconds());
+		}
+		else {
+			realTimeData.setEffortEnd(pamDataUnit.getTimeMilliseconds());
+		}
+	}
+
+	@Override
+	public void viewerLoadData() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -101,6 +101,7 @@ import PamguardMVC.PamObservable;
 import PamguardMVC.PamObserver;
 import PamguardMVC.dataSelector.DataSelector;
 import PamguardMVC.debug.Debug;
+import effort.EffortProvider;
 
 /**
  * Mainly a container for map objects, holding the main MapPanel and the right
@@ -580,6 +581,8 @@ public class SimpleMap extends JPanel implements PamObserver, PamScrollObserver,
 		}
 
 		initViewerControls();
+
+		effortDataBlock = PamController.getInstance().getDataBlockByLongName(mapParameters.effortDataSource); 
 		
 		if (mapFileManager != null) {
 			mapFileManager.readFileData(mapParameters.mapFile);
@@ -1156,8 +1159,22 @@ public class SimpleMap extends JPanel implements PamObserver, PamScrollObserver,
 				}
 			}
 		}
+		subscribeEffortProvider();
 		return changes;
 
+	}
+	
+	/**
+	 * Subscribe the effort provider to the scroller. 
+	 */
+	private void subscribeEffortProvider() {
+		if (viewerScroller == null) {
+			return;
+		}
+		EffortProvider effProv = mapPanel.findEffortProvider();
+		if (effProv != null) {
+			viewerScroller.addDataBlock(effProv.getParentDataBlock());
+		}
 	}
 
 	public PamScrollSlider getViewerScroller() {

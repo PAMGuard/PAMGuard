@@ -5,8 +5,14 @@ import PamguardMVC.PamDataUnit;
 
 public class EffortDataUnit extends PamDataUnit {
 
+	/**
+	 * Value for effort end to say that effort is ongoing. 
+	 */
+	public static final long ONGOINGEFFORT = Long.MAX_VALUE/2;
+	
 	private PamDataUnit referenceDataUnit;
 	private EffortProvider effortProvider;
+	
 
 	public EffortDataUnit(EffortProvider effortProvider, PamDataUnit referenceDataUnit, long effortStart, long effortEnd) {
 		super(effortStart);
