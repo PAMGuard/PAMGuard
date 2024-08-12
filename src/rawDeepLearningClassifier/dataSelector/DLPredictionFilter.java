@@ -41,7 +41,18 @@ public class DLPredictionFilter implements DLDataFilter {
 	@Override
 	public int scoreDLData(PamDataUnit dataUnit) {
 
-		
+		int maxIndex =  getHighestIndex( dataUnit);
+			
+		return maxIndex>=0 ? 1 : 0;
+	}
+	
+	/**
+	 * Get the index of the class with the highest score and which passes a minimum prediction value.
+	 * @param dataUnit - the data unit to find the highest class for. 
+	 * @return the index of the class with the  highest score that is greater than the min class prediction. -1 if there is no class that passes prediction.  
+	 */
+	private int getHighestIndex(PamDataUnit dataUnit) {
+
 		DLAnnotation annotation = (DLAnnotation) dataUnit. findDataAnnotation(DLAnnotation.class) ;
 
 		if (annotation==null) return -1;

@@ -129,7 +129,7 @@ public class DLDataSelector extends AnnotationDataSelector<DLAnnotation> {
 	@Override
 	public double scoreData(PamDataUnit pamDataUnit) {
 		int score = dataFilters.get(dlDataSelectParams.dataSelectorIndex).scoreDLData(pamDataUnit);
-		return score>=0 ? 1 : 0;
+		return score;
 	}
 
 	@Override
