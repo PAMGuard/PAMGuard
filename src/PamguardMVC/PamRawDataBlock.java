@@ -34,6 +34,8 @@ import Acquisition.RawDataBinaryDataSource;
 import PamController.PamController;
 import PamDetection.RawDataUnit;
 import PamUtils.PamUtils;
+import dataMap.OfflineDataMap;
+import effort.EffortProvider;
 
 /**
  * Extension of RecyclingDataBlock that is used for Raw audio data. 
@@ -601,6 +603,13 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 			}
 		}
 	}
+
+	@Override
+	public EffortProvider autoEffortProvider() {
+		return null;
+	}
+
+
 
 //	@Override
 //	protected void findParentSource() {

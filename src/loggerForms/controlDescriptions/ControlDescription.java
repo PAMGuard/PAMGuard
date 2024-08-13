@@ -3,8 +3,6 @@
  */
 package loggerForms.controlDescriptions;
 
-import generalDatabase.EmptyTableDefinition;
-
 import java.sql.Types;
 
 import javax.swing.JPanel;
@@ -12,7 +10,6 @@ import javax.swing.JPanel;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import PamUtils.XMLUtils;
 import loggerForms.FormDescription;
 import loggerForms.FormsDataUnit;
 import loggerForms.FormsTableItem;
@@ -37,7 +34,6 @@ public abstract class ControlDescription extends ItemDescription  {
 	protected ControlDescription(FormDescription formDescription, ItemInformation itemInformation) {
 		super(formDescription, itemInformation);
 		eType = ControlTypes.valueOf(getType());
-//		System.out.println(getType()+";"+eType.toString());
 	}
 	
 	
@@ -87,11 +83,6 @@ public abstract class ControlDescription extends ItemDescription  {
 		}
 		return formsTableItems;
 	}
-	
-	
-	
-	
-	
 	
 	private ControlTypes eType;
 	

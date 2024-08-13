@@ -59,7 +59,7 @@ import dataGram.DatagramProvider;
 import dataMap.BespokeDataMapGraphic;
 import dataMap.OfflineDataMap;
 import effort.EffortProvider;
-import effort.binary.BinaryEffortProvider;
+import effort.binary.DataMapEffortProvider;
 import annotation.DataAnnotationType;
 import annotation.handler.AnnotationHandler;
 import binaryFileStorage.BinaryDataSource;
@@ -1084,6 +1084,11 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			System.err.printf("Not loading %s since initialisation not yet complete\n", getDataName());
 			return false;
 		}
+//		long tenDays = 3600L*24L*1000L*10L;
+//		if (offlineDataLoadInfo.getEndMillis() - offlineDataLoadInfo.getStartMillis() > tenDays) {
+//			System.out.printf("Big many day data load %s to %s in %s", PamCalendar.formatDateTime(offlineDataLoadInfo.getStartMillis()),
+//					PamCalendar.formatDateTime(offlineDataLoadInfo.getEndMillis()) ,getLongDataName());
+//		}
 
 		saveViewerData();
 
@@ -1126,6 +1131,11 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			long uid = iter.next().getUID();
 			firstViewerUID = Math.min(firstViewerUID, uid);
 			lastViewerUID = Math.max(lastViewerUID, uid);
+		}
+		
+		EffortProvider effProv = getEffortProvider();
+		if (effProv != null) {
+			effProv.viewerLoadData();
 		}
 
 		return loadOk;
@@ -1272,6 +1282,10 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			 */
 			if (shouldNotify()) {
 				notifyInstantObservers(pamDataUnit);
+				EffortProvider effProvider = getEffortProvider();
+				if (effProvider != null) {
+					effProvider.newData(pamDataUnit);
+				}
 			}
 
 			if (offlineDataLoading.isCurrentOfflineLoadKeep()) {
@@ -3058,11 +3072,11 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			clearDataOrigins();
 			break;
 		case PamController.INITIALIZATION_COMPLETE:
-			autoEffortProvider();
+			effortProvider = autoEffortProvider();
 			break;
 		case PamController.ADD_CONTROLLEDUNIT:
 			if (PamController.getInstance().isInitializationComplete()) {
-				autoEffortProvider();
+				effortProvider = autoEffortProvider();
 			}
 			break;
 		}
@@ -4359,6 +4373,8 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			}
 		}
 	}
+	
+	
 	/**
 	 * @return the effort provider. 
 	 */
@@ -4372,7 +4388,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 * only going to happen when opening dialogs, etc. 
 	 * @return
 	 */
-	private EffortProvider autoEffortProvider() {
+	public EffortProvider autoEffortProvider() {
 		if (effortProvider != null) {
 			// don't change if there already is one. 
 			return effortProvider;
@@ -4380,7 +4396,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 		// see if we can do an auto binary one. 
 		BinaryStore binaryStore = BinaryStore.findBinaryStoreControl();
 		if (binaryStore != null && getBinaryDataSource() != null) {
-			return new BinaryEffortProvider(this);
+			return new DataMapEffortProvider(this, BinaryStore.class);
 		}
 		// other options may follow ...
 		return null;
@@ -4391,5 +4407,26 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 */
 	protected void setEffortProvider(EffortProvider effortProvider) {
 		this.effortProvider = effortProvider;
+	}
+
+	/**
+	 * Need this notification at startup time to perform a few standard actions. 
+	 * @param startTime
+	 */
+	public void pamStart(long startTime) {
+		EffortProvider effP = getEffortProvider();
+		if (effP != null) {
+			effP.realTimeStart(startTime);
+		}
+	}
+	/**
+	 * Need this notification at stop time to perform a few standard actions. 
+	 * @param startTime
+	 */
+	public void pamStop(long stopTime) {
+		EffortProvider effP = getEffortProvider();
+		if (effP != null) {
+			effP.realTimeStop(stopTime);
+		}
 	}
 }

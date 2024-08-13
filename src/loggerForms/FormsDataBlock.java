@@ -7,6 +7,8 @@ import PamguardMVC.PamProcess;
 import PamguardMVC.dataSelector.DataSelector;
 import PamguardMVC.dataSelector.DataSelectorCreator;
 import loggerForms.dataselect.FormDataSelCreator;
+import loggerForms.effort.FormsEffortUnit;
+import loggerForms.effort.LoggerEffortProvider;
 import loggerForms.monitor.FormsDataSelectorCreator;
 /**
  * 
@@ -16,6 +18,8 @@ import loggerForms.monitor.FormsDataSelectorCreator;
 public class FormsDataBlock extends PamDataBlock<FormsDataUnit> {
 	
 	private FormDescription formDescription;
+	
+	private LoggerEffortProvider loggerEffortProvider;
 
 	public FormsDataBlock(FormDescription formDescription, String dataName,
 			PamProcess parentProcess, int channelMap) {
@@ -25,6 +29,7 @@ public class FormsDataBlock extends PamDataBlock<FormsDataUnit> {
 		setDataSelectCreator(new FormDataSelCreator(this, formDescription));
 //		setBinaryDataSource(new FormsBinaryIO(formDescription.getFormsControl(), this));
 //		setNaturalLifetimeMillis(60000);
+		setEffortProvider(loggerEffortProvider = new LoggerEffortProvider(this));
 	}
 
 	public FormDescription getFormDescription() {

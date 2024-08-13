@@ -32,6 +32,7 @@ import PamView.PamSymbolType;
 import PamView.PanelOverlayDraw;
 import PamView.GeneralProjector.ParameterType;
 import PamView.GeneralProjector.ParameterUnits;
+import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.SymbolData;
 import PamguardMVC.PamDataUnit;
 
@@ -189,7 +190,7 @@ public class LoggerFormGraphics extends PanelOverlayDraw {
 
 		double shipCourse = plotOrigin.getCourseOverGround();
 		double shipHead = plotOrigin.getHeading();
-		PamSymbol plotSymbol = getPlotSymbol(formDataUnit);
+		PamSymbol plotSymbol = getPlotSymbol(generalProjector, formDataUnit);
 
 		Coordinate3d detOrigin = generalProjector.getCoord3d(plotOrigin.getLatitude(), plotOrigin.getLongitude(), plotOrigin.getHeight());
 		// see if there is range heading and bearing data. 
@@ -248,7 +249,7 @@ public class LoggerFormGraphics extends PanelOverlayDraw {
 		int nControls = data.length;
 		ControlDescription controlDescription;
 		ArrayList<InputControlDescription> controlDescriptions = formDescription.getInputControlDescriptions();
-		PamSymbol plotSymbol = getPlotSymbol(dataUnit);
+		PamSymbol plotSymbol = getPlotSymbol(generalProjector, dataUnit);
 		if (plotSymbol == null) {
 			return null;
 		}
@@ -354,7 +355,22 @@ public class LoggerFormGraphics extends PanelOverlayDraw {
 	 * @param pamDataUnit data unit to plot
 	 * @return symbol. 
 	 */
-	private PamSymbol getPlotSymbol(FormsDataUnit dataUnit) {
+	private PamSymbol getPlotSymbol(GeneralProjector projector, FormsDataUnit dataUnit) {
+		/**
+		 * Try to use the new selector system. If it's not there, then revert to
+		 * the older system. 
+		 */
+		PamSymbolChooser chooser = null;
+		if (projector != null) {
+			chooser = projector.getPamSymbolChooser();
+		}
+		if (chooser != null) {
+			PamSymbol chosenSymbol = chooser.getPamSymbol(projector, dataUnit);
+			if (chosenSymbol != null) {
+				return chosenSymbol;
+			}
+		}
+		
 		/**
 		 * first go through all the controls and see which is 
 		 * the first one that's initiated plotting. If it's 
@@ -409,22 +425,7 @@ public class LoggerFormGraphics extends PanelOverlayDraw {
 	@Override
 	public String getHoverText(GeneralProjector generalProjector,
 			PamDataUnit dataUnit, int iSide) {
-		FormsDataUnit formsDU = (FormsDataUnit) dataUnit;
-		String str = String.format("<html><b>%s</b>", formDescription.getFormNiceName());
-		Object[] data = formsDU.getFormData();
-		int iDat = 0;
-		for (ControlDescription cd:formDescription.getInputControlDescriptions()) {
-			if (data[iDat] == null) {
-				str += String.format("<p>%s: -", cd.getTitle());
-			}
-			else {
-				str += String.format("<p>%s: %s", cd.getTitle(), data[iDat].toString());
-			}
-			iDat++;
-		}
-
-		str += "</html>";
-		return str;
+		return dataUnit.getSummaryString();
 	}
 
 	private void createSymbols() {
