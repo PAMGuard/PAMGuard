@@ -2,8 +2,10 @@ package loggerForms;
 
 import GPS.GpsData;
 import PamUtils.PamCalendar;
+import PamView.GeneralProjector;
 import PamguardMVC.PamDataUnit;
 import generalDatabase.SQLTypes;
+import loggerForms.controlDescriptions.ControlDescription;
 /**
  * 
  * @author Graham Weatherup
@@ -147,6 +149,25 @@ public class FormsDataUnit extends PamDataUnit {
 			return time;
 		}
 		return super.getEndTimeInMilliseconds();
+	}
+	
+	@Override
+	public String getSummaryString() {
+		String str = String.format("<html><b>%s</b>", formDescription.getFormNiceName());
+		Object[] data = getFormData();
+		int iDat = 0;
+		for (ControlDescription cd:formDescription.getInputControlDescriptions()) {
+			if (data[iDat] == null) {
+				str += String.format("<p>%s: -", cd.getTitle());
+			}
+			else {
+				str += String.format("<p>%s: %s", cd.getTitle(), data[iDat].toString());
+			}
+			iDat++;
+		}
+
+		str += "</html>";
+		return str;
 	}
 
 

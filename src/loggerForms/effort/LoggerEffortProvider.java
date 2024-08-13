@@ -151,7 +151,7 @@ public class LoggerEffortProvider extends EffortProvider {
 			/*
 			 * If the previous effort didn't have a end time, then use this start as that's end. 
 			 */
-			if (lastEffort.getEffortEnd() == EffortDataUnit.ONGOINGEFFORT) {
+			if (lastEffort.getEffortEnd() >= EffortDataUnit.ONGOINGEFFORT/2) {
 				lastEffort.setEffortEnd(thisStart);
 			}
 		}

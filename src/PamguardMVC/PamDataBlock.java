@@ -1084,6 +1084,11 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			System.err.printf("Not loading %s since initialisation not yet complete\n", getDataName());
 			return false;
 		}
+//		long tenDays = 3600L*24L*1000L*10L;
+//		if (offlineDataLoadInfo.getEndMillis() - offlineDataLoadInfo.getStartMillis() > tenDays) {
+//			System.out.printf("Big many day data load %s to %s in %s", PamCalendar.formatDateTime(offlineDataLoadInfo.getStartMillis()),
+//					PamCalendar.formatDateTime(offlineDataLoadInfo.getEndMillis()) ,getLongDataName());
+//		}
 
 		saveViewerData();
 
@@ -1126,6 +1131,11 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			long uid = iter.next().getUID();
 			firstViewerUID = Math.min(firstViewerUID, uid);
 			lastViewerUID = Math.max(lastViewerUID, uid);
+		}
+		
+		EffortProvider effProv = getEffortProvider();
+		if (effProv != null) {
+			effProv.viewerLoadData();
 		}
 
 		return loadOk;

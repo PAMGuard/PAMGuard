@@ -134,6 +134,15 @@ public abstract class EffortProvider {
 		return getPamSymbol(chooser, dataUnit);
 	}
 
+	/**
+	 * Need to use this to get symbols for effort instead of direct calls into 
+	 * the symbol chooser, since the symbol chooser will almost definitely want
+	 * it's own type of data unit, NOT the EffortDataUnit which will probably crash
+	 * due to a cast exception. 
+	 * @param chooser
+	 * @param dataUnit
+	 * @return
+	 */
 	public PamSymbol getPamSymbol(PamSymbolChooser chooser, PamDataUnit dataUnit) {
 		if (chooser == null) {
 			return null;

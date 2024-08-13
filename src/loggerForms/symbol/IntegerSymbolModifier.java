@@ -40,7 +40,7 @@ public class IntegerSymbolModifier extends LoggerSymbolModifier {
 		}
 		if (data instanceof Number) {
 			try {
-				number = (int) (Number) data;
+				number = Integer.valueOf(data.toString());
 			}
 			catch (Exception e) {
 				return null;

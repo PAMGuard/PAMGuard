@@ -79,7 +79,17 @@ public class EffortDataUnit extends PamDataUnit {
 
 	@Override
 	public String toString() {
-		return String.format("%s %s to %s",effortProvider.getName(), PamCalendar.formatDBDateTime(getEffortStart()), PamCalendar.formatDBDateTime(getEffortEnd()));
+		String str;
+		if (getEffortEnd() >= ONGOINGEFFORT/2) {
+			str = String.format("%s ongoing from %s",effortProvider.getName(), PamCalendar.formatDBDateTime(getEffortStart()));
+		}
+		else {
+			str = String.format("%s %s to %s",effortProvider.getName(), PamCalendar.formatDBDateTime(getEffortStart()), PamCalendar.formatDBDateTime(getEffortEnd()));
+		}
+		if (referenceDataUnit != null) {
+			str += "<br>" + referenceDataUnit.getSummaryString();
+		}
+		return str;
 	}
 
 	@Override

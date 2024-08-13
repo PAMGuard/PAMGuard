@@ -1018,7 +1018,8 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 			if (latestEffort != null) {
 				PamSymbolChooser symbolModifier = effortProvider.getSymbolChooser(simpleMapRef.getSelectorName(), rectProj);
 				if (symbolModifier != null) {
-					PamSymbol symbol = symbolModifier.getPamSymbol(rectProj, latestEffort);
+					PamSymbol symbol = effortProvider.getPamSymbol(symbolModifier, latestEffort);
+//					PamSymbol symbol = symbolModifier.getPamSymbol(rectProj, latestEffort);
 					if (symbol != null && latestEffort.inEffort(newGpsDataUnit.getTimeMilliseconds())) {
 						symbol.getSymbolData().setGraphicsProperties(g);
 						effSet = true;
@@ -1375,17 +1376,21 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 
 	@Override
 	public void addData(PamObservable o, PamDataUnit arg) {
-
+//		if (arg instanceof EffortDataUnit) {
+		// won't work since only the data send notifications. 
+//			System.out.println("Effort add, so repaint base");
+//			repaintBaseDrawing();
+//		}
 		// PamDataBlock block = (PamDataBlock) o;
 		repaint(250);
 	}
 	
 	@Override
 	public void updateData(PamObservable observable, PamDataUnit pamDataUnit) {
-		if (observable == simpleMapRef.effortDataBlock) {
-			System.out.println("Effort update, so repaint base");
-			repaintBaseDrawing();
-		}
+//		if (pamDataUnit instanceof EffortDataUnit) {
+//			System.out.println("Effort update, so repaint base");
+//			repaintBaseDrawing();
+//		}
 		repaint(250);
 	}
 

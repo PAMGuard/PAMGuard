@@ -425,22 +425,7 @@ public class LoggerFormGraphics extends PanelOverlayDraw {
 	@Override
 	public String getHoverText(GeneralProjector generalProjector,
 			PamDataUnit dataUnit, int iSide) {
-		FormsDataUnit formsDU = (FormsDataUnit) dataUnit;
-		String str = String.format("<html><b>%s</b>", formDescription.getFormNiceName());
-		Object[] data = formsDU.getFormData();
-		int iDat = 0;
-		for (ControlDescription cd:formDescription.getInputControlDescriptions()) {
-			if (data[iDat] == null) {
-				str += String.format("<p>%s: -", cd.getTitle());
-			}
-			else {
-				str += String.format("<p>%s: %s", cd.getTitle(), data[iDat].toString());
-			}
-			iDat++;
-		}
-
-		str += "</html>";
-		return str;
+		return dataUnit.getSummaryString();
 	}
 
 	private void createSymbols() {
