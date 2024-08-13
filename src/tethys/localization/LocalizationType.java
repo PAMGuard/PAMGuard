@@ -7,5 +7,5 @@ package tethys.localization;
  *
  */
 public enum LocalizationType {
-	Bearing, PerpindicularRange, Point, Range, Track;
+	Bearing, PerpendicularRange, Point, Range, Track;
 }

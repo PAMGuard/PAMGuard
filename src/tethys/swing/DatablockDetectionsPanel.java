@@ -283,7 +283,7 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 			menuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-//					deleteDocument(pDets);
+					deleteDocument(pDets);
 				}
 			});
 			popMenu.add(menuItem);

@@ -13,13 +13,18 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import nilus.AngularCoordinateType;
 import nilus.BearingType;
-import nilus.CoordinateType;
 import nilus.Helper;
 import nilus.LocalizationType;
+import nilus.LocalizationType.Angular;
+import nilus.LocalizationType.Bearing;
+import nilus.LocalizationType.Parameters;
+import nilus.LocalizationType.Parameters.TargetMotionAnalysis;
 import nilus.LocalizationType.References;
 import nilus.LocalizationType.References.Reference;
+import nilus.LocalizationType.WGS84;
 import nilus.Localize;
 import nilus.SpeciesIDType;
+import nilus.WGS84CoordinateType;
 import pamMaths.PamVector;
 import nilus.Localize.Effort.CoordinateReferenceSystem;
 import tethys.Collection;
@@ -121,7 +126,7 @@ public class LocalizationHandler extends CollectionHandler {
 		case Cylindrical:
 			locEl = createCylindricalLoc(localiseDocument, dataBlock, dataUnit, streamExportParams);
 			break;
-		case PerpindicularRange:
+		case PerpendicularRange:
 			locEl = createPerpRange(localiseDocument, dataBlock, dataUnit, streamExportParams);
 			break;
 		case Polar:
@@ -224,30 +229,48 @@ public class LocalizationHandler extends CollectionHandler {
 			return null;
 		}
 		LocalizationType locType = makeBaseLoc(dataBlock, dataUnit);
-		CoordinateType coord = new CoordinateType();
-		coord.setX(latlong.getLongitude());
-		coord.setY(latlong.getLatitude());
-		coord.setZ(latlong.getHeight());
+		
+		
+		/**
+		 * Export the latlong data.
+		 */
+		locType.setEvent(TethysTimeFuncs.xmlGregCalFromMillis(dataUnit.getTimeMilliseconds()).toString());
+		WGS84 wgs84 = new WGS84();
+		WGS84CoordinateType coord = new WGS84CoordinateType();
+		wgs84.setCoordinate(coord);
+		coord.setLongitude(latlong.getLongitude());
+		coord.setLatitude(latlong.getLatitude());
+		coord.setElevationM(AutoTethysProvider.roundDecimalPlaces(latlong.getHeight(),3));
 
 		PamVector planarVec = loc.getPlanarVector();
-		locType.setCoordinate(coord);
+		locType.setWGS84(wgs84);
+		
+//		locType.setParameters(null);
+		Parameters params = locType.getParameters();
+		TargetMotionAnalysis tma = new TargetMotionAnalysis();
+		tma.setStart(TethysTimeFuncs.xmlGregCalFromMillis(dataUnit.getTimeMilliseconds()));
+		tma.setEnd(TethysTimeFuncs.xmlGregCalFromMillis(dataUnit.getEndTimeInMilliseconds()));
+		params.setTargetMotionAnalysis(tma);
+		
 
 		// see if it's possible to get a beam measurement. 
-		if (loc instanceof GroupLocalisation) {
-			GroupLocalisation groupLoc = (GroupLocalisation) loc;
-			GroupLocResult groupLocResult = groupLoc.getGroupLocaResult(0);
-			Double perpDist = groupLocResult.getPerpendicularDistance();
-			Long beamTime = groupLocResult.getBeamTime();
-			if (perpDist != null && beamTime != null) {
-				AngularCoordinateType acType = new AngularCoordinateType();
-				acType.setAngle1(90);
-				acType.setDistanceM(AutoTethysProvider.roundDecimalPlaces(perpDist,1));
-				locType.setAngularCoordinate(acType);
-				locType.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(beamTime));
-				locType.setCoordinate(null);
-			}
-			//			groupLoc.getp
-		}
+//		if (loc instanceof GroupLocalisation) {
+//			GroupLocalisation groupLoc = (GroupLocalisation) loc;
+//			GroupLocResult groupLocResult = groupLoc.getGroupLocaResult(0);
+//			Double perpDist = groupLocResult.getPerpendicularDistance();
+//			Long beamTime = groupLocResult.getBeamTime();
+//			if (perpDist != null && beamTime != null) {
+//				AngularCoordinateType acType = new AngularCoordinateType();
+//				acType.setAngle1(90);
+//				acType.setDistanceM(AutoTethysProvider.roundDecimalPlaces(perpDist,1));
+//				Angular angular = new Angular();
+//				angular.setCoordinate(acType);
+//				locType.setAngular(angular);
+//				locType.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(beamTime));
+//				localiseDocument.getEffort().setTimeReference(TimeReference.beam.toString());
+//			}
+//			//			groupLoc.getp
+//		}
 
 		/*
 		 * Try to also add a range loc. 
@@ -288,7 +311,9 @@ public class LocalizationHandler extends CollectionHandler {
 			//				angType.setAngle2(Math.toDegrees(angles[1]));
 			//			}
 		}
-		locType.setBearing(angType);
+		Bearing bearing = new Bearing();
+		bearing.setCoordinate(angType);
+		locType.setBearing(bearing);
 
 		double[] angErr = loc.getAngleErrors();
 		if (angErr != null && angErr.length >= 1) {
@@ -297,7 +322,7 @@ public class LocalizationHandler extends CollectionHandler {
 			if (angErr.length >= 2) {
 				angErrType.setAngle2(constrainRadianAngle(angErr[1]));
 			}
-			locType.setBearingError(angErrType);
+			bearing.setCoordinateError(angErrType);
 		}
 
 		return locType;
@@ -329,7 +354,9 @@ public class LocalizationHandler extends CollectionHandler {
 		if (loc.hasLocContent(LocContents.HAS_RANGE)) {
 			angType.setDistanceM(loc.getRange(0));
 		}
-		locType.setAngularCoordinate(angType);
+		Angular angular = new Angular();
+		angular.setCoordinate(angType);
+		locType.setAngular(angular);
 
 		double[] angErr = loc.getAngleErrors();
 		if (angErr != null && angErr.length >= 1) {
@@ -341,7 +368,7 @@ public class LocalizationHandler extends CollectionHandler {
 			if (loc.hasLocContent(LocContents.HAS_RANGEERROR)) {
 				angErrType.setDistanceM(loc.getRangeError(0));
 			}
-			locType.setAngularCoordinateError(angErrType);
+			angular.setCoordinateError(angErrType);
 		}
 
 		return locType;

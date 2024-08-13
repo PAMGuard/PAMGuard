@@ -890,6 +890,7 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 			tracks = new Tracks();
 			deployment.getData().setTracks(tracks);
 		}
+		tracks.setSpeedUnit("kn");
 		List<Track> trackList = tracks.getTrack(); // lists are usually there. 
 		
 		Track aTrack = new Track();
@@ -915,7 +916,7 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 				gpsPoint.setBearingDegN(bdn);
 			}
 			bdn.setValue(AutoTethysProvider.roundDecimalPlaces(PamUtils.constrainedAngle(gpsData.getHeading()),1));
-			gpsPoint.setSpeedKn(AutoTethysProvider.roundDecimalPlaces(gpsData.getSpeed(),2));
+			gpsPoint.setSpeed(AutoTethysProvider.roundDecimalPlaces(gpsData.getSpeed(),2));
 			
 			points.add(gpsPoint);
 			lastPointTime = gpsDataUnit.getTimeMilliseconds();

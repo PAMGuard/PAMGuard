@@ -802,13 +802,14 @@ public class DetectionsHandler extends CollectionHandler {
 //		List<String> locTypes = locEffort.getLocalizationType();
 		boolean ambiguity = locInfo.hasLocContent(LocContents.HAS_AMBIGUITY);
 		CoordinateReferenceSystem coordRefs = locEffort.getCoordinateReferenceSystem();		
+		List<String> locTypes = locEffort.getLocalizationType();
 		if (locInfo.getLocContent() == 0) {
 			return false;
 		}
 		else if (locInfo.hasLocContent(LocContents.HAS_LATLONG)) {
 			coordRefs.setName(CoordinateName.WGS84.toString());
 			coordRefs.setSubtype(LocalizationSubType.Geographic.toString());
-			locEffort.setLocalizationType(LocalizationType.Point.toString());
+			locTypes.add(LocalizationType.Point.toString());
 //			locEffort.set
 			if (locInfo.hasLocContent(LocContents.HAS_DEPTH)) {
 				locEffort.setDimension(3);
@@ -821,19 +822,19 @@ public class DetectionsHandler extends CollectionHandler {
 		else if (locInfo.hasLocContent(LocContents.HAS_XYZ)) {
 			coordRefs.setName(CoordinateName.Cartesian.toString());
 			coordRefs.setSubtype(LocalizationSubType.Engineering.toString());
-			locEffort.setLocalizationType(LocalizationType.Point.toString());
+			locTypes.add(LocalizationType.Point.toString());
 			locEffort.setDimension(3);
 		}
 		else if (locInfo.hasLocContent(LocContents.HAS_XY)) {
 			coordRefs.setName(CoordinateName.Cartesian.toString());
 			coordRefs.setSubtype(LocalizationSubType.Engineering.toString());
-			locEffort.setLocalizationType(LocalizationType.Point.toString());
+			locTypes.add(LocalizationType.Point.toString());
 			locEffort.setDimension(2);
 		}
 		else if (locInfo.hasLocContent(LocContents.HAS_BEARING)) {
 			coordRefs.setName(CoordinateName.Polar.toString());
 			coordRefs.setSubtype(LocalizationSubType.Engineering.toString());
-			locEffort.setLocalizationType(LocalizationType.Bearing.toString());
+			locTypes.add(LocalizationType.Bearing.toString());
 			if (ambiguity) {
 				locEffort.setDimension(1);
 			}

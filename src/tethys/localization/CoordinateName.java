@@ -7,7 +7,7 @@ package tethys.localization;
  *
  */
 public enum CoordinateName {
-	WGS84, UTM, Cartesian, Polar, Spherical, Cylindrical, Range, PerpindicularRange;
+	WGS84, UTM, Cartesian, Polar, Spherical, Cylindrical, Range, PerpendicularRange;
 	/*
 	 * I beleive there is only one LocalizationSubType for each of these. 
 	 * Cartesian onwards is always engineering subtype
@@ -27,7 +27,7 @@ public enum CoordinateName {
 		switch (this) {
 		case Cartesian:
 		case Cylindrical:
-		case PerpindicularRange:
+		case PerpendicularRange:
 		case Polar:
 		case Range:
 		case Spherical:
