@@ -1,10 +1,11 @@
 package ravendata;
 
+import PamDetection.PamDetection;
 import PamguardMVC.AcousticDataUnit;
 import PamguardMVC.DataUnitBaseData;
 import PamguardMVC.PamDataUnit;
 
-public class RavenDataUnit extends PamDataUnit implements AcousticDataUnit {
+public class RavenDataUnit extends PamDataUnit implements AcousticDataUnit, PamDetection {
 
 	public RavenDataUnit(long timeMilliseconds, int channelMap, long durationMillis, double f1, double f2) {
 		super(timeMilliseconds);

@@ -8,6 +8,7 @@ public class InputStoreInfo {
 	private int nFiles;
 	private long firstFileStart, lastFileStart, lastFileEnd;
 	private long[] fileStartTimes;
+	private long[] allFileEnds;
 	
 	public InputStoreInfo(DataInputStore dataInputStore, int nFiles, long firstFileStart, long lastFileStart, long lastFileEnd) {
 		super();
@@ -95,6 +96,21 @@ public class InputStoreInfo {
 	 */
 	public void setLastFileEnd(long lastFileEnd) {
 		this.lastFileEnd = lastFileEnd;
+	}
+
+	/**
+	 * Set all file end times. 
+	 * @param allFileEnds
+	 */
+	public void setFileEndTimes(long[] allFileEnds) {
+		this.allFileEnds = allFileEnds;
+	}
+
+	/**
+	 * @return the allFileEnds
+	 */
+	public long[] getAllFileEnds() {
+		return allFileEnds;
 	}
 	
 

@@ -9,11 +9,15 @@ import java.util.ArrayList;
 
 import javax.swing.JMenuItem;
 
+import Acquisition.AcquisitionControl;
+import PamController.InputStoreInfo;
 import PamController.PamConfiguration;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
+import PamController.PamController;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import PamView.dialog.warn.WarnOnce;
 import pamViewFX.PamSettingsMenuPane;
 import ravendata.swing.RavenImportDialog;
 
@@ -74,14 +78,11 @@ public class RavenControl extends PamControlledUnit implements PamSettings {
 			return;
 		}
 		if (ravenData != null) {
-			createPAMGuardData(fileReader, ravenData);
+			ravenProcess.createPAMGuardData(fileReader, ravenData);
 		}
 	}
 
-	private void createPAMGuardData(RavenFileReader fileReader, ArrayList<RavenDataRow> ravenData) {
-		// TODO Auto-generated method stub
-		
-	}
+	
 
 	@Override
 	public Serializable getSettingsReference() {

@@ -945,8 +945,12 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		InputStoreInfo storeInfo = new InputStoreInfo(acquisitionControl, allFiles.size(), firstFileStart, lastFileStart, lastFileEnd);
 		if (detail) {
 			long[] allFileStarts = new long[allFiles.size()];
+			long[] allFileEnds = new long[allFiles.size()];
 			for (int i = 0; i < allFiles.size(); i++) {
-				allFileStarts[i] = getFileStartTime(allFiles.get(i).getAbsoluteFile());
+				WavFileType aFile = allFiles.get(i);
+				allFileStarts[i] = getFileStartTime(aFile.getAbsoluteFile());
+				aFile.getAudioInfo();
+				allFileEnds[i] = (allFileStarts[i] + (long) (aFile.getDurationInSeconds()*1000.));
 				if (allFileStarts[i] < firstFileStart) {
 //					System.out.printf("Swap first file from %s to %s\n", firstFile.getName(), allFiles.get(i).getName());
 					firstFile = allFiles.get(i);
@@ -961,6 +965,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			storeInfo.setFirstFileStart(firstFileStart); // just incase changed. 
 			storeInfo.setLastFileEnd(lastFileEnd); // just incase changed
 			storeInfo.setFileStartTimes(allFileStarts);
+			storeInfo.setFileEndTimes(allFileEnds);
 		}
 		return storeInfo;
 	}

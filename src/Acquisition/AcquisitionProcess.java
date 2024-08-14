@@ -1240,6 +1240,9 @@ public class AcquisitionProcess extends PamProcess {
 	}
 
 	public InputStoreInfo getStoreInfo(boolean detail) {
+		if (runningSystem == null) {
+			runningSystem = acquisitionControl.findDaqSystem(null);
+		}
 		if (runningSystem instanceof DataInputStore) {
 			return ((DataInputStore) runningSystem).getStoreInfo(detail);
 		}
