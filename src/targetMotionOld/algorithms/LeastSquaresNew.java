@@ -73,8 +73,7 @@ public class LeastSquaresNew<T extends GroupDetection> extends AbstractTargetMot
 
 	@Override
 	public LocContents getLocContents() {
-		// TODO Auto-generated method stub
-		return null;
+		return new LocContents(LocContents.HAS_LATLONG | LocContents.HAS_PERPENDICULARERRORS);
 	}
 
 	@Override

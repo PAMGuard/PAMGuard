@@ -23,7 +23,7 @@ public enum CoordinateName {
 	 *
 	 */
 	
-	public LocalizationSubType getSubType() {
+	public LocalizationSubTypes getSubType() {
 		switch (this) {
 		case Cartesian:
 		case Cylindrical:
@@ -31,11 +31,11 @@ public enum CoordinateName {
 		case Polar:
 		case Range:
 		case Spherical:
-			return LocalizationSubType.Engineering;
+			return LocalizationSubTypes.Engineering;
 		case UTM:
-			return LocalizationSubType.Derived;
+			return LocalizationSubTypes.Derived;
 		case WGS84:
-			return LocalizationSubType.Geographic;
+			return LocalizationSubTypes.Geographic;
 		default:
 			break;		
 		}

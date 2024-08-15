@@ -1,6 +1,5 @@
 package tethys.detection;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -10,20 +9,12 @@ import javax.swing.SwingWorker;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import Localiser.LocalisationAlgorithm;
-import Localiser.LocalisationAlgorithmInfo;
-import PamController.PamControlledUnit;
 import PamController.PamController;
-import PamController.PamguardVersionInfo;
-import PamDetection.LocContents;
-import PamDetection.LocalisationInfo;
-import PamModel.PamPluginInterface;
 import PamUtils.PamCalendar;
 import PamView.dialog.PamDialog;
 import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
-import PamguardMVC.PamProcess;
 import PamguardMVC.dataSelector.DataSelector;
 import PamguardMVC.superdet.SuperDetDataBlock;
 import PamguardMVC.superdet.SuperDetDataBlock.ViewerLoadPolicy;
@@ -32,20 +23,12 @@ import dataMap.OfflineDataMapPoint;
 import nilus.AlgorithmType;
 import nilus.AlgorithmType.SupportSoftware;
 import nilus.Localize.Effort;
-import nilus.Localize.Effort.CoordinateReferenceSystem;
-import nilus.Localize.Effort.ReferencedDocuments;
-import nilus.Localize.Effort.ReferencedDocuments.Document;
-import nilus.Localize.Localizations;
 import nilus.DataSourceType;
-import nilus.Deployment;
 import nilus.Detection;
-import nilus.DetectionEffort;
-import nilus.DetectionEffortKind;
 import nilus.DetectionGroup;
 import nilus.Detections;
 import nilus.GranularityEnumType;
 import nilus.Helper;
-import nilus.Localize;
 import tethys.Collection;
 import tethys.CollectionHandler;
 import tethys.TethysControl;
@@ -53,11 +36,8 @@ import tethys.TethysTimeFuncs;
 import tethys.dbxml.DBXMLConnect;
 import tethys.dbxml.TethysException;
 import tethys.deployment.DeploymentHandler;
-import tethys.localization.CoordinateName;
+import tethys.localization.LocalizationBuilder;
 import tethys.localization.LocalizationHandler;
-import tethys.localization.LocalizationSubType;
-import tethys.localization.LocalizationType;
-import tethys.localization.PLocalization;
 import tethys.niluswraps.NilusDataWrapper;
 import tethys.niluswraps.PDeployment;
 import tethys.niluswraps.PDetections;
@@ -78,7 +58,6 @@ import tethys.swing.export.DetectionsExportWizard;
 public class DetectionsHandler extends CollectionHandler {
 
 	public int uniqueDetectionsId=1;
-	public int uniqueDetectionId;
 
 	private volatile boolean activeExport;
 
@@ -134,94 +113,94 @@ public class DetectionsHandler extends CollectionHandler {
 	}
 
 
-	/**
-	 * Get the Detection Effort part of a Detections document
-	 * @param pDeployment
-	 * @param dataBlock
-	 * @param exportParams
-	 * @return
-	 */
-	private DetectionEffort getDetectorEffort(PDeployment pDeployment, PamDataBlock dataBlock, StreamExportParams exportParams) {
-		DetectionEffort effort = new DetectionEffort();
-		Deployment deployment = pDeployment.nilusObject;
-		Long effortStart = pDeployment.getAudioStart();
-		Long effortEnd = pDeployment.getAudioEnd();
-		effort.setStart(TethysTimeFuncs.xmlGregCalFromMillis(effortStart));
-		effort.setEnd(TethysTimeFuncs.xmlGregCalFromMillis(effortEnd));
-		//		effort.set // no setter for DetectionEffortKind
-		List<DetectionEffortKind> effortKinds = effort.getKind();
-
-		TethysDataProvider dataProvider = dataBlock.getTethysDataProvider(tethysControl);
-		dataProvider.getEffortKinds(pDeployment, effortKinds, exportParams);
-
-
-		return effort;
-	}
-
-	/**
-	 * Method string for Detections Algorithm documents.
-	 * @param dataBlock
-	 * @return
-	 */
-	public String getMethodString(PamDataBlock dataBlock) {
-		if (dataBlock == null) {
-			return null;
-		}
-		PamProcess process = dataBlock.getParentProcess();
-		return "PAMGuard " + process.getProcessName();
-
-	}
-
-	/**
-	 * Software string for Detections Algorithm documents.
-	 * @param dataBlock
-	 * @return
-	 */
-	public String getSoftwareString(PamDataBlock dataBlock) {
-		if (dataBlock == null) {
-			return null;
-		}
-		return dataBlock.getLongDataName();
-	}
-
-	/**
-	 * Software string for Detections Algorithm documents.
-	 * @param dataBlock
-	 * @return
-	 */
-	public String getVersionString(PamDataBlock dataBlock) {
-		if (dataBlock == null) {
-			return null;
-		}
-		PamProcess process = dataBlock.getParentProcess();
-		PamControlledUnit pcu = process.getPamControlledUnit();
-		PamPluginInterface plugin = pcu.getPlugin();
-		if (plugin == null) {
-			return PamguardVersionInfo.version;
-		}
-		else {
-			return plugin.getVersion();
-		}
-	}
-
-	/**
-	 * 
-	 * @param dataBlock
-	 * @return default value is PAMGuard
-	 */
-	public String getSupportSoftware(PamDataBlock dataBlock) {
-		return "PAMGuard";
-	}
-
-	/**
-	 * 
-	 * @param dataBlock
-	 * @return PAMGuard version
-	 */
-	public String getSupportSoftwareVersion(PamDataBlock dataBlock) {
-		//		should try to dig into the binary store and get the version from there.
-		return PamguardVersionInfo.version;
-	}
+//	/**
+//	 * Get the Detection Effort part of a Detections document
+//	 * @param pDeployment
+//	 * @param dataBlock
+//	 * @param exportParams
+//	 * @return
+//	 */
+//	private DetectionEffort getDetectorEffort(PDeployment pDeployment, PamDataBlock dataBlock, StreamExportParams exportParams) {
+//		DetectionEffort effort = new DetectionEffort();
+//		Deployment deployment = pDeployment.nilusObject;
+//		Long effortStart = pDeployment.getAudioStart();
+//		Long effortEnd = pDeployment.getAudioEnd();
+//		effort.setStart(TethysTimeFuncs.xmlGregCalFromMillis(effortStart));
+//		effort.setEnd(TethysTimeFuncs.xmlGregCalFromMillis(effortEnd));
+//		//		effort.set // no setter for DetectionEffortKind
+//		List<DetectionEffortKind> effortKinds = effort.getKind();
+//
+//		TethysDataProvider dataProvider = dataBlock.getTethysDataProvider(tethysControl);
+//		dataProvider.getEffortKinds(pDeployment, effortKinds, exportParams);
+//
+//
+//		return effort;
+//	}
+//
+//	/**
+//	 * Method string for Detections Algorithm documents.
+//	 * @param dataBlock
+//	 * @return
+//	 */
+//	public String getMethodString(PamDataBlock dataBlock) {
+//		if (dataBlock == null) {
+//			return null;
+//		}
+//		PamProcess process = dataBlock.getParentProcess();
+//		return "PAMGuard " + process.getProcessName();
+//
+//	}
+//
+//	/**
+//	 * Software string for Detections Algorithm documents.
+//	 * @param dataBlock
+//	 * @return
+//	 */
+//	public String getSoftwareString(PamDataBlock dataBlock) {
+//		if (dataBlock == null) {
+//			return null;
+//		}
+//		return dataBlock.getLongDataName();
+//	}
+//
+//	/**
+//	 * Software string for Detections Algorithm documents.
+//	 * @param dataBlock
+//	 * @return
+//	 */
+//	public String getVersionString(PamDataBlock dataBlock) {
+//		if (dataBlock == null) {
+//			return null;
+//		}
+//		PamProcess process = dataBlock.getParentProcess();
+//		PamControlledUnit pcu = process.getPamControlledUnit();
+//		PamPluginInterface plugin = pcu.getPlugin();
+//		if (plugin == null) {
+//			return PamguardVersionInfo.version;
+//		}
+//		else {
+//			return plugin.getVersion();
+//		}
+//	}
+//
+//	/**
+//	 * 
+//	 * @param dataBlock
+//	 * @return default value is PAMGuard
+//	 */
+//	public String getSupportSoftware(PamDataBlock dataBlock) {
+//		return "PAMGuard";
+//	}
+//
+//	/**
+//	 * 
+//	 * @param dataBlock
+//	 * @return PAMGuard version
+//	 */
+//	public String getSupportSoftwareVersion(PamDataBlock dataBlock) {
+//		//		should try to dig into the binary store and get the version from there.
+//		return PamguardVersionInfo.version;
+//	}
 
 	/**
 	 * Detections will be exported in a separate worker thread since export may take some time and
@@ -418,14 +397,13 @@ public class DetectionsHandler extends CollectionHandler {
 		ArrayList<PDeployment> deployments = depHandler.getMatchedDeployments();
 
 		LocalizationHandler localizationHandler = tethysControl.getLocalizationHandler();
+		LocalizationBuilder localizationBuilder = null;
 
 		/*
 		 * The main documents for both dets and locs. 
 		 */
 		Detections detectionsDocument = null;
-		Localize localiseDocument = null;
 		DetectionGroup onEffortDetections = null;
-		Localizations localisations = null;
 
 		OfflineDataMap dataMap = dataBlock.getPrimaryDataMap();
 		DataSelector dataSelector = dataBlock.getDataSelector(tethysControl.getDataSelectName(), false);
@@ -479,11 +457,10 @@ public class DetectionsHandler extends CollectionHandler {
 //					onEffortDetections = null;
 //					detectionList = null;
 //				}
-				if (localiseDocument == null && streamExportParams.exportLocalisations) {
-					localiseDocument = startLocalisationDocument(deployment, detectionsDocument, dataBlock, streamExportParams);
-					Effort eff = localiseDocument.getEffort();
-					localiseDocument.getEffort().setStart(TethysTimeFuncs.xmlGregCalFromMillis(deployment.getAudioStart()));
-					localisations = localiseDocument.getLocalizations();
+				if (localizationBuilder == null && streamExportParams.exportLocalisations) {
+					localizationBuilder = new LocalizationBuilder(tethysControl, deployment, detectionsDocument, dataBlock, streamExportParams);
+					Effort eff = localizationBuilder.getCurrentDocument().getEffort();
+					eff.setStart(TethysTimeFuncs.xmlGregCalFromMillis(deployment.getAudioStart()));
 				}
 //				else {
 //					localisations = null;
@@ -517,11 +494,7 @@ public class DetectionsHandler extends CollectionHandler {
 					 * Localisations don't do granularity, so do all. 
 					 */
 					if (streamExportParams.exportLocalisations) {
-						// convert the dets into localisations and add them. 
-						nilus.LocalizationType localization = localizationHandler.createLocalization(localiseDocument, dataBlock, dataUnit, streamExportParams);
-						if (localization != null) {
-							localisations.getLocalization().add(localization);
-						}
+						localizationBuilder.addLocalization(dataUnit);
 					}
 
 					if (exportCount % 100 == 0) {
@@ -552,16 +525,16 @@ public class DetectionsHandler extends CollectionHandler {
 						}
 						detectionsDocument = null;
 					}
-					if (localiseDocument != null) {
-						closeLocaliseDocument(localiseDocument, mapPoint.getEndTime());
+					if (localizationBuilder != null) {
+						localizationBuilder.closeDocument(mapPoint.getEndTime());
 						try {
-							if (checkLocaliseDocument(localiseDocument, granularityHandler)) {
-								dbxmlConnect.postAndLog(localiseDocument);
+							if (localizationBuilder.checkDocument()) {
+								dbxmlConnect.postAndLog(localizationBuilder.getCurrentDocument());
 							}
 						} catch (TethysException e) {
 							tethysControl.showException(e);
 						}
-						localiseDocument = null;
+						localizationBuilder = null;
 					}
 				}
 
@@ -598,27 +571,19 @@ public class DetectionsHandler extends CollectionHandler {
 				}
 				detectionsDocument = null;
 			}
-			if (localiseDocument != null) {
-				Detection dets[] = granularityHandler.cleanup(deployment.getAudioEnd());
-				if (dets != null) {
-					for (int dd = 0; dd < dets.length; dd++) {
-						exportCount++;
-						documentCount++;
-						//						localiseDocument.getOnEffort().getDetection().add(dets[dd]);
-					}
-				}
-				prog = new DetectionExportProgress(deployment, detectionsDocument,totalMapPoints, doneMapPoints,
-						lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_WRITING);
-				closeLocaliseDocument(localiseDocument, deployment.getAudioEnd());
+			prog = new DetectionExportProgress(deployment, detectionsDocument,totalMapPoints, doneMapPoints,
+					lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_WRITING);
+			if (localizationBuilder != null) {
+				localizationBuilder.closeDocument(deployment.getAudioEnd());
 				try {
-					if (checkLocaliseDocument(localiseDocument, granularityHandler)) {
-						dbxmlConnect.postAndLog(localiseDocument);
+					if (localizationBuilder.checkDocument()) {
+						dbxmlConnect.postAndLog(localizationBuilder.getCurrentDocument());
 					}
 				} catch (TethysException e) {
-					tethysControl.showException(e);
+						tethysControl.showException(e);
+					}
+					localizationBuilder = null;
 				}
-				localiseDocument = null;
-			}
 		}
 
 //		prog = new DetectionExportProgress(null, null,totalMapPoints, totalMapPoints,
@@ -686,174 +651,174 @@ public class DetectionsHandler extends CollectionHandler {
 		return detections;
 	}
 
-	private Localize startLocalisationDocument(PDeployment deployment, Detections detectionsDocument, PamDataBlock dataBlock,
-			StreamExportParams exportParams) {
-		Localize localisations = new Localize();
-		try {
-			Helper.createRequiredElements(localisations);
-		} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
-			e.printStackTrace();
-			return null;
-		}		
-		Effort eff = localisations.getEffort();
-		if (eff == null) {
-			eff = new Effort();
-			try {
-				Helper.createRequiredElements(eff);
-			} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
-				e.printStackTrace();
-				return null;
-			}		
-			localisations.setEffort(eff);
-		}
-		if (detectionsDocument != null) {
-			/*
-			 *  add the reference document information.
-			 *  Within PAMGuard, this will always be 1:1 with a Detections doc.
-			 */
-			
-			ReferencedDocuments refDocs = eff.getReferencedDocuments();
-			if (refDocs == null) {
-				refDocs = new ReferencedDocuments();
-				try {
-					Helper.createRequiredElements(refDocs);
-				} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
-					e.printStackTrace();
-				}
-				eff.setReferencedDocuments(refDocs);
-			}
-			Document detectsDoc = new Document();
-			detectsDoc.setId(detectionsDocument.getId());
-			detectsDoc.setType(Collection.Detections.collectionName());
-			detectsDoc.setIndex(BigInteger.ZERO);
-			eff.getReferencedDocuments().getDocument().add(detectsDoc);
-		}
-		
-		TethysDataProvider dataProvider = dataBlock.getTethysDataProvider(tethysControl);
-
-		String prefix = deployment.nilusObject.getId() + "_" + dataProvider.getDetectionsName();
-		String fullId = "";
-		/*
-		 * Check the document name isn't already used and increment id as necessary.
-		 */
-		while (true) {
-			fullId = String.format("%s_%d", prefix, uniqueDetectionsId++);
-			if (!tethysControl.getDbxmlQueries().documentExists(Collection.Localizations.toString(), fullId)) {
-				break;
-			}
-		}
-		localisations.setId(fullId);
-		//		detections.setDescription(dataProvider.getDescription(deployment, tethysExportParams));
-		localisations.setDescription(exportParams.getNilusDetectionDescription());
-		DataSourceType dataSource = new DataSourceType();
-		dataSource.setDeploymentId(deployment.nilusObject.getId());
-		//		dataSource.setEnsembleId(""); ToDo
-		localisations.setDataSource(dataSource);
-		AlgorithmType algorithm = localisations.getAlgorithm();
-
-		if (dataProvider != null) {
-			algorithm = dataProvider.getAlgorithm(Collection.Localizations);
-			//			detections.setAlgorithm(algorithm);
-		}
-		LocalisationAlgorithm locAlgorithm = dataBlock.getLocalisationAlgorithm();
-		LocalisationAlgorithmInfo locAlgoinfo = null;
-		if (locAlgorithm != null) {
-			locAlgoinfo = locAlgorithm.getAlgorithmInfo();
-		}
-		if (locAlgoinfo != null) {
-			algorithm.setMethod(locAlgoinfo.getAlgorithmName());
-		}
-		else {
-			algorithm.setMethod(getMethodString(dataBlock));
-		}
-		algorithm.setSoftware(getSoftwareString(dataBlock));
-		algorithm.setVersion(getVersionString(dataBlock));
-
-		List<SupportSoftware> supSoft = algorithm.getSupportSoftware();
-		SupportSoftware supportSoft = new SupportSoftware();
-		supportSoft.setSoftware(getSupportSoftware(dataBlock));
-		supportSoft.setVersion(getSupportSoftwareVersion(dataBlock));
-		supSoft.add(supportSoft);
-		localisations.setAlgorithm(algorithm);
-
-		localisations.setUserId("PAMGuard user");
-		//		localisations.setEffort(getLocaliserEffort(deployment, dataBlock, exportParams));
-		sortLocaliseCoordinates(dataBlock, localisations);
-
-		// sort out coordinate system. 
-
-		return localisations;
-	}
-	
-	private boolean sortLocaliseCoordinates(PamDataBlock dataBlock, Localize localisations) {
-		LocalisationInfo locInfo = dataBlock.getLocalisationContents();
-		Effort locEffort = localisations.getEffort();
-		if (locEffort == null) {
-			locEffort = new Effort();
-			localisations.setEffort(locEffort);
-		}
-		try {
-			Helper.createRequiredElements(locEffort);
-		} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
-			e.printStackTrace();
-			return false;
-		}
-		locEffort.setTimeReference("relative");
+//	private Localize startLocalisationDocument(PDeployment deployment, Detections detectionsDocument, PamDataBlock dataBlock,
+//			StreamExportParams exportParams) {
+//		Localize localisations = new Localize();
+//		try {
+//			Helper.createRequiredElements(localisations);
+//		} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
+//			e.printStackTrace();
+//			return null;
+//		}		
+//		Effort eff = localisations.getEffort();
+//		if (eff == null) {
+//			eff = new Effort();
+//			try {
+//				Helper.createRequiredElements(eff);
+//			} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
+//				e.printStackTrace();
+//				return null;
+//			}		
+//			localisations.setEffort(eff);
+//		}
+//		if (detectionsDocument != null) {
+//			/*
+//			 *  add the reference document information.
+//			 *  Within PAMGuard, this will always be 1:1 with a Detections doc.
+//			 */
+//			
+//			ReferencedDocuments refDocs = eff.getReferencedDocuments();
+//			if (refDocs == null) {
+//				refDocs = new ReferencedDocuments();
+//				try {
+//					Helper.createRequiredElements(refDocs);
+//				} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
+//					e.printStackTrace();
+//				}
+//				eff.setReferencedDocuments(refDocs);
+//			}
+//			Document detectsDoc = new Document();
+//			detectsDoc.setId(detectionsDocument.getId());
+//			detectsDoc.setType(Collection.Detections.collectionName());
+//			detectsDoc.setIndex(BigInteger.ZERO);
+//			eff.getReferencedDocuments().getDocument().add(detectsDoc);
+//		}
+//		
+//		TethysDataProvider dataProvider = dataBlock.getTethysDataProvider(tethysControl);
+//
+//		String prefix = deployment.nilusObject.getId() + "_" + dataProvider.getDetectionsName();
+//		String fullId = "";
+//		/*
+//		 * Check the document name isn't already used and increment id as necessary.
+//		 */
+//		while (true) {
+//			fullId = String.format("%s_%d", prefix, uniqueDetectionsId++);
+//			if (!tethysControl.getDbxmlQueries().documentExists(Collection.Localizations.toString(), fullId)) {
+//				break;
+//			}
+//		}
+//		localisations.setId(fullId);
+//		//		detections.setDescription(dataProvider.getDescription(deployment, tethysExportParams));
+//		localisations.setDescription(exportParams.getNilusDetectionDescription());
+//		DataSourceType dataSource = new DataSourceType();
+//		dataSource.setDeploymentId(deployment.nilusObject.getId());
+//		//		dataSource.setEnsembleId(""); ToDo
+//		localisations.setDataSource(dataSource);
+//		AlgorithmType algorithm = localisations.getAlgorithm();
+//
+//		if (dataProvider != null) {
+//			algorithm = dataProvider.getAlgorithm(Collection.Localizations);
+//			//			detections.setAlgorithm(algorithm);
+//		}
+//		LocalisationAlgorithm locAlgorithm = dataBlock.getLocalisationAlgorithm();
+//		LocalisationAlgorithmInfo locAlgoinfo = null;
+//		if (locAlgorithm != null) {
+//			locAlgoinfo = locAlgorithm.getAlgorithmInfo();
+//		}
+//		if (locAlgoinfo != null) {
+//			algorithm.setMethod(locAlgoinfo.getAlgorithmName());
+//		}
+//		else {
+//			algorithm.setMethod(getMethodString(dataBlock));
+//		}
+//		algorithm.setSoftware(getSoftwareString(dataBlock));
+//		algorithm.setVersion(getVersionString(dataBlock));
+//
+//		List<SupportSoftware> supSoft = algorithm.getSupportSoftware();
+//		SupportSoftware supportSoft = new SupportSoftware();
+//		supportSoft.setSoftware(getSupportSoftware(dataBlock));
+//		supportSoft.setVersion(getSupportSoftwareVersion(dataBlock));
+//		supSoft.add(supportSoft);
+//		localisations.setAlgorithm(algorithm);
+//
+//		localisations.setUserId("PAMGuard user");
+//		//		localisations.setEffort(getLocaliserEffort(deployment, dataBlock, exportParams));
+//		sortLocaliseCoordinates(dataBlock, localisations);
+//
+//		// sort out coordinate system. 
+//
+//		return localisations;
+//	}
+//	
+//	private boolean sortLocaliseCoordinates(PamDataBlock dataBlock, Localize localisations) {
+//		LocalisationInfo locInfo = dataBlock.getLocalisationContents();
+//		Effort locEffort = localisations.getEffort();
+//		if (locEffort == null) {
+//			locEffort = new Effort();
+//			localisations.setEffort(locEffort);
+//		}
+//		try {
+//			Helper.createRequiredElements(locEffort);
+//		} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
+//			e.printStackTrace();
+//			return false;
+//		}
+//		locEffort.setTimeReference("relative");
+////		List<String> locTypes = locEffort.getLocalizationType();
+//		boolean ambiguity = locInfo.hasLocContent(LocContents.HAS_AMBIGUITY);
+//		CoordinateReferenceSystem coordRefs = locEffort.getCoordinateReferenceSystem();		
 //		List<String> locTypes = locEffort.getLocalizationType();
-		boolean ambiguity = locInfo.hasLocContent(LocContents.HAS_AMBIGUITY);
-		CoordinateReferenceSystem coordRefs = locEffort.getCoordinateReferenceSystem();		
-		List<String> locTypes = locEffort.getLocalizationType();
-		if (locInfo.getLocContent() == 0) {
-			return false;
-		}
-		else if (locInfo.hasLocContent(LocContents.HAS_LATLONG)) {
-			coordRefs.setName(CoordinateName.WGS84.toString());
-			coordRefs.setSubtype(LocalizationSubType.Geographic.toString());
-			locTypes.add(LocalizationType.Point.toString());
-//			locEffort.set
-			if (locInfo.hasLocContent(LocContents.HAS_DEPTH)) {
-				locEffort.setDimension(3);
-			}
-			else {
-				locEffort.setDimension(2);
-			}
-//			locEffort.set
-		}
-		else if (locInfo.hasLocContent(LocContents.HAS_XYZ)) {
-			coordRefs.setName(CoordinateName.Cartesian.toString());
-			coordRefs.setSubtype(LocalizationSubType.Engineering.toString());
-			locTypes.add(LocalizationType.Point.toString());
-			locEffort.setDimension(3);
-		}
-		else if (locInfo.hasLocContent(LocContents.HAS_XY)) {
-			coordRefs.setName(CoordinateName.Cartesian.toString());
-			coordRefs.setSubtype(LocalizationSubType.Engineering.toString());
-			locTypes.add(LocalizationType.Point.toString());
-			locEffort.setDimension(2);
-		}
-		else if (locInfo.hasLocContent(LocContents.HAS_BEARING)) {
-			coordRefs.setName(CoordinateName.Polar.toString());
-			coordRefs.setSubtype(LocalizationSubType.Engineering.toString());
-			locTypes.add(LocalizationType.Bearing.toString());
-			if (ambiguity) {
-				locEffort.setDimension(1);
-			}
-			else {
-				locEffort.setDimension(2);
-			}
-		}
-		else {
-			return false;
-		}
-		
-		return true;
-	}
-
-
-	private nilus.Localize.Effort getLocaliserEffort(PDeployment deployment, PamDataBlock dataBlock, StreamExportParams exportParams) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//		if (locInfo.getLocContent() == 0) {
+//			return false;
+//		}
+//		else if (locInfo.hasLocContent(LocContents.HAS_LATLONG)) {
+//			coordRefs.setName(CoordinateName.WGS84.toString());
+//			coordRefs.setSubtype(LocalizationSubTypes.Geographic.toString());
+//			locTypes.add(LocalizationTypes.Point.toString());
+////			locEffort.set
+//			if (locInfo.hasLocContent(LocContents.HAS_DEPTH)) {
+//				locEffort.setDimension(3);
+//			}
+//			else {
+//				locEffort.setDimension(2);
+//			}
+////			locEffort.set
+//		}
+//		else if (locInfo.hasLocContent(LocContents.HAS_XYZ)) {
+//			coordRefs.setName(CoordinateName.Cartesian.toString());
+//			coordRefs.setSubtype(LocalizationSubTypes.Engineering.toString());
+//			locTypes.add(LocalizationTypes.Point.toString());
+//			locEffort.setDimension(3);
+//		}
+//		else if (locInfo.hasLocContent(LocContents.HAS_XY)) {
+//			coordRefs.setName(CoordinateName.Cartesian.toString());
+//			coordRefs.setSubtype(LocalizationSubTypes.Engineering.toString());
+//			locTypes.add(LocalizationTypes.Point.toString());
+//			locEffort.setDimension(2);
+//		}
+//		else if (locInfo.hasLocContent(LocContents.HAS_BEARING)) {
+//			coordRefs.setName(CoordinateName.Polar.toString());
+//			coordRefs.setSubtype(LocalizationSubTypes.Engineering.toString());
+//			locTypes.add(LocalizationTypes.Bearing.toString());
+//			if (ambiguity) {
+//				locEffort.setDimension(1);
+//			}
+//			else {
+//				locEffort.setDimension(2);
+//			}
+//		}
+//		else {
+//			return false;
+//		}
+//		
+//		return true;
+//	}
+//
+//
+//	private nilus.Localize.Effort getLocaliserEffort(PDeployment deployment, PamDataBlock dataBlock, StreamExportParams exportParams) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 
 	/**
@@ -866,9 +831,6 @@ public class DetectionsHandler extends CollectionHandler {
 		detections.getEffort().setEnd(TethysTimeFuncs.xmlGregCalFromMillis(audioEnd));
 	}
 
-	private void closeLocaliseDocument(Localize localiseDocument, long endTime) {
-		localiseDocument.getEffort().setEnd(TethysTimeFuncs.xmlGregCalFromMillis(endTime));
-	}
 
 
 	/**
@@ -915,10 +877,6 @@ public class DetectionsHandler extends CollectionHandler {
 		return true;
 	}
 
-	private boolean checkLocaliseDocument(Localize localiseDocument, GranularityHandler granularityHandler) {
-		// TODO Auto-generated method stub
-		return true;
-	}
 
 	/**
 	 * Worker thread for exporting detections. 

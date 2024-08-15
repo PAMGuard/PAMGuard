@@ -123,6 +123,12 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 		}
 		if (collection == Collection.Localizations) {
 			nilus.AlgorithmType.Parameters locParameters = this.getLocalisationParameters();
+			if (locParameters == null) {
+				/*
+				 * It seems Tethys MUST have parameters, so make an empty one if needed. 
+				 */
+				locParameters = new nilus.AlgorithmType.Parameters();
+			}
 			if (algoParameters == null) {
 				algorithm.setParameters(locParameters);
 			}
@@ -143,6 +149,11 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 		return algorithm;
 	}
 
+	/**
+	 * Localisation parameters. Some localisers don't actually have any parameters, 
+	 * but Tethys requires a parameters element, so if there aren't any, set a dummy
+	 * @return
+	 */
 	public nilus.AlgorithmType.Parameters getLocalisationParameters() {
 		LocalisationAlgorithm algo = pamDataBlock.getLocalisationAlgorithm();
 		if (algo == null) {

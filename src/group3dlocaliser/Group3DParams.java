@@ -17,8 +17,8 @@ public class Group3DParams implements Serializable, Cloneable, ManagedParameters
 
 	public static final long serialVersionUID = 1L;
 	
-	@Deprecated
-	private GroupedSourceParameters groupedSourceParams;
+//	@Deprecated
+//	private GroupedSourceParameters groupedSourceParams;
 	
 	private String sourceName;
 	
@@ -146,9 +146,9 @@ public class Group3DParams implements Serializable, Cloneable, ManagedParameters
 	 * @return the sourceName
 	 */
 	public String getSourceName() {
-		if (sourceName == null && groupedSourceParams != null) {
-			sourceName = groupedSourceParams.getDataSource();
-		}
+//		if (sourceName == null && groupedSourceParams != null) {
+//			sourceName = groupedSourceParams.getDataSource();
+//		}
 		return sourceName;
 	}
 

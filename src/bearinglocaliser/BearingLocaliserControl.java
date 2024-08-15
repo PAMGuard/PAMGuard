@@ -32,6 +32,7 @@ import bearinglocaliser.toad.TOADBearingProvider;
 import offlineProcessing.OLProcessDialog;
 import offlineProcessing.OfflineTaskGroup;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
+import tethys.localization.LocalizationCreator;
 import userDisplay.UserDisplayControl;
 
 public class BearingLocaliserControl extends PamControlledUnit implements PamSettings, LocalisationAlgorithm, LocalisationAlgorithmInfo {
@@ -236,6 +237,12 @@ public class BearingLocaliserControl extends PamControlledUnit implements PamSet
 	@Override
 	public LocalisationAlgorithmInfo getAlgorithmInfo() {
 		return this;
+	}
+
+	@Override
+	public LocalizationCreator getTethysCreator() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	

@@ -1,9 +1,6 @@
 package Localiser;
 
-import java.io.Serializable;
-
-import PamDetection.LocContents;
-import PamDetection.LocalisationInfo;
+import tethys.localization.LocalizationCreator;
 
 /**
  * Interface to attach to localisation algorithms which can provide basic information
@@ -18,5 +15,13 @@ public interface LocalisationAlgorithm {
 	 * @return algorithm information. 
 	 */
 	public LocalisationAlgorithmInfo getAlgorithmInfo();
+	
+	/**
+	 * Get something that can make LocalisationType objects of a form
+	 * a bit bespoke to the type of localiser. This may be better than having
+	 * the standard functions in LocalizationBuilder guess what's best. 
+	 * @return can be null in which case standard functions will do the best they can. 
+	 */
+	public LocalizationCreator getTethysCreator();
 	
 }

@@ -1,45 +1,19 @@
 package tethys.localization;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 
-import Localiser.detectionGroupLocaliser.GroupLocResult;
-import Localiser.detectionGroupLocaliser.GroupLocalisation;
-import PamDetection.AbstractLocalisation;
-import PamDetection.LocContents;
-import PamUtils.LatLong;
-import PamUtils.PamUtils;
 import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamDataUnit;
-import nilus.AngularCoordinateType;
-import nilus.BearingType;
-import nilus.Helper;
-import nilus.LocalizationType;
-import nilus.LocalizationType.Angular;
-import nilus.LocalizationType.Bearing;
-import nilus.LocalizationType.Parameters;
-import nilus.LocalizationType.Parameters.TargetMotionAnalysis;
-import nilus.LocalizationType.References;
-import nilus.LocalizationType.References.Reference;
-import nilus.LocalizationType.WGS84;
 import nilus.Localize;
-import nilus.SpeciesIDType;
-import nilus.WGS84CoordinateType;
-import pamMaths.PamVector;
-import nilus.Localize.Effort.CoordinateReferenceSystem;
 import tethys.Collection;
 import tethys.CollectionHandler;
 import tethys.TethysControl;
-import tethys.TethysTimeFuncs;
 import tethys.detection.StreamDetectionsSummary;
 import tethys.niluswraps.NilusDataWrapper;
 import tethys.niluswraps.PDeployment;
-import tethys.output.StreamExportParams;
-import tethys.pamdata.AutoTethysProvider;
-import tethys.species.DataBlockSpeciesManager;
-import tethys.species.SpeciesMapItem;
 
 public class LocalizationHandler extends CollectionHandler {
+
+	private int uniqueLocalisationsId = 1;
 
 	public LocalizationHandler(TethysControl tethysControl) {
 		super(tethysControl, Collection.Localizations);
@@ -68,7 +42,7 @@ public class LocalizationHandler extends CollectionHandler {
 	 * Get a list of Localization documents associated with a particular data block for the list of deployments
 	 * documents. Group them by abstract or something
 	 * @param dataBlock
-	 * @param deployments can be null for all deployments. 
+	 * @param deployments can be null for all deployments.
 	 * @return
 	 */
 	public StreamDetectionsSummary<NilusDataWrapper<PLocalization>> getStreamLocalizations(PamDataBlock dataBlock, ArrayList<PDeployment> deployments) {
@@ -98,298 +72,18 @@ public class LocalizationHandler extends CollectionHandler {
 		return null;
 	}
 
-	/**
-	 * Create a Localization element object to add to a Localizations document. 
-	 * @param localiseDocument
-	 * @param dataBlock 
-	 * @param dataUnit
-	 * @param streamExportParams
-	 * @return
-	 */
-	public LocalizationType createLocalization(Localize localiseDocument, PamDataBlock dataBlock, PamDataUnit dataUnit,
-			StreamExportParams streamExportParams) {
+	public String getLocalisationdocId(String prefix) {
 		/*
-		 * Get the current type from the document. This should always exist, so
-		 * just go for it, then switch on the value to make the localisation. 
+		 * Check the document name isn't already used and increment id as necessary.
 		 */
-		CoordinateReferenceSystem coordSystem = localiseDocument.getEffort().getCoordinateReferenceSystem();
-		String name = coordSystem.getName();
-		CoordinateName coordName = CoordinateName.valueOf(name);
-		if (coordName == null) {
-			return null;
-		}
-		LocalizationType locEl = null;
-		switch (coordName) {
-		case Cartesian:
-			locEl = createCartesianLoc(localiseDocument, dataBlock, dataUnit, streamExportParams);
-			break;
-		case Cylindrical:
-			locEl = createCylindricalLoc(localiseDocument, dataBlock, dataUnit, streamExportParams);
-			break;
-		case PerpendicularRange:
-			locEl = createPerpRange(localiseDocument, dataBlock, dataUnit, streamExportParams);
-			break;
-		case Polar:
-			locEl = createPolarLoc(localiseDocument, dataBlock, dataUnit, streamExportParams);
-			break;
-		case Range:
-			locEl = createRangeLoc(localiseDocument, dataBlock, dataUnit, streamExportParams);
-			break;
-		case Spherical:
-			locEl = createSphericalLoc(localiseDocument, dataBlock, dataUnit, streamExportParams);
-			break;
-		case UTM:
-			break;
-		case WGS84:
-			locEl = createWGS84Loc(localiseDocument, dataBlock, dataUnit, streamExportParams);
-			break;
-		default:
-			break;
-
-		}
-		return locEl;
-	}
-
-	private LocalizationType makeBaseLoc(PamDataBlock dataBlock, PamDataUnit dataUnit) {
-		LocalizationType locType = new LocalizationType();
-		try {
-			Helper.createRequiredElements(locType);
-		} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
-			e.printStackTrace();
-		}
-		locType.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(dataUnit.getTimeMilliseconds()));
-
-		DataBlockSpeciesManager spManager = dataBlock.getDatablockSpeciesManager();
-		if (spManager != null) {
-			SpeciesMapItem speciesStuff = spManager.getSpeciesItem(dataUnit);
-			SpeciesIDType species = new SpeciesIDType();
-			if (speciesStuff != null) {
-				species.setValue(BigInteger.valueOf(speciesStuff.getItisCode()));
-				locType.setSpeciesId(species);
+		String fullId;
+		while (true) {
+			fullId = String.format("%s_%d", prefix, uniqueLocalisationsId++);
+			if (!tethysControl.getDbxmlQueries().documentExists(Collection.Localizations.toString(), fullId)) {
+				break;
 			}
 		}
-
-		References references = locType.getReferences();
-		if (references == null) {
-			references = new References();
-			try {
-				Helper.createRequiredElements(references);
-			} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
-				e.printStackTrace();
-			}
-			locType.setReferences(references);
-		}
-		Reference reference = new Reference();
-		reference.setIndex(BigInteger.valueOf(dataUnit.getUID()));
-		reference.setEventRef("UID");
-		locType.getReferences().getReference().add(reference);
-
-		return locType;
-	}
-
-	/**
-	 * Get angle in degrees constrained to 0-360
-	 * @param radians
-	 * @return
-	 */
-	private double constrainRadianAngle(double radians) {
-		double deg = Math.toDegrees(radians);
-		if (Math.abs(deg) > 3600) {
-			return 359.9;
-		}
-		deg = PamUtils.constrainedAngle(deg);
-		deg = AutoTethysProvider.roundDecimalPlaces(deg, 2);
-		return deg;
-	}
-
-	/**
-	 * Convert a vertical angle from radians to degrees and round. 
-	 * @param radians
-	 * @return
-	 */
-	private double toSlantAngle(double radians) {
-		/*
-		 * these really need to be constrained to -90 to 90, but I don't see what to do if
-		 * they are outside that range.
-		 */
-		double deg = Math.toDegrees(radians);
-		deg= PamUtils.constrainedAngle(deg, 180);
-		deg = AutoTethysProvider.roundDecimalPlaces(deg, 2);
-		return deg;				
-	}
-
-	private LocalizationType createWGS84Loc(Localize localiseDocument, PamDataBlock dataBlock, PamDataUnit dataUnit,
-			StreamExportParams streamExportParams) {
-		AbstractLocalisation loc = dataUnit.getLocalisation();
-		if (loc == null) {
-			return null;
-		}
-		LatLong latlong = loc.getLatLong(0);
-		if (latlong == null) {
-			return null;
-		}
-		LocalizationType locType = makeBaseLoc(dataBlock, dataUnit);
-		
-		
-		/**
-		 * Export the latlong data.
-		 */
-		locType.setEvent(TethysTimeFuncs.xmlGregCalFromMillis(dataUnit.getTimeMilliseconds()).toString());
-		WGS84 wgs84 = new WGS84();
-		WGS84CoordinateType coord = new WGS84CoordinateType();
-		wgs84.setCoordinate(coord);
-		coord.setLongitude(latlong.getLongitude());
-		coord.setLatitude(latlong.getLatitude());
-		coord.setElevationM(AutoTethysProvider.roundDecimalPlaces(latlong.getHeight(),3));
-
-		PamVector planarVec = loc.getPlanarVector();
-		locType.setWGS84(wgs84);
-		
-//		locType.setParameters(null);
-		Parameters params = locType.getParameters();
-		TargetMotionAnalysis tma = new TargetMotionAnalysis();
-		tma.setStart(TethysTimeFuncs.xmlGregCalFromMillis(dataUnit.getTimeMilliseconds()));
-		tma.setEnd(TethysTimeFuncs.xmlGregCalFromMillis(dataUnit.getEndTimeInMilliseconds()));
-		params.setTargetMotionAnalysis(tma);
-		
-
-		// see if it's possible to get a beam measurement. 
-//		if (loc instanceof GroupLocalisation) {
-//			GroupLocalisation groupLoc = (GroupLocalisation) loc;
-//			GroupLocResult groupLocResult = groupLoc.getGroupLocaResult(0);
-//			Double perpDist = groupLocResult.getPerpendicularDistance();
-//			Long beamTime = groupLocResult.getBeamTime();
-//			if (perpDist != null && beamTime != null) {
-//				AngularCoordinateType acType = new AngularCoordinateType();
-//				acType.setAngle1(90);
-//				acType.setDistanceM(AutoTethysProvider.roundDecimalPlaces(perpDist,1));
-//				Angular angular = new Angular();
-//				angular.setCoordinate(acType);
-//				locType.setAngular(angular);
-//				locType.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(beamTime));
-//				localiseDocument.getEffort().setTimeReference(TimeReference.beam.toString());
-//			}
-//			//			groupLoc.getp
-//		}
-
-		/*
-		 * Try to also add a range loc. 
-		 */
-		//		loc.
-
-		return locType;
-	}
-
-	private LocalizationType createSphericalLoc(Localize localiseDocument, PamDataBlock dataBlock, PamDataUnit dataUnit,
-			StreamExportParams streamExportParams) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private LocalizationType createRangeLoc(Localize localiseDocument, PamDataBlock dataBlock, PamDataUnit dataUnit,
-			StreamExportParams streamExportParams) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private LocalizationType createBearingLoc(Localize localiseDocument, PamDataBlock dataBlock, PamDataUnit dataUnit,
-			StreamExportParams streamExportParams) {
-		AbstractLocalisation loc = dataUnit.getLocalisation();
-		if (loc == null) {
-			return null;
-		}
-		LocalizationType locType = makeBaseLoc(dataBlock, dataUnit);
-		double[] angles = loc.getAngles();
-		if (angles == null || angles.length == 0) {
-			return null;
-		}
-		BearingType angType = new BearingType();
-		angType.setAngle1(constrainRadianAngle(angles[0]));
-		if (angles.length >= 2) {
-			angType.setAngle2(toSlantAngle(angles[1]));
-			//			if (angType.getAngle2() > 360) {
-			//				angType.setAngle2(Math.toDegrees(angles[1]));
-			//			}
-		}
-		Bearing bearing = new Bearing();
-		bearing.setCoordinate(angType);
-		locType.setBearing(bearing);
-
-		double[] angErr = loc.getAngleErrors();
-		if (angErr != null && angErr.length >= 1) {
-			BearingType angErrType = new BearingType();
-			angErrType.setAngle1(constrainRadianAngle(angErr[0]));
-			if (angErr.length >= 2) {
-				angErrType.setAngle2(constrainRadianAngle(angErr[1]));
-			}
-			bearing.setCoordinateError(angErrType);
-		}
-
-		return locType;
-	}
-	private LocalizationType createPolarLoc(Localize localiseDocument, PamDataBlock dataBlock, PamDataUnit dataUnit,
-			StreamExportParams streamExportParams) {
-		AbstractLocalisation loc = dataUnit.getLocalisation();
-		if (loc == null) {
-			return null;
-		}
-		if (loc.hasLocContent(LocContents.HAS_RANGE) == false) {
-
-			// do the more basic bearing type instead. 
-			return createBearingLoc(localiseDocument, dataBlock, dataUnit, streamExportParams);
-		}
-		LocalizationType locType = makeBaseLoc(dataBlock, dataUnit);
-		double[] angles = loc.getAngles();
-		if (angles == null || angles.length == 0) {
-			return null;
-		}
-		AngularCoordinateType angType = new AngularCoordinateType();
-		angType.setAngle1(constrainRadianAngle(angles[0]));
-		if (angles.length >= 2) {
-			angType.setAngle2(constrainRadianAngle(angles[1]));
-			if (angType.getAngle2() > 360) {
-				angType.setAngle2(toSlantAngle(angles[1]));
-			}
-		}
-		if (loc.hasLocContent(LocContents.HAS_RANGE)) {
-			angType.setDistanceM(loc.getRange(0));
-		}
-		Angular angular = new Angular();
-		angular.setCoordinate(angType);
-		locType.setAngular(angular);
-
-		double[] angErr = loc.getAngleErrors();
-		if (angErr != null && angErr.length >= 1) {
-			AngularCoordinateType angErrType = new AngularCoordinateType();
-			angErrType.setAngle1(constrainRadianAngle(angErr[0]));
-			if (angErr.length >= 2) {
-				angErrType.setAngle2(constrainRadianAngle(angErr[1]));
-			}
-			if (loc.hasLocContent(LocContents.HAS_RANGEERROR)) {
-				angErrType.setDistanceM(loc.getRangeError(0));
-			}
-			angular.setCoordinateError(angErrType);
-		}
-
-		return locType;
-	}
-
-	private LocalizationType createPerpRange(Localize localiseDocument, PamDataBlock dataBlock, PamDataUnit dataUnit,
-			StreamExportParams streamExportParams) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private LocalizationType createCylindricalLoc(Localize localiseDocument, PamDataBlock dataBlock,
-			PamDataUnit dataUnit, StreamExportParams streamExportParams) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private LocalizationType createCartesianLoc(Localize localiseDocument, PamDataBlock dataBlock, PamDataUnit dataUnit,
-			StreamExportParams streamExportParams) {
-		// TODO Auto-generated method stub
-		return null;
+		return fullId;
 	}
 
 }

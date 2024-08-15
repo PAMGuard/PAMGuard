@@ -13,6 +13,7 @@ import PamUtils.ArrayDump;
 import PamUtils.PamUtils;
 import PamUtils.SystemTiming;
 import pamMaths.PamVector;
+import tethys.localization.LocalizationCreator;
 
 /**
  * Maximum likelihood bearing localiser to get bearings from a closely 
@@ -651,5 +652,11 @@ public class MLGridBearingLocaliser implements BearingLocaliser {
 	@Override
 	public LocalisationAlgorithmInfo getAlgorithmInfo() {
 		return this;
+	}
+
+	@Override
+	public LocalizationCreator getTethysCreator() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

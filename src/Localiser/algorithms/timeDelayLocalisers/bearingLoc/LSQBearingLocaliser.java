@@ -11,6 +11,7 @@ import Localiser.LocalisationAlgorithmInfo;
 import PamDetection.LocContents;
 import PamUtils.PamUtils;
 import pamMaths.PamVector;
+import tethys.localization.LocalizationCreator;
 
 public class LSQBearingLocaliser implements BearingLocaliser {
 
@@ -228,8 +229,15 @@ public class LSQBearingLocaliser implements BearingLocaliser {
 	public Serializable getParameters() {
 		return null;
 	}
+	
 	@Override
 	public LocalisationAlgorithmInfo getAlgorithmInfo() {
 		return this;
+	}
+	
+	@Override
+	public LocalizationCreator getTethysCreator() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
