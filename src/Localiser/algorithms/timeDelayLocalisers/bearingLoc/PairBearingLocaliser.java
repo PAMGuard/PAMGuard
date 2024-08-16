@@ -310,7 +310,6 @@ public class PairBearingLocaliser implements BearingLocaliser {
 	public LocalisationAlgorithmInfo getAlgorithmInfo() {
 		return this;
 	}
-
 	@Override
 	public LocalizationCreator getTethysCreator() {
 		// TODO Auto-generated method stub
