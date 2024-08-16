@@ -60,7 +60,8 @@ import nilus.Deployment.Data;
 import nilus.Deployment.Data.Tracks;
 import nilus.Deployment.Data.Tracks.Track;
 import nilus.Deployment.Data.Tracks.Track.Point;
-import nilus.Deployment.Data.Tracks.Track.Point.BearingDegN;
+import nilus.Deployment.Data.Tracks.Track.Point.CourseOverGroundDegN;
+import nilus.Deployment.Data.Tracks.Track.Point.HeadingDegN;
 import nilus.Deployment.Instrument;
 import nilus.Deployment.SamplingDetails;
 import nilus.Deployment.Sensors;
@@ -910,13 +911,32 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 			gpsPoint.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(gpsDataUnit.getTimeMilliseconds()));
 			gpsPoint.setLatitude(gpsData.getLatitude());
 			gpsPoint.setLongitude(PamUtils.constrainedAngle(gpsData.getLongitude()));
-			BearingDegN bdn = gpsPoint.getBearingDegN();
-			if (bdn == null) {
-				bdn = new BearingDegN();
-				gpsPoint.setBearingDegN(bdn);
+			CourseOverGroundDegN cog = gpsPoint.getCourseOverGroundDegN();
+			if (cog == null) {
+				cog = new CourseOverGroundDegN();
+				gpsPoint.setCourseOverGroundDegN(cog);
 			}
-			bdn.setValue(AutoTethysProvider.roundDecimalPlaces(PamUtils.constrainedAngle(gpsData.getHeading()),1));
-			gpsPoint.setSpeed(AutoTethysProvider.roundDecimalPlaces(gpsData.getSpeed(),2));
+			cog.setValue(PamUtils.constrainedAngle(gpsData.getCourseOverGround()));
+			cog.setNorth(HeadingTypes.TRUE.toString());
+			Double trueHead = gpsData.getTrueHeading();
+			if (trueHead != null && trueHead.isInfinite()) {
+				HeadingDegN th = new HeadingDegN();
+				th.setValue(PamUtils.constrainedAngle(trueHead));
+				th.setNorth(HeadingTypes.TRUE.toString());
+				gpsPoint.setHeadingDegN(th);
+			}
+			else {
+				// else try magnetic
+				Double magHead = gpsData.getMagneticHeading();
+				if (magHead != null && magHead.isInfinite()) {
+					HeadingDegN mh = new HeadingDegN();
+					mh.setValue(PamUtils.constrainedAngle(magHead));
+					mh.setNorth(HeadingTypes.MAGNETIC.toString());
+					gpsPoint.setHeadingDegN(mh);
+				}
+			}
+			
+			gpsPoint.setSpeedOverGround(AutoTethysProvider.roundDecimalPlaces(gpsData.getSpeed(),2));
 			
 			points.add(gpsPoint);
 			lastPointTime = gpsDataUnit.getTimeMilliseconds();

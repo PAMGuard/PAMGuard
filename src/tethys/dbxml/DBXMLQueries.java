@@ -622,13 +622,15 @@ public class DBXMLQueries {
 
 
 	/**
-	 * Get the names of all detection documents for a given deployment for all data streams.
-	 * @param deploymentId
+	 * Get the names of all the detection or localisation documents for a given deployment id. 
+	 * @param collection Localizations or Detetections
+	 * @param deploymentId Deployment document id. 
 	 * @return
 	 */
-	public ArrayList<String> getDetectionsDocuments(String deploymentId) {
-		String queryBase = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/Id\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/DataSource/DeploymentId\",\"SomeDeploymentId\"],\"optype\":\"binary\"}],\"enclose\":1}";
+	public ArrayList<String> getDeploymentDocuments(Collection collection, String deploymentId) {
+		String queryBase = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"collectionname/Id\"],\"select\":[{\"op\":\"=\",\"operands\":[\"collectionname/DataSource/DeploymentId\",\"SomeDeploymentId\"],\"optype\":\"binary\"}],\"enclose\":1}";
 		String queryStr = queryBase.replace("SomeDeploymentId", deploymentId);
+		queryStr = queryStr.replace("collectionname", collection.documentName());
 		DBQueryResult queryResult = null;
 		try {
 			queryResult = executeQuery(queryStr);
@@ -658,6 +660,86 @@ public class DBXMLQueries {
 			detectionDocs.add(aNode.getTextContent());
 		}
 		return detectionDocs;
+	}
+
+	/**
+	 * Get the names of all detection documents for a given deployment for all data streams.
+	 * @param deploymentId
+	 * @return
+	 */
+	public ArrayList<String> getDetectionsDocuments(String deploymentId) {
+		return getDeploymentDocuments(Collection.Detections, deploymentId);
+//		String queryBase = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Detections/Id\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Detections/DataSource/DeploymentId\",\"SomeDeploymentId\"],\"optype\":\"binary\"}],\"enclose\":1}";
+//		String queryStr = queryBase.replace("SomeDeploymentId", deploymentId);
+//		DBQueryResult queryResult = null;
+//		try {
+//			queryResult = executeQuery(queryStr);
+//		} catch (TethysQueryException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		if (queryResult == null || queryResult.queryException != null) {
+//			return null;
+//		}
+//
+//		//		PamguardXMLWriter pamXMLWriter = PamguardXMLWriter.getXMLWriter();
+//
+//		Document doc = convertStringToXMLDocument(queryResult.queryResult);
+//		if (doc == null) {
+//			return null;
+//		}
+//
+//		ArrayList<String> detectionDocs = new ArrayList<>();
+//
+//		NodeList returns = doc.getElementsByTagName("Record");
+//		if (returns.getLength() == 0) {
+//			returns = doc.getElementsByTagName("Record");
+//		}
+//		for (int i = 0; i < returns.getLength(); i++) {
+//			Node aNode = returns.item(i);
+//			detectionDocs.add(aNode.getTextContent());
+//		}
+//		return detectionDocs;
+	}
+
+	/**
+	 * Get the names of all localisation documents for a given deployment for all data streams.
+	 * @param deploymentId
+	 * @return
+	 */
+	public ArrayList<String> getLocalizationsDocuments(String deploymentId) {
+		return getDeploymentDocuments(Collection.Localizations, deploymentId);
+//		String queryBase = "{\"species\":{\"query\":{\"op\":\"lib:abbrev2tsn\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]},\"return\":{\"op\":\"lib:tsn2abbrev\",\"optype\":\"function\",\"operands\":[\"%s\",\"SIO.SWAL.v1\"]}},\"return\":[\"Localize/Id\"],\"select\":[{\"op\":\"=\",\"operands\":[\"Localize/DataSource/DeploymentId\",\"SomeDeploymentId\"],\"optype\":\"binary\"}],\"enclose\":1}";
+//		String queryStr = queryBase.replace("SomeDeploymentId", deploymentId);
+//		DBQueryResult queryResult = null;
+//		try {
+//			queryResult = executeQuery(queryStr);
+//		} catch (TethysQueryException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		if (queryResult == null || queryResult.queryException != null) {
+//			return null;
+//		}
+//
+//		//		PamguardXMLWriter pamXMLWriter = PamguardXMLWriter.getXMLWriter();
+//
+//		Document doc = convertStringToXMLDocument(queryResult.queryResult);
+//		if (doc == null) {
+//			return null;
+//		}
+//
+//		ArrayList<String> detectionDocs = new ArrayList<>();
+//
+//		NodeList returns = doc.getElementsByTagName("Record");
+//		if (returns.getLength() == 0) {
+//			returns = doc.getElementsByTagName("Record");
+//		}
+//		for (int i = 0; i < returns.getLength(); i++) {
+//			Node aNode = returns.item(i);
+//			detectionDocs.add(aNode.getTextContent());
+//		}
+//		return detectionDocs;
 	}
 
 	public int countData(PamDataBlock dataBlock, String deploymentId) {

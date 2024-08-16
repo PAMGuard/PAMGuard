@@ -111,15 +111,19 @@ public class TMALocalizationCreator implements LocalizationCreator {
 			// so aren't really lat long errors. 
 			errorVec = elliptical.getEllipseDim();
 		}
-		if (errorVec != null && errorVec.length >= 2) {
-			wgsErr = new WGS84CoordinateType();
-			wgsErr.setLongitude(errorVec[0]);
-			wgsErr.setLatitude(errorVec[1]);
-			if (hasDepth && errorVec.length >= 3) {
-				wgsErr.setElevationM(errorVec[2]);
-			}
-			wgs84.setCoordinateError(wgsErr);
-		}
+		/*
+		 * Needs a bit of work to get errors in correct direction (needs import
+		 * of track data for this value ?) and conversion to latlong units.  
+		 */
+//		if (errorVec != null && errorVec.length >= 2) {
+//			wgsErr = new WGS84CoordinateType();
+//			wgsErr.setLongitude(errorVec[0]);
+//			wgsErr.setLatitude(errorVec[1]);
+//			if (hasDepth && errorVec.length >= 3) {
+//				wgsErr.setElevationM(errorVec[2]);
+//			}
+//			wgs84.setCoordinateError(wgsErr);
+//		}
 		
 		
 		loc.setWGS84(wgs84);
@@ -139,21 +143,27 @@ public class TMALocalizationCreator implements LocalizationCreator {
 			loc.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(timeAbeam));
 		}
 				
-		// now also output a perpendicular distance.
-		Double perp = groupLocResult.getPerpendicularDistance(); 
+//		 now also output a perpendicular distance.
+		Double perp = groupLocResult.getPerpendicularDistance();
 		if (perp != null) {
-			AngularCoordinateType acType = new AngularCoordinateType();
-			acType.setAngle1(90);
-			acType.setDistanceM(AutoTethysProvider.roundDecimalPlaces(perp,1));
-			Angular angular = new Angular();
-			angular.setCoordinate(acType);
-			if (errors != null) {
-				AngularCoordinateType angErr = new AngularCoordinateType();
-				angErr.setDistanceM(errors.norm());
-				angular.setCoordinateError(angErr);
-			}
-			loc.setAngular(angular);
+			loc.setPerpendicularRangeM(perp);
 		}
+		
+		
+		// con only output one type. 
+//		if (perp != null) {
+//			AngularCoordinateType acType = new AngularCoordinateType();
+//			acType.setAngle1(90);
+//			acType.setDistanceM(AutoTethysProvider.roundDecimalPlaces(perp,1));
+//			Angular angular = new Angular();
+//			angular.setCoordinate(acType);
+//			if (errors != null) {
+//				AngularCoordinateType angErr = new AngularCoordinateType();
+//				angErr.setDistanceM(errors.norm());
+//				angular.setCoordinateError(angErr);
+//			}
+//			loc.setAngular(angular);
+//		}
 
 		
 		

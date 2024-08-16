@@ -250,31 +250,47 @@ private RecordingList masterList;
 	 * @return true if there are no Detections or if they are sucessfully removed as well. 
 	 */
 	private boolean checkDetections(Deployment deployment) {
-		// get any deployment documents that associate with this deployment. 
-		ArrayList<String> detectionDocs = getTethysControl().getDbxmlQueries().getDetectionsDocuments(deployment.getId());
-		if (detectionDocs == null || detectionDocs.size() == 0) {
+		// get any deployment documents that associate with this deployment. 		
+		ArrayList<String> detectionDocs = getTethysControl().getDbxmlQueries().getDeploymentDocuments(Collection.Detections, deployment.getId());
+		ArrayList<String> localizationDocs = getTethysControl().getDbxmlQueries().getDeploymentDocuments(Collection.Localizations, deployment.getId());
+		int nDocs = 0;
+		if (detectionDocs != null) nDocs += detectionDocs.size();
+		if (localizationDocs != null) nDocs += localizationDocs.size();
+		if (nDocs == 0) {
 			return true;
 		}
-		String msg = String.format("<html>One or more Detections documents are associated with Deployment %s<br>", deployment.getId());
+		String msg = String.format("<html>%d other documents are associated with Deployment %s<br>", nDocs, deployment.getId());
 		for (String str : detectionDocs) {
 			msg += String.format("<br>%s", str);
 		}
 		msg += String.format("<br><br>You must delete these prior to deleting the Deploymen. Go ahead and delete ?");
-		int ans = WarnOnce.showWarning(getTethysControl().getGuiFrame(), "Existing Detections documents !" , msg, WarnOnce.OK_CANCEL_OPTION);
+		int ans = WarnOnce.showWarning(getTethysControl().getGuiFrame(), "Existing Detection / Localization documents !" , msg, WarnOnce.OK_CANCEL_OPTION);
 		if (ans == WarnOnce.CANCEL_OPTION) {
 			return false;
 		}
 		// OK, so delete all the Detections too !!!
 		boolean errors = false;
-		for (String str : detectionDocs) {
-			try {
-				boolean gone = getTethysControl().getDbxmlConnect().removeDocument(Collection.Detections, str);
-			} catch (TethysException e) {
-				getTethysControl().showException(e);
-				errors = true;
+		if (detectionDocs != null) {
+			for (String str : detectionDocs) {
+				try {
+					boolean gone = getTethysControl().getDbxmlConnect().removeDocument(Collection.Detections, str);
+				} catch (TethysException e) {
+					getTethysControl().showException(e);
+					errors = true;
+				}
 			}
 		}
-		
+		if (localizationDocs != null) {
+			for (String str : localizationDocs) {
+				try {
+					boolean gone = getTethysControl().getDbxmlConnect().removeDocument(Collection.Localizations, str);
+				} catch (TethysException e) {
+					getTethysControl().showException(e);
+					errors = true;
+				}
+			}
+		}
+
 		return !errors;
 	}
 
