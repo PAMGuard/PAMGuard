@@ -56,7 +56,6 @@ import pamScrollSystem.AbstractPamScrollerAWT;
 import pamScrollSystem.ScrollPaneAddon;
 import PamView.PamTabPanel;
 import PamView.panel.PamPanel;
-import PamView.symbol.StandardSymbolManager;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamController.PamControlledUnitSettings;
@@ -67,7 +66,6 @@ import PamUtils.PamCalendar;
 import PamUtils.XMLUtils;
 import loggerForms.controlDescriptions.ControlTypes;
 import loggerForms.controlDescriptions.InputControlDescription;
-import loggerForms.PropertyTypes;
 import loggerForms.controlDescriptions.ControlDescription;
 import loggerForms.formdesign.FormEditDialog;
 import loggerForms.formdesign.FormEditor;
@@ -75,6 +73,7 @@ import loggerForms.formdesign.FormList;
 import loggerForms.propertyInfos.BEARINGinfo;
 import loggerForms.propertyInfos.HEADINGinfo;
 import loggerForms.propertyInfos.RANGEinfo;
+import loggerForms.symbol.LoggerSymbolManager;
 /**
  * 
  * @author Graham Weatherup - SMRU
@@ -242,7 +241,7 @@ public class FormDescription implements Cloneable, Comparable<FormDescription> {
 		formsDataBlock = new FormsDataBlock(this, getFormName(), formsControl.getFormsProcess(), 0);
 		formsDataBlock.SetLogging(new FormsLogging(this,formsDataBlock));
 		formsDataBlock.setOverlayDraw(new LoggerFormGraphics(formsControl, this));
-		formsDataBlock.setPamSymbolManager(new StandardSymbolManager(formsDataBlock, LoggerFormGraphics.defaultSymbol, false));
+		formsDataBlock.setPamSymbolManager(new LoggerSymbolManager(formsDataBlock));
 
 
 		setTimeOfNextSave();
@@ -1068,7 +1067,7 @@ public class FormDescription implements Cloneable, Comparable<FormDescription> {
 				normalForm = createForm();
 				formComponent = normalForm.getComponent();
 			}
-			formsDataDisplayTable = new FormsDataDisplayTable(this);
+			formsDataDisplayTable = new FormsDataDisplayTable(formsControl, this);
 
 			splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, formComponent, formsDataDisplayTable.getMainPanel());
 			if (formSettingsControl.getFormSettings().splitPanelPosition != null) {
@@ -1122,7 +1121,8 @@ public class FormDescription implements Cloneable, Comparable<FormDescription> {
 	}
 
 	public LoggerForm createForm() {
-		return new LoggerForm(this,LoggerForm.NewDataForm);
+		boolean viewer = PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW;
+		return new LoggerForm(this, viewer ? LoggerForm.NewDataForm : LoggerForm.NewDataForm);
 	}
 
 
@@ -1229,6 +1229,22 @@ public class FormDescription implements Cloneable, Comparable<FormDescription> {
 		public void actionPerformed(ActionEvent arg0) {
 			removeForm(parentFrame);
 		}
+	}
+
+	/**
+	 * Delete a data unit from memory and from database. 
+	 * @param dataUnit
+	 * @return
+	 */
+	public boolean deleteDataUnit(FormsDataUnit dataUnit) {
+		if (dataUnit == null) {
+			return false;
+		}
+		boolean ans = getFormsDataBlock().remove(dataUnit, true);
+		if (formsDataDisplayTable != null) {
+			formsDataDisplayTable.dataChanged();
+		}
+		return ans;
 	}
 	/**
 	 * Create a new subtab form on the appropriate sub tab panel. 
@@ -1644,6 +1660,15 @@ public class FormDescription implements Cloneable, Comparable<FormDescription> {
 	public void viewDataUnit(FormsDataUnit formsDataUnit) {
 		if (normalForm != null) {
 			normalForm.restoreData(formsDataUnit);
+		}
+	}
+	
+	public void optionsChange() {
+		if (normalForm != null) {
+			normalForm.optionsChange();
+		}
+		if (formsDataDisplayTable != null) {
+			formsDataDisplayTable.optionsChange();
 		}
 	}
 

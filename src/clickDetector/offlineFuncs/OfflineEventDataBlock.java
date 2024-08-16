@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Vector;
 
+import Localiser.LocalisationAlgorithm;
 import Localiser.detectionGroupLocaliser.GroupDetection;
 import PamController.PamController;
 import PamController.PamControllerInterface;
@@ -16,9 +17,11 @@ import PamController.PamViewParameters;
 import PamUtils.PamCalendar;
 import PamView.symbol.StandardSymbolManager;
 import pamScrollSystem.ViewLoadObserver;
+import targetMotionOld.TargetMotionLocaliser;
 import tethys.TethysControl;
 import tethys.pamdata.TethysDataProvider;
 import tethys.species.DataBlockSpeciesManager;
+import clickDetector.ClickControl;
 import clickDetector.ClickDetection;
 //import staticLocaliser.StaticLocaliserControl;
 //import staticLocaliser.StaticLocaliserProvider;
@@ -315,6 +318,20 @@ public class OfflineEventDataBlock extends SuperDetDataBlock<OfflineEventDataUni
 	@Override
 	public DataAutomationInfo getDataAutomationInfo() {
 		return new DataAutomationInfo(DataAutomation.MANUALANDAUTOMATIC);
+	}
+
+	@Override
+	public LocalisationAlgorithm getLocalisationAlgorithm() {
+		/**
+		 * Need to override the default, which would have been finding the 
+		 * main click control. Here, we need to explicitly find the 
+		 * Target Motion Localiser 
+		 */
+		ClickControl clickControl = clickDetector.getClickControl();
+		ClicksOffline clicksOffline = clickControl.getClicksOffline();
+		TargetMotionLocaliser<GroupDetection> tml = clickControl.getTargetMotionLocaliser();
+		return tml;
+//		return super.getLocalisationAlgorithm();
 	}
 
 

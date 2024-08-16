@@ -6,6 +6,6 @@ package tethys.localization;
  * @author dg50
  *
  */
-public enum LocalizationType {
-	Bearing, PerpindicularRange, Point, Range, Track;
+public enum LocalizationTypes {
+	Bearing, PerpendicularRange, Point, Range, Track;
 }

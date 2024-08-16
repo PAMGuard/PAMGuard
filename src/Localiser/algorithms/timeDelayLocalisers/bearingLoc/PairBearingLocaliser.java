@@ -11,6 +11,7 @@ import Localiser.LocalisationAlgorithmInfo;
 import PamDetection.LocContents;
 import PamUtils.PamUtils;
 import pamMaths.PamVector;
+import tethys.localization.LocalizationCreator;
 
 /**
  * Really simple BearingLocaliser which works with two element closely
@@ -308,5 +309,10 @@ public class PairBearingLocaliser implements BearingLocaliser {
 	@Override
 	public LocalisationAlgorithmInfo getAlgorithmInfo() {
 		return this;
+	}
+	@Override
+	public LocalizationCreator getTethysCreator() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

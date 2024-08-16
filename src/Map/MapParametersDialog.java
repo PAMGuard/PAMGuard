@@ -31,7 +31,12 @@ import Array.Hydrophone;
 import Map.gridbaselayer.GridDialogPanel;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
+import PamView.dialog.SettingsButton;
+import PamView.dialog.SourcePanel;
 import PamView.panel.PamNorthPanel;
+import PamguardMVC.PamDataBlock;
+import effort.EffortProvider;
+import effort.swing.EffortSourcePanel;
 
 
 
@@ -64,6 +69,8 @@ public class MapParametersDialog extends PamDialog {
 	private JCheckBox headingUp = new JCheckBox("Ship heading always up");
 	
 	private JCheckBox showSurface = new JCheckBox("Show sea surface");
+	
+	private JCheckBox colourByEffort = new JCheckBox("Colour track-line by efort");
 
 	private MapFileManager mapFileManager;
 
@@ -78,6 +85,10 @@ public class MapParametersDialog extends PamDialog {
 	public JCheckBox showGrid;
 
 	private SimpleMap simpleMap;
+	
+	private EffortSourcePanel effortSourcePanel;
+	
+	private SettingsButton effortSettings;
 
 	private MapParametersDialog(java.awt.Window parentFrame, SimpleMap simpleMap) {
 
@@ -110,15 +121,21 @@ public class MapParametersDialog extends PamDialog {
 		setDialogComponent(tabbedPane);
 		setHelpPoint("mapping.mapHelp.docs.overview");
 		//		this.enableHelpButton(true);
+		colourByEffort.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				enableControls();
+			}
+		});
 
 		//hydroCheckBox.get
 	}
 //	MapParameters oldParameters, MapFileManager mapFile
 
 	public static MapParameters showDialog(java.awt.Window parentFrame, SimpleMap simpleMap) {
-		if (singleInstance == null || singleInstance.simpleMap != simpleMap) {
+//		if (singleInstance == null || singleInstance.simpleMap != simpleMap) {
 			singleInstance = new MapParametersDialog(parentFrame, simpleMap);
-		}
+//		}
 		singleInstance.mapParameters = simpleMap.mapParameters.clone();
 		singleInstance.mapFileManager = simpleMap.mapFileManager;
 		singleInstance.setParams();
@@ -141,6 +158,8 @@ public class MapParametersDialog extends PamDialog {
 		keepShipCentred.setSelected(mapParameters.keepShipCentred);
 		headingUp.setSelected(mapParameters.headingUp);
 		showSurface.setSelected(mapParameters.hideSurface == false);
+		colourByEffort.setSelected(mapParameters.colourByEffort);
+		effortSourcePanel.setSource(mapParameters.effortDataSource);
 
 		filePanel.setMapFile(mapParameters.mapFile);
 		
@@ -177,6 +196,8 @@ public class MapParametersDialog extends PamDialog {
 					return showWarning("Range rings sepration must be > 0");
 				}
 			}
+			mapParameters.colourByEffort = colourByEffort.isSelected();
+			mapParameters.effortDataSource = effortSourcePanel.getSourceName();
 		}
 		catch (Exception Ex) {
 			return false;
@@ -216,6 +237,14 @@ public class MapParametersDialog extends PamDialog {
 			GridBagLayout layout;
 			setLayout(layout = new GridBagLayout());
 			GridBagConstraints constraints = new PamGridBagContraints();
+			effortSourcePanel = new EffortSourcePanel(singleInstance);
+			effortSettings = new SettingsButton();
+			effortSettings.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					showEffortSettings();
+				}
+			});
 			//		t.setLayout(new GridLayout(4,3));
 			constraints.anchor = GridBagConstraints.WEST;
 			constraints.gridx = 0;
@@ -224,36 +253,61 @@ public class MapParametersDialog extends PamDialog {
 			constraints.gridx ++;
 			addComponent(this,trackShowtime = new JTextField(7), constraints);
 			constraints.gridx ++;
-			addComponent(this,new JLabel(" s"), constraints);
+			addComponent(this,new JLabel(" s "), constraints);
+			constraints.gridx++;
+			addComponent(this, colourByEffort, constraints);
+			constraints.gridx += 2;
+			constraints.gridwidth = 1;
+			constraints.fill = constraints.NONE;
+			constraints.anchor = constraints.LINE_END;
+			addComponent(this, effortSettings, constraints);
 			constraints.gridx = 0;
 			constraints.gridy ++;
+			constraints.anchor = constraints.LINE_START;
 			addComponent(this,new JLabel("Data storage time "), constraints);
 			constraints.gridx ++;
 			addComponent(this,dataKeepTime = new JTextField(7), constraints);
 			constraints.gridx ++;
-			addComponent(this,new JLabel(" s"), constraints);
+			addComponent(this,new JLabel(" s "), constraints);
+			constraints.gridx++;
+			constraints.gridwidth = 3;
+			constraints.fill = constraints.HORIZONTAL;
+			addComponent(this, effortSourcePanel.getPanel(), constraints);
 			constraints.gridx = 0;
 			constraints.gridy ++;
+			constraints.gridwidth = 1;
 			addComponent(this,new JLabel("Data display time "), constraints);
 			constraints.gridx ++;
 			addComponent(this,dataShowTime = new JTextField(7), constraints);
 			constraints.gridx ++;
-			addComponent(this,new JLabel(" s"), constraints);
+			addComponent(this,new JLabel(" s "), constraints);
 			constraints.gridx = 0;
 			constraints.gridy ++;
-			constraints.gridwidth = 3;
+			constraints.gridwidth = 2;
 
 			addComponent(this,shipCheckBox, constraints);
-			constraints.gridy ++;
+			constraints.gridx += constraints.gridwidth;
 			addComponent(this,keepShipOnMap, constraints);
+			constraints.gridy ++;
 			constraints.gridx = 0;
-			constraints.gridy ++;
-			constraints.gridwidth = 3;
 			addComponent(this,keepShipCentred, constraints);
-			constraints.gridy ++;
+			constraints.gridx += constraints.gridwidth;		
 			addComponent(this,headingUp, constraints);
 			constraints.gridy ++;
+			constraints.gridx = 0;
 			addComponent(this, showSurface, constraints);
+		}
+
+		protected void showEffortSettings() {
+			PamDataBlock effortBlock = effortSourcePanel.getSource();
+			if (effortBlock == null) {
+				return;
+			}
+			EffortProvider effortProvider = effortBlock.getEffortProvider();
+			if (effortProvider == null) {
+				return;
+			}
+			effortProvider.showOptionsDialog(singleInstance, simpleMap.getSelectorName());
 		}
 	}
 
@@ -491,6 +545,9 @@ public class MapParametersDialog extends PamDialog {
 		colourByChannel.setEnabled(hydroCheckBox.isSelected());
 		symbolSizeSpinner.setEnabled(hydroCheckBox.isSelected());
 		ringsRange.setEnabled(ringsType.getSelectedIndex() > 0);
+		boolean ec = colourByEffort.isSelected();
+		effortSettings.setSelected(ec);
+		effortSourcePanel.setEnabled(ec);
 	}
 
 

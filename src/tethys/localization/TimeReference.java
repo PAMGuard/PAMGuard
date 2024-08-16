@@ -6,5 +6,5 @@ package tethys.localization;
  *
  */
 public enum TimeReference {
-	absolute, channel, relative;
+	absolute, channel, relative, beam;
 }

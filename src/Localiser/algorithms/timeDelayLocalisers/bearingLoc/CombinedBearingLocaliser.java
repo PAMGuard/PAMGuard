@@ -5,6 +5,7 @@ import java.io.Serializable;
 import Localiser.LocalisationAlgorithmInfo;
 import PamDetection.LocContents;
 import pamMaths.PamVector;
+import tethys.localization.LocalizationCreator;
 
 @Deprecated
 public class CombinedBearingLocaliser implements BearingLocaliser {
@@ -84,6 +85,12 @@ public class CombinedBearingLocaliser implements BearingLocaliser {
 	@Override
 	public LocalisationAlgorithmInfo getAlgorithmInfo() {
 		return this;
+	}
+
+	@Override
+	public LocalizationCreator getTethysCreator() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

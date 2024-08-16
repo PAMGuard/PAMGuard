@@ -19,6 +19,7 @@ import detectionPlotFX.data.DDPlotRegister;
 import detectionPlotFX.rawDDPlot.ClickDDPlotProvider;
 import detectionPlotFX.whistleDDPlot.WhistleDDPlotProvider;
 import spectrogramNoiseReduction.SpectrogramNoiseProcess;
+import tethys.localization.LocalizationCreator;
 import whistlesAndMoans.layoutFX.WhistleMoanGUIFX;
 import whistlesAndMoans.plots.WhistlePlotProvider;
 import PamController.PamConfiguration;
@@ -235,5 +236,10 @@ public class WhistleMoanControl extends PamControlledUnit implements PamSettings
 	@Override
 	public LocalisationAlgorithmInfo getAlgorithmInfo() {
 		return whistleToneProcess.getLocAlgorithmInfo();
+	}
+
+	@Override
+	public LocalizationCreator getTethysCreator() {
+		return null;
 	}
 }

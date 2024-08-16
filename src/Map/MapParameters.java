@@ -95,6 +95,12 @@ public class MapParameters implements Serializable, Cloneable, ManagedParameters
 	
 	public int symbolSize = Hydrophone.DefaultSymbolSize;
 	
+	public boolean colourByEffort = false;
+	/**
+	 * Name of data block providing effort data. 
+	 */
+	public String effortDataSource;
+	
 	private static final int defaultMapRange = 10000;
 	/**
 	 * Value to store persistently between runs. 

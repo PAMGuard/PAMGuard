@@ -2,16 +2,20 @@ package loggerForms;
 
 import java.util.ArrayList;
 
+import PamController.PamViewParameters;
 import loggerForms.controlDescriptions.ControlDescription;
 import loggerForms.controlDescriptions.InputControlDescription;
+import pamScrollSystem.ViewLoadObserver;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import generalDatabase.PamConnection;
+import generalDatabase.PamTableDefinition;
 import generalDatabase.SQLLogging;
 import generalDatabase.SQLTypes;
 
 public class FormsLogging extends SQLLogging {
 
-	FormDescription formDescription;
+	private FormDescription formDescription;
 	
 	protected FormsLogging(FormDescription formDescription, PamDataBlock pamDataBlock) {
 		super(pamDataBlock);
@@ -20,53 +24,34 @@ public class FormsLogging extends SQLLogging {
 		setTableDefinition(formDescription.getOutputTableDef());
 	}
 
-//	@Override
-//	public void setTableData(PamDataUnit pamDataUnit) {
-//		
-//		FormsDataUnit formDataUnit = (FormsDataUnit) pamDataUnit;
-//		int dataLen = formDataUnit.getFormData().length;
-//		int tableLen= getTableDefinition().getTableItemCount();
-//		
-////		for (int j=0;j<tableLen;j++){
-////			System.out.println(getTableDefinition().getTableItem(j).getName());
-////		}
-//		
-//		int diff = tableLen-dataLen;
-//		// put number of standard items as static is pamtable item/table(ie diff ~3-5)
-//		
-////		System.out.printf("Save Forms Data "+PamCalendar.formatDateTime(formDataUnit.getTimeMilliseconds())+"\n");
-//		
-//		for (int i=0;i<dataLen;i++){
-////			System.out.printf("INTS.. %d dataLen:%d, tableLen:%d, diff:%d \n",i,dataLen,tableLen,diff);
-////			if ((formDataUnit.getFormData()[i]==null)){
-////				System.out.println("Object "+i+" to save: ~null");
-////				getTableDefinition().getTableItem(i+diff).setValue(null);  //be null;
-////			}else{
-////				System.out.println("Object "+i+" to save: "+formDataUnit.getFormData()[i].toString());
-////				System.out.println("Name: "+getTableDefinition().getTableItem(i+diff).getName());
-////				System.out.println("Data: "+formDataUnit.getFormData()[i]);
-//				getTableDefinition().getTableItem(i+diff).setValue(formDataUnit.getFormData()[i]);//object
-//				
-////			}
-//			
-//		}
-//		
-//	}
+	@Override
+	public String getViewerLoadClause(SQLTypes sqlTypes, PamViewParameters pvp) {
+		// modified clause in case the form defines a start time element in which 
+		// case we need an OR of that and UTC. 
+		String standardClause = super.getViewerLoadClause(sqlTypes, pvp);
+		PropertyDescription startProp = formDescription.findProperty(PropertyTypes.STARTTIME);
+		if (startProp == null) {
+			return standardClause;
+		}
+		String startName = startProp.getDbTitle();
+		if (startName == null) {
+			return standardClause;
+		}
+		startName = PamTableDefinition.deblankString(startName); // replace blanks with underscores. 
+		startName = sqlTypes.formatColumnName(startName); // wrap as standard for this database taype. 
+		String t1 = sqlTypes.formatDBDateTimeQueryString(pvp.viewStartTime);
+		String t2 = sqlTypes.formatDBDateTimeQueryString(pvp.viewEndTime);
+		String newClause = String.format(" WHERE (UTC BETWEEN %s AND %s) OR (%s BETWEEN %s AND %s) ORDER BY %s, UTC, UTCMilliseconds", 
+				t1, t2, startName, t1, t2, startName);
+		
+		return newClause;
+	}
 	
 	@Override
 	public void setTableData(SQLTypes sqlTypes, PamDataUnit pamDataUnit) {
 		FormsDataUnit formDataUnit = (FormsDataUnit) pamDataUnit;
 		
 		Object[] datas = formDataUnit.getFormData();
-//		for(LoggerControl lc:formDataUnit.getLoggerForm().getInputControls()){
-//			
-//			lc.moveDataToTableItems();
-////			for (FormsTableItem fti:lc.getControlDescription().getFormsTableItems()){
-////				
-////				getTableDefinition().getTableItem(fti).setValue(lc.getData());
-////				
-////			}
-//		}
 		
 		ArrayList<InputControlDescription> inputCtrls = formDescription.getInputControlDescriptions();
 		InputControlDescription cd;
@@ -76,9 +61,6 @@ public class FormsLogging extends SQLLogging {
 			
 		}
 		
-//		for (ControlDescription controlDescription:formDescription.getInputControlDescriptions()){
-//			controlDescription.moveDataTo
-//		}
 	}
 
 	/* (non-Javadoc)
@@ -98,21 +80,6 @@ public class FormsLogging extends SQLLogging {
 			}
 		}
 		
-//		
-//		int dataLen = formDescription.getInputControlDescriptions().size();
-//		int tableLen= getTableDefinition().getTableItemCount();
-//		int diff = tableLen-dataLen;
-//		Object[] formData = new Object[dataLen];
-//		int tableIndex;
-//		for (int j=0;j<dataLen;j++){
-//			tableIndex = j+diff;
-//			formData[j] = getTableDefinition().getTableItem(j+diff).getValue();
-//			if (formData[j] != null && formData[j].getClass() == String.class) {
-//				formData[j] = ((String) formData[j]).trim();
-//			}
-//		}
-		
-//		formDescription.getf
 		
 		FormsDataUnit formsDataUnit = new FormsDataUnit(null, timeMilliseconds, formDescription, formData);
 		formsDataUnit.setDatabaseIndex(databaseIndex);
@@ -120,16 +87,17 @@ public class FormsLogging extends SQLLogging {
 		
 		return formsDataUnit;
 		
-		
-		
-		
-		
-		
-		
-		
-		
-//		LoggerForm.
-//		return new FormsDataUnit(null, timeMilliseconds, formDescription, formData);
+	}
+
+
+
+	@Override
+	public boolean loadViewData(PamConnection con, PamViewParameters pamViewParameters, ViewLoadObserver loadObserver) {
+		boolean ans = super.loadViewData(con, pamViewParameters, loadObserver);
+		if (ans) {
+			getPamDataBlock().sortData();
+		}
+		return ans;
 	}
 
 }

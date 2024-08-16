@@ -15,6 +15,7 @@ import PamUtils.ArrayDump;
 import PamUtils.PamUtils;
 import PamUtils.SystemTiming;
 import pamMaths.PamVector;
+import tethys.localization.LocalizationCreator;
 import tethys.pamdata.AutoTethysProvider;
 
 /**
@@ -760,6 +761,12 @@ public class MLGridBearingLocaliser2 implements BearingLocaliser {
 	@Override
 	public LocalisationAlgorithmInfo getAlgorithmInfo() {
 		return this;
+	}
+
+	@Override
+	public LocalizationCreator getTethysCreator() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	/**

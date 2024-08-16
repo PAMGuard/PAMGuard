@@ -5,6 +5,11 @@ package tethys.localization;
  * @author dg50
  *
  */
-public enum LocalizationSubType {
+public enum LocalizationSubTypes {
 	Geographic, Derived, Engineering;
+	/*
+	 * Geographic is WGS84
+	 * Derived is something like UTM, but is basically geographic
+	 * Engineering is relative to platform or fixed point. 
+	 */
 }

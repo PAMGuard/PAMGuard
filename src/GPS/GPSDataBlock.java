@@ -2,6 +2,7 @@ package GPS;
 
 import java.util.ListIterator;
 
+import GPS.effort.GpsEffortProvider;
 import nmeaEmulator.EmulatedData;
 import nmeaEmulator.NMEAEmulator;
 import pamScrollSystem.ViewLoadObserver;
@@ -37,6 +38,7 @@ public class GPSDataBlock extends PamDataBlock<GpsDataUnit> implements NMEAEmula
 	public GPSDataBlock(PamProcess process) {
 		super(GpsDataUnit.class, process.getPamControlledUnit().getUnitName(), process, 1);
 		setSynchLock(NavDataSynchronisation.getSynchobject());
+		setEffortProvider(new GpsEffortProvider(this));
 	}
 
 	@Override

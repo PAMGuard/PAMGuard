@@ -144,10 +144,13 @@ public class LookUpTables {
 			String topic1 = list.get(i).getTopic().trim();
 			for (int j = i+1; j < n; j++) {
 				String code2 = list.get(j).getCode().trim();
-				String topic2 = list.get(j).getTopic().trim();
+				String topic2 = list.get(j).getTopic();
+				if (topic2 != null) {
+				topic2 = topic2.trim();
 				if (code.equals(code2) && topic1.equals(topic2)) {
 					isRepeat[j] = true;
 					nRepeat++;
+				}
 				}
 			}
 		}
@@ -183,7 +186,7 @@ public class LookUpTables {
 			return null;
 		}
 		ArrayList<String> topics = new ArrayList<>();
-		String qStr = "SELECT DISTINCT Topic FROM  " + lutTableDef.getTableName();
+		String qStr = "SELECT DISTINCT Topic FROM  " + lutTableDef.getTableName() + " WHERE TOPIC IS NOT NULL";
 		try {
 			Statement stmt = con.getConnection().createStatement();
 			boolean ok = stmt.execute(qStr);
