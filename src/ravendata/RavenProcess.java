@@ -12,7 +12,9 @@ import PamView.symbol.StandardSymbolManager;
 import PamView.symbol.SymbolData;
 import PamguardMVC.PamProcess;
 import dataMap.OfflineDataMap;
+import dataPlotsFX.data.TDDataProviderRegisterFX;
 import generalDatabase.DBControlUnit;
+import ravendata.fx.RavenPlotProviderFX;
 import ravendata.swing.RavenGraphics;
 
 public class RavenProcess extends PamProcess {
@@ -34,6 +36,8 @@ public class RavenProcess extends PamProcess {
 		ravenDataBlock.SetLogging(ravenLogging);
 		ravenDataBlock.setOverlayDraw(new RavenGraphics(ravenDataBlock));
 		ravenDataBlock.setPamSymbolManager(new StandardSymbolManager(ravenDataBlock, standardSymbol));
+		
+		TDDataProviderRegisterFX.getInstance().registerDataInfo(new RavenPlotProviderFX(ravenDataBlock));
 	}
 
 	@Override
