@@ -24,11 +24,13 @@ import dataPlotsFX.data.TDDataInfoFX;
 import dataPlotsFX.data.TDDataProviderFX;
 import dataPlotsFX.data.TDScaleInfo;
 import dataPlotsFX.layout.TDGraphFX;
+import dataPlotsFX.layout.TDSettingsPane;
 import dataPlotsFX.projector.TDProjectorFX;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
+import pamViewFX.fxNodes.PamSymbolFX;
 
 /**
  * Generic data plot info which can work for a wide variety of data types. May still 
@@ -57,7 +59,7 @@ public class GenericDataPlotInfo extends TDDataInfoFX {
 
 	private TDSymbolChooserFX managedSymbolChooser;
 	
-	
+	private GenericSettingsPane genericSettingsPane;
 	/**
 	 * The frequency info 
 	 */
@@ -76,10 +78,10 @@ public class GenericDataPlotInfo extends TDDataInfoFX {
 		bearingScaleInfo.setReverseAxis(true); //set the axis to be reverse so 0 is at top of graph
 		ampScaleInfo = new GenericScaleInfo(100, 200, ParameterType.AMPLITUDE, ParameterUnits.DB);
 		slantScaleInfo = new GenericScaleInfo(0, 180, ParameterType.SLANTBEARING, ParameterUnits.DEGREES);
-		
 		frequencyInfo = new GenericScaleInfo(0, 1, ParameterType.FREQUENCY, ParameterUnits.HZ);
 		Arrays.fill(frequencyInfo.getPlotChannels(),1); //TODO-manage plot pane channels somehow. 
 		frequencyInfo.setMaxVal(pamDataBlock.getSampleRate()/2);
+		genericSettingsPane = new GenericSettingsPane(this);
 
 		addScaleInfo(bearingScaleInfo);
 		addScaleInfo(slantScaleInfo);
@@ -118,6 +120,11 @@ public class GenericDataPlotInfo extends TDDataInfoFX {
 		
 		g.setLineDashes(null);
 		g.setLineWidth(2);
+		TDSymbolChooserFX symbolChooser = getSymbolChooser();
+		PamSymbolFX symbol = null;
+		if (symbolChooser != null) {
+			symbol = symbolChooser.getPamSymbol(pamDataUnit, type);
+		}
 		
 		double[] f = pamDataUnit.getFrequency();
 		if (f == null) {
@@ -131,10 +138,14 @@ public class GenericDataPlotInfo extends TDDataInfoFX {
 		double y1 = tdProjector.getYPix(f[1]);
 		double x0 = tdProjector.getTimePix(pamDataUnit.getTimeMilliseconds()-scrollStart);
 		double x1 = tdProjector.getTimePix(pamDataUnit.getEndTimeInMilliseconds()-scrollStart);
-		g.setStroke(getSymbolChooser().getPamSymbol(pamDataUnit, type).getLineColor());
+		if (symbol != null) {
+			g.setStroke(symbol.getLineColor());
+			g.setLineWidth(symbol.getLineThickness());
+			Color fillCol = symbol.getFillColor(); 
+			double alpha = fillCol.getOpacity();
+			g.setFill(Color.color(fillCol.getRed(), fillCol.getGreen(), fillCol.getBlue(), alpha)); //add alpha
+		}
 		
-		Color fillCol = getSymbolChooser().getPamSymbol(pamDataUnit, type).getFillColor(); 
-		g.setFill(Color.color(fillCol.getRed(), fillCol.getGreen(), fillCol.getBlue(), 0.4)); //add alpha
 
 		double y = Math.min(y0,  y1);
 		double h = Math.abs(y1-y0);
@@ -173,6 +184,11 @@ public class GenericDataPlotInfo extends TDDataInfoFX {
 		return null;
 	}
 	
+
+	@Override
+	public TDSettingsPane getGraphSettingsPane() {
+		return genericSettingsPane;
+	}
 
 	@Override
 	public Double getDataValue(PamDataUnit pamDataUnit) {
@@ -261,9 +277,9 @@ public class GenericDataPlotInfo extends TDDataInfoFX {
 
 	@Override
 	public TDSymbolChooserFX getSymbolChooser() {
-		if (managedSymbolChooser == null) {
+//		if (managedSymbolChooser == null) {
 			managedSymbolChooser = createSymbolChooser();
-		}
+//		}
 		return managedSymbolChooser;
 	}
 

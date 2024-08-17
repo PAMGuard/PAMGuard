@@ -2,6 +2,7 @@ package PamView.symbol;
 
 import java.awt.Color;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import PamUtils.PamArrayUtils;
@@ -131,6 +132,12 @@ public class StandardSymbolOptions extends PamSymbolOptions implements Serializa
 	 * @param i - the index of the symbol modifier (not modified). 
 	 */
 	public void setEnabled(boolean enabled, int i) {
+		if (isEnabled == null) {
+			isEnabled = new boolean[i+1];
+		}
+		else if (isEnabled.length < i+1) {
+			isEnabled = Arrays.copyOf(isEnabled, i+1);
+		}
 		isEnabled[i] = enabled;
 	}
 	
