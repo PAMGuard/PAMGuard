@@ -156,4 +156,13 @@ public class RavenDataRow {
 		return unpackOK;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof RavenDataRow == false) {
+			return false;
+		}
+		RavenDataRow oth = (RavenDataRow) obj;
+		return this.channel == oth.channel && this.beginT == oth.beginT && this.endT == oth.endT && this.f1 == oth.f1 && this.f2 == oth.f2;
+	}
+
 }

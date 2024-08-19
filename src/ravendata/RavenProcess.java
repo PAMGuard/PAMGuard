@@ -84,20 +84,28 @@ public class RavenProcess extends PamProcess {
 		ravenDataBlock.clearAll();
 		ravenLogging.deleteData(0, System.currentTimeMillis()*2);
 		
+		RavenDataRow prevRow = null;
 		for (RavenDataRow ravenRow : ravenData) {
-			int fileInd = getTimeIndex(ravenRow.getBeginT()*1000, absTime);
-			if (fileInd == absTime.length) {
-				String msg = String.format("Data at time %6.4f is beyond the end of available sound file data", ravenRow.getBeginT());
-				WarnOnce.showWarning("Error importing RAVEN data", msg, WarnOnce.WARNING_MESSAGE);
-				break;
+			if (ravenRow.equals(prevRow) == false) {
+				/**
+				 *  A lot of Raven data appear twice, with different view values. 
+				 *  No need to import both. so only doing this if they are different. 
+				 */
+				int fileInd = getTimeIndex(ravenRow.getBeginT()*1000, absTime);
+				if (fileInd == absTime.length) {
+					String msg = String.format("Data at time %6.4f is beyond the end of available sound file data", ravenRow.getBeginT());
+					WarnOnce.showWarning("Error importing RAVEN data", msg, WarnOnce.WARNING_MESSAGE);
+					break;
+				}
+				long fileStart = fileStarts[fileInd];
+				long absStart = fileStart + (long) (ravenRow.getBeginT()*1000.)-absTime[fileInd];
+				long duration = (long) ((ravenRow.getEndT()-ravenRow.getBeginT())*1000.);
+				int chanMap = 1<<(ravenRow.getChannel()-1);
+				RavenDataUnit rdu = new RavenDataUnit(absStart, chanMap, duration, ravenRow.getF1(), ravenRow.getF2());
+				getRavenDataBlock().addPamData(rdu);
+				ravenLogging.logData(DBControlUnit.findConnection(), rdu);
 			}
-			long fileStart = fileStarts[fileInd];
-			long absStart = fileStart + (long) (ravenRow.getBeginT()*1000.)-absTime[fileInd];
-			long duration = (long) ((ravenRow.getEndT()-ravenRow.getBeginT())*1000.);
-			int chanMap = 1<<(ravenRow.getChannel()-1);
-			RavenDataUnit rdu = new RavenDataUnit(absStart, chanMap, duration, ravenRow.getF1(), ravenRow.getF2());
-			getRavenDataBlock().addPamData(rdu);
-			ravenLogging.logData(DBControlUnit.findConnection(), rdu);
+			prevRow = ravenRow;
 		}
 		
 		OfflineDataMap dataMap = ravenDataBlock.getPrimaryDataMap();
