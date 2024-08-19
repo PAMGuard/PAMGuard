@@ -4,6 +4,8 @@ import PamController.PamControlledUnit;
 import PamView.symbol.StandardSymbolManager;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
+import annotationMark.fx.MarkDataPlotInfo;
+import annotationMark.fx.MarkPlotProviderFX;
 import dataPlotsFX.data.TDDataProviderRegisterFX;
 import dataPlotsFX.data.generic.GenericDataPlotProvider;
 
@@ -28,7 +30,7 @@ public class MarkProcess extends PamProcess {
 		markDataBlock.setPamSymbolManager(new StandardSymbolManager(markDataBlock, MarkOverlayDraw.defaultSymbolData, false));
 		addOutputDataBlock(markDataBlock);
 		
-		TDDataProviderRegisterFX.getInstance().registerDataInfo(genericDataPloProvider = new GenericDataPlotProvider(markDataBlock));
+		TDDataProviderRegisterFX.getInstance().registerDataInfo(genericDataPloProvider = new MarkPlotProviderFX(markDataBlock));
 //		markDataBlock.setOverlayDraw(new S);
 	}
 
