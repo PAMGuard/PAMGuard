@@ -1,5 +1,6 @@
 package export.RExport;
 
+import java.awt.Component;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -20,6 +21,7 @@ import PamguardMVC.PamDataUnit;
 import export.PamDataUnitExporter;
 import export.PamExporterManager;
 import export.MLExport.MLDetectionsManager;
+import javafx.scene.layout.Pane;
 
 /**
  * Handles exporting pam data units into an rdata. 
@@ -270,6 +272,20 @@ public class RExportManager implements PamDataUnitExporter {
 		System.out.println("RData length: " + allData.length());
 		
 		return false;
+	}
+
+
+	@Override
+	public Component getOptionsPanel() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public Pane getOptionsPane() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

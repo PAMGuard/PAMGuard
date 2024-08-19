@@ -1,5 +1,6 @@
 package export.wavExport;
 
+import java.awt.Component;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,15 +20,24 @@ import PamguardMVC.PamObservable;
 import PamguardMVC.PamObserver;
 import PamguardMVC.PamObserverAdapter;
 import PamguardMVC.PamRawDataBlock;
+import PamguardMVC.RawDataHolder;
 import PamguardMVC.dataOffline.OfflineDataLoading;
 import dataMap.OfflineDataMapPoint;
 import detectiongrouplocaliser.DetectionGroupSummary;
 import export.PamDataUnitExporter;
+import javafx.scene.layout.Pane;
 import wavFiles.Wav16AudioFormat;
 import wavFiles.WavFileWriter;
 
 /**
- * Manages .wav file writing based on what type of data unit is selected and whether raw data is available. 
+ * Manages .wav file writing based on what type of data unit is selected and whether raw data is available.
+ * <p>
+ * There are two primary use cases; 
+ * <br>
+ * 1) Order raw data from an overlay mark and save as a wav file
+ * <br>
+ * 2) Save a list of data units to wav files - either a single file with zero pads, a concatonated file or seperate files. 
+ * 
  * @author Jamie Macaulay
  *
  */
@@ -64,11 +74,14 @@ public class WavFileExportManager implements PamDataUnitExporter  {
 
 	private ArrayList<WavDataUnitExport> wavDataUnitExports = new ArrayList<WavDataUnitExport>();
 
-	private WavSaveCallback saveCallback; 
+	private WavSaveCallback saveCallback;
+	
+	private WavExportOptions wavFileoptions = new WavExportOptions(); 
+
+	private WavOptionsPanel wavOptionsPanel; 
 
 	public WavFileExportManager() {
 		wavDataUnitExports.add(new RawHolderWavExport());	
-
 
 		defaultPath=FileSystemView.getFileSystemView().getDefaultDirectory().getPath();
 		defaultPath=defaultPath + File.separator + "Pamguard Manual Export";
@@ -153,10 +166,18 @@ public class WavFileExportManager implements PamDataUnitExporter  {
 	}
 
 	/**
-	 * Convert the mark/dataunits to a .wav file. 
-	 * @param foundDataUnits - found data units. 
-	 * @param selectedIndex - the currently selected data unit. 
-	 * @param mark - overlay mark. 
+	 * Convert the mark/dataunits to a .wav file. makes a decision as to what to
+	 * save
+	 * 
+	 * 1) Data units with no raw data in which case we want to export a wav clip
+	 * from raw data <br> 2) Data units which all have raw data in which case we want to
+	 * export data unit clips as a zero padded wav file (this counts for a single
+	 * data unit too) <b> 3) Mixed data units in which case we want to export a wav clip
+	 * from raw data.
+	 * 
+	 * @param foundDataUnits - found data units.
+	 * @param selectedIndex  - the currently selected data unit.
+	 * @param mark           - overlay mark.
 	 */
 	public int dataUnits2Wav(DetectionGroupSummary foundDataUnits, int selectedIndex, OverlayMark mark) {
 		System.out.println("Data units 2 wav");
@@ -219,6 +240,7 @@ public class WavFileExportManager implements PamDataUnitExporter  {
 
 	/**
 	 * Save a clip of wav data from a pre existing .wav or other audio file within in PG. 
+	 * 
 	 * @param start - the start of the wav file. 
 	 * @param end - the end of the wac file. 
 	 */
@@ -236,6 +258,166 @@ public class WavFileExportManager implements PamDataUnitExporter  {
 
 		return 0; 
 	}
+
+
+	/**
+	 * Save wav data from a data unit instead of from the raw file store. 
+	 * @param foundDataUnits - the list of found data units. 
+	 * @return the number of data units that were saved. 
+	 */
+	private int saveDataUnitWav(DetectionGroupSummary foundDataUnits) {
+		return saveDataUnitWav(foundDataUnits.getDataList());
+	}
+	
+	/**
+	 * Save data units which contain raw data to a wav file. Note that this assumed
+	 * the data units all contain raw data and are in order.
+	 * 
+	 * @param foundDataUnits - data units containing raw data.
+	 * @return the number of data units saved - this should be the same as the size
+	 *         of the data unit list.
+	 */
+	private int saveDataUnitWav(List<PamDataUnit> foundDataUnits) {
+		int n=0; 
+		WavFileWriter wavWrite = null; 
+		for (PamDataUnit fnDataUnit: foundDataUnits){
+
+			String currentFile = createFileName(fnDataUnit.getTimeMilliseconds()); 
+
+			AudioFormat audioFormat = new Wav16AudioFormat(fnDataUnit.getParentDataBlock().getSampleRate(), PamUtils.getNumChannels(fnDataUnit.getChannelBitmap()));
+
+			System.out.println("Save detection wav." + foundDataUnits.size());
+			
+			for (int i=0; i<wavDataUnitExports.size(); i++) {
+				if (wavDataUnitExports.get(i).getUnitClass().isAssignableFrom(fnDataUnit.getClass())) {
+					
+					wavWrite= new WavFileWriter(currentFile, audioFormat); 
+
+					System.out.println("Append wav." + foundDataUnits.size());
+					//save the wav file of detection
+					wavWrite.append(wavDataUnitExports.get(i).getWavClip(fnDataUnit)); 
+					n++; 
+					
+					wavWrite.close();
+					break; 
+				}
+			}
+		}
+		
+		//send a message that the wav file has saved
+		if (wavWrite!=null && saveCallback!=null) saveCallback.wavSaved(wavWrite.getFileName(), 0);
+		
+		return n;
+	}
+
+
+
+	/**
+	 * Save wav data from a data unit instead of from the raw file store. 
+	 * @param foundDataUnits - the list of found data units. 
+	 * @return
+	 */
+	private int getNWavDataUnits(DetectionGroupSummary foundDataUnits) {
+		int n=0; 
+		for (PamDataUnit fnDataUnit: foundDataUnits.getDataList()){
+			//System.out.println("Save detection wav." + foundDataUnits.getNumDataUnits());
+			for (int i=0; i<wavDataUnitExports.size(); i++) {
+				if (wavDataUnitExports.get(i).getUnitClass().isAssignableFrom(fnDataUnit.getClass())) {
+					n++; 
+					break; 
+				}
+			}
+		}
+		return n; 
+	}
+
+	/**
+	 * Set a callback for saving .wav data. 
+	 * @param saveCallback - the callback
+	 */
+	public void setOnWavSaved(WavSaveCallback saveCallback) {
+		this.saveCallback=saveCallback; 
+	}
+
+
+
+	@Override
+	public boolean hasCompatibleUnits(Class dataUnitType) {
+//        boolean implementsInterface = Arrays.stream(dataUnitType.getInterfaces()).anyMatch(i -> i == RawDataHolder.class);
+		if ( RawDataHolder.class.isAssignableFrom(dataUnitType)) return true;
+		return false;
+	}
+
+
+
+	@Override
+	public boolean exportData(File fileName,
+			List<PamDataUnit> dataUnits, boolean append) {
+	
+		
+		//should we zeropad? 
+		saveDataUnitWav(dataUnits); 
+	
+		return true; 
+		
+		
+	}
+
+
+
+	@Override
+	public String getFileExtension() {
+		return "wav";
+	}
+
+
+
+	@Override
+	public String getIconString() {
+		return "mdi2f-file-music";
+	}
+
+
+
+	@Override
+	public String getName() {
+		return "raw sound";
+	}
+
+
+
+	@Override
+	public void close() {
+		// TODO Auto-generated method stub
+	}
+
+
+
+	@Override
+	public boolean isNeedsNewFile() {
+		return false;
+	}
+
+
+
+	@Override
+	public Component getOptionsPanel() {
+		if (this.wavOptionsPanel==null) {
+			this.wavOptionsPanel = new WavOptionsPanel(); 
+		}
+		return wavOptionsPanel;
+	}
+
+
+
+	@Override
+	public Pane getOptionsPane() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
 
 	/**
 	 * Observes incoming raw data and saves to a wav file 
@@ -344,134 +526,6 @@ public class WavFileExportManager implements PamDataUnitExporter  {
 			if (saveCallback!=null) saveCallback.wavSaved(wavWriter.getFileName(), 0);
 		}
 	}
-
-
-	/**
-	 * Save wav data from a data unit instead of from the raw file store. 
-	 * @param foundDataUnits - the list of found data units. 
-	 * @return
-	 */
-	private int saveDataUnitWav(DetectionGroupSummary foundDataUnits) {
-		//TODO - need to pad the detections...with zeros.
-		//System.out.println("Save data unit wav: " + foundDataUnits.getNumDataUnits()); 
-
-		int n=0; 
-		WavFileWriter wavWrite = null; 
-		for (PamDataUnit fnDataUnit: foundDataUnits.getDataList()){
-
-			String currentFile = createFileName(fnDataUnit.getTimeMilliseconds()); 
-
-			AudioFormat audioFormat = new Wav16AudioFormat(fnDataUnit.getParentDataBlock().getSampleRate(), PamUtils.getNumChannels(fnDataUnit.getChannelBitmap()));
-
-			System.out.println("Save detection wav." + foundDataUnits.getNumDataUnits());
-			
-			for (int i=0; i<wavDataUnitExports.size(); i++) {
-				if (wavDataUnitExports.get(i).getUnitClass().isAssignableFrom(fnDataUnit.getClass())) {
-					
-					wavWrite= new WavFileWriter(currentFile, audioFormat); 
-
-					System.out.println("Append wav." + foundDataUnits.getNumDataUnits());
-
-					//save the wav file of detection
-					wavWrite.append(wavDataUnitExports.get(i).getWavClip(fnDataUnit)); 
-					n++; 
-					
-					wavWrite.close();
-					break; 
-				}
-			}
-		}
-		
-		
-		if (wavWrite!=null && saveCallback!=null) saveCallback.wavSaved(wavWrite.getFileName(), 0);
-		
-		return n; 
-	}
-
-
-	/**
-	 * Save wav data from a data unit instead of from the raw file store. 
-	 * @param foundDataUnits - the list of found data units. 
-	 * @return
-	 */
-	private int getNWavDataUnits(DetectionGroupSummary foundDataUnits) {
-		int n=0; 
-		for (PamDataUnit fnDataUnit: foundDataUnits.getDataList()){
-			//System.out.println("Save detection wav." + foundDataUnits.getNumDataUnits());
-			for (int i=0; i<wavDataUnitExports.size(); i++) {
-				if (wavDataUnitExports.get(i).getUnitClass().isAssignableFrom(fnDataUnit.getClass())) {
-					n++; 
-					break; 
-				}
-			}
-		}
-		return n; 
-	}
-
-	/**
-	 * Set a callback for saving .wav data. 
-	 * @param saveCallback - the callback
-	 */
-	public void setOnWavSaved(WavSaveCallback saveCallback) {
-		this.saveCallback=saveCallback; 
-	}
-
-
-
-	@Override
-	public boolean hasCompatibleUnits(Class dataUnitType) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-
-
-	@Override
-	public boolean exportData(File fileName,
-			List<PamDataUnit> dataUnits, boolean append) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-
-
-	@Override
-	public String getFileExtension() {
-		return "wav";
-	}
-
-
-
-	@Override
-	public String getIconString() {
-		// TODO Auto-generated method stub
-		return "mdi2f-file-music";
-	}
-
-
-
-	@Override
-	public String getName() {
-		return "raw sound";
-	}
-
-
-
-	@Override
-	public void close() {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-
-	@Override
-	public boolean isNeedsNewFile() {
-		return false;
-	}
-
-
-
 
 
 	//	hello(){

@@ -1,6 +1,7 @@
 package export.layoutFX;
 
 import PamController.SettingsPane;
+import export.ExportParams;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import pamViewFX.fxNodes.PamBorderPane;

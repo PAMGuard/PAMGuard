@@ -46,17 +46,18 @@ public class ExportTask extends OfflineTask<PamDataUnit<?,?>>{
 	@Override
 	public boolean processDataUnit(PamDataUnit<?, ?> dataUnit) {
 
-//		System.out.println("Huh? " + this.getDataBlock().getDataName() + "  " + dataUnit + "  " + dataUnit.getParentDataBlock().equals(this.getDataBlock()));
+		//System.out.println("Huh? " + this.getDataBlock().getDataName() + "  " + dataUnit + "  " + dataUnit.getParentDataBlock().equals(this.getDataBlock()));
 		
 		if (dataUnit.getParentDataBlock().equals(this.getDataBlock())) {
 			//this is very important because the way the exporter works is that it iterates through multiple parent data blocks
-			System.out.println(this.getDataBlock().getDataName() + "  " + dataUnit + "  " + dataSelector.scoreData(dataUnit));
+			//System.out.println(this.getDataBlock().getDataName() + "  " + dataUnit + "  " + dataSelector.scoreData(dataUnit));
+			
 			if (dataSelector==null) {
-//				System.out.println("Data selector null: " + this.getDataBlock().getDataName() + "  " + dataUnit);
+				//System.out.println("Data selector null: " + this.getDataBlock().getDataName() + "  " + dataUnit);
 				exporter.exportDataUnit(dataUnit, false);
 			}
-			else if (dataSelector.scoreData(dataUnit)>=0 || dataSelector.getParams().getCombinationFlag()  == DataSelectParams.DATA_SELECT_DISABLE) {
-//				System.out.println("Data selector OK: " + this.getDataBlock().getDataName() + "  " + dataUnit);
+			else if (dataSelector.scoreData(dataUnit)>0 && dataSelector.getParams().getCombinationFlag()  != DataSelectParams.DATA_SELECT_DISABLE) {
+				//System.out.println("Data selector OK: " + this.getDataBlock().getDataName() + "  " + dataUnit);
 				exporter.exportDataUnit(dataUnit, false);
 			}
 		}

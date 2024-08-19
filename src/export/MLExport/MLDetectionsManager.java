@@ -1,5 +1,6 @@
 package export.MLExport;
 
+import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -11,6 +12,7 @@ import java.util.zip.Deflater;
 import PamUtils.PamArrayUtils;
 import PamguardMVC.PamDataUnit;
 import export.PamDataUnitExporter;
+import javafx.scene.layout.Pane;
 import us.hebi.matlab.mat.format.Mat5;
 import us.hebi.matlab.mat.format.Mat5File;
 import us.hebi.matlab.mat.format.Mat5Writer;
@@ -270,6 +272,18 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 	public boolean isNeedsNewFile() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public Component getOptionsPanel() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Pane getOptionsPane() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 
