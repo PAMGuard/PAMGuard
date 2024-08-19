@@ -146,7 +146,7 @@ public class TMALocalizationCreator implements LocalizationCreator {
 //		 now also output a perpendicular distance.
 		Double perp = groupLocResult.getPerpendicularDistance();
 		if (perp != null) {
-			loc.setPerpendicularRangeM(perp);
+			loc.setPerpendicularRangeM(AutoTethysProvider.roundDecimalPlaces(perp, 2));
 		}
 		
 		
