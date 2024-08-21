@@ -25,7 +25,7 @@ public class WavExportOptions implements Serializable, Cloneable {
 	public static final int SAVEWAV_INDIVIDUAL = 2;
 
 	/**
-	 * Flag to indicuate how to save files
+	 * Flag to indicate how to save files
 	 */
 	public int wavSaveChoice = SAVEWAV_CONCAT;
 

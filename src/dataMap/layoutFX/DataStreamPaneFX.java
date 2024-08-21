@@ -138,6 +138,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 		dataGraph = new DataGraphFX();
 		dataGraph.setupAxis();
 		dataName = new DataName();
+		dataName.setName(dataBlock.getDataName()); 
 		
 		this.setTop(topPane=createTopPane());
 		this.setCenter(dataGraph);
@@ -990,6 +991,16 @@ public class DataStreamPaneFX extends PamBorderPane {
 	}
 	
 	public class DataName {
+
+		private String name;
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String dataName) {
+			this.name=dataName;
+		}
 		
 	}
 	

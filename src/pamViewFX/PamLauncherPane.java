@@ -1,15 +1,9 @@
 package pamViewFX;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import atlantafx.base.controls.ToggleSwitch;
-import atlantafx.base.theme.PrimerDark;
-import atlantafx.base.theme.PrimerLight;
-import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ContentDisplay;
@@ -96,7 +90,16 @@ public class PamLauncherPane extends PamBorderPane {
 //        this.getStylesheets().add(getClass().getResource(primerPAMGuard).toExternalForm());
 //        this.getStylesheets().add(getClass().getResource(new PrimerDark().getUserAgentStylesheet()).toExternalForm());
 		PamStylesManagerFX.getPamStylesManagerFX().setCurStyle(new PamDefaultStyle());
-		
+	}
+	
+	private void setStyle(boolean PAMGuardFX) {
+		this.getStylesheets().clear();
+
+		if (PAMGuardFX) {
+			PamStylesManagerFX.getPamStylesManagerFX().setCurStyle(new PamAtlantaStyle());
+	        this.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getDialogCSS());
+	        this.setStyle("-fx-background-color: -fx-darkbackground");
+		}
 
 	}
 

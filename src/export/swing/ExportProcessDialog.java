@@ -37,6 +37,7 @@ import PamguardMVC.PamDataBlock;
 import export.ExportParams;
 import export.PamExporterManager;
 import offlineProcessing.OLProcessDialog;
+import offlineProcessing.OLProcessDialog.OLMonitor;
 import offlineProcessing.OfflineTaskGroup;
 import offlineProcessing.TaskMonitor;
 import offlineProcessing.TaskMonitorData;
@@ -359,7 +360,7 @@ public class ExportProcessDialog {
 
 
 		public void setParams(ExportParams params) {
-			System.out.println("EXPORT: SET PARAMS: " +params);
+//			System.out.println("EXPORT: SET PARAMS: " +params);
 
 			if (params ==null) currentParams = new ExportParams(); 
 			currentParams = params.clone(); 
@@ -367,44 +368,85 @@ public class ExportProcessDialog {
 			buttonGroup.clearSelection();
 			exportButtons[params.exportChoice].setSelected(true);
 
-			System.out.println("EXPORT: SET PARAMS: " +currentParams.folder);
+//			System.out.println("EXPORT: SET PARAMS: " +currentParams.folder);
 			exportTo.setText(currentParams.folder);
 
 			spinner.setValue(currentParams.maximumFileSize);
 			
 			enableTasks();
 		}
+		
+		
+		/**
+		 * Ok, this is a bit of a hack but because we run tasks for multiple data blocks 
+		 * we have to run a new task whenever the previous task is finished. So we use a task monitor
+		 * to deetct when the task is finsihed and then, instead of finishing we run a new task. 
+		 */
+		class ExportTaskMonitor extends OLMonitor {
+
+			private int taskIndex;
+
+			private ExportTaskGroup exportTaskGroup;
+
+			private boolean started = false;
+
+			private int activeTasks;
+
+			public ExportTaskMonitor(int i, ExportTaskGroup exportTaskGroup) {
+				super();
+				this.taskIndex = i;
+				this.exportTaskGroup = exportTaskGroup;
+				
+				this.activeTasks = 0; 
+				for (int i1=0; i1<exportTaskGroup.getNTasks(); i1++) {
+					if (exportTaskGroup.getTask(i1).isDoRun()) {
+					activeTasks++;
+					}
+				}
+				
+			}
 
 
-
-	}
-
-	class ExportTaskMonitor implements TaskMonitor {
-
-		private int taskIndex;
-
-		private ExportTaskGroup exportTaskGroup;
-
-		private boolean started = false;
-
-		public ExportTaskMonitor(int i, ExportTaskGroup exportTaskGroup) {
-			this.taskIndex = i;
-			this.exportTaskGroup = exportTaskGroup;
-		}
-
-
-		@Override
-		public void setTaskStatus(TaskMonitorData taskMonitorData) {
-			if (taskMonitorData.taskStatus== TaskStatus.COMPLETE && !started) {
-				System.out.println(" TASK COMPLETE:");
-				if (taskIndex<exportTaskGroup.getNTasks()) {
-					exportTaskGroup.runTaskFrom(taskIndex+1);
-					started = true;
+			@Override
+			public void setTaskStatus(TaskMonitorData taskMonitorData) {
+				
+				switch (taskMonitorData.taskStatus) {
+				case COMPLETE:
+					if (taskIndex<exportTaskGroup.getNTasks() && !started) {
+						exportTaskGroup.runTaskFrom(taskIndex+1);
+						started = true;
+					}
+					break;
+				default:
+					super.setTaskStatus(taskMonitorData);
+				}
+				
+				//A hack which sets the global 
+				switch (taskMonitorData.taskActivity) {
+				case LINKING:
+				case LOADING:
+					
+					//the progress of one datablocks
+					double progress = ((double) taskMonitorData.progValue)/taskMonitorData.progMaximum;
+					double totalProgress = ((double) taskIndex)/activeTasks + progress/activeTasks;
+//					System.out.println("Total progress: " + taskMonitorData.progValue + " of "  + taskMonitorData.progMaximum + " - " + totalProgress + "%" + "  " + progress + "  " + activeTasks + " " + taskIndex);
+					//needs to be added to the overall progress
+					int max = getGlobalProgress().getMaximum();
+					getGlobalProgress().setValue((int) (totalProgress*max));
+				default:
+					break;
 				}
 			}
+
 		}
+		
+		public ExportTaskMonitor newExportTaskMonitor(int i, ExportTaskGroup exportTaskGroup) {
+			return new ExportTaskMonitor(i, exportTaskGroup);
+		}
+		
 
 	}
+
 
 
 	/**
@@ -428,12 +470,12 @@ public class ExportProcessDialog {
 		 * @param i - the index
 		 */
 		public void runTaskFrom(int i) {
-			System.out.println("RUN TASK FROM :" + i);
 
+			//sets the porimary datablock to that of the relevent task. 
 			this.setPrimaryDataBlock(getTask(i).getDataBlock());
 			if (i<getNTasks()-1) {
 				//will start a new thread after this one has finished
-				this.setTaskMonitor(new ExportTaskMonitor(i, this));
+				this.setTaskMonitor(mtOfflineDialog.newExportTaskMonitor(i, this));
 			}
 			super.runTasks();
 		}

@@ -48,8 +48,12 @@ public abstract class MLDataUnitExport<T extends PamDataUnit<?, ?>> {
 		//UID for the detection.
 		Matrix UID =  Mat5.newScalar(dataUnit.getUID()); 
 
-		//the start sample.
-		Matrix startSample = Mat5.newScalar(dataUnit.getStartSample()); 
+		Matrix startSample = Mat5.newScalar(0); 
+		if (dataUnit.getStartSample()!=null) {
+			//the start sample.
+			 startSample = Mat5.newScalar(dataUnit.getStartSample()); 
+		}
+		
 
 		//the duration of the detection in samples.
 		Matrix sampleDuration = Mat5.newScalar(dataUnit.getSampleDuration()); 

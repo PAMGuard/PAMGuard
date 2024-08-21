@@ -42,7 +42,6 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Priority;
-import javafx.scene.paint.Color;
 
 /**
  * Pane which holds settings menu. All primary settings are accessed from this pane which sits in a hiding pane to the right 

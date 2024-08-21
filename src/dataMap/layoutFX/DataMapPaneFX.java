@@ -65,7 +65,7 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX {
 	/**
 	 * Pane which allows users to change scale on datamap. 
 	 */
-	private ScalePaneFX scalePane;
+	private DataMapSettingsPane dataMapSettingsPane;
 
 	private PamVBox settingsPane;
 
@@ -87,14 +87,14 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX {
 		//create all the different panes, 
 		summaryPane = new SummaryPaneFX(dataMapControl, this);
 		
-		scalePane=new ScalePaneFX(dataMapControl,this);
-
 		scrollingDataPanel= new ScrollingDataPaneFX(dataMapControl, this); 
+		
+		dataMapSettingsPane=new DataMapSettingsPane(dataMapControl,this);
 		
 		//create the setting spane
 		settingsPane=new PamVBox(); 
 //		settingsPane.getChildren().add(summaryPane);
-		settingsPane.getChildren().add(scalePane); 
+		settingsPane.getChildren().add(dataMapSettingsPane.getContentNode()); 
 		settingsPane.setPadding(new Insets(40,10,10,10));
 		settingsPane.setPrefWidth(HIDE_PANE_WIDTH);
 
@@ -178,12 +178,11 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX {
 	 * Called from ScalePanel when anything 
 	 * to do with scaling changes. 
 	 */
-	@Deprecated
 	public void scaleChanged() {
-		if (scalePane == null || scrollingDataPanel == null) {
+		if (dataMapSettingsPane == null || scrollingDataPanel == null) {
 			return;
 		}
-		scalePane.getParams(dataMapControl.dataMapParameters);
+		dataMapSettingsPane.getParams(dataMapControl.dataMapParameters);
 		//scrollingDataPanel.scaleChange();
 	}
 
@@ -228,24 +227,30 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX {
 		switch (changeType) {
 		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			scrollingDataPanel.updateScrollBar();
-			scalePane.checkDataGramPane();
+			dataMapSettingsPane.setParams(dataMapControl.dataMapParameters);
 			this.repaintAll();
+			break;
 		case PamControllerInterface.CHANGED_OFFLINE_DATASTORE:
 			scrollingDataPanel.updateScrollBar();
-			scalePane.checkDataGramPane();
+			dataMapSettingsPane.checkDataGramPane();
+			dataMapSettingsPane.setParams(dataMapControl.dataMapParameters);
+			break;
 		case PamControllerInterface.ADD_CONTROLLEDUNIT:
-			scalePane.checkDataGramPane();
 		case PamControllerInterface.REMOVE_CONTROLLEDUNIT:
-			scalePane.checkDataGramPane();
+			dataMapSettingsPane.checkDataGramPane();
+			dataMapSettingsPane.setParams(dataMapControl.dataMapParameters);
+			break;
 		case PamControllerInterface.INITIALIZE_LOADDATA:
 		case PamControllerInterface.EXTERNAL_DATA_IMPORTED:
 			scrollingDataPanel.updateScrollBar();
-			scalePane.checkDataGramPane();
+			dataMapSettingsPane.checkDataGramPane();
+			dataMapSettingsPane.setParams(dataMapControl.dataMapParameters);
 			this.repaintAll();
 			break;
 		case PamControllerInterface.OFFLINE_DATA_LOADED:
 			scrollingDataPanel.updateScrollBar();
-			scalePane.checkDataGramPane();
+			dataMapSettingsPane.checkDataGramPane();
+			dataMapSettingsPane.setParams(dataMapControl.dataMapParameters);
 			this.repaintAll();
 			break;
 		case PamControllerInterface.DATA_LOAD_COMPLETE:
@@ -302,6 +307,24 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX {
 	public UserDisplayControlFX getUserDisplayControl() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	/**
+	 * Get the current number of data stream panes
+	 * @return the number of data stream panes
+	 */
+	public int getNumDataStreamPanes() {
+		return this.scrollingDataPanel.getNumDataStreamPanes();
+	}
+	
+	/**
+	 * Get a data stream pane. 
+	 * @param n - the index of the data stream pane
+	 * @return the data stream pane or null if the index is out of bounds. 
+	 */
+	public DataStreamPaneFX getDataStreamPane(int n) {
+		return this.scrollingDataPanel.getDataSyreamPane( n);
+
 	}
 
 }

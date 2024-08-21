@@ -925,6 +925,8 @@ public class Scrolling2DPlotDataFX {
 
 		//reset transform in case of other drawings on base canvas. 
 		if (orientation == Orientation.VERTICAL) g2d.setTransform(horzAffine);
+		
+		
 
 	}
 	

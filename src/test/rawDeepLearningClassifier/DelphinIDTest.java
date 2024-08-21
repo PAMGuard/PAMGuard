@@ -218,8 +218,7 @@ public class DelphinIDTest {
 				//the values for the whistle detector.
 				double[][] pamguardWhistleImage = 	whistleScatter2Image(whistleValues);
 	
-				
-				System.out.println("Size python: " + compressedWhistleImage.length + " x " + compressedWhistleImage[0].length);
+				//System.out.println("Size python: " + compressedWhistleImage.length + " x " + compressedWhistleImage[0].length);
 				
 				float[][][] input = new float[1][][];
 				input[0] =  JamArr.doubleToFloat(compressedWhistleImage);
@@ -254,7 +253,6 @@ public class DelphinIDTest {
 		} 
 		
 		System.out.println("DelphinID mode test end");
-
 
 	}
 

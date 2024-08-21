@@ -56,7 +56,7 @@ public class ExportTask extends OfflineTask<PamDataUnit<?,?>>{
 				//System.out.println("Data selector null: " + this.getDataBlock().getDataName() + "  " + dataUnit);
 				exporter.exportDataUnit(dataUnit, false);
 			}
-			else if (dataSelector.scoreData(dataUnit)>0 && dataSelector.getParams().getCombinationFlag()  != DataSelectParams.DATA_SELECT_DISABLE) {
+			else if (dataSelector.scoreData(dataUnit)>0 || dataSelector.getParams().getCombinationFlag()  == DataSelectParams.DATA_SELECT_DISABLE) {
 				//System.out.println("Data selector OK: " + this.getDataBlock().getDataName() + "  " + dataUnit);
 				exporter.exportDataUnit(dataUnit, false);
 			}
@@ -73,7 +73,7 @@ public class ExportTask extends OfflineTask<PamDataUnit<?,?>>{
 
 	@Override
 	public void loadedDataComplete() {
-		System.out.println("EXPORTER: loaded data complete"); 
+//		System.out.println("EXPORTER: loaded data complete"); 
 		//force the exporter so save any renaming data units in the buffer
 		exporter.exportDataUnit(null,  true);
 		exporter.close();

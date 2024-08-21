@@ -28,7 +28,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 
 	/**
 	 * Standard millis to wait for repaint. 
-	 * Do not ake this too high i.e. above 50 or the display gets very jerky
+	 * Do not make this too high i.e. above 50 or the display gets very jerky
 	 */
 	public static final long REPAINTMILLIS = 50;
 
@@ -496,4 +496,24 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 //		this.notifyScrollChange();
 //	}
 
+	/**
+	 * Get the current number of data stream panes
+	 * @return the number of data stream panes
+	 */
+	public int getNumDataStreamPanes() {
+		return this.dataStreamPanels.size();
+	}
+	
+	/**
+	 * Get a data stream pane. 
+	 * @param n - the index of the data stream pane
+	 * @return the data stream pane or null if the index is out of bounds. 
+	 */
+	public DataStreamPaneFX getDataSyreamPane(int n) {
+		if (n<this.dataStreamPanels.size()) {
+			return dataStreamPanels.get(n);
+		}
+		else return null;
+	}
+	
 }

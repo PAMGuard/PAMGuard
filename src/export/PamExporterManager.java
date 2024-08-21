@@ -11,7 +11,7 @@ import PamguardMVC.PamDataUnit;
 import export.CSVExport.CSVExportManager;
 import export.MLExport.MLDetectionsManager;
 import export.RExport.RExportManager;
-import export.wavExport.WavFileExportManager;
+import export.wavExport.WavDetExportManager;
 
 /**
  * Exports data to external files. Manages the file sizes and creates data buffers for 
@@ -61,7 +61,7 @@ public class PamExporterManager {
 		//add the MATLAB export
 		pamExporters.add(new MLDetectionsManager());
 		pamExporters.add(new RExportManager(this));
-		pamExporters.add(new WavFileExportManager());
+		pamExporters.add(new WavDetExportManager());
 //		pamExporters.add(new CSVExportManager());
 	}
 

@@ -7,16 +7,13 @@ import PamView.paneloverlay.overlaymark.OverlayMark;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamRawDataBlock;
 import detectiongrouplocaliser.DetectionGroupSummary;
-import export.wavExport.WavFileExportManager;
-import javafx.animation.Timeline;
+import export.wavExport.WavDetExport;
 import javafx.application.Platform;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.Tooltip;
-import javafx.scene.effect.ColorInput;
 import javafx.scene.text.Text;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamButton;
-import wavFiles.WavFileWriter;
 
 /**
  * Export a .wav clip. 
@@ -27,27 +24,27 @@ public class WavExportOverlayMenu  extends ExportOverlayMenu {
 
 	private Text wavFileGlyph;
 
-	/**
-	 * The wav file write
-	 */
-	private WavFileWriter wavFile;
+//	/**
+//	 * The wav file write
+//	 */
+//	private WavFileWriter wavFile;
+//
+//	private String defaultPath;
+//
+//	private String currentFolder;
 
-	private String defaultPath;
+	private WavDetExport wavExportManager;
 
-	private String currentFolder;
-
-	private WavFileExportManager wavExportManager;
-
-	private ColorInput shadow;
-
-	private Timeline timline;
+//	private ColorInput shadow;
+//
+//	private Timeline timline;
 
 	private PamButton pamButton; 
 
 	public WavExportOverlayMenu(){
 //		wavFileGlyph=PamGlyphDude.createPamGlyph(MaterialDesignIcon.FILE_MUSIC, standardIconSize);
 		wavFileGlyph=PamGlyphDude.createPamIcon("mdi2f-file-music", standardIconSize+14);
-		wavExportManager= new WavFileExportManager(); 
+		wavExportManager= new WavDetExport(); 
 
 		//set a callback when saving is finsihed. 
 		wavExportManager.setOnWavSaved((saveFile, flag)->{
@@ -132,7 +129,7 @@ public class WavExportOverlayMenu  extends ExportOverlayMenu {
 	 */
 	private void writeWavFile(DetectionGroupSummary foundDataUnits, int selectedIndex, OverlayMark mark) {
 		//		 animateButton() ; //start button animation. 
-		wavExportManager.dataUnits2Wav(foundDataUnits, selectedIndex, mark);
+		wavExportManager.writeOverlayMarkWav(foundDataUnits, selectedIndex, mark);
 	}		
 
 
@@ -148,7 +145,7 @@ public class WavExportOverlayMenu  extends ExportOverlayMenu {
 			rawDataBlock=foundDataUnits.getDataList().get(0).getParentDataBlock().getRawSourceDataBlock();
 		}
 		//is there available raw data
-		if (mark!=null && WavFileExportManager.haveRawData(rawDataBlock, (long) mark.getLimits()[0], (long) mark.getLimits()[1])) {
+		if (mark!=null && WavDetExport.haveRawData(rawDataBlock, (long) mark.getLimits()[0], (long) mark.getLimits()[1])) {
 			return true;
 		} 
 

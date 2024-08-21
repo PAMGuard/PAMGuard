@@ -38,17 +38,17 @@ public class WavOptionsPanel extends PamPanel {
 		
 		this.setLayout((new GridBagLayout()));
 
-		addComponent(this, zeroPad = new JRadioButton("Concat"), c);
+		addComponent(this, zeroPad = new JRadioButton("Zero Pad"), c);
 		
 		c.gridx++;
 		
-		addComponent(this, noZeroPad = new JRadioButton("Zero pad"), c);
+		addComponent(this, noZeroPad = new JRadioButton("Concatonate"), c);
 
 		c.gridx++;
 		addComponent(this, indvidualWav = new JRadioButton("Individual"), c);
 		
-		c.gridx++;
-		addComponent(this, new JLabel(" wav"), c);
+//		c.gridx++;
+//		addComponent(this, new JLabel(" wav"), c);
 		
 		 // Initialization of object of "ButtonGroup" class. 
 		ButtonGroup buttonGroup = new ButtonGroup(); 
@@ -97,8 +97,8 @@ public class WavOptionsPanel extends PamPanel {
 	public WavExportOptions getParams(WavExportOptions wavExportOptions) {
 		
 		if (zeroPad.isSelected()) wavExportOptions.wavSaveChoice = WavExportOptions.SAVEWAV_ZERO_PAD;
-		if (noZeroPad.isSelected()) wavExportOptions.wavSaveChoice = WavExportOptions.SAVEWAV_ZERO_PAD;
-		if (indvidualWav.isSelected()) wavExportOptions.wavSaveChoice = WavExportOptions.SAVEWAV_ZERO_PAD;
+		if (noZeroPad.isSelected()) wavExportOptions.wavSaveChoice = WavExportOptions.SAVEWAV_CONCAT;
+		if (indvidualWav.isSelected()) wavExportOptions.wavSaveChoice = WavExportOptions.SAVEWAV_INDIVIDUAL;
 
 		return wavExportOptions; 
 	}

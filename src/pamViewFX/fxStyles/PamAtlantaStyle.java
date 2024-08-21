@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import PamView.ColourScheme;
 import PamView.PamColors;
+import atlantafx.base.theme.CupertinoDark;
+import atlantafx.base.theme.CupertinoLight;
 import atlantafx.base.theme.PrimerDark;
 import atlantafx.base.theme.PrimerLight;
 
@@ -53,6 +55,7 @@ public class PamAtlantaStyle extends PamDefaultStyle {
 	// private String guiCSS = new NordDark().getUserAgentStylesheet();
 //	protected String primerlight = "/Resources/css/primer-light.css";
 	protected String primerlight = new PrimerLight().getUserAgentStylesheet();
+//	protected String primerlight = new CupertinoLight().getUserAgentStylesheet();
 
 	/**
 	 * Relative location of the CSS style sheet to be used for the Pamguard standard
@@ -62,6 +65,7 @@ public class PamAtlantaStyle extends PamDefaultStyle {
 	// private String dialogCSS = new PrimerDark().getUserAgentStylesheet();
 //	protected String primerdark = "/Resources/css/primer-dark.css";
 	protected String primerdark = new PrimerDark().getUserAgentStylesheet();
+//	protected String primerdark = new CupertinoDark().getUserAgentStylesheet();
 
 	
 	/**
