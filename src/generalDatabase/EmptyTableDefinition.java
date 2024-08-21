@@ -402,10 +402,10 @@ public class EmptyTableDefinition implements Cloneable {
 	protected EmptyTableDefinition clone() {
 		try {
 			EmptyTableDefinition clone = (EmptyTableDefinition) super.clone();
-			clone.pamTableItems = new ArrayList<>();
-			for (PamTableItem tableItem : this.pamTableItems) {
-				clone.pamTableItems.add(tableItem.clone());
-			}
+//			clone.pamTableItems = new ArrayList<>();
+//			for (PamTableItem tableItem : this.pamTableItems) {
+//				clone.pamTableItems.add(tableItem.clone());
+//			}
 			return clone;
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();

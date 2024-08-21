@@ -9,16 +9,11 @@ import java.util.ArrayList;
 
 import javax.swing.JMenuItem;
 
-import Acquisition.AcquisitionControl;
-import PamController.InputStoreInfo;
 import PamController.PamConfiguration;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
-import PamController.PamController;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
-import PamView.dialog.warn.WarnOnce;
-import pamViewFX.PamSettingsMenuPane;
 import ravendata.swing.RavenImportDialog;
 
 /**
@@ -40,6 +35,9 @@ public class RavenControl extends PamControlledUnit implements PamSettings {
 		this.ravenProcess = new RavenProcess(this);
 		addPamProcess(ravenProcess);
 		PamSettingManager.getInstance().registerSettings(this);
+		if (isViewer()) {
+			ravenProcess.getRavenLogging().addExtraColumns(ravenParameters.getExtraColumns());
+		}
 	}
 
 	public RavenControl(PamConfiguration pamConfiguration, String unitType, String unitName) {
@@ -77,11 +75,29 @@ public class RavenControl extends PamControlledUnit implements PamSettings {
 			e.printStackTrace();
 			return;
 		}
+		
+		sortExtraColumns(fileReader, ravenData);
+		
 		if (ravenData != null) {
 			ravenProcess.createPAMGuardData(fileReader, ravenData);
 		}
 	}
 
+	/**
+	 * Check some information on column types. 
+	 * @param fileReader 
+	 * @param ravenData
+	 */
+	private void sortExtraColumns(RavenFileReader fileReader, ArrayList<RavenDataRow> ravenData) {
+		/*
+		 *  primarily need to add the extra columns to the SQL interface to make sure it's going to
+		 *  save the additional data. 
+		 *  Also put them into the module parameters. 
+		 */
+		ravenParameters.setExtraColumns(fileReader.getExtraColumns());
+		ravenProcess.getRavenLogging().addExtraColumns(fileReader.getExtraColumns());
+	}
+	
 	
 
 	@Override
