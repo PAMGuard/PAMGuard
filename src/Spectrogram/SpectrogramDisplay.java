@@ -132,6 +132,7 @@ import PamguardMVC.PamProcess;
 import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.SimpleDataObserver;
 import PamguardMVC.dataOffline.OfflineDataLoading;
+import PamguardMVC.dataSelector.DataSelectParams;
 import PamguardMVC.dataSelector.DataSelector;
 import dataPlotsFX.data.DataTypeInfo;
 import fftManager.FFTDataBlock;
@@ -2927,6 +2928,10 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 			//							PamCalendar.formatTime(currentTimeMilliseconds)));
 			String name = spectrogramDisplay.getDataSelectorName(panelId);
 			DataSelector dataSelector = usedDataBlock.getDataSelector(name, false);
+			
+			if (dataSelector != null && dataSelector.getParams().getCombinationFlag() == DataSelectParams.DATA_SELECT_DISABLE) {
+				dataSelector = null;
+			}
 			directDrawProjector.setDataSelector(dataSelector);
 			if (usedDataBlock.getPamSymbolManager() != null) {
 				directDrawProjector.setPamSymbolChooser(usedDataBlock.getPamSymbolManager().getSymbolChooser(name, directDrawProjector));

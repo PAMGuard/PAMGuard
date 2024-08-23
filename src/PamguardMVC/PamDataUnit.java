@@ -977,7 +977,15 @@ abstract public class PamDataUnit<T extends PamDataUnit, U extends PamDataUnit> 
 		// add frequency and amplitude information
 		double[] frequency = this.getFrequency();
 		if (frequency != null) {
-			str += "Frequency: " + FrequencyFormat.formatFrequencyRange(this.getFrequency(), true) + "<br>";
+			boolean allzeros = true;
+			for (int i = 0; i < frequency.length; i++) {
+				if (frequency[i] > 0) {
+					allzeros = false;
+				}
+			}
+			if (!allzeros) {
+				str += "Frequency: " + FrequencyFormat.formatFrequencyRange(this.getFrequency(), true) + "<br>";
+			}
 		}
 		if (getAmplitudeDB() != 0) {
 			str += String.format("Amplitude: %3.1fdB<br>", getAmplitudeDB());

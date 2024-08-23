@@ -1,6 +1,9 @@
 package tethys.swing.documents;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -8,18 +11,24 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
 
 import PamController.PamController;
 import PamView.dialog.PamDialogPanel;
+import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.warn.WarnOnce;
+import PamView.panel.WestAlignedPanel;
 import PamView.tables.SwingTableColumnWidths;
 import tethys.Collection;
 import tethys.DocumentInfo;
@@ -47,6 +56,10 @@ public class TethysDocumentTable implements PamDialogPanel {
 	
 	private JScrollPane scrollPane;
 
+	private JComboBox<Collection> collectionSelector;
+	
+	// won't work since only Deployment documents have project info. 
+//	private JCheckBox projectOnly;
 	/**
 	 * @param tethysControl
 	 * @param collectionName
@@ -55,6 +68,37 @@ public class TethysDocumentTable implements PamDialogPanel {
 		this.tethysControl = tethysControl;
 		this.collection = collection;
 		mainPanel = new JPanel(new BorderLayout());
+		JPanel topPanel = new JPanel(new GridBagLayout());
+		JPanel northPanel = new WestAlignedPanel(topPanel);
+		GridBagConstraints c = new PamGridBagContraints();
+		northPanel.setBorder(new TitledBorder("Options"));
+		collectionSelector = new JComboBox<Collection>();
+		Collection[] items = Collection.mainList();
+		for (int i = 0; i < items.length; i++) {
+			collectionSelector.addItem(items[i]);
+		}
+//		projectOnly = new JCheckBox("Current project only");
+		topPanel.add(new JLabel("Collection "),c);
+		c.gridx++;
+		topPanel.add(collectionSelector,c);
+//		topPanel.add(projectOnly);
+		mainPanel.add(BorderLayout.NORTH, northPanel);
+		collectionSelector.setSelectedItem(collection);
+//		projectOnly.setSelected(tethysControl.getTethysExportParams().projectOnlyDocs);
+		collectionSelector.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				collectionChanged();
+			}
+		});
+//		projectOnly.addActionListener(new ActionListener() {
+//			
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				collectionChanged();
+//			}
+//		});
+		
 		tableModel = new TableModel();
 		mainTable = new JTable(tableModel);
 		scrollPane = new JScrollPane(mainTable);
@@ -65,6 +109,19 @@ public class TethysDocumentTable implements PamDialogPanel {
 		mainTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 	}
 	
+	/**
+	 * Called on any options change. 
+	 */
+	protected void collectionChanged() {
+		Collection newItem = (Collection) collectionSelector.getSelectedItem();
+		if (newItem == null) {
+			return;
+		}
+		this.collection = newItem;
+		
+		updateTableData();
+	}
+
 	public void updateTableData() {
 		documentInfos = tethysControl.getDbxmlQueries().getCollectionDocumentList(collection);
 		if (documentInfos != null) {
@@ -88,6 +145,18 @@ public class TethysDocumentTable implements PamDialogPanel {
 				showPopupMenu(e);
 			}
 		}
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			int row = mainTable.getSelectedRow();
+			if (row < 0|| row >= documentInfos.size()) {
+				return;
+			}
+			DocumentInfo docInfo = documentInfos.get(row);
+			if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
+				showDocument(docInfo);
+			}
+		}
 		
 	}
 
@@ -101,8 +170,9 @@ public class TethysDocumentTable implements PamDialogPanel {
 		}
 		
 		DocumentInfo docInfo = documentInfos.get(row);
+		String docName = docInfo.getDocumentName();
 		JPopupMenu popMenu = new JPopupMenu();
-		JMenuItem menuItem = new JMenuItem("Show document " + docInfo);
+		JMenuItem menuItem = new JMenuItem("Show document " + docName);
 		menuItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -114,8 +184,9 @@ public class TethysDocumentTable implements PamDialogPanel {
 
 		int[] rows = mainTable.getSelectedRows();
 		if (rows != null && rows.length == 1) {
+			popMenu.addSeparator();
 //			docName = documentNames.get(rows[0]);
-			menuItem = new JMenuItem("Delete document " + docInfo);
+			menuItem = new JMenuItem("Delete document " + docName);
 			menuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -252,6 +323,7 @@ public class TethysDocumentTable implements PamDialogPanel {
 
 	public void setCollection(Collection collection) {
 		this.collection = collection;
+		this.collectionSelector.setSelectedItem(collection);
 		updateTableData();
 	}
 

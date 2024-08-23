@@ -229,14 +229,14 @@ private RecordingList masterList;
 			return;
 		}
 		for (PDeployment depl : matchedDeployments) {
-			if (depl.deployment == null) {
+			if (depl.nilusObject == null) {
 				continue;
 			}
 			try {
-				if (checkDetections(depl.deployment) == false) {
+				if (checkDetections(depl.nilusObject) == false) {
 					continue;
 				}
-				boolean gone = getTethysControl().getDbxmlConnect().deleteDocument(depl.deployment);
+				boolean gone = getTethysControl().getDbxmlConnect().deleteDocument(depl.nilusObject);
 			} catch (TethysException e) {
 				getTethysControl().showException(e);
 			}
@@ -250,36 +250,52 @@ private RecordingList masterList;
 	 * @return true if there are no Detections or if they are sucessfully removed as well. 
 	 */
 	private boolean checkDetections(Deployment deployment) {
-		// get any deployment documents that associate with this deployment. 
-		ArrayList<String> detectionDocs = getTethysControl().getDbxmlQueries().getDetectionsDocuments(deployment.getId());
-		if (detectionDocs == null || detectionDocs.size() == 0) {
+		// get any deployment documents that associate with this deployment. 		
+		ArrayList<String> detectionDocs = getTethysControl().getDbxmlQueries().getDeploymentDocuments(Collection.Detections, deployment.getId());
+		ArrayList<String> localizationDocs = getTethysControl().getDbxmlQueries().getDeploymentDocuments(Collection.Localizations, deployment.getId());
+		int nDocs = 0;
+		if (detectionDocs != null) nDocs += detectionDocs.size();
+		if (localizationDocs != null) nDocs += localizationDocs.size();
+		if (nDocs == 0) {
 			return true;
 		}
-		String msg = String.format("<html>One or more Detections documents are associated with Deployment %s<br>", deployment.getId());
+		String msg = String.format("<html>%d other documents are associated with Deployment %s<br>", nDocs, deployment.getId());
 		for (String str : detectionDocs) {
 			msg += String.format("<br>%s", str);
 		}
 		msg += String.format("<br><br>You must delete these prior to deleting the Deploymen. Go ahead and delete ?");
-		int ans = WarnOnce.showWarning(getTethysControl().getGuiFrame(), "Existing Detections documents !" , msg, WarnOnce.OK_CANCEL_OPTION);
+		int ans = WarnOnce.showWarning(getTethysControl().getGuiFrame(), "Existing Detection / Localization documents !" , msg, WarnOnce.OK_CANCEL_OPTION);
 		if (ans == WarnOnce.CANCEL_OPTION) {
 			return false;
 		}
 		// OK, so delete all the Detections too !!!
 		boolean errors = false;
-		for (String str : detectionDocs) {
-			try {
-				boolean gone = getTethysControl().getDbxmlConnect().removeDocument(Collection.Detections, str);
-			} catch (TethysException e) {
-				getTethysControl().showException(e);
-				errors = true;
+		if (detectionDocs != null) {
+			for (String str : detectionDocs) {
+				try {
+					boolean gone = getTethysControl().getDbxmlConnect().removeDocument(Collection.Detections, str);
+				} catch (TethysException e) {
+					getTethysControl().showException(e);
+					errors = true;
+				}
 			}
 		}
-		
+		if (localizationDocs != null) {
+			for (String str : localizationDocs) {
+				try {
+					boolean gone = getTethysControl().getDbxmlConnect().removeDocument(Collection.Localizations, str);
+				} catch (TethysException e) {
+					getTethysControl().showException(e);
+					errors = true;
+				}
+			}
+		}
+
 		return !errors;
 	}
 
 	protected void deleteDeployment(PDeployment pDeployment) {
-		Deployment dep = pDeployment.deployment;
+		Deployment dep = pDeployment.nilusObject;
 		if (dep == null) {
 			return;
 		}
@@ -300,11 +316,11 @@ private RecordingList masterList;
 	}
 
 	protected void exportDeployment(PDeployment pDeployment) {
-		getTethysControl().exportDocument(Collection.Deployments.collectionName(), pDeployment.deployment.getId());
+		getTethysControl().exportDocument(Collection.Deployments.collectionName(), pDeployment.nilusObject.getId());
 	}
 
 	protected void displayDeployment(PDeployment pDeployment) {
-		getTethysControl().displayDocument(Collection.Deployments.collectionName(), pDeployment.deployment.getId());
+		getTethysControl().displayDocument(Collection.Deployments.collectionName(), pDeployment.nilusObject.getId());
 	}
 
 	@Override
@@ -443,7 +459,7 @@ private RecordingList masterList;
 						if (deployment == null) {
 							return null;
 						}
-						return deployment.deployment.getId();
+						return deployment.nilusObject.getId();
 //						return makeDeplString(period, deployment);
 					case 8:
 						if (deployment == null) {

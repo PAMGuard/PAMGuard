@@ -2,6 +2,7 @@ package tethys.detection;
 
 import java.util.ArrayList;
 
+import tethys.niluswraps.NilusDataWrapper;
 import tethys.niluswraps.PDetections;
 
 /**
@@ -10,11 +11,11 @@ import tethys.niluswraps.PDetections;
  * @author dg50
  *
  */
-public class StreamDetectionsSummary {
+public class StreamDetectionsSummary<T extends NilusDataWrapper> {
 
-	public ArrayList<PDetections> detectionsDocs;
+	public ArrayList<T> detectionsDocs;
 
-	public StreamDetectionsSummary(ArrayList<PDetections> detectionsDocs) {
+	public StreamDetectionsSummary(ArrayList<T> detectionsDocs) {
 		this.detectionsDocs = detectionsDocs;
 	}
 

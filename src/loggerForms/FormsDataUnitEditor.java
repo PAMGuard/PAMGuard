@@ -16,8 +16,6 @@ import PamUtils.PamCalendar;
 public class FormsDataUnitEditor{
 
 	
-	
-	
 	/**
 	 * @param formDescription
 	 * @param formsDataUnit
@@ -29,8 +27,6 @@ public class FormsDataUnitEditor{
 		
 		JFrame frame=PamController.getInstance().getGuiFrameManager().getFrame(frameNo);
 
-		
-		
 		FormsDataUnit updatedData = FormsDataUnitEditDialog.showDialog(frame, formDescription, formsDataUnit);		
 
 		if (updatedData != null) {

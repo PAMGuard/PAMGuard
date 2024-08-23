@@ -26,14 +26,14 @@ public class TethysMenuActions {
 	}
 
 	public void deploymentMouseActions(MouseEvent e, PDeployment pDeployment) {
-		ArrayList<String> detDocNames = tethysControl.getDbxmlQueries().getDetectionsDocuments(pDeployment.deployment.getId());
+		ArrayList<String> detDocNames = tethysControl.getDbxmlQueries().getDetectionsDocuments(pDeployment.nilusObject.getId());
 //		System.out.println("Detections for deployment " + pDeployment.deployment.getId());
 //		for (String detName : detDocNames) {
 //			System.out.println(detName);
 //		}
 		JPopupMenu menu = new JPopupMenu();
 		if (detDocNames.size() == 0) {
-			JMenuItem menuItem = new JMenuItem("Delete deployment " + pDeployment.deployment.getId());
+			JMenuItem menuItem = new JMenuItem("Delete deployment " + pDeployment.nilusObject.getId());
 			menuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -47,7 +47,7 @@ public class TethysMenuActions {
 			menu.add(menuItem);
 		}
 		else {
-			String str = String.format("Delete deployment %s and %d Detections documents", pDeployment.deployment.getId(), detDocNames.size());
+			String str = String.format("Delete deployment %s and %d Detections documents", pDeployment.nilusObject.getId(), detDocNames.size());
 			JMenuItem menuItem = new JMenuItem(str);
 			menuItem.addActionListener(new ActionListener() {
 				@Override
@@ -65,6 +65,6 @@ public class TethysMenuActions {
 	}
 
 	protected void deleteDeployment(PDeployment pDeployment) throws TethysException {
-		tethysControl.getDbxmlConnect().deleteDeployment(pDeployment.deployment.getId());
+		tethysControl.getDbxmlConnect().deleteDeployment(pDeployment.nilusObject.getId());
 	}
 }

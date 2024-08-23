@@ -1,5 +1,7 @@
 package tethys.swing;
 
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,14 +29,20 @@ import PamView.dialog.warn.WarnOnce;
 import PamView.tables.SwingTableColumnWidths;
 import PamguardMVC.PamDataBlock;
 import nilus.DataSourceType;
+import nilus.DescriptionType;
+import nilus.DetectionEffort;
 import nilus.DetectionEffortKind;
 import nilus.Detections;
 import nilus.GranularityType;
+import nilus.Localize.Effort;
 import tethys.Collection;
 import tethys.TethysControl;
 import tethys.TethysState;
 import tethys.dbxml.TethysException;
 import tethys.detection.StreamDetectionsSummary;
+import tethys.localization.PLocalization;
+import tethys.niluswraps.NilusDataWrapper;
+import tethys.niluswraps.NilusDocumentWrapper;
 import tethys.niluswraps.PDeployment;
 import tethys.niluswraps.PDetections;
 
@@ -57,12 +65,16 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 
 	private PamDataBlock dataBlock;
 
-	private StreamDetectionsSummary streamDetectionsSummary;
+//	private StreamDetectionsSummary<NilusDataWrapper<PDetections>> streamDetectionsSummary;
+//
+//	private StreamDetectionsSummary<NilusDataWrapper<PLocalization>> streamLocalisationsSummary;
+	
+	private StreamDetectionsSummary<NilusDataWrapper> combinedSummary; 
 
 	public DatablockDetectionsPanel(TethysControl tethysControl) {
 		super(tethysControl);
 		mainPanel = new JPanel(new BorderLayout());
-		mainPanel.add(BorderLayout.NORTH, dataBlockName = new JLabel("PAMGUard data stream", JLabel.LEFT));
+		mainPanel.add(BorderLayout.NORTH, dataBlockName = new JLabel("PAMGuard data stream", JLabel.LEFT));
 		mainPanel.setBorder(new TitledBorder("Data stream Tethys Detections documents"));
 
 		tableModel = new TableModel();
@@ -95,23 +107,54 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 		//        if (rowIndex < 0) {
 		//        	return null;
 		//        }
+		NilusDataWrapper doc = detectionsForRow(rowIndex);
 		int colIndex = table.columnAtPoint(p);
 		switch (colIndex) {
 		case 0:
-			return "Tethys Detections document name";
+			if (doc != null) {
+				return "Tethys Detections document Id: " + doc.getDocumentId();
+			}
+			return "Tethys Detections document Id";
 		case 1:
+			if (dataBlock != null) {
+				return "Name of PAMGuard data stream: " + dataBlock.getLongDataName();
+			}
 			return "Name of PAMGuard data stream";
 		case 2:
-			return "Effort period";
+			return "Deployment type";
 		case 3:
-			return "Output granularity";
+			return "Output type and granularity ";
 		case 4:
-			return "Number of detection elements in document";
+			return "Effort period";
 		case 5:
-			return "Document abstract";
+			return "Number of detection or localization elements in document";
+		case 6:
+			DescriptionType desc = findDescription(rowIndex);
+			if (desc != null) {
+				String str = "Document abstract: " + desc.getAbstract();
+				return str;
+			}
+			else {
+				return "Document abstract";
+			}
 
 		}
 		return "No tip";
+	}
+	
+	
+	private DescriptionType findDescription(int rowIndex) {
+		NilusDataWrapper doc = detectionsForRow(rowIndex);
+		if (doc == null) {
+			return null;
+		}
+		Object desc = doc.getGotObject("getDescription");
+		if (desc instanceof DescriptionType) {
+			return (DescriptionType) desc;
+		}
+		else {
+			return null;
+		}
 	}
 
 	@Override
@@ -119,9 +162,13 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 		return mainPanel;
 	}
 
-	@Override
-	public void selectDataBlock(PamDataBlock dataBlock) {
-		if (this.dataBlock == dataBlock) {
+	/**
+	 * update table for this datablock
+	 * @param dataBlock datablock
+	 * @param always always update, even if datablock hasn't changed. 
+	 */
+	public void selectDataBlock(PamDataBlock dataBlock, boolean always) {
+		if (this.dataBlock == dataBlock && !always) {
 			return; // stops lots of requerying, which matters when database is large. 
 		}
 		this.dataBlock = dataBlock;
@@ -138,24 +185,44 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 	}
 
 	@Override
+	public void selectDataBlock(PamDataBlock dataBlock) {
+		selectDataBlock(dataBlock, false);
+	}
+
+	@Override
 	public void taskFinished(String result) {
 		tableModel.fireTableDataChanged();
 	}
 
 	@Override
 	public String runBackgroundTask(PamWorker<String> pamWorker) {
-		streamDetectionsSummary = getTethysControl().getDetectionsHandler().getStreamDetections(dataBlock);
+		StreamDetectionsSummary<NilusDataWrapper<PDetections>> streamDetectionsSummary = getTethysControl().getDetectionsHandler().getStreamDetections(dataBlock);
+		StreamDetectionsSummary<NilusDataWrapper<PLocalization>> streamLocalisationsSummary = getTethysControl().getLocalizationHandler().getStreamLocalizations(dataBlock);
+		ArrayList<NilusDataWrapper> allDocs = new ArrayList();
+		if (streamDetectionsSummary != null) {
+			allDocs.addAll(streamDetectionsSummary.detectionsDocs);
+		}
+		if (streamLocalisationsSummary != null) {
+			allDocs.addAll(streamLocalisationsSummary.detectionsDocs);
+		}
+		combinedSummary = new StreamDetectionsSummary<>(allDocs);
 		return null;
 	}
 
 	@Override
 	public void updateState(TethysState tethysState) {
+//		boolean fullUpdate = needFullUpdate(tethysState);
 		if (dataBlock != null) {
 			PamDataBlock currBlock = dataBlock;
 			selectDataBlock(null);
-			selectDataBlock(dataBlock);
+			selectDataBlock(currBlock);
 		}
 	}
+
+//	private boolean needFullUpdate(TethysState tethysState) {
+//		// TODO Auto-generated method stub
+//		return false;
+//	}
 
 	private class MouseActions extends MouseAdapter {
 
@@ -183,7 +250,7 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 		}
 		int[] rows = table.getSelectedRows();
 
-		PDetections pDets = detectionsForRow(row);
+		NilusDataWrapper pDets = detectionsForRow(row);
 		if (pDets == null) {
 			return;
 		}
@@ -193,7 +260,7 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 		JMenuItem menuItem;
 		if (rows.length == 1) {
 			
-			menuItem = new JMenuItem("Display document " + pDets.detections.getId());
+			menuItem = new JMenuItem("Display document " + pDets.getDocumentId());
 			menuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -202,7 +269,7 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 			});
 			popMenu.add(menuItem);
 
-			menuItem = new JMenuItem("Export document " + pDets.detections.getId());
+			menuItem = new JMenuItem("Export document " + pDets.getDocumentId());
 			menuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -212,7 +279,7 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 			popMenu.add(menuItem);
 			
 			popMenu.addSeparator();
-			menuItem = new JMenuItem("Delete document " + pDets.detections.getId());
+			menuItem = new JMenuItem("Delete document " + pDets.getDocumentId());
 			menuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -247,15 +314,15 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 			return;
 		}
 
-		ArrayList<Detections> toDelete = new ArrayList();
+		ArrayList<NilusDataWrapper> toDelete = new ArrayList();
 
 		for (int i = 0; i < rows.length; i++) {
 			int row = rows[i];
-			PDetections pDets = detectionsForRow(row);
+			NilusDataWrapper<PDetections> pDets = detectionsForRow(row);
 			if (pDets == null) {
 				continue;
 			}
-			toDelete.add(pDets.detections);
+			toDelete.add(pDets);
 		}
 		DeleteDocs dd = new DeleteDocs(toDelete);
 		PamWorker<Integer> worker = new PamWorker(dd, getTethysControl().getGuiFrame(), 1, "Deleting Detections documents");
@@ -265,18 +332,18 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 
 	private class DeleteDocs implements PamWorkWrapper<Integer> {
 
-		private ArrayList<Detections> toDelete;
+		private ArrayList<NilusDataWrapper> toDelete;
 
-		public DeleteDocs(ArrayList<Detections> toDelete) {
+		public DeleteDocs(ArrayList<NilusDataWrapper> toDelete) {
 			this.toDelete = toDelete;
 		}
 
 		@Override
 		public Integer runBackgroundTask(PamWorker<Integer> pamWorker) {
-			for (Detections dets : toDelete) {
+			for (NilusDocumentWrapper dets : toDelete) {
 				try {
 					
-					getTethysControl().getDbxmlConnect().deleteDocument(dets);
+					getTethysControl().getDbxmlConnect().deleteDocument(dets.nilusObject);
 				} catch (TethysException e) {
 					getTethysControl().showException(e);
 				}
@@ -286,57 +353,56 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 
 		@Override
 		public void taskFinished(Integer result) {
-			getTethysControl().exportedDetections(dataBlock);
-			selectDataBlock(dataBlock); // force table update. 			
+			getTethysControl().deletedDetections(dataBlock);
+			selectDataBlock(dataBlock, true); // force table update. 			
 		}
 
 	}
 
-	protected void deleteDocument(PDetections pDets) {
-		String msg = String.format("Are you sure you want to delete the Detections document %s ?", pDets.detections.getId());
+	protected void deleteDocument(NilusDataWrapper pDets) {
+		String msg = String.format("Are you sure you want to delete the Detections document %s ?", pDets.getDocumentId());
 		int ans = WarnOnce.showWarning(PamGui.findComponentWindow(mainPanel), "Delete Document", msg, WarnOnce.OK_CANCEL_OPTION);
 		if (ans != WarnOnce.OK_OPTION) {
 			return;
 		}
 		try {
-			getTethysControl().getDbxmlConnect().deleteDocument(pDets.detections);
+			getTethysControl().getDbxmlConnect().deleteDocument(pDets.nilusObject);
 		} catch (TethysException e) {
 			getTethysControl().showException(e);
 		}
-		getTethysControl().exportedDetections(dataBlock);
-		selectDataBlock(dataBlock); // force table update. 
+		getTethysControl().deletedDetections(dataBlock);
+		selectDataBlock(dataBlock, true); // force table update. 
 	}
 
-	private void displayDocument(PDetections pDets) {
-		getTethysControl().displayDocument(Collection.Detections.collectionName(), pDets.detections.getId());
-
-	}
-
-	private void exportDocument(PDetections pDets) {
-		getTethysControl().exportDocument(Collection.Detections.toString(), pDets.detections.getId());
+	private void displayDocument(NilusDataWrapper pDets) {
+		getTethysControl().displayDocument(pDets.getCollection().collectionName(), pDets.getDocumentId());
 
 	}
 
-	private PDetections detectionsForRow(int iRow) {
-		if (streamDetectionsSummary == null || streamDetectionsSummary.detectionsDocs == null) {
+	private void exportDocument(NilusDataWrapper pDets) {
+		getTethysControl().exportDocument(pDets.getCollection().collectionName(), pDets.getDocumentId());
+	}
+
+	private NilusDataWrapper detectionsForRow(int iRow) {
+		if (combinedSummary == null || combinedSummary.detectionsDocs == null) {
 			return null;
 		}
-		if (iRow < 0 || iRow >= streamDetectionsSummary.detectionsDocs.size()) {
+		if (iRow < 0 || iRow >= combinedSummary.detectionsDocs.size()) {
 			return null;
 		}
-		return streamDetectionsSummary.detectionsDocs.get(iRow);
+		return combinedSummary.detectionsDocs.get(iRow);
 	}
 
 	private class TableModel extends AbstractTableModel {
 
-		private String[] colNames = {"Document", "Detector", "Deployment", "Effort", "Granularity", "Count", "Abstract"};
+		private String[] colNames = {"Document", "Detector", "Deployment", "Type (Granularity)", "Effort", "Count", "Abstract"};
 
 		@Override
 		public int getRowCount() {
-			if (streamDetectionsSummary == null || streamDetectionsSummary.detectionsDocs == null) {
+			if (combinedSummary == null || combinedSummary.detectionsDocs == null) {
 				return 0;
 			}
-			return streamDetectionsSummary.detectionsDocs.size();
+			return combinedSummary.detectionsDocs.size();
 		}
 
 		@Override
@@ -351,28 +417,28 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
-			PDetections pDets = detectionsForRow(rowIndex);
+			NilusDataWrapper<PDetections> pDets = detectionsForRow(rowIndex);
 			return getValueAt(pDets, columnIndex);
 		}
 
-		private Object getValueAt(PDetections pDets, int columnIndex) {
+		private Object getValueAt(NilusDataWrapper<PDetections> pDets, int columnIndex) {
 			if (pDets == null) {
 				return null;
 			}
-			Detections dets = pDets.detections;
-			if (dets == null) {
+//			 PDetections dets = pDets.nilusObject;
+			if (pDets == null) {
 				return "Error in doc";
 			}
 			switch (columnIndex) {
 			case 0:
-				return dets.getId();
+				return pDets.getDocumentId();
 			case 1:
 				if (pDets.dataBlock == null) {
 					return null;
 				}
 				return pDets.dataBlock.getDataName();
 			case 2:
-				DataSourceType dataSource = dets.getDataSource();
+				DataSourceType dataSource = pDets.getDataSource();
 				if (dataSource == null) {
 					return null;
 				}
@@ -380,31 +446,53 @@ public class DatablockDetectionsPanel extends TethysGUIPanel implements StreamTa
 					return dataSource.getDeploymentId();
 				}
 			case 3:
-				XMLGregorianCalendar start = dets.getEffort().getStart();
-				XMLGregorianCalendar stop = dets.getEffort().getEnd();
-				return start + " to " + stop;
+//				String col = pDets.getCollection().collectionName();
+//				
+//				return pDets.getCollection();
+				return getType(pDets);
 			case 4:
-				List<DetectionEffortKind> kinds = dets.getEffort().getKind();
-				if (kinds == null) {
-					return null;
-				}
-				for (DetectionEffortKind kind : kinds) {
-					if (kind.getGranularity() != null) {
-						GranularityType granularity = kind.getGranularity();
-						return PDeployment.formatGranularity(granularity);
-						//						if (granularity != null) {
-						//							return granularity.getValue();
-						//						}
-					}
-				}
-				break;
+//				XMLGregorianCalendar start = dets.getEffort().getStart();
+//				XMLGregorianCalendar stop = dets.getEffort().getEnd();
+				XMLGregorianCalendar start = pDets.getEffortStart();
+				XMLGregorianCalendar stop = pDets.getEffortEnd();
+				return start + " to " + stop;
 			case 5:
 				return pDets.count;
 			case 6:
-				return dets.getDescription().getAbstract();
+				DescriptionType desc = pDets.getDescription();
+				if (desc != null) {
+					return desc.getAbstract();
+				}
 			}
 			return null;
 		}
 
+	}
+	
+	private String getType(NilusDataWrapper<PDetections> pDets) {
+		String type;
+		if (pDets == null || pDets.nilusObject == null) {
+			return null;
+		}
+		type = pDets.getCollection().collectionName();
+		
+		// if it's a detection, also get the granularity. 
+		Object effort = pDets.getGotObjects("getEffort");
+		if (effort instanceof DetectionEffort) {
+			DetectionEffort detectionEffort = (DetectionEffort) effort;
+			List<DetectionEffortKind> kinds = detectionEffort.getKind();
+			if (kinds == null) {
+				return type;
+			}
+			for (DetectionEffortKind kind : kinds) {
+				if (kind.getGranularity() != null) {
+					GranularityType granularity = kind.getGranularity();
+					if (granularity != null) {
+						type += " (" + granularity.getValue() + ")";
+					}
+				}
+			}
+		}
+		return type;
 	}
 }

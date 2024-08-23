@@ -2,6 +2,7 @@ package tethys.pamdata;
 
 import java.util.List;
 
+import PamDetection.LocalisationInfo;
 import PamguardMVC.PamDataUnit;
 import nilus.AlgorithmType;
 import nilus.AlgorithmType.Parameters;
@@ -10,6 +11,8 @@ import nilus.DescriptionType;
 import nilus.Detection;
 import nilus.DetectionEffortKind;
 import nilus.GranularityEnumType;
+import tethys.Collection;
+import tethys.localization.TethysLocalisationInfo;
 import tethys.niluswraps.PDeployment;
 import tethys.output.StreamExportParams;
 import tethys.output.TethysExportParams;
@@ -60,9 +63,10 @@ public interface TethysDataProvider {
 
 	/**
 	 * Get Algorithm information for a Tethys Detections document
+	 * @param collection Detections or Localisations may have different parameter sets. 
 	 * @return Algorithm information
 	 */
-	public AlgorithmType getAlgorithm();
+	public AlgorithmType getAlgorithm(Collection collection);
 	
 	/**
 	 * Get a list of allowed granularity types for this output 
@@ -81,7 +85,23 @@ public interface TethysDataProvider {
 	 * @return A name, similar to datablock.getLongDataName(), but no spaces. 
 	 */
 	public String getDetectionsName();
-
+	
+	/**
+	 * True if the datablock is detections. This will (nearly) always 
+	 * be true or the block wouldn't have a TethysDataProvider, however
+	 * there may be one or two localisers that should really only output
+	 * localisation information. 
+	 * @return
+	 */
+	public boolean hasDetections();
+	
+	/**
+	 * See if it's possible for this block to export localisations. This may 
+	 * depend on the selected granularity. 
+	 * @param granularityType
+	 * @return
+	 */
+	public boolean canExportLocalisations(GranularityEnumType granularityType);
 
 	/**
 	 * Create a Tethys Detection object from a PamDataUnit.<br>
@@ -120,5 +140,12 @@ public interface TethysDataProvider {
 	 */
 	public boolean wantExportDialogCard(ExportWizardCard wizPanel);
 	
+	/**
+	 * Get localisation info for the datablock. Can be null, but probably never is. More likely to have a zero of available types;
+	 * @return
+	 */
+	public TethysLocalisationInfo getLocalisationInfo();
+	
+			
 	
 }

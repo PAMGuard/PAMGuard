@@ -42,6 +42,7 @@ import Filters.Filter;
 import Filters.FilterMethod;
 import Filters.FilterType;
 import Localiser.DelayMeasurementParams;
+import Localiser.LocalisationAlgorithmInfo;
 import Localiser.algorithms.Correlations;
 import Localiser.algorithms.DelayGroup;
 import Localiser.algorithms.TimeDelayData;
@@ -312,19 +313,19 @@ public class ClickDetector extends PamProcess {
 		offlineEventDataBlock.SetLogging(offlineEventLogging);
 		targetMotionSQLLogging = new TargetMotionSQLLogging(2);
 		offlineEventLogging.addAddOn(targetMotionSQLLogging);
-		if (isViewer) {
-			// offlineEventDataBlock = new
-			// OfflineEventDataBlock(clickControl.getUnitName()+"_OfflineEvents",
-			// this, 0);
-			// offlineEventLogging = new OfflineEventLogging(clickControl,
-			// offlineEventDataBlock);
-			// targetMotionSQLLogging = new TargetMotionSQLLogging(2);
-			// offlineEventLogging.addAddOn(targetMotionSQLLogging);
-			// offlineEventDataBlock.SetLogging(offlineEventLogging);
-		} else { // for normal and mixed mode.
+//		if (isViewer) {
+//			// offlineEventDataBlock = new
+//			// OfflineEventDataBlock(clickControl.getUnitName()+"_OfflineEvents",
+//			// this, 0);
+//			// offlineEventLogging = new OfflineEventLogging(clickControl,
+//			// offlineEventDataBlock);
+//			// targetMotionSQLLogging = new TargetMotionSQLLogging(2);
+//			// offlineEventLogging.addAddOn(targetMotionSQLLogging);
+//			// offlineEventDataBlock.SetLogging(offlineEventLogging);
+//		} else { // for normal and mixed mode.
 			offlineEventDataBlock.setLocalisationContents(LocContents.HAS_BEARING | LocContents.HAS_RANGE
 					| LocContents.HAS_LATLONG | LocContents.HAS_AMBIGUITY | LocContents.HAS_PERPENDICULARERRORS);
-		}
+//		}
 		// set up the subtable for the Event Logger, and force creation
 		offlineEventLogging.setSubLogging(getClickDataBlock().getOfflineClickLogging());
 
@@ -458,6 +459,8 @@ public class ClickDetector extends PamProcess {
 			nChannelGroups = GroupedSourcePanel.countChannelGroups(cp.getChannelBitmap(), cp.getChannelGroups());
 			int groupChannels;
 			channelGroupDetectors = new ChannelGroupDetector[nChannelGroups];
+			
+			int locContents = 0;
 			for (int i = 0; i < nChannelGroups; i++) {
 				groupChannels = GroupedSourcePanel.getGroupChannels(i, cp.getChannelBitmap(), cp.getChannelGroups());
 				channelGroupDetectors[i] = new ChannelGroupDetector(i, groupChannels);
@@ -467,8 +470,20 @@ public class ClickDetector extends PamProcess {
 				if (multiThread) {
 					channelGroupDetectors[i].halfBuiltClicks.addObserver(newClickMonitor, true);
 				}
+				if (channelGroupDetectors[i].bearingLocaliser != null) {
+					locContents |= channelGroupDetectors[i].bearingLocaliser.getLocalisationContents();
+				}
 				// System.out.println("Group " + i + " contains channels list " +
 				// groupChannels);
+			}
+			outputClickData.setLocalisationContents(locContents);
+			if (locContents == 0) {
+				offlineEventDataBlock.setLocalisationContents(0);
+			}
+			else {
+				int eventLocCont = LocContents.HAS_LATLONG | LocContents.HAS_XYZ | LocContents.HAS_RANGE;
+				eventLocCont |= (locContents & LocContents.HAS_AMBIGUITY);
+				offlineEventDataBlock.setLocalisationContents(eventLocCont);
 			}
 
 			globalChannelList = new int[nChan = PamUtils
@@ -2094,5 +2109,23 @@ public class ClickDetector extends PamProcess {
 	public void destroyProcess() {
 		super.destroyProcess();
 		newClickMonitor.destroyProcess();
+	}
+
+	/**
+	 * Get information about the internal bearing localiser. Will have to do 
+	 * just for the first sub detector. 
+	 * @return
+	 */
+	public LocalisationAlgorithmInfo getLocaliserInfo() {
+		if (channelGroupDetectors == null || channelGroupDetectors.length == 0) {
+			return null;
+		}
+		BearingLocaliser bl = channelGroupDetectors[0].bearingLocaliser;
+		if (bl == null) {
+			return null;
+		}
+		else {
+			return bl.getAlgorithmInfo();
+		}
 	}
 }

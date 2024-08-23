@@ -3,6 +3,8 @@
  */
 package Localiser.algorithms.timeDelayLocalisers.bearingLoc;
 
+import PamDetection.LocContents;
+
 /**
  * @author dg50
  *
@@ -19,6 +21,11 @@ public class MLLineBearingLocaliser2 extends MLGridBearingLocaliser2 {
 		// TODO Auto-generated constructor stub
 	}
 
+	@Override
+	public int getLocalisationContents() {
+		return LocContents.HAS_BEARING | LocContents.HAS_AMBIGUITY | LocContents.HAS_AMBIGUITY;
+	}
+	
 	/**
 	 * Convert a bin into an angle. 
 	 * @param bin bin index

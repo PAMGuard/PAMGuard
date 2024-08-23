@@ -562,6 +562,20 @@ public class PamObservable {//extends PanelOverlayDraw {
 		return PamModel.getPamModel().getPamModelSettings().getThreadingJitterMillis();
 	}
 
+	/**
+	 * @return the pamObservers
+	 */
+	protected List<PamObserver> getPamObservers() {
+		return pamObservers;
+	}
+
+	/**
+	 * @return the instantObservers
+	 */
+	protected List<PamObserver> getInstantObservers() {
+		return instantObservers;
+	}
+
 	//	@Override
 	//	public boolean hasOptionsDialog(GeneralProjector generalProjector) {
 	//		if (overlayDraw != null) {

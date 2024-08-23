@@ -49,6 +49,7 @@ import tethys.dbxml.TethysException;
 import tethys.dbxml.TethysQueryException;
 import tethys.deployment.DeploymentHandler;
 import tethys.detection.DetectionsHandler;
+import tethys.localization.LocalizationHandler;
 import tethys.niluswraps.PDeployment;
 import tethys.output.DatablockSynchInfo;
 import tethys.output.TethysExportParams;
@@ -91,6 +92,7 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	private DeploymentHandler deploymentHandler;
 	private DetectionsHandler detectionsHandler;
 	private CalibrationHandler calibrationHandler;
+	private LocalizationHandler localizationHandler;
 	
 	private ITISFunctions itisFunctions;
 
@@ -102,6 +104,7 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		deploymentHandler = new DeploymentHandler(this);
 		detectionsHandler = new DetectionsHandler(this);
 		calibrationHandler = new CalibrationHandler(this);
+		localizationHandler = new LocalizationHandler(this);
 		
 		serverCheckTimer = new Timer(10000, new ActionListener() {
 			@Override
@@ -567,16 +570,22 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		for (DatablockSynchInfo synchInfo : dataBlockSynchInfos) {
 //			dataPrefixes[i] = DetectionsHandler.getDetectionsDocIdPrefix(deplData.getProject(), synchInfo.getDataBlock());
 			int detectionCount = 0;
-			int documentCount = 0;
+			int locDocumentCount = 0;
+			int detDocumentCount = 0;
 			for (PDeployment pDepl : matchedDeployments) {
-				detectionCount += dbxmlQueries.countData(synchInfo.getDataBlock(), pDepl.deployment.getId());
-				ArrayList<String> detectionsNames = getDbxmlQueries().getDetectionsDocuments(synchInfo.getDataBlock(), pDepl.deployment.getId());
+				detectionCount += dbxmlQueries.countData(synchInfo.getDataBlock(), pDepl.getDocumentId());
+				ArrayList<String> detectionsNames = getDbxmlQueries().getDetectionsDocuments(synchInfo.getDataBlock(), pDepl.getDocumentId());
 				if (detectionsNames != null) {
-					documentCount += detectionsNames.size();
+					detDocumentCount += detectionsNames.size();
+				}
+				ArrayList<String> locDocNames = getDbxmlQueries().getLocalizationDocuments(synchInfo.getDataBlock(), pDepl.getDocumentId());
+				if (locDocNames != null) {
+					locDocumentCount += locDocNames.size();
 				}
 			}
 			synchInfo.setDataCount(detectionCount);
-			synchInfo.setDetectionDocumentCount(documentCount);
+			synchInfo.setDetectionDocumentCount(detDocumentCount);
+			synchInfo.setLocalizationDocumentCount(locDocumentCount);
 			
 			i++;
 		}
@@ -593,6 +602,13 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 
 	public DetectionsHandler getDetectionsHandler() {
 		return detectionsHandler;
+	}
+
+	/**
+	 * @return the localizationHandler
+	 */
+	public LocalizationHandler getLocalizationHandler() {
+		return localizationHandler;
 	}
 
 	public void showException(TethysException tethysException) {
@@ -714,8 +730,16 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	 */
 	public void exportedDetections(PamDataBlock dataBlock) {
 		countProjectDetections();
-//		sendStateUpdate(new TethysState(StateType.NEWPAMGUARDSELECTION, Collection.Detections));
+//		sendStateUpdate(new TethysState(StateType.DELETEDATA));
+		sendStateUpdate(new TethysState(StateType.NEWPAMGUARDSELECTION, Collection.Detections));
 	}
+	
+	public void deletedDetections(PamDataBlock dataBlock) {
+		countProjectDetections();
+//		sendStateUpdate(new TethysState(StateType.DELETEDATA));
+		sendStateUpdate(new TethysState(StateType.NEWPAMGUARDSELECTION, Collection.Detections));		
+	}
+	
 	/**
 	 * @return the calibrationHandler
 	 */

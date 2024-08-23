@@ -9,10 +9,13 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import Localiser.LocalisationAlgorithm;
+import Localiser.LocalisationAlgorithmInfo;
 import PamController.PamControlledUnit;
 import PamController.PamSettings;
 import PamController.PamguardVersionInfo;
 import PamController.settings.output.xml.PamguardXMLWriter;
+import PamDetection.LocalisationInfo;
 import PamUtils.XMLUtils;
 import PamguardMVC.DataAutomationInfo;
 import PamguardMVC.DataUnitBaseData;
@@ -34,9 +37,11 @@ import nilus.DetectionEffortKind;
 import nilus.GranularityEnumType;
 import nilus.Helper;
 import nilus.SpeciesIDType;
+import tethys.Collection;
 import tethys.TethysControl;
 import tethys.TethysTimeFuncs;
 import tethys.detection.DetectionsHandler;
+import tethys.localization.TethysLocalisationInfo;
 import tethys.niluswraps.PDeployment;
 import tethys.output.StreamExportParams;
 import tethys.output.TethysExportParams;
@@ -99,29 +104,85 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 	}
 
 	@Override
-	public AlgorithmType getAlgorithm() {
+	public AlgorithmType getAlgorithm(Collection collection) {
+		/**
+		 * Probably need to split this to provide detection algorithm parameters and 
+		 * localisation algorithm parameters, or pass in the document type as a function 
+		 * argument. 
+		 */
 		AlgorithmType algorithm = new AlgorithmType();
 		try {
 			nilus.Helper.createRequiredElements(algorithm);
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
+		} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
 			e.printStackTrace();
 		}
-		//		algorithm.setMethod(this.getAlgorithmMethod());
-		//		algorithm.setSoftware("PAMGuard");
-		//		algorithm.setVersion(PamguardVersionInfo.version);
+		// do the parameters as normal whether it's dets or locs. 
 		nilus.AlgorithmType.Parameters algoParameters = this.getAlgorithmParameters();
 		if (algoParameters != null) {
 			algorithm.setParameters(algoParameters);
 		}
+		if (collection == Collection.Localizations) {
+			nilus.AlgorithmType.Parameters locParameters = this.getLocalisationParameters();
+			if (locParameters == null) {
+				/*
+				 * It seems Tethys MUST have parameters, so make an empty one if needed. 
+				 */
+				locParameters = new nilus.AlgorithmType.Parameters();
+			}
+			if (algoParameters == null) {
+				algorithm.setParameters(locParameters);
+			}
+			else if (locParameters != null) {
+				// merge the two sets, putting the localisation information first.  
+				List<Element> mainList = algoParameters.getAny();
+				List<Element> locList = locParameters.getAny();
+				if (mainList != null && locList != null) {
+					for (int i = 0; i < locList.size(); i++) {
+						mainList.add(i, locList.get(i));
+					}
+				}
+			}
+		}
+		else {
+		}
 
 		return algorithm;
+	}
+
+	/**
+	 * Localisation parameters. Some localisers don't actually have any parameters, 
+	 * but Tethys requires a parameters element, so if there aren't any, set a dummy
+	 * @return
+	 */
+	public nilus.AlgorithmType.Parameters getLocalisationParameters() {
+		LocalisationAlgorithm algo = pamDataBlock.getLocalisationAlgorithm();
+		if (algo == null) {
+			return null;
+		}
+		LocalisationAlgorithmInfo algoInfo = algo.getAlgorithmInfo();
+		if (algoInfo == null) {
+			return null;
+		}
+		Object params = algoInfo.getParameters();
+		if (params == null) {
+			return null;
+		}
+		// pack the params object
+		TethysParameterPacker paramPacker = null;
+		try {
+			paramPacker = new TethysParameterPacker(tethysControl);
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		}
+		Element paramEl = paramPacker.packObject(params, "localizer");
+		if (paramEl == null) {
+			return null;
+		}
+		nilus.AlgorithmType.Parameters parameters = new nilus.AlgorithmType.Parameters();
+		List<Element> paramList = parameters.getAny();
+		paramList.add(paramEl);
+		
+		return parameters;
 	}
 
 	@Override
@@ -504,6 +565,49 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 	public TethysControl getTethysControl() {
 		return tethysControl;
 	}
+
+	@Override
+	public boolean hasDetections() {
+		return true;
+	}
+
+	
+	@Override
+	public boolean canExportLocalisations(GranularityEnumType granularityType) {
+		LocalisationInfo locCont = pamDataBlock.getLocalisationContents();
+		if (locCont == null) {
+			return false;
+		}
+		return (locCont.getLocContent() > 0 & granularityOK(granularityType));
+	}
+
+	/**
+	 * Granularity is OK for export. 
+	 * @param granularityType
+	 * @return
+	 */
+	public boolean granularityOK(GranularityEnumType granularityType) {
+		return (granularityType == null || granularityType == GranularityEnumType.CALL);
+	}
+
+	@Override
+	public TethysLocalisationInfo getLocalisationInfo() {
+		LocalisationInfo locCont = pamDataBlock.getLocalisationContents();
+		if (locCont == null || locCont.getLocContent() == 0) {
+			return null;
+		}
+		else {
+			return new TethysLocalisationInfo(pamDataBlock);
+		}
+	}
+
+	/**
+	 * @return the pamDataBlock
+	 */
+	protected PamDataBlock getPamDataBlock() {
+		return pamDataBlock;
+	}
+	
 
 
 }

@@ -2,6 +2,7 @@ package clickDetector;
 
 import java.util.ListIterator;
 
+import Localiser.LocalisationAlgorithm;
 import pamScrollSystem.ViewLoadObserver;
 import tethys.TethysControl;
 import tethys.pamdata.TethysDataProvider;
@@ -334,6 +335,16 @@ public class ClickDataBlock extends AcousticDataBlock<ClickDetection>  implement
 	@Override
 	public DataAutomationInfo getDataAutomationInfo() {
 		return new DataAutomationInfo(DataAutomation.AUTOMATIC);
+	}
+
+	@Override
+	public LocalisationAlgorithm getLocalisationAlgorithm() {
+		/*
+		 * This is usually the bearing algorithm from click control. 
+		 * Howeveer, someone may have added an additional bearing localiser
+		 * in which case, the default function should find that. 
+		 */
+		return super.getLocalisationAlgorithm();
 	}
 
 

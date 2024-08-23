@@ -35,8 +35,7 @@ public class Simplex3DNew<T extends GroupDetection> extends Simplex2DNew<T>{
 	
 	@Override
 	public LocContents getLocContents() {
-		// TODO Auto-generated method stub
-		return null;
+		return new LocContents(LocContents.HAS_LATLONG | LocContents.HAS_DEPTH | LocContents.HAS_DEPTHERROR | LocContents.HAS_PERPENDICULARERRORS);
 	}
 
 }

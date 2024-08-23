@@ -372,6 +372,10 @@ public class WarnOnce implements PamSettings {
 			return -1;
 		}
 		
+		if (parent == null) {
+			parent = PamController.getMainFrame();
+		}
+		
 		// show the warning
 		if (canShowDialog()) {
 			WarnOnceDialog wo = new WarnOnceDialog(parent, title, message, messageType, helpPoint, error, okButtonText, cancelButtonText);

@@ -42,7 +42,7 @@ public class DetectionsExportWizard extends PamWizard {
 		
 		streamExportParams = tethysControl.getTethysExportParams().getStreamParams(dataBlock);
 		if (streamExportParams == null) {
-			streamExportParams = new StreamExportParams(tethysControl, dataBlock, false);
+			streamExportParams = new StreamExportParams(tethysControl, dataBlock);
 		}
 		tethysDataProvider = dataBlock.getTethysDataProvider(tethysControl);
 		getMainPanel().add(BorderLayout.NORTH, new ExportStreamInfoPanel(dataBlock));
@@ -81,6 +81,7 @@ public class DetectionsExportWizard extends PamWizard {
 			granularityCard.setParams(streamExportParams);
 		}
 		if (wizardCard == descriptionCard) {
+			streamExportParams.checkDescription();
 			 descriptionCard.setParams(streamExportParams.getNilusDetectionDescription());
 		}
 		if (wizardCard == algorithmCard) {

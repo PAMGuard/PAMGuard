@@ -77,7 +77,7 @@ public class AcquisitionProcess extends PamProcess {
 
 	protected PamRawDataBlock rawDataBlock;
 
-	private PamDataBlock<DaqStatusDataUnit> daqStatusDataBlock;
+	private DaqStatusDataBlock daqStatusDataBlock;
 
 	AcquisitionProcess acquisitionProcess;
 
@@ -125,12 +125,11 @@ public class AcquisitionProcess extends PamProcess {
 		//		PamUtils.makeChannelMap(acquisitionControl.acquisitionParameters.nChannels), 
 		//		acquisitionControl.acquisitionParameters.sampleRate));
 
-		addOutputDataBlock(rawDataBlock = new PamRawDataBlock(name, this, //Xiao Yan Deng
+		addOutputDataBlock(rawDataBlock = new PamRawDataBlock(name, this, 
 				PamUtils.makeChannelMap(acquisitionControl.acquisitionParameters.nChannels,acquisitionControl.acquisitionParameters.getHardwareChannelList()),
 				acquisitionControl.acquisitionParameters.sampleRate));
 
-
-		daqStatusDataBlock = new PamDataBlock<DaqStatusDataUnit>(DaqStatusDataUnit.class, acquisitionControl.getUnitName(),
+		daqStatusDataBlock = new DaqStatusDataBlock(acquisitionControl.getUnitName(),
 				this, 0);
 //		daqStatusDataBlock.
 		addOutputDataBlock(daqStatusDataBlock);
@@ -1241,6 +1240,9 @@ public class AcquisitionProcess extends PamProcess {
 	}
 
 	public InputStoreInfo getStoreInfo(boolean detail) {
+		if (runningSystem == null) {
+			runningSystem = acquisitionControl.findDaqSystem(null);
+		}
 		if (runningSystem instanceof DataInputStore) {
 			return ((DataInputStore) runningSystem).getStoreInfo(detail);
 		}

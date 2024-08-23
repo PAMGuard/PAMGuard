@@ -1,7 +1,13 @@
 package Localiser.algorithms.timeDelayLocalisers.bearingLoc;
 
-import pamMaths.PamVector;
+import java.io.Serializable;
 
+import Localiser.LocalisationAlgorithmInfo;
+import PamDetection.LocContents;
+import pamMaths.PamVector;
+import tethys.localization.LocalizationCreator;
+
+@Deprecated
 public class CombinedBearingLocaliser implements BearingLocaliser {
 	
 	private BearingLocaliser firstLocaliser;
@@ -21,6 +27,11 @@ public class CombinedBearingLocaliser implements BearingLocaliser {
 		firstLocaliser = new LSQBearingLocaliser(hydrophoneBitMap, timeMillis, timingError);
 		simplexBearingLocaliser = new SimplexBearingLocaliser(hydrophoneBitMap, timeMillis, timingError);
 		firstSimplexStep[0] = firstSimplexStep[1] = Math.PI/180.;
+	}
+
+	@Override
+	public int getLocalisationContents() {
+		return LocContents.HAS_BEARING | LocContents.HAS_AMBIGUITY;
 	}
 
 	@Override
@@ -59,6 +70,27 @@ public class CombinedBearingLocaliser implements BearingLocaliser {
 //				simplexBearingLocaliser.getChiVal(delays, res[0]), simplexBearingLocaliser.getChiVal(delays, res2[0]),
 //				simplexBearingLocaliser.getChiVal(delays, res[0])- simplexBearingLocaliser.getChiVal(delays, res2[0]));
 		return res2;
+	}
+
+	@Override
+	public String getAlgorithmName() {
+		return "Combined Simplex bearing localiser";
+	}
+
+	@Override
+	public Serializable getParameters() {
+		return null;
+	}
+
+	@Override
+	public LocalisationAlgorithmInfo getAlgorithmInfo() {
+		return this;
+	}
+
+	@Override
+	public LocalizationCreator getTethysCreator() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

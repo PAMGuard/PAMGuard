@@ -46,6 +46,7 @@ import fftManager.PamFFTControl;
 import group3dlocaliser.Group3DLocaliserControl;
 import meygenturbine.MeygenTurbine;
 import printscreen.PrintScreenControl;
+import ravendata.RavenControl;
 import rockBlock.RockBlockControl;
 import tethys.TethysControl;
 import turbineops.TurbineOperationControl;
@@ -469,6 +470,12 @@ final public class PamModel implements PamSettings {
 			mi.setMaxNumber(1);
 			//mi.addGUICompatabilityFlag(PamGUIManager.FX); //has FX enabled GUI.
 			mi.setHidden(SMRUEnable.isEnable() == false);
+			
+			mi = PamModuleInfo.registerControlledUnit(RavenControl.class.getName(), RavenControl.defaultName);
+			mi.setToolTipText("Import data from Raven selection tables");
+			mi.setModulesMenuGroup(utilitiesGroup);
+			mi.setHidden(SMRUEnable.isEnable() == false);			
+			
 		}		
 		
 		/*

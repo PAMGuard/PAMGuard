@@ -12,18 +12,16 @@ import tethys.deployment.RecordingPeriod;
  * @author dg50
  *
  */
-public class PDeployment {
-
-	public Deployment deployment;
+public class PDeployment extends NilusDocumentWrapper<Deployment>{
+	
 	private RecordingPeriod matchedPAMGaurdPeriod;
 
 	public PDeployment(Deployment deployment) {
-		super();
-		this.deployment = deployment;
+		super(deployment);
 	}
 	
 	public Long getAudioStart() {
-		DeploymentRecoveryDetails detail = deployment.getDeploymentDetails();
+		DeploymentRecoveryDetails detail = nilusObject.getDeploymentDetails();
 		if (detail == null || detail.getAudioTimeStamp() == null) {
 			return null;
 		}
@@ -31,7 +29,7 @@ public class PDeployment {
 	}
 	
 	public Long getAudioEnd() {
-		DeploymentRecoveryDetails detail = deployment.getRecoveryDetails();
+		DeploymentRecoveryDetails detail = nilusObject.getRecoveryDetails();
 		if (detail == null || detail.getAudioTimeStamp() == null) {
 			return null;
 		}
@@ -40,7 +38,7 @@ public class PDeployment {
 
 	@Override
 	public String toString() {
-		return String.format("%s:%d; %s - %s", deployment.getId(), deployment.getDeploymentId(), 
+		return String.format("%s:%d; %s - %s", nilusObject.getId(), nilusObject.getDeploymentId(), 
 				PamCalendar.formatDBDateTime(getAudioStart()), PamCalendar.formatDBDateTime(getAudioEnd()));
 	}
 
@@ -55,10 +53,10 @@ public class PDeployment {
 	public String getShortDescription() {
 		Long audioStart = getAudioStart();
 		if (audioStart == null) {
-			return String.format("%s %s", deployment.getId(), "unknown start");
+			return String.format("%s %s", nilusObject.getId(), "unknown start");
 		}
 		else {
-			return String.format("%s %s", deployment.getId(), PamCalendar.formatDBDate(getAudioStart()));
+			return String.format("%s %s", nilusObject.getId(), PamCalendar.formatDBDate(getAudioStart()));
 		}
 	}
 	

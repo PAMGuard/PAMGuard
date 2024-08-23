@@ -1334,7 +1334,13 @@ public class PamController implements PamControllerInterface, PamSettings {
 		}
 		for (int iU = 0; iU < pamControlledUnits.size(); iU++) {
 			for (int iP = 0; iP < pamControlledUnits.get(iU).getNumPamProcesses(); iP++) {
-				pamControlledUnits.get(iU).getPamProcess(iP).pamStart();
+				PamProcess pamProcess = pamControlledUnits.get(iU).getPamProcess(iP);
+				pamProcess.pamStart();
+				int nOut = pamProcess.getNumOutputDataBlocks();
+				for (int iB = 0; iB < nOut; iB++) {
+					PamDataBlock outBlock = pamProcess.getOutputDataBlock(iB);
+					outBlock.pamStart(startTime);
+				}
 			}
 			// long t2 = System.currentTimeMillis();
 			// System.out.printf("==================================Time taken to call
@@ -1378,11 +1384,19 @@ public class PamController implements PamControllerInterface, PamSettings {
 //		statusCheckThread = new Thread(new StatusTimer());
 //		statusCheckThread.start();
 		ArrayList<PamControlledUnit> pamControlledUnits = pamConfiguration.getPamControlledUnits();
+		
+		long stopTime = PamCalendar.getTimeInMillis();
 
 		// tell all controlled units to stop
 		for (int iU = 0; iU < pamControlledUnits.size(); iU++) {
 			for (int iP = 0; iP < pamControlledUnits.get(iU).getNumPamProcesses(); iP++) {
-				pamControlledUnits.get(iU).getPamProcess(iP).pamStop();
+				PamProcess pamProcess = pamControlledUnits.get(iU).getPamProcess(iP);
+				pamProcess.pamStop();
+				int nOut = pamProcess.getNumOutputDataBlocks();
+				for (int iB = 0; iB < nOut; iB++) {
+					PamDataBlock outBlock = pamProcess.getOutputDataBlock(iB);
+					outBlock.pamStop(stopTime);
+				}	
 			}
 		}
 

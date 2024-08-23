@@ -39,11 +39,12 @@ import org.w3c.dom.Element;
 import rocca.RoccaControl;
 import soundPlayback.PlaybackControl;
 import targetMotionOld.TargetMotionLocaliser;
-
-
+import tethys.localization.LocalizationCreator;
 import binaryFileStorage.BinaryStore;
 import Filters.FilterDialog;
 import Filters.FilterParams;
+import Localiser.LocalisationAlgorithm;
+import Localiser.LocalisationAlgorithmInfo;
 import Localiser.detectionGroupLocaliser.GroupDetection;
 import PamController.PamConfiguration;
 import PamController.PamControlledUnit;
@@ -112,7 +113,7 @@ import offlineProcessing.OfflineTaskGroup;
  * 
  */
 
-public class ClickControl extends PamControlledUnit implements PamSettings {
+public class ClickControl extends PamControlledUnit implements PamSettings, LocalisationAlgorithm {
 
 	protected ClickDetector clickDetector;
 
@@ -1291,6 +1292,17 @@ public class ClickControl extends PamControlledUnit implements PamSettings {
 			clickFFTDataOrganiser = new ClickFFTOrganiser(this);
 		}
 		return clickFFTDataOrganiser;
+	}
+
+	@Override
+	public LocalisationAlgorithmInfo getAlgorithmInfo() {
+		return clickDetector.getLocaliserInfo();
+	}
+
+	@Override
+	public LocalizationCreator getTethysCreator() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

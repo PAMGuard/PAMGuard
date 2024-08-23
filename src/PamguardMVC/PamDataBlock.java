@@ -49,6 +49,7 @@ import org.w3c.dom.Element;
 
 import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionProcess;
+import Localiser.LocalisationAlgorithm;
 import pamScrollSystem.ViewLoadObserver;
 import tethys.TethysControl;
 import tethys.pamdata.AutoTethysProvider;
@@ -57,10 +58,13 @@ import tethys.species.DataBlockSpeciesManager;
 import dataGram.DatagramProvider;
 import dataMap.BespokeDataMapGraphic;
 import dataMap.OfflineDataMap;
+import effort.EffortProvider;
+import effort.binary.DataMapEffortProvider;
 import annotation.DataAnnotationType;
 import annotation.handler.AnnotationHandler;
 import binaryFileStorage.BinaryDataSource;
 import binaryFileStorage.BinaryOfflineDataMap;
+import binaryFileStorage.BinaryStore;
 import binaryFileStorage.SecondaryBinaryStore;
 import PamController.OfflineDataStore;
 import PamController.PamControlledUnit;
@@ -1080,6 +1084,11 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			System.err.printf("Not loading %s since initialisation not yet complete\n", getDataName());
 			return false;
 		}
+//		long tenDays = 3600L*24L*1000L*10L;
+//		if (offlineDataLoadInfo.getEndMillis() - offlineDataLoadInfo.getStartMillis() > tenDays) {
+//			System.out.printf("Big many day data load %s to %s in %s", PamCalendar.formatDateTime(offlineDataLoadInfo.getStartMillis()),
+//					PamCalendar.formatDateTime(offlineDataLoadInfo.getEndMillis()) ,getLongDataName());
+//		}
 
 		saveViewerData();
 
@@ -1122,6 +1131,11 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			long uid = iter.next().getUID();
 			firstViewerUID = Math.min(firstViewerUID, uid);
 			lastViewerUID = Math.max(lastViewerUID, uid);
+		}
+		
+		EffortProvider effProv = getEffortProvider();
+		if (effProv != null) {
+			effProv.viewerLoadData();
 		}
 
 		return loadOk;
@@ -1268,6 +1282,10 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			 */
 			if (shouldNotify()) {
 				notifyInstantObservers(pamDataUnit);
+				EffortProvider effProvider = getEffortProvider();
+				if (effProvider != null) {
+					effProvider.newData(pamDataUnit);
+				}
 			}
 
 			if (offlineDataLoading.isCurrentOfflineLoadKeep()) {
@@ -2530,6 +2548,42 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	public void addLocalisationContents(int localisationContents) {
 		this.localisationContents.addLocContent(localisationContents);
 	}
+	
+	/**
+	 * Find localisation algorithm for this data. 
+	 * This may be within the owning module, or a downstream algorithm. 
+	 * @return first found localisation algorithm or null;
+	 */
+	public LocalisationAlgorithm getLocalisationAlgorithm() {
+		/*
+		 *  first check downstream modules. If these are in use, they
+		 *  probably override anything internal, so look for these first.  
+		 */
+		List<PamObserver> instObs = getInstantObservers();
+		for (PamObserver obs : instObs) {
+			if (obs instanceof LocalisationAlgorithm) {
+				return (LocalisationAlgorithm) obs;
+			}
+			if (obs instanceof PamProcess) {
+				PamProcess proc = (PamProcess) obs;
+				PamControlledUnit pcu = proc.getPamControlledUnit();
+				if (pcu == null) {
+					continue;
+				}
+				if (pcu instanceof LocalisationAlgorithm) {
+					return (LocalisationAlgorithm) pcu;
+				}
+			}
+		}
+		// if nothing downstream, then check the owning module
+		PamProcess proc = getParentProcess();
+		if (proc == null) return null;
+		PamControlledUnit pcu = proc.getPamControlledUnit();
+		if (pcu instanceof LocalisationAlgorithm) {
+			return (LocalisationAlgorithm) pcu;
+		}		
+		return null;
+	}
 
 	public static final int ITERATOR_END = -1;
 
@@ -3017,7 +3071,16 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 		case PamControllerInterface.HYDROPHONE_ARRAY_CHANGED:
 			clearDataOrigins();
 			break;
+		case PamController.INITIALIZATION_COMPLETE:
+			effortProvider = autoEffortProvider();
+			break;
+		case PamController.ADD_CONTROLLEDUNIT:
+			if (PamController.getInstance().isInitializationComplete()) {
+				effortProvider = autoEffortProvider();
+			}
+			break;
 		}
+		
 	}
 
 	/**
@@ -3620,6 +3683,8 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	private PamSymbolManager pamSymbolManager;
 
 	private DataSelectorCreator dataSelectorCreator;
+
+	private EffortProvider effortProvider;
 
 	public void setRecordingTrigger(RecorderTrigger recorderTrigger) {
 		this.recorderTrigger = recorderTrigger;
@@ -4306,6 +4371,62 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 				ThreadedObserver tObs = (ThreadedObserver) obs;
 				tObs.dumpBufferStatus(message, sayEmpties);
 			}
+		}
+	}
+	
+	
+	/**
+	 * @return the effort provider. 
+	 */
+	public EffortProvider getEffortProvider() {
+		return effortProvider;
+	}
+
+	/**
+	 * Auto generate an effort provider. This may get called many times
+	 * for blocks without effort, but that doesn't really matter since its
+	 * only going to happen when opening dialogs, etc. 
+	 * @return
+	 */
+	public EffortProvider autoEffortProvider() {
+		if (effortProvider != null) {
+			// don't change if there already is one. 
+			return effortProvider;
+		}
+		// see if we can do an auto binary one. 
+		BinaryStore binaryStore = BinaryStore.findBinaryStoreControl();
+		if (binaryStore != null && getBinaryDataSource() != null) {
+			return new DataMapEffortProvider(this, BinaryStore.class);
+		}
+		// other options may follow ...
+		return null;
+	}
+
+	/**
+	 * @param effortProvider the effortProvider to set
+	 */
+	protected void setEffortProvider(EffortProvider effortProvider) {
+		this.effortProvider = effortProvider;
+	}
+
+	/**
+	 * Need this notification at startup time to perform a few standard actions. 
+	 * @param startTime
+	 */
+	public void pamStart(long startTime) {
+		EffortProvider effP = getEffortProvider();
+		if (effP != null) {
+			effP.realTimeStart(startTime);
+		}
+	}
+	/**
+	 * Need this notification at stop time to perform a few standard actions. 
+	 * @param startTime
+	 */
+	public void pamStop(long stopTime) {
+		EffortProvider effP = getEffortProvider();
+		if (effP != null) {
+			effP.realTimeStop(stopTime);
 		}
 	}
 }

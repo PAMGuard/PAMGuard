@@ -10,14 +10,18 @@ import java.util.List;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
+import Localiser.LocalisationAlgorithm;
+import Localiser.LocalisationAlgorithmInfo;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import PamDetection.LocContents;
 import PamUtils.SimpleObservable;
 import PamguardMVC.PamDataUnit;
 import beamformer.algorithms.BeamAlgorithmProvider;
+import bearinglocaliser.algorithms.BearingAlgorithm;
 import bearinglocaliser.algorithms.BearingAlgorithmProvider;
 import bearinglocaliser.annotation.BearingAnnotationType;
 import bearinglocaliser.beamformer.BeamFormBearingWrapper;
@@ -28,9 +32,10 @@ import bearinglocaliser.toad.TOADBearingProvider;
 import offlineProcessing.OLProcessDialog;
 import offlineProcessing.OfflineTaskGroup;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
+import tethys.localization.LocalizationCreator;
 import userDisplay.UserDisplayControl;
 
-public class BearingLocaliserControl extends PamControlledUnit implements PamSettings {
+public class BearingLocaliserControl extends PamControlledUnit implements PamSettings, LocalisationAlgorithm, LocalisationAlgorithmInfo {
 	
 	public static final String unitType = "Bearing Calculator";
 	
@@ -227,5 +232,53 @@ public class BearingLocaliserControl extends PamControlledUnit implements PamSet
 
 	public String getHelpPoint() {
 		return helpPoint;
+	}
+
+	@Override
+	public LocalisationAlgorithmInfo getAlgorithmInfo() {
+		return this;
+	}
+
+	@Override
+	public LocalizationCreator getTethysCreator() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
+	private BearingAlgorithm findAlgorithm() {
+		BearingAlgorithmGroup[] groups = bearingProcess.getBearingAlgorithmGroups();
+		if (groups == null) {
+			return null;
+		}
+		for (int i = 0; i < groups.length; i++) {
+			BearingAlgorithm ba = groups[i].bearingAlgorithm;
+			if (ba != null) {
+				return ba;
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	public int getLocalisationContents() {
+		int cont = LocContents.HAS_BEARING | LocContents.HAS_BEARINGERROR;
+		// work out if we should also add ambiguity. How to work that out ? 
+		return cont;
+	}
+
+	@Override
+	public String getAlgorithmName() {
+//		BearingAlgorithm ba = findAlgorithm();
+//		if (ba == null) {
+//			return null;
+//		}
+//		ba.getParams().
+		return getUnitType();
+	}
+
+	@Override
+	public Serializable getParameters() {
+		return bearingLocaliserParams;
 	}
 }

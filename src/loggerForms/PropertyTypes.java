@@ -1,7 +1,7 @@
 package loggerForms;
 
 public enum PropertyTypes {
-	ORDER, AUTOALERT,SUBTABS,POPUP,HIDDEN,AUTORECORD,BEARING,
+	STARTTIME, ENDTIME, ORDER, AUTOALERT,SUBTABS,POPUP,HIDDEN,AUTORECORD,BEARING,
 	RANGE,HEADING,FONT,DBTABLENAME,
 	FORMCOLOUR,FORMCOLOR,
 	HOTKEY,NOCLEAR,NOCANCEL,NOTOFFLINE,NOTONLINE,
@@ -16,6 +16,10 @@ public enum PropertyTypes {
 
 	public String getDescription() {
 		switch (this) {
+		case STARTTIME:
+			return "Form start time. Will be used as main data UTC. If undefined, form time is save time";
+		case ENDTIME:
+			return "Form end time. Will be used data end time in period data";
 		case AUTOALERT:
 			return "A warning will be issued if the form has not been completed for a set time";
 		case AUTORECORD:

@@ -234,6 +234,8 @@ public class PamModuleInfo implements PamDependent{
 //		Class[] paramList = new Class[1];
 //		paramList[0] = unitName.getClass();
 		boolean error = false;
+		long tic = System.currentTimeMillis();
+		long toc = tic;
 		try {
 			Constructor constructor = moduleClass.getConstructor(constrParams1);
 			newUnit = (PamControlledUnit) constructor.newInstance(pamConfiguration, unitName);
@@ -261,6 +263,11 @@ public class PamModuleInfo implements PamDependent{
 				Ex.printStackTrace();
 				return null;
 			}
+		}
+		toc = System.currentTimeMillis();
+		if (toc-tic > 1000) {
+			System.out.printf("Module %s-%s was slow to load, taking %3.1f seconds\n", newUnit.getUnitType(), 
+					newUnit.getUnitName(), (double)(toc-tic)/1000.);
 		}
 
 		setNInstances(nInstances + 1);
