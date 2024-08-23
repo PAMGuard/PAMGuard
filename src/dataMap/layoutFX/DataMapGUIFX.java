@@ -27,6 +27,7 @@ public class DataMapGUIFX extends PamControlledGUIFX implements DataMapControlGU
 	 * The data map displays to add. 
 	 */
 	public ArrayList<UserDisplayNodeFX> getDisplays(){
+		try {
 		if (dataMapDisplays==null){
 			dataMapPaneFX = new DataMapPaneFX(dataMapControl);
 			dataMapDisplays=new ArrayList<UserDisplayNodeFX>();
@@ -34,6 +35,11 @@ public class DataMapGUIFX extends PamControlledGUIFX implements DataMapControlGU
 			dataMapDisplays.add(dataMapPaneFX);
 		}
 		return dataMapDisplays;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	@Override

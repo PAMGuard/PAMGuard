@@ -55,29 +55,12 @@ import pamguard.GlobalArguments;
 //import org.w3c.dom.Node;
 //import com.thoughtworks.xstream.XStream;
 
-
-
-
-
-
-
-
-import java.io.StringWriter;
-
-
 //import javax.xml.transform.OutputKeys;
 //import javax.xml.transform.Transformer;
 //import javax.xml.transform.TransformerException;
 //import javax.xml.transform.TransformerFactory;
 //import javax.xml.transform.dom.DOMSource;
 //import javax.xml.transform.stream.StreamResult;
-
-
-
-
-
-
-
 
 
 //import sun.jdbc.odbc.OdbcDef;
@@ -90,11 +73,7 @@ import PamController.settings.SettingsNameChanger;
 import PamUtils.PamCalendar;
 import PamUtils.PamFileChooser;
 import PamUtils.PamFileFilter;
-import PamUtils.Splash;
-import PamView.PamGui;
 import PamView.dialog.warn.WarnOnce;
-import amplifier.AmpDialog;
-import amplifier.AmpParameters;
 
 //import PamUtils.PamFileFilter;
 
@@ -172,6 +151,7 @@ public class PamSettingManager {
 	static public final String fileEnd = "psf";
 	static public final String fileEndx = "psfx";
 	static public final String fileEndXML = "psfxml";
+	
 	private static boolean saveAsPSFX = true;
 
 	static public String getCurrentSettingsFileEnd() {
@@ -220,11 +200,12 @@ public class PamSettingManager {
 	/**
 	 * Save settings to a psf file
 	 */
-	static private final int SAVE_PSF = 0x1;
+	static public final int SAVE_PSF = 0x1;
+	
 	/**
 	 * Save settings to database tables (if available).
 	 */
-	static private final int SAVE_DATABASE = 0x2;
+	static public final int SAVE_DATABASE = 0x2;
 
 	/**
 	 * running in remote mode, default normal
@@ -800,7 +781,6 @@ public class PamSettingManager {
 		/*
 		 * then save it to a single XML file
 		 */
-
 		//XML file test
 
 		objectToXMLFile(pamSettingsList,file);

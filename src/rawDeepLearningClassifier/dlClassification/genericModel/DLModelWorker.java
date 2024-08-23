@@ -53,7 +53,7 @@ public abstract class DLModelWorker<T> {
 	public float[][][] dataUnits2ModelInput(ArrayList<? extends PamDataUnit> dataUnits, float sampleRate, int iChan){
 		
 		@SuppressWarnings("unchecked")
-		ArrayList<GroupedRawData> rawDataUnits = ( ArrayList<GroupedRawData>) dataUnits;
+		ArrayList<GroupedRawData> rawDataUnits = (ArrayList<GroupedRawData>) dataUnits;
 		 
 		//the number of chunks. 
 		int numChunks = rawDataUnits.size(); 

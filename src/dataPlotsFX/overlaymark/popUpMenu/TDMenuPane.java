@@ -12,7 +12,7 @@ import dataPlotsFX.layout.TDGraphFX.TDPlotPane;
 import dataPlotsFX.overlaymark.menuOptions.OverlayMenuItem;
 import dataPlotsFX.overlaymark.menuOptions.OverlayMenuManager;
 import detectiongrouplocaliser.DetectionGroupSummary;
-import export.wavExport.WavFileExportManager;
+import export.wavExport.WavDetExport;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -546,7 +546,7 @@ public class TDMenuPane extends PamBorderPane {
 			PamRawDataBlock pamRawBlock =  findRawSourceBlock(); 
 			//			System.out.println("Pam raw data block: " +  pamRawBlock); 
 			
-			if (WavFileExportManager.haveRawData(pamRawBlock, (long) overlayMarker.getCurrentMark().getLimits()[0], (long) overlayMarker.getCurrentMark().getLimits()[1])) {
+			if (WavDetExport.haveRawData(pamRawBlock, (long) overlayMarker.getCurrentMark().getLimits()[0], (long) overlayMarker.getCurrentMark().getLimits()[1])) {
 				//System.out.println("Overaly Marker start X: " +  overlayMarker.getCurrentMark().getLimits()[0] + "  end: " +  overlayMarker.getCurrentMark().getLimits()[1]);
 				//System.out.println("Overlay Marker start Y: " +  overlayMarker.getCurrentMark().getLimits()[2] + "  end: " +  overlayMarker.getCurrentMark().getLimits()[3]);
 				groupDetectionDisplay.showRawData(pamRawBlock, overlayMarker.getCurrentMark().getLimits(), overlayMarker.getCurrentMark().getMarkChannels());

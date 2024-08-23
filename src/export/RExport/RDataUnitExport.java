@@ -33,7 +33,10 @@ public abstract class RDataUnitExport<T extends PamDataUnit<?, ?>> {
 		rData.add("UID", dataUnit.getUID());
 		rData.add("startSample", dataUnit.getStartSample());
 		rData.add("sampleDuration", dataUnit.getSampleDuration());
-		rData.add("freqLimits", new DoubleArrayVector(dataUnit.getBasicData().getFrequency()));
+//		rData.add("freqLimits", new DoubleArrayVector(dataUnit.getBasicData().getFrequency()));
+		rData.add("minFreq", dataUnit.getBasicData().getFrequency()[0]);
+		rData.add("maxFreq", dataUnit.getBasicData().getFrequency()[1]);
+		rData.add("amplitude", dataUnit.getBasicData().getCalculatedAmlitudeDB());
 
 		//there may be no delay info 
 		if (dataUnit.getBasicData().getTimeDelaysSeconds()!=null && dataUnit.getBasicData().getTimeDelaysSeconds().length>=1){

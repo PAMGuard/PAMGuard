@@ -22,9 +22,13 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
 /**
- * A general pane with a frequency slider, colour bar slider and colour combo box. These nodes are interconnected so when colour combo box is changed colours change. 
- * Other than that this pane does nothing but all slider value properties are available to be used in another class or subclass. This means this control pane should be 
- * available to be used for any spectrogram/3D colour image. 
+ * A general pane with a frequency slider, colour bar slider and colour combo
+ * box. These nodes are interconnected so when colour combo box is changed
+ * colours change. Other than that this pane does nothing but all slider value
+ * properties are available to be used in another class or subclass. This means
+ * this control pane should be available to be used for any spectrogram/3D
+ * colour image.
+ * 
  * @author Jamie Macaulay
  *
  */

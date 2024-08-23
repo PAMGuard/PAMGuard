@@ -66,6 +66,10 @@ public class DataTransformPaneFactory {
 			settingsPane = new FilterTransformPane(dlTransfrom); 
 			settingsPane.setParams(dlTransfrom);
 			break;
+		case PEAK_TRIM:
+			settingsPane = new PeakTrimTransformPane(dlTransfrom); 
+			settingsPane.setParams(dlTransfrom);
+			break;
 		case SPEC2DB:
 //			settingsPane = new LabelTransfromPane(dlTransfrom, DLTransformType.SPEC2DB.toString()); 
 //			settingsPane.setPadding(new Insets(0,0,0,20));

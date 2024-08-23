@@ -114,6 +114,15 @@ public class GroupedRawData extends PamDataUnit implements PamDetection, Cloneab
 	public double[][] getRawData() {
 		return rawData;
 	}
+	
+
+	/**
+	 * Set the raw data grouped by channel.
+	 * @param the raw acoustic data to set
+	 */
+	public void setRawData(double[][] rawData) {
+		 this.rawData=rawData;
+	}
 
 	/**
 	 * Get the current pointer for rawData.

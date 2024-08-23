@@ -712,6 +712,34 @@ public class PamArrayUtils {
 		//				return normArr;		
 
 	}
+	
+
+	/**
+	 * Normalise an array
+	 * @param arr  - the array to normalise
+	 * @param scaleFactor - multiply the resulting array by a scale factor. 
+	 * @return normalised copy of the array
+	 */
+	public static float[] normalise(float[] arr, double scaleFactor) {
+		//		//first find the sum of the square of the wave
+		if (arr != null) { 
+			int n = arr.length; 
+			double sum = 0.0; 
+
+			for (int i = 0; i < n; i++) { 
+				sum += arr[i] * arr[i]; 
+			} 
+			sum = Math.pow(sum, 0.5); 
+
+			float[] normArr=new float[arr.length]; 
+			for (int i=0; i<normArr.length; i++) {
+				normArr[i]=(float) (scaleFactor*arr[i]/sum); 
+			}
+			return normArr; 
+		}
+		else return null; 
+	}
+
 
 	/**
 	 * Flip a double array so that it is in the reverse order. Note the array is 
@@ -1253,6 +1281,7 @@ public class PamArrayUtils {
 		}
 		return arrayOut;
 	}
+
 
 
 

@@ -172,7 +172,7 @@ public class ReprocessManager {
 			choiceSummary.addChoice(ReprocessStoreChoice.STARTNORMAL);
 			return choiceSummary;
 		}
-
+				
 		choiceSummary.addChoice(ReprocessStoreChoice.STARTNORMAL);
 		
 		ArrayList<PamControlledUnit> outputStores = PamController.getInstance().findControlledUnits(DataOutputStore.class, true);

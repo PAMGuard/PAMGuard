@@ -47,10 +47,10 @@ public class MLWhistleMoanExport extends MLDataUnitExport<ConnectedRegionDataUni
 
 	/**
 	 * Calculate summary contour information to allow people to conveniently plot whisltle data
-	 * @param dataUnit - the connected regio data unit. 
+	 * @param dataUnit - the connected region data unit. 
 	 * @return peak contour frequency int[0] and contour width int[1]. 
 	 */
-	private int[][] calcPeakContourWidths(ConnectedRegionDataUnit dataUnit){
+	public static int[][] calcPeakContourWidths(ConnectedRegionDataUnit dataUnit){
 		
 		SliceData sliceData; 
 		// should change this to use iterators, not get since sliceList is linked list. 
