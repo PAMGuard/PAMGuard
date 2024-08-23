@@ -22,34 +22,33 @@ import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.dataOffline.OfflineDataLoading;
 import dataMap.OfflineDataMapPoint;
 import detectiongrouplocaliser.DetectionGroupSummary;
-import export.PamDataUnitExporter;
 import wavFiles.Wav16AudioFormat;
 import wavFiles.WavFileWriter;
 
-/**
- * Manages .wav file writing based on what type of data unit is selected and whether raw data is available. 
- * @author Jamie Macaulay
- *
- */
-public class WavFileExportManager implements PamDataUnitExporter  {
-
+public class WavDetExport {
+	
 	/**
 	 * Successful writing of .wav file. 
 	 */
-	public static final int SUCCESS_WAV=0; 
+//	public static final int SUCCESS_WAV=0; 
 
 	/**
 	 * Successful writing of .wav file from data contained in detections. 
 	 */
-	public static final int SUCCESS_DET_WAV=1; 
+//	public static final int SUCCESS_DET_WAV=1; 
 
 	/**
 	 * General failure in wav file writing 
 	 */
-	public static final int FAILURE_WAV=2; 
+//	public static final int FAILURE_WAV=2; 
 
 
-	public static final int LOADING_WAV=2;
+//	public static final int LOADING_WAV=2;
+
+	/**
+	 * The maximum allowed size
+	 */
+	private static final double MAX_ZEROPAD_SIZE_MEGABYTES = 1024; //MB
 
 	/**
 	 * The default path to write files to
@@ -64,11 +63,14 @@ public class WavFileExportManager implements PamDataUnitExporter  {
 
 	private ArrayList<WavDataUnitExport> wavDataUnitExports = new ArrayList<WavDataUnitExport>();
 
-	private WavSaveCallback saveCallback; 
+	private WavSaveCallback saveCallback;
+	
+	private WavExportOptions wavFileoptions = new WavExportOptions(); 
 
-	public WavFileExportManager() {
+	private WavOptionsPanel wavOptionsPanel; 
+
+	public WavDetExport() {
 		wavDataUnitExports.add(new RawHolderWavExport());	
-
 
 		defaultPath=FileSystemView.getFileSystemView().getDefaultDirectory().getPath();
 		defaultPath=defaultPath + File.separator + "Pamguard Manual Export";
@@ -153,12 +155,20 @@ public class WavFileExportManager implements PamDataUnitExporter  {
 	}
 
 	/**
-	 * Convert the mark/dataunits to a .wav file. 
-	 * @param foundDataUnits - found data units. 
-	 * @param selectedIndex - the currently selected data unit. 
-	 * @param mark - overlay mark. 
+	 * Convert the mark/dataunits to a .wav file. makes a decision as to what to
+	 * save
+	 * 
+	 * 1) Data units with no raw data in which case we want to export a wav clip
+	 * from raw data <br> 2) Data units which all have raw data in which case we want to
+	 * export data unit clips as a zero padded wav file (this counts for a single
+	 * data unit too) <b> 3) Mixed data units in which case we want to export a wav clip
+	 * from raw data.
+	 * 
+	 * @param foundDataUnits - found data units.
+	 * @param selectedIndex  - the currently selected data unit.
+	 * @param mark           - overlay mark.
 	 */
-	public int dataUnits2Wav(DetectionGroupSummary foundDataUnits, int selectedIndex, OverlayMark mark) {
+	public int writeOverlayMarkWav(DetectionGroupSummary foundDataUnits, int selectedIndex, OverlayMark mark) {
 		System.out.println("Data units 2 wav");
 		//this order for .wav files. 
 		//if there is a mark then save limits of mark. If there is one data unit then set limits of data units
@@ -203,15 +213,18 @@ public class WavFileExportManager implements PamDataUnitExporter  {
 
 		int flag=-1; 
 
+		String currentFileS = createFileName(foundDataUnits.getFirstTimeMillis()); 
+		File file = new File(currentFileS);
+
 		if (hasAllWavClips) {
-			flag = saveDataUnitWav(foundDataUnits); 
+			flag = writeDetGroupWav(foundDataUnits, file, false); 
 		}
 		else if (!hasAllWavClips && haveRawData) {
 			//no raw data
 			flag = saveRawWav(start, end, rawDataBlock); 
 		}
 		else {
-			flag = saveDataUnitWav(foundDataUnits); 
+			flag = writeDetGroupWav(foundDataUnits, file, false); 
 		}
 
 		return flag; 
@@ -219,6 +232,7 @@ public class WavFileExportManager implements PamDataUnitExporter  {
 
 	/**
 	 * Save a clip of wav data from a pre existing .wav or other audio file within in PG. 
+	 * 
 	 * @param start - the start of the wav file. 
 	 * @param end - the end of the wac file. 
 	 */
@@ -236,6 +250,168 @@ public class WavFileExportManager implements PamDataUnitExporter  {
 
 		return 0; 
 	}
+
+
+	/**
+	 * Save wav data from a data unit instead of from the raw file store. 
+	 * @param foundDataUnits - the list of found data units. 
+	 * @param currentFile - path to current file to save to. 
+	 * @param zeroPad - if true will zeroPad detections. 
+	 * @return the number of data units that were saved. 
+	 */
+	public int writeDetGroupWav(DetectionGroupSummary foundDataUnits, File filename, boolean zeroPad) {
+		return writeDataUnitWav(foundDataUnits.getDataList(), filename, zeroPad);
+	}
+	
+	
+	/**
+	 * Save data units which contain raw data to individual wav files within a folder. 
+	 * @param foundDataUnits - list of data units to save.
+	 * @param currentFile - the current folder. If this is a file name the parent directory will be used. 
+	 * @return the number of data units saved
+	 */
+	public int writeDataUnitWavs(List<PamDataUnit> foundDataUnits, File currentFile) {
+		int n=0; 
+		WavFileWriter wavWrite = null; 
+		for (PamDataUnit fnDataUnit: foundDataUnits){
+			
+			AudioFormat audioFormat = new Wav16AudioFormat(fnDataUnit.getParentDataBlock().getSampleRate(), PamUtils.getNumChannels(fnDataUnit.getChannelBitmap()));
+
+			String currentFileS = createFileName(fnDataUnit.getTimeMilliseconds()); 
+
+			//System.out.println("Save detection wav." + foundDataUnits.size());
+			for (int i=0; i<wavDataUnitExports.size(); i++) {
+				if (wavDataUnitExports.get(i).getUnitClass().isAssignableFrom(fnDataUnit.getClass())) {
+					
+					wavWrite= new WavFileWriter(currentFileS, audioFormat); 
+
+					System.out.println("Write individual wav." + foundDataUnits.size());
+					//save the wav file of detection
+					wavWrite.append(wavDataUnitExports.get(i).getWavClip(fnDataUnit)); 
+					n++; 
+					
+					wavWrite.close();
+					
+					break; 
+				}
+			}
+		}
+		
+		return n;
+	}
+
+	/**
+	 * Save data units which contain raw data to a wav file. Note that this assumed
+	 * the data units all contain raw data, the raw data is at the same sample rate and number of channels 
+	 * and the data units are in order. This will APPEND to the wav file if it currently exists. 
+	 * 
+	 * @param foundDataUnits - data units containing raw data.
+	 * @param currentFile - path to current file to save to. 
+	 * @param zeroPad - if true will zeroPad detections. 
+	 * @return the number of data units saved - this should be the same as the size
+	 *         of the data unit list.
+	 */
+	public int writeDataUnitWav(List<PamDataUnit> foundDataUnits, File currentFile, boolean zeroPad) {
+		int n=0; 
+		WavFileWriter wavWrite = null; 
+		PamDataUnit lastfnDataUnit = null;
+		
+		if (foundDataUnits==null || foundDataUnits.size()<=0) {
+			return 0;
+		}
+		
+		//System.out.println("Save detection wav." + foundDataUnits.size());
+		AudioFormat audioFormat = new Wav16AudioFormat(foundDataUnits.get(0).getParentDataBlock().getSampleRate(), PamUtils.getNumChannels(foundDataUnits.get(0).getChannelBitmap())); 
+		
+		wavWrite= new WavFileWriter(currentFile.getAbsolutePath(), audioFormat);
+				
+		for (PamDataUnit fnDataUnit: foundDataUnits){
+			
+			for (int i=0; i<wavDataUnitExports.size(); i++) {
+				if (wavDataUnitExports.get(i).getUnitClass().isAssignableFrom(fnDataUnit.getClass())) {
+					
+					System.out.println("Append wav. data unit: " + n + " samples: " + wavDataUnitExports.get(i).getWavClip(fnDataUnit)[0].length + " zeroPad: " + zeroPad);
+					
+					if (zeroPad && lastfnDataUnit!=null) {
+						//we need to append zero samples between the detections. 
+						long timeMillisDiff = fnDataUnit.getTimeMilliseconds() - lastfnDataUnit.getTimeMilliseconds();
+						
+						long sampleDiff =  fnDataUnit.getStartSample()  - lastfnDataUnit.getStartSample();
+						
+						int samplesPad;
+						//are the two similar? - are they within 5 milliseconds
+						if (Math.abs(((sampleDiff/audioFormat.getSampleRate())*1000.) - timeMillisDiff)<5){
+							//use the sample diff
+							samplesPad =  (int) sampleDiff;
+						}
+						else {
+							//use time millis for padding. May indicate that data units are from different wav files. 
+							samplesPad =  (int) ((((double) timeMillisDiff)/1000.)*audioFormat.getSampleRate());
+						}
+						
+						//now safety check - is this more than one GB of data. Each sample is 16bits but the input double array is 64 bits each. 
+						double size = samplesPad*16*audioFormat.getChannels()/1024/1024;
+						
+						System.out.println("Append wav. zero pad" + samplesPad);
+						//
+						if (size>MAX_ZEROPAD_SIZE_MEGABYTES) {
+							wavWrite.close();
+							System.err.println(String.format("WavDetExport: A zero padding of %.2f MB was requested. The maximum allowed size is %.2f - "
+									+ "the .wav file was closed and any additional data units have not been written %s", size, MAX_ZEROPAD_SIZE_MEGABYTES, currentFile));
+							return n;
+						}
+						
+						wavWrite.append(new double[audioFormat.getChannels()][samplesPad]);
+					}
+					
+					//save the wav file of detection
+					if (wavWrite.append(wavDataUnitExports.get(i).getWavClip(fnDataUnit))) { 
+						n++; 
+					}					
+					lastfnDataUnit = fnDataUnit;
+					break; 
+				}
+			}
+		}
+		
+		wavWrite.close();
+
+		
+		//send a message that the wav file has saved
+		if (wavWrite!=null && saveCallback!=null) saveCallback.wavSaved(wavWrite.getFileName(), 0);
+		
+		return n;
+	}
+
+
+
+	/**
+	 * Save wav data from a data unit instead of from the raw file store. 
+	 * @param foundDataUnits - the list of found data units. 
+	 * @return
+	 */
+	private int getNWavDataUnits(DetectionGroupSummary foundDataUnits) {
+		int n=0; 
+		for (PamDataUnit fnDataUnit: foundDataUnits.getDataList()){
+			//System.out.println("Save detection wav." + foundDataUnits.getNumDataUnits());
+			for (int i=0; i<wavDataUnitExports.size(); i++) {
+				if (wavDataUnitExports.get(i).getUnitClass().isAssignableFrom(fnDataUnit.getClass())) {
+					n++; 
+					break; 
+				}
+			}
+		}
+		return n; 
+	}
+
+	/**
+	 * Set a callback for saving .wav data. 
+	 * @param saveCallback - the callback
+	 */
+	public void setOnWavSaved(WavSaveCallback saveCallback) {
+		this.saveCallback=saveCallback; 
+	}
+
 
 	/**
 	 * Observes incoming raw data and saves to a wav file 
@@ -345,199 +521,5 @@ public class WavFileExportManager implements PamDataUnitExporter  {
 		}
 	}
 
-
-	/**
-	 * Save wav data from a data unit instead of from the raw file store. 
-	 * @param foundDataUnits - the list of found data units. 
-	 * @return
-	 */
-	private int saveDataUnitWav(DetectionGroupSummary foundDataUnits) {
-		//TODO - need to pad the detections...with zeros.
-		//System.out.println("Save data unit wav: " + foundDataUnits.getNumDataUnits()); 
-
-		int n=0; 
-		WavFileWriter wavWrite = null; 
-		for (PamDataUnit fnDataUnit: foundDataUnits.getDataList()){
-
-			String currentFile = createFileName(fnDataUnit.getTimeMilliseconds()); 
-
-			AudioFormat audioFormat = new Wav16AudioFormat(fnDataUnit.getParentDataBlock().getSampleRate(), PamUtils.getNumChannels(fnDataUnit.getChannelBitmap()));
-
-			System.out.println("Save detection wav." + foundDataUnits.getNumDataUnits());
-			
-			for (int i=0; i<wavDataUnitExports.size(); i++) {
-				if (wavDataUnitExports.get(i).getUnitClass().isAssignableFrom(fnDataUnit.getClass())) {
-					
-					wavWrite= new WavFileWriter(currentFile, audioFormat); 
-
-					System.out.println("Append wav." + foundDataUnits.getNumDataUnits());
-
-					//save the wav file of detection
-					wavWrite.append(wavDataUnitExports.get(i).getWavClip(fnDataUnit)); 
-					n++; 
-					
-					wavWrite.close();
-					break; 
-				}
-			}
-		}
-		
-		
-		if (wavWrite!=null && saveCallback!=null) saveCallback.wavSaved(wavWrite.getFileName(), 0);
-		
-		return n; 
-	}
-
-
-	/**
-	 * Save wav data from a data unit instead of from the raw file store. 
-	 * @param foundDataUnits - the list of found data units. 
-	 * @return
-	 */
-	private int getNWavDataUnits(DetectionGroupSummary foundDataUnits) {
-		int n=0; 
-		for (PamDataUnit fnDataUnit: foundDataUnits.getDataList()){
-			//System.out.println("Save detection wav." + foundDataUnits.getNumDataUnits());
-			for (int i=0; i<wavDataUnitExports.size(); i++) {
-				if (wavDataUnitExports.get(i).getUnitClass().isAssignableFrom(fnDataUnit.getClass())) {
-					n++; 
-					break; 
-				}
-			}
-		}
-		return n; 
-	}
-
-	/**
-	 * Set a callback for saving .wav data. 
-	 * @param saveCallback - the callback
-	 */
-	public void setOnWavSaved(WavSaveCallback saveCallback) {
-		this.saveCallback=saveCallback; 
-	}
-
-
-
-	@Override
-	public boolean hasCompatibleUnits(Class dataUnitType) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-
-
-	@Override
-	public boolean exportData(File fileName,
-			List<PamDataUnit> dataUnits, boolean append) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-
-
-	@Override
-	public String getFileExtension() {
-		return "wav";
-	}
-
-
-
-	@Override
-	public String getIconString() {
-		// TODO Auto-generated method stub
-		return "mdi2f-file-music";
-	}
-
-
-
-	@Override
-	public String getName() {
-		return "raw sound";
-	}
-
-
-
-	@Override
-	public void close() {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-
-	@Override
-	public boolean isNeedsNewFile() {
-		return false;
-	}
-
-
-
-
-
-	//	hello(){
-	//
-	//
-	//		if (mark==null) {
-	//			start= foundDataUnits.getFirstTimeMillis();
-	//			end= foundDataUnits.getLastTimeMillis(); 
-	//		}
-	//
-	//		File folder = new File(currentFolder); 
-	//
-	//		//save a .wav file clip. 
-	//		if (!folder.exists()){
-	//			if (!folder.mkdir()){
-	//				//TODO- warning message. 
-	//				return;
-	//			}
-	//		}
-	//
-	//		String currentPath = PamCalendar.formatFileDateTime();
-	//		//add data types to the filen,ae
-	//		for (int i=0 ;i<mlData.size(); i++ ){
-	//			currentPath=currentPath + "_" + mlData.get(i).getName(); 
-	//		}
-	//		//add correct file type.	
-	//		currentPath = currentPath + ".mat";
-	//		currentPath = currentFolder+"\\"+currentPath;
-	//
-	//
-	//		if (append && clipControl.clipSettings.storageOption == ClipSettings.STORE_WAVFILES) {
-	//			wavFile.append(rawData);
-	//			lastClipDataUnit.setSampleDuration(rawEnd-lastClipDataUnit.getStartSample());
-	//			clipDataBlock.updatePamData(lastClipDataUnit, dataUnit.getTimeMilliseconds());
-	//			//			System.out.println(String.format("%d samples added to file", rawData[0].length));
-	//		}
-	//		else {
-	//			ClipDataUnit clipDataUnit;
-	//			long startMillis = dataUnit.getTimeMilliseconds() - (long) (clipGenSetting.preSeconds*1000.);
-	//			if (clipControl.clipSettings.storageOption == ClipSettings.STORE_WAVFILES) {
-	//				String folderName = getClipFileFolder(dataUnit.getTimeMilliseconds(), true);
-	//				String fileName = getClipFileName(startMillis);
-	//				AudioFormat af = new Wav16AudioFormat(getSampleRate(), rawData.length);
-	//				wavFile = new WavFileWriter(folderName+fileName, af);
-	//				wavFile.write(rawData);
-	//				wavFile.close();
-	//				// make a data unit to go with it. 
-	//				clipDataUnit = new ClipDataUnit(startMillis, dataUnit.getTimeMilliseconds(), rawStart,
-	//						(int)(rawEnd-rawStart), channelMap, fileName, dataBlock.getDataName(), rawData, getSampleRate());
-	//			}
-	//			else {
-	//				clipDataUnit = new ClipDataUnit(startMillis, dataUnit.getTimeMilliseconds(), rawStart,
-	//						(int)(rawEnd-rawStart), channelMap, "", dataBlock.getDataName(), rawData, getSampleRate());
-	//			}
-	//			clipDataUnit.setFrequency(dataUnit.getFrequency());
-	//			lastClipDataUnit = clipDataUnit;
-	//			if (bearingLocaliser != null) {
-	//				localiseClip(clipDataUnit, bearingLocaliser, hydrophoneMap);
-	//			}				
-	//			clipDataBlock.addPamData(clipDataUnit);
-	//		}
-	//
-	//		return 0; // no error. 
-	//	}
-	//
-	//	}
-	//	}
 
 }

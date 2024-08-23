@@ -1,5 +1,6 @@
 package export.swing;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -33,9 +34,10 @@ import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamView.panel.PamPanel;
 import PamguardMVC.PamDataBlock;
+import export.ExportParams;
 import export.PamExporterManager;
-import export.layoutFX.ExportParams;
 import offlineProcessing.OLProcessDialog;
+import offlineProcessing.OLProcessDialog.OLMonitor;
 import offlineProcessing.OfflineTaskGroup;
 import offlineProcessing.TaskMonitor;
 import offlineProcessing.TaskMonitorData;
@@ -145,6 +147,10 @@ public class ExportProcessDialog {
 		 */
 		private JToggleButton[] exportButtons;
 
+		private PamPanel extraSettingsPanel;
+
+		private PamPanel mainPanel;
+
 
 		public ExportOLDialog(Window parentFrame, OfflineTaskGroup taskGroup, String title) {
 			super(parentFrame, taskGroup, title);
@@ -155,19 +161,23 @@ public class ExportProcessDialog {
 			super.getDeleteOldDataBox().setVisible(false);
 
 			//construc tthe panel. 
-			PamPanel mainPanel = new PamPanel();
+			mainPanel = new PamPanel();
+			mainPanel.setLayout(new BorderLayout());
 
 			mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
 			mainPanel.setBorder(new TitledBorder("Export Settings"));
 
 			buttonGroup = new ButtonGroup();
 
+			extraSettingsPanel = new PamPanel(); 
+
 			PamPanel buttonPanel = new PamPanel();
 
 			ActionListener listener = actionEvent -> {
-//				System.out.println(actionEvent.getActionCommand() + " Selected");
+				//				System.out.println(actionEvent.getActionCommand() + " Selected");
 				//TODO set the buttons to be disabled or enabled. 
-				enableTasks(getExportSelection());
+				enableTasks();
+
 			};
 
 			exportButtons = new JToggleButton[exportManager.getNumExporters()];
@@ -187,6 +197,8 @@ public class ExportProcessDialog {
 				buttonGroup.add(b);
 				buttonPanel.add(b);
 			}
+
+
 
 
 			PamPanel p = new PamPanel(new GridBagLayout());
@@ -238,13 +250,13 @@ public class ExportProcessDialog {
 			c.gridx ++;
 			addComponent(p, new JLabel("MB"), c);
 
-
-
 			mainPanel.add(p);
 			mainPanel.add(buttonPanel);
-
+			mainPanel.add(extraSettingsPanel);
 			//add the main panel at a different index. 
 			getMainPanel().add(mainPanel, 1);
+			
+			this.getTasksPanel().setBorder(new TitledBorder("Export Data"));
 
 			pack();
 
@@ -255,15 +267,24 @@ public class ExportProcessDialog {
 		 * Enable which task are disables and enabled. 
 		 * @param exportSelection
 		 */
-		private void enableTasks(int exportSelection) {
+		private void enableTasks() {
 			this.currentParams = getExportParams();
-			exportManager.setExportParams(currentParams);
-//			ExportTask task;
-//			for (int i=0; i<this.getTaskGroup().getNTasks(); i++) {
-//				task = (ExportTask) this.getTaskGroup().getTask(i);
-//			}
+			exportManager.setExportParams(currentParams);			
+			//			ExportTask task;
+			//			for (int i=0; i<this.getTaskGroup().getNTasks(); i++) {
+			//				task = (ExportTask) this.getTaskGroup().getTask(i);
+			//			}
 			enableControls();
+			
+			//add additional controls if needed 
+			extraSettingsPanel.removeAll();
+			if (exportManager.getCurretnExporter().getOptionsPanel()!=null) {
+				extraSettingsPanel.add(exportManager.getCurretnExporter().getOptionsPanel(), BorderLayout.CENTER);// add extra settings. 
+			}
+			mainPanel.validate();
+			pack();
 		}
+
 
 
 		private Ikon getIconFromString(String iconString) {
@@ -289,7 +310,7 @@ public class ExportProcessDialog {
 			}
 			return icon;
 		}
-		
+
 		private int getExportSelection() {
 			int sel=-1;
 			for (int i=0; i<exportButtons.length; i++) {
@@ -301,10 +322,10 @@ public class ExportProcessDialog {
 			return sel;
 		}
 
-		
+
 		public ExportParams getExportParams() {
 			currentParams.folder = null;
-			
+
 			if (exportTo.getText().length()>0) {
 
 				File file = new File(exportTo.getText());
@@ -316,15 +337,17 @@ public class ExportProcessDialog {
 					currentParams.folder  = file.getAbsolutePath();
 				}
 			}
-			
+
 			currentParams.exportChoice =  getExportSelection();
 			currentParams.maximumFileSize = (Double) spinner.getValue();
-			
+
 			return currentParams;
 		}
 
 		@Override
 		public boolean getParams() {
+			System.out.println("EXPORT: GET PARAMS:");
+
 			//make sure we update the current paramters before processing starts. 
 			this.currentParams = getExportParams();
 			exportManager.setExportParams(currentParams);
@@ -339,50 +362,94 @@ public class ExportProcessDialog {
 
 
 		public void setParams(ExportParams params) {
+//			System.out.println("EXPORT: SET PARAMS: " +params);
+
 			if (params ==null) currentParams = new ExportParams(); 
 			currentParams = params.clone(); 
 
 			buttonGroup.clearSelection();
 			exportButtons[params.exportChoice].setSelected(true);
-			
+
+//			System.out.println("EXPORT: SET PARAMS: " +currentParams.folder);
 			exportTo.setText(currentParams.folder);
-			
+
 			spinner.setValue(currentParams.maximumFileSize);
+			
+			enableTasks();
 		}
-
-
-
-	}
-	
-	class ExportTaskMonitor implements TaskMonitor {
 		
-		private int taskIndex;
 		
-		private ExportTaskGroup exportTaskGroup;
-		
-		private boolean started = false;
+		/**
+		 * Ok, this is a bit of a hack but because we run tasks for multiple data blocks 
+		 * we have to run a new task whenever the previous task is finished. So we use a task monitor
+		 * to deetct when the task is finsihed and then, instead of finishing we run a new task. 
+		 */
+		class ExportTaskMonitor extends OLMonitor {
 
-		public ExportTaskMonitor(int i, ExportTaskGroup exportTaskGroup) {
-			this.taskIndex = i;
-			this.exportTaskGroup = exportTaskGroup;
-		}
+			private int taskIndex;
 
-	
-		@Override
-		public void setTaskStatus(TaskMonitorData taskMonitorData) {
-			if (taskMonitorData.taskStatus== TaskStatus.COMPLETE && !started) {
-				System.out.println(" TASK COMPLETE:");
-				if (taskIndex<exportTaskGroup.getNTasks()) {
-					exportTaskGroup.runTaskFrom(taskIndex+1);
-					started = true;
+			private ExportTaskGroup exportTaskGroup;
+
+			private boolean started = false;
+
+			private int activeTasks;
+
+			public ExportTaskMonitor(int i, ExportTaskGroup exportTaskGroup) {
+				super();
+				this.taskIndex = i;
+				this.exportTaskGroup = exportTaskGroup;
+				
+				this.activeTasks = 0; 
+				for (int i1=0; i1<exportTaskGroup.getNTasks(); i1++) {
+					if (exportTaskGroup.getTask(i1).isDoRun()) {
+					activeTasks++;
+					}
+				}
+				
+			}
+
+
+			@Override
+			public void setTaskStatus(TaskMonitorData taskMonitorData) {
+				
+				//System.out.println();			
+				switch (taskMonitorData.taskStatus) {
+				case COMPLETE:
+					if (taskIndex<exportTaskGroup.getNTasks() && !started) {
+						exportTaskGroup.runTaskFrom(taskIndex+1);
+						started = true;
+					}
+					else super.setTaskStatus(taskMonitorData);
+					break;
+				default:
+					super.setTaskStatus(taskMonitorData);
+				}
+				
+				//A hack which sets the global 
+				switch (taskMonitorData.taskActivity) {
+				case LINKING:
+				case LOADING:
+					//the progress of one datablocks
+					double progress = ((double) taskMonitorData.progValue)/taskMonitorData.progMaximum;
+					double totalProgress = ((double) taskIndex)/activeTasks + progress/activeTasks;
+//					System.out.println("Total progress: " + taskMonitorData.progValue + " of "  + taskMonitorData.progMaximum + " - " + totalProgress + "%" + "  " + progress + "  " + activeTasks + " " + taskIndex);
+					//needs to be added to the overall progress
+					int max = getGlobalProgress().getMaximum();
+					getGlobalProgress().setValue((int) (totalProgress*max));
+				default:
+					break;
 				}
 			}
+
 		}
-
-
-
 		
+		public ExportTaskMonitor newExportTaskMonitor(int i, ExportTaskGroup exportTaskGroup) {
+			return new ExportTaskMonitor(i, exportTaskGroup);
+		}
+		
+
 	}
+
 
 
 	/**
@@ -390,35 +457,35 @@ public class ExportProcessDialog {
 	 */
 	class ExportTaskGroup extends OfflineTaskGroup {
 
-		
+
 		public ExportTaskGroup(String settingsName) {
 			super(null, settingsName);
 		}
 
-		
+
 		@Override
 		public String getUnitType() {
 			return "Export Data";
 		}
-		
+
 		/**
 		 * Runs tasks from a specific task number. 
 		 * @param i - the index
 		 */
 		public void runTaskFrom(int i) {
-			System.out.println("RUN TASK FROM :" + i);
 
+			//sets the porimary datablock to that of the relevent task. 
 			this.setPrimaryDataBlock(getTask(i).getDataBlock());
 			if (i<getNTasks()-1) {
 				//will start a new thread after this one has finished
-				this.setTaskMonitor(new ExportTaskMonitor(i, this));
+				this.setTaskMonitor(mtOfflineDialog.newExportTaskMonitor(i, this));
 			}
 			super.runTasks();
 		}
-		
-		
+
+
 		/**
-		 * Override the tasks o it runs through all tasks for each datablock. Usually
+		 * Override the tasks so it runs through all tasks for each datablock. Usually
 		 * task groups deal with just one parent datablock but exporters export from
 		 * different data blocks. The only way to deal with this is to let the task run
 		 * again and again through all tasks and letting tasks themselves check the
@@ -431,7 +498,7 @@ public class ExportProcessDialog {
 		}
 
 	}
-	
+
 
 
 

@@ -11,8 +11,7 @@ import PamguardMVC.PamDataUnit;
 import export.CSVExport.CSVExportManager;
 import export.MLExport.MLDetectionsManager;
 import export.RExport.RExportManager;
-import export.layoutFX.ExportParams;
-import export.wavExport.WavFileExportManager;
+import export.wavExport.WavDetExportManager;
 
 /**
  * Exports data to external files. Manages the file sizes and creates data buffers for 
@@ -62,8 +61,8 @@ public class PamExporterManager {
 		//add the MATLAB export
 		pamExporters.add(new MLDetectionsManager());
 		pamExporters.add(new RExportManager(this));
-		pamExporters.add(new WavFileExportManager());
-		pamExporters.add(new CSVExportManager());
+		pamExporters.add(new WavDetExportManager());
+//		pamExporters.add(new CSVExportManager());
 	}
 
 	/** 
@@ -73,11 +72,11 @@ public class PamExporterManager {
 	public boolean exportDataUnit(PamDataUnit<?, ?> dataUnit, boolean force) {
 		boolean exportOK = true;
 		
-		System.out.println("Add data unit " + dataUnit + " to: "+ currentFile); 
+		//System.out.println("Add data unit " + dataUnit + " to: "+ currentFile); 
 		
 		if (dataUnit==null) {
 			if (force) {
-				System.out.println("Write data 1!!" + dataUnitBuffer.size() ); 
+				//System.out.println("Write data 1!!" + dataUnitBuffer.size() ); 
 				//finish off saving any buffered data
 				exportOK = pamExporters.get(exportParams.exportChoice).exportData(currentFile, dataUnitBuffer, true);
 				dataUnitBuffer.clear();
@@ -101,7 +100,7 @@ public class PamExporterManager {
 
 		dataUnitBuffer.add(dataUnit);
 
-		System.out.println("Write data unit " + dataUnitBuffer.size() + " to: "+ currentFile); 
+		//System.out.println("Write data unit " + dataUnitBuffer.size() + " to: "+ currentFile); 
 		
 		if (dataUnitBuffer.size()>=BUFFER_SIZE || force) {
 //			System.out.println("Write data 2!!" + dataUnitBuffer.size()); 
@@ -178,6 +177,21 @@ public class PamExporterManager {
 
 	public void setExportParams(ExportParams currentParams) {
 		exportParams=currentParams;
+		
+	}
+
+	/**
+	 * Get the currently selected exporter. 
+	 * @return the currently selected exporter. 
+	 */
+	public PamDataUnitExporter getCurretnExporter() {
+		return this.pamExporters.get(this.exportParams.exportChoice);
+	}
+
+	public void perpareExport() {
+		for (PamDataUnitExporter exporter:pamExporters) {
+			exporter.prepareExport();
+		}
 		
 	}
 

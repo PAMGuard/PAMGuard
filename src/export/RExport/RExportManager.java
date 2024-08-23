@@ -1,5 +1,6 @@
 package export.RExport;
 
+import java.awt.Component;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -20,6 +21,7 @@ import PamguardMVC.PamDataUnit;
 import export.PamDataUnitExporter;
 import export.PamExporterManager;
 import export.MLExport.MLDetectionsManager;
+import javafx.scene.layout.Pane;
 
 /**
  * Handles exporting pam data units into an rdata. 
@@ -53,9 +55,11 @@ public class RExportManager implements PamDataUnitExporter {
 
 	@Override
 	public boolean exportData(File fileName, List<PamDataUnit> dataUnits, boolean append) {
+		
+		if (dataUnits==null || dataUnits.size()<=0) return false;
 
 		/**
-		 * Note - there is no way to save data units to R files wothout loading the file into memory. 
+		 * Note - there is no way to save data units to R files without loading the file into memory. 
 		 * So everything is stored in memory until saved. 
 		 */
 		PamDataUnit minByTime = PamArrayUtils.getMinTimeMillis(dataUnits);
@@ -183,7 +187,9 @@ public class RExportManager implements PamDataUnitExporter {
 				//check whether the same. 
 				if (rDataExport.get(i).getUnitClass().isAssignableFrom(dataUnits.get(j).getClass()) && !alreadyStruct[j]) {
 					dataList=rDataExport.get(i).detectionToStruct(dataUnits.get(j), n); 
-					dataListArray.add((rDataExport.get(i).getName() + "_" + dataUnits.get(j).getUID()), dataList);	
+					//dataListArray.add((rDataExport.get(i).getName() + "_" + dataUnits.get(j).getUID()), dataList);	
+					// format used in PAMBinaries
+					dataListArray.add(String.valueOf(dataUnits.get(j).getUID()), dataList);	
 
 					sampleRate = dataUnits.get(j).getParentDataBlock().getSampleRate(); 
 					n++; 
@@ -267,9 +273,28 @@ public class RExportManager implements PamDataUnitExporter {
 		
 		//TODO 
 		//check file size against the export params. 
-		System.out.println("RData length: " + allData.length());
+//		System.out.println("RData length: " + allData.length());
 		
 		return false;
+	}
+
+
+	@Override
+	public Component getOptionsPanel() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public Pane getOptionsPane() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public void prepareExport() {
+		
 	}
 
 
