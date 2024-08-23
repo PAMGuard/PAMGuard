@@ -3,6 +3,18 @@ package tethys.localization;
 import java.math.BigInteger;
 import java.util.List;
 
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Element;
+
+import Array.ArrayManager;
+import Array.PamArray;
+import Array.Streamer;
+import Array.streamerOrigin.OriginSettings;
+import Array.streamerOrigin.StaticOriginSettings;
+import GPS.GpsData;
+import GPS.GpsDataUnit;
 import Localiser.LocalisationAlgorithm;
 import Localiser.LocalisationAlgorithmInfo;
 import Localiser.detectionGroupLocaliser.GroupLocResult;
@@ -14,6 +26,7 @@ import PamUtils.LatLong;
 import PamUtils.PamUtils;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import binaryFileStorage.DataUnitFileInformation;
 import nilus.AlgorithmType;
 import nilus.AngularCoordinateType;
 import nilus.BearingType;
@@ -31,10 +44,12 @@ import nilus.LocalizationType.Parameters;
 import nilus.LocalizationType.References;
 import nilus.LocalizationType.WGS84;
 import nilus.LocalizationType.Parameters.TargetMotionAnalysis;
+import nilus.LocalizationType.Parameters.UserDefined;
 import nilus.LocalizationType.References.Reference;
 import nilus.Localize.Effort;
 import nilus.Localize.Effort.CoordinateReferenceSystem;
 import nilus.Localize.Effort.ReferencedDocuments;
+import nilus.Localize.Effort.CoordinateReferenceSystem.ReferenceFrame;
 import nilus.Localize.Effort.ReferencedDocuments.Document;
 import pamMaths.PamVector;
 import tethys.Collection;
@@ -68,6 +83,8 @@ public class LocalizationBuilder {
 	private Localize currentDocument;
 	private LocalizationCreator localisationCreator;
 	private TethysDataProvider dataProvider;
+	
+	private Helper helper;
 
 	public LocalizationBuilder(TethysControl tethysControl, PDeployment deployment, Detections detectionsDocument, PamDataBlock dataBlock,
 			StreamExportParams exportParams) {
@@ -76,6 +93,11 @@ public class LocalizationBuilder {
 		this.dataBlock = dataBlock;
 		this.streamExportParams = exportParams;
 		this.tethysControl = tethysControl;
+		try {
+			helper = new Helper();
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		}
 		dataProvider = dataBlock.getTethysDataProvider(tethysControl);
 		localisationHandler = tethysControl.getLocalizationHandler();
 		localisationAlgorithm = dataBlock.getLocalisationAlgorithm();
@@ -123,13 +145,13 @@ public class LocalizationBuilder {
 			}
 			Document detectsDoc = new Document();
 			detectsDoc.setId(detectionsDocument.getId());
-			detectsDoc.setType(Collection.Localizations.collectionName());
+			detectsDoc.setType(Collection.Detections.collectionName());
 			detectsDoc.setIndex(BigInteger.ZERO);
 			eff.getReferencedDocuments().getDocument().add(detectsDoc);
 		}
 
 
-		String prefix = deployment.nilusObject.getId() + "_" + dataProvider.getDetectionsName();
+		String prefix = deployment.nilusObject.getId() + "_" + dataProvider.getDetectionsName() + "_L";
 		String fullId = localisationHandler.getLocalisationdocId(prefix);
 		currentDocument.setId(fullId);
 		//		detections.setDescription(dataProvider.getDescription(deployment, tethysExportParams));
@@ -185,6 +207,54 @@ public class LocalizationBuilder {
 		return done;
 	}
 	
+	/**
+	 * Get a default reference frame for the header of a localization document. This is very dependent
+	 * on the localization subtype. Also on whether the array is fixed or moving. It it's fixed, then
+	 * we also need to add the instrument lat long. 
+	 * @param coordinateName
+	 * @param subType
+	 * @return
+	 */
+	public ReferenceFrame getDefaultReferenceFrame(CoordinateName coordinateName, LocalizationSubTypes subType) {
+		ReferenceFrame referenceFrame = new ReferenceFrame();
+		switch (subType) {
+		case Derived:
+			referenceFrame.setAnchor(Anchor.UTMZone.toString()); // i never use this on. If I do, this will need work !
+			break;
+		case Engineering:
+			referenceFrame.setAnchor(Anchor.instrument.toString()); 
+			break;
+		case Geographic:
+			referenceFrame.setAnchor(Anchor.WGS84.toString()); 
+			break;
+		default:
+			break;
+		}
+		/*
+		 * And see if it's a fixed or moving array. Will just have to look at the 
+		 * first streamer here. Hard to copy with multiples !
+		 */
+		PamArray array = ArrayManager.getArrayManager().getCurrentArray();
+		Streamer streamer = array.getStreamer(0);
+		if (streamer != null) {
+			OriginSettings origin = streamer.getOriginSettings();
+			if (origin instanceof StaticOriginSettings) {
+				StaticOriginSettings staticOrigin = (StaticOriginSettings) origin;
+				GpsDataUnit ll = staticOrigin.getStaticPosition();
+				if (ll != null) {
+					GpsData pos = ll.getGpsData();
+					if (pos != null) {
+						referenceFrame.setLatitude(TethysLatLong.formatLatitude(pos.getLatitude()));
+						referenceFrame.setLongitude(TethysLatLong.formatLongitude(pos.getLongitude()));
+						referenceFrame.setDatum(String.format("Altitude %3.2fm", pos.getHeight()));
+					}
+				}
+			}
+		}
+		
+		return referenceFrame;
+	}
+	
 	public boolean sortStandardCoordinates(PamDataBlock dataBlock) {
 		LocalisationInfo locInfo = dataBlock.getLocalisationContents();
 		Effort locEffort = currentDocument.getEffort();
@@ -202,6 +272,7 @@ public class LocalizationBuilder {
 //		List<String> locTypes = locEffort.getLocalizationType();
 		boolean ambiguity = locInfo.hasLocContent(LocContents.HAS_AMBIGUITY);
 		CoordinateReferenceSystem coordRefs = locEffort.getCoordinateReferenceSystem();		
+		ReferenceFrame referenceFrame = null;
 		List<String> locTypes = locEffort.getLocalizationType();
 		if (locInfo.getLocContent() == 0) {
 			return false;
@@ -217,6 +288,7 @@ public class LocalizationBuilder {
 			else {
 				locEffort.setDimension(2);
 			}
+			referenceFrame = getDefaultReferenceFrame(CoordinateName.WGS84, LocalizationSubTypes.Geographic);
 //			locEffort.set
 		}
 		else if (locInfo.hasLocContent(LocContents.HAS_XYZ)) {
@@ -224,12 +296,14 @@ public class LocalizationBuilder {
 			coordRefs.setSubtype(LocalizationSubTypes.Engineering.toString());
 			locTypes.add(LocalizationTypes.Point.toString());
 			locEffort.setDimension(3);
+			referenceFrame = getDefaultReferenceFrame(CoordinateName.Cartesian, LocalizationSubTypes.Engineering);
 		}
 		else if (locInfo.hasLocContent(LocContents.HAS_XY)) {
 			coordRefs.setName(CoordinateName.Cartesian.toString());
 			coordRefs.setSubtype(LocalizationSubTypes.Engineering.toString());
 			locTypes.add(LocalizationTypes.Point.toString());
 			locEffort.setDimension(2);
+			referenceFrame = getDefaultReferenceFrame(CoordinateName.Cartesian, LocalizationSubTypes.Engineering);
 		}
 		else if (locInfo.hasLocContent(LocContents.HAS_BEARING)) {
 			coordRefs.setName(CoordinateName.Polar.toString());
@@ -241,10 +315,12 @@ public class LocalizationBuilder {
 			else {
 				locEffort.setDimension(2);
 			}
+			referenceFrame = getDefaultReferenceFrame(CoordinateName.Polar, LocalizationSubTypes.Engineering);
 		}
 		else {
 			return false;
 		}
+		coordRefs.setReferenceFrame(referenceFrame);
 		
 		return true;
 	}
@@ -329,21 +405,41 @@ public class LocalizationBuilder {
 					locType.setSpeciesId(species);
 				}
 			}
-
-			References references = locType.getReferences();
-			if (references == null) {
-				references = new References();
-				try {
-					Helper.createRequiredElements(references);
-				} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
-					e.printStackTrace();
-				}
-				locType.setReferences(references);
+			
+			/*
+			 * Add references back to PAMGuard data as for Detections. 
+			 * Same code as in Detections, but classes are different (though with the same fields). 
+			 */
+			Parameters params = getParameters(locType);
+			String uid = BigInteger.valueOf(dataUnit.getUID()).toString();
+			Element el = addUserDefined(params,"PAMGuardUID", uid);
+			DataUnitFileInformation fileInf = dataUnit.getDataUnitFileInformation();
+			if (fileInf != null) {
+				el.setAttribute("BinaryFile", fileInf.getShortFileName(2048));
+				el.setAttribute("FileIndex", Long.valueOf(fileInf.getIndexInFile()).toString());
 			}
-			Reference reference = new Reference();
-			reference.setIndex(BigInteger.valueOf(dataUnit.getUID()));
-			reference.setEventRef("UID");
-			locType.getReferences().getReference().add(reference);
+			if (dataUnit.getDatabaseIndex() > 0) {
+				// only write the database index if it's > 0, i.e. is used.
+				addUserDefined(params, "DatabaseId", String.format("%d", dataUnit.getDatabaseIndex()));
+			}
+
+			/*
+			 * Not needed. something to do with references to Detection docs. 
+			 */
+//			References references = locType.getReferences();
+//			if (references == null) {
+//				references = new References();
+//				try {
+//					Helper.createRequiredElements(references);
+//				} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
+//					e.printStackTrace();
+//				}
+//				locType.setReferences(references);
+//			}
+//			Reference reference = new Reference();
+//			reference.setIndex(BigInteger.valueOf(dataUnit.getUID()));
+//			reference.setEventRef("UID");
+//			locType.getReferences().getReference().add(reference);
 
 			return locType;
 		}
@@ -405,11 +501,7 @@ public class LocalizationBuilder {
 			locType.setWGS84(wgs84);
 			
 //			locType.setParameters(null);
-			Parameters params = locType.getParameters();
-			if (params == null) {
-				params = new Parameters();
-				locType.setParameters(params);
-			}
+			Parameters params = getParameters(locType);
 			TargetMotionAnalysis tma = new TargetMotionAnalysis();
 			tma.setStart(TethysTimeFuncs.xmlGregCalFromMillis(dataUnit.getTimeMilliseconds()));
 			tma.setEnd(TethysTimeFuncs.xmlGregCalFromMillis(dataUnit.getEndTimeInMilliseconds()));
@@ -441,6 +533,40 @@ public class LocalizationBuilder {
 			//		loc.
 
 			return locType;
+		}
+		
+		/**
+		 * Convenience method to get the Parameters object for a localisation and
+		 * to automatically create it if it doesn't exist. 
+		 * @param localization
+		 * @return
+		 */
+		public Parameters getParameters(LocalizationType localization) {
+			Parameters params = localization.getParameters();
+			if (params == null) {
+				params = new Parameters();
+				localization.setParameters(params);
+			}
+			return params;
+		}
+		
+		public Element addUserDefined(Parameters parameters, String parameterName, String parameterValue) {
+			UserDefined userDefined = parameters.getUserDefined();
+			if (userDefined == null) {
+				userDefined = new UserDefined();
+				parameters.setUserDefined(userDefined);
+			}
+			Element el = null;
+			try {
+				el = helper.AddAnyElement(userDefined.getAny(), parameterName, parameterValue);
+			} catch (JAXBException e) {
+				e.printStackTrace();
+				return null;
+			} catch (ParserConfigurationException e) {
+				e.printStackTrace();
+				return null;
+			}
+			return el;
 		}
 
 		public LocalizationType createSphericalLoc(PamDataUnit dataUnit) {

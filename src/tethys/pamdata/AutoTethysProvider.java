@@ -1,32 +1,34 @@
 package tethys.pamdata;
 
+import java.io.StringReader;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamSource;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import Localiser.LocalisationAlgorithm;
 import Localiser.LocalisationAlgorithmInfo;
 import PamController.PamControlledUnit;
 import PamController.PamSettings;
-import PamController.PamguardVersionInfo;
-import PamController.settings.output.xml.PamguardXMLWriter;
 import PamDetection.LocalisationInfo;
-import PamUtils.XMLUtils;
 import PamguardMVC.DataAutomationInfo;
-import PamguardMVC.DataUnitBaseData;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamProcess;
 import PamguardMVC.TFContourData;
 import PamguardMVC.TFContourProvider;
 import binaryFileStorage.DataUnitFileInformation;
-import generalDatabase.DBSchemaWriter;
-import generalDatabase.SQLLogging;
 import nilus.AlgorithmType;
 import nilus.Deployment;
 import nilus.DescriptionType;
@@ -52,23 +54,11 @@ import tethys.species.SpeciesMapItem;
 import tethys.swing.export.ExportWizardCard;
 import whistleClassifier.WhistleContour;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.net.URISyntaxException;
-
 /**
- * Automatically provides Tethys data for a PAMGuard datablock. 
+ * Automatically provides Tethys data for a PAMGuard datablock.
  * Does most of what needs to be done, though individual modules
- * will want to override this, call the base createDetection function and then add a 
- * few more bespoke elements. 
+ * will want to override this, call the base createDetection function and then add a
+ * few more bespoke elements.
  * @author dg50
  *
  */
@@ -79,6 +69,7 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 	private PamControlledUnit pamControlledUnit;
 	private TethysControl tethysControl;
 	private Helper helper;
+	private boolean addFrequencyInfo  = false;
 
 	public AutoTethysProvider(TethysControl tethysControl, PamDataBlock pamDataBlock) {
 		this.tethysControl = tethysControl;
@@ -91,7 +82,7 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
 	public DescriptionType getDescription(Deployment deployment, TethysExportParams tethysExportParams) {
 		DescriptionType description = new DescriptionType();
@@ -106,9 +97,9 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 	@Override
 	public AlgorithmType getAlgorithm(Collection collection) {
 		/**
-		 * Probably need to split this to provide detection algorithm parameters and 
-		 * localisation algorithm parameters, or pass in the document type as a function 
-		 * argument. 
+		 * Probably need to split this to provide detection algorithm parameters and
+		 * localisation algorithm parameters, or pass in the document type as a function
+		 * argument.
 		 */
 		AlgorithmType algorithm = new AlgorithmType();
 		try {
@@ -116,7 +107,7 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 		} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
 			e.printStackTrace();
 		}
-		// do the parameters as normal whether it's dets or locs. 
+		// do the parameters as normal whether it's dets or locs.
 		nilus.AlgorithmType.Parameters algoParameters = this.getAlgorithmParameters();
 		if (algoParameters != null) {
 			algorithm.setParameters(algoParameters);
@@ -125,7 +116,7 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 			nilus.AlgorithmType.Parameters locParameters = this.getLocalisationParameters();
 			if (locParameters == null) {
 				/*
-				 * It seems Tethys MUST have parameters, so make an empty one if needed. 
+				 * It seems Tethys MUST have parameters, so make an empty one if needed.
 				 */
 				locParameters = new nilus.AlgorithmType.Parameters();
 			}
@@ -133,7 +124,7 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 				algorithm.setParameters(locParameters);
 			}
 			else if (locParameters != null) {
-				// merge the two sets, putting the localisation information first.  
+				// merge the two sets, putting the localisation information first.
 				List<Element> mainList = algoParameters.getAny();
 				List<Element> locList = locParameters.getAny();
 				if (mainList != null && locList != null) {
@@ -150,7 +141,7 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 	}
 
 	/**
-	 * Localisation parameters. Some localisers don't actually have any parameters, 
+	 * Localisation parameters. Some localisers don't actually have any parameters,
 	 * but Tethys requires a parameters element, so if there aren't any, set a dummy
 	 * @return
 	 */
@@ -181,13 +172,13 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 		nilus.AlgorithmType.Parameters parameters = new nilus.AlgorithmType.Parameters();
 		List<Element> paramList = parameters.getAny();
 		paramList.add(paramEl);
-		
+
 		return parameters;
 	}
 
 	@Override
 	public nilus.AlgorithmType.Parameters getAlgorithmParameters() {
-		if (pamControlledUnit instanceof PamSettings == false) {
+		if (!(pamControlledUnit instanceof PamSettings)) {
 			return null;
 		}
 		PamSettings pamSettings = (PamSettings) pamControlledUnit;
@@ -211,7 +202,7 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 
 	/**
 	 * Not used. Was an attempt to automatically add name spaces to the PAMGuard settings
-	 * XML I generate, but we found a better way. 
+	 * XML I generate, but we found a better way.
 	 * @param doc
 	 * @param settingsEl
 	 * @param xmlNameSpace
@@ -270,7 +261,7 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 
 			DOMSource source = new DOMSource(doc);
 
-			//            Result 
+			//            Result
 			//			Source text = new StreamSource(new File("input.xml"));
 			DOMResult result = new DOMResult();
 			transformer.transform(source, result);
@@ -294,8 +285,8 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 	}
 
 	/**
-	 * Algorithm method. Default is the module name. Can change to a paper citation 
-	 * by overriding this 
+	 * Algorithm method. Default is the module name. Can change to a paper citation
+	 * by overriding this
 	 * @return
 	 */
 	private String getAlgorithmMethod() {
@@ -335,16 +326,21 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 		}
 		detection.setSpeciesId(species);
 		/*
-		 * NOTE: I use channel bitmaps throughout since detections are often made on multiple channels. 
+		 * NOTE: I use channel bitmaps throughout since detections are often made on multiple channels.
 		 */
 		detection.setChannel(BigInteger.valueOf(dataUnit.getChannelBitmap()));
 
 		nilus.Detection.Parameters detParams = new nilus.Detection.Parameters();
 		detection.setParameters(detParams);
-		double[] freqs = dataUnit.getFrequency();
-		if (freqs != null && freqs[1] != 0) {
-			detParams.setMinFreqHz(freqs[0]);
-			detParams.setMaxFreqHz(freqs[1]);
+		if (addFrequencyInfo) {
+			/**
+			 * Don't add by default.
+			 */
+			double[] freqs = dataUnit.getFrequency();
+			if (freqs != null && freqs[1] != 0) {
+				detParams.setMinFreqHz(freqs[0]);
+				detParams.setMaxFreqHz(freqs[1]);
+			}
 		}
 		double ampli = dataUnit.getAmplitudeDB();
 		ampli = roundDecimalPlaces(ampli, 1);
@@ -359,7 +355,8 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 			el.setAttribute("BinaryFile", fileInf.getShortFileName(2048));
 			el.setAttribute("FileIndex", Long.valueOf(fileInf.getIndexInFile()).toString());
 		}
-		if (dataUnit.getDatabaseIndex() >= 0) {
+		if (dataUnit.getDatabaseIndex() > 0) {
+			// only write the database index if it's > 0, i.e. is used.
 			addUserDefined(detParams, "DatabaseId", String.format("%d", dataUnit.getDatabaseIndex()));
 		}
 
@@ -387,7 +384,7 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 
 	/**
 	 * Get tonal sounds contour. Sadly there are two slightly different interfaces in use
-	 * in PAMGuard, so try them both. 
+	 * in PAMGuard, so try them both.
 	 * @param detParams
 	 * @return true if a contour was added
 	 */
@@ -402,7 +399,7 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 				List<Double> offsetS = tonal.getOffsetS();
 				List<Double> hz = tonal.getHz();
 				for (int i = 0; i < tMillis.length; i++) {
-					offsetS.add(roundSignificantFigures((double) (tMillis[i]-tMillis[0]) / 1000., 4));
+					offsetS.add(roundSignificantFigures((tMillis[i]-tMillis[0]) / 1000., 4));
 					hz.add(roundSignificantFigures(fHz[i], 4));
 				}
 				detParams.setTonal(tonal);
@@ -485,7 +482,7 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 			kind.setCall(mapItem.getCallType());
 
 
-			effortKinds.add(kind);		
+			effortKinds.add(kind);
 
 		}
 
@@ -495,7 +492,7 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 	public String getDetectionsMethod() {
 		/*
 		 *  could really do with knowing what type of detector we're dealing with, i.e. if it's
-		 *  automatic or manual. For most blocks this is fixed, though some may have a mixture of both ! 
+		 *  automatic or manual. For most blocks this is fixed, though some may have a mixture of both !
 		 */
 		DataAutomationInfo dataAutomation = pamDataBlock.getDataAutomationInfo();
 		String method;
@@ -524,7 +521,7 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 		String blockName = pamDataBlock.getDataName();
 		String documentName;
 		/**
-		 * If the datablock name is the same as the unit name, no need to repeat onesself. 
+		 * If the datablock name is the same as the unit name, no need to repeat onesself.
 		 */
 		if (pcuName.equals(blockName)) {
 			documentName = new String(pcuName); // copy it, since we're about to modify it!
@@ -539,7 +536,7 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 	public static double roundDecimalPlaces(double value, int decPlaces) {
 		double scale = Math.pow(10, decPlaces);
 		long longVal = Math.round(value*scale);
-		return (double) longVal/scale;
+		return longVal/scale;
 	}
 
 	public static double roundSignificantFigures(double value, int sigFigs) {
@@ -551,7 +548,7 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 		double scale = sigFigs-Math.floor(Math.log10(value));
 		scale = Math.pow(10, scale);
 		long longVal = Math.round(value*scale);
-		return sign*(double) longVal/scale;
+		return sign*longVal/scale;
 	}
 
 	@Override
@@ -571,7 +568,7 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 		return true;
 	}
 
-	
+
 	@Override
 	public boolean canExportLocalisations(GranularityEnumType granularityType) {
 		LocalisationInfo locCont = pamDataBlock.getLocalisationContents();
@@ -582,7 +579,7 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 	}
 
 	/**
-	 * Granularity is OK for export. 
+	 * Granularity is OK for export.
 	 * @param granularityType
 	 * @return
 	 */
@@ -607,7 +604,21 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 	protected PamDataBlock getPamDataBlock() {
 		return pamDataBlock;
 	}
-	
+
+	/**
+	 * @return the addFrequencyInfo
+	 */
+	public boolean isAddFrequencyInfo() {
+		return addFrequencyInfo;
+	}
+
+	/**
+	 * @param addFrequencyInfo the addFrequencyInfo to set
+	 */
+	public void setAddFrequencyInfo(boolean addFrequencyInfo) {
+		this.addFrequencyInfo = addFrequencyInfo;
+	}
+
 
 
 }
