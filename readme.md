@@ -42,7 +42,7 @@ PAMGuard is designed to collect/process data from large acoustic datasets. PAMGu
 ### Access to detection and classification algorithms
 PAMGuard allows users to integrate automated detection and classification algorithms directly into their acoustic workflow. There are a multitude of different algorithms to choose from, including a basic click detector, whislte and moan detector, GPL detector, click train detectors and many others. The idea behind PAMGuard is allow researchers to access open-source state-of-the-art algorithms devleoped within the scientific community - if you want to contribute and get your algorithm into PAMGuard get in touch. 
 
-<center><img src="/Resources/Click_detector_screenshot.png" height=300 width=500></center>
+<center><img src="src/Resources/screenshots/Click_detector_screenshot.png" height=300 width=500></center>
 
 <center><em>The click detector is one of the most widely used detectors in PAMGuard. Detections can be displayed in various different displays</em></center>
 
@@ -58,7 +58,7 @@ Almost all detection data can be visualised on a map. PAMGuard also supports plo
 ### Suite of data visualisation tools
 An important aspect of PAMGuard is the ability for users to explore processed data. PAMGuard allows users to visualise data at multiple different times scales, from inspecting individual waveforms microseconds long to datagrams showing detector output or soundscape metrics over days, weeks or even years.
 
-<center><img src="/Resources/DataMap_screenshot.png" height=300 width=500></center>
+<center><img src="src/Resources/screenshots/Datamap_screenshot.png" height=300 width=500></center>
 
 <center><em>Data processed in PAMGuard be displayed at lots of different temporal scales, from days or even months of data dsiplayed in the data map shown here to individual waveforms</em></center>
 
