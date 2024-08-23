@@ -4,9 +4,6 @@ import org.renjin.sexp.AttributeMap;
 import org.renjin.sexp.IntArrayVector;
 import org.renjin.sexp.ListVector;
 import export.MLExport.MLWhistleMoanExport;
-import us.hebi.matlab.mat.format.Mat5;
-import us.hebi.matlab.mat.types.Struct;
-
 import org.renjin.sexp.ListVector.NamedBuilder;
 
 import PamUtils.PamArrayUtils;
@@ -37,7 +34,7 @@ public class RWhistleExport extends RDataUnitExport<ConnectedRegionDataUnit> {
 		rData.add("nSlices", dataUnit.getConnectedRegion().getNumSlices()); 
 		rData.add("sliceData", peakDatas); 
 		rData.add("contour", contours); 
-		rData.add("contourWidth", contourWidth); 
+		rData.add("contWidth", contourWidth); 
 		rData.add("meanWidth", PamArrayUtils.mean(contourData[0])); 
 
 	
@@ -83,9 +80,7 @@ public class RWhistleExport extends RDataUnitExport<ConnectedRegionDataUnit> {
 		
 		ListVector.NamedBuilder peakDatas = new ListVector.NamedBuilder(); ;
 
-		
-		Struct mlStructure= Mat5.newStruct(dataUnit.getConnectedRegion().getSliceData().size(), 1);
-
+	
 		//the start sample.
 		int sliceNumber;
 		int nPeaks;
@@ -127,7 +122,7 @@ public class RWhistleExport extends RDataUnitExport<ConnectedRegionDataUnit> {
 			rData.add("nPeaks", nPeaks);
 			rData.add("peakData", peakDataR);
 			
-			peakDatas.add(String.valueOf(sliceNumber), rData); 
+			peakDatas.add("[["+String.valueOf(i)+"]]", rData); 
 
 		}
 		

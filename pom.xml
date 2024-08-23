@@ -23,6 +23,8 @@
 	    <jaxb.runtime.version>2.4.0-b180830.0438</jaxb.runtime.version>
 		<jaxb.api.version>2.4.0-b180830.0359</jaxb.api.version>
 		<jaxb.xjc.version>2.4.0-b180830.0438</jaxb.xjc.version>
+		<mockito.version>1.10.19</mockito.version>
+		<powermock.version>1.6.6</powermock.version>
    </properties>
 
    <build>
@@ -888,7 +890,7 @@
 	<dependency>
 		<groupId>tethys.org</groupId>
 		<artifactId>nilus</artifactId>
-		<version>3.0</version>
+		<version>3.1</version>
 	</dependency>
 
 	<dependency>
@@ -970,6 +972,29 @@
 	    <artifactId>atlantafx-base</artifactId>
 	    <version>2.0.1</version>
 	</dependency>
+	
+	
+		<!-- Four dependencies from xbee library that are needed for Genus module. -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>4.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>${mockito.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-module-junit4</artifactId>
+			<version>${powermock.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-api-mockito</artifactId>
+			<version>${powermock.version}</version>
+		</dependency>
 	
 
   </dependencies>

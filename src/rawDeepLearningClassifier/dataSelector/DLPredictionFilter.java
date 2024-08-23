@@ -6,7 +6,6 @@ import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataSelector.DataSelectParams;
 import pamViewFX.fxSettingsPanes.DynamicSettingsPane;
 import rawDeepLearningClassifier.DLControl;
-import rawDeepLearningClassifier.dlClassification.DLDetection;
 import rawDeepLearningClassifier.dlClassification.PredictionResult;
 import rawDeepLearningClassifier.logging.DLAnnotation;
 

@@ -187,7 +187,9 @@ public class RExportManager implements PamDataUnitExporter {
 				//check whether the same. 
 				if (rDataExport.get(i).getUnitClass().isAssignableFrom(dataUnits.get(j).getClass()) && !alreadyStruct[j]) {
 					dataList=rDataExport.get(i).detectionToStruct(dataUnits.get(j), n); 
-					dataListArray.add((rDataExport.get(i).getName() + "_" + dataUnits.get(j).getUID()), dataList);	
+					//dataListArray.add((rDataExport.get(i).getName() + "_" + dataUnits.get(j).getUID()), dataList);	
+					// format used in PAMBinaries
+					dataListArray.add(String.valueOf(dataUnits.get(j).getUID()), dataList);	
 
 					sampleRate = dataUnits.get(j).getParentDataBlock().getSampleRate(); 
 					n++; 
