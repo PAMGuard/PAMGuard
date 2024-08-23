@@ -25,7 +25,9 @@
 
 # eclipse project file
 .project
-.hprof
+# hprof memory analyser files. 
+*.hprof
+java_pid*.*
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
@@ -112,7 +114,3 @@ settings.xml
 .classpath
 .settings/org.eclipse.jdt.core.prefs
 .classpath
-.classpath
-.settings/org.eclipse.core.resources.prefs
-.settings/org.eclipse.jdt.core.prefs
-dependency-reduced-pom.xml

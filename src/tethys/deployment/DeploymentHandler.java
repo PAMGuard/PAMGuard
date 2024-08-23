@@ -87,6 +87,7 @@ import tethys.dbxml.TethysException;
 import tethys.deployment.swing.DeploymentWizard;
 import tethys.deployment.swing.EffortProblemDialog;
 import tethys.deployment.swing.RecordingGapDialog;
+import tethys.localization.TethysLatLong;
 import tethys.niluswraps.PDeployment;
 import tethys.output.TethysExportParams;
 import tethys.pamdata.AutoTethysProvider;
@@ -909,8 +910,8 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 			GpsData gpsData = gpsDataUnit.getGpsData();
 			Point gpsPoint = new Point();
 			gpsPoint.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(gpsDataUnit.getTimeMilliseconds()));
-			gpsPoint.setLatitude(gpsData.getLatitude());
-			gpsPoint.setLongitude(PamUtils.constrainedAngle(gpsData.getLongitude()));
+			gpsPoint.setLatitude(TethysLatLong.formatLatitude(gpsData.getLatitude()));
+			gpsPoint.setLongitude(TethysLatLong.formatLongitude(gpsData.getLongitude()));
 			CourseOverGroundDegN cog = gpsPoint.getCourseOverGroundDegN();
 			if (cog == null) {
 				cog = new CourseOverGroundDegN();
@@ -1080,8 +1081,8 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 			double recLat = deploymentData.getRecoveryDetails().getLatitude();
 			double recLong = deploymentData.getRecoveryDetails().getLongitude();
 			if (recLat != 0 & recLong != 0.) {
-				deployment.getRecoveryDetails().setLatitude(recLat);
-				deployment.getRecoveryDetails().setLongitude(PamUtils.constrainedAngle(recLong));
+				deployment.getRecoveryDetails().setLatitude(TethysLatLong.formatLatitude(recLat));
+				deployment.getRecoveryDetails().setLongitude(TethysLatLong.formatLongitude(recLong));
 			}
 		}
 		

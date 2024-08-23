@@ -2,17 +2,8 @@ package tethys.localization;
 
 import java.util.ArrayList;
 
-import Localiser.detectionGroupLocaliser.GroupLocResult;
-import Localiser.detectionGroupLocaliser.GroupLocalisation;
-import PamDetection.AbstractLocalisation;
-import PamDetection.LocContents;
-import PamUtils.LatLong;
-import PamUtils.PamUtils;
 import PamguardMVC.PamDataBlock;
 import nilus.Localize;
-import nilus.SpeciesIDType;
-import pamMaths.PamVector;
-import nilus.Localize.Effort.CoordinateReferenceSystem;
 import tethys.Collection;
 import tethys.CollectionHandler;
 import tethys.TethysControl;
