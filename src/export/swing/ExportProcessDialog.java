@@ -255,6 +255,8 @@ public class ExportProcessDialog {
 			mainPanel.add(extraSettingsPanel);
 			//add the main panel at a different index. 
 			getMainPanel().add(mainPanel, 1);
+			
+			this.getTasksPanel().setBorder(new TitledBorder("Export Data"));
 
 			pack();
 
@@ -410,12 +412,14 @@ public class ExportProcessDialog {
 			@Override
 			public void setTaskStatus(TaskMonitorData taskMonitorData) {
 				
+				//System.out.println();			
 				switch (taskMonitorData.taskStatus) {
 				case COMPLETE:
 					if (taskIndex<exportTaskGroup.getNTasks() && !started) {
 						exportTaskGroup.runTaskFrom(taskIndex+1);
 						started = true;
 					}
+					else super.setTaskStatus(taskMonitorData);
 					break;
 				default:
 					super.setTaskStatus(taskMonitorData);
@@ -425,7 +429,6 @@ public class ExportProcessDialog {
 				switch (taskMonitorData.taskActivity) {
 				case LINKING:
 				case LOADING:
-					
 					//the progress of one datablocks
 					double progress = ((double) taskMonitorData.progValue)/taskMonitorData.progMaximum;
 					double totalProgress = ((double) taskIndex)/activeTasks + progress/activeTasks;

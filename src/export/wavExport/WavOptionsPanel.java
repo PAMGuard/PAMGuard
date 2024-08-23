@@ -42,7 +42,7 @@ public class WavOptionsPanel extends PamPanel {
 		
 		c.gridx++;
 		
-		addComponent(this, noZeroPad = new JRadioButton("Concatonate"), c);
+		addComponent(this, noZeroPad = new JRadioButton("Concatenate"), c);
 
 		c.gridx++;
 		addComponent(this, indvidualWav = new JRadioButton("Individual"), c);

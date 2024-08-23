@@ -37,6 +37,14 @@ public class ExportTask extends OfflineTask<PamDataUnit<?,?>>{
 
 
 	}
+	
+	/**
+	 * Called at the start of the thread which executes this task. 
+	 */
+	@Override
+	public void prepareTask() {
+		exporter.perpareExport();
+	}
 
 	@Override
 	public String getName() {

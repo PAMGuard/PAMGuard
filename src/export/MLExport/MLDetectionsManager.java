@@ -286,7 +286,11 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 		return null;
 	}
 
-
+	
+	@Override
+	public void prepareExport() {
+		this.currentFile = null; 
+	}
 
 
 }

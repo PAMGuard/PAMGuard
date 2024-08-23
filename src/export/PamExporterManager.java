@@ -188,6 +188,13 @@ public class PamExporterManager {
 		return this.pamExporters.get(this.exportParams.exportChoice);
 	}
 
+	public void perpareExport() {
+		for (PamDataUnitExporter exporter:pamExporters) {
+			exporter.prepareExport();
+		}
+		
+	}
+
 
 
 

@@ -352,16 +352,15 @@ public class WavDetExport {
 						//now safety check - is this more than one GB of data. Each sample is 16bits but the input double array is 64 bits each. 
 						double size = samplesPad*16*audioFormat.getChannels()/1024/1024;
 						
+						System.out.println("Append wav. zero pad" + samplesPad);
 						//
 						if (size>MAX_ZEROPAD_SIZE_MEGABYTES) {
 							wavWrite.close();
-							System.err.println(String.format("WavExportManager: A zero padding of %.2f MB was requested. The maximum allowed size is %.2f - "
+							System.err.println(String.format("WavDetExport: A zero padding of %.2f MB was requested. The maximum allowed size is %.2f - "
 									+ "the .wav file was closed and any additional data units have not been written %s", size, MAX_ZEROPAD_SIZE_MEGABYTES, currentFile));
 							return n;
 						}
 						
-						System.out.println("Append wav. zero pad" + samplesPad);
-
 						wavWrite.append(new double[audioFormat.getChannels()][samplesPad]);
 					}
 					

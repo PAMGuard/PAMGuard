@@ -2,6 +2,7 @@ package offlineProcessing;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -112,6 +113,10 @@ public class OLProcessDialog extends PamDialog {
 	 */
 	private boolean isNeedaNote = true;
 
+	/**
+	 * Tasks panel
+	 */
+	private PamAlignmentPanel tasksPanel;
 
 	public OLProcessDialog(Window parentFrame, OfflineTaskGroup taskGroup, String title) {
 		super(parentFrame, title, false);
@@ -150,7 +155,7 @@ public class OLProcessDialog extends PamDialog {
 		dataSelectPanel.add(BorderLayout.SOUTH, southPanel);
 				
 
-		JPanel tasksPanel = new PamAlignmentPanel(BorderLayout.WEST);
+		tasksPanel = new PamAlignmentPanel(BorderLayout.WEST);
 		tasksPanel.setLayout(new GridBagLayout());
 		tasksPanel.setBorder(new TitledBorder("Tasks"));
 		int nTasks = taskGroup.getNTasks();
@@ -885,6 +890,12 @@ public class OLProcessDialog extends PamDialog {
 	public JProgressBar getGlobalProgress() {
 		return globalProgress;
 	}
+	
+
+	public PamAlignmentPanel getTasksPanel() {
+		return tasksPanel;
+	}
+
 
 
 

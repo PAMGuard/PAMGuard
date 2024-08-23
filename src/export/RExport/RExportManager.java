@@ -55,9 +55,11 @@ public class RExportManager implements PamDataUnitExporter {
 
 	@Override
 	public boolean exportData(File fileName, List<PamDataUnit> dataUnits, boolean append) {
+		
+		if (dataUnits==null || dataUnits.size()<=0) return false;
 
 		/**
-		 * Note - there is no way to save data units to R files wothout loading the file into memory. 
+		 * Note - there is no way to save data units to R files without loading the file into memory. 
 		 * So everything is stored in memory until saved. 
 		 */
 		PamDataUnit minByTime = PamArrayUtils.getMinTimeMillis(dataUnits);
@@ -269,7 +271,7 @@ public class RExportManager implements PamDataUnitExporter {
 		
 		//TODO 
 		//check file size against the export params. 
-		System.out.println("RData length: " + allData.length());
+//		System.out.println("RData length: " + allData.length());
 		
 		return false;
 	}
@@ -286,6 +288,11 @@ public class RExportManager implements PamDataUnitExporter {
 	public Pane getOptionsPane() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	@Override
+	public void prepareExport() {
+		
 	}
 
 

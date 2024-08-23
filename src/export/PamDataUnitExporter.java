@@ -69,7 +69,12 @@ public interface PamDataUnitExporter {
 	 * An optional JavaFX pane that displays additional options for the user.
 	 * @return pane with additonal options - can be null. 
 	 */
-	public Pane getOptionsPane(); 
+	public Pane getOptionsPane();
+
+	/**
+	 * Called whenever a new export run is prepared. 
+	 */
+	public void prepareExport(); 
 
 
 }

@@ -60,6 +60,8 @@ public class WavDetExportManager implements PamDataUnitExporter  {
 	 */
 	private WavDetExport wavDetExport = new WavDetExport();
 
+	private File currentFile;
+
 	public WavDetExportManager() {
 
 	}
@@ -76,6 +78,21 @@ public class WavDetExportManager implements PamDataUnitExporter  {
 	@Override
 	public boolean exportData(File fileName,
 			List<PamDataUnit> dataUnits, boolean append) {
+		
+		if (fileName==null) return false;
+		
+		
+		if (this.currentFile==null || this.currentFile.compareTo(fileName)!=0) {
+			//we have a new .wav file to create. 
+			if (fileName.exists()) {
+				//we need to delete it 
+				System.out.println("PAMGuard export: wav file already existed and has been deleted: " + fileName.getName()); 
+				fileName.delete();
+			}
+		}
+		
+		this.currentFile = fileName;
+		
 
 		//make sure we have the latest options. 
 		if (wavOptionsPanel!=null) {
@@ -154,6 +171,12 @@ public class WavDetExportManager implements PamDataUnitExporter  {
 	public Pane getOptionsPane() {
 		// TODO - make FX version of settings. 
 		return null;
+	}
+
+	@Override
+	public void prepareExport() {
+		this.currentFile = null;
+		
 	}
 
 
