@@ -1,5 +1,8 @@
 package ravendata;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class RavenDataRow {
 	
 	private int iRow;
@@ -11,15 +14,16 @@ public class RavenDataRow {
 	private double endT;
 	private double f1;
 	private double f2;
-	private int[] dataIndexes;
+//	private int[] dataIndexes;
 	private boolean unpackOK;
+	private HashMap<String, String> extraData = new HashMap<>();
 
 	// data on a row of raven data from a table. 
-	public RavenDataRow(int iRow, String[] data, int[] dataIndexes) {
+	public RavenDataRow(RavenFileReader ravenReader, int iRow, String[] data) {
 		this.iRow = iRow;
 		this.data = data;
-		this.dataIndexes = dataIndexes;
-		unpackOK = unpackRow(dataIndexes);
+//		this.dataIndexes = dataIndexes;
+		unpackOK = unpackRow(ravenReader);
 	}
 
 	/**
@@ -74,10 +78,12 @@ public class RavenDataRow {
 	
 	/**
 	 * Unpack the row into more useful columns using the column indexes. 
-	 * @param mainIndexes
+	 * @param ravenReader
 	 * @return
 	 */
-	private boolean unpackRow(int[] mainIndexes) {
+	private boolean unpackRow(RavenFileReader ravenReader) {
+		int[] mainIndexes = ravenReader.getMainIndexes();
+		ArrayList<RavenColumnInfo> extraColumns = ravenReader.getExtraColumns();
 		try {
 			selection = getInteger(mainIndexes[0]);
 			view = getString(mainIndexes[1]);
@@ -86,11 +92,35 @@ public class RavenDataRow {
 			endT = getDouble(mainIndexes[4]);
 			f1 = getDouble(mainIndexes[5]);
 			f2 = getDouble(mainIndexes[6]);
+			// and add all the extra data into a HashMap
+			if (extraColumns == null) {
+				return true;
+			}
+			for (RavenColumnInfo col : extraColumns) {
+				String data = getString(col.ravenTableIndex);
+				if (data != null) {
+					col.maxStrLength = Math.max(col.maxStrLength, data.length());
+					extraData.put(col.name, data);
+				}
+			}
+			
 		}
 		catch (Exception e) {
 			return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * Get data from the extras map. 
+	 * @param name column name. 
+	 * @return
+	 */
+	public String getExtraData(String name) {
+		if (extraData == null) {
+			return null;
+		}
+		return extraData.get(name);
 	}
 
 	/**
@@ -142,17 +172,11 @@ public class RavenDataRow {
 		return f2;
 	}
 
-	/**
-	 * @return the dataIndexes
-	 */
-	protected int[] getDataIndexes() {
-		return dataIndexes;
-	}
-
+	
 	/**
 	 * @return the unpackOK
 	 */
-	protected boolean isUnpackOK() {
+	public boolean isUnpackOK() {
 		return unpackOK;
 	}
 
@@ -163,6 +187,10 @@ public class RavenDataRow {
 		}
 		RavenDataRow oth = (RavenDataRow) obj;
 		return this.channel == oth.channel && this.beginT == oth.beginT && this.endT == oth.endT && this.f1 == oth.f1 && this.f2 == oth.f2;
+	}
+
+	public HashMap<String, String> getExtraData() {
+		return extraData;
 	}
 
 }

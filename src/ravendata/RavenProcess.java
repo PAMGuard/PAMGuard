@@ -24,7 +24,7 @@ public class RavenProcess extends PamProcess {
 	private RavenDataBlock ravenDataBlock;
 	
 	private RavenLogging ravenLogging;
-	
+
 	private static SymbolData standardSymbol = new SymbolData(PamSymbolType.SYMBOL_SQUARE, 20, 20, false, Color.white, Color.red);
 
 	public RavenProcess(RavenControl pamControlledUnit) {
@@ -43,14 +43,17 @@ public class RavenProcess extends PamProcess {
 	@Override
 	public void pamStart() {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void pamStop() {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub	
 	}
+
+	public RavenLogging getRavenLogging() {
+		return ravenLogging;
+	}
+	
 	protected void createPAMGuardData(RavenFileReader fileReader, ArrayList<RavenDataRow> ravenData) {
 		/**
 		 * Need to find the acquisition module and then get detailed times of every file, not just
@@ -84,6 +87,12 @@ public class RavenProcess extends PamProcess {
 		ravenDataBlock.clearAll();
 		ravenLogging.deleteData(0, System.currentTimeMillis()*2);
 		
+		/**
+		 * Had to add an offset for some messed up Raven data. May or may not have to include
+		 * this as an option in future releases. 
+		 */
+		long offsetMillis = 0;//2843100;
+		
 		RavenDataRow prevRow = null;
 		for (RavenDataRow ravenRow : ravenData) {
 			if (ravenRow.equals(prevRow) == false) {
@@ -91,17 +100,19 @@ public class RavenProcess extends PamProcess {
 				 *  A lot of Raven data appear twice, with different view values. 
 				 *  No need to import both. so only doing this if they are different. 
 				 */
-				int fileInd = getTimeIndex(ravenRow.getBeginT()*1000, absTime);
+				double ravenStart = ravenRow.getBeginT()*1000 + offsetMillis;
+				int fileInd = getTimeIndex(ravenStart, absTime);
 				if (fileInd == absTime.length) {
 					String msg = String.format("Data at time %6.4f is beyond the end of available sound file data", ravenRow.getBeginT());
 					WarnOnce.showWarning("Error importing RAVEN data", msg, WarnOnce.WARNING_MESSAGE);
 					break;
 				}
 				long fileStart = fileStarts[fileInd];
-				long absStart = fileStart + (long) (ravenRow.getBeginT()*1000.)-absTime[fileInd];
+				long absStart = fileStart + (long) (ravenStart)-absTime[fileInd];
 				long duration = (long) ((ravenRow.getEndT()-ravenRow.getBeginT())*1000.);
 				int chanMap = 1<<(ravenRow.getChannel()-1);
 				RavenDataUnit rdu = new RavenDataUnit(absStart, chanMap, duration, ravenRow.getF1(), ravenRow.getF2());
+				rdu.setExtraData(ravenRow.getExtraData());
 				getRavenDataBlock().addPamData(rdu);
 				ravenLogging.logData(DBControlUnit.findConnection(), rdu);
 			}
