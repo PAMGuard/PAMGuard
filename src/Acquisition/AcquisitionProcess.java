@@ -429,7 +429,7 @@ public class AcquisitionProcess extends PamProcess {
 
 		// call acquireData one last time to make sure that 
 		// all data have been flushed from the buffer. 
-		if (bufferOverflow = false) {
+		if (bufferOverflow == false) {
 			acquireData();
 		}
 		else {
