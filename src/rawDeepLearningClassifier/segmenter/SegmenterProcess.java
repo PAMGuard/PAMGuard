@@ -736,7 +736,7 @@ public class SegmenterProcess extends PamProcess {
 
 		//add some extra metadata to the chunks 
 		packageSegmenterDataUnit(currentRawChunks[i]); 
-//		System.out.println("Segmenter process: Save current segments to datablock: " + currentRawChunks[i].getParentDataUnit().getUID() + " " + i + currentRawChunks[i].getRawData()[0][0]); 
+		//System.out.println("Segmenter process: Save current segments to datablock: " + currentRawChunks[i].getParentDataUnit().getUID() + " " + i + currentRawChunks[i].getRawData()[0][0]); 
 
 		//send the raw data unit off to be classified!
 
