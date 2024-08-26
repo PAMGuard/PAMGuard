@@ -7,7 +7,7 @@ The PAMGuard exporter allows users to export PAMGuard data, such as detections, 
 The PAMGuard exporter can be accessed from *File->Export*. This brings up the Export dialog. The export dialog allows users to select which data to export, where to export it and the file format to export as. Each data block also has a settings icon which opens the data block's unique data selector. So for example, users can export only specific types of clicks or whistles between certain frequencies. 
 
 <p align="center">
-  <img width="920" height="450" src = "resources/PAMGuard_exporter_dialog_annotated.png">
+  <img width="920" height="475" src = "resources/PAMGuard_exporter_dialog_annotated.png">
 </p>
 
 <center><em>  Diagram of the exporter dialog. The dialog allows users to select which part of the dataset to export, how to export it and which type of data to export </em></center>
