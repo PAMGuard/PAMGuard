@@ -502,5 +502,11 @@ public class StandardSymbolOptionsPane extends FXSymbolOptionsPane<StandardSymbo
 	public BorderPane getMainPane() {
 		return mainPane;
 	}
+	
+
+	public StandardSymbolModifierPane getDefaultSymbolPane() {
+		return defaultSymbolPane;
+	}
+
 
 }

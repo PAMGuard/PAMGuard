@@ -355,7 +355,7 @@ public class DetectionPlotDisplay extends PamBorderPane  {
 	 * the current data unit. 
 	 */
 	public void setupScrollBar(PamDataUnit newDataUnit){
-		System.out.println("SETUP SCROLL BAR:");
+//		System.out.println("SETUP SCROLL BAR:");
 		
 		if (currentDataInfo!=null) {
 			//important we put this here as it allows the plot to set up the scroll bar pane. 

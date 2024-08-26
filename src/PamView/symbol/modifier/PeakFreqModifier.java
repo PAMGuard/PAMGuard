@@ -111,9 +111,11 @@ public class PeakFreqModifier extends SymbolModifier {
 		}
 
 		frequency=(frequency - peakFreqSymbolOptions.freqLimts[0])/(peakFreqSymbolOptions.freqLimts[1]-peakFreqSymbolOptions.freqLimts[0]);
+		
 
 		checkColourArray(); 
-
+		
+		
 		Color freqCol = PamUtilsFX.fxToAWTColor(this.colourArray.getColour(frequency));
 
 		//		System.out.println("Freq colour: " + freqCol.getRed() + "  " + freqCol.getGreen() + "  " + freqCol.getBlue()); 

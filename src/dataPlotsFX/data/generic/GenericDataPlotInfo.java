@@ -42,6 +42,8 @@ import pamViewFX.fxNodes.PamSymbolFX;
  */
 public class GenericDataPlotInfo extends TDDataInfoFX {
 	
+	public static final double DEFAULT_FILL_OPACITY = 0.3;
+
 	/**
 	 * Scale infos to show what axis clicks can be plotted on. 
 	 */
@@ -350,6 +352,26 @@ public class GenericDataPlotInfo extends TDDataInfoFX {
 		return slantScaleInfo;
 	}
 	
+
+	/**
+	 * Called when the user selects a specific data line
+	 * @param dataLine
+	 */
+	@Override
+	public boolean setCurrentAxisName(ParameterType dataType, ParameterUnits dataUnits) {
+		setDefaultOpacity(dataType);
+		
+		return super.setCurrentAxisName(dataType, dataUnits);
+	}
+	
+	protected void setDefaultOpacity(ParameterType dataType) {
+		if (dataType.equals(ParameterType.FREQUENCY)) {
+			this.genericSettingsPane.setDefaultFillOpacity(DEFAULT_FILL_OPACITY);
+		}
+		else {
+			this.genericSettingsPane.setDefaultFillOpacity(1.0);
+		}
+	}
 
 
 }
