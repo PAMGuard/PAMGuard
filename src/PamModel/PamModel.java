@@ -1238,18 +1238,16 @@ final public class PamModel implements PamSettings {
 									}
 
 									// only add the plugin to the list if this is a valid run mode
-									if (pf.allowedModes()==PamPluginInterface.ALLMODES ||
-											(pf.allowedModes()==PamPluginInterface.VIEWERONLY && isViewer ) ||
-											(pf.allowedModes()==PamPluginInterface.NOTINVIEWER && !isViewer)) {
+//									if (isAllowedMode(pf)) {
 										pf.setJarFile(jarName);	// save the name of the jar, so that javahelp can find the helpset
 										if (getPluginBeingLoaded()==null) {
 											continue;
 										}
 
 										pluginList.add(pf); // add it to the list
-									} else {
-										System.out.println("     Error: " + pf.getDefaultName()+" cannot run in this mode.  Skipping module.");									
-									}
+//									} else {
+//										System.out.println("     Warning: " + pf.getDefaultName()+" cannot run in this mode.  Skipping module.");									
+//									}
 									if (getPluginBeingLoaded()==null) {
 										continue;
 									}
@@ -1337,6 +1335,10 @@ final public class PamModel implements PamSettings {
 							//URLClassLoader cl = new URLClassLoader(new URL[]{classFile.toURI().toURL()});
 //							mi = PamModuleInfo.registerControlledUnit(pf.getClassName(), pf.getDescription(),cl);
 							mi = PamModuleInfo.registerControlledUnit(pf.getClassName(), pf.getDescription(),classLoader);
+							if (isAllowedMode(pf) == false) {
+								mi.setHidden(true);
+								System.out.println("     Warning: " + pf.getDefaultName()+" cannot run in this mode.  hiding module.");	
+							}
 						} catch (Exception e) {
 							System.err.println("   Error accessing " + pf.getJarFile());
 							e.printStackTrace();
@@ -1420,6 +1422,17 @@ final public class PamModel implements PamSettings {
 		this.clearPluginBeingLoaded();
 	}
 
+	/**
+	 * Can this plugin run in this mode ? 
+	 * Even if it can't, leave it in the model, but don't allow any to be created. 
+	 * @param plugin
+	 * @return
+	 */
+	private boolean isAllowedMode(PamPluginInterface pf) {
+		return (pf.allowedModes()==PamPluginInterface.ALLMODES ||
+				(pf.allowedModes()==PamPluginInterface.VIEWERONLY && isViewer ) ||
+				(pf.allowedModes()==PamPluginInterface.NOTINVIEWER && !isViewer));
+	}
 	/**
 	 * Return a list of the plugins found in the plugin folder
 	 * @return

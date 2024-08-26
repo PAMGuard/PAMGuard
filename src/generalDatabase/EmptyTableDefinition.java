@@ -402,7 +402,13 @@ public class EmptyTableDefinition implements Cloneable {
 	protected EmptyTableDefinition clone() {
 		try {
 			EmptyTableDefinition clone = (EmptyTableDefinition) super.clone();
-//			clone.pamTableItems = new ArrayList<>();
+			/**
+			 * Don't clone the list items themselves since these may be referenced from the
+			 * SQLLogging class, which won't be able to find them if their references change.
+			 * Just clone the array list, leaving the individual items alone.  
+			 */
+			clone.pamTableItems = new ArrayList<>();
+			clone.pamTableItems.addAll(this.pamTableItems);
 //			for (PamTableItem tableItem : this.pamTableItems) {
 //				clone.pamTableItems.add(tableItem.clone());
 //			}
