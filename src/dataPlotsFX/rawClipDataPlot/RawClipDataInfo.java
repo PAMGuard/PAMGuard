@@ -69,8 +69,7 @@ public class RawClipDataInfo extends GenericDataPlotInfo {
 		rawWavePlotManager = new RawClipWavePlotManager(this); 
 		clipSettingsPane = new RawClipSettingsPane(this); 
 		clipSettingsPane.setParams();
-		
-
+	
 		//create the symbol chooser. 
 		rawSymbolChoosr = new RawClipSymbolChooser(this, pamDataBlock.getPamSymbolManager().getSymbolChooser(tdGraph.getUniqueName(), tdGraph.getGraphProjector()), TDSymbolChooserFX.DRAW_SYMBOLS); 
 		
@@ -278,12 +277,23 @@ public class RawClipDataInfo extends GenericDataPlotInfo {
 		return false;
 	}
 
+
 	/**
 	 * Called whenever settings are updated. 
 	 */
 	private void updateSettings() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	protected void setDefaultOpacity(ParameterType dataType) {
+		if (dataType.equals(ParameterType.FREQUENCY)) {
+			this.clipSettingsPane.setDefaultFillOpacity(DEFAULT_FILL_OPACITY);
+		}
+		else {
+			this.clipSettingsPane.setDefaultFillOpacity(1.0);
+		}
 	}
 
 

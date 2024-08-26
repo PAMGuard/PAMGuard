@@ -3,6 +3,8 @@ package rawDeepLearningClassifier.dataPlotFX;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 
+import org.jamdev.jpamutils.JamArr;
+
 import PamController.PamController;
 import PamUtils.PamArrayUtils;
 import PamView.GeneralProjector;
@@ -38,7 +40,7 @@ public class DLSymbolModifier extends SymbolModifier {
 	/**
 	 * The default symbol data for data annotated with a deep elanring classifier. 
 	 */
-	private SymbolData symbolData = new SymbolData(PamSymbolType.SYMBOL_CIRCLE, 5, 5, true, Color.BLACK, Color.BLACK);
+	private SymbolData symbolData = new SymbolData(PamSymbolType.SYMBOL_CIRCLE, 10, 10, true, Color.BLACK, Color.BLACK);
 
 
 	/**
@@ -142,10 +144,13 @@ public class DLSymbolModifier extends SymbolModifier {
 		
 		int[] indexBest = PamArrayUtils.maxPos(results); 
 		
+//		System.out.println( " Index best: " +  indexBest[0] +  "  " +  indexBest[1]);
+//		
+//		JamArr.printArray(results[0]);
+		
 		
 		if (passed || !dlSymbolOptions.showOnlyBinary) {
 			//work out the class colour...
-						
 			javafx.scene.paint.Color color = PamUtilsFX.intToColor(dlSymbolOptions.classColors[indexBest[1]]);
 			
 			Color colorAWT = PamUtilsFX.fxToAWTColor(color);

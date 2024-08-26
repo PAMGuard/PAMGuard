@@ -600,7 +600,7 @@ public class PamArrayUtils {
 		//		int count = 0; 
 		float cur;
 		for(int i=0; i<arr.length; i++) {
-			for(int j=0; j<arr.length; j++) {
+			for(int j=0; j<arr[i].length; j++) {
 				cur = arr[i][j];
 				if (cur>max) {
 					index[0]=i;

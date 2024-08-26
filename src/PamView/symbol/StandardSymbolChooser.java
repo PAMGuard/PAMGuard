@@ -1,5 +1,6 @@
 package PamView.symbol;
 
+import java.awt.Color;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -70,6 +71,11 @@ public class StandardSymbolChooser extends PamSymbolChooser {
 		if (modifiers == null || modifiers.size() == 0) {
 			return symbolData;
 		}
+		
+		Integer alpha = null;
+		if (symbolData != null) {
+			alpha = symbolData.getFillColor().getAlpha();
+		}
 
 		boolean isCloned = false;
 
@@ -96,6 +102,11 @@ public class StandardSymbolChooser extends PamSymbolChooser {
 				isCloned = true;
 			}
 			symbolData = modifiers.get(ind).modifySymbol(symbolData, projector, dataUnit);
+		}
+		if (alpha != null && alpha < 255) {
+			Color currCol = symbolData.getFillColor();
+			currCol = new Color(currCol.getRed(), currCol.getGreen(), currCol.getBlue(), alpha);
+			symbolData.setFillColor(currCol);
 		}
 		return symbolData;
 	}

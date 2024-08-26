@@ -330,7 +330,7 @@ public class WavDetExport {
 			for (int i=0; i<wavDataUnitExports.size(); i++) {
 				if (wavDataUnitExports.get(i).getUnitClass().isAssignableFrom(fnDataUnit.getClass())) {
 					
-					System.out.println("Append wav. data unit: " + n + " samples: " + wavDataUnitExports.get(i).getWavClip(fnDataUnit)[0].length + " zeroPad: " + zeroPad);
+					//System.out.println("Append wav. data unit: " + n + " samples: " + wavDataUnitExports.get(i).getWavClip(fnDataUnit)[0].length + " zeroPad: " + zeroPad);
 					
 					if (zeroPad && lastfnDataUnit!=null) {
 						//we need to append zero samples between the detections. 
@@ -352,7 +352,7 @@ public class WavDetExport {
 						//now safety check - is this more than one GB of data. Each sample is 16bits but the input double array is 64 bits each. 
 						double size = samplesPad*16*audioFormat.getChannels()/1024/1024;
 						
-						System.out.println("Append wav. zero pad" + samplesPad);
+						//System.out.println("Append wav. zero pad" + samplesPad);
 						//
 						if (size>MAX_ZEROPAD_SIZE_MEGABYTES) {
 							wavWrite.close();
