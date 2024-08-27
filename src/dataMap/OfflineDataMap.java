@@ -565,10 +565,10 @@ abstract public class OfflineDataMap<TmapPoint extends OfflineDataMapPoint> {
 
 	private void warnDoubleFind(long timeMillis, TmapPoint foundPoint,
 			TmapPoint mapPoint) {
-		System.out.println(String.format("Warning - data unit at time %s found in two map points %s - %s and %s - %s in %s ",
-				PamCalendar.formatDateTime(timeMillis), PamCalendar.formatDateTime(foundPoint.getStartTime()),
-				PamCalendar.formatDateTime(foundPoint.getEndTime()),PamCalendar.formatDateTime(mapPoint.getStartTime()),
-				PamCalendar.formatDateTime(mapPoint.getEndTime()), this.parentDataBlock.getDataName()));
+//		System.out.println(String.format("Warning - data unit at time %s found in two map points %s - %s and %s - %s in %s ",
+//				PamCalendar.formatDateTime(timeMillis), PamCalendar.formatDateTime(foundPoint.getStartTime()),
+//				PamCalendar.formatDateTime(foundPoint.getEndTime()),PamCalendar.formatDateTime(mapPoint.getStartTime()),
+//				PamCalendar.formatDateTime(mapPoint.getEndTime()), this.parentDataBlock.getDataName()));
 	}
 
 	/**
