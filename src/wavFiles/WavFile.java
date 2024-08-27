@@ -1,23 +1,10 @@
 package wavFiles;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-
 import javax.swing.JOptionPane;
 
-//import org.kc7bfi.jflac.util.ByteData;
-import org.jflac.util.ByteData;
-
 import clickDetector.WindowsFile;
-import java.io.ByteArrayInputStream;
-import java.util.Arrays;
-
-import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
 
 public class WavFile {
 

@@ -639,6 +639,9 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 			fileInputParameters.bitDepth = audioFormat.getSampleSizeInBits();
 
 			loadByteConverter(audioFormat);
+			
+//			System.out.println("FileInputSystem - prepareInputFile done"); 
+
 
 		} catch (UnsupportedAudioFileException ex) {
 			ex.printStackTrace();

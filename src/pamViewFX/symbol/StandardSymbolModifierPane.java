@@ -477,13 +477,13 @@ public class StandardSymbolModifierPane extends SymbolModifierPane {
 	public class ColorChooserPane extends SymbolChooserControls {
 
 
-		private ColorPicker symbolFillColourPicker; 
+		private PamColorPicker symbolFillColourPicker; 
 
 
 		public ColorChooserPane(int modFlag, String name) {
 			super(modFlag, name);
 
-			symbolFillColourPicker= new ColorPicker(); 
+			symbolFillColourPicker= new PamColorPicker(); 
 			symbolFillColourPicker.setStyle("-fx-color-label-visible: false ;");
 //			symbolFillColourPicker.valueProperty().addListener((obsVal, oldVal, newVal)->{
 //				//send a notification to the pane that a colour has changed
@@ -492,12 +492,33 @@ public class StandardSymbolModifierPane extends SymbolModifierPane {
 			this.setSettingsPane(symbolFillColourPicker); 
 		}
 
+		/**
+		 * Set the default opacity for the colour picker. When a new colour is selected,
+		 * then the opacity will default to the set value.
+		 * 
+		 * @param opacity - the default opacity to set. Default is 1.
+		 */
+		public void setDefaultOpacity(double opacity) {
+			symbolFillColourPicker.setDefaultOpacity(opacity);
+		}
+		
+		
+		/**
+		 * Get the default opacity for the colour picker. When a new colour is selected,
+		 * then the opacity will default to the set value.
+		 * 
+		 * @return opacity - the default opacity of the colour picker.
+		 */
+		public double getDefaultOpacity() {
+			return symbolFillColourPicker.getDefaultOpacity();
+		}
+
 
 		public ColorPicker getSymbolColourPicker() {
 			return symbolFillColourPicker;
 		}
 
-		public void setSymbolColourPicker(ColorPicker symbolFillColourPicker) {
+		public void setSymbolColourPicker(PamColorPicker symbolFillColourPicker) {
 			this.symbolFillColourPicker = symbolFillColourPicker;
 		}
 
@@ -624,6 +645,24 @@ public class StandardSymbolModifierPane extends SymbolModifierPane {
 	 */
 	public PamVBox getSymbolBox() {
 		return symbolBox;
+	}
+	
+	/**
+	 * Set the default opacity for selected colours from the colour picker. The
+	 * default opacity is the the opacity when a user selects a new colour. The user
+	 * can alter this with advanced colour controls.
+	 * 
+	 * @param opacity - the default opacity for fill colours.
+	 */
+	public void setDefaultFillOpacity(double opacity) {
+
+		//set the opacity ofr all fill colour controls
+		for (int i=0; i<symbolChooserControls.size(); i++) {
+			if ((symbolChooserControls.get(i).getModFlag()  & SymbolModType.FILLCOLOUR) != 0){
+				((ColorChooserPane) symbolChooserControls.get(i)).setDefaultOpacity(opacity); 
+			}
+		}
+
 	}
 
 }

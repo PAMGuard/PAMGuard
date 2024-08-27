@@ -8,6 +8,7 @@ public class WhistleMoanTethysProvider extends AutoTethysProvider {
 
 	public WhistleMoanTethysProvider(TethysControl tethysControl, PamDataBlock pamDataBlock) {
 		super(tethysControl, pamDataBlock);
+		setAddFrequencyInfo(true);
 	}
 
 }

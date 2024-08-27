@@ -2,6 +2,7 @@ package offlineProcessing;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -63,6 +64,7 @@ public class OLProcessDialog extends PamDialog {
 	private JButton[] settingsButton;
 	private JLabel status, currFile;
 	private JProgressBar globalProgress; // file by file progress 1: nFiles
+
 	private JProgressBar loadedProgress; // progress throgh loaded data
 	private JCheckBox deleteOldData;
 	private JLabel dataInfo;
@@ -111,6 +113,10 @@ public class OLProcessDialog extends PamDialog {
 	 */
 	private boolean isNeedaNote = true;
 
+	/**
+	 * Tasks panel
+	 */
+	private PamAlignmentPanel tasksPanel;
 
 	public OLProcessDialog(Window parentFrame, OfflineTaskGroup taskGroup, String title) {
 		super(parentFrame, title, false);
@@ -149,7 +155,7 @@ public class OLProcessDialog extends PamDialog {
 		dataSelectPanel.add(BorderLayout.SOUTH, southPanel);
 				
 
-		JPanel tasksPanel = new PamAlignmentPanel(BorderLayout.WEST);
+		tasksPanel = new PamAlignmentPanel(BorderLayout.WEST);
 		tasksPanel.setLayout(new GridBagLayout());
 		tasksPanel.setBorder(new TitledBorder("Tasks"));
 		int nTasks = taskGroup.getNTasks();
@@ -723,7 +729,7 @@ public class OLProcessDialog extends PamDialog {
 	 * @author Doug Gillespie
 	 *
 	 */
-	class OLMonitor implements TaskMonitor {
+	public class OLMonitor implements TaskMonitor {
 
 		@Override
 		public void setTaskStatus(TaskMonitorData taskMonitorData) {
@@ -734,6 +740,7 @@ public class OLProcessDialog extends PamDialog {
 			else {
 				currFile.setText(taskMonitorData.fileOrStatus);
 			}
+			
 			switch (taskMonitorData.taskActivity) {
 			case LINKING:
 			case LOADING:
@@ -755,6 +762,7 @@ public class OLProcessDialog extends PamDialog {
 			default:
 				break;
 			}
+			
 			switch (taskMonitorData.taskStatus) {
 			case COMPLETE:
 				globalProgress.setValue(100);
@@ -878,6 +886,17 @@ public class OLProcessDialog extends PamDialog {
 	public void setNeedaNote(boolean isNeedaNote) {
 		this.isNeedaNote = isNeedaNote;
 	}
+	
+	public JProgressBar getGlobalProgress() {
+		return globalProgress;
+	}
+	
+
+	public PamAlignmentPanel getTasksPanel() {
+		return tasksPanel;
+	}
+
+
 
 
 

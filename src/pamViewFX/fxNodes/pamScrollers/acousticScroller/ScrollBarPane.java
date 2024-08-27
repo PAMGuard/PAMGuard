@@ -6,6 +6,8 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
@@ -257,78 +259,6 @@ public class ScrollBarPane extends PamBorderPane {
 	}
 
 	/**
-	 * Create the text field that allows to manually chage the visible amount amount property. 
-	 */
-	private void createTextField(){
-		//create the textbox
-		textBox= new TextField();
-		textBox.layoutXProperty().bind(rectangle.layoutXProperty().add(rectangle.widthProperty().divide(2)).subtract(textBox.widthProperty().divide(2)));
-		textBox.layoutYProperty().bind(rectangle.heightProperty().divide(2).subtract(textBox.heightProperty().divide(2)));
-		textBox.setOnAction((action)-> {
-			double millis=this.getTextBoxValue(textBox.getText());
-			if (millis<=0 || millis>(this.maxValueProperty.get()-this.minValueProperty.get())){
-				textBoxErrorFlash(textBox);
-				this.setTextBoxValue(visibleAmountProperty.get());
-			}
-			else{
-				visibleAmountProperty.setValue(millis);
-			}
-
-		});
-
-		ft = new FadeTransition(Duration.millis(3000), textBox);
-
-		textBox.getStyleClass().add("text_field_trans");
-		textBox.setPrefWidth(70);
-
-		//the rectangle itself. 
-		textBox.setOnMousePressed((event)->{
-			rectanglePressed(event);
-		});
-
-
-		textBox.setOnMouseReleased((event)->{
-			rectangleReleased(event);
-
-		});
-
-		//text box needs to to drag the rectangle so there isn't a drag 'dead space' 
-		textBox.setOnMouseDragged((event)->{
-			rectangleDragged(event);
-		});
-
-		textBox.setOnMouseEntered((event)->{
-			setTextBoxVisible(true);
-		}); 
-
-		textBox.setOnMouseExited((event)->{
-			//only set invisible if not in rectangle. This is for fast mouse movements were the exist of the rectangle may not be called 
-			if (!rectangle.contains(rectangle.sceneToLocal(event.getSceneX(), event.getSceneY()))){
-				setTextBoxVisible(false);
-			}
-		}); 
-
-		setTextBoxVisible(false); 
-
-		//show and hide text box so keeps the scroll bar beautiful 
-		rectangle.setOnMouseEntered((event)->{
-			setTextBoxVisible(true);
-		});
-
-		rectangle.setOnMouseExited((event)->{
-			setTextBoxVisible(false);
-		});
-
-		//make sure the text box chnages with visible amount.,
-		this.visibleAmountProperty.addListener((obsVal, newVal, oldVal)->{
-			setTextBoxValue(visibleAmountProperty.get());
-		});
-
-
-		setTextBoxValue(visibleAmountProperty.get());
-	}
-
-	/**
 	 * Create the rectangle which can be dragged to change time but also dragged to change the width of time
 	 * shown. 
 	 * @return a rectangle which can be dragged and changed size within the scroll bar pane. 
@@ -382,6 +312,7 @@ public class ScrollBarPane extends PamBorderPane {
 		rightDrag.getChildren().add(rightdragLine); 
 		rectangle.getChildren().add(rightDrag); 
 
+		rectangle.setCursor(Cursor.OPEN_HAND); //Change cursor to hand
 
 		//now set behaviours 
 		leftDrag.setOnMousePressed((event)->{
@@ -436,15 +367,17 @@ public class ScrollBarPane extends PamBorderPane {
 		}); 
 
 		//now set behaviours 
-		rightDrag.setOnMousePressed((event)->{
+		rightDrag.setOnMousePressed((event)->{			
 			leftLayoutX=rectangle.getLayoutX();
 			isChanging.set(true);
+			rectangle.setCursor(Cursor.CLOSED_HAND); //Change cursor to hand
 			dragStarted(event, rightDrag);
 		});
 
 		rightDrag.setOnMouseReleased((event)->{
 			currentValueProperty.setValue(calcScrollBarVal(rectangle.getLayoutX()));
 			isChanging.set(false);
+			rectangle.setCursor(Cursor.OPEN_HAND); //Change cursor to hand
 			dragging(event); 
 		});
 
@@ -496,6 +429,7 @@ public class ScrollBarPane extends PamBorderPane {
 		rectangle.setOnMouseDragged((event)->{
 			rectangleDragged(event);
 		});
+	
 
 		return rectangle; 
 	}
@@ -541,6 +475,87 @@ public class ScrollBarPane extends PamBorderPane {
 		else {
 			textBox.setText(PamCalendar.formatDuration((long) visAmount));
 		}
+	}
+
+	/**
+	 * Create the text field that allows to manually chage the visible amount amount property. 
+	 */
+	private void createTextField(){
+		//create the textbox
+		textBox= new TextField();
+		textBox.layoutXProperty().bind(rectangle.layoutXProperty().add(rectangle.widthProperty().divide(2)).subtract(textBox.widthProperty().divide(2)));
+		textBox.layoutYProperty().bind(rectangle.heightProperty().divide(2).subtract(textBox.heightProperty().divide(2)));
+		textBox.setOnAction((action)-> {
+			double millis=this.getTextBoxValue(textBox.getText());
+			if (millis<=0 || millis>(this.maxValueProperty.get()-this.minValueProperty.get())){
+				textBoxErrorFlash(textBox);
+				this.setTextBoxValue(visibleAmountProperty.get());
+			}
+			else{
+				visibleAmountProperty.setValue(millis);
+			}
+	
+		});
+	
+		ft = new FadeTransition(Duration.millis(3000), textBox);
+	
+		textBox.getStyleClass().add("text_field_trans");
+		textBox.setPrefWidth(70);
+	
+		//the rectangle itself. 
+		textBox.setOnMousePressed((event)->{
+			rectanglePressed(event);
+		});
+	
+	
+		textBox.setOnMouseReleased((event)->{
+			rectangleReleased(event);
+	
+		});
+	
+		//text box needs to to drag the rectangle so there isn't a drag 'dead space' 
+		textBox.setOnMouseDragged((event)->{
+			rectangleDragged(event);
+		});
+	
+		textBox.setOnMouseEntered((event)->{
+			setTextBoxVisible(true);
+		}); 
+	
+		textBox.setOnMouseExited((event)->{
+			//only set invisible if not in rectangle. This is for fast mouse movements were the exist of the rectangle may not be called 
+			if (!rectangle.contains(rectangle.sceneToLocal(event.getSceneX(), event.getSceneY()))){
+				setTextBoxVisible(false);
+			}
+		}); 
+	
+		setTextBoxVisible(false); 
+	
+		//show and hide text box so keeps the scroll bar beautiful 
+		rectangle.setOnMouseEntered((event)->{
+			setTextBoxVisible(true);
+		});
+	
+		rectangle.setOnMouseExited((event)->{
+			setTextBoxVisible(false);
+		});
+	
+		//make sure the text box chnages with visible amount.,
+		this.visibleAmountProperty.addListener((obsVal, newVal, oldVal)->{
+			setTextBoxValue(visibleAmountProperty.get());
+		});
+	
+	
+		setTextBoxValue(visibleAmountProperty.get());
+	}
+
+
+	/**
+	 * Get the text box that shows the visible amount
+	 * @return - the text field
+	 */
+	public TextField getTextBox() {
+		return textBox;
 	}
 
 
@@ -842,6 +857,19 @@ public class ScrollBarPane extends PamBorderPane {
 	 */
 	public void setShowMillis(boolean showMillis) {
 		this.showMillis = showMillis;
+	}
+
+
+	/**
+	 * Convenience function which adds a change listener to the current value and visible amount prooperty. 
+	 * @param val - the change listener to add. 
+	 */
+	public void addValueListener(ChangeListener val) {
+		//add listener to visible amount property.
+		visibleAmountProperty.addListener(val);
+
+		//add listener to current value amount property.
+		currentValueProperty.addListener(val);
 	}
 
 }

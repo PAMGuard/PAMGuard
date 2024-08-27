@@ -229,6 +229,7 @@ public class LSQBearingLocaliser implements BearingLocaliser {
 	public Serializable getParameters() {
 		return null;
 	}
+	
 	@Override
 	public LocalisationAlgorithmInfo getAlgorithmInfo() {
 		return this;

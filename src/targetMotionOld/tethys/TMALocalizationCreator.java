@@ -12,25 +12,25 @@ import PamDetection.LocContents;
 import PamUtils.LatLong;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
-import nilus.AngularCoordinateType;
+import nilus.Helper;
 import nilus.LocalizationType;
 import nilus.Localize;
 import nilus.WGS84CoordinateType;
-import nilus.LocalizationType.Angular;
 import nilus.LocalizationType.Parameters;
 import nilus.LocalizationType.WGS84;
 import nilus.LocalizationType.Parameters.TargetMotionAnalysis;
 import nilus.Localize.Effort;
 import nilus.Localize.Effort.CoordinateReferenceSystem;
+import nilus.Localize.Effort.CoordinateReferenceSystem.ReferenceFrame;
 import pamMaths.PamVector;
 import targetMotionOld.TargetMotionLocaliser;
 import tethys.TethysTimeFuncs;
+import tethys.localization.Anchor;
 import tethys.localization.CoordinateName;
 import tethys.localization.LocalizationBuilder;
 import tethys.localization.LocalizationCreator;
 import tethys.localization.LocalizationSubTypes;
 import tethys.localization.LocalizationTypes;
-import tethys.localization.ReferenceFrame;
 import tethys.localization.TimeReference;
 import tethys.pamdata.AutoTethysProvider;
 
@@ -38,7 +38,7 @@ public class TMALocalizationCreator implements LocalizationCreator {
 
 
 	int maxDimension = 2;
-	
+
 	public TMALocalizationCreator(TargetMotionLocaliser targetMotionLocaliser) {
 		// TODO Auto-generated constructor stub
 	}
@@ -53,12 +53,36 @@ public class TMALocalizationCreator implements LocalizationCreator {
 		locTypes.add(LocalizationTypes.Point.toString());
 		locTypes.add(LocalizationTypes.PerpendicularRange.toString());
 
+		/**
+		 * Currently, TMA is only outputing as WGS84. Future release will have 
+		 * options to put out local xyz coordinates instead, in which case this 
+		 * will be Engineering and the referenceFrame will become instrument. 
+		 */
 		CoordinateReferenceSystem coordRefs = locEffort.getCoordinateReferenceSystem();
 		coordRefs.setName(CoordinateName.WGS84.toString());
 		coordRefs.setSubtype(LocalizationSubTypes.Geographic.toString());
-		
+
+		ReferenceFrame refFrame = localizationBuilder.getDefaultReferenceFrame(CoordinateName.WGS84, LocalizationSubTypes.Geographic);
+		if (refFrame != null) {
+			coordRefs.setReferenceFrame(refFrame);
+		}
+//		/**
+//		 * TMA is always references to the earth. 
+//		 */
+//		ReferenceFrame refFrame = coordRefs.getReferenceFrame();
+//		if (refFrame == null) {
+//			refFrame = new ReferenceFrame();
+//			try {
+//				Helper.createRequiredElements(refFrame);
+//			} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
+//				e.printStackTrace();
+//			}
+//			coordRefs.setReferenceFrame(refFrame);
+//		}
+//		refFrame.setAnchor(Anchor.WGS84.toString());
+
 		locEffort.setDimension(2);		
-		
+
 		return true;
 	}
 
@@ -115,19 +139,19 @@ public class TMALocalizationCreator implements LocalizationCreator {
 		 * Needs a bit of work to get errors in correct direction (needs import
 		 * of track data for this value ?) and conversion to latlong units.  
 		 */
-//		if (errorVec != null && errorVec.length >= 2) {
-//			wgsErr = new WGS84CoordinateType();
-//			wgsErr.setLongitude(errorVec[0]);
-//			wgsErr.setLatitude(errorVec[1]);
-//			if (hasDepth && errorVec.length >= 3) {
-//				wgsErr.setElevationM(errorVec[2]);
-//			}
-//			wgs84.setCoordinateError(wgsErr);
-//		}
-		
-		
+		//		if (errorVec != null && errorVec.length >= 2) {
+		//			wgsErr = new WGS84CoordinateType();
+		//			wgsErr.setLongitude(errorVec[0]);
+		//			wgsErr.setLatitude(errorVec[1]);
+		//			if (hasDepth && errorVec.length >= 3) {
+		//				wgsErr.setElevationM(errorVec[2]);
+		//			}
+		//			wgs84.setCoordinateError(wgsErr);
+		//		}
+
+
 		loc.setWGS84(wgs84);
-		
+
 		// set the TMA information
 		Parameters params = loc.getParameters();
 		if (params == null) {
@@ -142,31 +166,31 @@ public class TMALocalizationCreator implements LocalizationCreator {
 		if (timeAbeam != null) {
 			loc.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(timeAbeam));
 		}
-				
-//		 now also output a perpendicular distance.
+
+		//		 now also output a perpendicular distance.
 		Double perp = groupLocResult.getPerpendicularDistance();
 		if (perp != null) {
 			loc.setPerpendicularRangeM(AutoTethysProvider.roundDecimalPlaces(perp, 2));
 		}
-		
-		
-		// con only output one type. 
-//		if (perp != null) {
-//			AngularCoordinateType acType = new AngularCoordinateType();
-//			acType.setAngle1(90);
-//			acType.setDistanceM(AutoTethysProvider.roundDecimalPlaces(perp,1));
-//			Angular angular = new Angular();
-//			angular.setCoordinate(acType);
-//			if (errors != null) {
-//				AngularCoordinateType angErr = new AngularCoordinateType();
-//				angErr.setDistanceM(errors.norm());
-//				angular.setCoordinateError(angErr);
-//			}
-//			loc.setAngular(angular);
-//		}
 
-		
-		
+
+		// con only output one type. 
+		//		if (perp != null) {
+		//			AngularCoordinateType acType = new AngularCoordinateType();
+		//			acType.setAngle1(90);
+		//			acType.setDistanceM(AutoTethysProvider.roundDecimalPlaces(perp,1));
+		//			Angular angular = new Angular();
+		//			angular.setCoordinate(acType);
+		//			if (errors != null) {
+		//				AngularCoordinateType angErr = new AngularCoordinateType();
+		//				angErr.setDistanceM(errors.norm());
+		//				angular.setCoordinateError(angErr);
+		//			}
+		//			loc.setAngular(angular);
+		//		}
+
+
+
 		return loc;
 	}
 

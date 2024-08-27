@@ -1,6 +1,5 @@
 package geoMag;
 
-import weka.core.SingleIndex;
 import GPS.GpsData;
 
 /**

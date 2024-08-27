@@ -3,12 +3,14 @@ package rawDeepLearningClassifier.layoutFX;
 import java.util.ArrayList;
 
 import org.controlsfx.control.PopOver;
+import org.controlsfx.control.ToggleSwitch;
 
 import PamController.PamGUIManager;
 import PamController.SettingsPane;
 import PamDetection.RawDataUnit;
 import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
+import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.dataSelector.NullDataSelectorCreator;
 import clickDetector.ClickDetection;
 import clipgenerator.ClipDataUnit;
@@ -116,6 +118,10 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 	private DLModelSelectPane modelSelectPane;
 
+	private PamToggleSwitch segEnableSwitch;
+
+	private PamGridPane segmenterGridPane;
+
 
 
 	public DLSettingsPane(DLControl dlControl){
@@ -178,11 +184,26 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		vBox.getChildren().add(createDataSelectorPane());
 
 
-		// the segmentation params
-		Label label = new Label("Segmentation"); 
-		PamGuiManagerFX.titleFont2style(label); 
+		// the segmentation parameters
+		Label segLabel = new Label("Segmentation"); 
+		PamGuiManagerFX.titleFont2style(segLabel); 
 
-		vBox.getChildren().add(label);
+
+		segEnableSwitch = new PamToggleSwitch("Enable");
+		segEnableSwitch.selectedProperty().addListener((obsVal, oldVal, newVal)->{
+			enableControls(); 
+		});
+		segEnableSwitch.setVisible(false); //set visible by default
+		segEnableSwitch.setAlignment(Pos.CENTER_RIGHT);
+		
+
+		//segmentation can have an option to disable for certain input datablocks
+		PamBorderPane segmenterPane = new PamBorderPane();
+		segmenterPane.setLeft(segLabel);
+		segmenterPane.setRight(segEnableSwitch);
+
+		//add to the main pane
+		vBox.getChildren().add(segmenterPane);
 
 		windowLength = new PamSpinner<Integer>(0, Integer.MAX_VALUE, 10,  10000); 
 		windowLength.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
@@ -211,7 +232,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 			hopLength.getValueFactory().setValue(Math.round(windowLength.getValue()/2));
 		});
 
-		PamGridPane segmenterGridPane = new PamGridPane(); 
+		segmenterGridPane = new PamGridPane(); 
 		segmenterGridPane.setHgap(5);
 
 		ColumnConstraints col1 = new ColumnConstraints();
@@ -244,35 +265,16 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 		vBox.getChildren().add(label2);
 
-		/**
-		 * Pane which allows users to select a model type. 
-		 */
+		//Pane which allows users to select a model from a file, link or default model. 
 		modelSelectPane = new DLModelSelectPane(this); 
 
-		//		//add the possible deep learning models. 
-		//		dlModelBox= new ComboBox<String>();
-		//		for (int i=0; i<dlControl.getDLModels().size(); i++) {
-		//			dlModelBox.getItems().add(dlControl.getDLModels().get(i).getName()); 
-		//		}
-		//		dlModelBox.prefWidthProperty().bind(vBox.widthProperty());
-		//
-		//		dlModelBox.setOnAction((action)->{
-		//			setClassifierPane(); 
-		//			if (mainPane!=null) {
-		//				if (mainPane.getScene().getWindow() instanceof Stage) {
-		//					Stage stage = (Stage) mainPane.getScene().getWindow();
-		//					stage.sizeToScene();
-		//				}
-		//			}
-		//			//this.dlControl.getAnnotationType().getSymbolModifier(symbolChooser).
-		//		});
-		//
-		//		vBox.getChildren().add(dlModelBox);
-
+		//create pane which shows the classifier settings
 		classifierPane = new PamBorderPane(); 
 
-		vBox.getChildren().addAll(modelSelectPane, classifierPane);
+		//bump this in case no settings
+		segEnableSwitch.setSelected(true);
 
+		vBox.getChildren().addAll(modelSelectPane, classifierPane);
 
 		return vBox; 
 	}
@@ -354,6 +356,20 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		}
 
 		dataSelectorButton.setDisable(!dataSelectorCheckBox.isSelected());
+
+		boolean segEnable = true; //should we enable segmenter controls
+		if (sourcePane.getSource() instanceof PamRawDataBlock) {
+			//if a raw data block then we always enable segmentation no matter what
+			segEnable=true;
+			segEnableSwitch.setVisible(false);
+		}
+		else {
+			segEnable = segEnableSwitch.isSelected();
+			segEnableSwitch.setVisible(true);
+		}
+
+		segmenterGridPane.setDisable(!segEnable);	
+		infoLabel.setDisable(!segEnable);	
 	}
 
 
@@ -380,11 +396,11 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	 * Set the classifier pane. 
 	 */
 	protected void setClassifierPane() {
-		
-		
+
+
 		//set the classifier Pane.class 
 		if (modelSelectPane.currentClassifierModel!=null && modelSelectPane.currentClassifierModel.getModelUI()!=null) {
-			
+
 			classifierPane.setCenter(modelSelectPane.currentClassifierModel.getModelUI().getSettingsPane().getContentNode()); 
 
 			if (modelSelectPane.currentClassifierModel!=null) {
@@ -456,7 +472,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		//		}
 
 		currParams.useDataSelector = dataSelectorCheckBox.isSelected(); 
-		
+
 		if (dlControl.getDataSelector()!=null) {
 			dlControl.getDataSelector().getDialogPaneFX().getParams(true); 
 		}
@@ -470,6 +486,8 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		}
 
 		currParams.modelURI = this.modelSelectPane.currentSelectedFile; 
+
+		currParams.enableSegmentation =	segEnableSwitch.isSelected();
 
 		return currParams;
 	}
@@ -555,9 +573,11 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 		setClassifierPane(); 
 
-		enableControls(); 
-
 		setSegInfoLabel();
+
+		segEnableSwitch.setSelected(currParams.enableSegmentation);
+
+		enableControls(); 
 
 		//		//set up the model and the custom pane if necessary.  
 		this.modelSelectPane.loadNewModel(currParams.modelURI); 

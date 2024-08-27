@@ -620,7 +620,7 @@ public class DetectionsHandler extends CollectionHandler {
 		 * Check the document name isn't already used and increment id as necessary.
 		 */
 		while (true) {
-			fullId = String.format("%s_%d", prefix, uniqueDetectionsId++);
+			fullId = String.format("%s_D_%d", prefix, uniqueDetectionsId++);
 			if (!tethysControl.getDbxmlQueries().documentExists(Collection.Detections.toString(), fullId)) {
 				break;
 			}

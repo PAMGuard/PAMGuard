@@ -7,7 +7,6 @@ import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamController.StorageParameters;
-import export.layoutFX.ExportParams;
 import export.swing.ExportProcessDialog;
 
 /**
@@ -20,10 +19,10 @@ public class ExportOptions implements PamSettings {
 	
 	private static ExportOptions singleInstance;
 	
-	/**
-	 * Parameters for the exporter. 
-	 */
-	private ExportParams storageParameters = new ExportParams();
+//	/**
+//	 * Parameters for the exporter. 
+//	 */
+//	private ExportParams storageParameters = new ExportParams();
 
 	/**
 	 * Swing dialog for exporting data. 
@@ -57,7 +56,7 @@ public class ExportOptions implements PamSettings {
 		if (exportProcessDialog==null) {
 			exportProcessDialog= new ExportProcessDialog(exportManager); 
 		}
-		this.exportProcessDialog.showOfflineDialog(parentFrame, this.storageParameters);
+		this.exportProcessDialog.showOfflineDialog(parentFrame, exportManager.getExportParams());
 		
 //		ExportParams newParams = StorageOptionsDialog.showDialog(parentFrame, storageParameters);
 //		if (newParams != null) {
@@ -73,7 +72,7 @@ public class ExportOptions implements PamSettings {
 	
 	@Override
 	public Serializable getSettingsReference() {
-		return storageParameters;
+		return  exportManager.getExportParams();
 	}
 
 	@Override
@@ -94,20 +93,21 @@ public class ExportOptions implements PamSettings {
 	@Override
 	public boolean restoreSettings(
 			PamControlledUnitSettings pamControlledUnitSettings) {
-		storageParameters = ((ExportParams) pamControlledUnitSettings.getSettings()).clone();
+		ExportParams storageParameters = ((ExportParams) pamControlledUnitSettings.getSettings()).clone();
+		exportManager.setExportParams(storageParameters);
 		return true;
 	}
 
 	
-	public void setStorageParameters(ExportParams storageParameters) {
-		this.storageParameters = storageParameters;
+	public void setExportParameters(ExportParams storageParameters) {
+		exportManager.setExportParams(storageParameters);
 	}
 
 	/**
 	 * Get storage parameters settings. 
 	 * @return the storage paramters settings
 	 */
-	public ExportParams getStorageParameters() {
-		return storageParameters;
+	public ExportParams getExportParameters() {
+		return exportManager.getExportParams();
 	}
 }

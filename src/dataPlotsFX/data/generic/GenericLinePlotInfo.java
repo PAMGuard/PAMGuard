@@ -170,6 +170,8 @@ public abstract class GenericLinePlotInfo extends TDDataInfoFX {
 		}
 		GeneralProjector p = this.getTDGraph().getGraphProjector();
 		PamSymbolChooser sc = symbolManager.getSymbolChooser(getTDGraph().getUniqueName(), p);
+		
+		
 		return new TDManagedSymbolChooserFX(this, sc, TDSymbolChooserFX.DRAW_SYMBOLS);
 	}
 

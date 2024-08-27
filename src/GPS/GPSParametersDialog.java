@@ -183,10 +183,10 @@ public class GPSParametersDialog extends PamDialog {
 		}
 		PamDataBlock gpsSource = sourcePanel.getSource();
 		if (gpsSource == null && isNormal) {
-			return false;
+//			return false;
 		}
 		else if (gpsSource != null) {
-			gpsParameters.nmeaSource = gpsSource.getDataName();
+			gpsParameters.nmeaSource = gpsSource.getLongDataName();
 		}
 		else {
 			gpsParameters.nmeaSource = null;

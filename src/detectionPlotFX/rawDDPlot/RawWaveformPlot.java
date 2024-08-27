@@ -7,7 +7,8 @@ import detectionPlotFX.layout.DetectionPlotDisplay;
 import detectionPlotFX.plots.WaveformPlot;
 
 /**
- * Plot a click waveform. 
+ * Plot for any RawDataHolder to show a waveform.  
+ * 
  * @author Jamie Macaulay
  *
  */
@@ -38,7 +39,7 @@ public class RawWaveformPlot extends WaveformPlot<PamDataUnit>{
 
 	@Override
 	public String getName() {
-		return "Click Waveform";
+		return "Waveform";
 	}
 	
 	@Override

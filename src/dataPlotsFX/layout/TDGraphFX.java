@@ -350,8 +350,8 @@ public class TDGraphFX extends PamBorderPane {
 		setOverlayColour(LIGHT_TD_DISPLAY);
 		
 		
-		//show the left hiding pane byu default. 
-		stackPane.getLeftHidingPane().showHidePane(true);
+//		//show the left hiding pane byu default. 
+//		stackPane.getLeftHidingPane().showHidePane(true);
 	}
 
 	/**
@@ -1699,8 +1699,7 @@ public class TDGraphFX extends PamBorderPane {
 
 	/**
 	 * A bit different to the standard getter in that this only gets called just
-	 * before the configuration is serialized into the .psf. It's time to pull any
-	 * configuration information out about every line drawn on this boomin' thing !
+	 * before the configuration is serialized into the .psfx.
 	 * 
 	 * @return graph parameters ready to serialised.
 	 */
@@ -1733,6 +1732,11 @@ public class TDGraphFX extends PamBorderPane {
 					graphParameters.setScaleInfoData(scaleInfo.getDataTypeInfo(), scaleInfo.getScaleInfoData());
 				}
 			}
+			
+			//Finally save whether the hiding panels are open or not. 
+			graphParameters.showHidePaneLeft = stackPane.getLeftHidingPane().isShowing();
+			graphParameters.showHidePaneRight = stackPane.getRightHidingPane().isShowing();
+
 		}
 
 		return graphParameters;
@@ -1816,6 +1820,11 @@ public class TDGraphFX extends PamBorderPane {
 		tdAxisSelPane.remakePane();
 		tdAxisSelPane.selectAxisType();
 		setAxisName(graphParameters.currentDataType);
+		
+		//Open hide panes if needed. 
+		//Finally save whether the hiding panels are open or not. 
+		stackPane.getLeftHidingPane().showHidePane(graphParameters.showHidePaneLeft);
+		stackPane.getRightHidingPane().showHidePane(graphParameters.showHidePaneRight);
 
 	}
 

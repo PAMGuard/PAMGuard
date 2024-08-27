@@ -1,10 +1,12 @@
 package export;
 
+import java.awt.Component;
 import java.io.File;
 import java.util.List;
 
 
 import PamguardMVC.PamDataUnit;
+import javafx.scene.layout.Pane;
 
 /**
  * Manages the exporting of data units to a particular type of file e.g. CSV, MATLAB, R, WAV files 
@@ -56,6 +58,23 @@ public interface PamDataUnitExporter {
 	 * @return true if we need a new file. 
 	 */
 	public boolean isNeedsNewFile();
+	
+	/**
+	 * An optional panel that displays additional options for the user. 
+	 * @return additional options panel - can be null.
+	 */
+	public Component getOptionsPanel(); 
+
+	/**
+	 * An optional JavaFX pane that displays additional options for the user.
+	 * @return pane with additonal options - can be null. 
+	 */
+	public Pane getOptionsPane();
+
+	/**
+	 * Called whenever a new export run is prepared. 
+	 */
+	public void prepareExport(); 
 
 
 }

@@ -127,7 +127,7 @@ public class ProcessNmeaData extends PamProcess {
 			return false;
 		}
 		
-		newDataBlock = PamController.getInstance().getDataBlock(NMEADataUnit.class, gpsController.gpsParameters.nmeaSource);
+		newDataBlock = PamController.getInstance().getDataBlockByLongName(gpsController.gpsParameters.nmeaSource);
 		if (newDataBlock == null) {
 			newDataBlock = PamController.getInstance().getDataBlock(NMEADataUnit.class, 0);
 		}

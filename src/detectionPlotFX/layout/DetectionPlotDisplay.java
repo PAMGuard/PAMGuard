@@ -226,7 +226,7 @@ public class DetectionPlotDisplay extends PamBorderPane  {
 	 * Called whenever the scroll values change
 	 */
 	void scrollBarChanged() {
-		if (detectionPlotProjector.enableScrollBar) {
+		if (detectionPlotProjector.isEnableScrollBar()) {
 			detectionPlotProjector.setAxisMinMax(scrollBarPane.getCurrentValue(), 
 					scrollBarPane.getCurrentValue()+scrollBarPane.getVisibleAmount(), detectionPlotProjector.getScrollAxis());
 			drawCurrentUnit();
@@ -237,7 +237,7 @@ public class DetectionPlotDisplay extends PamBorderPane  {
 	 * Repaint the scroll bar. 
 	 */
 	private void repainScrollBar() {
-		if (currentDataInfo!=null && detectionPlotProjector.enableScrollBar && lastDetection!=null) {
+		if (currentDataInfo!=null && detectionPlotProjector.isEnableScrollBar() && lastDetection!=null) {
 			currentDataInfo.drawData(scrollBarPane.getDrawCanvas().getGraphicsContext2D(), 
 					new Rectangle(0,0,scrollBarPane.getDrawCanvas().getWidth(),scrollBarPane.getDrawCanvas().getHeight()), 
 					this.detectionPlotProjector, this.lastDetection, DetectionPlot.SCROLLPANE_DRAW);
@@ -355,6 +355,7 @@ public class DetectionPlotDisplay extends PamBorderPane  {
 	 * the current data unit. 
 	 */
 	public void setupScrollBar(PamDataUnit newDataUnit){
+//		System.out.println("SETUP SCROLL BAR:");
 		
 		if (currentDataInfo!=null) {
 			//important we put this here as it allows the plot to set up the scroll bar pane. 
@@ -382,12 +383,18 @@ public class DetectionPlotDisplay extends PamBorderPane  {
 						this.detectionPlotProjector, newDataUnit, DetectionPlot.SCROLLPANE_DRAW);
 			}
 	
-
 		}
 		else {
+			System.out.println("Min scroll limit: " + detectionPlotProjector.getMinScrollLimit() + "max: " + detectionPlotProjector.getMaxScrollLimit());
 			//need this to ensure the axis change when scroll bar is not longer displayed. 
 			detectionPlotProjector.setAxisMinMax(detectionPlotProjector.getMinScrollLimit(), 
 					detectionPlotProjector.getMaxScrollLimit(), detectionPlotProjector.getScrollAxis());
+			
+			//need to setup the axis as it takes it data fom the ploit projector. 
+			if (currentDataInfo!=null) {
+				this.currentDataInfo.setupAxis(detectionPlotProjector, newDataUnit); 
+			}
+			
 			this.setTop(null);
 		}
 	}
@@ -411,27 +418,32 @@ public class DetectionPlotDisplay extends PamBorderPane  {
 	 *Draw the data unit.  
 	 */
 	private void drawDataUnit(PamDataUnit newDataUnit) {
-		//Debug.out.println("DetectionPlotDisplay DrawDataUnit: " +newDataUnit);
-		if (currentDataInfo!=null){
-			
-			//sometimes the axis just need a little push to make sure the pane and axis object bindings have been updated
-			for (int i=0; i<Side.values().length; i++) {
-				dDPlotPane.getAxisPane(Side.values()[i]).layout(); 
-				
-			}
-			
-//			System.out.println("Axis Width: " + dDPlotPane.getAxisPane(Side.BOTTOM).getWidth() + " canvas width " + dDPlotPane.getPlotCanvas().getWidth());
 
-			
-			currentDataInfo.drawData(dDPlotPane.getPlotCanvas().getGraphicsContext2D(), 
-					new Rectangle(0,0,dDPlotPane.getPlotCanvas().getWidth(),dDPlotPane.getPlotCanvas().getHeight()), 
-					this.detectionPlotProjector, newDataUnit);
-		}
+		//Debug.out.println("DetectionPlotDisplay DrawDataUnit: " +newDataUnit);
 		if (reDrawScroll) {
 			 setupScrollBar(newDataUnit);
 			 reDrawScroll=false; 
 		}
 		
+		if (currentDataInfo!=null){
+			
+			//sometimes the axis just need a little push to make sure the pane and axis object bindings have been updated
+			for (int i=0; i<Side.values().length; i++) {
+				dDPlotPane.getAxisPane(Side.values()[i]).layout(); 
+			}
+			
+			
+			currentDataInfo.drawData(dDPlotPane.getPlotCanvas().getGraphicsContext2D(), 
+					new Rectangle(0,0,dDPlotPane.getPlotCanvas().getWidth(),dDPlotPane.getPlotCanvas().getHeight()), 
+					this.detectionPlotProjector, newDataUnit);
+		}
+		
+//		//Debug.out.println("DetectionPlotDisplay DrawDataUnit: " +newDataUnit);
+//		if (reDrawScroll) {
+//			 setupScrollBar(newDataUnit);
+//			 reDrawScroll=false; 
+//		}
+//		
 		//dDPlotPane.repaintAxis(); 
 	}
 

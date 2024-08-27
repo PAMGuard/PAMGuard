@@ -388,7 +388,7 @@ PamguardBeta_ViewerMode.exe):</p>
 <h1><a name="_LATEST_VERSION_2.02.03"></a><a name="_VERSION_2.02.07_January"></a><a
 name="_Latest_Version_2.02.10"></a><em><span style='font-size:12.0pt;
 font-family:"Cambria",serif;font-style:normal'><a href="#_Version_2.02.11_April">Latest
-Version 2.02.12 August 2024</a></span></em></h1>
+Version 2.02.13 August 2024</a></span></em></h1>
 
 <h1><em><span style='font-size:12.0pt;font-family:"Cambria",serif;font-style:
 normal'><a href="#_Version_2.02.10_January">Version 2.02.10 January 2024</a></span></em></h1>
@@ -465,7 +465,7 @@ Version 2.00.10 June 2017</a></span></h1>
 name="_Latest_Version_2.02.05"></a><a name="_Latest_Version_2.02.06"></a><a
 name="_Latest_Version_2.02.07"></a><a name="_Latest_Version_2.02.08"></a><a
 name="_Version_2.02.09_June"></a><a name="_Version_2.02.10_January"></a><a
-name="_Version_2.02.11_April"></a>Version 2.02.12 August 2024</h1>
+name="_Version_2.02.11_April"></a>Version 2.02.13 August 2024</h1>
 
 <p class=MsoNormal>&nbsp;</p>
 
@@ -486,15 +486,20 @@ information.</p>
 <p class=MsoNormal>‘Effort’ management system. New map options allow colouring
 of track line by ‘effort’ from various other modules. This is currently the
 acquisition system (so the track will change colour when PAMGuard is running),
-the binary store system (likely the same as the acquisition) or data from Logger
-forms. This system will be extended to other modules in the near future. </p>
+the binary store system (likely the same as the acquisition) or data from
+Logger forms. This system will be extended to other modules in the near future.
+</p>
+
+<p class=MsoNormal>Added a new exporter which allows users to export data to .mat
+(MATLAB, Python), .RData (open in R) or .wav files (open in Sonic Visualiser,
+Audacity etc.)</p>
 
 <h2>Tethys Database</h2>
 
 <p class=MsoNormal>Many users will be aware that we’re integrating an interface
-to the <a href="https://tethys.sdsu.edu/">Tethys Database</a> into PAMGuard. Some
-basic features are available for testing. If interested, please contact the
-PAMGuard support team. </p>
+to the <a href="https://tethys.sdsu.edu/">Tethys Database</a> into PAMGuard.
+Some basic features are available for testing. If interested, please contact
+the PAMGuard support team. </p>
 
 <h2>Bug Fixes</h2>
 
@@ -588,11 +593,11 @@ and stop PamObserver Timer to</span></p>
 
 <p class=MsoNormal><span lang=EN-US>force release</span></p>
 
-<p class=MsoNormal><span lang=EN-US>Fix problem tracing whistles in Rocca
-spectrogram pop-up: Whistle and raw data were being cleared before the user had
-time to trace out the whistle, causing PAMGuard to throw an exception.&nbsp;
-Both were already being cleared when the pop-up window is closed, so no need to
-do it here.</span></p>
+<p class=MsoNormal><span lang=EN-US>Fix problem tracing whistles in Rocca spectrogram
+pop-up: Whistle and raw data were being cleared before the user had time to
+trace out the whistle, causing PAMGuard to throw an exception.&nbsp; Both were
+already being cleared when the pop-up window is closed, so no need to do it
+here.</span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>DIFAR Module</span></b><span lang=EN-US>:
 Bug crashing the module with null pointer errors fixed.</span></p>
@@ -673,8 +678,8 @@ the first two characters of the string name may be. </span></p>
 data for static hydrophones had a bug whereby it would continually ‘forget’
 angle offsets applied to static hydrophones in viewer mode. This is now fixed. </span></p>
 
-<p class=MsoNormal><span lang=EN-US>Click tool bar: Correctly shows event
-selection options even if no species classification options are in place. </span></p>
+<p class=MsoNormal><span lang=EN-US>Click tool bar: Correctly shows event selection
+options even if no species classification options are in place. </span></p>
 
 <p class=MsoNormal><span lang=EN-US>Fixed Landmarks: Earlier versions were
 ‘losing’ these every time PAMGuard started or new data were loaded in viewer
@@ -694,10 +699,10 @@ processing.</span></p>
 
 <h2><span lang=EN-US>New Features</span></h2>
 
-<p class=MsoNormal><span lang=EN-US>New sound type for simulated sounds which
-generates random chirps between around 200 and 800Hz, roughly the frequency
-you’d expect sound from higher frequency baleen whales, such as humpbacks, to
-vocalise at. &nbsp;&nbsp;</span></p>
+<p class=MsoNormal><span lang=EN-US>New sound type for simulated sounds which generates
+random chirps between around 200 and 800Hz, roughly the frequency you’d expect
+sound from higher frequency baleen whales, such as humpbacks, to vocalise at.
+&nbsp;&nbsp;</span></p>
 
 <p class=MsoNormal><span lang=EN-US>Hiding tool tips. A menu item to
 permanently turn off all tool tips, or tap the ‘Esc’ key to turn them off for 6
@@ -934,8 +939,8 @@ data units and then moves mouse over display area </p>
 <p class=MsoNormal><b><span lang=EN-US>Upgrades</span></b></p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>1. </span><span
-lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-Added SIDE module for detector/operator analytics </p>
+lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
+lang=EN-US> </span>Added SIDE module for detector/operator analytics </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -1035,10 +1040,11 @@ help</a>. </p>
 <h1><a name="_Latest_Beta_Version_2.01.05"></a><span lang=EN-US>Latest Version
 2.01.05 October 2020</span></h1>
 
-<p class=MsoNormal><b>If you are upgrading from a PAMGuard core release (1.15.xx),
-PAMGuard Version 2 contains major updates. You should read and understand the
-notes listed for <a href="#_Latest_Beta_Version_2.00.10">Beta Version 2.00.10</a>
-before proceeding with installation and use of this version.</b></p>
+<p class=MsoNormal><b>If you are upgrading from a PAMGuard core release
+(1.15.xx), PAMGuard Version 2 contains major updates. You should read and
+understand the notes listed for <a href="#_Latest_Beta_Version_2.00.10">Beta
+Version 2.00.10</a> before proceeding with installation and use of this
+version.</b></p>
 
 <p class=MsoNormal>This version of PAMGuard has been bundled with Java 13
 (release 13.0.1). PSFX files generated in previous beta releases (2.xx.xx)

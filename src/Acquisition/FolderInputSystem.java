@@ -933,6 +933,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 
 	@Override
 	public InputStoreInfo getStoreInfo(boolean detail) {
+		System.out.println("FolderInputSystem: Get store info start:"); 
 		if (allFiles == null || allFiles.size() == 0) {
 			return null;
 		}
@@ -967,6 +968,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			storeInfo.setFileStartTimes(allFileStarts);
 			storeInfo.setFileEndTimes(allFileEnds);
 		}
+		System.out.println("FolderInputSystem: Get store info complete:"); 
 		return storeInfo;
 	}
 

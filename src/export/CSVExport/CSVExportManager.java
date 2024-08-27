@@ -1,10 +1,12 @@
 package export.CSVExport;
 
+import java.awt.Component;
 import java.io.File;
 import java.util.List;
 
 import PamguardMVC.PamDataUnit;
 import export.PamDataUnitExporter;
+import javafx.scene.layout.Pane;
 
 
 /**
@@ -48,6 +50,24 @@ public class CSVExportManager implements PamDataUnitExporter{
 	@Override
 	public boolean isNeedsNewFile() {
 		return false;
+	}
+
+	@Override
+	public Component getOptionsPanel() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Pane getOptionsPane() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	
+	@Override
+	public void prepareExport() {
+		
 	}
 
 }

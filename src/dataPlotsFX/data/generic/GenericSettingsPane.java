@@ -16,9 +16,7 @@ import pamViewFX.symbol.StandardSymbolOptionsPane;
 
 
 /**
- * Settings pane which holds the symbol options from the data block of the plot info. 
- * @author Jamie Macaulay
- *
+ * Settings pane which holds the symbol options from the data block of the plot info.  *
  *
  * @author Jamie Macaulay 
  *
@@ -159,6 +157,16 @@ public class GenericSettingsPane extends PamBorderPane implements TDSettingsPane
 	@Override
 	public Pane getPane() {
 		return this;
+	}
+
+	/**
+	 * Set the default fill opacity. 
+	 * @param opacity - the default fill opacity. 
+	 */
+	public void setDefaultFillOpacity(double opacity) {
+		if (symbolOptionsPane instanceof StandardSymbolOptionsPane) {
+			((StandardSymbolOptionsPane) symbolOptionsPane).getDefaultSymbolPane().setDefaultFillOpacity(opacity);
+		}
 	}
 
 }

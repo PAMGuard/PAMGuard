@@ -382,6 +382,7 @@ public class DelphinIDUtils {
 		//		String modelPath = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/testencounter415/whistle_model_2/whistle_4s_415.zip";
 		String modelPath = "D:/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/testencounter415/whistle_model_2/whistle_4s_415.zip";
 
+		//line widths in pixels
 		double[] lineWidths = new double[] {6, 7, 10, 15, 20};
 
 		for (double lineWidth:lineWidths) {

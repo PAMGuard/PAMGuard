@@ -6,6 +6,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.jamdev.jdl4pam.genericmodel.GenericModel;
 import org.jamdev.jdl4pam.transforms.DLTransform;
 import org.jamdev.jdl4pam.transforms.FreqTransform;
+import org.jamdev.jpamutils.JamArr;
 
 import PamModel.PamModel;
 import PamModel.PamModel.PluginClassloader;
@@ -42,10 +43,12 @@ public class GenericModelWorker extends DLModelWorker<StandardPrediction> {
 			//run a model if it is waveform info. 
 			float[][] waveStack = new float[transformedDataStack.length][]; 
 			for (int i=0; i<waveStack.length; i++) {
-				waveStack[i] = transformedDataStack[i][0]; 
+//				waveStack[i] = PamArrayUtils.double2Float(JamArr.product(PamArrayUtils.float2Double(transformedDataStack[i][0]), 0.99));
+				waveStack[i] = transformedDataStack[i][0];
 			}
 			
-			//System.out.println("RUN GENERIC MODEL WAVE: " + waveStack.length +  "  " + waveStack[0].length +  " " + waveStack[0][0]);
+//			System.out.println("RUN GENERIC MODEL WAVE: " + waveStack.length +  "  " + waveStack[0].length +  " " + waveStack[0][0]);
+//			PamArrayUtils.printArray(waveStack[0]);
 			results =  getModel().runModel(waveStack);
 		}
 //		System.out.println("GENERIC MODEL RESULTS: " + (results== null ? null : results.length));
@@ -117,7 +120,7 @@ public class GenericModelWorker extends DLModelWorker<StandardPrediction> {
 			
 			((GenericModelParams) genericParams).defaultShape = longArr2Long(genericModel.getInputShape().getShape()); 
 			((GenericModelParams) genericParams).defualtOuput = longArr2Long(genericModel.getOutShape().getShape()); 
-			
+					
 
 		}
 		catch (Exception e) {
