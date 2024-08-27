@@ -5,6 +5,9 @@ import dataGram.DatagramScaleInformation;
 import dataGram.DatagramSettings;
 import dataMap.DataMapControl;
 import dataMap.DataMapParameters;
+
+import org.controlsfx.control.CheckComboBox;
+
 import PamController.PamController;
 import PamUtils.PamCalendar;
 import binaryFileStorage.BinaryStore;
@@ -26,6 +29,7 @@ import javafx.scene.layout.Priority;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamGridPane;
+import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.comboBox.ColorComboBox;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
@@ -109,7 +113,13 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 
 	private DataGramColPane dataGramColPane;
 
-	private PamBorderPane mainPain; 
+	private PamBorderPane mainPain;
+
+	private Label colourLabel;
+
+	private Pane dataMpaChoicePane;
+
+	private CheckComboBox<String> dataMapCheckComboBox; 
 
 
 
@@ -128,8 +138,13 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 		//add the scale 
 		holder=new PamVBox(); 
 		holder.setSpacing(5);
+		
+		Label dataLabel = new Label("Show data maps");
+		PamGuiManagerFX.titleFont2style(dataLabel);
+		holder.getChildren().addAll(dataLabel, dataMpaChoicePane = createDataMapPane());
+		updateDataMapChoiceBox();
 
-		Label scaleLabel = new Label("Data Scale");
+		Label scaleLabel = new Label("Data scale");
 		PamGuiManagerFX.titleFont2style(scaleLabel);
 		holder.getChildren().add(scaleLabel);
 		holder.getChildren().add(scaleSettingsPane = createScalePane());
@@ -147,6 +162,27 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 
 	}
 
+	/**
+	 * Create the data mmpa choice pane. 
+	 * @return
+	 */
+	private Pane createDataMapPane() {
+		
+		dataMapCheckComboBox = new 	CheckComboBox<String>(); 
+		
+		PamHBox hBox = new PamHBox(); 
+		hBox.setSpacing(5.);
+		hBox.getChildren().addAll(dataMapCheckComboBox);
+		
+		return hBox;
+	}
+
+	private void updateDataMapChoiceBox() {
+		dataMapCheckComboBox.getItems().clear();
+		for (int i=0; i<this.dataMapPane.getNumDataStreamPanes(); i++) {
+			dataMapCheckComboBox.getItems().add(dataMapPane.getDataStreamPane(i).getDataName().getName()); 
+			}
+	}
 	/**
 	 * Adds a settings pane for the data gram if a binary store is present. 
 	 */
@@ -235,6 +271,7 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 
 		dataGramBox.setOnAction((action)->{
 			dataGramColPane.setDataStreamPanel(dataMapPane.getDataStreamPane(dataGramBox.getSelectionModel().getSelectedIndex()));
+			colourLabel.setText(String.format("Colours for %s " , dataMapPane.getDataStreamPane(dataGramBox.getSelectionModel().getSelectedIndex()).getDataName().getName())); 
 		});
 
 		//holds settings for the datagram
@@ -243,18 +280,26 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 		PamGridPane holder = new PamGridPane(); 
 		holder.setHgap(5);
 		holder.setVgap(5);
-		//holder.setGridLinesVisible(true);
+		
+//		holder.setGridLinesVisible(true);
 
 		int row = 0;
 		
 		holder.add(dataGramLabel, 0,row);
 		holder.add(datagramBinsBox, 1, row);
+		GridPane.setColumnSpan(datagramBinsBox, 2);
 		
 		row++;
 		
 		holder.add(new Label("Select datagram"), 0, row);
 		holder.add(dataGramBox, 1, row);
+		GridPane.setColumnSpan(dataGramBox, 2);
+
+		row++;
 		
+		holder.add(colourLabel = new Label("Colour for"), 0, row);
+		GridPane.setColumnSpan(colourLabel, 3);
+
 		row++;
 		
 		GridPane.setHgrow(dataGramColPane, Priority.ALWAYS);
@@ -263,17 +308,23 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 		//dunno why this always had to be set after the child has been added to work. 
 		GridPane.setColumnSpan(dataGramColPane, 3);
 		
-		//hack to make sure the third column of the gris expands to fit the pane
+		//hack to make sure the third column of the grid expands to fit the pane
         ColumnConstraints rightCol = new ColumnConstraints();
         rightCol.setHgrow(Priority.ALWAYS);
-        holder.getColumnConstraints().addAll(new ColumnConstraints(),  new ColumnConstraints(), rightCol);
+        
+        holder.getColumnConstraints().addAll(new ColumnConstraints(150),  new ColumnConstraints(150), rightCol);
+        
+        dataGramColPane.setDataStreamPanel(dataMapPane.getDataStreamPane(0));
+		colourLabel.setText(String.format("Colours for %s " , dataMapPane.getDataStreamPane(0))); 
 
 		return holder; 
-
 	}
 	
+	
+	
 	private void updateDataStreamBox() {
-		System.out.println("UPDATE DATA STREAM BOX: " + this.dataMapPane.getNumDataStreamPanes());
+		dataGramBox.getItems().clear();
+//		System.out.println("UPDATE DATA STREAM BOX: " + this.dataMapPane.getNumDataStreamPanes());
 		for (int i=0; i<this.dataMapPane.getNumDataStreamPanes(); i++) {
 			if (dataMapPane.getDataStreamPane(i).getScaleType() == DatagramScaleInformation.PLOT_3D) {
 				dataGramBox.getItems().add(dataMapPane.getDataStreamPane(i).getDataName().getName()); 
@@ -295,8 +346,6 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 		private Label ampLabel;
 
 		private ColorComboBox colorBox;
-
-		private ColourArrayType colorArray = ColourArrayType.HSV; 
 		
 		private DataStreamPaneFX dataStreamPane; 
 
@@ -315,8 +364,12 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 			colorBox=new ColorComboBox(ColorComboBox.COLOUR_ARRAY_BOX);
 			colorBox.setPrefWidth(80);
 			
+			colourSlider.lowValueProperty().addListener((obsVal, oldVal, newVal)->{
+				setColours();
+			});
+			
 			colourSlider.highValueProperty().addListener((obsVal, oldVal, newVal)->{
-				
+				setColours();
 			});
 
 			//Change the colour of the colour slider when combo box is changed. 
@@ -328,8 +381,6 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 			});
 			
 
-			colorBox.setValue(ColourArray.getName(getColourArrayType()));
-
 			//need to set up alignment properly. //FIXME- a bit messy 
 			BorderPane.setAlignment(colorBox, Pos.CENTER);
 			//sliderPane.setPadding(new Insets(10,0,0,0));
@@ -339,15 +390,19 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 			this.setRight(colorBox);
 		
 			//set up so the correct color
-			colorBox.setValue(ColourArray.getName(getColourArrayType()));
-			colourSlider.setColourArrayType(getColourArrayType()); 
+			colorBox.setValue(ColourArrayType.HSV);
+			colourSlider.setColourArrayType(ColourArrayType.HSV);
 
 		}
 
 
 		public void setDataStreamPanel(DataStreamPaneFX selectedItem) {
 			this.dataStreamPane=selectedItem;
-			//TODO - set the colours here. 
+			
+			if (dataStreamPane==null) return;
+
+			colorBox.setValue(dataStreamPane.getColourMapArray()); 
+			
 			
 		}
 
@@ -356,18 +411,17 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 		 * Set colours depending on current colour selection in combo box. 
 		 */
 		private void setColours(){
-			this.setColourArrayType(ColourArray.getColourArrayType(colorBox.getValue()));
-			colourSlider.setColourArrayType(getColourArrayType());
-		}
-		
-	
-		public ColourArrayType getColourArrayType() {
-			return colorArray;
+			
+			ColourArrayType colourArrayType = ColourArray.getColourArrayType(colorBox.getValue());
+			
+			colourSlider.setColourArrayType(colourArrayType);
+			
+			if (dataStreamPane==null) return;
+			
+			dataStreamPane.setColourArrayType(colourArrayType); 
+			dataStreamPane.setMinMaxColour(Math.max(colourSlider.getLowValue()/10., 0.01), colourSlider.getHighValue()/10.); 
 		}
 
-		public void setColourArrayType(ColourArrayType colourArrayType) {
-			this.colorArray = colourArrayType; 
-		}
 
 
 	}
@@ -413,6 +467,9 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 		scaleBox.getItems().add("per Minute");
 		scaleBox.getItems().add("per Hour");
 		scaleBox.getItems().add("per Day");
+		GridPane.setColumnSpan(scaleBox, 2);
+
+		Label showDetLabel  = new Label("Show detections ");
 		
 		controlPane.add(new Label("Show detections "),0,0);
 		controlPane.add(scaleBox,1,0);
@@ -427,10 +484,12 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 		logScaleToggle.selectedProperty().addListener((obsVal, oldVal, newVal)->{
 			dataMapPane.scaleChanged();
 		});
-
+		
+	    ColumnConstraints rightCol = new ColumnConstraints();
+        rightCol.setHgrow(Priority.ALWAYS);
+        controlPane.getColumnConstraints().addAll(new ColumnConstraints(150),  new ColumnConstraints(150), rightCol);
 
 		controlPane.add(logScaleToggle,0,1);
-
 
 		return controlPane;
 	}
@@ -454,6 +513,9 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 			
 		//make sure the combo box has correct datastreams
 		updateDataStreamBox();
+		
+		//make sure combo box for datamaps  is sorted
+		updateDataMapChoiceBox();
 		
 		setting = false;
 	}

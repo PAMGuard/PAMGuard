@@ -58,7 +58,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	private ArrayList<DataStreamPaneFX> dataStreamPanels = new ArrayList<DataStreamPaneFX>();
 
 	/**
-	 * Split pane whihc holds different graphs. 
+	 * Split pane which holds different graphs. 
 	 */
 	private PamVBox dataPanePanes;
 

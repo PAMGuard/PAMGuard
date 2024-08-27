@@ -36,6 +36,7 @@ import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.pamAxis.PamAxisFX;
 import pamViewFX.fxNodes.pamAxis.PamAxisPane;
 import pamViewFX.fxNodes.utilsFX.ColourArray;
+import pamViewFX.fxNodes.utilsFX.ColourArray.ColourArrayType;
 
 public class DataStreamPaneFX extends PamBorderPane {
 	
@@ -122,6 +123,8 @@ public class DataStreamPaneFX extends PamBorderPane {
 	private Timeline timeline;
 
 	private PamButton showButton;
+
+	private ColourArrayType colourArrayType = ColourArrayType.HOT;
 
 	/**
 	 * Constructor for the data stream pane. 
@@ -271,6 +274,8 @@ public class DataStreamPaneFX extends PamBorderPane {
 		private int totalWheelRotation;
 
 		private long lastTime;
+
+		public double[] dataGramColourLims = new double[] {0.1,1.};
 
 
 		private DataGraphFX() {
@@ -615,7 +620,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 			double[][] imageData = datagramImageData.imageData;
 
 			if (datagramColours == null) {
-				datagramColours = ColourArray.createHotArray(NCOLOURPOINTS);
+				datagramColours = ColourArray.createStandardColourArray(NCOLOURPOINTS, colourArrayType);
 			}
 			int nXPoints = imageData.length;
 			int nYPoints = imageData[0].length;
@@ -628,9 +633,12 @@ public class DataStreamPaneFX extends PamBorderPane {
 				return;
 			}
 			
-			minMaxValue[1] *= wheelScrollFactor;
+			minMaxValue[0] *= dataGramColourLims[0];
+			minMaxValue[1] *= dataGramColourLims[1];
+			
 			minMaxValue[0] = Math.log(minMaxValue[0]);
 			minMaxValue[1] = Math.log(minMaxValue[1]);
+			
 			/* 
 			 * now fudge the scale a little since black is zero and we want 
 			 * anything > 0 to be significantly away from black.
@@ -1126,6 +1134,26 @@ public class DataStreamPaneFX extends PamBorderPane {
 	 */
 	public boolean isCollapsed() {
 		return collapsed;
+	}
+
+	
+	/**
+	 * Set the colour array for the data stream panel. 
+	 * @param colourArrayType
+	 */
+	public void setColourArrayType(ColourArrayType colourArrayType) {
+		this.colourArrayType=colourArrayType;
+		dataGraph.datagramColours=null; //to force a recalc of colours
+		this.repaint(0);
+	}
+
+	public ColourArrayType getColourMapArray() {
+		return colourArrayType;
+	}
+
+	public void setMinMaxColour(double lowValue, double highValue) {
+		dataGraph.dataGramColourLims = new double[] {lowValue, highValue}; 
+		this.repaint(0);
 	}
 
 
