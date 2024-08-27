@@ -1,16 +1,13 @@
 package noiseOneBand;
 
-import java.io.File;
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.util.Arrays;
 
 import Filters.FilterParams;
-import Filters.FilterType;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
-import PamModel.parametermanager.PrivatePamParameterData;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
+import PamModel.parametermanager.PrivatePamParameterData;
 
 public class OneBandParameters implements Serializable, Cloneable, ManagedParameters {
 

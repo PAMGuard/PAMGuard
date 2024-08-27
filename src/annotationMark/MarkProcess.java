@@ -1,10 +1,7 @@
 package annotationMark;
 
-import PamController.PamControlledUnit;
 import PamView.symbol.StandardSymbolManager;
-import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
-import annotationMark.fx.MarkDataPlotInfo;
 import annotationMark.fx.MarkPlotProviderFX;
 import dataPlotsFX.data.TDDataProviderRegisterFX;
 import dataPlotsFX.data.generic.GenericDataPlotProvider;

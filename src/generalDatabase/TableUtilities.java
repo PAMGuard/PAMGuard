@@ -91,7 +91,7 @@ public class TableUtilities {
 		}
 		
 		if (tableItem.isPrimaryKey()) {
-			String primaryString = "ALTER TABLE "+tableDef.getTableName()+" ADD PRIMARY KEY ( " + tableItem.getName() + " )";;
+			String primaryString = "ALTER TABLE "+tableDef.getTableName()+" ADD PRIMARY KEY ( " + tableItem.getName() + " )";
 		
 			try {
 				stmt = con.createStatement();   

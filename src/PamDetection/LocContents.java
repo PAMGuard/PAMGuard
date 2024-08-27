@@ -134,6 +134,7 @@ public class LocContents implements LocalisationInfo {
 	 * 
 	 * @param locContents a set of flags specifying which data are available within this localisation object.
 	 */
+	@Override
 	public void setLocContent(int locContents) {
 		this.locContents = locContents;
 	}
@@ -142,6 +143,7 @@ public class LocContents implements LocalisationInfo {
 	 * The integer specifying which flags are present in the loclaisation. 
 	 * @return bitmap of localisation contents. 
 	 */
+	@Override
 	public int getLocContent( ) {
 		return locContents;
 	}
@@ -150,6 +152,7 @@ public class LocContents implements LocalisationInfo {
 	 * 
 	 * @param flagsToAdd localisation flags to add to existing flags. 
 	 */
+	@Override
 	public void addLocContent(int flagsToAdd) {
 		locContents |= flagsToAdd;
 	}
@@ -159,6 +162,7 @@ public class LocContents implements LocalisationInfo {
 	 * @param flagsToRemove bitmap of localisation flags to remove. 
 	 * @return new or remaining localisation content flags. 
 	 */
+	@Override
 	public int removeLocContent(int flagsToRemove) {
 		locContents &= (~flagsToRemove);
 		return locContents;
@@ -169,6 +173,7 @@ public class LocContents implements LocalisationInfo {
 	 * @param requiredContent specified content
 	 * @return true if specified content exists, false otherwise. 
 	 */
+	@Override
 	public boolean hasLocContent(int requiredContent) {
 		return ((requiredContent & locContents) >= requiredContent);
 	}

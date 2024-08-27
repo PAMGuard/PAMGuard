@@ -2,7 +2,6 @@ package videoRangePanel;
 
 import java.sql.Types;
 
-import PamUtils.PamCalendar;
 import PamguardMVC.PamDataUnit;
 import generalDatabase.PamTableDefinition;
 import generalDatabase.PamTableItem;

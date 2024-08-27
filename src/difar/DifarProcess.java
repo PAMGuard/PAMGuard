@@ -1,7 +1,5 @@
 package difar;
 
-import generalDatabase.lookupTables.LookupItem;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -12,23 +10,6 @@ import java.util.ListIterator;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
 
-import targetMotionModule.TargetMotionResult;
-import targetMotionModule.algorithms.Simplex2D;
-import warnings.PamWarning;
-import warnings.WarningSystem;
-import difar.DifarParameters.DifarOutputTypes;
-import difar.DifarParameters.DifarTriggerParams;
-import difar.DifarParameters.SpeciesParams;
-import difar.calibration.CalibrationDataBlock;
-import difar.calibration.CalibrationHistogram;
-import difar.calibration.CalibrationLogging;
-import difar.calibration.CalibrationProcess;
-import difar.demux.DifarDemux;
-import difar.demux.DifarResult;
-import difar.demux.AmmcDemux;
-import difar.demux.NativeDemux;
-import difar.display.DIFARUnitControlPanel;
-import difar.display.DifarOverlayGraphics;
 import Acquisition.AcquisitionProcess;
 import Array.ArrayManager;
 import Array.PamArray;
@@ -36,35 +17,45 @@ import Array.Streamer;
 import Array.streamerOrigin.OriginSettings;
 import Array.streamerOrigin.StaticOriginSettings;
 import Filters.FIRArbitraryFilter;
-import Filters.FilterParams;
-import Filters.FilterType;
 import GPS.GPSControl;
 import GPS.GpsData;
 import GPS.GpsDataUnit;
 import PamController.PamController;
-import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
-import PamDetection.RawDataUnit;
 import PamDetection.PamDetection;
+import PamDetection.RawDataUnit;
 import PamUtils.LatLong;
 import PamUtils.MatrixOps;
 import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamView.symbol.StandardSymbolManager;
-import PamguardMVC.AcousticDataUnit;
 import PamguardMVC.PamConstants;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
-import PamguardMVC.PamObserver;
 import PamguardMVC.PamObserverAdapter;
 import PamguardMVC.PamProcess;
 import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.RawDataUnavailableException;
 import Spectrogram.WindowFunction;
-import annotation.calcs.snr.SNRAnnotationType;
-import annotation.calcs.spl.SPLAnnotationType;
-import annotation.handler.AnnotationHandler;
+import difar.DifarParameters.DifarOutputTypes;
+import difar.DifarParameters.DifarTriggerParams;
+import difar.DifarParameters.SpeciesParams;
+import difar.calibration.CalibrationDataBlock;
+import difar.calibration.CalibrationHistogram;
+import difar.calibration.CalibrationLogging;
+import difar.calibration.CalibrationProcess;
+import difar.demux.AmmcDemux;
+import difar.demux.DifarDemux;
+import difar.demux.DifarResult;
+import difar.demux.NativeDemux;
+import difar.display.DIFARUnitControlPanel;
+import difar.display.DifarOverlayGraphics;
+import generalDatabase.lookupTables.LookupItem;
+import targetMotionModule.TargetMotionResult;
+import targetMotionModule.algorithms.Simplex2D;
+import warnings.PamWarning;
+import warnings.WarningSystem;
 
 public class DifarProcess extends PamProcess {
 
@@ -1044,7 +1035,7 @@ public class DifarProcess extends PamProcess {
 		int numTriggers = 0;
 		for (int i = 0; i < acousticDataBlocks.size(); i++) {
 			PamDataBlock aDataBlock = acousticDataBlocks.get(i);
-			if (aDataBlock.isCanClipGenerate() == true) numTriggers++;
+			if (aDataBlock.isCanClipGenerate()) numTriggers++;
 		}
 		return numTriggers;
 	}
@@ -1403,7 +1394,7 @@ public class DifarProcess extends PamProcess {
 				if (otherUnit.getChannelBitmap() != 1<<aChan) {
 					continue;
 				}
-				if (isSameSpecies(difarDataUnit, otherUnit) == false) {
+				if (!isSameSpecies(difarDataUnit, otherUnit)) {
 					continue;
 				}
 				thatStart = otherUnit.getTimeMilliseconds();

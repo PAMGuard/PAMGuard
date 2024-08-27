@@ -21,23 +21,11 @@
 
 package clickDetector;
 
-import networkTransfer.receive.BuoyStatusDataUnit;
-import clickDetector.ClickClassifiers.ClickIdInformation;
-import clickDetector.ClickClassifiers.ClickIdentifier;
-import clickDetector.echoDetection.EchoDetectionSystem;
-import clickDetector.echoDetection.EchoDetector;
-import clickDetector.offlineFuncs.ClickBearingTask;
-import clickDetector.offlineFuncs.ClickDelayTask;
-import clickDetector.offlineFuncs.OfflineEventDataBlock;
-import clickDetector.offlineFuncs.OfflineEventLogging;
-import clickDetector.tdPlots.ClickDetSymbolManager;
-import clickDetector.tdPlots.ClickEventSymbolManager;
-import signal.Hilbert;
-import targetMotionOld.TargetMotionLocaliser;
-import targetMotionOld.TargetMotionSQLLogging;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionProcess;
-import Acquisition.FileInputSystem;
 import Filters.Filter;
 import Filters.FilterMethod;
 import Filters.FilterType;
@@ -64,24 +52,33 @@ import PamguardMVC.PamConstants;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
-import PamguardMVC.PamObserver;
 import PamguardMVC.PamObserverAdapter;
 import PamguardMVC.PamProcess;
 import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.RawDataUnavailableException;
-import PamguardMVC.debug.Debug;
+import clickDetector.ClickClassifiers.ClickIdInformation;
+import clickDetector.ClickClassifiers.ClickIdentifier;
 import clickDetector.ClickClassifiers.ClickTypeCommonParams;
 import clickDetector.ClickClassifiers.annotation.ClickClassificationType;
 import clickDetector.ClickClassifiers.annotation.ClickClassifierAnnotation;
 import clickDetector.background.ClickBackgroundDataUnit;
 import clickDetector.background.ClickBackgroundManager;
 import clickDetector.basicalgorithm.TriggerBackgroundHandler;
+import clickDetector.echoDetection.EchoDetectionSystem;
+import clickDetector.echoDetection.EchoDetector;
+import clickDetector.offlineFuncs.ClickBearingTask;
+import clickDetector.offlineFuncs.ClickDelayTask;
+import clickDetector.offlineFuncs.OfflineEventDataBlock;
+import clickDetector.offlineFuncs.OfflineEventLogging;
+import clickDetector.tdPlots.ClickDetSymbolManager;
+import clickDetector.tdPlots.ClickEventSymbolManager;
 import fftFilter.FFTFilter;
 import fftFilter.FFTFilterParams;
 import fftManager.FastFFT;
-
-import java.util.ArrayList;
-import java.util.Arrays;
+import networkTransfer.receive.BuoyStatusDataUnit;
+import signal.Hilbert;
+import targetMotionOld.TargetMotionLocaliser;
+import targetMotionOld.TargetMotionSQLLogging;
 
 /**
  * Main click detector process.
@@ -97,7 +94,7 @@ public class ClickDetector extends PamProcess {
 
 	enum ClickStatus {
 		CLICK_ON, CLICK_ENDING, CLICK_OFF
-	};
+	}
 
 	private ClickDetector THIS;
 
@@ -276,14 +273,14 @@ public class ClickDetector extends PamProcess {
 		clickControl.clickParameters.publishTriggerFunction = true;
 
 		triggerFunctionDataBlock.setChannelMap(clickControl.clickParameters.getChannelBitmap());
-		if (clickControl.clickParameters.publishTriggerFunction && isViewer == false) {
+		if (clickControl.clickParameters.publishTriggerFunction && !isViewer) {
 			addOutputDataBlock(triggerFunctionDataBlock);
 		} else {
 			removeOutputDatablock(triggerFunctionDataBlock);
 		}
 		trackedClicks = new TrackedClickDataBlock(clickControl, this, 0);
 		trackedClicks.setChannelMap(clickControl.clickParameters.getChannelBitmap());
-		if (isViewer == false) {
+		if (!isViewer) {
 			addOutputDataBlock(trackedClicks);
 			// OfflineClickLogging trackedClickLogging;
 			// trackedClicks.SetLogging(trackedClickLogging = new
@@ -1152,7 +1149,7 @@ public class ClickDetector extends PamProcess {
 					newClick.addDataAnnotation(
 							new ClickClassifierAnnotation(clickAnnotationType, idInfo.classifiersPassed));
 				}
-				if (wantClick(newClick, idInfo) == false) {
+				if (!wantClick(newClick, idInfo)) {
 					return false;
 				}
 			}
@@ -1210,7 +1207,7 @@ public class ClickDetector extends PamProcess {
 			 */
 			double angle = newClick.getAngle();
 			// clickControl.angleVetoes.addAngleData(angle);
-			if (clickControl.angleVetoes.passAllVetoes(angle, true) == false) {
+			if (!clickControl.angleVetoes.passAllVetoes(angle, true)) {
 				return false;
 			}
 
@@ -1287,7 +1284,7 @@ public class ClickDetector extends PamProcess {
 			if (channelGroupDetectors[i].halfBuiltClicks == null) {
 				continue;
 			}
-			if (channelGroupDetectors[i].halfBuiltClicks.waitForThreadedObservers(maxWait) == false) {
+			if (!channelGroupDetectors[i].halfBuiltClicks.waitForThreadedObservers(maxWait)) {
 				errors++;
 			}
 		}
@@ -1306,13 +1303,13 @@ public class ClickDetector extends PamProcess {
 	 * @return
 	 */
 	public boolean wantClick(ClickDetection click, ClickIdInformation idInfo) {
-		if (clickControl.clickParameters.classifyOnline == false) {
+		if (!clickControl.clickParameters.classifyOnline) {
 			return true;
 		}
 		if (click.getClickType() == 0 && clickControl.clickParameters.discardUnclassifiedClicks) {
 			return false;
 		} else {
-			return (idInfo.discard == false);
+			return !idInfo.discard;
 		}
 	}
 

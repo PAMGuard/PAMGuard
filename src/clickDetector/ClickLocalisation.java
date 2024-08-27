@@ -1,9 +1,9 @@
 package clickDetector;
 
-import pamMaths.PamVector;
 import Array.ArrayManager;
 import PamDetection.AbstractLocalisation;
 import PamUtils.PamUtils;
+import pamMaths.PamVector;
 
 public class ClickLocalisation extends AbstractLocalisation {
 

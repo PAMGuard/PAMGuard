@@ -2,9 +2,6 @@ package fftFilter;
 
 import java.io.Serializable;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import Filters.FilterBand;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
@@ -32,7 +29,7 @@ public class FFTFilterParams implements Serializable, Cloneable, ManagedParamete
 	@Override
 	public boolean equals(Object other) {	
 		if (other == null) return false;
-		if (FFTFilterParams.class.isAssignableFrom(other.getClass()) == false) {
+		if (!FFTFilterParams.class.isAssignableFrom(other.getClass())) {
 			return false;
 		}
 		FFTFilterParams that = (FFTFilterParams) other;

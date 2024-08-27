@@ -8,7 +8,6 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -121,6 +120,7 @@ public class ObserverListPopup extends JDialog implements ActionListener {
 		panel.add(p);
 	}
 	
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == closeButton) {
 			setVisible(false);
@@ -128,6 +128,7 @@ public class ObserverListPopup extends JDialog implements ActionListener {
 	}
 
 	Timer t = new Timer(1000, new ActionListener() {
+		@Override
 		public void actionPerformed(ActionEvent evt) {
 			for (int i = 0; i < Math.min(dataBlock.countObservers(), cpuLabels.length); i++) {
 				cpuLabels[i].setText(String.format("%.1f%%", dataBlock.getCPUPercent(i)));

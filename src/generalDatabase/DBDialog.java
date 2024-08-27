@@ -12,8 +12,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import PamView.dialog.PamDialog;
 import PamView.dialog.warn.WarnOnce;
@@ -123,7 +121,7 @@ public class DBDialog extends PamDialog {
 	@Override
 	public boolean getParams() {
 
-		if (systemDialogPanel != null && systemDialogPanel.getParams() == false) return false;
+		if (systemDialogPanel != null && !systemDialogPanel.getParams()) return false;
 		
 		dbParameters.setDatabaseSystem(systemList.getSelectedIndex());
 		
@@ -171,6 +169,7 @@ public class DBDialog extends PamDialog {
 	
 	class SelectDBSystem implements ActionListener {
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 
 			selectSystem();

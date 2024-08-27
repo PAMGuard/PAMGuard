@@ -26,13 +26,13 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InvalidClassException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.URL;
 import java.net.URLClassLoader;
 
 import org.apache.commons.io.input.ClassLoaderObjectInputStream;
+
 import PamModel.PamModel;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
@@ -348,7 +348,8 @@ public class PamControlledUnitSettings implements Serializable, ManagedParameter
 		else {
 			classLoader = new URLClassLoader(new URL[0], PamControlledUnitSettings.class.getClassLoader()) {
 
-			    public void addURL(URL url) {
+			    @Override
+				public void addURL(URL url) {
 			        super.addURL(url);
 			    }
 			};

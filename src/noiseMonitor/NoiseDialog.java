@@ -24,13 +24,13 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
-import fftManager.FFTDataBlock;
-import fftManager.FFTDataUnit;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.SourcePanel;
 import PamView.dialog.SourcePanelMonitor;
 import PamguardMVC.PamDataBlock;
+import fftManager.FFTDataBlock;
+import fftManager.FFTDataUnit;
 
 public class NoiseDialog extends PamDialog {
 
@@ -285,8 +285,8 @@ public class NoiseDialog extends PamDialog {
 	}
 
 	private void enableControls() {
-		nMeasures.setEnabled(useAllButton.isSelected() == false);
-		if (useAllButton.isSelected() == true) {
+		nMeasures.setEnabled(!useAllButton.isSelected());
+		if (useAllButton.isSelected()) {
 			autoNMeasures();
 		}
 		boolean hasSource = (findSourceData() != null);
@@ -305,7 +305,7 @@ public class NoiseDialog extends PamDialog {
 		if (interval == null || nMeasures == null || useAllButton == null) {
 			return;
 		}
-		if (useAllButton.isSelected() == false) {
+		if (!useAllButton.isSelected()) {
 			return;
 		}
 		if (sourceData == null) {

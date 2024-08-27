@@ -3,12 +3,10 @@ package depthReadout;
 import java.awt.Frame;
 import java.io.Serializable;
 
-import depthReadout.MccDepthParameters.MccSensorParameters;
-
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
-
+import depthReadout.MccDepthParameters.MccSensorParameters;
 import mcc.MccJniInterface;
 import mcc.mccjna.MCCException;
 import mcc.mccjna.MCCUtils;
@@ -110,27 +108,33 @@ public class MccDepthSystem implements DepthSystem , PamSettings {
 		return depth;
 	}
 
+	@Override
 	public boolean shouldPoll() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
+	@Override
 	public Serializable getSettingsReference() {
 		return mccDepthParameters;
 	}
 
+	@Override
 	public long getSettingsVersion() {
 		return MccDepthParameters.serialVersionUID;
 	}
 
+	@Override
 	public String getUnitName() {
 		return "MCC Depth system";
 	}
 
+	@Override
 	public String getUnitType() {
 		return "MCC Depth system";
 	}
 
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		mccDepthParameters = ((MccDepthParameters) pamControlledUnitSettings.getSettings()).clone();
 		return true;

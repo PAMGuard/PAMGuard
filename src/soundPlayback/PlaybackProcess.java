@@ -7,7 +7,6 @@ import PamController.PamController;
 import PamDetection.RawDataUnit;
 import PamUtils.FrequencyFormat;
 import PamUtils.PamUtils;
-import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamInstantProcess;
@@ -17,9 +16,7 @@ import soundPlayback.preprocess.PlaybackDecimator;
 import soundPlayback.preprocess.PlaybackFilter;
 import soundPlayback.preprocess.PlaybackGain;
 import soundPlayback.preprocess.PlaybackPreprocess;
-import warnings.PamWarning;
 import warnings.QuickWarning;
-import warnings.WarningSystem;
 
 /**
  * Pam Process for sound playback (controls data from multiple channels
@@ -90,7 +87,7 @@ public class PlaybackProcess extends PamInstantProcess {
 		
 		boolean prepOK = playbackControl.playbackSystem.prepareSystem(playbackControl, 
 				runningChannels, (float) sampleRateData.getOutputSampleRate());
-		if (prepOK == false) {
+		if (!prepOK) {
 			showStartWarning(runningChannels, sampleRateData.getOutputSampleRate());
 			return false;
 		}
@@ -234,7 +231,7 @@ public class PlaybackProcess extends PamInstantProcess {
 			RawDataUnit[] playUnits = preprocessData(rawDataUnits);
 			if (playUnits != null) {
 				boolean playOK = playbackControl.playbackSystem.playData(playUnits, 1);
-				if (playOK == false) {
+				if (!playOK) {
 					playWarning.setWarning("PlaybackProcess: playData return error", 2);
 					noteNewSettings(); // forces full reset of playback
 				}
@@ -298,7 +295,7 @@ public class PlaybackProcess extends PamInstantProcess {
 
 	@Override
 	synchronized public void noteNewSettings() {
-		if (PamController.getInstance().isInitializationComplete() == false) {
+		if (!PamController.getInstance().isInitializationComplete()) {
 			return;
 		}
 		

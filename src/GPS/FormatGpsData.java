@@ -52,14 +52,14 @@ public class FormatGpsData {
 	Date dateO;
 
 	FormatGpsData() {
-	};
+	}
 
 	FormatGpsData(StringBuffer nmeaString) {
 		/*
 		 * Unpack the string buffer to populate the above datas
 		 */
 
-	};
+	}
 
 	public static String formatTime(int intTime) {
 		SimpleDateFormat gpsTimeFormat = new SimpleDateFormat("HHmmss");

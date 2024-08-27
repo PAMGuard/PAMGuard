@@ -361,7 +361,7 @@ public class PamDetectionLogging extends SQLLogging {
 		pamDetection.setStartSample((Long) startSample.getValue());
 		pamDetection.setMeasuredAmplitude((Double) amplitude.getValue());		
 		Object ts = tableDefinition.getTimeStampItem().getValue();
-		long t = sqlTypes.millisFromTimeStamp(ts);
+		long t = SQLTypes.millisFromTimeStamp(ts);
 		pamDetection.setTimeMilliseconds(t);
 		return true; 
 	}

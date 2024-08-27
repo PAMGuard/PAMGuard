@@ -3,8 +3,6 @@ package pamViewFX;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import dataPlotsFX.TDParametersFX;
-
 /**
  * Holds settings for the FX GUI.
  * @author Jamie Macaulay 

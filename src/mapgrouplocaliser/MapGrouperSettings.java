@@ -2,13 +2,11 @@ package mapgrouplocaliser;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.util.Hashtable;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
-import PamModel.parametermanager.PrivatePamParameterData;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
-import PamView.paneloverlay.OverlayDataInfo;
+import PamModel.parametermanager.PrivatePamParameterData;
 import PamView.paneloverlay.overlaymark.MarkDataSelectorParams;
 import PamView.paneloverlay.overlaymark.OverlayMarkDataInfo;
 import PamguardMVC.PamDataBlock;

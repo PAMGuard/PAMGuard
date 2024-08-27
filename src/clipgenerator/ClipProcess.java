@@ -9,17 +9,6 @@ import java.util.ListIterator;
 
 import javax.sound.sampled.AudioFormat;
 
-import networkTransfer.receive.BuoyStatusDataUnit;
-import soundPlayback.ClipPlayback;
-import warnings.PamWarning;
-import warnings.WarningSystem;
-import clipgenerator.clipDisplay.ClipSymbolManager;
-import clipgenerator.localisation.ClipDelays;
-import clipgenerator.localisation.ClipLocalisation;
-import dataPlotsFX.layout.TDGraphFX;
-import fftManager.FFTDataBlock;
-import wavFiles.Wav16AudioFormat;
-import wavFiles.WavFileWriter;
 import Localiser.algorithms.Correlations;
 import Localiser.algorithms.timeDelayLocalisers.bearingLoc.BearingLocaliser;
 import Localiser.algorithms.timeDelayLocalisers.bearingLoc.BearingLocaliserSelector;
@@ -37,8 +26,18 @@ import PamguardMVC.PamObserverAdapter;
 import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.RawDataUnavailableException;
 import Spectrogram.SpectrogramDisplay;
+import Spectrogram.SpectrogramMarkObserver;
 import Spectrogram.SpectrogramMarkProcess;
 import annotation.handler.ManualAnnotationHandler;
+import clipgenerator.clipDisplay.ClipSymbolManager;
+import clipgenerator.localisation.ClipDelays;
+import clipgenerator.localisation.ClipLocalisation;
+import dataPlotsFX.layout.TDGraphFX;
+import networkTransfer.receive.BuoyStatusDataUnit;
+import soundPlayback.ClipPlayback;
+import warnings.PamWarning;
+import wavFiles.Wav16AudioFormat;
+import wavFiles.WavFileWriter;
 
 /**
  * Process for making short clips of audio data. 
@@ -182,7 +181,7 @@ public class ClipProcess extends SpectrogramMarkProcess {
 		String path = getClipFileFolder(clipDataUnit.getTimeMilliseconds(), true);
 		path += clipDataUnit.fileName;
 		File aFile = new File(path);
-		if (aFile.exists() == false) {
+		if (!aFile.exists()) {
 			return null;
 		}
 		return aFile;
@@ -203,7 +202,7 @@ public class ClipProcess extends SpectrogramMarkProcess {
 
 			// now check that that folder exists. 
 			File folder = FileFunctions.createNonIndexedFolder(folderName);
-			if (folder == null || folder.exists() == false) {
+			if (folder == null || !folder.exists()) {
 				return null;
 			}
 		}
@@ -263,7 +262,7 @@ public class ClipProcess extends SpectrogramMarkProcess {
 		/**
 		 * Called when a manual mark is made on the spectrogram display. 
 		 */
-		if (downUp == SpectrogramMarkProcess.MOUSE_DOWN) {
+		if (downUp == SpectrogramMarkObserver.MOUSE_DOWN) {
 			// REMOVE THIS CHECK - ClipGenerator already knows the raw data source, set in the parameters.  So it doesn't need to worry about whether the FFT source is actually beamformer data
 //    		// do a quick check here of the source.  If the fft has sequence numbers, the channels are ambiguous and Rocca can't use it.  warn the user and exit
 //    		FFTDataBlock source = display.getSourceFFTDataBlock();
@@ -282,7 +281,7 @@ public class ClipProcess extends SpectrogramMarkProcess {
 			specMouseDowntime = startMilliseconds;
 			return false;
 		}
-		else if (downUp == SpectrogramMarkProcess.MOUSE_DRAG) {
+		else if (downUp == SpectrogramMarkObserver.MOUSE_DRAG) {
 			return false;
 		}
 		else {
@@ -406,7 +405,7 @@ public class ClipProcess extends SpectrogramMarkProcess {
 			
 			clipGenSetting = clipControl.clipSettings.getClipGenSetting(i);
 
-			if (clipGenSetting.enable == false) {
+			if (!clipGenSetting.enable) {
 				continue;
 			}
 			if (i == 0) {

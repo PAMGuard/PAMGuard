@@ -58,10 +58,10 @@ public class FileLocation implements Serializable, Cloneable, ManagedParameters 
 		}
 		try {
 			File fPath = new File(path);
-			if (fPath.exists() == false) {
+			if (!fPath.exists()) {
 				fPath = fPath.getParentFile();
 			}
-			if (fPath.exists() == false) {
+			if (!fPath.exists()) {
 				return null;
 			}
 			return fPath.getFreeSpace();

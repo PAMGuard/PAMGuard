@@ -12,11 +12,9 @@ import PamUtils.PamUtils;
 import PamguardMVC.PamDataUnit;
 import binaryFileStorage.BinaryDataSource;
 import binaryFileStorage.BinaryHeader;
-import binaryFileStorage.BinaryInputStream;
 import binaryFileStorage.BinaryObjectData;
 import binaryFileStorage.ModuleFooter;
 import binaryFileStorage.ModuleHeader;
-import binaryFileStorage.PackedBinaryObject;
 
 public class NoiseBinaryDataSource extends BinaryDataSource {
 

@@ -8,12 +8,11 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import fftManager.FFTDataUnit;
-
 import PamController.PamController;
 import PamView.dialog.PamDialog;
 import PamView.dialog.SourcePanel;
 import PamguardMVC.PamDataBlock;
+import fftManager.FFTDataUnit;
 
 /**
  * Dialog for smoothing kernel options.

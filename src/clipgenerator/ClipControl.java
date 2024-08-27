@@ -8,15 +8,7 @@ import java.util.ArrayList;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import userDisplay.UserDisplayComponent;
-import userDisplay.UserDisplayControl;
-import userDisplay.UserDisplayProvider;
-import clipgenerator.clipDisplay.ClipDisplayDecorations;
-import clipgenerator.clipDisplay.ClipDisplayPanel;
-import clipgenerator.clipDisplay.ClipDisplayParent;
-import clipgenerator.clipDisplay.ClipDisplayUnit;
-import dataPlotsFX.data.TDDataProviderRegisterFX;
-import dataPlotsFX.rawClipDataPlot.ClipPlotProviderFX;
+
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
@@ -27,6 +19,15 @@ import PamguardMVC.AcousticDataUnit;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import annotation.handler.ManualAnnotationHandler;
+import clipgenerator.clipDisplay.ClipDisplayDecorations;
+import clipgenerator.clipDisplay.ClipDisplayPanel;
+import clipgenerator.clipDisplay.ClipDisplayParent;
+import clipgenerator.clipDisplay.ClipDisplayUnit;
+import dataPlotsFX.data.TDDataProviderRegisterFX;
+import dataPlotsFX.rawClipDataPlot.ClipPlotProviderFX;
+import userDisplay.UserDisplayComponent;
+import userDisplay.UserDisplayControl;
+import userDisplay.UserDisplayProvider;
 
 /**
  * The clip generator is used to generate short sound clips around detections. 

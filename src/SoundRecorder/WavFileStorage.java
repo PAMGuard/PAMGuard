@@ -2,14 +2,11 @@ package SoundRecorder;
 
 import java.io.File;
 
-import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioFileFormat.Type;
-import javax.sound.sampled.AudioFormat.Encoding;
+import javax.sound.sampled.AudioFormat;
 
 import PamUtils.FileFunctions;
 import PamUtils.PamCalendar;
-import wavFiles.ByteConverter;
-import wavFiles.WavFile;
 import wavFiles.WavFileWriter;
 
 /**
@@ -43,7 +40,7 @@ public class WavFileStorage implements RecorderStorage {
 		//		this.bitDepth = bitDepth;
 		//		this.fileType = fileType;
 
-		boolean isBigendian = (fileType != audioFileType.WAVE);
+		boolean isBigendian = (fileType != Type.WAVE);
 		
 
 		audioFormat = new AudioFormat(sampleRate, bitDepth, nChannels, true, isBigendian);

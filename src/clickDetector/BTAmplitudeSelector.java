@@ -122,7 +122,7 @@ public class BTAmplitudeSelector implements PamDialogPanel {
 		@Override
 		public void paintLayer(Graphics g) {
 			BTDisplayParameters btDisplayParameters = btDisplay.getBtDisplayParameters();
-			if (btDisplayParameters.amplitudeSelect == false) {
+			if (!btDisplayParameters.amplitudeSelect) {
 				return;
 			}
 			axMin = allHistogram.getScaleMinVal();
@@ -148,7 +148,7 @@ public class BTAmplitudeSelector implements PamDialogPanel {
 		private boolean canDrag = false;
 		@Override
 		public void mouseDragged(MouseEvent mouseEvent) {
-			if (canDrag == false) {
+			if (!canDrag) {
 				return;
 			}
 			// work out a new value based on the current mouse position
@@ -174,7 +174,7 @@ public class BTAmplitudeSelector implements PamDialogPanel {
 				return false;
 			}
 			BTDisplayParameters btDisplayParameters = btDisplay.getBtDisplayParameters();
-			if (btDisplayParameters.amplitudeSelect == false) {
+			if (!btDisplayParameters.amplitudeSelect) {
 				return false;
 			}
 			double dx = (dataSelector.getParams().minimumAmplitude - histoOverLayer.axMin) / 
@@ -242,6 +242,7 @@ public class BTAmplitudeSelector implements PamDialogPanel {
 		}
 	}
 	class AmplitudeListener implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent arg0) {
 //			System.out.println("Amplitude Listener activated: " + arg0.toString());
 			updateBTParams();

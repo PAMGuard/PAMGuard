@@ -1,11 +1,9 @@
 package detectiongrouplocaliser;
 
 import java.awt.Color;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -15,16 +13,13 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import PamController.PamController;
 import PamUtils.PamCalendar;
 import PamView.PamColors;
 import PamView.PamSymbol;
 import PamView.paneloverlay.overlaymark.OverlayMark;
 import PamView.paneloverlay.overlaymark.OverlayMarkObserver;
 import PamView.paneloverlay.overlaymark.OverlayMarker;
-import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
-import PamguardMVC.debug.Debug;
 import javafx.scene.input.MouseEvent;
 import warnings.PamWarning;
 import warnings.WarningSystem;

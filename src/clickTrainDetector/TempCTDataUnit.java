@@ -3,8 +3,6 @@ package clickTrainDetector;
 import java.util.List;
 
 import PamguardMVC.PamDataUnit;
-import clickTrainDetector.localisation.CTLocalisation;
-import detectiongrouplocaliser.DetectionGroupDataUnit;
 
 /**
  * Temporary data unit for unconfirmed click trains. 

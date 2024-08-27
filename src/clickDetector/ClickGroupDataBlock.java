@@ -1,7 +1,6 @@
 package clickDetector;
 
 import Localiser.detectionGroupLocaliser.GroupDetection;
-import PamView.GeneralProjector;
 import PamguardMVC.AcousticDataBlock;
 import PamguardMVC.PamProcess;
 

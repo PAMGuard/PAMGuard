@@ -3,10 +3,6 @@ package seismicVeto;
 import java.awt.Color;
 import java.util.Random;
 
-import fftManager.Complex;
-import fftManager.FFTDataBlock;
-import fftManager.FFTDataUnit;
-import fftManager.FastFFT;
 import Acquisition.AcquisitionProcess;
 import PamController.PamController;
 import PamDetection.RawDataUnit;
@@ -24,7 +20,10 @@ import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
 import PamguardMVC.PamRawDataBlock;
-import autecPhones.AutecGraphics;
+import fftManager.Complex;
+import fftManager.FFTDataBlock;
+import fftManager.FFTDataUnit;
+import fftManager.FastFFT;
 
 public class VetoProcess extends PamProcess {
 
@@ -563,7 +562,7 @@ public class VetoProcess extends PamProcess {
 			}
 			background *= b2;
 			background += (energy * b1);
-			if (isVetoed(channel, arg.getStartSample()) == false) {
+			if (!isVetoed(channel, arg.getStartSample())) {
 				ComplexArray fftData = arg.getFftData();
 
 				for (int i = 0; i < runningBackground.length; i++) {
@@ -576,16 +575,16 @@ public class VetoProcess extends PamProcess {
 //			background *= backgroundUpdateConstant1;
 //			background += (energy * backgroundUpdateConstant);
 
-			if (overThresh == true && detectionOn == false) {
+			if (overThresh && !detectionOn) {
 				startDetection(arg, energy);
 				if (vetoController.vetoParameters.randomFillWaveform) {
 					randomWaveData = prepareRandomWaveData(NRANDOMSAMPLES);
 				}
 			}
-			else if (overThresh == true && detectionOn == true) {
+			else if (overThresh && detectionOn) {
 				continueDetection(arg, energy);
 			}
-			else if (overThresh == false && detectionOn == true) {
+			else if (!overThresh && detectionOn) {
 				endDetection();
 			}
 			// don't need to handle overThresh == false && detectionOn == false

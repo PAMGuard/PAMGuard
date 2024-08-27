@@ -6,14 +6,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import PamUtils.XMLUtils;
-import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import binaryFileStorage.BinaryDataSource;
 import binaryFileStorage.BinaryHeader;
 import binaryFileStorage.BinaryObjectData;
 import binaryFileStorage.ModuleFooter;
 import binaryFileStorage.ModuleHeader;
-import binaryFileStorage.PackedBinaryObject;
 
 public class FormsBinaryIO extends BinaryDataSource {
 

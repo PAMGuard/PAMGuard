@@ -136,6 +136,7 @@ public abstract class IshDetControl extends PamControlledUnit implements PamSett
 		public IshDetSettings(Frame parentFrame) {
 			this.parentFrame = parentFrame;
 		}
+		@Override
 		public void actionPerformed(ActionEvent e) { 
 			//old way: showParamsDialog(parentFrame, ishDetParams);
 			showParamsDialog1(parentFrame);
@@ -163,6 +164,7 @@ public abstract class IshDetControl extends PamControlledUnit implements PamSett
 	/** This is called after a settings file is read.  The subclass should 
 	 * get newParams and clone it as ishDetParams before calling here.
 	 */
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings dummy) {
 		//Subclass should clone newParams before calling here!!
 		if (ishDetFnProcess  != null) ishDetFnProcess .setupConnections();

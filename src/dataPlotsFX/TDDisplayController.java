@@ -1,18 +1,16 @@
 package dataPlotsFX;
 
 import java.util.ArrayList;
-import dataPlotsFX.data.TDDataInfoFX;
-import dataPlotsFX.data.TDDataProviderFX;
-import dataPlotsFX.data.TDDataProviderRegisterFX;
-import detectionPlotFX.data.DDPlotRegister;
-import detectionPlotFX.rawDDPlot.ClickDDPlotProvider;
-import pamViewFX.PamControlledGUIFX;
-import userDisplayFX.UserDisplayControlFX;
-import userDisplayFX.UserDisplayNodeFX;
+
 import PamController.PamController;
 import PamController.PamControllerInterface;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import dataPlotsFX.data.TDDataInfoFX;
+import dataPlotsFX.data.TDDataProviderFX;
+import dataPlotsFX.data.TDDataProviderRegisterFX;
+import userDisplayFX.UserDisplayControlFX;
+import userDisplayFX.UserDisplayNodeFX;
 
 /**
  * The controller for the TD display. This is only used in the FX GUI where displays

@@ -88,7 +88,7 @@ public class NoiseDisplayDialog extends PamDialog {
 	}
 
 	public void enableControls() {
-		boolean e = (autoLevel.isSelected() == false);
+		boolean e = !autoLevel.isSelected();
 		maxLevel.setEnabled(e);
 		minLevel.setEnabled(e);
 	}

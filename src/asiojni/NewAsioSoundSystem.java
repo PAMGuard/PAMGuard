@@ -15,12 +15,6 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
-import soundPlayback.PlaybackControl;
-import soundPlayback.PlaybackParameters;
-import soundPlayback.PlaybackSystem;
-import soundPlayback.fx.PlaybackSettingsPane;
-import soundPlayback.swing.PlaybackDialogComponent;
-
 import com.synthbot.jasiohost.AsioChannel;
 import com.synthbot.jasiohost.AsioDriver;
 import com.synthbot.jasiohost.AsioDriverListener;
@@ -28,16 +22,19 @@ import com.synthbot.jasiohost.AsioException;
 
 import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionDialog;
-import Acquisition.DaqSystem;
 import Acquisition.AudioDataQueue;
+import Acquisition.DaqSystem;
 import Acquisition.SoundCardParameters;
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamDetection.RawDataUnit;
-import PamUtils.PamCalendar;
-import PamUtils.PamUtils;
 import PamguardMVC.PamConstants;
+import soundPlayback.PlaybackControl;
+import soundPlayback.PlaybackParameters;
+import soundPlayback.PlaybackSystem;
+import soundPlayback.fx.PlaybackSettingsPane;
+import soundPlayback.swing.PlaybackDialogComponent;
 
 /**
  * this uses jAsioHost for acquisition. There are a few problems with jAsioHost. 

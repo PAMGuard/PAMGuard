@@ -2,9 +2,7 @@ package dataMap;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Insets;
 import java.awt.Polygon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,19 +21,11 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.border.EmptyBorder;
 
-import dataGram.DatagramImageData;
-import dataGram.DatagramManager;
-import dataGram.DatagramProvider;
-import dataGram.DatagramScaleInformation;
-import binaryFileStorage.BinaryOfflineDataMap;
-import binaryFileStorage.BinaryStore;
 import Layout.PamAxis;
 import PamController.OfflineDataStore;
 import PamController.PamController;
 import PamUtils.PamCalendar;
-import PamUtils.PamUtils;
 import PamView.ColourArray;
 import PamView.PamColors;
 import PamView.PamColors.PamColor;
@@ -45,6 +35,12 @@ import PamView.panel.JPanelWithPamKey;
 import PamView.panel.KeyPanel;
 import PamView.panel.PamPanel;
 import PamguardMVC.PamDataBlock;
+import binaryFileStorage.BinaryOfflineDataMap;
+import binaryFileStorage.BinaryStore;
+import dataGram.DatagramImageData;
+import dataGram.DatagramManager;
+import dataGram.DatagramProvider;
+import dataGram.DatagramScaleInformation;
 
 /**
  * Panelette to go into the main DataPanel to show the data for a single data
@@ -157,7 +153,7 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 
 	public void autoHide() {
 		getTotalDatas();
-		setGraphVisible(totalDatas > 0 || dataMapControl.isViewer() == false);
+		setGraphVisible(totalDatas > 0 || !dataMapControl.isViewer());
 	}
 
 	protected void sortScales() {
@@ -680,7 +676,7 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 			}
 			int xStart = getXCoord(dataStart);
 			int xEnd = getXCoord(dataEnd);
-			if (hasDatagram == false) {
+			if (!hasDatagram) {
 				g.setColor(Color.MAGENTA);
 			} else {
 				g.setColor(Color.DARK_GRAY);
@@ -915,7 +911,7 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			showDatagram = showDatagramMenu.isSelected();
-			if (showDatagram == false) {
+			if (!showDatagram) {
 				showDataCounts = true;
 			}
 			repaintAll();
@@ -926,7 +922,7 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			showDataCounts = showDataCountsMenu.isSelected();
-			if (showDataCounts == false) {
+			if (!showDataCounts) {
 				showDatagram = true;
 			}
 			repaintAll();
@@ -1077,14 +1073,14 @@ public class DataStreamPanel extends JPanel implements DataMapObserver {
 	 * @return
 	 */
 	private DatagramScaleInformation findDatagramScaleInfo() {
-		if (hasDatagram == false) {
+		if (!hasDatagram) {
 			return null;
 		}
 		DatagramProvider dp = dataBlock.getDatagramProvider();
 		if (dp == null) {
 			return null;
 		}
-		if (showDatagram == false) {
+		if (!showDatagram) {
 			return null;
 		}
 		return dp.getScaleInformation();

@@ -20,10 +20,6 @@
  */
 package PamModel;
 
-import java.io.File;
-
-import fftManager.FFTDataUnit;
-
 /**
  * Interface for PAMGuard plugins.
  * <p>

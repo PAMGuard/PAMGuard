@@ -7,6 +7,40 @@ import java.util.Optional;
 import javax.swing.JFrame;
 
 import org.controlsfx.glyphfont.Glyph;
+
+import PamController.PAMControllerGUI;
+import PamController.PamControlledUnit;
+import PamController.PamControlledUnitSettings;
+import PamController.PamController;
+import PamController.PamGUIManager;
+import PamController.PamSettingManager;
+import PamController.PamSettings;
+import PamModel.PamModel;
+import PamModel.PamModuleInfo;
+import PamView.PamViewInterface;
+import dataMap.layoutFX.DataMapPaneFX;
+import dataModelFX.DataModelPaneFX;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.Labeled;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.stage.Window;
+import javafx.stage.WindowEvent;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamTabPane;
 import pamViewFX.fxNodes.PamVBox;
@@ -17,39 +51,6 @@ import pamViewFX.fxStyles.PamAtlantaStyle;
 import pamViewFX.fxStyles.PamStylesManagerFX;
 import pamViewFX.pamTask.PamTaskUpdate;
 import userDisplayFX.UserDisplayNodeFX;
-import PamModel.PamModel;
-import PamModel.PamModuleInfo;
-import PamView.PamViewInterface;
-import dataMap.layoutFX.DataMapPaneFX;
-import PamController.PAMControllerGUI;
-import PamController.PamControlledUnit;
-import PamController.PamControlledUnitSettings;
-import PamController.PamController;
-import PamController.PamGUIManager;
-import PamController.PamSettingManager;
-import PamController.PamSettings;
-import dataModelFX.DataModelPaneFX;
-import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.Labeled;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.Pane;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import javafx.stage.Window;
-import javafx.stage.WindowEvent;
 
 /**
  * 
@@ -570,21 +571,25 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 		}
 	}
 
+	@Override
 	public void addView(PamViewInterface newView) {
 		// TODO Auto-generated method stub
 	}
 
 
+	@Override
 	public void showControlledUnit(PamControlledUnit unit) {
 		// TODO Auto-generated method stub
 	}
 
+	@Override
 	public void destroyModel() {
 		// TODO Auto-generated method stub
 
 	}
 
 
+	@Override
 	public void enableGUIControl(boolean enable) {
 		// TODO Auto-generated method stub
 
@@ -757,6 +762,7 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 	 * Notify the GUI that progress has been made in an external task. 
 	 * @param pamTaskUpdate - class which holds information on the Task and progress. 
 	 */
+	@Override
 	public void notifyLoadProgress(PamTaskUpdate pamTaskUpdate) {
 		for (int i=0; i<this.stages.size(); i++){
 			stages.get(i).notifyLoadProgress(pamTaskUpdate); 
@@ -864,7 +870,7 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 	public boolean prepareToClose(boolean weShouldSave) {
 		//		System.out.println("Preparing to close PAMGUARD");
 
-		if (pamController.canClose() == false) {
+		if (!pamController.canClose()) {
 			return false;
 		}
 

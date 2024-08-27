@@ -3,25 +3,19 @@ package clickDetector;
 import java.io.Serializable;
 import java.util.ListIterator;
 
-import Localiser.detectionGroupLocaliser.DetectionGroupLocaliser;
-import Localiser.detectionGroupLocaliser.DetectionGroupLocaliser2;
-import Localiser.detectionGroupLocaliser.GroupDetection;
 import Localiser.detectionGroupLocaliser.GroupLocalisation;
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
-import PamDetection.AbstractLocalisation;
 import PamUtils.PamCalendar;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
-import SoundRecorder.RecorderControl;
 import SoundRecorder.trigger.RecorderTrigger;
 import SoundRecorder.trigger.RecorderTriggerData;
 import clickDetector.clicktrains.ClickTrainIdParams;
 import clickDetector.localisation.ClickGroupLocaliser;
-import clickDetector.offlineFuncs.OfflineClickLogging;
 import clickDetector.offlineFuncs.OfflineEventDataBlock;
 import clickDetector.offlineFuncs.OfflineEventDataUnit;
 import clickDetector.tdPlots.ClickEventSymbolManager;
@@ -114,7 +108,7 @@ public class ClickTrainDetector extends PamProcess implements PamSettings {
 	
 	@Override
 	public long getRequiredDataHistory(PamObservable o, Object arg) {
-		if (clickTrainIdParameters.runClickTrainId == false) return 0;
+		if (!clickTrainIdParameters.runClickTrainId) return 0;
 		if (o == getClickTrainDataBlock()) return (long) (clickTrainIdParameters.iciRange[1] * 1000);//3600 * 1000;
 		if (o == newClickTrains) return (long) (clickTrainIdParameters.iciRange[1] * 1000);	
 		else if (o == clickDataBlock) return 60000; // 60s of data for now
@@ -123,7 +117,7 @@ public class ClickTrainDetector extends PamProcess implements PamSettings {
 
 	@Override
 	public void newData(PamObservable o, PamDataUnit arg) {
-		if (clickTrainIdParameters.runClickTrainId == false) return;
+		if (!clickTrainIdParameters.runClickTrainId) return;
 		if (o == clickDataBlock){
 			ClickDetection click = (ClickDetection) arg;
 			if (click.dataType != ClickDetection.CLICK_CLICK) {
@@ -154,7 +148,7 @@ public class ClickTrainDetector extends PamProcess implements PamSettings {
 			ListIterator<OfflineEventDataUnit> ctdIterator = offlineEventDataBlock.getListIterator(0);
 			while (ctdIterator.hasNext()) {
 				OfflineEventDataUnit nextTrain = ctdIterator.next();
-				if (ClickTrainDetection.class.isAssignableFrom(nextTrain.getClass()) == false) {
+				if (!ClickTrainDetection.class.isAssignableFrom(nextTrain.getClass())) {
 					continue;
 				}
 				aTrain = (ClickTrainDetection) nextTrain;
@@ -221,7 +215,7 @@ public class ClickTrainDetector extends PamProcess implements PamSettings {
 			ctdIterator = getClickTrainDataBlock().getListIterator(0);
 			while (ctdIterator.hasNext()) {
 				OfflineEventDataUnit nextTrain = ctdIterator.next();
-				if (ClickTrainDetection.class.isAssignableFrom(nextTrain.getClass()) == false) {
+				if (!ClickTrainDetection.class.isAssignableFrom(nextTrain.getClass())) {
 					continue;
 				}
 				aTrain = (ClickTrainDetection) nextTrain;
@@ -245,7 +239,7 @@ public class ClickTrainDetector extends PamProcess implements PamSettings {
 			ctdIterator = newClickTrains.getListIterator(0);
 			while (ctdIterator.hasNext()) {
 				OfflineEventDataUnit nextTrain = ctdIterator.next();
-				if (ClickTrainDetection.class.isAssignableFrom(nextTrain.getClass()) == false) {
+				if (!ClickTrainDetection.class.isAssignableFrom(nextTrain.getClass())) {
 					continue;
 				}
 				aTrain = (ClickTrainDetection) nextTrain;
@@ -379,6 +373,7 @@ public class ClickTrainDetector extends PamProcess implements PamSettings {
 		RecorderTriggerData recorderTriggerData = new RecorderTriggerData(clickControl.getUnitName() + " Click Trains", 
 				10, 120);
 
+		@Override
 		public RecorderTriggerData getDefaultTriggerData() {
 			return recorderTriggerData;
 		}

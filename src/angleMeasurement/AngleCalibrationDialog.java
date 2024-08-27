@@ -25,9 +25,9 @@ import Layout.PamAxis;
 import Layout.PamAxisPanel;
 import PamUtils.PamUtils;
 import PamView.ColorManaged;
+import PamView.PamColors.PamColor;
 import PamView.PamSymbol;
 import PamView.PamSymbolType;
-import PamView.PamColors.PamColor;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamView.panel.PamBorder;
@@ -111,7 +111,7 @@ public class AngleCalibrationDialog extends PamDialog implements AngleMeasuremen
 	public boolean getParams() {
 		paramErrors = false;
 		angleParameters.setCalibrationData(getNewCalData());
-		return (paramErrors == false);
+		return !paramErrors;
 	}
 	
 	protected double[] getNewCalData() {
@@ -246,6 +246,7 @@ public class AngleCalibrationDialog extends PamDialog implements AngleMeasuremen
 				nCal = cal;
 			}
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (latestRawAngle != null) {
 					calValues[nCal].setText(String.format("%.1f", latestRawAngle));
@@ -256,6 +257,7 @@ public class AngleCalibrationDialog extends PamDialog implements AngleMeasuremen
 		
 		class SetInterval implements ActionListener {
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				int newInterval = readInterval();
 				if (newInterval <= 0) {
@@ -300,6 +302,7 @@ public class AngleCalibrationDialog extends PamDialog implements AngleMeasuremen
 		
 		class DefaultButton implements ActionListener {
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				double defaults[] = angleParameters.getCalibrationPoints();
 				for (int i = 0; i < defaults.length; i++) {
@@ -311,14 +314,17 @@ public class AngleCalibrationDialog extends PamDialog implements AngleMeasuremen
 		
 		class CalKeyListener implements KeyListener {
 
+			@Override
 			public void keyPressed(KeyEvent e) {
 				rePlot();
 			}
 
+			@Override
 			public void keyReleased(KeyEvent e) {
 				rePlot();
 			}
 
+			@Override
 			public void keyTyped(KeyEvent e) {
 				rePlot();
 			}
@@ -505,6 +511,7 @@ public class AngleCalibrationDialog extends PamDialog implements AngleMeasuremen
 		}
 	}
 	
+	@Override
 	public void newAngle(Double rawAngle, Double calibratedAngle, Double correctedAngle) {
 
 		latestRawAngle = rawAngle;

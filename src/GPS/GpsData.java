@@ -20,8 +20,6 @@
  */
 package GPS;
 
-import geoMag.MagneticVariation;
-
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -29,8 +27,6 @@ import java.util.TimeZone;
 
 import Array.sensors.ArraySensorDataUnit;
 import Array.sensors.ArraySensorFieldType;
-import pamMaths.PamQuaternion;
-import pamMaths.PamVector;
 import NMEA.AcquireNmeaData;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
@@ -38,6 +34,9 @@ import PamModel.parametermanager.PrivatePamParameterData;
 import PamUtils.LatLong;
 import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
+import geoMag.MagneticVariation;
+import pamMaths.PamQuaternion;
+import pamMaths.PamVector;
 
 /**
  * Note on times for GPS data ...
@@ -176,7 +175,7 @@ public class GpsData extends LatLong implements Cloneable, ManagedParameters, Ar
 
 //		sortDistanceFromLast();
 
-	};
+	}
 	
 	/**
 	 * Constructor to create a GPSData object from a lat long. 
@@ -276,9 +275,9 @@ public class GpsData extends LatLong implements Cloneable, ManagedParameters, Ar
 			break;
 		}
 
-		if (dataOk == false) return;
+		if (!dataOk) return;
 
-	};
+	}
 
 	protected void sortDistanceFromLast() {
 
@@ -471,7 +470,7 @@ public class GpsData extends LatLong implements Cloneable, ManagedParameters, Ar
 				foundPoint = true;
 				continue;
 			}
-			if (foundPoint == false) {
+			if (!foundPoint) {
 				newDigit = (nmeaSentence[i] - 48);
 				number = (number * 10 + newDigit);
 			}

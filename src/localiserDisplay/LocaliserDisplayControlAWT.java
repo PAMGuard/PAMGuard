@@ -46,10 +46,12 @@ public class LocaliserDisplayControlAWT extends LoclaiserDisplayControl implemen
 	}
 
 
+	@Override
 	public String getUniqueName() {
 		return uniqueDisplayName;
 	}
 
+	@Override
 	public void setUniqueName(String uniqueName) {
 		this.uniqueDisplayName = uniqueName;
 	}

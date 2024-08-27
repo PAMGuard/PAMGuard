@@ -6,8 +6,8 @@ import java.lang.reflect.Field;
 import Filters.FilterType;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
-import PamModel.parametermanager.PrivatePamParameterData;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
+import PamModel.parametermanager.PrivatePamParameterData;
 
 public class NoiseBandSettings implements Serializable, Cloneable, ManagedParameters {
 

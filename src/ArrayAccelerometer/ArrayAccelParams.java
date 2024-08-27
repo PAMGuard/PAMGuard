@@ -1,12 +1,10 @@
 package ArrayAccelerometer;
 
 import java.io.Serializable;
-import java.util.Arrays;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
-import mcc.MccJniInterface;
 import mcc.mccjna.MCCConstants;
 
 public class ArrayAccelParams implements Serializable, Cloneable, ManagedParameters {

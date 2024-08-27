@@ -18,10 +18,10 @@ public class StandardChannelListPanel implements ChannelListPanel {
 //	public int channelList[] = new int[PamConstants.MAX_CHANNELS];
 	private JLabel panelChannelLabel[] = new JLabel[PamConstants.MAX_CHANNELS];
 	private JComboBox panelChannelList[] = new JComboBox[PamConstants.MAX_CHANNELS];
-	
+
 	private JPanel panel;
 	int nChannels = 0;
-	
+
 	public StandardChannelListPanel() {
 		super();
 		panel = createStandardChannelListPanel();
@@ -47,23 +47,23 @@ public class StandardChannelListPanel implements ChannelListPanel {
 
 	@Override
 	public void setNumChannels(int nChannels) {
-		
+
 		nChannels = Math.min(nChannels, panelChannelList.length);
-		
-		this.nChannels = nChannels; 
-		
+
+		this.nChannels = nChannels;
+
 		for (int i = 0; i < PamConstants.MAX_CHANNELS; i++) {
 			panelChannelLabel[i].setVisible(i < nChannels);
 			panelChannelList[i].setVisible(i < nChannels);
 		}
 
-//		
+//
 //		for (int iL = 0; iL < nChannels; iL++) {
 //			panelChannelList[iL].removeAllItems();
 //			for (int i = 0; i < PamConstants.MAX_CHANNELS; i++) {
 //				panelChannelList[iL].addItem(i);
 //			}
-//			
+//
 //		}
 	}
 
@@ -75,23 +75,23 @@ public class StandardChannelListPanel implements ChannelListPanel {
 		}
 		for (int i = 0; i < Math.min(panelChannelList.length, channelList.length); i++){
 			panelChannelList[i].setSelectedIndex(channelList[i]);
-//			System.out.println(String.format("%s Set box %d to item %d and get %d", 
+//			System.out.println(String.format("%s Set box %d to item %d and get %d",
 //					this.toString(), i, channelList[i], panelChannelList[i].getSelectedItem()));
 		}
 	}
 	@Override
 	public boolean isDataOk() {
-		
-		// now check for repeat combinations. 
+
+		// now check for repeat combinations.
 		for (int i = 0; i < nChannels-1; i++) {
 			for (int j = i+1; j < nChannels; j++) {
 				if (panelChannelList[i].getSelectedIndex() == panelChannelList[j].getSelectedIndex()) {
 					String w = String.format("Channel %d is used twice\n"+
 							"only use each channel once on each device",
 							panelChannelList[i].getSelectedIndex());
-					JOptionPane.showConfirmDialog(null, w, 
+					JOptionPane.showConfirmDialog(null, w,
 							"Error", JOptionPane.OK_OPTION, JOptionPane.ERROR_MESSAGE);
-					return false;			
+					return false;
 				}
 			}
 		}
@@ -103,9 +103,9 @@ public class StandardChannelListPanel implements ChannelListPanel {
 
 		/* code for select channel */
 		/*
-		 * put this in a separate panel so it can be hidden if 
-		 * it's not possible to change these parameters. 
-		 * 
+		 * put this in a separate panel so it can be hidden if
+		 * it's not possible to change these parameters.
+		 *
 		 * Text information updated DG & JG 12/8/08
 		 */
 		JPanel cP;
@@ -125,7 +125,7 @@ public class StandardChannelListPanel implements ChannelListPanel {
 		s += "<br>So be aware. If you've put a plug into socket 1, <br>you probably want to select channel 0, etc.</html>";
 		for (int i = 0; i < PamConstants.MAX_CHANNELS; i++){ //Xiao Yan Deng
 		//for (int i = 0; i < getNumChannels(); i++){
-			
+
 			if (i%2 ==0){
 				c2.gridx = 0;
 				c2.gridy ++;
@@ -140,19 +140,19 @@ public class StandardChannelListPanel implements ChannelListPanel {
 			else {
 				spaceStr = "";
 			}
-			PamDialog.addComponent(cP, panelChannelLabel[i] = 
+			PamDialog.addComponent(cP, panelChannelLabel[i] =
 				new JLabel(spaceStr + " SW Ch " + i + " = HW Ch "), c2);
 			c2.gridx ++;
 			//constraints.gridwidth = 2;
 			PamDialog.addComponent(cP, panelChannelList[i] = new JComboBox(), c2);
 			panelChannelLabel[i].setToolTipText(s);
 			panelChannelList[i].setToolTipText(s);
-			
+
 //			System.out.println(String.format("Fill channel list %d", i));
 			for (int iC = 0; iC < PamConstants.MAX_CHANNELS; iC++) {
 				panelChannelList[i].addItem(iC);
 			}
-			
+
 		}
 		return cP;
 	}
@@ -162,6 +162,6 @@ public class StandardChannelListPanel implements ChannelListPanel {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 
 }

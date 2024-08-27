@@ -32,7 +32,7 @@ public class AISBugSearch {
 				// first comma separates date and NMEA data
 				int chPos = line.indexOf(",");
 				String nmeaData = line.substring(chPos+1);
-				if (nmeaData.contains("AIVDM") == false) {
+				if (!nmeaData.contains("AIVDM")) {
 					continue;
 				}
 				System.out.println(nmeaData);

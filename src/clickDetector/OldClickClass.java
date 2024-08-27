@@ -21,10 +21,10 @@
 
 package clickDetector;
 
-import clickDetector.ClickClassifiers.basic.BasicClickIdentifier;
 import Acquisition.AcquisitionProcess;
 import Array.ArrayManager;
 import PamUtils.PamUtils;
+import clickDetector.ClickClassifiers.basic.BasicClickIdentifier;
 import fftManager.Complex;
 
 /**

@@ -1,6 +1,7 @@
 package Spectrogram;
 
 import java.awt.event.MouseEvent;
+
 import PamView.zoomer.ZoomShape;
 import PamView.zoomer.Zoomable;
 import Spectrogram.SpectrogramDisplay.SpectrogramPanel;

@@ -34,7 +34,6 @@ import Acquisition.RawDataBinaryDataSource;
 import PamController.PamController;
 import PamDetection.RawDataUnit;
 import PamUtils.PamUtils;
-import dataMap.OfflineDataMap;
 import effort.EffortProvider;
 
 /**
@@ -150,6 +149,7 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 	/**
 	 * Reset data integrity checking counters. 
 	 */
+	@Override
 	public void reset() {
 		prevChannelSample = new long[PamConstants.MAX_CHANNELS];
 		summaryTotals = new double[PamConstants.MAX_CHANNELS];
@@ -206,7 +206,7 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 	 * @throws RawDataUnavailableException
 	 */
 	synchronized public RawDataUnit[] getAvailableSamples(long startMillis, long durationMillis, int channelMap, boolean offlineLoad) throws RawDataUnavailableException {
-		if (hasDataSamples(startMillis, durationMillis) == false) {
+		if (!hasDataSamples(startMillis, durationMillis)) {
 			if (offlineLoad && 
 					PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW) {
 				// try to load some data !
@@ -340,7 +340,7 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 					firstSample, lastSample, startSample, duration);
 		}
 		dataUnit = getLastUnit();
-		if (hasLastSample(dataUnit, startSample+duration, channelMap) == false)  {
+		if (!hasLastSample(dataUnit, startSample+duration, channelMap))  {
 			throw new RawDataUnavailableException(this, RawDataUnavailableException.DATA_NOT_ARRIVED,
 					firstSample, lastSample, startSample, duration);
 		}
@@ -436,7 +436,7 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 //				break;
 //			}
 ////		}
-		if (foundStart == false) {
+		if (!foundStart) {
 			return false;
 		}
 //		if (blockNo < 0) {
@@ -509,7 +509,7 @@ public class PamRawDataBlock extends AcousticDataBlock<RawDataUnit> {
 			 * if we get here, then we still need more data, but there
 			 * may not be any, so may have to bail out. 
 			 */
-			if (rawIterator.hasNext() == false) {
+			if (!rawIterator.hasNext()) {
 				return false;
 			}
 			unit = rawIterator.next();

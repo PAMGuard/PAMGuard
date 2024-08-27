@@ -2,11 +2,8 @@ package spectrogramNoiseReduction;
 
 import java.io.Serializable;
 
-import org.w3c.dom.Element;
-
-import PamguardMVC.ProcessAnnotation;
 import PamguardMVC.PamProcess;
-
+import PamguardMVC.ProcessAnnotation;
 import fftManager.FFTDataUnit;
 import spectrogramNoiseReduction.layoutFX.SpecNoiseNodeFX;
 

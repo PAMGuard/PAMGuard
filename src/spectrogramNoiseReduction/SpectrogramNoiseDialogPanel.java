@@ -122,7 +122,7 @@ public class SpectrogramNoiseDialogPanel {
 				dC = methods.get(i).getDialogComponent();
 				if (dC != null && enableMethod[i].isSelected()) {
 					answer = dC.getParams();
-					if (answer == false) {
+					if (!answer) {
 						return false;
 					}
 				}
@@ -147,7 +147,7 @@ public class SpectrogramNoiseDialogPanel {
 			if (done) {
 				enableMethod[i].setSelected(false);
 			}
-			enableMethod[i].setEnabled(done == false);
+			enableMethod[i].setEnabled(!done);
 			if (dC != null) {
 				dC.setSelected(enableMethod[i].isSelected());
 			}

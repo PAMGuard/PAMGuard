@@ -31,13 +31,13 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
-import javax.swing.JTextField;
 //import javax.swing.JButton;
 //import javax.swing.JCheckBox;
 //import javax.swing.JComboBox;
 //import javax.swing.JDialog;
 //import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 //import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
@@ -48,7 +48,6 @@ import PamView.dialog.SourcePanel;
 import PamguardMVC.PamDataBlock;
 import warnings.PamWarning;
 import warnings.WarningSystem;
-import whistlesAndMoans.AbstractWhistleDataUnit;
 
 public abstract class IshLocParamsDialog extends PamDialog implements ActionListener 
 {
@@ -112,6 +111,7 @@ public abstract class IshLocParamsDialog extends PamDialog implements ActionList
 		public IshLocActionListener(Frame parentFrame) {
 			this.parentFrame = parentFrame;
 		}
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			enableFromCheckBox();
 		}
@@ -153,6 +153,7 @@ public abstract class IshLocParamsDialog extends PamDialog implements ActionList
 	}
 	*/
 
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		//if (e.getSource() == sourceList) {
 			//showChannelList();

@@ -23,13 +23,13 @@ package PamView;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.DefaultKeyboardFocusManager;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.HeadlessException;
 import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Window;
@@ -38,11 +38,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.MalformedURLException;
@@ -73,10 +73,6 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import Acquisition.DaqSystemInterface;
-import annotation.tasks.AnnotationManager;
-import metadata.MetaDataContol;
-import performanceTests.PerformanceDialog;
-import tipOfTheDay.TipOfTheDayManager;
 import Array.ArrayManager;
 //import Logging.LogDataObserver;
 import PamController.PamControlledUnit;
@@ -87,12 +83,11 @@ import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamController.PamguardVersionInfo;
 import PamController.settings.SettingsImport;
+import PamModel.AboutPluginDisplay;
 import PamModel.CommonPluginInterface;
 import PamModel.PamModel;
 import PamModel.PamModuleInfo;
 import PamModel.PamPluginInterface;
-import PamModel.AboutPluginDisplay;
-import PamModel.SMRUEnable;
 import PamUtils.PamCalendar;
 import PamUtils.Splash;
 import PamUtils.time.CalendarControl;
@@ -102,8 +97,10 @@ import PamView.panel.PamBorderPanel;
 import PamView.panel.PamTabbedPane;
 import PamView.paneloverlay.overlaymark.MarkRelationships;
 import PamguardMVC.datakeeper.DataKeeper;
-
-import java.io.File;
+import annotation.tasks.AnnotationManager;
+import metadata.MetaDataContol;
+import performanceTests.PerformanceDialog;
+import tipOfTheDay.TipOfTheDayManager;
 /**
  * @author Doug Gillespie
  * 
@@ -241,7 +238,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 				// some weird stuff going down whereby the screen position is
 				// given as -8 from the corner where it really it. this can return 
 				// false and then push the display onto a different monitor, so alow for this. 
-				if (posOK == false) {
+				if (!posOK) {
 					topCorner.x += 10;
 					topCorner.y += 10;
 					posOK = ScreenSize.isPointOnScreen(topCorner);
@@ -283,7 +280,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 				
 		public MainFrame(String title) throws HeadlessException {
 			super(title);
-			DefaultKeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
+			KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
 			noTipTimer = new Timer(6000, new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -386,6 +383,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 
 	}
 
+	@Override
 	public void addControlledUnit(PamControlledUnit unit) {
 		if (unit.getFrameNumber() != this.getFrameNumber()) {
 			return;
@@ -423,6 +421,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		return "Right click for more options";
 	}
 
+	@Override
 	public void removeControlledUnit(PamControlledUnit unit) {
 		unit.setPamView(null);
 		if (unit.getTabPanel() != null) mainTab.remove(unit.getTabPanel().getPanel());
@@ -443,6 +442,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 
 	class tabListener implements ChangeListener
 	{
+		@Override
 		public void stateChanged(ChangeEvent e) {
 			if (initializationComplete) {
 				guiParameters.selectedTab = mainTab.getSelectedIndex();
@@ -480,7 +480,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	 */
 	public void ShowTabSpecificSettings()
 	{   
-		if (initializationComplete == false) return;
+		if (!initializationComplete) return;
 		//System.out.println("Index: "+mainTab.getSelectedIndex());
 		//System.out.println("Placement: "+ mainTab.getTabPlacement());
 
@@ -644,7 +644,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		menuItem.addActionListener(new menuShowObjectDiagram());
 		fileMenu.add(menuItem);
 
-		if (isViewer == false) {
+		if (!isViewer) {
 			fileMenu.add(DataKeeper.getInstance().getSwingMenuItem(frame));
 		}
 
@@ -967,7 +967,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
         public void menuCanceled(MenuEvent e) {
 
         }
-	};
+	}
 
 	class StorageOptions implements ActionListener {
 		private JFrame parentFrame;
@@ -977,6 +977,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 			this.parentFrame = parentFrame;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			PamController.getInstance().storageOptions(parentFrame);
 		}
@@ -990,6 +991,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 			this.parentFrame = parentFrame;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			PamController.getInstance().exportData(parentFrame);
 		}
@@ -1001,6 +1003,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 			super();
 			this.parentFrame = parentFrame;
 		}
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			PamController.getInstance().exportGeneralXMLSettings(parentFrame, PamCalendar.getTimeInMillis());
 		}
@@ -1013,30 +1016,35 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	//		
 	//	}
 	class MenuDataSave implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			PamController.getInstance().saveViewerData();
 		}
 	}
 	
 	class menuSave implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			PamSettingManager.getInstance().saveSettings(frame);
 		}
 	}
 	
 	class menuSaveAs implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			PamSettingManager.getInstance().saveSettingsAs(frame);			
 		}
 	}
 	
 	class menuSaveAsXML implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			//			PamSettingManager.getInstance().saveSettingsAsXML(frame);			
 		}
 	}
 	
 	class menuLoadSettings implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			//			PamSettingManager.getInstance().loadSettingsFrom(frame);
 			/**
@@ -1054,16 +1062,19 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	 *
 	 */
 	class menuImportSettings implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			PamSettingManager.getInstance().importSettings(frame);
 		}
 	}
 	class menuExportSettings implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			PamSettingManager.getInstance().exportSettings(frame);
 		}
 	}
 	class TestMenuHelpPG implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			PamHelp.getInstance().displayHelp();
 			//DatabaseController.getInstance().
@@ -1071,6 +1082,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	}
 
 	class TipMenu implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){	
 			TipOfTheDayManager.getInstance().showTip(getGuiFrame(), null);
 		}
@@ -1083,6 +1095,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	 * 9/18/2010
 	 */
 	class OpenFolder implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 //			PrintStream newStream = null;
 //			/*
@@ -1142,6 +1155,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	}
 	
 	class ToggleLogFile implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			String logFile = pamguard.Pamguard.getLogFileName();
 			if (logFile == null) {
@@ -1159,6 +1173,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 
 
 	class ScalingFactorManager implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			PamSettingManager.getInstance().scalingFactorDialog(frame);
 		}
@@ -1167,6 +1182,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 
 
 	class PerformanceTests implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			PerformanceDialog.showDialog(getGuiFrame());
 		}
@@ -1180,12 +1196,14 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	//	}
 
 	class menuModuleOrder implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			pamControllerInterface.orderModules(frame);
 		}
 	}
 	
 	class menuArray implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			ArrayManager.getArrayManager().showArrayDialog(getGuiFrame());
 		}
@@ -1199,6 +1217,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 			this.menu=menu; 
 		}
 
+		@Override
 		public void mouseClicked(MouseEvent e) {
 			menu.setPopupMenuVisible(false);
 			ArrayManager.getArrayManager().showArrayDialog(getGuiFrame());
@@ -1207,34 +1226,40 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	}
 
 	class importArray implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			ArrayManager.getArrayManager().showHydrophoneImportDialog(getGuiFrame());		}
 	}
 
 	class importStreamer implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			ArrayManager.getArrayManager().showStreamerImportDialog(getGuiFrame());		}
 	}
 
 	class menuShowObjectList implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			PamObjectList.ShowObjectList(getGuiFrame());
 		}
 	}
 
 	class menuShowObjectDiagram implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			PamObjectViewer.Show(getGuiFrame(), pamController.getPamConfiguration());
 		}
 	}
 
 	class menuOpenLogFile implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			PamObjectList.ShowObjectList(getGuiFrame());
 		}
 	}
 
 	class menuExit implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			/*
 			 * Really should stop Pam first !
@@ -1247,6 +1272,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	}
 
 	class menuExitNoSave implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			prepareToClose(false);
 
@@ -1282,12 +1308,14 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	}
 	
 	class ClearHiddenWarnings implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			WarnOnce.clearHiddenList(getGuiFrame());
 		}
 	}
 
 	class menuPamStart implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			pamControllerInterface.manualStart();
 
@@ -1305,18 +1333,21 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	//	}
 
 	class menuPamStop implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			pamControllerInterface.manualStop();
 			//			enableLoggingMenu();		
 		}
 	}
 	class MenuMultiThreading implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			pamControllerInterface.modelSettings(frame);
 			//			enableLoggingMenu();		
 		}
 	}
 	class CreateWatchDog implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			PamController.getInstance().createWatchDog();
 		}
@@ -1396,6 +1427,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	}
 
 	class menuAbout implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			new Splash(30000, PamController.getInstance().getRunMode());
 		}
@@ -1408,6 +1440,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	 *
 	 */
 	class menuPlugin implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 
 			// figure out which plugin was selected.  The plugin default name was saved as the action command
@@ -1433,6 +1466,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	}
 
 	class menuCoreHelp implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			//System.out.println("PamGui: launch core pamguard help here");
 		}
@@ -1444,6 +1478,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 			super();
 			this.webAddr = webAddr;
 		}
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			URL url = null;
 			String fullAddr = "http://" + webAddr; 
@@ -1473,6 +1508,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	/* (non-Javadoc)
 	 * @see PamView.PamViewInterface#PamEnded()
 	 */
+	@Override
 	public void pamEnded() {
 
 		enableMenus();
@@ -1482,6 +1518,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	/* (non-Javadoc)
 	 * @see PamView.PamViewInterface#PamStarted()
 	 */
+	@Override
 	public void pamStarted() {
 
 		enableMenus();
@@ -1492,6 +1529,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	/* (non-Javadoc)
 	 * @see PamView.PamViewInterface#ModelChanged()
 	 */
+	@Override
 	public void modelChanged(int changeType) {
 		switch (changeType) {
 		case PamControllerInterface.INITIALIZATION_COMPLETE:
@@ -1677,6 +1715,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		//		PamSettingManager.getInstance().SaveSettings();
 
 	}
+	@Override
 	public void windowClosed(WindowEvent e) {
 		//		PamSettingManager.getInstance().SaveSettings();
 
@@ -1724,7 +1763,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 
 		PamController pamController = PamController.getInstance();
 
-		if (pamController.canClose() == false) {
+		if (!pamController.canClose()) {
 			return false;
 		}
 
@@ -1851,6 +1890,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	/* (non-Javadoc)
 	 * @see PamController.PamSettings#getSettingsReference()
 	 */
+	@Override
 	public Serializable getSettingsReference() {
 		return guiParameters;
 	}
@@ -1858,6 +1898,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	/* (non-Javadoc)
 	 * @see PamController.PamSettings#getSettingsVersion()
 	 */
+	@Override
 	public long getSettingsVersion() {
 		return GuiParameters.serialVersionUID;
 	}
@@ -1865,6 +1906,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	/* (non-Javadoc)
 	 * @see PamController.PamSettings#getUnitName()
 	 */
+	@Override
 	public String getUnitName() {
 		if (getFrameNumber() == 0) {
 			return "PamGUI";
@@ -1877,6 +1919,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	/* (non-Javadoc)
 	 * @see PamController.PamSettings#getUnitType()
 	 */
+	@Override
 	public String getUnitType() {
 		return "PamGUI";
 	}
@@ -1884,6 +1927,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	/* (non-Javadoc)
 	 * @see PamController.PamSettings#restoreSettings(PamController.PamControlledUnitSettings)
 	 */
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		guiParameters = ((GuiParameters) pamControlledUnitSettings.getSettings()).clone();
 		return true;
@@ -1949,7 +1993,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		normalLocation = guiFrame.getLocation();
 		normalSize = guiFrame.getSize();
 		//		guiFrame.setAlwaysOnTop(true);
-		guiFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		guiFrame.setExtendedState(Frame.MAXIMIZED_BOTH);
 		//		guiFrame.setVisible(false);
 		//		guiFrame.setUndecorated(true);
 		//		guiFrame.setVisible(true);
@@ -1968,7 +2012,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 			//			guiFrame.setSize(normalSize);
 		}
 		guiFrame.setAlwaysOnTop(false);
-		guiFrame.setExtendedState(JFrame.NORMAL);
+		guiFrame.setExtendedState(Frame.NORMAL);
 		//		guiFrame.setUndecorated(false);
 	}
 

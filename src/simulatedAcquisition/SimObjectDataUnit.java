@@ -4,17 +4,8 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Random;
 
-import javax.sound.midi.Transmitter;
-
-import pamMaths.PamVector;
-import propagation.PropagationModel;
-import simulatedAcquisition.movement.MovementModel;
-import simulatedAcquisition.movement.MovementModels;
-import simulatedAcquisition.sounds.SimSignal;
-import simulatedAcquisition.sounds.SimSound;
 import Acquisition.AcquisitionProcess;
 import Array.ArrayManager;
-import Array.HydrophoneLocator;
 import Array.PamArray;
 import Array.SnapshotGeometry;
 import PamController.PamController;
@@ -22,7 +13,11 @@ import PamUtils.LatLong;
 import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamguardMVC.PamDataUnit;
-import PamguardMVC.debug.Debug;
+import pamMaths.PamVector;
+import propagation.PropagationModel;
+import simulatedAcquisition.movement.MovementModel;
+import simulatedAcquisition.sounds.SimSignal;
+import simulatedAcquisition.sounds.SimSound;
 
 /**
  * SimObjectDataUnit is one per sound source, i.e. think 
@@ -95,7 +90,7 @@ public class SimObjectDataUnit extends PamDataUnit {
 			return;
 		}
 		float sampleRate = simProcess.getSampleRate();
-		if (simObject.randomIntervals == false && lastGenSample > 0) {
+		if (!simObject.randomIntervals && lastGenSample > 0) {
 			lastGenSample += (long) (sampleRate * simObject.meanInterval);
 		}
 		else {
@@ -352,7 +347,7 @@ public class SimObjectDataUnit extends PamDataUnit {
 					PamCalendar.getSessionStartTime();
 			// always move just before a sound is generated. 
 			boolean contSim = movementModel.takeStep(millis, this);
-			if (contSim == false) {
+			if (!contSim) {
 				stopRun();
 			}
 			else {

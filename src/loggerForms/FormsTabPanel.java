@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.KeyEventDispatcher;
 import java.awt.event.KeyEvent;
-import java.util.logging.LogManager;
 
 import javax.swing.JComponent;
 import javax.swing.JMenu;
@@ -13,9 +12,6 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 
-import org.jnativehook.GlobalScreen;
-import org.jnativehook.NativeHookException;
-import org.jnativehook.dispatcher.SwingDispatchService;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 

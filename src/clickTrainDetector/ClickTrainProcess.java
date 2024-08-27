@@ -4,7 +4,6 @@ import PamController.PamController;
 import PamController.status.ProcessCheck;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
-import PamguardMVC.PamInstantProcess;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
 import clickDetector.ClickDetection;

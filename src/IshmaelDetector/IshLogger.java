@@ -1,9 +1,5 @@
 package IshmaelDetector;
 
-import generalDatabase.PamTableDefinition;
-import generalDatabase.PamTableItem;
-import generalDatabase.SQLTypes;
-
 import java.sql.Types;
 
 import PamguardMVC.PamDataBlock;
@@ -12,6 +8,8 @@ import generalDatabase.EmptyTableDefinition;
 //import pamDatabase.SQLLogging;
 //import PamguardMVC.RecyclingDataBlock;
 import generalDatabase.PamDetectionLogging;
+import generalDatabase.PamTableItem;
+import generalDatabase.SQLTypes;
 
 public class IshLogger extends PamDetectionLogging {
 	IshDetControl ishDetControl;

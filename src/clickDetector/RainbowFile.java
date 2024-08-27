@@ -178,6 +178,7 @@ public class RainbowFile implements ClickFileStorage {
 	/**
 	 * Open a new rainbowFile for storage. 
 	 */
+	@Override
 	synchronized public boolean openClickStorage(long sampleOffset) {
 		this.sampleOffset = sampleOffset;
 
@@ -191,7 +192,7 @@ public class RainbowFile implements ClickFileStorage {
 		try {
 			AcquisitionProcess sourceProcess = (AcquisitionProcess) clickDetector.getSourceProcess();
 			Acquisition.DaqSystem daqSystem = sourceProcess.getAcquisitionControl().findDaqSystem(null);
-			if (daqSystem != null & daqSystem.isRealTime() == false) {
+			if (daqSystem != null & !daqSystem.isRealTime()) {
 				// assume it's a file name.
 				Acquisition.FileInputSystem fileSystem = (FileInputSystem) daqSystem;
 				soundFile = fileSystem.getCurrentFile();
@@ -227,7 +228,7 @@ public class RainbowFile implements ClickFileStorage {
 	 */
 	public boolean openClickStorage(File oldFile) {
 		sectionDataList.clear();
-		if (oldFile.exists() == false) {
+		if (!oldFile.exists()) {
 			return false;
 		}
 		try {
@@ -253,7 +254,7 @@ public class RainbowFile implements ClickFileStorage {
 				rsd.sectionStartTime = fileStartTime;
 				rsd.sectionSamples = fileSamples;
 				rsd.sectionDataPos = file.getFilePointer();
-				if (ans == false) {
+				if (!ans) {
 					break;
 				}
 				else {
@@ -263,7 +264,7 @@ public class RainbowFile implements ClickFileStorage {
 					// then cycle through clicks until a next section is met ...
 					filePos = file.getFilePointer();
 					ans = readClickHeader(click);
-					if (ans == false) {
+					if (!ans) {
 						break;
 					}
 					if (click.dataType == HEADER_CLICK) {
@@ -285,7 +286,7 @@ public class RainbowFile implements ClickFileStorage {
 						
 					}
 				}
-				if (ans == false) {
+				if (!ans) {
 					break;
 				}
 			}
@@ -364,6 +365,7 @@ public class RainbowFile implements ClickFileStorage {
 		".clk");
 	}
 
+	@Override
 	synchronized public void closeClickStorage() {
 		if (file == null) {
 			return;
@@ -385,6 +387,7 @@ public class RainbowFile implements ClickFileStorage {
 		return sectionDataList.size();
 	}
 
+	@Override
 	synchronized public boolean writeClickStructures(ClickParameters clickParameters) {
 
 		if (file == null) {
@@ -465,7 +468,7 @@ public class RainbowFile implements ClickFileStorage {
 		for (int i = 0; i < 32; i++) {
 			struct = 1<<i;
 			if ((struct & click.flags) > 0) {
-				if (readClickStructure(struct, clickParameters) == false) {
+				if (!readClickStructure(struct, clickParameters)) {
 					JOptionPane.showMessageDialog(null, "Error in Click File", 
 							"Incompatible click file format. \n" +
 							"Only use files created with PAMGUARD", JOptionPane.ERROR_MESSAGE);
@@ -722,6 +725,7 @@ public class RainbowFile implements ClickFileStorage {
 		return true;
 	}
 
+	@Override
 	synchronized public boolean writeClickHeader(ClickDetection click) {
 		if (file == null) {
 			return false;
@@ -1635,7 +1639,7 @@ class WAVFILEINFO
 		}
 		DaqSystem daqSystem = daqProcess.getAcquisitionControl().findDaqSystem(null);
 		if (daqSystem == null) return null;
-		if (daqSystem.isRealTime() == true){
+		if (daqSystem.isRealTime()){
 			return null;
 		}
 		// looks like it's file or file folder.
@@ -1653,6 +1657,7 @@ class WAVFILEINFO
 		return fileSystem.getCurrentFile();
 	}
 
+	@Override
 	public String getStorageName() {
 		return fileName;
 	}
@@ -1673,7 +1678,7 @@ class WAVFILEINFO
 		String dlgTitle = "Click Detector Rainbow File Storage";
 		if (file.exists() && file.isDirectory()) {
 			return true;
-		} else if (file.exists() == false) {
+		} else if (!file.exists()) {
 			int ans = JOptionPane.showOptionDialog(null, "Folder " + dirName
 					+ " does not exist. \nWould you like to create it ?",
 					dlgTitle,
@@ -1684,7 +1689,7 @@ class WAVFILEINFO
 			}
 			if (ans == JOptionPane.YES_OPTION) {
 				try {
-					if (file.mkdirs() == false) {
+					if (!file.mkdirs()) {
 						return checkStorage(dirName);
 					}
 					FileFunctions.setNonIndexingBit(file);

@@ -5,18 +5,16 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Window;
 
-import Array.streamerOrigin.HydrophoneOriginMethod;
 import GPS.GpsData;
-import GPS.GpsDataUnit;
 import PamUtils.Coordinate3d;
 import PamUtils.PamCalendar;
 import PamView.GeneralProjector;
+import PamView.GeneralProjector.ParameterType;
+import PamView.GeneralProjector.ParameterUnits;
 import PamView.PamKeyItem;
 import PamView.PamSymbol;
 import PamView.PamSymbolType;
 import PamView.PanelOverlayDraw;
-import PamView.GeneralProjector.ParameterType;
-import PamView.GeneralProjector.ParameterUnits;
 import PamView.symbol.SymbolData;
 import PamguardMVC.PamDataUnit;
 

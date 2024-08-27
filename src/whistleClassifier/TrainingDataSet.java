@@ -4,9 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
-import PamModel.parametermanager.ManagedParameters;
-import PamModel.parametermanager.PamParameterSet;
-
 /**
  * Training contours from a single file, each contour representing
  * one whistle. 

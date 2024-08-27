@@ -19,7 +19,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
@@ -30,10 +29,7 @@ import PamController.PamControllerInterface;
 import PamController.PamFolders;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
-import PamUtils.PamFileChooser;
 import PamUtils.PamFileFilter;
-import PamUtils.worker.PamWorkWrapper;
-import PamUtils.worker.PamWorker;
 import PamView.PamTabPanel;
 import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;

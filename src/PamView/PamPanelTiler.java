@@ -131,24 +131,28 @@ public class PamPanelTiler {
 	}
 	
 	private class Tile implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			tile();
 		}
 	}
 	
 	private class TileHorizontal implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			tileHorizontal();
 		}
 	}
 	
 	private class TileVertical implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			tileVertical();
 		}
 	}
 	
 	private class Cascade implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			cascade();
 		}

@@ -17,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.TitledBorder;
 
@@ -29,19 +30,19 @@ import PamView.dialog.PamDialog;
 public class AirgunParametersDialog extends PamDialog {
 
 	private static AirgunParametersDialog airgunParametersDialog;
-	
+
 	private AirgunParameters airgunParameters;
-	
+
 	private ShipDimensionsPanel shipDrawing;
-	
+
 	private ShipDimensionsFields shipDimensionsFields;
-	
+
 	private ShipIDPanel shipIDPanel;
-	
+
 	private ExclusionPanel exclusionPanel;
-	
+
 	private String[] fieldNames = {"E","F","Depth"};
-	
+
 	public AirgunParametersDialog(Frame parentFrame) {
 		super(parentFrame, "Airgun display parameters", false);
 		JPanel p = new JPanel();
@@ -49,7 +50,7 @@ public class AirgunParametersDialog extends PamDialog {
 		AirgunDimensionsDrawing ad = new AirgunDimensionsDrawing();
 		p.add(shipDrawing = new ShipDimensionsPanel(ad,
 				shipDimensionsFields = new ShipDimensionsFields(fieldNames)));
-		
+
 		JPanel q = new JPanel();
 		q.setLayout(new BoxLayout(q, BoxLayout.Y_AXIS));
 		q.add(shipIDPanel = new ShipIDPanel());
@@ -58,7 +59,7 @@ public class AirgunParametersDialog extends PamDialog {
 		setDialogComponent(p);
 //		setModal(true);
 	}
-	
+
 	public static AirgunParameters showDialog(Frame parentFrame, AirgunParameters airgunParameters) {
 		if (airgunParametersDialog == null || airgunParametersDialog.getParent() != parentFrame) {
 			airgunParametersDialog = new AirgunParametersDialog(parentFrame);
@@ -66,16 +67,16 @@ public class AirgunParametersDialog extends PamDialog {
 		airgunParametersDialog.airgunParameters = airgunParameters.clone();
 		airgunParametersDialog.setParams();
 		airgunParametersDialog.setVisible(true);
-		
+
 		return airgunParametersDialog.airgunParameters;
 	}
-	
+
 	@Override
 	public void cancelButtonPressed() {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	public void setParams() {
 		double[] dim = new double[3];
 		dim[0] = airgunParameters.dimE;
@@ -84,9 +85,9 @@ public class AirgunParametersDialog extends PamDialog {
 		shipDimensionsFields.setDimensions(dim);
 		shipIDPanel.setParams();
 		exclusionPanel.setParams();
-		
+
 	}
-	
+
 	@Override
 	public boolean getParams() {
 		double[] dim = shipDimensionsFields.getDimensions();
@@ -94,23 +95,22 @@ public class AirgunParametersDialog extends PamDialog {
 		airgunParameters.dimE = dim[0];
 		airgunParameters.dimF = dim[1];
 		airgunParameters.gunDepth = dim[2];
-		if (shipIDPanel.getParams() == false) return false;
-		if (exclusionPanel.getParams() == false) return false;
+		if (!shipIDPanel.getParams() || !exclusionPanel.getParams()) return false;
 		return true;
 	}
-	
+
 	@Override
 	public void restoreDefaultSettings() {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	class ShipIDPanel extends JPanel implements ActionListener {
 
 		private JRadioButton thisVessel, otherVessel, fixedLocation;
 		private JTextField mmsiNumber;
 		private LatLongEditableDialogStrip llStrip;
-		
+
 		public ShipIDPanel() {
 			super();
 			setBorder(new TitledBorder("Source Vessel Identification"));
@@ -131,7 +131,7 @@ public class AirgunParametersDialog extends PamDialog {
 			c.gridy++;
 			c.gridx = 0;
 			c.gridwidth = 1;
-			addComponent(this, new JLabel("Source vessel mmsi number ", JLabel.RIGHT), c);
+			addComponent(this, new JLabel("Source vessel mmsi number ", SwingConstants.RIGHT), c);
 			c.gridx++;
 			addComponent(this, mmsiNumber = new JTextField(7), c);
 			c.gridx = 0;
@@ -144,18 +144,19 @@ public class AirgunParametersDialog extends PamDialog {
 			addComponent(this, llStrip.getDialogComponent(), c);
 			bg.add(fixedLocation);
 			fixedLocation.addActionListener(this);
-			
+
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			enableControls();
 		}
-		
+
 		public void enableControls() {
 			mmsiNumber.setEnabled(otherVessel.isSelected());
 			llStrip.enableControls(fixedLocation.isSelected());
 		}
-		
+
 		public void setParams() {
 			thisVessel.setSelected(airgunParameters.gunsReferencePosition == AirgunParameters.GUNS_THIS_VESSEL);
 			otherVessel.setSelected(airgunParameters.gunsReferencePosition == AirgunParameters.GUNS_AIS_VESSEL);
@@ -164,7 +165,7 @@ public class AirgunParametersDialog extends PamDialog {
 			llStrip.setLatLong(airgunParameters.fixedPosition);
 			enableControls();
 		}
-		
+
 		public boolean getParams() {
 			if (thisVessel.isSelected()) {
 				airgunParameters.gunsReferencePosition = AirgunParameters.GUNS_THIS_VESSEL;
@@ -192,22 +193,22 @@ public class AirgunParametersDialog extends PamDialog {
 			}
 			return true;
 		}
-		
+
 	}
 	class ExclusionPanel extends JPanel implements ActionListener {
 
 		JTextField exRadius;
-		
+
 		JCheckBox showExclusion;
-		
+
 		JPanel exPanel;
-		
+
 		JButton exButton;
-		
+
 		JCheckBox predictAhead;
-		
+
 		JTextField predictionTime;
-		
+
 		public ExclusionPanel() {
 			super();
 			setBorder(new TitledBorder("Guns mitigation zone"));
@@ -229,7 +230,7 @@ public class AirgunParametersDialog extends PamDialog {
 			addComponent(this, exRadius = new JTextField(6), c);
 			c.gridx++;
 			addComponent(this, new JLabel(" m"), c);
-			
+
 			c.gridwidth = 1;
 			c.gridy++;
 			c.gridx = 0;
@@ -239,7 +240,7 @@ public class AirgunParametersDialog extends PamDialog {
 			c.gridx++;
 			addComponent(this, exButton = new JButton("Colour"), c);
 			exButton.addActionListener(this);
-			
+
 			c.gridx = 0;
 			c.gridy ++;
 			c.gridwidth = 3;
@@ -248,13 +249,13 @@ public class AirgunParametersDialog extends PamDialog {
 			c.gridx = 0;
 			c.gridy ++;
 			c.gridwidth = 1;
-			addComponent(this, new JLabel("Predict ahead for ", JLabel.RIGHT), c);
+			addComponent(this, new JLabel("Predict ahead for ", SwingConstants.RIGHT), c);
 			c.gridx++;
 			addComponent(this, predictionTime = new JTextField(6), c);
 			c.gridx++;
-			addComponent(this, new JLabel(" seconds ", JLabel.LEFT), c);
-			
-			
+			addComponent(this, new JLabel(" seconds ", SwingConstants.LEFT), c);
+
+
 		}
 		public void setParams() {
 			showExclusion.setSelected(airgunParameters.showExclusionZone);
@@ -282,9 +283,10 @@ public class AirgunParametersDialog extends PamDialog {
 			}
 			return true;
 		}
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (e.getSource() == exButton) {
-				Color newColor = JColorChooser.showDialog(this, "Mitigation zone colour", 
+				Color newColor = JColorChooser.showDialog(this, "Mitigation zone colour",
 						airgunParameters.exclusionColor);
 				if (newColor != null) {
 					setColour(newColor);
@@ -296,7 +298,7 @@ public class AirgunParametersDialog extends PamDialog {
 			else if (e.getSource() == predictAhead) {
 				enableControls();
 			}
-			
+
 		}
 		private void enableControls() {
 			predictAhead.setEnabled(showExclusion.isSelected());
@@ -305,5 +307,5 @@ public class AirgunParametersDialog extends PamDialog {
 			predictionTime.setEnabled(predictAhead.isSelected() && showExclusion.isSelected());
 		}
 	}
-	
+
 }

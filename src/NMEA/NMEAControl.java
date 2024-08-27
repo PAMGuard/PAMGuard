@@ -28,14 +28,12 @@ import java.io.Serializable;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-import nmeaEmulator.NMEAFrontEnd;
-
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
-import PamController.status.BaseProcessCheck;
+import nmeaEmulator.NMEAFrontEnd;
 
 
 /**
@@ -121,6 +119,7 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 			this.parentFrame = parentFrame;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			showNMEADialog(parentFrame);
 		}		
@@ -143,6 +142,7 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 			super();
 			this.parentFrame = parentFrame;
 		}
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			NMEAStringsTable.show(parentFrame, nmeaControl);
 		}
@@ -153,6 +153,7 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 			super();
 			this.parentFrame = parentFrame;
 		}
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			emulateNMEAData(parentFrame);
 		}
@@ -178,10 +179,12 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 	 * public void setNmeaSource(int source){
 	 * acquireNmeaData.setNMEASource(source); }
 	 */
+	@Override
 	public Serializable getSettingsReference() {
 		return nmeaParameters;
 	}
 
+	@Override
 	public long getSettingsVersion() {
 		return NMEAParameters.serialVersionUID;
 	}
@@ -191,6 +194,7 @@ public class NMEAControl extends PamControlledUnit implements PamSettings {
 	 * Stuff for settings interface
 	 */
 
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 
 		if (pamControlledUnitSettings.getUnitType().equals(this.getUnitType())

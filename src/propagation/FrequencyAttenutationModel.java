@@ -1,6 +1,5 @@
 package propagation;
 
-import PamUtils.PamUtils;
 import fftManager.FastFFT;
 
 public class FrequencyAttenutationModel implements AttenuationModel {
@@ -13,7 +12,7 @@ public class FrequencyAttenutationModel implements AttenuationModel {
 			return null;
 		}
 		int len = wave.length;
-		int fftLen = fastFFT.nextBinaryExp(len);
+		int fftLen = FastFFT.nextBinaryExp(len);
 		double[] complexData = new double[len*2];
 //		fastFFT.rfft(wave, complexData, fftLen);
 		return null;

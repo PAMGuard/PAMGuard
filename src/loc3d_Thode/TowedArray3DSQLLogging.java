@@ -1,18 +1,15 @@
 package loc3d_Thode;
 
-import generalDatabase.EmptyTableDefinition;
+import java.sql.Types;
+
+import PamDetection.LocContents;
+import PamguardMVC.PamDataBlock;
+import PamguardMVC.PamDataUnit;
 import generalDatabase.PamDetectionLogging;
 import generalDatabase.PamTableDefinition;
 import generalDatabase.PamTableItem;
 import generalDatabase.SQLLogging;
 import generalDatabase.SQLTypes;
-
-import java.sql.Types;
-
-import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamDataUnit;
-import PamDetection.AbstractLocalisation;
-import PamDetection.LocContents;
 
 public class TowedArray3DSQLLogging extends PamDetectionLogging {
 

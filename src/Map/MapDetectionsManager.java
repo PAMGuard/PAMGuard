@@ -7,6 +7,7 @@ import java.util.Comparator;
 
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
+import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamguardMVC.PamDataBlock;
@@ -56,12 +57,12 @@ public class MapDetectionsManager implements PamSettings {
 		 * createblocksList searches units for plottable blocks, it can't actually find them !
 		 */
 		switch (changeType) {
-		case PamController.INITIALIZATION_COMPLETE:
+		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			initialisationComplete = true;
-		case PamController.ADD_DATABLOCK:
-		case PamController.REMOVE_DATABLOCK:
-		case PamController.ADD_CONTROLLEDUNIT:
-		case PamController.REMOVE_CONTROLLEDUNIT:
+		case PamControllerInterface.ADD_DATABLOCK:
+		case PamControllerInterface.REMOVE_DATABLOCK:
+		case PamControllerInterface.ADD_CONTROLLEDUNIT:
+		case PamControllerInterface.REMOVE_CONTROLLEDUNIT:
 			if (initialisationComplete) {
 				createBlockList();
 			}
@@ -196,22 +197,27 @@ public class MapDetectionsManager implements PamSettings {
 	 * functions for storing of settings ... 
 	 */
 	
+	@Override
 	public Serializable getSettingsReference() {
 		return mapDetectionsParameters;
 	}
 
+	@Override
 	public long getSettingsVersion() {
 		return MapDetectionsParameters.serialVersionUID;
 	}
 
+	@Override
 	public String getUnitName() {
 		return mapControl.getUnitName();
 	}
 
+	@Override
 	public String getUnitType() {
 		return "Map Detections Manager";
 	}
 
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		mapDetectionsParameters = ((MapDetectionsParameters) pamControlledUnitSettings.getSettings()).clone();
 		return true;

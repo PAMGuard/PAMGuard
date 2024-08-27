@@ -30,87 +30,87 @@ import dataMap.filemaps.OfflineFileDialogPanel;
 import dataMap.filemaps.OfflineFileParameters;
 
 /**
- * Main dialog for acquisition control. Takes plug in panels from 
+ * Main dialog for acquisition control. Takes plug in panels from
  * the various sound systems to give more device specific controls where
- * necessary. 
- * 
+ * necessary.
+ *
  * @author Doug Gillespie
  *
  */
 public class AcquisitionDialog extends PamDialog {
 
 	private static AcquisitionParameters acquisitionParameters;
-	
+
 	private static AcquisitionDialog singleInstance;
-	
+
 	private static AcquisitionControl acquisitionControl;
-	
+
 	private OfflineFileDialogPanel offlineDAQDialogPanel;
-	
+
 	private PPSDialogPanel ppsDialogPanel;
 
 	private DaqSystem currentDaqSystem;
-	
+
 	private JComboBox deviceType;
-	
+
 	private JPanel mainPanel;
-	
+
 	private JComponent deviceSpecificPanel;
-	
+
 	private JTextField sampleRate, nChannels, vPeak2Peak;
-	
-	private JTextField preampGain; 
+
+	private JTextField preampGain;
 //	bandwidth0, bandwidth1;
 	private JCheckBox subtractDC;
-	
+
 	private JTextField dcTimeconstant;
-	
+
 //	public int channelList[] = new int[PamConstants.MAX_CHANNELS];
 //
 //	private JLabel panelChannelLabel[] = new JLabel[PamConstants.MAX_CHANNELS];
 //	private JComboBox panelChannelList[] = new JComboBox[PamConstants.MAX_CHANNELS];
-	
+
 	private ChannelListPanel standardChannelListPanel = new StandardChannelListPanel();
 	private ChannelListPanel currentChannelListPanel;
 	private JPanel channelListPanelArea = new JPanel();
 	//private static AcquisitionParameters acquisitionParameters; //Xiao Yan Deng
-	
+
 	/**
-	 * Main dialog for data acquisition control 
-	 * <p> 
-	 * When shown, the dialog contains three main panels. 
-	 * <p>The top one shows 
-	 * a list of available DaqSystems (e.g. sound cards, NI cards, etc. 
+	 * Main dialog for data acquisition control
+	 * <p>
+	 * When shown, the dialog contains three main panels.
+	 * <p>The top one shows
+	 * a list of available DaqSystems (e.g. sound cards, NI cards, etc.
 	 * >p>
 	 * The middle panel selected based on the type of DaqSytem and is implemented differently
 	 * within each DaqSystem. For instance, the sound card DaqSystem displays a list
-	 * of available sound cards. The file system displays a list of recent files, 
+	 * of available sound cards. The file system displays a list of recent files,
 	 * systems for other ADC cards mght display a channel selector and gain settings
-	 * specific for a particular device. 
+	 * specific for a particular device.
 	 * <p>
-	 * The bottom panel shows the number of channels, sample rate, and device sensitivity. 
+	 * The bottom panel shows the number of channels, sample rate, and device sensitivity.
 	 * The selected DaqSystem is queried to see if these are fixed, unknown or user entered
-	 * and enables the controls accordingly. If they are set by the DaqSystem, the 
+	 * and enables the controls accordingly. If they are set by the DaqSystem, the
 	 * DaqSystem should set them explicity using setSampleRate(), setChannels, and
-	 * setVPeak2Peak 
+	 * setVPeak2Peak
 	 *
 	 */
 	private AcquisitionDialog (Frame parentFrame) {
 
 		super(parentFrame, "Audio Data Acquisition", false);
 
-		
+
 		mainPanel = new JPanel();
-		
+
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 		mainPanel.add(DeviceTypePanel());
 		mainPanel.add(SamplingPanel());
 		mainPanel.add(CalibrationPanel());
-		
-		nChannels.addActionListener(new NumChannels()); 
+
+		nChannels.addActionListener(new NumChannels());
 
 		setHelpPoint("sound_processing.AcquisitionHelp.docs.AcquisitionConfiguration");
-		
+
 		if (PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW) {
 			JTabbedPane tabbedPane = new JTabbedPane();
 			offlineDAQDialogPanel = new OfflineFileDialogPanel(acquisitionControl, this);
@@ -131,45 +131,45 @@ public class AcquisitionDialog extends PamDialog {
 		setParams(); //Xiao Yan Deng
 		sortChannelLists(); // Xiao Yan Deng
 	}
-	
+
 	/**
-	 * Clear the static instance so that the dialog is 
-	 * totally rebuilt next time it's launched. 
+	 * Clear the static instance so that the dialog is
+	 * totally rebuilt next time it's launched.
 	 */
 	static public void clearInstance() {
 		singleInstance = null;
 	}
 	/**
-	 * Shows the data acquisition dialog. 
+	 * Shows the data acquisition dialog.
 	 * @param daqControl the calling AcquisitionControl
 	 * @param oldParams current parameters from the AcquisitionControl
 	 * @return new parameters selected in the dialog
 	 * @see AcquisitionControl
 	 */
 	static public AcquisitionParameters showDialog(Frame parentFrame, AcquisitionControl daqControl, AcquisitionParameters oldParams) {
-		
+
 		acquisitionParameters = oldParams.clone();
-				
+
 		acquisitionControl = daqControl;
 //		singleInstance = null;
-		
+
 		if (singleInstance == null || singleInstance.getOwner() != parentFrame) {
 			singleInstance = new AcquisitionDialog(parentFrame);
 		}
-		
+
 		singleInstance.setParams();
-		
+
 		singleInstance.sortChannelLists();
-		
+
 		singleInstance.setVisible(true);
-		
+
 		singleInstance.sortChannelLists(); // Xiao Yan Deng
-		
+
 		return acquisitionParameters;
 	}
-	
+
 	private void setParams() {
-		
+
 		// fill in the different device types.
 		deviceType.removeAllItems();
 		int ind = 0;
@@ -180,23 +180,23 @@ public class AcquisitionDialog extends PamDialog {
 			}
 		}
 		deviceType.setSelectedIndex(ind);
-		
+
 		newDeviceType();
-		
+
 		setSampleRate(acquisitionParameters.sampleRate);
-		
+
 		setChannels(acquisitionParameters.nChannels);
-		
+
 		setVPeak2Peak(acquisitionParameters.voltsPeak2Peak);
-		
+
 //		preampGain.setText(String.format("%.1f", acquisitionParameters.preamplifier.getGain()));
 		setPreampGain(acquisitionParameters.preamplifier.getGain());
 //		bandwidth0.setText(String.format("%.1f", acquisitionParameters.preamplifier.getBandwidth()[0]));
 //		bandwidth1.setText(String.format("%.1f", acquisitionParameters.preamplifier.getBandwidth()[1]));
 		subtractDC.setSelected(acquisitionParameters.subtractDC);
 		dcTimeconstant.setText(String.format("%3.1f", acquisitionParameters.dcTimeConstant));
-		
-		
+
+
 		if (currentDaqSystem != null) currentDaqSystem.dialogSetParams();
 
 		if (currentChannelListPanel != null) {
@@ -206,24 +206,24 @@ public class AcquisitionDialog extends PamDialog {
 		if (offlineDAQDialogPanel != null) {
 			offlineDAQDialogPanel.setParams();
 		}
-		
+
 		if (ppsDialogPanel != null) {
 			ppsDialogPanel.setParams(acquisitionParameters.getPpsParameters());
 		}
-		
+
 		enableControls();
 	}
 
 	/**
 	 * Called by the specific DaqSystem to set sample rate when it is set by
-	 * the DaqSystem (for instance FileInputSystem will set sample rate to the 
-	 * sample rate of data in the current file.  
+	 * the DaqSystem (for instance FileInputSystem will set sample rate to the
+	 * sample rate of data in the current file.
 	 * @param sampleRate Current sample rate
 	 */
 	public void setSampleRate(float sampleRate) {
 		this.sampleRate.setText(String.format("%.0f", sampleRate));
 	}
-	
+
 	/**
 	 * Get the sample rate, or null if sample rate is not a valid number
 	 * @return sample rate or null
@@ -239,15 +239,15 @@ public class AcquisitionDialog extends PamDialog {
 
 	/**
 	 * Called by the specific DaqSystem to set the number of channels when it is set by
-	 * the DaqSystem (for instance FileInputSystem will set it to the 
-	 * number of channels in the current file.  
+	 * the DaqSystem (for instance FileInputSystem will set it to the
+	 * number of channels in the current file.
 	 * @param nChannels Number of channels
 	 */
 	public void setChannels(int nChannels) {
 		this.nChannels.setText(String.format("%d", nChannels));
 	}
-	
-	/** 
+
+	/**
 	 * @return the number of channels or null if invalid number
 	 */
 	public Integer getChannels() {
@@ -258,7 +258,7 @@ public class AcquisitionDialog extends PamDialog {
 			return null;
 		}
 	}
-	
+
 	public void setPreampGain(double gain) {
 		preampGain.setText(String.format("%.1f", gain));
 	}
@@ -266,13 +266,13 @@ public class AcquisitionDialog extends PamDialog {
 	/**
 	 * Called by the specific DaqSystem to set the peak to peak voltage range.
 	 * This is used for calculating absolute SPL's in various detectors
-	 * the DaqSystem   
+	 * the DaqSystem
 	 * @param vPeak2Peak Peak to Peak input voltage
 	 */
 	public void setVPeak2Peak(double vPeak2Peak) {
 		this.vPeak2Peak.setText(String.format("%4.3f", vPeak2Peak));
 	}
-	
+
 	// read parameters back from the dialog
 	@Override
 	public boolean getParams() {
@@ -287,15 +287,15 @@ public class AcquisitionDialog extends PamDialog {
 //			bw[0] = Double.valueOf(bandwidth0.getText());
 //			bw[1] = Double.valueOf(bandwidth1.getText());
 //			acquisitionParameters.preamplifier.setBandwidth(bw);
-			
-			if(!currentDaqSystem.areSampleSettingsOk(acquisitionParameters.nChannels, acquisitionParameters.sampleRate)){			
+
+			if(!currentDaqSystem.areSampleSettingsOk(acquisitionParameters.nChannels, acquisitionParameters.sampleRate)){
 				currentDaqSystem.showSampleSettingsDialog(this);
 				return false;
-			}		
-				
+			}
+
      	    int nP = getNumChannels();
      	    if (getCurrentDaqSystem().supportsChannelLists() && currentChannelListPanel != null) {
-     	    	if (currentChannelListPanel.isDataOk() == false) {
+     	    	if (!currentChannelListPanel.isDataOk()) {
      	    		return false;
      	    	}
      	    	int[] chL = currentChannelListPanel.getChannelList();
@@ -312,7 +312,7 @@ public class AcquisitionDialog extends PamDialog {
 			Ex.printStackTrace();
 			return false;
 		}
-		
+
 		acquisitionParameters.subtractDC = subtractDC.isSelected();
 		if (acquisitionParameters.subtractDC) {
 			try {
@@ -325,8 +325,8 @@ public class AcquisitionDialog extends PamDialog {
 				return showWarning("The DC bacround subtractino time constant must be greater than zero");
 			}
 		}
-		
-		
+
+
 		if (offlineDAQDialogPanel != null) {
 			OfflineFileParameters ofp = offlineDAQDialogPanel.getParams();
 			if (ofp == null) {
@@ -346,13 +346,13 @@ public class AcquisitionDialog extends PamDialog {
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
-	
-	/** 
-	 * Read the latest sample rate value. 
-	 * @return sample rate Hz. 
+
+	/**
+	 * Read the latest sample rate value.
+	 * @return sample rate Hz.
 	 */
 	public double readSampleRate() {
 		double sr = 0;
@@ -365,22 +365,24 @@ public class AcquisitionDialog extends PamDialog {
 		return sr;
 	}
 
-	
+
 	@Override
 	public void cancelButtonPressed() {
 		acquisitionParameters = null;
 	}
 	@Override
 	public void restoreDefaultSettings() {
-		
+
 	}
-	
+
 	private class NewDeviceType implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			newDeviceType();
 		}
 	}
 	private class NumChannels implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			sortChannelLists();
 		}
@@ -395,7 +397,7 @@ public class AcquisitionDialog extends PamDialog {
 		deviceType.addActionListener(new NewDeviceType());
 		return p;
 	}
-	
+
 	/**
 	 * Only need to show the channel panel for certain device types,
 	 *
@@ -415,20 +417,20 @@ public class AcquisitionDialog extends PamDialog {
 			channelListPanelArea.add(standardChannelListPanel.getComponent());
 //			channelListPanel.setVisible(currentSystem.supportsChannelLists());
 		}
-		
+
 	}
-	
+
 	private JPanel SamplingPanel () {
-		
+
 		JPanel sP = new PamAlignmentPanel(new BorderLayout(), BorderLayout.WEST);
-		
+
 		JPanel p = new JPanel();
 		sP.setBorder(new TitledBorder("Sampling"));
 		GridBagLayout layout;
-		
+
 		p.setLayout(layout = new GridBagLayout());
 		GridBagConstraints constraints = new PamGridBagContraints();
-		
+
 		constraints.anchor = GridBagConstraints.EAST;
 		constraints.insets = new Insets(2,2,2,2);
 		constraints.fill = GridBagConstraints.NONE;
@@ -450,31 +452,31 @@ public class AcquisitionDialog extends PamDialog {
 		constraints.gridx ++;
 		constraints.gridwidth = 2;
 		addComponent(p, new JLabel(" (hit enter)"), constraints);
-		
+
 		sP.add(BorderLayout.NORTH, p);
-		
+
 //		constraints.gridy++;
 //		constraints.gridx = 0;
 //		constraints.gridwidth = 4;
 		standardChannelListPanel = new StandardChannelListPanel();
 //		addComponent(p, channelListPanel, constraints);
-		
+
 		constraints.insets = new Insets(2,2,2,2);
-		
-		
+
+
 		sP.add(BorderLayout.CENTER, channelListPanelArea);
-		
+
 		return sP;
 	}
-	
-//	
+
+//
 //	private JPanel createStandardChannelListPanel() {
 //
 //		/* code for select channel */
 //		/*
-//		 * put this in a separate panel so it can be hidden if 
-//		 * it's not possible to change these parameters. 
-//		 * 
+//		 * put this in a separate panel so it can be hidden if
+//		 * it's not possible to change these parameters.
+//		 *
 //		 * Text information updated DG & JG 12/8/08
 //		 */
 //		JPanel cP;
@@ -494,7 +496,7 @@ public class AcquisitionDialog extends PamDialog {
 //		s += "<br>So be aware. If you've put a plug into socket 1, <br>you probably want to select channel 0, etc.</html>";
 //		for (int i = 0; i < PamConstants.MAX_CHANNELS; i++){ //Xiao Yan Deng
 //		//for (int i = 0; i < getNumChannels(); i++){
-//			
+//
 //			if (i%2 ==0){
 //				c2.gridx = 0;
 //				c2.gridy ++;
@@ -509,28 +511,28 @@ public class AcquisitionDialog extends PamDialog {
 //			else {
 //				spaceStr = "";
 //			}
-//			addComponent(cP, panelChannelLabel[i] = 
+//			addComponent(cP, panelChannelLabel[i] =
 //				new JLabel(spaceStr + " SW Ch " + i + " = HW Ch "), c2);
 //			c2.gridx ++;
 //			//constraints.gridwidth = 2;
 //			addComponent(cP, panelChannelList[i] = new JComboBox(), c2);
 //			panelChannelLabel[i].setToolTipText(s);
 //			panelChannelList[i].setToolTipText(s);
-//			
+//
 //		}
 //		return cP;
 //	}
-//	
+//
 	private JPanel CalibrationPanel() {
-			
+
 		JPanel p = new PamAlignmentPanel(BorderLayout.WEST) ;
-		
+
 		p.setBorder(new TitledBorder("Calibration"));
 		GridBagLayout layout;
-		
+
 		p.setLayout(layout = new GridBagLayout());
 		GridBagConstraints constraints = new PamGridBagContraints();
-		
+
 		constraints.anchor = GridBagConstraints.WEST;
 		constraints.insets = new Insets(2,2,2,2);
 		constraints.gridx = 0;
@@ -588,13 +590,13 @@ public class AcquisitionDialog extends PamDialog {
 				enableControls();
 			}
 		});
-		String t = "Some input devices have a fixed (DC) offset in their voltage measurement.\n" + 
+		String t = "Some input devices have a fixed (DC) offset in their voltage measurement.\n" +
 		"Subtracting this off can lead to improved PAMGuard performance.";
 		dcTimeconstant.setToolTipText(t);
 		subtractDC.setToolTipText(t);
-		
-		
-		
+
+
+
 		return p;
 	}
 
@@ -604,10 +606,10 @@ public class AcquisitionDialog extends PamDialog {
 
 
 	/**
-	 * 
+	 *
 	 * @return the number of channels
 	 */
-	int getNumChannels() { 
+	int getNumChannels() {
 		try {
 			return Integer.valueOf(nChannels.getText());
 		}
@@ -616,7 +618,7 @@ public class AcquisitionDialog extends PamDialog {
 		}
 	}
 
-	private void sortChannelLists() { 
+	private void sortChannelLists() {
 		// first of all, only show the ones in range of nPanels
 		if (currentChannelListPanel != null) {
 			currentChannelListPanel.setNumChannels(getNumChannels());
@@ -624,64 +626,64 @@ public class AcquisitionDialog extends PamDialog {
 		pack();
 	}
 
-	
-	
+
+
 	/**
-	 * Called when the device type changes. Loads the appropriate panel for 
+	 * Called when the device type changes. Loads the appropriate panel for
 	 * the newly selected DaqSystem into the dialog
 	 *
-	 */ 
+	 */
 	private void newDeviceType() {
-		
+
 		int devNumber = deviceType.getSelectedIndex();
-		
+
 		if (devNumber < 0) return;
-		
+
 		// remove the old type specific panel and replace it with a new one.
 		if (deviceSpecificPanel != null) {
 			mainPanel.remove(deviceSpecificPanel);
 		}
 		currentDaqSystem = acquisitionControl.systemList.get(devNumber);
-		
+
 		deviceSpecificPanel = currentDaqSystem.getDaqSpecificDialogComponent(this);
 		if (deviceSpecificPanel != null) {
 			mainPanel.add(deviceSpecificPanel, 1);
 			currentDaqSystem.dialogSetParams();
 		}
-		
+
 		sampleRate.setEnabled(currentDaqSystem.getMaxSampleRate() != DaqSystem.PARAMETER_FIXED);
 		nChannels.setEnabled(currentDaqSystem.getMaxChannels() != DaqSystem.PARAMETER_FIXED);
 		vPeak2Peak.setEnabled(currentDaqSystem.getPeak2PeakVoltage(0) == DaqSystem.PARAMETER_UNKNOWN);
-		
+
 		showHideChannelPanel();
-		
+
 		if (currentChannelListPanel != null) {
 			currentChannelListPanel.setNumChannels(getNumChannels());
 			currentChannelListPanel.setParams(acquisitionParameters.getHardwareChannelList());
 		}
-		
+
 		pack();
 	}
 	public DaqSystem getCurrentDaqSystem() {
 		return currentDaqSystem;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @return the sample rate component
 	 */
 	public JTextField getSampleRateComponent() {
 		return sampleRate;
 	}
-	
+
 	/**
-	 * 
-	 * @return the nChannels component. 
+	 *
+	 * @return the nChannels component.
 	 */
 	public JTextField getnChanComponent() {
 		return nChannels;
 	}
-	
-	
-	
+
+
+
 }

@@ -48,10 +48,12 @@ public class VetoPluginPanelProvider implements DisplayPanelProvider {
 		DisplayProviderList.addDisplayPanelProvider(this);
 	}
 
+	@Override
 	public DisplayPanel createDisplayPanel(DisplayPanelContainer displayPanelContainer) {
 		return new VetoPluginPanel(this, displayPanelContainer);
 	}
 
+	@Override
 	public String getDisplayPanelName() {
 		return "Seismic Veto trigger function";
 	}
@@ -136,24 +138,29 @@ public class VetoPluginPanelProvider implements DisplayPanelProvider {
 			
 		}
 
+		@Override
 		public String getObserverName() {
 			return "veto plug in panel";
 		}
 
+		@Override
 		public long getRequiredDataHistory(PamObservable o, Object arg) {
 			return (long) this.displayPanelContainer.getXDuration();
 		}
 
+		@Override
 		public void noteNewSettings() {
 			// TODO Auto-generated method stub
 			
 		}
 
+		@Override
 		public void removeObservable(PamObservable o) {
 			// TODO Auto-generated method stub
 			
 		}
 
+		@Override
 		public void setSampleRate(float sampleRate, boolean notify) {
 			// TODO Auto-generated method stub
 			
@@ -170,6 +177,7 @@ public class VetoPluginPanelProvider implements DisplayPanelProvider {
 		/**
 		 * new data have arrived - work out what channel it's from and plot it.
 		 */
+		@Override
 		public void addData(PamObservable o, PamDataUnit arg) {
 			/*
 			 * Get the channel and y pixel for this data point

@@ -1,29 +1,21 @@
 package mapgrouplocaliser;
 
-import java.awt.Shape;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-import Localiser.algorithms.locErrors.json.ErrorJsonConverter;
-import PamUtils.Coordinate3d;
 import PamUtils.LatLong;
 import PamUtils.PamCoordinate;
 import PamView.paneloverlay.overlaymark.OverlayMark;
 import PamView.paneloverlay.overlaymark.OverlayMark.OverlayMarkType;
-import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.superdet.SuperDetDataBlock;
-import generalDatabase.DBControlUnit;
 import generalDatabase.JsonConverter;
-import generalDatabase.PamConnection;
 import generalDatabase.SQLLogging;
 import generalDatabase.SQLTypes;
 import generalDatabase.SuperDetLogging;

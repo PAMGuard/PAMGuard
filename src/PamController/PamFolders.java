@@ -24,15 +24,15 @@ public class PamFolders {
 		}
 		File fullFile = new File(fullName);
 		if (create) {
-			if (fullFile.exists() == false) {
-				if (fullFile.mkdir() == false) {
+			if (!fullFile.exists()) {
+				if (!fullFile.mkdir()) {
 					throw  new PamFolderException("Unable to create folder " + fullFile);
-				};
+				}
 			}
 		}
-		if (fullFile.exists() == false) {
+		if (!fullFile.exists()) {
 			throw  new PamFolderException("Folder " + fullFile + " does not exist");
-		};
+		}
 		return true;
 	}
 	

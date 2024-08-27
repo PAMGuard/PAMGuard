@@ -7,7 +7,6 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 
-import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import binaryFileStorage.BinaryDataSource;
 import binaryFileStorage.BinaryHeader;
@@ -53,7 +52,7 @@ public class GPLStateDataSource extends BinaryDataSource {
 		try {
 			double baseline = dis.readFloat();
 			double ceilnoise = dis.readFloat();
-			double threshfloor = dis.readFloat();;
+			double threshfloor = dis.readFloat();
 			int state = dis.readShort();
 			GPLStateDataUnit stateData = new GPLStateDataUnit(binaryObjectData.getDataUnitBaseData(), baseline, ceilnoise, threshfloor, state);
 			return stateData;

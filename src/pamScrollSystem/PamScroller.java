@@ -1,7 +1,6 @@
 package pamScrollSystem;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.MouseEvent;
@@ -11,16 +10,11 @@ import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
-import javax.swing.SwingUtilities;
 
-import PamController.PamControlledUnit;
 import PamUtils.PamCalendar;
 import PamView.component.PamScrollBar;
 import PamView.dialog.PamLabel;
 import PamView.panel.PamPanel;
-import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamProcess;
-import javafx.application.Platform;
 
 public class PamScroller extends AbstractPamScrollerAWT {
 	
@@ -116,7 +110,7 @@ public class PamScroller extends AbstractPamScrollerAWT {
 	}
 	
 	public void setShowTimes(boolean showTimes) {
-		if (showTimes == false && timePanel != null) {
+		if (!showTimes && timePanel != null) {
 			panel.remove(timePanel);
 			timePanel = null;
 		}

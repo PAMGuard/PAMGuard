@@ -3,16 +3,12 @@ package PamView;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Shape;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.WeakHashMap;
 
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 
 /**
  * Useful functions for swing. 

@@ -14,8 +14,8 @@ import java.text.NumberFormat;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
-import PamModel.parametermanager.PrivatePamParameterData;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
+import PamModel.parametermanager.PrivatePamParameterData;
 import PamguardMVC.PamConstants;
 import net.sf.geographiclib.Geodesic;
 import net.sf.geographiclib.PolygonArea;
@@ -731,7 +731,7 @@ public class LatLong implements Serializable, Cloneable, Transferable, PamCoordi
 
 //		DataFlavor[] a = clipboard.getContents(null).getTransferDataFlavors();
 		boolean ans = clipboard.getContents(null).isDataFlavorSupported(LatLong.getDataFlavor());
-		if (ans == false) {
+		if (!ans) {
 			return null;
 		}
 		

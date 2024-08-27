@@ -32,6 +32,7 @@ public class BinaryMapMakeProgress extends PamTaskUpdate {
 	/**
 	 * @return the status
 	 */
+	@Override
 	public int getStatus() {
 		return status;
 	}
@@ -39,6 +40,7 @@ public class BinaryMapMakeProgress extends PamTaskUpdate {
 	/**
 	 * @param status the status to set
 	 */
+	@Override
 	public void setStatus(int status) {
 		this.status = status;
 	}

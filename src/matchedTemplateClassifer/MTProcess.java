@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import PamController.PamController;
-import PamDetection.RawDataUnit;
-import PamUtils.PamArrayUtils;
 import PamUtils.complex.ComplexArray;
 import PamView.symbol.PamSymbolManager;
 import PamguardMVC.PamDataBlock;
@@ -17,7 +15,6 @@ import Spectrogram.WindowFunction;
 import clickDetector.ClickDetection;
 import clickDetector.ClickLength;
 import clickDetector.ClickClassifiers.basicSweep.SweepClassifierSet;
-import clipgenerator.ClipDataUnit;
 import fftManager.FastFFT;
 import matchedTemplateClassifer.annotation.MatchedClickAnnotation;
 import matchedTemplateClassifer.annotation.MatchedClickAnnotationType;

@@ -15,7 +15,6 @@ import java.io.Serializable;
 
 import javax.swing.JMenuItem;
 
-import IshmaelDetector.layoutFX.IshEnergyPaneFX;
 import IshmaelDetector.layoutFX.IshSpecCorrelationPaneFX;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
@@ -67,6 +66,7 @@ public class SgramCorrControl extends IshDetControl implements PamSettings
 	}
 	
 	class menuSmoothingDetection implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev) {
 //			KernelSmoothingParameters newParams = KernelSmoothingDialog.show(smoothingParameters, smoothingProcess.getOutputDataBlock(0));
 //			if (newParams != null) {
@@ -120,6 +120,7 @@ public class SgramCorrControl extends IshDetControl implements PamSettings
 		return super.restoreSettings(pamControlledUnitSettings);
 	}
 
+	@Override
 	public Serializable getSettingsReference() {
 		return ishDetParams;
 	}
@@ -127,6 +128,7 @@ public class SgramCorrControl extends IshDetControl implements PamSettings
 	/**
 	 * @return An integer version number for the settings
 	 */
+	@Override
 	public long getSettingsVersion() {
 		return SgramCorrParams.serialVersionUID;
 	}

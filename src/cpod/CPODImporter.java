@@ -2,7 +2,6 @@ package cpod;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -13,8 +12,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import org.apache.commons.io.FilenameUtils;
 
 import PamController.PamController;
 import PamUtils.PamCalendar;
@@ -28,7 +25,6 @@ import cpod.CPODReader.CPODHeader;
 import cpod.CPODUtils.CPODFileType;
 import cpod.FPODReader.FPODHeader;
 import cpod.FPODReader.FPODdata;
-import javafx.application.Platform;
 import javafx.concurrent.Task;
 
 /**
@@ -441,7 +437,7 @@ public class CPODImporter {
 				CPODClickOmparator cpodComparator =  new CPODClickOmparator();
 				
 				//make sure to sort the list. 
-				Collections.sort(cpodCP3Data, cpodComparator);;
+				Collections.sort(cpodCP3Data, cpodComparator);
 				//here we need to replace the CP1 detection in the CP1 file with the CP3 detections in the CP3 file
 				for (int j=0; j<cpodCP1Data.size(); j++) {
 					int index = Collections.binarySearch(cpodCP3Data, cpodCP1Data.get(j),cpodComparator);

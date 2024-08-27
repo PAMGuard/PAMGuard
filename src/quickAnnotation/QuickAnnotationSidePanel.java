@@ -1,7 +1,5 @@
 package quickAnnotation;
 
-import generalDatabase.lookupTables.LookupItem;
-
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -17,7 +15,6 @@ import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -27,6 +24,7 @@ import PamView.PamSidePanel;
 import PamView.dialog.PamCheckBox;
 import PamView.panel.PamPanel;
 import PamView.panel.PamScrollPane;
+import generalDatabase.lookupTables.LookupItem;
 
 /**
  * The DIFAR SidePanel contains the list of DIFAR classifications, to allow
@@ -45,6 +43,7 @@ public class QuickAnnotationSidePanel implements PamSidePanel {
 	DefaultListModel<LookupItem> defaultListModel;
 	PamList labelList;
 	private final Object defaultItem= new Object(){
+		@Override
 		public String toString() {
 			return "";
 		};
@@ -65,14 +64,16 @@ public class QuickAnnotationSidePanel implements PamSidePanel {
 
 		defaultListModel = new DefaultListModel<LookupItem>();
 		labelList = new PamList(defaultListModel)     {
-            public String getToolTipText( MouseEvent e )
+            @Override
+			public String getToolTipText( MouseEvent e )
             {
                 int row = locationToIndex( e.getPoint() );
                 Object o = getModel().getElementAt(row);
                 return o.toString();
             }
 
-            public Point getToolTipLocation(MouseEvent e)
+            @Override
+			public Point getToolTipLocation(MouseEvent e)
             {
                 int row = locationToIndex( e.getPoint() );
                 Rectangle r = getCellBounds(row, row);

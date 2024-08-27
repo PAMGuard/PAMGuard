@@ -251,7 +251,7 @@ public class FastFFT  {
 				break;
 		}
 		return power;
-	};
+	}
 	
 	/**
 	 * Finds the next highest binary exponential of the input integer. If the
@@ -273,7 +273,7 @@ public class FastFFT  {
 				break;
 		}
 		return power;
-	};
+	}
 	
 	/**
 	 * 

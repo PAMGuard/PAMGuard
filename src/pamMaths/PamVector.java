@@ -463,7 +463,7 @@ public class PamVector implements Serializable, Cloneable, PamCoordinate, Manage
 			return true;
 		}
 		// first check they are parallel
-		if (isParallel(vec) == false) {
+		if (!isParallel(vec)) {
 			return false;
 		}
 		/*

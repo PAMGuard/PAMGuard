@@ -1,10 +1,6 @@
 package noiseOneBand;
 
-import networkTransfer.receive.BuoyStatusDataUnit;
-import noiseOneBand.offline.OneBandDatagramProvider;
-
 import Acquisition.AcquisitionProcess;
-import Filters.FIRArbitraryFilter;
 import Filters.Filter;
 import Filters.FilterMethod;
 import PamController.PamController;
@@ -19,6 +15,8 @@ import PamguardMVC.PamObserver;
 import PamguardMVC.PamObserverAdapter;
 import PamguardMVC.PamProcess;
 import PamguardMVC.PamRawDataBlock;
+import networkTransfer.receive.BuoyStatusDataUnit;
+import noiseOneBand.offline.OneBandDatagramProvider;
 
 public class OneBandProcess extends PamProcess {
 	
@@ -141,6 +139,7 @@ public class OneBandProcess extends PamProcess {
 	/**
 	 * @return the sourceDataBlock
 	 */
+	@Override
 	public PamRawDataBlock getRawSourceDataBlock() {
 		return rawSourceDataBlock;
 	}

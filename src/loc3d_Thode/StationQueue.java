@@ -2,10 +2,9 @@ package loc3d_Thode;
 
 import java.util.ArrayList;
 
-import fftManager.FFT;
 import Localiser.DelayMeasurementParams;
 import Localiser.algorithms.Correlations;
-import loc3d_Thode.TowedArray3DProcessParameters;
+import fftManager.FFT;
 
 /**
  * StationQueue--

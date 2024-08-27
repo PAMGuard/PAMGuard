@@ -22,38 +22,31 @@ package PamguardMVC;
 
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Vector;
 
 import javax.swing.JPopupMenu;
 
-import pamMaths.PamVector;
-import annotation.DataAnnotation;
-import annotation.DataAnnotationType;
-import binaryFileStorage.DataUnitFileInformation;
-import clickDetector.offlineFuncs.OfflineEventDataUnit;
 import Acquisition.AcquisitionControl;
-import Acquisition.AcquisitionParameters;
 import Acquisition.AcquisitionProcess;
 import Array.ArrayManager;
-import Array.HydrophoneLocator;
-import Array.PamArray;
 import Array.SnapshotGeometry;
 import GPS.GpsData;
 import GPS.GpsDataUnit;
 import PamController.PamController;
 import PamDetection.AbstractLocalisation;
 import PamUtils.FrequencyFormat;
-import PamUtils.LatLong;
 import PamUtils.PamCalendar;
-import PamUtils.PamSort;
 import PamUtils.PamUtils;
 import PamUtils.time.CalendarControl;
 import PamguardMVC.datamenus.DataMenuParent;
-import PamguardMVC.superdet.SubdetectionInfo;
 import PamguardMVC.superdet.SuperDetection;
+import annotation.DataAnnotation;
+import annotation.DataAnnotationType;
+import binaryFileStorage.DataUnitFileInformation;
+import clickDetector.offlineFuncs.OfflineEventDataUnit;
+import pamMaths.PamVector;
 
 /**
  * @author Doug Gillespie
@@ -903,7 +896,7 @@ abstract public class PamDataUnit<T extends PamDataUnit, U extends PamDataUnit> 
 		str += String.format("%s %s %s<p>", PamCalendar.formatDate(basicData.getTimeMilliseconds(), true),
 				PamCalendar.formatTime(basicData.getTimeMilliseconds(), 3, true),
 				CalendarControl.getInstance().getTZCode(true));
-		if (CalendarControl.getInstance().isUTC() == false) {
+		if (!CalendarControl.getInstance().isUTC()) {
 			str += String.format("%s %s %s<p>", PamCalendar.formatDate(basicData.getTimeMilliseconds(), false),
 					PamCalendar.formatTime(basicData.getTimeMilliseconds(), 3, false),
 					"UTC");
@@ -1229,7 +1222,7 @@ abstract public class PamDataUnit<T extends PamDataUnit, U extends PamDataUnit> 
 					iter.remove();
 				}
 			}
-			if (superDetections.contains(superDetection) == false) {
+			if (!superDetections.contains(superDetection)) {
 				superDetections.add(superDetection);
 			}
 			if (parentDataBlock != null && PamController.getInstance().getRunMode() != PamController.RUN_PAMVIEW) {
@@ -1259,7 +1252,7 @@ abstract public class PamDataUnit<T extends PamDataUnit, U extends PamDataUnit> 
 	 * @return super detection or null
 	 */
 	public SuperDetection getSuperDetection(Class superClass, boolean includeSubClasses) {
-		if (includeSubClasses == false) {
+		if (!includeSubClasses) {
 			return getSuperDetection(superClass);
 		}
 		synchronized (superDetectionSyncronisation) {

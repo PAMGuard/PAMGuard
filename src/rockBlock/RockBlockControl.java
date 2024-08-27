@@ -142,6 +142,7 @@ public class RockBlockControl extends PamControlledUnit implements PamSettings {
 			this.parentFrame = parentFrame;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			RockBlockParams newParams = RockBlockParamsDialog.showDialog(parentFrame, rockBlockParams);
 			/*

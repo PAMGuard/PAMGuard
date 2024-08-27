@@ -10,18 +10,15 @@ import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import dbht.offline.DbHtSummaryTask;
-import offlineProcessing.DataCopyTask;
-import offlineProcessing.OLProcessDialog;
-import offlineProcessing.OfflineTaskGroup;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamView.PamTabPanel;
+import dbht.offline.DbHtSummaryTask;
+import offlineProcessing.DataCopyTask;
+import offlineProcessing.OLProcessDialog;
+import offlineProcessing.OfflineTaskGroup;
 
 public class DbHtControl extends PamControlledUnit implements PamSettings {
 

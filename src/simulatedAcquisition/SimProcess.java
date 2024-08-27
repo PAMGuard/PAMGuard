@@ -13,27 +13,19 @@ import java.util.Random;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
-import pamMaths.PamVector;
-import propagation.PropagationModel;
-import propagation.SphericalPropagation;
-import propagation.SurfaceEcho;
-
-
-import simulatedAcquisition.sounds.SimSignals;
 import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionDialog;
-import Acquisition.DaqSystem;
 import Acquisition.AudioDataQueue;
+import Acquisition.DaqSystem;
 import Array.ArrayManager;
 import Array.PamArray;
-import Array.StreamerDataUnit;
-import GPS.GpsData;
 import Map.MapController;
 import Map.MapPanel;
 import Map.MapRectProjector;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
+import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamDetection.RawDataUnit;
@@ -43,7 +35,11 @@ import PamUtils.PamCalendar;
 import PamView.symbol.StandardSymbolManager;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
-import PamguardMVC.debug.Debug;
+import pamMaths.PamVector;
+import propagation.PropagationModel;
+import propagation.SphericalPropagation;
+import propagation.SurfaceEcho;
+import simulatedAcquisition.sounds.SimSignals;
 
 /**
  * Simulation of simulated sound. 
@@ -144,12 +140,12 @@ public class SimProcess extends DaqSystem implements PamSettings {
 		if (simSoundsDataBlock == null) {
 			simSoundsDataBlock = new SimSoundDataBlock("Simulated Sounds", daqControl.getAcquisitionProcess(), 0);
 		}
-		if (wasSelected && select == false) {
+		if (wasSelected && !select) {
 			daqControl.getAcquisitionProcess().removeOutputDatablock(simObjectsDataBlock);
 			daqControl.getAcquisitionProcess().removeOutputDatablock(simSoundsDataBlock);
 			//			PamController.getInstance().notifyModelChanged(PamControllerInterface.REMOVE_DATABLOCK);
 		}
-		else if (wasSelected == false && select) {
+		else if (!wasSelected && select) {
 			daqControl.getAcquisitionProcess().addOutputDataBlock(simObjectsDataBlock);
 			daqControl.getAcquisitionProcess().addOutputDataBlock(simSoundsDataBlock);
 			setupObjects();
@@ -270,7 +266,7 @@ public class SimProcess extends DaqSystem implements PamSettings {
 				 * unit, then set it's reference to zero.
 				 */
 				while (newDataUnits.getQueueSize() > daqControl.acquisitionParameters.nChannels*2) {
-					if (dontStop == false) break;
+					if (!dontStop) break;
 					try {
 						Thread.sleep(2);
 					} catch (Exception ex) {
@@ -659,7 +655,7 @@ public class SimProcess extends DaqSystem implements PamSettings {
 	@Override
 	public void notifyModelChanged(int changeType) {
 		super.notifyModelChanged(changeType);
-		if (changeType == PamController.INITIALIZATION_COMPLETE) {
+		if (changeType == PamControllerInterface.INITIALIZATION_COMPLETE) {
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {

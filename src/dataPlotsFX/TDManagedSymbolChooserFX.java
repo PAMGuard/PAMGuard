@@ -2,7 +2,6 @@ package dataPlotsFX;
 
 import PamView.symbol.PamSymbolChooser;
 import PamguardMVC.PamDataUnit;
-import clickDetector.tdPlots.ClickSymbolChooser;
 import dataPlotsFX.clickPlotFX.ClickSymbolChooserFX;
 import dataPlotsFX.data.TDDataInfoFX;
 import pamViewFX.fxNodes.PamSymbolFX;

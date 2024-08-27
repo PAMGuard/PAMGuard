@@ -3,7 +3,6 @@ package signal;
 import java.util.Arrays;
 
 import PamUtils.complex.ComplexArray;
-import fftManager.Complex;
 import fftManager.FastFFT;
 
 /**

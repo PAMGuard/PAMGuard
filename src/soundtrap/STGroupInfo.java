@@ -1,15 +1,7 @@
 package soundtrap;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.UnsupportedAudioFileException;
-
-import Acquisition.pamAudio.WavFileInputStream;
 import soundtrap.xml.CDETInfo;
 import soundtrap.xml.DWVInfo;
 import soundtrap.xml.WAVInfo;

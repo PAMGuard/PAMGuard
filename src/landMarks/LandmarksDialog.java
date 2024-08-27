@@ -1,13 +1,8 @@
 package landMarks;
 
-import generalDatabase.DBControlUnit;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,18 +19,9 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
 
-
-
-
-
-
-
-
-
-
 import PamUtils.LatLong;
 import PamView.dialog.PamDialog;
-import PamView.dialog.PamGridBagContraints;
+import generalDatabase.DBControlUnit;
 
 public class LandmarksDialog extends PamDialog {
 
@@ -139,6 +125,7 @@ public class LandmarksDialog extends PamDialog {
 	}
 
 	class DeleteButton implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			int row = table.getSelectedRow();
 			if (row < 0 || row >= landmarkDatas.size()) {
@@ -150,6 +137,7 @@ public class LandmarksDialog extends PamDialog {
 	}
 	
 	class AddButton implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			LandmarkData newLandmark = LandmarkDialog.showDialog(parentFrame, landmarkControl, null);
 			if (newLandmark != null) {
@@ -163,6 +151,7 @@ public class LandmarksDialog extends PamDialog {
 	}
 	
 	class EditButton implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			int row = table.getSelectedRow();
 			if (row < 0 || row >= landmarkDatas.size()) {
@@ -202,10 +191,12 @@ public class LandmarksDialog extends PamDialog {
 			return colNames[column];
 		}
 
+		@Override
 		public int getColumnCount() {
 			return colNames.length;
 		}
 
+		@Override
 		public int getRowCount() {
 			if (landmarkDatas == null) {
 				return 0;
@@ -225,6 +216,7 @@ public class LandmarksDialog extends PamDialog {
 
 		}
 
+		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			if (landmarkDatas == null) {
 				return null;
@@ -258,7 +250,7 @@ public class LandmarksDialog extends PamDialog {
 		if (tN == null || tN.length() == 0) {
 			return;
 		}
-		if (dbi.checkTable(tN) == false) {
+		if (!dbi.checkTable(tN)) {
 			return;
 		}
 		ArrayList<LandmarkData> newData = dbi.readDatas(tN);

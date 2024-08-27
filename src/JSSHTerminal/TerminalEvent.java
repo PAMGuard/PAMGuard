@@ -1,13 +1,24 @@
 package JSSHTerminal;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.io.IOException;
+
+import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 
 /**
  * Terminal component super class
@@ -82,7 +93,8 @@ public abstract class TerminalEvent extends JComponent implements MouseListener,
     resizeComponent(width, height);
 
     addComponentListener(new ComponentAdapter() {
-      public void componentResized(ComponentEvent e) {
+      @Override
+	public void componentResized(ComponentEvent e) {
         resize();
       }
     });
@@ -126,7 +138,8 @@ public abstract class TerminalEvent extends JComponent implements MouseListener,
     if(session!=null) session.resize(termWidth,termHeight);
   }
 
-  public Dimension getPreferredSize() {
+  @Override
+public Dimension getPreferredSize() {
     return size;
   }
 
@@ -155,7 +168,8 @@ public abstract class TerminalEvent extends JComponent implements MouseListener,
   } 
   public abstract void drawComponent(Graphics g);
 
-  public void paint(Graphics g) {
+  @Override
+public void paint(Graphics g) {
 
     //long t0 = System.currentTimeMillis();
     drawComponent(g);
@@ -175,7 +189,8 @@ public abstract class TerminalEvent extends JComponent implements MouseListener,
   }
 
 
-  public void processKeyEvent(KeyEvent e) {
+  @Override
+public void processKeyEvent(KeyEvent e) {
 
     int id=e.getID();
 

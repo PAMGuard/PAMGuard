@@ -20,10 +20,8 @@ import PamController.PamSettings;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import PamguardMVC.superdet.SuperDetDataBlock;
-import clickDetector.offlineFuncs.OfflineEventDataBlock;
 import dataMap.DataMapControl;
 import dataMap.OfflineDataMap;
-import detectiongrouplocaliser.DetectionGroupDataBlock;
 import generalDatabase.SQLLogging;
 import generalDatabase.SuperDetLogging;
 import offlineProcessing.superdet.OfflineSuperDetFilter;
@@ -86,7 +84,7 @@ public class ViewerScrollerManager extends AbstractScrollManager implements PamS
 			}
 			aScroller.anotherScrollerMovedOuter(newMin, newMax);
 		}
-		if (currentScrollInitialisation == false) {
+		if (!currentScrollInitialisation) {
 			loadData(false);
 		}
 	}
@@ -227,7 +225,7 @@ public class ViewerScrollerManager extends AbstractScrollManager implements PamS
 	private void loadSubformData(ArrayList<DataLoadQueData> dataLoadQueue, DataLoader dataLoader) {
 		for (int i=0; i<dataLoadQueue.size(); i++) {
 			PamDataBlock dataBlock = dataLoadQueue.get(i).getPamDataBlock();
-			if (dataBlock instanceof SuperDetDataBlock  == false) {
+			if (!(dataBlock instanceof SuperDetDataBlock)) {
 				continue;
 			}
 //			System.out.println("Load subform data for datablock " + i + ": " + dataBlock.getLongDataName());
@@ -391,7 +389,7 @@ public class ViewerScrollerManager extends AbstractScrollManager implements PamS
 				 */
 				for (int i = 0; i < dataLoadQueue.size(); i++) {
 					DataLoadQueData queueItem = dataLoadQueue.get(i);
-					if (queueItem.isHasSubTable() == false) {
+					if (!queueItem.isHasSubTable()) {
 						continue;
 					}
 					OfflineDataMap priMap = dataLoadQueue.get(i).getPamDataBlock().getPrimaryDataMap();
@@ -429,7 +427,7 @@ public class ViewerScrollerManager extends AbstractScrollManager implements PamS
 				 */
 				for (int i = 0; i < dataLoadQueue.size(); i++) {
 					DataLoadQueData queueItem = dataLoadQueue.get(i);
-					if (queueItem.isHasSubTable() == true) {
+					if (queueItem.isHasSubTable()) {
 						continue;
 					}
 					LoadQueueProgressData lpd = new LoadQueueProgressData(storeName, 

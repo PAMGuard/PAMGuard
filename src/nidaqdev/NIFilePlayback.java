@@ -67,7 +67,7 @@ public class NIFilePlayback implements FilePlaybackDevice, PamSettings {
 				if (deviceInfo.get(i).isSimulated()) {
 					niDeviceNames[nDevs] += " (simulated)";
 				}
-				if (deviceInfo.get(i).isExists() == false) {
+				if (!deviceInfo.get(i).isExists()) {
 					niDeviceNames[nDevs] += " (not present)";
 				}
 				niDeviceLUT[nDevs] = i;

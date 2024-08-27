@@ -19,16 +19,19 @@ public class TextKeyItem implements PamKeyItem {
 		this.text = text;
 	}
 
+	@Override
 	public Component getIcon(int keyType, int nComponent) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public int getNumItems(int keyType) {
 		// TODO Auto-generated method stub
 		return 1;
 	}
 
+	@Override
 	public String getText(int keyType, int nComponent) {
 		return text;
 	}

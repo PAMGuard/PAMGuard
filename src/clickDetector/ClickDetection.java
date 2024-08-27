@@ -4,14 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import pamMaths.PamVector;
-import clickDetector.ClickClassifiers.basic.BasicClickIdentifier;
-import clickDetector.ClickClassifiers.basicSweep.ZeroCrossingStats;
-import clickDetector.offlineFuncs.OfflineEventDataUnit;
-import clickDetector.ClickDetector.ChannelGroupDetector;
 import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionProcess;
-import Array.ArrayManager;
 import Array.SnapshotGeometry;
 import Localiser.algorithms.timeDelayLocalisers.bearingLoc.BearingLocaliser;
 import PamDetection.LocContents;
@@ -26,12 +20,14 @@ import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.RawDataHolder;
 import PamguardMVC.RawDataTransforms;
-import Spectrogram.WindowFunction;
-import fftFilter.FFTFilter;
+import clickDetector.ClickDetector.ChannelGroupDetector;
+import clickDetector.ClickClassifiers.basic.BasicClickIdentifier;
+import clickDetector.ClickClassifiers.basicSweep.ZeroCrossingStats;
+import clickDetector.offlineFuncs.OfflineEventDataUnit;
 import fftFilter.FFTFilterParams;
-import fftManager.Complex;
 import fftManager.FFTDataUnit;
 import fftManager.FastFFT;
+import pamMaths.PamVector;
 
 /**
  * Class for Click Detector clicks. 
@@ -540,7 +536,7 @@ public class ClickDetection extends PamDataUnit<PamDataUnit, PamDataUnit> implem
 	 * @return analystic waveform. 
 	 */
 	public synchronized double[] getAnalyticWaveform(int iChan, boolean filtered, FFTFilterParams fftFilterParams) {
-		if (filtered == false || fftFilterParams == null) {
+		if (!filtered || fftFilterParams == null) {
 			return getAnalyticWaveform(iChan);
 		}
 		else {
@@ -929,7 +925,7 @@ public class ClickDetection extends PamDataUnit<PamDataUnit, PamDataUnit> implem
 	 * @return data filtered or otherwise. 
 	 */
 	public double[][] getWaveData(boolean filtered, FFTFilterParams fftFilterParams) {
-		if (filtered == false || fftFilterParams == null) {
+		if (!filtered || fftFilterParams == null) {
 			return getWaveData();
 		}
 		else {
@@ -944,7 +940,7 @@ public class ClickDetection extends PamDataUnit<PamDataUnit, PamDataUnit> implem
 	 * @return data filtered or otherwise. 
 	 */
 	public double[] getWaveData(int channelIndex, boolean filtered, FFTFilterParams fftFilterParams) {
-		if (filtered == false || fftFilterParams == null) {
+		if (!filtered || fftFilterParams == null) {
 			return getWaveData(channelIndex);
 		}
 		else {
@@ -970,6 +966,7 @@ public class ClickDetection extends PamDataUnit<PamDataUnit, PamDataUnit> implem
 	 * @return waveform data for all channels. Convert from compressed (int16) data 
 	 * if necessary. 
 	 */
+	@Override
 	public synchronized double[][] getWaveData() {
 		if (waveData != null) {
 			return waveData;

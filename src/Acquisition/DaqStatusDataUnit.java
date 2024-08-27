@@ -1,42 +1,41 @@
 package Acquisition;
 
 import PamUtils.PamCalendar;
-import PamUtils.PamUtils;
 import PamguardMVC.PamDataUnit;
 
 /**
- * Data unit containing information on run starts and stops. 
+ * Data unit containing information on run starts and stops.
  * <p>
- * The main purpose of producing these is so that they get picked up 
+ * The main purpose of producing these is so that they get picked up
  * by the database and logged
- * 
+ *
  * @author Doug Gillespie
  *
  */
 public class DaqStatusDataUnit extends PamDataUnit {
 
 	private String status = "Stop";
-	
+
 	private String reason = "";
-	
+
 	private String daqSystemType = "";
-	
+
 	public int sampleRate;
-	
+
 	public Double trueSampleRate;
-	
+
 	public int nChannels = 2;
-	
+
 	public double voltsPeak2Peak = 5;
-	
+
 	public double duration = 0;
-	
+
 	public double clockError;
 
 	private long adcMilliseconds;
-	
+
 	private long samples;
-	
+
 	private Long gpsPPSMilliseconds;
 
 	private Long serverTime;
@@ -44,13 +43,13 @@ public class DaqStatusDataUnit extends PamDataUnit {
 	private AcquisitionParameters daqParameters;
 
 	private long rawADCMillis;
-	
+
 	private String systemName;
 //	private static DaqStatusDataUnit previousDaqStatusUnit = null;
 
-	public DaqStatusDataUnit(long timeMilliseconds, long adcMilliseconds, long rawADCMillis, 
-			long samples, Long gpsPPSMillis, 
-			String status, String reason, 
+	public DaqStatusDataUnit(long timeMilliseconds, long adcMilliseconds, long rawADCMillis,
+			long samples, Long gpsPPSMillis,
+			String status, String reason,
 			AcquisitionParameters daqParameters, String systemName, double duration, double clockError) {
 		super(timeMilliseconds);
 		this.adcMilliseconds = adcMilliseconds;
@@ -60,7 +59,7 @@ public class DaqStatusDataUnit extends PamDataUnit {
 		this.status = status;
 		this.reason = reason;
 		if (daqParameters!=null) {
-			//null if statement only used in viewer mode were DAQ params are not loaded from database. 
+			//null if statement only used in viewer mode were DAQ params are not loaded from database.
 			this.daqSystemType = daqParameters.daqSystemType;
 			this.daqParameters = daqParameters;
 			this.sampleRate = (int) daqParameters.getSampleRate();
@@ -70,17 +69,17 @@ public class DaqStatusDataUnit extends PamDataUnit {
 		this.systemName = systemName;
 		this.duration = duration;
 		this.clockError = clockError;
-		
+
 		// set the DataUnitBaseData duration (in samples) to this duration
 		this.setSampleDuration((long) (duration*sampleRate));
-		
+
 //		/*
 //		 * This won't work if data are being sent from multiple receivers !
 //		 */
 //		calculateTrueSampleRate(previousDaqStatusUnit);
 //		previousDaqStatusUnit = this;
 	}
-	
+
 	/**
 	 * @return the systemName
 	 */
@@ -99,9 +98,9 @@ public class DaqStatusDataUnit extends PamDataUnit {
 		if (previousUnit == null || gpsPPSMilliseconds == null || previousUnit.getGpsPPSMilliseconds() == null) {
 			trueSampleRate = null;
 			return null;
-		}			
-		double samples = (double) (this.samples - previousUnit.getSamples());
-		double tDiff = (double) (this.gpsPPSMilliseconds - previousUnit.getGpsPPSMilliseconds()) / 1000.;
+		}
+		double samples = this.samples - previousUnit.getSamples();
+		double tDiff = (this.gpsPPSMilliseconds - previousUnit.getGpsPPSMilliseconds()) / 1000.;
 		if (tDiff > 0 && tDiff < 900 && samples > 0) {
 			trueSampleRate = samples/tDiff;
 		}

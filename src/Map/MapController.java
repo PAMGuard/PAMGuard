@@ -9,26 +9,18 @@ import java.util.ArrayList;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.Timer;
 
-import userDisplay.UserDisplayControl;
-
-import Array.ArrayManager;
-import Array.PamArray;
 import GPS.GPSControl;
-import GPS.GpsData;
-import GPS.GpsDataUnit;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
-import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamUtils.LatLong;
 import PamUtils.MapContourValues;
 import PamView.PamGui;
-import PamguardMVC.PamDataUnit;
+import userDisplay.UserDisplayControl;
 
 
 public class MapController extends PamControlledUnit implements PamSettings {
@@ -121,6 +113,7 @@ public class MapController extends PamControlledUnit implements PamSettings {
 			this.parentFrame = parentFrame;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent ev) {
 			//getMapFile.openMapDialog();
 			if (getMapFile.openMapDialog() != null){

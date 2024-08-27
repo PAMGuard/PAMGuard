@@ -85,7 +85,7 @@ public class DataUnitFinder<Tunit extends PamDataUnit> {
 		int loops = 0;
 		while (li.hasNext()) {
 			lastUnit = li.next();
-			if (li.hasNext() == false) {
+			if (!li.hasNext()) {
 				setupList();
 				loops++;
 				if (loops > 1) {

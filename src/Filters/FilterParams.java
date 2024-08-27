@@ -22,12 +22,7 @@ package Filters;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.Arrays;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import PamController.PamControlledUnit;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;

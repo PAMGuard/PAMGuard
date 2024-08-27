@@ -13,8 +13,6 @@ import java.io.Serializable;
 
 import javax.swing.JMenuItem;
 
-import IshmaelDetector.IshDetection;
-import IshmaelDetector.IshLogger;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
@@ -71,6 +69,7 @@ public class IshLocControl extends PamControlledUnit implements PamSettings {
 	/** This is called after a settings file is read.  The subclass should 
 	 * get newParams and clone it as ishDetParams before calling here.
 	 */
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings settings) {
 		IshLocParams newParams = (IshLocParams)settings.getSettings();
 		//I can't figure out why inputDataSource is not in the newParams
@@ -97,6 +96,7 @@ public class IshLocControl extends PamControlledUnit implements PamSettings {
 		public LocationActionListener(Frame parentFrame) {
 			this.parentFrame = parentFrame;
 		}
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			PamDataBlock b = (ishLocProcessHy == null) ? null
 					: ishLocProcessHy.outputDataBlock;
@@ -120,6 +120,7 @@ public class IshLocControl extends PamControlledUnit implements PamSettings {
 		}
 	}
 	
+	@Override
 	public Serializable getSettingsReference() {
 		return ishLocParams;
 	}
@@ -127,6 +128,7 @@ public class IshLocControl extends PamControlledUnit implements PamSettings {
 	/**
 	 * @return An integer version number for the settings
 	 */
+	@Override
 	public long getSettingsVersion() {
 		return IshLocParams.serialVersionUID;
 	}

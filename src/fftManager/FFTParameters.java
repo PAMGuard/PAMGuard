@@ -27,9 +27,8 @@ import PamModel.parametermanager.FieldNotFoundException;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterData;
 import PamModel.parametermanager.PamParameterSet;
-import spectrogramNoiseReduction.SpectrogramNoiseSettings;
-
 import Spectrogram.WindowFunction;
+import spectrogramNoiseReduction.SpectrogramNoiseSettings;
 
 public class FFTParameters implements Serializable, ManagedParameters, Cloneable {
 

@@ -22,23 +22,22 @@ package PamguardMVC;
 
 import java.awt.Graphics;
 import java.awt.Rectangle;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.Timer;
 
 import PamModel.PamModel;
 import PamModel.PamProfiler;
-import PamUtils.SystemTiming;
 import PamView.GeneralProjector;
-import PamView.PamKeyItem;
-import PamView.PanelOverlayDraw;
 import PamView.GeneralProjector.ParameterType;
 import PamView.GeneralProjector.ParameterUnits;
+import PamView.PamKeyItem;
+import PamView.PanelOverlayDraw;
 
 /**
  * @author Doug Gillespie
@@ -105,7 +104,7 @@ public class PamObservable {//extends PanelOverlayDraw {
 	public void addObserver(PamObserver o) {
 		// check each observer only observes once.
 		synchronized (pamObservers) {
-			if (pamObservers.contains(o) == false) {
+			if (!pamObservers.contains(o)) {
 				pamObservers.add(o);
 				if (cpuUsage == null || cpuUsage.length < countObservers()) {
 					cpuUsage = new long[countObservers()];
@@ -123,7 +122,7 @@ public class PamObservable {//extends PanelOverlayDraw {
 	public void addInstantObserver(PamObserver o) {
 		// check each observer only observes once.
 		synchronized (pamObservers) {
-			if (instantObservers.contains(o) == false) {
+			if (!instantObservers.contains(o)) {
 				instantObservers.add(o);
 				if (cpuUsage == null || cpuUsage.length < countObservers()) {
 					cpuUsage = new long[countObservers()];
@@ -135,7 +134,7 @@ public class PamObservable {//extends PanelOverlayDraw {
 
 	public void addObserver(PamObserver observer, boolean reThread) {
 		//		reThread = false;
-		if (reThread == false) {
+		if (!reThread) {
 			addObserver(observer);
 			return;
 		}
@@ -195,7 +194,7 @@ public class PamObservable {//extends PanelOverlayDraw {
 				if (pamObserver.getClass() == ThreadedObserver.class) {
 					threadedObserver = (ThreadedObserver) pamObserver;
 					waitingUnits += threadedObserver.getInterThreadListSize();
-					if (threadedObserver.isEmptyRead() == false) {
+					if (!threadedObserver.isEmptyRead()) {
 						waitingUnits++;
 					}
 				}
@@ -378,9 +377,9 @@ public class PamObservable {//extends PanelOverlayDraw {
 			//     perhaps running in a diagnostic mode.  			
 			//     
 
-			long cpuStart = tmxb.getThreadCpuTime(threadId);;
+			long cpuStart = tmxb.getThreadCpuTime(threadId);
 			getPamObserver(i).addData(this, o);
-			long cpuEnd = tmxb.getThreadCpuTime(threadId);;
+			long cpuEnd = tmxb.getThreadCpuTime(threadId);
 			cpuUsage[i] += (cpuEnd - cpuStart);
 		}
 		clearchanged();
@@ -409,6 +408,7 @@ public class PamObservable {//extends PanelOverlayDraw {
 	}
 
 	private Timer cpuTimer = new Timer(4321, new ActionListener() {
+		@Override
 		public void actionPerformed(ActionEvent evt) {
 			long now = System.currentTimeMillis();
 			if (cpuUsage == null) return;

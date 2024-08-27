@@ -14,7 +14,7 @@ import backupmanager.stream.BackupStream;
  */
 public class BackupProgress {
 
-	public enum STATE {CATALOGING, RUNNING, STREAMDONE, ALLDONE, PROBLEM};
+	public enum STATE {CATALOGING, RUNNING, STREAMDONE, ALLDONE, PROBLEM}
 	/**
 	 * Backup stream can never be null except in the one case of
 	 * things being complete. 

@@ -69,6 +69,7 @@ public class ScalePanel extends JPanel {
 
 	// this.get
 	Timer t = new Timer(100, new ActionListener() {
+		@Override
 		public void actionPerformed(ActionEvent evt) {
 
 			// paintImmediately(getBounds());

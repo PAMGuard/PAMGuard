@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 
 import com.sun.jna.platform.win32.Kernel32;
+import com.sun.jna.platform.win32.WinBase;
 import com.sun.jna.platform.win32.WinDef.DWORD;
+import com.sun.jna.platform.win32.WinNT;
 
 /**
  * Functions connected with storing data files. 
@@ -30,9 +32,9 @@ public class FileFunctions {
 			folder = new File(base);
 		}
 		if (autoCreate) {
-			if (folder.exists() == false) {
+			if (!folder.exists()) {
 				folder.mkdirs();
-				if (folder.exists() == false) {
+				if (!folder.exists()) {
 					return null;
 				}
 			}
@@ -49,9 +51,9 @@ public class FileFunctions {
 	 */
 	public static File createNonIndexedFolder(String path) {
 		File folder = new File(path);
-		if (folder.exists() == false) {
+		if (!folder.exists()) {
 			folder.mkdirs();
-			if (folder.exists() == false) {
+			if (!folder.exists()) {
 				return null;
 			}
 		}
@@ -84,7 +86,7 @@ public class FileFunctions {
 		boolean success = false;
 		try {
 			int theAttrib = FileFunctions.getAttributes(file);
-			DWORD attribWithSetBit = new DWORD (theAttrib | Kernel32.FILE_ATTRIBUTE_NOT_CONTENT_INDEXED);
+			DWORD attribWithSetBit = new DWORD (theAttrib | WinNT.FILE_ATTRIBUTE_NOT_CONTENT_INDEXED);
 			FileFunctions.setAttributes(file, attribWithSetBit);
 			success = true;
 		} catch (Exception e) {
@@ -102,7 +104,7 @@ public class FileFunctions {
 	private static int getAttributes(File file) throws Exception {
 		try {
 		int attrib = Kernel32.INSTANCE.GetFileAttributes(pathString(file));
-		if (attrib == Kernel32.INVALID_FILE_ATTRIBUTES) {
+		if (attrib == WinBase.INVALID_FILE_ATTRIBUTES) {
 			throw new IOException("Unable to read file attributes of " + file);
 		}
 		return attrib;
@@ -118,7 +120,7 @@ public class FileFunctions {
 	}
 
 	public static boolean isNotIndexed(File file) throws Exception {
-		return (getAttributes(file) & Kernel32.FILE_ATTRIBUTE_NOT_CONTENT_INDEXED) != 0;
+		return (getAttributes(file) & WinNT.FILE_ATTRIBUTE_NOT_CONTENT_INDEXED) != 0;
 	}
 
 }

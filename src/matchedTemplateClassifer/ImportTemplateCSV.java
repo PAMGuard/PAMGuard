@@ -4,9 +4,7 @@ package matchedTemplateClassifer
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collection;
 
-import PamUtils.PamArrayUtils;
 import PamUtils.TxtFileUtils;
 
 /**
@@ -70,6 +68,7 @@ public class ImportTemplateCSV implements TemplateImport {
 	 * Get extension
 	 * @return the extension
 	 */
+	@Override
 	public String[] getExtension() {
 		return extensionStrings; 
 	}

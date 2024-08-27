@@ -85,7 +85,7 @@ public class AsioJniInterface {
 	private static boolean loadLibraryTried = false;
 
 	public static void load() {
-		if (loadLibraryTried == false)
+		if (!loadLibraryTried)
 			try  {
 				System.loadLibrary(SILIB);
 				loadLibraryOK = true;

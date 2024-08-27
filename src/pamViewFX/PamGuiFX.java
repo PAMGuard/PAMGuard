@@ -5,9 +5,23 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
+import org.controlsfx.control.ToggleSwitch;
+
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamView.PamViewInterface;
+import dataModelFX.DataModelPaneFX;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.geometry.Side;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamButton;
@@ -18,21 +32,6 @@ import pamViewFX.fxNodes.hidingPane.HidingPane;
 import pamViewFX.pamTask.PamLoadingPane;
 import pamViewFX.pamTask.PamTaskUpdate;
 import userDisplayFX.UserDisplayNodeFX;
-import javafx.application.Platform;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.geometry.Side;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.stage.Stage;
-import dataModelFX.DataModelPaneFX;
-
-import org.controlsfx.control.ToggleSwitch;
 
 
 

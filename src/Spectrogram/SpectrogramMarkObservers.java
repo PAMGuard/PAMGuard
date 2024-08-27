@@ -43,7 +43,7 @@ public class SpectrogramMarkObservers {
 		ArrayList<OverlayMarkObserver> list = OverlayMarkObservers.singleInstance().getMarkObservers();
 		for (int i = 0; i < list.size(); i++) {
 			OverlayMarkObserver obs = list.get(i);
-			if (SpectrogramMarkConverter.class.isAssignableFrom(obs.getClass()) == false) {
+			if (!SpectrogramMarkConverter.class.isAssignableFrom(obs.getClass())) {
 				continue;
 			}
 			SpectrogramMarkConverter smc = (SpectrogramMarkConverter) obs;

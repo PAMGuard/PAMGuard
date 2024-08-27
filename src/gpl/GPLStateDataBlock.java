@@ -1,7 +1,6 @@
 package gpl;
 
 import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamProcess;
 
 public class GPLStateDataBlock extends PamDataBlock<GPLStateDataUnit> {
 

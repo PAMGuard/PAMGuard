@@ -2,7 +2,6 @@ package loggerForms;
 
 import GPS.GpsData;
 import PamUtils.PamCalendar;
-import PamView.GeneralProjector;
 import PamguardMVC.PamDataUnit;
 import generalDatabase.SQLTypes;
 import loggerForms.controlDescriptions.ControlDescription;

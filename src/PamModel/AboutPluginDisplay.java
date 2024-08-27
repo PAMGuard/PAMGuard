@@ -1,18 +1,15 @@
 package PamModel;
 
-import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
 
 import PamView.dialog.PamDialog;
@@ -91,7 +88,7 @@ public class AboutPluginDisplay extends PamDialog {
 		aboutText.setRows(10);
 		aboutText.setLineWrap(true);
 		aboutText.setWrapStyleWord(true);
-		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 		p.add(scrollPane,c);
 				
 		setDialogComponent(p);

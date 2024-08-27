@@ -6,8 +6,8 @@ import java.util.ArrayList;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
-import PamModel.parametermanager.PrivatePamParameterData;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
+import PamModel.parametermanager.PrivatePamParameterData;
 
 public class SpectrogramNoiseSettings implements Serializable, Cloneable, ManagedParameters {
 

@@ -28,7 +28,7 @@ public class FilterSpeed {
 			data[i] = r.nextGaussian();
 		}
 		testData = data.clone();
-		long sn, en, mn = 0;;
+		long sn, en, mn = 0;
 		double a;
 		long startTime = System.currentTimeMillis();
 		for (int i = 0; i < nTrials; i++) {

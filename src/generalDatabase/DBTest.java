@@ -1,16 +1,15 @@
 package generalDatabase;
 
-import generalDatabase.pamCursor.NonScrollablePamCursor;
-import generalDatabase.pamCursor.PamCursor;
-
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 
-import java.sql.Statement;
+import generalDatabase.pamCursor.NonScrollablePamCursor;
+import generalDatabase.pamCursor.PamCursor;
 
 public class DBTest {
 

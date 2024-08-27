@@ -1,7 +1,6 @@
 package ravendata;
 
 import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamProcess;
 
 public class RavenDataBlock extends PamDataBlock<RavenDataUnit> {
 

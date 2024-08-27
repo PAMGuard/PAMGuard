@@ -240,6 +240,7 @@ public class PamSymbolDialog extends PamDialog implements ActionListener {
 	 *  (non-Javadoc)
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
+	@Override
 	public void actionPerformed(ActionEvent e) {
 
 		if (e.getSource() == symbolButton) {
@@ -315,6 +316,7 @@ public class PamSymbolDialog extends PamDialog implements ActionListener {
 	 *
 	 */
 	class ColorListener implements ChangeListener {
+		@Override
 		public void stateChanged(ChangeEvent e) {
 			if (givenSymbol == null) {
 				return;
@@ -332,6 +334,7 @@ public class PamSymbolDialog extends PamDialog implements ActionListener {
 	 *
 	 */
 	class ThickListener implements ChangeListener {
+		@Override
 		public void stateChanged(ChangeEvent e) {
 			if (givenSymbol == null) {
 				return;
@@ -351,6 +354,7 @@ public class PamSymbolDialog extends PamDialog implements ActionListener {
 	}
 
 	class WidthListener implements ChangeListener {
+		@Override
 		public void stateChanged(ChangeEvent e) {
 			int width = 8;
 			String s = new String(symbolWidth.getValue().toString());
@@ -367,6 +371,7 @@ public class PamSymbolDialog extends PamDialog implements ActionListener {
 	}
 
 	class HeightListener implements ChangeListener {
+		@Override
 		public void stateChanged(ChangeEvent e) {
 			int height = 8;
 			String s = new String(symbolHeight.getValue().toString());

@@ -41,7 +41,7 @@ public class DepthProcess extends PamProcess {
 		double[] rawData = new double[depthControl.depthParameters.nSensors];
 		double[] depth = new double[depthControl.depthParameters.nSensors];
 		for (int i = 0; i < depthControl.depthParameters.nSensors; i++) {
-			if (depthSystem.readSensor(i) == false) {
+			if (!depthSystem.readSensor(i)) {
 				return false;
 			}
 			rawData[i] = depthSystem.getDepthRawData(i);

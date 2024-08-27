@@ -9,16 +9,12 @@ import java.awt.Window;
 
 import PamUtils.Coordinate3d;
 import PamView.GeneralProjector;
-import PamView.ManagedSymbol;
-import PamView.ManagedSymbolInfo;
+import PamView.GeneralProjector.ParameterType;
+import PamView.GeneralProjector.ParameterUnits;
 import PamView.PamDetectionOverlayGraphics;
 import PamView.PamKeyItem;
 import PamView.PamSymbol;
-import PamView.PamOldSymbolManager;
 import PamView.PamSymbolType;
-import PamView.PanelOverlayDraw;
-import PamView.GeneralProjector.ParameterType;
-import PamView.GeneralProjector.ParameterUnits;
 import PamView.symbol.SymbolData;
 import PamguardMVC.PamDataUnit;
 
@@ -108,6 +104,7 @@ public class MarkOverlayDraw extends PamDetectionOverlayGraphics {
 		return super.showOptions(parentWindow, generalProjector);
 	}
 	
+	@Override
 	public PamSymbol getDefaultSymbol() {
 		return new PamSymbol(defaultSymbolData);
 	}

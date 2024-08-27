@@ -1,6 +1,5 @@
 package wavFiles;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.util.ArrayList;
 

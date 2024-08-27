@@ -11,11 +11,8 @@ import Filters.interpolate.Interpolator;
 import Filters.interpolate.PolyInterpolator0;
 import Filters.interpolate.PolyInterpolator1;
 import Filters.interpolate.PolyInterpolator2;
-import Filters.interpolate.SplineInterpolator;
 import PamDetection.RawDataUnit;
-import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
-import PamguardMVC.debug.Debug;
 
 /**
  * Job to run the actual decimation. Separate out from 

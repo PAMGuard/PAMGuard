@@ -277,6 +277,7 @@ public class CPODControl2 extends PamControlledUnit implements PamSettings {
 	 * @param flag. The GUI type flag defined in PAMGuiManager.
 	 * @return the GUI for the PamControlledUnit unit.
 	 */
+	@Override
 	public PamControlledUnitGUI getGUI(int flag) {
 		if (flag == PamGUIManager.FX) {
 			if (rawGUIFX == null) {

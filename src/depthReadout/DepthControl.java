@@ -71,6 +71,7 @@ public class DepthControl extends PamControlledUnit implements PamSettings {
 
 	class TimerListener implements ActionListener {
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			
 			depthProcess.readDepthData();
@@ -202,6 +203,7 @@ public class DepthControl extends PamControlledUnit implements PamSettings {
 			this.parentFrame = parentFrame;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 
 			if (depthSystem != null && depthSystem.canConfigure()) {
@@ -213,12 +215,15 @@ public class DepthControl extends PamControlledUnit implements PamSettings {
 		
 	}
 
+	@Override
 	public Serializable getSettingsReference() {
 		return depthParameters;
 	}
+	@Override
 	public long getSettingsVersion() {
 		return DepthParameters.serialVersionUID;
 	}
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		depthParameters = ((DepthParameters) pamControlledUnitSettings.getSettings()).clone();
 		return true;

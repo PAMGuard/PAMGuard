@@ -2,8 +2,6 @@ package radardisplay;
 
 import java.awt.Point;
 
-import clickDetector.ClickBTDisplay.PlotKeyListener;
-
 import PamUtils.Coordinate3d;
 import PamUtils.PamCoordinate;
 import PamView.GeneralProjector;
@@ -110,7 +108,7 @@ public class RadarProjector extends GeneralProjector<Coordinate3d> {
 	 */
 	private Coordinate3d getRangeCood3d(double bearing, double range) {
 
-		if (canPlot(bearing) == false) return null;
+		if (!canPlot(bearing)) return null;
 		
 		Coordinate3d coord = new Coordinate3d();
 		Point p = radarDisplay.getCentre();
@@ -147,7 +145,7 @@ public class RadarProjector extends GeneralProjector<Coordinate3d> {
 
 	private Coordinate3d getSlantCoord3d(double bearing, double slantAngle) {
 
-		if (canPlot(bearing) == false) return null;
+		if (!canPlot(bearing)) return null;
 		
 		Coordinate3d coord = new Coordinate3d();
 		Point p = radarDisplay.getCentre();

@@ -1,38 +1,21 @@
 package loggerForms;
 
 import java.awt.Frame;
-import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.io.Serializable;
-import java.lang.reflect.Field;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.logging.LogManager;
 
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.KeyStroke;
 
-import org.jnativehook.GlobalScreen;
-import org.jnativehook.NativeHookException;
-import org.jnativehook.dispatcher.SwingDispatchService;
-import org.jnativehook.keyboard.NativeKeyEvent;
-import org.jnativehook.keyboard.NativeKeyListener;
-
-import generalDatabase.DBControlUnit;
-import generalDatabase.PamConnection;
-import loggerForms.FormDescription.FormPlotOptionsStore;
-import loggerForms.monitor.FormsMonitorMaster;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
@@ -40,15 +23,14 @@ import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamController.status.ModuleStatus;
-import PamModel.SMRUEnable;
-import PamModel.parametermanager.ManagedParameters;
-import PamModel.parametermanager.PamParameterSet;
-import PamModel.parametermanager.PrivatePamParameterData;
 import PamView.PamGui;
 import PamView.PamSidePanel;
 import PamView.PamTabPanel;
 import PamView.PamView;
 import PamguardMVC.PamDataBlock;
+import generalDatabase.DBControlUnit;
+import generalDatabase.PamConnection;
+import loggerForms.monitor.FormsMonitorMaster;
 
 /**
  * 
@@ -491,7 +473,7 @@ public class FormsControl extends PamControlledUnit implements PamSettings {
 		}
 		// will make a form table definition with a standard structure and name UDF_ ...
 		// check the current name starts with UDF and add if necessary.
-		if (newName.toUpperCase().startsWith("UDF_") == false) {
+		if (!newName.toUpperCase().startsWith("UDF_")) {
 			newName = "UDF_" + newName;
 		}
 		String message = String.format("The table definition %s will now be created in the database.", newName);
@@ -504,7 +486,7 @@ public class FormsControl extends PamControlledUnit implements PamSettings {
 		UDFTableDefinition tableDef = new UDFTableDefinition(newName);
 		message = String.format("The table %s could not be created in the databse %s", newName,
 				DBControlUnit.findDatabaseControl().getDatabaseName());
-		if (DBControlUnit.findDatabaseControl().getDbProcess().checkTable(tableDef) == false) {
+		if (!DBControlUnit.findDatabaseControl().getDbProcess().checkTable(tableDef)) {
 			JOptionPane.showMessageDialog(parentFrame, "Error Creating form", message, JOptionPane.ERROR_MESSAGE);
 		}
 		return newName;

@@ -4,10 +4,10 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.border.TitledBorder;
 
@@ -48,7 +48,7 @@ public class LocalTime extends PamControlledUnit {
 			mainPanel.setBorder(border);
 //			mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 			mainPanel.setLayout(new BorderLayout());
-			timeLabel = new PamLabel("", JLabel.CENTER);
+			timeLabel = new PamLabel("", SwingConstants.CENTER);
 			mainPanel.add(BorderLayout.CENTER, timeLabel);
 //			mainPanel.add(zoneLabel = new JLabel("", JLabel.CENTER));
 			Timer timer = new Timer(500, new TimeAction());

@@ -1,11 +1,8 @@
 package difar;
 
-import java.util.ArrayList;
-
+import PamUtils.LatLong;
 import pamMaths.PamVector;
 import targetMotionModule.TargetMotionResult;
-import GPS.GpsData;
-import PamUtils.LatLong;
 
 /**
  * 

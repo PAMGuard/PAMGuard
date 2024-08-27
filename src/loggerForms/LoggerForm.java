@@ -1,12 +1,6 @@
 package loggerForms;
 
-import generalDatabase.DBControlUnit;
-import generalDatabase.EmptyTableDefinition;
-import generalDatabase.PamConnection;
-import generalDatabase.SQLTypes;
-
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -27,21 +21,7 @@ import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.Timer;
 
-import Array.streamerOrigin.GPSOriginMethod;
-import Array.streamerOrigin.GPSOriginSystem;
-import Array.streamerOrigin.HydrophoneOriginMethod;
-import Array.streamerOrigin.HydrophoneOriginMethods;
-import Array.streamerOrigin.OriginIterator;
-import Array.streamerOrigin.StaticOriginSystem;
-import loggerForms.PropertyTypes;
-import loggerForms.controlDescriptions.ControlDescription;
-import loggerForms.controlDescriptions.ControlTypes;
-import loggerForms.controlDescriptions.InputControlDescription;
-import loggerForms.controls.CounterControl;
-import loggerForms.controls.LoggerControl;
-import loggerForms.controls.NMEAControl;
 import GPS.GPSDataBlock;
-import GPS.GpsData;
 import GPS.GpsDataUnit;
 import NMEA.NMEADataBlock;
 import NMEA.NMEADataUnit;
@@ -54,11 +34,20 @@ import PamView.dialog.PamLabel;
 import PamView.dialog.warn.WarnOnce;
 import PamView.panel.PamPanel;
 import PamView.panel.VerticalLayout;
-import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamObserver;
 import PamguardMVC.PamObserverAdapter;
+import generalDatabase.DBControlUnit;
+import generalDatabase.EmptyTableDefinition;
+import generalDatabase.PamConnection;
+import generalDatabase.SQLTypes;
+import loggerForms.controlDescriptions.ControlDescription;
+import loggerForms.controlDescriptions.ControlTypes;
+import loggerForms.controlDescriptions.InputControlDescription;
+import loggerForms.controls.CounterControl;
+import loggerForms.controls.LoggerControl;
+import loggerForms.controls.NMEAControl;
 
 /**
  * A LoggerForm is the central component of all form types, inclucing normal forms
@@ -261,7 +250,7 @@ public class LoggerForm{
 			String stringId = NMEADataBlock.getSubString(nmeaString, 0);
 			stringId = stringId.substring(1);
 
-			if (stringId.equalsIgnoreCase(nmeaSentence) == false) {
+			if (!stringId.equalsIgnoreCase(nmeaSentence)) {
 				return;
 			}
 
@@ -565,7 +554,7 @@ public class LoggerForm{
 //		boolean isSubForm = (formDescription.findProperty(PropertyTypes.SUBFORM) != null);
 		boolean isPopup = (formDescription.findProperty(PropertyTypes.POPUP) != null);
 		boolean isNormal;
-		if (isSubTabs==false && isPopup==false){
+		if (!isSubTabs && !isPopup){
 			isNormal=true;
 		}else{
 			isNormal=false;
@@ -833,7 +822,7 @@ public class LoggerForm{
 //		boolean isSubForm = (formDescription.findProperty(PropertyTypes.SUBFORM) != null);
 		boolean isPopup = (formDescription.findProperty(PropertyTypes.POPUP) != null);
 		boolean isNormal;
-		if (isSubTabs==false && isPopup==false){
+		if (!isSubTabs && !isPopup){
 			isNormal=true;
 		}else{
 			isNormal=false;
@@ -928,7 +917,7 @@ public class LoggerForm{
 		String req = "";
 		String name = loggerControlComponent.getControlDescription().getTitle()+": ";
 
-		if (loggerControlComponent.getControlDescription().getRequired()==true){
+		if (loggerControlComponent.getControlDescription().getRequired()){
 			req = ": Required";
 		}
 

@@ -29,19 +29,14 @@ import Filters.FilterMethod;
 import Filters.FilterType;
 import PamController.PamController;
 import PamDetection.RawDataUnit;
-import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamguardMVC.PamConstants;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
-import PamguardMVC.PamObserver;
 import PamguardMVC.PamProcess;
 import PamguardMVC.PamRawDataBlock;
-import PamguardMVC.RequestCancellationObject;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
-import clickDetector.ClickDetection;
-import clipgenerator.ClipDataUnit;
 
 /**
  * Decimates data - i.e. reduces it's frequency by 
@@ -333,7 +328,7 @@ public class DecimatorProcess extends PamProcess {
 		 * if offline files are not requested, continue to ask up the chain - there may
 		 * be data in an upstream process which can still be decimated as normal. 
 		 */
-		if (decimatorControl.getOfflineFileServer().getOfflineFileParameters().enable == false) {
+		if (!decimatorControl.getOfflineFileServer().getOfflineFileParameters().enable) {
 			return super.getOfflineData(offlineLoadDataInfo);
 		}
 		if (decimatorControl.getOfflineFileServer().loadData(getOutputDataBlock(), offlineLoadDataInfo, null)) {

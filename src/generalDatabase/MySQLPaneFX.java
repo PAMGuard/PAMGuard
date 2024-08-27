@@ -3,20 +3,22 @@ package generalDatabase;
 import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
+
 import PamUtils.PamCalendar;
 import generalDatabase.layoutFX.SystemDialogPaneFX;
-import pamViewFX.PamGuiManagerFX;
-import pamViewFX.fxNodes.PamBorderPane;
-import pamViewFX.fxNodes.PamButton;
-import pamViewFX.fxNodes.PamGridPane;
-import pamViewFX.fxNodes.PamVBox;
 import javafx.geometry.HPos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import pamViewFX.PamGuiManagerFX;
+import pamViewFX.fxNodes.PamBorderPane;
+import pamViewFX.fxNodes.PamButton;
+import pamViewFX.fxNodes.PamGridPane;
+import pamViewFX.fxNodes.PamVBox;
 
 public class MySQLPaneFX extends PamBorderPane implements SystemDialogPaneFX {
 	
@@ -66,7 +68,7 @@ public class MySQLPaneFX extends PamBorderPane implements SystemDialogPaneFX {
 		connectServer.setOnAction((action->{
 			connectServer();
 		}));
-		PamGridPane.setHalignment(connectServer, HPos.RIGHT);
+		GridPane.setHalignment(connectServer, HPos.RIGHT);
 
 		
 		vBox.getChildren().add(serverGridPane);
@@ -92,7 +94,7 @@ public class MySQLPaneFX extends PamBorderPane implements SystemDialogPaneFX {
 		newDatabase.setOnAction((action)->{
 			createNewDatabase();
 		});
-		PamGridPane.setHalignment(newDatabase, HPos.RIGHT);
+		GridPane.setHalignment(newDatabase, HPos.RIGHT);
 
 		vBox.getChildren().add(databaseGridPane);
 				
@@ -109,12 +111,13 @@ public class MySQLPaneFX extends PamBorderPane implements SystemDialogPaneFX {
 	}
 
 	MySQLParameters tempParams;
+	@Override
 	public boolean getParams() {
 		tempParams = serverBasedSystem.mySQLParameters.clone();
 		
-		if (getServerParams() == false) return false;
+		if (!getServerParams()) return false;
 		
-		if (getDbParams() == false) return false;
+		if (!getDbParams()) return false;
 		
 		// now if all ok, copy back.
 		serverBasedSystem.mySQLParameters = tempParams.clone();
@@ -137,6 +140,7 @@ public class MySQLPaneFX extends PamBorderPane implements SystemDialogPaneFX {
 		return true;
 	}
 
+	@Override
 	public void setParams() {
 		ipAddress.setText(serverBasedSystem.mySQLParameters.ipAddress);
 		userName.setText(serverBasedSystem.mySQLParameters.userName);
@@ -172,7 +176,7 @@ public class MySQLPaneFX extends PamBorderPane implements SystemDialogPaneFX {
 	 * Connect the SQL server. 
 	 */
 	private void connectServer(){
-		if (getServerParams() == false) return;
+		if (!getServerParams()) return;
 		serverBasedSystem.serverConnect(tempParams);
 		sayServerStatus();
 	}

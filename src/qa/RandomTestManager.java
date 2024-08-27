@@ -3,7 +3,6 @@ package qa;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
-import PamController.PamController;
 import PamController.PamControllerInterface;
 import PamController.PamViewParameters;
 import PamUtils.PamCalendar;
@@ -61,7 +60,7 @@ public class RandomTestManager implements QANotifyable {
 				//active don't need to do anything. 
 				LongRandomTestSet lrts = (LongRandomTestSet) currentDataUnit.getQaTestSet();
 				String currentState = lrts.getStatus();
-				if (QATestSet.STATUS_ACTIVE.equalsIgnoreCase(currentState) == false) {
+				if (!QATestSet.STATUS_ACTIVE.equalsIgnoreCase(currentState)) {
 					lrts.setStatus(QATestSet.STATUS_ACTIVE);
 					lrts.resetNextSample(generatorProcess.getCurrentSample(), generatorProcess.getSampleRate());
 					testsDataBlock.updatePamData(currentDataUnit, PamCalendar.getTimeInMillis());
@@ -71,11 +70,11 @@ public class RandomTestManager implements QANotifyable {
 				// want it, but don't have it, so make it
 				startRandomTest(cluster);
 			}
-			else if (wantRun == false && currentDataUnit != null) {
+			else if (!wantRun && currentDataUnit != null) {
 				// have it but don't want it, so stop the test.
 				stopRandomTest(currentDataUnit);
 			}
-			else if (wantRun == false && currentDataUnit == null) {
+			else if (!wantRun && currentDataUnit == null) {
 				// don't have it and don't want it. 
 			}
 			

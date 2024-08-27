@@ -34,14 +34,14 @@ public class IDIInfo {
 	 */
 	public int lastNumber = -1;
 	
-	public IDIInfo() {};
+	public IDIInfo() {}
 	
 	public IDIInfo(double medianIDI, double meanIDI, double stdIDI, int nUnits) {
 		this.medianIDI=medianIDI;
 		this.meanIDI=meanIDI;
 		this.stdIDI = stdIDI;
 		this.lastNumber=nUnits;
-	};
+	}
 
 	public void calcTimeSeriesData(List<PamDataUnit<?,?>> dataUnits) {
 		

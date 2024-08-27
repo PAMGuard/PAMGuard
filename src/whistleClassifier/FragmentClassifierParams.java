@@ -3,14 +3,13 @@ package whistleClassifier;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 
-import classifier.ClassifierParams;
-import classifier.ClassifierTypes;
-
 import Jama.Matrix;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
-import PamModel.parametermanager.PrivatePamParameterData;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
+import PamModel.parametermanager.PrivatePamParameterData;
+import classifier.ClassifierParams;
+import classifier.ClassifierTypes;
 
 /**
  * Parameters class for fragmented whistle classification. 

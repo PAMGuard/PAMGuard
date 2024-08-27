@@ -182,7 +182,7 @@ public class RavenDataRow {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof RavenDataRow == false) {
+		if (!(obj instanceof RavenDataRow)) {
 			return false;
 		}
 		RavenDataRow oth = (RavenDataRow) obj;

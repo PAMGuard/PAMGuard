@@ -45,8 +45,6 @@ import javax.swing.JToolBar;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
 
-import pamScrollSystem.AbstractPamScrollerAWT;
-import pamScrollSystem.ScrollPaneAddon;
 import PamController.PamController;
 import PamUtils.PamCalendar;
 import PamView.PamTabPanel;
@@ -54,6 +52,8 @@ import PamView.dialog.PamButton;
 import PamView.dialog.PamTextArea;
 import PamView.panel.PamBorderPanel;
 import PamguardMVC.PamDataBlock;
+import pamScrollSystem.AbstractPamScrollerAWT;
+import pamScrollSystem.ScrollPaneAddon;
 
 public class UserInputPanel implements PamTabPanel {
 
@@ -193,11 +193,13 @@ public class UserInputPanel implements PamTabPanel {
 
 //		submitButton.setText("Submit Comment");
 		submitButton.addActionListener(new java.awt.event.ActionListener() {
+			@Override
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				submitActionPerformed(evt);
 			}
 		});
 		clearButton.addActionListener(new java.awt.event.ActionListener() {
+			@Override
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				clearActionPerformed(evt);
 			}
@@ -208,6 +210,7 @@ public class UserInputPanel implements PamTabPanel {
 	
 	class TextListener implements KeyListener {
 
+		@Override
 		public void keyPressed(KeyEvent e) {
 			//if(e.getKeyText(e.getKeyCode())=="Enter"){
 			if(e.getKeyCode()==KeyEvent.VK_ENTER){
@@ -215,6 +218,7 @@ public class UserInputPanel implements PamTabPanel {
 			}
 		}
 
+		@Override
 		public void keyReleased(KeyEvent e) {
 			// TODO Auto-generated method stub
 			if(e.getKeyCode()==KeyEvent.VK_ENTER){
@@ -224,6 +228,7 @@ public class UserInputPanel implements PamTabPanel {
 			
 		}
 
+		@Override
 		public void keyTyped(KeyEvent e) {
 
 			enableButtons();
@@ -331,17 +336,20 @@ public class UserInputPanel implements PamTabPanel {
 		textInputField.requestFocus();
 	}
 
+	@Override
 	public JMenu createMenu(Frame parentFrame) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public JComponent getPanel() {
 		// TODO Auto-generated method stub
 		setFocusOnTextInput();
 		return uiPanel;
 	}
 	
+	@Override
 	public JToolBar getToolBar() {
 		// TODO Auto-generated method stub
 		return null;
