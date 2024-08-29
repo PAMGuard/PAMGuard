@@ -62,15 +62,15 @@ public class DelphinIDTest {
 		long dataStartMillis = 1340212413000L;
 
 		//path to the .mat containing whistle contours. 
-		String whistleContourPath = "D:/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/testencounter415/whistle_contours.mat";
+		String whistleContourPath = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Dde415/whistle_contours.mat";
 
 		//the path to the model
 //		String modelPath = "D:/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/testencounter415/whistle_model_2/whistle_4s_415.zip";
-		String modelPath = "D:/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/testencounter415/whistle_model_3/whistle_4s_415_f5.zip";
+		String modelPath = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Dde415/whistle_4s_415_model.zip";
 
 		
 		//the path to the model
-		String matImageSave = "C:/Users/Jamie Macaulay/MATLAB Drive/MATLAB/PAMGUARD/deep_learning/delphinID/whistleimages.mat";
+		String matImageSave = "/Users/au671271/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/delphinID/whistleimages_4s_415.mat";
 		
 		//create MatFile for saving the image data to. 
 		MatFile matFile = Mat5.newMatFile();
@@ -79,6 +79,7 @@ public class DelphinIDTest {
 		ArrayList<AbstractWhistleDataUnit> whistleContours = DelphinIDUtils.getWhistleContoursMAT(whistleContourPath);
 
 		//segment the whistle detections
+		//Note, delphinID starts from the first whislte and NOT the first file. 
 		ArrayList<SegmenterDetectionGroup> segments =  DelphinIDUtils.segmentWhsitleData(whistleContours,  (long) (dataStartMillis+(9.565*1000.)), 
 				segLen,  segHop);
 

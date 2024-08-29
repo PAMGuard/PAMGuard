@@ -53,7 +53,6 @@ public class Whistles2Image extends FreqTransform {
 	private SpecTransform whistleGroupToImage(SegmenterDetectionGroup whistleGroup, double[] freqLimits, double[] size, double lineWidth) {
 
 		SpecTransform specTransform = new SpecTransform(); 
-
 		/*
 		 * All time-frequency points are saved as a scatterplot with x-axis spanning 0-4
 		 * seconds in time and y-axis spanning 0-20 kHz in frequency. - Matplotlib was
@@ -74,10 +73,10 @@ public class Whistles2Image extends FreqTransform {
 		for (int i=0; i<imaged.length; i++) {
 			for (int j=0; j<imaged[0].length; j++) {
 				color = raster.getPixel(i, j, color);
-				imaged[i][j] = (255-color[0])/255.; //normalize
+				imaged[i][imaged[0].length-j-1] = (255-color[0])/255.; //normalize
 			}
 		}
-//		
+////		
 //		System.out.println("Original image: "); 
 //		PamArrayUtils.printArray(imaged);
 

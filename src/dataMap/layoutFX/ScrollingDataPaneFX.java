@@ -262,7 +262,9 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	public void notifyScrollChange() {
 		// tell all panlettes to repaint. 
 		for (int i = 0; i < dataStreamPanels.size(); i++) {
-			dataStreamPanels.get(i).scrollChanged();
+			if (!dataStreamPanels.get(i).isCollapsed()) {
+				dataStreamPanels.get(i).scrollChanged();
+			}
 		}
 //		settingsStrip.scrollChanged();
 
