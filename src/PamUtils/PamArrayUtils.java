@@ -195,6 +195,41 @@ public class PamArrayUtils {
 		
 		return minByTime;
 	}
+	
+	
+	   /**
+     * Finds the closest number to the given target in a sorted array.
+     *
+     * @param arr the sorted array of doubles
+     * @param target the target number
+     * @return the index of the closest number in the array
+     */
+    public static int findClosest(double[] arr, double target) {        
+    	
+    	   if(target < arr[0]) {
+               return 0;
+           }
+           if(target > arr[arr.length-1]) {
+               return arr.length-1;
+           }
+
+           int lo = 0;
+           int hi = arr.length - 1;
+
+           while (lo <= hi) {
+               int mid = (hi + lo) / 2;
+
+               if (target < arr[mid]) {
+                   hi = mid - 1;
+               } else if (target > arr[mid]) {
+                   lo = mid + 1;
+               } else {
+                   return mid;
+               }
+           }
+           // lo == hi + 1
+           return (arr[lo] - target) < (target - arr[hi]) ? lo : hi;
+    }
 
 	/**
 	 * Calculate the median value of an array 

@@ -105,7 +105,7 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX {
 		//topHolder.prefHeightProperty().bind(summaryPane.prefHeightProperty());
 		
 		//hiding summary pane
-		hidingSettingsPane=new HidingPane(Side.RIGHT, settingsPane, this, true);
+		hidingSettingsPane=new HidingPane(Side.RIGHT, settingsPane, scrollingDataPanel, true);
 		hidingSettingsPane.setVisibleImmediatly(false); 
 		hidingSettingsPane.showHidePane(true);
 		hidingSettingsPane.getStyleClass().add("pane-trans");
