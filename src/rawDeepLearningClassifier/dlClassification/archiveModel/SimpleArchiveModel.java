@@ -43,7 +43,7 @@ public class SimpleArchiveModel extends ArchiveModel {
 			String model = null;
 			model = getRelFilePath(zipFolder, ".pb");
 			if (model==null) model = getRelFilePath(zipFolder, ".py");
-			//System.out.println("MODEL PATH: " +model);
+			System.out.println("MODEL PATH: " +model + "  " + zipFolder);
 			return model;
 
 		} catch (IOException e) {
@@ -59,16 +59,23 @@ public class SimpleArchiveModel extends ArchiveModel {
 	}
 
 	/**
-	 * Gte the relative path of file within a zip folder. 
+	 * Get the relative path of file within a zip folder. 
 	 * @param zipFolder
 	 * @param fileEnd
 	 * @return
 	 * @throws IOException
 	 */
 	private static String getRelFilePath(String zipFolder, String fileEnd) throws IOException {
-		  try (Stream<Path> walk = Files.walk(Paths.get(zipFolder))) {
-		      List<String> result = walk
-		              .filter(p -> !Files.isDirectory(p))   // not a directory
+		  try (Stream<Path> walk = Files.walk(Paths.get(zipFolder)))  {
+			  List<String> result = walk
+		              .filter(p -> {
+						try {
+							return (!Files.isDirectory(p) && !Files.isHidden(p));
+						} catch (IOException e) {
+							e.printStackTrace();
+							return false;
+						}
+					})   // not a directory
 		              .map(p -> p.toString()) // convert path to string
 		              .filter(f -> f.endsWith(fileEnd))       // check end with
 		              .collect(Collectors.toList());        // collect all matched to a List

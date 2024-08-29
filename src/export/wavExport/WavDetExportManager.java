@@ -2,32 +2,12 @@ package export.wavExport;
 
 import java.awt.Component;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import javax.sound.sampled.AudioFormat;
-import javax.swing.filechooser.FileSystemView;
-
-import PamController.PamController;
-import PamDetection.RawDataUnit;
-import PamUtils.PamCalendar;
-import PamUtils.PamUtils;
-import PamView.paneloverlay.overlaymark.OverlayMark;
-import PamguardMVC.LoadObserver;
 import PamguardMVC.PamDataUnit;
-import PamguardMVC.PamObservable;
-import PamguardMVC.PamObserver;
-import PamguardMVC.PamObserverAdapter;
-import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.RawDataHolder;
-import PamguardMVC.dataOffline.OfflineDataLoading;
-import dataMap.OfflineDataMapPoint;
-import detectiongrouplocaliser.DetectionGroupSummary;
 import export.PamDataUnitExporter;
 import javafx.scene.layout.Pane;
-import wavFiles.Wav16AudioFormat;
-import wavFiles.WavFileWriter;
 
 /**
  * Writes data units and/or ordered raw data to a wav file. Has functions to

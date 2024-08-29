@@ -189,7 +189,7 @@ public class DelphinIDWorker extends  ArchiveModelWorker {
 			//a bit ugly but works.
 			transformedData2 = JamArr.transposeMatrix(transformedData2);
 
-//			System.out.println("DelphinID input image: " + transformedData2.length + " x " + transformedData2[0].length  );
+			//System.out.println("DelphinID input image: " + transformedData2.length + " x " + transformedData2[0].length  );
 			transformedDataStack[j] = DLUtils.toFloatArray(transformedData2); 
 			
 //			//TEMP

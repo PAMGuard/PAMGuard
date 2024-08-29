@@ -1,5 +1,6 @@
 package dataMap.layoutFX;
 
+import java.nio.IntBuffer;
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -20,8 +21,10 @@ import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
-import javafx.scene.image.PixelWriter;
+import javafx.scene.image.PixelBuffer;
+import javafx.scene.image.PixelFormat;
 import javafx.scene.image.WritableImage;
+import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -37,6 +40,7 @@ import pamViewFX.fxNodes.pamAxis.PamAxisFX;
 import pamViewFX.fxNodes.pamAxis.PamAxisPane;
 import pamViewFX.fxNodes.utilsFX.ColourArray;
 import pamViewFX.fxNodes.utilsFX.ColourArray.ColourArrayType;
+import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
 
 public class DataStreamPaneFX extends PamBorderPane {
 	
@@ -233,6 +237,8 @@ public class DataStreamPaneFX extends PamBorderPane {
 		private double lastPlotted2DminVal;
 		
 		private static final int NCOLOURPOINTS = 100;
+
+		private static final double MAX_LOG_LOOKUP = 1.;
 		
 		//for 3D data gram 
 		
@@ -276,6 +282,11 @@ public class DataStreamPaneFX extends PamBorderPane {
 		private long lastTime;
 
 		public double[] dataGramColourLims = new double[] {0.1,1.};
+
+		/**
+		 * A lookup table for log values to speed up image drawing for 3D images
+		 */
+		private double[] logimagetable;
 
 
 		private DataGraphFX() {
@@ -616,15 +627,28 @@ public class DataStreamPaneFX extends PamBorderPane {
 				return;
 			}
 			
-			DatagramImageData datagramImageData = datagramManager.getImageData(dataBlock, startMillis, endMillis, (int) getWidth());
+//			long time1 = System.currentTimeMillis();
+			
+			//JavaFX rendering works better with less pixels. 
+			DatagramImageData datagramImageData = datagramManager.getImageData(dataBlock, startMillis, endMillis, (int) Math.min(getWidth(), 1000.));
+			
 			double[][] imageData = datagramImageData.imageData;
-
+			
 			if (datagramColours == null) {
 				datagramColours = ColourArray.createStandardColourArray(NCOLOURPOINTS, colourArrayType);
 			}
+			
+			if (logimagetable==null) {
+				//now generate a log lookup table for the image because Math.log takes a long time!
+				//a bit complicate because, if we have a huge value then the lookup table is useless
+				//so need to us a median
+				generateLogImageTable(2000); 
+			}
+						
 			int nXPoints = imageData.length;
 			int nYPoints = imageData[0].length;
 			
+		
 			double[] minMaxValue;
 			if (getMinMaxValues(imageData, false)!=null){
 				minMaxValue = Arrays.copyOf(minMaxVal,2);
@@ -653,38 +677,59 @@ public class DataStreamPaneFX extends PamBorderPane {
 			if (imageData.length == 0 || imageData[0].length == 0) {
 				return;
 			}
-			datagramImage = new WritableImage(imageData.length, imageData[0].length);
-			PixelWriter writableRaster = datagramImage.getPixelWriter();
+			
+			//use a pixel buffer for rendering an image as it's much faster!
+			IntBuffer buffer = IntBuffer.allocate(nXPoints * nYPoints);
+			int[] pixels = buffer.array();
+			PixelBuffer<IntBuffer> pixelBuffer = new PixelBuffer<>(nXPoints, nYPoints, buffer, PixelFormat.getIntArgbPreInstance());
+
+			datagramImage = new WritableImage(pixelBuffer);
 			g.setFill(Color.LIGHTGRAY);
 			g.fillRect(0, 0, nXPoints, nYPoints);
+			
+			Color col = null;
+			int colorARGB = 0;
+					
+//			long time2 = System.currentTimeMillis();
 			for (int i = 0; i < nXPoints; i++) {
 				for (int j = 0; j < nYPoints; j++) {
 					y = nYPoints-j-1;
-					if (imageData[i][j] < 0) {
+					if (imageData[i][y] < 0) {
 						//writableRaster.setColor(i,y,Color.LIGHTGRAY);
 					}
-					else if (imageData[i][j] == 0) {
+					else if (imageData[i][y] == 0) {
 						//writableRaster.setColor(i,y, Color.LIGHTGRAY);
 					}
 					else {
-						iCol = (int) (NCOLOURPOINTS * (Math.log(imageData[i][j]) - minMaxValue[0]) / scaleRange);
+						iCol = (int) (NCOLOURPOINTS * (approximateLogLookup(imageData[i][y]) - minMaxValue[0]) / scaleRange);
 						iCol = Math.min(Math.max(0, iCol), NCOLOURPOINTS-1);
-						writableRaster.setColor(i, y, datagramColours.getColour(iCol));
+						
+						col = datagramColours.getColour(iCol); 
+//					
+						colorARGB = (255 << 24) | (((int) (col.getRed()*255.))  << 16) | (((int) (col.getGreen()*255.)) << 8) | (int) (col.getBlue()*255.);
+
+ 
+						pixels[(i % nXPoints) + (j * nXPoints)] =  colorARGB;
+												
+//						writableRaster.setColor(i, y, datagramColours.getColour(iCol));
 						//						datagramImage.setRGB(i, y, 0x0000FF);
+						
 					}
 				}
 			}
-			/*
-			 * Now finally paint that into the full window ...
-			 * 
-			 */
-			double imageWidth = getWidth();
-		
+			
+			// tell the buffer that the entire area needs redrawing
+			pixelBuffer.updateBuffer(b -> null);
+			
+//			long time3 = System.currentTimeMillis();		
 
 			//javafx version using a writable image (remember reversed compared to swing)
 			g.drawImage(datagramImage, 0, 0, nXPoints, nYPoints,
 					x1, 0,  x2-x1, getHeight());
 			
+//			long time4 = System.currentTimeMillis();
+			//System.out.println("Datagram Image data size: " + nXPoints +  "  " + nYPoints + " total time: " + (time4-time1) + " time pixel writer: " + (time3-time2) );
+
 			//swing version for ref
 			//g.drawImage(datagramImage, x1, 0, x2, getHeight(), 0, 0, nXPoints, nYPoints, null);
 
@@ -700,6 +745,65 @@ public class DataStreamPaneFX extends PamBorderPane {
 				drawDataRate(g, offlineDataMap, scrollingDataPanel.getDataStreamColour(offlineDataMap.getOfflineDataSource()));
 			}
 
+		}
+		
+		private void generateLogImageTable(int N) {
+			logimagetable=new double[N];
+			double min = 0.001;
+			double max = MAX_LOG_LOOKUP;
+			generateLogImageTable( min,  max,  N);
+		}
+		
+		private void generateLogImageTable(double min, double max, int N) {
+			logimagetable=new double[N];
+			double bin = (max-min)/N; 
+		    for (int i = 0; i < N; i++) {
+		        logimagetable[i] = Math.log(min + i*bin);
+		    }
+		}
+	
+
+		private double approximateLogLookup(double x) {
+//		    int index = (int) (x * 10000);
+			if (x>MAX_LOG_LOOKUP) {
+				//System.out.println("X>LOG: " + x); 
+				return Math.log(x);
+			}
+			
+			double bin = (MAX_LOG_LOOKUP-0.001)/logimagetable.length; 
+
+		    //int index  = PamArrayUtils.findClosest(logimagetable, x);
+			
+			int index = (int) Math.round((x -  0.001)/bin);
+			
+			index = index < 0 ? 0 : index;
+			index = index >=logimagetable.length ? (logimagetable.length-1): index; 
+			
+		    //System.out.println("Index: " + index + " x: "  + x + " " + minMaxVal[0] + "  " + minMaxVal[1]);
+		    return logimagetable[index];
+		}
+
+		
+		
+		public static double approximateLog(double x) {
+		    if (x <= 0) {
+		        return 0;
+		    }
+
+		    double result = 0;
+		    double term = x;
+		    double denominator = 1;
+
+		    int count=0;
+		    while (Math.abs(term) > 1e-3 && count<10000) {
+		        result += term;
+		        term *= -x;
+		        denominator++;
+		        term /= denominator;
+		        count++;
+		    }
+
+		    return result;
 		}
 		
 		public void drawDataRate(GraphicsContext g,
