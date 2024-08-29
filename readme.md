@@ -40,8 +40,9 @@ PAMGuard is designed to collect/process data from large acoustic datasets. PAMGu
 ### Access to detection and classification algorithms
 PAMGuard allows users to integrate automated detection and classification algorithms directly into their acoustic workflow. There are a multitude of different algorithms to choose from, including a basic click detector, whistle and moan detector, GPL detector, click train detectors and many others. The idea behind PAMGuard is allow researchers to access open source state-of-the-art algorithms developed within the scientific community - if you want to contribute and get your algorithm into PAMGuard get in touch. 
 
-![PAMGuard click detector](./src/Resources/screenshots/Click_detector_screenshot.png.png)
+![PAMGuard click detector](./src/Resources/screenshots/Click_detector_screenshot.png)
 
+_The PAMGuard click detector can be used to detect transient sonunds such as echolocation clicks. It also automatically loclaises click bearings for closely spaced hydrophones._
 
 ### Localisation
 PAMGuard has a multitude of different options for acoustic localisation. There's a comprehensive beam forming module for beam forming arrays, a large aperture localiser for 3D localisation and target motion analysis for towed hydrophone arrays. 
@@ -56,6 +57,9 @@ Almost all detection data can be visualised on a map. PAMGuard also supports plo
 An important aspect of PAMGuard is the ability for users to explore processed data. PAMGuard allows users to visualise data at multiple different times scales, from inspecting individual waveforms microseconds long to datagrams showing detector output or soundscape metrics over days, weeks or even years.
 
 ![Example of a data map](./src/Resources/screenshots/Datamap_screenshot.png)
+
+_The PAMGuard data map provides an overciew of the entire processed dataset over days, weeks and even years._
+
 
 ### Advanced manual annotation
 The displays within PAMGuard support a variety of manual annotation tools. Users can add data to annotations in multiple ways, from simple text annotations to complex forms created by users. 
