@@ -537,21 +537,20 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 	 * Set the GUI to show PAMGUARD has started or stopped. 
 	 */
 	public void setPamRunning(boolean running){
-		Glyph graphic;
-		for (int i=0; i<this.stages.size(); i++){
-			ArrayList<Button> recordButtons=stages.get(i).getRecordButtons();
-			for (int j=0; j<recordButtons.size(); j++){
-				if (running){
-					graphic=Glyph.create("FontAwesome|SQUARE").size(22).color(Color.BLACK);
-				}
-				else {
-					graphic=Glyph.create("FontAwesome|CIRCLE").size(22).color(Color.LIMEGREEN);
-				}
-				//now set all run buttons to correct format. 
-				recordButtons.get(j).setGraphic(graphic);
-
-			}
-		}
+//		Glyph graphic;
+//		for (int i=0; i<this.stages.size(); i++){
+//			ArrayList<Button> recordButtons=stages.get(i).getRecordButtons();
+//			for (int j=0; j<recordButtons.size(); j++){
+//				if (running){
+//					graphic=Glyph.create("FontAwesome|SQUARE").size(22).color(Color.BLACK);
+//				}
+//				else {
+//					graphic=Glyph.create("FontAwesome|CIRCLE").size(22).color(Color.LIMEGREEN);
+//				}
+//				//now set all run buttons to correct format. 
+//				recordButtons.get(j).setGraphic(graphic);
+//			}
+//		}
 	}
 
 	public void pamStop(WindowEvent e) {

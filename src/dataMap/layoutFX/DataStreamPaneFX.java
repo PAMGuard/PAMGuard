@@ -660,8 +660,8 @@ public class DataStreamPaneFX extends PamBorderPane {
 			minMaxValue[0] *= dataGramColourLims[0];
 			minMaxValue[1] *= dataGramColourLims[1];
 			
-			minMaxValue[0] = Math.log(minMaxValue[0]);
-			minMaxValue[1] = Math.log(minMaxValue[1]);
+			minMaxValue[0] = Math.log10(minMaxValue[0]);
+			minMaxValue[1] = Math.log10(minMaxValue[1]);
 			
 			/* 
 			 * now fudge the scale a little since black is zero and we want 
@@ -758,7 +758,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 			logimagetable=new double[N];
 			double bin = (max-min)/N; 
 		    for (int i = 0; i < N; i++) {
-		        logimagetable[i] = Math.log(min + i*bin);
+		        logimagetable[i] = Math.log10(min + i*bin);
 		    }
 		}
 	
@@ -767,7 +767,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 //		    int index = (int) (x * 10000);
 			if (x>MAX_LOG_LOOKUP) {
 				//System.out.println("X>LOG: " + x); 
-				return Math.log(x);
+				return Math.log10(x);
 			}
 			
 			double bin = (MAX_LOG_LOOKUP-0.001)/logimagetable.length; 
