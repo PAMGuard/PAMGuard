@@ -1,5 +1,6 @@
 package test.rawDeepLearningClassifier;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.awt.image.BufferedImage;
@@ -31,56 +32,6 @@ import us.hebi.matlab.mat.types.MatFile;
 import us.hebi.matlab.mat.types.Matrix;
 
 public class DelphinIDTest { 
-	
-	
-	private static double[][] whistleScatter2Image(double[][] whistleValues) {
-		
-		//now perform the image transform in Java 
-		double[] freqLimits = new double[] {2000., 20000.};
-		double[] size = new double[] {680., 480.};
-		
-		ArrayList<double[][]> whistleImageArr = new ArrayList<double[][]>();
-		whistleImageArr.add(whistleValues);
-		
-		BufferedImage canvas = Whistles2Image.makeScatterImage(whistleImageArr, size, new double[]{50, 50. + 4.}, freqLimits,  6.);
-
-		double[][] imaged = new double[(int) size[0]][(int) size[1]];
-
-		float[] color = new float[3];
-		Raster raster = canvas.getData();
-		for (int i=0; i<imaged.length; i++) {
-			for (int j=0; j<imaged[0].length; j++) {
-				color = raster.getPixel(i,j, color);
-				imaged[i][j] = (255-color[0])/255.; //normalize
-			}
-		}
-		
-		//create the model transforms
-		ArrayList<DLTransform> modelTransforms = new ArrayList<DLTransform>();
-		modelTransforms.add(new FreqTransform(DLTransformType.SPECFLIP));
-//		modelTransforms.add(new FreqTransform(DLTransformType.SPECNORMALISE_MINIMAX));
-		modelTransforms.add(new FreqTransform(DLTransformType.SPECRESIZE, new Number[] {Integer.valueOf(60), Integer.valueOf(80), SpecTransform.RESIZE_BICUBIC}));
-		modelTransforms.add(new FreqTransform(DLTransformType.GAUSSIAN_FILTER, new Number[] {Double.valueOf(0.5)}));
-
-		
-		SpecTransform specTransform = new SpecTransform(); 
-		specTransform.setSpecData(imaged);
-		specTransform.setSampleRate((float) (freqLimits[1]*2)); 
-
-		
-		//set the spec transform
-		((FreqTransform) modelTransforms.get(0)).setSpecTransfrom(specTransform);
-
-		//process all the transforms. 
-		DLTransform transform = modelTransforms.get(0); 
-		for (int i =0; i<modelTransforms.size(); i++) {
-			transform = modelTransforms.get(i).transformData(transform); 
-		}
-		
-		double[][] transformedData2 = ((FreqTransform) transform).getSpecTransfrom().getTransformedData(); 
-		
-		return transformedData2;
-	}
 	
 //	@Test
 //	public void whistle2ImageTest() {
@@ -188,81 +139,12 @@ public class DelphinIDTest {
 //	}
 	
 	@Test
-	public void modelInputTest() {
+	public static void modelInputTest() {
 		
-		System.out.println("DelphinID mode test start");
-
-		//ttest the model
-		String modelPath =  "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Dde415/whistle_4s_415_model.zip";
+		//test whether a single segment gives the correct answer. 
+		boolean result = rawDeepLearningClassifier.dlClassification.delphinID.DelphinIDTest.testDelphinIDImage(null);
 		
-		//the output for this image should be 
-		//0.998737633	0.000146952	1.49E-10	0.001111862	1.64E-10	1.66E-08	3.53E-06
-		String relMatPath  =	"./src/test/resources/rawDeepLearningClassifier/DelphinID/Dde_415_s06_S1120120620_171333_D035_48.mat";
-		double[] expectedOutput = new double[]{0.998737633, 0.998737633,	0.000146952,	1.49E-10,	0.001111862, 1.64E-10,	1.66E-08,	3.53E-06};
-
-		try {
-			
-			//load the model
-			SimpleArchiveModel model = new SimpleArchiveModel(new File(modelPath));
-			
-
-			Path path = Paths.get(relMatPath);
-		
-			// Create MAT file with a scalar in a nested struct
-				MatFile matFile = Mat5.readFromFile(path.toString());
-				Matrix array = matFile.getArray("tfvalues");
-				
-				//the values for the whistle detector.
-				double[][] whistleValues = DLMatFile.matrix2array(array);
-				
-				//the image after compression 
-				array = matFile.getArray("whistle_image_gray");
-				double[][] compressedWhistleImage = DLMatFile.matrix2array(array);
-				
-				//the raw whistle frequency time scatter values
-				array = matFile.getArray("tfvalues");
-				//the values for the whistle detector.
-				double[][] pamguardWhistleImage = 	whistleScatter2Image(whistleValues);
-	
-				//System.out.println("Size python: " + compressedWhistleImage.length + " x " + compressedWhistleImage[0].length);
-				
-				float[][][] input = new float[1][][];
-				input[0] =  JamArr.doubleToFloat(compressedWhistleImage);
-			
-				System.out.println("Model output: ");
-				float[] outputPython = model.runModel(input);
-				
-				input[0] =   JamArr.doubleToFloat(JamArr.transposeMatrix(pamguardWhistleImage));
-				
-				System.out.println("Size Java: " + 	input[0].length + " x " + 	input[0][0].length);
-
-				//a bit ugly but works.
-//				transformedData2 = JamArr.transposeMatrix(transformedData2);
-				
-				
-				float[] outputJava = model.runModel(input);
-				
-				for (int i=0; i<outputPython.length; i++) {
-					System.out.println(String.format("Output Python: %.4f Java: %.4f",outputPython[i],outputJava[i] )); 
-				}
-
-				MatFile matFileWrite = Mat5.newMatFile()
-					    .addArray("imagePython",DLMatFile.array2Matrix(compressedWhistleImage))
-					    .addArray("imageJava",DLMatFile.array2Matrix(JamArr.transposeMatrix(pamguardWhistleImage)));
-				
-				
-				Mat5.writeToFile(matFileWrite, "C:\\Users\\Jamie Macaulay\\MATLAB Drive\\MATLAB\\PAMGUARD\\deep_learning\\delphinID\\whistle_image_inout_test.mat");
-
-//			JamArr.printArray(output);
-			
-		} catch (MalformedModelException | IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-		
-		System.out.println("DelphinID mode test end");
-
+		assertTrue(result); 
 	}
-
 
 }

@@ -54,6 +54,11 @@ public class DLZipUtils {
 	 */
 	public static File extractFile(URI zipPackage, String fileToBeExtracted, String outFolder) throws IOException {
 		File fileOut = new File(outFolder, fileToBeExtracted); 
+		
+		//need this incase the file is within a folder within the zip file.
+		if (new File(fileOut.getParent()).exists() == false) {
+			new File(fileOut.getParent()).mkdir();
+		}
         OutputStream out = new FileOutputStream(fileOut);
         FileInputStream fileInputStream = new FileInputStream(new File(zipPackage));
         BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream );

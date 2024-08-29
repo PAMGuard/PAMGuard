@@ -164,10 +164,7 @@ public class DLTransformsPane extends PamBorderPane {
 			}
 
 			transformPane = DataTransformPaneFactory.getSettingsPane(dlTransforms.get(i)); 
-			
-			
 			//System.out.println("Set DL transfroms: " + dlTransforms.get(i).getDLTransformType() + " " + ((SimpleTransform) dlTransforms.get(i)).getParams()); 
-
 
 			//there must be a transform pane or else this will break. 
 			dlTransformPanes.add(transformPane); 

@@ -785,26 +785,26 @@ public class DataStreamPaneFX extends PamBorderPane {
 
 		
 		
-		public static double approximateLog(double x) {
-		    if (x <= 0) {
-		        return 0;
-		    }
-
-		    double result = 0;
-		    double term = x;
-		    double denominator = 1;
-
-		    int count=0;
-		    while (Math.abs(term) > 1e-3 && count<10000) {
-		        result += term;
-		        term *= -x;
-		        denominator++;
-		        term /= denominator;
-		        count++;
-		    }
-
-		    return result;
-		}
+//		public double approximateLog(double x) {
+//		    if (x <= 0) {
+//		        return 0;
+//		    }
+//
+//		    double result = 0;
+//		    double term = x;
+//		    double denominator = 1;
+//
+//		    int count=0;
+//		    while (Math.abs(term) > 1e-3 && count<10000) {
+//		        result += term;
+//		        term *= -x;
+//		        denominator++;
+//		        term /= denominator;
+//		        count++;
+//		    }
+//
+//		    return result;
+//		}
 		
 		public void drawDataRate(GraphicsContext g,
 				OfflineDataMap offlineDataMap, Color dataColour) {
