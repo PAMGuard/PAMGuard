@@ -186,7 +186,7 @@ public class DelphinIDWorker extends  ArchiveModelWorker {
 			
 			transformedData2 = ((FreqTransform) transform).getSpecTransfrom().getTransformedData(); 
 
-			//a bit ugly but works.
+			//a bit ugly but works - it is very important we tranpose the matrix!!
 			transformedData2 = JamArr.transposeMatrix(transformedData2);
 
 			//System.out.println("DelphinID input image: " + transformedData2.length + " x " + transformedData2[0].length  );
