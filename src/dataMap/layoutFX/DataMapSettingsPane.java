@@ -357,6 +357,8 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 			colourSlider.setShowTickMarks(false);
 			colourSlider.setShowTickLabels(false);
 			colourSlider.setOrientation(Orientation.HORIZONTAL);
+			colourSlider.setMin(0);
+			colourSlider.setMax(500);
 			//amplifier label
 			//				String dBRef = GlobalMedium.getdBRefString(PamController.getInstance().getGlobalMediumManager().getCurrentMedium());
 			Label ampLabel = new Label("Colour scale"); 

@@ -410,6 +410,10 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 		
 	}
 	
+	private boolean isViewer() {
+		return PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW;
+	}
+	
 
 	/**
 	 * Create the tool bar pane. The top of each tab content node contains a tool
@@ -430,11 +434,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 		 * opens the batch run manager to allow batch processing of data e.g. reclassifying clicks. 
 		 */
 		private PamButton recordButton;
-		
-		/**
-		 *Play/pause button. Plays back sound in real time/viewer mode. 
-		 */
-		private PamButton playButton;
+	
 		
 		/**
 		 * Holds all extra controls in the toolbar. 
@@ -473,48 +473,25 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 			this.pamGuiTab=pamGuiTab;
 		
 			//create record and play buttons. 
-			PamHBox playControls=new PamHBox();
-			recordButton=new PamButton();
-//			recordButton.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.CIRCLE, Color.LIMEGREEN, PamGuiManagerFX.iconSize));
-			recordButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-checkbox-blank-circle", Color.LIMEGREEN, PamGuiManagerFX.iconSize));
-			recordButton.getStyleClass().add("transparent-button");
-			recordButton.setStyle(" -fx-background-radius: 50;");
-			recordButton.setOnAction((action)->{
-				if (PamController.getInstance().getPamStatus()==PamController.PAM_RUNNING){
-					PamController.getInstance().pamStop();
-					pamGuiManagerFX.setPamRunning(false);
-				}
-				else {
-					PamController.getInstance().pamStart();
-					pamGuiManagerFX.setPamRunning(true);
-				}
-			});
+			Pane playControls;
+			
+			if (isViewer()) {
+				playControls = createViewerControls();
 
-			playButton=new PamButton();
-//			playButton.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.PLAY, Color.BLACK, PamGuiManagerFX.iconSize));
-			playButton.setGraphic(PamGlyphDude.createPamIcon("mdi2p-play", Color.BLACK, PamGuiManagerFX.iconSize));
-			playButton.getStyleClass().add("transparent-button");
-			playButton.setStyle(" -fx-background-radius: 50;");
-			playButton.setOnAction((action)->{
-				//TODO
-				//start pamguard
-				//PamController.getInstance().pamStart();
-			});
+			}
+			else {
+				playControls = createRealTimeControls();
+			}
 			
 			
-			playControls.getChildren().addAll(recordButton,playButton);
-			playControls.setSpacing(10);
-			playControls.setPadding(new Insets(0,10,0,20));
-			playControls.getStyleClass().add("pane-opaque");
-			playControls.setPrefHeight(prefHeight);
-			playControls.setAlignment(Pos.CENTER);
+
 			
 			//create window editing button. This holds a toggle to edit windows and options. 
 			rightHBox=new PamHBox();
 			rightHBox.setAlignment(Pos.CENTER_LEFT);
 			rightHBox.setPadding(new Insets(0,10,0,20));
 			rightHBox.setSpacing(5);
-			rightHBox.getStyleClass().add("pane-opaque");
+//			rightHBox.getStyleClass().add("pane-opaque");
 			
 			editWindows=new ToggleSwitch("Resize"); 
 			//HACK,
@@ -564,13 +541,102 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 			this.setRight(rightHBox);
 			
 			this.setPrefHeight(prefHeight);
-			this.getStyleClass().add("pane-opaque");
+//			this.getStyleClass().add("pane-opaque");
 
 
 			//this.setPadding(new Insets(0,0,0,0));
 			
 			this.toFront();
 
+		}
+		
+		
+		private Pane createViewerControls() {
+			
+			//create record and play buttons. 
+			PamHBox playControls = new PamHBox();
+			
+			PamButton reProcess=new PamButton("Reprocess");
+			reProcess.setGraphic(PamGlyphDude.createPamIcon("mdi2p-play", PamGuiManagerFX.iconSize));
+			reProcess.setOnAction((action)->{
+				//Open reprocess dialog. 
+			});
+			
+			
+			PamButton exportButton = new PamButton("Export data");
+			exportButton.setGraphic(PamGlyphDude.createPamIcon("mdi2d-database-export", PamGuiManagerFX.iconSize));
+			exportButton.setOnAction((action)->{
+				//export dialog
+				
+			});
+			
+			PamButton importButton = new PamButton("Import data");
+			importButton.setGraphic(PamGlyphDude.createPamIcon("mdi2d-database-import", PamGuiManagerFX.iconSize));
+			importButton.setOnAction((action)->{
+				//iport dialog
+			});
+
+
+			
+			playControls.getChildren().addAll(reProcess, exportButton, importButton);
+			playControls.setSpacing(5);
+			playControls.setPadding(new Insets(0,10,0,50));
+//			playControls.getStyleClass().add("pane-opaque");
+			playControls.setPrefHeight(prefHeight);
+			playControls.setAlignment(Pos.CENTER_LEFT);
+			
+			return playControls;
+			
+		}
+		
+		
+		/**
+		 * Create controls for PAMGuard for real time processing. 
+		 * @return
+		 */
+		private Pane createRealTimeControls() {
+			
+			//create record and play buttons. 
+			PamHBox playControls=new PamHBox();
+			recordButton=new PamButton("Process");
+//			recordButton.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.CIRCLE, Color.LIMEGREEN, PamGuiManagerFX.iconSize));
+			recordButton.setGraphic(PamGlyphDude.createPamIcon("mdi2r-record-circle", Color.RED, 30));
+			recordButton.getStyleClass().add("transparent-button");
+			recordButton.setStyle(" -fx-padding: 1 1 1 1");
+			
+			recordButton.setOnAction((action)->{
+				if (PamController.getInstance().getPamStatus()==PamController.PAM_RUNNING){
+					PamController.getInstance().pamStop();
+					pamGuiManagerFX.setPamRunning(false);
+//					recordButton.setGraphic(PamGlyphDude.createPamIcon("mdi2r-record-circle", Color.RED, PamGuiManagerFX.iconSize));
+
+				}
+				else {
+					PamController.getInstance().pamStart();
+					pamGuiManagerFX.setPamRunning(true);
+//					recordButton.setGraphic(PamGlyphDude.createPamIcon("mdi2p-pause", Color.DARKGRAY, PamGuiManagerFX.iconSize));
+				}
+			});
+
+//			playButton=new PamButton();
+////			playButton.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.PLAY, Color.BLACK, PamGuiManagerFX.iconSize));
+//			playButton.setGraphic(PamGlyphDude.createPamIcon("mdi2p-play", Color.BLACK, PamGuiManagerFX.iconSize));
+//			playButton.getStyleClass().add("transparent-button");
+////			playButton.setStyle(" -fx-background-radius: 50;");
+//			playButton.setOnAction((action)->{
+//				//TODO
+//				//start pamguard
+//				//PamController.getInstance().pamStart();
+//			});
+			
+			playControls.getChildren().addAll(recordButton);
+			playControls.setSpacing(10);
+			playControls.setPadding(new Insets(0,10,0,20));
+//			playControls.getStyleClass().add("pane-opaque");
+			playControls.setPrefHeight(prefHeight);
+			playControls.setAlignment(Pos.CENTER);
+			
+			return playControls;
 		}
 		
 		
