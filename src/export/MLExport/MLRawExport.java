@@ -28,7 +28,7 @@ public class MLRawExport extends MLDataUnitExport<PamDataUnit>{
 		//the number of channels
 		Matrix nChan = Mat5.newScalar(PamUtils.getNumChannels(dataUnit.getChannelBitmap())); 
 
-		//the duration - repeat of duration in main data unit. Keeping here so strcut is the same as the struct from binary files 
+		//the duration - repeat of duration in main data unit. Keeping here so struct is the same as the struct from binary files 
 		Matrix duration = Mat5.newScalar(dataUnit.getSampleDuration()); 
 
 		mlStruct.set("nChan", index, nChan);

@@ -11,6 +11,7 @@ import cpod.CPODClick;
 import cpod.CPODClickDataBlock;
 import cpod.CPODControl;
 import cpod.fx.CPODDataSelectorPane;
+import cpod.fx.CPODDataSelectorPanel;
 import pamViewFX.fxSettingsPanes.DynamicSettingsPane;
 
 /**
@@ -35,7 +36,9 @@ public class CPODDataSelector extends DataSelector {
 	/**
 	 * The cpod data selector pane. 
 	 */
-	private CPODDataSelectorPane cPODDataSelectorPane;
+	private CPODDataSelectorPane cPODDataSelectorPaneFX;
+
+	private CPODDataSelectorPanel cPODDataSelectorPanel;
 
 	public CPODDataSelector(PamControlledUnit cpodControl, CPODClickDataBlock cpodDataBlock, String selectorName,
 			boolean allowScores) {
@@ -60,16 +63,18 @@ public class CPODDataSelector extends DataSelector {
 
 	@Override
 	public PamDialogPanel getDialogPanel() {
-		// TODO Auto-generated method stub
-		return null;
+		if (cPODDataSelectorPanel==null) {
+			cPODDataSelectorPanel = new CPODDataSelectorPanel(this);
+		}
+		return cPODDataSelectorPanel;
 	}
 
 	@Override
 	public DynamicSettingsPane<Boolean> getDialogPaneFX() {
-		if (cPODDataSelectorPane==null) {
-			cPODDataSelectorPane = new CPODDataSelectorPane(this);
+		if (cPODDataSelectorPaneFX==null) {
+			cPODDataSelectorPaneFX = new CPODDataSelectorPane(this);
 		}
-		return cPODDataSelectorPane;
+		return cPODDataSelectorPaneFX;
 	}
 
 	@Override

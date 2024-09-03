@@ -15,6 +15,7 @@ import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataSelector.DataSelector;
 import cpod.CPODClick;
 import cpod.CPODClickDataBlock;
+import cpod.CPODSymbolManager;
 import dataPlotsFX.TDManagedSymbolChooserFX;
 import dataPlotsFX.TDSymbolChooserFX;
 import dataPlotsFX.data.TDDataInfoFX;
@@ -370,7 +371,7 @@ public class CPODPlotInfoFX extends GenericDataPlotInfo {
 	 * @author Jamie Maaulay 
 	 *
 	 */
-	public class CPODSymbolChooserFX extends TDManagedSymbolChooserFX{
+	public class CPODSymbolChooserFX extends TDManagedSymbolChooserFX {
 
 		
 		public CPODSymbolChooserFX(TDDataInfoFX dataInfoFX, PamSymbolChooser pamSymbolChooser, int drawTypes) {
@@ -381,11 +382,25 @@ public class CPODPlotInfoFX extends GenericDataPlotInfo {
 		public PamSymbolFX getPamSymbol(PamDataUnit dataUnit, int type) {
 			PamSymbolFX symbol =  super.getPamSymbol(dataUnit, type);
 			
+			//FIXME - don't know why this needs reset for every symbol...
+			symbol.setWidth(CPODSymbolManager.defaultSymbol.width);
+			symbol.setHeight(CPODSymbolManager.defaultSymbol.height);
+			
+			
+			//if there is a waveform then highlight as a larger symbol
 			if (((CPODClick) dataUnit).getWaveData()!=null && type!=TDSymbolChooserFX.HIGHLIGHT_SYMBOL) {
+				symbol = symbol.clone();
 				symbol.setLineColor(symbol.getFillColor().darker());
 				symbol.setHeight(symbol.getHeight()*1.5);
 				symbol.setWidth(symbol.getWidth()*1.5);
+
 				return symbol;
+			}
+			
+			if (type==TDSymbolChooserFX.HIGHLIGHT_SYMBOL) {
+				symbol = symbol.clone();
+				symbol.setHeight(CPODSymbolManager.defaultSymbol.width+4);;
+				symbol.setWidth(CPODSymbolManager.defaultSymbol.height+4);
 			}
 						
 			return symbol;
@@ -393,5 +408,11 @@ public class CPODPlotInfoFX extends GenericDataPlotInfo {
 		}
 		
 	}
+	
+	@Override
+	protected void setDefaultOpacity(ParameterType dataType) {
+
+	}
+
 
 }

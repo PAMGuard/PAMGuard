@@ -73,7 +73,7 @@ public class Whistles2Image extends FreqTransform {
 		for (int i=0; i<imaged.length; i++) {
 			for (int j=0; j<imaged[0].length; j++) {
 				color = raster.getPixel(i, j, color);
-				imaged[i][imaged[0].length-j-1] = (255-color[0])/255.; //normalize
+				imaged[i][j] = (255-color[0])/255.; //normalize
 			}
 		}
 ////		
