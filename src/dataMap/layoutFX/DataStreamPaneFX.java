@@ -14,6 +14,7 @@ import dataMap.DataMapControl;
 import dataMap.DataMapDrawing;
 import dataMap.OfflineDataMap;
 import dataMap.OfflineDataMapPoint;
+import dataPlotsFX.scrollingPlot2D.StandardPlot2DColours;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.geometry.Orientation;
@@ -242,8 +243,6 @@ public class DataStreamPaneFX extends PamBorderPane {
 		
 		//for 3D data gram 
 		
-		private ColourArray datagramColours;
-		
 		/**
 		 * The wheel scroll factor. 
 		 */
@@ -280,8 +279,8 @@ public class DataStreamPaneFX extends PamBorderPane {
 		private int totalWheelRotation;
 
 		private long lastTime;
-
-		public double[] dataGramColourLims = new double[] {0.1,1.};
+		
+		private StandardPlot2DColours plotColours2D = new StandardPlot2DColours(); 
 
 		/**
 		 * A lookup table for log values to speed up image drawing for 3D images
@@ -634,10 +633,6 @@ public class DataStreamPaneFX extends PamBorderPane {
 			
 			double[][] imageData = datagramImageData.imageData;
 			
-			if (datagramColours == null) {
-				datagramColours = ColourArray.createStandardColourArray(NCOLOURPOINTS, colourArrayType);
-			}
-			
 			if (logimagetable==null) {
 				//now generate a log lookup table for the image because Math.log takes a long time!
 				//a bit complicate because, if we have a huge value then the lookup table is useless
@@ -656,19 +651,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 			else{
 				return;
 			}
-			
-			minMaxValue[0] *= dataGramColourLims[0];
-			minMaxValue[1] *= dataGramColourLims[1];
-			
-			minMaxValue[0] = Math.log10(minMaxValue[0]);
-			minMaxValue[1] = Math.log10(minMaxValue[1]);
-			
-			/* 
-			 * now fudge the scale a little since black is zero and we want 
-			 * anything > 0 to be significantly away from black.
-			 */
-			double scaleRange = (minMaxValue[1] - minMaxValue[0]) * 1.2;
-			minMaxValue[0] = minMaxValue[1]-scaleRange;
+
 
 			int iCol, y;
 			int x1, x2;
@@ -701,11 +684,18 @@ public class DataStreamPaneFX extends PamBorderPane {
 						//writableRaster.setColor(i,y, Color.LIGHTGRAY);
 					}
 					else {
-						iCol = (int) (NCOLOURPOINTS * (approximateLogLookup(imageData[i][y]) - minMaxValue[0]) / scaleRange);
-						iCol = Math.min(Math.max(0, iCol), NCOLOURPOINTS-1);
 						
-						col = datagramColours.getColour(iCol); 
-//					
+						
+//						iCol = (int) (NCOLOURPOINTS * (approximateLogLookup(imageData[i][y]) - minMaxValue[0]) / scaleRange);
+//						iCol = Math.min(Math.max(0, iCol), NCOLOURPOINTS-1);
+						
+						col =plotColours2D.getColours(20*approximateLogLookup(imageData[i][y]) ); 
+						
+						
+//						if (i==0) {
+//						System.out.println("dB image: " + 20*approximateLogLookup(imageData[i][y])+ "  " + plotColours2D.getAmplitudeLimits()[0].get()); 
+//						}
+					
 						colorARGB = (255 << 24) | (((int) (col.getRed()*255.))  << 16) | (((int) (col.getGreen()*255.)) << 8) | (int) (col.getBlue()*255.);
 
  
@@ -1246,8 +1236,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 	 * @param colourArrayType
 	 */
 	public void setColourArrayType(ColourArrayType colourArrayType) {
-		this.colourArrayType=colourArrayType;
-		dataGraph.datagramColours=null; //to force a recalc of colours
+		dataGraph.plotColours2D.setColourMap(colourArrayType);
 		this.repaint(0);
 	}
 
@@ -1256,8 +1245,9 @@ public class DataStreamPaneFX extends PamBorderPane {
 	}
 
 	public void setMinMaxColour(double lowValue, double highValue) {
-		dataGraph.dataGramColourLims = new double[] {lowValue, highValue}; 
-		this.repaint(0);
+		dataGraph.plotColours2D .getAmplitudeLimits()[0].set(lowValue);
+		dataGraph.plotColours2D .getAmplitudeLimits()[1].set(highValue);
+		this.repaint(50);
 	}
 
 

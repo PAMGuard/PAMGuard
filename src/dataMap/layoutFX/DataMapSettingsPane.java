@@ -357,11 +357,11 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 			colourSlider.setShowTickMarks(false);
 			colourSlider.setShowTickLabels(false);
 			colourSlider.setOrientation(Orientation.HORIZONTAL);
-			colourSlider.setMin(0);
-			colourSlider.setMax(500);
+			colourSlider.setMin(-100);
+			colourSlider.setMax(100);
 			//amplifier label
 			//				String dBRef = GlobalMedium.getdBRefString(PamController.getInstance().getGlobalMediumManager().getCurrentMedium());
-			Label ampLabel = new Label("Colour scale"); 
+//			Label ampLabel = new Label("Colour scale"); 
 			
 			colorBox=new ColorComboBox(ColorComboBox.COLOUR_ARRAY_BOX);
 			colorBox.setPrefWidth(80);
@@ -421,7 +421,7 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 			if (dataStreamPane==null) return;
 			
 			dataStreamPane.setColourArrayType(colourArrayType); 
-			dataStreamPane.setMinMaxColour(Math.max(colourSlider.getLowValue()/10., 0.01), colourSlider.getHighValue()/10.); 
+			dataStreamPane.setMinMaxColour(colourSlider.getLowValue(), colourSlider.getHighValue()); 
 		}
 
 
