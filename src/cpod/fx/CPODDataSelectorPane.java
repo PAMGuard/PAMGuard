@@ -169,7 +169,7 @@ public class CPODDataSelectorPane extends DynamicSettingsPane<Boolean> {
 		}
 
 		public void setParams(StandardCPODFilterParams standardCPODFilterParams) {
-			System.out.println("StandardCPODFilterPane. SET PARAMS: min: " + standardCPODFilterParams.min + "  " + standardCPODFilterParams.max); 
+//			System.out.println("StandardCPODFilterPane. SET PARAMS: min: " + standardCPODFilterParams.min + "  " + standardCPODFilterParams.max); 
 			//set the parameters. 
 			rangeSlider.setHighValue(standardCPODFilterParams.max);
 			rangeSlider.setLowValue(standardCPODFilterParams.min);
