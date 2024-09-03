@@ -41,13 +41,16 @@ public class DelphinIDTest {
 	 * @param args - the arguments
 	 */
 	public static void main(String args[]) {
-
+//
 		String matImageSave = "C:\\Users\\Jamie Macaulay\\MATLAB Drive\\MATLAB\\PAMGUARD\\deep_learning\\delphinID\\whistleimages_4s_415.mat";
 		testDelphinIDModel(matImageSave);
 
 		//		//test a single image. 
-//				String imagePathOut = "C:\\Users\\Jamie Macaulay\\MATLAB Drive\\MATLAB\\PAMGUARD\\deep_learning\\delphinID\\whistle_image_python_java.mat";
-//				testDelphinIDImage(imagePathOut);
+		String imagePathOut = "C:\\Users\\Jamie Macaulay\\MATLAB Drive\\MATLAB\\PAMGUARD\\deep_learning\\delphinID\\whistle_image_python_java.mat";
+		testDelphinIDImage(imagePathOut);
+		
+		
+		
 	}
 
 
@@ -70,13 +73,17 @@ public class DelphinIDTest {
 
 	}
 
+
 	/**
-	 * This tests runs 
+	 * The 
+	 * @param matImageSave - the MATLAB image
+	 * @return true of the test is passed
 	 */
 	private static boolean testDelphinIDModel(String matImageSave) {
 		double segLen = 4000.;
 		double segHop = 1000.0;
 		float sampleRate =96000;
+		double startSeconds = 9.565; //seconds to start segments (so we can compare to Python)
 		//unix time from sound file
 		long dataStartMillis = 1340212413000L;
 
@@ -87,7 +94,6 @@ public class DelphinIDTest {
 		//		String modelPath = "D:/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/testencounter415/whistle_model_2/whistle_4s_415.zip";
 		String modelPath =  "./src/test/resources/rawDeepLearningClassifier/DelphinID/whistle_4s_415_model.zip";
 
-
 		//create MatFile for saving the image data to. 
 		MatFile matFile = Mat5.newMatFile();
 
@@ -96,7 +102,7 @@ public class DelphinIDTest {
 
 		//segment the whistle detections
 		//Note, delphinID starts from the first whislte and NOT the first file. 
-		ArrayList<SegmenterDetectionGroup> segments =  DelphinIDUtils.segmentWhsitleData(whistleContours,  (long) (dataStartMillis+(9.565*1000.)), 
+		ArrayList<SegmenterDetectionGroup> segments =  DelphinIDUtils.segmentWhsitleData(whistleContours,  (long) (dataStartMillis+(startSeconds*1000.)), 
 				segLen,  segHop);
 
 		for (int i=0; i<segments.size(); i++) {
@@ -124,10 +130,12 @@ public class DelphinIDTest {
 			float[] output =  predicition.get(0).getPrediction();
 
 			System.out.println();
-			System.out.print("Segment: " + i + " " + (aSegment.get(0).getSegmentStartMillis()-dataStartMillis)/1000. + "s ");
+			System.out.print(String.format("Segment: %d %.2f s" , i ,((aSegment.get(0).getSegmentStartMillis()-dataStartMillis)/1000. - startSeconds)));
 			for (int j=0; j<output.length; j++) {
-				System.out.print("  " + output[j]); 
+				System.out.print(String.format( " %.3f" , output[j])); 
 			}
+			
+			
 
 			Matrix image = DLMatFile.array2Matrix(PamArrayUtils.float2Double(model.getLastModelInput()[0]));
 			imageStruct.set("image", i, image);
@@ -148,17 +156,14 @@ public class DelphinIDTest {
 				e.printStackTrace();
 			}
 		}
-
 		//		for (int i=0; i<whistleContours.size(); i++) {
 		//			System.out.println("Whislte: " + i);
 		//			PamArrayUtils.printArray(whistleContours.get(i).getFreqsHz());
 		//		}
-
-		// TODO 
 		return true;
 	}
 
-	public static double[][] whistleScatter2Image(double[][] whistleValues) {
+	public static double[][] whistleScatter2Image(double[][] whistleValues, double startseg, double seglen) {
 
 		//now perform the image transform in Java 
 		double[] freqLimits = new double[] {2000., 20000.};
@@ -167,7 +172,7 @@ public class DelphinIDTest {
 		ArrayList<double[][]> whistleImageArr = new ArrayList<double[][]>();
 		whistleImageArr.add(whistleValues);
 
-		BufferedImage canvas = Whistles2Image.makeScatterImage(whistleImageArr, size, new double[]{50, 50. + 4.}, freqLimits,  6.);
+		BufferedImage canvas = Whistles2Image.makeScatterImage(whistleImageArr, size, new double[]{startseg, startseg + seglen}, freqLimits,  6.);
 
 		double[][] imaged = new double[(int) size[0]][(int) size[1]];
 
@@ -181,7 +186,6 @@ public class DelphinIDTest {
 		}
 		
 		//this is useful because it allows us to play around with transforms required to make this all work. 
-
 		//create the model transforms
 		ArrayList<DLTransform> modelTransforms = new ArrayList<DLTransform>();
 		modelTransforms.add(new FreqTransform(DLTransformType.SPECFLIP));
@@ -189,11 +193,9 @@ public class DelphinIDTest {
 		modelTransforms.add(new FreqTransform(DLTransformType.SPECRESIZE, new Number[] {Integer.valueOf(48), Integer.valueOf(62), SpecTransform.RESIZE_BICUBIC}));
 		modelTransforms.add(new FreqTransform(DLTransformType.GAUSSIAN_FILTER, new Number[] {Double.valueOf(0.5)}));
 
-
 		SpecTransform specTransform = new SpecTransform(); 
 		specTransform.setSpecData(imaged);
 		specTransform.setSampleRate((float) (freqLimits[1]*2)); 
-
 
 		//set the spec transform
 		((FreqTransform) modelTransforms.get(0)).setSpecTransfrom(specTransform);
@@ -220,19 +222,25 @@ public class DelphinIDTest {
 	public static boolean testDelphinIDImage(String imagePathOut) {
 
 		System.out.println("------DelphinID image comparison test---------");
+		
+		double seglen = 4;
 
-		//ttest the model
-		//		String modelPath =  "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Dde415/whistle_4s_415_model.zip";
-		String modelPath =  "./src/test/resources/rawDeepLearningClassifier/DelphinID/whistle_4s_415_model.zip";
+		//test the model
+		//String modelPath =  "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Dde415/whistle_4s_415_model.zip";
+		String modelPath = "./src/test/resources/rawDeepLearningClassifier/DelphinID/whistle_4s_415_model.zip";
 
 		File file = new File(modelPath);
 		System.out.println("File exists: ? " + file.exists()); 
 
 		//the output for this image should be 
 		//0.998737633	0.000146952	1.49E-10	0.001111862	1.64E-10	1.66E-08	3.53E-06
-		String relMatPath  =	"./src/test/resources/rawDeepLearningClassifier/DelphinID/Dde_415_s10_SI20120620_171333_d042_50.mat";
-		double[] expectedOutput = new double[]{0.998737633, 0.998737633,	0.000146952,	1.49E-10,	0.001111862, 1.64E-10,	1.66E-08,	3.53E-06};
-
+		String relMatPath = "./src/test/resources/rawDeepLearningClassifier/DelphinID/Dde_415_s10_SI20120620_171333_d042_27.mat";
+		
+		//Dde_415_s10_SI20120620_171333_d042_50
+//		double[] expectedOutput = new double[]{0.998737633, 0.998737633,	0.000146952,	1.49E-10,	0.001111862, 1.64E-10,	1.66E-08,	3.53E-06};
+		
+		//Dde_415_s10_SI20120620_171333_d042_27
+//		double[] expectedOutput = new double[]{0.8434083	3.48E-05	8.71E-05	0.14855734	9.86E-07	0.002373327	0.005538126};
 		try {
 
 			Path path = Paths.get(modelPath);
@@ -252,9 +260,11 @@ public class DelphinIDTest {
 			//the image after compression 
 			array = matFile.getArray("whistle_image_gray_python");
 			double[][] compressedWhistleImage = DLMatFile.matrix2array(array);
+			
+			array = matFile.getArray("timeseg");
 
 			//the values for the whistle detector.
-			double[][] pamguardWhistleImage = 	whistleScatter2Image(whistleValues);
+			double[][] pamguardWhistleImage = 	whistleScatter2Image(whistleValues, array.getDouble(0), seglen);
 
 			//IMPORTANT - WE MUST TRANPOSE THE MATRIC HERE. 
 			pamguardWhistleImage=PamArrayUtils.transposeMatrix(pamguardWhistleImage);
@@ -298,7 +308,8 @@ public class DelphinIDTest {
 
 			//			JamArr.printArray(output);
 
-		} catch (MalformedModelException | IOException e) {
+		} 
+		catch (MalformedModelException | IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 
