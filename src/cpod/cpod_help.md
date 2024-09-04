@@ -31,5 +31,5 @@ CPOD and FPOD data can be exported to .RData and .mat using PAMGuard's exporter.
  - slope: the slope which is a paramter measured by the CPOD and FPOD.
  - wave: this will be empty for most clicks but some clicks from FPODs will have a waveform. Note that this is reconstructed from zero corssings and is NOT a clip from the raw sound data.
  - species: if the CPOD is part of a click train then species will be 0 for UNKNOWN, 1 for NBHF, 2 for DOLPHIN and 3 for SONAR. -1 indicates a click is not part of a click train. 
-
+ - clicktrainID indicates the click train that the click belongs to. This can be cross referenced with UID column in the PAMGuard database which stores click trains and/or used to as an identifier to associate different clicks together into trains. 
 
