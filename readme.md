@@ -18,7 +18,7 @@ PAMGuard is available on Windows and can be downloaded from the [PAMGuard websit
 ## Quick start tutorial
 PAMGuard is a modular program with two modes; real-time and viewer. Typically a user will start with real-time model, either in the field collecting data or post processing sound files from a recorder. Once data are processed, users move on to viewer mode where data can be explored and further processed. 
 
-Upon opening PAMGuard for the first time you are greeted with a blank screen. You must add a series of modules to create the desired acoustic workflow - this is referred to as PAMGuard *data model*. For example if processing sound files then first add the Sound Acquisition module **_File->Add Modules->Sound Processing->Sound Acquisition_**. Then add the desired detection algorithms e.g.  **_File->Add Modules->Detector->Click Detectors_**. Some modules (such as the click detector) have their own bespoke displays, others are added to more generalised displays. For example, the whistle and moan detector module shows detections on a spectrogram display, time base display, map etc.. First add a new tab using  **_File->Add Modules->Displays->User Display**. Click on the user display tab and then from the top menu select **_User display-> New Spectrogram_**. Right click on the added spectrogram and select whistle and moan contours to show whistle detections overlaid on the raw spectrogram. 
+Upon opening PAMGuard for the first time you are greeted with a blank screen. You must add a series of modules to create the desired acoustic workflow - this is referred to as PAMGuard *data model*. For example if processing sound files then first add the Sound Acquisition module **_File->Add Modules->Sound Processing->Sound Acquisition_**. Then add the desired detection algorithms e.g.  **_File->Add Modules->Detector->Click Detectors_**. Some modules (such as the click detector) have their own bespoke displays, others are added to more generalised displays. For example, the whistle and moan detector module shows detections on a spectrogram display, time base display, map etc. First add a new tab using  **_File->Add Modules->Displays->User Display_**. Click on the user display tab and then from the top menu select **_User display-> New Spectrogram_**. Right click on the added spectrogram and select whistle and moan contours to show whistle detections overlaid on the raw spectrogram. 
 
 Make sure to add the database and binary file storage modules **_File->Add Modules->Utilities->..._**) to save data then press the run button (red button) and data will process. PAMGuard can handle huge datasets so running might take hours or even days. Progress is shown on the bottom of the screen. 
 
@@ -29,20 +29,20 @@ Once the data has run, open PAMGuard viewer mode. Select the database you used t
 PAMGuard connects with hardware such as various GPS and AIS systems and a multitude of different sound cards (e.g. [National Instruments](www.ni.com) devices, [SAIL DAQ cards](www.smruconsulting.com/contact-us), almost all ASIO sound cards and standard computer sound cards) for real time data collection and processing. PAMGuard also works with some very bespoke hardware such as [DIFAR Sonobuoys]();
 
 ### Real time operation
-PAMGuard takes advantage of multi-core processors to run multiple signal processing automatic analysis algorithms in real time to detect whales, dolphins, bats etc. Data are shown in different displays, including interactive spectrograms and maps. You might be using PAMGuard for simply viewing a spectrogram and making recordings or running deep learning algorithms for multiple species and localising the results to view locations on a map. Whatever acosutic workflow a user creates, PAMGuard can run it in real time. 
+PAMGuard takes advantage of multi-core processors to run multiple signal processing automatic analysis algorithms in real time to detect whales, dolphins, bats etc. Data are shown in different displays, including interactive spectrograms and maps. You might be using PAMGuard for simply viewing a spectrogram and making recordings or running deep learning algorithms for multiple species and localising the results to view locations on a map. Whatever acoustic workflow a user creates, PAMGuard can run it in real time. 
 
 ### Support for compressed audio
 PAMGuard supports processing audio data from standard files (e.g. wav, aif) and also compressed files (e.g. .flac and .sud). Note that sud files are created on SoundTraps widely used marine recorders and can be read by PAMGuard without decompressing - PAMGuard will automatically import click detections if present in sud files. PAMGuard also supports importing detection data from CPODs and FPODs. 
 
 ### Comprehensive data management system
-PAMGuard is designed to collect/process data from large acoustic datasets. PAMGuard stores data in an SQLite databases and "Binary" files. The database stores important metadata such as when data has been processed and some low volume data streams such as GPS. Binary files are not human readable but efficient to access - PAMGuard stores detection data (e.g. clicks, whistles, noise, etc) in these files. this allows PAMGuard to rapidly access data from large datasets. Data from binary files can be viewed in PAMGuard viewer mode or can be exported to MATLAB using the PAMGuard-MATLAB library or the exported to R using the R PAMBinaries package. 
+PAMGuard is designed to collect/process data from large acoustic datasets. PAMGuard stores data in an SQLite databases and "Binary" files. The database stores important metadata such as when data has been processed and some low volume data streams such as GPS. Binary files are not human readable but efficient to access - PAMGuard stores detection data (e.g. clicks, whistles, noise, etc) in these files. This allows PAMGuard to rapidly access data from large datasets. Data from binary files can be viewed in PAMGuard viewer mode or can be exported to MATLAB using the [PAMGuard-MATLAB](https://github.com/PAMGuard/PAMGuardMatlab) library or the exported to R using the R [PAMBinaries](https://github.com/TaikiSan21/PamBinaries) package. 
 
 ### Access to detection and classification algorithms
 PAMGuard allows users to integrate automated detection and classification algorithms directly into their acoustic workflow. There are a multitude of different algorithms to choose from, including a basic click detector, whistle and moan detector, GPL detector, click train detectors and many others. The idea behind PAMGuard is allow researchers to access open source state-of-the-art algorithms developed within the scientific community - if you want to contribute and get your algorithm into PAMGuard get in touch. 
 
 ![PAMGuard click detector](./src/Resources/screenshots/Click_detector_screenshot.png)
 
-_The PAMGuard click detector can be used to detect transient sonunds such as echolocation clicks. It also automatically loclaises click bearings for closely spaced hydrophones._
+_The PAMGuard click detector can be used to detect transient sounds such as echolocation clicks. It also automatically localises click bearings for closely spaced hydrophones._
 
 ### Localisation
 PAMGuard has a multitude of different options for acoustic localisation. There's a comprehensive beam forming module for beam forming arrays, a large aperture localiser for 3D localisation and target motion analysis for towed hydrophone arrays. 
@@ -58,7 +58,7 @@ An important aspect of PAMGuard is the ability for users to explore processed da
 
 ![Example of a data map](./src/Resources/screenshots/Datamap_screenshot.png)
 
-_The PAMGuard data map provides an overciew of the entire processed dataset over days, weeks and even years._
+_The PAMGuard data map provides an overview of the entire processed dataset over days, weeks and even years._
 
 
 ### Advanced manual annotation

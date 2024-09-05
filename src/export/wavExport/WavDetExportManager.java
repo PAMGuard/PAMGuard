@@ -6,6 +6,7 @@ import java.util.List;
 
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.RawDataHolder;
+import cpod.CPODClick;
 import export.PamDataUnitExporter;
 import javafx.scene.layout.Pane;
 
@@ -49,7 +50,12 @@ public class WavDetExportManager implements PamDataUnitExporter  {
 	@Override
 	public boolean hasCompatibleUnits(Class dataUnitType) {
 		//        boolean implementsInterface = Arrays.stream(dataUnitType.getInterfaces()).anyMatch(i -> i == RawDataHolder.class);
-		if ( RawDataHolder.class.isAssignableFrom(dataUnitType)) return true;
+		//don't allow folk to export FPOD data as wav files or even make it seem CPOD data can be export as wav - all sorts of confusion arises from here. 
+		if (CPODClick.class.isAssignableFrom(dataUnitType)) return false; 
+		
+		//if a raw data holder we can likely export detections to wav files. 
+		if (RawDataHolder.class.isAssignableFrom(dataUnitType)) return true;
+		
 		return false;
 	}
 

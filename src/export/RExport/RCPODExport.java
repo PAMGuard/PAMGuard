@@ -7,6 +7,7 @@ import org.renjin.sexp.ListVector.NamedBuilder;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.RawDataHolder;
 import cpod.CPODClick;
+import export.MLExport.MLCPODExport;
 
 
 public class RCPODExport extends RDataUnitExport<PamDataUnit> {
@@ -21,27 +22,27 @@ public class RCPODExport extends RDataUnitExport<PamDataUnit> {
 //		}
 		
 		
-		CPODClick dataholder = (CPODClick) dataUnit;
+		CPODClick fpodClick = (CPODClick) dataUnit;
 		
-		if (dataholder==null) return null; 
+		if (fpodClick==null) return null; 
 
 
 		//add the raw wave data 
-		if (dataholder.getWaveData()!=null && dataholder.getWaveData().length>0) {
-			int nbins =dataholder.getWaveData().length*dataholder.getWaveData()[0].length;
+		if (fpodClick.getWaveData()!=null && fpodClick.getWaveData().length>0) {
+			int nbins =fpodClick.getWaveData().length*fpodClick.getWaveData()[0].length;
 			int n=0;
 			double[] concatWaveform  = new double[nbins];
 			//System.out.println("Number of bins: " + nbins);
-			for (int i=0; i<dataholder.getWaveData().length; i++) {
-				for (int j=0; j<dataholder.getWaveData()[i].length; j++) {
+			for (int i=0; i<fpodClick.getWaveData().length; i++) {
+				for (int j=0; j<fpodClick.getWaveData()[i].length; j++) {
 //					System.out.println("Current: " + i + " "+ j 
 //							+ " nchan: " + dataUnit.getNChan() + "  wave size: " 
 //							+ dataUnit.getWaveLength() +"len concat: " + concatWaveform.length);
-					concatWaveform[n++] = dataholder.getWaveData()[i][j];
+					concatWaveform[n++] = fpodClick.getWaveData()[i][j];
 				}
 			}
 
-			Vector newMatrix = DoubleArrayVector.newMatrix(concatWaveform, dataholder.getWaveData()[0].length, dataholder.getWaveData().length); 
+			Vector newMatrix = DoubleArrayVector.newMatrix(concatWaveform, fpodClick.getWaveData()[0].length, fpodClick.getWaveData().length); 
 			rData.add("wave", newMatrix); 
 		}
 		else {
@@ -53,24 +54,36 @@ public class RCPODExport extends RDataUnitExport<PamDataUnit> {
 
 //		Matrix duration = Mat5.newScalar(fpodClick.getDurationInMilliseconds()); 
 		
-		rData.add("numcycles", dataholder.getnCyc()); 
-		rData.add("bandwidth", dataholder.getBw()*1000.); 
-		rData.add("peakfreq", dataholder.getkHz()*1000.); 
-		rData.add("endfreq", dataholder.getEndF()); 
-		rData.add("SPL", dataholder.getSpl()); 
-		rData.add("slope", dataholder.getSlope()); 
+		rData.add("numcycles", fpodClick.getnCyc()); 
+		rData.add("bandwidth", fpodClick.getBw()*1000.); 
+		rData.add("peakfreq", fpodClick.getkHz()*1000.); 
+		rData.add("endfreq", fpodClick.getEndF()*1000); 
+		rData.add("SPL", fpodClick.getSpl()); 
+		rData.add("slope", fpodClick.getSlope()); 
+		
+		short species = -1;
+		long clicktrainID = -1;
+
+		if (fpodClick.getCPODClickTrain()!=null) {
+			species =  MLCPODExport.getCPODSpecies(fpodClick.getCPODClickTrain().getSpecies());
+			clicktrainID = fpodClick.getCPODClickTrain().getUID();
+		}
+		
+		rData.add("species", species); 
+		rData.add("clicktrainID", clicktrainID); 
+
 		
 		return rData;
 	}
 
 	@Override
 	public Class<?> getUnitClass() {
-		return RawDataHolder.class;
+		return CPODClick.class;
 	}
 
 	@Override
 	public String getName() {
-		return "raw_data_units";
+		return "cpod_clicks";
 	}
 
 }
