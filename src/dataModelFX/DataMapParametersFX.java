@@ -1,13 +1,13 @@
-package dataMap;
+package dataModelFX;
 
 import java.io.Serializable;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
+import dataMap.OfflineDataMap;
 
-
-public class DataMapParameters implements Cloneable, Serializable, ManagedParameters {
+public class DataMapParametersFX implements Cloneable, Serializable, ManagedParameters {
 
 	protected static final long serialVersionUID = 1L;
 	
@@ -20,16 +20,11 @@ public class DataMapParameters implements Cloneable, Serializable, ManagedParame
 	 */
 	public int hScaleChoice = 4;
 	
-	public static final double[] hScaleChoices = {0.1, 0.5, 1, 2, 5, 10, 20, 60, 180, 600};
-	
-	public double getPixeslPerHour() {
-		return hScaleChoices[hScaleChoice];
-	}
 
 	@Override
-	protected DataMapParameters clone() {
+	protected DataMapParametersFX clone() {
 		try {
-			return (DataMapParameters) super.clone();
+			return (DataMapParametersFX) super.clone();
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();
 			return null;
