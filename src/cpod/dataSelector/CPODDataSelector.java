@@ -6,9 +6,11 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataSelector.DataSelectParams;
 import PamguardMVC.dataSelector.DataSelector;
+import PamguardMVC.superdet.SuperDetection;
 import clickDetector.alarm.ClickAlarmParameters;
 import cpod.CPODClick;
 import cpod.CPODClickDataBlock;
+import cpod.CPODClickTrainDataUnit;
 import cpod.CPODControl;
 import cpod.fx.CPODDataSelectorPane;
 import cpod.fx.CPODDataSelectorPanel;
@@ -88,6 +90,16 @@ public class CPODDataSelector extends DataSelector {
 			};
 			//could add an if statement for CPOD parameters type here to use a more sophisticated filter 
 			//e.g. the FPOD data has waveforms so when that is implemented may want extra bits and pieces. 
+		}
+		
+		if (dataSelectorParams.selectClickTrain) {
+			CPODClickTrainDataUnit cpodClickTrain = cpodClick.getCPODClickTrain();
+			if (cpodClickTrain==null) return 0;
+			
+			if (dataSelectorParams.speciesID != null && !dataSelectorParams.speciesID.equals(cpodClickTrain.getSpecies())) {
+				return 0;
+			}
+			
 		}
 
 		return 1;

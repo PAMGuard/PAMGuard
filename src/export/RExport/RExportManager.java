@@ -49,6 +49,7 @@ public class RExportManager implements PamDataUnitExporter {
 		/***Add more options here to export data units****/
 		rDataExport.add(new RClickExport()); 
 		rDataExport.add(new RWhistleExport()); 
+		rDataExport.add(new RCPODExport()); 
 		rDataExport.add(new RRawExport()); //should be last in case raw data holders have specific exporters
 	}
 

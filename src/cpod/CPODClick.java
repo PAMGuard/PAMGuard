@@ -339,7 +339,7 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 		str += String.format("End Freq: %dkHz<p>", getEndF());
 		str += String.format("Slope: %d<p>", getSlope());
 		str += String.format("SPL: %d", getSpl());
-		if (rawData.length == 40) {
+		if (rawData != null && rawData.length == 40) {
 			str += String.format("<p>QClass %d, SpClass %d", CPODUtils.getBits(rawData[19], (short) 0x3), 
 					CPODUtils.getBits(rawData[19], (short) 0b11100));
 			str += String.format("<p>Train %d, %d click", rawData[20], rawData[23]);
