@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import PamController.PamController;
 import PamController.PamControllerInterface;
 import dataMap.DataMapControl;
+import dataMap.layoutFX.DataStreamPaneFX.DataName;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -325,6 +326,10 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX {
 	public DataStreamPaneFX getDataStreamPane(int n) {
 		return this.scrollingDataPanel.getDataSyreamPane( n);
 
+	}
+
+	public DataStreamPaneFX getDataStreamPane(DataName selectedItem) {
+		return scrollingDataPanel.getDataStreamPane(selectedItem);
 	}
 
 }

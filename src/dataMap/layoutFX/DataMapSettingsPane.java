@@ -5,6 +5,7 @@ import dataGram.DatagramScaleInformation;
 import dataGram.DatagramSettings;
 import dataMap.DataMapControl;
 import dataMap.DataMapParameters;
+import dataMap.layoutFX.DataStreamPaneFX.DataName;
 
 import org.controlsfx.control.CheckComboBox;
 
@@ -19,6 +20,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
@@ -104,7 +106,7 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 
 	private Label dataGramLabel;
 
-	private ComboBox<String> dataGramBox;
+	private ComboBox<DataName> dataGramBox;
 
 	/**
 	 * Holdes datagram settings. 
@@ -264,13 +266,13 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 		ComboBox<String> datagramBinsBox = createDataGramBinPane(dataGramManager); 
 
 		//Pane for colouring datagrams. 
-		dataGramBox=new ComboBox<String> (); 
+		dataGramBox=new ComboBox<DataName> (); 
 
 		//find all datagrams. 
 		updateDataStreamBox();
 
 		dataGramBox.setOnAction((action)->{
-			dataGramColPane.setDataStreamPanel(dataMapPane.getDataStreamPane(dataGramBox.getSelectionModel().getSelectedIndex()));
+			dataGramColPane.setDataStreamPanel(dataMapPane.getDataStreamPane(dataGramBox.getSelectionModel().getSelectedItem()));
 			colourLabel.setText(String.format("Colours for %s " , dataMapPane.getDataStreamPane(dataGramBox.getSelectionModel().getSelectedIndex()).getDataName().getName())); 
 		});
 
@@ -316,6 +318,7 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
         
         dataGramColPane.setDataStreamPanel(dataMapPane.getDataStreamPane(0));
 		colourLabel.setText(String.format("Colours for %s " , dataMapPane.getDataStreamPane(0))); 
+		
 
 		return holder; 
 	}
@@ -324,10 +327,9 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 	
 	private void updateDataStreamBox() {
 		dataGramBox.getItems().clear();
-//		System.out.println("UPDATE DATA STREAM BOX: " + this.dataMapPane.getNumDataStreamPanes());
 		for (int i=0; i<this.dataMapPane.getNumDataStreamPanes(); i++) {
-			if (dataMapPane.getDataStreamPane(i).getScaleType() == DatagramScaleInformation.PLOT_3D) {
-				dataGramBox.getItems().add(dataMapPane.getDataStreamPane(i).getDataName().getName()); 
+			if (dataMapPane.getDataStreamPane(i).isHasDatagram()) {
+				dataGramBox.getItems().add(dataMapPane.getDataStreamPane(i).getDataName()); 
 			}
 		}
 	}
@@ -508,6 +510,8 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 	boolean setting = false;
 
 	public void setParams(DataMapParameters dataMapParameters) {
+		System.out.println("SET DATAMPA PARAMS");
+		
 		setting = true;
 //		timeSlider.setValue(dataMapParameters.hScaleChoice);
 		scaleBox.getSelectionModel().select(dataMapParameters.vScaleChoice);
@@ -539,13 +543,11 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 
 	@Override
 	public Node getContentNode() {
-		// TODO Auto-generated method stub
 		return mainPain;
 	}
 
 	@Override
 	public void paneInitialized() {
-		// TODO Auto-generated method stub
 		
 	}
 

@@ -17,6 +17,7 @@ import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import PamguardMVC.PamDataBlock;
 import dataMap.DataMapControl;
+import dataMap.layoutFX.DataStreamPaneFX.DataName;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamColorsFX;
 import pamViewFX.fxNodes.PamScrollPane;
@@ -516,6 +517,15 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 			return dataStreamPanels.get(n);
 		}
 		else return null;
+	}
+
+	public DataStreamPaneFX getDataStreamPane(DataName selectedItem) {
+		for (int i=0; i<dataStreamPanels.size(); i++) {
+			if (selectedItem.equals(dataStreamPanels.get(i).getDataName())) {
+				return dataStreamPanels.get(i);
+			}
+		}
+		return null;
 	}
 	
 }

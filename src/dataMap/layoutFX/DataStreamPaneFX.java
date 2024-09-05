@@ -21,6 +21,7 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.PixelBuffer;
 import javafx.scene.image.PixelFormat;
@@ -147,7 +148,8 @@ public class DataStreamPaneFX extends PamBorderPane {
 		dataGraph.setupAxis();
 		dataName = new DataName();
 		dataName.setName(dataBlock.getDataName()); 
-		
+		dataName.setLongName(dataBlock.getLongDataName()); 
+
 		this.setTop(topPane=createTopPane());
 		this.setCenter(dataGraph);
 	}
@@ -410,6 +412,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 			
 			this.setLeft(axisPane);
 			this.setCenter(canvasHolder);
+			
 		}
 		
 		
@@ -495,7 +498,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 		private void paintPlotCanvas(GraphicsContext gc){
 			setupAxis();
 			gc.clearRect(0, 0, plotCanvas.getWidth(), plotCanvas.getHeight());
-			if (hasDatagram && showDatagram) {
+			if (isHasDatagram() && showDatagram) {
 				datagramPaint(gc);
 			}
 			else {
@@ -523,6 +526,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 		}
 		
 		private void datagramPaint(GraphicsContext g) {
+//			System.out.println("PAINT DATA STREAM BOX: " + getScaleType() + "  " + getDataName().getName());
 			if (getScaleType() == DatagramScaleInformation.PLOT_3D) {
 				datagramPaint3D(g);
 			}
@@ -1095,13 +1099,28 @@ public class DataStreamPaneFX extends PamBorderPane {
 	public class DataName {
 
 		private String name;
+		
+		private String longDataName;
 
 		public String getName() {
 			return name;
 		}
+		
+		public String getLongtName() {
+			return longDataName;
+		}
+
+		public void setLongName(String longDataName) {
+			this.longDataName=longDataName; 
+		}
 
 		public void setName(String dataName) {
 			this.name=dataName;
+		}
+		
+		@Override
+		public String toString() {
+			return name; 
 		}
 		
 	}
@@ -1162,7 +1181,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 	 * @return
 	 */
 	private DatagramScaleInformation findDatagramScaleInfo() {
-		if (hasDatagram == false) {
+		if (isHasDatagram() == false) {
 			return null;
 		}
 		DatagramProvider dp = dataBlock.getDatagramProvider();
@@ -1248,6 +1267,10 @@ public class DataStreamPaneFX extends PamBorderPane {
 		dataGraph.plotColours2D .getAmplitudeLimits()[0].set(lowValue);
 		dataGraph.plotColours2D .getAmplitudeLimits()[1].set(highValue);
 		this.repaint(50);
+	}
+
+	public boolean isHasDatagram() {
+		return hasDatagram;
 	}
 
 
