@@ -1,6 +1,7 @@
 package cpod.fx;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 import PamView.dialog.PamDialogPanel;
+import PamView.dialog.PamGridBagContraints;
 import PamView.panel.PamPanel;
 import PamView.sliders.PamRangeSlider;
 import cpod.dataSelector.CPODDataSelector;
@@ -44,15 +46,16 @@ public class CPODDataSelectorPanel implements PamDialogPanel {
 		PamPanel vBox = new PamPanel();
 		vBox.setLayout(new GridBagLayout());
 		
-		GridBagConstraints c = new GridBagConstraints(); 
+		PamGridBagContraints c = new PamGridBagContraints(); 
 		
-		c.gridheight=3;
 		c.gridx = 0;
 		c.gridy = 0;
+		c.gridwidth=4;
 
 		
 		standardCPODFilterPanes = new ArrayList<StandardCPODFilterPanel>();
 		ArrayList<StandardCPODFilterParams> standParams = cpodDataSelector.getParams().cpodDataFilterParams; 
+		
 		for (int i=0; i<standParams.size(); i++) {
 			standardCPODFilterPanes.add(new StandardCPODFilterPanel( cpodDataSelector.getParams().cpodDataFilterParams.get(i))); 
 			
@@ -69,6 +72,7 @@ public class CPODDataSelectorPanel implements PamDialogPanel {
 		this.speciesSelectBox = new JComboBox<String>(); 
 		
 		c.gridy++;
+		c.gridwidth=2;
 
 		PamPanel.addComponent(vBox, clcikTrainCheckBox, c);
 		c.gridx = 2;
@@ -80,6 +84,8 @@ public class CPODDataSelectorPanel implements PamDialogPanel {
 		this.speciesSelectBox.addItem("NBHF");
 		this.speciesSelectBox.addItem("Dolphins");
 		this.speciesSelectBox.addItem("Sonar");
+		
+		vBox.validate();
 
 
 		return vBox; 
@@ -123,6 +129,8 @@ public class CPODDataSelectorPanel implements PamDialogPanel {
 
 	@Override
 	public void setParams() {
+		
+		System.out.println("CPOD SET PARAMS"); 
 		
 		for (int i=0; i<cpodDataSelector.getParams().cpodDataFilterParams.size(); i++) {
 			standardCPODFilterPanes.get(i).setParams(cpodDataSelector.getParams().cpodDataFilterParams.get(i)); 
@@ -168,32 +176,41 @@ public class CPODDataSelectorPanel implements PamDialogPanel {
 			JLabel topLabel = new JLabel(); 
 
 			rangeSlider.setMinimum(0);
-			rangeSlider.setMaximum(255);
+			rangeSlider.setMaximum(256);
+			
+			//dodger blue instead of obnoxius green
+			rangeSlider.setRangeColour(new Color(0, 90, 156));
 
 			rangeSlider.setPaintTicks(true);
-//			rangeSlider.setShowTickMarks(true);
+			rangeSlider.setPaintLabels(true);
 
+			rangeSlider.setMajorTickSpacing(40);
+			rangeSlider.setMinorTickSpacing(10);
+
+			String unit = "kHz";
 			switch (params.dataType) {
 			case StandardCPODFilterParams.AMPLITUDE:
-				topLabel.setText("Amplitude (dB re 1\u03BCPa)");
+				unit = "dB re 1\u03BCPa";
+				topLabel.setText("Amplitude ("+ unit+ ")");
 				rangeSlider.setMinimum(80);
 				rangeSlider.setMaximum(170);
 				break;
 			case StandardCPODFilterParams.PEAK_FREQ:
-				topLabel.setText("Peak Frequency (kHz)");
+				topLabel.setText("Peak Frequency ("+ unit+ ")");
 				break;
 			case StandardCPODFilterParams.BW:
-				topLabel.setText("Bandwidth (kHz)");
+				topLabel.setText("Bandwidth ("+ unit+ ")");
 				rangeSlider.setMinimum(0);
 				rangeSlider.setMaximum(100);
 
 				break;
 			case StandardCPODFilterParams.END_F:
-				topLabel.setText("End Frequency (kHz)");
+				topLabel.setText("End Frequency ("+ unit+ ")");
 
 				break;
 
 			case StandardCPODFilterParams.NCYCLES:
+				unit="";
 				topLabel.setText("Number cycles");
 				rangeSlider.setMinimum(0);
 				rangeSlider.setMaximum(40);
@@ -201,10 +218,22 @@ public class CPODDataSelectorPanel implements PamDialogPanel {
 			}
 
 			this.setLayout(new BorderLayout());
+			
+			//create  pane to show the min and the max values
+			JLabel valueLabel = new JLabel();
+			
+			final String unit2 = unit;
+			rangeSlider.addChangeListener((a)->{
+				valueLabel.setText(String.format("%d to %d %s",rangeSlider.getValue() ,rangeSlider.getUpperValue() , unit2));
+			});
 
-			this.add(topLabel, BorderLayout.NORTH);
+			PamPanel labePanel = new PamPanel();
+			labePanel.setLayout(new BorderLayout());
+			labePanel.add(topLabel, BorderLayout.WEST);
+			labePanel.add(valueLabel, BorderLayout.EAST);
+
+			this.add(labePanel, BorderLayout.NORTH);
 			this.add(rangeSlider, BorderLayout.CENTER);
-		
 			
 			this.setParams(params);
 
@@ -212,11 +241,12 @@ public class CPODDataSelectorPanel implements PamDialogPanel {
 		}
 
 		public void setParams(StandardCPODFilterParams standardCPODFilterParams) {
-//			System.out.println("StandardCPODFilterPane. SET PARAMS: min: " + standardCPODFilterParams.min + "  " + standardCPODFilterParams.max); 
+//			System.out.println("StandardCPODFilterPane. SET PARAMS: min: " + standardCPODFilterParams.min + "  " + standardCPODFilterParams.max  +  "  " + rangeSlider.getMaximum()); 
 			//set the parameters. 
 			
-			rangeSlider.setValue((int) standardCPODFilterParams.max);
-			rangeSlider.setUpperValue((int) standardCPODFilterParams.min);
+			rangeSlider.setValue((int) standardCPODFilterParams.min);
+			rangeSlider.setUpperValue((int) standardCPODFilterParams.max);
+			
 		}
 
 		public void getParams(StandardCPODFilterParams standardCPODFilterParams) {
