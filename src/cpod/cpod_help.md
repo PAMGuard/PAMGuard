@@ -50,8 +50,9 @@ _Screenshots of the data selector user interface used throughtout PAMGuard. Alth
 CPOD and FPOD data can be exported to .RData and .mat using PAMGuard's exporter. 
 
 <p align="center">
-  <img width="300" height="400" src = "resources/cpod_exporter_dialog_swing.png">
+  <img width="450" height="600" src = "resources/cpod_exporter_dialog_swing.png">
 </p>
+
 _PAMGuard's exporter can export CPOD/FPOD clicks to .mat or .RData files. These can be openend in MATLAB/Python and R respectively_
 
 The fields saved by the exporter are the same as a standard PAMGuard detection [(see exporter help)](./src/export/exporter_help.md). The additional fields for CPODs and FPODs are 
