@@ -18,7 +18,7 @@ The module has three possible modes of importing data
 Users can use the file button to select a single file (e.g. an FP3 file) or the folder button to select a folder of CPOD/FPOD files. If the folder button is used and there are both CP1/FP1 (detections) and CP3/FP3 (click trains) files then PAMGuard will automatically load all files and assign detections to click trains. Once files have imported select **_Import_** and the data will be imported into PAMGuard - note this can take some time, especially if importing CP1/FP1 files.
 
 <p align="center">
-  <img width="750" height="360" src = "resources/cpod_settings_description.png">
+  <img width="750" height="400" src = "resources/cpod_settings_description.png">
 </p>
 
 _The CPOD module allow users to import CPOD/FPOD data by selecting either individual files or a folder of files_
@@ -26,34 +26,43 @@ _The CPOD module allow users to import CPOD/FPOD data by selecting either indivi
 ## Visualising CPOD/FPOD data
 A broad overview of CPOD data is shown in PAMGuard's data map which shows a datagram similar to the click detector. The datagram shows the frequency density of CPOD/FPOD clicks constructed from the peak frequency parameter for each click The datagram can be useful for quickly navigating to sections of data that may contain porpoises and/or dolphins.
 
-CPOD detections can be viewed in the Time base display in PAMGuard. Add the CPOD module to a plot and then data can be viewed with time using a selection y-axis options such as Amplitude
+Individual CPOD detections can be viewed in the Time base display in PAMGuard. Add the CPOD module to a plot and then data can be viewed with time using a selection y-axis options such as Amplitude, Amplitude (stem), Frequency, bandwidth etc. 
 
 <p align="center">
-  <img width="750" height="360" src = "resources/cpod_time_display_stem.png">
+  <img width="750" height="380" src = "resources/cpod_time_display_stem.png">
 </p>
 <p align="center">
-  <img width="750" height="360" src = "resources/cpod_time_display_amplitude.png">
+  <img width="750" height="380" src = "resources/cpod_time_display_amplitude2.png">
 </p>
 
-_FPOD data visualised as a stem plots like FPOD.exe (top) and as a scatter plot of click amplitudes (bottom)_
-
+_FPOD data visualised in the time base display as a stem plots like FPOD.exe (top) and as a scatter plot of click amplitudes (bottom)_
 
 ## Data selector
-The CPOD module has a custom data selector which provides a unified interface for users to select subsets of CPOD/FPOD data. The data selector has sliders which set the range of various parameters, such as peak frequency and also allows the selection of CPOD/FPOD which belong to a click and those gave been classified to a particular species. 
+The CPOD module has a custom data selector which provides a unified interface for users to select subsets of CPOD/FPOD data. The data selector has sliders which set the range of various parameters, such as peak frequency and also allows the selection of CPOD/FPOD which belong to a click and those gave been classified to a particular species. Users can use the data selector to, for example, only export clicks classified as dolphin or perhaps plot only clicks with a peak frequency between 100 and 150 kHz on the time display.
 
+CPOD data selector             |  CPOD data selector in time display
+:-------------------------:|:-------------------------:
+![](resources/cpod_data_selector_swing.png)  |  ![](resources/cpod_data_selector_fx.png)
 
-_Screenshots of the data selector user interface_
+_Screenshots of the data selector user interface used throughtout PAMGuard. Although the style can change, the data selector is the same throughout PAMGuard_
 
 ## Exporting CPOD/FPOD data
-CPOD and FPOD data can be exported to .RData and .mat using PAMGuard's exporter. The fields saved by the exporter are the same as a standard PAMGuard detection (see exporter help). The additional fields for CPODs and FPODs are 
+CPOD and FPOD data can be exported to .RData and .mat using PAMGuard's exporter. 
 
- - bandwidth: the bandwidth of the click in Hz
- - numcycles: the number of cycles fo the click in Hz
- - peakfreq: the peak frequency of the click in Hz
- - endfreq: the end frequency of the click in Hz
- - SPL: the CPOD measure of sound pressure level which is an integer between 0 and 255. 
- - slope: the slope which is a paramter measured by the CPOD and FPOD.
- - wave: this will be empty for most clicks but some clicks from FPODs will have a waveform. Note that this is reconstructed from zero corssings and is NOT a clip from the raw sound data.
- - species: if the CPOD is part of a click train then species will be 0 for UNKNOWN, 1 for NBHF, 2 for DOLPHIN and 3 for SONAR. -1 indicates a click is not part of a click train. 
- - clicktrainID indicates the click train that the click belongs to. This can be cross referenced with UID column in the PAMGuard database which stores click trains and/or used to as an identifier to associate different clicks together into trains. 
+<p align="center">
+  <img width="300" height="400" src = "resources/cpod_exporter_dialog_swing.png">
+</p>
+_PAMGuard's exporter can export CPOD/FPOD clicks to .mat or .RData files. These can be openend in MATLAB/Python and R respectively_
+
+The fields saved by the exporter are the same as a standard PAMGuard detection [(see exporter help)](./src/export/exporter_help.md). The additional fields for CPODs and FPODs are 
+
+ - _bandwidth_: the bandwidth of the click in Hz
+ - _numcycles_: the number of cycles fo the click in Hz
+ - _peakfreq_: the peak frequency of the click in Hz
+ - _endfreq_: the end frequency of the click in Hz
+ - _SPL_: the CPOD measure of sound pressure level which is an integer between 0 and 255. 
+ - _slope_: the slope which is a paramter measured by the CPOD and FPOD.
+ - _wave_: this will be empty for most clicks but some clicks from FPODs will have a waveform. Note that this is reconstructed from zero corssings and is NOT a clip from the raw sound data.
+ - _species_: if the CPOD is part of a click train then species will be 0 for UNKNOWN, 1 for NBHF, 2 for DOLPHIN and 3 for SONAR. -1 indicates a click is not part of a click train. 
+ - _clicktrainID_: indicates the click train that the click belongs to. This can be cross referenced with UID column in the PAMGuard database which stores click trains and/or used to as an identifier to associate different clicks together into trains. 
 
