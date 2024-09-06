@@ -1,11 +1,8 @@
 package dataMap.layoutFX;
 
 import dataGram.DatagramManager;
-import dataGram.DatagramScaleInformation;
 import dataGram.DatagramSettings;
 import dataMap.DataMapControl;
-import dataMap.DataMapParameters;
-import dataMap.layoutFX.DataStreamPaneFX.DataName;
 
 import org.controlsfx.control.CheckComboBox;
 
@@ -20,7 +17,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
@@ -47,7 +43,7 @@ import pamViewFX.fxSettingsPanes.DynamicSettingsPane;
  * @author Jamie Macaulay
  *
  */
-public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> {
+public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParametersFX> {
 
 	/*
 	 * Reference to the data map control. 
@@ -106,7 +102,7 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 
 	private Label dataGramLabel;
 
-	private ComboBox<DataName> dataGramBox;
+	private ComboBox<DataMapInfo> dataGramBox;
 
 	/**
 	 * Holdes datagram settings. 
@@ -158,9 +154,8 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 		mainPain.setCenter(holder); 
 
 		//set params for the pane		
-		setParams(dataMapControl.dataMapParameters);
+		setParams(dataMapPane.getParams());
 		checkDataGramPane(); // create datagram pane if a binary store already added. 
-		sayHScale();
 
 	}
 
@@ -266,7 +261,7 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 		ComboBox<String> datagramBinsBox = createDataGramBinPane(dataGramManager); 
 
 		//Pane for colouring datagrams. 
-		dataGramBox=new ComboBox<DataName> (); 
+		dataGramBox=new ComboBox<DataMapInfo> (); 
 
 		//find all datagrams. 
 		updateDataStreamBox();
@@ -341,7 +336,6 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 	 * 
 	 */
 	public class DataGramColPane extends PamBorderPane {
-
 
 		private ColourRangeSlider colourSlider;
 
@@ -498,36 +492,34 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 		return controlPane;
 	}
 
-	/**
-	 * Show the horizontal scale. 
-	 */
-	private void sayHScale() {
-//		double hChoice = timeScaleChoices[this.];
-//		timeScaleLabel.setText(String.format("%s pixs/hour", new Double(timeScaleChoices[(int) hChoice]).toString()));
-	}
 
-	//HACK use setting flag to avoid immediate callback which overwrites changes 2 and 3 ! 
+
+	// use setting flag to avoid immediate callback which overwrites changes 2 and 3 ! 
 	boolean setting = false;
 
-	public void setParams(DataMapParameters dataMapParameters) {
-		System.out.println("SET DATAMPA PARAMS");
+	public void setParams(DataMapParametersFX dataMapParameters) {
+//		System.out.println("SET DATAMPA PARAMS");
 		
 		setting = true;
 //		timeSlider.setValue(dataMapParameters.hScaleChoice);
 		scaleBox.getSelectionModel().select(dataMapParameters.vScaleChoice);
 		logScaleToggle.setSelected(dataMapParameters.vLogScale);
 			
-		//make sure the combo box has correct datastreams
+		//make sure the combo box has correct data streams
 		updateDataStreamBox();
 		
 		//make sure combo box for datamaps  is sorted
 		updateDataMapChoiceBox();
 		
+		if (this.dataGramComboBox.getItems().size()>dataMapParameters.selectedDataGram && dataMapParameters.selectedDataGram>=0) {
+			dataGramComboBox.getSelectionModel().select(dataMapParameters.selectedDataGram );
+		}
+		
 		setting = false;
 	}
 
 
-	public DataMapParameters getParams(DataMapParameters dataMapParameters) {
+	public DataMapParametersFX getParams(DataMapParametersFX dataMapParameters) {
 		if (setting) return dataMapParameters;
 //		dataMapParameters.hScaleChoice = (int) timeSlider.getValue(); 
 		dataMapParameters.vScaleChoice = scaleBox.getSelectionModel().getSelectedIndex();
