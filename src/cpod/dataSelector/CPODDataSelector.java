@@ -2,16 +2,12 @@ package cpod.dataSelector;
 
 import PamController.PamControlledUnit;
 import PamView.dialog.PamDialogPanel;
-import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataSelector.DataSelectParams;
 import PamguardMVC.dataSelector.DataSelector;
-import PamguardMVC.superdet.SuperDetection;
-import clickDetector.alarm.ClickAlarmParameters;
 import cpod.CPODClick;
 import cpod.CPODClickDataBlock;
 import cpod.CPODClickTrainDataUnit;
-import cpod.CPODControl;
 import cpod.fx.CPODDataSelectorPane;
 import cpod.fx.CPODDataSelectorPanel;
 import pamViewFX.fxSettingsPanes.DynamicSettingsPane;

@@ -2638,6 +2638,8 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 				followCheckBox.setSelected(false);
 			}
 			ClickDetection click = findClick(e.getX(), e.getY(), 10);
+			
+			
 			if (click != null) {
 				setSelectedClick(click);
 			}
@@ -3474,12 +3476,20 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 	 *         click is close enough
 	 */
 	ClickDetection findClick(int x, int y, int maxdist) {
+		
+		System.out.println("Find click: " + x + " " + y); 
+		
 		ClickDetection closestClick = null;
 		PamDataBlock<ClickDetection> clickData = clickControl.getClickDataBlock();
 		ClickDetection unit;
 		Point pt;
-		int dist;
-		int closest = maxdist * maxdist;
+		
+		//important to use long here as 4k screens zoome din means we can get integer overflow errors and 
+		//the wrong click is selected. 
+		long dist;
+		long xdiff;
+		long ydiff;
+		long closest = maxdist * maxdist;
 		synchronized (clickData.getSynchLock()) {
 			ListIterator<ClickDetection> clickIterator = clickData.getListIterator(PamDataBlock.ITERATOR_END);
 			while (clickIterator.hasPrevious()) {
@@ -3488,12 +3498,23 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 				//					break;
 				if (shouldPlot(unit) == false) continue;
 				pt = clickXYPos(unit);
-				if ((dist = ((pt.x - x) * (pt.x - x) + (pt.y - y) * (pt.y - y))) <= closest) {
+				
+				xdiff = (pt.x - x) ;
+				ydiff =  (pt.y - y);
+				
+				dist = (xdiff *  xdiff + ydiff * ydiff);
+				
+				//System.out.println("pt: " +  pt.x + " " + pt.y + "  " + closest + " dist " + dist + " " + ((pt.x - x) * (pt.x - x)) + " huh? " + (pt.x - x)); 
+
+				
+				if (dist <= closest) {
 					closest = dist;
 					closestClick = unit;
 				}
 			}
 		}
+
+		System.out.println("Find click closest: " +closest); 
 
 		return closestClick;
 	}
