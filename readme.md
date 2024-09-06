@@ -71,7 +71,7 @@ PAMGuard allows users to run their own deep learning models using the deep learn
 PAMGuard Integrates with Tethys database. Users can export processed PAMGuard data to a Tethys database seamlessly; this feature is great for large scale projects or organisations with long term datasets. 
 
 ## Feature roadmap
-There's lots of features we would like to add to PAMGuard. If you want to add a feature you can either code it up yourself in Java and submit a pull request or get in touch with us to discuss how to it might be integrated. Some smaller features might be in our roadmap anyway but larger features usually require funding. Some features we are thinking about (but do not necassarily have time for yet) are;
+There's lots of features we would like to add to PAMGuard. If you want to add a feature you can either code it up yourself in Java and submit a pull request or get in touch with us to discuss how to it might be integrated. Some smaller features might be in our roadmap anyway but larger features usually require funding. Some features we are thinking about (but do not necessarily have time for yet) are;
 
 * Support for decidecade noise bands (base 10 filter bank) in noise band monitor to meet Euopean standards
 * Capability to export data directly from PAMGaurd e.g. as MAT files (in progress).

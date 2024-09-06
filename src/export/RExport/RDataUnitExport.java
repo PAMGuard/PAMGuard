@@ -17,9 +17,9 @@ public abstract class RDataUnitExport<T extends PamDataUnit<?, ?>> {
 	
 	
 	/**
-	 * Create a MATLAB structure which contains all information for a data unit. 
-	 * @param dataUnit - the data unit to convert to a MATLAB structure
-	 * @return detection data MATLAB structure ready to be exported to a .mat file or added to a ArrayList<MLArray>. 
+	 * Create a R data frame which contains all information for a data unit. 
+	 * @param dataUnit - the data unit to convert to a R structure
+	 * @return detection data R structure ready to be exported to a .mat file or added to a ArrayList<MLArray>. 
 	 */
 	public ListVector.NamedBuilder detectionToStruct(T dataUnit, int index){
 		

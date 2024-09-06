@@ -137,7 +137,7 @@ public class RExportManager implements PamDataUnitExporter {
 
 	/**
 	 * Sort a list of data units into lists of the same type of units. Convert to a list of structures. 
-	 * @param dataUnits - a list of data units to convert to matlab structures. 
+	 * @param dataUnits - a list of data units to convert to R data frames. 
 	 * @return list of list of R strucutures ready for saving to .RData file. 
 	 */
 	public RData dataUnits2R(List<PamDataUnit> dataUnits){
