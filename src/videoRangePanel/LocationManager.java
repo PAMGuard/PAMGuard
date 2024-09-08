@@ -78,7 +78,7 @@ public class LocationManager {
 	 * @return latlong at timeMillis
 	 */
 	public LatLong getLocation(long timeMillis){
-		LatLong latLong=null; ;
+		LatLong latLong=null; 
 		for (int i=0; i<currentMethods.length; i++){
 			latLong=getGPSPoint(timeMillis, currentMethods[i]);
 			if (latLong!=null){
@@ -111,8 +111,10 @@ public class LocationManager {
 	public LatLong searchGPSDataBlock(long timeMillis){
 //		System.out.println("VideoRangePanel: LocationManager: Searching GPS datablock: "+ArrayManager.getArrayManager().getGPSDataBlock());
 		GpsDataUnit gpsDataunit;
-		if (ArrayManager.getArrayManager().getGPSDataBlock()!=null){
-			gpsDataunit=ArrayManager.getArrayManager().getGPSDataBlock().getClosestUnitMillis(timeMillis);
+		ArrayManager.getArrayManager();
+		if (ArrayManager.getGPSDataBlock()!=null){
+			ArrayManager.getArrayManager();
+			gpsDataunit=ArrayManager.getGPSDataBlock().getClosestUnitMillis(timeMillis);
 			if (gpsDataunit!=null){
 				return gpsDataunit.getGpsData();
 			}

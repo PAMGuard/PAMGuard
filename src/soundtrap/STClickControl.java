@@ -37,9 +37,9 @@ import javax.swing.JSeparator;
 import org.pamguard.x3.sud.SUDClickDetectorInfo;
 
 import Acquisition.AcquisitionControl;
-import PamController.PamSensor;
 import PamController.PamControlledUnitSettings;
-import PamController.PamController;
+import PamController.PamControllerInterface;
+import PamController.PamSensor;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamguardMVC.PamRawDataBlock;
@@ -164,7 +164,7 @@ public class STClickControl extends ClickControl implements PamSensor {
 	@Override
 	public void notifyModelChanged(int changeType) {
 		super.notifyModelChanged(changeType);
-		if (changeType == PamController.INITIALIZATION_COMPLETE) {
+		if (changeType == PamControllerInterface.INITIALIZATION_COMPLETE) {
 			sudFileDWVHandler.subscribeSUD();
 		}
 	}

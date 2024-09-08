@@ -1,7 +1,7 @@
 package propagation;
 
-import pamMaths.PamVector;
 import PamUtils.LatLong;
+import pamMaths.PamVector;
 
 public class SurfaceEcho implements PropagationModel {
 

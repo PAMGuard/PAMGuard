@@ -1,12 +1,13 @@
 package pamViewFX;
 
+import PamController.SettingsPane;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
-import PamController.SettingsPane;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamButton;
@@ -56,7 +57,7 @@ public class TabSelectionPane extends SettingsPane<PamGuiTabFX> {
 		holderBox.setSpacing(5); 
 		tabChoice=new ComboBox<String>(); 
 		tabChoice.setMinWidth(100);
-		PamHBox.setHgrow(tabChoice, Priority.ALWAYS); //make sure choice nox is big enough
+		HBox.setHgrow(tabChoice, Priority.ALWAYS); //make sure choice nox is big enough
 		tabChoice.setEditable(false);
 
 		//listener for adding tabs

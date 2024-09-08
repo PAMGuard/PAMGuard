@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import whistlesAndMoans.WhistleToneConnectProcess.ShapeConnector;
 import Localiser.algorithms.timeDelayLocalisers.bearingLoc.BearingLocaliser;
 import PamController.PamController;
 import PamUtils.PamUtils;
@@ -19,7 +18,7 @@ import binaryFileStorage.BinaryHeader;
 import binaryFileStorage.BinaryObjectData;
 import binaryFileStorage.ModuleFooter;
 import binaryFileStorage.ModuleHeader;
-import binaryFileStorage.PackedBinaryObject;
+import whistlesAndMoans.WhistleToneConnectProcess.ShapeConnector;
 
 public class WhistleBinaryDataSource extends BinaryDataSource {
 

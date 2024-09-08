@@ -1,7 +1,5 @@
 package Map;
 
-import java.awt.Component;
-
 import pamScrollSystem.PamScrollSlider;
 import userDisplay.UserDisplayComponent;
 import userDisplay.UserDisplayControl;

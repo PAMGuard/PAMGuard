@@ -10,7 +10,6 @@ import java.util.ListIterator;
 import javax.swing.Timer;
 
 import PamController.PamController;
-import PamUtils.PamCalendar;
 
 /**
  * System for handling and displaying warnings and errors from various parts of PAMguard. 

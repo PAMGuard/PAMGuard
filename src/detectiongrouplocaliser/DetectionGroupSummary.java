@@ -8,7 +8,6 @@ import PamView.paneloverlay.overlaymark.OverlayMark;
 import PamView.paneloverlay.overlaymark.OverlayMarker;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
-import PamguardMVC.superdet.SuperDetection;
 import javafx.scene.input.MouseEvent;
 
 /**

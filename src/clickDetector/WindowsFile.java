@@ -55,6 +55,7 @@ public class WindowsFile extends RandomAccessFile implements WriteWinFile , Read
 	/* (non-Javadoc)
 	 * @see clickDetector.WriteWinFile#writeWinInt(int)
 	 */
+	@Override
 	public void writeWinInt(int val) throws IOException {
 		writeWinShort(val & 0xFFFF);
 		writeWinShort(val >> 16);
@@ -64,6 +65,7 @@ public class WindowsFile extends RandomAccessFile implements WriteWinFile , Read
 	/**
 	 * Read a Windows 32 bit integer
 	 */
+	@Override
 	public int readWinInt() throws IOException {
 		int val = readWinShort();
 		if (val < 0) val+=65536;
@@ -75,6 +77,7 @@ public class WindowsFile extends RandomAccessFile implements WriteWinFile , Read
 	/* (non-Javadoc)
 	 * @see clickDetector.WriteWinFile#writeWinShort(int)
 	 */
+	@Override
 	public void writeWinShort(int val) throws IOException {
 		/*
 		 * Write out low byte first
@@ -83,6 +86,7 @@ public class WindowsFile extends RandomAccessFile implements WriteWinFile , Read
 		writeByte(0xFF & (val >> 8));
 	}
 	
+	@Override
 	public int readWinShort() throws IOException {
 		/*
 		 * Read the low byte first
@@ -113,12 +117,14 @@ public class WindowsFile extends RandomAccessFile implements WriteWinFile , Read
 	/* (non-Javadoc)
 	 * @see clickDetector.WriteWinFile#writeWinFloat(float)
 	 */
+	@Override
 	public void writeWinFloat(float val) throws IOException {
 //		java.lang.Float floatValue = new Float(val);
 		int intValue = Float.floatToIntBits(val);
 		writeWinInt(intValue);
 	}
 	
+	@Override
 	public float readWinFloat() throws IOException {
 		int val = readWinInt();
 		return Float.intBitsToFloat(val);
@@ -127,11 +133,13 @@ public class WindowsFile extends RandomAccessFile implements WriteWinFile , Read
 	/* (non-Javadoc)
 	 * @see clickDetector.WriteWinFile#writeWinDouble(double)
 	 */
+	@Override
 	public void writeWinDouble(double val) throws IOException {
 		long intValue = Double.doubleToLongBits(val);
 		writeWinLong(intValue);
 	}
 	
+	@Override
 	public double readWinDouble() throws IOException {
 		long val = readWinLong();
 		return Double.longBitsToDouble(val);
@@ -140,11 +148,13 @@ public class WindowsFile extends RandomAccessFile implements WriteWinFile , Read
 	/* (non-Javadoc)
 	 * @see clickDetector.WriteWinFile#writeWinLong(long)
 	 */
+	@Override
 	public void writeWinLong(long longValue) throws IOException {
 		writeWinInt((int) (0xFFFFFFFF & longValue));
 		writeWinInt((int) (0xFFFFFFFF & (longValue >> 32)));
 	}
 	
+	@Override
 	public long readWinLong() throws IOException {
 		long val = readWinInt();
 		val += readWinInt() << 32;

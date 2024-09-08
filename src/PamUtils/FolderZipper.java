@@ -1,10 +1,10 @@
 package PamUtils;
 
 import java.io.File;
-import java.util.zip.ZipOutputStream;
-import java.io.FileOutputStream;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 //example by pitchoun from http://www.theserverside.com/discussions/thread.tss?thread_id=34906
 //FolderZipper provide a static method to zip a folder.
 /**

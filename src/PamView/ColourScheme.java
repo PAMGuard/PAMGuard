@@ -7,7 +7,6 @@ import java.util.Hashtable;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.border.TitledBorder;
 
 import PamView.PamColors.PamColor;
 
@@ -105,7 +104,7 @@ public class ColourScheme implements Serializable, Cloneable {
 	 * @return colour index (1 - 12)
 	 */
 	public int getWhaleColourIndex(int iCol) {
-		if (colsChecked == false) {
+		if (!colsChecked) {
 			checkAllColours();
 			colsChecked = true;
 		}
@@ -130,7 +129,7 @@ public class ColourScheme implements Serializable, Cloneable {
 	 * @return Colour
 	 */
 	public Color getChannelColour(int iCol) {
-		if (colsChecked == false) {
+		if (!colsChecked) {
 			checkAllColours();
 			colsChecked = true;
 		}

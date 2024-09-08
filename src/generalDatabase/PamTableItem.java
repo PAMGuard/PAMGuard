@@ -228,7 +228,7 @@ public class PamTableItem implements Cloneable {
 //		if (sqlType != Types.CHAR || value == null) {
 //			return null;
 //		}
-		if (value instanceof String == false) {
+		if (!(value instanceof String)) {
 			return null;
 		}
 		return ((String) value).trim();

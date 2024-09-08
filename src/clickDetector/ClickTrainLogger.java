@@ -1,15 +1,13 @@
 package clickDetector;
 
+import java.sql.Types;
+
+import PamguardMVC.PamDataUnit;
 import generalDatabase.PamConnection;
 import generalDatabase.PamTableDefinition;
 import generalDatabase.PamTableItem;
 import generalDatabase.SQLLogging;
 import generalDatabase.SQLTypes;
-
-import java.sql.Connection;
-import java.sql.Types;
-
-import PamguardMVC.PamDataUnit;
 
 public class ClickTrainLogger extends SQLLogging {
 

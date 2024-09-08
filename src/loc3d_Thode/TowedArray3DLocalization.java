@@ -4,10 +4,8 @@
 package loc3d_Thode;
 
 import Array.ArrayManager;
-import Array.HydrophoneLocator;
 import Array.PamArray;
 import PamDetection.AbstractLocalisation;
-import PamDetection.LocContents;
 import PamDetection.LocalisationInfo;
 import PamUtils.LatLong;
 import PamguardMVC.PamDataUnit;
@@ -99,13 +97,13 @@ public class TowedArray3DLocalization extends AbstractLocalisation {
 	@Override
 	public LatLong getLatLong(int iSide)
 	{
-		if (towedArray3DDataUnit.HasLatLong() == false) return null;
+		if (!towedArray3DDataUnit.HasLatLong()) return null;
 		return towedArray3DDataUnit.getLatlong(iSide);
 	}
 	
 	@Override
 	public double getDepth() {
-		if (towedArray3DDataUnit.isHasDepth() == false) return Double.NaN;
+		if (!towedArray3DDataUnit.isHasDepth()) return Double.NaN;
 		return towedArray3DDataUnit.getDepth();
 	}
 
@@ -117,7 +115,7 @@ public class TowedArray3DLocalization extends AbstractLocalisation {
 
 	@Override
 	public double getHeight(int iSide) {
-		if (towedArray3DDataUnit.isHasDepth() == false) return Double.NaN;
+		if (!towedArray3DDataUnit.isHasDepth()) return Double.NaN;
 		return towedArray3DDataUnit.getDepth();
 	}
 

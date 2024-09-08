@@ -10,7 +10,6 @@ import javax.swing.JMenuItem;
 
 import Array.ArrayManager;
 import Array.PamArray;
-import Array.Streamer;
 import Array.sensors.ArrayDisplayParameters;
 import Array.sensors.ArrayDisplayParamsProvider;
 import Array.sensors.swing.ArrayDisplayParamsDialog;
@@ -20,7 +19,6 @@ import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamController.StorageOptions;
 import PamController.StorageParameters.StoreChoice;
-import PamView.dialog.warn.WarnOnce;
 import analogarraysensor.swing.AnalogSensorDialog;
 import analoginput.AnalogDevicesManager;
 import analoginput.AnalogSensorUser;

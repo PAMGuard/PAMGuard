@@ -48,7 +48,7 @@ public class OfflineFileList {
 	}
 
 	private void addFiles(File current) {
-		if (current.exists() == false) {
+		if (!current.exists()) {
 			return;
 		}
 		if (current.isFile() && checkFilter(current)) {

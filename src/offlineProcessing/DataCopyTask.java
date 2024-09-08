@@ -1,16 +1,13 @@
 package offlineProcessing;
 
-import java.sql.Connection;
-
+import PamguardMVC.PamDataBlock;
+import PamguardMVC.PamDataUnit;
 import binaryFileStorage.BinaryDataSource;
-import generalDatabase.DBControl;
+import dataMap.OfflineDataMapPoint;
 import generalDatabase.DBControlUnit;
 import generalDatabase.DBProcess;
 import generalDatabase.PamConnection;
 import generalDatabase.SQLLogging;
-import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamDataUnit;
-import dataMap.OfflineDataMapPoint;
 
 /**
  * Generic class for copying data from binary data files to database files. 

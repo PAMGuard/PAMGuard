@@ -4,12 +4,12 @@ import java.util.ArrayList;
 
 import javax.vecmath.Point3f;
 
-import pamMaths.PamVector;
 import PamDetection.AbstractLocalisation;
 import PamUtils.LatLong;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import Stats.LinFit;
+import pamMaths.PamVector;
 
 /**
  * Class to rotate and transform an event so that it's track lies as close
@@ -233,7 +233,7 @@ public class EventRotator extends AbstractTargetMotionInformation{
 	 * @return time in milliseconds. 
 	 */
 	public long metresToTime(PamVector pt, boolean isRotated) {
-		if (isRotated == false) {
+		if (!isRotated) {
 			pt = pt.clone().rotate(-referenceAngle);
 		}
 		// now only have to work on the x coordinate. 
@@ -380,6 +380,7 @@ public class EventRotator extends AbstractTargetMotionInformation{
 	 * the array axis. 
 	 * @return
 	 */
+	@Override
 	public PamVector[][] getWorldVectors() {
 		if (worldVectors == null) {
 			calculateWorldVectors();
@@ -391,6 +392,7 @@ public class EventRotator extends AbstractTargetMotionInformation{
 	 * 
 	 * @return bitmap of hydrophones used in the event rotator
 	 */
+	@Override
 	public int getReferenceHydrophones() {
 		return referenceHydrophones;
 	}

@@ -1,21 +1,19 @@
 package noiseMonitor;
 
-import noiseMonitor.alarm.NoiseAlarmCounter;
-import noiseMonitor.alarm.NoiseAlarmProvider;
-import noiseMonitor.species.TethysNoiseDataProvider;
-import tethys.TethysControl;
-import tethys.pamdata.TethysDataProvider;
-import tethys.species.DataBlockSpeciesManager;
-import tethys.species.FixedSpeciesManager;
-import alarm.AlarmCounter;
-import alarm.AlarmCounterProvider;
-import alarm.AlarmDataSource;
 import PamUtils.FrequencyFormat;
 import PamUtils.PamUtils;
 import PamguardMVC.DataAutomation;
 import PamguardMVC.DataAutomationInfo;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
+import alarm.AlarmCounterProvider;
+import alarm.AlarmDataSource;
+import noiseMonitor.alarm.NoiseAlarmProvider;
+import noiseMonitor.species.TethysNoiseDataProvider;
+import tethys.TethysControl;
+import tethys.pamdata.TethysDataProvider;
+import tethys.species.DataBlockSpeciesManager;
+import tethys.species.FixedSpeciesManager;
 
 public class NoiseDataBlock extends PamDataBlock<NoiseDataUnit> implements AlarmDataSource {
 
@@ -55,6 +53,7 @@ public class NoiseDataBlock extends PamDataBlock<NoiseDataUnit> implements Alarm
 		
 	}
 
+	@Override
 	public void masterClockUpdate(long milliSeconds, long clockSample) {
 		super.masterClockUpdate(milliSeconds, clockSample);
 	}

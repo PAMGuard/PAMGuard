@@ -12,6 +12,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import PamController.PamController;
@@ -56,7 +57,7 @@ public class BinaryStorageDialogPanel {
 		PamDialog.addComponent(q, dateSubFolders = new JCheckBox("Store data in sub folders by date"), c);
 		c.gridy++;
 		c.gridx = 0;
-		q.add(new JLabel("Noise background storage location", JLabel.RIGHT), c);
+		q.add(new JLabel("Noise background storage location", SwingConstants.RIGHT), c);
 		c.gridx++;
 		c.gridwidth = 3;
 		q.add(noiseStoreType = new NoiseComboBox(), c);
@@ -78,11 +79,11 @@ public class BinaryStorageDialogPanel {
 		if (allowChannelOffsets) {
 			c.gridx = 0;
 			c.gridy++;
-			q.add(new JLabel("Offset channel bitmaps by ", JLabel.RIGHT), c);
+			q.add(new JLabel("Offset channel bitmaps by ", SwingConstants.RIGHT), c);
 			c.gridx++;
 			q.add(channelOffset = new JTextField(6), c);
 			c.gridx++;
-			q.add(new JLabel(" channels", JLabel.LEFT), c);
+			q.add(new JLabel(" channels", SwingConstants.LEFT), c);
 			channelOffset.setToolTipText("Used when combinging data from multiple recorders in viewer mode");
 		}
 		noiseStoreType.addItem(NoiseStoreType.PGDF);

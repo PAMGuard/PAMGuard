@@ -190,7 +190,7 @@ public class GuiFrameManager implements PamSettings, PAMControllerGUI {
 		makeFrameList();
 		int iFrame = 0;
 		while (true) {
-			if (frameExists(iFrame) == false) {
+			if (!frameExists(iFrame)) {
 				return iFrame;
 			}
 			iFrame++;
@@ -382,6 +382,7 @@ public class GuiFrameManager implements PamSettings, PAMControllerGUI {
 		
 	}
 
+	@Override
 	public void addControlledUnit(PamControlledUnit controlledUnit) {
 		for (int i = 0; i < pamViewList.size(); i++) {
 			pamViewList.get(i).addControlledUnit(controlledUnit);
@@ -395,6 +396,7 @@ public class GuiFrameManager implements PamSettings, PAMControllerGUI {
 		}
 	}
 
+	@Override
 	public void addView(PamViewInterface newView) {
 		if (pamViewList == null) {
 			pamViewList = new ArrayList<PamViewInterface>();
@@ -409,6 +411,7 @@ public class GuiFrameManager implements PamSettings, PAMControllerGUI {
 		pamViewList.remove(oldView);
 	}
 
+	@Override
 	public void showControlledUnit(PamControlledUnit unit) {
 		for (int i = 0; i < pamViewList.size(); i++) {
 			pamViewList.get(i).showControlledUnit(unit);
@@ -427,14 +430,15 @@ public class GuiFrameManager implements PamSettings, PAMControllerGUI {
 		}
 	}
 
+	@Override
 	public void notifyModelChanged(int changeType) {
 		for (int i = 0; i < pamViewList.size(); i++) {
 			pamViewList.get(i).modelChanged(changeType);
 		}
-		if (changeType == PamController.INITIALIZATION_COMPLETE) {
+		if (changeType == PamControllerInterface.INITIALIZATION_COMPLETE) {
 			intialiseFrames();
 		}
-		if (changeType==PamController.ADD_CONTROLLEDUNIT) {
+		if (changeType==PamControllerInterface.ADD_CONTROLLEDUNIT) {
 			if (this.getFrame(0)!=null)	this.getFrame(0).revalidate();
 		}
 		if (changeType==PamControllerInterface.REMOVE_CONTROLLEDUNIT) {
@@ -461,6 +465,7 @@ public class GuiFrameManager implements PamSettings, PAMControllerGUI {
 		
 	}
 
+	@Override
 	public void destroyModel() {
 		for (int i = 0; i < pamViewList.size(); i++) {
 			pamViewList.get(i).modelChanged(PamControllerInterface.DESTROY_EVERYTHING);
@@ -503,6 +508,7 @@ public class GuiFrameManager implements PamSettings, PAMControllerGUI {
 		return true;
 	}
 
+	@Override
 	public void enableGUIControl(boolean enable) {
 		for (int i = 0; i < pamViewList.size(); i++) {
 //			pamViewList.get(i).enableGUIControl(enable);
@@ -648,7 +654,7 @@ public class GuiFrameManager implements PamSettings, PAMControllerGUI {
 				continue;
 			}
 			frame.setLocation(loc, loc);
-			frame.setState(JFrame.NORMAL);
+			frame.setState(Frame.NORMAL);
 			frame.setVisible(true);
 			loc += 20;
 		}

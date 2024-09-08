@@ -1,8 +1,6 @@
 package whistlesAndMoans;
 
-import pamMaths.PamVector;
 import Array.ArrayManager;
-import Array.HydrophoneLocator;
 import Array.PamArray;
 import Localiser.algorithms.timeDelayLocalisers.bearingLoc.BearingLocaliser;
 import PamDetection.AbstractLocalisation;
@@ -10,6 +8,7 @@ import PamDetection.LocContents;
 import PamDetection.LocalisationInfo;
 import PamUtils.PamUtils;
 import PamguardMVC.PamDataUnit;
+import pamMaths.PamVector;
 
 public class WhistleBearingInfo extends AbstractLocalisation {
 

@@ -16,11 +16,9 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
-import PamguardMVC.debug.Debug;
 import generalDatabase.DBControlUnit;
 import generalDatabase.PamConnection;
 import group3dlocaliser.algorithm.LocaliserAlgorithm3D;
-import group3dlocaliser.algorithm.crossedbearing.CrossedBearingGroupLocaliser;
 import group3dlocaliser.grouper.DetectionGroupMonitor;
 import group3dlocaliser.grouper.DetectionGroupedSet;
 import group3dlocaliser.grouper.DetectionGrouper;
@@ -276,7 +274,7 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 			
 			
 		}
-		if (bestLocalisation != null && logAll == false) {
+		if (bestLocalisation != null && !logAll) {
 			// best make and output a data unit !
 			// List<PamDataUnit> bestGroup = detectionGroupedSet.getGroup(bestSet);
 			// Group3DDataUnit newDataUnit = new

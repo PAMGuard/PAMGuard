@@ -43,12 +43,6 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import noiseMonitor.ResolutionPanel;
-
-import spectrogramNoiseReduction.SpectrogramNoiseDialogPanel;
-import spectrogramNoiseReduction.SpectrogramNoiseProcess;
-
-
 import PamController.PamController;
 import PamDetection.RawDataUnit;
 import PamView.dialog.PamDialog;
@@ -58,6 +52,9 @@ import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamRawDataBlock;
 import Spectrogram.WindowFunction;
+import noiseMonitor.ResolutionPanel;
+import spectrogramNoiseReduction.SpectrogramNoiseDialogPanel;
+import spectrogramNoiseReduction.SpectrogramNoiseProcess;
 
 public class FFTParametersDialog extends PamDialog implements FFTLengthModeled {
 
@@ -324,7 +321,7 @@ public class FFTParametersDialog extends PamDialog implements FFTLengthModeled {
 		
 		fftParameters.windowFunction = windowFunction.getSelectedIndex();
 		
-		if (FFTParameters.isValidLength(fftParameters.fftLength) == false) {
+		if (!FFTParameters.isValidLength(fftParameters.fftLength)) {
 			String msg = "Using FFT Lenghts which are not a power of two will significantly increase execution times";
 			int ans = WarnOnce.showWarning(getOwner(), "FFT Lengh is not a power of 2", msg, WarnOnce.OK_CANCEL_OPTION);
 			if (ans == WarnOnce.CANCEL_OPTION) {
@@ -368,6 +365,7 @@ public class FFTParametersDialog extends PamDialog implements FFTLengthModeled {
 		paramsChanged=true;
 	}
 	
+	@Override
 	public void setFFTLength(int l) {
 		fftLengthData.setText(String.format("%d", l));
 	}

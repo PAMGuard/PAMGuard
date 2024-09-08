@@ -21,11 +21,8 @@
 package Map;
 
 import java.awt.Polygon;
-import java.awt.geom.AffineTransform;
 
-import GPS.GpsData;
 import PamUtils.Coordinate3d;
-import PamUtils.LatLong;
 import PamUtils.PamCoordinate;
 
 /**

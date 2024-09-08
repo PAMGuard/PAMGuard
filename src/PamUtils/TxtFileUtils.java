@@ -6,8 +6,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -246,7 +244,7 @@ public class TxtFileUtils {
 			data.add(dat);
 		}
 
-		if (isNaN==true && !nanOk) return null;
+		if (isNaN && !nanOk) return null;
 		else return data; 
 	}
 

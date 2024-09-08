@@ -88,6 +88,7 @@ public class KernelSmoothingControl extends PamControlledUnit implements PamSett
 			this.parentFrame = parentFrame;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent ev) {
 			KernelSmoothingParameters newParams = KernelSmoothingDialog.showDialog(parentFrame, smoothingParameters, 
 					smoothingProcess.getOutputDataBlock(0));
@@ -99,14 +100,17 @@ public class KernelSmoothingControl extends PamControlledUnit implements PamSett
 		}
 	}
 
+	@Override
 	public Serializable getSettingsReference() {
 		return smoothingParameters;
 	}
 
+	@Override
 	public long getSettingsVersion() {
 		return KernelSmoothingParameters.serialVersionUID;
 	}
 
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		smoothingParameters = ((KernelSmoothingParameters) pamControlledUnitSettings.getSettings()).clone();
 		newSettings();

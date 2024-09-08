@@ -11,7 +11,7 @@ import javax.swing.JMenuItem;
 
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
-import PamController.PamController;
+import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamView.PamColors;
@@ -159,7 +159,7 @@ public class DetectionGroupControl extends PamControlledUnit implements PamSetti
 	public void notifyModelChanged(int changeType) {
 		super.notifyModelChanged(changeType);
 		switch (changeType) {
-		case PamController.DATA_LOAD_COMPLETE:
+		case PamControllerInterface.DATA_LOAD_COMPLETE:
 			notifyGroupDataChanged();
 		}
 	}

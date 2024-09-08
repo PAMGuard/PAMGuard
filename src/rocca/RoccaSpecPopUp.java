@@ -22,25 +22,11 @@
 
 package rocca;
 
-//import com.csvreader.CsvReader;
-import Acquisition.AcquisitionProcess;
-import PamController.PamController;
-import PamUtils.FileParts;
-import PamUtils.PamCalendar;
-import PamUtils.PamUtils;
-import PamUtils.complex.ComplexArray;
-import PamView.dialog.warn.WarnOnce;
-import PamguardMVC.PamRawDataBlock;
-import PamguardMVC.RawDataUnavailableException;
-import Spectrogram.SpectrogramDisplay;
-import fftManager.Complex;
-import fftManager.FFTDataBlock;
-import fftManager.FFTDataUnit;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
-
 import java.awt.geom.Point2D;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -53,19 +39,32 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollBar;
 import javax.swing.JToggleButton;
-import javax.swing.SpinnerNumberModel;
-import wavFiles.WavFile;
-import wavFiles.WavFileWriter;
-
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.GroupLayout;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
-import javax.swing.JButton;
+
+//import com.csvreader.CsvReader;
+import Acquisition.AcquisitionProcess;
+import PamController.PamController;
+import PamUtils.FileParts;
+import PamUtils.PamCalendar;
+import PamUtils.PamUtils;
+import PamUtils.complex.ComplexArray;
+import PamView.dialog.warn.WarnOnce;
+import PamguardMVC.PamDataBlock;
+import PamguardMVC.PamRawDataBlock;
+import PamguardMVC.RawDataUnavailableException;
+import Spectrogram.SpectrogramDisplay;
+import fftManager.FFTDataBlock;
+import fftManager.FFTDataUnit;
+import wavFiles.WavFileWriter;
 
 /**
  *
@@ -444,7 +443,7 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
          */
         double[][] d = new double[numTimeBins][numFreqBins];
         for(int currentTimeBin = 0; currentTimeBin < numTimeBins; currentTimeBin++) {
-            fftUnit = fftData.getDataUnit(currentTimeBin, FFTDataBlock.REFERENCE_CURRENT);
+            fftUnit = fftData.getDataUnit(currentTimeBin, PamDataBlock.REFERENCE_CURRENT);
             fftVals = fftUnit.getFftData();
             timeBins[currentTimeBin] = fftUnit.getTimeMilliseconds();
 
@@ -481,7 +480,7 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
             timeBin = timeBins.length;
             for (int j=0; j<timeBins.length; j++) {
                 if (timeBins[j]>=roccaContourDataBlock.getDataUnit
-                    (i, FFTDataBlock.REFERENCE_CURRENT).getTimeMilliseconds()) {
+                    (i, PamDataBlock.REFERENCE_CURRENT).getTimeMilliseconds()) {
                     timeBin = j;
                     break;
                 }
@@ -492,7 +491,7 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
              * frequency bin to the constant NO_CONTOUR_HERE
              */
             if (roccaContourDataBlock.getDataUnit
-                (i, FFTDataBlock.REFERENCE_CURRENT).getPeakFreq()
+                (i, PamDataBlock.REFERENCE_CURRENT).getPeakFreq()
                 == RoccaContour.OUTOFRANGE) {
                 freqBin = RoccaParameters.NO_CONTOUR_HERE;
 
@@ -501,7 +500,7 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
                 for (int j=0; j<freqBins.length; j++) {
 
                     if (freqBins[j]>=roccaContourDataBlock.getDataUnit
-                        (i, FFTDataBlock.REFERENCE_CURRENT).getPeakFreq()) {
+                        (i, PamDataBlock.REFERENCE_CURRENT).getPeakFreq()) {
                         freqBin = j;
                         break;
                     }
@@ -572,7 +571,8 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
 
         zoomIn.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Zoom-in 16.png"))); // NOI18N
         zoomIn.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 zoomInActionPerformed(evt);
             }
         });
@@ -583,7 +583,8 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
         classify.setEnabled(false);
         classify.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         classify.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 classifyActionPerformed(evt);
             }
         });
@@ -616,59 +617,69 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
 
         zoomOut.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Zoom-out 16.png"))); // NOI18N
         zoomOut.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 zoomOutActionPerformed(evt);
             }
         });
 
         reset.setText("Reset");
         reset.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 resetActionPerformed(evt);
             }
         });
 
         brightDec.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Brightness dec 16.png"))); // NOI18N
         brightDec.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 brightDecActionPerformed(evt);
             }
         });
 
         brightInc.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/Brightness inc 16.png"))); // NOI18N
         brightInc.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 brightIncActionPerformed(evt);
             }
         });
 
         contrastDec.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/contrast dec 16.png"))); // NOI18N
         contrastDec.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 contrastDecActionPerformed(evt);
             }
         });
 
         contrastInc.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/contrast inc 16.png"))); // NOI18N
         contrastInc.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 contrastIncActionPerformed(evt);
             }
         });
 
         scroller.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
+            @Override
+			public void mousePressed(java.awt.event.MouseEvent evt) {
                 scrollerMousePressed(evt);
             }
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
+            @Override
+			public void mouseReleased(java.awt.event.MouseEvent evt) {
                 scrollerMouseReleased(evt);
             }
         });
         scroller.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseDragged(java.awt.event.MouseEvent evt) {
+            @Override
+			public void mouseDragged(java.awt.event.MouseEvent evt) {
                 scrollerMouseDragged(evt);
             }
-            public void mouseMoved(java.awt.event.MouseEvent evt) {
+            @Override
+			public void mouseMoved(java.awt.event.MouseEvent evt) {
                 scrollerMouseMoved(evt);
             }
         });
@@ -676,14 +687,16 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
         saveExit.setText("<html><font color=#808080>Save as encounter </font></html>");
         saveExit.setEnabled(false);
         saveExit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 saveExitActionPerformed(evt);
             }
         });
 
         discardExit.setText("<html>Discard and Exit</html>");
         discardExit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 discardExitActionPerformed(evt);
             }
         });
@@ -692,7 +705,8 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
 
         noiseSensSpinner.setEnabled(false);
         noiseSensSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+            @Override
+			public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 noiseSensSpinnerStateChanged(evt);
             }
         });
@@ -703,7 +717,8 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
         resetContour.setText("Reset Contour");
         resetContour.setEnabled(false);
         resetContour.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 resetContourActionPerformed(evt);
             }
         });
@@ -711,7 +726,8 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
         saveNewNameExit.setText("<html><font color=#808080>Save as diff encounter</font></html>");
         saveNewNameExit.setEnabled(false);
         saveNewNameExit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 saveNewNameExitActionPerformed(evt);
             }
         });
@@ -719,7 +735,8 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
         saveWavOnly.setText("<html><font color=#808080>Save WAV discard class</font></html>");
         saveWavOnly.setEnabled(false);
         saveWavOnly.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 saveWavOnlyActionPerformed(evt);
             }
         });
@@ -727,7 +744,8 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
         undoLastMove.setText("Undo Last Move");
         undoLastMove.setEnabled(false);
         undoLastMove.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 undoLastMoveActionPerformed(evt);
             }
         });
@@ -735,7 +753,8 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
         recalcContour.setText("Recalc Contour");
         recalcContour.setEnabled(false);
         recalcContour.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 recalcContourActionPerformed(evt);
             }
         });
@@ -745,11 +764,12 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
         highpassLbl.setText("Highpass Filter");
         highpassLbl.setEnabled(false);
 
-        highPass.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        highPass.setHorizontalAlignment(SwingConstants.RIGHT);
         highPass.setText("0");
         highPass.setEnabled(false);
         highPass.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 highPassActionPerformed(evt);
             }
         });
@@ -760,11 +780,12 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
         lowpassLbl.setText("Lowpass Filter");
         lowpassLbl.setEnabled(false);
 
-        lowPass.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        lowPass.setHorizontalAlignment(SwingConstants.RIGHT);
         lowPass.setText(String.format("%5.0f", freqBins[freqBins.length-1]));
         lowPass.setEnabled(false);
         lowPass.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 lowPassActionPerformed(evt);
             }
         });
@@ -776,7 +797,8 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
         resetFilters.setEnabled(false);
         resetFilters.setMargin(new java.awt.Insets(2, 10, 2, 10));
         resetFilters.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 resetFiltersActionPerformed(evt);
             }
         });
@@ -786,7 +808,8 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
         setLowpass.setEnabled(false);
         setLowpass.setMargin(new java.awt.Insets(2, 10, 2, 10));
         setLowpass.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 setLowpassActionPerformed(evt);
             }
         });
@@ -796,7 +819,8 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
         setHighpass.setEnabled(false);
         setHighpass.setMargin(new java.awt.Insets(2, 10, 2, 10));
         setHighpass.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 setHighpassActionPerformed(evt);
             }
         });
@@ -855,7 +879,8 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
         selectStart.setSelected(true);
         selectStart.setText("<html>Select Contour Start</html>");
         selectStart.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 selectStartActionPerformed(evt);
             }
         });
@@ -863,7 +888,8 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
         selectEnd.setText("<html>Select Contour End</html>");
         selectEnd.setEnabled(false);
         selectEnd.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 selectEndActionPerformed(evt);
             }
         });
@@ -872,7 +898,8 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
         toggleContour.setActionCommand("Toggle Contour");
         toggleContour.setEnabled(false);
         toggleContour.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 toggleContourActionPerformed(evt);
             }
         });
@@ -885,7 +912,8 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
         btnPickPoints.setMaximumSize(new Dimension(33, 9));
         btnPickPoints.setEnabled(false);
         btnPickPoints.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnPickPointsActionPerformed(evt);
             }
         });
@@ -1238,10 +1266,10 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
                     setTimeMilliseconds(timeBins[(int) x]);
              */
             roccaContourDataBlock.
-                    getDataUnit(indx, FFTDataBlock.REFERENCE_CURRENT).
+                    getDataUnit(indx, PamDataBlock.REFERENCE_CURRENT).
                     setPeakFreq(freqBins[(int) y]);
             roccaContourDataBlock.
-                    getDataUnit(indx, FFTDataBlock.REFERENCE_CURRENT).
+                    getDataUnit(indx, PamDataBlock.REFERENCE_CURRENT).
                     setUserChanged(true);
 
             // set the contourChanged flag
@@ -2047,7 +2075,7 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
             RoccaContourDataUnit rcdu = null;
             int numPoints = roccaContourDataBlock.getUnitsCount();
             for (int i = 0; i < numPoints; i++) {
-                rcdu = roccaContourDataBlock.getDataUnit(i, RoccaContourDataBlock.REFERENCE_CURRENT);
+                rcdu = roccaContourDataBlock.getDataUnit(i, PamDataBlock.REFERENCE_CURRENT);
                 if (rcdu.getPeakFreq() != RoccaParameters.NO_CONTOUR_HERE) {
                     String contourPoints =   rcdu.getTime() + "," +
                             rcdu.getPeakFreq() + "," +
@@ -2459,7 +2487,7 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
                 setTimeMilliseconds(timeBins[(int) lastMovedPoint.getX()]);
          */
         roccaContourDataBlock.
-                getDataUnit(lastMovedIndx, FFTDataBlock.REFERENCE_CURRENT).
+                getDataUnit(lastMovedIndx, PamDataBlock.REFERENCE_CURRENT).
                 setPeakFreq(freqBins[(int) lastMovedPoint.getY()]);
 
         /* clear the last point fields */
@@ -2752,7 +2780,7 @@ public class RoccaSpecPopUp extends javax.swing.JPanel {
          thisFrame.setContentPane(this);
          thisFrame.pack();
          thisFrame.setVisible(true);
-         thisFrame.setState(JFrame.ICONIFIED);
+         thisFrame.setState(Frame.ICONIFIED);
     }
 
     /**

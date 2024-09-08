@@ -27,8 +27,8 @@ import pamViewFX.fxNodes.PamTilePane;
 import pamViewFX.fxNodes.PamTitledPane;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.connectionPane.structures.ConnectionGroupBody;
-import pamViewFX.fxStyles.PamStylesManagerFX;
 import pamViewFX.fxNodes.connectionPane.structures.ExtensionSocketStructure;
+import pamViewFX.fxStyles.PamStylesManagerFX;
 
 /**
  * A pane which shows a list of all the available modules. These can be dragged

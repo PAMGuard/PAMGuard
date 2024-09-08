@@ -23,27 +23,10 @@
 
 package rocca;
 
-import PamUtils.PamCalendar;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.border.TitledBorder;
-
-import PamView.PamColors;
-import PamView.PamSidePanel;
-import PamView.PamColors.PamColor;
-import PamView.panel.PamBorderPanel;
-import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamDataUnit;
-import PamguardMVC.PamObservable;
-import PamguardMVC.PamObserver;
-import PamguardMVC.PamObserverAdapter;
-
-import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -55,15 +38,26 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.lang.String;
 import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 
 import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.border.TitledBorder;
+
+import PamUtils.PamCalendar;
+import PamView.PamColors;
+import PamView.PamColors.PamColor;
+import PamView.PamSidePanel;
+import PamView.panel.PamBorderPanel;
+import PamguardMVC.PamDataBlock;
+import PamguardMVC.PamObservable;
+import PamguardMVC.PamObserverAdapter;
 
 public class RoccaSidePanel extends PamObserverAdapter implements PamSidePanel  {
 
@@ -154,7 +148,7 @@ public class RoccaSidePanel extends PamObserverAdapter implements PamSidePanel  
 			setLayout(gb);
 
             /* if we've loaded a classifier, draw the species list */
-            if (roccaControl.roccaProcess.isClassifierLoaded() == true) {
+            if (roccaControl.roccaProcess.isClassifierLoaded()) {
                 drawThePanel();
                 
             /* otherwise, warn the user that no classifier has been loaded */
@@ -211,7 +205,8 @@ public class RoccaSidePanel extends PamObserverAdapter implements PamSidePanel  
                 prevSight = new JButton("<");
                 addComponent(this, prevSight, c );
                 prevSight.addActionListener(new ActionListener() {
-                	public void actionPerformed(ActionEvent evt) {
+                	@Override
+					public void actionPerformed(ActionEvent evt) {
                 		prevSighting();
                 	}
                 });
@@ -220,7 +215,8 @@ public class RoccaSidePanel extends PamObserverAdapter implements PamSidePanel  
                 nextSight = new JButton(">");
                 addComponent(this, nextSight, c);
                 nextSight.addActionListener(new ActionListener() {
-                	public void actionPerformed(ActionEvent evt) {
+                	@Override
+					public void actionPerformed(ActionEvent evt) {
                 		nextSighting();
                 	}
                 });
@@ -274,7 +270,8 @@ public class RoccaSidePanel extends PamObserverAdapter implements PamSidePanel  
                 encounterID.setHorizontalAlignment(SwingConstants.CENTER);
                 encounterID.setEditable(true);
                 encounterID.addActionListener(new ActionListener() {
-                	public void actionPerformed(ActionEvent evt) {
+                	@Override
+					public void actionPerformed(ActionEvent evt) {
                 		saveNewEncounterID();
                 	}
                 });
@@ -291,7 +288,8 @@ public class RoccaSidePanel extends PamObserverAdapter implements PamSidePanel  
                 speciesID.setHorizontalAlignment(SwingConstants.CENTER);
                 speciesID.setEditable(true);
                 speciesID.addActionListener(new ActionListener() {
-                	public void actionPerformed(ActionEvent evt) {
+                	@Override
+					public void actionPerformed(ActionEvent evt) {
                 		saveNewSpeciesID();
                 	}
                 });
@@ -304,7 +302,8 @@ public class RoccaSidePanel extends PamObserverAdapter implements PamSidePanel  
                 renameSighting = new JButton("Rename Encounter");
                 addComponent(this, renameSighting, c);
                 renameSighting.addActionListener(new ActionListener() {
-                	public void actionPerformed(ActionEvent evt) {
+                	@Override
+					public void actionPerformed(ActionEvent evt) {
                 		//                    String oldNum = currentUnit.getSightNum();
                 		//                    currentUnit.setSightNum(RoccaSightingDataUnit.NONE);
                 		//                    String dummy = addASighting(false);
@@ -319,7 +318,8 @@ public class RoccaSidePanel extends PamObserverAdapter implements PamSidePanel  
                 classifySighting = new JButton("Classify Encounter");
                 addComponent(this, classifySighting, c);
                 classifySighting.addActionListener(new ActionListener() {
-                	public void actionPerformed(ActionEvent evt) {
+                	@Override
+					public void actionPerformed(ActionEvent evt) {
                 		classifySighting();
                 	}
                 });
@@ -327,7 +327,8 @@ public class RoccaSidePanel extends PamObserverAdapter implements PamSidePanel  
                 saveSighting = new JButton("Save Encounter Now");
                 addComponent(this, saveSighting, c);
                 saveSighting.addActionListener(new ActionListener() {
-                	public void actionPerformed(ActionEvent evt) {
+                	@Override
+					public void actionPerformed(ActionEvent evt) {
                 		saveSighting();
                 	}
                 });
@@ -343,7 +344,8 @@ public class RoccaSidePanel extends PamObserverAdapter implements PamSidePanel  
                 newSightingNum = new JButton("New Encounter");
                 addComponent(this, newSightingNum, c);
                 newSightingNum.addActionListener(new ActionListener() {
-                	public void actionPerformed(ActionEvent evt) {
+                	@Override
+					public void actionPerformed(ActionEvent evt) {
                 		String dummy = addASighting(false);
                 	}
                 });
@@ -527,7 +529,8 @@ public class RoccaSidePanel extends PamObserverAdapter implements PamSidePanel  
             public SightNumFilter(String sNum) {
                 this.sNum = sNum + "-";
             }
-            public boolean accept(File dir, String name) {
+            @Override
+			public boolean accept(File dir, String name) {
                 return name.startsWith(sNum);
             }
         }
@@ -1159,17 +1162,20 @@ public class RoccaSidePanel extends PamObserverAdapter implements PamSidePanel  
     	speciesID.setText(roccaControl.roccaParameters.getNotesKnownSpecies());
     }
 
+	@Override
 	public JComponent getPanel() {
 		return sidePanel;
 	}
 
     
+	@Override
 	public void rename(String newName) {
 		titledBorder.setTitle(newName);	
 		sidePanel.repaint();		
 	}
 	
     
+	@Override
 	public String getObserverName() {
 		return "Rocca side panel";
 	}
@@ -1393,6 +1399,7 @@ public class RoccaSidePanel extends PamObserverAdapter implements PamSidePanel  
         this.currentUnit = currentUnit;
     }
 
+	@Override
 	public long getRequiredDataHistory(PamObservable o, Object arg) {
 		return 60000;
 	}

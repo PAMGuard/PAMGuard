@@ -7,7 +7,6 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 
-import fftManager.Complex;
 import PamController.PamController;
 import PamUtils.complex.ComplexArray;
 import PamguardMVC.PamDataUnit;
@@ -16,7 +15,6 @@ import binaryFileStorage.BinaryHeader;
 import binaryFileStorage.BinaryObjectData;
 import binaryFileStorage.ModuleFooter;
 import binaryFileStorage.ModuleHeader;
-import binaryFileStorage.PackedBinaryObject;
 
 public class LtsaBinaryDataSource extends BinaryDataSource {
 

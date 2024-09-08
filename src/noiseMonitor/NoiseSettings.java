@@ -7,8 +7,8 @@ import java.util.ListIterator;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
-import PamModel.parametermanager.PrivatePamParameterData;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
+import PamModel.parametermanager.PrivatePamParameterData;
 
 public class NoiseSettings implements Serializable, Cloneable, ManagedParameters {
 

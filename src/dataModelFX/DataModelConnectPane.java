@@ -12,9 +12,9 @@ import javafx.geometry.Point2D;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
-import pamViewFX.fxNodes.connectionPane.StandardConnectionNode;
 import pamViewFX.fxNodes.connectionPane.ConnectionNode;
 import pamViewFX.fxNodes.connectionPane.ConnectionPane;
+import pamViewFX.fxNodes.connectionPane.StandardConnectionNode;
 
 /**
  * Sub class of ConnectionPane to deal with modules being dragged from 

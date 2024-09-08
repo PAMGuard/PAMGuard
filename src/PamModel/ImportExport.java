@@ -4,7 +4,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -16,7 +15,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import PamController.settings.output.xml.PamguardXMLReader;
 import PamController.settings.output.xml.PamguardXMLWriter;
 import PamController.settings.output.xml.XMLImportData;
 import PamController.settings.output.xml.XMLSettingsSwing;

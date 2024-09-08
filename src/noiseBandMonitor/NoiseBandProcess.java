@@ -3,17 +3,10 @@ package noiseBandMonitor;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import noiseMonitor.NoiseBinaryDataSource;
-import noiseMonitor.NoiseDataBlock;
-import noiseMonitor.NoiseDataUnit;
-import noiseMonitor.NoiseLogging;
-
 import Acquisition.AcquisitionProcess;
 import Filters.Filter;
 import Filters.FilterMethod;
 import Filters.FilterParams;
-import PamController.PamControlledUnit;
-import PamController.PamController;
 import PamDetection.RawDataUnit;
 import PamUtils.PamUtils;
 import PamguardMVC.PamConstants;
@@ -21,8 +14,10 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
-import PamguardMVC.PamRawDataBlock;
-import PamguardMVC.debug.Debug;
+import noiseMonitor.NoiseBinaryDataSource;
+import noiseMonitor.NoiseDataBlock;
+import noiseMonitor.NoiseDataUnit;
+import noiseMonitor.NoiseLogging;
 
 public class NoiseBandProcess extends PamProcess {
 
@@ -60,6 +55,7 @@ public class NoiseBandProcess extends PamProcess {
 
 	}
 
+	@Override
 	public void setupProcess() {
 		super.setupProcess();
 		PamDataBlock sourceData = noiseBandControl.getPamConfiguration().getDataBlock(RawDataUnit.class, noiseBandControl.noiseBandSettings.rawDataSource);

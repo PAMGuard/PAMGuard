@@ -12,15 +12,9 @@ import java.util.List;
 
 import javax.swing.SwingWorker;
 
-import dataGram.DatagramManager;
-import dataMap.OfflineDataMapPoint;
-import generalDatabase.backup.DatabaseBackupStream;
-import pamScrollSystem.ViewLoadObserver;
-import pamViewFX.pamTask.PamTaskUpdate;
 import PamController.AWTScheduler;
 import PamController.DataIntegrityChecker;
 import PamController.DataOutputStore;
-import PamController.OfflineDataStore;
 import PamController.PamConfiguration;
 import PamController.PamControlledUnit;
 import PamController.PamController;
@@ -32,9 +26,13 @@ import PamController.status.ModuleStatus;
 import PamController.status.QuickRemedialAction;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
-import PamguardMVC.RequestCancellationObject;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import backupmanager.BackupInformation;
+import dataGram.DatagramManager;
+import dataMap.OfflineDataMapPoint;
+import generalDatabase.backup.DatabaseBackupStream;
+import pamScrollSystem.ViewLoadObserver;
+import pamViewFX.pamTask.PamTaskUpdate;
 
 /**
  * Version of DBControl for normal use while PAMGUARD is running 
@@ -114,19 +112,19 @@ public class DBControlUnit extends DBControl implements DataOutputStore {
 	public void notifyModelChanged(int changeType) {
 		super.notifyModelChanged(changeType);
 		switch (changeType) {
-		case PamController.INITIALIZATION_COMPLETE:
+		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			initialisationComplete = true;
 			if (isViewer) {
 				createOfflineDataMap(null);
 			}
 			getDbProcess().checkTables();
 			break;
-		case PamController.ADD_DATABLOCK:
+		case PamControllerInterface.ADD_DATABLOCK:
 			if (initialisationComplete) {
 				getDbProcess().checkTables();
 			}
 			break;
-		case PamController.ADD_CONTROLLEDUNIT:
+		case PamControllerInterface.ADD_CONTROLLEDUNIT:
 			if (initialisationComplete) {
 				PamController pc = PamController.getInstance();
 				int nUnit = pc.getNumControlledUnits();
@@ -331,7 +329,7 @@ public class DBControlUnit extends DBControl implements DataOutputStore {
 				while (resultSet.next()) {
 					timestamp = resultSet.getObject(1);//  getTimestamp(1);
 					actualMillis = (Integer) resultSet.getObject(2);
-					utcMillis = sqlTypes.millisFromTimeStamp(timestamp);
+					utcMillis = SQLTypes.millisFromTimeStamp(timestamp);
 					if (utcMillis % 1000 == 0 && actualMillis != null && dataMapPoint != null) {
 						/*
 						 * dataMapPoint == null is indicate of it being the first map point in 

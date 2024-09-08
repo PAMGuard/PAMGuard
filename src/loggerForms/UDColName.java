@@ -1,7 +1,5 @@
 package loggerForms;
 
-import generalDatabase.PamTableItem;
-
 import java.sql.Types;
 
 public enum UDColName {

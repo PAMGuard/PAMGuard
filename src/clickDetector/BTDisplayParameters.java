@@ -1,13 +1,10 @@
 package clickDetector;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.util.Arrays;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
-import PamModel.parametermanager.PrivatePamParameterData;
 import clickDetector.tdPlots.ClickSymbolOptions;
 
 public class BTDisplayParameters implements Serializable, Cloneable, ManagedParameters {

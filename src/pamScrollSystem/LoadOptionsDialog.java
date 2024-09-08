@@ -68,7 +68,7 @@ public class LoadOptionsDialog extends PamDialog {
 		c.gridwidth = 1;
 		addComponent(panel, startTime = new JTextField(14), c);
 		c.gridx++;
-		addComponent(panel, startTimeZone = new JLabel("", JLabel.LEFT), c);
+		addComponent(panel, startTimeZone = new JLabel("", SwingConstants.LEFT), c);
 		c.gridx = 0;
 		c.gridwidth = 1;
 		c.gridy++;

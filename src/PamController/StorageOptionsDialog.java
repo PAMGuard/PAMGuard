@@ -1,8 +1,5 @@
 package PamController;
 
-import generalDatabase.DBControlUnit;
-
-import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Window;
@@ -13,12 +10,14 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
-import binaryFileStorage.BinaryStore;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamguardMVC.PamDataBlock;
+import binaryFileStorage.BinaryStore;
+import generalDatabase.DBControlUnit;
 
 public class StorageOptionsDialog extends PamDialog {
 
@@ -83,7 +82,7 @@ public class StorageOptionsDialog extends PamDialog {
 			l.setToolTipText("Binary Storage is more efficient than the database for many types of detection data");
 		}
 		c.gridx++;
-		addComponent(mainPanel, l = new JLabel("  Database  ", JLabel.CENTER), c);
+		addComponent(mainPanel, l = new JLabel("  Database  ", SwingConstants.CENTER), c);
 		if (binaryStore == null) {
 			l.setToolTipText("Database module is not loaded");
 		}
@@ -107,7 +106,7 @@ public class StorageOptionsDialog extends PamDialog {
 			c.gridx = 0;
 			c.gridy++;
 			c.fill = GridBagConstraints.HORIZONTAL;
-			addComponent(mainPanel, l = new JLabel(aDataBlock.getDataName(), JLabel.RIGHT), c);
+			addComponent(mainPanel, l = new JLabel(aDataBlock.getDataName(), SwingConstants.RIGHT), c);
 			pcu = aDataBlock.getParentProcess().getPamControlledUnit();
 			l.setToolTipText("Module: " + pcu.getUnitName());
 
@@ -117,7 +116,7 @@ public class StorageOptionsDialog extends PamDialog {
 			addComponent(mainPanel, cb = new JCheckBox(), c);
 //			cb.setVisible(hasBinaryStore);
 			cb.setEnabled(hasBinaryStore && binaryStore != null);
-			if (hasBinaryStore == false) {
+			if (!hasBinaryStore) {
 				cb.setToolTipText("Binary storage is not available for this data block");
 			}
 			if (hasBinaryStore) {
@@ -129,7 +128,7 @@ public class StorageOptionsDialog extends PamDialog {
 			addComponent(mainPanel, cb = new JCheckBox(), c);
 //			cb.setVisible(hasDatabase);
 			cb.setEnabled(hasDatabase && database != null);
-			if (hasDatabase == false) {
+			if (!hasDatabase) {
 				cb.setToolTipText("Database storage is not available for this data block");
 			}
 			if (hasDatabase) {
@@ -154,7 +153,7 @@ public class StorageOptionsDialog extends PamDialog {
 		for (int i = 0; i < usedDataBlocks.size(); i++) {
 			storeDatabase = dbCheckBoxes.get(i).isSelected();
 			storeBinary = bsCheckBoxes.get(i).isSelected();
-			if (storeDatabase == false && storeBinary == false) {
+			if (!storeDatabase && !storeBinary) {
 				errors++;
 			}
 			storageParameters.setStorageOptions(usedDataBlocks.get(i), storeDatabase, storeBinary);

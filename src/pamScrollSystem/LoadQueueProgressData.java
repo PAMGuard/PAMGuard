@@ -162,6 +162,7 @@ public class LoadQueueProgressData extends PamTaskUpdate {
 	 * If two updates are available then this is used to return the fine progress update message.
 	 * @return
 	 */
+	@Override
 	public String getProgressString2(){
 		if (getState() == LoadQueueProgressData.STATE_LINKINGSUBTABLE) {
 			return "Linking " + getStreamName();

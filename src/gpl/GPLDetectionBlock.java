@@ -6,7 +6,6 @@ import PamView.GroupedSourceParameters;
 import PamView.dialog.GroupedSourcePanel;
 import PamguardMVC.AcousticDataBlock;
 import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamProcess;
 
 public class GPLDetectionBlock extends AcousticDataBlock<GPLDetection> implements GroupedDataSource {
 

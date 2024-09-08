@@ -7,8 +7,8 @@ import java.awt.Window;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import PamView.dialog.PamDialog;
@@ -43,11 +43,11 @@ public class DatagramDialog extends PamDialog {
 //		infoArea.setWrapStyleWord(true);
 		JPanel tPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new PamGridBagContraints();
-		addComponent(tPanel, new JLabel("Datagram bin size ", JLabel.RIGHT), c);
+		addComponent(tPanel, new JLabel("Datagram bin size ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		addComponent(tPanel, datagramSeconds = new JTextField(5), c);
 		c.gridx++;
-		addComponent(tPanel, new JLabel(" seconds", JLabel.LEFT), c);
+		addComponent(tPanel, new JLabel(" seconds", SwingConstants.LEFT), c);
 		mainPanel.add(BorderLayout.CENTER, tPanel);
 		
 		

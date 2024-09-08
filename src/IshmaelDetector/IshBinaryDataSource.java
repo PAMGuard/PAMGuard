@@ -6,7 +6,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import PamguardMVC.DataUnitBaseData;
 import PamguardMVC.PamDataBlock;

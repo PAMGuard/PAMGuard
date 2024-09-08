@@ -1,7 +1,6 @@
 package meygenturbine;
 
 import PamController.PamControlledUnit;
-import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
 
 public class MeygenTurbine extends PamControlledUnit {

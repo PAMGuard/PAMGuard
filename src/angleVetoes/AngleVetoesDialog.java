@@ -107,6 +107,7 @@ public class AngleVetoesDialog extends PamDialog {
 	}
 	
 	class AddButton implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			AngleVeto newVeto = AngleVetoDialog.showDialog((Frame)getOwner(), null);
 			if (newVeto != null) {
@@ -116,6 +117,7 @@ public class AngleVetoesDialog extends PamDialog {
 		}
 	}
 	class EditButton implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			int row = list.getSelectedRow();
 			if (row >= 0 && row < angleVetoParameters.getVetoCount()) {
@@ -129,6 +131,7 @@ public class AngleVetoesDialog extends PamDialog {
 		}
 	}
 	class DeleteButton implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			int row = list.getSelectedRow();
 			if (row >= 0 && row < angleVetoParameters.getVetoCount()) {
@@ -147,10 +150,12 @@ public class AngleVetoesDialog extends PamDialog {
 			return columnNames[column];
 		}
 
+		@Override
 		public int getColumnCount() {
 			return columnNames.length;
 		}
 
+		@Override
 		public int getRowCount() {
 			if (angleVetoParameters == null) {
 				return 0;
@@ -158,6 +163,7 @@ public class AngleVetoesDialog extends PamDialog {
 			return angleVetoParameters.getVetoCount();
 		}
 
+		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			AngleVeto angleVeto = angleVetoParameters.getVeto(rowIndex);
 			if (angleVeto == null) {

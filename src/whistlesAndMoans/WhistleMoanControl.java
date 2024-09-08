@@ -7,21 +7,8 @@ import java.io.Serializable;
 
 import javax.swing.JMenuItem;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import Localiser.LocalisationAlgorithm;
 import Localiser.LocalisationAlgorithmInfo;
-import dataPlots.data.TDDataProviderRegister;
-import dataPlotsFX.data.TDDataProviderRegisterFX;
-import dataPlotsFX.whistlePlotFX.WhistleMoanProviderFX;
-import detectionPlotFX.data.DDPlotRegister;
-import detectionPlotFX.rawDDPlot.ClickDDPlotProvider;
-import detectionPlotFX.whistleDDPlot.WhistleDDPlotProvider;
-import spectrogramNoiseReduction.SpectrogramNoiseProcess;
-import tethys.localization.LocalizationCreator;
-import whistlesAndMoans.layoutFX.WhistleMoanGUIFX;
-import whistlesAndMoans.plots.WhistlePlotProvider;
 import PamController.PamConfiguration;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitGUI;
@@ -32,6 +19,15 @@ import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamView.PamSidePanel;
 import PamView.WrapperControlledGUISwing;
+import dataPlots.data.TDDataProviderRegister;
+import dataPlotsFX.data.TDDataProviderRegisterFX;
+import dataPlotsFX.whistlePlotFX.WhistleMoanProviderFX;
+import detectionPlotFX.data.DDPlotRegister;
+import detectionPlotFX.whistleDDPlot.WhistleDDPlotProvider;
+import spectrogramNoiseReduction.SpectrogramNoiseProcess;
+import tethys.localization.LocalizationCreator;
+import whistlesAndMoans.layoutFX.WhistleMoanGUIFX;
+import whistlesAndMoans.plots.WhistlePlotProvider;
 
 public class WhistleMoanControl extends PamControlledUnit implements PamSettings, LocalisationAlgorithm {
 
@@ -212,6 +208,7 @@ public class WhistleMoanControl extends PamControlledUnit implements PamSettings
 	 * @param flag. The GUI type flag defined in PAMGuiManager. 
 	 * @return the GUI for the PamControlledUnit unit. 
 	 */
+	@Override
 	public PamControlledUnitGUI getGUI(int flag) {
 		if (flag==PamGUIManager.FX) {
 			if (whistleMoanGUIFX ==null) {

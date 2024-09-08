@@ -1,14 +1,10 @@
 package loc3d_Thode;
 
-import Array.ArrayManager;
-import Array.HydrophoneLocator;
-import Array.PamArray;
 import GPS.GpsData;
 import GPS.GpsDataUnit;
 import PamController.PamController;
 import PamDetection.PamDetection;
 import PamUtils.LatLong;
-import PamguardMVC.AcousticDataUnit;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.superdet.SuperDetection;

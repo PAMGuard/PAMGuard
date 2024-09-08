@@ -11,19 +11,16 @@ import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollBar;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import PamguardMVC.PamDataBlock;
 import dataMap.DataMapControl;
-import dataMap.layoutFX.DataStreamPaneFX.DataName;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamColorsFX;
 import pamViewFX.fxNodes.PamScrollPane;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.pamAxis.PamDateAxis;
-import pamViewFX.fxNodes.pamScrollers.acousticScroller.ScrollBarPane;
 
 public class ScrollingDataPaneFX extends PamBorderPane {
 
@@ -490,14 +487,14 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 		return dataMapPaneFX;
 	}
 
-//	int lastHScaleChoice=-1; 
-//	public void scaleChange() {
-//		if (lastHScaleChoice != dataMapControl.dataMapParameters.hScaleChoice) {
-//			lastHScaleChoice = dataMapControl.dataMapParameters.hScaleChoice;
-//			setupScrollBar();
-//		}
-//		this.notifyScrollChange();
-//	}
+	int lastHScaleChoice=-1; 
+	public void scaleChange() {
+		if (lastHScaleChoice != dataMapControl.dataMapParameters.hScaleChoice) {
+			lastHScaleChoice = dataMapControl.dataMapParameters.hScaleChoice;
+			setupScrollBar();
+		}
+		this.notifyScrollChange();
+	}
 
 	/**
 	 * Get the current number of data stream panes
@@ -519,7 +516,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 		else return null;
 	}
 
-	public DataStreamPaneFX getDataStreamPane(DataName selectedItem) {
+	public DataStreamPaneFX getDataStreamPane(DataMapInfo selectedItem) {
 		for (int i=0; i<dataStreamPanels.size(); i++) {
 			if (selectedItem.equals(dataStreamPanels.get(i).getDataName())) {
 				return dataStreamPanels.get(i);

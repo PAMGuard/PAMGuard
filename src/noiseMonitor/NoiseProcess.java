@@ -2,13 +2,8 @@ package noiseMonitor;
 
 import java.util.Arrays;
 import java.util.Random;
-import pamMaths.Mean;
 
-import fftManager.Complex;
-import fftManager.FFTDataBlock;
-import fftManager.FFTDataUnit;
 import Acquisition.AcquisitionProcess;
-import PamController.PamController;
 import PamController.PamControllerInterface;
 import PamUtils.PamUtils;
 import PamUtils.complex.ComplexArray;
@@ -18,6 +13,9 @@ import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
 import beamformer.continuous.BeamFormerDataBlock;
+import fftManager.FFTDataBlock;
+import fftManager.FFTDataUnit;
+import pamMaths.Mean;
 
 public class NoiseProcess extends PamProcess {
 

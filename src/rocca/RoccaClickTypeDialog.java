@@ -20,10 +20,29 @@
  */
 package rocca;
 
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
-import java.awt.*;
-import java.awt.event.*;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 
 /**
  * Use this modal dialog to let the user choose one string from a long
@@ -96,7 +115,8 @@ public class RoccaClickTypeDialog extends JDialog implements ActionListener {
             //of the list.  An alternative would be to set the unitIncrement
             //of the JScrollBar to a fixed value. You wouldn't get the nice
             //aligned scrolling, but it should work.
-            public int getScrollableUnitIncrement(Rectangle visibleRect,
+            @Override
+			public int getScrollableUnitIncrement(Rectangle visibleRect,
                                                   int orientation,
                                                   int direction) {
                 int row;
@@ -124,7 +144,8 @@ public class RoccaClickTypeDialog extends JDialog implements ActionListener {
         list.setLayoutOrientation(JList.VERTICAL);
         list.setVisibleRowCount(-1);
         list.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
+            @Override
+			public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     setButton.doClick(); //emulate button click
                 }
@@ -165,7 +186,8 @@ public class RoccaClickTypeDialog extends JDialog implements ActionListener {
     }
 
     //Handle clicks on the Set and Cancel buttons.
-    public void actionPerformed(ActionEvent e) {
+    @Override
+	public void actionPerformed(ActionEvent e) {
         if ("Set".equals(e.getActionCommand())) {
         	RoccaClickTypeDialog.value = list.getSelectedIndices();
         }

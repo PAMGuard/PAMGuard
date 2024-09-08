@@ -2,7 +2,6 @@ package simulatedAcquisition;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Window;
@@ -23,11 +22,11 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
-import propagation.PropagationModel;
 import PamController.masterReference.MasterReferencePoint;
 import PamUtils.LatLong;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
+import propagation.PropagationModel;
 
 public class SimDialogPanel {
 	

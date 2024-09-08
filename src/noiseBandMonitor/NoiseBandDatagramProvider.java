@@ -1,9 +1,9 @@
 package noiseBandMonitor;
 
-import noiseMonitor.NoiseDataUnit;
 import PamguardMVC.PamDataUnit;
 import dataGram.DatagramProvider;
 import dataGram.DatagramScaleInformation;
+import noiseMonitor.NoiseDataUnit;
 
 public class NoiseBandDatagramProvider implements DatagramProvider {
 

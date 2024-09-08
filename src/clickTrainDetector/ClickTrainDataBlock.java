@@ -1,7 +1,6 @@
 package clickTrainDetector;
 
 import PamUtils.PamCalendar;
-import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamProcess;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
@@ -9,7 +8,6 @@ import PamguardMVC.dataSelector.DataSelectorCreator;
 import PamguardMVC.debug.Debug;
 import PamguardMVC.superdet.SuperDetDataBlock;
 import clickTrainDetector.dataselector.CTDataSelectCreator;
-import generalDatabase.SuperDetLogging;
 import pamScrollSystem.ViewLoadObserver;
 
 /**

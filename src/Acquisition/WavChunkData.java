@@ -1,7 +1,7 @@
 package Acquisition;
 
 public class WavChunkData {
-	
+
 	static final byte RIFF[] = {'R','I','F','F'};
 	static final byte WAVE[] = {'W','A','V','E'};
 	static final byte FMT[] = {'f','m','t',' '};
@@ -10,7 +10,7 @@ public class WavChunkData {
 	static final byte ICOP[] = {'I','C','O','P'};
 	static final byte ICRD[] = {'I','C','R','D'};
 	static final byte DATA[] = {'d','a','t','a'};
-	
+
 	static public final int CHUNK_OTHER = 0;
 	static public final int CHUNK_RIFF = 1;
 	static public final int CHUNK_WAVE = 2;
@@ -19,7 +19,7 @@ public class WavChunkData {
 	static public final int CHUNK_INFO = 5;
 	static public final int CHUNK_ICOP = 6;
 	static public final int CHUNK_ICRD = 7;
-	
+
 	int chunkSize;
 	long fileOffset;
 	byte[] chunkId;
@@ -36,7 +36,7 @@ public class WavChunkData {
 //		String str = new String(chunkData);
 //		System.out.println(new String(chunkId) + "   " + str);
 	}
-	
+
 	public int getType() {
 		return chunkType;
 	}

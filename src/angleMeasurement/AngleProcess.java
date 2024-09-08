@@ -23,6 +23,7 @@ public class AngleProcess extends PamProcess implements AngleMeasurementListener
 		angleControl.angleMeasurement.addMeasurementListener(this);
 	}
 
+	@Override
 	public void newAngle(Double rawAngle, Double calibratedAngle, Double correctedAngle) {
 
 		lastDataUnit = new AngleDataUnit(PamCalendar.getTimeInMillis(), rawAngle, calibratedAngle, correctedAngle);

@@ -19,17 +19,16 @@ import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
-import warnings.PamWarning;
-import warnings.WarningSystem;
 import NMEA.NMEADataBlock;
 import NMEA.NMEADataUnit;
 import PamController.AdminTools;
-import PamController.PamController;
 import PamUtils.PamCalendar;
 import PamUtils.SystemTiming;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamObserver;
+import warnings.PamWarning;
+import warnings.WarningSystem;
 
 /**
  * Dialog to update the PC clock from GPRMC data.
@@ -127,13 +126,13 @@ public class UpdateClockDialog extends JDialog implements ActionListener, PamObs
 			singleInstance = new UpdateClockDialog(parentFrame);
 		}
 		
-		if (AdminTools.isAdmin() == false) {
+		if (!AdminTools.isAdmin()) {
 			JOptionPane.showMessageDialog(singleInstance, "The PC Clock can only be set automatically if you run PAMGuard as Administrator", 
 					"Warning", JOptionPane.ERROR_MESSAGE);
 		}
 		
 		singleInstance.autoUpdate = autoUpdate;
-		singleInstance.setModal(autoUpdate == false); // bodge it so it doens't halt program execution during auto update
+		singleInstance.setModal(!autoUpdate); // bodge it so it doens't halt program execution during auto update
 		singleInstance.setAlwaysOnTop(autoUpdate);
 		singleInstance.gpsControl = gpsControl;
 		singleInstance.newDataCount = 0;
@@ -165,6 +164,7 @@ public class UpdateClockDialog extends JDialog implements ActionListener, PamObs
 	}
 
 	Timer timer = new Timer(500, new ActionListener() {
+		@Override
 		public void actionPerformed(ActionEvent evt) {
 			tellTime();
 		}
@@ -174,6 +174,7 @@ public class UpdateClockDialog extends JDialog implements ActionListener, PamObs
 		pcTime.setText(PamCalendar.formatDateTime(PamCalendar.getTimeInMillis()));
 	}
 
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == cancelButton) {
 			this.setVisible(false);
@@ -190,14 +191,17 @@ public class UpdateClockDialog extends JDialog implements ActionListener, PamObs
 		return this;
 	}
 
+	@Override
 	public String getObserverName() {
 		return "Update Clock dialog";
 	}
 
+	@Override
 	public long getRequiredDataHistory(PamObservable o, Object arg) {
 		return 0;
 	}
 
+	@Override
 	public void noteNewSettings() {
 	}
 
@@ -216,13 +220,14 @@ public class UpdateClockDialog extends JDialog implements ActionListener, PamObs
 		// don't do anything by default
 	}
 
+	@Override
 	public void addData(PamObservable o, PamDataUnit arg) {
 		// look to see if it's an RMC String and if so get the date and time out.
 //		NMEADataBlock nmeaDataBlock = (NMEADataBlock) o;
 		NMEADataUnit nmeaDataUnit = (NMEADataUnit) arg;
 		StringBuffer nmeaData = nmeaDataUnit.getCharData();
 		String stringId = NMEADataBlock.getSubString(nmeaData, 0);
-		if (gpsControl.wantString(stringId) == false) {
+		if (!gpsControl.wantString(stringId)) {
 			return;
 		}
 		if (gpsControl.gpsParameters.mainString == GPSParameters.READ_GGA) {
@@ -373,7 +378,7 @@ public class UpdateClockDialog extends JDialog implements ActionListener, PamObs
 	
 
 	private void setTimeNow(Calendar nmeaCalendar) {
-		if (SystemTiming.setSystemTime(nmeaCalendar) == false) {
+		if (!SystemTiming.setSystemTime(nmeaCalendar)) {
 			String msg =  "The PC Clock can only be set automatically if you run PAMGuard as Administrator";
 			JOptionPane.showMessageDialog(singleInstance, msg, 
 					"Warning", JOptionPane.ERROR_MESSAGE);
@@ -385,6 +390,7 @@ public class UpdateClockDialog extends JDialog implements ActionListener, PamObs
 			System.out.println(String.format("PC Clock updated to " + PamCalendar.formatDateTime(nmeaCalendar.getTimeInMillis())));
 		}
 	}
+	@Override
 	public void removeObservable(PamObservable o) {
 		// TODO Auto-generated method stub
 		

@@ -5,7 +5,7 @@ import PamguardMVC.PamDataUnit;
 
 public class AutecDataUnit extends PamDataUnit {
 	
-	private LatLong latLong;;
+	private LatLong latLong;
 	private int iD;
 	private double depth;
 	private boolean isActive;

@@ -5,25 +5,22 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ListIterator;
 
-import fftManager.Complex;
-import fftManager.FastFFT;
-import wavFiles.WavFile;
-import wavFiles.WavFileReader;
-import wavFiles.WavHeader;
 import Acquisition.AcquisitionProcess;
 import PamController.PamController;
 import PamDetection.AbstractLocalisation;
 import PamDetection.PamDetection;
 import PamUtils.PamUtils;
-import PamguardMVC.AcousticDataUnit;
 import PamguardMVC.PamConstants;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.RawDataHolder;
 import PamguardMVC.RawDataTransforms;
-
 import PamguardMVC.superdet.SuperDetection;
 import Spectrogram.WindowFunction;
+import fftManager.Complex;
+import fftManager.FastFFT;
+import wavFiles.WavFileReader;
+import wavFiles.WavHeader;
 
 public class ClipDataUnit extends PamDataUnit<PamDataUnit, SuperDetection> implements PamDetection, RawDataHolder {
 
@@ -264,12 +261,13 @@ public class ClipDataUnit extends PamDataUnit<PamDataUnit, SuperDetection> imple
 	 * Get all the wave data into an array. 
 	 * @return the wave data or null if it can't be found. 
 	 */
+	@Override
 	public double[][] getWaveData() {
 		if (rawData != null) {
 			return rawData;
 		}
 		File wavFileName = findWavFile();
-		if (wavFileName == null || wavFileName.exists() == false || wavFileName.isDirectory()) {
+		if (wavFileName == null || !wavFileName.exists() || wavFileName.isDirectory()) {
 			return null;
 		}
 		WavFileReader wavFile = null;
@@ -300,7 +298,7 @@ public class ClipDataUnit extends PamDataUnit<PamDataUnit, SuperDetection> imple
 		}
 		
 		File wavFileName = findWavFile();
-		if (wavFileName == null || wavFileName.exists() == false) {
+		if (wavFileName == null || !wavFileName.exists()) {
 			return null;
 		}
 		WavFileReader wavFile = null;
@@ -355,7 +353,7 @@ public class ClipDataUnit extends PamDataUnit<PamDataUnit, SuperDetection> imple
 
 	private File findWavFile() {
 		try {
-			if (offlineFile == null || offlineFile.exists() == false) {
+			if (offlineFile == null || !offlineFile.exists()) {
 				if (getParentDataBlock() == null) return null;
 				ClipProcess clipProcess = (ClipProcess) getParentDataBlock().getParentProcess();
 				offlineFile = clipProcess.findClipFile(this);

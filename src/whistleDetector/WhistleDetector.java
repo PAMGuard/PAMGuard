@@ -22,11 +22,9 @@ package whistleDetector;
 
 import java.util.ListIterator;
 
-import whistlesAndMoans.AbstractWhistleDataBlock;
 import Acquisition.AcquisitionProcess;
 import Localiser.detectionGroupLocaliser.DetectionGroupLocaliser;
 import PamController.PamController;
-import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamUtils.PamUtils;
 import PamUtils.complex.ComplexArray;
@@ -36,12 +34,11 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
-import autecPhones.AutecGraphics;
-import fftManager.Complex;
 import fftManager.FFTDataBlock;
 import fftManager.FFTDataUnit;
 import generalDatabase.PamDetectionLogging;
 import generalDatabase.SQLLogging;
+import whistlesAndMoans.AbstractWhistleDataBlock;
 
 /**
  * @author Doug Gillespie
@@ -394,7 +391,7 @@ public class WhistleDetector extends PamProcess {
 		WhistleLocalisation whistleLocalisation = new WhistleLocalisation(shapeDataUnit, hydrophoneList);
 		
 		int delay, detectionChannel, bearingChannel;
-		detectionChannel = PamUtils.getNthChannel(0, shapeDataUnit.getChannelBitmap());;
+		detectionChannel = PamUtils.getNthChannel(0, shapeDataUnit.getChannelBitmap());
 		for (int i = 1; i < nChannels; i++) {
 			// measure as many delays as possible, all relative to channel 0, which will
 			// contain the detection data. 

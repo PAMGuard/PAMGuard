@@ -20,12 +20,9 @@
  */
 package Map;
 
-import geoMag.MagneticVariation;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -48,6 +45,7 @@ import PamUtils.LatLong;
 import PamUtils.PamCalendar;
 import PamView.PamColors;
 import PamView.PamColors.PamColor;
+import geoMag.MagneticVariation;
 
 public class GpsTextDisplay extends JPanel {
 

@@ -1,10 +1,10 @@
 package difar;
 
-import pamMaths.PamVector;
 import Array.ArrayManager;
 import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamUtils.LatLong;
+import pamMaths.PamVector;
 
 /**
  * Localisations from a single sonobuoy are bearings originating from the 

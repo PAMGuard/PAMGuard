@@ -1,13 +1,12 @@
 package targetMotionModule;
 
-import generalDatabase.SQLLogging;
-import generalDatabase.SQLTypes;
-
-import targetMotionModule.algorithms.TargetMotionModel;
 import GPS.GpsData;
 import PamUtils.LatLong;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import generalDatabase.SQLLogging;
+import generalDatabase.SQLTypes;
+import targetMotionModule.algorithms.TargetMotionModel;
 
 public class TargetMotionSQLLogging extends SQLLogging {
 	
@@ -110,7 +109,7 @@ public class TargetMotionSQLLogging extends SQLLogging {
 		tmr.setStartLatLong(new GpsData(sLL));
 		tmr.setEndLatLong(new GpsData(eLL));
 		if (ts != null) {
-			tmr.setBeamTime(sqlTypes.millisFromTimeStamp(ts));
+			tmr.setBeamTime(SQLTypes.millisFromTimeStamp(ts));
 		}
 		tmr.setAic((Double) table.getAic().getValue());
 		tmr.setProbability((Double) table.getPaprob().getValue());

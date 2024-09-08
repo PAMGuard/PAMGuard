@@ -50,6 +50,7 @@ public class MySQLSystem extends ServerBasedSystem {
 		return null;
 	}
 
+	@Override
 	public String buildDatabaseUrl(String ipAddress, int portNumber, String databaseName){	
 		return "jdbc:mysql://" + ipAddress + ":" + portNumber + "/" + databaseName +
 		"?jdbcCompliantTruncation=true";
@@ -60,6 +61,7 @@ public class MySQLSystem extends ServerBasedSystem {
 		return schemaName;
 	}
 
+	@Override
 	public String getUnitType() {
 		return "MySQL Database System";
 	}

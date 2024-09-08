@@ -31,8 +31,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
-import offlineProcessing.OfflineTaskGroup;
-
 import PamController.status.ModuleStatus;
 import PamController.status.ModuleStatusManager;
 import PamController.status.ProcessCheck;
@@ -45,9 +43,9 @@ import PamView.PamSidePanel;
 import PamView.PamTabPanel;
 import PamView.PamView;
 import PamguardMVC.PamConstants;
-import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
 import backupmanager.BackupInformation;
+import offlineProcessing.OfflineTaskGroup;
 
 /**
  * @author Doug Gillespie
@@ -470,6 +468,7 @@ public abstract class PamControlledUnit implements SettingsNameProvider {
 	 * 
 	 * @return the name of the unit
 	 */
+	@Override
 	public String getUnitName() {
 		return unitName;
 	}

@@ -43,6 +43,7 @@ abstract public class DataBlock2D<Tunit extends PamDataUnit> extends AcousticDat
 	 */
 	abstract public DataTypeInfo getScaleInfo();
 
+	@Override
 	public Element getDataBlockXML(Document doc) {
 		Element el = super.getDataBlockXML(doc);
 		DataTypeInfo dti = getScaleInfo();

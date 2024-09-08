@@ -1,6 +1,6 @@
 package Spectrogram;
 
-import javax.swing.JSlider;
+import javax.swing.SwingConstants;
 
 import PamView.ColourArray;
 import PamView.ColourArray.ColourArrayType;
@@ -19,11 +19,11 @@ public class ColourRangeSlider extends PamRangeSlider {
 	private static final long serialVersionUID = 1L;
 
 	public ColourRangeSlider(){
-		super(JSlider.VERTICAL);
+		super(SwingConstants.VERTICAL);
 	}
 	
 	public ColourRangeSlider(int min, int max){
-		super(min, max,JSlider.VERTICAL);
+		super(min, max,SwingConstants.VERTICAL);
 	}
 	
 	public ColourRangeSlider(int min, int max, int orientation){

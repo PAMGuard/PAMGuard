@@ -3,11 +3,9 @@ package NMEA;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridLayout;
-import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -110,12 +108,13 @@ public class NMEAStringsTable extends PamDialog {
 
 	class TimerListener implements ActionListener {
 		boolean doneLayout;
+		@Override
 		public void actionPerformed(ActionEvent ev) {
 			// table.
 //			nmeaTableData.fireTableRowsUpdated(0, 10);
 			nmeaTableData.fireTableDataChanged();
 			
-			if (doneLayout == false && nmeaTableData.getRowCount() > 0) {
+			if (!doneLayout && nmeaTableData.getRowCount() > 0) {
 				doneLayout = true;
 			}
 		}
@@ -135,6 +134,7 @@ public class NMEAStringsTable extends PamDialog {
 		/* (non-Javadoc)
 		 * @see javax.swing.table.TableModel#getColumnCount()
 		 */
+		@Override
 		public int getColumnCount() {
 			return tableColumns.length;
 		}
@@ -142,6 +142,7 @@ public class NMEAStringsTable extends PamDialog {
 		/* (non-Javadoc)
 		 * @see javax.swing.table.TableModel#getRowCount()
 		 */
+		@Override
 		public int getRowCount() {
 			if (nmeaDataBlock == null) return 0;
 			return nmeaDataBlock.getUnitsCount();
@@ -150,6 +151,7 @@ public class NMEAStringsTable extends PamDialog {
 		/* (non-Javadoc)
 		 * @see javax.swing.table.TableModel#getValueAt(int, int)
 		 */
+		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			NMEADataUnit pamDataUnit = nmeaDataBlock.getDataUnit(rowIndex, PamDataBlock.REFERENCE_CURRENT);
 			switch(columnIndex) {

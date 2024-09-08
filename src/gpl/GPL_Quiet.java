@@ -1,7 +1,6 @@
 package gpl;
 
 import gpl.whiten.InfiniteSort;
-import gpl.whiten.InfiniteSortGroup;
 import gpl.whiten.MovingMatrix;
 import gpl.whiten.WhitenMatrix;
 import gpl.whiten.WhitenVector;

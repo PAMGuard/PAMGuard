@@ -195,6 +195,7 @@ public class IirfFilter implements Filter {
 	/* (non-Javadoc)
 	 * @see Filters.Filter#runFilter(double[])
 	 */
+	@Override
 	synchronized public void runFilter(double[] inputData) {
 		int f;
 		for (int i = 0; i < inputData.length; i++) {
@@ -208,6 +209,7 @@ public class IirfFilter implements Filter {
 	/* (non-Javadoc)
 	 * @see Filters.Filter#runFilter(double[], double[])
 	 */
+	@Override
 	synchronized public void runFilter(double[] inputData, double[] outputData) {
 		int f;
 		if (outputData == null || outputData.length != inputData.length) {
@@ -225,6 +227,7 @@ public class IirfFilter implements Filter {
 	/* (non-Javadoc)
 	 * @see Filters.Filter#runFilter(double)
 	 */
+	@Override
 	synchronized public double runFilter(double aData) {
 		double newData = aData;
 		for (int f = 0; f < nFilterUnits; f++) {

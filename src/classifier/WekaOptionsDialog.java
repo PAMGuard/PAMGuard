@@ -18,10 +18,10 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
-import weka.core.Option;
 import PamView.PamGui;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
+import weka.core.Option;
 
 public class WekaOptionsDialog extends PamDialog {
 

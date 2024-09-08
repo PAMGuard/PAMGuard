@@ -30,9 +30,9 @@ import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
-import pamMaths.PamVector;
 import PamView.PamSymbol;
 import PamView.PamSymbolType;
+import pamMaths.PamVector;
 
 /**
  * 

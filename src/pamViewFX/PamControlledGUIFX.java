@@ -1,9 +1,13 @@
 package pamViewFX;
 
 import java.util.ArrayList;
+
+import PamController.PamControlledUnit;
 import PamController.PamControlledUnitGUI;
 import PamController.PamGUIManager;
 import PamController.SettingsPane;
+import PamguardMVC.PamProcess;
+import dataModelFX.connectionNodes.ModuleIconFactory;
 import javafx.scene.layout.Pane;
 import userDisplayFX.UserDisplayNodeFX;
 

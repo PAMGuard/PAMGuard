@@ -3,6 +3,7 @@ package clickTrainDetector;
 import java.awt.Frame;
 import java.io.Serializable;
 import java.util.ArrayList;
+
 import javax.swing.JMenuItem;
 
 import PamController.PamControlledUnit;
@@ -20,7 +21,6 @@ import clickTrainDetector.classification.CTClassifier;
 import clickTrainDetector.classification.CTClassifierManager;
 import clickTrainDetector.clickTrainAlgorithms.CTAlgorithmInfoManager;
 import clickTrainDetector.clickTrainAlgorithms.ClickTrainAlgorithm;
-import clickTrainDetector.clickTrainAlgorithms.classificationRatio.RatioClickTrainAlgorithm;
 import clickTrainDetector.clickTrainAlgorithms.mht.MHTClickTrainAlgorithm;
 import clickTrainDetector.layout.CTFXGUI;
 import clickTrainDetector.layout.CTSwingGUI;

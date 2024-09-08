@@ -17,14 +17,7 @@ import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.border.BevelBorder;
 
-import pamScrollSystem.AbstractPamScroller;
-import pamScrollSystem.AbstractPamScrollerAWT;
-import pamScrollSystem.PamScrollObserver;
-import pamScrollSystem.PamScroller;
-import pamScrollSystem.RangeSpinner;
-import pamScrollSystem.RangeSpinnerListener;
 import Layout.PamAxis;
 import Layout.PamAxisPanel;
 import PamController.PamControlledUnitSettings;
@@ -46,6 +39,12 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamObserverAdapter;
+import pamScrollSystem.AbstractPamScroller;
+import pamScrollSystem.AbstractPamScrollerAWT;
+import pamScrollSystem.PamScrollObserver;
+import pamScrollSystem.PamScroller;
+import pamScrollSystem.RangeSpinner;
+import pamScrollSystem.RangeSpinnerListener;
 /**
  * Display panel for dBHt data - can be incorporated into a spectrogram 
  * plug in or a stand alone display window. 
@@ -126,7 +125,7 @@ public class DbHtDisplayPanel {
 	}
 
 	void newParams() {
-		if (displayParams.autoScale == false) {
+		if (!displayParams.autoScale) {
 			axisPanel.ampAxis.setRange(displayParams.minAmplitude, displayParams.maxAmplitude);
 		}
 		for (int i = 0; i < DbHtControl.NMEASURES; i++) {

@@ -40,7 +40,7 @@ public class NMEADataBlock extends PamDataBlock<NMEADataUnit> {
 		// need to start by getting the first five characters for the scentence identifier.
 		StringBuffer nmeaString = pamDataUnit.getCharData();
 		if (nmeaString == null) return;
-		if (nmeaString.length() < 6 || isNmeaStartCharacter(nmeaString.charAt(0)) == false) return;
+		if (nmeaString.length() < 6 || !isNmeaStartCharacter(nmeaString.charAt(0))) return;
 		String newId = getSubString(nmeaString, 0);
 		if (newId == null) return;
 		String oldId;

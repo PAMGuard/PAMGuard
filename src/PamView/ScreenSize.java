@@ -5,14 +5,8 @@ import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.util.List;
-
-import javax.swing.SwingUtilities;
-
-import com.sun.glass.ui.Screen;
 
 import PamController.PamGUIManager;
-import javafx.scene.layout.Pane;
 
 /**
  * Class to launch a thread which will get the screen size 
@@ -110,7 +104,7 @@ public class ScreenSize {
 	 */
 	public static boolean forceBoundToScreen(Rectangle bounds) {
 		try {
-			if (isPointOnScreen(bounds.getLocation()) == false) {
+			if (!isPointOnScreen(bounds.getLocation())) {
 				bounds.x = bounds.y = 0;
 				return true;
 			}

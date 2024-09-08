@@ -3,7 +3,6 @@ package whistleDetector;
 import java.util.ArrayList;
 
 import PamDetection.PamDetection;
-import PamguardMVC.AcousticDataUnit;
 import PamguardMVC.PamDataUnit;
 
 /**

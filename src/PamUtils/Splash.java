@@ -26,13 +26,13 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Rectangle;
+import java.awt.SplashScreen;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.awt.SplashScreen;
-import java.awt.Rectangle;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -107,6 +107,7 @@ public class Splash extends JWindow implements Runnable {
 	}
 	
 	
+	@Override
 	public void run()  
 	   { 
 		//let's see if we have a JVM SplashScreen already displayed
@@ -236,6 +237,7 @@ public class Splash extends JWindow implements Runnable {
 		}
 		
 		final Runnable closeSplashRunnable = new Runnable() {
+			@Override
 			public void run() {
 				try {
 					setVisible(false);
@@ -250,6 +252,7 @@ public class Splash extends JWindow implements Runnable {
 		final int pauseTimeout = displayDuration; // Cast to final
 
 		Runnable displayDurationRunnable = new Runnable() {
+			@Override
 			public void run() {
 				try {
 					Thread.sleep(pauseTimeout);

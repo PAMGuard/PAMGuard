@@ -2,10 +2,10 @@ package whistleClassifier;
 
 import java.sql.Types;
 
-import classifier.Classifier;
 import PamController.PamController;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import classifier.Classifier;
 import generalDatabase.DBControl;
 import generalDatabase.PamTableDefinition;
 import generalDatabase.PamTableItem;
@@ -93,7 +93,7 @@ public class WhistleClassifierLogging extends SQLLogging {
 		if (params.fragmentClassifierParams != null) {
 			newList = params.fragmentClassifierParams.getSpeciesList();
 		}
-		if (speciesListChanged(newList) == false) {
+		if (!speciesListChanged(newList)) {
 			return; // no need to do anything. 
 		}
 		// will need to re-make the table definition and run checks to ensure that 
@@ -128,7 +128,7 @@ public class WhistleClassifierLogging extends SQLLogging {
 		for (int i = 0; i < newList.length; i++) {
 			// database column names are not case sensitive, so 
 			// we don't care about case. 
-			if (newList[i].equalsIgnoreCase(speciesNames[i]) == false) {
+			if (!newList[i].equalsIgnoreCase(speciesNames[i])) {
 				return true;
 			}
 		}

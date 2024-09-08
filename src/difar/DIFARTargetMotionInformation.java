@@ -4,11 +4,11 @@ import java.util.ArrayList;
 
 import javax.vecmath.Point3f;
 
-import pamMaths.PamQuaternion;
-import pamMaths.PamVector;
 import GPS.GpsData;
 import PamUtils.LatLong;
 import PamguardMVC.PamDataUnit;
+import pamMaths.PamQuaternion;
+import pamMaths.PamVector;
 import targetMotionModule.TargetMotionInformation;
 
 public class DIFARTargetMotionInformation implements TargetMotionInformation {

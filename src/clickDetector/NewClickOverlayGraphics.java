@@ -9,14 +9,10 @@ import java.awt.Rectangle;
 import PamUtils.Coordinate3d;
 import PamView.BasicKeyItem;
 import PamView.GeneralProjector;
-import PamView.HoverData;
-import PamView.PamColors;
 import PamView.PamDetectionOverlayGraphics;
 import PamView.PamKeyItem;
 import PamView.PamSymbol;
-import PamView.PamOldSymbolManager;
 import PamView.PamSymbolType;
-import PamView.GeneralProjector.ParameterType;
 import PamView.dialog.IconPanel;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
@@ -243,7 +239,7 @@ public class NewClickOverlayGraphics extends PamDetectionOverlayGraphics {
 		//		g.setColor(getLineColour());
 		//		System.out.println("Set line colour to red");
 		ClickDetection cd = (ClickDetection) pamDetection;
-		if (shouldDrawOnMap(cd) == false) {
+		if (!shouldDrawOnMap(cd)) {
 			return null;
 		}
 		//		if (cd.getClickType() == 0) {

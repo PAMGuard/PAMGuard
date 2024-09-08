@@ -20,8 +20,6 @@
  */
 package Filters;
 
-import fftManager.Complex;
-
 /**
  * @author Doug Gillespie
  *         <p>

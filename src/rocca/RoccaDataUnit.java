@@ -22,7 +22,6 @@
 package rocca;
 
 import PamDetection.PamDetection;
-import PamguardMVC.AcousticDataUnit;
 import PamguardMVC.PamDataUnit;
 
 

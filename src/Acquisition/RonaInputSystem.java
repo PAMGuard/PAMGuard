@@ -10,11 +10,9 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
-import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioFormat.Encoding;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import javax.sound.sampled.AudioFormat.Encoding;
-import javax.swing.filechooser.FileFilter;
 
 //import org.kc7bfi.jflac.FLACDecoder;
 //import org.kc7bfi.jflac.PCMProcessor;
@@ -25,27 +23,26 @@ import org.jflac.PCMProcessor;
 import org.jflac.metadata.StreamInfo;
 import org.jflac.util.ByteData;
 
-import wavFiles.ByteConverter;
-import Acquisition.pamAudio.PamAudioFileManager;
 import Acquisition.pamAudio.PamAudioFileFilter;
-import Acquisition.pamAudio.PamAudioSystem;
+import Acquisition.pamAudio.PamAudioFileManager;
 import PamDetection.RawDataUnit;
 import PamUtils.FileParts;
 import PamUtils.PamCalendar;
 import PamUtils.PamFileFilter;
 import PamUtils.PamUtils;
+import wavFiles.ByteConverter;
 
 /**
- * Bespoke system for handling data from the Rona hydrophone array which 
- * consists of sets of seven files, each with different ends in th ename. 
+ * Bespoke system for handling data from the Rona hydrophone array which
+ * consists of sets of seven files, each with different ends in th ename.
  * @author Doug
  *
  */
 public class RonaInputSystem extends FolderInputSystem {
 
 	private static final int RONACHANNELS = 0x21; // channels 5 and 0
-	
-	private static final int NCHANNELS = PamUtils.getNumChannels(RONACHANNELS); 
+
+	private static final int NCHANNELS = PamUtils.getNumChannels(RONACHANNELS);
 
 	private AudioInputStream[] audioStreams = new AudioInputStream[NCHANNELS];
 
@@ -58,9 +55,9 @@ public class RonaInputSystem extends FolderInputSystem {
 	private int readyMask = PamUtils.makeChannelMap(NCHANNELS);
 
 	private int runningChannels;
-	
+
 	private long lastFileTime = 0;
-	
+
 	public static final String systemType = "Rona File Folders";
 
 	public RonaInputSystem(AcquisitionControl acquisitionControl) {
@@ -98,7 +95,7 @@ public class RonaInputSystem extends FolderInputSystem {
 
 		@Override
 		public boolean accept(File f) {
-			if (super.accept(f) == false) {
+			if (!super.accept(f)) {
 				return false;
 			}
 			if (f.isDirectory()) {
@@ -108,11 +105,11 @@ public class RonaInputSystem extends FolderInputSystem {
 			String name = f.getName();
 			int lastDot = name.lastIndexOf('.');
 			if (lastDot < 0) return false;
-			char ch = name.charAt(lastDot-1); 
+			char ch = name.charAt(lastDot-1);
 			if ('1' != ch) {
 				return false;
 			}
-			// now check all other files in the set exist. 
+			// now check all other files in the set exist.
 			for (int i = 1; i < NCHANNELS; i++) {
 				File chanFile = findChannelFile(f, i, 2);
 				if (chanFile == null) {
@@ -177,14 +174,14 @@ public class RonaInputSystem extends FolderInputSystem {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 			return false;
-		}		
+		}
 
 		return true;
 	}
 
 	/**
-	 * swap the last digit in a file name for the higher channel 
-	 * number - rememebr the channels are one indexed. 
+	 * swap the last digit in a file name for the higher channel
+	 * number - rememebr the channels are one indexed.
 	 * @param baseFile base file
 	 * @param index 0 based file index
 	 * @return new file with the 1 replaced by another number
@@ -199,7 +196,7 @@ public class RonaInputSystem extends FolderInputSystem {
 	}
 
 	/**
-	 * Search for a nearby file with the same name, but secondds may differ 
+	 * Search for a nearby file with the same name, but secondds may differ
 	 * by one or two secs - may need to generate complete new file names !
 	 * @param baseFile
 	 * @param index
@@ -214,7 +211,7 @@ public class RonaInputSystem extends FolderInputSystem {
 		index = PamUtils.getNthChannel(index, RONACHANNELS);
 		/*
 		 * 		files are in the format 20051209-185714-02.flac
-		 * so get the time and add an offset to make a new file name. 
+		 * so get the time and add an offset to make a new file name.
 		 */
 		long fileTime = getFileStartTime(baseFile);
 		if (fileTime <= 0) {
@@ -245,7 +242,7 @@ public class RonaInputSystem extends FolderInputSystem {
 	@Override
 	public boolean prepareSystem(AcquisitionControl daqControl) {
 		this.acquisitionControl = daqControl;
-		if (prepareInputFile() == false) {
+		if (!prepareInputFile()) {
 			return false;
 		}
 		this.newDataUnits = acquisitionControl.getDaqProcess().getNewDataQueue();
@@ -285,7 +282,7 @@ public class RonaInputSystem extends FolderInputSystem {
 
 		currentFileStart = System.currentTimeMillis();
 		fileStartTime = currentFileStart;
-		
+
 		for (int i = 0; i < NCHANNELS; i++) {
 			Thread thread = new Thread(flacThreads[i]);
 			thread.start();
@@ -304,7 +301,7 @@ public class RonaInputSystem extends FolderInputSystem {
 		else {
 			runningChannels &= ~(1<<channel);
 		}
-		
+
 		System.out.println(String.format("Set channel %d run status to %s overall status was %d, is now %d (%s)", channel, new Boolean(running).toString(),
 				was, runningChannels, PamUtils.getChannelList(runningChannels)));
 
@@ -332,7 +329,7 @@ public class RonaInputSystem extends FolderInputSystem {
 		calculateETA();
 		systemHasStopped(runningChannels > 0);
 	}
-	
+
 	@Override
 	protected void calculateETA() {
 		long now = System.currentTimeMillis();
@@ -359,8 +356,8 @@ public class RonaInputSystem extends FolderInputSystem {
 				double[] newRaw = Arrays.copyOf(readyDataUnits[i].getRawData(), (int) firstDataLen);
 				readyDataUnits[i].setRawData(newRaw);
 				/**
-				 * Will also need to stop the run at this point since it's evident that one file is longer than others 
-				 * and will now go into a wait state while it tries to match it's data with other channels. 
+				 * Will also need to stop the run at this point since it's evident that one file is longer than others
+				 * and will now go into a wait state while it tries to match it's data with other channels.
 				 */
 				dontStop = false;
 			}
@@ -368,7 +365,7 @@ public class RonaInputSystem extends FolderInputSystem {
 			newDataUnits.addNewData(readyDataUnits[i]);
 		}
 		while (newDataUnits.getQueueSize() > NCHANNELS) {
-			if (dontStop == false) break;
+			if (!dontStop) break;
 			try {
 				Thread.sleep(2);
 			} catch (Exception ex) {
@@ -403,7 +400,7 @@ public class RonaInputSystem extends FolderInputSystem {
 
 		@Override
 		public void processPCM(ByteData byteData) {
-			if (dontStop == false) {
+			if (!dontStop) {
 				try {
 					fileStream.close(); // will make the flac reader bomb out !
 				}
@@ -443,12 +440,12 @@ public class RonaInputSystem extends FolderInputSystem {
 			//				newDataUnit.timeMilliseconds = blockMillis;
 			PamCalendar.setSoundFileTimeInMillis(blockMillis);
 			if (fileSamples > 0 && totalSamples - lastProgressUpdate >= getSampleRate()*2) {
-				int progress = (int) (1000. * (float)theseFileSamples / (float) fileSamples);
+				int progress = (int) (1000. * theseFileSamples / fileSamples);
 				fileProgress.setValue(progress);
 				sayEta();
 				long now = System.currentTimeMillis();
 				if (lastProgressTime > 0 && totalSamples > lastProgressUpdate) {
-					double speed = (double) (totalSamples - lastProgressUpdate) / 
+					double speed = (double) (totalSamples - lastProgressUpdate) /
 							getSampleRate() / ((now-lastProgressTime)/1000.);
 					speedLabel.setText(String.format(" (%3.1f X RT)", speed));
 				}
@@ -458,18 +455,18 @@ public class RonaInputSystem extends FolderInputSystem {
 			}
 
 			/**
-			 * Sit and wait until all threads have put there data units into the 
+			 * Sit and wait until all threads have put there data units into the
 			 * ready array, then they will release at the same time and this thread
-			 * can continue round. 
+			 * can continue round.
 			 */
 			for (int ichan = 0; ichan < 1; ichan++) {
 				while (waitingDataUnit(ichan+channelOffset)) {
-					if (dontStop == false) break;
+					if (!dontStop) break;
 					try {
 						Thread.sleep(2);
 					} catch (Exception ex) {
 						ex.printStackTrace();
-					}					
+					}
 				}
 			}
 
@@ -522,7 +519,7 @@ public class RonaInputSystem extends FolderInputSystem {
 				//					byteData = flacDecoder.decodeFrame(flacFrame, byteData);
 				//				}
 			} catch (IOException e) {
-				// don't print this since it happens naturally when we press the stop button. 
+				// don't print this since it happens naturally when we press the stop button.
 				//								e.printStackTrace();
 			}
 			try {

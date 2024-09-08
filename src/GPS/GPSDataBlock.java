@@ -3,12 +3,12 @@ package GPS;
 import java.util.ListIterator;
 
 import GPS.effort.GpsEffortProvider;
-import nmeaEmulator.EmulatedData;
-import nmeaEmulator.NMEAEmulator;
-import pamScrollSystem.ViewLoadObserver;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
+import nmeaEmulator.EmulatedData;
+import nmeaEmulator.NMEAEmulator;
+import pamScrollSystem.ViewLoadObserver;
 
 /**
  * Add a bit of extra functionality to GPSDataBlock so 
@@ -44,7 +44,7 @@ public class GPSDataBlock extends PamDataBlock<GpsDataUnit> implements NMEAEmula
 	@Override
 	public void addPamData(GpsDataUnit gpsDataUnit) {
 		boolean r = isReasonable(gpsDataUnit);
-		if (r == false) {
+		if (!r) {
 			gpsDataUnit.getGpsData().setDataOk(false);
 		}
 		else {
@@ -68,7 +68,7 @@ public class GPSDataBlock extends PamDataBlock<GpsDataUnit> implements NMEAEmula
 		GpsData thisData, thatData;
 		thisData = gpsDataUnit.getGpsData();
 
-		if (thisData.isDataOk() == false) {
+		if (!thisData.isDataOk()) {
 			return false;
 		}
 		
@@ -83,7 +83,7 @@ public class GPSDataBlock extends PamDataBlock<GpsDataUnit> implements NMEAEmula
 					return true;
 				}
 				// ignore gps points flagged as bad. 
-				if (thatData.isDataOk() == false) {
+				if (!thatData.isDataOk()) {
 					continue;
 				}
 				// OK if it's gone too far back in time
@@ -118,7 +118,7 @@ public class GPSDataBlock extends PamDataBlock<GpsDataUnit> implements NMEAEmula
 			readyGGAData = null;
 			return dd;
 		}
-		if (emulatorIterator.hasNext() == false) {
+		if (!emulatorIterator.hasNext()) {
 			return null;
 		}
 		GpsDataUnit gpsUnit =  emulatorIterator.next();

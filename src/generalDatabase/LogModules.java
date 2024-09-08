@@ -1,6 +1,5 @@
 package generalDatabase;
 
-import java.sql.Connection;
 import java.sql.Types;
 
 import PamController.PamControlledUnit;

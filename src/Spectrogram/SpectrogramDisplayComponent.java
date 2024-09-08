@@ -3,7 +3,6 @@ package Spectrogram;
 import java.awt.Component;
 
 import Layout.PamGraphLayout;
-import userDisplay.UserDisplayComponent;
 import userDisplay.UserDisplayComponentAdapter;
 import userDisplay.UserDisplayControl;
 

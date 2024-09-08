@@ -1,5 +1,15 @@
 package offlineProcessing;
 
+import java.util.ArrayList;
+import java.util.ListIterator;
+
+import PamController.PamControlledUnit;
+import PamController.PamViewParameters;
+import PamguardMVC.PamDataBlock;
+import PamguardMVC.PamDataUnit;
+import PamguardMVC.PamProcess;
+import PamguardMVC.superdet.SuperDetection;
+import dataMap.OfflineDataMapPoint;
 import generalDatabase.DBControlUnit;
 import generalDatabase.PamConnection;
 import generalDatabase.SQLLogging;
@@ -8,18 +18,6 @@ import generalDatabase.SuperDetLogging;
 import generalDatabase.clauses.FixedClause;
 import generalDatabase.clauses.FromClause;
 import generalDatabase.clauses.PAMSelectClause;
-
-import java.util.ArrayList;
-import java.util.ListIterator;
-
-import PamController.PamControlledUnit;
-import PamController.PamViewParameters;
-import dataMap.OfflineDataMapPoint;
-
-import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamDataUnit;
-import PamguardMVC.PamProcess;
-import PamguardMVC.superdet.SuperDetection;
 
 /**
  * An offline task, such as click species id. 
@@ -333,7 +331,7 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 	 * @return true to run. 
 	 */
 	public boolean isDoRun() {
-		if (canRun() == false) {
+		if (!canRun()) {
 			return false;
 		}
 		return doRun;

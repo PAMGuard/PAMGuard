@@ -14,15 +14,12 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import pamMaths.WignerTransform;
-import soundtrap.STClickControl;
 import Layout.PamAxis;
 import Layout.PamAxisPanel;
 import PamController.PamControlledUnitSettings;
@@ -32,6 +29,8 @@ import PamUtils.PamUtils;
 import PamView.ColourArray;
 import PamView.panel.JBufferedPanel;
 import clickDetector.ClickDisplayManager.ClickDisplayInfo;
+import pamMaths.WignerTransform;
+import soundtrap.STClickControl;
 
 public class WignerPlot extends ClickDisplay implements PamSettings {
 

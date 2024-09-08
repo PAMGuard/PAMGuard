@@ -11,6 +11,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
+
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamguardMVC.PamDataUnit;

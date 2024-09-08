@@ -1,8 +1,5 @@
 package annotation;
 
-import generalDatabase.SQLLoggingAddon;
-
-import PamView.symbol.AnnotationSymbolChooser;
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.modifier.SymbolModifier;
 import PamguardMVC.PamDataBlock;
@@ -10,8 +7,8 @@ import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataSelector.DataSelector;
 import annotation.binary.AnnotationBinaryHandler;
 import annotation.dataselect.AnnotationDataSelCreator;
-import annotation.dataselect.AnnotationDataSelector;
 import annotation.handler.AnnotationOptions;
+import generalDatabase.SQLLoggingAddon;
 
 /**
  * Something that can tell us a little more about 

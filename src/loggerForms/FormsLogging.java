@@ -3,15 +3,15 @@ package loggerForms;
 import java.util.ArrayList;
 
 import PamController.PamViewParameters;
+import PamguardMVC.PamDataBlock;
+import PamguardMVC.PamDataUnit;
+import generalDatabase.EmptyTableDefinition;
+import generalDatabase.PamConnection;
+import generalDatabase.SQLLogging;
+import generalDatabase.SQLTypes;
 import loggerForms.controlDescriptions.ControlDescription;
 import loggerForms.controlDescriptions.InputControlDescription;
 import pamScrollSystem.ViewLoadObserver;
-import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamDataUnit;
-import generalDatabase.PamConnection;
-import generalDatabase.PamTableDefinition;
-import generalDatabase.SQLLogging;
-import generalDatabase.SQLTypes;
 
 public class FormsLogging extends SQLLogging {
 
@@ -37,7 +37,7 @@ public class FormsLogging extends SQLLogging {
 		if (startName == null) {
 			return standardClause;
 		}
-		startName = PamTableDefinition.deblankString(startName); // replace blanks with underscores. 
+		startName = EmptyTableDefinition.deblankString(startName); // replace blanks with underscores. 
 		startName = sqlTypes.formatColumnName(startName); // wrap as standard for this database taype. 
 		String t1 = sqlTypes.formatDBDateTimeQueryString(pvp.viewStartTime);
 		String t2 = sqlTypes.formatDBDateTimeQueryString(pvp.viewEndTime);

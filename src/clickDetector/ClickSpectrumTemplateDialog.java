@@ -2,35 +2,23 @@ package clickDetector;
 
 
 import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import PamUtils.PamFileChooser;
 import PamUtils.PamFileFilter;
 import PamUtils.SelectFolder;
 import PamView.dialog.PamDialog;
-import PamView.dialog.PamGridBagContraints;
 
 public class ClickSpectrumTemplateDialog  extends PamDialog {
 	
@@ -93,6 +81,7 @@ public class ClickSpectrumTemplateDialog  extends PamDialog {
 	
 	class BrowseButtonAction implements ActionListener {
 		
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			
 			String template=openFileBrowser();

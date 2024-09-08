@@ -63,7 +63,7 @@ public class EmptyTableDefinition implements Cloneable {
 		char c;
 		for (int i = 0; i < newString.length(); i++) {
 			c = newString.charAt(i);
-			if (isValidCharacter(c) == false)  {
+			if (!isValidCharacter(c))  {
 				newString = newString.replace(c, '_');
 			}
 		}
@@ -249,13 +249,13 @@ public class EmptyTableDefinition implements Cloneable {
 		boolean first = true;
 		for (int i = 0; i < nItems; i++) {
 			tableItem = getTableItem(i);
-			if (tableItem.isCounter() && includeCounters == false) {
+			if (tableItem.isCounter() && !includeCounters) {
 				continue;
 			}
-			if (tableItem.isPrimaryKey() && includeCounters == false) {
+			if (tableItem.isPrimaryKey() && !includeCounters) {
 				continue;
 			}
-			if (first == false) {
+			if (!first) {
 				str+=", ";
 				valsBit+=", ";
 			}

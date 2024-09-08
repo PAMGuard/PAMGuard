@@ -11,25 +11,21 @@ import java.util.Vector;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
-import PamController.PamController;
+import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
-import PamUtils.PamCalendar;
 import PamView.PamSidePanel;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
-import PamguardMVC.debug.Debug;
 import effortmonitor.swing.EffortDataMapGraph;
 import effortmonitor.swing.EffortDialog;
 import effortmonitor.swing.EffortDisplayProvider;
 import effortmonitor.swing.EffortSidePanel;
 import pamScrollSystem.AbstractPamScroller;
 import pamScrollSystem.AbstractScrollManager;
-import pamScrollSystem.PamScroller;
 import pamScrollSystem.PamScrollerData;
 import userDisplay.UserDisplayControl;
 
@@ -84,26 +80,26 @@ public class EffortControl extends PamControlledUnit implements PamSettings{
 	public void notifyModelChanged(int changeType) {
 		super.notifyModelChanged(changeType);
 		switch (changeType) {
-		case PamController.INITIALIZATION_COMPLETE:
+		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			scrollManager = AbstractScrollManager.getScrollManager();
 			break;
-		case PamController.NEW_SCROLL_TIME:
+		case PamControllerInterface.NEW_SCROLL_TIME:
 			updateScrollerInfo();
 			break;
-		case PamController.DATA_LOAD_COMPLETE:
+		case PamControllerInterface.DATA_LOAD_COMPLETE:
 			updateScrollerInfo();
 			break;
 		}
 	}
 
 	private void updateScrollerInfo() {
-		if (onEffort == false) {
+		if (!onEffort) {
 			return;
 		}
 		/**
 		 * find out everything we can about every scroller that exists ...
 		 */
-		if (getPamController().isInitializationComplete() == false) {
+		if (!getPamController().isInitializationComplete()) {
 			return;
 		}
 		scrollManager = AbstractScrollManager.getScrollManager();
@@ -119,7 +115,7 @@ public class EffortControl extends PamControlledUnit implements PamSettings{
 	}
 
 	private void updateScrollerData(AbstractPamScroller scroller) {
-		if (scroller.isShowing() == false) {
+		if (!scroller.isShowing()) {
 			// this scroller is not visible on the screen, so no point in recording it
 			return;
 		}
@@ -154,7 +150,7 @@ public class EffortControl extends PamControlledUnit implements PamSettings{
 		EffortDataUnit effortData = effortDataBlock.findActiveUnit(scroller);
 		if (effortData != null) {
 			// old one exists
-			if (effortData.isContinuous() == false) {
+			if (!effortData.isContinuous()) {
 				// but it's needing closed because there is a gap
 				effortData.isContinuous();
 				effortData.setActive(false);
@@ -211,7 +207,7 @@ public class EffortControl extends PamControlledUnit implements PamSettings{
 	 * Quick and dirty to get observer name.
 	 */
 	private void checkObserverName() {
-		if (effortParams.isSet == false) {
+		if (!effortParams.isSet) {
 			while (effortParams.getObserver() == null) {
 				showSettingsDialog(getGuiFrame(), null);
 			}
@@ -349,7 +345,7 @@ public class EffortControl extends PamControlledUnit implements PamSettings{
 	 * @param selected
 	 */
 	public void setOnEffort(boolean selected) {
-		if (onEffort == false && selected == true) {
+		if (!onEffort && selected) {
 			onEffort = showSettingsDialog(getGuiFrame(), null);
 		}
 		else {

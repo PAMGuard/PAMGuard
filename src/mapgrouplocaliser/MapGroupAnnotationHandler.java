@@ -4,7 +4,6 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import annotation.handler.AnnotationChoiceHandler;
 import annotation.handler.AnnotationChoices;
-import annotation.handler.AnnotationHandler;
 import annotation.string.StringAnnotationType;
 import annotation.userforms.UserFormAnnotationType;
 

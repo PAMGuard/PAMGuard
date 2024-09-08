@@ -1,8 +1,11 @@
 package likelihoodDetectionModule;
 
-import java.io.*;
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 /**
  * The TargetConfigurationImporter is used to import a target configuration from an ASCII

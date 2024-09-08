@@ -76,7 +76,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 	/**
 	 * Name associated with the data stream.
 	 */
-	private DataName dataName;
+	private DataMapInfo dataName;
 	
 	private int totalDatas, maxDatas;
 
@@ -146,7 +146,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 		hasDatagram = (dataBlock.getDatagramProvider() != null);
 		dataGraph = new DataGraphFX();
 		dataGraph.setupAxis();
-		dataName = new DataName();
+		dataName = new DataMapInfo();
 		dataName.setName(dataBlock.getDataName()); 
 		dataName.setLongName(dataBlock.getLongDataName()); 
 
@@ -205,7 +205,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 	/**
 	 * @return the dataName
 	 */
-	public DataName getDataName() {
+	public DataMapInfo getDataName() {
 		return dataName;
 	}
 	
@@ -1096,34 +1096,6 @@ public class DataStreamPaneFX extends PamBorderPane {
 		return (long) (xPos / pixelsPerMilli) + scrollingDataPanel.getScreenStartMillis();
 	}
 	
-	public class DataName {
-
-		private String name;
-		
-		private String longDataName;
-
-		public String getName() {
-			return name;
-		}
-		
-		public String getLongtName() {
-			return longDataName;
-		}
-
-		public void setLongName(String longDataName) {
-			this.longDataName=longDataName; 
-		}
-
-		public void setName(String dataName) {
-			this.name=dataName;
-		}
-		
-		@Override
-		public String toString() {
-			return name; 
-		}
-		
-	}
 	
 	/**
 	 * @return the yScaleMin

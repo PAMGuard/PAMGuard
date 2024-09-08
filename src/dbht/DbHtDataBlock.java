@@ -1,12 +1,9 @@
 package dbht;
 
-import dbht.alarm.DbHtAlarmCounter;
-import dbht.alarm.DbHtAlarmProvider;
-import alarm.AlarmCounter;
+import PamguardMVC.PamDataBlock;
 import alarm.AlarmCounterProvider;
 import alarm.AlarmDataSource;
-import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamProcess;
+import dbht.alarm.DbHtAlarmProvider;
 
 public class DbHtDataBlock extends PamDataBlock<DbHtDataUnit> implements AlarmDataSource {
 

@@ -109,7 +109,7 @@ public class MTClassifierTest {
 			//add templates if inpout 
 			if (templates!=null) {
 				mtclassifier.waveformMatch=templates.get(i); 
-				mtclassifier.waveformReject=templates.get(i);; 
+				mtclassifier.waveformReject=templates.get(i); 
 			}
 
 			FastFFT fft = new FastFFT(); 

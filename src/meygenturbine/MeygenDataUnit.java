@@ -2,7 +2,6 @@ package meygenturbine;
 
 import PamUtils.LatLong;
 import PamUtils.PamCalendar;
-import PamguardMVC.DataUnitBaseData;
 import PamguardMVC.PamDataUnit;
 
 public class MeygenDataUnit extends PamDataUnit {

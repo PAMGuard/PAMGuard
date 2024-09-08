@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 import Acquisition.pamAudio.WavFileInputStream;
@@ -45,7 +44,7 @@ public class DWVReader {
 	}
 
 	public boolean openDWV() {
-		if (dwvFile == null || dwvFile.exists() == false) {
+		if (dwvFile == null || !dwvFile.exists()) {
 			return false;
 		}
 		closeDWV();

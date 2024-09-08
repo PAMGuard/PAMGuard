@@ -24,10 +24,6 @@ import javax.swing.Timer;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
 
-import pamScrollSystem.AbstractPamScroller;
-import pamScrollSystem.AbstractPamScrollerAWT;
-import pamScrollSystem.PamScrollObserver;
-import pamScrollSystem.ScrollPaneAddon;
 import Array.ArrayManager;
 import Array.PamArray;
 import PamController.PamController;
@@ -43,6 +39,10 @@ import PamView.dialog.PamLabel;
 import PamView.dialog.PamRadioButton;
 import PamView.panel.PamBorderPanel;
 import PamguardMVC.PamDataBlock;
+import pamScrollSystem.AbstractPamScroller;
+import pamScrollSystem.AbstractPamScrollerAWT;
+import pamScrollSystem.PamScrollObserver;
+import pamScrollSystem.ScrollPaneAddon;
 
 public class ThingHeardTabPanelControl implements PamTabPanel {
 

@@ -34,7 +34,6 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
 import PamView.PamTabPanel;
-import clickDetector.dialogs.ClickMapDialog;
 import clickDetector.dialogs.OverlayOptionsDialog;
 
 /**
@@ -88,6 +87,7 @@ public class ClickTabPanelControl implements PamTabPanel {
 		}
 	}
 
+	@Override
 	public JMenu createMenu(Frame parentFrame) {
 		
 		JMenuItem menuItem;
@@ -123,11 +123,11 @@ public class ClickTabPanelControl implements PamTabPanel {
 		menu.addSeparator();
 		
 		JCheckBoxMenuItem autoArrange = new JCheckBoxMenuItem("Auto arrange windows");
-		autoArrange.setSelected(clickDisplayManager.cdmp.isManualWindowSizes() == false);
+		autoArrange.setSelected(!clickDisplayManager.cdmp.isManualWindowSizes());
 		autoArrange.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				clickDisplayManager.cdmp.setManualWindowSizes(autoArrange.isSelected() == false);
+				clickDisplayManager.cdmp.setManualWindowSizes(!autoArrange.isSelected());
 				if (autoArrange.isSelected()) {
 					clickPanel.arrangeWindows();
 				}
@@ -145,6 +145,7 @@ public class ClickTabPanelControl implements PamTabPanel {
 		return menu;
 	}
 
+	@Override
 	public JComponent getPanel() {
 		return plainPanel;
 	}
@@ -158,6 +159,7 @@ public class ClickTabPanelControl implements PamTabPanel {
 			this.parentFrame = parentFrame;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent ev) {
 //			ClickParameters newParameters = 
 //				ClickDisplayDialog.showDialog(parentFrame, clickControl.clickParameters);
@@ -194,6 +196,7 @@ public class ClickTabPanelControl implements PamTabPanel {
 			this.parentFrame = parentFrame;
 		}
 		
+		@Override
 		public void actionPerformed(ActionEvent ev) {
 			ClickParameters newParameters = 
 				OverlayOptionsDialog.showDialog(parentFrame ,clickControl.clickParameters);
@@ -211,6 +214,7 @@ public class ClickTabPanelControl implements PamTabPanel {
 			this.parentFrame = parentFrame;
 		}
 		
+		@Override
 		public void actionPerformed(ActionEvent ev) {
 			clickPanel.arrangeWindows();
 		}
@@ -220,6 +224,7 @@ public class ClickTabPanelControl implements PamTabPanel {
 		return clickPanel;
 	}
 
+	@Override
 	public JToolBar getToolBar() {
 //		return clickToolBar.getToolBar();
 		return null;

@@ -287,7 +287,7 @@ public class PamGuiTabFX extends PamTabFX {
 					w = (horz) ? (holderWidth / largeWindows) : holderWidth ;
 				}
 				for (int i = 0; i < dw.size(); i++) {
-					if (dw.get(i).getUserDisplayNode().isMinorDisplay()== true) continue;
+					if (dw.get(i).getUserDisplayNode().isMinorDisplay()) continue;
 
 					dw.get(i).setPaneLayout(x, y);
 					
@@ -310,11 +310,11 @@ public class PamGuiTabFX extends PamTabFX {
 				}
 				else {
 					w = (horz) ? (holderWidth / smallWindows) :  holderWidth;
-					h = (horz) ? holderHeight : holderHeight/smallWindows;;
+					h = (horz) ? holderHeight : holderHeight/smallWindows;
 				}
 				
 				for (int i = 0; i < dw.size(); i++) {
-					if (dw.get(i).getUserDisplayNode().isMinorDisplay() == false) continue;
+					if (!dw.get(i).getUserDisplayNode().isMinorDisplay()) continue;
 					dw.get(i).setPaneLayout(x, y);
 					
 					//set the padding if the pane is not the last pane.

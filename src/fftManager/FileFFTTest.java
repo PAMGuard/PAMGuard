@@ -6,8 +6,6 @@ import java.util.Arrays;
 import javax.swing.JOptionPane;
 
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
-
-import wavFiles.WavFile;
 import wavFiles.WavFileReader;
 import wavFiles.WavHeader;
 
@@ -30,7 +28,7 @@ public class FileFFTTest {
 		
 		public void run() {
 			File aFile = new File(fileName);
-			if (aFile.exists() == false) {
+			if (!aFile.exists()) {
 				reportError("Wav file does not exist");
 			}
 			wavFile = new WavFileReader(fileName);

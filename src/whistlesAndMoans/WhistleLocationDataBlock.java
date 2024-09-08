@@ -1,7 +1,6 @@
 package whistlesAndMoans;
 
 import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamProcess;
 
 public class WhistleLocationDataBlock extends PamDataBlock<WhistleToneGroupedDetection> {
 

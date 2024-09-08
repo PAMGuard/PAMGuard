@@ -19,32 +19,35 @@ import PamController.positionreference.PositionReference;
 public class AirgunControl extends PamControlledUnit implements PamSettings, PositionReference {
 
 	AirgunParameters airgunParameters;
-	
+
 	AirgunProcess airgunProcess;
 
 	protected boolean initialisationComplete;
-	
+
 	public AirgunControl(String unitName) {
-		
+
 		super("Airgun Display", unitName);
 
 		airgunParameters = new AirgunParameters();
-		
+
 		addPamProcess(airgunProcess = new AirgunProcess(this));
-		
+
 		PamSettingManager.getInstance().registerSettings(this);
-		
+
 		airgunProcess.findSourceData();
 	}
 
+	@Override
 	public Serializable getSettingsReference() {
 		return airgunParameters;
 	}
 
+	@Override
 	public long getSettingsVersion() {
 		return AirgunParameters.serialVersionUID;
 	}
 
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		if (pamControlledUnitSettings.getVersionNo() != AirgunParameters.serialVersionUID) {
 			return false;
@@ -60,15 +63,16 @@ public class AirgunControl extends PamControlledUnit implements PamSettings, Pos
 		menuItem.addActionListener(new AirgunDisplayOptions(parentFrame));
 		return menuItem;
 	}
-	
+
 	private class AirgunDisplayOptions implements ActionListener {
-		
+
 		Frame frame;
 
 		public AirgunDisplayOptions(Frame frame) {
 			this.frame = frame;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 
 			AirgunParameters newParams = AirgunParametersDialog.showDialog(frame, airgunParameters);
@@ -76,8 +80,8 @@ public class AirgunControl extends PamControlledUnit implements PamSettings, Pos
 				airgunParameters = newParams.clone();
 				airgunProcess.findSourceData();
 			}
-		}	
-		
+		}
+
 	}
 
 	@Override
@@ -87,11 +91,11 @@ public class AirgunControl extends PamControlledUnit implements PamSettings, Pos
 		switch (changeType) {
 		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			initialisationComplete = true;
-			airgunProcess.findSourceData();			
+			airgunProcess.findSourceData();
 			break;
 		case PamControllerInterface.ADD_CONTROLLEDUNIT:
 			if (initialisationComplete) {
-				airgunProcess.findSourceData();			
+				airgunProcess.findSourceData();
 			}
 			break;
 		case PamControllerInterface.NEW_SCROLL_TIME:

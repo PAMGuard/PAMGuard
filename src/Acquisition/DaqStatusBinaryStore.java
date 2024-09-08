@@ -13,7 +13,6 @@ import binaryFileStorage.BinaryHeader;
 import binaryFileStorage.BinaryObjectData;
 import binaryFileStorage.ModuleFooter;
 import binaryFileStorage.ModuleHeader;
-import binaryFileStorage.PackedBinaryObject;
 
 public class DaqStatusBinaryStore extends BinaryDataSource {
 
@@ -50,12 +49,12 @@ public class DaqStatusBinaryStore extends BinaryDataSource {
 
 	@Override
 	public PamDataUnit sinkData(BinaryObjectData binaryObjectData, BinaryHeader bh, int moduleVersion) {
-		ByteArrayInputStream bis = new ByteArrayInputStream(binaryObjectData.getData(), 
+		ByteArrayInputStream bis = new ByteArrayInputStream(binaryObjectData.getData(),
 				0, binaryObjectData.getDataLength());
 		DataInputStream dis = new DataInputStream(bis);
-		
+
 		long adcMilliseconds = 0;
-		long samples = 0; 
+		long samples = 0;
 		Long gpsPPSMillis = null;
 		short status = 0;
 		short reason = 0;
@@ -68,7 +67,7 @@ public class DaqStatusBinaryStore extends BinaryDataSource {
 			gpsPPSMillis = dis.readLong();
 			if (gpsPPSMillis == 0) {
 				// zero must be intrpreted as null (no data) or it can screw up some time corrections in the
-				// network receiver. 
+				// network receiver.
 				gpsPPSMillis = null;
 			}
 			status = dis.readShort();
@@ -97,24 +96,24 @@ public class DaqStatusBinaryStore extends BinaryDataSource {
 			channels = PamUtils.PamUtils.makeChannelMap(acquisitionControl.acquisitionParameters.nChannels);
 			voltsPeak2Peak = acquisitionControl.acquisitionParameters.voltsPeak2Peak;
 		}
-		
+
 		AcquisitionParameters daqParams = new AcquisitionParameters();
 		daqParams.setVoltsPeak2Peak(voltsPeak2Peak);
 		daqParams.setPreamplifier(new Preamplifier(0, null));
 		daqParams.setSampleRate(sampleRate);
 		daqParams.setDaqSystemType(daqSystemType);
 		/**
-		 * Only used in netrx mode and doesn't handle corrected milliseconds. 
+		 * Only used in netrx mode and doesn't handle corrected milliseconds.
 		 */
-		DaqStatusDataUnit dsdu = new DaqStatusDataUnit(binaryObjectData.getTimeMilliseconds(), 
-				adcMilliseconds, adcMilliseconds, samples, gpsPPSMillis, (new Short(status)).toString(), 
+		DaqStatusDataUnit dsdu = new DaqStatusDataUnit(binaryObjectData.getTimeMilliseconds(),
+				adcMilliseconds, adcMilliseconds, samples, gpsPPSMillis, (new Short(status)).toString(),
 				(new Short(reason)).toString(), daqParams, null, duration, clockError);
 		return dsdu;
 	}
 
 	@Override
 	public ModuleHeader sinkModuleHeader(BinaryObjectData binaryObjectData, BinaryHeader bh) {
-		ByteArrayInputStream bis = new ByteArrayInputStream(binaryObjectData.getData(), 
+		ByteArrayInputStream bis = new ByteArrayInputStream(binaryObjectData.getData(),
 				0, binaryObjectData.getDataLength());
 		DataInputStream dis = new DataInputStream(bis);
 		moduleHeader = new DaqStatusModuleHeader(bh.getHeaderFormat());
@@ -127,7 +126,7 @@ public class DaqStatusBinaryStore extends BinaryDataSource {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return moduleHeader;
 	}
 

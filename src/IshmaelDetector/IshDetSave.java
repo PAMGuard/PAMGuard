@@ -6,7 +6,6 @@ package IshmaelDetector;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
-import PamguardMVC.PamObserver;
 import PamguardMVC.PamObserverAdapter;
 
 public class IshDetSave extends PamObserverAdapter
@@ -23,6 +22,7 @@ public class IshDetSave extends PamObserverAdapter
 		ishPeakDataBlock.addObserver(this);	//call update() when unit added
 	}
 
+	@Override
 	public void addData(PamObservable o, PamDataUnit arg1) {
 		IshDetection arg = (IshDetection)arg1; 
 		//inputData = arg.detData;
@@ -35,10 +35,12 @@ public class IshDetSave extends PamObserverAdapter
 	public void saveData() {
 	}
 
+	@Override
 	public String getObserverName() {
 		return "File Saver for Energy Sum";
 	}
 
+	@Override
 	public void setSampleRate(float sampleRate, boolean notify) {
 		this.sampleRate = sampleRate;
 	}

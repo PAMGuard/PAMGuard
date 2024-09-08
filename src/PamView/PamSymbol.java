@@ -587,6 +587,7 @@ public class PamSymbol extends PamSymbolBase implements Serializable, Icon, Clon
 	 * 
 	 * @return an int specifying the fixed width of the icon.
 	 */
+	@Override
 	public int getIconWidth() {
 		int iconWidth = 0;
 		if ((iconStyle & ICON_STYLE_SYMBOL) != 0) {
@@ -603,6 +604,7 @@ public class PamSymbol extends PamSymbolBase implements Serializable, Icon, Clon
 	 * 
 	 * @return an int specifying the fixed height of the icon.
 	 */
+	@Override
 	public int getIconHeight() {
 		if ((iconStyle & ICON_STYLE_SYMBOL) != 0) {
 			return 16;
@@ -613,10 +615,12 @@ public class PamSymbol extends PamSymbolBase implements Serializable, Icon, Clon
 		//		return 16;
 	}
 
+	@Override
 	public boolean isFill() {
 		return getSymbolData().fill;
 	}
 
+	@Override
 	public void setFill(boolean fill) {
 		getSymbolData().fill = fill;
 	}

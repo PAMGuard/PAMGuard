@@ -15,14 +15,12 @@ import java.io.Serializable;
 
 import javax.swing.JMenuItem;
 
-import IshmaelDetector.dataPlotFX.IshmaelDetPlotProvider;
 import IshmaelDetector.layoutFX.IshEnergyPaneFX;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamSettings;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamRawDataBlock;
-import dataPlotsFX.data.TDDataProviderRegisterFX;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
 
 @SuppressWarnings("rawtypes")
@@ -70,6 +68,7 @@ public class EnergySumControl extends IshDetControl implements PamSettings {
 	}
 	
 	class menuSmoothingDetection implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev) {
 //			KernelSmoothingParameters newParams = KernelSmoothingDialog.show(smoothingParameters, smoothingProcess.getOutputDataBlock(0));
 //			if (newParams != null) {
@@ -129,6 +128,7 @@ public class EnergySumControl extends IshDetControl implements PamSettings {
 		return super.restoreSettings(pamControlledUnitSettings);
 	}
 
+	@Override
 	public Serializable getSettingsReference() {
 		return ishDetParams;
 	}
@@ -136,6 +136,7 @@ public class EnergySumControl extends IshDetControl implements PamSettings {
 	/**
 	 * @return An integer version number for the settings
 	 */
+	@Override
 	public long getSettingsVersion() {
 		return EnergySumParams.serialVersionUID;
 	}

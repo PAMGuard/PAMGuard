@@ -4,21 +4,20 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Iterator;
 
-import binaryFileStorage.BinaryOfflineDataMapPoint;
-
-import clickDetector.ClickClassifiers.ClickIdentifier;
-import clickDetector.ClickClassifiers.ClickTypeProvider;
 import PamUtils.BubbleSort;
 import PamView.LineKeyItem;
 import PamView.PamSymbol;
 import PamView.panel.KeyPanel;
 import PamView.symbol.SymbolData;
+import binaryFileStorage.BinaryOfflineDataMapPoint;
+import clickDetector.ClickClassifiers.ClickIdentifier;
+import clickDetector.ClickClassifiers.ClickTypeProvider;
 import dataMap.DataMapDrawing;
+import dataMap.DataStreamPanel.DataGraph;
 import dataMap.OfflineDataMap;
 import dataMap.OfflineDataMapPoint;
-import javafx.scene.canvas.GraphicsContext;
-import dataMap.DataStreamPanel.DataGraph;
 import dataMap.layoutFX.DataStreamPaneFX.DataGraphFX;
+import javafx.scene.canvas.GraphicsContext;
 
 /**
  * Graphics for drawing clikc detections and classification on the data map.

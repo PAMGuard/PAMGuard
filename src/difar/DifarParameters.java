@@ -1,27 +1,17 @@
 package difar;
 
-import generalDatabase.lookupTables.LookupItem;
-import generalDatabase.lookupTables.LookupList;
-
-import java.awt.event.KeyEvent;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
-import javax.swing.KeyStroke;
-
 import Filters.FilterParams;
 import Filters.FilterType;
-import PamController.PamController;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
-import PamUtils.PamCalendar;
-import PamView.PamGui;
-import PamView.PamView;
-import PamguardMVC.PamDataBlock;
-import difar.demux.GreenridgeParams;
+import generalDatabase.lookupTables.LookupItem;
+import generalDatabase.lookupTables.LookupList;
 
 public class DifarParameters implements Serializable, Cloneable, ManagedParameters {
 	
@@ -227,7 +217,7 @@ public class DifarParameters implements Serializable, Cloneable, ManagedParamete
 	 */
 	public boolean showDifarGramFreqLimits = true;
 
-	public static enum DifarDemuxTypes{GREENERIDGE, AMMC_EXPERIMENTAL};
+	public static enum DifarDemuxTypes{GREENERIDGE, AMMC_EXPERIMENTAL}
 
 	public DifarDemuxTypes demuxType=DifarDemuxTypes.AMMC_EXPERIMENTAL;
 	
@@ -237,7 +227,7 @@ public class DifarParameters implements Serializable, Cloneable, ManagedParamete
 	
 	public static final String DefaultGroup = "No group";
 	
-	public static enum DifarOutputTypes{BARTLETT, MVDR};
+	public static enum DifarOutputTypes{BARTLETT, MVDR}
 	
 	/**
 	 * time afterwhich item has been sitting in difargram to autosave if no user interaction

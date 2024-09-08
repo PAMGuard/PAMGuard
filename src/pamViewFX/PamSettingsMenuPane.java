@@ -1,11 +1,8 @@
 package pamViewFX;
 
-import generalDatabase.DBControlUnit;
-
 import java.io.File;
 import java.util.Optional;
 
-import binaryFileStorage.BinaryStore;
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamController.PamControllerInterface;
@@ -18,15 +15,8 @@ import PamController.soundMedium.GlobalMedium;
 import PamController.soundMedium.GlobalMedium.SoundMedium;
 import PamModel.PamModuleInfo;
 import PamUtils.PamFileFilter;
-import pamViewFX.fxGlyphs.PamGlyphDude;
-import pamViewFX.fxNodes.PamButton;
-import pamViewFX.fxNodes.PamVBox;
-import pamViewFX.fxNodes.PamHBox;
-import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
-import pamViewFX.fxNodes.pamDialogFX.PamSettingsDialogFX;
-import pamViewFX.fxNodes.utilityPanes.SettingsDialog;
-import pamViewFX.fxSettingsPanes.StorageOptionsPane;
-import pamViewFX.fxStyles.PamStylesManagerFX;
+import binaryFileStorage.BinaryStore;
+import generalDatabase.DBControlUnit;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
@@ -35,13 +25,23 @@ import javafx.scene.control.Labeled;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Separator;
-import javafx.scene.text.TextAlignment;
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.text.TextAlignment;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
+import pamViewFX.fxGlyphs.PamGlyphDude;
+import pamViewFX.fxNodes.PamButton;
+import pamViewFX.fxNodes.PamHBox;
+import pamViewFX.fxNodes.PamVBox;
+import pamViewFX.fxNodes.pamDialogFX.PamDialogFX;
+import pamViewFX.fxNodes.pamDialogFX.PamSettingsDialogFX;
+import pamViewFX.fxNodes.utilityPanes.SettingsDialog;
+import pamViewFX.fxSettingsPanes.StorageOptionsPane;
+import pamViewFX.fxStyles.PamStylesManagerFX;
 
 /**
  * Pane which holds settings menu. All primary settings are accessed from this pane which sits in a hiding pane to the right 
@@ -134,7 +134,7 @@ public class PamSettingsMenuPane extends PamVBox {
 	    toggleButtonBox.setMaxWidth(Double.MAX_VALUE);
 	    
 	    PamHBox mediumToggleBox = new PamHBox(mediumLabel,toggleButtonBox);
-	    PamHBox.setHgrow(toggleButtonBox, Priority.ALWAYS);
+	    HBox.setHgrow(toggleButtonBox, Priority.ALWAYS);
 	    mediumToggleBox.setAlignment(Pos.CENTER_LEFT);
 	    mediumToggleBox.setSpacing(5);
 	    mediumToggleBox.setPadding(new Insets(0,5,0,0));

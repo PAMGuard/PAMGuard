@@ -1,7 +1,5 @@
 package asiojni;
 
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -9,7 +7,6 @@ import java.util.Set;
 import com.synthbot.jasiohost.AsioChannel;
 import com.synthbot.jasiohost.AsioDriver;
 import com.synthbot.jasiohost.AsioDriverListener;
-import com.synthbot.jasiohost.AsioDriverState;
 import com.synthbot.jasiohost.AsioException;
 import com.synthbot.jasiohost.AsioSampleType;
 

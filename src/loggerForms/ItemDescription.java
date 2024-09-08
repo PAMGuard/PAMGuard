@@ -1,7 +1,5 @@
 package loggerForms;
 
-import generalDatabase.PamTableItem;
-
 public abstract class ItemDescription {
 
 	private FormDescription formDescription;

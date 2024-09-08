@@ -5,9 +5,10 @@ import java.awt.GridBagLayout;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import fftManager.FFTDataBlock;
+
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
+import fftManager.FFTDataBlock;
 
 /**
  * Creates a standard panel to display frequency resolution information

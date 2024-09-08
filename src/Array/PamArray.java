@@ -23,27 +23,21 @@ package Array;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import Acquisition.AcquisitionControl;
-import pamMaths.PamVector;
-import Array.streamerOrigin.HydrophoneOriginMethod;
 import Array.streamerOrigin.OriginSettings;
-import Array.streamerOrigin.StreamerDataIterator;
-import GPS.GpsData;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
-import PamUtils.LatLong;
 import PamUtils.PamArrayUtils;
-import PamUtils.PamCalendar;
 import PamView.PamSymbol;
 import PamguardMVC.ChannelIterator;
 import PamguardMVC.PamConstants;
 import PamguardMVC.PamDataBlock;
+import pamMaths.PamVector;
 
 /**
  * 
@@ -1281,7 +1275,7 @@ public class PamArray implements Serializable, Cloneable, ManagedParameters {
 				return preceeding.getStreamerData();
 			}
 			// otherwise, we also want the next one ...
-			if (streamerIterator.hasNext() == false) {
+			if (!streamerIterator.hasNext()) {
 				return preceeding.getStreamerData();
 			}
 			nextUnit = streamerIterator.next();
@@ -1293,7 +1287,7 @@ public class PamArray implements Serializable, Cloneable, ManagedParameters {
 		double w1 = nextUnit.getTimeMilliseconds()-timeMilliseconds;
 		double w2 = timeMilliseconds-preceeding.getTimeMilliseconds();
 		double wTot = w1+w2;
-		if (wTot == 0 || Double.isFinite(wTot) == false) {
+		if (wTot == 0 || !Double.isFinite(wTot)) {
 			w1 = w2 = 0.5;
 		}
 		else {

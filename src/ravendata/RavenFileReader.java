@@ -2,7 +2,6 @@ package ravendata;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Types;
@@ -189,7 +188,7 @@ private int columnErrors;
 		// now find any extra columns hidden away in there. 
 		extraColumns = new ArrayList<>();
 		for (int i = 0; i < columnNames.size(); i++) {
-			if (isStandard[i] == false) {
+			if (!isStandard[i]) {
 				extraColumns.add(new RavenColumnInfo(i, columnNames.get(i)));
 			}
 		}

@@ -1,7 +1,6 @@
 package Array;
 
 import java.io.Serializable;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 
 import PamModel.parametermanager.ManagedParameters;

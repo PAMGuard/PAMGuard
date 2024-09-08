@@ -13,7 +13,7 @@ import Array.streamerOrigin.GPSOriginSettings;
 import Array.streamerOrigin.HydrophoneOriginMethod;
 import Array.streamerOrigin.HydrophoneOriginMethods;
 import Array.streamerOrigin.OriginSettings;
-import PamController.PamController;
+import PamController.PamControllerInterface;
 import PamController.masterReference.MasterReferencePoint;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
@@ -560,7 +560,7 @@ public class Streamer implements Serializable, Cloneable, ManagedParameters {
 			hydrophoneOrigin.prepare();
 		}
 		switch (changeType) {
-		case PamController.INITIALIZATION_COMPLETE:
+		case PamControllerInterface.INITIALIZATION_COMPLETE:
 //			if (PamController.getInstance().getRunMode() == PamController.RUN_NORMAL) {
 //				makeStreamerDataUnit();
 //			}
@@ -886,7 +886,7 @@ public class Streamer implements Serializable, Cloneable, ManagedParameters {
 			break;
 		case HEIGHT:
 			if (value != null) {
-				setZ(value);;
+				setZ(value);
 			}
 			break;
 		case PITCH:

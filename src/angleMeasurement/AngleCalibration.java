@@ -3,7 +3,6 @@ package angleMeasurement;
 import java.util.Arrays;
 
 import PamUtils.PamUtils;
-
 import pamMaths.Regressions;
 
 /**
@@ -95,7 +94,7 @@ public class AngleCalibration {
 			sortIndexes[i] = Arrays.binarySearch(sortedMeasuredValues, measuredValues[i]);
 			sortedTrueValues[sortIndexes[i]] = trueValues[i];
 		}
-		if (findZero() == false) {
+		if (!findZero()) {
 			return false;
 		}
 		zeroedSortedTrueValues = sortedTrueValues.clone();

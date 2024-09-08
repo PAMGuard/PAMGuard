@@ -11,8 +11,8 @@ import Layout.DisplayPanelProvider;
 import Layout.DisplayProviderList;
 import PamDetection.AbstractLocalisation;
 import PamView.PamColors;
-import PamView.PamSymbol;
 import PamView.PamColors.PamColor;
+import PamView.PamSymbol;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
@@ -42,10 +42,12 @@ public class ClickSpectrogramPlugin implements DisplayPanelProvider {
 		DisplayProviderList.addDisplayPanelProvider(this);
 	}
 
+	@Override
 	public DisplayPanel createDisplayPanel(DisplayPanelContainer displayPanelContainer) {
 		return new BTDisplayPanel(this, displayPanelContainer);
 	}
 
+	@Override
 	public String getDisplayPanelName() {
 		return clickControl.getUnitType() + " - " + clickControl.getUnitName();
 	}
@@ -82,19 +84,23 @@ public class ClickSpectrogramPlugin implements DisplayPanelProvider {
 			return this;
 		}
 
+		@Override
 		public String getObserverName() {
 			return "Plug in BT display panel";
 		}
 
+		@Override
 		public long getRequiredDataHistory(PamObservable o, Object arg) {
 			return 0;
 		}
 
+		@Override
 		public void noteNewSettings() {
 			// TODO Auto-generated method stub
 
 		}
 
+		@Override
 		public void removeObservable(PamObservable o) {
 			// TODO Auto-generated method stub
 
@@ -103,6 +109,7 @@ public class ClickSpectrogramPlugin implements DisplayPanelProvider {
 		float sampleRate = 1;
 		private ClickDataBlock clickDataBlock;
 
+		@Override
 		public void setSampleRate(float sampleRate, boolean notify) {
 			this.sampleRate = sampleRate;
 		}
@@ -119,6 +126,7 @@ public class ClickSpectrogramPlugin implements DisplayPanelProvider {
 		 * the click detector and added to the 
 		 * PamDataBlock
 		 */
+		@Override
 		public void addData(PamObservable o, PamDataUnit arg) {
 
 			clickDataBlock = (ClickDataBlock) o;

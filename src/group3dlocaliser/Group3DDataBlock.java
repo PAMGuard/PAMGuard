@@ -1,6 +1,5 @@
 package group3dlocaliser;
 
-import PamguardMVC.PamDataBlock;
 import PamguardMVC.dataSelector.DataSelectorCreator;
 import PamguardMVC.superdet.SuperDetDataBlock;
 import group3dlocaliser.dataselector.Group3DDataSelectCreator;

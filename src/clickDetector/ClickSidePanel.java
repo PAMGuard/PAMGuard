@@ -1,11 +1,13 @@
 package clickDetector;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -14,20 +16,13 @@ import javax.swing.border.TitledBorder;
 
 import PamUtils.PamCalendar;
 import PamView.PamColors;
-import PamView.PamSidePanel;
 import PamView.PamColors.PamColor;
+import PamView.PamSidePanel;
 import PamView.dialog.PamLabel;
 import PamView.panel.PamBorderPanel;
 import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
-import PamguardMVC.PamObserver;
 import PamguardMVC.PamObserverAdapter;
-import clickDetector.ClickClassifiers.ClickTypeCommonParams;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Insets;
-import javax.swing.JButton;
 
 public class ClickSidePanel extends PamObserverAdapter implements PamSidePanel {
 
@@ -125,7 +120,8 @@ public class ClickSidePanel extends PamObserverAdapter implements PamSidePanel {
          *
          * @param e
          */
-        public void actionPerformed(ActionEvent e) {
+        @Override
+		public void actionPerformed(ActionEvent e) {
 //            int[] codeList = clickControl.getClickIdentifier().getCodeList();
 //            ClickTypeCommonParams commonParams = null;
 //            for (int i=0; i<codeList.length; i++) {
@@ -185,16 +181,19 @@ public class ClickSidePanel extends PamObserverAdapter implements PamSidePanel {
 		}
 	}
 
+	@Override
 	public JComponent getPanel() {
 		return sidePanel;
 	}
 
+	@Override
 	public void rename(String newName) {
 		titledBorder.setTitle(newName);	
 		sidePanel.repaint();		
 	}
 	
 	class TimerEvent implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			sidePanel.fillData();	
 		}

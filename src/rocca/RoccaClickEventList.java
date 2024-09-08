@@ -20,10 +20,27 @@
  */
 package rocca;
 
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import java.awt.*;
-import java.awt.event.*;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 
 /**
  * Creates a modal dialog box containing the current Click Events, and allows the user
@@ -94,7 +111,8 @@ public class RoccaClickEventList extends JDialog implements ActionListener {
             //of the list.  An alternative would be to set the unitIncrement
             //of the JScrollBar to a fixed value. You wouldn't get the nice
             //aligned scrolling, but it should work.
-            public int getScrollableUnitIncrement(Rectangle visibleRect,
+            @Override
+			public int getScrollableUnitIncrement(Rectangle visibleRect,
                                                   int orientation,
                                                   int direction) {
                 int row;
@@ -165,7 +183,8 @@ public class RoccaClickEventList extends JDialog implements ActionListener {
     }
 
     //Handle clicks on the buttons.
-    public void actionPerformed(ActionEvent e) {
+    @Override
+	public void actionPerformed(ActionEvent e) {
     	if (e.getSource()==analyzeButton) {
         	RoccaClickEventList.value = list.getSelectedIndices();
             RoccaClickEventList.dialog.setVisible(false);

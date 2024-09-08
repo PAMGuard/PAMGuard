@@ -81,7 +81,7 @@ public class WhistleControl extends PamControlledUnit implements PamSettings {
 		
 		PamSettingManager.getInstance().registerSettings(this);
 		
-		if (whistleParameters.ackOutOfDate == false) {
+		if (!whistleParameters.ackOutOfDate) {
 			boolean ans = DeprecatedModuleDialog.showDialog(null, 
 					"Whistle Detector", "Whistle and Moan Detector", 
 			"detectors.whistleMoanHelp.docs.whistleMoan_Overview");
@@ -121,6 +121,7 @@ public class WhistleControl extends PamControlledUnit implements PamSettings {
 			this.parentFrame = parentFrame;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent ev) {
 			WhistleParameters newParams = WhistleParametersDialog.showDialog(parentFrame, THIS, whistleParameters, whistleDetector.getSampleRate());
 			if (newParams != null) {
@@ -131,14 +132,17 @@ public class WhistleControl extends PamControlledUnit implements PamSettings {
 		}
 	}
 
+	@Override
 	public Serializable getSettingsReference() {
 		return whistleParameters;
 	}
 
+	@Override
 	public long getSettingsVersion() {
 		return WhistleParameters.serialVersionUID;
 	}
 
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		whistleParameters = ((WhistleParameters) pamControlledUnitSettings.getSettings()).clone();
 		return true;

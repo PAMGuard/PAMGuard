@@ -25,8 +25,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
-
-
 import Array.streamerOrigin.HydrophoneOriginMethod;
 import PamController.PamController;
 
@@ -219,6 +217,7 @@ public class HydrophoneDialogPanel implements ActionListener, ListSelectionListe
 		hydrophoneTableData.fireTableDataChanged();
 	}
 
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == recentArrays) {
 			arrayDialog.newArraySelection();
@@ -573,7 +572,7 @@ public class HydrophoneDialogPanel implements ActionListener, ListSelectionListe
 			/**
 			 * and the hydrophones ...
 			 */
-			if (phonesToo == false) {
+			if (!phonesToo) {
 				return;
 			}
 			int nPhones = currentArray.getHydrophoneCount();
@@ -694,11 +693,13 @@ public class HydrophoneDialogPanel implements ActionListener, ListSelectionListe
 
 	class HydrophoneTableData extends AbstractTableModel {
 
+		@Override
 		public int getColumnCount() {
 			return hydrophoneColumns.length;
 		}
 		
 
+		@Override
 		public int getRowCount() {
 			PamArray currentArray = getDialogSelectedArray();
 			if (currentArray == null) return 0;
@@ -710,6 +711,7 @@ public class HydrophoneDialogPanel implements ActionListener, ListSelectionListe
 			return hydrophoneColumns[column];
 		}
 
+		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			PamArray array = getDialogSelectedArray();
 			Hydrophone hydrophone = array.getHydrophone(rowIndex);
@@ -750,6 +752,7 @@ public class HydrophoneDialogPanel implements ActionListener, ListSelectionListe
 	/* (non-Javadoc)
 	 * @see javax.swing.event.ListSelectionListener#valueChanged(javax.swing.event.ListSelectionEvent)
 	 */
+	@Override
 	public void valueChanged(ListSelectionEvent e) {
 		enableButtons();		
 	}

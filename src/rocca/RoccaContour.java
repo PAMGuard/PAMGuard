@@ -23,17 +23,14 @@
 
 package rocca;
 
+import java.util.ListIterator;
+
 import PamUtils.PamUtils;
 import PamUtils.complex.ComplexArray;
 import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.RawDataUnavailableException;
-import fftManager.Complex;
 import fftManager.FFTDataBlock;
 import fftManager.FFTDataUnit;
-import java.util.ListIterator;
-import whistleDetector.ShapeDataUnit;
-import whistleDetector.WhistlePeak;
-import whistleDetector.WhistleShape;
 
 /**
  *

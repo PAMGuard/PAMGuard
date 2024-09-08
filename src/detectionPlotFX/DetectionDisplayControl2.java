@@ -2,7 +2,6 @@ package detectionPlotFX;
 
 import java.util.ArrayList;
 
-import PamController.PamController;
 import PamController.PamControllerInterface;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
@@ -39,7 +38,7 @@ public class DetectionDisplayControl2 extends UserDisplayControlFX {
 	private DetectionDataObserver detectionDataObserver;
 	
 	
-	private PamInternalPane internalFrame;; 
+	private PamInternalPane internalFrame; 
 
 
 	public DetectionDisplayControl2(String unitName) {

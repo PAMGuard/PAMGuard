@@ -9,17 +9,19 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.Arrays;
+
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
+
 import Acquisition.AcquisitionControl;
 import GPS.GpsData;
 import Layout.PamAxis;
 import Layout.PamAxisPanel;
 import PamController.PamController;
 import PamUtils.LatLong;
+import PamView.PamColors.PamColor;
 import PamView.PamSymbol;
 import PamView.PamSymbolType;
-import PamView.PamColors.PamColor;
 import PamView.panel.PamBorder;
 import pamMaths.PamVector;
 

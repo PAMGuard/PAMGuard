@@ -47,6 +47,7 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+
 import Array.ArrayManager;
 import Array.PamArray;
 import Array.SnapshotGeometry;
@@ -70,12 +71,12 @@ import PamView.ColorManaged;
 import PamView.ColourArray;
 import PamView.ColourScheme;
 import PamView.PamColors;
+import PamView.PamColors.PamColor;
 import PamView.PamKeyItem;
 import PamView.PamSymbol;
 import PamView.PamSymbolType;
 import PamView.PanelOverlayDraw;
 import PamView.SymbolKeyItem;
-import PamView.PamColors.PamColor;
 import PamView.panel.JPanelWithPamKey;
 import PamView.panel.KeyPanel;
 import PamView.paneloverlay.OverlayCheckboxMenuItem;
@@ -84,7 +85,6 @@ import PamView.paneloverlay.overlaymark.MarkOverlayDraw;
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.PamSymbolManager;
 import PamView.symbol.SymbolData;
-import PamView.symbol.modifier.SymbolModifier;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
@@ -211,7 +211,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 	@Override
 	public void paintComponent(Graphics g) {
 
-		if (isShowing() == false || g == null)
+		if (!isShowing() || g == null)
 			return;
 
 		super.paintComponent(g);
@@ -246,7 +246,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 		 */
 		if (repaintBase || lastHeight != getHeight() || lastWidth != getWidth() || lastMapRangeMetres != mapRangeMetres
 				|| lastMapRotationDegrees != rectProj.getMapRotationDegrees()
-				|| lastMapCentreDegrees.equals(mapCentreDegrees) == false) {
+				|| !lastMapCentreDegrees.equals(mapCentreDegrees)) {
 			lastHeight = getHeight();
 			lastWidth = getWidth();
 			lastMapCentreDegrees = mapCentreDegrees.clone();
@@ -397,7 +397,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 		}
 
 		if (grid != null) {
-			if (simpleMapRef.mapParameters.hideGrid == false) {
+			if (!simpleMapRef.mapParameters.hideGrid) {
 				grid.drawGrid(g, rectProj);
 			}
 			myCompass.drawCompass(g, rectProj);
@@ -469,7 +469,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 	}
 
 	private void drawRotatedSurface(Graphics2D g) {
-		double mapScale = 2 * Math.PI * rectProj.EARTHRADIUS * rectProj.pixelsPerMetre / 360.0;
+		double mapScale = 2 * Math.PI * MapRectProjector.EARTHRADIUS * rectProj.pixelsPerMetre / 360.0;
 		mapScale = rectProj.pixelsPerMetre;
 		int[] px = new int[4];
 		int[] py = new int[4];
@@ -502,7 +502,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 	 * @return true if the entire surface should be filled, not a rated rectangle.
 	 */
 	public boolean isFillSurface() {
-		return (rectProj.getMapVerticalRotationDegrees() == 0. && simpleMapRef.getMapParameters().hideSurface == false);
+		return (rectProj.getMapVerticalRotationDegrees() == 0. && !simpleMapRef.getMapParameters().hideSurface);
 	}
 
 	/**
@@ -660,7 +660,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 	}
 
 	private void paintContours(Graphics g) {
-		if (prepareContourData() == false) {
+		if (!prepareContourData()) {
 			return;
 		}
 		MapFileManager mapManager = simpleMapRef.mapFileManager;
@@ -806,7 +806,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 	}
 	
 	public EffortProvider findEffortProvider() {
-		if (simpleMapRef.mapParameters.colourByEffort == false) {
+		if (!simpleMapRef.mapParameters.colourByEffort) {
 			return null;
 		}
 		if (simpleMapRef.effortDataBlock == null) {
@@ -924,7 +924,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 						}
 						
 						gpsData = dataUnit.getGpsData();
-						if (gpsData.isDataOk() == false) {
+						if (!gpsData.isDataOk()) {
 							continue;
 						}
 						c2 = rectProj.getCoord3d(gpsData.getLatitude(), gpsData.getLongitude(), 0.);
@@ -1169,7 +1169,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 				if (mapDetectionData == null) {
 					return; // this should never happen !
 				}
-				if (mapDetectionData.select == false) {
+				if (!mapDetectionData.select) {
 					return;
 				}
 				if (mapDetectionData.fade) {
@@ -1191,10 +1191,10 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 					rectProj.setPamSymbolChooser(null);
 				}
 				boolean contin = dataBlock.getOverlayDraw().preDrawAnything(g, dataBlock, rectProj);
-				if (contin == false) {
+				if (!contin) {
 					return;
 				}
-				if (mapDetectionData.allAvailable == true) {
+				if (mapDetectionData.allAvailable) {
 					earliestToPlot = 0;
 				} else if (sliderVal != null) {
 					earliestToPlot = now - 1000 * sliderVal;
@@ -1210,7 +1210,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 				}
 				// tempDataUnitId = dataBlock.getDataName() + ", "
 				// + dataBlock.getParentProcess().getProcessName();
-				if (mapDetectionData.select == false) {
+				if (!mapDetectionData.select) {
 					return;
 				}
 				ds = dataBlock.getDataSelector(simpleMapRef.getUnitName(), false, DATASELECTNAME);
@@ -1223,7 +1223,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 					// dataUnit.getLastChangeTime() < earliestToPlot) {
 					// continue; // functionality moved into shouldPlot.
 					// }
-					if (simpleMapRef.shouldPlot(dataUnit, mapDetectionData, earliestToPlot, now, null) == false) {
+					if (!simpleMapRef.shouldPlot(dataUnit, mapDetectionData, earliestToPlot, now, null)) {
 						continue;
 					}
 					rectProj.setDataSelector(ds);
@@ -1394,6 +1394,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 		repaint(250);
 	}
 
+	@Override
 	public String getObserverName() {
 		return "Map Panel";
 	}
@@ -1479,10 +1480,10 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 	}
 
 	protected void createKey() {
-		if (PamController.getInstance().isInitializationComplete() == false) {
+		if (!PamController.getInstance().isInitializationComplete()) {
 			return;
 		}
-		if (simpleMapRef.mapParameters.showKey == false) {
+		if (!simpleMapRef.mapParameters.showKey) {
 			// keyPanel.getPanel().setVisible(false);
 			this.setKeyPanel(null);
 			return;
@@ -1499,7 +1500,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 				dataBlock = detectorDataBlocks.get(m);
 				// tempDataUnitId = detectorDataBlocks.get(m).getDataName() + ", "
 				// + detectorDataBlocks.get(m).getParentProcess().getProcessName();
-				if (dataBlock.canDraw(rectProj) == false)
+				if (!dataBlock.canDraw(rectProj))
 					continue;
 				if (simpleMapRef.shouldPlot(dataBlock)) {
 					SymbolData symbolData = null;
@@ -1530,7 +1531,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 			// private Color[] contourColours = null;
 			// private int[] contourDepths = null;
 			for (int i = 0; i < wantedContours.length; i++) {
-				if (wantedContours[i] == false) {
+				if (!wantedContours[i]) {
 					continue;
 				}
 				keyPanel.add(createContourKeyItem(contourDepths[i], contourColours[i]));
@@ -1685,6 +1686,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 	JCheckBoxMenuItem panZoomMenu, showGpsMenu, showKeyMenu;
 
 	class ShowKey implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			simpleMapRef.mapParameters.showKey = showKeyMenu.isSelected();
 			createKey();
@@ -1692,6 +1694,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 	}
 
 	class ShowPanZoom implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			simpleMapRef.mapParameters.showPanZoom = panZoomMenu.isSelected();
 			simpleMapRef.showMapObjects();
@@ -1699,6 +1702,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 	}
 
 	class ShowGpsMenu implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			simpleMapRef.mapParameters.showGpsData = showGpsMenu.isSelected();
 			simpleMapRef.showMapObjects();
@@ -1713,6 +1717,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 			this.mapDetectionData = mapDetectionData;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			OverlayCheckboxMenuItem menuItem = (OverlayCheckboxMenuItem) e.getSource();
 			Point mousePoint = MouseInfo.getPointerInfo().getLocation();
@@ -1767,6 +1772,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 
 	class OverlayOptions implements ActionListener {
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			Frame frame = (JFrame) PamController.getMainFrame();
 			if (mapController.getPamView() != null) {
@@ -1855,11 +1861,13 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 //	}
 
 	class SettingsAction implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			// spectrogramDisplay.SetSettings();
 		}
 	}
 
+	@Override
 	public long getRequiredDataHistory(PamObservable o, Object arg) {
 		MapDetectionData mdd = simpleMapRef.mapDetectionsManager.findDetectionData((PamDataBlock) o);
 		if (mdd != null) {
@@ -1869,6 +1877,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 		}
 	}
 
+	@Override
 	public void noteNewSettings() {
 		createKey();
 	}
@@ -1895,6 +1904,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 		this.setMapRangeMetres(newVal);
 	}
 
+	@Override
 	public void removeObservable(PamObservable o) {
 
 	}
@@ -1994,7 +2004,7 @@ public class MapPanel extends JPanelWithPamKey implements PamObserver, ColorMana
 		if (tip == null) {
 			return tip;
 		}
-		if (tip.startsWith("<html>GPS") == false) {
+		if (!tip.startsWith("<html>GPS")) {
 			return tip;
 		}
 		

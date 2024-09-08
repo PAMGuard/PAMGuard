@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
-import Acquisition.filedate.FileDate;
 import PamUtils.FileParts;
 
 public class D2TextTime {
@@ -39,13 +38,13 @@ public class D2TextTime {
 		if (end == null) {
 			return Long.MIN_VALUE;
 		}
-		if (end.equalsIgnoreCase("wav")  == false) {
+		if (!end.equalsIgnoreCase("wav")) {
 			return Long.MIN_VALUE;
 		}
 		String txtFileName = wavFileName.replace(".wav", ".txt");
 		txtFileName = txtFileName.replace(".WAV", ".txt");
 		File txtFile = new File(txtFileName);
-		if (txtFile.exists() == false) {
+		if (!txtFile.exists()) {
 			return Long.MIN_VALUE;
 		}
 		long fileTime = Long.MIN_VALUE;

@@ -1,14 +1,20 @@
 package likelihoodDetectionModule;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.util.ArrayList;
+
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.border.TitledBorder;
+import javax.swing.table.DefaultTableColumnModel;
+
 import PamDetection.RawDataUnit;
 import PamView.dialog.PamDialog;
 import PamView.dialog.SourcePanel;
-
-import javax.swing.*;
-import java.awt.*;
-import javax.swing.border.*;
-import java.util.ArrayList;
-import javax.swing.table.DefaultTableColumnModel;
 
 /**
  * The class LikelihoodDetectionParametersDialog is created by the LikelihoodDetectionUnit to

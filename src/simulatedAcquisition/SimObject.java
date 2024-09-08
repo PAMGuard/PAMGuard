@@ -7,9 +7,9 @@ import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
+import PamUtils.LatLong;
 import simulatedAcquisition.movement.MovementModel;
 import simulatedAcquisition.movement.MovementModels;
-import PamUtils.LatLong;
 
 /**
  * Information on a single simulated object

@@ -6,10 +6,10 @@ import java.util.Vector;
 
 import javax.swing.JPopupMenu;
 
-import dataMap.OfflineDataMap;
-import pamScrollSystem.coupling.ScrollerCoupling;
 import PamController.PamController;
 import PamguardMVC.PamDataBlock;
+import dataMap.OfflineDataMap;
+import pamScrollSystem.coupling.ScrollerCoupling;
 
 public abstract class AbstractScrollManager {
 

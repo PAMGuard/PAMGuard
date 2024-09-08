@@ -23,18 +23,18 @@
 
 package rocca;
 
-import Acquisition.AcquisitionProcess;
-import Acquisition.FileInputSystem;
-import PamController.PamController;
-import PamUtils.PamCalendar;
-import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamProcess;
 import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
 
+import Acquisition.AcquisitionProcess;
+import Acquisition.FileInputSystem;
+import PamController.PamController;
+import PamUtils.PamCalendar;
+import PamguardMVC.PamDataBlock;
+import PamguardMVC.PamProcess;
 import clickDetector.ClickDetection;
 import clickDetector.ClickClassifiers.basicSweep.ZeroCrossingStats;
 
@@ -912,7 +912,7 @@ public class RoccaContourDataBlock extends PamDataBlock<RoccaContourDataUnit> {
         // 2017/11/30 synchronize to make sure that the data doesn't accidentally get erased halfway through the calc 
         double[] waveData;
         synchronized (clickDetection) {
-        	waveData = clickDetection.applyHanningWindow(clickDetection.getWaveData()[0]);
+        	waveData = ClickDetection.applyHanningWindow(clickDetection.getWaveData()[0]);
 		}
     	
     	// calculate the peak frequency
@@ -1003,7 +1003,7 @@ public class RoccaContourDataBlock extends PamDataBlock<RoccaContourDataUnit> {
         if (clickNoise != null) {
         	double[] noiseData;
         	synchronized (clickNoise) {
-    	    	noiseData = clickDetection.applyHanningWindow(clickNoise.getWaveData()[0]);
+    	    	noiseData = ClickDetection.applyHanningWindow(clickNoise.getWaveData()[0]);
 			}
 	    	double sumNoise = 0;
 	        for (int i = 0; i < noiseData.length; i++)
@@ -1348,7 +1348,7 @@ public class RoccaContourDataBlock extends PamDataBlock<RoccaContourDataUnit> {
         // serialVersionUI=22 2015/09/09
         if (PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW) {
 	        boolean success = roccaProcess.rldb.saveViewerData();
-			if (success == false) {
+			if (!success) {
 				System.out.println("RoccaContourDataBlock:  Unable to save info to database");
 	//		} else {
 	//			System.out.println("RoccaContourDataBlock:  info saved to database");
@@ -1378,7 +1378,7 @@ public class RoccaContourDataBlock extends PamDataBlock<RoccaContourDataUnit> {
 		try {
 			AcquisitionProcess sourceProcess = (AcquisitionProcess) roccaProcess.getSourceProcess();
 			Acquisition.DaqSystem daqSystem = sourceProcess.getAcquisitionControl().findDaqSystem(null);
-			if (daqSystem != null & daqSystem.isRealTime() == false) {
+			if (daqSystem != null & !daqSystem.isRealTime()) {
 				// assume it's a file name.
                 // MIGHT NOT WORK IF THIS IS A LINE INPUT - TEST
 				Acquisition.FileInputSystem fileSystem = (FileInputSystem) daqSystem;

@@ -39,10 +39,10 @@ import rawDeepLearningClassifier.dlClassification.delphinID.DelphinIDClassifier;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericDLClassifier;
 import rawDeepLearningClassifier.dlClassification.ketos.KetosClassifier2;
 import rawDeepLearningClassifier.dlClassification.koogu.KooguClassifier;
+import rawDeepLearningClassifier.layoutFX.DLSettingsPane;
 import rawDeepLearningClassifier.layoutFX.DLSidePanelSwing;
 import rawDeepLearningClassifier.layoutFX.DLSymbolManager;
 import rawDeepLearningClassifier.layoutFX.PredictionSymbolManager;
-import rawDeepLearningClassifier.layoutFX.DLSettingsPane;
 import rawDeepLearningClassifier.logging.DLAnnotationType;
 import rawDeepLearningClassifier.logging.DLDataUnitDatagram;
 import rawDeepLearningClassifier.logging.DLDetectionBinarySource;
@@ -273,7 +273,6 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 		if (this.isViewer) {
 			dlOfflineProcess = new DLOfflineProcess(this);
 		}
-		;
 
 		// register click detector for the javafx display.
 		TDDataProviderRegisterFX.getInstance()
@@ -385,7 +384,7 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		RawDLParams newParameters = (RawDLParams) pamControlledUnitSettings.getSettings();
-		;
+		
 		rawDLParmas = newParameters.clone();
 		return true;
 	}
@@ -497,6 +496,7 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	 * @param flag. The GUI type flag defined in PAMGuiManager.
 	 * @return the GUI for the PamControlledUnit unit.
 	 */
+	@Override
 	public PamControlledUnitGUI getGUI(int flag) {
 		if (flag == PamGUIManager.FX) {
 			if (rawGUIFX == null) {

@@ -61,6 +61,7 @@ public class DepthDialog extends PamDialog {
 	
 	private class HitEnter implements ActionListener {
 
+		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			System.out.println("Hit enter");
 		}

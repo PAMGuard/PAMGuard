@@ -17,15 +17,15 @@ public class AirgunParameters implements Serializable, Cloneable, ManagedParamet
 	public static final int GUNS_FIXEDPOSITION = 2;
 
 	static public final long serialVersionUID = 1;
-	
+
 	/**
 	 * True if guns are on this vessel
 	 */
 	private boolean gunsThisVessel = true;
-	
+
 	public int gunsReferencePosition = GUNS_THIS_VESSEL;
 	private boolean hasGunsReferencePosition = false;
-	
+
 	/**
 	 * mmsi number of vessel if guns are on another vessel
 	 */
@@ -35,54 +35,54 @@ public class AirgunParameters implements Serializable, Cloneable, ManagedParamet
 	 * distance in m towards the stern from the vessels GPS receiver
 	 */
 	double dimE = 20;
-	
+
 	/**
 	 * distance in m towards the starboard side from the vessels GPS receiver
 	 */
 	double dimF = 0;
-	
+
 	/**
-	 * Gun depth in metres. 
+	 * Gun depth in metres.
 	 */
 	double gunDepth = 0;
-	
+
 	/**
 	 * Show exclusion zone on the map
 	 */
 	boolean showExclusionZone = true;
-	
+
 	/**
 	 * radius of exclusion xone in m
 	 */
 	int exclusionRadius = 500;
-	
+
 	/**
 	 * Colour for exclusion zone on map.
 	 */
 	Color exclusionColor = Color.RED;
-	
+
 	/**
 	 * predict where we'll be in a certain time
 	 */
 	boolean predictAhead = false;
-	
+
 	/**
 	 *  prediction time in seconds
 	 */
 	int secondsAhead = 600;
-	
+
 	public LatLong fixedPosition;
-	
+
 
 	@Override
 	public AirgunParameters clone() {
 		try {
 			AirgunParameters np =  (AirgunParameters) super.clone();
-			if (np.hasGunsReferencePosition == false) {
+			if (!np.hasGunsReferencePosition) {
 				// sort out what happens if old boolean ref was used
-				// instead of new int type. 
+				// instead of new int type.
 				np.hasGunsReferencePosition = true;
-				if (np.gunsThisVessel == false) {
+				if (!np.gunsThisVessel) {
 					np.gunsReferencePosition = GUNS_AIS_VESSEL;
 				}
 			}
@@ -93,7 +93,7 @@ public class AirgunParameters implements Serializable, Cloneable, ManagedParamet
 		}
 		return null;
 	}
-	
+
 	@Override
 	public PamParameterSet getParameterSet() {
 		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DISPLAY);

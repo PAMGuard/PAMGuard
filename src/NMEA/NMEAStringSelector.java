@@ -4,12 +4,9 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
-import PamController.PamControlledUnit;
 import PamController.PamController;
-import PamView.dialog.PamDialogPanel;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
-import PamguardMVC.PamObserver;
 import PamguardMVC.PamObserverAdapter;
 
 /**

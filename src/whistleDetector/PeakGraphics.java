@@ -28,12 +28,12 @@ import java.util.ArrayList;
 
 import PamUtils.Coordinate3d;
 import PamView.GeneralProjector;
+import PamView.GeneralProjector.ParameterType;
+import PamView.GeneralProjector.ParameterUnits;
 import PamView.PamKeyItem;
 import PamView.PamSymbol;
 import PamView.PamSymbolType;
 import PamView.PanelOverlayDraw;
-import PamView.GeneralProjector.ParameterType;
-import PamView.GeneralProjector.ParameterUnits;
 import PamView.symbol.SymbolData;
 import PamguardMVC.PamDataUnit;
 
@@ -57,6 +57,7 @@ public class PeakGraphics extends PanelOverlayDraw {
 		this.whistleDetector = whistleDetector;
 	}
 
+	@Override
 	public boolean canDraw(ParameterType[] parameterTypes, ParameterUnits[] parameterUnits) {
 		if (parameterTypes[0] == ParameterType.TIME
 				&& parameterTypes[1] == ParameterType.FREQUENCY)
@@ -64,6 +65,7 @@ public class PeakGraphics extends PanelOverlayDraw {
 		return false;
 	}
 
+	@Override
 	public Rectangle drawDataUnit(Graphics g, PamDataUnit pamDataUnit,
 			GeneralProjector projector) {
 		if (projector.getParmeterType(0) == ParameterType.TIME

@@ -1,13 +1,12 @@
 package IshmaelDetector;
 
 
+import PamUtils.complex.ComplexArray;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import fftManager.FFTDataBlock;
 import fftManager.FFTDataUnit;
-import IshmaelDetector.IshDetFnDataUnit;
-import PamUtils.complex.ComplexArray;
 
 /* 
  * Process for the energy sum detector. 

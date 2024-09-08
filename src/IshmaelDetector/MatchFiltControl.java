@@ -52,6 +52,7 @@ public class MatchFiltControl extends IshDetControl implements PamSettings
 	}
 	
 	class menuSmoothingDetection implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev) {
 		}
 	}
@@ -77,6 +78,7 @@ public class MatchFiltControl extends IshDetControl implements PamSettings
 		return super.restoreSettings(pamControlledUnitSettings);
 	}
 
+	@Override
 	public Serializable getSettingsReference() {
 		return ishDetParams;
 	}
@@ -84,6 +86,7 @@ public class MatchFiltControl extends IshDetControl implements PamSettings
 	/**
 	 * @return An integer version number for the settings
 	 */
+	@Override
 	public long getSettingsVersion() {
 		return MatchFiltParams.serialVersionUID;
 	}

@@ -7,7 +7,6 @@ import java.io.Serializable;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 
-import Array.ArrayManager;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;

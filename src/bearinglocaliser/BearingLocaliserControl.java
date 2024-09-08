@@ -14,13 +14,12 @@ import Localiser.LocalisationAlgorithm;
 import Localiser.LocalisationAlgorithmInfo;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
-import PamController.PamController;
+import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamDetection.LocContents;
 import PamUtils.SimpleObservable;
 import PamguardMVC.PamDataUnit;
-import beamformer.algorithms.BeamAlgorithmProvider;
 import bearinglocaliser.algorithms.BearingAlgorithm;
 import bearinglocaliser.algorithms.BearingAlgorithmProvider;
 import bearinglocaliser.annotation.BearingAnnotationType;
@@ -96,7 +95,7 @@ public class BearingLocaliserControl extends PamControlledUnit implements PamSet
 				showDetectionMenu(parentFrame);
 			}
 		});
-		if (isViewer() == false) {
+		if (!isViewer()) {
 			return menuItem;
 		}
 		JMenu menu = new JMenu(getUnitName());
@@ -128,7 +127,7 @@ public class BearingLocaliserControl extends PamControlledUnit implements PamSet
 	@Override
 	public void notifyModelChanged(int changeType) {
 		switch(changeType) {
-		case PamController.INITIALIZATION_COMPLETE:
+		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			detectionMonitor.prepareProcess();
 			bearingProcess.prepareBearingGroups();
 			break;

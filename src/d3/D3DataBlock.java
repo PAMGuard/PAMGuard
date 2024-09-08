@@ -1,8 +1,7 @@
 package d3;
 
-import fileOfflineData.OfflineFileProcess;
 import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamProcess;
+import fileOfflineData.OfflineFileProcess;
 
 public class D3DataBlock extends PamDataBlock<D3DataUnit> {
 

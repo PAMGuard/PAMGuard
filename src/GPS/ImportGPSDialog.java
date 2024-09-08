@@ -63,7 +63,7 @@ public class ImportGPSDialog extends PamDialog{
 		importGPS.add(BorderLayout.CENTER, p);
 		setDialogComponent(importGPS);
 		
-		setLocation(location);;
+		setLocation(location);
 		
 		
 		
@@ -115,6 +115,7 @@ public class ImportGPSDialog extends PamDialog{
 	class BrowseButtonAction implements ActionListener {
 		
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			
 			File lastFile;

@@ -1,9 +1,9 @@
 package Array;
 
-import generalDatabase.SQLLogging;
-import generalDatabase.SQLTypes;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import generalDatabase.SQLLogging;
+import generalDatabase.SQLTypes;
 
 public class HydrophoneSQLLogging extends SQLLogging {
 	

@@ -79,10 +79,12 @@ public class IshDetGraphics implements DisplayPanelProvider, PamSettings {
 		PamSettingManager.getInstance().registerSettings(this); 
 	}
 
+	@Override
 	public DisplayPanel createDisplayPanel(DisplayPanelContainer displayPanelContainer) {
 		return new IshDisplayPanel(this, displayPanelContainer);
 	}
 
+	@Override
 	public String getDisplayPanelName() {
 		return ishDetControl.getUnitName() + " graphics";
 	}
@@ -145,8 +147,9 @@ public class IshDetGraphics implements DisplayPanelProvider, PamSettings {
 			//menuAutoScale = new JCheckBoxMenuItem(" Test");
 			scaleMenuItem = new JMenuItem("Scale settings...");
 			scaleMenuItem.addActionListener( action ->{ 
+				PamController.getInstance();
 				//show a dialog with options to change Ishmael detectior scale settings. 
-				IshDisplayParams newIshDisplayParams = IshDisplayDialog.showDialog(PamController.getInstance().getMainFrame(), ishDisplayParams); 
+				IshDisplayParams newIshDisplayParams = IshDisplayDialog.showDialog(PamController.getMainFrame(), ishDisplayParams); 
 				//System.out.println("NewIshDisplayParams: " + newIshDisplayParams.verticalScaleFactor);
 				if (newIshDisplayParams!=null) {
 					ishDisplayParams=newIshDisplayParams;
@@ -183,17 +186,21 @@ public class IshDetGraphics implements DisplayPanelProvider, PamSettings {
 				ishDetDataBlock.deleteObserver(this);
 		}
 
+		@Override
 		public String getObserverName() {
 			return displayPanelProvider.getDisplayPanelName();
 		}
 
+		@Override
 		public long getRequiredDataHistory(PamObservable o, Object arg) {
 			return 0;
 		}
 
+		@Override
 		public void noteNewSettings() {	
 		}
 
+		@Override
 		public void removeObservable(PamObservable o) {
 		}
 
@@ -224,10 +231,12 @@ public class IshDetGraphics implements DisplayPanelProvider, PamSettings {
 
 		}
 
+		@Override
 		public void setSampleRate(float sampleRate, boolean notify) {
 			this.sampleRate = sampleRate;
 		}
 
+		@Override
 		public void addData(PamObservable o, PamDataUnit dataUnit1) {
 			IshDetFnDataUnit dataUnit = (IshDetFnDataUnit)dataUnit1; 
 			//This is called whenever new data arrives from my parent.

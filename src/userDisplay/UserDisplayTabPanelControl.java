@@ -30,9 +30,6 @@ import javax.swing.JMenu;
 import javax.swing.JToolBar;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
-import radardisplay.RadarDisplayProvider;
-import radardisplay.RadarParameters;
-
 
 import Layout.PamInternalFrame;
 import PamView.PamPanelTiler;
@@ -40,6 +37,8 @@ import PamView.PamTabPanel;
 import Spectrogram.SpectrogramDiplayProvider;
 import Spectrogram.SpectrogramDisplay;
 import Spectrogram.SpectrogramParameters;
+import radardisplay.RadarDisplayProvider;
+import radardisplay.RadarParameters;
 
 public class UserDisplayTabPanelControl implements PamTabPanel {
 
@@ -94,7 +93,7 @@ public class UserDisplayTabPanelControl implements PamTabPanel {
 	 * @param dpParams 
 	 */
 	public void addUserDisplay(UserDisplayProvider userDisplayProvider, DisplayProviderParameters dpParams) {
-		if (userDisplayProvider.canCreate() == false) {
+		if (!userDisplayProvider.canCreate()) {
 			return;
 		}
 		String uniqueName = DisplayNameManager.getInstance().getUniqueName(userDisplayProvider.getName(), dpParams);
@@ -181,6 +180,7 @@ public class UserDisplayTabPanelControl implements PamTabPanel {
 		}
 	}
 
+	@Override
 	public JMenu createMenu(Frame parentFrame) {
 		return null;
 	}
@@ -189,10 +189,12 @@ public class UserDisplayTabPanelControl implements PamTabPanel {
 	 * @return Reference to a graphics component that can be added to the view.
 	 *         This will typically be a JPanel or a JInternalFrame;
 	 */
+	@Override
 	public JComponent getPanel() {
 		return userDisplayTabPanel;
 	}
 
+	@Override
 	public JToolBar getToolBar() {
 		// TODO Auto-generated method stub
 		return null;
@@ -214,7 +216,7 @@ public class UserDisplayTabPanelControl implements PamTabPanel {
 		JInternalFrame[] allFrames = userDisplayTabPanel.getAllFrames();
 		UserFramePlots userDisplay;
 		for (int i = 0; i < allFrames.length; i++) {
-			if (PamInternalFrame.class.isAssignableFrom(allFrames[i].getClass()) == false) {
+			if (!PamInternalFrame.class.isAssignableFrom(allFrames[i].getClass())) {
 				continue;
 			}
 			userDisplay = (UserFramePlots) ((PamInternalFrame) allFrames[i]).getFramePlots();

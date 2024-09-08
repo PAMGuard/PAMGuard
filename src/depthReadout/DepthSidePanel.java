@@ -10,7 +10,6 @@ import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.util.ListIterator;
 
-import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -23,15 +22,14 @@ import PamController.PamController;
 import PamUtils.PamCalendar;
 import PamView.ColorManaged;
 import PamView.PamColors;
-import PamView.PamSidePanel;
 import PamView.PamColors.PamColor;
+import PamView.PamSidePanel;
 import PamView.dialog.PamLabel;
 import PamView.panel.PamBorder;
 import PamView.panel.PamBorderPanel;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
-import PamguardMVC.PamObserver;
 import PamguardMVC.PamObserverAdapter;
 
 public class DepthSidePanel extends PamObserverAdapter implements PamSidePanel {
@@ -60,10 +58,12 @@ public class DepthSidePanel extends PamObserverAdapter implements PamSidePanel {
 		depthControl.getDepthDataBlock().addObserver(this);
 	}
 
+	@Override
 	public JComponent getPanel() {
 		return depthPanel;
 	}
 
+	@Override
 	public void rename(String newName) {
 
 		depthPanel.setBorder(new TitledBorder(newName));
@@ -77,14 +77,17 @@ public class DepthSidePanel extends PamObserverAdapter implements PamSidePanel {
 		depthPanel = new DepthPanel();
 	}
 
+	@Override
 	public String getObserverName() {
 		return "Depth Side Panel";
 	}
 
+	@Override
 	public long getRequiredDataHistory(PamObservable o, Object arg) {
 		return panelLifetime * 1000;
 	}
 
+	@Override
 	public void addData(PamObservable o, PamDataUnit arg) {
 
 		DepthDataUnit depthDataUnit = (DepthDataUnit) arg;

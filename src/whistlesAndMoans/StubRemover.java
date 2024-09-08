@@ -1,7 +1,6 @@
 package whistlesAndMoans;
 
 import java.util.List;
-import java.util.ListIterator;
 
 public class StubRemover {
 
@@ -33,7 +32,7 @@ public class StubRemover {
 		}
 		int diagGap = whistleControl.getWhistleToneParameters().getConnectType() == 4 ? 0 : 1;
 		
-		SliceData aSlice;;
+		SliceData aSlice;
 		for (int i = 0; i < nSlice; i++) {
 			aSlice = sliceData.get(i);
 			if (aSlice.nPeaks > 1) {

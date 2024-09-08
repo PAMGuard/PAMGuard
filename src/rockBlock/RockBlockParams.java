@@ -1,8 +1,6 @@
 package rockBlock;
 import java.io.Serializable;
 
-import rocca.RoccaParameters;
-
 /*
  *  PAMGUARD - Passive Acoustic Monitoring GUARDianship.
  * To assist in the Detection Classification and Localisation

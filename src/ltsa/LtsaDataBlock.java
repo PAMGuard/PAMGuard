@@ -5,7 +5,6 @@ import java.util.ListIterator;
 import PamguardMVC.LoadObserver;
 import PamguardMVC.PamObserver;
 import PamguardMVC.PamProcess;
-import PamguardMVC.RequestCancellationObject;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import fftManager.FFTDataBlock;
 import fftManager.FFTDataUnit;

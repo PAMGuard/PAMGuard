@@ -150,7 +150,7 @@ public class BinaryStoreDeleter {
 		catch (IOException e) {
 			headOk = false;
 		}
-		if (headOk == false || binaryHead.getDataDate() >= timeMillis) {
+		if (!headOk || binaryHead.getDataDate() >= timeMillis) {
 			boolean deleteOk = deleteFileSet(dataFile);
 			return deleteOk ? FILE_DELETED : FILE_DELETE_ERROR;
 		}
@@ -192,7 +192,7 @@ public class BinaryStoreDeleter {
 		System.out.printf("Partial delete of file %s from %s\n", dataFile.getAbsoluteFile(), PamCalendar.formatDBDateTime(timeMillis));
 		try {
 			BinaryInputStream inputStream = new BinaryInputStream(binaryStore, aBlock);
-			if (inputStream.openFile(dataFile) == false) {
+			if (!inputStream.openFile(dataFile)) {
 				return false;
 			}
 			
@@ -282,8 +282,8 @@ public class BinaryStoreDeleter {
 						" to " + dataFile.getAbsolutePath());
 				e.printStackTrace();
 			}
-			if (renamedNew == false) {
-				if (deletedOld == false) {
+			if (!renamedNew) {
+				if (!deletedOld) {
 					binaryStore.reportError("Unable to delete " + dataFile.getAbsolutePath());
 				}
 				return binaryStore.reportError(String.format("Unable to rename %s to %s", 

@@ -1,9 +1,5 @@
 package whistlesAndMoans;
 
-import java.awt.Window;
-import java.io.Serializable;
-
-import PamguardMVC.PamDataUnit;
 import SoundRecorder.trigger.RecorderTrigger;
 import SoundRecorder.trigger.RecorderTriggerData;
 

@@ -117,6 +117,7 @@ public class ModuleNodeParams extends UsedModuleInfo implements ConnectionNodePa
 		this.connectionNodeType= connectionnoNodeType;
 	}
 	
+	@Override
 	public PAMConnectionNodeType getNodeType() {
 		return connectionNodeType; 
 	}

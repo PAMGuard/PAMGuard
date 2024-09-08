@@ -276,6 +276,7 @@ public abstract class BeamAlgorithmParams implements Serializable, Cloneable, Ma
 	 * Extended classes must override this method to ensure the params get saved properly.  See
 	 * the {@link BasicFreqDomParams#clone BasicFreqDomParams.clone} method for an example;
 	 */
+	@Override
 	public abstract BeamAlgorithmParams clone();
 
 	/**

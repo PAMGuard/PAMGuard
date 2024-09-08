@@ -24,7 +24,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
-import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -55,11 +54,6 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.MouseInputAdapter;
 
-import pamScrollSystem.AbstractPamScroller;
-import pamScrollSystem.AbstractPamScrollerAWT;
-import pamScrollSystem.PamScrollObserver;
-import pamScrollSystem.PamScrollSlider;
-import userDisplay.UserDisplayComponent;
 import Array.ArrayManager;
 import Array.PamArray;
 import GPS.GPSControl;
@@ -79,11 +73,8 @@ import PamUtils.Coordinate3d;
 import PamUtils.LatLong;
 import PamUtils.PamCalendar;
 import PamView.ClipboardCopier;
-import PamView.GeneralProjector;
 import PamView.PamColors;
 import PamView.PamColors.PamColor;
-import PamView.PamGui;
-import PamView.PanelOverlayDraw;
 import PamView.dialog.PamRadioButton;
 import PamView.hidingpanel.HidingDialogPanel;
 import PamView.panel.CornerLayoutContraint;
@@ -92,7 +83,6 @@ import PamView.paneloverlay.overlaymark.ExtMapMouseHandler;
 import PamView.paneloverlay.overlaymark.MarkDataSelector;
 import PamView.paneloverlay.overlaymark.MarkOverlayDraw;
 import PamView.paneloverlay.overlaymark.OverlayMark;
-import PamView.paneloverlay.overlaymark.OverlayMarkObserver;
 import PamView.paneloverlay.overlaymark.OverlayMarkProviders;
 import PamView.paneloverlay.overlaymark.OverlayMarker;
 import PamguardMVC.PamDataBlock;
@@ -100,8 +90,12 @@ import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamObserver;
 import PamguardMVC.dataSelector.DataSelector;
-import PamguardMVC.debug.Debug;
 import effort.EffortProvider;
+import pamScrollSystem.AbstractPamScroller;
+import pamScrollSystem.AbstractPamScrollerAWT;
+import pamScrollSystem.PamScrollObserver;
+import pamScrollSystem.PamScrollSlider;
+import userDisplay.UserDisplayComponent;
 
 /**
  * Mainly a container for map objects, holding the main MapPanel and the right
@@ -221,7 +215,7 @@ public class SimpleMap extends JPanel implements PamObserver, PamScrollObserver,
 		
 		mapParameters = new MapParameters();
 		thisMapIndex = simpleMapIndex++;
-		if (isMainTab == false) {
+		if (!isMainTab) {
 			initialisationComplete = true;
 		}
 		PamSettingManager.getInstance().registerSettings(this);
@@ -275,6 +269,7 @@ public class SimpleMap extends JPanel implements PamObserver, PamScrollObserver,
 		return getUnitName();
 	}
 
+	@Override
 	public String getUnitName() {
 		if (thisMapIndex != 0) {
 			return mapController.getUnitName()+thisMapIndex;
@@ -366,7 +361,7 @@ public class SimpleMap extends JPanel implements PamObserver, PamScrollObserver,
 	 * @return
 	 */
 	public boolean shouldPlot(PamDataUnit pamDataUnit, MapDetectionData mapDetectionData, long earliestToPlot, long now, DataSelector ds) {
-		if (mapDetectionData.select == false) {
+		if (!mapDetectionData.select) {
 			return false;
 		}
 		if (ds != null && ds.scoreData(pamDataUnit) == 0) {
@@ -691,14 +686,17 @@ public class SimpleMap extends JPanel implements PamObserver, PamScrollObserver,
 
 	}
 
+	@Override
 	public String getObserverName() {
 		return "simple map display component";
 	}
 
+	@Override
 	public void noteNewSettings() {
 
 	}
 
+	@Override
 	public void setSampleRate(float sampleRate, boolean notify) {
 	}
 
@@ -708,6 +706,7 @@ public class SimpleMap extends JPanel implements PamObserver, PamScrollObserver,
 
 	}
 
+	@Override
 	public long getRequiredDataHistory(PamObservable o, Object arg) {
 		PamDataBlock block = (PamDataBlock) o;
 		if (block.getUnitClass() == GpsDataUnit.class) {
@@ -954,6 +953,7 @@ public class SimpleMap extends JPanel implements PamObserver, PamScrollObserver,
 
 	private class MouseWheelHandler implements MouseWheelListener {
 
+		@Override
 		public void mouseWheelMoved(MouseWheelEvent arg0) {
 
 //			if (arg0.getWheelRotation() < 0
@@ -1004,6 +1004,7 @@ public class SimpleMap extends JPanel implements PamObserver, PamScrollObserver,
 	 * 
 	 * @see Map.PamMap#removeObservable(PamguardMVC.PamObservable)
 	 */
+	@Override
 	public void removeObservable(PamObservable o) {
 		// TODO Auto-generated method stub
 
@@ -1146,7 +1147,7 @@ public class SimpleMap extends JPanel implements PamObserver, PamScrollObserver,
 			dataBlock = detectorDataBlocks.get(i);
 			if (mapDetectionsManager.isShouldPlot(dataBlock)) {
 //				if (dataBlock.getNumOfflineDataMaps() > 0) {
-					if (viewerScroller.isDataBlockUsed(dataBlock) == false) {
+					if (!viewerScroller.isDataBlockUsed(dataBlock)) {
 						viewerScroller.addDataBlock(dataBlock);
 						changes = true;
 					}
@@ -1204,6 +1205,7 @@ public class SimpleMap extends JPanel implements PamObserver, PamScrollObserver,
 			this.parentFrame = parentFrame;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent ev) {
 			showParametersDialog(parentFrame);
 		}
@@ -1253,6 +1255,7 @@ public class SimpleMap extends JPanel implements PamObserver, PamScrollObserver,
 		OverlayMarkProviders.singleInstance().removeProvider(mapMarker);		
 	}
 
+	@Override
 	public void notifyModelChanged(int changeType) {
 		mapDetectionsManager.notifyModelChanged(changeType);
 

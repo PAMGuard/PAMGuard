@@ -4,6 +4,7 @@ import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
+
 import javax.swing.JMenuItem;
 
 import PamController.PamControlledUnit;
@@ -98,6 +99,7 @@ public class TowedArray3DController extends PamControlledUnit implements PamSett
 	 */
 	class MapSymbolSelect implements ActionListener {
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 
 //			PamSymbol newSymbol = PamSymbolDialog.show(towedArray3DProcessParameters.mapSymbol);
@@ -133,6 +135,7 @@ public class TowedArray3DController extends PamControlledUnit implements PamSett
 			this.towedArray3DController = towedArray3DController;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 
 			TowedArray3DProcessParameters newParams = TowedArray3DParametersDialog.showDialog(parentFrame, towedArray3DController,
@@ -155,14 +158,17 @@ public class TowedArray3DController extends PamControlledUnit implements PamSett
 	 * These next three functions are needed for the PamSettings interface
 	 * which will enable Pamguard to save settings between runs
 	 */
+	@Override
 	public Serializable getSettingsReference() {
 		return towedArray3DProcessParameters;
 	}
 
+	@Override
 	public long getSettingsVersion() {
 		return TowedArray3DProcessParameters.serialVersionUID;
 	}
 
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		towedArray3DProcessParameters = (TowedArray3DProcessParameters) pamControlledUnitSettings.getSettings();
 		return true;

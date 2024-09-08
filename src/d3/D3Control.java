@@ -10,21 +10,20 @@ import java.util.List;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 
-import PamController.fileprocessing.StoreStatus;
+import PamguardMVC.PamDataBlock;
+import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import d3.calibration.CalFileReader;
 import d3.calibration.CalibrationInfo;
 import d3.calibration.CalibrationSet;
 import d3.plots.D3DataPlotProvider;
 import dataPlots.data.TDDataProviderRegister;
+import fileOfflineData.OfflineFileControl;
+import fileOfflineData.OfflineFileMapPoint;
+import fileOfflineData.OfflineFileProcess;
 //import au.com.bytecode.opencsv.CSVReader;
 import pamScrollSystem.ViewLoadObserver;
 import wavFiles.WavFileReader;
 import wavFiles.WavHeader;
-import fileOfflineData.OfflineFileControl;
-import fileOfflineData.OfflineFileMapPoint;
-import fileOfflineData.OfflineFileProcess;
-import PamguardMVC.PamDataBlock;
-import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 
 public class D3Control extends OfflineFileControl {
 
@@ -99,7 +98,7 @@ public class D3Control extends OfflineFileControl {
 		 */
 		String tlogName = d3FileTypes.getFileName("tlog");
 		File tLogFile = new File(tlogName);
-		if (tLogFile.exists() == false) {
+		if (!tLogFile.exists()) {
 			/*
 			 *  dead easy - just have to make a single data map point which is the length of 
 			 *  the swv file. 
@@ -224,7 +223,7 @@ public class D3Control extends OfflineFileControl {
 
 		int samplesPerChunk = Math.max(swvSampleRate / 1000, 1);
 		long currentSample = dataStartSample;
-		if (wavFile.setPosition(currentSample) == false) {
+		if (!wavFile.setPosition(currentSample)) {
 			return false;
 		}
 
@@ -390,7 +389,7 @@ public class D3Control extends OfflineFileControl {
 
 		String fn = getFileParams().offlineFolder + "\\d418.xml";
 		File calFile = new File(fn);
-		if (calFile.exists() == false) {
+		if (!calFile.exists()) {
 			System.out.println("D3 cal file cannot be found at " + fn);
 //			return false;
 			calibrations = null;

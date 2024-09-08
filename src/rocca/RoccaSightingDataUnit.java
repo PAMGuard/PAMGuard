@@ -23,19 +23,17 @@
 
 package rocca;
 
-import PamDetection.PamDetection;
-import PamguardMVC.AcousticDataUnit;
-import PamguardMVC.PamDataUnit;
-
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import javax.swing.JLabel;
+
+import PamDetection.PamDetection;
+import PamguardMVC.PamDataUnit;
 
 /**
  * Container holding information about the current sighting, including pointers

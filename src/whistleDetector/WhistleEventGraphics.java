@@ -1,11 +1,12 @@
 package whistleDetector;
 
 import java.awt.Color;
+
 import PamView.GeneralProjector;
+import PamView.GeneralProjector.ParameterType;
 import PamView.PamDetectionOverlayGraphics;
 import PamView.PamSymbol;
 import PamView.PamSymbolType;
-import PamView.GeneralProjector.ParameterType;
 import PamView.symbol.SymbolData;
 
 public class WhistleEventGraphics extends PamDetectionOverlayGraphics {

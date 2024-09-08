@@ -8,10 +8,8 @@ import java.lang.reflect.Field;
 import PamController.PamSettingManager;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
-import PamModel.parametermanager.PrivatePamParameterData;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
-import difar.DifarControl;
-import difar.DifarParameters;
+import PamModel.parametermanager.PrivatePamParameterData;
 import generalDatabase.lookupTables.LookupItem;
 import generalDatabase.lookupTables.LookupList;
 
@@ -43,6 +41,7 @@ public class QuickAnnotationParameters implements Serializable, Cloneable, Manag
 		shouldPopupDialog = false;
 	}
 	
+	@Override
 	public QuickAnnotationParameters clone() {
 		try {
 			QuickAnnotationParameters np = (QuickAnnotationParameters) super.clone();

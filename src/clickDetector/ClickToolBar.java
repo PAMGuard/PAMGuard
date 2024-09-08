@@ -46,6 +46,7 @@ public class ClickToolBar implements ActionListener{
 		toolBar.add(showICI);
 	}
 	
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		// get settings out of tool bar and notify ClickTabPanelControl
 		readToolBar();

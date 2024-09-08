@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import PamUtils.PamUtils;
 import PamUtils.complex.ComplexArray;
-import Spectrogram.WindowFunction;
 import clickDetector.ClickDetection;
 import clipgenerator.ClipSpectrogram;
 import fftFilter.FFTFilter;
@@ -461,7 +460,7 @@ public class RawDataTransforms {
 	 */
 	public double[] getAnalyticWaveform(int iChan, boolean filtered, FFTFilterParams fftFilterParams) {
 		synchronized (synchObject) {
-			if (filtered == false || fftFilterParams == null) {
+			if (!filtered || fftFilterParams == null) {
 				return getAnalyticWaveform(iChan);
 			}
 			else {

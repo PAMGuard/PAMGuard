@@ -3,24 +3,24 @@ package dataPlotsFX;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import javafx.application.Platform;
-import javafx.scene.layout.Region;
-import pamViewFX.fxNodes.internalNode.PamInternalPane;
-import userDisplayFX.UserDisplayControlFX;
-import userDisplayFX.UserDisplayNodeFX;
-import userDisplayFX.UserDisplayNodeParams;
-import dataPlotsFX.data.TDDataInfoFX;
-import dataPlotsFX.data.TDDataProviderFX;
-import dataPlotsFX.data.TDDataProviderRegisterFX;
-import dataPlotsFX.layout.TDDisplayFX;
-import dataPlotsFX.layout.TDGraphFX;
-import detectiongrouplocaliser.DetectionGroupSummary;
 import PamController.PamController;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamObserverAdapter;
 import PamguardMVC.PamRawDataBlock;
+import dataPlotsFX.data.TDDataInfoFX;
+import dataPlotsFX.data.TDDataProviderFX;
+import dataPlotsFX.data.TDDataProviderRegisterFX;
+import dataPlotsFX.layout.TDDisplayFX;
+import dataPlotsFX.layout.TDGraphFX;
+import detectiongrouplocaliser.DetectionGroupSummary;
+import javafx.application.Platform;
+import javafx.scene.layout.Region;
+import pamViewFX.fxNodes.internalNode.PamInternalPane;
+import userDisplayFX.UserDisplayControlFX;
+import userDisplayFX.UserDisplayNodeFX;
+import userDisplayFX.UserDisplayNodeParams;
 
 /**
  * 
@@ -151,6 +151,7 @@ public class TDControlFX extends TDControl implements UserDisplayNodeFX {
 	 * Get currently displayed data blocks in the display and set them as the parent
 	 * data blocks in the display process.
 	 */
+	@Override
 	public void dataModelToDisplay() {
 		//
 //		System.out.println("TDControlFX: dataModelToDisplay: " + tdDisplayController.allowProcessNotify);
@@ -284,6 +285,7 @@ public class TDControlFX extends TDControl implements UserDisplayNodeFX {
 	 * Get the data observer- monitors incoming real time data an updates graphs. 
 	 * @return data observer
 	 */
+	@Override
 	public DataObserver getDataObserver() {
 		return dataObserver;
 	}
@@ -310,6 +312,7 @@ public class TDControlFX extends TDControl implements UserDisplayNodeFX {
 	 * In real time mode check if PAMGUARD is paused. 
 	 * @return true if paused. 
 	 */
+	@Override
 	public boolean isPaused(){
 		if (PamController.getInstance().getPamStatus()==PamController.PAM_RUNNING) return false; 
 		else return true; 
@@ -371,6 +374,7 @@ public class TDControlFX extends TDControl implements UserDisplayNodeFX {
 	 * information to add to this since it's not kept up to date on the fly. 
 	 * @return object to serialise.
 	 */
+	@Override
 	protected Serializable prepareSerialisedSettings() {
 		 super.prepareSerialisedSettings();
 		 //prepare the serialised settings. 

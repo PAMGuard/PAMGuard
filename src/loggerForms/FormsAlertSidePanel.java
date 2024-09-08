@@ -22,7 +22,6 @@ import PamView.dialog.PamLabel;
 import PamView.panel.PamBorderPanel;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
-import PamguardMVC.PamObserver;
 import PamguardMVC.PamObserverAdapter;
 
 public class FormsAlertSidePanel extends PamObserverAdapter implements PamSidePanel {

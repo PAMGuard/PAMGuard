@@ -2,9 +2,7 @@ package autecPhones;
 
 import java.awt.Frame;
 
-import AirgunDisplay.AirgunGraphics;
 import PamController.PamControlledUnit;
-import PamView.PamOldSymbolManager;
 import PamView.symbol.StandardSymbolManager;
 import PamguardMVC.PamProcess;
 
@@ -21,6 +19,7 @@ public class AutecPhonesControl extends PamControlledUnit {
 		addPamProcess(autecProcess = new AutecProcess(this));
 	}
 
+	@Override
 	public Frame getGuiFrame() {
 		return super.getGuiFrame();
 	}
