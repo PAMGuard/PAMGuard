@@ -10,12 +10,8 @@ import java.util.Calendar;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFileFormat.Type;
-import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.Timer;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import Acquisition.FolderInputSystem;
 import PamController.PamControlledUnit;
@@ -161,6 +157,7 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 	 * that triggers all sorts of things.
 	 */
 	Timer recorderTimer = new Timer(500, new ActionListener() {
+		@Override
 		public void actionPerformed(ActionEvent evt) {
 
 			recorderTabPanel.timerActions();
@@ -362,6 +359,7 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 			this.parentFrame = parentFrame;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			recordSettingsDialog(parentFrame);
 		}
@@ -420,6 +418,7 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 		}
 	}
 
+	@Override
 	public Serializable getSettingsReference() {
 		//		if (recorderTriggers.size() > 0) {
 		//			for (int i = recorderTriggers.size()-1; i >= 0; i--) {
@@ -430,10 +429,12 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 		return recorderSettings;
 	}
 
+	@Override
 	public long getSettingsVersion() {
 		return RecorderSettings.serialVersionUID;
 	}
 
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		recorderSettings = ((RecorderSettings) pamControlledUnitSettings.getSettings()).clone();
 		/*
@@ -522,9 +523,9 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 		RecorderTriggerData rtData = recorderSettings.findTriggerData(recorderTrigger);
 
 		boolean enabled = rtData.isEnabled();
-		if (enabled == false) return;
+		if (!enabled) return;
 
-		if (recorderTrigger.triggerDataUnit(dataUnit, rtData) == false) {
+		if (!recorderTrigger.triggerDataUnit(dataUnit, rtData)) {
 			return;
 		}
 		/*
@@ -532,7 +533,7 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 		 * decide whether or not to go ahead with the recording. 
 		 */		
 		// find out that the recorder can actually record at the moment
-		if (shouldEnableRecording() == false) return;
+		if (!shouldEnableRecording()) return;
 
 		TriggerDecisionMaker tdm = rtData.getDecisionMaker();
 
@@ -650,7 +651,7 @@ public class RecorderControl extends PamControlledUnit implements PamSettings {
 			return "Unspecified output folder for sound recorder";
 		}
 		File path = new File(parts[1].trim());
-		if (path.exists() == false) {
+		if (!path.exists()) {
 			path.mkdirs();
 		}
 		if (path.isDirectory()) {

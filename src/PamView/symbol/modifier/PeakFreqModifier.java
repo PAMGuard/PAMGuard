@@ -5,6 +5,7 @@ import java.awt.Color;
 import PamUtils.PamUtils;
 import PamView.GeneralProjector;
 import PamView.PamSymbolType;
+import PamView.dialog.PamDialogPanel;
 import PamView.symbol.PamSymbolChooser;
 import PamView.symbol.SymbolData;
 import PamguardMVC.PamDataUnit;
@@ -25,11 +26,11 @@ import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
  *
  */
 public class PeakFreqModifier extends SymbolModifier {
-	
+
 	public final static String PEAK_FREQ_MODIFIER_NAME = "Peak Frequency";
-	
+
 	private SymbolData symbolData = new SymbolData(PamSymbolType.SYMBOL_CIRCLE, 5, 5, true, Color.BLACK, Color.BLACK);
-	
+
 	/**
 	 * The colour array for frequency 
 	 */
@@ -45,27 +46,35 @@ public class PeakFreqModifier extends SymbolModifier {
 	 */
 	private ColourArrayType colourArrayType;
 
-	private PeakFreqOptionsPane peakFreqOptions;
+	/**
+	 * JavaFX pane for frequency symbol options. 
+	 */
+	private PeakFreqOptionsPane peakFreqOptionsPaneFX;
+
+	/**
+	 * Swing panel for frequency symbol options
+	 */
+	private PamDialogPanel peakFreqOptionsPanel;
 
 	public PeakFreqModifier(PamSymbolChooser symbolChooser) {
 		super(PEAK_FREQ_MODIFIER_NAME, symbolChooser, SymbolModType.FILLCOLOUR |  SymbolModType.LINECOLOUR );
-		 checkColourArray();
-		 setToolTipText("Colour by the peak frequency of the sound");
+		checkColourArray();
+		setToolTipText("Colour by the peak frequency of the sound");
 	}
-	
+
 	public SymbolData modifySymbol(SymbolData symbolData, GeneralProjector projector, PamDataUnit dataUnit) {
-//		 checkColourArray();
+		//		 checkColourArray();
 		return super.modifySymbol(symbolData, projector, dataUnit); 
 	}
 
-	
+
 	@Override
 	public SymbolData getSymbolData(GeneralProjector projector, PamDataUnit dataUnit) {		
 		return colourByFreq(symbolData, projector, dataUnit);
 	}
 
-	
-	
+
+
 	/**
 	 * Colour the symbol by frequency. 
 	 * @param symbolData - the symbol data. 
@@ -74,9 +83,19 @@ public class PeakFreqModifier extends SymbolModifier {
 	 * @return  the symbol data 
 	 */
 	private SymbolData colourByFreq(SymbolData symbolData, GeneralProjector projector, PamDataUnit dataUnit) {
-		
+
 		double frequency = Double.NaN;
-		if (dataUnit instanceof RawDataHolder) {
+
+		if (dataUnit instanceof CPODClick) {
+
+			//A bit of a HACK
+
+			frequency = ((CPODClick) dataUnit).getkHz()*1000; 
+
+			//				System.out.println("Frequency: " + frequency +  " Upper freq: " + peakFreqSymbolOptions.freqLimts[1]  " Lower freq: " + peakFreqSymbolOptions.freqLimts[0]  ); 
+		}		
+		else if (dataUnit instanceof RawDataHolder) {
+
 			RawDataHolder click = (RawDataHolder) dataUnit;
 
 
@@ -86,32 +105,27 @@ public class PeakFreqModifier extends SymbolModifier {
 
 			frequency= (maxIndex/(double) powerSpectrum.length)*dataUnit.getParentDataBlock().getSampleRate()/2;
 
-
 		}
-		else if (dataUnit instanceof CPODClick) {
-
-			frequency = ((CPODClick) dataUnit).getkHz()*1000; 
-			
-//			System.out.println("Frequency: " + frequency +  " Upper freq: " + peakFreqSymbolOptions.freqLimts[1]  " Lower freq: " + peakFreqSymbolOptions.freqLimts[0]  ); 
-		}		
 		else {
 			return null;
 		}
-		
+
 		frequency=(frequency - peakFreqSymbolOptions.freqLimts[0])/(peakFreqSymbolOptions.freqLimts[1]-peakFreqSymbolOptions.freqLimts[0]);
+		
 
 		checkColourArray(); 
-
-		Color freqCol = PamUtilsFX.fxToAWTColor(this.colourArray.getColour(frequency));
 		
-//		System.out.println("Freq colour: " + freqCol.getRed() + "  " + freqCol.getGreen() + "  " + freqCol.getBlue()); 
+		
+		Color freqCol = PamUtilsFX.fxToAWTColor(this.colourArray.getColour(frequency));
+
+		//		System.out.println("Freq colour: " + freqCol.getRed() + "  " + freqCol.getGreen() + "  " + freqCol.getBlue()); 
 		symbolData.setFillColor(freqCol);
 		symbolData.setLineColor(freqCol);
 
 
 		return symbolData;
 	}
-	
+
 
 
 	/**
@@ -123,17 +137,26 @@ public class PeakFreqModifier extends SymbolModifier {
 			this.colourArrayType=peakFreqSymbolOptions.freqColourArray; 
 		}
 	}
-	
+
 	@Override
 	public SymbolModifierPane getOptionsPane() {
 		//System.out.println("PEAK FREQ COLOUR ARRAY2: " + peakFreqSymbolOptions.freqColourArray);
-		if (this.peakFreqOptions==null) {
-			peakFreqOptions = new PeakFreqOptionsPane(this); 
-			peakFreqOptions.setParams();
+		if (this.peakFreqOptionsPaneFX==null) {
+			peakFreqOptionsPaneFX = new PeakFreqOptionsPane(this); 
+			peakFreqOptionsPaneFX.setParams();
 		}
-		return peakFreqOptions; 
+		return peakFreqOptionsPaneFX; 
 	}
 	
+	public PamDialogPanel getDialogPanel() {
+		//System.out.println("PEAK FREQ COLOUR ARRAY2: " + peakFreqSymbolOptions.freqColourArray);
+		if (this.peakFreqOptionsPanel==null) {
+			peakFreqOptionsPanel = new PeakFreqOptionsPanel(this); 
+			peakFreqOptionsPanel.setParams();
+		}
+		return peakFreqOptionsPanel; 
+	}
+
 	@Override
 	public SymbolModifierParams getSymbolModifierParams() {
 		//System.out.println("PEAK FREQ COLOUR ARRAY3: " + peakFreqSymbolOptions.freqColourArray);
@@ -154,7 +177,7 @@ public class PeakFreqModifier extends SymbolModifier {
 			//System.out.println("PEAK FREQ COLOUR ARRAY: " + peakFreqSymbolOptions.freqColourArray);
 			checkColourArray();
 		}
-		
+
 	}
 
 

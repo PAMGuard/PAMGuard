@@ -40,13 +40,12 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
-import fftManager.FFTPluginPanelProvider.FFTPluginPanel;
-
 import PamUtils.PamUtils;
 import PamView.dialog.ChannelListScroller;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.PamLabel;
+import fftManager.FFTPluginPanelProvider.FFTPluginPanel;
 
 
 
@@ -215,6 +214,7 @@ public class FFTPluginParamsDialog extends PamDialog implements ActionListener{
 			
 		private class UseSpecValues implements ActionListener {
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				enableControls();
 			}
@@ -286,6 +286,7 @@ public class FFTPluginParamsDialog extends PamDialog implements ActionListener{
 			
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			// TODO Auto-generated method stub
 			

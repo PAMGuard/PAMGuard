@@ -1,15 +1,12 @@
 package pamScrollSystem;
 
 import java.awt.BorderLayout;
-import java.awt.Insets;
-import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
-import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 

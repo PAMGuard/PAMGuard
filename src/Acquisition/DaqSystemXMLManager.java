@@ -15,11 +15,11 @@ import PamController.PamController;
  * is shared by multiple PamSettings classes.  For example: the SoundCardParameters class is used
  * by the SoundCardSystem, ASIOSoundSystem and NewAsioSoundSystem classes.  Each of these has it's own
  * type (see the individual getUnitType calls) but the SoundCardParameters class doesn't know who called
- * it and so can't properly check whether the type matches.  Further, SoundCardParameters is extended by 
+ * it and so can't properly check whether the type matches.  Further, SoundCardParameters is extended by
  * NIDAQParams, SimParameters and SmruDaqParameters.  So trying to make SoundCardParameters check for a
  * type would potentially screw up those extended classes.  That being said, the extended classes are
  * able to check for their types themselves.
- * 
+ *
  * @author dg50
  *
  */
@@ -30,8 +30,8 @@ public class DaqSystemXMLManager {
 		if (daqs == null) {
 			return false;
 		}
-		for (int i = 0; i < daqs.size(); i++) {
-			AcquisitionControl daq = (AcquisitionControl) daqs.get(i);
+		for (PamControlledUnit daq2 : daqs) {
+			AcquisitionControl daq = (AcquisitionControl) daq2;
 			AcquisitionParameters daqParams = daq.getAcquisitionParameters();
 			if (daqParams.daqSystemType.equals(daqSystemType)) {
 				return true;

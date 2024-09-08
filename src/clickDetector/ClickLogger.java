@@ -30,15 +30,14 @@
 
 package clickDetector;
 
-import generalDatabase.PamDetectionLogging;
-import generalDatabase.PamTableItem;
-import generalDatabase.SQLLogging;
-import generalDatabase.SQLTypes;
-
 import java.sql.Types;
 
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import generalDatabase.PamDetectionLogging;
+import generalDatabase.PamTableItem;
+import generalDatabase.SQLLogging;
+import generalDatabase.SQLTypes;
 
 /**
  * Databse logging information for Clicks.

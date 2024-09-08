@@ -2,26 +2,7 @@ package clickDetector;
 
 import java.util.ListIterator;
 
-import pamScrollSystem.ViewLoadObserver;
-import tethys.TethysControl;
-import tethys.pamdata.TethysDataProvider;
-import tethys.species.DataBlockSpeciesManager;
-//import staticLocaliser.StaticLocaliserControl;
-//import staticLocaliser.StaticLocaliserProvider;
-//import staticLocaliser.panels.AbstractLocaliserControl;
-//import staticLocaliser.panels.ClickLocaliserControl;
-import alarm.AlarmCounterProvider;
-import alarm.AlarmDataSource;
-import binaryFileStorage.BinaryStore;
-import clickDetector.ClickClassifiers.ClickBlockSpeciesManager;
-import clickDetector.dataSelector.ClickDataSelectCreator;
-import clickDetector.offlineFuncs.OfflineClickLogging;
-import clickDetector.tethys.ClickTethysDataProvider;
-import clickDetector.toad.ClickTOADCalculator;
-import dataMap.OfflineDataMap;
-import fftManager.fftorganiser.FFTDataOrganiser;
-import fftManager.fftorganiser.OrganisedFFTData;
-import generalDatabase.SQLLogging;
+import Localiser.LocalisationAlgorithm;
 import PamController.PamController;
 import PamController.PamControllerInterface;
 import PamDetection.LocContents;
@@ -38,6 +19,26 @@ import PamguardMVC.PamProcess;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import PamguardMVC.dataSelector.DataSelectorCreator;
 import PamguardMVC.toad.TOADCalculator;
+//import staticLocaliser.StaticLocaliserControl;
+//import staticLocaliser.StaticLocaliserProvider;
+//import staticLocaliser.panels.AbstractLocaliserControl;
+//import staticLocaliser.panels.ClickLocaliserControl;
+import alarm.AlarmCounterProvider;
+import alarm.AlarmDataSource;
+import binaryFileStorage.BinaryStore;
+import clickDetector.ClickClassifiers.ClickBlockSpeciesManager;
+import clickDetector.dataSelector.ClickDataSelectCreator;
+import clickDetector.offlineFuncs.OfflineClickLogging;
+import clickDetector.tethys.ClickTethysDataProvider;
+import clickDetector.toad.ClickTOADCalculator;
+import dataMap.OfflineDataMap;
+import fftManager.fftorganiser.FFTDataOrganiser;
+import fftManager.fftorganiser.OrganisedFFTData;
+import generalDatabase.SQLLogging;
+import pamScrollSystem.ViewLoadObserver;
+import tethys.TethysControl;
+import tethys.pamdata.TethysDataProvider;
+import tethys.species.DataBlockSpeciesManager;
 
 public class ClickDataBlock extends AcousticDataBlock<ClickDetection>  implements AlarmDataSource, 
 	GroupedDataSource, OrganisedFFTData, FFTDataHolderBlock {
@@ -217,7 +218,7 @@ public class ClickDataBlock extends AcousticDataBlock<ClickDetection>  implement
 			ListIterator<ClickDetection> iter = getListIterator(n-50);
 			while (iter.hasPrevious()) {
 				click = iter.previous();
-				if (click.hasComplexSpectrum() == false) {
+				if (!click.hasComplexSpectrum()) {
 					break; // probably no need to go further down the list 
 				}
 				click.freeClickMemory();
@@ -334,6 +335,16 @@ public class ClickDataBlock extends AcousticDataBlock<ClickDetection>  implement
 	@Override
 	public DataAutomationInfo getDataAutomationInfo() {
 		return new DataAutomationInfo(DataAutomation.AUTOMATIC);
+	}
+
+	@Override
+	public LocalisationAlgorithm getLocalisationAlgorithm() {
+		/*
+		 * This is usually the bearing algorithm from click control. 
+		 * Howeveer, someone may have added an additional bearing localiser
+		 * in which case, the default function should find that. 
+		 */
+		return super.getLocalisationAlgorithm();
 	}
 
 

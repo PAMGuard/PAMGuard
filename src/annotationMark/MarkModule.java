@@ -1,8 +1,8 @@
 package annotationMark;
 
-import generalDatabase.SQLLoggingAddon;
 import annotation.DataAnnotationType;
 import annotation.handler.AnnotationHandler;
+import generalDatabase.SQLLoggingAddon;
 
 
 public abstract class MarkModule extends PamController.PamControlledUnit {

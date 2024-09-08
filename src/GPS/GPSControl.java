@@ -9,11 +9,6 @@ import java.util.ListIterator;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import warnings.PamWarning;
-import warnings.WarningSystem;
 import NMEA.NMEADataBlock;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
@@ -21,9 +16,10 @@ import PamController.PamController;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamController.positionreference.PositionReference;
-import PamUtils.PamCalendar;
 import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
+import warnings.PamWarning;
+import warnings.WarningSystem;
 
 public class GPSControl extends PamControlledUnit implements PamSettings, PositionReference {
 
@@ -144,7 +140,9 @@ public class GPSControl extends PamControlledUnit implements PamSettings, Positi
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			String currentPath;
-			ImportGPSParams newParams=ImportGPSDialog.showDialog(PamController.getInstance().getMainFrame(), PamController.getInstance().getMainFrame().getMousePosition(),gpsImportParams, importGPSData);
+			PamController.getInstance();
+			PamController.getInstance();
+			ImportGPSParams newParams=ImportGPSDialog.showDialog(PamController.getMainFrame(), PamController.getMainFrame().getMousePosition(),gpsImportParams, importGPSData);
 			
 			if (newParams!=null) gpsImportParams=newParams.clone();
 			
@@ -168,6 +166,7 @@ public class GPSControl extends PamControlledUnit implements PamSettings, Positi
 			this.parentFrame = parentFrame;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			GPSParameters newP = GPSParametersDialog.showDialog(parentFrame, gpsParameters);
 			if (newP != null) {
@@ -184,6 +183,7 @@ public class GPSControl extends PamControlledUnit implements PamSettings, Positi
 			this.parentFrame = parentFrame;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			String message = "<html>Clock management is now controlled from the \"File/Global time settings\" menu<p>" +
 		"The Global time settings do not require administrator privilidges<p><p>" +
@@ -195,13 +195,16 @@ public class GPSControl extends PamControlledUnit implements PamSettings, Positi
 			}
 		}
 	}
+	@Override
 	public Serializable getSettingsReference() {
 		return gpsParameters;
 	}
+	@Override
 	public long getSettingsVersion() {
 		return GPSParameters.serialVersionUID;
 	}
 	
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 
 		if (pamControlledUnitSettings.getUnitType().equals(this.getUnitType())
@@ -260,7 +263,7 @@ public class GPSControl extends PamControlledUnit implements PamSettings, Positi
 	 * @return interpolated gps position. 
 	 */
 	public GpsDataUnit getShipPosition(long timeMilliseconds, boolean interpolate) {
- 		if (interpolate == false) {
+ 		if (!interpolate) {
 			return getGpsDataBlock().getClosestUnitMillis(timeMilliseconds);
 		}
 		// otherwise try to fine a point either side and weighted mean them or extrapolate. 

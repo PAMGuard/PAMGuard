@@ -9,15 +9,13 @@ import PamUtils.Coordinate3d;
 import PamUtils.LatLong;
 import PamView.BasicKeyItem;
 import PamView.GeneralProjector;
-import PamView.ManagedSymbol;
+import PamView.GeneralProjector.ParameterType;
+import PamView.GeneralProjector.ParameterUnits;
 import PamView.ManagedSymbolInfo;
 import PamView.PamKeyItem;
 import PamView.PamSymbol;
-import PamView.PamOldSymbolManager;
 import PamView.PamSymbolType;
 import PamView.PanelOverlayDraw;
-import PamView.GeneralProjector.ParameterType;
-import PamView.GeneralProjector.ParameterUnits;
 import PamView.symbol.SymbolData;
 import PamguardMVC.PamDataUnit;
 

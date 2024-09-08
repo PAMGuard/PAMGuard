@@ -22,13 +22,11 @@ package Map;
 
 import java.io.File;
 import java.io.Serializable;
-import java.lang.reflect.Field;
 
 import Array.Hydrophone;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
-import PamModel.parametermanager.PrivatePamParameterData;
 
 public class MapParameters implements Serializable, Cloneable, ManagedParameters {
 
@@ -94,6 +92,12 @@ public class MapParameters implements Serializable, Cloneable, ManagedParameters
 	public boolean colourHydrophonesByChannel;
 	
 	public int symbolSize = Hydrophone.DefaultSymbolSize;
+	
+	public boolean colourByEffort = false;
+	/**
+	 * Name of data block providing effort data. 
+	 */
+	public String effortDataSource;
 	
 	private static final int defaultMapRange = 10000;
 	/**

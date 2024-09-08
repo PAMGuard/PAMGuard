@@ -1,17 +1,22 @@
 package Localiser.algorithms.timeDelayLocalisers.bearingLoc;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 import Array.ArrayManager;
 import Array.PamArray;
 import Jama.Matrix;
+import Localiser.LocalisationAlgorithmInfo;
 import Localiser.algorithms.Correlations;
 import Localiser.algorithms.PeakPosition2D;
 import Localiser.algorithms.PeakSearch;
+import PamDetection.LocContents;
 import PamUtils.ArrayDump;
 import PamUtils.PamUtils;
 import PamUtils.SystemTiming;
 import pamMaths.PamVector;
+import tethys.localization.LocalizationCreator;
+import tethys.pamdata.AutoTethysProvider;
 
 /**
  * Revamp of the earlier MLGridBearingLocaliser but with a more sensible 
@@ -71,6 +76,11 @@ public class MLGridBearingLocaliser2 implements BearingLocaliser {
 	public void prepare(int[] arrayElements, long timMillis, double timingError) {
 		this.useDefaults=true;
 		prepare(arrayElements, timMillis, timingError, Math.toRadians(3), Math.toRadians(3));
+	}
+
+	@Override
+	public int getLocalisationContents() {
+		return LocContents.HAS_BEARING | LocContents.HAS_AMBIGUITY;
 	}
 	
 	synchronized private void prepare(int[] arrayElements, long timeMillis, double timingError, double thetaStep, double phiStep) {
@@ -737,5 +747,42 @@ public class MLGridBearingLocaliser2 implements BearingLocaliser {
 	public double[][] getLikelihoodLUT() {
 		return likelihoodLUT;
 	}
+
+	@Override
+	public String getAlgorithmName() {
+		return "Maximum likelyhood grid bearing localiser V2";
+	}
+
+	@Override
+	public Serializable getParameters() {
+		return new LocaliserParams(this.thetaStep, this.phiStep);
+	}
 	
+	@Override
+	public LocalisationAlgorithmInfo getAlgorithmInfo() {
+		return this;
+	}
+
+	@Override
+	public LocalizationCreator getTethysCreator() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	/**
+	 * For passing to Tethys output. 
+	 * @author dg50
+	 *
+	 */
+	public class LocaliserParams implements Serializable {
+		private static final long serialVersionUID = 1L;
+		public double thetaStep, phiStep;
+		public LocaliserParams(double thetaStep, double phiStep) {
+			super();
+			this.thetaStep = Math.toDegrees(thetaStep);
+			this.phiStep = Math.toDegrees(phiStep);
+			this.thetaStep = AutoTethysProvider.roundDecimalPlaces(this.thetaStep, 2);
+			this.phiStep = AutoTethysProvider.roundDecimalPlaces(this.phiStep, 2);
+		}
+	}
 }

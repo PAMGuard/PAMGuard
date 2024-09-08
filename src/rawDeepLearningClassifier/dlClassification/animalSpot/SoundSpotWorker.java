@@ -1,12 +1,13 @@
 package rawDeepLearningClassifier.dlClassification.animalSpot;
 
+import java.nio.file.Paths;
+
 import org.jamdev.jdl4pam.animalSpot.AnimalSpotModel;
 import org.jamdev.jdl4pam.animalSpot.AnimalSpotParams;
 
-import PamModel.PamModel;
-import PamModel.PamModel.PluginClassloader;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
+import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 
 
 /**
@@ -18,13 +19,16 @@ import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
  * @author Jamie Macaulay 
  *
  */
-public class SoundSpotWorker extends DLModelWorker<SoundSpotResult> {
+public class SoundSpotWorker extends DLModelWorker<StandardPrediction> {
 
 
 	/**
 	 * Sound spot model. 
 	 */
-	private AnimalSpotModel soundSpotModel; 
+	private AnimalSpotModel soundSpotModel;
+
+
+	private String currentPath; 
 
 
 	/**
@@ -39,8 +43,8 @@ public class SoundSpotWorker extends DLModelWorker<SoundSpotResult> {
 	 */
 	public void prepModel(StandardModelParams soundSpotParams, DLControl dlControl) {
 		//ClassLoader origCL = Thread.currentThread().getContextClassLoader();
-		
-		System.out.println("prepModel: " + soundSpotParams.useDefaultTransfroms); 
+
+		//System.out.println("prepModel: " + soundSpotParams.useDefaultTransfroms); 
 
 		try {
 
@@ -52,9 +56,13 @@ public class SoundSpotWorker extends DLModelWorker<SoundSpotResult> {
 			//				PluginClassloader newCL = PamModel.getPamModel().getClassLoader();
 			//				Thread.currentThread().setContextClassLoader(newCL);
 			//			}
+			if (soundSpotModel==null || currentPath ==null || !Paths.get(currentPath).equals(Paths.get(soundSpotParams.modelPath))) {
+				//System.out.println("Sound spot path: " + soundSpotParams.modelPath);
+				//first open the model and get the correct parameters. 
+				soundSpotModel = new AnimalSpotModel(soundSpotParams.modelPath); 
+				this.currentPath = soundSpotParams.modelPath; 
 
-			//first open the model and get the correct parameters. 
-			soundSpotModel = new AnimalSpotModel(soundSpotParams.modelPath); 
+			}
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -66,7 +74,7 @@ public class SoundSpotWorker extends DLModelWorker<SoundSpotResult> {
 			AnimalSpotParams dlParams = new AnimalSpotParams(soundSpotModel.getTransformsString());
 
 			//only load new transforms if defaults are selected
-			if (getModelTransforms()==null || soundSpotParams.useDefaultTransfroms) {
+			if (getModelTransforms()==null || soundSpotParams.dlTransfroms==null || soundSpotParams.useDefaultTransfroms) {
 				//only set the transforms if they are null - otherwise handled elsewhere. 
 				setModelTransforms(model2DLTransforms(dlParams)); 
 				soundSpotParams.useDefaultTransfroms = true; 
@@ -75,7 +83,7 @@ public class SoundSpotWorker extends DLModelWorker<SoundSpotResult> {
 				//use the old transforms. 
 				setModelTransforms(soundSpotParams.dlTransfroms); 
 			}
-			
+
 			soundSpotParams.defaultSegmentLen = dlParams.seglen; //the segment length in microseconds. 
 			soundSpotParams.numClasses = dlParams.classNames.length; 
 
@@ -132,7 +140,8 @@ public class SoundSpotWorker extends DLModelWorker<SoundSpotResult> {
 	 * Destroy the model. 
 	 */
 	public void closeModel() {
-		//TODO
+		//TODO - need to be able to access model in JPAM API.
+		this.currentPath = null; 
 	}
 
 
@@ -142,6 +151,12 @@ public class SoundSpotWorker extends DLModelWorker<SoundSpotResult> {
 	 */
 	public AnimalSpotModel getModel() {
 		return soundSpotModel;
+	}
+
+
+	@Override
+	public boolean isModelNull() {
+		return soundSpotModel==null;
 	}
 
 

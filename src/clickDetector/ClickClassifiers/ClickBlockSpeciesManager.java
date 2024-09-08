@@ -15,8 +15,8 @@ public class ClickBlockSpeciesManager extends DataBlockSpeciesManager<ClickDetec
 	public ClickBlockSpeciesManager(ClickControl clickControl, ClickDataBlock clickDataBlock) {
 		super(clickDataBlock);
 		this.clickControl = clickControl;
-		setDefaultDefaultSpecies(new SpeciesMapItem(ITISTypes.OTHER, "Unknown", "Unknown"));
-		setDefaultSpeciesCode("Unknown");
+		setDefaultDefaultSpecies(new SpeciesMapItem(ITISTypes.CETACEAN, "Click", "Click"));
+		setDefaultSpeciesCode("Click");
 	}
 
 	@Override

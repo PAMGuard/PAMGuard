@@ -58,7 +58,7 @@ public class DependencyManager {
 		PamControlledUnit dependency = findDependency(pamDependency);
 
 //		System.out.println("HereA 2");
-		if (dependency != null || create == false) return dependency;
+		if (dependency != null || !create) return dependency;
 
 		/*
 		 * No data block of the correct type / data name exists, so 

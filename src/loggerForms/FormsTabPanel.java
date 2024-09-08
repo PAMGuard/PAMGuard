@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.KeyEventDispatcher;
 import java.awt.event.KeyEvent;
-import java.util.logging.LogManager;
 
 import javax.swing.JComponent;
 import javax.swing.JMenu;
@@ -13,9 +12,6 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 
-import org.jnativehook.GlobalScreen;
-import org.jnativehook.NativeHookException;
-import org.jnativehook.dispatcher.SwingDispatchService;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
@@ -47,20 +43,20 @@ public class FormsTabPanel implements PamTabPanel {
 //		keyManager=KeyboardFocusManager.getCurrentKeyboardFocusManager();
 //		keyManager.addKeyEventDispatcher(new LoggerKeyEventDispatcher());
 		
-		/** Global (OS-level) hotkey manager: 
-		 * jnativehook supported systems: Windows, X11, MacOS
-		 * 
-		 */
-		try {
-			LogManager.getLogManager().reset();
-			GlobalScreen.setEventDispatcher(new SwingDispatchService());
-			GlobalScreen.registerNativeHook();
-			GlobalScreen.addNativeKeyListener(new GlobalKeyListenerExample());
-		}
-		catch (NativeHookException ex) {
-			System.err.println("There was a problem registering the native hook.");
-			System.err.println(ex.getMessage());
-		}
+//		/** Global (OS-level) hotkey manager: 
+//		 * jnativehook supported systems: Windows, X11, MacOS
+//		 * 
+//		 */
+//		try {
+//			LogManager.getLogManager().reset();
+//			GlobalScreen.setEventDispatcher(new SwingDispatchService());
+//			GlobalScreen.registerNativeHook();
+//			GlobalScreen.addNativeKeyListener(new GlobalKeyListenerExample());
+//		}
+//		catch (NativeHookException ex) {
+//			System.err.println("There was a problem registering the native hook.");
+//			System.err.println(ex.getMessage());
+//		}
 	}
 
 	@Override

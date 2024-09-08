@@ -5,32 +5,32 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import PamController.PamControlledUnitSettings;
+import PamController.PamController;
+import PamController.PamSettingManager;
+import PamController.PamSettings;
+import PamView.PamDetectionOverlayGraphics;
+import PamView.PamSymbol;
+import PamguardMVC.PamDataBlock;
+import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import cpod.dataPlotFX.CPODPlotProviderFX;
 import cpod.tdPlots.CPODPlotProvider;
 import dataGram.DatagramManager;
 import dataPlots.data.TDDataProviderRegister;
 import dataPlotsFX.data.TDDataProviderRegisterFX;
-import pamScrollSystem.ViewLoadObserver;
 import fileOfflineData.OfflineFileControl;
 import fileOfflineData.OfflineFileDataMap;
 import fileOfflineData.OfflineFileMapPoint;
 import fileOfflineData.OfflineFileProcess;
-import PamController.PamControlledUnitSettings;
-import PamController.PamController;
-import PamController.PamSettingManager;
-import PamController.PamSettings;
-import PamController.fileprocessing.StoreStatus;
-import PamView.PamDetectionOverlayGraphics;
-import PamView.PamSymbol;
-import PamguardMVC.PamDataBlock;
-import PamguardMVC.dataOffline.OfflineDataLoadInfo;
+import pamScrollSystem.ViewLoadObserver;
 
 /**
  * Module for loading CPOD data and converting into PAMGuard binary fiel format. 
  * @author Doug Gillespie
  * @author Jamie Macaulay
  *
- */
+ */	
+@Deprecated
 public class CPODControl extends OfflineFileControl implements PamSettings {
 
 	private CPODClickDataBlock cp1DataBlock, cp3DataBlock;
@@ -91,7 +91,7 @@ public class CPODControl extends OfflineFileControl implements PamSettings {
 	 * @return milliseconds. 
 	 */
 	public static long podTimeToMillis(long podTime) {
-		return podTime * 60L * 1000L - (25569L*3600L*24000L);
+		return CPODUtils.podTimeToMillis(podTime);
 	}
 
 	public long stretchClicktime(long rawTime) {

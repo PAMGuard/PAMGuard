@@ -82,6 +82,7 @@ public class CTClassificationProcess extends PamInstantProcess {
 		}
 	}
 	
+	@Override
 	public void updateData(PamObservable o, PamDataUnit arg) {
 		Debug.out.println("CTClassificationProcess: update click train classification: " + o + " " + clickTrainControl.getClickTrainDataBlock()); 
 		if (o == clickTrainControl.getClickTrainDataBlock()) {

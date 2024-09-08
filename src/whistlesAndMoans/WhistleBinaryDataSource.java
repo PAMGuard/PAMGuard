@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import whistlesAndMoans.WhistleToneConnectProcess.ShapeConnector;
 import Localiser.algorithms.timeDelayLocalisers.bearingLoc.BearingLocaliser;
 import PamController.PamController;
 import PamUtils.PamUtils;
@@ -19,7 +18,7 @@ import binaryFileStorage.BinaryHeader;
 import binaryFileStorage.BinaryObjectData;
 import binaryFileStorage.ModuleFooter;
 import binaryFileStorage.ModuleHeader;
-import binaryFileStorage.PackedBinaryObject;
+import whistlesAndMoans.WhistleToneConnectProcess.ShapeConnector;
 
 public class WhistleBinaryDataSource extends BinaryDataSource {
 
@@ -151,11 +150,15 @@ public class WhistleBinaryDataSource extends BinaryDataSource {
 
 			/**
 			 * Bit of mess sorted out on 15/5/2020. Was working because module version went from 1 to 2 at same time 
-			 * as file version went from 3 to 4. May have been some middly stuff where file version and module 
+			 * as file version went from 3 to 4. May have been some middle stuff where file version and module 
 			 * There is some FV 3 with MV 1, in which case data were probably duplicated. 
 			 */
 			if (fileVersion > 3) { // basic data now in standard format. 
-				firstSliceSample = startSample = binaryObjectData.getDataUnitBaseData().getStartSample();
+				if (binaryObjectData.getDataUnitBaseData().getStartSample()==null) {
+					//some very rare circumstances
+					firstSliceSample =0;
+				}
+				else firstSliceSample = startSample = binaryObjectData.getDataUnitBaseData().getStartSample();
 				
 				// if the DataUnitBaseData contains a sequence map, use it in place of the channel map
 				if (binaryObjectData.getDataUnitBaseData().getSequenceBitmap()!=null) {

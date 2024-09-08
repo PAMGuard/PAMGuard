@@ -178,7 +178,7 @@ public class OfflineWavFileServer extends OfflineFileServer<FileDataMapPoint> {
 			return false;
 		}
 		
-		PamAudioFileLoader audioFile = PamAudioFileManager.getInstance().getAudioLoader(mapPoint.getSoundFile()); 
+		PamAudioFileLoader audioFile = PamAudioFileManager.getInstance().getAudioFileLoader(mapPoint.getSoundFile()); 
 		
 		if (audioFile==null) {
 			System.err.println("OfflineWavFileServer: could not find audio loader for mapped sound file: " + mapPoint.getSoundFile()); 

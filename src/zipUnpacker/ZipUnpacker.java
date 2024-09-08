@@ -49,10 +49,10 @@ public class ZipUnpacker implements PamSettings {
 		if (zipSettings.getArchiveFolder() == null || zipSettings.getDataFolder() == null) {
 			return;
 		}
-		if (new File(zipSettings.getArchiveFolder()).exists() == false) {
+		if (!new File(zipSettings.getArchiveFolder()).exists()) {
 			return;
 		}
-		if (new File(zipSettings.getDataFolder()).exists() == false) {
+		if (!new File(zipSettings.getDataFolder()).exists()) {
 			return;
 		}
 		ArrayList<String> newDoneFiles = new ArrayList<>();
@@ -90,8 +90,8 @@ public class ZipUnpacker implements PamSettings {
 			outFolderName += FileParts.getFileSeparator() + dataType;
 		}
 		File outFolder = new File(outFolderName);
-		if (outFolder.exists() == false) {
-			if (outFolder.mkdirs() == false) {
+		if (!outFolder.exists()) {
+			if (!outFolder.mkdirs()) {
 				System.err.println("Error creating data folder " + outFolderName);
 			}
 			else {
@@ -135,7 +135,7 @@ public class ZipUnpacker implements PamSettings {
 			    	int lastSep = folderName.lastIndexOf('\\');
 			    	if (lastSep > 0) {
 			    		File folder = new File(folderName.substring(0, lastSep));
-			    		if (folder.exists() == false) {
+			    		if (!folder.exists()) {
 			    			folder.mkdirs();
 			    			FileFunctions.setNonIndexingBit(folder);
 			    		}

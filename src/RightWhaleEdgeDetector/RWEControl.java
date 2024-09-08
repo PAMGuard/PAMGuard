@@ -7,18 +7,13 @@ import java.io.Serializable;
 
 import javax.swing.JMenuItem;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import KernelSmoothing.KernelSmoothingProcess;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
-import PamController.PamController;
 import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamUtils.PamUtils;
-import PamView.GroupedDataSource;
 import PamView.GroupedSourceParameters;
 import PamView.dialog.GroupedSourcePanel;
 import PamguardMVC.PamDataBlock;
@@ -43,6 +38,7 @@ public class RWEControl extends PamControlledUnit implements PamSettings {
 		super("RW Edge Detector", unitName);
 		rweProcess = new RWEProcess(this);
 		addPamProcess(rweProcess);
+		
 		PamSettingManager.getInstance().registerSettings(this);
 	}
 

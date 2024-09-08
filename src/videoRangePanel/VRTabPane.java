@@ -4,7 +4,6 @@ import java.awt.Point;
 import java.io.File;
 
 import PamView.PamTabPanel;
-import videoRangePanel.layoutFX.VRTabPanelControlFX;
 
 public abstract class VRTabPane implements PamTabPanel {
 	

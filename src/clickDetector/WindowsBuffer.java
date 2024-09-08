@@ -59,6 +59,7 @@ public class WindowsBuffer implements WriteWinFile {
 	}
 	
 
+	@Override
 	public void writeWinInt(int val) throws IOException {
 		writeWinShort(val & 0xFFFF);
 		writeWinShort(val >> 16);
@@ -71,6 +72,7 @@ public class WindowsBuffer implements WriteWinFile {
 		return val;
 	}
 
+	@Override
 	public void writeWinShort(int val) throws IOException {
 		/*
 		 * Write out low byte first
@@ -86,6 +88,7 @@ public class WindowsBuffer implements WriteWinFile {
 		return val;
 	}
 	
+	@Override
 	public void writeByte(int b)throws IOException  {
 		writeByte((byte) b);
 	}
@@ -99,15 +102,18 @@ public class WindowsBuffer implements WriteWinFile {
 		return bytes[offset++];
 	}
 	
+	@Override
 	public void writeWinFloat(float val) throws IOException {
 //		java.lang.Float floatValue = new Float(val);
 		int intValue = Float.floatToIntBits(val);
 		writeWinInt(intValue);
 	}
+	@Override
 	public void writeWinDouble(double val) throws IOException {
 		long intValue = Double.doubleToLongBits(val);
 		writeWinLong(intValue);
 	}
+	@Override
 	public void writeWinLong(long longValue) throws IOException {
 		writeWinInt((int) (0xFFFFFFFF & longValue));
 		writeWinInt((int) (0xFFFFFFFF & (longValue >> 32)));

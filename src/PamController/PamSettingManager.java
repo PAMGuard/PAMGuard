@@ -20,10 +20,6 @@
  */
 package PamController;
 
-import generalDatabase.DBControl;
-import generalDatabase.DBControlSettings;
-import javafx.scene.control.Alert.AlertType;
-
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,6 +38,15 @@ import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 
+import PamController.settings.SettingsNameChange;
+import PamController.settings.SettingsNameChanger;
+import PamUtils.PamCalendar;
+import PamUtils.PamFileChooser;
+import PamUtils.PamFileFilter;
+import PamView.dialog.warn.WarnOnce;
+import generalDatabase.DBControl;
+import generalDatabase.DBControlSettings;
+import javafx.scene.control.Alert.AlertType;
 import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
 import pamViewFX.fxSettingsPanes.SettingsFileDialogFX;
 import pamguard.GlobalArguments;
@@ -55,16 +60,6 @@ import pamguard.GlobalArguments;
 //import org.w3c.dom.Node;
 //import com.thoughtworks.xstream.XStream;
 
-
-
-
-
-
-
-
-import java.io.StringWriter;
-
-
 //import javax.xml.transform.OutputKeys;
 //import javax.xml.transform.Transformer;
 //import javax.xml.transform.TransformerException;
@@ -73,28 +68,10 @@ import java.io.StringWriter;
 //import javax.xml.transform.stream.StreamResult;
 
 
-
-
-
-
-
-
-
 //import sun.jdbc.odbc.OdbcDef;
 import tipOfTheDay.TipOfTheDayManager;
 //import javax.swing.filechooser.FileFilter;
 //import javax.swing.filechooser.FileNameExtensionFilter;
-
-import PamController.settings.SettingsNameChange;
-import PamController.settings.SettingsNameChanger;
-import PamUtils.PamCalendar;
-import PamUtils.PamFileChooser;
-import PamUtils.PamFileFilter;
-import PamUtils.Splash;
-import PamView.PamGui;
-import PamView.dialog.warn.WarnOnce;
-import amplifier.AmpDialog;
-import amplifier.AmpParameters;
 
 //import PamUtils.PamFileFilter;
 
@@ -172,6 +149,7 @@ public class PamSettingManager {
 	static public final String fileEnd = "psf";
 	static public final String fileEndx = "psfx";
 	static public final String fileEndXML = "psfxml";
+	
 	private static boolean saveAsPSFX = true;
 
 	static public String getCurrentSettingsFileEnd() {
@@ -220,11 +198,12 @@ public class PamSettingManager {
 	/**
 	 * Save settings to a psf file
 	 */
-	static private final int SAVE_PSF = 0x1;
+	static public final int SAVE_PSF = 0x1;
+	
 	/**
 	 * Save settings to database tables (if available).
 	 */
-	static private final int SAVE_DATABASE = 0x2;
+	static public final int SAVE_DATABASE = 0x2;
 
 	/**
 	 * running in remote mode, default normal
@@ -481,7 +460,7 @@ public class PamSettingManager {
 	public PamSettings findSettingsOwner(String unitType, String unitName, String unitClassName) {
 		for (PamSettings owner:owners) {
 			if (owner.getClass() != null && unitClassName != null) {
-				if (owner.getClass().getName().equals(unitClassName) == false) {
+				if (!owner.getClass().getName().equals(unitClassName)) {
 					continue;
 				}
 			}
@@ -521,7 +500,7 @@ public class PamSettingManager {
 	 */
 	public boolean saveSettings(int saveWhere) {
 
-		if (initializationComplete == false) {
+		if (!initializationComplete) {
 			// if PAMGAURD hasn't finished loading, then don't save the settings
 			// or the file will get wrecked (bug tracker 2269579)			
 			String msg = "There was an error loading settings from this configuration, so the configuration"
@@ -800,7 +779,6 @@ public class PamSettingManager {
 		/*
 		 * then save it to a single XML file
 		 */
-
 		//XML file test
 
 		objectToXMLFile(pamSettingsList,file);
@@ -1035,7 +1013,7 @@ public class PamSettingManager {
 		loadSettingsFileData();
 		
 
-		if (PamSettingManager.RUN_REMOTE == false && GlobalArguments.isBatch() == false) {
+		if (!PamSettingManager.RUN_REMOTE && !GlobalArguments.isBatch()) {
 			if (settingsFileData != null) {
 				TipOfTheDayManager.getInstance().setShowAtStart(settingsFileData.showTipAtStartup);
 				if (settingsFileData.showTipAtStartup) {
@@ -1235,8 +1213,8 @@ public class PamSettingManager {
 		PamSettings owner;
 		for (int i = 0; i < ownersList.size(); i++) {
 			owner = ownersList.get(i);
-			if (owner.getUnitType().equals(unitType) == false) continue;
-			if (unitName != null && owner.getUnitName().equals(unitName) == false) continue;
+			if (!owner.getUnitType().equals(unitType)) continue;
+			if (unitName != null && !owner.getUnitName().equals(unitName)) continue;
 			return owner;
 		}
 
@@ -1684,7 +1662,7 @@ public class PamSettingManager {
 		 * then create the file (and do a few other things)
 		 */
 		File slFile = getSettingsListFile();
-		if (slFile.exists() == false) {
+		if (!slFile.exists()) {
 			createSettingsListFile();
 		}
 
@@ -1790,7 +1768,7 @@ public class PamSettingManager {
 		if (settingsFileData == null) {
 			return false;
 		}
-		if (PamSettingManager.RUN_REMOTE == false) {
+		if (!PamSettingManager.RUN_REMOTE) {
 			settingsFileData.showTipAtStartup = TipOfTheDayManager.getInstance().isShowAtStart();
 		}
 		settingsFileData.trimList();

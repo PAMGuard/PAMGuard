@@ -93,7 +93,7 @@ public abstract class WaveformPlot<D extends PamDataUnit> implements DetectionPl
 	 */
 	@Override
 	public void setupAxis(D pamDetection, double sR, DetectionPlotProjector plotProjector){
-		//System.out.println("WaveformPlot: plotting the waveform" + waveform.length);
+		//System.out.println("WaveformPlot.setupAxis plotting the waveform: " + getWaveform(pamDetection)[0].length);
 		//all axis are used in the waveform plot except the right axis. 
 		double[][] waveform=getWaveform(pamDetection); 
 
@@ -107,19 +107,22 @@ public abstract class WaveformPlot<D extends PamDataUnit> implements DetectionPl
 		else binLength=waveform[0].length;
 
 		//System.out.println("Waveform Length: " + binLength); 
+//		plotProjector.setEnableScrollBar(true);
+
 
 		//set the scroller minimum and maximum 
 		plotProjector.setMinScrollLimit(0);
 		plotProjector.setMaxScrollLimit((binLength*1000.)/sR);
-		plotProjector.setEnableScrollBar(true);
 		plotProjector.setScrollAxis(Side.BOTTOM);
 		
-//		System.out.println("Waveform Time Axis: min " + (plotProjector.getAxis(Side.BOTTOM).getMinVal()/1000.)*sR + 
-//				" max: " + 	(plotProjector.getAxis(Side.BOTTOM).getMaxVal()/1000)*sR);
 		
-		//set the min and max value. 
+		//set the min and max value from the bottom axis on the top axis. This essentially means that the scroller can
+		//set the top axis. 
 		plotProjector.setAxisMinMax((plotProjector.getAxis(Side.BOTTOM).getMinVal()/1000.)*sR, 
 				(plotProjector.getAxis(Side.BOTTOM).getMaxVal()/1000)*sR, Side.TOP);
+		
+//		System.out.println("WaveformPlot.setupAxis: min " + (plotProjector.getAxis(Side.BOTTOM).getMinVal()/1000.)*sR + 
+//				" max: " + 	(plotProjector.getAxis(Side.BOTTOM).getMaxVal()/1000)*sR);
 		
 		
 		//		plotProjector.setAxisMinMax(0, (binLength*1000.)/sR, Side.BOTTOM);
@@ -146,6 +149,7 @@ public abstract class WaveformPlot<D extends PamDataUnit> implements DetectionPl
 	public void paintPlot(D pamDetection, GraphicsContext gc, Rectangle rectangle, DetectionPlotProjector plotProjector, int flag){
 		//if (currentDetection == pamDetection) return; 		
 		currentDetection = pamDetection; 
+		
 		if (flag == DetectionPlot.SCROLLPANE_DRAW) {
 			//drawing a datagram in the scroll pane. 
 			//System.out.println("WaveformPlot: Print scroll datagram: " +  pamDetection+ "  " + rectangle); 
@@ -166,6 +170,8 @@ public abstract class WaveformPlot<D extends PamDataUnit> implements DetectionPl
 	private void paintScrollDataGram(D pamDetection, GraphicsContext gc, Rectangle clipRect, DetectionPlotProjector projector) {
 		currentWaveform=getWaveform(pamDetection);
 		
+		if (currentWaveform==null) return;
+		
 		paintWaveform(currentWaveform, currentDetection.getSequenceBitmap(),  gc,  clipRect,  0, currentWaveform[0].length,
 				log2Amplitude, null, true,  false);	
 
@@ -179,7 +185,11 @@ public abstract class WaveformPlot<D extends PamDataUnit> implements DetectionPl
 	 * @param projector - the projector
 	 */
 	private void forcePaintPlot(D pamDetection, GraphicsContext gc, Rectangle rectangle, DetectionPlotProjector projector){
+//		System.out.println("WaveformPlot.forcePaintPlot:");
 		currentWaveform=getWaveform(pamDetection);
+	
+		if (currentWaveform==null) return;
+
 		waveformPlotParams.invert=false; 
 		setYScale();
 		paintWaveform(currentWaveform, gc,  rectangle, projector, null);
@@ -249,8 +259,11 @@ public abstract class WaveformPlot<D extends PamDataUnit> implements DetectionPl
 		synchronized (storedWaveformLock) {
 			if (currentDetection == null || waveform==null || waveform.length==0 || waveform[0]==null)
 				return;
-			paintWaveform(waveform, currentDetection.getSequenceBitmap(),  g,  clipRect,  (int) projector.getAxis(Side.TOP).getMinVal(), (int) projector.getAxis(Side.TOP).getMaxVal(),
-					log2Amplitude, color, !waveformPlotParams.showSperateWaveform || waveform.length==1,  waveformPlotParams.invert);
+						
+			paintWaveform(waveform, currentDetection.getSequenceBitmap(), g, clipRect,
+					(int) projector.getAxis(Side.TOP).getMinVal(), (int) projector.getAxis(Side.TOP).getMaxVal(),
+					log2Amplitude, color, !waveformPlotParams.showSperateWaveform || waveform.length == 1,
+					waveformPlotParams.invert);
 		}
 	}
 
@@ -268,7 +281,7 @@ public abstract class WaveformPlot<D extends PamDataUnit> implements DetectionPl
 	 */
 	public static void paintWaveform(double[][] waveform, int channelBitMap, GraphicsContext g, Rectangle clipRect,
 			int minbin, int maxbin, double yScaleInfo, Color color, boolean singlePlot, boolean invert) {
-		//System.out.println("Paint the waveform: " + clipRect.getWidth());
+//		System.out.println("Paint the waveform: " + waveform[0].length);
 		g.setLineWidth(1);
 
 //		boolean singlePlot=!waveformPlotParams.showSperateWaveform; 

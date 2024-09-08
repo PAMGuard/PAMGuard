@@ -51,7 +51,7 @@ public class PamLoadingPane extends PamVBox {
 	/**
 	 * Time for loading before load pane showsn.
 	 */
-	private long waitBeforeShiow=3000; // wait three seconds before a load 
+	private long waitBeforeShiow=1000; // wait one seconds before a load 
 	
 	
 	public PamLoadingPane(PamGuiManagerFX pamGuiManager){
@@ -66,7 +66,7 @@ public class PamLoadingPane extends PamVBox {
 	 */
 	public void updateLoadPane(PamTaskUpdate taskUpdate){
 		
-//		System.out.println("New PAMTask Update: " + taskUpdate.getName() + " Progress: "  + taskUpdate.getProgress() + " Status: "+ taskUpdate.getStatus());
+//		System.out.println("New PAMTask Update: " + taskUpdate.getName() + " Progress: "  + taskUpdate.getProgress() + " Status: "+ taskUpdate.getStatus() + " Progress: "  + taskUpdate.getProgressString());
 		
 		//first, figure out if there there is a PamTaskPane for the update; 
 		PamTaskPane pamTaskPane = null;

@@ -10,9 +10,9 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.border.TitledBorder;
 
-import binaryFileStorage.BinaryOfflineDataMapPoint;
 import PamView.CancelObserver;
 import PamView.dialog.PamDialog;
+import binaryFileStorage.BinaryOfflineDataMapPoint;
 
 public class DatagramProgressDialog extends PamDialog {
 

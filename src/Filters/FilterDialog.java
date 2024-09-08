@@ -21,6 +21,7 @@
 package Filters;
 
 import java.awt.Window;
+
 import PamView.dialog.PamDialog;
 
 public class FilterDialog extends PamDialog {

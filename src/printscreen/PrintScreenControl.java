@@ -8,8 +8,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -18,6 +16,7 @@ import javax.swing.JMenuItem;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
+import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamUtils.FileFunctions;
@@ -26,8 +25,6 @@ import PamView.GuiFrameManager;
 import PamView.PamSidePanel;
 import PamguardMVC.PamProcess;
 import annotation.handler.AnnotationChoiceHandler;
-import annotation.handler.AnnotationChoices;
-import annotation.handler.AnnotationHandler;
 import annotation.string.StringAnnotationType;
 import annotation.userforms.UserFormAnnotationType;
 import generalDatabase.DBControlUnit;
@@ -85,7 +82,7 @@ public class PrintScreenControl extends PamControlledUnit implements PamSettings
 	public void notifyModelChanged(int changeType) {
 		super.notifyModelChanged(changeType);
 		switch (changeType) {
-		case PamController.INITIALIZATION_COMPLETE:
+		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			annotationHandler.loadAnnotationChoices();
 			sortSQLLogging();
 			break;
@@ -141,7 +138,7 @@ public class PrintScreenControl extends PamControlledUnit implements PamSettings
         if (frameIndex == 0) {
         	// only do annotations for the first frame to keep life simple. 
         	boolean ok = annotationHandler.annotateDataUnit(getGuiFrame(), psdu);
-        	if (ok == false) {
+        	if (!ok) {
         		return false;
         	}
         }

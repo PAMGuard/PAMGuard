@@ -1,10 +1,5 @@
 package Array;
 
-import GPS.GpsData;
-import GPS.GpsDataUnit;
-import PamUtils.LatLong;
-import PamguardMVC.PamDataBlock;
-
 abstract public class MovingHydrophoneLocator extends SimpleHydrophoneLocator {
 
 	/**

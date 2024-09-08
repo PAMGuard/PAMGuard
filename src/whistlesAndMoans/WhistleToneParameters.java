@@ -5,9 +5,8 @@ import java.io.Serializable;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
-import spectrogramNoiseReduction.SpectrogramNoiseSettings;
-
 import PamView.GroupedSourceParameters;
+import spectrogramNoiseReduction.SpectrogramNoiseSettings;
 
 
 public class WhistleToneParameters extends GroupedSourceParameters implements Serializable, Cloneable, ManagedParameters {

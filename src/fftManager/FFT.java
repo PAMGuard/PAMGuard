@@ -67,7 +67,7 @@ public class FFT {
 		int signalEnd = testSignal.length;
 		int kernelStart = 0;
 		int kernelEnd = testKernel.length;
-		;
+		
 
 		double[] xCorrelation = crossCorrelation(testSignal, signalStart,
 				signalEnd, testKernel, kernelStart, kernelEnd);
@@ -90,7 +90,7 @@ public class FFT {
 					.println("testCrossCorellation result matches expected result.");
 
 		return resultMatch;
-	};
+	}
 
 	/**
 	 * Setup up the internal reference to the input double[] to be used to
@@ -175,7 +175,7 @@ public class FFT {
 		// //System.out.println("Nearest power: " + power);
 
 		return power;
-	};
+	}
 	
 	public static int log2(int num) {
 		// return -1 if it's not a natural power of 2

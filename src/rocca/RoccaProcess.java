@@ -23,28 +23,6 @@
 
 package rocca;
 
-import Acquisition.AcquisitionControl;
-import Acquisition.AcquisitionProcess;
-import Acquisition.DaqStatusDataUnit;
-import GPS.GPSDataBlock;
-import GPS.GpsDataUnit;
-import PamController.PamControlledUnit;
-import PamController.PamController;
-import PamDetection.RawDataUnit;
-import PamUtils.FileParts;
-import PamUtils.PamCalendar;
-import PamUtils.PamUtils;
-import PamView.dialog.warn.WarnOnce;
-import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamDataUnit;
-import PamguardMVC.PamObservable;
-import PamguardMVC.PamProcess;
-import PamguardMVC.PamRawDataBlock;
-import PamguardMVC.RawDataUnavailableException;
-import PamModel.PamModel;
-import Spectrogram.SpectrogramDisplay;
-import fftManager.FFTDataBlock;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -61,11 +39,31 @@ import java.util.ListIterator;
 
 import javax.swing.JOptionPane;
 
+import Acquisition.AcquisitionControl;
+import Acquisition.AcquisitionProcess;
+import Acquisition.DaqStatusDataUnit;
+import GPS.GPSDataBlock;
+import GPS.GpsDataUnit;
+import PamController.PamControlledUnit;
+import PamController.PamController;
+import PamDetection.RawDataUnit;
+import PamModel.PamModel;
+import PamUtils.FileParts;
+import PamUtils.PamCalendar;
+import PamUtils.PamUtils;
+import PamView.dialog.warn.WarnOnce;
+import PamguardMVC.PamDataBlock;
+import PamguardMVC.PamDataUnit;
+import PamguardMVC.PamObservable;
+import PamguardMVC.PamProcess;
+import PamguardMVC.PamRawDataBlock;
+import PamguardMVC.RawDataUnavailableException;
+import Spectrogram.SpectrogramDisplay;
 import clickDetector.ClickDataBlock;
 import clickDetector.ClickDetection;
 import clickDetector.NoiseDataBlock;
 import clickDetector.TrackedClickDataBlock;
-import wavFiles.WavFile;
+import fftManager.FFTDataBlock;
 import wavFiles.WavFileWriter;
 import whistlesAndMoans.AbstractWhistleDataBlock;
 import whistlesAndMoans.AbstractWhistleDataUnit;
@@ -1126,7 +1124,7 @@ public class RoccaProcess extends PamProcess {
             RoccaContourDataUnit rcdu = null;
             int numPoints = rcdb.getUnitsCount();
             for (int i = 0; i < numPoints; i++) {
-                rcdu = rcdb.getDataUnit(i, RoccaContourDataBlock.REFERENCE_CURRENT);
+                rcdu = rcdb.getDataUnit(i, PamDataBlock.REFERENCE_CURRENT);
                 if (rcdu.getPeakFreq() != RoccaParameters.NO_CONTOUR_HERE ) {
                     String contourPoints =   rcdu.getTime() + "," +
                             rcdu.getPeakFreq() + "," +

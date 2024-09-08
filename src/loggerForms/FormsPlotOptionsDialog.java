@@ -30,7 +30,7 @@ public class FormsPlotOptionsDialog extends PamDialog {
 		mainPanel.add(BorderLayout.CENTER, tabbedPane);
 		for (int i = 0; i < n; i++) {
 			formDescription = formsControl.getFormDescription(i);
-			if (formDescription.canDrawOnMap() == false) {
+			if (!formDescription.canDrawOnMap()) {
 				continue;
 			}
 			aPanel = new FormPlotOptionsPanel(formDescription);

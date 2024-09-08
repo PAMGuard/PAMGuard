@@ -15,21 +15,21 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
-import depthReadout.MccDepthParameters.MccSensorParameters;
-
-import mcc.MccJniInterface;
-import mcc.mccjna.MCCBoardInfo;
-import mcc.mccjna.MCCConstants;
-import mcc.mccjna.MCCJNA;
-import mcc.mccjna.MCCUtils;
 import Array.ArrayManager;
 import Array.PamArray;
 import PamController.PamController;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.warn.WarnOnce;
+import depthReadout.MccDepthParameters.MccSensorParameters;
+import mcc.MccJniInterface;
+import mcc.mccjna.MCCBoardInfo;
+import mcc.mccjna.MCCConstants;
+import mcc.mccjna.MCCJNA;
+import mcc.mccjna.MCCUtils;
 
 public class MccDialog extends PamDialog {
 	
@@ -90,10 +90,10 @@ public class MccDialog extends PamDialog {
 	
 	@Override
 	public boolean getParams() {
-		if (boardPanel.getParams() == false) {
+		if (!boardPanel.getParams()) {
 			return false;
 		}
-		if (sensorsPanel.getParams() == false) {
+		if (!sensorsPanel.getParams()) {
 			return false;
 		}
 		depthControl.depthParameters = depthParameters;
@@ -193,7 +193,7 @@ public class MccDialog extends PamDialog {
 			c.gridy++;
 			c.gridx = 0;
 			c.anchor = GridBagConstraints.WEST;
-			addComponent(this, new JLabel("Streamers ", JLabel.RIGHT), c);
+			addComponent(this, new JLabel("Streamers ", SwingConstants.RIGHT), c);
 			ArrayManager arrayManager = ArrayManager.getArrayManager();
 			PamArray array = arrayManager.getCurrentArray();
 			int nS = array.getNumStreamers();
@@ -419,6 +419,7 @@ public class MccDialog extends PamDialog {
 		}
 		private class HitEnter implements ActionListener {
 
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				int numSensors;
 				try {

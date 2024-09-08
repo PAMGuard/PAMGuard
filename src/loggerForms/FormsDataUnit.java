@@ -3,6 +3,8 @@ package loggerForms;
 import GPS.GpsData;
 import PamUtils.PamCalendar;
 import PamguardMVC.PamDataUnit;
+import generalDatabase.SQLTypes;
+import loggerForms.controlDescriptions.ControlDescription;
 /**
  * 
  * @author Graham Weatherup
@@ -11,9 +13,6 @@ import PamguardMVC.PamDataUnit;
  * UTC
  * UTCmillisecond
  * PCLocalTime
- * 
- * 
- * 
  * 
  */
 public class FormsDataUnit extends PamDataUnit {
@@ -92,6 +91,82 @@ public class FormsDataUnit extends PamDataUnit {
 			}
 		}
 		return formOriginLatLong;
+	}
+
+	@Override
+	public long getTimeMilliseconds() {
+		Long time = findTimeValue(PropertyTypes.STARTTIME);
+		if (time != null) {
+			return time;
+		}
+		return super.getTimeMilliseconds();
+	}
+
+	/**
+	 * Find one of the time property controls and get its value. 
+	 * @param timeProperty
+	 * @return
+	 */
+	public Long findTimeValue(PropertyTypes timeProperty) {
+		if (formData == null) {
+			return null;
+		}
+		PropertyDescription prop = formDescription.findProperty(timeProperty);
+		if (prop == null) {
+			return null;
+		}
+		String ctrlTitle = prop.getItemInformation().getStringProperty("Title");
+		if (ctrlTitle == null) {
+			return null;
+		}
+		int timeControlIndex = formDescription.findInputControlByName(ctrlTitle);
+		if (timeControlIndex < 0 || timeControlIndex >= formData.length) {
+			return null;
+		}
+		Object timeObj = formData[timeControlIndex];
+		/*
+		 *  this should have found the time contol in the form of a string from the database.
+		 *  try to unpack it.  
+		 */
+		Long timeMillis = SQLTypes.millisFromTimeStamp(timeObj);
+		
+		return timeMillis;
+	}
+	
+	/**
+	 * find a correctly set property value for the end time (if set). 
+	 * @return
+	 */
+	public Long getSetEndTime() {
+		return findTimeValue(PropertyTypes.ENDTIME);
+	}
+
+	@Override
+	public long getEndTimeInMilliseconds() {
+		Long time = findTimeValue(PropertyTypes.ENDTIME);
+		if (time != null) {
+			return time;
+		}
+		return super.getEndTimeInMilliseconds();
+	}
+	
+	@Override
+	public String getSummaryString() {
+		String str = String.format("<html><b>%s</b>", formDescription.getFormNiceName());
+		Object[] data = getFormData();
+		int iDat = 0;
+		for (ControlDescription cd:formDescription.getInputControlDescriptions()) {
+			if (data[iDat] == null) {
+				str += String.format("<p>%s: -", cd.getTitle());
+			}
+			else {
+				str += String.format("<p>%s: %s", cd.getTitle(), data[iDat].toString());
+			}
+			iDat++;
+		}
+
+		str += "</html>";
+		return str;
 	}
 
 

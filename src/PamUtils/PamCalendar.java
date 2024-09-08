@@ -85,7 +85,7 @@ public class PamCalendar {
 	 * viewPositions which is the number of milliseconds from the sessionsStartTime.
 	 */
 	private static long viewPosition;
-	
+		
 	
 	/**
 	 * If files are being analysed, return the time based on the file
@@ -880,14 +880,18 @@ public class PamCalendar {
 	 */
 	public static void setSessionStartTime(long sessionStartTime) {
 		PamCalendar.sessionStartTime = sessionStartTime;
+		PamController.getInstance().updateMasterClock(getTimeInMillis());
 	}
 
 	/**
 	 * 
-	 * @param soundFileTimeMillis The start time of a sound file
+	 * Relative time within a sound file. This is always just added to sessionStartTime
+	 * to give an absolute time. 
+	 * @param soundFileTimeMillis The relative time of a sound file. 
 	 */
 	public static void setSoundFileTimeInMillis(long soundFileTimeMillis) {
 		PamCalendar.soundFileTimeInMillis = soundFileTimeMillis;
+		PamController.getInstance().updateMasterClock(getTimeInMillis());
 	}
 
 	/**
@@ -947,7 +951,8 @@ public class PamCalendar {
 			"yyyy-MM-dd HH_mm_ss", // Avisoft.
 			"yyyy-MM-dd_HH-mm-ss", // y2000 Cornell pop up data
 			"yyyyMMddHHmmss", //Tanzania survey (recorder using 'bul filerename' program)
-			"yyyy-MM-dd HH-mm-ss" // RS Orca recorder. index 32. Must remain at this position !!!!
+			"yyyy-MM-dd HH-mm-ss", // RS Orca recorder. index 32. Must remain at this position !!!!
+			"dd/MM/yyyy HH:ss" //An excel standard
 	};
 
 	public static Long unpackStandardDateTime(String numstr) {

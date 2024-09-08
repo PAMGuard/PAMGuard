@@ -258,6 +258,8 @@ public class Correlations {
 		correlationValue = newPeak[1];
 		return newPeak[0];
 	}
+	
+	
 	/**
 	 * Measure the time delay between pulses on two channels. Inputs in this case are the 
 	 * spectrum data (most of the cross correlation is done in the frequency domain)<p>

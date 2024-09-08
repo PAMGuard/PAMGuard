@@ -6,8 +6,7 @@ package IshmaelLocator;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-
-
+import IshmaelDetector.IshDetFnDataUnit;
 import Layout.DisplayPanel;
 import Layout.DisplayPanelContainer;
 import Layout.DisplayPanelProvider;
@@ -19,7 +18,6 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamObserver;
-import IshmaelDetector.IshDetFnDataUnit;
 
 /**
  * @author Hisham
@@ -35,10 +33,12 @@ IshLocControl ishLocControl;
 		this.ishLocControl = ishLocControl;
 	}
 
+	@Override
 	public DisplayPanel createDisplayPanel(DisplayPanelContainer displayPanelContainer) {
 		return new IshDisplayPanel(this, displayPanelContainer);
 	}
 
+	@Override
 	public String getDisplayPanelName() {
 		return ishLocControl.getUnitName() + " Graphics";
 //		return "Ishmael Graphics Panel";
@@ -80,19 +80,23 @@ IshLocControl ishLocControl;
 				ishmaelDataHy.deleteObserver(this);
 		}
 
+		@Override
 		public String getObserverName() {
 			return displayPanelProvider.getDisplayPanelName();
 		}
 
+		@Override
 		public long getRequiredDataHistory(PamObservable o, Object arg) {
 			return 0;
 		}
 
+		@Override
 		public void noteNewSettings() {
 			// TODO Auto-generated method stub
 			
 		}
 
+		@Override
 		public void removeObservable(PamObservable o) {
 			// TODO Auto-generated method stub
 			
@@ -110,12 +114,14 @@ IshLocControl ishLocControl;
 			
 		}
 
+		@Override
 		public void setSampleRate(float sampleRate, boolean notify) {
 			this.sampleRate = sampleRate;
 		}
 
 		int lastX = 0;
 		int lastY = 0;
+		@Override
 		public void addData(PamObservable o, PamDataUnit dataUnit1) {
 
 			/**

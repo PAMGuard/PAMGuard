@@ -1,32 +1,22 @@
 package difar.trackedGroups;
 
 import java.util.ArrayList;
-import java.util.ListIterator;
-
-import generalDatabase.DBControl;
 import generalDatabase.DBControlUnit;
 import generalDatabase.PamConnection;
-import generalDatabase.SQLLogging;
-import difar.DIFARCrossingInfo;
-import difar.DIFARTargetMotionInformation;
 import difar.DifarControl;
 import difar.DifarDataUnit;
 import pamScrollSystem.PamScroller;
-import pamScrollSystem.ViewLoadObserver;
 import targetMotionModule.TargetMotionResult;
 import targetMotionModule.algorithms.Simplex2D;
 import Array.ArrayManager;
 import Array.StreamerDataUnit;
 import PamController.PamController;
 import PamUtils.LatLong;
-import PamUtils.PamCalendar;
-import PamUtils.PamUtils;
 import PamView.symbol.StandardSymbolManager;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
-import autecPhones.AutecGraphics;
 
 /**
  * Subscribe to DifarDataBlocks and assign new bearings to groups of whales 

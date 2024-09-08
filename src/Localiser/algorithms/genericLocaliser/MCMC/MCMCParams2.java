@@ -6,6 +6,12 @@ import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 
+/**
+ * Paramters for running a Marklov chain Monte Carlo algorithm.
+ * 
+ * @author Jamie Macaulay 
+ *
+ */
 public class MCMCParams2 implements Serializable, Cloneable, ManagedParameters  {
 	
 	public static final long serialVersionUID = 3L;
@@ -30,7 +36,7 @@ public class MCMCParams2 implements Serializable, Cloneable, ManagedParameters  
 	public int numberOfJumps=250000; //int
 	
 	/**
-	 * Where in paramter space the chains should start. Each value in the array is for one dimension. When
+	 * Where in parameter space the chains should start. Each value in the array is for one dimension. When
 	 * chains start a random number between the two numbers is chosen as the start position in that dimension for the
 	 * chain. 
 	 */
@@ -42,12 +48,12 @@ public class MCMCParams2 implements Serializable, Cloneable, ManagedParameters  
 	public int numberOfChains=4; //int 
 	
 	/**
-	 * Use cyclindrical jumps. 
+	 * Use cylindrical jumps. 
 	 */
 	public boolean cylindricalCoOrdinates = false; 
 	/**
-	 * Set the chain jump size- sets the jump size of all dimensions to the input jumpsize
-	 * @param jumpsize the jumpsize for all dimensions. 
+	 * Set the chain jump size- sets the jump size of all dimensions to the input jump size.
+	 * @param jumpsize the jump size for all dimensions. 
 	 * @param nDim the number of dimensions. 
 	 */
 	public void setJumpSize(double jumpsize, int nDim){
@@ -59,8 +65,8 @@ public class MCMCParams2 implements Serializable, Cloneable, ManagedParameters  
 	
 	/**
 	 * Set chain start dispersion to one value for all dimensions. The start dispersion is a random number centered
-	 * on zero and from a distribution with a size defined by the dispersion input paramater. 
-	 * @param dispersion the chain start dispersion for all dimensions. element 1 is th
+	 * on zero and from a distribution with a size defined by the dispersion input parameter. 
+	 * @param dispersion the chain start dispersion for all dimensions. 
 	 */
 	public double[][] setChainDispersion(double dispersion, int nDim){
 		chainStartDispersion=new double[nDim][2];
@@ -87,11 +93,20 @@ public class MCMCParams2 implements Serializable, Cloneable, ManagedParameters  
 	public double percentageToIgnore=0.7; //%
 
 	
-	//cluster analysis;
+	/**
+	 * The type of cluster analysis to use to merge the different chains if they converge on the same or ambiguous results. See K_MEANS and NONE constants. 
+	 */
 	public int clusterAnalysis=K_MEANS; 
 	
+	/**
+	 * Do not attempt to cluster the chains. 
+	 */
 	public static final int NONE=0;
-			
+	
+	
+	/**
+	 * Use K_MEANS to cluster the different chains		
+	 */
 	public static final int K_MEANS=1;
 	
 	public Integer nKMeans=2; //int
@@ -99,12 +114,12 @@ public class MCMCParams2 implements Serializable, Cloneable, ManagedParameters  
 	public double maxClusterSize=5; //meters
 
 	/**
-	 * The number of times to perform a kmeans algorithm on results The algorithm starts clusters at random locations. 
+	 * The number of times to perform a k-means algorithm on results The algorithm starts clusters at random locations. 
 	 */
 	public int kmeanAttempts=10;
 
 	/**
-	 * The number of iterations for each kmeans attempt. Kmeans converges to a result but requires a certain number of iteration to 
+	 * The number of iterations for each k-means attempt. K-means converges to a result but requires a certain number of iteration to 
 	 * do so. 
 	 */
 	public int kmeansIterations=20;

@@ -8,6 +8,7 @@ import java.awt.GridBagLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -19,12 +20,11 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
-import fftManager.FFTDataUnit;
-
 import PamController.PamController;
 import PamView.dialog.GroupedSourcePanel;
 import PamView.dialog.PamDialog;
 import PamguardMVC.PamDataBlock;
+import fftManager.FFTDataUnit;
 
 public class WhistleParametersDialog extends PamDialog {
 	
@@ -391,6 +391,7 @@ public class WhistleParametersDialog extends PamDialog {
 		
 		class DefButtonAction implements ActionListener {
 
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if (arg0.getSource() == searchStartButton) {
 					searchStartHz.setText("0");

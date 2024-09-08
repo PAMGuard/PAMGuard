@@ -21,6 +21,15 @@
 
 package rocca;
 
+import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.Serializable;
+
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
@@ -31,19 +40,6 @@ import PamUtils.PamCalendar;
 import PamView.PamGui;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
-
-import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.Serializable;
-
-import javax.swing.AbstractAction;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-
 import clickDetector.ClickControl;
 import clickDetector.ClickDetection;
 import clickDetector.offlineFuncs.OfflineEventDataBlock;
@@ -300,6 +296,7 @@ public class RoccaControl extends PamControlledUnit implements PamSettings {
 //	class CheckRoccaMenuItem implements MenuListener {
 	class CheckRoccaMenuItem implements ActionListener {
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			createClickEventDialog();			
 		}
@@ -383,6 +380,7 @@ public class RoccaControl extends PamControlledUnit implements PamSettings {
 	
 	class SelectClickEvent implements ActionListener {
 		
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			JMenuItem source = (JMenuItem)(e.getSource());
 			int index = (int) source.getClientProperty("index");
@@ -400,6 +398,7 @@ public class RoccaControl extends PamControlledUnit implements PamSettings {
 			this.parentFrame = parentFrame;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			RoccaParameters newParams = RoccaParametersDialog.showDialog
                     (parentFrame, roccaParameters, roccaControl);
@@ -476,15 +475,18 @@ public class RoccaControl extends PamControlledUnit implements PamSettings {
 	}
 
 // Serializable methods
-    public Serializable getSettingsReference() {
+    @Override
+	public Serializable getSettingsReference() {
         return roccaParameters;
     }
 
-    public long getSettingsVersion() {
+    @Override
+	public long getSettingsVersion() {
 		return RoccaParameters.serialVersionUID;
     }
 
-    public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
+    @Override
+	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		this.roccaParameters = ((RoccaParameters) pamControlledUnitSettings
 				.getSettings()).clone();
  		return true;

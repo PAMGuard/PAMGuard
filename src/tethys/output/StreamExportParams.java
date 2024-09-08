@@ -26,11 +26,19 @@ public class StreamExportParams implements Serializable {
 
 	/**
 	 * Datablock long data name (used instead of datablock
-	 * reference so this object and serialise. 
+	 * reference so this object is serialise. 
 	 */
 	public String longDataName;
 	
-	public boolean selected;
+	/**
+	 * Have selected export of detections. 
+	 */
+	public boolean exportDetections;
+	
+	/**
+	 * Have selected export of localisations. 
+	 */
+	public boolean exportLocalisations;
 	
 	/**
 	 * Granularity type, binned, call, encounter, grouped. 
@@ -71,14 +79,39 @@ public class StreamExportParams implements Serializable {
 		if (detectionDescription == null) {
 			detectionDescription = new WrappedDescriptionType();
 		}
+//		if (detectionDescription.getMethod() == null) {
+//			
+//		}
 		return detectionDescription;
 	}
 
-	public StreamExportParams(TethysControl tethysControl, PamDataBlock dataBlock, boolean selected) {
+	public StreamExportParams(TethysControl tethysControl, PamDataBlock dataBlock) {
 		super();
 		this.longDataName = dataBlock.getLongDataName();
-		this.selected = selected;
 		autoFill(tethysControl, dataBlock);
+	}
+	
+	/**
+	 * Used to get the description data back in again if it's changes
+	 * as PAMGuard updates. This object can't store references to the 
+	 * TethysControl or the datablock since they aren't serializable. 
+	 * Normally, the description is auto filled at constructoin, but once
+	 * serialized, this can no longer happen, so can call this function to 
+	 * sort it all out.  
+	 */
+	public void checkDescription() {
+		TethysControl tethysControl = (TethysControl) PamController.getInstance().findControlledUnit(TethysControl.class, null);
+		PamDataBlock dataBlock = PamController.getInstance().getDataBlockByLongName(longDataName);
+		if (tethysControl == null || dataBlock == null) {
+			return; // probably impossible for this to happen, but just in case.  
+		}
+		DescriptionType desc = getNilusDetectionDescription();
+		if (desc == null) {
+			detectionDescription.setDescription(desc = new DescriptionType());
+		}
+		if (desc.getMethod() == null || desc.getMethod().length() == 0) {
+			autoFill(tethysControl, dataBlock);
+		}
 	}
 
 	/**

@@ -5,9 +5,6 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 
-import javax.activation.DataSource;
-
-import PamUtils.Coordinate3d;
 import PamView.GeneralProjector;
 import PamView.PamColors;
 import PamView.PamDetectionOverlayGraphics;

@@ -3,7 +3,6 @@ package Map;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -24,6 +23,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
@@ -31,7 +31,11 @@ import Array.Hydrophone;
 import Map.gridbaselayer.GridDialogPanel;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
+import PamView.dialog.SettingsButton;
 import PamView.panel.PamNorthPanel;
+import PamguardMVC.PamDataBlock;
+import effort.EffortProvider;
+import effort.swing.EffortSourcePanel;
 
 
 
@@ -64,6 +68,8 @@ public class MapParametersDialog extends PamDialog {
 	private JCheckBox headingUp = new JCheckBox("Ship heading always up");
 	
 	private JCheckBox showSurface = new JCheckBox("Show sea surface");
+	
+	private JCheckBox colourByEffort = new JCheckBox("Colour track-line by efort");
 
 	private MapFileManager mapFileManager;
 
@@ -78,6 +84,10 @@ public class MapParametersDialog extends PamDialog {
 	public JCheckBox showGrid;
 
 	private SimpleMap simpleMap;
+	
+	private EffortSourcePanel effortSourcePanel;
+	
+	private SettingsButton effortSettings;
 
 	private MapParametersDialog(java.awt.Window parentFrame, SimpleMap simpleMap) {
 
@@ -110,15 +120,21 @@ public class MapParametersDialog extends PamDialog {
 		setDialogComponent(tabbedPane);
 		setHelpPoint("mapping.mapHelp.docs.overview");
 		//		this.enableHelpButton(true);
+		colourByEffort.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				enableControls();
+			}
+		});
 
 		//hydroCheckBox.get
 	}
 //	MapParameters oldParameters, MapFileManager mapFile
 
 	public static MapParameters showDialog(java.awt.Window parentFrame, SimpleMap simpleMap) {
-		if (singleInstance == null || singleInstance.simpleMap != simpleMap) {
+//		if (singleInstance == null || singleInstance.simpleMap != simpleMap) {
 			singleInstance = new MapParametersDialog(parentFrame, simpleMap);
-		}
+//		}
 		singleInstance.mapParameters = simpleMap.mapParameters.clone();
 		singleInstance.mapFileManager = simpleMap.mapFileManager;
 		singleInstance.setParams();
@@ -140,7 +156,9 @@ public class MapParametersDialog extends PamDialog {
 		keepShipOnMap.setSelected(mapParameters.keepShipOnMap);
 		keepShipCentred.setSelected(mapParameters.keepShipCentred);
 		headingUp.setSelected(mapParameters.headingUp);
-		showSurface.setSelected(mapParameters.hideSurface == false);
+		showSurface.setSelected(!mapParameters.hideSurface);
+		colourByEffort.setSelected(mapParameters.colourByEffort);
+		effortSourcePanel.setSource(mapParameters.effortDataSource);
 
 		filePanel.setMapFile(mapParameters.mapFile);
 		
@@ -168,7 +186,7 @@ public class MapParametersDialog extends PamDialog {
 			mapParameters.keepShipOnMap = keepShipOnMap.isSelected();
 			mapParameters.keepShipCentred = keepShipCentred.isSelected();
 			mapParameters.headingUp = headingUp.isSelected();
-			mapParameters.hideSurface = showSurface.isSelected() == false;
+			mapParameters.hideSurface = !showSurface.isSelected();
 			mapParameters.symbolSize = forceEven((Integer) symbolSize.getValue());
 			mapParameters.showRangeRings = ringsType.getSelectedIndex();
 			if (mapParameters.showRangeRings > 0) {
@@ -177,6 +195,8 @@ public class MapParametersDialog extends PamDialog {
 					return showWarning("Range rings sepration must be > 0");
 				}
 			}
+			mapParameters.colourByEffort = colourByEffort.isSelected();
+			mapParameters.effortDataSource = effortSourcePanel.getSourceName();
 		}
 		catch (Exception Ex) {
 			return false;
@@ -185,7 +205,7 @@ public class MapParametersDialog extends PamDialog {
 		mapParameters.mapContours = filePanel.getContoursList();
 		mapParameters.allow3D = allow3D.isSelected();
 		mapParameters.hideGrid = !showGrid.isSelected();
-		if (gridDialogPanel.getParams() == false) {
+		if (!gridDialogPanel.getParams()) {
 			return false;
 		}
 		return true;
@@ -216,6 +236,14 @@ public class MapParametersDialog extends PamDialog {
 			GridBagLayout layout;
 			setLayout(layout = new GridBagLayout());
 			GridBagConstraints constraints = new PamGridBagContraints();
+			effortSourcePanel = new EffortSourcePanel(singleInstance);
+			effortSettings = new SettingsButton();
+			effortSettings.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					showEffortSettings();
+				}
+			});
 			//		t.setLayout(new GridLayout(4,3));
 			constraints.anchor = GridBagConstraints.WEST;
 			constraints.gridx = 0;
@@ -224,36 +252,61 @@ public class MapParametersDialog extends PamDialog {
 			constraints.gridx ++;
 			addComponent(this,trackShowtime = new JTextField(7), constraints);
 			constraints.gridx ++;
-			addComponent(this,new JLabel(" s"), constraints);
+			addComponent(this,new JLabel(" s "), constraints);
+			constraints.gridx++;
+			addComponent(this, colourByEffort, constraints);
+			constraints.gridx += 2;
+			constraints.gridwidth = 1;
+			constraints.fill = GridBagConstraints.NONE;
+			constraints.anchor = GridBagConstraints.LINE_END;
+			addComponent(this, effortSettings, constraints);
 			constraints.gridx = 0;
 			constraints.gridy ++;
+			constraints.anchor = GridBagConstraints.LINE_START;
 			addComponent(this,new JLabel("Data storage time "), constraints);
 			constraints.gridx ++;
 			addComponent(this,dataKeepTime = new JTextField(7), constraints);
 			constraints.gridx ++;
-			addComponent(this,new JLabel(" s"), constraints);
+			addComponent(this,new JLabel(" s "), constraints);
+			constraints.gridx++;
+			constraints.gridwidth = 3;
+			constraints.fill = GridBagConstraints.HORIZONTAL;
+			addComponent(this, effortSourcePanel.getPanel(), constraints);
 			constraints.gridx = 0;
 			constraints.gridy ++;
+			constraints.gridwidth = 1;
 			addComponent(this,new JLabel("Data display time "), constraints);
 			constraints.gridx ++;
 			addComponent(this,dataShowTime = new JTextField(7), constraints);
 			constraints.gridx ++;
-			addComponent(this,new JLabel(" s"), constraints);
+			addComponent(this,new JLabel(" s "), constraints);
 			constraints.gridx = 0;
 			constraints.gridy ++;
-			constraints.gridwidth = 3;
+			constraints.gridwidth = 2;
 
 			addComponent(this,shipCheckBox, constraints);
-			constraints.gridy ++;
+			constraints.gridx += constraints.gridwidth;
 			addComponent(this,keepShipOnMap, constraints);
+			constraints.gridy ++;
 			constraints.gridx = 0;
-			constraints.gridy ++;
-			constraints.gridwidth = 3;
 			addComponent(this,keepShipCentred, constraints);
-			constraints.gridy ++;
+			constraints.gridx += constraints.gridwidth;		
 			addComponent(this,headingUp, constraints);
 			constraints.gridy ++;
+			constraints.gridx = 0;
 			addComponent(this, showSurface, constraints);
+		}
+
+		protected void showEffortSettings() {
+			PamDataBlock effortBlock = effortSourcePanel.getSource();
+			if (effortBlock == null) {
+				return;
+			}
+			EffortProvider effortProvider = effortBlock.getEffortProvider();
+			if (effortProvider == null) {
+				return;
+			}
+			effortProvider.showOptionsDialog(singleInstance, simpleMap.getSelectorName());
 		}
 	}
 
@@ -272,7 +325,7 @@ public class MapParametersDialog extends PamDialog {
 			addComponent(this, colourByChannel, c);
 			c.gridy++;
 			c.gridwidth = 1;
-			addComponent(this, new JLabel("Symbol size ",  JLabel.RIGHT), c);
+			addComponent(this, new JLabel("Symbol size ",  SwingConstants.RIGHT), c);
 			c.gridx++;
 			symbolSize = new SpinnerNumberModel(Hydrophone.DefaultSymbolSize, 4, 30, 2);
 			addComponent(this, symbolSizeSpinner = new JSpinner(symbolSize), c);
@@ -305,7 +358,7 @@ public class MapParametersDialog extends PamDialog {
 			ringsPanel.setBorder(new TitledBorder("Range Rings"));
 			ringsPanel.setLayout(new GridBagLayout());
 			GridBagConstraints c = new PamGridBagContraints();
-			ringsPanel.add(new JLabel("Show ", JLabel.RIGHT), c);
+			ringsPanel.add(new JLabel("Show ", SwingConstants.RIGHT), c);
 			c.gridx++;
 			ringsPanel.add(ringsType = new JComboBox<String>(), c);
 			ringsType.addItem("No range rings");
@@ -314,7 +367,7 @@ public class MapParametersDialog extends PamDialog {
 			ringsType.addItem("Rings in Nautical miles");
 			c.gridx = 0;
 			c.gridy++;
-			ringsPanel.add(new JLabel("Sepration ", JLabel.RIGHT), c);
+			ringsPanel.add(new JLabel("Sepration ", SwingConstants.RIGHT), c);
 			c.gridx++;
 			ringsPanel.add(ringsRange = new JTextField(6), c);
 			ringsType.addActionListener(new ActionListener() {
@@ -453,21 +506,25 @@ public class MapParametersDialog extends PamDialog {
 			}
 		}
 		private class BrowseButton implements ActionListener {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				browseMaps();
 			}
 		}
 		private class ClearButton implements ActionListener {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				clearMap();
 			}
 		}
 		private class AllButton implements ActionListener {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				selectAllContours(true);
 			}
 		}
 		private class NoneButton implements ActionListener {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				selectAllContours(false);
 			}
@@ -491,6 +548,9 @@ public class MapParametersDialog extends PamDialog {
 		colourByChannel.setEnabled(hydroCheckBox.isSelected());
 		symbolSizeSpinner.setEnabled(hydroCheckBox.isSelected());
 		ringsRange.setEnabled(ringsType.getSelectedIndex() > 0);
+		boolean ec = colourByEffort.isSelected();
+		effortSettings.setSelected(ec);
+		effortSourcePanel.setEnabled(ec);
 	}
 
 

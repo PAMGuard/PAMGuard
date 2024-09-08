@@ -1,14 +1,14 @@
 package PamView;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Shape;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
-import javax.swing.JPanel;
+import javax.swing.JComponent;
 
 /**
  * Useful functions for swing. 
@@ -19,21 +19,51 @@ public class PamAWTUtils {
 	
 	/**
 	 * Disable an entire swing panel including all child components. 
-	 * @param panel - the panel to disable
+	 * @param jComponent - the panel to disable
 	 * @param isEnabled true if enabled. 
 	 */
-	public static void setPanelEnabled(JPanel panel, Boolean isEnabled) {
-	    panel.setEnabled(isEnabled);
-
-	    Component[] components = panel.getComponents();
-
-	    for (Component component : components) {
-	        if (component instanceof JPanel) {
-	            setPanelEnabled((JPanel) component, isEnabled);
-	        }
-	        component.setEnabled(isEnabled);
-	    }
+	public static void setPanelEnabled(JComponent jComponent, Boolean isEnabled) {
+		setPanelEnabled(jComponent, isEnabled? 1 :-1);
 	}
+	
+//    private static final Map<Component, Integer> componentAvailability = new WeakHashMap<Component, Integer>();
+    
+    public static void setMoreEnabled(Component component) {
+    	setPanelEnabled(component, +1);
+    }
+
+    public static void setMoreDisabled(Component component) {
+    	setPanelEnabled(component, -1);
+    }
+	
+    // val = 1 for enabling, val = -1 for disabling
+    private static void setPanelEnabled(Component component, int val) {
+        if (component != null) {
+        	
+//            final Integer oldValObj = componentAvailability.get(component);
+//            
+//            final int oldVal = (oldValObj == null)
+//                    ? 0
+//                    : oldValObj;
+//            
+//            final int newVal = oldVal + val;
+//            componentAvailability.put(component, newVal);
+            
+            int newVal = val;
+
+            if (newVal >= 0) {
+                component.setEnabled(true);
+            } else if (newVal < 0) {
+                component.setEnabled(false);
+            }
+            if (component instanceof Container) {
+                Container componentAsContainer = (Container) component;
+                for (Component c : componentAsContainer.getComponents()) {
+                	setPanelEnabled(c,val);
+                }
+            }
+        }
+    }
 
 	/**
 	 * Find the closest boundary of a shape to a point. 	
@@ -125,4 +155,29 @@ public class PamAWTUtils {
 		return bestPoint; 
 
 	}
+	
+	
+	 /**
+	  * Convert a colour to an int.
+	  * @param c - the colour to change.
+	  * @return the int representation of the colour
+	  */
+	 public static int colorToInt(java.awt.Color c) {
+		    int r = (int) Math.round(c.getRed());
+		    int g = (int) Math.round(c.getGreen());
+		    int b = (int) Math.round(c.getBlue());
+		    return (r << 16) | (g << 8) | b;
+	}
+	 
+	 /**
+	  * Convert an int encoded with a colour to a Color object. 
+	  * @param value - the int to convert to colour
+	  * @return the Color object for the int
+	  */
+	 public static java.awt.Color intToColor(int value) {
+		    int r = (value >>> 16) & 0xFF;
+		    int g = (value >>> 8) & 0xFF;
+		    int b = value & 0xFF;
+		    return new java.awt.Color(r,g,b);
+	 }
 }

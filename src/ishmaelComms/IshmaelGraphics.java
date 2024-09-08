@@ -9,18 +9,15 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Window;
 
-import Array.ArrayManager;
-import Array.HydrophoneLocator;
-import Array.PamArray;
 import PamUtils.Coordinate3d;
 import PamUtils.LatLong;
 import PamView.GeneralProjector;
+import PamView.GeneralProjector.ParameterType;
+import PamView.GeneralProjector.ParameterUnits;
 import PamView.PamKeyItem;
 import PamView.PamSymbol;
 import PamView.PamSymbolType;
 import PamView.PanelOverlayDraw;
-import PamView.GeneralProjector.ParameterType;
-import PamView.GeneralProjector.ParameterUnits;
 import PamView.symbol.SymbolData;
 import PamguardMVC.PamDataUnit;
 
@@ -37,6 +34,7 @@ public class IshmaelGraphics extends PanelOverlayDraw{
 		this.ishmaelDataControl = ishmaelDataControl;
 	}
 
+	@Override
 	public boolean canDraw(ParameterType[] parameterTypes, ParameterUnits[] parameterUnits) {
 		if (parameterTypes[0] == GeneralProjector.ParameterType.LATITUDE && 
 				parameterTypes[1] == GeneralProjector.ParameterType.LONGITUDE)
@@ -47,6 +45,7 @@ public class IshmaelGraphics extends PanelOverlayDraw{
 		return false;
 	}
 
+	@Override
 	public Rectangle drawDataUnit(Graphics g, PamDataUnit pamDataUnit, GeneralProjector generalProjector) {
 		IshmaelDataUnit ishmaelDataUnit = (IshmaelDataUnit) pamDataUnit;
 		if (generalProjector.getParmeterType(0) == ParameterType.LATITUDE
@@ -166,11 +165,13 @@ public class IshmaelGraphics extends PanelOverlayDraw{
 		return null;
 	}
 
+	@Override
 	public PamKeyItem createKeyItem(GeneralProjector generalProjector, int keyType) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
+	@Override
 	public String getHoverText(GeneralProjector generalProjector, PamDataUnit dataUnit, int iSide) {
 		// TODO Auto-generated method stub
 		return null;

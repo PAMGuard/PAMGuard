@@ -4,7 +4,6 @@ import java.sql.Types;
 
 import GPS.GpsData;
 import PamUtils.PamUtils;
-import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import generalDatabase.PamTableDefinition;
 import generalDatabase.PamTableItem;

@@ -1,20 +1,18 @@
 package quickAnnotation;
 
-import java.awt.Component;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 import javax.swing.BoxLayout;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
-
-import java.io.File;
 
 import PamController.PamController;
 import PamController.PamSettingManager;
@@ -25,7 +23,6 @@ import PamView.dialog.PamDialog;
 import PamView.dialog.PamLabel;
 import PamView.panel.PamBorderPanel;
 import PamView.panel.PamPanel;
-import annotation.handler.AnnotationsSelectionPanel;
 import generalDatabase.lookupTables.LookupEditDialog;
 import generalDatabase.lookupTables.LookupList;
 
@@ -95,7 +92,7 @@ public class QuickAnnotationParamsDialog extends PamDialog {
 		c.gridy++; 
 
 		c.gridx = 0;
-		c.gridwidth = c.REMAINDER;
+		c.gridwidth = GridBagConstraints.REMAINDER;
 
 		wavFolderSelect = new SelectFolder("Select output folder", 32, false);
 		String filePath = PamSettingManager.getInstance().getDefaultFile();
@@ -161,7 +158,8 @@ public class QuickAnnotationParamsDialog extends PamDialog {
 		 * Edit lookup list and update the side panel of quick selections
 		 */
 		private void editQuickList() {
-			LookupList newList = LookupEditDialog.showDialog(PamController.getInstance().getMainFrame(), 
+			PamController.getInstance();
+			LookupList newList = LookupEditDialog.showDialog(PamController.getMainFrame(), 
 					quickAnnotationModule.getQuickAnnotationParameters().getQuickList(quickAnnotationModule));
 			if (newList != null) {
 				quickAnnotationModule.getQuickAnnotationParameters().setQuickList(newList);
@@ -197,6 +195,7 @@ public class QuickAnnotationParamsDialog extends PamDialog {
 	 */
 	class SorpDefaultAction implements ActionListener {
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			LookupList newList = quickAnnotationParams.sorpList(quickAnnotationModule);
 			if (newList != null) {

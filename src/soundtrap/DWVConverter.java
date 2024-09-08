@@ -5,22 +5,18 @@ import java.util.List;
 
 import javax.swing.SwingWorker;
 
-import binaryFileStorage.BinaryDataSource;
-import binaryFileStorage.BinaryFooter;
-import binaryFileStorage.BinaryObjectData;
-import binaryFileStorage.BinaryOutputStream;
-import binaryFileStorage.BinaryStore;
 import PamController.PamController;
 import PamUtils.PamCalendar;
 import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.debug.Debug;
+import binaryFileStorage.BinaryDataSource;
+import binaryFileStorage.BinaryFooter;
+import binaryFileStorage.BinaryOutputStream;
+import binaryFileStorage.BinaryStore;
 import clickDetector.ClickBinaryDataSource;
-import clickDetector.ClickControl;
 import clickDetector.ClickDataBlock;
 import clickDetector.ClickDetection;
 import clickDetector.ClickDetector;
-import warnings.PamWarning;
-import warnings.WarningSystem;
 
 public class DWVConverter {
 
@@ -85,7 +81,7 @@ public class DWVConverter {
 				int nFile = fileGroups.size();
 				for (STGroupInfo fileGroup:fileGroups) {
 					processFiles(fileGroup, nFile, ++iFile);
-					if (keepRunning == false) {
+					if (!keepRunning) {
 						break;
 					}
 				}
@@ -98,7 +94,7 @@ public class DWVConverter {
 
 		private void processFiles(STGroupInfo fileGroup, int nFile, int iFile) {
 			this.publish(new DWVConvertInformation(fileGroup, nFile, iFile, 0, 0));
-			if (fileGroup.hasDWV() == false) {
+			if (!fileGroup.hasDWV()) {
 				/*
 				 * Don't do this. In quiet conditions there will be a BCL file with a start and stop time
 				 * but if there were no detections there will be no dwv file. We should make the pgdf file
@@ -111,7 +107,7 @@ public class DWVConverter {
 			}
 			BCLReader bclReader = new BCLReader(fileGroup.getBclFile());
 			boolean ok = bclReader.open();
-			if (ok == false) return;
+			if (!ok) return;
 			int nDWV = 0;
 			DWVReader dwvReader = null;
 			if (fileGroup.hasDWV()) {

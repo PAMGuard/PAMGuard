@@ -1,9 +1,25 @@
 package JSSHTerminal;
 
-import com.jcraft.jsch.*;
+import java.io.BufferedReader;
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
 
-import javax.swing.*;
-import java.io.*;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.WindowConstants;
+
+import com.jcraft.jsch.ChannelShell;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.UserInfo;
 
 /**
  * SSH session
@@ -396,13 +412,14 @@ public final class SSHSession implements UserInfo {
     JOptionPane pane = new JOptionPane(panel,
         JOptionPane.QUESTION_MESSAGE,
         JOptionPane.OK_CANCEL_OPTION) {
-      public void selectInitialValue() {
+      @Override
+	public void selectInitialValue() {
       }
     };
 
     JDialog dialog = pane.createDialog(_parent,
         message);
-    dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+    dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     dialog.setVisible(true);
     Object o = pane.getValue();
 

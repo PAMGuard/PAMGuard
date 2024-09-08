@@ -8,7 +8,6 @@ import java.awt.event.ActionListener;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -18,29 +17,20 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import soundPlayback.FilePlayback;
-import soundPlayback.PlaybackControl;
-import soundPlayback.PlaybackSystem;
-import soundPlayback.SoundCardPlayback;
-
-
 import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionDialog;
+import Acquisition.AudioDataQueue;
 import Acquisition.ChannelListPanel;
 import Acquisition.DaqSystem;
-import Acquisition.AudioDataQueue;
-import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
-import PamController.PamController;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamDetection.RawDataUnit;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamguardMVC.PamConstants;
+import soundPlayback.PlaybackControl;
+import soundPlayback.PlaybackSystem;
 
 public class NIDAQProcess extends DaqSystem implements PamSettings {
 
@@ -471,14 +461,17 @@ public class NIDAQProcess extends DaqSystem implements PamSettings {
 		return range[1]-range[0];
 	}
 	
+	@Override
 	public Serializable getSettingsReference() {
 		return niParameters;
 	}
 	
+	@Override
 	public long getSettingsVersion() {
 		return NIDaqParams.serialVersionUID;
 	}
 	
+	@Override
 	public String getUnitName() {
 //		return settingsUnitName;
 		return daqControl.getUnitName();
@@ -498,11 +491,13 @@ public class NIDAQProcess extends DaqSystem implements PamSettings {
 //		}
 //	}
 
+	@Override
 	public String getUnitType() {
 //		return "Acquisition System";
 		return settingsUnitName;
 	}
 	
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 //		if (PamSettingManager.getInstance().isSettingsUnit(this, pamControlledUnitSettings)) {
 			try {
@@ -526,7 +521,7 @@ public class NIDAQProcess extends DaqSystem implements PamSettings {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if (allowMultiBoard.isSelected() == false) {
+			if (!allowMultiBoard.isSelected()) {
 				getNiChannelListPanel().setAllBoards(audioDevices.getSelectedIndex());
 			}
 			checkDevice();
@@ -540,7 +535,7 @@ public class NIDAQProcess extends DaqSystem implements PamSettings {
 		else if (devInfo.isSimulated()) {
 			warningText.setText("*** Simulted NI Device ***");
 		}
-		else if (devInfo.isExists() == false) {
+		else if (!devInfo.isExists()) {
 			warningText.setText("*** This NI Device is not currently present ***");
 		}
 		else {
@@ -548,11 +543,11 @@ public class NIDAQProcess extends DaqSystem implements PamSettings {
 		}
 	}
 	public void enableMasterDevice() {
-		audioDevices.setEnabled(allowMultiBoard.isSelected() == false);
+		audioDevices.setEnabled(!allowMultiBoard.isSelected());
 	}
 	
 	public void setMasterDevice(int iDevice) {
-		if (audioDevices == null || allowMultiBoard == null || allowMultiBoard.isSelected() == false) {
+		if (audioDevices == null || allowMultiBoard == null || !allowMultiBoard.isSelected()) {
 			return;
 		}
 		if (iDevice >= 0) {
@@ -595,6 +590,7 @@ public class NIDAQProcess extends DaqSystem implements PamSettings {
 //	}
 	
 	class AllowMultiBoard implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			if (warnMultiBoardOps()) {
 				enableMultiBoardOps();
@@ -645,6 +641,7 @@ public class NIDAQProcess extends DaqSystem implements PamSettings {
 	
 	class NITransferThread implements Runnable {
 		
+		@Override
 		public void run() {
 			
 		}

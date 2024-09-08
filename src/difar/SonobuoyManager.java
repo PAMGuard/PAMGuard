@@ -4,7 +4,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.concurrent.TimeUnit;
 
 import javax.swing.JOptionPane;
 import javax.swing.RowSorter;
@@ -18,7 +17,6 @@ import Array.SnapshotGeometry;
 import Array.Streamer;
 import Array.StreamerDataBlock;
 import Array.StreamerDataUnit;
-import Array.StreamerDialog;
 import Array.StreamerLogging;
 import Array.streamerOrigin.OriginSettings;
 import Array.streamerOrigin.StaticOriginSettings;
@@ -33,19 +31,14 @@ import PamUtils.PamUtils;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
-import PamguardMVC.PamObserver;
 import PamguardMVC.PamProcess;
-import PamguardMVC.RequestCancellationObject;
 import annotation.handler.AnnotationChoiceHandler;
-import annotation.handler.AnnotationHandler;
-import annotation.string.StringAnnotation;
 import annotation.string.StringAnnotationType;
 import annotation.timestamp.TimestampAnnotation;
 import annotation.timestamp.TimestampAnnotationType;
 import difar.calibration.CalibrationDataUnit;
 import difar.calibration.CalibrationDialog;
 import difar.calibration.CalibrationHistogram;
-import difar.calibration.CalibrationProcess;
 import difar.dialogs.SonobuoyDialog;
 import generalDatabase.DBControl;
 import generalDatabase.DBControlUnit;
@@ -521,8 +514,8 @@ public class SonobuoyManager extends PamProcess {
 		tableData[row][COLUMN_ENDTIME] =  endTime;
 		tableData[row][COLUMN_CHANNEL] = PamUtils.getSingleChannel(sdu.getChannelBitmap());
 		if (sdu.getGpsData()!=null){
-			tableData[row][COLUMN_LATITUDE] = GpsData.formatLatitude(sdu.getGpsData().getLatitude()); 
-			tableData[row][COLUMN_LONGITUDE] = GpsData.formatLongitude(sdu.getGpsData().getLongitude());
+			tableData[row][COLUMN_LATITUDE] = LatLong.formatLatitude(sdu.getGpsData().getLatitude()); 
+			tableData[row][COLUMN_LONGITUDE] = LatLong.formatLongitude(sdu.getGpsData().getLongitude());
 		}
 		tableData[row][COLUMN_DEPTH] = sdu.getStreamerData().getZ();
 		tableData[row][COLUMN_HEADING] = sdu.getStreamerData().getHeading();

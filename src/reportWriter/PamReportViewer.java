@@ -1,17 +1,5 @@
 package reportWriter;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
-import javax.swing.text.BadLocationException;
-
 //
 //import sl.docx.DocxDocument;
 //import sl.docx.DocxEditorKit;

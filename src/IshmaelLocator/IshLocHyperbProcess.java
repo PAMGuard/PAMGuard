@@ -1,16 +1,12 @@
 package IshmaelLocator;
 
 
-import fftManager.FFT;
-import Localiser.*;
+import Localiser.DelayMeasurementParams;
 import Localiser.algorithms.Correlations;
+import PamDetection.LocContents;
 import PamUtils.CoordUtils;
 import PamguardMVC.PamDataUnit;
-import IshmaelLocator.IshLocProcess;
-import IshmaelLocator.IshLocalisation;
-import IshmaelLocator.LM;
-import PamDetection.AbstractLocalisation;
-import PamDetection.LocContents;
+import fftManager.FFT;
 
 
 /** Two-hydrophone bearing calculation.

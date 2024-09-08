@@ -23,7 +23,7 @@ package UserInput;
 import java.awt.Color;
 
 import PamController.PamController;
-import PamView.PamSymbol;
+import PamView.PamSymbolBase;
 import PamView.symbol.StandardSymbolManager;
 import PamView.symbol.SymbolData;
 import PamguardMVC.PamDataBlock;
@@ -45,7 +45,7 @@ public class UserInputProcess extends PamProcess {
 				"User Input Data", this, 0b1111111111111111)));
 		uiDataBlock.setOverlayDraw(new UserInputOverlayGraphics(uiDataBlock));
 		uiDataBlock.setPamSymbolManager(new StandardSymbolManager(uiDataBlock, 
-				new SymbolData(PamSymbol.interpretTextCode("v"),20,20,false,Color.red,Color.black),
+				new SymbolData(PamSymbolBase.interpretTextCode("v"),20,20,false,Color.red,Color.black),
 				true));
 		uiDataBlock.setChannelMap(0b1111111111111111);
 		uiDataBlock.setNaturalLifetime(3600*24); // natural lifetime 24 hours. 

@@ -8,8 +8,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 
-
-
+import javax.swing.SwingConstants;
 
 import PamView.ColourArray;
 import PamView.ColourArray.ColourArrayType;
@@ -78,6 +77,8 @@ public class ColourRangeSliderUI extends PamRangeSliderUI {
 	
 	
 	private void createColourMapImage(){
+        if (b.getOrientation() == SwingConstants.VERTICAL) {
+
 	// now make a standard amplitude image
 		if (colourArray != null && colourArray.length > 0) {
 			amplitudeImage = new BufferedImage(1, colourArray.length,
@@ -85,6 +86,15 @@ public class ColourRangeSliderUI extends PamRangeSliderUI {
 			WritableRaster raster = amplitudeImage.getRaster();
 			for (int i = 0; i < colourArray.length; i++) {
 				raster.setPixel(0, colourArray.length - i - 1, colourArray[i]);
+			}
+		}
+        }
+		else {
+			amplitudeImage = new BufferedImage(colourArray.length, 1,
+					BufferedImage.TYPE_INT_RGB);
+			WritableRaster raster = amplitudeImage.getRaster();
+			for (int i = 0; i < colourArray.length; i++) {
+				raster.setPixel(i, 0,colourArray[i]);
 			}
 		}
 	}
@@ -119,24 +129,96 @@ public class ColourRangeSliderUI extends PamRangeSliderUI {
         
         Rectangle trackBounds = trackRect;
         
-        // Determine position of selected range by moving from the middle
-        // of one thumb to the other.
-        int lowerY = thumbRect.y + (thumbRect.width / 2);
-        int upperY = getUpperThumbRect().y + (getUpperThumbRect().width / 2);
-            
-        // Determine track position.
-        int cx = (trackBounds.width / 2) - 2;
-
         // Save colour and shift position.
         Color oldColor = g.getColor();
-        g.translate(trackBounds.x + cx, trackBounds.y);
             
-        drawColourMapVert( g,  lowerY - trackBounds.y, upperY - trackBounds.y, -(getUpperThumbRect().width /4)-trackBounds.x,(getUpperThumbRect().width / 2)-trackBounds.x+(trackBounds.width / 4)+2);
+        int cx;
 
+        if (b.getOrientation() == SwingConstants.VERTICAL) {
+        	
+            // Determine position of selected range by moving from the middle
+            // of one thumb to the other.
+            int lowerY = thumbRect.y + (thumbRect.width / 2);
+            int upperY = getUpperThumbRect().y + (getUpperThumbRect().width / 2);
+                
+            // Determine track position.
+             cx = (trackBounds.width / 2) - 2;
+
+            g.translate(trackBounds.x + cx, trackBounds.y);
+	        drawColourMapVert( g,  lowerY - trackBounds.y, upperY - trackBounds.y, -(getUpperThumbRect().width /4)-trackBounds.x,(getUpperThumbRect().width / 2)-trackBounds.x+(trackBounds.width / 4)+2);
+      
+	        cx = (trackBounds.width / 2) - 2;
+	        g.translate(-(trackBounds.x + cx), -trackBounds.y);
+
+        }
+        else {
+            // Determine position of selected range by moving from the middle
+            // of one thumb to the other.
+            int lowerX = thumbRect.x;
+            int upperX = getUpperThumbRect().x;
+                
+            // Determine track position.
+            cx = (trackBounds.width / 2) - 2;
+//            -(getUpperThumbRect().height /4)-trackBounds.y, (getUpperThumbRect().height / 2)-trackBounds.y+(trackBounds.height / 4)+2
+        	drawColourMapHorz(g, trackBounds.height/2-getUpperThumbRect().height/2, trackBounds.height/2+getUpperThumbRect().height/2, lowerX + getUpperThumbRect().width/2, upperX+ getUpperThumbRect().width/2);
+
+        }
         // Restore position and colour.
-        g.translate(-(trackBounds.x + cx), -trackBounds.y);
         g.setColor(oldColor);
         
+    }
+    
+    /**
+     * Draw the colour map between the two thumbs in the slider bar. Colour the section above the top most thumb
+     * and the section below the lower most thumb with the color map extremes. 
+     * @param g- graphics
+     * @param y1
+     * @param y2
+     * @param x1
+     * @param x2
+     */
+    private void drawColourMapHorz(Graphics g, int y1, int y2, int x1, int x2){
+    	
+    	if (amplitudeImage == null) return;
+
+		Graphics2D g2d = (Graphics2D) g;
+		
+		int width=Math.abs(x2-x1);
+		int height=Math.abs(y2-y1);
+		
+//		System.out.println("Width: " + width + " " + height + " x1 " + x1);
+
+		//calculate the distance between thumbs
+		double ascaleX = width
+		/ (double) amplitudeImage.getWidth(null);
+		double ascaleY = height
+		/ (double) amplitudeImage.getHeight(null);
+		
+		AffineTransform xform = new AffineTransform();
+		// xform.translate(1, amplitudeImage.getWidth(null));
+		xform.scale(ascaleX, ascaleY);
+		//translate to the correct location;
+		g2d.translate(x1, y1);
+		//now translate back for the rest of the operations;
+		g2d.drawImage(amplitudeImage, xform, b);
+		
+		//translate back to our original position. 
+		g2d.translate(-x1, -y1);
+		
+		//go to the left of the lower thumb;
+//		g2d.translate(0, height);
+		g2d.setColor(new Color((int) colourArray[0][0],(int)colourArray[0][1],(int) colourArray[0][2]));
+		for (int i=y1; i<y2; i++){
+			g2d.drawLine(0,i,x1, i);
+		}
+	
+		
+		//color left of the thumb
+		g2d.setColor(new Color((int) colourArray[colourArray.length-1][0],(int)colourArray[colourArray.length-1][1],(int) colourArray[colourArray.length-1][2]));
+		for (int i=y1; i<y2; i++){
+			g2d.drawLine(x2,i, trackRect.width + thumbRect.width/2, i);
+		}
+		
     }
     
     /**

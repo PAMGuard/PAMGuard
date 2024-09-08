@@ -7,6 +7,7 @@ import java.awt.Window;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import PamView.dialog.PamDialog;
@@ -25,7 +26,7 @@ public class ClipDisplayDialog extends PamDialog {
 		JPanel rangePanel = new JPanel(new GridBagLayout());
 		rangePanel.setBorder(new TitledBorder("Map bearing lines"));
 		GridBagConstraints c = new PamGridBagContraints();
-		rangePanel.add(new JLabel("Clip trigger ", JLabel.RIGHT), c);
+		rangePanel.add(new JLabel("Clip trigger ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		rangePanel.add(new JLabel("Range (m)"));
 		rangeFields = new JTextField[clipSettings.getNumClipGenerators()];
@@ -33,7 +34,7 @@ public class ClipDisplayDialog extends PamDialog {
 			c.gridx = 0;
 			c.gridy++;
 			ClipGenSetting genSet = clipSettings.getClipGenSetting(i);
-			rangePanel.add(new JLabel(genSet.dataName, JLabel.RIGHT), c);
+			rangePanel.add(new JLabel(genSet.dataName, SwingConstants.RIGHT), c);
 			c.gridx++;
 			rangePanel.add(rangeFields[i] = new JTextField(4), c);
 			rangeFields[i].setText(String.format("%3.1f", genSet.mapLineLength));

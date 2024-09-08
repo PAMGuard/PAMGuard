@@ -1,12 +1,10 @@
 package noiseOneBand;
 
-import noiseOneBand.alarm.OneBandAlarmCounter;
-import noiseOneBand.alarm.OneBandAlarmProvider;
-import alarm.AlarmCounter;
-import alarm.AlarmCounterProvider;
-import alarm.AlarmDataSource;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
+import alarm.AlarmCounterProvider;
+import alarm.AlarmDataSource;
+import noiseOneBand.alarm.OneBandAlarmProvider;
 
 public class OneBandDataBlock extends PamDataBlock<OneBandDataUnit> implements AlarmDataSource {
 

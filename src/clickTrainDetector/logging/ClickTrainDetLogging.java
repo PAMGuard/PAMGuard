@@ -30,7 +30,6 @@ import pamMaths.PamInterp;
  */
 public class ClickTrainDetLogging extends SuperDetLogging {
 
-
 	/**
 	 * The delimiter used for the average spectrum in the database. 
 	 */
@@ -46,7 +45,6 @@ public class ClickTrainDetLogging extends SuperDetLogging {
 	 */
 	private final static int DEFAULT_SPECTRUM_LEN = 256; 
 
-
 	/**
 	 * Reference to the click train data block. 
 	 */
@@ -58,7 +56,7 @@ public class ClickTrainDetLogging extends SuperDetLogging {
 	private ClickTrainControl clickTrainControl;
 
 	/**
-	 * The pam table items for saving.
+	 * The PAM table items for saving.
 	 */
 	private PamTableItem endTime, dataCount, chi2, medianIDI, meanIDI, stdIDI,
 	algorithmInfo, avrg_Spectrum, speciesFlag, avrg_Spectrum_max;

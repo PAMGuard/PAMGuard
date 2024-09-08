@@ -70,7 +70,7 @@ public class BasicClickIdParameters implements Serializable, Cloneable, ManagedP
 						used = true;
 						break;
 					}
-					if (used == false) {
+					if (!used) {
 						return id;
 					}
 				}

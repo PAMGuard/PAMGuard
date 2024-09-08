@@ -259,7 +259,7 @@ public class QAControl extends PamControlledUnit implements PamSettings, QANotif
 			int nSeq = qaParameters.getnQuickTestSequences();
 			for (QACluster cluster:availableClusters) {
 				ClusterParameters clusterParams = qaParameters.getClusterParameters(cluster);
-				if (clusterParams.runImmediate == false) {
+				if (!clusterParams.runImmediate) {
 					continue;
 				}
 				QALocationGenerator locGen = locationManager.makeLocationGenerator(locator, cluster, nSeq, getRangeLimits(clusterParams.monitorRange));

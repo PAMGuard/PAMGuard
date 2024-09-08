@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.net.URL;
+
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -204,7 +205,8 @@ public class ClickAlarm implements Comparable<ClickAlarm>, Serializable, Cloneab
         return name;
     }
 
-    public int compareTo(ClickAlarm alarm) {
+    @Override
+	public int compareTo(ClickAlarm alarm) {
         return name.compareTo(alarm.getName());
     }
 

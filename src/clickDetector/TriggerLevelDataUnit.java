@@ -1,7 +1,6 @@
 package clickDetector;
 
 import PamDetection.PamDetection;
-import PamguardMVC.AcousticDataUnit;
 import PamguardMVC.PamDataUnit;
 
 public class TriggerLevelDataUnit extends PamDataUnit<PamDataUnit,PamDataUnit> implements PamDetection {

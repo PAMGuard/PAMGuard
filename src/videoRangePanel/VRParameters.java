@@ -5,8 +5,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import videoRangePanel.pamImage.ImageTimeOffset;
-import videoRangePanel.pamImage.ImageTimeParser;
-import videoRangePanel.pamImage.MetaDataTimeParser;
 import videoRangePanel.pamImage.TimeOffset;
 import videoRangePanel.vrmethods.landMarkMethod.LandMarkGroup;
 

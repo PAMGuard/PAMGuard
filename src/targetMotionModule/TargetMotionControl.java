@@ -3,24 +3,26 @@ package targetMotionModule;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.ListIterator;
+
 import javax.swing.JPopupMenu;
-//import staticLocaliser.SLResult;
-import targetMotionModule.TMManager.TMInfoWorker;
-import targetMotionModule.offline.TMOfflineFunctions;
-import targetMotionModule.panels.*;
+
 import Array.ArrayManager;
 import Array.Streamer;
-import Array.StreamerDataUnit;
 import Array.streamerOrigin.HydrophoneOriginMethod;
 import GPS.GpsData;
 import Localiser.DisplayLocaliserMenu;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
+import PamController.PamControllerInterface;
 import PamController.PamSettings;
 import PamDetection.RawDataUnit;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+//import staticLocaliser.SLResult;
+import targetMotionModule.TMManager.TMInfoWorker;
+import targetMotionModule.offline.TMOfflineFunctions;
+import targetMotionModule.panels.TargetMotionMainPanel;
 
 /**
  * Target motion module. Allows users to localise using target motion based algorithms. 
@@ -85,7 +87,7 @@ public class TargetMotionControl extends PamControlledUnit implements PamSetting
 	/**
 	 * Update panels with thread progress. 
 	 */
-	public static final int DETECTION_INFO_CALC_PROGRESS = 11;;
+	public static final int DETECTION_INFO_CALC_PROGRESS = 11;
 
 
 
@@ -171,7 +173,7 @@ public class TargetMotionControl extends PamControlledUnit implements PamSetting
 	public void notifyModelChanged(int changeType) {
 		super.notifyModelChanged(changeType);
 		switch(changeType) {
-		case PamController.INITIALIZATION_COMPLETE:
+		case PamControllerInterface.INITIALIZATION_COMPLETE:
 //			System.out.println("TargetMotionControl. notifyModelChanged: INITIALIZATION_COMPLETE");
 			targetMotionMainPanel.updateCurrentControlPanel();
 			targetMotionMainPanel.updateCurrentControlPanel();
@@ -181,7 +183,7 @@ public class TargetMotionControl extends PamControlledUnit implements PamSetting
 			
 		break;
 			
-		case PamController.OFFLINE_DATA_LOADED:
+		case PamControllerInterface.OFFLINE_DATA_LOADED:
 //			System.out.println("TargetMotionControl. notifyModelChanged: OFFLINE_DATA_LOADED");
 			targetMotionMainPanel.updateCurrentControlPanel();
 			//need to make the streamer path null as gps data may have changed. 
@@ -194,15 +196,15 @@ public class TargetMotionControl extends PamControlledUnit implements PamSetting
 		break;
 			
 			
-		case PamController.ADD_DATABLOCK:
+		case PamControllerInterface.ADD_DATABLOCK:
 			
 		break;
 		
-		case PamController.REMOVE_DATABLOCK:
+		case PamControllerInterface.REMOVE_DATABLOCK:
 			
 		break;
 		
-		case PamController.HYDROPHONE_ARRAY_CHANGED:
+		case PamControllerInterface.HYDROPHONE_ARRAY_CHANGED:
 //			System.out.println("TargetMotionControl. notifyModelChanged: HYDROPHONE_ARRAY_CHANGED");
 			//the array may have changed or a different type of hydrophone locator used. Need to recalculate things
 			//need to make the streamer path null as the model used to reconstruct the streamer location may have changed.
@@ -378,8 +380,9 @@ public class TargetMotionControl extends PamControlledUnit implements PamSetting
 		ArrayList<GpsData> streamerPath;
 		ArrayList<ArrayList<GpsData>> streamersAll=new ArrayList<ArrayList<GpsData>>();
 		
+		ArrayManager.getArrayManager();
 		//units to keep track of progress; 
-		int nCount=ArrayManager.getArrayManager().getGPSDataBlock().getUnitsCount();
+		int nCount=ArrayManager.getGPSDataBlock().getUnitsCount();
 		int streamerCount=streamerIndex.size();
 		double progress; 
 

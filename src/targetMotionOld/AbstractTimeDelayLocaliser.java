@@ -5,13 +5,13 @@ import java.util.ArrayList;
 import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
 
-import pamMaths.PamVector;
-import targetMotionOld.algorithms.AbstractTargetMotionModel;
 import Array.ArrayManager;
 import Array.PamArray;
 import PamUtils.PamUtils;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.superdet.SuperDetection;
+import pamMaths.PamVector;
+import targetMotionOld.algorithms.AbstractTargetMotionModel;
 
 /**
  * Reinstated Target motion add-in as used by the click detector. Hope one day still to replace this
@@ -147,7 +147,7 @@ import PamguardMVC.superdet.SuperDetection;
 			//check that the detection origins have been calculated.
 
 			if (detectionOrigins==null) return;
-			if (detectionHeadings==null) return;;
+			if (detectionHeadings==null) return;
 
 			/*now loop over every hydrophone in every subdetection to rotate the positions and essentially convert into one large multi element array in cartesian space. 
 			 * The number of elements in this array will be nSubDFetections*numberOfHydrophones

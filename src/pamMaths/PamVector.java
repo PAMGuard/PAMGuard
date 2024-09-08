@@ -384,6 +384,7 @@ public class PamVector implements Serializable, Cloneable, PamCoordinate, Manage
 	public double norm(int nDim) {
 		return Math.sqrt(normSquared(nDim));
 	}
+	
 	/**
 	 * 
 	 * @param vec a PamVector
@@ -462,7 +463,7 @@ public class PamVector implements Serializable, Cloneable, PamCoordinate, Manage
 			return true;
 		}
 		// first check they are parallel
-		if (isParallel(vec) == false) {
+		if (!isParallel(vec)) {
 			return false;
 		}
 		/*
@@ -904,7 +905,7 @@ public class PamVector implements Serializable, Cloneable, PamCoordinate, Manage
 		}
 		double[] angs = new double[3];
 		angs[0] = vectors[0].getHeading();
-		angs[1] = vectors[1].getPitch();
+		angs[1] = vectors[0].getPitch();
 		if (vectors.length >= 2) {
 			angs[2] = vectors[1].getPitch();
 		}

@@ -1,15 +1,7 @@
 package IshmaelLocator;
 
-import generalDatabase.PamTableDefinition;
-import generalDatabase.PamTableItem;
-import generalDatabase.SQLTypes;
-
 import java.sql.Types;
 
-
-
-
-import Array.ArrayManager;
 import IshmaelDetector.IshDetection;
 import PamUtils.LatLong;
 import PamguardMVC.PamDataBlock;
@@ -18,6 +10,8 @@ import generalDatabase.EmptyTableDefinition;
 //import pamDatabase.SQLLogging;
 //import PamguardMVC.RecyclingDataBlock;
 import generalDatabase.PamDetectionLogging;
+import generalDatabase.PamTableItem;
+import generalDatabase.SQLTypes;
 
 public class IshLocSqlLogging extends PamDetectionLogging {
 	IshLocControl ishLocControl;

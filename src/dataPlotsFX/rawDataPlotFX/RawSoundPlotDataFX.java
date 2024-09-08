@@ -221,10 +221,10 @@ public class RawSoundPlotDataFX {
 	 */
 	public void newRawData(RawDataUnit rawDataUnit, double binsPerPixel) {
 		
-		// crashes with a Stack Overflow error processing offline wav files. 
-		if (!JamieDev.isEnabled()) {
-			return;
-		}
+//		// crashes with a Stack Overflow error processing offline wav files. 
+//		if (!JamieDev.isEnabled()) {
+//			return;
+//		}
 		
 		if (soundStore.binsPerPixel==binsPerPixel || binsPerPixel==-1){
 			//add data to the sound data store. 
@@ -382,7 +382,7 @@ public class RawSoundPlotDataFX {
 		
 		if (soundStore.currentRawDataMillis==0){
 			if (++timeErrors < 10) {
-			System.err.println("Raw sound data has no associated millisecond time: "+ soundStore.currentRawDataMillis);
+//			System.err.println("RawSoundPlotData: Raw sound data has no associated millisecond time: "+ soundStore.currentRawDataMillis);
 			}
 			return;
 		}
@@ -428,7 +428,7 @@ public class RawSoundPlotDataFX {
 			start=(int) Math.round(startPixel);
 		}
 		
-		//System.out.println(String.format("secondsBack: %.3f  arrayPixBack %.1f  arrayPixStart: %d start: %d soundStore.storeSize: %d wrapPix %.2f", secondsBack, arrayPixBack, arrayPixStart,start, soundStore.storeSize, wrapPix)); 
+//		System.out.println(String.format("secondsBack: %.3f  arrayPixBack %.1f  arrayPixStart: %d start: %d soundStore.storeSize: %d wrapPix %.2f", secondsBack, arrayPixBack, arrayPixStart,start, soundStore.storeSize, wrapPix)); 
 
 	
 		int windowSize = (int) ((orientation==Orientation.HORIZONTAL) ? windowRect.getWidth(): windowRect.getHeight());

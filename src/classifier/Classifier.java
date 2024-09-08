@@ -27,7 +27,7 @@ abstract public class Classifier {
 	 * @author Doug Gillespie
 	 *
 	 */
-	public enum ProbabilityType {UNAVAILABLE, ABSOLUTE, NORMALISED};
+	public enum ProbabilityType {UNAVAILABLE, ABSOLUTE, NORMALISED}
 	
 	/**
 	 * Minimum acceptance probability. <p>

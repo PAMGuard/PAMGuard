@@ -27,7 +27,7 @@ public class GlobalMediumManager implements PamSettings {
 	
 	private GlobalMediumParams globalMediumParams = new GlobalMediumParams(); 
 	
-	private String warning =  "	Changing to between air and water requires a PAMGuard restart\n"
+	public String warning =  "	Changing to between air and water requires a PAMGuard restart\n"
 							+ "	for some display changes to take effect. Settings such as\n"
 							+ " sound speed, reciever sensitivity values and data unit amplitudes\n"
 							+ " will be recalculated or set to new default values.\n"
@@ -74,6 +74,7 @@ public class GlobalMediumManager implements PamSettings {
 			subMenu.add(rbMenuItem); 
 		}
 	}
+	
 
 
 	/**

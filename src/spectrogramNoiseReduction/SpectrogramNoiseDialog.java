@@ -2,13 +2,15 @@ package spectrogramNoiseReduction;
 
 import java.awt.Frame;
 import java.awt.Window;
+
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import fftManager.FFTDataUnit;
+
 import PamView.dialog.PamDialog;
 import PamView.dialog.SourcePanel;
 import PamguardMVC.PamDataBlock;
+import fftManager.FFTDataUnit;
 
 public class SpectrogramNoiseDialog extends PamDialog {
 

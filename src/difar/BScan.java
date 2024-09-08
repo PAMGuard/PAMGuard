@@ -1,18 +1,12 @@
 package difar;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import difar.DifarParameters.DifarOutputTypes;
-import difar.DifarProcess.DifarDemuxWorker;
-import likelihoodDetectionModule.CheckRenderer;
-
-
-import fftManager.Complex;
-import fftManager.FastFFT;
 import PamUtils.MatrixOps;
 import Spectrogram.WindowFunction;
+import difar.DifarParameters.DifarOutputTypes;
+import difar.DifarProcess.DifarDemuxWorker;
+import fftManager.Complex;
+import fftManager.FastFFT;
 
 /**
  * DIFAR Calculations, based on the Matlab bScanNew functions

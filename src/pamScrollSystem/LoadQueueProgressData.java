@@ -34,11 +34,13 @@ public class LoadQueueProgressData extends PamTaskUpdate {
 		this.loadEnd = loadEnd;
 		this.loadCurrent = loadCurrent;
 		this.nLoaded = nLoaded;
+		setDualProgressUpdate(true);
 	}
 	
 	public LoadQueueProgressData(int status) {
 		super();
 		this.setStatus(PamTaskUpdate.STATUS_DONE);
+		setDualProgressUpdate(true);
 	}
 
 
@@ -119,6 +121,7 @@ public class LoadQueueProgressData extends PamTaskUpdate {
 
 	@Override
 	public double getProgress() {		
+//		System.out.println( getStreamName() + " progress: " + iStream + " of " + totalStreams);
 		if (getStreamName() != null) {
 			return (double )iStream/ (double) totalStreams;
 		}
@@ -127,6 +130,7 @@ public class LoadQueueProgressData extends PamTaskUpdate {
 
 	@Override
 	public String getProgressString() {
+
 		if (getState() == LoadQueueProgressData.STATE_LINKINGSUBTABLE) {
 			return String.format("Linking subtable data %d of %d", 
 					getIStream(), getTotalStreams());
@@ -141,13 +145,15 @@ public class LoadQueueProgressData extends PamTaskUpdate {
 	} 
 	
 	@Override
-	public double getProgress2() {		
+	public double getProgress2() {	
+//		System.out.println( getStreamName() + " progress2: " + getLoadStart() );
 		long interval =getLoadEnd() - getLoadStart();
-		if (interval == 0) {
+		if (interval <= 0) {
 			return ProgressIndicator.INDETERMINATE_PROGRESS; 
 		}
 		else {
 			long done =getLoadCurrent() - getLoadStart();
+//			System.out.println( getStreamName() + " progress2: " + done + " " + interval + " start " + getLoadStart() + " end " + getLoadEnd())
 			return ((double) done )/ interval;
 		}
 	}
@@ -156,6 +162,7 @@ public class LoadQueueProgressData extends PamTaskUpdate {
 	 * If two updates are available then this is used to return the fine progress update message.
 	 * @return
 	 */
+	@Override
 	public String getProgressString2(){
 		if (getState() == LoadQueueProgressData.STATE_LINKINGSUBTABLE) {
 			return "Linking " + getStreamName();

@@ -16,8 +16,8 @@ import java.lang.reflect.Field;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
-import PamModel.parametermanager.PrivatePamParameterData;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
+import PamModel.parametermanager.PrivatePamParameterData;
 import PamView.GroupedSourceParameters;
 
 public class IshDetParams implements Serializable, Cloneable, ManagedParameters {

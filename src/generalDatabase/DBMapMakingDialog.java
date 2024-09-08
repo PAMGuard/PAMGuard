@@ -32,8 +32,8 @@ public class DBMapMakingDialog extends PamDialog {
 		JPanel p = new JPanel();
 		p.setBorder(new TitledBorder("Creating data map"));
 		p.setLayout(new BoxLayout(p, BoxLayout.PAGE_AXIS));
-		p.add(databaseName = new JLabel(""));
-		p.add(streamName = new JLabel(""));
+		p.add(databaseName = new JLabel("  "));
+		p.add(streamName = new JLabel("  "));
 		p.add(streamProgress = new JProgressBar());
 //		p.setPreferredSize(new Dimension(400, 200));
 		streamName.setPreferredSize(new Dimension(250, 5));
@@ -57,7 +57,7 @@ public class DBMapMakingDialog extends PamDialog {
 	
 	@Override
 	public void setVisible(boolean visible) {
-		if (visible == false) {
+		if (!visible) {
 //			dispose();
 //			singleInstance = null;
 			closeLater();

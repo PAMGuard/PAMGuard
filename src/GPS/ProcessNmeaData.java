@@ -20,15 +20,11 @@
  */
 package GPS;
 
-import warnings.PamWarning;
-import warnings.WarningSystem;
-import geoMag.MagneticVariation;
 import NMEA.NMEADataBlock;
 import NMEA.NMEADataUnit;
 import PamController.PamController;
-import PamController.masterReference.MasterReferencePoint;
+import PamController.PamControllerInterface;
 import PamController.status.BaseProcessCheck;
-import PamController.status.ProcessCheck;
 import PamModel.PamModel;
 import PamModel.SMRUEnable;
 import PamUtils.PamCalendar;
@@ -38,7 +34,9 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
-import autecPhones.AutecGraphics;
+import geoMag.MagneticVariation;
+import warnings.PamWarning;
+import warnings.WarningSystem;
 
 /**
  * @author Doug Gillespie
@@ -90,7 +88,7 @@ public class ProcessNmeaData extends PamProcess {
 		findNMEADataBlock();
 
 		addOutputDataBlock((gpsDataBlock = new GPSDataBlock(this)));
-		if (gpsControl.isGpsMaster() == false) {
+		if (!gpsControl.isGpsMaster()) {
 			gpsDataBlock.setOverlayDraw(new GPSOverlayGraphics(gpsControl));
 			gpsDataBlock.setPamSymbolManager(new StandardSymbolManager(gpsDataBlock, GPSOverlayGraphics.defSymbol, false));
 		}
@@ -123,11 +121,11 @@ public class ProcessNmeaData extends PamProcess {
 	boolean findNMEADataBlock() {
 		
 		PamDataBlock newDataBlock = null;
-		if (gpsController.isGpsMaster() == false) {
+		if (!gpsController.isGpsMaster()) {
 			return false;
 		}
 		
-		newDataBlock = PamController.getInstance().getDataBlock(NMEADataUnit.class, gpsController.gpsParameters.nmeaSource);
+		newDataBlock = PamController.getInstance().getDataBlockByLongName(gpsController.gpsParameters.nmeaSource);
 		if (newDataBlock == null) {
 			newDataBlock = PamController.getInstance().getDataBlock(NMEADataUnit.class, 0);
 		}
@@ -151,9 +149,9 @@ public class ProcessNmeaData extends PamProcess {
 	@Override
 	public void notifyModelChanged(int changeType) {
 		switch (changeType) {
-		case PamController.ADD_CONTROLLEDUNIT:
-		case PamController.REMOVE_CONTROLLEDUNIT:
-		case PamController.INITIALIZATION_COMPLETE:
+		case PamControllerInterface.ADD_CONTROLLEDUNIT:
+		case PamControllerInterface.REMOVE_CONTROLLEDUNIT:
+		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			noteNewSettings();
 		}
 	}
@@ -193,7 +191,7 @@ public class ProcessNmeaData extends PamProcess {
 				}
 
 				//				newUnit.data = gpsData;
-				if (wantDataUnit(newUnit) == false) {
+				if (!wantDataUnit(newUnit)) {
 					return;
 				}
 				

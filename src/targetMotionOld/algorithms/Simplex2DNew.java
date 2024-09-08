@@ -61,13 +61,12 @@ public class Simplex2DNew<T extends GroupDetection> extends AbstractTargetMotion
 
 	@Override
 	public LocContents getLocContents() {
-		// TODO Auto-generated method stub
-		return null;
+		return new LocContents(LocContents.HAS_LATLONG | LocContents.HAS_PERPENDICULARERRORS);
 	}
 
 	@Override
-	public LocaliserPane<?> getSettingsPane() {
-		return detectionGroupLocaliser.getSettingsPane();
+	public LocaliserPane<?> getAlgorithmSettingsPane() {
+		return detectionGroupLocaliser.getAlgorithmSettingsPane();
 	}
 
 	@Override

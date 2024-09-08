@@ -8,10 +8,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 
-import javax.swing.JOptionPane;
-
-import PamUtils.PamCalendar;
-
 
 public class DBSpeedTest {
 
@@ -271,7 +267,7 @@ public class DBSpeedTest {
 				selectStatement.close();
 			}
 
-			if (con.getAutoCommit() == false) {
+			if (!con.getAutoCommit()) {
 				con.commit();
 			}
 

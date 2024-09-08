@@ -853,7 +853,7 @@ public class PamAxis {
 		interval = Math.log10(interval);
 		int iint = (int) interval;
 		double baseinterval = Math.pow(10., iint);
-		if (allowScaleMultiples == false || fractionalScale) {
+		if (!allowScaleMultiples || fractionalScale) {
 			baseinterval = 1;
 			interval = Math.abs(intervals[intervals.length-1]);
 		}
@@ -1131,7 +1131,7 @@ public class PamAxis {
 	public double getPosition(double dataValue) {
 		//		totalPixs = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 		double pixs;
-		if (logScale == false) {
+		if (!logScale) {
 			pixs =  totalPixs * (dataValue - getMinVal()) / (getMaxVal() - getMinVal());
 		}
 		else {
@@ -1162,7 +1162,7 @@ public class PamAxis {
 	public double getOuterPosition(double dataValue) {
 		//		totalPixs = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 		double pixs;
-		if (logScale == false) {
+		if (!logScale) {
 			pixs =  totalPixs * (dataValue - getMinVal()) / (getMaxVal() - getMinVal());
 		}
 		else {
@@ -1198,7 +1198,7 @@ public class PamAxis {
 		if (x1 == x2) {
 			position = totalPixs - position; // y axis, so go from other side. 
 		}
-		if (logScale == false) {
+		if (!logScale) {
 			dataValue = position * (getMaxVal() - getMinVal()) / totalPixs + getMinVal();
 		}
 		else {

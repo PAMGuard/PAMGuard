@@ -134,7 +134,7 @@ public class SummaryPanel extends HidingDialogComponent {
 		}
 		else {
 			String str = PamCalendar.formatDateTime2(timeMillis, true);
-			if (CalendarControl.getInstance().isUTC() == false) {
+			if (!CalendarControl.getInstance().isUTC()) {
 				str += String.format("%s  (%s UTC)", CalendarControl.getInstance().getTZCode(true), PamCalendar.formatDateTime2(timeMillis, false));
 			}
 			cursorPos.setText(str);

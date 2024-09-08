@@ -11,6 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import PamDetection.RawDataUnit;
@@ -54,9 +55,9 @@ public class LevelMeterDialog extends PamDialog {
 		
 		JPanel rangebit = new JPanel(new FlowLayout(FlowLayout.LEFT));
 //		rangebit.setLayout(new BoxLayout(rangebit, BoxLayout.X_AXIS));
-		rangebit.add(new JLabel("Scale range ", JLabel.RIGHT));
+		rangebit.add(new JLabel("Scale range ", SwingConstants.RIGHT));
 		rangebit.add(scaleRange = new JTextField(5));
-		rangebit.add(new JLabel(" dB", JLabel.LEFT));
+		rangebit.add(new JLabel(" dB", SwingConstants.LEFT));
 		scalePanel.add(rangebit, BorderLayout.SOUTH);
 		
 		mainPanel.add(scalePanel,BorderLayout.CENTER);

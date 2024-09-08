@@ -40,7 +40,7 @@ public class PamGuiTabFX extends PamTabFX {
     /**
      * List of internal panes within the tab content pane. 
      */
-    ArrayList<PamGuiInternalPane> internalPanes=new ArrayList<PamGuiInternalPane>();
+    private ArrayList<PamGuiInternalPane> internalPanes=new ArrayList<PamGuiInternalPane>();
     
     /**
      * True if panes are editable. 
@@ -87,33 +87,24 @@ public class PamGuiTabFX extends PamTabFX {
 	
 	/**
 	 * Constructor for a new tab
-	 * @param text. Name of tab
+	 * @param tabInfo - info on the tab such as name
+	 * @param pamGui - reference to the PamGuiFX the pane belongs to.
 	 */
 	public PamGuiTabFX(TabInfo tabInfo, PamGuiFX pamGui) {
-		super(tabInfo.tabName);
-		this.pamGui=pamGui; 
-		this.tabInfo=tabInfo; 
-
-		contentHolder=new PamBorderPane(); 
-		
-		//needs to be in this order so toolbar pane sits on top of center pane. 
-		holder=new Pane();
-		contentHolder.setCenter(holder);
-		
-		super.setContent(contentHolder);
-		setPanesEditable(editable);
+		this(tabInfo, null, pamGui);
 	}
 
 	/**
 	 * Constructor for a new tab
-	 * @param text - Name of tab
-	 * @param toolbar - pane which sits just below tab
-	 * @param content - content for tab pane. 
+	 * @param tabInfo - info on the tab such as name
+	 * @param newContent - content to display
+	 * @param pamGui - reference to the PamGuiFX the pane belongs to.
 	 */
 	public PamGuiTabFX(TabInfo tabInfo, UserDisplayNodeFX newContent, PamGuiFX pamGui) {
 		super(tabInfo.tabName);
 		this.pamGui=pamGui; 
 		this.tabInfo=tabInfo; 
+		
 		
 		contentHolder=new PamBorderPane(); 
 		
@@ -165,7 +156,7 @@ public class PamGuiTabFX extends PamTabFX {
 	public Pane createNewPane(Tab tab, PamTabPane tabPane, Stage newStage){
 		//create a new GUI frame. 
 		PamGuiFX pamGUIFX=new PamGuiFX(tabPane, newStage, pamGui.getPamGuiManagerFX()); 
-		pamGUIFX.getStylesheets().add(pamGui.getPamGuiManagerFX().getPamCSS());
+		pamGUIFX.getStylesheets().addAll(pamGui.getPamGuiManagerFX().getPamCSS());
 		
 		
 		//need to add PamGUIFX to list in PamGUIManagerFX. 
@@ -210,7 +201,17 @@ public class PamGuiTabFX extends PamTabFX {
 	 * @return the internal pane which has been added
 	 */
 	public PamGuiInternalPane addInternalPane(UserDisplayNodeFX userDisplayNodeFX){
+//		System.out.println("UserDisplayNodeFX: " + userDisplayNodeFX);
 		if (userDisplayNodeFX==null || userDisplayNodeFX.getNode()==null) return null;
+		
+		for (PamGuiInternalPane internalPane: this.internalPanes) {
+			if (userDisplayNodeFX == internalPane.getUserDisplayNode()) {
+				System.err.println("UserDisplayNodeFX is laready in pane");
+				return null;
+			}
+		}
+		
+		
 		PamGuiInternalPane newInternalPane=new PamGuiInternalPane(userDisplayNodeFX, holder);
 		if (!userDisplayNodeFX.isResizeableDisplay()) newInternalPane.showResizeControls(false);
 		holder.getChildren().add(newInternalPane);
@@ -252,6 +253,10 @@ public class PamGuiTabFX extends PamTabFX {
 			double r1 = 1 - r;
 
 			int smallWindows = 0;
+			
+			
+			//the padding between windows
+			double padding = 10; 
 
 			ArrayList<PamGuiInternalPane> dw = internalPanes;
 
@@ -267,7 +272,9 @@ public class PamGuiTabFX extends PamTabFX {
 
 			//now place windows in correct position
 			//large windows 
-			double x, y, w, h = 0;
+			double x, y, w, h = 0.;
+			double pad =0.;
+			
 			if (largeWindows > 0) {
 				x = 0;
 				y = 0;
@@ -280,10 +287,13 @@ public class PamGuiTabFX extends PamTabFX {
 					w = (horz) ? (holderWidth / largeWindows) : holderWidth ;
 				}
 				for (int i = 0; i < dw.size(); i++) {
-					if (dw.get(i).getUserDisplayNode().isMinorDisplay()== true) continue;
+					if (dw.get(i).getUserDisplayNode().isMinorDisplay()) continue;
 
 					dw.get(i).setPaneLayout(x, y);
-					dw.get(i).setPaneSize(w, h);
+					
+					//set the padding if the pane is not the last pane.
+					pad = (i== dw.size()-1) ? 0 : padding;
+					dw.get(i).setPaneSize(w - (horz?  pad:0), h -  (horz?  0:pad));
 					if (horz) x += w;
 					else y += h; 
 				}
@@ -300,13 +310,16 @@ public class PamGuiTabFX extends PamTabFX {
 				}
 				else {
 					w = (horz) ? (holderWidth / smallWindows) :  holderWidth;
-					h = (horz) ? holderHeight : holderHeight/smallWindows;;
+					h = (horz) ? holderHeight : holderHeight/smallWindows;
 				}
 				
 				for (int i = 0; i < dw.size(); i++) {
-					if (dw.get(i).getUserDisplayNode().isMinorDisplay() == false) continue;
+					if (!dw.get(i).getUserDisplayNode().isMinorDisplay()) continue;
 					dw.get(i).setPaneLayout(x, y);
-					dw.get(i).setPaneSize(w, h);
+					
+					//set the padding if the pane is not the last pane.
+					pad = (i== dw.size()-1) ? 0 : padding;
+					dw.get(i).setPaneSize(w- (horz?  pad:0), h -  (horz?  0:pad));
 					if (horz) x += w;
 					else y +=h;
 				}
@@ -404,7 +417,9 @@ public class PamGuiTabFX extends PamTabFX {
 	 * @return name of tabs. 
 	 */
 	public String getName() {
-		return this.getText();
+		//note that this should not be getText() because 
+		//this is not set in the parent class constructor. 
+		return this.tabInfo.tabName;
 	}
 	
 	/**
@@ -413,7 +428,7 @@ public class PamGuiTabFX extends PamTabFX {
 	 * @author Jamie Macaulay
 	 *
 	 */
-	private class PamGuiInternalPane extends PamInternalPane {
+	class PamGuiInternalPane extends PamInternalPane {
 		
 
 		private UserDisplayNodeFX mainPane;

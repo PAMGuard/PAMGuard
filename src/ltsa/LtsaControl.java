@@ -7,15 +7,11 @@ import java.io.Serializable;
 
 import javax.swing.JMenuItem;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import fftManager.FFTPluginPanelProvider;
-
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import fftManager.FFTPluginPanelProvider;
 
 public class LtsaControl extends PamControlledUnit implements PamSettings {
 

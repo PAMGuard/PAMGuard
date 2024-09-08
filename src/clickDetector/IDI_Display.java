@@ -23,26 +23,9 @@
 
 package clickDetector;
 
-import Layout.PamAxis;
-import Layout.PamAxisPanel;
-import Layout.PamFramePlots;
-import PamController.PamControlledUnitSettings;
-import PamController.PamSettingManager;
-import PamController.PamSettings;
-import PamView.ColourArray;
-import PamView.PamColors;
-import PamView.panel.JBufferedPanel;
-import PamView.panel.PamPanel;
-import PamguardMVC.PamDataUnit;
-import PamguardMVC.PamObservable;
-import PamguardMVC.PamObserver;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
@@ -58,7 +41,6 @@ import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageFilter;
 import java.awt.image.ImageObserver;
 import java.awt.image.ReplicateScaleFilter;
-import java.awt.image.WritableRaster;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -68,14 +50,23 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
-import javax.sound.sampled.Line;
+
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.border.EmptyBorder;
-import pamMaths.PamHistogram;
+
+import Layout.PamAxis;
+import Layout.PamAxisPanel;
+import PamController.PamControlledUnitSettings;
+import PamController.PamSettingManager;
+import PamController.PamSettings;
+import PamView.ColourArray;
+import PamView.panel.JBufferedPanel;
+import PamguardMVC.PamDataUnit;
+import PamguardMVC.PamObservable;
+import PamguardMVC.PamObserver;
 import soundtrap.STClickControl;
 
 /**
@@ -300,7 +291,8 @@ public class IDI_Display extends ClickDisplay implements PamObserver, PamSetting
     }
 
     /** On new data, add ICI variable to current histogram */
-    public void addData(PamObservable o, PamDataUnit arg) {
+    @Override
+	public void addData(PamObservable o, PamDataUnit arg) {
         ClickDetection click = (ClickDetection) arg;
         double ici = click.getTimeMilliseconds() - prevClickTime;
 
@@ -354,7 +346,8 @@ public class IDI_Display extends ClickDisplay implements PamObserver, PamSetting
      * Timer task - executes whenever the timer hits the user-specified time bin
      */
     class IDI_DisplayTimer extends TimerTask {
-        public void run() {
+        @Override
+		public void run() {
 
             /* troubleshooting - print out ici value */
 //            System.out.println("   *** Time triggered at " + System.currentTimeMillis());
@@ -531,16 +524,20 @@ public class IDI_Display extends ClickDisplay implements PamObserver, PamSetting
 					r.height - insets.bottom);
         }
 
-        public void componentMoved(ComponentEvent e) {
+        @Override
+		public void componentMoved(ComponentEvent e) {
             idiInnerPanel.revalidate();
         }
 
-        public void componentResized(ComponentEvent e) {
+        @Override
+		public void componentResized(ComponentEvent e) {
             idiInnerPanel.revalidate();
         }
 
-        public void componentShown(ComponentEvent e) {}
-        public void componentHidden(ComponentEvent e) {}
+        @Override
+		public void componentShown(ComponentEvent e) {}
+        @Override
+		public void componentHidden(ComponentEvent e) {}
     }
 
     /**
@@ -1055,23 +1052,28 @@ public class IDI_Display extends ClickDisplay implements PamObserver, PamSetting
     /*                       */
     /* Serialization Methods */
     /*                       */
-    public Serializable getSettingsReference() {
+    @Override
+	public Serializable getSettingsReference() {
         return idiParams;
     }
 
-    public long getSettingsVersion() {
+    @Override
+	public long getSettingsVersion() {
         return IDI_DisplayParams.getSerialVersionUID();
     }
 
-    public String getUnitName() {
+    @Override
+	public String getUnitName() {
         return getName();
     }
 
-    public String getUnitType() {
+    @Override
+	public String getUnitType() {
         return getName();
     }
 
-    public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
+    @Override
+	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		idiParams = ((IDI_DisplayParams) pamControlledUnitSettings
 				.getSettings()).clone();
  		return true;

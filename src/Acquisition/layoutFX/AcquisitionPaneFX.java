@@ -6,23 +6,18 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import pamViewFX.PamGuiManagerFX;
-import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
-import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamComboBox;
 import pamViewFX.fxNodes.PamGridPane;
-import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamTextField;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.flipPane.FlipPane;
@@ -43,7 +38,7 @@ import dataMap.filemaps.OfflineFileParameters;
  */
 public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 	
-	private final static int TEXT_FIELD_WIDTH = 60; 
+	private final static int TEXT_FIELD_WIDTH = 80; 
 
 	/**
 	 * Reference to acquisition control. 
@@ -120,13 +115,13 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 	/**
 	 * 
 	 */
-	private FlipPane flipPane;
+	private PamFlipPane flipPane;
 	
 	
 	/**
 	 * Pane which can be used for advanced settings. 
 	 */
-	private PamBorderPane advancedSettingPane;
+//	private PamBorderPane advancedSettingPane;
 
 	/**
 	 * Title label for the advanced pane. 
@@ -147,12 +142,13 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 		super(null);
 		mainPane = new PamBorderPane();
 		mainPane.setPrefWidth(400);
+		mainPane.setPadding(new Insets(5,5,5,5));
 
 		this.acquisitionControl=aquisitionControl;
 		this.acquisitionParameters=acquisitionControl.getAcquisitionParameters();
 		
 		//create the flip pane. 
-		flipPane=new FlipPane(); 
+		flipPane=new PamFlipPane(); 
 		flipPane.setFlipDirection(Orientation.HORIZONTAL);
 		flipPane.setFlipTime(PamFlipPane.FLIP_TIME); //default is 700ms- way too high
 		//flipPane.prefWidthProperty().bind(mainPane.widthProperty());
@@ -166,45 +162,45 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 		flipPane.getFront().getChildren().add(mainPane);
 		
 		//create the advanced flip pane.
-		advancedSettingPane = createAdvSettingsPane(); 
-		flipPane.getBack().getChildren().add(advancedSettingPane);
+//		advancedSettingPane = createAdvSettingsPane(); 
+//		flipPane.getBack().getChildren().add(advancedSettingPane);
 		//System.out.println("MAKE PANE: "  +  acquisitionParameters.getDaqSystemType());
 
 	} 
 	
-	/**
-	 * Create the advanced settings pane which can be accessed by DAQ panes if needed. 
-	 */
-	private PamBorderPane createAdvSettingsPane() {
-		
-		PamButton back = new PamButton(); 
-		back.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-left", Color.WHITE, PamGuiManagerFX.iconSize));
-		
-		back.setOnAction((action)->{
-			flipPane.flipToFront(); 
-		});
-		
-		PamBorderPane advPane = new PamBorderPane(); 
-		advPane.setPadding(new Insets(5,5,5,5));
-		
-		PamHBox buttonHolder = new PamHBox(); 
-		
-		buttonHolder.setBackground(null);
-		//buttonHolder.setStyle("-fx-background-color: red;");
-		buttonHolder.setAlignment(Pos.CENTER_LEFT);
-		buttonHolder.getChildren().addAll(back, advLabel = new Label("Adv. Settings")); 
-		advLabel.setAlignment(Pos.CENTER);
-		advLabel.setMaxWidth(Double.MAX_VALUE); //need to make sure label is in center. 
-		PamGuiManagerFX.titleFont2style(advLabel);
-		
-		advLabel.setAlignment(Pos.CENTER);
-		HBox.setHgrow(advLabel, Priority.ALWAYS);
-		
-		advPane.setTop(buttonHolder);
-		
-		return advPane; 
-		
-	}
+//	/**
+//	 * Create the advanced settings pane which can be accessed by DAQ panes if needed. 
+//	 */
+//	private PamBorderPane createAdvSettingsPane() {
+//		
+//		PamButton back = new PamButton(); 
+//		back.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-left", Color.WHITE, PamGuiManagerFX.iconSize));
+//		
+//		back.setOnAction((action)->{
+//			flipPane.flipToFront(); 
+//		});
+//		
+//		PamBorderPane advPane = new PamBorderPane(); 
+//		advPane.setPadding(new Insets(5,5,5,5));
+//		
+//		PamHBox buttonHolder = new PamHBox(); 
+//		
+//		buttonHolder.setBackground(null);
+//		//buttonHolder.setStyle("-fx-background-color: red;");
+//		buttonHolder.setAlignment(Pos.CENTER_LEFT);
+//		buttonHolder.getChildren().addAll(back, advLabel = new Label("Adv. Settings")); 
+//		advLabel.setAlignment(Pos.CENTER);
+//		advLabel.setMaxWidth(Double.MAX_VALUE); //need to make sure label is in center. 
+//		PamGuiManagerFX.titleFont2style(advLabel);
+//		
+//		advLabel.setAlignment(Pos.CENTER);
+//		HBox.setHgrow(advLabel, Priority.ALWAYS);
+//		
+//		advPane.setTop(buttonHolder);
+//		
+//		return advPane; 
+//		
+//	}
 
 	/**
 	 * Create the Sound Aquisition pane for real time monitoring. 
@@ -290,7 +286,7 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 		//custom pane for each aquisition system. 
 		systemPane=new PamBorderPane(); 
 
-		offlineDAQPaneFX= new OfflineDAQPane(acquisitionControl, this);
+		offlineDAQPaneFX= new OfflineDAQPane(acquisitionControl);
 
 		//the main pane is for reference only in viewer mode. 
 		Pane samplingPane=createSamplingPane();
@@ -606,11 +602,12 @@ public class AcquisitionPaneFX extends SettingsPane<AcquisitionParameters>{
 	}
 
 	public PamBorderPane getAdvancedPane() {
-		return this.advancedSettingPane;
+		return this.flipPane.getAdvContentPane()
+;
 	}
 
-	public Label getAdvancedLabel() {
-		return this.advLabel;
+	public TextField getAdvancedLabel() {
+		return this.flipPane.getAdvLabel();
 	}
 
 }

@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 
 import PamUtils.PamCalendar;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableMap;
@@ -196,27 +197,55 @@ public class VRMediaView extends PamBorderPane implements VRImage {
 	public boolean setMedia(File currentFile) {
 		this.currentFile=currentFile; 
 		this.fileTime=currentFile.lastModified(); 
-		
+
 		try {
 			media = new Media(currentFile.toURI().toURL().toExternalForm());
+
+
+			//player.getMedia().getMetadata(); 
+			//        Media media = new Media("file:///home/paul/MoviePlayer/trailers/sintel.mp4");
+			player = new MediaPlayer(media);
+
+			//the media player is loaded asynchronously so must wait. 
+			player.setOnReady(() -> {
+				//the meta data 
+				this.metaData = getMetaData(media);
+				setUpPlayer() ; 
+				setImageFreeze();
+
+				Platform.runLater(()->{
+					vrDisplayFX.getInfoPane().setMetaText( getMetaData());
+				});
+
+			});
+			//			player.setAutoPlay(true);
+			mediaView.setMediaPlayer(player);
+
+			//wait for the player to be ready....
+			//player.getOnReady().wait();
+
+			//18/09/2023 - really no great but only way I could 
+			Thread.sleep(100);
+
+
+			//			while (player.getStatus()==MediaPlayer.Status.UNKNOWN) {
+
+			//not great just to put a sleep here but while loop to wait on the 
+			//			Thread.sleep(100);
+			//			System.out.println("Status: " + player.getStatus());
+			//				player.play();
+			//			}
+
+			return true;
+
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return false; 
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-
-		//the meta data 
-		this.metaData = getMetaData(media);
-		player.getMedia().getMetadata(); 
-		//        Media media = new Media("file:///home/paul/MoviePlayer/trailers/sintel.mp4");
-		player = new MediaPlayer(media);
-		setUpPlayer() ; 
-		mediaView.setMediaPlayer(player);
-
-		setImageFreeze();
-		//player.play(); //TEMP
-
-		return true;
+		return false;
 	}
 
 
@@ -229,22 +258,24 @@ public class VRMediaView extends PamBorderPane implements VRImage {
 		MetaData metaData = new MetaData(); 
 		try {
 			ObservableMap<String, Object> vidMetaData = currentFile.getMetadata(); 
-			
+
+			//			System.out.println("File information: " + currentFile.getHeight() + "  " +  currentFile.getWidth() +   "  "  + currentFile.getMetadata());
+
 			//TODO - need to implement JavaFX metadata here. 
-//			printDetails("Bit-rate", metaData.bitRate=currentFile.getBitRate());
-//			printDetails("Frame Rate", metaData.frameRate=vInfo.getFrameRate());
+			//			printDetails("Bit-rate", metaData.bitRate=currentFile.getBitRate());
+			//			printDetails("Frame Rate", metaData.frameRate=vInfo.getFrameRate());
 			printDetails("Height", metaData.height=currentFile.getHeight());
 			printDetails("Width", metaData.width=currentFile.getHeight());
 
 			printDetails("Duration", metaData.duration=(long) currentFile.getDuration().toMillis());
-//			printDetails("Format", metaData.format=info.getFormat());
-//
-//			printDetails("Bit-rate", metaData.bitRate=info.getAudio().getBitRate());
-//			printDetails("Channels",  metaData.audioChannels=info.getAudio().getChannels());
-//			printDetails("Sampling Rate", metaData.audioSamplingRate=info.getAudio().getSamplingRate());
+			//			printDetails("Format", metaData.format=info.getFormat());
+			//
+			//			printDetails("Bit-rate", metaData.bitRate=info.getAudio().getBitRate());
+			//			printDetails("Channels",  metaData.audioChannels=info.getAudio().getChannels());
+			//			printDetails("Sampling Rate", metaData.audioSamplingRate=info.getAudio().getSamplingRate());
 
 		} catch (Exception e) {
-			System.out.println("Could nto find meta data!");
+			System.out.println("Could not find meta data!");
 			e.printStackTrace();
 		}
 		return metaData; 
@@ -252,27 +283,31 @@ public class VRMediaView extends PamBorderPane implements VRImage {
 
 
 	boolean wasPausedOnDrag =false; 
+
+
 	/**
 	 * Set up the player controls to play, pause and set time of media. This is called whenever a new Media File is 
 	 * played. 
 	 */
 	private void setUpPlayer() {
 
-		player.setOnReady(new Runnable() {
-			@Override
-			public void run() {
+		//		player.setOnReady(new Runnable() {
+		//			@Override
+		//			public void run() {
 
-				int w = player.getMedia().getWidth();
-				int h = player.getMedia().getHeight();
+		int w = player.getMedia().getWidth();
+		int h = player.getMedia().getHeight();
 
-				seekslider.setMin(0.0);
-				seekslider.setValue(0.0);
-				seekslider.setMax(player.getTotalDuration().toSeconds());
+		seekslider.setMin(0.0);
+		seekslider.setValue(0.0);
+		seekslider.setMax(player.getTotalDuration().toSeconds());
 
-				player.setVolume(0.5);
+		//				System.out.println("Get total duration:" + player.getTotalDuration()); 
 
-			}
-		});
+		player.setVolume(0.5);
+
+		//			}
+		//		});
 
 
 		/******Time Slider****/
@@ -289,7 +324,7 @@ public class VRMediaView extends PamBorderPane implements VRImage {
 			}
 		});
 
-		
+
 		//need to pause the video if the slider is dragged and than start again when slider is Ok. 
 		seekslider.valueChangingProperty().addListener((obsVal, oldVal, newVal)->{
 			if (newVal && newVal!=oldVal) {
@@ -361,12 +396,12 @@ public class VRMediaView extends PamBorderPane implements VRImage {
 
 
 		player.setOnPlaying(()->{
-//			playButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.PAUSE, controlIconSize));
+			//			playButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.PAUSE, controlIconSize));
 			playButton.setGraphic(PamGlyphDude.createPamIcon("mdi2p-pause", controlIconSize));
 		});
 
 		player.setOnPaused(()->{
-//			playButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.PLAY_ARROW, controlIconSize));
+			//			playButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.PLAY_ARROW, controlIconSize));
 			playButton.setGraphic(PamGlyphDude.createPamIcon("mdi2p-play", controlIconSize));
 		});
 
@@ -423,21 +458,21 @@ public class VRMediaView extends PamBorderPane implements VRImage {
 	 */
 	private void setVolumeGraphic(double volume) {
 		if (volume ==0) {
-//			volumeButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.VOLUME_OFF, controlIconSize));
+			//			volumeButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.VOLUME_OFF, controlIconSize));
 			volumeButton.setGraphic(PamGlyphDude.createPamIcon("mdi2v-volume-off", controlIconSize));
 
 		}
 		else if (volume>0 && volume<=0.33) {
-//			volumeButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.VOLUME_MUTE, controlIconSize));
+			//			volumeButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.VOLUME_MUTE, controlIconSize));
 			volumeButton.setGraphic(PamGlyphDude.createPamIcon("mdi2v-volume-mute", controlIconSize));
 		}
 		else if (volume>0.33 && volume<=0.66) {
-//			volumeButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.VOLUME_DOWN, controlIconSize));
+			//			volumeButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.VOLUME_DOWN, controlIconSize));
 			volumeButton.setGraphic(PamGlyphDude.createPamIcon("mdi2v-volume-medium", controlIconSize));
 
 		}
 		else if (volume>0.66 && volume<1) {
-//			volumeButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.VOLUME_UP, controlIconSize));
+			//			volumeButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.VOLUME_UP, controlIconSize));
 			volumeButton.setGraphic(PamGlyphDude.createPamIcon("mdi2v-volume-high", controlIconSize));
 
 		}
@@ -452,10 +487,11 @@ public class VRMediaView extends PamBorderPane implements VRImage {
 	}
 
 	/**
-	 * Gte the duration of a single frame. 
-	 * @return the duration of a single frame. 
+	 * Get the duration of a single frame. 
+	 * @return the duration of a single frame in milliseconds. 
 	 */
 	private long getSingleFrameDuration() {
+		if ( metaData.frameRate==0.0) return 100; 
 		long frameDuration =  (long) (Math.ceil(1000.*(1/(double) metaData.frameRate)));
 		return frameDuration; 
 	}
@@ -471,7 +507,7 @@ public class VRMediaView extends PamBorderPane implements VRImage {
 
 		//long frameDuration =  (long) (Math.ceil(1000.*(1/(double) metaData.frameRate)));
 
-//		System.out.println("Frame duration millis: " + millis);
+		//		System.out.println("Frame duration millis: " + millis);
 
 		if (!forward) millis =-millis;
 
@@ -531,44 +567,44 @@ public class VRMediaView extends PamBorderPane implements VRImage {
 
 		//the play and pause button
 		playButton = new PamButton(); 
-//		playButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.PLAY_ARROW, controlIconSize));
+		//		playButton.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.PLAY_ARROW, controlIconSize));
 		playButton.setGraphic(PamGlyphDude.createPamIcon("mdi2p-play", controlIconSize));
 		playButton.getStyleClass().add("square-button-trans");
 		playButton.setTooltip(new Tooltip("Play or pause the media"));
 
 
 		leftFrame = new PamButton(); 
-//		leftFrame.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.CHEVRON_LEFT, controlIconSize));
+		//		leftFrame.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.CHEVRON_LEFT, controlIconSize));
 		leftFrame.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-left", controlIconSize));
 		leftFrame.getStyleClass().add("square-button-trans");
 		leftFrame.setTooltip(new Tooltip("Move to the previous frame"));
 
 		rightFrame= new PamButton(); 
-//		rightFrame.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.CHEVRON_RIGHT,controlIconSize));
+		//		rightFrame.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.CHEVRON_RIGHT,controlIconSize));
 		rightFrame.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-right",controlIconSize));
 		rightFrame.getStyleClass().add("square-button-trans");
 		rightFrame.setTooltip(new Tooltip("Move to the next frame"));
 
 		nextMedia= new PamButton(); 
-//		nextMedia.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.SKIP_PREVIOUS,controlIconSize));
+		//		nextMedia.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.SKIP_PREVIOUS,controlIconSize));
 		nextMedia.setGraphic(PamGlyphDude.createPamIcon("mdi2s-skip-previous",controlIconSize));
 		nextMedia.getStyleClass().add("square-button-trans");
 		nextMedia.setTooltip(new Tooltip("Move to the next image or video"));
 
 		prevMedia= new PamButton(); 
-//		prevMedia.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.SKIP_NEXT,	controlIconSize));
+		//		prevMedia.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.SKIP_NEXT,	controlIconSize));
 		prevMedia.setGraphic(PamGlyphDude.createPamIcon("mdi2s-skip-next", controlIconSize));
 		prevMedia.getStyleClass().add("square-button-trans");
 		prevMedia.setTooltip(new Tooltip("Move to the previous image or video"));
 
 		skipForward= new PamButton(); 
-//		skipForward.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.CHEVRON_DOUBLE_RIGHT,	controlIconSize));
+		//		skipForward.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.CHEVRON_DOUBLE_RIGHT,	controlIconSize));
 		skipForward.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-double-right",	controlIconSize));
 		skipForward.getStyleClass().add("square-button-trans");
 		skipForward.setTooltip(new Tooltip("Skip 2 seconds forward"));
 
 		skipBackward= new PamButton(); 
-//		skipBackward.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.CHEVRON_DOUBLE_LEFT,	controlIconSize));
+		//		skipBackward.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.CHEVRON_DOUBLE_LEFT,	controlIconSize));
 		skipBackward.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-double-left", controlIconSize));
 		skipBackward.getStyleClass().add("square-button-trans");
 		skipBackward.setTooltip(new Tooltip("Skip 2 seconds backward"));
@@ -661,7 +697,7 @@ public class VRMediaView extends PamBorderPane implements VRImage {
 		 * Size of the video file 
 		 */
 		public int height;
-		
+
 		/**
 		 * Size of the video file 
 		 */
@@ -687,6 +723,12 @@ public class VRMediaView extends PamBorderPane implements VRImage {
 	 * @return the pamImage representing the snapshot. 
 	 */
 	public PamImage getImageSnapshot() {
+
+		//System.out.println("Fit height: " + mediaView.getFitHeight());
+		//		
+		//		if (metaData==null || metaData.width==0 || metaData.height == 0 ) {
+		//			return null; 
+		//		}
 
 		WritableImage image = new WritableImage(metaData.width, metaData.height); 
 

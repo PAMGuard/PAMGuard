@@ -20,21 +20,6 @@ package pamguard;
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-import PamController.PamController;
-import PamController.PamGUIManager;
-import PamController.PamSettingManager;
-import PamController.PamguardVersionInfo;
-import PamController.pamBuoyGlobals;
-import PamModel.SMRUEnable;
-import PamUtils.FileFunctions;
-import PamUtils.PamExceptionHandler;
-import PamView.FullScreen;
-import PamView.ScreenSize;
-import PamguardMVC.debug.Debug;
-import dataPlotsFX.JamieDev;
-import javafx.application.Application;
-import javafx.stage.Stage;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -50,6 +35,21 @@ import java.util.Date;
 import java.util.TimeZone;
 //import com.sun.java.swing.plaf.windows.WindowsLookAndFeel;
 
+import PamController.PamController;
+import PamController.PamGUIManager;
+import PamController.PamSettingManager;
+import PamController.PamguardVersionInfo;
+import PamController.pamBuoyGlobals;
+import PamModel.SMRUEnable;
+import PamUtils.FileFunctions;
+import PamUtils.PamExceptionHandler;
+import PamView.FullScreen;
+import PamView.ScreenSize;
+import PamguardMVC.debug.Debug;
+import dataPlotsFX.JamieDev;
+import javafx.application.Application;
+import javafx.stage.Stage;
+
 /**
  * Pamguard main class. 
  * 
@@ -61,11 +61,14 @@ public class PamguardFX extends Application {
 
 
 
+	private static int runMode;
+
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		//this is called from launch(args)
 		try {
-			PamController.create(PamController.RUN_NORMAL, primaryStage);
+		    System.out.println("javafx.runtime.version: " + System.getProperty("javafx.runtime.version"));
+			PamController.create(runMode, primaryStage);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -89,7 +92,7 @@ public class PamguardFX extends Application {
 
 		Debug.setPrintDebug(false); // make sure the class instantiates static members. 
 
-		int runMode = PamController.RUN_NORMAL;
+		runMode = PamController.RUN_NORMAL;
 		String InputPsf = "NULL";
 
 
@@ -273,6 +276,7 @@ public class PamguardFX extends Application {
 		//that kicked off from with the EDT CJB 2009-06-16 
 
 		PamGUIManager.setType(PamGUIManager.FX);
+		
 		launch(args);
 
 	}
@@ -375,6 +379,7 @@ public class PamguardFX extends Application {
 		/**
 		 * Print to both the console and the file
 		 */
+		@Override
 		public synchronized void print(final String str) {
 			if (str.contains("WARN org.docx4j") || str.contains("INFO org.docx4j")) return;	// don't bother printing these messages out
 			origPrintStream.print(str);
@@ -388,6 +393,7 @@ public class PamguardFX extends Application {
 		/**
 		 * Print to both the console and the file
 		 */
+		@Override
 		public synchronized void println(final String str) {
 			if (str.contains("WARN org.docx4j") || str.contains("INFO org.docx4j")) return;	// don't bother printing these messages out
 			origPrintStream.println(str);
@@ -404,6 +410,7 @@ public class PamguardFX extends Application {
 		 * the string.  Instead, compile it all into a single string first
 		 * and then call print
 		 */
+		@Override
 		public synchronized PrintStream printf(String format, Object... args) {
 			String theString = String.format(format, args);
 			print(theString);

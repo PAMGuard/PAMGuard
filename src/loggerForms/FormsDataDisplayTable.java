@@ -4,23 +4,29 @@
 package loggerForms;
 
 import java.awt.GridLayout;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
-import loggerForms.controlDescriptions.ControlDescription;
-import loggerForms.controlDescriptions.ControlTypes;
 import PamController.PamController;
 import PamUtils.PamCalendar;
 import PamView.PamTable;
 import PamView.dialog.PamDialog;
+import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
+import loggerForms.controlDescriptions.ControlDescription;
+import loggerForms.controlDescriptions.ControlTypes;
 
 /**
  * @author GrahamWeatherup
@@ -37,11 +43,13 @@ public class FormsDataDisplayTable {
 
 	private JScrollPane scrollPane;
 
+	private FormsControl formsControl;
+
 	/**
 	 * @param formDescription
 	 */
-	public FormsDataDisplayTable(FormDescription formDescription) {
-		// TODO Auto-generated constructor stub
+	public FormsDataDisplayTable(FormsControl formsControl, FormDescription formDescription) {
+		this.formsControl = formsControl;
 		this.formDescription=formDescription;
 		
 //		GridLayout(rows,columns)
@@ -63,35 +71,15 @@ public class FormsDataDisplayTable {
 		formsTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		
 		// for now, don't allow edits in viewer mode. 
-		if (PamController.getInstance().getRunMode() != PamController.RUN_PAMVIEW) {
+//		if (PamController.getInstance().getRunMode() != PamController.RUN_PAMVIEW) {
 			formsTable.addMouseListener(new EditDataListener());
-		}
+//		}
 
 		scrollPane = new JScrollPane(formsTable);
 		
 		mainPanel.add(scrollPane);
-
-//		mainPanel.setPreferredSize(new Dimension(800, 200));
-
-		
-		
 		
 	}
-
-//	class TimerListener implements ActionListener {
-//		boolean doneLayout;
-//		public void actionPerformed(ActionEvent ev) {
-//			// table.
-////			nmeaTableData.fireTableRowsUpdated(0, 10);
-//			formsTableDataModel.fireTableDataChanged();
-//			
-//			if (doneLayout == false && formsTableDataModel.getRowCount() > 0) {
-//				doneLayout = true;
-//			}
-//		}
-//	}
-
-	
 
 	class TableListListener implements ListSelectionListener {
 
@@ -108,9 +96,15 @@ public class FormsDataDisplayTable {
 				formDescription.viewDataUnit(formsDataUnit);
 			}
 		}
-
 	}
 	
+	private boolean canEdit() {
+		if (PamController.getInstance().getRunMode() != PamController.RUN_PAMVIEW) {
+			return true;
+		}
+		if (formsControl == null) return false;
+		return formsControl.getFormsParameters().allowViewerChanges;
+	}
 	/**
 	 * Find the data unit for a particular row in the table. 
 	 * @param iRow
@@ -125,9 +119,11 @@ public class FormsDataDisplayTable {
 	class EditDataListener extends MouseAdapter{
 		@Override
 		public void mouseClicked(MouseEvent e) {
+			if (!canEdit()) {
+				return;
+			}
 			if (e.getClickCount() == 2) {
 				
-//				FormsDataBlock formsDataBlock = formDescription.getFormsDataBlock();
 				int row = formsTable.getSelectedRow();
 				
 				FormsDataUnit formsDataUnit = findDataUnitForRow(row);
@@ -135,13 +131,31 @@ public class FormsDataDisplayTable {
 					PamDialog.showWarning(null, "WARNING", "could not find formsDataUnit");
 					return;
 				}
-				
-								
-				
-				FormsDataUnitEditor due = new FormsDataUnitEditor(formDescription,formsDataUnit);
-				
+				editDataUnit(formsDataUnit);			
 				
 			}
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+			maybePopup(e);
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			maybePopup(e);
+		}
+
+		private void maybePopup(MouseEvent e) {
+			if (!e.isPopupTrigger()) {
+				return;
+			}
+			if (!canEdit()) {
+				return;
+			}
+			int row = formsTable.getSelectedRow();
+			
+			showPopupMenu(e.getPoint());
 		}
 	}
 	
@@ -211,7 +225,7 @@ public class FormsDataDisplayTable {
 					Object value = ctrlDescription.formatDataItem(fd[ctIndex]);
 					if (value == null) return null;
 					if (getColumnClass(columnIndex) == Boolean.class) {
-						if (value instanceof Boolean == false) {
+						if (!(value instanceof Boolean)) {
 //							System.out.println("Bad boolean value: " + value);
 							return FormsControl.checkBadBoolean(value);
 						}
@@ -259,9 +273,69 @@ public class FormsDataDisplayTable {
 		return mainPanel;
 	}
 
+	public void showPopupMenu(Point pt) {
+		
+		FormsDataUnit dataUnit = findDataUnitForRow(formsTable.getSelectedRow());
 
+		JPopupMenu menu = new JPopupMenu();
+		JMenuItem menuItem;
+		if (dataUnit != null) {
+			menuItem = new JMenuItem("Edit row ...");
+			menuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					editDataUnit(dataUnit);
+				}
+			});
+			menu.add(menuItem);
+		}
 
+		menuItem = new JMenuItem("Create row ...");
+		menuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				addDataUnit();
+			}
+		});
+		menu.add(menuItem);
+		
+		if (dataUnit != null) {
+			menu.addSeparator();
+			menuItem = new JMenuItem("Delete row ...");
+			menuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					deleteDataUnit(dataUnit);
+				}
+			});
+			menu.add(menuItem);
+		}
 
+		menu.show(formsTable, pt.x, pt.y);
+	}
+	
+	private boolean editDataUnit(FormsDataUnit dataUnit) {
+		FormsDataUnitEditor due = new FormsDataUnitEditor(formDescription, dataUnit);
+		return true;
+	}
+
+	private boolean deleteDataUnit(FormsDataUnit dataUnit) {
+		if (dataUnit == null) {
+			return false;
+		}
+		int ans = WarnOnce.showWarning("Delete logger form data", "Are you sure you want to delete data Id " + dataUnit.getDatabaseIndex(), WarnOnce.OK_CANCEL_OPTION);
+		if (ans != WarnOnce.OK_OPTION) {
+			return false;
+		}
+		formDescription.deleteDataUnit(dataUnit);
+		return true;
+	}
+	
+	private boolean addDataUnit() {
+		formDescription.viewDataUnit(null);
+		return false;
+	}
+	
 	/**
 	 * Called when data have changed in the datablock. 
 	 */
@@ -275,5 +349,13 @@ public class FormsDataDisplayTable {
 	 */
 	public JScrollPane getScrollPane() {
 		return scrollPane;
+	}
+	
+	/**
+	 * Some optins have changed. 
+	 */
+	public void optionsChange() {
+		// TODO Auto-generated method stub
+		
 	}
 }

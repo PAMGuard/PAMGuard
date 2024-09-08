@@ -5,25 +5,12 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 
 import Localiser.algorithms.Correlations;
 import Localiser.algorithms.timeDelayLocalisers.bearingLoc.BearingLocaliser;
 import Localiser.algorithms.timeDelayLocalisers.bearingLoc.BearingLocaliserSelector;
-import annotation.calcs.snr.SNRAnnotationType;
-import autecPhones.AutecGraphics;
-import fftManager.Complex;
-import fftManager.FFTDataBlock;
-import fftManager.FFTDataUnit;
-import networkTransfer.receive.BuoyStatusDataUnit;
-import spectrogramNoiseReduction.kernelSmoothing.KernelSmoothing;
-import whistlesAndMoans.WhistleBearingInfo;
 import PamController.PamController;
-import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
-import PamDetection.LocalisationInfo;
-import PamUtils.LatLong;
-import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamUtils.complex.ComplexArray;
 import PamView.symbol.StandardSymbolManager;
@@ -32,8 +19,15 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
-import PamguardMVC.debug.Debug;
+import RightWhaleEdgeDetector.graphics.RWEDataPlotProviderFX;
 import RightWhaleEdgeDetector.graphics.RWESymbolManager;
+import annotation.calcs.snr.SNRAnnotationType;
+import dataPlotsFX.data.TDDataProviderRegisterFX;
+import fftManager.FFTDataBlock;
+import fftManager.FFTDataUnit;
+import networkTransfer.receive.BuoyStatusDataUnit;
+import spectrogramNoiseReduction.kernelSmoothing.KernelSmoothing;
+import whistlesAndMoans.WhistleBearingInfo;
 
 public class RWEProcess extends PamProcess {
 
@@ -53,13 +47,14 @@ public class RWEProcess extends PamProcess {
 	 */
 	private boolean isPreSmoothed;
 	private KernelSmoothing kernelSmoothing;
+	private RWEDataPlotProviderFX fxPlotProvider;
 	
 	public RWEProcess(RWEControl rweControl) {
 		super(rweControl, null);
 		this.rweControl = rweControl;
 		rweDataBlock = new RWEDataBlock(rweControl, rweControl.getUnitName(), this, 0);
 		addOutputDataBlock(rweDataBlock);
-		rweDataBlock.setLocalisationContents(LocContents.HAS_BEARING);
+//		rweDataBlock.setLocalisationContents(LocContents.HAS_BEARING);
 		rweDataBlock.setDatagramProvider(new RWEDatagramProvider());
 		rweDataBlock.setOverlayDraw(new RWEOverlayGraphics(this, rweDataBlock));
 		StandardSymbolManager symbolManager = symbolManager = new RWESymbolManager(rweDataBlock, RWEOverlayGraphics.defaultSymbol, true);
@@ -71,6 +66,9 @@ public class RWEProcess extends PamProcess {
 		rweDataBlock.setCanClipGenerate(true);
 		rweDataBlock.SetLogging(new RWESQLLogging(rweControl, rweDataBlock));
 		rweDataBlock.addDataAnnotationType(new SNRAnnotationType());
+
+		fxPlotProvider = new RWEDataPlotProviderFX(this, rweDataBlock);
+		TDDataProviderRegisterFX.getInstance().registerDataInfo(fxPlotProvider);
 	}
 	
 	@Override
@@ -131,6 +129,11 @@ public class RWEProcess extends PamProcess {
 			if ((channelMap & (1<<i)) != 0) {
 				rweChannelProcesses[i] = new RWEChannelProcess(this, i);
 			}
+		}
+		int nChan = PamUtils.getNumChannels(channelMap);
+		if (nChan > 1) {
+			// really needs properly setting up with channel groups 
+			rweDataBlock.setLocalisationContents(LocContents.HAS_BEARING);
 		}
 //		checkBearingLocaliser(sourceDataBlock.getChannelMap());
 	}
@@ -262,7 +265,7 @@ public class RWEProcess extends PamProcess {
 			    	backgroundData[i] += (magData[i]-backgroundData[i])/updateConstant[0];
 			    }
 				if (Double.isNaN(backgroundData[i]) || Double.isInfinite(backgroundData[i])) {
-					System.out.println(String.format("Bad bg data slice %d = %3.5f", i, backgroundData[i]));
+//					System.out.println(String.format("Bad bg data slice %d = %3.5f", i, backgroundData[i]));
 					backgroundData[i] = magData[i] * 10.;
 				}
 			}
@@ -427,6 +430,7 @@ public class RWEProcess extends PamProcess {
 		int hydrophoneMap = sourceDataBlock.getChannelListManager().channelIndexesToPhones(chanMap);
 		return findBearingLocaliser(hydrophoneMap);
 	}
+	
 	private synchronized BearingLocaliser findBearingLocaliser(int hydrophoneMap) {
 		int nPhones = PamUtils.getNumChannels(hydrophoneMap);
 		if (nPhones < 2) {

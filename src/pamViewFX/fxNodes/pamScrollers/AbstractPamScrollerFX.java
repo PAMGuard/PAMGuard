@@ -158,7 +158,7 @@ public abstract class AbstractPamScrollerFX extends AbstractPamScroller implemen
 		
 		navigationdialog.setParams(this.getScrollerData());
 		PamSettingsDialogFX<?> settingsDialog=new PamSettingsDialogFX(navigationdialog); 
-		settingsDialog.getDialogPane().getStylesheets().add(PamController.getInstance().getGuiManagerFX().getPamSettingsCSS());
+		settingsDialog.getDialogPane().getStylesheets().addAll(PamController.getInstance().getGuiManagerFX().getPamSettingsCSS());
 		Optional<?> newData=settingsDialog.showAndWait();	
 
         //PamScrollerData newData=NavigationDialog.showDialog(null, false, StageStyle.UNDECORATED, this);

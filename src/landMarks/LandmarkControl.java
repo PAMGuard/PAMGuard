@@ -51,14 +51,17 @@ public class LandmarkControl extends PamControlledUnit implements PamSettings {
 		return menuItem;
 	}
 
+	@Override
 	public Serializable getSettingsReference() {
 		return landmarkDatas;
 	}
 
+	@Override
 	public long getSettingsVersion() {
 		return LandmarkDatas.serialVersionUID;
 	}
 
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		landmarkDatas = ((LandmarkDatas) pamControlledUnitSettings.getSettings()).clone();
 		landmarkDataBlock.createDataUnits(landmarkDatas);
@@ -74,6 +77,7 @@ public class LandmarkControl extends PamControlledUnit implements PamSettings {
 			this.parentFrame = parentFrame;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			landmarkSettings(parentFrame);
 		}

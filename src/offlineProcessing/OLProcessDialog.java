@@ -1,6 +1,7 @@
 package offlineProcessing;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -12,7 +13,6 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -24,10 +24,13 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 
+import org.kordamp.ikonli.swing.FontIcon;
+
 import PamUtils.PamCalendar;
 import PamUtils.TxtFileUtils;
 import PamView.CancelObserver;
 import PamView.DBTextArea;
+import PamView.component.PamSettingsIconButton;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamFileBrowser;
 import PamView.dialog.PamGridBagContraints;
@@ -59,6 +62,7 @@ public class OLProcessDialog extends PamDialog {
 	private JButton[] settingsButton;
 	private JLabel status, currFile;
 	private JProgressBar globalProgress; // file by file progress 1: nFiles
+
 	private JProgressBar loadedProgress; // progress throgh loaded data
 	private JCheckBox deleteOldData;
 	private JLabel dataInfo;
@@ -89,17 +93,35 @@ public class OLProcessDialog extends PamDialog {
 	private PamPanel timeChunkDataPanel;
 
 
-	public static ImageIcon settings = new ImageIcon(ClassLoader.getSystemResource("Resources/SettingsButtonSmall2.png"));
+//	public static ImageIcon settings = new ImageIcon(ClassLoader.getSystemResource("Resources/SettingsButtonSmall2.png"));
+	public static FontIcon settings = FontIcon.of(PamSettingsIconButton.SETTINGS_IKON, PamSettingsIconButton.NORMAL_SIZE, Color.DARK_GRAY);
+
 
 	TaskStatus currentStatus = TaskStatus.IDLE;
 
+	/**
+	 * Reference to the main panel
+	 */
+	private JPanel mainPanel;
+
+	private JPanel notePanel;
+
+	/**
+	 * True if a note is required for the 
+	 */
+	private boolean isNeedaNote = true;
+
+	/**
+	 * Tasks panel
+	 */
+	private PamAlignmentPanel tasksPanel;
 
 	public OLProcessDialog(Window parentFrame, OfflineTaskGroup taskGroup, String title) {
 		super(parentFrame, title, false);
 		this.taskGroup = taskGroup;
 		taskGroup.setTaskMonitor(new OLMonitor());
 
-		JPanel mainPanel = new JPanel();
+		mainPanel = new JPanel();
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
 		JPanel dataSelectPanel = new PamAlignmentPanel(BorderLayout.WEST);
@@ -131,7 +153,7 @@ public class OLProcessDialog extends PamDialog {
 		dataSelectPanel.add(BorderLayout.SOUTH, southPanel);
 				
 
-		JPanel tasksPanel = new PamAlignmentPanel(BorderLayout.WEST);
+		tasksPanel = new PamAlignmentPanel(BorderLayout.WEST);
 		tasksPanel.setLayout(new GridBagLayout());
 		tasksPanel.setBorder(new TitledBorder("Tasks"));
 		int nTasks = taskGroup.getNTasks();
@@ -153,7 +175,7 @@ public class OLProcessDialog extends PamDialog {
 			c.gridy++;
 		}
 		
-		JPanel notePanel = new JPanel(new BorderLayout());
+		notePanel = new JPanel(new BorderLayout());
 		notePanel.setBorder(new TitledBorder("Notes"));
 		noteText = new DBTextArea(2, 40, TaskLogging.TASK_NOTE_LENGTH);
 		noteText.getComponent().setToolTipText("Notes to add to database record of complete tasks");
@@ -173,11 +195,14 @@ public class OLProcessDialog extends PamDialog {
 		c.gridwidth = 1;
 		addComponent(progressPanel, new JLabel("File ", SwingConstants.RIGHT), c);
 		c.gridx++;
+		c.gridwidth = 2;
 		addComponent(progressPanel, loadedProgress = new PamProgressBar(0, 100), c);
 		c.gridx = 0;
 		c.gridy++;
+		c.gridwidth = 1;
 		addComponent(progressPanel, new JLabel("All Data ", SwingConstants.RIGHT), c);
 		c.gridx++;
+		c.gridwidth = 2;
 		addComponent(progressPanel, globalProgress = new PamProgressBar(00, 100), c);
 
 		mainPanel.add(dataSelectPanel);
@@ -206,6 +231,23 @@ public class OLProcessDialog extends PamDialog {
 		
 		setResizable(true);
 
+	}
+	
+	/**
+	 * Remove the notes panel. 
+	 */
+	public void removeNotePanel() {
+		isNeedaNote = false;
+		mainPanel.remove(notePanel);
+		pack();
+	}
+	
+	/**
+	 * Get the main panel. This can be used to add additional controls if needed. 
+	 * @return the main panel. 
+	 */
+	public JPanel getMainPanel() {
+		return mainPanel;
 	}
 
 	/**
@@ -257,7 +299,7 @@ public class OLProcessDialog extends PamDialog {
 
 	@Override
 	protected void okButtonPressed() {
-		if (getParams() == false) {
+		if (!getParams()) {
 			return;
 		}
 		if (taskGroup.runTasks()) {
@@ -286,11 +328,11 @@ public class OLProcessDialog extends PamDialog {
 		for (int i = 0; i < nTasks; i++) {
 			aTask = taskGroup.getTask(i);
 			taskCheckBox[i].setEnabled(aTask.canRun() && nr);
-			if (aTask.canRun() == false) {
+			if (!aTask.canRun()) {
 				taskCheckBox[i].setSelected(false);
 			}
 			if (settingsButton[i] != null) {
-				settingsButton[i].setEnabled(nr);
+				settingsButton[i].setEnabled(aTask.canRun() && nr);
 			}
 			if (taskCheckBox[i].isSelected()) {
 				selectedTasks++;
@@ -348,13 +390,14 @@ public class OLProcessDialog extends PamDialog {
 		}
 		
 		String note = noteText.getText();
-		if (note == null || note.length() == 0) {
+		if ((note == null || note.length() == 0) && isNeedaNote) {
 			return PamDialog.showWarning(super.getOwner(), "Task note", "you must enter a note about what you are doing");
 		}
 		taskGroupParams.taskNote = note;
 		
 		return true;
 	}
+	
 	
 	public void setTaskToolTips() {
 		int nTasks = taskGroup.getNTasks();
@@ -684,7 +727,7 @@ public class OLProcessDialog extends PamDialog {
 	 * @author Doug Gillespie
 	 *
 	 */
-	class OLMonitor implements TaskMonitor {
+	public class OLMonitor implements TaskMonitor {
 
 		@Override
 		public void setTaskStatus(TaskMonitorData taskMonitorData) {
@@ -695,6 +738,7 @@ public class OLProcessDialog extends PamDialog {
 			else {
 				currFile.setText(taskMonitorData.fileOrStatus);
 			}
+			
 			switch (taskMonitorData.taskActivity) {
 			case LINKING:
 			case LOADING:
@@ -716,6 +760,7 @@ public class OLProcessDialog extends PamDialog {
 			default:
 				break;
 			}
+			
 			switch (taskMonitorData.taskStatus) {
 			case COMPLETE:
 				globalProgress.setValue(100);
@@ -822,5 +867,35 @@ public class OLProcessDialog extends PamDialog {
 	public OfflineTaskGroup getTaskGroup() {
 		return this.taskGroup;
 	}
+	
+
+	/**
+	 * Check whether a note is required. 
+	 * @return true if a note is required. 
+	 */
+	public boolean isNeedaNote() {
+		return isNeedaNote;
+	}
+
+	/**
+	 * Set whether a note is required before processing
+	 * @param isNeedaNote - true to require user to input a note. 
+	 */
+	public void setNeedaNote(boolean isNeedaNote) {
+		this.isNeedaNote = isNeedaNote;
+	}
+	
+	public JProgressBar getGlobalProgress() {
+		return globalProgress;
+	}
+	
+
+	public PamAlignmentPanel getTasksPanel() {
+		return tasksPanel;
+	}
+
+
+
+
 
 }

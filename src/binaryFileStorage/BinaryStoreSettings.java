@@ -52,7 +52,7 @@ public class BinaryStoreSettings implements Serializable, Cloneable, ManagedPara
 		if (storeLocation == null || other.storeLocation == null) {
 			return true;
 		}
-		if (storeLocation.equals(other.storeLocation) == false) {
+		if (!storeLocation.equals(other.storeLocation)) {
 			return true;
 		}
 		if (datedSubFolders != other.datedSubFolders) {

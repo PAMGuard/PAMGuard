@@ -388,7 +388,7 @@ PamguardBeta_ViewerMode.exe):</p>
 <h1><a name="_LATEST_VERSION_2.02.03"></a><a name="_VERSION_2.02.07_January"></a><a
 name="_Latest_Version_2.02.10"></a><em><span style='font-size:12.0pt;
 font-family:"Cambria",serif;font-style:normal'><a href="#_Version_2.02.11_April">Latest
-Version 2.02.11 April 2024</a></span></em></h1>
+Version 2.02.13 August 2024</a></span></em></h1>
 
 <h1><em><span style='font-size:12.0pt;font-family:"Cambria",serif;font-style:
 normal'><a href="#_Version_2.02.10_January">Version 2.02.10 January 2024</a></span></em></h1>
@@ -461,26 +461,51 @@ Version 2.00.10 June 2017</a></span></h1>
 
 <h1><span style='font-size:12.0pt'><a href="#_Older_Versions">Older Versions</a></span></h1>
 
-<h1><a name="_Latest_Version_2.02.03_1"></a><a name="_Latest_Version_2.02.05"></a><a
-name="_Latest_Version_2.02.06"></a><a name="_Latest_Version_2.02.07"></a><a
-name="_Latest_Version_2.02.08"></a><a name="_Version_2.02.09_June"></a><a
-name="_Version_2.02.10_January"></a><a name="_Version_2.02.11_April"></a>Version
-2.02.11 April 2024</h1>
+<h1><a name="_Hlk174698335"></a><a name="_Latest_Version_2.02.03_1"></a><a
+name="_Latest_Version_2.02.05"></a><a name="_Latest_Version_2.02.06"></a><a
+name="_Latest_Version_2.02.07"></a><a name="_Latest_Version_2.02.08"></a><a
+name="_Version_2.02.09_June"></a><a name="_Version_2.02.10_January"></a><a
+name="_Version_2.02.11_April"></a>Version 2.02.13 August 2024</h1>
 
 <p class=MsoNormal>&nbsp;</p>
 
 <h2>New Features</h2>
 
+<p class=MsoNormal>Deep Learning Classifier. Major upgrade to support for Deep
+Learning models in PAMGuard. See online help for details.</p>
+
 <p class=MsoNormal>Click detector: Remembers locations of displays and doesn’t
 continually reset them. </p>
 
-<p class=MsoNormal>Help for Matched Click Classifier</p>
+<p class=MsoNormal>Help for Matched Click Classifier.</p>
+
+<p class=MsoNormal>Project information dialog. This allows capture of essential
+project information to store with your data. See menu item Settings/Project
+information.</p>
+
+<p class=MsoNormal>‘Effort’ management system. New map options allow colouring
+of track line by ‘effort’ from various other modules. This is currently the
+acquisition system (so the track will change colour when PAMGuard is running),
+the binary store system (likely the same as the acquisition) or data from
+Logger forms. This system will be extended to other modules in the near future.
+</p>
+
+<p class=MsoNormal>Added a new exporter which allows users to export data to .mat
+(MATLAB, Python), .RData (open in R) or .wav files (open in Sonic Visualiser,
+Audacity etc.)</p>
+
+<h2>Tethys Database</h2>
+
+<p class=MsoNormal>Many users will be aware that we’re integrating an interface
+to the <a href="https://tethys.sdsu.edu/">Tethys Database</a> into PAMGuard.
+Some basic features are available for testing. If interested, please contact
+the PAMGuard support team. </p>
 
 <h2>Bug Fixes</h2>
 
 <p class=MsoNormal>Linking clicks to offline clicks table. We had a database
-that had become corrupted so added code to relink offline clicks to their corresponding
-clicks from binary data. </p>
+that had become corrupted so added code to relink offline clicks to their
+corresponding clicks from binary data. </p>
 
 <p class=MsoNormal>Drawing non-acoustic data: Data that were not associated
 with any hydrophones, e.g. visual sightings in Logger forms were not drawing on
@@ -497,14 +522,38 @@ as PAMGuard stops / restarts. </p>
 function fixed and now inserts correct times of start and ends of events into
 database. </p>
 
+<p class=MsoNormal>Clip generator. Changes to ensure PAMGuard keeps audio data
+long enough to make clips. In some circumstances data were being discarded too
+early so clips could not be created. </p>
+
+<p class=MsoNormal>Acquisition “Skip initial seconds” feature, designed to
+remove high sample levels e.g. from calibration tones at start of a soundtrap
+recording was not working with the click detector. This is fixed but replacing
+all data with 0’s and still sending data. Note that this may lead to
+artificially low noise measures at the start of a file. </p>
+
+<p class=MsoNormal>Data reprocessing options. Updated to ensure that the option
+&quot;Start normally. Note risk of overwriting!&quot; is always available. Also
+improved code naming binary files to attempt to push them to exact times,
+rather than a couple of seconds after the hour. </p>
+
+<p class=MsoNormal>improved code naming binary files to attempt to push them to
+exact times, rather than a couple of seconds after the hour. </p>
+
+<p class=MsoNormal>Updated icons to improve display on high definition screens.
+</p>
+
+<p class=MsoNormal>SAIL Daq Card. Automatic restart when DAQ card stalls
+(happening increasingly often with latest Windows updates)</p>
+
 <h1>Version 2.02.10 January 2024</h1>
 
 <h2><span lang=EN-US>New Features</span></h2>
 
 <p class=MsoNormal><b><span lang=EN-US>Importing modules</span></b><span
-lang=EN-US> from other configurations: New options from file menu allowing import
-of specific modules, or module settings from other configurations. E.g. if you
-had three similar configurations and had set one of them up with a new
+lang=EN-US> from other configurations: New options from file menu allowing
+import of specific modules, or module settings from other configurations. E.g.
+if you had three similar configurations and had set one of them up with a new
 detector, or got the click classifier settings set up just right in one of
 those configurations, you can import the additional modules or the click
 detector settings easily into the other configurations. </span></p>
@@ -532,9 +581,9 @@ correctly saving updated bearings to the database. Now fixed. </span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>ROCCA Classifier fixes</span></b></p>
 
-<p class=MsoNormal><span lang=EN-US>Allow Rocca to run without classifiers: Fixed
-bug that threw an error if no classifier files were &nbsp;specified in Rocca
-Params dialog</span></p>
+<p class=MsoNormal><span lang=EN-US>Allow Rocca to run without classifiers:
+Fixed bug that threw an error if no classifier files were &nbsp;specified in
+Rocca Params dialog</span></p>
 
 <p class=MsoNormal><span lang=EN-US>Fix memory issue with
 RoccaContourDataBlocks not being released for garbage collection</span></p>
@@ -544,11 +593,11 @@ and stop PamObserver Timer to</span></p>
 
 <p class=MsoNormal><span lang=EN-US>force release</span></p>
 
-<p class=MsoNormal><span lang=EN-US>Fix problem tracing whistles in Rocca
-spectrogram pop-up: Whistle and raw data were being cleared before the user had
-time to trace out the whistle, causing PAMGuard to throw an exception.&nbsp;
-Both were already being cleared when the pop-up window is closed, so no need to
-do it here.</span></p>
+<p class=MsoNormal><span lang=EN-US>Fix problem tracing whistles in Rocca spectrogram
+pop-up: Whistle and raw data were being cleared before the user had time to
+trace out the whistle, causing PAMGuard to throw an exception.&nbsp; Both were
+already being cleared when the pop-up window is closed, so no need to do it
+here.</span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>DIFAR Module</span></b><span lang=EN-US>:
 Bug crashing the module with null pointer errors fixed.</span></p>
@@ -629,8 +678,8 @@ the first two characters of the string name may be. </span></p>
 data for static hydrophones had a bug whereby it would continually ‘forget’
 angle offsets applied to static hydrophones in viewer mode. This is now fixed. </span></p>
 
-<p class=MsoNormal><span lang=EN-US>Click tool bar: Correctly shows event
-selection options even if no species classification options are in place. </span></p>
+<p class=MsoNormal><span lang=EN-US>Click tool bar: Correctly shows event selection
+options even if no species classification options are in place. </span></p>
 
 <p class=MsoNormal><span lang=EN-US>Fixed Landmarks: Earlier versions were
 ‘losing’ these every time PAMGuard started or new data were loaded in viewer
@@ -650,10 +699,10 @@ processing.</span></p>
 
 <h2><span lang=EN-US>New Features</span></h2>
 
-<p class=MsoNormal><span lang=EN-US>New sound type for simulated sounds which
-generates random chirps between around 200 and 800Hz, roughly the frequency
-you’d expect sound from higher frequency baleen whales, such as humpbacks, to
-vocalise at. &nbsp;&nbsp;</span></p>
+<p class=MsoNormal><span lang=EN-US>New sound type for simulated sounds which generates
+random chirps between around 200 and 800Hz, roughly the frequency you’d expect
+sound from higher frequency baleen whales, such as humpbacks, to vocalise at.
+&nbsp;&nbsp;</span></p>
 
 <p class=MsoNormal><span lang=EN-US>Hiding tool tips. A menu item to
 permanently turn off all tool tips, or tap the ‘Esc’ key to turn them off for 6
@@ -890,8 +939,8 @@ data units and then moves mouse over display area </p>
 <p class=MsoNormal><b><span lang=EN-US>Upgrades</span></b></p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>1. </span><span
-lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-Added SIDE module for detector/operator analytics </p>
+lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
+lang=EN-US> </span>Added SIDE module for detector/operator analytics </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -1218,10 +1267,10 @@ lang=EN-US> </span>Add functionality for bluetooth headsets. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
-lang=EN-US> </span>Add user-facing option to adjust the startup delay for the time-correction
-(Global Time module). This provides a workaround to speed up analysis of
-thousands of wav files (i.e. by setting startup delay to 0 instead of default
-value of 2000 ms). </p>
+lang=EN-US> </span>Add user-facing option to adjust the startup delay for the
+time-correction (Global Time module). This provides a workaround to speed up
+analysis of thousands of wav files (i.e. by setting startup delay to 0 instead
+of default value of 2000 ms). </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>3. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
@@ -1232,8 +1281,8 @@ lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nb
 Add 15 minute data load option to viewer mode. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>5. </span><span
-lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-Add 3D map for target motion module. </p>
+lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
+lang=EN-US> </span>Add 3D map for target motion module. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>6. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
@@ -1259,12 +1308,12 @@ lang=EN-US> </span>Added channel display to noise one band measurement display.
 </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>11. </span><span
-lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-Added Azigram module, to work in conjunction with Difar. </p>
+lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
+lang=EN-US> </span>Added Azigram module, to work in conjunction with Difar. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>12. </span><span
-lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-Added beaked whale to sim sounds </p>
+lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
+lang=EN-US> </span>Added beaked whale to sim sounds </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>13. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
@@ -1301,8 +1350,9 @@ PSFX files when PAMGuard exits.</p>
 <p class=MsoNormal><b><span lang=EN-US>Bug Fixes</span></b></p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>1. </span><span
-lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-Bug 433. Custom storage options were being lost when Pamguard restarted.</p>
+lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
+lang=EN-US> </span>Bug 433. Custom storage options were being lost when
+Pamguard restarted.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
@@ -1310,8 +1360,8 @@ lang=EN-US> </span>Bug 434. Pamguard Viewer mode was having problems importing
 settings from psfx file.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>3. </span><span
-lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-Bug 435. Logger forms subtabs not working.</p>
+lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
+lang=EN-US> </span>Bug 435. Logger forms subtabs not working.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>4. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
@@ -1415,9 +1465,9 @@ lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nb
 Implemented a simple UDP output for PAMGuard alarms. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>7. </span><span
-lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-Changes to Spectrogram Mark Observers, to allow individual channels to be
-selected instead of the spectrogram panel as a whole. </p>
+lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
+lang=EN-US> </span>Changes to Spectrogram Mark Observers, to allow individual
+channels to be selected instead of the spectrogram panel as a whole. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>8. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
@@ -1452,9 +1502,9 @@ be compatible with this version, and vice-versa.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-Java 12 is better at handling Windows scaling issues on high-DPI displays. Beyond
-that, users should not notice much of a difference between this version and
-previous beta releases.</p>
+Java 12 is better at handling Windows scaling issues on high-DPI displays.
+Beyond that, users should not notice much of a difference between this version
+and previous beta releases.</p>
 
 <!-- ************************************************************************************************************************** --><!-- ************************************************************************************************************************** -->
 
@@ -1688,8 +1738,8 @@ lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nb
 <p class=MsoNormal><b><span lang=EN-US>Upgrades</span></b></p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>1. </span><span
-lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-Improvement to Range Rings in Map display.</p>
+lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
+lang=EN-US> </span>Improvement to Range Rings in Map display.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -2158,7 +2208,7 @@ showing. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span><span lang=EN-US>Bug 323. Difar module.</span> Fixed a couple of small
+</span><span lang=EN-US>Bug 323. Difar module. </span>Fixed a couple of small
 bugs in the DIFAR system which caused it to not work if old configuratins were
 used. </p>
 
@@ -2615,9 +2665,9 @@ main click detector display. </span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>Target Motion Analysis</span></b></p>
 
-<p class=MsoNormal><span lang=EN-US>A major piece of work has been undertaken to
-improve the Target Motion tracking with PAMGuard. Details are available in the
-online help. Users of the Click Detector will notice the following changes:</span></p>
+<p class=MsoNormal><span lang=EN-US>A major piece of work has been undertaken
+to improve the Target Motion tracking with PAMGuard. Details are available in
+the online help. Users of the Click Detector will notice the following changes:</span></p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>1.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2761,9 +2811,9 @@ easy to understand options have been developed in a new options dialog.</p>
 
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'>9.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 281. Click classification dialog has grown too big to fit on the
-screen. The options have now been split across three tabbed panes which solves
-the problem.</p>
+</span>Bug 281. Click classification dialog has grown too big to fit on the screen.
+The options have now been split across three tabbed panes which solves the
+problem.</p>
 
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'>10.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -3055,8 +3105,8 @@ allocation to allow more memory for the database interface. Hopefully Fixed. </p
 
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'><span
 lang=EN-AU>9.</span><span lang=EN-AU style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 239. <span lang=EN-AU>Fixed bug in the DIFAR module that was incorrectly
-preventing cross-fixes for some calls.</span></p>
+</span>Bug 239. <span lang=EN-AU>Fixed bug in the DIFAR module that was
+incorrectly preventing cross-fixes for some calls.</span></p>
 
 <p class=MsoNormal>Details of these bugs can be found at <a
 href="https://sourceforge.net/p/pamguard/bugs">https://sourceforge.net/p/pamguard/bugs</a></p>
@@ -3067,10 +3117,10 @@ href="https://sourceforge.net/p/pamguard/bugs">https://sourceforge.net/p/pamguar
 
 <p class=MsoListParagraph style='margin-left:47.25pt;text-indent:-29.25pt'><span
 lang=EN-US>1.</span><span lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Spectrogram annotation marks. A simple system for marking spectrograms
-during real time analysis has been incorporated. To use it, add the module, in
-the spectrogram settings, select the annotation marks in the 'Mark Observers'
-tab of the spectrogram configuration dialog, and also right click on the
+</span>Spectrogram annotation marks. A simple system for marking spectrograms during
+real time analysis has been incorporated. To use it, add the module, in the
+spectrogram settings, select the annotation marks in the 'Mark Observers' tab
+of the spectrogram configuration dialog, and also right click on the
 spectrogram and select to display the annotations. Annotations are saved to the
 database so you will also need a database module in your configuration. &nbsp;</p>
 
@@ -3340,9 +3390,9 @@ of third octave noise bands. See online help for details. </p>
 
 <p class=MsoNormal><i>Filtered Noise Measurement</i> (Sound Processing Group)</p>
 
-<p class=MsoNormal>This module, developed by Douglas Gillespie, measures noise
-levels in a single frequency band using a variety of filter functions. See
-online help for details. </p>
+<p class=MsoNormal>This module, developed by Douglas Gillespie, measures noise levels
+in a single frequency band using a variety of filter functions. See online help
+for details. </p>
 
 <p class=MsoNormal><i>Envelope Tracing</i> (Beta Only, Sound Processing Group)</p>
 
@@ -3515,9 +3565,9 @@ to these menus to provide additional information to users. &nbsp;</p>
 
 <p class=MsoNormal style='margin-left:36.0pt'><i>Radar Display</i></p>
 
-<p class=MsoNormal style='margin-left:36.0pt'>Functionality has been added to the
-radar display so that bearings can be shown relative to either the vessel or to
-true North. </p>
+<p class=MsoNormal style='margin-left:36.0pt'>Functionality has been added to
+the radar display so that bearings can be shown relative to either the vessel
+or to true North. </p>
 
 <p class=MsoNormal style='margin-left:36.0pt'>Better control of data in viewer
 mode, making is easy to scroll through and view data for short time periods. </p>
@@ -4302,11 +4352,11 @@ Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>New menu functionality by right clicking on any of the tabs of the main tab
-control will allow the user to copy the tab contents to the system clipboard
-from where it can be copied into other programs (e.g. Word, Powerpoint,
-etc.).Some modules, such as the map, have this implemented in other menus
-(right click) and also allow printing.&nbsp; </p>
+</span>New menu functionality by right clicking on any of the tabs of the main
+tab control will allow the user to copy the tab contents to the system
+clipboard from where it can be copied into other programs (e.g. Word,
+Powerpoint, etc.).Some modules, such as the map, have this implemented in other
+menus (right click) and also allow printing.&nbsp; </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -4374,8 +4424,8 @@ online help. </p>
 
 <p class=MsoNormal><b>PAMGUARD Mixed Mode operation</b></p>
 
-<p class=MsoNormal>Analyses data from wav or AIF file and synchronises it with GPS
-data reloaded from a database so that detected sounds may be correctly
+<p class=MsoNormal>Analyses data from wav or AIF file and synchronises it with
+GPS data reloaded from a database so that detected sounds may be correctly
 localised. Multiple display frames - enables PAMGUARD GUI to be split into
 multiple display windows, displayed on multiple monitors if desired. Enables
 the operator to simultaneously view the map and the click detector for example,

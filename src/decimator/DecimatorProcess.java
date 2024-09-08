@@ -20,6 +20,7 @@
  */
 package decimator;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import Filters.Filter;
@@ -28,16 +29,13 @@ import Filters.FilterMethod;
 import Filters.FilterType;
 import PamController.PamController;
 import PamDetection.RawDataUnit;
-import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamguardMVC.PamConstants;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
-import PamguardMVC.PamObserver;
 import PamguardMVC.PamProcess;
 import PamguardMVC.PamRawDataBlock;
-import PamguardMVC.RequestCancellationObject;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 
 /**
@@ -330,7 +328,7 @@ public class DecimatorProcess extends PamProcess {
 		 * if offline files are not requested, continue to ask up the chain - there may
 		 * be data in an upstream process which can still be decimated as normal. 
 		 */
-		if (decimatorControl.getOfflineFileServer().getOfflineFileParameters().enable == false) {
+		if (!decimatorControl.getOfflineFileServer().getOfflineFileParameters().enable) {
 			return super.getOfflineData(offlineLoadDataInfo);
 		}
 		if (decimatorControl.getOfflineFileServer().loadData(getOutputDataBlock(), offlineLoadDataInfo, null)) {
@@ -339,5 +337,11 @@ public class DecimatorProcess extends PamProcess {
 		else {
 			return PamDataBlock.REQUEST_NO_DATA;
 		}
+	}
+	
+	
+	@Override
+	public ArrayList getCompatibleDataUnits(){
+		return new ArrayList<Class<? extends PamDataUnit>>(Arrays.asList(RawDataUnit.class));
 	}
 }

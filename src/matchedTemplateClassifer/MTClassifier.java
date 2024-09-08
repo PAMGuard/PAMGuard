@@ -4,22 +4,21 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.jamdev.jdl4pam.utils.DLMatFile;
 import org.jamdev.jpamutils.wavFiles.WavInterpolator;
-
-import com.jmatio.types.MLArray;
-import com.jmatio.types.MLDouble;
-import com.jmatio.types.MLStructure;
 
 import Filters.SmoothingFilter;
 import Localiser.DelayMeasurementParams;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
-import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamUtils.PamArrayUtils;
 import PamUtils.PamInterp;
 import PamUtils.complex.ComplexArray;
 import fftManager.FastFFT;
+import us.hebi.matlab.mat.format.Mat5;
+import us.hebi.matlab.mat.types.Matrix;
+import us.hebi.matlab.mat.types.Struct;
 
 /**
  * Parameters and useful functions for a single MT classifier. 
@@ -135,7 +134,6 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 			//re-sample the waveform if the sample rate is different
 			this.interpWaveformMatch=interpWaveform(this.waveformMatch, sR); 
 			
-			//System.out.println("interpWaveformMatch: " + interpWaveformMatch.length + " sR " + sR);
 			
 			//normalise
 			//this.interpWaveformMatch=PamArrayUtils.normalise(interpWaveformMatch);
@@ -143,8 +141,7 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 			//this.inteprWaveformReject=PamArrayUtils.divide(interpWaveformMatch, PamArrayUtils.max(interpWaveformMatch));
 			this.interpWaveformMatch = normaliseWaveform(interpWaveformMatch, this.normalisation);
 			
-//			System.out.println("MatchNorm: MATCH");
-//			MTClassifierTest.normalizeTest(interpWaveformMatch);
+			//System.out.println("interpWaveformMatch: " + interpWaveformMatch.length + " sR " + sR + " max: " + PamArrayUtils.max(interpWaveformMatch));
 			
 			/**
 			 * There is an issue here because, if we have a long template waveform, then it
@@ -249,13 +246,15 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 	 * @return
 	 */
 	public static double[] normaliseWaveform(double[] waveform, int normeType) {
+//		System.out.println("Normalise waveform: " + normeType);
 		double[] newWaveform = null;
 		switch(normeType) {
 		case MatchedTemplateParams.NORMALIZATION_NONE:
 			newWaveform = waveform;
 			break; 
 		case MatchedTemplateParams.NORMALIZATION_PEAK:
-			newWaveform =PamUtils.PamArrayUtils.divide(waveform, PamUtils.PamArrayUtils.max(waveform));
+			//important to clone here or the template waveforms are normalised!
+			newWaveform =PamUtils.PamArrayUtils.divide(waveform.clone(), PamUtils.PamArrayUtils.max(waveform));
 			break;
 		case MatchedTemplateParams.NORMALIZATION_RMS:
 			newWaveform =PamUtils.PamArrayUtils.normalise(waveform);
@@ -305,8 +304,8 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 	 * @param value - the value  
 	 * @return
 	 */
-	private MLDouble mlDouble(double value) {
-		return new MLDouble(null, new double[]{value}, 1);
+	private Matrix mlDouble(double value) {
+		return Mat5.newScalar(value);
 	} 
 	
 	
@@ -322,10 +321,11 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 
 	 * @return an ML Structure with results of all stuff. 
 	 */
-	public MLStructure calcCorrelationMatchTest(ComplexArray click, float sR) {
+	public Struct calcCorrelationMatchTest(ComplexArray click, float sR) {
 	
-		MLStructure mlStruct = new MLStructure("matchdata", new int[] {1,1});
-		mlStruct.setField("waveform_fft",  complexArray2MLArray(click));
+//		Struct mlStruct = new MLStructure("matchdata", new int[] {1,1});
+		Struct mlStruct = Mat5.newStruct();
+		mlStruct.set("waveform_fft",  complexArray2MLArray(click));
 	
 		
 		//set the stored sR
@@ -354,14 +354,14 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 		}
 		
 		//add data to struct her ebecause some arrays get overwritten
-		mlStruct.setField("match_template_waveform",  new MLDouble(null, new double[][] {this.interpWaveformMatch}));
-		mlStruct.setField("reject_template_waveform", new MLDouble(null, new double[][] {this.inteprWaveformReject}));
+		mlStruct.set("match_template_waveform", DLMatFile.array2Matrix(this.interpWaveformMatch));
+		mlStruct.set("reject_template_waveform", DLMatFile.array2Matrix(this.inteprWaveformReject));
 
 		//add data to struct her ebecause some arrays get overwritten
-		mlStruct.setField("match_template_fft",  complexArray2MLArray(matchTemplate));
-		mlStruct.setField("reject_template_fft",  complexArray2MLArray(rejectTemplate));
-		mlStruct.setField("match_result_corr",  complexArray2MLArray(matchResult));
-		mlStruct.setField("reject_result_corr",  complexArray2MLArray(rejectResult));
+		mlStruct.set("match_template_fft",  complexArray2MLArray(matchTemplate));
+		mlStruct.set("reject_template_fft",  complexArray2MLArray(rejectTemplate));
+		mlStruct.set("match_result_corr",  complexArray2MLArray(matchResult));
+		mlStruct.set("reject_result_corr",  complexArray2MLArray(rejectResult));
 		
 		//must use scaling to get the same result as MATLAB 
 		if (fft==null) fft= new FastFFT();
@@ -380,10 +380,10 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 
 		double result = 2*(PamArrayUtils.max(matchReal)-PamArrayUtils.max(rejectReal)); 
 		
-		mlStruct.setField("match_result_ifft",  complexArray2MLArray(matchResult));
-		mlStruct.setField("reject_result_ifft",  complexArray2MLArray(rejectResult));
-		mlStruct.setField("result", mlDouble(result));
-		mlStruct.setField("sR",   mlDouble(sR));
+		mlStruct.set("match_result_ifft",  complexArray2MLArray(matchResult));
+		mlStruct.set("reject_result_ifft",  complexArray2MLArray(rejectResult));
+		mlStruct.set("result", mlDouble(result));
+		mlStruct.set("sR",   mlDouble(sR));
 
 
 		return mlStruct;
@@ -395,13 +395,14 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 	 * @param complexArray the complex array to export. 
 	 * @return the ML array. 
 	 */
-	private MLDouble complexArray2MLArray(ComplexArray complexArray) {
-		MLDouble matchTemplateML = new MLDouble(null, new int[]{complexArray.length(),1}, MLArray.mxDOUBLE_CLASS, MLArray.mtFLAG_COMPLEX ); 
+	private Matrix complexArray2MLArray(ComplexArray complexArray) {
+		
+		Matrix matchTemplateML = Mat5.newComplex(complexArray.length(),1);
+//		MLDouble matchTemplateML = new MLDouble(null, new int[]{complexArray.length(),1}, MLArray.mxDOUBLE_CLASS, MLArray.mtFLAG_COMPLEX ); 
 		
 		for (int i=0; i<complexArray.length(); i++) {
-			matchTemplateML.setReal(complexArray.getReal(i), i);
-			matchTemplateML.setImaginary(complexArray.getImag(i), i);
-
+			matchTemplateML.setDouble(i, complexArray.getReal(i));
+			matchTemplateML.setImaginaryDouble(i, complexArray.getImag(i));
 		}
 		return matchTemplateML;
 	}
@@ -422,7 +423,7 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 		//set the stored sR
 		currentSr=sR;
 		
-		System.out.println("Waveform click: len: " + click.length()); 
+//		System.out.println("Waveform click: len: " + click.length()); 
 
 		//System.out.println("Waveform Reject max: " + PamArrayUtils.max(this.inteprWaveformReject)+ " len " + interpWaveformMatch.length); 
 
@@ -446,7 +447,7 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 //		System.out.println("matchTemplate: len: " + waveformMatch.waveform.length+ " max: " +  PamArrayUtils.max(waveformMatch.waveform)); 
 //		System.out.println("matchTemplate interp: len: " + interpWaveformMatch.length+ " max: " +  PamArrayUtils.max(interpWaveformMatch)); 
 
-		System.out.println("matchTemplate len: " + matchTemplate.length() + " click.length(): "  +click.length()); 
+//		System.out.println("matchTemplate len: " + matchTemplate.length() + " click.length(): "  +click.length()); 
 		for (int i=0; i<Math.min(matchTemplate.length(), click.length()); i++) {
 			matchResult.set(i, click.get(i).times(matchTemplate.get(i)));
 		}
@@ -457,8 +458,8 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 			rejectResult.set(i, click.get(i).times(rejectTemplate.get(i)));
 		}
 		
-		System.out.println("Waveform Match max: " + PamArrayUtils.max(this.interpWaveformMatch)); 
-		System.out.println("Waveform Reject max: " + PamArrayUtils.max(this.inteprWaveformReject)); 
+//		System.out.println("Waveform Match max: " + PamArrayUtils.max(this.interpWaveformMatch)); 
+//		System.out.println("Waveform Reject max: " + PamArrayUtils.max(this.inteprWaveformReject)); 
 		
 		//System.out.println("Click input: " + click.length() + " click template: " + matchTemplate.length());
 
@@ -509,7 +510,7 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 			result = PamArrayUtils.max(matchReal)-maxreject; 
 		}
 
-		System.out.println("Match corr " + maxmatch + " Reject Corr: " + maxreject);
+//		System.out.println("Match corr " + maxmatch + " Reject Corr: " + maxreject);
 
 		MatchedTemplateResult matchTmpResult = new MatchedTemplateResult(); 
 		matchTmpResult.threshold=result; 
@@ -630,7 +631,7 @@ public class MTClassifier implements Serializable, Cloneable, ManagedParameters 
 	 */
 	@Override
 	public PamParameterSet getParameterSet() {
-		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DETECTOR);
+		PamParameterSet ps = PamParameterSet.autoGenerate(this);
 		try {
 			Field field = this.getClass().getDeclaredField("inteprWaveformReject");
 			ps.put(new PrivatePamParameterData(this, field) {

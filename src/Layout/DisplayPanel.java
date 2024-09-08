@@ -329,7 +329,7 @@ abstract public class DisplayPanel {
 		@Override
 		protected void paintComponent(Graphics g) {
 			super.paintComponent(g);
-			if (isShowing() == false) return;
+			if (!isShowing()) return;
 			if (getWidth() != imageWidth || 
 					getHeight() != imageHeight) {
 				displayPanel.createImage();

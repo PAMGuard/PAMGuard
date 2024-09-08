@@ -44,6 +44,7 @@ public class MySQLDialogPanel implements SystemDialogPanel {
 		this.serverBasedSystem = serverBasedSystem;
 	}
 
+	@Override
 	public JPanel getPanel() {
 		if (p == null) {
 			createPanel();
@@ -120,12 +121,13 @@ public class MySQLDialogPanel implements SystemDialogPanel {
 	}
 
 	MySQLParameters tempParams;
+	@Override
 	public boolean getParams() {
 		tempParams = serverBasedSystem.mySQLParameters.clone();
 		
-		if (getServerParams() == false) return false;
+		if (!getServerParams()) return false;
 		
-		if (getDbParams() == false) return false;
+		if (!getDbParams()) return false;
 		
 		// now if all ok, copy back.
 		serverBasedSystem.mySQLParameters = tempParams.clone();
@@ -148,6 +150,7 @@ public class MySQLDialogPanel implements SystemDialogPanel {
 		return true;
 	}
 
+	@Override
 	public void setParams() {
 		ipAddress.setText(serverBasedSystem.mySQLParameters.ipAddress);
 		userName.setText(serverBasedSystem.mySQLParameters.userName);
@@ -181,9 +184,10 @@ public class MySQLDialogPanel implements SystemDialogPanel {
 
 	class ConnectServer implements ActionListener {
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			if (getServerParams() == false) return;
+			if (!getServerParams()) return;
 			serverBasedSystem.serverConnect(tempParams);
 			sayServerStatus();
 		}
@@ -213,6 +217,7 @@ public class MySQLDialogPanel implements SystemDialogPanel {
 	
 	class CreateNewDatabase implements ActionListener {
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 
 			String defaultName = null;

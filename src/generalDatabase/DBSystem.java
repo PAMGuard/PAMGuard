@@ -1,11 +1,11 @@
 package generalDatabase;
 
-import generalDatabase.layoutFX.SystemDialogPaneFX;
-import generalDatabase.pamCursor.PamCursor;
-
 import java.awt.Component;
 import java.io.File;
 import java.sql.SQLException;
+
+import generalDatabase.layoutFX.SystemDialogPaneFX;
+import generalDatabase.pamCursor.PamCursor;
 
 
 

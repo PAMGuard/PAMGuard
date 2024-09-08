@@ -23,6 +23,7 @@ public class TimedObservable extends Observable {
 	
 	class ObserverTimerAction implements ActionListener {
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			notifyObservers();
 		}
@@ -59,7 +60,7 @@ public class TimedObservable extends Observable {
 			super.notifyObservers();
 		}
 		else {
-			if (t.isRunning() == false) {
+			if (!t.isRunning()) {
 				t.start();
 			}
 		}

@@ -3,9 +3,6 @@ package analoginput;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
@@ -14,7 +11,6 @@ import PamView.dialog.PamDialog;
 import PamView.dialog.PamDialogPanel;
 import analoginput.brainboxes.BrainBoxDevices;
 import analoginput.measurementcomputing.MCCAnalogDevices;
-import analoginput.swing.AnalogDiagnosticsDisplay;
 import analoginput.swing.AnalogDiagnosticsDisplayProvider;
 import analoginput.swing.AnalogDialogPanel;
 import userDisplay.UserDisplayControl;

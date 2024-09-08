@@ -1,14 +1,10 @@
 package generalDatabase;
 
-import generalDatabase.pamCursor.PamCursor;
-import generalDatabase.pamCursor.PamCursorManager;
-
 import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Window;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -18,12 +14,15 @@ import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 //import com.sun.java.help.impl.SwingWorker;
 
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
+import generalDatabase.pamCursor.PamCursor;
+import generalDatabase.pamCursor.PamCursorManager;
 
 public class DatabaseSpeedDialog extends PamDialog{
 
@@ -53,7 +52,7 @@ public class DatabaseSpeedDialog extends PamDialog{
 		tableDef.setUseCheatIndexing(true);
 
 		getOkButton().setText("Start");
-		if (checkTableDef() == false) {
+		if (!checkTableDef()) {
 			getOkButton().setEnabled(false);
 		}
 		JPanel mainPanel = new JPanel(new BorderLayout());
@@ -64,23 +63,23 @@ public class DatabaseSpeedDialog extends PamDialog{
 		topPanel.setBorder(new TitledBorder("Test Output"));
 		topPanel.setLayout(new GridBagLayout());
 		GridBagConstraints c = new PamGridBagContraints();
-		addComponent(topPanel, new JLabel("Total Writes: ", JLabel.RIGHT), c);
+		addComponent(topPanel, new JLabel("Total Writes: ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		addComponent(topPanel, nWrites = new JTextField(6), c);
 		c.gridx = 0;
 		c.gridy++;
-		addComponent(topPanel, new JLabel("Time for last write: ", JLabel.RIGHT), c);
+		addComponent(topPanel, new JLabel("Time for last write: ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		addComponent(topPanel, lastTime = new JTextField(6), c);
 		c.gridx++;
-		addComponent(topPanel, new JLabel(" milliseconds", JLabel.LEFT), c);
+		addComponent(topPanel, new JLabel(" milliseconds", SwingConstants.LEFT), c);
 		c.gridx = 0;
 		c.gridy++;
-		addComponent(topPanel, new JLabel("Last database index: ", JLabel.RIGHT), c);
+		addComponent(topPanel, new JLabel("Last database index: ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		addComponent(topPanel, lastIndex = new JTextField(6), c);
 		c.gridx++;
-		addComponent(topPanel, new JLabel(" (read back from db)", JLabel.LEFT), c);
+		addComponent(topPanel, new JLabel(" (read back from db)", SwingConstants.LEFT), c);
 
 
 		setDialogComponent(mainPanel);
@@ -231,7 +230,7 @@ public class DatabaseSpeedDialog extends PamDialog{
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}; 
+			} 
 
 			return null;
 		}

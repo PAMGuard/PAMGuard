@@ -42,7 +42,7 @@ public class LikilihoodError extends EllipticalError {
 		super();
 		this.chi2=chi2;
 		this.point=point; 
-		super.setErrorEllipse(chi2SurftoErrorEllipse( chi2,  point, 3)); 
+		super.setErrorEllipse(chi2SurftoErrorEllipse(point, 3)); 
 	}
 	
 	
@@ -50,7 +50,7 @@ public class LikilihoodError extends EllipticalError {
 		super();
 		this.chi2=chi2;
 		this.point=point; 
-		super.setErrorEllipse(chi2SurftoErrorEllipse( chi2,  point, nDim)); 
+		super.setErrorEllipse(chi2SurftoErrorEllipse(point, nDim)); 
 	}
 	
 	
@@ -62,17 +62,17 @@ public class LikilihoodError extends EllipticalError {
 	 * @param nDim - the number of dimensions. 2 or 3. 
 	 * @return the approximate 3D ellipse which represents the error. 
 	 */
-	private ErrorEllipse chi2SurftoErrorEllipse(MinimisationFunction chi2, double[] point, int nDim){
+	private ErrorEllipse chi2SurftoErrorEllipse(double[] point, int nDim){
 		ErrorEllipse errorEllipse; 
 		if (nDim==2){
-			errorEllipse = chi2SurfToErrorEllipse2D(chi2, point);
+			errorEllipse = chi2SurfToErrorEllipse2D( point);
 		}
 		else if (nDim==3){
-			errorEllipse = chi2SurfToErrorEllipse3D(chi2, point);
+			errorEllipse = chi2SurfToErrorEllipse3D (point);
 			if (errorEllipse==null) {
 				//maight have failed due to a 3D model trying to fit a 2D problem and therefore 
 				//heading off to infinity...
-				errorEllipse = chi2SurfToErrorEllipse2D(chi2, point);
+				errorEllipse = chi2SurfToErrorEllipse2D( point);
 			}
 		}
 		else{
@@ -90,7 +90,7 @@ public class LikilihoodError extends EllipticalError {
 	 * @param point - the point on the surface to search around for error. 
 	 * @return the approximate 3D ellipse which represents the error. 
 	 */
-	private ErrorEllipse chi2SurfToErrorEllipse2D(MinimisationFunction chi2, double[] point2) {
+	private ErrorEllipse chi2SurfToErrorEllipse2D(double[] point2) {
 		
 		//create a set of numbers around a sphere; 
 		double angleBin=(2*Math.PI)/nSpherePoints;
@@ -100,14 +100,14 @@ public class LikilihoodError extends EllipticalError {
 		int ind=-1; 
 		for (int i=0; i<nSpherePoints; i++){
 			//now because the sphere has a radius of 1, all the points are already unit vectors. 
-			curvatureError=getLLCurvature(chi2, point, PamVector.fromHeadAndSlant(Math.toDegrees(angleBin*i), 0));
+			curvatureError=getLLCurvature(point, PamVector.fromHeadAndSlant(Math.toDegrees(angleBin*i), 0));
 			if (curvatureError>max){
 				max=curvatureError;
 				ind=i; //record index of max value; 
 			}
 		}
 		
-		double[] dim={max, getLLCurvature(chi2, point, PamVector.fromHeadAndSlant(Math.toDegrees(angleBin*ind)+90, 0)),-1 };
+		double[] dim={max, getLLCurvature(point, PamVector.fromHeadAndSlant(Math.toDegrees(angleBin*ind)+90, 0)),-1 };
 		double[] angles={angleBin*ind, 0,0};
 		
 		for (int i=0; i<dim.length; i++){
@@ -130,7 +130,7 @@ public class LikilihoodError extends EllipticalError {
 	 * @param point - the point on the surface to search around for error. 
 	 * @return the approximate 3D ellipse which represents the error. Returns null if it is not possible to calculate an error. 
 	 */
-	private ErrorEllipse chi2SurfToErrorEllipse3D(MinimisationFunction chi2, double[] point){
+	private ErrorEllipse chi2SurfToErrorEllipse3D(double[] point){
 		//first, find the largest error. 
 
 		//create a set of numbers around a sphere; 
@@ -141,7 +141,7 @@ public class LikilihoodError extends EllipticalError {
 		int ind=-1; 
 		for (int i=0; i<spherePoints.length; i++){
 			//now because the sphere has a radius of 1, all the points are already unit vectors. 
-			curvatureError=getLLCurvature(chi2, point, new PamVector(spherePoints[i]));
+			curvatureError=getLLCurvature(point, new PamVector(spherePoints[i]));
 			//System.out.printf("Curve error %d = %3.2f\n", i, curvatureError);
 			if (curvatureError>max){
 				max=curvatureError;
@@ -171,7 +171,7 @@ public class LikilihoodError extends EllipticalError {
 			Vector3D location3D=plane.getPointAt(vector2D, 0);
 			
 			// get the max error in this plane. 
-			curvatureError=getLLCurvature(chi2, point, new PamVector(location3D.toArray()));
+			curvatureError=getLLCurvature(point, new PamVector(location3D.toArray()));
 			if (curvatureError>maxPlane){
 				maxPlane=curvatureError;
 				indPlane=n; //record index of max value; 
@@ -203,7 +203,7 @@ public class LikilihoodError extends EllipticalError {
 		ArrayList<Vector3D> vectors=new ArrayList<Vector3D>(); 
 		vectors.add(firstEigenvector.scalarMultiply(max)); //have already calculated error in previous steps. 
 		vectors.add(secondVector.scalarMultiply(maxPlane)); //have already calculated error in previous steps. 
-		vectors.add(thirdVector.scalarMultiply(getLLCurvature( chi2,  point, new PamVector(thirdVector.toArray()))));
+		vectors.add(thirdVector.scalarMultiply(getLLCurvature( point, new PamVector(thirdVector.toArray()))));
 		
 		//create an error ellipse.
 		ErrorEllipse errorEllipse=new ErrorEllipse(vectors); 
@@ -240,7 +240,7 @@ public class LikilihoodError extends EllipticalError {
 	 * direction specified and in the opposite direction. Curvature is expressed as 1 standard deviation
 	 * error
 	 */
-	private double getLLCurvature(MinimisationFunction chi2, double[] point, PamVector errorVector) {
+	private double getLLCurvature(double[] point, PamVector errorVector) {
 	
 		double dis = 10; //the jump along the chi2 surface. 
 		double err = 0;

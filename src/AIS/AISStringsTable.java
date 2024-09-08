@@ -109,12 +109,13 @@ public class AISStringsTable {
 
 	class TimerListener implements ActionListener {
 		boolean doneLayout;
+		@Override
 		public void actionPerformed(ActionEvent ev) {
 			// table.
 //			nmeaTableData.fireTableRowsUpdated(0, 10);
 			aisTableData.fireTableDataChanged();
 			
-			if (doneLayout == false && aisTableData.getRowCount() > 0) {
+			if (!doneLayout && aisTableData.getRowCount() > 0) {
 				doneLayout = true;
 			}
 		}
@@ -134,6 +135,7 @@ public class AISStringsTable {
 		/* (non-Javadoc)
 		 * @see javax.swing.table.TableModel#getColumnCount()
 		 */
+		@Override
 		public int getColumnCount() {
 			return tableColumns.length;
 		}
@@ -141,6 +143,7 @@ public class AISStringsTable {
 		/* (non-Javadoc)
 		 * @see javax.swing.table.TableModel#getRowCount()
 		 */
+		@Override
 		public int getRowCount() {
 			if (aisDataBlock == null) return 0;
 			//System.out.println(aisDataBlock.getUnitsCount() + " rows in AIS data");
@@ -150,6 +153,7 @@ public class AISStringsTable {
 		/* (non-Javadoc)
 		 * @see javax.swing.table.TableModel#getValueAt(int, int)
 		 */
+		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			AISDataUnit aisDataUnit = aisDataBlock.getDataUnit(rowIndex, PamDataBlock.REFERENCE_CURRENT);
 			

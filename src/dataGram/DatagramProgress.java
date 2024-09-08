@@ -1,10 +1,10 @@
 package dataGram;
 
+import PamguardMVC.PamDataBlock;
+import binaryFileStorage.BinaryOfflineDataMapPoint;
 import dataMap.OfflineDataMapPoint;
 import javafx.scene.control.ProgressIndicator;
 import pamViewFX.pamTask.PamTaskUpdate;
-import PamguardMVC.PamDataBlock;
-import binaryFileStorage.BinaryOfflineDataMapPoint;
 
 /**
  * Progress data on datagram creation 
@@ -77,8 +77,7 @@ public class DatagramProgress extends PamTaskUpdate {
 	}
 
 	@Override
-	public double getProgress() {
-//		System.out.println("DatagramProgress: " + processedUnits + " tot: " + totalUnits); 
+	public double getProgress2() {
 		double progress= ProgressIndicator.INDETERMINATE_PROGRESS;
 		switch(getStatus()) {
 		case DatagramProgress.STATUS_BLOCKCOUNT:
@@ -95,13 +94,17 @@ public class DatagramProgress extends PamTaskUpdate {
 			else progress=0; 
 			break;
 		}
+		
+		//System.out.println("DatagramProgress: " + processedUnits + " tot: " + totalUnits + " progress: " + progress); 
+
 		return progress;
 	}
 	
 	@Override
-	public double getProgress2(){
+	public double getProgress(){
+		//seems like the current point is simply the percentage done...
 		double progress;
-		if (pointsToUpdate>0) progress=((double)currentPoint)/pointsToUpdate;
+		if (pointsToUpdate>0) progress=((double)currentPoint)/100.;
 		else progress=0; 
 		switch(getStatus()) {
 		case DatagramProgress.STATUS_BLOCKCOUNT:
@@ -110,14 +113,16 @@ public class DatagramProgress extends PamTaskUpdate {
 			progress=0; 
 			break;
 		case DatagramProgress.STATUS_STARTINGFILE:
-			progress=((double)currentPoint)/pointsToUpdate;
+			progress=((double)currentPoint)/100.;
 			break;
 		case DatagramProgress.STATUS_ENDINGFILE:
-			progress=((double)currentPoint)/pointsToUpdate;
+			progress=((double)currentPoint)/100.;
 			break;
 		case DatagramProgress.STATUS_UNITCOUNT:	
 			break;
 		}
+		//System.out.println("DatagramProgress2: " + currentPoint + " tot: " + pointsToUpdate + " progress: " + progress); 
+
 		return progress;
 	}
 	

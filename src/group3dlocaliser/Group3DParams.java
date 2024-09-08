@@ -8,7 +8,6 @@ import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
-import PamView.GroupedSourceParameters;
 import group3dlocaliser.algorithm.LocaliserAlgorithm3D;
 import group3dlocaliser.algorithm.LocaliserAlgorithmParams;
 import group3dlocaliser.grouper.DetectionGrouperParams;
@@ -17,8 +16,8 @@ public class Group3DParams implements Serializable, Cloneable, ManagedParameters
 
 	public static final long serialVersionUID = 1L;
 	
-	@Deprecated
-	private GroupedSourceParameters groupedSourceParams;
+//	@Deprecated
+//	private GroupedSourceParameters groupedSourceParams;
 	
 	private String sourceName;
 	
@@ -146,9 +145,9 @@ public class Group3DParams implements Serializable, Cloneable, ManagedParameters
 	 * @return the sourceName
 	 */
 	public String getSourceName() {
-		if (sourceName == null && groupedSourceParams != null) {
-			sourceName = groupedSourceParams.getDataSource();
-		}
+//		if (sourceName == null && groupedSourceParams != null) {
+//			sourceName = groupedSourceParams.getDataSource();
+//		}
 		return sourceName;
 	}
 

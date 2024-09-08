@@ -21,13 +21,9 @@
 
 package UserInput;
 
-import PamUtils.FrequencyFormat;
-import PamUtils.PamCalendar;
-import PamUtils.PamUtils;
 import PamguardMVC.PamDataUnit;
 import annotation.DataAnnotation;
 import annotation.DataAnnotationType;
-import pamMaths.PamVector;
 
 /**
  * 

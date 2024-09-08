@@ -2,16 +2,11 @@ package generalDatabase;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Desktop;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -20,7 +15,6 @@ import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
 import PamUtils.PamFileFilter;
-import PamUtils.PamUtils;
 
 public class MSAccessDialogPanel implements SystemDialogPanel {
 	
@@ -51,17 +45,19 @@ public class MSAccessDialogPanel implements SystemDialogPanel {
 		browseButton.addActionListener(new BrowseButtonAction());
 	}
 	
+	@Override
 	public JPanel getPanel() {
 		return p;
 	}
 	
+	@Override
 	public boolean getParams() {
 		// selected item may not be first in the list - so re-order the 
 		// list to make sure that it is.
 		int ind = dbList.getSelectedIndex();
 		if (ind >= 0) {
 			File selFile = (File) dbList.getSelectedItem();
-			if (selFile.exists() == false) return false;
+			if (!selFile.exists()) return false;
 			msAccessSystem.getRecentDatabases().remove(selFile);
 			msAccessSystem.getRecentDatabases().add(0, selFile);
 			return true;
@@ -71,6 +67,7 @@ public class MSAccessDialogPanel implements SystemDialogPanel {
 		}
 	}
 	
+	@Override
 	public void setParams() {
 		
 		dbList.removeAllItems();
@@ -98,6 +95,7 @@ public class MSAccessDialogPanel implements SystemDialogPanel {
 	
 	class BrowseButtonAction implements ActionListener {
 		
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			
 			String newDB = msAccessSystem.browseDatabases(parent);
@@ -112,7 +110,7 @@ public class MSAccessDialogPanel implements SystemDialogPanel {
 				// then insert the file at the top of the list.
 				File newFile = new File(newDB);
 				// if the file doesn't exit, consider creating it.
-				if (newFile.exists() == false) {
+				if (!newFile.exists()) {
 					newFile = createNewDatabase(newDB);
 					if (newFile == null) {
 						System.out.println("Unable to create "+newFile);
@@ -134,7 +132,7 @@ public class MSAccessDialogPanel implements SystemDialogPanel {
 		String dummy = "BlankAccess._accdb";
 		
 		File cpdb=new File(dummy);
-		if (cpdb.exists() == false) {
+		if (!cpdb.exists()) {
 			return null;
 		}
 		File newFile = new File(newDB);

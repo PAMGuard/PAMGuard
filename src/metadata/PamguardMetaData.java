@@ -2,7 +2,6 @@ package metadata;
 
 import java.io.Serializable;
 
-import PamUtils.LatLong;
 import nilus.ContactInfo;
 import nilus.Deployment;
 import nilus.DeploymentRecoveryDetails;

@@ -2,21 +2,14 @@ package mapgrouplocaliser;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.Stroke;
 
-import PamView.GeneralProjector;
-import PamView.ManagedSymbol;
 import PamView.ManagedSymbolInfo;
 import PamView.PamSymbol;
-import PamView.PamOldSymbolManager;
 import PamView.PamSymbolType;
 import PamView.paneloverlay.overlaymark.MarkManager;
 import PamView.paneloverlay.overlaymark.MarkOverlayDraw;
 import PamView.symbol.SymbolData;
-import PamguardMVC.PamDataUnit;
 
 
 public class MapGroupOverlayDraw extends MarkOverlayDraw {
@@ -38,7 +31,7 @@ public class MapGroupOverlayDraw extends MarkOverlayDraw {
 	 */
 	@Override
 	public Color getFillCol() {
-		if (getPamSymbol().isFill() == false) {
+		if (!getPamSymbol().isFill()) {
 			return null;
 		}
 		Color col = getPamSymbol().getFillColor();

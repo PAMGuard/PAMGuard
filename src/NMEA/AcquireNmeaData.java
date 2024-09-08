@@ -20,8 +20,6 @@
  */
 package NMEA;
 
-import geoMag.MagneticVariation;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -40,12 +38,6 @@ import java.util.Random;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import org.apache.commons.math3.analysis.function.Signum;
-
-import serialComms.jserialcomm.PJSerialComm;
-import serialComms.jserialcomm.PJSerialException;
-import serialComms.jserialcomm.PJSerialLineListener;
-import warnings.PamWarning;
 import GPS.GpsData;
 import NMEA.NMEAParameters.NmeaSources;
 import PamController.PamController;
@@ -57,7 +49,11 @@ import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
-import PamguardMVC.debug.Debug;
+import geoMag.MagneticVariation;
+import serialComms.jserialcomm.PJSerialComm;
+import serialComms.jserialcomm.PJSerialException;
+import serialComms.jserialcomm.PJSerialLineListener;
+import warnings.PamWarning;
 
 /**
  * @author Doug Gillespie, Dave McLaren, Paul Redmond
@@ -299,6 +295,7 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 
 	// Start pdu packaging timer
 	class SimThread implements Runnable {
+		@Override
 		public void run() {
 
 			//System.out.println("********GPS SIM THREAD*********");
@@ -542,6 +539,7 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 
 
 	class UdpThread implements Runnable {
+		@Override
 		public void run() {
 			/*
 			 * Sit here reading data from the port. Every time a new NMEA string
@@ -598,6 +596,7 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 	}
 
 	class MulticastThread implements Runnable {
+		@Override
 		public void run() {
 			/*
 			 * Sit here reading data from the port. Every time a new NMEA string
@@ -672,6 +671,7 @@ public class AcquireNmeaData extends PamProcess implements ActionListener, Modul
 		}
 	}
 
+	@Override
 	public void actionPerformed(ActionEvent event) {
 		/*
 		 * As called by Timer this gets called every 100ms or so. Look in the

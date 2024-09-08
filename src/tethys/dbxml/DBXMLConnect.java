@@ -150,8 +150,7 @@ public class DBXMLConnect {
 	 */
 	public boolean postAndLog(Object nilusObject, String documentName) throws TethysException
 	{
-		boolean ok = NilusChecker.warnEmptyFields(tethysControl.getGuiFrame(), nilusObject);
-
+//		boolean ok = NilusChecker.warnEmptyFields(tethysControl.getGuiFrame(), nilusObject);
 
 		TethysException e = null;
 		boolean success = false;
@@ -516,7 +515,7 @@ C:\Users\dg50\AppData\Local\Temp\PAMGuardTethys\20080311_2DSimplex_0.xmlnot: 0 b
 	 * @param nilusObject
 	 * @return document Id for any type of document, or null if the document doesn't have a getID function
 	 */
-	private String getDocumentId(Object nilusObject) {
+	public static String getDocumentId(Object nilusObject) {
 		String tempName = null;
 		Class nilusClass = nilusObject.getClass();
 		Method getId;

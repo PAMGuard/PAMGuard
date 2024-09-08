@@ -1,14 +1,22 @@
 package cpod;
 
 import PamUtils.PamCalendar;
-import PamguardMVC.AcousticDataUnit;
+import PamUtils.PamUtils;
 import PamguardMVC.DataUnitBaseData;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import PamguardMVC.RawDataHolder;
+import PamguardMVC.RawDataTransforms;
 import PamguardMVC.superdet.SuperDetection;
+import cpod.FPODReader.FPODdata;
 
-public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implements AcousticDataUnit {
+/**
+ * CPOD or FPOD click. 
+ */
+public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implements RawDataHolder {
 
+	private double[][] wavData;
+	
 	private short nCyc;
 	private short bw;
 	private short kHz;
@@ -18,10 +26,18 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 	private long iciSamples;
 	private short[] rawData;
 	
+	
 	/**
 	 * The amplitude in dB. 
 	 */
 	private Double amplitudedB;
+	
+	/**
+	 * The raw data transforms for the CPOD click
+	 */
+	private RawDataTransforms rawDataTransforms = null;
+
+	private CPODClassification cpodClassification;
 	
 	/**
 	 * Create a CPOD click. (This is used to load CPOD clicks from the binary store)
@@ -41,6 +57,7 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 		short slope = shortData[8];
 		CPODClick cpodClick = new CPODClick(baseData.getTimeMilliseconds(), baseData.getStartSample(), 
 				nCyc, bw, kHz, endF, spl, slope, shortData);
+//		cpodClick.setDurationInMilliseconds(baseData.getMillisecondDuration());
 		return cpodClick;
 	}
 	
@@ -52,11 +69,13 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 	 * @param shortData
 	 * @return
 	 */
+	@Deprecated
 	public static CPODClick makeClick(CPODControl cpodControl, long minuteMillis, short[] shortData) {
 
 		int t = shortData[0]<<16 | 
 				shortData[1]<<8 |
 				shortData[2]; // 5 microsec intervals !
+		
 		long tMillis = minuteMillis + t/200;
 		// now a bit of time stretching. Need to get the start time and see how
 		// different this is, then it's a linear stretch. 
@@ -72,44 +91,80 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 		short endF = shortData[6];
 		short spl = shortData[7];
 		short slope = shortData[8];
+		
 		CPODClick cpodClick = new CPODClick(tMillis, fileSamples, nCyc, bw, kHz, endF, spl, slope, shortData);
+		
+//		//estimate the duration in millis - not accurate but gives an idea.
+//		double duration = (nCyc/(double) kHz);
+//		cpodClick.setDurationInMilliseconds(duration);
+		
 		return cpodClick;
 	}
 	
 	/**
-	 * Create a CPOD click. This is usually called whenever the CPOD click is imported from a CSV file. 
-	 * 
-	 * @param minuteMillis The time in milliseconds of the minute block preceding the
-	 * current click. 
-	 * @param shortData
-	 * @return
+	 * Make a FPOD click. This called whenever click has been imported from a FP1 or FP3 file
+	 * @param tMillis - the time in milliseconds datenum.
+	 * @param fileSamples - the number of samples into the file the CPOD click is at - this is calculated from CPODClickDataBlock.CPOD_SR
+	 * @param shortData - the raw data from the CPOD click. This can be 8 bytes or 30 bytes if a click train clcik
+	 * @return a CPODClick object. 
 	 */
-	public static CPODClick makeClick(CPODControl2 cpodControl, long minuteMillis, short[] shortData) {
+	public static CPODClick makeFPODClick(long tMillis, long fileSamples, FPODdata fpodData) {
+		
+		
+		CPODClick cpodClick = new CPODClick(tMillis, fileSamples, (short) fpodData.Ncyc, (short) fpodData.BW, 
+				(short) FPODReader.IPItoKhz(fpodData.IPIatMax),  (short) FPODReader.IPItoKhz(fpodData.EndIPI), 
+				(short) fpodData.MaxPkExtnd, (short) 0, null);
+		
+		//durartion is measured more accurately in FPOD data
+		cpodClick.setDurationInMilliseconds((fpodData.duration*5.)/1000.);
+		cpodClick.setSampleDuration((long) ((fpodData.duration*5./1e6)*CPODClickDataBlock.CPOD_SR));
+		
+		//some FPOD clicks have raw wave data - some do not. 
+		if (fpodData.getWavData()!=null) {	
+			
+			int[] waveData = FPODReader.makeResampledWaveform(fpodData);
+			
+			//now need to scale the data so it fits as a raw data holder. 
+			double[] waveDataD = FPODReader.scaleWavData(waveData);
+			
+			cpodClick.wavData = new double[1][];//create a 2D array
+			cpodClick.wavData[0]=waveDataD;
+			
+			cpodClick.setRawDataTransfroms(new CPODWaveTransforms(cpodClick));
+		}
+		
+		return cpodClick;
+	}
+	
 
-		int t = shortData[0]<<16 | 
-				shortData[1]<<8 |
-				shortData[2]; // 5 microsec intervals !
-		long tMillis = minuteMillis + t/200;
-		// now a bit of time stretching. Need to get the start time and see how
-		// different this is, then it's a linear stretch. 
-		tMillis = cpodControl.stretchClicktime(tMillis);
+	/**
+	 * Make a CPOD click. This called whenever click has been imported from a CP1 or CP3 file
+	 * @param tMillis - the time in milliseconds datenum.
+	 * @param fileSamples - the number of samples into the file the CPOD click is at - this is calculated from CPODClickDataBlock.CPOD_SR
+	 * @param shortData - the raw data from the CPOD click. This can be 8 bytes or 40 bytes if a click train clcik
+	 * @return a CPODClick object. 
+	 */
+	public static CPODClick makeCPODClick(long tMillis, long fileSamples, short[] shortData) {
 		
-		
-		// do a sample number within the file as 5us intervals
-		long fileSamples = t + minuteMillis * 200;
-//		int micros = t%200;
 		short nCyc = shortData[3];
-		short bw = shortData[4];
+		short bw = shortData[4]; //bandwidth is an arbitary scale between 0 and 31; 
+		bw = (short) ((255./31.) * (bw+1)); //make some attempt to convert to kHz
 		short kHz = shortData[5];
 		short endF = shortData[6];
 		short spl = shortData[7];
 		short slope = shortData[8];
 		CPODClick cpodClick = new CPODClick(tMillis, fileSamples, nCyc, bw, kHz, endF, spl, slope, shortData);
+		
+//		//estimate the duration in millis - not accurate but gives an idea.
+		double duration = (nCyc/(double) kHz);
+		cpodClick.setDurationInMilliseconds(duration);
+		
+		
 		return cpodClick;
 	}
 
 	/**
-	 * Constructor for a CPOD click. 
+	 * Constructor for a CPOD click. This adds all basic information that is required for a CPOD or FPOD click
 	 * @param tMillis - the time in millis. 
 	 * @param fileSamples - the file samples
 	 * @param nCyc - the number of cycles
@@ -130,15 +185,19 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 		this.spl = spl;
 		this.slope = slope;
 		double[] f = new double[2];
-		f[0] = Math.min(kHz, endF)*1000;
-		f[1] = Math.max(kHz, endF)*1000;
+		
+		f[0] = (kHz - bw/2.)*1000.;
+		f[1] = (kHz + bw/2.)*1000.;
+		
 		setFrequency(f);
 		
-		//estimate the duration in millis - not accurate but gives an idea.
-		double duration = (nCyc/(double) kHz);
-		this.setDurationInMilliseconds(duration);
-		
-		this.rawData = shortData.clone();
+//		double duration = (nCyc/(double) kHz);
+//		setDurationInMilliseconds(duration);
+	
+		if (shortData!=null) {
+			//only CPOD
+			this.rawData = shortData.clone();
+		}
 	}
 
 	/**
@@ -252,6 +311,7 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 		}
 		return amplitudedB;
 	}
+	
 
 	/* (non-Javadoc)
 	 * @see PamDetection.AcousticDataUnit#getSummaryString()
@@ -267,6 +327,7 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 		}
 		long tm = getTimeMilliseconds();
 		str += PamCalendar.formatDate(tm) + " " + PamCalendar.formatTime(tm, 3) + "<p>";
+		str += String.format("UID: %dkHz<p>", this.getUID());
 		str += String.format("Start Freq: %dkHz<p>", getkHz());
 		str += String.format("N Cycles: %d<p>", getnCyc());
 		str += String.format("BandWidth: %dkHz<p>", getBw());
@@ -274,12 +335,12 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 		str += String.format("Slope: %d<p>", getSlope());
 		str += String.format("SPL: %d", getSpl());
 		if (rawData.length == 40) {
-			str += String.format("<p>QClass %d, SpClass %d", getBits(rawData[19], (short) 0x3), 
-					getBits(rawData[19], (short) 0b11100));
+			str += String.format("<p>QClass %d, SpClass %d", CPODUtils.getBits(rawData[19], (short) 0x3), 
+					CPODUtils.getBits(rawData[19], (short) 0b11100));
 			str += String.format("<p>Train %d, %d click", rawData[20], rawData[23]);
 			str += String.format("<p>Qn %d, RateGood %d, SpGood %d, SpClass %d",
-					getBits(rawData[36], (short)3), getBits(rawData[36], (short) 4),
-					getBits(rawData[36], (short)8), getBits(rawData[36], (short) 240));
+					CPODUtils.getBits(rawData[36], (short)3), CPODUtils.getBits(rawData[36], (short) 4),
+					CPODUtils.getBits(rawData[36], (short)8), CPODUtils.getBits(rawData[36], (short) 240));
 		}
 		if (rawData != null) {
 			int nRaw = rawData.length;
@@ -291,19 +352,83 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 				}
 			}
 		}
+		CPODClickTrainDataUnit clicktrain = getCPODClickTrain();
+		if (clicktrain!=null) {
+			str += "<p>" + clicktrain.getStringInfo() + "<p>";
+		}
+		else {
+			str += "<p>" + String.format("No click train info <p>");
+		}
+		
 //		str += "<\html>";
 		return str;
 	}
 
-	short getBits(short data, short bitMap) {
-		short firstBit = 0;
-		for (int i = 0; i < 8; i++) {
-			if ((bitMap & (1<<i)) != 0) {
-				break;
-			}
-			firstBit++;
-		}
-		data &= bitMap;
-		return (short) (data>>firstBit);
+
+	@Override
+	public double[][] getWaveData() {
+		return this.wavData;
 	}
+
+	@Override
+	public RawDataTransforms getDataTransforms() {
+		return rawDataTransforms;
+	}
+	
+	public void setRawDataTransfroms(RawDataTransforms rawDataTransforms) {
+		this.rawDataTransforms = rawDataTransforms;
+		
+	}
+
+	public void setWavData(double[][] ds) {
+		this.wavData=ds;
+	}
+	
+	static class CPODWaveTransforms extends RawDataTransforms {
+
+		CPODClick rawDataHolder;
+		
+		public CPODWaveTransforms(PamDataUnit rawDataHolder) {
+			super(rawDataHolder);
+			this.rawDataHolder = (CPODClick) rawDataHolder;
+
+		}
+		
+		@Override
+		public float getSampleRate() {
+			return FPODReader.FPOD_WAV_SAMPLERATE;
+		}
+		
+		@Override
+		public int getCurrentSpectrumLength() {
+			//note that the waveform has a higher sample rate than the CPODclicks. 
+			return PamUtils.getMinFftLength(rawDataHolder.getWaveData()[0].length);
+		}
+		
+	}
+
+	/**
+	 * Get the click train detection from the click detection
+	 * @return the click train detection
+	 */
+	public CPODClickTrainDataUnit getCPODClickTrain() {
+		for (int i=0; i<this.getSuperDetectionsCount(); i++) {
+			if (this.getSuperDetection(i) instanceof CPODClickTrainDataUnit) {
+				return (CPODClickTrainDataUnit) this.getSuperDetection(i);
+			}
+		}
+		return null;
+		
+	}
+
+	public void setClassification(CPODClassification cpodClassification) {
+		this.cpodClassification = cpodClassification;
+	}
+
+	
+	public CPODClassification getClassification() {
+		return this.cpodClassification;
+	}
+
+
 }

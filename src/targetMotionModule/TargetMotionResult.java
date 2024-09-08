@@ -1,13 +1,12 @@
 package targetMotionModule;
 
-import GPS.GpsData;
-import PamUtils.LatLong;
-import PamguardMVC.PamDataUnit;
-
 import java.util.ArrayList;
 
 import javax.vecmath.Point3f;
 
+import GPS.GpsData;
+import PamUtils.LatLong;
+import PamguardMVC.PamDataUnit;
 import pamMaths.PamVector;
 import targetMotionModule.algorithms.TargetMotionModel;
 

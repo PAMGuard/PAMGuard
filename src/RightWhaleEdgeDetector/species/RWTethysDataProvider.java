@@ -14,6 +14,7 @@ public class RWTethysDataProvider extends AutoTethysProvider {
 
 	public RWTethysDataProvider(TethysControl tethysControl, PamDataBlock pamDataBlock) {
 		super(tethysControl, pamDataBlock);
+		setAddFrequencyInfo(true);
 	}
 
 	@Override

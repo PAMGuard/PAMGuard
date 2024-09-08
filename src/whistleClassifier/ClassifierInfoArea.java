@@ -13,9 +13,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import classifier.ClassifierTypes;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
+import classifier.ClassifierTypes;
 
 /**
  * dialog panel to show basic information from a fragemtn classifier and to load

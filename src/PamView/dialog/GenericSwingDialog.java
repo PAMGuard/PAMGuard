@@ -10,6 +10,8 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import PamController.PamController;
+
 public class GenericSwingDialog extends PamDialog {
 
 	private boolean allOk;
@@ -45,6 +47,9 @@ public class GenericSwingDialog extends PamDialog {
 	 * @return
 	 */
 	public static boolean showDialog(Window parentFrame, String title, Point screenPoint, PamDialogPanel ...dialogPanels) {
+		if (parentFrame == null) {
+			parentFrame = PamController.getMainFrame();
+		}
 		GenericSwingDialog swingDialog = new GenericSwingDialog(parentFrame, title, dialogPanels);
 		swingDialog.setParams();
 		swingDialog.pack();

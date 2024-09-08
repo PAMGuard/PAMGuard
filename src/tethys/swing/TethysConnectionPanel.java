@@ -226,7 +226,7 @@ public class TethysConnectionPanel extends TethysGUIPanel {
 		 */
 		ArrayList<PDeployment> projectDeployments = getTethysControl().getDeploymentHandler().getProjectDeployments();
 		if (projectDeployments != null && projectDeployments.size() > 0) {
-			Deployment dep = projectDeployments.get(0).deployment;
+			Deployment dep = projectDeployments.get(0).nilusObject;
 			globDeployment.setProject(dep.getProject());
 			globDeployment.setRegion(dep.getRegion());
 			getTethysControl().sendStateUpdate(new TethysState(TethysState.StateType.NEWPROJECTSELECTION));

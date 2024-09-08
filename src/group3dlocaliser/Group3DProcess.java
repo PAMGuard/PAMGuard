@@ -16,11 +16,9 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
-import PamguardMVC.debug.Debug;
 import generalDatabase.DBControlUnit;
 import generalDatabase.PamConnection;
 import group3dlocaliser.algorithm.LocaliserAlgorithm3D;
-import group3dlocaliser.algorithm.crossedbearing.CrossedBearingGroupLocaliser;
 import group3dlocaliser.grouper.DetectionGroupMonitor;
 import group3dlocaliser.grouper.DetectionGroupedSet;
 import group3dlocaliser.grouper.DetectionGrouper;
@@ -53,7 +51,7 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 	public Group3DProcess(Group3DLocaliserControl group3DControl) {
 		super(group3DControl, null);
 		this.group3DControl = group3DControl;
-		localiserAlgorithm3D = new CrossedBearingGroupLocaliser();
+		localiserAlgorithm3D = group3DControl.getAlgorithmProviders().get(0);
 		detectionGrouper = new DetectionGrouper(this);
 		group3dDataBlock = new Group3DDataBlock(group3DControl.getUnitName() + " Localisations", this, 0,
 				group3DControl);
@@ -62,7 +60,7 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 		group3dDataBlock.setPamSymbolManager(new Group3DSymbolManager(group3DControl, group3dDataBlock,
 				Group3DOverlayDraw.defaultSymbol.getSymbolData()));
 		group3dLogging = new Group3DLogging(group3DControl, group3dDataBlock);
-		group3dDataBlock.SetLogging(group3dLogging);
+		group3dDataBlock.SetLogging(group3dLogging);		
 	}
 
 	/*
@@ -118,6 +116,9 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 
 	@Override
 	public void pamStop() {
+		
+		///need this here to close the group
+		this.detectionGrouper.closeMotherGroup();
 		String prf = String.format("%s %s ", group3DControl.getUnitName(), localiserAlgorithm3D.getName());
 		System.out.println(cpuMonitor.getSummary(prf));
 	}
@@ -180,7 +181,10 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 	}
 
 	@Override
-	public void newGroupedDataSet(DetectionGroupedSet detectionGroupedSet) {
+	public void newGroupedDataSet(DetectionGroupedSet detectionGroupedSet1) {
+		
+		DetectionGroupedSet detectionGroupedSet = this.localiserAlgorithm3D.preFilterLoc(detectionGroupedSet1); 
+		
 		int nGroups = detectionGroupedSet.getNumGroups();
 		AbstractLocalisation abstractLocalisation;
 		GroupLocalisation groupLocalisation;
@@ -223,14 +227,17 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 					logViewerData(newDataUnit);
 				}
 			}
-//			System.out.println("Ran localisation " + localiserAlgorithm3D.getName() + "  got: " + abstractLocalisation);
+		
+			System.out.println("Ran localisation " + i + " " + localiserAlgorithm3D.getName() + "  got: " + abstractLocalisation.getLatLong(0) + "  " + abstractLocalisation.getHeight(0) + " Error: " +  abstractLocalisation.getLocError(0));
 
 			if (abstractLocalisation instanceof GroupLocalisation) {
 				groupLocalisation = (GroupLocalisation) abstractLocalisation;
+				
 				cpuMonitor.stop();
 				if (groupLocalisation != null) {
 					groupLocalisation.sortLocResults();
 					GroupLocResult locResult = groupLocalisation.getGroupLocaResult(0);
+					
 					if (locResult == null) {
 						continue;
 					}
@@ -257,12 +264,17 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 //						bestSet = i;
 //					}
 				}
-			} else {
+			} else if (bestLocalisation==null) {
+				//note it is important here to make sure bestLoclaisation is null. If we have an array which has a linear
+				//compenent than a set of time delays of only the linear system may return a linear loclaisation in which case, without a
+				// null check, this will always override a group loclaisation. 
 				bestLocalisation = abstractLocalisation;
 				bestSet = i;
 			}
+			
+			
 		}
-		if (bestLocalisation != null && logAll == false) {
+		if (bestLocalisation != null && !logAll) {
 			// best make and output a data unit !
 			// List<PamDataUnit> bestGroup = detectionGroupedSet.getGroup(bestSet);
 			// Group3DDataUnit newDataUnit = new
@@ -272,6 +284,8 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 			// }
 			Group3DDataUnit newDataUnit = group3dDataUnits[bestSet];
 			newDataUnit.setLocalisation(bestLocalisation);
+			
+			System.out.println("Set click localisation: " + bestSet + "  " + bestLocalisation.getRange(0) + "  " + bestLocalisation.getLatLong(0));
 			group3dDataBlock.addPamData(newDataUnit);
 			if (group3DControl.isViewer()) {
 				// call explicityly since it won't happen in normal mode.
@@ -288,7 +302,7 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 	 * @param group2
 	 * @param result1
 	 * @param result2
-	 * @return
+	 * @return true if group 1 is better than group 2. 
 	 */
 	private boolean isBetter(List<PamDataUnit> group1, List<PamDataUnit> group2, GroupLocResult result1,
 			GroupLocResult result2) {
@@ -298,6 +312,17 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 		double chi2 = result2.getChi2() / nch2;
 		Double errMag1 = null, errMag2 = null;
 		LocaliserError err = result1.getLocError();
+		
+		//if one has location information and the other does not, choose the one with the 
+		System.out.println("LAT LONG TEST: " + result1.getLatLong() + "  " + result2.getLatLong()); 
+		if (result1.getLatLong()==null && result2.getLatLong()!=null) {
+			return false;
+		}
+		
+		if (result2.getLatLong() == null && result1.getLatLong() != null) {
+			return true;
+		}
+		
 		if (err != null) {
 			errMag1 = err.getErrorMagnitude();
 			if (errMag1.isInfinite()) {

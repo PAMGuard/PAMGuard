@@ -2,11 +2,11 @@ package fftFilter;
 
 import java.util.Arrays;
 
-import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
-import fftManager.Complex;
 import Filters.Filter;
 import PamUtils.PamUtils;
 import PamUtils.complex.ComplexArray;
+import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
+import fftManager.Complex;
 
 public class FFTFilter implements Filter {
 	

@@ -7,16 +7,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-
-import pamScrollSystem.ViewLoadObserver;
-import PamUtils.PamCalendar;
-import PamguardMVC.PamDataBlock;
-import PamguardMVC.RequestCancellationObject;
 
 import dataGram.DatagramDataPoint;
-import fileOfflineData.OfflineFileMapPoint;
 
+@Deprecated
 public class CPODMap {
 
 	private File cpFile;
@@ -29,6 +23,7 @@ public class CPODMap {
 	
 	public static final int FILE_CP1 = 1;
 	public static final int FILE_CP3 = 3;
+	
 	int cpFileType = 0; 
 	
 
@@ -85,9 +80,9 @@ public class CPODMap {
 			return -1;
 		}
 		CPODDataGramProvider datagram;
-		if (readHeader(bis) == false) {
+		if (!readHeader(bis)) {
 			return -2;
-		};
+		}
 		if (cpFileType == FILE_CP1) {
 			 datagram = cpodControl.cpodDatagramProvider[0];
 		}

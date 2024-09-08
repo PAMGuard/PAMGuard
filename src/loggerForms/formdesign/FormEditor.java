@@ -11,6 +11,7 @@ import loggerForms.ItemInformation;
 import loggerForms.PropertyDescription;
 import loggerForms.PropertyTypes;
 import loggerForms.UDColName;
+import loggerForms.controlDescriptions.ControlTypes;
 import loggerForms.formdesign.propertypanels.AutoAlertPanel;
 import loggerForms.formdesign.propertypanels.BearingPanel;
 import loggerForms.formdesign.propertypanels.BooleanPanel;
@@ -26,6 +27,7 @@ import loggerForms.formdesign.propertypanels.PropertyPanel;
 import loggerForms.formdesign.propertypanels.RangePanel;
 import loggerForms.formdesign.propertypanels.SymbolPanel;
 import loggerForms.formdesign.propertypanels.TextPanel;
+import loggerForms.formdesign.propertypanels.XReferencePanel;
 
 /**
  * Layer that sits between the form description and the actual edit
@@ -154,6 +156,10 @@ public class FormEditor {
 	public PropertyPanel makePropertyPanel(PropertyTypes propertyType) {
 		
 		switch (propertyType) {
+		case STARTTIME:
+			return new XReferencePanel(this, propertyType, ControlTypes.TIMESTAMP);
+		case ENDTIME:
+			return new XReferencePanel(this, propertyType, ControlTypes.TIMESTAMP);
 		case AUTOALERT:
 			return new IntegerPanel(this, propertyType, UDColName.AutoUpdate, "Alert operator every", "minutes");
 		case AUTORECORD:

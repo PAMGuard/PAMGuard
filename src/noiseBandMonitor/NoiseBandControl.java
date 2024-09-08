@@ -7,12 +7,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import noiseMonitor.NoiseTabPanel;
 
 import Filters.ButterworthMethod;
 import Filters.FIRFilterMethod;
@@ -22,11 +16,11 @@ import Filters.FilterParams;
 import Filters.FilterType;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
-import PamController.PamController;
+import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamView.PamTabPanel;
-import PamguardMVC.debug.Debug;
+import noiseMonitor.NoiseTabPanel;
 
 public class NoiseBandControl extends PamControlledUnit implements PamSettings {
 
@@ -236,6 +230,9 @@ public class NoiseBandControl extends PamControlledUnit implements PamSettings {
 	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		noiseBandSettings = ((NoiseBandSettings)pamControlledUnitSettings.getSettings()).clone();
+//		System.out.println("********************************************************");
+//		System.out.println("NOISE BAND SETTINGS: " + noiseBandSettings.rawDataSource);
+//		System.out.println("********************************************************");
 		return true;
 	}
 
@@ -263,7 +260,7 @@ public class NoiseBandControl extends PamControlledUnit implements PamSettings {
 	@Override
 	public void notifyModelChanged(int changeType) {
 		switch (changeType) {
-		case PamController.INITIALIZATION_COMPLETE:
+		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			noiseBandProcess.setupProcess();
 			sortBandEdges();
 		}

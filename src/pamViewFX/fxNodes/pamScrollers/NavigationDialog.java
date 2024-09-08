@@ -101,7 +101,7 @@ public class NavigationDialog extends SettingsPane<PamScrollerData> {
 		
 		//FIXME for some reason when styling with settings CSS the dialog has strange resizing issues. This is due
 		//to padding being set in the CSS- have fixed now but kept commented code to show workaround if ever needed in future. 
-		outerPane.getStylesheets().add(PamController.getInstance().getGuiManagerFX().getPamSettingsCSS());
+		outerPane.getStylesheets().addAll(PamController.getInstance().getGuiManagerFX().getPamSettingsCSS());
 //		this.getDialogPane().getStylesheets().add(PamController.getInstance().getGuiManagerFX().getPamCSS());
 //		this.getDialogPane().getStyleClass().add("dialog-pane-dark");
 //		this.getDialogPane().lookupButton(ButtonType.OK).getStyleClass().add("dialog-button-dark");

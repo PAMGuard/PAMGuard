@@ -44,6 +44,7 @@ public class AISControl extends PamControlledUnit implements PamSettings {
 			super();
 			this.parentFrame = parentFrame;
 		}
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			AISStringsTable.show(aisControl);
 		}
@@ -55,6 +56,7 @@ public class AISControl extends PamControlledUnit implements PamSettings {
 			super();
 			this.parentFrame = parentFrame;
 		}
+		@Override
 		public void actionPerformed(ActionEvent e) {
 
 			AISParameters newParams = AISDisplayDialog.showDialog(parentFrame, aisParameters);
@@ -70,6 +72,7 @@ public class AISControl extends PamControlledUnit implements PamSettings {
 			super();
 			this.parentFrame = parentFrame;
 		}
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			AISParameters newParams = AISSettingsDialog.showDialog(parentFrame, aisParameters);
 			if (newParams != null) {
@@ -115,14 +118,17 @@ public class AISControl extends PamControlledUnit implements PamSettings {
 		aisProcess.noteNewSettings();
 	}
 
+	@Override
 	public Serializable getSettingsReference() {
 		return aisParameters;
 	}
 
+	@Override
 	public long getSettingsVersion() {
 		return AISParameters.serialVersionUID;
 	}
 
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 
 		this.aisParameters = ((AISParameters) pamControlledUnitSettings.getSettings()).clone();

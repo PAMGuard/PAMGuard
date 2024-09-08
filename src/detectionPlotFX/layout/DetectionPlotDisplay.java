@@ -37,7 +37,7 @@ import userDisplayFX.UserDisplayNodeParams;
  * @author Jamie Macaulay
  *
  */
-public class DetectionPlotDisplay extends PamBorderPane implements UserDisplayNodeFX  {
+public class DetectionPlotDisplay extends PamBorderPane  {
 	
 
 	private static final double PREF_SETTINGS_WIDTH = 250;
@@ -73,8 +73,7 @@ public class DetectionPlotDisplay extends PamBorderPane implements UserDisplayNo
 	/**
 	 * Pane which sits on the right hand side and 
 	 */
-	private PamBorderPane settingsHolder; 
-
+	private PamBorderPane settingsHolder;
 
 
 	/**
@@ -82,11 +81,7 @@ public class DetectionPlotDisplay extends PamBorderPane implements UserDisplayNo
 	 */
 	private boolean enableSettingsButton = true; 
 
-	/**
-	 * Convenience reference to the settings css style
-	 */
-	String cssSettingsResource=PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS();
-
+	
 	/**
 	 * The pane which allows users to settings specific to the type of display
 	 */
@@ -231,7 +226,7 @@ public class DetectionPlotDisplay extends PamBorderPane implements UserDisplayNo
 	 * Called whenever the scroll values change
 	 */
 	void scrollBarChanged() {
-		if (detectionPlotProjector.enableScrollBar) {
+		if (detectionPlotProjector.isEnableScrollBar()) {
 			detectionPlotProjector.setAxisMinMax(scrollBarPane.getCurrentValue(), 
 					scrollBarPane.getCurrentValue()+scrollBarPane.getVisibleAmount(), detectionPlotProjector.getScrollAxis());
 			drawCurrentUnit();
@@ -242,7 +237,7 @@ public class DetectionPlotDisplay extends PamBorderPane implements UserDisplayNo
 	 * Repaint the scroll bar. 
 	 */
 	private void repainScrollBar() {
-		if (currentDataInfo!=null && detectionPlotProjector.enableScrollBar && lastDetection!=null) {
+		if (currentDataInfo!=null && detectionPlotProjector.isEnableScrollBar() && lastDetection!=null) {
 			currentDataInfo.drawData(scrollBarPane.getDrawCanvas().getGraphicsContext2D(), 
 					new Rectangle(0,0,scrollBarPane.getDrawCanvas().getWidth(),scrollBarPane.getDrawCanvas().getHeight()), 
 					this.detectionPlotProjector, this.lastDetection, DetectionPlot.SCROLLPANE_DRAW);
@@ -257,56 +252,23 @@ public class DetectionPlotDisplay extends PamBorderPane implements UserDisplayNo
 		return isViewer;
 	}
 
-
-	@Override
-	public String getName() {
-		return "Detection Display";
-	}
-
-	@Override
-	public Region getNode() {
-		return this;
-	}
-
-	@Override
-	public void openNode() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public boolean isStaticDisplay() {
-		return false;
-	}
-
-	@Override
-	public boolean isResizeableDisplay() {
-		return true;
-	}
-
-	@Override
-	public void closeNode() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void notifyModelChanged(int changeType) {
-		switch (changeType){
-		case PamControllerInterface.INITIALIZATION_COMPLETE:
-
-			break; 
-		case PamControllerInterface.ADD_CONTROLLEDUNIT:
-			this.dataSettingsPane.notifyDataChange(); 
-			break; 
-		case PamControllerInterface.CHANGED_PROCESS_SETTINGS:
-			//this is were the data block may have been added. Need to add an observer to this data block to say when the thing has 
-			//thing has a new detection. 
-			this.dataSettingsPane.notifyDataChange(); 
-			break;
-		}
-
-	}
+//	@Override
+//	public void notifyModelChanged(int changeType) {
+//		switch (changeType){
+//		case PamControllerInterface.INITIALIZATION_COMPLETE:
+//
+//			break; 
+//		case PamControllerInterface.ADD_CONTROLLEDUNIT:
+//			this.dataSettingsPane.notifyDataChange(); 
+//			break; 
+//		case PamControllerInterface.CHANGED_PROCESS_SETTINGS:
+//			//this is were the data block may have been added. Need to add an observer to this data block to say when the thing has 
+//			//thing has a new detection. 
+//			this.dataSettingsPane.notifyDataChange(); 
+//			break;
+//		}
+//
+//	}
 
 	/**
 	 * Set the DataInfo for the display. 
@@ -393,15 +355,17 @@ public class DetectionPlotDisplay extends PamBorderPane implements UserDisplayNo
 	 * the current data unit. 
 	 */
 	public void setupScrollBar(PamDataUnit newDataUnit){
+//		System.out.println("SETUP SCROLL BAR:");
+		
+		if (currentDataInfo!=null) {
+			//important we put this here as it allows the plot to set up the scroll bar pane. 
+			this.currentDataInfo.setupAxis(detectionPlotProjector, newDataUnit); 
+		}
+		
 		//setup the scroll bar (or not)
 		if (enableScrollBar && this.detectionPlotProjector.enableScrollBar && newDataUnit!=null) {
 			
 			this.setTop(scrollBarPane);
-			
-			if (currentDataInfo!=null) {
-			//important we put this here as it allows the plot to set up the scroll bar pane. 
-				this.currentDataInfo.setupAxis(detectionPlotProjector, newDataUnit); 
-			}
 			
 			//System.out.println("Set min and max limits for scroll bar: " +  detectionPlotProjector.getMinScrollLimit() +  "   " + detectionPlotProjector.getMaxScrollLimit()); 
 			scrollBarPane.setMinVal(detectionPlotProjector.getMinScrollLimit());
@@ -419,9 +383,18 @@ public class DetectionPlotDisplay extends PamBorderPane implements UserDisplayNo
 						this.detectionPlotProjector, newDataUnit, DetectionPlot.SCROLLPANE_DRAW);
 			}
 	
-
 		}
 		else {
+			System.out.println("Min scroll limit: " + detectionPlotProjector.getMinScrollLimit() + "max: " + detectionPlotProjector.getMaxScrollLimit());
+			//need this to ensure the axis change when scroll bar is not longer displayed. 
+			detectionPlotProjector.setAxisMinMax(detectionPlotProjector.getMinScrollLimit(), 
+					detectionPlotProjector.getMaxScrollLimit(), detectionPlotProjector.getScrollAxis());
+			
+			//need to setup the axis as it takes it data fom the ploit projector. 
+			if (currentDataInfo!=null) {
+				this.currentDataInfo.setupAxis(detectionPlotProjector, newDataUnit); 
+			}
+			
 			this.setTop(null);
 		}
 	}
@@ -445,21 +418,32 @@ public class DetectionPlotDisplay extends PamBorderPane implements UserDisplayNo
 	 *Draw the data unit.  
 	 */
 	private void drawDataUnit(PamDataUnit newDataUnit) {
+
 		//Debug.out.println("DetectionPlotDisplay DrawDataUnit: " +newDataUnit);
+		if (reDrawScroll) {
+			 setupScrollBar(newDataUnit);
+			 reDrawScroll=false; 
+		}
+		
 		if (currentDataInfo!=null){
+			
 			//sometimes the axis just need a little push to make sure the pane and axis object bindings have been updated
 			for (int i=0; i<Side.values().length; i++) {
 				dDPlotPane.getAxisPane(Side.values()[i]).layout(); 
 			}
-
+			
+			
 			currentDataInfo.drawData(dDPlotPane.getPlotCanvas().getGraphicsContext2D(), 
 					new Rectangle(0,0,dDPlotPane.getPlotCanvas().getWidth(),dDPlotPane.getPlotCanvas().getHeight()), 
 					this.detectionPlotProjector, newDataUnit);
 		}
-		if (reDrawScroll) {
-			 setupScrollBar( newDataUnit);
-			 reDrawScroll=false; 
-		}
+		
+//		//Debug.out.println("DetectionPlotDisplay DrawDataUnit: " +newDataUnit);
+//		if (reDrawScroll) {
+//			 setupScrollBar(newDataUnit);
+//			 reDrawScroll=false; 
+//		}
+//		
 		//dDPlotPane.repaintAxis(); 
 	}
 
@@ -503,12 +487,7 @@ public class DetectionPlotDisplay extends PamBorderPane implements UserDisplayNo
 		detectionDisplayControl.dataModelToDisplay();
 	}	
 
-	@Override
-	public boolean requestNodeSettingsPane() {
-		if (dDPlotPane.getHidePane(Side.RIGHT)!=null) dDPlotPane.getHidePane(Side.RIGHT).showHidePane(true);
-		if (dDPlotPane.getHidePane(Side.LEFT)!=null) dDPlotPane.getHidePane(Side.LEFT).showHidePane(true);
-		return true;
-	}
+
 
 	/**
 	 * Get an axis pane
@@ -528,11 +507,7 @@ public class DetectionPlotDisplay extends PamBorderPane implements UserDisplayNo
 		return dDPlotPane.getHidePane(side);
 	}
 
-	@Override
-	public boolean isMinorDisplay() {
-		// these are generally smaller minor displays- only used for automatic resize. 
-		return true;
-	}
+
 
 	/**
 	 * Called whenever a new datablock is added. 
@@ -601,6 +576,7 @@ public class DetectionPlotDisplay extends PamBorderPane implements UserDisplayNo
 	 */
 	public void setEnableScrollBar(boolean enableScrollBarPane) {
 		enableScrollBar=enableScrollBarPane;
+		this.detectionPlotProjector.enableScrollBar = enableScrollBarPane;
 		setupScrollBar();
 	}
 
@@ -613,18 +589,6 @@ public class DetectionPlotDisplay extends PamBorderPane implements UserDisplayNo
 		return detectionPlotProjector;
 	}
 
-
-	@Override
-	public UserDisplayNodeParams getDisplayParams() {
-		return this.detectionPlotParams;
-	}
-
-
-	@Override
-	public void setFrameHolder(PamInternalPane internalFrame) {
-		// TODO Auto-generated method stub
-	}
-	
 	
 	/**
 	 * The pane which holds settings for the the current plot. 

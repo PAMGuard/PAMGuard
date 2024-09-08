@@ -5,7 +5,6 @@ import java.util.Vector;
 
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.border.LineBorder;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;

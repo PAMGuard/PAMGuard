@@ -40,10 +40,6 @@ import java.awt.geom.Rectangle2D;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import clickDetector.dialogs.WaveDisplayDialog;
-import clickDetector.offlineFuncs.OfflineEventDataUnit;
-import clickDetector.waveCorrector.WaveCorrector;
-import soundtrap.STClickControl;
 import Layout.PamAxis;
 import Layout.PamAxisPanel;
 import PamController.PamController;
@@ -55,6 +51,10 @@ import PamView.panel.JBufferedPanel;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamObserver;
+import clickDetector.dialogs.WaveDisplayDialog;
+import clickDetector.offlineFuncs.OfflineEventDataUnit;
+import clickDetector.waveCorrector.WaveCorrector;
+import soundtrap.STClickControl;
 
 /**
  * Display which shows the raw click waveform. 
@@ -414,7 +414,7 @@ public class ClickWaveform extends ClickDisplay implements PamObserver {
 		 */
 		public void paintWaveform(Graphics g, Rectangle clipRect) {
 
-			if (isViewer==true){
+			if (isViewer){
 				Graphics2D g2 = (Graphics2D) g;
 				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 						RenderingHints.VALUE_ANTIALIAS_ON);
@@ -511,10 +511,12 @@ public class ClickWaveform extends ClickDisplay implements PamObserver {
 		return "Click Waveform Display";
 	}
 
+	@Override
 	public String getObserverName() {
 		return getName();
 	}
 
+	@Override
 	public long getRequiredDataHistory(PamObservable o, Object arg) {
 		return 0;
 	}
@@ -524,10 +526,12 @@ public class ClickWaveform extends ClickDisplay implements PamObserver {
 
 	}
 
+	@Override
 	public void removeObservable(PamObservable o) {
 
 	}
 
+	@Override
 	public void setSampleRate(float sampleRate, boolean notify) {
 		setYScale();		
 	}
@@ -544,6 +548,7 @@ public class ClickWaveform extends ClickDisplay implements PamObserver {
 
 	}
 
+	@Override
 	public void addData(PamObservable o, PamDataUnit arg) {
 
 		if (clickDisplayManager.isBAutoScroll() && !isViewer) {
@@ -747,7 +752,7 @@ public class ClickWaveform extends ClickDisplay implements PamObserver {
 		Boolean newTimeSet=WaveCorrector.showDialog(frame, clickControl, storedClick, waveMarker.markedChannel,
 				waveMarker.markStartSample, waveMarker.markLength);
 		//if a new time has been set then we need to make changes to other displays
-		if (newTimeSet==true){
+		if (newTimeSet){
 			//TODO
 			//display changes. 
 			//need to update bt display. 

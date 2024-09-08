@@ -9,7 +9,6 @@ import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
 import Spectrogram.SpectrogramParameters;
-
 import radardisplay.RadarParameters;
 
 public class UserDisplayParameters implements Serializable, Cloneable, ManagedParameters {

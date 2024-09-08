@@ -1,13 +1,5 @@
 package mcc;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-
-import analoginput.AnalogRangeData;
-import analoginput.AnalogRangeData.AnalogType;
-
 /**
  * Interface to Measurement Computing data acquisition boards. 
  * Interfaces to native source code (MS Windows only)

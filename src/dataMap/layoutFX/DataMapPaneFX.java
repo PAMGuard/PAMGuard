@@ -10,23 +10,33 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamButton;
+import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.hidingPane.HidingPane;
 import pamViewFX.fxNodes.internalNode.PamInternalPane;
+import pamViewFX.fxNodes.pamAxis.PamDateAxis;
+import pamViewFX.fxStyles.PamStylesManagerFX;
+import userDisplayFX.UserDisplayControlFX;
 import userDisplayFX.UserDisplayNodeFX;
 import userDisplayFX.UserDisplayNodeParams;
 
 /**
- * Pane which shows users all data currently stored in binary files and databases within PAMGuard. Also allows for navigation to
- * different part of the data time series. 
+ * Pane which shows users all data currently stored in binary files and
+ * databases within PAMGuard. Also allows for navigation to different part of
+ * the data time series.
+ * 
  * @author Jamie Macaulay
  *
  */
 public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX {
 	
+	private static final double HIDE_PANE_WIDTH = 400;
+
 	/**
 	 * Reference to the data map control. 
 	 */
@@ -45,7 +55,7 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX {
 	/**
 	 * The hiding pane which holds the summary pane. 
 	 */
-	private HidingPane hidingSummaryPane;
+	private HidingPane hidingSettingsPane;
 
 	/**
 	 * The buttons which shows the top hiding pane. 
@@ -55,9 +65,14 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX {
 	/**
 	 * Pane which allows users to change scale on datamap. 
 	 */
-	private ScalePaneFX scalePane;
+	private DataMapSettingsPane dataMapSettingsPane;
 
-	private PamBorderPane topHolder;
+	private PamVBox settingsPane;
+
+	/**
+	 * Axis which shows the current dates
+	 */
+	private PamDateAxis dateAxis;
 
 	public DataMapPaneFX(DataMapControl dataMapControl){
 		this.dataMapControl=dataMapControl; 
@@ -71,50 +86,55 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX {
 		
 		//create all the different panes, 
 		summaryPane = new SummaryPaneFX(dataMapControl, this);
-		summaryPane.getStyleClass().add("pane");
 		
-		scalePane=new ScalePaneFX(dataMapControl,this);
-		scalePane.getStyleClass().add("pane");
-
 		scrollingDataPanel= new ScrollingDataPaneFX(dataMapControl, this); 
 		
-		//create top section
-		topHolder=new PamBorderPane(); 
-		topHolder.getStyleClass().add("pane");
-		topHolder.setLeft(summaryPane);
-		topHolder.setRight(scalePane); 
-		topHolder.setPadding(new Insets(10,10,10,10));
-		topHolder.setPrefHeight(120);
+		dataMapSettingsPane=new DataMapSettingsPane(dataMapControl,this);
 		
+		//create the setting spane
+		settingsPane=new PamVBox(); 
+//		settingsPane.getChildren().add(summaryPane);
+		settingsPane.getChildren().add(dataMapSettingsPane.getContentNode()); 
+		settingsPane.setPadding(new Insets(40,10,10,10));
+		settingsPane.setPrefWidth(HIDE_PANE_WIDTH);
+
 //		//have a horizontal scroll pane 
 //		PamScrollPane topScrollHolder=new PamScrollPane(topHolder); 
 //		topScrollHolder.setPrefHeight(180);
-//		topScrollHolder.setVbarPolicy(ScrollBarPolicy.NEVER);
-
-		
+//		topScrollHolder.setVbarPolicy(ScrollBarPolicy.NEVER)
 		//topHolder.prefHeightProperty().bind(summaryPane.prefHeightProperty());
 		
 		//hiding summary pane
-		hidingSummaryPane=new HidingPane(Side.TOP, topHolder, this, false);
-		hidingSummaryPane.getStyleClass().add("pane");
-		hidingSummaryPane.setVisibleImmediatly(false); 
-		hidingSummaryPane.showHidePane(true);
-		hidingSummaryPane.getStylesheets().add(PamController.getInstance().getGuiManagerFX().getPamSettingsCSS()); //style as a settings pane.
-		
+		hidingSettingsPane=new HidingPane(Side.RIGHT, settingsPane, this, true);
+		hidingSettingsPane.setVisibleImmediatly(false); 
+		hidingSettingsPane.showHidePane(true);
+		hidingSettingsPane.getStyleClass().add("pane-trans");
+		hidingSettingsPane.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
+		StackPane.setAlignment(hidingSettingsPane, Pos.TOP_RIGHT);
+		hidingSettingsPane.setPrefWidth(HIDE_PANE_WIDTH);
+
 		//style the show button. 
-		showButton=hidingSummaryPane.getShowButton();
-		showButton.getStyleClass().add("transparent-button-square");
-		showButton.setStyle("-fx-background-radius: 0 0 10 10;");
+		showButton=hidingSettingsPane.getShowButton();
+		showButton.getStyleClass().add("close-button-left");
+		showButton.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
 
-//		showButton.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.CHEVRON_DOWN, PamGuiManagerFX.iconColor, PamGuiManagerFX.iconSize));
-		showButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-down", PamGuiManagerFX.iconColor, PamGuiManagerFX.iconSize));
-		showButton.setPrefWidth(60);
-		scrollingDataPanel.setTop(showButton);
-		PamBorderPane.setAlignment(showButton, Pos.TOP_CENTER);
+
+//		showButton.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.CHEVRON_DOWN, PamGuiManagerFX.iconColor, PamGuiManagerFX.iconSize));\
+		showButton.setGraphic( PamGlyphDude.createPamIcon("mdi2c-cog", Color.WHITE, PamGuiManagerFX.iconSize));
+		showButton.setPrefHeight(60);
+		scrollingDataPanel.setRight(showButton);
 		
-
-		this.setTop(hidingSummaryPane);
-		this.setCenter(scrollingDataPanel);
+		StackPane.setAlignment(showButton, Pos.CENTER_RIGHT);
+		
+		StackPane stackPane = new StackPane();
+		stackPane.getChildren().addAll(scrollingDataPanel, hidingSettingsPane, showButton);
+		
+		dateAxis = new PamDateAxis();
+		dateAxis.setMinHeight(50);
+		dateAxis.prefWidthProperty().bind(scrollingDataPanel.widthProperty());
+		 
+		this.setTop(dateAxis);
+		this.setCenter(stackPane);
 	}
 
 	public void newSettings() {
@@ -151,7 +171,7 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX {
 	public void newDataSources() {
 		scrollingDataPanel.newDataSources();
 		summaryPane.newDataSources();		
-		hidingSummaryPane.resetHideAnimation();
+		//hidingSummaryPane.resetHideAnimation();
 	}
 	
 	/**
@@ -159,11 +179,11 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX {
 	 * to do with scaling changes. 
 	 */
 	public void scaleChanged() {
-		if (scalePane == null || scrollingDataPanel == null) {
+		if (dataMapSettingsPane == null || scrollingDataPanel == null) {
 			return;
 		}
-		scalePane.getParams(dataMapControl.dataMapParameters);
-		scrollingDataPanel.scaleChange();
+		dataMapSettingsPane.getParams(dataMapControl.dataMapParameters);
+		//scrollingDataPanel.scaleChange();
 	}
 
 	@Override
@@ -207,24 +227,30 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX {
 		switch (changeType) {
 		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			scrollingDataPanel.updateScrollBar();
-			scalePane.checkDataGramPane();
+			dataMapSettingsPane.setParams(dataMapControl.dataMapParameters);
 			this.repaintAll();
+			break;
 		case PamControllerInterface.CHANGED_OFFLINE_DATASTORE:
 			scrollingDataPanel.updateScrollBar();
-			scalePane.checkDataGramPane();
+			dataMapSettingsPane.checkDataGramPane();
+			dataMapSettingsPane.setParams(dataMapControl.dataMapParameters);
+			break;
 		case PamControllerInterface.ADD_CONTROLLEDUNIT:
-			scalePane.checkDataGramPane();
 		case PamControllerInterface.REMOVE_CONTROLLEDUNIT:
-			scalePane.checkDataGramPane();
+			dataMapSettingsPane.checkDataGramPane();
+			dataMapSettingsPane.setParams(dataMapControl.dataMapParameters);
+			break;
 		case PamControllerInterface.INITIALIZE_LOADDATA:
 		case PamControllerInterface.EXTERNAL_DATA_IMPORTED:
 			scrollingDataPanel.updateScrollBar();
-			scalePane.checkDataGramPane();
+			dataMapSettingsPane.checkDataGramPane();
+			dataMapSettingsPane.setParams(dataMapControl.dataMapParameters);
 			this.repaintAll();
 			break;
 		case PamControllerInterface.OFFLINE_DATA_LOADED:
 			scrollingDataPanel.updateScrollBar();
-			scalePane.checkDataGramPane();
+			dataMapSettingsPane.checkDataGramPane();
+			dataMapSettingsPane.setParams(dataMapControl.dataMapParameters);
 			this.repaintAll();
 			break;
 		case PamControllerInterface.DATA_LOAD_COMPLETE:
@@ -258,13 +284,6 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX {
 		summaryPane.setSelectedDataTime(timeStart, timeEnd);
 	}
 
-	/**
-	 * Pane which holds all top controls. Sits within a hiding pane. 
-	 * @return the pane which holds top controls and indicators. 
-	 */
-	public PamBorderPane getTopHolder() {
-		return topHolder;
-	}
 
 	@Override
 	public boolean isMinorDisplay() {
@@ -282,6 +301,30 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX {
 	public void setFrameHolder(PamInternalPane internalFrame) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public UserDisplayControlFX getUserDisplayControl() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * Get the current number of data stream panes
+	 * @return the number of data stream panes
+	 */
+	public int getNumDataStreamPanes() {
+		return this.scrollingDataPanel.getNumDataStreamPanes();
+	}
+	
+	/**
+	 * Get a data stream pane. 
+	 * @param n - the index of the data stream pane
+	 * @return the data stream pane or null if the index is out of bounds. 
+	 */
+	public DataStreamPaneFX getDataStreamPane(int n) {
+		return this.scrollingDataPanel.getDataSyreamPane( n);
+
 	}
 
 }

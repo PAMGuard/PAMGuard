@@ -7,7 +7,8 @@ import detectionPlotFX.layout.DetectionPlotDisplay;
 import detectionPlotFX.plots.WaveformPlot;
 
 /**
- * Plot a click waveform. 
+ * Plot for any RawDataHolder to show a waveform.  
+ * 
  * @author Jamie Macaulay
  *
  */
@@ -32,14 +33,13 @@ public class RawWaveformPlot extends WaveformPlot<PamDataUnit>{
 			return rawDetection.getDataTransforms().getFilteredWaveData(super.getWaveformPlotParams().waveformFilterParams.clone());
 		}
 		else {
-//			System.out.println("Get normal waveform. ");
 			return rawDetection.getWaveData(); 
 		}	
 	}
 
 	@Override
 	public String getName() {
-		return "Click Waveform";
+		return "Waveform";
 	}
 	
 	@Override

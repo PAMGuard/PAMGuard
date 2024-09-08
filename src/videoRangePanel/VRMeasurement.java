@@ -1,12 +1,10 @@
 package videoRangePanel;
 
 import java.awt.Point;
-import java.awt.geom.Point2D;
 import java.io.Serializable;
 
-import videoRangePanel.vrmethods.VRMethod;
-
 import PamUtils.LatLong;
+import videoRangePanel.vrmethods.VRMethod;
 
 /**
  * Class to store information on loclaisations using an image. All angles are stored in degrees. 

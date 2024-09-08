@@ -1,12 +1,7 @@
 package generalDatabase;
 
-import generalDatabase.pamCursor.NonScrollablePamCursor;
-import generalDatabase.pamCursor.PamCursor;
-
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,6 +16,8 @@ import PamController.PamSettingsGroup;
 import PamUtils.Ascii6Bit;
 import PamUtils.PamCalendar;
 import PamguardMVC.PamDataUnit;
+import generalDatabase.pamCursor.NonScrollablePamCursor;
+import generalDatabase.pamCursor.PamCursor;
 
 /**
  * Functions for writing serialised Pamguard Settings into any database as character data
@@ -109,9 +106,9 @@ public class LogSettings extends DbSpecial {
 		 * data that will fit into the database. 
 		 */  
 		try {
-		if (pamSettings.getUnitName().equals("User TDDisplay")) {
-			System.out.println("Saving user display data");
-		}
+//		if (pamSettings.getUnitName().equals("User TDDisplay")) {
+//			System.out.println("Saving user display data");
+//		}
 		}
 		catch (NullPointerException e) {
 			e.printStackTrace();
@@ -196,7 +193,7 @@ public class LogSettings extends DbSpecial {
 
 				tableItem = tableDef.getTimeStampItem();
 //				timestamp = (Timestamp) tableItem.getTimestampValue();
-				timeMillis = sqlTypes.millisFromTimeStamp(tableItem.getValue());
+				timeMillis = SQLTypes.millisFromTimeStamp(tableItem.getValue());
 
 				nStrings = (Integer) tableDef.getGroupTotal().getValue();
 				iString = (Integer) tableDef.getGroupIndex().getValue();

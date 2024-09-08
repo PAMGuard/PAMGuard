@@ -1,9 +1,7 @@
 package whistlesAndMoans;
 
 import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamDataUnit;
 import generalDatabase.PamDetectionLogging;
-import generalDatabase.SQLTypes;
 
 public class WhistleToneLogging extends PamDetectionLogging {
 

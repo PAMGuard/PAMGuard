@@ -73,7 +73,7 @@ public class DBCommitter {
 			return false;
 		}
 		try {
-			if (pamCon.getConnection().getAutoCommit() == false) {
+			if (!pamCon.getConnection().getAutoCommit()) {
 				pamCon.getConnection().commit();
 			}
 		} catch (SQLException e) {

@@ -324,5 +324,15 @@ public class RawClipSettingsPane extends PamBorderPane implements TDSettingsPane
 	public Pane getPane() {
 		return this;
 	}
+	
+	/**
+	 * Set the default fill opacity. 
+	 * @param opacity - the default fill opacity. 
+	 */
+	public void setDefaultFillOpacity(double opacity) {
+		if (symbolOptionsPane instanceof StandardSymbolOptionsPane) {
+			((StandardSymbolOptionsPane) symbolOptionsPane).getDefaultSymbolPane().setDefaultFillOpacity(opacity);
+		}
+	}
 
 }

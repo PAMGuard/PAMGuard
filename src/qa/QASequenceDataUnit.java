@@ -1,6 +1,5 @@
 package qa;
 
-import PamguardMVC.PamDataUnit;
 import qa.generator.sequence.SoundSequence;
 
 public class QASequenceDataUnit extends QADataUnit<QASoundDataUnit, QATestDataUnit> {

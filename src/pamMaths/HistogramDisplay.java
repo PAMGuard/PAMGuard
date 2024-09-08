@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
-import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.SwingConstants;
+
 import Layout.PamAxis;
 import Layout.PamAxisPanel;
 import PamView.PamColors;
@@ -123,6 +123,7 @@ public class HistogramDisplay extends Object implements Observer {
 		histoAxisPanel.getSouthAxis().setFormat(format);
 	}
 
+	@Override
 	public void update(Observable o, Object arg) {
 		if (arg == o) {
 			// it's the histogram itself which has changed, so redraw the axis.

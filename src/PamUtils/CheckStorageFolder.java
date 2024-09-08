@@ -34,7 +34,7 @@ public class CheckStorageFolder {
 					moduleName, JOptionPane.WARNING_MESSAGE);
 			return false;
 		}
-		else if (file.exists() == false & autoCreate) {
+		else if (!file.exists() & autoCreate) {
 			int ans = JOptionPane.showOptionDialog(null, "Folder " + pathName
 					+ " does not exist. \nWould you like to create it ?",
 					moduleName,
@@ -45,7 +45,7 @@ public class CheckStorageFolder {
 			}
 			if (ans == JOptionPane.YES_OPTION) {
 				try {
-					if (file.mkdirs() == false) {
+					if (!file.mkdirs()) {
 						return checkPath(pathName, false);
 					}
 					FileFunctions.setNonIndexingBit(file);

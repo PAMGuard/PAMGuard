@@ -46,10 +46,12 @@ public class LocaliserDisplayControlAWT extends LoclaiserDisplayControl implemen
 	}
 
 
+	@Override
 	public String getUniqueName() {
 		return uniqueDisplayName;
 	}
 
+	@Override
 	public void setUniqueName(String uniqueName) {
 		this.uniqueDisplayName = uniqueName;
 	}
@@ -106,7 +108,7 @@ public class LocaliserDisplayControlAWT extends LoclaiserDisplayControl implemen
 		Group root=  new  Group();
 		Scene scene  =  new  Scene(root, Color.GRAY);
 		scene.getStylesheets().clear();
-		scene.getStylesheets().add(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getGUICSS()); 
+		scene.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getGUICSS()); 
 		
 		localiser = new LocaliserDisplayFX(this);
 		root.getChildren().add(localiser); 

@@ -198,6 +198,8 @@
 
 <mapID target="utilities.quickAnnotations.docs.quickAnnotations" url="utilities/quickAnnotations/docs/quickAnnotations.html"/>
 
+<mapID target="overview.dataexport.docs.dataexport" url="overview/dataexport/docs/dataexport.html"/>
+
 <mapID target="classifiers.roccaHelp.docs.rocca_Spectrogram" url="classifiers/roccaHelp/docs/rocca_Spectrogram.html"/>
 
 <mapID target="displays.userDisplayHelp.docs.userDisplayPanel" url="displays/userDisplayHelp/docs/userDisplayPanel.html"/>

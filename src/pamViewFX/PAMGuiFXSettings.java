@@ -3,8 +3,6 @@ package pamViewFX;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import dataPlotsFX.TDParametersFX;
-
 /**
  * Holds settings for the FX GUI.
  * @author Jamie Macaulay 
@@ -36,7 +34,7 @@ public class PAMGuiFXSettings implements Serializable, Cloneable {
 	/**
 	 * True if PG is in fullscreen on startup
 	 */
-	public boolean fullscreen = true;
+	public boolean fullscreen = false;
 	
 	
 	/* (non-Javadoc)

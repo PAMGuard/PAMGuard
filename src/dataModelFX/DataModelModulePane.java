@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import PamController.PamController;
 import PamModel.PamModuleInfo;
-import atlantafx.base.theme.PrimerDark;
 import dataModelFX.ConnectionNodeParams.PAMConnectionNodeType;
 import dataModelFX.connectionNodes.ModuleIconFactory;
 import javafx.beans.property.ObjectProperty;
@@ -13,7 +12,6 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
-import javafx.scene.control.Button;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
@@ -29,9 +27,8 @@ import pamViewFX.fxNodes.PamTilePane;
 import pamViewFX.fxNodes.PamTitledPane;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.connectionPane.structures.ConnectionGroupBody;
-import pamViewFX.fxNodes.connectionPane.structures.ConnectionStructure.ConnectionStructureType;
-import pamViewFX.fxStyles.PamStylesManagerFX;
 import pamViewFX.fxNodes.connectionPane.structures.ExtensionSocketStructure;
+import pamViewFX.fxStyles.PamStylesManagerFX;
 
 /**
  * A pane which shows a list of all the available modules. These can be dragged
@@ -75,7 +72,7 @@ public class DataModelModulePane  extends PamBorderPane {
 	private PamScrollPane createPane(){
 		moduleSelectPane=new PamScrollPane(); 
 				
-		moduleSelectPane.getStylesheets().add(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
+		moduleSelectPane.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS());
 	
 		moduleSelectPane.setPrefWidth(250);
 		moduleSelectPane.getStyleClass().add("scroll-pane-dark");		

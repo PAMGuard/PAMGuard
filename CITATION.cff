@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+title: PAMGuard
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Douglas
+    family-names: Gillespie
+    email: dg50@st-andrews.ac.uk
+    affiliation: University of St Andrews
+    orcid: 'https://orcid.org/0000-0001-9628-157X'
+  - given-names: Jamie
+    family-names: Macaulay
+    email: jdjm@st-andrews.ac.uk
+    affiliation: University of St Andrews
+    orcid: 'https://orcid.org/0000-0003-1309-4889'
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.13378951
+repository-code: 'https://github.com/PAMGuard/PAMGuard'
+url: 'https://www.pamguard.org/'
+abstract: >-
+  Software for Detection, Classification, and Localisation
+  of animal sounds using passive acoustics
+keywords:
+  - Passive Acoustics
+  - Marine Mammals
+license: GPL-3.0-or-later
+version: V2.02.13
+date-released: '2024-08-27'

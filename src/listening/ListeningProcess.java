@@ -1,11 +1,9 @@
 package listening;
 
 import PamUtils.PamCalendar;
-import PamView.PamSymbol;
 import PamView.symbol.StandardSymbolManager;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
-import autecPhones.AutecGraphics;
 
 public class ListeningProcess extends PamProcess {
 

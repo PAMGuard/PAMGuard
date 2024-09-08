@@ -20,15 +20,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import PamUtils.PamCalendar;
 import soundtrap.xml.CDETInfo;
 import soundtrap.xml.DWVInfo;
 import soundtrap.xml.SoundTrapXMLTools;
 import soundtrap.xml.TimeInformation;
 import soundtrap.xml.WAVInfo;
-import PamUtils.FileParts;
-import PamUtils.PamCalendar;
-import d3.D3XMLFile;
-import d3.SoundTrapTime;
 
 public class STXMLFile {
 
@@ -214,7 +211,7 @@ public class STXMLFile {
 	 * @return an XML file, from which additional information can then be extracted. 
 	 */
 	public static STXMLFile openXMLFile(File xmlFile, String dateTimeFormat) {
-		if (xmlFile == null || xmlFile.exists() == false) {
+		if (xmlFile == null || !xmlFile.exists()) {
 			return null;
 		}
 		/*

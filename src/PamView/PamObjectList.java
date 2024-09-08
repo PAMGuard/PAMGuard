@@ -30,7 +30,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -41,8 +40,8 @@ import javax.swing.table.AbstractTableModel;
 
 import PamController.PamController;
 import PamUtils.PamCalendar;
-import PamView.tables.SwingTableColumnWidths;
 import PamView.dialog.PamDialog;
+import PamView.tables.SwingTableColumnWidths;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObserver;
@@ -81,7 +80,7 @@ public class PamObjectList extends PamDialog implements WindowListener {
 	}
 
 	private PamObjectList(PamController pamController) {
-		super(pamController.getMainFrame(), "PAMGuard Object List", false);
+		super(PamController.getMainFrame(), "PAMGuard Object List", false);
 
 		mainPanel = new JPanel(new GridLayout(1, 0));
 		mainPanel.setOpaque(true);
@@ -173,14 +172,17 @@ public class PamObjectList extends PamDialog implements WindowListener {
 			return columnNames[column];
 		}
 
+		@Override
 		public synchronized int getRowCount() {
 			return PamController.getInstance().getDataBlocks().size();
 		}
 
+		@Override
 		public synchronized int getColumnCount() {
 			return columnNames.length;
 		}
 
+		@Override
 		public synchronized Object getValueAt(int row, int col) {
 			/*
 			 * need to find the right process by going through and seeing which
@@ -247,6 +249,7 @@ public class PamObjectList extends PamDialog implements WindowListener {
 	}
 
 	class TimerListener implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev) {
 			tableData.fireTableDataChanged();
 		}
@@ -320,30 +323,37 @@ public class PamObjectList extends PamDialog implements WindowListener {
 	/**
 	 * Implementation of WindowListener
 	 */
+	@Override
 	public void windowActivated(WindowEvent e) {
 	}
 
+	@Override
 	public void windowClosing(WindowEvent e) {
 		timer.stop();
 	}
 
+	@Override
 	public void windowOpened(WindowEvent e) {
 		timer.start();
 	}
 
+	@Override
 	public void windowIconified(WindowEvent e) {
 
 	}
 
+	@Override
 	public void windowDeiconified(WindowEvent e) {
 
 	}
 
+	@Override
 	public void windowDeactivated(WindowEvent e) {
 		// PamSettingManager.getInstance().SaveSettings();
 
 	}
 
+	@Override
 	public void windowClosed(WindowEvent e) {
 		// PamSettingManager.getInstance().SaveSettings();
 

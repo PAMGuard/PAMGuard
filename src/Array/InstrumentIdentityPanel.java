@@ -7,6 +7,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import PamView.dialog.PamGridBagContraints;
@@ -30,12 +31,12 @@ public class InstrumentIdentityPanel {
 		mainPanel.setBorder(new TitledBorder("Instrument information"));
 		mainPanel.setLayout(new GridBagLayout());
 		GridBagConstraints c = new PamGridBagContraints();
-		mainPanel.add(new JLabel("Instrument Type ", JLabel.RIGHT), c);
+		mainPanel.add(new JLabel("Instrument Type ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		mainPanel.add(instrumentType = new JTextField(20), c);
 		c.gridx = 0;
 		c.gridy++;
-		mainPanel.add(new JLabel("Instrument Id ", JLabel.RIGHT), c);
+		mainPanel.add(new JLabel("Instrument Id ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		mainPanel.add(instrumentId = new JTextField(20), c);
 		

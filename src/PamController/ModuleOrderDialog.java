@@ -96,6 +96,7 @@ ListSelectionListener{
 			localLUTTable[i] = i;
 		}
 	}
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		int r = moduleTable.getSelectedRow();
 		int dum;
@@ -122,6 +123,7 @@ ListSelectionListener{
 	/* (non-Javadoc)
 	 * @see javax.swing.event.ListSelectionListener#valueChanged(javax.swing.event.ListSelectionEvent)
 	 */
+	@Override
 	public void valueChanged(ListSelectionEvent e) {
 		
 		enableButtons();
@@ -141,6 +143,7 @@ ListSelectionListener{
 		/* (non-Javadoc)
 		 * @see javax.swing.table.TableModel#getColumnCount()
 		 */
+		@Override
 		public int getColumnCount() {
 			return columnNames.length;
 		}
@@ -148,6 +151,7 @@ ListSelectionListener{
 		/* (non-Javadoc)
 		 * @see javax.swing.table.TableModel#getRowCount()
 		 */
+		@Override
 		public int getRowCount() {
 			return pamController.getNumControlledUnits();
 		}
@@ -155,6 +159,7 @@ ListSelectionListener{
 		/* (non-Javadoc)
 		 * @see javax.swing.table.TableModel#getValueAt(int, int)
 		 */
+		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 
 			if (rowIndex >= pamController.getNumControlledUnits()) return null;

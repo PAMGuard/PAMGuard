@@ -1,6 +1,5 @@
 package hfDaqCard;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import PamUtils.BubbleSort;
@@ -19,6 +18,9 @@ public class SmruDaqJNI {
 	static public final int SMRU_VAL_SLAVE_MASTERED = 3;
 	
 	static public final int SMRU_RET_OK = 0;
+	
+	static public final int GREEN_LED = 1;
+	static public final int RED_LED = 0;
 
 	/**
 	 * Have rebuilt SAIL Daq interface in 2022, but in principle this was 
@@ -29,11 +31,6 @@ public class SmruDaqJNI {
 	private static final String SILIB = "SailDaqJNI";
 //	private static final String SILIB = "SailDaqV7";
 	
-	/**
-	 * this is the verbose level for the C code part. 
-	 */
-	private static final int verboseLevel = 0;
-
 	private static final String DEVNAME = "/dev/cypress_smru0";
 	
 	private static final int MINJNIVERSION = 5;
@@ -265,7 +262,7 @@ public class SmruDaqJNI {
 		this.smruDaqSystem = smruDaqSystem;
 		loadLibrary();
 		if (haveLibrary()) {
-			setVerbose(verboseLevel);
+			setVerbose(SmruDaqSystem.VERBOSELEVEL);
 
 			/**
 			 * List the devices, but don't do any resetting and 
@@ -295,7 +292,7 @@ public class SmruDaqJNI {
 	 * @return number of devices found. 
 	 */
 	private int listDevices() {
-		if (haveLibrary == false) {
+		if (!haveLibrary) {
 			return -1;
 		}
 		nDevices = getNumDevices();
@@ -371,7 +368,7 @@ public class SmruDaqJNI {
 	 * @return serial number. This will be zero if the reset failed. 
 	 */
 	long resetBoard(int iBoard, boolean fullReset) {
-		if (haveLibrary == false) return 0;
+		if (!haveLibrary) return 0;
 		jniCloseCard(iBoard);
 //		jniResetCard(iBoard);
 		int ok = prepareDevice(iBoard, fullReset);
@@ -399,7 +396,7 @@ public class SmruDaqJNI {
 	 * Load the jni library
 	 */
 	private void loadLibrary() {
-		if (loadLibraryTried == false) {
+		if (!loadLibraryTried) {
 			try  {
 				System.loadLibrary(SILIB);
 				int v = jniGetVersion();
@@ -492,7 +489,7 @@ public class SmruDaqJNI {
 	public int toggleLED(int board, int led) {
 		board = boardOrder[board];
 		int state = getLED(board, led);
-		System.out.println("state="+state);
+//		System.out.println("LED state="+state);
 		if (state == 0) {
 			state = 1;
 		}
@@ -772,7 +769,7 @@ public class SmruDaqJNI {
 	 * @see jniGetChannelBufferSize
 	 */
 	public int getAvailableSamples(int device, int channel) {
-		if (haveLibrary == false) {
+		if (!haveLibrary) {
 			return -1;
 		}
 		return jniGetAvailableSamples(device, channel);
@@ -786,7 +783,7 @@ public class SmruDaqJNI {
 	 * @return the size of the data buffer for each channel in samples.
 	 */
 	public int getChannelBufferSize() {
-		if (haveLibrary == false) {
+		if (!haveLibrary) {
 			return -1;
 		}
 		return jniGetChannelBufferSize();		
@@ -803,7 +800,7 @@ public class SmruDaqJNI {
 	 * cannot be set.
 	 */
 	public int setChannelBufferSize(int bufferSamples) {
-		if (haveLibrary == false) {
+		if (!haveLibrary) {
 			return -1;
 		}
 		return jniSetChannelBufferSize(bufferSamples);
@@ -821,10 +818,10 @@ public class SmruDaqJNI {
 		 */
 		int hardId = getBoardOrder(board);
 		boolean wasOpen = isboardOpen(hardId);
-		if (wasOpen == false) {
+		if (!wasOpen) {
 			smruDaqSystem.terminalPrint("Opening card to flash board " + board, 2);
 			boolean isOpen = prepareDevice(hardId, false) == 0;
-			if (isOpen == false) {
+			if (!isOpen) {
 				return false;
 			}
 		}
@@ -839,7 +836,7 @@ public class SmruDaqJNI {
 		}
 		setLED(board, 0, 0);
 		setLED(board, 0, 0);
-		if (wasOpen == false) {
+		if (!wasOpen) {
 			smruDaqSystem.terminalPrint("Closing card after flash board " + board, 2);
 			closeCard(board);
 		}

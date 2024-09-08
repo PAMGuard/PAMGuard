@@ -101,12 +101,23 @@ public class DescriptionTypePanel {
 			tMethod.setText(null);
 		}
 		else {
+			checkDescription(description);
 			tObjectives.setText(description.getObjectives());
 			tAbstract.setText(description.getAbstract());
 			tMethod.setText(description.getMethod());
 		}
 	}
 	
+	/**
+	 * Auto fill some of the description fields. 
+	 * @param description
+	 */
+	private void checkDescription(DescriptionType description) {
+		if (description.getMethod() == null || description.getMethod().length() == 0) {
+			
+		}
+	}
+
 	public boolean getParams(DescriptionType description) {
 		Window f = PamGui.findComponentWindow(mainPanel);
 		if (checkField(requireObjective, tObjectives) == false) {

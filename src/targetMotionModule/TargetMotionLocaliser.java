@@ -13,19 +13,19 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.SwingWorker;
 
+import Localiser.algorithms.timeDelayLocalisers.bearingLoc.AbstractLocaliser;
+import PamguardMVC.PamDataBlock;
+import PamguardMVC.PamDataUnit;
 import targetMotionModule.algorithms.LeastSquares;
 import targetMotionModule.algorithms.MarkovChain;
 import targetMotionModule.algorithms.Simplex2D;
 import targetMotionModule.algorithms.Simplex3D;
 import targetMotionModule.algorithms.Simplex3DTD;
 import targetMotionModule.algorithms.TargetMotionModel;
-import Localiser.algorithms.timeDelayLocalisers.bearingLoc.AbstractLocaliser;
-import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamDataUnit;
 
 public class TargetMotionLocaliser<T extends PamDataUnit> extends AbstractLocaliser {
 
-	public enum Interractive {START, SAVE, BACK, CANCEL, SETNULL, SAVE_ALL};
+	public enum Interractive {START, SAVE, BACK, CANCEL, SETNULL, SAVE_ALL}
 	//	public enum WorkStatus {IDLE, LOADING, WAITING};
 
 	private TargetMotionControl targetMotionControl;
@@ -207,7 +207,7 @@ public class TargetMotionLocaliser<T extends PamDataUnit> extends AbstractLocali
 			if (targetMotionList==null) return null;
 			
 			for(int i=0; i<targetMotionList.size(); i++){
-				if (localiseTM(targetMotionList.get(i), modelList) == false) {
+				if (!localiseTM(targetMotionList.get(i), modelList)) {
 					return null;
 				}
 			}

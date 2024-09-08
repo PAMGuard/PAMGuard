@@ -1,13 +1,14 @@
 package rawDeepLearningClassifier.logging;
 
 import PamView.symbol.PamSymbolChooser;
-import PamView.symbol.modifier.SymbolModifier;
 import annotation.CentralAnnotationsList;
 import annotation.DataAnnotationType;
 import annotation.binary.AnnotationBinaryHandler;
+import annotation.dataselect.AnnotationDataSelCreator;
 import generalDatabase.SQLLoggingAddon;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dataPlotFX.DLSymbolModifier;
+import rawDeepLearningClassifier.dataSelector.DLDataSelectCreator;
 
 /**
  * Annotation type for data from the matched click classifier. 
@@ -25,6 +26,8 @@ public class DLAnnotationType extends DataAnnotationType<DLAnnotation>  {
 		private DLControl dlControl;
 
 		private DLAnnotationSymbolChooser dlSymbolChooser;
+
+		private DLDataSelectCreator dlDataSelectorCreator;
 
 		public DLAnnotationType(DLControl mtControl) {
 			this.dlControl=mtControl;
@@ -91,6 +94,15 @@ public class DLAnnotationType extends DataAnnotationType<DLAnnotation>  {
 		
 		public DLControl getDlControl() {
 			return dlControl;
+		}
+		
+		
+		@Override
+		public AnnotationDataSelCreator getDataSelectCreator(String selectorName, boolean allowScores) {
+			if (dlDataSelectorCreator == null) {
+				dlDataSelectorCreator = new DLDataSelectCreator(dlControl, this);
+			}
+			return dlDataSelectorCreator;
 		}
 
 		

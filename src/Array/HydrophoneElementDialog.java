@@ -110,8 +110,8 @@ public class HydrophoneElementDialog extends PamDialog {
 
 	@Override
 	public boolean getParams() {
-		if (generalPanel.getParams() == false) return false;
-		if (coordinatePanel.getParams() == false) return false;
+		if (!generalPanel.getParams()) return false;
+		if (!coordinatePanel.getParams()) return false;
 		//		if (sensitivityPanel.getParams() == false) return false;
 		int hi = interpolationDialogPanel.getSelection();
 		if (hi >= 0) {
@@ -158,7 +158,7 @@ public class HydrophoneElementDialog extends PamDialog {
 			constraints.gridwidth = 1;
 			constraints.gridx = 0;
 			constraints.gridy++;
-			addComponent(this, recieverTypeLabel = new JLabel("",  JLabel.RIGHT), constraints);
+			addComponent(this, recieverTypeLabel = new JLabel("",  SwingConstants.RIGHT), constraints);
 			constraints.gridx++;
 			constraints.gridwidth = 2;
 			addComponent(this, type = new JTextField(12), constraints);
@@ -169,7 +169,7 @@ public class HydrophoneElementDialog extends PamDialog {
 			constraints.gridx = 0;
 			constraints.gridy++;
 			constraints.anchor = GridBagConstraints.EAST;
-			addComponent(this, recieverSensLabel = new JLabel("", JLabel.RIGHT), constraints);
+			addComponent(this, recieverSensLabel = new JLabel("", SwingConstants.RIGHT), constraints);
 			constraints.gridx++;
 			constraints.anchor = GridBagConstraints.WEST;
 			addComponent(this, hSens = new JTextField(5), constraints);
@@ -181,7 +181,7 @@ public class HydrophoneElementDialog extends PamDialog {
 			constraints.gridx = 0;
 			constraints.gridy++;
 			constraints.anchor = GridBagConstraints.EAST;
-			addComponent(this, new JLabel("Preamplifier gain ", JLabel.RIGHT), constraints);
+			addComponent(this, new JLabel("Preamplifier gain ", SwingConstants.RIGHT), constraints);
 			constraints.gridx++;
 			constraints.anchor = GridBagConstraints.WEST;
 			addComponent(this, preampGain = new JTextField(5), constraints);
@@ -380,7 +380,7 @@ public class HydrophoneElementDialog extends PamDialog {
 			double zCoeff = PamController.getInstance().getGlobalMediumManager().getZCoeff(); 
 			setRecieverLabelText(); 
 
-			if (newHydrophone == false) {
+			if (!newHydrophone) {
 				x.setText(formatDouble(hydrophone.getX()));
 				y.setText(formatDouble(hydrophone.getY()));
 				depth.setText(formatDouble(zCoeff*hydrophone.getZ()));
@@ -397,6 +397,8 @@ public class HydrophoneElementDialog extends PamDialog {
 				dz.setText(null);		
 			}
 		}
+		
+		
 		boolean getParams() {
 			
 			double zCoeff = PamController.getInstance().getGlobalMediumManager().getZCoeff(); 

@@ -27,18 +27,12 @@ package UserInput;
  */
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import PamUtils.PamCalendar;
@@ -60,11 +54,13 @@ public class UserInputSidePanel implements PamSidePanel{
 		sidePanel = new SidePanel();
 	}
 
+	@Override
 	public JComponent getPanel() {
 		// TODO Auto-generated method stub
 		return sidePanel;
 	}
 
+	@Override
 	public void rename(String newName) {
 		// TODO Auto-generated method stub
 
@@ -99,12 +95,14 @@ public class UserInputSidePanel implements PamSidePanel{
 
 		class TextListener implements KeyListener {
 
+			@Override
 			public void keyPressed(KeyEvent e) {
 				if(e.getKeyCode()==KeyEvent.VK_ENTER){
 					submitText();			
 				}
 			}
 
+			@Override
 			public void keyReleased(KeyEvent e) {
 				if(e.getKeyCode()==KeyEvent.VK_ENTER){
 					textInputField.setText(null);
@@ -113,6 +111,7 @@ public class UserInputSidePanel implements PamSidePanel{
 
 			}
 
+			@Override
 			public void keyTyped(KeyEvent e) {
 			}
 

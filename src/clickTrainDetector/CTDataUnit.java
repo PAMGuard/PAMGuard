@@ -1,10 +1,8 @@
 package clickTrainDetector;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import PamUtils.PamArrayUtils;
 import PamUtils.avrgwaveform.AverageWaveform;
 import PamguardMVC.AcousticDataUnit;
 import PamguardMVC.PamDataUnit;

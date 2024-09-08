@@ -1,18 +1,16 @@
 package AIS;
 
-import generalDatabase.DBControlUnit;
-import generalDatabase.SQLTypes;
-
 import java.util.ListIterator;
 
-import pamScrollSystem.ViewLoadObserver;
-import nmeaEmulator.EmulatedData;
-import nmeaEmulator.NMEAEmulator;
 import NMEA.AcquireNmeaData;
 import PamController.masterReference.MasterReferencePoint;
 import PamUtils.LatLong;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
+import generalDatabase.DBControlUnit;
+import generalDatabase.SQLTypes;
+import nmeaEmulator.EmulatedData;
+import nmeaEmulator.NMEAEmulator;
 
 public class AISDataBlock extends PamDataBlock<AISDataUnit> implements NMEAEmulator {
 	
@@ -76,7 +74,7 @@ public class AISDataBlock extends PamDataBlock<AISDataUnit> implements NMEAEmula
 	}
 	
 	private boolean wantData(AISDataUnit existingUnit, AISDataUnit newUnit) {
-		if (aisControl.aisParameters.limitRange == false) {
+		if (!aisControl.aisParameters.limitRange) {
 			return true;
 		}
 		double range = 0;
@@ -133,7 +131,7 @@ public class AISDataBlock extends PamDataBlock<AISDataUnit> implements NMEAEmula
 	@Override
 	public EmulatedData getNextData() {
 		SQLTypes sqlTypes = DBControlUnit.findConnection().getSqlTypes();
-		if (getLogging().readNextEmulation(sqlTypes) == false) {
+		if (!getLogging().readNextEmulation(sqlTypes)) {
 			return null;
 		}
 		// now all data should be in the loggers table definition.

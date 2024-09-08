@@ -6,9 +6,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
-import d3.calibration.CalibrationInfo;
+
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
+
+import d3.calibration.CalibrationInfo;
 
 /**
  * Class to hold various types of information about a sensor. 

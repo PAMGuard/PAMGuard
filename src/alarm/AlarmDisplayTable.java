@@ -6,20 +6,17 @@ import java.awt.Component;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.table.AbstractTableModel;
 
-import userDisplay.UserDisplayComponent;
-import userDisplay.UserDisplayComponentAdapter;
 import PamUtils.PamCalendar;
 import PamView.PamTable;
 import PamView.tables.SwingTableColumnWidths;
-import PamView.tables.TableColumnWidthData;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
-import PamguardMVC.PamObserver;
 import PamguardMVC.PamObserverAdapter;
+import userDisplay.UserDisplayComponentAdapter;
 
 public class AlarmDisplayTable extends UserDisplayComponentAdapter {
 
@@ -44,7 +41,7 @@ public class AlarmDisplayTable extends UserDisplayComponentAdapter {
 		
 		JPanel tablePanel = new JPanel(new BorderLayout());
 		JScrollPane scrollPane = new JScrollPane(alarmTable, 
-				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		tablePanel.add(BorderLayout.CENTER, scrollPane);
 		alarmPanel.add(BorderLayout.CENTER, tablePanel);
 		

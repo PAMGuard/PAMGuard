@@ -108,7 +108,7 @@ public class DBControlSettings extends DBControl {
 		}
 		if (showDatabaseDialog == 2) {
 			// open the database dialog.
-			if (selectDatabase(null, null) == false) {
+			if (!selectDatabase(null, null)) {
 				return null;
 			}
 		}

@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
@@ -16,9 +15,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
-import dataMap.OfflineDataMap;
-import PamController.OfflineDataStore;
 import PamguardMVC.PamDataBlock;
+import dataMap.OfflineDataMap;
 
 public class DataMapSerialiser {
 
@@ -153,7 +151,7 @@ public class DataMapSerialiser {
 		while (it.hasPrevious()) {
 			aPoint = it.previous();
 			file = aPoint.getBinaryFile(binaryStore);
-			if (file == null || file.exists() == false) {
+			if (file == null || !file.exists()) {
 				it.remove();
 				nRemovals ++;
 			}

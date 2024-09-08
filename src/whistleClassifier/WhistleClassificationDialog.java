@@ -20,15 +20,14 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
-import pamMaths.MatrixDialog;
-
-import whistlesAndMoans.AbstractWhistleDataUnit;
 import Jama.Matrix;
 import PamUtils.SelectFolder;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.SourcePanel;
 import PamguardMVC.PamDataBlock;
+import pamMaths.MatrixDialog;
+import whistlesAndMoans.AbstractWhistleDataUnit;
 
 public class WhistleClassificationDialog extends PamDialog {
 
@@ -110,6 +109,7 @@ public class WhistleClassificationDialog extends PamDialog {
 
 	class RunSelection implements ActionListener {
 
+		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			enableAndShow();
 		}
@@ -216,13 +216,13 @@ public class WhistleClassificationDialog extends PamDialog {
 				return false;
 			}
 			whistleClassificationParameters.wavFolderNameAsSpecies = useFolderNames.isSelected();
-			if (whistleClassificationParameters.wavFolderNameAsSpecies == false) {
+			if (!whistleClassificationParameters.wavFolderNameAsSpecies) {
 				if (whistleClassificationParameters.trainingSpecies == null ||
 						whistleClassificationParameters.trainingDataFolder == null) {
 					return false;
 				}
 			}
-			if (checkStorageFolder(whistleClassificationParameters.trainingDataFolder) == false) {
+			if (!checkStorageFolder(whistleClassificationParameters.trainingDataFolder)) {
 				return false;
 			}
 			return true;
@@ -245,7 +245,7 @@ public class WhistleClassificationDialog extends PamDialog {
 			String dlgTitle = "Whistle Classifier Training Data Storage";
 			if (file.exists() && file.isDirectory()) {
 				return true;
-			} else if (file.exists() == false) {
+			} else if (!file.exists()) {
 				int ans = JOptionPane.showOptionDialog(null, "Folder " + dirName
 						+ " does not exist. \nWould you like to create it ?",
 						dlgTitle,
@@ -256,7 +256,7 @@ public class WhistleClassificationDialog extends PamDialog {
 				}
 				if (ans == JOptionPane.YES_OPTION) {
 					try {
-						if (file.mkdir() == false) {
+						if (!file.mkdir()) {
 							return checkStorageFolder(dirName);
 						}
 					} catch (SecurityException ex) {
@@ -306,7 +306,7 @@ public class WhistleClassificationDialog extends PamDialog {
 		}
 
 		protected boolean getParams() {
-			if (runOptsPanel.getParams() == false) {
+			if (!runOptsPanel.getParams()) {
 				return false;
 			}
 			return true;

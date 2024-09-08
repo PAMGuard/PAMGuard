@@ -1,15 +1,10 @@
 package loggerForms;
 
-import generalDatabase.DBControlUnit;
-import generalDatabase.EmptyTableDefinition;
-import generalDatabase.PamConnection;
-import generalDatabase.SQLTypes;
-
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -26,21 +21,7 @@ import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.Timer;
 
-import Array.streamerOrigin.GPSOriginMethod;
-import Array.streamerOrigin.GPSOriginSystem;
-import Array.streamerOrigin.HydrophoneOriginMethod;
-import Array.streamerOrigin.HydrophoneOriginMethods;
-import Array.streamerOrigin.OriginIterator;
-import Array.streamerOrigin.StaticOriginSystem;
-import loggerForms.PropertyTypes;
-import loggerForms.controlDescriptions.ControlDescription;
-import loggerForms.controlDescriptions.ControlTypes;
-import loggerForms.controlDescriptions.InputControlDescription;
-import loggerForms.controls.CounterControl;
-import loggerForms.controls.LoggerControl;
-import loggerForms.controls.NMEAControl;
 import GPS.GPSDataBlock;
-import GPS.GpsData;
 import GPS.GpsDataUnit;
 import NMEA.NMEADataBlock;
 import NMEA.NMEADataUnit;
@@ -50,13 +31,23 @@ import PamView.PamColors;
 import PamView.dialog.PamButton;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamLabel;
+import PamView.dialog.warn.WarnOnce;
 import PamView.panel.PamPanel;
 import PamView.panel.VerticalLayout;
-import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamObserver;
 import PamguardMVC.PamObserverAdapter;
+import generalDatabase.DBControlUnit;
+import generalDatabase.EmptyTableDefinition;
+import generalDatabase.PamConnection;
+import generalDatabase.SQLTypes;
+import loggerForms.controlDescriptions.ControlDescription;
+import loggerForms.controlDescriptions.ControlTypes;
+import loggerForms.controlDescriptions.InputControlDescription;
+import loggerForms.controls.CounterControl;
+import loggerForms.controls.LoggerControl;
+import loggerForms.controls.NMEAControl;
 
 /**
  * A LoggerForm is the central component of all form types, inclucing normal forms
@@ -136,6 +127,7 @@ public class LoggerForm{
 	public static final int PreviewDataForm = 2;
 	private int NewOrEdit;
 	private LoggerFormPanel lastRow;
+	private FormsDataUnit restoredDataUnit;
 
 	////	/**
 	////	 * used to hold reference to dataUnit being edited in "edit" mode
@@ -258,7 +250,7 @@ public class LoggerForm{
 			String stringId = NMEADataBlock.getSubString(nmeaString, 0);
 			stringId = stringId.substring(1);
 
-			if (stringId.equalsIgnoreCase(nmeaSentence) == false) {
+			if (!stringId.equalsIgnoreCase(nmeaSentence)) {
 				return;
 			}
 
@@ -562,7 +554,7 @@ public class LoggerForm{
 //		boolean isSubForm = (formDescription.findProperty(PropertyTypes.SUBFORM) != null);
 		boolean isPopup = (formDescription.findProperty(PropertyTypes.POPUP) != null);
 		boolean isNormal;
-		if (isSubTabs==false && isPopup==false){
+		if (!isSubTabs && !isPopup){
 			isNormal=true;
 		}else{
 			isNormal=false;
@@ -605,21 +597,35 @@ public class LoggerForm{
 	 * Enable / disable buttons
 	 * <p> for now this is basically just disabling buttons if
 	 * we're in viewer mode. A More sophisticated function 
-	 * might consider enabling  / diabling depending on whether 
+	 * might consider enabling  / disabling depending on whether 
 	 * or not a form can be saved. 
 	 */
 	public void enableControls() {
 		boolean isViewer = PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW;
-		if (saveButton != null) saveButton.setEnabled(!isViewer);
-		if (clearButton != null) clearButton.setEnabled(!isViewer);
-		if (cancelButton != null) cancelButton.setEnabled(!isViewer);
+		boolean viewerEds = false;
+		if (formDescription != null) {
+			FormsControl formsControl = formDescription.getFormsControl();
+			viewerEds = formsControl.getFormsParameters().allowViewerChanges;
+		}
+		if (saveButton != null) {
+			saveButton.setEnabled(!isViewer || viewerEds);
+			if (isViewer) {
+				saveButton.setText(restoredDataUnit == null ? "Save" : "Update...");
+			}
+		}
+		if (clearButton != null) { 
+			clearButton.setEnabled(!isViewer);
+		}
+		if (cancelButton != null) {
+			cancelButton.setEnabled(!isViewer);
+		}
 	}
 
 	class SaveButtonListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if (e.getActionCommand().equals("Save")) {
+//			if (e.getActionCommand().equals("Save")) {
 				String er = getFormErrors();
 
 				getFormWarnings();
@@ -628,7 +634,7 @@ public class LoggerForm{
 				if (er==null){
 					save();
 				}
-			}
+//			}
 		}
 	}
 
@@ -636,17 +642,16 @@ public class LoggerForm{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if (e.getActionCommand().equals("Save")) {
+//			if (e.getActionCommand().equals("Save")) {
 				String er = getFormErrors();
 
 				getFormWarnings();
-
-
+				
 				if (er==null){
 					save();
 					formDescription.removeSubtabform(loggerForm);
 				}
-			}
+//			}
 		}
 	}
 
@@ -737,9 +742,16 @@ public class LoggerForm{
 	 * @param formsDataUnit
 	 */
 	void restoreData(FormsDataUnit formsDataUnit){
-		//		this.formsDataUnit = formsDataUnit;
-		Object[] formData = formsDataUnit.getFormData();
-		transferDataArrayToForm(formData);
+		restoredDataUnit = formsDataUnit;
+		if (formsDataUnit != null) {
+			//		this.formsDataUnit = formsDataUnit;
+			Object[] formData = formsDataUnit.getFormData();
+			transferDataArrayToForm(formData);
+		}
+		else {
+			clear();
+		}
+		enableControls();
 	}
 
 	/**
@@ -810,7 +822,7 @@ public class LoggerForm{
 //		boolean isSubForm = (formDescription.findProperty(PropertyTypes.SUBFORM) != null);
 		boolean isPopup = (formDescription.findProperty(PropertyTypes.POPUP) != null);
 		boolean isNormal;
-		if (isSubTabs==false && isPopup==false){
+		if (!isSubTabs && !isPopup){
 			isNormal=true;
 		}else{
 			isNormal=false;
@@ -840,14 +852,40 @@ public class LoggerForm{
 	 * Extract and save teh data inot a new PAmDAtaUnit. 
 	 */
 	private void save() {
-		//create form data object v
+		//create form data object 
 		Object[] formData = extractFormData();
+		
+		boolean isViewer = PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW;
+		boolean isNew = true;
+		if (isViewer && restoredDataUnit != null) {
+			isNew = false;
+		}
 
-		if (NewOrEdit==NewDataForm){
+		if (isNew){
 			FormsDataUnit formDataUnit = new FormsDataUnit(loggerForm,PamCalendar.getTimeInMillis(), formDescription, formData);
-			//		dU.setParentDataBlock(formDescription.getFormsDataBlock());
-//			System.out.println(formDescription.getXMLData(formDataUnit));
 			formDescription.getFormsDataBlock().addPamData(formDataUnit);
+			// in viewer mode, will need to do something to get this to save. 
+			if (isViewer) {
+				formDescription.getFormsDataBlock().getLogging().logData(DBControlUnit.findConnection(), formDataUnit);
+				formDescription.getFormsDataBlock().sortData();
+			}
+		}
+		else {
+			// update the data form. Ask first. 
+			Frame win = formDescription.getFormsControl().getGuiFrame();
+			String msg = "Do you want to update this form with new data ?";
+			int ans = WarnOnce.showWarning(win, "Logger forms: " + formDescription.getFormName(), msg, WarnOnce.OK_CANCEL_OPTION);
+			if (ans == WarnOnce.OK_OPTION) {
+				if (restoredDataUnit == null) {
+					WarnOnce.showWarning(win, "Logger forms: " + formDescription.getFormName(), "No data to update", WarnOnce.WARNING_MESSAGE);
+				}
+				else {
+					restoredDataUnit.setFormsData(loggerForm, formData);
+					// should update database on next SaveData, but not before. 
+					formDescription.getFormsDataBlock().updatePamData(restoredDataUnit, PamCalendar.getTimeInMillis());
+					formDescription.getFormsDataBlock().sortData();
+				}
+			}
 		}
 		//		else if(NewOrEdit==EditDataForm && formsDataUnit != null){
 		//			formsDataUnit.setFormsData(formData);
@@ -879,7 +917,7 @@ public class LoggerForm{
 		String req = "";
 		String name = loggerControlComponent.getControlDescription().getTitle()+": ";
 
-		if (loggerControlComponent.getControlDescription().getRequired()==true){
+		if (loggerControlComponent.getControlDescription().getRequired()){
 			req = ": Required";
 		}
 
@@ -913,6 +951,9 @@ public class LoggerForm{
 	 */
 	public JButton getSaveButton() {
 		return saveButton;
+	}
+	public void optionsChange() {
+		enableControls();
 	}
 	
 //	public GpsData getOriginLatLong(FormsDataUnit formsDataUnit) {

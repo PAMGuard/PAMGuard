@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.border.TitledBorder;
+import javax.swing.SwingConstants;
 
 import PamView.dialog.PamGridBagContraints;
 import mcc.mccjna.MCCBoardInfo;
@@ -36,7 +36,7 @@ public class MccPanel {
 		GridBagConstraints c = new PamGridBagContraints();
 		c.gridwidth = 1;
 		c.fill = GridBagConstraints.HORIZONTAL;
-		mccPanel.add(new JLabel("Board ", JLabel.RIGHT), c);
+		mccPanel.add(new JLabel("Board ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		c.gridwidth = 2;
 		mccPanel.add(boardList = new JComboBox<>(), c);
@@ -45,7 +45,7 @@ public class MccPanel {
 		c.gridx = 0;
 		c.gridy++;
 		c.gridwidth = 1;
-		mccPanel.add(new JLabel("Range ", JLabel.RIGHT), c);
+		mccPanel.add(new JLabel("Range ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		c.gridwidth = 2;
 		mccPanel.add(boardRange = new JComboBox<>(), c);

@@ -3,7 +3,6 @@ package PamguardMVC;
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamController.PamControllerInterface;
-import PamModel.PamModel;
 
 /**
  * Similar to PAMProcess, but always subscribes itself to upstream 

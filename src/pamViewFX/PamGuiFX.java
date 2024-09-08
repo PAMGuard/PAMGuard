@@ -5,9 +5,23 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
+import org.controlsfx.control.ToggleSwitch;
+
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamView.PamViewInterface;
+import dataModelFX.DataModelPaneFX;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.geometry.Side;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamButton;
@@ -18,21 +32,7 @@ import pamViewFX.fxNodes.hidingPane.HidingPane;
 import pamViewFX.pamTask.PamLoadingPane;
 import pamViewFX.pamTask.PamTaskUpdate;
 import userDisplayFX.UserDisplayNodeFX;
-import javafx.application.Platform;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.geometry.Side;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.stage.Stage;
-import dataModelFX.DataModelPaneFX;
 
-import org.controlsfx.control.ToggleSwitch;
 
 
 /**
@@ -125,7 +125,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 		this.pamGuiManagerFX=pamGuiManagerFX; 
         this.mainTabPane = mainTabPane;
 		
-        Pane layout=createMainPane(mainTabPane, stage); 
+        Node layout=createMainPane(mainTabPane, stage); 
 
 		//add main pane to PamGui
 		this.getChildren().add(layout);
@@ -140,7 +140,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 		//create the main tab pane. 
         this.mainTabPane = new PamTabPane();
        		
-        Pane layout=createMainPane(mainTabPane, stage); 
+        Node layout=createMainPane(mainTabPane, stage); 
 	   
 	    //add main pane to PamGui
 	    this.getChildren().add(layout);
@@ -154,7 +154,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 	 * @param stage - the stage holding this GUI.
 	 * @return a pane which sits in the stage. 
 	 */
-	private Pane createMainPane(PamTabPane mainTabPane, Stage stage){
+	private Node createMainPane(PamTabPane mainTabPane, Stage stage){
 
 		//create the pane which holds tab pane
 		final PamBorderPane layout = new PamBorderPane();
@@ -166,6 +166,8 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 		sidePaneContent.setPadding(new Insets(25,5,5,5)); //give quite  abit of spacing at the top so that there is room for close button
 		sidePaneContent.setMinWidth(0);
 		hidingSidePane=new HidingPane(Side.RIGHT, sidePaneContent, this, false);
+		hidingSidePane.setShowButtonOpacity(1.0);
+
 		hidingSidePane.showHidePane(false);
 
 		//create the button which shows the hiding panel. Although we get this button from the hiding pane, where to place
@@ -174,7 +176,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 //		showButtonRight.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.CHEVRON_LEFT, PamGuiManagerFX.iconColor, PamGuiManagerFX.iconSize));
 		showButtonRight.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-left", PamGuiManagerFX.iconColor, PamGuiManagerFX.iconSize));
 		//showLeftButton.setText(PamFontAwesome.ICON_CHEVRON_LEFT);
-		showButtonRight.getStyleClass().add("close-button-left");
+		showButtonRight.getStyleClass().add("close-button-left-trans");
 		showButtonRight.setStyle("-fx-background-radius: 0 0 0 0;");
 
 		//alter animations to remove/add showButton to tab pane. 
@@ -199,8 +201,8 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 		});
 
 		PamButton closeButtonLeft=hidingSidePane.getHideButton();
+		closeButtonLeft.getStyleClass().add("close-button-right-trans");
 //		closeButtonLeft.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.CHEVRON_RIGHT, Color.DARKGRAY.darker(), PamGuiManagerFX.iconSize));
-		closeButtonLeft.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-right", Color.DARKGRAY.darker(), PamGuiManagerFX.iconSize));
 		closeButtonLeft.prefHeightProperty().bind(mainTabPane.getHeaderHeightProperty());
 		
 		//add hiding pane to main pane. 
@@ -212,12 +214,12 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 		hidingPaneLeft=new HidingPane(Side.LEFT, settingsPane, this, false);
 		hidingPaneLeft.showHidePane(false);
 		
-		hidingPaneLeft.getStylesheets().add(pamGuiManagerFX.getPamSettingsCSS());
+		hidingPaneLeft.getStylesheets().addAll(pamGuiManagerFX.getPamSettingsCSS());
 
 		PamButton showButtonLeft=hidingPaneLeft.getShowButton();
 //		showButtonLeft.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.BARS, Color.LIGHTGRAY, PamGuiManagerFX.iconSize));
 		showButtonLeft.setGraphic(PamGlyphDude.createPamIcon("mdi2m-menu", Color.LIGHTGRAY, PamGuiManagerFX.iconSize));
-		showButtonLeft.getStyleClass().add("close-button-right");
+		showButtonLeft.getStyleClass().add("close-button-right-trans");
 		showButtonLeft.setStyle(" -fx-background-radius: 0 0 0 0;");
 		
 		PamButton closeRightButton=hidingPaneLeft.getHideButton();
@@ -242,23 +244,23 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 
 		mainTabPane.setTabEndRegion(showButtonRight);
 		mainTabPane.setTabStartRegion(showButtonLeft);
+//		mainTabPane.getStyleClass().add(Styles.TABS_FLOATING);
 
 		mainTabPane.getAddTabButton().setOnAction((value)->{
-		    addPamTab(new TabInfo("Display " + this.getNumTabs()+1), null ,true); 
+		    addPamTab(new TabInfo("Display " + (this.getNumTabs()+1)), null ,true); 
 		    mainTabPane.layout();
 		});
 		
 		//now have a holder - add the loading pane. 
 		/**create left hiding pane**/
 		loadPane=new PamLoadingPane(this.pamGuiManagerFX);
-		loadPane.setPrefWidth(250);
-		hidingLoadPane=new HidingPane(Side.LEFT, loadPane, this, false);
+		hidingLoadPane=new HidingPane(Side.TOP, loadPane, this, false);
+		hidingLoadPane.setPrefHeight(110);
 		hidingLoadPane.removeHideButton();
 		hidingLoadPane.showHidePane(false);
 		
 		PamBorderPane layoutHolder=new PamBorderPane(layout);
-		layoutHolder.setLeft(hidingLoadPane);
-		
+		layoutHolder.setTop(hidingLoadPane);
 
 	    return  layoutHolder; 
 	    
@@ -306,8 +308,23 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
         	}
         }
         
-        newTab.setDetachable(detachable);
+        newTab.setOnClosed((action)->{
+        	//when a tab is closer. 
+        	for (int i=0; i<newTab.getInternalPanes().size(); i++) {
+        		System.out.println("REMOVE TAB: " + newTab.getInternalPanes().size());
+
+	        	newTab.getInternalPanes().get(i).getUserDisplayNode().closeNode();
+	        	if (newTab.getInternalPanes().get(i).getUserDisplayNode().getUserDisplayControl()!=null) {
+	        		System.out.println("REMOVE CONTROLLED DISPLAY UNIT: " + newTab.getInternalPanes().get(i).getUserDisplayNode().getUserDisplayControl());
+	        		//the display is a standalone display and so remove the tab means the controlled unit should be removed from the data model 
+	        		PamController.getInstance().removeControlledUnt(newTab.getInternalPanes().get(i).getUserDisplayNode().getUserDisplayControl());
+	        		PamGuiManagerFX.getInstance().getDataModelFX().dataModeltoPamModel();
+	        	}
+        	}
+        });
         
+        newTab.setDetachable(detachable);
+   
         //add tab
         mainTabPane.getTabs().add(newTab);
         
@@ -538,7 +555,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 			centerHBox=new PamHBox();
 			centerHBox.setSpacing(10);
 			//need to set this style to prevent the pane form being transparent. 
-			centerHBox.getStyleClass().add("pane-opaque");
+			//centerHBox.getStyleClass().add("pane-opaque");
 			centerHBox.setPrefHeight(prefHeight);
 			
 			this.setCenter(centerHBox);
@@ -546,6 +563,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 			this.setRight(rightHBox);
 			
 			this.setPrefHeight(prefHeight);
+			this.getStyleClass().add("pane-opaque");
 
 
 			//this.setPadding(new Insets(0,0,0,0));

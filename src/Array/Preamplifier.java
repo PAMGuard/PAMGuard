@@ -73,7 +73,7 @@ public class Preamplifier implements Serializable, Cloneable, ManagedParameters 
 		  return (Preamplifier) super.clone();
 		}
 		catch (CloneNotSupportedException Ex) {
-			Ex.printStackTrace();;
+			Ex.printStackTrace();
 			return null;
 		}
 	}

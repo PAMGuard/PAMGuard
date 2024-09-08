@@ -1,12 +1,13 @@
 package pamViewFX;
 
+import PamController.SettingsPane;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
-import PamController.SettingsPane;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamButton;
@@ -56,15 +57,15 @@ public class TabSelectionPane extends SettingsPane<PamGuiTabFX> {
 		holderBox.setSpacing(5); 
 		tabChoice=new ComboBox<String>(); 
 		tabChoice.setMinWidth(100);
-		PamHBox.setHgrow(tabChoice, Priority.ALWAYS); //make sure choice nox is big enough
-		tabChoice.setEditable(true);
+		HBox.setHgrow(tabChoice, Priority.ALWAYS); //make sure choice nox is big enough
+		tabChoice.setEditable(false);
 
 		//listener for adding tabs
 		addButton=new PamButton(); 
 //		addButton.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.PLUS, Color.WHITE, PamGuiManagerFX.iconSize)); 
 		addButton.setGraphic(PamGlyphDude.createPamIcon("mdi2p-plus", Color.WHITE, PamGuiManagerFX.iconSize)); 
 		addButton.setOnAction((action)->{
-			pamGuiFX.addPamTab(new TabInfo("New Display " +(pamGuiFX.getTabs().size()+1)), null, true); 
+			pamGuiFX.addPamTab(new TabInfo("Display " +(pamGuiFX.getTabs().size()+1)), null, true); 
 			populateChoiceBox();
 			//select the tab which has just been added. 
 			tabChoice.getSelectionModel().selectLast();

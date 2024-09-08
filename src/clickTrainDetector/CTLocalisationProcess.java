@@ -1,18 +1,15 @@
 package clickTrainDetector;
 
 import PamDetection.LocContents;
-import PamUtils.PamCalendar;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamInstantProcess;
 import PamguardMVC.PamObservable;
-import PamguardMVC.dataSelector.DataSelector;
 import PamguardMVC.debug.Debug;
 import annotation.localise.targetmotion.TMAnnotation;
 import annotation.localise.targetmotion.TMAnnotationOptions;
 import annotation.localise.targetmotion.TMAnnotationType;
 import clickTrainDetector.localisation.CTLocalisation;
 import clickTrainDetector.localisation.CTMAnntoationType;
-import generalDatabase.SQLLogging;
 
 /**
  * Process which, if conditions are met, attempts to localise a click train. 

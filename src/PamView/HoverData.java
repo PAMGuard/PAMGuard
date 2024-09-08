@@ -31,7 +31,7 @@ public class HoverData {
 	}
 
 	public HoverData(Coordinate3d c, PamDataUnit pamDataUnit, int iSide, int subPlotNumber) {
-		this.setCoordinate3D(c);;
+		this.setCoordinate3D(c);
 		this.pamDataUnit = pamDataUnit;
 		this.iSide = iSide;
 		this.subPlotNumber = subPlotNumber;

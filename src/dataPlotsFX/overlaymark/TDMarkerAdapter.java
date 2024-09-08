@@ -2,9 +2,15 @@ package dataPlotsFX.overlaymark;
 
 import java.util.List;
 
+import javax.swing.JPopupMenu;
+
+import PamView.GeneralProjector.ParameterType;
+import PamView.paneloverlay.overlaymark.MarkDataSelector;
 import PamView.paneloverlay.overlaymark.MarkRelationships;
 import PamView.paneloverlay.overlaymark.OverlayMark;
+import PamView.paneloverlay.overlaymark.OverlayMarkObserver;
 import PamView.paneloverlay.overlaymark.OverlayMarkProviders;
+import PamView.paneloverlay.overlaymark.OverlayMarker;
 import dataPlotsFX.layout.TDGraphFX;
 import dataPlotsFX.layout.TDGraphFX.TDPlotPane;
 import detectiongrouplocaliser.DetectionGroupSummary;
@@ -30,7 +36,7 @@ public class TDMarkerAdapter extends TDOverlayAdapter {
 	/**
 	 * The overlay marker with hooks into other modules which subscribe to the display.
 	 */
-	private StandardOverlayMarker pamMarker;
+	private TDMarkerFX pamMarker;
 
 	public TDMarkerAdapter(TDGraphFX tdGraphFX){
 		
@@ -51,7 +57,13 @@ public class TDMarkerAdapter extends TDOverlayAdapter {
 			MarkRelationships.getInstance().subscribeObservers(pamMarker);
 		}
 		pamMarker.setProjector(tdGraphFX.getGraphProjector());
+		
+		pamMarker.addDetectionGroupListener((detectionGroup)->{
+			tdGraphFX.getTDDisplay().getTDControl().newSelectedDetectionGroup(detectionGroup, tdGraphFX); 
+		});
 	}
+	
+
 	
 	/**
 	 * Get the selected detections
@@ -59,8 +71,6 @@ public class TDMarkerAdapter extends TDOverlayAdapter {
 	 */
 	public DetectionGroupSummary getSelectedDetectionGroup(){
 		//get the currently selected data units. 
-		
-		//System.out.println("Get selected detection group: " + pamMarker.getCurrentDetectionGroup());
 		return pamMarker.getCurrentDetectionGroup(); 
 	}
 	

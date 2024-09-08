@@ -65,7 +65,7 @@ public enum Collection {
 		 * Otherwise, may need to do a longer search to see if the user has passed 
 		 * the singular document name. 
 		 */
-		if (name.endsWith("s") == false) {
+		if (!name.endsWith("s")) {
 			c = Collection.valueOf(name+"s");
 			if (c != null) {
 				return c;
@@ -89,7 +89,7 @@ public enum Collection {
 			return Calibrations;
 		case "nilus.Ensemble":
 			return Ensembles;
-		case "nilus.Localization":
+		case "nilus.Localize":
 			return Localizations;
 		case "nilus.SpeciesAbbreviation":
 			return SpeciesAbbreviations;

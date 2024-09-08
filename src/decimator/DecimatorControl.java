@@ -28,29 +28,28 @@ import java.io.Serializable;
 
 import javax.swing.JMenuItem;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import dataGram.DatagramManager;
-import dataMap.OfflineDataMapPoint;
-import dataMap.filemaps.OfflineFileServer;
-import pamScrollSystem.ViewLoadObserver;
 import Acquisition.filedate.FileDate;
 import Acquisition.filedate.StandardFileDate;
 import Acquisition.offlineFuncs.OfflineWavFileServer;
 import PamController.OfflineFileDataStore;
 import PamController.PamControlledUnit;
+import PamController.PamControlledUnitGUI;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamControllerInterface;
+import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
-import PamController.fileprocessing.StoreStatus;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamProcess;
 import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
+import dataGram.DatagramManager;
+import dataMap.OfflineDataMapPoint;
+import dataMap.filemaps.OfflineFileServer;
+import decimator.layoutFX.DecimatorUIFX;
+import pamScrollSystem.ViewLoadObserver;
 
 /**
  * @author Doug Gillespie
@@ -70,6 +69,11 @@ public class DecimatorControl extends PamControlledUnit implements PamSettings, 
 	private OfflineFileServer offlineFileServer;
 	
 	private FileDate fileDate;
+
+	/**
+	 * JavaFX GUI components for the decimator.
+	 */
+	private DecimatorUIFX decimatorGUIFX;
 	
 	public DecimatorControl(String name) {
 		
@@ -116,6 +120,7 @@ public class DecimatorControl extends PamControlledUnit implements PamSettings, 
 			this.parentFrame = parentFrame;
 		}
 		
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			DecimatorParams newParams = DecimatorParamsDialog.showDialog(parentFrame, DecimatorControl.this, decimatorParams);
 			if (newParams != null) {
@@ -143,6 +148,7 @@ public class DecimatorControl extends PamControlledUnit implements PamSettings, 
 	/* (non-Javadoc)
 	 * @see PamController.PamSettings#GetSettingsReference()
 	 */
+	@Override
 	public Serializable getSettingsReference() {
 		return decimatorParams;
 	}
@@ -151,6 +157,7 @@ public class DecimatorControl extends PamControlledUnit implements PamSettings, 
 	/* (non-Javadoc)
 	 * @see PamController.PamSettings#GetSettingsVersion()
 	 */
+	@Override
 	public long getSettingsVersion() {
 		return DecimatorParams.serialVersionUID;
 	}
@@ -158,6 +165,7 @@ public class DecimatorControl extends PamControlledUnit implements PamSettings, 
 	/* (non-Javadoc)
 	 * @see PamController.PamSettings#RestoreSettings(PamController.PamControlledUnitSettings)
 	 */
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		decimatorParams = ((DecimatorParams) pamControlledUnitSettings.getSettings()).clone();
 				
@@ -270,6 +278,32 @@ public class DecimatorControl extends PamControlledUnit implements PamSettings, 
 		double fsmall = Math.min(sourceFS, newSampleRate);
 		double m = fbig % fsmall;
 		return m == 0;
+	}
+	
+	
+	@Override
+	public PamControlledUnitGUI getGUI(int flag) {
+		if (flag==PamGUIManager.FX) {
+			if (decimatorGUIFX ==null) {
+				decimatorGUIFX= new DecimatorUIFX(this);
+			}
+			return decimatorGUIFX;
+		}
+		//TODO swing
+		return null;
+	}
+
+	public void setDecimatorParams(DecimatorParams newParams) {
+		this.decimatorParams=newParams;
+		
+	}
+
+	/**
+	 * Get the decimator process. 
+	 * @return the decimator process. 
+	 */
+	public DecimatorProcessW getDecimatorProcess() {
+		return this.decimatorProcess;
 	}
 
 	

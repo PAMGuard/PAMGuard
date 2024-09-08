@@ -60,7 +60,8 @@ import nilus.Deployment.Data;
 import nilus.Deployment.Data.Tracks;
 import nilus.Deployment.Data.Tracks.Track;
 import nilus.Deployment.Data.Tracks.Track.Point;
-import nilus.Deployment.Data.Tracks.Track.Point.BearingDegN;
+import nilus.Deployment.Data.Tracks.Track.Point.CourseOverGroundDegN;
+import nilus.Deployment.Data.Tracks.Track.Point.HeadingDegN;
 import nilus.Deployment.Instrument;
 import nilus.Deployment.SamplingDetails;
 import nilus.Deployment.Sensors;
@@ -86,6 +87,7 @@ import tethys.dbxml.TethysException;
 import tethys.deployment.swing.DeploymentWizard;
 import tethys.deployment.swing.EffortProblemDialog;
 import tethys.deployment.swing.RecordingGapDialog;
+import tethys.localization.TethysLatLong;
 import tethys.niluswraps.PDeployment;
 import tethys.output.TethysExportParams;
 import tethys.pamdata.AutoTethysProvider;
@@ -492,7 +494,7 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 		PDeployment exDeploymnet = onePeriod.getMatchedTethysDeployment();
 		try {
 			if (exDeploymnet != null) {
-				deployment.setId(exDeploymnet.deployment.getId());
+				deployment.setId(exDeploymnet.nilusObject.getId());
 				dbxmlConnect.updateDocument(deployment);
 			}
 			else {
@@ -522,7 +524,7 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 			String id = String.format("%s_%d", exportParams.getDatasetName(), i);
 			if (exDeploymnet != null) {
 				deployment = createDeploymentDocument(freeId, recordPeriod, id);
-				deployment.setId(exDeploymnet.deployment.getId());
+				deployment.setId(exDeploymnet.nilusObject.getId());
 			}
 			if (deployment == null) {
 				deployment = createDeploymentDocument(freeId++, recordPeriod, id);
@@ -646,7 +648,7 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 		}
 		ArrayList<PInstrument> instruments = new ArrayList<>();
 		for (PDeployment aDepl : projectDeployments) {
-			Instrument intr = aDepl.deployment.getInstrument();
+			Instrument intr = aDepl.nilusObject.getInstrument();
 			if (intr == null) {
 				continue;
 			}
@@ -764,7 +766,7 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 		int firstFree = 0;
 		if (projectDeployments != null) {
 			for (PDeployment dep : projectDeployments) {
-				firstFree = Math.max(firstFree, dep.deployment.getDeploymentId()+1);
+				firstFree = Math.max(firstFree, dep.nilusObject.getDeploymentId()+1);
 			}
 		}
 		return firstFree;
@@ -890,6 +892,7 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 			tracks = new Tracks();
 			deployment.getData().setTracks(tracks);
 		}
+		tracks.setSpeedUnit("kn");
 		List<Track> trackList = tracks.getTrack(); // lists are usually there. 
 		
 		Track aTrack = new Track();
@@ -907,15 +910,34 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 			GpsData gpsData = gpsDataUnit.getGpsData();
 			Point gpsPoint = new Point();
 			gpsPoint.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(gpsDataUnit.getTimeMilliseconds()));
-			gpsPoint.setLatitude(gpsData.getLatitude());
-			gpsPoint.setLongitude(PamUtils.constrainedAngle(gpsData.getLongitude()));
-			BearingDegN bdn = gpsPoint.getBearingDegN();
-			if (bdn == null) {
-				bdn = new BearingDegN();
-				gpsPoint.setBearingDegN(bdn);
+			gpsPoint.setLatitude(TethysLatLong.formatLatitude(gpsData.getLatitude()));
+			gpsPoint.setLongitude(TethysLatLong.formatLongitude(gpsData.getLongitude()));
+			CourseOverGroundDegN cog = gpsPoint.getCourseOverGroundDegN();
+			if (cog == null) {
+				cog = new CourseOverGroundDegN();
+				gpsPoint.setCourseOverGroundDegN(cog);
 			}
-			bdn.setValue(AutoTethysProvider.roundDecimalPlaces(PamUtils.constrainedAngle(gpsData.getHeading()),1));
-			gpsPoint.setSpeedKn(AutoTethysProvider.roundDecimalPlaces(gpsData.getSpeed(),2));
+			cog.setValue(PamUtils.constrainedAngle(gpsData.getCourseOverGround()));
+			cog.setNorth(HeadingTypes.TRUE.toString());
+			Double trueHead = gpsData.getTrueHeading();
+			if (trueHead != null && trueHead.isInfinite()) {
+				HeadingDegN th = new HeadingDegN();
+				th.setValue(PamUtils.constrainedAngle(trueHead));
+				th.setNorth(HeadingTypes.TRUE.toString());
+				gpsPoint.setHeadingDegN(th);
+			}
+			else {
+				// else try magnetic
+				Double magHead = gpsData.getMagneticHeading();
+				if (magHead != null && magHead.isInfinite()) {
+					HeadingDegN mh = new HeadingDegN();
+					mh.setValue(PamUtils.constrainedAngle(magHead));
+					mh.setNorth(HeadingTypes.MAGNETIC.toString());
+					gpsPoint.setHeadingDegN(mh);
+				}
+			}
+			
+			gpsPoint.setSpeedOverGround(AutoTethysProvider.roundDecimalPlaces(gpsData.getSpeed(),2));
 			
 			points.add(gpsPoint);
 			lastPointTime = gpsDataUnit.getTimeMilliseconds();
@@ -1059,8 +1081,8 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 			double recLat = deploymentData.getRecoveryDetails().getLatitude();
 			double recLong = deploymentData.getRecoveryDetails().getLongitude();
 			if (recLat != 0 & recLong != 0.) {
-				deployment.getRecoveryDetails().setLatitude(recLat);
-				deployment.getRecoveryDetails().setLongitude(PamUtils.constrainedAngle(recLong));
+				deployment.getRecoveryDetails().setLatitude(TethysLatLong.formatLatitude(recLat));
+				deployment.getRecoveryDetails().setLongitude(TethysLatLong.formatLongitude(recLong));
 			}
 		}
 		

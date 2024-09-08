@@ -10,6 +10,8 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 //import org.kc7bfi.jflac.sound.spi.FlacAudioFileReader;
 import org.jflac.sound.spi.FlacAudioFileReader;
 
+import Acquisition.sud.SudAudioFileReader;
+
 /**
  * Now replaced with PamAudioFileManager.
  * 

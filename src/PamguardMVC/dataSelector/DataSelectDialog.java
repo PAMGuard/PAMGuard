@@ -76,6 +76,22 @@ public class DataSelectDialog extends PamDialog {
 //		}
 	}
 	
+	public boolean setTab(int tabIndex) {
+		if (tabPane == null) {
+			return false;
+		}
+		if (tabIndex < 0 || tabIndex >= tabPane.getTabCount()) {
+			return false;
+		}
+		try {
+			tabPane.setSelectedIndex(tabIndex);
+		}
+		catch (Exception e) {
+			return false;
+		}
+		return true;
+	}
+	
 	public boolean showDialog() {
 		if (dataPanel != null) {
 			dataPanel.setParams();

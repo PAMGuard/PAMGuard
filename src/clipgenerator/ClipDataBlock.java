@@ -9,7 +9,6 @@ import java.util.List;
 import javax.swing.JMenuItem;
 
 import PamguardMVC.PamDataUnit;
-import PamguardMVC.PamProcess;
 import PamguardMVC.dataSelector.DataSelector;
 import PamguardMVC.dataSelector.DataSelectorCreator;
 import PamguardMVC.datamenus.DataMenuParent;
@@ -71,6 +70,7 @@ public class ClipDataBlock extends ClipDisplayDataBlock<ClipDataUnit> {
 		return super.getDataSelectCreator();
 	}
 
+	@Override
 	public DataSelector getDataSelector(String selectorName, boolean allowScores, String selectorType) {
 		DataSelector ds = super.getDataSelector(selectorName, allowScores, selectorType);
 //		DataSelector newDS = super.getDataSelector("Randomuiname", allowScores, selectorType);

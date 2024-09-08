@@ -7,6 +7,12 @@ import java.util.List;
 
 import javax.swing.SwingUtilities;
 
+import Acquisition.DaqSystem;
+import PamDetection.RawDataUnit;
+import PamUtils.PamCalendar;
+import PamUtils.PlatformInfo;
+import PamUtils.PlatformInfo.OSType;
+import PamguardMVC.debug.Debug;
 import asiojni.ASIOFilePlaybackSystem;
 import nidaqdev.NIFilePlayback;
 import soundPlayback.fx.FilePlaybackSettingsPane;
@@ -14,14 +20,6 @@ import soundPlayback.fx.PlaybackSettingsPane;
 import soundPlayback.swing.FilePlaybackDialogComponent;
 import soundPlayback.swing.PlaybackDialogComponent;
 import warnings.QuickWarning;
-import Acquisition.DaqSystem;
-import PamController.PamController;
-import PamDetection.RawDataUnit;
-import PamModel.SMRUEnable;
-import PamUtils.PamCalendar;
-import PamUtils.PlatformInfo;
-import PamUtils.PlatformInfo.OSType;
-import PamguardMVC.debug.Debug;
 
 /**
  * Playback of sound from wav files. 
@@ -79,6 +77,7 @@ public class FilePlayback extends PlaybackSystem {
 		//		} 
 	}
 
+	@Override
 	public int getMaxChannels() {
 		FilePlaybackDevice device = filePBDevices.get(playbackControl.playbackParameters.deviceType);
 		return device.getNumPlaybackChannels(getDeviceNumber());
@@ -121,6 +120,7 @@ public class FilePlayback extends PlaybackSystem {
 
 	}
 
+	@Override
 	synchronized public boolean unPrepareSystem() {
 		if (realTimePlayback) {
 			synchronized (realTimeQueue) {
@@ -133,6 +133,7 @@ public class FilePlayback extends PlaybackSystem {
 		return false;
 	}
 
+	@Override
 	public boolean playData(RawDataUnit[] data, double gain) {
 
 		if (currentDevice == null) {
@@ -174,9 +175,10 @@ public class FilePlayback extends PlaybackSystem {
 						data = realTimeQueue.remove(0);
 						//						double gain = Math.pow(10., playbackControl.playbackParameters.playbackGain/20.);
 						boolean ok = currentDevice.playData(data);
-						if (ok == false) {
+						if (!ok) {
 							keepRunning = false;
 							SwingUtilities.invokeLater(new Runnable() {
+								@Override
 								public void run() {
 									playbackError();
 								}
@@ -213,6 +215,7 @@ public class FilePlayback extends PlaybackSystem {
 		prepareSystem(playbackControl, currentChannels, currentSampleRate);
 	}
 
+	@Override
 	public PlaybackDialogComponent getDialogComponent() {
 		return filePlaybackDialogComponent;
 	}

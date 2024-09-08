@@ -21,6 +21,7 @@
 package Layout;
 
 import java.awt.Component;
+
 import javax.swing.JMenuItem;
 
 import PamView.ClipboardCopier;

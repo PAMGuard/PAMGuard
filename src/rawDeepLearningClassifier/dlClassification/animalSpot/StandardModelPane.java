@@ -1,35 +1,27 @@
 package rawDeepLearningClassifier.dlClassification.animalSpot;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.util.ArrayList;
-
 import org.controlsfx.control.CheckComboBox;
+import org.controlsfx.control.IndexedCheckModel;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.ToggleSwitch;
 
 import PamController.SettingsPane;
+import PamUtils.PamArrayUtils;
 import PamView.dialog.warn.WarnOnce;
-import ai.djl.Device;
-import javafx.application.Platform;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener.Change;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.control.Labeled;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
@@ -38,8 +30,9 @@ import pamViewFX.fxNodes.PamGridPane;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamSpinner;
 import pamViewFX.fxNodes.PamVBox;
-import pamViewFX.fxNodes.flipPane.FlipPane;
+import pamViewFX.validator.PamValidator;
 import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
+import rawDeepLearningClassifier.dlClassification.StandardClassifierModel;
 
 /**
  * Settings pane for SoundSpot
@@ -54,20 +47,12 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 	 */
 	private PamBorderPane mainPane;
 
-	/**
-	 * The directory chooser.
-	 */
-	private FileChooser fileChooser;
 
 	/**
 	 * Currently selected file.
 	 */
 	private File currentSelectedFile = new File(System.getProperty("user.home"));
 
-	/**
-	 * The label showing the path to the file. 
-	 */
-	private Label pathLabel;
 
 	/**
 	 * Detection spinner
@@ -114,9 +99,17 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 	 */
 	private PamVBox vBoxHolder;
 
+	/**
+	 * Use the default segment length
+	 */
 	protected PamHBox defaultSegBox;
 
+	/**
+	 * Model indicator. 
+	 */
 	private ProgressIndicator modelLoadIndicator;
+	
+	PamValidator validator;
 
 
 
@@ -125,10 +118,8 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 		this.dlClassifierModel=soundSpotClassifier; 
 
 		mainPane = createPane(); 
-		//the directory chooser. 
-		fileChooser = new FileChooser();
-		fileChooser.setTitle("Classifier Model Location");
-		setAdvSettingsPane(new StandardAdvModelPane()); 
+
+		setAdvSettingsPane(new StandardAdvModelPane());
 	}
 
 	/**
@@ -138,89 +129,20 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 	private PamBorderPane createPane() {
 		PamBorderPane mainPane = new PamBorderPane(); 
 
-
-		Label classiferInfoLabel = new Label(dlClassifierModel.getName() + " Classifier"); 
-		//PamGuiManagerFX.titleFont2style(classiferInfoLabel);
+		//font to use for title labels. 
 		Font font= Font.font(null, FontWeight.BOLD, 11);
-		classiferInfoLabel.setFont(font);
 
-		/**Basic classifier info**/
-		pathLabel = new Label("No classifier file selected"); 
-//		PamButton pamButton = new PamButton("", PamGlyphDude.createPamGlyph(MaterialDesignIcon.FILE, PamGuiManagerFX.iconSize)); 
-		PamButton pamButton = new PamButton("", PamGlyphDude.createPamIcon("mdi2f-file", PamGuiManagerFX.iconSize)); 
+		Node classifierIcon;
+		if (dlClassifierModel.getModelUI()!=null && dlClassifierModel.getModelUI().getIcon()!=null) {
+			classifierIcon = dlClassifierModel.getModelUI().getIcon();
+		}
+		else {
+			Label classiferInfoLabel = new Label(dlClassifierModel.getName() + " Classifier"); 
+			//PamGuiManagerFX.titleFont2style(classiferInfoLabel);
+			classiferInfoLabel.setFont(font);
+			classifierIcon=classiferInfoLabel;
+		}
 		
-		modelLoadIndicator = new ProgressIndicator(-1);
-		modelLoadIndicator.setVisible(false);
-		modelLoadIndicator.prefHeightProperty().bind(pamButton.heightProperty().subtract(3));
-		
-		pamButton.setMinWidth(30);
-		pamButton.setTooltip(new Tooltip("Browse to selcect a model file"));
-		
-
-		pamButton.setOnAction((action)->{
-			
-			fileChooser.getExtensionFilters().clear();
-			fileChooser.getExtensionFilters().addAll(getExtensionFilters()); 
-
-
-			Path path = currentSelectedFile.toPath();
-			if(path!=null && Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
-				fileChooser.setInitialDirectory(new File(currentSelectedFile.getParent()));
-			}
-			else { 
-				fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-			}
-
-			File file = fileChooser.showOpenDialog(null); 
-
-			if (file==null) {
-				return; 
-			}
-			
-			modelLoadIndicator.setVisible(true);
-
-			pathLabel.setText("Loading model...");
-			
-			//whenever a new model is selected then the the paramters should be set to use defualt transforms again - this ensures
-			//that the new transforms are loaded up 
-			advSettingsPane.getParams(paramsClone); 
-			paramsClone.useDefaultTransfroms=true; 
-			advSettingsPane.setParams(paramsClone);
-			
-			
-            // separate non-FX thread - load the model 
-			//on a separate thread so we can show a moving load 
-			//bar on the FX thread. Otherwise the GUI locks up  
-			//whilst stuff is loaded. 
-			new Thread() {
-				// runnable for that thread
-				public void run() {
-					try {
-						newModelSelected(file); 
-						Thread.sleep(5000);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-					Platform.runLater(new Runnable() {
-						public void run() {
-							modelLoadIndicator.setVisible(false);
-							updatePathLabel(); 
-							setClassNames(paramsClone);  
-						}
-					});
-				}
-			}.start();
-
-			
-			
-		});
-
-		PamHBox hBox = new PamHBox(); 
-		hBox.setSpacing(5);
-		hBox.getChildren().addAll(modelLoadIndicator, pathLabel, pamButton); 
-		hBox.setAlignment(Pos.CENTER_RIGHT);
 
 //		PamButton advButton = new PamButton("", PamGlyphDude.createPamGlyph(MaterialDesignIcon.SETTINGS, PamGuiManagerFX.iconSize)); 
 		PamButton advButton = new PamButton("", PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconSize)); 
@@ -240,6 +162,10 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 		usedefaultSeg = new ToggleSwitch (); 
 		usedefaultSeg.selectedProperty().addListener((obsval, oldval, newval)->{
 			defaultSegmentLenChanged(); 
+			//only set the hop if the user physically changes the toggle switch. This is not included in defaultSegmentLenChanged
+			//becuase defaultSegmentLenChanged can be called from elsewhere
+			int defaultsamples =  getDefaultSamples(dlClassifierModel, paramsClone);
+			dlClassifierModel.getDLControl().getSettingsPane().getHopLenSpinner().getValueFactory().setValue((int) defaultsamples/2);
 		});
 		usedefaultSeg.setPadding(new Insets(0,0,0,0));
 		//there is an issue with the toggle switch which means that it has dead space to the left if
@@ -262,7 +188,9 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 
 
 		/**Classification thresholds etc to set.**/
-		Label classiferInfoLabel2 = new Label("Binary Classification Threshold"); 
+		Label classiferInfoLabel2 = new Label("Decision Threshold"); 
+		classiferInfoLabel2.setTooltip(new Tooltip("Set the minimum prediciton value for selected classes. If a prediction exceeds this value "
+				+ "a detection will be saved."));
 		classiferInfoLabel2.setFont(font);
 
 		//PamGuiManagerFX.titleFont2style(classiferInfoLabel2);
@@ -276,34 +204,57 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 
 		gridPane.add(new Label("Min. prediction"), 0, 0);
 		gridPane.add(detectionSpinner = new PamSpinner<Double>(0.0, 1.0, 0.9, 0.1), 1, 0);
-		detectionSpinner.setPrefWidth(80);
+		detectionSpinner.setPrefWidth(70);
 		detectionSpinner.setEditable(true);
 		detectionSpinner.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
+		detectionSpinner.setTooltip(new Tooltip("Set the minimum prediciton value for selected classes. If a prediction exceeds this value "
+				+ "a detection will be saved."));
+
 
 		gridPane.add(new Label(""), 2, 0);
 		speciesIDBox = new CheckComboBox<String>(); 
 		gridPane.add(speciesIDBox, 3, 0);
-		speciesIDBox.setMaxWidth(100);
-		speciesIDBox.setPrefWidth(100);
+		//speciesIDBox.setMaxWidth(100);
+//		speciesIDBox.setPrefWidth(100);
 		speciesIDBox.prefHeightProperty().bind(detectionSpinner.heightProperty());
+		speciesIDBox.setMaxWidth(150); //otherwise expands too much if multiple classes selected
+		speciesIDBox.setTooltip(new Tooltip("Select output classes to use for binary classification. "
+				+ "If the prediction value of a selected class exceeds the minimum prediction threshold then a detection is saved. "));
+		validator = new PamValidator();
+		
+		final SimpleIntegerProperty checkItemsCount = new SimpleIntegerProperty(); 
+		
+		speciesIDBox.getCheckModel().getCheckedItems().addListener((Change<? extends String> c)->{
+			checkItemsCount.set(speciesIDBox.getCheckModel().getCheckedItems().size());
+		});
+		
+
+        validator.createCheck()
+          .dependsOn("species_box",checkItemsCount)
+          .withMethod(c -> {
+        	int nChecked = c.get("species_box");
+        	
+        	if (nChecked==speciesIDBox.getItems().size() && speciesIDBox.getItems().size()>1) {
+                c.warn("All output class are checked. If one of these classes is noise then PAMGuard will continually detect all sound data...");
+        	}
+        	
+            if (nChecked==0) {
+              c.warn("No output classes are checked for binary classification. PAMGuard will save all prediction values but no detections will be generated");
+            }
+          })
+          .decorates(speciesIDBox)
+          .immediate();
+        ;
 
 		vBoxHolder = new PamVBox(); 
 		vBoxHolder.setSpacing(5);
-		vBoxHolder.getChildren().addAll(classiferInfoLabel, hBox, advSettings, classiferInfoLabel2, gridPane); 
+		vBoxHolder.getChildren().addAll(classifierIcon, advSettings, classiferInfoLabel2, gridPane); 
 		
 		mainPane.setCenter(vBoxHolder);
 
 		return mainPane; 
 	}
 
-
-	/**
-	 * Get a list of extension fitlers for the file dialog. 
-	 * e.g. 
-	 * new ExtensionFilter("Pytorch Model", "*.pk")
-	 * @return a list of extension fitlers for the file dialog. 
-	 */
-	public abstract ArrayList<ExtensionFilter> getExtensionFilters(); 
 
 	/**
 	 * The default segment len changed. 
@@ -317,19 +268,25 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 			//			int defaultsamples = (int) this.soundSpotClassifier.millis2Samples(paramsClone.defaultSegmentLen); 
 
 
-			float sR = dlClassifierModel.getDLControl().getSettingsPane().getSelectedParentDataBlock().getSampleRate(); 
+//			float sR = dlClassifierModel.getDLControl().getSettingsPane().getSelectedParentDataBlock().getSampleRate(); 
 
-			int defaultsamples =  (int) (paramsClone.defaultSegmentLen.doubleValue()*sR/1000.0);
+			int defaultsamples =  getDefaultSamples(dlClassifierModel, paramsClone);
 
 			//work out the window length in samples
 			dlClassifierModel.getDLControl().getSettingsPane().getSegmentLenSpinner().getValueFactory().setValue(defaultsamples);
-			dlClassifierModel.getDLControl().getSettingsPane().getHopLenSpinner().getValueFactory().setValue((int) defaultsamples/2);
+//			dlClassifierModel.getDLControl().getSettingsPane().getHopLenSpinner().getValueFactory().setValue((int) defaultsamples/2);
 
 			dlClassifierModel.getDLControl().getSettingsPane().getSegmentLenSpinner().setDisable(true); 
 		}
 		else {
 			dlClassifierModel.getDLControl().getSettingsPane().getSegmentLenSpinner().setDisable(false); 
 		}
+	}
+	
+	public static int getDefaultSamples(DLClassiferModel dlClassifierModel, StandardModelParams paramsClone) {
+		float sR = dlClassifierModel.getDLControl().getSettingsPane().getSelectedParentDataBlock().getSampleRate(); 
+		int defaultsamples =  (int) (paramsClone.defaultSegmentLen.doubleValue()*sR/1000.0);
+		return defaultsamples;
 	}
 
 	/**
@@ -368,38 +325,14 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 	
 
 
-	/**
-	 * Update the path label and tool tip text; 
-	 */
-	private void updatePathLabel() {
-		if (currentSelectedFile==null || !dlClassifierModel.checkModelOK()) {
-			pathLabel.setText("No classifier model loaded: Select model");
-			pathLabel.setTooltip(new Tooltip("Use the Browse... button to select a .pk file"));
-			usedefaultSeg.setDisable(true);
 
-		}
-		else {
-			pathLabel .setText(this.currentSelectedFile.getName()); 
-			try {
-				pathLabel.setTooltip(new Tooltip(this.currentSelectedFile.getPath() 
-						+ "\n" +" Processor CPU " + Device.cpu() + "  " +  Device.gpu()));
-			}
-			catch (Exception e) {
-				//sometimes get an error here for some reason
-				//does not make a difference other than tooltip. 
-				System.err.println("StandardModelPane: Error getting the default device!");
-			}
-			usedefaultSeg.setDisable(false);
-		}
-
-	}
 
 	@Override
 	public StandardModelParams getParams(StandardModelParams currParams) {
-
+		
 		if (currentSelectedFile==null) {
 			//uuurgh need to sort this out with FX stuff
-			WarnOnce.showWarningFX(null,  "No Model File",  "There is no model file selected in the path: Please select a compatible model" , AlertType.ERROR);
+			WarnOnce.showWarningFX(null, "No Model File",  "There is no model file selected in the path: Please select a compatible model" , AlertType.ERROR);
 
 		}
 		else {
@@ -414,13 +347,9 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 		currParams.threshold = detectionSpinner.getValue(); 
 		//		currParams.useCUDA = useCuda.isSelected(); 
 
-		//System.out.println("StandardModelParams 1: " + currParams); 
+//		System.out.println("GET PARAMS: StandardModelParams : this.paramsClone.numClasses " + this.paramsClone.numClasses); 
+	
 		
-		//System.out.println("StandardModelParams 2: " + currParams.useDefaultTransfroms); 
-
-		
-		//System.out.println("StandardModelParams 2: " + currParams.useDefaultTransfroms); 
-
 		boolean[] speciesClass = new boolean[this.paramsClone.numClasses]; 
 
 		for (int i=0; i< speciesClass.length; i++) {
@@ -433,14 +362,13 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 		
 		
 		currParams = (StandardModelParams) this.getAdvSettingsPane().getParams(currParams);
-
-
+				
 		//get class names from the paramClone as these may have been set by a loaded model
 		//instead of a using changing a control.
 		currParams.classNames = paramsClone.classNames; 
 		currParams.numClasses = paramsClone.numClasses; 
 		
-		if (paramsClone.classNames == null && speciesIDBox.getItems()!=null) {
+		if ((paramsClone.classNames == null ||  paramsClone.classNames.length<=0) && speciesIDBox.getItems()!=null) {
 			
 			String[] classNames = new String[speciesIDBox.getItems().size()]; 
 			for (int i=0; i<speciesIDBox.getItems().size(); i++) {
@@ -448,40 +376,51 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 			}
 			currParams.classNames = this.dlClassifierModel.getDLControl().getClassNameManager().makeClassNames(classNames);
 		}
+		
+//		System.out.println("GET CLASS NAMES: currParams.classNames: " + currParams.classNames + " " +   
+//		(currParams.classNames!=null?  currParams.classNames.length: 0 + " " + currParams.numClasses)); 
 
 		currParams.useDefaultSegLen = usedefaultSeg.isSelected(); 
 		
-		
 		//System.out.println("Get CLASS NAMES: currParams.classNames: " + currParams.classNames + " Num classes " + currParams.numClasses); 
-
-		
 		return currParams;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void setParams(StandardModelParams currParams) {
-		this.paramsClone = currParams.clone(); 
+		try {
 
-		pathLabel .setText(this.currentSelectedFile.getPath()); 
+		this.paramsClone = currParams.clone(); 
+		
+		//pathLabel .setText(this.currentSelectedFile.getPath()); 
 
 		detectionSpinner.getValueFactory().setValue(Double.valueOf(currParams.threshold));
 
-		
-		//set the params on the advanced pane. 
-		this.getAdvSettingsPane().setParams(paramsClone);
 
+		//set the params on the advanced pane. 
+//		System.out.println("SET PARAMS ADV PANE: " + (paramsClone.classNames == null ? null : paramsClone.classNames.length));
+		this.getAdvSettingsPane().setParams(paramsClone);
+		
 		if (paramsClone.modelPath!=null) {
+			//this might 
 			currentSelectedFile = new File(paramsClone.modelPath);
+			
+			//this might change the paramsClone values if the model contains pamguard compatible metadata
 			newModelSelected(currentSelectedFile); 
 		}
+		
+		setClassNames(paramsClone);
 
-
-		setClassNames(currParams);
-
-		usedefaultSeg.setSelected(currParams.useDefaultSegLen); 
+		usedefaultSeg.setSelected(paramsClone.useDefaultSegLen); 
 		defaultSegmentLenChanged();
-
-		updatePathLabel(); 
+		
+		}
+		
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		//updatePathLabel(); 
 
 	}
 
@@ -492,12 +431,11 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 	private void setClassNames(StandardModelParams currParams) {
 		speciesIDBox.getItems().clear();
 
+//		System.out.println("SET CLASS NAMES: currParams.classNames: " + currParams.classNames + " " +  (currParams.classNames!=null ? currParams.classNames.length: 0) + " " + currParams.numClasses); 
 
 		int classNamesLen = 0; 
 
 		if (currParams.classNames!=null) classNamesLen = currParams.classNames.length; 
-
-		//System.out.println("SET CLASS NAMES: currParams.classNames: " + currParams.classNames + " " +  classNamesLen + " " + currParams.numClasses); 
 
 
 		for (int i=0; i<Math.max(classNamesLen, currParams.numClasses); i++) {
@@ -508,7 +446,9 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 				speciesIDBox.getItems().add("Class: " + i); 
 			}
 		}
-
+		
+//		System.out.println("Binary classification: set: " + speciesIDBox.getItems().size());
+//		PamArrayUtils.printArray(currParams.binaryClassification);
 
 		for (int i=0; i<speciesIDBox.getItems().size(); i++) {
 			if (currParams.binaryClassification!=null && i<currParams.binaryClassification.length) {
@@ -516,7 +456,6 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 			}
 			else {
 				speciesIDBox.getItemBooleanProperty(i).set(true);
-
 			}
 		}
 	}

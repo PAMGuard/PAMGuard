@@ -9,7 +9,7 @@ import generalDatabase.SuperDetLogging;
 
 /**
  * Logs the the children of the click train detection. 
- * @author macst
+ * @author Jamie Macaulay
  *
  */
 public class ClickTrainDetSubLogging extends SQLLogging {

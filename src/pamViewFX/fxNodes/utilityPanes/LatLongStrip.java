@@ -12,7 +12,7 @@ import pamViewFX.fxNodes.PamHBox;
 
 /**
  * A pane which shows a latitude or longitude. Allows users to enter data as decimal or minutes/seconds. 
- * (copied ot FX from Doug Gillespie's LatLongDialogStrip)
+ * (copied to FX from Doug Gillespie's LatLongDialogStrip)
  * @author Jamie Macaulay 
  *
  */
@@ -39,6 +39,7 @@ public class LatLongStrip extends PamBorderPane {
 	 * The format type e.g. LatLong.FORMAT_DECIMALMINUTES.
 	 */
 	private int formatType = LatLong.FORMAT_DECIMALMINUTES;
+	
 	private Label titleLabel;
 
 
@@ -152,7 +153,7 @@ public class LatLongStrip extends PamBorderPane {
 		this.setCenter(holder);
 		this.setBottom(formattedText);
 
-		showControls(formatType);
+		showControls(formatType, true);
 	}
 
 	private void newTypedValues(KeyEvent e) {
@@ -170,10 +171,25 @@ public class LatLongStrip extends PamBorderPane {
 		// and say the formated version
 		sayFormattedValue(v);
 	}
-
+	
+	
+	/**
+	 * Change the current controls for to show to show the current format of Latitude or Longitude.
+	 * @param formatStyle - the style of Latitude or longitude e.g. LatLong.FORMAT_DECIMALMINUTES;
+	 */
 	public void showControls(int formatStyle) {
 		
-		if (formatType==formatStyle) {
+		showControls(formatStyle, false);
+	}
+
+	/**
+	 * Change the current controls for to show to show the current format of Latitude or Longitude.
+	 * @param force - force a reset of controls even if the format style is the same as the current style. 
+	 * @param formatStyle - the style of Latitude or longitude e.g. LatLong.FORMAT_DECIMALMINUTES;
+	 */
+	private void showControls(int formatStyle, boolean force) {
+		
+		if (formatType==formatStyle && !force) {
 			return;
 		}
 		
@@ -223,7 +239,7 @@ public class LatLongStrip extends PamBorderPane {
 
 	public void setValue(double value, boolean hiddenOnly) {
 		
-		System.out.println("Set value: " + value);
+//		System.out.println("Set value: " + value);
 		if (value >= 0) {
 			nsew.getSelectionModel().select(0);
 		}

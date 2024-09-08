@@ -773,7 +773,7 @@ public class Nidaq {
 		public void setTaskHandle(int taskHandle) {
 			this.taskHandle = taskHandle;
 		}
-	};
+	}
 
 	// ------------------------------------------ DAQmxStopTaskParams
 	public class DAQmxStopTaskParams 
@@ -795,7 +795,7 @@ public class Nidaq {
 		public void setTaskHandle(int taskHandle) {
 			this.taskHandle = taskHandle;
 		}
-	};
+	}
 	// ------------------------------------------ DAQmxClearTaskParams
 	public class DAQmxClearTaskParams 
 	{
@@ -817,7 +817,7 @@ public class Nidaq {
 		public void setTaskHandle(int taskHandle) {
 			this.taskHandle = taskHandle;
 		}
-	};
+	}
 
 	// ------------------------------------------ DAQmxCreateAIVoltageChanParams
 	public class DAQmxCreateAIVoltageChanParams 
@@ -1000,7 +1000,7 @@ public class Nidaq {
 
 		public void setDeviceIsSimulated(boolean deviceIsSimulated) {
 			this.deviceIsSimulated = deviceIsSimulated;
-		};
+		}
 	}
 
 	// ------------------------------------------ DAQmxReadAnalogF64Params
@@ -1128,7 +1128,7 @@ public class Nidaq {
 	//	}
 
 	public void load() {
-		if (loadLibraryTried == false) {
+		if (!loadLibraryTried) {
 			try  {
 				System.loadLibrary(SILIB);
 				loadLibraryOK = true;
@@ -1152,7 +1152,7 @@ public class Nidaq {
 	 * May be useful for assisting users. 
 	 */
 	private void sayVersionInfo() {
-		if (versionShown == false) {
+		if (!versionShown) {
 			int majV = getMajorVersion();
 			int minV = getMinorVersion();
 			System.out.println(String.format("National Instruments software loaded version %d.%d", majV, minV));

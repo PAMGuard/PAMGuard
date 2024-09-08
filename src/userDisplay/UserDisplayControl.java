@@ -21,7 +21,6 @@
 package userDisplay;
 
 import java.awt.Frame;
-import java.awt.MenuItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
@@ -31,20 +30,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
-import clickDetector.ClickClassifiers.UserTypesPanel;
-import dataPlots.TDDisplayProvider;
-import dataPlotsFX.JamieDev;
-import dataPlotsFX.TDDisplayProviderFX;
-import radardisplay.RadarDisplay;
-import radardisplay.RadarDisplayProvider;
-import radardisplay.RadarParameters;
-import radardisplay.RadarParametersDialog;
-import radardisplay.RadarProjector;
-import soundPlayback.PlaybackControl;
-import fftManager.FFTDataUnit;
-import localiserDisplay.LocaliserDisplayProvider;
-import pamScrollSystem.AbstractScrollManager;
-import pamScrollSystem.coupling.ScrollerCoupling;
 //import localiserDisplay.LocaliserDisplayProvider;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
@@ -55,12 +40,20 @@ import PamController.PamSettings;
 import PamModel.PamDependency;
 import PamModel.PamDependent;
 import PamModel.PamModel;
-import PamModel.SMRUEnable;
-import PamView.MenuItemEnabler;
 import PamView.PamGui;
 import Spectrogram.SpectrogramDiplayProvider;
 import Spectrogram.SpectrogramParameters;
 import Spectrogram.SpectrogramParamsDialog;
+import dataPlots.TDDisplayProvider;
+import dataPlotsFX.TDDisplayProviderFX;
+import fftManager.FFTDataUnit;
+import pamScrollSystem.AbstractScrollManager;
+import pamScrollSystem.coupling.ScrollerCoupling;
+import radardisplay.RadarDisplayProvider;
+import radardisplay.RadarParameters;
+import radardisplay.RadarParametersDialog;
+import radardisplay.RadarProjector;
+import soundPlayback.PlaybackControl;
 
 public class UserDisplayControl extends PamControlledUnit implements
 		PamSettings {
@@ -95,10 +88,10 @@ public class UserDisplayControl extends PamControlledUnit implements
 		TDDisplayProvider.register();
 		TDDisplayProviderFX.register();
 	
-		//register the localiser display. 
-		if (JamieDev.isEnabled()) {
-			LocaliserDisplayProvider.register(); 
-		}
+//		//register the localiser display. 
+//		if (JamieDev.isEnabled()) {
+//			LocaliserDisplayProvider.register(); 
+//		}
 			
 				
 	}
@@ -115,7 +108,7 @@ public class UserDisplayControl extends PamControlledUnit implements
 //		if (changeType == PamController.ADD_CONTROLLEDUNIT) {
 		if (changeType == PamControllerInterface.ADD_CONTROLLEDUNIT) {
 		}
-		if (changeType == PamController.INITIALIZATION_COMPLETE) {
+		if (changeType == PamControllerInterface.INITIALIZATION_COMPLETE) {
 			createDisplays();
 		}
 		
@@ -199,6 +192,7 @@ public class UserDisplayControl extends PamControlledUnit implements
 			this.parentFrame = parentFrame;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent ev) {
 			/*
 			 * First check necessary dependents are all in place
@@ -221,6 +215,7 @@ public class UserDisplayControl extends PamControlledUnit implements
 			this.parentFrame = parentFrame;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent ev) {
 			RadarParameters params = new RadarParameters();
 			RadarProjector radarProjector = new RadarProjector(null);
@@ -262,6 +257,7 @@ public class UserDisplayControl extends PamControlledUnit implements
 		/* (non-Javadoc)
 		 * @see PamModel.PamDependent#addDependency(PamModel.PamDependency)
 		 */
+		@Override
 		public void addDependency(PamDependency dependancy) {
 			// TODO Auto-generated method stub
 			
@@ -270,6 +266,7 @@ public class UserDisplayControl extends PamControlledUnit implements
 		/* (non-Javadoc)
 		 * @see PamModel.PamDependent#getDependency()
 		 */
+		@Override
 		public PamDependency getDependency() {
 			return dependency;
 		}
@@ -277,6 +274,7 @@ public class UserDisplayControl extends PamControlledUnit implements
 		/* (non-Javadoc)
 		 * @see PamModel.PamDependent#getDependentUserName()
 		 */
+		@Override
 		public String getDependentUserName() {
 			return "Spectrogram";
 		}
@@ -287,14 +285,17 @@ public class UserDisplayControl extends PamControlledUnit implements
 	 * Stuff for settings interface
 	 */
 	
+	@Override
 	public long getSettingsVersion() {
 		return UserDisplayParameters.serialVersionUID;
 	}
 
+	@Override
 	public Serializable getSettingsReference() {
 		return tabPanelControl.getSettingsReference();
 	}
 
+	@Override
 	public boolean restoreSettings(
 			PamControlledUnitSettings pamControlledUnitSettings) {
 		/*
@@ -373,7 +374,7 @@ public class UserDisplayControl extends PamControlledUnit implements
 
 	@Override
 	public boolean canPlayViewerSound() {
-		if (PlaybackControl.getViewerPlayback().hasPlayDataSource() == false) {
+		if (!PlaybackControl.getViewerPlayback().hasPlayDataSource()) {
 			return false;
 		}
 		return tabPanelControl.canPlayViewerSound();

@@ -10,7 +10,14 @@ public class DetectionGrouperParams implements Serializable, Cloneable, ManagedP
 
 	public static final long serialVersionUID = 1L;
 
+	/**
+	 * Use all the possible combinations
+	 */
 	public static final int GROUPS_ALL_POSSIBLE = 0;
+	
+	/**
+	 * Use only the first combination
+	 */
 	public static final int GROUPS_FIRST_ONLY = 1;
 
 	public int maxPerSubGroup = 10;
@@ -18,6 +25,13 @@ public class DetectionGrouperParams implements Serializable, Cloneable, ManagedP
 	public int maxPerGroup = 20;
 	
 	public int minSubGroups = 2;
+	
+	/**
+	 * The primary detection groups. The slected detection groups must be included in the combination for a loclaisation 
+	 * 
+	 * null means there is no primary group. 
+	 */
+	public int[] primaryDetGroup = null; 
 	
 	public int groupingChoice = GROUPS_ALL_POSSIBLE;
 	

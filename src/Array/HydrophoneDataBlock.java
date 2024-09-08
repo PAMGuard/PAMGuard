@@ -3,11 +3,11 @@ package Array;
 import java.util.ListIterator;
 
 import GPS.NavDataSynchronisation;
-import pamScrollSystem.ViewLoadObserver;
 import PamController.PamController;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
+import pamScrollSystem.ViewLoadObserver;
 
 public class HydrophoneDataBlock extends PamDataBlock<HydrophoneDataUnit> {
 
@@ -68,6 +68,11 @@ public class HydrophoneDataBlock extends PamDataBlock<HydrophoneDataUnit> {
 	@Override
 	public boolean loadViewerData(OfflineDataLoadInfo offlineDataLoadInfo,
 			ViewLoadObserver loadObserver) {
+		
+//		if (offlineDataLoadInfo!=null) {
+//		System.out.print("Load Hydrophones: " + ((offlineDataLoadInfo.getEndMillis() - offlineDataLoadInfo.getStartMillis())/1000/60/60 + " hours"));
+//		System.out.print("From: " +PamCalendar.formatDateTime(offlineDataLoadInfo.getStartMillis()) + " to " +  PamCalendar.formatDateTime(offlineDataLoadInfo.getEndMillis()));
+//		}
 		/**
 		 * Always put in default data units at time zero. 
 		 */
@@ -98,11 +103,12 @@ public class HydrophoneDataBlock extends PamDataBlock<HydrophoneDataUnit> {
 			long difference;
 
 			ListIterator<HydrophoneDataUnit> listIterator = getListIterator(ITERATOR_END);
-			if (listIterator.hasPrevious() == false) {
+			if (!listIterator.hasPrevious()) {
 				return null;
 			}
 			unit = listIterator.previous();
 			difference = Math.abs(startTime	- unit.getTimeMilliseconds());
+			
 			while (listIterator.hasPrevious()) {
 				preceedingUnit = listIterator.previous();
 				if (preceedingUnit.getHydrophone().getID()!=ihydrophone) {
@@ -110,6 +116,7 @@ public class HydrophoneDataBlock extends PamDataBlock<HydrophoneDataUnit> {
 				}
 				newdifference = Math.abs(startTime- preceedingUnit.getTimeMilliseconds());
 				if (newdifference > difference) {
+//					System.out.println("Hydrophone datablock: newDifference: " + newdifference + " " + unit.getHydrophone().getZ()); 
 					return unit;
 				}
 				else {

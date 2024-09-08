@@ -4,12 +4,13 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+
 import com.fazecast.jSerialComm.SerialPort;
 
+import NMEA.NMEAParameters;
 import serialComms.SerialPortConstants;
 import serialComms.jserialcomm.PJSerialComm;
 import serialComms.jserialcomm.PJSerialException;
-import NMEA.NMEAParameters;
 
 public class SerialOutput {
 

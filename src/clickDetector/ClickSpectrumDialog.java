@@ -89,7 +89,7 @@ public class ClickSpectrumDialog extends PamDialog {
 		addComponent(r, showEventInfo = new JCheckBox("Show Event Average"), c);
 		showEventInfo.addActionListener(new ShowEventInfo());
 		c.gridy++;
-		if (isViewer==true){
+		if (isViewer){
 		mainPanel.add(r);
 		}
 		
@@ -133,8 +133,8 @@ public class ClickSpectrumDialog extends PamDialog {
 	}
 
 	private void setParams() {
-		plotSpectrogram.setSelected(clickSpectrumParams.plotCepstrum == false);
-		plotCepstrum.setSelected(clickSpectrumParams.plotCepstrum == true);
+		plotSpectrogram.setSelected(!clickSpectrumParams.plotCepstrum);
+		plotCepstrum.setSelected(clickSpectrumParams.plotCepstrum);
 		logScale.setSelected(clickSpectrumParams.logScale);
 		logRange.setText(String.format("%3.1f", clickSpectrumParams.logRange));
 		channelChoice.setSelectedIndex(clickSpectrumParams.channelChoice);
@@ -161,7 +161,7 @@ public class ClickSpectrumDialog extends PamDialog {
 		}
 		
 		clickSpectrumParams.channelChoice = channelChoice.getSelectedIndex();
-		if (clickSpectrumParams.smoothPlot = smoothData.isSelected() == true) {
+		if (clickSpectrumParams.smoothPlot = smoothData.isSelected()) {
 			try {
 				clickSpectrumParams.plotSmoothing = Integer.valueOf(smoothBins.getText());
 			}

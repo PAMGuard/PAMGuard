@@ -32,7 +32,7 @@ public class PamSettingsDialogFX<T> extends PamDialogFX<T> {
 //			this.getDialogPane().getStylesheets().add(PamController.getInstance().getGuiManagerFX().getPamSettingsCSS());
 //		}
 		PamStylesManagerFX stylesManager = PamStylesManagerFX.getPamStylesManagerFX();
-		this.getDialogPane().getStylesheets().add(stylesManager.getCurStyle().getDialogCSS());
+		this.getDialogPane().getStylesheets().addAll(stylesManager.getCurStyle().getDialogCSS());
 		this.setOnShown((value)->{
 			settingsPane.paneInitialized();
 		});

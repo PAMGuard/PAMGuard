@@ -22,7 +22,11 @@
 
 package JSSHTerminal;
 
-import com.jcraft.jsch.*;
+import com.jcraft.jsch.IdentityRepository;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Proxy;
+import com.jcraft.jsch.UserInfo;
 
 public class JSchSession {
 

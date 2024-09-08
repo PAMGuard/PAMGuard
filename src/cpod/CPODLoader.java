@@ -6,10 +6,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import pamScrollSystem.ViewLoadObserver;
+
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import fileOfflineData.OfflineFileMapPoint;
+import pamScrollSystem.ViewLoadObserver;
 
 /**
  * Functions to handle loading of CPOD data. 
@@ -17,6 +18,7 @@ import fileOfflineData.OfflineFileMapPoint;
  * @author Doug Gillespie
  *
  */
+@Deprecated
 public class CPODLoader {
 
 	private CPODControl cpodControl;
@@ -70,7 +72,7 @@ public class CPODLoader {
 		if (clickDataBlock.clikcType == CPODMap.FILE_CP3) {
 			dataFile = CPODControl.getCP3File(dataFile);
 		}
-		if (dataFile.exists() == false) {
+		if (!dataFile.exists()) {
 			return -1;
 		}
 		try {

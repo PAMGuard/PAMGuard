@@ -36,9 +36,8 @@ import java.awt.event.ActionListener;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.util.ArrayList;
-import javax.swing.Timer;
 
-import networkTransfer.receive.BuoyStatusDataUnit;
+import javax.swing.Timer;
 
 import PamController.PamControlledUnit;
 import PamController.PamController;
@@ -48,6 +47,7 @@ import PamModel.PamModel;
 import PamModel.PamProfiler;
 import PamUtils.PamCalendar;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
+import networkTransfer.receive.BuoyStatusDataUnit;
 
 /**
  * @author Doug Gillespie
@@ -364,6 +364,7 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 		return processName;
 	}
 
+	@Override
 	public String getObserverName() {
 		return "Process: " + getProcessName();
 	}
@@ -373,6 +374,7 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 	 * 
 	 * @see PamguardMVC.PamObserver#SetSampleRate(float, boolean)
 	 */
+	@Override
 	public void setSampleRate(float sampleRate, boolean notify) {
 		// notify all output data blocks that there is a new sample rate
 		this.sampleRate = sampleRate;
@@ -464,6 +466,7 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 		return (long) (millis * sampleRate / 1000);
 	}
 
+	@Override
 	public void noteNewSettings() {
 		for (int i = 0; i < outputDataBlocks.size(); i++) {
 			outputDataBlocks.get(i).noteNewSettings();
@@ -632,7 +635,7 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 	 *            Reference to a PamDataBlock
 	 */
 	public void addOutputDataBlock(PamDataBlock outputDataBlock) {
-		if (outputDataBlocks.contains(outputDataBlock) == false){
+		if (!outputDataBlocks.contains(outputDataBlock)){
 			outputDataBlocks.add(outputDataBlock);
 			PamController.getInstance().notifyModelChanged(PamControllerInterface.ADD_DATABLOCK);
 		}
@@ -761,6 +764,7 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 	}
 	
 	Timer t = new Timer(1000, new ActionListener() {
+		@Override
 		public void actionPerformed(ActionEvent evt) {
 			long now = System.currentTimeMillis();
 			if (lastCPUCheckTime == now) return;
@@ -789,6 +793,7 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 		
 	}
 	
+	@Override
 	public void updateData(PamObservable o, PamDataUnit arg) {
 		
 	}
@@ -836,6 +841,7 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 	 * Called when a PamDataBlock observed by this PamProcess is
 	 * removed. 
 	 */
+	@Override
 	public void removeObservable(PamObservable observable) {
 		// TODO Auto-generated method stub
 		// called when the source data block has been removed. 
@@ -941,7 +947,7 @@ abstract public class PamProcess implements PamObserver, ProcessAnnotator {
 		int errors = 0;
 		int nDB = getNumOutputDataBlocks();
 		for (int i = 0; i < nDB; i++) {
-			if (getOutputDataBlock(i).waitForThreadedObservers(maxWait) == false) {
+			if (!getOutputDataBlock(i).waitForThreadedObservers(maxWait)) {
 				errors++;
 			}
 		}

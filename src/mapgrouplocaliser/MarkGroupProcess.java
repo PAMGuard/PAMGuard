@@ -3,20 +3,15 @@ package mapgrouplocaliser;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.PointerInfo;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import PamUtils.PamCalendar;
-import PamUtils.PamCoordinate;
 import PamView.GeneralProjector;
 import PamView.GeneralProjector.ParameterType;
 import PamView.HoverData;
-import PamView.paneloverlay.OverlayDataInfo;
 import PamView.paneloverlay.overlaymark.MarkDataMatcher;
 import PamView.paneloverlay.overlaymark.MarkDataSelector;
 import PamView.paneloverlay.overlaymark.OverlayMark;
@@ -32,7 +27,6 @@ import annotation.AnnotationDialog;
 import annotation.AnnotationDialogPanel;
 import annotation.DataAnnotationType;
 import annotation.handler.AnnotationChoiceHandler;
-import autecPhones.AutecGraphics;
 import detectiongrouplocaliser.DetectionGroupSummary;
 import javafx.scene.input.MouseEvent;
 
@@ -93,7 +87,7 @@ public class MarkGroupProcess extends PamProcess implements OverlayMarkObserver 
 				continue;
 			}
 
-			if (wantDataUnit(hoverData, markMatch) == false) {
+			if (!wantDataUnit(hoverData, markMatch)) {
 				continue;
 			}
 
@@ -156,11 +150,11 @@ public class MarkGroupProcess extends PamProcess implements OverlayMarkObserver 
 		PamDataBlock dataBlock = dataUnit.getParentDataBlock();
 		OverlayMarkDataInfo overlayDataInfo = findMarkDataInfo(dataBlock);
 		// is it checked that we want this type of data. 
-		if (overlayDataInfo == null || overlayDataInfo.select == false) {
+		if (overlayDataInfo == null || !overlayDataInfo.select) {
 			return false;
 		}
 		// do we want this individual data unit ?
-		if (isDataSelected(dataBlock, dataUnit) == false) {
+		if (!isDataSelected(dataBlock, dataUnit)) {
 			return false;
 		}
 		// now see if it's in the marked area...

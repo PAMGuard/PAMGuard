@@ -13,6 +13,8 @@ public class CompoundDataSelector extends DataSelector {
 	
 	private CompoundParams compoundParams = new CompoundParams();
 
+	private CompoundDialogPaneFX compoundPaneFX;
+
 	public CompoundDataSelector(PamDataBlock pamDataBlock, ArrayList<DataSelector> allSelectors,
 			String selectorName, boolean allowScores, String selectorType) {
 		super(pamDataBlock, selectorName, allowScores);
@@ -57,8 +59,10 @@ public class CompoundDataSelector extends DataSelector {
 
 	@Override
 	public DynamicSettingsPane<Boolean> getDialogPaneFX() {
-		// TODO Auto-generated method stub
-		return null;
+		if (compoundPaneFX==null) {
+			compoundPaneFX = new CompoundDialogPaneFX(this);
+		}
+		return compoundPaneFX;
 	}
 
 	@Override
@@ -91,6 +95,9 @@ public class CompoundDataSelector extends DataSelector {
 				score = Math.max(score,  score2); // take the largest
 			}
 		}
+		
+//		System.out.println("Hello Compound Data selector: " + score);
+		
 		return score;
 	}
 
@@ -99,6 +106,27 @@ public class CompoundDataSelector extends DataSelector {
 	 */
 	public ArrayList<DataSelector> getSelectorList() {
 		return selectorList;
+	}
+
+	@Override
+	public DataSelector findDataSelector(Class selectorClass) {
+		/**
+		 * Check this, then all in the selector list. Should iterate happily back to 
+		 * a basic data selector as required even if there are multiple Compound ones. 
+		 */
+		if (this.getClass() == selectorClass) {
+			return this;
+		}
+		if (selectorList == null) {
+			return null;
+		}
+		for (DataSelector aSelector : selectorList) {
+			DataSelector subSel = aSelector.findDataSelector(selectorClass);
+			if (subSel != null) {
+				return subSel;
+			}
+		}
+		return null;
 	}
 
 }

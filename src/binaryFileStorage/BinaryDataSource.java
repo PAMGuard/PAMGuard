@@ -6,10 +6,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-
-
-import dataMap.DataMapDrawing;
-
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.background.BackgroundBinaryWriter;
@@ -19,6 +15,7 @@ import annotation.DataAnnotation;
 import annotation.DataAnnotationType;
 import annotation.binary.AnnotationBinaryData;
 import annotation.binary.AnnotationBinaryHandler;
+import dataMap.DataMapDrawing;
 
 /**
  * Not just a source, but also a sink for binary data from the
@@ -201,7 +198,7 @@ public abstract class BinaryDataSource {
 			return false;
 		}
 
-		if (storeData == false) {
+		if (!storeData) {
 			return false;
 		}
 		

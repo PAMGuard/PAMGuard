@@ -254,7 +254,7 @@ public class WavAudioFile implements PamAudioFileLoader {
 
 	@Override
 	public AudioInputStream getAudioStream(File soundFile) {
-		if (soundFile.exists() == false) return null;
+		if (soundFile.exists() == false || soundFile.length()<44) return null;
 		if (soundFile != null && isSoundFile(soundFile)) {
 			try {
 				return WavFileInputStream.openInputStream(soundFile);
@@ -262,7 +262,7 @@ public class WavAudioFile implements PamAudioFileLoader {
 			catch (UnsupportedAudioFileException | IOException e) {
 				e.printStackTrace(); 
 				// don't do anything and it will try the built in Audiosystem
-				System.err.println("Could not open wav file: trying default audio stream: " + soundFile.getName()); 
+				System.err.println("Could not open wav file: trying default audio stream: " + soundFile.getName() + "  " + soundFile.length()); 
 			}
 		}
 		try {
@@ -276,9 +276,30 @@ public class WavAudioFile implements PamAudioFileLoader {
 	}
 
 
-	public boolean isSoundFile(File soundFile) {
+	public static boolean isSoundFile(File soundFile) {
 		String extension = FileUtils.getExtension(soundFile.getName()); 
-		return (extension.equals(".wav"));
+		//2023-03-12 - for some reason this was .wav
+		return (extension.equals("wav"));
+	}
+	
+	
+	public static void main(String args[]) {
+		
+		File wavFile = new File("E:\\SoundNet\\1chan_analysis\\pamguard\\67150826\\mf_wav\\20180529\\PAM_20180529_055114_000.wav");
+		try {
+			WavFileInputStream.openInputStream(wavFile);
+			System.out.println("Wav file opened successfully: " + isSoundFile(wavFile));
+			
+		} catch (UnsupportedAudioFileException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public PamAudioSettingsPane getSettingsPane() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

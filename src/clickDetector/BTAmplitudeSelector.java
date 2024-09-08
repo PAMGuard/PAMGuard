@@ -29,6 +29,7 @@ import PamView.PamSymbolType;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamDialogPanel;
 import PamView.dialog.PamGridBagContraints;
+import clickDetector.dataSelector.ClickDataSelector;
 import pamMaths.HistogramDisplay;
 import pamMaths.HistogramGraphicsLayer;
 import pamMaths.PamHistogram;
@@ -59,6 +60,7 @@ public class BTAmplitudeSelector implements PamDialogPanel {
 	private JCheckBox amplitudeSelect;
 	private JTextField minAmplitude;
 	private JFrame ownerFrame;
+	private ClickDataSelector dataSelector;
 	/**
 	 * @param btDisplay
 	 */
@@ -66,6 +68,7 @@ public class BTAmplitudeSelector implements PamDialogPanel {
 		super();
 		this.clickControl = clickControl;
 		this.btDisplay = btDisplay;
+		dataSelector = btDisplay.getClickDataSelector();
 		clickDataBlock = clickControl.getClickDataBlock();
 		histoPlot = new HistogramDisplay();
 		histoPlot.setGraphicsOverLayer(histoOverLayer = new HistoOverLayer());
@@ -119,13 +122,14 @@ public class BTAmplitudeSelector implements PamDialogPanel {
 		@Override
 		public void paintLayer(Graphics g) {
 			BTDisplayParameters btDisplayParameters = btDisplay.getBtDisplayParameters();
-			if (btDisplayParameters.amplitudeSelect == false) {
+			if (!btDisplayParameters.amplitudeSelect) {
 				return;
 			}
 			axMin = allHistogram.getScaleMinVal();
 			axMax = allHistogram.getScaleMaxVal();
 			plotRectangle = g.getClipBounds();
-			double dx = (btDisplayParameters.minAmplitude - axMin) / (axMax-axMin) * plotRectangle.width;
+//			double dx = (btDisplayParameters.minAmplitude - axMin) / (axMax-axMin) * plotRectangle.width;
+			double dx = (dataSelector.getParams().minimumAmplitude - axMin) / (axMax-axMin) * plotRectangle.width;
 			int x = (int) Math.round(dx);
 			g.setColor(Color.RED);
 			g.drawLine(x, 0, x, plotRectangle.height);
@@ -144,14 +148,14 @@ public class BTAmplitudeSelector implements PamDialogPanel {
 		private boolean canDrag = false;
 		@Override
 		public void mouseDragged(MouseEvent mouseEvent) {
-			if (canDrag == false) {
+			if (!canDrag) {
 				return;
 			}
 			// work out a new value based on the current mouse position
 			double newAmp = (double) mouseEvent.getX() / histoOverLayer.plotRectangle.width * 
 			(histoOverLayer.axMax-histoOverLayer.axMin) + histoOverLayer.axMin;
 			BTDisplayParameters btDisplayParameters = btDisplay.getBtDisplayParameters();
-			btDisplayParameters.minAmplitude = newAmp;
+			dataSelector.getParams().minimumAmplitude = newAmp;
 			ampCtrlPanel.setParams(btDisplayParameters);
 			redrawHisto();
 			//
@@ -170,10 +174,10 @@ public class BTAmplitudeSelector implements PamDialogPanel {
 				return false;
 			}
 			BTDisplayParameters btDisplayParameters = btDisplay.getBtDisplayParameters();
-			if (btDisplayParameters.amplitudeSelect == false) {
+			if (!btDisplayParameters.amplitudeSelect) {
 				return false;
 			}
-			double dx = (btDisplayParameters.minAmplitude - histoOverLayer.axMin) / 
+			double dx = (dataSelector.getParams().minimumAmplitude - histoOverLayer.axMin) / 
 			(histoOverLayer.axMax-histoOverLayer.axMin) * histoOverLayer.plotRectangle.width;
 			int x = (int) Math.round(dx);
 			if (Math.abs(e.getX()-x) > 10) {
@@ -213,14 +217,14 @@ public class BTAmplitudeSelector implements PamDialogPanel {
 		}
 		private void setParams(BTDisplayParameters btParams) {
 			amplitudeSelect.setSelected(btParams.amplitudeSelect);
-			minAmplitude.setText(String.format("%3.1f", btParams.minAmplitude));
+			minAmplitude.setText(String.format("%3.1f", dataSelector.getParams().minimumAmplitude));
 
 			enableControls();
 		}
 		private boolean getParams(BTDisplayParameters btParams) {
 			btParams.amplitudeSelect = amplitudeSelect.isSelected();
 			try {
-				btParams.minAmplitude = Double.valueOf(minAmplitude.getText());
+				dataSelector.getParams().minimumAmplitude = Double.valueOf(minAmplitude.getText());
 			}
 			catch (NumberFormatException e) {
 				return false;
@@ -238,6 +242,7 @@ public class BTAmplitudeSelector implements PamDialogPanel {
 		}
 	}
 	class AmplitudeListener implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent arg0) {
 //			System.out.println("Amplitude Listener activated: " + arg0.toString());
 			updateBTParams();

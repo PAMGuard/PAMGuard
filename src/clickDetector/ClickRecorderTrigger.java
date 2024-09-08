@@ -1,8 +1,5 @@
 package clickDetector;
 
-import java.awt.Window;
-
-import PamguardMVC.PamDataUnit;
 import SoundRecorder.trigger.RecorderTrigger;
 import SoundRecorder.trigger.RecorderTriggerData;
 

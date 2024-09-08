@@ -34,13 +34,6 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
-import noiseBandMonitor.NoiseBandSettings;
-import pamScrollSystem.AbstractPamScroller;
-import pamScrollSystem.AbstractPamScrollerAWT;
-import pamScrollSystem.PamScrollObserver;
-import pamScrollSystem.PamScroller;
-import pamScrollSystem.RangeSpinner;
-import pamScrollSystem.RangeSpinnerListener;
 import Layout.PamAxis;
 import Layout.PamAxisPanel;
 import PamController.PamControlledUnit;
@@ -48,6 +41,7 @@ import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import PamController.soundMedium.GlobalMedium;
 import PamUtils.FrequencyFormat;
 import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
@@ -55,11 +49,11 @@ import PamView.BasicKeyItem;
 import PamView.ColourArray;
 import PamView.LineKeyItem;
 import PamView.PamColors;
+import PamView.PamColors.PamColor;
 import PamView.PamKeyItem;
 import PamView.PamSymbol;
 import PamView.PamSymbolType;
 import PamView.PamTabPanel;
-import PamView.PamColors.PamColor;
 import PamView.dialog.PamCheckBox;
 import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.PamLabel;
@@ -69,12 +63,15 @@ import PamView.panel.JPanelWithPamKey;
 import PamView.panel.KeyPanel;
 import PamView.panel.PamPanel;
 import PamguardMVC.PamConstants;
-import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
-import PamguardMVC.PamObserver;
 import PamguardMVC.PamObserverAdapter;
-import PamController.soundMedium.GlobalMedium;
+import pamScrollSystem.AbstractPamScroller;
+import pamScrollSystem.AbstractPamScrollerAWT;
+import pamScrollSystem.PamScrollObserver;
+import pamScrollSystem.PamScroller;
+import pamScrollSystem.RangeSpinner;
+import pamScrollSystem.RangeSpinnerListener;
 
 public class NoiseTabPanel implements PamTabPanel {
 
@@ -312,7 +309,7 @@ private void setAxisLabels() {
 		if (noiseDataBlock != null) {
 			noiseDataBlock.addObserver(noiseObserver);
 		}
-		if (noiseDisplaySettings.autoScale == false) {
+		if (!noiseDisplaySettings.autoScale) {
 			levelAxis.setMinVal(noiseDisplaySettings.levelMin);
 			levelAxis.setMaxVal(noiseDisplaySettings.levelMax);
 			if (specLevelAxis != null) {
@@ -375,7 +372,7 @@ private void setAxisLabels() {
 				noiseData = aUnit.getNoiseBandData();
 //				chan = PamUtils.getSingleChannel(aUnit.getChannelBitmap());
 				chan = PamUtils.getSingleChannel(aUnit.getSequenceBitmap());
-				if (noiseDisplaySettings.selectedChannels[chan] == false) {
+				if (!noiseDisplaySettings.selectedChannels[chan]) {
 //					continue;
 				}
 				nBands = noiseData.length;
@@ -384,7 +381,7 @@ private void setAxisLabels() {
 				}
 				lastUnit = lastChanUnit[chan];
 				for (int i = 0; i < nMeasures; i++) {
-					if (noiseDisplaySettings.isSelectData(i) == false) {
+					if (!noiseDisplaySettings.isSelectData(i)) {
 //						continue;
 					}
 					for (int m = 0; m < nBands; m++) {
@@ -565,13 +562,13 @@ private void setAxisLabels() {
 			int nStats = noiseDataBlock.getNumUsedStats();
 			if (noiseDisplaySettings.selectedChannels == null) {
 				return;
-			};
+			}
 			for (int iChan = 0; iChan <= hChan; iChan++) {
 //				if (((1<<iChan) & noiseDataBlock.getChannelMap()) == 0) {
 				if (((1<<iChan) & noiseDataBlock.getSequenceMap()) == 0) {
 					continue;
 				}
-				if (noiseDisplaySettings.selectedChannels[iChan] == false) {
+				if (!noiseDisplaySettings.selectedChannels[iChan]) {
 					continue;
 				}
 				aUnit = latestNoise[iChan];
@@ -723,7 +720,7 @@ private void setAxisLabels() {
 			 * Only need to do the symbols once for all four measurement type
 			 * USe the colour of the first entry for this. 
 			 */
-			if (noiseDisplaySettings.selectedStats == 0 || noiseDisplaySettings.showKey == false) { 
+			if (noiseDisplaySettings.selectedStats == 0 || !noiseDisplaySettings.showKey) { 
 				setKeyPanel(null);
 				return;
 			}
@@ -750,11 +747,11 @@ private void setAxisLabels() {
 			String txt;
 			for (int iChan = 0; iChan < nChan; iChan++) {
 				chanNum = channelIndexToNumber(iChan);
-				if (noiseDisplaySettings.selectedChannels[chanNum] == false) {
+				if (!noiseDisplaySettings.selectedChannels[chanNum]) {
 					continue;
 				}
 				for (int iM = 0; iM < nThings; iM++) {
-					if (noiseDisplaySettings.isSelectData(iM) == false) {
+					if (!noiseDisplaySettings.isSelectData(iM)) {
 						continue;
 					}
 //					txt = String.format("Ch %d %s", channelSelectionPanel.channelLUT[iChan],
@@ -799,7 +796,7 @@ private void setAxisLabels() {
 					noiseData = aUnit.getNoiseBandData();
 //					chan = PamUtils.getSingleChannel(aUnit.getChannelBitmap());
 					chan = PamUtils.getSingleChannel(aUnit.getSequenceBitmap());
-					if (noiseDisplaySettings.selectedChannels[chan] == false) {
+					if (!noiseDisplaySettings.selectedChannels[chan]) {
 						continue;
 					}
 					lastUnit = lastChanUnit[chan];
@@ -814,7 +811,7 @@ private void setAxisLabels() {
 					nMeasures = noiseData.length;
 					
 					for (int i = 0; i < nMeasures; i++) {
-						if (noiseDisplaySettings.isSelectData(i) == false) {
+						if (!noiseDisplaySettings.isSelectData(i)) {
 							continue;
 						}
 						nStats = noiseData[i].length;

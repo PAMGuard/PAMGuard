@@ -6,6 +6,7 @@ import java.net.URI;
 /**
  * Class for breaking a file name down into it's constituent 
  * parts. 
+ * 
  * @author Doug Gillespie
  *
  */

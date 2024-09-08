@@ -60,7 +60,7 @@ public class D3XMLFile {
 		if (end == null) {
 			return null;
 		}
-		if (end.equalsIgnoreCase("wav")  == false && end.equalsIgnoreCase("xml")  == false) {
+		if (!end.equalsIgnoreCase("wav") && !end.equalsIgnoreCase("xml")) {
 			return null;
 		}
 		String xmlFileName = wavFileName.replace(".wav", ".xml");
@@ -70,7 +70,7 @@ public class D3XMLFile {
 		//			return null;
 		//		}
 		File xmlFile = new File(xmlFileName);
-		if (xmlFile.exists() == false) {
+		if (!xmlFile.exists()) {
 			return null;
 		}
 		/*
@@ -204,7 +204,7 @@ public class D3XMLFile {
 			}
 		}
 		catch (Exception e) {
-			System.out.println("Error unpacking device Id: " + fullId);;
+			System.out.println("Error unpacking device Id: " + fullId);
 			return false;
 		}
 		return true;

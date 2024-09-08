@@ -84,29 +84,29 @@ public class SystemTiming {
 	 * 
 	 */
 	public static long getProcessCPUTime () {
-		if (loadTried == false) {
+		if (!loadTried) {
 			load();
 		}
-		if (loadOK == false) return 0;
+		if (!loadOK) return 0;
 
 		return sysGetProcessCPUTime();
 	}
 	
 	public static boolean setSystemTime(long timeMilliseconds) {
-		if (loadTried == false) {
+		if (!loadTried) {
 			load();
 		}
-		if (loadOK == false) return false;
+		if (!loadOK) return false;
 		Calendar c = Calendar.getInstance();
 		c.setTimeInMillis(timeMilliseconds);
 		return setSystemTime(c);
 	}
 
 	public static boolean setSystemTime(Calendar c) {
-		if (loadTried == false) {
+		if (!loadTried) {
 			load();
 		}
-		if (loadOK == false) return false;
+		if (!loadOK) return false;
 		c.setTimeZone(TimeZone.getTimeZone("GMT"));
 		return sysSetSystemTime(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DATE), 
 				c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), c.get(Calendar.SECOND), c.get(Calendar.MILLISECOND));

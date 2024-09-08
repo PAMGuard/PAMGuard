@@ -13,9 +13,9 @@ public class AirgunDimensionsDrawing extends ShipDimensionsDrawing {
 
 	private double dimE = 0.1;
 	static private double dimF = 0.5;
-	
+
 	PamSymbol airgunSymbol;
-	
+
 	public AirgunDimensionsDrawing() throws HeadlessException {
 		super();
 		airgunSymbol = new PamSymbol(PamSymbolType.SYMBOL_HEXAGRAM, 10, 10, false, Color.BLUE, Color.BLUE);

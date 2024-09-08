@@ -1,6 +1,7 @@
 package dataPlotsFX.overlaymark;
 
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JPopupMenu;
@@ -36,17 +37,20 @@ public class TDMarkerFX extends StandardOverlayMarker  {
 	 * The current detection group. 
 	 */
 	private DetectionGroupSummary currentDetectionGroup;
+	
+	/**
+	 * The detection groups. 
+	 */
+	public ArrayList<DetectionGroupListener> detectionGroupListeners = new ArrayList<DetectionGroupListener>(); 
 
 	/**
 	 * The maximum distance a click can be from a data unit to be selected. 
 	 */
 	private static double maxMarkDistance=15; 
-
-
+	
 
 	public TDMarkerFX(TDGraphFX tdGraphFX) {
 		super(tdGraphFX);
-
 	}
 
 	/*
@@ -57,6 +61,23 @@ public class TDMarkerFX extends StandardOverlayMarker  {
 		return true; 
 	}
 
+	/**
+	 * Add the detection group listener. 
+	 * @param detectionGroupListener - the detection group listener
+	 */
+	public void addDetectionGroupListener(DetectionGroupListener detectionGroupListener) {
+		detectionGroupListeners.add(detectionGroupListener);
+	}
+
+	/**
+	 * Notify all listeners that there is a new detection group.
+	 * @param detectionGroup - the detection groups. 
+	 */
+	private void notifyNewDetectionGroup(DetectionGroupSummary detectionGroup) {
+		for (DetectionGroupListener aDetectionGroupListener : detectionGroupListeners) {
+			aDetectionGroupListener.newSelectedGroup(detectionGroup);
+		}
+	}
 
 	/**
 	 * Override to allow a highlighting of selected data units. 
@@ -110,7 +131,7 @@ public class TDMarkerFX extends StandardOverlayMarker  {
 
 		currentDetectionGroup = new DetectionGroupSummary(e, this, this.getCurrentMark(),
 				getSelectedMarkedDataUnits(this.getCurrentMark(), null) ); 
-
+		notifyNewDetectionGroup(currentDetectionGroup);
 		//		Debug.out.println("TDMarkerFX: Marked data units: " + currentDetectionGroup.getNumDataUnits()); 
 
 		this.setNowMarking(false);
@@ -160,6 +181,7 @@ public class TDMarkerFX extends StandardOverlayMarker  {
 			//System.out.println("PamMarkerFX: Found a data unit @ distance: " + foundDataUnit.distance + " "
 			//		+ PamCalendar.formatDateTime(foundDataUnit.dataUnit.getTimeMilliseconds()));
 			currentDetectionGroup =  new DetectionGroupSummary(e, this, this.getCurrentMark(), foundDataUnit.dataUnit);  
+			notifyNewDetectionGroup(currentDetectionGroup);
 			return true; 
 		}
 		else{
@@ -168,6 +190,7 @@ public class TDMarkerFX extends StandardOverlayMarker  {
 				//only do this if the primary mouse button. Otherwise we might be right clicking on a markout out area in which
 				//all saved markes will be removed and the pop up menu will show nothing. So the user can only use the primary button to select data units.
 				currentDetectionGroup =null; 
+				notifyNewDetectionGroup(currentDetectionGroup);
 			}
 			foundDataUnit=null; 
 			return false; 

@@ -137,10 +137,10 @@ public class OfflineTaskManager {
 	public OfflineTask findOfflineTask(String unitType, String unitName, String taskName) {
 		// could possibly also do a check on class type ????
 		for (OfflineTask aTask : globalTaskList) {
-			if (aTask.getUnitType().equals(unitType) == false) {
+			if (!aTask.getUnitType().equals(unitType)) {
 				continue;
 			}
-			if (aTask.getUnitName().equals(unitName) == false) {
+			if (!aTask.getUnitName().equals(unitName)) {
 				continue;
 			}
 			if (aTask.getName().equals(taskName)) {

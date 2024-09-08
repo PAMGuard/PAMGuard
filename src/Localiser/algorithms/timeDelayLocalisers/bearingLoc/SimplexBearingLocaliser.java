@@ -1,5 +1,6 @@
 package Localiser.algorithms.timeDelayLocalisers.bearingLoc;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 import org.apache.commons.math.FunctionEvaluationException;
@@ -14,9 +15,13 @@ import Array.ArrayManager;
 import Array.PamArray;
 import Jama.Matrix;
 import Jama.QRDecomposition;
+import Localiser.LocalisationAlgorithmInfo;
+import PamDetection.LocContents;
 import PamUtils.PamUtils;
 import pamMaths.PamVector;
+import tethys.localization.LocalizationCreator;
 
+@Deprecated
 public class SimplexBearingLocaliser implements BearingLocaliser {
 	private int arrayType;
 	private Matrix hydrophoneVectors;
@@ -37,6 +42,11 @@ public class SimplexBearingLocaliser implements BearingLocaliser {
 		this.hydrophoneBitMap = hydrophoneBitMap;
 		this.timeMillis = timeMillis;
 		this.timingError = timingError;
+	}
+
+	@Override
+	public int getLocalisationContents() {
+		return LocContents.HAS_BEARING | LocContents.HAS_AMBIGUITY;
 	}
 
 	@Override
@@ -230,7 +240,27 @@ public class SimplexBearingLocaliser implements BearingLocaliser {
 	public void setFirstStep(double[] firstStep) {
 		this.firstStep = firstStep;
 	}
-	
+
+	@Override
+	public String getAlgorithmName() {
+		return "Simplex bearing localiser";
+	}
+
+	@Override
+	public LocalisationAlgorithmInfo getAlgorithmInfo() {
+		return this;
+	}
+
+	@Override
+	public LocalizationCreator getTethysCreator() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Serializable getParameters() {
+		return null;
+	}
 //	private class BearingConvergence implements RealConvergenceChecker {
 //
 //		@Override

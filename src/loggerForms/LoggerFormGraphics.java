@@ -1,16 +1,27 @@
 package loggerForms;
 
-import generalDatabase.lookupTables.LookupItem;
-import generalDatabase.lookupTables.LookupList;
-import geoMag.MagneticVariation;
-
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Window;
 import java.util.ArrayList;
 
+import GPS.GpsData;
+import Map.MapRectProjector;
+import PamUtils.Coordinate3d;
+import PamUtils.LatLong;
+import PamView.GeneralProjector;
+import PamView.GeneralProjector.ParameterType;
+import PamView.GeneralProjector.ParameterUnits;
+import PamView.PamKeyItem;
+import PamView.PamSymbol;
+import PamView.PanelOverlayDraw;
+import PamView.symbol.PamSymbolChooser;
+import PamView.symbol.SymbolData;
+import PamguardMVC.PamDataUnit;
+import generalDatabase.lookupTables.LookupItem;
+import generalDatabase.lookupTables.LookupList;
+import geoMag.MagneticVariation;
 import loggerForms.controlDescriptions.CdLookup;
 import loggerForms.controlDescriptions.ControlDescription;
 import loggerForms.controlDescriptions.ControlTypes;
@@ -19,21 +30,6 @@ import loggerForms.formdesign.propertypanels.SymbolPanel;
 import loggerForms.propertyInfos.BEARINGinfo;
 import loggerForms.propertyInfos.HEADINGinfo;
 import loggerForms.propertyInfos.RANGEinfo;
-import loggerForms.PropertyTypes;
-import GPS.GpsData;
-import Map.MapRectProjector;
-import PamUtils.Coordinate3d;
-import PamUtils.LatLong;
-import PamView.GeneralProjector;
-import PamView.PamColors;
-import PamView.PamKeyItem;
-import PamView.PamSymbol;
-import PamView.PamSymbolType;
-import PamView.PanelOverlayDraw;
-import PamView.GeneralProjector.ParameterType;
-import PamView.GeneralProjector.ParameterUnits;
-import PamView.symbol.SymbolData;
-import PamguardMVC.PamDataUnit;
 
 public class LoggerFormGraphics extends PanelOverlayDraw {
 
@@ -116,7 +112,7 @@ public class LoggerFormGraphics extends PanelOverlayDraw {
 	private Rectangle drawOnMap(Graphics g, PamDataUnit pamDataUnit,
 			GeneralProjector generalProjector) {
 		FormsDataUnit formDataUnit = (FormsDataUnit) pamDataUnit;
-		if (shouldPlotOnMap(formDataUnit, generalProjector) == false) {
+		if (!shouldPlotOnMap(formDataUnit, generalProjector)) {
 			return null;
 		}
 
@@ -189,7 +185,7 @@ public class LoggerFormGraphics extends PanelOverlayDraw {
 
 		double shipCourse = plotOrigin.getCourseOverGround();
 		double shipHead = plotOrigin.getHeading();
-		PamSymbol plotSymbol = getPlotSymbol(formDataUnit);
+		PamSymbol plotSymbol = getPlotSymbol(generalProjector, formDataUnit);
 
 		Coordinate3d detOrigin = generalProjector.getCoord3d(plotOrigin.getLatitude(), plotOrigin.getLongitude(), plotOrigin.getHeight());
 		// see if there is range heading and bearing data. 
@@ -248,7 +244,7 @@ public class LoggerFormGraphics extends PanelOverlayDraw {
 		int nControls = data.length;
 		ControlDescription controlDescription;
 		ArrayList<InputControlDescription> controlDescriptions = formDescription.getInputControlDescriptions();
-		PamSymbol plotSymbol = getPlotSymbol(dataUnit);
+		PamSymbol plotSymbol = getPlotSymbol(generalProjector, dataUnit);
 		if (plotSymbol == null) {
 			return null;
 		}
@@ -326,7 +322,7 @@ public class LoggerFormGraphics extends PanelOverlayDraw {
 				continue;
 			}
 			controlDescription = controlDescriptions.get(i);
-			if (controlDescription.getPlot() == false) {
+			if (!controlDescription.getPlot()) {
 				// control description is not one to plot, so won't decide on that either !
 				continue;
 			}
@@ -354,7 +350,22 @@ public class LoggerFormGraphics extends PanelOverlayDraw {
 	 * @param pamDataUnit data unit to plot
 	 * @return symbol. 
 	 */
-	private PamSymbol getPlotSymbol(FormsDataUnit dataUnit) {
+	private PamSymbol getPlotSymbol(GeneralProjector projector, FormsDataUnit dataUnit) {
+		/**
+		 * Try to use the new selector system. If it's not there, then revert to
+		 * the older system. 
+		 */
+		PamSymbolChooser chooser = null;
+		if (projector != null) {
+			chooser = projector.getPamSymbolChooser();
+		}
+		if (chooser != null) {
+			PamSymbol chosenSymbol = chooser.getPamSymbol(projector, dataUnit);
+			if (chosenSymbol != null) {
+				return chosenSymbol;
+			}
+		}
+		
 		/**
 		 * first go through all the controls and see which is 
 		 * the first one that's initiated plotting. If it's 
@@ -374,7 +385,7 @@ public class LoggerFormGraphics extends PanelOverlayDraw {
 				continue;
 			}
 			controlDescription = controlDescriptions.get(i);
-			if (controlDescription.getPlot() == false) {
+			if (!controlDescription.getPlot()) {
 				// control description is not one to plot, so won't decide on that either !
 				continue;
 			}
@@ -394,7 +405,7 @@ public class LoggerFormGraphics extends PanelOverlayDraw {
 					}
 				}
 			}
-			if (formPlotOptions.isPlotControl(i+1) == false) {
+			if (!formPlotOptions.isPlotControl(i+1)) {
 				/*
 				 *  this one will work for non lookup controls and for lookup 
 				 *  controls where the select all function has been selected.
@@ -409,22 +420,7 @@ public class LoggerFormGraphics extends PanelOverlayDraw {
 	@Override
 	public String getHoverText(GeneralProjector generalProjector,
 			PamDataUnit dataUnit, int iSide) {
-		FormsDataUnit formsDU = (FormsDataUnit) dataUnit;
-		String str = String.format("<html><b>%s</b>", formDescription.getFormNiceName());
-		Object[] data = formsDU.getFormData();
-		int iDat = 0;
-		for (ControlDescription cd:formDescription.getInputControlDescriptions()) {
-			if (data[iDat] == null) {
-				str += String.format("<p>%s: -", cd.getTitle());
-			}
-			else {
-				str += String.format("<p>%s: %s", cd.getTitle(), data[iDat].toString());
-			}
-			iDat++;
-		}
-
-		str += "</html>";
-		return str;
+		return dataUnit.getSummaryString();
 	}
 
 	private void createSymbols() {

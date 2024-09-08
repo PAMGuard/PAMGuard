@@ -15,12 +15,10 @@ import PamUtils.LatLong;
 import PamView.PamColors;
 import PamView.PamColors.PamColor;
 import PamView.panel.PamBorder;
-import PamView.panel.PamBorderPanel;
 import PamView.panel.PamPanel;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
-import PamguardMVC.PamObserver;
 import PamguardMVC.PamObserverAdapter;
 
 /*
@@ -36,7 +34,7 @@ public class ArrayAccelPanel {
 	private long zeroGraphTime;
 	private ArrayAccelDataBlock accelDataBlock;
 	private int panelDurationSecs = 300;
-	private double timeScale = 1;;
+	private double timeScale = 1;
 
 
 	public ArrayAccelPanel(ArrayAccelControl accelControl) {

@@ -63,7 +63,7 @@ public class EmptyTableDefinition implements Cloneable {
 		char c;
 		for (int i = 0; i < newString.length(); i++) {
 			c = newString.charAt(i);
-			if (isValidCharacter(c) == false)  {
+			if (!isValidCharacter(c))  {
 				newString = newString.replace(c, '_');
 			}
 		}
@@ -249,13 +249,13 @@ public class EmptyTableDefinition implements Cloneable {
 		boolean first = true;
 		for (int i = 0; i < nItems; i++) {
 			tableItem = getTableItem(i);
-			if (tableItem.isCounter() && includeCounters == false) {
+			if (tableItem.isCounter() && !includeCounters) {
 				continue;
 			}
-			if (tableItem.isPrimaryKey() && includeCounters == false) {
+			if (tableItem.isPrimaryKey() && !includeCounters) {
 				continue;
 			}
-			if (first == false) {
+			if (!first) {
 				str+=", ";
 				valsBit+=", ";
 			}
@@ -402,10 +402,16 @@ public class EmptyTableDefinition implements Cloneable {
 	protected EmptyTableDefinition clone() {
 		try {
 			EmptyTableDefinition clone = (EmptyTableDefinition) super.clone();
+			/**
+			 * Don't clone the list items themselves since these may be referenced from the
+			 * SQLLogging class, which won't be able to find them if their references change.
+			 * Just clone the array list, leaving the individual items alone.  
+			 */
 			clone.pamTableItems = new ArrayList<>();
-			for (PamTableItem tableItem : this.pamTableItems) {
-				clone.pamTableItems.add(tableItem.clone());
-			}
+			clone.pamTableItems.addAll(this.pamTableItems);
+//			for (PamTableItem tableItem : this.pamTableItems) {
+//				clone.pamTableItems.add(tableItem.clone());
+//			}
 			return clone;
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();

@@ -203,7 +203,8 @@ public class PamControlledGUISwing extends PamControlledUnitGUI {
 			return pamView.getGuiFrame();
 		}
 		else {
-			return PamController.getInstance().getMainFrame();
+			PamController.getInstance();
+			return PamController.getMainFrame();
 		}
 	}
 

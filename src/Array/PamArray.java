@@ -23,26 +23,21 @@ package Array;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import Acquisition.AcquisitionControl;
-import pamMaths.PamVector;
-import Array.streamerOrigin.HydrophoneOriginMethod;
 import Array.streamerOrigin.OriginSettings;
-import Array.streamerOrigin.StreamerDataIterator;
-import GPS.GpsData;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
-import PamUtils.LatLong;
 import PamUtils.PamArrayUtils;
 import PamView.PamSymbol;
 import PamguardMVC.ChannelIterator;
 import PamguardMVC.PamConstants;
 import PamguardMVC.PamDataBlock;
+import pamMaths.PamVector;
 
 /**
  * 
@@ -265,7 +260,9 @@ public class PamArray implements Serializable, Cloneable, ManagedParameters {
 	}
 
 	protected Hydrophone getHydrophone(int iPhone, long timeMilliseconds) {
-		//		Debug.println("PAMArray: Get hydrophone coords: " + timeMilliseconds + " iPhone: " + iPhone);
+//		System.out.println("PAMArray: Get hydrophone coords: " + PamCalendar.formatDateTime(timeMilliseconds) + " iPhone: " + iPhone);
+		
+
 		if (hydrophoneInterpolation == ORIGIN_USE_LATEST) {
 			return getHydrophone(iPhone);
 		}
@@ -275,12 +272,14 @@ public class PamArray implements Serializable, Cloneable, ManagedParameters {
 
 		//FIXME - for some reason the above lines were always returning the first hydrophone in the datablock ^
 		HydrophoneDataUnit hdu = ArrayManager.getArrayManager().getHydrophoneDataBlock().getClosestHydrophone(timeMilliseconds, iPhone); 
+		
+//		System.out.println("PAMArray: hdu: " + hdu + " " + (hdu==null? null: PamCalendar.formatDateTime(hdu.getTimeMilliseconds()) + " Z" + hdu.getHydrophone().getdZ()));
 
 		if (hdu != null) {
-			//			Debug.println("PAMArray: found unit: " + hdu.getTimeMilliseconds());
-			//			long firstTime = ArrayManager.getArrayManager().getHydrophoneDataBlock().getFirstUnit().getTimeMilliseconds();
-			//			long lastTime = ArrayManager.getArrayManager().getHydrophoneDataBlock().getLastUnit().getTimeMilliseconds(); 
-			//			Debug.println("PAMArray: found unit: " + firstTime + " " + lastTime + " no: units: " + ArrayManager.getArrayManager().getHydrophoneDataBlock().getUnitsCount()); 
+//						System.out.println("PAMArray: found unit: " + hdu.getTimeMilliseconds());
+//						long firstTime = ArrayManager.getArrayManager().getHydrophoneDataBlock().getFirstUnit().getTimeMilliseconds();
+//						long lastTime = ArrayManager.getArrayManager().getHydrophoneDataBlock().getLastUnit().getTimeMilliseconds(); 
+//						System.out.println("PAMArray: found unit: " + firstTime + " " + lastTime + " no: units: " + ArrayManager.getArrayManager().getHydrophoneDataBlock().getUnitsCount()); 
 			// TODO should maybe do something here to average out two hydrophones if interpolation option is selected. 
 			return hdu.getHydrophone();
 		}
@@ -1276,7 +1275,7 @@ public class PamArray implements Serializable, Cloneable, ManagedParameters {
 				return preceeding.getStreamerData();
 			}
 			// otherwise, we also want the next one ...
-			if (streamerIterator.hasNext() == false) {
+			if (!streamerIterator.hasNext()) {
 				return preceeding.getStreamerData();
 			}
 			nextUnit = streamerIterator.next();
@@ -1288,7 +1287,7 @@ public class PamArray implements Serializable, Cloneable, ManagedParameters {
 		double w1 = nextUnit.getTimeMilliseconds()-timeMilliseconds;
 		double w2 = timeMilliseconds-preceeding.getTimeMilliseconds();
 		double wTot = w1+w2;
-		if (wTot == 0 || Double.isFinite(wTot) == false) {
+		if (wTot == 0 || !Double.isFinite(wTot)) {
 			w1 = w2 = 0.5;
 		}
 		else {
@@ -1305,7 +1304,6 @@ public class PamArray implements Serializable, Cloneable, ManagedParameters {
 	 * @return
 	 */
 	public int addStreamer(Streamer streamer) {
-
 		synchronized (streamers) {
 			streamers.add(streamer);
 			checkStreamerIndexes();

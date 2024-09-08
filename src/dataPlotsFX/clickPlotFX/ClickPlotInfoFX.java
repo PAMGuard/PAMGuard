@@ -238,7 +238,7 @@ public class ClickPlotInfoFX extends TDDataInfoFX {
 
 		ClickDetection click = (ClickDetection) pamDataUnit;
 		//first check we can generally plot the click
-		if (!shouldPlot(click)) return null; 
+//		if (!shouldPlot(click)) return null; 
 		//click has passed the first test! Now get the correct data value; 
 		Double val = null;
 		switch (getCurrentScaleInfo().getDataType()) {
@@ -517,7 +517,7 @@ public class ClickPlotInfoFX extends TDDataInfoFX {
 
 		if (pamDataUnit.getSuperDetectionsCount()==0) return null;
 
-		ListIterator<PamDataUnit> iterator = this.getPamDataBlock().getListIterator(PamDataBlock.ITERATOR_END); 
+		ListIterator<PamDataUnit> iterator = this.getDataBlock().getListIterator(PamDataBlock.ITERATOR_END); 
 		PamDataUnit testDataUnit; 
 
 		while (iterator.hasPrevious()) {
@@ -599,21 +599,21 @@ public class ClickPlotInfoFX extends TDDataInfoFX {
 	//	}
 
 
-	/***
-	 * Used to determine which clicks should be plotted on the display by using the click data selector. 
-	 * @param click - the click to check. 	
-	 * @return true to plot the click. 
-	 */
-	private synchronized boolean shouldPlot(ClickDetection click) {
-
-		if (click == null) return false;
-
-		dataSelector.scoreData(click); 
-
-		if (clickDisplayParams.displayChannels > 0 && (clickDisplayParams.displayChannels & click.getChannelBitmap()) == 0) return false;
-
-		return true;
-	}
+//	/***
+//	 * Used to determine which clicks should be plotted on the display by using the click data selector. 
+//	 * @param click - the click to check. 	
+//	 * @return true to plot the click. 
+//	 */
+//	private synchronized boolean shouldPlot(ClickDetection click) {
+//
+//		if (click == null) return false;
+//
+//		if (dataSelector.scoreData(click)<=0) return false; 
+//
+//		if (clickDisplayParams.displayChannels > 0 && (clickDisplayParams.displayChannels & click.getChannelBitmap()) == 0) return false;
+//
+//		return true;
+//	}
 
 	@Override
 	public TDSymbolChooserFX getSymbolChooser() {
@@ -931,7 +931,7 @@ public class ClickPlotInfoFX extends TDDataInfoFX {
 	 * time/frequency displays...
 	 * @return The FFT plot manager.
 	 */
-	public ClickFFTPlotManager2 getClickFFTplotManager() {
+	public ClickFFTPlotManager2 getClickFFTPlotManager() {
 		return clickFFTplotManager;
 	}
 

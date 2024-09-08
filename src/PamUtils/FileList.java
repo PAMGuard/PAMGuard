@@ -44,7 +44,7 @@ public class FileList {
 			return null;
 		}
 		File rootFolder = new File(folderName);
-		if (rootFolder.exists() == false) {
+		if (!rootFolder.exists()) {
 			return null;
 		}
 		fileList = new ArrayList<File>();

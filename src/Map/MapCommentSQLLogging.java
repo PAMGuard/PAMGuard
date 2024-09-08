@@ -2,12 +2,12 @@ package Map;
 
 import java.sql.Types;
 
+import PamUtils.LatLong;
+import PamguardMVC.PamDataUnit;
 import generalDatabase.PamTableDefinition;
 import generalDatabase.PamTableItem;
 import generalDatabase.SQLLogging;
 import generalDatabase.SQLTypes;
-import PamUtils.LatLong;
-import PamguardMVC.PamDataUnit;
 
 public class MapCommentSQLLogging extends SQLLogging {
 

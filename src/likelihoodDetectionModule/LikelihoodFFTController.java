@@ -108,7 +108,7 @@ public class LikelihoodFFTController extends PamControlledUnit {
 	public void removeUnusedProcesses() {
 		for ( int i = 0; i < fftProcesses.size(); ++i ) {
 			LikelihoodFFTProcess p = fftProcesses.get(i);
-			if ( p.getInUse() == false ) {
+			if ( !p.getInUse() ) {
 				p.destroyProcess();
 				removePamProcess( p );
 				fftProcesses.remove( i );

@@ -7,21 +7,20 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.DateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
 import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioFormat.Encoding;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import javax.sound.sampled.AudioFormat.Encoding;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -31,33 +30,24 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileFilter;
 
 import org.jflac.FLACDecoder;
+import org.jflac.PCMProcessor;
 import org.jflac.frame.Frame;
+import org.jflac.metadata.StreamInfo;
+import org.jflac.sound.spi.FlacEncoding;
 import org.jflac.util.ByteData;
 import org.pamguard.x3.sud.Chunk;
 import org.pamguard.x3.sud.SudAudioInputStream;
 import org.pamguard.x3.sud.SudFileListener;
-import org.pamguard.x3.sud.SudParams;
-import org.jflac.PCMProcessor;
-import org.jflac.metadata.StreamInfo;
-import org.jflac.sound.spi.FlacEncoding;
 
-//import org.kc7bfi.jflac.FLACDecoder;
-//import org.kc7bfi.jflac.PCMProcessor;
-//import org.kc7bfi.jflac.frame.Frame;
-//import org.kc7bfi.jflac.metadata.SeekPoint;
-//import org.kc7bfi.jflac.metadata.StreamInfo;
-//import org.kc7bfi.jflac.sound.spi.FlacEncoding;
-//import org.kc7bfi.jflac.util.ByteData;
-
-import wavFiles.ByteConverter;
 import Acquisition.filedate.FileDate;
 import Acquisition.filedate.FileDateDialogStrip;
 import Acquisition.filedate.FileDateObserver;
 import Acquisition.filetypes.SoundFileType;
-import Acquisition.pamAudio.PamAudioFileManager;
 import Acquisition.pamAudio.PamAudioFileFilter;
+import Acquisition.pamAudio.PamAudioFileManager;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamSettingManager;
@@ -72,9 +62,19 @@ import PamView.panel.PamProgressBar;
 import pamguard.GlobalArguments;
 import warnings.PamWarning;
 
+//import org.kc7bfi.jflac.FLACDecoder;
+//import org.kc7bfi.jflac.PCMProcessor;
+//import org.kc7bfi.jflac.frame.Frame;
+//import org.kc7bfi.jflac.metadata.SeekPoint;
+//import org.kc7bfi.jflac.metadata.StreamInfo;
+//import org.kc7bfi.jflac.sound.spi.FlacEncoding;
+//import org.kc7bfi.jflac.util.ByteData;
+
+import wavFiles.ByteConverter;
+
 /**
- * Implementation of DaqSystem for reading data from audio files. 
- * 
+ * Implementation of DaqSystem for reading data from audio files.
+ *
  * @author Doug Gillespie
  * @see Acquisition.DaqSystem
  * @see Acquisition.AcquisitionProcess
@@ -108,7 +108,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	protected PamLabel speedLabel;
 
 	/**
-	 * using a system.currentTimeMS not PamCalander time to predict eta. 
+	 * using a system.currentTimeMS not PamCalander time to predict eta.
 	 */
 	protected long fileStartTime;
 
@@ -147,14 +147,14 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	protected ByteConverter byteConverter;
 
 	protected FileDateDialogStrip fileDateStrip;
-	
+
 	/**
 	 * Sound file types present in the current selections.
 	 */
 	private List<SoundFileType> selectedFileTypes;
 
 	/**
-	 * Text field for skipping initial few seconds of a file. 
+	 * Text field for skipping initial few seconds of a file.
 	 */
 	private JTextField skipSecondsField;
 
@@ -180,13 +180,12 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 
 		this.acquisitionDialog = acquisitionDialog;
 
-
 		return getDialogPanel();
 	}
 
 	/**
 	 * Gets and where necessary creates ...
-	 * @return Daq dialog panel. 
+	 * @return Daq dialog panel.
 	 */
 	protected JPanel getDialogPanel() {
 		if (daqDialog == null) {
@@ -197,7 +196,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 
 	protected JPanel createDaqDialogPanel() {
 
-		JPanel p = new JPanel();
+		PamPanel p = new PamPanel();
 		p.setBorder(new TitledBorder("Select sound file"));
 		GridBagLayout layout = new GridBagLayout();
 		layout.columnWidths = new int[]{100, 100, 10};
@@ -217,7 +216,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		constraints.fill = GridBagConstraints.NONE;
 		constraints.anchor = GridBagConstraints.WEST;
 		constraints.gridx = 0;
-		addComponent(p, repeat = new JCheckBox("Repeat"), constraints);	
+		addComponent(p, repeat = new JCheckBox("Repeat"), constraints);
 		constraints.gridx = 2;
 		constraints.gridy = 1;
 		constraints.gridwidth = 1;
@@ -234,7 +233,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		p.add(fileDateStrip.getDialogComponent(), constraints);
 
 		//		if (SMRUEnable.isEnable()) {
-		// no reason to hide this option from users. 
+		// no reason to hide this option from users.
 		constraints.gridy++;
 		constraints.gridx = 0;
 		constraints.gridwidth = 1;
@@ -252,6 +251,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		//		constraints.gridwidth = 2;
 		//		addComponent(p, fileDateText = new JTextField(), constraints);
 		//		fileDateText.setEnabled(false);
+
 		return p;
 
 	}
@@ -286,8 +286,8 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		fileNameCombo.removeAllItems();
 		String file;
 		if (fileInputParameters.recentFiles.size() == 0) return;
-		for (int i = 0; i < fileInputParameters.recentFiles.size(); i++){
-			file = fileInputParameters.recentFiles.get(i);
+		for (String element : fileInputParameters.recentFiles) {
+			file = element;
 			if (file == null || file.length() == 0) continue;
 			fileNameCombo.addItem(file);
 		}
@@ -300,7 +300,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		if (file != null && file.length() > 0) {
 			fileInputParameters.recentFiles.remove(file);
 			fileInputParameters.recentFiles.add(0, file);
-			// check we're not building up too long a list. 
+			// check we're not building up too long a list.
 			while (fileInputParameters.recentFiles.size() > FileInputParameters.MAX_RECENT_FILES) {
 				fileInputParameters.recentFiles.remove(fileInputParameters.recentFiles.size()-1);
 				fileInputParameters.recentFiles.trimToSize();
@@ -316,11 +316,11 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 
 		if (skipSecondsField!=null) {
 			try {
-				Double skipSeconds = Double.valueOf(skipSecondsField.getText())*1000.; // saved in millis. 
+				Double skipSeconds = Double.valueOf(skipSecondsField.getText())*1000.; // saved in millis.
 				fileInputParameters.skipStartFileTime = skipSeconds.longValue();
 			}
 			catch (Exception e) {
-				return false; 
+				return false;
 			}
 		}
 
@@ -334,13 +334,13 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 
 	@Override
 	public String getSystemName() {
-		if (fileInputParameters.recentFiles == null) return null;
-		if (fileInputParameters.recentFiles.size() < 1) return null;
+		if ((fileInputParameters.recentFiles == null) || (fileInputParameters.recentFiles.size() < 1)) return null;
 		File f = getCurrentFile();
 		if (f == null) return null;
 		return f.getName();
 	}
 
+	@Override
 	public void actionPerformed(ActionEvent e) {
 
 		if (e.getSource() == fileSelect) {
@@ -373,8 +373,8 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 			fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			javax.swing.filechooser.FileFilter[] filters = fileChooser
 					.getChoosableFileFilters();
-			for (int i = 0; i < filters.length; i++) {
-				fileChooser.removeChoosableFileFilter(filters[i]);
+			for (FileFilter filter : filters) {
+				fileChooser.removeChoosableFileFilter(filter);
 			}
 			fileChooser.addChoosableFileFilter(new PamAudioFileFilter());
 
@@ -391,7 +391,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	}
 
 	/**
-	 * Called when user selects a file in the dialog. 
+	 * Called when user selects a file in the dialog.
 	 * @param newFile
 	 */
 	public void setNewFile (String newFile) {
@@ -402,17 +402,16 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	}
 
 	/**
-	 * Called when a new file or folder is selected. 
+	 * Called when a new file or folder is selected.
 	 * @param newFile
 	 */
 	public void interpretNewFile(String newFile){
-		if (newFile == null) return;
-		if (newFile.length() == 0) return;
+		if ((newFile == null) || (newFile.length() == 0)) return;
 
 		File file = new File(newFile);
-		
+
 		setSelectedFileTypes(acquisitionControl.soundFileTypes.getUsedTypes(file));
-		
+
 		if (file == null) return;
 
 		// try to work out the date of the file
@@ -429,11 +428,13 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		//		acquisitionDialog.NotifyChange();
 		if (file.isFile() && !file.isHidden() && acquisitionDialog != null) {
 			try {
+
+				System.out.println("FileInputSystem - interpretNewFile");
 				AudioInputStream audioStream = PamAudioFileManager.getInstance().getAudioInputStream(file);
 
-				//      // Get additional information from the header if it's a wav file. 
+				//      // Get additional information from the header if it's a wav file.
 				//				if (WavFileInputStream.class.isAssignableFrom(audioStream.getClass())) {
-				//					WavHeader wavHeader = ((WavFileInputStream) audioStream).getWavHeader(); 
+				//					WavHeader wavHeader = ((WavFileInputStream) audioStream).getWavHeader();
 				//					int nChunks = wavHeader.getNumHeadChunks();
 				//					for (int i = 0; i < nChunks; i++) {
 				//						WavHeadChunk aChunk = wavHeader.getHeadChunk(i);
@@ -444,7 +445,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 				if (audioStream instanceof SudAudioInputStream) {
 					acquisitionControl.getSUDNotificationManager().interpretNewFile(newFile, (SudAudioInputStream) audioStream);
 				}
-				
+
 				AudioFormat audioFormat = audioStream.getFormat();
 				//				fileLength = file.length();
 				fileSamples = audioStream.getFrameLength();
@@ -470,7 +471,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		super.setStreamStatus(streamStatus);
 		// file has ended, so notify the daq control.
 		if (streamStatus == STREAM_ENDED) {
-			// tell the rest of PAMGUARD to stop. 
+			// tell the rest of PAMGUARD to stop.
 			PamController.getInstance().stopLater();
 		}
 	}
@@ -508,24 +509,29 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		return false;
 	}
 
+	@Override
 	public Serializable getSettingsReference() {
 		return fileInputParameters;
 	}
 
+	@Override
 	public long getSettingsVersion() {
 		return FileInputParameters.serialVersionUID;
 	}
 
+	@Override
 	public String getUnitName() {
 		//		return "File Input System";
 		return acquisitionControl.getUnitName();
 	}
 
+	@Override
 	public String getUnitType() {
 		//		return "Acquisition System";
 		return "File Input System";
 	}
 
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		//		if (PamSettingManager.getInstance().isSettingsUnit(this, pamControlledUnitSettings)) {
 		fileInputParameters = ((FileInputParameters) pamControlledUnitSettings.getSettings()).clone();
@@ -558,16 +564,15 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		//		if (fileInputParameters.recentFiles == null) return false;
 		//		if (fileInputParameters.recentFiles.size() < 1) return false;
 		//		String fileName = fileInputParameters.recentFiles.get(0);
-		if (runFileAnalysis() == false) {
+		if (!runFileAnalysis()) {
 			return false;
 		}
 		return true;
 	}
 
 	public File getCurrentFile() {
-//		System.out.println("fileInputParameters: " + fileInputParameters); 
-		if (fileInputParameters.recentFiles == null) return null;
-		if (fileInputParameters.recentFiles.size() < 1) return null;
+//		System.out.println("fileInputParameters: " + fileInputParameters);
+		if ((fileInputParameters.recentFiles == null) || (fileInputParameters.recentFiles.size() < 1)) return null;
 		String fileName = fileInputParameters.recentFiles.get(0);
 		return new File(fileName);
 	}
@@ -582,8 +587,8 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	}
 
 	/**
-	 * Open the audio stream for processing. 
-	 * @return true if audio stream opened correctly. 
+	 * Open the audio stream for processing.
+	 * @return true if audio stream opened correctly.
 	 */
 	public boolean prepareInputFile() {
 
@@ -599,6 +604,8 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 			if (audioStream != null) {
 				audioStream.close();
 			}
+
+//			System.out.println("FileInputSystem - prepareInputFile");
 
 			audioStream = PamAudioFileManager.getInstance().getAudioInputStream(currentFile);
 
@@ -622,8 +629,8 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 			audioFormat = audioStream.getFormat();
 
 			if (audioFormat==null) {
-				System.err.println("AudioFormat was null: " + currentFile.getAbsolutePath()); 
-				return false; 
+				System.err.println("AudioFormat was null: " + currentFile.getAbsolutePath());
+				return false;
 			}
 
 			//			fileLength = currentFile.length();
@@ -635,6 +642,9 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 
 			loadByteConverter(audioFormat);
 
+//			System.out.println("FileInputSystem - prepareInputFile done");
+
+
 		} catch (UnsupportedAudioFileException ex) {
 			ex.printStackTrace();
 			return false;
@@ -644,7 +654,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		} catch (IOException ex) {
 			ex.printStackTrace();
 			return false;
-		}		
+		}
 		return true;
 	}
 
@@ -663,7 +673,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		this.newDataUnits = acquisitionControl.getDaqProcess().getNewDataQueue();
 
 		//		if (this.newDataUnits == null) {
-		//			System.err.println("newDataUnits: == null: "); 
+		//			System.err.println("newDataUnits: == null: ");
 		//			return false;
 		//		}
 
@@ -671,7 +681,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 
 			String audioFileStr = getCurrentFile()==null? "Null File": getCurrentFile().getAbsolutePath();
 			String title = "Error loading audio file";
-			String msg = "<html><p>There was an error trying to access the audio file </p><b> " + 
+			String msg = "<html><p>There was an error trying to access the audio file </p><b> " +
 					audioFileStr +
 					"</b><br><br><p>Please check to ensure that the file exists, and that the path entered in PAMGuard is correct.</p>" +
 					"<p>Note this error may also indicate that the file is corrupt and unreadable by PAMGuard.</p></html>";
@@ -699,9 +709,9 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 
 			String audioFileStr = getCurrentFile()==null? "Null File": getCurrentFile().getAbsolutePath();
 
-			System.err.println("FileInputSystem: runFileAnalysis: AudioFile format is null: " + audioFileStr); 
+			System.err.println("FileInputSystem: runFileAnalysis: AudioFile format is null: " + audioFileStr);
 
-			return false; 
+			return false;
 		}
 
 		nChannels = audioFormat.getChannels();
@@ -725,11 +735,11 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	}
 
 	/**
-	 * Interpret the file name to get the file time. 
-	 * <p>Moved to a separate function so it can be overridden in a special version 
-	 * for the DCL5 data set. 
-	 * @param file audio file. 
-	 * @return time in milliseconds. 
+	 * Interpret the file name to get the file time.
+	 * <p>Moved to a separate function so it can be overridden in a special version
+	 * for the DCL5 data set.
+	 * @param file audio file.
+	 * @return time in milliseconds.
 	 */
 	public long getFileStartTime(File file) {
 		// if there is no file, return 0
@@ -741,11 +751,11 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	public boolean startSystem(AcquisitionControl daqControl) {
 
 
-		
+
 		if (audioStream == null) return false;
 
 		dontStop = true;
-		
+
 		fullyStopped = false;
 
 		theThread.start();
@@ -759,7 +769,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	public void stopSystem(AcquisitionControl daqControl) {
 		/*
 		 * This only gets called when daq is stopped manually from the GUI menu.
-		 * It does not get called when a file ends. 
+		 * It does not get called when a file ends.
 		 */
 		boolean stillRunning = (audioStream != null);
 
@@ -805,7 +815,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 
 	/**
 	 * FLAC uses such a different way of decoding data to wav and aif
-	 * that it needs to use it's own reader. 
+	 * that it needs to use it's own reader.
 	 */
 	protected void collectFlacData() {
 		FileInputStream fileStream;
@@ -867,7 +877,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 
 		@Override
 		public void processPCM(ByteData byteData) {
-			if (dontStop == false) {
+			if (!dontStop) {
 				try {
 					fileStream.close(); // will make the flac reader bomb out !
 				}
@@ -906,7 +916,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 				sayEta();
 				long now = System.currentTimeMillis();
 				if (lastProgressTime > 0 && totalSamples > lastProgressUpdate) {
-					double speed = (double) (totalSamples - lastProgressUpdate) / 
+					double speed = (double) (totalSamples - lastProgressUpdate) /
 							getSampleRate() / ((now-lastProgressTime)/1000.);
 					speedLabel.setText(String.format(" (%3.1f X RT)", speed));
 				}
@@ -915,7 +925,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 			}
 
 			while (newDataUnits.getQueueSize() > 3*nChannels) {
-				if (dontStop == false) break;
+				if (!dontStop) break;
 				try {
 					Thread.sleep(2);
 				} catch (Exception ex) {
@@ -935,6 +945,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 
 	public class CollectorThread implements Runnable {
 
+		@Override
 		public void run() {
 			if (audioFormat.getEncoding() == FlacEncoding.FLAC) {
 				collectFlacData();
@@ -977,9 +988,9 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 					break; // file read error
 				}
 				while (bytesRead < blockSize) {
-					// for single file operation, don't do anything, but need to have a hook 
+					// for single file operation, don't do anything, but need to have a hook
 					// in here to read multiple files, in which case we may just get the extra
-					// samples from the next file. 
+					// samples from the next file.
 					if (bytesRead == -1) {
 						bytesRead = 0;
 					}
@@ -1001,7 +1012,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 				}
 				if (bytesRead > 0) {
 					// convert byte array to set of double arrays, one per
-					// channel					
+					// channel
 					newSamples = bytesRead / audioFormat.getFrameSize();
 					doubleData = new double[nChannels][newSamples];
 					int convertedSamples = byteConverter.bytesToDouble(byteArray, doubleData, bytesRead);
@@ -1013,9 +1024,11 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 						newDataUnit = new RawDataUnit(ms, 1 << ichan, totalSamples, newSamples);
 						newDataUnit.setRawData(doubleData[ichan]);
 
-						if (1000*(readFileSamples/sampleRate)>=fileInputParameters.skipStartFileTime) {
-							newDataUnits.addNewData(newDataUnit);
+						if (1000*(readFileSamples/sampleRate)<fileInputParameters.skipStartFileTime) {
+							// zero the data. Skipping it causes all the timing to screw up
+							Arrays.fill(doubleData[ichan], 0.);
 						}
+						newDataUnits.addNewData(newDataUnit);
 
 						// GetOutputDataBlock().addPamData(pamDataUnit);
 					}
@@ -1028,7 +1041,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 						sayEta();
 						long now = System.currentTimeMillis();
 						if (lastProgressTime > 0 && totalSamples > lastProgressUpdate) {
-							double speed = (double) (totalSamples - lastProgressUpdate) / 
+							double speed = (double) (totalSamples - lastProgressUpdate) /
 									getSampleRate() / ((now-lastProgressTime)/1000.);
 							if  (speedLabel!=null) speedLabel.setText(String.format(" (%3.1f X RT)", speed));
 						}
@@ -1041,7 +1054,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 					 * unit, then set it's reference to zero.
 					 */
 					while (newDataUnits.getQueueSize() > 3*nChannels) {
-						if (dontStop == false) break;
+						if (!dontStop) break;
 						try {
 							Thread.sleep(1);
 						} catch (Exception ex) {
@@ -1052,7 +1065,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 					totalSamples += newSamples;
 					readFileSamples += newSamples;
 
-				} 
+				}
 				else {
 					break; // end of file
 				}
@@ -1069,10 +1082,10 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 				}
 			}
 			// note the reason why the file has ended.
-			if (dontStop == false) { // stop button pressed
+			if (!dontStop) { // stop button pressed
 				setStreamStatus(STREAM_PAUSED);
 			}
-			else {  // file ended, since dont stop is true. 
+			else {  // file ended, since dont stop is true.
 				setStreamStatus(STREAM_ENDED);
 			}
 			//acquisitionControl.getDaqProcess().acquisitionStopped();
@@ -1084,13 +1097,13 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	}
 
 	/**
-	 * Open next file in a list for continuous processing, not the 
+	 * Open next file in a list for continuous processing, not the
 	 * function that opens a file for normal processing.
 	 * @param totalSamples
 	 * @return
 	 */
 	protected boolean openNextFile(long totalSamples) {
-		if (fileInputParameters.repeatLoop == false) {
+		if (!fileInputParameters.repeatLoop) {
 			return false;
 		}
 		// otherwise, open the same file again.
@@ -1102,7 +1115,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	/** Format one channel of the data in a byte array into a sample array.
 	 */
 	public static double[] bytesToSamples(byte[] byteArray, long nBytes, int channel,
-			AudioFormat audioFormat) 
+			AudioFormat audioFormat)
 	{
 		int nSamples = (int)(nBytes / audioFormat.getFrameSize());
 		double[] samples = new double[nSamples];
@@ -1110,7 +1123,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		int bytesPerSample = ((audioFormat.getSampleSizeInBits() + 7) / 8);
 		int byteI = channel * bytesPerSample;
 		for (int isamp = 0; isamp < nSamples; isamp++) {
-			samples[isamp] = 
+			samples[isamp] =
 					getSample(byteArray, byteI, bytesPerSample, audioFormat.isBigEndian());
 			byteI += audioFormat.getFrameSize();
 		}
@@ -1150,7 +1163,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	}
 
 	/**
-	 * Called when all files to be processed have been processed. 
+	 * Called when all files to be processed have been processed.
 	 */
 	protected void fileListComplete() {
 		if (GlobalArguments.getParam(PamController.AUTOEXIT) != null) {
@@ -1238,7 +1251,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 
 	/**
 	 * Get the acquisition control for the input system
-	 * @return the acquisition control. 
+	 * @return the acquisition control.
 	 */
 	public AcquisitionControl getAquisitionControl() {
 		return this.acquisitionControl;
@@ -1262,7 +1275,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	/**
 	 * Called when the file or file list selection is changes and finds a list of all
 	 * sound file types included in the selection. this is only implemented for SUD files
-	 * at the moment, the idea being to offer some additional functionality. 
+	 * at the moment, the idea being to offer some additional functionality.
 	 * @param selectedFileTypes the selectedFileTypes to set
 	 */
 	public void setSelectedFileTypes(List<SoundFileType> selectedFileTypes) {

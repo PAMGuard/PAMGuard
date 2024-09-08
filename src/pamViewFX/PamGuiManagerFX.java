@@ -7,6 +7,40 @@ import java.util.Optional;
 import javax.swing.JFrame;
 
 import org.controlsfx.glyphfont.Glyph;
+
+import PamController.PAMControllerGUI;
+import PamController.PamControlledUnit;
+import PamController.PamControlledUnitSettings;
+import PamController.PamController;
+import PamController.PamGUIManager;
+import PamController.PamSettingManager;
+import PamController.PamSettings;
+import PamModel.PamModel;
+import PamModel.PamModuleInfo;
+import PamView.PamViewInterface;
+import dataMap.layoutFX.DataMapPaneFX;
+import dataModelFX.DataModelPaneFX;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.Labeled;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.stage.Window;
+import javafx.stage.WindowEvent;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamTabPane;
 import pamViewFX.fxNodes.PamVBox;
@@ -17,41 +51,6 @@ import pamViewFX.fxStyles.PamAtlantaStyle;
 import pamViewFX.fxStyles.PamStylesManagerFX;
 import pamViewFX.pamTask.PamTaskUpdate;
 import userDisplayFX.UserDisplayNodeFX;
-import PamModel.PamModel;
-import PamModel.PamModuleInfo;
-import PamView.PamViewInterface;
-import atlantafx.base.theme.PrimerDark;
-import atlantafx.base.theme.PrimerLight;
-import dataMap.layoutFX.DataMapPaneFX;
-import PamController.PAMControllerGUI;
-import PamController.PamControlledUnit;
-import PamController.PamControlledUnitSettings;
-import PamController.PamController;
-import PamController.PamGUIManager;
-import PamController.PamSettingManager;
-import PamController.PamSettings;
-import dataModelFX.DataModelPaneFX;
-import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.Labeled;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.Pane;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import javafx.stage.WindowEvent;
 
 /**
  * 
@@ -136,10 +135,10 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 
 	private Scene scene; 
 
+	private static PamGuiManagerFX instance; 
 
 	public PamGuiManagerFX(PamController pamController, Object stage) {
 
-		
 		this.pamController=pamController; 
 		pamGuiSettings= new PAMGuiFXSettings(); 
 				
@@ -151,7 +150,16 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 		
 		start(primaryStage);
 		
+		instance=this;
 				
+	}
+	
+	/**
+	 * Get the instance of the PAMGuiManager
+	 * @return the instance; 
+	 */
+	public static PamGuiManagerFX getInstance() {
+		return instance; 
 	}
 	
 	
@@ -171,7 +179,7 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 		dataModelFX=stages.get(0).addDataModelTab();
 		
 		scene = new Scene(stages.get(0));
-		scene.getStylesheets().add(getPamCSS());
+		scene.getStylesheets().addAll(getPamCSS());
 
 		
 //		Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
@@ -289,14 +297,14 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 	}
 
 	/**
-	 * Add a controlled unit from the scene. The controlled unit may have a graphical component or no graphical component at all. 
+	 * Remove a controlled unit from the scene. The controlled unit may have a graphical component or no graphical component at all. 
 	 * @param controlledUnit - the controlled unit to remove (here we're removing all it's displays)
 	 */
 	@Override
 	public void removeControlledUnit(PamControlledUnit controlledUnit){
 		//now set the content for the tab.
 		if (controlledUnit.getGUI(PamGUIManager.FX)!=null){
-			//System.out.println("PAMGuiMangerFX: Remove module (PamControlledUnit) added" +controlledUnit.getUnitName()); 
+			System.out.println("PAMGuiMangerFX: Remove module (PamControlledUnit)" +controlledUnit.getUnitName()); 
 			//if FX content then is handles as an FX Node within GUI manager. 
 			PamControlledGUIFX pamControlledUnitFX=(PamControlledGUIFX) controlledUnit.getGUI(PamGUIManager.FX);
 			//figure out which tab the display should be added to. 
@@ -352,7 +360,7 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 				//add the display to the current set of tabs. 
 				ArrayList<PamGuiTabFX> allTabs = getAllTabs(); 
 				for (int i=0; i<allTabs.size(); i++) {
-					if (allTabs.get(i).getText().equals(newDisplay.getDisplayParams().tabName)){
+					if (allTabs.get(i).getName().equals(newDisplay.getDisplayParams().tabName)){
 						return allTabs.get(i); 
 					}
 				}
@@ -376,6 +384,8 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 	private void addDisplay(UserDisplayNodeFX newDisplay){
 		PamGuiTabFX tab;
 		
+		System.out.println("ADD USER DISPLAY");
+		
 		if (!newDisplay.isStaticDisplay()){
 			//if a non static display then add to a selected tab. 
 			tab=getDisplayTab(newDisplay); 
@@ -398,6 +408,7 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 //					+ newDisplay.getDisplayParams().sizeY);
 
 			newDisplay.getDisplayParams().tabName=tab.getName(); 
+			System.out.println("ADD USER DISPLAY 2a " + newDisplay.getDisplayParams().tabName + " " + tab.getName() + " " + tab.getTabInfo().tabName);
 			newDisplay.setFrameHolder(internalFrame); 
 
 			//Have to platform later this as needs some time to intitialise? 11/08/2018
@@ -409,8 +420,13 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 			});
 		}
 		else {
-			
+			if (newDisplay.getDisplayParams()!=null) {
+				newDisplay.getDisplayParams().tabName=tab.getName(); 
+				System.out.println("ADD USER DISPLAY 2b " + newDisplay.getDisplayParams().tabName);
+			}
 		}
+		
+
 	}
 
 
@@ -465,7 +481,7 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 			TabSelectionPane tabSelectionPane=new TabSelectionPane(stages.get(0));
 
 			PamSettingsDialogFX<?> settingsDialog=new PamSettingsDialogFX(tabSelectionPane); 
-			settingsDialog.getDialogPane().getStylesheets().add(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getDialogCSS());
+			settingsDialog.getDialogPane().getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getDialogCSS());
 			settingsDialog.initStyle(StageStyle.UNDECORATED);
 
 			//			ChoiceDialog<String> dialog = new ChoiceDialog<>(tabStrings.get(1), tabStrings);
@@ -492,7 +508,7 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 	 * Get CSS for PAMGUARD setting 'look and feel' for sliding dialogs
 	 * @return the CSS for settings feels. 
 	 */
-	public String getPamSettingsCSS() {//return new PrimerDark().getUserAgentStylesheet();
+	public ArrayList<String> getPamSettingsCSS() {//return new PrimerDark().getUserAgentStylesheet();
 		//		return getClass().getResource("/Resources/css/pamSettingsCSS.css").toExternalForm();
 		return PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getSlidingDialogCSS();
 	}
@@ -501,7 +517,7 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 	 * Get CSS for PAMGUARD GUI standard 'look and feel'
 	 * @return the standard CSS fro PAMGUARD. 
 	 */
-	public String getPamCSS() {
+	public ArrayList<String> getPamCSS() {
 		//return new PrimerLight().getUserAgentStylesheet();
 		//		return getClass().getResource("/Resources/css/pamCSS.css").toExternalForm();
 		return PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getGUICSS();
@@ -511,7 +527,7 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 	 * Get CSS for PAMGUARD GUI standard 'look and feel' for regular dialogs
 	 * @return the standard CSS fro PAMGUARD. 
 	 */
-	public String getPamDialogCSS() {//return new PrimerDark().getUserAgentStylesheet();
+	public ArrayList<String> getPamDialogCSS() {//return new PrimerDark().getUserAgentStylesheet();
 
 		return PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getDialogCSS();
 	}
@@ -555,21 +571,25 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 		}
 	}
 
+	@Override
 	public void addView(PamViewInterface newView) {
 		// TODO Auto-generated method stub
 	}
 
 
+	@Override
 	public void showControlledUnit(PamControlledUnit unit) {
 		// TODO Auto-generated method stub
 	}
 
+	@Override
 	public void destroyModel() {
 		// TODO Auto-generated method stub
 
 	}
 
 
+	@Override
 	public void enableGUIControl(boolean enable) {
 		// TODO Auto-generated method stub
 
@@ -577,7 +597,6 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 
 
 	public Stage getMainScene() {
-		// TODO Auto-generated method stub
 		return primaryStage;
 	}
 
@@ -653,7 +672,7 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 		mainPane.getChildren().addAll(title, namePane);
 
 		dialog.getDialogPane().setContent(mainPane);
-		dialog.getDialogPane().getStylesheets().add(this.getPamDialogCSS());
+		dialog.getDialogPane().getStylesheets().addAll(this.getPamDialogCSS());
 
 		//add listener to prevent close request if the dialog
 		final Button btOk = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
@@ -743,6 +762,7 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 	 * Notify the GUI that progress has been made in an external task. 
 	 * @param pamTaskUpdate - class which holds information on the Task and progress. 
 	 */
+	@Override
 	public void notifyLoadProgress(PamTaskUpdate pamTaskUpdate) {
 		for (int i=0; i<this.stages.size(); i++){
 			stages.get(i).notifyLoadProgress(pamTaskUpdate); 
@@ -850,7 +870,7 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 	public boolean prepareToClose(boolean weShouldSave) {
 		//		System.out.println("Preparing to close PAMGUARD");
 
-		if (pamController.canClose() == false) {
+		if (!pamController.canClose()) {
 			return false;
 		}
 
@@ -1020,6 +1040,10 @@ public class PamGuiManagerFX implements PAMControllerGUI, PamSettings {
 
 		//TODO
 		
+	}
+
+	public Window getPrimaryStage() {
+		return this.primaryStage;
 	}
 
 

@@ -9,16 +9,15 @@ import javax.swing.SwingWorker;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import Localiser.LocalisationAlgorithm;
+import Localiser.LocalisationAlgorithmInfo;
 import PamController.PamControlledUnit;
 import PamController.PamController;
-import PamController.PamguardVersionInfo;
-import PamModel.PamPluginInterface;
 import PamUtils.PamCalendar;
 import PamView.dialog.PamDialog;
 import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
-import PamguardMVC.PamProcess;
 import PamguardMVC.dataSelector.DataSelector;
 import PamguardMVC.superdet.SuperDetDataBlock;
 import PamguardMVC.superdet.SuperDetDataBlock.ViewerLoadPolicy;
@@ -26,11 +25,9 @@ import dataMap.OfflineDataMap;
 import dataMap.OfflineDataMapPoint;
 import nilus.AlgorithmType;
 import nilus.AlgorithmType.SupportSoftware;
+import nilus.Localize.Effort;
 import nilus.DataSourceType;
-import nilus.Deployment;
 import nilus.Detection;
-import nilus.DetectionEffort;
-import nilus.DetectionEffortKind;
 import nilus.DetectionGroup;
 import nilus.Detections;
 import nilus.GranularityEnumType;
@@ -42,6 +39,9 @@ import tethys.TethysTimeFuncs;
 import tethys.dbxml.DBXMLConnect;
 import tethys.dbxml.TethysException;
 import tethys.deployment.DeploymentHandler;
+import tethys.localization.LocalizationBuilder;
+import tethys.localization.LocalizationHandler;
+import tethys.niluswraps.NilusDataWrapper;
 import tethys.niluswraps.PDeployment;
 import tethys.niluswraps.PDetections;
 import tethys.output.StreamExportParams;
@@ -61,7 +61,6 @@ import tethys.swing.export.DetectionsExportWizard;
 public class DetectionsHandler extends CollectionHandler {
 
 	public int uniqueDetectionsId=1;
-	public int uniqueDetectionId;
 
 	private volatile boolean activeExport;
 
@@ -84,7 +83,7 @@ public class DetectionsHandler extends CollectionHandler {
 	 * this data set (not the entire project).
 	 * @param dataBlock
 	 */
-	public StreamDetectionsSummary getStreamDetections(PamDataBlock dataBlock) {
+	public StreamDetectionsSummary<NilusDataWrapper<PDetections>> getStreamDetections(PamDataBlock dataBlock) {
 		ArrayList<PDeployment> deployments = tethysControl.getDeploymentHandler().getMatchedDeployments();
 		return getStreamDetections(dataBlock, deployments);
 	}
@@ -96,12 +95,12 @@ public class DetectionsHandler extends CollectionHandler {
 	 * @param deployments
 	 * @return
 	 */
-	public StreamDetectionsSummary getStreamDetections(PamDataBlock dataBlock, ArrayList<PDeployment> deployments) {
+	public StreamDetectionsSummary<NilusDataWrapper<PDetections>> getStreamDetections(PamDataBlock dataBlock, ArrayList<PDeployment> deployments) {
 		// get the basic data for each document including it's Description.
 
 		ArrayList<PDetections> detectionsDocs = new ArrayList<>();
 		for (PDeployment aDep : deployments) {
-			ArrayList<String> someNames = tethysControl.getDbxmlQueries().getDetectionsDocuments(dataBlock, aDep.deployment.getId());
+			ArrayList<String> someNames = tethysControl.getDbxmlQueries().getDetectionsDocuments(dataBlock, aDep.nilusObject.getId());
 			if (someNames == null) {
 				continue;
 			}
@@ -116,94 +115,95 @@ public class DetectionsHandler extends CollectionHandler {
 		return new StreamDetectionsSummary(detectionsDocs);
 	}
 
-	/**
-	 * Get the Detection Effort part of a Detections document
-	 * @param pDeployment
-	 * @param dataBlock
-	 * @param exportParams
-	 * @return
-	 */
-	private DetectionEffort getDetectorEffort(PDeployment pDeployment, PamDataBlock dataBlock, StreamExportParams exportParams) {
-		DetectionEffort effort = new DetectionEffort();
-		Deployment deployment = pDeployment.deployment;
-		Long effortStart = pDeployment.getAudioStart();
-		Long effortEnd = pDeployment.getAudioEnd();
-		effort.setStart(TethysTimeFuncs.xmlGregCalFromMillis(effortStart));
-		effort.setEnd(TethysTimeFuncs.xmlGregCalFromMillis(effortEnd));
-//		effort.set // no setter for DetectionEffortKind
-		List<DetectionEffortKind> effortKinds = effort.getKind();
 
-		TethysDataProvider dataProvider = dataBlock.getTethysDataProvider(tethysControl);
-		dataProvider.getEffortKinds(pDeployment, effortKinds, exportParams);
-
-
-		return effort;
-	}
-
-	/**
-	 * Method string for Detections Algorithm documents.
-	 * @param dataBlock
-	 * @return
-	 */
-	public String getMethodString(PamDataBlock dataBlock) {
-		if (dataBlock == null) {
-			return null;
-		}
-		PamProcess process = dataBlock.getParentProcess();
-		return "PAMGuard " + process.getProcessName();
-
-	}
-
-	/**
-	 * Software string for Detections Algorithm documents.
-	 * @param dataBlock
-	 * @return
-	 */
-	public String getSoftwareString(PamDataBlock dataBlock) {
-		if (dataBlock == null) {
-			return null;
-		}
-		return dataBlock.getLongDataName();
-	}
-
-	/**
-	 * Software string for Detections Algorithm documents.
-	 * @param dataBlock
-	 * @return
-	 */
-	public String getVersionString(PamDataBlock dataBlock) {
-		if (dataBlock == null) {
-			return null;
-		}
-		PamProcess process = dataBlock.getParentProcess();
-		PamControlledUnit pcu = process.getPamControlledUnit();
-		PamPluginInterface plugin = pcu.getPlugin();
-		if (plugin == null) {
-			return PamguardVersionInfo.version;
-		}
-		else {
-			return plugin.getVersion();
-		}
-	}
-
-	/**
-	 * 
-	 * @param dataBlock
-	 * @return default value is PAMGuard
-	 */
-	public String getSupportSoftware(PamDataBlock dataBlock) {
-		return "PAMGuard";
-	}
-
-	/**
-	 * 
-	 * @param dataBlock
-	 * @return PAMGuard version
-	 */
-	public String getSupportSoftwareVersion(PamDataBlock dataBlock) {
-//		should try to dig into the binary store and get the version from there.
-		return PamguardVersionInfo.version;
-	}
+//	/**
+//	 * Get the Detection Effort part of a Detections document
+//	 * @param pDeployment
+//	 * @param dataBlock
+//	 * @param exportParams
+//	 * @return
+//	 */
+//	private DetectionEffort getDetectorEffort(PDeployment pDeployment, PamDataBlock dataBlock, StreamExportParams exportParams) {
+//		DetectionEffort effort = new DetectionEffort();
+//		Deployment deployment = pDeployment.nilusObject;
+//		Long effortStart = pDeployment.getAudioStart();
+//		Long effortEnd = pDeployment.getAudioEnd();
+//		effort.setStart(TethysTimeFuncs.xmlGregCalFromMillis(effortStart));
+//		effort.setEnd(TethysTimeFuncs.xmlGregCalFromMillis(effortEnd));
+//		//		effort.set // no setter for DetectionEffortKind
+//		List<DetectionEffortKind> effortKinds = effort.getKind();
+//
+//		TethysDataProvider dataProvider = dataBlock.getTethysDataProvider(tethysControl);
+//		dataProvider.getEffortKinds(pDeployment, effortKinds, exportParams);
+//
+//
+//		return effort;
+//	}
+//
+//	/**
+//	 * Method string for Detections Algorithm documents.
+//	 * @param dataBlock
+//	 * @return
+//	 */
+//	public String getMethodString(PamDataBlock dataBlock) {
+//		if (dataBlock == null) {
+//			return null;
+//		}
+//		PamProcess process = dataBlock.getParentProcess();
+//		return "PAMGuard " + process.getProcessName();
+//
+//	}
+//
+//	/**
+//	 * Software string for Detections Algorithm documents.
+//	 * @param dataBlock
+//	 * @return
+//	 */
+//	public String getSoftwareString(PamDataBlock dataBlock) {
+//		if (dataBlock == null) {
+//			return null;
+//		}
+//		return dataBlock.getLongDataName();
+//	}
+//
+//	/**
+//	 * Software string for Detections Algorithm documents.
+//	 * @param dataBlock
+//	 * @return
+//	 */
+//	public String getVersionString(PamDataBlock dataBlock) {
+//		if (dataBlock == null) {
+//			return null;
+//		}
+//		PamProcess process = dataBlock.getParentProcess();
+//		PamControlledUnit pcu = process.getPamControlledUnit();
+//		PamPluginInterface plugin = pcu.getPlugin();
+//		if (plugin == null) {
+//			return PamguardVersionInfo.version;
+//		}
+//		else {
+//			return plugin.getVersion();
+//		}
+//	}
+//
+//	/**
+//	 * 
+//	 * @param dataBlock
+//	 * @return default value is PAMGuard
+//	 */
+//	public String getSupportSoftware(PamDataBlock dataBlock) {
+//		return "PAMGuard";
+//	}
+//
+//	/**
+//	 * 
+//	 * @param dataBlock
+//	 * @return PAMGuard version
+//	 */
+//	public String getSupportSoftwareVersion(PamDataBlock dataBlock) {
+//		//		should try to dig into the binary store and get the version from there.
+//		return PamguardVersionInfo.version;
+//	}
 
 	/**
 	 * Detections will be exported in a separate worker thread since export may take some time and
@@ -255,7 +255,7 @@ public class DetectionsHandler extends CollectionHandler {
 	public void cancelExport() {
 		activeExport = false;
 	}
-	
+
 	/**
 	 * Round a bin start so that it's aligned correctly with
 	 * day starts. 
@@ -283,7 +283,7 @@ public class DetectionsHandler extends CollectionHandler {
 		TethysExportParams exportParams = tethysControl.getTethysExportParams();
 		DeploymentHandler depHandler = tethysControl.getDeploymentHandler();
 		ArrayList<PDeployment> deployments = depHandler.getMatchedDeployments();
-//		Detections currentDetections = null;
+		//		Detections currentDetections = null;
 		OfflineDataMap dataMap = dataBlock.getPrimaryDataMap();
 		DataSelector dataSelector = dataBlock.getDataSelector(tethysControl.getDataSelectName(), false);
 		int totalCount = dataMap.getDataCount();
@@ -314,7 +314,7 @@ public class DetectionsHandler extends CollectionHandler {
 			// export everything in that deployment.
 			// need to loop through all map points in this interval.
 			List<OfflineDataMapPoint> mapPoints = dataMap.getMapPoints();
-			
+
 			for (OfflineDataMapPoint mapPoint : mapPoints) {
 				if (!activeExport) {
 					prog = new DetectionExportProgress(deployment, null,totalMapPoints, doneMapPoints,
@@ -345,24 +345,24 @@ public class DetectionsHandler extends CollectionHandler {
 					if (dets != null) {
 						exportCount+=dets.length;
 						documentCount+=dets.length;
-						
+
 						if (exportCount % 100 == 0) {
 							prog = new DetectionExportProgress(deployment, null,totalMapPoints, doneMapPoints,
 									lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_COUNTING);
 							exportObserver.update(prog);
 						}
 					}
-//					Detection det = dataProvider.createDetection(dataUnit, exportParams, streamExportParams);
-//					exportCount++;
-//					documentCount++;
-//					onEffort.getDetection().add(det);
+					//					Detection det = dataProvider.createDetection(dataUnit, exportParams, streamExportParams);
+					//					exportCount++;
+					//					documentCount++;
+					//					onEffort.getDetection().add(det);
 					lastUnitTime = dataUnit.getTimeMilliseconds();
 				}
 				doneMapPoints++;
 				prog = new DetectionExportProgress(deployment, null,totalMapPoints, doneMapPoints,
 						lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_COUNTING);
 				exportObserver.update(prog);
-				
+
 				if (viewerLoadPolicy == ViewerLoadPolicy.LOAD_ALWAYS_EVERYTHING) {
 					break;
 				}
@@ -374,14 +374,16 @@ public class DetectionsHandler extends CollectionHandler {
 			if (dets != null) {
 				exportCount += dets.length;
 			}
-			
+
 
 
 		}
 
 		return exportCount;
-	}/**
-	 * Export detections in all deployments for this PAMGuard dataset.
+	}
+
+	/**
+	 * Export detections and localisations in all deployments for this PAMGuard dataset.
 	 * @param dataBlock
 	 * @param streamExportParams
 	 * @param exportObserver
@@ -396,7 +398,16 @@ public class DetectionsHandler extends CollectionHandler {
 		DBXMLConnect dbxmlConnect = tethysControl.getDbxmlConnect();
 		DeploymentHandler depHandler = tethysControl.getDeploymentHandler();
 		ArrayList<PDeployment> deployments = depHandler.getMatchedDeployments();
-		Detections currentDetections = null;
+
+		LocalizationHandler localizationHandler = tethysControl.getLocalizationHandler();
+		LocalizationBuilder localizationBuilder = null;
+
+		/*
+		 * The main documents for both dets and locs. 
+		 */
+		Detections detectionsDocument = null;
+		DetectionGroup onEffortDetections = null;
+
 		OfflineDataMap dataMap = dataBlock.getPrimaryDataMap();
 		DataSelector dataSelector = dataBlock.getDataSelector(tethysControl.getDataSelectName(), false);
 		int totalCount = dataMap.getDataCount();
@@ -421,24 +432,43 @@ public class DetectionsHandler extends CollectionHandler {
 					lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_COUNTING);
 			exportObserver.update(prog);
 			granularityHandler.prepare(deployment.getAudioStart());
+			
+			List<Detection> detectionList = null;
 
 			// export everything in that deployment.
 			// need to loop through all map points in this interval.
 			List<OfflineDataMapPoint> mapPoints = dataMap.getMapPoints();
 			for (OfflineDataMapPoint mapPoint : mapPoints) {
 				if (!activeExport) {
-					prog = new DetectionExportProgress(deployment, currentDetections,totalMapPoints, doneMapPoints,
+					prog = new DetectionExportProgress(deployment, detectionsDocument,totalMapPoints, doneMapPoints,
 							lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_CANCELED);
 					exportObserver.update(prog);
 					break;
 				}
 
-				if (currentDetections == null) {
+				if (detectionsDocument == null && streamExportParams.exportDetections) {
 					// needed in inner loop in case doc gets written at 500000.
-					currentDetections = startDetectionsDocument(deployment, dataBlock, streamExportParams);
-					currentDetections.getEffort().setStart(TethysTimeFuncs.xmlGregCalFromMillis(deployment.getAudioStart()));
+					detectionsDocument = startDetectionsDocument(deployment, dataBlock, streamExportParams);
+					detectionsDocument.getEffort().setStart(TethysTimeFuncs.xmlGregCalFromMillis(deployment.getAudioStart()));
+					onEffortDetections = detectionsDocument.getOnEffort();
+					detectionList = onEffortDetections.getDetection();
+//					if {detectionList == null) {
+//						onEffortDetections.
+//					}
 				}
-				
+//				else {
+//					onEffortDetections = null;
+//					detectionList = null;
+//				}
+				if (localizationBuilder == null && streamExportParams.exportLocalisations) {
+					localizationBuilder = new LocalizationBuilder(tethysControl, deployment, detectionsDocument, dataBlock, streamExportParams);
+					Effort eff = localizationBuilder.getCurrentDocument().getEffort();
+					eff.setStart(TethysTimeFuncs.xmlGregCalFromMillis(deployment.getAudioStart()));
+				}
+//				else {
+//					localisations = null;
+//				}
+
 				if (mapPoint.getEndTime() < deployment.getAudioStart()) {
 					continue;
 				}
@@ -449,21 +479,29 @@ public class DetectionsHandler extends CollectionHandler {
 				ArrayList<PamDataUnit> dataCopy = dataBlock.getDataCopy(deployment.getAudioStart(), deployment.getAudioEnd(), true, dataSelector);
 				Collections.sort(dataCopy);
 				skipCount += dataBlock.getUnitsCount() - dataCopy.size();
-				DetectionGroup onEffort = currentDetections.getOnEffort();
 				for (PamDataUnit dataUnit : dataCopy) {
 					/*
 					 * Here is where we need to handle the different granularities.
 					 */
-					Detection dets[] = granularityHandler.addDataUnit(dataUnit);
-					if (dets != null) {
-						for (int dd = 0; dd < dets.length; dd++) {
-							exportCount++;
-							documentCount++;
-							onEffort.getDetection().add(dets[dd]);
+					if (streamExportParams.exportDetections) {
+						Detection dets[] = granularityHandler.addDataUnit(dataUnit);
+						if (dets != null) {
+							for (int dd = 0; dd < dets.length; dd++) {
+								exportCount++;
+								documentCount++;
+								detectionList.add(dets[dd]);
+							}
 						}
 					}
+					/**
+					 * Localisations don't do granularity, so do all. 
+					 */
+					if (streamExportParams.exportLocalisations) {
+						localizationBuilder.addLocalization(dataUnit);
+					}
+
 					if (exportCount % 100 == 0) {
-						prog = new DetectionExportProgress(deployment, currentDetections, totalMapPoints, doneMapPoints,
+						prog = new DetectionExportProgress(deployment, detectionsDocument, totalMapPoints, doneMapPoints,
 								lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_GATHERING);
 						exportObserver.update(prog);
 					}
@@ -471,23 +509,36 @@ public class DetectionsHandler extends CollectionHandler {
 				}
 
 				doneMapPoints ++;
-				prog = new DetectionExportProgress(deployment, currentDetections,totalMapPoints, doneMapPoints,
+				prog = new DetectionExportProgress(deployment, detectionsDocument,totalMapPoints, doneMapPoints,
 						lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_GATHERING);
 				exportObserver.update(prog);
 
 				if (documentCount > 50000000 && mapPoint != dataMap.getLastMapPoint()) {
-					prog = new DetectionExportProgress(deployment, currentDetections,totalMapPoints, doneMapPoints,
+					prog = new DetectionExportProgress(deployment, detectionsDocument,totalMapPoints, doneMapPoints,
 							lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_WRITING);
 					exportObserver.update(prog);
-					closeDetectionsDocument(currentDetections, mapPoint.getEndTime());
-					try {
-						if (checkDetectionsDocument(currentDetections, granularityHandler)) {
-							dbxmlConnect.postAndLog(currentDetections);
+					if (detectionsDocument != null) {
+						closeDetectionsDocument(detectionsDocument, mapPoint.getEndTime());
+						try {
+							if (checkDetectionsDocument(detectionsDocument, granularityHandler)) {
+								dbxmlConnect.postAndLog(detectionsDocument);
+							}
+						} catch (TethysException e) {
+							tethysControl.showException(e);
 						}
-					} catch (TethysException e) {
-						tethysControl.showException(e);
+						detectionsDocument = null;
 					}
-					currentDetections = null;
+					if (localizationBuilder != null) {
+						localizationBuilder.closeDocument(mapPoint.getEndTime());
+						try {
+							if (localizationBuilder.checkDocument()) {
+								dbxmlConnect.postAndLog(localizationBuilder.getCurrentDocument());
+							}
+						} catch (TethysException e) {
+							tethysControl.showException(e);
+						}
+						localizationBuilder = null;
+					}
 				}
 
 				if (viewerLoadPolicy == ViewerLoadPolicy.LOAD_ALWAYS_EVERYTHING) {
@@ -502,35 +553,48 @@ public class DetectionsHandler extends CollectionHandler {
 				return DetectionExportProgress.STATE_CANCELED;
 			}
 
-			if (currentDetections != null) {
+			if (detectionsDocument != null) {
 				Detection dets[] = granularityHandler.cleanup(deployment.getAudioEnd());
 				if (dets != null) {
 					for (int dd = 0; dd < dets.length; dd++) {
 						exportCount++;
 						documentCount++;
-						currentDetections.getOnEffort().getDetection().add(dets[dd]);
+						detectionsDocument.getOnEffort().getDetection().add(dets[dd]);
 					}
 				}
-				prog = new DetectionExportProgress(deployment, currentDetections,totalMapPoints, doneMapPoints,
+				prog = new DetectionExportProgress(deployment, detectionsDocument,totalMapPoints, doneMapPoints,
 						lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_WRITING);
-				closeDetectionsDocument(currentDetections, deployment.getAudioEnd());
+				closeDetectionsDocument(detectionsDocument, deployment.getAudioEnd());
 				try {
-					if (checkDetectionsDocument(currentDetections, granularityHandler)) {
-						dbxmlConnect.postAndLog(currentDetections);
+					if (checkDetectionsDocument(detectionsDocument, granularityHandler)) {
+						dbxmlConnect.postAndLog(detectionsDocument);
 					}
 				} catch (TethysException e) {
 					tethysControl.showException(e);
 				}
-				currentDetections = null;
+				detectionsDocument = null;
 			}
+			prog = new DetectionExportProgress(deployment, detectionsDocument,totalMapPoints, doneMapPoints,
+					lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_WRITING);
+			if (localizationBuilder != null) {
+				localizationBuilder.closeDocument(deployment.getAudioEnd());
+				try {
+					if (localizationBuilder.checkDocument()) {
+						dbxmlConnect.postAndLog(localizationBuilder.getCurrentDocument());
+					}
+				} catch (TethysException e) {
+						tethysControl.showException(e);
+					}
+					localizationBuilder = null;
+				}
 		}
 
-		prog = new DetectionExportProgress(null, null,totalMapPoints, totalMapPoints,
-				lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_COMPLETE);
-		exportObserver.update(prog);
+//		prog = new DetectionExportProgress(null, null,totalMapPoints, totalMapPoints,
+//				lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_COMPLETE);
+//		exportObserver.update(prog);
 		return DetectionExportProgress.STATE_COMPLETE;
 	}
-	
+
 	/**
 	 * Start a new detections document for the deployment and datablock. <br>
 	 * Add all the standard information to the top of the Document
@@ -550,29 +614,29 @@ public class DetectionsHandler extends CollectionHandler {
 		}
 		TethysDataProvider dataProvider = dataBlock.getTethysDataProvider(tethysControl);
 
-		String prefix = deployment.deployment.getId() + "_" + dataProvider.getDetectionsName();
+		String prefix = deployment.nilusObject.getId() + "_" + dataProvider.getDetectionsName();
 		String fullId = "";
 		/*
 		 * Check the document name isn't already used and increment id as necessary.
 		 */
 		while (true) {
-			fullId = String.format("%s_%d", prefix, uniqueDetectionsId++);
+			fullId = String.format("%s_D_%d", prefix, uniqueDetectionsId++);
 			if (!tethysControl.getDbxmlQueries().documentExists(Collection.Detections.toString(), fullId)) {
 				break;
 			}
 		}
 		detections.setId(fullId);
-//		detections.setDescription(dataProvider.getDescription(deployment, tethysExportParams));
+		//		detections.setDescription(dataProvider.getDescription(deployment, tethysExportParams));
 		detections.setDescription(exportParams.getNilusDetectionDescription());
 		DataSourceType dataSource = new DataSourceType();
-		dataSource.setDeploymentId(deployment.deployment.getId());
-//		dataSource.setEnsembleId(""); ToDo
+		dataSource.setDeploymentId(deployment.nilusObject.getId());
+		//		dataSource.setEnsembleId(""); ToDo
 		detections.setDataSource(dataSource);
 		AlgorithmType algorithm = detections.getAlgorithm();
 
 		if (dataProvider != null) {
-			algorithm = dataProvider.getAlgorithm();
-//			detections.setAlgorithm(algorithm);
+			algorithm = dataProvider.getAlgorithm(Collection.Detections);
+			//			detections.setAlgorithm(algorithm);
 		}
 		algorithm.setMethod(getMethodString(dataBlock));
 		algorithm.setSoftware(getSoftwareString(dataBlock));
@@ -599,7 +663,9 @@ public class DetectionsHandler extends CollectionHandler {
 	private void closeDetectionsDocument(Detections detections, Long audioEnd) {
 		detections.getEffort().setEnd(TethysTimeFuncs.xmlGregCalFromMillis(audioEnd));
 	}
-	
+
+
+
 	/**
 	 * Run some checks on the Detections document prior to submission. <br>
 	 * Currently, is is just a check that the detections are within the effort times.   
@@ -644,6 +710,7 @@ public class DetectionsHandler extends CollectionHandler {
 		return true;
 	}
 
+
 	/**
 	 * Worker thread for exporting detections. 
 	 * Currently, it counts them first, then checks the user wants to export 
@@ -675,16 +742,16 @@ public class DetectionsHandler extends CollectionHandler {
 		protected Integer doInBackground() throws Exception {
 			Integer ans = null;
 			try {
-//				int count = countDetections(dataBlock, exportParams, exportObserver);
-//				if (activeExport == false) {
-//					return 0;
-//				}
-//				String msg = String.format("Do you want to go ahead and output %d %s detections to Tethys?", 
-//						count, exportParams.granularity);
-//				int doit = WarnOnce.showWarning("Tethys Detections Export", msg, WarnOnce.OK_CANCEL_OPTION);
-//				if (doit == WarnOnce.OK_OPTION) {
-					ans = exportDetections(dataBlock, exportParams, this);
-//				}
+				//				int count = countDetections(dataBlock, exportParams, exportObserver);
+				//				if (activeExport == false) {
+				//					return 0;
+				//				}
+				//				String msg = String.format("Do you want to go ahead and output %d %s detections to Tethys?", 
+				//						count, exportParams.granularity);
+				//				int doit = WarnOnce.showWarning("Tethys Detections Export", msg, WarnOnce.OK_CANCEL_OPTION);
+				//				if (doit == WarnOnce.OK_OPTION) {
+				ans = exportDetections(dataBlock, exportParams, this);
+				//				}
 			}
 			catch (Exception e) {
 				e.printStackTrace();
@@ -694,7 +761,7 @@ public class DetectionsHandler extends CollectionHandler {
 
 		@Override
 		protected void done() {
-//			this.
+			//			this.
 			DetectionExportProgress prog = new DetectionExportProgress(null, null, 0, 0,  0, 0, 0, 0, DetectionExportProgress.STATE_COMPLETE);
 			tethysControl.exportedDetections(dataBlock);
 			exportObserver.update(prog);

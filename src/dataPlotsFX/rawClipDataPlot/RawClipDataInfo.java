@@ -2,6 +2,7 @@ package dataPlotsFX.rawClipDataPlot;
 
 
 import java.awt.geom.Path2D;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -14,7 +15,7 @@ import PamguardMVC.PamDataUnit;
 import PamguardMVC.RawDataHolder;
 import clipgenerator.ClipSpectrogram;
 import dataPlotsFX.TDSymbolChooserFX;
-import dataPlotsFX.clickPlotFX.ClickSymbolChooserFX;
+import dataPlotsFX.clickPlotFX.ClickDisplayParams;
 import dataPlotsFX.data.TDDataProviderFX;
 import dataPlotsFX.data.TDScaleInfo;
 import dataPlotsFX.data.generic.GenericDataPlotInfo;
@@ -68,8 +69,7 @@ public class RawClipDataInfo extends GenericDataPlotInfo {
 		rawWavePlotManager = new RawClipWavePlotManager(this); 
 		clipSettingsPane = new RawClipSettingsPane(this); 
 		clipSettingsPane.setParams();
-		
-
+	
 		//create the symbol chooser. 
 		rawSymbolChoosr = new RawClipSymbolChooser(this, pamDataBlock.getPamSymbolManager().getSymbolChooser(tdGraph.getUniqueName(), tdGraph.getGraphProjector()), TDSymbolChooserFX.DRAW_SYMBOLS); 
 		
@@ -255,6 +255,47 @@ public class RawClipDataInfo extends GenericDataPlotInfo {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	/* (non-Javadoc)
+	 * @see dataPlots.data.TDDataInfo#getStoredSettings()
+	 */
+	@Override
+	public Serializable getStoredSettings() {
+		return rawClipParams;
+	}
+
+	/* (non-Javadoc)
+	 * @see dataPlots.data.TDDataInfo#setStoredSettings(java.io.Serializable)
+	 */
+	@Override
+	public boolean setStoredSettings(Serializable storedSettings) {
+		if (RawClipParams.class.isAssignableFrom(storedSettings.getClass())) {
+			rawClipParams = (RawClipParams) storedSettings;
+			updateSettings();
+			return true;
+		}
+		return false;
+	}
+
+
+	/**
+	 * Called whenever settings are updated. 
+	 */
+	private void updateSettings() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	protected void setDefaultOpacity(ParameterType dataType) {
+		if (dataType.equals(ParameterType.FREQUENCY)) {
+			this.clipSettingsPane.setDefaultFillOpacity(DEFAULT_FILL_OPACITY);
+		}
+		else {
+			this.clipSettingsPane.setDefaultFillOpacity(1.0);
+		}
+	}
+
 
 
 }

@@ -1,22 +1,13 @@
 package difar;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ListIterator;
 
-import javax.swing.Timer;
-
-import clipgenerator.ClipDisplayDataBlock;
-import difar.dataSelector.DifarDataSelectCreator;
-import difar.dataSelector.DifarDataSelector;
-import PamguardMVC.dataSelector.DataSelectorCreator;
-import PamController.PamController;
-import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
-import PamUtils.SystemTiming;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
-import PamguardMVC.PamProcess;
+import PamguardMVC.dataSelector.DataSelectorCreator;
+import clipgenerator.ClipDisplayDataBlock;
+import difar.dataSelector.DifarDataSelectCreator;
 
 public class DifarDataBlock extends ClipDisplayDataBlock<DifarDataUnit> {
 

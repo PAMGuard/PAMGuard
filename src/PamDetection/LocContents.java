@@ -10,6 +10,7 @@ package PamDetection;
 public class LocContents implements LocalisationInfo {
 	
 	/**Flags for what type of 'Raw' localisation information from a detection**/
+	
 
 	/**
 	 * Time delays are present 
@@ -78,8 +79,47 @@ public class LocContents implements LocalisationInfo {
 	/**
 	 * Errors parallel and perpendicular to the ships track.
 	 */
-	static public final int HAS_PERPENDICULARERRORS = 0x100;
+	static public final int HAS_PERPENDICULARERRORS = 0x1000;
+
+	static public final int[] allTypes = {HAS_TIMEDELAYS, HAS_ECHO, HAS_BEARING, HAS_BEARINGERROR, HAS_RANGE, HAS_RANGEERROR, HAS_DEPTH, HAS_DEPTHERROR, 
+			HAS_LATLONG, HAS_XY, HAS_XYZ, HAS_AMBIGUITY, HAS_PERPENDICULARERRORS};
 	
+	/**
+	 * Main types of interest. 
+	 */
+	static public final int[] mainTypes = {HAS_BEARING, HAS_RANGE, HAS_DEPTH, HAS_LATLONG, HAS_XY, HAS_XYZ};
+	
+	public static String getTypeString(int type) {
+		switch (type) {
+		case HAS_TIMEDELAYS:
+			return "Time delays";
+		case HAS_ECHO:
+			return "Echoes";
+		case HAS_BEARING:
+			return "Bearing";
+		case HAS_BEARINGERROR:
+			return "Bearing Error";
+		case HAS_RANGE:
+			return "Range";
+		case HAS_DEPTH:
+			return "Depth";
+		case HAS_RANGEERROR:
+			return "Range Error";
+		case HAS_DEPTHERROR:
+			return "Depth Error";
+		case HAS_LATLONG:
+			return "Lat Long";
+		case HAS_XY:
+			return "XY";
+		case HAS_XYZ:
+			return "XYZ";
+		case HAS_AMBIGUITY:
+			return "Ambiguity";
+		case HAS_PERPENDICULARERRORS:
+			return "Perpendicular Errors";
+		}
+		return null;
+	}
 	
 	/**
 	 * bitmap of flags saying what's in the localisation information
@@ -94,6 +134,7 @@ public class LocContents implements LocalisationInfo {
 	 * 
 	 * @param locContents a set of flags specifying which data are available within this localisation object.
 	 */
+	@Override
 	public void setLocContent(int locContents) {
 		this.locContents = locContents;
 	}
@@ -102,6 +143,7 @@ public class LocContents implements LocalisationInfo {
 	 * The integer specifying which flags are present in the loclaisation. 
 	 * @return bitmap of localisation contents. 
 	 */
+	@Override
 	public int getLocContent( ) {
 		return locContents;
 	}
@@ -110,6 +152,7 @@ public class LocContents implements LocalisationInfo {
 	 * 
 	 * @param flagsToAdd localisation flags to add to existing flags. 
 	 */
+	@Override
 	public void addLocContent(int flagsToAdd) {
 		locContents |= flagsToAdd;
 	}
@@ -119,6 +162,7 @@ public class LocContents implements LocalisationInfo {
 	 * @param flagsToRemove bitmap of localisation flags to remove. 
 	 * @return new or remaining localisation content flags. 
 	 */
+	@Override
 	public int removeLocContent(int flagsToRemove) {
 		locContents &= (~flagsToRemove);
 		return locContents;
@@ -129,6 +173,7 @@ public class LocContents implements LocalisationInfo {
 	 * @param requiredContent specified content
 	 * @return true if specified content exists, false otherwise. 
 	 */
+	@Override
 	public boolean hasLocContent(int requiredContent) {
 		return ((requiredContent & locContents) >= requiredContent);
 	}

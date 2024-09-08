@@ -20,8 +20,12 @@ import Localiser.algorithms.locErrors.LikilihoodError;
 import Localiser.algorithms.locErrors.LocaliserError;
 
 /**
- * Time delay based simplex method for localisation. Note that a lot of the code here has been referenced directly from static MCMC functions. This is because both MCMC and Simplex are based on the forward time delay problem
- * hence are mathematically very similar. Simplex is much faster than MCMC but does not provide a full 3D probability distribution. 
+ * Time delay based simplex method for localisation. Note that a lot of the code
+ * here has been referenced directly from static MCMC functions. This is because
+ * both MCMC and Simplex are based on the forward time delay problem hence are
+ * mathematically very similar. Simplex is much faster than MCMC but does not
+ * provide a full 3D probability distribution.
+ * 
  * @author Jamie Macaulay
  *
  */

@@ -1,10 +1,8 @@
 package alarm;
 
 import java.awt.Frame;
-import java.awt.Window;
 
 import PamguardMVC.PamDataUnit;
-
 import dataMap.OfflineDataMapPoint;
 import offlineProcessing.OfflineTask;
 

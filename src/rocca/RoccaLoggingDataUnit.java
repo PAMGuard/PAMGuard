@@ -21,11 +21,10 @@
 
 package rocca;
 
-import PamguardMVC.AcousticDataUnit;
-import PamguardMVC.PamDataUnit;
 import java.util.EnumMap;
 
 import PamDetection.PamDetection;
+import PamguardMVC.PamDataUnit;
 
 
 /**

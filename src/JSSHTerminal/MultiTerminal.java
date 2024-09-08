@@ -1,7 +1,7 @@
 package JSSHTerminal;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -10,6 +10,17 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.prefs.Preferences;
+
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 
 /**
  * Launch several terminal a place them on the screen
@@ -115,7 +126,8 @@ public class MultiTerminal extends JFrame implements ActionListener {
     loadButton.setBounds(145, 145, 105, 25);
 
     addWindowListener(new WindowAdapter() {
-      public void windowClosing(WindowEvent e) {
+      @Override
+	public void windowClosing(WindowEvent e) {
         // Save pref
         prefs.put("HostList",hostList.getText());
         prefs.put("User",userText.getText());
@@ -130,7 +142,7 @@ public class MultiTerminal extends JFrame implements ActionListener {
     setTitle("MultiTerminal");
     pack();
     setLocationRelativeTo(null);
-    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     setVisible(true);
 
   }

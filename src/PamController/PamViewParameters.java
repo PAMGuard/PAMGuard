@@ -82,6 +82,7 @@ public class PamViewParameters extends PAMSelectClause implements Serializable, 
 	 * @param sqlTypes SQL types for any bespoke formatting
 	 * @return results query. 
 	 */
+	@Override
 	public String getSelectClause(SQLTypes sqlTypes) {
 		/**
 		 * Moved this here so that it can be overridden. It used 
@@ -158,7 +159,7 @@ public class PamViewParameters extends PAMSelectClause implements Serializable, 
 		if (otherParameters.useAnalysisTime != useAnalysisTime) {
 			return false;
 		}
-		if (useAnalysisTime == false) {
+		if (!useAnalysisTime) {
 			return true; // no need to shcek the other parameters in this instance
 		}
 		if (otherParameters.analStartTime != analStartTime) {

@@ -103,7 +103,7 @@ public class PerformanceDialog extends PamDialog {
 		str = String.format("%d. %s", iTest+1, pt.getName());
 		appendString(str);
 		boolean ran = pt.runTest();
-		if (ran == false) {
+		if (!ran) {
 			appendString(String.format("****** TEST FAILED ******"));
 		}
 		appendString(pt.getResultString());

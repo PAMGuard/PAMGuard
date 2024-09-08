@@ -1,10 +1,5 @@
 package whistlesAndMoans;
 
-import whistlesAndMoans.alarm.WMAlarmCounterProvider;
-import whistlesAndMoans.dataSelector.WMDDataSelectCreator;
-import whistlesAndMoans.species.WhistleMoanTethysProvider;
-import whistlesAndMoans.species.WhistleSpeciesManager;
-import whistlesAndMoans.toad.WSLToadCalculator;
 import PamView.GroupedDataSource;
 import PamView.GroupedSourceParameters;
 import PamguardMVC.DataAutomation;
@@ -17,6 +12,11 @@ import alarm.AlarmDataSource;
 import tethys.TethysControl;
 import tethys.pamdata.TethysDataProvider;
 import tethys.species.DataBlockSpeciesManager;
+import whistlesAndMoans.alarm.WMAlarmCounterProvider;
+import whistlesAndMoans.dataSelector.WMDDataSelectCreator;
+import whistlesAndMoans.species.WhistleMoanTethysProvider;
+import whistlesAndMoans.species.WhistleSpeciesManager;
+import whistlesAndMoans.toad.WSLToadCalculator;
 
 public class ConnectedRegionDataBlock extends AbstractWhistleDataBlock<ConnectedRegionDataUnit> implements AlarmDataSource, GroupedDataSource, FFTDataHolderBlock  {
 

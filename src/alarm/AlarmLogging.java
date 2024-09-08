@@ -87,7 +87,7 @@ public class AlarmLogging extends SQLLogging {
 	@Override
 	public synchronized boolean reLogData(PamConnection con, PamDataUnit dataUnit) {
 		AlarmDataUnit adu = (AlarmDataUnit) dataUnit;
-		if (adu.isActive() == false) {
+		if (!adu.isActive()) {
 			return logData(con, dataUnit);
 		}
 		else {

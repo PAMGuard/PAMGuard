@@ -18,14 +18,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.Timer;
 
-import pamScrollSystem.AbstractPamScroller;
-import pamScrollSystem.AbstractPamScrollerAWT;
-import pamScrollSystem.PamScrollObserver;
-import pamScrollSystem.PamScroller;
-import pamScrollSystem.RangeSpinner;
-import pamScrollSystem.RangeSpinnerListener;
-import userDisplay.UserDisplayControl;
-import userDisplay.UserFramePlots;
 import GPS.GpsDataUnit;
 import Layout.PamAxis;
 import Layout.PamAxisPanel;
@@ -38,10 +30,10 @@ import PamController.PamSettings;
 import PamDetection.AbstractLocalisation;
 import PamUtils.PamCalendar;
 import PamView.PamColors;
+import PamView.PamColors.PamColor;
 import PamView.PamKeyItem;
 import PamView.PamSymbol;
 import PamView.SymbolKeyItem;
-import PamView.PamColors.PamColor;
 import PamView.panel.CornerLayoutContraint;
 import PamView.panel.JPanelWithPamKey;
 import PamView.panel.KeyPanel;
@@ -54,6 +46,14 @@ import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamObserver;
 import PamguardMVC.dataSelector.DataSelector;
+import pamScrollSystem.AbstractPamScroller;
+import pamScrollSystem.AbstractPamScrollerAWT;
+import pamScrollSystem.PamScrollObserver;
+import pamScrollSystem.PamScroller;
+import pamScrollSystem.RangeSpinner;
+import pamScrollSystem.RangeSpinnerListener;
+import userDisplay.UserDisplayControl;
+import userDisplay.UserFramePlots;
 
 public class RadarDisplay extends UserFramePlots implements PamObserver, PamSettings {
 
@@ -231,7 +231,7 @@ public class RadarDisplay extends UserFramePlots implements PamObserver, PamSett
 			PamDataBlock dataBlock;
 			for (int i = 0; i < detectorDataBlocks.size(); i++) {
 				dataBlock = detectorDataBlocks.get(i);
-				if (dataBlock.canDraw(radarProjector) == false || radarParameters.getRadarDataInfo(dataBlock).select == false) continue;
+				if (!dataBlock.canDraw(radarProjector) || !radarParameters.getRadarDataInfo(dataBlock).select) continue;
 				RadarDataInfo rdi = radarParameters.getRadarDataInfo(dataBlock);
 				paintDetectorData(g2d, dataBlock, rdi.getDetectorLifetime() * 1000, rdi.isFadeDetector());
 			}
@@ -694,6 +694,7 @@ public class RadarDisplay extends UserFramePlots implements PamObserver, PamSett
 	}
 	class SettingsAction implements ActionListener {
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 
 			RadarParameters newParams = RadarParametersDialog.showDialog(RadarDisplay.this,
@@ -765,13 +766,14 @@ public class RadarDisplay extends UserFramePlots implements PamObserver, PamSett
 	}
 	
 	void repaintAll(){
-		if (radarPlot.isShowing() == false) return;
+		if (!radarPlot.isShowing()) return;
 		radarAxis.repaint();
 		radarPlot.repaint();
 	}
 	
 	class TimerListener implements ActionListener {
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 						
 			radarPlot.repaint();
@@ -795,7 +797,7 @@ public class RadarDisplay extends UserFramePlots implements PamObserver, PamSett
 		for (int i = 0; i < detectorDataBlocks.size(); i++) {
 			dataBlock = detectorDataBlocks.get(i);
 			dataBlock.deleteObserver(this);
-			if (radarParameters.getRadarDataInfo(dataBlock).select == false) continue;
+			if (!radarParameters.getRadarDataInfo(dataBlock).select) continue;
 			dataBlock.addObserver(this);
 			if (radarScroller != null) {
 				radarScroller.addDataBlock(dataBlock);
@@ -821,7 +823,7 @@ public class RadarDisplay extends UserFramePlots implements PamObserver, PamSett
 		PamDataBlock dataBlock;
 		for (int i = 0; i < detectorDataBlocks.size(); i++) {
 			dataBlock = detectorDataBlocks.get(i);
-			if (dataBlock.canDraw(radarProjector) == false || radarParameters.getRadarDataInfo(dataBlock).select == false) continue;
+			if (!dataBlock.canDraw(radarProjector) || !radarParameters.getRadarDataInfo(dataBlock).select) continue;
 //			keyPanel.add(dataBlock.createKeyItem(radarProjector, keyPanel.getKeyType()));
 			
 			SymbolData symbolData = null;
@@ -866,10 +868,12 @@ public class RadarDisplay extends UserFramePlots implements PamObserver, PamSett
 		radarPlot.setKeyPosition(keyPos);
 	}
 
+	@Override
 	public String getObserverName() {
 		return getName();
 	}
 
+	@Override
 	public long getRequiredDataHistory(PamObservable o, Object arg) {
 		if (detectorDataBlocks == null) return 0;
 		PamDataBlock dataBlock = (PamDataBlock) o;
@@ -879,17 +883,20 @@ public class RadarDisplay extends UserFramePlots implements PamObserver, PamSett
 		return 0;
 	}
 
+	@Override
 	public void noteNewSettings() {
 		// TODO Auto-generated method stub
 		newSettings();
 		
 	}
 
+	@Override
 	public void removeObservable(PamObservable o) {
 		// TODO Auto-generated method stub
 		
 	}
 
+	@Override
 	public void setSampleRate(float sampleRate, boolean notify) {
 		// TODO Auto-generated method stub
 		
@@ -903,6 +910,7 @@ public class RadarDisplay extends UserFramePlots implements PamObserver, PamSett
 		
 	}
 
+	@Override
 	public void addData(PamObservable o, PamDataUnit pamDataUnit) {
 
 		if (o == gpsDataBlock) {

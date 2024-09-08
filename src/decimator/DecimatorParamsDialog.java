@@ -6,7 +6,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -15,6 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import Filters.FilterBand;
@@ -114,7 +114,7 @@ public class DecimatorParamsDialog extends PamDialog {
 		constraints.gridx = 0;
 		constraints.gridwidth = 1;
 		constraints.gridy++;
-		addComponent(decimatorPanel, new JLabel("Interpolation: ", JLabel.RIGHT), constraints);
+		addComponent(decimatorPanel, new JLabel("Interpolation: ", SwingConstants.RIGHT), constraints);
 		constraints.gridx += constraints.gridwidth;
 		constraints.gridwidth = 2;
 		addComponent(decimatorPanel, interpolator = new JComboBox<String>(), constraints);

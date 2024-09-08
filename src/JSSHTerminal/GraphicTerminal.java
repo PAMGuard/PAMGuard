@@ -1,16 +1,13 @@
 package JSSHTerminal;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 /**
  * Terminal component: Use bitmap font to render
@@ -64,7 +61,8 @@ public class GraphicTerminal extends TerminalEvent {
 
   }
 
-  public void dispose() {
+  @Override
+public void dispose() {
 
     tmpImgG.dispose();
     tmpImg = null;
@@ -74,7 +72,8 @@ public class GraphicTerminal extends TerminalEvent {
   }
 
 
-  public void sizeComponent(int width,int height) {
+  @Override
+public void sizeComponent(int width,int height) {
 
     //GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
     //GraphicsDevice device = env.getDefaultScreenDevice();
@@ -85,7 +84,8 @@ public class GraphicTerminal extends TerminalEvent {
   }
 
 
-  public synchronized void drawComponent(Graphics g) {
+  @Override
+public synchronized void drawComponent(Graphics g) {
 
     if (terminal == null) {
       g.setColor(Color.BLACK);

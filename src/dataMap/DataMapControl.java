@@ -7,10 +7,6 @@ import java.util.ArrayList;
 
 import javax.swing.SwingUtilities;
 
-import pamScrollSystem.AbstractScrollManager;
-import generalDatabase.DBControlUnit;
-import binaryFileStorage.BinaryStore;
-import dataMap.layoutFX.DataMapGUIFX;
 import PamController.OfflineDataStore;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitGUI;
@@ -26,6 +22,10 @@ import PamView.PamView;
 import PamView.WrapperControlledGUISwing;
 import PamguardMVC.PamConstants;
 import PamguardMVC.PamDataBlock;
+import binaryFileStorage.BinaryStore;
+import dataMap.layoutFX.DataMapGUIFX;
+import generalDatabase.DBControlUnit;
+import pamScrollSystem.AbstractScrollManager;
 
 /**
  * The data map appears only during PAMGUARD viewer mode and is the root of
@@ -402,6 +402,7 @@ public class DataMapControl extends PamControlledUnit implements PamSettings {
 	 * @param flag. The GUI type flag defined in PAMGuiManager. 
 	 * @return the GUI for the PamControlledUnit unit. 
 	 */
+	@Override
 	public PamControlledUnitGUI getGUI(int flag) {
 		if (flag==PamGUIManager.FX) {
 			if (dataGramGUIFX ==null) {

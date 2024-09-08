@@ -16,9 +16,7 @@ import pamViewFX.symbol.StandardSymbolOptionsPane;
 
 
 /**
- * Settings pane which holds the symbol options from the data block of the plot info. 
- * @author Jamie Macaulay
- *
+ * Settings pane which holds the symbol options from the data block of the plot info.  *
  *
  * @author Jamie Macaulay 
  *
@@ -33,7 +31,7 @@ public class GenericSettingsPane extends PamBorderPane implements TDSettingsPane
 	/*
 	 * The raw clip info. 
 	 */
-	private TDDataInfoFX rawClipDataInfo;
+	private TDDataInfoFX tdDataInfoFX;
 
 	/**
 	 * The icon for the pane. 
@@ -52,8 +50,8 @@ public class GenericSettingsPane extends PamBorderPane implements TDSettingsPane
 	/**
 	 * The clip plot pane. 
 	 */
-	public GenericSettingsPane(TDDataInfoFX rawClipDataInfo){
-		this.rawClipDataInfo = rawClipDataInfo; 
+	public GenericSettingsPane(TDDataInfoFX tdDataInfoFX){
+		this.tdDataInfoFX = tdDataInfoFX; 
 		createPane();
 		this.setPrefWidth(PREF_WIDTH);
 		setParams(); 
@@ -81,7 +79,7 @@ public class GenericSettingsPane extends PamBorderPane implements TDSettingsPane
 	private void newSettings(long milliswait) {
 		getParams();
 
-		this.rawClipDataInfo.getTDGraph().repaint(milliswait);
+		this.tdDataInfoFX.getTDGraph().repaint(milliswait);
 	}
 
 
@@ -112,10 +110,10 @@ public class GenericSettingsPane extends PamBorderPane implements TDSettingsPane
 	 */
 	private StandardSymbolOptionsPane createSymbolOptionsPane(){
 
-		PamSymbolManager<?> pamSymbolManager=  rawClipDataInfo.getDataBlock().getPamSymbolManager();
+		PamSymbolManager<?> pamSymbolManager=  tdDataInfoFX.getDataBlock().getPamSymbolManager();
 
-		symbolOptionsPane= pamSymbolManager.getFXOptionsPane(rawClipDataInfo.getTDGraph().getUniqueName(), 
-				rawClipDataInfo.getTDGraph().getGraphProjector()); 
+		symbolOptionsPane= pamSymbolManager.getFXOptionsPane(tdDataInfoFX.getTDGraph().getUniqueName(), 
+				tdDataInfoFX.getTDGraph().getGraphProjector()); 
 
 		//create a new settings listener
 		symbolOptionsPane.addSettingsListener(()->{
@@ -159,6 +157,16 @@ public class GenericSettingsPane extends PamBorderPane implements TDSettingsPane
 	@Override
 	public Pane getPane() {
 		return this;
+	}
+
+	/**
+	 * Set the default fill opacity. 
+	 * @param opacity - the default fill opacity. 
+	 */
+	public void setDefaultFillOpacity(double opacity) {
+		if (symbolOptionsPane instanceof StandardSymbolOptionsPane) {
+			((StandardSymbolOptionsPane) symbolOptionsPane).getDefaultSymbolPane().setDefaultFillOpacity(opacity);
+		}
 	}
 
 }

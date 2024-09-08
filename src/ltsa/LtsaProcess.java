@@ -1,8 +1,5 @@
 package ltsa;
 
-import fftManager.Complex;
-import fftManager.FFTDataBlock;
-import fftManager.FFTDataUnit;
 import PamController.PamController;
 import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
@@ -12,6 +9,8 @@ import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
+import fftManager.FFTDataBlock;
+import fftManager.FFTDataUnit;
 
 public class LtsaProcess extends PamProcess {
 

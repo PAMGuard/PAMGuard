@@ -28,6 +28,8 @@ import PamDetection.LocalisationInfo;
 import PamUtils.PamUtils;
 import PamguardMVC.PamConstants;
 import PamguardMVC.PamDataBlock;
+import PamguardMVC.PamDataUnit;
+import PamguardMVC.PamProcess;
 
 /**
  * Standard panel for dialogs that shows a list of
@@ -46,7 +48,7 @@ public class SourcePanel implements ActionListener{
 	protected String borderTitle;
 	protected boolean includeSubClasses;
 	
-	protected JComboBox sourceList;
+	protected JComboBox<PamDataBlock> sourceList;
 	protected JCheckBox channelBoxes[];
 	
 	protected Window ownerWindow;
@@ -66,6 +68,10 @@ public class SourcePanel implements ActionListener{
 	
 	private JLabel channelListHeader;
 	
+	/**
+	 * Allow a null selection, i.e. don't want to select anything at all. 
+	 */
+	private boolean allowNull;
 	/**
 	 * Construct a panel with a titles border
 	 * @param ownerWindow parentWindow
@@ -253,6 +259,7 @@ public class SourcePanel implements ActionListener{
 	}
 	
 	private int currentNShown = 0;
+	private NullDataBlock nullDataBlock;
 	/**
 	 * Repack the owner window if the number of channels has changed
 	 * @param channelsMap bitmap of used channels. 
@@ -386,6 +393,10 @@ public class SourcePanel implements ActionListener{
 		
 		LocalisationInfo availableLocData;
 		
+		if (allowNull) {
+			sourceList.addItem(getNullDataBlock());
+		}
+		
 		for (int i = 0; i < sl.size(); i++) {
 			
 			if (excludedBlocks.contains(sl.get(i))) continue;
@@ -432,7 +443,13 @@ public class SourcePanel implements ActionListener{
 	 * @return source data block
 	 */
 	public PamDataBlock getSource() {
-		return (PamDataBlock) sourceList.getSelectedItem();
+		PamDataBlock source = (PamDataBlock) sourceList.getSelectedItem();
+		if (source == getNullDataBlock()) {
+			return null;
+		}
+		else {
+			return source;
+		}
 	}
 	
 	/**
@@ -582,5 +599,41 @@ public class SourcePanel implements ActionListener{
 	 */
 	public void setSourceToolTip(String toolTip) {
 		sourceList.setToolTipText(toolTip);
+	}
+
+	/**
+	 * @return the allowNull
+	 */
+	public boolean isAllowNull() {
+		return allowNull;
+	}
+
+	/**
+	 * Allow a null selection. 
+	 * @param allowNull the allowNull to set
+	 */
+	public void setAllowNull(boolean allowNull) {
+		this.allowNull = allowNull;
+		setSourceList();
+	}
+	
+	private NullDataBlock getNullDataBlock() {
+		if (nullDataBlock == null) {
+			nullDataBlock = new NullDataBlock();
+		}
+		return nullDataBlock;
+	}
+	
+	private class NullDataBlock extends PamDataBlock {
+
+		public NullDataBlock() {
+			super(PamDataUnit.class, "Null data", null, 0);
+		}
+
+		@Override
+		public String toString() {
+			return "No (null) selection";
+		}
+		
 	}
 }

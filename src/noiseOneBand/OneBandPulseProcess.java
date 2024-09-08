@@ -1,13 +1,11 @@
 package noiseOneBand;
 
-import noiseOneBand.offline.OneBandDatagramProvider;
-import PamController.PamControlledUnit;
 import PamUtils.PamUtils;
 import PamguardMVC.PamConstants;
-import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
+import noiseOneBand.offline.OneBandDatagramProvider;
 
 public class OneBandPulseProcess extends PamProcess {
 
@@ -113,7 +111,7 @@ public class OneBandPulseProcess extends PamProcess {
 				prevRms = rms;
 				return;
 			}
-			if (pulseOn == false) {
+			if (!pulseOn) {
 				if (rms-prevRms > dbhtControl.getParameters().singlePulseThreshold) {
 					// start a pulse
 					peakMax = rms;

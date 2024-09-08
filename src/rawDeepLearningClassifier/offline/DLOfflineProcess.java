@@ -54,6 +54,9 @@ public class DLOfflineProcess {
 		dlOfflineGroup.setPrimaryDataBlock(dlControl.getParentDataBlock());
 		dlOfflineTask.setParentDataBlock(dlControl.getParentDataBlock());
 		
+		//need this to make sure annotations trigger saving if, ofr example, the input source are click detections
+		dlOfflineTask.addAffectedDataBlock(dlControl.getParentDataBlock());
+		
 		//if null open the dialog- also create a new offlineTask group if the datablock has changed. 
 		if (mtOfflineDialog == null) {
 			mtOfflineDialog = new OLProcessDialog(this.dlControl.getGuiFrame(), 

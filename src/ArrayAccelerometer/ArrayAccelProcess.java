@@ -5,17 +5,12 @@ import java.awt.event.ActionListener;
 
 import javax.swing.Timer;
 
+import PamController.PamController;
+import PamUtils.PamCalendar;
+import PamguardMVC.PamProcess;
 import mcc.MccJniInterface;
 import mcc.mccjna.MCCException;
 import mcc.mccjna.MCCUtils;
-import Array.ArrayManager;
-import Array.PamArray;
-import Array.Streamer;
-import PamController.PamControlledUnit;
-import PamController.PamController;
-import PamUtils.PamCalendar;
-import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamProcess;
 
 
 public class ArrayAccelProcess extends PamProcess {

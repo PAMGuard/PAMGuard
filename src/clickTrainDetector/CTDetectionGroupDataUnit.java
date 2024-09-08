@@ -6,9 +6,7 @@ import java.util.ListIterator;
 
 import PamDetection.LocContents;
 import PamDetection.PamDetection;
-import PamguardMVC.AcousticDataUnit;
 import PamguardMVC.PamDataUnit;
-import PamguardMVC.dataSelector.DataSelector;
 import clickTrainDetector.dataselector.CTSelectParams;
 import detectiongrouplocaliser.DetectionGroupDataUnit;
 

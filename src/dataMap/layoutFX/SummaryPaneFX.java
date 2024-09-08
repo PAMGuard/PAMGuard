@@ -159,10 +159,6 @@ public class SummaryPaneFX extends PamBorderPane {
 		long[] dataExtent;
 		dataStorePane.getChildren().clear(); 
 		
-		
-		this.setPrefHeight(n*30+40); //set preferred height for hiding pane. 
-		dataMapPaneFX.getTopHolder().setPrefHeight(n*30+40); 
-		
 		for (int i = 0; i < n; i++) {
 			dataStorePane.add( dataNames[i], 0, i);
 			dataStorePane.add( dataStarts[i] , 1, i);

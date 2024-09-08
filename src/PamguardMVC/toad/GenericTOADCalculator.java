@@ -134,6 +134,7 @@ public class GenericTOADCalculator implements TOADCalculator, PamSettings {
 				 * to give better timing accuracy. 
 				 */
 				FFTDataList fftData = fftDataOrganiser.createFFTDataList(dataUnit, sampleRate, dataUnit.getChannelBitmap() & channelMap);
+//				System.out.println("fftData: " + fftData);
 				if (fftData == null || fftData.getMaxChannelCount() == 0) {
 					// debug stuff ...
 					System.out.println("No FFT Data for " + dataUnit.getSummaryString());

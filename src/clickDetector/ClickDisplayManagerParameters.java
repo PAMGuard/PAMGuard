@@ -2,8 +2,6 @@ package clickDetector;
 
 import java.io.Serializable;
 
-import PamController.PamController;
-
 public class ClickDisplayManagerParameters implements Cloneable, Serializable {
 
 	static public final long serialVersionUID = 2;

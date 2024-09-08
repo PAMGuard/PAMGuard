@@ -69,7 +69,7 @@ public class AngleDataBlock extends PamDataBlock<AngleDataUnit> {
 	}
 	
 	protected void setNextLogTime(AngleLoggingParameters angleLoggingParameters, long thisTime) {
-		if (angleLoggingParameters.timedRandom == false) {
+		if (!angleLoggingParameters.timedRandom) {
 			nextLogTime = thisTime + (long) (1000 * angleLoggingParameters.logInterval);
 		}
 		else {

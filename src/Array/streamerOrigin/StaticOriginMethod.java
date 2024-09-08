@@ -29,10 +29,11 @@ import PamUtils.LatLongDialog;
 import PamUtils.PamCalendar;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
+import javafx.scene.layout.Pane;
 
 public class StaticOriginMethod extends HydrophoneOriginMethod {
 
-	private StaticHydrophoneDialogComponent staticHydrophoneDialogComponent;
+	private StaticHydrophoneComponent staticHydrophoneDialogComponent;
 
 	private StaticOriginSettings staticOriginSettings = new StaticOriginSettings();
 
@@ -48,12 +49,107 @@ public class StaticOriginMethod extends HydrophoneOriginMethod {
 	@Override
 	public OriginDialogComponent getDialogComponent() {
 		if (staticHydrophoneDialogComponent == null) {
-			staticHydrophoneDialogComponent = new StaticHydrophoneDialogComponent();
+			staticHydrophoneDialogComponent = new StaticHydrophoneComponent();
 		}
 		return staticHydrophoneDialogComponent;
 	}
 
 
+	@Override
+	public OriginSettings getOriginSettings() {
+		return staticOriginSettings;
+	}
+
+	@Override
+	public void setOriginSettings(OriginSettings originSettings) {
+		staticOriginSettings = (StaticOriginSettings) originSettings;
+	}
+
+	@Override
+	public boolean prepare() {
+		return true;
+	}
+
+	@Override
+	public StreamerDataUnit getLastStreamerData() {
+		StreamerDataBlock streamerDataBlock = ArrayManager.getArrayManager().getStreamerDatabBlock();
+		StreamerDataUnit sdu = streamerDataBlock.getLastUnit(1<<streamer.getStreamerIndex());		
+		if (sdu == null) {
+		 sdu = new StreamerDataUnit(PamCalendar.getTimeInMillis(), streamer);
+		//System.out.println("StaticOriginMethod: Streamer rotation: " +sdu.getGpsData().getQuaternion().toHeading());
+		}
+		return sdu;
+	}
+
+	@Override
+	public OriginIterator getGpsDataIterator(int wherefrom) {
+		return new StreamerDataIterator(wherefrom, streamer);
+	}
+
+	@Override
+	public Object getSynchronizationObject() {
+		return NavDataSynchronisation.getSynchobject();
+	}
+	
+	
+	/**
+	 * GUI components for the static hydrophone locator. This returns a JavaFX or Swing component depending on the current GUI. 
+	 */
+	private class StaticHydrophoneComponent extends OriginDialogComponent {
+		
+		/**
+		 * Swing component. 
+		 */
+		private StaticHydrophoneDialogComponent staticHydrophoneDialog;
+		
+		/**
+		 * JavaFX pane for static hydrophones.
+		 */
+		private StaticHydrophonePane staticHydrophonePane;
+		
+		
+		@Override
+		public JComponent getComponent(Window owner) {
+			if (staticHydrophoneDialog==null) {
+				staticHydrophoneDialog = new StaticHydrophoneDialogComponent(); 
+			}
+			return staticHydrophoneDialog.getComponent(owner);
+		}
+
+		@Override
+		public void setParams() {
+			if (staticHydrophoneDialog!=null) {
+				staticHydrophoneDialog.setParams();
+			}
+			if (staticHydrophonePane!=null) {
+				staticHydrophonePane.setParams(); 
+			}
+		}
+
+		@Override
+		public boolean getParams() {
+			if (staticHydrophoneDialog!=null) {
+				return staticHydrophoneDialog.getParams();
+			}
+			if (staticHydrophonePane!=null) {
+				return staticHydrophonePane.getParams();
+			}
+			return false;
+		}
+
+		@Override
+		public Pane getSettingsPane() {
+			if (staticHydrophonePane==null) {
+				staticHydrophonePane = new StaticHydrophonePane(StaticOriginMethod.this); 
+			}
+			return staticHydrophonePane;
+		}
+	}
+	
+
+	/**
+	 * Swing components for the static hydrophone locator. 
+	 */
 	private class StaticHydrophoneDialogComponent extends OriginDialogComponent {
 
 		private JPanel outerPanel;
@@ -268,41 +364,12 @@ public class StaticOriginMethod extends HydrophoneOriginMethod {
 			}
 		}
 
-	}
-
-	@Override
-	public OriginSettings getOriginSettings() {
-		return staticOriginSettings;
-	}
-
-	@Override
-	public void setOriginSettings(OriginSettings originSettings) {
-		staticOriginSettings = (StaticOriginSettings) originSettings;
-	}
-
-	@Override
-	public boolean prepare() {
-		return true;
-	}
-
-	@Override
-	public StreamerDataUnit getLastStreamerData() {
-		StreamerDataBlock streamerDataBlock = ArrayManager.getArrayManager().getStreamerDatabBlock();
-		StreamerDataUnit sdu = streamerDataBlock.getLastUnit(1<<streamer.getStreamerIndex());		
-		if (sdu == null) {
-		 sdu = new StreamerDataUnit(PamCalendar.getTimeInMillis(), streamer);
-		//System.out.println("StaticOriginMethod: Streamer rotation: " +sdu.getGpsData().getQuaternion().toHeading());
+		@Override
+		public Pane getSettingsPane() {
+			// TODO Auto-generated method stub
+			return null;
 		}
-		return sdu;
+
 	}
 
-	@Override
-	public OriginIterator getGpsDataIterator(int wherefrom) {
-		return new StreamerDataIterator(wherefrom, streamer);
-	}
-
-	@Override
-	public Object getSynchronizationObject() {
-		return NavDataSynchronisation.getSynchobject();
-	}
 }
