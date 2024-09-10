@@ -265,7 +265,6 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 			}
 		}
 //		settingsStrip.scrollChanged();
-
 		updateDateAxis();
 	}
 
@@ -442,9 +441,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	public double getPixelsPerHour() {
 //		System.out.println("Pixels per hour: " + dataMapControl.dataMapParameters.getPixeslPerHour() + " " + this.getPlotWidth()/(this.timeScrollBar.getVisibleAmount()/1000./3600.));
 		//return dataMapControl.dataMapParameters.getPixeslPerHour();
-
 		return this.getPlotWidth()/(this.timeScrollBar.getVisibleAmount()/1000./3600.);
-
 	}
 
 	/**
@@ -487,12 +484,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 		return dataMapPaneFX;
 	}
 
-	int lastHScaleChoice=-1; 
 	public void scaleChange() {
-		if (lastHScaleChoice != dataMapControl.dataMapParameters.hScaleChoice) {
-			lastHScaleChoice = dataMapControl.dataMapParameters.hScaleChoice;
-			setupScrollBar();
-		}
 		this.notifyScrollChange();
 	}
 
@@ -509,20 +501,32 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	 * @param n - the index of the data stream pane
 	 * @return the data stream pane or null if the index is out of bounds. 
 	 */
-	public DataStreamPaneFX getDataSyreamPane(int n) {
-		if (n<this.dataStreamPanels.size()) {
+	public DataStreamPaneFX getDataStreamPane(int n) {
+		if (n>=0 && n<this.dataStreamPanels.size()) {
 			return dataStreamPanels.get(n);
 		}
 		else return null;
 	}
 
 	public DataStreamPaneFX getDataStreamPane(DataMapInfo selectedItem) {
+		if (selectedItem==null) return null;
 		for (int i=0; i<dataStreamPanels.size(); i++) {
 			if (selectedItem.equals(dataStreamPanels.get(i).getDataName())) {
 				return dataStreamPanels.get(i);
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Get the data map parameters associated with the FX GUI. Note these are
+	 * separate from the parameters in the DataMapControls which are for the default
+	 * swing display (not great)
+	 * 
+	 * @return the current data map parameters.
+	 */
+	public DataMapParametersFX getDataMapParams() {
+		return this.dataMapPaneFX.getDataMapParams();
 	}
 	
 }

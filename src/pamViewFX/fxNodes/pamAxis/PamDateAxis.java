@@ -20,6 +20,7 @@ import javafx.util.converter.TimeStringConverter;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.Instant;
 import java.util.*;
 
 /*
@@ -64,8 +65,8 @@ public class PamDateAxis extends ValueAxis<Long> {
 
     /** These are matching date formatter strings */
     private static final String[] TICK_UNIT_FORMATTER_DEFAULTS = {
-        "HH:mm:SS",     // 1 hour
-        "HH:mm:SS",     // 1 day
+        "HH:mm:ss",     // 1 hour
+        "HH:mm:ss",     // 1 day
         "MM/dd/yy",     // 2 days
         "MM/dd/yy",     // 3 days
         "MM/dd/yy",     // 4 days
@@ -157,6 +158,13 @@ public class PamDateAxis extends ValueAxis<Long> {
      */
     public PamDateAxis() {
         forceZeroInRange.set(false);
+       
+       
+        this.upperBoundProperty().addListener((obsval, oldVal, newVal)->{
+        	
+        	
+        	defaultFormatter.setFormatter(DefaultFormatter.getFormatter(currentRangeIndexProperty.get()));
+        });
     }
 
     /**
@@ -183,6 +191,8 @@ public class PamDateAxis extends ValueAxis<Long> {
         super(lowerBound, upperBound);
         setTickUnit(tickUnit);
         setLabel(axisLabel);
+        
+
     }
 
     // -------------- PROTECTED METHODS --------------------------------------------------------------------------------
@@ -289,6 +299,7 @@ public class PamDateAxis extends ValueAxis<Long> {
      * @param animate If true animate the change in range
      */
     @Override protected void setRange(Object range, boolean animate) {
+
         final double[] rangeProps = (double[]) range;
         final double lowerBound = rangeProps[0];
         final double upperBound = rangeProps[1];
@@ -558,7 +569,15 @@ public class PamDateAxis extends ValueAxis<Long> {
      */
     public static class DefaultFormatter extends StringConverter<Long> {
         private TimeStringConverter formatter;
-        private String prefix = null;
+        public TimeStringConverter getFormatter() {
+			return formatter;
+		}
+
+		public void setFormatter(TimeStringConverter formatter) {
+			this.formatter = formatter;
+		}
+
+		private String prefix = null;
         private String suffix = null;
 
         private Date tempDate = new Date();
@@ -575,11 +594,13 @@ public class PamDateAxis extends ValueAxis<Long> {
          */
         public DefaultFormatter(final PamDateAxis axis) {
             formatter = getFormatter(axis.isAutoRanging()? axis.currentRangeIndexProperty.get() : -1);
+            
             final ChangeListener axisListener = new ChangeListener() {
                 @Override public void changed(ObservableValue observable, Object oldValue, Object newValue) {
                     formatter = getFormatter(axis.isAutoRanging()? axis.currentRangeIndexProperty.get() : -1);
                 }
             };
+            
             axis.currentRangeIndexProperty.addListener(axisListener);
             axis.autoRangingProperty().addListener(axisListener);
         }
@@ -598,11 +619,20 @@ public class PamDateAxis extends ValueAxis<Long> {
         }
 
         private static TimeStringConverter getFormatter(int rangeIndex) {
+//        	System.out.println("Get fomatter range: " + rangeIndex);
+
             if (rangeIndex < 0) {
                 return new TimeStringConverter("MM/dd/yy");
             } else if(rangeIndex >= TICK_UNIT_FORMATTER_DEFAULTS.length) {
                 return new TimeStringConverter(TICK_UNIT_FORMATTER_DEFAULTS[TICK_UNIT_FORMATTER_DEFAULTS.length-1]);
             } else {
+            	
+            	TimeStringConverter timestringConverter = new TimeStringConverter(TICK_UNIT_FORMATTER_DEFAULTS[rangeIndex]);
+            	timestringConverter.toString(Date.from(Instant.now()));
+            	
+//            	System.out.println("Get fomatter range 2: " + TICK_UNIT_FORMATTER_DEFAULTS[rangeIndex]+ "  " + timestringConverter.toString(Date.from(Instant.now())));
+
+
                 return new TimeStringConverter(TICK_UNIT_FORMATTER_DEFAULTS[rangeIndex]);
             }
         }
@@ -646,6 +676,7 @@ public class PamDateAxis extends ValueAxis<Long> {
             return formatter.fromString(string.substring(prefixLength, string.length() - suffixLength)).getTime();
         }
     }
+
 
 
     public static void main (String [] args)

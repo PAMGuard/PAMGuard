@@ -326,7 +326,7 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX, P
 	 * @return the data stream pane or null if the index is out of bounds. 
 	 */
 	public DataStreamPaneFX getDataStreamPane(int n) {
-		return this.scrollingDataPanel.getDataSyreamPane( n);
+		return this.scrollingDataPanel.getDataStreamPane( n);
 
 	}
 
@@ -334,7 +334,14 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX, P
 		return scrollingDataPanel.getDataStreamPane(selectedItem);
 	}
 
-	public DataMapParametersFX getParams() {
+	/**
+	 * Get the data map parameters associated with the FX GUI. Note these are
+	 * separate from the parameters in the DataMapControls which are for the default
+	 * swing display (not great)
+	 * 
+	 * @return the current data map parameters.
+	 */
+	public DataMapParametersFX getDataMapParams() {
 		return this.dataMapParamsFX;
 	}
 
