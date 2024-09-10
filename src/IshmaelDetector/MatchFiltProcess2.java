@@ -110,11 +110,19 @@ public class MatchFiltProcess2 extends IshDetFnProcess {
 		int bufLen = Math.max((int)Math.round(sampleRate * 0.1), kernel.length * 2);
 		fftLength = FastFFT.nextBinaryExp(bufLen);
 		logFFTLength = FastFFT.log2(fftLength);
+		// pack it slightly differently so that the data are at the end. 
 		double[] packedKernel = Arrays.copyOf(kernel, fftLength);
+//		double[] packedKernel = new double[fftLength];
+//		for (int i = 0, j = fftLength-packedKernel.length; i < kernel.length; i++, j++) {
+//			packedKernel[j] = kernel[i];
+//		}
+		
+		
 		fastFFT = new FastFFT();
 		// this will initialise the fastFFT for bufLen, to reuse in subsequent calls
 		complexKernel = fastFFT.rfft(packedKernel, fftLength);
-		usefulSamples = fftLength/2;//-kernel.length;
+//		usefulSamples = fftLength/2;//-kernel.length;
+		usefulSamples = fftLength-2*kernel.length;
 		normConst = 0;
 		for (int i = 0; i < kernel.length; i++) {
 			normConst += Math.pow(kernel[i], 2);
@@ -152,9 +160,7 @@ public class MatchFiltProcess2 extends IshDetFnProcess {
 		
 		int bufferIndex = 0;
 		
-		int totalSamples = 0;
-		
-		long bufferStartMillis;
+		long totalSamples = 0;
 		
 		double[] dataBuffer;
 		
@@ -167,7 +173,6 @@ public class MatchFiltProcess2 extends IshDetFnProcess {
 			if (dataBuffer == null) {
 				dataBuffer = new double[fftLength];
 				bufferIndex = 0;
-				bufferStartMillis = absSamplesToMilliseconds(0);
 			}
 			for (int i = 0; i < raw.length; i++, totalSamples++) {
 				dataBuffer[bufferIndex++] = raw[i];
@@ -175,7 +180,6 @@ public class MatchFiltProcess2 extends IshDetFnProcess {
 					processBuffer();
 					shuffleBuffer();
 					bufferIndex -= usefulSamples;
-					bufferStartMillis = absSamplesToMilliseconds(totalSamples);
 				}
 			}
 		}
@@ -199,22 +203,18 @@ public class MatchFiltProcess2 extends IshDetFnProcess {
 			ComplexArray fftData = fastFFT.rfft(dataBuffer, fftLength);
 			ComplexArray xCorrDat = fftData.conjTimes(complexKernel);
 			// because it was a rfft, these data are only half of what we need for the inv FFt.
-			xCorrDat = xCorrDat.fillConjugateHalf();
-			fastFFT.ifft(xCorrDat, fftLength);
-			/*
-			 *  now I THINK we need values from the second half of the returned array
-			 *  but only usefulSamples of them. 
-			 */
-			double[] complexData = xCorrDat.getData();
+//			xCorrDat = xCorrDat.fillConjugateHalf();
+			double[] xCorr = fastFFT.realInverse(xCorrDat);
+
+			long startSamp = totalSamples - fftLength;
+			long bufferStartMillis = absSamplesToMilliseconds(startSamp);
+
 			double[] dataOut = new double[usefulSamples];
-			for (int i = 0, j = 0; i < usefulSamples; i++, j+=2) {
-				if (j>= complexData.length) {
-					j -= complexData.length;
-				}
-				dataOut[i] = complexData[j]/normConst/(fftLength);
+			for (int i = 0; i < usefulSamples; i++) {
+				dataOut[i] = xCorr[i]/normConst;
 			}
 			// now throw that at a new data unit ...
-			IshDetFnDataUnit outData = new IshDetFnDataUnit(bufferStartMillis, 1<<iChannel, totalSamples-fftLength, usefulSamples, dataOut);
+			IshDetFnDataUnit outData = new IshDetFnDataUnit(bufferStartMillis, 1<<iChannel, startSamp, usefulSamples, dataOut);
 
 			outputDataBlock.addPamData(outData);
 		}

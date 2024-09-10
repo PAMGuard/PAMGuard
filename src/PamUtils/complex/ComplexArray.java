@@ -654,4 +654,22 @@ public class ComplexArray implements Cloneable, Serializable {
 		return s;
 	}
 
+	@Override
+	public String toString() {
+		String fmt = "%5.3f";
+		return toString(fmt);
+	}
+
+	private String toString(String fmt) {
+		if (data == null || data.length< 2) {
+			return null;
+		}
+		String lFmt = fmt + ", " + fmt;
+		String str = "";
+		for (int i = 0, j = 1; i < data.length; i+=2, j+=2) {
+			str += String.format(lFmt, data[i], data[j]) + "\n";
+		}
+		return str;
+	}
+
 }

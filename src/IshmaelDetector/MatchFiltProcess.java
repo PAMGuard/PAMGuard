@@ -17,6 +17,7 @@ import fftManager.FFT;
 
 /* @author Dave Mellinger
  */
+@Deprecated // use MAtchFiltProc2 which uses faster FFT and is generally more efficient. 
 public class MatchFiltProcess extends IshDetFnProcess
 {
 	/**

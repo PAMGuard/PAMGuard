@@ -17,6 +17,27 @@ public class FftTest {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		new FftTest().conjugateTest();
+	}
+	
+	private void conjugateTest() {
+		// check exactly how it does complex conj of real data. 
+		FastFFT fastFFT = new FastFFT();
+		int n = 8;
+		double[] data = new double[n];
+		for (int i = 0; i < n; i++) {
+			data[i] = Math.random();
+		}
+		ComplexArray halfDat = fastFFT.rfft(data, n);
+		double[] fullDat = data.clone();
+		ComplexArray other = fastFFT.rfftFull(fullDat, n);
+		double[] reverse = fastFFT.realInverse(halfDat);
+		
+		System.out.println(halfDat.toString());
+		System.out.println(other.toString());
+		
+	}
+	private void speedTest() {
 		int nTrial = 100000;
 		int fftLen = 2000;
 		long startTime, endTime;
@@ -34,18 +55,20 @@ public class FftTest {
 		
 		Filter filter = new IirfFilter(0, sampleRate, filterParams);
 		
-		try {
-			if (args.length > 0) {
-				nTrial = Integer.valueOf(args[0]); 
-			}
-			if (args.length > 1) {
-				fftLen = Integer.valueOf(args[1]); 
-			}
-		}
-		catch(NumberFormatException e) {
-			e.printStackTrace();
-			return;
-		}
+//		try {
+//			if (args.length > 0) {
+//				nTrial = Integer.valueOf(args[0]); 
+//			}
+//			if (args.length > 1) {
+//				fftLen = Integer.valueOf(args[1]); 
+//			}
+//		}
+		nTrial = 10;
+		fftLen = 512;
+//		catch(NumberFormatException e) {
+//			e.printStackTrace();
+//			return;
+//		}
 
 		int m = PamUtils.log2(fftLen);
 		
