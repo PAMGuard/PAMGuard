@@ -122,7 +122,7 @@ public class MatchFiltProcess2 extends IshDetFnProcess {
 		// this will initialise the fastFFT for bufLen, to reuse in subsequent calls
 		complexKernel = fastFFT.rfft(packedKernel, fftLength);
 //		usefulSamples = fftLength/2;//-kernel.length;
-		usefulSamples = fftLength-2*kernel.length;
+		usefulSamples = fftLength-kernel.length;
 		normConst = 0;
 		for (int i = 0; i < kernel.length; i++) {
 			normConst += Math.pow(kernel[i], 2);
@@ -205,13 +205,24 @@ public class MatchFiltProcess2 extends IshDetFnProcess {
 			// because it was a rfft, these data are only half of what we need for the inv FFt.
 //			xCorrDat = xCorrDat.fillConjugateHalf();
 			double[] xCorr = fastFFT.realInverse(xCorrDat);
+			/**
+			 * For normalisation, we need to sum the energy in the waveform for each sample of
+			 * the correlation. So add the first block, the length of the kernel, then for 
+			 * each sample add one in and take one out
+			 */
+			double norm2 = 0;
+			for (int i = 0; i < kernel.length; i++) {
+				norm2 += Math.pow(dataBuffer[i],2);
+			}
 
 			long startSamp = totalSamples - fftLength;
 			long bufferStartMillis = absSamplesToMilliseconds(startSamp);
 
 			double[] dataOut = new double[usefulSamples];
-			for (int i = 0; i < usefulSamples; i++) {
-				dataOut[i] = xCorr[i]/normConst;
+			for (int i = 0, j = kernel.length; i < usefulSamples; i++, j++) {
+				dataOut[i] = xCorr[i]/Math.sqrt(normConst*norm2);
+				norm2 -= Math.pow(dataBuffer[i],2); // remove first
+				norm2 += Math.pow(dataBuffer[j],2); // add next
 			}
 			// now throw that at a new data unit ...
 			IshDetFnDataUnit outData = new IshDetFnDataUnit(bufferStartMillis, 1<<iChannel, startSamp, usefulSamples, dataOut);
