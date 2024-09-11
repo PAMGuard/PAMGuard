@@ -272,6 +272,7 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParametersFX
 		updateDatagramColorBox();
 
 		dataGramBox.setOnAction((action)->{
+			if (dataGramBox.getSelectionModel().getSelectedItem()==null) return;
 			dataGramColPane.setDataStreamPanel(dataMapPane.getDataStreamPane(dataGramBox.getSelectionModel().getSelectedItem()));
 			colourLabel.setText(String.format("Colours for %s " , dataGramBox.getSelectionModel().getSelectedItem().getName())); 
 			colourLabel.setTooltip(new Tooltip(String.format("Colours for %s " , dataGramBox.getSelectionModel().getSelectedItem().getName()))); 

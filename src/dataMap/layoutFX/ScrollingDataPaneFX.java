@@ -16,11 +16,15 @@ import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import PamguardMVC.PamDataBlock;
 import dataMap.DataMapControl;
+import pamViewFX.PamGuiManagerFX;
+import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
+import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamColorsFX;
 import pamViewFX.fxNodes.PamScrollPane;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.pamAxis.PamDateAxis;
+
 
 public class ScrollingDataPaneFX extends PamBorderPane {
 
@@ -34,6 +38,8 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	 * The default expanded hieght for each pane. 
 	 */
 	private static final int DATASTREAMPANE_HEIGHT = 220;
+
+	private static final double SCROLL_BAR_INCREMENT = 0.05; //10% movement when scroll bnutton pressed
 
 	/**
 	 * Reference to the DataMapControl.
@@ -227,8 +233,45 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 
 		holder.setCenter(timeScrollBar);
 		holder.setBottom(timeLabelPane);
+		
+		PamButton scrollLeft = new PamButton(); 
+		scrollLeft.setOnAction((a)->{
+			 /*
+			  * The distance is a percentage of the
+			 * visible distance. So 1. means the scroll bar will move by the visible
+			 * distance. 0.5 means half the visible distance and so on. Negative means move
+			 * left and positive means move right/
+			 */
+			moveScrollBar(-timeScrollBar.getVisibleAmount()*SCROLL_BAR_INCREMENT);
+		});
+		scrollLeft.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-left", PamGuiManagerFX.iconSize));
+		scrollLeft.prefHeightProperty().bind(timeScrollBar.heightProperty());
+
+		PamButton scrollRight = new PamButton(); 
+		scrollRight.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-right", PamGuiManagerFX.iconSize));
+		scrollRight.setOnAction((a)->{
+			moveScrollBar(timeScrollBar.getVisibleAmount()*SCROLL_BAR_INCREMENT);
+		});
+		scrollRight.prefHeightProperty().bind(timeScrollBar.heightProperty());
+		
+		holder.setLeft(scrollLeft);
+		holder.setRight(scrollRight);
 
 		return holder; 
+	}
+
+	/**
+	 * Move the scroll bar by a a number fo seconds. Positive means move forward in
+	 * time, negative means move back in time.
+	 * 
+	 * @param the distance to move as a percentage of the visible amount
+	 */
+	private void moveScrollBar(double seconds) {
+		
+		double newValue =  timeScrollBar.getCurrentValue()+seconds;
+	
+		//this should trigger all relevant repaint listeners etc. 
+		timeScrollBar.setCurrentValue(newValue);
 	}
 
 	/**
