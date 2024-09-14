@@ -25,10 +25,18 @@ public class FftTest {
 		FastFFT fastFFT = new FastFFT();
 		int n = 8;
 		double[] data = new double[n];
+		double totSq = 0;
 		for (int i = 0; i < n; i++) {
 			data[i] = Math.random();
+			totSq += Math.pow(data[i],2);
 		}
 		ComplexArray halfDat = fastFFT.rfft(data, n);
+		double fTot = 0;
+		for (int i = 0; i < halfDat.length(); i++) {
+			fTot += halfDat.magsq(i);
+		}
+		System.out.printf("Total %3.3f, %3.3f ratio %3.3f\n", totSq, fTot, fTot/totSq);
+		
 		double[] fullDat = data.clone();
 		ComplexArray other = fastFFT.rfftFull(fullDat, n);
 		double[] reverse = fastFFT.realInverse(halfDat);

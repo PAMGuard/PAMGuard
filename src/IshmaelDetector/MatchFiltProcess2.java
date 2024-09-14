@@ -226,6 +226,12 @@ public class MatchFiltProcess2 extends IshDetFnProcess {
 			}
 			// now throw that at a new data unit ...
 			IshDetFnDataUnit outData = new IshDetFnDataUnit(bufferStartMillis, 1<<iChannel, startSamp, usefulSamples, dataOut);
+			
+//			double maxOut = 0;
+//			for (int i = 0; i < dataOut.length; i++) {
+//				maxOut = Math.max(maxOut, dataOut[i]);
+//			}
+//			System.out.printf("MAx correlation value is %5.3f\n", maxOut);
 
 			outputDataBlock.addPamData(outData);
 		}

@@ -656,7 +656,7 @@ public class ComplexArray implements Cloneable, Serializable {
 
 	@Override
 	public String toString() {
-		String fmt = "%5.3f";
+		String fmt = "%6.3f";
 		return toString(fmt);
 	}
 

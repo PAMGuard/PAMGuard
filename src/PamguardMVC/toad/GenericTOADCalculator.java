@@ -464,6 +464,9 @@ public class GenericTOADCalculator implements TOADCalculator, PamSettings {
 			conjData[re2] = conjData[re];
 			conjData[im2] = -conjData[im];
 		}
+//		double[] newDat = Arrays.copyOf(conjData, fftLength/2);
+//		ComplexArray oth = new ComplexArray(newDat);
+//		double[] xCorr = correlations.getFastFFT().realInverse(oth);
 		correlations.getFastFFT().ifft(conjArray, fftLength);
 		double[] delayAndHeight = correlations.getInterpolatedPeak(conjArray, scale, halfFFFTLen);
 		delayAndHeight = Arrays.copyOf(delayAndHeight, 3);
