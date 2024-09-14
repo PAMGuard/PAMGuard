@@ -2,6 +2,7 @@ package IshmaelDetector;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
 
@@ -12,6 +13,8 @@ import Layout.DisplayPanel;
 import Layout.DisplayPanelContainer;
 import Layout.DisplayPanelProvider;
 import Layout.DisplayProviderList;
+import Layout.PamAxis;
+import Layout.RepeatedAxis;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamSettingManager;
@@ -19,6 +22,8 @@ import PamController.PamSettings;
 import PamUtils.PamUtils;
 import PamView.PamColors;
 import PamView.PamColors.PamColor;
+import PamView.PamSymbol;
+import PamView.PamSymbolType;
 import PamguardMVC.PamConstants;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
@@ -48,7 +53,7 @@ public class IshDetGraphics implements DisplayPanelProvider, PamSettings {
 	/**
 	 * True for the very first line draw
 	 */
-	private boolean firstTime;			
+	private boolean firstTime = true;			
 
 	/**
 	 * The active channels. 
@@ -115,6 +120,12 @@ public class IshDetGraphics implements DisplayPanelProvider, PamSettings {
 		 * The last recorded height in pixels of the image. Used for resizing calcs
 		 */
 		private int lastImageHeight;
+
+		PamAxis westAxis, eastAxis;
+		
+		private long lastSample;
+		
+		private PamSymbol symbol = new PamSymbol(PamSymbolType.SYMBOL_CROSS2, 6, 6, true, Color.GREEN, Color.GREEN);
 		
 		/**
 		 * Holds some display infor for each channel. 
@@ -127,12 +138,14 @@ public class IshDetGraphics implements DisplayPanelProvider, PamSettings {
 			int yLo, yHi;			//Y-bounds of my display region
 			int lastX, lastY, lastThreshy;		//where the last drawn line ended, in pixels
 			float yScale;
+			public IshDetFnDataUnit lastDataUnit;
 						
 			public PerChannelInfo(int yLo, int yHi, float yScale) {
 				this.yLo = yLo;
 				this.yHi = yHi;
 				this.yScale = yScale;
 				lastX = 0;
+				lastThreshy = Integer.MIN_VALUE;
 				xAdvance = -2;		//special case meaning "skip first 2 values"
 				lastY = yHi;
 			}
@@ -173,6 +186,8 @@ public class IshDetGraphics implements DisplayPanelProvider, PamSettings {
 			if (ishDetDataBlock != null) {
 				ishDetDataBlock.addObserver(this); //call my update() when unit added
 			}
+			westAxis = new PamAxis(0, 1, 0, 1, 0, 1, PamAxis.ABOVE_LEFT, "", PamAxis.LABEL_NEAR_CENTRE, "%3.2f");
+			westAxis.setCrampLabels(true);
 		}
 
 		@Override
@@ -224,6 +239,10 @@ public class IshDetGraphics implements DisplayPanelProvider, PamSettings {
 		 * Reference to the yScale. 
 		 */
 		private float yScale = 1; 
+		
+		private double currentXPixel = 0;
+
+		private double scrollRemainder;
 
 		@Override
 		public void masterClockUpdate(long milliSeconds, long sampleNumber) {
@@ -238,29 +257,69 @@ public class IshDetGraphics implements DisplayPanelProvider, PamSettings {
 
 		@Override
 		public void addData(PamObservable o, PamDataUnit dataUnit1) {
-			IshDetFnDataUnit dataUnit = (IshDetFnDataUnit)dataUnit1; 
+			IshDetFnDataUnit ishDataUnit = (IshDetFnDataUnit)dataUnit1; 
 			//This is called whenever new data arrives from my parent.
 			//PamDataBlock inputDataBlock = (PamDataBlock)o;
 
-			double[][] ishDetectorData = dataUnit.getDetData();
+			double[][] ishDetectorData = ishDataUnit.getDetData();
+			if (ishDetectorData == null || ishDetectorData.length == 0) {
+				return;
+			}
+			int ishTypes = ishDetectorData.length;
+			int ishSamples = ishDetectorData[0].length;
+			
+			if (ishDataUnit.getStartSample() < lastSample) {
+				clearImage();
+				firstTime = true;
+			}
+			lastSample = ishDataUnit.getStartSample();
+			/*
+			 *  this is the number of samples at the original sample rate, some
+			 *  detectors put out fewer levels than original samples, e.g. one per FFT.  
+			 */
+			Long ishDuration = ishDataUnit.getSampleDuration();
+			if (ishDuration == null) {
+				return;
+			}
+			int ishScale = ishDuration.intValue() / ishSamples;
+			
+			// need to know if this is the first channel in the datablock. 
+			int firstBlockChan = PamUtils.getLowestChannel(ishDetDataBlock.getChannelMap());
+			int firstUnitChan = PamUtils.getLowestChannel(ishDataUnit.getChannelBitmap());
+			boolean firstChan = (firstBlockChan == firstUnitChan);
 		
 			//if (ishDetectorData.length != 1)
 			//ishDetectorData[0] = 0;
 
 			//int totalChannels = PamUtils.getNumChannels(dataBlock.getChannelMap());
 			//			int chanIx = PamUtils.getSingleChannel(dataUnit.getChannelBitmap());
-			int chanIx = PamUtils.getSingleChannel(dataUnit.getSequenceBitmap());
-
+			int chanIx = PamUtils.getSingleChannel(ishDataUnit.getSequenceBitmap());
 			BufferedImage image = getDisplayImage();
 			
 			if (image == null) return;
+
+			// graphics handle to the image. 
+			Graphics2D g2d = (Graphics2D) image.getGraphics();
+			boolean wrap = getDisplayPanelContainer().wrapDisplay();
 
 			int len = ishDetectorData[0].length; //length of the detector output
 			int len2 = ishDetectorData.length; //number of data streams; 
 			//if the length is greater than 1 then the actual detector energy is at index 2,
 			//otherwise it is at index 1 (the trigger data is same as the d data so point in replicating data)
 			int detIndex = len2 > 1 ? 2 : 0; 
-			
+
+			// need to work out from the dataUnits start time in 
+			// milliseconds where it should start drawing ...
+			double containerDrawPix = 0;
+			long containerTime = 0;
+			double pixelsPerMilli = 0;
+			synchronized (displayPanelContainer) {
+				containerDrawPix = displayPanelContainer.getCurrentXPixel();
+				containerTime = displayPanelContainer.getCurrentXTime();
+				pixelsPerMilli = getInnerWidth()/ displayPanelContainer.getXDuration();
+			}
+//			System.out.println(String.format("DR Ch %d t = %d", dataUnit.getChannelBitmap(), dataUnit.timeMilliseconds));
+			int currentPixel = (int) containerDrawPix;
 			
 			//the height scale values. 
 			float yScale = this.yScale;
@@ -289,6 +348,10 @@ public class IshDetGraphics implements DisplayPanelProvider, PamSettings {
 			else {
 				yScale = (float) ishDisplayParams.verticalScaleFactor;
 			}
+			if (westAxis.getMaxVal() != yScale) {
+				westAxis.setMaxVal(yScale);
+				displayPanelContainer.panelNotify(DisplayPanelContainer.DRAW_BORDER);
+			}
 			this.yScale=yScale; 
 			
 			//check for resize; 
@@ -299,41 +362,129 @@ public class IshDetGraphics implements DisplayPanelProvider, PamSettings {
 			
 			if (firstTime) {
 				clearLastX = 0;
+//				chan.lastDataUnit = null;
 				activeChannels = ishDetControl.getActiveChannels(); 
 				int nChansActive = PamUtils.getNumChannels(activeChannels); //no need to recalc this every iteration. 
 
 				int chanN = 0;
 				for (int i = 0; i < perChannelInfo.length; i++) {
-					if ((activeChannels & (1 << i)) != 0) {
+//					if ((activeChannels & (1 << i)) != 0) {
 						int yLo = Math.round((float) chanN      / (float) nChansActive * lastImageHeight);
 						int yHi = Math.round((float)(chanN + 1) / (float) nChansActive * lastImageHeight);
 						perChannelInfo[i] = new PerChannelInfo(yLo, yHi, yScale);
 						chanN++;
-					}
-					else perChannelInfo[i]=null; //need to reset to nul//						
+//					}
+//					else perChannelInfo[i]=null; //need to reset to nul//						
 					//System.out.println("nChansActive: " + nChansActive +" chanN: " + chanN + " yLo: "+ yLo + " yHi: " + yHi);
 				}
 				firstTime = false;
 			}
-		
-			//Figure out which channel this data is for.
 			PerChannelInfo chan = perChannelInfo[chanIx];
 			if (chan == null) return;
-			
+
+			/*
+			 * Sort out x position and scaling
+			 */
+			double drawStartPix = containerDrawPix - (containerTime-ishDataUnit.getTimeMilliseconds()) * pixelsPerMilli;
+			if (!wrap) {
+				drawStartPix = currentXPixel;
+			}
+			/*
+			 * Check for wrap and either shuffle the image along, or clear the end of it.  
+			 */
 			//calculate the current x (time) position. 
+			//Figure out which channel this data is for.
 			int xEnd = (int) displayPanelContainer.getCurrentXPixel();
 			int xStart = chan.lastX;
-			
-			/**
+			xEnd = (int) (xStart + ishDataUnit.getDurationInMilliseconds()*pixelsPerMilli); 
+			int firstPixel = (int) Math.floor(drawStartPix);			/**
 			 * OK, there is a a problem here...the position of the cursor does not
 			 * necessarily correspond to the current time of the data unit which was
 			 * previously assumed. So take the time of the cursor and count pixels back. 
 			 */
-			double pixelsback = ((double) (displayPanelContainer.getCurrentXTime() - dataUnit1.getTimeMilliseconds()))/displayPanelContainer.getXDuration();
-			pixelsback = pixelsback*getInnerWidth(); 
+			if (firstPixel > image.getWidth()) {
+				firstPixel = (int) ((dataUnit1.getTimeMilliseconds()-displayPanelContainer.getCurrentXTime())*pixelsPerMilli);
+			}
+//			double pixelsback = ((double) (displayPanelContainer.getCurrentXTime() - dataUnit1.getTimeMilliseconds()))/displayPanelContainer.getXDuration();
+//			pixelsback = pixelsback*getInnerWidth(); 
 			
+			long currentXTime = getDisplayPanelContainer().getCurrentXTime();
+			/*
+			 * Drawng off the currentXtime is a disaster, since it's out of synch with the incoming
+			 * correlation data. 
+			 */
+//			currentXTime = ishDataUnit.getEndTimeInMilliseconds();
 			//convert to pixels. 
-			xEnd= (int) (xEnd - pixelsback); 
+//			xEnd= (int) (xEnd - pixelsback); 
+			if (!wrap && firstChan) {
+				/*
+				 * If we just use the number of samples in the data, this 
+				 * Doesn't work for FFT based data because of the FFT overlap.
+				 * So we need to work out the millis difference between this unit
+				 * and the preceding one.
+				 * It's actually a bit more complex, for the correlation detectors there is quite a lag
+				 * in the data, e.g. the first MF data may say it has 2095 samples, but the actual data
+				 * started 4096 samples before now. This means we never ever have the latest data (the length
+				 * of the kernel), so need to move everything left by that ammount.  Can we do it off the 
+				 * millis time of the data unit. Need to work out two x values, for start and end of 
+				 * each block.  
+				 */
+				// this is the absolute number of pixels we're going to scroll by. 
+				double scrollPixs = ((double) (ishSamples * 1000. * ishScale) / sampleRate * pixelsPerMilli);
+				if (chan.lastDataUnit != null && chan.lastDataUnit.getTimeMilliseconds() < ishDataUnit.getTimeMilliseconds()) {
+					scrollPixs = (ishDataUnit.getTimeMilliseconds()-chan.lastDataUnit.getTimeMilliseconds())*pixelsPerMilli;
+//					scrollPixs = (currentXTime-ishDataUnit.getEndTimeInMilliseconds())*pixelsPerMilli;
+				}
+				int w = image.getWidth();
+				// but we may be starting earlier, due to lag in correlation detectors. 
+//				double lag = currentXTime-ishDataUnit.getEndTimeInMilliseconds();
+				double scrollXEnd = w;// - (lag*pixelsPerMilli);
+//				double scrollXStart = w - scrollPixs; //- ((currentXTime-ishDataUnit.getTimeMilliseconds())*pixelsPerMilli);
+//				scrollPixs = scrollXEnd-scrollXStart;
+				int intScrollPixs = (int) scrollPixs;
+				double scrollXStart = scrollXEnd-intScrollPixs;
+				scrollRemainder += (scrollPixs-intScrollPixs);
+				// deal with itty bitty non integer bits. 
+				if (scrollRemainder >= 1) {
+					scrollRemainder -= 1;
+					intScrollPixs++;
+				}
+				// shuffle the image along. 
+				g2d.drawImage(image, 0, 0, w-intScrollPixs, image.getHeight(), intScrollPixs, 0, w, image.getHeight(), null);
+				
+//				if (wrap) {
+//				g2d.fillRect(w-intScrollPixs, 0, intScrollPixs, image.getHeight());
+//				}
+				firstPixel = (int) scrollXStart;
+				xStart = firstPixel;
+				xEnd = (int) scrollXEnd;
+				// clear end of imate. 
+				g2d.setBackground(plotBackground);
+				g2d.fillRect(firstPixel, 0, w-firstPixel, image.getHeight());
+				// draw the threshold. 
+				g2d.setColor(Color.RED);
+				int yT = (int) westAxis.getPosition(ishDetControl.ishDetParams.thresh);
+				g2d.drawLine(xStart-1, yT, xEnd, yT);
+				chan.lastDataUnit = ishDataUnit;
+				// shuffle all the chan lastX values. 
+				for (int i = 0; i < perChannelInfo.length; i++) {
+					if (perChannelInfo[i] != null) {
+						if (perChannelInfo[i].lastX == 0) {
+							perChannelInfo[i].lastX = xStart;
+						}
+						else {
+							perChannelInfo[i].lastX -= intScrollPixs;
+						}
+					}
+				}
+			}
+			else if (firstChan) {
+				clearImage(xStart, xEnd, true);
+			}
+		
+			
+			
+
 		
 
 //			//HACK to get autoscale working. This is code is a total mess. 
@@ -342,16 +493,22 @@ public class IshDetGraphics implements DisplayPanelProvider, PamSettings {
 			// sometimes xEnd < clearLastX, and the whole plugin window gets erased.  So make sure, in that case,
 			// we don't call the clearImage method
 //			if (clearLastX != xEnd) {
-			if (clearLastX < xEnd) {
+			if (clearLastX < xEnd & wrap) {
 				clearImage(clearLastX + 1, xEnd + 1, true);
 				clearLastX = xEnd;
 			}
+			int w = image.getWidth();
+//			System.out.printf("Drawing between xpixels %d and %d 0f %d\n", xStart, xEnd, w);
 			for (int i = 0; i < len; i++) {
-				int x = (len == 1) ? xEnd : 
+				int x = (len == 1) ? xEnd-1 : 
 					(int) Math.round(PamUtils.linterp(0,len-1,xStart,xEnd,i));
 				
 				//plot detection data
 				int y = (int) (chan.yHi - (ishDetectorData[detIndex][i]/chan.yScale) * (chan.yHi-chan.yLo));
+				y = (int) westAxis.getPosition(ishDetectorData[detIndex][i]);
+//				if (i == 0) {
+//					symbol.draw(g2d, new Point(x,image.getHeight()/2));
+//				}
 				
 				int threshY; 
 				if (len2>1) {
@@ -365,20 +522,31 @@ public class IshDetGraphics implements DisplayPanelProvider, PamSettings {
 								
 				y = Math.min(chan.yHi, Math.max(y, chan.yLo));
 				//if (x >= lastX) {
-				Graphics2D g2d = (Graphics2D) image.getGraphics();
 								
-				g2d.setColor(PamColors.getInstance().getColor(PamColor.PlOTWINDOW)); 
-				g2d.fillRect(chan.lastX+1, 0, Math.abs(x-chan.lastX), image.getHeight());
+//				g2d.setColor(PamColors.getInstance().getColor(PamColor.PlOTWINDOW)); 
+//				if (wrap) {
+//					g2d.fillRect(chan.lastX+1, 0, Math.abs(x-chan.lastX), image.getHeight());
+//				}
 				
 				g2d.setColor(PamColors.getInstance().getChannelColor(chanIx));		
 
+				if (wrap) {
+					if (x > image.getWidth()) {
+						x -= image.getWidth();
+					}
+				}
 				//detection function
-				if (x >= chan.lastX) {
+				if (x >= chan.lastX-1) {
 					g2d.drawLine(chan.lastX, chan.lastY, x, y);
 				}
-				if (x >= chan.lastX && threshY >= chan.yLo && threshY < chan.yHi) {
-					g2d.setColor(Color.RED);			//threshold line
-					g2d.drawLine(chan.lastX, chan.lastThreshy, x, threshY);
+				if (wrap) {
+					if (x >= chan.lastX && threshY >= chan.yLo && threshY < chan.yHi) {
+						g2d.setColor(Color.RED);			//threshold line
+						if (chan.lastThreshy == Integer.MIN_VALUE) {
+							chan.lastThreshy = threshY;
+						}
+						g2d.drawLine(chan.lastX, chan.lastThreshy, x, threshY);
+					}
 				}
 				chan.xAdvance = (chan.xAdvance <= 2) ? chan.xAdvance+1 
 						: Math.max(chan.xAdvance, x - chan.lastX);
@@ -399,6 +567,12 @@ public class IshDetGraphics implements DisplayPanelProvider, PamSettings {
 		public void updateData(PamObservable observable, PamDataUnit pamDataUnit) {
 			// TODO Auto-generated method stub
 			
+		}
+
+
+		@Override
+		public PamAxis getWestAxis() {
+			return westAxis;
 		}	
 	}
 	

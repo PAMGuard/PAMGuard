@@ -174,8 +174,9 @@ public class MatchFiltProcess2 extends IshDetFnProcess {
 				dataBuffer = new double[fftLength];
 				bufferIndex = 0;
 			}
-			for (int i = 0; i < raw.length; i++, totalSamples++) {
+			for (int i = 0; i < raw.length; i++) {
 				dataBuffer[bufferIndex++] = raw[i];
+				totalSamples++;
 				if (bufferIndex == fftLength) {
 					processBuffer();
 					shuffleBuffer();

@@ -94,6 +94,7 @@ public class RawDataDisplay implements DisplayPanelProvider {
 			westAxis = new RepeatedAxis(0, 10, 0, 20, -1, 1, true, "", "%2.2g");
 			westAxis.setInterval(1);
 			westAxis.setRepeatCount(nChan);
+			westAxis.setCrampLabels(true);
 			eastAxis = new RepeatedAxis(0, 10, 0, 20, -1, 1, false, "", "%2.2g");
 			eastAxis.setInterval(1);
 			eastAxis.setRepeatCount(nChan);

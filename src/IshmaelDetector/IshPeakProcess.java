@@ -179,12 +179,16 @@ public class IshPeakProcess extends PamProcess
 			if (isIshOverThreshold(inputData[iSamp]) && chan.nOverThresh <=maxTimeN+1) {
 				if (chan.nOverThresh == 0) {
 					chan.peakHeight = Double.NEGATIVE_INFINITY; 
+					chan.startSample = ishFnDataUnit.getStartSample()+iSamp;
 				}
+				chan.endSample = ishFnDataUnit.getStartSample()+iSamp;
+				chan.nUnderThresh = 0;
 				chan.nOverThresh++;
 				//			System.out.println("above threshold, startSample= " + String.valueOf(ishFnDataUnit.getStartSample()) + ", inputData= " + String.valueOf(inputData[0]) + ", nOverThresh= "+ String.valueOf(chan.nOverThresh));
 				if (inputData[iSamp] >= chan.peakHeight) {
+//					System.out.printf("Inc peak from %4.2f to %4.2f at samp %d\n", chan.peakHeight, inputData[iSamp], ishFnDataUnit.getStartSample()+iSamp);
 					chan.peakHeight = inputData[iSamp];
-					chan.peakTimeSam = ishFnDataUnit.getStartSample(); //
+					chan.peakTimeSam = ishFnDataUnit.getStartSample()+iSamp; //
 				}
 			} 
 			else {
@@ -192,14 +196,28 @@ public class IshPeakProcess extends PamProcess
 				// Below threshold or over the maximum time allowed. 
 				// Check to see if we were over enough times, and if so,
 				//add an output unit. Data has to be less then the max time
-				if (chan.nOverThresh > 0 && chan.nOverThresh >= minTimeN && chan.nOverThresh<=maxTimeN) {
+				chan.nUnderThresh++;
+				if (chan.nUnderThresh < refactoryTimeSam) {
+					/*
+					 *  just wait until we've reached this time before ending the call.
+					 *  Calls cross threshold many times, so it's possible it will go back 
+					 *  over threshold in a couple more samples. So do absolutely nothing here.  
+					 */
+					
+				}
+				else if (chan.nOverThresh > 0 && chan.durationSamples() >= minTimeN && chan.nOverThresh<=maxTimeN) {
+					/*
+					 * If we're here, the call duration is long enough and it's been below threshold for longer
+					 * than the minimum allowed gap, so it is time to properly end the call. 
+					 */
 
 					//Append the new data to the end of the data stream.
-					long startSam = ishFnDataUnit.getStartSample();
-					long durationSam = chan.nOverThresh;
-					durationSam *= sampleRate / (ishDetControl.ishDetFnProcess.getDetSampleRate());
-					long startMsec = absSamplesToMilliseconds(startSam - durationSam);
-					long endMsec = absSamplesToMilliseconds(startSam) + 
+//					long startSam = ishFnDataUnit.getStartSample();
+					long durationSam = chan.endSample-chan.startSample+1;
+//					durationSam *= sampleRate / (ishDetControl.ishDetFnProcess.getDetSampleRate());
+//					long startMsec = absSamplesToMilliseconds(startSam - durationSam);
+					long startMsec = absSamplesToMilliseconds(chan.startSample);
+					long endMsec = startMsec + 
 							Math.round(1000.0 * (float)durationSam * ishDetControl.ishDetFnProcess.getDetSampleRate()); 
 					float lowFreq = ishDetControl.ishDetFnProcess.getLoFreq();
 					float highFreq = ishDetControl.ishDetFnProcess.getHiFreq();
@@ -217,7 +235,7 @@ public class IshPeakProcess extends PamProcess
 					//							chan.peakHeight, outputDataBlock, 1 << chanIx, startSam, durationSam);
 					//11/03/2020 - major bug fix - start sample of Ishamel detector data unit was wrong - it was at the end of the data unit for some reason. 
 					iDet = new IshDetection(startMsec, endMsec, lowFreq, highFreq, chan.peakTimeSam, 
-							chan.peakHeight, outputDataBlock, arg1.getChannelBitmap(), startSam - durationSam, durationSam);
+							chan.peakHeight, outputDataBlock, arg1.getChannelBitmap(), chan.startSample, durationSam);
 
 					iDet.setSequenceBitmap(arg1.getSequenceBitmapObject());
 					iDet.setParentDataBlock(outputDataBlock);
@@ -226,12 +244,13 @@ public class IshPeakProcess extends PamProcess
 					//now check if the refactory time is OK
 
 
-					double iDISam =Math.abs((startSam) - (chan.lastStartSam+durationSam)); 
+					double iDISam =Math.abs(chan.startSample - (chan.lastStartSam+chan.lastDurationSam)); 
 
 					//				System.out.println("Samplediff: " +  iDISam 
 					//				+ " maxTimeN: " + this.maxTimeN + " sR: " + ishDetControl.ishDetFnProcess.getDetSampleRate()); 
-					if (chan.lastStartSam==-1 || startSam<chan.lastStartSam || iDISam>=refactoryTimeSam) {
+					if (chan.lastStartSam==-1 || chan.startSample<chan.lastStartSam || iDISam>=refactoryTimeSam) {
 						outputDataBlock.addPamData(iDet);
+//						System.out.println(iDet.getSummaryString());
 						//					System.out.println("");
 						//					System.out.println("Ishmael data unit accepted because of refactory time: " 
 						//							+ startSam + "  " + chan.lastStartSam + " minIDI: (samples): " + refactoryTimeSam 
@@ -244,11 +263,19 @@ public class IshPeakProcess extends PamProcess
 						//							+ " minIDI (s) " + this.ishDetControl.ishDetParams.refractoryTime);
 					}
 					//keep a reference to the last time and duration
-					chan.lastStartSam = startSam; 
+					chan.lastStartSam = chan.startSample; 
 					chan.lastDurationSam = durationSam; 
 
+					chan.reset();
 				}
-				chan.nOverThresh = 0;
+				else {
+					/*
+					 * Get here if there may have been a call building, but it didn't get adequate duration and 
+					 * has now been below threshold for a while. So reset the detector and allow it to start a
+					 * new detection. 
+					 */
+					chan.reset();
+				}
 			}
 		}
 	}
@@ -269,6 +296,9 @@ public class IshPeakProcess extends PamProcess
 	private class PerChannelInfo {
 
 
+		public long endSample;
+		public int nUnderThresh;
+		public long startSample;
 		/**
 		 * The sample time of the start of the last saved detection (samples)
 		 */
@@ -277,6 +307,16 @@ public class IshPeakProcess extends PamProcess
 		int nOverThresh = 0;		//number of times we've been over threshold in units of FFT length
 		double peakHeight;			//height of peak within the current event
 		long peakTimeSam;			//sample number at which that peak occurred
+		
+		private long durationSamples() {
+			return endSample-startSample+1;
+		}
+
+		public void reset() {
+			nOverThresh = 0;
+			startSample = endSample = 0;
+			peakHeight = 0;
+		}
 	}
 
 	@Override public void pamStart() {
