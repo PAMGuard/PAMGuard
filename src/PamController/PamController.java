@@ -42,6 +42,7 @@ import PamController.command.NetworkController;
 import PamController.command.TerminalController;
 import PamController.command.WatchdogComms;
 import PamController.fileprocessing.ReprocessManager;
+import PamController.fileprocessing.ReprocessManagerMonitor;
 import PamController.masterReference.MasterReferencePoint;
 import PamController.settings.BatchViewSettingsImport;
 import PamController.settings.output.xml.XMLWriterDialog;
@@ -1287,17 +1288,68 @@ public class PamController implements PamControllerInterface, PamSettings {
 		 * off, etc.
 		 */
 		if (saveSettings && getRunMode() == RUN_NORMAL) { // only true on a button press or network start.
-			ReprocessManager reprocessManager = new ReprocessManager();
-			boolean goonthen = reprocessManager.checkOutputDataStatus();
-			if (!goonthen) {
-				System.out.println(
-						"Data processing will not start since you've chosen not to overwrite existing output data");
-				pamStop();
-				setPamStatus(PAM_IDLE);
-				return false;
-			}
+			checkReprocessManager(saveSettings, startTime);
 		}
+		else {
+			return continueStart(saveSettings, startTime);
+		}
+		return true;
+	}
+	
+	/**
+	 * Check the reprocess manager in a swing worker thread. 
+	 * @param saveSettings
+	 * @param startTime
+	 */
+	private void checkReprocessManager(boolean saveSettings, long startTime) {
+		ReprocessMon mon = new ReprocessMon(saveSettings, startTime);
+		ReprocessManager reprocessManager = new ReprocessManager();
+//		boolean goonthen = reprocessManager.checkOutputDataStatus();
+//		if (!goonthen) {
+//			System.out.println(
+//					"Data processing will not start since you've chosen not to overwrite existing output data");
+//			pamStop();
+//			setPamStatus(PAM_IDLE);
+//			return false;
+//		}
+		reprocessManager.startCheckingThread(getMainFrame(), mon);
+	}
+	
+	private class ReprocessMon implements ReprocessManagerMonitor {
+		private boolean saveSettings;
+		private long startTime;
+		public ReprocessMon(boolean saveSettings, long startTime) {
+			super();
+			this.saveSettings = saveSettings;
+			this.startTime = startTime;
+		}
+		@Override
+		public void done(boolean continueStart) {
+			reprocessManagerDone(continueStart, continueStart, startTime);
+		}
+	}
+	
+	private void reprocessManagerDone(boolean goonthen, boolean saveSettings, long startTime) {
+		if (!goonthen) {
+			System.out.println(
+					"Data processing will not start since you've chosen not to overwrite existing output data");
+			pamStop();
+			setPamStatus(PAM_IDLE);
+		}
+		else {
+			continueStart(saveSettings, startTime);
+		}
+	}
 
+	/**
+	 * Second half of the start process. This was originally in pamStart, but had
+	 * to be split out, so that the reprocessManager checks can run in a separate
+	 * thread in order to display a progress bar as files are catalogued. 
+	 * @param saveSettings
+	 * @param startTime
+	 * @return
+	 */
+	public boolean continueStart(boolean saveSettings, long startTime) {
 		if (saveSettings) {
 			startTime = PamCalendar.getSessionStartTime();
 //			System.out.printf("Saving settings for start time %s\n", PamCalendar.formatDBDateTime(startTime));
@@ -1313,7 +1365,8 @@ public class PamController implements PamControllerInterface, PamSettings {
 
 		StorageOptions.getInstance().setBlockOptions();
 
-		t1 = System.currentTimeMillis();
+		long t1 = System.currentTimeMillis();
+		ArrayList<PamControlledUnit> pamControlledUnits = pamConfiguration.getPamControlledUnits();
 		for (int iU = 0; iU < pamControlledUnits.size(); iU++) {
 			pamControlledUnits.get(iU).pamToStart();
 			// long t2 = System.currentTimeMillis();
@@ -1486,7 +1539,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 		 * If it's running in multithreading mode, then at this point it is necessary to
 		 * make sure that all internal datablock buffers have had time to empty.
 		 */
-		System.out.println("Arrived in PamStopped() in thread " + Thread.currentThread().toString());
+//		System.out.println("Arrived in PamStopped() in thread " + Thread.currentThread().toString());
 
 		ArrayList<PamControlledUnit> pamControlledUnits = pamConfiguration.getPamControlledUnits();
 

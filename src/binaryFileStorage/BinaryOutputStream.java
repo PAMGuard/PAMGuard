@@ -601,8 +601,7 @@ public class BinaryOutputStream {
 			opStream = new DataOutputStream(new BufferedOutputStream(new 
 					FileOutputStream(indexFile)));
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.err.println("Error creating index file: " + e.getMessage());
 			return false;
 		}
 
