@@ -71,6 +71,7 @@ public class PlaybackProcess extends PamInstantProcess {
 //		super.prepareProcess();
 //		System.out.println("Playback prepare process");
 		prepareProcess(getSourceSampleRate());
+		remainDelayMillis = 0;
 	}
 	
 	public boolean prepareProcess(double sourceSampleRate) {
@@ -204,7 +205,10 @@ public class PlaybackProcess extends PamInstantProcess {
 
 	@Override
 	synchronized public void newData(PamObservable o, PamDataUnit arg) {
-		if (playbackControl.playbackSystem == null) return;
+		if (playbackControl.playbackSystem == null) {
+			runSpeedLimit(o, arg);
+			return;
+		}
 		int channel = PamUtils.getSingleChannel(arg.getChannelBitmap());
 		int pos = channelPos[channel];
 //		System.out.printf("Channel %d, pos %d\n", channel, pos);
@@ -233,6 +237,7 @@ public class PlaybackProcess extends PamInstantProcess {
 				boolean playOK = playbackControl.playbackSystem.playData(playUnits, 1);
 				if (!playOK) {
 					playWarning.setWarning("PlaybackProcess: playData return error", 2);
+					runSpeedLimit(o, arg);
 					noteNewSettings(); // forces full reset of playback
 				}
 				else {
@@ -253,6 +258,43 @@ public class PlaybackProcess extends PamInstantProcess {
 //			playWarning.setWarning(msg, 2);
 ////			System.out.println(msg);
 //		}
+	}
+
+	double remainDelayMillis = 0;
+	/**
+	 * Modern desktops won't show a soundcard if no headphones are connected
+	 * or plugged in. e.g. the ones in the teachinglab at work. In this case it's
+	 * almost impossible to run the tutorials since everything happens so fast. 
+	 * So this function will cause a small delay before returning when no 
+	 * devices are present.  
+	 * @param o
+	 * @param arg
+	 */
+	private void runSpeedLimit(PamObservable o, PamDataUnit arg) {
+		Double dataMillis = arg.getDurationInMilliseconds();
+		if (dataMillis == null) {
+			return;
+		}
+		double speed = playbackControl.playbackParameters.getPlaybackSpeed();
+		double delay = dataMillis / speed;
+		int intDelay = (int) Math.floor(delay);
+		/*
+		 * Be a bit anal and deal with non integer bits by randomly chosing 
+		 * to add an extra milli or not. 
+		 */
+		double remainder = delay - intDelay;
+		remainDelayMillis += remainder;
+		while (remainDelayMillis > 1) {
+			intDelay++;
+			remainDelayMillis--;
+		}
+		if (intDelay > 0) {
+			try {
+				Thread.sleep(intDelay);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	private RawDataUnit[] preprocessData(RawDataUnit[] inputDataUnits) {
