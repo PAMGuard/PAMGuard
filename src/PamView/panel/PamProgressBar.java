@@ -1,7 +1,5 @@
 package PamView.panel;
 
-import java.awt.Dimension;
-
 import javax.swing.BoundedRangeModel;
 import javax.swing.JProgressBar;
 

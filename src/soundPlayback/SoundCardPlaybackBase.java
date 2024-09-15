@@ -94,10 +94,9 @@ public class SoundCardPlaybackBase {
 			// give up if there are no mixers on the system
 			return false;
 		}
-		if (deviceNumber >= mixerinfos.size()) {
+		if (deviceNumber >= mixerinfos.size() || deviceNumber < 0) {
 			deviceNumber = 0;// reset to default device. 
 		}
-		
 		Mixer.Info thisMixerInfo = mixerinfos.get(deviceNumber);
 		currentMixer = AudioSystem.getMixer(thisMixerInfo);
 		if (currentMixer.getSourceLineInfo().length <= 0){

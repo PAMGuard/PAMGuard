@@ -94,7 +94,7 @@ public class ClipProcess extends SpectrogramMarkProcess {
 		symbolManager.addSymbolOption(StandardSymbolManager.HAS_LINE_AND_LENGTH);
 		clipDataBlock.setPamSymbolManager(symbolManager);
 		addOutputDataBlock(clipDataBlock);
-		clipDelays = new ClipDelays(clipControl);
+		clipDelays = new ClipDelays(clipControl, clipDataBlock);
 		buoyLocaliserManager = new BuoyLocaliserManager();
 		manualAnnotaionHandler = new ManualAnnotationHandler(clipControl, clipDataBlock);
 		clipDataBlock.setAnnotationHandler(manualAnnotaionHandler);
@@ -505,6 +505,9 @@ public class ClipProcess extends SpectrogramMarkProcess {
 //					}
 //				}
 //			}
+			if (rawDataBlock == null) {
+				return 0;
+			}
 			
 			double[][] rawData = null;
 			try {
@@ -548,6 +551,7 @@ public class ClipProcess extends SpectrogramMarkProcess {
 				clipDataUnit.setTriggerDataUnit(dataUnit);
 				clipDataUnit.setFrequency(dataUnit.getFrequency());
 				lastClipDataUnit = clipDataUnit;
+				clipDataUnit.setParentDataBlock(clipDataBlock);
 				if (bearingLocaliser != null) {
 					localiseClip(clipDataUnit, bearingLocaliser, hydrophoneMap);
 				}				
