@@ -674,7 +674,6 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		boolean ans = false;
 		if (!folderInputParameters.mergeFiles) return false;
 
-
 		long currFileStart = 0;
 		long currFileLength = 0;
 		long currFileEnd = 0;
@@ -701,6 +700,9 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			currFileEnd += lastBit;
 		}
 		if (++currentFile < allFiles.size()) {
+			
+			calculateETA();
+			
 			long newStartTime = getFileStartTime(getCurrentFile());
 			long diff = newStartTime - currFileEnd;
 			if (diff > 2000 || diff < -5000 || newStartTime == 0) {
@@ -759,11 +761,12 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		if (currentFile > 0 && currentFile >= allFiles.size()) {
 			fileListComplete();
 		}
-		System.out.println("FolderinputSytem: daqHasEnded");
+//		System.out.println("FolderinputSytem: daqHasEnded");
 	}
 
 	private void setFolderProgress() {
 		folderProgress.setValue(currentFile);
+		folderProgress.setString(String.format("%d/%d", currentFile, folderProgress.getMaximum()));
 	}
 
 	protected void calculateETA() {
@@ -789,6 +792,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			barBit.add(folderProgress);
 			barBit.add(new PamLabel("   "));
 			barBit.add(super.getStatusBarComponent());
+			folderProgress.setToolTipText("Process through file folder(s)");
 		}
 		return barBit;
 	}
