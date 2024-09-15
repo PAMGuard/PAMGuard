@@ -10,6 +10,7 @@ import PamController.PamController;
 import PamDetection.AbstractLocalisation;
 import PamDetection.PamDetection;
 import PamUtils.PamUtils;
+import PamUtils.complex.ComplexArray;
 import PamguardMVC.PamConstants;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
@@ -223,6 +224,44 @@ public class ClipDataUnit extends PamDataUnit<PamDataUnit, SuperDetection> imple
 			for (int j = 0; j < fftLength/2; j++) {
 				specData[i][j] = complexOutput[j].clone();
 			}
+		}
+		return specData;
+	}
+	/**
+	 * Generate complex spectrogram data for the clip. 
+	 * @param channel
+	 * @param fftLength FFT length
+	 * @param fftHop FFT hop
+	 * @return Array of ComplexArray FFT data (half fft length, due to real input)
+	 */
+	public ComplexArray[] generateSpectrogramArrays(int channel, int fftLength, int fftHop) {
+		// TODO Auto-generated method stub
+		double[] wave = getSpectrogramWaveData(channel, getDisplaySampleRate());
+		if (wave == null) {
+			return null;
+		}
+		int nFFT = (wave.length - (fftLength-fftHop)) / fftHop;
+		if (nFFT <= 0) {
+			return null;
+		}
+		ComplexArray[] specData = new ComplexArray[nFFT];
+		double[] waveBit = new double[fftLength];
+		double[] winFunc = getWindowFunc(fftLength);
+		Complex[] complexOutput = Complex.allocateComplexArray(fftLength/2);
+		int wPos = 0;
+		getFastFFT(fftLength);
+		int m = FastFFT.log2(fftLength);
+		for (int i = 0; i < nFFT; i++) {
+			wPos = i*fftHop;
+			for (int j = 0; j < fftLength; j++) {
+//				waveBit[j] = wave[j+wPos]*winFunc[j];
+				waveBit[j] = wave[j+wPos]; // no windowing for this since used in cross correlation. 
+			}
+			specData[i] = fastFFT.rfft(waveBit, fftLength);
+//			fastFFT.rfft(waveBit, complexOutput, m);
+//			for (int j = 0; j < fftLength/2; j++) {
+//				specData[i][j] = complexOutput[j].clone();
+//			}
 		}
 		return specData;
 	}

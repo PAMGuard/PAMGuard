@@ -79,4 +79,13 @@ public class IshDetection extends PamDataUnit<PamDataUnit, SuperDetection> imple
 		setPeakTimeSam(peakTimeSam);     //relative to start of PAMGUARD run
 	}
 
+
+	@Override
+	public String getSummaryString() {
+		String str = super.getSummaryString();
+		str += String.format("<br>Peak %5.3f", peakHeight);
+		
+		return str;
+	}
+
 }

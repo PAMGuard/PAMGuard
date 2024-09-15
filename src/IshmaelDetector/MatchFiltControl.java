@@ -33,7 +33,7 @@ public class MatchFiltControl extends IshDetControl implements PamSettings
 
 	@Override
 	public IshDetFnProcess getNewDetProcess(PamDataBlock defaultDataBlock) {
-		return new MatchFiltProcess(this, defaultDataBlock);
+		return new MatchFiltProcess2(this, defaultDataBlock);
 	}
 	
 	/* (non-Javadoc)

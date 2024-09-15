@@ -120,9 +120,15 @@ public abstract class IshDetControl extends PamControlledUnit implements PamSett
 	 * then they would show up in the Data Model.
 	 */
 	public void prepareNonDetProcesses() {
-		ishDetGraphics.prepareForRun();
-		ishPeakProcess.prepareForRun();
-		ishDetSave.prepareForRun();
+		if (ishDetGraphics != null) {
+			ishDetGraphics.prepareForRun();
+		}
+		if (ishPeakProcess != null) {
+			ishPeakProcess.prepareForRun();
+		}
+		if (ishDetSave != null) {
+			ishDetSave.prepareForRun();
+		}
 	}
 	
 	public JMenuItem createDetectionMenu(Frame parentFrame, String menuString) {

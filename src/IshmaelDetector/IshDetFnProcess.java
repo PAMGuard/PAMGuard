@@ -58,9 +58,12 @@ public abstract class IshDetFnProcess extends PamProcess
 		outputDataBlock = new PamDataBlock(
 				IshDetFnDataUnit.class, getLongName(), this, 1 << channel);
 		
-		
-		ishmealBinaryDataSource = new IshFnBinarySource(this, outputDataBlock, "Ishmael Fn");
-		outputDataBlock.setBinaryDataSource(ishmealBinaryDataSource);
+		/*
+		 * Remove binary output from the detection functions. Was useful in debugging
+		 * but the volume of the MatchFilter output is way to big. 
+		 */
+//		ishmealBinaryDataSource = new IshFnBinarySource(this, outputDataBlock, "Ishmael Fn");
+//		outputDataBlock.setBinaryDataSource(ishmealBinaryDataSource);
 		
 //		outputDataBlock = new RecyclingDataBlock<IshDetFnDataUnit>(
 //				IshDetFnDataUnit.class, getLongName(), this, 1 << channel);
