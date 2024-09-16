@@ -465,9 +465,31 @@ Version 2.00.10 June 2017</a></span></h1>
 name="_Latest_Version_2.02.05"></a><a name="_Latest_Version_2.02.06"></a><a
 name="_Latest_Version_2.02.07"></a><a name="_Latest_Version_2.02.08"></a><a
 name="_Version_2.02.09_June"></a><a name="_Version_2.02.10_January"></a><a
-name="_Version_2.02.11_April"></a>Version 2.02.13 August 2024</h1>
+name="_Version_2.02.11_April"></a>Version whatevers next</h1>
+
+<h2>New Features</h2>
 
 <p class=MsoNormal>&nbsp;</p>
+
+<h2>Bug Fixes</h2>
+
+<p class=MsoNormal>Ishmael Matched Filter detector. Improved correlation
+algorithm to use correct data normalisation (and a faster FFT). </p>
+
+<p class=MsoNormal>Ishamel detector graphics. Improved graphics (spectrogram
+plugins) to work when scrolling the spectrogram and to have better automatic
+scaling. </p>
+
+<p class=MsoNormal>Folder processing: At startup, while PAMGuard catalogues the
+sound files, a progress bar is shown. This doesn’t change anything, or speed up
+the process, but does at least let the user know what’s happening. </p>
+
+<p class=MsoNormal>No sound card ? If no sound cards are present on your
+computer (or if no headphones are attached, even though a sound card is
+present) when processing files offline, PAMGuard will still slow the analysis
+rate as it would if a soundcard were present. </p>
+
+<h1>Version 2.02.13 August 2024</h1>
 
 <h2>New Features</h2>
 
@@ -490,9 +512,9 @@ the binary store system (likely the same as the acquisition) or data from
 Logger forms. This system will be extended to other modules in the near future.
 </p>
 
-<p class=MsoNormal>Added a new exporter which allows users to export data to .mat
-(MATLAB, Python), .RData (open in R) or .wav files (open in Sonic Visualiser,
-Audacity etc.)</p>
+<p class=MsoNormal>Added a new exporter which allows users to export data to
+.mat (MATLAB, Python), .RData (open in R) or .wav files (open in Sonic
+Visualiser, Audacity etc.)</p>
 
 <h2>Tethys Database</h2>
 
@@ -593,11 +615,11 @@ and stop PamObserver Timer to</span></p>
 
 <p class=MsoNormal><span lang=EN-US>force release</span></p>
 
-<p class=MsoNormal><span lang=EN-US>Fix problem tracing whistles in Rocca spectrogram
-pop-up: Whistle and raw data were being cleared before the user had time to
-trace out the whistle, causing PAMGuard to throw an exception.&nbsp; Both were
-already being cleared when the pop-up window is closed, so no need to do it
-here.</span></p>
+<p class=MsoNormal><span lang=EN-US>Fix problem tracing whistles in Rocca
+spectrogram pop-up: Whistle and raw data were being cleared before the user had
+time to trace out the whistle, causing PAMGuard to throw an exception.&nbsp;
+Both were already being cleared when the pop-up window is closed, so no need to
+do it here.</span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>DIFAR Module</span></b><span lang=EN-US>:
 Bug crashing the module with null pointer errors fixed.</span></p>
@@ -678,8 +700,8 @@ the first two characters of the string name may be. </span></p>
 data for static hydrophones had a bug whereby it would continually ‘forget’
 angle offsets applied to static hydrophones in viewer mode. This is now fixed. </span></p>
 
-<p class=MsoNormal><span lang=EN-US>Click tool bar: Correctly shows event selection
-options even if no species classification options are in place. </span></p>
+<p class=MsoNormal><span lang=EN-US>Click tool bar: Correctly shows event
+selection options even if no species classification options are in place. </span></p>
 
 <p class=MsoNormal><span lang=EN-US>Fixed Landmarks: Earlier versions were
 ‘losing’ these every time PAMGuard started or new data were loaded in viewer
@@ -699,10 +721,10 @@ processing.</span></p>
 
 <h2><span lang=EN-US>New Features</span></h2>
 
-<p class=MsoNormal><span lang=EN-US>New sound type for simulated sounds which generates
-random chirps between around 200 and 800Hz, roughly the frequency you’d expect
-sound from higher frequency baleen whales, such as humpbacks, to vocalise at.
-&nbsp;&nbsp;</span></p>
+<p class=MsoNormal><span lang=EN-US>New sound type for simulated sounds which
+generates random chirps between around 200 and 800Hz, roughly the frequency
+you’d expect sound from higher frequency baleen whales, such as humpbacks, to
+vocalise at. &nbsp;&nbsp;</span></p>
 
 <p class=MsoNormal><span lang=EN-US>Hiding tool tips. A menu item to
 permanently turn off all tool tips, or tap the ‘Esc’ key to turn them off for 6
@@ -1461,8 +1483,8 @@ txt file as well. File is stored in user.home/Pamguard folder - look under the
 Help menu item for a shortcut to open the folder. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>6. </span><span
-lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-Implemented a simple UDP output for PAMGuard alarms. </p>
+lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
+lang=EN-US> </span>Implemented a simple UDP output for PAMGuard alarms. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>7. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
@@ -1569,8 +1591,8 @@ lang=EN-US> </span>Updates to the Ishmael detectors.</p>
 <h1><a name="_Latest_Beta_Version_2.00.16"></a><span lang=EN-US>Beta Version
 2.00.16 May 2019</span></h1>
 
-<p class=MsoNormal><span lang=EN-US>PAMGuard Version 2 contains major updates.
-You should read and understand the notes listed for <a
+<p class=MsoNormal><span lang=EN-US>PAMGuard Version 2 contains major updates. You
+should read and understand the notes listed for <a
 href="#_Latest_Beta_Version_2.00.10">Beta Version 2.00.10</a> before proceeding
 with installation and use of this version.</span></p>
 
@@ -1660,10 +1682,10 @@ lang=EN-US> </span>Added adaptive noise filter to Ishmael Detectors.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>5. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
-lang=EN-US> </span>Many upgrades to the Sound Playback module, including a
-high-pass filter, gain control, and the ability to mix wavefrom and envelope
-data together to listen to high-frequency clicks and dolphin whistles at the
-same time.</p>
+lang=EN-US> </span>Many upgrades to the Sound Playback module, including a high-pass
+filter, gain control, and the ability to mix wavefrom and envelope data
+together to listen to high-frequency clicks and dolphin whistles at the same
+time.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>6. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -1761,9 +1783,9 @@ lang=EN-US> </span>New methods for handling and logging time offsets from the
 PC clock based either on GPS NMEA data or on pings of an NTP time server.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>6. </span><span
-lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-Improvements to Difar module graphics - easier reading, better visibility at
-night.</p>
+lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
+lang=EN-US> </span>Improvements to Difar module graphics - easier reading,
+better visibility at night.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>7. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
@@ -2208,9 +2230,9 @@ showing. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span><span lang=EN-US>Bug 323. Difar module. </span>Fixed a couple of small
-bugs in the DIFAR system which caused it to not work if old configuratins were
-used. </p>
+</span><span lang=EN-US>Bug 323. Difar module. </span>Fixed a couple of small bugs
+in the DIFAR system which caused it to not work if old configuratins were used.
+</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>3.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2341,11 +2363,11 @@ PAMGuard help files (Localisation/Detection Group Localiser).</span></p>
 <h3><span lang=EN-US>Display Colours</span></h3>
 
 <p class=MsoNormal><span lang=EN-US>A new system for handling display colours
-has been implemented across all PAMGuard displays. This gives greater
-flexibility to the user to control how data units are shown. For instance, you
-might simply want to show clicks in blue and whistles in green. However, for
-clicks and whistles that have been assigned to a Detection Group, you may want
-to colour them by the colour assigned to the group. </span></p>
+has been implemented across all PAMGuard displays. This gives greater flexibility
+to the user to control how data units are shown. For instance, you might simply
+want to show clicks in blue and whistles in green. However, for clicks and
+whistles that have been assigned to a Detection Group, you may want to colour
+them by the colour assigned to the group. </span></p>
 
 <h3><span lang=EN-US>Using Old PAMGuard Configurations</span></h3>
 
@@ -2471,10 +2493,9 @@ January 2017</span></h1>
 
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'><span
 lang=EN-US>1.</span><span lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span><span lang=EN-US>Bug 306. Certain methods have been querying
-AcousticDataUnit.getDuration and expecting to receive a response in
-milliseconds. However, getDuration actually returns the number of samples.
-&nbsp;This has been corrected. </span></p>
+</span><span lang=EN-US>Bug 306. Certain methods have been querying AcousticDataUnit.getDuration
+and expecting to receive a response in milliseconds. However, getDuration
+actually returns the number of samples. &nbsp;This has been corrected. </span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>Plug-Ins</span></b></p>
 
@@ -2750,10 +2771,10 @@ since V 1.15.03:</p>
 
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'>1.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 272. File types: Some File Open / File Save dialogs were allowing
-selection of all file types. e.g. Save Configuration As, Section of whistle
-classifier training file, Map file Selection, These have now been changed so
-that only the correct type of file can be selected.</p>
+</span>Bug 272. File types: Some File Open / File Save dialogs were allowing selection
+of all file types. e.g. Save Configuration As, Section of whistle classifier
+training file, Map file Selection, These have now been changed so that only the
+correct type of file can be selected.</p>
 
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'>2.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2811,9 +2832,9 @@ easy to understand options have been developed in a new options dialog.</p>
 
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'>9.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 281. Click classification dialog has grown too big to fit on the screen.
-The options have now been split across three tabbed panes which solves the
-problem.</p>
+</span>Bug 281. Click classification dialog has grown too big to fit on the
+screen. The options have now been split across three tabbed panes which solves
+the problem.</p>
 
 <p class=MsoListParagraph style='margin-left:38.25pt;text-indent:-20.25pt'>10.<span
 style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -3117,10 +3138,10 @@ href="https://sourceforge.net/p/pamguard/bugs">https://sourceforge.net/p/pamguar
 
 <p class=MsoListParagraph style='margin-left:47.25pt;text-indent:-29.25pt'><span
 lang=EN-US>1.</span><span lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Spectrogram annotation marks. A simple system for marking spectrograms during
-real time analysis has been incorporated. To use it, add the module, in the
-spectrogram settings, select the annotation marks in the 'Mark Observers' tab
-of the spectrogram configuration dialog, and also right click on the
+</span>Spectrogram annotation marks. A simple system for marking spectrograms
+during real time analysis has been incorporated. To use it, add the module, in
+the spectrogram settings, select the annotation marks in the 'Mark Observers'
+tab of the spectrogram configuration dialog, and also right click on the
 spectrogram and select to display the annotations. Annotations are saved to the
 database so you will also need a database module in your configuration. &nbsp;</p>
 
@@ -3390,9 +3411,9 @@ of third octave noise bands. See online help for details. </p>
 
 <p class=MsoNormal><i>Filtered Noise Measurement</i> (Sound Processing Group)</p>
 
-<p class=MsoNormal>This module, developed by Douglas Gillespie, measures noise levels
-in a single frequency band using a variety of filter functions. See online help
-for details. </p>
+<p class=MsoNormal>This module, developed by Douglas Gillespie, measures noise
+levels in a single frequency band using a variety of filter functions. See
+online help for details. </p>
 
 <p class=MsoNormal><i>Envelope Tracing</i> (Beta Only, Sound Processing Group)</p>
 
@@ -3579,15 +3600,15 @@ other data sources for the PAMGuard viewer. </p>
 
 <p class=MsoNormal style='margin-left:36.0pt'><i>Database</i></p>
 
-<p class=MsoNormal style='margin-left:36.0pt'>Can now copy data from binary
-storage to the database offline for any module having both binary and database
-storage. </p>
+<p class=MsoNormal style='margin-left:36.0pt'>Can now copy data from binary storage
+to the database offline for any module having both binary and database storage.
+</p>
 
 <p class=MsoNormal style='margin-left:36.0pt'>Can create a blank MS Access
 database (2007 and later *.accdb formats only).</p>
 
-<p class=MsoNormal style='margin-left:36.0pt'>Can open MS Access from within
-PAMGuard to make it easier to view database content. </p>
+<p class=MsoNormal style='margin-left:36.0pt'>Can open MS Access from within PAMGuard
+to make it easier to view database content. </p>
 
 <p class=MsoNormal style='margin-left:36.0pt'>Support for open office
 databases.</p>
@@ -3667,8 +3688,8 @@ margin-left:36.0pt'>&nbsp;</p>
 <p class=MsoListParagraph style='margin-left:54.0pt;text-indent:-18.0pt'><i>Ishmael
 Detection Modules</i></p>
 
-<p class=MsoListParagraph style='margin-left:54.0pt;text-indent:-18.0pt'>We
-have implemented database storage for output of these modules. </p>
+<p class=MsoListParagraph style='margin-left:54.0pt;text-indent:-18.0pt'>We have
+implemented database storage for output of these modules. </p>
 
 <p class=MsoNormal><b>Bug fixes</b></p>
 
@@ -4342,9 +4363,9 @@ more details. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Simulated sound sources. New sound source simulator. Accessible from
-within the main data acquisition dialog. The old simulator didn't work well and
-has been deleted.</p>
+</span>Simulated sound sources. New sound source simulator. Accessible from within
+the main data acquisition dialog. The old simulator didn't work well and has
+been deleted.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -4444,8 +4465,8 @@ This would cause memory leaks when multiple files were being analysed off-line
 and would eventually crash PAMGUARD. The way that colours are managed in
 PAMGUARD has been rewritten.&nbsp; </p>
 
-<p class=MsoNormal>Some issues with Swing fixed that might have been causing
-hang ups on startup especially on Macs/Linux machines</p>
+<p class=MsoNormal>Some issues with Swing fixed that might have been causing hang
+ups on startup especially on Macs/Linux machines</p>
 
 <p class=MsoNormal>&nbsp;Some tidying up of events and default ports for serial
 devices to improve GPS data collection (particularly for USB-Serial GPS on
@@ -4520,10 +4541,10 @@ Utilities. This will not affect how existing settings files are loaded. </p>
 <p class=MsoNormal><b>Multi-screen environments.</b></p>
 
 <p class=MsoNormal>In previous versions, if PAMGUARD was configured in a
-multiscreen environment and is then run on a single screen, it was possible
-that the display would not appear. PAMGUARD now checks screen dimensions at
-start up and ensures that the main display is visible. Consequently, program
-start-up takes slightly longer than previously. </p>
+multiscreen environment and is then run on a single screen, it was possible that
+the display would not appear. PAMGUARD now checks screen dimensions at start up
+and ensures that the main display is visible. Consequently, program start-up
+takes slightly longer than previously. </p>
 
 <p class=MsoNormal><b>Outstanding bugs</b></p>
 
@@ -4824,8 +4845,8 @@ point &nbsp;located from shore)</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Seismic veto code to detect seismic pulses and then veto out that pulse
-from audio and spectrogram data streams</p>
+</span>Seismic veto code to detect seismic pulses and then veto out that pulse from
+audio and spectrogram data streams</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
