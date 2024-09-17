@@ -1,13 +1,20 @@
 package likelihoodDetectionModule;
 
-import javax.swing.*;
-import javax.swing.tree.*;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Color;
-import javax.swing.plaf.ColorUIResource;
 import java.awt.Graphics;
 import java.awt.event.ItemListener;
+
+import javax.swing.Icon;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTree;
+import javax.swing.UIManager;
+import javax.swing.plaf.ColorUIResource;
+import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreeModel;
 
 /**
  * This class provides a custom renderer for a JTree that displays a
@@ -60,7 +67,8 @@ public class CheckRenderer extends JPanel implements TreeCellRenderer {
   /* (non-Javadoc)
    * @see javax.swing.tree.TreeCellRenderer#getTreeCellRendererComponent(javax.swing.JTree, java.lang.Object, boolean, boolean, boolean, int, boolean)
    */
-  public Component getTreeCellRendererComponent( JTree tree, Object value, boolean isSelected,
+  @Override
+public Component getTreeCellRendererComponent( JTree tree, Object value, boolean isSelected,
       boolean isExpanded, boolean isLeaf, int row, boolean hasFocus ) {
 
     String stringValue = tree.convertValueToText( value, isSelected, isExpanded, isLeaf, row, hasFocus );

@@ -2,9 +2,6 @@ package PamguardMVC;
 
 import java.util.ListIterator;
 
-import Array.StreamerDataUnit;
-import Array.streamerOrigin.StaticOriginMethod;
-
 /**
  * An iterator that has a bit more functionality than a basic iterator. <br>
  * It's main enhancement is to use a channel map match to PamDataUnits, so that it only returns

@@ -7,16 +7,15 @@ import java.util.TimerTask;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.LineEvent;
+import javax.sound.sampled.LineEvent.Type;
 import javax.sound.sampled.LineListener;
 import javax.sound.sampled.Mixer;
-import javax.sound.sampled.SourceDataLine;
-import javax.sound.sampled.LineEvent.Type;
 import javax.sound.sampled.Mixer.Info;
+import javax.sound.sampled.SourceDataLine;
 
 import Acquisition.SoundCardSystem;
 import PamDetection.RawDataUnit;
 import PamUtils.PamCalendar;
-import PamguardMVC.debug.Debug;
 import warnings.PamWarning;
 import warnings.QuickWarning;
 import warnings.WarningSystem;

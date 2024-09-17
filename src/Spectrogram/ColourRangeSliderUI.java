@@ -8,7 +8,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 
-import javax.swing.JSlider;
+import javax.swing.SwingConstants;
 
 import PamView.ColourArray;
 import PamView.ColourArray.ColourArrayType;
@@ -77,7 +77,7 @@ public class ColourRangeSliderUI extends PamRangeSliderUI {
 	
 	
 	private void createColourMapImage(){
-        if (b.getOrientation() == JSlider.VERTICAL) {
+        if (b.getOrientation() == SwingConstants.VERTICAL) {
 
 	// now make a standard amplitude image
 		if (colourArray != null && colourArray.length > 0) {
@@ -134,7 +134,7 @@ public class ColourRangeSliderUI extends PamRangeSliderUI {
             
         int cx;
 
-        if (b.getOrientation() == JSlider.VERTICAL) {
+        if (b.getOrientation() == SwingConstants.VERTICAL) {
         	
             // Determine position of selected range by moving from the middle
             // of one thumb to the other.

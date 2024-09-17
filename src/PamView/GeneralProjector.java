@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
 import javax.swing.JComponent;
 import javax.swing.Timer;
 import javax.swing.ToolTipManager;
@@ -99,7 +100,7 @@ public abstract class GeneralProjector<T extends PamCoordinate> {
 		}
 		
 		
-	};
+	}
 
 	static public enum ParameterUnits {
 		SECONDS ("s"), HZ ("Hz"), DB ("dB"), RAW ("raw"), DECIMALDEGREES ("\u00B0"), METERS ("m"), 
@@ -127,7 +128,7 @@ public abstract class GeneralProjector<T extends PamCoordinate> {
 //			
 //			}
 //		}
-	};
+	}
 
 	static public final int NPARAMETERS = 3;
 
@@ -303,27 +304,32 @@ public abstract class GeneralProjector<T extends PamCoordinate> {
 			timer = new Timer(10,this);
 		}
 
+		@Override
 		public void mouseExited(MouseEvent e) {
 			hideHoverItem();
 			timer.stop();
 		}
 
+		@Override
 		public void mouseMoved(MouseEvent e) {
 			mousePoint = e.getPoint();
 			hideHoverItem();
 			timer.restart();
 		}
 
+		@Override
 		public void mousePressed(MouseEvent e) {
 		}
 
 		public void mouseWheelMoved(MouseWheelEvent e) {
 		}
 
+		@Override
 		public void mouseEntered(MouseEvent e) {
 			timer.start();
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (e.getSource() == timer) {
 				showHoverItem();
@@ -343,16 +349,19 @@ public abstract class GeneralProjector<T extends PamCoordinate> {
 			timer.restart();
 		}
 
+		@Override
 		public void mouseClicked(MouseEvent e) {
 			// TODO Auto-generated method stub
 
 		}
 
+		@Override
 		public void mouseReleased(MouseEvent e) {
 			// TODO Auto-generated method stub
 
 		}
 
+		@Override
 		public void mouseDragged(MouseEvent e) {
 			// TODO Auto-generated method stub
 

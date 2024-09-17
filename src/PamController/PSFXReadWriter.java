@@ -12,7 +12,6 @@ import java.util.ArrayList;
 
 import PamUtils.PamCalendar;
 import PamView.dialog.warn.WarnOnce;
-
 import binaryFileStorage.BinaryFooter;
 import binaryFileStorage.BinaryHeader;
 import binaryFileStorage.BinaryStore;
@@ -154,7 +153,7 @@ public class PSFXReadWriter {
 		if (file == null) {
 			return null;
 		}
-		if (file.exists() == false) {
+		if (!file.exists()) {
 			return null;
 		}
 		

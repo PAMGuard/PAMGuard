@@ -8,6 +8,7 @@ import java.awt.Window;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import PamView.dialog.PamDialog;
@@ -34,18 +35,18 @@ public class WMRecordTriggerdialog extends PamDialog {
 		freqPanel.setLayout(new GridBagLayout());
 		freqPanel.setBorder(new TitledBorder("Trigger Options"));
 		GridBagConstraints c = new PamGridBagContraints();
-		addComponent(freqPanel, new JLabel("Minimum Frequency ", JLabel.RIGHT), c);
+		addComponent(freqPanel, new JLabel("Minimum Frequency ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		addComponent(freqPanel, minFreq = new JTextField(6), c);
 		c.gridx++;
-		addComponent(freqPanel, new JLabel(" Hz", JLabel.LEFT), c);
+		addComponent(freqPanel, new JLabel(" Hz", SwingConstants.LEFT), c);
 		c.gridx = 0;
 		c.gridy++;
-		addComponent(freqPanel, new JLabel("Maximum Frequency ", JLabel.RIGHT), c);
+		addComponent(freqPanel, new JLabel("Maximum Frequency ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		addComponent(freqPanel, maxFreq = new JTextField(6), c);
 		c.gridx++;
-		addComponent(freqPanel, new JLabel(" Hz", JLabel.LEFT), c);
+		addComponent(freqPanel, new JLabel(" Hz", SwingConstants.LEFT), c);
 		
 		setDialogComponent(mainPanel);
 		

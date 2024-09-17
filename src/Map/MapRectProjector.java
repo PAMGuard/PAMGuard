@@ -28,12 +28,10 @@ import java.util.ListIterator;
 import GPS.GPSControl;
 import GPS.GPSDataBlock;
 import GPS.GpsDataUnit;
-import PamController.PamController;
 import PamUtils.Coordinate3d;
 import PamUtils.LatLong;
 import PamUtils.PamCoordinate;
 import PamUtils.PamUtils;
-import PamguardMVC.debug.Debug;
 import effort.EffortDataUnit;
 
 /**

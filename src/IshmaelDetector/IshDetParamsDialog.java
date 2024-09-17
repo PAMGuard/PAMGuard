@@ -20,10 +20,7 @@
  */
 package IshmaelDetector;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.Frame;
-import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -32,11 +29,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import PamController.PamController;
 import PamView.dialog.GroupedSourcePanel;
 import PamView.dialog.PamDialog;
-import PamView.dialog.SourcePanel;
-import PamguardMVC.PamDataBlock;
 
 public abstract class IshDetParamsDialog extends PamDialog 
 {

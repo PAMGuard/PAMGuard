@@ -1,18 +1,21 @@
 package likelihoodDetectionModule;
 
-import javax.swing.JDialog;
-import java.awt.event.ActionListener;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JButton;
 import javax.swing.JPanel;
-import java.util.ArrayList;
 import javax.swing.JTextField;
-import java.awt.event.*;
-import java.util.Iterator;
-import javax.swing.BoxLayout;
-import java.awt.*;
 
 /**
  * The NewBandNameDialog is used by the LikelihoodDetectionParametersDialog to allow the
@@ -127,6 +130,7 @@ public class NewBandNameDialog extends JDialog implements ActionListener, KeyLis
 	/* (non-Javadoc)
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
+	@Override
 	public void actionPerformed( ActionEvent e ) {
 		if ( e.getSource() == okButton ) {
 		
@@ -142,6 +146,7 @@ public class NewBandNameDialog extends JDialog implements ActionListener, KeyLis
 	/* (non-Javadoc)
 	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
 	 */
+	@Override
 	public void keyReleased( KeyEvent e ) {
 		
 		if ( identifierField.getText().isEmpty() ) {
@@ -203,11 +208,13 @@ public class NewBandNameDialog extends JDialog implements ActionListener, KeyLis
 	/* (non-Javadoc)
 	 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
 	 */
+	@Override
 	public void keyTyped( KeyEvent e ) {}
 	
 	/* (non-Javadoc)
 	 * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
 	 */
+	@Override
 	public void keyPressed( KeyEvent e ) {}
 }
 

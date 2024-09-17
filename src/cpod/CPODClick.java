@@ -2,7 +2,6 @@ package cpod;
 
 import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
-import PamguardMVC.AcousticDataUnit;
 import PamguardMVC.DataUnitBaseData;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;

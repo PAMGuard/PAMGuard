@@ -1,7 +1,5 @@
 package PamUtils;
 
-import PamUtils.PamFileFilter;
-
 public class PamAudioFileFilter extends PamFileFilter {
 
 	public PamAudioFileFilter() {

@@ -1,6 +1,5 @@
 package PamView;
 
-import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -10,14 +9,12 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.Window;
-import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import pamMaths.PamVector;
 import Acquisition.AcquisitionProcess;
 import Array.ArrayManager;
 import Array.HydrophoneLocator;
@@ -40,6 +37,7 @@ import PamView.symbol.StandardSymbolChooser;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import Spectrogram.SpectrogramProjector;
+import pamMaths.PamVector;
 
 public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 
@@ -133,6 +131,7 @@ public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 	 * For simplicity I've broken it up into the three main display types 
 	 * currently existing in Pamguard. 
 	 */
+	@Override
 	public boolean canDraw(GeneralProjector generalProjector) {
 		return canDraw(generalProjector.getParameterTypes(), generalProjector.getParameterUnits());
 	}
@@ -147,6 +146,7 @@ public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 	 * @param parameterUnits parameter units. 
 	 * @return true if the data can be (probably) drawn using this projector. 
 	 */
+	@Override
 	public boolean canDraw(ParameterType[] parameterTypes, ParameterUnits[] parameterUnits) {
 
 		/*
@@ -228,6 +228,7 @@ public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 	 * Gets information for making up a key on various displays. 
 	 * PamKeyItem is not yet implemented.
 	 */
+	@Override
 	public PamKeyItem createKeyItem(GeneralProjector generalProjector, int keyType) {
 		return new PanelOverlayKeyItem(this);
 	}
@@ -238,9 +239,10 @@ public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 	 * of reading this code and for overriding the various functions. <p>
 	 * If display types are added to PAMGUARD, these functions will need to be added to. 
 	 */
+	@Override
 	public Rectangle drawDataUnit(Graphics g, PamDataUnit pamDataUnit, GeneralProjector generalProjector) {
 
-		if (canDraw(generalProjector) == false) return null;
+		if (!canDraw(generalProjector)) return null;
 		Graphics2D g2d = (Graphics2D) g;
 		Stroke oldStroke = null;
 		pamSymbol = getPamSymbol(pamDataUnit, generalProjector);
@@ -695,7 +697,7 @@ public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 	protected Rectangle drawOnSpectrogram(Graphics g, PamDataUnit pamDataUnit, GeneralProjector generalProjector) {
 		// draw a rectangle with time and frequency bounds of detection.
 		// spectrogram projector is now updated to use Hz instead of bins. 
-		if (isDetectionData == false) return null;
+		if (!isDetectionData) return null;
 		PamDataUnit pamDetection = pamDataUnit;	// originally cast pamDataUnit to PamDetection class
 		
 		
@@ -737,10 +739,10 @@ public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 	
 	
 	protected Rectangle drawAmplitudeOnRadar(Graphics g, PamDataUnit pamDataUnit, GeneralProjector generalProjector) {
-		if (isDetectionData == false) return null;
+		if (!isDetectionData) return null;
 		PamDataUnit pamDetection = pamDataUnit;	// originally cast pamDataUnit to PamDetection class
 		AbstractLocalisation localisation = pamDataUnit.getLocalisation();
-		if (localisation == null || localisation.hasLocContent(LocContents.HAS_BEARING) == false) return null;
+		if (localisation == null || !localisation.hasLocContent(LocContents.HAS_BEARING)) return null;
 		/*
 		 * Try to get the new bearing information first, then if that fails, get 
 		 * the old one. 
@@ -818,7 +820,7 @@ public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 	protected Rectangle drawRangeOnRadar(Graphics g, PamDataUnit pamDataUnit, GeneralProjector generalProjector) {
 
 		AbstractLocalisation localisation = pamDataUnit.getLocalisation();
-		if (localisation == null || localisation.hasLocContent(LocContents.HAS_BEARING | LocContents.HAS_RANGE) == false) return null;
+		if (localisation == null || !localisation.hasLocContent(LocContents.HAS_BEARING | LocContents.HAS_RANGE)) return null;
 		int nLocs = localisation.getAmbiguityCount();
 		double bearing, range;
 		Rectangle r = null, newR = null;
@@ -893,7 +895,7 @@ public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 
 		AbstractLocalisation localisation = pamDataUnit.getLocalisation();
 		if (localisation == null || 
-				localisation.hasLocContent(LocContents.HAS_BEARING) == false) return null;
+				!localisation.hasLocContent(LocContents.HAS_BEARING)) return null;
 		double bearing, slantAngle;
 		ProjectorDrawingOptions drawOptions = generalProjector.getProjectorDrawingOptions();
 		Rectangle r = null, newR;
@@ -953,6 +955,7 @@ public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 	 * @param iSide left or right (0 or 1 I think, might be -1 or +1 though !)
 	 * @return tooltip content consisting of text and  / or an image. 
 	 */
+	@Override
 	public String getHoverText(GeneralProjector generalProjector, PamDataUnit dataUnit, int iSide) {
 		BufferedImage im = getHoverImage(generalProjector, dataUnit, iSide);
 		//		String hoverText = getHoverTextWithoutWrap(generalProjector, dataUnit, iSide);
@@ -978,7 +981,7 @@ public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 				e.printStackTrace();
 			}			
 		}
-		if (hoverText != null && hoverText.length() > 0 && hoverText.startsWith("<html>") == false) {
+		if (hoverText != null && hoverText.length() > 0 && !hoverText.startsWith("<html>")) {
 			return "<html>" + hoverText + "</html>";
 		}
 		else {
@@ -1086,6 +1089,7 @@ public class PamDetectionOverlayGraphics extends PanelOverlayDraw {
 	 * set symbol for the overlay, but can be overridden if a detector has
 	 * some complicated way of using different symbols for different dataUnits. 
 	 */
+	@Override
 	public PamSymbol getPamSymbol(PamDataUnit pamDataUnit, GeneralProjector projector) {
 		PamSymbolChooser symbolChooser = projector.getPamSymbolChooser();
 		if (symbolChooser == null) {

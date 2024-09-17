@@ -20,7 +20,6 @@ import PamController.PamControllerInterface;
 import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
-import PamUtils.PamCalendar;
 import PamView.MenuItemEnabler;
 import PamView.TopToolBar;
 import PamguardMVC.LoadObserver;
@@ -123,14 +122,17 @@ public class PlaybackControl extends PamControlledUnit implements PamSettings {
 		stopButtonEnabler.addMenuItem(button);
 	}
 
+	@Override
 	public Serializable getSettingsReference() {
 		return playbackParameters;
 	}
 
+	@Override
 	public long getSettingsVersion() {
 		return PlaybackParameters.serialVersionUID;
 	}
 
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 
 		playbackParameters = ((PlaybackParameters) pamControlledUnitSettings.getSettings()).clone();
@@ -144,7 +146,7 @@ public class PlaybackControl extends PamControlledUnit implements PamSettings {
 		playbackSystem = findPlaybackSystem(sourceDataBlock);
 		playbackProcess.noteNewSettings();
 		playbackSidePanel.newSettings();
-		if (playBackGUI!=null) playBackGUI.notifyGUIChange(PamController.CHANGED_PROCESS_SETTINGS);
+		if (playBackGUI!=null) playBackGUI.notifyGUIChange(PamControllerInterface.CHANGED_PROCESS_SETTINGS);
 //		if (this.getSidePanel() != null){
 //			this.getSidePanel().getPanel().setVisible(!isRealTimePlayback());
 //		}
@@ -182,7 +184,7 @@ public class PlaybackControl extends PamControlledUnit implements PamSettings {
 		if (daqProcess == null) return null;
 		DaqSystem daqSystem = daqProcess.getAcquisitionControl().findDaqSystem(null);
 		if (daqSystem == null) return null;
-		if (daqSystem.isRealTime() == false || isViewer || isMixed){
+		if (!daqSystem.isRealTime() || isViewer || isMixed){
 			realTimePlayback = false;
 			return filePlayback;
 		}
@@ -231,6 +233,7 @@ public class PlaybackControl extends PamControlledUnit implements PamSettings {
 			this.parentFrame = parentFrame;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 
 			PlaybackParameters newParams = PlaybackDialog.showDialog(parentFrame, playbackParameters, playbackControl);

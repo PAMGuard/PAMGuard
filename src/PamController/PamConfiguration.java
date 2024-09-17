@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import Array.ArrayManager;
 import PamController.settings.output.xml.PamguardXMLWriter;
 import PamDetection.PamDetection;
 import PamDetection.RawDataUnit;
@@ -63,7 +62,7 @@ public class PamConfiguration {
 	 */
 	public boolean canClose() {
 		for (int i = 0; i < pamControlledUnits.size(); i++) {
-			if (pamControlledUnits.get(i).canClose() == false) {
+			if (!pamControlledUnits.get(i).canClose()) {
 				return false;
 			}
 		}
@@ -365,7 +364,7 @@ public class PamConfiguration {
 	 * @return List of current instances of this class. 
 	 */
 	public ArrayList<PamControlledUnit> findControlledUnits(Class unitClass, boolean includeSubClasses) {
-		if (includeSubClasses == false) {
+		if (!includeSubClasses) {
 			return findControlledUnits(unitClass);
 		}
 		ArrayList<PamControlledUnit> foundUnits = new ArrayList<>();
@@ -499,7 +498,7 @@ public class PamConfiguration {
 	public void destroyModel() {
 
 		for (int i = 0; i < pamControlledUnits.size(); i++) {
-			pamControlledUnits.get(i).notifyModelChanged(PamController.DESTROY_EVERYTHING);
+			pamControlledUnits.get(i).notifyModelChanged(PamControllerInterface.DESTROY_EVERYTHING);
 		}
 		pamControlledUnits.clear();
 	}
@@ -526,7 +525,7 @@ public class PamConfiguration {
 		if (storeLoc == null) {
 			return "";
 		}
-		if (storeLoc.endsWith(File.separator) == false) {
+		if (!storeLoc.endsWith(File.separator)) {
 			storeLoc += File.separator;
 		}
 		return storeLoc;

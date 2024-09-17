@@ -3,13 +3,7 @@ package whistleClassifier;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.ListIterator;
-import classifier.Classifier;
 
-import whistleClassifier.training.FileTrainingStore;
-import whistleClassifier.training.TrainingDataSet;
-import whistleClassifier.training.TrainingDataStore;
-import whistlesAndMoans.AbstractWhistleDataBlock;
-import whistlesAndMoans.AbstractWhistleDataUnit;
 import Acquisition.AcquisitionProcess;
 import Acquisition.FileInputSystem;
 import PamController.PamController;
@@ -17,6 +11,12 @@ import PamUtils.FileParts;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
+import classifier.Classifier;
+import whistleClassifier.training.FileTrainingStore;
+import whistleClassifier.training.TrainingDataSet;
+import whistleClassifier.training.TrainingDataStore;
+import whistlesAndMoans.AbstractWhistleDataBlock;
+import whistlesAndMoans.AbstractWhistleDataUnit;
 
 /**
  * Whistle Classifier process <p>
@@ -57,7 +57,7 @@ public class WhistleClassifierProcess extends PamProcess {
 	 * Need to keep a list of recent whistle times so that the system can be cleared
 	 * if there are no longer any whistles. 
 	 */
-	private LinkedList<Long> whistleTimes = new LinkedList<Long>();;
+	private LinkedList<Long> whistleTimes = new LinkedList<Long>();
 
 	public WhistleClassifierProcess(WhistleClassifierControl whistleClassifierControl) {
 
@@ -142,7 +142,7 @@ public class WhistleClassifierProcess extends PamProcess {
 		try {
 			AcquisitionProcess sourceProcess = (AcquisitionProcess) getSourceProcess();
 			Acquisition.DaqSystem daqSystem = sourceProcess.getAcquisitionControl().findDaqSystem(null);
-			if (daqSystem != null & daqSystem.isRealTime() == false) {
+			if (daqSystem != null & !daqSystem.isRealTime()) {
 				// assume it's a file name.
 				Acquisition.FileInputSystem fileSystem = (FileInputSystem) daqSystem;
 				soundFile = fileSystem.getCurrentFile();

@@ -2,7 +2,6 @@ package offlineProcessing;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -25,7 +24,6 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 
-import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import PamUtils.PamCalendar;
@@ -301,7 +299,7 @@ public class OLProcessDialog extends PamDialog {
 
 	@Override
 	protected void okButtonPressed() {
-		if (getParams() == false) {
+		if (!getParams()) {
 			return;
 		}
 		if (taskGroup.runTasks()) {
@@ -330,7 +328,7 @@ public class OLProcessDialog extends PamDialog {
 		for (int i = 0; i < nTasks; i++) {
 			aTask = taskGroup.getTask(i);
 			taskCheckBox[i].setEnabled(aTask.canRun() && nr);
-			if (aTask.canRun() == false) {
+			if (!aTask.canRun()) {
 				taskCheckBox[i].setSelected(false);
 			}
 			if (settingsButton[i] != null) {

@@ -47,7 +47,7 @@ public class AlarmParameters implements Serializable, Cloneable, ManagedParamete
 			if (np.triggerCounts == null || np.triggerCounts.length != COUNT_LEVELS) {
 				np.triggerCounts = new double[COUNT_LEVELS];
 			}
-			if (np.hadHold == false) {
+			if (!np.hadHold) {
 				np.setHoldSeconds(3600);
 				np.hadHold = true;
 			}

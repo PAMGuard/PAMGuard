@@ -12,7 +12,6 @@ import java.util.HashMap;
 
 import PamUtils.PamCalendar;
 import cpod.CPODUtils.CPODFileType;
-import cpod.FPODReader.FPODdata;
 
 /**
  * Read CPOD data.
@@ -156,7 +155,7 @@ public class CPODReader  {
 		CPODHeader header = readHeader(bis, cpFileType); 
 		if (header == null) {
 			return null;
-		};
+		}
 
 		totalBytes = getHeadSize(cpFileType);
 		int dataSize = getDataSize(cpFileType);

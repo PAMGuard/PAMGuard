@@ -6,17 +6,17 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 
 import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioFileFormat.Type;
 import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioFormat.Encoding;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.AudioFormat.Encoding;
 
+import PamUtils.FileFunctions;
+import PamUtils.PamCalendar;
 import warnings.PamWarning;
 import warnings.WarningSystem;
 import wavFiles.ByteConverter;
-import wavFiles.WavFile;
-import PamUtils.FileFunctions;
-import PamUtils.PamCalendar;
 
 /**
  * Implementation of RecorderStorage specific to audio files.
@@ -65,10 +65,12 @@ public class PamAudioFileStorage  implements RecorderStorage {
 		audioWriteWarning = new PamWarning(recorderControl.getUnitName(), "Audio Write problem", 2);
 	}
 	
+	@Override
 	public String getFileName() {
 		return fileName;
 	}
 
+	@Override
 	synchronized public boolean addData(long dataTimeMillis, double[][] newData) {
 		if (newData == null || newData.length != audioFormat.getChannels()) return false;
 		if (fileName == null) {
@@ -108,6 +110,7 @@ public class PamAudioFileStorage  implements RecorderStorage {
 	 * (non-Javadoc)
 	 * @see SoundRecorder.RecorderStorage#closeStorage()
 	 */
+	@Override
 	synchronized public boolean closeStorage() {
 		/*
 		 * The exact order things happen in here is quite important. No more samples will be added
@@ -195,6 +198,7 @@ public class PamAudioFileStorage  implements RecorderStorage {
 	 * This is one end of a pair of PipedInput and PipedOutput Streams. This thread
 	 * writes data into the other end of the pipe as it arrives. 
 	 */
+	@Override
 	synchronized public boolean openStorage(AudioFileFormat.Type fileType, long recordingStart, 
 			float sampleRate, int nChannels, int bitDepth) {
 		
@@ -205,7 +209,7 @@ public class PamAudioFileStorage  implements RecorderStorage {
 		this.nChannels = nChannels;
 		this.bitDepth = bitDepth;
 		
-		boolean isBigendian = (fileType != audioFileType.WAVE);
+		boolean isBigendian = (fileType != Type.WAVE);
 		
 		audioFormat = new AudioFormat(sampleRate, bitDepth, nChannels, true, isBigendian);
 		
@@ -267,6 +271,7 @@ public class PamAudioFileStorage  implements RecorderStorage {
 	 */
 	class WriteThread implements Runnable {
 	
+		@Override
 		public void run() {
 			writeData();
 		}

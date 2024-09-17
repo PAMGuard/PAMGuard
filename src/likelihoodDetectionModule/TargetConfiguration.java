@@ -38,7 +38,7 @@ public class TargetConfiguration implements Serializable, ManagedParameters {
 		
 		/** The configuration is in Error. */
 		Error
-	};
+	}
 
 	/** The state. */
 	private State state = State.Active;

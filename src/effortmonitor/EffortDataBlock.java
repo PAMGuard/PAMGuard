@@ -2,15 +2,12 @@ package effortmonitor;
 
 import java.util.ListIterator;
 
-import PamController.PamController;
-import PamUtils.PamCalendar;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamProcess;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import dataMap.BespokeDataMapGraphic;
 import dataMap.DataMapControl;
-import dataMap.OfflineDataMap;
 import pamScrollSystem.AbstractPamScroller;
 import pamScrollSystem.ViewLoadObserver;
 

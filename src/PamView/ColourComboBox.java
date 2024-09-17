@@ -1,13 +1,21 @@
 package PamView;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
+
 import PamView.ColourArray.ColourArrayType;
 import PamView.panel.PamPanel;
-
-import javax.swing.*;
 
 
 @SuppressWarnings("serial")
@@ -153,6 +161,7 @@ public class ColourComboBox extends PamPanel {
 		* to the selected value and returns the label, set up
 		* to display the text and image.
 		*/
+		@Override
 		public Component getListCellRendererComponent(
 		                    JList list,
 		                    Object value,

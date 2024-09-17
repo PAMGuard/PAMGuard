@@ -142,9 +142,9 @@ public class BinaryStoreStatusFuncs {
 		BinaryInputStream inputStream = new BinaryInputStream(binaryStore, null);
 		try {
 			// need to work through the file now. 
-			if (inputStream.openFile(aFile) == false) {
+			if (!inputStream.openFile(aFile)) {
 				return null;
-			};
+			}
 			BinaryObjectData binaryObjectData;
 			BinaryHeader bh = inputStream.readHeader();
 			if (bh==null) {
@@ -251,7 +251,7 @@ public class BinaryStoreStatusFuncs {
 			return StoreStatus.STATUS_MISSING;
 		}
 		File currfolder = new File(currDir);
-		if (currfolder.exists() == false) {
+		if (!currfolder.exists()) {
 			return StoreStatus.STATUS_MISSING;
 		}
 		// look for files in the folder. 

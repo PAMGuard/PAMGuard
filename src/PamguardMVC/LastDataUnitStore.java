@@ -1,6 +1,5 @@
 package PamguardMVC;
 
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 

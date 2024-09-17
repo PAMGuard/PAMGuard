@@ -18,10 +18,8 @@ import PamController.PamController;
 import PamDetection.PamDetection;
 import PamView.dialog.PamDialog;
 import PamView.dialog.SourcePanel;
-import PamguardMVC.AcousticDataUnit;
 //import PamguardMVC.DataType;
 import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamDataUnit;
 import warnings.PamWarning;
 import warnings.WarningSystem;
 

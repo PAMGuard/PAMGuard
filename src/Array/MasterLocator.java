@@ -2,23 +2,12 @@ package Array;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
 
-import Array.streamerOrigin.OriginSettings;
-import GPS.GPSControl;
 import GPS.GpsData;
-import GPS.GpsDataUnit;
-import PamController.PamController;
-import PamController.PamSettingsSource;
-import PamController.SettingsObject;
-import PamController.masterReference.MasterReferencePoint;
+import PamController.PamControllerInterface;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
-import PamUtils.LatLong;
-import PamUtils.PamCalendar;
-import PamguardMVC.PamDataBlock;
 
 /**
  * Master PAMGuard array localiser. There is now one of these and 
@@ -192,8 +181,8 @@ public class MasterLocator extends HydrophoneLocator implements Serializable, Cl
 //			streamerLocators[i].notifyModelChanged(changeType);
 //		}
 		if (initComplete) switch (changeType) {
-		case PamController.HYDROPHONE_ARRAY_CHANGED:
-		case PamController.INITIALIZATION_COMPLETE:
+		case PamControllerInterface.HYDROPHONE_ARRAY_CHANGED:
+		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			setupLocators(ArrayManager.getArrayManager().getCurrentArray());
 		}
 	}
@@ -238,7 +227,7 @@ public class MasterLocator extends HydrophoneLocator implements Serializable, Cl
 		boolean isStat = true;
 		for (int i = 0; i < n; i++) {
 			Streamer streamer = pamArray.getStreamer(i);
-			if (streamer.getHydrophoneLocator().isStatic() == false) {
+			if (!streamer.getHydrophoneLocator().isStatic()) {
 				isStat = false;
 			}
 		}

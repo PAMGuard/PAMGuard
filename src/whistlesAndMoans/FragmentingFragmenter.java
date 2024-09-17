@@ -99,7 +99,7 @@ public class FragmentingFragmenter extends DiscardingFragmenter {
 					 */
 					matchAll = true;
 					for (int iP = 0; iP < prevSlice.nPeaks; iP++) {
-						if (matchPeak(prevSlice.peakInfo[iP], thisSlice.peakInfo[iP], conType) == false) {
+						if (!matchPeak(prevSlice.peakInfo[iP], thisSlice.peakInfo[iP], conType)) {
 							matchAll = false;
 						}
 					}
@@ -109,7 +109,7 @@ public class FragmentingFragmenter extends DiscardingFragmenter {
 						}
 					}
 				}
-				if (matchAll == false) {
+				if (!matchAll) {
 					/*
 					 * Be  bit more individualistic about it. 
 					 */

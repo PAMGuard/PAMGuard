@@ -1,7 +1,6 @@
 package PamView;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -12,8 +11,6 @@ import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 
 import PamController.memory.PamMemory;
-import PamView.PamColors.PamColor;
-import PamView.dialog.PamLabel;
 import PamView.dialog.PamTextDisplay;
 import PamView.panel.PamPanel;
 

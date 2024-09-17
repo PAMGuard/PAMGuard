@@ -61,7 +61,7 @@ public class BinaryMapMakingDialog extends PamDialog {
 
 	@Override
 	public void setVisible(boolean visible) {
-		if (visible == false) {
+		if (!visible) {
 //			dispose();
 //			singleInstance = null;
 			closeLater();

@@ -1,14 +1,12 @@
 package pamScrollSystem;
 
-import pamViewFX.fxNodes.PamBorderPane;
-import pamViewFX.fxNodes.PamScrollBarFX;
-import pamViewFX.fxNodes.pamScrollers.AbstractPamScrollerFX;
-import PamUtils.PamCalendar;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Orientation;
-import javafx.scene.Node;
 import javafx.scene.layout.Pane;
+import pamViewFX.fxNodes.PamBorderPane;
+import pamViewFX.fxNodes.PamScrollBarFX;
+import pamViewFX.fxNodes.pamScrollers.AbstractPamScrollerFX;
 
 /**
  * Creates a scroll bar system that allows users to navigate through data in real time and viewer mode. 
@@ -50,7 +48,8 @@ public class PamScrollerFX extends AbstractPamScrollerFX {
 		
 		//add a listener to the scroll bar.
 		scrollBar.valueProperty().addListener(new ChangeListener<Number>() {
-            public void changed(ObservableValue<? extends Number> ov,
+            @Override
+			public void changed(ObservableValue<? extends Number> ov,
                 Number old_val, Number new_val) {
                     scrollMoved();
             }
@@ -168,6 +167,7 @@ public class PamScrollerFX extends AbstractPamScrollerFX {
 	 * 
 	 * @return The visible amount of the display in milliseconds. 
 	 */
+	@Override
 	public long getVisibleAmount() {
 		return (long) scrollBar.getVisibleAmount() * (long) scrollerData.getStepSizeMillis();
 	}

@@ -6,11 +6,8 @@ import java.awt.Point;
 import java.awt.Rectangle;
 
 import PamUtils.Coordinate3d;
-import PamView.BasicKeyItem;
 import PamView.GeneralProjector;
-import PamView.HoverData;
 import PamView.PamDetectionOverlayGraphics;
-import PamView.PamKeyItem;
 import PamView.PamSymbol;
 import PamView.PamSymbolType;
 import PamguardMVC.PamDataBlock;

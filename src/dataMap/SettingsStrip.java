@@ -24,7 +24,6 @@ import PamController.UsedModuleInfo;
 import PamModel.SMRUEnable;
 import PamUtils.PamCalendar;
 import PamView.PamColors;
-import PamView.PamGui;
 import PamView.PamSymbol;
 import PamView.PamSymbolType;
 import PamView.dialog.warn.WarnOnce;
@@ -225,10 +224,10 @@ public class SettingsStrip extends JPanelWithPamKey {
 				available = false;
 			}
 			have = (pamController.findControlledUnit(moduleClass, aModuleInfo.unitName) != null);
-			if (available == false) {
+			if (!available) {
 				str += String.format("<p><span style=\"color:red\">%s (unavailable)</span>", aModuleInfo.unitName);
 			}
-			else if (have == false) {
+			else if (!have) {
 				str += String.format("<p><b>%s (not present)</b>", aModuleInfo.unitName);
 			}
 			else {

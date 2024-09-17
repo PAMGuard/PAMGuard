@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 import NMEA.NMEABitArray;
 import NMEA.NMEADataBlock;
-import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamUtils.PamCalendar;
 import PamguardMVC.PamDataUnit;

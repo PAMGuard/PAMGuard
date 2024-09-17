@@ -29,8 +29,6 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
-import autecPhones.AutecGraphics;
-import fftManager.Complex;
 import fftManager.FFTDataBlock;
 import fftManager.FFTDataUnit;
 
@@ -91,7 +89,7 @@ abstract public class PeakDetector extends PamProcess {
 
 	enum PeakStatus {
 		PEAK_ON, PEAK_OFF, PEAK_ENDING
-	};
+	}
 
 	public PeakDetector(WhistleControl whistleControl,
 			WhistleDetector whistleDetector, FFTDataBlock fftDataSource, int groupChannels) {
@@ -143,7 +141,7 @@ abstract public class PeakDetector extends PamProcess {
 		bgndUpdate0_1 = 1. - bgndUpdate0;
 		bgndUpdate1 = whistleDetector.fftHop / getSampleRate()
 				/ whistleControl.whistleParameters.peakTimeConstant[1];
-		;
+		
 		bgndUpdate1_1 = 1. - bgndUpdate1;
 		
 		searchBin0 = whistleDetector.hzToBins(whistleControl.whistleParameters.getSearchStartHz());
@@ -225,7 +223,7 @@ abstract public class PeakDetector extends PamProcess {
 		for (int i = 0; i < whistleDetector.fftLength / 2; i++) {
 			magsq = newFftData.magsq(i);
 			newval = magsq / spectrumAverage[i];
-			if ((overThreshold[i] = newval > detectionThreshold) == true) {
+			if ((overThreshold[i] = newval > detectionThreshold)) {
 				spectrumAverage[i] *= bgndUpdate1_1;
 				spectrumAverage[i] += magsq * bgndUpdate1;
 				nOver++;

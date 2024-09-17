@@ -4,8 +4,6 @@ import dataGram.DatagramManager;
 import dataGram.DatagramScaleInformation;
 import dataGram.DatagramSettings;
 import dataMap.DataMapControl;
-import dataMap.DataMapParameters;
-import dataMap.layoutFX.DataStreamPaneFX.DataName;
 
 import org.controlsfx.control.CheckComboBox;
 
@@ -20,9 +18,9 @@ import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -47,7 +45,7 @@ import pamViewFX.fxSettingsPanes.DynamicSettingsPane;
  * @author Jamie Macaulay
  *
  */
-public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> {
+public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParametersFX> {
 
 	/*
 	 * Reference to the data map control. 
@@ -106,7 +104,7 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 
 	private Label dataGramLabel;
 
-	private ComboBox<DataName> dataGramBox;
+	private ComboBox<DataMapInfo> dataGramBox;
 
 	/**
 	 * Holdes datagram settings. 
@@ -119,7 +117,7 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 
 	private Label colourLabel;
 
-	private Pane dataMpaChoicePane;
+	private Pane dataMapChoicePane;
 
 	private CheckComboBox<String> dataMapCheckComboBox; 
 
@@ -143,7 +141,7 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 		
 		Label dataLabel = new Label("Show data maps");
 		PamGuiManagerFX.titleFont2style(dataLabel);
-		holder.getChildren().addAll(dataLabel, dataMpaChoicePane = createDataMapPane());
+		holder.getChildren().addAll(dataLabel, dataMapChoicePane = createDataMapPane());
 		updateDataMapChoiceBox();
 
 		Label scaleLabel = new Label("Data scale");
@@ -158,9 +156,8 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 		mainPain.setCenter(holder); 
 
 		//set params for the pane		
-		setParams(dataMapControl.dataMapParameters);
+		setParams(dataMapPane.getDataMapParams());
 		checkDataGramPane(); // create datagram pane if a binary store already added. 
-		sayHScale();
 
 	}
 
@@ -179,11 +176,14 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 		return hBox;
 	}
 
+	/**
+	 * Update the combo box which allows users to select which datagram are shown. 
+	 */
 	private void updateDataMapChoiceBox() {
 		dataMapCheckComboBox.getItems().clear();
 		for (int i=0; i<this.dataMapPane.getNumDataStreamPanes(); i++) {
 			dataMapCheckComboBox.getItems().add(dataMapPane.getDataStreamPane(i).getDataName().getName()); 
-			}
+		}
 	}
 	/**
 	 * Adds a settings pane for the data gram if a binary store is present. 
@@ -266,14 +266,17 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 		ComboBox<String> datagramBinsBox = createDataGramBinPane(dataGramManager); 
 
 		//Pane for colouring datagrams. 
-		dataGramBox=new ComboBox<DataName> (); 
+		dataGramBox=new ComboBox<DataMapInfo> (); 
 
 		//find all datagrams. 
-		updateDataStreamBox();
+		updateDatagramColorBox();
 
 		dataGramBox.setOnAction((action)->{
+			if (dataGramBox.getSelectionModel().getSelectedItem()==null) return;
 			dataGramColPane.setDataStreamPanel(dataMapPane.getDataStreamPane(dataGramBox.getSelectionModel().getSelectedItem()));
-			colourLabel.setText(String.format("Colours for %s " , dataMapPane.getDataStreamPane(dataGramBox.getSelectionModel().getSelectedIndex()).getDataName().getName())); 
+			colourLabel.setText(String.format("Colours for %s " , dataGramBox.getSelectionModel().getSelectedItem().getName())); 
+			colourLabel.setTooltip(new Tooltip(String.format("Colours for %s " , dataGramBox.getSelectionModel().getSelectedItem().getName()))); 
+
 		});
 
 		//holds settings for the datagram
@@ -325,23 +328,148 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 	
 	
 	
-	private void updateDataStreamBox() {
+	/**
+	 * Update the datagram colours combo box thjat allows users to select which datagram to select for changing colour settings.. 
+	 */
+	private void updateDatagramColorBox() {
 		dataGramBox.getItems().clear();
 		for (int i=0; i<this.dataMapPane.getNumDataStreamPanes(); i++) {
-			if (dataMapPane.getDataStreamPane(i).isHasDatagram()) {
+			//only include if the data block has a datagram and the data gram is a color plot - some datagrams can be lines e.g. filtered noise meaurements. 
+			if (dataMapPane.getDataStreamPane(i).isHasDatagram() && dataMapPane.getDataStreamPane(i).getScaleType() == DatagramScaleInformation.PLOT_3D) {
 				dataGramBox.getItems().add(dataMapPane.getDataStreamPane(i).getDataName()); 
 			}
 		}
 	}
 
 
+	/**
+	 * Create a pane to change vertical scales. 
+	 * @return pamne with controls to change vertical scales. 
+	 */
+	private PamGridPane createScalePane() {
 
+		PamGridPane controlPane=new PamGridPane(); 
+		controlPane.setHgap(5);
+		controlPane.setVgap(5);
+
+		//		//create time scale controls
+		//		controlPane.add(new Label("Time window"),0,1);
+		//		
+		//		//create time slider 
+		//		timeSlider=new Slider(0, timeScaleChoices.length-1, 1); 
+		//		timeSlider.setShowTickLabels(true);
+		//		timeSlider.setShowTickMarks(true);
+		//		timeSlider.setMajorTickUnit(1);
+		//		
+		//		timeSlider.setLabelFormatter(new ScaleStringConverter());
+		//		
+		////		PamGridPane.setHalignment(timeSlider, Pos.BOTTOM_CENTER);
+		//
+		//		controlPane.add(timeSlider,1,1);
+		//		//add listener to time slider to change datamap. 
+		//		timeSlider.valueProperty().addListener((ov, oldVal, newVal)->{
+		//			sayHScale();
+		//			dataMapPane.scaleChanged();
+		//		}); 
+		//		 
+		//		controlPane.add(timeScaleLabel=new Label(""),3,1);
+
+		//create vertical scale controls
+		
+		scaleBox=new ComboBox<String> (); 
+		scaleBox.getItems().add("No Scaling");
+		scaleBox.getItems().add("per Second");
+		scaleBox.getItems().add("per Minute");
+		scaleBox.getItems().add("per Hour");
+		scaleBox.getItems().add("per Day");
+		GridPane.setColumnSpan(scaleBox, 2);
+
+		Label showDetLabel  = new Label("Show detections ");
+		
+		controlPane.add(new Label("Show detections "),0,0);
+		controlPane.add(scaleBox,1,0);
+//		scaleBox.setPrefWidth(200);
+
+		scaleBox.valueProperty().addListener((ov, oldVal, newVal)->{
+			dataMapPane.scaleChanged();
+		}); 
+
+
+		logScaleToggle=new PamToggleSwitch("Log Scale"); 
+		logScaleToggle.selectedProperty().addListener((obsVal, oldVal, newVal)->{
+			dataMapPane.scaleChanged();
+		});
+		
+	    ColumnConstraints rightCol = new ColumnConstraints();
+        rightCol.setHgrow(Priority.ALWAYS);
+        controlPane.getColumnConstraints().addAll(new ColumnConstraints(150),  new ColumnConstraints(150), rightCol);
+
+		controlPane.add(logScaleToggle,0,1);
+
+		return controlPane;
+	}
+
+
+
+	// use setting flag to avoid immediate callback which overwrites changes 2 and 3 ! 
+	boolean setting = false;
+
+	public void setParams(DataMapParametersFX dataMapParameters) {
+		System.out.println("SET DATAMPA PARAMS");
+		
+		setting = true;
+//		timeSlider.setValue(dataMapParameters.hScaleChoice);
+		scaleBox.getSelectionModel().select(dataMapParameters.vScaleChoice);
+		logScaleToggle.setSelected(dataMapParameters.vLogScale);
+			
+		//make sure the combo box has correct data streams
+		updateDatagramColorBox();
+		
+		//make sure combo box for datamaps  is sorted
+		updateDataMapChoiceBox();
+		
+		if (this.dataGramComboBox.getItems().size()>dataMapParameters.selectedDataGram && dataMapParameters.selectedDataGram>=0) {
+			dataGramComboBox.getSelectionModel().select(dataMapParameters.selectedDataGram);
+		}
+		else if (this.dataGramComboBox.getItems().size()>0){
+			dataGramComboBox.getSelectionModel().select(0);
+		}
+		
+		setting = false;
+	}
+
+
+	public DataMapParametersFX getParams(DataMapParametersFX dataMapParameters) {
+		if (setting) return dataMapParameters;
+//		dataMapParameters.hScaleChoice = (int) timeSlider.getValue(); 
+		
+		dataMapParameters.vScaleChoice = scaleBox.getSelectionModel().getSelectedIndex();
+		dataMapParameters.vLogScale = logScaleToggle.isSelected();
+		
+		return dataMapParameters;
+	}
+
+	@Override
+	public String getName() {
+		return "Datamap settings";
+	}
+
+	@Override
+	public Node getContentNode() {
+		return mainPain;
+	}
+
+	@Override
+	public void paneInitialized() {
+		
+	}
+
+	
 	/** 
 	 * Allows the user to change datagram colours. 
 	 * 
 	 */
 	public class DataGramColPane extends PamBorderPane {
-
 
 		private ColourRangeSlider colourSlider;
 
@@ -429,127 +557,5 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParameters> 
 
 
 	}
-
-
-	/**
-	 * Create a pane to change vertical scales. 
-	 * @return pamne with controls to change vertical scales. 
-	 */
-	private PamGridPane createScalePane() {
-
-		PamGridPane controlPane=new PamGridPane(); 
-		controlPane.setHgap(5);
-		controlPane.setVgap(5);
-
-		//		//create time scale controls
-		//		controlPane.add(new Label("Time window"),0,1);
-		//		
-		//		//create time slider 
-		//		timeSlider=new Slider(0, timeScaleChoices.length-1, 1); 
-		//		timeSlider.setShowTickLabels(true);
-		//		timeSlider.setShowTickMarks(true);
-		//		timeSlider.setMajorTickUnit(1);
-		//		
-		//		timeSlider.setLabelFormatter(new ScaleStringConverter());
-		//		
-		////		PamGridPane.setHalignment(timeSlider, Pos.BOTTOM_CENTER);
-		//
-		//		controlPane.add(timeSlider,1,1);
-		//		//add listener to time slider to change datamap. 
-		//		timeSlider.valueProperty().addListener((ov, oldVal, newVal)->{
-		//			sayHScale();
-		//			dataMapPane.scaleChanged();
-		//		}); 
-		//		 
-		//		controlPane.add(timeScaleLabel=new Label(""),3,1);
-
-		//create vertical scale controls
-		
-		scaleBox=new ComboBox<String> (); 
-		scaleBox.getItems().add("No Scaling");
-		scaleBox.getItems().add("per Second");
-		scaleBox.getItems().add("per Minute");
-		scaleBox.getItems().add("per Hour");
-		scaleBox.getItems().add("per Day");
-		GridPane.setColumnSpan(scaleBox, 2);
-
-		Label showDetLabel  = new Label("Show detections ");
-		
-		controlPane.add(new Label("Show detections "),0,0);
-		controlPane.add(scaleBox,1,0);
-//		scaleBox.setPrefWidth(200);
-
-		scaleBox.valueProperty().addListener((ov, oldVal, newVal)->{
-			dataMapPane.scaleChanged();
-		}); 
-
-
-		logScaleToggle=new PamToggleSwitch("Log Scale"); 
-		logScaleToggle.selectedProperty().addListener((obsVal, oldVal, newVal)->{
-			dataMapPane.scaleChanged();
-		});
-		
-	    ColumnConstraints rightCol = new ColumnConstraints();
-        rightCol.setHgrow(Priority.ALWAYS);
-        controlPane.getColumnConstraints().addAll(new ColumnConstraints(150),  new ColumnConstraints(150), rightCol);
-
-		controlPane.add(logScaleToggle,0,1);
-
-		return controlPane;
-	}
-
-	/**
-	 * Show the horizontal scale. 
-	 */
-	private void sayHScale() {
-//		double hChoice = timeScaleChoices[this.];
-//		timeScaleLabel.setText(String.format("%s pixs/hour", new Double(timeScaleChoices[(int) hChoice]).toString()));
-	}
-
-	//HACK use setting flag to avoid immediate callback which overwrites changes 2 and 3 ! 
-	boolean setting = false;
-
-	public void setParams(DataMapParameters dataMapParameters) {
-		System.out.println("SET DATAMPA PARAMS");
-		
-		setting = true;
-//		timeSlider.setValue(dataMapParameters.hScaleChoice);
-		scaleBox.getSelectionModel().select(dataMapParameters.vScaleChoice);
-		logScaleToggle.setSelected(dataMapParameters.vLogScale);
-			
-		//make sure the combo box has correct datastreams
-		updateDataStreamBox();
-		
-		//make sure combo box for datamaps  is sorted
-		updateDataMapChoiceBox();
-		
-		setting = false;
-	}
-
-
-	public DataMapParameters getParams(DataMapParameters dataMapParameters) {
-		if (setting) return dataMapParameters;
-//		dataMapParameters.hScaleChoice = (int) timeSlider.getValue(); 
-		dataMapParameters.vScaleChoice = scaleBox.getSelectionModel().getSelectedIndex();
-		dataMapParameters.vLogScale = logScaleToggle.isSelected();
-		
-		return dataMapParameters;
-	}
-
-	@Override
-	public String getName() {
-		return "Datamap settings";
-	}
-
-	@Override
-	public Node getContentNode() {
-		return mainPain;
-	}
-
-	@Override
-	public void paneInitialized() {
-		
-	}
-
 
 }

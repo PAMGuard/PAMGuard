@@ -1,14 +1,12 @@
 package PamController;
 
-import generalDatabase.DBControlUnit;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
-import binaryFileStorage.BinaryStore;
 import PamguardMVC.PamDataBlock;
+import generalDatabase.DBControlUnit;
 
 public class StorageOptions implements PamSettings {
 	
@@ -82,7 +80,7 @@ public class StorageOptions implements PamSettings {
 			 * storing to the database by default
 			 */
 			boolean haveBinary = (aBlock.getBinaryDataSource() != null);
-			doLog = storageParameters.isStoreDatabase(aBlock, haveBinary == false);
+			doLog = storageParameters.isStoreDatabase(aBlock, !haveBinary);
 			aBlock.setShouldLog(doLog);
 			doLog = storageParameters.isStoreBinary(aBlock, true);
 			aBlock.setShouldBinary(doLog);

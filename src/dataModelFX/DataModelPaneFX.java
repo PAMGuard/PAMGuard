@@ -6,22 +6,6 @@ import java.util.List;
 
 import org.controlsfx.glyphfont.Glyph;
 
-import pamViewFX.PamGuiTabFX;
-import pamViewFX.fxNodes.PamBorderPane;
-import pamViewFX.fxNodes.PamButton;
-import pamViewFX.fxNodes.PamSplitPane;
-import pamViewFX.fxNodes.connectionPane.ConnectionNode;
-import pamViewFX.fxNodes.connectionPane.ConnectionPane;
-import pamViewFX.fxNodes.connectionPane.StandardConnectionNode;
-import pamViewFX.fxNodes.connectionPane.StandardConnectionPlug;
-import pamViewFX.fxNodes.connectionPane.structures.ConnectionGroupStructure;
-import pamViewFX.fxNodes.connectionPane.structures.ConnectionStructure;
-import pamViewFX.fxStyles.PamStylesManagerFX;
-import javafx.beans.property.ObjectProperty;
-import javafx.geometry.Orientation;
-import javafx.scene.control.SplitPane;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamController.PamControllerInterface;
@@ -33,6 +17,21 @@ import dataModelFX.DataModelModulePane.ModuleRectangle;
 import dataModelFX.DataModelModulePane.StructureRectangle;
 import dataModelFX.connectionNodes.ConnectionNodeFactory;
 import dataModelFX.connectionNodes.ModuleConnectionNode;
+import javafx.beans.property.ObjectProperty;
+import javafx.geometry.Orientation;
+import javafx.scene.control.SplitPane;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import pamViewFX.PamGuiTabFX;
+import pamViewFX.fxNodes.PamBorderPane;
+import pamViewFX.fxNodes.PamButton;
+import pamViewFX.fxNodes.PamSplitPane;
+import pamViewFX.fxNodes.connectionPane.ConnectionNode;
+import pamViewFX.fxNodes.connectionPane.ConnectionPane;
+import pamViewFX.fxNodes.connectionPane.StandardConnectionNode;
+import pamViewFX.fxNodes.connectionPane.StandardConnectionPlug;
+import pamViewFX.fxNodes.connectionPane.structures.ConnectionGroupStructure;
+import pamViewFX.fxNodes.connectionPane.structures.ConnectionStructure;
 
 /**
  * The data model pane allows users to change PAMGuard's data model. 

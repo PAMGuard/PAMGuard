@@ -1,10 +1,11 @@
 package wavFiles;
 
 import java.io.IOException;
+
+import javax.sound.sampled.AudioFormat;
 import javax.swing.JOptionPane;
 
 import clickDetector.WindowsFile;
-import javax.sound.sampled.AudioFormat;
 
 public class WavFile {
 

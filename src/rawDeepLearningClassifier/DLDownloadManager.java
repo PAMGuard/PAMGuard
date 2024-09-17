@@ -13,7 +13,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -324,9 +323,9 @@ public class DLDownloadManager {
 	 */
 	private static File makeFolder(String settingsFolder) {
 		File folder = new File(settingsFolder);
-		if (folder.exists() == false) {
+		if (!folder.exists()) {
 			folder.mkdirs();
-			if (folder.exists() == false) {
+			if (!folder.exists()) {
 				return null;
 			}
 		}

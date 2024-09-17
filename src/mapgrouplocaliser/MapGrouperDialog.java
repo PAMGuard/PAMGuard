@@ -7,11 +7,9 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.border.TitledBorder;
 
-import PamView.GeneralProjector.ParameterType;
 import PamView.dialog.PamDialog;
 import PamView.dialog.warn.WarnOnce;
 import PamView.panel.WestAlignedPanel;
-import PamView.paneloverlay.OverlayDataManager;
 import PamView.paneloverlay.OverlaySwingPanel;
 import PamView.paneloverlay.overlaymark.MarkProvidersPanel;
 import annotation.handler.AnnotationsSelectionPanel;
@@ -73,13 +71,13 @@ public class MapGrouperDialog extends PamDialog {
 	
 	@Override
 	public boolean getParams() {
-		if (markProvidersPanel.getParams() == false) {
+		if (!markProvidersPanel.getParams()) {
 			int ans = WarnOnce.showWarning(getOwner(), "Marker Selection", "No marking displays have been selected", WarnOnce.OK_CANCEL_OPTION);
 			if (ans == WarnOnce.CANCEL_OPTION) {
 				return false;
 			}
 		}
-		if (overlayPanel.getParams() == false) {
+		if (!overlayPanel.getParams()) {
 			int ans = WarnOnce.showWarning(getOwner(), "Data Selection", "No data types have been selected", WarnOnce.OK_CANCEL_OPTION);
 			if (ans == WarnOnce.CANCEL_OPTION) {
 				return false;

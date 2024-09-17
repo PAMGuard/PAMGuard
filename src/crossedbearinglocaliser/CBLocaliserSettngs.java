@@ -5,7 +5,6 @@ import java.io.Serializable;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
-import PamguardMVC.PamDataBlock;
 import annotation.localise.targetmotion.TMAnnotationOptions;
 
 public class CBLocaliserSettngs implements Serializable, Cloneable, ManagedParameters {

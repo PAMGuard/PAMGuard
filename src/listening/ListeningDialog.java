@@ -142,7 +142,7 @@ public class ListeningDialog extends PamDialog {
 		if (newSp == null) {
 			return;
 		}
-		if (checkSpeciesLength(newSp) == false) {
+		if (!checkSpeciesLength(newSp)) {
 			return;
 		}
 		listeningParameters.speciesList.add(new SpeciesItem(newSp));
@@ -176,7 +176,7 @@ public class ListeningDialog extends PamDialog {
 		if (newSp == null) {
 			return;
 		}
-		if (checkSpeciesLength(newSp) == false) {
+		if (!checkSpeciesLength(newSp)) {
 			return;
 		}
 		sp.setName(newSp);

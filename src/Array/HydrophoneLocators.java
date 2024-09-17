@@ -3,7 +3,6 @@ package Array;
 import java.util.ArrayList;
 
 import PamController.PamController;
-import PamController.PamguardVersionInfo;
 
 public class HydrophoneLocators {
 

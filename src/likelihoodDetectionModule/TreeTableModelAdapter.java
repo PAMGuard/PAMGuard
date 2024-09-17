@@ -1,15 +1,16 @@
 package likelihoodDetectionModule;
 
+import java.util.ArrayList;
+import java.util.Vector;
+
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.tree.TreePath;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
-import java.util.Vector;
-import java.util.ArrayList;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.tree.TreePath;
 
 /**
  * The class TreeTableModelAdapter is a necessary part of the TreeTable implementation
@@ -58,10 +59,12 @@ public class TreeTableModelAdapter extends AbstractTableModel {
         tree.addTreeExpansionListener(new TreeExpansionListener() {
             // Don't use fireTableRowsInserted() here; the selection model
             // would get updated twice. 
-            public void treeExpanded(TreeExpansionEvent event) {  
+            @Override
+			public void treeExpanded(TreeExpansionEvent event) {  
               fireTableDataChanged(); 
             }
-            public void treeCollapsed(TreeExpansionEvent event) {  
+            @Override
+			public void treeCollapsed(TreeExpansionEvent event) {  
               fireTableDataChanged(); 
             }
         });
@@ -71,19 +74,23 @@ public class TreeTableModelAdapter extends AbstractTableModel {
         // not be guaranteed the tree will have finished processing
         // the event before us.
         treeTableModel.addTreeModelListener(new TreeModelListener() {
-            public void treeNodesChanged(TreeModelEvent e) {
+            @Override
+			public void treeNodesChanged(TreeModelEvent e) {
                 delayedFireTableDataChanged();
             }
 
-            public void treeNodesInserted(TreeModelEvent e) {
+            @Override
+			public void treeNodesInserted(TreeModelEvent e) {
                 delayedFireTableDataChanged();
             }
 
-            public void treeNodesRemoved(TreeModelEvent e) {
+            @Override
+			public void treeNodesRemoved(TreeModelEvent e) {
                 delayedFireTableDataChanged();
             }
 
-            public void treeStructureChanged(TreeModelEvent e) {
+            @Override
+			public void treeStructureChanged(TreeModelEvent e) {
                 delayedFireTableDataChanged();
             }
         });
@@ -263,7 +270,8 @@ public class TreeTableModelAdapter extends AbstractTableModel {
     /* (non-Javadoc)
      * @see javax.swing.table.TableModel#getColumnCount()
      */
-    public int getColumnCount() {
+    @Override
+	public int getColumnCount() {
         return treeTableModel.getColumnCount();
     }
     
@@ -286,7 +294,8 @@ public class TreeTableModelAdapter extends AbstractTableModel {
     /* (non-Javadoc)
      * @see javax.swing.table.TableModel#getRowCount()
      */
-    public int getRowCount() {
+    @Override
+	public int getRowCount() {
         return tree.getRowCount();
     }
 
@@ -308,7 +317,8 @@ public class TreeTableModelAdapter extends AbstractTableModel {
     /* (non-Javadoc)
      * @see javax.swing.table.TableModel#getValueAt(int, int)
      */
-    public Object getValueAt(int row, int column) {
+    @Override
+	public Object getValueAt(int row, int column) {
         return treeTableModel.getValueAt(nodeForRow(row), column);
     }
 
@@ -335,7 +345,8 @@ public class TreeTableModelAdapter extends AbstractTableModel {
      */
     protected void delayedFireTableDataChanged() {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 fireTableDataChanged();
             }
         });

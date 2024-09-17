@@ -20,13 +20,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
-import clickDetector.ClickParameters;
-import dataMap.filemaps.OfflineFileParameters;
-import soundtrap.xml.CDETInfo;
 import Acquisition.AcquisitionControl;
 import Acquisition.FolderInputSystem;
 import PamController.PamControlledUnit;
@@ -41,6 +39,9 @@ import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.debug.Debug;
+import clickDetector.ClickParameters;
+import dataMap.filemaps.OfflineFileParameters;
+import soundtrap.xml.CDETInfo;
 
 public class ImportBCLDialog extends PamDialog {
 
@@ -112,7 +113,7 @@ public class ImportBCLDialog extends PamDialog {
 		c.gridx = c.gridy = 0;
 		c.anchor = GridBagConstraints.LINE_START;
 		soundTrapDate.setBorder(new CompoundBorder(new TitledBorder("Soundtrap Date/Time Format "), new EmptyBorder(0, 10, 0, 0)));
-		soundTrapDate.add(new JLabel("Enter the date/time format to use ", JLabel.LEFT),c);
+		soundTrapDate.add(new JLabel("Enter the date/time format to use ", SwingConstants.LEFT),c);
 		c.gridx++;
 		soundTrapDate.add(customDateTimeFormat,c);
 		c.gridy++;
@@ -121,10 +122,10 @@ public class ImportBCLDialog extends PamDialog {
 		String text = "<html><body style='width: 350px'>" + 
 				"See https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html for " +
 				"information on date and time codes, as well as examples of common formats.";
-		soundTrapDate.add(new JLabel(text, JLabel.LEFT),c);
+		soundTrapDate.add(new JLabel(text, SwingConstants.LEFT),c);
 		c.gridy++;
 		text = "The default format is yyyy-MM-dd'T'HH:mm:ss";
-		soundTrapDate.add(new JLabel(text, JLabel.LEFT),c);
+		soundTrapDate.add(new JLabel(text, SwingConstants.LEFT),c);
 		mainPanel.add(soundTrapDate);
 		mainPanel.add(Box.createRigidArea(new Dimension(0, 5)));
 
@@ -186,7 +187,7 @@ public class ImportBCLDialog extends PamDialog {
 	 * Start button has been pressed !
 	 */
 	protected void startButtton() {
-		if (getParams() == false) {
+		if (!getParams()) {
 			return;
 		}
 		/*

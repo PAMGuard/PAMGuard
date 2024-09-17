@@ -9,30 +9,21 @@ import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.Window;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.MappedByteBuffer;
 
-import javax.imageio.ImageIO;
-
-import pamguard.Pamguard;
-import fftManager.FFTDataBlock;
 import PamController.PamController;
 import PamView.ColourArray;
 import PamView.GeneralProjector;
-import PamView.PamColors;
+import PamView.GeneralProjector.ParameterType;
 import PamView.PamDetectionOverlayGraphics;
 import PamView.PamKeyItem;
 import PamView.PamSymbol;
 import PamView.PamSymbolType;
-import PamView.PanelOverlayDraw;
-import PamView.GeneralProjector.ParameterType;
 import PamView.symbol.SymbolData;
 import PamguardMVC.PamDataUnit;
 import Spectrogram.DirectDrawProjector;
 import Spectrogram.SpectrogramDisplay;
 import Spectrogram.SpectrogramParameters;
+import fftManager.FFTDataBlock;
 
 public class ClipOverlayGraphics extends PamDetectionOverlayGraphics {
 

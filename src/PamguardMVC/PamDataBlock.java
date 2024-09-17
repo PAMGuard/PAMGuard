@@ -20,10 +20,6 @@
  */
 package PamguardMVC;
 
-import generalDatabase.SQLLogging;
-import generalDatabase.external.crossreference.CrossReference;
-import jsonStorage.JSONObjectDataSource;
-
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -40,6 +36,7 @@ import java.util.Vector;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 
@@ -50,29 +47,12 @@ import org.w3c.dom.Element;
 import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionProcess;
 import Localiser.LocalisationAlgorithm;
-import pamScrollSystem.ViewLoadObserver;
-import tethys.TethysControl;
-import tethys.pamdata.AutoTethysProvider;
-import tethys.pamdata.TethysDataProvider;
-import tethys.species.DataBlockSpeciesManager;
-import dataGram.DatagramProvider;
-import dataMap.BespokeDataMapGraphic;
-import dataMap.OfflineDataMap;
-import effort.EffortProvider;
-import effort.binary.DataMapEffortProvider;
-import annotation.DataAnnotationType;
-import annotation.handler.AnnotationHandler;
-import binaryFileStorage.BinaryDataSource;
-import binaryFileStorage.BinaryOfflineDataMap;
-import binaryFileStorage.BinaryStore;
-import binaryFileStorage.SecondaryBinaryStore;
 import PamController.OfflineDataStore;
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamController.PamControllerInterface;
 import PamDetection.LocContents;
 import PamDetection.LocalisationInfo;
-import PamDetection.PamDetection;
 import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamView.symbol.PamSymbolManager;
@@ -83,7 +63,6 @@ import PamguardMVC.dataOffline.OfflineDataLoading;
 import PamguardMVC.dataSelector.DataSelectParams;
 import PamguardMVC.dataSelector.DataSelector;
 import PamguardMVC.dataSelector.DataSelectorCreator;
-import PamguardMVC.dataSelector.DataSelectorSettings;
 import PamguardMVC.dataSelector.NullDataSelectorCreator;
 import PamguardMVC.datamenus.DataMenuParent;
 import PamguardMVC.nanotime.NanoTimeCalculator;
@@ -92,6 +71,24 @@ import PamguardMVC.toad.TOADCalculator;
 import PamguardMVC.uid.DataBlockUIDHandler;
 import SoundRecorder.RecorderControl;
 import SoundRecorder.trigger.RecorderTrigger;
+import annotation.DataAnnotationType;
+import annotation.handler.AnnotationHandler;
+import binaryFileStorage.BinaryDataSource;
+import binaryFileStorage.BinaryOfflineDataMap;
+import binaryFileStorage.BinaryStore;
+import binaryFileStorage.SecondaryBinaryStore;
+import dataGram.DatagramProvider;
+import dataMap.BespokeDataMapGraphic;
+import dataMap.OfflineDataMap;
+import effort.EffortProvider;
+import effort.binary.DataMapEffortProvider;
+import generalDatabase.SQLLogging;
+import generalDatabase.external.crossreference.CrossReference;
+import jsonStorage.JSONObjectDataSource;
+import pamScrollSystem.ViewLoadObserver;
+import tethys.TethysControl;
+import tethys.pamdata.TethysDataProvider;
+import tethys.species.DataBlockSpeciesManager;
 
 /**
  * 
@@ -483,6 +480,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	}
 
 	Timer removeTimer = new Timer(500, new ActionListener() {
+		@Override
 		public void actionPerformed(ActionEvent evt) {
 			int n;
 			if (shouldDelete()) {
@@ -1080,7 +1078,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	 *                            load progress.
 	 */
 	public boolean loadViewerData(OfflineDataLoadInfo offlineDataLoadInfo, ViewLoadObserver loadObserver) {
-		if (PamController.getInstance().isInitializationComplete() == false) {
+		if (!PamController.getInstance().isInitializationComplete()) {
 			System.err.printf("Not loading %s since initialisation not yet complete\n", getDataName());
 			return false;
 		}
@@ -1092,7 +1090,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 
 		saveViewerData();
 
-		if (needViewerDataLoad(offlineDataLoadInfo) == false) {
+		if (!needViewerDataLoad(offlineDataLoadInfo)) {
 			return true;
 		}
 
@@ -1291,7 +1289,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			if (offlineDataLoading.isCurrentOfflineLoadKeep()) {
 				pamDataUnits.add(pamDataUnit);
 			}
-			if (shouldBinary && getBinaryDataSource() != null && !isOffline && pamDataUnit.isEmbryonic() == false) {
+			if (shouldBinary && getBinaryDataSource() != null && !isOffline && !pamDataUnit.isEmbryonic()) {
 				getBinaryDataSource().saveData(pamDataUnit);
 			}
 		}
@@ -1365,7 +1363,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 	public void updatePamData(Tunit pamDataUnit, long updateTimeMillis) {
 		pamDataUnit.updateDataUnit(updateTimeMillis);
 		setChanged();
-		if (!isOffline && pamDataUnit.isEmbryonic() == false) {
+		if (!isOffline && !pamDataUnit.isEmbryonic()) {
 			/*
 			 * Save it if it't not been saved already or we're saving updates. 
 			 * Detectors can keep a dataunit in an embryonic state and add them to the 
@@ -1435,7 +1433,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			//				Debug.out.println("Removing data unit " + aDataUnit);
 			//			}
 			boolean rem = pamDataUnits.remove(aDataUnit);
-			if (rem == false) {
+			if (!rem) {
 				return false;
 			}
 			if (isOffline) {
@@ -1985,7 +1983,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			long difference;
 
 			ListIterator<Tunit> listIterator = getListIterator(ITERATOR_END);
-			if (listIterator.hasPrevious() == false) {
+			if (!listIterator.hasPrevious()) {
 				return null;
 			}
 			unit = listIterator.previous();
@@ -2031,7 +2029,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			long difference;
 
 			ListIterator<Tunit> listIterator = getListIterator(ITERATOR_END);
-			if (listIterator.hasPrevious() == false) {
+			if (!listIterator.hasPrevious()) {
 				return null;
 			}
 			unit = listIterator.previous();
@@ -3071,10 +3069,10 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 		case PamControllerInterface.HYDROPHONE_ARRAY_CHANGED:
 			clearDataOrigins();
 			break;
-		case PamController.INITIALIZATION_COMPLETE:
+		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			effortProvider = autoEffortProvider();
 			break;
-		case PamController.ADD_CONTROLLEDUNIT:
+		case PamControllerInterface.ADD_CONTROLLEDUNIT:
 			if (PamController.getInstance().isInitializationComplete()) {
 				effortProvider = autoEffortProvider();
 			}
@@ -4266,7 +4264,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			lab = String.format("        %s ...", getDataName());
 		}
 		JLabel label;
-		popMenu.add(label = new JLabel(lab, JLabel.CENTER));
+		popMenu.add(label = new JLabel(lab, SwingConstants.CENTER));
 		label.setBorder(new EmptyBorder(3, 6, 0, 0));
 		for (JMenuItem menuItem : menuItems) {
 			popMenu.add(menuItem);
@@ -4305,7 +4303,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			if (superDet == null) {
 				continue;
 			}
-			if (uniqueSuperDets.contains(superDet) == false) {
+			if (!uniqueSuperDets.contains(superDet)) {
 				uniqueSuperDets.add(superDet);
 			}
 		}

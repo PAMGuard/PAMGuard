@@ -1,6 +1,5 @@
 package clickDetector;
 
-import PamguardMVC.AcousticDataBlock;
 import PamguardMVC.PamProcess;
 
 public class TrackedClickDataBlock extends ClickDataBlock {

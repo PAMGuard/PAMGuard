@@ -3,8 +3,6 @@ package wavFiles;
 import java.io.File;
 import java.io.IOException;
 
-import javax.sound.sampled.AudioFormat;
-
 import clickDetector.WindowsFile;
 
 public class WavFileReader extends WavFile {
@@ -18,7 +16,7 @@ public class WavFileReader extends WavFile {
 
 	private boolean openForReading() {
 		File file = new File(fileName);
-		if (file.exists() == false) {
+		if (!file.exists()) {
 			return reportError(String.format("file %s does not exist on the system", fileName));
 		}
 		try {

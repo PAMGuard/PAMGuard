@@ -6,6 +6,7 @@ import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -194,17 +195,20 @@ public class PamTipViewer extends PamDialog {
 	}
 
 	class PrevButton implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			prevButton();
 		}
 	}
 
 	class NextButton implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			nextButton();
 		}
 	}
 	class CloseButton implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			closeButton();
 		}

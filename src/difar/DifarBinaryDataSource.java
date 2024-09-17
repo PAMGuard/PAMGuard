@@ -7,21 +7,16 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 
-import clipgenerator.ClipSettings;
 import Filters.FilterParams;
-import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamUtils.LatLong;
-import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
-import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import binaryFileStorage.BinaryDataSource;
 import binaryFileStorage.BinaryHeader;
 import binaryFileStorage.BinaryObjectData;
 import binaryFileStorage.ModuleFooter;
 import binaryFileStorage.ModuleHeader;
-import binaryFileStorage.PackedBinaryObject;
 
 public class DifarBinaryDataSource extends BinaryDataSource {
 

@@ -7,13 +7,13 @@ import java.io.Serializable;
 
 import javax.swing.JMenuItem;
 
-import mcc.MccJniInterface;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamView.PamSidePanel;
 import PamView.dialog.warn.WarnOnce;
+import mcc.MccJniInterface;
 
 public class ArrayAccelControl extends PamControlledUnit implements PamSettings {
 

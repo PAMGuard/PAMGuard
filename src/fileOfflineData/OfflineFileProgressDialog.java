@@ -13,8 +13,6 @@ import javax.swing.border.TitledBorder;
 
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
-import dataMap.filemaps.FileMapMakingdialog;
-import dataMap.filemaps.OfflineFileServer;
 
 public class OfflineFileProgressDialog extends PamDialog {
 

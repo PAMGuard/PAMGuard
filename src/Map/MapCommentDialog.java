@@ -57,7 +57,7 @@ public class MapCommentDialog extends PamView.dialog.PamDialog {
 	@Override
 	public void setVisible(boolean visible) {
 
-		if (visible == true) {
+		if (visible) {
 			// now positions it close to the mouse click.
 			// but make sure it's still on the window. 
 			Point newPoint = new Point(mapPoint);
@@ -121,6 +121,7 @@ public class MapCommentDialog extends PamView.dialog.PamDialog {
 
 	class TextListener implements KeyListener {
 
+		@Override
 		public void keyPressed(KeyEvent e) {
 			//if(e.getKeyText(e.getKeyCode())=="Enter"){
 			if(e.getKeyCode()==KeyEvent.VK_ENTER){
@@ -128,10 +129,12 @@ public class MapCommentDialog extends PamView.dialog.PamDialog {
 			}
 		}
 
+		@Override
 		public void keyReleased(KeyEvent e) {
 			// TODO Auto-generated method stub
 		}
 
+		@Override
 		public void keyTyped(KeyEvent e) {
 
 			

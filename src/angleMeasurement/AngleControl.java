@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+
 import PamController.PamControlledUnit;
 import PamView.PamSidePanel;
 
@@ -62,6 +63,7 @@ public class AngleControl extends PamControlledUnit {
 			this.parent = parent;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			angleMeasurement.settings(parent);
 		}
@@ -74,6 +76,7 @@ public class AngleControl extends PamControlledUnit {
 			this.parent = parent;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			AngleParameters newParams = AngleCalibrationDialog.showDialog(parent, THIS, angleMeasurement.getAngleParameters());
 			if (newParams != null) {

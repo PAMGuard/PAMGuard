@@ -318,7 +318,7 @@ public class NIChannelListPanel implements ChannelListPanel {
 				hasMaster = true;
 			}
 		}
-		if (hasMaster == false) {
+		if (!hasMaster) {
 			JOptionPane.showConfirmDialog(null, 
 					"At least one channel must be using the master device selected above!", 
 					"Error", JOptionPane.OK_OPTION, JOptionPane.ERROR_MESSAGE);
@@ -383,7 +383,7 @@ public class NIChannelListPanel implements ChannelListPanel {
 		for (int i = 0; i < nDevices; i++) {
 			if (devChannels[i] > 0) {
 				devInfo = niDaqProcess.getDeviceInfo(i);
-				if (devInfo.isExists() == false) {
+				if (!devInfo.isExists()) {
 					String er2 = String.format("The device %s is not currently present, continue anyway ?", 
 							devInfo);
 					int ans = JOptionPane.showConfirmDialog(null, er2, 
@@ -395,7 +395,7 @@ public class NIChannelListPanel implements ChannelListPanel {
 						continue; // skip the next stage !
 					}
 				}
-				if (devInfo.canSample(sr, devChannels[i]) == false) {
+				if (!devInfo.canSample(sr, devChannels[i])) {
 					String err = String.format("The device %s cannot sample %d channels at %d Hz",
 							devInfo.toString(), devChannels[i], (int) sr);
 					JOptionPane.showConfirmDialog(null, err, 

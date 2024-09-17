@@ -692,7 +692,7 @@ public class GPLProcess extends PamBlockProcess {
 			whitenedSpectrogram.addPamData(newData);
 			if (allNan) {
 				for (int i = 1; i < wData.length-1; i++) {
-					if (Double.isNaN(wData[i]) == false) {
+					if (!Double.isNaN(wData[i])) {
 						allNan = false;
 						break;
 					}
@@ -848,7 +848,7 @@ public class GPLProcess extends PamBlockProcess {
 				long startMillis = absSamplesToMilliseconds(startSample);
 				int storedContours = 0;
 				for (GPLContour aContour : contours) {
-					if (wantContour(aContour, params.minContourArea, storedContours) == false) {
+					if (!wantContour(aContour, params.minContourArea, storedContours)) {
 						continue;
 					}
 //					startSample += aContour.getMinTBin()*sourceFFTData.getHopSamples();

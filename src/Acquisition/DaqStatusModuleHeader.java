@@ -14,7 +14,7 @@ import binaryFileStorage.ModuleHeader;
 class DaqStatusModuleHeader extends ModuleHeader implements Serializable, ManagedParameters {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	public DaqStatusModuleHeader(int moduleVersion) {
 		super(moduleVersion);
 	}

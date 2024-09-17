@@ -31,11 +31,9 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
@@ -43,13 +41,12 @@ import javax.swing.border.TitledBorder;
 
 import PamUtils.PamCalendar;
 import PamView.PamColors;
+import PamView.PamColors.PamColor;
 import PamView.PamSidePanel;
 import PamView.dialog.PamButton;
 import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.PamLabel;
-import PamView.PamColors.PamColor;
 import PamView.panel.PamBorderPanel;
-import rocca.RoccaSidePanel.SidePanel;
 
 /**
  * @author mo55
@@ -151,7 +148,8 @@ public class RockBlockSidePanel implements PamSidePanel{
 //			send.setHorizontalAlignment(SwingConstants.LEFT);
 //			send.setAlignmentX(LEFT_ALIGNMENT);
 			send.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
+                    @Override
+					public void actionPerformed(ActionEvent evt) {
                         sendTheMessage();
                     }
 			});
@@ -160,6 +158,7 @@ public class RockBlockSidePanel implements PamSidePanel{
 //			checkSignal.setHorizontalAlignment(SwingConstants.LEFT);
 //			resetRockBlock.setAlignmentX(LEFT_ALIGNMENT);
 			resetRockBlock.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					resetRBCommObject();
 				}
@@ -168,37 +167,37 @@ public class RockBlockSidePanel implements PamSidePanel{
 			c.gridy++;
 			c.gridx = 0;
 			JLabel aLabel;
-			this.add(aLabel = new JLabel("Com Port: ", JLabel.RIGHT),c);
+			this.add(aLabel = new JLabel("Com Port: ", SwingConstants.RIGHT),c);
 			c.gridx++;
 			this.add(comPort, c);
 
 			c.gridy++;
 			c.gridx = 0;
-			add(aLabel = new JLabel("Com Ready: ", JLabel.RIGHT),c);
+			add(aLabel = new JLabel("Com Ready: ", SwingConstants.RIGHT),c);
 			c.gridx++;
 			add(commReady,c);
 
 			c.gridy++;
 			c.gridx = 0;
-			this.add(aLabel = new JLabel("Com Error: ", JLabel.RIGHT),c);
+			this.add(aLabel = new JLabel("Com Error: ", SwingConstants.RIGHT),c);
 			c.gridx++;
 			this.add(portError,c);
 
 			c.gridy++;
 			c.gridx = 0;
-			this.add(aLabel = new JLabel("Signal Strength: ", JLabel.RIGHT),c);
+			this.add(aLabel = new JLabel("Signal Strength: ", SwingConstants.RIGHT),c);
 			c.gridx++;
 			this.add(signalStrength,c);
 
 			c.gridy++;
 			c.gridx = 0;
-			this.add(aLabel = new JLabel("Num Outgoing Mess: ", JLabel.RIGHT),c);
+			this.add(aLabel = new JLabel("Num Outgoing Mess: ", SwingConstants.RIGHT),c);
 			c.gridx++;
 			this.add(numOutgoing,c);
 
 			c.gridy++;
 			c.gridx = 0;
-			this.add(aLabel = new JLabel("Num Incoming Mess: ", JLabel.RIGHT),c);
+			this.add(aLabel = new JLabel("Num Incoming Mess: ", SwingConstants.RIGHT),c);
 			c.gridx++;
 			this.add(numIncoming,c);
 			

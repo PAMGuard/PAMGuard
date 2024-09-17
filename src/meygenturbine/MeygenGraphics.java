@@ -17,8 +17,6 @@ import PamUtils.LatLong;
 import PamView.GeneralProjector;
 import PamView.GeneralProjector.ParameterType;
 import PamView.GeneralProjector.ParameterUnits;
-import PamView.HoverData;
-import PamView.PamDetectionOverlayGraphics;
 import PamView.PamKeyItem;
 import PamView.PamSymbol;
 import PamView.PanelOverlayDraw;
@@ -64,7 +62,7 @@ public class MeygenGraphics extends PanelOverlayDraw {
 	}
 
 	private Rectangle drawOnMap(Graphics g, MeygenDataUnit dataUnit, GeneralProjector generalProjector) {
-		if (generalProjector instanceof MapRectProjector == false) {
+		if (!(generalProjector instanceof MapRectProjector)) {
 			return null;
 		}
 		MapRectProjector mapProj = (MapRectProjector) generalProjector;

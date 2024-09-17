@@ -10,7 +10,6 @@ import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import binaryFileStorage.BinaryTypes;
-
 import dataMap.OfflineDataMapPoint;
 
 /**

@@ -23,9 +23,6 @@
 
 package rocca;
 
-import PamUtils.PamCalendar;
-import PamView.dialog.warn.WarnOnce;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,6 +32,8 @@ import java.util.Locale;
 
 import javax.swing.ProgressMonitorInputStream;
 
+import PamUtils.PamCalendar;
+import PamView.dialog.warn.WarnOnce;
 import weka.classifiers.AbstractClassifier;
 import weka.core.DenseInstance;
 import weka.core.Instance;
@@ -414,7 +413,7 @@ public class RoccaClassifier {
     		else {
 		        String fname = roccaControl.roccaParameters.roccaClassifierModelFilename.getAbsolutePath();
 		        File f = new File(fname);
-		        if (f.exists() == false) {
+		        if (!f.exists()) {
 		        	WarnOnce.showWarning(roccaControl.getUnitName(), "Rocca whistle classifier file cannot be found at " + fname, WarnOnce.WARNING_MESSAGE);
 		            roccaControl.roccaParameters.setClassifyWhistles(false);
 		        }
@@ -464,7 +463,7 @@ public class RoccaClassifier {
     		else {
 		        String fname = roccaControl.roccaParameters.roccaClickClassifierModelFilename.getAbsolutePath();
 		        File f = new File(fname);
-		        if (f.exists() == false) {
+		        if (!f.exists()) {
 		        	WarnOnce.showWarning(roccaControl.getUnitName(), "Rocca click classifier file cannot be found at " + fname, WarnOnce.WARNING_MESSAGE);
 		            roccaControl.roccaParameters.setClassifyClicks(false);
 		        }
@@ -521,7 +520,7 @@ public class RoccaClassifier {
     		else {
 		        String fname = roccaControl.roccaParameters.roccaEventClassifierModelFilename.getAbsolutePath();
 		        File f = new File(fname);
-		        if (f.exists() == false) {
+		        if (!f.exists()) {
 		        	WarnOnce.showWarning(roccaControl.getUnitName(), "Rocca events classifier file cannot be found at " + fname, WarnOnce.WARNING_MESSAGE);
 		            roccaControl.roccaParameters.setClassifyEvents(false);
 		        }

@@ -1,9 +1,5 @@
 package PamUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.RandomAccess;
 import java.util.Vector;
 
 
@@ -33,7 +29,7 @@ public class PamSort {
 			theOther = list.get(p2);
 			if (theOther.compareTo(theOne) < 0) {
 				break;
-			};
+			}
 			list.set(pos, theOther);
 		}
 		list.set(pos, theOne);

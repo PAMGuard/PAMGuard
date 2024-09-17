@@ -14,18 +14,17 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
-import alarm.actions.AlarmAction;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.SourcePanel;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import alarm.actions.AlarmAction;
 
 public class AlarmDialog extends PamDialog {
 
@@ -73,7 +72,7 @@ public class AlarmDialog extends PamDialog {
 		JPanel southPanel = new JPanel(new GridBagLayout());
 		southPanel.setBorder(new TitledBorder("Alarm Count"));
 		c = new PamGridBagContraints();
-		addComponent(southPanel, new JLabel("Count Type ", JLabel.RIGHT), c);
+		addComponent(southPanel, new JLabel("Count Type ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		c.gridwidth = 3;
 		addComponent(southPanel, countType = new JComboBox<String>(), c);
@@ -84,25 +83,25 @@ public class AlarmDialog extends PamDialog {
 		c.gridwidth = 1;
 		c.gridx = 0;
 		c.gridy++;
-		addComponent(southPanel, new JLabel("Count Time ", JLabel.RIGHT), c);
+		addComponent(southPanel, new JLabel("Count Time ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		addComponent(southPanel, alarmTime = new JTextField(5), c);
 		c.gridx++;
-		addComponent(southPanel, new JLabel(" (s) ", JLabel.RIGHT), c);
+		addComponent(southPanel, new JLabel(" (s) ", SwingConstants.RIGHT), c);
 		for (int i = 0; i < AlarmParameters.COUNT_LEVELS; i++) {
 			c.gridx = 0;
 			c.gridy++;
-			addComponent(southPanel, new JLabel(AlarmParameters.levelNames[i] + " Count ", JLabel.RIGHT), c);
+			addComponent(southPanel, new JLabel(AlarmParameters.levelNames[i] + " Count ", SwingConstants.RIGHT), c);
 			c.gridx++;
 			addComponent(southPanel, alarmCount[i] = new JTextField(5), c);
 		}
 		c.gridy++;
 		c.gridx = 0;
-		addComponent(southPanel, new JLabel("Minimum gap ", JLabel.RIGHT), c);
+		addComponent(southPanel, new JLabel("Minimum gap ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		addComponent(southPanel, alarmInterval = new JTextField(5), c);
 		c.gridx++;
-		addComponent(southPanel, new JLabel(" (s) ", JLabel.RIGHT), c);
+		addComponent(southPanel, new JLabel(" (s) ", SwingConstants.RIGHT), c);
 		configPanel.add(BorderLayout.SOUTH, southPanel);
 		
 		JPanel actionsPanel = new JPanel(new GridBagLayout());
@@ -137,11 +136,11 @@ public class AlarmDialog extends PamDialog {
 		dataPanel.setBorder(new TitledBorder("Data"));
 		dataPanel.setLayout(new GridBagLayout());
 		c = new PamGridBagContraints();
-		dataPanel.add(new JLabel("Data hold time ", JLabel.RIGHT), c);
+		dataPanel.add(new JLabel("Data hold time ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		dataPanel.add(holdTime = new JTextField(5), c);
 		c.gridx++;
-		dataPanel.add(new JLabel(" seconds ", JLabel.LEFT), c);
+		dataPanel.add(new JLabel(" seconds ", SwingConstants.LEFT), c);
 		actionsOuterPanel.add(dataPanel);
 		holdTime.setToolTipText("Time to hold alarm data in memory before deleting");
 		
@@ -230,7 +229,7 @@ public class AlarmDialog extends PamDialog {
 	private void enableControls() {
 		AlarmCounter ac = findAlarmCounter();
 		boolean isSingles = countType.getSelectedIndex() == AlarmParameters.COUNT_SINGLES;
-		if (ac == null || ac.hasOptions() == false) {
+		if (ac == null || !ac.hasOptions()) {
 			settingsButton.setEnabled(false);
 		}
 		else {

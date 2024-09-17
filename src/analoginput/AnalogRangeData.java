@@ -10,7 +10,7 @@ public class AnalogRangeData implements Serializable, Cloneable, Comparable<Anal
 
 	public static final long serialVersionUID = 1L;
 
-	public enum AnalogType {VOLTS, AMPS}; 
+	public enum AnalogType {VOLTS, AMPS} 
 	
 	private double[] range;
 	
@@ -88,7 +88,7 @@ public class AnalogRangeData implements Serializable, Cloneable, Comparable<Anal
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof AnalogRangeData == false) {
+		if (!(obj instanceof AnalogRangeData)) {
 			return false;
 		}
 		AnalogRangeData oth = (AnalogRangeData) obj;

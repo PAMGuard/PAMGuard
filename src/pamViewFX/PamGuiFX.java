@@ -5,19 +5,12 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
+import org.controlsfx.control.ToggleSwitch;
+
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamView.PamViewInterface;
-import pamViewFX.fxGlyphs.PamGlyphDude;
-import pamViewFX.fxNodes.PamBorderPane;
-import pamViewFX.fxNodes.PamButton;
-import pamViewFX.fxNodes.PamHBox;
-import pamViewFX.fxNodes.PamTabPane;
-import pamViewFX.fxNodes.PamVBox;
-import pamViewFX.fxNodes.hidingPane.HidingPane;
-import pamViewFX.pamTask.PamLoadingPane;
-import pamViewFX.pamTask.PamTaskUpdate;
-import userDisplayFX.UserDisplayNodeFX;
+import dataModelFX.DataModelPaneFX;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -30,9 +23,16 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import dataModelFX.DataModelPaneFX;
-
-import org.controlsfx.control.ToggleSwitch;
+import pamViewFX.fxGlyphs.PamGlyphDude;
+import pamViewFX.fxNodes.PamBorderPane;
+import pamViewFX.fxNodes.PamButton;
+import pamViewFX.fxNodes.PamHBox;
+import pamViewFX.fxNodes.PamTabPane;
+import pamViewFX.fxNodes.PamVBox;
+import pamViewFX.fxNodes.hidingPane.HidingPane;
+import pamViewFX.pamTask.PamLoadingPane;
+import pamViewFX.pamTask.PamTaskUpdate;
+import userDisplayFX.UserDisplayNodeFX;
 
 
 

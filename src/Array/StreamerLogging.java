@@ -1,6 +1,5 @@
 package Array;
 
-import java.sql.Connection;
 import java.sql.Types;
 
 import Array.sensors.ArrayParameterType;
@@ -8,11 +7,6 @@ import Array.sensors.ArraySensorFieldType;
 import Array.streamerOrigin.HydrophoneOriginMethod;
 import Array.streamerOrigin.HydrophoneOriginMethods;
 import Array.streamerOrigin.HydrophoneOriginSystem;
-import Array.streamerOrigin.OriginSettings;
-import Array.streamerOrigin.StaticOriginSettings;
-import GPS.GPSDataBlock;
-import GPS.GpsData;
-import GPS.GpsDataUnit;
 import PamUtils.PamCalendar;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;

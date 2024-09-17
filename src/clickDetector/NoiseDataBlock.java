@@ -1,6 +1,5 @@
 package clickDetector;
 
-import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;

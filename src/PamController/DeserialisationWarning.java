@@ -3,8 +3,6 @@ package PamController;
 import java.awt.Window;
 import java.util.ArrayList;
 
-import PamView.dialog.warn.WarnOnce;
-
 /**
  * Class to handle warnings from deserialisations which occurr when classes no longer exist. These warnings
  * are occurring more often because of the plugin system which means users are opening viewer databases and

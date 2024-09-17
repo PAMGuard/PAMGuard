@@ -8,13 +8,11 @@ import PamUtils.PamUtils;
 import PamUtils.complex.ComplexArray;
 import PamguardMVC.PamConstants;
 import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamRawDataBlock;
 import fftManager.Complex;
 import fftManager.FFTDataBlock;
 import fftManager.FFTDataUnit;
 import fftManager.FastFFT;
-import PamguardMVC.PamRawDataBlock;
 
 /**
  * Class for estimating whistle delays from a whistle shape. 
@@ -63,7 +61,7 @@ public class WhistleDelays {
 		sourceData = (FFTDataBlock) whProcess.getParentDataBlock();
 		if (nDelays <= 0) {
 			return;
-		};
+		}
 		delayMeasures = new DelayMeasure[nDelays];
 		for (int i = 0; i < nDelays; i++) {
 			delayMeasures[i] = new DelayMeasure(sourceData.getFftLength());

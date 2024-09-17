@@ -76,7 +76,8 @@ public class ImportGPSData {
 	 */
 	public void loadFile(String fileString){
 		
-		importLoadBar=ImportLoadBar.showDialog(PamController.getInstance().getMainFrame(), "Load GPS Data");
+		PamController.getInstance();
+		importLoadBar=ImportLoadBar.showDialog(PamController.getMainFrame(), "Load GPS Data");
 		importLoadBar.setProgress(0);
 		importLoadBar.setIntermediate(true);
 		PamController.getInstance().enableGUIControl(false);
@@ -137,7 +138,9 @@ public class ImportGPSData {
 		 Collection<String> nmeaStrings=importFileStrings( file.getAbsolutePath());
 		 
 		 if  (checkGGA(nmeaStrings)) {
-			 ImportGPSParams newParams=ImportGGADialog.showDialog(PamController.getInstance().getMainFrame(), PamController.getInstance().getMainFrame().getMousePosition(), gpsControl.gpsImportParams, this) ;
+			 PamController.getInstance();
+			PamController.getInstance();
+			ImportGPSParams newParams=ImportGGADialog.showDialog(PamController.getMainFrame(), PamController.getMainFrame().getMousePosition(), gpsControl.gpsImportParams, this) ;
 			 if (newParams!=null) gpsControl.gpsImportParams=newParams.clone();
 		 }
 	}
@@ -375,7 +378,7 @@ public class ImportGPSData {
 								 if (gpsData.isDataOk()) saveGPSData(gpsData);
 							 }
 							 
-							 gpsData=new GpsData(nmeaString, gpsControl.gpsParameters.READ_GGA);
+							 gpsData=new GpsData(nmeaString, GPSParameters.READ_GGA);
 							 ///GGA strings contain no date so we need to set it. 
 							 gpsData.getGpsCalendar().set(Calendar.YEAR, gpsControl.gpsImportParams.year);
 							 gpsData.getGpsCalendar().set(Calendar.MONTH, gpsControl.gpsImportParams.month);
@@ -397,7 +400,7 @@ public class ImportGPSData {
 						 }
 						 
 //						 System.out.println("nmea string: "+nmeaString);
-						 gpsData=new GpsData(nmeaString, gpsControl.gpsParameters.READ_RMC);
+						 gpsData=new GpsData(nmeaString, GPSParameters.READ_RMC);
 						 
 						 break; 
 					 }
@@ -452,7 +455,7 @@ public class ImportGPSData {
 		 
 		 gpsDataBlock.saveViewerData();
 
-	 };
+	 }
 	 
 	public void saveGPSData(GpsData gpsData){
 		//System.out.println("GPSData to save:  " +gpsData + "gpsDataBlock: "+gpsDataBlock);
@@ -508,7 +511,7 @@ public class ImportGPSData {
 	 
 	private void loadKMLFile(File file , ImportGPSThread importGPSThread){
 		// TODO Auto-generated method stub
-	};
+	}
 	 
 	private void loadGPXFile(File file2, ImportGPSThread importGPSThread) {
 		// TODO Auto-generated method stub

@@ -3,9 +3,7 @@ package PamView;
 import java.awt.Color;
 
 import javax.swing.JList;
-import javax.swing.JTextArea;
 import javax.swing.ListModel;
-import javax.swing.text.Document;
 
 import PamView.PamColors.PamColor;
 

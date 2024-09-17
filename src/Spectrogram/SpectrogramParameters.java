@@ -28,12 +28,11 @@ import Array.ArrayManager;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
-import userDisplay.UserFrameParameters;
-
 import PamView.ColourArray.ColourArrayType;
 import PamView.paneloverlay.OverlayDataInfo;
 import PamguardMVC.PamConstants;
 import PamguardMVC.PamDataBlock;
+import userDisplay.UserFrameParameters;
 
 /**
  * These are the parameter settings for a single

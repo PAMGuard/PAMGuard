@@ -9,18 +9,18 @@ import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
+import PamView.dialog.PamDialog;
+import PamView.dialog.PamGridBagContraints;
 import mcc.MccJniInterface;
 import mcc.MccPanel;
 import mcc.mccjna.MCCException;
 import mcc.mccjna.MCCUtils;
-import PamView.dialog.PamDialog;
-import PamView.dialog.PamGridBagContraints;
 
 public class ArrayAccelDialog extends PamDialog {
 	
@@ -52,17 +52,17 @@ public class ArrayAccelDialog extends PamDialog {
 		JPanel rPanel = new JPanel(new GridBagLayout());
 		rPanel.setBorder(new TitledBorder("Readout"));
 		GridBagConstraints c = new PamGridBagContraints();
-		rPanel.add(new JLabel("Read interval ", JLabel.RIGHT), c);
+		rPanel.add(new JLabel("Read interval ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		rPanel.add(readInterval = new JTextField(5), c);
 		readInterval.setToolTipText("Readout interval in seconds");
 		c.gridx++;
-		rPanel.add(new JLabel(" s", JLabel.LEFT), c);
+		rPanel.add(new JLabel(" s", SwingConstants.LEFT), c);
 		for (int i = 0; i < ArrayAccelParams.NDIMENSIONS; i++) {
 			c.gridx = 0;
 			c.gridy++;
 			c.fill = GridBagConstraints.HORIZONTAL;
-			rPanel.add(new JLabel("Channel " + ArrayAccelParams.DIMENSIONNAME[i] + " ", JLabel.RIGHT), c);
+			rPanel.add(new JLabel("Channel " + ArrayAccelParams.DIMENSIONNAME[i] + " ", SwingConstants.RIGHT), c);
 			c.gridx++;
 			c.fill = GridBagConstraints.NONE;
 			rPanel.add(dimChannel[i] = new JTextField(3), c);
@@ -75,23 +75,23 @@ public class ArrayAccelDialog extends PamDialog {
 		calPanel.setBorder(new TitledBorder("Calibration"));
 		c = new PamGridBagContraints();
 		c.gridx = 1;
-		calPanel.add(new JLabel("Zero", JLabel.CENTER), c);
+		calPanel.add(new JLabel("Zero", SwingConstants.CENTER), c);
 		c.gridx += 2;
-		calPanel.add(new JLabel("Scale", JLabel.CENTER), c);
+		calPanel.add(new JLabel("Scale", SwingConstants.CENTER), c);
 		for (int i = 0; i < ArrayAccelParams.NDIMENSIONS; i++) {
 			c.gridy ++;
 			c.gridx = 0;
-			calPanel.add(new JLabel(ArrayAccelParams.DIMENSIONNAME[i] + " ", JLabel.RIGHT), c);
+			calPanel.add(new JLabel(ArrayAccelParams.DIMENSIONNAME[i] + " ", SwingConstants.RIGHT), c);
 			c.gridx++;
 			calPanel.add(zeroVolts[i] = new JTextField(5), c);
 			zeroVolts[i].setToolTipText(String.format("Offset voltage for %s coordinate", ArrayAccelParams.DIMENSIONNAME[i]));
 			c.gridx++;
-			calPanel.add(new JLabel(" V,   ", JLabel.LEFT), c);
+			calPanel.add(new JLabel(" V,   ", SwingConstants.LEFT), c);
 			c.gridx++;
 			calPanel.add(voltsPerG[i] = new JTextField(5), c);
 			voltsPerG[i].setToolTipText(String.format("Voltage scale for %s coordinate", ArrayAccelParams.DIMENSIONNAME[i]));
 			c.gridx++;
-			calPanel.add(new JLabel(" V/g ", JLabel.LEFT), c);
+			calPanel.add(new JLabel(" V/g ", SwingConstants.LEFT), c);
 		}
 		c.gridx = 0;
 		c.gridwidth = 3;
@@ -103,23 +103,23 @@ public class ArrayAccelDialog extends PamDialog {
 		c.gridy++;
 		c.gridx = 0;
 		c.gridwidth = 3;
-		calPanel.add(new JLabel("Roll offset ", JLabel.RIGHT), c);
+		calPanel.add(new JLabel("Roll offset ", SwingConstants.RIGHT), c);
 		c.gridx += c.gridwidth;
 		c.gridwidth = 1;
 		calPanel.add(rollOffset = new JTextField(5), c);
 		rollOffset.setToolTipText("This value gets ADDED to the measured roll");
 		c.gridx++;
-		calPanel.add(new JLabel(" deg.", JLabel.LEFT), c);
+		calPanel.add(new JLabel(" deg.", SwingConstants.LEFT), c);
 		c.gridy++;
 		c.gridx = 0;
 		c.gridwidth = 3;
-		calPanel.add(new JLabel("Pitch offset ", JLabel.RIGHT), c);
+		calPanel.add(new JLabel("Pitch offset ", SwingConstants.RIGHT), c);
 		c.gridx += c.gridwidth;
 		c.gridwidth = 1;
 		calPanel.add(pitchOffset = new JTextField(5), c);
 		pitchOffset.setToolTipText("This value gets ADDED to the measured pitch");
 		c.gridx++;
-		calPanel.add(new JLabel(" deg.", JLabel.LEFT), c);
+		calPanel.add(new JLabel(" deg.", SwingConstants.LEFT), c);
 		
 		
 		
@@ -226,7 +226,7 @@ public class ArrayAccelDialog extends PamDialog {
 	 * Set the zero voltage for each channel. 
 	 */
 	public void findZero() {
-		if (getParams() == false) {
+		if (!getParams()) {
 			return;
 		}
 		// read the voltages from the three channels and set as

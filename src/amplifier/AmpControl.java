@@ -29,14 +29,17 @@ public class AmpControl extends PamControlledUnit implements PamSettings {
 		PamSettingManager.getInstance().registerSettings(this);
 	}
 
+	@Override
 	public Serializable getSettingsReference() {
 		return ampParameters;
 	}
 
+	@Override
 	public long getSettingsVersion() {
 		return AmpParameters.serialVersionUID;
 	}
 
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		ampParameters = ((AmpParameters) pamControlledUnitSettings.getSettings()).clone();
 		return true;
@@ -61,6 +64,7 @@ public class AmpControl extends PamControlledUnit implements PamSettings {
 			this.parentFrame = parentFrame;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 
 			AmpParameters newParams = AmpDialog.showDialog(parentFrame, ampParameters, ampControl);

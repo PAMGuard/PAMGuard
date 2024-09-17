@@ -20,7 +20,7 @@ public class DisplayProviderList {
 	static ArrayList<DisplayPanelProvider> displayPanelProviders = new ArrayList<DisplayPanelProvider>();
 	
 	public static void addDisplayPanelProvider(DisplayPanelProvider displayPanelProvider) {
-		if (displayPanelProviders.contains(displayPanelProvider) == false) {
+		if (!displayPanelProviders.contains(displayPanelProvider)) {
 			displayPanelProviders.add(displayPanelProvider);
 		}
 	}

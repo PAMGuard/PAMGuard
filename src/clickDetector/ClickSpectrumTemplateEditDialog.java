@@ -48,10 +48,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import clickDetector.offlineFuncs.OfflineEventDataUnit;
-import clickDetector.offlineFuncs.OfflineEventListPanel;
-
-
 import Layout.PamAxis;
 import Layout.PamAxisPanel;
 import PamUtils.PamFileChooser;
@@ -62,6 +58,8 @@ import PamView.dialog.PamDialog;
 import PamView.panel.PamBorder;
 import PamView.panel.PamPanel;
 import PamguardMVC.PamDataUnit;
+import clickDetector.offlineFuncs.OfflineEventDataUnit;
+import clickDetector.offlineFuncs.OfflineEventListPanel;
 
 /**
  * The edit template dialog allows users to create mean spectrums from marked out events. A created mean spectrum can be exported as .csv file and displayed on the Click Spectrum window. Templates contain data on species
@@ -371,7 +369,7 @@ public class ClickSpectrumTemplateEditDialog extends PamDialog{
 		
 		if (averageFFTLog==null || stdFFTLog==null) return;
 		
-		if (confidenceIntervalsb==false){
+		if (!confidenceIntervalsb){
 			this.logMaximum=0; 
 			return;
 		}
@@ -567,7 +565,7 @@ public class ClickSpectrumTemplateEditDialog extends PamDialog{
 		if (file!=null){
 			ClickTemplate clickTemplate=createTemplate();
 
-			if (file.endsWith(".csv")==false){
+			if (!file.endsWith(".csv")){
 				ClickTemplate.writeClickTemptoFile(clickTemplate, file+".csv");
 			}
 			else{
@@ -604,7 +602,7 @@ public class ClickSpectrumTemplateEditDialog extends PamDialog{
 		if (file!=null){
 		ClickTemplate clickTemplate=createTemplate();
 
-			if (file.endsWith(".csv")==false){
+			if (!file.endsWith(".csv")){
 				ClickTemplate.writeClickTemptoFile(clickTemplate,fftAllD, file+".csv");
 			}
 			else{
@@ -1334,7 +1332,7 @@ public class ClickSpectrumTemplateEditDialog extends PamDialog{
 				          RenderingHints.VALUE_RENDER_QUALITY);
 				
 				super.paintComponent(g2);
-				if (logScaleb==true) paintPLineSpectrum(g, averageFFTLog,stdFFTLog);
+				if (logScaleb) paintPLineSpectrum(g, averageFFTLog,stdFFTLog);
 				else paintPLineSpectrum(g, averageFFT,stdFFT);
 				//System.out.println("RepaintPlot: "+System.currentTimeMillis());
 			}
@@ -1375,7 +1373,7 @@ public class ClickSpectrumTemplateEditDialog extends PamDialog{
 				xScale = (double) r.width / (double) (specdata.length - 1);
 				yScale = r.height / (maxVal * 1.1);
 				
-				if (logScaleb==true){
+				if (logScaleb){
 					yScale = r.height / Math.abs(logMinimum-maxVal);
 				}
 
@@ -1394,7 +1392,7 @@ public class ClickSpectrumTemplateEditDialog extends PamDialog{
 					}
 					xScale = (double) r.width / (double) (specdata.length - 1);
 					yScale = r.height / (maxVal * 1.1);
-					if (logScaleb==true)yScale = r.height / Math.abs(logMinimum) ;
+					if (logScaleb)yScale = r.height / Math.abs(logMinimum) ;
 				}
 
 				GeneralPath polygon = ClickSpectrum.drawPolygon(specDataTemp,maxVal,xScale,yScale,logScaleb,r);

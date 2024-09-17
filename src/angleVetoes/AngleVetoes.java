@@ -44,22 +44,27 @@ public class AngleVetoes extends Object implements PamSettings {
 		PamSettingManager.getInstance().registerSettings(this);
 	}
 
+	@Override
 	public Serializable getSettingsReference() {
 		return angleVetoParameters;
 	}
 
+	@Override
 	public long getSettingsVersion() {
 		return AngleVetoParameters.serialVersionUID;
 	}
 
+	@Override
 	public String getUnitName() {
 		return pamControlledUnit.getUnitName();
 	}
 
+	@Override
 	public String getUnitType() {
 		return "Detector Vetoes";
 	}
 
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		angleVetoParameters = ((AngleVetoParameters) pamControlledUnitSettings.getSettings()).clone();
 		return (angleVetoParameters != null);
@@ -91,6 +96,7 @@ public class AngleVetoes extends Object implements PamSettings {
 			this.frame = frame;
 		}
 		
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			getNewSettings(frame);
 		}
@@ -132,6 +138,7 @@ public class AngleVetoes extends Object implements PamSettings {
 			this.frame = frame;
 		}
 		
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			displayAction(frame);
 		}
@@ -195,7 +202,7 @@ public class AngleVetoes extends Object implements PamSettings {
 		int count = angleVetoParameters.getVetoCount();
 		boolean pass = true;
 		for (int i = 0; i < count; i++) {
-			if (passVeto(i, angle) == false) {
+			if (!passVeto(i, angle)) {
 				pass = false;
 				break;
 			}

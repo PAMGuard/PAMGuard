@@ -27,16 +27,6 @@ import java.io.Serializable;
 
 import javax.swing.JMenuItem;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import dataPlots.data.TDDataProviderRegister;
-import dataPlotsFX.data.TDDataProviderRegisterFX;
-import dataPlotsFX.spectrogramPlotFX.FFTPlotProvider;
-import fftManager.layoutFX.FFTGuiFX;
-//import fftManager.layoutFX.FFTGuiFX;
-import fftManager.newSpectrogram.SpectrogramPlotProvider;
-import spectrogramNoiseReduction.SpectrogramNoiseProcess;
 import PamController.PamConfiguration;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitGUI;
@@ -49,6 +39,13 @@ import PamController.PamSettings;
 import PamView.PamControlledGUISwing;
 import PamView.WrapperControlledGUISwing;
 import PamguardMVC.PamRawDataBlock;
+import dataPlots.data.TDDataProviderRegister;
+import dataPlotsFX.data.TDDataProviderRegisterFX;
+import dataPlotsFX.spectrogramPlotFX.FFTPlotProvider;
+import fftManager.layoutFX.FFTGuiFX;
+//import fftManager.layoutFX.FFTGuiFX;
+import fftManager.newSpectrogram.SpectrogramPlotProvider;
+import spectrogramNoiseReduction.SpectrogramNoiseProcess;
 
 public class PamFFTControl extends PamControlledUnit implements PamSettings {
 
@@ -115,6 +112,7 @@ public class PamFFTControl extends PamControlledUnit implements PamSettings {
 			this.parentFrame = parentFrame;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			showParamsDialog(parentFrame);
 		}
@@ -140,6 +138,7 @@ public class PamFFTControl extends PamControlledUnit implements PamSettings {
 		return fftParameters;
 	}
 
+	@Override
 	public Serializable getSettingsReference() {
 		fftParameters.spectrogramNoiseSettings = spectrogramNoiseProcess.getNoiseSettings();
 		return fftParameters;
@@ -148,11 +147,13 @@ public class PamFFTControl extends PamControlledUnit implements PamSettings {
 	/**
 	 * @return An integer version number for the settings
 	 */
+	@Override
 	public long getSettingsVersion() {
 		return FFTParameters.serialVersionUID;
 	}
 
 
+	@Override
 	public boolean restoreSettings(
 			PamControlledUnitSettings pamControlledUnitSettings) {
 		FFTParameters newParameters = (FFTParameters) pamControlledUnitSettings
@@ -171,7 +172,7 @@ public class PamFFTControl extends PamControlledUnit implements PamSettings {
 		//System.out.println("FFTControl: notifyModelChanged : " +changeType);
 		super.notifyModelChanged(changeType);
 		switch (changeType) {
-		case PamController.INITIALIZATION_COMPLETE:
+		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			setupControlledUnit();
 			break;
 		}

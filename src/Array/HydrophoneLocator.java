@@ -3,14 +3,12 @@ package Array;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 
-import Array.streamerOrigin.StreamerDataIterator;
 import GPS.GpsData;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
 import PamUtils.LatLong;
-import PamguardMVC.PamDataBlock;
 import pamMaths.PamQuaternion;
 import pamMaths.PamVector;
 

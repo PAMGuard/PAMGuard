@@ -14,9 +14,9 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
-import fftManager.FFTDataBlock;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
+import fftManager.FFTDataBlock;
 
 public class UserBandDialog extends PamDialog {
 	
@@ -137,12 +137,12 @@ public class UserBandDialog extends PamDialog {
 			showErrorMessage(theMessage);
 			return false;
 		}
-		if (checkFreq(noiseMeasurementBand.f1) == false) {
+		if (!checkFreq(noiseMeasurementBand.f1)) {
 			String theMessage = "Error - lower frequency limit is too high.";
 			showErrorMessage(theMessage);
 			return false; 
 		}
-		if (checkFreq(noiseMeasurementBand.f2) == false) {
+		if (!checkFreq(noiseMeasurementBand.f2)) {
 			String theMessage = "Error - upper frequency limit is too high.";
 			showErrorMessage(theMessage);
 			return false; 

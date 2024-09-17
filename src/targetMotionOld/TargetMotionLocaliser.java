@@ -16,15 +16,6 @@ import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
-import pamScrollSystem.AbstractScrollManager;
-import pamScrollSystem.ViewerScrollerManager;
-import targetMotionModule.TargetMotionLocaliserProvider;
-import targetMotionOld.algorithms.LeastSquaresNew;
-import targetMotionOld.algorithms.Simplex2DNew;
-import targetMotionOld.algorithms.Simplex3DNew;
-import targetMotionOld.dialog.TargetMotionDialog;
-import targetMotionOld.tethys.TMALocalizationCreator;
-import tethys.localization.LocalizationCreator;
 import GPS.GPSDataBlock;
 import GPS.GpsDataUnit;
 import Localiser.LocalisationAlgorithm;
@@ -42,10 +33,16 @@ import PamDetection.LocContents;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
-import PamguardMVC.PamObserver;
 import PamguardMVC.PamObserverAdapter;
 import PamguardMVC.debug.Debug;
-import bearinglocaliser.BearingLocaliserParams;
+import pamScrollSystem.AbstractScrollManager;
+import pamScrollSystem.ViewerScrollerManager;
+import targetMotionOld.algorithms.LeastSquaresNew;
+import targetMotionOld.algorithms.Simplex2DNew;
+import targetMotionOld.algorithms.Simplex3DNew;
+import targetMotionOld.dialog.TargetMotionDialog;
+import targetMotionOld.tethys.TMALocalizationCreator;
+import tethys.localization.LocalizationCreator;
 
 /**
  * Reinstated Target motion add-in as used by the click detector. Hope one day still to replace this
@@ -56,7 +53,7 @@ import bearinglocaliser.BearingLocaliserParams;
  */
 public class TargetMotionLocaliser<T extends GroupDetection> extends AbstractLocaliser<T> implements LocalisationAlgorithm, LocalisationAlgorithmInfo  {
 
-	public enum Interractive {START, SAVE, BACK, CANCEL, SETNULL, KEEPOLD};
+	public enum Interractive {START, SAVE, BACK, CANCEL, SETNULL, KEEPOLD}
 	//	public enum WorkStatus {IDLE, LOADING, WAITING};
 
 	private TargetMotionDialog<T> targetMotionDialog;
@@ -459,7 +456,7 @@ public class TargetMotionLocaliser<T extends GroupDetection> extends AbstractLoc
 			String comment = null;
 			for (eventListIndex = 0; eventListIndex < eventList.length; eventListIndex++) {
 				anEvent = findEvent(eventList[eventListIndex]);
-				if (processEvent(anEvent, modelList) == false) {
+				if (!processEvent(anEvent, modelList)) {
 					return null;
 				}
 				if (supervised) {

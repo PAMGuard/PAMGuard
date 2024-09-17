@@ -24,7 +24,7 @@ public class WavFileFuncs extends AudioFileFuncs {
 			e.printStackTrace();
 		}
 
-		if (wavHead.checkSizes(aFile.length()) == false) {
+		if (!wavHead.checkSizes(aFile.length())) {
 			wavHead.repairSizes(aFile.length());
 			return writeNewSizes(wavHead, aFile);
 		}
@@ -106,7 +106,7 @@ public class WavFileFuncs extends AudioFileFuncs {
 
 	private static byte[] readChunkId(WindowsFile file) {
 
-		byte[] chunkId = new byte[4]; 
+		byte[] chunkId = new byte[4];
 		try {
 			for (int i = 0; i < 4; i++) {
 				chunkId[i] = file.readByte();

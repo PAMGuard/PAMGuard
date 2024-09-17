@@ -22,12 +22,11 @@ package KernelSmoothing;
 
 import PamUtils.PamUtils;
 import PamUtils.complex.ComplexArray;
-import PamguardMVC.ProcessAnnotation;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
-import fftManager.Complex;
+import PamguardMVC.ProcessAnnotation;
 import fftManager.FFTDataBlock;
 import fftManager.FFTDataUnit;
 

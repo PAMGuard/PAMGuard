@@ -56,7 +56,7 @@ public class WhistleJSONDataSource extends JSONObjectDataSource<WhistleJSONData>
 			objectData.contour[i] = objectData.sliceData[i].peakData[0][1];
 			objectData.contWidth[i] = objectData.sliceData[i].peakData[0][2]-objectData.sliceData[i].peakData[0][0] + 1;
 		}
-		objectData.meanWidth = Arrays.stream(objectData.contWidth).average().orElse(Double.NaN);;
+		objectData.meanWidth = Arrays.stream(objectData.contWidth).average().orElse(Double.NaN);
 	}
 
 	

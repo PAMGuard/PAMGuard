@@ -1,6 +1,5 @@
 package simulatedAcquisition;
 
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Window;
@@ -14,15 +13,16 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
-import simulatedAcquisition.movement.MovementModel;
-import simulatedAcquisition.sounds.SimSignal;
-import simulatedAcquisition.sounds.SimSignals;
 import PamModel.SMRUEnable;
 import PamUtils.LatLongDialogStrip;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
+import simulatedAcquisition.movement.MovementModel;
+import simulatedAcquisition.sounds.SimSignal;
+import simulatedAcquisition.sounds.SimSignals;
 
 public class SimObjectDialog extends PamDialog {
 
@@ -56,31 +56,31 @@ public class SimObjectDialog extends PamDialog {
 		p.setBorder(new TitledBorder("Object parameters"));
 		p.setLayout(new GridBagLayout());
 		GridBagConstraints c = new PamGridBagContraints();
-		addComponent(p, new JLabel("Name ", JLabel.RIGHT), c);
+		addComponent(p, new JLabel("Name ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		c.gridwidth = 5;
 		addComponent(p, name = new JTextField(10), c);
 		c.gridy++;
 		c.gridx = 0;
 		c.gridwidth = 1;
-		addComponent(p, new JLabel("Sound Type ", JLabel.RIGHT), c);
+		addComponent(p, new JLabel("Sound Type ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		c.gridwidth = 5;
 		addComponent(p, soundTypes = new JComboBox(), c);
 		c.gridx = 0;
 		c.gridy++;
 		c.gridwidth = 1;
-		addComponent(p, new JLabel("Source Level", JLabel.RIGHT), c);
+		addComponent(p, new JLabel("Source Level", SwingConstants.RIGHT), c);
 		c.gridx++;
 		addComponent(p, amplitude = new JTextField(5), c);
 		c.gridx++;
 		c.gridwidth = 2;
-		addComponent(p, new JLabel("<html>dB re.1&mu;Pa p-p</html>", JLabel.LEFT), c);
+		addComponent(p, new JLabel("<html>dB re.1&mu;Pa p-p</html>", SwingConstants.LEFT), c);
 		if (SMRUEnable.isEnable()) {
 			c.gridy++;
 			c.gridx= 0;
 			c.gridwidth = 1;
-			addComponent(p, new JLabel("Beam Pattern ", JLabel.RIGHT), c);
+			addComponent(p, new JLabel("Beam Pattern ", SwingConstants.RIGHT), c);
 			c.gridx++;
 			c.gridwidth = 3;
 			addComponent(p, pistonModel = new JCheckBox("Use Piston Model radius"), c);
@@ -88,17 +88,17 @@ public class SimObjectDialog extends PamDialog {
 			c.gridwidth = 1;
 			addComponent(p, pistonRadius = new JTextField(3), c);
 			c.gridx++;
-			addComponent(p, new JLabel(" cm", JLabel.LEFT), c);
+			addComponent(p, new JLabel(" cm", SwingConstants.LEFT), c);
 		}
 		
 		c.gridy++;
 		c.gridx= 0;
 		c.gridwidth = 1;
-		addComponent(p, new JLabel("Mean Interval ", JLabel.RIGHT), c);
+		addComponent(p, new JLabel("Mean Interval ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		addComponent(p, meanInterval = new JTextField(5), c);
 		c.gridx++;
-		addComponent(p, new JLabel(" s ", JLabel.LEFT), c);
+		addComponent(p, new JLabel(" s ", SwingConstants.LEFT), c);
 		c.gridx++;
 		c.gridwidth = 2;
 		c.anchor = GridBagConstraints.WEST;
@@ -107,7 +107,7 @@ public class SimObjectDialog extends PamDialog {
 		c.gridy++; 
 		c.gridx=0; 
 		c.gridwidth=1; 
-		addComponent(p, new JLabel("Echos", JLabel.RIGHT), c);
+		addComponent(p, new JLabel("Echos", SwingConstants.RIGHT), c);
 		c.gridx++;
 		addComponent(p, enableEchoes=new JCheckBox("Add Echoes"), c);
 		enableEchoes.addActionListener((action)->{
@@ -115,11 +115,11 @@ public class SimObjectDialog extends PamDialog {
 		});
 		enableEchoes.setToolTipText("Add some echoes to the simulated data");
 		c.gridx++; 
-		addComponent(p, new JLabel("Delay", JLabel.RIGHT), c); 
+		addComponent(p, new JLabel("Delay", SwingConstants.RIGHT), c); 
 		c.gridx++; 
 		addComponent(p, echoTextField = new JTextField(5), c); 
 		c.gridx++; 
-		addComponent(p, new JLabel("ms", JLabel.LEFT), c); 
+		addComponent(p, new JLabel("ms", SwingConstants.LEFT), c); 
 		c.gridx++; 
 		addComponent(p, seperateEchoes=new JCheckBox("Seperate"), c); 
 		seperateEchoes.setToolTipText("Click to have seperate detections which are echoes. "
@@ -136,13 +136,13 @@ public class SimObjectDialog extends PamDialog {
 		addComponent(p, longDialogStrip, c);
 		c.gridy++;
 		c.gridwidth = 1;
-		addComponent(p, new JLabel("Depth ", JLabel.RIGHT), c);
+		addComponent(p, new JLabel("Depth ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		addComponent(p, depth = new JTextField(3), c);
 		c.gridx++;
 		addComponent(p, new JLabel(" m  "), c);
 		c.gridx++;
-		addComponent(p, new JLabel(" Speed ", JLabel.RIGHT), c);
+		addComponent(p, new JLabel(" Speed ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		addComponent(p, spd = new JTextField(3), c);
 		c.gridx++;
@@ -150,13 +150,13 @@ public class SimObjectDialog extends PamDialog {
 		c.gridy++;
 		c.gridx = 0;
 		c.gridwidth = 1;
-		addComponent(p, new JLabel("Course ", JLabel.RIGHT), c);
+		addComponent(p, new JLabel("Course ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		addComponent(p, cog = new JTextField(3), c);
 		c.gridx++;
 		addComponent(p, new JLabel(" deg'  "), c);
 		c.gridx++;
-		addComponent(p, new JLabel(" Slant ", JLabel.RIGHT), c);
+		addComponent(p, new JLabel(" Slant ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		addComponent(p, slant = new JTextField(3), c);
 		c.gridx++;
@@ -165,7 +165,7 @@ public class SimObjectDialog extends PamDialog {
 			c.gridy++;
 			c.gridx = 0;
 			c.gridwidth = 1;
-			addComponent(p, new JLabel("Movement Model ", JLabel.RIGHT), c);
+			addComponent(p, new JLabel("Movement Model ", SwingConstants.RIGHT), c);
 			c.gridx++;
 			c.gridwidth = 2;
 			addComponent(p, movementModel = new JComboBox<String>(), c);
@@ -228,14 +228,14 @@ public class SimObjectDialog extends PamDialog {
 		echoTextField.setEnabled(enableEchoes.isSelected());
 		seperateEchoes.setEnabled(enableEchoes.isSelected());
 
-		latDialogStrip.setEnabled(adv == false);
-		longDialogStrip.setEnabled(adv == false);
-		depth.setEnabled(adv == false);
-		spd.setEnabled(adv == false);
-		cog.setEnabled(adv == false);
-		slant.setEnabled(adv == false);
+		latDialogStrip.setEnabled(!adv);
+		longDialogStrip.setEnabled(!adv);
+		depth.setEnabled(!adv);
+		spd.setEnabled(!adv);
+		cog.setEnabled(!adv);
+		slant.setEnabled(!adv);
 		if (advancedButton != null) {
-			advancedButton.setEnabled(adv == true);
+			advancedButton.setEnabled(adv);
 		}
 	}
 

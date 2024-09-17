@@ -4,7 +4,6 @@ import java.util.ListIterator;
 
 import PamUtils.complex.ComplexArray;
 import PamguardMVC.PamDataBlock;
-import fftManager.Complex;
 import fftManager.FFTDataBlock;
 import fftManager.FFTDataUnit;
 import fftManager.FastFFT;

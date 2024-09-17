@@ -2,7 +2,6 @@ package PamView;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Window;
@@ -78,6 +77,7 @@ public class PamSymbolSelector extends JPanel {
 		}
 
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			
 			PamSymbol newSymbol = PamSymbolDialog.show(guiFrame, currentSymbol);

@@ -8,8 +8,8 @@ import javax.swing.JProgressBar;
 import javax.swing.border.TitledBorder;
 
 import PamView.PamColors;
-import PamView.PamSidePanel;
 import PamView.PamColors.PamColor;
+import PamView.PamSidePanel;
 import PamView.dialog.PamLabel;
 import PamView.panel.PamPanel;
 

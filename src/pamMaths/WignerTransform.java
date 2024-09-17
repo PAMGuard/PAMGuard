@@ -2,11 +2,9 @@ package pamMaths;
 
 import java.util.Arrays;
 
-import com.sun.glass.ui.Pixels;
-
 import PamUtils.complex.ComplexArray;
-import signal.Hilbert;
 import fftManager.FastFFT;
+import signal.Hilbert;
 
 public class WignerTransform {
 

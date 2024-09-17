@@ -4,16 +4,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import dataMap.OfflineDataMap;
-import dataMap.OfflineDataMapPoint;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
-import binaryFileStorage.BinaryStore.BinaryDataMapMaker;
 import dataGram.Datagram;
 import dataGram.DatagramDataPoint;
 import dataGram.DatagramManager;
-import dataGram.DatagramPoint;
 import dataGram.DatagramProvider;
+import dataMap.OfflineDataMap;
 
 /**
  * A binary offline data map is a datamap for a single data stream (i.e. the output 

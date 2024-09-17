@@ -5,7 +5,6 @@ import java.io.Serializable;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
-import simulatedAcquisition.SimProcess;
 
 /**
  * Used by SoundCardSystem
@@ -16,12 +15,12 @@ import simulatedAcquisition.SimProcess;
 public class SoundCardParameters implements Serializable, Cloneable, ManagedParameters {
 
 	public static final long serialVersionUID = 1;
-	
+
 	public int deviceNumber;
-	
+
 	public String systemType;
-		
-	
+
+
 	/**
 	 * @param systemType
 	 */

@@ -14,14 +14,12 @@ import javax.swing.border.TitledBorder;
 
 import PamUtils.PamCalendar;
 import PamView.PamColors;
-import PamView.PamSidePanel;
 import PamView.PamColors.PamColor;
+import PamView.PamSidePanel;
 import PamView.dialog.PamLabel;
 import PamView.panel.PamBorderPanel;
 import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
-import PamguardMVC.PamObserver;
 import PamguardMVC.PamObserverAdapter;
 
 public class WhistleSidePanel extends PamObserverAdapter implements PamSidePanel {
@@ -113,25 +111,30 @@ public class WhistleSidePanel extends PamObserverAdapter implements PamSidePanel
 		}
 	}
 
+	@Override
 	public JComponent getPanel() {
 		return sidePanel;
 	}
 
+	@Override
 	public void rename(String newName) {
 		titledBorder.setTitle(newName);	
 		sidePanel.repaint();		
 	}
 	
 	class TimerEvent implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			sidePanel.fillData();	
 		}
 	}
 
+	@Override
 	public String getObserverName() {
 		return "Whistle side panel";
 	}
 
+	@Override
 	public long getRequiredDataHistory(PamObservable o, Object arg) {
 		return countTime * 60000;
 	}

@@ -37,7 +37,7 @@ public class LoadingDataDialog extends PamDialog {
 		super(parentFrame, "Loading viewer data", false);
 		streamProgress = new JProgressBar(SwingConstants.HORIZONTAL);
 		allProgress = new JProgressBar(SwingConstants.HORIZONTAL);
-		storeName = new JLabel("  -  ", JLabel.LEFT) {
+		storeName = new JLabel("  -  ", SwingConstants.LEFT) {
 			@Override
 			public Dimension getPreferredSize() {
 				// do this to set a minimum width for the control, will stretch out the
@@ -48,7 +48,7 @@ public class LoadingDataDialog extends PamDialog {
 			}
 			
 		};
-		streamName = new JLabel("  -  ", JLabel.LEFT);
+		streamName = new JLabel("  -  ", SwingConstants.LEFT);
 //		storeName.setEditable(false);
 //		streamName.setEditable(false);
 		JPanel p = new JPanel();
@@ -107,7 +107,7 @@ public class LoadingDataDialog extends PamDialog {
 		 * the main frame ends up being pushed back down a layer
 		 * and disappears behind another window. 
 		 */
-		if (visible == false) {
+		if (!visible) {
 			closeLater();
 		}
 		else {

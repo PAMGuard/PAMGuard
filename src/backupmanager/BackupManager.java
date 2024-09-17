@@ -16,6 +16,7 @@ import javax.swing.SwingWorker;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
+import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import backupmanager.BackupProgress.STATE;
@@ -195,7 +196,7 @@ public class BackupManager extends PamControlledUnit implements PamSettings {
 	@Override
 	public void notifyModelChanged(int changeType) {
 		super.notifyModelChanged(changeType);
-		if (changeType == PamController.INITIALIZATION_COMPLETE) {
+		if (changeType == PamControllerInterface.INITIALIZATION_COMPLETE) {
 
 		}
 	}
@@ -224,7 +225,7 @@ public class BackupManager extends PamControlledUnit implements PamSettings {
 	private void notifyObservers(BackupProgress backupProgress) {
 		for (BackupObserver obs : progressObservers) {
 			boolean ans = obs.update(backupProgress);
-			if (ans == false) {
+			if (!ans) {
 				continueBackup = false;
 			}
 		}

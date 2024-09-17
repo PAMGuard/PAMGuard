@@ -146,6 +146,7 @@ public class Consumer {
 
 	// Start pdu packaging timer
 	Timer t = new Timer(40000, new ActionListener() {
+		@Override
 		public void actionPerformed(ActionEvent evt) {
 			System.out.println("timer");
 			// if (newDataUnits.size() >1) {
@@ -204,6 +205,7 @@ public class Consumer {
 	}
 
 	class CaptureThread implements Runnable {
+		@Override
 		public void run() {
 			/*
 			 * Sit here reading data from the port. Every time a new NMEA string
@@ -327,6 +329,7 @@ public class Consumer {
 	}
 	
 	class DisplayThread implements Runnable {
+		@Override
 		public void run() {}}
 	
 }

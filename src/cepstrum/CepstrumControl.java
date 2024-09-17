@@ -9,7 +9,7 @@ import javax.swing.JMenuItem;
 
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
-import PamController.PamController;
+import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 
@@ -82,7 +82,7 @@ public class CepstrumControl extends PamControlledUnit implements PamSettings {
 	@Override
 	public void notifyModelChanged(int changeType) {
 		super.notifyModelChanged(changeType);
-		if (changeType == PamController.INITIALIZATION_COMPLETE) {
+		if (changeType == PamControllerInterface.INITIALIZATION_COMPLETE) {
 			cepstrumProcess.prepareProcess();
 		}
 	}

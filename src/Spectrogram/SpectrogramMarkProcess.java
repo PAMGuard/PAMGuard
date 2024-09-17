@@ -2,11 +2,11 @@ package Spectrogram;
 
 import java.awt.event.MouseEvent;
 
-import fftManager.FFTDataBlock;
-import fftManager.FFTDataUnit;
 import PamController.PamControlledUnit;
 import PamguardMVC.PamProcess;
 import dataPlotsFX.layout.TDGraphFX;
+import fftManager.FFTDataBlock;
+import fftManager.FFTDataUnit;
 
 /**
  * Standard process for any PamControlled unit observing marks made manually
@@ -82,6 +82,7 @@ abstract public class SpectrogramMarkProcess extends PamProcess implements Spect
 	*may be interleaved.
 	*
 	 */
+	@Override
 	public boolean spectrogramNotification(SpectrogramDisplay display, MouseEvent mouseEvent, int downUp, 
 			int channel, long startMilliseconds, long duration, double f1, double f2, TDGraphFX tdDisplay) {
 
@@ -119,6 +120,7 @@ abstract public class SpectrogramMarkProcess extends PamProcess implements Spect
 		return false;
 	}
 	
+	@Override
 	public String getMarkObserverName() {
 		return getProcessName();
 	}

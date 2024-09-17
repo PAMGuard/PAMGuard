@@ -1,22 +1,15 @@
 package hfDaqCard;
 
 import java.io.Serializable;
-import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import soundPlayback.PlaybackControl;
-import soundPlayback.PlaybackSystem;
 import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionDialog;
-import Acquisition.AcquisitionProcess;
-import Acquisition.DaqSystem;
 import Acquisition.AudioDataQueue;
+import Acquisition.DaqSystem;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamGUIManager;
@@ -24,8 +17,9 @@ import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamDetection.RawDataUnit;
 import PamUtils.PamUtils;
-import PamView.dialog.PamDialog;
 import PamguardMVC.PamConstants;
+import soundPlayback.PlaybackControl;
+import soundPlayback.PlaybackSystem;
 
 public class SmruDaqSystem extends DaqSystem implements PamSettings {
 
@@ -450,7 +444,7 @@ public class SmruDaqSystem extends DaqSystem implements PamSettings {
 
 			totalSamples += readSamples;
 
-		};
+		}
 		daqThreadRunning = false;
 		
 		for (int iBoard = 0; iBoard < nDaqCards; iBoard++) {
@@ -500,7 +494,7 @@ public class SmruDaqSystem extends DaqSystem implements PamSettings {
 
 	@Override
 	public void stopSystem(AcquisitionControl daqControl) {
-		if (keepRunning == false) {
+		if (!keepRunning) {
 			/*
 			 *  it was never running, so no need to do this. From the GUI this isn't ever a problem 
 			 *  but PAMDog can call stop a little over zealously, and there seems to be a problem

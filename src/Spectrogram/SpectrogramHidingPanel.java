@@ -2,12 +2,8 @@ package Spectrogram;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,31 +12,24 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import fftManager.FFTDataBlock;
 import Layout.PamAxis;
 import Layout.PamAxisPanel;
-import PamController.PamController;
-import PamController.soundMedium.GlobalMedium;
 import PamView.ColourArray;
 import PamView.ColourArray.ColourArrayType;
-import PamView.PamColors.PamColor;
-import PamView.dialog.PamDialog;
-import PamView.dialog.PamGridBagContraints;
 import PamView.ColourComboBox;
 import PamView.PamColors;
+import PamView.PamColors.PamColor;
 import PamView.hidingpanel.HidingDialog;
 import PamView.hidingpanel.HidingDialogChangeListener;
 import PamView.hidingpanel.HidingDialogComponent;
-import PamView.hidingpanel.HidingPanel;
 import PamView.panel.PamPanel;
 import PamView.sliders.PamRangeSlider;
+import fftManager.FFTDataBlock;
 
 
 
@@ -351,7 +340,7 @@ public class SpectrogramHidingPanel extends HidingDialogComponent {
 		FrequencyPanel(int min, int max) {
 			super();
 			setLayout(new BorderLayout());
-			add(pamRangeSlider=new PamRangeSlider(0,sliderRange,PamRangeSlider.VERTICAL), BorderLayout.CENTER);
+			add(pamRangeSlider=new PamRangeSlider(0,sliderRange,SwingConstants.VERTICAL), BorderLayout.CENTER);
 			pamRangeSlider.addChangeListener(new FrequencyRangeListener());
 			pamRangeSlider.setTrackDragging(true);
 			pamRangeSlider.setThumbSizes(15);

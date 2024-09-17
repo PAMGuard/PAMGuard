@@ -40,13 +40,13 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
-import serialComms.jserialcomm.PJSerialComm;
 import NMEA.NMEAParameters.NmeaSources;
 import PamView.dialog.PamCheckBox;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.PamLabel;
 import PamView.dialog.PamTextField;
+import serialComms.jserialcomm.PJSerialComm;
 
 public class NMEAParametersDialog extends PamDialog implements ActionListener {
 	
@@ -278,6 +278,7 @@ public class NMEAParametersDialog extends PamDialog implements ActionListener {
 		
 	}
 	
+	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		// TODO Auto-generated method stub
 		enableControls();

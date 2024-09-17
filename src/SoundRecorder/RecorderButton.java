@@ -43,7 +43,7 @@ public class RecorderButton extends PamButton {
 	@Override
 	public void setBackground(Color bg) {
 		setOpaque(true);
-		if (pressed == false) {
+		if (!pressed) {
 			super.setBackground(PamColors.getInstance().getColor(PamColor.BUTTONFACE));
 			super.setForeground(PamColors.getInstance().getColor(PamColor.AXIS));
 		}

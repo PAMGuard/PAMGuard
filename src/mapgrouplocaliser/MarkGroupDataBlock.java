@@ -1,6 +1,5 @@
 package mapgrouplocaliser;
 
-import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
 import PamguardMVC.superdet.SuperDetDataBlock;
 import annotationMark.MarkDataUnit;

@@ -42,7 +42,7 @@ public class CheckWavFileHeaders extends PamDialog {
 
 	private CheckFiles checkFilesWorker;
 
-	private ArrayList<File> allFiles = new ArrayList<File>();
+	private ArrayList<File> allFiles = new ArrayList<>();
 
 	private CheckWavFileHeaders(Window parentFrame) {
 		super(parentFrame, "Check File Headers", false);
@@ -89,8 +89,8 @@ public class CheckWavFileHeaders extends PamDialog {
 	}
 
 	private void enableControls() {
-		getOkButton().setEnabled(nFiles > 0 & running == false && ran == false);
-		getCancelButton().setEnabled(running == false);
+		getOkButton().setEnabled(nFiles > 0 & !running && !ran);
+		getCancelButton().setEnabled(!running);
 	}
 
 	private int countFiles(File folder) {
@@ -98,8 +98,8 @@ public class CheckWavFileHeaders extends PamDialog {
 		File[] files = folder.listFiles(new PamAudioFileFilter());
 		if (files == null) return 0;
 		File file;
-		for (int i = 0; i < files.length; i++) {
-			file = files[i];
+		for (File file2 : files) {
+			file = file2;
 			if (file.isDirectory() && subFolders) {
 				System.out.println(file.getAbsoluteFile());
 				nF += countFiles(file.getAbsoluteFile());
@@ -146,7 +146,7 @@ public class CheckWavFileHeaders extends PamDialog {
 	private void setProgressInfo(ProgressData progressData) {
 		progressBar.setValue(++doneFiles);
 		String msg = AudioFileFuncs.getMessage(progressData.headerError);
-		textArea.append(String.format("\n%s - %s", progressData.file.getName(), msg));	
+		textArea.append(String.format("\n%s - %s", progressData.file.getName(), msg));
 		boolean problem = progressData.headerError != AudioFileFuncs.FILE_OK;
 		if (problem) {
 			nErrors++;
@@ -164,7 +164,7 @@ public class CheckWavFileHeaders extends PamDialog {
 	 * @return true if there is an error
 	 */
 	private int checkFile(File aFile) {
-		if (aFile.exists() == false || aFile.isDirectory() == true) {
+		if (!aFile.exists() || aFile.isDirectory()) {
 			return AudioFileFuncs.FILE_DOESNTEXIST;
 		}
 		String fileName = aFile.getName();
@@ -179,7 +179,7 @@ public class CheckWavFileHeaders extends PamDialog {
 		}
 		else if (fileEnd.equalsIgnoreCase("aif")) {
 			return checkAifFile(aFile);
-		} 
+		}
 		return AudioFileFuncs.FILE_UNKNOWNTYPE;
 	}
 
@@ -198,13 +198,13 @@ public class CheckWavFileHeaders extends PamDialog {
 		protected Integer doInBackground() throws Exception {
 			/*
 			 *  need to loop over files again
-			 *  for each file, report on progress with it's name and 
+			 *  for each file, report on progress with it's name and
 			 *  whether or not it had an error
 			 */
 			int error;
 			File aFile;
-			for (int i = 0; i < allFiles.size(); i++) {
-				error = checkFile(aFile = allFiles.get(i));
+			for (File file : allFiles) {
+				error = checkFile(aFile = file);
 				publish(new ProgressData(aFile, error));
 			}
 			return null;
@@ -220,8 +220,8 @@ public class CheckWavFileHeaders extends PamDialog {
 
 		@Override
 		protected void process(List<ProgressData> progressData) {
-			for (int i = 0; i < progressData.size(); i++) {
-				setProgressInfo(progressData.get(i));
+			for (ProgressData element : progressData) {
+				setProgressInfo(element);
 			}
 		}
 

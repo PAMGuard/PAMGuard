@@ -1,8 +1,5 @@
 package detectiongrouplocaliser;
 
-import java.awt.MouseInfo;
-import java.awt.Point;
-import java.awt.PointerInfo;
 import java.awt.Window;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +7,7 @@ import java.util.ListIterator;
 
 import javax.swing.JPopupMenu;
 
-import PamController.PamController;
+import PamController.PamControllerInterface;
 import PamUtils.PamCalendar;
 import PamView.GeneralProjector.ParameterType;
 import PamView.paneloverlay.OverlayMarkSwingPanel;
@@ -88,7 +85,7 @@ public class DetectionGroupProcess extends PamProcess {
 	public void notifyModelChanged(int changeType) {
 		super.notifyModelChanged(changeType);
 		switch (changeType) {
-		case PamController.INITIALIZATION_COMPLETE:
+		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			subscribeMarkObserver();
 			annotationHandler.loadAnnotationChoices();
 			sortSQLLogging();
@@ -413,7 +410,7 @@ public class DetectionGroupProcess extends PamProcess {
 			}
 		}
 		for (PamDataUnit superData:groupSummary.getSuperDetections()) {
-			if (DetectionGroupDataUnit.class.isAssignableFrom(superData.getClass()) == false) {
+			if (!DetectionGroupDataUnit.class.isAssignableFrom(superData.getClass())) {
 				continue;
 			}
 			DetectionGroupDataUnit dgdu = (DetectionGroupDataUnit) superData;

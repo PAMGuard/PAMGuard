@@ -1,19 +1,10 @@
 package loggerForms;
 
-import java.awt.ComponentOrientation;
-import java.awt.GridLayout;
 import java.sql.Types;
 import java.util.Hashtable;
 
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
-import PamView.panel.PamPanel;
-import loggerForms.controlDescriptions.ControlTypes;
-import generalDatabase.EmptyTableDefinition;
 import generalDatabase.PamTableItem;
+import loggerForms.controlDescriptions.ControlTypes;
 
 /**
  * 

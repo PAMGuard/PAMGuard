@@ -12,7 +12,6 @@ import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -20,16 +19,15 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.border.TitledBorder;
 
+import PamView.dialog.PamDialog;
+import PamView.hidingpanel.HidingGridBagContraints;
+import PamView.panel.PamPanel;
 import dataPlots.data.TDDataInfo;
 import dataPlots.data.TDDataProvider;
 import dataPlots.data.TDDataProviderRegister;
 import dataPlots.data.TDInfoMonitor;
 import dataPlots.layout.TDGraph;
-import pamScrollSystem.PamScroller;
-import PamView.dialog.PamDialog;
-import PamView.hidingpanel.HidingDialogComponent;
-import PamView.hidingpanel.HidingGridBagContraints;
-import PamView.panel.PamPanel;
+import pamScrollSystem.AbstractPamScrollerAWT;
 
 public class HidingControlPanel extends PamPanel {
 
@@ -79,7 +77,7 @@ public class HidingControlPanel extends PamPanel {
 		c.gridy = 0;
 		graphPanel.add(new JLabel(" Configure graphs: "),c);
 		
-		vertical.setSelected(tdControl.getTdParameters().orientation == PamScroller.VERTICAL);
+		vertical.setSelected(tdControl.getTdParameters().orientation == AbstractPamScrollerAWT.VERTICAL);
 		checkGraphButtons();
 		
 	}
@@ -140,7 +138,7 @@ public class HidingControlPanel extends PamPanel {
 	private class Vertical implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			tdControl.getTdParameters().orientation = (vertical.isSelected() ? PamScroller.VERTICAL : PamScroller.HORIZONTAL);
+			tdControl.getTdParameters().orientation = (vertical.isSelected() ? AbstractPamScrollerAWT.VERTICAL : AbstractPamScrollerAWT.HORIZONTAL);
 			tdControl.layoutGraphs();
 		}
 	}

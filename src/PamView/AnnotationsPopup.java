@@ -11,8 +11,8 @@ import javax.swing.JPanel;
 
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
-import PamguardMVC.ProcessAnnotation;
 import PamguardMVC.PamDataBlock;
+import PamguardMVC.ProcessAnnotation;
 
 public class AnnotationsPopup extends PamDialog {
 

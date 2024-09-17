@@ -21,6 +21,7 @@
 package IshmaelDetector;
 
 import java.awt.Frame;
+
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;

@@ -6,7 +6,6 @@ import java.util.Set;
 
 import PamDetection.PamDetection;
 import PamguardMVC.AcousticDataUnit;
-import PamguardMVC.DataUnitBaseData;
 import PamguardMVC.PamDataUnit;
 
 public class RavenDataUnit extends PamDataUnit implements AcousticDataUnit, PamDetection {

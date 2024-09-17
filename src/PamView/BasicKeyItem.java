@@ -22,7 +22,7 @@ public class BasicKeyItem implements PamKeyItem {
 	}
 	
 	public void addIcon(Icon icon, String text) {
-		if (setupArrays(true) == false) return;
+		if (!setupArrays(true)) return;
 		icons.add(icon);
 		texts.add(text);
 	}
@@ -32,7 +32,7 @@ public class BasicKeyItem implements PamKeyItem {
 	}
 	
 	public void addIcon(Component component, String text) {
-		if (setupArrays(false) == false) return;
+		if (!setupArrays(false)) return;
 		components.add(component);
 		texts.add(text);
 	}
@@ -60,6 +60,7 @@ public class BasicKeyItem implements PamKeyItem {
 		return true;
 	}
 
+	@Override
 	public Component getIcon(int keyType, int nComponent) {
 		if (texts == null) return null;
 		if (nComponent >= 0 && nComponent < texts.size()) {
@@ -73,10 +74,12 @@ public class BasicKeyItem implements PamKeyItem {
 		return null;
 	}
 
+	@Override
 	public int getNumItems(int keyType) {
 		return texts.size();
 	}
 
+	@Override
 	public String getText(int keyType, int nComponent) {
 		if (nComponent >= 0 && nComponent < texts.size()) {
 			return texts.get(nComponent);

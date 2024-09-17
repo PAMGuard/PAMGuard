@@ -2,9 +2,8 @@ package beamformer;
 
 import java.util.ArrayList;
 
-import Array.ArrayManager;
-import Array.PamArray;
 import PamController.PamController;
+import PamController.PamControllerInterface;
 import PamUtils.PamUtils;
 import PamView.dialog.GroupedSourcePanel;
 import PamguardMVC.PamDataBlock;
@@ -12,7 +11,6 @@ import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
 import beamformer.algorithms.BeamAlgorithmProvider;
-import beamformer.algorithms.BeamFormerAlgorithm;
 import beamformer.continuous.BeamFormerDataBlock;
 import beamformer.continuous.BeamOGramDataBlock;
 import beamformer.plot.BeamOGramPlotProvider;
@@ -20,7 +18,6 @@ import dataPlotsFX.data.TDDataProviderRegisterFX;
 import dataPlotsFX.spectrogramPlotFX.FFTPlotProvider;
 import fftManager.FFTDataBlock;
 import fftManager.FFTDataUnit;
-import pamMaths.PamVector;
 import pamViewFX.fxNodes.utilityPanes.GroupedSourcePaneFX;
 
 /**
@@ -311,7 +308,7 @@ abstract public class BeamFormerBaseProcess extends PamProcess {
 	 */
 	@Override
 	public void notifyModelChanged(int changeType) {
-		if (changeType == PamController.INITIALIZATION_COMPLETE) {
+		if (changeType == PamControllerInterface.INITIALIZATION_COMPLETE) {
 			prepareProcess();
 		}
 		super.notifyModelChanged(changeType);

@@ -3,7 +3,6 @@ package detectiongrouplocaliser;
 import java.util.List;
 
 import PamguardMVC.PamDataUnit;
-import PamguardMVC.debug.Debug;
 import PamguardMVC.superdet.SuperDetection;
 
 public class DetectionGroupDataUnit extends SuperDetection<PamDataUnit> {

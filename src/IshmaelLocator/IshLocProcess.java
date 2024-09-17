@@ -11,25 +11,24 @@ import Array.PamArray;
 import Array.SnapshotGeometry;
 import IshmaelDetector.IshDetControl;
 import IshmaelDetector.IshDetection;
-import PamguardMVC.AcousticDataUnit;
-import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamDataUnit;
-import PamguardMVC.PamObservable;
-import PamguardMVC.PamRawDataBlock;
-import PamguardMVC.RawDataUnavailableException;
 import PamController.PamController;
 import PamDetection.PamDetection;
 import PamView.symbol.StandardSymbolManager;
+import PamguardMVC.PamDataBlock;
+import PamguardMVC.PamDataUnit;
+import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
+import PamguardMVC.PamRawDataBlock;
+import PamguardMVC.RawDataUnavailableException;
+import Spectrogram.SpectrogramDisplay;
+import Spectrogram.SpectrogramMarkObserver;
+import Spectrogram.SpectrogramMarkObservers;
+import dataPlotsFX.layout.TDGraphFX;
 import fftManager.Complex;
 import fftManager.FFTDataBlock;
 import pamMaths.PamVector;
 import warnings.PamWarning;
 import warnings.WarningSystem;
-import Spectrogram.*;
-import autecPhones.AutecGraphics;
-import dataPlotsFX.data.TDDataInfoFX;
-import dataPlotsFX.layout.TDGraphFX;
 
 /** Various location algorithms can fail to find a solution.  If so,
  * they just throw this Exception.
@@ -124,6 +123,7 @@ abstract public class IshLocProcess extends PamProcess implements SpectrogramMar
 		}
 	}
 	
+	@Override
 	public void setupProcess() {
 		super.setupProcess();
 		outputDataBlock.setNaturalLifetime(300);
@@ -180,6 +180,7 @@ abstract public class IshLocProcess extends PamProcess implements SpectrogramMar
 	 * @param durationMsec
 	 * @param f0,f1			frequency range of the selection
 	 */
+	@Override
 	public boolean spectrogramNotification(SpectrogramDisplay display, MouseEvent mouseEvent, int downUp, 
 			int channel, long startMsec, long durationMsec, double f0, double f1, TDGraphFX tdDisplay) 	{		
 		
@@ -424,6 +425,7 @@ abstract public class IshLocProcess extends PamProcess implements SpectrogramMar
 		outputDataBlock.addPamData(outputUnit);
 	}
 	
+	@Override
 	public String getMarkObserverName() {
 		return getProcessName();
 	}

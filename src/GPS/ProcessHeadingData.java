@@ -3,6 +3,7 @@ package GPS;
 import NMEA.NMEADataBlock;
 import NMEA.NMEADataUnit;
 import PamController.PamController;
+import PamController.PamControllerInterface;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
@@ -50,7 +51,7 @@ where:
 
 	@Override
 	public void newData(PamObservable o, PamDataUnit arg) {
-		if (gpsControl.gpsParameters.readHeading == false) {
+		if (!gpsControl.gpsParameters.readHeading) {
 			return;
 		}
 		NMEADataUnit nmeaData = (NMEADataUnit) arg;
@@ -121,7 +122,7 @@ where:
 	}
 
 	private void findDataSource() {
-		if (gpsControl.isGpsMaster() == false) {
+		if (!gpsControl.isGpsMaster()) {
 			return;
 		}
 		NMEADataBlock newSource = (NMEADataBlock) PamController.getInstance().
@@ -134,9 +135,9 @@ where:
 	@Override
 	public void notifyModelChanged(int changeType) {
 		switch (changeType) {
-		case PamController.ADD_CONTROLLEDUNIT:
-		case PamController.REMOVE_CONTROLLEDUNIT:
-		case PamController.INITIALIZATION_COMPLETE:
+		case PamControllerInterface.ADD_CONTROLLEDUNIT:
+		case PamControllerInterface.REMOVE_CONTROLLEDUNIT:
+		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			noteNewSettings();
 		}
 	}

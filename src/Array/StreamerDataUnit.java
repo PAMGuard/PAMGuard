@@ -2,9 +2,7 @@ package Array;
 
 import Array.sensors.ArrayParameterType;
 import Array.sensors.ArraySensorFieldType;
-import Array.streamerOrigin.HydrophoneOriginMethod;
 import Array.streamerOrigin.OriginSettings;
-import Array.streamerOrigin.StaticOriginMethod;
 import Array.streamerOrigin.StaticOriginSettings;
 import GPS.GpsData;
 import GPS.GpsDataUnit;

@@ -40,9 +40,6 @@
 
 package rocca;
 
-import PamView.ColourArray;
-import PamView.ColourArray.ColourArrayType;
-
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -60,6 +57,9 @@ import java.awt.image.ReplicateScaleFilter;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
+
+import PamView.ColourArray;
+import PamView.ColourArray.ColourArrayType;
 
 
 

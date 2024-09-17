@@ -1,7 +1,6 @@
 package dataPlotsFX;
 
 import PamController.PamController;
-import PamModel.SMRUEnable;
 import userDisplay.UserDisplayComponent;
 import userDisplay.UserDisplayControl;
 import userDisplay.UserDisplayProvider;

@@ -7,11 +7,9 @@ import AIS.AISDataUnit;
 import AIS.AISPositionReport;
 import GPS.GpsData;
 import GPS.GpsDataUnit;
-import Map.MapCommentOverlayGraphics;
 import PamController.PamController;
 import PamUtils.LatLong;
 import PamUtils.PamCalendar;
-import PamView.symbol.PamSymbolManager;
 import PamView.symbol.StandardSymbolManager;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
@@ -22,11 +20,11 @@ import PamguardMVC.SingletonDataBlock;
 public class AirgunProcess extends PamProcess {
 
 	AirgunControl airgunControl;
-	
+
 	PamDataBlock<GpsDataUnit> gpsDataBlock;
 	AISDataBlock aisDataBlock;
 	PamDataBlock<AirgunDataUnit> outputDataBlock;
-	
+
 	public AirgunProcess(AirgunControl airgunControl) {
 		super(airgunControl, null);
 		this.airgunControl = airgunControl;
@@ -53,10 +51,10 @@ public class AirgunProcess extends PamProcess {
 	public void newData(PamObservable o, PamDataUnit arg) {
 		useData(o, arg);
 	}
-	
+
 	/**
-	 * AIS data are generally updated rather than created new, so 
-	 * use newData and updateData in the same way, 
+	 * AIS data are generally updated rather than created new, so
+	 * use newData and updateData in the same way,
 	 * @param o PamObservable sent to updateData or newData
 	 * @param arg PamDataUnit sent to updateData or newData
 	 */
@@ -72,7 +70,7 @@ public class AirgunProcess extends PamProcess {
 			useAisData((PamDataBlock) o, (AISDataUnit) arg);
 		}
 	}
-	
+
 	private void useGpsData(PamDataBlock dataBlock, GpsDataUnit gpsDataUnit) {
 		if (gpsDataUnit == null) {
 			return;
@@ -80,7 +78,7 @@ public class AirgunProcess extends PamProcess {
 		GpsData gpsData = gpsDataUnit.getGpsData();
 		createAirgunData(gpsData);
 	}
-	
+
 	private void useAisData(PamDataBlock dataBlock, AISDataUnit aisDataUnit) {
 		if (aisDataUnit.mmsiNumber != airgunControl.airgunParameters.gunsMMSIVessel) return;
 //		if (aisDataUnit.isComplete() == false) {
@@ -104,29 +102,29 @@ public class AirgunProcess extends PamProcess {
 		gpsData.setTimeInMillis(aisDataUnit.getTimeMilliseconds());
 		createAirgunData(gpsData);
 	}
-	
-	
+
+
 	private void createAirgunData(GpsData gpsData) {
 //		PamDataUnit nU = outputDataBlock.getNewUnit(0,0,0);
 		AirgunDataUnit nU = new AirgunDataUnit(PamCalendar.getTimeInMillis(), gpsData);
 		outputDataBlock.addPamData(nU);
 	}
-	
+
 	@Override
 	public void noteNewSettings() {
 //		super.noteNewSettings();
 		findSourceData();
 	}
 	synchronized public void findSourceData(){
-				
+
 		PamDataBlock newDataBlock = null;
 		if (airgunControl.airgunParameters.gunsReferencePosition == AirgunParameters.GUNS_THIS_VESSEL) {
 			aisDataBlock = null;
 			// find and subscribe to the GPS data block
 			/*
 			 * 4/3/13 Change this to ensure it get's the correct GPS data block. In past it was picking up itself if the
-			 * airgun unit was before the GPS unit since the airgun data unit is a subclass of GPSDataUnit. Should now get 
-			 * the correct GPS data. 
+			 * airgun unit was before the GPS unit since the airgun data unit is a subclass of GPSDataUnit. Should now get
+			 * the correct GPS data.
 			 */
 //			newDataBlock = PamController.getInstance().getDataBlock(GpsDataUnit.class, 0);
 			ArrayList<PamDataBlock> gpsBlocks = PamController.getInstance().getDataBlocks(GpsDataUnit.class, false);
@@ -149,7 +147,7 @@ public class AirgunProcess extends PamProcess {
 				setParentDataBlock(aisDataBlock);
 			}
 			else {
-				
+
 				System.out.println("Unable to find AIS data block for airgun display");
 			}
 		}
@@ -158,10 +156,10 @@ public class AirgunProcess extends PamProcess {
 		}
 
 	}
-	
+
 	/**
-	 * Called when view times change so that the display can update it's 
-	 * location based on the new time. 
+	 * Called when view times change so that the display can update it's
+	 * location based on the new time.
 	 */
 	protected void newViewTime(){
 		if (airgunControl.airgunParameters.gunsReferencePosition == AirgunParameters.GUNS_THIS_VESSEL) {
@@ -195,18 +193,18 @@ public class AirgunProcess extends PamProcess {
 	@Override
 	public void pamStart() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void pamStop() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	/**
-	 * Implementation of PositionReference. Will try to return a ref position 
-	 * for a given time. 
+	 * Implementation of PositionReference. Will try to return a ref position
+	 * for a given time.
 	 * @param timeMillis
 	 * @return
 	 */
@@ -220,7 +218,7 @@ public class AirgunProcess extends PamProcess {
 		if (airgunControl.airgunParameters.gunsReferencePosition == AirgunParameters.GUNS_FIXEDPOSITION){
 			return getFixedPosition(timeMillis);
 		}
-		
+
 		return null;
 	}
 
@@ -237,9 +235,9 @@ public class AirgunProcess extends PamProcess {
 			return null;
 		}
 		GpsData gpsData = gpsDataUnit.getGpsData();
-		LatLong gunPos = gpsData.travelDistanceMeters(gpsData.getHeading() + 180, 
+		LatLong gunPos = gpsData.travelDistanceMeters(gpsData.getHeading() + 180,
 				airgunControl.airgunParameters.dimE);
-		gunPos = gunPos.travelDistanceMeters(gpsData.getHeading() + 90, 
+		gunPos = gunPos.travelDistanceMeters(gpsData.getHeading() + 90,
 				airgunControl.airgunParameters.dimF);
 		GpsData gunGPS = gpsData.clone();
 		gunGPS.setLatitude(gunPos.getLatitude());
@@ -247,7 +245,7 @@ public class AirgunProcess extends PamProcess {
 		return gunGPS;
 	}
 
-	private GpsData getAISBasedPosition(long timeMillis) {			
+	private GpsData getAISBasedPosition(long timeMillis) {
 		if (aisDataBlock == null) {
 			return null;
 		}
@@ -260,9 +258,9 @@ public class AirgunProcess extends PamProcess {
 			return null;
 		}
 		LatLong gunPos = aisPositionReport.latLong;
-		gunPos = gunPos.travelDistanceMeters(aisPositionReport.courseOverGround + 180, 
+		gunPos = gunPos.travelDistanceMeters(aisPositionReport.courseOverGround + 180,
 				airgunControl.airgunParameters.dimE);
-		gunPos = gunPos.travelDistanceMeters(aisPositionReport.courseOverGround + 90, 
+		gunPos = gunPos.travelDistanceMeters(aisPositionReport.courseOverGround + 90,
 				airgunControl.airgunParameters.dimF);
 		GpsData gunGPS = new GpsData(gunPos);
 		gunGPS.setCourseOverGround(aisPositionReport.courseOverGround);

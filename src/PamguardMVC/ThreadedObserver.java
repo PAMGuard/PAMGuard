@@ -10,7 +10,6 @@ import Acquisition.DaqSystem;
 import PamController.PamController;
 import PamModel.PamModel;
 import PamUtils.PamCalendar;
-import PamguardMVC.debug.Debug;
 
 /**
  * This is a decorator class for PamObservers which intercepts any
@@ -81,7 +80,7 @@ public class ThreadedObserver implements PamObserver {
 			AcquisitionControl daqCtrl = (AcquisitionControl) PamController.getInstance().findControlledUnit(AcquisitionControl.unitType);
 			if (daqCtrl != null) {
 				DaqSystem daqSystem = daqCtrl.findDaqSystem(null);
-				if (daqSystem != null && daqSystem.isRealTime() == false) {
+				if (daqSystem != null && !daqSystem.isRealTime()) {
 					defJitter = 2;
 				}
 			}
@@ -548,7 +547,7 @@ public class ThreadedObserver implements PamObserver {
 
 	public void dumpBufferStatus(String message, boolean sayEmpties) {
 		int n = toDoList.size();
-		if (sayEmpties == false && n == 0) {
+		if (!sayEmpties && n == 0) {
 			return;
 		}
 		String name = singleThreadObserver.getObserverName();

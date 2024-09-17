@@ -1,7 +1,6 @@
 package noiseOneBand;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Window;
@@ -13,6 +12,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import Filters.FilterDialogPanel;
@@ -21,7 +21,6 @@ import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.SourcePanel;
 import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamRawDataBlock;
 
 public class OneBandDialog extends PamDialog {
 
@@ -61,18 +60,18 @@ public class OneBandDialog extends PamDialog {
 		timePanel.setBorder(new TitledBorder("Measurement Time"));
 		timePanel.setLayout(new GridBagLayout());
 		GridBagConstraints c = new PamGridBagContraints();
-		timePanel.add(new JLabel("Measurement Interval ", JLabel.RIGHT), c);
+		timePanel.add(new JLabel("Measurement Interval ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		timePanel.add(measurementInterval = new JTextField(3), c);
 		c.gridx++;
-		timePanel.add(new JLabel(" s", JLabel.LEFT), c);
+		timePanel.add(new JLabel(" s", SwingConstants.LEFT), c);
 		c.gridx = 0;
 		c.gridy++;
-		timePanel.add(new JLabel("SEL Integration Time ", JLabel.RIGHT), c);
+		timePanel.add(new JLabel("SEL Integration Time ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		timePanel.add(integrationTime = new JTextField(3), c);
 		c.gridx++;
-		timePanel.add(new JLabel(" s", JLabel.LEFT), c);
+		timePanel.add(new JLabel(" s", SwingConstants.LEFT), c);
 		northPanel.add(timePanel);
 
 		JPanel pulsePanel = new JPanel();
@@ -85,18 +84,18 @@ public class OneBandDialog extends PamDialog {
 		c.gridwidth = 1;
 		c.gridx = 0;
 		c.gridy++;
-		pulsePanel.add(new JLabel("Det' Threshold ", JLabel.RIGHT), c);
+		pulsePanel.add(new JLabel("Det' Threshold ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		pulsePanel.add(singlePulseThreshold = new JTextField(3), c);
 		c.gridx++;
-		pulsePanel.add(new JLabel(" dB", JLabel.LEFT), c);
+		pulsePanel.add(new JLabel(" dB", SwingConstants.LEFT), c);
 		c.gridx = 0;
 		c.gridy++;
-		pulsePanel.add(new JLabel("Max Length ", JLabel.RIGHT), c);
+		pulsePanel.add(new JLabel("Max Length ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		pulsePanel.add(maxPulseLength = new JTextField(3), c);
 		c.gridx++;
-		pulsePanel.add(new JLabel(" S", JLabel.LEFT), c);
+		pulsePanel.add(new JLabel(" S", SwingConstants.LEFT), c);
 		
 		
 		northPanel.add(pulsePanel);
@@ -146,7 +145,7 @@ public class OneBandDialog extends PamDialog {
 		params.channelMap = sourcePanel.getChannelList();
 		filterDialogPanel.setSampleRate(dataBlock.getSampleRate());
 		
-		if (filterDialogPanel.getParams() == false) {
+		if (!filterDialogPanel.getParams()) {
 			return false;
 		}
 		params.setFilterParams(filterDialogPanel.getFilterParams());

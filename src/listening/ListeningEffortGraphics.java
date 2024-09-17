@@ -9,15 +9,12 @@ import PamUtils.Coordinate3d;
 import PamUtils.LatLong;
 import PamUtils.PamCalendar;
 import PamView.GeneralProjector;
-import PamView.ManagedSymbol;
-import PamView.ManagedSymbolInfo;
-import PamView.PamKeyItem;
-import PamView.PamSymbol;
-import PamView.PamOldSymbolManager;
-import PamView.PamSymbolType;
-import PamView.PanelOverlayDraw;
 import PamView.GeneralProjector.ParameterType;
 import PamView.GeneralProjector.ParameterUnits;
+import PamView.PamKeyItem;
+import PamView.PamSymbol;
+import PamView.PamSymbolType;
+import PamView.PanelOverlayDraw;
 import PamView.symbol.SymbolData;
 import PamguardMVC.PamDataUnit;
 
@@ -32,16 +29,19 @@ public class ListeningEffortGraphics extends PanelOverlayDraw {
 		this.listeningControl = listeningControl;
 //		PamOldSymbolManager.getInstance().addManagesSymbol(this);
 	}
+	@Override
 	public boolean canDraw(ParameterType[] parameterTypes, ParameterUnits[] parameterUnits) {
 		return (parameterTypes[0] == GeneralProjector.ParameterType.LATITUDE && 
 				parameterTypes[1] == GeneralProjector.ParameterType.LONGITUDE);
 	}
 
+	@Override
 	public PamKeyItem createKeyItem(GeneralProjector generalProjector,
 			int keyType) {
 		return getDefaultSymbol().makeKeyItem("Listening Effort");
 	}
 
+	@Override
 	public Rectangle drawDataUnit(Graphics g, PamDataUnit pamDataUnit,
 			GeneralProjector generalProjector) {
 		if (generalProjector.getParmeterType(0) == GeneralProjector.ParameterType.LATITUDE && 
@@ -70,6 +70,7 @@ public class ListeningEffortGraphics extends PanelOverlayDraw {
 		return r;
 	}
 	
+	@Override
 	public String getHoverText(GeneralProjector generalProjector,
 			PamDataUnit dataUnit, int iSide) {
 

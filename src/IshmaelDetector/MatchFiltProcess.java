@@ -8,10 +8,10 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 
 import Acquisition.FileInputSystem;
+import PamDetection.RawDataUnit;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
-import PamDetection.RawDataUnit;
 import fftManager.FFT;
 
 

@@ -73,6 +73,7 @@ public class IshmaelDataControl extends PamControlledUnit implements PamSettings
 	/*
 	 * Stuff for settings interface
 	 */
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		// interface bluffing
 		return true;
@@ -81,10 +82,12 @@ public class IshmaelDataControl extends PamControlledUnit implements PamSettings
 	 * public void setNmeaSource(int source){
 	 * acquireNmeaData.setNMEASource(source); }
 	 */
+	@Override
 	public Serializable getSettingsReference() {
 		// interface bluffing
 		return null;
 	}
+	@Override
 	public long getSettingsVersion() {
 		return NMEAParameters.serialVersionUID;
 	}

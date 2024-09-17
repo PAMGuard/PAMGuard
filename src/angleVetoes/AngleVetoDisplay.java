@@ -15,13 +15,13 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
 
-import pamMaths.HistogramDisplay;
-import pamMaths.HistogramGraphicsLayer;
-import pamMaths.PamHistogram;
 import Layout.PamAxis;
 import PamUtils.PamCalendar;
 import PamView.dialog.PamLabel;
 import PamView.panel.PamBorderPanel;
+import pamMaths.HistogramDisplay;
+import pamMaths.HistogramGraphicsLayer;
+import pamMaths.PamHistogram;
 
 /**
  * Dispaly for angle veto. Shows a histogram of angles
@@ -117,6 +117,7 @@ public class AngleVetoDisplay {
 	class GraphicsUnderlayer implements HistogramGraphicsLayer {
 
 		Color vetoColor = new Color(255, 215, 215);
+		@Override
 		public void paintLayer(Graphics g) {
 			Rectangle r = g.getClipBounds();
 			PamAxis southAxis = histogramDisplay.getSouthAxis();
@@ -146,6 +147,7 @@ public class AngleVetoDisplay {
 	class HalfLifeTimer implements ActionListener {
 		private boolean first = true;
 		private long lastTime = 0;
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			long now = PamCalendar.getTimeInMillis();
 			long delay = now - lastTime;

@@ -1,7 +1,6 @@
 package IshmaelDetector;
 
 import PamDetection.PamDetection;
-import PamguardMVC.AcousticDataUnit;
 import PamguardMVC.PamDataUnit;
 
 /**

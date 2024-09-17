@@ -23,16 +23,15 @@
 
 package clickDetector;
 
+import java.io.File;
+
+import javax.sound.sampled.Clip;
+
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
 import clickDetector.ClickClassifiers.ClickTypeCommonParams;
-import java.io.File;
-import java.net.URL;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
 
 /**
  *

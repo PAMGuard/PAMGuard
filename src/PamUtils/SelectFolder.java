@@ -22,8 +22,6 @@
 package PamUtils;
 
 import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -35,11 +33,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.border.TitledBorder;
 
 import PamController.PamFolders;
-import PamView.dialog.PamDialog;
-import PamView.dialog.PamGridBagContraints;
 
 /**
  * Makes a dialog panel for selecting a folder
@@ -118,11 +113,13 @@ public class SelectFolder {
 			setVisibleControls();
 		}
 		class BrowseButton implements ActionListener {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				browseDirectories();				
 			}
 		}
 		class SubFolders implements ActionListener {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				notifyChangeListeners();
 			}
@@ -197,17 +194,17 @@ public class SelectFolder {
 		String folder = folderName.getText();
 		File f = new File(folder);
 		if (checkPath) {
-			if (f.exists() == false) {
+			if (!f.exists()) {
 				if (JOptionPane.showConfirmDialog(folderPanel, "The directory " + folder + " does not exist " +
 						"do you want to create it ?", "Select Directory", JOptionPane.YES_NO_CANCEL_OPTION) == JOptionPane.YES_OPTION) {
-					if (f.mkdirs() == false) {
+					if (!f.mkdirs()) {
 						// print a warning message
 						JOptionPane.showMessageDialog(folderPanel, "The folder " + folder + " could not be created", 
 								"Error", JOptionPane.ERROR_MESSAGE);
 					}
 				}
 			}
-			if (f.exists() == false) return null;
+			if (!f.exists()) return null;
 			FileFunctions.setNonIndexingBit(f);
 		}
 		return folder;

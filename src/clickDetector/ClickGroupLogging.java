@@ -1,17 +1,16 @@
 package clickDetector;
 
-import pamMaths.PamVector;
-import generalDatabase.PamTableItem;
-import generalDatabase.SQLTypes;
 import Localiser.detectionGroupLocaliser.GroupDetection;
 import Localiser.detectionGroupLocaliser.GroupLocInfoLogging;
-import Localiser.detectionGroupLocaliser.GroupLocalisation;
 import Localiser.detectionGroupLocaliser.GroupLocResult;
-import PamDetection.AbstractLocalisation;
+import Localiser.detectionGroupLocaliser.GroupLocalisation;
 import PamDetection.LocContents;
 import PamUtils.LatLong;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import generalDatabase.PamTableItem;
+import generalDatabase.SQLTypes;
+import pamMaths.PamVector;
 
 public class ClickGroupLogging extends GroupLocInfoLogging {
 

@@ -1,12 +1,9 @@
 package Spectrogram;
 
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 
-import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import PamUtils.PamCalendar;
 import PamUtils.PamCoordinate;
 import PamUtils.PamUtils;
 import PamView.GeneralProjector.ParameterType;

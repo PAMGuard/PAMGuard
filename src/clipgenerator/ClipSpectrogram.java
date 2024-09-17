@@ -6,7 +6,6 @@ import java.util.Arrays;
 import PamUtils.complex.ComplexArray;
 import PamguardMVC.PamDataUnit;
 import Spectrogram.WindowFunction;
-import clickDetector.ClickDetection;
 import fftManager.FastFFT;
 
 /**

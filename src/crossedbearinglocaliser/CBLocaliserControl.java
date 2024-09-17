@@ -10,13 +10,10 @@ import javax.swing.JMenuItem;
 
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
-import PamController.PamController;
+import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
-import PamController.SettingsPane;
 import annotation.localise.targetmotion.TMAnnotationType;
-import beamformer.localiser.BFLocaliserParams;
-import beamformer.localiser.dialog.BFLocSettingsPane2;
 import crossedbearinglocaliser.offline.CBOfflineTask;
 import offlineProcessing.OLProcessDialog;
 import offlineProcessing.OfflineTaskGroup;
@@ -29,6 +26,7 @@ import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
  * @deprecated Replaced by new 3D group localiser. 
  *
  */
+@Deprecated
 public class CBLocaliserControl extends PamControlledUnit implements PamSettings {
 
 	public static final String unitType = "Crossed Bearing Localiser";
@@ -139,7 +137,7 @@ public class CBLocaliserControl extends PamControlledUnit implements PamSettings
 	@Override
 	public void notifyModelChanged(int changeType) {
 		super.notifyModelChanged(changeType);
-		if (changeType == PamController.INITIALIZATION_COMPLETE) {
+		if (changeType == PamControllerInterface.INITIALIZATION_COMPLETE) {
 			cbLocaliserProcess.prepareProcess();
 		}
 	}

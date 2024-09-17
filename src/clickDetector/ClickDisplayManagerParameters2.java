@@ -2,19 +2,16 @@ package clickDetector;
 
 import java.awt.Dimension;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 import Layout.PamInternalFrame;
-import clickDetector.IDI_Display.IDIHistogramImage;
-
 import PamController.PamController;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
-import PamModel.parametermanager.PrivatePamParameterData;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
+import PamModel.parametermanager.PrivatePamParameterData;
 
 public class ClickDisplayManagerParameters2 implements Cloneable, Serializable, ManagedParameters {
 
@@ -158,7 +155,7 @@ public class ClickDisplayManagerParameters2 implements Cloneable, Serializable, 
 	public ClickDisplayManagerParameters2 clone() {
 		try {
 			ClickDisplayManagerParameters2 np =  (ClickDisplayManagerParameters2) super.clone();
-			if (np.initialised == false) {
+			if (!np.initialised) {
 				setDefaults();
 			}
 			return np;

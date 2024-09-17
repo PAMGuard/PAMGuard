@@ -170,7 +170,7 @@ public class XMLUtils {
 	 * @return document
 	 */
 	public static Document createDocument(File xmlFile) {
-		if (xmlFile == null || xmlFile.exists() == false) {
+		if (xmlFile == null || !xmlFile.exists()) {
 			return null;
 		}
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();

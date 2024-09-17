@@ -1,6 +1,5 @@
 package clickDetector;
 
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
@@ -255,7 +254,7 @@ public class ConcatenatedSpectrogram extends ClickDisplay implements PamSettings
 		if (click == null) {
 			return;
 		}
-		if (needUpdate(click) == false) {
+		if (!needUpdate(click)) {
 			return;
 		}
 		SuperDetection event = click.getSuperDetection(0);
@@ -288,7 +287,7 @@ public class ConcatenatedSpectrogram extends ClickDisplay implements PamSettings
 		double[][] powerSpectra = new double[nClick][nFreq];
 		for (int i = 0; i < nClick; i++) {
 			PamDataUnit du = event.getSubDetection(i);
-			if (du instanceof ClickDetection == false) {
+			if (!(du instanceof ClickDetection)) {
 				continue;
 			}
 			ClickDetection aClick = (ClickDetection) du;

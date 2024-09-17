@@ -1,5 +1,7 @@
 # PAMGuard
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13378951.svg)](https://doi.org/10.5281/zenodo.13378951)
+
 ## Introduction
 PAMGuard is a bioacoustics analysis program designed for use in real time research contexts and for the processing of large datasets. PAMGuard provides users access to a suite of state-of-the-art automated analysis algorithms alongside displays for visualisation data and a comprehensive data management systems. 
 

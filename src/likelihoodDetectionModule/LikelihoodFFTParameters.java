@@ -5,10 +5,10 @@ import java.lang.reflect.Field;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
-import PamModel.parametermanager.PrivatePamParameterData;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
-import fftManager.FFTParameters;
+import PamModel.parametermanager.PrivatePamParameterData;
 import Spectrogram.WindowFunction;
+import fftManager.FFTParameters;
 
 /**
  * The LikelihoodFFTParameters class represents Likelihood Detector-specific FFT

@@ -48,6 +48,7 @@ public class VetoController extends PamControlledUnit implements PamSettings {
 			this.parentFrame = parentFrame;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			VetoParameters newParams = VetoParametersDialog.showDialog(parentFrame, vetoParameters, vetoProcess.getFftOutputData());
 			if (newParams != null) {
@@ -71,14 +72,17 @@ public class VetoController extends PamControlledUnit implements PamSettings {
 		}
 	}
 
+	@Override
 	public Serializable getSettingsReference() {
 		return vetoParameters;
 	}
 
+	@Override
 	public long getSettingsVersion() {
 		return VetoParameters.serialVersionUID;
 	}
 
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		vetoParameters = ((VetoParameters) pamControlledUnitSettings.getSettings()).clone();
 		return true;

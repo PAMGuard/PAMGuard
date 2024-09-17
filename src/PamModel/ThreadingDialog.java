@@ -13,6 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import PamView.dialog.PamDialog;
@@ -77,7 +78,7 @@ public class ThreadingDialog extends PamDialog {
 		gcPanel.add(enableGC = new JCheckBox("Run additional garbage collection"), c);
 		c.gridwidth = 1;
 		c.gridy++;
-		gcPanel.add(new JLabel("Interval ", JLabel.RIGHT), c);
+		gcPanel.add(new JLabel("Interval ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		gcPanel.add(gcInterval = new JTextField(5), c);
 		c.gridx++;

@@ -7,22 +7,15 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JToolBar;
 import javax.swing.Timer;
 
 import org.kordamp.ikonli.materialdesign2.MaterialDesignP;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignR;
 import org.kordamp.ikonli.swing.FontIcon;
 
-import warnings.PamWarning;
-import warnings.SingleLineWarningDisplay;
-import warnings.WarningDisplay;
-import warnings.WarningLabel;
-import warnings.WarningSystem;
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamUtils.PamCalendar;
@@ -30,6 +23,7 @@ import PamView.PamColors.PamColor;
 import PamView.component.PamSettingsIconButton;
 import PamView.dialog.PamLabel;
 import PamView.panel.PamPanel;
+import warnings.SingleLineWarningDisplay;
 
 public class TopToolBar extends PamToolBar implements ColorManaged {
 
@@ -105,6 +99,7 @@ public class TopToolBar extends PamToolBar implements ColorManaged {
 
 
 	Timer barTimer = new Timer(500, new ActionListener() {
+		@Override
 		public void actionPerformed(ActionEvent evt) {
 			tellTime();
 		}

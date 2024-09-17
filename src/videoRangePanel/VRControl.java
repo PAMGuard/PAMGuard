@@ -1,6 +1,5 @@
 package videoRangePanel;
 
-import java.util.List;
 import java.awt.Frame;
 import java.awt.Point;
 import java.io.File;
@@ -8,10 +7,21 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.ListIterator;
 
-import javax.swing.JFrame;
-
+import Map.GebcoMapFile;
+import Map.MapFileManager;
+import PamController.PamControlledUnit;
+import PamController.PamControlledUnitSettings;
+import PamController.PamController;
+import PamController.PamControllerInterface;
+import PamController.PamSettingManager;
+import PamController.PamSettings;
+import PamModel.SMRUEnable;
+import PamUtils.PamCalendar;
+import PamView.importData.ImportDataSystem;
+import dataPlotsFX.JamieDev;
 import pamScrollSystem.AbstractPamScrollerAWT;
 import pamScrollSystem.PamScroller;
 import videoRangePanel.externalSensors.AngleListener;
@@ -31,19 +41,6 @@ import videoRangePanel.vrmethods.calibration.AddCalibrationMethod;
 import videoRangePanel.vrmethods.horizonMethod.VRHorizonMethod;
 import videoRangePanel.vrmethods.landMarkMethod.VRLandMarkMethod;
 import videoRangePanel.vrmethods.shoreMethod.VRShoreMethod;
-import Map.GebcoMapFile;
-import Map.MapFileManager;
-import PamController.PamControlledUnit;
-import PamController.PamControlledUnitSettings;
-import PamController.PamController;
-import PamController.PamControllerInterface;
-import PamController.PamSettingManager;
-import PamController.PamSettings;
-import PamModel.PamModel;
-import PamModel.SMRUEnable;
-import PamUtils.PamCalendar;
-import PamView.importData.ImportDataSystem;
-import dataPlotsFX.JamieDev;
 
 /**
  * The videoRange module determines location information based on photographs of objects (photogrammetry). The ideal for determining the location of an animal is to know the heading, pitch, roll, focal length, GPS location and height of a camera along with the height of the tide.
@@ -445,7 +442,7 @@ public class VRControl extends PamControlledUnit implements PamSettings {
 		File newFile=null; 
 		boolean iterate=true;
 
-		while (iterate==true){
+		while (iterate){
 			if (forward) {
 				listFile=listIterator.next();
 				iterate=listIterator.hasNext();
@@ -553,14 +550,17 @@ public class VRControl extends PamControlledUnit implements PamSettings {
 		return false;
 	}
 
+	@Override
 	public Serializable getSettingsReference() {
 		return vrParameters;
 	}
 
+	@Override
 	public long getSettingsVersion() {
 		return VRParameters.serialVersionUID;
 	}
 
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {	
 		vrParameters = ((VRParameters) pamControlledUnitSettings.getSettings()).clone();
 		return true;

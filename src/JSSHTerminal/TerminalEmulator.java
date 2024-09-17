@@ -1,17 +1,16 @@
 package JSSHTerminal;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-
-import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * Screen buffer and escape sequence handling
@@ -642,7 +641,7 @@ class Screen {
     return height+scrollFill;
   }
 
-};
+}
 
 
 // ------------------------------------------------------------------------------------
@@ -1110,7 +1109,8 @@ public class TerminalEmulator {
   }
 
   private static final EscapeSequence NONE = new EscapeSequence() {
-    public void handle(TerminalEmulator t, String s, Matcher m) {
+    @Override
+	public void handle(TerminalEmulator t, String s, Matcher m) {
     }
   };
 
@@ -1145,7 +1145,8 @@ public class TerminalEmulator {
       if (esc != null) {
         for (String s : esc.value()) {
           ESCAPE_SEQUENCES.put(s, new EscapeSequence() {
-            public void handle(TerminalEmulator t, String s, Matcher m2) {
+            @Override
+			public void handle(TerminalEmulator t, String s, Matcher m2) {
               try {
                 m.invoke(t);
               } catch (IllegalAccessException e) {
@@ -1159,7 +1160,8 @@ public class TerminalEmulator {
       }
       if (m.getName().startsWith("csi_") && m.getName().length() == 5) {
         CSI_SEQUENCE.put(m.getName().charAt(4), new CsiSequence() {
-          void handle(TerminalEmulator t, int[] args) {
+          @Override
+		void handle(TerminalEmulator t, int[] args) {
             try {
               m.invoke(t, new Object[]{args});
             } catch (IllegalAccessException e) {
@@ -1192,7 +1194,8 @@ public class TerminalEmulator {
     REGEXP_ESCAPE_SEQUENCES.put(
         Pattern.compile("\u001B\\[\\??([0-9;]*)([@ABCDEFGHJKLMPSTXacdefghlmnqrstu`])"),
         new EscapeSequence() {
-          public void handle(TerminalEmulator t, String s2, Matcher m) {
+          @Override
+		public void handle(TerminalEmulator t, String s2, Matcher m) {
             String s = m.group(1);
             CsiSequence seq = CSI_SEQUENCE.get(m.group(2).charAt(0));
             if (seq != null) {
@@ -1217,7 +1220,8 @@ public class TerminalEmulator {
         // OSC
         Pattern.compile("\u001B\\]([0-9];[\\p{Alpha}\\p{Digit}\\p{Punct} ]*)\u0007"),
         new EscapeSequence() {
-          public void handle(TerminalEmulator t, String s2, Matcher m) {
+          @Override
+		public void handle(TerminalEmulator t, String s2, Matcher m) {
             try {
               String s = m.group(1);
               String[] tokens = s.split(";");

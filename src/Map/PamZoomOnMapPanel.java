@@ -63,6 +63,7 @@ public class PamZoomOnMapPanel implements PanZoomBehaviour {
 	}
 
 	Timer t = new Timer(50, new ActionListener() {
+		@Override
 		public void actionPerformed(ActionEvent evt) {
 			ll = mp.getMapCentreDegrees();
 			mp.setMapCentreCoords(new Coordinate3d((mp.getWidth() / 2.0)
@@ -77,6 +78,7 @@ public class PamZoomOnMapPanel implements PanZoomBehaviour {
 		}
 	});
 
+	@Override
 	public void handleMBReleased() {
 		t.stop();
 		mouseButtonDown = false;
@@ -86,56 +88,66 @@ public class PamZoomOnMapPanel implements PanZoomBehaviour {
 		rotationAdj = 0.0;
 	}
 
+	@Override
 	public void handleUp() {
 		latAdj = -1.0;
 		t.start();
 	}
 
+	@Override
 	public void handleDown() {
 		latAdj = 1.0;
 		t.start();
 	}
 
+	@Override
 	public void handleLeft() {
 
 		longAdj = -1.0;
 		t.start();
 	}
 
+	@Override
 	public void handleRight() {
 		longAdj = 1.0;
 		t.start();
 	}
 
+	@Override
 	public void handleUpRight() {
 		latAdj = -1.0;
 		longAdj = 1.0;
 		t.start();
 	}
 
+	@Override
 	public void handleUpLeft() {
 		latAdj = -1.0;
 		longAdj = -1.0;
 		t.start();
 	}
 
+	@Override
 	public void handleDownLeft() {
 		latAdj = 1.0;
 		longAdj = -1.0;
 		t.start();
 	}
 
+	@Override
 	public void handleDownRight() {
 		latAdj = 1.0;
 		longAdj = 1.0;
 		t.start();
 	}
 
+	@Override
 	public void handleZoomIn() {
 		zoomAdj = -1; // Math.pow((double)mp.getMapRangeMetres()/125.0,1.05);
 		t.start();
 	}
 
+	@Override
 	public void handleZoomOut() {
 		zoomAdj = 1; // Math.pow((double)mp.getMapRangeMetres()/125.0,1.05);
 						// //100;
@@ -147,16 +159,19 @@ public class PamZoomOnMapPanel implements PanZoomBehaviour {
 		t.start();
 	}
 
+	@Override
 	public void handleRotateClockwise() {
 		rotationAdj = 1;
 		t.start();
 	}
 
+	@Override
 	public void handleRotateAntiClockwise() {
 		rotationAdj = -1;
 		t.start();
 	}
 
+	@Override
 	public void handleNorthUp() {
 		if (mp != null) {
 			mp.rotateNorthUp(true);
@@ -164,6 +179,7 @@ public class PamZoomOnMapPanel implements PanZoomBehaviour {
 		}
 	}
 
+	@Override
 	public void handleHeadUp() {
 		if (mp != null) {
 			mp.rotateHeadingUp(true);
@@ -171,15 +187,18 @@ public class PamZoomOnMapPanel implements PanZoomBehaviour {
 		}
 	}
 
+	@Override
 	public void handleCentreOnShip() {
 		mp.setMapCentreDegrees(MasterReferencePoint.getLatLong());
 		mp.repaint();
 	}
 
+	@Override
 	public void handleMeasureWithMouse() {
 		mp.mapController.setMouseMoveAction(MapController.MOUSE_MEASURE);		
 	}
 
+	@Override
 	public void handlePanWithMouse() {
 		mp.mapController.setMouseMoveAction(MapController.MOUSE_PAN);			
 	}

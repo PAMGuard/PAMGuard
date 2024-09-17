@@ -112,6 +112,7 @@ public class ChannelAISData implements AISDataSet {
 	/* (non-Javadoc)
 	 * @see NMEA.AISDataSet#getNext()
 	 */
+	@Override
 	public String getNext() {
 		String str = aisStrings[next];
 		if (++next >= aisStrings.length) {
@@ -123,6 +124,7 @@ public class ChannelAISData implements AISDataSet {
 	/* (non-Javadoc)
 	 * @see NMEA.AISDataSet#reset()
 	 */
+	@Override
 	public void reset() {
 		next = 0;
 	}

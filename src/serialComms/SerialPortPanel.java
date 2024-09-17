@@ -2,9 +2,11 @@ package serialComms;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import com.fazecast.jSerialComm.SerialPort;
@@ -85,7 +87,7 @@ public class SerialPortPanel extends Object {
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.anchor = GridBagConstraints.EAST;
 //		c.insets = new Insets(2,5,2,5);
-		PamDialog.addComponent(panel, new JLabel("Port Id ", JLabel.RIGHT), c);
+		PamDialog.addComponent(panel, new JLabel("Port Id ", SwingConstants.RIGHT), c);
 		c.gridx = 1;
 		c.anchor = GridBagConstraints.WEST;
 		PamDialog.addComponent(panel, portList = new JComboBox<String>(), c);
@@ -94,7 +96,7 @@ public class SerialPortPanel extends Object {
 			c.gridy++;
 			c.gridx = 0;
 			c.anchor = GridBagConstraints.EAST;
-			PamDialog.addComponent(panel, new JLabel("Bits per second (BAUD) ", JLabel.RIGHT), c);
+			PamDialog.addComponent(panel, new JLabel("Bits per second (BAUD) ", SwingConstants.RIGHT), c);
 			c.gridx = 1;
 			c.anchor = GridBagConstraints.WEST;
 			PamDialog.addComponent(panel, baudList, c);
@@ -104,7 +106,7 @@ public class SerialPortPanel extends Object {
 			c.gridy++;
 			c.gridx = 0;
 			c.anchor = GridBagConstraints.EAST;
-			PamDialog.addComponent(panel, new JLabel("Data Bits ", JLabel.RIGHT), c);
+			PamDialog.addComponent(panel, new JLabel("Data Bits ", SwingConstants.RIGHT), c);
 			c.gridx = 1;
 			c.anchor = GridBagConstraints.WEST;
 			PamDialog.addComponent(panel, bitsList, c);
@@ -114,7 +116,7 @@ public class SerialPortPanel extends Object {
 			c.gridy++;
 			c.gridx = 0;
 			c.anchor = GridBagConstraints.EAST;
-			PamDialog.addComponent(panel, new JLabel("Parity ", JLabel.RIGHT), c);
+			PamDialog.addComponent(panel, new JLabel("Parity ", SwingConstants.RIGHT), c);
 			c.gridx = 1;
 			c.anchor = GridBagConstraints.WEST;
 			PamDialog.addComponent(panel, parityList, c);
@@ -124,7 +126,7 @@ public class SerialPortPanel extends Object {
 			c.gridy++;
 			c.gridx = 0;
 			c.anchor = GridBagConstraints.EAST;
-			PamDialog.addComponent(panel, new JLabel("Stop Bits ", JLabel.RIGHT), c);
+			PamDialog.addComponent(panel, new JLabel("Stop Bits ", SwingConstants.RIGHT), c);
 			c.gridx = 1;
 			c.anchor = GridBagConstraints.WEST;
 			PamDialog.addComponent(panel, stopBitsList, c);
@@ -134,7 +136,7 @@ public class SerialPortPanel extends Object {
 			c.gridy++;
 			c.gridx = 0;
 			c.anchor = GridBagConstraints.EAST;
-			PamDialog.addComponent(panel, new JLabel("Flow Control ", JLabel.RIGHT), c);
+			PamDialog.addComponent(panel, new JLabel("Flow Control ", SwingConstants.RIGHT), c);
 			c.gridx = 1;
 			c.anchor = GridBagConstraints.WEST;
 			PamDialog.addComponent(panel, flowControlList, c);

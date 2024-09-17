@@ -5,21 +5,18 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
-import java.util.ArrayList;
 
 import javax.swing.JMenuItem;
 
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
-import PamController.PamController;
+import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamView.GeneralProjector.ParameterType;
 import PamView.GeneralProjector.ParameterUnits;
 import PamView.paneloverlay.overlaymark.MarkRelationships;
 import PamView.paneloverlay.overlaymark.OverlayMarkObservers;
-import PamView.paneloverlay.overlaymark.OverlayMarkProviders;
-import PamView.paneloverlay.overlaymark.OverlayMarker;
 import annotation.handler.AnnotationChoiceHandler;
 import generalDatabase.DBControlUnit;
 import generalDatabase.SQLLogging;
@@ -59,7 +56,7 @@ public class MapGroupLocaliserControl extends PamControlledUnit implements PamSe
 	public void notifyModelChanged(int changeType) {
 		super.notifyModelChanged(changeType);
 		switch (changeType) {
-		case PamController.INITIALIZATION_COMPLETE:
+		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			subscribeMarkObserver();
 			annotationHandler.loadAnnotationChoices();
 			sortSQLLogging();

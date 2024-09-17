@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
+import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamguardMVC.PamDataBlock;
@@ -74,7 +75,8 @@ public class DetectionGroupDisplayFX extends DetectionGroupDisplay  implements U
 	}
 
 	@Override
-	public void closeNode() {};
+	public void closeNode() {}
+	
 
 	@Override
 	public DetectionPlotParams getDisplayParams() {		
@@ -125,15 +127,14 @@ public class DetectionGroupDisplayFX extends DetectionGroupDisplay  implements U
 
 
 	private void showSettingsPane(boolean b) {
-		this.detectionDisplay.getHidingPane(Side.RIGHT).showHidePane(b);;
-
+		this.detectionDisplay.getHidingPane(Side.RIGHT).showHidePane(b);
 	}
 
 	@Override
 	public void notifyModelChanged(int changeType) {
 
 		switch (changeType) {
-		case PamController.INITIALIZATION_COMPLETE:
+		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			PamDataBlock dataBlock = PamController.getInstance().getDataBlockByLongName(detectionPlotParams.dataSource); 
 			//set the correct parent data block if on exists
 			displayControl.getUserDisplayProcess().setParentDataBlock(dataBlock);	

@@ -16,7 +16,6 @@ import PamController.PamSettings;
 import group3dlocaliser.algorithm.LocaliserAlgorithm3D;
 import group3dlocaliser.algorithm.LocaliserAlgorithmParams;
 import group3dlocaliser.algorithm.crossedbearing.CrossedBearingGroupLocaliser;
-import group3dlocaliser.algorithm.gridsearch.TOADGridSearch;
 import group3dlocaliser.algorithm.hyperbolic.HyperbolicLocaliser;
 import group3dlocaliser.algorithm.toadmcmc.ToadMCMCLocaliser;
 import group3dlocaliser.algorithm.toadmimplex.ToadMimplexLocaliser;
@@ -92,7 +91,7 @@ public class Group3DLocaliserControl extends PamControlledUnit implements PamSet
 				showSettingsMenu(parentFrame);
 			}
 		});
-		if (isViewer() == false) {
+		if (!isViewer()) {
 			return menuItem;
 		}
 		// Otherwise make a more complex menu.

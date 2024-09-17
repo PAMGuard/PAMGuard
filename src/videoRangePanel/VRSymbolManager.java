@@ -3,7 +3,6 @@ package videoRangePanel;
 import PamView.ManagedSymbol;
 import PamView.ManagedSymbolInfo;
 import PamView.PamSymbol;
-import PamView.PamOldSymbolManager;
 
 public class VRSymbolManager implements ManagedSymbol {
 		
@@ -19,14 +18,17 @@ public class VRSymbolManager implements ManagedSymbol {
 			}
 		}
 
+		@Override
 		public PamSymbol getPamSymbol() {
 			return symbol;
 		}
 
+		@Override
 		public ManagedSymbolInfo getSymbolInfo() {
 			return symbolInfo;
 		}
 
+		@Override
 		public void setPamSymbol(PamSymbol pamSymbol) {
 			this.symbol = pamSymbol;
 		}

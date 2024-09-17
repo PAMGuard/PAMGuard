@@ -6,13 +6,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
 import java.util.ArrayList;
+
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamView.importData.ImportDataSystem;
-import PamView.paneloverlay.overlaymark.OverlayMarkObservers;
 import annotation.calcs.snr.SNRAnnotationType;
 import annotation.calcs.spl.SPLAnnotationType;
 import annotation.calcs.wav.WavAnnotation;
@@ -22,7 +23,6 @@ import annotation.string.StringAnnotationType;
 import annotationMark.MarkAnnotationDialog;
 import annotationMark.MarkDataUnit;
 import annotationMark.spectrogram.SpectrogramAnnotationModule;
-import annotationMark.spectrogram.SpectrogramAnnotationModule.DisplayObserver;
 import generalDatabase.lookupTables.LookupItem;
 import quickAnnotation.importAnnotation.QuickAnnotationImport;
 import quickAnnotation.importAnnotation.QuickAnnotationImportParams;
@@ -76,7 +76,7 @@ public class QuickAnnotationModule extends SpectrogramAnnotationModule implement
 	@Override
 	public long getSettingsVersion() {
 		// TODO Auto-generated method stub
-		return quickAnnotationParams.serialVersionUID;
+		return QuickAnnotationParameters.serialVersionUID;
 	}
 
 	@Override

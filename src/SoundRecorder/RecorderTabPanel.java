@@ -16,9 +16,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
-import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -37,8 +35,8 @@ import PamDetection.RawDataUnit;
 import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamView.ColorManaged;
-import PamView.PamTabPanel;
 import PamView.PamColors.PamColor;
+import PamView.PamTabPanel;
 import PamView.dialog.PamButton;
 import PamView.dialog.PamCheckBox;
 import PamView.dialog.PamDialog;
@@ -84,15 +82,18 @@ public class RecorderTabPanel implements PamTabPanel, RecorderView {
 		recorderPanel = new RecorderPanel();
 	}
 	
+	@Override
 	public JMenu createMenu(Frame parentFrame) {
 		return null;
 	}
 
+	@Override
 	public JComponent getPanel() {
 		return recorderPanel;
 		
 	}
 
+	@Override
 	public JToolBar getToolBar() {
 		return null;
 	}
@@ -100,6 +101,7 @@ public class RecorderTabPanel implements PamTabPanel, RecorderView {
 	/* (non-Javadoc)
 	 * @see SoundRecorder.RecorderView#newParams()
 	 */
+	@Override
 	public void newParams() {
 		enableBuffer.setSelected(recorderControl.recorderSettings.enableBuffer);
 		bufferContent.setMaximum(Math.max(1, recorderControl.recorderSettings.bufferLength));
@@ -107,6 +109,7 @@ public class RecorderTabPanel implements PamTabPanel, RecorderView {
 		bufferLength.setText(String.format(" %d s", recorderControl.recorderSettings.bufferLength));
 	}
 
+	@Override
 	public void enableRecording(boolean enable) {
 		buttonAuto.setEnabled(enable);
 		buttonStart.setEnabled(enable);
@@ -114,6 +117,7 @@ public class RecorderTabPanel implements PamTabPanel, RecorderView {
 	}
 
 	
+	@Override
 	public void enableRecordingControl(boolean enable) {
 		for (int i = 0; i < enableChannel.length; i++) {
 			if (enableChannel[i] != null) {
@@ -123,6 +127,7 @@ public class RecorderTabPanel implements PamTabPanel, RecorderView {
 		buttonSettings.setEnabled(enable);
 	}
 	
+	@Override
 	public void sayStatus(String status) {
 		recordStatus.setText(status);
 		long fileBytes = recorderControl.recorderStorage.getFileSizeBytes();
@@ -154,7 +159,7 @@ public class RecorderTabPanel implements PamTabPanel, RecorderView {
 		checkBuffer();
 	}
 	private void checkBuffer() {
-		if (recorderControl.recorderSettings.enableBuffer == false) {
+		if (!recorderControl.recorderSettings.enableBuffer) {
 			bufferContent.setValue(0);
 		}
 		else {
@@ -178,6 +183,7 @@ public class RecorderTabPanel implements PamTabPanel, RecorderView {
 	/* (non-Javadoc)
 	 * @see SoundRecorder.RecorderView#newData(PamguardMVC.PamDataBlock, PamguardMVC.PamDataUnit)
 	 */
+	@Override
 	public void newData(PamDataBlock dataBlock, PamDataUnit dataUnit) {
 
 		RawDataUnit rawDataUnit = (RawDataUnit) dataUnit;
@@ -189,6 +195,7 @@ public class RecorderTabPanel implements PamTabPanel, RecorderView {
 		levelsPanel.showLevel(PamUtils.getSingleChannel(rawDataUnit.getChannelBitmap()), logAmplitude);
 	}
 	
+	@Override
 	public void setButtonStates(int pressedButton) {
 			buttonOff.setSelected(pressedButton == BUTTON_OFF);
 			buttonAuto.setSelected(pressedButton == BUTTON_AUTO);
@@ -336,12 +343,14 @@ public class RecorderTabPanel implements PamTabPanel, RecorderView {
 			MainButtonListener(int buttonCommand) {
 				this.buttonCommand = buttonCommand;
 			}
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				recorderControl.buttonCommand(buttonCommand);
 			}
 		}
 		class SettingsButtonListener implements ActionListener {
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				recorderControl.recordSettingsDialog(recorderControl.getGuiFrame());
 			}
@@ -349,6 +358,7 @@ public class RecorderTabPanel implements PamTabPanel, RecorderView {
 		}
 		class BufferButtonListener implements ActionListener {
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				recorderControl.recorderSettings.enableBuffer = enableBuffer.isSelected();
 			}
@@ -428,6 +438,7 @@ public class RecorderTabPanel implements PamTabPanel, RecorderView {
 				public BarEnableListener(int barId) {
 					this.barId = barId;
 				}
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					recorderControl.recorderSettings.setChannelBitmap(barId, enableChannel[barId].isSelected());
 //					recorderControl.recorderSettings.channelBitmap = 
@@ -560,7 +571,7 @@ public class RecorderTabPanel implements PamTabPanel, RecorderView {
 		RecorderTriggerData rtd;
 		TriggerCheckBox cb;
 		JButton button;
-		for (RecorderTrigger rt:recorderControl.recorderTriggers) {
+		for (RecorderTrigger rt:RecorderControl.recorderTriggers) {
 
 			rtd = recorderControl.recorderSettings.findTriggerData(rt);
 

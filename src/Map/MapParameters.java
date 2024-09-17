@@ -22,13 +22,11 @@ package Map;
 
 import java.io.File;
 import java.io.Serializable;
-import java.lang.reflect.Field;
 
 import Array.Hydrophone;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
-import PamModel.parametermanager.PrivatePamParameterData;
 
 public class MapParameters implements Serializable, Cloneable, ManagedParameters {
 

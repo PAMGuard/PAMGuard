@@ -114,7 +114,7 @@ public class LinFit {
 	 * @return the fit intercept
 	 */
 	public double getA() {
-		if (doneErrors == false) doErrors();
+		if (!doneErrors) doErrors();
 		return a;
 	}
 
@@ -123,31 +123,31 @@ public class LinFit {
 	 * @return the fit gradient
 	 */
 	public double getB() {
-		if (doneErrors == false) doErrors();
+		if (!doneErrors) doErrors();
 		return b;
 	}
 
 
 	public double getChi2() {
-		if (doneErrors == false) doErrors();
+		if (!doneErrors) doErrors();
 		return chi2;
 	}
 
 
 	public double getQ() {
-		if (doneErrors == false) doErrors();
+		if (!doneErrors) doErrors();
 		return q;
 	}
 
 
 	public double getSiga() {
-		if (doneErrors == false) doErrors();
+		if (!doneErrors) doErrors();
 		return siga;
 	}
 
 
 	public double getSigb() {
-		if (doneErrors == false) doErrors();
+		if (!doneErrors) doErrors();
 		return sigb;
 	}
 
@@ -241,5 +241,5 @@ public class LinFit {
 		return -tmp+Math.log(2.5066282746310005*ser/x);
 	}
 	
-	double SQR(double f){return f*f;};
+	double SQR(double f){return f*f;}
 }

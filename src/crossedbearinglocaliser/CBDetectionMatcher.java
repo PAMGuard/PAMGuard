@@ -1,12 +1,10 @@
 package crossedbearinglocaliser;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import PamUtils.LatLong;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.superdet.SuperDetection;
 
@@ -169,7 +167,7 @@ public class CBDetectionMatcher {
 			 */
 			int nSub = getSubDetectionsCount();
 			for (int i = 0; i < nSub; i++) {
-				if (CBDetectionMatcher.this.canMatch(dataUnit, getSubDetection(i)) == false) {
+				if (!CBDetectionMatcher.this.canMatch(dataUnit, getSubDetection(i))) {
 					return false;
 				}
 					

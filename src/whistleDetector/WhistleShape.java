@@ -119,6 +119,7 @@ public class WhistleShape implements Comparable<WhistleShape> {
 	 * @return 1 if this whistle is the longer of the two
 	 * -1 otherwise. 
 	 */
+	@Override
 	public int compareTo(WhistleShape w) {
 		if (this.whistlePeaks.size() > w.whistlePeaks.size())
 			return 1;

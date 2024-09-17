@@ -9,7 +9,6 @@ import java.io.IOException;
 
 import PamguardMVC.DataUnitBaseData;
 import PamguardMVC.PamDataUnit;
-import PamguardMVC.RawDataTransforms;
 import binaryFileStorage.BinaryDataSource;
 import binaryFileStorage.BinaryHeader;
 import binaryFileStorage.BinaryObjectData;
@@ -150,7 +149,7 @@ public class CPODBinaryStore extends BinaryDataSource {
 		dos.writeInt(cd.getRawData().length);
 		for (int i=0; i<cd.getRawData().length; i++) {
 			dos.writeShort(cd.getRawData()[i]);
-		};
+		}
 
 	}
 
@@ -249,7 +248,7 @@ public class CPODBinaryStore extends BinaryDataSource {
 		short[] cpodRawData = new short[dis.readInt()];
 		for (int i=0; i<cpodRawData.length; i++) {
 			cpodRawData[i] =dis.readShort();
-		};	
+		}	
 		return cpodRawData;
 	}
 

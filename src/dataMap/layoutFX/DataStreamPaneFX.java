@@ -76,7 +76,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 	/**
 	 * Name associated with the data stream.
 	 */
-	private DataName dataName;
+	private DataMapInfo dataName;
 	
 	private int totalDatas, maxDatas;
 
@@ -146,7 +146,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 		hasDatagram = (dataBlock.getDatagramProvider() != null);
 		dataGraph = new DataGraphFX();
 		dataGraph.setupAxis();
-		dataName = new DataName();
+		dataName = new DataMapInfo();
 		dataName.setName(dataBlock.getDataName()); 
 		dataName.setLongName(dataBlock.getLongDataName()); 
 
@@ -205,7 +205,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 	/**
 	 * @return the dataName
 	 */
-	public DataName getDataName() {
+	public DataMapInfo getDataName() {
 		return dataName;
 	}
 	
@@ -512,7 +512,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 		public void setupAxis(){
 			sortScales();
 			//use log scale only if datagram is null. 
-			if (findDatagramScaleInfo()==null)datastreamAxis.setLogScale(dataMapControl.dataMapParameters.vLogScale);
+			if (findDatagramScaleInfo()==null)datastreamAxis.setLogScale(scrollingDataPanel.getDataMapParams().vLogScale);
 			datastreamAxis.setRange(getYScaleMin(), getYScaleMax());
 			datastreamAxis.setLabel(getScaleUnits());
 			paintAxis();
@@ -855,8 +855,8 @@ public class DataStreamPaneFX extends PamBorderPane {
 		 */
 		public double getYCoord(double count, long itemDuration) {
 			double plotHeight = getHeight();
-			boolean logScale = dataMapControl.dataMapParameters.vLogScale;
-			int scaleType = dataMapControl.dataMapParameters.vScaleChoice;
+			boolean logScale = scrollingDataPanel.getDataMapParams().vLogScale;
+			int scaleType = scrollingDataPanel.getDataMapParams().vScaleChoice;
 			double value = OfflineDataMap.scaleData(count, itemDuration, scaleType);
 			if (logScale) {
 				if (value <= 0) {
@@ -966,7 +966,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 
 
 			yScaleMin = 0;
-			yScaleMax = highestMap.getHighestPoint(dataMapControl.dataMapParameters.vScaleChoice);
+			yScaleMax = highestMap.getHighestPoint(scrollingDataPanel.getDataMapParams().vScaleChoice);
 			if (dataMapControl.dataMapParameters.vLogScale) {
 				yScaleMin = highestMap.getLowestNonZeroPoint(dataMapControl.dataMapParameters.vScaleChoice);
 				//			if (yScaleMin > 0) {
@@ -1096,34 +1096,6 @@ public class DataStreamPaneFX extends PamBorderPane {
 		return (long) (xPos / pixelsPerMilli) + scrollingDataPanel.getScreenStartMillis();
 	}
 	
-	public class DataName {
-
-		private String name;
-		
-		private String longDataName;
-
-		public String getName() {
-			return name;
-		}
-		
-		public String getLongtName() {
-			return longDataName;
-		}
-
-		public void setLongName(String longDataName) {
-			this.longDataName=longDataName; 
-		}
-
-		public void setName(String dataName) {
-			this.name=dataName;
-		}
-		
-		@Override
-		public String toString() {
-			return name; 
-		}
-		
-	}
 	
 	/**
 	 * @return the yScaleMin

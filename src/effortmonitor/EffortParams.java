@@ -30,7 +30,7 @@ public class EffortParams implements Cloneable, Serializable, ManagedParameters 
 	 * @return The most recently selected observer
 	 */
 	public String getObserver() {
-		if (isSet == false) {
+		if (!isSet) {
 			return null;
 		}
 		if (recentObservers.size() > 0) {
@@ -44,7 +44,7 @@ public class EffortParams implements Cloneable, Serializable, ManagedParameters 
 	 * @return The most recently selected observer
 	 */
 	public String getObjective() {
-		if (isSet == false) {
+		if (!isSet) {
 			return null;
 		}
 		if (recentObjectives.size() > 0) {

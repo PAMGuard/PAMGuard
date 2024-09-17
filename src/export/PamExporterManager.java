@@ -5,10 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import PamUtils.PamCalendar;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
-import export.CSVExport.CSVExportManager;
 import export.MLExport.MLDetectionsManager;
 import export.RExport.RExportManager;
 import export.wavExport.WavDetExportManager;
@@ -126,7 +124,7 @@ public class PamExporterManager {
 	private boolean isNeedsNewFile(File currentFile2, PamDataUnitExporter pamDataUnitExporter) {
 		if( getFileSizeMegaBytes(currentFile2) >= exportParams.maximumFileSize) {
 			return true;
-		};
+		}
 		return pamDataUnitExporter.isNeedsNewFile();
 	}
 

@@ -13,10 +13,6 @@ import java.util.List;
 import javax.swing.JMenuItem;
 import javax.swing.SwingWorker;
 
-import dataGram.DatagramManager;
-import dataMap.OfflineDataMap;
-import dataMap.OfflineDataMapPoint;
-import pamScrollSystem.ViewLoadObserver;
 import PamController.AWTScheduler;
 import PamController.OfflineDataStore;
 import PamController.PamControlledUnit;
@@ -26,10 +22,12 @@ import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamUtils.FileList;
-import PamUtils.PamCalendar;
 import PamguardMVC.PamDataBlock;
-import PamguardMVC.RequestCancellationObject;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
+import dataGram.DatagramManager;
+import dataMap.OfflineDataMap;
+import dataMap.OfflineDataMapPoint;
+import pamScrollSystem.ViewLoadObserver;
 
 public abstract class OfflineFileControl extends PamControlledUnit implements OfflineDataStore {
 

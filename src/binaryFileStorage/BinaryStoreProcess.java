@@ -56,7 +56,7 @@ public class BinaryStoreProcess extends PamProcess {
 	}
 
 	public void checkFileTimer() {
-		boolean needTimer = PamCalendar.isSoundFile() == false;
+		boolean needTimer = !PamCalendar.isSoundFile();
 		if (needTimer) {
 			startTimer();
 		}

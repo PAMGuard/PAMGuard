@@ -11,17 +11,18 @@ import java.util.List;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
-import annotation.AnnotationDialogPanel;
-import annotation.DataAnnotationType;
-import annotation.handler.AnnotationHandler;
 import PamUtils.FrequencyFormat;
 import PamUtils.PamCalendar;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.PamTextDisplay;
 import PamguardMVC.PamDataBlock;
+import annotation.AnnotationDialogPanel;
+import annotation.DataAnnotationType;
+import annotation.handler.AnnotationHandler;
 
 
 public class MarkAnnotationDialog extends PamDialog {
@@ -44,22 +45,22 @@ public class MarkAnnotationDialog extends PamDialog {
 		acousticPanel.setBorder(new TitledBorder("Info"));
 		GridBagConstraints c = new PamGridBagContraints();
 		
-		acousticPanel.add(new JLabel("Start ", JLabel.RIGHT), c);
+		acousticPanel.add(new JLabel("Start ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		c.gridwidth = 2;
 		acousticPanel.add(startTime = new PamTextDisplay(20), c);
 		c.gridx = 0;
 		c.gridy++;
 		c.gridwidth = 1;
-		acousticPanel.add(new JLabel("Duration ", JLabel.RIGHT), c);
+		acousticPanel.add(new JLabel("Duration ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		acousticPanel.add(duration = new PamTextDisplay(6), c);
 		c.gridx++;
-		acousticPanel.add(new JLabel(" s", JLabel.LEFT), c);
+		acousticPanel.add(new JLabel(" s", SwingConstants.LEFT), c);
 		c.gridx = 0;
 		c.gridy++;
 		c.gridwidth = 1;
-		acousticPanel.add(new JLabel("Frequency ", JLabel.RIGHT), c);
+		acousticPanel.add(new JLabel("Frequency ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		c.gridwidth = 2;
 		acousticPanel.add(fRange = new PamTextDisplay(20), c);

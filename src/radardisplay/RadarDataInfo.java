@@ -25,6 +25,7 @@
 package radardisplay;
 
 import java.io.Serializable;
+
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamView.paneloverlay.OverlayDataInfo;

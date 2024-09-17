@@ -2,18 +2,17 @@ package simulatedAcquisition;
 
 import java.sql.Types;
 
-import pamMaths.PamVector;
-import simulatedAcquisition.sounds.SimSound;
 import Array.ArrayManager;
 import GPS.GpsData;
 import PamUtils.LatLong;
 import PamUtils.PamUtils;
-import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import generalDatabase.PamTableDefinition;
 import generalDatabase.PamTableItem;
 import generalDatabase.SQLLogging;
 import generalDatabase.SQLTypes;
+import pamMaths.PamVector;
+import simulatedAcquisition.sounds.SimSound;
 
 public class SimSoundsLogging extends SQLLogging {
 

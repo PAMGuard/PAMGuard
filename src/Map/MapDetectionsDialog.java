@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -17,7 +16,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
-import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
 import org.kordamp.ikonli.swing.FontIcon;
 
 import PamController.PamController;
@@ -207,6 +205,7 @@ public class MapDetectionsDialog extends PamDialog {
 			iOverlay = overlay;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			enableRow(iOverlay);
 		}
@@ -216,15 +215,15 @@ public class MapDetectionsDialog extends PamDialog {
 		boolean e = plotCheckBox[iOverlay].isSelected();
 		boolean e2 = allAvailable[iOverlay].isSelected();
 		boolean viewer = PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW;
-		showTimes[iOverlay].setEnabled(e && e2 == false);
-		defaults[iOverlay].setEnabled(e && e2 == false);
+		showTimes[iOverlay].setEnabled(e && !e2);
+		defaults[iOverlay].setEnabled(e && !e2);
 		allAvailable[iOverlay].setEnabled(e);
 		PamDataBlock pdb = 	mapDetectionsParameters.mapDetectionDatas.get(iOverlay).dataBlock;
 		boolean e3 = e & pdb.getDataSelectCreator() != null;
 		options[iOverlay].setEnabled(e3);
 		options[iOverlay].setVisible(pdb.getDataSelectCreator() != null);
-		fades[iOverlay].setEnabled(e == true && e2 == false);
-		if (fades[iOverlay].isEnabled() == false) {
+		fades[iOverlay].setEnabled(e && !e2);
+		if (!fades[iOverlay].isEnabled()) {
 			fades[iOverlay].setSelected(false);
 		}
 	}
@@ -237,6 +236,7 @@ public class MapDetectionsDialog extends PamDialog {
 			iOverlay = overlay;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			
 			showTimes[iOverlay].setText(String.format("%d", mapDetectionsManager.getDefaultTime()));
@@ -253,6 +253,7 @@ public class MapDetectionsDialog extends PamDialog {
 			iOverlay = overlay;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 
 			enableRow(iOverlay);

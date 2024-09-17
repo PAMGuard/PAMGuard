@@ -2,7 +2,6 @@ package analogarraysensor;
 
 import Array.sensors.ArraySensorFieldType;
 import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamProcess;
 
 public class AnalogArraySensorDataBlock extends PamDataBlock<AnalogArraySensorDataUnit> implements Array.sensors.ArraySensorDataBlock{
 

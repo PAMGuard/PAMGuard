@@ -1,7 +1,5 @@
 package ishmaelComms;
 
-import ishmaelComms.IshmaelData.IshmaelDataType;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -20,12 +18,11 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-
 import PamUtils.PamCalendar;
 import PamView.symbol.StandardSymbolManager;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
-import autecPhones.AutecGraphics;
+import ishmaelComms.IshmaelData.IshmaelDataType;
 
 public class ProcessIshmaelData extends PamProcess implements ActionListener {
 
@@ -75,6 +72,7 @@ public class ProcessIshmaelData extends PamProcess implements ActionListener {
 	}
 
 
+	@Override
 	public void actionPerformed(ActionEvent e) {
 
 		while(newIshmaelData.size() > 0) {
@@ -153,6 +151,7 @@ public class ProcessIshmaelData extends PamProcess implements ActionListener {
 			// super("PAMGUARD TCP CLIENT");
 		} // constructor
 
+		@Override
 		public void run() {
 
 			try {
@@ -405,6 +404,7 @@ public class ProcessIshmaelData extends PamProcess implements ActionListener {
 		//===================================================
 		void displayMessage(final String incoming) {
 			SwingUtilities.invokeLater(new Runnable() {
+				@Override
 				public void run() {
 					displayArea.append(incoming);
 				}

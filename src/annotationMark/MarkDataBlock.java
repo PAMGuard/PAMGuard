@@ -1,8 +1,5 @@
 package annotationMark;
 
-import pamScrollSystem.ViewLoadObserver;
-import annotation.DataAnnotationType;
-import annotation.calcs.snr.SNRAnnotationType;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
 

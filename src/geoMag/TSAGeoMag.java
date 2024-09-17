@@ -54,13 +54,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StreamTokenizer;
-import java.net.URISyntaxException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import PamController.PamController;
-import PamController.PamSettingManager;
-import PamModel.PamModel;
 
 //import org.apache.log4j.Logger;
 
@@ -537,7 +534,7 @@ public class TSAGeoMag
 //            InputStream input = getClass().getResourceAsStream("WMM.COF");
             String thePath = PamController.getInstance().getInstallFolder();
             File wmFile = new File(thePath + "WMM.COF");
-            if (wmFile.exists() == false) {
+            if (!wmFile.exists()) {
                 if(input == null) throw new FileNotFoundException("WMM.COF not found");
             }
             InputStream input = new FileInputStream(wmFile); // changed from above getResourceAsStrem fn DG. 28/2/2016

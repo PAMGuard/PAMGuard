@@ -1,10 +1,11 @@
 package landMarks;
 
+import java.awt.Color;
+import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.lang.reflect.Field;
 
 import PamUtils.LatLong;
 import PamView.PamSymbol;
@@ -13,7 +14,6 @@ import generalDatabase.DBControlUnit;
 import generalDatabase.EmptyTableDefinition;
 import generalDatabase.PamTableItem;
 import generalDatabase.pamCursor.PamCursor;
-import java.awt.Color;
 
 
 public class DatabaseImport {
@@ -50,7 +50,7 @@ public class DatabaseImport {
 	}
 
 	public ArrayList<LandmarkData> readDatas(String tableName) {
-		if (checkTable(tableName) == false) {
+		if (!checkTable(tableName)) {
 			return null;
 		}
 		DBControlUnit dbControl = DBControlUnit.findDatabaseControl();

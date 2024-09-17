@@ -1,7 +1,5 @@
 package PamDetection;
 
-import pamMaths.PamQuaternion;
-import pamMaths.PamVector;
 import Array.ArrayManager;
 import GPS.GpsData;
 import Jama.Matrix;
@@ -10,6 +8,8 @@ import PamUtils.LatLong;
 import PamUtils.PamUtils;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import pamMaths.PamQuaternion;
+import pamMaths.PamVector;
 
 /**
  * Class for localisation information. 

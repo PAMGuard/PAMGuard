@@ -7,22 +7,19 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Window;
 
-import Map.MapProjector;
 import Map.MapRectProjector;
 import Map.Vessel;
 import PamUtils.Coordinate3d;
 import PamUtils.PamCalendar;
 import PamView.GeneralProjector;
-import PamView.ManagedSymbol;
+import PamView.GeneralProjector.ParameterType;
+import PamView.GeneralProjector.ParameterUnits;
 import PamView.ManagedSymbolInfo;
 import PamView.PamKeyItem;
 import PamView.PamSymbol;
-import PamView.PamOldSymbolManager;
 import PamView.PamSymbolType;
 import PamView.PanelOverlayDraw;
 import PamView.SymbolKeyItem;
-import PamView.GeneralProjector.ParameterType;
-import PamView.GeneralProjector.ParameterUnits;
 import PamView.symbol.SymbolData;
 import PamguardMVC.PamDataUnit;
 
@@ -69,7 +66,7 @@ public class GPSOverlayGraphics extends PanelOverlayDraw {
 		Coordinate3d coord = generalProjector.getCoord3d( gpsData.getLatitude(), gpsData.getLongitude(),gpsData.getHeight());
 		Point p = coord.getXYPoint();
 		if (lastDrawnDataUnit != null && Math.abs(lastDrawnDataUnit.getAbsBlockIndex()-gpsDataUnit.getAbsBlockIndex()) == 1) {
-			if (p.equals(lastCoord) == false) {
+			if (!p.equals(lastCoord)) {
 				g.setColor(s.getLineColor());
 				g.drawLine(p.x, p.y, lastCoord.x, lastCoord.y);
 			}

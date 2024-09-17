@@ -19,8 +19,6 @@ import javax.swing.WindowConstants;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
-import clickDetector.offlineFuncs.OfflineEventDataUnit;
-
 import Layout.PamInternalFrame;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
@@ -31,6 +29,7 @@ import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
 import PamView.MenuItemEnabler;
+import clickDetector.offlineFuncs.OfflineEventDataUnit;
 
 public class ClickDisplayManager implements PamSettings {
 
@@ -139,6 +138,7 @@ public class ClickDisplayManager implements PamSettings {
 
 		class CreateMenuAction implements ActionListener {
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 
 				clickDisplayInfo.createUnit();
@@ -228,34 +228,41 @@ public class ClickDisplayManager implements PamSettings {
 			return getName();
 		}
 
+		@Override
 		public void componentHidden(ComponentEvent e) {
 			//			System.out.println("componentHidden");
 		}
 
+		@Override
 		public void componentMoved(ComponentEvent e) {
 			//System.out.println("componentMoved");
 		}
 
+		@Override
 		public void componentResized(ComponentEvent e) {
 			//System.out.println("componentResized");
 		}
 
+		@Override
 		public void componentShown(ComponentEvent e) {
 			//System.out.println("componentShown");
 		}
 
+		@Override
 		public void componentAdded(ContainerEvent e) {
 			// TODO Auto-generated method stub
 			//			System.out.println("componentAdded");
 
 		}
 
+		@Override
 		public void componentRemoved(ContainerEvent e) {
 			// TODO Auto-generated method stub
 			//			System.out.println("componentRemoved");
 
 		}
 
+		@Override
 		public void internalFrameActivated(InternalFrameEvent frameEvent) {
 			JInternalFrame internalFrame = frameEvent.getInternalFrame();
 			ClickDisplay clickDisplay = (ClickDisplay) ((PamInternalFrame) internalFrame).getFramePlots();
@@ -264,6 +271,7 @@ public class ClickDisplayManager implements PamSettings {
 			clickControl.displayActivated(clickDisplay);
 		}
 
+		@Override
 		public void internalFrameClosed(InternalFrameEvent e) {
 			// TODO Auto-generated method stub
 			//			System.out.println("internalFrameClosed");
@@ -271,30 +279,35 @@ public class ClickDisplayManager implements PamSettings {
 
 		}
 
+		@Override
 		public void internalFrameClosing(InternalFrameEvent arg0) {
 			// TODO Auto-generated method stub
 			//			System.out.println("internalFrameClosing");
 
 		}
 
+		@Override
 		public void internalFrameDeactivated(InternalFrameEvent arg0) {
 			// TODO Auto-generated method stub
 			//			System.out.println("internalFrameDeactivated");
 
 		}
 
+		@Override
 		public void internalFrameDeiconified(InternalFrameEvent arg0) {
 			// TODO Auto-generated method stub
 			//			System.out.println("internalFrameDeiconified");
 
 		}
 
+		@Override
 		public void internalFrameIconified(InternalFrameEvent arg0) {
 			// TODO Auto-generated method stub
 			//			System.out.println("internalFrameIconified");
 
 		}
 
+		@Override
 		public void internalFrameOpened(InternalFrameEvent arg0) {
 			// TODO Auto-generated method stub
 			//			System.out.println("internalFrameOpened");
@@ -405,6 +418,7 @@ public class ClickDisplayManager implements PamSettings {
 		return windowList;
 	}
 
+	@Override
 	public Serializable getSettingsReference() {
 		cdmp.countEverything(this);
 		cdmp.saveDisplayLocations(getWindowList());
@@ -426,18 +440,22 @@ public class ClickDisplayManager implements PamSettings {
 		return count;
 	}
 
+	@Override
 	public long getSettingsVersion() {
 		return ClickDisplayManagerParameters2.serialVersionUID;
 	}
 
+	@Override
 	public String getUnitName() {
 		return clickTabPanelControl.clickControl.getUnitName() + "_Click Display Manager";
 	}
 
+	@Override
 	public String getUnitType() {
 		return "Click Display Manager";
 	}
 
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		try {
 			cdmp = ((ClickDisplayManagerParameters2) pamControlledUnitSettings.getSettings()).clone();

@@ -69,7 +69,7 @@ public class ModbusTCP {
 	}
 	
 	public boolean isAlive() {
-		return tcpSocket.isClosed() == false;
+		return !tcpSocket.isClosed();
 	}
 	
 	public void close() {

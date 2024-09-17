@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
+
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -16,6 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
+
 import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionParameters;
 import PamController.PamController;
@@ -170,7 +172,7 @@ public class ArrayDialog extends PamDialog implements ActionListener {
 	public boolean getParams() {
 		// all OK, so
 		// move the selected array to the top of the list in the ArrayManager
-		if (okOK(true) == false) return false;
+		if (!okOK(true)) return false;
 
 		PamArray array = hydrophoneDialogPanel.getDialogSelectedArray();
 		ArrayManager.getArrayManager().setCurrentArray(array);
@@ -179,7 +181,7 @@ public class ArrayDialog extends PamDialog implements ActionListener {
 		hydrophoneDialogPanel.getParams();
 		instrumentIdentityPanel.getParams(array);
 
-		if (checkDaqChannels(array) == false) {
+		if (!checkDaqChannels(array)) {
 			return false;
 		}
 
@@ -198,7 +200,7 @@ public class ArrayDialog extends PamDialog implements ActionListener {
 		ArrayList<AcquisitionControl> daqControllers = AcquisitionControl.getControllers();
 		boolean allOk = true;
 		for (int i = 0; i < daqControllers.size(); i++) {
-			if (checkDaqChannels(daqControllers.get(i), array) == false) {
+			if (!checkDaqChannels(daqControllers.get(i), array)) {
 				allOk = false;
 			}
 		}
@@ -238,7 +240,7 @@ public class ArrayDialog extends PamDialog implements ActionListener {
 			}
 			return false;
 		}
-		else if (environmentPanel.getParams() == false) {
+		else if (!environmentPanel.getParams()) {
 			return false;
 		}
 
@@ -274,6 +276,7 @@ public class ArrayDialog extends PamDialog implements ActionListener {
 		deleteArrayButton.setEnabled(ArrayManager.getArrayManager().getArrayCount() > 1);
 	}
 
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == cancelButton) {
 			this.setVisible(false);

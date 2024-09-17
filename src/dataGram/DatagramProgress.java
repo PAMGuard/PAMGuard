@@ -1,10 +1,10 @@
 package dataGram;
 
+import PamguardMVC.PamDataBlock;
+import binaryFileStorage.BinaryOfflineDataMapPoint;
 import dataMap.OfflineDataMapPoint;
 import javafx.scene.control.ProgressIndicator;
 import pamViewFX.pamTask.PamTaskUpdate;
-import PamguardMVC.PamDataBlock;
-import binaryFileStorage.BinaryOfflineDataMapPoint;
 
 /**
  * Progress data on datagram creation 

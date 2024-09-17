@@ -102,7 +102,7 @@ public class ClipGenSetting implements Serializable, Cloneable, ManagedParameter
 		try {
 			ClipGenSetting newObj = (ClipGenSetting) super.clone();
 			// force map line length to 1000m for old objects. 
-			if (newObj.hadMapLine == false) {
+			if (!newObj.hadMapLine) {
 				newObj.hadMapLine = true;
 				newObj.mapLineLength = 1000.;
 			}

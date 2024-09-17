@@ -26,7 +26,6 @@ import java.awt.Container;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.ColorModel;
 import java.io.Serializable;
 import java.util.Scanner;
 
@@ -35,7 +34,6 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import PamController.PamControlledUnitSettings;
@@ -44,7 +42,6 @@ import PamController.PamControllerInterface;
 import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
-import PamModel.SMRUEnable;
 
 
 /**
@@ -64,7 +61,7 @@ public class PamColors implements PamSettings {
 	public static enum PamColor {
 		PlOTWINDOW, BORDER, PLAIN, AXIS, GRID, MAP, WARNINGBORDER, BACKGROUND_ALPHA, HIGHLIGHT_ALPHA, HIGHLIGHT, 
 		GPSTRACK, LATLINE, LONLINE, TITLEBORDER, BUTTONFACE
-	};
+	}
 	
 
 	static private PamColors singleInstance;
@@ -211,7 +208,7 @@ public class PamColors implements PamSettings {
 	}
 
 	public void notifyModelChanged(int changeType) {
-		if (PamController.getInstance().isInitializationComplete() == false) {
+		if (!PamController.getInstance().isInitializationComplete()) {
 			return;
 		}
 		switch (changeType) {
@@ -397,22 +394,27 @@ public class PamColors implements PamSettings {
 		return boldFont;
 	}
 	
+	@Override
 	public Serializable getSettingsReference() {
 		return colorSettings;
 	}
 
+	@Override
 	public long getSettingsVersion() {
 		return ColorSettings.serialVersionUID;
 	}
 
+	@Override
 	public String getUnitName() {
 		return "Pam Color Manager";
 	}
 
+	@Override
 	public String getUnitType() {
 		return "Pam Color Manager";
 	}
 
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		ColorSettings newSettings = (ColorSettings) pamControlledUnitSettings.getSettings();
 		this.colorSettings = newSettings.clone();

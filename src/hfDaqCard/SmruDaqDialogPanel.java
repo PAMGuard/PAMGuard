@@ -16,7 +16,6 @@ import javax.swing.border.TitledBorder;
 
 import Acquisition.AcquisitionDialog;
 import Array.ArrayManager;
-import Array.PamArray;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamguardMVC.PamConstants;
@@ -55,7 +54,7 @@ public class SmruDaqDialogPanel {
 		dialogPanel.setBorder(new TitledBorder("Daq card configuration"));
 		GridBagConstraints c = new PamGridBagContraints();
 		c.gridwidth = 3;
-		dialogPanel.add(new JLabel("Library version: ", JLabel.RIGHT), c);
+		dialogPanel.add(new JLabel("Library version: ", SwingConstants.RIGHT), c);
 		c.gridx += c.gridwidth;
 		dialogPanel.add(libVersion = new JLabel("Unknown"));
 		c.gridx = 0;
@@ -79,10 +78,10 @@ public class SmruDaqDialogPanel {
 			c.gridx = 0;
 			c.gridy++;
 			JLabel l;
-			PamDialog.addComponent(dialogPanel, l= new JLabel("**** WARNING ****", JLabel.CENTER), c);
+			PamDialog.addComponent(dialogPanel, l= new JLabel("**** WARNING ****", SwingConstants.CENTER), c);
 			l.setForeground(Color.RED);
 			c.gridy++;
-			PamDialog.addComponent(dialogPanel, l =new JLabel("No SAIL Daq cards are present on your system ", JLabel.CENTER), c);
+			PamDialog.addComponent(dialogPanel, l =new JLabel("No SAIL Daq cards are present on your system ", SwingConstants.CENTER), c);
 			l.setForeground(Color.RED);
 		}
 		int iBoard = 0;		
@@ -97,7 +96,7 @@ public class SmruDaqDialogPanel {
 			c.gridwidth = 5;
 
 			JLabel snrLabel;
-			PamDialog.addComponent(dialogPanel, snrLabel = new JLabel("", JLabel.CENTER), c);			
+			PamDialog.addComponent(dialogPanel, snrLabel = new JLabel("", SwingConstants.CENTER), c);			
 			if (b < nSmruDaqBoards) {
 				snStr = String.format("Board %d s/n %X", b, smruDaqSystem.getSmruDaqJNI().getSerialNumber(b));
 				snrLabel.setText(snStr);
@@ -232,6 +231,7 @@ public class SmruDaqDialogPanel {
 			this.board = board;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			SmruDaqJNI smruJNI = smruDaqSystem.getSmruDaqJNI();
 			boolean ok = smruJNI.flashLEDs(board, 6);
@@ -255,6 +255,7 @@ public class SmruDaqDialogPanel {
 			this.led = led;
 			setText();
 		}
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			smruDaqSystem.toggleLED(board, led);
 			setText();

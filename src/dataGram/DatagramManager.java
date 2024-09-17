@@ -9,18 +9,11 @@ import java.util.ListIterator;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
-import javafx.concurrent.Task;
-import pamViewFX.pamTask.PamTaskUpdate;
-import pamViewFX.pamTask.SimplePamTaskUpdate;
-import pamguard.GlobalArguments;
-import dataMap.OfflineDataMap;
-import dataMap.OfflineDataMapPoint;
-import binaryFileStorage.BinaryOfflineDataMap;
-import binaryFileStorage.BinaryOfflineDataMapPoint;
 import PamController.AWTScheduler;
 import PamController.OfflineDataStore;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
+import PamController.PamControllerInterface;
 import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
@@ -28,6 +21,14 @@ import PamView.CancelObserver;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
+import binaryFileStorage.BinaryOfflineDataMap;
+import binaryFileStorage.BinaryOfflineDataMapPoint;
+import dataMap.OfflineDataMap;
+import dataMap.OfflineDataMapPoint;
+import javafx.concurrent.Task;
+import pamViewFX.pamTask.PamTaskUpdate;
+import pamViewFX.pamTask.SimplePamTaskUpdate;
+import pamguard.GlobalArguments;
 
 public class DatagramManager {
 
@@ -73,7 +74,7 @@ public class DatagramManager {
 		/**
 		 * Check to see if any of the blocks have an existing datagram
 		 */
-		if (datagramSettings.validDatagramSettings == false && isBatch == false) {
+		if (!datagramSettings.validDatagramSettings && !isBatch) {
 			/*
 			 *  this is the first time this has been run, so ask
 			 *  the user what datagram size they want.  
@@ -242,7 +243,7 @@ public class DatagramManager {
 				dmp = it.next();
 				datagram = dmp.getDatagram();
 				if (datagram == null || datagram.getIntervalSeconds() != datagramSettings.datagramSeconds) {
-					nToUpdate++;;
+					nToUpdate++;
 				}
 			}
 			updateProgress(new DatagramProgress(DatagramProgress.STATUS_STARTINGBLOCK, pamDataBlock, nToUpdate));
@@ -359,8 +360,8 @@ public class DatagramManager {
 		@Override
 		protected void done() {
 			//notify datamap that a load has occured
-			updateProgress(new DatagramProgress(DatagramProgress.STATUS_DONE, 1, 1));
-			PamController.getInstance().notifyModelChanged(PamController.DATA_LOAD_COMPLETE);
+			updateProgress(new DatagramProgress(PamTaskUpdate.STATUS_DONE, 1, 1));
+			PamController.getInstance().notifyModelChanged(PamControllerInterface.DATA_LOAD_COMPLETE);
 		}
 
 		@Override
@@ -420,7 +421,7 @@ public class DatagramManager {
 				dmp = it.next();
 				datagram = dmp.getDatagram();
 				if (datagram == null || datagram.getIntervalSeconds() != datagramSettings.datagramSeconds) {
-					nToUpdate++;;
+					nToUpdate++;
 				}
 			}
 			publish(new DatagramProgress(DatagramProgress.STATUS_STARTINGBLOCK, pamDataBlock, nToUpdate));
@@ -616,7 +617,7 @@ public class DatagramManager {
 		float[] data;
 		while (iterator.hasNext()) {
 			mapPoint = iterator.next();
-			if (DatagramPoint.class.isAssignableFrom(mapPoint.getClass()) == false) {
+			if (!DatagramPoint.class.isAssignableFrom(mapPoint.getClass())) {
 				continue;
 			}
 			datagramPoint = (DatagramPoint) mapPoint;
@@ -737,7 +738,7 @@ public class DatagramManager {
 				imageStart = mapPoint.getStartTime();
 			}
 			imageEnd = mapPoint.getEndTime();
-			if (DatagramPoint.class.isAssignableFrom(mapPoint.getClass()) == false) {
+			if (!DatagramPoint.class.isAssignableFrom(mapPoint.getClass())) {
 				continue;
 			}
 			datagramPoint = (DatagramPoint) mapPoint;
@@ -808,7 +809,7 @@ public class DatagramManager {
 
 		@Override
 		public long getSettingsVersion() {
-			return datagramSettings.serialVersionUID;
+			return DatagramSettings.serialVersionUID;
 		}
 
 		@Override

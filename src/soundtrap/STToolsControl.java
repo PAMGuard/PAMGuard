@@ -58,7 +58,7 @@ public class STToolsControl extends PamControlledUnit implements PamSettings {
 		public void actionPerformed(ActionEvent e) {
 			importBCL(parentFrame);
 		}
-	};
+	}
 	
 	/**
 	 * Import data from sound trap detector files. 

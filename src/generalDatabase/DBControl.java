@@ -1,38 +1,19 @@
 package generalDatabase;
 
-import generalDatabase.external.CopyManager;
-import generalDatabase.layoutFX.DBGuiFX;
-import generalDatabase.lookupTables.LookUpTables;
-import generalDatabase.lookupTables.LookupList;
-import generalDatabase.pamCursor.PamCursor;
-import generalDatabase.postgresql.PostgreSQLSystem;
-import generalDatabase.sqlite.SqliteSystem;
-import loggerForms.FormsControl;
-
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.Serializable;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Properties;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-import org.apache.commons.io.FilenameUtils;
-
-import offlineProcessing.DataCopyTask;
-import offlineProcessing.OLProcessDialog;
-import offlineProcessing.OfflineTaskGroup;
-import pamguard.GlobalArguments;
-import warnings.PamWarning;
-import warnings.WarningSystem;
 import PamController.PamConfiguration;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitGUI;
@@ -50,6 +31,19 @@ import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import annotation.userforms.UserFormAnnotationType;
+import generalDatabase.external.CopyManager;
+import generalDatabase.layoutFX.DBGuiFX;
+import generalDatabase.lookupTables.LookUpTables;
+import generalDatabase.lookupTables.LookupList;
+import generalDatabase.pamCursor.PamCursor;
+import generalDatabase.sqlite.SqliteSystem;
+import loggerForms.FormsControl;
+import offlineProcessing.DataCopyTask;
+import offlineProcessing.OLProcessDialog;
+import offlineProcessing.OfflineTaskGroup;
+import pamguard.GlobalArguments;
+import warnings.PamWarning;
+import warnings.WarningSystem;
 
 /**
  * Database system for accessing data in just about any type of odbc database.
@@ -159,7 +153,7 @@ PamSettingsSource {
 
 		//		selectDatabase(null);
 
-		if (isInMainConfiguration() == false) {
+		if (!isInMainConfiguration()) {
 			openImmediately = false;
 		}
 		if (databaseSystem == null){
@@ -221,12 +215,12 @@ PamSettingsSource {
 		// Do a quick check here to see if the database exists.  If not, warn the user before creating a new one.  Note that if
 		// the database name is null, the user is creating a brand new database so skip the check
 		boolean checkExists = databaseSystem.checkDatabaseExists(forcedName);
-		if (checkExists == false && forcedName != null) {
+		if (!checkExists && forcedName != null) {
 			databaseSystem.createNewDatabase(forcedName);
 			checkExists = databaseSystem.checkDatabaseExists(forcedName);
 		}
 
-		if (checkExists == false) {
+		if (!checkExists) {
 			String title = "Database not found";
 			String msg = "PAMGuard is unable to access the following database:<br><br><b>" +
 					forcedName +
@@ -303,7 +297,7 @@ PamSettingsSource {
 		}
 		synchronized (DBControl.class) {
 			try {
-				if (connection.getConnection().getAutoCommit() == false) {
+				if (!connection.getConnection().getAutoCommit()) {
 					connection.getConnection().commit();
 				}
 			} catch (SQLException e) {
@@ -368,15 +362,18 @@ PamSettingsSource {
 		return connection;
 	}
 
+	@Override
 	public Serializable getSettingsReference() {
 		dbParameters.setDatabaseName(getLongDatabaseName());
 		return dbParameters;
 	}
 
+	@Override
 	public long getSettingsVersion() {
 		return DBParameters.serialVersionUID;
 	}
 
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		DBParameters np = (DBParameters) pamControlledUnitSettings.getSettings();
 		dbParameters = np.clone();
@@ -419,7 +416,7 @@ PamSettingsSource {
 
 //		if (dbParameters.getUseAutoCommit() == false) {
 			JMenuItem commitItem = new JMenuItem("Commit Changes");
-			commitItem.setEnabled(dbParameters.getUseAutoCommit() == false);
+			commitItem.setEnabled(!dbParameters.getUseAutoCommit());
 			commitItem.setToolTipText("Immediately commit recent changes to the database");
 			commitItem.addActionListener(new ActionListener() {
 				@Override
@@ -465,6 +462,7 @@ PamSettingsSource {
 			this.frame = frame;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 
 			selectDatabase(frame, null);
