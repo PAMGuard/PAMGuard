@@ -25,6 +25,12 @@ public class PlotParams2D implements Serializable, Cloneable, ManagedParameters 
 	 */
 	public double[] maxAmplitudeLimits={30,180}; 
 	
+	/**
+	 * Limits of amplitude range- this is a double property which can be bound to colour sliders.
+	 */
+	private transient DoubleProperty[] amplitudeLimits= {new SimpleDoubleProperty(amplitudeLimitsSerial[0]), new SimpleDoubleProperty(amplitudeLimitsSerial[1])};
+	
+	
 
 	/**
 	 * @return the amplitudeLimitsSerial
@@ -62,11 +68,6 @@ public class PlotParams2D implements Serializable, Cloneable, ManagedParameters 
 		return amplitudeLimits;
 	}
 
-	/**
-	 * Limits of amplitude range- this is a double property which can be bound to colour sliders.
-	 */
-	private transient DoubleProperty[] amplitudeLimits= {new SimpleDoubleProperty(amplitudeLimitsSerial[0]), new SimpleDoubleProperty(amplitudeLimitsSerial[1])};
-	
 	public PlotParams2D() {
 		super();
 		//make sure the amplitude limits are set to the correct air/water to begin with. 

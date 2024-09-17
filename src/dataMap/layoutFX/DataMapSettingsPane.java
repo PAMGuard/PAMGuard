@@ -4,6 +4,7 @@ import dataGram.DatagramManager;
 import dataGram.DatagramScaleInformation;
 import dataGram.DatagramSettings;
 import dataMap.DataMapControl;
+import dataPlotsFX.scrollingPlot2D.PlotParams2D;
 
 import org.controlsfx.control.CheckComboBox;
 
@@ -104,7 +105,7 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParametersFX
 
 	private Label dataGramLabel;
 
-	private ComboBox<DataMapInfo> dataGramBox;
+	private ComboBox<DataMapInfo> dataGramColorBox;
 
 	/**
 	 * Holdes datagram settings. 
@@ -120,7 +121,6 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParametersFX
 	private Pane dataMapChoicePane;
 
 	private CheckComboBox<String> dataMapCheckComboBox; 
-
 
 
 	public DataMapSettingsPane(DataMapControl dataMapControl, DataMapPaneFX dataMapPane) {
@@ -142,7 +142,7 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParametersFX
 		Label dataLabel = new Label("Show data maps");
 		PamGuiManagerFX.titleFont2style(dataLabel);
 		holder.getChildren().addAll(dataLabel, dataMapChoicePane = createDataMapPane());
-		updateDataMapChoiceBox();
+		updateDataMapBinBox();
 
 		Label scaleLabel = new Label("Data scale");
 		PamGuiManagerFX.titleFont2style(scaleLabel);
@@ -179,14 +179,14 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParametersFX
 	/**
 	 * Update the combo box which allows users to select which datagram are shown. 
 	 */
-	private void updateDataMapChoiceBox() {
+	private void updateDataMapBinBox() {
 		dataMapCheckComboBox.getItems().clear();
 		for (int i=0; i<this.dataMapPane.getNumDataStreamPanes(); i++) {
 			dataMapCheckComboBox.getItems().add(dataMapPane.getDataStreamPane(i).getDataName().getName()); 
 		}
 	}
 	/**
-	 * Adds a settings pane for the data gram if a binary store is present. 
+	 * Adds a settings pane for the datagram if a binary store is present. 
 	 */
 	public void checkDataGramPane(){
 		if (BinaryStore.findBinaryStoreControl()!=null){
@@ -266,16 +266,16 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParametersFX
 		ComboBox<String> datagramBinsBox = createDataGramBinPane(dataGramManager); 
 
 		//Pane for colouring datagrams. 
-		dataGramBox=new ComboBox<DataMapInfo> (); 
+		dataGramColorBox=new ComboBox<DataMapInfo> (); 
 
 		//find all datagrams. 
 		updateDatagramColorBox();
 
-		dataGramBox.setOnAction((action)->{
-			if (dataGramBox.getSelectionModel().getSelectedItem()==null) return;
-			dataGramColPane.setDataStreamPanel(dataMapPane.getDataStreamPane(dataGramBox.getSelectionModel().getSelectedItem()));
-			colourLabel.setText(String.format("Colours for %s " , dataGramBox.getSelectionModel().getSelectedItem().getName())); 
-			colourLabel.setTooltip(new Tooltip(String.format("Colours for %s " , dataGramBox.getSelectionModel().getSelectedItem().getName()))); 
+		dataGramColorBox.setOnAction((action)->{
+			if (dataGramColorBox.getSelectionModel().getSelectedItem()==null) return;
+			dataGramColPane.setDataStreamPanel(dataMapPane.getDataStreamPane(dataGramColorBox.getSelectionModel().getSelectedItem()));
+			colourLabel.setText(String.format("Colours for %s " , dataGramColorBox.getSelectionModel().getSelectedItem().getName())); 
+			colourLabel.setTooltip(new Tooltip(String.format("Colours for %s " , dataGramColorBox.getSelectionModel().getSelectedItem().getName()))); 
 
 		});
 
@@ -297,8 +297,8 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParametersFX
 		row++;
 		
 		holder.add(new Label("Select datagram"), 0, row);
-		holder.add(dataGramBox, 1, row);
-		GridPane.setColumnSpan(dataGramBox, 2);
+		holder.add(dataGramColorBox, 1, row);
+		GridPane.setColumnSpan(dataGramColorBox, 2);
 
 		row++;
 		
@@ -332,11 +332,11 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParametersFX
 	 * Update the datagram colours combo box thjat allows users to select which datagram to select for changing colour settings.. 
 	 */
 	private void updateDatagramColorBox() {
-		dataGramBox.getItems().clear();
+		dataGramColorBox.getItems().clear();
 		for (int i=0; i<this.dataMapPane.getNumDataStreamPanes(); i++) {
 			//only include if the data block has a datagram and the data gram is a color plot - some datagrams can be lines e.g. filtered noise meaurements. 
 			if (dataMapPane.getDataStreamPane(i).isHasDatagram() && dataMapPane.getDataStreamPane(i).getScaleType() == DatagramScaleInformation.PLOT_3D) {
-				dataGramBox.getItems().add(dataMapPane.getDataStreamPane(i).getDataName()); 
+				dataGramColorBox.getItems().add(dataMapPane.getDataStreamPane(i).getDataName()); 
 			}
 		}
 	}
@@ -415,26 +415,51 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParametersFX
 	boolean setting = false;
 
 	public void setParams(DataMapParametersFX dataMapParameters) {
-		System.out.println("SET DATAMPA PARAMS");
+		System.out.println("SET DATAMAP PARAMS");
+		
+		// ----- Datagram bin size ----- //
+
 		
 		setting = true;
 //		timeSlider.setValue(dataMapParameters.hScaleChoice);
 		scaleBox.getSelectionModel().select(dataMapParameters.vScaleChoice);
 		logScaleToggle.setSelected(dataMapParameters.vLogScale);
 			
+		// ----- Datagram bin size ----- //
+		//make sure combo box for datamaps  is sorted
+		updateDataMapBinBox();
+		
+		if (BinaryStore.findBinaryStoreControl()!=null){
+			DatagramManager dataGramManager=BinaryStore.findBinaryStoreControl().getDatagramManager();
+		dataGramComboBox.getSelectionModel().select(durationToString(dataGramManager.getDatagramSettings().datagramSeconds*1000L));
+		}
+
+	
+		// ----- Datagram colours ----- //
+		
 		//make sure the combo box has correct data streams
 		updateDatagramColorBox();
 		
-		//make sure combo box for datamaps  is sorted
-		updateDataMapChoiceBox();
-		
-		if (this.dataGramComboBox.getItems().size()>dataMapParameters.selectedDataGram && dataMapParameters.selectedDataGram>=0) {
+		if (this.dataGramColorBox.getItems().size()>dataMapParameters.selectedDataGram && dataMapParameters.selectedDataGram>=0) {
 			dataGramComboBox.getSelectionModel().select(dataMapParameters.selectedDataGram);
 		}
-		else if (this.dataGramComboBox.getItems().size()>0){
+		else if (this.dataGramColorBox.getItems().size()>0){
 			dataGramComboBox.getSelectionModel().select(0);
 		}
 		
+		//get colour data from Hash tables	
+		DataStreamPaneFX dataStreamPane;
+		for (int i=0; i<dataGramColorBox.getItems().size(); i++) {
+			
+			 dataStreamPane = dataMapPane.getDataStreamPane(dataGramColorBox.getItems().get(i));
+			 
+			 PlotParams2D plotCols =  dataMapParameters.datagramColours.get(dataGramColorBox.getItems().get(i));
+			 if (plotCols!=null) {
+				 dataStreamPane.setMinMaxColourLimits(plotCols.getAmplitudeLimits()[0].get(), plotCols.getAmplitudeLimits()[1].get());
+				 dataStreamPane.setColourArrayType(plotCols.getColourMap());
+			 }
+
+		}
 		setting = false;
 	}
 
@@ -551,7 +576,7 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParametersFX
 			if (dataStreamPane==null) return;
 			
 			dataStreamPane.setColourArrayType(colourArrayType); 
-			dataStreamPane.setMinMaxColour(colourSlider.getLowValue(), colourSlider.getHighValue()); 
+			dataStreamPane.setMinMaxColourLimits(colourSlider.getLowValue(), colourSlider.getHighValue()); 
 		}
 
 

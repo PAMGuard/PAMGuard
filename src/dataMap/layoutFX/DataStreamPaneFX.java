@@ -14,6 +14,7 @@ import dataMap.DataMapControl;
 import dataMap.DataMapDrawing;
 import dataMap.OfflineDataMap;
 import dataMap.OfflineDataMapPoint;
+import dataPlotsFX.scrollingPlot2D.PlotParams2D;
 import dataPlotsFX.scrollingPlot2D.StandardPlot2DColours;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -129,8 +130,6 @@ public class DataStreamPaneFX extends PamBorderPane {
 	private Timeline timeline;
 
 	private PamButton showButton;
-
-	private ColourArrayType colourArrayType = ColourArrayType.HOT;
 
 	/**
 	 * Constructor for the data stream pane. 
@@ -1231,19 +1230,43 @@ public class DataStreamPaneFX extends PamBorderPane {
 		this.repaint(0);
 	}
 
+	/**
+	 * Get the colour map for the datagram.
+	 * @return the colour map for the datagram.
+	 */
 	public ColourArrayType getColourMapArray() {
-		return colourArrayType;
+		return dataGraph.plotColours2D.getColourMap();
 	}
 
-	public void setMinMaxColour(double lowValue, double highValue) {
+	/**
+	 * Set the minimum and maximum colour limits for the datagram
+	 * @param lowValue - the low colour limit in dB
+	 * @param highValue - the high colour limit in dB
+	 */
+	public void setMinMaxColourLimits(double lowValue, double highValue) {
 		dataGraph.plotColours2D .getAmplitudeLimits()[0].set(lowValue);
 		dataGraph.plotColours2D .getAmplitudeLimits()[1].set(highValue);
 		this.repaint(50);
+	}
+	
+	
+	/**
+	 * Get the minimum dB for the colour array
+	 * @return - the minimum dB for the colour array. 
+	 */
+	public double getMinColourLimit() {
+		return dataGraph.plotColours2D .getAmplitudeLimits()[0].get();
+	}
+	
+	
+	public double getMaxColourLimit() {
+		return dataGraph.plotColours2D .getAmplitudeLimits()[1].get();
 	}
 
 	public boolean isHasDatagram() {
 		return hasDatagram;
 	}
+
 
 
 }

@@ -21,6 +21,7 @@ public class StandardPlot2DColours implements Plot2DColours {
 	
 	private Color[] colourArray=ColourArray.createStandardColourArray(NCOLOUR_DEFUALT, colourArrayType=ColourArrayType.HOT).getColours();
 	
+	
 	/**
 	 * The amplitude limits 
 	 */
