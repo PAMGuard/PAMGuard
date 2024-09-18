@@ -400,10 +400,23 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	 * @param newFile
 	 */
 	public void setNewFile (String newFile) {
-		fileInputParameters.recentFiles.remove(newFile);
-		fileInputParameters.recentFiles.add(0, newFile);
-		fillFileList();
+		if (newFile == null) {
+			return;
+		}
+		String currentFirst = getFirstFile();
+		if (newFile.equals(currentFirst) == false) {
+			fileInputParameters.recentFiles.remove(newFile);
+			fileInputParameters.recentFiles.add(0, newFile);
+			fillFileList();
+		}
 		interpretNewFile(newFile);
+	}
+	
+	public String getFirstFile() {
+		if (fileInputParameters.recentFiles.size() == 0) {
+			return null;
+		}
+		return fileInputParameters.recentFiles.get(0);
 	}
 
 	/**
@@ -434,7 +447,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		if (file.isFile() && !file.isHidden() && acquisitionDialog != null) {
 			try {
 
-				System.out.println("FileInputSystem - interpretNewFile");
+//				System.out.println("FileInputSystem - interpretNewFile");
 				AudioInputStream audioStream = PamAudioFileManager.getInstance().getAudioInputStream(file);
 
 				//      // Get additional information from the header if it's a wav file.
