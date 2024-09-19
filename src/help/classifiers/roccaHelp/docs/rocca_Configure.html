@@ -129,7 +129,7 @@ as classification variables.</p>
 <br>
 <h3><a name="rocca_ParamsClassifier">Contour/Classifier
 tab</a></h3>
-<img alt="" src="file:///C:/Users/SCANS/workspace/Pamguard_BWbranch/src/help/detectors/roccaHelp/docs/images/rocca_params_contour-classifier5.png" border="0">&nbsp;<br>
+<img alt="" src="images/rocca_params_contour-classifier6.png" border="0">&nbsp;<br>
 <ol>
 <li>
 <p><a name="rocca_ClassifierModel">Whistle
@@ -178,6 +178,13 @@ whistle or click is considered non-classifiable and is labelled as
 encounters</a>. If the percent of trees voting for the predicted
 species in the random forest falls below this threshold, the encounter
 is considered non-classifiable and is labelled as &#8216;ambiguous&#8217;.</p>
+</li>
+<li>
+<p>The whistle/click threshold can be used in one of two ways: as an absolute value, or as the 
+minimum difference between the highest vote and the second-highest vote.  If used as an absolute, whistles will only be classified
+ if the percent of trees in the random forest voting for the predicted species is higher than the selected threshold.
+  If used as a difference, whistles will only be classified if the highest percentage of trees in the random forest voting for the
+   predicted species is greater than the second-highest percentage by the threshold value.</p>
 </li>
 <li>
 <p>Noise Sensitivity: specify the global noise sensitivity

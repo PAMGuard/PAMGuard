@@ -24,6 +24,8 @@
 package rocca;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 import weka.classifiers.AbstractClassifier;
 import weka.core.DenseInstance;
@@ -98,6 +100,9 @@ public class RoccaRFModel implements java.io.Serializable {
             double[] theseVotes =
                     roccaClassifierModel.distributionForInstance(rcdbInst); 
             double treeConfClassified = theseVotes[(int) speciesNum];
+            double[] dupVotes = theseVotes.clone();
+            Arrays.sort(dupVotes);
+            double bigDiff = dupVotes[dupVotes.length-1]-dupVotes[dupVotes.length-2];
             
             // save the tree votes to rcdb.  Step through the species list one at a time and
             // compare to the species in the current model.  When we find a match, save the
@@ -124,9 +129,16 @@ public class RoccaRFModel implements java.io.Serializable {
             
 
             // if the vote is less than the threshold, set the class to AMBIG and exit
-            if (treeConfClassified <
+            boolean threshIsDiff = roccaClassifier.roccaControl.roccaParameters.isStrongWhistleDiff();
+            if (
+            		(!threshIsDiff && treeConfClassified <
                     ((float) roccaClassifier.roccaControl.roccaParameters.getClassificationThreshold())
-                    /100) {
+                    /100)
+            		||
+            		(threshIsDiff && bigDiff < 
+                    ((float) roccaClassifier.roccaControl.roccaParameters.getClassificationThreshold())
+                    /100)
+            	){
             	rcdb.setClassifiedAs(classifiedAs);
             	
             // otherwise, check if there is a next stage for the classified species	
