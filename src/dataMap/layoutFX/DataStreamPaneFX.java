@@ -293,7 +293,10 @@ public class DataStreamPaneFX extends PamBorderPane {
 			createDataGraph();
 			addDataGraphMouse();
 			
-			
+			//set some sensible default amplitude limits. 
+			plotColours2D.getAmplitudeLimits()[0].set(-80);
+			plotColours2D.getAmplitudeLimits()[0].set(80);
+
 		}
 		
 		
@@ -1255,7 +1258,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 	 * @return - the minimum dB for the colour array. 
 	 */
 	public double getMinColourLimit() {
-		return dataGraph.plotColours2D .getAmplitudeLimits()[0].get();
+		return dataGraph.plotColours2D.getAmplitudeLimits()[0].get();
 	}
 	
 	

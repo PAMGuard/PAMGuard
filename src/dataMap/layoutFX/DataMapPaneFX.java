@@ -94,6 +94,15 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX, P
 		scrollingDataPanel= new ScrollingDataPaneFX(dataMapControl, this); 
 
 		dataMapSettingsPane=new DataMapSettingsPane(dataMapControl,this);
+		dataMapSettingsPane.addSettingsListener(()->{
+			//make sure paramters updates whenever user changes a setting. 
+			dataMapParamsFX = dataMapSettingsPane.getParams(dataMapParamsFX);
+			
+			if (scrollingDataPanel !=null) {
+				//forces things like the date axis to change. 
+				scrollingDataPanel.notifyScrollChange();
+			}
+		});
 
 		//create the setting spane
 		settingsPane=new PamVBox(); 
@@ -177,17 +186,17 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX, P
 		//hidingSummaryPane.resetHideAnimation();
 	}
 
-	/**
-	 * Called from ScalePanel when anything 
-	 * to do with scaling changes. 
-	 */
-	public void scaleChanged() {
-		if (dataMapSettingsPane == null || scrollingDataPanel == null) {
-			return;
-		}
-		dataMapSettingsPane.getParams(dataMapParamsFX);
-		scrollingDataPanel.scaleChange();
-	}
+//	/**
+//	 * Called from ScalePanel when anything 
+//	 * to do with scaling changes. 
+//	 */
+//	public void scaleChanged() {
+//		if (dataMapSettingsPane == null || scrollingDataPanel == null) {
+//			return;
+//		}
+//		dataMapSettingsPane.getParams(dataMapParamsFX);
+//		scrollingDataPanel.scaleChange();
+//	}
 
 	@Override
 	public Region getNode() {
@@ -209,7 +218,7 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX, P
 	@Override
 	public boolean isResizeableDisplay() {
 		//Cannot resize the display
-		return true;
+		return false;
 	}
 
 	@Override
@@ -296,7 +305,7 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX, P
 
 	@Override
 	public UserDisplayNodeParams getDisplayParams() {
-		// TODO Auto-generated method stub
+		// the datamap is a display which cannot be moved or changed so this is not needed. 
 		return null;
 	}
 
@@ -332,6 +341,14 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX, P
 
 	public DataStreamPaneFX getDataStreamPane(DataMapInfo selectedItem) {
 		return scrollingDataPanel.getDataStreamPane(selectedItem);
+	}
+	
+	/**
+	 * Set the data map parameters. 
+	 * @param dataMapParamsFX
+	 */
+	public void setDataMapParams(DataMapParametersFX dataMapParamsFX) {
+		 this.dataMapParamsFX = dataMapParamsFX;
 	}
 
 	/**

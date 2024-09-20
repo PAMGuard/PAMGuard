@@ -36,6 +36,7 @@ public class DataMapInfo implements Serializable {
 
 	@Override
 	public boolean equals(Object dataMapInfo1) {
+		if (dataMapInfo1==null) return false;
 		DataMapInfo dataMapInfo = (DataMapInfo) dataMapInfo1;
 		if (this.longDataName.equals(dataMapInfo.longDataName) && this.name.equals(dataMapInfo.name)) return true;
 		return false;

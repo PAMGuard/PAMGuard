@@ -43,7 +43,7 @@ public class DataMapParametersFX implements Cloneable, Serializable, ManagedPara
 	/**
 	 * The selected dfatagranm for colour changes. 
 	 */
-	public int selectedDataGram = 0; 
+	public int selectedColourDatagram = 0; 
 	
 
 	@Override

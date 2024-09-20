@@ -30,7 +30,6 @@ public class PlotParams2D implements Serializable, Cloneable, ManagedParameters 
 	 */
 	private transient DoubleProperty[] amplitudeLimits= {new SimpleDoubleProperty(amplitudeLimitsSerial[0]), new SimpleDoubleProperty(amplitudeLimitsSerial[1])};
 	
-	
 
 	/**
 	 * @return the amplitudeLimitsSerial
