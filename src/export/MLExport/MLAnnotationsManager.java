@@ -4,10 +4,12 @@ import java.util.List;
 
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import annotation.DataAnnotation;
 import annotation.DataAnnotationType;
 import bearinglocaliser.annotation.BearingAnnotationType;
 import clickDetector.ClickClassifiers.annotation.ClickClassificationType;
 import matchedTemplateClassifer.annotation.MatchedClickAnnotationType;
+import rawDeepLearningClassifier.logging.DLAnnotation;
 import rawDeepLearningClassifier.logging.DLAnnotationType;
 import us.hebi.matlab.mat.types.Struct;
 
@@ -26,9 +28,9 @@ public class MLAnnotationsManager {
 
 	/**
 	 * Add annotations to a MATLAB structure. 
-	 * @param mlStruct
-	 * @param index 
-	 * @param dataUnit
+	 * @param mlStruct - the structure to add to.
+	 * @param index  - index of the struct .
+	 * @param dataUnit - the data unit with annotations to add. 
 	 */
 	public void addAnnotations(Struct mlStruct, int index, PamDataUnit dataUnit) {
 
@@ -42,34 +44,50 @@ public class MLAnnotationsManager {
 
 			annotType = annotationTypes.get(i);
 			
-			//now iterate through the data annotations within the data unit. 
-
-			switch (annotType.getAnnotationName()){
-			case BearingAnnotationType.NAME:
+			//now iterate through the data annotations within the data unit and find the data annotation			
+			DataAnnotation dataAnnotationType;
+			for (int j=0; j<dataUnit.getNumDataAnnotations(); j++) {
 				
-				
-				break;
-
-			case ClickClassificationType.NAME:
-				
-				
-				break;
-
-			case MatchedClickAnnotationType.NAME:
-				break;
-
-			case DLAnnotationType.NAME:
-				
-
-				break;
-			default:
-				System.out.println("MLAnnotationsManager: Annotation: " + annotType.getAnnotationName() + " for " + dataUnit + " not supported: ");
-
 			}
-
+			
+			//add the annotation even if it null
+			addAnnotations( mlStruct,  index,  dataUnit,  dataUnit.getDataAnnotation(i), annotType);
+			
 		}; 
 
 	}
+	
+	public void addAnnotations(Struct mlStruct, int index, PamDataUnit dataUnit, DataAnnotation dataAnnotation, DataAnnotationType annotationType) {
+		switch (dataAnnotation.getDataAnnotationType().getAnnotationName()){
+		case BearingAnnotationType.NAME:
+			
+			
+			break;
+
+		case ClickClassificationType.NAME:
+			
+			
+			break;
+
+		case MatchedClickAnnotationType.NAME:
+			
+			
+			
+			break;
+
+		case DLAnnotationType.NAME:
+			
+			DLAnnotation dlAnnotation = (DLAnnotation) dlAnnotation;
+			
+			break;
+		default:
+			System.out.println("MLAnnotationsManager: Annotation: " + dataAnnotation.getDataAnnotationType().getAnnotationName() 
+					+ " for " + dataUnit + " not supported: ");
+
+		}
+
+	}
+ 
 
 
 
