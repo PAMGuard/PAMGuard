@@ -209,6 +209,30 @@ public class FastFFT  {
 	}
 	
 	/**
+	 * Inverse transform of what was real data. Will automatically 
+	 * assume a second half complex conj of the first half. This can 
+	 * be used to transform back data used in cross correlations rather
+	 * than trying to fill in the second half of the conjugate, which is not
+	 * really possible with the missing middle point of the FFT. 
+	 * @param x Complex input data, which originally came from real. 
+	 * @return real data array 2x the length of the Complex input (i.e. same length as 
+	 * double array within complex input). 
+	 */
+	public synchronized double[] realInverse(ComplexArray x) {
+		double[] data = x.getData().clone();
+		int n = data.length; // i.e. 2* the number of complex numbers. 
+		/*
+		 * Check the transform has been created with the right fft length
+		 */
+		if (doubleFFT_1D == null || transformSize != n) {
+			doubleFFT_1D = new DoubleFFT_1D(transformSize = n);
+		}
+		
+		doubleFFT_1D.realInverse(data, true);
+		return data;
+	}
+	
+	/**
 	 * Inverse FFT for Complex data. 
 	 * <br> I FFT is performed 'in place' so data are overwritten
 	 * @param x ComplexArray - the input data

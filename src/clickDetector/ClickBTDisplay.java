@@ -2642,8 +2642,6 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 				followCheckBox.setSelected(false);
 			}
 			ClickDetection click = findClick(e.getX(), e.getY(), 10);
-			
-			
 			if (click != null) {
 				setSelectedClick(click);
 			}
@@ -3133,7 +3131,8 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 				zoomer.paintShape(g, this, true);
 			}
 
-			ArrayList<ClickDetection> clickCopy = clickData.getDataCopy(displayStartMillis, displayStartMillis+displayLengthMillis, true, getDataSelector());
+//			ArrayList<ClickDetection> clickCopy = clickData.getDataCopy(displayStartMillis, displayStartMillis+displayLengthMillis, true, getDataSelector());
+			ArrayList<ClickDetection> clickCopy = getPlottableClicks();
 			if (clickCopy.size() == 0) {
 				return;
 			}
@@ -3485,45 +3484,23 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 	 *         click is close enough
 	 */
 	ClickDetection findClick(int x, int y, int maxdist) {
-		
-		System.out.println("Find click: " + x + " " + y); 
-		
 		ClickDetection closestClick = null;
-		PamDataBlock<ClickDetection> clickData = clickControl.getClickDataBlock();
 		ClickDetection unit;
 		Point pt;
-		
-		//important to use long here as 4k screens zoome din means we can get integer overflow errors and 
-		//the wrong click is selected. 
-		long dist;
-		long xdiff;
-		long ydiff;
-		long closest = maxdist * maxdist;
-		synchronized (clickData.getSynchLock()) {
-			ListIterator<ClickDetection> clickIterator = clickData.getListIterator(PamDataBlock.ITERATOR_END);
-			while (clickIterator.hasPrevious()) {
-				unit = clickIterator.previous();
-				//				if (unit.getTimeMilliseconds() < displayStartMillis - 1000)
-				//					break;
-				if (!shouldPlot(unit)) continue;
-				pt = clickXYPos(unit);
-				
-				xdiff = (pt.x - x) ;
-				ydiff =  (pt.y - y);
-				
-				dist = (xdiff *  xdiff + ydiff * ydiff);
-				
-				//System.out.println("pt: " +  pt.x + " " + pt.y + "  " + closest + " dist " + dist + " " + ((pt.x - x) * (pt.x - x)) + " huh? " + (pt.x - x)); 
-
-				
-				if (dist <= closest) {
-					closest = dist;
-					closestClick = unit;
-				}
+		int dist;
+		int closest = maxdist * maxdist;
+		ListIterator<ClickDetection> clickIterator = getPlottableClicksIterator(0);
+		while (clickIterator.hasNext()) {
+			unit = clickIterator.next();
+			//				if (unit.getTimeMilliseconds() < displayStartMillis - 1000)
+			//					break;
+			if (!shouldPlot(unit)) continue;
+			pt = clickXYPos(unit);
+			if ((dist = ((pt.x - x) * (pt.x - x) + (pt.y - y) * (pt.y - y))) <= closest) {
+				closest = dist;
+				closestClick = unit;
 			}
 		}
-
-		System.out.println("Find click closest: " +closest); 
 
 		return closestClick;
 	}
@@ -3784,7 +3761,8 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		}
 		// first find the current click
 		ClickDetection click;
-		ListIterator<ClickDetection> clickIterator = cdb.getListIterator(PamDataBlock.ITERATOR_END);
+//		ListIterator<ClickDetection> clickIterator = cdb.getListIterator(PamDataBlock.ITERATOR_END);
+		ListIterator<ClickDetection> clickIterator = getPlottableClicksIterator(PamDataBlock.ITERATOR_END);
 		while (clickIterator.hasPrevious()) {
 			click = clickIterator.previous();
 			if (click == selectedClick) {
@@ -3818,14 +3796,45 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		// TODO Auto-generated method stub
 		super.clickedOnClick(click);
 	}
+	
+	/**
+	 * Get plottable clicks, i.e ones within time range and ones which 
+	 * pass data selection. 
+	 * @return Array list of clicks. 
+	 */
+	private ArrayList<ClickDetection> getPlottableClicks() {
+		/**
+		 * In viewer mode, it may be possible to not bother calling this by simply keeping
+		 * this list if the parameters haven't changed. 
+		 */
+		PamDataBlock<ClickDetection> clickData = clickControl.getClickDataBlock();
+		return clickData.getDataCopy(displayStartMillis, displayStartMillis+displayLengthMillis, true, getClickDataSelector());		
+	}
+	
+	/**
+	 * Get an iterator to plottable clicks, based around a COPY of underlying 
+	 * data, so no need to synchronize, but not to modify. 
+	 * @return iterator from start of plottable clicks array list. 
+	 */
+	private ListIterator<ClickDetection> getPlottableClicksIterator(int whereFrom) {
+		ArrayList<ClickDetection> clicks = getPlottableClicks();
+		if (whereFrom == PamDataBlock.ITERATOR_END) {
+			whereFrom = Math.max(0, clicks.size()-1);
+		}
+		return clicks.listIterator(whereFrom);
+	}
 
 	private ClickDetection getFirstSelectableClick() {
 		PamDataBlock<ClickDetection> cdb = clickControl.getClickDataBlock();
 		ListIterator<ClickDetection> clickIterator = cdb.getListIterator(0);
 		ClickDetection click;
+		ClickDataSelector dataSelector = getClickDataSelector();
 		while (clickIterator.hasNext()) {
 			click = clickIterator.next();
 			if (!shouldPlot(click) || !clickInMarkedArea(click)) {
+				continue;
+			}
+			if (dataSelector != null && dataSelector.scoreData(click) == 0) {
 				continue;
 			}
 			return click;
@@ -3837,9 +3846,13 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		PamDataBlock<ClickDetection> cdb = clickControl.getClickDataBlock();
 		ListIterator<ClickDetection> clickIterator = cdb.getListIterator(PamDataBlock.ITERATOR_END);
 		ClickDetection click;
+		ClickDataSelector dataSelector = getClickDataSelector();
 		while (clickIterator.hasPrevious()) {
 			click = clickIterator.previous();
 			if (!shouldPlot(click) || !clickInMarkedArea(click)) {
+				continue;
+			}
+			if (dataSelector != null && dataSelector.scoreData(click) == 0) {
 				continue;
 			}
 			return click;
@@ -3881,7 +3894,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			return;
 		}
 		PamDataBlock<ClickDetection> cdb = clickControl.getClickDataBlock();
-		ListIterator<ClickDetection> clickIterator = cdb.getListIterator(0);
+		ListIterator<ClickDetection> clickIterator = getPlottableClicksIterator(0);
 		ClickDetection click;
 		while (clickIterator.hasNext()) {
 			click = clickIterator.next();
@@ -4048,7 +4061,7 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 			double[][] clickWave = null;
 			int clickLen = 0;
 			try {
-				clickIterator = clickData.getListIterator(0);
+				clickIterator = getPlottableClicksIterator(0);
 
 				click = getFirstClick(startMillis);
 				if (click != null) {

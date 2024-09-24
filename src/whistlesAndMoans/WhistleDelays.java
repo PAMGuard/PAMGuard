@@ -184,8 +184,8 @@ public class WhistleDelays {
 		}
 		
 		private void clear(int fftLength) {
-			if (complexData == null || complexData.length() != fftLength) {
-				complexData = new ComplexArray(fftLength);
+			if (complexData == null || complexData.length() != fftLength/2) {
+				complexData = new ComplexArray(fftLength/2);
 				this.fftLength = fftLength;
 			}
 			else {
@@ -216,21 +216,21 @@ public class WhistleDelays {
 		}
 		
 		private double getDelay(double maxDelay) {
-			int i2;
-			for (int i = 0; i < fftLength / 2; i++) {
-				i2 = fftLength - 1 - i;
-				complexData.setReal(i2, complexData.getReal(i));
-				complexData.setImag(i2, -complexData.getImag(i));
-			}
-			fft.ifft(complexData, fftLength);
-			double scale = Math.sqrt(scale1*scale2)*2;
-			ComplexArray bearingData = complexData;
-//			double maxInd = -getPeakPos(bearingData);
-			double[] corrPeak = correlations.getInterpolatedPeak(complexData, scale, maxDelay);
+//			int i2;
+//			for (int i = 0; i < fftLength / 2; i++) {
+//				i2 = fftLength - 1 - i;
+//				complexData.setReal(i2, complexData.getReal(i));
+//				complexData.setImag(i2, -complexData.getImag(i));
+//			}
+//			fft.ifft(complexData, fftLength);
+//			ComplexArray bearingData = complexData;
+//			double[] corrPeak = correlations.getInterpolatedPeak(complexData, scale, maxDelay);
+			// swap to use more efficient inverse FFT that assumes conjugate. Faster and more accurate. 
+			double scale = Math.sqrt(scale1*scale2)*2/fftLength;
+			double[] xCorr = fft.realInverse(complexData);
+			double[] corrPeak = correlations.getInterpolatedPeak(xCorr, scale, maxDelay);
 			return corrPeak[0];
 			
-			
-//			return maxInd;
 		}
 		
 		private double getPeakPos(Complex[] bearingData) {

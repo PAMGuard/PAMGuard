@@ -583,7 +583,7 @@ public class ComplexArray implements Cloneable, Serializable {
 	 */
 	public ComplexArray fillConjugateHalf() {
 		double[] fData = Arrays.copyOf(data, data.length*2);
-		for (int re1 = 0, im1 = 1, re2 = fData.length-2, im2 = fData.length-1; re1 < data.length; re1+=2, im1+=2, re2-=2, im2-=2) {
+		for (int re1 = 0, im1 = re1+1, re2 = fData.length-2, im2 = re2+1; re1 < data.length; re1+=2, im1+=2, re2-=2, im2-=2) {
 			fData[re2] = data[re1];
 			fData[im2] = -data[im1];
 		}
@@ -652,6 +652,24 @@ public class ComplexArray implements Cloneable, Serializable {
 			s += rV*rV+iV*iV;
 		}
 		return s;
+	}
+
+	@Override
+	public String toString() {
+		String fmt = "%6.3f";
+		return toString(fmt);
+	}
+
+	private String toString(String fmt) {
+		if (data == null || data.length< 2) {
+			return null;
+		}
+		String lFmt = fmt + ", " + fmt;
+		String str = "";
+		for (int i = 0, j = 1; i < data.length; i+=2, j+=2) {
+			str += String.format(lFmt, data[i], data[j]) + "\n";
+		}
+		return str;
 	}
 
 }

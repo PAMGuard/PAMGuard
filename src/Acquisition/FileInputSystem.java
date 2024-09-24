@@ -13,9 +13,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioFormat.Encoding;
@@ -48,6 +50,8 @@ import Acquisition.filedate.FileDateObserver;
 import Acquisition.filetypes.SoundFileType;
 import Acquisition.pamAudio.PamAudioFileFilter;
 import Acquisition.pamAudio.PamAudioFileManager;
+import PamController.DataInputStore;
+import PamController.InputStoreInfo;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamSettingManager;
@@ -55,6 +59,7 @@ import PamController.PamSettings;
 import PamDetection.RawDataUnit;
 import PamUtils.PamCalendar;
 import PamUtils.PamFileChooser;
+import PamUtils.worker.filelist.WavFileType;
 import PamView.dialog.PamLabel;
 import PamView.dialog.warn.WarnOnce;
 import PamView.panel.PamPanel;
@@ -81,7 +86,7 @@ import wavFiles.ByteConverter;
  * @see FolderInputSystem
  *
  */
-public class FileInputSystem  extends DaqSystem implements ActionListener, PamSettings, FileDateObserver {
+public class FileInputSystem  extends DaqSystem implements ActionListener, PamSettings, FileDateObserver, DataInputStore {
 
 	public static final String sysType = "Audio File";
 
@@ -395,10 +400,23 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	 * @param newFile
 	 */
 	public void setNewFile (String newFile) {
-		fileInputParameters.recentFiles.remove(newFile);
-		fileInputParameters.recentFiles.add(0, newFile);
-		fillFileList();
+		if (newFile == null) {
+			return;
+		}
+		String currentFirst = getFirstFile();
+		if (newFile.equals(currentFirst) == false) {
+			fileInputParameters.recentFiles.remove(newFile);
+			fileInputParameters.recentFiles.add(0, newFile);
+			fillFileList();
+		}
 		interpretNewFile(newFile);
+	}
+	
+	public String getFirstFile() {
+		if (fileInputParameters.recentFiles.size() == 0) {
+			return null;
+		}
+		return fileInputParameters.recentFiles.get(0);
 	}
 
 	/**
@@ -429,7 +447,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		if (file.isFile() && !file.isHidden() && acquisitionDialog != null) {
 			try {
 
-				System.out.println("FileInputSystem - interpretNewFile");
+//				System.out.println("FileInputSystem - interpretNewFile");
 				AudioInputStream audioStream = PamAudioFileManager.getInstance().getAudioInputStream(file);
 
 				//      // Get additional information from the header if it's a wav file.
@@ -806,10 +824,10 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		if (getCurrentFile() == null) {
 			return;
 		}
-		double fileSecs = readFileSamples / getSampleRate();
-		double analSecs = (stopTime - fileStartTime) / 1000.;
-		System.out.println(String.format("File %s, SR=%dHz, length=%3.1fs took %3.1fs = %3.1fx real time",
-				getCurrentFile().getName(), (int)getSampleRate(), fileSecs, analSecs, fileSecs / analSecs));
+//		double fileSecs = readFileSamples / getSampleRate();
+//		double analSecs = (stopTime - fileStartTime) / 1000.;
+//		System.out.println(String.format("File %s, SR=%dHz, length=%3.1fs took %3.1fs = %3.1fx real time",
+//				getCurrentFile().getName(), (int)getSampleRate(), fileSecs, analSecs, fileSecs / analSecs));
 		fullyStopped = true;
 	}
 
@@ -915,7 +933,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 				fileProgress.setValue(progress);
 				sayEta();
 				long now = System.currentTimeMillis();
-				if (lastProgressTime > 0 && totalSamples > lastProgressUpdate) {
+				if (lastProgressTime > 0 && totalSamples > lastProgressUpdate && now-lastProgressTime > 1000) {
 					double speed = (double) (totalSamples - lastProgressUpdate) /
 							getSampleRate() / ((now-lastProgressTime)/1000.);
 					speedLabel.setText(String.format(" (%3.1f X RT)", speed));
@@ -1035,11 +1053,11 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 					long blockMillis = (int) ((newDataUnit.getStartSample() * 1000) / sampleRate);
 					//					newDataUnit.timeMilliseconds = blockMillis;
 					PamCalendar.setSoundFileTimeInMillis(blockMillis);
-					if (fileSamples > 0 && totalSamples - lastProgressUpdate >= getSampleRate()*2) {
+					long now = System.currentTimeMillis();
+					if (fileSamples > 0 && totalSamples - lastProgressUpdate >= getSampleRate()*2 && now-lastProgressTime>1000) {
 						int progress = (int) (1000 * readFileSamples / fileSamples);
 						fileProgress.setValue(progress);
 						sayEta();
-						long now = System.currentTimeMillis();
 						if (lastProgressTime > 0 && totalSamples > lastProgressUpdate) {
 							double speed = (double) (totalSamples - lastProgressUpdate) /
 									getSampleRate() / ((now-lastProgressTime)/1000.);
@@ -1187,6 +1205,9 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 			fileProgress.setMinimum(0);
 			fileProgress.setMaximum(1000);
 			fileProgress.setValue(0);
+			etaLabel.setToolTipText("Estimated end time (Local time)");
+			speedLabel.setToolTipText("Process speed (factor above real time)");
+			fileProgress.setToolTipText("Progress through current file");
 		}
 		return statusPanel;
 	}
@@ -1212,14 +1233,20 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 
 		long now = System.currentTimeMillis();
 		DateFormat df;
+		String str;
 		if (timeMs - now < (6 * 3600 * 1000)) {
-			df = DateFormat.getTimeInstance(DateFormat.MEDIUM);
+//			df = DateFormat.getTimeInstance(DateFormat.MEDIUM);
+			df = new SimpleDateFormat("HH:mm:ss");
+//			df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+//			str = PamCalendar.formatLocalDateTime(timeMs)
 		}
 		else {
-			df = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.MEDIUM);
+//			df = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.MEDIUM);
+			df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		}
 		Calendar c = Calendar.getInstance();
 		c.setTimeInMillis(timeMs);
+		TimeZone zone = c.getTimeZone();
 		etaLabel.setText("End " + df.format(c.getTime()));
 	}
 
@@ -1286,5 +1313,36 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		for (SoundFileType aType : selectedFileTypes) {
 			aType.selected(this);
 		}
+	}
+	@Override
+	public InputStoreInfo getStoreInfo(boolean detail) {
+//		System.out.println("FileInputSystem: Get store info start:");
+		File currentFile = getCurrentFile();
+		if (currentFile == null || currentFile.exists() == false) {
+			return null;
+		}
+		WavFileType wavType = new WavFileType(currentFile);
+		wavType.getAudioInfo();
+		long firstFileStart = getFileStartTime(currentFile.getAbsoluteFile());
+		float duration = wavType.getDurationInSeconds();
+		long fileEnd = (long) (firstFileStart + duration*1000.);
+		long[] allFileStarts = {firstFileStart};
+		long[] allFileEnds = {fileEnd};
+		InputStoreInfo storeInf = new InputStoreInfo(acquisitionControl, 1, firstFileStart, firstFileStart, fileEnd);
+		storeInf.setFileStartTimes(allFileStarts);
+		storeInf.setFileEndTimes(allFileEnds);
+		return storeInf;
+	}
+
+	@Override
+	public boolean setAnalysisStartTime(long startTime) {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	@Override
+	public String getBatchStatus() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
