@@ -72,7 +72,7 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 	@Override
 	public boolean exportData(File fileName, List<PamDataUnit> dataUnits, boolean append) {
 
-		System.out.println("Export: " + dataUnits.size() + " data units " + append);
+		System.out.println("Export: " + dataUnits.size() + " data units to mat append: " + append);
 
 		if (dataUnits==null || dataUnits.size()<1) {
 			//nothing to write but no error. 
@@ -93,7 +93,7 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 			//is there an existing sink? Is that sink writing to the correct file?
 			if (sink==null || !fileName.equals(currentFile)) {
 
-				System.out.println("Export: " + dataUnitsStruct.getNumDimensions() + entryName);
+				//System.out.println("Export: " + dataUnitsStruct.getNumDimensions() + entryName);
 
 				currentFile = fileName;
 

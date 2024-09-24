@@ -29,20 +29,7 @@ public class RRawExport extends RDataUnitExport<PamDataUnit> {
 
 		//add the raw wave data 
 		if (dataholder.getWaveData()!=null && dataholder.getWaveData().length>0) {
-			int nbins =dataholder.getWaveData().length*dataholder.getWaveData()[0].length;
-			int n=0;
-			double[] concatWaveform  = new double[nbins];
-			//System.out.println("Number of bins: " + nbins);
-			for (int i=0; i<dataholder.getWaveData().length; i++) {
-				for (int j=0; j<dataholder.getWaveData()[i].length; j++) {
-//					System.out.println("Current: " + i + " "+ j 
-//							+ " nchan: " + dataUnit.getNChan() + "  wave size: " 
-//							+ dataUnit.getWaveLength() +"len concat: " + concatWaveform.length);
-					concatWaveform[n++] = dataholder.getWaveData()[i][j];
-				}
-			}
-
-			Vector newMatrix = DoubleArrayVector.newMatrix(concatWaveform, dataholder.getWaveData()[0].length, dataholder.getWaveData().length); 
+			Vector newMatrix = doubleArr2R(dataholder.getWaveData()); 
 			rData.add("wave", newMatrix); 
 		}
 		
@@ -66,6 +53,8 @@ public class RRawExport extends RDataUnitExport<PamDataUnit> {
 		return rData;
 	}
 
+
+
 	@Override
 	public Class<?> getUnitClass() {
 		return RawDataHolder.class;
@@ -75,5 +64,7 @@ public class RRawExport extends RDataUnitExport<PamDataUnit> {
 	public String getName() {
 		return "raw_data_units";
 	}
+	
+	
 
 }

@@ -102,7 +102,7 @@ public class DLPredictionPanel implements PamDialogPanel {
 		c.ipadx =5;
 
 		c.gridwidth=2;
-		contentPanel.add(new Label("Min. prediciton for each class"), c);
+		contentPanel.add(new Label("Min. prediction for each class"), c);
 		c.gridwidth=1;
 		c.gridy++;
 

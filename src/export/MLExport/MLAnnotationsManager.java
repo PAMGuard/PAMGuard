@@ -49,23 +49,59 @@ public class MLAnnotationsManager {
 
 		DataAnnotationType annotType;
 		List<DataAnnotationType<?>> annotationTypes = parentblock.getAnnotationHandler().getAvailableAnnotationTypes();
+
+
 		for (int i=0; i<parentblock.getAnnotationHandler().getNumUsedAnnotationTypes(); i++) {
 
 			annotType = annotationTypes.get(i);
-			
-			//now iterate through the data annotations within the data unit and find the data annotation			
-			DataAnnotation dataAnnotationType;
+
+			//now iterate through the data annotations within the data unit and find the data annotation	
+			//Maybe not necessary but much safer than assuming data type list is same as annotatio list. 
+			DataAnnotation dataAnnotation;
 			for (int j=0; j<dataUnit.getNumDataAnnotations(); j++) {
-				
+				dataAnnotation=  dataUnit.getDataAnnotation(j); 
+				if (dataAnnotation.getDataAnnotationType().getAnnotationName().equals(annotType.getAnnotationName())){
+					//add the annotation even if it null
+					addAnnotations( mlStruct,  index,  dataUnit,  dataAnnotation, annotType);
+					break;
+				} 
 			}
-			
-			//add the annotation even if it null
-			addAnnotations( mlStruct,  index,  dataUnit,  dataUnit.getDataAnnotation(i), annotType);
-			
+
 		}; 
 
 	}
-	
+
+	/**
+	 * Get the name for the annotation i.e. the name to be used in the struct. 
+	 * @param annotationType - the annotation type
+	 * @return the anme to be used in the struct for the annotation
+	 */
+	public static String getAnnotationNameMAT( DataAnnotationType annotationType) {
+
+		String name = null;
+		switch (annotationType.getAnnotationName()){
+
+		case BearingAnnotationType.NAME:
+			name="bearing";
+			break;
+
+		case ClickClassificationType.NAME:
+			name="classification";
+			break;
+
+		case MatchedClickAnnotationType.NAME:
+			name="mclassification";
+			break;
+
+		case DLAnnotationType.NAME:
+			name="dlclassification";
+			break;
+		}
+
+		return name;
+
+	}
+
 	/**
 	 * Add an annotation to an existing MATLAB structure. 
 	 * @param mlStruct
@@ -75,77 +111,123 @@ public class MLAnnotationsManager {
 	 * @param annotationType
 	 */
 	public void addAnnotations(Struct mlStruct, int index, PamDataUnit dataUnit, DataAnnotation dataAnnotation, DataAnnotationType annotationType) {
-		
+
+
 		//if we don't have an annotation
 		if (dataAnnotation == null) {
-			mlStruct.set(annotationType.getAnnotationName(), index, Mat5.newMatrix(0, 0));
+			mlStruct.set(getAnnotationNameMAT(annotationType), index, Mat5.newMatrix(0, 0));
 			return;
 		}
-		
-		Struct struct = Mat5.newStruct();
 
+		Array annotation =null;
 		switch (dataAnnotation.getDataAnnotationType().getAnnotationName()){
+
 		case BearingAnnotationType.NAME:
 			BearingAnnotation bearingAnnotation = (BearingAnnotation) dataAnnotation;
-			struct.set(annotationType.getAnnotationName(),bearingAnnotation2MAT(bearingAnnotation));
+			annotation = bearingAnnotation2MAT(bearingAnnotation);
 			break;
 
 		case ClickClassificationType.NAME:
 			ClickClassifierAnnotation clkClassifierAnnotation = (ClickClassifierAnnotation) dataAnnotation;
-			struct.set(annotationType.getAnnotationName(),clkClassification2MAT(clkClassifierAnnotation));
+			annotation = clkClassification2MAT(clkClassifierAnnotation);
 			break;
 
 		case MatchedClickAnnotationType.NAME:
 			MatchedClickAnnotation matchAnnotation = (MatchedClickAnnotation) dataAnnotation;
-			struct.set(annotationType.getAnnotationName(),matchAnnotation2MAT(matchAnnotation));
+			annotation = matchAnnotation2MAT(matchAnnotation);
 			break;
 
 		case DLAnnotationType.NAME:
 			DLAnnotation dlAnnotation = (DLAnnotation) dataAnnotation;
-			struct.set(annotationType.getAnnotationName(),dlAnnoation2MAT(dlAnnotation));
+			annotation = dlAnnoation2MAT(dlAnnotation);
 			break;
-			
+
 		default:
 			System.out.println("MLAnnotationsManager: Annotation: " + dataAnnotation.getDataAnnotationType().getAnnotationName() 
-					+ " for " + dataUnit + " not supported: ");
+					+ " for " + dataUnit + " not yet supported: ");
+			return;
 
 		}
+		
+		mlStruct.set(getAnnotationNameMAT(annotationType),index,annotation);
+
 
 	}
-	
+
 
 	private Array matchAnnotation2MAT(MatchedClickAnnotation matchAnnotation) {
 		//now write the matched template classifier results. Results form each template are written. 
 		double threshold;
 		double matchCorr;
 		double rejectCorr; 
-		
+
 		double[][] macthAnnotationM = new double[matchAnnotation.getMatchedTemplateResult().size()][];
-		
+
 		for (int i = 0; i<matchAnnotation.getMatchedTemplateResult().size(); i++) {
 			threshold  = matchAnnotation.getMatchedTemplateResult().get(i).threshold;
 			matchCorr  = matchAnnotation.getMatchedTemplateResult().get(i).matchCorr;
 			rejectCorr = matchAnnotation.getMatchedTemplateResult().get(i).rejectCorr;
-			
+
 			macthAnnotationM[i] = new double[] {threshold, matchCorr, rejectCorr};
 
 		}
-	
 		return DLMatFile.array2Matrix(macthAnnotationM);
 	}
-	
-	
+
+
 	private Struct bearingAnnotation2MAT(BearingAnnotation bearingAnnotation) {
-		// TODO Auto-generated method stub
-		return null;
+
+
+		//extract the data needed for the bearing annotation
+		int hydrophones  = bearingAnnotation.getBearingLocalisation().getReferenceHydrophones(); 
+		int arrayType  = bearingAnnotation.getBearingLocalisation().getSubArrayType();
+		int localisationContent  = bearingAnnotation.getBearingLocalisation().getLocContents().getLocContent();
+		int nAngles  = bearingAnnotation.getBearingLocalisation().getAngles().length;
+		double[] angles  = bearingAnnotation.getBearingLocalisation().getAngles();
+		int nErrors  = bearingAnnotation.getBearingLocalisation().getAngleErrors().length;
+		double[] errors  = bearingAnnotation.getBearingLocalisation().getAngleErrors();
+		double[] refAngles =  bearingAnnotation.getBearingLocalisation().getReferenceAngles();
+
+		Struct bearingStruct = Mat5.newStruct(); 
+
+		bearingStruct.set("hydrophones", Mat5.newScalar(hydrophones));
+		bearingStruct.set("arrayType", Mat5.newScalar(arrayType));
+		bearingStruct.set("localisationContent", Mat5.newScalar(localisationContent));
+		bearingStruct.set("nAngles", Mat5.newScalar(nAngles));
+		bearingStruct.set("nErrors", Mat5.newScalar(nErrors));
+
+		bearingStruct.set("angles", DLMatFile.array2Matrix(angles));
+		bearingStruct.set("errors", DLMatFile.array2Matrix(errors));
+		bearingStruct.set("refAngles", DLMatFile.array2Matrix(refAngles));
+
+		//		for (int i=0; i<predictions.length; i++) {
+		//			predictions[i] = dlAnnotation.getModelResults().get(i).getPrediction();
+		//			decision[i] = dlAnnotation.getModelResults().get(i).isBinaryClassification();
+		//		}
+		//		
+		//		Struct dlAnnotationMat = Mat5.newStruct(); 
+		//		
+		//		dlAnnotationMat.set("predictions", DLMatFile.array2Matrix(PamArrayUtils.float2Double(predictions)));
+		//		
+		//		Matrix matrix = Mat5.newMatrix(decision.length, 1);
+		//		for (int i=0; i<decision.length; i++) {
+		//				matrix.setBoolean(i, decision[i]);
+		//		}
+		//		dlAnnotationMat.set("isdecision", matrix);
+
+		return bearingStruct;
 	}
 
-	private Struct clkClassification2MAT(ClickClassifierAnnotation dlAnnotation) {
-		
-		return null;
+	private Struct clkClassification2MAT(ClickClassifierAnnotation clkClassifyAnnot) {
+
+		Struct clkclsfrAnnotation = Mat5.newStruct(); 
+		clkclsfrAnnotation.set("classify_set", DLMatFile.array2Matrix(clkClassifyAnnot.getClassiferSet()));
+
+		return clkclsfrAnnotation; 
+
 	}
 
-	
+
 
 	private Struct dlAnnoation2MAT(DLAnnotation dlAnnotation) {
 		float[][] predictions = new float[dlAnnotation.getModelResults().size()][];
@@ -155,20 +237,20 @@ public class MLAnnotationsManager {
 			predictions[i] = dlAnnotation.getModelResults().get(i).getPrediction();
 			decision[i] = dlAnnotation.getModelResults().get(i).isBinaryClassification();
 		}
-		
+
 		Struct dlAnnotationMat = Mat5.newStruct(); 
-		
+
 		dlAnnotationMat.set("predictions", DLMatFile.array2Matrix(PamArrayUtils.float2Double(predictions)));
-		
+
 		Matrix matrix = Mat5.newMatrix(decision.length, 1);
 		for (int i=0; i<decision.length; i++) {
-				matrix.setBoolean(i, decision[i]);
+			matrix.setBoolean(i, decision[i]);
 		}
 		dlAnnotationMat.set("isdecision", matrix);
-		
+
 		return dlAnnotationMat;
 	}
- 
+
 
 
 
