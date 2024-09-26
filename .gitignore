@@ -37,6 +37,10 @@ bin/
 .classpath
 target/WMM.COF
 
+# IntellIJ
+.idea
+
+# Eclipse
 settings.xml
 .classpath
 .classpath
