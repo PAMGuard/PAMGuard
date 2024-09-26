@@ -136,7 +136,7 @@ public class FFTPluginPanelProvider implements DisplayPanelProvider {
 			isViewer = PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW;
 			setupPanel();
 
-			westAxis = new PamAxis(0, 0, 1, 1, getScaleMin(), getScaleMax(), true, "dB", "%.0f");
+			westAxis = new PamAxis(0, 0, 1, 1, getScaleMin(), getScaleMax(), true, "PSD (dB re 1µPa²/Hz)", "%.0f");
 			westAxis.setInterval(20);
 			//southAxis = new PamAxis(0, 0, 10, 10, 0, pamFFTProcess.getSampleRate()/2/1000, true, "kHz", "%.0f");
 			southAxis = new PamAxis(0, 0, 1, 1, 0, fftDataBlock.getSampleRate()/2/1000, false, "kHz", "%.0f");
