@@ -14,7 +14,7 @@ import us.hebi.matlab.mat.types.Struct;
  * @author Jamie Macaulay
  *
  */
-public class MLRawExport extends MLDataUnitExport<PamDataUnit>{
+public class MLRawExport extends MLDataUnitExport<PamDataUnit<?,?>>{
 
 	@Override
 	public Struct addDetectionSpecificFields(Struct mlStruct, int index, PamDataUnit dataUnit) {

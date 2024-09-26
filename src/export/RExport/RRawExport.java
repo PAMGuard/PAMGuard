@@ -10,7 +10,7 @@ import org.renjin.sexp.ListVector.NamedBuilder;
 
 import clickDetector.ClickDetection;
 
-public class RRawExport extends RDataUnitExport<PamDataUnit> {
+public class RRawExport extends RDataUnitExport<PamDataUnit<?,?>> {
 
 	@Override
 	public NamedBuilder addDetectionSpecificFields(NamedBuilder rData, PamDataUnit dataUnit, int index) {

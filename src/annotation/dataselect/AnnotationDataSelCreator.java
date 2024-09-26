@@ -5,7 +5,7 @@ import PamguardMVC.dataSelector.DataSelectorCreator;
 import annotation.DataAnnotation;
 import annotation.DataAnnotationType;
 
-public abstract class AnnotationDataSelCreator<TDataAnnotation extends DataAnnotation> extends DataSelectorCreator {
+public abstract class AnnotationDataSelCreator<TDataAnnotation extends DataAnnotation<?>> extends DataSelectorCreator {
 
 	private DataAnnotationType<TDataAnnotation> dataAnnotationType;
 	
