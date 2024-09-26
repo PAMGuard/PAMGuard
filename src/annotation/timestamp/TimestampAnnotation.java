@@ -4,11 +4,11 @@ import PamUtils.PamCalendar;
 import annotation.DataAnnotation;
 import annotation.DataAnnotationType;
 
-public class TimestampAnnotation extends DataAnnotation {
+public class TimestampAnnotation<T extends DataAnnotationType<?>> extends DataAnnotation<T> {
 
 	private long timestamp; 
 	
-	public TimestampAnnotation(DataAnnotationType dataAnnotationType) {
+	public TimestampAnnotation(T dataAnnotationType) {
 		super(dataAnnotationType);
 	}
 
