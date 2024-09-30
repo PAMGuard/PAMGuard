@@ -59,6 +59,8 @@ public class DelphinIDWorker extends  ArchiveModelWorker {
 
 		//now have to read the whsitle2image transform to get correct parameters for that. 
 		String jsonString  = DLTransformsParser.readJSONString(new File(this.getModel().getAudioReprFile()));
+		
+		
 		whistleImageParams = readWhistleImageTransform(new JSONObject(jsonString)) ;
 		if (whistleImageParams==null) {
 			System.err.println("Error: could not find whistle2image transform in DelphinID JSON file. Model will not work.");
@@ -96,12 +98,15 @@ public class DelphinIDWorker extends  ArchiveModelWorker {
 				freqLimits[1] = jsonObjectParams.getFloat("maxfreq"); 
 				size[0] = jsonObjectParams.getInt("widthpix"); 
 				size[1] = jsonObjectParams.getInt("heightpix"); 
+				double minfragmillis = jsonObjectParams.getDouble("minfragmillis"); 
+
 				double lineWidth = jsonObjectParams.getDouble("linewidthpix"); 
 
 				Whistle2ImageParams whistle2ImageParmas = new Whistle2ImageParams();
 				whistle2ImageParmas.freqLimits = freqLimits;
 				whistle2ImageParmas.size = size;
 				whistle2ImageParmas.lineWidth = lineWidth;
+				whistle2ImageParmas.minFragSize = minfragmillis;
 
 				return whistle2ImageParmas;
 			}
@@ -186,10 +191,10 @@ public class DelphinIDWorker extends  ArchiveModelWorker {
 			
 			transformedData2 = ((FreqTransform) transform).getSpecTransfrom().getTransformedData(); 
 
-			//a bit ugly but works.
+			//a bit ugly but works - it is very important we tranpose the matrix!!
 			transformedData2 = JamArr.transposeMatrix(transformedData2);
 
-//			System.out.println("DelphinID input image: " + transformedData2.length + " x " + transformedData2[0].length  );
+			//System.out.println("DelphinID input image: " + transformedData2.length + " x " + transformedData2[0].length  );
 			transformedDataStack[j] = DLUtils.toFloatArray(transformedData2); 
 			
 //			//TEMP

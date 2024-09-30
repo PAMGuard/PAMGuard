@@ -18,7 +18,7 @@ public class CPODSymbolManager extends StandardSymbolManager {
 	private PamControlledUnit cpodControl;
 	
 	
-	private static SymbolData defaultSymbol = new SymbolData(PamSymbolType.SYMBOL_CIRCLE, 10, 10, true, Color.BLACK, Color.BLACK);
+	public static SymbolData defaultSymbol = new SymbolData(PamSymbolType.SYMBOL_CIRCLE, 10, 10, true, Color.BLACK, Color.BLACK);
 	
 //	/**
 //	 * Flag to colour clicks by their frequency. It has to be one higher than the other options. 

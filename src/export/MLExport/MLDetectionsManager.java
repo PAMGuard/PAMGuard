@@ -49,6 +49,7 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 	public MLDetectionsManager(){
 		mlDataUnitsExport.add(new MLClickExport()); 
 		mlDataUnitsExport.add(new MLWhistleMoanExport()); 
+		mlDataUnitsExport.add(new MLCPODExport()); 
 		mlDataUnitsExport.add(new MLRawExport()); 
 	}
 
@@ -56,8 +57,10 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 	public boolean hasCompatibleUnits(Class dataUnitType) {
 		for (int i=0; i<mlDataUnitsExport.size(); i++){
 			//check whether the same. ;
-			//System.out.println(" dataUnits.get(j).getClass(): " + dataUnits.get(j).getClass());
-			//System.out.println(" mlDataUnitsExport.get(i).getUnitClass(): " + mlDataUnitsExport.get(i).getUnitClass());
+//			System.out.println("------");
+//			System.out.println(" dataUnitType " + dataUnitType);
+//			System.out.println(" mlDataUnitsExport.get(i).getUnitClass() " + mlDataUnitsExport.get(i).getUnitClass() 
+//					+ " " +  (mlDataUnitsExport.get(i).getUnitClass().isAssignableFrom(dataUnitType)));
 			if (mlDataUnitsExport.get(i).getUnitClass().isAssignableFrom(dataUnitType)) {
 				//System.out.println("FOUND THE DATA UNIT!");
 				return true; 
@@ -69,7 +72,7 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 	@Override
 	public boolean exportData(File fileName, List<PamDataUnit> dataUnits, boolean append) {
 
-		System.out.println("Export: " + dataUnits.size() + " data units " + append);
+		System.out.println("Export: " + dataUnits.size() + " data units to mat append: " + append);
 
 		if (dataUnits==null || dataUnits.size()<1) {
 			//nothing to write but no error. 
@@ -90,7 +93,7 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 			//is there an existing sink? Is that sink writing to the correct file?
 			if (sink==null || !fileName.equals(currentFile)) {
 
-				System.out.println("Export: " + dataUnitsStruct.getNumDimensions() + entryName);
+				//System.out.println("Export: " + dataUnitsStruct.getNumDimensions() + entryName);
 
 				currentFile = fileName;
 

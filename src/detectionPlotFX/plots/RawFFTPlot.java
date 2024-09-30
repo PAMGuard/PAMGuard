@@ -155,7 +155,7 @@ public abstract class RawFFTPlot<D extends PamDataUnit> extends FFTPlot<D> {
 		}
 		else {
 			//repaint the image!!
-			System.out.println("PAINT the image for: " +dataUnit.getUID());
+			//System.out.println("PAINT the image for: " +dataUnit.getUID());
 			if (detectionPlotDisplay.isViewer()) paintSpecImage(graphicsContext,  rectangle, projector);
 			paintDetections(dataUnit,  graphicsContext,  rectangle, projector) ;
 		}

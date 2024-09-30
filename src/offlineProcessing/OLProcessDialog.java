@@ -166,6 +166,7 @@ public class OLProcessDialog extends PamDialog {
 			c.gridx = 0;
 			aTask = taskGroup.getTask(i);
 			addComponent(tasksPanel, taskCheckBox[i] = new JCheckBox(aTask.getName()), c);
+			taskCheckBox[i].setToolTipText(aTask.getLongName());
 			taskCheckBox[i].addActionListener(new SelectionListener(aTask, taskCheckBox[i]));
 			c.gridx++;
 			if (aTask.hasSettings()) {

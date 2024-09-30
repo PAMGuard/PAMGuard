@@ -15,9 +15,12 @@ import pamViewFX.fxNodes.utilsFX.ColourArray.ColourArrayType;
  */
 public class StandardPlot2DColours implements Plot2DColours {
 	
+	private static final int NCOLOUR_DEFUALT = 256;
+
 	private ColourArrayType colourArrayType=ColourArrayType.HOT; 
 	
-	private Color[] colourArray=ColourArray.createStandardColourArray(256, colourArrayType=ColourArrayType.HOT).getColours();
+	private Color[] colourArray=ColourArray.createStandardColourArray(NCOLOUR_DEFUALT, colourArrayType=ColourArrayType.HOT).getColours();
+	
 	
 	/**
 	 * The amplitude limits 
@@ -115,15 +118,27 @@ public class StandardPlot2DColours implements Plot2DColours {
 	public ColourArrayType getColourMap() {
 		return this.colourArrayType;
 	}
-
+	
 	/**
 	 * Set the current colour map. 
-	 * @param colourMap
+	 * @param colourMap - the colour map to set.
 	 */
 	public void setColourMap(ColourArrayType colourMap) {
 		this.colourArrayType=colourMap; 
 		if (spectParams!=null) spectParams.setColourMap(colourMap);
-		ColourArray colourArray = ColourArray.createStandardColourArray(256, colourArrayType);
+		ColourArray colourArray = ColourArray.createStandardColourArray(NCOLOUR_DEFUALT, colourArrayType);
+		this.colourArray=colourArray.getColours();
+	}
+
+	/**
+	 * Set the current colour map. 
+	 * @param ncolours - the number of colours in the colour map. 
+	 * @param colourMap - the colour map to set.
+	 */
+	public void setColourMap(ColourArrayType colourMap, int ncolours) {
+		this.colourArrayType=colourMap; 
+		if (spectParams!=null) spectParams.setColourMap(colourMap);
+		ColourArray colourArray = ColourArray.createStandardColourArray(ncolours, colourArrayType);
 		this.colourArray=colourArray.getColours();
 	}
 
@@ -143,4 +158,5 @@ public class StandardPlot2DColours implements Plot2DColours {
 	public  DoubleProperty[]  getAmplitudeLimits() {
 		return this.amplitudeLimits;
 	}
+
 }

@@ -55,6 +55,8 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 		short endF = shortData[6];
 		short spl = shortData[7];
 		short slope = shortData[8];
+		
+		
 		CPODClick cpodClick = new CPODClick(baseData.getTimeMilliseconds(), baseData.getStartSample(), 
 				nCyc, bw, kHz, endF, spl, slope, shortData);
 //		cpodClick.setDurationInMilliseconds(baseData.getMillisecondDuration());
@@ -115,7 +117,7 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 				(short) FPODReader.IPItoKhz(fpodData.IPIatMax),  (short) FPODReader.IPItoKhz(fpodData.EndIPI), 
 				(short) fpodData.MaxPkExtnd, (short) 0, null);
 		
-		//durartion is measured more accurately in FPOD data
+		//DURATION is measured more accurately in FPOD data
 		cpodClick.setDurationInMilliseconds((fpodData.duration*5.)/1000.);
 		cpodClick.setSampleDuration((long) ((fpodData.duration*5./1e6)*CPODClickDataBlock.CPOD_SR));
 		
@@ -223,6 +225,8 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 	}
 
 	/**
+	 * 
+	 * Get the bandwidth in kHz
 	 * @return the bw
 	 */
 	public short getBw() {
@@ -334,7 +338,7 @@ public class CPODClick extends PamDataUnit<PamDataUnit,SuperDetection> implement
 		str += String.format("End Freq: %dkHz<p>", getEndF());
 		str += String.format("Slope: %d<p>", getSlope());
 		str += String.format("SPL: %d", getSpl());
-		if (rawData.length == 40) {
+		if (rawData != null && rawData.length == 40) {
 			str += String.format("<p>QClass %d, SpClass %d", CPODUtils.getBits(rawData[19], (short) 0x3), 
 					CPODUtils.getBits(rawData[19], (short) 0b11100));
 			str += String.format("<p>Train %d, %d click", rawData[20], rawData[23]);

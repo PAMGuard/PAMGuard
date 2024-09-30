@@ -127,12 +127,12 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 	private ExecutorService executorService;
 
 	/**
-	 * The left arrow
+	 * The left arrow (or top if vertical).
 	 */
 	private PamButton arrowBottomLeft;
 
 	/**
-	 * The right arrow. 
+	 * The right arrow (or top if vertical).
 	 */
 	private PamButton arrowTopRight;
 

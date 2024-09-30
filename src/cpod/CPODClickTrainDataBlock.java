@@ -6,7 +6,6 @@ import PamguardMVC.PamProcess;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import PamguardMVC.debug.Debug;
 import PamguardMVC.superdet.SuperDetDataBlock;
-import clickTrainDetector.CTDataUnit;
 import pamScrollSystem.ViewLoadObserver;
 
 /**
@@ -32,7 +31,7 @@ public class CPODClickTrainDataBlock extends SuperDetDataBlock<CPODClickTrainDat
 
 
 	public CPODClickTrainDataBlock(CPODControl2 cpodControl, PamProcess parentProcess, String name, int channelMap) {
-		super(CTDataUnit.class, name, parentProcess, channelMap, SuperDetDataBlock.ViewerLoadPolicy.LOAD_OVERLAPTIME);
+		super(CPODClickTrainDataUnit.class, name, parentProcess, channelMap, SuperDetDataBlock.ViewerLoadPolicy.LOAD_OVERLAPTIME);
 		this.cpodControl = cpodControl;
 	}
 	

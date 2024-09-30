@@ -9,7 +9,6 @@ import detectiongrouplocaliser.DetectionGroupDataUnit;
 
 /**
  * Base class for a click train data unit. 
- * Note this must implrement PamDetection to work with the clip generator. 
  * 
  * @author Jamie Macaulay 
  *
@@ -42,8 +41,6 @@ public class CPODClickTrainDataUnit extends DetectionGroupDataUnit implements Pa
 	 * @return
 	 */
 	public String getStringInfo() {
-		
-		
 		return String.format("Species: %s Confidence %d is echo? %b", getSpecies(), getConfidence(), isEcho());
 	}
 	

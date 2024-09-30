@@ -16,10 +16,12 @@ import PamController.soundMedium.GlobalMedium.SoundMedium;
 import PamModel.PamModuleInfo;
 import PamUtils.PamFileFilter;
 import binaryFileStorage.BinaryStore;
+import dataModelFX.connectionNodes.ModuleIconFactory;
 import generalDatabase.DBControlUnit;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.MenuButton;
@@ -163,7 +165,14 @@ public class PamSettingsMenuPane extends PamVBox {
 			for (int i=0; i<nUnits ;i++){
 				final int n=i; //need to make n final- OK since menu re-makes itself every time opened. 
 				menuItem=new MenuItem(PamController.getInstance().getControlledUnit(i).getUnitName());
+				
+//				Node icon = ModuleIconFactory.getInstance().getModuleNode(PamController.getInstance().getControlledUnit(i).getPamModuleInfo().getClassName());
+//				icon.setScaleX(0.25);
+//				icon.setScaleY(0.25);
+//				menuItem.setGraphic(icon);
+				
 				settings.getItems().add(menuItem);
+				
 				menuItem.setOnAction((event) -> { 
 					openSettingsDialog( PamController.getInstance().getControlledUnit(n));
 				});
