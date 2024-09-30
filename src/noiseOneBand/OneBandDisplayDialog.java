@@ -48,7 +48,7 @@ public class OneBandDisplayDialog extends PamDialog {
 		mainPanel.add(tabPane);
 		
 		JPanel scalePanel = new JPanel(new GridBagLayout());
-		scalePanel.setBorder(new TitledBorder("Amlitude Scale"));
+		scalePanel.setBorder(new TitledBorder("Amplitude Scale"));
 		GridBagConstraints c = new PamGridBagContraints();
 		c.gridwidth = 3;
 		addComponent(scalePanel, showGrid = new JCheckBox("Show Grid"), c);
@@ -62,14 +62,14 @@ public class OneBandDisplayDialog extends PamDialog {
 		c.gridx++;
 		addComponent(scalePanel, minAmp = new JTextField(5), c);
 		c.gridx++;
-		addComponent(scalePanel, new JLabel(" dB re 1\u03BCPa ", SwingConstants.LEFT), c);
+		addComponent(scalePanel, new JLabel(" dB", SwingConstants.LEFT), c);
 		c.gridx = 0;
 		c.gridy++;
 		addComponent(scalePanel, new JLabel("Max ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		addComponent(scalePanel, maxAmp = new JTextField(5), c);
 		c.gridx++;
-		addComponent(scalePanel, new JLabel(" dB re 1\u03BCPa ", SwingConstants.LEFT), c);
+		addComponent(scalePanel, new JLabel(" dB", SwingConstants.LEFT), c);
 		
 		tabPane.add(scalePanel, "Scale");
 		

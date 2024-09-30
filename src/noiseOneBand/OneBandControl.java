@@ -24,7 +24,12 @@ import offlineProcessing.OfflineTaskGroup;
 public class OneBandControl extends PamControlledUnit implements PamSettings {
 
 	public static final int NMEASURES = 4;
-	public static final String[] measureNames = {"RMS", "0-Peak", "Peak-Peak", "Integrated SEL"};
+	public static final String[] measureNames = {
+			"RMS (dB re 1µPa)",
+			"0-Peak (dB re 1µPa)",
+			"Peak-Peak (dB re 1µPa)",
+			"Integrated SEL  (dB re 1µPa²s)"
+	};
 	private OneBandProcess oneBandProcess;
 	private OneBandPulseProcess pulseProcess;
 	protected OneBandParameters oneBandParameters = new OneBandParameters();
