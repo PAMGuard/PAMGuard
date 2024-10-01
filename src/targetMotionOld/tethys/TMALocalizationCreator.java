@@ -1,5 +1,6 @@
 package targetMotionOld.tethys;
 
+import java.awt.Window;
 import java.util.List;
 
 import Localiser.LocaliserModel;
@@ -24,6 +25,7 @@ import nilus.Localize.Effort.CoordinateReferenceSystem;
 import nilus.Localize.Effort.CoordinateReferenceSystem.ReferenceFrame;
 import pamMaths.PamVector;
 import targetMotionOld.TargetMotionLocaliser;
+import targetMotionOld.TargetMotionOptions;
 import tethys.TethysTimeFuncs;
 import tethys.localization.Anchor;
 import tethys.localization.CoordinateName;
@@ -33,18 +35,22 @@ import tethys.localization.LocalizationSubTypes;
 import tethys.localization.LocalizationTypes;
 import tethys.localization.TimeReference;
 import tethys.pamdata.AutoTethysProvider;
+import tethys.swing.export.LocalizationOptionsPanel;
 
 public class TMALocalizationCreator implements LocalizationCreator {
 
 
 	int maxDimension = 2;
+	private TargetMotionLocaliser targetMotionLocaliser;
 
 	public TMALocalizationCreator(TargetMotionLocaliser targetMotionLocaliser) {
-		// TODO Auto-generated constructor stub
+		this.targetMotionLocaliser = targetMotionLocaliser;
 	}
 
 	@Override
 	public boolean sortLocalisationCoordinates(LocalizationBuilder localizationBuilder, PamDataBlock dataBlock) {
+
+
 		Localize doc = localizationBuilder.getCurrentDocument();
 		Effort locEffort = doc.getEffort();
 		locEffort.setTimeReference(TimeReference.beam.toString());
@@ -54,36 +60,35 @@ public class TMALocalizationCreator implements LocalizationCreator {
 		locTypes.add(LocalizationTypes.PerpendicularRange.toString());
 
 		/**
-		 * Currently, TMA is only outputing as WGS84. Future release will have 
-		 * options to put out local xyz coordinates instead, in which case this 
-		 * will be Engineering and the referenceFrame will become instrument. 
+		 * Set the coordinate type based on the options. 
 		 */
-		CoordinateReferenceSystem coordRefs = locEffort.getCoordinateReferenceSystem();
-		coordRefs.setName(CoordinateName.WGS84.toString());
-		coordRefs.setSubtype(LocalizationSubTypes.Geographic.toString());
+		CoordinateName coordName = getCoordinateName();
 
-		ReferenceFrame refFrame = localizationBuilder.getDefaultReferenceFrame(CoordinateName.WGS84, LocalizationSubTypes.Geographic);
+		CoordinateReferenceSystem coordRefs = locEffort.getCoordinateReferenceSystem();
+		coordRefs.setName(coordName.toString());
+		coordRefs.setSubtype(coordName.getSubType().toString());
+
+		ReferenceFrame refFrame = localizationBuilder.getDefaultReferenceFrame(coordName, coordName.getSubType());
 		if (refFrame != null) {
 			coordRefs.setReferenceFrame(refFrame);
 		}
-//		/**
-//		 * TMA is always references to the earth. 
-//		 */
-//		ReferenceFrame refFrame = coordRefs.getReferenceFrame();
-//		if (refFrame == null) {
-//			refFrame = new ReferenceFrame();
-//			try {
-//				Helper.createRequiredElements(refFrame);
-//			} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
-//				e.printStackTrace();
-//			}
-//			coordRefs.setReferenceFrame(refFrame);
-//		}
-//		refFrame.setAnchor(Anchor.WGS84.toString());
 
-		locEffort.setDimension(2);		
+		locEffort.setDimension(2);	
 
 		return true;
+	}
+
+	/**
+	 * Get the coordinate type, setting to WGS84 if it's undefined. 
+	 * @return Coordinate name
+	 */
+	private CoordinateName getCoordinateName() {
+//		TargetMotionOptions tmaOptions = targetMotionLocaliser.getTargetMotionOptions();
+//		if (tmaOptions.exportCoordinate == null) {
+//			tmaOptions.exportCoordinate = CoordinateName.WGS84;
+//		}
+//		return tmaOptions.exportCoordinate;
+		return CoordinateName.WGS84; // always this I think. I don't see a possibility of options in this one. 
 	}
 
 	@Override
@@ -91,12 +96,93 @@ public class TMALocalizationCreator implements LocalizationCreator {
 		/*
 		 * Add two types of localisation. A WGS84 and a perpendicular range. 
 		 */
+		CoordinateName coordName = getCoordinateName();
 		AbstractLocalisation pamLoc = dataUnit.getLocalisation();
-		LatLong latLong = pamLoc.getLatLong(0);
-		if (pamLoc instanceof GroupLocalisation == false || latLong == null) {
-			return localizationBuilder.createStandardLocalization(dataUnit);
+		if (pamLoc == null) {
+			return null;
+		}
+		if (pamLoc instanceof GroupLocalisation == false) {
+			return null;
 		}
 		LocalizationType loc = localizationBuilder.makeBaseLoc(dataUnit);
+		boolean locOk = false;
+		switch (coordName) {
+		case WGS84:
+			locOk = makeWGS84Localization(loc, pamLoc);
+			break;
+		case Cartesian:
+			locOk = makeCartesianLocalization(loc, pamLoc);
+			break;
+		case Cylindrical:
+			locOk = makeCylinderLocalization(loc, pamLoc);
+			break;
+		}
+		if (locOk == false) {
+			return null;
+		}
+
+		GroupLocalisation groupLoc = (GroupLocalisation) pamLoc;
+		GroupLocResult groupLocResult = groupLoc.getGroupLocaResult(0);
+		LocaliserModel tmaModel = groupLocResult.getModel();
+		// set the TMA information
+		Parameters params = loc.getParameters();
+		if (params == null) {
+			params = new Parameters();
+			loc.setParameters(params);
+		}
+		TargetMotionAnalysis tma = new TargetMotionAnalysis();
+		tma.setStart(TethysTimeFuncs.xmlGregCalFromMillis(dataUnit.getTimeMilliseconds()));
+		tma.setEnd(TethysTimeFuncs.xmlGregCalFromMillis(dataUnit.getEndTimeInMilliseconds()));
+		params.setTargetMotionAnalysis(tma);
+		Long timeAbeam = groupLocResult.getBeamTime();
+		if (timeAbeam != null) {
+			loc.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(timeAbeam));
+		}
+
+		//		 now also output a perpendicular distance.
+		Double perp = groupLocResult.getPerpendicularDistance();
+		if (perp != null) {
+			loc.setPerpendicularRangeM(AutoTethysProvider.roundDecimalPlaces(perp, 2));
+		}
+
+
+		// con only output one type. 
+		//		if (perp != null) {
+		//			AngularCoordinateType acType = new AngularCoordinateType();
+		//			acType.setAngle1(90);
+		//			acType.setDistanceM(AutoTethysProvider.roundDecimalPlaces(perp,1));
+		//			Angular angular = new Angular();
+		//			angular.setCoordinate(acType);
+		//			if (errors != null) {
+		//				AngularCoordinateType angErr = new AngularCoordinateType();
+		//				angErr.setDistanceM(errors.norm());
+		//				angular.setCoordinateError(angErr);
+		//			}
+		//			loc.setAngular(angular);
+		//		}
+
+
+
+		return loc;
+	}
+
+	private boolean makeCylinderLocalization(LocalizationType loc, AbstractLocalisation pamLoc) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	private boolean makeCartesianLocalization(LocalizationType loc, AbstractLocalisation pamLoc) {
+		LatLong latLong = pamLoc.getLatLong(0);
+		GroupLocalisation groupLoc = (GroupLocalisation) pamLoc;
+		GroupLocResult groupLocResult = groupLoc.getGroupLocaResult(0);
+		LocaliserModel tmaModel = groupLocResult.getModel();
+		boolean hasDepth = false;
+		
+		return false;
+	}
+
+	private boolean makeWGS84Localization(LocalizationType loc, AbstractLocalisation pamLoc) {
+		LatLong latLong = pamLoc.getLatLong(0);
 		GroupLocalisation groupLoc = (GroupLocalisation) pamLoc;
 		GroupLocResult groupLocResult = groupLoc.getGroupLocaResult(0);
 		LocaliserModel tmaModel = groupLocResult.getModel();
@@ -152,46 +238,7 @@ public class TMALocalizationCreator implements LocalizationCreator {
 
 		loc.setWGS84(wgs84);
 
-		// set the TMA information
-		Parameters params = loc.getParameters();
-		if (params == null) {
-			params = new Parameters();
-			loc.setParameters(params);
-		}
-		TargetMotionAnalysis tma = new TargetMotionAnalysis();
-		tma.setStart(TethysTimeFuncs.xmlGregCalFromMillis(dataUnit.getTimeMilliseconds()));
-		tma.setEnd(TethysTimeFuncs.xmlGregCalFromMillis(dataUnit.getEndTimeInMilliseconds()));
-		params.setTargetMotionAnalysis(tma);
-		Long timeAbeam = groupLocResult.getBeamTime();
-		if (timeAbeam != null) {
-			loc.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(timeAbeam));
-		}
-
-		//		 now also output a perpendicular distance.
-		Double perp = groupLocResult.getPerpendicularDistance();
-		if (perp != null) {
-			loc.setPerpendicularRangeM(AutoTethysProvider.roundDecimalPlaces(perp, 2));
-		}
-
-
-		// con only output one type. 
-		//		if (perp != null) {
-		//			AngularCoordinateType acType = new AngularCoordinateType();
-		//			acType.setAngle1(90);
-		//			acType.setDistanceM(AutoTethysProvider.roundDecimalPlaces(perp,1));
-		//			Angular angular = new Angular();
-		//			angular.setCoordinate(acType);
-		//			if (errors != null) {
-		//				AngularCoordinateType angErr = new AngularCoordinateType();
-		//				angErr.setDistanceM(errors.norm());
-		//				angular.setCoordinateError(angErr);
-		//			}
-		//			loc.setAngular(angular);
-		//		}
-
-
-
-		return loc;
+		return true;
 	}
 
 	@Override
@@ -201,5 +248,6 @@ public class TMALocalizationCreator implements LocalizationCreator {
 		locEffort.setDimension(maxDimension);
 		return ok;
 	}
+
 
 }

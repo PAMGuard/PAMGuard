@@ -1,5 +1,6 @@
 package binaryFileStorage;
 
+import java.awt.Desktop;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -31,6 +32,7 @@ import PamController.PamControlledUnitGUI;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamControllerInterface;
+import PamController.PamFolders;
 import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
@@ -478,24 +480,44 @@ PamSettingsSource, DataOutputStore {
 	@Override
 	public JMenuItem createFileMenu(JFrame parentFrame) {
 		JMenuItem m;
+		m = new JMenuItem("Storage options ...");
+		m.setToolTipText("Configure binary storage location and file lengths");
+		m.addActionListener(new BinaryStorageOptions(parentFrame));
+		JMenu settingsMenu = new JMenu(getUnitName());
+		settingsMenu.add(m);
+
 		if (isViewer || SMRUEnable.isEnable()) {
-			m = new JMenuItem("Storage options ...");
-			m.addActionListener(new BinaryStorageOptions(parentFrame));
-			JMenu settingsMenu = new JMenu(getUnitName());
-			settingsMenu.add(m);
 			m = new JMenuItem("Datagram options ...");
 			m.addActionListener(new DatagramOptions(parentFrame));
 			settingsMenu.add(m);
-			return settingsMenu;
 		}
-		else {
-			m = new JMenuItem("Binary Storage options ...");
-			m.addActionListener(new BinaryStorageOptions(parentFrame));
-			JMenu settingsMenu = new JMenu(getUnitName());
-			return m;
-		}
+
+		m = new JMenuItem("Open binary folder");
+		m.setToolTipText("Open folder in Explorer");
+		m.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				openBinaryFolder();
+			}
+		});
+		settingsMenu.add(m);
+		return settingsMenu;
 	}
 	
+	protected void openBinaryFolder() {
+		File file = new File(binaryStoreSettings.getStoreLocation());
+		if (file.exists() == false || file.isDirectory() == false) {
+			return;
+		}
+		Desktop desktop = Desktop.getDesktop();
+		try {
+			desktop.open(file);
+		} catch (IOException e1) {
+			System.out.println("Unable to open folder " + file);
+		}
+		
+	}
+
 	class DatagramOptions implements ActionListener {
 
 		private JFrame parentFrame;
