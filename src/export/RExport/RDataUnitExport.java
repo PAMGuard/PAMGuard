@@ -2,9 +2,12 @@ package export.RExport;
 
 import org.renjin.sexp.DoubleArrayVector;
 import org.renjin.sexp.ListVector;
+import org.renjin.sexp.Vector;
+import org.renjin.sexp.ListVector.NamedBuilder;
 
 import PamUtils.PamCalendar;
 import PamguardMVC.PamDataUnit;
+import export.MLExport.MLAnnotationsManager;
 
 /**
  * Exports a data unit to a List in R. Specific data units should subclass this. 
@@ -15,11 +18,17 @@ import PamguardMVC.PamDataUnit;
  */
 public abstract class RDataUnitExport<T extends PamDataUnit<?, ?>> {
 	
+	private RAnnotationManager rAnnotationsManager;
+
+	public RDataUnitExport() {
+		this.rAnnotationsManager = new RAnnotationManager(); 
+	}
+	
 	
 	/**
-	 * Create a MATLAB structure which contains all information for a data unit. 
-	 * @param dataUnit - the data unit to convert to a MATLAB structure
-	 * @return detection data MATLAB structure ready to be exported to a .mat file or added to a ArrayList<MLArray>. 
+	 * Create a R data frame which contains all information for a data unit. 
+	 * @param dataUnit - the data unit to convert to a R structure
+	 * @return detection data R structure ready to be exported to a .mat file or added to a ArrayList<MLArray>. 
 	 */
 	public ListVector.NamedBuilder detectionToStruct(T dataUnit, int index){
 		
@@ -57,6 +66,8 @@ public abstract class RDataUnitExport<T extends PamDataUnit<?, ?>> {
 		//add detection specific data 
 		rData= addDetectionSpecificFields(rData, dataUnit, index);
 		
+		rAnnotationsManager.addDataAnnotations(rData, dataUnit, index);
+				
 		return rData; 
 	}
 
@@ -79,5 +90,30 @@ public abstract class RDataUnitExport<T extends PamDataUnit<?, ?>> {
 	 * @return
 	 */
 	public abstract String getName();
+	
+	/**
+	 * Convert a 2D double array to a vector which can be added to an RData frame.
+	 * @param arr - the array
+	 * @return Vector containing the array data. 
+	 */
+	public static Vector doubleArr2R(double[][] arr) {
+		int nbins =arr.length*arr[0].length;
+		int n=0;
+		double[] concatWaveform  = new double[nbins];
+		//System.out.println("Number of bins: " + nbins);
+		for (int i=0; i<arr.length; i++) {
+			for (int j=0; j<arr[i].length; j++) {
+//				System.out.println("Current: " + i + " "+ j 
+//						+ " nchan: " + dataUnit.getNChan() + "  wave size: " 
+//						+ dataUnit.getWaveLength() +"len concat: " + concatWaveform.length);
+				concatWaveform[n++] = arr[i][j];
+			}
+		}
+
+		Vector newMatrix = DoubleArrayVector.newMatrix(concatWaveform, arr[0].length, arr.length); 
+		
+		return newMatrix;
+	}
+
 
 }

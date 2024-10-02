@@ -133,7 +133,7 @@ public class PitchRollComponent extends ArrayDimComponent {
 			if (drew) nDrawn++;
 			int iStreamer = getStreamerIndex(i);
 			if (nStreamers > 1) {
-				String sTxt = String.format("  –S%d", iStreamer);
+				String sTxt = String.format("S%d", iStreamer);
 				xt -= fontMetrics.charsWidth(sTxt.toCharArray(), 0, sTxt.length());
 				g2d.drawString(sTxt, xt, yt);
 			}

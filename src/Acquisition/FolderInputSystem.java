@@ -981,6 +981,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 
 	@Override
 	public boolean setAnalysisStartTime(long startTime) {
+				
 		/**
 		 * Called from the reprocess manager just before PAMGuard starts with a time
 		 * we want to process from. This should be equal to the start of one of the files

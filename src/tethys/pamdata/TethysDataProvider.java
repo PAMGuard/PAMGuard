@@ -2,6 +2,7 @@ package tethys.pamdata;
 
 import java.util.List;
 
+import Localiser.LocalisationAlgorithm;
 import PamDetection.LocalisationInfo;
 import PamguardMVC.PamDataUnit;
 import nilus.AlgorithmType;
@@ -140,6 +141,13 @@ public interface TethysDataProvider {
 	 */
 	public boolean wantExportDialogCard(ExportWizardCard wizPanel);
 	
+	/**
+	 * Get the localisation algorithm (if there is one). This is generally 
+	 * found automatically from the datablock, but it may be necessary to override. 
+	 * @return Localisation Algorithm, or null. 
+	 */
+	public LocalisationAlgorithm getLocalisationAlgorithm();
+
 	/**
 	 * Get localisation info for the datablock. Can be null, but probably never is. More likely to have a zero of available types;
 	 * @return

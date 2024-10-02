@@ -366,6 +366,7 @@ public class GenericDataPlotInfo extends TDDataInfoFX {
 	
 	protected void setDefaultOpacity(ParameterType dataType) {
 		if (dataType.equals(ParameterType.FREQUENCY)) {
+			//we set the default opacity because often frequency is shown as a box on a spectrogram. 
 			this.genericSettingsPane.setDefaultFillOpacity(DEFAULT_FILL_OPACITY);
 		}
 		else {

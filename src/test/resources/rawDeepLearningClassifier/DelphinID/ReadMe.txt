@@ -1,0 +1,1 @@
+Dde_415_s10_SI20120620_171333_d042_50.mat contains a Python image (whistle_image_gray_python) and the whistle contours (tfcontours) for a single segment. The whistle contours can be opened in Java to check that the and converted to an image then compared to the Python image. 

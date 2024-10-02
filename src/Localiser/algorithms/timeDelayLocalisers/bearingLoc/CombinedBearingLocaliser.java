@@ -1,11 +1,14 @@
 package Localiser.algorithms.timeDelayLocalisers.bearingLoc;
 
+import java.awt.Window;
 import java.io.Serializable;
 
 import Localiser.LocalisationAlgorithmInfo;
 import PamDetection.LocContents;
 import pamMaths.PamVector;
+import tethys.localization.LocalizationBuilder;
 import tethys.localization.LocalizationCreator;
+import tethys.swing.export.LocalizationOptionsPanel;
 
 @Deprecated
 public class CombinedBearingLocaliser implements BearingLocaliser {
@@ -90,6 +93,11 @@ public class CombinedBearingLocaliser implements BearingLocaliser {
 	@Override
 	public LocalizationCreator getTethysCreator() {
 		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public LocalizationOptionsPanel getLocalizationOptionsPanel(Window parent, LocalizationBuilder locBuilder) {
 		return null;
 	}
 

@@ -4,6 +4,7 @@ package cpod.dataSelector;
 import java.util.ArrayList;
 
 import PamguardMVC.dataSelector.DataSelectParams;
+import cpod.CPODClassification.CPODSpeciesType;
 
 /**
  * Parameters for the CPOD data data selectors. Thus allows users to filter
@@ -21,6 +22,16 @@ public class CPODDatSelectorParams extends DataSelectParams {
 	
 	//create the default list of params; 
 	public ArrayList<StandardCPODFilterParams> cpodDataFilterParams;
+
+	/**
+	 * Select only click trains
+	 */
+	public boolean selectClickTrain = false;
+	
+	/**
+	 * The species to select. Null indicates all species. 
+	 */
+	public  CPODSpeciesType speciesID = null;
 	
 	public CPODDatSelectorParams(){
 		cpodDataFilterParams = new 	ArrayList<StandardCPODFilterParams>(); 

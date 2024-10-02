@@ -11,7 +11,8 @@ import javafx.scene.paint.Color;
 import pamViewFX.fxNodes.pamScrollers.acousticScroller.ScrollBarPane;
 
 /**
- * A scroll bar whihc shows a summary fo the data. 
+ * A scroll bar which shows a summary of the data. This allows users to scroll to different sections of the data, 
+ * 
  */
 public class DataMapScrollBar extends ScrollBarPane {
 

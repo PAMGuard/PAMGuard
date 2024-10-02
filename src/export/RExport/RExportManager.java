@@ -49,6 +49,7 @@ public class RExportManager implements PamDataUnitExporter {
 		/***Add more options here to export data units****/
 		rDataExport.add(new RClickExport()); 
 		rDataExport.add(new RWhistleExport()); 
+		rDataExport.add(new RCPODExport()); 
 		rDataExport.add(new RRawExport()); //should be last in case raw data holders have specific exporters
 	}
 
@@ -136,7 +137,7 @@ public class RExportManager implements PamDataUnitExporter {
 
 	/**
 	 * Sort a list of data units into lists of the same type of units. Convert to a list of structures. 
-	 * @param dataUnits - a list of data units to convert to matlab structures. 
+	 * @param dataUnits - a list of data units to convert to R data frames. 
 	 * @return list of list of R strucutures ready for saving to .RData file. 
 	 */
 	public RData dataUnits2R(List<PamDataUnit> dataUnits){
