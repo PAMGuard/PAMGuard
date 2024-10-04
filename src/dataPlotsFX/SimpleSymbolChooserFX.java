@@ -1,13 +1,9 @@
 package dataPlotsFX;
 
-import pamViewFX.fxNodes.PamSymbolFX;
-import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
-import javafx.scene.paint.Color;
 import PamView.PamSymbolType;
-import PamView.symbol.LineData;
 import PamView.symbol.SymbolData;
-import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import pamViewFX.fxNodes.PamSymbolFX;
 
 public class SimpleSymbolChooserFX implements TDSymbolChooserFX {
 	

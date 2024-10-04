@@ -284,7 +284,7 @@ public abstract class LM {
 
 	  //The original Fortran (and C) code had 'goto L300' statements.
 	  //Here we replace them with 'throw new L300()' in a try/catch block.
-	  class L300 extends Exception { static final long serialVersionUID = 0; };
+	  class L300 extends Exception { static final long serialVersionUID = 0; }
 	  
 	  try {
 	  /* Check the input parameters for errors.
@@ -551,7 +551,7 @@ public abstract class LM {
 	   */
 	  }
 
-	  } catch (L300 ex) {};      //this used to be labeled 'L300:'
+	  } catch (L300 ex) {}      //this used to be labeled 'L300:'
 
 	  /* Termination, either normal or user imposed.
 	   */

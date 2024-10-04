@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.List;
 
 import PamController.PamViewParameters;
 import PamguardMVC.PamDataUnit;
@@ -132,6 +131,7 @@ public abstract class SuperDetLogging extends SQLLogging {
 		return ok;
 	}
 
+	@Override
 	public boolean saveOfflineData(DBControlUnit dbControlUnit, PamConnection connection) {
 		return super.saveOfflineData(dbControlUnit, connection);
 	}

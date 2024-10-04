@@ -24,8 +24,6 @@
 
 package soundtrap;
 
-import java.awt.Component;
-
 import Acquisition.AcquisitionControl;
 import Acquisition.DaqSystem;
 import PamController.PamControlledUnitSettings;

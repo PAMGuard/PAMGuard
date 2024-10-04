@@ -1,12 +1,10 @@
 package targetMotionModule;
 
 import java.util.ArrayList;
+
 import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
 
-import pamMaths.PamQuaternion;
-import pamMaths.PamVector;
-import targetMotionModule.TMManager.TMInfoWorker;
 import Array.ArrayManager;
 import Array.PamArray;
 import GPS.GPSDataBlock;
@@ -19,6 +17,9 @@ import PamUtils.PamUtils;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.debug.Debug;
+import pamMaths.PamQuaternion;
+import pamMaths.PamVector;
+import targetMotionModule.TMManager.TMInfoWorker;
 
 @SuppressWarnings("rawtypes") 
 @Deprecated 
@@ -104,6 +105,7 @@ public class AbstractTargetMotionInformation implements TargetMotionInformation 
 		speedOfSound = currentArray.getSpeedOfSound();
 	}
 	
+	@Override
 	public int getNDetections(){
 		if (currentDetections==null) return 0;
 		return currentDetections.size();
@@ -420,6 +422,7 @@ public class AbstractTargetMotionInformation implements TargetMotionInformation 
 		return v;
 	}
 	
+	@Override
 	public int getReferenceHydrophones(){
 		int referenceHydrophones=0; 
 		for (int i=0; i<currentDetections.size(); i++){
@@ -496,6 +499,7 @@ public class AbstractTargetMotionInformation implements TargetMotionInformation 
 	 * @return lat long
 	 */
 	long millisOver=90000; 
+	@Override
 	public GpsData getBeamLatLong(LatLong localised){
 		
 		GPSDataBlock gpsDataBlock = (GPSDataBlock) PamController.getInstance().getDataBlock(GpsDataUnit.class, 0);

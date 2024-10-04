@@ -8,14 +8,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 
-import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.border.TitledBorder;
 
 import PamView.PamSidePanel;
 import PamView.dialog.PamButton;
-import PamView.dialog.PamLabel;
 import PamView.dialog.ScrollingPamLabel;
 import PamView.panel.PamBorder;
 import PamView.panel.PamBorderPanel;
@@ -42,6 +40,7 @@ public class RecorderSidePanel implements PamSidePanel , RecorderView {
 		
 	}
 	
+	@Override
 	public JComponent getPanel() {
 		return sidePanel;
 	}
@@ -96,25 +95,30 @@ public class RecorderSidePanel implements PamSidePanel , RecorderView {
 		}
 	}
 
+	@Override
 	public void newData(PamDataBlock dataBlock, PamDataUnit dataUnit) {
 		// TODO Auto-generated method stub
 		
 	}
 
+	@Override
 	public void enableRecording(boolean enable) {
 		buttonAuto.setEnabled(enable);
 		buttonStart.setEnabled(enable);
 		buttonStartBuffered.setEnabled(enable);
 	}
 	
+	@Override
 	public void enableRecordingControl(boolean enable) {
 	}
 		
+	@Override
 	public void newParams() {
 		// TODO Auto-generated method stub
 		
 	}
 
+	@Override
 	public void setButtonStates(int pressedButton) {
 			buttonOff.setSelected(pressedButton == BUTTON_OFF);
 			buttonAuto.setSelected(pressedButton == BUTTON_AUTO);
@@ -129,12 +133,14 @@ public class RecorderSidePanel implements PamSidePanel , RecorderView {
 		MainButtonListener(int buttonCommand) {
 			this.buttonCommand = buttonCommand;
 		}
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			recorderControl.buttonCommand(buttonCommand);
 		}
 	}
 	
 
+	@Override
 	public void sayStatus(String status) {
 		String str = "File Error";
 		switch (recorderControl.getRecorderStatus()) {
@@ -158,6 +164,7 @@ public class RecorderSidePanel implements PamSidePanel , RecorderView {
 		recordStatus.setText(str);
 	}
 
+	@Override
 	public void rename(String newName) {
 		titledBorder.setTitle(newName);	
 		sidePanel.repaint();

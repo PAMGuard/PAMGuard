@@ -6,8 +6,6 @@ package mapgrouplocaliser;
 import java.awt.Window;
 
 import Map.MapProjector;
-import PamView.GeneralProjector;
-import PamView.paneloverlay.OverlayDataInfo;
 import PamView.paneloverlay.OverlayDataManager;
 import PamView.paneloverlay.OverlayMarkSwingPanel;
 import PamView.paneloverlay.OverlaySwingPanel;

@@ -1,16 +1,15 @@
 package quickAnnotation;
 
 import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+
 import PamUtils.Coordinate3d;
 import PamView.GeneralProjector;
 import PamView.PamSymbol;
 import PamguardMVC.PamDataUnit;
 import annotation.string.StringAnnotation;
-import annotation.string.StringAnnotationType;
 import annotationMark.MarkDataBlock;
 import annotationMark.MarkDataUnit;
 import annotationMark.MarkModule;

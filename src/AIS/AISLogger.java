@@ -1,22 +1,19 @@
 package AIS;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
+
+import PamController.PamController;
+import PamView.dialog.warn.WarnOnce;
+import PamguardMVC.PamDataUnit;
 import generalDatabase.DBProcess;
 import generalDatabase.PamConnection;
 import generalDatabase.PamTableDefinition;
 import generalDatabase.PamTableItem;
 import generalDatabase.SQLLogging;
 import generalDatabase.SQLTypes;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
-
-import javax.naming.ldap.HasControls;
-
-import PamController.PamController;
-import PamView.dialog.warn.WarnOnce;
-import PamguardMVC.PamDataUnit;
 
 public class AISLogger extends SQLLogging {
 
@@ -167,7 +164,7 @@ public class AISLogger extends SQLLogging {
 			acallSign = (String) callSign.getValue();
 			ashipName = (String) shipName.getValue();
 			ashipType = (String) shipType.getValue();
-			aetaMillis = sqlTypes.millisFromTimeStamp(eta.getValue());
+			aetaMillis = SQLTypes.millisFromTimeStamp(eta.getValue());
 			//			aetaMillis = (Long) eta.getValue();
 			adraught = (Double) draft.getValue();
 			adestination = (String) destination.getValue();

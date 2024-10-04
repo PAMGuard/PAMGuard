@@ -1,7 +1,6 @@
 package whistlesAndMoans;
 
 import PamUtils.complex.ComplexArray;
-import fftManager.Complex;
 import fftManager.FFTDataUnit;
 
 public class SliceData {
@@ -90,7 +89,7 @@ public class SliceData {
 			iR = 0;
 		}
 		for (int i = 0; i < sliceLength; i++) {
-			if (slicePixs[i] == false) {
+			if (!slicePixs[i]) {
 				continue;
 			}
 			temp = fftData.magsq(i);

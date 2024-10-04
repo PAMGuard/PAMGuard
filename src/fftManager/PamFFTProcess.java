@@ -24,17 +24,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Vector;
 
-import PamController.PamController;
 import PamDetection.RawDataUnit;
 import PamUtils.PamUtils;
 import PamUtils.complex.ComplexArray;
-import PamguardMVC.ProcessAnnotation;
 import PamguardMVC.PamConstants;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
 import PamguardMVC.PamRawDataBlock;
+import PamguardMVC.ProcessAnnotation;
 import Spectrogram.WindowFunction;
 
 /**

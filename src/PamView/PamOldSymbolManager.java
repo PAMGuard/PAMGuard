@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamControllerInterface;
@@ -66,7 +67,7 @@ public class PamOldSymbolManager implements PamSettings, Serializable {
 	 *            class with the symbol to be managed
 	 */
 	public void addManagesSymbol(ManagedSymbol managedSymbol) {
-		if (managedSymbols.contains(managedSymbol) == false) {
+		if (!managedSymbols.contains(managedSymbol)) {
 			managedSymbols.add(managedSymbol);
 
 			if (oldSettings != null) {
@@ -95,13 +96,13 @@ public class PamOldSymbolManager implements PamSettings, Serializable {
 	 * @param managedSymbol
 	 */
 	public void updateManagedSymbol(ManagedSymbol managedSymbol) {
-		if (managedSymbols.contains(managedSymbol) == false) {
+		if (!managedSymbols.contains(managedSymbol)) {
 			return;
 		}
 
 		if (oldSettings != null) {
 			for (int i = 0; i < oldSettings.size(); i++) {
-				if (i < usedOldSettings.length && usedOldSettings[i] == false)
+				if (i < usedOldSettings.length && !usedOldSettings[i])
 					continue;
 				if (managedSymbol.getSymbolInfo().getDescription().equals(
 						oldSettings.get(i).getDescription())) {
@@ -183,6 +184,7 @@ public class PamOldSymbolManager implements PamSettings, Serializable {
 			this.managedSymbol = managedSymbol;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent arg0) {
 
 			changeSymbol(guiFrame, managedSymbol);
@@ -208,6 +210,7 @@ public class PamOldSymbolManager implements PamSettings, Serializable {
 		}
 	}
 
+	@Override
 	public Serializable getSettingsReference() {
 
 		ArrayList<SymbolSettingsStoreUnit> s = new ArrayList<SymbolSettingsStoreUnit>();
@@ -221,18 +224,22 @@ public class PamOldSymbolManager implements PamSettings, Serializable {
 		return s;
 	}
 
+	@Override
 	public long getSettingsVersion() {
 		return SymbolSettingsStoreUnit.serialVersionUID;
 	}
 
+	@Override
 	public String getUnitName() {
 		return "PamSymbolManager";
 	}
 
+	@Override
 	public String getUnitType() {
 		return "PamSymbolManager";
 	}
 
+	@Override
 	public boolean restoreSettings(
 			PamControlledUnitSettings pamControlledUnitSettings) {
 		try {

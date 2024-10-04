@@ -164,7 +164,8 @@ abstract public class DisplayPanel {
 		g2d.setColor(PamColors.getInstance().getColor(PamColor.PlOTWINDOW));
 		if (x1 <= x2) {
 			g2d.fillRect(x1, 0, x2-x1+1, imageHeight);
-			if (drawLine) {
+			boolean wrap = getDisplayPanelContainer().wrapDisplay();
+			if (drawLine && wrap) {
 				//			g2d.setColor(PamColors.getInstance().getColor(PamColor.PLAIN));
 				g2d.setColor(Color.RED);
 				g2d.drawLine(x2+1, 0, x2+1, imageHeight);
@@ -329,7 +330,7 @@ abstract public class DisplayPanel {
 		@Override
 		protected void paintComponent(Graphics g) {
 			super.paintComponent(g);
-			if (isShowing() == false) return;
+			if (!isShowing()) return;
 			if (getWidth() != imageWidth || 
 					getHeight() != imageHeight) {
 				displayPanel.createImage();

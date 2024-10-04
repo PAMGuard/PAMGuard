@@ -1,12 +1,9 @@
 package effort;
 
-import java.awt.Frame;
 import java.awt.Window;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import Map.MapParametersDialog;
 import PamController.PamController;
 import PamView.GeneralProjector;
 import PamView.PamSymbol;
@@ -52,13 +49,13 @@ public abstract class EffortProvider {
 	 * notified at real time end
 	 * @param timeMilliseconds
 	 */
-	public abstract void realTimeStop(long timeMilliseconds); ;
+	public abstract void realTimeStop(long timeMilliseconds);
 	
 	/**
 	 * Notified for real time data. 
 	 * @param pamDataUnit
 	 */
-	public abstract void newData(PamDataUnit pamDataUnit); ;
+	public abstract void newData(PamDataUnit pamDataUnit);
 	
 	/**
 	 * Get the effort for a specific time. 

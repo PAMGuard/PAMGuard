@@ -9,6 +9,7 @@ import Localiser.detectionGroupLocaliser.GroupLocalisation;
 import PamController.PamController;
 import PamController.PamControllerInterface;
 import PamDetection.AbstractLocalisation;
+import PamDetection.LocContents;
 import PamUtils.CPUMonitor;
 import PamView.GroupedDataSource;
 import PamView.GroupedSourceParameters;
@@ -16,11 +17,9 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
-import PamguardMVC.debug.Debug;
 import generalDatabase.DBControlUnit;
 import generalDatabase.PamConnection;
 import group3dlocaliser.algorithm.LocaliserAlgorithm3D;
-import group3dlocaliser.algorithm.crossedbearing.CrossedBearingGroupLocaliser;
 import group3dlocaliser.grouper.DetectionGroupMonitor;
 import group3dlocaliser.grouper.DetectionGroupedSet;
 import group3dlocaliser.grouper.DetectionGrouper;
@@ -41,6 +40,8 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 	private Group3DLogging group3dLogging;
 
 	private CPUMonitor cpuMonitor = new CPUMonitor();
+
+	private int standardLocContents = LocContents.HAS_LATLONG | LocContents.HAS_DEPTH | LocContents.HAS_XYZ | LocContents.HAS_PERPENDICULARERRORS;
 
 	/**
 	 * Process for 3D localisation based on multiple hydrophone clusters.
@@ -63,6 +64,7 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 				Group3DOverlayDraw.defaultSymbol.getSymbolData()));
 		group3dLogging = new Group3DLogging(group3DControl, group3dDataBlock);
 		group3dDataBlock.SetLogging(group3dLogging);		
+		group3dDataBlock.setLocalisationContents(standardLocContents );
 	}
 
 	/*
@@ -230,7 +232,7 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 				}
 			}
 		
-			System.out.println("Ran localisation " + i + " " + localiserAlgorithm3D.getName() + "  got: " + abstractLocalisation.getLatLong(0) + "  " + abstractLocalisation.getHeight(0) + " Error: " +  abstractLocalisation.getLocError(0));
+//			System.out.println("Ran localisation " + i + " " + localiserAlgorithm3D.getName() + "  got: " + abstractLocalisation.getLatLong(0) + "  " + abstractLocalisation.getHeight(0) + " Error: " +  abstractLocalisation.getLocError(0));
 
 			if (abstractLocalisation instanceof GroupLocalisation) {
 				groupLocalisation = (GroupLocalisation) abstractLocalisation;
@@ -276,7 +278,7 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 			
 			
 		}
-		if (bestLocalisation != null && logAll == false) {
+		if (bestLocalisation != null && !logAll) {
 			// best make and output a data unit !
 			// List<PamDataUnit> bestGroup = detectionGroupedSet.getGroup(bestSet);
 			// Group3DDataUnit newDataUnit = new
@@ -287,7 +289,7 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 			Group3DDataUnit newDataUnit = group3dDataUnits[bestSet];
 			newDataUnit.setLocalisation(bestLocalisation);
 			
-			System.out.println("Set click localisation: " + bestSet + "  " + bestLocalisation.getRange(0) + "  " + bestLocalisation.getLatLong(0));
+//			System.out.println("Set click localisation: " + bestSet + "  " + bestLocalisation.getRange(0) + "  " + bestLocalisation.getLatLong(0));
 			group3dDataBlock.addPamData(newDataUnit);
 			if (group3DControl.isViewer()) {
 				// call explicityly since it won't happen in normal mode.
@@ -316,7 +318,7 @@ public class Group3DProcess extends PamProcess implements DetectionGroupMonitor 
 		LocaliserError err = result1.getLocError();
 		
 		//if one has location information and the other does not, choose the one with the 
-		System.out.println("LAT LONG TEST: " + result1.getLatLong() + "  " + result2.getLatLong()); 
+//		System.out.println("LAT LONG TEST: " + result1.getLatLong() + "  " + result2.getLatLong()); 
 		if (result1.getLatLong()==null && result2.getLatLong()!=null) {
 			return false;
 		}

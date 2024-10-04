@@ -2,7 +2,6 @@ package Map;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.ListIterator;
 
 import PamModel.parametermanager.ManagedParameters;
@@ -21,7 +20,7 @@ public class MapDetectionsParameters implements Serializable, Cloneable, Managed
 	
 	static public final long serialVersionUID = 0;
 	
-	protected ArrayList<MapDetectionData> mapDetectionDatas = new ArrayList<MapDetectionData>();;
+	protected ArrayList<MapDetectionData> mapDetectionDatas = new ArrayList<MapDetectionData>();
 
 	@Override
 	public MapDetectionsParameters clone() {

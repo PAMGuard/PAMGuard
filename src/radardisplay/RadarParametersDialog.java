@@ -14,13 +14,12 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import Array.ArrayManager;
-import Map.MapDetectionData;
 import PamController.PamController;
 import PamView.GeneralProjector.ParameterType;
 import PamView.dialog.PamDialog;
@@ -86,9 +85,9 @@ public class RadarParametersDialog extends PamDialog {
 
 	@Override
 	public boolean getParams() {
-		if (stylePanel.getParams() == false) return false;
-		if (scalePanel.getParams() == false) return false;
-		if (detectorsPanel.getParams() == false) return false;
+		if (!stylePanel.getParams()) return false;
+		if (!scalePanel.getParams()) return false;
+		if (!detectorsPanel.getParams()) return false;
 		return true;
 	}
 
@@ -141,20 +140,20 @@ public class RadarParametersDialog extends PamDialog {
 			setBorder(new TitledBorder("Plot layout"));
 			constraints.gridx = 0;
 			constraints.gridy = 0;
-			addComponent(this, new JLabel("Name ", JLabel.RIGHT), constraints);
+			addComponent(this, new JLabel("Name ", SwingConstants.RIGHT), constraints);
 			constraints.gridx ++;
 			constraints.gridwidth = 2;
 			addComponent(this, windowName = new JTextField(20), constraints);
 			constraints.gridwidth = 1;
 			constraints.gridx = 0;
 			constraints.gridy ++;
-			addComponent(this, new JLabel("Style ", JLabel.RIGHT), constraints);
+			addComponent(this, new JLabel("Style ", SwingConstants.RIGHT), constraints);
 			constraints.gridx ++;
 			addComponent(this, sides = new JComboBox(), constraints);
 
 			constraints.gridx = 0;
 			constraints.gridy ++;
-			addComponent(this, new JLabel("Orientation ", JLabel.RIGHT), constraints);
+			addComponent(this, new JLabel("Orientation ", SwingConstants.RIGHT), constraints);
 			constraints.gridx ++;
 			addComponent(this, orientation = new JComboBox(), constraints);
 			orientation.addItem("Heading Up");
@@ -163,7 +162,7 @@ public class RadarParametersDialog extends PamDialog {
 			
 			constraints.gridx = 0;
 			constraints.gridy ++;
-			addComponent(this, new JLabel("Radial Axis ", JLabel.RIGHT), constraints);
+			addComponent(this, new JLabel("Radial Axis ", SwingConstants.RIGHT), constraints);
 			constraints.gridx ++;
 			addComponent(this, radialAxis = new JComboBox(), constraints);
 			radialAxis.addActionListener(new ChangeListener());
@@ -214,6 +213,7 @@ public class RadarParametersDialog extends PamDialog {
 	
 	class ChangeListener implements ActionListener {
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			
 			if (scalePanel != null) {
@@ -384,9 +384,9 @@ public class RadarParametersDialog extends PamDialog {
 
 			addComponent(this, new JLabel("Detector"), constraints);
 			constraints.gridx++;
-			addComponent(this, new JLabel("Lifetime (s)", JLabel.CENTER), constraints);
+			addComponent(this, new JLabel("Lifetime (s)", SwingConstants.CENTER), constraints);
 			constraints.gridx++;
-			addComponent(this, new JLabel(" Fade ", JLabel.CENTER), constraints);
+			addComponent(this, new JLabel(" Fade ", SwingConstants.CENTER), constraints);
 			
 			if (detectorDataBlocks != null) {
 //				if (radarParameters.showDetector == null ||
@@ -409,7 +409,7 @@ public class RadarParametersDialog extends PamDialog {
 			EnableListener enableListener = new EnableListener();
 			for (int i = 0; i < detectorDataBlocks.size(); i++) {
 				dataBlock = detectorDataBlocks.get(i);
-				if (dataBlock.canDraw(radarProjector) == false) continue;
+				if (!dataBlock.canDraw(radarProjector)) continue;
 				constraints.gridx = 0;
 				constraints.gridy ++;
 				constraints.anchor = GridBagConstraints.WEST;

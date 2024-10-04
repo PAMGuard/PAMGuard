@@ -18,7 +18,6 @@ import javax.swing.border.TitledBorder;
 
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
-import PamguardMVC.PamDataBlock;
 
 public class ClipGenSettingDialog extends PamDialog {
 

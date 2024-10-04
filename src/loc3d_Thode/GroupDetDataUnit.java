@@ -1,8 +1,6 @@
 package loc3d_Thode;
 
 import PamDetection.PamDetection;
-import PamguardMVC.AcousticDataUnit;
-import PamguardMVC.PamDataUnit;
 import PamguardMVC.superdet.SuperDetection;
 
 public class GroupDetDataUnit extends SuperDetection implements PamDetection {

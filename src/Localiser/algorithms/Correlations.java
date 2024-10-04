@@ -194,31 +194,31 @@ public class Correlations {
 		return getDelay(complexArray, complexArray2, fftLength, maxDelaySamples, binLims);
 	}
 
-	/**
-	 * Measure the time delay between pulses on two channels. Inputs in this case are the 
-	 * spectrum data (most of the cross correlation is done in the frequency domain)
-	 * @param f1 complex spectrum on channel 1
-	 * @param f2 complex spectrum on channel 2
-	 * @param delayMeasurementParams Measurement parameters. 
-	 * @param fftLength FFT length to use (data will be packed or truncated as necessary)
-	 * @param maxDelay Maximum feasible delay between channels. 
-	 * @return time delay in samples. 
-	 * @deprecated use ComplexArray for everything. This is now never called. 
-	 */
-	public double getDelay(Complex[] f1, Complex[] f2, DelayMeasurementParams delayMeasurementParams, int fftLength, double maxDelay) {
-		/*
-		 * Everything ultimately ends up here and we can assume that the complex data are from a waveform and not 
-		 * an envelope at this point. We may therefore have to both filter the data and take a hilbert transform 
-		 * in order to satisfy new options in delayMeasurementParams. It's possible that f1 and f2 are references back
-		 * into the original spectra which we don't want to mess with. 
-		 * If it's complex wave data and we want to do the envelope, then we'll also need to Hilbert transform and 
-		 * then call right back into the correlations call which uses the waveform data, which will end up in a second call back into here
-		 * once it's done yet another FFT of the analytic waveform (or it's derivative). What a lot of options !  
-		 */
-		
-		
-		return getDelay(f1, f2, fftLength, maxDelay);
-	}
+//	/**
+//	 * Measure the time delay between pulses on two channels. Inputs in this case are the 
+//	 * spectrum data (most of the cross correlation is done in the frequency domain)
+//	 * @param f1 complex spectrum on channel 1
+//	 * @param f2 complex spectrum on channel 2
+//	 * @param delayMeasurementParams Measurement parameters. 
+//	 * @param fftLength FFT length to use (data will be packed or truncated as necessary)
+//	 * @param maxDelay Maximum feasible delay between channels. 
+//	 * @return time delay in samples. 
+//	 * @deprecated use ComplexArray for everything. This is now never called. 
+//	 */
+//	public double getDelay(Complex[] f1, Complex[] f2, DelayMeasurementParams delayMeasurementParams, int fftLength, double maxDelay) {
+//		/*
+//		 * Everything ultimately ends up here and we can assume that the complex data are from a waveform and not 
+//		 * an envelope at this point. We may therefore have to both filter the data and take a hilbert transform 
+//		 * in order to satisfy new options in delayMeasurementParams. It's possible that f1 and f2 are references back
+//		 * into the original spectra which we don't want to mess with. 
+//		 * If it's complex wave data and we want to do the envelope, then we'll also need to Hilbert transform and 
+//		 * then call right back into the correlations call which uses the waveform data, which will end up in a second call back into here
+//		 * once it's done yet another FFT of the analytic waveform (or it's derivative). What a lot of options !  
+//		 */
+//		
+//		
+//		return getDelay(f1, f2, fftLength, maxDelay);
+//	}
 	/**
 	 * Measure the time delay between pulses on two channels. Inputs in this case are the 
 	 * spectrum data (most of the cross correlation is done in the frequency domain)<p>
@@ -283,19 +283,31 @@ public class Correlations {
 		// complex conjugate of the other
 		// and at the same time, fill in the other half of it.
 		// also normalise it.
-		ComplexArray corrData = f1.conjTimes(f2, binRange).fillConjugateHalf();
+		ComplexArray corrData = f1.conjTimes(f2, binRange);//.fillConjugateHalf();
 		double scale1=0, scale2=0;
 		for (int i = binRange[0]; i < binRange[1]; i++) {
 			scale1 += f1.magsq(i);
 			scale2 += f2.magsq(i);
 		}
 		// now take the inverse FFT ...
-		fastFFT.ifft(corrData, fftLength);
-		double scale = Math.sqrt(scale1*scale2)*2; // double it for negative freq energy not incl in original sums. 
+//		fastFFT.ifft(corrData, fftLength);
+//		ComplexArray oldMeth = corrData.fillConjugateHalf();
+//		fastFFT.ifft(oldMeth, fftLength);
 		
-		double[] newPeak = getInterpolatedPeak(corrData, scale, maxDelay);
+		double[] xCorr = fastFFT.realInverse(corrData);
+		double scale = Math.sqrt(scale1*scale2)*2; // double it for negative freq energy not incl in original sums. 
+		/*
+		 * Because scale was worked out in frequency domain, it's fftLength bigger than 
+		 * the scale would be if the were the magnitude of the wave data. Therefore the 
+		 * scale will need to be scaled down by fftLength for it to add up right. 
+		 */
+		scale /= fftLength;
+		
+//		double[] oldPeak = getInterpolatedPeak(oldMeth, scale, maxDelay);
+		double[] newPeak = getInterpolatedPeak(xCorr, scale, maxDelay);
 		correlationValue = newPeak[1];
-		return new TimeDelayData(newPeak[0], newPeak[1]);
+//		System.out.printf("Corrrelation peak height is %6.4f\n", correlationValue);
+		return new TimeDelayData(newPeak[0], correlationValue);
 	}
 	/**
 	 * Get the value of the last correlation calculated by 
@@ -450,6 +462,24 @@ public class Correlations {
 		for (int i = 0; i < maxCorrLen; i++) {
 			linCorr[i+maxCorrLen] = complexData.getReal(i);
 			linCorr[maxCorrLen-1-i] = complexData.getReal(fftLength-1-i);
+		}
+		double[] parabolicPeak = getInterpolatedPeak(linCorr);
+		parabolicPeak[1] /= scale;
+		parabolicPeak[0] -= maxCorrLen;
+		parabolicPeak[0] = -parabolicPeak[0];
+		parabolicPeak[0] = Math.max(-maxDelay, Math.min(maxDelay, parabolicPeak[0]));
+		lastPeak = parabolicPeak;
+		return parabolicPeak;
+	}
+	
+	public double[] getInterpolatedPeak(double[] invFFTData, double scale, double maxDelay) {
+		int fftLength = invFFTData.length;
+		int maxCorrLen = (int) (Math.ceil(maxDelay) + 2);
+		maxCorrLen = Math.min(fftLength/2, maxCorrLen);
+		double[] linCorr = new double[maxCorrLen*2]; 
+		for (int i = 0; i < maxCorrLen; i++) {
+			linCorr[i+maxCorrLen] = invFFTData[i];
+			linCorr[maxCorrLen-1-i] = invFFTData[fftLength-1-i];
 		}
 		double[] parabolicPeak = getInterpolatedPeak(linCorr);
 		parabolicPeak[1] /= scale;

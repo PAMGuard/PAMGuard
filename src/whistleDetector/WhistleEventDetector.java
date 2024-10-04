@@ -6,12 +6,9 @@ import PamView.symbol.StandardSymbolManager;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
-import PamguardMVC.PamObserver;
 import PamguardMVC.PamProcess;
-import SoundRecorder.RecorderControl;
 import SoundRecorder.trigger.RecorderTrigger;
 import SoundRecorder.trigger.RecorderTriggerData;
-import autecPhones.AutecGraphics;
 
 public class WhistleEventDetector extends PamProcess {
 
@@ -166,6 +163,7 @@ public class WhistleEventDetector extends PamProcess {
 		RecorderTriggerData recorderTriggerData = new RecorderTriggerData(whistleControl.getUnitName() + " Events",
 				30, 60);
 		
+		@Override
 		public RecorderTriggerData getDefaultTriggerData() {
 			return recorderTriggerData;
 		}

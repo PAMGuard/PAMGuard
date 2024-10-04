@@ -9,7 +9,6 @@ import Acquisition.SoundCardParameters;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
-import hfDaqCard.SmruDaqSystem;
 
 /**
  * Parameters for all simulated objects

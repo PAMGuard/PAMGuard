@@ -1,6 +1,7 @@
 package Filters;
 
 import java.awt.Frame;
+
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 

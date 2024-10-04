@@ -1,5 +1,19 @@
 package rockBlock;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+
+import javax.swing.Timer;
+
+import PamController.status.BaseProcessCheck;
+import PamController.status.ModuleStatus;
+import PamController.status.ModuleStatusManager;
+import PamUtils.PamCalendar;
+import PamguardMVC.PamDataBlock;
+import PamguardMVC.PamProcess;
+import PamguardMVC.debug.Debug;
+
 /*
  *  PAMGUARD - Passive Acoustic Monitoring GUARDianship.
  * To assist in the Detection Classification and Localisation
@@ -23,21 +37,7 @@ package rockBlock;
  */
 
 import serialComms.jserialcomm.PJSerialComm;
-import serialComms.jserialcomm.PJSerialException;
 import serialComms.jserialcomm.PJSerialLineListener;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import javax.swing.Timer;
-
-import PamController.status.BaseProcessCheck;
-import PamController.status.ModuleStatus;
-import PamController.status.ModuleStatusManager;
-import PamUtils.PamCalendar;
-import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamProcess;
-import PamguardMVC.debug.Debug;
 
 
 /**

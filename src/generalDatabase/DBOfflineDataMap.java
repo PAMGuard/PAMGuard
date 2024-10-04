@@ -1,7 +1,7 @@
 package generalDatabase;
 
-import dataMap.OfflineDataMap;
 import PamguardMVC.PamDataBlock;
+import dataMap.OfflineDataMap;
 
 public class DBOfflineDataMap extends OfflineDataMap<DBOfflineDataMapPoint> {
 

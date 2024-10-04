@@ -3,12 +3,11 @@ package Array;
 import java.util.ListIterator;
 
 import GPS.NavDataSynchronisation;
-import pamScrollSystem.ViewLoadObserver;
 import PamController.PamController;
-import PamUtils.PamCalendar;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
+import pamScrollSystem.ViewLoadObserver;
 
 public class HydrophoneDataBlock extends PamDataBlock<HydrophoneDataUnit> {
 
@@ -104,7 +103,7 @@ public class HydrophoneDataBlock extends PamDataBlock<HydrophoneDataUnit> {
 			long difference;
 
 			ListIterator<HydrophoneDataUnit> listIterator = getListIterator(ITERATOR_END);
-			if (listIterator.hasPrevious() == false) {
+			if (!listIterator.hasPrevious()) {
 				return null;
 			}
 			unit = listIterator.previous();

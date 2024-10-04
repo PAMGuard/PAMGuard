@@ -1,16 +1,21 @@
 
 package likelihoodDetectionModule;
 
-import java.util.ArrayList;
-import javax.swing.tree.*;
-import javax.swing.event.*;
-import javax.swing.tree.TreeModel;
-import java.util.Iterator;
-import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
-import java.util.Vector;
-import likelihoodDetectionModule.normalizer.NormalizerProcess.NormalizerAlgorithm;
+import java.awt.event.ItemListener;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Vector;
+
+import javax.swing.event.EventListenerList;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+
+import likelihoodDetectionModule.normalizer.NormalizerProcess.NormalizerAlgorithm;
 
 /**
  * The TreeTableModel represents a LikelihoodDetectionParameters object
@@ -775,7 +780,8 @@ public class TreeTableModel implements TreeModel {
      * @see TreeModel
      */
     
-    public int getChildCount( Object node ) {
+    @Override
+	public int getChildCount( Object node ) {
       int retval = ((Node)node).children.size();
       return retval;
     }
@@ -791,7 +797,8 @@ public class TreeTableModel implements TreeModel {
      * @see TreeModel
      */
     
-    public Object getChild( Object node, int child ) {
+    @Override
+	public Object getChild( Object node, int child ) {
       return ((Node)node).children.get( child );
     }
     
@@ -803,7 +810,8 @@ public class TreeTableModel implements TreeModel {
      * @see TreeModel
      */
     
-    public Object getRoot() {
+    @Override
+	public Object getRoot() {
         return rootNode;
     }
 
@@ -817,7 +825,8 @@ public class TreeTableModel implements TreeModel {
      * @see TreeModel
      */
     
-    public boolean isLeaf(Object node) {
+    @Override
+	public boolean isLeaf(Object node) {
         //return getChildCount(node) == 0;
       boolean val = getChildCount(node) == 0;
       return val;
@@ -833,7 +842,8 @@ public class TreeTableModel implements TreeModel {
      * @see TreeModel
      */
     
-    public void valueForPathChanged(TreePath path, Object newValue) {}
+    @Override
+	public void valueForPathChanged(TreePath path, Object newValue) {}
  
     /**
      * Implementation of TreeModel.getIndexOfChild()
@@ -846,7 +856,8 @@ public class TreeTableModel implements TreeModel {
      * @see TreeModel
      */
     
-    public int getIndexOfChild(Object parent, Object child) {
+    @Override
+	public int getIndexOfChild(Object parent, Object child) {
         for (int i = 0; i < getChildCount(parent); i++) {
 	         if (getChild(parent, i).equals(child)) { 
 	           return i; 
@@ -862,7 +873,8 @@ public class TreeTableModel implements TreeModel {
      * @param l the l
      */
     
-    public void addTreeModelListener(TreeModelListener l) {
+    @Override
+	public void addTreeModelListener(TreeModelListener l) {
         listenerList.add(TreeModelListener.class, l);
     }
 
@@ -872,7 +884,8 @@ public class TreeTableModel implements TreeModel {
      * @param l the l
      */
     
-    public void removeTreeModelListener(TreeModelListener l) {
+    @Override
+	public void removeTreeModelListener(TreeModelListener l) {
         listenerList.remove(TreeModelListener.class, l);
     }
 
@@ -1272,7 +1285,8 @@ public boolean isError() {
 		return numberSignalNodes;
   }
   
-  public void itemStateChanged( ItemEvent e ) {
+  @Override
+public void itemStateChanged( ItemEvent e ) {
     if ( e.getStateChange() == ItemEvent.SELECTED ) {
     	if ( this.state != TargetConfiguration.State.Error ) state = TargetConfiguration.State.Active;
     }
@@ -1283,7 +1297,7 @@ public boolean isError() {
   
   private TargetConfiguration.State state;
   private String name;
-};
+}
 
 /** 
  * The TimeResolutionNode represents the time resolution value

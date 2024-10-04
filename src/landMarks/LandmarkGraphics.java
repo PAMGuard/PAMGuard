@@ -1,22 +1,18 @@
 package landMarks;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Window;
-
-import javax.swing.SwingUtilities;
 
 import PamController.masterReference.MasterReferencePoint;
 import PamUtils.Coordinate3d;
 import PamUtils.LatLong;
 import PamView.GeneralProjector;
-import PamView.PamKeyItem;
-import PamView.PamSymbol;
-import PamView.PamSymbolType;
-import PamView.PanelOverlayDraw;
 import PamView.GeneralProjector.ParameterType;
 import PamView.GeneralProjector.ParameterUnits;
+import PamView.PamKeyItem;
+import PamView.PamSymbol;
+import PamView.PanelOverlayDraw;
 import PamView.symbol.SymbolData;
 import PamguardMVC.PamDataUnit;
 
@@ -34,16 +30,19 @@ public class LandmarkGraphics extends PanelOverlayDraw {
 		this.landmarkControl = landmarkControl;
 	}
 
+	@Override
 	public boolean canDraw(ParameterType[] parameterTypes, ParameterUnits[] parameterUnits) {
 		return (parameterTypes[0] == GeneralProjector.ParameterType.LATITUDE && 
 				parameterTypes[1] == GeneralProjector.ParameterType.LONGITUDE);
 	}
 
+	@Override
 	public PamKeyItem createKeyItem(GeneralProjector generalProjector,
 			int keyType) {
 		return null;
 	}
 
+	@Override
 	public Rectangle drawDataUnit(Graphics g, PamDataUnit pamDataUnit,
 			GeneralProjector generalProjector) {
 		if (generalProjector.getParmeterType(0) == GeneralProjector.ParameterType.LATITUDE && 
@@ -70,6 +69,7 @@ public class LandmarkGraphics extends PanelOverlayDraw {
 		return null;
 	}
 
+	@Override
 	public String getHoverText(GeneralProjector generalProjector,
 			PamDataUnit dataUnit, int iSide) {
 		LandmarkDataUnit landmarkDataUnit = (LandmarkDataUnit) dataUnit;

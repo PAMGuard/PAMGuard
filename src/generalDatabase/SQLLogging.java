@@ -29,11 +29,6 @@
 
 package generalDatabase;
 
-import generalDatabase.clauses.FixedClause;
-import generalDatabase.clauses.PAMSelectClause;
-import generalDatabase.clauses.UIDViewParameters;
-import generalDatabase.pamCursor.CursorFinder;
-import generalDatabase.pamCursor.PamCursor;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -42,12 +37,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.ListIterator;
 
-import pamScrollSystem.LoadQueueProgressData;
-import pamScrollSystem.ViewLoadObserver;
-import qa.QASoundDataUnit;
 import PamController.PamController;
 import PamController.PamViewParameters;
 import PamUtils.PamCalendar;
@@ -55,10 +46,16 @@ import PamguardMVC.DataUnitFinder;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.SaveRequirements;
-import PamguardMVC.debug.Debug;
 import PamguardMVC.superdet.SubdetectionInfo;
 import PamguardMVC.superdet.SuperDetection;
 import binaryFileStorage.DataUnitFileInformation;
+import generalDatabase.clauses.FixedClause;
+import generalDatabase.clauses.PAMSelectClause;
+import generalDatabase.pamCursor.CursorFinder;
+import generalDatabase.pamCursor.PamCursor;
+import pamScrollSystem.LoadQueueProgressData;
+import pamScrollSystem.ViewLoadObserver;
+import qa.QASoundDataUnit;
 
 /**
  * 
@@ -664,7 +661,7 @@ public abstract class SQLLogging {
 			return null;
 		}
 		boolean readOk = readLastData(con);
-		if (readOk == false) {
+		if (!readOk) {
 			return null;
 		}
 		PamDataUnit du = createDataUnit(con.getSqlTypes(), lastTime, lastLoadIndex);
@@ -969,7 +966,7 @@ public abstract class SQLLogging {
 		if (clause == null) {
 			clause = " ORDER BY UTC, UTCMilliseconds";
 		}
-		else if (clause.toUpperCase().contains("ORDER BY") == false) {
+		else if (!clause.toUpperCase().contains("ORDER BY")) {
 			clause +=  " ORDER BY UTC, UTCMilliseconds";
 		}
 		return clause;
@@ -1163,7 +1160,7 @@ public abstract class SQLLogging {
 			lastLoadIndex = getTableDefinition().getIndexItem().getIntegerValue();
 			if (tableDef instanceof PamTableDefinition) {
 				PamTableDefinition pamTableDef = (PamTableDefinition) tableDef;
-				lastTime = sqlTypes.millisFromTimeStamp(pamTableDef.getTimeStampItem().getValue());
+				lastTime = SQLTypes.millisFromTimeStamp(pamTableDef.getTimeStampItem().getValue());
 				if (lastTime%1000 == 0) {
 					// some databases may have stored the milliseconds, in which 
 					// case this next bit is redundant. 
@@ -1233,7 +1230,7 @@ public abstract class SQLLogging {
 		boolean ans;
 		try {
 			ans = mixedModeResult.next();
-			if (ans == false) {
+			if (!ans) {
 				return false;
 			}
 			return transferDataFromResult(sqlTypes, mixedModeResult);
@@ -1295,7 +1292,7 @@ public abstract class SQLLogging {
 						}
 					}
 				}
-				if (mixedModeResult.next() == false) {
+				if (!mixedModeResult.next()) {
 					mixedDataWaiting = false;
 					break;
 				}
@@ -1461,7 +1458,7 @@ public abstract class SQLLogging {
 					clause = "WHERE Id < 0"; // generate a null set. 
 				}
 				pamCursor = dbControlUnit.createPamCursor(getTableDefinition());
-				if (pamCursor.openScrollableCursor(connection, true, true, clause) == false) {
+				if (!pamCursor.openScrollableCursor(connection, true, true, clause)) {
 					System.out.println("Error opening update cursor " + pamDataBlock.getDataName());
 				}
 				if (sr.getNumUpdates() > 0) while(pamCursor.next()) {

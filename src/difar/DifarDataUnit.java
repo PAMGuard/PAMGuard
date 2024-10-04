@@ -3,16 +3,6 @@ package difar;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
-import fftManager.Complex;
-import fftManager.FastFFT;
-import generalDatabase.DBControlUnit;
-import generalDatabase.SQLLogging;
-import generalDatabase.lookupTables.LookupItem;
-import generalDatabase.lookupTables.LookupList;
-import clipgenerator.ClipDataUnit;
-import difar.trackedGroups.TrackedGroupDataBlock;
-import difar.trackedGroups.TrackedGroupDataUnit;
-import difar.trackedGroups.TrackedGroupProcess;
 import Filters.Filter;
 import Filters.FilterBand;
 import Filters.FilterMethod;
@@ -24,6 +14,13 @@ import PamUtils.LatLong;
 import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamguardMVC.PamDataUnit;
+import clipgenerator.ClipDataUnit;
+import fftManager.Complex;
+import fftManager.FastFFT;
+import generalDatabase.DBControlUnit;
+import generalDatabase.SQLLogging;
+import generalDatabase.lookupTables.LookupItem;
+import generalDatabase.lookupTables.LookupList;
 
 public class DifarDataUnit extends ClipDataUnit {
 

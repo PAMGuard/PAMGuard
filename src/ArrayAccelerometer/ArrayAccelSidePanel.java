@@ -1,11 +1,8 @@
 package ArrayAccelerometer;
 
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
-import PamView.PamColors.PamColor;
-import PamView.panel.PamPanel;
 import PamView.PamSidePanel;
 
 public class ArrayAccelSidePanel implements PamSidePanel {

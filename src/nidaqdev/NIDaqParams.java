@@ -9,7 +9,6 @@ import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
 import PamguardMVC.PamConstants;
-import hfDaqCard.SmruDaqSystem;
 
 public class NIDaqParams extends SoundCardParameters implements Serializable, Cloneable, ManagedParameters {
 	

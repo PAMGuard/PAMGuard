@@ -12,8 +12,8 @@ import javax.swing.border.TitledBorder;
 import PamController.PamController;
 import PamView.ColorManaged;
 import PamView.PamColors;
-import PamView.PamSidePanel;
 import PamView.PamColors.PamColor;
+import PamView.PamSidePanel;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamLabel;
 
@@ -105,6 +105,7 @@ public class DBSidePanel implements PamSidePanel {
 		}
 	}
 
+	@Override
 	public JComponent getPanel() {
 		// TODO Auto-generated method stub
 		return p;
@@ -112,6 +113,7 @@ public class DBSidePanel implements PamSidePanel {
 	
 	
 
+	@Override
 	public void rename(String newName) {
 		// TODO Auto-generated method stub
 		

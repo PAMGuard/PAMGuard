@@ -59,13 +59,14 @@ public class ImportLoadBar extends PamDialog {
 		textUpdate.setText(string); 
 	}
 	
+	@Override
 	public JButton getCancelButton( ){
 		return super.getCancelButton();
 	}
 	
 	@Override
 	public void setVisible(boolean visible) {
-		if (visible == false) {
+		if (!visible) {
 			closeLater();
 		}
 		else {

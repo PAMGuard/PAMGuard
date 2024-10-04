@@ -1,6 +1,5 @@
 package nmeaEmulator;
 
-import generalDatabase.DBControl;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,6 +20,7 @@ import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamController.PamSettingManager;
 import PamguardMVC.PamDataBlock;
+import generalDatabase.DBControl;
 
 public class NMEAFrontEnd {
 
@@ -121,6 +121,7 @@ public class NMEAFrontEnd {
 	}
 
 	class MenuExit implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			prepareToClose();
 		}
@@ -128,7 +129,7 @@ public class NMEAFrontEnd {
 
 	private boolean prepareToClose() {
 
-		if (PamController.getInstance().canClose() == false) {
+		if (!PamController.getInstance().canClose()) {
 			return false;
 		}
 		serialOutput.closeSerialPort();
@@ -156,12 +157,14 @@ public class NMEAFrontEnd {
 
 
 	class MenuStart implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			//			menuTimes();
 		}
 	}
 
 	class MenuStop implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent ev){
 			//			menuTimes();
 		}
@@ -215,7 +218,7 @@ public class NMEAFrontEnd {
 			boolean dataPrepared[] = new boolean[nBlocks];
 			String outString;
 			publish(new EmulationProgress("Initialise serial port ..."));
-			if (serialOutput.openSerialPort() == false) {
+			if (!serialOutput.openSerialPort()) {
 				publish(new EmulationProgress("Unable to open serial port ..."));
 				return null;
 			}
@@ -238,7 +241,7 @@ public class NMEAFrontEnd {
 						emulatedData[i] = emulatedDataBlocks.get(i).getNextData();
 					}
 				}
-				while (stopNow == false) {
+				while (!stopNow) {
 					currentRealTime = System.currentTimeMillis();
 					timePassed = currentRealTime - simStartTime;
 					currentDataTime = timeLimits[0] + timePassed;
@@ -276,7 +279,7 @@ public class NMEAFrontEnd {
 					publish(new EmulationProgress(currentRealTime, currentDataTime, 
 							(int) (timePassed * 100 / dataLength)));
 				}
-				if (stopNow || nmeaOutdialog.isRepeat() == false) {
+				if (stopNow || !nmeaOutdialog.isRepeat()) {
 					break;
 				}
 			}

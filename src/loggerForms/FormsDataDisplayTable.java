@@ -19,14 +19,14 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
-import loggerForms.controlDescriptions.ControlDescription;
-import loggerForms.controlDescriptions.ControlTypes;
 import PamController.PamController;
 import PamUtils.PamCalendar;
 import PamView.PamTable;
 import PamView.dialog.PamDialog;
 import PamView.dialog.warn.WarnOnce;
 import PamguardMVC.PamDataBlock;
+import loggerForms.controlDescriptions.ControlDescription;
+import loggerForms.controlDescriptions.ControlTypes;
 
 /**
  * @author GrahamWeatherup
@@ -119,7 +119,7 @@ public class FormsDataDisplayTable {
 	class EditDataListener extends MouseAdapter{
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			if (canEdit() == false) {
+			if (!canEdit()) {
 				return;
 			}
 			if (e.getClickCount() == 2) {
@@ -147,10 +147,10 @@ public class FormsDataDisplayTable {
 		}
 
 		private void maybePopup(MouseEvent e) {
-			if (e.isPopupTrigger() == false) {
+			if (!e.isPopupTrigger()) {
 				return;
 			}
-			if (canEdit() == false) {
+			if (!canEdit()) {
 				return;
 			}
 			int row = formsTable.getSelectedRow();
@@ -225,7 +225,7 @@ public class FormsDataDisplayTable {
 					Object value = ctrlDescription.formatDataItem(fd[ctIndex]);
 					if (value == null) return null;
 					if (getColumnClass(columnIndex) == Boolean.class) {
-						if (value instanceof Boolean == false) {
+						if (!(value instanceof Boolean)) {
 //							System.out.println("Bad boolean value: " + value);
 							return FormsControl.checkBadBoolean(value);
 						}

@@ -2,11 +2,6 @@ package Array;
 
 import java.util.ArrayList;
 
-import javax.vecmath.Point3d;
-import javax.vecmath.Point3f;
-
-import GPS.GpsData;
-
 import pamMaths.PamVector;
 
 /**
@@ -14,8 +9,8 @@ import pamMaths.PamVector;
  * more concrete locators, in particular the StaticHydrophoneLocator
  * and StraightHydrophoneLocators
  * @author Doug Gillespie
+ * @see Array.ThreadingHydrophoneLocator
  * @see Array.StraightHydrophoneLocator
- * @see Array.StaticHydrophoneLocator
  *
  */
 

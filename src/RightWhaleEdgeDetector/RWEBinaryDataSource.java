@@ -7,14 +7,12 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 
-import PamguardMVC.DataUnitBaseData;
 import PamguardMVC.PamDataUnit;
 import binaryFileStorage.BinaryDataSource;
 import binaryFileStorage.BinaryHeader;
 import binaryFileStorage.BinaryObjectData;
 import binaryFileStorage.ModuleFooter;
 import binaryFileStorage.ModuleHeader;
-import binaryFileStorage.PackedBinaryObject;
 
 public class RWEBinaryDataSource extends BinaryDataSource {
 

@@ -346,7 +346,7 @@ public class ExportProcessDialog {
 
 		@Override
 		public boolean getParams() {
-			System.out.println("EXPORT: GET PARAMS:");
+//			System.out.println("EXPORT: GET PARAMS:");
 
 			//make sure we update the current paramters before processing starts. 
 			this.currentParams = getExportParams();

@@ -1,11 +1,10 @@
 package Array;
 
-import pamScrollSystem.AbstractScrollManager;
 import PamUtils.PamCalendar;
 import PamView.symbol.StandardSymbolManager;
-import PamguardMVC.PamConstants;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
+import pamScrollSystem.AbstractScrollManager;
 
 public class HydrophoneProcess extends PamProcess{
 	

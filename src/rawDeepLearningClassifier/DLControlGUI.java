@@ -1,6 +1,5 @@
 package rawDeepLearningClassifier;
 
-import PamController.PamController;
 import PamController.PamControllerInterface;
 import PamController.SettingsPane;
 import pamViewFX.PamControlledGUIFX;
@@ -30,6 +29,7 @@ public class DLControlGUI extends PamControlledGUIFX {
 	 * @param <T>
 	 * @return a Pane containing controls to change settings for module.
 	 */
+	@Override
 	public SettingsPane<?> getSettingsPane(){
 		dlControl.getSettingsPane().setParams(dlControl.getDLParams());
 		return dlControl.getSettingsPane();
@@ -49,7 +49,7 @@ public class DLControlGUI extends PamControlledGUIFX {
 	@Override
 	public void notifyGUIChange(int changeType) {
 		switch (changeType) {
-		case PamController.INITIALIZATION_COMPLETE:
+		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			break;
 		case PamControllerInterface.CHANGED_PROCESS_SETTINGS:
 			//data source may have potentially changed. e.g. by a datamodelfx Need to set in params.

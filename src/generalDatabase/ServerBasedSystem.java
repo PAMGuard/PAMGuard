@@ -1,10 +1,5 @@
 package generalDatabase;
 
-import generalDatabase.layoutFX.SystemDialogPaneFX;
-import generalDatabase.pamCursor.PamCursor;
-import generalDatabase.pamCursor.PamCursorManager;
-import generalDatabase.pamCursor.ScrollablePamCursor;
-
 import java.awt.Component;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -16,15 +11,13 @@ import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
-
-
-
-
-
-
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import generalDatabase.layoutFX.SystemDialogPaneFX;
+import generalDatabase.pamCursor.PamCursor;
+import generalDatabase.pamCursor.PamCursorManager;
+import generalDatabase.pamCursor.ScrollablePamCursor;
 
 abstract public class ServerBasedSystem extends DBSystem implements PamSettings {
 	
@@ -130,8 +123,8 @@ abstract public class ServerBasedSystem extends DBSystem implements PamSettings 
 				}
 			}
 		}
-		if (isOpen == false || openDatabase.equalsIgnoreCase(databaseName) == false) {
-			if (serverConnect(mySQLParameters) == false) return null;
+		if (!isOpen || !openDatabase.equalsIgnoreCase(databaseName)) {
+			if (!serverConnect(mySQLParameters)) return null;
 			if (databaseName == null) return null;
 
 			String databaseURL = buildDatabaseUrl(mySQLParameters.ipAddress, mySQLParameters.portNumber, databaseName);
@@ -187,7 +180,7 @@ abstract public class ServerBasedSystem extends DBSystem implements PamSettings 
 			params = goodUserParameters;
 		}
 		boolean ok = serverConnect(params.ipAddress, params.portNumber, getUserName(params), getUserPassword(params));
-		if (ok == false) {
+		if (!ok) {
 			goodUserParameters = null;
 		}
 		return ok;
@@ -258,7 +251,7 @@ abstract public class ServerBasedSystem extends DBSystem implements PamSettings 
 
 	ArrayList<String> getAvailableDatabases(boolean doUpdate) {
 		if (serverConnection == null) return null;
-		if (doUpdate == false && availableDatabases != null) {
+		if (!doUpdate && availableDatabases != null) {
 			return availableDatabases;
 		}
 		availableDatabases = new ArrayList<String>();
@@ -307,18 +300,22 @@ abstract public class ServerBasedSystem extends DBSystem implements PamSettings 
 		return mySQLParameters.databaseName;
 	}
 
+	@Override
 	public Serializable getSettingsReference() {
 		return mySQLParameters;
 	}
 
+	@Override
 	public long getSettingsVersion() {
 		return MySQLParameters.serialVersionUID;
 	}
 
+	@Override
 	public String getUnitName() {
 		return dbControl.getUnitName();
 	}
 
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		mySQLParameters = ((MySQLParameters) pamControlledUnitSettings.getSettings()).clone();
 		return (mySQLParameters != null);
@@ -340,14 +337,15 @@ abstract public class ServerBasedSystem extends DBSystem implements PamSettings 
 	public String browseDatabasesFX(int type) {
 		// TODO Auto-generated method stub
 		return null;
-	};
+	}
 
+	@Override
 	public boolean checkDatabaseExists(String dbName) {
 		if (dbName == null) {
 			dbName = mySQLParameters.databaseName;
 		}
 		boolean servOK = serverConnect(mySQLParameters);
-		if (servOK == false) {
+		if (!servOK) {
 			return false;
 		}
 		ArrayList<String> dbs = getAvailableDatabases(true);

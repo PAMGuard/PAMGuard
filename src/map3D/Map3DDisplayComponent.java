@@ -5,8 +5,6 @@ import java.awt.Component;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import map3D.fx.DIY3DDisplay;
-import map3D.fx.Map3DDisplayFX;
-import map3D.fx.Test3DDisplayFX;
 import userDisplay.UserDisplayComponent;
 import userDisplay.UserDisplayControl;
 

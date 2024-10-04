@@ -1,16 +1,27 @@
 package loggerForms;
 
-import generalDatabase.lookupTables.LookupItem;
-import generalDatabase.lookupTables.LookupList;
-import geoMag.MagneticVariation;
-
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Window;
 import java.util.ArrayList;
 
+import GPS.GpsData;
+import Map.MapRectProjector;
+import PamUtils.Coordinate3d;
+import PamUtils.LatLong;
+import PamView.GeneralProjector;
+import PamView.GeneralProjector.ParameterType;
+import PamView.GeneralProjector.ParameterUnits;
+import PamView.PamKeyItem;
+import PamView.PamSymbol;
+import PamView.PanelOverlayDraw;
+import PamView.symbol.PamSymbolChooser;
+import PamView.symbol.SymbolData;
+import PamguardMVC.PamDataUnit;
+import generalDatabase.lookupTables.LookupItem;
+import generalDatabase.lookupTables.LookupList;
+import geoMag.MagneticVariation;
 import loggerForms.controlDescriptions.CdLookup;
 import loggerForms.controlDescriptions.ControlDescription;
 import loggerForms.controlDescriptions.ControlTypes;
@@ -19,22 +30,6 @@ import loggerForms.formdesign.propertypanels.SymbolPanel;
 import loggerForms.propertyInfos.BEARINGinfo;
 import loggerForms.propertyInfos.HEADINGinfo;
 import loggerForms.propertyInfos.RANGEinfo;
-import loggerForms.PropertyTypes;
-import GPS.GpsData;
-import Map.MapRectProjector;
-import PamUtils.Coordinate3d;
-import PamUtils.LatLong;
-import PamView.GeneralProjector;
-import PamView.PamColors;
-import PamView.PamKeyItem;
-import PamView.PamSymbol;
-import PamView.PamSymbolType;
-import PamView.PanelOverlayDraw;
-import PamView.GeneralProjector.ParameterType;
-import PamView.GeneralProjector.ParameterUnits;
-import PamView.symbol.PamSymbolChooser;
-import PamView.symbol.SymbolData;
-import PamguardMVC.PamDataUnit;
 
 public class LoggerFormGraphics extends PanelOverlayDraw {
 
@@ -117,7 +112,7 @@ public class LoggerFormGraphics extends PanelOverlayDraw {
 	private Rectangle drawOnMap(Graphics g, PamDataUnit pamDataUnit,
 			GeneralProjector generalProjector) {
 		FormsDataUnit formDataUnit = (FormsDataUnit) pamDataUnit;
-		if (shouldPlotOnMap(formDataUnit, generalProjector) == false) {
+		if (!shouldPlotOnMap(formDataUnit, generalProjector)) {
 			return null;
 		}
 
@@ -327,7 +322,7 @@ public class LoggerFormGraphics extends PanelOverlayDraw {
 				continue;
 			}
 			controlDescription = controlDescriptions.get(i);
-			if (controlDescription.getPlot() == false) {
+			if (!controlDescription.getPlot()) {
 				// control description is not one to plot, so won't decide on that either !
 				continue;
 			}
@@ -390,7 +385,7 @@ public class LoggerFormGraphics extends PanelOverlayDraw {
 				continue;
 			}
 			controlDescription = controlDescriptions.get(i);
-			if (controlDescription.getPlot() == false) {
+			if (!controlDescription.getPlot()) {
 				// control description is not one to plot, so won't decide on that either !
 				continue;
 			}
@@ -410,7 +405,7 @@ public class LoggerFormGraphics extends PanelOverlayDraw {
 					}
 				}
 			}
-			if (formPlotOptions.isPlotControl(i+1) == false) {
+			if (!formPlotOptions.isPlotControl(i+1)) {
 				/*
 				 *  this one will work for non lookup controls and for lookup 
 				 *  controls where the select all function has been selected.

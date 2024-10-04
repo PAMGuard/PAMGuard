@@ -95,7 +95,7 @@ public class RavenProcess extends PamProcess {
 		
 		RavenDataRow prevRow = null;
 		for (RavenDataRow ravenRow : ravenData) {
-			if (ravenRow.equals(prevRow) == false) {
+			if (!ravenRow.equals(prevRow)) {
 				/**
 				 *  A lot of Raven data appear twice, with different view values. 
 				 *  No need to import both. so only doing this if they are different. 

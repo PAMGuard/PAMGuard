@@ -7,7 +7,6 @@ import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
-import mcc.MccJniInterface;
 import mcc.mccjna.MCCConstants;
 
 public class MccDepthParameters implements Serializable, Cloneable, ManagedParameters {

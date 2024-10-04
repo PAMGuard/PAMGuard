@@ -31,7 +31,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import PamguardMVC.debug.Debug;
-import weka.classifiers.Classifier;
 import weka.classifiers.functions.Logistic;
 import weka.core.Attribute;
 import weka.core.DenseInstance;

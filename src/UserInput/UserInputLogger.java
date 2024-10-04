@@ -20,18 +20,15 @@
  */
 package UserInput;
 
+import java.sql.Types;
+
+import PamguardMVC.PamDataBlock;
+import PamguardMVC.PamDataUnit;
 import generalDatabase.PamConnection;
 import generalDatabase.PamTableDefinition;
 import generalDatabase.PamTableItem;
 import generalDatabase.SQLLogging;
 import generalDatabase.SQLTypes;
-
-import java.sql.Connection;
-import java.sql.Types;
-
-import PamUtils.PamCalendar;
-import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamDataUnit;
 
 /**
  * 

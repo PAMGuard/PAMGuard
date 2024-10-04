@@ -385,7 +385,7 @@ public class DetectionPlotDisplay extends PamBorderPane  {
 	
 		}
 		else {
-			System.out.println("Min scroll limit: " + detectionPlotProjector.getMinScrollLimit() + "max: " + detectionPlotProjector.getMaxScrollLimit());
+//			System.out.println("Min scroll limit: " + detectionPlotProjector.getMinScrollLimit() + "max: " + detectionPlotProjector.getMaxScrollLimit());
 			//need this to ensure the axis change when scroll bar is not longer displayed. 
 			detectionPlotProjector.setAxisMinMax(detectionPlotProjector.getMinScrollLimit(), 
 					detectionPlotProjector.getMaxScrollLimit(), detectionPlotProjector.getScrollAxis());

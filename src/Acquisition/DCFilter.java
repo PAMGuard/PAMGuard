@@ -1,7 +1,7 @@
 package Acquisition;
 
 /**
- * Class to remove DC offset from audio data. 
+ * Class to remove DC offset from audio data.
  * @author Douglas Gillespie
  *
  */
@@ -20,7 +20,7 @@ public class DCFilter {
 		background = new double[nChannels];
 		alpha = 1-1./(sampleRate*timeConstant);
 	}
-	
+
 	public void filterData(int channel, double[] data) {
 		double x;
 		double b = background[channel];

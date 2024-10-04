@@ -4,11 +4,11 @@ import java.awt.Frame;
 import java.io.IOException;
 import java.io.Serializable;
 
+import PamController.PamControlledUnitSettings;
+import PamUtils.PamUtils;
 import serialComms.jserialcomm.PJSerialComm;
 import serialComms.jserialcomm.PJSerialException;
 import serialComms.jserialcomm.PJSerialLineListener;
-import PamController.PamControlledUnitSettings;
-import PamUtils.PamUtils;
 
 /**
  * Read out a Fluxgate World 3030 shaft encoder. 
@@ -84,14 +84,17 @@ public class FluxgateWorldAngles extends AngleMeasurement  {
 		return false;
 	}
 
+	@Override
 	public Serializable getSettingsReference() {
 		return fluxgateWorldParameters;
 	}
 
+	@Override
 	public long getSettingsVersion() {
 		return FluxgateWorldParameters.serialVersionUID;
 	}
 
+	@Override
 	public boolean restoreSettings(
 			PamControlledUnitSettings pamControlledUnitSettings) {
 		fluxgateWorldParameters = ((FluxgateWorldParameters) pamControlledUnitSettings.getSettings()).clone();

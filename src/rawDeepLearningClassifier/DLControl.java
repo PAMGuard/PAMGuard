@@ -39,10 +39,10 @@ import rawDeepLearningClassifier.dlClassification.delphinID.DelphinIDClassifier;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericDLClassifier;
 import rawDeepLearningClassifier.dlClassification.ketos.KetosClassifier2;
 import rawDeepLearningClassifier.dlClassification.koogu.KooguClassifier;
+import rawDeepLearningClassifier.layoutFX.DLSettingsPane;
 import rawDeepLearningClassifier.layoutFX.DLSidePanelSwing;
 import rawDeepLearningClassifier.layoutFX.DLSymbolManager;
 import rawDeepLearningClassifier.layoutFX.PredictionSymbolManager;
-import rawDeepLearningClassifier.layoutFX.DLSettingsPane;
 import rawDeepLearningClassifier.logging.DLAnnotationType;
 import rawDeepLearningClassifier.logging.DLDataUnitDatagram;
 import rawDeepLearningClassifier.logging.DLDetectionBinarySource;
@@ -69,7 +69,7 @@ import rawDeepLearningClassifier.segmenter.SegmenterProcess;
  * Currently the jdl4pam library supports three types of deep learning model,
  * Generic, AnimalSpot and Ketos.
  * <p>
- * <li>Generic</li>
+ * Generic<br>
  * Generic models allows users to load almost any type of model and manually
  * assign the types of data transform and input shape. This means that the user
  * has to get the settings exactly right or the model will not work. It is the
@@ -77,14 +77,14 @@ import rawDeepLearningClassifier.segmenter.SegmenterProcess;
  * However, users can export a settings file which makes it easier to set up for
  * another user.
  * <p><p>
- * <li>AnimalSpot </li>
+ * AnimalSpot <br>
  * AnimalSpot is a framework for training acoustic deep learning
  * models using Pytorch. Users can load a .py model which contains embedded
  * metadata so that PMAGuard knows the exact transforms required for the model
  * input. This makes deploying models in PAMGuard very easy - users require little
  * or no experience to get this working.
  * <p>
- * <li>Ketos</li>
+ * Ketos<br>
  * Ketos is a framework for training acoustic deep learning models
  * using TensorFlow. Users can load a .ktpb model which contains embedded
  * metadata so that PMAGuard knows the exact transforms required for the model
@@ -273,7 +273,6 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 		if (this.isViewer) {
 			dlOfflineProcess = new DLOfflineProcess(this);
 		}
-		;
 
 		// register click detector for the javafx display.
 		TDDataProviderRegisterFX.getInstance()
@@ -385,7 +384,7 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		RawDLParams newParameters = (RawDLParams) pamControlledUnitSettings.getSettings();
-		;
+		
 		rawDLParmas = newParameters.clone();
 		return true;
 	}
@@ -497,6 +496,7 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	 * @param flag. The GUI type flag defined in PAMGuiManager.
 	 * @return the GUI for the PamControlledUnit unit.
 	 */
+	@Override
 	public PamControlledUnitGUI getGUI(int flag) {
 		if (flag == PamGUIManager.FX) {
 			if (rawGUIFX == null) {

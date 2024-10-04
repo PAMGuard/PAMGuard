@@ -1,15 +1,10 @@
 package Array;
 
 import java.lang.reflect.Field;
-import java.util.ListIterator;
-import pamMaths.PamVector;
-import Array.sensors.StreamerSensorManager;
+
 import Array.streamerOrigin.HydrophoneOriginMethod;
 import Array.streamerOrigin.OriginIterator;
-import GPS.GPSControl;
-import GPS.GPSDataBlock;
 import GPS.GpsData;
-import GPS.GpsDataUnit;
 import GPS.NavDataSynchronisation;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
@@ -92,7 +87,7 @@ public class ThreadingHydrophoneLocator extends StraightHydrophoneLocator implem
 				 */			
 				gpsUnit = gpsIt.previous();
 			}
-			if (gpsIt.hasPrevious() == false) {
+			if (!gpsIt.hasPrevious()) {
 				/**
 				 * We're off the start of the available track, so can do nothing except use the stright model to 
 				 * interpolate backwards. 

@@ -2,22 +2,12 @@ package soundPlayback;
 
 import java.util.ArrayList;
 
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.LineEvent;
-import javax.sound.sampled.LineEvent.Type;
-import javax.sound.sampled.LineListener;
-import javax.sound.sampled.Mixer;
-import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.Mixer.Info;
 
 import Acquisition.SoundCardSystem;
 import PamDetection.RawDataUnit;
-import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamView.dialog.PamDialogPanel;
-import warnings.PamWarning;
-import warnings.WarningSystem;
 
 public class SoundCardFilePlayback implements FilePlaybackDevice {
 

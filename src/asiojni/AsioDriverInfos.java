@@ -60,7 +60,7 @@ public class AsioDriverInfos {
 			long tic = System.currentTimeMillis();
 			boolean firstHz = true;
 			for(int j = 0;j<asioDriverList.get(i).sampleRateInfo.size();j++){
-				if (firstHz == false) {
+				if (!firstHz) {
 					System.out.printf(", ");
 				}
 				else {

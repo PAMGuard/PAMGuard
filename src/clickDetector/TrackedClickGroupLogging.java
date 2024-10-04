@@ -1,9 +1,9 @@
 package clickDetector;
 
-import generalDatabase.PamTableDefinition;
-import generalDatabase.SQLTypes;
 import PamguardMVC.PamDataUnit;
 import clickDetector.offlineFuncs.OfflineEventDataUnit;
+import generalDatabase.PamTableDefinition;
+import generalDatabase.SQLTypes;
 
 public class TrackedClickGroupLogging extends ClickGroupLogging {
 	

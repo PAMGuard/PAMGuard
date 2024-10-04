@@ -13,7 +13,6 @@ import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.util.ArrayList;
 
-import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
@@ -282,7 +281,7 @@ public class ScrollingDataPanel extends PamBorderPanel {
 		DataStreamPanel dsp;
 		for (int i = 0; i < dataStreamPanels.size(); i++) {
 			dsp = dataStreamPanels.get(i);
-			if (dsp.isGraphVisible() == false) {
+			if (!dsp.isGraphVisible()) {
 				continue;
 			}
 			thatPt = dsp.getDataGraph().getLocationOnScreen();

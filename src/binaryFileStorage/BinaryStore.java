@@ -1,5 +1,6 @@
 package binaryFileStorage;
 
+import java.awt.Desktop;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,35 +17,22 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.TimerTask;
 import java.util.Vector;
+
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import pamScrollSystem.ViewLoadObserver;
-import pamViewFX.pamTask.PamTaskUpdate;
-import pamguard.GlobalArguments;
-
-//import com.mysql.jdbc.NdbLoadBalanceExceptionChecker;
-
-import dataGram.Datagram;
-import dataGram.DatagramManager;
-import dataMap.OfflineDataMap;
-import dataMap.OfflineDataMapPoint;
 import PamController.AWTScheduler;
-import PamController.DataInputStore;
 import PamController.DataIntegrityChecker;
 import PamController.DataOutputStore;
-import PamController.OfflineDataStore;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitGUI;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamControllerInterface;
+import PamController.PamFolders;
 import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
@@ -77,6 +65,16 @@ import backupmanager.BackupInformation;
 import binaryFileStorage.backup.BinaryBackupStream;
 import binaryFileStorage.checker.BinaryIntegrityChecker;
 import binaryFileStorage.layoutFX.BinaryStoreGUIFX;
+
+//import com.mysql.jdbc.NdbLoadBalanceExceptionChecker;
+
+import dataGram.Datagram;
+import dataGram.DatagramManager;
+import dataMap.OfflineDataMap;
+import dataMap.OfflineDataMapPoint;
+import pamScrollSystem.ViewLoadObserver;
+import pamViewFX.pamTask.PamTaskUpdate;
+import pamguard.GlobalArguments;
 
 /**
  * The binary store will work very much like the database in that it 
@@ -353,7 +351,7 @@ PamSettingsSource, DataOutputStore {
 				for (int d = 0; d < nDataBlocks; d++) {
 					pamDataBlock = pp.getOutputDataBlock(d);
 					if (pamDataBlock.getBinaryDataSource() != null ) {
-						if (binaryStore == false || 
+						if (!binaryStore || 
 								(pamDataBlock.getBinaryDataSource().isDoBinaryStore() && pamDataBlock.getShouldBinary(null))) {
 							streamingDataBlocks.add(pamDataBlock);
 						}
@@ -400,7 +398,7 @@ PamSettingsSource, DataOutputStore {
 
 			// now check that that folder exists. 
 			File folder = FileFunctions.createNonIndexedFolder(folderName);
-			if (folder == null || folder.exists() == false) {
+			if (folder == null || !folder.exists()) {
 				return null;
 			}
 		}
@@ -482,24 +480,44 @@ PamSettingsSource, DataOutputStore {
 	@Override
 	public JMenuItem createFileMenu(JFrame parentFrame) {
 		JMenuItem m;
+		m = new JMenuItem("Storage options ...");
+		m.setToolTipText("Configure binary storage location and file lengths");
+		m.addActionListener(new BinaryStorageOptions(parentFrame));
+		JMenu settingsMenu = new JMenu(getUnitName());
+		settingsMenu.add(m);
+
 		if (isViewer || SMRUEnable.isEnable()) {
-			m = new JMenuItem("Storage options ...");
-			m.addActionListener(new BinaryStorageOptions(parentFrame));
-			JMenu settingsMenu = new JMenu(getUnitName());
-			settingsMenu.add(m);
 			m = new JMenuItem("Datagram options ...");
 			m.addActionListener(new DatagramOptions(parentFrame));
 			settingsMenu.add(m);
-			return settingsMenu;
 		}
-		else {
-			m = new JMenuItem("Binary Storage options ...");
-			m.addActionListener(new BinaryStorageOptions(parentFrame));
-			JMenu settingsMenu = new JMenu(getUnitName());
-			return m;
-		}
+
+		m = new JMenuItem("Open binary folder");
+		m.setToolTipText("Open folder in Explorer");
+		m.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				openBinaryFolder();
+			}
+		});
+		settingsMenu.add(m);
+		return settingsMenu;
 	}
 	
+	protected void openBinaryFolder() {
+		File file = new File(binaryStoreSettings.getStoreLocation());
+		if (file.exists() == false || file.isDirectory() == false) {
+			return;
+		}
+		Desktop desktop = Desktop.getDesktop();
+		try {
+			desktop.open(file);
+		} catch (IOException e1) {
+			System.out.println("Unable to open folder " + file);
+		}
+		
+	}
+
 	class DatagramOptions implements ActionListener {
 
 		private JFrame parentFrame;
@@ -1189,7 +1207,7 @@ PamSettingsSource, DataOutputStore {
 		}
 		PamDataBlock parentStream = findDataStream(bhf.binaryHeader, streams);
 		if (parentStream == null) {
-			if (lastFailedStream == null || lastFailedStream.equals(bhf.binaryHeader.getModuleName()) == false) {
+			if (lastFailedStream == null || !lastFailedStream.equals(bhf.binaryHeader.getModuleName())) {
 				System.out.println(String.format("No internal data stream for %s %s %s",
 						bhf.binaryHeader.getModuleType(), bhf.binaryHeader.getModuleName(), 
 						bhf.binaryHeader.getStreamName()));
@@ -1387,7 +1405,7 @@ PamSettingsSource, DataOutputStore {
 //		String newPath = filePath.substring(0, pathLen-4) + indexFileType;
 		File newFile = makeIndexFile(dataFile);
 		if (checkExists) {
-			if (newFile.exists() == false) {
+			if (!newFile.exists()) {
 				return null;
 			}
 		}
@@ -1407,7 +1425,7 @@ PamSettingsSource, DataOutputStore {
 //		String newPath = filePath.substring(0, pathLen-4) + indexFileType;
 		File newFile = swapFileType(dataFile, noiseFileType);
 		if (checkExists) {
-			if (newFile.exists() == false) {
+			if (!newFile.exists()) {
 				return null;
 			}
 		}
@@ -1470,6 +1488,7 @@ PamSettingsSource, DataOutputStore {
 	 * @param dmp 
 	 * @param dataBlock 
 	 */
+	@Override
 	public boolean rewriteIndexFile(PamDataBlock dataBlock, OfflineDataMapPoint offlineDataMapPoint) {
 		BinaryOfflineDataMapPoint dmp = (BinaryOfflineDataMapPoint) offlineDataMapPoint;
 		String fileName = dmp.getBinaryFile(this).getAbsolutePath();
@@ -1592,7 +1611,7 @@ PamSettingsSource, DataOutputStore {
 			BinaryDataSink dataSink = new DataLoadSink();
 			for (int i = 0; i < mapPoints.size(); i++) {
 				//				System.out.println(mapPoints.get(i).getBinaryFile().getPath());
-				if (loadData(dataBlock, mapPoints.get(i), offlineDataLoadInfo.getStartMillis(),  offlineDataLoadInfo.getEndMillis(), dataSink) == false) {
+				if (!loadData(dataBlock, mapPoints.get(i), offlineDataLoadInfo.getStartMillis(),  offlineDataLoadInfo.getEndMillis(), dataSink)) {
 					break;
 				}
 			}
@@ -1624,7 +1643,7 @@ PamSettingsSource, DataOutputStore {
 		if (mapPoint.getBinaryFile(this).getAbsolutePath().contains("Click_Detector_Click_Detector_Clicks_20180823_100006.pgdf")) {
 			System.out.println("Load file");
 		}
-		if (inputStream.openFile(mapPoint.getBinaryFile(this)) == false) {
+		if (!inputStream.openFile(mapPoint.getBinaryFile(this))) {
 			return false;
 		}
 		BinaryDataSource binarySource = dataBlock.getBinaryDataSource();
@@ -1724,9 +1743,9 @@ PamSettingsSource, DataOutputStore {
 					
 					unpackAnnotationData(bh.getHeaderFormat(), createdUnit, binaryObjectData, dataSink);
 					
-					if (dataSink.newDataUnit(binaryObjectData, dataBlock, createdUnit) == false) {
+					if (!dataSink.newDataUnit(binaryObjectData, dataBlock, createdUnit)) {
 						return false;
-					};
+					}
 				}
 			}
 		}
@@ -1855,7 +1874,7 @@ PamSettingsSource, DataOutputStore {
 	public boolean saveData(PamDataBlock pamDataBlock) {
 		ArrayList<File> changedFileList = createChangedFileList(pamDataBlock);
 		for (int i = 0; i < changedFileList.size(); i++) {
-			if (saveData(changedFileList.get(i), pamDataBlock) == false) {
+			if (!saveData(changedFileList.get(i), pamDataBlock)) {
 				return false;
 			}
 		}
@@ -1889,12 +1908,12 @@ PamSettingsSource, DataOutputStore {
 		int inputFormat = CURRENT_FORMAT;
 		int outputFormat = CURRENT_FORMAT;
 
-		if (outputStream.openPGDFFile(tempFile) ==  false) {
+		if (!outputStream.openPGDFFile(tempFile)) {
 			return reportError("Unable to open temp output file for rewriting " + 
 					tempFile.getAbsolutePath()); 
 		}
 
-		if (inputStream.openFile(file) == false) {
+		if (!inputStream.openFile(file)) {
 			return reportError("Unable to open data file for rewriting " + 
 					file.getAbsolutePath()); 
 		}
@@ -1970,7 +1989,7 @@ PamSettingsSource, DataOutputStore {
 				time+=t2-t1;
 				if (aDataUnit != null) {
 					//System.out.println("BinaryStore: aDataUnit: Datablock: "+PamUtils.getSingleChannel(((ClickDetection) aDataUnit).getChannelBitmap()));
-					long t11=System.currentTimeMillis();;
+					long t11=System.currentTimeMillis();
 					binarySource.saveData(aDataUnit);
 					aDataUnit.getDataUnitFileInformation().setNeedsUpdate(false);
 					long t12=System.currentTimeMillis();
@@ -2042,8 +2061,8 @@ PamSettingsSource, DataOutputStore {
 					" to " + file.getAbsolutePath());
 			e.printStackTrace();
 		}
-		if (renamedNew == false) {
-			if (deletedOld == false) {
+		if (!renamedNew) {
+			if (!deletedOld) {
 				reportError("Unable to delete " + file.getAbsolutePath());
 			}
 			return reportError(String.format("Unable to rename %s to %s", 
@@ -2309,7 +2328,7 @@ PamSettingsSource, DataOutputStore {
 				 * to be restored in the binary file. Need to more explicityly set the fileInfo needs
 				 * update flag when a data unit has changes to the extent that it needs a re-save.  
 				 */
-				if (fileInfo.isNeedsUpdate() == false/* && aDataUnit.getUpdateCount() == 0*/) {
+				if (!fileInfo.isNeedsUpdate()) {
 					continue;
 				}
 				aFile = fileInfo.getFile();
@@ -2411,6 +2430,7 @@ PamSettingsSource, DataOutputStore {
 	/**
 	 * @return the datagramManager
 	 */
+	@Override
 	public DatagramManager getDatagramManager() {
 		return datagramManager;
 	}
@@ -2427,7 +2447,7 @@ PamSettingsSource, DataOutputStore {
 	public BinaryFooter rebuildFileFooter(File file) {
 
 		BinaryInputStream inputStream = new BinaryInputStream(this, null);
-		if (inputStream.openFile(file) == false) {
+		if (!inputStream.openFile(file)) {
 			return null;
 		}
 		
@@ -2502,6 +2522,7 @@ PamSettingsSource, DataOutputStore {
 	 * @param flag. The GUI type flag defined in PAMGuiManager. 
 	 * @return the GUI for the PamControlledUnit unit. 
 	 */
+	@Override
 	public PamControlledUnitGUI getGUI(int flag) {
 		if (flag==PamGUIManager.FX) {
 			if (binaryStoreGUIFX ==null) {
@@ -2524,7 +2545,7 @@ PamSettingsSource, DataOutputStore {
 		if (PamController.getInstance().getPamStatus() == PamController.PAM_IDLE) {
 			storeState = true;
 		}
-		if (storeState == false || binaryStoreSettings.getStoreLocation() == null) {
+		if (!storeState || binaryStoreSettings.getStoreLocation() == null) {
 			ModuleStatus moduleStatus = new ModuleStatus(ModuleStatus.STATUS_ERROR, "No binary storage folder");
 			moduleStatus.setRemedialAction(new QuickRemedialAction(this, "Select binary storage folder",
 					new BinaryStorageOptions((JFrame) getGuiFrame())));
@@ -2595,6 +2616,7 @@ PamSettingsSource, DataOutputStore {
 		return state;
 	}
   
+	@Override
 	public String getDataLocation() {
 		return binaryStoreSettings.getStoreLocation();
 	}

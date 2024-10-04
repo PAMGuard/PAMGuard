@@ -1,6 +1,7 @@
 package bearinglocaliser;
 
 import java.awt.Frame;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
@@ -14,13 +15,12 @@ import Localiser.LocalisationAlgorithm;
 import Localiser.LocalisationAlgorithmInfo;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
-import PamController.PamController;
+import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamDetection.LocContents;
 import PamUtils.SimpleObservable;
 import PamguardMVC.PamDataUnit;
-import beamformer.algorithms.BeamAlgorithmProvider;
 import bearinglocaliser.algorithms.BearingAlgorithm;
 import bearinglocaliser.algorithms.BearingAlgorithmProvider;
 import bearinglocaliser.annotation.BearingAnnotationType;
@@ -32,7 +32,9 @@ import bearinglocaliser.toad.TOADBearingProvider;
 import offlineProcessing.OLProcessDialog;
 import offlineProcessing.OfflineTaskGroup;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
+import tethys.localization.LocalizationBuilder;
 import tethys.localization.LocalizationCreator;
+import tethys.swing.export.LocalizationOptionsPanel;
 import userDisplay.UserDisplayControl;
 
 public class BearingLocaliserControl extends PamControlledUnit implements PamSettings, LocalisationAlgorithm, LocalisationAlgorithmInfo {
@@ -96,7 +98,7 @@ public class BearingLocaliserControl extends PamControlledUnit implements PamSet
 				showDetectionMenu(parentFrame);
 			}
 		});
-		if (isViewer() == false) {
+		if (!isViewer()) {
 			return menuItem;
 		}
 		JMenu menu = new JMenu(getUnitName());
@@ -128,7 +130,7 @@ public class BearingLocaliserControl extends PamControlledUnit implements PamSet
 	@Override
 	public void notifyModelChanged(int changeType) {
 		switch(changeType) {
-		case PamController.INITIALIZATION_COMPLETE:
+		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			detectionMonitor.prepareProcess();
 			bearingProcess.prepareBearingGroups();
 			break;
@@ -280,5 +282,10 @@ public class BearingLocaliserControl extends PamControlledUnit implements PamSet
 	@Override
 	public Serializable getParameters() {
 		return bearingLocaliserParams;
+	}
+
+	@Override
+	public LocalizationOptionsPanel getLocalizationOptionsPanel(Window parent, LocalizationBuilder locBuilder) {
+		return null;
 	}
 }

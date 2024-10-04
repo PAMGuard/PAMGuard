@@ -15,10 +15,10 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
-import fftManager.FFTLengthModel;
-import fftManager.FFTLengthModeled;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
+import fftManager.FFTLengthModel;
+import fftManager.FFTLengthModeled;
 
 public class WignerPlotdialog extends PamDialog implements FFTLengthModeled {
 

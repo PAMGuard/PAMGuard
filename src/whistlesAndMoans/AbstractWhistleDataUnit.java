@@ -1,11 +1,9 @@
 package whistlesAndMoans;
 
-import whistleClassifier.WhistleContour;
 import PamDetection.PamDetection;
-import PamguardMVC.AcousticDataUnit;
 import PamguardMVC.DataUnitBaseData;
 import PamguardMVC.PamDataUnit;
-import PamguardMVC.TFContourProvider;;
+import whistleClassifier.WhistleContour;;
 
 public abstract class AbstractWhistleDataUnit extends PamDataUnit<PamDataUnit, PamDataUnit> 
 	implements WhistleContour, PamDetection {
@@ -29,11 +27,13 @@ public abstract class AbstractWhistleDataUnit extends PamDataUnit<PamDataUnit, P
 	 * Get an array of the times of each slice in seconds
 	 * @return times in seconds
 	 */
+	@Override
 	abstract public double[] getTimesInSeconds();
 	
 	/**
 	 * Get an array of the peak frequencies in Hz. 
 	 * @return peak frequencies in Hz.
 	 */
+	@Override
 	abstract public double[] getFreqsHz();
 }

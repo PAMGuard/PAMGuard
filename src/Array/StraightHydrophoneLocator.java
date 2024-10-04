@@ -1,21 +1,13 @@
 package Array;
 
 import java.lang.reflect.Field;
-import java.util.ListIterator;
 
-import depthReadout.DepthControl;
-import depthReadout.DepthDataBlock;
-import depthReadout.DepthDataUnit;
-import Array.streamerOrigin.HydrophoneOriginMethod;
 import GPS.GpsData;
 import GPS.GpsDataUnit;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PrivatePamParameterData;
-import PamUtils.LatLong;
-import PamUtils.PamUtils;
 import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamObservable;
 
 /**
  * Straight Hydrophone Locator, uses GPS heading information from

@@ -30,15 +30,6 @@
 
 package GPS;
 
-import generalDatabase.DBControlUnit;
-import generalDatabase.DBProcess;
-import generalDatabase.PamConnection;
-import generalDatabase.PamTableDefinition;
-import generalDatabase.PamTableItem;
-import generalDatabase.SQLLogging;
-import generalDatabase.SQLTypes;
-
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -46,16 +37,16 @@ import java.sql.Types;
 
 import javax.swing.JOptionPane;
 
-
-
-
-
-
-
 import PamController.PamViewParameters;
-import PamUtils.PamCalendar;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import generalDatabase.DBControlUnit;
+import generalDatabase.DBProcess;
+import generalDatabase.PamConnection;
+import generalDatabase.PamTableDefinition;
+import generalDatabase.PamTableItem;
+import generalDatabase.SQLLogging;
+import generalDatabase.SQLTypes;
 
 public class GpsLogger extends SQLLogging {
 	
@@ -117,7 +108,7 @@ public class GpsLogger extends SQLLogging {
 
 	@Override
 	public synchronized boolean doExtraChecks(DBProcess dbProcess, PamConnection connection) {
-		if (dbProcess.tableExists(tableDefinition) == false) {
+		if (!dbProcess.tableExists(tableDefinition)) {
 			return true; // PAMGUARD will create the table normally. 
 		}
 		// make sure the table has the right columns. 
@@ -136,7 +127,7 @@ public class GpsLogger extends SQLLogging {
 //		boolean hasId = dbProcess.columnExists(tableDefinition, tableDefinition.getIndexItem());
 		boolean hasUTC = dbProcess.columnNull(tableDefinition.getTableName(), tableDefinition.getTimeStampItem()) != 2;
 //		boolean hasLoctime = dbProcess.columnExists(tableDefinition, tableDefinition.getLocalTimeItem());
-		if (hasIndex && hasPCTime  && hasUTC == false) {
+		if (hasIndex && hasPCTime  && !hasUTC) {
 			// seems to be a logger table
 			String warningText = String.format("The data in table %s appear to be from the IFAW\n" +
 					"Logger 2000 software and are incompatible with PAMGUARD\n\n" +
@@ -297,7 +288,7 @@ public class GpsLogger extends SQLLogging {
 		int gpsIntTimeVal = gpsTime.getIntegerValue();
 		PamTableDefinition pamTableDef = (PamTableDefinition) getTableDefinition();
 		Object ts = pamTableDef.getTimeStampItem().getValue();
-		long gpsDate = sqlTypes.millisFromTimeStamp(ts);
+		long gpsDate = SQLTypes.millisFromTimeStamp(ts);
 		if (gpsDate%1000 == 0) {
 			// some databases may have stored the milliseconds, in which 
 			// case this next bit is redundant. 
@@ -318,9 +309,9 @@ public class GpsLogger extends SQLLogging {
 		if (nmeaProcess != null) {
 			// this should apply the rules of how much GPD data to keep as it's loading
 			// can reduce amount of data loaded in viewer mode to something sensible. 
-			if (nmeaProcess.wantDataUnit(gpsDataUnit) == false) {
+			if (!nmeaProcess.wantDataUnit(gpsDataUnit)) {
 				return null;
-			};
+			}
 		}
 		
 		String fixTypeStr = fixType.getDeblankedStringValue();

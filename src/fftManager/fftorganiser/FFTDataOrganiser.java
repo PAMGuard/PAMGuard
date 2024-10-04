@@ -141,9 +141,9 @@ public class FFTDataOrganiser {
 	 * @see FFTInputTypes
 	 */
 	public FFTDataList createFFTDataList(PamDataUnit pamDataUnit, double sampleRate, int channelMap) throws FFTDataException {
-		if (rawOrFFTData == null) {
-			return null;
-		}
+//		if (rawOrFFTData == null) {
+//			return null;
+//		}
 		
 //		if (PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW) {
 //			checkOfflineDataLoad(rawOrFFTData, pamDataUnit.getTimeMilliseconds(), pamDataUnit.getEndTimeInMilliseconds());

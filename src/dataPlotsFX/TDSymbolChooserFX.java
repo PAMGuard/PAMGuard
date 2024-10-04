@@ -1,8 +1,7 @@
 package dataPlotsFX;
 
-import pamViewFX.fxNodes.PamSymbolFX;
 import PamguardMVC.PamDataUnit;
-import javafx.scene.paint.Color;
+import pamViewFX.fxNodes.PamSymbolFX;
 
 /**
  * Interface allowing things getting drawn on the plots to chose their won

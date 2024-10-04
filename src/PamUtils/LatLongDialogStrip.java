@@ -11,7 +11,6 @@ import java.awt.event.KeyListener;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import PamView.dialog.PamDialog;
@@ -153,6 +152,7 @@ public class LatLongDialogStrip extends JPanel implements KeyListener, ActionLis
 	/* (non-Javadoc)
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		
 		newTypedValues(null);
@@ -161,6 +161,7 @@ public class LatLongDialogStrip extends JPanel implements KeyListener, ActionLis
 	/* (non-Javadoc)
 	 * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
 	 */
+	@Override
 	public void keyPressed(KeyEvent e) {
 		
 		newTypedValues(e);
@@ -169,6 +170,7 @@ public class LatLongDialogStrip extends JPanel implements KeyListener, ActionLis
 	/* (non-Javadoc)
 	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
 	 */
+	@Override
 	public void keyReleased(KeyEvent e) {
 		
 		newTypedValues(e);
@@ -177,6 +179,7 @@ public class LatLongDialogStrip extends JPanel implements KeyListener, ActionLis
 	/* (non-Javadoc)
 	 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
 	 */
+	@Override
 	public void keyTyped(KeyEvent e) {
 		
 		newTypedValues(e);
@@ -234,12 +237,12 @@ public class LatLongDialogStrip extends JPanel implements KeyListener, ActionLis
 			nsew.setSelectedIndex(1);
 		}
 		double deg = LatLong.getSignedDegrees(value);
-		if (degrees.isVisible() == false || !hiddenOnly) degrees.setText(String.format("%d", (int)Math.abs(deg)));
-		if (minutes.isVisible() == false || !hiddenOnly) minutes.setText(String.format("%d", LatLong.getIntegerMinutes(value)));
-		if (decminutes.isVisible() == false || !hiddenOnly) decminutes.setText(String.format("%3.5f", LatLong.getDecimalMinutes(value)));
-		if (seconds.isVisible() == false || !hiddenOnly) seconds.setText(String.format("%3.5f", LatLong.getSeconds(value)));
-		if (nsew.isVisible() == false || !hiddenOnly) nsew.setSelectedIndex(deg >= 0 ? 0 : 1);
-		if (decimal.isVisible() == false || !hiddenOnly) decimal.setText(String.format("%.8f", value));
+		if (!degrees.isVisible() || !hiddenOnly) degrees.setText(String.format("%d", (int)Math.abs(deg)));
+		if (!minutes.isVisible() || !hiddenOnly) minutes.setText(String.format("%d", LatLong.getIntegerMinutes(value)));
+		if (!decminutes.isVisible() || !hiddenOnly) decminutes.setText(String.format("%3.5f", LatLong.getDecimalMinutes(value)));
+		if (!seconds.isVisible() || !hiddenOnly) seconds.setText(String.format("%3.5f", LatLong.getSeconds(value)));
+		if (!nsew.isVisible() || !hiddenOnly) nsew.setSelectedIndex(deg >= 0 ? 0 : 1);
+		if (!decimal.isVisible() || !hiddenOnly) decimal.setText(String.format("%.8f", value));
 		
 		sayFormattedValue(value);
 	}

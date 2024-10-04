@@ -8,10 +8,10 @@ import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
-import PamView.GroupedSourceParameters;
 import group3dlocaliser.algorithm.LocaliserAlgorithm3D;
 import group3dlocaliser.algorithm.LocaliserAlgorithmParams;
 import group3dlocaliser.grouper.DetectionGrouperParams;
+import tethys.localization.CoordinateName;
 
 public class Group3DParams implements Serializable, Cloneable, ManagedParameters {
 
@@ -27,6 +27,8 @@ public class Group3DParams implements Serializable, Cloneable, ManagedParameters
 	private String algorithmName;
 	
 	private Hashtable<String, LocaliserAlgorithmParams> algorithmSpecificParams; 
+	
+	private CoordinateName exportCoordinateName = CoordinateName.WGS84;
 	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#clone()
@@ -157,6 +159,23 @@ public class Group3DParams implements Serializable, Cloneable, ManagedParameters
 	 */
 	public void setSourceName(String sourceName) {
 		this.sourceName = sourceName;
+	}
+
+	/**
+	 * @return the exportCoordinateName
+	 */
+	public CoordinateName getExportCoordinateName() {
+		if (exportCoordinateName == null) {
+			exportCoordinateName = CoordinateName.WGS84;
+		}
+		return exportCoordinateName;
+	}
+
+	/**
+	 * @param exportCoordinateName the exportCoordinateName to set
+	 */
+	public void setExportCoordinateName(CoordinateName exportCoordinateName) {
+		this.exportCoordinateName = exportCoordinateName;
 	}
 	
 }

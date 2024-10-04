@@ -236,6 +236,7 @@ public abstract class AbstractPamScroller implements DataTimeLimits {
 	/**
 	 * @return the minimumMillis - the minimum of loaded data
 	 */
+	@Override
 	public long getMinimumMillis() {
 		return scrollerData.minimumMillis;
 	}
@@ -243,6 +244,7 @@ public abstract class AbstractPamScroller implements DataTimeLimits {
 	/**
 	 * @return the maximumMillis - the maximum of loaded data
 	 */
+	@Override
 	public long getMaximumMillis() {
 		return scrollerData.maximumMillis;
 	}

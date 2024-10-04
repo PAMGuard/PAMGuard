@@ -57,6 +57,7 @@ public class RawDataDisplay implements DisplayPanelProvider {
 	 * A name that can be used when constructing options
 	 * menus, etc.
 	 */
+	@Override
 	public String getDisplayPanelName() {
 		return rawDataBlock.getDataName();
 	}
@@ -66,6 +67,7 @@ public class RawDataDisplay implements DisplayPanelProvider {
 	 * Each provider may create any number of display panels for
 	 * different parts of the Pamguard display
 	 */
+	@Override
 	public DisplayPanel createDisplayPanel(DisplayPanelContainer displayPanelContainer) {
 		return new RawDisplayPanel(this, displayPanelContainer);
 	}
@@ -92,6 +94,7 @@ public class RawDataDisplay implements DisplayPanelProvider {
 			westAxis = new RepeatedAxis(0, 10, 0, 20, -1, 1, true, "", "%2.2g");
 			westAxis.setInterval(1);
 			westAxis.setRepeatCount(nChan);
+			westAxis.setCrampLabels(true);
 			eastAxis = new RepeatedAxis(0, 10, 0, 20, -1, 1, false, "", "%2.2g");
 			eastAxis.setInterval(1);
 			eastAxis.setRepeatCount(nChan);
@@ -102,6 +105,7 @@ public class RawDataDisplay implements DisplayPanelProvider {
 			return this;
 		}
 		
+		@Override
 		public String getObserverName() {
 			return "Plug in BT display panel";
 		}
@@ -134,6 +138,7 @@ public class RawDataDisplay implements DisplayPanelProvider {
 		/**
 		 * Implementation of PamObserver
 		 */
+		@Override
 		public long getRequiredDataHistory(PamObservable o, Object arg) {
 			return 1000; // is this really necessary !
 		}
@@ -141,6 +146,7 @@ public class RawDataDisplay implements DisplayPanelProvider {
 		/**
 		 * Implementation of PamObserver
 		 */
+		@Override
 		public void noteNewSettings() {
 			// TODO Auto-generated method stub
 			
@@ -149,6 +155,7 @@ public class RawDataDisplay implements DisplayPanelProvider {
 		/**
 		 * Implementation of PamObserver
 		 */
+		@Override
 		public void removeObservable(PamObservable o) {
 			// TODO Auto-generated method stub
 			
@@ -158,6 +165,7 @@ public class RawDataDisplay implements DisplayPanelProvider {
 		 * Implementation of PamObserver
 		 */
 		float sampleRate;
+		@Override
 		public void setSampleRate(float sampleRate, boolean notify) {
 			this.sampleRate = sampleRate;
 		}
@@ -189,6 +197,7 @@ public class RawDataDisplay implements DisplayPanelProvider {
 
 		private double[] scrollRemainder = new double[PamConstants.MAX_CHANNELS];
 		
+		@Override
 		public void addData(PamObservable o, PamDataUnit dataUnit) {
 			
 			RawDataUnit rawDataUnit = (RawDataUnit) dataUnit;
@@ -350,22 +359,27 @@ public class RawDataDisplay implements DisplayPanelProvider {
 		/**
 		 * Implementation of PamSettings
 		 */
+		@Override
 		public Serializable getSettingsReference() {
 			return waveOptions;
 		}
 
+		@Override
 		public long getSettingsVersion() {
 			return RawDataDisplayOptions.serialVersionUID;
 		}
 
+		@Override
 		public String getUnitName() {
 			return displayPanelProvider.getDisplayPanelName();
 		}
 
+		@Override
 		public String getUnitType() {
 			return "waveform panel";
 		}
 
+		@Override
 		public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 			waveOptions = (RawDataDisplayOptions) pamControlledUnitSettings.getSettings();
 			checkMenuItem();
@@ -374,9 +388,10 @@ public class RawDataDisplay implements DisplayPanelProvider {
 
 		class OptionsListener implements ActionListener {
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				waveOptions.autoScale = (!waveOptions.autoScale);		
-				if (waveOptions.autoScale == false) {
+				if (!waveOptions.autoScale) {
 					scale = 1;
 					setAxisRange(1);
 				}
@@ -386,6 +401,7 @@ public class RawDataDisplay implements DisplayPanelProvider {
 		}
 		
 		class ZoomInListener implements ActionListener {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				scale = scale*2;
 				setAxisRange(1./scale);
@@ -394,6 +410,7 @@ public class RawDataDisplay implements DisplayPanelProvider {
 		}
 		
 		class ZoomOutListener implements ActionListener {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				scale = scale/2;
 				setAxisRange(1./scale);

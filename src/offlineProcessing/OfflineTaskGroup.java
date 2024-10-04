@@ -8,18 +8,11 @@ import java.util.ListIterator;
 
 import javax.swing.SwingWorker;
 
-import binaryFileStorage.DataUnitFileInformation;
-import dataMap.OfflineDataMap;
-import dataMap.OfflineDataMapPoint;
-import generalDatabase.DBControlUnit;
-import offlineProcessing.logging.TaskLogging;
-import offlineProcessing.superdet.OfflineSuperDetFilter;
-import pamScrollSystem.DataTimeLimits;
-import pamScrollSystem.ViewLoadObserver;
 import PamController.OfflineDataStore;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
+import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamUtils.CPUMonitor;
@@ -29,6 +22,14 @@ import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import PamguardMVC.debug.Debug;
 import PamguardMVC.superdet.SuperDetDataBlock;
+import binaryFileStorage.DataUnitFileInformation;
+import dataMap.OfflineDataMap;
+import dataMap.OfflineDataMapPoint;
+import generalDatabase.DBControlUnit;
+import offlineProcessing.logging.TaskLogging;
+import offlineProcessing.superdet.OfflineSuperDetFilter;
+import pamScrollSystem.DataTimeLimits;
+import pamScrollSystem.ViewLoadObserver;
 
 /**
  * 
@@ -96,7 +97,7 @@ public class OfflineTaskGroup implements PamSettings {
 			aTask = getTask(iTask);
 			for (int i = 0; i < aTask.getNumRequiredDataBlocks(); i++) {
 				blockInfo = aTask.getRequiredDataBlock(i);
-				if (hasRequiredDataBlock(blockInfo) == false) {
+				if (!hasRequiredDataBlock(blockInfo)) {
 					requiredDataBlocks.add(blockInfo);
 				}
 			}
@@ -121,8 +122,8 @@ public class OfflineTaskGroup implements PamSettings {
 		}
 		for (RequiredDataBlockInfo dbinfo : requiredDataBlocks) {
 			if (dbinfo.getPamDataBlock() == dataBlockInfo.getPamDataBlock()) {
-				dbinfo.setPreLoadTime(Math.max(dbinfo.getPreLoadTime(), dataBlockInfo.getPreLoadTime()));;
-				dbinfo.setPostLoadTime(Math.max(dbinfo.getPostLoadTime(), dataBlockInfo.getPostLoadTime()));;
+				dbinfo.setPreLoadTime(Math.max(dbinfo.getPreLoadTime(), dataBlockInfo.getPreLoadTime()));
+				dbinfo.setPostLoadTime(Math.max(dbinfo.getPostLoadTime(), dataBlockInfo.getPostLoadTime()));
 				return true;
 			}
 		}
@@ -226,7 +227,7 @@ public class OfflineTaskGroup implements PamSettings {
 		// then scan the database to try to find if everything is later ...
 		long taskMinLatest = Long.MAX_VALUE;
 		for (OfflineTask aTask : offlineTasks) {
-			if (aTask.isDoRun() == false) {
+			if (!aTask.isDoRun()) {
 				continue;
 			}
 			Long taskLatest = getPreviousEndTime(aTask);
@@ -271,7 +272,7 @@ public class OfflineTaskGroup implements PamSettings {
 			return 0;
 		}
 		for (OfflineTask task : tasks) {
-			if (haveTask(task) == false) { 
+			if (!haveTask(task)) { 
 				addTask(task);
 				n++;
 			}
@@ -490,9 +491,9 @@ public class OfflineTaskGroup implements PamSettings {
 					//System.out.println("HELLOOOOO: " + (mapPoint.getEndTime()-mapPoint.getStartTime())/1000.+  "s"); 
 					continue; // will whip through early part of list without increasing the counters
 				}
-				if (shouldProcess(mapPoint) == false) {
+				if (!shouldProcess(mapPoint)) {
 					Debug.out.printf("Skipping map point %s since no matching data\n", mapPoint.toString());
-					reallyDoIt = false;;
+					reallyDoIt = false;
 				}
 				primaryDataBlock.clearAll();
 				
@@ -513,7 +514,7 @@ public class OfflineTaskGroup implements PamSettings {
 					loadSecondaryData(mapPoint.getStartTime(), mapPoint.getEndTime());
 					//					}
 					for (OfflineTask aTask: offlineTasks) {
-						if (aTask.isDoRun() == false) {
+						if (!aTask.isDoRun()) {
 							continue;
 						}
 						aTask.newDataLoad(mapPoint.getStartTime(), mapPoint.getEndTime(), mapPoint);
@@ -587,7 +588,7 @@ public class OfflineTaskGroup implements PamSettings {
 			OfflineTask aTask;
 			for (int iTask = 0; iTask < nTasks; iTask++) {
 				aTask = getTask(iTask);
-				if (aTask.canRun() == false) {
+				if (!aTask.canRun()) {
 					continue;
 				}
 				if (aTask.isDoRun()) {
@@ -696,7 +697,7 @@ public class OfflineTaskGroup implements PamSettings {
 					break;
 				}
 				
-				if (shouldProcess(dataUnit) == false) {
+				if (!shouldProcess(dataUnit)) {
 					doTasks = false;
 				}
 				
@@ -710,7 +711,7 @@ public class OfflineTaskGroup implements PamSettings {
 
 					for (int iTask = 0; iTask < nTasks; iTask++) {
 						aTask = getTask(iTask);
-						if (aTask.isDoRun() == false ||  !isInTimeChunk(dataUnit, taskGroupParams.timeChunks)) {
+						if (!aTask.isDoRun() ||  !isInTimeChunk(dataUnit, taskGroupParams.timeChunks)) {
 							continue;
 						}
 						cpuMonitor.start();
@@ -737,7 +738,7 @@ public class OfflineTaskGroup implements PamSettings {
 			}
 			for (int iTask = 0; iTask < nTasks; iTask++) {
 				aTask = getTask(iTask);
-				if (aTask.isDoRun() == false) {
+				if (!aTask.isDoRun()) {
 					continue;
 				}
 				aTask.loadedDataComplete();
@@ -805,7 +806,7 @@ public class OfflineTaskGroup implements PamSettings {
 			OfflineTask aTask;
 			for (int iTask = 0; iTask < nTasks; iTask++) {
 				aTask = getTask(iTask);
-				if (aTask.canRun() == false) {
+				if (!aTask.canRun()) {
 					continue;
 				}
 				aTask.completeTask();
@@ -868,7 +869,7 @@ public class OfflineTaskGroup implements PamSettings {
 
 	private void logTaskStatus(TaskMonitorData monitorData) {
 		for (OfflineTask aTask : offlineTasks) {
-			if (aTask.isDoRun() == false) {
+			if (!aTask.isDoRun()) {
 				continue;
 			}
 			
@@ -890,7 +891,7 @@ public class OfflineTaskGroup implements PamSettings {
 		long currentStart = primaryDataBlock.getCurrentViewDataStart();
 		long currentEnd = primaryDataBlock.getCurrentViewDataEnd();
 		//System.out.println("TASKS COMPLETE:");
-		PamController.getInstance().notifyModelChanged(PamController.OFFLINE_PROCESS_COMPLETE);
+		PamController.getInstance().notifyModelChanged(PamControllerInterface.OFFLINE_PROCESS_COMPLETE);
 	}
 
 	@Override

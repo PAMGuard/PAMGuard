@@ -9,7 +9,7 @@ import Array.sensors.swing.ArrayDisplayParamsDialog;
 import Array.swing.sidepanel.ArraySidePanel;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
-import PamController.PamController;
+import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamUtils.PamCalendar;
@@ -45,13 +45,13 @@ public class ArraySidePanelControl extends PamControlledUnit implements ArrayDis
 	public void notifyModelChanged(int changeType) {
 		super.notifyModelChanged(changeType);
 		switch (changeType) {
-		case PamController.INITIALIZATION_COMPLETE:
-		case PamController.HYDROPHONE_ARRAY_CHANGED:
+		case PamControllerInterface.INITIALIZATION_COMPLETE:
+		case PamControllerInterface.HYDROPHONE_ARRAY_CHANGED:
 			if (arraySidePanel != null) {
 				arraySidePanel.update();
 			}
 			break;
-		case PamController.NEW_SCROLL_TIME:
+		case PamControllerInterface.NEW_SCROLL_TIME:
 			if (isViewer()) {
 				arraySidePanel.updateViewerTime(PamCalendar.getTimeInMillis());
 			}

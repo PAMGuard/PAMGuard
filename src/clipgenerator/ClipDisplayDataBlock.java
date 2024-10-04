@@ -1,7 +1,6 @@
 package clipgenerator;
 
 import PamguardMVC.AcousticDataBlock;
-import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
 
 /**

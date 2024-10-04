@@ -13,7 +13,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
-
 import PamController.PamController;
 import PamDetection.RawDataUnit;
 import PamView.dialog.PamDialog;
@@ -170,6 +169,7 @@ public class PatchPanelDialog extends PamDialog {
 	}
 	class PatchBoxListener implements ActionListener {
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 
 			buttonsChanged();
@@ -180,9 +180,9 @@ public class PatchPanelDialog extends PamDialog {
 	
 	private void buttonsChanged() {
 		
-		if (immediate.isSelected() == false) return;
+		if (!immediate.isSelected()) return;
 		
-		if (getParams() == false) return;
+		if (!getParams()) return;
 		
 		patchPanelControl.newSettings(patchPanelParameters);
 		

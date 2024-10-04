@@ -37,9 +37,13 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
+
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvException;
 
 import Layout.PamAxis;
 import PamUtils.PamFileChooser;
@@ -49,9 +53,6 @@ import PamView.PamColors.PamColor;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamView.panel.PamPanel;
-import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvException;
-
 import fftManager.Complex;
 
 /**
@@ -188,8 +189,9 @@ public class FilterDialogPanel implements ActionListener {
 		repaintAll();
 	}
 
+	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (isSetup == false) {
+		if (!isSetup) {
 			return;
 		}
 		if (e.getSource() == filterTypes) {
@@ -235,7 +237,7 @@ public class FilterDialogPanel implements ActionListener {
 			break;
 		}
 		boolean isArb = filterType == 4;
-		normalPanel.setVisible(isArb == false);
+		normalPanel.setVisible(!isArb);
 		arbPanel.setVisible(isArb);
 	}
 
@@ -321,14 +323,14 @@ public class FilterDialogPanel implements ActionListener {
 			c.gridwidth = 1;
 			c.gridy++;
 			c.gridx = xc;
-			normalPanel.add(new JLabel(" High Pass", JLabel.RIGHT), c);
+			normalPanel.add(new JLabel(" High Pass", SwingConstants.RIGHT), c);
 			c.gridx++;
 			normalPanel.add(highCut, c);
 			c.gridx++;
 			normalPanel.add(new JLabel(" Hz"), c);
 			c.gridy++;
 			c.gridx = xc;
-			normalPanel.add(new JLabel(" Low Pass", JLabel.RIGHT), c);
+			normalPanel.add(new JLabel(" Low Pass", SwingConstants.RIGHT), c);
 			c.gridx++;
 			normalPanel.add(lowCut, c);
 			c.gridx++;
@@ -702,10 +704,10 @@ public class FilterDialogPanel implements ActionListener {
 			if (filterMethod == null) {
 				return;
 			}
-			if (IIRFilterMethod.class.isAssignableFrom(filterMethod.getClass()) == true) {
+			if (IIRFilterMethod.class.isAssignableFrom(filterMethod.getClass())) {
 				paintPoleZeros(g);
 			}
-			else if (FIRFilterMethod.class.isAssignableFrom(filterMethod.getClass()) == true) {
+			else if (FIRFilterMethod.class.isAssignableFrom(filterMethod.getClass())) {
 				paintImpulseResponse(g);
 			}
 		}

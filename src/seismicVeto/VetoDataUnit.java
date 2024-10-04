@@ -1,7 +1,6 @@
 package seismicVeto;
 
 import PamDetection.PamDetection;
-import PamguardMVC.AcousticDataUnit;
 import PamguardMVC.PamDataUnit;
 
 public class VetoDataUnit extends PamDataUnit<PamDataUnit,PamDataUnit> implements PamDetection {

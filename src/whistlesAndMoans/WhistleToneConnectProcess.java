@@ -5,15 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import networkTransfer.receive.BuoyStatusDataUnit;
-import spectrogramNoiseReduction.SpectrogramNoiseProcess;
-import spectrogramNoiseReduction.SpectrogramNoiseSettings;
-import whistlesAndMoans.plots.WhistleSymbolManager;
-import eventCounter.DataCounter;
-import fftManager.FFTDataBlock;
-import fftManager.FFTDataUnit;
-import generalDatabase.PamDetectionLogging;
-import generalDatabase.SQLLogging;
 import Array.ArrayManager;
 import Localiser.LocalisationAlgorithmInfo;
 import Localiser.algorithms.Correlations;
@@ -37,6 +28,15 @@ import PamguardMVC.PamProcess;
 import PamguardMVC.background.SpecBackgroundDataUnit;
 import PamguardMVC.background.SpecBackgroundManager;
 import Spectrogram.SpectrumBackgrounds;
+import eventCounter.DataCounter;
+import fftManager.FFTDataBlock;
+import fftManager.FFTDataUnit;
+import generalDatabase.PamDetectionLogging;
+import generalDatabase.SQLLogging;
+import networkTransfer.receive.BuoyStatusDataUnit;
+import spectrogramNoiseReduction.SpectrogramNoiseProcess;
+import spectrogramNoiseReduction.SpectrogramNoiseSettings;
+import whistlesAndMoans.plots.WhistleSymbolManager;
 
 public class WhistleToneConnectProcess extends PamProcess {
 	
@@ -349,7 +349,7 @@ public class WhistleToneConnectProcess extends PamProcess {
 		if (sbProcess == null) {
 			return sourceBlock;
 		}
-		if (sbProcess instanceof SpectrogramNoiseProcess == false) {
+		if (!(sbProcess instanceof SpectrogramNoiseProcess)) {
 			return sourceBlock;
 		}
 		else {
@@ -559,7 +559,7 @@ public class WhistleToneConnectProcess extends PamProcess {
 
 			// loop over new data
 			for (int i = space; i < dataLen+space; i++) {
-				if (spacedArray[i] == false) {
+				if (!spacedArray[i]) {
 					continue; // continue of this pixel is not set. 
 				}
 				/*
@@ -606,7 +606,7 @@ public class WhistleToneConnectProcess extends PamProcess {
 					 * this region, but didn't get assigned. 
 					 */
 					for (int ii = i-1; ii >0; ii--) {
-						if (spacedArray[ii] == false || regionArray[1][ii] != null) {
+						if (!spacedArray[ii] || regionArray[1][ii] != null) {
 							break;
 						}
 						regionArray[1][ii] = regionArray[1][i];
@@ -619,7 +619,7 @@ public class WhistleToneConnectProcess extends PamProcess {
 			 * need to run up the column again creating new regions. 
 			 */
 			for (int i = space; i < dataLen+space; i++) {
-				if (spacedArray[i] == false || regionArray[1][i] != null) {
+				if (!spacedArray[i] || regionArray[1][i] != null) {
 					continue; // continue of this pixel is not set. 
 				}
 				/*
@@ -734,9 +734,9 @@ public class WhistleToneConnectProcess extends PamProcess {
 			ConnectedRegion r;
 			while(rl.hasNext()) {
 				r=rl.next();
-				if (r.isGrowing() == false) {
+				if (!r.isGrowing()) {
 					rl.remove();
-					if (completeRegion(r) == false) {
+					if (!completeRegion(r)) {
 						recycleRegion(r);
 					}
 				}
@@ -753,7 +753,7 @@ public class WhistleToneConnectProcess extends PamProcess {
 			
 //			if (region.getFirstSlice() == 44647) {
 //				System.out.println("Defrag big one");
-			if (whistleMoanControl.getWhistleToneParameters().keepShapeStubs == false) {
+			if (!whistleMoanControl.getWhistleToneParameters().keepShapeStubs) {
 				stubRemover.removeStubs(region);
 			}
 //			}

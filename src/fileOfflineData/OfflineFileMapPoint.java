@@ -1,11 +1,9 @@
 package fileOfflineData;
 
 import java.io.File;
-import java.lang.reflect.Field;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
-import PamModel.parametermanager.PrivatePamParameterData;
 import dataMap.OfflineDataMapPoint;
 
 public class OfflineFileMapPoint extends OfflineDataMapPoint implements ManagedParameters {

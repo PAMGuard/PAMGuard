@@ -2,7 +2,6 @@ package Spectrogram;
 
 import java.awt.event.MouseEvent;
 
-import PamguardMVC.PamDataBlock;
 import dataPlotsFX.layout.TDGraphFX;
 
 /**

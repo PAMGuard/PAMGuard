@@ -1,8 +1,5 @@
 package loggerForms;
 
-import generalDatabase.lookupTables.LookupComponent;
-import generalDatabase.lookupTables.LookupItem;
-
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -18,7 +15,8 @@ import javax.swing.border.TitledBorder;
 
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
-import loggerForms.PropertyTypes;
+import generalDatabase.lookupTables.LookupComponent;
+import generalDatabase.lookupTables.LookupItem;
 import loggerForms.controlDescriptions.ControlDescription;
 import loggerForms.controlDescriptions.ControlTypes;
 
@@ -71,7 +69,7 @@ public class FormPlotOptionsPanel {
 			if (aControl.getEType() != ControlTypes.LOOKUP) {
 				continue;
 			}
-			if (aControl.getPlot() == null || aControl.getPlot() == false) {
+			if (aControl.getPlot() == null || !aControl.getPlot()) {
 				continue;
 			}
 			LookupPanel lookupPanel = new LookupPanel(iControl, aControl);
@@ -150,7 +148,7 @@ public class FormPlotOptionsPanel {
 			}
 			boolean s = showAll.isSelected();
 			for (int i = 1; i < checkBoxes.size(); i++) {
-				checkBoxes.get(i).setEnabled(s==false);
+				checkBoxes.get(i).setEnabled(!s);
 			}
 		}
 	}

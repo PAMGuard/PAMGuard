@@ -17,13 +17,6 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 import javax.swing.border.TitledBorder;
 
-import pamScrollSystem.AbstractPamScroller;
-import pamScrollSystem.AbstractPamScrollerAWT;
-import pamScrollSystem.PamScrollObserver;
-import pamScrollSystem.PamScroller;
-import pamScrollSystem.RangeSpinner;
-import pamScrollSystem.RangeSpinnerListener;
-import classifier.Classifier;
 import Layout.PamAxis;
 import Layout.PamAxisPanel;
 import PamController.PamController;
@@ -40,8 +33,14 @@ import PamView.panel.PamBorderPanel;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
-import PamguardMVC.PamObserver;
 import PamguardMVC.PamObserverAdapter;
+import classifier.Classifier;
+import pamScrollSystem.AbstractPamScroller;
+import pamScrollSystem.AbstractPamScrollerAWT;
+import pamScrollSystem.PamScrollObserver;
+import pamScrollSystem.PamScroller;
+import pamScrollSystem.RangeSpinner;
+import pamScrollSystem.RangeSpinnerListener;
 
 /**
  * Provides a history window for classification results. 
@@ -187,6 +186,7 @@ public class ClassifierHistoryWindow extends PamObserverAdapter {
 
 	class TimerAction implements ActionListener {
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 
 			repaintPlots();

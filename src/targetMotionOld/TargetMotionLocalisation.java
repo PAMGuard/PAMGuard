@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import pamMaths.PamVector;
 import GPS.GpsData;
 import Localiser.detectionGroupLocaliser.GroupLocResult;
 import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamUtils.LatLong;
 import PamguardMVC.PamDataUnit;
+import pamMaths.PamVector;
 
 /**
  * Reinstated Target motion add-in as used by the click detector. Hope one day still to replace this

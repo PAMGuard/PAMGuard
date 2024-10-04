@@ -1,7 +1,5 @@
 package targetMotionOld;
 
-import pamMaths.PamVector;
-
 import java.util.List;
 
 import PamDetection.AbstractLocalisation;
@@ -10,6 +8,7 @@ import PamguardMVC.PamDataUnit;
 import PamguardMVC.superdet.SubdetectionInfo;
 import PamguardMVC.superdet.SuperDetection;
 import Stats.LinFit;
+import pamMaths.PamVector;
 
 /**
  * Reinstated class to rotate and transform an event so that it's track lies as close
@@ -253,7 +252,7 @@ public class EventRotator {
 	 * @return time in milliseconds. 
 	 */
 	public long metresToTime(PamVector pt, boolean isRotated) {
-		if (isRotated == false) {
+		if (!isRotated) {
 			pt = pt.clone().rotate(-referenceAngle);
 		}
 		// now only have to work on the x coordinate. 

@@ -56,7 +56,7 @@ public class PamModelSettings implements Cloneable, Serializable, ManagedParamet
 		 * settings file). After that, the user can set to zero
 		 * if they want to. 
 		 */
-		if (oldJitterParam == false) {
+		if (!oldJitterParam) {
 			threadingJitterMillis = 1000;
 			oldJitterParam = true;
 		}

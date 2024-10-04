@@ -29,7 +29,6 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Rectangle;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
@@ -112,6 +111,7 @@ public class ClickTrigger extends ClickDisplay implements PamObserver {
 	}
 
 
+	@Override
 	public long getRequiredDataHistory(PamObservable o, Object arg) {
 		return 0;
 	}
@@ -121,6 +121,7 @@ public class ClickTrigger extends ClickDisplay implements PamObserver {
 		return this;
 	}
 	
+	@Override
 	public void addData(PamObservable obs, PamDataUnit newData) {
 		// should get here everytime there is a new raw data unit so update the
 		// appropriate bar.
@@ -159,6 +160,7 @@ public class ClickTrigger extends ClickDisplay implements PamObserver {
 		
 	}
 	
+	@Override
 	public String getObserverName() {
 		return "click detector trigger display";
 	}
@@ -180,6 +182,7 @@ public class ClickTrigger extends ClickDisplay implements PamObserver {
 		triggerPlot.repaint();
 	}
 
+	@Override
 	public void setSampleRate(float sampleRate, boolean notify) {
 		// this.sampleRate = sampleRate;
 	}
@@ -372,7 +375,7 @@ public class ClickTrigger extends ClickDisplay implements PamObserver {
 						0);
 				progressBars[i].setValue(-60);
 				channel = PamUtils.getNthChannel(i, clickControl.clickParameters.getChannelBitmap());
-				subPanel.add(BorderLayout.NORTH, new PamLabel(Integer.toString(channel), JLabel.CENTER));
+				subPanel.add(BorderLayout.NORTH, new PamLabel(Integer.toString(channel), SwingConstants.CENTER));
 				subPanel.add(BorderLayout.CENTER, progressBars[i]);
 				barPanel.add(subPanel);
 //				PamColors.getInstance().registerComponent(progressBars[i], PamColor.BORDER);
@@ -396,6 +399,7 @@ public class ClickTrigger extends ClickDisplay implements PamObserver {
 		levelMeters.newSettings();
 	}
 
+	@Override
 	public void removeObservable(PamObservable o) {
 		// TODO Auto-generated method stub
 

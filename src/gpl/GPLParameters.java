@@ -1,6 +1,5 @@
 package gpl;
 
-import java.io.File;
 import java.io.Serializable;
 
 import PamModel.parametermanager.FieldNotFoundException;
@@ -14,7 +13,7 @@ public class GPLParameters implements Serializable, Cloneable, ManagedParameters
 
 	public static final long serialVersionUID = 1L;
 	
-	public enum ConnectType  {CONNECT4, CONNECT8};
+	public enum ConnectType  {CONNECT4, CONNECT8}
 
 	/**
 	 * Generic description for this parameter set used

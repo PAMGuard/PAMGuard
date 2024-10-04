@@ -1,11 +1,23 @@
 package ishmaelComms;
 
+import java.awt.BorderLayout;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 //import NMEA.GpsData;
 //import NMEA.GpsData.*;
-import java.net.*;
-import java.io.*;
-import java.awt.BorderLayout;
-import javax.swing.*;
+import java.net.Socket;
+import java.net.SocketAddress;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 
 
 
@@ -127,6 +139,7 @@ public class Client extends JFrame implements Runnable
 		
 	}
 
+	@Override
 	public void run() 
 	{
 		
@@ -395,6 +408,7 @@ public class Client extends JFrame implements Runnable
 		(
 				new Runnable()
 				{
+					@Override
 					public void run()
 					{
 						displayArea.append(incoming);
@@ -420,7 +434,7 @@ public class Client extends JFrame implements Runnable
 	{
 		
 	    Client PGClient =new Client();
-		PGClient.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		PGClient.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		
 
 	}

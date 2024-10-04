@@ -5,8 +5,6 @@ import java.util.ListIterator;
 
 import javax.sound.sampled.AudioFileFormat;
 
-
-
 import PamController.PamController;
 import PamDetection.RawDataUnit;
 import PamUtils.CheckStorageFolder;
@@ -17,7 +15,6 @@ import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
 import PamguardMVC.PamRawDataBlock;
-import SoundRecorder.trigger.RecorderTriggerData;
 
 /**
  * Process raw audio data prior to storage. Raw data blocks

@@ -1,10 +1,10 @@
 package ArrayAccelerometer;
 
-import pamMaths.PamVector;
 import Array.sensors.ArraySensorDataUnit;
 import Array.sensors.ArraySensorFieldType;
 import PamUtils.PamUtils;
 import PamguardMVC.PamDataUnit;
+import pamMaths.PamVector;
 
 public class ArrayAccelDataUnit extends PamDataUnit implements ArraySensorDataUnit {
 

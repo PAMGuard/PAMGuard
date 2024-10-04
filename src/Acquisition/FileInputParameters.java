@@ -16,14 +16,14 @@ import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 public class FileInputParameters implements Serializable, Cloneable, ManagedParameters {
 
 	static public final long serialVersionUID = 1;
-	
+
 	static public final int MAX_RECENT_FILES = 20;
-	
+
 	/**
-	 * A list of the recent files or folders selected. 
+	 * A list of the recent files or folders selected.
 	 */
-	public ArrayList<String> recentFiles = new ArrayList<String>();
-	
+	public ArrayList<String> recentFiles = new ArrayList<>();
+
 	public boolean realTime;
 
 	public String getMostRecentFile() {
@@ -34,21 +34,21 @@ public class FileInputParameters implements Serializable, Cloneable, ManagedPara
 			return null;
 		}
 	}
-	
+
 	public String systemType;
-	
+
 	/**
 	 * Repeat in an infinite loop
 	 */
-	public boolean repeatLoop; 
-	
+	public boolean repeatLoop;
+
 	/**
-	 * Skip a section an initial section of the file in millis. For example, use with SoundTrap calibration values. 
+	 * Skip a section an initial section of the file in millis. For example, use with SoundTrap calibration values.
 	 */
 	public long skipStartFileTime = 0;
-	
+
 	public int bitDepth;
-	
+
 	/**
 	 * @param systemType
 	 */
@@ -71,7 +71,7 @@ public class FileInputParameters implements Serializable, Cloneable, ManagedPara
 		}
 		return null;
 	}
-	
+
 	@Override
 	public PamParameterSet getParameterSet() {
 		// if the user has not selected this system type, just return null

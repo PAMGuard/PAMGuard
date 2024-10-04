@@ -89,6 +89,7 @@ public class MatchFiltParamsDialog extends IshDetParamsDialog implements ActionL
 			kernelFilenameBox.setSelectedIndex(0);
 	}
 
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == kernelFileButton)		//user clicked "Select file"
 			selectFile();

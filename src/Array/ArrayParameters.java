@@ -1,7 +1,6 @@
 package Array;
 
 import java.io.Serializable;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 
 import PamModel.parametermanager.ManagedParameters;
@@ -9,7 +8,7 @@ import PamModel.parametermanager.PamParameterSet;
 
 /**
  * Parameters wrapper for array data. Shockingly, the current system just serializes
- * an array list of recent arrays - ArrayList<PamArray>. Are now going to wrap that in a new class so that 
+ * an array list of recent arrays - ArrayList of PamArray's. Are now going to wrap that in a new class so that 
  * the stored class can do something creative with parameter management with the new PamParameterData classes.
  * @author dg50
  *

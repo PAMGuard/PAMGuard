@@ -1,14 +1,12 @@
 package SoundRecorder;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.lang.model.SourceVersion;
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.swing.BoxLayout;
@@ -24,7 +22,6 @@ import javax.swing.border.TitledBorder;
 
 import Acquisition.AcquisitionProcess;
 import Acquisition.DaqSystem;
-import Acquisition.pamAudio.PamAudioSystem;
 import PamController.PamController;
 import PamDetection.RawDataUnit;
 import PamModel.SMRUEnable;
@@ -145,13 +142,13 @@ public class RecorderSettingsDialog extends PamDialog {
 	@Override
 	public boolean getParams() {
 		recorderSettings.rawDataSource = sourcePanel.getSourceName();
-		if (recorderSettings.rawDataSource == null) return showWarning("No raw data source");;
-		if (bufferPanel.getParams() == false) return showWarning("Error in buffer settings");;
+		if (recorderSettings.rawDataSource == null) return showWarning("No raw data source");
+		if (!bufferPanel.getParams()) return showWarning("Error in buffer settings");
 		recorderSettings.outputFolder = selectFolder.getFolderName(true);
 		recorderSettings.datedSubFolders = selectFolder.isIncludeSubFolders();
-		if (outputFormat.getParams() == false) return showWarning("Error in output format settings");
-		if (fileLengthPanel.getParams() == false) return showWarning("Error in file length settings");
-		if (autoPanel.getParams() == false) return false;
+		if (!outputFormat.getParams()) return showWarning("Error in output format settings");
+		if (!fileLengthPanel.getParams()) return showWarning("Error in file length settings");
+		if (!autoPanel.getParams()) return false;
 		
 		return checkBitDepth();
 	}

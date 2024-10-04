@@ -23,12 +23,9 @@ package clickDetector;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Hashtable;
 
-import clickDetector.ClickClassifiers.ClickClassifierManager;
-import clickDetector.dialogs.ClickParamsDialog;
-import clickDetector.localisation.ClickLocParams;
-import fftFilter.FFTFilterParams;
 import Filters.FilterBand;
 import Filters.FilterParams;
 import Filters.FilterType;
@@ -37,15 +34,15 @@ import PamModel.parametermanager.FieldNotFoundException;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterData;
 import PamModel.parametermanager.PamParameterSet;
-import PamModel.parametermanager.PrivatePamParameterData;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
+import PamModel.parametermanager.PrivatePamParameterData;
 import PamView.GroupedSourceParameters;
 import PamView.dialog.GroupedSourcePanel;
 import PamView.paneloverlay.overlaymark.MarkDataSelectorParams;
 import PamguardMVC.PamConstants;
-
-import java.util.ArrayList;
-import java.util.Hashtable;
+import clickDetector.ClickClassifiers.ClickClassifierManager;
+import clickDetector.localisation.ClickLocParams;
+import fftFilter.FFTFilterParams;
 
 public class ClickParameters implements Serializable, Cloneable, ManagedParameters {
 

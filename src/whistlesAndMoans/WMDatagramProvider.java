@@ -30,7 +30,7 @@ public class WMDatagramProvider implements DatagramProvider {
 
 	@Override
 	public int addDatagramData(PamDataUnit dataUnit, float[] dataGramLine) {
-		if (dataUnit instanceof ConnectedRegionDataUnit == false) {
+		if (!(dataUnit instanceof ConnectedRegionDataUnit)) {
 			return 0;
 		}
 		ConnectedRegionDataUnit crDataUnit = (ConnectedRegionDataUnit) dataUnit;

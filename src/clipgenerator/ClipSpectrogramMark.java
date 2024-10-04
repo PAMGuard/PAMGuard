@@ -1,7 +1,6 @@
 package clipgenerator;
 
 import PamDetection.PamDetection;
-import PamguardMVC.AcousticDataUnit;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.superdet.SuperDetection;
 

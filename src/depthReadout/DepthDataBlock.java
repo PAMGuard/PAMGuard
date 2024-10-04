@@ -1,7 +1,5 @@
 package depthReadout;
 
-import com.drew.imaging.FileType;
-
 import Array.sensors.ArraySensorDataBlock;
 import Array.sensors.ArraySensorFieldType;
 import PamguardMVC.PamDataBlock;

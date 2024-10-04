@@ -8,19 +8,14 @@ import java.io.Serializable;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import Filters.layoutFX.FilterGUIFX;
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitGUI;
 import PamController.PamControlledUnitSettings;
-import PamController.PamController;
 import PamController.PamControllerInterface;
 import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
-import fftManager.layoutFX.FFTGuiFX;
 
 /**
  * Filters raw data using a specified filter. 
@@ -71,6 +66,7 @@ public class FilterControl extends PamControlledUnit implements PamSettings {
 			this.parentFrame = parentFrame;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 
 			FilterParameters_2 newParams = FilterDataSourceDialog.showDialog(filterParams, parentFrame, filterProcess.outputData);
@@ -90,6 +86,7 @@ public class FilterControl extends PamControlledUnit implements PamSettings {
 			super();
 			this.parentFrame = parentFrame;
 		}
+		@Override
 		public void actionPerformed(ActionEvent e) {
 
 			FilterParams newParams = FilterDialog.showDialog(parentFrame,
@@ -109,7 +106,7 @@ public class FilterControl extends PamControlledUnit implements PamSettings {
 	public void notifyModelChanged(int changeType) {
 		//System.out.println("FFTControl: notifyModelChanged : " +changeType);
 		super.notifyModelChanged(changeType);
-		if (changeType == PamController.INITIALIZATION_COMPLETE) {
+		if (changeType == PamControllerInterface.INITIALIZATION_COMPLETE) {
 			filterProcess.setupProcess();
 		}
 		if (filterGUIFX!=null) {
@@ -117,14 +114,17 @@ public class FilterControl extends PamControlledUnit implements PamSettings {
 		}
 	}
 	
+	@Override
 	public Serializable getSettingsReference() {
 		return filterParams;
 	}
 
+	@Override
 	public long getSettingsVersion() {
 		return FilterParams.serialVersionUID;
 	}
 
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		filterParams = ((FilterParameters_2) pamControlledUnitSettings.getSettings()).clone();
 		return true;

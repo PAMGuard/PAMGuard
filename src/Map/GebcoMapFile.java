@@ -31,6 +31,7 @@ public class GebcoMapFile implements MapFileManager {
 	/* (non-Javadoc)
 	 * @see Map.MapFile#selectMapFile()
 	 */
+	@Override
 	public File selectMapFile(File currentFile) {
 		JFileChooser fileChooser;
 		File gebcoFile= null;
@@ -77,6 +78,7 @@ public class GebcoMapFile implements MapFileManager {
 		return gebcoFile;
 	}
 	
+	@Override
 	public boolean readFileData(File file, boolean contours) {
 		return readMapFile(file, contours);
 	}
@@ -84,6 +86,7 @@ public class GebcoMapFile implements MapFileManager {
 	/* (non-Javadoc)
 	 * @see Map.MapFile#readFileData(java.io.File)
 	 */
+	@Override
 	public boolean readFileData(File file) {
 		try {
 			return readMapFile(file, true);
@@ -100,7 +103,7 @@ public class GebcoMapFile implements MapFileManager {
 
 		mapContours.removeAllElements();
 		
-		if (gebcoFile == null || gebcoFile.exists() == false) return false;
+		if (gebcoFile == null || !gebcoFile.exists()) return false;
 		
 		FileReader fileReader = null;
 		BufferedReader reader;
@@ -149,7 +152,7 @@ public class GebcoMapFile implements MapFileManager {
 					mapContour.addLatLong(new LatLong(lat, lon));
 				}
 				if (depth == 0 || readContours) {
-					if (hasMapContour(depth) == false) {
+					if (!hasMapContour(depth)) {
 						availableContours.add(depth);
 					}
 					mapContours.add(mapContour);
@@ -184,6 +187,7 @@ public class GebcoMapFile implements MapFileManager {
 	/* (non-Javadoc)
 	 * @see Map.MapFileManager#getContourIndex(double)
 	 */
+	@Override
 	public int getContourIndex(double depth) {
 		for (int i = 0; i < availableContours.size(); i++) {
 			if (availableContours.get(i) == depth) {
@@ -205,6 +209,7 @@ public class GebcoMapFile implements MapFileManager {
 	/* (non-Javadoc)
 	 * @see Map.MapFile#getAvailableContours()
 	 */
+	@Override
 	public Vector<Integer> getAvailableContours() {
 		return availableContours;
 	}
@@ -212,6 +217,7 @@ public class GebcoMapFile implements MapFileManager {
 	/* (non-Javadoc)
 	 * @see Map.MapFileManager#getContourCount()
 	 */
+	@Override
 	public int getContourCount() {
 		if (mapContours == null) return 0;
 		return mapContours.size();
@@ -220,6 +226,7 @@ public class GebcoMapFile implements MapFileManager {
 	/* (non-Javadoc)
 	 * @see Map.MapFile#getMapContour(int)
 	 */
+	@Override
 	public MapContour getMapContour(int contourIndex) {
 		return mapContours.get(contourIndex);
 	}
@@ -227,6 +234,7 @@ public class GebcoMapFile implements MapFileManager {
 	/* (non-Javadoc)
 	 * @see Map.MapFileManager#clearFileData()
 	 */
+	@Override
 	public void clearFileData() {
 		mapContours.removeAllElements();
 		availableContours.removeAllElements();

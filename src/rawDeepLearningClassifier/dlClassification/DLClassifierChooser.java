@@ -46,6 +46,7 @@ public class DLClassifierChooser {
 					//there's a settings file - does it contain a metadata field describing which
 					//type of classifier it belongs to. 
 					String outFolder = System.getProperty("user.home") +  File.separator + "PAMGuard_temp";
+					
 					new File(outFolder).mkdir();
 
 					File file = DLZipUtils.extractFile(modelURI, settingsFile, outFolder);

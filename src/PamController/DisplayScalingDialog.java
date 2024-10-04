@@ -33,7 +33,6 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import PamView.dialog.PamDialog;
-import javafx.scene.layout.Border;
 
 /**
  * @author mo55

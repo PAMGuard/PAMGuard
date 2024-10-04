@@ -1,6 +1,7 @@
 package targetMotionOld;
 
 import java.awt.Frame;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
@@ -16,15 +17,6 @@ import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
-import pamScrollSystem.AbstractScrollManager;
-import pamScrollSystem.ViewerScrollerManager;
-import targetMotionModule.TargetMotionLocaliserProvider;
-import targetMotionOld.algorithms.LeastSquaresNew;
-import targetMotionOld.algorithms.Simplex2DNew;
-import targetMotionOld.algorithms.Simplex3DNew;
-import targetMotionOld.dialog.TargetMotionDialog;
-import targetMotionOld.tethys.TMALocalizationCreator;
-import tethys.localization.LocalizationCreator;
 import GPS.GPSDataBlock;
 import GPS.GpsDataUnit;
 import Localiser.LocalisationAlgorithm;
@@ -35,17 +27,29 @@ import Localiser.detectionGroupLocaliser.GroupDetection;
 import Localiser.detectionGroupLocaliser.GroupLocResult;
 import Localiser.detectionGroupLocaliser.GroupLocalisation;
 import PamController.PamControlledUnit;
+import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamControllerInterface;
+import PamController.PamSettingManager;
+import PamController.PamSettings;
 import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
-import PamguardMVC.PamObserver;
 import PamguardMVC.PamObserverAdapter;
 import PamguardMVC.debug.Debug;
-import bearinglocaliser.BearingLocaliserParams;
+import pamScrollSystem.AbstractScrollManager;
+import pamScrollSystem.ViewerScrollerManager;
+import targetMotionOld.algorithms.LeastSquaresNew;
+import targetMotionOld.algorithms.Simplex2DNew;
+import targetMotionOld.algorithms.Simplex3DNew;
+import targetMotionOld.dialog.TargetMotionDialog;
+import targetMotionOld.tethys.TMALocalizationCreator;
+import targetMotionOld.tethys.TMAOptionsPanel;
+import tethys.localization.LocalizationBuilder;
+import tethys.localization.LocalizationCreator;
+import tethys.swing.export.LocalizationOptionsPanel;
 
 /**
  * Reinstated Target motion add-in as used by the click detector. Hope one day still to replace this
@@ -54,9 +58,9 @@ import bearinglocaliser.BearingLocaliserParams;
  *
  * @param <T>
  */
-public class TargetMotionLocaliser<T extends GroupDetection> extends AbstractLocaliser<T> implements LocalisationAlgorithm, LocalisationAlgorithmInfo  {
+public class TargetMotionLocaliser<T extends GroupDetection> extends AbstractLocaliser<T> implements LocalisationAlgorithm, LocalisationAlgorithmInfo, PamSettings  {
 
-	public enum Interractive {START, SAVE, BACK, CANCEL, SETNULL, KEEPOLD};
+	public enum Interractive {START, SAVE, BACK, CANCEL, SETNULL, KEEPOLD}
 	//	public enum WorkStatus {IDLE, LOADING, WAITING};
 
 	private TargetMotionDialog<T> targetMotionDialog;
@@ -67,6 +71,8 @@ public class TargetMotionLocaliser<T extends GroupDetection> extends AbstractLoc
 	private ArrayList<GroupLocResult> results = new ArrayList<GroupLocResult>();
 	private int bestResultIndex = -1;
 	private EventLocaliserWorker eventLocaliserWorker;
+	
+	private TargetMotionOptions targetMotionOptions = new TargetMotionOptions();
 
 	//	private Object dataSynchObject = new Object();
 	//	/**
@@ -99,6 +105,8 @@ public class TargetMotionLocaliser<T extends GroupDetection> extends AbstractLoc
 		models.add(new LeastSquaresNew<T>(this));
 		models.add(new Simplex2DNew<T>(this));
 		models.add(new Simplex3DNew<T>(this));
+		
+		PamSettingManager.getInstance().registerSettings(this);
 	}
 
 	@Override
@@ -459,7 +467,7 @@ public class TargetMotionLocaliser<T extends GroupDetection> extends AbstractLoc
 			String comment = null;
 			for (eventListIndex = 0; eventListIndex < eventList.length; eventListIndex++) {
 				anEvent = findEvent(eventList[eventListIndex]);
-				if (processEvent(anEvent, modelList) == false) {
+				if (!processEvent(anEvent, modelList)) {
 					return null;
 				}
 				if (supervised) {
@@ -758,5 +766,44 @@ public class TargetMotionLocaliser<T extends GroupDetection> extends AbstractLoc
 		// TODO Auto-generated method stub
 //		return new BearingLocaliserParams();
 		return null;
+	}
+
+
+	@Override
+	public LocalizationOptionsPanel getLocalizationOptionsPanel(Window parent, LocalizationBuilder locBuilder) {
+		return null;// new TMAOptionsPanel(parent, this);
+	}
+
+	@Override
+	public String getUnitName() {
+		return pamControlledUnit.getUnitName();
+	}
+
+	@Override
+	public String getUnitType() {
+		return "Target Motion Localiser (old)";
+	}
+
+	@Override
+	public Serializable getSettingsReference() {
+		return targetMotionOptions;
+	}
+
+	@Override
+	public long getSettingsVersion() {
+		return TargetMotionOptions.serialVersionUID;
+	}
+
+	@Override
+	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
+		this.targetMotionOptions = (TargetMotionOptions) pamControlledUnitSettings.getSettings();
+		return true;
+	}
+
+	/**
+	 * @return the targetMotionOptions
+	 */
+	public TargetMotionOptions getTargetMotionOptions() {
+		return targetMotionOptions;
 	}
 }

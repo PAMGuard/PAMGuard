@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import PamView.dialog.PamDialog;
@@ -32,7 +33,7 @@ public class ShipDimensionsFields extends JPanel implements ActionListener{
 		for (int i = 0; i < dimNames.length; i++) {
 			gbs.gridy = i;
 			gbs.gridx = 0;
-			PamDialog.addComponent(this, new JLabel(" " + dimNames[i] + " ", JLabel.RIGHT), gbs);
+			PamDialog.addComponent(this, new JLabel(" " + dimNames[i] + " ", SwingConstants.RIGHT), gbs);
 			gbs.gridx = 1;
 			PamDialog.addComponent(this, shipDims[i] = new JTextField(4), gbs);
 			gbs.gridx = 2;
@@ -62,6 +63,7 @@ public class ShipDimensionsFields extends JPanel implements ActionListener{
 		return dimensions;
 	}
 	
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 //		dimensionsChanged();

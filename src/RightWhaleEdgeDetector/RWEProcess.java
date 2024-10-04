@@ -5,26 +5,12 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 
 import Localiser.algorithms.Correlations;
 import Localiser.algorithms.timeDelayLocalisers.bearingLoc.BearingLocaliser;
 import Localiser.algorithms.timeDelayLocalisers.bearingLoc.BearingLocaliserSelector;
-import annotation.calcs.snr.SNRAnnotationType;
-import autecPhones.AutecGraphics;
-import dataPlotsFX.data.TDDataProviderRegisterFX;
-import fftManager.Complex;
-import fftManager.FFTDataBlock;
-import fftManager.FFTDataUnit;
-import networkTransfer.receive.BuoyStatusDataUnit;
-import spectrogramNoiseReduction.kernelSmoothing.KernelSmoothing;
-import whistlesAndMoans.WhistleBearingInfo;
 import PamController.PamController;
-import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
-import PamDetection.LocalisationInfo;
-import PamUtils.LatLong;
-import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamUtils.complex.ComplexArray;
 import PamView.symbol.StandardSymbolManager;
@@ -33,9 +19,15 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
-import PamguardMVC.debug.Debug;
 import RightWhaleEdgeDetector.graphics.RWEDataPlotProviderFX;
 import RightWhaleEdgeDetector.graphics.RWESymbolManager;
+import annotation.calcs.snr.SNRAnnotationType;
+import dataPlotsFX.data.TDDataProviderRegisterFX;
+import fftManager.FFTDataBlock;
+import fftManager.FFTDataUnit;
+import networkTransfer.receive.BuoyStatusDataUnit;
+import spectrogramNoiseReduction.kernelSmoothing.KernelSmoothing;
+import whistlesAndMoans.WhistleBearingInfo;
 
 public class RWEProcess extends PamProcess {
 

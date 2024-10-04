@@ -1,6 +1,5 @@
 package PamUtils;
 
-import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Window;
@@ -15,6 +14,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import Array.ArrayManager;
@@ -49,7 +49,7 @@ public class LatLongEditableDialogStrip implements PamDialogPanel {
 		c.gridx = 0;
 		c.gridy = 0;
 		c.gridwidth = 1;
-		PamDialog.addComponent(mainPanel, new JLabel("Latitude: ", JLabel.RIGHT), c);
+		PamDialog.addComponent(mainPanel, new JLabel("Latitude: ", SwingConstants.RIGHT), c);
 		c.gridx ++;
 		c.gridwidth = 2;
 		PamDialog.addComponent(mainPanel, latitude = new JTextField(12), c);
@@ -67,7 +67,7 @@ public class LatLongEditableDialogStrip implements PamDialogPanel {
 		c.gridx = 0;
 		c.gridy++;
 		c.gridwidth = 1;
-		PamDialog.addComponent(mainPanel, new JLabel("Longitude: ", JLabel.RIGHT), c);
+		PamDialog.addComponent(mainPanel, new JLabel("Longitude: ", SwingConstants.RIGHT), c);
 		c.gridx ++;
 		c.gridwidth = 2;
 		PamDialog.addComponent(mainPanel, longitude = new JTextField(12), c);

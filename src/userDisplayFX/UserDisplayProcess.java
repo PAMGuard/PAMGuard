@@ -2,7 +2,6 @@ package userDisplayFX;
 
 import java.util.ArrayList;
 
-import javafx.collections.ListChangeListener.Change;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamProcess;

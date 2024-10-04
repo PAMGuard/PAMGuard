@@ -9,7 +9,7 @@ package PamController;
  */
 public class PamguardVersionInfo {
 
-	public static enum ReleaseType {CORE, BETA, OTHER};
+	public static enum ReleaseType {CORE, BETA, OTHER}
 	
 	/**
 	 * Type of release - used to switch off and on some features. 
@@ -31,12 +31,12 @@ public class PamguardVersionInfo {
 	 * Version number, major version.minorversion.sub-release.
 	 * Note: can't go higher than sub-release 'f'
 	 */
-	static public final String version = "2.02.13";
+	static public final String version = "2.02.13c";
 	
 	/**
 	 * Release date
 	 */
-	static public final String date = "27 August 2024";
+	static public final String date = "September 2024";
 	
 //	/**
 //	 * Release type - Beta or Core

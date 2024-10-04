@@ -5,25 +5,23 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ListIterator;
 
-import fftManager.Complex;
-import fftManager.FastFFT;
-import wavFiles.WavFile;
-import wavFiles.WavFileReader;
-import wavFiles.WavHeader;
 import Acquisition.AcquisitionProcess;
 import PamController.PamController;
 import PamDetection.AbstractLocalisation;
 import PamDetection.PamDetection;
 import PamUtils.PamUtils;
-import PamguardMVC.AcousticDataUnit;
+import PamUtils.complex.ComplexArray;
 import PamguardMVC.PamConstants;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.RawDataHolder;
 import PamguardMVC.RawDataTransforms;
-
 import PamguardMVC.superdet.SuperDetection;
 import Spectrogram.WindowFunction;
+import fftManager.Complex;
+import fftManager.FastFFT;
+import wavFiles.WavFileReader;
+import wavFiles.WavHeader;
 
 public class ClipDataUnit extends PamDataUnit<PamDataUnit, SuperDetection> implements PamDetection, RawDataHolder {
 
@@ -229,6 +227,44 @@ public class ClipDataUnit extends PamDataUnit<PamDataUnit, SuperDetection> imple
 		}
 		return specData;
 	}
+	/**
+	 * Generate complex spectrogram data for the clip. 
+	 * @param channel
+	 * @param fftLength FFT length
+	 * @param fftHop FFT hop
+	 * @return Array of ComplexArray FFT data (half fft length, due to real input)
+	 */
+	public ComplexArray[] generateSpectrogramArrays(int channel, int fftLength, int fftHop) {
+		// TODO Auto-generated method stub
+		double[] wave = getSpectrogramWaveData(channel, getDisplaySampleRate());
+		if (wave == null) {
+			return null;
+		}
+		int nFFT = (wave.length - (fftLength-fftHop)) / fftHop;
+		if (nFFT <= 0) {
+			return null;
+		}
+		ComplexArray[] specData = new ComplexArray[nFFT];
+		double[] waveBit = new double[fftLength];
+		double[] winFunc = getWindowFunc(fftLength);
+		Complex[] complexOutput = Complex.allocateComplexArray(fftLength/2);
+		int wPos = 0;
+		getFastFFT(fftLength);
+		int m = FastFFT.log2(fftLength);
+		for (int i = 0; i < nFFT; i++) {
+			wPos = i*fftHop;
+			for (int j = 0; j < fftLength; j++) {
+//				waveBit[j] = wave[j+wPos]*winFunc[j];
+				waveBit[j] = wave[j+wPos]; // no windowing for this since used in cross correlation. 
+			}
+			specData[i] = fastFFT.rfft(waveBit, fftLength);
+//			fastFFT.rfft(waveBit, complexOutput, m);
+//			for (int j = 0; j < fftLength/2; j++) {
+//				specData[i][j] = complexOutput[j].clone();
+//			}
+		}
+		return specData;
+	}
 	
 	protected static FastFFT fastFFT;
 	protected static FastFFT getFastFFT(int fftLength) {
@@ -264,12 +300,13 @@ public class ClipDataUnit extends PamDataUnit<PamDataUnit, SuperDetection> imple
 	 * Get all the wave data into an array. 
 	 * @return the wave data or null if it can't be found. 
 	 */
+	@Override
 	public double[][] getWaveData() {
 		if (rawData != null) {
 			return rawData;
 		}
 		File wavFileName = findWavFile();
-		if (wavFileName == null || wavFileName.exists() == false || wavFileName.isDirectory()) {
+		if (wavFileName == null || !wavFileName.exists() || wavFileName.isDirectory()) {
 			return null;
 		}
 		WavFileReader wavFile = null;
@@ -300,7 +337,7 @@ public class ClipDataUnit extends PamDataUnit<PamDataUnit, SuperDetection> imple
 		}
 		
 		File wavFileName = findWavFile();
-		if (wavFileName == null || wavFileName.exists() == false) {
+		if (wavFileName == null || !wavFileName.exists()) {
 			return null;
 		}
 		WavFileReader wavFile = null;
@@ -355,7 +392,7 @@ public class ClipDataUnit extends PamDataUnit<PamDataUnit, SuperDetection> imple
 
 	private File findWavFile() {
 		try {
-			if (offlineFile == null || offlineFile.exists() == false) {
+			if (offlineFile == null || !offlineFile.exists()) {
 				if (getParentDataBlock() == null) return null;
 				ClipProcess clipProcess = (ClipProcess) getParentDataBlock().getParentProcess();
 				offlineFile = clipProcess.findClipFile(this);

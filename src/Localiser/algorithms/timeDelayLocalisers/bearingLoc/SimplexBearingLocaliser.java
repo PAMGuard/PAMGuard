@@ -1,5 +1,6 @@
 package Localiser.algorithms.timeDelayLocalisers.bearingLoc;
 
+import java.awt.Window;
 import java.io.Serializable;
 import java.util.Arrays;
 
@@ -19,7 +20,9 @@ import Localiser.LocalisationAlgorithmInfo;
 import PamDetection.LocContents;
 import PamUtils.PamUtils;
 import pamMaths.PamVector;
+import tethys.localization.LocalizationBuilder;
 import tethys.localization.LocalizationCreator;
+import tethys.swing.export.LocalizationOptionsPanel;
 
 @Deprecated
 public class SimplexBearingLocaliser implements BearingLocaliser {
@@ -261,6 +264,12 @@ public class SimplexBearingLocaliser implements BearingLocaliser {
 	public Serializable getParameters() {
 		return null;
 	}
+
+	@Override
+	public LocalizationOptionsPanel getLocalizationOptionsPanel(Window parent, LocalizationBuilder locBuilder) {
+		return null;
+	}
+	
 //	private class BearingConvergence implements RealConvergenceChecker {
 //
 //		@Override

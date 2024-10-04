@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -18,11 +17,9 @@ import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
 import NMEA.NMEADataUnit;
-import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
@@ -104,7 +101,7 @@ public class GPSParametersDialog extends PamDialog {
 //		setModal(true);
 	}
 	private void dimensionsChanged() {
-		if (gpsParametersDialog.getParams() == true) {
+		if (gpsParametersDialog.getParams()) {
 //			shipDrawing.setDimensions(gpsParameters.dimA, gpsParameters.dimB,
 //				gpsParameters.dimC, gpsParameters.dimD);
 		}
@@ -198,9 +195,9 @@ public class GPSParametersDialog extends PamDialog {
 		gpsParameters.dimB = dims[1];
 		gpsParameters.dimC = dims[2];
 		gpsParameters.dimD = dims[3];
-		if (predictPanel.getParams() == false) return false;
-		if (readOptions.getParams() == false) return false;
-		if (smoothingOptions.getParams() == false) return false;
+		if (!predictPanel.getParams()) return false;
+		if (!readOptions.getParams()) return false;
+		if (!smoothingOptions.getParams()) return false;
 		
 		return headingPanel.getParams(gpsParameters);
 	}
@@ -408,6 +405,7 @@ public class GPSParametersDialog extends PamDialog {
 			return true;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			enableControls();
 		}

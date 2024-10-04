@@ -125,7 +125,7 @@ public class OneBandDisplayDialog extends PamDialog {
 	}
 
 	private void enableControls() {
-		boolean e = (autoScale.isSelected() == false);
+		boolean e = !autoScale.isSelected();
 		minAmp.setEnabled(e);
 		maxAmp.setEnabled(e);
 		if (PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER) {
@@ -181,7 +181,7 @@ public class OneBandDisplayDialog extends PamDialog {
 		}
 		int selChan = 0;
 		for (int i = 0; i < showChannel.length; i++) {
-			if (showChannel[i].isVisible() == false) {
+			if (!showChannel[i].isVisible()) {
 				continue;
 			}
 			if (showChannel[i].isSelected()) {

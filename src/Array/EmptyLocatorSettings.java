@@ -1,7 +1,5 @@
 package Array;
 
-import GPS.GpsData;
-
 public class EmptyLocatorSettings extends LocatorSettings {
 
 	public EmptyLocatorSettings(Class locatorClass) {

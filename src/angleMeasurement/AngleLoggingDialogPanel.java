@@ -91,8 +91,8 @@ public class AngleLoggingDialogPanel {
 		logHeld.setSelected(this.angleLoggingParameters.logAngles == AngleLoggingParameters.LOG_HELD);
 		logTimed.setSelected(this.angleLoggingParameters.logAngles == AngleLoggingParameters.LOG_TIMED);
 		logTime.setText(String.format("%.1f", this.angleLoggingParameters.logInterval));
-		timedEven.setSelected(this.angleLoggingParameters.timedRandom == false);
-		timedRandom.setSelected(this.angleLoggingParameters.timedRandom == true);
+		timedEven.setSelected(!this.angleLoggingParameters.timedRandom);
+		timedRandom.setSelected(this.angleLoggingParameters.timedRandom);
 		
 		enableControls();
 	}
@@ -139,6 +139,7 @@ public class AngleLoggingDialogPanel {
 	
 	private class ButtonListeer implements ActionListener {
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			enableControls();
 		}

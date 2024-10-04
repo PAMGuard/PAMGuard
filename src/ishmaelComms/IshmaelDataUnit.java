@@ -18,6 +18,17 @@ public class IshmaelDataUnit extends PamDataUnit {
 	public void setIshmaelData(IshmaelData ishmaelData) {
 		this.ishmaelData = ishmaelData;
 	}
+
+	@Override
+	public double[] getFrequency() {
+		if (ishmaelData.lofreq == 0 && ishmaelData.hifreq == 0) {
+			return null;
+		}
+		double[] freq = new double[2];
+		freq[0] = ishmaelData.lofreq;
+		freq[1] = ishmaelData.hifreq;
+		return freq;
+	}
 	
 
 }

@@ -229,6 +229,7 @@ public abstract class IIRFilterMethod extends FilterMethod {
 	 * Get coefficients from poles and zeros for fast filter computations. 
 	 * @return
 	 */
+	@Override
 	public double[] getFastFilterCoefficients() {
 		Complex[] poles = getPoles(filterParams);
 		Complex[] zeros = getZeros(filterParams);

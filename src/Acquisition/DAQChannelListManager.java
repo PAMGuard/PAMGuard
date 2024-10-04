@@ -4,7 +4,7 @@ import PamguardMVC.ChannelListManager;
 
 /**
  * Class for converting channel indexes and numbers to hydrophones
- * for the main PAMGAURD DAQ. 
+ * for the main PAMGAURD DAQ.
  * <p>
  * All these functions are passed through to the AcquisitionParameters class
  * but these ones are better organised and therefore much easier to use than
@@ -16,7 +16,7 @@ import PamguardMVC.ChannelListManager;
 public class DAQChannelListManager extends ChannelListManager {
 
 	private AcquisitionControl acquisitionControl;
-	
+
 	public DAQChannelListManager(AcquisitionControl acquisitionControl) {
 		this.acquisitionControl = acquisitionControl;
 	}
@@ -25,7 +25,7 @@ public class DAQChannelListManager extends ChannelListManager {
 //	public int channelIndexToNumber(int channelIndex) {
 //
 //		return acquisitionControl.acquisitionParameters.getChannelList(channelIndex);
-//		
+//
 //	}
 
 	@Override

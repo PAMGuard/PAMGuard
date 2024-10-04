@@ -4,7 +4,6 @@ import PamView.GroupedDataSource;
 import PamView.GroupedSourceParameters;
 import PamguardMVC.DataAutomation;
 import PamguardMVC.DataAutomationInfo;
-import PamguardMVC.PamProcess;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import PamguardMVC.dataSelector.DataSelectorCreator;
 import RightWhaleEdgeDetector.datasel.RWDataSelCreator;

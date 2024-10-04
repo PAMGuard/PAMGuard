@@ -8,6 +8,16 @@ import java.util.ArrayList;
 import javax.swing.JCheckBox;
 import javax.swing.JLayeredPane;
 
+import PamController.PamControlledUnitSettings;
+import PamController.PamController;
+import PamController.PamSettingManager;
+import PamController.PamSettings;
+import PamView.hidingpanel.HidingPanel;
+import PamView.panel.CornerLayoutContraint;
+import PamguardMVC.PamObservable;
+import PamguardMVC.PamObserver;
+import PamguardMVC.PamObserverAdapter;
+import PamguardMVC.PamRawDataBlock;
 import dataPlots.layout.GraphParameters;
 import dataPlots.layout.TDAxes;
 import dataPlots.layout.TDGraph;
@@ -18,17 +28,6 @@ import pamScrollSystem.PamScrollObserver;
 import pamScrollSystem.PamScroller;
 import pamScrollSystem.RangeSpinner;
 import pamScrollSystem.RangeSpinnerListener;
-import PamController.PamControlledUnitSettings;
-import PamController.PamController;
-import PamController.PamSettingManager;
-import PamController.PamSettings;
-import PamView.hidingpanel.HidingPanel;
-import PamView.panel.CornerLayoutContraint;
-import PamguardMVC.PamDataUnit;
-import PamguardMVC.PamObservable;
-import PamguardMVC.PamObserver;
-import PamguardMVC.PamObserverAdapter;
-import PamguardMVC.PamRawDataBlock;
 import userDisplay.UserDisplayComponentAdapter;
 
 public class TDControl extends UserDisplayComponentAdapter implements PamSettings {
@@ -239,7 +238,7 @@ public class TDControl extends UserDisplayComponentAdapter implements PamSetting
 //			return;
 //		}
 //		key
-		if (pauseButton.isSelected() == false) {
+		if (!pauseButton.isSelected()) {
 			long oldPos = getTimeScroller().getValueMillis();
 //			if (Math.abs(scrollPos-oldPos) == 0) return;
 			getTimeScroller().setValueMillis(scrollPos);
@@ -279,7 +278,7 @@ public class TDControl extends UserDisplayComponentAdapter implements PamSetting
 			tdAxes.getTimeRangePanel().remove(timeRangeSpinner.getComponent());
 		}
 		PamScroller scroller = createScroller();
-		if (tdParameters.orientation == PamScroller.HORIZONTAL) {
+		if (tdParameters.orientation == AbstractPamScrollerAWT.HORIZONTAL) {
 			tdAxes.getAxisInnerPanel().add(BorderLayout.SOUTH, scroller.getComponent());
 			timeScroller.addControl(timeRangeSpinner.getComponent());
 		}
@@ -290,7 +289,7 @@ public class TDControl extends UserDisplayComponentAdapter implements PamSetting
 //			tdAxes.getLayeredPane().add(timeRangeSpinner.getComponent(), c, JLayeredPane.DEFAULT_LAYER);
 			tdAxes.getTimeRangePanel().add(timeRangeSpinner.getComponent());
 		}
-		tdAxes.getTimeRangePanel().setVisible(tdParameters.orientation == PamScroller.VERTICAL);
+		tdAxes.getTimeRangePanel().setVisible(tdParameters.orientation == AbstractPamScrollerAWT.VERTICAL);
 		TDGraphContainer tdGraphContainer = new TDGraphContainer(this);
 		tdAxes.getAxisInnerPanel().add(BorderLayout.CENTER, tdGraphContainer.getGraphContainer());
 		for (int i = 0; i < graphs.size(); i++) {
@@ -330,6 +329,7 @@ public class TDControl extends UserDisplayComponentAdapter implements PamSetting
 		 * Show or hide the panel
 		 * @param state true = show, false = hide. 
 		 */
+		@Override
 		public void showPanel(boolean state) {			
 //			if (graphs.size()>0) System.out.println("Height start: "+graphs.get(0).getGraphPlotPanel(0).getHeight());
 			super.showPanel(state);

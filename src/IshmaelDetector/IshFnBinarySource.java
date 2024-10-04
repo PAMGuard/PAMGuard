@@ -36,7 +36,7 @@ public class IshFnBinarySource extends BinaryDataSource {
 	 */
 	private IshDetFnProcess ishDetFnProcess;
 	
-	private static final int currentVersion = 1;
+	private static final int currentVersion = 2;
 	
 	public IshFnBinarySource(IshDetFnProcess ishDetFnProcess, PamDataBlock sisterDataBlock, String streamName) {
 		super(sisterDataBlock);
@@ -84,9 +84,21 @@ public class IshFnBinarySource extends BinaryDataSource {
 			int nDet = dis.readInt(); 
 
 			double[][] detData = new double[nDet][]; 
-			for (int i=0; i<nDet; i++) {
-				//the first double is peak, the second is noise. 
-				detData[i] = new double[] {dis.readDouble(), dis.readDouble()};
+			if (moduleVersion < 2) {
+				for (int i=0; i<nDet; i++) {
+					//the first double is peak, the second is noise. 
+					detData[i] = new double[] {dis.readDouble(), dis.readDouble()};
+				}
+			}
+			else {
+				int n2 = dis.readInt();
+				detData = new double[nDet][n2];
+				for (int i = 0; i < nDet; i++) {
+					for (int i2 = 0; i2 < n2; i2++) {
+						detData[i][i2] = dis.readDouble();
+					}
+				}
+				
 			}
 
 			if (baseData.getChannelBitmap()==0) {
@@ -139,10 +151,18 @@ public class IshFnBinarySource extends BinaryDataSource {
 		}
 
 		try {
-			dos.writeInt(ishDet.getDetData().length);
+			double[][] data = ishDet.getDetData();
+			int len1 = data.length;
+			int len2 = 0;
+			if (len1>0) {
+				len2 = data[0].length;
+			}
+			dos.writeInt(len1);
+			dos.writeInt(len2);
 			for (int i=0; i<ishDet.getDetData().length; i++) {
-				dos.writeDouble(ishDet.getDetData()[i][0]);
-				dos.writeDouble(ishDet.getDetData()[i][1]);
+				for (int i2 = 0; i2 < len2; i2++) {
+					dos.writeDouble(data[i][i2]);
+				}
 			}
 		}
 		catch (IOException e) {

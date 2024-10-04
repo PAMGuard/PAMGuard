@@ -48,6 +48,7 @@ public class PatchPanelControl extends PamControlledUnit implements PamSettings 
 			this.parentFrame = parentFrame;
 		}
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 
 			PatchPanelParameters newParams = PatchPanelDialog.showDialog(parentFrame, 
@@ -64,14 +65,17 @@ public class PatchPanelControl extends PamControlledUnit implements PamSettings 
 		patchPanelProcess.noteNewSettings();
 	}
 
+	@Override
 	public Serializable getSettingsReference() {
 		return patchPanelParameters;
 	}
 
+	@Override
 	public long getSettingsVersion() {
 		return PatchPanelParameters.serialVersionUID;
 	}
 
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		patchPanelParameters = ((PatchPanelParameters) pamControlledUnitSettings.getSettings()).clone();
 		

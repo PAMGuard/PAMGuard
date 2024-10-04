@@ -9,7 +9,7 @@ public class PlatformInfo {
 // http://javablog.co.uk/2007/05/19/making-jni-cross-platform/
 // CJB 2009-06-10
 
-	public enum OSType {WINDOWS, MACOSX, LINUX, UNSUPPORTED};
+	public enum OSType {WINDOWS, MACOSX, LINUX, UNSUPPORTED}
 	
 	public static OSType calculateOS() {
 	    String osName = System.getProperty("os.name").toLowerCase();
@@ -27,7 +27,7 @@ public class PlatformInfo {
 	    return OSType.UNSUPPORTED;
 	}
 	    
-	public enum ARCHType {X86, X86_64,UNSUPPORTED};
+	public enum ARCHType {X86, X86_64,UNSUPPORTED}
 	     
     public static ARCHType calculateArch() {
     	//For now only going to worry about shared libraries for 

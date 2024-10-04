@@ -7,7 +7,6 @@ import PamController.PamControllerInterface;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
-import PamguardMVC.PamObserver;
 import PamguardMVC.PamObserverAdapter;
 import detectionPlotFX.data.DDDataInfo;
 import detectionPlotFX.data.DDDataProvider;

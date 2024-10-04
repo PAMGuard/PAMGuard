@@ -1,15 +1,8 @@
 package matchedTemplateClassifer;
 
-import PamController.PamControlledUnitGUI;
-import PamController.PamController;
 import PamController.PamControllerInterface;
-import PamController.PamGUIManager;
 import PamController.SettingsPane;
-import PamView.WrapperControlledGUISwing;
 import pamViewFX.PamControlledGUIFX;
-import rawDeepLearningClassifier.DLControl;
-import rawDeepLearningClassifier.DLControlGUI;
-import rawDeepLearningClassifier.RawDLParams;
 
 /**
  * The JavaFX GUI for the Matched click classifier control...
@@ -35,6 +28,7 @@ public class MTControlGUI extends PamControlledGUIFX {
 	 * @param <T>
 	 * @return a Pane containing controls to change settings for module.
 	 */
+	@Override
 	public SettingsPane<?> getSettingsPane(){
 		mtControl.getSettingsPane().setParams(mtControl.getMTParams());
 		return mtControl.getSettingsPane();
@@ -54,7 +48,7 @@ public class MTControlGUI extends PamControlledGUIFX {
 	@Override
 	public void notifyGUIChange(int changeType) {
 		switch (changeType) {
-		case PamController.INITIALIZATION_COMPLETE:
+		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			break;
 		case PamControllerInterface.CHANGED_PROCESS_SETTINGS:
 			//data source may have potentially changed. e.g. by a datamodelfx Need to set in params.

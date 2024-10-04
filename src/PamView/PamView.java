@@ -66,6 +66,7 @@ abstract public class PamView implements PamViewInterface {
 	 * tells the view to show the main display panel of a pamControlledUnit
 	 * @param pamControlledUnit
 	 */
+	@Override
 	abstract public void showControlledUnit(PamControlledUnit pamControlledUnit);
 	
 	abstract public void renameControlledUnit(PamControlledUnit pamControlledUnit);
@@ -73,6 +74,7 @@ abstract public class PamView implements PamViewInterface {
 	abstract public String getViewName();
 
 
+	@Override
 	public int getFrameNumber() {
 		return frameNumber;
 	}

@@ -1,7 +1,6 @@
 package PamUtils;
 
 import java.io.File;
-import java.text.NumberFormat;
 
 /**
  * Functions to get and display disk space in sensible units. 
@@ -35,10 +34,10 @@ public class DiskSpaceFormat {
 		}
 		try {
 			File fPath = new File(path);
-			if (fPath.exists() == false) {
+			if (!fPath.exists()) {
 				fPath = fPath.getParentFile();
 			}
-			if (fPath.exists() == false) {
+			if (!fPath.exists()) {
 				return null;
 			}
 			return fPath.getFreeSpace();

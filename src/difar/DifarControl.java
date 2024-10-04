@@ -1,12 +1,5 @@
 package difar;
 
-import generalDatabase.DBControl;
-import generalDatabase.DBControlUnit;
-import generalDatabase.PamConnection;
-import generalDatabase.SQLLogging;
-import generalDatabase.lookupTables.LookupItem;
-import generalDatabase.lookupTables.LookupList;
-
 import java.awt.Frame;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
@@ -23,32 +16,34 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.ListIterator;
 
 import javax.swing.JFileChooser;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JTable;
 import javax.swing.KeyStroke;
-import javax.swing.RowSorter;
-import javax.swing.RowSorter.SortKey;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.table.DefaultTableModel;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import offlineProcessing.DataCopyTask;
-import offlineProcessing.OLProcessDialog;
-import offlineProcessing.OfflineTaskGroup;
+import Array.ArrayManager;
+import PamController.PamControlledUnit;
+import PamController.PamControlledUnitSettings;
+import PamController.PamController;
+import PamController.PamControllerInterface;
+import PamController.PamSettingManager;
+import PamController.PamSettings;
+import PamUtils.PamCalendar;
+import PamUtils.PamFileChooser;
+import PamUtils.PamFileFilter;
+import PamUtils.PamUtils;
+import PamView.PamSymbol;
+import Spectrogram.SpectrogramDisplay;
+import Spectrogram.SpectrogramMarkObserver;
+import Spectrogram.SpectrogramMarkObservers;
 import clipgenerator.clipDisplay.ClipDisplayParameters;
 import dataPlots.data.TDDataProviderRegister;
 import dataPlotsFX.layout.TDGraphFX;
-import difar.DifarControl.SpectrogramObserver;
 import difar.DifarParameters.SpeciesParams;
-import difar.beamforming.BeamformProcess;
 import difar.dialogs.DifarDisplayParamsDialog;
 import difar.dialogs.DifarParamsDialog;
 import difar.display.DIFARDisplayUnit;
@@ -69,26 +64,12 @@ import difar.offline.UpdateCrossingTask;
 import difar.plots.DifarBearingPlotProvider;
 import difar.plots.DifarIntensityPlotProvider;
 import difar.trackedGroups.TrackedGroupProcess;
-import fftManager.FFTDataBlock;
+import generalDatabase.lookupTables.LookupItem;
+import generalDatabase.lookupTables.LookupList;
+import offlineProcessing.OLProcessDialog;
+import offlineProcessing.OfflineTaskGroup;
 import userDisplay.UserDisplayControl;
 import warnings.PamWarning;
-import warnings.WarningSystem;
-import Array.ArrayManager;
-import Filters.FilterParams;
-import PamController.PamControlledUnit;
-import PamController.PamControlledUnitSettings;
-import PamController.PamController;
-import PamController.PamSettingManager;
-import PamController.PamSettings;
-import PamUtils.PamCalendar;
-import PamUtils.PamFileChooser;
-import PamUtils.PamFileFilter;
-import PamUtils.PamUtils;
-import PamView.PamSymbol;
-import Spectrogram.SpectrogramDisplay;
-import Spectrogram.SpectrogramMarkConverter;
-import Spectrogram.SpectrogramMarkObserver;
-import Spectrogram.SpectrogramMarkObservers;
 
 public class DifarControl extends PamControlledUnit implements PamSettings {
 
@@ -382,7 +363,7 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 			int numChans = PamUtils.getNumChannels(channelBitmap);
 			if (downUp == SpectrogramMarkObserver.MOUSE_UP) {
 			
-				SpeciesParams sP = difarParameters.findSpeciesParams(difarParameters.Default);
+				SpeciesParams sP = difarParameters.findSpeciesParams(DifarParameters.Default);
 				float sr = sP.sampleRate;
 
 				if (difarParameters.multiChannelClips){ 
@@ -524,10 +505,10 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 	public void notifyModelChanged(int changeType) {
 		super.notifyModelChanged(changeType);
 		switch (changeType) {
-		case PamController.INITIALIZATION_COMPLETE:
+		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			difarProcess.setupProcess();
 			break;
-		case PamController.OFFLINE_DATA_LOADED:
+		case PamControllerInterface.OFFLINE_DATA_LOADED:
 			sonobuoyManager.updateSonobuoyTableData();
 		}
 	}
@@ -762,7 +743,7 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 				if (keyPressed == nextClassKey){
 					int ix = difarSidePanel.getSpeciesSelector().getSelectedIndex();
 					ix = ++ix % difarSidePanel.getSpeciesSelector().getModel().getSize();
-					difarSidePanel.getSpeciesSelector().setSelectedIndex(ix);;
+					difarSidePanel.getSpeciesSelector().setSelectedIndex(ix);
 					return true;
 				}
 				if (keyPressed == prevClassKey){
@@ -780,20 +761,20 @@ public class DifarControl extends PamControlledUnit implements PamSettings {
 
 	public boolean isSaveEnabled() {
 		DifarDataUnit currentDataUnit = getCurrentDemuxedUnit();
-		return (isViewer == false && 
+		return (!isViewer && 
 				getCurrentDemuxedUnit() != null && 
 				getCurrentDemuxedUnit().getSelectedAngle() != null);
 	}
 	
 	public boolean isSaveWithoutCrossEnabled() {
-		return (isViewer == false && 
+		return (!isViewer && 
 				getCurrentDemuxedUnit() != null &&
 				getCurrentDemuxedUnit().getSelectedAngle() !=null && 
 				getCurrentDemuxedUnit().getTempCrossing() != null);
 	}	
 	
 	public boolean isDeleteEnabled() {
-		return (isViewer == false && getCurrentDemuxedUnit() != null);
+		return (!isViewer && getCurrentDemuxedUnit() != null);
 	}
 	
 

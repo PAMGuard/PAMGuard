@@ -59,6 +59,7 @@ public class ChannelPanel implements ActionListener, ListSelectionListener {
 		channelTableData.fireTableDataChanged();	
 	}
 	
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == daqControllerList) {
 			selectDaqController();
@@ -167,10 +168,12 @@ public class ChannelPanel implements ActionListener, ListSelectionListener {
 
 	class ChannelTableData extends AbstractTableModel {
 
+		@Override
 		public int getColumnCount() {
 			return channelColumns.length;
 		}
 
+		@Override
 		public int getRowCount() {
 			if (acquisitionControl == null) return 0;
 			return (acquisitionControl.acquisitionParameters.nChannels);
@@ -181,6 +184,7 @@ public class ChannelPanel implements ActionListener, ListSelectionListener {
 			return channelColumns[column];
 		}
 
+		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			if (acquisitionControl == null) return null;
 			// see if the controller has a hydrophone list
@@ -247,6 +251,7 @@ public class ChannelPanel implements ActionListener, ListSelectionListener {
 	/* (non-Javadoc)
 	 * @see javax.swing.event.ListSelectionListener#valueChanged(javax.swing.event.ListSelectionEvent)
 	 */
+	@Override
 	public void valueChanged(ListSelectionEvent e) {
 		enableButtons();		
 	}

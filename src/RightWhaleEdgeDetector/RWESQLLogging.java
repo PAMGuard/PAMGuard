@@ -8,7 +8,6 @@ import PamUtils.PamUtils;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import generalDatabase.EmptyTableDefinition;
-import generalDatabase.PamTableDefinition;
 import generalDatabase.PamTableItem;
 import generalDatabase.SQLTypes;
 

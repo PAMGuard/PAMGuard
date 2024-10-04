@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Vector;
 
 import javax.sound.sampled.AudioFormat;
@@ -15,12 +14,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
-import soundPlayback.PlaybackControl;
-import soundPlayback.PlaybackSystem;
 import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionDialog;
-import Acquisition.DaqSystem;
 import Acquisition.AudioDataQueue;
+import Acquisition.DaqSystem;
 import Acquisition.SoundCardParameters;
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
@@ -28,6 +25,8 @@ import PamController.PamSettings;
 import PamDetection.RawDataUnit;
 import PamUtils.PamCalendar;
 import PamguardMVC.PamConstants;
+import soundPlayback.PlaybackControl;
+import soundPlayback.PlaybackSystem;
 
 /**
  * Everything and everything to do with controlling and reading ASIO 
@@ -298,6 +297,7 @@ public class ASIOSoundSystem extends DaqSystem implements PamSettings {
 		JButton asioControl = new JButton("Control");
 		asioControl.addActionListener(new ActionListener() {
 			int trials = 0;
+			@Override
 			public void actionPerformed(ActionEvent evt) {
 			asioJniInterface.asioDriverSettings.displayAsioDriverSettings();
 
@@ -414,22 +414,27 @@ public class ASIOSoundSystem extends DaqSystem implements PamSettings {
 //		return PARAMETER_UNKNOWN;
 //	}
 
+	@Override
 	public Serializable getSettingsReference() {
 		return soundCardParameters;
 	}
 
+	@Override
 	public long getSettingsVersion() {
 		return SoundCardParameters.serialVersionUID;
 	}
 
+	@Override
 	public String getUnitName() {
 		return acquisitionControl.getUnitName();
 	}
 
+	@Override
 	public String getUnitType() {
 		return "ASIO Sound System";
 	}
 
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 //		if (PamSettingManager.getInstance().isSettingsUnit(this, pamControlledUnitSettings)) {
 		try {
@@ -478,6 +483,7 @@ public class ASIOSoundSystem extends DaqSystem implements PamSettings {
 	}
 
 	class CaptureThreadAsio implements Runnable {
+		@Override
 		public void run() {
 
 			asioJniInterface.createChannelBuffers();

@@ -7,6 +7,7 @@ import java.awt.GridBagLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -82,8 +83,8 @@ public class ClipDialog extends PamDialog {
 		if (clipSettings.dataSourceName == null) {
 			return showWarning("No data source");
 		}
-		if (storagePanel.getParams() == false) return showWarning("Error in storage location");
-		if (clipPanel.getParams() == false) return showWarning("Error in clip generator settings");
+		if (!storagePanel.getParams()) return showWarning("Error in storage location");
+		if (!clipPanel.getParams()) return showWarning("Error in clip generator settings");
 		return true;
 	}
 

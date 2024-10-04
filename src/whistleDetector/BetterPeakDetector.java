@@ -24,7 +24,6 @@ import java.util.ArrayList;
 
 import PamUtils.complex.ComplexArray;
 import PamguardMVC.PamObservable;
-import fftManager.Complex;
 import fftManager.FFTDataBlock;
 import fftManager.FFTDataUnit;
 
@@ -83,7 +82,7 @@ public class BetterPeakDetector extends BasicPeakDetector {
 		for (int i = searchBin0; i <= searchBin1; i++) {
 			magSquareData[i] = newFftData.magsq(i);
 			newval = magSquareData[i] / spectrumAverage[i];
-			if ((overThreshold[i] = newval > detectionThreshold) == true) {
+			if ((overThreshold[i] = newval > detectionThreshold)) {
 				spectrumAverage[i] *= bgndUpdate1_1;
 				spectrumAverage[i] += magSquareData[i] * bgndUpdate1;
 				nOver++;

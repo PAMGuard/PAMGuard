@@ -2,30 +2,28 @@ package clickDetector;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.io.File;
+
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
-
-import PamView.dialog.PamDialog;
-import PamView.dialog.PamGridBagContraints;
-
-import java.awt.Insets;
-import java.awt.event.ItemListener;
-import java.io.File;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
 import PamUtils.PamFileChooser;
+import PamView.dialog.PamDialog;
+import PamView.dialog.PamGridBagContraints;
 
 public class IDI_DisplayDialog extends PamDialog  implements ItemListener, ActionListener {
 
@@ -296,7 +294,8 @@ public class IDI_DisplayDialog extends PamDialog  implements ItemListener, Actio
      * 
      * @param e
      */
-    public void itemStateChanged(ItemEvent e) {
+    @Override
+	public void itemStateChanged(ItemEvent e) {
         if (e.getStateChange() == ItemEvent.SELECTED) {
             outputDirTxt.setEnabled(true);
             outputDirectoryButton.setEnabled(true);
@@ -313,7 +312,8 @@ public class IDI_DisplayDialog extends PamDialog  implements ItemListener, Actio
      *
      * @param e
      */
-    public void actionPerformed(ActionEvent e) {
+    @Override
+	public void actionPerformed(ActionEvent e) {
         String currFile = outputDirTxt.getText();
 		JFileChooser fileChooser = new PamFileChooser();
         fileChooser.setDialogTitle("Select output file...");
@@ -337,7 +337,8 @@ public class IDI_DisplayDialog extends PamDialog  implements ItemListener, Actio
      */
     private class csvFileFilter extends FileFilter {
         //Accept all directories and csv files.
-        public boolean accept(File f) {
+        @Override
+		public boolean accept(File f) {
             if (f.isDirectory()) {
                 return true;
             }
@@ -367,7 +368,8 @@ public class IDI_DisplayDialog extends PamDialog  implements ItemListener, Actio
         }
 
         //The description of this filter
-        public String getDescription() {
+        @Override
+		public String getDescription() {
             return "Comma-Separated File (*.csv)";
         }
     }

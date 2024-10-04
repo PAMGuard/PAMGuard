@@ -16,7 +16,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
-import PamController.PamguardVersionInfo.ReleaseType;
 import PamUtils.PamFileChooser;
 import PamUtils.PamFileFilter;
 import PamView.dialog.PamDialog;
@@ -79,6 +78,7 @@ public class SettingsFileDialog extends PamDialog {
 
 	
 	private class BrowseButton implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (e.getSource() == browseButton) {
 				browseForFiles();
@@ -112,7 +112,7 @@ public class SettingsFileDialog extends PamDialog {
 		 * If the new file is really a "new" file, that doesnt' actually exist, 
 		 * We'll need to check it has the correct end.
 		 */
-		if (newFile.exists() == false) {
+		if (!newFile.exists()) {
 			newFile = PamFileFilter.checkFileEnd(newFile, PamSettingManager.getCurrentSettingsFileEnd(), true);
 		}
 		
@@ -124,6 +124,7 @@ public class SettingsFileDialog extends PamDialog {
 		fileList.setSelectedIndex(0);
 	}
 	private class NewButton implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (e.getSource() == browseButton) {
 				newConfig();

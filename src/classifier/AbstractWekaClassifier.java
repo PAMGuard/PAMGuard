@@ -4,17 +4,16 @@ import java.awt.Window;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
+import Jama.Matrix;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
 
-import Jama.Matrix;
-
 abstract public class AbstractWekaClassifier extends Classifier {
 
-	private weka.classifiers.AbstractClassifier wekaClassifier;;
+	private weka.classifiers.AbstractClassifier wekaClassifier;
 	private Instances data;
 	//	private Enumeration wekaOptions;
 
@@ -109,7 +108,7 @@ abstract public class AbstractWekaClassifier extends Classifier {
 
 	@Override
 	public boolean setClassifierParams(ClassifierParams classifierParams) {
-		if (WekaClassifierParams.class.isAssignableFrom(classifierParams.getClass()) == false) {
+		if (!WekaClassifierParams.class.isAssignableFrom(classifierParams.getClass())) {
 			return false;
 		}
 		WekaClassifierParams wp = (WekaClassifierParams) classifierParams;

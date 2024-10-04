@@ -7,8 +7,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 
-import radardisplay.RadarProjector;
-
 import GPS.GpsData;
 import GPS.GpsDataUnit;
 import Map.MapRectProjector;
@@ -20,14 +18,14 @@ import PamUtils.Coordinate3d;
 import PamUtils.LatLong;
 import PamUtils.PamCalendar;
 import PamView.GeneralProjector;
+import PamView.GeneralProjector.ParameterType;
 import PamView.PamDetectionOverlayGraphics;
 import PamView.PamKeyItem;
 import PamView.PamSymbol;
 import PamView.PamSymbolType;
-import PamView.GeneralProjector.ParameterType;
 import PamView.symbol.SymbolData;
 import PamguardMVC.PamDataUnit;
-import PamguardMVC.debug.Debug;
+import radardisplay.RadarProjector;
 
 
 public class AISGraphics extends PamDetectionOverlayGraphics {
@@ -73,12 +71,12 @@ public class AISGraphics extends PamDetectionOverlayGraphics {
 		AISStaticData staticData = aisDataUnit.getStaticData();
 		AISPositionReport positionReport = aisDataUnit.getPositionReport();
 
-		if (aisDataUnit.isComplete() == false) {
+		if (!aisDataUnit.isComplete()) {
 			return null;
 		}
 
 		AbstractLocalisation localisation = pamDataUnit.getLocalisation();
-		if (localisation == null || localisation.hasLocContent(LocContents.HAS_BEARING | LocContents.HAS_RANGE) == false) return null;
+		if (localisation == null || !localisation.hasLocContent(LocContents.HAS_BEARING | LocContents.HAS_RANGE)) return null;
 		double bearing = localisation.getBearing(0) * 180 / Math.PI;
 		double range = localisation.getRange(0);
 		Coordinate3d c3d = generalProjector.getCoord3d(bearing, range, 0);

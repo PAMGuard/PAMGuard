@@ -4,22 +4,24 @@ import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import javax.swing.JMenuItem;
+
 import PamController.PamControlledUnit;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
+import PamController.PamControllerInterface;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import PamDetection.RawDataUnit;
+import PamguardMVC.PamDataBlock;
+import PamguardMVC.PamRawDataBlock;
 import likelihoodDetectionModule.linearAverageSpectra.LinearAverageSpectraProcess;
 import likelihoodDetectionModule.normalizer.NormalizerProcess;
 import likelihoodDetectionModule.spectralEti.SpectralEtiProcess;
 import likelihoodDetectionModule.thresholdDetector.ThresholdDetectorProcess;
-import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamRawDataBlock;
-import PamDetection.RawDataUnit;
-import java.util.ArrayList;
-import java.util.HashMap;
-import PamController.PamControllerInterface;
 
 /**
  * The class LikelihoodDetectionUnit implements that standard PamControlledUnit functionality
@@ -251,6 +253,7 @@ public class LikelihoodDetectionUnit extends PamControlledUnit implements PamSet
 	/* (non-Javadoc)
 	 * @see PamController.PamSettings#getSettingsReference()
 	 */
+	@Override
 	public Serializable getSettingsReference() {
 		return likelihoodDetectionParameters;
 	}
@@ -259,6 +262,7 @@ public class LikelihoodDetectionUnit extends PamControlledUnit implements PamSet
 	/* (non-Javadoc)
 	 * @see PamController.PamSettings#getSettingsVersion()
 	 */
+	@Override
 	public long getSettingsVersion() {
 		return LikelihoodDetectionParameters.serialVersionUID;
 	}
@@ -268,6 +272,7 @@ public class LikelihoodDetectionUnit extends PamControlledUnit implements PamSet
 	/* (non-Javadoc)
 	 * @see PamController.PamSettings#restoreSettings(PamController.PamControlledUnitSettings)
 	 */
+	@Override
 	public boolean restoreSettings( PamControlledUnitSettings settings ) {
 		// Point to the settings object stored in the controlled unit, rather
 		// than the locally-created one.
@@ -319,6 +324,7 @@ public class LikelihoodDetectionUnit extends PamControlledUnit implements PamSet
 		/* (non-Javadoc)
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
+		@Override
 		public void actionPerformed( ActionEvent e ) {
 
 			LikelihoodDetectionParameters p
@@ -371,11 +377,11 @@ public class LikelihoodDetectionUnit extends PamControlledUnit implements PamSet
 		// If this is the very first notification received, then configure. It is
 		// helpful to configure once before initialisation is complete because the
 		// notification is probably from this module being added.
-		if ( this.firstNotification == true ) {
+		if ( this.firstNotification ) {
 			configure();
 			this.firstNotification = false;
 		}
-		else if ( this.selfNotification == true ) {
+		else if ( this.selfNotification ) {
 			// If this module is added before any others that are not dependencies,
 			// then the notification from the first/subsequent configurations needs to
 			// be run in order for those modules to find our output blocks. Sometimes
@@ -387,14 +393,14 @@ public class LikelihoodDetectionUnit extends PamControlledUnit implements PamSet
 		
 		// For complicated scenarios, it is very helpful to ignore all of the traffic coming
 		// from other modules until the initialisation complete notification is received.
-		if ( this.isInitialized == false && changeType == PamControllerInterface.INITIALIZATION_COMPLETE ) {	
+		if ( !this.isInitialized && changeType == PamControllerInterface.INITIALIZATION_COMPLETE ) {	
 			this.isInitialized = true;
 			configure();
 		}
 		
 		// After the initialisation complete notification has been seen, any other changes to processing
 		// settings or new modules should trigger us to reconfigure.
-		if ( isInitialized == true && ( changeType == PamControllerInterface.CHANGED_PROCESS_SETTINGS || changeType == PamControllerInterface.ADD_CONTROLLEDUNIT || changeType == PamControllerInterface.ADD_PROCESS ) ) {
+		if ( isInitialized && ( changeType == PamControllerInterface.CHANGED_PROCESS_SETTINGS || changeType == PamControllerInterface.ADD_CONTROLLEDUNIT || changeType == PamControllerInterface.ADD_PROCESS ) ) {
 			configure();
 		}
 	}

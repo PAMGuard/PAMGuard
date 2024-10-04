@@ -5,6 +5,7 @@ import Array.ArrayManager;
 import Array.PamArray;
 import Array.Streamer;
 import PamController.PamController;
+import PamController.PamControllerInterface;
 import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamguardMVC.PamProcess;
@@ -144,7 +145,7 @@ public class ArraySensorProcess extends PamProcess {
 	@Override
 	public void notifyModelChanged(int changeType) {
 		super.notifyModelChanged(changeType);
-		if (changeType == PamController.INITIALIZATION_COMPLETE) {
+		if (changeType == PamControllerInterface.INITIALIZATION_COMPLETE) {
 			startSystem();
 		}
 	}

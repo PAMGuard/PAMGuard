@@ -28,7 +28,7 @@ public class WavHeader {
 
 	public void addChunkData(WavChunkData chunkData) {
 		if (otherChunks == null) {
-			otherChunks = new ArrayList<WavChunkData>();
+			otherChunks = new ArrayList<>();
 		}
 		otherChunks.add(chunkData);
 		int t = chunkData.getType();
@@ -39,12 +39,12 @@ public class WavHeader {
 	}
 
 	private boolean unpackFmtData(WavChunkData chunkData) {
-		// read the 12 bytes of data from the byte array. 
+		// read the 12 bytes of data from the byte array.
 		if (chunkData.chunkSize < 12) {
 			return false;
 		}
 		WindowsBuffer winBuff = new WindowsBuffer(chunkData.chunkData);
-		
+
 		try {
 			this.audioformat = winBuff.readWinShort();
 			this.nChannels = winBuff.readWinShort();
@@ -61,11 +61,11 @@ public class WavHeader {
 	}
 
 	/**
-	 * Check the two size informations in the wav file. 
+	 * Check the two size informations in the wav file.
 	 * The first in the second 4 bytes in the RIFF chunk
 	 * which should be equal to the number of bytes in the file - 4
-	 * The second is the data length, which should be equal to the 
-	 * length of the file - the data start point. 
+	 * The second is the data length, which should be equal to the
+	 * length of the file - the data start point.
 	 * @param length
 	 */
 	public boolean checkSizes(long length) {
@@ -80,10 +80,10 @@ public class WavHeader {
 		}
 		return ok;
 	}
-		
-	/** 
-	 * Write the correct sizes into the file data. 
-	 * @param length total length of file in bytes.  
+
+	/**
+	 * Write the correct sizes into the file data.
+	 * @param length total length of file in bytes.
 	 */
 	public void repairSizes(long length) {
 		riffChunkSize = length - 8;

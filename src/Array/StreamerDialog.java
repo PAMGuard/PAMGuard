@@ -7,16 +7,15 @@ import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ListIterator;
 
 import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
@@ -123,7 +122,7 @@ public class StreamerDialog extends PamDialog {
 		addComponent(p, new JLabel("Error"), c);
 		c.gridx = 0;
 		c.gridy ++;
-		addComponent(p, new JLabel("x ", JLabel.RIGHT), c);
+		addComponent(p, new JLabel("x ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		addComponent(p, x = new JTextField(textLength), c);
 		c.gridx++;
@@ -133,7 +132,7 @@ public class StreamerDialog extends PamDialog {
 
 		c.gridx = 0;
 		c.gridy ++;
-		addComponent(p, new JLabel("y ", JLabel.RIGHT), c);
+		addComponent(p, new JLabel("y ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		addComponent(p, y = new JTextField(textLength), c);
 		c.gridx++;
@@ -143,7 +142,7 @@ public class StreamerDialog extends PamDialog {
 
 		c.gridx = 0;
 		c.gridy ++;
-		addComponent(p, streamerHeightLabel = new JLabel(" ", JLabel.RIGHT), c); // set in setStreamerLabels
+		addComponent(p, streamerHeightLabel = new JLabel(" ", SwingConstants.RIGHT), c); // set in setStreamerLabels
 		c.gridx++;
 		addComponent(p, z = new JTextField(textLength), c);
 		c.gridx++;
@@ -196,29 +195,29 @@ public class StreamerDialog extends PamDialog {
 		String degsLab = LatLong.deg + " ";
 		c.gridx = 0;
 		c.gridy++;
-		addComponent(headPanel, new JLabel("Heading ", JLabel.RIGHT), c);
+		addComponent(headPanel, new JLabel("Heading ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		addComponent(headPanel, heading = new JTextField(orWidth), c);
 		c.gridx++;
-		addComponent(headPanel, new JLabel(degsLab, JLabel.LEFT), c);
+		addComponent(headPanel, new JLabel(degsLab, SwingConstants.LEFT), c);
 		c.gridx++;
 		addComponent(headPanel, sensorComponents[ArraySensorFieldType.HEADING.ordinal()].getComponent(), c);
 		c.gridx = 0;
 		c.gridy++;
-		addComponent(headPanel, new JLabel("Pitch ", JLabel.RIGHT), c);
+		addComponent(headPanel, new JLabel("Pitch ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		addComponent(headPanel, pitch = new JTextField(orWidth), c);
 		c.gridx++;
-		addComponent(headPanel, new JLabel(degsLab, JLabel.LEFT), c);
+		addComponent(headPanel, new JLabel(degsLab, SwingConstants.LEFT), c);
 		c.gridx++;
 		addComponent(headPanel, sensorComponents[ArraySensorFieldType.PITCH.ordinal()].getComponent(), c);
 		c.gridx = 0;
 		c.gridy++;
-		addComponent(headPanel, new JLabel("Roll ", JLabel.RIGHT), c);
+		addComponent(headPanel, new JLabel("Roll ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		addComponent(headPanel, roll = new JTextField(orWidth), c);
 		c.gridx++;
-		addComponent(headPanel, new JLabel(degsLab, JLabel.LEFT), c);
+		addComponent(headPanel, new JLabel(degsLab, SwingConstants.LEFT), c);
 		c.gridx++;
 		addComponent(headPanel, sensorComponents[ArraySensorFieldType.ROLL.ordinal()].getComponent(), c);
 
@@ -240,7 +239,7 @@ public class StreamerDialog extends PamDialog {
 		locPanel.setLayout(new BorderLayout());
 		locPanel.setBorder(locateRecieverBorder = new TitledBorder("")); //set by steStreamerLabels
 		locPanel.add(BorderLayout.WEST, relPanel);
-		locPanel.add(BorderLayout.CENTER, new JSeparator(JSeparator.VERTICAL));
+		locPanel.add(BorderLayout.CENTER, new JSeparator(SwingConstants.VERTICAL));
 		locPanel.add(BorderLayout.EAST, headPanel);
 		getMainPanel().add(locPanel);
 		getMainPanel().add(interpolationPanel.getComponent(getOwner()));
@@ -403,7 +402,7 @@ public class StreamerDialog extends PamDialog {
 			}
 		OriginDialogComponent mthDialogComponent = currentOriginMethod.getDialogComponent();
 		if (mthDialogComponent != null) {
-			if (mthDialogComponent.getParams() == false) {
+			if (!mthDialogComponent.getParams()) {
 				return false;
 			}
 		}
@@ -517,7 +516,7 @@ public class StreamerDialog extends PamDialog {
 	}
 
 	public void newOriginMethod() {
-		if (constructed == false) {
+		if (!constructed) {
 			return;
 		}
 		int methInd = originMethod.getSelectedIndex();

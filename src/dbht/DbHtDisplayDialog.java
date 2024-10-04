@@ -108,7 +108,7 @@ public class DbHtDisplayDialog extends PamDialog {
 	}
 
 	private void enableControls() {
-		boolean e = (autoScale.isSelected() == false);
+		boolean e = !autoScale.isSelected();
 		minAmp.setEnabled(e);
 		maxAmp.setEnabled(e);
 		if (PamController.getInstance().getRunMode() == PamController.RUN_NETWORKRECEIVER) {

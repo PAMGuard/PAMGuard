@@ -9,14 +9,17 @@ import java.util.List;
 import javax.swing.JMenuItem;
 
 import PamguardMVC.PamDataUnit;
-import PamguardMVC.PamProcess;
 import PamguardMVC.dataSelector.DataSelector;
 import PamguardMVC.dataSelector.DataSelectorCreator;
 import PamguardMVC.datamenus.DataMenuParent;
+import clipgenerator.localisation.ClipFFTOrganiser;
+import fftManager.fftorganiser.FFTDataOrganiser;
+import fftManager.fftorganiser.OrganisedFFTData;
 
-public class ClipDataBlock extends ClipDisplayDataBlock<ClipDataUnit> {
+public class ClipDataBlock extends ClipDisplayDataBlock<ClipDataUnit> implements OrganisedFFTData {
 
 	private ClipProcess clipProcess;
+	private ClipFFTOrganiser fftOrganiser;
 
 	public ClipDataBlock(String dataName,
 			ClipProcess clipProcess, int channelMap) {
@@ -71,9 +74,20 @@ public class ClipDataBlock extends ClipDisplayDataBlock<ClipDataUnit> {
 		return super.getDataSelectCreator();
 	}
 
+	@Override
 	public DataSelector getDataSelector(String selectorName, boolean allowScores, String selectorType) {
 		DataSelector ds = super.getDataSelector(selectorName, allowScores, selectorType);
 //		DataSelector newDS = super.getDataSelector("Randomuiname", allowScores, selectorType);
 		return ds;
 	}
+	
+
+	@Override
+	public FFTDataOrganiser getFFTDataOrganiser() {
+		if (fftOrganiser == null) {
+			fftOrganiser = new ClipFFTOrganiser(clipProcess.getClipControl(), this);
+		}		
+		return fftOrganiser;
+	}
+	
 }

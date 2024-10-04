@@ -30,45 +30,46 @@ public class IshPeakProcess extends PamProcess
 	//public Complex[] inputData;
 	//IshDetCalcIntfc ishDetCalcIntfc;
 	//IshDetIoIntfc ishDetIoIntfc;
-//	FFTDataSource parentProcess;
+	//	FFTDataSource parentProcess;
 	IshDetControl ishDetControl;
-	
-	PamDataBlock<IshDetection> outputDataBlock;
-	
+
+	IshDataBlock outputDataBlock;
+
 	int savedFftLength = -1;		//-1 forces recalculation
-	
+
 	double[] outData;
-	
+
 	long minTimeN, maxTimeN, refactoryTimeSam;	//time values converted to slice numbers
-	
+
 	PerChannelInfo perChannelInfo[] = new PerChannelInfo[PamConstants.MAX_CHANNELS];
-	
+
 	/**
 	 * The active channels i.e. the trigger channels. 
 	 */
 	private int activeChannels;
-	
+
 	/**
 	 * The Ishmael binary data source. 
 	 */
 	private IshBinaryDataSource ishmealBinaryDataSource;
-	
-	
+
+
 	public IshPeakProcess(IshDetControl ishDetControl, 
 			PamDataBlock parentDataBlock) {
 		super(ishDetControl, null);
 		this.ishDetControl = ishDetControl;
 		setParentDataBlock(parentDataBlock);
-//		outputDataBlock = new PamDataBlock<IshDetection>(IshDetection.class, 
-//				ishDetControl.getUnitName() + " events", this, parentDataBlock.getChannelMap());
-		outputDataBlock = new PamDataBlock<IshDetection>(IshDetection.class, 
-				ishDetControl.getUnitName() + " events", this, parentDataBlock.getSequenceMap());
+		//		outputDataBlock = new PamDataBlock<IshDetection>(IshDetection.class, 
+		//				ishDetControl.getUnitName() + " events", this, parentDataBlock.getChannelMap());
+		outputDataBlock = new IshDataBlock(ishDetControl.getUnitName() + " events", 
+				this, parentDataBlock.getSequenceMap());
 		outputDataBlock.setCanClipGenerate(true);
 		addOutputDataBlock(outputDataBlock);
-		
+
 		//set the binary data source. 
 		ishmealBinaryDataSource = new IshBinaryDataSource(this, outputDataBlock, "Ishmael Detections");
 		outputDataBlock.setBinaryDataSource(ishmealBinaryDataSource);
+
 
 		//graphics for the map and spectrogram. 
 		PamDetectionOverlayGraphics overlayGraphics = new PamDetectionOverlayGraphics(outputDataBlock, new PamSymbol(defaultSymbol));
@@ -80,12 +81,12 @@ public class IshPeakProcess extends PamProcess
 		outputDataBlock.SetLogging(ishLogger);
 		setupConnections();
 	}
-	
+
 	@Override
 	public void setParentDataBlock(PamDataBlock newParentDataBlock) {
 		super.setParentDataBlock(newParentDataBlock);
 	}
-	
+
 	/**
 	 * Gte all channels used- these are NOT the actiuve channels
 	 * @return the active channels. 
@@ -93,28 +94,28 @@ public class IshPeakProcess extends PamProcess
 	public int getChannelMap() {
 		return ishDetControl.ishDetParams.groupedSourceParmas.getChanOrSeqBitmap(); 
 	}
-	
+
 	@Override
 	public void setSampleRate(float sampleRate, boolean notify) {
 		super.setSampleRate(sampleRate, notify);
 		prepareMyParams();
 	}
-	
+
 	public void setupConnections() {
 		// Find the existing source data block and remove myself from observing it.
 		// Then find the new one and subscribe to that instead. 
 		//if (getParentDataBlock() != null) 
-			//getParentDataBlock().deleteObserver(this);
-		
+		//getParentDataBlock().deleteObserver(this);
+
 		if (ishDetControl == null) 
 			return;
 		IshDetParams p = ishDetControl.ishDetParams;  //local reference
 		//PamDataBlock detfnDataBlock = 
-			//PamController.getInstance().getDetectorDataBlock(p.detfnDataSource);
+		//PamController.getInstance().getDetectorDataBlock(p.detfnDataSource);
 		//setParentDataBlock(detfnDataBlock);
 
 		prepareMyParams();
-//		outputDataBlock.setChannelMap(p.channelList);
+		//		outputDataBlock.setChannelMap(p.channelList);
 		PamDataBlock inputDataBlock = getParentDataBlock();
 		outputDataBlock.sortOutputMaps(inputDataBlock.getChannelMap(), inputDataBlock.getSequenceMapObject(), p.groupedSourceParmas.getChanOrSeqBitmap());
 		//setProcessName("Peak-picker: threshold " + p.thresh);
@@ -129,9 +130,9 @@ public class IshPeakProcess extends PamProcess
 	protected void prepareMyParams() {
 		IshDetParams p = ishDetControl.ishDetParams;  //local reference
 		float dRate     = ishDetControl.ishDetFnProcess.getDetSampleRate();
-		
+
 		minTimeN        = Math.max(0, (long)(dRate * p.minTime));
-		
+
 		// if maxTime==0, it means we're not using it so set the param to infinity so that we are always under it
 		if (p.maxTime==0) {
 			maxTimeN = Long.MAX_VALUE-1;	// -1, because we test against maxTimeN+1 later; if we don't subtract 1 here, it rolls over to 0
@@ -139,9 +140,9 @@ public class IshPeakProcess extends PamProcess
 		else {
 			maxTimeN        = Math.max(0, (long)(dRate * p.maxTime));
 		}
-		
+
 		refactoryTimeSam = Math.max(0, (long)(this.getSampleRate() * p.refractoryTime));
-		
+
 		activeChannels = ishDetControl.getActiveChannels(); //no need to recalc this every iteration. 
 	}
 
@@ -150,7 +151,7 @@ public class IshPeakProcess extends PamProcess
 		for (int i = 0; i < perChannelInfo.length; i++)
 			perChannelInfo[i] = new PerChannelInfo();
 	}
-	
+
 	/* 
 	 * PeakProcess uses recycled data blocks; the length of the data unit should
 	 * correspond to the output of the detector function: Just one double.
@@ -162,92 +163,123 @@ public class IshPeakProcess extends PamProcess
 		double[] inputData = ishFnDataUnit.getDetData()[0];
 
 		//See if the channel is one we want before doing anything.
-//		if ((arg.getChannelBitmap() & ishDetControl.ishDetParams.channelList) == 0)
+		//		if ((arg.getChannelBitmap() & ishDetControl.ishDetParams.channelList) == 0)
 		if ((activeChannels & ishFnDataUnit.getSequenceBitmap())==0) {
 			return;
 		}
-//		int chanIx = PamUtils.getSingleChannel(arg.getChannelBitmap());
-		
+		//		int chanIx = PamUtils.getSingleChannel(arg.getChannelBitmap());
+
 		int chanIx = PamUtils.getSingleChannel(ishFnDataUnit.getSequenceBitmap());
 		PerChannelInfo chan = perChannelInfo[chanIx];
-		
+
 		//The actual peak-picking calculation. Check whether the peak is over calculation and 
 		//that the peak has not exceeded the maximum time... 
-		if (isIshOverThreshold(inputData[0]) && chan.nOverThresh <=maxTimeN+1) {
-			if (chan.nOverThresh == 0) {
-				chan.peakHeight = Double.NEGATIVE_INFINITY; 
-			}
-			chan.nOverThresh++;
-//			System.out.println("above threshold, startSample= " + String.valueOf(ishFnDataUnit.getStartSample()) + ", inputData= " + String.valueOf(inputData[0]) + ", nOverThresh= "+ String.valueOf(chan.nOverThresh));
-			if (inputData[0] >= chan.peakHeight) {
-				chan.peakHeight = inputData[0];
-				chan.peakTimeSam = ishFnDataUnit.getStartSample(); //
-			}
-		} 
-		else {
-//			System.out.println("below threshold, nOverThresh = "+ String.valueOf(chan.nOverThresh) + ", minTimeN= "+ String.valueOf(minTimeN));
-			// Below threshold or over the maximum time allowed. 
-			// Check to see if we were over enough times, and if so,
-			//add an output unit. Data has to be less then the max time
-			if (chan.nOverThresh > 0 && chan.nOverThresh >= minTimeN && chan.nOverThresh<=maxTimeN) {
-				
-				//Append the new data to the end of the data stream.
-				long startSam = ishFnDataUnit.getStartSample();
-				long durationSam = chan.nOverThresh;
-				durationSam *= sampleRate / (ishDetControl.ishDetFnProcess.getDetSampleRate());
-				long startMsec = absSamplesToMilliseconds(startSam - durationSam);
-				long endMsec = absSamplesToMilliseconds(startSam) + 
-				Math.round(1000.0 * (float)durationSam * ishDetControl.ishDetFnProcess.getDetSampleRate()); 
-				float lowFreq = ishDetControl.ishDetFnProcess.getLoFreq();
-				float highFreq = ishDetControl.ishDetFnProcess.getHiFreq();
-			
-				IshDetection iDet = outputDataBlock.getRecycledUnit();
-				if (iDet != null) {                //refurbished
-//					iDet.setInfo(startMsec, 1 << chanIx, startSam, durationSam, 
-//							lowFreq, highFreq, chan.peakTimeSam, chan.peakHeight);
-					iDet.setInfo(startMsec, arg1.getChannelBitmap(), startSam, durationSam, 
-							lowFreq, highFreq, chan.peakTimeSam, chan.peakHeight);
-					iDet.setSequenceBitmap(arg1.getSequenceBitmapObject());
-				} else {                           //new
-//					iDet = new IshDetection(startMsec, endMsec, lowFreq, highFreq, chan.peakTimeSam, 
-//							chan.peakHeight, outputDataBlock, 1 << chanIx, startSam, durationSam);
+		int nSamples = inputData.length;
+		for (int iSamp = 0; iSamp < nSamples; iSamp++) {
+			if (isIshOverThreshold(inputData[iSamp]) && chan.nOverThresh <=maxTimeN+1) {
+				if (chan.nOverThresh == 0) {
+					chan.peakHeight = Double.NEGATIVE_INFINITY; 
+					chan.startSample = ishFnDataUnit.getStartSample()+iSamp;
+				}
+				chan.endSample = ishFnDataUnit.getStartSample()+iSamp;
+				chan.nUnderThresh = 0;
+				chan.nOverThresh++;
+				//			System.out.println("above threshold, startSample= " + String.valueOf(ishFnDataUnit.getStartSample()) + ", inputData= " + String.valueOf(inputData[0]) + ", nOverThresh= "+ String.valueOf(chan.nOverThresh));
+				if (inputData[iSamp] >= chan.peakHeight) {
+//					System.out.printf("Inc peak from %4.2f to %4.2f at samp %d\n", chan.peakHeight, inputData[iSamp], ishFnDataUnit.getStartSample()+iSamp);
+					chan.peakHeight = inputData[iSamp];
+					chan.peakTimeSam = ishFnDataUnit.getStartSample()+iSamp; //
+				}
+			} 
+			else {
+				//			System.out.println("below threshold, nOverThresh = "+ String.valueOf(chan.nOverThresh) + ", minTimeN= "+ String.valueOf(minTimeN));
+				// Below threshold or over the maximum time allowed. 
+				// Check to see if we were over enough times, and if so,
+				//add an output unit. Data has to be less then the max time
+				chan.nUnderThresh++;
+				if (chan.nUnderThresh < refactoryTimeSam) {
+					/*
+					 *  just wait until we've reached this time before ending the call.
+					 *  Calls cross threshold many times, so it's possible it will go back 
+					 *  over threshold in a couple more samples. So do absolutely nothing here.  
+					 */
+					
+				}
+				else if (chan.nOverThresh > 0 && chan.durationSamples() >= minTimeN && chan.nOverThresh<=maxTimeN) {
+					/*
+					 * If we're here, the call duration is long enough and it's been below threshold for longer
+					 * than the minimum allowed gap, so it is time to properly end the call. 
+					 */
+
+					//Append the new data to the end of the data stream.
+//					long startSam = ishFnDataUnit.getStartSample();
+					long durationSam = chan.endSample-chan.startSample+1;
+//					durationSam *= sampleRate / (ishDetControl.ishDetFnProcess.getDetSampleRate());
+//					long startMsec = absSamplesToMilliseconds(startSam - durationSam);
+					long startMsec = absSamplesToMilliseconds(chan.startSample);
+					long endMsec = startMsec + 
+							Math.round(1000.0 * (float)durationSam * ishDetControl.ishDetFnProcess.getDetSampleRate()); 
+					float lowFreq = ishDetControl.ishDetFnProcess.getLoFreq();
+					float highFreq = ishDetControl.ishDetFnProcess.getHiFreq();
+
+					IshDetection iDet;
+					//				= outputDataBlock.getRecycledUnit();
+					//				if (iDet != null) {                //refurbished
+					////					iDet.setInfo(startMsec, 1 << chanIx, startSam, durationSam, 
+					////							lowFreq, highFreq, chan.peakTimeSam, chan.peakHeight);
+					//					iDet.setInfo(startMsec, arg1.getChannelBitmap(), startSam, durationSam, 
+					//							lowFreq, highFreq, chan.peakTimeSam, chan.peakHeight);
+					//					iDet.setSequenceBitmap(arg1.getSequenceBitmapObject());
+					//				} else {                           //new
+					//					iDet = new IshDetection(startMsec, endMsec, lowFreq, highFreq, chan.peakTimeSam, 
+					//							chan.peakHeight, outputDataBlock, 1 << chanIx, startSam, durationSam);
 					//11/03/2020 - major bug fix - start sample of Ishamel detector data unit was wrong - it was at the end of the data unit for some reason. 
 					iDet = new IshDetection(startMsec, endMsec, lowFreq, highFreq, chan.peakTimeSam, 
-							chan.peakHeight, outputDataBlock, arg1.getChannelBitmap(), startSam - durationSam, durationSam);
-					
+							chan.peakHeight, outputDataBlock, arg1.getChannelBitmap(), chan.startSample, durationSam);
+
 					iDet.setSequenceBitmap(arg1.getSequenceBitmapObject());
 					iDet.setParentDataBlock(outputDataBlock);
-				}
-				
-				//now check if the refactory time is OK
+					//				}
 
-				
-				double iDISam =Math.abs((startSam) - (chan.lastStartSam+durationSam)); 
-				
-//				System.out.println("Samplediff: " +  iDISam 
-//				+ " maxTimeN: " + this.maxTimeN + " sR: " + ishDetControl.ishDetFnProcess.getDetSampleRate()); 
-				if (chan.lastStartSam==-1 || startSam<chan.lastStartSam || iDISam>=refactoryTimeSam) {
-					outputDataBlock.addPamData(iDet);
-//					System.out.println("");
-//					System.out.println("Ishmael data unit accepted because of refactory time: " 
-//							+ startSam + "  " + chan.lastStartSam + " minIDI: (samples): " + refactoryTimeSam 
-//							+ " minIDI (s) " + this.ishDetControl.ishDetParams.refractoryTime);
+					//now check if the refactory time is OK
+
+
+					double iDISam =Math.abs(chan.startSample - (chan.lastStartSam+chan.lastDurationSam)); 
+
+					//				System.out.println("Samplediff: " +  iDISam 
+					//				+ " maxTimeN: " + this.maxTimeN + " sR: " + ishDetControl.ishDetFnProcess.getDetSampleRate()); 
+					if (chan.lastStartSam==-1 || chan.startSample<chan.lastStartSam || iDISam>=refactoryTimeSam) {
+						outputDataBlock.addPamData(iDet);
+//						System.out.println(iDet.getSummaryString());
+						//					System.out.println("");
+						//					System.out.println("Ishmael data unit accepted because of refactory time: " 
+						//							+ startSam + "  " + chan.lastStartSam + " minIDI: (samples): " + refactoryTimeSam 
+						//							+ " minIDI (s) " + this.ishDetControl.ishDetParams.refractoryTime);
+					}
+					else {
+						//					System.out.println("");
+						//					System.out.println("Ishmael data unit REJECTED because of refactory time: " + startSam 
+						//							+ "  " + chan.lastStartSam + " minIDI: (samples): " + refactoryTimeSam 
+						//							+ " minIDI (s) " + this.ishDetControl.ishDetParams.refractoryTime);
+					}
+					//keep a reference to the last time and duration
+					chan.lastStartSam = chan.startSample; 
+					chan.lastDurationSam = durationSam; 
+
+					chan.reset();
 				}
 				else {
-//					System.out.println("");
-//					System.out.println("Ishmael data unit REJECTED because of refactory time: " + startSam 
-//							+ "  " + chan.lastStartSam + " minIDI: (samples): " + refactoryTimeSam 
-//							+ " minIDI (s) " + this.ishDetControl.ishDetParams.refractoryTime);
+					/*
+					 * Get here if there may have been a call building, but it didn't get adequate duration and 
+					 * has now been below threshold for a while. So reset the detector and allow it to start a
+					 * new detection. 
+					 */
+					chan.reset();
 				}
-				//keep a reference to the last time and duration
-				chan.lastStartSam = startSam; 
-				chan.lastDurationSam = durationSam; 
-
 			}
-			chan.nOverThresh = 0;
 		}
 	}
-	
+
 
 	/**
 	 * Checks whether a peak is over threshold...
@@ -260,10 +292,13 @@ public class IshPeakProcess extends PamProcess
 		}
 		return false; 
 	} 
-	
-	private class PerChannelInfo {
-		
 
+	private class PerChannelInfo {
+
+
+		public long endSample;
+		public int nUnderThresh;
+		public long startSample;
 		/**
 		 * The sample time of the start of the last saved detection (samples)
 		 */
@@ -272,17 +307,27 @@ public class IshPeakProcess extends PamProcess
 		int nOverThresh = 0;		//number of times we've been over threshold in units of FFT length
 		double peakHeight;			//height of peak within the current event
 		long peakTimeSam;			//sample number at which that peak occurred
+		
+		private long durationSamples() {
+			return endSample-startSample+1;
+		}
+
+		public void reset() {
+			nOverThresh = 0;
+			startSample = endSample = 0;
+			peakHeight = 0;
+		}
 	}
 
 	@Override public void pamStart() {
 		//This doesn't get called because we don't do addPamProcess(ishPeakProcess).
 		//(Why not?  Then it shows up in the data model.)
 	}
-	
+
 	//This keeps the compiler happy -- it's abstract in the superclass.
 	@Override public void pamStop() { }
 
 	public PamDataBlock getOutputDataBlock() {
-		 return this.outputDataBlock;
+		return this.outputDataBlock;
 	}
 }

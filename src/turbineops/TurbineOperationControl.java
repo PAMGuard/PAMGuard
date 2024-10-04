@@ -6,7 +6,6 @@ import java.util.List;
 
 import PamView.GeneralProjector.ParameterType;
 import PamView.GeneralProjector.ParameterUnits;
-import dataPlotsFX.data.TDScaleInfo;
 import generalDatabase.lineplots.EnhancedTableItem;
 import generalDatabase.lineplots.LinePlotControl;
 import generalDatabase.lineplots.LinePlotScaleInfo;

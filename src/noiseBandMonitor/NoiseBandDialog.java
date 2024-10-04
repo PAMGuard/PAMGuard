@@ -15,34 +15,26 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BandCombineOp;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import Filters.ANSIStandard;
-import Filters.ButterworthMethod;
-import Filters.FIRFilterMethod;
-import Filters.Filter;
-import Filters.FilterBand;
 import Filters.FilterMethod;
-import Filters.FilterParams;
 import Filters.FilterType;
-import Filters.IIRFilterMethod;
 import Layout.PamAxis;
 import Layout.PamAxisPanel;
 import PamDetection.RawDataUnit;
@@ -51,7 +43,6 @@ import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.SourcePanel;
 import PamView.panel.JPanelWithPamKey;
 import PamView.panel.PamBorderPanel;
-import PamView.panel.PamPanel;
 import PamguardMVC.PamDataBlock;
 
 public class NoiseBandDialog extends PamDialog {
@@ -136,11 +127,11 @@ public class NoiseBandDialog extends PamDialog {
 		outputPanel.setBorder(new TitledBorder("Output"));
 		outputPanel.setLayout(new GridBagLayout());
 		GridBagConstraints c = new PamGridBagContraints();
-		addComponent(outputPanel, new JLabel("Output Interval ", JLabel.RIGHT), c);
+		addComponent(outputPanel, new JLabel("Output Interval ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		addComponent(outputPanel, outputInterval = new JTextField(5), c);
 		c.gridx++;
-		addComponent(outputPanel, new JLabel(" s", JLabel.RIGHT), c);
+		addComponent(outputPanel, new JLabel(" s", SwingConstants.RIGHT), c);
 		optionsPanel.add(outputPanel);
 
 		JPanel bandPanel = new JPanel();
@@ -158,7 +149,7 @@ public class NoiseBandDialog extends PamDialog {
 //		bbGroup.add(thirdOctave);
 //		octave.addActionListener(bl);
 //		thirdOctave.addActionListener(bl);
-		addComponent(bandPanel, new JLabel("Band Type: ", JLabel.RIGHT), c);
+		addComponent(bandPanel, new JLabel("Band Type: ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		c.gridwidth = 2;
 		addComponent(bandPanel, bandType = new JComboBox<BandType>(), c);
@@ -181,7 +172,7 @@ public class NoiseBandDialog extends PamDialog {
 		addComponent(bandPanel, maxButton, c);
 		c.gridx = 0;
 		c.gridy++;
-		addComponent(bandPanel, new JLabel("Number of decimators ", JLabel.RIGHT), c);
+		addComponent(bandPanel, new JLabel("Number of decimators ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		nDecimators = new SpinnerNumberModel(2, 0, 20, 1);
 		nDecimators.addChangeListener(new NDEcimatorsListener());
@@ -193,7 +184,7 @@ public class NoiseBandDialog extends PamDialog {
 		filtPanel.setLayout(new GridBagLayout());
 		filtPanel.setBorder(new TitledBorder("Filters"));
 		c = new PamGridBagContraints();
-		addComponent(filtPanel, new JLabel("Filter Type ", JLabel.RIGHT), c);
+		addComponent(filtPanel, new JLabel("Filter Type ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		c.gridwidth = 2;
 		addComponent(filtPanel, filterType = new JComboBox(), c);
@@ -201,14 +192,14 @@ public class NoiseBandDialog extends PamDialog {
 		c.gridx = 0;
 		c.gridwidth = 1;
 		c.gridy++;
-		addComponent(filtPanel, new JLabel("Filter Order ", JLabel.RIGHT), c);
+		addComponent(filtPanel, new JLabel("Filter Order ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		filterOrder = new SpinnerNumberModel(2, 2, 20, 1);
 		filterOrder.addChangeListener(new FilterOrderListener());
 		addComponent(filtPanel, new JSpinner(filterOrder), c);
 		c.gridx = 0;
 		c.gridy++;
-		addComponent(filtPanel, new JLabel("Filter Gamma ", JLabel.RIGHT), c);
+		addComponent(filtPanel, new JLabel("Filter Gamma ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		addComponent(filtPanel, filterGamma = new JTextField(), c);
 		filterType.addItem("Butterworth");
@@ -581,7 +572,7 @@ public class NoiseBandDialog extends PamDialog {
 			PamAxis xAxis = bodePlotAxis.xAxis;
 			PamAxis yAxis = bodePlotAxis.yAxis;
 			for (int i = 0; i < 3; i++) {
-				if (showStandard[i].isSelected() == false) {
+				if (!showStandard[i].isSelected()) {
 					continue;
 				}
 				minAtten = ANSIStandard.getMinAttenuation(i);
@@ -644,7 +635,7 @@ public class NoiseBandDialog extends PamDialog {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if (setupComplete == false) {
+			if (!setupComplete) {
 				return;
 			}
 			findDataSource();
@@ -657,7 +648,7 @@ public class NoiseBandDialog extends PamDialog {
 	private class FilterTypeListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if (setupComplete == false) {
+			if (!setupComplete) {
 				return;
 			}
 			FilterType ft = getFilterType();
@@ -670,7 +661,7 @@ public class NoiseBandDialog extends PamDialog {
 
 		@Override
 		public void stateChanged(ChangeEvent arg0) {
-			if (setupComplete == false) {
+			if (!setupComplete) {
 				return;
 			}
 			repaintAll();
@@ -682,7 +673,7 @@ public class NoiseBandDialog extends PamDialog {
 
 		@Override
 		public void stateChanged(ChangeEvent arg0) {
-			if (setupComplete == false) {
+			if (!setupComplete) {
 				return;
 			}
 			noiseBandSettings.endDecimation = (Integer) nDecimators.getValue();
@@ -786,10 +777,10 @@ public class NoiseBandDialog extends PamDialog {
 	}
 
 	public void repaintAll() {
-		if (this.setupComplete == false) {
+		if (!this.setupComplete) {
 			return;
 		}
-		if (getParams() == false) {
+		if (!getParams()) {
 			return;
 		}
 		makeFilters();

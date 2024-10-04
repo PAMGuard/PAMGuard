@@ -8,8 +8,6 @@ import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
 import PamView.GroupedSourceParameters;
-import PamguardMVC.PamConstants;
-import whistlesAndMoans.WhistleToneParameters;
 
 public class AzigramParameters implements Serializable, ManagedParameters, Cloneable {
 

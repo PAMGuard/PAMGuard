@@ -1,8 +1,16 @@
 package loc3d_Thode;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import Acquisition.AcquisitionProcess;
+//import loc3d_Thode.FindAnchorOverlayGraphics;
+//import FindAnchor.FindAnchorSQLLogging;
+import Array.ArrayManager;
+import Array.PamArray;
+import Array.SnapshotGeometry;
 import Localiser.DelayMeasurementParams;
 import Localiser.algorithms.Correlations;
 import PamController.PamController;
@@ -12,24 +20,13 @@ import PamDetection.PamDetection;
 import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamView.symbol.StandardSymbolManager;
-import PamguardMVC.AcousticDataUnit;
 //import PamguardMVC.DataType;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamObservable;
 import PamguardMVC.PamProcess;
-import autecPhones.AutecGraphics;
-import loc3d_Thode.TowedArray3DController;
-//import loc3d_Thode.FindAnchorOverlayGraphics;
-//import FindAnchor.FindAnchorSQLLogging;
-import Array.ArrayManager;
-import Array.PamArray;
-import Array.SnapshotGeometry;
 import clickDetector.ClickDetection;
 import fftManager.FFT;
-
-import java.util.Calendar;
-import java.io.*;
 
 public class TowedArray3DProcess extends PamProcess{
 
@@ -430,7 +427,7 @@ public class TowedArray3DProcess extends PamProcess{
 			ldu.setLatLong();
 		}
 		else
-			ldu.getLocalisation().getLocContents().setLocContent(0);;
+			ldu.getLocalisation().getLocContents().setLocContent(0);
 
 
 		try {

@@ -60,7 +60,7 @@ public class LogXMLSettings extends DbSpecial {
 	}
 
 	private void saveModuleSettings(PamConnection con, long dataTime, long now, PamControlledUnit controlledUnit) {
-		if (controlledUnit instanceof PamSettings == false) {
+		if (!(controlledUnit instanceof PamSettings)) {
 			return;
 		}
 		PamSettings pamSettings = (PamSettings) controlledUnit;
@@ -84,7 +84,7 @@ public class LogXMLSettings extends DbSpecial {
 	}
 	
 	private void updateModuleSettings(PamConnection con, long dataTime, long now, PamControlledUnit controlledUnit) {
-		if (controlledUnit instanceof PamSettings == false) {
+		if (!(controlledUnit instanceof PamSettings)) {
 			return;
 		}
 		PamSettings pamSettings = (PamSettings) controlledUnit;

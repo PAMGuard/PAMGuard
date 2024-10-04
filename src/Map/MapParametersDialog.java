@@ -3,7 +3,6 @@ package Map;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -24,6 +23,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
@@ -32,7 +32,6 @@ import Map.gridbaselayer.GridDialogPanel;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamView.dialog.SettingsButton;
-import PamView.dialog.SourcePanel;
 import PamView.panel.PamNorthPanel;
 import PamguardMVC.PamDataBlock;
 import effort.EffortProvider;
@@ -157,7 +156,7 @@ public class MapParametersDialog extends PamDialog {
 		keepShipOnMap.setSelected(mapParameters.keepShipOnMap);
 		keepShipCentred.setSelected(mapParameters.keepShipCentred);
 		headingUp.setSelected(mapParameters.headingUp);
-		showSurface.setSelected(mapParameters.hideSurface == false);
+		showSurface.setSelected(!mapParameters.hideSurface);
 		colourByEffort.setSelected(mapParameters.colourByEffort);
 		effortSourcePanel.setSource(mapParameters.effortDataSource);
 
@@ -187,7 +186,7 @@ public class MapParametersDialog extends PamDialog {
 			mapParameters.keepShipOnMap = keepShipOnMap.isSelected();
 			mapParameters.keepShipCentred = keepShipCentred.isSelected();
 			mapParameters.headingUp = headingUp.isSelected();
-			mapParameters.hideSurface = showSurface.isSelected() == false;
+			mapParameters.hideSurface = !showSurface.isSelected();
 			mapParameters.symbolSize = forceEven((Integer) symbolSize.getValue());
 			mapParameters.showRangeRings = ringsType.getSelectedIndex();
 			if (mapParameters.showRangeRings > 0) {
@@ -206,7 +205,7 @@ public class MapParametersDialog extends PamDialog {
 		mapParameters.mapContours = filePanel.getContoursList();
 		mapParameters.allow3D = allow3D.isSelected();
 		mapParameters.hideGrid = !showGrid.isSelected();
-		if (gridDialogPanel.getParams() == false) {
+		if (!gridDialogPanel.getParams()) {
 			return false;
 		}
 		return true;
@@ -258,12 +257,12 @@ public class MapParametersDialog extends PamDialog {
 			addComponent(this, colourByEffort, constraints);
 			constraints.gridx += 2;
 			constraints.gridwidth = 1;
-			constraints.fill = constraints.NONE;
-			constraints.anchor = constraints.LINE_END;
+			constraints.fill = GridBagConstraints.NONE;
+			constraints.anchor = GridBagConstraints.LINE_END;
 			addComponent(this, effortSettings, constraints);
 			constraints.gridx = 0;
 			constraints.gridy ++;
-			constraints.anchor = constraints.LINE_START;
+			constraints.anchor = GridBagConstraints.LINE_START;
 			addComponent(this,new JLabel("Data storage time "), constraints);
 			constraints.gridx ++;
 			addComponent(this,dataKeepTime = new JTextField(7), constraints);
@@ -271,7 +270,7 @@ public class MapParametersDialog extends PamDialog {
 			addComponent(this,new JLabel(" s "), constraints);
 			constraints.gridx++;
 			constraints.gridwidth = 3;
-			constraints.fill = constraints.HORIZONTAL;
+			constraints.fill = GridBagConstraints.HORIZONTAL;
 			addComponent(this, effortSourcePanel.getPanel(), constraints);
 			constraints.gridx = 0;
 			constraints.gridy ++;
@@ -326,7 +325,7 @@ public class MapParametersDialog extends PamDialog {
 			addComponent(this, colourByChannel, c);
 			c.gridy++;
 			c.gridwidth = 1;
-			addComponent(this, new JLabel("Symbol size ",  JLabel.RIGHT), c);
+			addComponent(this, new JLabel("Symbol size ",  SwingConstants.RIGHT), c);
 			c.gridx++;
 			symbolSize = new SpinnerNumberModel(Hydrophone.DefaultSymbolSize, 4, 30, 2);
 			addComponent(this, symbolSizeSpinner = new JSpinner(symbolSize), c);
@@ -359,7 +358,7 @@ public class MapParametersDialog extends PamDialog {
 			ringsPanel.setBorder(new TitledBorder("Range Rings"));
 			ringsPanel.setLayout(new GridBagLayout());
 			GridBagConstraints c = new PamGridBagContraints();
-			ringsPanel.add(new JLabel("Show ", JLabel.RIGHT), c);
+			ringsPanel.add(new JLabel("Show ", SwingConstants.RIGHT), c);
 			c.gridx++;
 			ringsPanel.add(ringsType = new JComboBox<String>(), c);
 			ringsType.addItem("No range rings");
@@ -368,7 +367,7 @@ public class MapParametersDialog extends PamDialog {
 			ringsType.addItem("Rings in Nautical miles");
 			c.gridx = 0;
 			c.gridy++;
-			ringsPanel.add(new JLabel("Sepration ", JLabel.RIGHT), c);
+			ringsPanel.add(new JLabel("Sepration ", SwingConstants.RIGHT), c);
 			c.gridx++;
 			ringsPanel.add(ringsRange = new JTextField(6), c);
 			ringsType.addActionListener(new ActionListener() {
@@ -507,21 +506,25 @@ public class MapParametersDialog extends PamDialog {
 			}
 		}
 		private class BrowseButton implements ActionListener {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				browseMaps();
 			}
 		}
 		private class ClearButton implements ActionListener {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				clearMap();
 			}
 		}
 		private class AllButton implements ActionListener {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				selectAllContours(true);
 			}
 		}
 		private class NoneButton implements ActionListener {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				selectAllContours(false);
 			}

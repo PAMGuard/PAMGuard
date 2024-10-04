@@ -38,9 +38,9 @@ import PamUtils.Coordinate3d;
 import PamUtils.LatLong;
 import PamUtils.PamCalendar;
 import PamView.PamColors;
+import PamView.PamColors.PamColor;
 import PamView.PamSymbol;
 import PamView.PamSymbolType;
-import PamView.PamColors.PamColor;
 
 public class Vessel extends PamSymbol implements Serializable, Cloneable, ManagedParameters {
 	
@@ -344,7 +344,7 @@ public class Vessel extends PamSymbol implements Serializable, Cloneable, Manage
 		if (shipGps == null) {
 			return null;
 		}
-		else if (predict == false) {
+		else if (!predict) {
 			return shipGps;
 		}
 		else {
@@ -426,6 +426,7 @@ public class Vessel extends PamSymbol implements Serializable, Cloneable, Manage
 		return y;
 	}
 
+	@Override
 	public PamParameterSet getParameterSet() {
 		PamParameterSet ps = super.getParameterSet();
 		try {

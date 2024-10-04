@@ -1,14 +1,12 @@
 package PamDetection;
 
 import java.sql.Types;
-import java.util.ArrayList;
 import java.util.List;
 
-import annotation.DataAnnotationType;
-import annotation.handler.AnnotationHandler;
-import annotationMark.MarkDataUnit;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import annotation.DataAnnotationType;
+import annotation.handler.AnnotationHandler;
 import generalDatabase.PamTableDefinition;
 import generalDatabase.PamTableItem;
 import generalDatabase.SQLLogging;

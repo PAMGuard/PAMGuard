@@ -4,7 +4,6 @@ import java.awt.Component;
 import java.io.File;
 import java.util.List;
 
-
 import PamguardMVC.PamDataUnit;
 import javafx.scene.layout.Pane;
 

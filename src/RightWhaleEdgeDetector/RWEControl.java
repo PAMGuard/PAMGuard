@@ -18,8 +18,6 @@ import PamView.GroupedSourceParameters;
 import PamView.dialog.GroupedSourcePanel;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.ProcessAnnotation;
-import RightWhaleEdgeDetector.graphics.RWEDataPlotProviderFX;
-import dataPlotsFX.data.TDDataProviderRegisterFX;
 
 /**
  * Exact implementation of the 2003 Right Whale detector I developed when I was 

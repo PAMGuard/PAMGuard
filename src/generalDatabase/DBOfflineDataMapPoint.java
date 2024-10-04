@@ -1,9 +1,9 @@
 package generalDatabase;
 
-import dataMap.OfflineDataMapPoint;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamUtils.PamCalendar;
+import dataMap.OfflineDataMapPoint;
 
 public class DBOfflineDataMapPoint extends OfflineDataMapPoint implements ManagedParameters {
 

@@ -1,9 +1,9 @@
 package whistlesAndMoans;
 
-import java.util.ListIterator;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 import fftManager.FFTDataUnit;
 
@@ -234,7 +234,7 @@ public class ConnectedRegion implements Cloneable{
 		int firstHoleSlice = 0;
 		boolean hasHoles = false;
 		for (int i = 0; i < getNumSlices(); i++) {
-			if (hasHoles == false && nHoles[i] > 0) {
+			if (!hasHoles && nHoles[i] > 0) {
 				firstHoleSlice = i;
 				hasHoles = true;
 			}
@@ -392,9 +392,9 @@ public class ConnectedRegion implements Cloneable{
 		while (li.hasNext()) {
 			slices[2] = li.next();
 			for (int i = 0; i < slices[0].sliceLength; i++) {
-				if (slices[0].slicePixs[i] == false & 
-						slices[1].slicePixs[i] == true & 
-						slices[2].slicePixs[i] == false) {
+				if (!slices[0].slicePixs[i] & 
+						slices[1].slicePixs[i] & 
+						!slices[2].slicePixs[i]) {
 					slices[1].slicePixs[i] = false;
 				}
 			}
@@ -414,9 +414,9 @@ public class ConnectedRegion implements Cloneable{
 		while (li.hasNext()) {
 			slices[2] = li.next();
 			for (int i = 0; i < slices[0].sliceLength; i++) {
-				if (slices[0].slicePixs[i] == true & 
-						slices[1].slicePixs[i] == false & 
-						slices[2].slicePixs[i] == true) {
+				if (slices[0].slicePixs[i] & 
+						!slices[1].slicePixs[i] & 
+						slices[2].slicePixs[i]) {
 					slices[1].slicePixs[i] = true;
 				}
 			}

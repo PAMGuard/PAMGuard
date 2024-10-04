@@ -182,22 +182,27 @@ public class RefractionMethod extends RoundEarthMethod implements PamSettings {
 		return refractionDialogPanel;
 	}
 
+	@Override
 	public Serializable getSettingsReference() {
 		return refractionParameters;
 	}
 
+	@Override
 	public long getSettingsVersion() {
 		return RefractionParameters.serialVersionUID;
 	}
 
+	@Override
 	public String getUnitName() {
 		return vrControl.getUnitName();
 	}
 
+	@Override
 	public String getUnitType() {
 		return "Video Range Refraction";
 	}
 
+	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		refractionParameters = ((RefractionParameters) pamControlledUnitSettings.getSettings()).clone();
 		return true;
@@ -239,10 +244,12 @@ public class RefractionMethod extends RoundEarthMethod implements PamSettings {
 			
 		}
 
+		@Override
 		public Component getPanel() {
 			return panel;
 		}
 
+		@Override
 		public boolean getParams() {
 			try {
 				refractionParameters.seaSurfactCelcius = Double.valueOf(temp.getText());
@@ -255,6 +262,7 @@ public class RefractionMethod extends RoundEarthMethod implements PamSettings {
 			return true;
 		}
 
+		@Override
 		public void setParams() {
 			
 			temp.setText(String.format("%.1f", refractionParameters.seaSurfactCelcius));

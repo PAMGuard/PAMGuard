@@ -55,10 +55,12 @@ public abstract class AngleMeasurement implements PamSettings{
 		this.name = name;
 	}
 
+	@Override
 	public String getUnitName() {
 		return name;
 	}
 
+	@Override
 	public String getUnitType() {
 		return "AngleMeasurement";
 	}
@@ -73,12 +75,12 @@ public abstract class AngleMeasurement implements PamSettings{
 	}
 	
 	public void addMeasurementListener(AngleMeasurementListener angleMeasurementListener) {
-		if (measurementListeners.contains(angleMeasurementListener) == false) {
+		if (!measurementListeners.contains(angleMeasurementListener)) {
 			measurementListeners.add(angleMeasurementListener);
 		}
 	}
 	public void removeMeasurementListener(AngleMeasurementListener angleMeasurementListener) {
-		if (measurementListeners.contains(angleMeasurementListener) == false) {
+		if (!measurementListeners.contains(angleMeasurementListener)) {
 			measurementListeners.remove(angleMeasurementListener);
 		}
 	}

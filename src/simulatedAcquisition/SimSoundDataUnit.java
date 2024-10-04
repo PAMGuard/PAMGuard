@@ -1,7 +1,7 @@
 package simulatedAcquisition;
 
-import simulatedAcquisition.sounds.SimSound;
 import PamguardMVC.PamDataUnit;
+import simulatedAcquisition.sounds.SimSound;
 
 /**
  * One of these will be created for every sound produced

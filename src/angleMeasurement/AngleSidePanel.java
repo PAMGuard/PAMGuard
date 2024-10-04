@@ -63,15 +63,18 @@ public class AngleSidePanel implements PamSidePanel {
 		}
 	}
 
+	@Override
 	public JComponent getPanel() {
 		return outerPanel;
 	}
 
+	@Override
 	public void rename(String newName) {
 		titledBorder.setTitle(newName);
 	}
 	
 	class HoldButton implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			angleControl.holdButton();
 		}

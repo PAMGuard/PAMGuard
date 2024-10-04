@@ -32,7 +32,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -57,7 +56,6 @@ import org.docx4j.wml.Text;
 import org.docx4j.wml.Tr;
 
 import PamView.PamTable;
-import PamguardMVC.debug.Debug;
 
 /**
  * Static class containing all of the processing necessary to generate a docx report from a Report object.
@@ -250,7 +248,7 @@ public final class ReportFactory {
 					run.getContent().add(text);
 					//					run.getContent().add(getLineBreak());
 					paragraph.getContent().add(run);
-					mainDoc.addObject(paragraph);;
+					mainDoc.addObject(paragraph);
 				}
 			}
 
@@ -265,7 +263,7 @@ public final class ReportFactory {
 					run.getContent().add(text);
 					//					run.getContent().add(getLineBreak());
 					paragraph.getContent().add(run);
-					mainDoc.addObject(paragraph);;
+					mainDoc.addObject(paragraph);
 				}
 				Tbl newTable = processTable(aSection.getTable(), wordPackage);
 				if (newTable!=null) {

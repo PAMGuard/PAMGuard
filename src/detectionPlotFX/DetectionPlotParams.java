@@ -5,7 +5,6 @@ import java.util.HashMap;
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
-import dataPlotsFX.TDParametersFX;
 import userDisplayFX.UserDisplayNodeParams;
 
 /**

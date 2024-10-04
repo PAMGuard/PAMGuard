@@ -1,6 +1,9 @@
 package JSSHTerminal;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineMetrics;
 import java.awt.geom.Rectangle2D;
@@ -76,15 +79,18 @@ public class TextTerminal extends TerminalEvent {
 
   }
 
-  public void dispose() {
+  @Override
+public void dispose() {
     dummyImg = null;
   }
 
-  public void sizeComponent(int width,int height) {
+  @Override
+public void sizeComponent(int width,int height) {
     charBuffer = new char[width];
   }
 
-  public synchronized void drawComponent(Graphics g) {
+  @Override
+public synchronized void drawComponent(Graphics g) {
 
     Graphics2D g2 = (Graphics2D)g;
 

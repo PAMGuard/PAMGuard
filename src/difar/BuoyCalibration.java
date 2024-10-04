@@ -3,12 +3,9 @@
  */
 package difar;
 
-import Array.ArrayManager;
 import Array.HydrophoneLocator;
-import GPS.GPSDataBlock;
 import PamUtils.LatLong;
 import PamUtils.PamCalendar;
-import PamView.dialog.PamDialog;
 import PamguardMVC.PamDataUnit;
 
 /**

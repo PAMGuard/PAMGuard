@@ -18,9 +18,9 @@ import javax.swing.JTextField;
 import javax.swing.Timer;
 import javax.swing.border.TitledBorder;
 
-import serialComms.SerialPortPanel;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
+import serialComms.SerialPortPanel;
 
 public class FluxgateWorldDialog extends PamDialog implements AngleMeasurementListener {
 
@@ -202,9 +202,10 @@ public class FluxgateWorldDialog extends PamDialog implements AngleMeasurementLi
 
 	class PortAction implements ActionListener {
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			if (getParams() == false) {
+			if (!getParams()) {
 				return;
 			}
 			
@@ -217,6 +218,7 @@ public class FluxgateWorldDialog extends PamDialog implements AngleMeasurementLi
 	
 	class ClearOffset implements ActionListener {
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			fluxgateWorldParameters.angleOffset = 0;
 			fluxgateWorldAngles.setFluxgateWorldParameters(fluxgateWorldParameters.clone());
@@ -225,6 +227,7 @@ public class FluxgateWorldDialog extends PamDialog implements AngleMeasurementLi
 	
 	class SetOffset implements ActionListener {
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			Double angle = fluxgateWorldAngles.getCalibratedAngle();
 			Double geoReference = getGeoReferenceAngle();
@@ -237,6 +240,7 @@ public class FluxgateWorldDialog extends PamDialog implements AngleMeasurementLi
 	
 	class InvertAngles implements ActionListener {
 
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (getParams()) {
 				fluxgateWorldAngles.setFluxgateWorldParameters(fluxgateWorldParameters.clone());				
@@ -246,6 +250,7 @@ public class FluxgateWorldDialog extends PamDialog implements AngleMeasurementLi
 	}
 
 	Double latestRawAngle;
+	@Override
 	public void newAngle(Double rawAngle, Double calibratedAngle, Double correctedAngle) {
 
 		latestRawAngle = rawAngle;

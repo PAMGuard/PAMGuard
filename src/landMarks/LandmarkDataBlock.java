@@ -1,11 +1,9 @@
 package landMarks;
 
 import PamUtils.PamCalendar;
-import PamView.symbol.StandardSymbolManager;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamProcess;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
-import autecPhones.AutecGraphics;
 import pamScrollSystem.ViewLoadObserver;
 
 public class LandmarkDataBlock extends PamDataBlock<LandmarkDataUnit> {

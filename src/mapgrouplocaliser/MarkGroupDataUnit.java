@@ -1,7 +1,6 @@
 package mapgrouplocaliser;
 
 import PamView.paneloverlay.overlaymark.OverlayMark;
-import PamguardMVC.PamDataUnit;
 import PamguardMVC.superdet.SuperDetection;
 
 public class MarkGroupDataUnit extends SuperDetection {

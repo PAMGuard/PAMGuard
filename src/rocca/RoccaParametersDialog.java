@@ -22,32 +22,11 @@
 package rocca;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.Vector;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
-import GPS.GPSControl;
-import GPS.GpsDataUnit;
-import fftManager.FFTDataUnit;
-import warnings.PamWarning;
-import warnings.WarningSystem;
-import PamController.PamController;
-import PamUtils.PamFileChooser;
-import PamView.dialog.PamDialog;
-import PamView.dialog.SourcePanel;
-import PamguardMVC.PamDataBlock;
-import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -58,26 +37,47 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.Objects;
+import java.util.Vector;
+
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JRadioButton;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.ProgressMonitorInputStream;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
+import GPS.GPSControl;
+import GPS.GpsDataUnit;
+import PamController.PamController;
+import PamUtils.PamFileChooser;
+import PamView.dialog.PamDialog;
+import PamView.dialog.SourcePanel;
+import PamguardMVC.PamDataBlock;
 import clickDetector.ClickControl;
 import clickDetector.ClickDetection;
 import clickDetector.NoiseDataBlock;
+import fftManager.FFTDataUnit;
+import warnings.PamWarning;
+import warnings.WarningSystem;
 import weka.core.Attribute;
 import weka.core.Instances;
 import weka.core.SerializationHelper;
@@ -138,6 +138,9 @@ public class RoccaParametersDialog extends PamDialog implements ActionListener, 
     JCheckBox ancCalcs4Clicks;	 	// serialVersionUID=22 2015/06/13 added
     JCheckBox ancCalcs4Whistles;	 	// serialVersionUID=22 2015/06/13 added
     JCheckBox trimWav;
+    JRadioButton absStrongThreshold;
+    JRadioButton diffStrongThreshold; 
+    ButtonGroup strongThreshold;
     JLabel outputDirLbl;
     JTextField outputDirTxt;
     JButton outputDirectoryButton;
@@ -329,7 +332,7 @@ public class RoccaParametersDialog extends PamDialog implements ActionListener, 
 		c.anchor=GridBagConstraints.LINE_START;
 		c.fill=GridBagConstraints.NONE;
 		clickSourceSubPanel.setBorder(new TitledBorder("Click Detector Data source"));
-		clickSourceSubPanel.add(new JLabel("Click Detector Source", JLabel.LEFT),c);
+		clickSourceSubPanel.add(new JLabel("Click Detector Source", SwingConstants.LEFT),c);
 		c.gridx++;
 		c.fill=GridBagConstraints.HORIZONTAL;
 		clickSourceSubPanel.add(clickSourcePanel.getPanel(),c);
@@ -344,7 +347,7 @@ public class RoccaParametersDialog extends PamDialog implements ActionListener, 
 		c.gridx=0;
 		c.gridwidth=2;
 		clickTypeNote = new JLabel("<html><div WIDTH=300><strong>Warning</strong> - one or more Click Types must be defined " +
-		" in the Click Classifier before you can use Rocca with the Click Detector</div></html>", JLabel.CENTER);
+		" in the Click Classifier before you can use Rocca with the Click Detector</div></html>", SwingConstants.CENTER);
 		clickSourceSubPanel.add(clickTypeNote,c);
 		c.gridy++;
 		clickTypeDialog = new JButton("Select Click Types to analyze");
@@ -558,6 +561,11 @@ public class RoccaParametersDialog extends PamDialog implements ActionListener, 
         sightingThreshold = new JTextField(3);
         sightingThreshold.setMaximumSize(new Dimension(40, sightingThreshold.getHeight()));
         JLabel schoolUnits = new JLabel("%");
+        absStrongThreshold = new JRadioButton("Threshold is absolute value",true);
+        diffStrongThreshold = new JRadioButton("Threshold is difference between highest and 2nd highest votes");
+        strongThreshold = new ButtonGroup();
+        strongThreshold.add(absStrongThreshold);
+        strongThreshold.add(diffStrongThreshold);
         GroupLayout thresholdLayout = new GroupLayout(thresholdSubPanel);
         thresholdSubPanel.setLayout(thresholdLayout);
         thresholdLayout.setAutoCreateGaps(true);
@@ -572,6 +580,10 @@ public class RoccaParametersDialog extends PamDialog implements ActionListener, 
                     .addComponent(schoolLbl)
                     .addComponent(sightingThreshold)
                     .addComponent(schoolUnits))
+                .addGroup(thresholdLayout.createSequentialGroup()
+                		.addComponent(absStrongThreshold))
+                .addGroup(thresholdLayout.createSequentialGroup()
+                		.addComponent(diffStrongThreshold))
         );
         thresholdLayout.setVerticalGroup(
             thresholdLayout.createSequentialGroup()
@@ -583,6 +595,10 @@ public class RoccaParametersDialog extends PamDialog implements ActionListener, 
                     .addComponent(schoolLbl)
                     .addComponent(sightingThreshold)
                     .addComponent(schoolUnits))
+                .addGroup(thresholdLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                		.addComponent(absStrongThreshold))
+                .addGroup(thresholdLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                		.addComponent(diffStrongThreshold))
         );
         thresholdLayout.linkSize(SwingConstants.HORIZONTAL, whistleLbl, schoolLbl);
 		classifierPanel.add(thresholdSubPanel);
@@ -866,7 +882,8 @@ public class RoccaParametersDialog extends PamDialog implements ActionListener, 
 		setDialogComponent(tabbedPane);
 	}
 
-    public void actionPerformed(ActionEvent e) {
+    @Override
+	public void actionPerformed(ActionEvent e) {
         if (e.getSource() == outputDirectoryButton) {
             selectDirectory();
         } else if (e.getSource() == outputContourStatsFileButton) {
@@ -1311,6 +1328,13 @@ public class RoccaParametersDialog extends PamDialog implements ActionListener, 
 		ancCalcs4Clicks.setSelected(roccaParameters.runAncCalcs4Clicks); 	// serialVersionUID=22 2015/06/13 added
 		ancCalcs4Whistles.setSelected(roccaParameters.runAncCalcs4Whistles); 	// serialVersionUID=22 2015/06/13 added
 		trimWav.setSelected(roccaParameters.isTrimWav());
+		if (roccaParameters.isStrongWhistleDiff()) {
+			diffStrongThreshold.setSelected(true);
+			absStrongThreshold.setSelected(false);
+		} else {
+			diffStrongThreshold.setSelected(false);
+			absStrongThreshold.setSelected(true);
+		}
         classificationThreshold.setText(String.format("%d",
                 roccaParameters.getClassificationThreshold()));
         sightingThreshold.setText(String.format("%d",
@@ -1637,6 +1661,12 @@ public class RoccaParametersDialog extends PamDialog implements ActionListener, 
 			roccaParameters.setGpsSource(gpsSourcePanel.getSourceName());
 		}
 		
+		if(diffStrongThreshold.isSelected()) {
+			roccaParameters.setStrongWhistleDiff(true);
+		} else {
+			roccaParameters.setStrongWhistleDiff(false);
+		}
+		
 		
 		// will throw an exception if the number format of any of the parameters is invalid, 
 		// so catch the exception and return false to prevent exit from the dialog. 
@@ -1720,7 +1750,7 @@ public class RoccaParametersDialog extends PamDialog implements ActionListener, 
 	    	}
 	    } else if (e.getSource() == gpsButton) {
 	    	if (e.getStateChange()==ItemEvent.SELECTED) {
-		    	roccaParameters.setUseGPS(true);;
+		    	roccaParameters.setUseGPS(true);
 	    	} else {
 		    	roccaParameters.setUseGPS(false);
 	    	}

@@ -7,6 +7,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import PamView.dialog.PamDialog;
@@ -27,7 +28,7 @@ public class NIPlaybackSettingsPanel implements PamDialogPanel {
 		mainPanel.setBorder(new TitledBorder("NI Play options"));
 		GridBagConstraints c = new PamGridBagContraints();
 		
-		mainPanel.add(new JLabel("Output level ", JLabel.RIGHT), c);
+		mainPanel.add(new JLabel("Output level ", SwingConstants.RIGHT), c);
 		c.gridx++;
 		mainPanel.add(outputLevel = new JComboBox<>(), c);
 		c.gridx++;
