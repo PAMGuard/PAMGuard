@@ -2,15 +2,26 @@ package cpod.fx;
 
 import java.util.ArrayList;
 
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+
 import org.controlsfx.control.RangeSlider;
 
+import PamView.panel.PamPanel;
+import cpod.CPODClassification.CPODSpeciesType;
+import cpod.CPODUtils;
 import cpod.dataSelector.CPODDataSelector;
 import cpod.dataSelector.StandardCPODFilterParams;
+import export.MLExport.MLCPODExport;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamVBox;
+import pamViewFX.fxNodes.utilityPanes.PamToggleSwitch;
 import pamViewFX.fxSettingsPanes.DynamicSettingsPane;
 
 /**
@@ -31,7 +42,11 @@ public class CPODDataSelectorPane extends DynamicSettingsPane<Boolean> {
 	 */
 	private ArrayList<StandardCPODFilterPane> standardCPODFilterPanes = new ArrayList<StandardCPODFilterPane>(); 
 
-	Pane mainPane; 
+	Pane mainPane;
+
+	private PamToggleSwitch clcikTrainCheckBox;
+
+	private ComboBox<String> speciesSelectBox; 
 
 	public CPODDataSelectorPane(CPODDataSelector cpodDataSelector) {
 		super(null);
@@ -50,6 +65,35 @@ public class CPODDataSelectorPane extends DynamicSettingsPane<Boolean> {
 
 			vBox.getChildren().add(standardCPODFilterPanes.get(i)); 
 		}
+		
+		
+		PamHBox speciesBox = new PamHBox(); 
+		speciesBox.setSpacing(5);
+		speciesBox.setAlignment(Pos.CENTER_LEFT);
+		
+		this.clcikTrainCheckBox = new PamToggleSwitch("Select click trains only: Species"); 
+		clcikTrainCheckBox.selectedProperty().addListener((obsVal, oldVal, newVal)->{
+			speciesSelectBox.setDisable(!newVal); 
+			this.getParams(true);
+			notifySettingsListeners(); 
+		});
+		this.speciesSelectBox = new ComboBox<String>(); 
+		speciesSelectBox.setOnAction((action)->{
+			this.getParams(true);
+			notifySettingsListeners(); 
+
+		});
+
+		//CPODs and FPODs have set species identifiers.
+		this.speciesSelectBox.getItems().add("All");
+		this.speciesSelectBox.getItems().add("Unknown");
+		this.speciesSelectBox.getItems().add("NBHF");
+		this.speciesSelectBox.getItems().add("Dolphins");
+		this.speciesSelectBox.getItems().add("Sonar");
+		
+		speciesBox.getChildren().addAll(clcikTrainCheckBox, speciesSelectBox); 
+		
+		vBox.getChildren().add(speciesBox); 
 
 		return vBox; 
 	}
@@ -60,7 +104,11 @@ public class CPODDataSelectorPane extends DynamicSettingsPane<Boolean> {
 		for (int i=0; i<cpodDataSelector.getParams().cpodDataFilterParams.size(); i++) {
 			standardCPODFilterPanes.get(i).getParams(cpodDataSelector.getParams().cpodDataFilterParams.get(i)); 
 		}
-
+		
+		cpodDataSelector.getParams().selectClickTrain = clcikTrainCheckBox.isSelected();
+		 
+		cpodDataSelector.getParams().speciesID = getSpecies(speciesSelectBox.getSelectionModel().getSelectedIndex());
+		
 		return true;
 	}
 
@@ -69,7 +117,23 @@ public class CPODDataSelectorPane extends DynamicSettingsPane<Boolean> {
 		for (int i=0; i<cpodDataSelector.getParams().cpodDataFilterParams.size(); i++) {
 			standardCPODFilterPanes.get(i).setParams(cpodDataSelector.getParams().cpodDataFilterParams.get(i)); 
 		}
+		
+		clcikTrainCheckBox.setSelected(cpodDataSelector.getParams().selectClickTrain);
+		speciesSelectBox.getSelectionModel().select(getSpeciesIndex(cpodDataSelector.getParams().speciesID));
+		
+		speciesSelectBox.setDisable(!cpodDataSelector.getParams().selectClickTrain); 
+		
+	}
+	
+	protected static int getSpeciesIndex(CPODSpeciesType speciesType) {
+		if (speciesType==null) return 0;
+		else return MLCPODExport.getCPODSpecies(speciesType)+1;
+	}
 
+	
+	protected static CPODSpeciesType getSpecies(int selectedIndex) {
+		if (selectedIndex==0) return null;
+		else return CPODUtils.getCPODSpecies((short) (selectedIndex-1)); 
 	}
 
 	@Override
@@ -169,7 +233,7 @@ public class CPODDataSelectorPane extends DynamicSettingsPane<Boolean> {
 		}
 
 		public void setParams(StandardCPODFilterParams standardCPODFilterParams) {
-			System.out.println("StandardCPODFilterPane. SET PARAMS: min: " + standardCPODFilterParams.min + "  " + standardCPODFilterParams.max); 
+//			System.out.println("StandardCPODFilterPane. SET PARAMS: min: " + standardCPODFilterParams.min + "  " + standardCPODFilterParams.max); 
 			//set the parameters. 
 			rangeSlider.setHighValue(standardCPODFilterParams.max);
 			rangeSlider.setLowValue(standardCPODFilterParams.min);

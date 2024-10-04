@@ -9,8 +9,8 @@ import pamMaths.PamVector;
  * more concrete locators, in particular the StaticHydrophoneLocator
  * and StraightHydrophoneLocators
  * @author Doug Gillespie
+ * @see Array.ThreadingHydrophoneLocator
  * @see Array.StraightHydrophoneLocator
- * @see Array.StaticHydrophoneLocator
  *
  */
 

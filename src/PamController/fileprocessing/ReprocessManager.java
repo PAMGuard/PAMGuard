@@ -184,10 +184,14 @@ public class ReprocessManager {
 		}
 		InputStoreInfo inputInfo = null;
 		boolean OK = true;
+		long procStartTime = deleteFrom;
+		if (choice == ReprocessStoreChoice.STARTNORMAL) {
+			procStartTime = 0;
+		}
 		for (PamControlledUnit aPCU : inputStores) {
 			DataInputStore inputStore = (DataInputStore) aPCU;
-			OK &= inputStore.setAnalysisStartTime(deleteFrom);
-//			System.out.println("Input store info: " + inputInfo);
+			OK &= inputStore.setAnalysisStartTime(procStartTime);
+			System.out.println("Input store info: " + inputInfo);
 		}
 		return OK;
 	}

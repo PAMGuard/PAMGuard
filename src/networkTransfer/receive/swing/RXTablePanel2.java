@@ -240,17 +240,23 @@ public class RXTablePanel2 extends DataBlockTableView<BuoyStatusDataUnit>{
 	}
 
 	private Integer getExtraInfoIndex(int column) {
+		if (networkReceiver == null) {
+			return null;
+		}
 		column -= (colNames1.length);
 		return (column >= 0 & column < networkReceiver.getExtraTableInfo().size() ? column : null);
 	}
 
 	private Integer getCols2Index(int column) {
+		if (networkReceiver == null) {
+			return null;
+		}
 		column -= (colNames1.length + networkReceiver.getExtraTableInfo().size());
 		return (column >= 0 & column < colNames2.length ? column : null);
 	}
 
 	private Integer getDatablockIndex(int column) {
-		if (networkReceiver.getRxDataBlocks() == null) {
+		if (networkReceiver == null || networkReceiver.getRxDataBlocks() == null) {
 			return null;
 		}
 		column -= (colNames1.length + networkReceiver.getExtraTableInfo().size() + colNames2.length);

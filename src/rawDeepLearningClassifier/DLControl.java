@@ -69,7 +69,7 @@ import rawDeepLearningClassifier.segmenter.SegmenterProcess;
  * Currently the jdl4pam library supports three types of deep learning model,
  * Generic, AnimalSpot and Ketos.
  * <p>
- * <li>Generic</li>
+ * Generic<br>
  * Generic models allows users to load almost any type of model and manually
  * assign the types of data transform and input shape. This means that the user
  * has to get the settings exactly right or the model will not work. It is the
@@ -77,14 +77,14 @@ import rawDeepLearningClassifier.segmenter.SegmenterProcess;
  * However, users can export a settings file which makes it easier to set up for
  * another user.
  * <p><p>
- * <li>AnimalSpot </li>
+ * AnimalSpot <br>
  * AnimalSpot is a framework for training acoustic deep learning
  * models using Pytorch. Users can load a .py model which contains embedded
  * metadata so that PMAGuard knows the exact transforms required for the model
  * input. This makes deploying models in PAMGuard very easy - users require little
  * or no experience to get this working.
  * <p>
- * <li>Ketos</li>
+ * Ketos<br>
  * Ketos is a framework for training acoustic deep learning models
  * using TensorFlow. Users can load a .ktpb model which contains embedded
  * metadata so that PMAGuard knows the exact transforms required for the model

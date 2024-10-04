@@ -11,18 +11,20 @@ import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollBar;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import PamguardMVC.PamDataBlock;
 import dataMap.DataMapControl;
+import pamViewFX.PamGuiManagerFX;
+import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
+import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamColorsFX;
 import pamViewFX.fxNodes.PamScrollPane;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.pamAxis.PamDateAxis;
-import pamViewFX.fxNodes.pamScrollers.acousticScroller.ScrollBarPane;
+
 
 public class ScrollingDataPaneFX extends PamBorderPane {
 
@@ -36,6 +38,8 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	 * The default expanded hieght for each pane. 
 	 */
 	private static final int DATASTREAMPANE_HEIGHT = 220;
+
+	private static final double SCROLL_BAR_INCREMENT = 0.05; //10% movement when scroll bnutton pressed
 
 	/**
 	 * Reference to the DataMapControl.
@@ -58,7 +62,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	private ArrayList<DataStreamPaneFX> dataStreamPanels = new ArrayList<DataStreamPaneFX>();
 
 	/**
-	 * Split pane whihc holds different graphs. 
+	 * Split pane which holds different graphs. 
 	 */
 	private PamVBox dataPanePanes;
 
@@ -229,8 +233,45 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 
 		holder.setCenter(timeScrollBar);
 		holder.setBottom(timeLabelPane);
+		
+		PamButton scrollLeft = new PamButton(); 
+		scrollLeft.setOnAction((a)->{
+			 /*
+			  * The distance is a percentage of the
+			 * visible distance. So 1. means the scroll bar will move by the visible
+			 * distance. 0.5 means half the visible distance and so on. Negative means move
+			 * left and positive means move right/
+			 */
+			moveScrollBar(-timeScrollBar.getVisibleAmount()*SCROLL_BAR_INCREMENT);
+		});
+		scrollLeft.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-left", PamGuiManagerFX.iconSize));
+		scrollLeft.prefHeightProperty().bind(timeScrollBar.heightProperty());
+
+		PamButton scrollRight = new PamButton(); 
+		scrollRight.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-right", PamGuiManagerFX.iconSize));
+		scrollRight.setOnAction((a)->{
+			moveScrollBar(timeScrollBar.getVisibleAmount()*SCROLL_BAR_INCREMENT);
+		});
+		scrollRight.prefHeightProperty().bind(timeScrollBar.heightProperty());
+		
+		holder.setLeft(scrollLeft);
+		holder.setRight(scrollRight);
 
 		return holder; 
+	}
+
+	/**
+	 * Move the scroll bar by a a number fo seconds. Positive means move forward in
+	 * time, negative means move back in time.
+	 * 
+	 * @param the distance to move as a percentage of the visible amount
+	 */
+	private void moveScrollBar(double seconds) {
+		
+		double newValue =  timeScrollBar.getCurrentValue()+seconds;
+	
+		//this should trigger all relevant repaint listeners etc. 
+		timeScrollBar.setCurrentValue(newValue);
 	}
 
 	/**
@@ -262,10 +303,11 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	public void notifyScrollChange() {
 		// tell all panlettes to repaint. 
 		for (int i = 0; i < dataStreamPanels.size(); i++) {
-			dataStreamPanels.get(i).scrollChanged();
+			if (!dataStreamPanels.get(i).isCollapsed()) {
+				dataStreamPanels.get(i).scrollChanged();
+			}
 		}
 //		settingsStrip.scrollChanged();
-
 		updateDateAxis();
 	}
 
@@ -442,9 +484,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	public double getPixelsPerHour() {
 //		System.out.println("Pixels per hour: " + dataMapControl.dataMapParameters.getPixeslPerHour() + " " + this.getPlotWidth()/(this.timeScrollBar.getVisibleAmount()/1000./3600.));
 		//return dataMapControl.dataMapParameters.getPixeslPerHour();
-
 		return this.getPlotWidth()/(this.timeScrollBar.getVisibleAmount()/1000./3600.);
-
 	}
 
 	/**
@@ -487,14 +527,9 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 		return dataMapPaneFX;
 	}
 
-//	int lastHScaleChoice=-1; 
-//	public void scaleChange() {
-//		if (lastHScaleChoice != dataMapControl.dataMapParameters.hScaleChoice) {
-//			lastHScaleChoice = dataMapControl.dataMapParameters.hScaleChoice;
-//			setupScrollBar();
-//		}
-//		this.notifyScrollChange();
-//	}
+	public void scaleChange() {
+		this.notifyScrollChange();
+	}
 
 	/**
 	 * Get the current number of data stream panes
@@ -509,11 +544,32 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	 * @param n - the index of the data stream pane
 	 * @return the data stream pane or null if the index is out of bounds. 
 	 */
-	public DataStreamPaneFX getDataSyreamPane(int n) {
-		if (n<this.dataStreamPanels.size()) {
+	public DataStreamPaneFX getDataStreamPane(int n) {
+		if (n>=0 && n<this.dataStreamPanels.size()) {
 			return dataStreamPanels.get(n);
 		}
 		else return null;
+	}
+
+	public DataStreamPaneFX getDataStreamPane(DataMapInfo selectedItem) {
+		if (selectedItem==null) return null;
+		for (int i=0; i<dataStreamPanels.size(); i++) {
+			if (selectedItem.equals(dataStreamPanels.get(i).getDataName())) {
+				return dataStreamPanels.get(i);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Get the data map parameters associated with the FX GUI. Note these are
+	 * separate from the parameters in the DataMapControls which are for the default
+	 * swing display (not great)
+	 * 
+	 * @return the current data map parameters.
+	 */
+	public DataMapParametersFX getDataMapParams() {
+		return this.dataMapPaneFX.getDataMapParams();
 	}
 	
 }

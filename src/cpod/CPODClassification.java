@@ -16,7 +16,7 @@ public class CPODClassification {
 		public enum CPODSpeciesType{NBHF, DOLPHIN, SONAR, UNKNOWN}
 		
 		/**
-		 * A unique ID for the click trian within the file
+		 * A unique ID for the click train within the file
 		 */
 		public int clicktrainID = 0;
 		

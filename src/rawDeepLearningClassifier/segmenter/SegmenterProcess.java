@@ -167,6 +167,11 @@ public class SegmenterProcess extends PamProcess {
 			nextRawChunks = new GroupedRawData[chanGroups.length][]; 
 			segmenterDetectionGroup = new SegmenterDetectionGroup[chanGroups.length];
 		}
+		
+		
+		//reset segments - important otherwise PG will crash if the wav file is reset. 
+		segmentStart=-1;
+		segmenterEnd=-1; 
 
 
 		//set up connection to the parent
@@ -254,7 +259,7 @@ public class SegmenterProcess extends PamProcess {
 
 		//TODO
 		//this contains no raw data so we are branching off on a completely different processing path here.
-		//Whislte data units are saved to a buffer and then fed to the deep learning algorithms
+		//Whistle data units are saved to a buffer and then fed to the deep learning algorithms
 		
 		int[] chanGroups = dlControl.getDLParams().groupedSourceParams.getChannelGroups();
 		
@@ -265,9 +270,9 @@ public class SegmenterProcess extends PamProcess {
 				break;
 			}
 		}
-		
-		//FIXME - TWEMP
-		index =0;
+
+//		//FIXME - TWEMP
+//		index =0;
 		
 //		System.out.println("Whistle data: " + ((dataUnit.getTimeMilliseconds()-firstClockUpdate)/1000.) + "s " + chanGroups.length +  "  " +  index + "  " + dataUnit.getChannelBitmap());
 //		PamArrayUtils.printArray(chanGroups);
@@ -287,7 +292,8 @@ public class SegmenterProcess extends PamProcess {
 			}
 			
 			while(!detectionInSegment(dataUnit,  segmentStart,  segmenterEnd)) {
-				nextGroupSegment( index);
+				System.out.println("Detection in segment: " + segmentStart); 
+				nextGroupSegment(index);
 			}
 		}
 		
@@ -736,7 +742,7 @@ public class SegmenterProcess extends PamProcess {
 
 		//add some extra metadata to the chunks 
 		packageSegmenterDataUnit(currentRawChunks[i]); 
-//		System.out.println("Segmenter process: Save current segments to datablock: " + currentRawChunks[i].getParentDataUnit().getUID() + " " + i + currentRawChunks[i].getRawData()[0][0]); 
+		//System.out.println("Segmenter process: Save current segments to datablock: " + currentRawChunks[i].getParentDataUnit().getUID() + " " + i + currentRawChunks[i].getRawData()[0][0]); 
 
 		//send the raw data unit off to be classified!
 

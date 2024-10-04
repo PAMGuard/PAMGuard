@@ -1,9 +1,12 @@
 package Localiser;
 
+import java.awt.Window;
 import java.io.Serializable;
 
 import PamDetection.LocContents;
 import PamDetection.LocalisationInfo;
+import tethys.localization.LocalizationBuilder;
+import tethys.swing.export.LocalizationOptionsPanel;
 
 public interface LocalisationAlgorithmInfo {
 	
@@ -27,5 +30,13 @@ public interface LocalisationAlgorithmInfo {
 	 * @return algorithm parameters object. Might be null;
 	 */
 	public Serializable getParameters();
+	
+	/**
+	 * Get options panel to either build into the export dialog or to show as a separate
+	 * dialog (in which case export wizard will show a button). Can be null if no options. 
+	 * @param locBuilder
+	 * @return options panel or null if there are no options. 
+	 */
+	public LocalizationOptionsPanel getLocalizationOptionsPanel(Window parent, LocalizationBuilder locBuilder);
 	
 }

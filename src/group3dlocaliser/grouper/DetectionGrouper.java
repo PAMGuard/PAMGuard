@@ -265,6 +265,9 @@ public class DetectionGrouper {
 	 * @param motherGroup
 	 */
 	private void processFirstGroup(FirstGrouping motherGroup) {
+		if (motherGroup == null) {
+			return;
+		}
 		List<PamDataUnit> dataUnits = motherGroup.getDataUnits();
 //		for (int i = 0; i < dataUnits.size(); i++) {
 //			if (dataUnits.get(i).getUID() == 291039474) {
@@ -422,7 +425,7 @@ public class DetectionGrouper {
 			}
 		}
 		if (nAccepted > 0) {
-			System.out.printf("Accepted %d of %d data combinations\n", detectionGroupedSet.getNumGroups(), totalCombinations);
+//			System.out.printf("Accepted %d of %d data combinations\n", detectionGroupedSet.getNumGroups(), totalCombinations);
 			detectionGroupMonitor.newGroupedDataSet(detectionGroupedSet);
 		}
 

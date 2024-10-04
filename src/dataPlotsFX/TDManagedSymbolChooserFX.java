@@ -53,8 +53,9 @@ public class TDManagedSymbolChooserFX implements TDSymbolChooserFX{
 			symbol =pamSymbolChooser.getPamSymbolFX(dataInfoFX.getTDGraph().getGraphProjector(), dataUnit);
 		}
 		else if (type==TDSymbolChooserFX.HIGHLIGHT_SYMBOL) {
-			symbol=ClickSymbolChooserFX.highLightClick; 
+			symbol=ClickSymbolChooserFX.highLightClick;
 		}
+		
 		return symbol; 
 	}
 	

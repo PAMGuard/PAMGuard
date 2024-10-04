@@ -588,6 +588,11 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 	}
 
 	@Override
+	public LocalisationAlgorithm getLocalisationAlgorithm() {
+		return pamDataBlock.getLocalisationAlgorithm();
+	}
+
+	@Override
 	public TethysLocalisationInfo getLocalisationInfo() {
 		LocalisationInfo locCont = pamDataBlock.getLocalisationContents();
 		if (locCont == null || locCont.getLocContent() == 0) {

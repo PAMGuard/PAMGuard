@@ -64,8 +64,11 @@ import tethys.species.SpeciesMapItem;
 
 /**
  * Class to build a single localisation document during export. 
- * Works hand in had with the global LocalisationHandler and also 
- * with other functions it's going to find in the datablock and whatever localisation 
+ * Works hand in had with the global LocalisationHandler and also with 
+ * the LocalizationCreator that should be part of each localisation algorithm.
+ * <p>To understand the difference, this contains most of the required functionality
+ * but by having the interface on specific algorithms, it's easy for them to override
+ * that on a localiser specific basis.  
  * algorithm was used. 
  * @author dg50
  *
@@ -244,8 +247,8 @@ public class LocalizationBuilder {
 				if (ll != null) {
 					GpsData pos = ll.getGpsData();
 					if (pos != null) {
-						referenceFrame.setLatitude(TethysLatLong.formatLatitude(pos.getLatitude()));
-						referenceFrame.setLongitude(TethysLatLong.formatLongitude(pos.getLongitude()));
+						referenceFrame.setLatitude(TethysLatLong.formatLatitude(pos.getLatitude(),TethysLatLong.mmDecimalPlaces));
+						referenceFrame.setLongitude(TethysLatLong.formatLongitude(pos.getLongitude(),TethysLatLong.mmDecimalPlaces));
 						referenceFrame.setDatum(String.format("Altitude %3.2fm", pos.getHeight()));
 					}
 				}
@@ -457,7 +460,7 @@ public class LocalizationBuilder {
 			deg = PamUtils.constrainedAngle(deg);
 			deg = AutoTethysProvider.roundDecimalPlaces(deg, 2);
 			return deg;
-		}
+		}	
 
 		/**
 		 * Convert a vertical angle from radians to degrees and round. 

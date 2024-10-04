@@ -38,7 +38,7 @@ public class WavOptionsPanel extends PamPanel {
 		
 		this.setLayout((new GridBagLayout()));
 
-		addComponent(this, zeroPad = new JRadioButton("Zero Pad"), c);
+		addComponent(this, zeroPad = new JRadioButton("Zero pad"), c);
 		
 		c.gridx++;
 		

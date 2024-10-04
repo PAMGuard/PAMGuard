@@ -2,15 +2,14 @@ package cpod.dataSelector;
 
 import PamController.PamControlledUnit;
 import PamView.dialog.PamDialogPanel;
-import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataSelector.DataSelectParams;
 import PamguardMVC.dataSelector.DataSelector;
-import clickDetector.alarm.ClickAlarmParameters;
 import cpod.CPODClick;
 import cpod.CPODClickDataBlock;
-import cpod.CPODControl;
+import cpod.CPODClickTrainDataUnit;
 import cpod.fx.CPODDataSelectorPane;
+import cpod.fx.CPODDataSelectorPanel;
 import pamViewFX.fxSettingsPanes.DynamicSettingsPane;
 
 /**
@@ -35,7 +34,9 @@ public class CPODDataSelector extends DataSelector {
 	/**
 	 * The cpod data selector pane. 
 	 */
-	private CPODDataSelectorPane cPODDataSelectorPane;
+	private CPODDataSelectorPane cPODDataSelectorPaneFX;
+
+	private CPODDataSelectorPanel cPODDataSelectorPanel;
 
 	public CPODDataSelector(PamControlledUnit cpodControl, CPODClickDataBlock cpodDataBlock, String selectorName,
 			boolean allowScores) {
@@ -60,16 +61,18 @@ public class CPODDataSelector extends DataSelector {
 
 	@Override
 	public PamDialogPanel getDialogPanel() {
-		// TODO Auto-generated method stub
-		return null;
+		if (cPODDataSelectorPanel==null) {
+			cPODDataSelectorPanel = new CPODDataSelectorPanel(this);
+		}
+		return cPODDataSelectorPanel;
 	}
 
 	@Override
 	public DynamicSettingsPane<Boolean> getDialogPaneFX() {
-		if (cPODDataSelectorPane==null) {
-			cPODDataSelectorPane = new CPODDataSelectorPane(this);
+		if (cPODDataSelectorPaneFX==null) {
+			cPODDataSelectorPaneFX = new CPODDataSelectorPane(this);
 		}
-		return cPODDataSelectorPane;
+		return cPODDataSelectorPaneFX;
 	}
 
 	@Override
@@ -83,6 +86,16 @@ public class CPODDataSelector extends DataSelector {
 			};
 			//could add an if statement for CPOD parameters type here to use a more sophisticated filter 
 			//e.g. the FPOD data has waveforms so when that is implemented may want extra bits and pieces. 
+		}
+		
+		if (dataSelectorParams.selectClickTrain) {
+			CPODClickTrainDataUnit cpodClickTrain = cpodClick.getCPODClickTrain();
+			if (cpodClickTrain==null) return 0;
+			
+			if (dataSelectorParams.speciesID != null && !dataSelectorParams.speciesID.equals(cpodClickTrain.getSpecies())) {
+				return 0;
+			}
+			
 		}
 
 		return 1;

@@ -497,13 +497,16 @@ public class PamguardXMLWriter implements PamSettings {
 		// so far, everything above is the same as for the Decimus output. Now it changes however
 		// since we're going to add a whole load of settings 0 - many depending on the module ...
 		if (toWrite != null) {
+			ArrayList<Object> repeatStopper = new ArrayList<Object>();
 			Element settingEl = doc.createElement("CONFIGURATION");
 			moduleData.appendChild(settingEl);
 			for (int i = 0; i < toWrite.length; i++) {
 				if (wantObject(toWrite[i]) == false) {
 					continue;
 				}
-				Element setEl = writeSettings(doc, toWrite[i], new ArrayList<Object>());
+//				System.out.println("Writing settings : " + toWrite[i].toString());
+				Element setEl = writeSettings(doc, toWrite[i], repeatStopper);
+//				System.out.println("Repeat stopper has x elements: " + repeatStopper.size());
 				if (setEl != null) {
 					settingEl.appendChild(setEl);
 				}
