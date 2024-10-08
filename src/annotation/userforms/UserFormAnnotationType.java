@@ -17,7 +17,7 @@ import loggerForms.FormDescription;
 import loggerForms.FormsControl;
 import loggerForms.LoggerForm;
 
-public class UserFormAnnotationType extends DataAnnotationType<UserFormAnnotation> {
+public class UserFormAnnotationType extends DataAnnotationType<UserFormAnnotation<?>> {
 
 
 	private UserFormAnnotationOptions userFormAnnotationOptions;
@@ -201,7 +201,7 @@ public class UserFormAnnotationType extends DataAnnotationType<UserFormAnnotatio
 	}
 
 	@Override
-	public AnnotationBinaryHandler<UserFormAnnotation> getBinaryHandler() {
+	public AnnotationBinaryHandler<UserFormAnnotation<?>> getBinaryHandler() {
 		if (userFormBinaryHandler == null) {
 			synchronized (this) {
 				if (userFormBinaryHandler == null) {

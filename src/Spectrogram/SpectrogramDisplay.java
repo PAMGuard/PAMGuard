@@ -809,7 +809,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 		createColours();
 
 		timeAxis = new PamAxis(10, 0, imageWidth, 0, 0,
-				spectrogramParameters.displayLength, true, "seconds", "%3.1f");
+				spectrogramParameters.displayLength, true, "Time (s)", "%3.1f");
 		spectrogramAxis.setNorthAxis(timeAxis);
 
 		if (rangeSpinner != null) {
@@ -817,13 +817,15 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 		}
 
 		double fScale = 1;
+		String westLabel = "Frequency (Hz)";
 		if (spectrogramParameters.frequencyLimits[1] > 2000) {
 			fScale = 1000;
+			westLabel = "Frequency (kHz)";
 		}
 
 		frequencyAxis = new PamAxis(0, 200, 0, 10,
 				spectrogramParameters.frequencyLimits[0] / fScale,
-				spectrogramParameters.frequencyLimits[1] / fScale, true, "",
+				spectrogramParameters.frequencyLimits[1] / fScale, true, westLabel,
 				null);
 		frequencyAxis.setFractionalScale(true);
 		frequencyAxis.setCrampLabels(true);
@@ -1696,9 +1698,11 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 			// setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 10));
 			setLayout(new BorderLayout());
 			add(new AmplitudeBar(), BorderLayout.CENTER);
+
+			String label = String.format("PSD (%s)", PamController.getInstance().getGlobalMediumManager().getdBPSDString());
 			amplitudeAxis = new PamAxis(0, 200, 0, 10,
 					spectrogramParameters.amplitudeLimits[0],
-					spectrogramParameters.amplitudeLimits[1], false, "", "%3.0f");
+					spectrogramParameters.amplitudeLimits[1], false, label, "%3.0f");
 			setEastAxis(amplitudeAxis);
 		}
 

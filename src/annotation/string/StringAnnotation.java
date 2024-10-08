@@ -3,11 +3,11 @@ package annotation.string;
 import annotation.DataAnnotation;
 import annotation.DataAnnotationType;
 
-public class StringAnnotation extends DataAnnotation {
+public class StringAnnotation<T extends DataAnnotationType<?>> extends DataAnnotation<T> {
 
 	private String string; 
 	
-	public StringAnnotation(DataAnnotationType dataAnnotationType) {
+	public StringAnnotation(T dataAnnotationType) {
 		super(dataAnnotationType);
 	}
 

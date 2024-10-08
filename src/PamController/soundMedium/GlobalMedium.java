@@ -201,6 +201,50 @@ public class GlobalMedium {
 	}
 
 	/**
+	 * Get a string description of the dB reference for a power spectral density.
+	 * @param currentMedium - the current medium.
+	 * @return string of dB reference
+	 */
+	public static String getdBPSDString(SoundMedium currentMedium) {
+		String zString;
+		switch (currentMedium) {
+			case Air:
+				zString =  "dB re 400\u00B5Pa\u00B2/Hz";
+				break;
+			case Water:
+				zString =  "dB re 1\u00B5Pa\u00B2/Hz";
+				break;
+			default:
+				zString =  "dB re 1\u00B5Pa\u00B2/Hz";
+				break;
+		}
+
+		return zString;
+	}
+
+	/**
+	 * Get a string description of the dB reference for a sound exposure level.
+	 * @param currentMedium - the current medium.
+	 * @return string of dB reference
+	 */
+	public static String getdBSELString(SoundMedium currentMedium) {
+		String zString;
+		switch (currentMedium) {
+			case Air:
+				zString =  "dB re 400\u00B5Pa\u00B2s";
+				break;
+			case Water:
+				zString =  "dB re 1\u00B5Pa\u00B2s";
+				break;
+			default:
+				zString =  "dB re 1\u00B5Pa\u00B2s";
+				break;
+		}
+
+		return zString;
+	}
+
+	/**
 	 * Get the z coefficient value for displays. Height are always stored so
 	 * that +z points up (i.e. -g). In display height is input as depth as so must
 	 * be multiplied by -1 before being stored. In air height is more sensible to

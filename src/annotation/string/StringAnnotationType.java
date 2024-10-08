@@ -13,7 +13,7 @@ import annotation.handler.AnnotationOptions;
  * @author Doug Gillespie
  *
  */
-public class StringAnnotationType extends DataAnnotationType<StringAnnotation> {
+public class StringAnnotationType extends DataAnnotationType<StringAnnotation<?>> {
 
 	private String annotationName;
 	private StringSQLLogging sqlAddon;
