@@ -91,7 +91,7 @@ public class OneBandDisplayDialog extends PamDialog {
 		for (int i = 0; i < OneBandControl.NMEASURES; i++) {
 			c.gridx = 0;
 			c.gridy++;
-			addComponent(symPanel, showMeasure[i] = new JCheckBox("Show " + OneBandControl.measureNames[i]), c);
+			addComponent(symPanel, showMeasure[i] = new JCheckBox("Show " + OneBandControl.getMeasurementName(i)), c);
 		}
 		tabPane.add(symPanel, "Symbols");
 		
