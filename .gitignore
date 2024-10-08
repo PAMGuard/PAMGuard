@@ -19,6 +19,7 @@
 *.nar
 *.ear
 *.zip
+!src/test/**/*.zip
 *.tar.gz
 *.rar
 *.dll
