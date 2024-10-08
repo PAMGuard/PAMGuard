@@ -162,6 +162,11 @@ public class SpectrogramParameters extends UserFrameParameters implements Serial
 	
 	public boolean[] useSpectrogramMarkObserver;
 
+	/**
+	 * apply meny selections to all channels 
+	 */
+	public boolean applySelectAll;
+
 	public SpectrogramParameters() {
 		boundingRectangle.x = (int) (Math.random() * 300);
 		boundingRectangle.y = (int) (Math.random() * 200);
