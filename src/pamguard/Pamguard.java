@@ -38,9 +38,13 @@ import java.util.TimeZone;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import com.formdev.flatlaf.FlatLightLaf;
+
 import Acquisition.FolderInputSystem;
 import PamController.PamController;
 import PamController.PamGUIManager;
+import PamController.PamRunModeDialog;
+import PamController.PamRunModeParams;
 import PamController.PamSettingManager;
 import PamController.PamguardVersionInfo;
 import PamController.pamBuoyGlobals;
@@ -91,6 +95,9 @@ public class Pamguard {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		
+		FlatLightLaf.setup();
+
 
 		Debug.setPrintDebug(false); // make sure the class instantiates static members. 
 		try {			
@@ -100,9 +107,8 @@ public class Pamguard {
 			else {
 				//do not use the mac version...it's awful
 				//UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-
-				UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-			}
+			    UIManager.setLookAndFeel(new FlatLightLaf() );		
+			    }
 			//		    for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 			//		        if ("Nimbus".equals(info.getName())) {
 			//		            UIManager.setLookAndFeel(info.getClassName());
@@ -120,7 +126,9 @@ public class Pamguard {
 			//			  System.out.println(keys.nextElement() + ": " + ui.get(nxt));
 			//			}
 			//			PamColors.getInstance().setColors();
-		} catch (Exception e) { }
+		} catch (Exception e) { 
+			e.printStackTrace();
+		}
 
 		int runMode = PamController.RUN_NORMAL;
 		String InputPsf = "NULL";
@@ -162,6 +170,20 @@ public class Pamguard {
 			String anArg;
 			while (iArg < nArgs) {
 				anArg = args[iArg++];
+				
+				if (anArg.equalsIgnoreCase("-c")) {
+					//the user chooses which run mode
+					PamRunModeParams runbModeParams = PamRunModeDialog.showDialog(null);
+					if (runbModeParams==null || runbModeParams.runMode<0) {
+						//use cancelled
+						System.exit(0);
+					}
+					else {
+						//set anArg to whatever the user chose
+						anArg = runbModeParams.getRunString();
+					}
+				}
+				
 				if (anArg.equalsIgnoreCase("-v")) {
 					runMode = PamController.RUN_PAMVIEW;
 					System.out.println("PAMGUARD Viewer");

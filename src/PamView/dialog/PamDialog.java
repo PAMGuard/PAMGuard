@@ -42,6 +42,7 @@ import PamView.ClipboardCopier;
 import PamView.PamColors;
 import PamView.ScreenSize;
 import PamView.help.PamHelp;
+import PamView.PamIcon;
 import gpl.GPLParameters;
 
 /**
@@ -134,7 +135,7 @@ abstract public class PamDialog extends JDialog {
 		setAlwaysOnTop(parentFrame == null);
 
 		setIconImage(new ImageIcon(ClassLoader
-				.getSystemResource("Resources/pamguardIcon.png")).getImage());
+				.getSystemResource(PamIcon.getPAMGuardIconPath(PamIcon.SMALL))).getImage());
 
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
