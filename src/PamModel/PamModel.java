@@ -525,6 +525,7 @@ final public class PamModel implements PamSettings {
 		mi.setModulesMenuGroup(sensorsGroup);
 		mi.setToolTipText("Imports CPOD data");
 		//mi.setHidden(SMRUEnable.isEnable() == false);
+		mi.setHidden(!isViewer);
 		mi.addGUICompatabilityFlag(PamGUIManager.FX); //has FX enabled GUI.
 
 		/*
