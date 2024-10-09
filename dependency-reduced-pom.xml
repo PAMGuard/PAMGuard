@@ -152,7 +152,7 @@
         <configuration>
           <plist>
             <JVMMainClassName>pamguard.Pamguard</JVMMainClassName>
-            <CFBundleIconFile>src/Resources/PamguardIcon.icns</CFBundleIconFile>
+            <CFBundleIconFile>src/Resources/PamguardIcon2.icns</CFBundleIconFile>
             <CFBundleDisplayName>PAMGuard</CFBundleDisplayName>
             <CFBundleDevelopmentRegion>English</CFBundleDevelopmentRegion>
             <CFBundleURLTypes>

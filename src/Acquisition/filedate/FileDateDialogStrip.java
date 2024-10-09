@@ -79,7 +79,7 @@ public class FileDateDialogStrip {
 	
 		PamPanel.addComponent(centPanel, formatLabel, c);
 		
-		mainPanel.add(BorderLayout.CENTER, centPanel);
+		mainPanel.add(BorderLayout.WEST, centPanel);
 		
 		
 //		mainPanel = new JPanel(new GridBagLayout());
