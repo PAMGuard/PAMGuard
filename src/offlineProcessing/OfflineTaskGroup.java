@@ -676,9 +676,11 @@ public class OfflineTaskGroup implements PamSettings {
 			 */
 
 			/**
-			 * Now process the data
+			 * Now process the data. Copy to preserve data integrity. 
 			 */
-			it = primaryDataBlock.getListIterator(0);
+			ArrayList dataCopy = primaryDataBlock.getDataCopy();
+			it = dataCopy.listIterator();
+			
 			unitChanged = false;
 			int totalUnits = 0;
 			int unitsChanged = 0;
