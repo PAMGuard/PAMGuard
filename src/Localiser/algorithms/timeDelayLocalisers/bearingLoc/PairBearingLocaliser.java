@@ -1,5 +1,6 @@
 package Localiser.algorithms.timeDelayLocalisers.bearingLoc;
 
+import java.awt.Window;
 import java.io.Serializable;
 import java.util.Arrays;
 
@@ -11,7 +12,9 @@ import Localiser.LocalisationAlgorithmInfo;
 import PamDetection.LocContents;
 import PamUtils.PamUtils;
 import pamMaths.PamVector;
+import tethys.localization.LocalizationBuilder;
 import tethys.localization.LocalizationCreator;
+import tethys.swing.export.LocalizationOptionsPanel;
 
 /**
  * Really simple BearingLocaliser which works with two element closely
@@ -313,6 +316,10 @@ public class PairBearingLocaliser implements BearingLocaliser {
 	@Override
 	public LocalizationCreator getTethysCreator() {
 		// TODO Auto-generated method stub
+		return null;
+	}	
+	@Override
+	public LocalizationOptionsPanel getLocalizationOptionsPanel(Window parent, LocalizationBuilder locBuilder) {
 		return null;
 	}
 }

@@ -124,22 +124,6 @@ public abstract class OverlayDataManager<TOverlayInfoType extends OverlayDataInf
 			}
 			DataSelector dataSel = dataBlock.getDataSelector(getDataSelectorName(), allowScores);
 			checkMenuItem = new OverlayCheckboxMenuItem(dataBlock, getDataSelectorName(), dataInfo.select, includeSymbolManagement);
-//			if (dataSel != null) {
-//				if (dataInfo != null && dataInfo.select) {
-//					checkMenuItem = new OverlayCheckboxMenuItem(dataBlock.getDataName(), settingsIcon);
-//				}
-//				else {
-//					checkMenuItem = new OverlayCheckboxMenuItem(dataBlock.getDataName(), settingsIconNot);
-//				}
-//			}
-//			else {
-//				checkMenuItem = new OverlayCheckboxMenuItem(dataBlock.getDataName());
-//			}
-//			try {
-//				checkMenuItem.setToolTipText(dataBlock.getParentProcess().getPamControlledUnit().getUnitName());
-//			}
-//			catch (NullPointerException e) {				
-//			}
 			checkMenuItem.setSelected(dataInfo.select);
 			PamSymbolChooser symbolChooser = null;
 			PamSymbolManager symbolManager = dataBlock.getPamSymbolManager();

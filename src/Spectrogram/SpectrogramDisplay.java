@@ -2965,7 +2965,9 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 					if (dataUnit.getTimeMilliseconds() > timeToUse) {
 						continue;
 					}
-					if ((1<<spectrogramParameters.channelList[panelId] & dataUnit.getSequenceBitmap()) == 0) {
+					int wantedMap = 1<<spectrogramParameters.channelList[panelId];
+					int dataChanMap = dataUnit.getSequenceBitmap();
+					if ((wantedMap & dataChanMap) == 0) {
 						continue;
 					}
 					if (dataSelector != null && dataSelector.scoreData(dataUnit) <= 0) {

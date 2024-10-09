@@ -25,7 +25,6 @@ import javafx.scene.shape.Rectangle;
  * 
  * @author Jamie Macaulay
  * @param <D> - the super detection type
- * @param <E> - the sub detection type
  *
  */
 public class WaterfallSpecPlot<D extends DetectionGroupDataUnit> extends RawFFTPlot<D>{

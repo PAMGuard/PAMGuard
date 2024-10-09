@@ -18,6 +18,10 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
+import Localiser.LocalisationAlgorithm;
+import Localiser.LocalisationAlgorithmInfo;
+import PamView.component.PamSettingsIconButton;
+import PamView.dialog.GenericSwingDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamView.panel.WestAlignedPanel;
 import PamguardMVC.PamDataBlock;
@@ -54,6 +58,12 @@ public class GranularityCard extends ExportWizardCard {
 	private GranularityEnumType[] allowedGranularities;
 
 	private TethysDataProvider tethysDataProvider;
+
+	private LocalisationAlgorithm localisationAlgorithm;
+
+	private LocalizationOptionsPanel localisationPanel;
+	
+	private PamSettingsIconButton locSetingsButton;
 	
 	public GranularityCard(DetectionsExportWizard detectionsExportWizard, TethysControl tethysControl, PamDataBlock dataBlock) {
 		super(tethysControl, detectionsExportWizard, "Granularity", dataBlock);
@@ -61,27 +71,40 @@ public class GranularityCard extends ExportWizardCard {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		tethysDataProvider = dataBlock.getTethysDataProvider(tethysControl);
+		localisationAlgorithm = tethysDataProvider.getLocalisationAlgorithm();
+		if (localisationAlgorithm != null) {
+			LocalisationAlgorithmInfo locinfo = localisationAlgorithm.getAlgorithmInfo();
+			if (locinfo != null) {
+				localisationPanel = locinfo.getLocalizationOptionsPanel(detectionsExportWizard, null);
+			}
+		}
 
 		GranularityChange gc = new GranularityChange();
 		
 		exportDetections = new JCheckBox("Export Detections");
 		exportLocalisations = new JCheckBox("Export Localisations");
+		locSetingsButton = new PamSettingsIconButton("Options");
 		exportDetections.addActionListener(gc);
 		exportLocalisations.addActionListener(gc);
 		JPanel whatPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints cw = new PamGridBagContraints();
-		cw.gridwidth = 2;
+		cw.gridwidth = 1;
 		whatPanel.add(exportDetections, cw);
 		cw.gridy++;
 		whatPanel.add(exportLocalisations, cw);
+		cw.gridx += cw.gridwidth;
+		whatPanel.add(locSetingsButton, cw);
 		cw.gridwidth = 1;
+		cw.gridx = 0;
 		cw.gridy++;
-		whatPanel.add(new JLabel("Loclisation types: ", JLabel.RIGHT), cw);
+		whatPanel.add(new JLabel("Localisation types:  ", JLabel.RIGHT), cw);
 		cw.gridx++;
+		cw.gridwidth = 2;
 		whatPanel.add(localisationTypes = new JLabel("none"), cw);
 		JPanel walPanel = new WestAlignedPanel(whatPanel);
 		walPanel.setBorder(new TitledBorder("What to export"));
 		this.add(walPanel);
+		locSetingsButton.setToolTipText("Localisation export options");
 		localisationTypes.setToolTipText("Not all listed localisation types may be present in actual data");
 		
 		// granularity
@@ -167,6 +190,13 @@ public class GranularityCard extends ExportWizardCard {
 			dataPanel.add(BorderLayout.CENTER, sp);
 			this.add(dataPanel);
 		}
+		
+		locSetingsButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				showLocalisationOptions();
+			}
+		});
 
 	}
 
@@ -239,6 +269,13 @@ public class GranularityCard extends ExportWizardCard {
 			return detectionsExportWizard.showWarning("You must select Detections or Localisations for export");
 		}
 		
+		if (localisationPanel != null) {
+			boolean lpOK = localisationPanel.getParams();
+			if (!lpOK) {
+				return false;
+			}
+		}
+		
 		return streamExportParams.granularity != null;
 	}
 
@@ -275,18 +312,28 @@ public class GranularityCard extends ExportWizardCard {
 			exportDetections.setSelected(streamExportParams.exportDetections);
 			exportLocalisations.setSelected(streamExportParams.exportLocalisations);
 			
+			if (localisationPanel != null) {
+				localisationPanel.setParams();
+			}
+			
 			newDataSelection();
 			enableControls();
 		}
 
 	private void enableControls() {
+		exportDetections.setEnabled(tethysDataProvider.hasDetections());
+		if (tethysDataProvider.hasDetections() == false) {
+			exportDetections.setSelected(false);
+			exportLocalisations.setSelected(true);
+			granularities[callIndex].setSelected(true);
+		}
 		String locStr = getLocInfString();
 		boolean dets = exportDetections.isSelected();
 		boolean locs = exportLocalisations.isSelected();
 		granularities[binnedIndex].setEnabled(!locs);
 		granularities[encounterIndex].setEnabled(!locs);
 		GranularityEnumType granularity = getCurrentGranularity();
-		boolean canLoc = tethysDataProvider.canExportLocalisations(granularity);
+		boolean canLoc = localisationAlgorithm != null;//tethysDataProvider.canExportLocalisations(granularity);
 		exportLocalisations.setEnabled(canLoc);
 		if (canLoc == false) {
 			exportLocalisations.setSelected(false);
@@ -296,6 +343,7 @@ public class GranularityCard extends ExportWizardCard {
 		if (granularities.length == 1) {
 			granularities[0].setSelected(true);
 		}
+		locSetingsButton.setEnabled(exportLocalisations.isSelected() && localisationPanel != null);
 		
 		binLength.setEnabled(granularities[binnedIndex].isSelected());
 		minBinnedCalls.setEnabled(granularities[binnedIndex].isSelected());
@@ -312,6 +360,13 @@ public class GranularityCard extends ExportWizardCard {
 			return null;
 		}
 		return locInf.getLoclisationTypes();
+	}
+
+	private void showLocalisationOptions() {
+		if (localisationPanel == null) {
+			return; // should never happen since button disabled if this is null, but ...
+		}
+		GenericSwingDialog.showDialog(detectionsExportWizard, "Localisation options", localisationPanel);
 	}
 
 }

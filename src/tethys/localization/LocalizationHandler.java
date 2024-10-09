@@ -11,6 +11,16 @@ import tethys.detection.StreamDetectionsSummary;
 import tethys.niluswraps.NilusDataWrapper;
 import tethys.niluswraps.PDeployment;
 
+/**
+ * Handler for localizations. This was originally going to mirror the DetectionsHandler, but became 
+ * a bit redundant when it became clear that the localization export would have to happen in parralel
+ * with the detections export, so all happens in DetectionsHandler. The DetectionsHandler will use
+ * a LocalizationBuilder class to create each document, but will call through the an interface
+ * in each Localiser algorithm (LocalizationCreator) to do the real work or sorting out coordinate
+ * frames and creating the actual detections. 
+ * @author dg50
+ *
+ */
 public class LocalizationHandler extends CollectionHandler {
 
 	private int uniqueLocalisationsId = 1;

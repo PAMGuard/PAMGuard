@@ -125,7 +125,7 @@ abstract public class TOADBaseAlgorithm extends LocaliserAlgorithm3D {
 				groupDataUnit.getTimeMilliseconds());
 		
 		
-		System.out.println("HYDROPHONE 0 POSITION: "+  groupDataUnit.getTimeMilliseconds() + "  " + geometry.getGeometry()[0]);
+//		System.out.println("HYDROPHONE 0 POSITION: "+  groupDataUnit.getTimeMilliseconds() + "  " + geometry.getGeometry()[0]);
 
 
 		//		if (groupDataUnit.getSubDetection(0).getUID() == 9035003222L) {

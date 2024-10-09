@@ -25,7 +25,6 @@ public class Group3DLogging extends SuperDetLogging {
 	private Group3DLocaliserControl group3DControl;
 	
 	private PamTableItem masterChild, otherChilds;
-//	superId;
 
 	private SQLLoggingAddon currentSQLAddon;
 	
