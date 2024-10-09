@@ -96,9 +96,6 @@ public class Pamguard {
 	 */
 	public static void main(String[] args) {
 		
-		FlatLightLaf.setup();
-
-
 		Debug.setPrintDebug(false); // make sure the class instantiates static members. 
 		try {			
 			if (PlatformInfo.calculateOS() == OSType.WINDOWS) {
@@ -108,7 +105,7 @@ public class Pamguard {
 				//do not use the mac version...it's awful
 				//UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			    UIManager.setLookAndFeel(new FlatLightLaf() );		
-			    }
+			}
 			//		    for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 			//		        if ("Nimbus".equals(info.getName())) {
 			//		            UIManager.setLookAndFeel(info.getClassName());

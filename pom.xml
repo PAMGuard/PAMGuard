@@ -422,6 +422,13 @@
 			<artifactId>javafx-web</artifactId>
 			<version>${javafx.version}</version>
 		</dependency>
+		
+		<!-- Swing theme for MacOS -->
+		<dependency>
+		  <groupId>com.formdev</groupId>
+		  <artifactId>flatlaf</artifactId>
+		  <version>3.5.1</version>
+		</dependency>
 
 		<!-- Decorates JavaFX components with error icons if inputs are incorrect-->
 		<dependency>
@@ -1043,13 +1050,7 @@
 			<artifactId>powermock-api-mockito</artifactId>
 			<version>${powermock.version}</version>
 		</dependency>
-		
-		<!-- Theme for MacOS-->
-		<dependency>
-		  <groupId>com.formdev</groupId>
-		  <artifactId>flatlaf</artifactId>
-		  <version>3.5.1</version>
-		</dependency>
+
 
 
 	</dependencies>
