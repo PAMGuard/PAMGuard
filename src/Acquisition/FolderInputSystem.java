@@ -252,13 +252,21 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		constraints.gridy++;
 		constraints.gridx = 0;
 		constraints.gridwidth = 1;
-		addComponent(p,  new JLabel("Skip initial :"), constraints);
-		constraints.gridx++;
-		addComponent(p, skipSecondsField = new JTextField(4), constraints);
-		constraints.gridx++;
-		addComponent(p,  new JLabel("seconds"), constraints);
-		//		}
+		
+		//panel which allows the users to skip the first section of a file. 
+		PamPanel skipPanel = new PamPanel(new GridBagLayout()); 
 
+		constraints.insets = new Insets(0,0,0,5); 
+		addComponent(skipPanel,  new JLabel("Skip initial "), constraints);
+		constraints.gridx++;
+		addComponent(skipPanel, skipSecondsField = new JTextField(4), constraints);
+		constraints.gridx++;
+		addComponent(skipPanel,  new JLabel("seconds"), constraints);
+		constraints.anchor = GridBagConstraints.WEST;
+		
+		constraints.gridwidth = 3;
+		constraints.gridx = 0; 
+		addComponent(p,  skipPanel, constraints);	
 
 		//panel to show bespoke settings for certain audio loaders.
 		constraints.anchor = GridBagConstraints.WEST;

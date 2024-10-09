@@ -184,7 +184,7 @@
 			</plugin>
 
 
-<!--			 Plugin which creates a .dmg file for MacOS. 
+<!--			 Plugin which creates a .dmg file for MacOS. -->
 		    <plugin>
 		        <groupId>de.perdian.maven.plugins</groupId>
 		        <artifactId>macosappbundler-maven-plugin</artifactId>
@@ -199,10 +199,10 @@
 		                    <string>msa</string>
 		                </CFBundleURLTypes>
 		                <JVMVersion>21+</JVMVersion>
-		                <JVMOptions>
+		                <!--<JVMOptions>
 		                    <string>-Dfoo=bar</string>
 		                    <string>-Dx=y</string>
-		                </JVMOptions>
+		                </JVMOptions>-->
 		                <JVMArguments>
 		                    <string>-v</string>
 		                </JVMArguments>
@@ -231,7 +231,7 @@
 		                </goals>
 		            </execution>
 		        </executions>
-		    </plugin> -->
+		    </plugin> 
 		    
 		</plugins>
 

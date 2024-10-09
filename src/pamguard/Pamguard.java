@@ -173,7 +173,7 @@ public class Pamguard {
 				
 				if (anArg.equalsIgnoreCase("-c")) {
 					//the user chooses which run mode
-					PamRunModeParams runbModeParams = PamRunModeDialog.showDialog(null);
+					PamRunModeParams runbModeParams = PamRunModeDialog.showDialog(null, true);
 					if (runbModeParams==null || runbModeParams.runMode<0) {
 						//use cancelled
 						System.exit(0);

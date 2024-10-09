@@ -245,7 +245,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 
 		PamPanel skipPanel = new PamPanel(new GridBagLayout()); 
 
-		addComponent(skipPanel,  new JLabel("Skip initial"), constraints);
+		addComponent(skipPanel,  new JLabel("Skip initial "), constraints);
 		constraints.gridx++;
 		addComponent(skipPanel, skipSecondsField = new JTextField(4), constraints);
 		constraints.gridx++;
@@ -253,6 +253,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		constraints.anchor = GridBagConstraints.EAST;
 		
 		constraints.gridwidth = 3;
+		constraints.gridx = 0; 
 		addComponent(p,  skipPanel, constraints);
 
 		//		}

@@ -65,9 +65,9 @@ public class FileDateDialogStrip {
 		PamPanel centPanel = new PamPanel(new GridBagLayout());
 		
 		c.gridx = 0; 
-		c.insets = new Insets(0,5,0,5); 
+		c.insets = new Insets(0,0,0,5); 
 
-		JLabel fileDateLabel = new JLabel("File date :  ");
+		JLabel fileDateLabel = new JLabel("File date ");
 		PamPanel.addComponent(centPanel,fileDateLabel, c);
 		c.gridx ++;
 		PamPanel.addComponent(centPanel, fileTime, c);

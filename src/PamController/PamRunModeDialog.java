@@ -1,9 +1,11 @@
 package PamController;
 
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.Image;
 import java.awt.Window;
 import java.io.File;
@@ -43,7 +45,7 @@ public class PamRunModeDialog  extends PamDialog {
 
 	public PamRunModeDialog(Window parentFrame) {
 		super(parentFrame, "Storage Options", false);
-		
+
 		mainPanel = new JPanel();
 		mainPanel.setBorder(new TitledBorder("Select PAMGuard mode"));
 		mainPanel.setLayout(new GridBagLayout());
@@ -71,15 +73,15 @@ public class PamRunModeDialog  extends PamDialog {
 		viewerMode.setToolTipText(
 				"<html>Run PAMGuard in viewer mode. <p>"
 						+"Viewer mode is used to view processed data from normal mode</html>");
-		
-		
-	    try {
+
+
+		try {
 			Image img = ImageIO.read(getClass().getResource(File.separator+PamIcon.getPAMGuardIconPath(PamIcon.NORMAL)));
 			normalMode.setIcon(new ImageIcon(img));
 			normalMode.setHorizontalAlignment(SwingConstants.TRAILING);
-		    viewerMode.setIcon(new ImageIcon(img));
-		    viewerMode.setHorizontalAlignment(SwingConstants.TRAILING);
-		
+			viewerMode.setIcon(new ImageIcon(img));
+			viewerMode.setHorizontalAlignment(SwingConstants.TRAILING);
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -88,16 +90,16 @@ public class PamRunModeDialog  extends PamDialog {
 		ButtonGroup buttonGroup = new ButtonGroup();
 		buttonGroup.add(normalMode);
 		buttonGroup.add(viewerMode);
-		
+
 		GridBagConstraints gridBagConstrints = new GridBagConstraints(); 
 		gridBagConstrints.gridy = 0;
 		gridBagConstrints.gridx = 0;
 		gridBagConstrints.insets = new Insets(5,5,5,5);
 
-//		PamPanel.addComponent(mainPanel, new JLabel("Select PAMGuard mode"), gridBagConstrints);
-//		gridBagConstrints.gridwidth=2;
-//		
-//		gridBagConstrints.gridwidth=1;
+		//		PamPanel.addComponent(mainPanel, new JLabel("Select PAMGuard mode"), gridBagConstrints);
+		//		gridBagConstrints.gridwidth=2;
+		//		
+		//		gridBagConstrints.gridwidth=1;
 		gridBagConstrints.gridy ++;
 		PamPanel.addComponent(mainPanel, normalMode, gridBagConstrints);
 		gridBagConstrints.gridx ++;
@@ -108,11 +110,28 @@ public class PamRunModeDialog  extends PamDialog {
 
 	}
 
-	public static PamRunModeParams showDialog(JFrame parentFrame) {
+	/**
+	 * Show the run mode dialog. 
+	 * @param parentFrame - the parent frame - usually null. 
+	 * @param center - true to show the dialog in the center of the screen.
+	 * @return run mode params. 
+	 */
+	public static PamRunModeParams showDialog(JFrame parentFrame, boolean center) {
 		if (singleInstance == null || singleInstance.getOwner() != parentFrame) {
 			singleInstance = new PamRunModeDialog(parentFrame);
 		}
+
+		if (center) {
+			final Toolkit toolkit = Toolkit.getDefaultToolkit();
+			final Dimension screenSize = toolkit.getScreenSize();
+			final int x = (screenSize.width - singleInstance.getWidth()) / 2;
+			final int y = (screenSize.height - singleInstance.getHeight()) / 2;
+			System.out.println("Set dialog location: " + x + "  " + y);
+			singleInstance.setLocation(x, y);
+		}
+
 		singleInstance.setVisible(true);
+
 		return singleInstance.runbModeParams;
 
 	}
@@ -137,7 +156,7 @@ public class PamRunModeDialog  extends PamDialog {
 	public void cancelButtonPressed() {
 		runbModeParams.runMode=-1;
 	}
-	
+
 
 	@Override
 	public void restoreDefaultSettings() {
