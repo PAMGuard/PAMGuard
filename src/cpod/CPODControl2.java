@@ -251,6 +251,7 @@ public class CPODControl2 extends PamControlledUnit implements PamSettings {
 			SettingsPane<CPODParams> setPane = (SettingsPane<CPODParams>) getSettingsPane();
 			setPane.setParams(this.cpodParams);
 			settingsDialog = new PamDialogFX2AWT<CPODParams>(parentFrame, setPane, false);
+			settingsDialog.setHelpPoint("sensors.cpod.docs.cpod");
 			settingsDialog.setResizable(true);
 		}
 		CPODParams newParams = settingsDialog.showDialog(cpodParams);

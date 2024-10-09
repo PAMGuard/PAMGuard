@@ -58,7 +58,7 @@ public class ExportProcessDialog {
 	private OfflineTaskGroup dlOfflineGroup;
 
 
-	private ExportOLDialog mtOfflineDialog;
+	private ExportOLDialog exportDialog;
 
 	/**
 	 * Reference to the export manager. 
@@ -74,6 +74,7 @@ public class ExportProcessDialog {
 		//create the offline task group. 
 		this.exportManager=exportManager;
 		dlOfflineGroup = new ExportTaskGroup("Export data");
+
 	}
 
 
@@ -97,14 +98,16 @@ public class ExportProcessDialog {
 		createExportGroup();
 
 		//if null open the dialog- also create a new offlineTask group if the datablock has changed. 
-		if (mtOfflineDialog == null) {
-			mtOfflineDialog = new ExportOLDialog(parentFrame, 
+		if (exportDialog == null) {
+			exportDialog = new ExportOLDialog(parentFrame, 
 					dlOfflineGroup, "Export Data");
 			//batchLocaliseDialog.setModalityType(Dialog.ModalityType.MODELESS);
 		}
-		mtOfflineDialog.setParams(params); 
-		mtOfflineDialog.enableControls();
-		mtOfflineDialog.setVisible(true);
+		exportDialog.setHelpPoint("overview.dataexport.docs.dataexport");
+
+		exportDialog.setParams(params); 
+		exportDialog.enableControls();
+		exportDialog.setVisible(true);
 	}
 
 
@@ -478,7 +481,7 @@ public class ExportProcessDialog {
 			this.setPrimaryDataBlock(getTask(i).getDataBlock());
 			if (i<getNTasks()-1) {
 				//will start a new thread after this one has finished
-				this.setTaskMonitor(mtOfflineDialog.newExportTaskMonitor(i, this));
+				this.setTaskMonitor(exportDialog.newExportTaskMonitor(i, this));
 			}
 			super.runTasks();
 		}
