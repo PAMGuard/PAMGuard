@@ -133,9 +133,15 @@ abstract public class PamDialog extends JDialog {
 
 		this.setResizable(false);
 		setAlwaysOnTop(parentFrame == null);
+		
+		
+		String icon = PamIcon.getPAMGuardIconPath(PamIcon.SMALL);
+//		
+//		System.out.println("Get icon: " + ClassLoader
+//				.getSystemResource(PamIcon.getPAMGuardIconPath(PamIcon.SMALL)));
 
 		setIconImage(new ImageIcon(ClassLoader
-				.getSystemResource(PamIcon.getPAMGuardIconPath(PamIcon.SMALL))).getImage());
+				.getSystemResource("Resources/pamguardIcon.png")).getImage());
 
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 

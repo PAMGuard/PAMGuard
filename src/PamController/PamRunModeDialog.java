@@ -1,10 +1,12 @@
 package PamController;
 
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Image;
 import java.awt.Window;
+import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
@@ -12,6 +14,7 @@ import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
@@ -22,7 +25,7 @@ import PamView.dialog.PamDialog;
 import PamView.panel.PamPanel;
 
 /**
- * A simple dialog which allows the user to select 
+ * A simple dialog which allows the user to select which mode to run PAMGuard in. 
  */
 public class PamRunModeDialog  extends PamDialog {
 
@@ -39,16 +42,15 @@ public class PamRunModeDialog  extends PamDialog {
 	private AbstractButton viewerMode;
 
 	public PamRunModeDialog(Window parentFrame) {
-		
-		
-		
 		super(parentFrame, "Storage Options", false);
+		
 		mainPanel = new JPanel();
 		mainPanel.setBorder(new TitledBorder("Select PAMGuard mode"));
 		mainPanel.setLayout(new GridBagLayout());
 
 		//toggle buttonb
 		normalMode = new JToggleButton("Normal");
+		normalMode.setFont(normalMode.getFont().deriveFont(Font.BOLD));
 		normalMode.addItemListener((a)->{
 			// event is generated in button
 			int state = a.getStateChange();
@@ -60,6 +62,7 @@ public class PamRunModeDialog  extends PamDialog {
 
 
 		viewerMode = new JToggleButton("Viewer");
+		viewerMode.setFont(viewerMode.getFont().deriveFont(Font.BOLD));
 		viewerMode.addItemListener((a)->{
 			// event is generated in button
 			int state = a.getStateChange();
@@ -71,7 +74,7 @@ public class PamRunModeDialog  extends PamDialog {
 		
 		
 	    try {
-			Image img = ImageIO.read(getClass().getResource(PamIcon.getPAMGuardIconPath(PamIcon.NORMAL)));
+			Image img = ImageIO.read(getClass().getResource(File.separator+PamIcon.getPAMGuardIconPath(PamIcon.NORMAL)));
 			normalMode.setIcon(new ImageIcon(img));
 			normalMode.setHorizontalAlignment(SwingConstants.TRAILING);
 		    viewerMode.setIcon(new ImageIcon(img));
@@ -91,6 +94,11 @@ public class PamRunModeDialog  extends PamDialog {
 		gridBagConstrints.gridx = 0;
 		gridBagConstrints.insets = new Insets(5,5,5,5);
 
+//		PamPanel.addComponent(mainPanel, new JLabel("Select PAMGuard mode"), gridBagConstrints);
+//		gridBagConstrints.gridwidth=2;
+//		
+//		gridBagConstrints.gridwidth=1;
+		gridBagConstrints.gridy ++;
 		PamPanel.addComponent(mainPanel, normalMode, gridBagConstrints);
 		gridBagConstrints.gridx ++;
 		PamPanel.addComponent(mainPanel, viewerMode, gridBagConstrints);

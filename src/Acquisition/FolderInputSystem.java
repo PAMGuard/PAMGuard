@@ -570,6 +570,9 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 				acquisitionDialog.setSampleRate(audioFormat.getSampleRate());
 				acquisitionDialog.setChannels(fudgeNumChannels(audioFormat.getChannels()));
 				audioStream.close();
+				//prevent the dialog from going nuts when components are resized. 
+				acquisitionDialog.validate();
+				acquisitionDialog.pack();
 			}
 			catch (Exception Ex) {
 				//				Ex.printStackTrace();
