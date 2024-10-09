@@ -47,8 +47,6 @@ public class RAnnotationManager {
 		DataAnnotationType annotType;
 		List<DataAnnotationType<?>> annotationTypes = parentblock.getAnnotationHandler().getAvailableAnnotationTypes();
 		
-		
-
 		for (int i=0; i<parentblock.getAnnotationHandler().getNumUsedAnnotationTypes(); i++) {
 
 			annotType = annotationTypes.get(i);

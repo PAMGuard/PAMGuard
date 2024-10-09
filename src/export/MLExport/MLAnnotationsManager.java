@@ -49,7 +49,6 @@ public class MLAnnotationsManager {
 		
 		if (parentblock.getAnnotationHandler()==null) return;
 
-
 		DataAnnotationType annotType;
 		List<DataAnnotationType<?>> annotationTypes = parentblock.getAnnotationHandler().getAvailableAnnotationTypes();
 
@@ -229,8 +228,6 @@ public class MLAnnotationsManager {
 		return clkclsfrAnnotation; 
 
 	}
-
-
 
 	private Struct dlAnnoation2MAT(DLAnnotation dlAnnotation) {
 		float[][] predictions = new float[dlAnnotation.getModelResults().size()][];

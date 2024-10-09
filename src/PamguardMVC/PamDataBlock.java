@@ -987,6 +987,23 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			}
 		}
 	}
+	
+	public void clearAll(boolean andDownStream) {
+		clearAll();
+		if (andDownStream) {
+			int nObs = countObservers();
+			for (int i = 0; i < nObs; i++) {
+				PamObserver obs = getPamObserver(i);
+				if (obs instanceof PamProcess) {
+					PamProcess proc = (PamProcess) obs;
+					ArrayList<PamDataBlock> procOuts = proc.getOutputDataBlocks();
+					for (PamDataBlock b : procOuts) {
+						b.clearAll(andDownStream);
+					}
+				}
+			}
+		}
+	}
 
 	/**
 	 * Reset a datablock. This is called at PamStart from PamController It's been
