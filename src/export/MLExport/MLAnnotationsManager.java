@@ -46,6 +46,9 @@ public class MLAnnotationsManager {
 		//first we need to find out which data annotation the data unit data block has - need to ensure we add all the annotation
 		//even if they don't exist- otherwise we may get dissimilar structure exceptions. 
 		PamDataBlock parentblock = dataUnit.getParentDataBlock();
+		
+		if (parentblock.getAnnotationHandler()==null) return;
+
 
 		DataAnnotationType annotType;
 		List<DataAnnotationType<?>> annotationTypes = parentblock.getAnnotationHandler().getAvailableAnnotationTypes();

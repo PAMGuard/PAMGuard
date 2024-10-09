@@ -41,9 +41,13 @@ public class RAnnotationManager {
 		//first we need to find out which data annotation the data unit data block has - need to ensure we add all the annotation
 		//even if they don't exist- otherwise we may get dissimilar structure exceptions. 
 		PamDataBlock parentblock = dataUnit.getParentDataBlock();
+		
+		if (parentblock.getAnnotationHandler()==null) return rData;
 
 		DataAnnotationType annotType;
 		List<DataAnnotationType<?>> annotationTypes = parentblock.getAnnotationHandler().getAvailableAnnotationTypes();
+		
+		
 
 		for (int i=0; i<parentblock.getAnnotationHandler().getNumUsedAnnotationTypes(); i++) {
 
