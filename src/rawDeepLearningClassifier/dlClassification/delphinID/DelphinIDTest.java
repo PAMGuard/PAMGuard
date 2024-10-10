@@ -42,7 +42,8 @@ public class DelphinIDTest {
 	 */
 	public static void main(String args[]) {
 		
-		testDelphinIDArray(null);
+		String matout = "/Users/jdjm/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/delphinID/whistle1D/whistlespectra_4s.mat";
+		testDelphinIDArray( matout);
 
 		//
 		//		String matImageSave = "C:\\Users\\Jamie Macaulay\\MATLAB Drive\\MATLAB\\PAMGUARD\\deep_learning\\delphinID\\whistleimages_4s_415.mat";
@@ -241,7 +242,7 @@ public class DelphinIDTest {
 		System.out.println("File exists: ? " + file.exists()); 
 
 		//the image to test
-		String relMatPath = "./src/test/resources/rawDeepLearningClassifier/DelphinID/Dde_415_s10_SI20120620_171333_d042_50.mat";
+		String relMatPath = "./src/test/resources/rawDeepLearningClassifier/DelphinID/Ggr242_s10_PAM_20200918_123234_366_1.mat";
 
 		//Dde_415_s10_SI20120620_171333_d042_50
 		//		double[] expectedOutput = new double[]{0.998737633, 0.998737633,	0.000146952,	1.49E-10,	0.001111862, 1.64E-10,	1.66E-08,	3.53E-06};
@@ -338,30 +339,27 @@ public class DelphinIDTest {
 	 * 
 	 * @return true if the test is passed. 
 	 */
-	public static boolean testDelphinIDArray(String arrayPathOut) {
+	public static boolean testDelphinIDArray(String matFileout) {
 
 		System.out.println("------DelphinID 1D array comparison test---------");
 
 		double seglen = 4;
 		//test the model
 		//String modelPath =  "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Dde415/whistle_4s_415_model.zip";
-		String modelPath = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/whistleclassifier.zip";
+		String modelPath = "/Users/jdjm/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/whistleclassifier.zip";
 		//		String modelPath = "./src/test/resources/rawDeepLearningClassifier/DelphinID/whistle_4s_415_model.zip";
 
 		File file = new File(modelPath);
 		System.out.println("File exists: ? " + file.exists()); 
 
 		//the image to test
-		String relMatPath = "./src/test/resources/rawDeepLearningClassifier/DelphinID/Dde_415_s10_SI20120620_171333_d042_50.mat";
+		String relMatPath = "./src/test/resources/rawDeepLearningClassifier/DelphinID/Ggr242_s10_PAM_20200918_123234_366_1.mat";
 	
 		try {
 
-			Path path = Paths.get(modelPath);
 
-			//load the model
-			SimpleArchiveModel model = new SimpleArchiveModel(new File(path.toString()));
 			
-			path = Paths.get(relMatPath);
+			Path path = Paths.get(relMatPath);
 
 			// Create MAT file with a scalar in a nested struct
 			MatFile matFile = Mat5.readFromFile(path.toString());
@@ -391,14 +389,30 @@ public class DelphinIDTest {
 			float[][] input = new float[1][];
 			input[0] = whistleSpectrumF;
 			
-			float[] outputJava = model.runModel(input);
 			
-			System.out.println("Whistle spectrum output: "); 
-			PamArrayUtils.printArray(outputJava);
+			//write some output data for plotting if there is an output file set. 
+			if (matFileout!=null){
+				MatFile matFileWrite = Mat5.newMatFile()
+						.addArray("spectrumJava",DLMatFile.array2Matrix(whistleArray))
+						.addArray("spectrumPython",matFile.getArray("tfspectrum"));
+
+				Mat5.writeToFile(matFileWrite, matFileout);
+			}
+			
+			
+			/*****Load the deep learning model and run*****/
+//			Path path = Paths.get(modelPath);
+//
+//			//load the model
+//			SimpleArchiveModel model = new SimpleArchiveModel(new File(path.toString()));
+//			float[] outputJava = model.runModel(input);
+//			
+//			System.out.println("Whistle spectrum output: "); 
+//			PamArrayUtils.printArray(outputJava);
 
 
 		} 
-		catch (MalformedModelException | IOException e) {
+		catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 

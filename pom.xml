@@ -204,14 +204,14 @@
 		                    <string>-Dx=y</string>
 		                </JVMOptions>-->
 		                <JVMArguments>
-		                    <string>-v</string>
+		                    <string>-c</string>
 		                </JVMArguments>
 		            </plist>
 		              <dmg>
 		                <generate>true</generate>
 		                <additionalResources>
 		                    <additionalResource>
-		                        <directory>src/target/macos/</directory>
+		                        <directory>src/target/bundle/</directory>
 		                    </additionalResource>
 		                </additionalResources>
 		            </dmg>
@@ -219,9 +219,9 @@
 			            <include>true</include>
 			            <location>/Library/Java/JavaVirtualMachines/amazon-corretto-21.jdk</location>
 			        </jdk>
-		             <codesign>
+		             <!--<codesign>
 		                <identity>3rd Party Mac Developer Application: PAMGuard</identity>
-		            </codesign> 
+		            </codesign> -->
 		        </configuration>
 		        <executions>
 		            <execution>

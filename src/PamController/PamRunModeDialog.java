@@ -6,17 +6,11 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Toolkit;
-import java.awt.Image;
 import java.awt.Window;
-import java.io.File;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
@@ -76,7 +70,7 @@ public class PamRunModeDialog  extends PamDialog {
 
 
 		try {
-			String file = File.separator+PamIcon.getPAMGuardIconPath(PamIcon.NORMAL);
+			String file = PamIcon.getPAMGuardIconPath(PamIcon.NORMAL);
 //			icon = 
 			ImageIcon icon = new ImageIcon(ClassLoader.getSystemResource(file));
 //			Image img = ImageIO.read(ClassLoader.getSystemResource(file));
