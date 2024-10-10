@@ -53,9 +53,6 @@ public class DelphinIDTest {
 		//		String imagePathOut = "C:\\Users\\Jamie Macaulay\\MATLAB Drive\\MATLAB\\PAMGUARD\\deep_learning\\delphinID\\whistle_image_python_java.mat";
 		//		String imagePathOut = null;
 		//		testDelphinIDImage(imagePathOut);
-
-
-
 	}
 
 
@@ -219,47 +216,6 @@ public class DelphinIDTest {
 
 		return transformedData2;
 	}
-
-
-	private static double[] whistle2AverageArray(double[][] whistleValues, double startseg, double seglen, double[] freqLimits) {
-
-		//now perform the image transform in Java 
-//		double[] freqLimits = new double[] {2000., 20000.};
-
-		double freqBin = 100.;
-
-		int nbins = (int) ((freqLimits[1] -freqLimits[0])/freqBin);
-
-		System.out.println("Number of bins: " + nbins);
-
-		double[] peakBins = new double[nbins];
-		double minFreq, maxFreq;
-		int n;
-		int ntot = 0;
-		for (int i=0; i<nbins; i++) {
-			
-			minFreq = i*freqBin+freqLimits[0];
-			maxFreq = (i+1)*freqBin+freqLimits[0];
-
-			n=0;
-			for (int j=0; j<whistleValues.length ; j++) {
-				if (whistleValues[j][1]>= minFreq && whistleValues[j][1]< maxFreq && whistleValues[j][0]>=startseg && whistleValues[j][0]<(startseg+seglen)) {
-					n++;
-				}
-			}
-			
-			ntot=ntot+n;
-
-			System.out.println("Bin: " + minFreq + " Hz   " + n); 
-			peakBins[i]=n;
-		}
-		
-		for (int i=0; i<nbins; i++) {
-			peakBins[i]=peakBins[i]/ntot;
-		}
-		
-		return peakBins;
-	}
 	
 
 	/**
@@ -370,6 +326,12 @@ public class DelphinIDTest {
 	}
 	
 	
+	/****---------------------1D Tests---------------------****/
+	/*
+	/*
+	/*
+	/****--------------------------------------------------****/
+
 	/**
 	 * This test runs delphinID on one 4 second window from whistle contours saved
 	 * in a mat file. 
@@ -411,15 +373,20 @@ public class DelphinIDTest {
 			double[] freqLimits = new double[] {2000., 20000.};
 			
 			//Create spectrum
-			//the values for the whistle detector.
 			double[] whistleArray = whistle2AverageArray(whistleValues, array.getDouble(0), seglen, freqLimits);
 			
-			System.out.println("Whistle spectrum size: " + whistleArray.length); 
+			System.out.println("Whistle spectrum size intial: " + whistleArray.length); 
 			
+			//normalise the array 
+			whistleArray = PamArrayUtils.divide(whistleArray, PamArrayUtils.sum(whistleArray)); 
 			
-
+			//down sample by a factor of 2
+			whistleArray =  downSampleMean(whistleArray, 2);
+			
 			float[] whistleSpectrumF = PamArrayUtils.double2Float(whistleArray);
 			
+			System.out.println("Whistle spectrum size after transforms: " + whistleArray.length); 
+
 			//generate model input
 			float[][] input = new float[1][];
 			input[0] = whistleSpectrumF;
@@ -440,6 +407,76 @@ public class DelphinIDTest {
 		
 		
 		return false;
+	}
+	
+	/**
+	 * Down sample a spectrum array. 
+	 * @param spectrum - down sample a spectrum arra by a factor of 2 
+	 * @return the down sampled array. 
+	 */
+	private static double[] downSampleMean(double[] spectrum, int factor) {
+		
+		int newlen = (int) Math.floor(((double) spectrum.length)/factor); 
+		
+		double[] downSample = new double[newlen]; 
+		
+		int n=0; 
+		double mean =0; 
+		for (int i=0; i<spectrum.length; i+=factor) {
+			
+			mean=0;
+			for (int j=0; j<factor; j++) {
+				mean += spectrum[i+j]; 
+			}
+			mean =mean/factor; 
+			
+			downSample[n]=mean;
+			n++; 
+		}
+		
+		return downSample; 
+	}
+	
+
+
+	private static double[] whistle2AverageArray(double[][] whistleValues, double startseg, double seglen, double[] freqLimits) {
+
+		//now perform the image transform in Java 
+//		double[] freqLimits = new double[] {2000., 20000.};
+
+		double freqBin = 100.;
+
+		int nbins = (int) ((freqLimits[1] -freqLimits[0])/freqBin);
+
+		System.out.println("Number of bins: " + nbins);
+
+		double[] peakBins = new double[nbins];
+		double minFreq, maxFreq;
+		int n;
+		int ntot = 0;
+		for (int i=0; i<nbins; i++) {
+			
+			minFreq = i*freqBin+freqLimits[0];
+			maxFreq = (i+1)*freqBin+freqLimits[0];
+
+			n=0;
+			for (int j=0; j<whistleValues.length ; j++) {
+				if (whistleValues[j][1]>= minFreq && whistleValues[j][1]< maxFreq && whistleValues[j][0]>=startseg && whistleValues[j][0]<(startseg+seglen)) {
+					n++;
+				}
+			}
+			
+			ntot=ntot+n;
+
+			System.out.println("Bin: " + minFreq + " Hz   " + n); 
+			peakBins[i]=n;
+		}
+		
+		for (int i=0; i<nbins; i++) {
+			peakBins[i]=peakBins[i]/ntot;
+		}
+		
+		return peakBins;
 	}
 
 

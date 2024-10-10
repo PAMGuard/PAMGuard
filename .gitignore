@@ -117,3 +117,4 @@ settings.xml
 .settings/org.eclipse.jdt.core.prefs
 .classpath
 .project
+.settings/org.eclipse.core.resources.prefs
