@@ -654,6 +654,8 @@
 
 <mapID target="utilities.listening.docs.Listening_Overview" url="utilities/listening/docs/Listening_Overview.html"/>
 
+<mapID target="sensors.cpod.docs.cpod" url="sensors/cpod/docs/cpod.html"/>
+
 <mapID target="utilities.SIDEModule.docs.SIDE_Overview_tests" url="utilities/SIDEModule/docs/SIDE_Overview.html#tests"/>
 
 <mapID target="overview.PamMasterHelp.docs.modules_utilities" url="overview/PamMasterHelp/docs/modules.html#utilities"/>

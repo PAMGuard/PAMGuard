@@ -76,13 +76,16 @@ public class PamRunModeDialog  extends PamDialog {
 
 
 		try {
-			Image img = ImageIO.read(getClass().getResource(File.separator+PamIcon.getPAMGuardIconPath(PamIcon.NORMAL)));
-			normalMode.setIcon(new ImageIcon(img));
+			String file = File.separator+PamIcon.getPAMGuardIconPath(PamIcon.NORMAL);
+//			icon = 
+			ImageIcon icon = new ImageIcon(ClassLoader.getSystemResource(file));
+//			Image img = ImageIO.read(ClassLoader.getSystemResource(file));
+			normalMode.setIcon(icon);
 			normalMode.setHorizontalAlignment(SwingConstants.TRAILING);
-			viewerMode.setIcon(new ImageIcon(img));
+			viewerMode.setIcon(icon);
 			viewerMode.setHorizontalAlignment(SwingConstants.TRAILING);
 
-		} catch (IOException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

@@ -241,6 +241,10 @@
    <tocitem text="Configuration " target="sensors.arrayAccelerometer.docs.accelerometer_configuration" image="topic"/>
 
   </tocitem>
+  <tocitem text="CPOD ">
+   <tocitem text="CPOD Module " target="sensors.cpod.docs.cpod" image="topic"/>
+
+  </tocitem>
  </tocitem>
  <tocitem text="Displays ">
   <tocitem text="Data Selection ">
