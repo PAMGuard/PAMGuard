@@ -378,8 +378,12 @@ public class DelphinIDTest {
 			//normalise the array 
 			whistleArray = PamArrayUtils.divide(whistleArray, PamArrayUtils.sum(whistleArray)); 
 			
+			PamArrayUtils.printArray(whistleArray);
+
 			//down sample by a factor of 2
 			whistleArray =  downSampleMean(whistleArray, 2);
+			
+			PamArrayUtils.printArray(whistleArray);
 			
 			float[] whistleSpectrumF = PamArrayUtils.double2Float(whistleArray);
 			
@@ -462,7 +466,7 @@ public class DelphinIDTest {
 
 		int nbins = (int) ((freqLimits[1] -freqLimits[0])/freqBin);
 
-		System.out.println("Number of bins: " + nbins);
+		System.out.println("No. of bins: " + nbins + "no. of whistle points: " + whistleValues.length);
 
 		double[] peakBins = new double[nbins];
 		double minFreq, maxFreq;
@@ -486,8 +490,11 @@ public class DelphinIDTest {
 			peakBins[i]=n;
 		}
 		
+		if (ntot!=0) {
 		for (int i=0; i<nbins; i++) {
 			peakBins[i]=peakBins[i]/ntot;
+
+		}
 		}
 		
 		return peakBins;
