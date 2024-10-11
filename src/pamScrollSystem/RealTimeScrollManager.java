@@ -59,4 +59,10 @@ public class RealTimeScrollManager extends AbstractScrollManager {
 		return newMin;
 	}
 
+	@Override
+	public void scrollToTime(PamDataBlock dataBlock, long menuMouseTime) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
