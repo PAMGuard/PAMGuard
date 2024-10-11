@@ -4,7 +4,7 @@
   <groupId>org.pamguard</groupId>
   <artifactId>Pamguard</artifactId>
   <name>Pamguard</name>
-  <version>2.02.13c</version>
+  <version>2.02.13d</version>
   <description>Pamguard using Maven to control dependencies</description>
   <url>www.pamguard.org</url>
   <organization>
@@ -172,7 +172,7 @@
             </additionalResources>
           </dmg>
           <jdk>
-            <include>true</include>
+            <include>false</include>
             <location>/Library/Java/JavaVirtualMachines/amazon-corretto-21.jdk</location>
           </jdk>
           <codesign>

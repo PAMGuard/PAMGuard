@@ -26,7 +26,8 @@ public class PamIcon {
 		
 
 		//the default is windows. Icon automatically resize on Windows. 
-		String path = "Resources\\pamguardIcon.png";
+		// Even on Windows, use a / slash. A \\ doesn't work (OK in debugger, not in built version)
+		String path = "Resources/pamguardIcon.png";
 
 		if (System.getProperty("os.name").equals("Linux") || System.getProperty("os.name").startsWith("Mac")) {
 			switch (sizeFlag) {
