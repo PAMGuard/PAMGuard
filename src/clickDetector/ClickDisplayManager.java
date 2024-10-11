@@ -29,6 +29,7 @@ import PamModel.parametermanager.PamParameterSet;
 import PamModel.parametermanager.PamParameterSet.ParameterSetType;
 import PamModel.parametermanager.PrivatePamParameterData;
 import PamView.MenuItemEnabler;
+import PamView.PamIcon;
 import clickDetector.offlineFuncs.OfflineEventDataUnit;
 
 public class ClickDisplayManager implements PamSettings {
@@ -166,9 +167,8 @@ public class ClickDisplayManager implements PamSettings {
 
 			pf = new PamInternalFrame(newClickDisplay, false);
 
-			if (!System.getProperty("os.name").equals("Linux")) {
-				newClickDisplay.getFrame().setFrameIcon(new ImageIcon(ClassLoader
-						.getSystemResource("Resources/pamguardIcon.png")));
+			if (!System.getProperty("os.name").equals("Linux") && !System.getProperty("os.name").startsWith("Mac")) {
+				newClickDisplay.getFrame().setFrameIcon(PamIcon.getPAMGuardImageIcon(PamIcon.SMALL));
 			}
 
 			newClickDisplay.getFrame().setClosable(true);

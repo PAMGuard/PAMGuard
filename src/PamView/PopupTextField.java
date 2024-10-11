@@ -25,8 +25,7 @@ public class PopupTextField {
 	private PopupTextField(String title) {
 //		frame = new JFrame();
 		frame = new JDialog();
-		frame.setIconImage(new ImageIcon(ClassLoader
-				.getSystemResource("Resources/pamguardIcon.png")).getImage());
+		frame.setIconImage(PamIcon.getPAMGuardImageIcon(PamIcon.SMALL).getImage());
 		frame.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
 		frame.setIconImage(null);
 		frame.setLayout(new BorderLayout());

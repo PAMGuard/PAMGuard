@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,6 +23,7 @@ import org.kordamp.ikonli.swing.FontIcon;
 import PamUtils.PamCalendar;
 import PamView.component.PamSettingsIconButton;
 import PamView.dialog.PamGridBagContraints;
+import PamView.panel.PamPanel;
 
 /**
  * Simpel dialog component which can interact with a file date. 
@@ -41,7 +43,7 @@ public class FileDateDialogStrip {
 	private JButton settingsButton;
 
 //	private ImageIcon settingsIcon = new ImageIcon(ClassLoader.getSystemResource("Resources/SettingsButtonSmall2.png"));
-	public static FontIcon settingsIcon =  FontIcon.of(PamSettingsIconButton.SETTINGS_IKON, PamSettingsIconButton.NORMAL_SIZE, Color.DARK_GRAY);
+	public static FontIcon settingsIcon =  FontIcon.of(PamSettingsIconButton.SETTINGS_IKON, PamSettingsIconButton.NORMAL_SIZE);
 
 	
 	private Window parent;	
@@ -53,18 +55,32 @@ public class FileDateDialogStrip {
 		this.parent = parent;
 		settingsButton = new JButton(settingsIcon);
 		formatLabel = new JLabel(" ");
-		fileTime = new JTextField(20);
+		fileTime = new JTextField(20); 
+		
 		
 		mainPanel = new JPanel(new BorderLayout());
-		JPanel centPanel = new JPanel(new BorderLayout());
-		centPanel.add(BorderLayout.NORTH, formatLabel);
-		centPanel.add(BorderLayout.SOUTH, fileTime);
-		mainPanel.add(BorderLayout.CENTER, centPanel);
-		mainPanel.add(BorderLayout.EAST, settingsButton);
-		JPanel westPanel = new JPanel(new BorderLayout());
-		westPanel.add(BorderLayout.NORTH, new JLabel("  "));
-		westPanel.add(BorderLayout.CENTER, new JLabel("File date :  "));
-		mainPanel.add(BorderLayout.WEST, westPanel);
+		
+		GridBagConstraints c = new GridBagConstraints();
+		
+		PamPanel centPanel = new PamPanel(new GridBagLayout());
+		
+		c.gridx = 0; 
+		c.insets = new Insets(0,0,0,5); 
+
+		JLabel fileDateLabel = new JLabel("File date ");
+		PamPanel.addComponent(centPanel,fileDateLabel, c);
+		c.gridx ++;
+		PamPanel.addComponent(centPanel, fileTime, c);
+		c.gridx++;
+		PamPanel.addComponent(centPanel, settingsButton, c);
+		
+		//keep the lable below the text box
+		c.gridx = 1; 
+	
+		PamPanel.addComponent(centPanel, formatLabel, c);
+		
+		mainPanel.add(BorderLayout.WEST, centPanel);
+		
 		
 //		mainPanel = new JPanel(new GridBagLayout());
 //		GridBagConstraints c = new PamGridBagContraints();
