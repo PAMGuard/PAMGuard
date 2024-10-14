@@ -31,7 +31,12 @@ public class UserDisplayFrame extends JInternalFrame {
 		add(userDisplayComponent.getComponent());
 		setTitle(userDisplayComponent.getFrameTitle());
 
-		setFrameIcon(PamIcon.getPAMGuardImageIcon(PamIcon.SMALL));
+		try {
+			setFrameIcon(PamIcon.getPAMGuardImageIcon(PamIcon.SMALL));
+		}
+		catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
 		
 		setSize(900, 400);
 		setVisible(true);

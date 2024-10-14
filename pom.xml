@@ -216,7 +216,7 @@
 		                </additionalResources>
 		            </dmg>
 		             <jdk>
-			            <include>true</include>
+			            <include>false</include>
 			            <location>/Library/Java/JavaVirtualMachines/amazon-corretto-21.jdk</location>
 			        </jdk>
 		             <codesign>

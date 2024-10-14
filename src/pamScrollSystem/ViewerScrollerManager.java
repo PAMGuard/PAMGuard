@@ -644,7 +644,7 @@ public class ViewerScrollerManager extends AbstractScrollManager implements PamS
 		newMin = checkMinimumTime(menuMouseTime - scrollRange / 2);
 		newMax = checkMaximumTime(newMin + scrollRange);
 		newMin = menuMouseTime - scrollRange/2;
-		newMin = checkGapPos(dataBlock, newMin, newMax);
+//		newMin = checkGapPos(dataBlock, newMin, newMax); // doesn't work.
 		newMax = newMin + scrollRange;
 		System.out.printf("Centering scoller at %s, range %s to %s\n", PamCalendar.formatDBDateTime(menuMouseTime),
 				PamCalendar.formatDBDateTime(newMin), PamCalendar.formatDBDateTime(newMax));
