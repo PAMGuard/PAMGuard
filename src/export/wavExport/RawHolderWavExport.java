@@ -9,7 +9,7 @@ import clickDetector.ClickDetection;
  * @author Jamie Macaulay 
  *
  */
-public class RawHolderWavExport extends WavDataUnitExport<PamDataUnit> {
+public class RawHolderWavExport extends WavDataUnitExport<PamDataUnit<?,?>> {
 
 	@Override
 	public double[][] getWavClip(PamDataUnit dataUnit) {

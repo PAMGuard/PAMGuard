@@ -8,7 +8,7 @@ import annotation.DataAnnotation;
 import annotation.DataAnnotationType;
 import pamViewFX.fxSettingsPanes.DynamicSettingsPane;
 
-public abstract class ScalarDataSelector<TDataAnnotation extends DataAnnotation> extends AnnotationDataSelector<TDataAnnotation> {
+public abstract class ScalarDataSelector<TDataAnnotation extends DataAnnotation<?>> extends AnnotationDataSelector<TDataAnnotation> {
 	
 	/**
 	 * @return the scalarDataParams

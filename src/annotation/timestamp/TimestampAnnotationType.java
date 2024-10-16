@@ -12,7 +12,7 @@ import annotation.DataAnnotationType;
  * @author Doug Gillespie
  *
  */
-public class TimestampAnnotationType extends DataAnnotationType<TimestampAnnotation> {
+public class TimestampAnnotationType extends DataAnnotationType<TimestampAnnotation<?>> {
 
 	private String annotationName;
 	private TimestampSQLLogging sqlAddon;

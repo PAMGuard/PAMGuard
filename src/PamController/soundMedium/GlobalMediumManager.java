@@ -136,6 +136,21 @@ public class GlobalMediumManager implements PamSettings {
 		return GlobalMedium.getdBRefString(globalMediumParams.currentMedium); 
 	}
 
+	/**
+	 * Get the string for the default dB reference unit for power spectral density e.g. dB re 1uPa^2/Hz.
+	 * @return the string for dB values.
+	 */
+	public String getdBPSDString() {
+		return GlobalMedium.getdBPSDString(globalMediumParams.currentMedium);
+	}
+
+	/**
+	 * Get the string for the default dB reference unit for power spectral density e.g. dB re 1uPa^2/Hz.
+	 * @return the string for dB values.
+	 */
+	public String getdBSELString() {
+		return GlobalMedium.getdBSELString(globalMediumParams.currentMedium);
+	}
 
 	/**
 	 * Get the height coefficient value for displays. Heights are always stored so
