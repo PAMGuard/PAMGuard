@@ -14,6 +14,8 @@ import org.jamdev.jdl4pam.transforms.DLTransform.DLTransformType;
 import org.jamdev.jdl4pam.utils.DLMatFile;
 import org.jamdev.jpamutils.JamArr;
 import org.jamdev.jpamutils.spectrogram.SpecTransform;
+import org.jamdev.jpamutils.spectrum.Spectrum;
+
 import PamUtils.PamArrayUtils;
 import PamguardMVC.PamDataUnit;
 import ai.djl.MalformedModelException;
@@ -41,8 +43,8 @@ public class DelphinIDTest {
 	 * @param args - the arguments
 	 */
 	public static void main(String args[]) {
-		
-		String matout = "/Users/jdjm/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/delphinID/whistle1D/whistlespectra_4s.mat";
+
+		String matout = "/Users/au671271/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/delphinID/whistle1D/whistlespectra_4s.mat";
 		testDelphinIDArray( matout);
 
 		//
@@ -81,7 +83,7 @@ public class DelphinIDTest {
 
 
 	/**
-	 * The 
+	 * Test a model including transforms saved in the model
 	 * @param matImageSave - the MATLAB image
 	 * @return true of the test is passed
 	 */
@@ -141,8 +143,6 @@ public class DelphinIDTest {
 			for (int j=0; j<output.length; j++) {
 				System.out.print(String.format( " %.3f" , output[j])); 
 			}
-
-
 
 			Matrix image = DLMatFile.array2Matrix(PamArrayUtils.float2Double(model.getLastModelInput()[0]));
 			imageStruct.set("image", i, image);
@@ -217,7 +217,7 @@ public class DelphinIDTest {
 
 		return transformedData2;
 	}
-	
+
 
 	/**
 	 * This test runs delphinID on a single 4 second window from whistle contours saved
@@ -274,7 +274,7 @@ public class DelphinIDTest {
 			//the values for the whistle detector.
 			double[][] pamguardWhistleImage = 	whistleScatter2Image(whistleValues, array.getDouble(0), seglen);
 
-			//IMPORTANT - WE MUST TRANPOSE THE MATRIC HERE. 
+			//IMPORTANT - WE MUST TRANPOSE THE MATRIX HERE. 
 			pamguardWhistleImage=PamArrayUtils.transposeMatrix(pamguardWhistleImage);
 
 			//System.out.println("Size python: " + compressedWhistleImage.length + " x " + compressedWhistleImage[0].length);
@@ -325,8 +325,8 @@ public class DelphinIDTest {
 			return false;
 		} 
 	}
-	
-	
+
+
 	/****---------------------1D Tests---------------------****/
 	/*
 	/*
@@ -346,7 +346,7 @@ public class DelphinIDTest {
 		double seglen = 4;
 		//test the model
 		//String modelPath =  "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Dde415/whistle_4s_415_model.zip";
-		String modelPath = "/Users/jdjm/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/whistleclassifier.zip";
+		String modelPath = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/whistleclassifier.zip";
 		//		String modelPath = "./src/test/resources/rawDeepLearningClassifier/DelphinID/whistle_4s_415_model.zip";
 
 		File file = new File(modelPath);
@@ -354,11 +354,9 @@ public class DelphinIDTest {
 
 		//the image to test
 		String relMatPath = "./src/test/resources/rawDeepLearningClassifier/DelphinID/Ggr242_s10_PAM_20200918_123234_366_1.mat";
-	
+
 		try {
 
-
-			
 			Path path = Paths.get(relMatPath);
 
 			// Create MAT file with a scalar in a nested struct
@@ -367,33 +365,31 @@ public class DelphinIDTest {
 
 			//the values for the whistle detector.
 			double[][] whistleValues = DLMatFile.matrix2array(array);
-			
+
 			double[] freqLimits = new double[] {2000., 20000.};
-			
+
 			//Create spectrum
-			double[] whistleArray = whistle2AverageArray(whistleValues, array.getDouble(0), seglen, freqLimits);
-			
+			double[] whistleArray = Whsitle2Spectrum.whistle2AverageArray(whistleValues, array.getDouble(0), seglen, freqLimits);
+
 			System.out.println("Whistle spectrum size intial: " + whistleArray.length); 
-			
-			//normalise the array 
-			whistleArray = PamArrayUtils.divide(whistleArray, PamArrayUtils.sum(whistleArray)); 
-			
-			PamArrayUtils.printArray(whistleArray);
 
 			//down sample by a factor of 2
-			whistleArray =  downSampleMean(whistleArray, 2);
+			whistleArray =  Spectrum.downSampleSpectrumMean(whistleArray, 2); 
 			
+			//normalise the array 			
+			whistleArray =  Spectrum.normaliseSpectrumSum(whistleArray); 
+
 			PamArrayUtils.printArray(whistleArray);
-			
+
 			float[] whistleSpectrumF = PamArrayUtils.double2Float(whistleArray);
-			
+
 			System.out.println("Whistle spectrum size after transforms: " + whistleArray.length); 
 
 			//generate model input
 			float[][] input = new float[1][];
 			input[0] = whistleSpectrumF;
-			
-			
+
+
 			//write some output data for plotting if there is an output file set. 
 			if (matFileout!=null){
 				MatFile matFileWrite = Mat5.newMatFile()
@@ -402,19 +398,23 @@ public class DelphinIDTest {
 
 				Mat5.writeToFile(matFileWrite, matFileout);
 			}
-			
-			
+
 			/*****Load the deep learning model and run*****/
-//			Path path = Paths.get(modelPath);
-//
-//			//load the model
-//			SimpleArchiveModel model = new SimpleArchiveModel(new File(path.toString()));
-//			float[] outputJava = model.runModel(input);
-//			
-//			System.out.println("Whistle spectrum output: "); 
-//			PamArrayUtils.printArray(outputJava);
+			path = Paths.get(modelPath);
 
+			//load the model
+			SimpleArchiveModel model = new SimpleArchiveModel(new File(path.toString()));
+			float[] outputJava = model.runModel(input);
+			System.out.println("Whistle spectrum output Java: "); 
+			PamArrayUtils.printArray(outputJava);
 
+			//load the model
+
+			input[0] = PamArrayUtils.double2Float(matrix2array1D(matFile.getArray("tfspectrum")));
+			float[] outputPython = model.runModel(input);
+			System.out.println("Whistle spectrum output Python: "); 
+			PamArrayUtils.printArray(outputPython);
+			
 		} 
 		catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -422,82 +422,37 @@ public class DelphinIDTest {
 
 			return false;
 		}
-		
-		
+
 		return false;
 	}
-	
+
+	/**
+	 * Convert a matrix to a 
+	 * @param matrix - the MAT file matrix
+	 * @return double[][] array of results
+	 */
+	public static double[] matrix2array1D(Matrix matrix) {
+		if (matrix==null) return null;
+
+		double[] arrayOut = new double[matrix.getNumElements()];
+		for (int i=0; i<matrix.getNumElements(); i++) {
+			arrayOut[i] = matrix.getDouble(i);
+
+		}
+		return arrayOut;
+	}
+
+
 	/**
 	 * Down sample a spectrum array. 
 	 * @param spectrum - down sample a spectrum arra by a factor of 2 
 	 * @return the down sampled array. 
 	 */
 	private static double[] downSampleMean(double[] spectrum, int factor) {
-		
-		int newlen = (int) Math.floor(((double) spectrum.length)/factor); 
-		
-		double[] downSample = new double[newlen]; 
-		
-		int n=0; 
-		double mean =0; 
-		for (int i=0; i<spectrum.length; i+=factor) {
-			
-			mean=0;
-			for (int j=0; j<factor; j++) {
-				mean += spectrum[i+j]; 
-			}
-			mean =mean/factor; 
-			
-			downSample[n]=mean;
-			n++; 
-		}
-		
-		return downSample; 
-	}
-	
+
+		return Spectrum.downSampleSpectrumMean(spectrum, factor); 
 
 
-	private static double[] whistle2AverageArray(double[][] whistleValues, double startseg, double seglen, double[] freqLimits) {
-
-		//now perform the image transform in Java 
-//		double[] freqLimits = new double[] {2000., 20000.};
-
-		double freqBin = 100.;
-
-		int nbins = (int) ((freqLimits[1] -freqLimits[0])/freqBin);
-
-		System.out.println("No. of bins: " + nbins + "no. of whistle points: " + whistleValues.length);
-
-		double[] peakBins = new double[nbins];
-		double minFreq, maxFreq;
-		int n;
-		int ntot = 0;
-		for (int i=0; i<nbins; i++) {
-			
-			minFreq = i*freqBin+freqLimits[0];
-			maxFreq = (i+1)*freqBin+freqLimits[0];
-
-			n=0;
-			for (int j=0; j<whistleValues.length ; j++) {
-				if (whistleValues[j][1]>= minFreq && whistleValues[j][1]< maxFreq && whistleValues[j][0]>=startseg && whistleValues[j][0]<(startseg+seglen)) {
-					n++;
-				}
-			}
-			
-			ntot=ntot+n;
-
-			System.out.println("Bin: " + minFreq + " Hz   " + n); 
-			peakBins[i]=n;
-		}
-		
-		if (ntot!=0) {
-		for (int i=0; i<nbins; i++) {
-			peakBins[i]=peakBins[i]/ntot;
-
-		}
-		}
-		
-		return peakBins;
 	}
 
 

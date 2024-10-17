@@ -106,7 +106,7 @@ public abstract class DLModelWorker<T> {
 
 	/**
 	 * Run the initial data feature extraction and the model
-	 * @param rawDataUnit - the raw data unit. This is a stack of data units to be classified either together or seperately.  
+	 * @param rawDataUnit - the raw data unit. This is a stack of data units to be classified either together or separately.  
 	 * @param iChan - the channel to run the data on. 
 	 * @return the model to run. 
 	 */

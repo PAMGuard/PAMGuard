@@ -35,20 +35,20 @@ import us.hebi.matlab.mat.types.Struct;
  * @author Jamie Macaulay
  *
  */
-public class DelphinIDWorker extends  ArchiveModelWorker {
+public class DelphinIDWorker extends ArchiveModelWorker {
 
 	/**
 	 * Parameters for the whistle to image transform. 
 	 */
-	private Whistle2ImageParams whistleImageParams;
+	private DelphinIDTransform whistleTransform = new DelphinIDTransform();
 
 	/**
 	 * Get the whislte to image parameters. 
 	 * 
 	 * @return
 	 */
-	public Whistle2ImageParams getWhistleImageParams() {
-		return whistleImageParams;
+	public DelphinIDTransform getWhistleTransform() {
+		return whistleTransform;
 	}
 
 
@@ -56,13 +56,13 @@ public class DelphinIDWorker extends  ArchiveModelWorker {
 	public void prepModel(StandardModelParams dlParams, DLControl dlControl) {
 		//most of the model prep is done in the perent class. 
 		super.prepModel(dlParams, dlControl);
-
+				
 		//now have to read the whsitle2image transform to get correct parameters for that. 
 		String jsonString  = DLTransformsParser.readJSONString(new File(this.getModel().getAudioReprFile()));
 		
-		
-		whistleImageParams = readWhistleImageTransform(new JSONObject(jsonString)) ;
-		if (whistleImageParams==null) {
+		boolean whistleOK = whistleTransform.setJSONData(new JSONObject(jsonString)); 
+
+		if (!whistleOK) {
 			System.err.println("Error: could not find whistle2image transform in DelphinID JSON file. Model will not work.");
 			this.setModel(null); // set model to null to make sure nothing works and errors are thrown
 		}
@@ -115,49 +115,18 @@ public class DelphinIDWorker extends  ArchiveModelWorker {
 		//something has gone wrong if we get here. 
 		return null; 
 	}
-	
-	
-	
-	private Struct imageStruct;
-	int count = 0;
-	/**
-	 * Tets by exporting results to a .mat file. 
-	 * @param data
-	 * @param aSegment
-	 */
-	private void addIMage2MatFile(double[][] data, SegmenterDetectionGroup aSegment) {
-		long dataStartMillis = 1340212413000L;
-
-		if (imageStruct==null) {
-			 imageStruct = Mat5.newStruct(100,1);
-		}
-		Matrix image = DLMatFile.array2Matrix(data);
-		imageStruct.set("image", count, image);
-		imageStruct.set("startmillis", count, Mat5.newScalar(aSegment.getSegmentStartMillis()));
-		imageStruct.set("startseconds", count, Mat5.newScalar((aSegment.getSegmentStartMillis()-dataStartMillis)/1000.));
-
-		count++;
-		
-		System.out.println("SAVED " +count + " TO MAT FILE");
-		
-		if (count==10) {
-			//create MatFile for saving the image data to. 
-			MatFile matFile = Mat5.newMatFile();
-			matFile.addArray("whistle_images", imageStruct);
-			//the path to the model
-			String matImageSave = "C:/Users/Jamie Macaulay/MATLAB Drive/MATLAB/PAMGUARD/deep_learning/delphinID/whistleimages_pg.mat";
-			try {
-				Mat5.writeToFile(matFile,matImageSave);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
 
 
 	@Override
 	public float[][][] dataUnits2ModelInput(ArrayList<? extends PamDataUnit> dataUnits, float sampleRate, int iChan){
+		
+		
+		/**
+		 * Need to override this as the standard function assumes dataUnits are GroupedAudioData and 
+		 * adds AudioData to first transforms and runs the transforms. We need to take whsiltes and do something
+		 * completely different here. 
+		 */
+		
 		//Get a list of of the model transforms. 
 		ArrayList<DLTransform> modelTransforms = getModelTransforms();
 
@@ -174,14 +143,9 @@ public class DelphinIDWorker extends  ArchiveModelWorker {
 		
 		
 		for (int j=0; j<numChunks; j++) {
-
-//			System.out.println("Number of whistle to process: " + whistleGroups.get(j).getStartSecond() + "s  " +  whistleGroups.get(j).getSubDetectionsCount() + "  " + whistleGroups.get(j).getSegmentStartMillis());
-			//create the first transform and set then whistle data. Note that the absolute time limits are
-			//contained within the SegmenterDetectionGroup unit. 
-			Whistles2Image whistles2Image = new Whistles2Image(whistleGroups.get(j), whistleImageParams);
-
-			//set the spec transform
-			((FreqTransform) modelTransforms.get(0)).setSpecTransfrom(whistles2Image.getSpecTransfrom());
+			
+		
+			whistleTransform.setWhistleData(whistleGroups.get(j), modelTransforms.get(0));
 
 			//process all the transforms. 
 			DLTransform transform = modelTransforms.get(0); 
@@ -209,6 +173,45 @@ public class DelphinIDWorker extends  ArchiveModelWorker {
 
 		return transformedDataStack;
 	} 
+	
+	
+	
+//	private Struct imageStruct;
+//	int count = 0;
+//	/**
+//	 * Tets by exporting results to a .mat file. 
+//	 * @param data
+//	 * @param aSegment
+//	 */
+//	private void addIMage2MatFile(double[][] data, SegmenterDetectionGroup aSegment) {
+//		long dataStartMillis = 1340212413000L;
+//
+//		if (imageStruct==null) {
+//			 imageStruct = Mat5.newStruct(100,1);
+//		}
+//		Matrix image = DLMatFile.array2Matrix(data);
+//		imageStruct.set("image", count, image);
+//		imageStruct.set("startmillis", count, Mat5.newScalar(aSegment.getSegmentStartMillis()));
+//		imageStruct.set("startseconds", count, Mat5.newScalar((aSegment.getSegmentStartMillis()-dataStartMillis)/1000.));
+//
+//		count++;
+//		
+//		System.out.println("SAVED " +count + " TO MAT FILE");
+//		
+//		if (count==10) {
+//			//create MatFile for saving the image data to. 
+//			MatFile matFile = Mat5.newMatFile();
+//			matFile.addArray("whistle_images", imageStruct);
+//			//the path to the model
+//			String matImageSave = "C:/Users/Jamie Macaulay/MATLAB Drive/MATLAB/PAMGUARD/deep_learning/delphinID/whistleimages_pg.mat";
+//			try {
+//				Mat5.writeToFile(matFile,matImageSave);
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+//	}
 
 
 }

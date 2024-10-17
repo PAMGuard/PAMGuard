@@ -303,8 +303,10 @@ public class DelphinIDUtils {
 	private static void generateTrainingData(String modelPath, String whistlefolder, String imageFolder, double lineWidth) {
 		DelphinIDWorkerTest model = DelphinIDUtils.prepDelphinIDModel(modelPath);
 		model.setEnableSoftMax(false);
+		
+		model.getWhistleTransform().getTransformParams();
 
-		model.getWhistleImageParams().lineWidth=lineWidth;
+		((WhistleImageParams) model.getWhistleTransform().getTransformParams()).lineWidth=lineWidth;
 
 		FileList filelist = new FileList();
 
