@@ -61,6 +61,7 @@ import effortmonitor.EffortControl;
 import fftManager.FFTDataUnit;
 import fftManager.PamFFTControl;
 import group3dlocaliser.Group3DLocaliserControl;
+import landMarks.LandmarkControl;
 import meygenturbine.MeygenTurbine;
 import printscreen.PrintScreenControl;
 import ravendata.RavenControl;
@@ -267,7 +268,7 @@ final public class PamModel implements PamSettings {
 		mi.setMinNumber(0);
 		//		mi.setMaxNumber(1);
 
-		mi = PamModuleInfo.registerControlledUnit("landMarks.LandmarkControl", "Fixed Landmarks");
+		mi = PamModuleInfo.registerControlledUnit(LandmarkControl.class.getName(), "Fixed Landmarks");
 		mi.setModulesMenuGroup(mapsGroup);
 		mi.setToolTipText("Place object symbols on the PAMGuard map");
 		
