@@ -10,8 +10,10 @@ import javafx.animation.Timeline;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import PamguardMVC.PamDataBlock;
@@ -39,6 +41,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	 */
 	private static final int DATASTREAMPANE_HEIGHT = 220;
 
+	
 	private static final double SCROLL_BAR_INCREMENT = 0.05; //10% movement when scroll bnutton pressed
 
 	/**
@@ -101,6 +104,12 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	 * Axis which shows the current dates
 	 */
 	private PamDateAxis dateAxis;
+	
+	/**
+	 * The main stack pane. 
+	 */
+	private StackPane mainStackPane; 
+
 
 	/**
 	 * Constructor for the ScrollingDataPaneFX
@@ -176,7 +185,10 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 		vBox.getChildren().add(dateAxis);
 
 		holder.setTop(vBox);
-		holder.setCenter(mainScrollPane);
+		
+		mainStackPane = new StackPane(); 
+		mainStackPane.getChildren().add(mainScrollPane); 
+		holder.setCenter(mainStackPane);
 
 		setupScrollBar();		
 
@@ -312,7 +324,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	}
 
 	Timeline timeline; 
-	long lastTime = 0; 
+	long lastTime = 0;
 
 	/**
 	 * Notify all panels and the settings strip that the scroll bar moved - but have a timer to wait to not call too often. 
@@ -570,6 +582,10 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 	 */
 	public DataMapParametersFX getDataMapParams() {
 		return this.dataMapPaneFX.getDataMapParams();
+	}
+
+	public StackPane getCenterStackPane() {
+		return mainStackPane;
 	}
 	
 }

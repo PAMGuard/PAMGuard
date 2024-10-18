@@ -16,6 +16,7 @@ import PamguardMVC.DataUnitBaseData;
 import PamguardMVC.PamDataUnit;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.delphinID.DelphinIDTest.DelphinIDWorkerTest;
+import rawDeepLearningClassifier.dlClassification.delphinID.Whistles2Image.Whistle2ImageParams;
 import rawDeepLearningClassifier.segmenter.SegmenterDetectionGroup;
 import us.hebi.matlab.mat.format.Mat5;
 import us.hebi.matlab.mat.format.Mat5File;
@@ -306,7 +307,7 @@ public class DelphinIDUtils {
 		
 		model.getWhistleTransform().getTransformParams();
 
-		((WhistleImageParams) model.getWhistleTransform().getTransformParams()).lineWidth=lineWidth;
+		((Whistle2ImageParams) model.getWhistleTransform().getTransformParams()).lineWidth=lineWidth;
 
 		FileList filelist = new FileList();
 

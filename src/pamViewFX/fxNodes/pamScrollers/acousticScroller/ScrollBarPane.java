@@ -478,7 +478,7 @@ public class ScrollBarPane extends PamBorderPane {
 	}
 
 	/**
-	 * Create the text field that allows to manually chage the visible amount amount property. 
+	 * Create the text field that allows to manually e the visible amount amount property. 
 	 */
 	private void createTextField(){
 		//create the textbox

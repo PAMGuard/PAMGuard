@@ -30,7 +30,12 @@ import us.hebi.matlab.mat.types.Matrix;
 import us.hebi.matlab.mat.types.Struct;
 
 /**
- * 
+ * The delphinID worker. This worker has two additional tasks compared to it's
+ * parent class.
+ * <ul>
+ * <li>Read the the JSON parameters that transform that converts a group of clicks or whistles to a transform</li>
+ * <li>Insert the custon transform at the start of the transforms list before data are transformed</li>
+ * </ul>
  * 
  * @author Jamie Macaulay
  *
@@ -40,7 +45,7 @@ public class DelphinIDWorker extends ArchiveModelWorker {
 	/**
 	 * Parameters for the whistle to image transform. 
 	 */
-	private DelphinIDTransform whistleTransform = new DelphinIDTransform();
+	private DelphinIDTransform groupDataTransform = new DelphinIDTransform();
 
 	/**
 	 * Get the whislte to image parameters. 
@@ -48,7 +53,7 @@ public class DelphinIDWorker extends ArchiveModelWorker {
 	 * @return
 	 */
 	public DelphinIDTransform getWhistleTransform() {
-		return whistleTransform;
+		return groupDataTransform;
 	}
 
 
@@ -60,10 +65,10 @@ public class DelphinIDWorker extends ArchiveModelWorker {
 		//now have to read the whsitle2image transform to get correct parameters for that. 
 		String jsonString  = DLTransformsParser.readJSONString(new File(this.getModel().getAudioReprFile()));
 		
-		boolean whistleOK = whistleTransform.setJSONData(new JSONObject(jsonString)); 
+		boolean transformOK = groupDataTransform.setJSONData(new JSONObject(jsonString)); 
 
-		if (!whistleOK) {
-			System.err.println("Error: could not find whistle2image transform in DelphinID JSON file. Model will not work.");
+		if (!transformOK) {
+			System.err.println("Error: could not find whsitle or click group transform in DelphinID JSON file. Model will not work.");
 			this.setModel(null); // set model to null to make sure nothing works and errors are thrown
 		}
 		
@@ -73,49 +78,6 @@ public class DelphinIDWorker extends ArchiveModelWorker {
 		}
 	
 	}
-
-
-	/**
-	 * Read the whistle transform settings- this is not included in the JPAM library because it directly 
-	 * reference PAMGuard specific detections. 
-	 */
-	private Whistle2ImageParams readWhistleImageTransform(JSONObject mainObject) {
-		//first parse the transforms.
-		JSONArray jsonArray = mainObject.getJSONArray("transforms"); 
-
-		JSONObject jsonObjectParams; 
-		for (int i=0; i<jsonArray.length(); i++) {
-
-			String transformName = (String) jsonArray.getJSONObject(i).get("name"); 
-
-			if (transformName.trim().equals("whistles2image")) {
-
-				jsonObjectParams  = (JSONObject) jsonArray.getJSONObject(i).get("params"); 
-
-				double[] freqLimits = new double[2]; 
-				double[] size = new double[2];
-				freqLimits[0] = jsonObjectParams.getFloat("minfreq"); 
-				freqLimits[1] = jsonObjectParams.getFloat("maxfreq"); 
-				size[0] = jsonObjectParams.getInt("widthpix"); 
-				size[1] = jsonObjectParams.getInt("heightpix"); 
-				double minfragmillis = jsonObjectParams.getDouble("minfragmillis"); 
-
-				double lineWidth = jsonObjectParams.getDouble("linewidthpix"); 
-
-				Whistle2ImageParams whistle2ImageParmas = new Whistle2ImageParams();
-				whistle2ImageParmas.freqLimits = freqLimits;
-				whistle2ImageParmas.size = size;
-				whistle2ImageParmas.lineWidth = lineWidth;
-				whistle2ImageParmas.minFragSize = minfragmillis;
-
-				return whistle2ImageParmas;
-			}
-		}
-			
-		//something has gone wrong if we get here. 
-		return null; 
-	}
-
 
 	@Override
 	public float[][][] dataUnits2ModelInput(ArrayList<? extends PamDataUnit> dataUnits, float sampleRate, int iChan){
@@ -131,10 +93,10 @@ public class DelphinIDWorker extends ArchiveModelWorker {
 		ArrayList<DLTransform> modelTransforms = getModelTransforms();
 
 		@SuppressWarnings("unchecked")
-		ArrayList<SegmenterDetectionGroup> whistleGroups = (ArrayList<SegmenterDetectionGroup>) dataUnits;
+		ArrayList<SegmenterDetectionGroup> detectionGroups = (ArrayList<SegmenterDetectionGroup>) dataUnits;
 
 		//the number of chunks. 
-		int numChunks = whistleGroups.size(); 
+		int numChunks = detectionGroups.size(); 
 
 		//data input into the model - a stack of spectrogram images. 
 		float[][][] transformedDataStack = new float[numChunks][][]; 
@@ -145,7 +107,7 @@ public class DelphinIDWorker extends ArchiveModelWorker {
 		for (int j=0; j<numChunks; j++) {
 			
 		
-			whistleTransform.setWhistleData(whistleGroups.get(j), modelTransforms.get(0));
+			groupDataTransform.setGroupDetectionData(detectionGroups.get(j), modelTransforms.get(0));
 
 			//process all the transforms. 
 			DLTransform transform = modelTransforms.get(0); 

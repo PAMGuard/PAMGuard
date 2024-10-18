@@ -218,24 +218,17 @@ public class Whistles2Image extends FreqTransform {
 		return canvas; 
 	}
 
-	public static class Whistle2ImageParams {
+	public static class Whistle2ImageParams extends WhistleTransformParams {
 
-		/**
-		 * The frequency limitis in 
+		/**the size of the image inpixels 
+		 * 
 		 */
-		public double[] freqLimits;
-
 		public double[] size;
 
 		/**
 		 * The line width to draw in pixels
 		 */
 		public double lineWidth = 10.;
-
-		/**
-		 * The minimum fragment length in millis. 
-		 */
-		public double minFragSize = 200.; //ms
 
 	}
 

@@ -21,12 +21,22 @@ public class DataMapScrollBar extends ScrollBarPane {
 	public DataMapScrollBar(DataMapControl dataMapControl) {
 		super();
 		this.dataMapControl=dataMapControl;
+		
+		this.widthProperty().addListener((obsVal, oldval, newVal)->{
+			paintDataSummary();
+		});
+		
+		this.heightProperty().addListener((obsVal, oldval, newVal)->{
+			paintDataSummary();
+		});
 	}
 
 	/**
 	 * Paint a summary of the data
 	 */
 	public void paintDataSummary() {
+		
+		this.getDrawCanvas().getGraphicsContext2D().clearRect(0, 0, this.getWidth(), this.getHeight());
 
 		ArrayList<OfflineDataStore> offlineDataStores = PamController.getInstance().findOfflineDataStores();
 		OfflineDataStore aSource;

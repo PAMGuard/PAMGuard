@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.jamdev.jpamutils.spectrum.Spectrum;
 
+import rawDeepLearningClassifier.dlClassification.delphinID.Whistles2Image.Whistle2ImageParams;
 import rawDeepLearningClassifier.segmenter.SegmenterDetectionGroup;
 
 
@@ -11,6 +12,19 @@ import rawDeepLearningClassifier.segmenter.SegmenterDetectionGroup;
  * Functions to convert a group fo whistle contours to an average spectrum. 
  */
 public class Whsitle2Spectrum {
+	
+	private Spectrum spectrum;
+
+
+	public Whsitle2Spectrum(SegmenterDetectionGroup whistleGroups, double[] freqLimits, double minFragSize) {
+		this.spectrum = whistle2Spectrum(whistleGroups, freqLimits,  minFragSize);
+	}
+
+
+	public Whsitle2Spectrum(SegmenterDetectionGroup whistleGroups, Whistle2spectrumParams transformParams) {
+		this.spectrum = whistle2Spectrum(whistleGroups, transformParams.getFreqLimits(),  transformParams.minFragSize);
+
+	}
 
 
 	/**
@@ -39,9 +53,9 @@ public class Whsitle2Spectrum {
 
 	
 	/**
-	 * Convert an arraylist of individual contours to a single list of time and frequency values of all contours. 
-	 * @param points
-	 * @return
+	 * Convert an ArrayList of individual contours to a single list of time and frequency values of all contours. 
+	 * @param points - individual and moan contours with each point time (seconds) and frequency (Hz).
+	 * @return the concatonated whistle and moan contours with each point time (seconds) and frequency (Hz).
 	 */
 	public  static double[][] concatWhistleContours(	ArrayList<double[][]> points){
 		int n=0;
@@ -51,7 +65,7 @@ public class Whsitle2Spectrum {
 			}
 		}
 		
-		double[][] doubleArr = new double[n][]; 
+		double[][] doubleArr = new double[n][2]; 
 		
 		n=0;
 		for (int i=0; i<points.size(); i++) {
@@ -117,5 +131,31 @@ public class Whsitle2Spectrum {
 
 		return peakBins;
 	}
+	
+	
+
+	public Spectrum getSpectrum() {
+		return spectrum;
+	}
+
+
+	public void setSpectrum(Spectrum spectrum) {
+		this.spectrum = spectrum;
+	}
+	
+	public static class Whistle2spectrumParams extends WhistleTransformParams {
+		
+	
+		/**
+		 * Get the frequency limits in Hz
+		 * @return
+		 */
+		public double[] getFreqLimits() {
+			// TODO Auto-generated method stub
+			return freqLimits;
+		}
+		
+	}
+
 
 }

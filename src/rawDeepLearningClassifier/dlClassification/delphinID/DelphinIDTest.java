@@ -78,31 +78,9 @@ public class DelphinIDTest {
 
 	}
 
-
-
-
-
-	/**
-	 * Test a model including transforms saved in the model
-	 * @param matImageSave - the MATLAB image
-	 * @return true of the test is passed
-	 */
-	private static boolean testDelphinID2DModel(String matImageSave) {
-		double segLen = 4000.;
-		double segHop = 1000.0;
-		float sampleRate =96000;
-		double startSeconds = 9.565; //seconds to start segments (so we can compare to Python)
-		//unix time from sound file
-		long dataStartMillis = 1340212413000L;
-
-		//path to the .mat containing whistle contours. 
-		String whistleContourPath = "./src/test/resources/rawDeepLearningClassifier/DelphinID/SI20120620_171333_whistle_contours.mat";
-
-		//the path to the model
-		//String modelPath = "D:/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/testencounter415/whistle_model_2/whistle_4s_415.zip";
-		String modelPath = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Dde415/whistle_4s_415_model.zip";
-		//		String modelPath =  "./src/test/resources/rawDeepLearningClassifier/DelphinID/whistle_4s_415_model.zip";
-
+	
+	public static boolean runWhistleModel(String modelPath, String whistleContourPath, String matImageSave, long dataStartMillis, double startSeconds, double segLen, double segHop, float sampleRate) {
+		
 		//create MatFile for saving the image data to. 
 		MatFile matFile = Mat5.newMatFile();
 
@@ -169,6 +147,43 @@ public class DelphinIDTest {
 		//		}
 		return true;
 	}
+
+	
+	
+	/****---------------------2D Whistle Image Tests---------------------****/
+	/*
+	/*
+	/*
+	/****----------------------------------------------------------------****/
+	
+
+
+	/**
+	 * Test a model including JSON transforms etc. This function tests a 2D Image model. 
+	 * @param matImageSave - the MATLAB image
+	 * @return true of the test is passed
+	 */
+	private static boolean testDelphinIDImageModel(String matImageSave) {
+		double segLen = 4000.;
+		double segHop = 1000.0;
+		float sampleRate =96000;
+		double startSeconds = 9.565; //seconds to start segments (so we can compare to Python)
+		//unix time from sound file
+		long dataStartMillis = 1340212413000L;
+
+		//path to the .mat containing whistle contours. 
+		String whistleContourPath = "./src/test/resources/rawDeepLearningClassifier/DelphinID/SI20120620_171333_whistle_contours.mat";
+
+		//the path to the model
+		//String modelPath = "D:/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/testencounter415/whistle_model_2/whistle_4s_415.zip";
+		String modelPath = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Dde415/whistle_4s_415_model.zip";
+		//		String modelPath =  "./src/test/resources/rawDeepLearningClassifier/DelphinID/whistle_4s_415_model.zip";
+
+		boolean whistleOK = runWhistleModel( modelPath,  whistleContourPath,  matImageSave,  dataStartMillis,  startSeconds,  segLen,  segHop,  sampleRate);
+		
+		return whistleOK;
+	}
+	
 
 	public static double[][] whistleScatter2Image(double[][] whistleValues, double startseg, double seglen) {
 
@@ -327,11 +342,38 @@ public class DelphinIDTest {
 	}
 
 
-	/****---------------------1D Tests---------------------****/
+	/****---------------------1D Whistle Spectrum Tests---------------------****/
 	/*
 	/*
 	/*
-	/****--------------------------------------------------****/
+	/****------------------------------------------------------------------****/
+	
+	/**
+	 * Test a model including JSON transforms etc. This function tests a 2D Image model. 
+	 * @param matImageSave - the MATLAB image
+	 * @return true of the test is passed
+	 */
+	private static boolean testDelphinIDSpectrumModel(String matImageSave) {
+		double segLen = 4000.;
+		double segHop = 1000.0;
+		float sampleRate =96000;
+		double startSeconds = 9.565; //seconds to start segments (so we can compare to Python)
+		//unix time from sound file
+		long dataStartMillis = 1340212413000L;
+
+		//path to the .mat containing whistle contours. 
+		String whistleContourPath = "./src/test/resources/rawDeepLearningClassifier/DelphinID/SI20120620_171333_whistle_contours.mat";
+
+		//the path to the model
+		//String modelPath = "D:/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/testencounter415/whistle_model_2/whistle_4s_415.zip";
+		String modelPath = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Dde415/whistle_4s_415_model.zip";
+		//		String modelPath =  "./src/test/resources/rawDeepLearningClassifier/DelphinID/whistle_4s_415_model.zip";
+
+		boolean whistleOK = runWhistleModel( modelPath,  whistleContourPath,  matImageSave,  dataStartMillis,  startSeconds,  segLen,  segHop,  sampleRate);
+		
+		return whistleOK;
+	}
+	
 
 	/**
 	 * This test runs delphinID on one 4 second window from whistle contours saved

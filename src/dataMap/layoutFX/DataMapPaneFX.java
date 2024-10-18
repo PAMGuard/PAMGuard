@@ -67,12 +67,6 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX, P
 	private DataMapSettingsPane dataMapSettingsPane;
 
 	private PamVBox settingsPane;
-
-	/**
-	 * Axis which shows the current dates
-	 */
-	private PamDateAxis dateAxis;
-
 	/**
 	 * The parameters for the data map 
 	 */
@@ -139,15 +133,10 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX, P
 
 		StackPane.setAlignment(showButton, Pos.CENTER_RIGHT);
 
-		StackPane stackPane = new StackPane();
-		stackPane.getChildren().addAll(scrollingDataPanel, hidingSettingsPane, showButton);
+		//add the settings pane to the scroll pane. 
+		scrollingDataPanel.getCenterStackPane().getChildren().addAll(hidingSettingsPane, showButton);
 
-		dateAxis = new PamDateAxis();
-		dateAxis.setMinHeight(50);
-		dateAxis.prefWidthProperty().bind(scrollingDataPanel.widthProperty());
-
-		this.setTop(dateAxis);
-		this.setCenter(stackPane);
+		this.setCenter(scrollingDataPanel);
 	}
 
 	public void newSettings() {

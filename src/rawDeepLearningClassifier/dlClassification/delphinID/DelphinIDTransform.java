@@ -2,10 +2,12 @@ package rawDeepLearningClassifier.dlClassification.delphinID;
 
 import org.jamdev.jdl4pam.transforms.DLTransform;
 import org.jamdev.jdl4pam.transforms.FreqTransform;
+import org.jamdev.jdl4pam.transforms.SpectrumTransform;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import rawDeepLearningClassifier.dlClassification.delphinID.Whistles2Image.Whistle2ImageParams;
+import rawDeepLearningClassifier.dlClassification.delphinID.Whsitle2Spectrum.Whistle2spectrumParams;
 import rawDeepLearningClassifier.segmenter.SegmenterDetectionGroup;
 
 /**
@@ -94,7 +96,7 @@ public class DelphinIDTransform {
 	 * @param whistleGroups
 	 * @param dlTransform
 	 */
-	public void setWhistleData(SegmenterDetectionGroup whistleGroups, DLTransform dlTransform) {
+	public void setGroupDetectionData(SegmenterDetectionGroup whistleGroups, DLTransform dlTransform) {
 
 		switch (delphinIDTransformType) {
 
@@ -108,14 +110,18 @@ public class DelphinIDTransform {
 			break;
 		case WHISTLE_SPECTRUM:
 			
-			((SpectrumTransform) dlTransform).setSpectrum(whistles2Image.getSpecTransfrom());
-
+			Whsitle2Spectrum spectrum = new Whsitle2Spectrum(whistleGroups,  (Whistle2spectrumParams) transformParams); 
+						
+			((SpectrumTransform) dlTransform).setSpectrum(spectrum.getSpectrum());
 			
 			break;
 		}
 
 
 	}
+	
+	
+	/****Read JSON for different transforms***/
 
 
 	/**
@@ -124,31 +130,42 @@ public class DelphinIDTransform {
 	 */
 	private Whistle2ImageParams readWhistleImageTransform(JSONObject jsonObjectParams) {
 
-		double[] freqLimits = new double[2]; 
 		double[] size = new double[2];
-		freqLimits[0] = jsonObjectParams.getFloat("minfreq"); 
-		freqLimits[1] = jsonObjectParams.getFloat("maxfreq"); 
 		size[0] = jsonObjectParams.getInt("widthpix"); 
 		size[1] = jsonObjectParams.getInt("heightpix"); 
-		double minfragmillis = jsonObjectParams.getDouble("minfragmillis"); 
 
 		double lineWidth = jsonObjectParams.getDouble("linewidthpix"); 
 
 		Whistle2ImageParams whistle2ImageParmas = new Whistle2ImageParams();
-		whistle2ImageParmas.freqLimits = freqLimits;
+		whistle2ImageParmas = (Whistle2ImageParams) readWhistleTransform(jsonObjectParams,  whistle2ImageParmas);
+
 		whistle2ImageParmas.size = size;
 		whistle2ImageParmas.lineWidth = lineWidth;
-		whistle2ImageParmas.minFragSize = minfragmillis;
 
 		return whistle2ImageParmas;
 	}
 
+	private Whistle2spectrumParams readWhistleSpectrumTransform(JSONObject jsonObjectParams) {
 
+		Whistle2spectrumParams whistle2spectrumParmas = new Whistle2spectrumParams();
+		whistle2spectrumParmas = (Whistle2spectrumParams) readWhistleTransform(jsonObjectParams,  whistle2spectrumParmas);
 
+		return whistle2spectrumParmas;
+	}
+	
+	
+	private WhistleTransformParams readWhistleTransform(JSONObject jsonObjectParams, WhistleTransformParams params) {
+		double[] freqLimits = new double[2]; 
+		freqLimits[0] = jsonObjectParams.getFloat("minfreq"); 
+		freqLimits[1] = jsonObjectParams.getFloat("maxfreq"); 
+		
+		double minfragmillis = jsonObjectParams.getDouble("minfragmillis"); 
+		
+		params.freqLimits = freqLimits;
+		params.minFragSize = minfragmillis;
+		
+		return params;
 
-	private Double readWhistleSpectrumTransform(JSONObject jsonObjectParams) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/**
