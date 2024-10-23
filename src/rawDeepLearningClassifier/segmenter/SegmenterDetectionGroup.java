@@ -70,5 +70,9 @@ public class SegmenterDetectionGroup extends GroupDetection<PamDataUnit> {
 		return timeS;
 	}
 
+	public float getSampleRate() {
+		return super.getParentDataBlock().getSampleRate();
+	}
+
 
 }

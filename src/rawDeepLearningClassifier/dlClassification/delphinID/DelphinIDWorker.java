@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import org.jamdev.jdl4pam.transforms.DLTransform;
 import org.jamdev.jdl4pam.transforms.DLTransfromParams;
 import org.jamdev.jdl4pam.transforms.FreqTransform;
+import org.jamdev.jdl4pam.transforms.SpectrumTransform;
+import org.jamdev.jdl4pam.transforms.WaveTransform;
 import org.jamdev.jdl4pam.transforms.DLTransform.DLTransformType;
 import org.jamdev.jdl4pam.transforms.jsonfile.DLTransformsParser;
 import org.jamdev.jdl4pam.utils.DLMatFile;
@@ -115,21 +117,23 @@ public class DelphinIDWorker extends ArchiveModelWorker {
 				transform = modelTransforms.get(i).transformData(transform); 
 			}
 			
-			transformedData2 = ((FreqTransform) transform).getSpecTransfrom().getTransformedData(); 
+			if (transform instanceof FreqTransform) {
+				//Process whistle or click segment images
+				//add a spectrogram to the stacl
+				transformedData2 = ((FreqTransform) transform).getSpecTransfrom().getTransformedData(); 
 
-			//a bit ugly but works - it is very important we tranpose the matrix!!
-			transformedData2 = JamArr.transposeMatrix(transformedData2);
-
-			//System.out.println("DelphinID input image: " + transformedData2.length + " x " + transformedData2[0].length  );
-			transformedDataStack[j] = DLUtils.toFloatArray(transformedData2); 
+				//a bit ugly but works - it is very important we tranpose the matrix!!
+				transformedData2 = JamArr.transposeMatrix(transformedData2);
+				transformedDataStack[j] = DLUtils.toFloatArray(transformedData2);
+			}
+			else {
+				//process whistle or click segment spectra
+				//add wavefrom to the stack = we make the 2nd dimesnion 1. 
+				double[] spectrum = ((SpectrumTransform) transform).getSpectrum().getRealSpectrum();
+				transformedDataStack[j] = new float[1][spectrum.length];
+				transformedDataStack[j][0] = DLUtils.toFloatArray(spectrum); 
+			}
 			
-//			//TEMP
-//			try {
-//				addIMage2MatFile(transformedData2,  whistleGroups.get(j));
-//			}
-//			catch (Exception e) {
-//				e.printStackTrace();
-//			}
 		}
 
 

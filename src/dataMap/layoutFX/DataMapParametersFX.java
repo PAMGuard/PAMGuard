@@ -26,7 +26,7 @@ public class DataMapParametersFX implements Cloneable, Serializable, ManagedPara
 
 	
 	/**
-	 * A has map of colours for each data gram. 
+	 * A has map of colours for each datagram. 
 	 */
 	public HashMap<DataMapInfo, PlotParams2D> datagramColours = new HashMap<DataMapInfo, PlotParams2D>();
 	

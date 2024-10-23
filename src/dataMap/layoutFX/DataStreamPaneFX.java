@@ -1212,6 +1212,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 	 * @param collapsed - true if collapsed.
 	 */
 	public void setCollapsed(boolean collapsed) {
+		if (this.collapsed==collapsed) return;
 		this.collapsed=collapsed;
 		if (collapsed) {
 			this.setCenter(null);
@@ -1221,8 +1222,8 @@ public class DataStreamPaneFX extends PamBorderPane {
 		else {
 			this.setCenter(dataGraph);
 			this.setMaxHeight(-1);
-
 		}
+		this.setButtonGraphic();
 	}
 
 	/**
@@ -1279,7 +1280,4 @@ public class DataStreamPaneFX extends PamBorderPane {
 	public boolean isHasDatagram() {
 		return hasDatagram;
 	}
-
-
-
 }

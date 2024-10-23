@@ -215,13 +215,13 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 				.getRawDataBlock(rawDLParmas.groupedSourceParams.getDataSource());
 		
 		
-		/**
-		 * In the latest release of djl (0.11.0) there is a bug with the dll's of tensorflow and 
-		 * pytorch. If tensorflow is loaded before pytorch there is a conglict in dll's and 
-		 * pytorch models will not load. This is a workaround for now and the bug has been logged and 
-		 * will bne fixed in subsequent djl releases. 
-		 */
-		Engine.getEngine("PyTorch"); 
+//		/**
+//		 * In the latest release of djl (0.11.0) there is a bug with the dll's of tensorflow and 
+//		 * pytorch. If tensorflow is loaded before pytorch there is a conglict in dll's and 
+//		 * pytorch models will not load. This is a workaround for now and the bug has been logged and 
+//		 * will been fixed in subsequent djl releases. 
+//		 */
+//		Engine.getEngine("PyTorch"); 
 
 		// segment the raw sound data
 		addPamProcess(segmenterProcess = new SegmenterProcess(this, rawDataBlock));

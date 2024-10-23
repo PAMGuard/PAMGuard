@@ -73,6 +73,8 @@ public class DelphinIDTransform {
 				jsonObjectParams  = (JSONObject) jsonArray.getJSONObject(i).get("params"); 
 
 				transformParams = readWhistleImageTransform( jsonObjectParams);
+				
+				delphinIDTransformType = WHISTLE_IMAGE;
 
 				return true;
 			}
@@ -81,6 +83,8 @@ public class DelphinIDTransform {
 				jsonObjectParams  = (JSONObject) jsonArray.getJSONObject(i).get("params"); 
 
 				transformParams = readWhistleSpectrumTransform( jsonObjectParams);
+				
+				delphinIDTransformType = WHISTLE_SPECTRUM;
 
 				return true;
 			}
@@ -97,7 +101,6 @@ public class DelphinIDTransform {
 	 * @param dlTransform
 	 */
 	public void setGroupDetectionData(SegmenterDetectionGroup whistleGroups, DLTransform dlTransform) {
-
 		switch (delphinIDTransformType) {
 
 		case WHISTLE_IMAGE:
@@ -109,12 +112,15 @@ public class DelphinIDTransform {
 			
 			break;
 		case WHISTLE_SPECTRUM:
-			
+				
 			Whsitle2Spectrum spectrum = new Whsitle2Spectrum(whistleGroups,  (Whistle2spectrumParams) transformParams); 
 						
 			((SpectrumTransform) dlTransform).setSpectrum(spectrum.getSpectrum());
 			
 			break;
+		default:
+			System.err.println("Error in delphinID - no transform was created for group data");
+				
 		}
 
 

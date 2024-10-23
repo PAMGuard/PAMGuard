@@ -46,7 +46,7 @@ public class Whsitle2Spectrum {
 
 		double[] spectrumD  = whistle2AverageArray(tfCntours,  0,  whistleGroups.getSegmentDuration(), freqLimits);
 
-		Spectrum spectrum = new Spectrum(spectrumD, whistleGroups.getFrequency(), whistleGroups.getParentDataBlock().getSampleRate());
+		Spectrum spectrum = new Spectrum(spectrumD, null, whistleGroups.getSampleRate());
 
 		return spectrum; 
 	}
@@ -57,9 +57,10 @@ public class Whsitle2Spectrum {
 	 * @param points - individual and moan contours with each point time (seconds) and frequency (Hz).
 	 * @return the concatonated whistle and moan contours with each point time (seconds) and frequency (Hz).
 	 */
-	public  static double[][] concatWhistleContours(	ArrayList<double[][]> points){
+	public  static double[][] concatWhistleContours(ArrayList<double[][]> points){
 		int n=0;
 		for (int i=0; i<points.size(); i++) {
+//			System.out.println("No. whistle points: " + i + " " + points.get(i).length);
 			for (int j=0; j<points.get(i).length; j++) {
 				n++;
 			}
@@ -70,12 +71,13 @@ public class Whsitle2Spectrum {
 		n=0;
 		for (int i=0; i<points.size(); i++) {
 			for (int j=0; j<points.get(i).length; j++) {
-
 				doubleArr[n][0] = points.get(i)[j][0];
 				doubleArr[n][1] = points.get(i)[j][1];
+				n++;
 			}
 		}
 
+//		System.out.println("No. whistle points: " + n + " " + points.size());
 
 		return doubleArr; 
 	}
@@ -98,7 +100,7 @@ public class Whsitle2Spectrum {
 
 		int nbins = (int) ((freqLimits[1] -freqLimits[0])/freqBin);
 
-		System.out.println("No. of bins: " + nbins + "no. of whistle points: " + whistleValues.length);
+//		System.out.println("No. of bins: " + nbins + "no. of whistle points: " + whistleValues.length);
 
 		double[] peakBins = new double[nbins];
 		double minFreq, maxFreq;
@@ -118,7 +120,7 @@ public class Whsitle2Spectrum {
 
 			ntot=ntot+n;
 
-			System.out.println("Bin: " + minFreq + " Hz   " + n); 
+//			System.out.println("Bin: " + minFreq + " Hz   " + n); 
 			peakBins[i]=n;
 		}
 

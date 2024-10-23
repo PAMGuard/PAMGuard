@@ -11,9 +11,9 @@ import javax.imageio.ImageIO;
 
 import PamUtils.FileList;
 import PamUtils.PamArrayUtils;
-import PamUtils.TxtFileUtils;
+import PamUtils.PamCalendar;
 import PamguardMVC.DataUnitBaseData;
-import PamguardMVC.PamDataUnit;
+import PamguardMVC.PamDataBlock;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.delphinID.DelphinIDTest.DelphinIDWorkerTest;
 import rawDeepLearningClassifier.dlClassification.delphinID.Whistles2Image.Whistle2ImageParams;
@@ -44,6 +44,9 @@ public class DelphinIDUtils {
 		return delphinIDWorker;
 	}
 
+	
+	public record WhistleGroup(ArrayList<AbstractWhistleDataUnit> whistle, double sampleRate, double fftLen, double fftHop, long fileDataStart) { }
+
 
 	/**
 	 * Load whistle contours from a MAT file. ()
@@ -52,7 +55,7 @@ public class DelphinIDUtils {
 	 * 
 	 * @return a list of whistle contour objects from the mat file. 
 	 */
-	public static ArrayList<AbstractWhistleDataUnit> getWhistleContoursMAT(String filePath){
+	public static WhistleGroup getWhistleContoursMAT(String filePath){
 
 		ArrayList<AbstractWhistleDataUnit> contours = new ArrayList<AbstractWhistleDataUnit>();
 
@@ -67,15 +70,17 @@ public class DelphinIDUtils {
 			double fftLen = matFile.getMatrix("fftlen").getDouble(0);
 			double fftHop = matFile.getMatrix("ffthop").getDouble(0);
 			double sampleRate = matFile.getMatrix("samplerate").getDouble(0);
+			
+			long fileDataStart = PamCalendar.dateNumtoMillis(matFile.getMatrix("filedate").getDouble(0));
 
-			return getWhistleContoursMAT(whistlesStruct,  fftLen,  fftHop,  sampleRate);
+			return new WhistleGroup(getWhistleContoursMAT(whistlesStruct,  fftLen,  fftHop,  sampleRate), sampleRate, fftLen, fftHop, fileDataStart);
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		return contours; 
+		return null; 
 	}
 
 
@@ -130,8 +135,7 @@ public class DelphinIDUtils {
 		return contours;
 	}
 
-
-
+	
 	/**
 	 * Segment the detections into groups. Note that segments are overlaps so each whistle may belong to  multiple segments. 
 	 * @param whistles - a list of whistles - not necessarily sorted by time. 
@@ -142,6 +146,22 @@ public class DelphinIDUtils {
 	 */
 	public static ArrayList<SegmenterDetectionGroup> segmentWhsitleData(ArrayList<AbstractWhistleDataUnit> whistles, long dataStartMillis, 
 			double segLen, double segHop){
+		return segmentWhsitleData(whistles,  dataStartMillis, 
+				 segLen,  segHop, null);
+	}
+
+
+	/**
+	 * Segment the detections into groups. Note that segments are overlaps so each whistle may belong to  multiple segments. 
+	 * @param whistles - a list of whistles - not necessarily sorted by time. 
+	 * @param dataStartMillis - the start time of the data in millis i.e. where the first segment starts. 
+	 * @param segLen - the segment size in milliseconds. 
+	 * @param segHop - the segment hop in milliseconds. 
+	 * @param sampleRate - the sample rate to set. 
+	 * @return groups of data units within each segment. 
+	 */
+	public static ArrayList<SegmenterDetectionGroup> segmentWhsitleData(ArrayList<AbstractWhistleDataUnit> whistles, long dataStartMillis, 
+			double segLen, double segHop, Float sampleRate){
 
 		ArrayList<SegmenterDetectionGroup> group = new ArrayList<SegmenterDetectionGroup>(); 
 
@@ -158,10 +178,11 @@ public class DelphinIDUtils {
 
 		long whistleStart; 
 		long whistleEnd;
-		SegmenterDetectionGroup whistleGroup;
+		WhistleSegmenterDetectionGroup whistleGroup;
 		while (segStart<endTime){
 
-			whistleGroup = new SegmenterDetectionGroup(segStart, 1, segEnd, segLen);
+			whistleGroup = new WhistleSegmenterDetectionGroup(segStart, 1, segEnd, segLen);
+			whistleGroup.setHardSampleRate(sampleRate);
 
 			for (AbstractWhistleDataUnit whislte: whistles) {
 				whistleStart = whislte.getTimeMilliseconds();
@@ -185,7 +206,43 @@ public class DelphinIDUtils {
 		return group;
 
 	}
+	
+	
+	private static class WhistleSegmenterDetectionGroup extends SegmenterDetectionGroup {
+		
+		public Float hardSampleRate;
 
+		public WhistleSegmenterDetectionGroup(long timeMilliseconds, int channelBitmap, long startSample,
+				double duration) {
+			super(timeMilliseconds, channelBitmap, startSample, duration);
+			// TODO Auto-generated constructor stub
+		}
+		
+		@Override
+		public float getSampleRate() {
+			if (super.getParentDataBlock()==null) {
+			return hardSampleRate;
+			}
+			else {
+				return super.getSampleRate();
+			}
+			
+		}
+
+		public Float getHardSampleRate() {
+			return hardSampleRate;
+		}
+
+		public void setHardSampleRate(Float hardSampleRate) {
+			this.hardSampleRate = hardSampleRate;
+		}
+		
+	}
+	
+
+	/**
+	 * Subclass of Abstract whsitle data unit for loading whistle contours from .mat files. 
+	 */
 	public static class WhistleContourMAT extends AbstractWhistleDataUnit {
 
 		private double[] freq;
@@ -365,7 +422,7 @@ public class DelphinIDUtils {
 			}
 		}
 	}
-
+		
 	public static void main(String[] args) {
 
 		//		double[] density = new double[] {0.15 - 1.5}; 
