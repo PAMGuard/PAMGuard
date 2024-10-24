@@ -17,6 +17,7 @@ import dataMap.OfflineDataMapPoint;
 import dataPlotsFX.scrollingPlot2D.StandardPlot2DColours;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
@@ -119,7 +120,10 @@ public class DataStreamPaneFX extends PamBorderPane {
 	 */
 	private Pane topPane;
 
-	private boolean collapsed;
+	/**
+	 * The collapsed property for the pane. 
+	 */
+	private SimpleBooleanProperty collapsed = new SimpleBooleanProperty();;
 	
 	/**
 	 * Timer that repaints after time diff has been reached 
@@ -145,13 +149,26 @@ public class DataStreamPaneFX extends PamBorderPane {
 		dataName = new DataMapInfo();
 		dataName.setName(dataBlock.getDataName()); 
 		dataName.setLongName(dataBlock.getLongDataName()); 
+		
+		this.collapsed.addListener((obsVal, oldVal, newVal)->{
+			if (newVal) {
+				this.setCenter(null);
+				this.setMaxHeight(PREF_HEADER_HEIGHT);
+
+			}
+			else {
+				this.setCenter(dataGraph);
+				this.setMaxHeight(-1);
+			}
+			this.setButtonGraphic();
+		});
 
 		this.setTop(topPane=createTopPane());
 		this.setCenter(dataGraph);
 	}
 
 	/*
-	 * Create pane which holds datasream label and allows the split pane to collapse
+	 * Create pane which holds data stream label and allows the split pane to collapse
 	 */
 	private Pane createTopPane(){
 		PamHBox topPane=new PamHBox();
@@ -179,8 +196,6 @@ public class DataStreamPaneFX extends PamBorderPane {
 	}
 	
 	
-	
-	
 	private void setButtonGraphic() {
 		if (this.isCollapsed()) {
 			showButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-down", (int) PREF_HEADER_HEIGHT-2));
@@ -188,7 +203,6 @@ public class DataStreamPaneFX extends PamBorderPane {
 		else {
 			showButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-up", (int) PREF_HEADER_HEIGHT-2));
 		}
-		
 	}
 
 	/**
@@ -1206,34 +1220,6 @@ public class DataStreamPaneFX extends PamBorderPane {
 	public Pane getTopPane() {
 		return topPane;
 	}
-
-	/***
-	 * Set a flag that the data stream pane has been collapsed. 
-	 * @param collapsed - true if collapsed.
-	 */
-	public void setCollapsed(boolean collapsed) {
-		if (this.collapsed==collapsed) return;
-		this.collapsed=collapsed;
-		if (collapsed) {
-			this.setCenter(null);
-			this.setMaxHeight(PREF_HEADER_HEIGHT);
-
-		}
-		else {
-			this.setCenter(dataGraph);
-			this.setMaxHeight(-1);
-		}
-		this.setButtonGraphic();
-	}
-
-	/**
-	 * Check whether he data stream pane has been collapsed. 
-	 * @return true if collapsed. 
-	 */
-	public boolean isCollapsed() {
-		return collapsed;
-	}
-
 	
 	/**
 	 * Set the colour array for the data stream panel. 
@@ -1279,5 +1265,29 @@ public class DataStreamPaneFX extends PamBorderPane {
 
 	public boolean isHasDatagram() {
 		return hasDatagram;
+	}
+
+	/**
+	 * The collapsed property. 
+	 * @return the collapsed property. 
+	 */
+	public SimpleBooleanProperty collapedProperty() {
+		return this.collapsed;
+	}
+	
+	/***
+	 * Set a flag that the data stream pane has been collapsed. 
+	 * @param collapsed - true if collapsed.
+	 */
+	public void setCollapsed(boolean collapsed) {
+		this.collapsed.set(collapsed);;
+	}
+
+	/**
+	 * Check whether he data stream pane has been collapsed. 
+	 * @return true if collapsed. 
+	 */
+	public boolean isCollapsed() {
+		return collapsed.get();
 	}
 }

@@ -92,11 +92,9 @@ public class DataMapControl extends PamControlledUnit implements PamSettings {
 	public DataMapControl(String unitName) {
 		super("Data map", unitName);
 		
-		
 		dataMapPanel = new DataMapPanel(this);
 		PamSettingManager.getInstance().registerSettings(this);
 		dataMapPanel.newSettings();
-		
 		
 		dataMapControl = this;
 	}
@@ -355,8 +353,7 @@ public class DataMapControl extends PamControlledUnit implements PamSettings {
 	}
 
 	@Override
-	public boolean restoreSettings(
-			PamControlledUnitSettings pamControlledUnitSettings) {
+	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		dataMapParameters = ((DataMapParameters) pamControlledUnitSettings.getSettings()).clone();
 		return (dataMapParameters != null);
 	}

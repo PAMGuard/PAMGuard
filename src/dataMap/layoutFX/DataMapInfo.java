@@ -33,13 +33,26 @@ public class DataMapInfo implements Serializable {
 	public String toString() {
 		return name; 
 	}
+	
+
+    @Override
+    public int hashCode() {
+    	//need to make sure this provides a unique hash code or things go wrong...
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((longDataName == null) ? 0 : longDataName.hashCode());
+        return result;
+    }
 
 	@Override
 	public boolean equals(Object dataMapInfo1) {
 		if (dataMapInfo1==null) return false;
 		DataMapInfo dataMapInfo = (DataMapInfo) dataMapInfo1;
-		if (this.longDataName.equals(dataMapInfo.longDataName) && this.name.equals(dataMapInfo.name)) return true;
-		return false;
+		if (this.longDataName.equals(dataMapInfo.longDataName) && this.name.equals(dataMapInfo.name)) {
+			return true;
+		}
+		else return false;
 	}
 	
 }

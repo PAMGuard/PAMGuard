@@ -10,7 +10,6 @@ import javafx.animation.Timeline;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.layout.StackPane;
@@ -171,7 +170,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 
 		dateAxis = new PamDateAxis();
 		dateAxis.setAutoRanging(false);
-		dateAxis.setLabel("Time");
+//		dateAxis.setLabel("Time");
 		dateAxis.setSide(Side.TOP);
 		dateAxis.setAnimated(false);
 		dateAxis.setMinHeight(50);
@@ -377,6 +376,21 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 		DataStreamPaneFX aStreamPanel;
 		for (int i = 0; i < dataBlocks.size(); i++) {
 			aStreamPanel = new DataStreamPaneFX(dataMapControl, this, dataBlocks.get(i));
+			
+			final DataStreamPaneFX sTreamPanelFinal = aStreamPanel;
+			
+			//check which data maps should be collapsed and or shown or not. 
+			Boolean isCollapsed = this.getDataMapParams().dataMapsCollapsed.get(sTreamPanelFinal.getDataName());
+			System.out.println("Creating pane - should we collapse it?: " + sTreamPanelFinal.getDataName() + "  " + isCollapsed );
+			if (isCollapsed!=null) {
+				aStreamPanel.setCollapsed(isCollapsed);
+			}
+			
+			aStreamPanel.collapedProperty().addListener((obsVal, oldval, newval)->{
+				this.getDataMapParams().dataMapsCollapsed.put(sTreamPanelFinal.getDataName(), newval);
+			});
+			
+			
 			dataStreamPanels.add(aStreamPanel);
 			dataStreamPanels.get(i).setPrefHeight(DATASTREAMPANE_HEIGHT);
 			//now add to a split pane. 
@@ -387,6 +401,7 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 
 		return dataBlocks.size();
 	}
+
 
 
 	/***
