@@ -62,7 +62,7 @@ public class BinaryStoreGUIFX extends PamControlledGUIFX {
 			getSettingsPane().paneInitialized();
 			//fix to make sure the dialog appearsa in pre PG GUI FX insitialisation i.e. when selecting viewer database 
 			//on PG start up/. 
-			((Stage) dBsettingsDialog.getDialogPane().getScene().getWindow()).setAlwaysOnTop(true);;
+			//((Stage) dBsettingsDialog.getDialogPane().getScene().getWindow()).setAlwaysOnTop(true);;
 		});
 
 

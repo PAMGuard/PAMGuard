@@ -147,7 +147,7 @@ public class DelphinIDTransform {
 
 		whistle2ImageParmas.size = size;
 		whistle2ImageParmas.lineWidth = lineWidth;
-
+				
 		return whistle2ImageParmas;
 	}
 

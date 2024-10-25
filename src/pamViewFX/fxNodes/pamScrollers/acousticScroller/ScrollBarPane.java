@@ -179,7 +179,7 @@ public class ScrollBarPane extends PamBorderPane {
 
 	FadeTransition ft ;
 	/**
-	 * Set thetext box visible. If false then the text box fades away. 
+	 * Set the text box visible. If false then the text box fades away. 
 	 * @param visible
 	 */
 	private void setTextBoxVisible(boolean visible){

@@ -9,6 +9,7 @@ import generalDatabase.DBParameters;
 import generalDatabase.EmptyTableDefinition;
 import generalDatabase.lookupTables.LookUpTables;
 import generalDatabase.lookupTables.LookupList;
+import javafx.geometry.Insets;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import loggerForms.FormsControl;
@@ -49,9 +50,9 @@ public class DBGuiFX extends PamControlledGUIFX {
 		if (alwaysOnTop) {
 			dBsettingsDialog.setOnShown((value)->{
 				getSettingsPane().paneInitialized();
-				//fix to make sure the dialog appearsa in pre PG GUI FX insitialisation i.e. when selecting viewer database 
-				//on PG start up/. 
-				((Stage) dBsettingsDialog.getDialogPane().getScene().getWindow()).setAlwaysOnTop(true);;
+//				//fix to make sure the dialog appearsa in pre PG GUI FX insitialisation i.e. when selecting viewer database 
+//				//on PG start up/. 
+//				((Stage) dBsettingsDialog.getDialogPane().getScene().getWindow()).setAlwaysOnTop(true);;
 			});
 		}
 				

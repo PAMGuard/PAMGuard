@@ -20,6 +20,7 @@ import javafx.animation.Timeline;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
@@ -29,9 +30,11 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
 import PamController.OfflineDataStore;
 import PamController.PamController;
+import PamUtils.PamCalendar;
 import PamguardMVC.PamDataBlock;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
@@ -326,8 +329,10 @@ public class DataStreamPaneFX extends PamBorderPane {
 				int millisSelect = (int) (dataBlock.getCurrentViewDataEnd() - dataBlock.getCurrentViewDataStart());
 				
 				paintDrawCanvas(drawCanvas.getGraphicsContext2D());
+				
+				
 				//show a preview of what will be loaded. 
-				paintDataSelection(drawCanvas.getGraphicsContext2D(), mouseDataColor,  tm-millisSelect/2,  tm+millisSelect/2);
+				paintDataSelection(drawCanvas.getGraphicsContext2D(), mouseDataColor,  tm-millisSelect/2,  tm+millisSelect/2, true);
 				
 			});
 			
@@ -486,20 +491,20 @@ public class DataStreamPaneFX extends PamBorderPane {
 			long dataStart = dataBlock.getCurrentViewDataStart();
 			long dataEnd = dataBlock.getCurrentViewDataEnd();
 			
-			paintDataSelection(g, loadDataColor, dataStart, dataEnd); 
+			paintDataSelection(g, loadDataColor, dataStart, dataEnd, false); 
 		
 		}
 		
 		
 		/**
-		 * Paint the data which is current selected. 
+		 * Paint the data which is currently selected. 
 		 *
 		 * @param g - the graphics context. 
 		 * @param dataHighlightCol - the colour to use.
 		 * @param dataStart - the start of the highlighted area.
 		 * @param dataEnd - the end of the highlighted area.
 		 */
-		private void paintDataSelection(GraphicsContext g,  Color dataHighlightCol, long dataStart, long dataEnd) {
+		private void paintDataSelection(GraphicsContext g,  Color dataHighlightCol, long dataStart, long dataEnd, boolean showTime) {
 
 			if (dataStart <= 0 || dataEnd < dataStart) {
 				return;
@@ -513,6 +518,18 @@ public class DataStreamPaneFX extends PamBorderPane {
 
 			g.strokeRect(xStart, 0, xEnd-xStart, drawCanvas.getHeight());
 			g.fillRect(xStart, 0, xEnd-xStart, drawCanvas.getHeight());
+			
+			if (showTime) {
+				String time = PamCalendar.formatDateTime2(dataStart, false);
+				//bit of a faff to get the text drawing vertically!
+				g.save();
+		        g.setTextBaseline(VPos.CENTER);
+		        g.setTextAlign(TextAlignment.CENTER);
+		        g.translate(xStart, drawCanvas.getHeight());
+		        g.rotate(-90);
+				g.strokeText(time, drawCanvas. getHeight()/2,-10);
+			    g.restore();
+			}
 		}
 
 

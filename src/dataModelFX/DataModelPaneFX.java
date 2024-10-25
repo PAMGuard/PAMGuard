@@ -19,6 +19,7 @@ import dataModelFX.connectionNodes.ConnectionNodeFactory;
 import dataModelFX.connectionNodes.ModuleConnectionNode;
 import javafx.beans.property.ObjectProperty;
 import javafx.geometry.Orientation;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
@@ -187,9 +188,12 @@ public class DataModelPaneFX extends PamBorderPane {
 
 		moduleSelectPane.setMinWidth(Region.USE_PREF_SIZE);
 		moduleSelectPane.setPrefWidth(370);
+		
+		ScrollPane scrollPane = new ScrollPane(); 
+		scrollPane.setContent(dataModelPane);
 
 		// splitPane.getItems().addAll(pamScrollPane,dataModelPane);
-		splitPane.getItems().addAll(moduleSelectPane, dataModelPane);
+		splitPane.getItems().addAll(moduleSelectPane, scrollPane);
 		SplitPane.setResizableWithParent(moduleSelectPane, false);
 
 		return splitPane;
