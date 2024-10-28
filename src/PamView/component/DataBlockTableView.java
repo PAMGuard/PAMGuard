@@ -250,6 +250,18 @@ public abstract class DataBlockTableView<T extends PamDataUnit> {
 	}
 	
 	/**
+	 * Get the data unit for the selected data row
+	 * @return
+	 */
+	public T getSelectedDataUnit() {
+		int row = testTable.getSelectedRow();
+		if (row < 0) {
+			return null;
+		}
+		return getDataUnit(row);
+	}
+	
+	/**
 	 * Get the number of rows in the table - default behaviour is the 
 	 * number of rows in the datablock, but this may be overridden if
 	 * data are being selected in a different way. 
@@ -344,7 +356,7 @@ public abstract class DataBlockTableView<T extends PamDataUnit> {
 	}
 	
 	public void popupMenuAction(MouseEvent e, T dataUnit, String colName) {
-		
+//		System.out.println("Pop");
 	}
 
 	private void showPopupMenu(MouseEvent e) {

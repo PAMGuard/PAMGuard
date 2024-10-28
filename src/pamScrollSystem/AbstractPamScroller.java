@@ -42,7 +42,7 @@ public abstract class AbstractPamScroller implements DataTimeLimits {
 	/*
 	 * List of play speeds for a quick menu
 	 */
-	protected double[] playSpeeds = {.1, 0.25, .5, 1.0, 2, 5, 10};
+	protected double[] playSpeeds = {.1, 0.25, .5, 1.0, 2, 5, 10, 20, 30, 60};
 
 //	private long realTimerStart;
 //

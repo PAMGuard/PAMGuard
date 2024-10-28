@@ -394,7 +394,12 @@ public class ClipProcess extends SpectrogramMarkProcess {
 	 */
 	public synchronized void subscribeDataBlocks() {
 		unSubscribeDataBlocks();
-		rawDataBlock = PamController.getInstance().getRawDataBlock(clipControl.clipSettings.dataSourceName);
+		rawDataBlock = (PamRawDataBlock) PamController.getInstance().getDataBlockByLongName(clipControl.clipSettings.dataSourceName);
+		if (rawDataBlock == null) {
+			// have changed dialog to use long data name. More robust. Old configs will get null
+			// from that, so use this instead. 
+			rawDataBlock = PamController.getInstance().getRawDataBlock(clipControl.clipSettings.dataSourceName);
+		}
 		setParentDataBlock(rawDataBlock, true);
 		
 		int nBlocks = clipControl.clipSettings.getNumClipGenerators();

@@ -93,11 +93,12 @@ public class PamScrollSlider extends AbstractPamScrollerAWT {
 	}
 
 	@Override
-	void doMouseWheelAction(MouseWheelEvent mouseWheelEvent) {
+	public void doMouseWheelAction(MouseWheelEvent mouseWheelEvent) {
 		int n = mouseWheelEvent.getWheelRotation();
 		slider.setValue(slider.getValue() - n);
 		scrollMoved();
 	}
+	
 	public void scrollMoved() {
 		AbstractScrollManager.getScrollManager().moveInnerScroller(this, getValueMillis());	
 		notifyValueChange();
@@ -146,6 +147,7 @@ public class PamScrollSlider extends AbstractPamScrollerAWT {
 	public long getVisibleAmount() {
 		return 0;
 	}
+
 	/* (non-Javadoc)
 	 * @see pamScrollSystem.AbstractPamScroller#setRangeMillis(long, long, boolean)
 	 */

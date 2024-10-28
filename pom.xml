@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.pamguard</groupId>
   <artifactId>Pamguard</artifactId>
-  <version>2.02.13d</version>
+  <version>2.02.14</version>
   <name>Pamguard</name>
   <description>Pamguard using Maven to control dependencies</description>
 	<url>www.pamguard.org</url>
@@ -184,7 +184,7 @@
 			</plugin>
 
 
-<!--			 Plugin which creates a .dmg file for MacOS. -->
+<!--			 Plugin which creates a .dmg file for MacOS. 
 		    <plugin>
 		        <groupId>de.perdian.maven.plugins</groupId>
 		        <artifactId>macosappbundler-maven-plugin</artifactId>
@@ -199,10 +199,6 @@
 		                    <string>msa</string>
 		                </CFBundleURLTypes>
 		                <JVMVersion>21+</JVMVersion>
-		                <!--<JVMOptions>
-		                    <string>-Dfoo=bar</string>
-		                    <string>-Dx=y</string>
-		                </JVMOptions>-->
 		                <JVMArguments>
 		                    <string>-c</string>
 		                </JVMArguments>
@@ -216,7 +212,7 @@
 		                </additionalResources>
 		            </dmg>
 		             <jdk>
-			            <include>true</include>
+			            <include>false</include>
 			            <location>/Library/Java/JavaVirtualMachines/amazon-corretto-21.jdk</location>
 			        </jdk>
 		             <!--<codesign>
@@ -231,7 +227,7 @@
 		                </goals>
 		            </execution>
 		        </executions>
-		    </plugin> 
+		    </plugin> -->
 		    
 		</plugins>
 
