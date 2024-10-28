@@ -173,10 +173,10 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 
 		String iconLoc;
 		switch (PamController.getInstance().getRunMode()){
-		case(PamController.RUN_NETWORKRECEIVER):iconLoc="Resources/pamguardIconNR.png";break;
-		case(PamController.RUN_PAMVIEW):iconLoc="Resources/pamguardIconV.png";break;
-		case(PamController.RUN_MIXEDMODE):iconLoc="Resources/pamguardIconM.png";break;
-		default:iconLoc="Resources/pamguardIcon.png";
+		case(PamController.RUN_NETWORKRECEIVER):iconLoc=PamIcon.getPAMGuardIconPath(PamIcon.NORMAL);break;
+		case(PamController.RUN_PAMVIEW):iconLoc=PamIcon.getPAMGuardIconPath(PamIcon.NORMAL);break;
+		case(PamController.RUN_MIXEDMODE):iconLoc=PamIcon.getPAMGuardIconPath(PamIcon.NORMAL);break;
+		default:iconLoc=PamIcon.getPAMGuardIconPath(PamIcon.NORMAL);
 		}
 
 		frame.setIconImage(new ImageIcon(ClassLoader

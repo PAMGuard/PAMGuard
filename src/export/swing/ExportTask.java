@@ -58,7 +58,8 @@ public class ExportTask extends OfflineTask<PamDataUnit<?,?>>{
 		
 		if (dataUnit.getParentDataBlock().equals(this.getDataBlock())) {
 			//this is very important because the way the exporter works is that it iterates through multiple parent data blocks
-			//System.out.println(this.getDataBlock().getDataName() + "  " + dataUnit + "  " + dataSelector.scoreData(dataUnit));
+//			System.out.println(this.getDataBlock().getDataName() + "  " + dataUnit.getUID() + "  " + dataSelector.scoreData(dataUnit) +  "  " 
+//			+ (dataSelector.getParams().getCombinationFlag()  == DataSelectParams.DATA_SELECT_DISABLE));
 			
 			if (dataSelector==null) {
 				//System.out.println("Data selector null: " + this.getDataBlock().getDataName() + "  " + dataUnit);

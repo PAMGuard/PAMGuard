@@ -5,6 +5,7 @@ import org.jamdev.jdl4pam.utils.DLMatFile;
 import PamUtils.PamCalendar;
 import PamguardMVC.PamDataUnit;
 import us.hebi.matlab.mat.format.Mat5;
+import us.hebi.matlab.mat.types.Array;
 import us.hebi.matlab.mat.types.Matrix;
 import us.hebi.matlab.mat.types.Struct;
 
@@ -93,9 +94,40 @@ public abstract class MLDataUnitExport<T extends PamDataUnit<?, ?>> {
 		//add detection specific data 
 		mlStruct= addDetectionSpecificFields(mlStruct, index, dataUnit);
 		
+		//super detections - a bit messy at the moment but meh. 
+		long[] superDetUID = null;
+		Array superUID =null;
+		if (dataUnit.getSuperDetectionsCount()>0) {
+			superDetUID= new long[dataUnit.getSuperDetectionsCount()]; 
+			for (int i=0; i<dataUnit.getSuperDetectionsCount(); i++) {
+				superDetUID[i]=dataUnit.getSuperDetection(i).getUID();
+			}
+			superUID = array2Matrix(superDetUID) ;
+		}
+		else {
+			superUID = Mat5.EMPTY_MATRIX;
+		}
+		
+		mlStruct.set("superDet", index, superUID);
+
+		
 		this.mlAnnotationsManager.addAnnotations(mlStruct, index, dataUnit); 
 		
 		return mlStruct; 
+	}
+	
+	/**
+	 * Get a Matrix object from a long[] array. 
+	 * @param specData - the long array to convert. 
+	 * @return the matrix object. 
+	 */
+	public static Matrix array2Matrix(long[] samplesChunk) {
+		Matrix matrix = Mat5.newMatrix(samplesChunk.length, 1);
+		for (int i=0; i<samplesChunk.length; i++) {
+				matrix.setLong(i,0, samplesChunk[i]);
+		}
+		
+		return matrix;
 	}
 
 	/**

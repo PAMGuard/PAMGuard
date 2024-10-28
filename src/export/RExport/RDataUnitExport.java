@@ -1,13 +1,18 @@
 package export.RExport;
 
+import org.renjin.sexp.AttributeMap;
 import org.renjin.sexp.DoubleArrayVector;
+import org.renjin.sexp.IntArrayVector;
 import org.renjin.sexp.ListVector;
 import org.renjin.sexp.Vector;
 import org.renjin.sexp.ListVector.NamedBuilder;
+import org.renjin.sexp.LongArrayVector;
 
 import PamUtils.PamCalendar;
 import PamguardMVC.PamDataUnit;
 import export.MLExport.MLAnnotationsManager;
+import us.hebi.matlab.mat.format.Mat5;
+import us.hebi.matlab.mat.types.Array;
 
 /**
  * Exports a data unit to a List in R. Specific data units should subclass this. 
@@ -65,6 +70,26 @@ public abstract class RDataUnitExport<T extends PamDataUnit<?, ?>> {
 		
 		//add detection specific data 
 		rData= addDetectionSpecificFields(rData, dataUnit, index);
+		
+		
+		//super detections - a bit messy at the moment but meh. 
+		int[] superDetUID = null;
+		IntArrayVector superUID =null;
+		if (dataUnit.getSuperDetectionsCount()>0) {
+			superDetUID= new int[dataUnit.getSuperDetectionsCount()]; 
+			for (int i=0; i<dataUnit.getSuperDetectionsCount(); i++) {
+				//this is a little dodgy but super detections tend to have lower UID values and 
+				//R exporting does not support long's well
+				superDetUID[i]=(int) dataUnit.getSuperDetection(i).getUID();
+			}
+			superUID = new IntArrayVector(superDetUID);
+
+		}
+		else {
+			superUID = new IntArrayVector();
+		}
+		
+		rData.add("superUID", superUID);
 		
 		rAnnotationsManager.addDataAnnotations(rData, dataUnit, index);
 				
