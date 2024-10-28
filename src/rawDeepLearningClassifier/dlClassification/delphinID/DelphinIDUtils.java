@@ -13,7 +13,6 @@ import PamUtils.FileList;
 import PamUtils.PamArrayUtils;
 import PamUtils.PamCalendar;
 import PamguardMVC.DataUnitBaseData;
-import PamguardMVC.PamDataBlock;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.delphinID.DelphinIDTest.DelphinIDWorkerTest;
 import rawDeepLearningClassifier.dlClassification.delphinID.Whistles2Image.Whistle2ImageParams;
@@ -43,9 +42,81 @@ public class DelphinIDUtils {
 
 		return delphinIDWorker;
 	}
+	
+	
+	
+	//record WhistleGroup(ArrayList<AbstractWhistleDataUnit> whistle, double sampleRate, double fftLen, double fftHop, long fileDataStart) { }
 
 	
-	public record WhistleGroup(ArrayList<AbstractWhistleDataUnit> whistle, double sampleRate, double fftLen, double fftHop, long fileDataStart) { }
+	
+	/**
+	 * Holds a whistle group and some extra information on sample rate, fft length and hop and the strat of the processed file. 
+	 * Keep Java 11 compliant so do not use record. 
+	 *
+	 */
+	public static class WhistleGroup {
+		
+		public WhistleGroup(ArrayList<AbstractWhistleDataUnit> whistle, double sampleRate, double fftLen, double fftHop, long fileDataStart) { 
+			this.whistle=whistle;
+			this.sampleRate=sampleRate;
+			this.fftLen=fftLen;
+			this.fftHop=fftHop;
+			this.fileDataStart=fileDataStart;
+		}
+		
+		public ArrayList<AbstractWhistleDataUnit> getWhistle() {
+			return whistle;
+		}
+
+		public void setWhistle(ArrayList<AbstractWhistleDataUnit> whistle) {
+			this.whistle = whistle;
+		}
+
+		public double getSampleRate() {
+			return sampleRate;
+		}
+
+		public void setSampleRate(double sampleRate) {
+			this.sampleRate = sampleRate;
+		}
+
+		public double getFftLen() {
+			return fftLen;
+		}
+
+		public void setFftLen(double fftLen) {
+			this.fftLen = fftLen;
+		}
+
+		public double getFftHop() {
+			return fftHop;
+		}
+
+		public void setFftHop(double fftHop) {
+			this.fftHop = fftHop;
+		}
+
+		public long getFileDataStart() {
+			return fileDataStart;
+		}
+
+		public void setFileDataStart(long fileDataStart) {
+			this.fileDataStart = fileDataStart;
+		}
+
+		public ArrayList<AbstractWhistleDataUnit> whistle;
+		
+		public double sampleRate; 
+		
+		public double fftLen;
+		
+		public double fftHop;
+		
+		public long fileDataStart;
+		
+	}
+	
+	
 
 
 	/**

@@ -108,14 +108,14 @@ public class DelphinIDTest {
 
 		//get the whislte contours form a .mat file. 
 		WhistleGroup whistlegroup = DelphinIDUtils.getWhistleContoursMAT(whistleContourPath);
-		ArrayList<AbstractWhistleDataUnit> whistleContours = whistlegroup.whistle();
-		float sampleRate = (float) whistlegroup.sampleRate();
-		long dataStartMillis = whistlegroup.fileDataStart();
+		ArrayList<AbstractWhistleDataUnit> whistleContours = whistlegroup.getWhistle();
+		float sampleRate = (float) whistlegroup.getSampleRate();
+		long dataStartMillis = whistlegroup.getFileDataStart();
 
 		//segment the whistle detections
 		//Note, delphinID starts from the first whistle and NOT the first file. 
 		ArrayList<SegmenterDetectionGroup> segments =  DelphinIDUtils.segmentWhsitleData(whistleContours,  (long) (dataStartMillis+(startSeconds*1000.)), 
-				segLen,  segHop, (float) whistlegroup.sampleRate());
+				segLen,  segHop, (float) whistlegroup.getSampleRate());
 
 		for (int i=0; i<segments.size(); i++) {
 			System.out.println("Segment " + i + " contains " + segments.get(i).getSubDetectionsCount() + " whistles"); 

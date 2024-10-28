@@ -1,18 +1,11 @@
 package export.RExport;
 
-import org.renjin.sexp.AttributeMap;
 import org.renjin.sexp.DoubleArrayVector;
 import org.renjin.sexp.IntArrayVector;
 import org.renjin.sexp.ListVector;
 import org.renjin.sexp.Vector;
-import org.renjin.sexp.ListVector.NamedBuilder;
-import org.renjin.sexp.LongArrayVector;
-
 import PamUtils.PamCalendar;
 import PamguardMVC.PamDataUnit;
-import export.MLExport.MLAnnotationsManager;
-import us.hebi.matlab.mat.format.Mat5;
-import us.hebi.matlab.mat.types.Array;
 
 /**
  * Exports a data unit to a List in R. Specific data units should subclass this. 

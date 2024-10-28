@@ -245,9 +245,9 @@ public class DataStreamPaneFX extends PamBorderPane {
 
 	public class DataGraphFX extends PamBorderPane {
 		
-		public static final Color loadDataColor=Color.DODGERBLUE;
+		public  Color loadDataColor=Color.DODGERBLUE;
 
-		public static final Color mouseDataColor=Color.CYAN;
+		public  Color mouseDataColor=Color.CYAN;
 
 		private Canvas plotCanvas;
 		
@@ -523,11 +523,12 @@ public class DataStreamPaneFX extends PamBorderPane {
 				String time = PamCalendar.formatDateTime2(dataStart, false);
 				//bit of a faff to get the text drawing vertically!
 				g.save();
+				g.setFill(dataHighlightCol);
 		        g.setTextBaseline(VPos.CENTER);
 		        g.setTextAlign(TextAlignment.CENTER);
 		        g.translate(xStart, drawCanvas.getHeight());
 		        g.rotate(-90);
-				g.strokeText(time, drawCanvas. getHeight()/2,-10);
+				g.fillText(time, drawCanvas. getHeight()/2,-10);
 			    g.restore();
 			}
 		}
