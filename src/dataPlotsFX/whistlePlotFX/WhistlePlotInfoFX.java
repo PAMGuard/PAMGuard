@@ -2,6 +2,8 @@ package dataPlotsFX.whistlePlotFX;
 
 import java.awt.geom.Path2D;
 import java.util.ListIterator;
+
+import PamUtils.PamCalendar;
 import PamView.GeneralProjector.ParameterType;
 import PamView.GeneralProjector.ParameterUnits;
 import PamView.HoverData;
@@ -170,6 +172,7 @@ public class WhistlePlotInfoFX extends TDDataInfoFX {
 	 */
 	private void drawWhistleFFT(int plotNumber, PamDataUnit pamDataUnit,
 			GraphicsContext g, TDProjectorFX tdprojector, double scrollStart, int type) {
+				
 		if (!shouldDraw(plotNumber, pamDataUnit)){
 			//System.out.println("Cannot plot whistle");
 			iCol++;
@@ -232,13 +235,17 @@ public class WhistlePlotInfoFX extends TDDataInfoFX {
 		//get position on time axis
 		long timeMillis=pamDataUnit.getTimeMilliseconds();
 		double tC = tdprojector.getTimePix(timeMillis-scrollStart); 
+		double tCEnd = tdprojector.getTimePix(pamDataUnit.getEndTimeInMilliseconds()-scrollStart); 
+		
+//		System.out.println("Plot whislte: "  + PamCalendar.formatDateTime(timeMillis));
 
 		//		timeAxis.getPosition((timeMillis-scrollStart)/1000.);
 
-		if (tC < 0 || tC >  tdprojector.getGraphTimePixels()) {
+		//make sure that we do not cut off whistles that are partly off the screen
+		if (tCEnd < -10 || tC >  tdprojector.getGraphTimePixels()) {
 			return null;
 		}
-
+		
 		ConnectedRegionDataUnit dataUnit=((ConnectedRegionDataUnit) pamDataUnit);
 		ConnectedRegion cr = dataUnit.getConnectedRegion();
 		WhistleToneParameters wmParams = wmControl.getWhistleToneParameters();
@@ -302,9 +309,9 @@ public class WhistlePlotInfoFX extends TDDataInfoFX {
 
 			tC=tdprojector.getTimePix((long) (sliceMillis-scrollStart)); 
 						
-			if (tC < 0 || tC >  tdprojector.getGraphTimePixels()) {
-				return null;
-			}
+//			if (tC < 0 || tC >  tdprojector.getGraphTimePixels()) {
+//				return null;
+//			}
 
 			//			if (wrap){
 			//				tC= PamUtils.constrainedNumber(this.getTDGraph().getWrapPix() + 

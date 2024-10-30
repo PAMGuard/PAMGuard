@@ -1,9 +1,6 @@
 package dataPlotsFX.layout;
 
 import java.util.ArrayList;
-
-import org.controlsfx.glyphfont.Glyph;
-
 import pamScrollSystem.AbstractPamScroller;
 import pamScrollSystem.PamScrollObserver;
 import pamViewFX.PamGuiManagerFX;
@@ -49,7 +46,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 
 /**
  * The main display node for showing tdGraphs. Contains time axis, tdGraphs, time axis and control pane. 
@@ -61,7 +57,7 @@ public class TDDisplayFX extends PamBorderPane {
 	/**
 	 * The standard refresh rate in millis
 	 */
-	public static long standardRefreshMillis=50;
+	public static long STANDARD_REFRESH_MILLIS=50;
 
 	//flags for canvas repaint
 
@@ -158,7 +154,7 @@ public class TDDisplayFX extends PamBorderPane {
 	/**
 	 * The height of the control pane. 
 	 */
-	final static double CONTROL_PANE_HEIGHT=80;
+	final static double CONTROL_PANE_HEIGHT=70;
 
 
 	/**
@@ -242,7 +238,10 @@ public class TDDisplayFX extends PamBorderPane {
 
 		hidingControlPane=new HidingPane(Side.TOP, controlPane, this, false );
 		hidingControlPane.showHidePane(tdParametersFX.showControl);
-		hidingControlPane.getStylesheets().addAll(this.getCSSSettingsResource()); //style as a settings pane. 
+		hidingControlPane.getStylesheets().clear();
+//		hidingControlPane.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getGUICSS()); //style as a settings pane. 
+		hidingControlPane.getHideButton().setStyle("-fx-border-color: none;");
+
 		hidingControlPane.showingProperty().addListener((valProp, oldVal, newVal)->{
 			//set correct showing property.
 			tdParametersFX.showControl=newVal; 
@@ -254,7 +253,7 @@ public class TDDisplayFX extends PamBorderPane {
 		showButton=hidingControlPane.getShowButton();
 		hidingControlPane.setShowButtonOpacity(1.0);
 //		showButton.getStyleClass().add("transparent-button-square");
-		showButton.setStyle("-fx-background-radius: 0 0 10 0;");
+		showButton.setStyle("-fx-background-radius: 0 0 0 10; -fx-border-color: none;");
 		showButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-down", PamGuiManagerFX.iconSize));
 		showButton.setPrefWidth(30);
 		showButton.setMaxHeight(timeAxisSize-20);
@@ -277,7 +276,7 @@ public class TDDisplayFX extends PamBorderPane {
 		StackPane mainGraphPane=new StackPane();
 		mainGraphPane.getChildren().add(splitPaneHolder);
 		mainGraphPane.getChildren().add(showButton);
-		StackPane.setAlignment(showButton, Pos.TOP_LEFT);		
+		StackPane.setAlignment(showButton, Pos.TOP_RIGHT);		
 
 		this.setCenter(mainGraphPane);
 
@@ -701,7 +700,7 @@ public class TDDisplayFX extends PamBorderPane {
 
 		setTimeStamp();
 
-		repaintAll(standardRefreshMillis);
+		repaintAll(STANDARD_REFRESH_MILLIS);
 
 	}
 
@@ -836,7 +835,7 @@ public class TDDisplayFX extends PamBorderPane {
 				aGraph.timeRangeSpinnerChange(oldValue, newValue);
 			}
 
-			repaintAll(standardRefreshMillis); //here 50 because scrollValueChanged is also called. 
+			repaintAll(STANDARD_REFRESH_MILLIS); //here 50 because scrollValueChanged is also called. 
 
 		}
 	}
@@ -857,7 +856,7 @@ public class TDDisplayFX extends PamBorderPane {
 			//may not be on fx thread
 			Platform.runLater(()->{
 				setTimeStamp();
-				repaintAll(TDDisplayFX.standardRefreshMillis);
+				repaintAll(TDDisplayFX.STANDARD_REFRESH_MILLIS);
 			});
 		}
 		@Override
@@ -888,7 +887,7 @@ public class TDDisplayFX extends PamBorderPane {
 					aGraph.timeScrollValueChanged(((AcousticScrollerFX) pamScroller).getValueMillisD());
 				}
 				setTimeStamp();
-				repaintAll(standardRefreshMillis);
+				repaintAll(STANDARD_REFRESH_MILLIS);
 			});
 		}
 

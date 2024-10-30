@@ -59,7 +59,7 @@ public class SoundOutputManager {
 		this.tdDisplayFX = tdDisplayFX;
 		play=new ToggleButton();
 //		play.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.PLAY_ARROW, Color.WHITE, PamGuiManagerFX.iconSize));
-		play.setGraphic(PamGlyphDude.createPamIcon("mdi2p-play", Color.WHITE, PamGuiManagerFX.iconSize));
+		play.setGraphic(PamGlyphDude.createPamIcon("mdi2p-play", PamGuiManagerFX.iconSize));
 		play.setToggleGroup(group);
 		play.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -71,7 +71,7 @@ public class SoundOutputManager {
 		//create button to open settings
 		pause=new ToggleButton();
 //		pause.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.PAUSE, Color.WHITE, PamGuiManagerFX.iconSize));
-		pause.setGraphic(PamGlyphDude.createPamIcon("mdi2p-pause", Color.WHITE, PamGuiManagerFX.iconSize));
+		pause.setGraphic(PamGlyphDude.createPamIcon("mdi2p-pause", PamGuiManagerFX.iconSize));
 		pause.setToggleGroup(group);
 		pause.setOnAction(new EventHandler<ActionEvent>() {
 			@Override

@@ -89,7 +89,7 @@ public class DelphinIDPane extends SettingsPane<DelphinIDParams> {
 		PamHBox minDensityHolder = new PamHBox();
 		minDensityHolder.setAlignment(Pos.CENTER_RIGHT);
 		minDensityHolder.setSpacing(5);
-		Label minDensity = new Label("Min. density");
+		Label minDensity = new Label("Min. detectection density");
 		minDensityHolder.getChildren().addAll(minDensity, detectionDensitySpinner);
 
 		/**Classification thresholds etc to set.**/

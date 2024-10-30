@@ -98,6 +98,7 @@ public class GenericDataPlotInfo extends TDDataInfoFX {
 	@Override
 	public Polygon drawDataUnit(int plotNumber, PamDataUnit pamDataUnit, GraphicsContext g, double scrollStart,
 			TDProjectorFX tdProjector, int type) {
+
 		if (getCurrentScaleInfo().getDataType() == ParameterType.FREQUENCY) { // frequency data !
 			return drawFrequencyData(plotNumber, pamDataUnit, g, scrollStart, tdProjector, type);
 		}
@@ -119,7 +120,11 @@ public class GenericDataPlotInfo extends TDDataInfoFX {
 	 */
 	public Polygon drawFrequencyData(int plotNumber, PamDataUnit pamDataUnit, GraphicsContext g, double scrollStart,
 			TDProjectorFX tdProjector, int type) {
+				
 		
+		System.out.println("paint data unit " + pamDataUnit);
+		
+
 		g.setLineDashes(null);
 		g.setLineWidth(2);
 		TDSymbolChooserFX symbolChooser = getSymbolChooser();

@@ -1,18 +1,8 @@
 package clickTrainDetector.layout;
 
-import java.awt.Color;
-
-import PamView.GeneralProjector;
-import PamView.PamColors;
 import PamView.symbol.PamSymbolChooser;
-import PamView.symbol.StandardSymbolChooser;
 import PamView.symbol.StandardSymbolManager;
-import PamView.symbol.SymbolData;
-import PamView.symbol.modifier.PeakFreqModifier;
-import PamView.symbol.modifier.RotateColoursModifier;
 import PamguardMVC.PamDataBlock;
-import PamguardMVC.PamDataUnit;
-import clickTrainDetector.CTDataUnit;
 import detectiongrouplocaliser.DetectionGroupGraphics;
 
 /**

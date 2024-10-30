@@ -30,7 +30,7 @@ public class DragMarkerAdapter extends TDOverlayAdapter {
 	@Override
 	public Node getIcon() {
 //		return PamGlyphDude.createPamGlyph(MaterialIcon.PAN_TOOL, Color.WHITE, PamGuiManagerFX.iconSize);
-		return PamGlyphDude.createPamIcon("mdi2h-hand-right", Color.WHITE, PamGuiManagerFX.iconSize);
+		return PamGlyphDude.createPamIcon("mdi2h-hand-right", PamGuiManagerFX.iconSize);
 	}
 
 	@Override

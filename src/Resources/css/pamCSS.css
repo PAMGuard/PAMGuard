@@ -72,8 +72,9 @@
 .button{
  -fx-background-color: transparent;
  -fx-background-radius: 5 5 5 5;
- -fx-border-color:  transparent;
  -fx-border-radius: 5 5 5 5;
+ -fx-border-color: -fx_border_col;
+
 }
 
 .transparent-button-square{
@@ -197,6 +198,46 @@
 
 .menu-button > .arrow-button > .arrow {
     -fx-padding: 0;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * SplitMenuButton                                                             *
+ *                                                                             *
+ ******************************************************************************/
+
+.split-menu-button{
+  -fx-background-color: transparent;
+  -fx-border-radius: 5;
+  -fx-border-color: -fx_border_col;
+}
+
+
+.split-menu-button:hover{
+
+}
+
+
+.split-menu-button .label {
+-fx-background-color: transparent;
+  -fx-border-radius: 5;
+}
+
+
+.split-menu-button .label:hover {
+   -fx-background-color: -fx-highlight; 
+}
+
+
+.split-menu-button .arrow-button {
+-fx-background-color: transparent;
+  -fx-border-radius: 5;
+}
+
+
+.split-menu-button .arrow-button:hover {
+ -fx-background-color: -fx-highlight; 
 }
 
 /*******************************************************************************
@@ -425,10 +466,38 @@
     -fx-opacity: 0.4;
 }
 
+/*******************************************************************************
+ *                                                                             *
+ * Toggle Button                                                                *
+ *                                                                             *
+ ******************************************************************************/
+
+ .toggle-button{
+   -fx-background-color: transparent;
+   -fx-border-radius: 5;
+   -fx-background-radius:6;
+   -fx-padding: 3 6 6 6;
+   -fx-border-color: -fx_border_col;
+}
+
+.toggle-button:hover{
+   -fx-background-color: -fx-highlight; 
+}
+
+.toggle-button:selected {
+  -fx-border-color: -fx-highlight;
+  -fx-background-color: -fx-highlight;
+}
+
+.toggle-button:selected:focused {
+  -fx-border-color: -fx-highlight;
+  -fx-background-color: -fx-highlight;
+}
+
 
 /*******************************************************************************
  *                                                                             *
- * ToggleSwitch                                                                *
+ * TextField                                                               *
  *                                                                             *
  ******************************************************************************/
 

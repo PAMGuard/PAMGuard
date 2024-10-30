@@ -38,7 +38,6 @@ public class DLAnnotationBinary extends AnnotationBinaryHandler<DLAnnotation> {
 		//System.out.println("DLAnnotationBinary: Saving DL annotation results:"); 
 
 		DLAnnotation ba = (DLAnnotation) annotation;
-		
 
 		//write the number of results for reading back
 		try {

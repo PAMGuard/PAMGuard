@@ -141,7 +141,6 @@ public class DelphinIDWorker extends ArchiveModelWorker {
 	} 
 	
 	
-	
 //	private Struct imageStruct;
 //	int count = 0;
 //	/**

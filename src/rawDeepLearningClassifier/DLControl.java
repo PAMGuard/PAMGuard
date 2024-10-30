@@ -22,6 +22,7 @@ import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.dataSelector.DataSelector;
 import ai.djl.engine.Engine;
 import dataPlotsFX.data.TDDataProviderRegisterFX;
+import dataPlotsFX.data.generic.GenericDataPlotProvider;
 import detectionPlotFX.data.DDPlotRegister;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
 import rawDeepLearningClassifier.dataPlotFX.DLDetectionPlotProvider;
@@ -251,9 +252,11 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 
 		dlClassifyProcess.getDLDetectionDatablock()
 				.setPamSymbolManager(new DLSymbolManager(this, dlClassifyProcess.getDLDetectionDatablock()));
+		dlClassifyProcess.getDLGroupDetectionDataBlock()
+			.setPamSymbolManager(new DLSymbolManager(this, dlClassifyProcess.getDLDetectionDatablock()));
 		dlClassifyProcess.getDLPredictionDataBlock()
 				.setPamSymbolManager(new PredictionSymbolManager(this, dlClassifyProcess.getDLDetectionDatablock()));
-
+		
 		/***** Add new deep learning models here ****/
 
 		dlModels.add(new SoundSpotClassifier(this));
@@ -279,6 +282,9 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 				.registerDataInfo(new DLDetectionPlotProvider(this, dlClassifyProcess.getDLDetectionDatablock()));
 		TDDataProviderRegisterFX.getInstance()
 				.registerDataInfo(new DLPredictionProvider(this, dlClassifyProcess.getDLPredictionDataBlock()));
+		TDDataProviderRegisterFX.getInstance()
+				.registerDataInfo(new GenericDataPlotProvider(dlClassifyProcess.getDLGroupDetectionDataBlock()));
+
 
 		// register the DD display
 		DDPlotRegister.getInstance()
