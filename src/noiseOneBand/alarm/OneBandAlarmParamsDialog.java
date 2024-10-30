@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.border.TitledBorder;
 
+import PamController.soundMedium.GlobalMediumManager;
 import PamView.dialog.PamDialog;
 import noiseOneBand.OneBandAlarmParameters;
 import noiseOneBand.OneBandControl;
@@ -28,7 +29,7 @@ public class OneBandAlarmParamsDialog extends PamDialog {
 		mainPanel.setBorder(new TitledBorder("Select measure"));
 		ButtonGroup bg = new ButtonGroup();
 		for (int i = 0; i < OneBandControl.NMEASURES; i++) {
-			measures[i] = new JRadioButton(OneBandControl.measureNames[i]);
+			measures[i] = new JRadioButton(OneBandControl.getMeasurementName(i));
 			bg.add(measures[i]);
 			mainPanel.add(measures[i]);
 		}
