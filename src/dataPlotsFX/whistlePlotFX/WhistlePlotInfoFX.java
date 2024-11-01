@@ -207,9 +207,10 @@ public class WhistlePlotInfoFX extends TDDataInfoFX {
 	 * @return a 2D path in pixels of the fragment. 
 	 */
 	public static Path2D drawWhistleFragement(PamDataUnit pamDataUnit, WhistleMoanControl wmControl, int fftLength, int fftHop, float sampleRate,
-			GraphicsContext g, TimeProjectorFX tdprojector, double scrollStart, int type,  Color fillCol, Color linCol, Orientation orientation) {
-		return WhistlePlotInfoFX.drawWhistleFragement(pamDataUnit, wmControl, fftLength, fftHop, sampleRate, g, tdprojector, scrollStart, type, fillCol, linCol, false, orientation);
+			GraphicsContext g, TimeProjectorFX tdprojector, double scrollStart, int type,  Color fillCol, Color linCol, Orientation orientation, boolean iswrap) {
+		return WhistlePlotInfoFX.drawWhistleFragement(pamDataUnit, wmControl, fftLength, fftHop, sampleRate, g, tdprojector, scrollStart, type, fillCol, linCol, false, orientation, iswrap);
 	}
+
 
 	/**
 	 * Draw a whistle fragment. 
@@ -230,7 +231,7 @@ public class WhistlePlotInfoFX extends TDDataInfoFX {
 	 * @return a 2D path in pixels of the fragment. 
 	 */
 	public static Path2D drawWhistleFragement(PamDataUnit pamDataUnit, WhistleMoanControl wmControl, int fftLength, int fftHop, float sampleRate,
-			GraphicsContext g, TimeProjectorFX tdprojector, double scrollStart, int type,  Color fillCol, Color linCol, boolean useKhz, Orientation orientation) {
+			GraphicsContext g, TimeProjectorFX tdprojector, double scrollStart, int type,  Color fillCol, Color linCol, boolean useKhz, Orientation orientation, boolean iswrap) {
 
 		//get position on time axis
 		long timeMillis=pamDataUnit.getTimeMilliseconds();
@@ -309,9 +310,9 @@ public class WhistlePlotInfoFX extends TDDataInfoFX {
 
 			tC=tdprojector.getTimePix((long) (sliceMillis-scrollStart)); 
 						
-//			if (tC < 0 || tC >  tdprojector.getGraphTimePixels()) {
-//				return null;
-//			}
+			if (iswrap && (tC < 0 || tC >  tdprojector.getGraphTimePixels())) {
+				return null;
+			}
 
 			//			if (wrap){
 			//				tC= PamUtils.constrainedNumber(this.getTDGraph().getWrapPix() + 
@@ -439,7 +440,7 @@ public class WhistlePlotInfoFX extends TDDataInfoFX {
 		Color linCol=getFragmentColour(dataUnit, this.whistleSymbolChooser);
 
 		return drawWhistleFragement( pamDataUnit,  wmControl,  fftLength,  fftHop,  sampleRate,
-				g,  tdprojector,  scrollStart,  type,   fillCol,  linCol, tdprojector.getOrientation()) ;
+				g,  tdprojector,  scrollStart,  type,   fillCol,  linCol, tdprojector.getOrientation(), this.getTDGraph().isWrap()) ;
 	}
 
 	/**

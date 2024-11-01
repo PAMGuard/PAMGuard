@@ -50,7 +50,7 @@ public class WhistleFFTPlot extends  RawFFTPlot<ConnectedRegionDataUnit> {
 				whistleMoanControl.getWhistleToneProcess().getOutputData().getFftHop(),
 				whistleDataUnit.getParentDataBlock().getSampleRate(), //need to use this because FFT sample rate can be unreliable  
 				graphicsContext,
-				super.getProjector(), getScrollStart(), 0, getContourColor(), getContourColor(), this.isUseKHz(), Orientation.HORIZONTAL); 
+				super.getProjector(), getScrollStart(), 0, getContourColor(), getContourColor(), this.isUseKHz(), Orientation.HORIZONTAL, false); 
 
 	}
 	

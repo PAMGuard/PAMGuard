@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 import PamController.PamController;
 import PamDetection.RawDataUnit;
+import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamView.GroupedSourceParameters;
 import PamView.PamDetectionOverlayGraphics;
@@ -292,7 +293,7 @@ public class SegmenterProcess extends PamProcess {
 			}
 			
 			while(!detectionInSegment(dataUnit,  segmentStart,  segmenterEnd)) {
-				System.out.println("Detection in segment: " + segmentStart); 
+				//System.out.println("Detection in segment: " + segmentStart); 
 				nextGroupSegment(index);
 			}
 		}
@@ -332,7 +333,9 @@ public class SegmenterProcess extends PamProcess {
 				}
 			}
 			
-//			System.out.println("SAVE WHISTLE SEGMENT!: " + ((segmenterDetectionGroup[index].getSegmentStartMillis()-firstClockUpdate)/1000.) + "s" + " " + " no. whsitles: " + segmenterDetectionGroup[index].getSubDetectionsCount() + " " + segmenterDetectionGroup[index].getSegmentStartMillis() + "  " + segmenterDetectionGroup[index]);
+//			System.out.println("SAVE WHISTLE SEGMENT!: " + ((segmenterDetectionGroup[index].getSegmentStartMillis()-firstClockUpdate)/1000.) + "s" + " " + " no. whistles: " 
+//			+ segmenterDetectionGroup[index].getSubDetectionsCount() + " " + PamCalendar.formatDateTime(segmenterDetectionGroup[index].getSegmentStartMillis()) + "  " 
+//					+ segmenterDetectionGroup[index]);
 			//save the data unit to the data block
 			if (segmenterDetectionGroup[index].getSubDetectionsCount()>0) {
 				this.segmenterGroupDataBlock.addPamData(segmenterDetectionGroup[index]);

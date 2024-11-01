@@ -81,8 +81,15 @@ public abstract class GenericLinePlotInfo extends TDDataInfoFX {
 			TDProjectorFX tdProjector, int type) {
 //		System.out.println("A Plot line: "  + PamCalendar.formatDateTime(pamDataUnit.getTimeMilliseconds()));
 
+		
 		double mintC= -1000.;
 		double maxtC = tdProjector.getWidth()+1000.;
+		
+		if  (this.getTDGraph().isWrap()) {
+			mintC=0;
+			maxtC=tdProjector.getWidth(); 
+		}
+
 		
 		int chan = PamUtils.PamUtils.getLowestChannel(pamDataUnit.getChannelBitmap()); 
 
@@ -106,6 +113,8 @@ public abstract class GenericLinePlotInfo extends TDDataInfoFX {
 //			System.out.println("Line is outside display " + tC);
 			return null;
 		}
+		
+		
 
 		double dataPixel; 
 		Coordinate3d c; 
@@ -140,13 +149,16 @@ public abstract class GenericLinePlotInfo extends TDDataInfoFX {
 	
 					if (lastUnits[chan][i]==null) {
 						lastUnits[chan][i] = new Point2D(tC, dataPixel); 
-						g.fillOval(tC, dataPixel, 5,5);
+						g.fillOval(tC, dataPixel, 10,10);
+						System.out.println("Fill oval:");
 						return null; 
 					}
 					else {
-						if (tC>lastUnits[chan][i].getX() && (!this.getTDGraph().isWrap() || 
+						if (tC>lastUnits[chan][i].getX() && (!this.getTDGraph().isWrap() ||
 								tC<maxtC && tC>=mintC && lastUnits[chan][i].getX()<maxtC && lastUnits[chan][i].getX()>mintC)) {
 							//in wrap mode we can get some weird effects with tC co-ordintates. Still have not quite cracked this...
+							
+							
 //							if (Math.abs(tC - lastUnits[chan][i].getX())>100) {
 //								System.out.println("tC: " + tC + " lastUnits[i].getX(): " + lastUnits[chan][i].getX() 
 //										+ "  " + tdProjector. getTimeAxis().getPosition((timeMillis-scrollStart)/1000.) + "  " + tdProjector.getWidth());

@@ -39,7 +39,7 @@ public class IshmaelDetPlotInfo extends GenericDataPlotInfo {
 	}
 	
 	
-	public TDSettingsPane getGraphSettingsPane() {
+	public GenericSettingsPane getGraphSettingsPane() {
 		if (genericSymbolpane==null) {
 			genericSymbolpane = new GenericSettingsPane(this);
 			genericSymbolpane.setIcon(makeIcon());

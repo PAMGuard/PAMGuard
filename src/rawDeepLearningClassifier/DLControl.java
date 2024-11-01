@@ -279,11 +279,11 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 
 		// register click detector for the javafx display.
 		TDDataProviderRegisterFX.getInstance()
-				.registerDataInfo(new DLDetectionPlotProvider(this, dlClassifyProcess.getDLDetectionDatablock()));
+				.registerDataInfo(new DLDetectionPlotProvider(this, dlClassifyProcess.getDLDetectionDatablock(), false));
 		TDDataProviderRegisterFX.getInstance()
 				.registerDataInfo(new DLPredictionProvider(this, dlClassifyProcess.getDLPredictionDataBlock()));
 		TDDataProviderRegisterFX.getInstance()
-				.registerDataInfo(new GenericDataPlotProvider(dlClassifyProcess.getDLGroupDetectionDataBlock()));
+				.registerDataInfo(new DLDetectionPlotProvider(this, dlClassifyProcess.getDLGroupDetectionDataBlock(), true));
 
 
 		// register the DD display

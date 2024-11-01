@@ -17,7 +17,7 @@ public class SegmenterDetectionGroup extends GroupDetection<PamDataUnit> {
 	private double segDuration;
 	
 	/**
-	 * The start time fo the segment in millis.
+	 * The start time of the segment in millis.
 	 */
 	private long segMillis;
 
@@ -41,11 +41,18 @@ public class SegmenterDetectionGroup extends GroupDetection<PamDataUnit> {
 	
 	@Override
 	public boolean isAllowSubdetectionSharing() {
-		//segmetns share sub detections
+		//segments share sub detections
 		return true;
 	}
 	
-	
+	/**
+	 * Get the segment start milliseconds. Note that this can be quite different to
+	 * the getTimeMillis() because getTimeMillis() returns the time millis of the
+	 * first data unit. For a long data unit, like a whistle, the end can be in the
+	 * segment but the start is significantly before the segment starts
+	 * 
+	 * @return the segment start in millis.
+	 */
 	public long getSegmentStartMillis() {
 		return segMillis;
 	}

@@ -4,17 +4,20 @@ import java.util.List;
 
 import PamDetection.PamDetection;
 import PamguardMVC.PamDataUnit;
-import detectiongrouplocaliser.DetectionGroupDataUnit;
+import rawDeepLearningClassifier.segmenter.SegmenterDetectionGroup;
 
 /*8
  * A deep learning detection which is derived from a group of data units. 
  */
-public class DLGroupDetection  extends DetectionGroupDataUnit implements PamDetection {
+public class DLGroupDetection  extends SegmenterDetectionGroup implements PamDetection {
 
-	public DLGroupDetection(long timeMilliseconds, List<PamDataUnit> list) {
-		super(timeMilliseconds, list);
+	public DLGroupDetection(long timeMilliseconds, int channelBitmap, long startSample, double duration, List<PamDataUnit> list) {
+		super(timeMilliseconds, channelBitmap, startSample, duration);
 		// TODO Auto-generated constructor stub
 	}
+
+
+
 
 
 }
