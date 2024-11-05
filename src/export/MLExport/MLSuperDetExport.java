@@ -44,7 +44,7 @@ public class MLSuperDetExport extends MLDataUnitExport {
 		ArrayList<PamDataUnit> savedUnits;
 		Struct dataUnitstruct;
 		for (int j=0; j<mlDetectionsManager.getMlDataUnitsExport().size(); j++) {
-			
+						
 			exporter = mlDetectionsManager.getMlDataUnitsExport().get(j);
 
 			//do we have any data units of that type?
@@ -65,7 +65,7 @@ public class MLSuperDetExport extends MLDataUnitExport {
 				}
 				//now we have to remove all the data units that were saved. Otherwise they will be saved again by the more generic 
 				//exporters towards the bottom of the list. 
-				subDataUnits.remove(savedUnits);
+				subDataUnits.removeAll(savedUnits);
 				
 				dataUnits.set(exporter.getName(), dataUnitStruct); 
 			}
