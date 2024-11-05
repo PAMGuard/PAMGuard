@@ -172,9 +172,13 @@
             </additionalResources>
           </dmg>
           <jdk>
-            <include>false</include>
+            <include>true</include>
             <location>/Library/Java/JavaVirtualMachines/amazon-corretto-21.jdk</location>
           </jdk>
+          <codesign>
+            <enable>true</enable>
+            <identity>3rd Party Mac Developer Application: Jamie Macaulay (7365S9DZ34)</identity>
+          </codesign>
         </configuration>
       </plugin>
     </plugins>

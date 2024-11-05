@@ -105,7 +105,7 @@ public class MLCPODExport extends MLDataUnitExport<PamDataUnit<?, ?>>{
 
 	@Override
 	public String getName() {
-		return "raw_data_units";
+		return "cpod";
 	}
 
 }

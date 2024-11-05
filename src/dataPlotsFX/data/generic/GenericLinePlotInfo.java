@@ -150,7 +150,7 @@ public abstract class GenericLinePlotInfo extends TDDataInfoFX {
 					if (lastUnits[chan][i]==null) {
 						lastUnits[chan][i] = new Point2D(tC, dataPixel); 
 						g.fillOval(tC, dataPixel, 10,10);
-						System.out.println("Fill oval:");
+//						System.out.println("Fill oval:");
 						return null; 
 					}
 					else {

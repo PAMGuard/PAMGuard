@@ -70,7 +70,7 @@ public class PamExporterManager {
 	public boolean exportDataUnit(PamDataUnit<?, ?> dataUnit, boolean force) {
 		boolean exportOK = true;
 		
-		//System.out.println("Add data unit " + dataUnit + " to: "+ currentFile); 
+//		System.out.println("Add data unit " +(dataUnit==null? "null" : dataUnit.getUID()) + " to: "+ currentFile); 
 		
 		if (dataUnit==null) {
 			if (force) {
@@ -192,8 +192,6 @@ public class PamExporterManager {
 		}
 		
 	}
-
-
 
 
 }

@@ -84,10 +84,27 @@ public class ExportProcessDialog {
 
 		for (int i=0; i<dataBlocks.size(); i++) {
 			if (exportManager.canExportDataBlock(dataBlocks.get(i))) {
-				dlOfflineGroup.addTask(new ExportTask(dataBlocks.get(i), exportManager));
+				dlOfflineGroup.addTask(createExportTask(dataBlocks.get(i)));
 			}
 		}
 	}
+	
+	/**
+	 * Create an export task from a data block. 
+	 * @param dataBlock - the data block to create the export tasks for. 
+	 * @return the export task. 
+	 */
+	private ExportTask createExportTask(PamDataBlock dataBlock) {
+		
+		//this is not good coding but cannot let the click event datablock be call "Tracked Clicks" in the exporter. 
+		if (dataBlock.getDataName().equals("Tracked Events")) {
+			return new ClickEventExportTask(dataBlock, exportManager); 
+		}
+		
+		return new ExportTask(dataBlock, exportManager);
+	}
+	
+	
 	////---Swing stuff----/// should not be here but this is how PG works. 
 
 	public void showOfflineDialog(Frame parentFrame, ExportParams params) {

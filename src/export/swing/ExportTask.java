@@ -6,6 +6,7 @@ import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataSelector.DataSelectDialog;
 import PamguardMVC.dataSelector.DataSelectParams;
 import PamguardMVC.dataSelector.DataSelector;
+import PamguardMVC.superdet.SuperDetDataBlock;
 import dataMap.OfflineDataMapPoint;
 import export.PamExporterManager;
 import offlineProcessing.OfflineTask;
@@ -34,8 +35,7 @@ public class ExportTask extends OfflineTask<PamDataUnit<?,?>>{
 		super(parentDataBlock);
 		this.exporter = exporter; 
 		dataSelector=parentDataBlock.getDataSelectCreator().getDataSelector(this.getUnitName() +"_export", false, null);
-
-
+		this.addRequiredDataBlock(parentDataBlock);
 	}
 	
 	/**
@@ -53,7 +53,7 @@ public class ExportTask extends OfflineTask<PamDataUnit<?,?>>{
 
 	@Override
 	public boolean processDataUnit(PamDataUnit<?, ?> dataUnit) {
-
+		
 		//System.out.println("Huh? " + this.getDataBlock().getDataName() + "  " + dataUnit + "  " + dataUnit.getParentDataBlock().equals(this.getDataBlock()));
 		
 		if (dataUnit.getParentDataBlock().equals(this.getDataBlock())) {
@@ -82,13 +82,26 @@ public class ExportTask extends OfflineTask<PamDataUnit<?,?>>{
 
 	@Override
 	public void loadedDataComplete() {
-//		System.out.println("EXPORTER: loaded data complete"); 
+		System.out.println("EXPORTER: loaded data complete"); 
 		//force the exporter so save any renaming data units in the buffer
+		
+		//exporter.exportDataUnit(null,  true);
+		//exporter.close();
+		//exporter.setCurrentFile(null)
+	}
+	
+	
+
+	/**
+	 * Called at the end of the thread which executes this task. 
+	 */
+	public void completeTask() { 
+		System.out.println("EXPORTER: complete task"); 
 		exporter.exportDataUnit(null,  true);
 		exporter.close();
 		exporter.setCurrentFile(null); 
-
 	}
+
 	/**
 	 * task has settings which can be called
 	 * @return true or false
