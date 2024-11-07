@@ -47,6 +47,7 @@ public class RExportManager implements PamDataUnitExporter {
 	public RExportManager(PamExporterManager pamExporterManager){
 		this.pamExporterManager=pamExporterManager;
 		/***Add more options here to export data units****/
+		rDataExport.add(new RSuperDetectionExport(this)); 
 		rDataExport.add(new RClickExport()); 
 		rDataExport.add(new RWhistleExport()); 
 		rDataExport.add(new RCPODExport()); 
@@ -298,6 +299,14 @@ public class RExportManager implements PamDataUnitExporter {
 		
 	}
 
-
-
+	/**
+	 * Get all the R exporters. Each exporter can export a certain type of data unit./ 
+	 * @return a lis to the currently implemented R exporters. 
+	 */
+	public ArrayList<RDataUnitExport> getRDataUnitsExport() {
+		return rDataExport;
+	}
+	
 }
+
+

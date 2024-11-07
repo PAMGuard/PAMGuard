@@ -7,6 +7,7 @@ import PamguardMVC.dataSelector.DataSelectDialog;
 import PamguardMVC.dataSelector.DataSelectParams;
 import PamguardMVC.dataSelector.DataSelector;
 import PamguardMVC.superdet.SuperDetDataBlock;
+import PamguardMVC.superdet.SuperDetection;
 import dataMap.OfflineDataMapPoint;
 import export.PamExporterManager;
 import offlineProcessing.OfflineTask;
@@ -60,6 +61,10 @@ public class ExportTask extends OfflineTask<PamDataUnit<?,?>>{
 			//this is very important because the way the exporter works is that it iterates through multiple parent data blocks
 //			System.out.println(this.getDataBlock().getDataName() + "  " + dataUnit.getUID() + "  " + dataSelector.scoreData(dataUnit) +  "  " 
 //			+ (dataSelector.getParams().getCombinationFlag()  == DataSelectParams.DATA_SELECT_DISABLE));
+			
+//			if (dataUnit instanceof SuperDetection) {
+//				System.out.println("Super detection: " + ((SuperDetection) dataUnit).getSubDetectionsCount() + "  " + ((SuperDetection) dataUnit).getLoadedSubDetectionsCount());
+//			}
 			
 			if (dataSelector==null) {
 				//System.out.println("Data selector null: " + this.getDataBlock().getDataName() + "  " + dataUnit);

@@ -107,7 +107,7 @@ public class ScrollBarPane extends PamBorderPane {
 	/**
 	 * Text field to enter visible time manually. 
 	 */
-	private TextField textBox;
+	private ScrollTextBox textBox;
 
 
 	/**
@@ -482,11 +482,11 @@ public class ScrollBarPane extends PamBorderPane {
 	 */
 	private void createTextField(){
 		//create the textbox
-		textBox= new TextField();
+		textBox= new ScrollTextBox();
 		textBox.layoutXProperty().bind(rectangle.layoutXProperty().add(rectangle.widthProperty().divide(2)).subtract(textBox.widthProperty().divide(2)));
 		textBox.layoutYProperty().bind(rectangle.heightProperty().divide(2).subtract(textBox.heightProperty().divide(2)));
-		textBox.setOnAction((action)-> {
-			double millis=this.getTextBoxValue(textBox.getText());
+		textBox.getTextBox().setOnAction((action)-> {
+			double millis=ScrollTextBox.getTextBoxValue(textBox.getText(), isShowMillis());
 			if (millis<=0 || millis>(this.maxValueProperty.get()-this.minValueProperty.get())){
 				textBoxErrorFlash(textBox);
 				this.setTextBoxValue(visibleAmountProperty.get());
@@ -513,8 +513,13 @@ public class ScrollBarPane extends PamBorderPane {
 	
 		});
 	
-		//text box needs to to drag the rectangle so there isn't a drag 'dead space' 
+		//text box needs to drag the rectangle so there isn't a drag 'dead space' 
 		textBox.setOnMouseDragged((event)->{
+			rectangleDragged(event);
+		});
+		
+		//text box needs to drag the rectangle so there isn't a drag 'dead space' 
+		textBox.getTextBox().setOnMouseDragged((event)->{
 			rectangleDragged(event);
 		});
 	
@@ -554,73 +559,8 @@ public class ScrollBarPane extends PamBorderPane {
 	 * Get the text box that shows the visible amount
 	 * @return - the text field
 	 */
-	public TextField getTextBox() {
+	public ScrollTextBox getTextBox() {
 		return textBox;
-	}
-
-
-	/**
-	 * 
-	 * @param textBoxText
-	 * @return the visible range to set  in millis 
-	 */
-	private double getTextBoxValue(String textBoxText) {
-
-		double millis=-1; 
-
-		/**
-		 * Three possible inputs. 1) number in seconds e.g. number with letter e.g.10s for 10 seconds or 10m for 10 millis) time e.g. 00:00:01
-		 */
-		String formatted = null; 
-		try {
-			if (textBoxText.contains("ms")){
-				//find number 
-				formatted = textBoxText.replaceAll("[^.?0-9]+", " ");
-				millis= Double.valueOf(formatted); 
-
-			}
-			else if (textBoxText.contains("s")){
-				//find number 
-				formatted = textBoxText.replaceAll("[^.?0-9]+", " ");
-				millis= (Double.valueOf(formatted)*1000.); 
-
-			}
-			else if(textBoxText.contains("m")){
-				formatted = textBoxText.replaceAll("[^.?0-9]+", " ");
-				millis= (Double.valueOf(formatted)*1.); 
-
-			}
-			else if(textBoxText.contains(":")){
-				String[] vals=textBoxText.split(":");
-
-				int days=0; 
-				int minutes=0; 
-				int seconds=0; 
-				if (vals.length==2){
-					minutes=Integer.valueOf(vals[0]); 
-					seconds=Integer.valueOf(vals[1]); 
-				}
-				else if (vals.length==3){
-					days=Integer.valueOf(vals[0]); 
-					minutes=Integer.valueOf(vals[1]); 
-					seconds=Integer.valueOf(vals[2]); 
-				}
-
-				double totalSeconds=days*60*60 + minutes*60 + seconds; 
-				millis=(totalSeconds*1000); 
-
-			}
-			else {
-				// the value in seconds. 
-				millis=(isShowMillis() ? Double.valueOf(textBoxText) :  Double.valueOf(textBoxText)*1000); 
-				return millis; 
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return -1.; 
-		}
-
-		return millis;
 	}
 
 

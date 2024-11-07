@@ -716,7 +716,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 
 			datagramImage = new WritableImage(pixelBuffer);
 			g.setFill(Color.LIGHTGRAY);
-			g.fillRect(0, 0, nXPoints, nYPoints);
+			g.fillRect(0, 0, datagramImage.getWidth(), datagramImage.getHeight());
 			
 			Color col = null;
 			int colorARGB = 0;
