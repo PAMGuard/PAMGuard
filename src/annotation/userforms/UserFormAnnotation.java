@@ -3,14 +3,14 @@ package annotation.userforms;
 import annotation.DataAnnotation;
 import annotation.DataAnnotationType;
 
-public class UserFormAnnotation extends DataAnnotation {
+public class UserFormAnnotation<T extends DataAnnotationType<?>> extends DataAnnotation<T> {
 
 	/**
 	 * Data extracted from the logger form. 
 	 */
 	private Object[] loggerFormData;
 	
-	public UserFormAnnotation(DataAnnotationType dataAnnotationType, Object[] loggerFormData) {
+	public UserFormAnnotation(T dataAnnotationType, Object[] loggerFormData) {
 		super(dataAnnotationType);
 		this.setLoggerFormData(loggerFormData);
 	}

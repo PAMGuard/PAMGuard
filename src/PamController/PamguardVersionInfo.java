@@ -23,7 +23,7 @@ public class PamguardVersionInfo {
 	 * Set the minimum and maximum Java versions that this version of
 	 * PAMGuard can work with. 
 	 */
-	static public final String minJavaVersion = "11.0.0";
+	static public final String minJavaVersion = "11.00";
 	static public final String maxJavaVersion = "21.99.99";
 	
 
@@ -31,12 +31,12 @@ public class PamguardVersionInfo {
 	 * Version number, major version.minorversion.sub-release.
 	 * Note: can't go higher than sub-release 'f'
 	 */
-	static public final String version = "2.02.13d";
+	static public final String version = "2.02.14a";
 	
 	/**
 	 * Release date
 	 */
-	static public final String date = "October 2024";
+	static public final String date = " 28 October 2024";
 	
 //	/**
 //	 * Release type - Beta or Core

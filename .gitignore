@@ -19,6 +19,7 @@
 *.nar
 *.ear
 *.zip
+!src/test/**/*.zip
 *.tar.gz
 *.rar
 *.dll
@@ -37,6 +38,10 @@ bin/
 .classpath
 target/WMM.COF
 
+# IntellIJ
+.idea
+
+# Eclipse
 settings.xml
 .classpath
 .classpath
