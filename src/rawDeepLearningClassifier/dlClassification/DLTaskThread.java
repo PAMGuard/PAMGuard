@@ -49,7 +49,7 @@ public abstract class DLTaskThread extends Thread {
 			//				System.out.println("ORCASPOT THREAD while: " + "The queue size is " + queue.size()); 
 			try {
 				if (queue.size()>0) {
-					System.out.println("DL TASK THREAD: " + "The queue size is " + queue.size()); 
+//					System.out.println("DL TASK THREAD: " + "The queue size is " + queue.size()); 
 					ArrayList<? extends PamDataUnit> groupedRawData = queue.remove(0);
 
 					ArrayList<StandardPrediction> modelResult = dlModelWorker.runModel(groupedRawData, 

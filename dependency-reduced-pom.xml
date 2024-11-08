@@ -4,7 +4,7 @@
   <groupId>org.pamguard</groupId>
   <artifactId>Pamguard</artifactId>
   <name>Pamguard</name>
-  <version>2.02.13c</version>
+  <version>2.02.14a</version>
   <description>Pamguard using Maven to control dependencies</description>
   <url>www.pamguard.org</url>
   <organization>
@@ -136,49 +136,6 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>
-      <plugin>
-        <groupId>de.perdian.maven.plugins</groupId>
-        <artifactId>macosappbundler-maven-plugin</artifactId>
-        <version>1.21.1</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>bundle</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <plist>
-            <JVMMainClassName>pamguard.Pamguard</JVMMainClassName>
-            <CFBundleIconFile>src/Resources/PamguardIcon2.icns</CFBundleIconFile>
-            <CFBundleDisplayName>PAMGuard</CFBundleDisplayName>
-            <CFBundleDevelopmentRegion>English</CFBundleDevelopmentRegion>
-            <CFBundleURLTypes>
-              <string>msa</string>
-            </CFBundleURLTypes>
-            <JVMVersion>21+</JVMVersion>
-            <JVMArguments>
-              <string>-v</string>
-            </JVMArguments>
-          </plist>
-          <dmg>
-            <generate>true</generate>
-            <additionalResources>
-              <additionalResource>
-                <directory>src/target/macos/</directory>
-              </additionalResource>
-            </additionalResources>
-          </dmg>
-          <jdk>
-            <include>true</include>
-            <location>/Library/Java/JavaVirtualMachines/amazon-corretto-21.jdk</location>
-          </jdk>
-          <codesign>
-            <identity>3rd Party Mac Developer Application: PAMGuard</identity>
-          </codesign>
-        </configuration>
       </plugin>
     </plugins>
   </build>

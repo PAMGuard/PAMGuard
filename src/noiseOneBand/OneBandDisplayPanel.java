@@ -508,7 +508,7 @@ public class OneBandDisplayPanel {
 			OneBandDisplayParams params = getDisplayParams(panelType);
 			for (int i = OneBandControl.NMEASURES-1; i >= 0; i--) {
 				if ((params.showWhat & 1<<i) != 0) {
-					keyPanel.add(new SymbolKeyItem(measureSymbols[i], OneBandControl.measureNames[i]));
+					keyPanel.add(new SymbolKeyItem(measureSymbols[i], OneBandControl.getMeasurementName(i)));
 				}
 			}
 			if (displayParams.colourByChannel) {
