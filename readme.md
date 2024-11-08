@@ -13,7 +13,7 @@ PAMGuard fulfils two main requirements within marine bioacoustics
 2) **Processing and visualisation of large datasets**: Off-the-shelf autonomous PAM devices, large scale surveys involving drifters, towed arrays, gliders, bottom mounted devices and real time continuous monitoring system all generate huge volumes of data which requires automated analysis approaches. PAMGuard allows the processing of very large passive acoustic datasets using automated algorithms and crucially provides comprehensive visualisation tools for a manual analyst to check the results.
 
 ## Installation
-PAMGuard is available on Windows and can be downloaded from the [PAMGuard website](www.pamguard.org). Note that we are considering MacOS and Linux installers but they are not available at this time. 
+PAMGuard is available on Windows and can be downloaded from the [PAMGuard website](https://pamguard.org). Note that we are considering MacOS and Linux installers but they are not available at this time. 
 
 ## Quick start tutorial
 PAMGuard is a modular program with two modes; real-time and viewer. Typically a user will start with real-time model, either in the field collecting data or post processing sound files from a recorder. Once data are processed, users move on to viewer mode where data can be explored and further processed. 
