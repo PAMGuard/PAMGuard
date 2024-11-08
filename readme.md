@@ -26,7 +26,7 @@ Once the data has run, open PAMGuard viewer mode. Select the database you used t
 
 ## Features
 ### Hardware integration
-PAMGuard connects with hardware such as various GPS and AIS systems and a multitude of different sound cards (e.g. [National Instruments](www.ni.com) devices, [SAIL DAQ cards](www.smruconsulting.com/contact-us), almost all ASIO sound cards and standard computer sound cards) for real time data collection and processing. PAMGuard also works with some very bespoke hardware such as [DIFAR Sonobuoys]();
+PAMGuard connects with hardware such as various GPS and AIS systems and a multitude of different sound cards (e.g. [National Instruments](https://ni.com) devices, [SAIL DAQ cards](https://smruconsulting.com/contact-us), almost all ASIO sound cards and standard computer sound cards) for real time data collection and processing. PAMGuard also works with some very bespoke hardware such as [DIFAR Sonobuoys](https://pubs.aip.org/asa/jasa/article/139/3/EL83/910724);
 
 ### Real time operation
 PAMGuard takes advantage of multi-core processors to run multiple signal processing automatic analysis algorithms in real time to detect whales, dolphins, bats etc. Data are shown in different displays, including interactive spectrograms and maps. You might be using PAMGuard for simply viewing a spectrogram and making recordings or running deep learning algorithms for multiple species and localising the results to view locations on a map. Whatever acoustic workflow a user creates, PAMGuard can run it in real time. 
