@@ -66,13 +66,13 @@ public class PamCalendar {
 	 * For accurate timing within detectors, always try to use sample number
 	 * and count samples from the start time for the detector.
 	 */
-	private static long soundFileTimeInMillis;
+	private static volatile long soundFileTimeInMillis;
 
 	/**
 	 * Time that data processing started - can be set to a file time
 	 * when files are being processed, otherwise it's just the current time. 
 	 */
-	private static long sessionStartTime;
+	private static volatile long sessionStartTime;
 
 	/**
 	 * When running in viewer mode, use the sessionStartTime and the viewEndtime
@@ -877,9 +877,25 @@ public class PamCalendar {
 	/**
 	 * 
 	 * @param sessionStartTime the time that processing started
+	 * And also set the file time to zero within that since both this
+	 * and setSoundFileTime send out notifications, so this can really mess
+	 * up timing, causing new binary files to be created and all sorts of 
+	 * other problems. 
 	 */
 	public static void setSessionStartTime(long sessionStartTime) {
+		setSessionStartTime(sessionStartTime, 0);
+//		PamCalendar.sessionStartTime = sessionStartTime;
+//		PamController.getInstance().updateMasterClock(getTimeInMillis());
+	}
+
+	/**
+	 * 
+	 * @param sessionStartTime the time that processing started
+	 * @param soundFileTimeMillis sound file time relative to start time. Good to set this zero right away. 
+	 */
+	public static void setSessionStartTime(long sessionStartTime, long soundFileTimeMillis) {
 		PamCalendar.sessionStartTime = sessionStartTime;
+		PamCalendar.soundFileTimeInMillis = soundFileTimeMillis;
 		PamController.getInstance().updateMasterClock(getTimeInMillis());
 	}
 
