@@ -189,6 +189,9 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 				pauseDataload(newVal);
 			}
 		});
+		
+		scrollBarPane.getScrollBox().setPrefWidth(100);
+		scrollBarPane.showVisibleRangeButton(false); 
 
 
 		if (isViewer){

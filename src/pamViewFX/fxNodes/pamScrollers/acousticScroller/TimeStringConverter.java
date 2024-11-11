@@ -1,60 +1,19 @@
 package pamViewFX.fxNodes.pamScrollers.acousticScroller;
 
-import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
-import pamViewFX.fxNodes.PamButton;
-import pamViewFX.fxNodes.PamHBox;
 
-public class ScrollTextBox extends PamHBox {
-	
-	/**
-	 * The text field 
-	 */
-	private TextField textBox;
-	
-	private PamButton rangeButton;
-	
-	/**
-	 * List of default range values that appear in the menu. 
-	 */
-	private Number[] defaultRangeValues;
-	
-	private StringConverter<Long> stringConverter = new TimeStringConverter(); 
-	
-	public ScrollTextBox() {
-		textBox = new TextField();
-		this.getChildren().add(textBox); 
-		
-		rangeButton =new PamButton("xx");
-		this.getChildren().add(rangeButton); 
+public class TimeStringConverter extends StringConverter<Long> {
+
+	@Override
+	public String toString(Long object) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
-	public void setText(String format) {
-		this.textBox.setText(format);
-		
-	}
-
-	public TextField getTextBox() {
-		return this.textBox;
-	}
-
-	public String getText() {
-		return 	this.textBox.getText();
-	}
-
-	public void setPrefColumnCount(int i) {
-		this.textBox.setPrefColumnCount(i);
-		
-	}
-
-	/**
-	 * Set whether the a button to select a custom set of ranges is availble. Usually these will be times. 
-	 * @param b - true to show the button. 
-	 */
-	public void setRangeButtonVisible(boolean b) {
-		if (b && !this.getChildren().contains(rangeButton)) this.getChildren().add(rangeButton);
-		else  this.getChildren().remove(b);
-
+	@Override
+	public Long fromString(String string) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	
@@ -122,7 +81,5 @@ public class ScrollTextBox extends PamHBox {
 
 		return millis;
 	}
-
-	
 
 }

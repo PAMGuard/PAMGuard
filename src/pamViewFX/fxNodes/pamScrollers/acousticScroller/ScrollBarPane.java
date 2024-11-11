@@ -25,6 +25,7 @@ import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
 
 /**
  * A custom scroll bar. 
+ * 
  * @author Jamie Macaulay 
  *
  */
@@ -559,7 +560,7 @@ public class ScrollBarPane extends PamBorderPane {
 	 * Get the text box that shows the visible amount
 	 * @return - the text field
 	 */
-	public ScrollTextBox getTextBox() {
+	public ScrollTextBox getScrollBox() {
 		return textBox;
 	}
 
@@ -810,6 +811,12 @@ public class ScrollBarPane extends PamBorderPane {
 
 		//add listener to current value amount property.
 		currentValueProperty.addListener(val);
+	}
+
+
+	public void showVisibleRangeButton(boolean b) {
+		this.textBox.setRangeButtonVisible(b);
+		
 	}
 
 }

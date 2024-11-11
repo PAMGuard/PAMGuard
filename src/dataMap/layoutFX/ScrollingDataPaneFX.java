@@ -234,8 +234,8 @@ public class ScrollingDataPaneFX extends PamBorderPane {
 			notifyScrollChange();
 		});
 
-		timeScrollBar.getTextBox().setPrefColumnCount(15);
-		timeScrollBar.getTextBox().setPrefWidth(100);
+		timeScrollBar.getScrollBox().setPrefColumnCount(15);
+		timeScrollBar.getScrollBox().setPrefWidth(150);
 
 		timeScrollBar.setPrefHeight(50);
 		
