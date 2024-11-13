@@ -590,7 +590,7 @@ public class TDGraphFX extends PamBorderPane {
 		
 		//needed to add this here because, if a new graph was created, the data type infos could be messed up and nothing would plot. 
 		if (currentScaleInfo.getDataTypeInfo().dataType != graphParameters.currentDataType.dataType) {
-			System.err.println("TDGraphFX: The graph paramters data type is not the same as the current dsata type"); 
+			System.err.println("TDGraphFX: The graph paramters data type is not the same as the current data type"); 
 			graphParameters.currentDataType = currentScaleInfo.getDataTypeInfo(); 
 		}
 		

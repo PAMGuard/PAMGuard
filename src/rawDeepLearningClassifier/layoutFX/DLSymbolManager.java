@@ -10,7 +10,7 @@ import rawDeepLearningClassifier.DLControl;
 public class DLSymbolManager extends StandardSymbolManager {
 
 	/**
-	 * Reference ot the click control. 
+	 * Reference to the click control. 
 	 */
 	private DLControl dlControl;
 

@@ -93,22 +93,13 @@ public class DLClassifyProcess extends PamInstantProcess {
 	 */
 	private DLGroupDataBlock dlGroupDetectionDataBlock;
 
-	/**
-	 * DL Group detection logging. 
-	 */
-	private DLGroupDetectionLogging dlGroupDetLogging; 
-
-
 	public DLClassifyProcess(DLControl dlControl, SegmenterDataBlock parentDataBlock) {
 		super(dlControl);
-
 
 		this.setParentDataBlock(parentDataBlock);
 
 		//		this.setParentDataBlock(parentDataBlock);
-
 		this.dlControl = dlControl; 
-
 
 		//create an annotations object. 
 		dlAnnotationType = new DLAnnotationType(dlControl);
@@ -137,24 +128,10 @@ public class DLClassifyProcess extends PamInstantProcess {
 		dlGroupDetectionDataBlock.addDataAnnotationType(dlAnnotationType);
 		dlGroupDetectionDataBlock.setCanClipGenerate(true); 
 
-		//set database logging for group detections
-		dlDetectionDataBlock.SetLogging(dlGroupDetLogging = new DLGroupDetectionLogging(dlControl, dlGroupDetectionDataBlock));
-		dlGroupDetLogging.setSubLogging(new DLGroupSubLogging(dlGroupDetLogging, dlGroupDetectionDataBlock));
-
-		//add custom graphics
-		PamDetectionOverlayGraphics overlayGraphics = new DLGraphics(dlModelResultDataBlock);
-		overlayGraphics.setDetectionData(true);
-		dlModelResultDataBlock.setOverlayDraw(overlayGraphics);
-
-		overlayGraphics = new DLDetectionGraphics(dlDetectionDataBlock);
-		overlayGraphics.setDetectionData(true);
-		dlDetectionDataBlock.setOverlayDraw(overlayGraphics);
-
 		classificationBuffer =  new ArrayList<PamDataUnit>(); 
 
 		//the process name. 
 		setProcessName("Deep Learning Classifier");  
-
 	}
 
 	/**
@@ -399,7 +376,8 @@ public class DLClassifyProcess extends PamInstantProcess {
 		
 		DLGroupDetection dlgroupDetection = new DLGroupDetection(timeMillis, groupDetections.get(0).getChannelBitmap(), startSample,  (endTimeMillis-timeMillis), dataUnits); 
 		dlgroupDetection.setFrequency(new double[] {minFreq, maxFreq});
-		
+		addDLAnnotation(dlgroupDetection, predictedResults); 
+				
 		return dlgroupDetection;
 	}
 
@@ -595,7 +573,7 @@ public class DLClassifyProcess extends PamInstantProcess {
 							}
 							else {
 								System.out.println("Save click annotation to " + lastParentDataUnit[i].getUID()); 
-								addDLAnnotation(lastParentDataUnit[i],groupRawDataBuffer[i],modelResultDataBuffer[i]); 
+								addDLAnnotation(lastParentDataUnit[i],modelResultDataBuffer[i]); 
 								clearBuffer(i); 
 							}
 						}
@@ -652,7 +630,7 @@ public class DLClassifyProcess extends PamInstantProcess {
 			if (PamUtils.hasChannel(getSourceParams().getGroupChannels(i), PamUtils.getSingleChannel(dataUnit.getChannelBitmap()))) {
 				if (groupRawDataBuffer[i].size()>0) {
 					//System.out.println("Save click annotation to " + lastParentDataUnit[i].getUID()); 
-					addDLAnnotation(dataUnit,groupRawDataBuffer[i],modelResultDataBuffer[i]); 
+					addDLAnnotation(dataUnit,modelResultDataBuffer[i]); 
 					lastParentDataUnit[i]=null;
 					clearBuffer(i); 
 				}
@@ -699,7 +677,7 @@ public class DLClassifyProcess extends PamInstantProcess {
 
 		//		System.out.println("Model result: " + modelResult.size()); 
 		DLDetection dlDetection = new DLDetection(basicData, rawdata); 
-		addDLAnnotation(dlDetection, groupDataBuffer,modelResult); 
+		addDLAnnotation(dlDetection,modelResult); 
 
 		//create the data unit
 		return dlDetection; 
@@ -762,7 +740,7 @@ public class DLClassifyProcess extends PamInstantProcess {
 	 * @param modelResult     - the model results.
 	 * @return a DL detection with merged raw data.
 	 */
-	private void addDLAnnotation(PamDataUnit parentDataUnit, ArrayList<GroupedRawData> groupDataBuffer,
+	private void addDLAnnotation(PamDataUnit parentDataUnit,
 			ArrayList<PredictionResult> modelResult) {
 
 		//System.out.println("DLClassifyProces: Add annnotation to  " + parentDataUnit); 

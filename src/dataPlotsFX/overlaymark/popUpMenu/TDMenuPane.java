@@ -234,8 +234,7 @@ public class TDMenuPane extends PamBorderPane {
 	/**
 	 * Set the summary text for the data unit in the menu. 
 	 */
-	private void setSummaryText() {
-		
+	private void setSummaryText() {		
 		if (currentDataUnit==null || detectionSummary==null) return; 
 
 		String text; 

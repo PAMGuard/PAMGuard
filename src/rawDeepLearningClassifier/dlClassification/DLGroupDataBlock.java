@@ -1,5 +1,6 @@
 package rawDeepLearningClassifier.dlClassification;
 
+import PamView.GeneralProjector;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.superdet.SuperDetDataBlock;
 import clickTrainDetector.CTDataUnit;
@@ -18,6 +19,12 @@ public class DLGroupDataBlock extends SuperDetDataBlock<DLGroupDetection, PamDat
 		
 		
 	}
+	
+	@Override
+	public String getHoverText(GeneralProjector generalProjector, PamDataUnit dataUnit, int iSide) {
+		return super.getHoverText(generalProjector, dataUnit, iSide);
+	}
+
 
 
 }

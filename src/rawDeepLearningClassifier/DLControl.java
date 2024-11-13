@@ -15,8 +15,11 @@ import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamController.SettingsPane;
+import PamView.PamDetectionOverlayGraphics;
 import PamView.PamSidePanel;
 import PamView.WrapperControlledGUISwing;
+import PamView.symbol.StandardSymbolManager;
+import PamView.symbol.SymbolData;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.dataSelector.DataSelector;
@@ -40,6 +43,8 @@ import rawDeepLearningClassifier.dlClassification.delphinID.DelphinIDClassifier;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericDLClassifier;
 import rawDeepLearningClassifier.dlClassification.ketos.KetosClassifier2;
 import rawDeepLearningClassifier.dlClassification.koogu.KooguClassifier;
+import rawDeepLearningClassifier.layoutFX.DLDetectionGraphics;
+import rawDeepLearningClassifier.layoutFX.DLGraphics;
 import rawDeepLearningClassifier.layoutFX.DLSettingsPane;
 import rawDeepLearningClassifier.layoutFX.DLSidePanelSwing;
 import rawDeepLearningClassifier.layoutFX.DLSymbolManager;
@@ -48,6 +53,8 @@ import rawDeepLearningClassifier.logging.DLAnnotationType;
 import rawDeepLearningClassifier.logging.DLDataUnitDatagram;
 import rawDeepLearningClassifier.logging.DLDetectionBinarySource;
 import rawDeepLearningClassifier.logging.DLDetectionDatagram;
+import rawDeepLearningClassifier.logging.DLGroupDetectionLogging;
+import rawDeepLearningClassifier.logging.DLGroupSubLogging;
 import rawDeepLearningClassifier.logging.DLResultBinarySource;
 import rawDeepLearningClassifier.offline.DLOfflineProcess;
 import rawDeepLearningClassifier.segmenter.SegmenterProcess;
@@ -203,6 +210,12 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	 */
 	private DLDefaultModelManager defaultModelManager;
 	
+	/**
+	 * DL Group detection logging. 
+	 */
+	private DLGroupDetectionLogging dlGroupDetLogging; 
+
+	
 	
 	/**
 	 * Constructor for the DL Control.
@@ -249,14 +262,34 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 		dlDetectionBinarySource = new DLDetectionBinarySource(this, dlClassifyProcess.getDLDetectionDatablock());
 		dlClassifyProcess.getDLDetectionDatablock().setBinaryDataSource(dlDetectionBinarySource);
 		dlClassifyProcess.getDLDetectionDatablock().setDatagramProvider(new DLDetectionDatagram(this));
+		
+//		//set database logging for group detections
+		dlClassifyProcess.getDLGroupDetectionDataBlock().SetLogging(dlGroupDetLogging = new DLGroupDetectionLogging(this, dlClassifyProcess.getDLGroupDetectionDataBlock()));
+		dlGroupDetLogging.setSubLogging(new DLGroupSubLogging(dlGroupDetLogging, dlClassifyProcess.getDLGroupDetectionDataBlock()));
+		
+		
+		//add custom graphics
+		PamDetectionOverlayGraphics overlayGraphics = new DLGraphics(dlClassifyProcess.getDLPredictionDataBlock());
+		overlayGraphics.setDetectionData(true);
+		dlClassifyProcess.getDLPredictionDataBlock().setOverlayDraw(overlayGraphics);
 
+		overlayGraphics = new DLDetectionGraphics(	dlClassifyProcess.getDLDetectionDatablock());
+		overlayGraphics.setDetectionData(true);
+		dlClassifyProcess.getDLDetectionDatablock().setOverlayDraw(overlayGraphics);
+		
+		overlayGraphics = new DLDetectionGraphics(dlClassifyProcess.getDLGroupDetectionDataBlock());
+		overlayGraphics.setDetectionData(true);
+		dlClassifyProcess.getDLGroupDetectionDataBlock().setOverlayDraw(overlayGraphics);
+		
+		//set the symbol managers. 
 		dlClassifyProcess.getDLDetectionDatablock()
 				.setPamSymbolManager(new DLSymbolManager(this, dlClassifyProcess.getDLDetectionDatablock()));
 		dlClassifyProcess.getDLGroupDetectionDataBlock()
-			.setPamSymbolManager(new DLSymbolManager(this, dlClassifyProcess.getDLDetectionDatablock()));
+			.setPamSymbolManager(new StandardSymbolManager(	dlClassifyProcess.getDLGroupDetectionDataBlock(),  new SymbolData()));
 		dlClassifyProcess.getDLPredictionDataBlock()
 				.setPamSymbolManager(new PredictionSymbolManager(this, dlClassifyProcess.getDLDetectionDatablock()));
 		
+	
 		/***** Add new deep learning models here ****/
 
 		dlModels.add(new SoundSpotClassifier(this));
