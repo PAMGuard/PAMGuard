@@ -1,7 +1,9 @@
 package pamViewFX.fxNodes.pamScrollers.acousticScroller;
 
+import javafx.geometry.Insets;
 import javafx.scene.control.TextField;
-import javafx.util.StringConverter;
+import pamViewFX.PamGuiManagerFX;
+import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamHBox;
 
@@ -12,6 +14,9 @@ public class ScrollTextBox extends PamHBox {
 	 */
 	private TextField textBox;
 	
+	/**
+	 * Button whihc can be used to select different ranges.
+	 */
 	private PamButton rangeButton;
 	
 	/**
@@ -19,14 +24,24 @@ public class ScrollTextBox extends PamHBox {
 	 */
 	private Number[] defaultRangeValues;
 	
-	private StringConverter<Long> stringConverter = new TimeStringConverter(); 
+	/**
+	 * The converter for converting strings to numbers and vice versa. 
+	 */
+	private DurationStringConverter stringConverter = new DurationStringConverter();
+
+	private boolean showMillis; 
 	
 	public ScrollTextBox() {
 		textBox = new TextField();
 		this.getChildren().add(textBox); 
 		
-		rangeButton =new PamButton("xx");
-		this.getChildren().add(rangeButton); 
+		rangeButton =new PamButton();
+		rangeButton.setGraphic( PamGlyphDude.createPamIcon("mdi2m-menu-down", PamGuiManagerFX.iconSize));
+		
+		rangeButton.setStyle("-fx-border-radius: 0 5 5 0; -fx-background-radius: 0 5 5 0;");
+	
+		setRangeButtonVisible(false);
+				
 	}
 
 	public void setText(String format) {
@@ -52,77 +67,54 @@ public class ScrollTextBox extends PamHBox {
 	 * @param b - true to show the button. 
 	 */
 	public void setRangeButtonVisible(boolean b) {
-		if (b && !this.getChildren().contains(rangeButton)) this.getChildren().add(rangeButton);
-		else  this.getChildren().remove(b);
+		if (b && !this.getChildren().contains(rangeButton)) {
+			textBox.setStyle("-fx-border-radius: 5 0 0 5; -fx-background-radius: 5 0 0 5;");
+			this.getChildren().add(rangeButton);
+		}
+		else {
+			textBox.setStyle("-fx-border-radius: 5 5 5 5; -fx-background-radius: 5 5 5 5;");
+			this.getChildren().remove(rangeButton);
+		}
 
 	}
-	
+
+	/**
+	 * Get the duration set in the text box in millis. 
+	 * @param showMillis - true of the text box only shows millis.
+	 * @return
+	 */
+	public Number getTextBoxDuration() {
+		return stringConverter.fromString(getText());
+	}
+
+	/**
+	 * Set the duration in the text box as a formatted time string.  
+	 * @param visAmount the duration to set in millis. 
+	 */
+	public void setTextBoxMillis(double visAmount) {
+		String text = stringConverter.toString(visAmount);
+		setText(text);
+	}
 	
 	
 	/**
-	 * 
-	 * @param textBoxText
-	 * @return the visible range to set  in millis 
+	 * Check whether the scroll bar's default <b>display</b> units are millis 
+	 * (note that stored units for calculations always remain milliseconds)
+	 * @return true if the display units are millis
 	 */
-	public static double getTextBoxValue(String textBoxText, boolean showMillis) {
-
-		double millis=-1; 
-
-		/**
-		 * Three possible inputs. 1) number in seconds e.g. number with letter e.g.10s for 10 seconds or 10m for 10 millis) time e.g. 00:00:01
-		 */
-		String formatted = null; 
-		try {
-			if (textBoxText.contains("ms")){
-				//find number 
-				formatted = textBoxText.replaceAll("[^.?0-9]+", " ");
-				millis= Double.valueOf(formatted); 
-
-			}
-			else if (textBoxText.contains("s")){
-				//find number 
-				formatted = textBoxText.replaceAll("[^.?0-9]+", " ");
-				millis= (Double.valueOf(formatted)*1000.); 
-
-			}
-			else if(textBoxText.contains("m")){
-				formatted = textBoxText.replaceAll("[^.?0-9]+", " ");
-				millis= (Double.valueOf(formatted)*1.); 
-
-			}
-			else if(textBoxText.contains(":")){
-				String[] vals=textBoxText.split(":");
-
-				int days=0; 
-				int minutes=0; 
-				int seconds=0; 
-				if (vals.length==2){
-					minutes=Integer.valueOf(vals[0]); 
-					seconds=Integer.valueOf(vals[1]); 
-				}
-				else if (vals.length==3){
-					days=Integer.valueOf(vals[0]); 
-					minutes=Integer.valueOf(vals[1]); 
-					seconds=Integer.valueOf(vals[2]); 
-				}
-
-				double totalSeconds=days*60*60 + minutes*60 + seconds; 
-				millis=(totalSeconds*1000); 
-
-			}
-			else {
-				// the value in seconds. 
-				millis=(showMillis ? Double.valueOf(textBoxText) :  Double.valueOf(textBoxText)*1000); 
-				return millis; 
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return -1.; 
-		}
-
-		return millis;
+	public boolean isShowMillis() {
+		return showMillis;
 	}
 
+	/**
+	 * Set whether the scroll bar's default <b>display</b> units to milliseconds
+	 * (note that stored units for calculations always remain milliseconds)
+	 * @param true if the display units are millis
+	 */
+	public void setShowMillis(boolean showMillis) {
+		this.showMillis = showMillis;
+		stringConverter.setShowMillis(showMillis);
+	}
 	
 
 }

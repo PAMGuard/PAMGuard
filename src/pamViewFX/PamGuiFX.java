@@ -175,7 +175,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 		//it and what colour it is etc has to be set for whatever pane it is to be located in. 
 		PamButton showButtonRight=hidingSidePane.getShowButton();
 //		showButtonRight.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.CHEVRON_LEFT, PamGuiManagerFX.iconColor, PamGuiManagerFX.iconSize));
-		showButtonRight.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-left", PamGuiManagerFX.iconColor, PamGuiManagerFX.iconSize));
+		showButtonRight.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-left", PamGuiManagerFX.iconSize));
 		//showLeftButton.setText(PamFontAwesome.ICON_CHEVRON_LEFT);
 		showButtonRight.getStyleClass().add("close-button-left-trans");
 		showButtonRight.setStyle("-fx-background-radius: 0 0 0 0;");
@@ -219,7 +219,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 
 		PamButton showButtonLeft=hidingPaneLeft.getShowButton();
 //		showButtonLeft.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.BARS, Color.LIGHTGRAY, PamGuiManagerFX.iconSize));
-		showButtonLeft.setGraphic(PamGlyphDude.createPamIcon("mdi2m-menu", Color.LIGHTGRAY, PamGuiManagerFX.iconSize));
+		showButtonLeft.setGraphic(PamGlyphDude.createPamIcon("mdi2m-menu", PamGuiManagerFX.iconSize));
 		showButtonLeft.getStyleClass().add("close-button-right-trans");
 		showButtonLeft.setStyle(" -fx-background-radius: 0 0 0 0;");
 		
@@ -227,7 +227,7 @@ public class PamGuiFX extends StackPane implements PamViewInterface {
 		closeRightButton.setPrefWidth(40);
 		closeRightButton.getStyleClass().add("close-button-left-trans");
 //		closeRightButton.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.CHEVRON_LEFT, Color.WHITE, PamGuiManagerFX.iconSize));
-		closeRightButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-left", Color.WHITE, PamGuiManagerFX.iconSize));
+		closeRightButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-left", PamGuiManagerFX.iconSize));
 		closeRightButton.prefHeightProperty().bind(mainTabPane.getHeaderHeightProperty());
 		
 		//add hiding pane to main pane. 

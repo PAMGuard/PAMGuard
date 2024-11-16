@@ -1,18 +1,15 @@
 package pamViewFX.fxNodes.pamScrollers.acousticScroller;
 
-import PamUtils.PamCalendar;
 import javafx.animation.FadeTransition;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -20,8 +17,6 @@ import javafx.scene.shape.Line;
 import javafx.util.Duration;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
-
-
 
 /**
  * A custom scroll bar. 
@@ -470,12 +465,7 @@ public class ScrollBarPane extends PamBorderPane {
 	 * @param visAmount - the visible amount
 	 */
 	private void setTextBoxValue(double visAmount) {
-		if (isShowMillis()){
-			textBox.setText(String.format("%.2fms", visAmount)); 
-		}
-		else {
-			textBox.setText(PamCalendar.formatDuration((long) visAmount));
-		}
+		textBox.setTextBoxMillis(visAmount);
 	}
 
 	/**
@@ -487,7 +477,8 @@ public class ScrollBarPane extends PamBorderPane {
 		textBox.layoutXProperty().bind(rectangle.layoutXProperty().add(rectangle.widthProperty().divide(2)).subtract(textBox.widthProperty().divide(2)));
 		textBox.layoutYProperty().bind(rectangle.heightProperty().divide(2).subtract(textBox.heightProperty().divide(2)));
 		textBox.getTextBox().setOnAction((action)-> {
-			double millis=ScrollTextBox.getTextBoxValue(textBox.getText(), isShowMillis());
+			
+			double millis=textBox.getTextBoxDuration().doubleValue();
 			if (millis<=0 || millis>(this.maxValueProperty.get()-this.minValueProperty.get())){
 				textBoxErrorFlash(textBox);
 				this.setTextBoxValue(visibleAmountProperty.get());
@@ -788,7 +779,7 @@ public class ScrollBarPane extends PamBorderPane {
 	 * @return true if the display units are millis
 	 */
 	public boolean isShowMillis() {
-		return showMillis;
+		return textBox.isShowMillis();
 	}
 
 	/**
@@ -797,7 +788,7 @@ public class ScrollBarPane extends PamBorderPane {
 	 * @param true if the display units are millis
 	 */
 	public void setShowMillis(boolean showMillis) {
-		this.showMillis = showMillis;
+		this.textBox.isShowMillis();
 	}
 
 
