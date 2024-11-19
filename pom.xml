@@ -54,9 +54,11 @@
 	<profiles>
 	
 		<!-- The MacOS profile creates a DMG package for installing PAMGuard on MacOS-->
-		<!--Note: Maven bug when using profiles when the plugin order is messed up and seemingly quite random.
-		IN pAMGuard it essential that the shade plugin is called before the macos plugin and so the phase of the 
-		plugin has -->
+		<!--Note: Ther eis a Maven bug when using profiles when the plugin order is messed up and seemingly quite random. 
+		In PAMGuard it essential that the shade plugin is called before the macos plugin and so the phase of the 
+		macos bundling has been moved to deploy. To run the bundler we therefore need to put both the macossappbunlder 
+		and exec shell script into the deploy phase so they are never really called. We then explicatelyl call them after 
+		the package phase using mvn package shade:shade macosappbundler:bundle exec:exec -->
 		<profile>
 			<id>macos-profile</id>
 	        <activation>
@@ -98,9 +100,13 @@
 								<dmgFileName>${project.build.finalName}</dmgFileName>
 								<appendVersion>false</appendVersion>
 							</dmg>
-							<jdk>
+							<!--Very important or deep learning does not work-->
+							 <app>
+					            <includeDependencies>false</includeDependencies>
+					        </app>
+					        <jdk>
 								<include>true</include>
-								<location>/Library/Java/JavaVirtualMachines/amazon-corretto-21.jdk</location>
+								<!--<location>/Library/Java/JavaVirtualMachines/amazon-corretto-21.jdk</location>-->
 							</jdk>
 							<codesign>
 								<enable>false</enable>
@@ -109,7 +115,7 @@
 						</configuration>
 						<executions>
 							<execution>
-								<phase>package</phase>
+								<phase>deploy</phase>
 								<goals>
 									<goal>bundle</goal>
 								</goals>
@@ -117,17 +123,18 @@
 						</executions>
 					</plugin>
 
+
 					<!--There is an issue with coide signing in the macosappbundler-maven-plugin. Details of the issue are here.
 					https://developer.apple.com/library/archive/qa/qa1940/_index.html  
 					To get round this run a script afterwards which signs the .app and create an alternative dmg file which is signed  -->
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>exec-maven-plugin</artifactId>
-						<version>3.1.0</version>
+						<version>3.5.0</version>
 						<executions>
 							<execution>
 								<id>sign-app</id>
-								<phase>install</phase>
+								<phase>deploy</phase>
 								<goals>
 									<goal>exec</goal>
 								</goals>
@@ -139,9 +146,10 @@
 											echo ${project.basedir}/target/${project.build.finalName}.dmg
 											xattr -cr ${project.basedir}/target/PAMGuard.app
 											codesign --force --sign "3rd Party Mac Developer Application: Jamie Macaulay" ${project.basedir}/target/PAMGuard.app
-											ln -s ${project.basedir}/target/PAMGuard.app ${project.basedir}/target/bundle/PAMGuard.app
+											cp -r ${project.basedir}/target/PAMGuard.app ${project.basedir}/target/bundle/PAMGuard.app
 											cd ${project.basedir}/target/bundle
 											hdiutil create -srcfolder ${project.basedir}/target/bundle -volname "PAMGuard" -fs HFS+ -o "${project.build.finalName}-signed.dmg"
+											rm -r ${project.basedir}/target/bundle/PAMGuard.app
 										</argument>
 									</arguments>
 								</configuration>
@@ -152,8 +160,8 @@
 				</plugins>
 			</build>
 		</profile>
-	
-		
+
+
 		<!-- The common profile always runs-->
 		<profile>
 			<id>common-profile</id>
@@ -305,6 +313,59 @@
 			          -->
 						</executions>
 					</plugin>
+
+
+					<!--  Plugin which creates a .dmg file for MacOS. -->
+					<plugin>
+						<groupId>de.perdian.maven.plugins</groupId>
+						<artifactId>macosappbundler-maven-plugin</artifactId>
+						<version>1.21.1</version>
+						<configuration>
+							<plist>
+								<JVMMainClassName>pamguard.Pamguard</JVMMainClassName>
+								<CFBundleIconFile>
+									src/Resources/PamguardIcon2.icns</CFBundleIconFile>
+								<CFBundleDisplayName>PAMGuard</CFBundleDisplayName>
+								<CFBundleDevelopmentRegion>English</CFBundleDevelopmentRegion>
+								<CFBundleURLTypes>
+									<string>msa</string>
+								</CFBundleURLTypes>
+								<JVMVersion>21+</JVMVersion>
+								<JVMArguments>
+									<string>-c</string>
+								</JVMArguments>
+								<NSAppSleepDisabled>true</NSAppSleepDisabled>
+							</plist>
+							<dmg>
+								<generate>true</generate>
+								<additionalResources>
+									<additionalResource>
+										<directory>
+											${project.basedir}/target/bundle/</directory>
+									</additionalResource>
+								</additionalResources>
+								<dmgFileName>${project.build.finalName}</dmgFileName>
+								<appendVersion>false</appendVersion>
+							</dmg>
+							<jdk>
+								<include>false</include>
+								<location>/Library/Java/JavaVirtualMachines/amazon-corretto-21.jdk</location>
+							</jdk>
+							<codesign>
+								<enable>false</enable>
+								<identity>3rd Party Mac Developer Application: Jamie Macaulay (7365S9DZ34)</identity>
+							</codesign>
+						</configuration>
+						<executions>
+							<execution>
+								<phase>deploy</phase>
+								<goals>
+									<goal>bundle</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
 				</plugins>
 
 		
