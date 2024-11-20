@@ -1091,7 +1091,6 @@ final public class PamModel implements PamSettings {
 		// clear the current list
 		pluginList.clear();
 		daqList.clear();
-		
 		/*
 		 * If developing a new PAMPlugin in eclipse, the easiest way to do it is to make a new
 		 * Eclipse project for your plugin code. Within that project, copy this PamModel class 

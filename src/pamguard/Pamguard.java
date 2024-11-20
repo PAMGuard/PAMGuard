@@ -42,6 +42,7 @@ import com.formdev.flatlaf.FlatLightLaf;
 
 import Acquisition.FolderInputSystem;
 import PamController.PamController;
+import PamController.PamFolders;
 import PamController.PamGUIManager;
 import PamController.PamRunModeDialog;
 import PamController.PamRunModeParams;
@@ -722,6 +723,12 @@ public class Pamguard {
 	private static class FolderSizeMonitor implements Runnable {
 		@Override
 		public void run() {
+			
+			PamFolders.deleteTempFiles(".x86_64.dll");
+			PamFolders.deleteTempFiles(".dll.lck");
+			PamFolders.deleteTempFiles(".tmp");
+			PamFolders.deleteTempFiles("-sqlitejdbc.dll");
+			
 			while(true) {
 				long length = 0;
 				File dir = new File(getSettingsFolder());
