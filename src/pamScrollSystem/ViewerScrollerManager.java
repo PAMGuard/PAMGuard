@@ -644,10 +644,10 @@ public class ViewerScrollerManager extends AbstractScrollManager implements PamS
 		newMin = checkMinimumTime(menuMouseTime - scrollRange / 2);
 		newMax = checkMaximumTime(newMin + scrollRange);
 		newMin = menuMouseTime - scrollRange/2;
-//		newMin = checkGapPos(dataBlock, newMin, newMax); // doesn't work.
+//		newMin = checkGapPos(dataBlock, newMin, newMax);
 		newMax = newMin + scrollRange;
-		System.out.printf("Centering scoller at %s, range %s to %s\n", PamCalendar.formatDBDateTime(menuMouseTime),
-				PamCalendar.formatDBDateTime(newMin), PamCalendar.formatDBDateTime(newMax));
+//		System.out.printf("Centering scoller at %s, range %s to %s\n", PamCalendar.formatDBDateTime(menuMouseTime),
+//				PamCalendar.formatDBDateTime(newMin), PamCalendar.formatDBDateTime(newMax));
 		aScroller.setRangeMillis(newMin, newMax, false);
 		aScroller.setValueMillis(menuMouseTime);
 	}
@@ -796,7 +796,7 @@ public class ViewerScrollerManager extends AbstractScrollManager implements PamS
 			 *  the next data.  
 			 */
 			if ((oldMinGap == OfflineDataMap.IN_GAP)) {
-				newStart = getNextDataStart(scroller, oldMin);
+				newStart = getNextDataStart(scroller, newMin);
 				if (newStart != Long.MAX_VALUE) {
 					return newStart;
 				}
