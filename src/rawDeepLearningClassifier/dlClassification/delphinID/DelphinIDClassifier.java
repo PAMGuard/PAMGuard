@@ -18,6 +18,7 @@ import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
 import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
+import rawDeepLearningClassifier.segmenter.SegmenterDetectionGroup;
 import whistlesAndMoans.ConnectedRegionDataBlock;
 
 /**
@@ -129,6 +130,29 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 	private boolean whistlePreFilter(ArrayList<? extends PamDataUnit> groupedRawData) {
 		//TODO
 //		System.out.println("Check WHISTLE fragment density"); 
+//		
+//		3.	Within each time frame, the density of detection is calculated and used as a filter.
+//		-	Density 2
+//		-	where the length of frame = frame duration / mean time step across contour
+//		(time steps between time-frequency points in contour saved by ROCCA depend on FFT resolution but can vary slightly within contour)
+//
+//		4.	If a detection frame has less than 0.30 detection density, it is not used for classification
+//		double density = DelphinIDUtils.getDensity(null); 
+		
+
+		if (groupedRawData==null || groupedRawData.size()<1) {
+			System.err.println("DelphinIDClassifier: + the grouped raw data is null or zero size:"); 
+			return false;
+		}
+		
+		System.out.println("Run DelphinID model: " +  groupedRawData.size() + " min density: " + delphinIDParams.minDetectionDensity); 
+		
+		double density = DelphinIDUtils.getDensity((SegmenterDetectionGroup) groupedRawData.get(0)); 
+		
+		if (density>=delphinIDParams.minDetectionDensity) {
+			return true;
+		}
+		
 		return true;
 	}
 

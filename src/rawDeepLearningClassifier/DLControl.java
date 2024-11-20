@@ -24,9 +24,12 @@ import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.dataSelector.DataSelector;
 import ai.djl.engine.Engine;
+import annotation.handler.AnnotationHandler;
 import dataPlotsFX.data.TDDataProviderRegisterFX;
 import dataPlotsFX.data.generic.GenericDataPlotProvider;
 import detectionPlotFX.data.DDPlotRegister;
+import generalDatabase.DBControlUnit;
+import generalDatabase.SQLLoggingAddon;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
 import rawDeepLearningClassifier.dataPlotFX.DLDetectionPlotProvider;
 import rawDeepLearningClassifier.dataPlotFX.DLPredictionProvider;
@@ -267,6 +270,13 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 		dlClassifyProcess.getDLGroupDetectionDataBlock().SetLogging(dlGroupDetLogging = new DLGroupDetectionLogging(this, dlClassifyProcess.getDLGroupDetectionDataBlock()));
 		dlGroupDetLogging.setSubLogging(new DLGroupSubLogging(dlGroupDetLogging, dlClassifyProcess.getDLGroupDetectionDataBlock()));
 		
+		//a little strange this is not automatic but seems you have to add SQL add ons explicitly. 
+		AnnotationHandler annotationHandler = dlClassifyProcess.getDLGroupDetectionDataBlock().getAnnotationHandler();
+		annotationHandler.addAnnotationType(dlClassifyProcess.getDLAnnotionType());
+		SQLLoggingAddon sqlAddon = dlClassifyProcess.getDLAnnotionType().getSQLLoggingAddon();
+		if (sqlAddon != null) {
+			dlGroupDetLogging.addAddOn(sqlAddon);
+		}
 		
 		//add custom graphics
 		PamDetectionOverlayGraphics overlayGraphics = new DLGraphics(dlClassifyProcess.getDLPredictionDataBlock());
@@ -336,6 +346,7 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 		// ensure everything is updated.
 		updateParams(rawDLParmas);
 	}
+
 
 	/**
 	 * Get the available deep learning models

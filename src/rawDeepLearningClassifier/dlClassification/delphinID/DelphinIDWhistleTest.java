@@ -36,7 +36,7 @@ import whistlesAndMoans.AbstractWhistleDataUnit;
  * @author Jamie Macaulay
  * 
  */
-public class DelphinIDTest {
+public class DelphinIDWhistleTest {
 
 
 	/**

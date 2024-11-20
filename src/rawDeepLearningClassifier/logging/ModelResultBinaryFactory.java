@@ -158,6 +158,37 @@ public class ModelResultBinaryFactory {
 			return null; 
 		}
 	}
+	
+	/**
+	 * Create a prediction result object from data. 
+	 * @param type - flag indicating the type of prediction result. 
+	 * @param predictions - the predictions. 
+	 * @param classID - the classIDs associated with the predictions
+	 * @param isBinary - whether the predictions was classified as being a true positive. 
+	 * @return the prediction result object. 
+	 */
+	public static PredictionResult makePredictionResult(int type, float[] data, short[] classID, boolean isBinary) {
+		//TODO - not sure why some parameters like isBinary and classID are not passed to Ketos or StandardPrediction...
+		
+		PredictionResult result; 
+		//specific settings for different modules 
+		switch (type) {
+		case SOUND_SPOT:
+			result = new SoundSpotResult(data, classID, isBinary);  
+			break; 
+		case DUMMY_RESULT:
+			result = new DummyModelResult(data);  
+			break; 
+		case KETOS:
+			result = new KetosResult(data);  
+			break; 
+		default:
+			//ideally should never be used. 
+			result = new StandardPrediction(data, isBinary); 
+			break; 
+		}
+		return result;
+	}
 
 	/**
 	 * Get the type flag for a model result. this is based on the class type. 

@@ -1,6 +1,7 @@
 package pamViewFX.fxNodes.pamScrollers.acousticScroller;
 
-import javafx.geometry.Insets;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxGlyphs.PamGlyphDude;
@@ -17,7 +18,7 @@ public class ScrollTextBox extends PamHBox {
 	/**
 	 * Button whihc can be used to select different ranges.
 	 */
-	private PamButton rangeButton;
+	private MenuButton rangeButton;
 	
 	/**
 	 * List of default range values that appear in the menu. 
@@ -31,19 +32,35 @@ public class ScrollTextBox extends PamHBox {
 
 	private boolean showMillis; 
 	
+	/**
+	 * 
+	 */
+	private  double[] defaultDurations = new double[] {60000., 5*60000., 3600*1000., 86400*1000., 7*86400*1000., 30*86400*1000.};
+	
 	public ScrollTextBox() {
 		textBox = new TextField();
 		this.getChildren().add(textBox); 
 		
-		rangeButton =new PamButton();
-		rangeButton.setGraphic( PamGlyphDude.createPamIcon("mdi2m-menu-down", PamGuiManagerFX.iconSize));
+		rangeButton =new MenuButton();
+//		rangeButton.setGraphic( PamGlyphDude.createPamIcon("mdi2m-menu-down", PamGuiManagerFX.iconSize));
 		
 		rangeButton.setStyle("-fx-border-radius: 0 5 5 0; -fx-background-radius: 0 5 5 0;");
-	
+			
 		setRangeButtonVisible(false);
-				
+		setDefaultDurations(defaultDurations);
 	}
 
+	/**
+	 * Set the default durations. These are shown in the range button. 
+	 * @param durations - the durations to set.
+	 */
+	public void setDefaultDurations(double[] durations) {
+		rangeButton.getItems().clear();
+		for (int i=0; i<durations.length; i++) {
+			rangeButton.getItems().add(new MenuItem(stringConverter.toString(durations[i]))); 
+		}
+	}
+	
 	public void setText(String format) {
 		this.textBox.setText(format);
 		

@@ -29,6 +29,8 @@ public class DataMapScrollBar extends ScrollBarPane {
 		this.heightProperty().addListener((obsVal, oldval, newVal)->{
 			paintDataSummary();
 		});
+		
+		this.getScrollBox().setRangeButtonVisible(true);
 	}
 
 	/**

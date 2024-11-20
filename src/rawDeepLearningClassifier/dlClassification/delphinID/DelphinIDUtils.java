@@ -14,7 +14,7 @@ import PamUtils.PamArrayUtils;
 import PamUtils.PamCalendar;
 import PamguardMVC.DataUnitBaseData;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
-import rawDeepLearningClassifier.dlClassification.delphinID.DelphinIDTest.DelphinIDWorkerTest;
+import rawDeepLearningClassifier.dlClassification.delphinID.DelphinIDWhistleTest.DelphinIDWorkerTest;
 import rawDeepLearningClassifier.dlClassification.delphinID.Whistles2Image.Whistle2ImageParams;
 import rawDeepLearningClassifier.segmenter.SegmenterDetectionGroup;
 import us.hebi.matlab.mat.format.Mat5;
@@ -398,7 +398,7 @@ public class DelphinIDUtils {
 	 * @param group - the group
 	 * @return
 	 */
-	private static double getDensity(SegmenterDetectionGroup group) {
+	public static double getDensity(SegmenterDetectionGroup group) {
 		//number of whistle bins/number of time bins
 		ArrayList<double[][]> contour = Whistles2Image.whistContours2Points(group);
 		
