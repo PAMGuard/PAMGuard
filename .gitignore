@@ -131,3 +131,6 @@ settings.xml
 .classpath
 .classpath
 .classpath
+PAMGuard.app
+dependency-reduced-pom.xml
+.classpath
