@@ -20,7 +20,7 @@ import PamUtils.PamArrayUtils;
 import PamguardMVC.PamDataUnit;
 import ai.djl.MalformedModelException;
 import rawDeepLearningClassifier.dlClassification.archiveModel.SimpleArchiveModel;
-import rawDeepLearningClassifier.dlClassification.delphinID.DelphinIDUtils.WhistleGroup;
+import rawDeepLearningClassifier.dlClassification.delphinID.DelphinIDUtils.DetectionGroupMAT;
 import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 import rawDeepLearningClassifier.segmenter.SegmenterDetectionGroup;
 import us.hebi.matlab.mat.format.Mat5;
@@ -107,14 +107,14 @@ public class DelphinIDWhistleTest {
 		MatFile matFile = Mat5.newMatFile();
 
 		//get the whislte contours form a .mat file. 
-		WhistleGroup whistlegroup = DelphinIDUtils.getWhistleContoursMAT(whistleContourPath);
-		ArrayList<AbstractWhistleDataUnit> whistleContours = whistlegroup.getWhistle();
+		DetectionGroupMAT whistlegroup = DelphinIDUtils.getWhistleContoursMAT(whistleContourPath);
+		ArrayList<AbstractWhistleDataUnit> whistleContours = whistlegroup.getDetections();
 		float sampleRate = (float) whistlegroup.getSampleRate();
 		long dataStartMillis = whistlegroup.getFileDataStart();
 
 		//segment the whistle detections
 		//Note, delphinID starts from the first whistle and NOT the first file. 
-		ArrayList<SegmenterDetectionGroup> segments =  DelphinIDUtils.segmentWhsitleData(whistleContours,  (long) (dataStartMillis+(startSeconds*1000.)), 
+		ArrayList<SegmenterDetectionGroup> segments =  DelphinIDUtils.segmentDetectionData(whistleContours,  (long) (dataStartMillis+(startSeconds*1000.)), 
 				segLen,  segHop, (float) whistlegroup.getSampleRate());
 
 		for (int i=0; i<segments.size(); i++) {

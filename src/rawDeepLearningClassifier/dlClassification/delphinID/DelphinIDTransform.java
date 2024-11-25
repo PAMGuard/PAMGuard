@@ -118,6 +118,13 @@ public class DelphinIDTransform {
 			((SpectrumTransform) dlTransform).setSpectrum(spectrum.getSpectrum());
 			
 			break;
+		case CLICK_SPECTRUM:
+			
+			Whsitle2Spectrum spectrum = new Whsitle2Spectrum(whistleGroups,  (Whistle2spectrumParams) transformParams); 
+						
+			((SpectrumTransform) dlTransform).setSpectrum(spectrum.getSpectrum());
+			
+			break;
 		default:
 			System.err.println("Error in delphinID - no transform was created for group data");
 				
