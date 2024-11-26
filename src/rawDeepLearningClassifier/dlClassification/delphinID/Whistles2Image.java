@@ -218,7 +218,7 @@ public class Whistles2Image extends FreqTransform {
 		return canvas; 
 	}
 
-	public static class Whistle2ImageParams extends WhistleTransformParams {
+	public static class Whistle2ImageParams extends DetectionGroupTransformParams {
 
 		/**the size of the image inpixels 
 		 * 

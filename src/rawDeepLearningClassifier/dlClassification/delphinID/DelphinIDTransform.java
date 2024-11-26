@@ -6,6 +6,7 @@ import org.jamdev.jdl4pam.transforms.SpectrumTransform;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import rawDeepLearningClassifier.dlClassification.delphinID.Clicks2Spectrum.Clks2SpectrumParams;
 import rawDeepLearningClassifier.dlClassification.delphinID.Whistles2Image.Whistle2ImageParams;
 import rawDeepLearningClassifier.dlClassification.delphinID.Whsitle2Spectrum.Whistle2spectrumParams;
 import rawDeepLearningClassifier.segmenter.SegmenterDetectionGroup;
@@ -88,12 +89,38 @@ public class DelphinIDTransform {
 
 				return true;
 			}
+			
+			if (transformName.trim().equals("clicks2spectrum")) {
+
+				jsonObjectParams  = (JSONObject) jsonArray.getJSONObject(i).get("params"); 
+
+				transformParams = readClickSpectrumTransform( jsonObjectParams);
+				
+				delphinIDTransformType = WHISTLE_SPECTRUM;
+
+				return true;
+			}
 
 		}
 
 		return false;
 	}
 
+
+	private Clks2SpectrumParams readClickSpectrumTransform(JSONObject jsonObjectParams ) {
+		Clks2SpectrumParams params = new Clks2SpectrumParams();
+
+		double[] freqLimits = new double[2]; 
+		freqLimits[0] = jsonObjectParams.getFloat("minfreq"); 
+		freqLimits[1] = jsonObjectParams.getFloat("maxfreq"); 
+		
+		double minfragmillis = jsonObjectParams.getDouble("minclks"); 
+		
+		params.freqLimits = freqLimits;
+		params.minFragSize = minfragmillis;
+		
+		return params; 
+	}
 
 	/**
 	 * Set the whsitle data. 
@@ -120,9 +147,9 @@ public class DelphinIDTransform {
 			break;
 		case CLICK_SPECTRUM:
 			
-			Whsitle2Spectrum spectrum = new Whsitle2Spectrum(whistleGroups,  (Whistle2spectrumParams) transformParams); 
+			Clicks2Spectrum clkSpectrum = new Clicks2Spectrum(whistleGroups,  (Clks2SpectrumParams) transformParams); 
 						
-			((SpectrumTransform) dlTransform).setSpectrum(spectrum.getSpectrum());
+			((SpectrumTransform) dlTransform).setSpectrum(clkSpectrum.getSpectrum());
 			
 			break;
 		default:
@@ -167,7 +194,7 @@ public class DelphinIDTransform {
 	}
 	
 	
-	private WhistleTransformParams readWhistleTransform(JSONObject jsonObjectParams, WhistleTransformParams params) {
+	private DetectionGroupTransformParams readWhistleTransform(JSONObject jsonObjectParams, DetectionGroupTransformParams params) {
 		double[] freqLimits = new double[2]; 
 		freqLimits[0] = jsonObjectParams.getFloat("minfreq"); 
 		freqLimits[1] = jsonObjectParams.getFloat("maxfreq"); 

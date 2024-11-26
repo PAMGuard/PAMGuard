@@ -4,7 +4,7 @@ package rawDeepLearningClassifier.dlClassification.delphinID;
 /**
  * Basic paramter for whistle group transforms. 
  */
-public class WhistleTransformParams {
+public class DetectionGroupTransformParams {
 	/**
 	 * The frequency limits in 
 	 */

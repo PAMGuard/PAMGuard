@@ -145,7 +145,7 @@ public class Whsitle2Spectrum {
 		this.spectrum = spectrum;
 	}
 	
-	public static class Whistle2spectrumParams extends WhistleTransformParams {
+	public static class Whistle2spectrumParams extends DetectionGroupTransformParams {
 		
 	
 		/**

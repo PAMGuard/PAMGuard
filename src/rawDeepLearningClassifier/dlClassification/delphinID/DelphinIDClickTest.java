@@ -35,7 +35,7 @@ public class DelphinIDClickTest {
 	public static boolean testDelphinIDClickSegment(String matFileout) {
 		
 		
-		String clicksMatPath = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/clicks_20200918_123234.mat";
+		String clicksMatPath = "/Users/jdjm/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/clicks_20200918_123234.mat";
 		
 		double segLen = 4000.;
 		double segHop = 1000.0;
@@ -62,6 +62,8 @@ public class DelphinIDClickTest {
 				sum += segments.get(i).getSubDetectionsCount() ;
 				System.out.println("Segment" + i + " time:  " +  (double)(segments.get(i).getSegmentStartMillis()-dataStartMillis)/1000.  + "s no. clicks " + segments.get(i).getSubDetectionsCount() + " total: " + sum);
 			}
+			
+			
 			
 			
 		} catch (Exception e) {

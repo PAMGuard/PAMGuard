@@ -70,7 +70,7 @@ public class DurationStringConverter extends StringConverter<Number> {
 				millis= Double.valueOf(formatted); 
 
 			}
-			else if (durationString.contains("s")){
+			else if (durationString.contains("s") && !durationString.contains("days")){
 				//find number 
 				formatted = durationString.replaceAll("[^.?0-9]+", " ");
 				millis= (Double.valueOf(formatted)*1000.); 
