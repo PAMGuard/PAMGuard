@@ -88,6 +88,7 @@ import PamModel.CommonPluginInterface;
 import PamModel.PamModel;
 import PamModel.PamModuleInfo;
 import PamModel.PamPluginInterface;
+import PamModel.SMRUDevFunctions;
 import PamUtils.PamCalendar;
 import PamUtils.Splash;
 import PamUtils.time.CalendarControl;
@@ -614,6 +615,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		});
 		fileMenu.add(menuItem);
 //		}
+		SMRUDevFunctions.getDevFuncs().addFileMenuFuncs(fileMenu);
 
 		fileMenu.addSeparator();
 

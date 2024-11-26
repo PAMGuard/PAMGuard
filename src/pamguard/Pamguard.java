@@ -229,6 +229,10 @@ public class Pamguard {
 					JamieDev.setEnabled(true);
 					System.out.println("Enabling Jamie Macaulay modifications.");
 				}
+				else if (anArg.equalsIgnoreCase("-smrudev")) {
+					SMRUEnable.setDevEnable(true);
+					System.out.println("Enabling Jamie Macaulay modifications.");
+				}
 				else if (anArg.equalsIgnoreCase("-rocca")) {
 					RoccaDev.setEnabled(true);
 					System.out.println("Enabling Rocca development mode");

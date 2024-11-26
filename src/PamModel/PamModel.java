@@ -778,7 +778,7 @@ final public class PamModel implements PamSettings {
 		mi = PamModuleInfo.registerControlledUnit("rocca.RoccaControl", "Rocca");
 		mi.addDependency(new PamDependency(FFTDataUnit.class, "fftManager.PamFFTControl"));	
 		mi.setToolTipText("Classifies dolphin whistles selected from the spectrogram display");
-		mi.setToolTipText("");
+		mi.setToolTipText("Real-time acoustic species identification of delphinid whistles and clicks");
 		mi.setModulesMenuGroup(classifierGroup);
 		
 		mi = PamModuleInfo.registerControlledUnit("matchedTemplateClassifer.MTClassifierControl", "Matched Template Click Classifer");

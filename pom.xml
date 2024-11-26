@@ -526,6 +526,13 @@
 			</exclusions>
 		</dependency>
 
+<!-- html to markdown conversion https://github.com/furstenheim/copy-down --> 
+    <dependency>
+        <groupId>io.github.furstenheim</groupId>
+        <artifactId>copy_down</artifactId>
+        <version>1.1</version>
+    </dependency>
+
 		<!-- https://search.maven.org/artifact/org.kordamp.ikonli/ikonli-javafx/12.2.0/jar -->
 		<!-- Icon symbol pack to replace FontAwesome.  This is the core library, and the
 	     actual symbol packs need to be added separately (see below) -->

@@ -24,6 +24,9 @@
 *.rar
 *.dll
 
+# quarto built sebsite
+/src/quartohelp/_site
+
 # eclipse project file
 .project
 # hprof memory analyser files. 
@@ -122,3 +125,4 @@ settings.xml
 .settings/org.eclipse.jdt.core.prefs
 .classpath
 .project
+.Rproj.user
