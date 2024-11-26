@@ -1,0 +1,27 @@
+---
+title: "PAMGUARD Background"
+---
+ PAMGUARD Background  
+
+PAMGUARD
+========
+
+PAMGUARD Overview
+-----------------
+
+  
+
+### Background
+
+The PAMGUARD project was established to provide a world standard software infrastructure for acoustic detection, localisation and classification for use in mitigating against the risk of harm to marine mammals, and for research into their abundance, distribution and behaviour. Many marine activities involve underwater sound emissions. To mitigate against harm to marine mammals, observers are often employed to visually scan the sea surface for the presence of animals. In the event of a sighting, procedures such as suspension/delay of activities may be implemented to avoid harm. Visual observations play a vital role, but marine mammals are difficult to spot on the sea surface, especially when weather and light conditions are poor. However, many marine mammals produce loud and distinctive vocalisations, which can often be detected more reliably than visual cues. For these species, passive acoustic monitoring (PAM) offers an effective means of detection.
+
+  
+  
+
+### The PAMGUARD Approach
+
+PAMGUARD seeks to provide open-source PAM software based on a platform-independent (e.g. Windows, Linux, Macintosh OS), flexible, modular architecture. The open-source aspect of software development is facilitated through the project's presence on SourceForge, where a community of altruistic developers can provide extra resources. This community currently includes developers with proven PAM experience from both the UK and the USA. Open development means that the software is free and that access to the code is easy and assured. It also allows the code's copyright to be protected in perpetuity so that it cannot readily be closed and commercialised to the detriment of its users. It ultimately ensures that more people have easy access for development. This generally speeds up innovations and improves the performance and maintainability of the code.
+
+It is anticipated that the PAM community will support this initiative and donate their intellect and facilities to assist PAMGUARD in achieving its goal. Involvement in the PAMGUARD community allows researchers and industry to develop and contribute to a technology which will provide an important tool for the understanding and protection of the marine environment.
+
+[Next: PAMGUARD Architecture](pamGuardArchitecture.html)

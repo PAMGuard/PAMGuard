@@ -1,0 +1,61 @@
+---
+title: "Contour Extraction"
+---
+ Rocca Contour Extraction and Manipulation 
+
+ROCCA
+=====
+
+Contour Extraction / Manipulation
+---------------------------------
+
+  
+
+The whistle contour is automatically extracted from the spectrogram by stepping through the spectra one time slice at a time and measuring the peak frequency for each slice within a specific frequency bin. The upper and lower limits of the search bin are defined by the peak frequency of the previous time slice +/- the noise sensitivity (as defined in the [Rocca Parameters window](rocca_Configure.html#rocca_ParamsClassifier)). The frequency bin of the first time slice is determined by the user-selected start frequency +/- the noise sensitivity.
+
+  
+  
+
+### Adjusting the Noise Sensitivity
+
+If the contour does not match the underlying whistle, the first step should be to adjust the noise sensitivity.
+
+*   Decreasing the sensitivity narrows the frequency band used when searching for the peak frequency in the next time slice. A smaller band means the extraction algorithm is less likely to jump from the whistle contour to a nearby noisy peak. However, a smaller band also means that if the algorithm does jump to a nearby noisy peak, there is less chance it will be able to jump back to the whistle contour.
+    
+*   Increasing the sensitivity widens the frequency band used when searching for the peak frequency in the next time slice. A wider band increases the chances that an extraction gone off-track and following noise will be able to jump back to the whistle contour. However, a wider band also increases the chances of going off-track in the first place.
+    
+
+![](images/noise_sens.png)
+
+A button is provided in the top toolbar to quickly adjust noise sensitivity. The spectrogram will automatically update with the recalculated contour each time the sensitivity is changed.
+
+  
+  
+
+### Adjusting the highpass/lowpass filters
+
+The highpass and lowpass filters limit the contour extraction algorithm to only function within a specific frequency band. The highpass filter defines the lower bound, and the lowpass filter defines the upper bound. Specify a filter by typing in the desired frequency and hitting <enter>, or hitting the <Set> button and clicking on the desired frequency in the spectrogram. The filter is displayed on the spectrogram as a red horizontal line. If the extraction algorithm finds a peak frequency lower than the highpass filter specified, the peak frequency will be set to the value of the highpass filter. Similarly, if the extraction algorithm finds a peak frequency higher than the lowpass filter specified, the peak frequency will be set to the value of the lowpass filter.
+
+The filters can be reset by clicking the [<Reset Filters> button](rocca_Spectrogram.html#rocca_ResetFilter).
+
+  
+  
+
+### Adjusting the contour points manually
+
+![](images/contour_points.png)
+
+Individual contour points can be dragged manually to new positions. In order to view the points, move the mouse over the spectrogram and press the left mouse button. Try to move the mouse to a position away from the current whistle contour, to avoid accidentally dragging a contour point. Contour points will be displayed as light green dots.
+
+![](images/contour_points_selected.png)
+
+Contour points can only be dragged vertically. That is, the frequency can be changed but not the time slice. Once the contour point to be moved is determined, position the mouse over top of the point and press and hold the mouse button. The contour points will again be displayed as light green dots, but the point closest to the cursor will have a red circle. Move the mouse up or down to the desired frequency, and release the mouse button.
+
+Once a contour point has been moved, it will be locked in the new position even if the contour is recalculated by adjusting the noise sensitivity, modifying filters or clicking the [<Recalc Contour> button](rocca_Spectrogram.html#rocca_RecalcContour). In this way, if the contour extraction algorithm has followed noise instead of the desired whistle, the user can move a point to the correct position and get the extraction back on track. The contour point can still be moved manually, and clicking the [<Reset Contour> button](rocca_Spectrogram.html#rocca_ResetContour) will unlock all locked points.
+
+  
+  
+
+[Previous: Spectrogram Popup Window](rocca_Spectrogram.html)
+
+[Next: Whistle and Encounter Classification](rocca_WhistleSchoolClassification.html)

@@ -1,0 +1,48 @@
+---
+title: "Output"
+---
+ SIDE Output  
+
+SIDE Module
+===========
+
+Output
+------
+
+The SIDE Module saves information to the database, and can also generate summary reports for later review.
+
+  
+
+### Database
+
+Three linked tables are generated in the PAMGuard database:
+
+*   SIDE\_Sounds lists every sound injected
+*   SIDE\_Sequences lists every sequence
+*   SIDE\_Tests lists every test
+
+Each record in the sounds table cross references back to a record in the sequences table and each record in the sequences table cross references back to the tests table.
+
+  
+  
+
+### Summary Report
+
+Detection Efficiency Reports (DER) can be generated at any time after a test by right-clicking on one or more tests listed in the PAMGuard [Test History Information Table](SIDE_InfoTables.html#TestHistory) and selecting **_Process Test_** from the drop down menu. The operator can choose whether to show results for both sounds and sequences, or sequences only. Detection efficiency of separate detectors can be displayed on a single plot (if there are not too many detectors) or on separate plots (for multiple detectors).
+
+A logistic regression will be conducted for each Species Cluster / detector (or human) combination and a report automatically generated as a Microsoft Word document. The report provides several key outputs:
+
+*   The report date and time and the version of PAMGuard used for monitoring
+*   System information including the hydrophone array configuration with details on hydrophone specifications, spacing, and tow position
+*   PAMGuard modules in operation during the monitoring
+*   A detection efficiency table for injected cluster signals showing range, the number of signals injected, the percentage of signals detected by the detectors, and where applicable, the number of signals detected by the operator
+*   A logistic regression plot for individual signal detection probability versus range
+*   A detection efficiency table and logistic regression plot for injected cluster sequences
+
+The report provides information on detection range probabilities for each selected species cluster at both the signal and the sequence level. The logistic regression plots show the number of _hits_ and _misses_ for the automated detectors or the operator as well as the detection probability versus range. Additional information regarding the monitoring period and signal parameters are included in the efficiency report for each cluster.
+
+  
+  
+  
+
+[Previous: SIDE Workflow](SIDE_Process.html)

@@ -1,0 +1,39 @@
+---
+title: "Configure the Module"
+---
+ Difar Module  
+
+DIFAR Localisation
+==================
+
+Configuring the DIFAR module
+----------------------------
+
+DIFAR Localisation requires a relatively complex PAMGuard configuration. You may want to start by downloading the DIFAR example configuration from the [pamguard.org](http://www.pamguard.org) website.
+
+### Required PAMGuard modules
+
+The following modules are required for DIFAR Localisation.
+
+*   Sound Acquisition: Recording data from a VHF radio receiver at a sample rate of 48kHz.
+*   Decimator: To reduce the sample rate of the data you’ll actually be looking at to a few kHz or less, depending on your target species.
+*   FFT (Spectrogram) Engine: To display a spectrogram of the Decimated data for manually marking detections, and also to be used as input to an automatic detector.
+*   User Display: The DIFAR display modules and spectrograms can all be integrated into a single display module. However, if you’ve multiple screens, you may wish to make multiple user displays and spread out a little.
+*   DIFAR Localisation: Contains the DIFAR specific components
+
+### Recommended Modules
+
+The following modules are not required, but are highly recommened to facilitate analysis of DIFAR Localisations
+
+*   Additional FFT (Spectrogram) Engine processing raw data from the sound acquisition. The primary purpose of this FFT is to show the spectrum of the full signal which is a useful diagnostic to determine whether the DIFAR sonobuoy is functioning correctly. The spectrum of a correctly functioning DIFAR sonobuoy will show spectral peaks at the 7.5 and 15 kHz carrier frequencies. Absence of these peaks is a good indicator that something in the recording chain is amiss.
+*   Database: DIFAR results can be written to the database, so you’ll need one if you plan to access your results from a database.
+*   Binary store: Localised audio and the DIFARGram are stored in the binary store, so like the Database, this module must be active in order to view results in the [viewer-mode](../../../overview/PamMasterHelp/docs/viewerMode.html).
+*   NMEA, GPS and Map Modules. These aren’t absolutely necessary for DIFAR processing, but it’s likely you’ll want them as part of your configuration.
+
+The figure below shows a typical PAMGuard model for DIFAR processing
+
+![difarDataModel](./images/DataModel.png)
+
+[Previous: Overview](difar_Overview.html)
+
+[Next: Deploying Sonobuoys](difar_HydrophoneArray.html)

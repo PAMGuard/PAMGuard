@@ -1,0 +1,764 @@
+---
+title: "Measurements and Classification"
+---
+ Rocca Measurements and Classification  
+
+ROCCA
+=====
+
+Measurements and Classification
+-------------------------------
+
+  
+
+### Classification technique
+
+ROCCA classifies whistles, clicks and encounters using Random Forest classifiers. ROCCA currently uses a Random Forest classifier model based on the open-source statistical software package [Weka](http://www.cs.waikato.ac.nz/ml/weka/index.html). For more information on Random Forests and the WEKA package, the user is encouraged to refer to the book [Data Mining: Practical Machine Learning Tools and Techniques](http://www.cs.waikato.ac.nz/ml/weka/book.html)
+
+  
+
+### Whistle Contour Measurement and Classification
+
+Table 1 lists the 50 variables measured from each whistle contour.
+
+**Variable Code**
+
+**Variable Name**
+
+**Units**
+
+**Explanation**
+
+FREQBEGSWEEP
+
+Beginning Sweep
+
+Categorical variable
+
+Slope of the beginning sweep (1=positive -1=negative, 0=zero)
+
+FREQBEGUP
+
+Positive beginning sweep
+
+Binary variable
+
+1=beginning slope is positive, 0=beginning slope is negative
+
+FREQBEGDWN
+
+Negative beginning sweep
+
+Binary variable
+
+1=beginning slope is negative, 0=beginning slope is positive
+
+FREQENDSWEEP
+
+Ending sweep
+
+Categorical variable
+
+Slope of the beginning sweep (1=positive -1=negative, 0=zero)
+
+FREQENDUP
+
+Positive ending sweep
+
+Binary variable
+
+1=ending slope is positive, 0=ending slope is negative
+
+FREQENDDWN
+
+Negative ending sweep
+
+Binary variable
+
+1=ending slope is negative, 0=ending slope is positive
+
+FREQBEG
+
+Beginning frequency
+
+Hz
+
+Beginning frequency
+
+FREQEND
+
+Ending frequency
+
+Hz
+
+Ending frequency
+
+FREQMIN
+
+Minimum frequency
+
+Hz
+
+Minimu frequency
+
+DURATION
+
+Duration
+
+Seconds
+
+Duration of the whistle
+
+FREQRANGE
+
+Frequency range
+
+Hz
+
+Maximum frequency - minimum frequency
+
+FREQMAX
+
+Maximum frequency
+
+Hz
+
+Maximum frequency
+
+FREQMEAN
+
+Mean frequency
+
+Hz
+
+Mean frequency
+
+FREQMEDIAN
+
+Median frequency
+
+Hz
+
+Median frequency
+
+FREQSTDDEV
+
+Standard deviation of the frequency
+
+Hz
+
+Standard deviation of the frequency
+
+FREQSPREAD
+
+Frequency spread
+
+Hz
+
+Difference between the 75th and the 25th percentile of the frequency
+
+FREQQUARTER1
+
+First quarter frequency
+
+Hz
+
+Frequency at one-quarter of the duration
+
+FREQQUARTER2
+
+Half frequency
+
+Hz
+
+Frequency at one-half of the duration
+
+FREQQUARTER3
+
+Third quarter frequency
+
+Hz
+
+Frequency at three-quarters of the duration
+
+FREQCENTER
+
+Center frequency
+
+Hz
+
+(minimum frequency + (maximum frequency - minimum frequency)) / 2
+
+FREQRELBW
+
+Relative bandwidth
+
+Hz
+
+(maximum frequency - minimum frequency)/center frequency
+
+FREQMAXMINRATIO
+
+Maximum-minimum ratio
+
+None
+
+Maximum frequency / minimum frequency
+
+FREQBEGENDRATIO
+
+Beginning-ending ratio
+
+None
+
+Beginning frequency / end frequency
+
+FREQCOFM
+
+Coefficient of frequency modulation
+
+None
+
+Take 20 frequency measurements equally spaced in time, then subtract each frequency value from the one before it. COFM is the sum of the absolute values of these differences, all divided by 10,000
+
+FREQNUMSTEPS
+
+Number of steps
+
+None
+
+10 percent or greater increase or decrease in frequency over two contour points
+
+NUMINFLECTIONS
+
+Number of inflection points
+
+None
+
+Changes from positive to negative or negative to positive slope
+
+INFLMAXDELTA
+
+Maximum delta
+
+Seconds
+
+Maximum time between inflection points
+
+INFLMINDELTA
+
+Minimum delta
+
+Seconds
+
+Minimum time between inflection points
+
+INFLMAXMINDELTA
+
+Maximum-minimum delta ratio
+
+None
+
+Maximum delta / minimum delta
+
+INFLMEANDELTA
+
+Mean delta
+
+Seconds
+
+Mean time between inflection points
+
+INFLSTDDEVDELTA
+
+Standard deviation delta
+
+Seconds
+
+Standard deviation of the time between inflection points
+
+INFLMEDIANDELTA
+
+Median delta
+
+Seconds
+
+Median of the time between inflection points
+
+FREQSLOPEMEAN
+
+Mean slope
+
+Hz/second
+
+Overall mean slope
+
+FREQPOSSLOPEMEAN
+
+Positive slope
+
+Hz/second
+
+Mean positive slope
+
+FREQNEGSLOPEMEAN
+
+Negative slope
+
+Hz/second
+
+Mean negative slope
+
+FREQABSSLOPEMEAN
+
+Absolute slope
+
+Hz/second
+
+Mean absolute value of the slope
+
+FRQESLOPERATIO
+
+Positive-negative slope ratio
+
+None
+
+Mean positive slope / mean negative slope
+
+FREQSWEEPUPPERCENT
+
+Percent positive
+
+None
+
+Percent of the whistle that has a positive slope
+
+FREQSWEEPDWNPERCENT
+
+Percent negative
+
+None
+
+Percent of the whistle that has a negative slope
+
+FREQSWEEPFLATPERCENT
+
+Percent flat
+
+None
+
+Percent of the whistle that has a zero slope
+
+NUMSWEEPSUPDWN
+
+Positive-negative slope
+
+None
+
+Number of inflection points that change from positive slope to negative slope
+
+NUMSWEEPSDWNUP
+
+Negative-positive slope
+
+None
+
+Number of inflection points that change from negative slope to positive slope
+
+NUMSWEEPSUPFLAT
+
+Positive-flat slope
+
+None
+
+Number of times the slope changes from positive to zero
+
+NUMSWEEPSDWNFLAT
+
+Negative-flat slope
+
+None
+
+Number of times the slope changes from negative to zero
+
+NUMSWEEPSFLATDWN
+
+Flat-negative slope
+
+None
+
+Number of times the slope changes from zero to negative
+
+NUMSWEEPSFLATUP
+
+Flat-positive slope
+
+None
+
+Number of times the slope changes from zero to positive
+
+FREQSTEPUP
+
+Steps up
+
+None
+
+Number of steps that have increasing frequency
+
+FREQSTEPDOWN
+
+Steps down
+
+None
+
+Number of steps that have decreasing frequency
+
+INFLDUR
+
+Inflection points / duration
+
+None
+
+Number of inflection points / duration
+
+STEPDUR
+
+Steps/duration
+
+None
+
+Number of steps / duration
+
+To classify a whistle, the vector of variables measured from that whistle is analysed with the random forest model, which contains hundreds of classification trees. Each tree in the forest classifies the whistle and final classification is based on the species that the greatest percentage of trees voted for. If the greatest percentage of tree votes falls below the whistle threshold (as specified in the [ROCCA Parameters window](rocca_Configure.html#rocca_ParamsClassifier)) , the whistle is classified as Ambiguous.
+
+  
+  
+
+### Click Classification
+
+Table 2 lists the 17 variables measured from each click.
+
+**Variable Code**
+
+**Variable Name**
+
+**Units**
+
+**Explanation**
+
+DURATION
+
+Duration
+
+Seconds
+
+Duration of the click
+
+FREQPEAK
+
+Peak frequency
+
+Hz
+
+frequency with the highest amplitude
+
+BW3DBLOW
+
+\-3dB bandwidth lower limit
+
+Hz
+
+First frequency lower than the peak frequency at which the amplitude has dropped by 3dB
+
+BW3DBHIGH
+
+\-3dB bandwidth upper limit
+
+Hz
+
+First frequency higher than the peak frequency at which the amplitude has dropped by 3dB
+
+BW3DB
+
+\-3dB bandwidth
+
+Hz
+
+BW3DBHIGH - BW3DBLOW
+
+BW10DBLOW
+
+\-10dB bandwidth lower limit
+
+Hz
+
+First frequency lower than the peak frequency at which the amplitude has dropped by 10dB
+
+BW10DBHIGH
+
+\-10dB bandwidth upper limit
+
+Hz
+
+First frequency higher than the peak frequency at which the amplitude has dropped by 10dB
+
+BW10DB
+
+\-10dB bandwidth
+
+Hz
+
+BW10DBHIGH - BW10DBLOW
+
+RMSSIGNAL
+
+Signal RMS
+
+dB
+
+Root-mean-square of the click amplitude
+
+RMSNOISE
+
+Noise RMS
+
+dB
+
+Root-mean-square of the noise amplitude
+
+SNR
+
+Signal-to-noise ratio
+
+dB
+
+RMSSIGNAL - RMSNOISE
+
+NCROSSINGS
+
+Number of zero crossings
+
+None
+
+Number of times the waveform crosses zero
+
+SWEEPRATE
+
+Sweep rate
+
+kHz/ms
+
+sweep rate of the zero crossings
+
+MEANTIMEZC\*
+
+Zero crossing mean time
+
+ms
+
+mean time between zero crossings
+
+MEDIANTIMEZC\*
+
+Zero crossing median time
+
+ms
+
+median time between zero crossings
+
+VARIANCETIMEZC
+
+Zero crossing variance
+
+ms2
+
+variance of the time between zero crossings
+
+ICI
+
+Inter-click Interval
+
+seconds
+
+Time from the end of one click to the start of the next click
+
+\*Mean and median zero crossing times are not used in the current classifier, but still calculated by the Rocca algorithms. Rocca will ignore these variables during classification.
+
+To classify a click, the vector of variables measured from that click is analysed with the random forest model, which contains hundreds of classification trees. Each tree in the forest classifies the click and final classification is based on the species that the greatest percentage of trees voted for. If the greatest percentage of tree votes falls below the click threshold (as specified in the [ROCCA Parameters window](rocca_Configure.html#rocca_ParamsClassifier)) , the click is classified as Ambiguous.
+
+  
+  
+
+### School Classification
+
+Table 3 lists the 17 variables calculated based on whistle and click detections for each encounter (if specified by the user in the ROCCA [parameters](rocca_Configure.html#SchoolStats) window):
+
+**Variable Code**
+
+**Variable Name**
+
+**Units**
+
+**Explanation**
+
+Encounter\_Duration\_s
+
+Encounter duration
+
+Seconds
+
+Duration from the start of the first whistle/click to the end of the last whistle/click
+
+Number\_of\_whistles
+
+Number of whistles
+
+None
+
+Number of whistles
+
+Whistle\_Duration\_s
+
+Whistle duration
+
+Seconds
+
+Duration from the start of the first whistle to the end of the last whistle
+
+Min\_Time\_Between\_Whistle\_Detections\_s
+
+Minimum time between whistles
+
+Seconds
+
+Minimum time between whistles
+
+Max\_Time\_Between\_Whistle\_Detections\_s
+
+Maximum time between whistles
+
+Seconds
+
+Maximum time between whistles
+
+Ave\_Time\_Between\_Whistle\_Detections\_s
+
+Average time between whistles
+
+Seconds
+
+Average time between whistles
+
+Whistle\_Detections\_per\_Second
+
+Whistles per second
+
+Counts/s
+
+The number of whistles / whistle duration
+
+Whistle\_Density
+
+Whistle density
+
+None
+
+Sum of the whistle durations / the encounter duration
+
+Ave\_Whistle\_Overlap
+
+Average whistle overlap
+
+None
+
+Total duration during which whistles overlap / encounter duration
+
+Number\_of\_Clicks
+
+Number of clicks
+
+None
+
+Number of clicks
+
+Click\_Duration\_s
+
+Click duration
+
+Seconds
+
+Duration from start of first click to end of last click
+
+Min\_Time\_Between\_Click\_Detections
+
+Minimum time between clicks
+
+Seconds
+
+Minimum time between clicks
+
+Max\_Time\_Between\_Click\_Detections
+
+Maximum time between clicks
+
+Seconds
+
+Maximum time between clicks
+
+Ave\_Time\_Between\_Click\_Detections
+
+Average time between clicks
+
+Seconds
+
+Average time between clicks
+
+Click\_Detections\_per\_Second
+
+Clicks per second
+
+Counts/s
+
+Sum of the click durations / encounter duration
+
+Ave\_Click\_Overlap
+
+Average click overlap
+
+None
+
+Total duration during which clicks overlap / encounter duration
+
+Lat\*
+
+Latitude
+
+Deg
+
+Latitude
+
+Long\*
+
+Longitude
+
+Deg
+
+Longitude
+
+\*Latitude and Longitude are not measured from the whistle and click data, but taken from the GPS source as specified in the [Rocca Parameters Window Source tab](rocca_Configure.html#rocca_SourceTab).
+
+Each [encounter number](rocca_Sidebar.html) holds a list of possible species based on the whistle/click classifier models used. There are two values stored for each species: the number of times a whistle/click has been classified to that species (displayed), and a cumulative total of all the percentage tree votes for the species (not displayed). When a new whistle/click classification is saved to an encounter number, the count of the classified species is increased by one and the percentage tree votes for each species are added to the corresponding cumulative totals.
+
+The encounter is classified in one of two ways:
+
+1.  If an encounter classifier has been loaded, the vector of encounter parameters and the random forest probabilities from the whistle and click classifiers are analysed with the encounter random forest and the encounter is classified as the species with the highest percentage of tree votes.
+    
+2.  2\. If no encounter classifier has been selected by the user, the encounter is classified as the species with the highest cumulative percentage of tree votes. Note that this may be different than the species most often classified - the value shown in the sidebar species list. If the highest cumulative percentage of tree votes falls below the school threshold (as specified in the [ROCCA Parameters window](rocca_Configure.html#rocca_ParamsClassifier)), the detection is classified as Ambiguous.
+    
+
+  
+  
+
+[Previous: Contour Extraction / Manipulation](rocca_ContourExtractionManipulation.html)
+
+[Next: ROCCA Sidebar](rocca_Sidebar.html)

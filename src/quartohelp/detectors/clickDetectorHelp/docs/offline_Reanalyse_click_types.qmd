@@ -1,0 +1,59 @@
+---
+title: "Reanalyse click types"
+---
+ Reanalyse click types 
+
+Click Detector Viewer Functions
+===============================
+
+Reanalyse click types
+---------------------
+
+Sometimes your initial click parameter settings need changing. There is an option in Viewer to reanalyse click types which will change the corresponding binary files. Go to **_Click Detection>Reanalyse click types..._**.
+
+  
+  
+![Reanalyse](images/Reanalyse.png)  
+  
+
+The click reprocessing window will open giving you various options to proceed. First you need to decide which data you would like to reclassify. The options are: Loaded data, all data or new data. To reprocess all data is time consuming so if you try out different parameter settings use the option of loaded data as it is much quicker. Once you are content with your new settings you can apply it to the whole data set.
+
+In the case of offline tasks which change database entries (not all do), checking the _Delete old database entries_ checkbox will ensure old entries are deleted and duplicates are not made.
+
+  
+  
+![ClickProcessing](images/ClickProcessing.png)  
+  
+The parameters you can change are the same as in the[click detector](../../../detectors/clickDetectorHelp/docs/ClickDetector_clickDetector.html).
+
+### Reclassify clicks
+
+This brings you to the [click classification](../../../detectors/clickDetectorHelp/docs/ClickDetector_clickClassification.html). Here you can change either the click parameters or add a new classification.
+
+### Echo Detection
+
+This opens the Echo Detection window. Here you can change the parameters for echo classification. MORE JAMIE?
+
+  
+![EchoDetection](images/EchoDetection.png)  
+
+### Recalculate click delays
+
+This opens the delay measurement window. Here you can alter the setting of how click delays are calculated.  
+  
+![ClickDelay](images/ClickDelay.png)  
+  
+You can choose either of the two options, both or none.  
+  
+**Option 1:** Filter data before measurement  
+This option has the following settings:  
+  
+![FFT_Filtersettings](images/FFT_Filtersettings.png)  
+  
+**Option 2:** Use wave form envelope. EXPLAIN?? MORE JAMIE.
+
+### Click bearings
+
+This option allows zou to recalculate click bearings. JAMIE MORE.  
+  
+You can run all 4 reclassification options at once or tick the ones which are suitable for the analysis. Press _'Start'_ to beginn the recalculation process. You can see how far advanced the recaclulation process is in the progress bar. During re-processing the cancel button will change to a _'Stop'_ button and when the process is finished it will change to a _'Close'_ button. When recalculating large data sets the Close button might not appear after the last file. Just press Stop instead.

@@ -1,0 +1,28 @@
+---
+title: "AIS Configuration"
+---
+ AIS Configuration  
+
+AIS
+===
+
+AIS Configuration
+-----------------
+
+  
+
+The AIS module requires an [NMEA Data Source](../../NMEA/docs/configuringNMEADataSource.html) configured to read AIS data via a serial port.
+
+The normal baud rate for AIS receivers is 38400 bps.
+
+To configure the AIS module, open the AIS configuration dialog from the _**Detection>AIS Ship Reporting**_ menu and select the correct NMEA data source.
+
+  
+![AIS Options](images/AISOptions.png)
+
+  
+If a database module is active in the PAMGUARD model, then AIS data will be logged to the database  
+
+[Previous: AIS Overview](AISOverview.html)
+
+[Next: AIS Display](AISDisplay.html)

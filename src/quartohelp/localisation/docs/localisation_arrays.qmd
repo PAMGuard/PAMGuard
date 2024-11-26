@@ -1,0 +1,56 @@
+---
+title: "Types of Array"
+---
+ Generic Localisers 
+
+Localisation
+============
+
+Types of array
+--------------
+
+  
+
+The type of localisation that can be performed depends a lot on the size and shape of the hydrophone array. A short linear array of two or more hydrophones can measure a single bearing to a detected sound, but not estimate range. A longer linear array may also be able to estimate range. Similarly, a small horizontally aligned triangle of hydrophones can estimate an unambiguous bearing in the horizontal plane and possibly also an elevation angle, although the elevation angle will be subject to an up-down ambiguity. Large arrays of several widely distributed hydrophones can estimate locations in three dimensions.
+
+#### Small and large, compact and distributed, small and wide aperture
+
+These terms are often used to describe hydrophones arrays. All are easily stated, but not so easily understood and what is a wide aperture array for one species may be considered a compact array for a different species.
+
+In the current context, a small or compact array is an array who's dimension is a) much smaller than the detection range of the sounds being detected such that animals are almost guaranteed to be outside the volume or area of the array, and b) small enough that the time difference between the arrival of sounds on the different receivers is never (or rarely) confused my multiple arrivals, and c) small enough that a sound received on one receiver is almost guaranteed to be visible on all of them.
+
+A large or wide aperture array, on the other hand, is likely to be large enough that many animals will be within, or at least relatively close to, the area or volume covered by the receivers. Detection of a sound on one receiver is no guarantee of detection on other receivers and the arrival of multiple sounds on the different receivers may cause ambiguities in working out which sounds match on the different receivers.
+
+As a general rule (remembering that rules are there to be broken) is that whatever the dimension of the array, 2 or 3D localisation is excellent within the volume of the array and is OK out to 3, or sometimes even 10 times the array dimension. Beyond that distance, bearing estimation is still possible, but errors on range become so large that the range estimations have no validity. It therefore follows that a compact array is good for bearing measurements, whereas a wider aperture array can be used for 2 or 3D localisation.
+
+#### Hydrophone Spacing
+
+Most PAMGuard localisers are based upon Time Difference of Arrival (TDOA) measurements between multiple hydrophones. Time differences can be measured more accurately with high frequency sounds sampled at high sample rates. With advanced signal processing, time differences can be measured to a fraction of a sample and to a fraction of a wavelength of the detected sound. For example, Gillespie and Macaulay (2019) showed that for harbour porpoise like clicks (Frequency 130kHz, wavelength 1.2cm) sampled at 500kHz, they could measure TDOA's to an accuracy of a few microseconds - that's 1/100ths of a sample, or well below 1/100'th of a wavelength. Gillespie et. al, 2020 describe how three small aperture arrays of dimension 30cm cold be used to accurately measure bearings to porpoise clicks and that three of these clusters spaced over several metres formed a wide aperture array which could be used to localise porpoise clicks in three dimensions.
+
+At the other extreme, say working with blue whales, which can produce sounds at 15Hz (wavelength 100m) you'd hardly expect to get a blue whale within an array a few metres across and would probably want to detect them out to a distance of several 10's of km. Timing measurements to blue whale sounds will also be far less accurate than for porpoise clicks (milliseconds rather than a fraction of a microsecond) so the wide aperture array used for porpoises would be a compact array for blue whales.
+
+#### Numbers of Hydrophones
+
+Hydrophones are expensive to purchase and both complex and expensive to deploy, but you do need to make sure you have enough for the type of localisation you're aiming to use.
+
+Localisations can be in one, two or three dimensions and are most often described in [polar (bearing and range)](https://en.wikipedia.org/wiki/Polar_coordinate_system) or [cartesian (x,y,z)](https://en.wikipedia.org/wiki/Cartesian_coordinate_system) space.
+
+Whichever system is used, a pair of hydrophones can measure a single time difference, so can resolve one dimension. Three hydrophones can measure two independent time differences, so can estimate two dimensions (e.g. x and y or latitude and longitude) and four hydrophones can measure three independent time differences, so can in principle estimate three dimensions.
+
+However, the reality is often that at least one extra hydrophone is required to resolve ambiguities. For example, a pair of hydrophones will measure a bearing, but it will be ambiguous, whereas a triangle of hydrophones can measure a surface bearing without ambiguity. A common misconception is that three widely spaced hydrophones can provide two dimensional localisations. The truth is that while animals within the array will probably get an unambiguous position, positions outside the array can sometimes still be ambiguous (Spiesberger, 2001). As an illustration of this, the figures below show hyperbolic localisations from a two dimensional 3 element array. The first localisation does not have am ambiguity, but the second one clearly does.
+
+![](images/locunambig.png) ![](images/locambigm.png)
+
+The addition of a fourth hydrophone will resolve the ambiguity for a two dimensional array. Five hydrophones are required for unambiguous 3D localisation.
+
+#### References
+
+_[Gillespie, D., and Macaulay, J. (2019). �Time of arrival difference estimation for narrow band high frequency echolocation clicks,� The Journal of the Acoustical Society of America, 146, EL387�EL392.](https://asa.scitation.org/doi/10.1121/1.5129678)_
+
+_[Gillespie, D., Palmer, L., Macaulay, J., Sparling, C., and Hastie, G. (2020). �Passive acoustic methods for tracking the 3D movements of small cetaceans around marine structures,� PLoS ONE, 15 (5), 16pp. doi:https://doi.org/10.1371/journal. pone.0229058](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0229058)_
+
+_[Spiesberger, J. L. (2001). �Hyperbolic location errors due to insufficient numbers of receivers,� The Journal of the Acoustical Society of America, 109, 3076�3079](https://asa.scitation.org/doi/10.1121/1.1373442)_
+
+[Previous: Localisation Techniques](localisation_algorithms.html)
+
+[Next: Generic Localisers](localisation_generic.html)

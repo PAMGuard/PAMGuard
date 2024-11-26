@@ -1,0 +1,30 @@
+---
+title: "Click Detector Alarm"
+---
+Click Alarm Options 
+
+Click Detector
+==============
+
+Click Alarm Options
+-------------------
+
+  
+![alarm_options (22K)](images/alarm_options.png)  
+  
+
+### Options Window
+
+Alarms can be used to provide an audible signal when certain [click types](ClickDetector_clickClassification.html "Click Type Classification dialog") are detected. The Alarm Options dialog allows the user to create, modify and delete any number of alarms. The Alarm Options dialog can be opened from the **_Click Detection>Audible Alarm_** menu.
+
+The alarm can be a predefined 'beep', or a user-selected wav file.
+
+Use the Rename button to rename the current alarm (the alarm visible in the drop-down box). Use the Remove button to delete the current alarm. Note that there must always be at least one alarm in the list - in such a case, this button is not selectable. Use the Add button to create a new alarm.
+
+This dialog is only used to create a list of available alarms. Associating a _specific_ alarm with a _specific_ click type is done in the [Individual Click Classification dialog](ClickDetector_clickClassification.html).
+
+  
+
+[Previous: Tracking and Click Train Identification](ClickDetector_clickTrainLocalization.html)
+
+[Next: Click Detector Viewer Functions - Overview](offline_Overview.html)

@@ -1,0 +1,27 @@
+---
+title: "Sidebar"
+---
+ Sidebar  
+
+SIDE Module
+===========
+
+Sidebar
+-------
+
+The Sidebar shows the current operational state, as well as information about the last test run.
+
+![](images/SIDESidebar.PNG)  
+  
+
+The current operations status can be selected from the drop-down text box. In order to properly log a status change to the database, a selection must be made from the text box _even if the correct status is already displayed_. When a status is selected, it will be shown in the [Operations State](SIDE_InfoTables.html#opState) table in the middle of the SIDE Module display, along with a time stamp to indicate when the status was changed.
+
+The test information can be displayed or hidden by clicking on the arrow (![](images/SIDEArrow.PNG)). Use this feature if you are limited on screen space and don't need to see all of the information.
+
+  
+  
+  
+
+[Previous: Reporting Matrix](SIDE_ReportMatrix.html)
+
+[Next: SIDE Workflow](SIDE_Process.html)

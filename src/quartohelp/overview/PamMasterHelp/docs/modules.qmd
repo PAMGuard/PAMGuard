@@ -1,0 +1,643 @@
+---
+title: "PAMGUARD Modules"
+---
+ PAMGUARD Modules  
+
+PAMGUARD
+========
+
+PAMGUARD Modules
+----------------
+
+PAMGUARD contains of an ever growing number of plug-in modules, each of which performs some sort of data handling task. Individual modules may do anything from acquiring sound data, to managing a database or searching for a particular sound type. Generally, every module will acquire data either from another module, or through some external interface (such as a sound card, GPS or depth sensor readout). The output of a module may be a display, more data or both. A single module may have multiple output data streams. For instance, the sound acquisition module primarily outputs raw audio data to other PAMGUARD modules, but also outputs data providing a record of when sound acquisition was started and stopped which can be stored in the database.
+
+PAMGUARD currently contains 41 plug-in modules which can be selected and configured by the user (See the table below). It is generally possible to create multiple instances of a given module type. For instance, the operator may wish to incorporate two click detectors, each optimised for a different species, or have two sound acquisition modules, one acquiring low frequency data and one high frequency data. For certain module types (e.g. GPS acquisition), the user may be restricted to having a single instance.
+
+We are constantly developing new modules for PAMGuard. The table also includes some information on modules which we're working on at the moment. Due to PAMGuard being open source, there may of course be other modules under development we don't yet know about.
+
+Last updated 27 November, 2014  
+  
+[Maps and Mapping](#maps)  
+[Utilities](#utilities)  
+[Sensors](#sensors)  
+[Displays](#displays)  
+[Sound Processing](#sound_processing)  
+[Detectors](#detectors)  
+[Classifiers](#classifiers)  
+[Localisers](#Localisers)  
+[Visual Methods](#visual_methods)
+
+Module
+
+Data Input
+
+Output
+
+Instances
+
+Function
+
+Status
+
+**Maps and Mapping**
+
+[NMEA data collection](../../../mapping/NMEA/docs/configuringNMEADataSource.html)
+
+Serial port or server
+
+Strings of NMEA data
+
+Any
+
+Acquire NMEA data for use by other modules.
+
+Core
+
+[GPS Processing](../../../mapping/NMEA/docs/ConfiguringGPS.html)
+
+NMEA data
+
+GPS locations
+
+0-1
+
+Identified GPS data and unpacks NMEA strings
+
+Core
+
+[Map](../../../mapping/mapHelp/docs/overview.html)
+
+GPS and all detectors
+
+Map graphics panel  
+map comments
+
+Any
+
+Displays vessel location and data from other modules.
+
+Core
+
+[AIS Processing](../../../mapping/AIS/docs/AISOverview.html)
+
+NMEA data
+
+Ship locations
+
+0-1
+
+Unpacks AIS data
+
+Core
+
+[Airgun display](../../../mapping/AirgunDisplay/docs/AirgunOverview.html)
+
+GPS or AIS Data
+
+Graphic overlay for map
+
+Any
+
+Displays the locations of airguns and mitigation zones referenced to either the PAMGUARD vessel or some other vessel broadcasting Its position over AIS.
+
+Core
+
+Fixed Landmarks
+
+Manual input
+
+Fixed points on map
+
+Any
+
+Place object symbols on the PAMGUARD map.
+
+Beta
+
+[WILD ArcGIS Interface](../../../utilities/WILDInterface/docs/WILDOverview.html)
+
+None
+
+NMEA strings
+
+0-1
+
+Outputs an NMEA string via the serial port for interfacing to other software
+
+Beta
+
+**Utilities**
+
+[Database](../../../utilities/generalDatabaseHelp/docs/database_database.html)
+
+Multiple modules
+
+Database
+
+0-1
+
+Stores data from multiple modules in a Microsoft Access, MySQL or ODF(Beta) database
+
+Core
+
+[Binary Storage](../../../utilities/BinaryStore/docs/binarystore_overview.html)
+
+Multiple modules
+
+Binary data files
+
+0-1
+
+Stores data from multiple modules in a proprietary data format
+
+Core
+
+[Data Map](../../../utilities/datamap/docs/datamap.html)
+
+Multiple modules
+
+None
+
+0-1
+
+Provides an overview of all data in [Viewer Mode](./viewerMode.html)
+
+Core
+
+[User Input](../../../utilities/userInputHelp/docs/userInput.html)
+
+User comments
+
+0-1
+
+Time stamps and stores any comment entered by the user
+
+Core
+
+[Aural Listening Form](../../../utilities/listening/docs/Listening_Overview.html)
+
+Things heard by the operator
+
+Any
+
+Time stamps and stores lists of things heard by an operator monitoring hydrophones aurally.
+
+Core
+
+[Alarms](../../../utilities/Alarms/docs/Alarms_Overview.html)
+
+Any
+
+Multiple possibilities of Actions
+
+Any
+
+Alarms can be used to alert the operator to specific events
+
+Beta
+
+**Sensors**
+
+[Hydrophone Depth Readout](../../../utilities/depthreadout/docs/depth_overview.html)
+
+Analogue depth sensors
+
+Depth data
+
+0-1
+
+Depth data are displayed on screen, used in real time to update hydrophone locations and sent to the database.
+
+Core
+
+[Array Accelerometer](../../../sensors/arrayAccelerometer/docs/arrayAccelerometer.html)
+
+Analogue acceleration sensors
+
+Orientation data
+
+0-1
+
+Data from accelerometers are used in real time to update hydrophone orientations and sent to the database.
+
+Beta
+
+Angle Measurement
+
+Fluxgate World shaft encoder
+
+Shaft angles
+
+Any
+
+Reads angles from a Fluxgate World shaft angle encode. (Can be used to read angle of binocular stands).
+
+Beta
+
+**Displays**
+
+[User Display Panel](../../../displays/userDisplayHelp/docs/userDisplayPanel.html)
+
+Displays
+
+Any
+
+Provides a container for spectrogram and radar like displays. Data from detectors can be overlaid on top of these displays.
+
+Core
+
+[Local Time](../../../displays/LocalTime/Docs/LocalTime.html)
+
+Any
+
+Adds a small side panel showing the Local Time from the computer (all other PAMGuard times are in UTC)
+
+Beta
+
+[Level Meters](../../../displays/LevelMeters/Docs/LevelMeters.html)
+
+Sound Acquisition
+
+Display in Side-bar
+
+Any
+
+Adds a small side panel showing the Level from the Sound Acquisition Module
+
+Beta
+
+**Sound Processing**
+
+[Sound Acquisition](../../../sound_processing/AcquisitionHelp/docs/AcquisitionOverview.html)
+
+Sound cards, audio files and other acquisition devices.
+
+Packed chunks of raw audio data
+
+Any
+
+Controls a data acquisition device and passes it's data on to other modules
+
+Core
+
+[Sound Output](../../../sound_processing/soundPlaybackHelp/docs/soundPlayback_soundPlayback.html)
+
+Audio data
+
+Output to the system sound card
+
+Any
+
+Outputs audio data through a sound card so it can be listened to on headphones
+
+Core
+
+[FFT (Spectrogram) Engine](../../../sound_processing/fftManagerHelp/docs/FFTEngine_Overview.html)
+
+Audio data
+
+FFT Data
+
+Any
+
+Computes spectrograms (Fourier transforms of multiple overlapping chunks of audio data).
+
+Core
+
+[Filters (IIR and FIR)](../../../sound_processing/FiltersHelp/Docs/Filters_filters.html)
+
+Audio data
+
+Audio data
+
+Any
+
+Filters audio data using either Butterworth of Chebyshev filter.
+
+Core
+
+[Decimator](../../../sound_processing/decimatorHelp/docs/decimator_decimator.html)
+
+Audio data
+
+Audio data
+
+Any
+
+Filters and reduces the sample data of audio data
+
+Core
+
+[Sound Recorder](../../../sound_processing/soundRecorderHelp/docs/RecorderOverview.html)
+
+Audio data
+
+Wav of Aif files
+
+Any
+
+Writes audio data to file. Recording may be initiated by the operator or triggered by a detector or make regular recordings according to some set cycle.
+
+Core
+
+[Clip Generator](../../../sound_processing/ClipGenerator/docs/ClipGenerator.html)
+
+Audio data
+
+Short clips of sound
+
+Any
+
+Stores short clips of sound either in wav files or binary files
+
+Beta
+
+[Signal Amplifier](../../../sound_processing/amplifier/docs/amplifier.html)
+
+Audio data
+
+Audio data
+
+Any
+
+Amplifies audio data by some scaling factor (can invert data if required)
+
+Core
+
+[Patch Panel](../../../sound_processing/patchPanelHelp/docs/patchpanel.html)
+
+Audio data
+
+Audio data
+
+Any
+
+Mixes data between multiple channels, changes channel ordering, etc.
+
+Beta
+
+[Spectrogram smoothing kernel](../../../sound_processing/SpectrogramSmoothing/docs/SpectrogramSmoothing.html)
+
+FFT Data
+
+FFT Data
+
+Any
+
+Smoothes a spectrogram by convolving it with a Gaussian smoothing kernel.
+
+Core
+
+[Seismic Veto](../../../sound_processing/seismicveto/docs/veto_overview.html)
+
+FFT and raw data
+
+FFT and raw data
+
+Any
+
+Detects very loud sounds using an in band energy detector and replaces these with randomly generated coloured noise based on recent measurements of the local noise field.
+
+Core
+
+Noise Monitor
+
+FFT data
+
+Noise Measurements
+
+Any
+
+Measures noise in predefined frequency bands (e.g. thrid octave).
+
+Beta
+
+[Noise Band Monitor](../../../sound_processing/NoiseBands/Docs/NoiseBands.html)
+
+Audio data
+
+Noise Measurements
+
+Any
+
+An alternative method of measuring noise in octave and third octave bands which can work over a wider frequency range than the Noise Monitor module
+
+Dev'
+
+[Filtered Noise Measurements](../../../sound_processing/NoiseOneBand/Docs/NoiseOneBand.html)
+
+Audio data
+
+Noise Measurements
+
+Any
+
+Measures noise relative to an arbitrarily shaped filter band (e.g. the hearing response of a particular species)
+
+Dev'
+
+[Long Term Spectral Average](../../../sound_processing/LTSA/Docs/LTSA.html)
+
+FFT Data
+
+Averaged FFT Data
+
+Any
+
+Measures and stores averaged FFT data over extended time periods (several minutes). USeful for generating a good overview of a dataaset.
+
+Dev'
+
+[Envelope Tracing](../../../sound_processing/EnvelopeTrace/Docs/EnvelopeOverview.html)
+
+Audio data
+
+Any
+
+This module allows you to drop the frequency of ultrasonic transient sounds into the audio band.
+
+Dev'
+
+**Detectors**
+
+[Click Detector](../../../detectors/clickDetectorHelp/docs/ClickDetector_clickDetector.html)
+
+Audio Data
+
+Detected Clicks
+
+Any
+
+Searches for transient sounds, attempts to assign species, measure bearings to source, group into click trains, etc.
+
+Core
+
+[Whistle and Moan Detector](../../../detectors/whistleMoanHelp/docs/whistleMoan_Overview.html)
+
+FFT Data
+
+Whistle and Moan Contours
+
+Any
+
+Searches for tonal noises. Measures bearings and locations of source. Replaces older Whistle Detector
+
+Core
+
+[Whistle Detector](../../../detectors/whistleDetectorHelp/docs/whistleDetector_Overview.html)
+
+FFT Data
+
+Detected Whistles
+
+Any
+
+Searches for tonal noises. Measures bearings and locations of source.
+
+Core
+
+Ishmael Energy Sum
+
+FFT Data
+
+Detected sounds
+
+Any
+
+Detects sounds with energy in a specific frequency band
+
+Core
+
+Ishmael Spectrogram Correlation
+
+FFT Data
+
+Detected sounds
+
+Any
+
+Detects sounds matching a user defined 'shape' on a spectrogram
+
+Core
+
+Ishmael Matched Filtering
+
+Audio Data
+
+Detected Sounds
+
+Any
+
+Detects sounds using a user defined matched filter.
+
+Core
+
+[Likelihood Detector](../../../detectors/likelihoodDetectionModuleHelp/docs/LikelihoodDetector_Introduction.html)
+
+Audio Data
+
+Detected Sounds
+
+Any
+
+An implementation of a likelihood ratio test. Suitable for detecting both short duration Odontocete clicks (Sperm, Beaked, etc.) and moderate duration Mysticete calls (Humpback, Bowhead, etc.)
+
+Core
+
+Right Whale Edge Detector
+
+FFT Data
+
+Right whale detections
+
+Any
+
+Searches for right whale upsweep calls using methods described in Gillespie, D. (**2004**). “Detection and classification of right whale calls using an edge detector operating on a smoothed spectrogram,” Canadian Acoustics **32**, 39–47.
+
+Dev'
+
+**Classifiers**
+
+[Whistle Classifier](../../../detectors/whistleClassifierHelp/docs/whistleClassifier_Overview.html)
+
+Detected Whistles
+
+Species probabilities
+
+Any
+
+Analyses multiple whistle contours and uses a discriminant analysis function to assign to species.
+
+Beta
+
+[Rocca](../../../detectors/roccaHelp/docs/rocca_Overview.html)
+
+FFT Data
+
+Species Classes
+
+Any
+
+The Rocca species classifier is used to assign dolphin whistles selected by an operator to species. To do this it uses a Random Forest classifier trained with known samples from each species.
+
+Beta
+
+**Localisers**
+
+Ishmael Locator
+
+FFT Data / User input
+
+Located sounds
+
+Any
+
+Locates sounds extracted either from areas marked out on a spectrogram display or using output from a detector
+
+Core
+
+[Multipath 3D Localiser](../../../detectors/Pam3DHelp/docs/guiOverview.html)
+
+Detected Clicks
+
+Located sounds
+
+Any
+
+Locates sounds detected by the click detector using surface echo's to obtain slant angles and generate a 3-D location.
+
+Core
+
+**Visual Methods**
+
+[Video Range](../../../visual_methods/videoRangeHelp/docs/videoRange_videoRange.html)
+
+Captured video images
+
+Ranges to Sightings
+
+Any
+
+Calculates ranges based on angles measured from video, observer height and earth radius.
+
+Core
+
+[Logger Forms](../../../visual_methods/loggerFormsHelp/docs/loggerFormsOverview.html)
+
+None
+
+Manually input data
+
+0-1
+
+Replicates the functionality of User Defined Forms in the [IFAW Logger software](http://www.marineconservationresearch.co.uk/downloads/logger-2000-rainbowclick-software-downloads/).
+
+Beta
+
+Core = Included in Core and Beta Releases; Beta = Included in Beta release only; Dev' = Module under development
+
+  
+
+[Previous: PAMGUARD Architecture](pamGuardArchitecture.html)
+
+[Next: Graphical User Interface Overview](guiOverview.html)

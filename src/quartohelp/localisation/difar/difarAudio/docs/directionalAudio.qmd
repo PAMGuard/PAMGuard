@@ -1,0 +1,79 @@
+---
+title: "DIFAR Directional Audio"
+---
+ Difar Directional Audio  
+
+DIFAR Directional Audio
+=======================
+
+**\*Warning\***
+
+This module is BETA software. It has only received limited testing as of 23/09/2016 and it may crash and/or halt PAMGuard. As such, it may not be advisable to use during fieldwork or real-time data collection, but is probably reasonably safe to use for post-processing of existing data.
+
+**\*Use at your own risk\***
+
+Overview
+--------
+
+The DIFAR Directional Audio module can be used to create a directional audio stream from data that have been collected from DIFAR sonobuoys. The module can be run in [normal-mode](../../overview/PamMasterHelp/docs/normalMode.html), [mixed-mode](../../../overview/PamMasterHelp/docs/mixedMode.html) for [post-processing/re-analysis of existing DIFAR recordings](difar_PostProcessingTutorial.html), and [viewer-mode](../../../overview/PamMasterHelp/docs/viewerMode.html).
+
+### Background
+
+DIFAR sonobuoys contain a single omnidirectional pressure sensor, two directional particle-velocity sensors, and a magnetic compass. By applying signal processing techniques to the signals on each of the three acoustic sensors it is possible to listen preferentially in a chosen direction, and attenuate sounds that come from the opposite direction.
+
+This module works well with the DIFAR Localisation Module.
+
+Configuring the Directional Audio
+---------------------------------
+
+### Required PAMGuard modules
+
+The following modules are required for DIFAR Localisation.
+
+*   Sound Acquisition: Recording data from a VHF radio receiver at a sample rate of 48kHz.
+*   NMEA, GPS. These module are required if you wish to use the Directional Audio module to reduce noise from the direction of the GPS (e.g. noise from the research vessel)
+
+### Recommended Modules
+
+The following modules are not required, but are highly recommened to facilitate analysis of DIFAR data.
+
+*   DIFAR Localisation: Contains a Sonobuoy Manager for easy tracking of metadata when deploying sonobuoys
+    
+*   Additional FFT (Spectrogram) Engine view the spectrum of the directional audio.
+    
+
+### Settings
+
+The configuration for the Directional Audio are accessed via the Settings menu.
+
+![](./images/settings.png)
+
+The Data Source must contain multiplexed audio from a DIFAR sonobuoy, including pilot tones at 7500 and 15000 Hz. The Directional audio module requires 24 kHz of audio bandwidth from the raw audio source (48 kHz minimum sample rate). An typical data source would be an Analog-Digital converter or sound card that is connected to the audio output of one or many VHF radio receivers.
+
+The output sample rate of the directional audio is presently fixed at 8000 Hz, but can be resampled with a [Decimator module](../decimatorHelp/docs/decimator_decimator.html).
+
+If the option _Use GPS data source for noise reduction_ is checked, then the Directional Audio module will attempt to adjust the listening direction in the opposite direction of the GPS data. Presently only GPS sources are available for noise reduction, but AIS sources, and possibly DIFAR localisations may also be available as Noise Cancellation locations in future releases.
+
+### Usage
+
+#### Noise reduction
+
+The Directional Audio module can be used to preferentially listen to audio from a particular direction, while attenuating audio from the opposite direction.
+
+This module requires audio from a DIFAR sonobuoy and will output directional audio by using a beamforming algorithm. This module makes use of the AMMC DIFAR demodulator, and beamforming algorithm is that described in Equation 1 from Thode et al (2016). This module can use a GPS data stream to automatically set the listening direction in order to potentially reduce masking noise in the direciton of the GPS data source.
+
+When using GPS data for noise cancellation, the listening direction (steering angle of the beamformer) will automatically be set in the opposite direction of the GPS data source. The module uses the location of the current HydrophoneStreamer as the location of the sonobuoy. The Heading of the streamer is used to apply an additional Compass Correction to the angle between the Sonobuoy and GPS data.
+
+As described by Thode et al (2016) steering the null of the beam towards the GPS bearing will attenuate sounds originating from that direction. The expected performance and limitations are described in detail by Thode et al, but in short, noise reduction typically applies to an entire quadrant (90 degree span of bearings, 45 degrees on either side of the null angle).
+
+At present, this feature may be useful for detecting whales using DIFAR sonobuoys that have been deployed from a noisy vessel.
+
+#### Directional Listening
+
+If not using the GPS data for noise reduction, then the direction of listening can be adjusted manually by typing preferred listening angle into the Side Panel. The new listening direction will come into effect after hitting enter
+
+![](./images/sidebar.png)
+
+### References
+
+Thode, AM, KH Kim, RG Norman, SB Blackwell and CR Greene 2016. _Acoustic vector sensor beamforming reduces masking from underwater industrial noise during passive monitoring_. JASA-Express Letters 139(4) EL105-EL111. DOI:http://dx.doi.org/10.1121/1.4946011

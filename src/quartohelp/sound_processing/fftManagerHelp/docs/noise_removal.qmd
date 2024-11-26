@@ -1,0 +1,60 @@
+---
+title: "Noise Removal"
+---
+ Configuring an FFT Engine  
+
+FFT Engine
+==========
+
+Noise Removal
+-------------
+
+  
+
+The FFT Engine contains five different noise removal processes
+
+  
+**[Click Removal](#clickremoval)  
+
+[Median Filter](#medianfilter)  
+
+[Average Subtraction](#averagesubtraction)  
+
+[Gaussian Kernel Smoothing](#kernelsmoothing)  
+
+[Thresholding](#thresholding)** 
+
+Each method can be enabled individually
+
+  
+
+### Click Removal
+
+The click removal method operates on the time series data prior to the FFT calculation and therefore affects both output streams of the FFT Engine.
+
+Click removal measures the standard deviation of the time series data and then multiplies the signal by a factor which increases rapidly for large signal components. This has the effect of reducing the magnitude of short duration transient signals such as echolocation clicks
+
+### Median Filter
+
+Within each spectrogram slice, the median value about each point is taken and subtracted from that point.
+
+### Average Subtraction
+
+A decaying average spectrogram is computed and subtracted from the current spectrogram value.
+
+### Gaussian Kernel Smoothing
+
+The spectrogram is smoothed by convolving the image with a Gaussian smoothing kernel
+
+1 2 1  
+2 4 2  
+1 2 1.
+
+### Thresholding
+
+A threshold is applied and all data falling below that threshold set to 0.
+
+  
+  
+
+[Previous: Creating an FFT Engine](FFTEngine_Configuring.html)

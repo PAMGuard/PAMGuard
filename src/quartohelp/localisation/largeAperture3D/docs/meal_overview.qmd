@@ -1,0 +1,24 @@
+---
+title: "Overview"
+---
+ Overview  
+
+Large Aperture 3D Localiser
+===========================
+
+Overview
+--------
+
+The purpose of this exercise is to use PAMGUARD to determine the fine scale tracks of harbour porpoises using data from a wide aperture 10 element hydrophone array.
+
+The Materials to do these exercises are provided on the pamguard website.
+
+In this exercise we are going to turn this
+
+![](images/image001.jpg)
+
+Into this
+
+![](images/image002.jpg)
+
+[Next: Exercise1 - Detect Porpoises](meal_exercise1_detectPorpoises.html)

@@ -1,0 +1,125 @@
+---
+title: "Configuration"
+---
+ Sound Acquisition  
+
+Sound Acquisition Configuration
+===============================
+
+To access the module's settings, select _**Detection>Sound Acquisition...**_ from the main menu and click on the name of your module. This will bring up an Audio Data Acquisition dialogue similar to the one shown below.
+
+![Sound Acquisition Dialogue](images/AcquisitionDialog.png)
+
+  
+
+The dialog is divided into four separate regions. the information in each region may vary depending on the type of input device you are using.
+
+### Data Source Type
+
+From the drop down list, select the type of input device you wish to use. Different input devices offer different numbers of channels, sample rates and quality of data. For many applications using just two channels of data in the human audio band, a standard sound card is adequate, but for higher sample rates, or higher numbers of channels, ASIO sound cards or National Instruments Data Acquisition devices may be required
+
+Note that not all input types are supported on all platforms.  
+
+Data Source Type
+
+Windows
+
+Mac
+
+Linux
+
+Restrictions / Notes
+
+[Sound Card](AcquisitionSoundCard.html)
+
+Yes
+
+Yes
+
+Yes
+
+Maximum of two channels.  
+Considerable variation in quality between devices
+
+[ASIO Sound Card](AcquisitionAsioSoundCard.html)
+
+Yes
+
+Not yet
+
+No
+
+Some cards allow sampling on > 2 channels
+
+[Audio File](AcquisitionFile.html)
+
+Yes
+
+Yes
+
+Yes
+
+Analyse archived data. You should consider using [Mixed Mode](..\..\..\overview\PamMasterHelp\docs\mixedMode.html) for this if you with to correctly localise sounds relative to GPS data.
+
+[Audio File folder  
+or multiple files](AcquisitionFileFolder.html)
+
+Yes
+
+Yes
+
+Yes
+
+Batch process many files.
+
+[National Instruments DAQ Cards](AcquisitionNIDAQ.html)
+
+Yes
+
+No
+
+No
+
+Support for multiple channels at high sample rates
+
+[SAIL Daq Cards](SAILDaqCard.html)
+
+Yes
+
+No
+
+No
+
+USB input, high speed sampling on up to 12 channels (four per card).
+
+[Simulated Sound Sources](AcquisitionSimulator.html)
+
+Yes
+
+Yes
+
+Yes
+
+Simulated sources are useful for training, testing and developing new modules
+
+### Select audio line (or specific input device or file)
+
+The information displayed here will vary depending on the type of Data Source. Please refer to instructions on specific data source configuration.
+
+### Sampling
+
+The information displayed here will vary depending on the type of Data Source. Please refer to instructions on specific data source configuration.
+
+### Calibration
+
+The peak to peak voltage range of the device and the preamplifier gain are used by some PAMGUARD modules to calculate absolute received signal levels in dB re. 1&mu Pa. For some devices, this information may be filled in automatically, for others you will need to enter it yourself. If you don't know the input sensitivity of your device, don't worry, PAMGUARD will run, but amplitudes may not be accurate.
+
+If your sound acquisition system has a DC offset in it (many do), tick the 'Subtract DC ...' button and enter a time constant. A single pole high pass filter will then be applied to all incoming data.
+
+(Note that the 'Bandwidth' field has been removed since it was not used in any way)
+
+  
+
+[Previous: Acquisition Overview](AcquisitionOverview.html)
+
+[Next: Sound Cards](AcquisitionSoundCard.html)

@@ -1,0 +1,67 @@
+---
+title: "Display"
+---
+ Map Display  
+
+Map
+===
+
+Display
+-------
+
+  
+
+### Map
+
+The map provides a plan view of the survey area. The figure below is an example screen shot of the map in its simplest configuration.
+
+  
+  
+![map screenshot](images/map.png)  
+  
+  
+
+The vessel which hosts the GPS is indicated by a red icon and the course of the vessel, as derived from the GPS data, is indicated by the direction of the vessel icon.
+
+By default, when PAMGUARD starts up the vessel icon is placed in the centre of the map. Left clicking on the map allows the user to drag the map in the direction of the cursor.
+
+The vessel�s recent track is indicated by a grey line.
+
+### Map Options
+
+Selecting **_Map>Map options_** or right clicking anywhere on the map and selecting "Map Options" allows the user to set the �map lifetime� � i.e. the length (in time) of the vessel track line and whether or not positions of hydrophones should be shown.
+
+![map options](images/mapoptions1b.png)  
+  
+
+Other options include keeping the ship always on the map, keeping it centred and telling the map to rotate so that the ships heading is always towards to top of the screen.
+
+It is also possible to enable rotation of the map in three dimensions. Once enabled, hold the Shift key and drag the map with the mouse to rotate.
+
+### Grid
+
+Two grids are now available and can be selected by the user on the 'Grid' tab.
+
+![map options](images/mapoptions2b.png)  
+  
+
+The default grid is lines of latitude (red) and longitude (blue). The resolution of the latitude and longitude lines displayed is automatically set, dependent on the map zoom factor. In the upper right hand corner of the map, a compass icon indicates the rotation of the map.
+
+you can also display concentric rings centred about the ship.
+
+### Coast and Contour Files
+
+PAMGuard currently supports display of raster and contour files which can be exported from the BODC website or the GEBCO software [(Click here for information on making maps for PAMGuard).](mapMaking.html)
+
+[Raster and contour maps can be selected independently and it's quite OK to have both - a raster map overlayed with contours.
+
+Map files are selected on the third and fourth tabs of the map options dialog
+
+![map options](images/mapoptions3b.png)  
+  
+  
+![map options](images/mapoptions4b.png)](mapMaking.html) 
+
+[](mapMaking.html)[Previous: Map Overview](overview.html)
+
+[Next: Map Overlays](MapOverlays.html)

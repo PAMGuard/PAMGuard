@@ -1,0 +1,36 @@
+---
+title: "Range Measurement Setup"
+---
+ Video Range Setup  
+
+Video Range
+===========
+
+Range Measurement Setup
+-----------------------
+
+To measure a range from an image choose a previously entered Height in the **Height** drop down dialogue.
+
+If an appropriate height has not be set then press _**Settings>Heights> Add**_
+
+Enter the camera height above sea level and give it a sensible name
+
+![Choose Height](images/Height.jpg)
+
+The **Settings** tabs allow different choices of calculation method to be chosen
+
+![CalculationMethod](images/Calculation.jpg)
+
+The "Round Earth" method is most straight forward and quite adequate for closer objects.
+
+The "Refraction Method" makes allowances for predicted refraction conditions based on the prevailing temperature, temperature gradient and atmospheric pressure. Values for these must be added in the appropriate fields.
+
+The final choice, under **Analysis**, is between Measuring from the Horizon and Measuring from the Shore.
+
+Measuring from the shore line is an advanced option to be used when a shore line and no horizon is visible behind the object of interest. Details of how to use this option are found here. [Measuring to the Shore](videoRange_MeasureToShoreline.html)  
+
+  
+
+[Previous: Calibration](videoRange_Calibrating.html)
+
+[Next: Plotting and Measuring](videoRange_Measuring_Plot.html)

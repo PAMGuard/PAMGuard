@@ -1,0 +1,76 @@
+---
+title: "Configuration"
+---
+ Seismic Veto Configuration  
+
+Seismic Veto
+============
+
+Configuration
+-------------
+
+  
+
+### Creating a Seismic Veto
+
+From the **_File>Add modules>Sound Processing_** menu, or from the pop-up menu on the data model display select "**_Seismic Veto_**". Enter a name for the new seismic veto module and press Ok.
+
+  
+
+### Seismic Veto Configuration
+
+  
+![Seismic Veto Configuration](images/VetoConfiguration.png)  
+
+### FFT Data Source
+
+Select a source of FFT data for the seismic veto module. The veto module will automatically find the input raw data used to create the FFT / Spectrogram data.
+
+Select the channels you wish to include in the Veto output data using the check boxes
+
+### Veto Trigger
+
+Set the parameters of the veto trigger. To assist in setting the right parameters, you should view the Seismic Veto Trigger Function plugin on the bottom of a spectrogram display as shown below.
+
+The lower black horizontal line shows the 0dB (or average noise) level, the upper line shows the trigger threshold
+
+Clearly, when the signal rises above threshold, the veto has cut out all data in the spectrogram and replaced it with zeros.
+
+  
+![Seismic Veto Trigger](images/VetoTriggerWindow.png)  
+
+This shows the difference between current signal level in a given energy band and the background noise averaged over a set time period. The Seismic pulses should be clearly visible in the display window. Set the trigger threshold so that the seismic pulses rise above the threshold, wheras other sounds do not.
+
+#### Trigger Threshold
+
+Is the threshold value in dB between the current signal and the measured background.
+
+#### Background smoothing constant
+
+Time in seconds that background noise should be measured over
+
+#### low and high frequencies
+
+Frequency limits of background and noise level measurements
+
+### Veto Actions
+
+Set the time you want the veto to start at relative to the start of the trigger
+
+Generally you will want to start the veto a fraction of a second before the onset of the seismic pulse
+
+.
+
+Set the time you want the veto to continue for after the end of the trigger
+
+Generally you will want to end the veto a fraction of a second after the end of the seismic pulse
+
+.
+
+Set whether you want to fill the vetoed data with zeros, or with random generated noise
+
+For listening, zeros are generally more pleasant, but some detectors thresholds may adjust badly during a period of empty data and consequently get a number of false detections immediately the veto ends
+
+  
+
+[Previous: Seismic Veto Overview](veto_overview.html)

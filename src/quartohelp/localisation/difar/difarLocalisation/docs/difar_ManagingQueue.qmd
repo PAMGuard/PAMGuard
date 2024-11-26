@@ -1,0 +1,32 @@
+---
+title: "Managing the Queue"
+---
+ Difar Module  
+
+DIFAR Localisation
+==================
+
+Managing the Queue
+------------------
+
+![Image of Difar Loacalisation Queue](./images/DIFARLocalisationQueue.png)
+
+Clips marked by the user or clips resulting from automatic detections are held in the DIFAR queue. At the top of the queue panel are a set of controls which can be used to resize and change the colour contrast on the clips. The top panel can also be hidden, using the small button on the left hand side of the control panel, in order to generate more space for sound clips.
+
+Each clip is displayed as a small spectrogram. To the right of each clip is a set of buttons which perform the following actions:
+
+**Del**: Permanently deletes the clip. No further processing will take place.
+
+**Proc:** Sends the clip to the DIFAR Localisation display. Note that this button is only enabled once a species has been assigned to a clip. Since clips can be processed automatically once a species has been assigned, this button may only be necessary in situations where the unit was not processed because a clip was already in the DIFAR processor which had not been deleted or saved.
+
+**Ves:** Marks the clip as a calibration (i.e. vessel) clip.
+
+**Classification buttons:** Up to three species buttons will be displayed, which were [defined by the user](./difar_ConfigureProcessing.html#Species). Pressing a classification button will automatically send the clip for processing.
+
+**Other:** If the user has defined more than three species, then pressing this button will generate a popup menu containing all species options.
+
+**Automatic Processing:** There is an option in the [Automation tab](./difar_ConfigureProcessing.html#Automation) of the difar parameters tab to auto-process clips. When this option is checked clips will automatically be sent to the DIFAR Localisation display and the DIFARGram computed.
+
+[Previous: Using the Spectrogram](difar_UsingSpectrogram.html)
+
+[Next: Using the DIFARGram Display](difar_UsingDifarGramDisplay.html)

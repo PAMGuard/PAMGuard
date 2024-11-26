@@ -1,0 +1,38 @@
+---
+title: "Contours"
+---
+ Generalised Power Law Detector  
+
+Generalised Power Law Detector
+==============================
+
+Contour Detection
+-----------------
+
+Once a power law detection has been completed, the detector makes a search of that region of the spectrogram to find the outlines, or 'contours' of sounds. Within each detection, it may be possible that there are multiple contours, for example due to harmonics, or several closely spaced separate sounds. If the contour detection threshold is set too high, or if the sounds were very faint, it's also possible that no contours will be found within a detection.
+
+![](images/gpl_contour.png)
+
+  
+
+_**Contour detection threshold**_  
+This is the main threshold for contour detection. Prior to applying this threshold, the whitened data from the first stage of detection pass through a second whitening process. It is therefore not possible to relate this threshold to a meaningful Decibel value.
+
+_**Minimum contour area**_  
+Minimum area for detected contours expressed as a number of pixels (time-frequency bins) from the spectrogram rising above the contour detection threshold. Contours smaller than this will be rejected.
+
+_**Connect 4 and Connect 8**_  
+These control how pixels in the whitened spectrogram that are above the contour detection threshold are joined together. If Connect 4 is selected, pixels will only be joined if they are touching at their sides (i.e. above, below, before or after). If Connect 8 is selected, pixels will also be joined if they are touching on their diagonals.
+
+_**Multiple contours**_  
+Three options are available when multiple contours are detected:  
+_Biggest contour only_: Keep only the largest contour based on it's area (total number of pixels).  
+_Separate all contours_: Keep every contour as a separate detection.  
+_Merge all contours_: Merge all the separate contours into one larger contour.
+
+_**Detections with no contour**_  
+On occasion, the GPL algorithm detects a sound, but the sound is too faint for any contours to be found in that region of data. These regions will be discarded, not being shown on the displays and not being stored in the [Binary Files](../../../utilities/BinaryStore/docs/binarystore_overview.html) or [Database](../../../utilities/generalDatabaseHelp/docs/database_database.html) unless you select the option to "Keep detections with no contour".
+
+[Previous: Detection](detection.html)
+
+[Next: Notes](notes.html)

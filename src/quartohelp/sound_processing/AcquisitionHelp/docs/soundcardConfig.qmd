@@ -1,0 +1,47 @@
+---
+title: "Sound Acquisition"
+---
+ Sound Acquisition  
+
+PAMGUARD
+========
+
+Sound Acquisition
+-----------------
+
+  
+
+### Adding a Sound Acquisition Module
+
+Add a Sound Acquisition module using File>Add modules�>Sound Acquisition and enter a name of your choice. To access the module's settings, select Detection from the main menu and click on the name of your module. This will bring up an Audio Data Acquisition dialogue, as shown below.
+
+  
+
+![Audio Data Acquisition Dialogue](images/AcquisitionDialog.png)
+
+  
+
+### Selecting a Device and Audio Line
+
+Choose Sound Card from the Data Source Type drop down menu. The Select Audio Line drop down list will then display the available mixer lines. Choose the line associated with your sound card input(s).
+
+  
+
+### Sampling Settings
+
+*   **Sample Rate:** Enter a sample rate that is supported by your sound card (you may need to consult your sound card documentation).
+    
+*   **Number of channels:** Enter the number of input channels from which you want to acquire data. For non-ASIO audio lines, this will be a maximum of 2.
+    
+*   **Peak-Peak voltage range:** This value represents the maximum input voltage range capable for your card, without overdriving the input (clipping) and is used to scale the sound data in PAMGUARD. You may find this value from your device's specifications.
+    
+*   **Preamplifier gain:** If you have any hardware which provides gain in your system, this value should equal the total gain (in dB).
+    
+*   **DC Background subtraction:** If your sound acquisition system has a DC offset in it (many do), tick the 'Subtract DC ...' button and enter a time constant. A single pole high pass filter will then be applied to all incoming data.
+    
+
+(Note that the 'Bandwidth' field has been removed since it was not used in any way)
+
+  
+
+[Next: Configuring ASIO Sound Cards](AsioHelp.html)

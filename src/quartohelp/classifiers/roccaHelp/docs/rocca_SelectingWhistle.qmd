@@ -1,0 +1,28 @@
+---
+title: "Selecting a Whistle"
+---
+Rocca - Selecting a Whistle  
+
+ROCCA
+=====
+
+Manually Selecting a Whistle
+----------------------------
+
+  
+
+To manually classify a whistle using ROCCA, the user must first select the whistle from the scrolling spectrogram display. Move the cursor to one corner of the whistle, press and hold the mouse button while dragging the cursor to the opposite corner, and release the button. A red box will be drawn around the selection, and the time and frequency of the starting point (upper left corner) and ending point (lower right corner) of the box are displayed in the ROCCA sidebar for reference.
+
+![a selected whistle in the scrolling spectrogram](images/selected_whistle.png)
+
+When the mouse button is released, a new window will be opened containing that portion of the spectrogram selected by the user. The new window is minimized automatically to allow the user to continue selecting whistles from the scrolling spectrogram. The user does NOT need to classify the whistle immediately. The number of captured whistles is only limited by the amount of memory available on the computer.
+
+If an [Encounter Number](rocca_Sidebar.html) has not yet been specified, the user will be prompted for one after the first whistle has been selected.
+
+  
+  
+  
+
+[Previous: ROCCA Creation and Configuration](rocca_Configure.html)
+
+[Next: Spectrogram Popup Window](rocca_Spectrogram.html)

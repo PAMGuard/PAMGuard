@@ -1,0 +1,24 @@
+---
+title: "SUBTABS Property"
+---
+ SUBTABS Property  
+
+SUBTABS Property
+================
+
+The SUBTABS Property is used to change the way forms appear on the display.
+
+By default (i.e. if the SUBTABS property is not used) one copy of each form is always visible. If the SUBTABS property is set, then initially no forms are visible, just an empty space in the main Logger forms layout. You may then open as many forms as you require simply by double clicking on the tab on the main layout.
+
+(Functionality to open SUBTAB forms using buttons, as in Logger 2000 will be added at some future date)
+
+SUBTAB forms are great for things like animal sightings, when several things may be happening at once.
+
+### Required Fields
+
+**None**
+
+  
+  
+
+[Back to form Design](./designingForms.html)

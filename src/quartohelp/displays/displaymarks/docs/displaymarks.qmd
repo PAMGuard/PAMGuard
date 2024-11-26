@@ -1,0 +1,89 @@
+---
+title: "Overview"
+---
+ Display Marks  
+
+Display Marks
+=============
+
+Overview
+--------
+
+  
+
+PAMGuard contains powerful methods for manually marking and selecting data on many of it's displays. Manually marking data is often an essential step in data analysis whether it be in real time of offline using the PAMGuard Viewer
+
+There are two essential components making up the mark system, Mark Sources and Mark Observers.
+
+Mark Sources
+------------
+
+Mark Sources are displays that can respond to mouse or touch actions to mark out a region of that display.
+
+Displays which currently have this functionality are the [Spectrogram Display](../../../displays/spectrogramDisplayHelp/docs/UserDisplay_Spectrogram.html), the [Map](../../../mapping/mapHelp/docs/overview.html) and the [FX time based display](../../../displays/timedisplayfx/docs/timedisplayfx.html).
+
+The click Detector continues to have it's own marking system for linking clicks into click trains. The marks from the click detector cannot currently be sent to other Mark Observers. However, the Click Detector can now act as a Mark Observer, receiving mark information from other Mark Sources.
+
+  
+
+Mark Observers
+--------------
+
+Mark Observers are PAMGuard modules which receive an respond ot marks from the Mark Sources.
+
+Mark Observers are the [Click Detector event management system](../../../detectors/clickDetectorHelp/docs/offline_MarkingOutEvents.html) , the new [Detection Group Localiser module](../../../localisation/detectiongroup/docs/dglocaliser.html), the [DIFAR module](../../../localisation/difar/docs/difar_Overview.html), the [Clip Generator](../../../sound_processing/ClipGenerator/docs/ClipGenerator.html) and the [Spectrogram Annotation module](../../../utilities/spectrogramannotations/docs/spectrogramannotations.html).
+
+Some Mark Observers will respond immediately to the arrival of a mark, others may display a pop-up menu or a dialog box requiring additional user input.
+
+How each Mark Observer used the mark data is very module specific, so you should refer to the documentation for the observer module for details.
+
+Mark source / Observer Relationships
+------------------------------------
+
+Which Mark Sources send marks to which Mark Observers can be controlled by the user.
+
+Some Mark Sources and some Mark Observers may include a list of Observers or Sources to select within their own configuration dialogs. There is also a master configuration dialog controlling all relationships between Markers and Observers which can accessed from the Display/Display marks and observers menu item
+
+  
+
+![](./images/markobservers.png)
+
+  
+
+In this example, there are four different Mark Sources and three Mark Observers
+
+Both the Beaked Whale detector and the Detection Group Localiser can use marks made on displays with any axis units (e.g. Latitude / Longitude on the map or Bearing / Time on a bearing-time display), whereas the DIFAR module can only handle marks made on a spectrogram type display with units of Frequency and Time. Consequently, check boxes for linking some maek sources (the map and one of the fx display graphs) are not available.
+
+While it is possible to have multiple observers of a single mark source, generally this is not recommended
+
+Data Selection
+--------------
+
+Some mark observers may use the coordinates of the mark (in whatever units were in use on the marked display), others may use a list of data from the display indicating which data units were enclosed within the mark or in some way overlapped with the mark.
+
+Some Mark Observers may also contain additional data selection options so that only certain types of data unit from within a marked area are included in whatever actions take place within the Mark Observer. For details, refer to documentation for the specific Mark Observers.
+
+Marking Data
+------------
+
+Individual displays may have restricted or altered the way in which marks are made, but generally, there are two types of marks that can be made, Rectangles and Polygons
+
+Not all displays work in the same way, although we are in the process of trying to standardise their behaviour as much as possible across PAMGuard
+
+Main points to note at that not all displays will support Polygon Marks and some displays (the Map and the FX displays) require the Ctrl key to be held down while the mark is made. Also note that displays will not create or show a mark if the display is not linked to one or more Mark Observers.
+
+### Rectangular Marks
+
+To make a rectangular mark, hold the Ctrl key, press the mouse at one corner of the area you wish to mark and drag it across to the opposite corner before releasing the mouse button.
+
+It does not matter whether the mouse is dragged from left to right or right to left or op rather than down the display.
+
+### Polygon Marks
+
+To make a polygon mark, hold the Ctrl key, click at the point you wish to start the polygon at, then repeatedly click around the area you wish to mark. The polygon will be closed when you click close to the start of the polygon.
+
+You can cancel marking by right clicking with the mouse at any time.
+
+### Notifications to Mark Observers
+
+Notifications of the current mark size, shape and status are sent to Mark Observers each time the mark changes. Most Mark Observers are programmed to only act when the mark is complete, i.e. the mouse has been released from a rectuangular mark or a polygon mark has been closed.

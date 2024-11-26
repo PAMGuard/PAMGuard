@@ -1,0 +1,39 @@
+---
+title: "Calibration"
+---
+ Analog Array Sensors  
+
+Analog Array Sensors
+====================
+
+Calibration
+-----------
+
+Go to **_Settings>Analog Array Sensor Settings..._** and click on the calibration tab.
+
+  
+![](images/analogarraycalibration.png)  
+
+For each channel enter calibration constants which will convert the measured voltage or current into a Depth, Pitch, Roll or Heading. These all follow a simple linear formula:
+
+Depth (or heading, or pitch or roll) = (measured value + constant 1) \* constant 2 + constant 3
+
+There is some redundancy in this formula, but this is intended to make it easier to enter the correct calibration values. For example, if you were using a 4 - 20mA depth sensor which had a nominal maximum depth of 100m, the values would be calculated as follows:
+
+The first value is simply the 4mA offset on the reading, so set it to -0.04
+
+The second value is the range of the sensor (100m) divided by the range of the input device (16mA) so set it to 100/0.016 = 6250.0.
+
+The third value can be left at zero
+
+Now consider the consequences of finding that there is a 3.2m offset in the depth readings. You could recalculate the first two constants, which would become -0.0045 and 6250. Much more simple will be to adjust the third parameter by the measured offset, leaving the first two alone, i.e. the three parameters become -.004, 6250 and 3.2.
+
+  
+
+If you require a non-linear calibration, please contact the PAMGuard development team.
+
+  
+
+[Previous: Configuration](analogarrayconfig.html)
+
+[Next: Display](analogarraydisplays.html)

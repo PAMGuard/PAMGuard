@@ -1,0 +1,24 @@
+---
+title: "Data Storage"
+---
+ Data Storage  
+
+Data Storage
+============
+
+PAMGuard has two data storage options:
+
+1.  [The Database](../../../utilities/generalDatabaseHelp/docs/database_database.html)
+2.  [The Binary Store](../../../utilities/BinaryStore.docs/binarystore_overview.html)
+
+Each has advantages and disadvantaged.
+
+The great advantage of the database is that stored data are generally in a form which is each to read either as a human, or via some other software.
+
+However, the database interface can be slow and the database is very inefficient at handling variable length records, such as the waveform of a click, or the contour of a whistle.
+
+The Binary store is fast and is great at handling any type of data, but the files are impossible to read except with proprietary computer software
+
+[Previous: Model viewer](modelViewer.html)
+
+[Next: Performance Tests](performanceTests.html)

@@ -1,0 +1,87 @@
+---
+title: "Overview"
+---
+Click Viewer Overview  
+
+Click Detector Viewer Function
+==============================
+
+Click Viewer Overview
+---------------------
+
+An offline analysis functionality, which is similar to that in the IFAW RainbowClick software, is available in PAMGUARD. To use this functionality, click detector data must be available in the [binary storage format](../../../utilities/BinaryStore/docs/binarystore_overview.html) and PAMGUARD must be running in [Viewer Mode](../../../overview/PamMasterHelp/docs/viewerMode.html).
+
+The click detector viewer mode provides several powerful tools for data analysis:
+
+*   The [data map](../../../utilities/datamap/docs/datamap.html) allows for rapid navigation and visualisation of large data sets.
+    
+*   Events can be [manually marked](offline_MarkingOutEvents.html) and saved to a database.
+    
+*   Data collected using towed arrays can be localised using [target motion analysis](../../../localisation/targetmotion/docs/targetmotion_overview.html).
+    
+
+### Beginning Analysis
+
+To begin using the offline click viewer you must have a set of [binary files](../../../utilities/BinaryStore/docs/binarystore_overview.html) and a [database](../../../utilities/generalDatabaseHelp/docs/database_database.html). If this is NOT the case, you have to [create binaries offline](../../../utilities/BinaryStore/docs/CreateBinariesOffline.html) (i.e. after you have collected you data in the field). Ideally the database will have been created whilst collecting data. It should then contain GPS co-ordinates, a list of the binary files, settings information etc. When you open up PamguardViewer the first option is to select the database.  
+  
+
+![Database](images/Database.png)
+
+  
+  
+
+By selecting this database, viewer will load automatically the corresponding binary-, settings- and data files but sometimes it gets the directory path wrong (especially if your data is on an external hard drive and you plugged it in and out frequently). Just double check if the binary storage options are correct (Note: In this case the drive is wrong).
+
+  
+  
+
+![Binary](images/Binary.png)
+
+  
+  
+
+The programme will then load the data and create the [data map](../../../utilities/datamap/docs/datamap.html) which can take a couple of minutes if you are opening up the data for the first time. Use the data map for [navigation](../../../detectors/clickDetectorHelp/docs/offline_Navigating.html). Now you start to [manually mark events](offline_MarkingOutEvents.html).
+
+  
+  
+
+![BinaryDataMapping](images/BinaryDataMapping.png)
+
+  
+  
+
+If no database is available then a a new one must be created. Open Pamguard viewer and select a blank database. A message will appear.
+
+  
+  
+
+![NoDatabaseMessage](images/NoDatabaseMessage.png)
+
+  
+  
+
+Select _'OK'_. A dialogue asking you to select binary files will then appear. Select the path to your processed binary files and click 'OK'. The following window should then appear. (Note that your binary files must contain .psfx files. These should be automatically created when binary files are created.)
+
+  
+  
+
+![NoSettingsBegin](images/NoSettingsBegin.png)
+
+  
+  
+
+Right click on the small red triangle and select _'load settings from....'_. Clicks should then be loaded from the binary files and a datamap created.
+
+  
+  
+
+![Settings Loaded](images/Settings%20Loaded.png)
+
+  
+  
+
+Selecting the Click Detector tab should bring up the clicks contained in the binary files. If GPS data needs to be added a new table must be manually created in the database. The table must be named _''gpsData'_ and should be in a specific format ([Adding GPS Data offline](../../../detectors/clickDetectorHelp/docs/offline_AddingGPSData.html)).  
+  
+  
+
+[Next: Importing Rainbow Click files](offline_ImportingRBC.html)

@@ -1,0 +1,26 @@
+---
+title: "Text Annotation"
+---
+ Text Annotation  
+
+Text Annotations
+================
+
+Overview
+--------
+
+Text annotations store a single line of text entered by the user. The length of text that can be entered is currently set by the programmer.
+
+Usage
+-----
+
+When required a small dialog box will appear on the screen. The user should enter text and press Ok, or press Cancel if they do not wish to add any text.
+
+![](./images/textannotation.png)
+
+  
+
+Stored Data
+-----------
+
+A single data field using a name given to the annotation by the programmer (generally 'text' or 'notes') will be added to database tables.

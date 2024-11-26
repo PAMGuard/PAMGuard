@@ -1,0 +1,46 @@
+---
+title: "Importing and Exporting"
+---
+ Database  
+
+Database
+========
+
+Importing and Exporting from other Databases
+--------------------------------------------
+
+In Viewer Mode, database tables can be imported or exported from the current PAMGuard database to and from external databases. This feature can be used to copy an entire database (for example, you may need to import and old Microsoft Access database into the newer SQLite database format) or you could copy data for an subset of tables (for example, import the UDF\_ logger forms definitions from another database).
+
+Currently, in order to avoid duplicating data, it is only possible to copy entire database tables into entirely empty database tables. If you wish to transfer data into a table which already contains data, you will be prompted to delete and recreate that table prior to importing / exporting data.
+
+To export or import data, select one of the **_File>Database>External>Export to database_** or _**Import from database**_ menu items.
+
+You will then be presented with the database selection dialog where you chose the database you want to exchange data with.
+
+Once you select a database, you will see the Import / Export dialog where you can chose which tables to copy between the two databases. (There may be a short delay while PAMGuard analyses the external database).
+
+  
+![SQLite Configuration](Images/import_export.png)  
+  
+
+If you are transferring data to a new blank database, then it's likely that most of the destination tables will show an Error. Hover the mouse over the buttons to see the error. Most likely it's simply that the tables need creating. Press the "Create" button near the top of the screen and the errors will disappear. If tables already contain data, they will be flagged as "Warning". Again, hover the mouse over each button to see what's wrong. Click the button for a menu of possible actions to fix any problems (generally dropping and recreating tables).
+
+Select the tables you wish to export / import and press "Start".
+
+If you are importing data, at the end of the import process, by default, PAMGuard will load the latest configuration from the imported configuration tables. Un-check the box if you do not want this to happen.
+
+### Indexing and Cross Referencing
+
+Every PAMGuard database table has an indexed column named "Id". This number is automatically generated as data are written to the table and may therefore change when data are copied between databases.
+
+For simple data, where the original data were written by PAMGuard and nothing was deleted, then it's likely that the Id's will be the same. However, for data which have been manipulated either by someone messing with the database or by data being added / deleted in the Viewer, then it's likely that the copied data will have different Id's
+
+To keep track of data, each copied database table will contain an additional column with the name "CopyId". This will contain the Id of the data in the table it was copied from.
+
+For most data this is not a problem. However, Click Detector events marked in the PAMGuard Viewer populate two database tables one of which cross references to the other. With the possible change of Id's, these cross references may no longer be correct. PAMGuard will automatically correct these altered cross references.
+
+Otherwise, you will only ever be aware of these Id changes should you have referred to an event by it's Id - e.g. if you emailed a colleague and event number to check over.
+
+  
+  
+[Back to database main page](database_database.html)

@@ -1,0 +1,22 @@
+---
+title: "User Input Panel"
+---
+ User Input  
+
+PAMGUARD
+========
+
+User Input
+----------
+
+### Overview
+
+The user input utility allows users to type comments into PAMGUARD. These will be time-stamped and stored in the database.
+
+To add a new User Input module to PAMGUARD, select the _**File>Add Modules>Utilities>User Input**_ menu command.
+
+![User Input](images/UserInput.png)
+
+In addition to the main panel which can be used for entering comments of any length, a small input box is provide on the left hand side panel to allow short comments can be added without needing to tab to the main panel.
+
+Long comments written to the database will be broken into shorter sections each less than 255 characters in length and will be written to multiple rows in the database table.

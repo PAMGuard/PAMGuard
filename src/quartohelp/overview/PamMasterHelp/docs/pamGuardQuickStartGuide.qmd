@@ -1,0 +1,25 @@
+---
+title: "Quick Start Guide"
+---
+ Quick Start Guide  
+
+PAMGUARD
+========
+
+Quick Start Guide
+-----------------
+
+  
+
+### Installation
+
+This assumes that you have successfully installed PAMGUARD and started the application. If this is not the case, please see the _PAMGUARD Installation Guide_ included in the program download.
+
+****TO BE COMPLETED****
+
+  
+  
+
+[Previous: PAMGUARD Architecture](pamGuardArchitecture.html)
+
+[Next: Graphical User Interface Overview](guiOverview.html)

@@ -1,0 +1,22 @@
+---
+title: "Side Panel"
+---
+Click Detector Side Panel 
+
+Click Detector
+==============
+
+Click Side Panel
+----------------
+
+  
+![side panel](images/sidepanel_no_alarm.png)  
+  
+
+The side panel displays a running tally of the number of clicks and click events that have occurred. Also displayed is the name of the alarm that is currently sounding (or _No Alarm Sounding_, as shown above, if there is no alarm at the moment).
+
+Pressing the Test Alarm button will sound each of the currently defined alarms, one at a time, with a short pause in between.
+
+[Previous: Tab Panel Displays](ClickDetector_clickTabPanelDisplays.html)
+
+[Next: Click Detector Graphic Overlays](ClickDetector_MapOverlays.html)

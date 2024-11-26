@@ -1,0 +1,45 @@
+---
+title: "Sound Recorder Operation"
+---
+ Sound Recorder Operation  
+
+Sound Recorder
+==============
+
+Operation
+---------
+
+  
+
+### Off
+
+If the _**Off**_ button is highlighted, then only triggered recordings will be made.
+
+### Automatic Cycle
+
+Pressing the _**Automatic Cycle**_ button causes the recorder to start recording for specified durations at predefined time intervals.
+
+### Continuous
+
+Pressing the _**Continuous**_ button will start continuous recording. File lengths will never exceed the maximum set in the Options dialog. If a new file is started automatically, then no data will be lost and there will be no gap if you should join the files together again, or analyse them as a single file at a later date.
+
+### Continuous + Buffer
+
+Pressing the _**Continuous + Buffer**_ button will have the same effect as the Continuous button, but the buffer contents will be written at the start of the file and the file name will reflect the start time of the recording (i.e. some time before the button was pressed).
+
+### Triggered Recording
+
+Some detectors are capable of automatically triggering recording. The instructions that do this are hard coded into individual detectors. Detectors that trigger recordings will have a time to record from _prior_ to the detection (using the buffer system as used with Continuous + Buffer manual recordings) and a time to record for after the detection. If multiple detections occur with the set recording times, recording will simply continue. These times may be hard coded in specific detectors or may be controllable by the user via menu items associated with the detectors in question.
+
+Triggered recording may be enabled and disabled for individual detectors using the check boxes on the main Sound Recorder display panel.
+
+### Side Panel
+
+The four main control buttons and status display are duplicated in a side panel for ease of operation.  
+  
+![Sound Recorder Side Panel](images/SoundRecorderSidePanel.png)  
+  
+If a database module is active in the PAMGUARD model, then AIS data will be logged to the database  
+  
+
+[Previous: Sound Recorder Configuration](RecorderConfiguration.html)

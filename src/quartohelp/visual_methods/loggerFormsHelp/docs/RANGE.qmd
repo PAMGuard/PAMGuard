@@ -1,0 +1,34 @@
+---
+title: "RANGE Property"
+---
+ RANGE Property  
+
+RANGE Property
+==============
+
+The RANGE Property is used to tell PAMGuard which of the Controls contains range information (about a sighting, etc.)
+
+### Required Fields
+
+**Topic**
+
+The title of one of the other controls, which contains numeric data giving a range.
+
+**PostTitle**
+
+Must be one of the following:
+
+1.  nmi: Range is in nautical miles
+2.  km: Range is in kilometres
+3.  m: Range is in metres
+
+### Optional Fields
+
+Topic - set to FIXED to display data at a fixed range (i.e. if you have bearing data but no range data)
+
+Length - Used to specify the range if Topic has been set to FIXED
+
+  
+  
+
+[Back to form Design](./designingForms.html)

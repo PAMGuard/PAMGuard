@@ -1,0 +1,72 @@
+---
+title: "NMEAFLOAT Control"
+---
+ NMEAFLOAT Control  
+
+NMEAFLOAT Control
+=================
+
+The NMEAFLOAT Type is used on a User Defined Form to automatically collect floating point data from an NMEA string
+
+An [NMEA module](../../../mapping/NMEA/docs/configuringNMEADataSource.html) should be included in the PAMGuard configuration to acquire NMEA data from a serial port
+
+### Required Fields
+
+**Order**
+
+The order in which the controls are read in by the program
+
+**Title**
+
+The text to be shown on the display
+
+**Topic**
+
+The name of the NMEA module from which data should be harvested
+
+**NMEA\_String**
+
+The name of the NMEA string containing the data
+
+**NMEA\_Position**
+
+The position of the data item in the NMEA string. Strings are comma separated, the 0'the item will be the string name, the 1'st item the one after that, etc.
+
+**Length**
+
+Length of the input field in characters
+
+### Optional Fields
+
+**Autoupdate**
+
+This control will update on a time if a non-null positive integer value is entered in the Autoupdate column. The number is the number of seconds between auto-updates
+
+**Autoclear**
+
+The control is automatically cleared when data is saved
+
+**DbTitle**
+
+Column heading for the output database. (This will default to the Title if this filed is not completed)
+
+**Hint**
+
+Text for a hint to be displayed when entering data in the control
+
+**PostTitle**
+
+Additional text to display after the input box.
+
+**Required**
+
+Forces the user to fill in the input box before the form can be saved
+
+**Plot**
+
+Data from this form can be plotted if the value is non-zero. Note that there are extensive plot options available from the Display / Logger forms menu.
+
+  
+  
+
+[Back to form Design](./designingForms.html)

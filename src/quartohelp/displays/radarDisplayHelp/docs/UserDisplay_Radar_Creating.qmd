@@ -1,0 +1,23 @@
+---
+title: "Creating  a Radar Display"
+---
+ Creating a Radar Display  
+
+Radar Display
+=============
+
+Creating a Radar display
+------------------------
+
+  
+First you must have created an instance of a [User Display Panel](../../userDisplayHelp/docs/userDisplayPanel.html)
+
+From the User Display menu select _**User Display>New Radar displa**_y�
+
+A Radar Display Parameters dialog will open allowing you to select the type of radar display.
+
+Click Ok and the radar display will be added to the [user display panel](../../userDisplayHelp/docs/userDisplayPanel.html).
+
+[Previous: Radar Display](UserDisplay_Radar.html)
+
+[Next: Configuring a radar display](UserDisplay_Radar_Configuring.html)

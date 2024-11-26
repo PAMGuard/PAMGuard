@@ -1,0 +1,30 @@
+---
+title: "Symbol Choosers"
+---
+ Display Marks  
+
+Symbol Choosers
+===============
+
+Overview
+--------
+
+There are lots of reasons to change the colour and shape of a symbol in PAMGuard. For example, if you're displaying clicks, you might want to display them according to the type of click, the channel they are detected on, or their grouping into click trains or 'Events'. On the other hand, if you're plotting them on a map along with other data, you may want them all the same colour, using a different colour for other types of data.
+
+Three things can be changed for a symbol, although not all of them apply on all displays, so some options might be available which aren't actually used. These are:
+
+*   The fill colour of the symbol.
+*   The line colour of the symbol.
+*   The symbol shape.
+
+For each symbol chooser, you can select a default symbol for the display. This is then modified by a series of 'symbol modifiers'. The types of modifiers available will depend on the PAMGuard module and it's connections to other modules.
+
+Symbol modifiers are processed in order, so you can select 'line colour' in more than one modifier, but that last modifier in the list which has valid data with prevail
+
+You can change the order of the modifiers by right clicking with the mouse and selecting 'Move Earlier' or 'Move Later'. Some will also have additional options, which are accessed from the same popup menu.
+
+  
+
+![](./images/symbolchoice2.png) ![](./images/symbolchoice1.png)
+
+Back to [overview](selectandsymbol.html)

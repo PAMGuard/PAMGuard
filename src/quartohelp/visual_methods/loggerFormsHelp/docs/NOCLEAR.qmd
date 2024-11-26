@@ -1,0 +1,18 @@
+---
+title: "NOCLEAR Property"
+---
+ NOCLEAR Property  
+
+NOCLEAR Property
+================
+
+The NOCLEAR Property will cause the "Clear" button not to appear on a form.
+
+### Required Fields
+
+**None**
+
+  
+  
+
+[Back to form Design](./designingForms.html)

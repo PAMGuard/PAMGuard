@@ -1,0 +1,51 @@
+---
+title: "Importing and Exporting Target Configurations"
+---
+ Likelihood Detector Module  
+
+The Likelihood Detector Module
+==============================
+
+Importing and Exporting Target Configurations
+---------------------------------------------
+
+The Likelihood Detector module provides the ability to export a single target configuration to disk and then read it back in to the same or other Likelihood Detector modules. This makes it easy and convenient to save and share target configurations.  
+  
+To export a target configuration, simply right-click on the name of the target configuration you wish to export and then select the `Export Configuration` menu option. You will be prompted to select an output directory and to enter a file name for the target configuration file. The output file will be supplied with the extension `TCF`.
+
+  
+  
+
+Exporting a target configuration
+
+![](images/export-configuration.png)
+
+  
+
+A previously-exported target configuration file can be imported into a Likelhood Detector module by right-clicking on the `Target Configuration` node of the configuration tree and selecting the `Import Configuration` menu option.
+
+  
+  
+
+Importing a target configuration
+
+![](images/import-configuration.png)
+
+  
+
+You will be prompted to select the directory and file name of the target configuration file. The dialog will automatically filter out all files that do not have the `TCF` extension.
+
+  
+  
+
+Selecting a target configuration
+
+![](images/import-configuration-dialog.png)
+
+  
+
+* * *
+
+[Next: Removing a Likelihood Detection Module](LikelihoodDetector_RemoveModule.html)
+
+[Previous: Configuring the Likelihood Detector](LikelihoodDetector_Config.html)

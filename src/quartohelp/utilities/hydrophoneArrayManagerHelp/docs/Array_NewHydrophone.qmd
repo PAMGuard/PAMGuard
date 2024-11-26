@@ -1,0 +1,45 @@
+---
+title: "New Hydrophone Dialog"
+---
+ Adding a New Hydrophone  
+
+Hydrophone Array
+================
+
+New Hydrophone Dialog
+---------------------
+
+  
+
+![Image](./Images/NewHydrophone.png)  
+  
+
+The hydrophone Id will be assigned automatically.
+
+Assign the hydrophone to a streamer from the drop down list.
+
+The hydrophone type is for information only.
+
+  
+
+### Hydrophone Coordinates
+
+Enter the x,y, and depth coordinates and estimates of the errors on those coordinates.
+
+  
+
+### Sensitivity
+
+The sensitivity, preamplifier gain and combined bandwidth (the bandwidth of the hydrophone element and any associated preamplifier combination) are taken by default from the previously selected hydrophone (to save you having to repeatedly type them in for multi-element arrays.
+
+  
+
+### Interpolation
+
+Things sometimes move ! As we start to incorporate sensors into our arrays, it will be necessary to chose how to pick a position from a list of evolving positions over time.
+
+These options tell the system to take the latest value entered by the user, to interpolate between values bracketing the time of an event or to use the values immediately preceding an event.
+
+Once you have completed the information, press the Ok button and the new hydrophone will appear in the list.
+
+[Previous: Streamer Dialog](Array_NewStreamer.html)

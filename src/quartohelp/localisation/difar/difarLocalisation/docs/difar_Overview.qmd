@@ -1,0 +1,22 @@
+---
+title: "Overview"
+---
+ Difar Overview  
+
+DIFAR Localisation
+==================
+
+Overview
+--------
+
+The PAMGuard DIFAR Localisation module can be used to locate tonal sounds (e.g. calls from baleen whales) that have been acquired from DIFAR (directional) sonobuoys. The DIFAR Localisation module can be run in [normal-mode](../../overview/PamMasterHelp/docs/normalMode.html) for real-time localisation, or in [mixed-mode](../../../overview/PamMasterHelp/docs/mixedMode.html) for [post-processing/re-analysis of existing DIFAR recordings](difar_PostProcessingTutorial.html), and the results from the DIFAR Localisation module can be displayed in [viewer-mode](../../../overview/PamMasterHelp/docs/viewerMode.html).
+
+### Background
+
+Over the past two decades DIFAR (directional) sonobuoys have seen [increased use in whale research programs worldwide](difar_References.html).
+
+DIFAR sonobuoys contain a single omnidirectional pressure sensor, two directional particle-velocity sensors, and a magnetic compass. By comparing the amplitude and phase of signals on each of the three acoustic sensors it is possible to calculate the direction that a sound is coming from relative to magnetic north. Additionally, most DIFAR sonobuoys send data via VHF radio link back to an aircraft or nearby vessel. Consequently, the acoustic data from the three sensors are multiplexed (modulated) into a single signal prior to transmission. An important part of the processing is therefore the de-multiplexing (demodulation) of the signal back into the three separate acoustic components (Delagrange 1992). While there are some general purpose tools available for working with DIFAR data such as the beamforming software from [WhaleAcoustics](http://whaleacoustics.com/), and the [demultiplexing software by Greeneridge Sciences Inc](http://www.greeneridge.com/software.html) real-time analysis of signals from DIFAR sonobuoys has remained the province of a limited number of bespoke (or restricted military) systems.
+
+This module has been developed between SMRU and the Australian Marine Mammal Centre to serve as a flexible tool for for real-time localisation of loud & vocal species of baleen whales. The PAMGuard DIFAR Localisation module was made possible by the [Southern Ocean Research Partnership](http://www.marinemammals.gov.au/sorp). The module is BETA software, and further development of the module is still ongoing as of December 2014. For questions, comments, or to report bugs on the DIFAR module contact Brian Miller at the Australian Marine Mammal Centre.
+
+[Next: Configuring the module](difar_ConfigureModule.html)

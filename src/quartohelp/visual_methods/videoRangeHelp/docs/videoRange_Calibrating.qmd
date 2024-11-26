@@ -1,0 +1,32 @@
+---
+title: "Calibration"
+---
+ Video Range Calibration  
+
+Video Range
+===========
+
+Calibration
+-----------
+
+A calibration factor is required to allow distances measured on the image (in pixels) to be converted into angles subtended at the lens and a new a factor will be needed for each camera / zoom combination.
+
+Calculation of a calibration factor using PAMGUARD involves making measurements between points on a perpendicular image of an object of known size taken at a known range, with the camera and zoom setting to be used for later range measurements.
+
+To open the image press either the **Paste** or **File** buttons under **Image** in the control panel as appropriate (depending on whether the image has bee stored as a file or on the clipboard.)
+
+Use the cursor to mark two known points on the object.
+
+A dialogue opens prompting for the distance between these points (in cm) and the range from the camera to the object (in m). Provide a sensible name for the calibration factor (e.g. "Full Zoom") and store it.
+
+![Calibration](images/Calibration.jpg)
+
+_In the image above the distance between two white bands 50cm apart on a pole placed 46m from the camera have been marked. The calibrations factor will be stored with the name "Full Zoom"._
+
+This calibration factor will now be available to be chosen for future analysis of any images taken with these camera settings.  
+
+  
+
+[Previous: Adding a Video Range Module](VideoRange_SidePanel.html)
+
+[Next: Range Measurement Setup](videoRange_Measuring_setup.html)

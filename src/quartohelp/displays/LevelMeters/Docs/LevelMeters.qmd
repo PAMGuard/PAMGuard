@@ -1,0 +1,31 @@
+---
+title: "Level Meters"
+---
+ Level Meters  
+
+Level Meters
+============
+
+Overview
+--------
+
+  
+
+This module displays level meters for the audio signals in the side panel of the main PAMGuard GUI.
+
+This can be useful in diagnosing that all input channels are active and that none are saturating.
+
+### Creating the module
+
+From the _**File>Add modules>Displays**_ menu, or from the pop-up menu on the data model display select "_**Level Meters**_". Enter a name for the new module and press Ok.
+
+### Configuring the module
+
+To configure the module, open the settings dialog from the _**Detection>"your module name"**_ menu:
+
+  
+![](Images/LevelMeters.png)  
+
+In the dialog select the sound source (generally the sound acquisition module, but you could connect to the output of some other process such as a filter or decimator).
+
+The module has no other settings, but you might want to adjust the position of the display in the side panel which can be done by changing the order of the modules from the File>Module Ordering menu command.

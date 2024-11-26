@@ -1,0 +1,34 @@
+---
+title: "Map Overlays"
+---
+ Map Overlays  
+
+Map
+===
+
+Map Overlays
+------------
+
+  
+
+PAMGUARD uses a system of overlays to display data from detectors and other PAMGUARD modules on the map. Which overlay options are available will depend on which modules are currently loaded.
+
+### Turning overlays on and off
+
+The easiest and quickest way to turn overlays on and off is from the map pop up menu, accessed by clicking with the right mouse button anywhere on the map.  
+  
+![Map Overlay Menu](images/MapOverlayMenu.png)  
+  
+You may select or de-select each overlay item. Selected items will appear on the map and be listed in the map key.
+
+Many types of data now have additional selection options which control exactly which data get displayed. If additional options are available, the tick mark adjacent to selected items is replaced with a small button ![](images/SettingsButtonSmall2.png).
+
+For more advanced options, use the second item on the pop-up menu **"Plot Overlay Options...**" to access the overlay options dialog.  
+  
+![Map Overlay Dialog](images/MapOverlayDialog.png)  
+  
+This allows the same selection of items as the pop-up menu, but also offers additional options to specify for how long each type of data should be displayed. Again, data which have additional display options will have a small button beside them ![](images/SettingsButtonSmall2.png). Click this button for options specific to that type of data.
+
+[Previous: Map Display](mapDisplay.html)
+
+[Next: Map Information Panel](mapInformationDisplayPanel.html)

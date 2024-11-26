@@ -1,0 +1,38 @@
+---
+title: "Connecting to Tethys"
+---
+ Tethys Connection and Project Details   
+
+Connection and Project Details
+==============================
+
+Make sure you have a [Tethys Server](tethys_server.html) running. The PAMGuard interface will only work with [Tethys 3](https://tethys.sdsu.edu/tethys3/) or later. The section below specifies how to set the address of Tethys server address as well as determine if PAMGuard can communicate successfully with Tethys. (The top panel will be orange if communication is not working.
+
+Tethys Server
+-------------
+
+The Tethys Server field next to the picture of the goddess Tethys indicates the address of the Tehtys server. To change this field, click on the gear icon. You will be prompted to provide a computer address (URL) and a port. The address should start with http:// followed by the machine name or internet protocol address unless the Tethys server has been configured to use an encrypted connection. In this case, start the address with https://.
+
+By default, PAMGuard will use http://localhost:9779 which assumes that your Tethys server is running on the same computer as PAMGuard and that it expects communication on port 9779, the default port (administrators may change this).
+
+If PAMGuard can communicate with the Tethys server, the Connection and Project panel will be light grey. If communication is not possible, the panel will be colored orange. Likely causes for communication failure are:
+
+*   The server address or port is incorrect.
+*   Tethys has not been started on the server machine. One of the main reasons that we see this is when the administrator has not configured Tethys to run automatically as a service. In that case, when a machine reboots (e.g., for automatic operaing system updates) the server will not start automatically. The Tethys manual explains how to configure Tethys as a service that starts automatically when the machine boots.
+*   Firewall rules do not permit traffic between the machine executing PAMGuard and the one hosting Tethys on the selected port. If you do not have adminstrative privileges, you will need to contact your support team for help.
+
+Project and Instrument Information
+----------------------------------
+
+Projects are names used by Tethys to help track work that should be considered together, such as a series of deployments designed to answer a specific question or funded under a specific grant. If you do not already have a project defined in your PAMGuard database, you can click the "New Project" button in the "Connection and Project details" section of the Tethys module. This will start a dialog that asks for a case-sensitive project name and a geographic region. The geographic region is for convenience, PAMGuard and Tethys track information by longitude and latitude, but sometimes it is helpful to query for information with respect to a geographic name such as Channel Islands National Marine Sanctuary.
+
+The array instrumentation is selected from a drop-down menu next to the Instruments label. A dropdown menu next to the label “Instruments” shows the list of hydrophone arrays. These are likely to have been previously established prior to starting analysis of your data by using the menu Settings -> Hydrophone Array.
+
+If you are a long-time user of PAMGuard, you will notice additional fields are required for instrumentation: Instrument Type and Instrument Id. The type indicates what type of instrument is being used and may be generic such as a mooring or array or denote a specific instrument such as a HARP, Rock Hopper, SoundTrap, etc. The Id is a unique identifier for the instrument such as a serial number. Note that if you are using an older PAMGuard database, you may see a blank entry in the instruments list as these new fields will not have been populated. Press new/edit to access the instrument settings from the Tethys module page.
+
+  
+  
+
+[Previous: Tethys module](tethys_module.html)
+
+[Next: Instrument calibrations](calibrations.html)

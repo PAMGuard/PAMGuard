@@ -1,0 +1,43 @@
+---
+title: "Information Tables"
+---
+ Information Tables  
+
+SIDE Module
+===========
+
+Information Tables
+------------------
+
+Two tables are shown in the middle of the SIDE Module display: the Test History and the Operations State.
+
+  
+
+### Test History
+
+![](images/SIDETestHist.png)  
+  
+
+The **_Test History_** table documents the tests that have run or are currently running. The _UTC_ column shows when the test was started, and the _Ops_ column indicates the Operations State when the test was started. _Version_ specifies the Sound Type Generator version being used. _Sequences_ is the number of sequences that have already been completed.
+
+A summary report can be generated any time after a test is complete by right-clicking on one or more tests listed in the table and selecting **_Process Test ##_** from the drop down menu.
+
+  
+  
+
+### Operations State
+
+![](images/SIDEOpStatTable.PNG)  
+  
+
+The **_Operations State_** table shows the changing operations statuses throughout the day. The current Operations State can be selected in the [Operations Status](SIDE_OpStat.html) panel along the left side of the SIDE Module display, and also in the [Sidebar](SIDE_Sidebar.html).
+
+Items in the table can be edited by right-clicking on the Operational Status and selecting _Edit_.
+
+  
+  
+  
+
+[Previous: Operations Status](SIDE_OpStat.html)
+
+[Next: Reporting Matrix](SIDE_ReportMatrix.html)

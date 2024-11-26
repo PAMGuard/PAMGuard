@@ -1,0 +1,31 @@
+---
+title: "Noise Band Displays"
+---
+ Noise Band Displays and Output    
+  
+
+Noise Band Displays and Output
+==============================
+
+Displays
+--------
+
+The user can select which bands to show on the scrolling display of sound pressure vs. time.
+
+In real time operation, the levels in individual bands are shown in the upper display.
+
+You can select to show either SPL across each band or spectrum level estimates.
+
+Right click on the lower display for display options.
+
+  
+![](Images/NoiseBandDisplay.png)  
+
+Output
+------
+
+Measurements are written to both the [Database](../../../utilities/generalDatabaseHelp/docs/database_database.html) and the [Binary Store](../../../utilities/BinaryStore/docs/binarystore_overview.html) if those modules are present in the PAMGuard configuration.
+
+  
+
+[Previous: Noise Band Measurements](NoiseBands.html)

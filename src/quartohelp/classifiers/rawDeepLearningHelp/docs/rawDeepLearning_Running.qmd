@@ -1,0 +1,26 @@
+---
+title: "Running"
+---
+ PAMGuard Deep Learning Module - Running  
+
+PAMGuard's Deep Learning Module
+===============================
+
+Running
+-------
+
+### Real time
+
+In real time, the deep learning model runs automatically when processing starts. A warning will appear if there are issues with the model and/or it cannot cope with real time speeds.
+
+### Viewer Mode
+
+The deep learning module can be re-run on _detector_ data (e.g. click or clip detections) in PAMGuard _viewer_ mode. Detections can be reclassified by selecting the _Settings > Raw Deep Learning Classifier > Reclassify detections_. Select the data range in the reprocessing dialog e.g. Loaded Data and select _Start_. Detections without a deep learning annotation will have one added and detections with an existing annotation will have it overwritten.
+
+  
+  
+  
+
+[Previous: Creating and Configuring the Deep Learning module](rawDeepLearning_CreateAndConfig.html)
+
+[Next: Viewing and Exporting Results](rawDeepLearning_Results.html)

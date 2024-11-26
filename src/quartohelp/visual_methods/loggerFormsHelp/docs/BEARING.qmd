@@ -1,0 +1,29 @@
+---
+title: "BEARING Property"
+---
+ BEARING Property  
+
+BEARING Property
+================
+
+The BEARING Property is used to tell PAMGuard which of the Controls contains bearing information (about a sighting, etc.)
+
+### Required Fields
+
+**Topic**
+
+The title of one of the other controls, which contains numeric data giving a bearing in degrees.
+
+**Topic**
+
+Must be one of the following:
+
+1.  MAGNETIC: Bearing is relative to magnetic North
+2.  TRUE: Bearing is relative to true North
+3.  RELATIVE1: Bearing is relative to the vessels heading
+4.  RELATIVE2: Bearing is relative to the vessels heading, but with left/right ambiguity
+
+  
+  
+
+[Back to form Design](./designingForms.html)

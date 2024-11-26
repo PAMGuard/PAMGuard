@@ -1,0 +1,49 @@
+---
+title: "Basic classifier"
+---
+ Basic Click Classification  
+
+Click Detector
+==============
+
+Basic Click Classification
+--------------------------
+
+  
+
+The Basic click Classifier is the same as the click classifier in the IFAW RainbowClick software. The basic classifier is generally adequate for the classification of high frequency harbour porpoise clicks.
+
+  
+  
+![ClickType (14K)](images/ClickTypeWithAlarm.png)  
+
+Clicks are classified according to any or all of 4 different tests. Each test has a check box to the left of its parameters which can be used to enable or disable particular tests. All enabled tests must be passed for a positive classification to result.
+
+**Test 1.** _Energy Band comparison_  
+The summed acoustic energy in two frequency bands (Test band and Control band) is compared. The energy in each band must lie in the ranges indicated and the ratio between the energy in the test band must exceed that in the control band by the specified number of decibels.
+
+**Test 2.** _Peak Frequency position_  
+The peak frequency must lie within a certain range. The search for the peak frequency need not cover the entire spectrum - for instance, if low frequency noise is always present, it will make more sense to start the search at a higher frequency as shown in the example, where the search is between 20kHz and 250kHz, and the peak frequency must lie in the range 100kHz to 150kHz.
+
+**Test 3.** _Peak frequency width_  
+Sets limits on the width of the spectral peak. The width is defined as the minimum amount of spectrum required to sum up to the specified percentage of the total click energy.
+
+**Test 4.** _Mean frequency_  
+Sets limits on the mean frequency of the click energy within the specified frequency band.
+
+**Test 5.** _Click length_  
+Sets limits on the length of the click in milliseconds. The length is defined as the minimum length of the data required to sum up to the specified percentage of the total click energy.
+
+**Acoustic Alarm**  
+Allows user to select the alarm associated with this click type. The alarms shown in the drop-down list are the ones previously defined in the [Acoustic Alarm Settings window](ClickDetector_clickAlarmOptions.html "Acoustic Alarm Settings window"). The user is also able to specify a maximum amount of elapsed time between detections, to minimize alarming on spurious clicks and focus on specific inter-click intervals. The alarm will not sound on a click detection if the elapsed time since the previous click detection is greater than this number.  
+  
+
+### Species Default settings
+
+The 'Species Defaults' button allows the user to use stored standard settings for beaked whale and harbour porpoise classifiers.
+
+  
+
+[Previous:Click Classification](ClickDetector_clickClassification.html)
+
+[Next: Advanced Click Classification](ClickDetector_betterClassification.html)
