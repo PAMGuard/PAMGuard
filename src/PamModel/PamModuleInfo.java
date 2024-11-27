@@ -32,6 +32,7 @@ public class PamModuleInfo implements PamDependent{
 	private String defaultName;
 	private Class moduleClass;
 	private String toolTipText;
+	private String helpPoint;
 	
 	private static final Class[] constrParams1 = {PamConfiguration.class, String.class};
 	private static final Class[] constrParams2 = {String.class};
@@ -626,6 +627,20 @@ public class PamModuleInfo implements PamDependent{
 	 */
 	public int getGUICompatabilityFlag(int index) {
 		return guiCombatibility.get(index);
+	}
+
+	/**
+	 * @return the helpPoint
+	 */
+	protected String getHelpPoint() {
+		return helpPoint;
+	}
+
+	/**
+	 * @param helpPoint the helpPoint to set
+	 */
+	protected void setHelpPoint(String helpPoint) {
+		this.helpPoint = helpPoint;
 	}
 
 
