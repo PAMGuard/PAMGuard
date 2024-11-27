@@ -462,7 +462,7 @@ public class DLClassifyProcess extends PamInstantProcess {
 	 */
 	private boolean checkGroupData(GroupedRawData rawDataUnit) {
 
-		if (PamArrayUtils.sum(rawDataUnit.getRawData())==0) {
+		if (PamArrayUtils.sumall(rawDataUnit.getRawData())==0) {
 			System.out.println("DLCLassifyProcess: Warning: the input data was all zero - no passing to DL Process: "); 
 			return false; 
 		}

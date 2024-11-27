@@ -217,8 +217,9 @@ public class DelphinIDUtils {
 			double[][] waveform = null;
 			Matrix waveformM = clicksStruct.getMatrix("wave", i);
 			waveform = DLMatFile.matrix2array(waveformM);
+			
 
-			clicks.add(new ClickDetectionMAT(basicData, waveform, (float) sampleRate)); 
+			clicks.add(new ClickDetectionMAT(basicData,PamArrayUtils.transposeMatrix(waveform), (float) sampleRate)); 
 		}
 
 		return clicks;

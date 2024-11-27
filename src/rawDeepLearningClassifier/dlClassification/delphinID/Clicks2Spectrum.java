@@ -1,9 +1,14 @@
 package rawDeepLearningClassifier.dlClassification.delphinID;
 
+import java.util.ArrayList;
+
 import org.jamdev.jpamutils.spectrum.Spectrum;
 
 import PamUtils.PamArrayUtils;
+import PamUtils.complex.ComplexArray;
+import PamguardMVC.PamDataUnit;
 import PamguardMVC.RawDataHolder;
+import PamguardMVC.RawDataTransforms;
 import rawDeepLearningClassifier.segmenter.SegmenterDetectionGroup;
 
 
@@ -15,20 +20,20 @@ public class Clicks2Spectrum {
 	private Spectrum spectrum;
 
 
-	public Clicks2Spectrum(SegmenterDetectionGroup clickGroup, double[] freqLimits, int fftLen) {
-		this.spectrum = clicks2Spectrum(clickGroup, freqLimits, fftLen);
+	public Clicks2Spectrum(SegmenterDetectionGroup clickGroup, int fftLen) {
+		this.spectrum = clicks2Spectrum(clickGroup.getSubDetections(), clickGroup.getSampleRate(), fftLen);
 	}
 	
 	
 
 	public Clicks2Spectrum(SegmenterDetectionGroup clickGroup, Clks2SpectrumParams transformParams) {
-		this(clickGroup, transformParams.freqLimits, transformParams.fftLength); 
+		this(clickGroup, transformParams.fftLength); 
 	}
 
 
 
 	/**
-	 * Convert whistles to a spectrum. 
+	 * Convert clicks to an average spectrum. 
 	 * @param whistleValues - whistle values. 
 	 * @param startseg - the start segment in seconds.
 	 * @param seglen - the segment length in seconds. 
@@ -36,21 +41,27 @@ public class Clicks2Spectrum {
 	 * @param minFragSize - the minimum fragment length in seconds. 
 	 * @return the average spectrum. 
 	 */
-	public Spectrum clicks2Spectrum(SegmenterDetectionGroup clickGroup, double[] freqLimits, int fftLen) {
+	public static Spectrum clicks2Spectrum(ArrayList<? extends PamDataUnit> arrayList, float sampleRate, int fftLen) {
 
 
 		//create an average spectrum
 		double[] fftAverage = new double[(int) (fftLen/2)]; 
 		double[] fftClk;
-		for (int i=0;i<clickGroup.getSubDetectionsCount(); i++) {
-			fftClk = ((RawDataHolder) clickGroup.getSubDetection(i)).getDataTransforms().getPowerSpectrum(0, fftLen); 
-		
+		for (int i=0;i<arrayList.size(); i++) {
+			
+			fftClk = ((RawDataHolder) arrayList.get(i)).getDataTransforms().getPowerSpectrum(0, fftLen); 
+			
+//			 ComplexArray arr = RawDataTransforms.getComplexSpectrumHann(((RawDataHolder) arrayList.get(i)).getWaveData()[0], fftLen); 
+			
+//			PamArrayUtils.printArray(arr.getReal()); 
+
 			fftAverage = PamArrayUtils.sum(fftAverage, fftClk); 
 		}
 		
-		fftAverage = PamArrayUtils.divide(fftAverage, clickGroup.getSubDetectionsCount());
+		fftAverage = PamArrayUtils.divide(fftAverage, arrayList.size());
 		
-		Spectrum spectrum = new Spectrum(fftAverage, null, clickGroup.getSampleRate());
+		Spectrum spectrum = new Spectrum(fftAverage, null, sampleRate);
+
 
 		return spectrum; 
 	}
