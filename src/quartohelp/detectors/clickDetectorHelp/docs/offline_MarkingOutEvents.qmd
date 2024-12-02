@@ -1,8 +1,6 @@
 ---
 title: "Marking out Events"
 ---
-Marking out Events  
-
 Click Detector Viewer Functions
 ===============================
 

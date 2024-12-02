@@ -1,8 +1,6 @@
 ---
 title: "Overview"
 ---
- Click Detector  
-
 Click Train Detector
 ====================
 

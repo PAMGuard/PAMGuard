@@ -1,8 +1,6 @@
 ---
 title: "Sound Recorder Operation"
 ---
- Sound Recorder Operation  
-
 Sound Recorder
 ==============
 
@@ -39,7 +37,7 @@ The four main control buttons and status display are duplicated in a side panel 
   
 ![Sound Recorder Side Panel](images/SoundRecorderSidePanel.png)  
   
-If a database module is active in the PAMGUARD model, then AIS data will be logged to the database  
+If a database module is active in the PAMGuard model, then AIS data will be logged to the database  
   
 
 [Previous: Sound Recorder Configuration](RecorderConfiguration.html)

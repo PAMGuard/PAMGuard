@@ -1,8 +1,6 @@
 ---
 title: "Running"
 ---
- PAMGuard Deep Learning Module - Running  
-
 PAMGuard's Deep Learning Module
 ===============================
 

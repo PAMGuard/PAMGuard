@@ -1,8 +1,6 @@
 ---
 title: "Offline Click Analysis Tools"
 ---
-Tools for marking an event  
-
 Click Detector Viewer Functions
 ===============================
 

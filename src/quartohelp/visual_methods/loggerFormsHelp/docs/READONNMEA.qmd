@@ -1,8 +1,6 @@
 ---
 title: "READONNMEA Property"
 ---
- READONNMEA Property  
-
 READONNMEA Property
 ===================
 

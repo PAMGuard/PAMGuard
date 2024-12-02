@@ -1,8 +1,6 @@
 ---
 title: "Setting the PC Clock"
 ---
- Clock Options  
-
 NMEA
 ====
 
@@ -12,7 +10,7 @@ Update PC Clock
   
 Accurate timing is critical to many survey and mitigation exercises.
 
-All timing within PAMGUARD uses the Universal Time Code (equivalent to GMT) which is read from the PC clock.
+All timing within PAMGuard uses the Universal Time Code (equivalent to GMT) which is read from the PC clock.
 
 The PC Clock should be set from the GPS, which receives an accurate time stamp from satellites.
 
@@ -22,10 +20,10 @@ Select the menu _**Detection>GPS>Update PC Clock**_ to open the dialog
   
 The upper text area shows the current PC time. When GPS data are received, the correct time will be printed in the lower text area and you are given the option of setting the PC clock from the GPS data.
 
-Check **"Auto set on PAMGUARD start-up"** and the PC clock will automatically be set from the GPS each time PAMGUARD starts.
+Check **"Auto set on PAMGuard start-up"** and the PC clock will automatically be set from the GPS each time PAMGuard starts.
 
 #### Time Zones
 
-Note that PAMGUARD sets and reads the PC clock in such as way that the local time, (for instance, as shown in the Windows task bar) may show a time different to UTC as governed by the time zone and daylight savings settings of your computer. Don't worry - this is perfectly normal. The correct UTC time as used by PAMGUARD is clearly visible on the GUI display. Setting the PC clock by hand from the control panel is likely to set the incorrect UTC in the machine.
+Note that PAMGuard sets and reads the PC clock in such as way that the local time, (for instance, as shown in the Windows task bar) may show a time different to UTC as governed by the time zone and daylight savings settings of your computer. Don't worry - this is perfectly normal. The correct UTC time as used by PAMGuard is clearly visible on the GUI display. Setting the PC clock by hand from the control panel is likely to set the incorrect UTC in the machine.
 
 [Previous: Configuring GPS](ConfiguringGPS.html)

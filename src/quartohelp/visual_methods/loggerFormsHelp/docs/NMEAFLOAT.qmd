@@ -1,8 +1,6 @@
 ---
 title: "NMEAFLOAT Control"
 ---
- NMEAFLOAT Control  
-
 NMEAFLOAT Control
 =================
 

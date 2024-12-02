@@ -1,8 +1,6 @@
 ---
 title: "Graphics Output"
 ---
- Difar Module  
-
 DIFAR Localisation
 ==================
 

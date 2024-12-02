@@ -1,8 +1,6 @@
 ---
 title: "Detection Grouper"
 ---
- Detection Grouper  
-
 Detection Grouper
 =================
 

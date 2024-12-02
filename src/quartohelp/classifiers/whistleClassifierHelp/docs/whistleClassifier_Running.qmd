@@ -1,8 +1,6 @@
 ---
 title: "Running the classifier"
 ---
- Whistle Classifier Overview  
-
 Whistle Classifier
 ==================
 
@@ -31,7 +29,7 @@ Either they will have been set when you ran the [Discriminant Function Training]
 
 Or you can load a set of training parameters from a Whistle Classifier Settings (\*.wcsd) file provided to you by someone else.
 
-To load parameters from a .wcsd file, press the 'Select ...' button and navigate to the file on your hard drive. the parameters will be loaded into your PAMGUARD configuration, so you will only need to access the file once.
+To load parameters from a .wcsd file, press the 'Select ...' button and navigate to the file on your hard drive. the parameters will be loaded into your PAMGuard configuration, so you will only need to access the file once.
 
 The remainder of the dialog shows information about how the training was set up (fragment length, frequency range, etc.). Since these parameters must be identical when you run the classifier to parameters used when training the classifier, you are unable to change any of these parameters.
 

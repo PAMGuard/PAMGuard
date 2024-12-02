@@ -1,8 +1,6 @@
 ---
 title: "Localisation Algorithms"
 ---
- Target Motion Overview 
-
 Target Motion
 =============
 
@@ -11,7 +9,7 @@ Localisation Algorithms
 
   
 
-PAMGUARD allows the user to select a number of localisation algorithms for target motion analysis. The mathematical basis behind these algorithms can be found in the [Localisation Techniques](../../../localisation/docs/localisation_algorithms.html) section.  
+PAMGuard allows the user to select a number of localisation algorithms for target motion analysis. The mathematical basis behind these algorithms can be found in the [Localisation Techniques](../../../localisation/docs/localisation_algorithms.html) section.  
   
 The Localisation algorithms utilised in target motion analysis are either 2D or 3D in nature. A 2D algorithm does not consider depth as a variable and will attempt to find the most likely position of the source on the sea surface. A 3D algorithm attempts to localise in all three dimensions.  
   

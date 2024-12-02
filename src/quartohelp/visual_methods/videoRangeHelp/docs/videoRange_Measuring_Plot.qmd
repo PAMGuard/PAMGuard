@@ -1,8 +1,6 @@
 ---
 title: "Measuring to the horizon"
 ---
- Video Range Measuring  
-
 Video Range
 ===========
 
@@ -27,7 +25,7 @@ _The figure above shows an example of an image taken from a shore station showin
 
 If **Bearings** have been obtained manually (e.g. from a bearing ring or compass) then they should be entered as true bearings in the box in the bar at the top of the display window. The incremental angle for each point plotted within the image is calculated and added to the bearing angle.
 
-PAMGUARD includes modules for measuring bearings automatically and help on these can be found here [Angle Measurement](../../angleMeasurementHelp/docs/angleMeasurement.html)
+PAMGuard includes modules for measuring bearings automatically and help on these can be found here [Angle Measurement](../../angleMeasurementHelp/docs/angleMeasurement.html)
 
 Settings will remain in place unless changed. To analyse additional images with the same settings simply **Load** the new image.
 

@@ -30,7 +30,9 @@ public class PamIcon {
 //		String path = "Resources/pamguardIcon.png";
 		String path = "Resources/PAMGuardIcon2Opaque.png";
 
-		if (System.getProperty("os.name").equals("Linux") || System.getProperty("os.name").startsWith("Mac")) {
+		if (System.getProperty("os.name").equals("Linux") 
+				|| System.getProperty("os.name").startsWith("Mac")
+				|| System.getProperty("os.name").startsWith("Win")) {
 			switch (sizeFlag) {
 			case SMALL:
 				path = "Resources/PAMGuardIcon2small.png";

@@ -1,12 +1,10 @@
 ---
 title: "Overview"
 ---
- Sound Acquisition  
-
 Sound Acquisition Overview
 ==========================
 
-PAMGUARD is designed to analyse data in real time using a sound card or other data acquisition device or from previously recorded data stored as a hard disk recording.
+PAMGuard is designed to analyse data in real time using a sound card or other data acquisition device or from previously recorded data stored as a hard disk recording.
 
 ### Adding a Sound Acquisition Module
 

@@ -1,8 +1,6 @@
 ---
 title: "Creation and Configuration"
 ---
- PAMGuard Deep Learning Module - Create and Configure  
-
 PAMGuard Deep Learning Module
 =============================
 

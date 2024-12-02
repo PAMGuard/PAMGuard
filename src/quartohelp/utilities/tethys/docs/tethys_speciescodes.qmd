@@ -1,8 +1,6 @@
 ---
 title: "ITIS Species Codes"
 ---
- Species coding  
-
 Species and Call Type Names
 ===========================
 

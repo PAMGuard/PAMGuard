@@ -1,8 +1,6 @@
 ---
 title: "Sound Cards"
 ---
- Sound Cards  
-
 Sound Cards
 ===========
 
@@ -26,7 +24,7 @@ The audio quality of many sound cards is very poor and some, particularly those 
 
 ### USB
 
-Many external sound cards connect using USB. While convenient, we have often experienced problems with USB sound cards 'dropping' data. This happens more when the computer is busy (which it will be when you're running PAMGUARD). These drop outs can result in the lost of several percent of your audio input data.
+Many external sound cards connect using USB. While convenient, we have often experienced problems with USB sound cards 'dropping' data. This happens more when the computer is busy (which it will be when you're running PAMGuard). These drop outs can result in the lost of several percent of your audio input data.
 
 If you are using a laptop and need an external sound card, try to get one that connects using Firewire (IEEE 1394).
 

@@ -1,8 +1,6 @@
 ---
 title: "Array Accelerometer Readout"
 ---
- Array Accelerometer  
-
 Array Accelerometer
 ===================
 
@@ -22,7 +20,7 @@ Three axis accelerometers are readily available at low cost (most of us probably
 
 The system currently only works with MeasurementComputing data acquisition cards ([www.mccdaq.com](http://www.mccdaq.com)) but may be extended to support other devices in the future. It is possible to use the same MeasurementComputing card with the Array Accelerometer module and the [Hydrophone Depth Module](../../../utilities/depthreadout/docs/depth_overview.html)
 
-Pith and roll information is passed to the [hydrophone array manager](../../../utilities/hydrophoneArrayManagerHelp/docs/Array_Overview.html) which makes it available to other PAMGUARD modules as required.
+Pith and roll information is passed to the [hydrophone array manager](../../../utilities/hydrophoneArrayManagerHelp/docs/Array_Overview.html) which makes it available to other PAMGuard modules as required.
 
 [hydrophone array configuration dialog](../../../utilities/hydrophoneArrayManagerHelp/docs/Array_Configuration.html).
 
@@ -33,7 +31,7 @@ A small side panel shows a graph of recent pitch and roll history.
 
 ### Database output
 
-Both the raw voltage data and the calculated pitch and roll are written to the [database](../../generalDatabaseHelp/docs/database_database.html). It is therefore possible to recalculate pitch and roll off-line if sensors are re-calibrated at any point. (PAMGUARD will not currently do this for you - you'll have to work it out for yourself using your own software).  
+Both the raw voltage data and the calculated pitch and roll are written to the [database](../../generalDatabaseHelp/docs/database_database.html). It is therefore possible to recalculate pitch and roll off-line if sensors are re-calibrated at any point. (PAMGuard will not currently do this for you - you'll have to work it out for yourself using your own software).  
   
 
 [Next: Accelerometer Configuration](accelerometer_configuration.html)

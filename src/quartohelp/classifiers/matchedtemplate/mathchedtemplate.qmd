@@ -1,8 +1,6 @@
 ---
 title: "Matched Template Classifier"
 ---
-Matched Click Classifier  
-
 Matched click classifier
 ========================
 

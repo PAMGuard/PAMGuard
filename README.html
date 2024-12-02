@@ -299,16 +299,13 @@ ul
 
 <p class=MsoTitle>PAMGuard Release Notes</p>
 
-<p class=MsoNormal>(Note that the ordering of release notes is now reversed in
-this document with the latest version coming first). </p>
-
 <h1><a name="_Toc444450390"></a><a name="_Toc444450026"></a><a
 name="_Toc312065297"></a><a name="_Toc312063942"></a>ABOUT PAMGuard</h1>
 
-<p class=MsoNormal>The PAMGUARD project develops software to help detect,
+<p class=MsoNormal>The PAMGuard project develops software to help detect,
 locate and classify marine mammals using Passive Acoustic Monitoring.</p>
 
-<p class=MsoNormal>See <a href="http://www.pamguard.org">http://www.pamguard.org</a></p>
+<p class=MsoNormal>See <a href="http://www.PAMGuard.org">http://www.PAMGuard.org</a></p>
 
 <p class=MsoNormal>Code is now on GitHub at <a
 href="https://github.com/PAMGuard">https://github.com/PAMGuard</a>. </p>
@@ -316,7 +313,7 @@ href="https://github.com/PAMGuard">https://github.com/PAMGuard</a>. </p>
 <h1><a name="_Toc444450391"></a><a name="_Toc444450027"></a><a
 name="_Toc312065298"></a><a name="_Toc312063943"></a>LICENSE</h1>
 
-<p class=MsoNormal>PAMGUARD is free software, and you are welcome to
+<p class=MsoNormal>PAMGuard is free software, and you are welcome to
 redistribute and modify it under the terms of the GNU General Public License
 (either version 3 or any later version - <a
 href="http://www.gnu.org/licenses/gpl-3.0-standalone.html">http://www.gnu.org/licenses/gpl-3.0-standalone.html</a>).</p>
@@ -348,7 +345,7 @@ href="https://java.com/en/download/manual.jsp">https://java.com/en/download/manu
 <p class=MsoNormal>Note that the interface to Microsoft Access databases is not
 supported in the 64 bit version or when using a 32 bit Java 8. </p>
 
-<h1><a name="_Toc444450029"></a><a name="_Toc444450393"></a>STARTING PAMGUARD</h1>
+<h1><a name="_Toc444450029"></a><a name="_Toc444450393"></a>STARTING PAMGuard</h1>
 
 <p class=MsoNormal>On Windows, the installers will create shortcuts in the
 Windows Start menu.</p>
@@ -356,18 +353,18 @@ Windows Start menu.</p>
 <p class=MsoNormal>In a Windows operating system you may want to set the
 preferences for the launchers (and/or the shortcuts to them) to state that they
 should always be run under Administrator privileges. These are required if you
-want PAMGUARD to be able to perform actions such as using the GPS time to set
+want PAMGuard to be able to perform actions such as using the GPS time to set
 the system clock. </p>
 
 <p class=MsoNormal>If using other operating systems such as Linux or Mac OS X
-you should be able to launch PAMGUARD via an appropriate command line which
+you should be able to launch PAMGuard via an appropriate command line which
 should be something like:</p>
 
 <p class=MsoNormal><em><span style='font-family:"Calibri",sans-serif'>java
--Xms384m -Xmx4096m -Djava.library.path=lib64 -jar Pamguard_xxxxxx.jar</span></em></p>
+-Xms384m -Xmx4096m -Djava.library.path=lib64 -jar PAMGuard_xxxxxx.jar</span></em></p>
 
 <p class=MsoNormal>The -Xms384m -Xmx4096m specify the initial and maximum heap
-size for the JVM being used to run Pamguard i.e. how much memory it gets to
+size for the JVM being used to run PAMGuard i.e. how much memory it gets to
 use. The default max size usually being too low.</p>
 
 <p class=MsoNormal>The -Djava.library.path=lib64 tells the JVM that it should
@@ -377,11 +374,11 @@ for the 32 bit version).</p>
 
 <p class=MsoNormal>For &quot;Mixed&quot; and &quot;Viewer&quot; modes just add
 a &quot;-m&quot; or &quot;-v&quot; to the list of java arguments. On Windows
-just run the appropriately named executable (e.g. PamguardBeta_MixedMode.exe or
-PamguardBeta_ViewerMode.exe):</p>
+just run the appropriately named executable (e.g. PAMGuardBeta_MixedMode.exe or
+PAMGuardBeta_ViewerMode.exe):</p>
 
 <p class=MsoNormal><em><span style='font-family:"Calibri",sans-serif'>java
--Xms384m -Xmx4096m -Djava.library.path=lib64 -jar PamguardBeta_xxxxxx.jar -v</span></em></p>
+-Xms384m -Xmx4096m -Djava.library.path=lib64 -jar PAMGuardBeta_xxxxxx.jar -v</span></em></p>
 
 <p class=MsoNormal><em><span style='font-family:"Calibri",sans-serif'>&nbsp;</span></em></p>
 
@@ -475,7 +472,11 @@ name="_Latest_Version_2.02.05"></a><a name="_Latest_Version_2.02.06"></a><a
 name="_Latest_Version_2.02.07"></a><a name="_Latest_Version_2.02.08"></a><a
 name="_Version_2.02.09_June"></a><a name="_Version_2.02.10_January"></a><a
 name="_Version_2.02.11_April"></a><a name="_Version_2.02.14_October"></a><a
+<<<<<<< Updated upstream
 name="_Version_2.02.Next"></a>Version 2.02.15 December 2014</h1>
+=======
+name="_Version_2.02.Next"></a>Version 2.02.15 December 2024</h1>
+>>>>>>> Stashed changes
 
 <p class=MsoNormal>First official release for MacOS11+, ARM Processors</p>
 
@@ -498,6 +499,8 @@ closed with an incorrect end time. </p>
 to first available input source. </p>
 
 <p class=MsoNormal>Removed unnecessary text output from DL classifier module. </p>
+
+<p class=MsoNormal>Fixed units on spectrogram displays for air based measurements.</p>
 
 <h1>Version 2.02.14 October 2024</h1>
 
@@ -638,7 +641,7 @@ audio data in Viewer mode. </span></p>
 
 <p class=MsoNormal><b><span lang=EN-US>Viewer Launch</span></b><span
 lang=EN-US> by right clicking on sqlite database and selecting “open with /
-Pamguard ViewerMode” launcher menu option.</span></p>
+PAMGuard ViewerMode” launcher menu option.</span></p>
 
 <h2><span lang=EN-US>Bug Fixes</span></h2>
 
@@ -968,7 +971,7 @@ thoroughly tested and a number of bugs rectified. Documentation has been
 developed and is available in the online help. Further, a number of example
 configurations have been generated, configuration files for these are available
 in the PAMGuard downloads area <a
-href="http://www.pamguard.org/downloads.php?cat_id=3">here</a>.</p>
+href="http://www.PAMGuard.org/downloads.php?cat_id=3">here</a>.</p>
 
 <p class=MsoNormal><b><span lang=EN-US>Detection Group Localiser</span></b><span
 lang=EN-US> </span></p>
@@ -1088,7 +1091,7 @@ lang=EN-US> </span>Noise Level Outputs - as an aid to performance diagnosis,
 some detectors (currently the GPL, Click Detector and Whistle and Moan
 Detector) are outputting additional noise metrics to their binary output files.
 These can be read with the <a
-href="https://sourceforge.net/projects/pamguard/files/Matlab/">PAMGuard Matlab
+href="https://sourceforge.net/projects/PAMGuard/files/Matlab/">PAMGuard Matlab
 library</a> and used to diagnose system performance in varying noise
 conditions. Improved displays within PAMGuard for these noise metrics will be
 included in a future release. </p>
@@ -1425,11 +1428,11 @@ PSFX files when PAMGuard exits.</p>
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>1. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
 lang=EN-US> </span>Bug 433. Custom storage options were being lost when
-Pamguard restarted.</p>
+PAMGuard restarted.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
-lang=EN-US> </span>Bug 434. Pamguard Viewer mode was having problems importing
+lang=EN-US> </span>Bug 434. PAMGuard Viewer mode was having problems importing
 settings from psfx file.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>3. </span><span
@@ -1530,7 +1533,7 @@ lang=EN-US> </span>Functionality to clone hydrophone streamers. </p>
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>5. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
 Added automatic log file - all messages to the console will now be written to a
-txt file as well. File is stored in user.home/Pamguard folder - look under the
+txt file as well. File is stored in user.home/PAMGuard folder - look under the
 Help menu item for a shortcut to open the folder. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>6. </span><span
@@ -1699,7 +1702,7 @@ were present.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>11. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 424. Pamguard would occasionally freeze when processing offline
+</span>Bug 424. PAMGuard would occasionally freeze when processing offline
 files.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>12. </span><span
@@ -1783,7 +1786,7 @@ Signal Amplifier and the multithreading options are changed. Fixed.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>4. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 406. Pamguard resetting UID values in binary files. </p>
+</span>Bug 406. PAMGuard resetting UID values in binary files. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>5. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2008,9 +2011,9 @@ lang=EN-US> </span>Added ability to read differential GPS data.</p>
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>5. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span
 lang=EN-US> </span>Added check for duplicate settings in the psf file when
-exiting Pamguard. If duplicate settings are found, user is given the option to
+exiting PAMGuard. If duplicate settings are found, user is given the option to
 leave them in the psf or get rid of them. Duplicate settings are ignored by
-Pamguard, but can cause the psf file to grow large over time.</p>
+PAMGuard, but can cause the psf file to grow large over time.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>6. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -2066,7 +2069,7 @@ for Clicks.</p>
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>7. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span>Bug 373. Incorrect GPS headings in the database are propagated through
-Pamguard and cause problems with mapping and TMA.</p>
+PAMGuard and cause problems with mapping and TMA.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>8. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2079,7 +2082,11 @@ lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nb
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>10. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span>Bug 376. Error when using a serialised data map which spans a period of time
+<<<<<<< Updated upstream
 in which Pamguard modules have changed.</p>
+=======
+in which PAMGuard modules have changed.</p>
+>>>>>>> Stashed changes
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>11. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2114,7 +2121,7 @@ lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nb
 lang=EN-US> </span>Added option to export all settings and parameters as an
 XML-formatted file. Note that this required changes to the structure of the
 Array Manager, and as such any settings (psf) files created with this version
-of Pamguard cannot be used in older versions. Older psf files can be loaded
+of PAMGuard cannot be used in older versions. Older psf files can be loaded
 with this version, but will be converted.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>4. </span><span
@@ -2136,7 +2143,7 @@ with installation and use of this version.</span></p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>1. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 355. Pamguard crashed when database module was present and Rocca
+</span>Bug 355. PAMGuard crashed when database module was present and Rocca
 tried to load classifier</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2. </span><span
@@ -2155,7 +2162,7 @@ lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nb
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>5. </span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 359. Pamguard crashes when selecting auto-scale option in Noise
+</span>Bug 359. PAMGuard crashes when selecting auto-scale option in Noise
 Monitor module</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>6. </span><span
@@ -2209,7 +2216,7 @@ with installation and use of this version.</span></p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>1.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 334. Fixed problem of GPS dialog occasionally resizing Pamguard
+</span>Bug 334. Fixed problem of GPS dialog occasionally resizing PAMGuard
 window.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2.</span><span
@@ -2239,7 +2246,7 @@ invalid entries.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>7.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 347. Pamguard crashes when loading a Sound Acquisition module when
+</span>Bug 347. PAMGuard crashes when loading a Sound Acquisition module when
 Java 7 is installed on computer. Caused by JFLAC library, which has been
 recompiled to correct issue.</p>
 
@@ -2456,7 +2463,7 @@ Hawaii/Temperate Pacific/North Atlantic datasets. This has been corrected.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 320. Pamguard stopped reading Click Detector Event data from
+</span>Bug 320. PAMGuard stopped reading Click Detector Event data from
 database when target motion analysis information was encountered. Corrected.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>3.</span><span
@@ -2470,7 +2477,7 @@ lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nb
 </span>Added Copy-to-Clipboard button to Warning dialogs, to store error
 messages and stack trace information on the Windows clipboard. This information
 can then be easily pasted into emails, text documents, etc when contacting
-Pamguard support.</p>
+PAMGuard support.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span lang=EN-US>2.</span><span
 lang=EN-US style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -2497,7 +2504,7 @@ saying what get's plotted on each map and for how long became corrupted and the
 list grew to a ridiculous size. Code has been put in place to a) stop it
 happening again and b) to repair any configuration files which are corrupted.
 Corrupted files will be slow to load, slow to save and will be &gt; several
-megabytes in size. It may be necessary to delete the PamguardSettings table in
+megabytes in size. It may be necessary to delete the PAMGuardSettings table in
 any databases since these too may have become oversized which will slow down
 viewer mode PAMGuard start-up.</p>
 
@@ -2561,7 +2568,11 @@ jar file will be required rather than a new bespoke PAMGuard installation.</span
 <p class=MsoNormal><span lang=EN-US>Module code development remains largely
 unchanged, in most cases simply requiring the addition of an interface class.
 &nbsp;Instructions for the development of new modules utilizing the plug-in
+<<<<<<< Updated upstream
 scheme can be found <a href="http://www.pamguard.org/16_HowtomakePlug-Ins.html"
+=======
+scheme can be found <a href="http://www.PAMGuard.org/16_HowtomakePlug-Ins.html"
+>>>>>>> Stashed changes
 target="_blank">here</a>. &nbsp;Plug-in modules can be downloaded from the PAMGuard
 website here, but developers are encouraged to host and maintain their own
 modules.</span></p>
@@ -2942,7 +2953,7 @@ Bearings from each pair are crossed to create a localization. Fixed.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'>5.<span style='font-size:
 7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Bug 270. Improved file names display in Pamguard Viewer offline data map
+</span>Bug 270. Improved file names display in PAMGuard Viewer offline data map
 and datagram creation.</p>
 
 <h1><a name="_Toc444450394"></a><span lang=EN-US>Version 1.15.00 February 2016</span></h1>
@@ -3183,7 +3194,7 @@ lang=EN-AU>9.</span><span lang=EN-AU style='font-size:7.0pt;font-family:"Times N
 incorrectly preventing cross-fixes for some calls.</span></p>
 
 <p class=MsoNormal>Details of these bugs can be found at <a
-href="https://sourceforge.net/p/pamguard/bugs">https://sourceforge.net/p/pamguard/bugs</a></p>
+href="https://sourceforge.net/p/PAMGuard/bugs">https://sourceforge.net/p/PAMGuard/bugs</a></p>
 
 <h1><a name="_Toc444450397">Version 1.13.04 Beta, June 2015</a></h1>
 
@@ -3284,7 +3295,7 @@ displayed at 0 degrees on the bearing time display.</span></p>
 lang=EN-US>&nbsp;</span></p>
 
 <p class=MsoNormal>Details of these bugs can be found at <a
-href="https://sourceforge.net/p/pamguard/bugs">https://sourceforge.net/p/pamguard/bugs</a></p>
+href="https://sourceforge.net/p/PAMGuard/bugs">https://sourceforge.net/p/PAMGuard/bugs</a></p>
 
 <h1><a name="_Toc444450398">Version 1.13.03 Beta, March 2015</a></h1>
 
@@ -3588,24 +3599,28 @@ whistle.</p>
      stops or fails to start generating sounds. </li>
  <li class=MsoNormal style='margin-bottom:0cm'>Bug in calculated spectrum
      levels if data were decimated (<a
-     href="http://sourceforge.net/p/pamguard/bugs/187/">http://sourceforge.net/p/pamguard/bugs/187/</a>)
+     href="http://sourceforge.net/p/PAMGuard/bugs/187/">http://sourceforge.net/p/PAMGuard/bugs/187/</a>)
      . Did not affect band level calculations. </li>
  <li class=MsoNormal style='margin-bottom:0cm'>Bug in noise band monitor.
      Crashed when sample rate was exactly 2kHz. Fixed </li>
  <li class=MsoNormal style='margin-bottom:0cm'>Memory leak in click detector.
      Severe memory leak when processing clicks in viewer mode now fixed. </li>
  <li class=MsoNormal style='margin-bottom:0cm'>Flickering of click display (<a
-     href="http://sourceforge.net/p/pamguard/bugs/191/">http://sourceforge.net/p/pamguard/bugs/191/</a>)
+     href="http://sourceforge.net/p/PAMGuard/bugs/191/">http://sourceforge.net/p/PAMGuard/bugs/191/</a>)
      now fixed. </li>
  <li class=MsoNormal style='margin-bottom:0cm'>Logger forms crashing in Viewer
      mode. Bug now fixed. </li>
  <li class=MsoNormal style='margin-bottom:0cm'>Storage options (<a
-     href="https://sourceforge.net/p/pamguard/bugs/175/">https://sourceforge.net/p/pamguard/bugs/175/</a>)
+     href="https://sourceforge.net/p/PAMGuard/bugs/175/">https://sourceforge.net/p/PAMGuard/bugs/175/</a>)
      whereby clicks were stored to database is now fixed. </li>
  <li class=MsoNormal style='margin-bottom:0cm'>Sound Recorder output folder is
      now defaulting to the User folder (Generally
      C:\Users\username\PAMRecordings) instead of C:\Program Files
+<<<<<<< Updated upstream
      (x86)\PamguardBeta which didn't work since the software doesn't have write
+=======
+     (x86)\PAMGuardBeta which didn't work since the software doesn't have write
+>>>>>>> Stashed changes
      access to that folder. </li>
 </ol>
 
@@ -3623,7 +3638,7 @@ indeed any other data stream within PAMGuard). &nbsp;</p>
 computers local time on the main display panel. </p>
 
 <p class=MsoNormal style='margin-left:36.0pt'>WILD interface: provides the user
-the ability to integrate Pamguard with the WILD ArcGIS-based marine mammal
+the ability to integrate PAMGuard with the WILD ArcGIS-based marine mammal
 survey software package.</p>
 
 <p class=MsoNormal><b>New Features</b></p>
@@ -3847,7 +3862,7 @@ Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span>Offline event marking. Offline event marking similar to functionality in
-RainbowClick is now available in the PAMGUARD viewer. Event summary data is
+RainbowClick is now available in the PAMGuard viewer. Event summary data is
 stored in the database and can also be exported to text files (e.g. for
 importing into the Distance software).&nbsp; </p>
 
@@ -3902,7 +3917,7 @@ to 0dN</p>
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span>The Binary store now saves a complete data map between runs of the
-PAMGUARD viewer. This leads to significant improvements in the time the viewer
+PAMGuard viewer. This leads to significant improvements in the time the viewer
 takes to load large data sets.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
@@ -4004,13 +4019,13 @@ displaying spectrogram data during viewer mode operation.&nbsp; </p>
 
 <p class=MsoNormal>3. Heading sensor readout</p>
 
-<p class=MsoNormal>PAMGUARD can now read true or magnetic heading data from
+<p class=MsoNormal>PAMGuard can now read true or magnetic heading data from
 gyro compasses, fluxgate compasses, etc. See help for details.</p>
 
 <p class=MsoNormal>4. Click detector offline event marking</p>
 
 <p class=MsoNormal>Functionality for offline analysis, similar to that in
-RainbowClick is now partially incorporated into the PAMGUARD click detector in
+RainbowClick is now partially incorporated into the PAMGuard click detector in
 viewer mode. Help files have not yet been developed for these features. </p>
 
 <p class=MsoNormal>5. Better support in the Decimator module for non-integer
@@ -4039,7 +4054,7 @@ recording names under Linux (which uses &quot;/&quot; as opposed to
 <p class=MsoNormal>Acquisition dialog for ASIO sound cards was resetting all
 channel numbers to zero.</p>
 
-<p class=MsoNormal>Degree symbols throughout PAMGUARD have been fixed so that
+<p class=MsoNormal>Degree symbols throughout PAMGuard have been fixed so that
 they work on all Win64, (Mac and Linux.)</p>
 
 <p class=MsoNormal>An unnecessary channel warning from the seismic veto has
@@ -4052,9 +4067,9 @@ become too bit to fit on a screen. </p>
 <p class=MsoNormal><b>New Feature</b></p>
 
 <p class=MsoNormal>psf file name is now displayed in the title bar of the main
-PAMGUARD display. </p>
+PAMGuard display. </p>
 
-<p class=MsoNormal>Windows Installer now sets permissions on PAMGUARD folder so
+<p class=MsoNormal>Windows Installer now sets permissions on PAMGuard folder so
 that don't need to be an administrator in order to create new files in that
 directory. Prevents problems especially under Vista/Windows 7 when saving psfs
 and recording sounds to the default directory.&nbsp; </p>
@@ -4066,19 +4081,19 @@ and recording sounds to the default directory.&nbsp; </p>
 <p class=MsoNormal>A new internal channel numbering scheme for ASIO sound cards
 was released on 8 March in Alpha version 1.8.02. These changes have now been
 promoted to this Beta release 1.9.00. These changes were described in an email
-to PAMGUARD User, the text of which is repeated here:</p>
+to PAMGuard User, the text of which is repeated here:</p>
 
-<p class=MsoNormal>Within PAMGUARD, there have been constant problems with
+<p class=MsoNormal>Within PAMGuard, there have been constant problems with
 lookup tables relating hardware channel numbers to internal channel numbers.
 99.9% of the time, this is not a problem since people are just reading channels
 0 and 1 from a normal sound card or a list of channels 0,1,2,3, etc from an
 ASIO card or National Instruments card. However, when using the ASIO sound
 acquisition system, it is possible to read out hardware channels 2,3,4,5 say
-and those numbers would propagate through PAMGUARD and be used by all the
+and those numbers would propagate through PAMGuard and be used by all the
 detectors. While this gave some clarity to&nbsp; the displays, it also created
 a number of problems since look up tables were constantly required to relate
-hardware numbers and software numbers in every PAMGUARD module. Since this type
-of channel numbering was only implemented several years into the PAMGUARD
+hardware numbers and software numbers in every PAMGuard module. Since this type
+of channel numbering was only implemented several years into the PAMGuard
 project, it was never fully implemented or well supported by the different
 modules which resulted in a number of bugs which could cause confusion as to
 which hydrophones were being used during localisation or during calibrated
@@ -4087,10 +4102,10 @@ sound cards such as the RME Fireface 400 on which the most useful inputs, the
 balanced line inputs, are hardware channels 4,5,6 and 7 on the back of the instrument.
 (On the Fireface 800, the balanced line inputs are channels 0 to 7). When using
 the National Instruments system, data were always sent into the rest of
-PAMGUARD with sequential channel numbering starting at 0. This was required in
+PAMGuard with sequential channel numbering starting at 0. This was required in
 order to support multiple NI Daq boards where it is possible to read for
 example channel 0 and 1 on two different devices, so to uniquely identify
-channels in the rest of PAMGUARD, the only rational thing to do was to re-label
+channels in the rest of PAMGuard, the only rational thing to do was to re-label
 those channels 0,1,2,3. </p>
 
 <p class=MsoNormal>There have been other annoyances with the ASIO channel
@@ -4102,10 +4117,10 @@ reconfigure every detector and several of the displays to handle the changes in
 channel numbering. </p>
 
 <p class=MsoNormal>I have spent a considerable amount of time trying to work
-out a better system for handling channel numbering in PAMGUARD and have decided
+out a better system for handling channel numbering in PAMGuard and have decided
 that the only practical thing to do is to force all software channel numbering
 back to a zero indexed system. i.e. even if you read out hardware channels
-3,4,5 and 6, within PAMGUARD, everywhere apart from the Sound acquisition
+3,4,5 and 6, within PAMGuard, everywhere apart from the Sound acquisition
 dialog, you will see them listed as channels 0,1,2 and 3. &nbsp;The
 consequences of doing this are mainly very good. Most users will not notice any
 changes. For those who need for some reason to read channel numbers not
@@ -4117,10 +4132,10 @@ number. </p>
 
 <p class=MsoNormal><b>Other Changes / new features</b></p>
 
-<p class=MsoNormal>PAMGUARD Viewer</p>
+<p class=MsoNormal>PAMGuard Viewer</p>
 
 <p class=MsoNormal>The way in which data are loaded for each module has changed
-in the PAMGUARD viewer. In the scroll bar for each display, at the right hand
+in the PAMGuard viewer. In the scroll bar for each display, at the right hand
 end, there are buttons for pagingforward, backward and setting page length
 options. </p>
 
@@ -4137,7 +4152,7 @@ minute of data during real time operation. </p>
 
 <p class=MsoNormal>Bearings are now written to the database.</p>
 
-<p class=MsoNormal>PAMGUARD Viewer scrolling mechanism has changed. </p>
+<p class=MsoNormal>PAMGuard Viewer scrolling mechanism has changed. </p>
 
 <p class=MsoNormal>Each display now has a small control in the right hand end
 of a scroll bar or a slider which allows you to page through data. This is only
@@ -4146,15 +4161,15 @@ more displays are set up for offline data viewing in future releases. </p>
 
 <p class=MsoNormal>Viewer data map</p>
 
-<p class=MsoNormal>When using the PAMGUARD viewer an additional panel will be
+<p class=MsoNormal>When using the PAMGuard viewer an additional panel will be
 displayed showing an overview of data quantity (per hour) from the various
-database tables connected to PAMGUARD. </p>
+database tables connected to PAMGuard. </p>
 
 <p class=MsoNormal>Spectrogram Display overlays</p>
 
 <p class=MsoNormal>The mechanism behind this has changed. Should not affect
 operations, but if you have problems with overlays on the spectrogram, please
-notify <a href="mailto:support@pamguard.org">support@pamguard.org</a> </p>
+notify <a href="mailto:support@PAMGuard.org">support@PAMGuard.org</a> </p>
 
 <p class=MsoNormal>All display overlays</p>
 
@@ -4210,7 +4225,11 @@ port is closed. Might prevent a few problems when using a GPS. </p>
 <p class=MsoNormal>Crashes caused in real time or Mixed Mode if the number of software
 channels exceeds the number of hydrophones configured in the array manager. It
 is of course illogical to have software channels which are not assigned to a
+<<<<<<< Updated upstream
 hydrophone, so rather than entirely prevent PAMGUARD from crashing I have
+=======
+hydrophone, so rather than entirely prevent PAMGuard from crashing I have
+>>>>>>> Stashed changes
 inserted additional checks into the hydrophone array dialog which will prevent
 the user from closing that dialog unless all software channels are assigned to
 a hydrophone. </p>
@@ -4275,7 +4294,7 @@ exceeded 3s a false buffer overflow would occur).</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Major changes to the multi-threading model in PAMGUARD. </p>
+</span>Major changes to the multi-threading model in PAMGuard. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -4324,7 +4343,7 @@ around so that time is up the screen rather than across.&nbsp; </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Checks on Recordings and Clicks output folders before PAMGUARD starts. </p>
+</span>Checks on Recordings and Clicks output folders before PAMGuard starts. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -4360,7 +4379,7 @@ display correctly and amplitude scale updates after scale parameter changes. </p
 
 <p class=MsoNormal>PAMGAURD FFT calculations now use the JTransforms FFT
 library which gives a factor 2 speed improvement compared to previous FFT
-methods used in PAMGUARD</p>
+methods used in PAMGuard</p>
 
 <p class=MsoNormal><b>New Modules</b></p>
 
@@ -4434,7 +4453,7 @@ menus (right click) and also allow printing.&nbsp; </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Installer now checks for previous versions of PAMGUARD and uninstalls
+</span>Installer now checks for previous versions of PAMGuard and uninstalls
 them before proceeding with installation.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
@@ -4448,7 +4467,7 @@ Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif
 </span>When running the *.exe launchers on a 64 bit version of Windows they now
 perform a check as to whether a 32bit JVM is available. (Until 64bit versions
 of all the relevant shared libraries are available a 32bit JVM is still
-required to get access to the full functionality of PAMGUARD)</p>
+required to get access to the full functionality of PAMGuard)</p>
 
 <h2>Version 1.5.01 Beta</h2>
 
@@ -4475,7 +4494,7 @@ loaded. Now issues a warning message to the terminal and does not crash. </p>
 <p class=MsoNormal>The National Instruments interface has now been
 comprehensively rewritten and is now stable. One or more NI data acquisition
 devices can be used to acquire high speed data on multiple channels. See the
-PAMGUARD help file for details. </p>
+PAMGuard help file for details. </p>
 
 <p class=MsoNormal><b>Performance Tests</b></p>
 
@@ -4489,18 +4508,18 @@ tests and the &nbsp;corresponding help files can be finalised.</p>
 
 <p class=MsoNormal><b>New Features</b></p>
 
-<p class=MsoNormal>Details of new features are documented in the PAMGUARD
+<p class=MsoNormal>Details of new features are documented in the PAMGuard
 online help. </p>
 
-<p class=MsoNormal><b>PAMGUARD Viewer </b></p>
+<p class=MsoNormal><b>PAMGuard Viewer </b></p>
 
-<p class=MsoNormal>Reloads data from a PAMGUARD output database for viewing</p>
+<p class=MsoNormal>Reloads data from a PAMGuard output database for viewing</p>
 
-<p class=MsoNormal><b>PAMGUARD Mixed Mode operation</b></p>
+<p class=MsoNormal><b>PAMGuard Mixed Mode operation</b></p>
 
 <p class=MsoNormal>Analyses data from wav or AIF file and synchronises it with
 GPS data reloaded from a database so that detected sounds may be correctly
-localised. Multiple display frames - enables PAMGUARD GUI to be split into
+localised. Multiple display frames - enables PAMGuard GUI to be split into
 multiple display windows, displayed on multiple monitors if desired. Enables
 the operator to simultaneously view the map and the click detector for example,
 which is much &nbsp;easier than continually moving between multiple tabs. </p>
@@ -4515,8 +4534,8 @@ help pages</p>
 
 <p class=MsoNormal>Memory leak caused by Night / Day colour manager now fixed.
 This would cause memory leaks when multiple files were being analysed off-line
-and would eventually crash PAMGUARD. The way that colours are managed in
-PAMGUARD has been rewritten.&nbsp; </p>
+and would eventually crash PAMGuard. The way that colours are managed in
+PAMGuard has been rewritten.&nbsp; </p>
 
 <p class=MsoNormal>Some issues with Swing fixed that might have been causing
 hang ups on startup especially on Macs/Linux machines</p>
@@ -4593,9 +4612,9 @@ Utilities. This will not affect how existing settings files are loaded. </p>
 
 <p class=MsoNormal><b>Multi-screen environments.</b></p>
 
-<p class=MsoNormal>In previous versions, if PAMGUARD was configured in a
+<p class=MsoNormal>In previous versions, if PAMGuard was configured in a
 multiscreen environment and is then run on a single screen, it was possible
-that the display would not appear. PAMGUARD now checks screen dimensions at
+that the display would not appear. PAMGuard now checks screen dimensions at
 start up and ensures that the main display is visible. Consequently, program
 start-up takes slightly longer than previously. </p>
 
@@ -4619,7 +4638,7 @@ long are now correctly &nbsp;recognised. </p>
 search and index features now all work as they should.</p>
 
 <p class=MsoNormal>The layout of the help content has been re-ordered into more
-functional groups (as laid out in the PAMGUARD add modules menu). </p>
+functional groups (as laid out in the PAMGuard add modules menu). </p>
 
 <p class=MsoNormal>Improved help has been added for the following modules:</p>
 
@@ -4698,7 +4717,7 @@ likelihood. It is </p>
 (Sperm, Beaked, etc.) as well as moderate duration Mysticete calls (Humpback,
 Bowhead, etc.).It is not suitable for detecting whistles.</p>
 
-<p class=MsoNormal>Note that the likelihood detector will not run with PAMGUARD
+<p class=MsoNormal>Note that the likelihood detector will not run with PAMGuard
 in multithreading mode. </p>
 
 <p class=MsoNormal><b>Bug fixes</b></p>
@@ -4716,7 +4735,7 @@ localiser (affects stability of click train localiser and whistle localiser in <
 
 <h2>1.2.0 Beta December 2008</h2>
 
-<p class=MsoNormal>This release contains many bug fixes from the PAMGUARD
+<p class=MsoNormal>This release contains many bug fixes from the PAMGuard
 industry field trial which took place in the Gulf of Mexico on the RV New
 Venture in November 2008.</p>
 
@@ -4759,13 +4778,13 @@ channels or textual content change. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span>Model viewer. Have stopped it from jumping on top of the main PAMGUARD
+</span>Model viewer. Have stopped it from jumping on top of the main PAMGuard
 &nbsp;display when dialogs are closed. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span>General problems with timing solved (sound cards not always running at
-the speed they should run at). Large improvements in overall PAMGUARD
+the speed they should run at). Large improvements in overall PAMGuard
 reliability. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
@@ -4777,7 +4796,7 @@ Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span>National Instruments sound acquisition. Hangs occasionally. Requires
-restart &nbsp;of PAMGUARD to get going again. </p>
+restart &nbsp;of PAMGuard to get going again. </p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -4824,7 +4843,7 @@ mouse is moved over the display. Choice of colour maps for display. </p>
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span>Sound playback. Now supported in ASIO sound cards, so you can have sound
 coming in through the ASIO card and back out through its headphone socket
-(after passing through PAMGUARD filters and other modules) at the same time.</p>
+(after passing through PAMGuard filters and other modules) at the same time.</p>
 
 <p class=MsoListParagraph style='text-indent:-18.0pt'><span style='font-family:
 Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -4844,8 +4863,8 @@ Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif
 
 <p class=MsoNormal><b>Multithreading</b></p>
 
-<p class=MsoNormal>PAMGUARD now processes data in each module in a different
-processing thread. This allows PAMGUARD to use both processor cores on dual or
+<p class=MsoNormal>PAMGuard now processes data in each module in a different
+processing thread. This allows PAMGuard to use both processor cores on dual or
 multi core processor machines. However, multithreading may still cause
 instability in some modules. An option is therefore accessible from the main
 Detection menu to enable and disable multithreading. </p>
@@ -5019,7 +5038,7 @@ Symbol'>'</span><span style='font-size:7.0pt;font-family:"Times New Roman",serif
 
 <p class=MsoNormal><a name="_Toc312065304"></a><a name="_Toc312063949"></a><span
 class=Heading2Char><span style='font-size:13.0pt'>1.0Beta 22 Jan 2008 -
-Pamguard starts two releases, core and beta release</span></span>, </p>
+PAMGuard starts two releases, core and beta release</span></span>, </p>
 
 <p class=MsoNormal>this is the beta release</p>
 
@@ -5092,11 +5111,11 @@ and Ishmael-type detectors and localisers. </p>
 configurable user displays which support real time scrolling spectrograms and
 radar displays. Detection and localisation information can be optionally
 displayed on the map display.Map enhancements include improved scrolling
-whereby the user can click and drag to pan the area. PamGuard can now interface
+whereby the user can click and drag to pan the area. PAMGuard can now interface
 with MySQL database servers and users can easily select which information is
 logged. (This replaces the previous 'flat-file' logging feature). A simulation
 module allows virtual vocalising animals to be placed on the map to assist in
-training and development. Extensive online user help has been added to PamGuard
+training and development. Extensive online user help has been added to PAMGuard
 Application</p>
 
 <h2>0.03b - first version used in a real 'at sea' environment.18/08/06</h2>

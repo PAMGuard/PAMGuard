@@ -4,9 +4,12 @@ project:
 website:
   title: "PAMGuard Help"  
   navbar:
-    icon: ./images/redHelpIcon.png
+    logo: ./images/redHelpIcon.png
     search: true
     background: rgba(72,188,213,255)
+    right: 
+      - href: http://www.pamguard.org
+        text: "PAMGuard Website"
           
     tools:
       - icon: github
@@ -20,6 +23,7 @@ website:
       - icon: facebook
         href: https://www.facebook.com/pamguard
         target: pgfbpage    
+        
   sidebar:
     search: true
     logo: images/PAMGuardIcon2.png

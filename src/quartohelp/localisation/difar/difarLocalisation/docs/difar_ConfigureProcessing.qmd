@@ -1,8 +1,6 @@
 ---
 title: "Configure Processing"
 ---
- Difar Module  
-
 DIFAR Localisation
 ==================
 

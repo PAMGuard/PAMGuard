@@ -1,8 +1,6 @@
 ---
 title: "Managing the Queue"
 ---
- Difar Module  
-
 DIFAR Localisation
 ==================
 

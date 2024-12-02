@@ -1,8 +1,6 @@
 ---
 title: "INTEGER Control"
 ---
- INTEGER Control  
-
 INTEGER Control
 ===============
 

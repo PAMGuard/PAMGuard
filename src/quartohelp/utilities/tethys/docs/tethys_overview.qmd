@@ -1,8 +1,6 @@
 ---
 title: "Tethys Overview"
 ---
- Tethys Module Overview   
-
 Tethys Interface
 ================
 

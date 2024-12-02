@@ -1,8 +1,6 @@
 ---
 title: "GPS Processing"
 ---
- GPS Configuration  
-
 NMEA
 ====
 
@@ -13,9 +11,9 @@ Configuring GPS Processing
 
 ### Adding an GPS Processing Module
 
-To add a new GPS Data Collection module to PAMGUARD, select the _**File->Maps and Mapping->GPS Processing**_ menu item.
+To add a new GPS Data Collection module to PAMGuard, select the _**File->Maps and Mapping->GPS Processing**_ menu item.
 
-Note that it is only possible to have one GPS Processing module in PAMGUARD, so the menu item will be greyed out if a module has already been added.
+Note that it is only possible to have one GPS Processing module in PAMGuard, so the menu item will be greyed out if a module has already been added.
 
 ### Setting the GPS Parameters
 
@@ -26,7 +24,7 @@ From the Detection Menu, select **_GPS>GPS Options_** �
 
 ### Select NMEA Data Source
 
-Select the NMEA data source from the drop down list. If there are no NMEA Data Collection modules in the current PAMGUARD model, you must close the GPS Options dialog and add one.
+Select the NMEA data source from the drop down list. If there are no NMEA Data Collection modules in the current PAMGuard model, you must close the GPS Options dialog and add one.
 
 #### Main Navigation data string
 
@@ -44,7 +42,7 @@ Three options for reading and storing GPS data are available.
 
 **Read on timer or course of speed change:** GPS data will be used at fixed time intervals or whenever the course or speed change.
 
-The latter options minimises the amount of data stored when undertaking straight line transects. PAMGUARD will interpolate between GPS positions, so it is possible to set a relatively long time interval (say 1 minute) for regular reads, but data will get read more often if there are course or speed changes.
+The latter options minimises the amount of data stored when undertaking straight line transects. PAMGuard will interpolate between GPS positions, so it is possible to set a relatively long time interval (say 1 minute) for regular reads, but data will get read more often if there are course or speed changes.
 
 ### Heading Data
 
@@ -63,7 +61,7 @@ A number of options exist for reading the true heading of a vessel, i.e. the dir
 
 Most of the above devices will output an NMEA string GPHDT which contains either the true or the magnetic heading information, depending on the type of sensor.
 
-PAMGUARD can read the GPHDT string and will add the heading information to the data from the GPS receiver. The heading data are displayed on the map and are also written to the GPSData database table
+PAMGuard can read the GPHDT string and will add the heading information to the data from the GPS receiver. The heading data are displayed on the map and are also written to the GPSData database table
 
 ![Heading Data](images/GPSOptions2.png)  
 
@@ -75,7 +73,7 @@ Clicking the vessel tab allows you to specify where the GPS receiver is on the v
 
 ![Vessel Options](images/GPSOptions3.png)  
   
-Enter the ships dimensions and select an optional heading arrow to be shown on the map. These parameters affect displays only and have no other effect on PAMGUARD operation.
+Enter the ships dimensions and select an optional heading arrow to be shown on the map. These parameters affect displays only and have no other effect on PAMGuard operation.
 
 [Previous: Configuring NMEA](configuringNMEADataSource.html)
 

@@ -1,8 +1,6 @@
 ---
 title: "Localisation Techniques"
 ---
- Target Motion Overview 
-
 Localisation
 ============
 

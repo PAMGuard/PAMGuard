@@ -1,8 +1,6 @@
 ---
 title: "Adding GPS offline"
 ---
- Click Viewer Overview 
-
 Click Detector Viewer Function
 ==============================
 

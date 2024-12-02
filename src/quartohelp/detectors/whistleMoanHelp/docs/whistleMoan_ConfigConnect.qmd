@@ -1,8 +1,6 @@
 ---
 title: "Connected Region Search"
 ---
- Whistle and Moan Detector Overview  
-
 Whistle and Moan Detector
 =========================
 

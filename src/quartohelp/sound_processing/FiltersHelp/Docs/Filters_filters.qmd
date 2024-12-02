@@ -1,8 +1,6 @@
 ---
 title: "Overview"
 ---
- IIRF Filters  
-
 IIRF Filters
 ============
 
@@ -11,7 +9,7 @@ Overview
 
   
 
-Filters can be used to filter audio data within PAMGUARD. They can be inserted anywhere in the PAMGUARD data model where there are raw audio data.  
+Filters can be used to filter audio data within PAMGuard. They can be inserted anywhere in the PAMGuard data model where there are raw audio data.  
 Note that some other modules, such as the [click detector](../../../detectors/clickDetectorHelp/docs/ClickDetector_clickDetector.html) and the [Decimator](../../decimatorHelp/docs/decimator_decimator.html), use the same filter modules, built into that module's functionality.
 
   

@@ -1,8 +1,6 @@
 ---
 title: "Noise Removal and Thresholding"
 ---
- Whistle and Moan Detector Overview  
-
 Whistle and Moan Detector
 =========================
 
@@ -13,7 +11,7 @@ Noise removal and thresholding is one of the most important steps in the operati
 
 Noise removal and thresholding is a five stage process. The first stage has to occur before FFT data are calculated in the [FFT (Spectrogram) Engine](../../../sound_processing/fftManagerHelp/docs/FFTEngine_Overview.html). The remaining four stages can take place either in the [FFT (Spectrogram) Engine](../../../sound_processing/fftManagerHelp/docs/FFTEngine_Overview.html) module or in the Whistle and Moan detector.
 
-Performing the noise removal in the [FFT (Spectrogram) Engine](../../../sound_processing/fftManagerHelp/docs/FFTEngine_Overview.html) module has the advantage that other PAMGUARD processes and displays will have access to the data
+Performing the noise removal in the [FFT (Spectrogram) Engine](../../../sound_processing/fftManagerHelp/docs/FFTEngine_Overview.html) module has the advantage that other PAMGuard processes and displays will have access to the data
 
 The Whistle and Moan detector will try to ensure that the correct noise removal processes are run once and only once but looking back at the FFT data source and testing whether noise removal has already been done.
 

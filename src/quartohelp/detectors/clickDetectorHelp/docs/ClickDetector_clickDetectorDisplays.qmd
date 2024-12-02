@@ -1,8 +1,6 @@
 ---
 title: "Click Detector Displays"
 ---
- Click Detector Displays 
-
 Click Detector
 ==============
 

@@ -1,8 +1,6 @@
 ---
 title: "NMEA / GPS Troubleshooting"
 ---
- GPS and NMEA Troubleshooting  
-
 NMEA
 ====
 
@@ -32,7 +30,7 @@ There are several possible causes of this. Either the [GPS has no output](#NoGPS
 
 **I can't find the correct serial port**  
   
-If you have no serial ports or too many serial ports in the [NMEA Configuration Dialog](configuringNMEADataSource.html) and are using a serial to USB converter check that the drivers are correctly installer. On Windows machines, look in the control panel for unknown USB devices. If you're having trouble identifying the right port, then it may be worth restarting PAMGUARD with and without the converter plugged in to see which ports appear and disappear from the list in the [NMEA Configuration Dialog](configuringNMEADataSource.html).
+If you have no serial ports or too many serial ports in the [NMEA Configuration Dialog](configuringNMEADataSource.html) and are using a serial to USB converter check that the drivers are correctly installer. On Windows machines, look in the control panel for unknown USB devices. If you're having trouble identifying the right port, then it may be worth restarting PAMGuard with and without the converter plugged in to see which ports appear and disappear from the list in the [NMEA Configuration Dialog](configuringNMEADataSource.html).
 
 \[[Back to the top](#top)\]  
 

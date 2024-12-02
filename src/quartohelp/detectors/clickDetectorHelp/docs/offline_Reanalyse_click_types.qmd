@@ -1,8 +1,6 @@
 ---
 title: "Reanalyse click types"
 ---
- Reanalyse click types 
-
 Click Detector Viewer Functions
 ===============================
 

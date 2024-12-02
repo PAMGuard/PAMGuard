@@ -1,8 +1,6 @@
 ---
 title: "Geo referencing 3D localisations"
 ---
- Geo referencing 3D localisations  
-
 Large Aperture 3D Localiser
 ===========================
 
@@ -15,9 +13,9 @@ _Use the MEAL localiser with vector GPS data._
 
 In the last exercise we used a vertical array which we assumed was stationary and determined a porpoise dive profile. In real life it is possible we will be using an array which is not stationary. If this is case there are two vital pieces of information needed to relate localisation information to real world co-ordinates, the heading and latitude/longitude of the array.
 
-Open PAMGUARD viewer mode and select the database **_VertQuad_** in the **_Exercise 4_** folder. Open the binary file folder **_20120715._**
+Open PAMGuard viewer mode and select the database **_VertQuad_** in the **_Exercise 4_** folder. Open the binary file folder **_20120715._**
 
-In order to use GPS data you need to add the GPS module. **_Go to File > Add Modules > Maps and Mapping_** and add **_NMEA Data Collection_**, **_GPS Processing_** and **_Map_**. You should see the Map tab appear in PAMGUARD.
+In order to use GPS data you need to add the GPS module. **_Go to File > Add Modules > Maps and Mapping_** and add **_NMEA Data Collection_**, **_GPS Processing_** and **_Map_**. You should see the Map tab appear in PAMGuard.
 
 ![](images/image048.jpg)
 

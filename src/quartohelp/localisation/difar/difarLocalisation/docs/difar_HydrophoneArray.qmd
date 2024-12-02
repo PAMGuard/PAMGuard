@@ -1,8 +1,6 @@
 ---
 title: "Deploying Sonobuoys"
 ---
- Difar Module  
-
 DIFAR Localisation
 ==================
 

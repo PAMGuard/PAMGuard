@@ -1,8 +1,6 @@
 ---
 title: "TIMESTAMP Control"
 ---
- TIMESTAMP Control  
-
 TIMESTAMP Control
 =================
 

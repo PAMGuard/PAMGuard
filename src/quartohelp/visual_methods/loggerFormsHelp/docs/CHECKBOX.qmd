@@ -1,8 +1,6 @@
 ---
 title: "CHECKBOX Control"
 ---
- CHECKBOX Control  
-
 CHECKBOX Control
 ================
 

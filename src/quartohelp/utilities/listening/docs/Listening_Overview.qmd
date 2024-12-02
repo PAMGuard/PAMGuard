@@ -1,8 +1,6 @@
 ---
 title: "Overview"
 ---
- Aural Listening Overview  
-
 Aural Listening
 ===============
 
@@ -13,9 +11,9 @@ Overview
 
 The Aural listening module can be used to keep a record of when you are listening and what you are hearing on headphones.
 
-To add a new Aural Listening module to PAMGUARD, select the _**File>Add Modules>Utilities>Aural Listening**_ menu command.
+To add a new Aural Listening module to PAMGuard, select the _**File>Add Modules>Utilities>Aural Listening**_ menu command.
 
-An Aural Listening tab will be added to the PAMGUARD GUI
+An Aural Listening tab will be added to the PAMGuard GUI
 
   
 ![Aural Listening](./images/ListeningDisplay.png)  
@@ -51,7 +49,7 @@ The lower part of the display shows the history of what you've recently heard
 
 ### Database Output
 
-Both the effort data and the things heard data are written to the PAMGUARD database.
+Both the effort data and the things heard data are written to the PAMGuard database.
 
 ### Map Display
 

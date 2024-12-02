@@ -1,8 +1,6 @@
 ---
 title: "Configuration"
 ---
- Whistle Classifier Overview  
-
 Whistle Classifier
 ==================
 

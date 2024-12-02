@@ -1,8 +1,6 @@
 ---
 title: "Matlab and R"
 ---
- Binary Storage  
-
 Binary Storage
 ==============
 

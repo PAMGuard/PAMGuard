@@ -1,8 +1,6 @@
 ---
 title: "Sidebar Controls"
 ---
-Rocca Sidebar  
-
 ROCCA
 =====
 

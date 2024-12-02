@@ -1,8 +1,6 @@
 ---
 title: "Localise"
 ---
- Localise  
-
 Large Aperture 3D Localiser
 ===========================
 
@@ -15,9 +13,9 @@ _Add the MEAL localiser and localise porpoise clicks. Batch process the entire d
 
 ### 3.1 Set up the localiser
 
-Now we have detected and classified our porpoise clicks we can begin to localise. The MEAL localiser module is currently still under development and can only be accessed in PAMGUARD viewer. This partly due to the fact that localisation is computationally intensive and so currently not suitable for real time use.
+Now we have detected and classified our porpoise clicks we can begin to localise. The MEAL localiser module is currently still under development and can only be accessed in PAMGuard viewer. This partly due to the fact that localisation is computationally intensive and so currently not suitable for real time use.
 
-For this exercise we are going to use some data already prepared so that all participants are using the same classification settings etc. Start a new instance of PAMGUARD viewer mode, open the database named **_PorpFineScalePAMTech_** in the Exercise 3 folder and select the corresponding binary files in the folder named **_20120630._**
+For this exercise we are going to use some data already prepared so that all participants are using the same classification settings etc. Start a new instance of PAMGuard viewer mode, open the database named **_PorpFineScalePAMTech_** in the Exercise 3 folder and select the corresponding binary files in the folder named **_20120630._**
 
 Go to **_File > Add Modules > Loclaisers > MEAL localiser._** This will add the MEAL localiser to viewer mode. As the module is still in development there are a few minor issues which need to be sorted out when adding the module. Your instructor will guide you through these.
 

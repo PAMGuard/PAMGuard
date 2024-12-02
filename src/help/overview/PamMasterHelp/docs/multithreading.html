@@ -6,17 +6,17 @@
 
 <body>
 
-<h1>PAMGUARD</h1>
+<h1>PAMGuard</h1>
 <h2>Multi-threading</h2>
 <p><br>
-  PAMGUARD can operate in either a single thread mode, or a multi-thread mode. 
+  PAMGuard can operate in either a single thread mode, or a multi-thread mode. 
 </p>
 <p>
-  In multi-thread mode, each process within each PAMGUARD module operates in a different 
+  In multi-thread mode, each process within each PAMGuard module operates in a different 
   processing thread, which basically allows several processes to take place at once in a multiprocessor computer. 
 </p>
 <p>
-  In single thread mode, actions take place one at a time as data propagates through PAMGUARD. 
+  In single thread mode, actions take place one at a time as data propagates through PAMGuard. 
 </p>
 <p>
   The advantage of multi-thread operation is that the different tasks will spread between 
@@ -37,7 +37,7 @@
 <br><p>You can also set the amount of "jitter" between threads. This is the maximum amount of data
 that can be queued between two threads. If the data queue exceeds this time, then the earlier
 thread will wait until the second thread has processed some of the data in the queue.  </p>
-<p>More jitter allows more flexibility between threads which can allow PAMGUARD to use multiple 
+<p>More jitter allows more flexibility between threads which can allow PAMGuard to use multiple 
 processor cores more efficiently. However, increased jitter can cause a loss of synchronisation 
 between the processing, graphics output and sound play back</p>  
 <p>

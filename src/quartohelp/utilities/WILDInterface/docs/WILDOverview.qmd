@@ -1,9 +1,7 @@
 ---
 title: "WILD ArcGIS Interface"
 ---
- WILD ArcGIS Interface 
-
-PAMGUARD
+PAMGuard
 ========
 
 WILD ArcGIS Interface

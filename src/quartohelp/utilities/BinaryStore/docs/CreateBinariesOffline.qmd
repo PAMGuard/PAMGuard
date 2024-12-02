@@ -1,8 +1,6 @@
 ---
 title: "Create Binary Files Offline"
 ---
- Create binary files offline 
-
 Pamguard Viewer
 ===============
 

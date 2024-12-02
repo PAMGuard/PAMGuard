@@ -1,8 +1,6 @@
 ---
 title: "Advanced Localisation (Triangulation and Groups)"
 ---
- Difar Module  
-
 DIFAR Localisation
 ==================
 

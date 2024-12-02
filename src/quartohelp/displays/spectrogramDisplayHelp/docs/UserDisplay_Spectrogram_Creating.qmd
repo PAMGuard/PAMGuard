@@ -1,8 +1,6 @@
 ---
 title: "Creating a Spectrogram Display"
 ---
- Creating a Spectrogram Display  
-
 Spectrogram Display
 ===================
 

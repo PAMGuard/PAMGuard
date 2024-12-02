@@ -1,8 +1,6 @@
 ---
 title: "NMEA Connections"
 ---
- NMEA Connection  
-
 NMEA
 ====
 
@@ -17,13 +15,13 @@ Connection to a 9 pin serial connector is very simple. In a 9 pin D plug connect
 > 
 > Pin 5 to Ground (usually the same wire as connects to the negative of the power supply)
 
-It is not necessary to make any other connections. PAMGUARD does not send any data back to the GPS, so connection of Pin 3 (NMEA Data Out) is not necessary.
+It is not necessary to make any other connections. PAMGuard does not send any data back to the GPS, so connection of Pin 3 (NMEA Data Out) is not necessary.
 
 ### Using Serial to USB converters
 
 Most PC's no longer have a built in serial (RS-232) port. If you don't have a serial port, then purchase a serial to USB converter. Follow the manufacturers installation instructions for the converter and once installed connect your NMEA device. Your device will appear in the NMEA configuration dialog as a normal serial port.
 
-Note that if you move the serial to USB converter to a different serial port, then your operating system may re-install the drivers and assign a different serial port number, in which case you will have to reconfigure the NMEA settings in PAMGUARD.  
+Note that if you move the serial to USB converter to a different serial port, then your operating system may re-install the drivers and assign a different serial port number, in which case you will have to reconfigure the NMEA settings in PAMGuard.  
 
 ### Using a USB GPS
 

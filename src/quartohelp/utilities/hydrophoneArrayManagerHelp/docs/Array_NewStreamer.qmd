@@ -1,8 +1,6 @@
 ---
 title: "Streamer Dialog"
 ---
- Adding a New Hydrophone  
-
 Hydrophone Array
 ================
 

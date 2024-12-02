@@ -1,8 +1,6 @@
 ---
-title: "PAMGuard Deep Learning Module - Overview"
+title: "PAMGuard's Deep Learning Module"
 ---
- PAMGuard Deep Learning Module - Overview  
-
 PAMGuard's Deep Learning Module
 ===============================
 

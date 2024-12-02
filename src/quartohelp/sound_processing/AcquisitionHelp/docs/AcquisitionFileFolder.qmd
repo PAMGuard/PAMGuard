@@ -1,12 +1,10 @@
 ---
 title: "Audio File Folders"
 ---
- File Folders 
-
 Audio File Folders
 ==================
 
-If you've a whole folder (or many folders) full or archived data than you wish to re-analyse, then you can set PAMGUARD up to work it's way through the whole lot in one go
+If you've a whole folder (or many folders) full or archived data than you wish to re-analyse, then you can set PAMGuard up to work it's way through the whole lot in one go
 
 Processing speed and dates and times operate in the same way as for [single audio file analysis](AcquisitionFile.html)
 
@@ -27,7 +25,7 @@ If you want to analyse multiple sub folders of data, then check the 'Include sub
 
 #### Repeating the List
 
-In order to have PAMGUARD automatically restart processing from the beginning of the first audio file when the end of the last audio file is reached, check the 'repeat' box.
+In order to have PAMGuard automatically restart processing from the beginning of the first audio file when the end of the last audio file is reached, check the 'repeat' box.
 
 ### Select multiple files
 
@@ -35,7 +33,7 @@ If you don't want to select all files in a folder, then navigate into the folder
 
 ### Merging files
 
-Files will be analysed in alphabetical order. It is not uncommon that a single recording session will have been broken into many short files. You can have PAMGUARD merge files which are part of continuous recording together by checking the 'Merge contiguous files' box. If this box is not checked, then PAMGUARD will stop at the end of each file and then restart on the next file.
+Files will be analysed in alphabetical order. It is not uncommon that a single recording session will have been broken into many short files. You can have PAMGuard merge files which are part of continuous recording together by checking the 'Merge contiguous files' box. If this box is not checked, then PAMGuard will stop at the end of each file and then restart on the next file.
 
 ### Time and Date
 
@@ -49,7 +47,7 @@ Ideally the file times should be in UTC. If they are not, then the time zone of 
 
 ### Starting/Stopping/Restarting Analysis
 
-During batch processing, when PAMGUARD reaches the end of one audio file it will automatically begin processing the next file. In the event that an audio file cannot be properly loaded, PAMGUARD will move on to the next audio filerather than halt processing . Similarly if the user stops processing by manually pressing the Stop button, upon restart PAMGUARD will begin processing the next audio file in the list.
+During batch processing, when PAMGuard reaches the end of one audio file it will automatically begin processing the next file. In the event that an audio file cannot be properly loaded, PAMGuard will move on to the next audio filerather than halt processing . Similarly if the user stops processing by manually pressing the Stop button, upon restart PAMGuard will begin processing the next audio file in the list.
 
 If the user wishes to restart batch processing at the beginning of the list, either after manually halting processing or upon reaching the end of the last audio file, the Sound Acquisition settings dialog must be opened. When the OK button is pressed, the list is reinitialized and processing will proceed from the beginning.
 

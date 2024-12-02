@@ -1,8 +1,6 @@
 ---
 title: "Welcome to a new Help Project"
 ---
-   
-
 Welcome to a new Help Project
 -----------------------------
 

@@ -1,8 +1,6 @@
 ---
 title: "Tab Panel Displays"
 ---
-Click Detector Tab Panels  
-
 Click Detector
 ==============
 
@@ -44,13 +42,13 @@ Tracked clicks may be overlaid on the map display and also on radar type display
 
 #### Manual tracking with least squares localisation
 
-If the same operation is performed using the right mouse button, then a pop-up menu appears and the operator is asked to assign clicks to numbered groups. Clicks within the same tracking group are assumed to be from the same source. PAMGUARD then uses a least squares fit to estimate the position of the source based on the most likely crossing point of the bearing lines for each tracked group.
+If the same operation is performed using the right mouse button, then a pop-up menu appears and the operator is asked to assign clicks to numbered groups. Clicks within the same tracking group are assumed to be from the same source. PAMGuard then uses a least squares fit to estimate the position of the source based on the most likely crossing point of the bearing lines for each tracked group.
 
 If a location has been successfully calculated, it can be displayed on the map and radar displays.
 
 ### Automatic Tracking
 
-If the automatic click train identifier is running, clicks will be coloured when they are assigned to a click train. As with manual tracking, PAMGUARD will use a least squares fit to estimate the position of the source based on the most likely crossing point of the bearing lines.
+If the automatic click train identifier is running, clicks will be coloured when they are assigned to a click train. As with manual tracking, PAMGuard will use a least squares fit to estimate the position of the source based on the most likely crossing point of the bearing lines.
 
 As with manual tracking, automatic click trains are displayed on the map, either as bering lines (when no position has been calculated) or as a bearing line and point if a position has been calculated.
 

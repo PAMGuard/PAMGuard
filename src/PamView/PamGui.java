@@ -172,12 +172,21 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 
 		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
+<<<<<<< Updated upstream
 		String iconLoc = PamIcon.getPAMGuardIconPath(PamIcon.LARGE);
 //		switch (PamController.getInstance().getRunMode()){
 //		case(PamController.RUN_NETWORKRECEIVER):iconLoc=PamIcon.getPAMGuardIconPath(PamIcon.NORMAL);break;
 //		case(PamController.RUN_PAMVIEW):iconLoc=PamIcon.getPAMGuardIconPath(PamIcon.NORMAL);break;
 //		case(PamController.RUN_MIXEDMODE):iconLoc=PamIcon.getPAMGuardIconPath(PamIcon.NORMAL);break;
 //		default:iconLoc=PamIcon.getPAMGuardIconPath(PamIcon.LARGE);
+=======
+		String iconLoc=PamIcon.getPAMGuardIconPath(PamIcon.NORMAL);
+//		switch (PamController.getInstance().getRunMode()){
+//		case(PamController.RUN_NETWORKRECEIVER):iconLoc="Resources/pamguardIconNR.png";break;
+//		case(PamController.RUN_PAMVIEW):iconLoc="Resources/pamguardIconV.png";break;
+//		case(PamController.RUN_MIXEDMODE):iconLoc="Resources/pamguardIconM.png";break;
+//		default:iconLoc="Resources/pamguardIcon.png";
+>>>>>>> Stashed changes
 //		}
 
 		frame.setIconImage(new ImageIcon(ClassLoader
@@ -926,7 +935,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		menu.add(menuItem);
 
 		menuItem = new JMenuItem("Contact and Support");
-		menuItem.addActionListener(new MenuPamguardURL("www.pamguard.org/contact.shtml"));
+		menuItem.addActionListener(new MenuPamguardURL("www.pamguard.org/contact.html"));
 		menu.add(menuItem);
 
 		menuBar.add(menu);	

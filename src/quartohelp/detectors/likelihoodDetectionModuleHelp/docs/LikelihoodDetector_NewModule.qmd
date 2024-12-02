@@ -1,15 +1,13 @@
 ---
 title: "Adding a new Likelihood Detector"
 ---
- Adding a New Likelihood Detector Module  
-
 The Likelihood Detector Module
 ==============================
 
 Adding a New Likelihood Detector
 --------------------------------
 
-To add a new Likelihood detection module to PAMGUARD, select the `File->Add Modules>Detectors->Likelihood Detector` menu item. The Likelihood detector requires an audio data source, so if there is not a Sound Acquisition module available, the Likelihood module will prompt you with a dialog box to create one.
+To add a new Likelihood detection module to PAMGuard, select the `File->Add Modules>Detectors->Likelihood Detector` menu item. The Likelihood detector requires an audio data source, so if there is not a Sound Acquisition module available, the Likelihood module will prompt you with a dialog box to create one.
 
   
   
@@ -45,7 +43,7 @@ To do this, select the "`File->Hydrophone array...`" menu option, pictured below
 
   
 
-This will bring up the large hydrophone array configuration dialog that is part of PAMGUARD. Explanation of how to use this dialog is outside the scope of the Likelihood detector module help, however it will be necessary to verify that the correct number of hydrophones (i.e. channels) are represented and that their characteristics are represented correctly.
+This will bring up the large hydrophone array configuration dialog that is part of PAMGuard. Explanation of how to use this dialog is outside the scope of the Likelihood detector module help, however it will be necessary to verify that the correct number of hydrophones (i.e. channels) are represented and that their characteristics are represented correctly.
 
   
   

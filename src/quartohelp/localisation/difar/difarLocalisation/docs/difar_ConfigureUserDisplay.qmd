@@ -1,8 +1,6 @@
 ---
 title: "Configure User Display"
 ---
- Difar Module  
-
 DIFAR Localisation
 ==================
 

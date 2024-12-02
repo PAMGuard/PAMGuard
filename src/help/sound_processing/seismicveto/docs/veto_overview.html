@@ -9,7 +9,7 @@
 
 <h1>Seismic Veto</h1>
 <h2>Overview</h2><br>
-<p>Many of the PAMGUARD detectors set detection thresholds
+<p>Many of the PAMGuard detectors set detection thresholds
 automatically as a function of background noise. Loud sounds from
 airguns can upset this automatic threshold setting. It is of course
 extremely unpleasant listening on headphones when airguns are firing
@@ -30,7 +30,7 @@ before the onset of the pulse (this is achieved by delaying the signal
 slightly in an internal buffer).</p>
 <p>The seismic veto module has two output streams, the first
 containing vetoed FFT data and the second containing vetoed raw audio
-data. Other PAMGUARD modules can subscribe to the appropriate output of
+data. Other PAMGuard modules can subscribe to the appropriate output of
 the seismic veto module and operate as normal, but without the loud
 airgun sounds.</p>
 
@@ -38,7 +38,7 @@ airgun sounds.</p>
 <img alt="Seismic Veto Data Model" src="images/VetoDataModel.png" /></center>
 <br>
 
-<p>The figure above shows a simple PAMGUARD configuration with the output
+<p>The figure above shows a simple PAMGuard configuration with the output
 of the seismic veto connected to a 
 <a href="../../soundPlaybackHelp/docs/soundPlayback_soundPlayback.html">
 sound playback module</a>, a click
@@ -48,7 +48,7 @@ waveforms of data before and after the seismic veto module.</p>
 <img alt="Seismic Veto Spectrograms" src="Images/VetoSpectrograms.png" /></center>
 <br>
 
-<p>A veto can be inserted anywhere in the PAMGUARD data model
+<p>A veto can be inserted anywhere in the PAMGuard data model
 where there is 
 <a href="../../fftManagerHelp/docs/FFTEngine_Overview.html">FFT / Spectrogram data</a>.</p>
 <br>

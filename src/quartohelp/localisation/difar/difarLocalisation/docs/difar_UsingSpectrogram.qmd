@@ -1,8 +1,6 @@
 ---
 title: "Using the Spectrogram"
 ---
- Difar Module  
-
 DIFAR Localisation
 ==================
 

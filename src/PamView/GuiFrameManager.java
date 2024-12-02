@@ -60,20 +60,20 @@ public class GuiFrameManager implements PamSettings, PAMControllerGUI {
 		this.pamController = pamController;
 		PamSettingManager.getInstance().registerSettings(this);
 
-		String iconLoc;
-		switch (PamController.getInstance().getRunMode()){
-		case(PamController.RUN_NETWORKRECEIVER):
-			iconLoc="Resources/pamguardIconNR.png";
-			break;
-		case(PamController.RUN_PAMVIEW):
-			iconLoc="Resources/pamguardIconV.png";
-			break;
-		case(PamController.RUN_MIXEDMODE):
-			iconLoc="Resources/pamguardIconM.png";
-			break;
-		default:
-			iconLoc="Resources/pamguardIcon.png";
-		}
+		String iconLoc = PamIcon.getPAMGuardIconPath(PamIcon.NORMAL);
+//		switch (PamController.getInstance().getRunMode()){
+//		case(PamController.RUN_NETWORKRECEIVER):
+//			iconLoc="Resources/pamguardIconNR.png";
+//			break;
+//		case(PamController.RUN_PAMVIEW):
+//			iconLoc="Resources/pamguardIconV.png";
+//			break;
+//		case(PamController.RUN_MIXEDMODE):
+//			iconLoc="Resources/pamguardIconM.png";
+//			break;
+//		default:
+//			iconLoc="Resources/pamguardIcon.png";
+//		}
 
 		frameIcon = new ImageIcon(ClassLoader.getSystemResource(iconLoc)).getImage();
 	}

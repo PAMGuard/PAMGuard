@@ -1,8 +1,6 @@
 ---
 title: "Asio Sound Cards"
 ---
- Asio Sound Cards  
-
 Asio Sound Cards
 ================
 
@@ -30,7 +28,7 @@ Asio sound cards often support data acquisition from more than two channels.
 
 The number of available channels (and the quality of the data) will of course still vary from card to card.
 
-Another very important feature is that you can define which channels you want to read out by mapping the hardware channels on the device to software channels in PAMGUARD
+Another very important feature is that you can define which channels you want to read out by mapping the hardware channels on the device to software channels in PAMGuard
 
 When you select an Asio sound card, the 'Sampling' section of the acquisition dialog will expand to show a set of drop down boxes, the bumber of boxes corresponding to the number of channels you are reading out:
 
@@ -38,7 +36,7 @@ When you select an Asio sound card, the 'Sampling' section of the acquisition di
 
 For each software channel, select the hardware channel you wish to use.
 
-**Note that PAMGUARD channel numbering starts at 0. Your hardware channel numbering may start at 1. So be aware. If you've put a plug into socket 1, you probably want to select channel 0, etc.**
+**Note that PAMGuard channel numbering starts at 0. Your hardware channel numbering may start at 1. So be aware. If you've put a plug into socket 1, you probably want to select channel 0, etc.**
 
   
 

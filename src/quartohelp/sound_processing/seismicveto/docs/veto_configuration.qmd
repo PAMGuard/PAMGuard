@@ -1,8 +1,6 @@
 ---
 title: "Configuration"
 ---
- Seismic Veto Configuration  
-
 Seismic Veto
 ============
 

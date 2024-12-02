@@ -1,8 +1,6 @@
 ---
 title: "Importing and Exporting Target Configurations"
 ---
- Likelihood Detector Module  
-
 The Likelihood Detector Module
 ==============================
 

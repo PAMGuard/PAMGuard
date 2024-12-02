@@ -1,8 +1,6 @@
 ---
 title: "Reclassify Clicks"
 ---
-Reclassify clicks  
-
 Click Detector Viewer Functions
 ===============================
 

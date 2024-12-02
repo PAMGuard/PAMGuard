@@ -1,8 +1,6 @@
 ---
 title: "Graphic Overlays"
 ---
-Click Detector Map Overlays  
-
 Click Detector
 ==============
 

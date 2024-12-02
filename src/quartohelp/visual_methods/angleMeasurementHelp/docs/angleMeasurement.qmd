@@ -1,8 +1,6 @@
 ---
 title: "Automated Bearing Measurement"
 ---
- Video Range  
-
 Video Range
 ===========
 

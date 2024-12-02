@@ -9,7 +9,7 @@
 <h1>NMEA</h1>
 <h2>Configuring the NMEA Data Source</h2><br>
 
-<h3>PAMGUARD GPS & NMEA Overview</h3>
+<h3>PAMGuard GPS & NMEA Overview</h3>
 <p>
 GPS Data are output from GPS Receivers in National Marine Electronics Association (NMEA) format. NMEA format Data are also output by many other ships instruments, such as 
   wind instruments and echo sounder and also by AIS (Automatic Ship Identification) systems. 
@@ -19,10 +19,10 @@ GPS Data are output from GPS Receivers in National Marine Electronics Associatio
 NMEA Data are generally sent in RS-232 protocols and can be input to a computer via a serial port. If your computer does not have a serial port (nowadays few laptops do), then it's generally possible to use a serial to USB to serial converter. 
 <p>
 
-GPS data are fundamental to PAMGUARD in addition, several other useful data sources which may be useful to PAMGUARD may be available in an NMEA data string and several PAMGUARD module may need to access  NMEA data. Thus, PAMGUARD has a module for accessing NMEA data and an additional  module for GPS Processing which is dependent on an NMEA Acquisition module.
+GPS data are fundamental to PAMGuard in addition, several other useful data sources which may be useful to PAMGuard may be available in an NMEA data string and several PAMGuard module may need to access  NMEA data. Thus, PAMGuard has a module for accessing NMEA data and an additional  module for GPS Processing which is dependent on an NMEA Acquisition module.
 
 <h3>Adding an NMEA Data Collection Module</h3>
-<p>To add a new NMEA Data Collection module to PAMGUARD, 
+<p>To add a new NMEA Data Collection module to PAMGuard, 
   select the<em><strong> File->Maps and Mapping->NMEA Data Collection </strong></em>menu item. </p>
 <h3>Setting the NMEA Parameters</h3>
 <p>
@@ -32,14 +32,14 @@ From the Detection Menu, select NMEA <em><strong>Data Collection>NMEA Parameters
   <img alt="NmeaParametersDialogue (17K)" src="images/NmeaParametersDialogue.png"/><br>
 </p>
 <p>&nbsp;</p>
-<p>There are two ways of reading NMEA data into PAMGUARD
+<p>There are two ways of reading NMEA data into PAMGuard
   
 </p>
 <h4>Direct control of the Serial Port</h4>
-<p>This is by far the easiest and most sensible way of getting NMEA data into PAMGUARD. </p>
+<p>This is by far the easiest and most sensible way of getting NMEA data into PAMGuard. </p>
 <p>
 At present, Java does not provide direct serial port access. However, 
-PAMGUARD provides cross platform support for serial ports through the RXTX library.
+PAMGuard provides cross platform support for serial ports through the RXTX library.
 <p>
 In the NMEA Parameters dialog, select <strong>Serial NMEA data</strong>. 
 <p>		Then, select the COM port that your NMEA equipment
@@ -51,15 +51,15 @@ Some NMEA multiplexing devices may also use other baud rates. Refer to the equip
 
 <h4>External NMEA Server</h4>
 <p>An alternative to direct control of the serial port is to use an external NMEA server program which 
-  will read the serial port and send NMEA data to PAMGUARD using a network protocol (UDP). This method is only 
+  will read the serial port and send NMEA data to PAMGuard using a network protocol (UDP). This method is only 
   ever used when also working with the IFAW Logger Software. 
   The IFAW NMEA server software, which is bundled with the IFAW Logger software
   can simultaneously output NMEA data to both PAMGuard and to Logger. With 
-  either server, the UDP Port number in PAMGUARD must match that in the NMEA server. </p>
+  either server, the UDP Port number in PAMGuard must match that in the NMEA server. </p>
 <p>
 
 <h4>Simulated NMEA and AIS Data</h4>
-<p>PAMGUARD can also simulate NMEA GPS and AIS data. This is useful during training and setting up exercises. 
+<p>PAMGuard can also simulate NMEA GPS and AIS data. This is useful during training and setting up exercises. 
   GPS Data are simulated according to a user defined start position, course and speed. AIS data are sampled 
   from data collected in the English channel.    
   </p>
@@ -76,7 +76,7 @@ Some NMEA multiplexing devices may also use other baud rates. Refer to the equip
 
 <img alt="nmeaStringsListDialogue (17K)" src="images/nmeaStringsListDialogue.png"/><br><br>
 
-<p>This dialogue shows the current NMEA strings being acquired by PAMGUARD. 
+<p>This dialogue shows the current NMEA strings being acquired by PAMGuard. 
 The update time and string ID are also shown. 
 In the example above, a GPRMC string has been acquired. </p>
 

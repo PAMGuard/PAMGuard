@@ -1,8 +1,6 @@
 ---
 title: "Generic Localisers"
 ---
- Generic Localisers 
-
 Localisation
 ============
 

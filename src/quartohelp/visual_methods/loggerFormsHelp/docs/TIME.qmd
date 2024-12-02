@@ -1,8 +1,6 @@
 ---
 title: "TIME Control"
 ---
- TIME Control  
-
 TIME Control
 ============
 

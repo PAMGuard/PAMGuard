@@ -1,8 +1,6 @@
 ---
 title: "Configure the Module"
 ---
- Difar Module  
-
 DIFAR Localisation
 ==================
 

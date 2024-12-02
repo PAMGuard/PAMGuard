@@ -1,8 +1,6 @@
 ---
 title: "Displays"
 ---
- Alarms Display and Storage  
-
 Alarms Display and Storage
 ==========================
 

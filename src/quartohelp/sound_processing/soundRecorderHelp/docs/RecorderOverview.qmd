@@ -1,8 +1,6 @@
 ---
 title: "Sound Recorder Overview"
 ---
- Sound Recorder Overview  
-
 Sound Recorder
 ==============
 
@@ -16,10 +14,10 @@ The sound recorder may be used to make WAV or AIF file recordings to the compute
 ![Sound Recorder](images/SoundRecorder.png)  
   
   
-Recording can be continuous, or the recorder can be scheduled to make fixed length recordings at set time intervals. The recorder can also be set up to be triggered by any PAMGUARD detectors so that recordings are made only when detections occur.
+Recording can be continuous, or the recorder can be scheduled to make fixed length recordings at set time intervals. The recorder can also be set up to be triggered by any PAMGuard detectors so that recordings are made only when detections occur.
 
 The recorder also contains a memory buffer so that sounds heard by the operator, or sounds which trigger detectors can be captured without having to record continuously.
 
-The most obvious source of data for the sound recorder is a sound acquisition module, but it is also possible to connect a sound recorder to many other PAMGUARD processes that produce raw data, including [Decimators](../../decimatorHelp/docs/decimator_decimator.html) and [Filters](../../FiltersHelp/Docs/Filters_filters.html). More than one Recorder can be configured if necessary.
+The most obvious source of data for the sound recorder is a sound acquisition module, but it is also possible to connect a sound recorder to many other PAMGuard processes that produce raw data, including [Decimators](../../decimatorHelp/docs/decimator_decimator.html) and [Filters](../../FiltersHelp/Docs/Filters_filters.html). More than one Recorder can be configured if necessary.
 
 [Next: Sound Recorder Configuration](RecorderConfiguration.html)

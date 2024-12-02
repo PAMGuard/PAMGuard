@@ -1,8 +1,6 @@
 ---
 title: "Localisation"
 ---
- Generalised Power Law Detector  
-
 Generalised Power Law Detector
 ==============================
 

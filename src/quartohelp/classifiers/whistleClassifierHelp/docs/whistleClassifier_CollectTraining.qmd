@@ -1,8 +1,6 @@
 ---
 title: "Collecting Training Data"
 ---
- Whistle Classifier Overview  
-
 Whistle Classifier
 ==================
 
@@ -55,7 +53,7 @@ Training data are stored in files with the ending .wctd (Whistle Classifier Trai
 
 #### Running
 
-Run PAMGUARD. All the files in the directory structure of training data will be processed and .wctd files created in your output folder. The main classifier display will show distributions of whistle fragment parameter but will not be performing classification.
+Run PAMGuard. All the files in the directory structure of training data will be processed and .wctd files created in your output folder. The main classifier display will show distributions of whistle fragment parameter but will not be performing classification.
 
 There are of course other ways of organising your training data. For instance, if you wish to add new data to an already existing training set, it is not necessary to reprocess all the data.
 

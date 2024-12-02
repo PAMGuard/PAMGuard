@@ -1,8 +1,6 @@
 ---
 title: "Airgun Display"
 ---
- Airgun Display Configuration  
-
 Airgun Display
 ==============
 

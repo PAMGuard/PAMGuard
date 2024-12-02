@@ -1,8 +1,6 @@
 ---
 title: "Noise Band Measurement"
 ---
- Noise Band Measurement  
-
 Noise Band Measurement
 ======================
 

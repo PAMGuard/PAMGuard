@@ -1,8 +1,6 @@
 ---
 title: "Sidebar"
 ---
- Sidebar  
-
 SIDE Module
 ===========
 

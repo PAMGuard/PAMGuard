@@ -1,8 +1,6 @@
 ---
 title: "Creating  a Radar Display"
 ---
- Creating a Radar Display  
-
 Radar Display
 =============
 

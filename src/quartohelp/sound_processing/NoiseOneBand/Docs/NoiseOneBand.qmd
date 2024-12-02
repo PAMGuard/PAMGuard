@@ -1,8 +1,6 @@
 ---
 title: "Overview"
 ---
- Filtered Noise Measurement  
-
 Filtered Noise Measurement
 ==========================
 

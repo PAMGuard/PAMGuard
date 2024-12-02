@@ -1,8 +1,6 @@
 ---
 title: "Azigram (DIFAR Azigram Engine)"
 ---
- Sperm Whale IPI Plugin  
-
 Azigram plugin (beta)
 =====================
 

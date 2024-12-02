@@ -1,8 +1,6 @@
 ---
 title: "MySQL Databases"
 ---
- MySQL Database  
-
 Database
 ========
 
@@ -21,7 +19,7 @@ To connect to a MySQL database you will need to have a user name and password fo
 
 Once you have successfully connected to the MySQL server, you can either select an existing database or you can automatically create a new database by pressing the 'Create New' button and filling in the name of the new database.
 
-You do not need to add tables to the database, PAMGUARD will automatically create all of the tables it needs.
+You do not need to add tables to the database, PAMGuard will automatically create all of the tables it needs.
 
   
 [Back to database main page](database_database.html)

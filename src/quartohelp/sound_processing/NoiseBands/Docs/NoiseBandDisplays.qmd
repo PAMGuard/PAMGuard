@@ -1,7 +1,7 @@
 ---
 title: "Noise Band Displays"
 ---
- Noise Band Displays and Output    
+  
   
 
 Noise Band Displays and Output

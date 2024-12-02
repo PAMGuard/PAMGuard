@@ -1,8 +1,6 @@
 ---
 title: "Overview"
 ---
- PAMGuard Deep Learning Module - Overview  
-
 PAMGuard's deep learning module
 ===============================
 

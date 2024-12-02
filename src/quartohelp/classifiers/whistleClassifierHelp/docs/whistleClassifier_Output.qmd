@@ -1,8 +1,6 @@
 ---
 title: "Classifier Output"
 ---
- Whistle Classifier Overview  
-
 Whistle Classifier
 ==================
 
@@ -11,7 +9,7 @@ Whistle Classifier Output
 
 ### Graphical Output
 
-Classifier output is shown graphically on a tab on the [main PAMGUARD display](../../../overview/PamMasterHelp/docs/guiOverview.html).
+Classifier output is shown graphically on a tab on the [main PAMGuard display](../../../overview/PamMasterHelp/docs/guiOverview.html).
 
   
 

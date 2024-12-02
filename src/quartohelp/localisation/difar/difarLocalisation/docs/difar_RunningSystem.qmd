@@ -1,8 +1,6 @@
 ---
 title: "Running the System"
 ---
- Difar Module  
-
 DIFAR Localisation
 ==================
 

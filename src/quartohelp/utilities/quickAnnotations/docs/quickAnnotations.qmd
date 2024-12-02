@@ -1,8 +1,6 @@
 ---
 title: "Overview"
 ---
- Spectrogram Annotations  
-
 Quick Spectrogram Annotations
 =============================
 

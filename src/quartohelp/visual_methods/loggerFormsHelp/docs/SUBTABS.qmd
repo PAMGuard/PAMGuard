@@ -1,8 +1,6 @@
 ---
 title: "SUBTABS Property"
 ---
- SUBTABS Property  
-
 SUBTABS Property
 ================
 

@@ -1,8 +1,6 @@
 ---
 title: "SAIL Daq Cards"
 ---
- SAIL Data Acquisition Cards  
-
 SAIL Data Acquisition Cards
 ===========================
 

@@ -1,8 +1,6 @@
 ---
 title: "Overview"
 ---
- Radar Display  
-
 Radar Display
 =============
 

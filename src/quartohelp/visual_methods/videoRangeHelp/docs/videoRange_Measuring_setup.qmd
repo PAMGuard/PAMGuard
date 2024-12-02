@@ -1,8 +1,6 @@
 ---
 title: "Range Measurement Setup"
 ---
- Video Range Setup  
-
 Video Range
 ===========
 

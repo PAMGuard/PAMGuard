@@ -1,8 +1,6 @@
 ---
 title: "Bearing Calculator Overview"
 ---
- Bearing Localiser Overview  
-
 Bearing Localiser
 =================
 

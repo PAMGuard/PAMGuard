@@ -1,8 +1,6 @@
 ---
 title: "Configuring"
 ---
- Configuring an FFT Engine  
-
 FFT Engine
 ==========
 
@@ -15,13 +13,13 @@ Configuring an FFT Engine
 
 The FFT Parameters dialog is shown automatically when a new FFT Engine is created. It can also be accessed in the two following ways
 
-1\. From the _**Detection>FFT Parameters**_� menu 2. From the pop-up menu on the FFT Engine window in the PAMGUARD Data Model display.
+1\. From the _**Detection>FFT Parameters**_� menu 2. From the pop-up menu on the FFT Engine window in the PAMGuard Data Model display.
 
 ### Select a data source
 
 From the drop down list select a source of audio data. When you select a new data source, the channel list will be updated to show the number of channels in the selected data source. Tick the check boxes for the channels you wish FFT data to be computed for.
 
-To save processor power, do not calculate FFT data for channels that are not needed in subsequent PAMGUARD processes.
+To save processor power, do not calculate FFT data for channels that are not needed in subsequent PAMGuard processes.
 
 ### Set the FFT Length
 

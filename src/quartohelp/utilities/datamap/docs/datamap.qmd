@@ -1,17 +1,15 @@
 ---
 title: "Overview"
 ---
- Data Map  
-
 Data Map
 ========
 
 Overview
 --------
 
-Key to [PAMGUARD viewer](../../../overview/PamMasterHelp/docs/viewerMode.html) operation is the data map which provides an overview of all data available to the viewer.
+Key to [PAMGuard viewer](../../../overview/PamMasterHelp/docs/viewerMode.html) operation is the data map which provides an overview of all data available to the viewer.
 
-There is never a need to create a data map since it is created automatically whenever PAMGUARD is operating in Viewer mode. The data map is not available in other operation modes.
+There is never a need to create a data map since it is created automatically whenever PAMGuard is operating in Viewer mode. The data map is not available in other operation modes.
 
 ![Image](./images/DataMap.png)
 
@@ -30,7 +28,7 @@ You can double click on the title bar of each data density graph to minimise unw
 
 ### Loading Settings
 
-Each time PAMGUARD is started, settings are stored in the database and in the binary storage system. The times at which settings were stored are shown by small triangles in the "Settings" strip near the top of the data map. Hover the mouse over any of these triangles to see a list of modules in use at that time. To load a particular set of PAMGAURD settings, right click on the triangle and execute the pop up menu command.
+Each time PAMGuard is started, settings are stored in the database and in the binary storage system. The times at which settings were stored are shown by small triangles in the "Settings" strip near the top of the data map. Hover the mouse over any of these triangles to see a list of modules in use at that time. To load a particular set of PAMGAURD settings, right click on the triangle and execute the pop up menu command.
 
 ### Data Navigation
 

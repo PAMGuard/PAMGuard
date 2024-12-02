@@ -1,8 +1,6 @@
 ---
 title: "Tracking and Click Train Identification"
 ---
-Tracking and Click Train Identification  
-
 Click Detector
 ==============
 

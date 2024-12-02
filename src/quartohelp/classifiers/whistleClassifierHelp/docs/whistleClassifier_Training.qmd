@@ -1,8 +1,6 @@
 ---
 title: "Training the classifier"
 ---
- Whistle Classifier Overview  
-
 Whistle Classifier
 ==================
 
@@ -56,7 +54,7 @@ Progress will be indicated in the bar at the bottom of the window and also as te
 
 ### Training Output
 
-The training process produces a number of matrices which will control the classification process. These are automatically stored into the standard PAMGUARD settings file you are currently using.
+The training process produces a number of matrices which will control the classification process. These are automatically stored into the standard PAMGuard settings file you are currently using.
 
 You can also export the classifier settings to a Whistle Classifier Settings (\*.wcsd) file for archiving and easy sharing with other users so that they can set up the same classifier without requiring access to the training data set.
 

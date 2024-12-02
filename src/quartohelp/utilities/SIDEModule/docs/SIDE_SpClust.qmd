@@ -1,8 +1,6 @@
 ---
 title: "Species Cluster Selection"
 ---
- Species Cluster Selection  
-
 SIDE Module
 ===========
 

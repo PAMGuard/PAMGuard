@@ -1,15 +1,13 @@
 ---
 title: "Configuring the Likelihood Detector"
 ---
- Likelihood Detector Introduction  
-
 The Likelihood Detector Module
 ==============================
 
 Configuring the Likelihood Detector
 -----------------------------------
 
-Once there is a Likelihood detector module added to the PAMGUARD system, the module can be configured by selecting the `Detection->` menu item and choosing the menu option with the name that was supplied when the module was added.  
+Once there is a Likelihood detector module added to the PAMGuard system, the module can be configured by selecting the `Detection->` menu item and choosing the menu option with the name that was supplied when the module was added.  
   
 If this is the first time the module has been configured, then a dialog resembling the following will appear.
 
@@ -26,7 +24,7 @@ Likelihood Detector Parameters Dialog
 Selecting an Audio Data Source
 ------------------------------
 
-Located at the top of the Likelihood Detector configuration dialog is the standard PAMGUARD `Raw Data Source` management panel. Using the drop-down box you can select a single audio source for the module. A Likelihood Detection module can only have one audio source. If you would like to process multiple target configurations on multiple audio sources simultaneously, you will need to add another Likelihood Detection module. See the section on [adding a new Likelihood Detection module](LikelihoodDetector_NewModule.html) for more information.  
+Located at the top of the Likelihood Detector configuration dialog is the standard PAMGuard `Raw Data Source` management panel. Using the drop-down box you can select a single audio source for the module. A Likelihood Detection module can only have one audio source. If you would like to process multiple target configurations on multiple audio sources simultaneously, you will need to add another Likelihood Detection module. See the section on [adding a new Likelihood Detection module](LikelihoodDetector_NewModule.html) for more information.  
   
 You can also select which channels of audio data to process. By default, all channels will be selected, but by using the checkboxes you can filter out specific channeles.
 
