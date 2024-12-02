@@ -140,11 +140,6 @@ abstract public class PamDialog extends JDialog {
 //		System.out.println("Get icon: " + ClassLoader
 //				.getSystemResource(PamIcon.getPAMGuardIconPath(PamIcon.SMALL)));
 
-<<<<<<< Updated upstream
-=======
-//		setIconImage(new ImageIcon(ClassLoader
-//				.getSystemResource("Resources/pamguardIcon.png")).getImage());
->>>>>>> Stashed changes
 		setIconImage(PamIcon.getPAMGuardImageIcon(PamIcon.SMALL).getImage());
 
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
