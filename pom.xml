@@ -14,6 +14,7 @@
 	</organization>
 
 
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<javafx.version>21</javafx.version>
@@ -26,6 +27,7 @@
 		<mockito.version>1.10.19</mockito.version>
 		<powermock.version>1.6.6</powermock.version>
 	</properties>
+
 
 	<build>
 		<!-- Define where the source and test directories are -->
@@ -41,242 +43,375 @@
 				</excludes>
 			</resource>
 		</resources>
+	</build>
+
+	<!-- We define multiple profiles based on the operating system.
+	common-profile runs on all systems and then there are specific profiles which
+	are activated depending on the OS type. Note that the order of profiles is such
+	that  the ones which are defined later take precedence over the ones defined
+	earlier. Most OS specific profiles are for generating executables and code signing. 
+	Note use help:active-profiles to see which profiles are active -->
+	<profiles>
+	
+		<!-- The MacOS profile creates a DMG package for installing PAMGuard on MacOS-->
+		<!--Note: Ther eis a Maven bug when using profiles when the plugin order is messed up and seemingly quite random. 
+		In PAMGuard it essential that the shade plugin is called before the macos plugin and so the phase of the 
+		macos bundling has been moved to deploy. To run the bundler we therefore need to put both the macossappbunlder 
+		and exec shell script into the deploy phase so they are never really called. We then explicatelyl call them after 
+		the package phase using mvn package shade:shade macosappbundler:bundle exec:exec -->
+		<profile>
+			<id>macos-profile</id>
+	        <activation>
+	            <os>
+	                <family>mac</family>
+	            </os>
+	        </activation>
+			<build>
+				<plugins>
+					<!--  Plugin which creates a .dmg file for MacOS. -->
+					<plugin>
+						<groupId>de.perdian.maven.plugins</groupId>
+						<artifactId>macosappbundler-maven-plugin</artifactId>
+						<version>1.21.1</version>
+						<configuration>
+							<plist>
+								<JVMMainClassName>pamguard.Pamguard</JVMMainClassName>
+								<CFBundleIconFile>
+									src/Resources/PamguardIcon2.icns</CFBundleIconFile>
+								<CFBundleDisplayName>PAMGuard</CFBundleDisplayName>
+								<CFBundleDevelopmentRegion>English</CFBundleDevelopmentRegion>
+								<CFBundleURLTypes>
+									<string>msa</string>
+								</CFBundleURLTypes>
+								<JVMVersion>21+</JVMVersion>
+								<JVMArguments>
+									<string>-c</string>
+								</JVMArguments>
+								<NSAppSleepDisabled>true</NSAppSleepDisabled>
+							</plist>
+							<dmg>
+								<generate>true</generate>
+								<additionalResources>
+									<additionalResource>
+										<directory>
+											${project.basedir}/target/bundle/</directory>
+									</additionalResource>
+								</additionalResources>
+								<dmgFileName>${project.build.finalName}</dmgFileName>
+								<appendVersion>false</appendVersion>
+							</dmg>
+							<!--Very important or deep learning does not work-->
+							 <app>
+					            <includeDependencies>false</includeDependencies>
+					        </app>
+					        <jdk>
+								<include>true</include>
+								<!--<location>/Library/Java/JavaVirtualMachines/amazon-corretto-21.jdk</location>-->
+							</jdk>
+							<codesign>
+								<enable>false</enable>
+								<identity>3rd Party Mac Developer Application: Jamie Macaulay (7365S9DZ34)</identity>
+							</codesign>
+						</configuration>
+						<executions>
+							<execution>
+								<phase>deploy</phase>
+								<goals>
+									<goal>bundle</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
 
 
-		<plugins>
-			<!-- original maven compiler definition - uses the JRE's javac compiler, not the one Eclipse uses 
-	        <artifactId>maven-compiler-plugin</artifactId>
-	        <version>3.8.0</version>
-	        <configuration>
-	          <release>13</release>
-	        </configuration>
-	      -->
+					<!--There is an issue with coide signing in the macosappbundler-maven-plugin. Details of the issue are here.
+					https://developer.apple.com/library/archive/qa/qa1940/_index.html  
+					To get round this run a script afterwards which signs the .app and create an alternative dmg file which is signed  -->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>3.5.0</version>
+						<executions>
+							<execution>
+								<id>sign-app</id>
+								<phase>deploy</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>bash</executable>
+									<arguments>
+										<argument>-c</argument>
+										<argument>
+											echo ${project.basedir}/target/${project.build.finalName}.dmg
+											xattr -cr ${project.basedir}/target/PAMGuard.app
+											codesign --force --sign "3rd Party Mac Developer Application: Jamie Macaulay" ${project.basedir}/target/PAMGuard.app
+											cp -r ${project.basedir}/target/PAMGuard.app ${project.basedir}/target/bundle/PAMGuard.app
+											cd ${project.basedir}/target/bundle
+											hdiutil create -srcfolder ${project.basedir}/target/bundle -volname "PAMGuard" -fs HFS+ -o "${project.build.finalName}-signed.dmg"
+											rm -r ${project.basedir}/target/bundle/PAMGuard.app
+										</argument>
+									</arguments>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					
+				</plugins>
+			</build>
+		</profile>
 
-			<!--  attempt to use the Eclipse JDT compiler, so that the errors match when building
-			https://stackoverflow.com/questions/38070326/java-generics-compiler-error-not-shown-in-eclipse
-			https://wiki.eclipse.org/JDT/FAQ#Can_I_use_JDT_outside_Eclipse_to_compile_Java_code.3F
-			https://wiki.eclipse.org/Tycho/FAQ#Can_I_use_the_Tycho_compiler_support_in_non-OSGi_projects.2C_too.3F
-			-->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.12.1</version>
-				<configuration>
-					<!--  set compiler to use Java version 11 API https://docs.oracle.com/javase/9/tools/javac.htm#JSWOR627 -->
-					<release>21</release>
-					<compilerId>jdt</compilerId>
-				</configuration>
-				<dependencies>
-					<!-- https://mvnrepository.com/artifact/org.eclipse.tycho/tycho-compiler-jdt -->
-					<dependency>
-						<groupId>org.eclipse.tycho</groupId>
-						<artifactId>tycho-compiler-jdt</artifactId>
-						<version>1.5.1</version>
-					</dependency>
-				</dependencies>
-			</plugin>
 
-			<!-- Set up javafx properly.  -->
-			<plugin>
-				<groupId>org.openjfx</groupId>
-				<artifactId>javafx-maven-plugin</artifactId>
-				<version>0.0.8</version>
-			</plugin>
+		<!-- The common profile always runs-->
+		<profile>
+			<id>common-profile</id>
+			
+			<activation>
+				<!--<activeByDefault>true</activeByDefault>--> <!--Deactivates if another profile activates--> 
+				 <file><exists>.</exists></file>
+			</activation>
 
-			<!--  Maven Shade plugin - for creating the uberjar / fatjar -->
-			<!--  see http://maven.apache.org/plugins/maven-shade-plugin/index.html for details -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.2.1</version>
-				<configuration>
-					<transformers>
-						<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-					</transformers>
-					<filters>
-						<!-- Moved these filters up to here from where they were int <executions><execution><configurtion> 
-						based on advice at https://stackoverflow.com/questions/34738653/maven-shade-plugin-does-not-exclude-the-manifest-signature-files
-						and the are now working -->
-						<filter>
-							<artifact>*:*</artifact>
-							<excludes>
-								<exclude>META-INF/*.SF</exclude> <!--  get rid of manifests from library jars - also done in orig ant build file -->
-								<exclude>META-INF/*.DSA</exclude>
-								<exclude>META-INF/*.RSA</exclude>
-								<exclude>test/resources/**</exclude> <!--  get rid of deep learning moduels and wav files used for unit tests -->
-							</excludes>
-						</filter>
-					</filters>
-				</configuration>
+			<build>
+				<plugins>
+					<!-- original maven compiler definition - uses the JRE's javac compiler, not the one Eclipse uses 
+			        <artifactId>maven-compiler-plugin</artifactId>
+			        <version>3.8.0</version>
+			        <configuration>
+			          <release>13</release>
+			        </configuration>
+			     	 -->
 
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
+					<!--  attempt to use the Eclipse JDT compiler, so that the errors match when building
+					https://stackoverflow.com/questions/38070326/java-generics-compiler-error-not-shown-in-eclipse
+					https://wiki.eclipse.org/JDT/FAQ#Can_I_use_JDT_outside_Eclipse_to_compile_Java_code.3F
+					https://wiki.eclipse.org/Tycho/FAQ#Can_I_use_the_Tycho_compiler_support_in_non-OSGi_projects.2C_too.3F
+					-->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<version>3.12.1</version>
+						<configuration>
+							<!--  set compiler to use Java version 11 API https://docs.oracle.com/javase/9/tools/javac.htm#JSWOR627 -->
+							<release>21</release>
+							<compilerId>jdt</compilerId>
+						</configuration>
+						<dependencies>
+							<!-- https://mvnrepository.com/artifact/org.eclipse.tycho/tycho-compiler-jdt -->
+							<dependency>
+								<groupId>org.eclipse.tycho</groupId>
+								<artifactId>tycho-compiler-jdt</artifactId>
+								<version>1.5.1</version>
+							</dependency>
+						</dependencies>
+					</plugin>
+
+					<!-- Set up javafx properly.  -->
+					<plugin>
+						<groupId>org.openjfx</groupId>
+						<artifactId>javafx-maven-plugin</artifactId>
+						<version>0.0.8</version>
+					</plugin>
+
+					<!--  Maven Shade plugin - for creating the uberjar / fatjar -->
+					<!--  see http://maven.apache.org/plugins/maven-shade-plugin/index.html for details -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-shade-plugin</artifactId>
+						<version>3.6.0</version>
 						<configuration>
 							<transformers>
-								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<manifestEntries>
-										<Main-Class>pamguard.Pamguard</Main-Class>
-										<Class-Path>.</Class-Path> <!--  this is from the orig ant build file -->
-										<SplashScreen-Image>Resources/pgBlankSplash.png</SplashScreen-Image> <!--  this is from the orig ant build file -->
-									</manifestEntries>
-								</transformer>
-								<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
 							</transformers>
+							<filters>
+								<!-- Moved these filters up to here from where they were int <executions><execution><configurtion> 
+								based on advice at https://stackoverflow.com/questions/34738653/maven-shade-plugin-does-not-exclude-the-manifest-signature-files
+								and the are now working -->
+								<filter>
+									<artifact>*:*</artifact>
+									<excludes>
+										<exclude>META-INF/*.SF</exclude> <!--  get rid of manifests from library jars - also done in orig ant build file -->
+										<exclude>META-INF/*.DSA</exclude>
+										<exclude>META-INF/*.RSA</exclude>
+										<exclude>test/resources/**</exclude> <!--  get rid of deep learning moduels and wav files used for unit tests -->
+									</excludes>
+								</filter>
+							</filters>
 						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-
-			<!--  The Maven-JDEPS plugin, to analyze necessary JDK dependencies.  See
-		  this site for details: https://maven.apache.org/plugins/maven-jdeps-plugin/index.html -->
-			<plugin>
-				<groupId>com.github.marschall</groupId>
-				<artifactId>jdeps-maven-plugin</artifactId>
-				<version>0.5.1</version>
-			</plugin>
-
-			<!-- The Maven dependency plugin, which can copy all dependencies into a temp folder for jdeps analysis -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>3.1.1</version>
-				<executions>
-					<execution>
-						<id>copy-dependencies</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/tempDependencies</outputDirectory>
-							<overWriteReleases>false</overWriteReleases>
-							<overWriteSnapshots>false</overWriteSnapshots>
-							<overWriteIfNewer>true</overWriteIfNewer>
-						</configuration>
-					</execution>
-					<!--  this deletes all the dependencies in the local repository and downloads them again.  
-	          Run a Maven > Update after doing this in order to properly reset the dependencies.  Also, you
-	          will need to add the 3 jar files (x3, JasioHost and jave) back into the local repository after
-	          running this command -->
-
-					<!-- I'm not sure why, but every time I try to run the shade:shade build to create a
-			fatjar it first runs this, which deletes all of the dependencies and completely fails.
-			I think it has something to do with the lifecycle mapping, but that's beyond my Maven
-			abilities right now.
-			I can't even remember why I added this in the first place, so I'm going to comment
-			it out 
-	          <execution>
-	            <id>purge-local-dependencies</id>
-	            <phase>process-sources</phase>
-	            <goals>
-	              <goal>purge-local-repository</goal>
-	            </goals>
-	            <configuration>
-	            </configuration>
-	          </execution>
-	          -->
-				</executions>
-			</plugin>
-			
-			<plugin>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.5.1</version>
-				<configuration>
-					<reuseForks>false</reuseForks>
-				</configuration>
-			</plugin>
 		
-
-<!--			 Plugin which creates a .dmg file for MacOS. 
-		    <plugin>
-		        <groupId>de.perdian.maven.plugins</groupId>
-		        <artifactId>macosappbundler-maven-plugin</artifactId>
-		        <version>1.21.1</version>
-		        <configuration>
-		            <plist>
-		                <JVMMainClassName>pamguard.Pamguard</JVMMainClassName>
-		               <CFBundleIconFile>src/Resources/PamguardIcon2.icns</CFBundleIconFile>
-		                <CFBundleDisplayName>PAMGuard</CFBundleDisplayName>
-		                <CFBundleDevelopmentRegion>English</CFBundleDevelopmentRegion>
-		                <CFBundleURLTypes>
-		                    <string>msa</string>
-		                </CFBundleURLTypes>
-		                <JVMVersion>21+</JVMVersion>
-		                <JVMArguments>
-		                    <string>-v</string>
-		                </JVMArguments>
-		            </plist>
-		              <dmg>
-		                <generate>true</generate>
-		                <additionalResources>
-		                    <additionalResource>
-		                        <directory>src/target/macos/</directory>
-		                    </additionalResource>
-		                </additionalResources>
-		            </dmg>
-		             <jdk>
-			            <include>false</include>
-			            <location>/Library/Java/JavaVirtualMachines/amazon-corretto-21.jdk</location>
-			        </jdk>
-		             <codesign>
-		                <identity>3rd Party Mac Developer Application: PAMGuard</identity>
-		            </codesign> 
-		        </configuration>
-		        <executions>
-		            <execution>
-		                <phase>package</phase>
-		                <goals>
-		                    <goal>bundle</goal>
-		                </goals>
-		            </execution>
-		        </executions>
-		    </plugin> -->
-		</plugins>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>shade</goal>
+								</goals>
+								<configuration>
+									<transformers>
+										<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+											<manifestEntries>
+												<Main-Class>pamguard.Pamguard</Main-Class>
+												<Class-Path>.</Class-Path> <!--  this is from the orig ant build file -->
+												<SplashScreen-Image>Resources/pgBlankSplash.png</SplashScreen-Image> <!--  this is from the orig ant build file -->
+											</manifestEntries>
+										</transformer>
+										<transformer
+											implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+									</transformers>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
 
 
-		<pluginManagement>
-			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-	    									org.apache.maven.plugins
-	    								</groupId>
-										<artifactId>
-	    									maven-dependency-plugin
-	    								</artifactId>
-										<versionRange>
-	    									[3.1.1,)
-	    								</versionRange>
-										<goals>
-											<goal>
-	    										purge-local-repository
-	    									</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
+					<!--  The Maven-JDEPS plugin, to analyze necessary JDK dependencies.  See
+				  this site for details: https://maven.apache.org/plugins/maven-jdeps-plugin/index.html -->
+					<plugin>
+						<groupId>com.github.marschall</groupId>
+						<artifactId>jdeps-maven-plugin</artifactId>
+						<version>0.5.1</version>
+					</plugin>
+
+					<!-- The Maven dependency plugin, which can copy all dependencies into a temp folder for jdeps analysis -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<version>3.8.1</version>
+						<executions>
+							<execution>
+								<id>copy-dependencies</id>
+								<phase>package</phase>
+								<goals>
+									<goal>copy-dependencies</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${project.build.directory}/tempDependencies</outputDirectory>
+									<overWriteReleases>false</overWriteReleases>
+									<overWriteSnapshots>false</overWriteSnapshots>
+									<overWriteIfNewer>true</overWriteIfNewer>
+								</configuration>
+							</execution>
+							<!--  this deletes all the dependencies in the local repository and downloads them again.  
+			          Run a Maven > Update after doing this in order to properly reset the dependencies.  Also, you
+			          will need to add the 3 jar files (x3, JasioHost and jave) back into the local repository after
+			          running this command -->
+
+							<!-- I'm not sure why, but every time I try to run the shade:shade build to create a
+					fatjar it first runs this, which deletes all of the dependencies and completely fails.
+					I think it has something to do with the lifecycle mapping, but that's beyond my Maven
+					abilities right now.
+					I can't even remember why I added this in the first place, so I'm going to comment
+					it out 
+			          <execution>
+			            <id>purge-local-dependencies</id>
+			            <phase>process-sources</phase>
+			            <goals>
+			              <goal>purge-local-repository</goal>
+			            </goals>
+			            <configuration>
+			            </configuration>
+			          </execution>
+			          -->
+						</executions>
+					</plugin>
+
+
+					<!--  Plugin which creates a .dmg file for MacOS. -->
+					<plugin>
+						<groupId>de.perdian.maven.plugins</groupId>
+						<artifactId>macosappbundler-maven-plugin</artifactId>
+						<version>1.21.1</version>
+						<configuration>
+							<plist>
+								<JVMMainClassName>pamguard.Pamguard</JVMMainClassName>
+								<CFBundleIconFile>
+									src/Resources/PamguardIcon2.icns</CFBundleIconFile>
+								<CFBundleDisplayName>PAMGuard</CFBundleDisplayName>
+								<CFBundleDevelopmentRegion>English</CFBundleDevelopmentRegion>
+								<CFBundleURLTypes>
+									<string>msa</string>
+								</CFBundleURLTypes>
+								<JVMVersion>21+</JVMVersion>
+								<JVMArguments>
+									<string>-c</string>
+								</JVMArguments>
+								<NSAppSleepDisabled>true</NSAppSleepDisabled>
+							</plist>
+							<dmg>
+								<generate>true</generate>
+								<additionalResources>
+									<additionalResource>
+										<directory>
+											${project.basedir}/target/bundle/</directory>
+									</additionalResource>
+								</additionalResources>
+								<dmgFileName>${project.build.finalName}</dmgFileName>
+								<appendVersion>false</appendVersion>
+							</dmg>
+							<jdk>
+								<include>false</include>
+								<location>/Library/Java/JavaVirtualMachines/amazon-corretto-21.jdk</location>
+							</jdk>
+							<codesign>
+								<enable>false</enable>
+								<identity>3rd Party Mac Developer Application: Jamie Macaulay (7365S9DZ34)</identity>
+							</codesign>
+						</configuration>
+						<executions>
+							<execution>
+								<phase>deploy</phase>
+								<goals>
+									<goal>bundle</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+
+		
+				<pluginManagement>
+					<plugins>
+						<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+						<plugin>
+							<groupId>org.eclipse.m2e</groupId>
+							<artifactId>lifecycle-mapping</artifactId>
+							<version>1.0.0</version>
+							<configuration>
+								<lifecycleMappingMetadata>
+									<pluginExecutions>
+										<pluginExecution>
+											<pluginExecutionFilter>
+												<groupId>
+			    									org.apache.maven.plugins
+			    								</groupId>
+												<artifactId>
+			    									maven-dependency-plugin
+			    								</artifactId>
+												<versionRange>
+			    									[3.1.1,)
+			    								</versionRange>
+												<goals>
+													<goal>
+			    										purge-local-repository
+			    									</goal>
+												</goals>
+											</pluginExecutionFilter>
+											<action>
+												<ignore></ignore>
+											</action>
+										</pluginExecution>
+									</pluginExecutions>
+								</lifecycleMappingMetadata>
+							</configuration>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+			
+	    </profile>
+		
+	</profiles>
+	
+
 
 	<reporting>
 		<plugins>
@@ -358,7 +493,7 @@
 		<dependency>
 			<groupId>io.github.macster110</groupId>
 			<artifactId>jpamutils</artifactId>
-			<version>0.0.59d</version>
+			<version>0.0.59e</version>
 			<exclusions>
 				<exclusion>
 					<!-- com.github.psambit9791:wavfile:jar:0.1 pulls in various junit dependencies which breaks our own testing -->
@@ -372,7 +507,7 @@
 		<dependency>
 			<groupId>io.github.macster110</groupId>
 			<artifactId>jdl4pam</artifactId>
-			<version>0.0.99d</version>
+			<version>0.0.99e</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/gov.nist.math/jama -->
@@ -433,7 +568,7 @@
 			<artifactId>javafx-web</artifactId>
 			<version>${javafx.version}</version>
 		</dependency>
-		
+
 		<!-- Swing theme for MacOS -->
 		<dependency>
 		  <groupId>com.formdev</groupId>

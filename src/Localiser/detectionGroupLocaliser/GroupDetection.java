@@ -8,7 +8,6 @@ import PamDetection.PamDetection;
 import PamUtils.LatLong;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.superdet.SuperDetection;
-import PamguardMVC.superdet.SuperDetection;
 
 public class GroupDetection<T extends PamDataUnit> extends SuperDetection<T> implements PamDetection {
 

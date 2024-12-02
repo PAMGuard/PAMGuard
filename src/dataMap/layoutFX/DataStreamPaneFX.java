@@ -14,26 +14,27 @@ import dataMap.DataMapControl;
 import dataMap.DataMapDrawing;
 import dataMap.OfflineDataMap;
 import dataMap.OfflineDataMapPoint;
-import dataPlotsFX.scrollingPlot2D.PlotParams2D;
 import dataPlotsFX.scrollingPlot2D.StandardPlot2DColours;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.PixelBuffer;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.WritableImage;
-import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
 import PamController.OfflineDataStore;
 import PamController.PamController;
+import PamUtils.PamCalendar;
 import PamguardMVC.PamDataBlock;
 import pamViewFX.fxGlyphs.PamGlyphDude;
 import pamViewFX.fxNodes.PamBorderPane;
@@ -41,10 +42,10 @@ import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.pamAxis.PamAxisFX;
 import pamViewFX.fxNodes.pamAxis.PamAxisPane;
-import pamViewFX.fxNodes.utilsFX.ColourArray;
 import pamViewFX.fxNodes.utilsFX.ColourArray.ColourArrayType;
-import pamViewFX.fxNodes.utilsFX.PamUtilsFX;
 
+
+@SuppressWarnings("rawtypes") 
 public class DataStreamPaneFX extends PamBorderPane {
 	
 	/**
@@ -122,7 +123,10 @@ public class DataStreamPaneFX extends PamBorderPane {
 	 */
 	private Pane topPane;
 
-	private boolean collapsed;
+	/**
+	 * The collapsed property for the pane. 
+	 */
+	private SimpleBooleanProperty collapsed = new SimpleBooleanProperty();;
 	
 	/**
 	 * Timer that repaints after time diff has been reached 
@@ -148,13 +152,26 @@ public class DataStreamPaneFX extends PamBorderPane {
 		dataName = new DataMapInfo();
 		dataName.setName(dataBlock.getDataName()); 
 		dataName.setLongName(dataBlock.getLongDataName()); 
+		
+		this.collapsed.addListener((obsVal, oldVal, newVal)->{
+			if (newVal) {
+				this.setCenter(null);
+				this.setMaxHeight(PREF_HEADER_HEIGHT);
+
+			}
+			else {
+				this.setCenter(dataGraph);
+				this.setMaxHeight(-1);
+			}
+			this.setButtonGraphic();
+		});
 
 		this.setTop(topPane=createTopPane());
 		this.setCenter(dataGraph);
 	}
 
 	/*
-	 * Create pane which holds datasream label and allows the split pane to collapse
+	 * Create pane which holds data stream label and allows the split pane to collapse
 	 */
 	private Pane createTopPane(){
 		PamHBox topPane=new PamHBox();
@@ -182,8 +199,6 @@ public class DataStreamPaneFX extends PamBorderPane {
 	}
 	
 	
-	
-	
 	private void setButtonGraphic() {
 		if (this.isCollapsed()) {
 			showButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-down", (int) PREF_HEADER_HEIGHT-2));
@@ -191,7 +206,6 @@ public class DataStreamPaneFX extends PamBorderPane {
 		else {
 			showButton.setGraphic(PamGlyphDude.createPamIcon("mdi2c-chevron-up", (int) PREF_HEADER_HEIGHT-2));
 		}
-		
 	}
 
 	/**
@@ -209,7 +223,6 @@ public class DataStreamPaneFX extends PamBorderPane {
 	}
 	
 	private int getTotalDatas() {
-
 		int nMaps = dataBlock.getNumOfflineDataMaps();
 		OfflineDataMap aMap;
 		totalDatas = maxDatas = 0;
@@ -232,11 +245,11 @@ public class DataStreamPaneFX extends PamBorderPane {
 
 	public class DataGraphFX extends PamBorderPane {
 		
-		private Canvas plotCanvas;
-		
-		private double lastPlotted2DmaxVal;
+		public  Color loadDataColor=Color.DODGERBLUE;
 
-		private double lastPlotted2DminVal;
+		public  Color mouseDataColor=Color.CYAN;
+
+		private Canvas plotCanvas;
 		
 		private static final int NCOLOURPOINTS = 100;
 
@@ -311,6 +324,21 @@ public class DataStreamPaneFX extends PamBorderPane {
 				
 				scrollingDataPanel.getDataMapPane().selectedDataTime(dataBlock.getCurrentViewDataStart(), dataBlock.getCurrentViewDataEnd());
 				scrollingDataPanel.getDataMapPane().dataGraphMouseTime(tm);
+				
+				//the current viewer 
+				int millisSelect = (int) (dataBlock.getCurrentViewDataEnd() - dataBlock.getCurrentViewDataStart());
+				
+				paintDrawCanvas(drawCanvas.getGraphicsContext2D());
+				
+				
+				//show a preview of what will be loaded. 
+				paintDataSelection(drawCanvas.getGraphicsContext2D(), mouseDataColor,  tm-millisSelect/2,  tm+millisSelect/2, true);
+				
+			});
+			
+			canvasHolder.setOnMouseExited( e->{
+				//cleaar the hover data selector
+				paintDrawCanvas(drawCanvas.getGraphicsContext2D());
 			});
 			
 			canvasHolder.setOnMousePressed( e->{
@@ -453,42 +481,56 @@ public class DataStreamPaneFX extends PamBorderPane {
 		
 		/**
 		 * Paint any annotation marks on the draw canvas. 
-		 * @param graphicsContext2D - the graphcis handle to paint on. 
+		 * @param graphicsContext2D - the graphics handle to paint on. 
+		 * @param loadDataColor - the loaded data color. 
 		 */
 		private void paintDrawCanvas(GraphicsContext g) {
 			g.clearRect(0, 0, drawCanvas.getWidth(), drawCanvas.getHeight());
 
-			//create some sort of annotation user interface here?
-
-			//draw marks
-			/**
-			 * Draw on the chart the period of data loaded into memory.
-			 * @param g graphics
-			 */
+			//paint the currently selected data
 			long dataStart = dataBlock.getCurrentViewDataStart();
 			long dataEnd = dataBlock.getCurrentViewDataEnd();
+			
+			paintDataSelection(g, loadDataColor, dataStart, dataEnd, false); 
+		
+		}
+		
+		
+		/**
+		 * Paint the data which is currently selected. 
+		 *
+		 * @param g - the graphics context. 
+		 * @param dataHighlightCol - the colour to use.
+		 * @param dataStart - the start of the highlighted area.
+		 * @param dataEnd - the end of the highlighted area.
+		 */
+		private void paintDataSelection(GraphicsContext g,  Color dataHighlightCol, long dataStart, long dataEnd, boolean showTime) {
 
 			if (dataStart <= 0 || dataEnd < dataStart) {
 				return;
 			}
-			
-//			if (getScaleType() == DatagramScaleInformation.PLOT_3D){
-//				System.out.println("DataSTreamPaneFX: datastart: " + PamCalendar.formatDateTime2(dataStart) +  " "+dataBlock.getDataName()); 
-//				System.out.println("DataSTreamPaneFX: dataend: " + PamCalendar.formatDateTime2(dataEnd)+  " "+dataBlock.getDataName()); 
-//			}
 
 			double xStart = getXCoord(dataStart);
 			double xEnd = getXCoord(dataEnd);
-			
-			//TEMP
-			Color color=Color.DODGERBLUE;
-			
-			g.setStroke(color);
-			g.setFill(Color.rgb(((int) color.getRed()*255), ((int) color.getGreen()*255), ((int) color.getBlue()*255), this.dataBarOpacity=0.4));
+						
+			g.setStroke(dataHighlightCol);
+			g.setFill(Color.rgb(((int) dataHighlightCol.getRed()*255), ((int) dataHighlightCol.getGreen()*255), ((int) dataHighlightCol.getBlue()*255), this.dataBarOpacity));
 
-			int yEff = 5;
 			g.strokeRect(xStart, 0, xEnd-xStart, drawCanvas.getHeight());
 			g.fillRect(xStart, 0, xEnd-xStart, drawCanvas.getHeight());
+			
+			if (showTime) {
+				String time = PamCalendar.formatDateTime2(dataStart, false);
+				//bit of a faff to get the text drawing vertically!
+				g.save();
+				g.setFill(dataHighlightCol);
+		        g.setTextBaseline(VPos.CENTER);
+		        g.setTextAlign(TextAlignment.CENTER);
+		        g.translate(xStart, drawCanvas.getHeight());
+		        g.rotate(-90);
+				g.fillText(time, drawCanvas. getHeight()/2,-10);
+			    g.restore();
+			}
 		}
 
 
@@ -674,7 +716,7 @@ public class DataStreamPaneFX extends PamBorderPane {
 
 			datagramImage = new WritableImage(pixelBuffer);
 			g.setFill(Color.LIGHTGRAY);
-			g.fillRect(0, 0, nXPoints, nYPoints);
+			g.fillRect(0, 0, datagramImage.getWidth(), datagramImage.getHeight());
 			
 			Color col = null;
 			int colorARGB = 0;
@@ -1196,33 +1238,6 @@ public class DataStreamPaneFX extends PamBorderPane {
 	public Pane getTopPane() {
 		return topPane;
 	}
-
-	/***
-	 * Set a flag that the data stream pane has been collapsed. 
-	 * @param collapsed - true if collapsed.
-	 */
-	public void setCollapsed(boolean collapsed) {
-		this.collapsed=collapsed;
-		if (collapsed) {
-			this.setCenter(null);
-			this.setMaxHeight(PREF_HEADER_HEIGHT);
-
-		}
-		else {
-			this.setCenter(dataGraph);
-			this.setMaxHeight(-1);
-
-		}
-	}
-
-	/**
-	 * Check whether he data stream pane has been collapsed. 
-	 * @return true if collapsed. 
-	 */
-	public boolean isCollapsed() {
-		return collapsed;
-	}
-
 	
 	/**
 	 * Set the colour array for the data stream panel. 
@@ -1270,6 +1285,27 @@ public class DataStreamPaneFX extends PamBorderPane {
 		return hasDatagram;
 	}
 
+	/**
+	 * The collapsed property. 
+	 * @return the collapsed property. 
+	 */
+	public SimpleBooleanProperty collapedProperty() {
+		return this.collapsed;
+	}
+	
+	/***
+	 * Set a flag that the data stream pane has been collapsed. 
+	 * @param collapsed - true if collapsed.
+	 */
+	public void setCollapsed(boolean collapsed) {
+		this.collapsed.set(collapsed);;
+	}
 
-
+	/**
+	 * Check whether he data stream pane has been collapsed. 
+	 * @return true if collapsed. 
+	 */
+	public boolean isCollapsed() {
+		return collapsed.get();
+	}
 }

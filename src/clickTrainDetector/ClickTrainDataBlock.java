@@ -174,7 +174,6 @@ public class ClickTrainDataBlock<T extends CTDetectionGroupDataUnit> extends Sup
 			clickDataSelectCreator = new CTDataSelectCreator(clickTrainControl, this);
 		}
 		return clickDataSelectCreator;
-	
 	}
 
 }

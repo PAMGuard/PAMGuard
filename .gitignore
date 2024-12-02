@@ -24,9 +24,6 @@
 *.rar
 *.dll
 
-# quarto built sebsite
-/src/quartohelp/_site
-
 # eclipse project file
 .project
 # hprof memory analyser files. 
@@ -125,4 +122,15 @@ settings.xml
 .settings/org.eclipse.jdt.core.prefs
 .classpath
 .project
-.Rproj.user
+.settings/org.eclipse.core.resources.prefs
+.classpath
+.settings/org.eclipse.core.resources.prefs
+.classpath
+.classpath
+.classpath
+.classpath
+.classpath
+.classpath
+PAMGuard.app
+dependency-reduced-pom.xml
+.classpath

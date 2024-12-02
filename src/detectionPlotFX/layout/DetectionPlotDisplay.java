@@ -194,6 +194,7 @@ public class DetectionPlotDisplay extends PamBorderPane  {
 		this.scrollBarPane = new ScrollBarPane(); 
 		scrollBarPane.setShowMillis(true);
 
+
 		scrollBarPane.currentValueProperty().addListener((obsVal, oldVala, newVal)->{
 			scrollBarChanged();
 

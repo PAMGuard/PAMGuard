@@ -25,7 +25,6 @@ public class MLClickExport extends MLRawExport {
 
 		Matrix type = Mat5.newScalar(clickDetection.getClickType()); 
 
-
 		Matrix flag = Mat5.newScalar(clickDetection.getClickFlags()); 
 
 		//add to the structure. 

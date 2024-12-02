@@ -15,14 +15,21 @@ import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamController.SettingsPane;
+import PamView.PamDetectionOverlayGraphics;
 import PamView.PamSidePanel;
 import PamView.WrapperControlledGUISwing;
+import PamView.symbol.StandardSymbolManager;
+import PamView.symbol.SymbolData;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.dataSelector.DataSelector;
 import ai.djl.engine.Engine;
+import annotation.handler.AnnotationHandler;
 import dataPlotsFX.data.TDDataProviderRegisterFX;
+import dataPlotsFX.data.generic.GenericDataPlotProvider;
 import detectionPlotFX.data.DDPlotRegister;
+import generalDatabase.DBControlUnit;
+import generalDatabase.SQLLoggingAddon;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
 import rawDeepLearningClassifier.dataPlotFX.DLDetectionPlotProvider;
 import rawDeepLearningClassifier.dataPlotFX.DLPredictionProvider;
@@ -39,6 +46,8 @@ import rawDeepLearningClassifier.dlClassification.delphinID.DelphinIDClassifier;
 import rawDeepLearningClassifier.dlClassification.genericModel.GenericDLClassifier;
 import rawDeepLearningClassifier.dlClassification.ketos.KetosClassifier2;
 import rawDeepLearningClassifier.dlClassification.koogu.KooguClassifier;
+import rawDeepLearningClassifier.layoutFX.DLDetectionGraphics;
+import rawDeepLearningClassifier.layoutFX.DLGraphics;
 import rawDeepLearningClassifier.layoutFX.DLSettingsPane;
 import rawDeepLearningClassifier.layoutFX.DLSidePanelSwing;
 import rawDeepLearningClassifier.layoutFX.DLSymbolManager;
@@ -47,6 +56,8 @@ import rawDeepLearningClassifier.logging.DLAnnotationType;
 import rawDeepLearningClassifier.logging.DLDataUnitDatagram;
 import rawDeepLearningClassifier.logging.DLDetectionBinarySource;
 import rawDeepLearningClassifier.logging.DLDetectionDatagram;
+import rawDeepLearningClassifier.logging.DLGroupDetectionLogging;
+import rawDeepLearningClassifier.logging.DLGroupSubLogging;
 import rawDeepLearningClassifier.logging.DLResultBinarySource;
 import rawDeepLearningClassifier.offline.DLOfflineProcess;
 import rawDeepLearningClassifier.segmenter.SegmenterProcess;
@@ -202,6 +213,12 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	 */
 	private DLDefaultModelManager defaultModelManager;
 	
+	/**
+	 * DL Group detection logging. 
+	 */
+	private DLGroupDetectionLogging dlGroupDetLogging; 
+
+	
 	
 	/**
 	 * Constructor for the DL Control.
@@ -215,13 +232,13 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 				.getRawDataBlock(rawDLParmas.groupedSourceParams.getDataSource());
 		
 		
-		/**
-		 * In the latest release of djl (0.11.0) there is a bug with the dll's of tensorflow and 
-		 * pytorch. If tensorflow is loaded before pytorch there is a conglict in dll's and 
-		 * pytorch models will not load. This is a workaround for now and the bug has been logged and 
-		 * will bne fixed in subsequent djl releases. 
-		 */
-		Engine.getEngine("PyTorch"); 
+//		/**
+//		 * In the latest release of djl (0.11.0) there is a bug with the dll's of tensorflow and 
+//		 * pytorch. If tensorflow is loaded before pytorch there is a conglict in dll's and 
+//		 * pytorch models will not load. This is a workaround for now and the bug has been logged and 
+//		 * will been fixed in subsequent djl releases. 
+//		 */
+//		Engine.getEngine("PyTorch"); 
 
 		// segment the raw sound data
 		addPamProcess(segmenterProcess = new SegmenterProcess(this, rawDataBlock));
@@ -248,12 +265,41 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 		dlDetectionBinarySource = new DLDetectionBinarySource(this, dlClassifyProcess.getDLDetectionDatablock());
 		dlClassifyProcess.getDLDetectionDatablock().setBinaryDataSource(dlDetectionBinarySource);
 		dlClassifyProcess.getDLDetectionDatablock().setDatagramProvider(new DLDetectionDatagram(this));
+		
+//		//set database logging for group detections
+		dlClassifyProcess.getDLGroupDetectionDataBlock().SetLogging(dlGroupDetLogging = new DLGroupDetectionLogging(this, dlClassifyProcess.getDLGroupDetectionDataBlock()));
+		dlGroupDetLogging.setSubLogging(new DLGroupSubLogging(dlGroupDetLogging, dlClassifyProcess.getDLGroupDetectionDataBlock()));
+		
+		//a little strange this is not automatic but seems you have to add SQL add ons explicitly. 
+		AnnotationHandler annotationHandler = dlClassifyProcess.getDLGroupDetectionDataBlock().getAnnotationHandler();
+		annotationHandler.addAnnotationType(dlClassifyProcess.getDLAnnotionType());
+		SQLLoggingAddon sqlAddon = dlClassifyProcess.getDLAnnotionType().getSQLLoggingAddon();
+		if (sqlAddon != null) {
+			dlGroupDetLogging.addAddOn(sqlAddon);
+		}
+		
+		//add custom graphics
+		PamDetectionOverlayGraphics overlayGraphics = new DLGraphics(dlClassifyProcess.getDLPredictionDataBlock());
+		overlayGraphics.setDetectionData(true);
+		dlClassifyProcess.getDLPredictionDataBlock().setOverlayDraw(overlayGraphics);
 
+		overlayGraphics = new DLDetectionGraphics(	dlClassifyProcess.getDLDetectionDatablock());
+		overlayGraphics.setDetectionData(true);
+		dlClassifyProcess.getDLDetectionDatablock().setOverlayDraw(overlayGraphics);
+		
+		overlayGraphics = new DLDetectionGraphics(dlClassifyProcess.getDLGroupDetectionDataBlock());
+		overlayGraphics.setDetectionData(true);
+		dlClassifyProcess.getDLGroupDetectionDataBlock().setOverlayDraw(overlayGraphics);
+		
+		//set the symbol managers. 
 		dlClassifyProcess.getDLDetectionDatablock()
 				.setPamSymbolManager(new DLSymbolManager(this, dlClassifyProcess.getDLDetectionDatablock()));
+		dlClassifyProcess.getDLGroupDetectionDataBlock()
+			.setPamSymbolManager(new StandardSymbolManager(	dlClassifyProcess.getDLGroupDetectionDataBlock(),  new SymbolData()));
 		dlClassifyProcess.getDLPredictionDataBlock()
 				.setPamSymbolManager(new PredictionSymbolManager(this, dlClassifyProcess.getDLDetectionDatablock()));
-
+		
+	
 		/***** Add new deep learning models here ****/
 
 		dlModels.add(new SoundSpotClassifier(this));
@@ -276,9 +322,12 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 
 		// register click detector for the javafx display.
 		TDDataProviderRegisterFX.getInstance()
-				.registerDataInfo(new DLDetectionPlotProvider(this, dlClassifyProcess.getDLDetectionDatablock()));
+				.registerDataInfo(new DLDetectionPlotProvider(this, dlClassifyProcess.getDLDetectionDatablock(), false));
 		TDDataProviderRegisterFX.getInstance()
 				.registerDataInfo(new DLPredictionProvider(this, dlClassifyProcess.getDLPredictionDataBlock()));
+		TDDataProviderRegisterFX.getInstance()
+				.registerDataInfo(new DLDetectionPlotProvider(this, dlClassifyProcess.getDLGroupDetectionDataBlock(), true));
+
 
 		// register the DD display
 		DDPlotRegister.getInstance()
@@ -297,6 +346,7 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 		// ensure everything is updated.
 		updateParams(rawDLParmas);
 	}
+
 
 	/**
 	 * Get the available deep learning models

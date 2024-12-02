@@ -38,6 +38,7 @@ import java.util.TimeZone;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 
 import Acquisition.FolderInputSystem;
@@ -105,7 +106,8 @@ public class Pamguard {
 			else {
 				//do not use the mac version...it's awful
 				//UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			    UIManager.setLookAndFeel(new FlatLightLaf() );		
+			    UIManager.setLookAndFeel(new FlatLightLaf() );	
+
 			}
 			//		    for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 			//		        if ("Nimbus".equals(info.getName())) {

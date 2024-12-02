@@ -57,6 +57,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
 import javafx.geometry.Side;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -247,6 +248,7 @@ public class TDGraphFX extends PamBorderPane {
 
 		// create pane for plot panels.
 		plotPanels = new PamGridPane();
+		plotPanels.setCursor(Cursor.CROSSHAIR);
 
 		// create the graph projector. Has to be done here, so also need to set in
 		// marker.
@@ -590,7 +592,7 @@ public class TDGraphFX extends PamBorderPane {
 		
 		//needed to add this here because, if a new graph was created, the data type infos could be messed up and nothing would plot. 
 		if (currentScaleInfo.getDataTypeInfo().dataType != graphParameters.currentDataType.dataType) {
-			System.err.println("TDGraphFX: The graph paramters data type is not the same as the current dsata type"); 
+			System.err.println("TDGraphFX: The graph paramters data type is not the same as the current data type"); 
 			graphParameters.currentDataType = currentScaleInfo.getDataTypeInfo(); 
 		}
 		

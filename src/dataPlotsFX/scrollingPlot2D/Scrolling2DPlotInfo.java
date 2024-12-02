@@ -401,12 +401,12 @@ abstract public class Scrolling2DPlotInfo extends TDDataInfoFX implements Plot2D
 					//only repaint the base canvas. Otherwise overlaid detections will repaint and this can take a 
 					//a very long time. 
 					if (isViewer)
-						getTDGraph().repaint(TDDisplayFX.standardRefreshMillis, TDPlotPane.BASE_CANVAS);
+						getTDGraph().repaint(TDDisplayFX.STANDARD_REFRESH_MILLIS, TDPlotPane.BASE_CANVAS);
 					else {
 						//01/11/2019
 						// change back to repaint everything - if we only repaint the base canvas, the spectrogram will scroll continuously but
 						// overlay data will only get updated periodically and get out of sync with the spectrogram image
-						getTDGraph().repaint(TDDisplayFX.standardRefreshMillis);	
+						getTDGraph().repaint(TDDisplayFX.STANDARD_REFRESH_MILLIS);	
 					}
 				});
 			}

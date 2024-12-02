@@ -1,5 +1,9 @@
 package rawDeepLearningClassifier.dataPlotFX;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import dataPlotsFX.data.TDDataProviderFX;
@@ -19,11 +23,20 @@ import rawDeepLearningClassifier.dlClassification.DLDetection;
  */
 public class DLDetectionPlotInfoFX extends RawClipDataInfo {
 
+	protected static String iconResourcePath = "/Resources/modules/noun_Deep Learning_2486374.svg"; 
+
 
 	public DLDetectionPlotInfoFX(TDDataProviderFX tdDataProvider, DLControl dlControlm, TDGraphFX tdGraph, PamDataBlock pamDataBlock) {
 		super(tdDataProvider, tdGraph, pamDataBlock);
-		Node showingIcon = makeIcon(); 
-		this.getClipSettingsPane().setIcon(showingIcon);
+		
+		try {
+			URL iconURL = getClass().getResource(iconResourcePath).toURI().toURL();
+			Node showingIcon = makeIcon(iconURL); 
+			this.getClipSettingsPane().setIcon(showingIcon);
+		} catch (MalformedURLException | URISyntaxException e) {
+			e.printStackTrace();
+		}
+			
 		this.getClipSettingsPane().setShowingName("Deep Learning Detections");
 
 	}
@@ -40,17 +53,15 @@ public class DLDetectionPlotInfoFX extends RawClipDataInfo {
 		//System.out.println("Getting a spectrogram: " + spec.length + " x " + spec[0].length + " " + spec[0][5]);
 		return spec; 
 	}
-
 	
-	private Node makeIcon() {
-		String resourcePath = "/Resources/modules/noun_Deep Learning_2486374.svg"; 
+	protected static Node makeIcon(URL icon) {
 		try {
 			PamSVGIcon iconMaker= new PamSVGIcon(); 
 			//PamSVGIcon svgsprite = iconMaker.create(new File(getClass().getResource(resourcePath).toURI()), Color.WHITE);
-			PamSVGIcon svgsprite = iconMaker.create(getClass().getResource(resourcePath).toURI().toURL(), Color.WHITE,1);
-			 
-//			svgsprite.getSpriteNode().setStyle("-fx-text-color: white");				
-//			svgsprite.getSpriteNode().setStyle("-fx-fill: white");
+			PamSVGIcon svgsprite = iconMaker.create(icon, Color.WHITE,1);
+
+			//				svgsprite.getSpriteNode().setStyle("-fx-text-color: white");				
+			//				svgsprite.getSpriteNode().setStyle("-fx-fill: white");
 			svgsprite.setFitHeight(20);
 			svgsprite.setFitWidth(20);
 			return svgsprite.getSpriteNode(); 
@@ -60,5 +71,7 @@ public class DLDetectionPlotInfoFX extends RawClipDataInfo {
 		}
 		return null; 
 	}
+
+
 }
 

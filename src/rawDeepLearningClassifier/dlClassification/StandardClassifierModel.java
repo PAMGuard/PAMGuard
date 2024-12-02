@@ -73,7 +73,7 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 
 		
 		/**
-		 * If a sound file is being analysed then Ketos can go as slow as it wants. if used in real time
+		 * If a sound file is being analysed then classifier can go as slow as it wants. if used in real time
 		 * then there is a buffer with a maximum queue size. 
 		 */
 		if ((PamCalendar.isSoundFile() && !forceQueue) || dlControl.isViewer()) {

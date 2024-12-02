@@ -470,10 +470,16 @@ public class OfflineTaskGroup implements PamSettings {
 
 			//			synchronized(primaryDataBlock) {
 			OfflineDataMap dataMap = primaryDataBlock.getPrimaryDataMap();
+			if (dataMap==null) {
+				System.err.println("OfflineTaskGroup: processAllData: dataMap was null for " 
+						+ primaryDataBlock.getDataName());
+				return;
+			}
+			
 			int nMapPoints = dataMap.getNumMapPoints(startTime, endTime);
 			int iMapPoint = 0;
 			
-			System.out.println("N MAP POINTS: "+ nMapPoints + "  dataMap: " + dataMap.getParentDataBlock() + " start: " + PamCalendar.formatDateTime(startTime) + "  "  +PamCalendar.formatDateTime(endTime));
+//			System.out.println("N MAP POINTS: "+ nMapPoints + "  dataMap: " + dataMap.getParentDataBlock() + " start: " + PamCalendar.formatDateTime(startTime) + "  "  +PamCalendar.formatDateTime(endTime));
 			
 			publish(new TaskMonitorData(TaskStatus.RUNNING, TaskActivity.PROCESSING, nMapPoints, 0, "",  
 					taskGroupParams.startRedoDataTime));

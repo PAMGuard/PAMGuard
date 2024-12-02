@@ -1,9 +1,9 @@
 package dataMap.layoutFX;
 
 import java.io.Serializable;
-
 import PamController.PamControlledUnitSettings;
 import PamController.PamControllerInterface;
+import PamController.PamSettingManager;
 import PamController.PamSettings;
 import dataMap.DataMapControl;
 import javafx.application.Platform;
@@ -20,7 +20,6 @@ import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.hidingPane.HidingPane;
 import pamViewFX.fxNodes.internalNode.PamInternalPane;
-import pamViewFX.fxNodes.pamAxis.PamDateAxis;
 import pamViewFX.fxStyles.PamStylesManagerFX;
 import userDisplayFX.UserDisplayControlFX;
 import userDisplayFX.UserDisplayNodeFX;
@@ -67,12 +66,6 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX, P
 	private DataMapSettingsPane dataMapSettingsPane;
 
 	private PamVBox settingsPane;
-
-	/**
-	 * Axis which shows the current dates
-	 */
-	private PamDateAxis dateAxis;
-
 	/**
 	 * The parameters for the data map 
 	 */
@@ -81,6 +74,9 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX, P
 	public DataMapPaneFX(DataMapControl dataMapControl){
 		this.dataMapControl=dataMapControl; 
 		createDataMapPaneFX();
+		
+		PamSettingManager.getInstance().registerSettings(this);
+
 	}
 
 	/**
@@ -133,21 +129,16 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX, P
 
 
 		//		showButton.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.CHEVRON_DOWN, PamGuiManagerFX.iconColor, PamGuiManagerFX.iconSize));\
-		showButton.setGraphic( PamGlyphDude.createPamIcon("mdi2c-cog", Color.WHITE, PamGuiManagerFX.iconSize));
+		showButton.setGraphic( PamGlyphDude.createPamIcon("mdi2c-cog", PamGuiManagerFX.iconSize));
 		showButton.setPrefHeight(60);
 		scrollingDataPanel.setRight(showButton);
 
 		StackPane.setAlignment(showButton, Pos.CENTER_RIGHT);
 
-		StackPane stackPane = new StackPane();
-		stackPane.getChildren().addAll(scrollingDataPanel, hidingSettingsPane, showButton);
+		//add the settings pane to the scroll pane. 
+		scrollingDataPanel.getCenterStackPane().getChildren().addAll(hidingSettingsPane, showButton);
 
-		dateAxis = new PamDateAxis();
-		dateAxis.setMinHeight(50);
-		dateAxis.prefWidthProperty().bind(scrollingDataPanel.widthProperty());
-
-		this.setTop(dateAxis);
-		this.setCenter(stackPane);
+		this.setCenter(scrollingDataPanel);
 	}
 
 	public void newSettings() {
@@ -161,18 +152,9 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX, P
 				/**
 				 * First check the limits of the database and binary stores. 
 				 */
-				setGraphDimensions();
 				scrollingDataPanel.createDataGraphs();
 			}
 		});
-	}
-
-	/**
-	 * Based on the scale and on the total length of data
-	 * work out how big the little panels need to be 
-	 */
-	private void setGraphDimensions() {
-		long totalLength = dataMapControl.getLastTime() - dataMapControl.getFirstTime();
 	}
 
 	public void repaintAll() {
@@ -235,11 +217,9 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX, P
 
 	@Override
 	public void notifyModelChanged(int changeType) {
-		//		System.out.println("DataMapPane: Notify model changed!!!: " + changeType);
 		switch (changeType) {
 		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			scrollingDataPanel.updateScrollBar();
-			dataMapSettingsPane.setParams(dataMapParamsFX);
 			this.repaintAll();
 			break;
 		case PamControllerInterface.CHANGED_OFFLINE_DATASTORE:
@@ -374,18 +354,28 @@ public class DataMapPaneFX extends PamBorderPane implements UserDisplayNodeFX, P
 
 	@Override
 	public Serializable getSettingsReference() {
+		dataMapParamsFX = this.dataMapSettingsPane.getParams(dataMapParamsFX);	
+		
+		//prep the settings for saving. 
+		dataMapParamsFX.saveSerialised();
+		
 		return this.dataMapParamsFX;
 	}
 
 	@Override
 	public long getSettingsVersion() {
 		return  DataMapParametersFX.serialVersionUID;
-
 	}
 
 	@Override
 	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
 		dataMapParamsFX = ((DataMapParametersFX) pamControlledUnitSettings.getSettings()).clone();
+		
+		this.dataMapSettingsPane.setParams(dataMapParamsFX);
+		
+		//load any required serialized data into object properties. 
+		dataMapParamsFX.loadSerialised();
+		
 		return (dataMapParamsFX != null);
 	}
 

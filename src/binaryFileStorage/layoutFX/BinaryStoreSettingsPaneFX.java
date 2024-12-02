@@ -61,6 +61,8 @@ public class BinaryStoreSettingsPaneFX extends SettingsPane<BinaryStoreSettings>
 		super(null);
 		this.mainPane= new PamBorderPane();
 		createBinaryStorePane();
+		//Padding only seems to work if using CSS
+		mainPane.setStyle("-fx-padding: 5px;");
 	}
 	
 	

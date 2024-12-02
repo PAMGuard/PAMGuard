@@ -37,11 +37,8 @@ import PamguardMVC.PamDataBlock;
 import export.ExportParams;
 import export.PamExporterManager;
 import offlineProcessing.OLProcessDialog;
-import offlineProcessing.OLProcessDialog.OLMonitor;
 import offlineProcessing.OfflineTaskGroup;
-import offlineProcessing.TaskMonitor;
 import offlineProcessing.TaskMonitorData;
-import offlineProcessing.TaskStatus;
 
 /**
  * Handles an offline dialog for processing offline data and exporting to bespoke file types.
@@ -87,10 +84,27 @@ public class ExportProcessDialog {
 
 		for (int i=0; i<dataBlocks.size(); i++) {
 			if (exportManager.canExportDataBlock(dataBlocks.get(i))) {
-				dlOfflineGroup.addTask(new ExportTask(dataBlocks.get(i), exportManager));
+				dlOfflineGroup.addTask(createExportTask(dataBlocks.get(i)));
 			}
 		}
 	}
+	
+	/**
+	 * Create an export task from a data block. 
+	 * @param dataBlock - the data block to create the export tasks for. 
+	 * @return the export task. 
+	 */
+	private ExportTask createExportTask(PamDataBlock dataBlock) {
+		
+		//this is not good coding but cannot let the click event datablock be call "Tracked Clicks" in the exporter. 
+		if (dataBlock.getDataName().equals("Tracked Events")) {
+			return new ClickEventExportTask(dataBlock, exportManager); 
+		}
+		
+		return new ExportTask(dataBlock, exportManager);
+	}
+	
+	
 	////---Swing stuff----/// should not be here but this is how PG works. 
 
 	public void showOfflineDialog(Frame parentFrame, ExportParams params) {
@@ -385,7 +399,7 @@ public class ExportProcessDialog {
 		/**
 		 * Ok, this is a bit of a hack but because we run tasks for multiple data blocks 
 		 * we have to run a new task whenever the previous task is finished. So we use a task monitor
-		 * to deetct when the task is finsihed and then, instead of finishing we run a new task. 
+		 * to detect when the task is finished and then, instead of finishing we run a new task. 
 		 */
 		class ExportTaskMonitor extends OLMonitor {
 
@@ -405,7 +419,7 @@ public class ExportProcessDialog {
 				this.activeTasks = 0; 
 				for (int i1=0; i1<exportTaskGroup.getNTasks(); i1++) {
 					if (exportTaskGroup.getTask(i1).isDoRun()) {
-					activeTasks++;
+						activeTasks++;
 					}
 				}
 				
@@ -414,12 +428,11 @@ public class ExportProcessDialog {
 
 			@Override
 			public void setTaskStatus(TaskMonitorData taskMonitorData) {
-				
-				//System.out.println();			
 				switch (taskMonitorData.taskStatus) {
 				case COMPLETE:
-					if (taskIndex<exportTaskGroup.getNTasks() && !started) {
-						exportTaskGroup.runTaskFrom(taskIndex+1);
+					if (getNextTask()<exportTaskGroup.getNTasks() && !started) {
+						completeActiveTasks++;
+						exportTaskGroup.runTaskFrom(getNextTask());
 						started = true;
 					}
 					else super.setTaskStatus(taskMonitorData);
@@ -432,10 +445,11 @@ public class ExportProcessDialog {
 				switch (taskMonitorData.taskActivity) {
 				case LINKING:
 				case LOADING:
-					//the progress of one datablocks
+					//the progress of one data blocks
 					double progress = ((double) taskMonitorData.progValue)/taskMonitorData.progMaximum;
-					double totalProgress = ((double) taskIndex)/activeTasks + progress/activeTasks;
-//					System.out.println("Total progress: " + taskMonitorData.progValue + " of "  + taskMonitorData.progMaximum + " - " + totalProgress + "%" + "  " + progress + "  " + activeTasks + " " + taskIndex);
+					double totalProgress = ((double) completeActiveTasks)/activeTasks + progress/activeTasks;
+					System.out.println("Total progress: " + taskMonitorData.progValue + " of "  + taskMonitorData.progMaximum + " - " 
+					+ totalProgress + "%" + "  " + progress + "  " + activeTasks + " " + taskIndex + " completeActiveTasks " + completeActiveTasks);
 					//needs to be added to the overall progress
 					int max = getGlobalProgress().getMaximum();
 					getGlobalProgress().setValue((int) (totalProgress*max));
@@ -443,8 +457,25 @@ public class ExportProcessDialog {
 					break;
 				}
 			}
-
+			
+		
+			/**
+			 * FInd the index of the next task to run. 
+			 * @return the index of the next task to run. 
+			 */
+			private int getNextTask() {
+				for (int i1=taskIndex+1; i1<exportTaskGroup.getNTasks(); i1++) {
+					if (exportTaskGroup.getTask(i1).isDoRun()) {
+						return i1;
+					}
+				}
+				return exportTaskGroup.getNTasks();
+			}
+			
+			
 		}
+		
+	
 		
 		public ExportTaskMonitor newExportTaskMonitor(int i, ExportTaskGroup exportTaskGroup) {
 			return new ExportTaskMonitor(i, exportTaskGroup);
@@ -454,6 +485,8 @@ public class ExportProcessDialog {
 	}
 
 
+	//the numbe rof complete tasks. 
+	int completeActiveTasks = 0;
 
 	/**
 	 * Export task
@@ -477,7 +510,7 @@ public class ExportProcessDialog {
 		 */
 		public void runTaskFrom(int i) {
 
-			//sets the porimary datablock to that of the relevent task. 
+			//sets the primary data block to that of the relevent task. 
 			this.setPrimaryDataBlock(getTask(i).getDataBlock());
 			if (i<getNTasks()-1) {
 				//will start a new thread after this one has finished
@@ -496,7 +529,17 @@ public class ExportProcessDialog {
 		 */
 		@Override
 		public boolean runTasks() {
-			runTaskFrom(0) ;
+			completeActiveTasks=0;
+			//we run from the first active task - not from zero - otherwise the first task will always run. 
+			int firstActiveTask = 0; 
+			for (int i1=0; i1<getNTasks(); i1++) {
+				if (getTask(i1).isDoRun()) {
+					firstActiveTask=i1;
+					break;
+				}
+			}
+			
+			runTaskFrom(firstActiveTask) ;
 			return true;
 		}
 
