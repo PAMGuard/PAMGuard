@@ -1,0 +1,53 @@
+---
+title: "Overview"
+---
+ Filtered Noise Measurement  
+
+Filtered Noise Measurement
+==========================
+
+Overview
+--------
+
+  
+
+This module allows you to measure noise is a single band defined by a selection of filter types. As well as outputting several measurements at fixed time intervals it calculates cumulative sound exposure and also single pulse sound exposure for loud transients.
+
+### Creating the module
+
+From the _**File>Add modules>Sound Processing**_ menu, or from the pop-up menu on the data model display select "_**Filtered Noise Measurement**_". Enter a name for the new module and press Ok.
+
+### Configuring the module
+
+To configure the module, open the settings dialog from the _**Detection>"your module name"**_ menu:
+
+  
+![Filters Settings](Images/OneBandNoise.png)  
+
+#### Raw Data Source
+
+Select a source of raw data. This will generally be a [Sound Acquisition Module](../../AcquisitionHelp/docs/AcquisitionOverview.html) or the output of a [Decimator](../../decimatorHelp/docs/decimator_decimator.html) if a lower frequency noise measurement is required. Check the channels you want to measure noise on.
+
+  
+
+#### Measurement Interval
+
+Enter the interval between measurements in seconds and the interval for integrated sound exposure measurements.
+
+  
+
+#### Pulse Measurement
+
+If your want to measure parameters from a single pulse, you should check the "Detect Pulses" box. Enter a pulse detection threshold and the maximum duration of a single pulse.
+
+If you are using pulse detection, the measurement interval should be relatively short compared to the pulse interval (e.g. 1s for piling or seismic). The pulse detection algorithm is very simple and just requires a jump in received amplitude from one measurement to the next that is greater than the Detection Threshold. The pulse will end when the measured levels drop to lower then the maximum measurement within the pulse minus the threshold. If a pulse continues for too long, it will be truncated when it reaches the Max Length. This should generally be set to be between the expected pulse length and the expected pulse interval.
+
+  
+
+#### Filter Design
+
+A number of filter options are available. These are described in the [Filter Design](../../FiltersHelp/Docs/Filters_panel.html) section
+
+  
+
+[Next: Displays and Output](NoiseOneBandDisplays.html)

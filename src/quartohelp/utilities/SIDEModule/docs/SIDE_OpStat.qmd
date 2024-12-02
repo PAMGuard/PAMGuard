@@ -1,0 +1,35 @@
+---
+title: "Operations Status"
+---
+ Operations Status  
+
+SIDE Module
+===========
+
+Operations Status
+-----------------
+
+  
+
+The Operations Status window allows the user to specify and log the current operating conditions or monitoring phase. Test statistics will be collected separately for each state. **Critical Monitoring** and **Non-Critical Monitoring** statuses are included by default. The Critical Monitoring state is intended for periods of active mitigation monitoring, while the Non-Critical Monitoring state is intended for periods of monitoring that are not required for compliance or prior to a critical monitoring period.
+
+It is recommended that Quick Tests be performed during non-critical monitoring when possible. Random Drills can be implemented and edited throughout monitoring periods.
+
+  
+  
+![](images/SIDEOpStat.PNG)  
+  
+
+The current operations status can be selected from the drop-down text box. In order to properly log a status change to the database, a selection must be made from the text box _even if the correct status is already displayed_. When a status is selected, it will be shown in the [Operations State](SIDE_InfoTables.html#opState) table in the middle of the SIDE Module display, along with a time stamp to indicate when the status was changed.
+
+Pressing the **_Edit_** button will allow the user to add custom operational status codes. For example, noise conditions may vary considerably when seismic shooting and not shooting, so it may be sensible to have separate statuses for each of those conditions.
+
+It may also be desirable to avoid Random Drill tests during certain 'Critical Monitoring' periods such as immediately prior to line start. Random Drill tests can therefore be allowed or disabled for specific operations states by checking or unchecking the appropriate box.
+
+  
+  
+  
+
+[Previous: Quick/Random Test Parameters](SIDE_TestParams.html)
+
+[Next: Information Tables](SIDE_InfoTables.html)

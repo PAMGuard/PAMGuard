@@ -1,0 +1,30 @@
+---
+title: "Spectrogram Smoothing"
+---
+ spectrogram Smoothing Overview  
+
+Spectrogram Smoothing Kernel
+============================
+
+Overview
+--------
+
+The spectrogram smoothing kernel filters a spectrogram image in two dimensions by convolving an existing spectrogram with a 3 x 3 Guassian smoothing kernel  
+
+![User Input](images/Kernel.png)
+
+Image smoothing in this way is a standard process in many image processing edge detection applications, causing edges to become less broken.
+
+In signal processing terms, it is analogous to low pass filtering of audio data.
+
+The spectrogram images below show a smoothed spectrogram on the left and an un-smoothed spectrogram of the same data on the right.
+
+![User Input](images/Smoothing.png)
+
+The resulting smoothed spectrogram may be used by any PAMGUARD module that uses spectrogram data. Within PAMGUARD it is useful to include a spectrogram smoothing kernel before the [Whistle detector](../../../detectors/whistleDetectorHelp/docs/whistleDetector_Overview.html).
+
+### Adding a new smoothing kernel to PAMGUARD
+
+To add a new Spectrogram Smoothing Kernel module to PAMGUARD, select the **_File>Add Modules>Sound Processing>Spectrogram smoothing kernel_** menu command.
+
+[Next: Spectrogram Smoothing Configuration](AddingConfiguring.html)

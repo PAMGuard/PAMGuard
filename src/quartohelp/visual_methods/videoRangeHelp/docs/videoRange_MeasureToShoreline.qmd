@@ -1,0 +1,34 @@
+---
+title: "Measuring to a shoreline"
+---
+ Video Range Measuring to the Horizon  
+
+Video Range
+===========
+
+Measuring from a Shore Line
+---------------------------
+
+In situations where a horizon is not visible "behind" the object or animal, but a shoreline is, PAMGUARD provides he option to calculate a range based on the angle subtended between the object and the shoreline rather than the object and the horizon.
+
+To use this option choose the **Shore** tab of the **Video Range Settings** options
+
+![Shore Option](images/ShoreTabs.jpg)  
+
+One will need to specify the a file in PAMGAURD map format which holds the shoreline data. Use the **Browse** button to find and choose the appropriate file. (Help on maps in PAMUARD format can be found [here](../../../mapping/mapHelp/docs/mapMaking.html).)
+
+PAMGUARD will now use the camera's location and bearing to determine the range to the closest shoreline in the direction the imaged was taken. From this, and the observer's height, the dip to the waterline on the shore can be determined.
+
+Additional options are provided by three tick boxes
+
+**Ignore closest shore segments** should be chosen when making observations from shore because the first shoreline on the bearing line would be the one between the land and sea below the observation point.
+
+**Draw Shore on image**
+
+**Highlight Shore Vector Points**
+
+**Note:** In areas with a high tidal range and a gently shelving shore the range to to the waterline on the shore may vary considerable with tide height and in these situations this method will be unreliable and should not be used.
+
+  
+
+[Previous: Plotting and Measuring](videoRange_Measuring_Plot.html)

@@ -1,0 +1,20 @@
+---
+title: "Click Detector Displays"
+---
+ Click Detector Displays 
+
+Click Detector
+==============
+
+Click Detector Displays
+-----------------------
+
+  
+
+Data display and an interactive Graphical User Interface are fundamental to the workings of the click detector. Clicks from many species are often quite indistinct, especially when detected in noise and at the limits of detectability. Visually, it is often easy for an operator to pick out click trains on the display which consist of lines of regularly spaced clicks on consistent, slowly changing bearings.
+
+The click detector has a bespoke display panel containing a number of different displays for looking both at click trains and at individual clicks. It also displays information in the PAMGuard side panel and can overlay information on the map and other standard displays.
+
+[Previous: Click Detector Overview](ClickDetector_clickDetector.html)
+
+[Next: Tab Panel Displays](ClickDetector_clickTabPanelDisplays.html)

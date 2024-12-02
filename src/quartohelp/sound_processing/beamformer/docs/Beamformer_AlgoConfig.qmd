@@ -1,0 +1,71 @@
+---
+title: "Beamformer Algorithm Configuration"
+---
+Beamformer Algorithm Configuration  
+
+Beamformer Module
+=================
+
+Algorithm Configuration
+-----------------------
+
+  
+
+### Algorithm Dialog Tabs
+
+Both the Basic Frequency Domain and MVDR Beamformer Algorithms have the same user-configurable options. The dialog window has 2 tabs: [Individual Beams](#BF_ConfigIndivid) and [Beamogram](#BF_ConfigBeamogram). The user is able to define either individual beams, a beamogram, or both, depending on the output desired.
+
+  
+  
+
+### Configuring Individual Beams
+
+Individual beams can be created to focus the beamformer algorithms in a specific _look_ direction. The output data of a beam can be used with any module that accepts fft data, such as a spectrogram or the Whistle & Moan detector. When selecting a beam to use, the 'beam number' is used in place of the channel number that is normally specified in a dialog.
+
+  
+![](images/BF Individ Beams.PNG)
+
+1.  Array Information: The type of array _as defined by the channels in this group_, and the corresponding valid angle ranges. There are three possible array types: Linear, Planar and Volumetric.
+    
+    *   Linear arrays position all the hydrophones in a single line (1-dimensional). This type of array has both left/right and up/down ambiguity. The primary angle is defined in the direction of the main array axis (Y-axis, as given in the Array Manager) and is valid from 0° (positive Y) to 180° (negative Y). The secondary angle is undefined.
+        
+    *   Planar arrays position the hydrophones in two different axes (2-dimensional). This type of array resolves one of the ambiguities of the linear array, but not the other. For example, a planar array with both axis in the horizontal plane (X and Y) would be able to distinguish between left and right of the array, but not above or below. In that case the primary angle is defined relative to the main axis (positive Y) and valid from -180° to 180°. The secondary angle is measured perpendicular to the plane, and valid from 0° (in the same plane) to 90° (directly above/below).
+        
+    *   Volumetric arrays position the hydrophones in all three axes (3-dimensional). This type of array has no ambiguity. The primary angle is defined relative to the main axis (positive Y) and valid from -180° to 180°. The secondary angle is defined relative to the perpendicular axis (positive Z) and valid from -90° to 90°.
+        
+2.  List of Individual Beams: A list of the currently defined beams. Selecting one of the beams will highlight it and display the beam pattern in the chart to the right (if all beam patterns are being displayed in the chart, the selected beam pattern will be shown in orange).
+    
+3.  Beam Generation Tools: To create a new beam, type in the primary angle and secondary angle, select the window type, and press the Add Beam button. Pressing the Delete Beam button will delete whichever beam is currently selected in the table above. Pressing the Create Default Beams button will automaticall create _n_ beams, where _n_ is equal to the number of channels in this group. The beams will be evenly spaced throughout the valid primary angle range.
+    
+4.  Beam Pattern chart: a chart displaying the beam pattern of the currently selected beam, in orange. If all beams are being displayed, the other beams will be appear in grey. The beam pattern shows the gain as a function of primary angle, at the specified secondary angle and frequency. The gain is an indication of the angles at which constructive/destructive interference will occur between the channels.
+    
+5.  Beam Configuration Tools: tools to allow the user to modify the beam parameters and immediately see the effect in the chart above. The parameters are applied only to the beam selected in the table to the left, which will be shown in orange in the chart. Checking the Display All Beam Patterns box will display all of the beams in the chart, with the selected beam in orange and the remaining beams in grey.
+    
+
+  
+
+### Configuring the Beamogram
+
+Instead of creating individual beams to identify signals originating from a specific direction, a beamogram can be used to sweep an entire range of directions. The resultant output is a 'heat-map' of the amplitude of the signal versus primary and secondary angles. The output can be shown on a User Display tab by selecting New Beamformer Display.
+
+A beamogram can be considered as a great number of individual beams, combined into a single output. As such, it is much more computationally-intensive and care should be taken when selecting the parameters below. Small step sizes and large angle ranges (i.e. fine resolution scanning) will require appropriate processor speed and memory.
+
+![](images/BF Beamogram.PNG)  
+
+1.  Array Information: The type of array _as defined by the channels in this group_. Valid angle ranges are given in the appropriate sections below. There are three possible array types: Linear, Planar and Volumetric. See the [Individual Beams Array Information](#BF_ArryInfo) section for details of each.
+    
+2.  Checkbox indicating whether or not to calculate the beamogram.
+    
+3.  Primary angle parameters: the minimum, maximum and step size to use when sweeping the primary angle. The direction and valid range of the primary angle depends on the type of array. See the [Individual Beams Array Information](#BF_ArryInfo) section for details.
+    
+4.  Secondary angle parameters: the minimum, maximum and step size to use when sweeping the secondary angle. The direction and valid range of the secondary angle depends on the type of array. See the [Individual Beams Array Information](#BF_ArryInfo) section for details.
+    
+5.  The Frequency range: the beamogram requires much more processing-power than individual beams. In order to speed up the calculations and prevent memory overflow problems, it is recommended that the frequency range over which the beamogram is calculated be limited to the frequencies containing the signals of interest.
+    
+
+  
+  
+
+[Previous: Beamformer Settings](Beamformer_Settings.html)
+
+[Next: Beamformer Output](Beamformer_Output.html)

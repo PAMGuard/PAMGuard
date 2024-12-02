@@ -1,0 +1,37 @@
+---
+title: "Multiple Displays"
+---
+ Multiple Displays  
+
+PAMGUARD
+========
+
+Multiple Displays
+-----------------
+
+  
+
+### Overview
+
+To make the information displayed by PAMGUARD easier to see you can create multiple graphics frames each displaying the tab panels from one or more plug in module.
+
+For instance, you may want to put the map onto a separate frame and arrange your desktop so that you can view detector output in one frame and the map in another.
+
+This is particularly useful if you have more than one monitor attached to your computer. Most Laptops and other computers support multiple monitors. (See your computer's help files or manual for further information.)
+
+### Creating frames
+
+To create a new graphics frame, simply right click on one of the tabs in the [PAMGUARD GUI](guiOverview.html) and from the menu, either move the tab to another already existing GUI frame or create a new one.
+
+![Move Tabs](images/MoveTabs.png)
+
+If an additional GUI frame is closed, it's tabs will automatically be transferred back to the main GUI frame.
+
+If the main GUI frame is closed, PAMGUARD will exit.
+
+Additional frame configuration information is not currently stored when PAMGUARD exits.  
+  
+
+[Previous: Copying and Printing](CopyingPrinting.html)
+
+[Next: Adding and Removing Plugin Modules](addingRemovingPlugins.html)

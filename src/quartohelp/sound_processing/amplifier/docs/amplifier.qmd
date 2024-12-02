@@ -1,0 +1,32 @@
+---
+title: "Overview"
+---
+ Signal Amplifier  
+
+Signal Amplifier
+================
+
+The Signal Amplifier module can be used to increase or reduce the level of an audio signal and can also be used to invert signals.
+
+### Creating a Signal Amplifier
+
+From the **_File>Add modules>Sound Processing_** menu, or from the pop-up menu on the data model display select "**_Signal Amplifier_**". Enter a name for the new amplifier module and press Ok.
+
+  
+
+### Configuring the Signal Amplifier
+
+To access the module's settings, select _**Detection>Signal Amplifier...**_ from the detection menu. This will bring up a dialogue similar to the one shown below.
+
+  
+![Signal Amplifier](images/amplifier.png)  
+
+Select the sound source from the drop down list
+
+Set the gain for each channel in dB
+
+Check the box if you wish to invert the signal on a channel (multiply all valued by -1).
+
+### Using the Signal Amplifier
+
+Other PAMGUARD modules that use raw audio data can then subscribe to the output of the Signal Amplifier module instead of the [sound acquisition module](../../AcquisitionHelp/docs/AcquisitionOverview.html).

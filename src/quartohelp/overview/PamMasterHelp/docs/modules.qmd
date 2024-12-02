@@ -1,0 +1,168 @@
+---
+title: "PAMGUARD Modules"
+---
+
+PAMGUARD Modules
+
+# PAMGUARD
+
+## PAMGUARD Modules
+
+PAMGUARD contains of an ever growing number of plug-in modules, each of which performs some sort of data handling task. Individual modules may do anything from acquiring sound data, to managing a database or searching for a particular sound type. Generally, every module will acquire data either from another module, or through some external interface (such as a sound card, GPS or depth sensor readout). The output of a module may be a display, more data or both. A single module may have multiple output data streams. For instance, the sound acquisition module primarily outputs raw audio data to other PAMGUARD modules, but also outputs data providing a record of when sound acquisition was started and stopped which can be stored in the database.
+
+PAMGUARD currently contains 70 plug-in modules which can be selected and configured by the user (See the table below). It is generally possible to create multiple instances of a given module type. For instance, the operator may wish to incorporate two click detectors, each optimised for a different species, or have two sound acquisition modules, one acquiring low frequency data and one high frequency data. For certain module types (e.g. GPS acquisition), the user may be restricted to having a single instance.
+
+We are constantly developing new modules for PAMGuard. The table also includes some information on modules which we're working on at the moment. Due to PAMGuard being open source, there may of course be other modules under development we don't yet know about.
+
+ 
+Last updated 27 November 2024
+
+[Maps and Mapping](#_Maps_and_Mapping),
+[Utilities](#_Utilities),
+[Sensors](#_Sensors),
+[Displays](#_Displays),
+[Sound Processing](#_Sound_Processing),
+[Detectors](#_Detectors),
+[Classifiers](#_Classifiers),
+[Localisers](#_Localisers),
+[Visual Methods](#_Visual_Methods)
+
+ 
+<a name="_Maps_and_Mapping"></a>
+
+## Maps and Mapping (6 modules)
+ 
+| Module | Number | Function |
+|------|---|-------|
+| [NMEA Data Collection](../../../mapping/NMEA/docs/configuringNMEADataSource.html) | Any | Collects NMEA data from a serial port |
+| [GPS Processing](../../../mapping/NMEA/docs/ConfiguringGPS.html) | Any | Interprets NMEA data to extract GPS data |
+| [Map](../../../mapping/NMEA/docs/ConfiguringGPS.html) | Any | Displays a map of vessel position and detections |
+| [AIS Processing](../../../mapping/AIS/docs/AISOverview.html) | Up to 1 | Interprets NMEA data to extract AIS data |
+| [Airgun Display](../../../mapping/AirgunDisplay/docs/AirgunOverview.html) | Any | Shows the position of airguns (or any other source) on the map |
+| Fixed Landmarks | Any | Place object symbols on the PAMGuard map |
+ 
+<a name="_Utilities"></a>
+
+## Utilities (11 modules)
+ 
+| Module | Number | Function |
+|------|---|-------|
+| [Database](../../../utilities/generalDatabaseHelp/docs/database_database.html) | Exactly 1 | Stores PAMGuard data in a database |
+| [Binary Storage](../../../utilities/BinaryStore/docs/binarystore_overview.html) | Up to 1 | Stores PAMGuard data in files on the hard drive |
+| [Data Map](../../../utilities/datamap/docs/datamap.html) | Exactly 1 | Shows a summary of data density over time for large datasets |
+| [User input](../../../utilities/userInputHelp/docs/userInput.html) | Up to 1 | Creates a form for the user to type comments into |
+| [Aural Listening Form](../../../utilities/listening/docs/Listening_Overview.html) | Any | Creates a form for the user to manually log things they hear |
+| [Signal Injection and Detector Evaluation (SIDE)](../../../utilities/SIDEModule/docs/SIDE_Overview.html) | Up to 1 | Signal injection and real time performance tests |
+| [Alarm](../../../utilities/Alarms/docs/Alarms_Overview.html) | Any | Alerts the operator when certain detections are made |
+| [Spectrogram Annotation](../../../displays/displaymarks/docs/displaymarks.html) | Any | Offline marking on the spectrogram display |
+| [Print Screen](../../../overview/PamMasterHelp/docs/CopyingPrinting.html) | Up to 1 | Capture PAMGuard screens to time-stamped image files and the clipboard.  Use <CTRL-P> as a shortcut |
+| Scroll Effort | Up to 1 | Enables an observer to enter their name and infomation about which displays are being monitored |
+| [Backup Manager](../../../utilities/backupmanager/docs/backupmanager.html) | Up to 1 | Manage automated data backups |
+ 
+<a name="_Sensors"></a>
+
+## Sensors (6 modules)
+ 
+| Module | Number | Function |
+|------|---|-------|
+| [Analog Array Sensors](../../../sensors/analogarray/docs/analogarray.html) | Up to 1 | Reads Depth, Heading, Pitch and Roll) using analog sensors |
+| [Hydrophone Depth Readout](../../../utilities/depthreadout/docs/depth_overview.html) | Any | Reads and displays hydrophone depth information |
+| [Array Accelerometer](../../../sensors/arrayAccelerometer/docs/arrayAccelerometer.html) | Up to 1 | Reads and accelerometer to orientate a hydrophone array |
+| Angle Measurement | Any | Reads angles from a Fluxgate World shaft angle encoder. (Can be used to read angle of binocular stands) |
+| SoundTrap Detector Import | Up to 1 | Tools for import of SoundTrap detector data |
+| [CPOD Detector Import](../../../sensors/cpod/docs/cpod.html) | Any | Imports CPOD data |
+ 
+<a name="_Displays"></a>
+
+## Displays (4 modules)
+ 
+| Module | Number | Function |
+|------|---|-------|
+| [User Display](../../../displays/userDisplayHelp/docs/userDisplayPanel.html) | Any | Creates an empty display panel which the user can add spectrograms and other displays to |
+| [Local Time](../../../displays/LocalTime/Docs/LocalTime.html) | Any | Shows local time on the display |
+| [Level Meter](../../../displays/LevelMeters/Docs/LevelMeters.html) | Any | Shows signal level meters |
+| [Array Orientation](../../../sensors/analogarray/docs/analogarray.html) | Up to 1 | Displays array depth and orientation data |
+ 
+<a name="_Sound_Processing"></a>
+
+## Sound Processing (18 modules)
+ 
+| Module | Number | Function |
+|------|---|-------|
+| [Sound Acquisition](../../../sound_processing/AcquisitionHelp/docs/AcquisitionOverview.html) | Any | Controls input of sound data from sound cards, NI cards, etc.  |
+| [Sound Output](../../../sound_processing/soundPlaybackHelp/docs/soundPlayback_soundPlayback.html) | Exactly 1 | Controls output of sound data for listening to on headphones |
+| [FFT (Spectrogram) Engine](../../../sound_processing/fftManagerHelp/docs/FFTEngine_Overview.html) | Any | Computes spectrograms of audio data |
+| [Filters (IIR and FIR)](../../../sound_processing/FiltersHelp/Docs/Filters_filters.html) | Any | Filters audio data |
+| [Decimator](../../../sound_processing/decimatorHelp/docs/decimator_decimator.html) | Any | Decimates (reduces the frequency of) audio data |
+| Cepstrum | Any | Calculates a continuous Cepstrum from FFT Data |
+| [Sound recorder](../../../sound_processing/soundRecorderHelp/docs/RecorderOverview.html) | Any | Records audio data to wav of AIF files |
+| [Clip generator](../../../sound_processing/ClipGenerator/docs/ClipGenerator.html) | Any | Generates and stores short clips of sound data in response to detections |
+| [Signal Amplifier](../../../sound_processing/amplifier/docs/amplifier.html) | Any | Amplifies (or attenuates) audio data |
+| Patch Panel | Any | Reorganises and mixes audio data between channels |
+| [Spectrogram smoothing kernel](../../../sound_processing/SpectrogramSmoothing/docs/SpectrogramSmoothing.html) | Any | Smooths a spectrogram of audio data |
+| [Seismic Veto](../../../sound_processing/seismicveto/docs/veto_overview.html) | Any | Cuts out loud sounds from audio data |
+| Noise Monitor | Any | Measures noise in predefined frequency bands (e.g. thrid octave) |
+| [Noise Band Monitor](../../../sound_processing/NoiseBands/Docs/NoiseBands.html) | Any | Measure noise in octave or third octave bands |
+| [Filtered Noise Measurement](../../../sound_processing/NoiseOneBand/Docs/NoiseOneBand.html) | Any | Measure noise in a single arbitrary filter band (replaces dBHt module) |
+| [Long Term Spectral Average](../../../sound_processing/LTSA/Docs/LTSA.html) | Any | Make Long Term Spectral Average Measurements |
+| [Envelope Tracing](../../../sound_processing/EnvelopeTrace/Docs/EnvelopeOverview.html) | Any |  |
+| [Beamformer](../../../sound_processing/beamformer/docs/Beamformer_Overview.html) | Any | Continuous Frequency Domain Beamforming |
+ 
+<a name="_Detectors"></a>
+
+## Detectors (11 modules)
+ 
+| Module | Number | Function |
+|------|---|-------|
+| [Click Detector](../../../detectors/clickDetectorHelp/docs/ClickDetector_clickDetector.html) | Any | Searches for transient sounds, attempts to assign species, measure bearings to source, group into click trains, etc. |
+| [Click Train Detector](../../../detectors/ClickTrainDetector/docs/ClickTrainDetector.html) | Any | Searches for click trains in detected clicks. |
+| [Whistle and Moan Detector](../../../detectors/whistleMoanHelp/docs/whistleMoan_Overview.html) | Any | Searches for tonal noises. Measures bearings and locations of source. Replaces older Whistle Detector |
+| [Whistle Detector](../../../detectors/whistleDetectorHelp/docs/whistleDetector_Overview.html) | Any | Searches for tonal noises. Measures bearings and locations of source |
+| Ishmael energy sum | Any | Detects sounds with energy in a specific frequency band |
+| Ishmael spectrogram correlation | Any | Detects sounds matching a user defined 'shape' on a spectrogram |
+| Ishmael matched filtering | Any | Detects sounds using a user defined matched filter |
+| [Likelihood Detector](../../../detectors/likelihoodDetectionModuleHelp/docs/LikelihoodDetector_Introduction.html) | Any | An implementation of a likelihood ratio test |
+| Right Whale Edge Detector | Any | Detects right whale upsweep calls |
+| [Generalised Power Law Detector](../../../detectors/gpl/docs/gpldetector.html) | Any | Generalised Power Law Detector for tonal sounds |
+| SoundTrap Click Detector | Any | Click Detector module for Soundtrap detector data only |
+ 
+<a name="_Classifiers"></a>
+
+## Classifiers (4 modules)
+ 
+| Module | Number | Function |
+|------|---|-------|
+| [Whistle Classifier](../../../classifiers/whistleClassifierHelp/docs/whistleClassifier_Overview.html) | Any | Analyses multiple whistle contours to assign to species |
+| [Rocca](../../../classifiers/roccaHelp/docs/rocca_Overview.html) | Any | Real-time acoustic species identification of delphinid whistles and clicks |
+| [Matched Template Click Classifer](../../../classifiers/matchedtemplate/mathchedtemplate.html) | Any | Classifies clicks based on an ideal template to match and a template to reject. An example of this is to classify beaked whale clicks in an environment with dolphin clicks |
+| [Deep Learning Classifier](../../../classifiers/rawDeepLearningHelp/docs/rawDeepLearning_overview.html) | Any | Classifies sections of raw acoustic data based on an imported deep learning classifier |
+ 
+<a name="_Localisers"></a>
+
+## Localisers (8 modules)
+ 
+| Module | Number | Function |
+|------|---|-------|
+| [Bearing Localiser](../../../localisation/bearingLocaliser/docs/BL_Overview.html) | Any | Estimate bearing to detections or spectrogram marks from small aperture arrays |
+| [Group 3D Localiser](../../../localisation/group3d/docs/3doverview.html) | Any | 2D and 3D Localisation for large aperture arrays |
+| [Detection Grouper](../../../localisation/detectiongroup/docs/dglocaliser.html) | Any | Groups detections and other data using manual annotations on PAMGuard displays |
+| Ishmael Locator | Any | Locates sounds extracted either from areas marked out on a spectrogram display or using output from a detector |
+| [Multipath 3D Localiser](../../../detectors/Pam3DHelp/docs/guiOverview.html) | Any | Locates sounds detected by the click detector using surface echo's to obtain slant angles and generate a 3-D location |
+| [DIFAR Azigram Engine](../../../localisation/difar/difarAzigram/docs/azigram.html) | Any | (BETA) Azigram engine for multiplexed DIFAR data (BETA) |
+| [DIFAR Directional Audio](../../../localisation/difar/difarAudio/docs/directionalAudio.html) | Any | Audio from a DIFAR sonobuoy that has been beamformed at a user-specified single steering angle. This module can be used to reduce directional masking noise. |
+| [DIFAR Localisation](../../../localisation/difar/difarLocalisation/docs/difar_Overview.html) | Up to 1 | DIFAR Sonobuoy localisation module - takes raw data source with multiplexed directional audio data |
+ 
+<a name="_Visual_Methods"></a>
+
+## Visual Methods (2 modules)
+ 
+| Module | Number | Function |
+|------|---|-------|
+| [Video Range](../../../visual_methods/videoRangeHelp/docs/videoRange_videoRange.html) | Any | Calculates ranges based on angles measured from video, observer height and earth radius |
+| [Logger Forms](../../../visual_methods/loggerFormsHelp/docs/loggerFormsOverview.html) | Up to 1 | Replicates the functionality of User Defined Forms in the IFAW Logger software |
+
+
+
+[Previous: PAMGUARD Architecture](pamGuardArchitecture.html)
+
+[Next: Graphical User Interface Overview](guiOverview.html)

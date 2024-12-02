@@ -1,0 +1,38 @@
+---
+title: "Overview"
+---
+ FFT Engine Overview  
+
+FFT Engine
+==========
+
+Overview
+--------
+
+  
+
+Spectrograms of sound data are used throughout the PAMGUARD system. They provide the basic data for many detectors and also play an essential role in the PAMGUARD display. The FFT (spectrogram) Engine in PAMGUARD provides a powerful tool for generating spectrogram data from a raw data source.
+
+Data from a single FFT engine may be shared between multiple displays and detectors in order that processor intensive calculations are not repeated.
+
+  
+
+Output
+------
+
+  
+
+Versions Beta 1.5.00 and later include a number of [noise reduction](noise_removal.html) options as part of the FFT Engine. The FFT Engine therefore now has two output data streams which other PAMGUARD modules can subscribe to.
+
+The first is the raw FFT data
+
+The second is the FFT data after it's passed through the noise reduction processes
+
+Both of these data streams should appear automatically in drop down lists of data sources when you configure other modules.
+
+(If no noise reduction is enabled, then the output of the two streams will be identical)
+
+  
+  
+
+[Next: Creating an FFT Engine](FFTEngine_Creating.html)

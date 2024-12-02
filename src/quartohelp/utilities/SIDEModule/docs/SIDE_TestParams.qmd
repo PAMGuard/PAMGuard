@@ -1,0 +1,54 @@
+---
+title: "Test Parameters"
+---
+ Test Parameters  
+
+SIDE Module
+===========
+
+Quick / Random Drill Test Parameters
+------------------------------------
+
+For descriptions of the Quick Test and Random Drill Tests, please see [the Overview](SIDE_Overview.html#tests) page.
+
+  
+
+### Quick test
+
+![](images/SIDEQuick.PNG)  
+  
+
+The **_Number of Sequences_** defines how many [sequences](SIDE_Overview.html#seq) the SIDE Module will generate for each of the species checked off under _Quick_ in the [Species Cluster](SIDE_SpClust.html#spClust) window. 20 sequences are a recommended minimum to complete a Quick Test. A 20-sequence Quick Test with all species clusters should take approximately 15 minutes to complete. If you have enough time, 40 sequences will provide you with more accuracy.
+
+Pressing the **_Run Quick Tests_** button starts the Quick Test process. Note that this button is disabled (as shown in the image above) until all of the following conditions are met
+
+*   PAMGuard processing has begun
+*   At least one species has been selected for a Quick Test in the _Species Clusters_ window
+*   A Quick Test is not already running
+*   PAMGuard is not in Viewer mode
+*   An [Operations Status](SIDE_OpStat.html) has been selected.
+
+Poor results (e.g. poor regressions or all misses) likely indicate system or noise issues. Rather than increase the number of sequences injected in the hopes that a more accurate measure will yield better results, those issues should be investigated and solved first.
+
+Checking the **_Auto generate report_** box will cause a report to immediately be created upon completion of the Quick Test. If this box is left unchecked, a report can be generated any time after a test by simply right-clicking on one or more tests listed in the PAMGuard [Test History Information Table](SIDE_InfoTables.html#TestHistory) and selecting **_Process Test ##_** from the drop down menu.
+
+  
+  
+
+### Random Drill Tests
+
+![](images/SIDEDrill.PNG)  
+  
+
+The **_Random Drill Interval_** defines the average amount of time (in minutes) between injected sounds. Actual elapsed time between sounds will be randomly distributed around this number. The injection period may be adjusted depending on the monitoring phase. The following _minimum_ intervals are recommended to reduce the frequency of injections:
+
+*   60 minutes for 3-5 species clusters
+*   120 minutes for > 5 species clusters
+
+  
+  
+  
+
+[Previous: Species Cluster Selection](SIDE_SpClust.html)
+
+[Next: Operations Status](SIDE_OpStat.html)

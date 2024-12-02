@@ -1,0 +1,30 @@
+---
+title: "Matlab and R"
+---
+ Binary Storage  
+
+Binary Storage
+==============
+
+Matlab and R
+------------
+
+While the [PAMGuard Viewer](../../../overview/PamMasterHelp/docs/viewerMode.html) provides a powerful tool for reviewing data offline, many researchers want to wrte their own bespoke algorithms to further analyse PAMGuard detections or to plot and view the data in ways not available within the viewer.
+
+Although PAMGuard is fully open source, modifying the Java source code requires considerable programming expertise and is not for everyone. The PAMGuard team and our collaborators have therefore made available library functions in both the [Matlab](https://uk.mathworks.com/products/matlab.html) and [R](https://www.r-project.org/) programming languages, which allow users to unpack binary files into those programming environments for further bespoke analysis.
+
+Both the Matlab and R libraries are available for free. However, while the PAMGuard team are always interested in bug reports, both libraries are provided "as is" and come with no guarantee.
+
+### Matlab
+
+The Matlab code is available through the PAMGuard sourceforge site at [https://sourceforge.net/p/pamguard/svn/HEAD/tree/MatlabCode/](https://sourceforge.net/p/pamguard/svn/HEAD/tree/MatlabCode/). You don't need write access to the repository to get the code which can be downloaded from this link as a "snapshot", or via SVN if you want to get updates. There is direct support for SVN within Matlab, or you can use the free [Tortoise SVN](https://tortoisesvn.net/) client for Windows.
+
+If you don't have a Matlab license, the library should also be compatible with the free programming language [GNU Octave](https://www.gnu.org/software/octave/index>).
+
+### R
+
+The R interface was developed by colleagues at NOAA's South West Fisheries Science Centre in San Diego and is available on GitHub at [https://github.com/TaikiSan21/PamBinaries](https://github.com/TaikiSan21/PamBinaries).  
+  
+  
+
+[Previous: Binary store overview](binarystore_overview.html)

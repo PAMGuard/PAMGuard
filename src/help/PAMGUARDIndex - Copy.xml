@@ -1,0 +1,986 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<index version="1.0">
+ <indexitem text="ITIS Species Codes " target="utilities.tethys.docs.tethys_speciescodes"/>
+
+ <indexitem text="Tethys server " target="utilities.tethys.docs.tethys_server"/>
+
+ <indexitem text="Tethys database interface " target="utilities.tethys.docs.tethys_overview"/>
+
+ <indexitem text="SUD Files " target="sound_processing.AcquisitionHelp.docs.sudfiles"/>
+
+ <indexitem text="SoundTrap " target="sound_processing.AcquisitionHelp.docs.sudfiles"/>
+
+ <indexitem text="Sound Trap " target="sound_processing.AcquisitionHelp.docs.sudfiles"/>
+
+ <indexitem text="Click Train " target="detectors.ClickTrainDetector.docs.ClickTrainDetector"/>
+
+ <indexitem text="SUD " target="detectors.clickDetectorHelp.docs.SoundTrapClickDetector"/>
+
+ <indexitem text="SoundTrap " target="detectors.clickDetectorHelp.docs.SoundTrapClickDetector"/>
+
+ <indexitem text="3D Localisation " target="detectors.Pam3DHelp.docs.guiOverview"/>
+
+ <indexitem text="Adding or Editing a Hydrophone " target="utilities.hydrophoneArrayManagerHelp.docs.Array_NewHydrophone"/>
+
+ <indexitem text="Adding or Editing a Streamer " target="utilities.hydrophoneArrayManagerHelp.docs.Array_NewStreamer"/>
+
+ <indexitem text="Airgun Display " target="mapping.AirgunDisplay.docs.AirgunDisplay"/>
+
+ <indexitem text="Airgun Display configuration " target="mapping.AirgunDisplay.docs.AirgunConfiguration"/>
+
+ <indexitem text="Airgun Display Overview " target="mapping.AirgunDisplay.docs.AirgunOverview"/>
+
+ <indexitem text="AIS Configuration " target="mapping.AIS.docs.AISConfiguration"/>
+
+ <indexitem text="AIS Display " target="mapping.AIS.docs.AISDisplay"/>
+
+ <indexitem text="AIS Overview " target="mapping.AIS.docs.AISOverview"/>
+
+ <indexitem text="Alarms Actions " target="utilities.Alarms.docs.Alarms_Actions"/>
+
+ <indexitem text="Alarms Configuration " target="utilities.Alarms.docs.Alarms_Configuration"/>
+
+ <indexitem text="Alarms Display and Storage " target="utilities.Alarms.docs.Alarms_Display"/>
+
+ <indexitem text="Angle Measurement " target="visual_methods.angleMeasurementHelp.docs.angleMeasurement"/>
+
+ <indexitem text="Asio Sound Cards " target="sound_processing.AcquisitionHelp.docs.AcquisitionAsioSoundCard"/>
+
+ <indexitem text="ASIO Sound Cards " target="sound_processing.AcquisitionHelp.docs.AsioHelp"/>
+
+ <indexitem text="Audio File Folders " target="sound_processing.AcquisitionHelp.docs.AcquisitionFileFolder"/>
+
+ <indexitem text="Audio Files " target="sound_processing.AcquisitionHelp.docs.AcquisitionFile"/>
+
+ <indexitem text="Aural Listening Configuration " target="utilities.listening.docs.Listening_Configuration"/>
+
+ <indexitem text="Aural Listening Overview " target="utilities.listening.docs.Listening_Overview"/>
+
+ <indexitem text="Autoalert " target="visual_methods.loggerFormsHelp.docs.AUTOALERT"/>
+
+ <indexitem text="Avarage Subtration " target="sound_processing.fftManagerHelp.docs.noise_removal_averagesubtraction"/>
+
+ <indexitem text="Background subtraction " target="detectors.whistleMoanHelp.docs.whistleMoan_ConfigNoise_averagesubtraction"/>
+
+ <indexitem text="Basic click classifier " target="detectors.clickDetectorHelp.docs.ClickDetector_basicClassification"/>
+
+ <indexitem text="Beamformer Algorithm Configuration " target="sound_processing.beamformer.docs.Beamformer_AlgoConfig"/>
+
+ <indexitem text="Beamformer Output " target="sound_processing.beamformer.docs.Beamformer_Output"/>
+
+ <indexitem text="Beamformer Overview " target="sound_processing.beamformer.docs.Beamformer_Overview"/>
+
+ <indexitem text="Beamformer Settings " target="sound_processing.beamformer.docs.Beamformer_Settings"/>
+
+ <indexitem text="Bearing " target="visual_methods.loggerFormsHelp.docs.BEARING"/>
+
+ <indexitem text="Bearing Calculator Algorithm Configuration " target="localisation.bearingLocaliser.docs.BL_AlgoConfig"/>
+
+ <indexitem text="Bearing Calculator Output " target="localisation.bearingLocaliser.docs.BL_Output"/>
+
+ <indexitem text="Bearing Calculator Overview " target="localisation.bearingLocaliser.docs.BL_Overview"/>
+
+ <indexitem text="Bearings " target="sound_processing.ClipGenerator.docs.ClipGeneratorBearings"/>
+
+ <indexitem text="Beep " target="utilities.Alarms.docs.Alarms_Actions"/>
+
+ <indexitem text="Binary " target="classifiers.whistleClassifierHelp.docs.whistleClassifier_Output"/>
+
+ <indexitem text="Binary " target="detectors.clickDetectorHelp.docs.ClickDetector_clickStorageOptions"/>
+
+ <indexitem text="Binary Storage " target="utilities.BinaryStore.docs.binarystore_overview"/>
+
+ <indexitem text="Binary Store " target="overview.PamMasterHelp.docs.datastorage2"/>
+
+ <indexitem text="Branching " target="detectors.whistleMoanHelp.docs.whistleMoan_ConfigBranching"/>
+
+ <indexitem text="Can't find serial port " target="mapping.NMEA.docs.Troubleshooting_NoSerialPort"/>
+
+ <indexitem text="Cancel Button " target="visual_methods.loggerFormsHelp.docs.NOCANCEL"/>
+
+ <indexitem text="Channel grouping and bearings " target="detectors.whistleMoanHelp.docs.whistleMoan_ConfigGrouping"/>
+
+ <indexitem text="Classification " target="detectors.clickDetectorHelp.docs.offline_Reclassify_clicks"/>
+
+ <indexitem text="Classification " target="detectors.clickDetectorHelp.docs.offline_Reanalyse_click_types"/>
+
+ <indexitem text="Classifiers " target="overview.PamMasterHelp.docs.modules_classifiers"/>
+
+ <indexitem text="Click Amplitude " target="detectors.clickDetectorHelp.docs.offline_Tools_AmplSel"/>
+
+ <indexitem text="Click Classification " target="detectors.clickDetectorHelp.docs.ClickDetector_clickClassification"/>
+
+ <indexitem text="Click Classifier with frequency sweep " target="detectors.clickDetectorHelp.docs.ClickDetector_betterClassification"/>
+
+ <indexitem text="Click Detector " target="detectors.clickDetectorHelp.docs.ClickDetector_clickDetector"/>
+
+ <indexitem text="Click Detector Displays " target="detectors.clickDetectorHelp.docs.ClickDetector_clickDetectorDisplays"/>
+
+ <indexitem text="Click Detector Offline Analysis " target="detectors.clickDetectorHelp.docs.offline_Overview"/>
+
+ <indexitem text="Click Detector Sidepanel " target="detectors.clickDetectorHelp.docs.ClickDetector_clickSidePanel"/>
+
+ <indexitem text="Click Display " target="detectors.clickDetectorHelp.docs.offline_Tools_Zoom"/>
+
+ <indexitem text="Click Removal " target="sound_processing.fftManagerHelp.docs.noise_removal_clickremoval"/>
+
+ <indexitem text="Click removal " target="detectors.whistleMoanHelp.docs.whistleMoan_ConfigNoise_clickremoval"/>
+
+ <indexitem text="Click Storage " target="detectors.clickDetectorHelp.docs.ClickDetector_clickStorageOptions"/>
+
+ <indexitem text="Click Train Identification " target="detectors.clickDetectorHelp.docs.ClickDetector_clickTrainIdentification"/>
+
+ <indexitem text="Click trains " target="detectors.clickDetectorHelp.docs.offline_MarkingOutEvents"/>
+
+ <indexitem text="Clip Generator " target="sound_processing.ClipGenerator.docs.ClipGeneratorDisplay"/>
+
+ <indexitem text="Clip Generator " target="sound_processing.ClipGenerator.docs.ClipGeneratorBearings"/>
+
+ <indexitem text="Clip generator " target="sound_processing.ClipGenerator.docs.ClipGenerator"/>
+
+ <indexitem text="Clipping " target="displays.LevelMeters.Docs.LevelMeters"/>
+
+ <indexitem text="Clock Setting from GPS " target="mapping.NMEA.docs.ClockOptions"/>
+
+ <indexitem text="Collect training data " target="classifiers.whistleClassifierHelp.docs.whistleClassifier_CollectTraining"/>
+
+ <indexitem text="Components " target="visual_methods.loggerFormsHelp.docs.CHAR"/>
+
+ <indexitem text="Components " target="visual_methods.loggerFormsHelp.docs.TIMESTAMP"/>
+
+ <indexitem text="Components " target="visual_methods.loggerFormsHelp.docs.TIME"/>
+
+ <indexitem text="Components " target="visual_methods.loggerFormsHelp.docs.SINGLE"/>
+
+ <indexitem text="Components " target="visual_methods.loggerFormsHelp.docs.SHORT"/>
+
+ <indexitem text="Components " target="visual_methods.loggerFormsHelp.docs.NMEAINT"/>
+
+ <indexitem text="Components " target="visual_methods.loggerFormsHelp.docs.NMEAFLOAT"/>
+
+ <indexitem text="Components " target="visual_methods.loggerFormsHelp.docs.NMEACHAR"/>
+
+ <indexitem text="Components " target="visual_methods.loggerFormsHelp.docs.LOOKUP"/>
+
+ <indexitem text="Components " target="visual_methods.loggerFormsHelp.docs.LATLONG"/>
+
+ <indexitem text="Components " target="visual_methods.loggerFormsHelp.docs.INTEGER"/>
+
+ <indexitem text="Components " target="visual_methods.loggerFormsHelp.docs.DOUBLE"/>
+
+ <indexitem text="Components " target="visual_methods.loggerFormsHelp.docs.CHECKBOX"/>
+
+ <indexitem text="Components " target="visual_methods.loggerFormsHelp.docs.COUNTER"/>
+
+ <indexitem text="Configuration " target="classifiers.roccaHelp.docs.rocca_Configure_rocca_SourceTab"/>
+
+ <indexitem text="Configuration " target="classifiers.roccaHelp.docs.rocca_Configure_rocca_SchoolStatsFile"/>
+
+ <indexitem text="Configuration " target="classifiers.roccaHelp.docs.rocca_Configure_rocca_ParamsOutput"/>
+
+ <indexitem text="Configuration " target="classifiers.roccaHelp.docs.rocca_Configure_rocca_ParamsFilename"/>
+
+ <indexitem text="Configuration " target="classifiers.roccaHelp.docs.rocca_Configure_rocca_ParamsContour"/>
+
+ <indexitem text="Configuration " target="classifiers.roccaHelp.docs.rocca_Configure_rocca_ParamsClassifier"/>
+
+ <indexitem text="Configuration " target="classifiers.roccaHelp.docs.rocca_Configure_rocca_ClassifierModel"/>
+
+ <indexitem text="Configuration " target="classifiers.roccaHelp.docs.rocca_Configure_OutputDir"/>
+
+ <indexitem text="Configuration " target="classifiers.roccaHelp.docs.rocca_Configure"/>
+
+ <indexitem text="Configure Whistle Moan Detector " target="detectors.whistleMoanHelp.docs.whistleMoan_Configure"/>
+
+ <indexitem text="Configuring the whistle classifier " target="classifiers.whistleClassifierHelp.docs.whistleClassifier_Configure"/>
+
+ <indexitem text="Connected Regions " target="detectors.whistleMoanHelp.docs.whistleMoan_ConfigConnect"/>
+
+ <indexitem text="Contour Manipulation " target="classifiers.roccaHelp.docs.rocca_ContourExtractionManipulation_manual"/>
+
+ <indexitem text="Contour Manipulation " target="classifiers.roccaHelp.docs.rocca_ContourExtractionManipulation"/>
+
+ <indexitem text="Copying and Printing " target="overview.PamMasterHelp.docs.CopyingPrinting"/>
+
+ <indexitem text="Counter " target="visual_methods.loggerFormsHelp.docs.COUNTER"/>
+
+ <indexitem text="Creation and Configuration " target="utilities.SIDEModule.docs.SIDE_Configure"/>
+
+ <indexitem text="Custom Forms " target="visual_methods.loggerFormsHelp.docs.loggerFormsOverview"/>
+
+ <indexitem text="Data Acquisition Configuration " target="sound_processing.AcquisitionHelp.docs.AcquisitionConfiguration"/>
+
+ <indexitem text="Data Acquisition Overview " target="sound_processing.AcquisitionHelp.docs.AcquisitionOverview"/>
+
+ <indexitem text="Data Annotation " target="overview.annotations.docs.annotations"/>
+
+ <indexitem text="Data Entry " target="visual_methods.loggerFormsHelp.docs.loggerFormsOverview"/>
+
+ <indexitem text="Data Map " target="detectors.clickDetectorHelp.docs.offline_Navigating"/>
+
+ <indexitem text="Data Map " target="utilities.datamap.docs.datamap"/>
+
+ <indexitem text="Data source " target="detectors.whistleMoanHelp.docs.whistleMoan_ConfigSource"/>
+
+ <indexitem text="Data Storage " target="overview.PamMasterHelp.docs.datastorage"/>
+
+ <indexitem text="Data Storage " target="overview.PamMasterHelp.docs.datastorage2"/>
+
+ <indexitem text="Database " target="classifiers.whistleClassifierHelp.docs.whistleClassifier_Output"/>
+
+ <indexitem text="Database " target="overview.PamMasterHelp.docs.datastorage2"/>
+
+ <indexitem text="Database " target="detectors.clickDetectorHelp.docs.ClickDetector_clickStorageOptions"/>
+
+ <indexitem text="Database Import and Export " target="utilities.generalDatabaseHelp.docs.import_export"/>
+
+ <indexitem text="Database Overview " target="utilities.generalDatabaseHelp.docs.database_database"/>
+
+ <indexitem text="dB " target="displays.LevelMeters.Docs.LevelMeters"/>
+
+ <indexitem text="Decibels " target="displays.LevelMeters.Docs.LevelMeters"/>
+
+ <indexitem text="Decimator " target="sound_processing.decimatorHelp.docs.decimator_decimator"/>
+
+ <indexitem text="Detectors " target="overview.PamMasterHelp.docs.modules_detectors"/>
+
+ <indexitem text="Difar " target="localisation.difar.difarLocalisation.docs.difar_UsingSpectrogram"/>
+
+ <indexitem text="DIFAR Calibration " target="localisation.difar.difarLocalisation.docs.difar_Calibration"/>
+
+ <indexitem text="DIFAR Display " target="localisation.difar.difarLocalisation.docs.difar_UsingDifarGramDisplay"/>
+
+ <indexitem text="DIFAR Display " target="localisation.difar.difarLocalisation.docs.difar_ConfigureUserDisplay"/>
+
+ <indexitem text="DIFAR Graphics " target="localisation.difar.difarLocalisation.docs.difar_GraphicsOutput"/>
+
+ <indexitem text="DIFAR Groups " target="localisation.difar.difarLocalisation.docs.difar_CrossingBearings"/>
+
+ <indexitem text="DIFAR Layout " target="localisation.difar.difarLocalisation.docs.difar_DifarOutput"/>
+
+ <indexitem text="DIFAR Localisation " target="localisation.difar.difarLocalisation.docs.difar_CrossingBearings"/>
+
+ <indexitem text="DIFAR Operation " target="localisation.difar.difarLocalisation.docs.difar_RunningSystem"/>
+
+ <indexitem text="DIFAR Output " target="localisation.difar.difarLocalisation.docs.difar_DifarOutput"/>
+
+ <indexitem text="DIFAR Parameters " target="localisation.difar.difarLocalisation.docs.difar_ConfigureProcessing"/>
+
+ <indexitem text="DIFAR Queue " target="localisation.difar.difarLocalisation.docs.difar_ManagingQueue"/>
+
+ <indexitem text="DIFAR Setup " target="localisation.difar.difarLocalisation.docs.difar_ConfigureModule"/>
+
+ <indexitem text="DIFAR Triangulation " target="localisation.difar.difarLocalisation.docs.difar_CrossingBearings"/>
+
+ <indexitem text="Difargram " target="localisation.difar.difarLocalisation.docs.difar_UsingDifarGramDisplay"/>
+
+ <indexitem text="Display " target="classifiers.roccaHelp.docs.rocca_Spectrogram"/>
+
+ <indexitem text="Display " target="classifiers.roccaHelp.docs.rocca_Sidebar"/>
+
+ <indexitem text="Display " target="sound_processing.ClipGenerator.docs.ClipGeneratorDisplay"/>
+
+ <indexitem text="Display " target="sound_processing.NoiseOneBand.Docs.NoiseOneBandDisplays"/>
+
+ <indexitem text="Display " target="sound_processing.NoiseBands.Docs.NoiseBandDisplays"/>
+
+ <indexitem text="Display " target="visual_methods.loggerFormsHelp.docs.AUTOALERT"/>
+
+ <indexitem text="Display " target="visual_methods.loggerFormsHelp.docs.BEARING"/>
+
+ <indexitem text="Display " target="visual_methods.loggerFormsHelp.docs.RANGE"/>
+
+ <indexitem text="Display " target="visual_methods.loggerFormsHelp.docs.SYMBOLTYPE"/>
+
+ <indexitem text="Display " target="localisation.difar.difarLocalisation.docs.difar_UsingSpectrogram"/>
+
+ <indexitem text="Displays " target="overview.PamMasterHelp.docs.modules_displays"/>
+
+ <indexitem text="DLM Common Mistakes and Bugs " target="classifiers.rawDeepLearningHelp.docs.rawDeepLearning_Bugs"/>
+
+ <indexitem text="DLM Create and Configure " target="classifiers.rawDeepLearningHelp.docs.rawDeepLearning_CreateAndConfig"/>
+
+ <indexitem text="DLM Overview " target="classifiers.rawDeepLearningHelp.docs.rawDeepLearning_overview"/>
+
+ <indexitem text="DLM Results " target="classifiers.rawDeepLearningHelp.docs.rawDeepLearning_Results"/>
+
+ <indexitem text="DLM Running " target="classifiers.rawDeepLearningHelp.docs.rawDeepLearning_Running"/>
+
+ <indexitem text="Double " target="visual_methods.loggerFormsHelp.docs.DOUBLE"/>
+
+ <indexitem text="Empty NMEA strings " target="mapping.NMEA.docs.Troubleshooting_EmptyStrings"/>
+
+ <indexitem text="Envelope Tracing " target="sound_processing.EnvelopeTrace.Docs.EnvelopeOverview"/>
+
+ <indexitem text="FFT " target="sound_processing.fftManagerHelp.docs.noise_removal_thresholding"/>
+
+ <indexitem text="FFT " target="sound_processing.fftManagerHelp.docs.noise_removal_medianfilter"/>
+
+ <indexitem text="FFT " target="sound_processing.fftManagerHelp.docs.noise_removal_kernelsmoothing"/>
+
+ <indexitem text="FFT " target="sound_processing.fftManagerHelp.docs.noise_removal_clickremoval"/>
+
+ <indexitem text="FFT " target="sound_processing.fftManagerHelp.docs.noise_removal_averagesubtraction"/>
+
+ <indexitem text="FFT " target="sound_processing.fftManagerHelp.docs.noise_removal"/>
+
+ <indexitem text="FFT Engine Configuration " target="sound_processing.fftManagerHelp.docs.FFTEngine_Configuring"/>
+
+ <indexitem text="FFT Engine Creating " target="sound_processing.fftManagerHelp.docs.FFTEngine_Creating"/>
+
+ <indexitem text="FFT Engine Overview " target="sound_processing.fftManagerHelp.docs.FFTEngine_Overview"/>
+
+ <indexitem text="Filter Design " target="sound_processing.FiltersHelp.Docs.Filters_panel"/>
+
+ <indexitem text="Filter Types " target="sound_processing.FiltersHelp.Docs.Filters_types"/>
+
+ <indexitem text="Filtered Noise Measurement " target="sound_processing.NoiseOneBand.Docs.NoiseOneBandDisplays"/>
+
+ <indexitem text="Filtered Noise Measurement " target="sound_processing.NoiseOneBand.Docs.NoiseOneBand"/>
+
+ <indexitem text="Filters " target="sound_processing.FiltersHelp.Docs.Filters_filters"/>
+
+ <indexitem text="Floating point " target="visual_methods.loggerFormsHelp.docs.SYMBOLTYPE"/>
+
+ <indexitem text="Floating point " target="visual_methods.loggerFormsHelp.docs.SINGLE"/>
+
+ <indexitem text="Floating point " target="visual_methods.loggerFormsHelp.docs.NMEAFLOAT"/>
+
+ <indexitem text="Form Design " target="visual_methods.loggerFormsHelp.docs.designingForms"/>
+
+ <indexitem text="General Alarm Alert Warning " target="utilities.Alarms.docs.Alarms_Overview"/>
+
+ <indexitem text="GMT " target="displays.LocalTime.Docs.LocalTime"/>
+
+ <indexitem text="GPS " target="visual_methods.loggerFormsHelp.docs.READONGPS"/>
+
+ <indexitem text="GPS " target="detectors.clickDetectorHelp.docs.offline_AddingGPSData"/>
+
+ <indexitem text="GPS and NMEA Troubleshooting " target="mapping.NMEA.docs.Troubleshooting"/>
+
+ <indexitem text="GPS Configuration " target="mapping.NMEA.docs.ConfiguringGPS"/>
+
+ <indexitem text="Graphic Overlays " target="detectors.clickDetectorHelp.docs.ClickDetector_MapOverlays"/>
+
+ <indexitem text="Heading " target="visual_methods.loggerFormsHelp.docs.HEADING"/>
+
+ <indexitem text="Hydrophone Array Configuration " target="utilities.hydrophoneArrayManagerHelp.docs.Array_Configuration"/>
+
+ <indexitem text="Hydrophone Array Overview " target="utilities.hydrophoneArrayManagerHelp.docs.Array_Overview"/>
+
+ <indexitem text="Hydrophone Depth Readout Configuration " target="utilities.depthreadout.docs.depth_configuration"/>
+
+ <indexitem text="Hydrophone Depth Readout Overview " target="utilities.depthreadout.docs.depth_overview"/>
+
+ <indexitem text="Importing Modules " target="overview.PamMasterHelp.docs.ImportingModules"/>
+
+ <indexitem text="Importing Rainbow Click (RBC .clk) Files " target="detectors.clickDetectorHelp.docs.offline_ImportingRBC"/>
+
+ <indexitem text="Information tables " target="utilities.SIDEModule.docs.SIDE_InfoTables"/>
+
+ <indexitem text="Integer " target="visual_methods.loggerFormsHelp.docs.SHORT"/>
+
+ <indexitem text="Integer " target="visual_methods.loggerFormsHelp.docs.NMEAINT"/>
+
+ <indexitem text="Integer " target="visual_methods.loggerFormsHelp.docs.INTEGER"/>
+
+ <indexitem text="Kernal Smoothing " target="sound_processing.fftManagerHelp.docs.noise_removal_kernelsmoothing"/>
+
+ <indexitem text="Kernel smoothing " target="detectors.whistleMoanHelp.docs.whistleMoan_ConfigNoise_kernelsmoothing"/>
+
+ <indexitem text="Lat Long " target="visual_methods.loggerFormsHelp.docs.LATLONG"/>
+
+ <indexitem text="Lattitude Longitude " target="visual_methods.loggerFormsHelp.docs.LATLONG"/>
+
+ <indexitem text="Level Meters " target="displays.LevelMeters.Docs.LevelMeters"/>
+
+ <indexitem text="Likelihood Detector Configuration " target="detectors.likelihoodDetectionModuleHelp.docs.LikelihoodDetector_Config"/>
+
+ <indexitem text="Likelihood Detector Creating " target="detectors.likelihoodDetectionModuleHelp.docs.LikelihoodDetector_NewModule"/>
+
+ <indexitem text="Likelihood Detector Data FLow " target="detectors.likelihoodDetectionModuleHelp.docs.LikelihoodDetector_IntroductionFlow"/>
+
+ <indexitem text="Likelihood Detector Import/Export " target="detectors.likelihoodDetectionModuleHelp.docs.LikelihoodDetector_ImportExport"/>
+
+ <indexitem text="Likelihood Detector Overview " target="detectors.likelihoodDetectionModuleHelp.docs.LikelihoodDetector_Introduction"/>
+
+ <indexitem text="Likelihood Detector Removal " target="detectors.likelihoodDetectionModuleHelp.docs.LikelihoodDetector_RemoveModule"/>
+
+ <indexitem text="Local Time " target="displays.LocalTime.Docs.LocalTime"/>
+
+ <indexitem text="Localisation " target="localisation.difar.difarLocalisation.docs.difar_CrossingBearings"/>
+
+ <indexitem text="Localisation Algorithms " target="localisation.docs.localisation_algorithms"/>
+
+ <indexitem text="Localisers " target="overview.PamMasterHelp.docs.modules_Localisers"/>
+
+ <indexitem text="Localising Cetaceans " target="localisation.docs.localisation_overview"/>
+
+ <indexitem text="Logger forms " target="visual_methods.loggerFormsHelp.docs.loggerFormsOverview"/>
+
+ <indexitem text="Logger Forms " target="visual_methods.loggerFormsHelp.docs.AUTOALERT"/>
+
+ <indexitem text="Logger Forms " target="visual_methods.loggerFormsHelp.docs.CHAR"/>
+
+ <indexitem text="Logger Forms " target="visual_methods.loggerFormsHelp.docs.BEARING"/>
+
+ <indexitem text="Logger Forms " target="visual_methods.loggerFormsHelp.docs.TIMESTAMP"/>
+
+ <indexitem text="Logger Forms " target="visual_methods.loggerFormsHelp.docs.TIME"/>
+
+ <indexitem text="Logger Forms " target="visual_methods.loggerFormsHelp.docs.SYMBOLTYPE"/>
+
+ <indexitem text="Logger Forms " target="visual_methods.loggerFormsHelp.docs.SUBTABS"/>
+
+ <indexitem text="Logger Forms " target="visual_methods.loggerFormsHelp.docs.SINGLE"/>
+
+ <indexitem text="Logger Forms " target="visual_methods.loggerFormsHelp.docs.SHORT"/>
+
+ <indexitem text="Logger Forms " target="visual_methods.loggerFormsHelp.docs.READONTIMER"/>
+
+ <indexitem text="Logger Forms " target="visual_methods.loggerFormsHelp.docs.READONNMEA"/>
+
+ <indexitem text="Logger Forms " target="visual_methods.loggerFormsHelp.docs.READONGPS"/>
+
+ <indexitem text="Logger Forms " target="visual_methods.loggerFormsHelp.docs.RANGE"/>
+
+ <indexitem text="Logger Forms " target="visual_methods.loggerFormsHelp.docs.NOCLEAR"/>
+
+ <indexitem text="Logger Forms " target="visual_methods.loggerFormsHelp.docs.NOCANCEL"/>
+
+ <indexitem text="Logger Forms " target="visual_methods.loggerFormsHelp.docs.NMEAINT"/>
+
+ <indexitem text="Logger Forms " target="visual_methods.loggerFormsHelp.docs.NMEAFLOAT"/>
+
+ <indexitem text="Logger Forms " target="visual_methods.loggerFormsHelp.docs.NMEACHAR"/>
+
+ <indexitem text="Logger Forms " target="visual_methods.loggerFormsHelp.docs.LOOKUP"/>
+
+ <indexitem text="Logger Forms " target="visual_methods.loggerFormsHelp.docs.LATLONG"/>
+
+ <indexitem text="Logger Forms " target="visual_methods.loggerFormsHelp.docs.INTEGER"/>
+
+ <indexitem text="Logger Forms " target="visual_methods.loggerFormsHelp.docs.HEADING"/>
+
+ <indexitem text="Logger Forms " target="visual_methods.loggerFormsHelp.docs.DOUBLE"/>
+
+ <indexitem text="Logger Forms " target="visual_methods.loggerFormsHelp.docs.CHECKBOX"/>
+
+ <indexitem text="Logger Forms " target="visual_methods.loggerFormsHelp.docs.COUNTER"/>
+
+ <indexitem text="Logger Forms " target="visual_methods.loggerFormsHelp.docs.designingForms"/>
+
+ <indexitem text="Logger Forms " target="visual_methods.loggerFormsHelp.docs.loggerFormsOverview"/>
+
+ <indexitem text="Logger Forms Annotations " target="overview.annotations.docs.loggerannotation"/>
+
+ <indexitem text="Logger Properties - AUTOALERT " target="visual_methods.loggerFormsHelp.docs.AUTOALERT"/>
+
+ <indexitem text="Logger Properties - AUTOALERT " target="visual_methods.loggerFormsHelp.docs.AUTOALERT"/>
+
+ <indexitem text="Logger Properties - BEARING " target="visual_methods.loggerFormsHelp.docs.BEARING"/>
+
+ <indexitem text="Logger Properties - BEARING " target="visual_methods.loggerFormsHelp.docs.BEARING"/>
+
+ <indexitem text="Logger Properties - CHAR " target="visual_methods.loggerFormsHelp.docs.CHAR"/>
+
+ <indexitem text="Logger Properties - CHECKBOX " target="visual_methods.loggerFormsHelp.docs.CHECKBOX"/>
+
+ <indexitem text="Logger Properties - HEADING " target="visual_methods.loggerFormsHelp.docs.HEADING"/>
+
+ <indexitem text="Logger Properties - NOCANCEL " target="visual_methods.loggerFormsHelp.docs.NOCANCEL"/>
+
+ <indexitem text="Logger Properties - NOCLEAR " target="visual_methods.loggerFormsHelp.docs.NOCLEAR"/>
+
+ <indexitem text="Logger Properties - RANGE " target="visual_methods.loggerFormsHelp.docs.RANGE"/>
+
+ <indexitem text="Logger Properties - READONGPS " target="visual_methods.loggerFormsHelp.docs.READONGPS"/>
+
+ <indexitem text="Logger Properties - READONNMEA " target="visual_methods.loggerFormsHelp.docs.READONNMEA"/>
+
+ <indexitem text="Logger Properties - READONTIMER " target="visual_methods.loggerFormsHelp.docs.READONTIMER"/>
+
+ <indexitem text="Logger Properties - SYMBOLTYPE " target="visual_methods.loggerFormsHelp.docs.SYMBOLTYPE"/>
+
+ <indexitem text="Logger Properties Subtabs " target="visual_methods.loggerFormsHelp.docs.SUBTABS"/>
+
+ <indexitem text="Long Term Spectral Average " target="sound_processing.LTSA.Docs.LTSA"/>
+
+ <indexitem text="Lookup " target="visual_methods.loggerFormsHelp.docs.LOOKUP"/>
+
+ <indexitem text="LTSA " target="sound_processing.LTSA.Docs.LTSA"/>
+
+ <indexitem text="LTSA Displays and Output " target="sound_processing.LTSA.Docs.LTSADisplays"/>
+
+ <indexitem text="Map " target="visual_methods.loggerFormsHelp.docs.BEARING"/>
+
+ <indexitem text="Map " target="visual_methods.loggerFormsHelp.docs.SYMBOLTYPE"/>
+
+ <indexitem text="Map " target="visual_methods.loggerFormsHelp.docs.RANGE"/>
+
+ <indexitem text="Map Control Panel " target="mapping.mapHelp.docs.mapControlPanel"/>
+
+ <indexitem text="Map Display " target="mapping.mapHelp.docs.mapDisplay"/>
+
+ <indexitem text="Map Files " target="mapping.mapHelp.docs.mapMaking"/>
+
+ <indexitem text="Map Graphic Overlays " target="mapping.mapHelp.docs.MapOverlays"/>
+
+ <indexitem text="Map Information " target="mapping.mapHelp.docs.mapInformationDisplayPanel"/>
+
+ <indexitem text="Map Options " target="detectors.clickDetectorHelp.docs.ClickDetector_MapOptions"/>
+
+ <indexitem text="Map Overlays " target="mapping.mapHelp.docs.MapOverlays"/>
+
+ <indexitem text="Maps and Mapping " target="overview.PamMasterHelp.docs.modules_maps"/>
+
+ <indexitem text="Marking out Events " target="detectors.clickDetectorHelp.docs.offline_MarkingOutEvents"/>
+
+ <indexitem text="Measure to a shoreline " target="visual_methods.videoRangeHelp.docs.videoRange_MeasureToShoreline"/>
+
+ <indexitem text="MEasure to the horizon " target="visual_methods.videoRangeHelp.docs.videoRange_Measuring_Plot"/>
+
+ <indexitem text="Median Filter " target="sound_processing.fftManagerHelp.docs.noise_removal_medianfilter"/>
+
+ <indexitem text="Median filter " target="detectors.whistleMoanHelp.docs.whistleMoan_ConfigNoise_medianfilter"/>
+
+ <indexitem text="Microsoft Access Database " target="utilities.generalDatabaseHelp.docs.database_msAccess"/>
+
+ <indexitem text="Mixed Mode operation " target="overview.PamMasterHelp.docs.mixedMode"/>
+
+ <indexitem text="Model viewer " target="overview.PamMasterHelp.docs.modelViewer"/>
+
+ <indexitem text="Mouse goes crazy " target="mapping.NMEA.docs.Troubleshooting_CrazyMouse"/>
+
+ <indexitem text="Multiple Displays " target="overview.PamMasterHelp.docs.multipleDisplays"/>
+
+ <indexitem text="Multithreading " target="overview.PamMasterHelp.docs.multithreading"/>
+
+ <indexitem text="MySQL Database " target="utilities.generalDatabaseHelp.docs.database_MySQL"/>
+
+ <indexitem text="National Instruments Data Acquisition Cards " target="sound_processing.AcquisitionHelp.docs.AcquisitionNIDAQ"/>
+
+ <indexitem text="Navigating Click Data " target="detectors.clickDetectorHelp.docs.offline_Navigating"/>
+
+ <indexitem text="NMEA " target="visual_methods.loggerFormsHelp.docs.AUTOALERT"/>
+
+ <indexitem text="NMEA " target="visual_methods.loggerFormsHelp.docs.READONNMEA"/>
+
+ <indexitem text="NMEA " target="visual_methods.loggerFormsHelp.docs.NMEACHAR"/>
+
+ <indexitem text="NMEA Configuration " target="mapping.NMEA.docs.configuringNMEADataSource_NMEAStringList"/>
+
+ <indexitem text="NMEA Connections " target="mapping.NMEA.docs.NMEAConnections"/>
+
+ <indexitem text="NMEA Data Collection " target="mapping.NMEA.docs.configuringNMEADataSource"/>
+
+ <indexitem text="NMEA Troubleshooting " target="mapping.NMEA.docs.Troubleshooting_top"/>
+
+ <indexitem text="No GPS output " target="mapping.NMEA.docs.Troubleshooting_NoGPSOut"/>
+
+ <indexitem text="No NMEA or GPS Data " target="mapping.NMEA.docs.Troubleshooting_NoData"/>
+
+ <indexitem text="Noise Band Measurement " target="sound_processing.NoiseBands.Docs.NoiseBandDisplays"/>
+
+ <indexitem text="Noise Band Measurement " target="sound_processing.NoiseBands.Docs.NoiseBands"/>
+
+ <indexitem text="Noise reduction and thresholding " target="detectors.whistleMoanHelp.docs.whistleMoan_ConfigNoise"/>
+
+ <indexitem text="Noise Removal " target="sound_processing.fftManagerHelp.docs.noise_removal_thresholding"/>
+
+ <indexitem text="Noise Removal " target="sound_processing.fftManagerHelp.docs.noise_removal_medianfilter"/>
+
+ <indexitem text="Noise Removal " target="sound_processing.fftManagerHelp.docs.noise_removal_kernelsmoothing"/>
+
+ <indexitem text="Noise Removal " target="sound_processing.fftManagerHelp.docs.noise_removal_clickremoval"/>
+
+ <indexitem text="Noise Removal " target="sound_processing.fftManagerHelp.docs.noise_removal_averagesubtraction"/>
+
+ <indexitem text="Noise Removal " target="sound_processing.fftManagerHelp.docs.noise_removal"/>
+
+ <indexitem text="Normal Operation " target="overview.PamMasterHelp.docs.normalMode"/>
+
+ <indexitem text="Number " target="visual_methods.loggerFormsHelp.docs.TIMESTAMP"/>
+
+ <indexitem text="Number " target="visual_methods.loggerFormsHelp.docs.TIME"/>
+
+ <indexitem text="Number " target="visual_methods.loggerFormsHelp.docs.SINGLE"/>
+
+ <indexitem text="Number " target="visual_methods.loggerFormsHelp.docs.SHORT"/>
+
+ <indexitem text="Number " target="visual_methods.loggerFormsHelp.docs.NMEAINT"/>
+
+ <indexitem text="Number " target="visual_methods.loggerFormsHelp.docs.NMEAFLOAT"/>
+
+ <indexitem text="Octave Bands " target="sound_processing.NoiseBands.Docs.NoiseBands"/>
+
+ <indexitem text="Offline " target="detectors.clickDetectorHelp.docs.offline_Navigating"/>
+
+ <indexitem text="Offline " target="detectors.clickDetectorHelp.docs.offline_MarkingOutEvents"/>
+
+ <indexitem text="Offline " target="detectors.clickDetectorHelp.docs.offline_ImportingRBC"/>
+
+ <indexitem text="Offline " target="detectors.clickDetectorHelp.docs.offline_AddingGPSData"/>
+
+ <indexitem text="Offline Click Detector Overview " target="detectors.clickDetectorHelp.docs.offline_Overview"/>
+
+ <indexitem text="Offline Events " target="detectors.clickDetectorHelp.docs.ClickDetector_clickTrainIdentification"/>
+
+ <indexitem text="Offline Tasks " target="detectors.clickDetectorHelp.docs.offline_Reclassify_clicks"/>
+
+ <indexitem text="Offline Tasks " target="detectors.clickDetectorHelp.docs.offline_Reanalyse_click_types"/>
+
+ <indexitem text="Offline Tools " target="detectors.clickDetectorHelp.docs.offline_Tools"/>
+
+ <indexitem text="old Logger Forms 2000 " target="visual_methods.loggerFormsHelp.docs.oldLoggerForms"/>
+
+ <indexitem text="Open Datatbase Format (LibreOffice or OpenOffice) " target="utilities.generalDatabaseHelp.docs.database_OOo"/>
+
+ <indexitem text="Overview " target="utilities.SIDEModule.docs.SIDE_Overview"/>
+
+ <indexitem text="PAMGUARD Architecture " target="overview.PamMasterHelp.docs.pamGuardArchitecture"/>
+
+ <indexitem text="PAMGUARD Background " target="overview.PamMasterHelp.docs.pamguardBackground"/>
+
+ <indexitem text="PAMGUARD Graphical User Interface " target="overview.PamMasterHelp.docs.guiOverview"/>
+
+ <indexitem text="Pamguard Help " target="index"/>
+
+ <indexitem text="PAMGUARD Modules " target="overview.PamMasterHelp.docs.modules"/>
+
+ <indexitem text="PAMGUARD Overview " target="mapping.mapHelp.docs.overview"/>
+
+ <indexitem text="Paramaters " target="utilities.Alarms.docs.Alarms_Configuration"/>
+
+ <indexitem text="Patch Panel " target="sound_processing.patchPanelHelp.docs.patchpanel"/>
+
+ <indexitem text="Performance Tests " target="overview.PamMasterHelp.docs.performanceTests"/>
+
+ <indexitem text="Quick (Spectrogram) Annotation " target="utilities.quickAnnotations.docs.quickAnnotations"/>
+
+ <indexitem text="Radar Display Configuration " target="displays.radarDisplayHelp.docs.UserDisplay_Radar_Configuring"/>
+
+ <indexitem text="Radar Display Creation " target="displays.radarDisplayHelp.docs.UserDisplay_Radar_Creating"/>
+
+ <indexitem text="Radar Display Overview " target="displays.radarDisplayHelp.docs.UserDisplay_Radar"/>
+
+ <indexitem text="Rainbow " target="utilities.BinaryStore.docs.CreateBinariesOffline"/>
+
+ <indexitem text="Range " target="visual_methods.loggerFormsHelp.docs.RANGE"/>
+
+ <indexitem text="RBC files " target="utilities.BinaryStore.docs.CreateBinariesOffline"/>
+
+ <indexitem text="Recalculate " target="classifiers.roccaHelp.docs.rocca_Spectrogram_rocca_ResetFilter"/>
+
+ <indexitem text="Recalculate " target="classifiers.roccaHelp.docs.rocca_Spectrogram_rocca_ResetContour"/>
+
+ <indexitem text="Recalculate " target="classifiers.roccaHelp.docs.rocca_Spectrogram_rocca_RecalcContour"/>
+
+ <indexitem text="Recalculate " target="detectors.clickDetectorHelp.docs.offline_Reanalyse_click_types"/>
+
+ <indexitem text="Reclassify clicks " target="detectors.clickDetectorHelp.docs.offline_Reanalyse_click_types"/>
+
+ <indexitem text="Removal Thresholding " target="sound_processing.fftManagerHelp.docs.noise_removal_thresholding"/>
+
+ <indexitem text="Removing PAMGUARD Plug-ins " target="overview.PamMasterHelp.docs.addingRemovingPlugins"/>
+
+ <indexitem text="Reporting Matrix " target="utilities.SIDEModule.docs.SIDE_ReportMatrix"/>
+
+ <indexitem text="Rocca " target="classifiers.roccaHelp.docs.rocca_WhistleSchoolClassification_SchoolClassification"/>
+
+ <indexitem text="Rocca " target="classifiers.roccaHelp.docs.rocca_WhistleSchoolClassification"/>
+
+ <indexitem text="Rocca " target="classifiers.roccaHelp.docs.rocca_Spectrogram_rocca_ResetFilter"/>
+
+ <indexitem text="Rocca " target="classifiers.roccaHelp.docs.rocca_Spectrogram_rocca_ResetContour"/>
+
+ <indexitem text="Rocca " target="classifiers.roccaHelp.docs.rocca_Spectrogram_rocca_RecalcContour"/>
+
+ <indexitem text="Rocca " target="classifiers.roccaHelp.docs.rocca_Spectrogram"/>
+
+ <indexitem text="Rocca " target="classifiers.roccaHelp.docs.rocca_Sidebar_SaveNow"/>
+
+ <indexitem text="Rocca " target="classifiers.roccaHelp.docs.rocca_Sidebar"/>
+
+ <indexitem text="Rocca " target="classifiers.roccaHelp.docs.rocca_SelectingWhistle"/>
+
+ <indexitem text="Rocca " target="classifiers.roccaHelp.docs.rocca_SavedFiles_school"/>
+
+ <indexitem text="Rocca " target="classifiers.roccaHelp.docs.rocca_SavedFiles_individ"/>
+
+ <indexitem text="Rocca " target="classifiers.roccaHelp.docs.rocca_SavedFiles_contour"/>
+
+ <indexitem text="Rocca " target="classifiers.roccaHelp.docs.rocca_SavedFiles"/>
+
+ <indexitem text="Rocca " target="classifiers.roccaHelp.docs.rocca_Overview"/>
+
+ <indexitem text="Rocca " target="classifiers.roccaHelp.docs.rocca_ContourExtractionManipulation_manual"/>
+
+ <indexitem text="Rocca " target="classifiers.roccaHelp.docs.rocca_ContourExtractionManipulation"/>
+
+ <indexitem text="Rocca " target="classifiers.roccaHelp.docs.rocca_Configure_rocca_SourceTab"/>
+
+ <indexitem text="Rocca " target="classifiers.roccaHelp.docs.rocca_Configure_rocca_SchoolStatsFile"/>
+
+ <indexitem text="Rocca " target="classifiers.roccaHelp.docs.rocca_Configure_rocca_ParamsOutput"/>
+
+ <indexitem text="Rocca " target="classifiers.roccaHelp.docs.rocca_Configure_rocca_ParamsFilename"/>
+
+ <indexitem text="Rocca " target="classifiers.roccaHelp.docs.rocca_Configure_rocca_ParamsContour"/>
+
+ <indexitem text="Rocca " target="classifiers.roccaHelp.docs.rocca_Configure_rocca_ParamsClassifier"/>
+
+ <indexitem text="Rocca " target="classifiers.roccaHelp.docs.rocca_Configure_rocca_ClassifierModel"/>
+
+ <indexitem text="Rocca " target="classifiers.roccaHelp.docs.rocca_Configure_OutputDir"/>
+
+ <indexitem text="Rocca " target="classifiers.roccaHelp.docs.rocca_Configure"/>
+
+ <indexitem text="Running the whistle classifier " target="classifiers.whistleClassifierHelp.docs.whistleClassifier_Running"/>
+
+ <indexitem text="SAIL DAQ Card " target="sound_processing.AcquisitionHelp.docs.SAILDaqCard"/>
+
+ <indexitem text="Saturation " target="displays.LevelMeters.Docs.LevelMeters"/>
+
+ <indexitem text="Seismic Veto Configuration " target="sound_processing.seismicveto.docs.veto_configuration"/>
+
+ <indexitem text="Seismic Veto Overview " target="sound_processing.seismicveto.docs.veto_overview"/>
+
+ <indexitem text="Select multiple clicks " target="detectors.clickDetectorHelp.docs.offline_Tools_Zoom"/>
+
+ <indexitem text="Sensors " target="overview.PamMasterHelp.docs.modules_sensors"/>
+
+ <indexitem text="Setting the Operations Status " target="utilities.SIDEModule.docs.SIDE_OpStat"/>
+
+ <indexitem text="Settings " target="utilities.Alarms.docs.Alarms_Configuration"/>
+
+ <indexitem text="Setup " target="visual_methods.videoRangeHelp.docs.videoRange_Measuring_setup"/>
+
+ <indexitem text="SIDE Module Output " target="utilities.SIDEModule.docs.SIDE_Output"/>
+
+ <indexitem text="Side Panel " target="utilities.Alarms.docs.Alarms_Overview"/>
+
+ <indexitem text="Side Panel " target="utilities.Alarms.docs.Alarms_Actions"/>
+
+ <indexitem text="Side Panel " target="visual_methods.loggerFormsHelp.docs.AUTOALERT"/>
+
+ <indexitem text="Side Panel " target="visual_methods.videoRangeHelp.docs.VideoRange_SidePanel"/>
+
+ <indexitem text="SIDE Workflow " target="utilities.SIDEModule.docs.SIDE_Process"/>
+
+ <indexitem text="Sidebar " target="utilities.SIDEModule.docs.SIDE_Sidebar"/>
+
+ <indexitem text="Signal Amplifier " target="sound_processing.amplifier.docs.amplifier"/>
+
+ <indexitem text="Simulated Sources " target="sound_processing.AcquisitionHelp.docs.AcquisitionSimulator"/>
+
+ <indexitem text="Sound Cards " target="sound_processing.AcquisitionHelp.docs.AcquisitionSoundCard"/>
+
+ <indexitem text="Sound Cards " target="sound_processing.AcquisitionHelp.docs.soundcardConfig"/>
+
+ <indexitem text="Sound Playback " target="sound_processing.soundPlaybackHelp.docs.soundPlayback_soundPlayback"/>
+
+ <indexitem text="Sound Playback Configuration " target="sound_processing.soundPlaybackHelp.docs.soundPlayback_Config"/>
+
+ <indexitem text="Sound Playback Control " target="sound_processing.soundPlaybackHelp.docs.soundPlayback_Control"/>
+
+ <indexitem text="Sound Processing " target="overview.PamMasterHelp.docs.modules_sound_processing"/>
+
+ <indexitem text="Sound Recorder Configuration " target="sound_processing.soundRecorderHelp.docs.RecorderConfiguration"/>
+
+ <indexitem text="Sound Recorder Operation " target="sound_processing.soundRecorderHelp.docs.RecorderOperation"/>
+
+ <indexitem text="Sound Recorder Overview " target="sound_processing.soundRecorderHelp.docs.RecorderOverview"/>
+
+ <indexitem text="Species Cluster Selection " target="utilities.SIDEModule.docs.SIDE_SpClust"/>
+
+ <indexitem text="Spectrogram " target="localisation.difar.difarLocalisation.docs.difar_UsingSpectrogram"/>
+
+ <indexitem text="Spectrogram Annotation " target="utilities.spectrogramannotations.docs.spectrogramannotations"/>
+
+ <indexitem text="Spectrogram Display Configuration " target="displays.spectrogramDisplayHelp.docs.UserDisplay_Spectrogram_Configuring"/>
+
+ <indexitem text="Spectrogram Display Creation " target="displays.spectrogramDisplayHelp.docs.UserDisplay_Spectrogram_Creating"/>
+
+ <indexitem text="Spectrogram Display Graphic Overlays " target="displays.spectrogramDisplayHelp.docs.UserDisplay_Spectrogram_Overlays"/>
+
+ <indexitem text="Spectrogram Display Overview " target="displays.spectrogramDisplayHelp.docs.UserDisplay_Spectrogram"/>
+
+ <indexitem text="Spectrogram Smoothing Configuration " target="sound_processing.SpectrogramSmoothing.docs.AddingConfiguring"/>
+
+ <indexitem text="Spectrogram Smoothing Kernel " target="sound_processing.SpectrogramSmoothing.docs.SpectrogramSmoothing"/>
+
+ <indexitem text="SQLite Datbase " target="utilities.generalDatabaseHelp.docs.database_sqlite"/>
+
+ <indexitem text="Storage " target="classifiers.roccaHelp.docs.rocca_Sidebar_SaveNow"/>
+
+ <indexitem text="Storage " target="classifiers.roccaHelp.docs.rocca_SavedFiles_school"/>
+
+ <indexitem text="Storage " target="classifiers.roccaHelp.docs.rocca_SavedFiles_individ"/>
+
+ <indexitem text="Storage " target="classifiers.roccaHelp.docs.rocca_SavedFiles_contour"/>
+
+ <indexitem text="Storage " target="classifiers.roccaHelp.docs.rocca_SavedFiles"/>
+
+ <indexitem text="Storage " target="classifiers.roccaHelp.docs.rocca_Configure_rocca_ParamsOutput"/>
+
+ <indexitem text="Storage " target="classifiers.roccaHelp.docs.rocca_Configure_rocca_ParamsFilename"/>
+
+ <indexitem text="Storage " target="classifiers.roccaHelp.docs.rocca_Configure_OutputDir"/>
+
+ <indexitem text="Storage " target="sound_processing.NoiseOneBand.Docs.NoiseOneBandDisplays"/>
+
+ <indexitem text="Storage " target="sound_processing.NoiseBands.Docs.NoiseBandDisplays"/>
+
+ <indexitem text="String " target="visual_methods.loggerFormsHelp.docs.CHAR"/>
+
+ <indexitem text="String " target="visual_methods.loggerFormsHelp.docs.NMEACHAR"/>
+
+ <indexitem text="Subtabs " target="visual_methods.loggerFormsHelp.docs.NOCANCEL"/>
+
+ <indexitem text="Tab Panel Displays " target="detectors.clickDetectorHelp.docs.ClickDetector_clickTabPanelDisplays"/>
+
+ <indexitem text="Target motion " target="detectors.clickDetectorHelp.docs.offline_AddingGPSData"/>
+
+ <indexitem text="Target Motion Analysis Overview " target="localisation.targetmotion.docs.targetmotion_overview"/>
+
+ <indexitem text="Target Motion Annotations " target="overview.annotations.docs.targetmotionannotation"/>
+
+ <indexitem text="Target Motion Localisation " target="localisation.targetmotion.docs.targetmotion_Localising"/>
+
+ <indexitem text="Target Motion Localisation Algorithms " target="localisation.targetmotion.docs.targetmotion_LocalisationAlgorithms"/>
+
+ <indexitem text="Target Motion Localisation Results " target="localisation.targetmotion.docs.targetmotion_LocalisationResults"/>
+
+ <indexitem text="Test Parameters " target="utilities.SIDEModule.docs.SIDE_TestParams"/>
+
+ <indexitem text="Text Annotations " target="overview.annotations.docs.textannotation"/>
+
+ <indexitem text="Third Octave Bands " target="sound_processing.NoiseBands.Docs.NoiseBands"/>
+
+ <indexitem text="thresholding " target="detectors.whistleMoanHelp.docs.whistleMoan_ConfigNoise_thresholding"/>
+
+ <indexitem text="Time " target="visual_methods.loggerFormsHelp.docs.TIMESTAMP"/>
+
+ <indexitem text="Time " target="visual_methods.loggerFormsHelp.docs.TIME"/>
+
+ <indexitem text="Time " target="displays.LocalTime.Docs.LocalTime"/>
+
+ <indexitem text="Time Zones " target="sound_processing.AcquisitionHelp.docs.FileTimeZone"/>
+
+ <indexitem text="Timer " target="visual_methods.loggerFormsHelp.docs.READONTIMER"/>
+
+ <indexitem text="Timestamp " target="visual_methods.loggerFormsHelp.docs.TIMESTAMP"/>
+
+ <indexitem text="Timestamp " target="visual_methods.loggerFormsHelp.docs.TIME"/>
+
+ <indexitem text="Timezones " target="displays.LocalTime.Docs.LocalTime"/>
+
+ <indexitem text="Tracking and Click Train Identification " target="detectors.clickDetectorHelp.docs.ClickDetector_clickTrainLocalization"/>
+
+ <indexitem text="Traffic Lights " target="utilities.Alarms.docs.Alarms_Overview"/>
+
+ <indexitem text="Training the whistle classifier " target="classifiers.whistleClassifierHelp.docs.whistleClassifier_Training"/>
+
+ <indexitem text="Trigger " target="visual_methods.loggerFormsHelp.docs.READONTIMER"/>
+
+ <indexitem text="Trigger " target="visual_methods.loggerFormsHelp.docs.READONNMEA"/>
+
+ <indexitem text="Trigger " target="visual_methods.loggerFormsHelp.docs.READONGPS"/>
+
+ <indexitem text="Triggered Recordings " target="sound_processing.soundRecorderHelp.docs.RecorderOperation"/>
+
+ <indexitem text="Unique Data Indentifiers (UID's) " target="overview.uid.docs.uid"/>
+
+ <indexitem text="User Display Panels Overview " target="displays.userDisplayHelp.docs.userDisplayPanel"/>
+
+ <indexitem text="User Input " target="utilities.userInputHelp.docs.userInput"/>
+
+ <indexitem text="UTC " target="displays.LocalTime.Docs.LocalTime"/>
+
+ <indexitem text="Utilities " target="overview.PamMasterHelp.docs.modules_utilities"/>
+
+ <indexitem text="Video Range Calibration " target="visual_methods.videoRangeHelp.docs.videoRange_Calibrating"/>
+
+ <indexitem text="Video Range Configuration " target="visual_methods.videoRangeHelp.docs.videoRange_Measuring_setup"/>
+
+ <indexitem text="Video Range Measurement " target="visual_methods.videoRangeHelp.docs.videoRange_Measuring_Plot"/>
+
+ <indexitem text="Video Range Overview " target="visual_methods.videoRangeHelp.docs.videoRange_videoRange"/>
+
+ <indexitem text="Video Range Side Panel " target="visual_methods.videoRangeHelp.docs.VideoRange_SidePanel"/>
+
+ <indexitem text="Viewer " target="utilities.BinaryStore.docs.CreateBinariesOffline"/>
+
+ <indexitem text="Viewer " target="detectors.clickDetectorHelp.docs.offline_Reclassify_clicks"/>
+
+ <indexitem text="Viewer " target="detectors.clickDetectorHelp.docs.offline_Reanalyse_click_types"/>
+
+ <indexitem text="Viewer " target="detectors.clickDetectorHelp.docs.offline_Overview"/>
+
+ <indexitem text="Viewer " target="detectors.clickDetectorHelp.docs.offline_Navigating"/>
+
+ <indexitem text="Viewer " target="detectors.clickDetectorHelp.docs.offline_MarkingOutEvents"/>
+
+ <indexitem text="Viewer " target="detectors.clickDetectorHelp.docs.offline_ImportingRBC"/>
+
+ <indexitem text="Viewer " target="detectors.clickDetectorHelp.docs.offline_AddingGPSData"/>
+
+ <indexitem text="Viewer Mode " target="overview.PamMasterHelp.docs.viewerMode"/>
+
+ <indexitem text="Visual Methods " target="overview.PamMasterHelp.docs.modules_visual_methods"/>
+
+ <indexitem text="Warning " target="utilities.Alarms.docs.Alarms_Actions"/>
+
+ <indexitem text="Warning " target="visual_methods.loggerFormsHelp.docs.AUTOALERT"/>
+
+ <indexitem text="Whistle and Moan " target="sound_processing.fftManagerHelp.docs.noise_removal_thresholding"/>
+
+ <indexitem text="Whistle and Moan " target="sound_processing.fftManagerHelp.docs.noise_removal_medianfilter"/>
+
+ <indexitem text="Whistle and Moan " target="sound_processing.fftManagerHelp.docs.noise_removal_kernelsmoothing"/>
+
+ <indexitem text="Whistle and Moan " target="sound_processing.fftManagerHelp.docs.noise_removal_averagesubtraction"/>
+
+ <indexitem text="Whistle and Moan " target="sound_processing.fftManagerHelp.docs.noise_removal"/>
+
+ <indexitem text="Whistle and Moan Branching " target="detectors.whistleMoanHelp.docs.whistleMoan_ConfigBranching"/>
+
+ <indexitem text="Whistle and Moan Configuration " target="detectors.whistleMoanHelp.docs.whistleMoan_Configure"/>
+
+ <indexitem text="Whistle and Moan Connected Regions " target="detectors.whistleMoanHelp.docs.whistleMoan_ConfigConnect"/>
+
+ <indexitem text="Whistle and Moan Data Sources and Bearings " target="detectors.whistleMoanHelp.docs.whistleMoan_ConfigSource"/>
+
+ <indexitem text="Whistle and Moan Noise Removal and Thresholding " target="detectors.whistleMoanHelp.docs.whistleMoan_ConfigNoise"/>
+
+ <indexitem text="Whistle Classification " target="classifiers.roccaHelp.docs.rocca_Overview"/>
+
+ <indexitem text="Whistle Classification " target="classifiers.roccaHelp.docs.rocca_Configure_rocca_ClassifierModel"/>
+
+ <indexitem text="Whistle Classifier overview " target="classifiers.whistleClassifierHelp.docs.whistleClassifier_Overview"/>
+
+ <indexitem text="Whistle Detector Configuration " target="detectors.whistleDetectorHelp.docs.whistleDetector_Configuring"/>
+
+ <indexitem text="Whistle Detector Creating " target="detectors.whistleDetectorHelp.docs.whistleDetector_Creating"/>
+
+ <indexitem text="Whistle Detector Display " target="detectors.clickDetectorHelp.docs.ClickDetector_clickAlarmOptions"/>
+
+ <indexitem text="Whistle Detector Display " target="detectors.whistleDetectorHelp.docs.whistleDetector_Display"/>
+
+ <indexitem text="Whistle Detector Overview " target="detectors.whistleDetectorHelp.docs.whistleDetector_Overview"/>
+
+ <indexitem text="Whistle Moan overview " target="detectors.whistleMoanHelp.docs.whistleMoan_Overview"/>
+
+ <indexitem text="Whistle School Classification " target="classifiers.roccaHelp.docs.rocca_WhistleSchoolClassification_SchoolClassification"/>
+
+ <indexitem text="Whistle School Classification " target="classifiers.roccaHelp.docs.rocca_WhistleSchoolClassification"/>
+
+ <indexitem text="Whistle Storage " target="classifiers.whistleClassifierHelp.docs.whistleClassifier_Output"/>
+
+ <indexitem text="Write configuration to an XML file " target="overview.PamMasterHelp.docs.xmloutput"/>
+
+ <indexitem text="Zoom " target="detectors.clickDetectorHelp.docs.offline_Tools_Zoom"/>
+
+</index>

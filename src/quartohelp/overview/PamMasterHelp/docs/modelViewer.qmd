@@ -1,0 +1,77 @@
+---
+title: "Model Viewer"
+---
+ Model Viewer  
+
+PAMGUARD
+========
+
+PAMGUARD Data Model Viewer
+--------------------------
+
+  
+The user can configure multiple PAMGUARD modules in any number of ways, depending on the application. To assist the operator to apreciate how the different modules are connected and how data flows between them, the **Data Model Viewer** shows a graphical depiction of PAMGUARD Modules and the processes and data within them.
+
+The model viewer is opened from the _**File>Show Data Model**_ menu command.
+
+![Model Viewer](images/ModelViewer.png)
+
+  
+
+In this example, eleven modules are being used in the following ways:
+
+1.  **[NMEA Data Collection](../../../mapping/NMEA/docs/configuringNMEADataSource.html)**  
+    Acquires NMEA data from both GPS and AIS receivers (the data are multiplexed in the AIS receiver).
+    
+2.  **[AIS Processing](../../../mapping/AIS/docs/AISOverview.html)**  
+    Takes NMEA data, identifies AIS strings and unpacks the data in them.
+    
+3.  **[GPS Processing](../../../mapping/NMEA/docs/ConfiguringGPS.html)**  
+    Takes NMEA data, identifies GPS strings and unpacks the data in them.
+    
+4.  **[Map](../../../mapping/mapHelp/docs/overview.html)**  
+    The Map display.
+    
+5.  **[ODBC Database](../../../utilities/generalDatabaseHelp/docs/database_database.html)**  
+    Controls writing of navigation and detector data to a database.
+    
+6.  **[User Input](../../../utilities/userInputHelp/docs/userInput.html)**  
+    Provides a form for the user to type in comments.
+    
+7.  **[Sound Acquisition](../../../sound_processing/AcquisitionHelp/docs/AcquisitionOverview.html)**  
+    Acquires audio data in real time from a sound card.
+    
+8.  **[FFT (Spectrogram) Engine](../../../sound_processing/fftManagerHelp/docs/FFTEngine_Overview.html)**  
+    Takes audio data from the Sound Acquisition module, and then computes FFT's of blocks of data.
+    
+9.  **[SpectrogramSmoothing](../../../sound_processing/SpectrogramSmoothing/docs/SpectrogramSmoothing.html)**  
+    Takes the spectrogram data and smoothes it through convolution with a Gaussian kernel.
+    
+10.  **[Whistle Detector](../../../detectors/whistleDetectorHelp/docs/whistleDetector_Overview.html)**  
+    Searches for dolphin whistles in the smoothed spectrogram data.
+    
+11.  **[Click Detector](../../../detectors/clickDetectorHelp/docs/ClickDetector_clickDetector.html)**  
+    Searches for sperm whales and other odontocete clicks in teh raw audio data from the sound acquisition module.
+    
+
+For each module, PAMGUARD processes are shown in red. Some modules contain multiple processes. The percentage of available CPU power being used by each process is shown just to the right of the red box. Clicking on the red box with the right mouse button will often bring up a menu of options controlling that process.
+
+Below each process there are one or more grey boxes. These represent data streams within PAMGUARD. Data held within data streams may be of many kinds: blocks of raw audio data from the sound card, units of GPS data, and detected clicks and click trains are just examples. The number to the right of each grey box shows the number of data units currently held in memory for each data stream.
+
+Only the main data flows from data streams to PAMGUARD processes are shown by the arrows. So for example, although the database will be monitoring and receiving data from all data streams, yet no arrows are shown going into the database process.
+
+Clicking on one of the grey data streams will bring up a window showing the full list of subscribers to that data stream.
+
+![Subscribers](images/Observers.png)
+
+  
+
+The window also shows for how long the subscribing module requires the data to be held in memory and also how much CPU the subscriber processes are using.
+
+Right clicking on blank space in the Model Viewer brings up a menu from where the user can add and remove PAMGUARD modules.
+
+  
+
+[Previous: Importing Modules](ImportingModules.html)
+
+[Next: Multi-threading](multithreading.html)

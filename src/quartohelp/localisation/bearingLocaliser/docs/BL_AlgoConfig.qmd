@@ -1,0 +1,71 @@
+---
+title: "Bearing Calculator Algorithm Configuration"
+---
+Bearing Calculator Algorithm Configuration  
+
+Bearing Localiser
+=================
+
+Algorithm Configuration
+-----------------------
+
+  
+
+### Algorithm Dialog Tabs
+
+The Basic Frequency Domain beamformer, MVDR Beamformer and TOAD Algorithms all have similar user-configurable options to generate Beamograms. Unlike the Beamformer module, the user cannot configure individual beams with the Bearing Calculator.
+
+  
+  
+
+### Configuring the Basic Frequency Domain and MVDR beamformers
+
+A beamogram can be used to sweep an entire area. The resultant output is a 'heat-map' of the amplitude of the signal versus primary angle, secondary angle or frequency. The output can be shown on a User Display tab by selecting New Bearing Calculator Display.
+
+  
+![](images/BL Beamogram.PNG)
+
+1.  Array Information: The type of array _as defined by the channels in this group_. Valid angle ranges are given in the appropriate sections below. There are three possible array types: Linear, Planar and Volumetric.
+    
+    *   Linear arrays position all the hydrophones in a single line (1-dimensional). This type of array has both left/right and up/down ambiguity. The primary angle is defined in the direction of the main array axis (Y-axis, as given in the Array Manager) and is valid from 0° (positive Y) to 180° (negative Y). The secondary angle is undefined.
+        
+    *   Planar arrays position the hydrophones in two different axes (2-dimensional). This type of array resolves one of the ambiguities of the linear array, but not the other. For example, a planar array with both axis in the horizontal plane (X and Y) would be able to distinguish between left and right of the array, but not above or below. In that case the primary angle is defined relative to the main axis (positive Y) and valid from -180° to 180°. The secondary angle is measured perpendicular to the plane, and valid from 0° (in the same plane) to 90° (directly above/below).
+        
+    *   Volumetric arrays position the hydrophones in all three axes (3-dimensional). This type of array has no ambiguity. The primary angle is defined relative to the main axis (positive Y) and valid from -180° to 180°. The secondary angle is defined relative to the perpendicular axis (positive Z) and valid from -90° to 90°.
+        
+2.  Checkbox indicating whether or not to calculate the beamogram.
+    
+3.  Primary angle parameters: the minimum, maximum and step size to use when sweeping the primary angle. The direction and valid range of the primary angle depends on the type of array (see above for details).
+    
+4.  Secondary angle parameters: the minimum, maximum and step size to use when sweeping the secondary angle. The direction and valid range of the secondary angle depends on the type of array (see above for details).
+    
+5.  The Frequency range: in order to speed up the calculations and prevent memory overflow problems, it is recommended that the frequency range over which the beamogram is calculated be limited to the frequencies containing the signals of interest.
+    
+
+  
+
+### Configuring the TOAD Algorithm
+
+The TOAD algorithm uses the same primary and secondary angle parameters as the beamformer, but does not require a frequency range.
+
+![](images/BL TOAD.PNG)  
+
+1.  Array Information: The type of array _as defined by the channels in this group_. Valid angle ranges are given in the appropriate sections below. There are three possible array types: Linear, Planar and Volumetric.
+    
+    *   Linear arrays position all the hydrophones in a single line (1-dimensional). This type of array has both left/right and up/down ambiguity. The primary angle is defined in the direction of the main array axis (Y-axis, as given in the Array Manager) and is valid from 0° (positive Y) to 180° (negative Y). The secondary angle is undefined.
+        
+    *   Planar arrays position the hydrophones in two different axes (2-dimensional). This type of array resolves one of the ambiguities of the linear array, but not the other. For example, a planar array with both axis in the horizontal plane (X and Y) would be able to distinguish between left and right of the array, but not above or below. In that case the primary angle is defined relative to the main axis (positive Y) and valid from -180° to 180°. The secondary angle is measured perpendicular to the plane, and valid from 0° (in the same plane) to 90° (directly above/below).
+        
+    *   Volumetric arrays position the hydrophones in all three axes (3-dimensional). This type of array has no ambiguity. The primary angle is defined relative to the main axis (positive Y) and valid from -180° to 180°. The secondary angle is defined relative to the perpendicular axis (positive Z) and valid from -90° to 90°.
+        
+2.  Primary angle parameters: the minimum, maximum and step size to use when sweeping the primary angle. The direction and valid range of the primary angle depends on the type of array (see above for details).
+    
+3.  Secondary angle parameters: the minimum, maximum and step size to use when sweeping the secondary angle. The direction and valid range of the secondary angle depends on the type of array (see above for details).
+    
+
+  
+  
+
+[Previous: Bearing Calculator Settings](BL_Settings.html)
+
+[Next: Bearing Calculator Output](BL_Output.html)

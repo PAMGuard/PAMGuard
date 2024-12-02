@@ -1,0 +1,29 @@
+---
+title: "LTSA Displays"
+---
+ LTSA Displays and Output    
+  
+
+LTSA Displays and Output
+========================
+
+Displays
+--------
+
+LTSA Data can be displayed using the same [spectrogram display](../../../displays/spectrogramDisplayHelp/docs/UserDisplay_Spectrogram.html) modules that are used for 'normal' FFT data
+
+  
+![](Images/LTSADisplay.png)  
+
+When using the [PAMGuard Viewer](../../../overview/PamMasterHelp/docs/viewerMode.html), data will be loaded from the [Binary Store](../../../utilities/BinaryStore/docs/binarystore_overview.html) and displayed enabling you to scroll through large quantities of data.
+
+  
+
+Output
+------
+
+Measurements are written to the [Binary Store](../../../utilities/BinaryStore/docs/binarystore_overview.html) if this module is present in the PAMGuard configuration.
+
+  
+
+[Previous: LTSA Overview](LTSA.html)

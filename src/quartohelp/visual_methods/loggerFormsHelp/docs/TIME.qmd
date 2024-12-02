@@ -1,0 +1,69 @@
+---
+title: "TIME Control"
+---
+ TIME Control  
+
+TIME Control
+============
+
+The TIME Type is used on a User Defined Form to create an input filed for time data
+
+### Required Fields
+
+**Order**
+
+The order in which the controls are read in by the program
+
+**Title**
+
+The text to be shown on the display
+
+**Length**
+
+Length of the input field in characters
+
+### Optional Fields
+
+**Autoupdate**
+
+This control will update on a time if a non-null positive integer value is entered in the Autoupdate column. The number is the number of seconds between auto-updates
+
+**Topic**
+
+The time zone for the data. By default all data are in UTC. Enter a standard time zone name to collect data in other time zones.
+
+**Autoclear**
+
+The control is automatically cleared when data is saved
+
+**DbTitle**
+
+Column heading for the output database. (This will default to the Title if this filed is not completed)
+
+**Hint**
+
+Text for a hint to be displayed when entering data in the control
+
+**PostTitle**
+
+Additional text to display after the input box.
+
+**Required**
+
+Forces the user to fill in the input box before the form can be saved
+
+**Plot**
+
+Data from this form can be plotted if the entered value is non-zero. Note that there are extensive plot options available from the Display / Logger forms menu.
+
+  
+  
+
+### NMEA Input
+
+Not yet implemented for this control type
+
+  
+  
+
+[Back to form Design](./designingForms.html)

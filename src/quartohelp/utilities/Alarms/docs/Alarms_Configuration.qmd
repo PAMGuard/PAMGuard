@@ -1,0 +1,61 @@
+---
+title: "Configuration"
+---
+ Alarms Configuration  
+
+Alarms Configuration
+====================
+
+To configure an alarm, go to the _**Detection>Alarm Settings ...**_menu command and the alarm dialog will appear.
+
+  
+![Alarm Configuration](./images/AlarmConfig.png)  
+  
+
+### Trigger Source
+
+Select the data you want to trigger the alarm. This can be absolutely any data from anywhere within PAMGuard. Some may make more sense than others, for example, if you were to trigger off data from the acquisition module, alarms would fire several times a second whenever PAMGuard is running. The choice of alarm trigger is however your's, so chose wisely !
+
+Depending on the data source, it may have additional options. For example, if you select the click detector it will allow you to select the types of click which will trigger an alarm. This uses the same system of [Data Selectors](../../../displays/dataselect/docs/dataselection.html) that has been developed for the PAMGuard displays and will automatically include options for detection groups and data annotations.
+
+### Alarm Count
+
+The type of alarm count you select will depend on the type of trigger you are using. Three types are available:
+
+1.  Simple Counts
+2.  Scored Values
+3.  Single Measurements
+
+Note that not all count types can be used with all types of data. In future releases we hope to automatically restrict the count types available for particular data sources, but for now, you'll have to use your intelligence and pick a rational combination.
+
+#### Simple Counts
+
+Selecting this option causes the alarm module to simply count up the number of data which arrive from a data source. For example, it could be used to trigger an alarm if a certain number of whistles were to arrive in a given time interval.
+
+#### Scored Values
+
+This is slightly more sophisticated than the simple counts and would generally be used with a data source such as a noise measurement where you're more interested in the value of the noise measurement rather than the fact that there has been a measurement.
+
+How scored values are added may depend on the data source.
+
+#### Single Measurements
+
+As the name suggests, this is suitable for assessing single measurements, such as noise levels where the value of a single measurement is of interest, not the fact that a measurement has been made.
+
+### Count Time
+
+This is the number of seconds to count for. This option is not used with Single Measurements.
+
+### Amber and Red Counts
+
+These are the thresholds at which amber and red alarms are triggered.
+
+For noise alarms, they are likely to be the noise level in Decibels. For detections, you should enter the number of detections required to trigger the alarm.
+
+### Minimum Gap
+
+Alarm status messages are sent every time the alarm status changes. However if the alarm remains in the same state and more data are arriving which continually trigger that state, alarm messages might start firing thick and fast. Entering a value of a few seconds here will limit the number of alarm triggers. For example, you would want to use this on a click based alarm so that if hundreds of clicks were being detected every minute, you would get occasional reminders of the alarm status, but not one for every click.
+
+[Previous: Alarms Overview](Alarms_Overview.html)
+
+[Next: Alarms Actions](Alarms_Actions.html)

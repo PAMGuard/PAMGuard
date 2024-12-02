@@ -1,0 +1,32 @@
+---
+title: "Configuration"
+---
+ Aural Listening Configuration  
+
+Aural Listening
+===============
+
+Configuration
+-------------
+
+  
+
+You can configure the list of species and noise types in a dialog accessed from the _**Detection>Aural Listening Settings ...**_menu command.
+
+  
+![Aural Listening](./images/ListeningConfig.png)  
+  
+
+Use the Add, Remove and Edit buttons to Add Remove and Edit items in the list of sound types.
+
+Use the Move up and Move down buttons to change the order of a selected item in the list
+
+Items on the main aural listening tab display will appear in the same order as they do in the list
+
+### Symbols
+
+To set a species specific symbol, double click on the symbol in the right hand column and a dialog will appear from which you can change both the symbol type, it's size and it's colour
+
+  
+
+[Previous: Listening Overview](Listening_Overview.html)

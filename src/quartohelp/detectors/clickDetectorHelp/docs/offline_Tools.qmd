@@ -1,0 +1,69 @@
+---
+title: "Offline Click Analysis Tools"
+---
+Tools for marking an event  
+
+Click Detector Viewer Functions
+===============================
+
+Tools for marking an event
+--------------------------
+
+  
+There are a few tools which are useful whilst [marking an event](../../../detectors/clickDetectorHelp/docs/offline_MarkingOutEvents.html) or working with the click detector in [Viewer Mode](../../../overview/PamMasterHelp/docs/viewerMode.html).  
+
+1.  [Amplitude Selector](#AmplSel)
+    
+2.  [Zoom Selection](#Zoom)
+    
+
+### 
+
+Amplitude Selector
+
+The amplitude selector is effectivly a filter. It will only show you the clicks after a certain decibel threshold. This becomes useful if your data shows extensive background noise.  
+  
+
+![AmplNotSet](images/AmplNotSet.png)
+
+  
+  
+
+You can also enhance a click event by applying the amplitude selector as it makes the click train usually cleaner, which will improve [Target Motion Analysis](../../../localisation/targetmotion/docs/targetmotion_overview). The amplitude selector can be activated by a right click on the bearing time display selecting _'Show amplitude selector'_.
+
+  
+  
+
+![ShowAmplitudeFilter](images/ShowAmplitudeFilter.png)
+
+  
+  
+
+A window for the amplitude selector will open showing an amplitude histogram and some descriptive statistics from the loaded data. The default setting for minimum amplitude is set to zero. Go to the field and put a sensible number in judging by the histogram and tick the box _'Display only clicks of set amplitude'_. A red line appears in the histogram which you can drag with the mouse which changes the amplitude threshold. The clicks shown in the bearing time display change accordingly. When the amplitude selector is active a message appears at the bottom of the bearing time display which reads how many clicks are not displayed and the amplitude threshold currently set.
+
+  
+  
+
+![AmplitudeFilter](images/AmplitudeFilter.png)
+
+  
+  
+
+### 
+
+Zoom Selection
+
+There are different ways to zoom. A simple rectangular area of clicks can be selected by clicking on the bearing time display and dragging the mouse. A black square will apear which you can zoom into with a double click.
+
+  
+
+![SquareSelectionTool](images/SquareSelectionTool.png)
+
+  
+  
+
+You can also use the advanced area selection tool (the one where it gets grey) for more complex click sections. Same principle applies. Alternatively to the double click to zoom you can also right click and select _'Zoom in'_. Right click and select _'Zoom right out'_ to return to the full click display.  
+  
+  
+
+[Previous: Reclassifying Clicks](offline_Reclassify_clicks.html)

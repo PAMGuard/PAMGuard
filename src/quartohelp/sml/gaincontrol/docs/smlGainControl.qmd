@@ -1,0 +1,12 @@
+---
+title: "Seiche Measurement Preamp Gain Control"
+---
+ Seiche Measurement Preamp Gain Control  
+
+Seiche Measurement Preamp Gain Control
+======================================
+
+Help page under development.
+
+  
+![Gain control dialog](images/gainControl.png)

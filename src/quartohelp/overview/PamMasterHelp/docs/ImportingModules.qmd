@@ -1,0 +1,31 @@
+---
+title: "Importing PAMGuard Modules"
+---
+ Importing Modules  
+
+PAMGuard
+========
+
+Importing Modules
+-----------------
+
+  
+
+Settings for individual modules or groups of modules can be imported into a PAMGuard configuration from other configurations on your system. To import modules from another configuration select **_File>Import Modules..._**
+
+A file open dialog will open where you can select the PAMGuard configuration file (.psf file) you wish to import from.
+
+Once you've selected a psf file, a dialog will appear showing a list of modules in that file and giving you options for importing those modules and their configurations into your current configuration.
+
+![Importing Modules](images/SettingsImport.png)
+
+For each module right click on the right hand (Import Options) column for a drop down list of options. These will be to not import the module, to overwrite the settings for an existing module or to create a new module.
+
+Make your selections and press Ok. Settings will be imported and modules created.
+
+  
+  
+
+[Previous: Adding and Removing Modules](addingRemovingPlugins.html)
+
+[Next: Model Viewer](modelViewer.html)

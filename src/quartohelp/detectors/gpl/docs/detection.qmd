@@ -1,0 +1,39 @@
+---
+title: "Detection"
+---
+ Generalised Power Law Detector  
+
+Generalised Power Law Detector
+==============================
+
+Detection
+---------
+
+The GPL detector has several parameters controlling the frequency range of data to search for sounds, the power law to apply, duration of sounds, etc. The PAMGuard implementation also provides some pre-set default values provided by Tyler Helble which work reasonably well for a number of species. Note however that all parameters may require adjustment in different noise environments.
+
+![](images/gpl_detect.png)
+
+  
+
+_**Minimum and Maximum Frequency**_  
+These are the minimum and maximum frequencies used by the detector for spectrogram whitening, background measurement and detection.
+
+_**Whitening scale factor**_  
+This is a scaling factor used to increase the level of background subtraction during the whitening process. Generally it should be 1.0, but can be increased to 1.5 for noisy data.
+
+_**Power law's (time and frequency)**_  
+These are the variables &nu1 and &nu2 in Equation 6 in Helble et al 2011. The two power law parameters have slightly different properties, in that &nu1 is operating on a spectrogram whitened over time and is therefore better at rejecting constant noise sources, whereas &nu2 operates on a spectrogram whitened over frequency, so is better at rejecting broad band transients. However, the effects of the two parameters are broadly similar. Overall, the sum of both &nu1 and &nu2 should be around 2.5 for the detection of narrow band tonal systems.
+
+_**Detection ON and OFF Thresholds**_  
+For a detection to occur, the detection statistic must rise above the ON threshold. When this occurs, the detector will then search backwards and forwards in time and select all data which were above the lower OFF threshold.  
+The values are expressed as factors, simple ratios of the power law statistic compared to background noise. As a guide, approximate decibel values based on the threshold and magnitude of the power law parameters are also given.
+
+_**Minimum Gap**_  
+Many detections, particularly of lower amplitude sounds, will rise and fall above the detection thresholds more than once due to varying amplitude over time. If the gap between subsequent peaks above threshold is less than the minimum gap, multiple small detections will be joined together into a single large detection. The value is entered as the number of FFT time bins, but is also displayed in seconds, based on the entered value and configuration of the spectrogram module.
+
+_**Minimum and Maximum Length**_  
+These are the minimum and maximum lengths of a detection in seconds. Any detection that is shorter than or longer than these limits will be rejected. The values are entered in seconds, but also displayed in FFT time bins, based on the entered value and configuration of the spectrogram module.
+
+[Previous: Configuration](configure.html)
+
+[Next: Contour detection](contours.html)

@@ -1,0 +1,33 @@
+---
+title: "Data Source"
+---
+ Whistle and Moan Detector Data Source  
+
+Whistle and Moan Detector Data Source
+=====================================
+
+Data Source Setup
+-----------------
+
+To use the Whistle and Moan detector, you will need to configure a [FFT (Spectrogram) Engine](../../../sound_processing/fftManagerHelp/docs/FFTEngine_Overview.html). When selecting the FFT length and hop, consider the time and frequency resolution of the spectrogram. For instance, a 1024 pt FFT with 50% overlap (512 pt hop) operating on data with a sample rate of 48 kHz will have a frequency resolution of 47Hz and a time resolution of approximately 10ms. Generally, for detecting dolphin whistles with data sampled at 48 kHz, a 512 pt FFT length and 256 pt Hop is suitable. At higher sample rates, scale the FFT length and hop accordingly, i.e. at a sample rate of 96 kHz use a FFT length of 1024 pt and a hop of 512 pt, etc.
+
+### Select the data source
+
+[Noise removal and thresholding](whistleMoan_ConfigNoise.html.html) is a critical step in the detection process. However, the noise removal methods can also be used by other PAMGUARD detectors and displays, so they have been included in both the [FFT (Spectrogram) Engine](../../../sound_processing/fftManagerHelp/docs/FFTEngine_Overview.html) as well as in the Whistle and Moan detector.
+
+The [FFT (Spectrogram) Engine](../../../sound_processing/fftManagerHelp/docs/FFTEngine_Overview.html) has two output streams, one which is the raw FFT data and one which has been through some or all of the noise removal processes.
+
+Whether you do the noise removal in the FFT Engine or in the Whistle and Moan detector is entirely up to you, but try not to do it twice since that will place an unnecessary load on the processor
+
+From the drop down box at the top of the Whistle and Moan detector options dialog, select which data source you want to use.
+
+  
+
+![](images/WhistleMoanDialog_DataSource.png)
+
+  
+  
+
+[Previous: Configure the Whistle and Moan Detector](whistleMoan_Configure.html)
+
+[Next: Configure channel grouping](whistleMoan_ConfigGrouping.html)

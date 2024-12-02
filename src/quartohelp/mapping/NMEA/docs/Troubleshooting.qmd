@@ -1,0 +1,64 @@
+---
+title: "NMEA / GPS Troubleshooting"
+---
+ GPS and NMEA Troubleshooting  
+
+NMEA
+====
+
+GPS and NMEA Troubleshooting
+----------------------------
+
+### Contents
+
+1.  [I'm not getting any GPS Data](#NoData)
+    
+2.  [I can't find the right serial port](#NoSerialPort)
+    
+3.  [The GPS makes my mouse go crazy !](#CrazyMouse)
+    
+4.  [The GPS isn't outputting any data](#NoGPSOut)
+    
+5.  [All or some of the NMEA Strings are empty](#EmptyStrings)
+    
+
+### Answers
+
+**I'm not getting any GPS Data**  
+  
+There are several possible causes of this. Either the [GPS has no output](#NoGPSOut), the [serial port is incorrectly configured](#NoSerialPort), there is a [problem with the antenna](#EmptyStrings) or there is a [wiring problem](NMEAConnections.html) between the GPS and computer.
+
+\[[Back to the top](#top)\]  
+
+**I can't find the correct serial port**  
+  
+If you have no serial ports or too many serial ports in the [NMEA Configuration Dialog](configuringNMEADataSource.html) and are using a serial to USB converter check that the drivers are correctly installer. On Windows machines, look in the control panel for unknown USB devices. If you're having trouble identifying the right port, then it may be worth restarting PAMGUARD with and without the converter plugged in to see which ports appear and disappear from the list in the [NMEA Configuration Dialog](configuringNMEADataSource.html).
+
+\[[Back to the top](#top)\]  
+
+**The GPS makes my mouse/cursor go crazy !**  
+  
+When a Windows PC starts up and a GPS or other NMEA device is connected, the Plug and Play system thinks that a serial mouse or trackball has been installed. The system then starts to interpret NMEA messages as mouse movements. Your cursor seems to jump all over the place and it becomes impossible to control your machine.
+
+To solve this problem either temporarily or permanently, do one of the following:
+
+*   Make sure the GPS is either switched off or is not plugged in when you start your system.
+    
+*   Start the system with the GPS plugged in and switched on - your system will recognise it as a mouse or trackball and go a bit crazy. Before it manages to click on anything too important unplug or switch off your GPS. This will enable you to control your system without the GPS creating random cursor movements. Go into the control panel, select the mouse icon, go to the hardware tab and you will see your normal mouse or mice listed as well as the annoying phantom mouse which is really the GPS. You can disable it in this dialog by selecting the phantom mouse, clicking on the properties button and disabling it at the bottom of the properties dialog. You only have to do this once in the lifetime of your computer. Your system will then start normally whether the GPS is plugged in or not as you start up (i.e. it will continue to recognise the GPS as a mouse, but will know that it's disabled and not use it). If you start your computer without the GPS plugged in, then the GPS will not appear in the list of mice in the control panel, so you can't disable it in the way outlined above. I've done this on dozens of machines and it always seems to work and does not interfere in any way with other mice on your system - just make sure you disable the right one !
+    
+
+\[[Back to the top](#top)\]  
+
+**The GPS isn't outputting any data**  
+  
+If you're convinced that the GPS is correctly connected any you still aren't getting any data, then it's possible that the GPS has been configured to either not output data at all, to output data in a different format or at a different baud rate.
+
+This is unlikely with marine GPS's, but many hand held devices are set to different communications protocols. Refer to the manufacturers hand book (or jab about randomly at the GPS's menu options) and set it to output data in NMEA 0183 format at 4800 baud.
+
+\[[Back to the top](#top)\]  
+
+**All or some of the NMEA Strings are empty**  
+  
+If data are getting into the computer and you can see strings in the [NMEA Strings List](configuringNMEADataSource.html#NMEAStringList) which are mostly lot's of ,,,,,,,, then the most likely explanation is that you've no satellite signal. Check your antenna has a clear view of the sky. If your GPS has only been switched on for a few minutes and has moved a long distance since it was last switched on it may take some minutes to find satellites. Refer to the manufacturers handbook for further information.
+
+\[[Back to the top](#top)\]

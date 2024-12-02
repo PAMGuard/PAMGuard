@@ -1,0 +1,70 @@
+---
+title: "Actions"
+---
+ Alarms Actions  
+
+Alarms Actions
+==============
+
+  
+
+From the [alarm configuration](Alarms_Configuration.html) dialog, select the "Actions" tab to chose what will happen when an alarm fires.
+
+  
+![Alarm Actions](./images/AlarmActions2.png)  
+  
+
+Three alarm actions are currently available:
+
+1.  Playing a sound
+    
+2.  Sending a message via a serial port
+    
+3.  Sending an email via SMTP
+    
+
+Additional alarm actions may be added in future releases
+
+_Data hold time_ refers to the amount of time (in seconds) that each trigger of the alarm is held in internal memory. Note the alarm triggers are stored immediately in the database, and the value entered here does not affect that. It will, however, affect how long the alarm is shown in the [User Display Panel](Alarms_Display.html)
+
+  
+
+### Play a sound
+
+Press the settings button to select the sound you want to play. Sounds will be played back over the default sound output device. Sounds should be in wav file format and can be anything you want - a beep or even a recorded voice message.
+
+  
+
+### Serial Port Output
+
+This option outputs a string of data over a serial (COM) port. Note that the format of the strings may vary depending on the alarm trigger.
+
+Note that if multiple alarms are used, all alarms will share a common serial port.
+
+  
+
+### Send Email
+
+Press the settings button to configure the SMTP email client. The following window is displayed:
+
+![Email Parameters](./images/AlarmEmailParams.PNG)  
+  
+
+The values given for the Host and Port shown above are default for a Gmail account.
+
+It is HIGHLY recommended that you create a new Gmail account for this application, and _only_ use that account for this application. PAMGuard is open source software; as such, anyone with programming experience and access to your computer could potentially step through the code and find the password associated with the email account. To minimize this risk, the password is not stored in the psfx file or within PAMGuard - you will be required to enter it every time you start PAMGuard or change the email settings.
+
+Enter the email address of the account in the _Account Username_ text box.
+
+Enter the email address to send the email to in the _To Address_ text box.
+
+Enter the email address which will appear in the From field of the email, in the _From Address_ text box. Note that this is typically the same as what you enter in the _Account Username_ text box, but it does not have to be.
+
+Check whether you want an email sent for an Amber alarm, a Red alarm, or both.
+
+  
+  
+
+[Previous: Alarms Configuration](Alarms_Configuration.html)
+
+[Next: Alarms Display and Storage](Alarms_Display.html)

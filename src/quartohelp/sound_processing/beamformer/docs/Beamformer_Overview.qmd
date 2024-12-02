@@ -1,0 +1,31 @@
+---
+title: "Beamformer Overview"
+---
+ Beamformer Overview  
+
+Beamformer Module
+=================
+
+Overview
+--------
+
+### Background
+
+Time-domain beamforming uses streams of audio input from multiple sensor channels, adds different time delays/advances to these audio streams, and then differentially weighs and sums them, resulting in one or more acoustic _beams_. These beams will be most sensitive in only one direction, the direction providing constructive interference. They will suppress noise coming from other directions, destructive interference, thereby improving signal-to-noise ratios in the desired direction. In effect, a beamformer is a spatial filter, filtering out all arriving signals except those in the direction of interest.
+
+An alternative interpretation is that beamforming converts data from a multi-sensor/multi-channel array into data from a single directional receiver located at the array phase center. The direction in which this directional receiver is pointed can be changed via time delays and advances. Time-delay-and-sum beamforming is a phase-coherent array processing method. Other phase-coherent beamformers operate in the frequency domain, after taking Fourier transforms of the input time series data, phase delaying/advancing, weighting, and summing, and outputting one or more narrowband beams that can be integrated over a frequency band of interest for broadband signals.
+
+More advanced algorithms (e.g., adaptive beamforming) can be used to electronically _steer_ the beams under specified optimization criteria (e.g., minimize the beamformer's output variance under the constraint of unity gain in the desired _look_ direction), allowing the user to effectively _look_ or listen in a specific direction while minimizing the interference from noise and sounds in other directions. These data-adaptive beamforming approaches are effective for maximizing array gain in the presence of interfering noise sources, such as airgun operations or vessel noise.
+
+  
+
+### Implementation
+
+PAMGuard's Beamformer module offers two different types of frequency-domain beamforming algorithms: Basic (aka _Conventional_ or _Bartlett_), and Minimum Variance Distortionless Response (aka _MVDR_). The Conventional beamformer uses a fixed set of weightings to combine signals from different channels. The MVDR uses uses an adaptive weighting scheme which seeks to minimize the variance of the input signal. The MVDR is more processor-intensive, but may result in better noise reduction and signal amplification.
+
+The beamformer module can be configured two different ways. Individual beams can be defined, which point in a specific direction. Output from these beams is FFT data which can be used as input to other modules and processes. A _beamogram_ can also be configured, which sweeps over an area/volume to reveal bearing angles from which higher amplitude signals are originating.
+
+  
+  
+
+[Next: Configuring the module](Beamformer_Settings.html)

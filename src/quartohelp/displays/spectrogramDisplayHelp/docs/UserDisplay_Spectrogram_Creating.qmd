@@ -1,0 +1,21 @@
+---
+title: "Creating a Spectrogram Display"
+---
+ Creating a Spectrogram Display  
+
+Spectrogram Display
+===================
+
+Creating a Spectrogram display
+------------------------------
+
+  
+First you must have created an instance of a [User Display Panel](../../userDisplayHelp/docs/userDisplayPanel.html)
+
+From the User Display menu select **_User Display>New Spectrogram Displa_**y�
+
+A Spectrogram Display Parameters dialog will open allowing you to set display options. Click Ok and the spectrogram display will be added to the [user display panel](../../userDisplayHelp/docs/userDisplayPanel.html).
+
+[Previous: Spectrogram Overview](UserDisplay_Spectrogram.html)
+
+[Next: Configuring a spectrogram display](UserDisplay_Spectrogram_Configuring.html)

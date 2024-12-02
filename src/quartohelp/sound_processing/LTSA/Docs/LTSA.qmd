@@ -1,0 +1,39 @@
+---
+title: "LTSA (Long Term Spectral Averaging)"
+---
+ Long Term Spectral Average  
+
+Long Term Spectral Average
+==========================
+
+Overview
+--------
+
+  
+
+This module allows you to make average measurements of spectrum data over periods of several seconds.
+
+The output of a typical spectrogram (for example a 512 pt FFT with 50% overlap operating on data sampled at 48kHz) produces around 200 FFT 'slices' per second. Consequently a typical laptop display 1600 or so pixels wide can only display around 8s of data if one pixel of the display is used for one 'slice' of FFT data.
+
+An LTSA is a great way of viewing large amounts of data. For example, even averaging FFT data over a single second and displaying the result will mean that 200 time more data (about 20 minutes in this example) are shown on the display.
+
+### Creating the module
+
+From the _**File>Add modules>Sound Processing**_ menu, or from the pop-up menu on the data model display select "_**Sound Processing> Long Term Spectral Average**_". Enter a name for the new module and press Ok.
+
+Since the LTSA module needs to connect to the output of a [FFT (spectrogram) module](../../fftManagerHelp/docs/FFTEngine_Overview.html), if an FFT module is not already present, you will be prompted to create one.
+
+### Configuring the module
+
+To configure the module, open the settings dialog from the _**Detection>"your module name"**_ menu:
+
+  
+![Filters Settings](Images/LTSADialog.png)  
+
+#### Raw Data Source
+
+Select a source of FFT data. This will generally be a [FFT (spectrogram) module](../../fftManagerHelp/docs/FFTEngine_Overview.html). Check the channels you want to measure on.
+
+  
+
+[Next: Displays and Output](LTSADisplays.html)

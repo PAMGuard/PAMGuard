@@ -1,0 +1,24 @@
+---
+title: "Creating"
+---
+ Creating an FFT Engine  
+
+FFT Engine
+==========
+
+Creating a new FFT Engine
+-------------------------
+
+  
+
+From either the _**File>Add Modules**_ menu or the popup menu on the PAMGUARD data model view, select new FFT (Spectrogram) Engine �.
+
+You will be prompted to enter a name for the new FFT Engine.
+
+The FFT Parameters dialog will then be displayed allowing you to set-up the FFT Engine.
+
+  
+
+[Previous: Overview](FFTEngine_Overview.html)
+
+[Next: Configuring an FFT Engine](FFTEngine_Configuring.html)

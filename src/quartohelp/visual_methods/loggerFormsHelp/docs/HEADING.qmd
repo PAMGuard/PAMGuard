@@ -1,0 +1,22 @@
+---
+title: "HEADING Property"
+---
+ HEADING Property  
+
+HEADING Property
+================
+
+The HEADING Property is used to tell PAMGuard which of the Controls contains heading information (about a sighting, etc.)
+
+This can be plotted on the map in the form of a small arrow pointing in that direction.
+
+### Required Fields
+
+**Topic**
+
+The title of one of the other controls, which contains numeric data giving a range.
+
+  
+  
+
+[Back to form Design](./designingForms.html)

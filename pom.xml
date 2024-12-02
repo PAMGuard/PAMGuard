@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.pamguard</groupId>
   <artifactId>Pamguard</artifactId>
-  <version>2.02.14a</version>
+  <version>2.02.14b</version>
   <name>Pamguard</name>
   <description>Pamguard using Maven to control dependencies</description>
 	<url>www.pamguard.org</url>
@@ -365,7 +365,6 @@
 							</execution>
 						</executions>
 					</plugin>
-
 				</plugins>
 
 		
@@ -412,6 +411,7 @@
 		
 	</profiles>
 	
+
 
 	<reporting>
 		<plugins>
@@ -467,16 +467,6 @@
 			<url>https://nexus.bedatadriven.com/content/groups/public/</url>
 		</repository>
 
-
-		<repository>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<id>talan</id>
-			<name>talan</name>
-			<url>https://nexus.talanlabs.com/content/repositories/releases/</url>
-		</repository>
-
 		<repository>
 			<id>central</id>
 			<url>https://repo1.maven.org/maven2</url>
@@ -486,6 +476,17 @@
 
 
 	<!--  ************************* Dependencies ************************************* -->
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.junit</groupId>
+				<artifactId>junit-bom</artifactId>
+				<version>5.11.3</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<dependencies>
 
 		<!--jpam project - utilities -->
@@ -493,6 +494,13 @@
 			<groupId>io.github.macster110</groupId>
 			<artifactId>jpamutils</artifactId>
 			<version>0.0.59e</version>
+			<exclusions>
+				<exclusion>
+					<!-- com.github.psambit9791:wavfile:jar:0.1 pulls in various junit dependencies which breaks our own testing -->
+					<groupId>org.junit.platform</groupId>
+					<artifactId>junit-platform-surefire-provider</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!--jpam project - Deep learning java library -->
@@ -652,6 +660,13 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
+<!-- html to markdown conversion https://github.com/furstenheim/copy-down --> 
+    <dependency>
+        <groupId>io.github.furstenheim</groupId>
+        <artifactId>copy_down</artifactId>
+        <version>1.1</version>
+    </dependency>
 
 		<!-- https://search.maven.org/artifact/org.kordamp.ikonli/ikonli-javafx/12.2.0/jar -->
 		<!-- Icon symbol pack to replace FontAwesome.  This is the core library, and the
@@ -1191,5 +1206,11 @@
 
 
 
+		<!-- Test dependencies -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>

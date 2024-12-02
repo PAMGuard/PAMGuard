@@ -1,0 +1,52 @@
+---
+title: "Beamformer Output"
+---
+Beamformer Output  
+
+Beamformer Module
+=================
+
+Beamformer Output
+-----------------
+
+  
+
+### Individual Beam Output
+
+The output of individually-configured beamformer beams is FFT data, and as such any module that can accept FFT data will be able to use the beamformer as input. For visualisation purposes, this typically means a [Spectrogram](../../../displays/spectrogramDisplayHelp/docs/UserDisplay_Spectrogram.html).
+
+![](images/BF Output Individ.PNG)
+
+1.  In the Spectrogram Parameters window, select Beamformer data as the FFT Source
+    
+2.  The channel numbers here are actually the beam numbers, as defined in the [Beam Algorithm Configuration](Beamformer_AlgoConfig.html#BF_ConfigIndivid) dialog.
+    
+
+  
+  
+
+### Beamogram Output
+
+The beamogram outputs a time-series dataset, and can be displayed on an FX Spectrogram. When a User Display tab is active, select _User Display_ from the main menu, and then select _New Time base Data display FX_
+
+![](images/FX Display.PNG)
+
+  
+
+See the [help file](../../../displays/timedisplayfx/docs/timedisplayfx.html) for more information about FX displays.
+
+Add the beamogram data to the display, and adjust the angle range to view. Although a beamformer can calculate up to 3 different dimensions of data for each time slice (primary angle, secondary angle and frequency), only primary angle versus time is displayed in the spectrogram. To do this, the beamformer data is averaged over the frequency and secondary angle for each primary angle bin.
+
+![](images/BF Output Beamogram.PNG)
+
+1.  Standard Spectrogram, showing the FFT Engine output.
+    
+2.  Beamogram Display, showing primary angle versus time with the amplitude represented by the colour.
+    
+
+The image above shows a simulated right whale call generated 90 degrees from the ship's heading, and captured with a 16 channel array. The gain is proportional to the number of channels being combined, so with fewer channels the spread in amplitude will decrease. This means that, with smaller arrays, it may be difficult to visually see the angle with the highest amplitude as the display will look more like vertical bars of the same (or similar) colour.
+
+  
+  
+
+[Previous: Beamformer Algorithm Configuration](Beamformer_AlgoConfig.html)

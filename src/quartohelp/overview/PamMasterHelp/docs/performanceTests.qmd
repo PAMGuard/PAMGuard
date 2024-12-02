@@ -1,0 +1,44 @@
+---
+title: "Performance Tests"
+---
+ Performance Tests  
+
+PAMGUARD
+========
+
+Performance Tests
+-----------------
+
+  
+
+PAMGUARD puts a heavy load on the machine it's running on
+
+Machine performance is dependent not just on the CPU speed but also on things like the quality of the graphics card and the types of hard drive
+
+The PAMGUARD team are developing a set of performance tests which can be run from within PAMGUARD to assess the likely performance of different platforms
+
+### Running the performance tests
+
+Open the performance tests dialog from the **_Help>System performance Tests_** menu
+
+Press the 'Start tests' button
+
+### Interpreting the output of the performance tests
+
+These tests are currently under development and more information will be provided within the performance tests dialog in the near future
+
+As a general guide:
+
+Test 3 the Double precision number crunching, should execute in less than 700 ms.
+
+Test 4 directly drawing dots on the screen should take around 400 - 500 ms
+
+Test 5 drawing dots using a buffered image should take < 100 ms
+
+Test 6 drawing dots using a callback function should take less than 700 ms
+
+These numbers are very preliminary and are based on tests carried out on a Dell Latitude D830 laptop with an Intel Core Duo CPU T9300 @2.5GHz with 3.5 GB of RAM. This machine runs PAMGUARD very well.
+
+  
+
+[Previous: Data Storage](datastorage2.html)

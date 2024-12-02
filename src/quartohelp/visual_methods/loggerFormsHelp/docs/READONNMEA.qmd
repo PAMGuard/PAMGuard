@@ -1,0 +1,24 @@
+---
+title: "READONNMEA Property"
+---
+ READONNMEA Property  
+
+READONNMEA Property
+===================
+
+The READONNMEA Property is used to make a form automatically save every time a specified NMEA string arrives.
+
+Typically, READONMEA is used if you want to store every instance of a particular string. In this case, you will need to build a form containing a number of fields of types NMEACHAR, NMEAFLOAT and NMEAINT which will read individual values from the NMEA string and store them in database columns.
+
+Note that this is very different to reading on a timer which will only ever store the latest data from a particular string.
+
+### Required Fields
+
+**Autoupdate**
+
+The time interval in seconds at which the form should be automatically saved
+
+  
+  
+
+[Back to form Design](./designingForms.html)

@@ -1,0 +1,74 @@
+---
+title: "SYMBOLTYPE Property"
+---
+ SYMBOLTYPE Property  
+
+SYMBOLTYPE Property
+===================
+
+The SYMBOLTYPE Property is used to set the default symbol used by a particular form when data are plotted on the PAMGuard map.
+
+Available symbols are:
+
+.
+
+point
+
+o
+
+circle
+
+x
+
+x-mark
+
++
+
+plus
+
+\*
+
+star
+
+s
+
+square
+
+d
+
+diamond
+
+v
+
+triangle(down)
+
+^
+
+triangle (up)
+
+<
+
+triangle (left)
+
+\>
+
+triangle(right)
+
+p
+
+pentagon
+
+h
+
+hexagon
+
+### Required Fields
+
+**Title**
+
+The type of symbol taken from the above list.
+
+  
+  
+
+[Back to form Design](./designingForms.html)

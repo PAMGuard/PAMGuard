@@ -1,0 +1,21 @@
+---
+title: "Airgun Display Overview"
+---
+ Airgun Display Configuration  
+
+Airgun Display
+==============
+
+Overview
+--------
+
+  
+
+During mitigation exercises, it is often required to know the locations of detections relative to an airgun array.
+
+PAMGUARD can display the locations of airguns, and the extent of a specified mitigation zone around the guns.
+
+Airgun locations can be set relative to the [GPS receiver](../../NMEA/docs/ConfiguringGPS.html") of the vessel running PAMGUARD or relative to the [AIS data](../../AIS/docs/AISOverview.html) received from one or more different vessels.  
+  
+
+[Next: Airgun Display Configuration](AirgunConfiguration.html)

@@ -87,6 +87,9 @@ public class SimParameters extends SoundCardParameters implements Cloneable, Ser
 		}
 
 		PamParameterSet ps = super.getParameterSet();
+		if (ps == null) {
+			return null;
+		}
 		try {
 			Field field = this.getClass().getDeclaredField("simObjects");
 			ps.put(new PrivatePamParameterData(this, field) {

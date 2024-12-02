@@ -1,0 +1,47 @@
+---
+title: "Configuration"
+---
+ Analog Array Sensors  
+
+Analog Array Sensors
+====================
+
+Configuration
+-------------
+
+### Creating an Array Sensors Module
+
+From the **_File>Add modules>Sensors_** menu, or from the pop-up menu on the data model display select _'Analog Array Sensors'_. Enter a name for the new module and press Ok.
+
+The module is not dependent on any other modules and will automatically find and exchange information with the [Hydrophone Array Manager](../../../utilities/hydrophoneArrayManagerHelp/docs/Array_Overview.html).
+
+### Configuring the Module
+
+Go to **_Settings>Analog Array Sensor Settings..._** and the following dialog will appear.
+
+  
+![Accelerometer side panel](images/analogarrayconfiguration.png)  
+
+The top section of the dialog shows the number of array streamers. The number of different inputs shown in the bottom section of the dialog will depend on how many streams are present in your array configuration.
+
+Enter the readout time in seconds.
+
+### Input Device Settings
+
+Select either [Measurement Computing Devices](http://www.mccdaq.com) or [Brain Boxes ED-549 devices](http://www.brainboxes.com/product/ed-549/ethernet-to-8-analogue-inputs-rs485-gateway) . Other device types may be added in future releases.
+
+#### Channels
+
+Select which input channel you wish to use for each parameter. If you do not wish to read a particular parameter, then select "-" for that channel (in the example, Pitch and Roll are not being read out for the second streamer).
+
+For Measurement Computing Devices you will be asked to select a device from a drop down list. This will have had to be correctly configured using the Measurement Computing InstaCal software.
+
+For the Brainboxes device, enter it's IP address. you may also have to adjust your network adapter settings (or use a separate USB-Ethernet Adapter).
+
+Select the input range for each channel. This should match the output of the sensors you are using.
+
+  
+
+[Previous: Overview](analogarray.html)
+
+[Next: Calibration](analogarraycalibration.html)
