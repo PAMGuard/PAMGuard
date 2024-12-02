@@ -884,8 +884,6 @@ public class PamCalendar {
 	 */
 	public static void setSessionStartTime(long sessionStartTime) {
 		setSessionStartTime(sessionStartTime, 0);
-//		PamCalendar.sessionStartTime = sessionStartTime;
-//		PamController.getInstance().updateMasterClock(getTimeInMillis());
 	}
 
 	/**

@@ -2,6 +2,7 @@ package pamViewFX.fxNodes.pamDialogFX;
 
 import java.util.Optional;
 
+import PamView.PamIcon;
 import dataPlotsFX.FXIconLoder;
 import javafx.event.ActionEvent;
 import javafx.geometry.Point2D;
@@ -104,7 +105,7 @@ public abstract class PamDialogFX<T> extends Dialog<T> {
 	 */
 	private void setDefaultIcon() {
 		try {
-			Image icon = FXIconLoder.createImage("Resources/pamguardIcon.png");
+			Image icon = FXIconLoder.createImage(PamIcon.getPAMGuardIconPath(PamIcon.SMALL));
 			Stage stage = (Stage) this.getDialogPane().getScene().getWindow();
 			stage.getIcons().add(icon);
 		}

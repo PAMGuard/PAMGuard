@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.pamguard</groupId>
   <artifactId>Pamguard</artifactId>
-  <version>2.02.14b</version>
+  <version>2.02.15</version>
   <name>Pamguard</name>
   <description>Pamguard using Maven to control dependencies</description>
 	<url>www.pamguard.org</url>
@@ -494,13 +494,6 @@
 			<groupId>io.github.macster110</groupId>
 			<artifactId>jpamutils</artifactId>
 			<version>0.0.59e</version>
-			<exclusions>
-				<exclusion>
-					<!-- com.github.psambit9791:wavfile:jar:0.1 pulls in various junit dependencies which breaks our own testing -->
-					<groupId>org.junit.platform</groupId>
-					<artifactId>junit-platform-surefire-provider</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 
 		<!--jpam project - Deep learning java library -->
