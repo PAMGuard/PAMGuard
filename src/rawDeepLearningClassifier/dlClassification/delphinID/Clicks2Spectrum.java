@@ -5,10 +5,8 @@ import java.util.ArrayList;
 import org.jamdev.jpamutils.spectrum.Spectrum;
 
 import PamUtils.PamArrayUtils;
-import PamUtils.complex.ComplexArray;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.RawDataHolder;
-import PamguardMVC.RawDataTransforms;
 import rawDeepLearningClassifier.segmenter.SegmenterDetectionGroup;
 
 

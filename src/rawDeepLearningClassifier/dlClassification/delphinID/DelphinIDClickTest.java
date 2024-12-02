@@ -25,15 +25,15 @@ public class DelphinIDClickTest {
 	public static void main(String args[]) {
 
 		//test a single segment. 
-		String matFileout = "/Users/au671271/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/delphinID/click1D/clickspectrum.mat";
+		String matFileout = "/Users/jdjm/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/delphinID/click1D/clickspectrum.mat";
 
 		//
 		float[][] output = testDelphinIDClickSegment(matFileout); 
 
 		//run the model
-		String modelFile = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/clickclassifier.zip";
+		String modelFile = "/Users/jdjm/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/clickclassifier.zip";
 
-		String matFileout2 = "/Users/au671271/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/delphinID/click1D/clickspectrum_results.mat";
+		String matFileout2 = "/Users/jdjm/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/delphinID/click1D/clickspectrum_results.mat";
 
 		testDelphinIDModelRaw(modelFile, output, matFileout2); 
 
@@ -88,12 +88,12 @@ public class DelphinIDClickTest {
 
 
 		//		String clicksMatPath = "/Users/jdjm/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/clicks_20200918_123234.mat";
-		String clicksMatPath = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/clicks_20200918_123234.mat";
+		String clicksMatPath = "/Users/jdjm/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/clicks_20200918_123234.mat";
 
 		double segLen = 4000.;
 		double segHop = 1000.0;
 		double startSeconds = 1.50355; //seconds to start segments (so we can compare to Python)
-		double[] freqLimits = new double[] {10000., 40000.};
+		double[] freqLimits = new double[] {10000., 40188.};
 		int fftLen = 512; 
 
 		// Create MAT file with a scalar in a nested struct
@@ -124,15 +124,23 @@ public class DelphinIDClickTest {
 				Spectrum spectrum  = Clicks2Spectrum.clicks2Spectrum(clicksSeg, (float) clicks.getSampleRate(), fftLen); 
 				clkStruct.set("averagespectrum", i, DLMatFile.array2Matrix(spectrum.getRealSpectrum())); 
 				clkStruct.set("nclks", i, Mat5.newScalar(clicksSeg.size())); 
+				
+				//System.out.println("Segment average" + i + " time:  " +  (double)(segments.get(i).getSegmentStartMillis()-dataStartMillis)/1000.  + "s no. clicks " + segments.get(i).getSubDetectionsCount() + " total: " + sum + "  spectrum " + spectrum.length() + "  " + spectrum.getRealSpectrum()[0]);
 
 				//convert to dB
 				spectrum = spectrum.spectrumdB(true);
+				
+				//System.out.println("Segment dB" + i + " time:  " +  (double)(segments.get(i).getSegmentStartMillis()-dataStartMillis)/1000.  + "s no. clicks " + segments.get(i).getSubDetectionsCount() + " total: " + sum + "  spectrum " + spectrum.length() + "  " + spectrum.getRealSpectrum()[0]);
 
 				//smooth spectrum
 				spectrum = spectrum.smoothSpectrum(3);
+				
+				//System.out.println("Segment smooth" + i + " time:  " +  (double)(segments.get(i).getSegmentStartMillis()-dataStartMillis)/1000.  + "s no. clicks " + segments.get(i).getSubDetectionsCount() + " total: " + sum + "  spectrum " + spectrum.length() + "  " + spectrum.getRealSpectrum()[0]);
 
 				//trim spectrum
 				spectrum = spectrum.trimSpectrum(freqLimits);
+				
+				//System.out.println("Segment trim" + i + " time:  " +  (double)(segments.get(i).getSegmentStartMillis()-dataStartMillis)/1000.  + "s no. clicks " + segments.get(i).getSubDetectionsCount() + " total: " + sum + "  spectrum " + spectrum.length() + "  " + spectrum.getRealSpectrum()[0]);
 
 				//normalise spectrum row sum
 				spectrum = spectrum.normaliseSpectrumSum();
@@ -140,7 +148,7 @@ public class DelphinIDClickTest {
 				//down sample the spectrum.
 				spectrum.downSampleSpectrumMean(2);
 
-				System.out.println("Segment" + i + " time:  " +  (double)(segments.get(i).getSegmentStartMillis()-dataStartMillis)/1000.  + "s no. clicks " + segments.get(i).getSubDetectionsCount() + " total: " + sum + "  spectrum " + spectrum.length());
+				System.out.println("Segment " + i + " time:  " +  (double)(segments.get(i).getSegmentStartMillis()-dataStartMillis)/1000.  + "s no. clicks " + segments.get(i).getSubDetectionsCount() + " total: " + sum + "  spectrum " + spectrum.length() + "  " + spectrum.getRealSpectrum()[0]);
 
 				clkStruct.set("transformedspectrum", i, DLMatFile.array2Matrix(spectrum.getRealSpectrum())); 
 
