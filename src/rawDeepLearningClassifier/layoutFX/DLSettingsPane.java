@@ -3,8 +3,6 @@ package rawDeepLearningClassifier.layoutFX;
 import java.util.ArrayList;
 
 import org.controlsfx.control.PopOver;
-import org.controlsfx.control.ToggleSwitch;
-
 import PamController.PamGUIManager;
 import PamController.SettingsPane;
 import PamDetection.RawDataUnit;
@@ -40,8 +38,8 @@ import pamViewFX.fxNodes.utilityPanes.PamToggleSwitch;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.DLStatus;
 import rawDeepLearningClassifier.RawDLParams;
+import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
 import warnings.PamWarning;
-import whistlesAndMoans.ConnectedRegionDataUnit;
 
 /**
  * The settings pane. 
@@ -123,7 +121,6 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	private PamGridPane segmenterGridPane;
 
 
-
 	public DLSettingsPane(DLControl dlControl){
 		super(null); 
 		this.dlControl=dlControl; 
@@ -163,11 +160,13 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 		PamVBox vBox=new PamVBox();
 		vBox.setSpacing(5);
 
-		sourcePane = new GroupedSourcePaneFX("Raw Sound Data", RawDataUnit.class, true, false, true);
-		sourcePane.addSourceType(ClickDetection.class, false);
-		sourcePane.addSourceType(ClipDataUnit.class, false);
-		sourcePane.addSourceType(ConnectedRegionDataUnit.class, false);
-
+		sourcePane = new GroupedSourcePaneFX("Raw Sound Data", null, true, false, true);
+		setDefaultSourceList();
+		
+//		sourcePane.addSourceType(ClickDetection.class, false);
+//		sourcePane.addSourceType(ClipDataUnit.class, false);
+//		sourcePane.addSourceType(ConnectedRegionDataUnit.class, false);
+		
 
 		vBox.getChildren().add(sourcePane);
 		sourcePane.prefWidthProperty().bind(vBox.widthProperty());
@@ -396,24 +395,69 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	 * Set the classifier pane. 
 	 */
 	protected void setClassifierPane() {
-
-
 		//set the classifier Pane.class 
+		
+		//System.out.println("SET CLASSIFIER PANE"); 
+		
 		if (modelSelectPane.currentClassifierModel!=null && modelSelectPane.currentClassifierModel.getModelUI()!=null) {
 
 			classifierPane.setCenter(modelSelectPane.currentClassifierModel.getModelUI().getSettingsPane().getContentNode()); 
 
 			if (modelSelectPane.currentClassifierModel!=null) {
 				modelSelectPane.currentClassifierModel.getModelUI().setParams(); 
+				setSourceList(modelSelectPane.currentClassifierModel);
 			}
 			else {
 				classifierPane.setCenter(null); 
+				setDefaultSourceList();
 			}
 
 		}
 		else {
 			classifierPane.setCenter(null); 
+			setDefaultSourceList();
 		}
+	}
+
+
+	/**
+	 * Set the allowed sources for this type of model. 
+	 * @param currentClassifierModel - the allowed sources. 
+	 */
+	private void setSourceList(DLClassiferModel currentClassifierModel) {
+		
+		//System.out.println("SET SOURCE LIST: " + currentClassifierModel.getAllowedDataTypes()); 
+		//set the source list for a given classifier model. 
+		if (currentClassifierModel.getAllowedDataTypes()==null) {
+			setDefaultSourceList() ;
+		}
+		else {
+			sourcePane.setTitleText("Detection data");
+			sourcePane.clearSourceTypeList();
+			sourcePane.setSourceIndex(-1);
+			for (@SuppressWarnings("rawtypes") Class type: currentClassifierModel.getAllowedDataTypes()) {
+				sourcePane.addSourceType(type, false);
+			}
+		}
+		
+		//System.out.println("SET SOURCE LIST: " + sourcePane.getSourceCount()); 
+
+		//soemthing has gone wrong but at least have sound acquisition for  samplerate.  
+		if  (sourcePane.getSourceCount()<=0) {
+			setDefaultSourceList() ;
+		}
+	}
+
+
+	/**
+	 * Set the default data sources which are anything that contains raw acoustic data. 
+	 */
+	private void setDefaultSourceList() {
+		sourcePane.setTitleText("Raw Sound Data");
+		sourcePane.clearSourceTypeList();
+		sourcePane.addSourceType(RawDataUnit.class, false);
+		sourcePane.addSourceType(ClickDetection.class, false);
+		sourcePane.addSourceType(ClipDataUnit.class, false);
 	}
 
 

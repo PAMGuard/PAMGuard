@@ -10,32 +10,44 @@ import org.jamdev.jdl4pam.utils.DLMatFile;
 import org.jamdev.jpamutils.spectrum.Spectrum;
 
 import PamUtils.PamArrayUtils;
+import PamUtils.PamCalendar;
 import PamguardMVC.PamDataUnit;
 import ai.djl.MalformedModelException;
 import rawDeepLearningClassifier.dlClassification.archiveModel.SimpleArchiveModel;
 import rawDeepLearningClassifier.dlClassification.delphinID.DelphinIDUtils.ClickDetectionMAT;
 import rawDeepLearningClassifier.dlClassification.delphinID.DelphinIDUtils.DetectionGroupMAT;
+import rawDeepLearningClassifier.dlClassification.delphinID.DelphinIDWhistleTest.DelphinIDWorkerTest;
+import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 import rawDeepLearningClassifier.segmenter.SegmenterDetectionGroup;
 import us.hebi.matlab.mat.format.Mat5;
 import us.hebi.matlab.mat.types.MatFile;
+import us.hebi.matlab.mat.types.Matrix;
 import us.hebi.matlab.mat.types.Struct;
+import whistlesAndMoans.AbstractWhistleDataUnit;
 
 public class DelphinIDClickTest {
 
 	public static void main(String args[]) {
 
+		String clicksMatPath = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/clicks_20200918_123234.mat";
+		String modelFile = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/clickclassifier.zip";
+
+		DetectionGroupMAT<ClickDetectionMAT> clicks = DelphinIDUtils.getClicksMAT(clicksMatPath);
+
+		//-----basic tests to check transforms----
 		//test a single segment. 
-		String matFileout = "/Users/jdjm/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/delphinID/click1D/clickspectrum.mat";
-
+		//		String matFileout = "/Users/au671271/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/delphinID/click1D/clickspectrum.mat";
+		//		float[][] output = testDelphinIDClickSegment(matFileout, clicks); 
 		//
-		float[][] output = testDelphinIDClickSegment(matFileout); 
+		//		//run the model
+		//
+		//		String matFileout2 = "/Users/au671271/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/delphinID/click1D/clickspectrum_results.mat";
+		//
+		//		testDelphinIDModelRaw(modelFile, output, matFileout2); 
 
-		//run the model
-		String modelFile = "/Users/jdjm/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/clickclassifier.zip";
 
-		String matFileout2 = "/Users/jdjm/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/delphinID/click1D/clickspectrum_results.mat";
-
-		testDelphinIDModelRaw(modelFile, output, matFileout2); 
+		//---complete test on the model and transforms------
+		float[][] results = testDelphinIDClickModel( modelFile,	clicks ); 
 
 	}
 
@@ -45,6 +57,86 @@ public class DelphinIDClickTest {
 	/*
 	/*
 	/****------------------------------------------------------------------****/
+
+
+	public static float[][] testDelphinIDClickModel(String modelPath,	DetectionGroupMAT<ClickDetectionMAT> clicks ) {
+
+		Path path = Paths.get(modelPath);
+
+
+		double segLen = 4000.;
+		double segHop = 1000.0;
+		int minclicks = 5; 
+
+		//load the model
+		try {
+
+			//now feed segments directly into model to test. 
+
+			float sampleRate = (float) clicks.getSampleRate();
+			long dataStartMillis = clicks.getFileDataStart();
+
+			
+			Float hardSampleRate = Float.valueOf((float) clicks.sampleRate); 
+			//segment the whistle detections
+			//Note, delphinID starts from the first whistle and NOT the first file. 
+			ArrayList<SegmenterDetectionGroup> segments  = DelphinIDUtils.segmentDetectionData(clicks.getDetections(), dataStartMillis, segLen,  segHop, hardSampleRate);
+
+			for (int i=0; i<segments.size(); i++) {
+				System.out.println("Segment " + i + " contains " + segments.get(i).getSubDetectionsCount() + " clicks"); 
+			}
+
+			//prepare the model - this loads the zip file and loads the correct transforms. 
+			DelphinIDWorkerTest model = DelphinIDUtils.prepDelphinIDModel(path.toAbsolutePath().toString());
+			model.setEnableSoftMax(false);
+
+
+			//initialise strcuture for image data
+			Struct imageStruct = Mat5.newStruct(segments.size(), 1);
+
+			for (int i=0; i<segments.size(); i++) {
+
+				//remember that the input is a stack of detections to be run by the model at once - Here we want to do each one individually. 
+				ArrayList<SegmenterDetectionGroup> aSegment = new  ArrayList<SegmenterDetectionGroup>();
+				
+				aSegment.add(segments.get(i)); 
+
+				if (segments.get(i).getSubDetectionsCount()>minclicks) {
+					//the prediction. 
+					ArrayList<StandardPrediction> predicition = model.runModel(aSegment, sampleRate, 1);		
+
+					float[] output =  predicition.get(0).getPrediction();
+
+					System.out.print(String.format("Segment: %d no. clicks %d %.4f s" , i , segments.get(i).getSubDetectionsCount() ,((aSegment.get(0).getSegmentStartMillis()-dataStartMillis)/1000.)));
+					for (int j=0; j<output.length; j++) {
+						System.out.print(String.format( " %.4f" , output[j])); 
+					}
+					System.out.println();
+
+					Matrix modelinput = DLMatFile.array2Matrix(PamArrayUtils.float2Double(model.getLastModelInput()[0]));
+					imageStruct.set("modelinput", i, modelinput);
+					imageStruct.set("startmillis", i, Mat5.newScalar(aSegment.get(0).getSegmentStartMillis()));
+					imageStruct.set("startseconds", i, Mat5.newScalar((aSegment.get(0).getSegmentStartMillis()-dataStartMillis)/1000.));
+					imageStruct.set("prediction", i, DLMatFile.array2Matrix(PamArrayUtils.float2Double(output)));
+				}
+				else {
+					System.out.println(String.format("Segment: %d no. clicks %d %s" , i , segments.get(i).getSubDetectionsCount(), "-------------------------"));
+				}
+
+			}
+
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+		return null;
+
+	}
+
+
 
 
 
@@ -63,18 +155,19 @@ public class DelphinIDClickTest {
 				float[][] input = new float[1][];
 				input[0] = rawModelInput[i];
 				outputJava = model.runModel(input);
-				
-				System.out.println("Click spectrum output Java: "); 
-				PamArrayUtils.printArray(outputJava);
+
+				System.out.print(i+" :"); 
+
+				PamArrayUtils.printArray(outputJava, true);
+				System.out.println("");
 			}
-			
-	
+
+
 
 		} catch (MalformedModelException | IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 
 
@@ -84,11 +177,10 @@ public class DelphinIDClickTest {
 	 * 
 	 * @return true if the test is passed. 
 	 */
-	public static float[][] testDelphinIDClickSegment(String matFileout) {
+	public static float[][] testDelphinIDClickSegment(String matFileout, DetectionGroupMAT<ClickDetectionMAT> clicks ) {
 
 
 		//		String clicksMatPath = "/Users/jdjm/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/clicks_20200918_123234.mat";
-		String clicksMatPath = "/Users/jdjm/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/clicks_20200918_123234.mat";
 
 		double segLen = 4000.;
 		double segHop = 1000.0;
@@ -101,7 +193,6 @@ public class DelphinIDClickTest {
 		int sum = 0;
 		try {
 
-			DetectionGroupMAT<ClickDetectionMAT> clicks = DelphinIDUtils.getClicksMAT(clicksMatPath);
 			System.out.println("Total clicks: " + clicks.getDetections().size() + " First click: " + (clicks.getDetections().get(0).getStartSample()/clicks.getSampleRate()) + "s");
 
 
@@ -124,22 +215,22 @@ public class DelphinIDClickTest {
 				Spectrum spectrum  = Clicks2Spectrum.clicks2Spectrum(clicksSeg, (float) clicks.getSampleRate(), fftLen); 
 				clkStruct.set("averagespectrum", i, DLMatFile.array2Matrix(spectrum.getRealSpectrum())); 
 				clkStruct.set("nclks", i, Mat5.newScalar(clicksSeg.size())); 
-				
+
 				//System.out.println("Segment average" + i + " time:  " +  (double)(segments.get(i).getSegmentStartMillis()-dataStartMillis)/1000.  + "s no. clicks " + segments.get(i).getSubDetectionsCount() + " total: " + sum + "  spectrum " + spectrum.length() + "  " + spectrum.getRealSpectrum()[0]);
 
 				//convert to dB
 				spectrum = spectrum.spectrumdB(true);
-				
+
 				//System.out.println("Segment dB" + i + " time:  " +  (double)(segments.get(i).getSegmentStartMillis()-dataStartMillis)/1000.  + "s no. clicks " + segments.get(i).getSubDetectionsCount() + " total: " + sum + "  spectrum " + spectrum.length() + "  " + spectrum.getRealSpectrum()[0]);
 
 				//smooth spectrum
 				spectrum = spectrum.smoothSpectrum(3);
-				
+
 				//System.out.println("Segment smooth" + i + " time:  " +  (double)(segments.get(i).getSegmentStartMillis()-dataStartMillis)/1000.  + "s no. clicks " + segments.get(i).getSubDetectionsCount() + " total: " + sum + "  spectrum " + spectrum.length() + "  " + spectrum.getRealSpectrum()[0]);
 
 				//trim spectrum
 				spectrum = spectrum.trimSpectrum(freqLimits);
-				
+
 				//System.out.println("Segment trim" + i + " time:  " +  (double)(segments.get(i).getSegmentStartMillis()-dataStartMillis)/1000.  + "s no. clicks " + segments.get(i).getSubDetectionsCount() + " total: " + sum + "  spectrum " + spectrum.length() + "  " + spectrum.getRealSpectrum()[0]);
 
 				//normalise spectrum row sum
@@ -164,7 +255,7 @@ public class DelphinIDClickTest {
 			if (matFileout!=null){
 				MatFile matFileWrite = Mat5.newMatFile()
 						.addArray("spectrumJava",clkStruct)
-						.addArray("file", Mat5.newString(clicksMatPath)); 
+						.addArray("filedate", Mat5.newScalar(PamCalendar.millistoDateNum(clicks.getFileDataStart()))); 
 
 				Mat5.writeToFile(matFileWrite, matFileout);
 			}

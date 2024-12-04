@@ -67,7 +67,10 @@ public class DelphinIDWorker extends ArchiveModelWorker {
 		//now have to read the whsitle2image transform to get correct parameters for that. 
 		String jsonString  = DLTransformsParser.readJSONString(new File(this.getModel().getAudioReprFile()));
 		
-		boolean transformOK = groupDataTransform.setJSONData(new JSONObject(jsonString)); 
+		JSONObject jsonObject = new JSONObject(jsonString); 
+		boolean transformOK = groupDataTransform.setJSONData(jsonObject); 
+		
+		((DelphinIDParams) dlParams).dataType = groupDataTransform.getDataType(); 
 
 		if (!transformOK) {
 			System.err.println("Error: could not find whsitle or click group transform in DelphinID JSON file. Model will not work.");

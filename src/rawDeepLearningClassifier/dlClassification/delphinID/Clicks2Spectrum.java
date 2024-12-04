@@ -51,15 +51,17 @@ public class Clicks2Spectrum {
 			
 //			 ComplexArray arr = RawDataTransforms.getComplexSpectrumHann(((RawDataHolder) arrayList.get(i)).getWaveData()[0], fftLen); 
 			
-//			PamArrayUtils.printArray(arr.getReal()); 
+//			PamArrayUtils.printArray(arr.getReal()); 			
+//			System.out.println("fft len: " + i + "  " + fftAverage.length + " " +  fftClk.length); 
 
 			fftAverage = PamArrayUtils.sum(fftAverage, fftClk); 
 		}
 		
+//		System.out.println(fftAverage + " " +  arrayList.size()); 
+		
 		fftAverage = PamArrayUtils.divide(fftAverage, arrayList.size());
 		
 		Spectrum spectrum = new Spectrum(fftAverage, null, sampleRate);
-
 
 		return spectrum; 
 	}

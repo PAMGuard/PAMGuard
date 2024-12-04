@@ -384,7 +384,7 @@ public class DelphinIDUtils {
 		@Override
 		public float getSampleRate() {
 			if (super.getParentDataBlock()==null) {
-			return hardSampleRate;
+				return hardSampleRate;
 			}
 			else {
 				return super.getSampleRate();

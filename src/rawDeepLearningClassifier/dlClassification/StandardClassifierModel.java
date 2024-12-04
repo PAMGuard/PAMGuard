@@ -365,6 +365,13 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 		return warnings;
 
 	}
+	
+	@Override
+	public ArrayList<Class> getAllowedDataTypes(){
+		//null means default data types which is anything with raw data. 
+		return null;
+	}
+
 
 
 

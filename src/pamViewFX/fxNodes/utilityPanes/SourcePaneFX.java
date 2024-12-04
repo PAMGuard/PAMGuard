@@ -43,6 +43,7 @@ import PamguardMVC.PamDataBlock;
 public class SourcePaneFX extends PamBorderPane {
 
 	private ArrayList<SourceSelection> sourceType = new ArrayList<>();
+	
 	private boolean hasChannels;
 	private String borderTitle;
 	
@@ -79,14 +80,16 @@ public class SourcePaneFX extends PamBorderPane {
 	private PamVBox channelListPane;
 	
 	/**
-	 * The title labe. Sits above the combo box. 
+	 * The title label. Sits above the combo box. 
 	 */
-	private Label titleLabel;
+	protected Label titleLabel;
 	
 	/**
 	 * Validator for channels 
 	 */
     protected PamValidator channelValidator;
+    
+    
 	private Label channelLabel;
 
 	/**
@@ -100,6 +103,7 @@ public class SourcePaneFX extends PamBorderPane {
 		if (sourceType != null) {
 			this.sourceType.add(new SourceSelection(sourceType, includeSubClasses));
 		}
+		
 		channelValidator = new PamValidator();
 		this.setHasChannels(hasChannels);
 		this.setBorderTitle(borderTitle);
@@ -560,6 +564,7 @@ public class SourcePaneFX extends PamBorderPane {
 	protected List<PamDataBlock> getSourceDataBlocks() {
 		ArrayList<PamDataBlock> dataBlocks = new ArrayList<>();
 		for (SourceSelection sourceSel:sourceType) {
+			//System.out.println("SOURCE TYPE BLOCKS: " + sourceSel.sourceType + "  " + sourceType.size());
 			ArrayList<PamDataBlock> sl = PamController.getInstance().getDataBlocks(sourceSel.sourceType, sourceSel.allowSubClasses);
 			for (PamDataBlock db:sl) {
 				if (dataBlocks.contains(db) == false) {
@@ -825,5 +830,21 @@ public class SourcePaneFX extends PamBorderPane {
      */
 	public PamValidator getChannelValidator() {
 		return channelValidator;
+	}
+	
+	/**
+	 * Set the title.
+	 * @param titleString - the title text
+	 */
+	public void setTitleText(String titleString) {
+		titleLabel.setText(titleString);
+	}
+	
+	
+	/**
+	 * Clear the source types. 
+	 */
+	public void clearSourceTypeList() {
+		this.sourceType.clear();
 	}
 }

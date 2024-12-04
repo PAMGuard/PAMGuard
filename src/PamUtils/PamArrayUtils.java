@@ -920,14 +920,23 @@ public class PamArrayUtils {
 	/**
 	 * Print an array to the console. 
 	 * @param array to print
+	 * @param row - if true then prints all results in a single row
 	 */
-	public static void printArray(float[] array) {
+	public static void printArray(float[] array, boolean row) {
 		if (array==null) System.out.println("null"); 
 		for (int i=0; i<array.length; i++) {
-			System.out.println(i + ": " + array[i]);
+			if (row) System.out.print(array[i] + "  ");
+			else System.out.println(i + ": " + array[i]);
 		}
 	}
 	
+	/**
+	 * Print an array to the console. 
+	 * @param array to print
+	 */
+	public static void printArray(float[] array) {
+		printArray(array, false);  
+	}
 	
 	/**
 	 * Print an array to the console with no index numbers

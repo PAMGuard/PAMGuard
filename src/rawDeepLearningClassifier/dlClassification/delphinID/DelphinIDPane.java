@@ -10,6 +10,9 @@ import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.SpinnerValueFactory.DoubleSpinnerValueFactory;
+import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -48,6 +51,12 @@ public class DelphinIDPane extends SettingsPane<DelphinIDParams> {
 
 	private File currentSelectedFile;
 
+	private Label detectionDensity;
+
+	private DoubleSpinnerValueFactory whislteValueFactory;
+
+	private DoubleSpinnerValueFactory clickValueFactory;
+
 	public DelphinIDPane(DelphinIDClassifier delphinUIClassifier) {
 		super(null);
 		this.delphinUIClassifier = delphinUIClassifier; 
@@ -75,13 +84,17 @@ public class DelphinIDPane extends SettingsPane<DelphinIDParams> {
 
 		PamVBox vBox = new PamVBox(); 
 		vBox.setSpacing(5.);
+		
+		clickValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(1., Double.MAX_VALUE, 1., 5.);
+		whislteValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 1.0, 0.3, 0.1);
 
 		/**Classification thresholds etc to set.**/
-		Label detectionDensity = new Label("Detection Density"); 
+		detectionDensity = new Label("Detection Density"); 
 		detectionDensity.setFont(font);
 		String tooltip = "Set the minimum detection density to attempt to classify.";
 		detectionDensity.setTooltip(new Tooltip(tooltip));
-		detectionDensitySpinner = new PamSpinner<Double>(0.0, 1.0, 0.3, 0.1);
+		detectionDensitySpinner = new PamSpinner<Double>();
+		detectionDensitySpinner.setValueFactory(whislteValueFactory);
 		detectionDensitySpinner.setPrefWidth(70);
 		detectionDensitySpinner.setEditable(true);
 		detectionDensitySpinner.getStyleClass().add(Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL);
@@ -117,7 +130,7 @@ public class DelphinIDPane extends SettingsPane<DelphinIDParams> {
 	@Override
 	public DelphinIDParams getParams(DelphinIDParams currParams) {
 		currParams.threshold = decisionSlider.getValue();
-		currParams.minDetectionDensity = detectionDensitySpinner.getValue();
+		currParams.minDetectionValue = detectionDensitySpinner.getValue();
 		return currParams;
 	}
 
@@ -125,7 +138,24 @@ public class DelphinIDPane extends SettingsPane<DelphinIDParams> {
 	public void setParams(DelphinIDParams input) {
 		this.currentParams = input;
 		decisionSlider.setValue(input.threshold);
-		detectionDensitySpinner.getValueFactory().setValue(input.minDetectionDensity);
+		detectionDensitySpinner.getValueFactory().setValue(input.minDetectionValue);
+				
+		//set the correct label and minimum detection value
+		switch (input.getDataType()) {
+		case CLICKS:
+			this.detectionDensity.setText("Minimum no. clicks");
+			detectionDensitySpinner.setTooltip(new Tooltip("Set the minimum number of clicks before a segment is classified"));
+			detectionDensitySpinner.setValueFactory(clickValueFactory);
+			break;
+		case WHISTLES:
+			detectionDensitySpinner.setTooltip(new Tooltip("Set the minimum  whistle density before a segment is classified"));
+			this.detectionDensity.setText("Minimum whistle density");
+			detectionDensitySpinner.setValueFactory(whislteValueFactory);
+			break;
+		default:
+			break;
+		
+		}
 
 		if (input.modelPath!=null) {
 			//this might 
