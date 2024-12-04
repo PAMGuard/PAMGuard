@@ -2,6 +2,8 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13378951.svg)](https://doi.org/10.5281/zenodo.13378951)
 
+PAMGuard website: [www.pamguard.org](http://www.pamguard.org)
+
 ## Introduction
 PAMGuard is a bioacoustics analysis program designed for use in real time research contexts and for the processing of large datasets. PAMGuard provides users access to a suite of state-of-the-art automated analysis algorithms alongside displays for visualisation data and a comprehensive data management systems. 
 
@@ -87,4 +89,5 @@ If you are a PAMGuard developer, you should clone and branch this repository and
 PAMGuard uses Maven as build tool. 
 
 # Organisation and License
-PAMGuard is open source under an MIT license. It is currently primarily managed by the Sea Mammal Research Unit within the [University of St Andrews](https://www.st-andrews.ac.uk/). Please get in touch if you have any questions. 
+PAMGuard is open source under the [GPL 3.0 license](https://www.gnu.org/licenses/gpl-3.0.en.html). 
+It is currently primarily managed by the Sea Mammal Research Unit within the [University of St Andrews](https://www.st-andrews.ac.uk/). Please get in touch if you have any questions. 
