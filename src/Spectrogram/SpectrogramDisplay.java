@@ -2952,9 +2952,11 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 			try {
 				//				System.out.println("Unlocked" + usedDataBlock.getDataName());
 				iterator = usedDataBlock.getListIterator(PamDataBlock.ITERATOR_END);
+//				int iUn = 0;
 				while(iterator.hasPrevious()) {
 					dataUnit = iterator.previous();
-
+//					System.out.printf("Draw data %d/%d at %s\n", ++iUn, usedDataBlock.getUnitsCount(),
+//							PamCalendar.formatTime(dataUnit.getTimeMilliseconds()));			
 					// decide whether or not to display the data unit based on the current time, unless we have frozen the
 					// image.  In that case, base the decision on the frozen time
 					long timeToUse = currentTimeMilliseconds;
@@ -2982,6 +2984,8 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 			}
 			catch (Exception e) {
 				// avoid synck lock 
+				System.out.println("Exception in wsl draw: " + e.getMessage());
+//				e.printStackTrace();
 			}
 
 		}
