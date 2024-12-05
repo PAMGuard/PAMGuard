@@ -244,7 +244,7 @@ public abstract class DataBlockTableView<T extends PamDataUnit> {
 			if (dataUnitCopy == null) {
 				return null;
 			}
-			return dataUnitCopy.get(tableRow);
+			return dataUnitCopy.get(rowIndex);
 //			return pamDataBlock.getDataUnit(rowIndex, PamDataBlock.REFERENCE_CURRENT);
 		}
 	}
@@ -286,6 +286,9 @@ public abstract class DataBlockTableView<T extends PamDataUnit> {
 	 * @return
 	 */
 	public int getDataIndexForRow(int tableRow) {
+		if (tableRow == -1) {
+			return -1;
+		}
 		if (dataUnitCopy == null) {
 			return tableRow;
 		}
