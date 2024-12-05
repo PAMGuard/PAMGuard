@@ -92,7 +92,7 @@ public class SMRUEnable {
 	/**
 	 * @return the setDevEnable
 	 */
-	protected static boolean isDevEnable() {
+	public static boolean isDevEnable() {
 		return setDevEnable;
 	}
 	
