@@ -43,6 +43,11 @@ public interface CommonPluginInterface {
 	 * include that in the filename.  For example, if the package name is MyFirstPlugin
 	 * and the help file is MyPluginHelp.hs, the return should be:<p>
 	 * {@code return "MyFirstPlugin/MyPluginHelp.hs";}<p>
+	 * To create links into the main PAMGuard help, you need a special pattern at the 
+	 * start of each hyperlink, for example<br>
+	 * 
+        href="_mainHelp_detectors/clickDetectorHelp/docs/ClickDetector_clickDetector.html or
+	<br>href="_mainHelp_overview/PamMasterHelp/docs/normalMode.html"<p>
 	 * If there is no helpset file, return null.
 	 * 
 	 * @return
