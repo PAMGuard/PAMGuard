@@ -4,7 +4,7 @@
   <groupId>org.pamguard</groupId>
   <artifactId>Pamguard</artifactId>
   <name>Pamguard</name>
-  <version>2.02.14a</version>
+  <version>2.02.14b</version>
   <description>Pamguard using Maven to control dependencies</description>
   <url>www.pamguard.org</url>
   <organization>
@@ -67,9 +67,11 @@
                 <dmgFileName>${project.build.finalName}</dmgFileName>
                 <appendVersion>false</appendVersion>
               </dmg>
+              <app>
+                <includeDependencies>false</includeDependencies>
+              </app>
               <jdk>
                 <include>true</include>
-                <location>/Library/Java/JavaVirtualMachines/amazon-corretto-21.jdk</location>
               </jdk>
               <codesign>
                 <enable>false</enable>
@@ -80,7 +82,7 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
-            <version>3.1.0</version>
+            <version>3.5.0</version>
             <executions>
               <execution>
                 <id>sign-app</id>
@@ -95,9 +97,10 @@
                     <argument>echo ${project.basedir}/target/${project.build.finalName}.dmg
 											xattr -cr ${project.basedir}/target/PAMGuard.app
 											codesign --force --sign "3rd Party Mac Developer Application: Jamie Macaulay" ${project.basedir}/target/PAMGuard.app
-											ln -s ${project.basedir}/target/PAMGuard.app ${project.basedir}/target/bundle/PAMGuard.app
+											cp -r ${project.basedir}/target/PAMGuard.app ${project.basedir}/target/bundle/PAMGuard.app
 											cd ${project.basedir}/target/bundle
-											hdiutil create -srcfolder ${project.basedir}/target/bundle -volname "PAMGuard" -fs HFS+ -o "${project.build.finalName}-signed.dmg"</argument>
+											hdiutil create -srcfolder ${project.basedir}/target/bundle -volname "PAMGuard" -fs HFS+ -o "${project.build.finalName}-signed.dmg"
+											rm -r ${project.basedir}/target/bundle/PAMGuard.app</argument>
                   </arguments>
                 </configuration>
               </execution>
@@ -222,6 +225,53 @@
               </execution>
             </executions>
           </plugin>
+          <plugin>
+            <groupId>de.perdian.maven.plugins</groupId>
+            <artifactId>macosappbundler-maven-plugin</artifactId>
+            <version>1.21.1</version>
+            <executions>
+              <execution>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>bundle</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <plist>
+                <JVMMainClassName>pamguard.Pamguard</JVMMainClassName>
+                <CFBundleIconFile>src/Resources/PamguardIcon2.icns</CFBundleIconFile>
+                <CFBundleDisplayName>PAMGuard</CFBundleDisplayName>
+                <CFBundleDevelopmentRegion>English</CFBundleDevelopmentRegion>
+                <CFBundleURLTypes>
+                  <string>msa</string>
+                </CFBundleURLTypes>
+                <JVMVersion>21+</JVMVersion>
+                <JVMArguments>
+                  <string>-c</string>
+                </JVMArguments>
+                <NSAppSleepDisabled>true</NSAppSleepDisabled>
+              </plist>
+              <dmg>
+                <generate>true</generate>
+                <additionalResources>
+                  <additionalResource>
+                    <directory>${project.basedir}/target/bundle/</directory>
+                  </additionalResource>
+                </additionalResources>
+                <dmgFileName>${project.build.finalName}</dmgFileName>
+                <appendVersion>false</appendVersion>
+              </dmg>
+              <jdk>
+                <include>false</include>
+                <location>/Library/Java/JavaVirtualMachines/amazon-corretto-21.jdk</location>
+              </jdk>
+              <codesign>
+                <enable>false</enable>
+                <identity>3rd Party Mac Developer Application: Jamie Macaulay (7365S9DZ34)</identity>
+              </codesign>
+            </configuration>
+          </plugin>
         </plugins>
       </build>
     </profile>
@@ -251,18 +301,24 @@
       <url>https://nexus.bedatadriven.com/content/groups/public/</url>
     </repository>
     <repository>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <id>talan</id>
-      <name>talan</name>
-      <url>https://nexus.talanlabs.com/content/repositories/releases/</url>
-    </repository>
-    <repository>
       <id>central</id>
       <url>https://repo1.maven.org/maven2</url>
     </repository>
   </repositories>
+  <dependencies>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>5.11.3</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>junit-jupiter-params</artifactId>
+          <groupId>org.junit.jupiter</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+  </dependencies>
   <reporting>
     <plugins>
       <plugin>
@@ -272,6 +328,17 @@
       </plugin>
     </plugins>
   </reporting>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>5.11.3</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <properties>
     <maven.compiler.source>11</maven.compiler.source>
     <mockito.version>1.10.19</mockito.version>
