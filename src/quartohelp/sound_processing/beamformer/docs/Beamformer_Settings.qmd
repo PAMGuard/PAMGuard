@@ -1,8 +1,6 @@
 ---
 title: "Beamformer Configuration"
 ---
-Beamformer Configuration  
-
 Beamformer Module
 =================
 

@@ -1,8 +1,6 @@
 ---
 title: "Overview"
 ---
- Hydrophone Depth Readout Overview  
-
 Hydrophone Depth Readout
 ========================
 
@@ -15,7 +13,7 @@ For current loop depth sensors (which output a current proportional to depth), t
 
 The system currently only works with MeasurementComputing data acquisition cards ([www.mccdaq.com](http://www.mccdaq.com)) but may be extended to support other devices in the future.
 
-Time-stamped depth information is passed to the [hydrophone array manager](../../hydrophoneArrayManagerHelp/docs/Array_Overview.html) which makes it available to other PAMGUARD modules as required, the information from the sensors effectively overriding the default depth information in the [hydrophone array configuration dialog](../../hydrophoneArrayManagerHelp/docs/Array_Configuration.html).
+Time-stamped depth information is passed to the [hydrophone array manager](../../hydrophoneArrayManagerHelp/docs/Array_Overview.html) which makes it available to other PAMGuard modules as required, the information from the sensors effectively overriding the default depth information in the [hydrophone array configuration dialog](../../hydrophoneArrayManagerHelp/docs/Array_Configuration.html).
 
 A small side panel shows a graph of recent depth history.
 
@@ -24,7 +22,7 @@ A small side panel shows a graph of recent depth history.
 
 ### Database output
 
-Both the raw voltage data and the calculated depth for each sensor are written to the [database](../../generalDatabaseHelp/docs/database_database.html). It is therefore possible to recalculate depths off-line if depth sensors are re-calibrated at any point. (PAMGUARD will not currently do this for you - you'll have to work it out for yourself using your own software).  
+Both the raw voltage data and the calculated depth for each sensor are written to the [database](../../generalDatabaseHelp/docs/database_database.html). It is therefore possible to recalculate depths off-line if depth sensors are re-calibrated at any point. (PAMGuard will not currently do this for you - you'll have to work it out for yourself using your own software).  
   
 
 [Next: Depth Readout Configuration](depth_configuration.html)

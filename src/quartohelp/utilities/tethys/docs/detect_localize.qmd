@@ -1,8 +1,6 @@
 ---
 title: "Detections and Localizations"
 ---
- Detections/Localizations   
-
 Exporting Detections/Localizations (PAMGuard data blocks)
 =========================================================
 

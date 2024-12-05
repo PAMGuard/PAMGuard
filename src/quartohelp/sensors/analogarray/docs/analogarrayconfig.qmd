@@ -1,8 +1,6 @@
 ---
 title: "Configuration"
 ---
- Analog Array Sensors  
-
 Analog Array Sensors
 ====================
 

@@ -1,8 +1,6 @@
 ---
 title: "Whistle Detector Display"
 ---
- Whistle Detector Display  
-
 Whistle Detector
 ================
 

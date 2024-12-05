@@ -1,8 +1,6 @@
 ---
 title: "Using old Logger 2000 UDF forms"
 ---
- Using old Logger 2000 UDF forms  
-
 Using old Logger 2000 UDF forms
 ===============================
 
@@ -10,7 +8,7 @@ Some users may wish to import UDF form definitions from databases used with the 
 
 For compatibility with a wider range of database systems, we have had to make a number of changes to the format of the UDF\_tables in PAMGuad.
 
-If you attempt to use an old Logger forms UDF table with PAMGUARD you are likely to get a number of errors. To correct these, you will have to make the following changes to the UDF table. Please note that these changes may stop the table working with Logger 2000
+If you attempt to use an old Logger forms UDF table with PAMGuard you are likely to get a number of errors. To correct these, you will have to make the following changes to the UDF table. Please note that these changes may stop the table working with Logger 2000
 
 1.  "Id" column: The PAMGuard forms must have a column titled Id of type AutoNumber, which should ideally also be set to be a primary key
 2.  "Length" column has changed from Integer to Long Integer

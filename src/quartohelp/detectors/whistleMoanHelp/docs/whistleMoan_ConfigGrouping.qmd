@@ -1,8 +1,6 @@
 ---
 title: "Channel Grouping"
 ---
- Whistle and Moan Detector Overview  
-
 Whistle and Moan Detector
 =========================
 

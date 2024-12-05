@@ -1,8 +1,6 @@
 ---
 title: "Target Motion Analysis"
 ---
- Target Motion Overview 
-
 Target Motion
 =============
 
@@ -45,7 +43,7 @@ Figure 3
 
 Figure 3 shows the probability distribution calculated from ther same data as in Figure 2 but assuming an almost perfect knowledge of the array position corresponding to the path of the trackline. Here the wobble in the trackline has resulted in a much tighter probability distribution with the most likely location of the cetacean being almost directly beneath the array.
 
-Localisation results are therefore a combined product of the expected uncertainties in measurements, the design of the towed array and the degree to which the trackline deviates from a straight line. PAMGUARD features multiple localisation algorithms which take all these factors into account.
+Localisation results are therefore a combined product of the expected uncertainties in measurements, the design of the towed array and the degree to which the trackline deviates from a straight line. PAMGuard features multiple localisation algorithms which take all these factors into account.
 
   
 

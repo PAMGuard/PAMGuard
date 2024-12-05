@@ -1,8 +1,6 @@
 ---
 title: "Common Mistakes and Bugs"
 ---
- PAMGuard Deep Learning Module - Mistakes  
-
 PAMGuard's Deep Learning Module
 ===============================
 

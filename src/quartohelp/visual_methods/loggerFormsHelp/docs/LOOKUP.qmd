@@ -1,8 +1,6 @@
 ---
 title: "LOOKUP Control"
 ---
- LOOKUP Control  
-
 LOOKUP Control
 ==============
 

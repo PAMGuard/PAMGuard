@@ -1,8 +1,6 @@
 ---
 title: "Overview"
 ---
- Display Marks  
-
 Data and Symbol Selection
 =========================
 

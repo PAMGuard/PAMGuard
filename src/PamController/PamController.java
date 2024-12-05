@@ -2980,6 +2980,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * @return reference to main GUI frame.
 	 */
 	public static Frame getMainFrame() {
+
 		PamController c = getInstance();
 		if (c.guiFrameManager == null) {
 			return null;

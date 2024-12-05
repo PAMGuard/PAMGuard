@@ -1,15 +1,13 @@
 ---
 title: "Sound Output Overview"
 ---
- Sound Output Overview  
-
 Sound Output
 ============
 
 Overview
 --------
 
-The sound output module can be used to play back sounds from PAMGUARD through a sound card or other data acquisition device.
+The sound output module can be used to play back sounds from PAMGuard through a sound card or other data acquisition device.
 
 This allows you to aurally monitor sounds after they have been modified by PAMguard modules such as [Filters](../../FiltersHelp/Docs/filters_filters.html) or the [Seismic Veto](../../seismicveto/docs/veto_overview.html)
 
@@ -31,7 +29,7 @@ Data will automatically be decimated or up-sampled to match the input sample rat
 
 From the _**F**_**_ile>Add modules>Sound Processing_** menu, or from the pop-up menu on the data model display select "**_Sound Output_**". Enter a name for the new module and press Ok.
 
-Sound output modules can be inserted anywhere in the PAMGUARD data model where there are raw audio data such as the output of a [Sound acquisition module](../../AcquisitionHelp/docs/AcquisitionOverview.html), a [Filter module](../../FiltersHelp/Docs/Filters_filters.html), a [Decimator](../../decimatorHelp/docs/decimator_decimator.html), a [Seismic Veto](../../seismicveto/docs/veto_overview.html), etc.
+Sound output modules can be inserted anywhere in the PAMGuard data model where there are raw audio data such as the output of a [Sound acquisition module](../../AcquisitionHelp/docs/AcquisitionOverview.html), a [Filter module](../../FiltersHelp/Docs/Filters_filters.html), a [Decimator](../../decimatorHelp/docs/decimator_decimator.html), a [Seismic Veto](../../seismicveto/docs/veto_overview.html), etc.
 
   
   

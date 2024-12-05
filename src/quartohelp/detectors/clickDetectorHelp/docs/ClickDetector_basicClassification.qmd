@@ -1,8 +1,6 @@
 ---
 title: "Basic classifier"
 ---
- Basic Click Classification  
-
 Click Detector
 ==============
 

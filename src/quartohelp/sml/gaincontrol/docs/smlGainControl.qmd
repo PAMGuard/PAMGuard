@@ -1,8 +1,6 @@
 ---
 title: "Seiche Measurement Preamp Gain Control"
 ---
- Seiche Measurement Preamp Gain Control  
-
 Seiche Measurement Preamp Gain Control
 ======================================
 

@@ -1,8 +1,6 @@
 ---
 title: "Overview"
 ---
- Spectrogram Display  
-
 Spectrogram Display
 ===================
 
@@ -19,10 +17,10 @@ Each spectrogram display contains two main section divided by a movable divider 
 
 Each section may be divided into several sub-displays.
 
-The top section (which always exists) displays a number of spectrogram windows with optional graphic overlays from some PAMGUARD detectors
+The top section (which always exists) displays a number of spectrogram windows with optional graphic overlays from some PAMGuard detectors
 
-The bottom section (which is optional) displays plug in displays from other parts of the PAMGUARD system for showing data such as waveforms, detector output, trigger functions, etc. Data shown in the plug in panels will scroll in synchrony of the spectrogram data in the top section.
+The bottom section (which is optional) displays plug in displays from other parts of the PAMGuard system for showing data such as waveforms, detector output, trigger functions, etc. Data shown in the plug in panels will scroll in synchrony of the spectrogram data in the top section.
 
-The types of plug in panels available will depend on the current PAMGUARD configuration.
+The types of plug in panels available will depend on the current PAMGuard configuration.
 
 [Next: Creating a Spectrogram Display](UserDisplay_Spectrogram_Creating.html)

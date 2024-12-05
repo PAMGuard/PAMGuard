@@ -1,8 +1,6 @@
 ---
 title: "Region Branching"
 ---
- Whistle and Moan Branching  
-
 Whistle and Moan Detector
 =========================
 

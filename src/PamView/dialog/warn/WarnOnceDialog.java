@@ -15,6 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import PamView.PamIcon;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 
@@ -63,7 +64,7 @@ public class WarnOnceDialog extends PamDialog {
 		JPanel p = new JPanel(new GridBagLayout());
 		p.setBorder(new EmptyBorder(10, 10, 0, 10));
 		GridBagConstraints c = new PamGridBagContraints();
-		ImageIcon pgIcon = new ImageIcon(ClassLoader.getSystemResource("Resources/pamguardIcon.png"));
+		ImageIcon pgIcon = new ImageIcon(PamIcon.getPAMGuardIconPath(PamIcon.SMALL));
 		p.add(new JLabel(pgIcon), c);
 		c.gridx++;
 		p.add(new JLabel("    "), c);

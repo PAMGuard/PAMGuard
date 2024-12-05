@@ -1,8 +1,6 @@
 ---
 title: "Configuration"
 ---
- Whistle and Moan Detector Configuration  
-
 Whistle and Moan Detector
 =========================
 

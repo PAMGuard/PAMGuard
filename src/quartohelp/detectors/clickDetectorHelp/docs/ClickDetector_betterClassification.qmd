@@ -1,8 +1,6 @@
 ---
 title: "Classifier with frequency sweep"
 ---
- Click Classification with Frequency Sweep 
-
 Click Detector
 ==============
 
@@ -13,7 +11,7 @@ Click Classification With Frequency Sweep
 
 ### Overview
 
-The click classifier with frequency sweep was added to PAMGUARD in 2010 to provide a wider choice of species identification parameters, particularly for the detection of beaked whales.
+The click classifier with frequency sweep was added to PAMGuard in 2010 to provide a wider choice of species identification parameters, particularly for the detection of beaked whales.
 
 Operation is similar to that of the [Basic click Classifier](ClickDetector_basicClassification.html) in so much that a number of different tests can be carried out on each click and the click will have to satisfy all of those tests in order to be classified.
 

@@ -1,8 +1,6 @@
 ---
 title: "Calibration"
 ---
- Analog Array Sensors  
-
 Analog Array Sensors
 ====================
 

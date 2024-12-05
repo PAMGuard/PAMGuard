@@ -1,8 +1,6 @@
 ---
 title: "Side Panel"
 ---
- Video Range  
-
 Video Range
 ===========
 
@@ -21,7 +19,7 @@ This will create a new side panel which contains access to the controls required
 
 Two **Image** buttons allow an image, stored as a file or on the clipboard, to be opened.
 
-The **Scrolling** dialogue provides options for how PAMGUARD should handle images that are larger than the display window
+The **Scrolling** dialogue provides options for how PAMGuard should handle images that are larger than the display window
 
 > **Scroll,** allows the user to scroll around the image using the image-viewer scroll bars.
 > 

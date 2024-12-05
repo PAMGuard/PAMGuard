@@ -1,8 +1,6 @@
 ---
 title: "Configuration"
 ---
- Alarms Configuration  
-
 Alarms Configuration
 ====================
 

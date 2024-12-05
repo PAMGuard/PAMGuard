@@ -1,9 +1,7 @@
 ---
 title: "Sound Acquisition"
 ---
- Sound Acquisition  
-
-PAMGUARD
+PAMGuard
 ========
 
 Sound Acquisition
@@ -33,7 +31,7 @@ Choose Sound Card from the Data Source Type drop down menu. The Select Audio Lin
     
 *   **Number of channels:** Enter the number of input channels from which you want to acquire data. For non-ASIO audio lines, this will be a maximum of 2.
     
-*   **Peak-Peak voltage range:** This value represents the maximum input voltage range capable for your card, without overdriving the input (clipping) and is used to scale the sound data in PAMGUARD. You may find this value from your device's specifications.
+*   **Peak-Peak voltage range:** This value represents the maximum input voltage range capable for your card, without overdriving the input (clipping) and is used to scale the sound data in PAMGuard. You may find this value from your device's specifications.
     
 *   **Preamplifier gain:** If you have any hardware which provides gain in your system, this value should equal the total gain (in dB).
     

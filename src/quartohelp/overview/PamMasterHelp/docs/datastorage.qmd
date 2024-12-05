@@ -1,8 +1,6 @@
 ---
 title: "Data Storage"
 ---
- Data Storage  
-
 Data Storage
 ============
 

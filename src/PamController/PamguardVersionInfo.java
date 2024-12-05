@@ -24,14 +24,14 @@ public class PamguardVersionInfo {
 	 * PAMGuard can work with. 
 	 */
 	static public final String minJavaVersion = "11.00";
-	static public final String maxJavaVersion = "21.99.99";
+	static public final String maxJavaVersion = "23.99.99";
 	
 
 	/**
 	 * Version number, major version.minorversion.sub-release.
 	 * Note: can't go higher than sub-release 'f'
 	 */
-	static public final String version = "2.02.14a";
+	static public final String version = "2.02.15";
 	
 	/**
 	 * Release date

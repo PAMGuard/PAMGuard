@@ -1,8 +1,6 @@
 ---
 title: "Click Storage Options"
 ---
- Click Storage Options 
-
 Click Detector
 ==============
 
@@ -18,13 +16,13 @@ Click Storage Options
 
 ### Database Storage
 
-Individual clicks may be written to the PAMGUARD database.
+Individual clicks may be written to the PAMGuard database.
 
-Be warned though that writing to the database can be slow and can seriously affect overall PAMGUARD performance
+Be warned though that writing to the database can be slow and can seriously affect overall PAMGuard performance
 
 ### RainbowClick files
 
-The click detector also stores click data in a format compatible with the IFAW RainbowClick software. This allows RainbowClick can be used for offline data analysis. Offline analysis is currently not as well developed in PAMGUARD as it is in Rainbowclick.
+The click detector also stores click data in a format compatible with the IFAW RainbowClick software. This allows RainbowClick can be used for offline data analysis. Offline analysis is currently not as well developed in PAMGuard as it is in Rainbowclick.
 
 For the files to be compatible with RainbowClick, the click detector must be [configured](ClickDetector_clickDetector.html) to analyse pairs of channels. If you have multiple pairs of hydrophones you should use RainbowClick version 4.06.0000 or higher.
 

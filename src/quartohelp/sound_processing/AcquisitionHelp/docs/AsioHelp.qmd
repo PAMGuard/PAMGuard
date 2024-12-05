@@ -1,17 +1,15 @@
 ---
 title: "Overview"
 ---
- ASIO Sound Cards  
-
 Asio Sound Card Selection
 =========================
 
 Overview
 --------
 
-These instructions guide a user on how to configure the Asio Sound Card module in PAMGUARD.
+These instructions guide a user on how to configure the Asio Sound Card module in PAMGuard.
 
-In PAMGUARD users can tell the program to read a certain number of channels e.g 1, 3, 6, 7 ...
+In PAMGuard users can tell the program to read a certain number of channels e.g 1, 3, 6, 7 ...
 
   
   

@@ -1,8 +1,6 @@
 ---
 title: "SYMBOLTYPE Property"
 ---
- SYMBOLTYPE Property  
-
 SYMBOLTYPE Property
 ===================
 

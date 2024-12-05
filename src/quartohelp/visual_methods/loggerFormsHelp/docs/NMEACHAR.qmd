@@ -1,8 +1,6 @@
 ---
 title: "NMEACHAR Control"
 ---
- NMEACHAR Control  
-
 NMEACHAR Control
 ================
 

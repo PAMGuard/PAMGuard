@@ -81,10 +81,10 @@ public class TipOfTheDayManager {
 		addTipRandom(new PamTip("Map Display", "You can use the scroll wheel on the mouse to zoom the map in and out"));
 		addTipRandom(new PamTip("Bug reporting", "We can only fix them if we know about them !\n" +
 				"Please email bug reports to support@pamguard.org"));
-		addTipRandom(new PamTip("User email list", "Details of the PAMGUARD users email list " +
-				"can be found on the web at www.pamguard.org/contact.php"));
-		addTipRandom(new PamTip("Developer email list", "Details of the PAMGUARD developers email list " +
-		"can be found on the web at www.pamguard.org/contact.shtml"));
+//		addTipRandom(new PamTip("User email list", "Details of the PAMGUARD users email list " +
+//				"can be found on the web at www.pamguard.org/contact.php"));
+//		addTipRandom(new PamTip("Developer email list", "Details of the PAMGUARD developers email list " +
+//		"can be found on the web at www.pamguard.org/contact.shtml"));
 		addTipRandom(new PamTip("Visual data", "PAMGUARD is not just for acoustic processing. " +
 				"Check out the Logger forms and the Video Range tracking modules."));
 		addTipRandom(new PamTip("We are on Facebook", "Check out the PAMGUARD Facebook page at www.facebook.com/pamguard"));

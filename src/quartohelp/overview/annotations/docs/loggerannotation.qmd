@@ -1,8 +1,6 @@
 ---
 title: "Logger Forms Annotation"
 ---
- Logger Form Annotation  
-
 Logger Form Annotation
 ======================
 

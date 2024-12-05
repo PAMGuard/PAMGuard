@@ -1,8 +1,6 @@
 ---
 title: "Airgun Display Configuration"
 ---
- Airgun Configuration  
-
 Airgun Display
 ==============
 
@@ -19,17 +17,17 @@ The airgun display configuration dialog is accessed from the _**Display>AIS Ship
 The two pieces of information required to correctly position the guns are
 
 2.  **The Source Vessel Identification**  
-    This is either the vessel PAMGUARD is running on, in which case the gun position will be relative to the GPS receiver plugged into PAMGUARD, or it can be another vessel in which case the guns' positions will be calculated relative to the GPS receiver feeding the AIS transponder on that vessel. If the guns are on another vessel, you will need to know the vessel's Maritime Mobile Service Identity (MMSI) number and input it to the AIS Display dialog. You can get this either from the AIS data listed within PAMGUARD, or ask the vessel's captain.
+    This is either the vessel PAMGuard is running on, in which case the gun position will be relative to the GPS receiver plugged into PAMGuard, or it can be another vessel in which case the guns' positions will be calculated relative to the GPS receiver feeding the AIS transponder on that vessel. If the guns are on another vessel, you will need to know the vessel's Maritime Mobile Service Identity (MMSI) number and input it to the AIS Display dialog. You can get this either from the AIS data listed within PAMGuard, or ask the vessel's captain.
     
 3.  **The location of the airgun array**  
-    This is in the form of two coordinates relative to the GPS receiver feeding PAMGUARD or the GPS receiver feeding the AIS transponder on a different vessel.
+    This is in the form of two coordinates relative to the GPS receiver feeding PAMGuard or the GPS receiver feeding the AIS transponder on a different vessel.
     
 
 ### Mitigation Zone
 
 You may also enter a mitigation zone, which is a simple circle of fixed radius around the airgun location.
 
-You may also enter a predicted mitigation zone which will display the area on the PAMGUARD map which will fall within the mitigation zone within the specified time period.  
+You may also enter a predicted mitigation zone which will display the area on the PAMGuard map which will fall within the mitigation zone within the specified time period.  
   
   
 

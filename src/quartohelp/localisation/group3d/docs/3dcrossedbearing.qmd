@@ -1,8 +1,6 @@
 ---
 title: "Crossed Bearing"
 ---
- Group 3D Localiser  
-
 Group 3D Localiser
 ==================
 

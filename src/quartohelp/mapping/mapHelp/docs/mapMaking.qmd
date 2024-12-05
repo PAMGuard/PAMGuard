@@ -1,12 +1,10 @@
 ---
 title: "Making Map Files"
 ---
- Map Menu Items  
-
 Map
 ===
 
-Making Maps for PAMGUARD
+Making Maps for PAMGuard
 ------------------------
 
   
@@ -35,7 +33,7 @@ Sadly, the GEBCO digital atlas is no longer available, though many users will ha
 
 For more information on GEBCO [click here](https://www.bodc.ac.uk/resources/products/data/bodc_products/gebco//).
 
-PAMGUARD contour map files consist of a series of datablocks each of which defines a segment of depth contour (or coastline). Within each block the first line specifies the contour identity and the number of latitude and longitude values to follow. Subsequent lines are the latitude and longitude values for the contour segment
+PAMGuard contour map files consist of a series of datablocks each of which defines a segment of depth contour (or coastline). Within each block the first line specifies the contour identity and the number of latitude and longitude values to follow. Subsequent lines are the latitude and longitude values for the contour segment
 
  0 3  
 \-10.0261 39.7077  
@@ -123,7 +121,7 @@ The final step is to remove all the “>” symbols from the document. This can 
  56.3573 -3.2443  
  56.3531 -3.2707
 
-Save the file as a text file with an .asc extension and load it within PAMGUARD by clicking
+Save the file as a text file with an .asc extension and load it within PAMGuard by clicking
 
 **_Map>Map Options_**
 

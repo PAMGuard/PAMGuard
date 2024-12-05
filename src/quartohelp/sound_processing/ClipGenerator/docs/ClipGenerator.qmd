@@ -1,8 +1,6 @@
 ---
 title: "Overview"
 ---
- Clip Generator  
-
 Clip Generator
 ==============
 

@@ -130,9 +130,17 @@ public class CROverlayGraphics extends PamDetectionOverlayGraphics {
 					continue;
 				}
 				if (lastPeakNum >= prevSlice.peakInfo.length) {
-					lastPeak = prevSlice.peakInfo[lastPeakNum];		
+					/*
+					 * I don't think this is meant to happen and that this line was
+					 * put here to catch a bug. It seems to happen only with branched
+					 * regions, which is no longer the default, so noone ever notices
+					 * it.
+					 */
+					lastPeak = prevSlice.peakInfo[prevSlice.peakInfo.length-1];		
 				}
-				lastPeak = prevSlice.peakInfo[lastPeakNum];
+				else {
+					lastPeak = prevSlice.peakInfo[lastPeakNum];
+				}
 				f1 = thisPeak[1] * sampleRate / fftLength;
 				//					f2 = lastPeak[1] * sampleRate / fftLength;
 

@@ -1,8 +1,6 @@
 ---
 title: "AIS Configuration"
 ---
- AIS Configuration  
-
 AIS
 ===
 
@@ -21,7 +19,7 @@ To configure the AIS module, open the AIS configuration dialog from the _**Detec
 ![AIS Options](images/AISOptions.png)
 
   
-If a database module is active in the PAMGUARD model, then AIS data will be logged to the database  
+If a database module is active in the PAMGuard model, then AIS data will be logged to the database  
 
 [Previous: AIS Overview](AISOverview.html)
 

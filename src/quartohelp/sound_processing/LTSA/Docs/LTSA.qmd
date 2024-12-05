@@ -1,8 +1,6 @@
 ---
 title: "LTSA (Long Term Spectral Averaging)"
 ---
- Long Term Spectral Average  
-
 Long Term Spectral Average
 ==========================
 

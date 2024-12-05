@@ -1,8 +1,6 @@
 ---
 title: "Overview"
 ---
- Click Detector  
-
 Click Detector
 ==============
 
@@ -45,7 +43,7 @@ If you only have a pair of hydrophones, then select either 'One group' or 'User 
 
 If you have multiple pairs of hydrophones, select 'User groups' and arrange the group numbers so that each group contains two channels as shown above.
 
-If you select 'no grouping' each channel will be analysed totally independently. There are currently no PAMGUARD functions which can re-group these single channel clicks for source localisation.
+If you select 'no grouping' each channel will be analysed totally independently. There are currently no PAMGuard functions which can re-group these single channel clicks for source localisation.
 
 ### Data flow and advanced configuration
 

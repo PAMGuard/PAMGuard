@@ -1,8 +1,6 @@
 ---
 title: "Detection"
 ---
- Generalised Power Law Detector  
-
 Generalised Power Law Detector
 ==============================
 

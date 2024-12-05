@@ -1,8 +1,6 @@
 ---
 title: "References"
 ---
- Difar References  
-
 DIFAR Localisation
 ==================
 

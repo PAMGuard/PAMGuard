@@ -1,8 +1,6 @@
 ---
 title: "Contour Extraction"
 ---
- Rocca Contour Extraction and Manipulation 
-
 ROCCA
 =====
 

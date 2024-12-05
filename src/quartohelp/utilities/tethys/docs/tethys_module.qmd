@@ -1,8 +1,6 @@
 ---
 title: "Tethys Module"
 ---
- Tethys Module Overview  
-
 Tethys Module Overview
 ======================
 

@@ -1,12 +1,10 @@
 ---
 title: "Audio Files"
 ---
- Audio Files  
-
 Audio Files
 ===========
 
-As well as analysing data from sound cards in real time, PAMGUARD can be used to analyse archived data from audio filed in [WAV](https://en.wikipedia.org/wiki/WAV), [AIF](https://en.wikipedia.org/wiki/Audio_Interchange_File_Format), [FLAC](https://en.wikipedia.org/wiki/FLAC), or [SUD](sudfiles.html) file format.
+As well as analysing data from sound cards in real time, PAMGuard can be used to analyse archived data from audio filed in [WAV](https://en.wikipedia.org/wiki/WAV), [AIF](https://en.wikipedia.org/wiki/Audio_Interchange_File_Format), [FLAC](https://en.wikipedia.org/wiki/FLAC), or [SUD](sudfiles.html) file format.
 
   
 
@@ -23,7 +21,7 @@ the sample rate and the number of channels in the 'Sampling' section of the dial
 
 ### Processing Speed and listening while you analyse
 
-If no [Sound Playback](../../soundPlaybackHelp/docs/soundPlayback_soundPlayback.html) module is included in the PAMGUARD configuration, or if no channels are selected in the [Sound Playback](../../soundPlaybackHelp/docs/soundPlayback_soundPlayback.html) module, then file data will be analysed as fast as possible, which could be considerably faster than real time.
+If no [Sound Playback](../../soundPlaybackHelp/docs/soundPlayback_soundPlayback.html) module is included in the PAMGuard configuration, or if no channels are selected in the [Sound Playback](../../soundPlaybackHelp/docs/soundPlayback_soundPlayback.html) module, then file data will be analysed as fast as possible, which could be considerably faster than real time.
 
 If a [Sound playback](../../soundPlaybackHelp/docs/soundPlayback_soundPlayback.html) module is present and is in use, then analysis will run in real time and you will be able to hear the sounds being played back from the computers sound card
 
@@ -35,7 +33,7 @@ If the repeat button is selected, as soon as processing of the file is somplete,
 
 If possible, the data and time will be read from the file name.
 
-PAMGUARD will strip text from the beginning and end of the file name and then attempt to match the remaining characters to a number of different date templates.
+PAMGuard will strip text from the beginning and end of the file name and then attempt to match the remaining characters to a number of different date templates.
 
 During analysis, all times displayed on the screen and all times written to the database and binary storage will be based on the time extracted from the file name and the sample number within the file.
 

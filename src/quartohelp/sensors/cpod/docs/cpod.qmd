@@ -1,8 +1,6 @@
 ---
 title: "CPOD Module"
 ---
- Array Accelerometer  
-
 CPOD module help
 ================
 

@@ -1,15 +1,13 @@
 ---
 title: "Overview"
 ---
-Click Viewer Overview  
-
 Click Detector Viewer Function
 ==============================
 
 Click Viewer Overview
 ---------------------
 
-An offline analysis functionality, which is similar to that in the IFAW RainbowClick software, is available in PAMGUARD. To use this functionality, click detector data must be available in the [binary storage format](../../../utilities/BinaryStore/docs/binarystore_overview.html) and PAMGUARD must be running in [Viewer Mode](../../../overview/PamMasterHelp/docs/viewerMode.html).
+An offline analysis functionality, which is similar to that in the IFAW RainbowClick software, is available in PAMGuard. To use this functionality, click detector data must be available in the [binary storage format](../../../utilities/BinaryStore/docs/binarystore_overview.html) and PAMGuard must be running in [Viewer Mode](../../../overview/PamMasterHelp/docs/viewerMode.html).
 
 The click detector viewer mode provides several powerful tools for data analysis:
 

@@ -1,8 +1,6 @@
 ---
 title: "Overview"
 ---
- Whistle and Moan Detector Overview  
-
 Whistle and Moan Detector
 =========================
 
@@ -11,7 +9,7 @@ Overview
 
 The Whistle and Moan detector can be used to detect any tonal vocalisation, including odontocete whistles and baleen whale calls. Details of the operation of the detector are available in Gillespie et al, (2013).
 
-The Whistle and Moan detector supersedes the old PAMGUARD Whistle detector which should no longer be used.
+The Whistle and Moan detector supersedes the old PAMGuard Whistle detector which should no longer be used.
 
 The Whistle and Moan detector can be used alone, or with the [Whistle Classifier](../../whistleClassifierHelp/docs/whistleClassifier_Overview.html) which can be used to identify groups of whistles to species.
 

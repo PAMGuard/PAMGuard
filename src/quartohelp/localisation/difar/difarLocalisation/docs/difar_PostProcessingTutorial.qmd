@@ -1,8 +1,6 @@
 ---
 title: "Custom install of the PAMGuard DIFAR jarfile"
 ---
-  JOURNAL ARTICLE   
-
 Tutorial: Post-processing of data from DIFAR sonobuoys with the PAMGuard DIFAR module
 
 Brian S. Miller
@@ -119,7 +117,7 @@ where:
 
 · PamguardDifar\_YYYY-MM-DD.jar specifies the runnable jarfile containing release e.g. 2014-08-04 of the PAMGuard DIFAR module.
 
-Once you have command line that successfully launches PAMGUARD on your system then there is always the option of incorporating the command line into a suitable shell script or batch file.
+Once you have command line that successfully launches PAMGuard on your system then there is always the option of incorporating the command line into a suitable shell script or batch file.
 
 OPTIONAL: Installation of the Greeneridge Sciences Demultiplexing Software
 --------------------------------------------------------------------------

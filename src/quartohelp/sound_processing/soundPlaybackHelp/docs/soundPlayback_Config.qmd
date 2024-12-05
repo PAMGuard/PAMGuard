@@ -1,8 +1,6 @@
 ---
 title: "Sound Output Configuration"
 ---
- Sound Output Configuration  
-
 Sound Output
 ============
 

@@ -1,8 +1,6 @@
 ---
 title: "Beamformer Overview"
 ---
- Beamformer Overview  
-
 Beamformer Module
 =================
 

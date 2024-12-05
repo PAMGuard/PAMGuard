@@ -1,8 +1,6 @@
 ---
 title: "Configuring a Whistle Detector"
 ---
- Configuring a Whistle Detector  
-
 Whistle Detector
 ================
 
@@ -17,7 +15,7 @@ Parameters for each of the three main stages of whistle detection are accessed v
 ![Whistle Detector Data Source](./images/WhistleSource.png)  
   
 
-A drop down box will show a list of available data sources for the whistle detector. These are either the output from an [FFTEngine](../../../sound_processing/fftManagerHelp/docs/FFTEngine_Overview.html), or some other process that produces FFT / Spectrogram data. If no data sources are listed, you need to create an appropriate FFTEngine in the PAMGUARD data model.
+A drop down box will show a list of available data sources for the whistle detector. These are either the output from an [FFTEngine](../../../sound_processing/fftManagerHelp/docs/FFTEngine_Overview.html), or some other process that produces FFT / Spectrogram data. If no data sources are listed, you need to create an appropriate FFTEngine in the PAMGuard data model.
 
 #### Channel List and Grouping
 

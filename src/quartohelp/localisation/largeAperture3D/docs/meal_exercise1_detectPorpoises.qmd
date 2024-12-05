@@ -1,8 +1,6 @@
 ---
 title: "Detect Porpoises"
 ---
- Detect Porpoises  
-
 Large Aperture 3D Localiser
 ===========================
 
@@ -15,7 +13,7 @@ _Process 10 channel .wav files using the click detector to detect porpoises and 
 
 ### 1.1 Create the Module Structure
 
-To begin we need to analyse the raw .wav data in PAMGUARD. Start PAMGUARD in **_normal mode._** Select **_File > Add Modules > Sound Processing > Sound Acquisition_** to add the sound acquisition module. This will allow the raw .wav files to be analysed in PAMGUARD. Next we need a click detector. Go to **_File > Add Modules > Detector > Click Detector._** The click detector module should now appear. Finally we need a database (**_File > Add Modules > Utilities > Database_**) and binary storage (**_File > Add Modules > Utilities > Binary Store_**).
+To begin we need to analyse the raw .wav data in PAMGuard. Start PAMGuard in **_normal mode._** Select **_File > Add Modules > Sound Processing > Sound Acquisition_** to add the sound acquisition module. This will allow the raw .wav files to be analysed in PAMGuard. Next we need a click detector. Go to **_File > Add Modules > Detector > Click Detector._** The click detector module should now appear. Finally we need a database (**_File > Add Modules > Utilities > Database_**) and binary storage (**_File > Add Modules > Utilities > Binary Store_**).
 
 Now you have added the modules the next stage is to set up everything. Your data model should look like.
 
@@ -23,7 +21,7 @@ Now you have added the modules the next stage is to set up everything. Your data
 
 Figure 1 The data model should look roughly like this to analyse clicks.
 
-In PAMGUARD you always move from modules on the left to modules on the right when inputting settings. So here we start with sound acquisition and then move to the click detector. **_Select Detection > Sound Acquisition..._** In the dialog box set the audio source to **_Audio file or multiple file,_** select **_Select Folder or Files..._** and choose the folder containing the porpoise .wav files. Now that the sound acquisition knows you are dealing with ten channels of data you will need to create a ten channel hydrophone array in the array manager. Go to **_File > Hydrophone Array..._** and use **_Import._** to select the ten channel array file for this porpoise data. (In Exercise 1-2 folder) The hydrophone array manager dialog box should look like.
+In PAMGuard you always move from modules on the left to modules on the right when inputting settings. So here we start with sound acquisition and then move to the click detector. **_Select Detection > Sound Acquisition..._** In the dialog box set the audio source to **_Audio file or multiple file,_** select **_Select Folder or Files..._** and choose the folder containing the porpoise .wav files. Now that the sound acquisition knows you are dealing with ten channels of data you will need to create a ten channel hydrophone array in the array manager. Go to **_File > Hydrophone Array..._** and use **_Import._** to select the ten channel array file for this porpoise data. (In Exercise 1-2 folder) The hydrophone array manager dialog box should look like.
 
 ![](images/image005.jpg)
 
@@ -53,7 +51,7 @@ Figure 5. The digital trigger filter should be a band pass between 100 and 150kH
 
 ### 1.4 Create a porpoise click classifier
 
-The click detector is now set up to detect clicks in the porpoise frequency range. However, although we have optimised the click detector for porpoise like vocalisations it will still detect many different types of sounds. In order to determine whether porpoise are present we need to classify clicks. For this we can use the PAMGUARD click classifier. Go to **_Click Detection > Click Classification_.** In the **_Click Classifier Selection_** drop down box select **_Classifier with frequency sweep._** Select **_New_** to bring up a new click classifier settings dialog. In the bottom of the dialog box use the **_Set Defaults_** button to create default porpoise parameters. Click OK.
+The click detector is now set up to detect clicks in the porpoise frequency range. However, although we have optimised the click detector for porpoise like vocalisations it will still detect many different types of sounds. In order to determine whether porpoise are present we need to classify clicks. For this we can use the PAMGuard click classifier. Go to **_Click Detection > Click Classification_.** In the **_Click Classifier Selection_** drop down box select **_Classifier with frequency sweep._** Select **_New_** to bring up a new click classifier settings dialog. In the bottom of the dialog box use the **_Set Defaults_** button to create default porpoise parameters. Click OK.
 
 ![](images/image011.jpg)
 
@@ -73,7 +71,7 @@ We have now set the detector click detector up to detect and classifiy porpoise 
 
 Figure 8. The click detector running through the ten channel .wav files should look something like the above.
 
-**_A note on groups._** _In many detectors you have the option of "grouping channels". Grouping tells PAMGUARD to automatically calculate extra information for those channels which have been selected as belonging to a group. Grouped channels are saved as a single data unit containing information from each channel. For example, a towed array contains two closely spaced hydrophones. These two channels, when analysed in PAMGUARD, are usually grouped. If a click is detected on one of the hydrophones then a waveform clip is also automatically recorded from the other channel; this is then saved as a data unit containing information on both channels. PAMGUARD can calculate extra information for any data unit which contains more than channel of information. For our towed array, two clicks allow bearing information to be calculated for bearing time displays and target motion analysis. In general widely spaced hydrophones are not grouped._
+**_A note on groups._** _In many detectors you have the option of "grouping channels". Grouping tells PAMGuard to automatically calculate extra information for those channels which have been selected as belonging to a group. Grouped channels are saved as a single data unit containing information from each channel. For example, a towed array contains two closely spaced hydrophones. These two channels, when analysed in PAMGuard, are usually grouped. If a click is detected on one of the hydrophones then a waveform clip is also automatically recorded from the other channel; this is then saved as a data unit containing information on both channels. PAMGuard can calculate extra information for any data unit which contains more than channel of information. For our towed array, two clicks allow bearing information to be calculated for bearing time displays and target motion analysis. In general widely spaced hydrophones are not grouped._
 
 [Previous: Overview.html](meal_overview.html)
 

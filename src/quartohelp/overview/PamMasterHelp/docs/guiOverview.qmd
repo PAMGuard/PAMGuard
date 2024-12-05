@@ -1,9 +1,7 @@
 ---
 title: "Graphical User Interface"
 ---
- Graphical User Interface  
-
-PAMGUARD
+PAMGuard
 ========
 
 Graphical User Interface
@@ -13,7 +11,7 @@ Graphical User Interface
 
 ### Key Regions of the Graphical User Interface
 
-PAMGUARD features a dynamic, multi-panel user interface. The key regions of the interface are:
+PAMGuard features a dynamic, multi-panel user interface. The key regions of the interface are:
 
 *   Main menu
     
@@ -30,7 +28,7 @@ PAMGUARD features a dynamic, multi-panel user interface. The key regions of the 
 
 ![Main Menu](images/mainMenu.png)
 
-The menus in PAMGUARD are generally dynamic, i.e. items on the menus change depending on the current user-selected view and/or plugins selected. Most of the settings are accessible through the main menu items, although some actions are carried out exclusively through mouse operations.
+The menus in PAMGuard are generally dynamic, i.e. items on the menus change depending on the current user-selected view and/or plugins selected. Most of the settings are accessible through the main menu items, although some actions are carried out exclusively through mouse operations.
 
   
   
@@ -55,11 +53,11 @@ The side panel allows you to view information from plugin modules, even when the
 
 ### Status panel
 
-The status panel is by default located at the bottom of the PAMGUARD window. This view provides information on PAMGUARD's current status, for example, which sound card is running.
+The status panel is by default located at the bottom of the PAMGuard window. This view provides information on PAMGuard's current status, for example, which sound card is running.
 
   
   
 
-[Previous: PAMGUARD Modules](modules.html)
+[Previous: PAMGuard Modules](modules.html)
 
 [Next: Copying and Printing](CopyingPrinting.html)

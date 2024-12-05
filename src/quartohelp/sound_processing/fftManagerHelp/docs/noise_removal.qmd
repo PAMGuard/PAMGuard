@@ -1,8 +1,6 @@
 ---
 title: "Noise Removal"
 ---
- Configuring an FFT Engine  
-
 FFT Engine
 ==========
 

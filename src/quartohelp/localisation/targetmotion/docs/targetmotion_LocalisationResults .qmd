@@ -1,8 +1,6 @@
 ---
 title: "Results"
 ---
- Target Motion Overview 
-
 Target Motion
 =============
 
@@ -11,7 +9,7 @@ Results
 
   
 
-Results are displayed at the bottom of the Target Motion Analysis window described in the [Localising an Event](../../../localisation/targetmotion/docs/targetmotion_Localising.html) section. Multiple localisation algorithms can be run from the Model Control panel populating the table with multiple results. The result which best fits the data is automaticaly selected by PAMGUARD however this can be manually changed by selecting one of the other result checkboxes.  
+Results are displayed at the bottom of the Target Motion Analysis window described in the [Localising an Event](../../../localisation/targetmotion/docs/targetmotion_Localising.html) section. Multiple localisation algorithms can be run from the Model Control panel populating the table with multiple results. The result which best fits the data is automaticaly selected by PAMGuard however this can be manually changed by selecting one of the other result checkboxes.  
   
 
 Figure 1

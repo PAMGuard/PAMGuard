@@ -50,7 +50,7 @@ public class QuartoMigrate {
 
 	public static void main(String[] args) {
 		QuartoMigrate qm = new QuartoMigrate();
-//		qm.convertSource(new File(qm.helpsrc));
+		qm.convertSource(new File(qm.helpsrc));
 		qm.convertIndex();
 	}
 
@@ -141,6 +141,8 @@ public class QuartoMigrate {
 		String md = null;
 		try {
 			String text = new String(Files.readAllBytes(aFile.toPath()), StandardCharsets.UTF_8);
+			text = removeHead(text);
+			text = text.replace("PAMGUARD", "PAMGuard");
 			 md = copydown.convert(text);
 //			System.out.println(md);
 			if (h2 == null) {
@@ -173,6 +175,22 @@ public class QuartoMigrate {
 		
 		
 	}
+	
+	/**
+	 * Remove the xml between <head> and </head>
+	 * @param text
+	 * @return
+	 */
+	private String removeHead(String text) {
+		int s = text.indexOf("<head>");
+		int e = text.indexOf("</head>");
+		if (s < 0 || e < 0) {
+			return text;
+		}
+		text = text.replace(text.substring(s, e+7),"");
+		return text;
+	}
+
 	private void writeHeaderMD(BufferedWriter br, String h2) throws IOException {
 		br.write("---\r\n");
 		if (h2 != null) {

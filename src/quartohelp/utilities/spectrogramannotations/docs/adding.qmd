@@ -1,8 +1,6 @@
 ---
 title: "Adding and Configuring"
 ---
- Spectrogram Annotations 
-
 Spectrogram Annotations
 =======================
 

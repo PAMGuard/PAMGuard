@@ -1,8 +1,6 @@
 ---
 title: "Data Source"
 ---
- Whistle and Moan Detector Data Source  
-
 Whistle and Moan Detector Data Source
 =====================================
 
@@ -13,7 +11,7 @@ To use the Whistle and Moan detector, you will need to configure a [FFT (Spectro
 
 ### Select the data source
 
-[Noise removal and thresholding](whistleMoan_ConfigNoise.html.html) is a critical step in the detection process. However, the noise removal methods can also be used by other PAMGUARD detectors and displays, so they have been included in both the [FFT (Spectrogram) Engine](../../../sound_processing/fftManagerHelp/docs/FFTEngine_Overview.html) as well as in the Whistle and Moan detector.
+[Noise removal and thresholding](whistleMoan_ConfigNoise.html.html) is a critical step in the detection process. However, the noise removal methods can also be used by other PAMGuard detectors and displays, so they have been included in both the [FFT (Spectrogram) Engine](../../../sound_processing/fftManagerHelp/docs/FFTEngine_Overview.html) as well as in the Whistle and Moan detector.
 
 The [FFT (Spectrogram) Engine](../../../sound_processing/fftManagerHelp/docs/FFTEngine_Overview.html) has two output streams, one which is the raw FFT data and one which has been through some or all of the noise removal processes.
 

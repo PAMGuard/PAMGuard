@@ -53,7 +53,7 @@ towed astern of the vessel, y coordinates are generally negative
 numbers. For a single array in the centre line of the vessel with a
 centrally mounted GPS, all x coordinates will be zero, etc. For display
 purposes, depth is entered as a positive number, however developers
-should be aware that within the PAMGUARD data model, the positive z
+should be aware that within the PAMGuard data model, the positive z
 coordinate is upwards, therefore depths are stored as negative numbers.
 </p>
 <p>For fixed locations, the diagram is relative to the heading set for that mooring, 
@@ -89,9 +89,9 @@ add or edit a hydrophone the <a href="Array_NewHydrophone.html">Hydrophone Dialo
 <p>The first stage of most PAM processes is to acquire the sound
 with a digitiser (e.g. a <a
 	href="../../../sound_processing/AcquisitionHelp/docs/AcquisitionOverview.html">sound
-card</a>) or some other Sound Acquisition module within the PAMGUARD model.
+card</a>) or some other Sound Acquisition module within the PAMGuard model.
 </p>
-<p>It is possible for PAMGUARD to operate with more than one Sound
+<p>It is possible for PAMGuard to operate with more than one Sound
 Acquisition module and a one-to-many relationship can exist between
 hydrophones and data channels within the sound acquisition modules. For
 instance, a single multi-element array may contain both low and high
@@ -99,10 +99,10 @@ frequency hydrophones, some of which are connected to a low frequency
 digitiser and other high frequency hydrophones.</p>
 <p>The drop down list at the top of the Channel Configuration panel
 will list all Sound Acquisition Modules currently instantiated in the
-PAMGUARD data model. Information on a single Sound Acquisition module is
+PAMGuard data model. Information on a single Sound Acquisition module is
 displayed at any one time.</p>
 <p>By default, when a sound acquisition module is created, it will
-map it's channels 1 to 1 to the PAMGUARD array. To change these
+map it's channels 1 to 1 to the PAMGuard array. To change these
 mappings, select the software channel of interest in the Channel
 Configuration panel and press 'Change hydrophone' and select the
 hydrophone you want to relate to that software channel.</p>
@@ -114,25 +114,25 @@ information only.</p>
 <h3><a name="sec4"></a>Environment</h3>
 <p>This currently contains the speed of sound in sea water and an estimate of
 the error on the speed of sound measurement.</p>
-<p>(It is possible that future releases of PAMGUARD will allow entry
+<p>(It is possible that future releases of PAMGuard will allow entry
 of a sound speed profile here ).</p>
 <br>
 
 <h3><a name="sec5"></a>Array Management</h3>
-<p>When you have finished with the PAMGUARD Hydrophone Array dialog,
+<p>When you have finished with the PAMGuard Hydrophone Array dialog,
 press the <em><strong>OK </strong></em>button.</p>
 <p>To exit without saving changes, press<em><strong>
 Cancel</strong></em>.</p>
 <p>Other buttons perform the following actions:</p>
-<p><strong>New Array</strong>: Creates a new PAMGUARD
+<p><strong>New Array</strong>: Creates a new PAMGuard
 hydrophone array</p>
 <p><strong>Copy</strong>: Copies the currently loaded array</p>
 <p><strong>Rename</strong>: Renames the currently loaded
 array</p>
 <p><strong>Import</strong>: Imports a hydrophone array from a
-PAMGUARD Array File (.paf)</p>
+PAMGuard Array File (.paf)</p>
 <p><strong>Export</strong>: Exports the currently selected
-array to a PAMGUARD Array File (.paf)</p>
+array to a PAMGuard Array File (.paf)</p>
 <p><strong>Delete</strong>: Deletes the currently selected
 array.</p>
 <br>

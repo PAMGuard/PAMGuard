@@ -1,8 +1,6 @@
 ---
 title: "SoundTrap Click Detector"
 ---
-Click Classification
-
 Click Detector
 ==============
 

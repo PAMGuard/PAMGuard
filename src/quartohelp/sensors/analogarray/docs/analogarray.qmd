@@ -1,8 +1,6 @@
 ---
 title: "Overview"
 ---
- Analog Array Sensors  
-
 Analog Array Sensors
 ====================
 

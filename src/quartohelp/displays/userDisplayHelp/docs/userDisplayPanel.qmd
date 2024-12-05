@@ -1,8 +1,6 @@
 ---
 title: "Overview"
 ---
- User Display Panel  
-
 User Display Panel
 ==================
 
@@ -13,7 +11,7 @@ User Display Panel
 
 User display panels are containers for other types of display window.
 
-Each User Display panel will appear as a new tab on the PAMGUARD GUI and can contain multiple display windows.
+Each User Display panel will appear as a new tab on the PAMGuard GUI and can contain multiple display windows.
 
 ![Scroller coupling dialog](./images/userdisplay.png)  
 
@@ -37,7 +35,7 @@ To add display windows to the user display, from the User Display menu select ei
 
 Individual display windows may be dragged and resized in the normal way. Alternatively, you may use the options in the User _Display>Arrange Windows_ sub menu.
 
-The positions of windows will be remembered when you exit PAMGUARD.
+The positions of windows will be remembered when you exit PAMGuard.
 
 ### Scroller Coupling
 

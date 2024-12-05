@@ -1,8 +1,6 @@
 ---
 title: "Adding and Removing Plug-ins"
 ---
- Adding and Removing Modules  
-
 PAMGuard
 ========
 

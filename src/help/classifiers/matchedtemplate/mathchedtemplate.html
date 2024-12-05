@@ -64,7 +64,7 @@ click is classified. </p>
 
 <h3 id="extracting-correlation-values-using-matlab-r">Extracting correlation values using MATLAB/R</h3>
 <p>Clicks are loaded from binary files using the MATLAB/R function </p>
-<pre><code><span class="hljs-attribute">clicks</span>  = loadPamguardBinaryFile(<span class="hljs-string">"/path/to/pamguardfile.pgdf"</span>)<span class="hljs-comment">;</span>
+<pre><code><span class="hljs-attribute">clicks</span>  = loadPAMGuardBinaryFile(<span class="hljs-string">"/path/to/PAMGuardfile.pgdf"</span>)<span class="hljs-comment">;</span>
 </code></pre><p>where clicks is a list of MATLAB/R structures containing the data for each click in the file. </p>
 <p>The matched click classifier template threshold, match value and reject value are then accessed from each click using</p>
 <pre><code><span class="hljs-attr">matchedtemplatevals</span> = clicks(<span class="hljs-number">1</span>).annotations. mclassification

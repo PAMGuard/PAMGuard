@@ -1,8 +1,6 @@
 ---
 title: "Level Meters"
 ---
- Level Meters  
-
 Level Meters
 ============
 

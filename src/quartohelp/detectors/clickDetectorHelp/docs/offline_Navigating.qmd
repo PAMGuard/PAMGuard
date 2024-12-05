@@ -1,8 +1,6 @@
 ---
 title: "Navigating"
 ---
-Navigating through Data  
-
 Click Detector Viewer Function
 ==============================
 

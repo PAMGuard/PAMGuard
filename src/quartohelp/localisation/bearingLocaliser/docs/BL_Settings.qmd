@@ -1,8 +1,6 @@
 ---
 title: "Bearing Calculator Configuration"
 ---
-Bearing Calculator Configuration  
-
 Bearing Localiser
 =================
 

@@ -1,8 +1,6 @@
 ---
 title: "Click Classification"
 ---
-Click Classification
-
 Click Detector
 ==============
 

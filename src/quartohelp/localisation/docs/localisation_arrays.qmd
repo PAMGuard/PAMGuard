@@ -1,8 +1,6 @@
 ---
 title: "Types of Array"
 ---
- Generic Localisers 
-
 Localisation
 ============
 

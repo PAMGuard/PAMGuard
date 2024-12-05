@@ -27,9 +27,12 @@ public class PamIcon {
 
 		//the default is windows. Icon automatically resize on Windows. 
 		// Even on Windows, use a / slash. A \\ doesn't work (OK in debugger, not in built version)
-		String path = "Resources/pamguardIcon.png";
+//		String path = "Resources/pamguardIcon.png";
+		String path = "Resources/PAMGuardIcon2Opaque.png";
 
-		if (System.getProperty("os.name").equals("Linux") || System.getProperty("os.name").startsWith("Mac")) {
+		if (System.getProperty("os.name").equals("Linux") 
+				|| System.getProperty("os.name").startsWith("Mac")
+				|| System.getProperty("os.name").startsWith("Win")) {
 			switch (sizeFlag) {
 			case SMALL:
 				path = "Resources/PAMGuardIcon2small.png";
@@ -39,6 +42,16 @@ public class PamIcon {
 				break;
 			case LARGE:
 				path = "Resources/PAMGuardIcon2.png";
+				break;
+			}
+		}
+		else {
+			switch (sizeFlag) {
+			case SMALL:
+				path = "Resources/PAMGuardIcon2small.png";
+				break;
+			case NORMAL:
+				path = "Resources/PAMGuardIcon2medium.png";
 				break;
 			}
 		}

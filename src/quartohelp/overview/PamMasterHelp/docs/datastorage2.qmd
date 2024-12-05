@@ -1,9 +1,7 @@
 ---
 title: "Data Storage"
 ---
- Data Storage  
-
-PAMGUARD
+PAMGuard
 ========
 
 Data Storage

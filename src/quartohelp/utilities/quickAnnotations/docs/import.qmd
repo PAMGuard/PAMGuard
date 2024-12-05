@@ -1,8 +1,6 @@
 ---
 title: "Importing"
 ---
- Spectrogram Annotations  
-
 Quick Annotations
 =================
 

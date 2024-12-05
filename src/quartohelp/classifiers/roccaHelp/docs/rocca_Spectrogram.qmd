@@ -1,8 +1,6 @@
 ---
 title: "Rocca Spectrogram"
 ---
-Rocca Spectrogram PopUp Details  
-
 ROCCA
 =====
 

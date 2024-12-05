@@ -1,8 +1,6 @@
 ---
 title: "AIS Overview"
 ---
- AIS Overview  
-
 AIS
 ===
 
@@ -17,11 +15,11 @@ Vessels equipped with an AIS tranceiver system regularly transmit their position
 
 While AIS transceivers are expensive and must be registered with international shipping authorities, AIS receivers which do not transmit, but can receive data from other vessels can be purchased for a modest price.
 
-PAMGUARD can decode AIS data and use it in a number of ways, for example:
+PAMGuard can decode AIS data and use it in a number of ways, for example:
 
 1.  Display other vessels on the [PAMGuard map](../../../mapping/mapHelp/docs/overview.html)
     
-2.  Display the locations of airguns on other vessels, which is particularly useful if PAMGUARD is being operated from a guard vessel or during multi-vessel surveys when airguns are in use on multiple vessels.
+2.  Display the locations of airguns on other vessels, which is particularly useful if PAMGuard is being operated from a guard vessel or during multi-vessel surveys when airguns are in use on multiple vessels.
     
 
 [](AISConfiguration.html)[Next: AIS Configuration](AISConfiguration.html)

@@ -1,8 +1,6 @@
 ---
 title: "Beamformer Output"
 ---
-Beamformer Output  
-
 Beamformer Module
 =================
 

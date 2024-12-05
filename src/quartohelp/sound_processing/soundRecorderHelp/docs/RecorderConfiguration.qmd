@@ -1,8 +1,6 @@
 ---
 title: "Sound Recorder Configuration"
 ---
- Sound Recorder Configuration   
-
 Sound Recorder
 ==============
 

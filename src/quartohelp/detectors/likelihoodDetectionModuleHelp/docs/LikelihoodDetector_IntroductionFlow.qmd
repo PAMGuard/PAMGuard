@@ -1,8 +1,6 @@
 ---
 title: "The Likelihood Detector Module"
 ---
- Likelihood Detector Introduction  
-
 The Likelihood Detector Module
 ------------------------------
 

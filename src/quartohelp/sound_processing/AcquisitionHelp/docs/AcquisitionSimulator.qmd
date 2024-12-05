@@ -1,12 +1,10 @@
 ---
 title: "Simulated Sources"
 ---
- Audio Files  
-
 Simulated Sources
 =================
 
-PAMGUARD can simulate data for a variety of different sound types from one or multiple sources.
+PAMGuard can simulate data for a variety of different sound types from one or multiple sources.
 
 Simulated data are useful in training and are can be used by developers to test detection and localisation algorithms.
 
@@ -49,7 +47,7 @@ You can also set the source depth, course and speed over ground.
 
 ### Processing speed and listening to simulated data
 
-If no [Sound Playback](../../soundPlaybackHelp/docs/soundPlayback_soundPlayback.html) module is included in the PAMGUARD configuration, or if no channels are selected in the [Sound Playback](../../soundPlaybackHelp/docs/soundPlayback_soundPlayback.html) module, then simulated data will be analysed as fast as possible, which could be considerably faster than real time.
+If no [Sound Playback](../../soundPlaybackHelp/docs/soundPlayback_soundPlayback.html) module is included in the PAMGuard configuration, or if no channels are selected in the [Sound Playback](../../soundPlaybackHelp/docs/soundPlayback_soundPlayback.html) module, then simulated data will be analysed as fast as possible, which could be considerably faster than real time.
 
 If a [Sound playback](../../soundPlaybackHelp/docs/soundPlayback_soundPlayback.html) module is present and is in use, then analysis will run in real time and you will be able to hear the sounds being played back from the computers sound card
 

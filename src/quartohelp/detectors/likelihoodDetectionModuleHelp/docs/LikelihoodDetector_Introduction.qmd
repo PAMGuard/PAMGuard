@@ -1,8 +1,6 @@
 ---
 title: "Likelihood Detector Introduction"
 ---
- Likelihood Detector Introduction  
-
 The Likelihood Detector Module
 ==============================
 
@@ -48,7 +46,7 @@ The data flow begins with an audio data source (i.e., a Sound Acquisition module
   
 
 1.  _FFT Processing_  
-    When a target configuration is created, the first thing the Likelihood Detection Module does is calculate the actual FFT parameters required based on the operator's suggestions for the frequency and time resolutions and the audio data source's parameters. The module will then seek an existing FFT data block within the PAMGUARD system that has those parameters and is also for the same configured audio source. If a matching FFT process is not located, an FFT process is automatically created within the Likelihood Detection Module, and becomes the first step in the processing stream for the target configuration. The output of this stage of processing is a standard PAMGUARD FFT data block (i.e., `RecyclingDataBlock<FFTDataUnit>`).
+    When a target configuration is created, the first thing the Likelihood Detection Module does is calculate the actual FFT parameters required based on the operator's suggestions for the frequency and time resolutions and the audio data source's parameters. The module will then seek an existing FFT data block within the PAMGuard system that has those parameters and is also for the same configured audio source. If a matching FFT process is not located, an FFT process is automatically created within the Likelihood Detection Module, and becomes the first step in the processing stream for the target configuration. The output of this stage of processing is a standard PAMGuard FFT data block (i.e., `RecyclingDataBlock<FFTDataUnit>`).
     
   
 3.  _Linear Average Spectra Processing_  
@@ -64,7 +62,7 @@ The data flow begins with an audio data source (i.e., a Sound Acquisition module
     
   
 9.  _Threshold Detection Processing_  
-    The detection process computes the actual likelihood ration test (LRT) portion of the detection process. This algorithm does two tests: first, for any given signal band, if the likelihood ration is greater than the user defined threshold, then a detection may be present. Second, if defined, and there may be a detection present, the detector divides the signal estimate of the signal-band by the average signal estimate af all of the associated guard bands. If that ratio is greater than the user-defined threshold, then a detection results. The output of this stage of processing is zero to many `ThresholdDetectorDataUnit`, which is an extension of the standard PAMGUARD `PamDetection<>` class.
+    The detection process computes the actual likelihood ration test (LRT) portion of the detection process. This algorithm does two tests: first, for any given signal band, if the likelihood ration is greater than the user defined threshold, then a detection may be present. Second, if defined, and there may be a detection present, the detector divides the signal estimate of the signal-band by the average signal estimate af all of the associated guard bands. If that ratio is greater than the user-defined threshold, then a detection results. The output of this stage of processing is zero to many `ThresholdDetectorDataUnit`, which is an extension of the standard PAMGuard `PamDetection<>` class.
     
 
   

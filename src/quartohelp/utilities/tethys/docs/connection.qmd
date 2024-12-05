@@ -1,8 +1,6 @@
 ---
 title: "Connecting to Tethys"
 ---
- Tethys Connection and Project Details   
-
 Connection and Project Details
 ==============================
 

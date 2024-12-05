@@ -1,8 +1,6 @@
 ---
 title: "Overview"
 ---
- Whistle Detector Overview  
-
 Whistle Detector
 ================
 
@@ -13,7 +11,7 @@ Overview
 
 Note that the Whistle detector has now been replaced by the new  
 [Whistle and Moan detector](../../whistleMoanHelp/docs/whistleMoan_Overview.html)  
-and may be removed altogether from future PAMGUARD releases
+and may be removed altogether from future PAMGuard releases
 
 **
 
@@ -34,7 +32,7 @@ Detected peaks are then joined together. The joining process takes account of th
 
 Once a time frequency contour is completed, it is classified as a whistle if it exceeds a minimum length. (In fact these are usually fractions of whistles.)
 
-Future releases of PAMGUARD will contain more sophisticated classification systems to determine species.
+Future releases of PAMGuard will contain more sophisticated classification systems to determine species.
 
 ### Whistle Event
 

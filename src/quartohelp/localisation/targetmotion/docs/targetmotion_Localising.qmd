@@ -1,8 +1,6 @@
 ---
 title: "Localising an Event"
 ---
- Target Motion Overview 
-
 Target Motion
 =============
 
@@ -11,7 +9,7 @@ Localising an Event
 
   
 
-PAMGUARD is capable of localising target motion data utilising multiple algorithms. In order to do so click trains must be marked out as described in the [Click Detector Viewer Functions](../../../detectors/clickDetectorHelp/docs/offline_MarkingOutEvents.html) section. Once a click train has been marked as an event it can be localised either by right clicking on a click and selecting _'Localise Click Train idxxx'_ or selecting _'Target Motion Analysis..'_ from the _'Click Detection'_ drop down menu. This will open the target motion dialogue panel.  
+PAMGuard is capable of localising target motion data utilising multiple algorithms. In order to do so click trains must be marked out as described in the [Click Detector Viewer Functions](../../../detectors/clickDetectorHelp/docs/offline_MarkingOutEvents.html) section. Once a click train has been marked as an event it can be localised either by right clicking on a click and selecting _'Localise Click Train idxxx'_ or selecting _'Target Motion Analysis..'_ from the _'Click Detection'_ drop down menu. This will open the target motion dialogue panel.  
   
 
 Figure 1

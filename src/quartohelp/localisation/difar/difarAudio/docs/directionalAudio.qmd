@@ -1,8 +1,6 @@
 ---
 title: "DIFAR Directional Audio"
 ---
- Difar Directional Audio  
-
 DIFAR Directional Audio
 =======================
 

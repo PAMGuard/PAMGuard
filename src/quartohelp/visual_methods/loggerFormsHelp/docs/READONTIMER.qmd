@@ -1,8 +1,6 @@
 ---
 title: "READONTIMER Property"
 ---
- READONTIMER Property  
-
 READONTIMER Property
 ====================
 

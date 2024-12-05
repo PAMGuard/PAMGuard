@@ -1,8 +1,6 @@
 ---
 title: "BEARING Property"
 ---
- BEARING Property  
-
 BEARING Property
 ================
 

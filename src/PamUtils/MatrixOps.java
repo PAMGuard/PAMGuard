@@ -6,6 +6,14 @@ import java.awt.image.WritableRaster;
 import PamView.ColourArray;
 import fftManager.Complex;
 
+/**
+ * Matrix operations for arrays of Complex data
+ * Really need to write these for ComplexArray rather than Complex[] since
+ * it's a lot faster. 
+ * Widely used in the DIFAR module. 
+ * @author dg50
+ *
+ */
 public class MatrixOps {
 
 	/**Check the array is rectangular, => all sub arrays are same length.

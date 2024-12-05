@@ -1,15 +1,13 @@
 ---
 title: "Multipath 3D Localisation"
 ---
- 3D Localization  
-
 3D Localization
 ===============
 
 Overview
 --------
 
-These instructions guide a user on how to configure the "3-D" module in PAMGUARD for estimating range and depth of a source using a long-aperture towed array. At the time of this writing the module has only been tested with synthetic WAV files and not real-time input, and only with a Static and Threading Hydrophone Locator.
+These instructions guide a user on how to configure the "3-D" module in PAMGuard for estimating range and depth of a source using a long-aperture towed array. At the time of this writing the module has only been tested with synthetic WAV files and not real-time input, and only with a Static and Threading Hydrophone Locator.
 
   
   
@@ -93,7 +91,7 @@ Any 3-D tracking method (TOA option in the Tracking method pull-down menu) will 
 
 ![Tracking methods](images/RadarPlot3D.png)
 
-This figure shows Spectrogram and radar plot of simulated 3-D sources on PAMGUARD.
+This figure shows Spectrogram and radar plot of simulated 3-D sources on PAMGuard.
 
   
   

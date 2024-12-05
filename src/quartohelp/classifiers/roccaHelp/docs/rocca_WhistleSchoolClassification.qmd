@@ -1,8 +1,6 @@
 ---
 title: "Measurements and Classification"
 ---
- Rocca Measurements and Classification  
-
 ROCCA
 =====
 

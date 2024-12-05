@@ -1,8 +1,6 @@
 ---
 title: "Spectrogram Smoothing"
 ---
- spectrogram Smoothing Overview  
-
 Spectrogram Smoothing Kernel
 ============================
 
@@ -21,10 +19,10 @@ The spectrogram images below show a smoothed spectrogram on the left and an un-s
 
 ![User Input](images/Smoothing.png)
 
-The resulting smoothed spectrogram may be used by any PAMGUARD module that uses spectrogram data. Within PAMGUARD it is useful to include a spectrogram smoothing kernel before the [Whistle detector](../../../detectors/whistleDetectorHelp/docs/whistleDetector_Overview.html).
+The resulting smoothed spectrogram may be used by any PAMGuard module that uses spectrogram data. Within PAMGuard it is useful to include a spectrogram smoothing kernel before the [Whistle detector](../../../detectors/whistleDetectorHelp/docs/whistleDetector_Overview.html).
 
-### Adding a new smoothing kernel to PAMGUARD
+### Adding a new smoothing kernel to PAMGuard
 
-To add a new Spectrogram Smoothing Kernel module to PAMGUARD, select the **_File>Add Modules>Sound Processing>Spectrogram smoothing kernel_** menu command.
+To add a new Spectrogram Smoothing Kernel module to PAMGuard, select the **_File>Add Modules>Sound Processing>Spectrogram smoothing kernel_** menu command.
 
 [Next: Spectrogram Smoothing Configuration](AddingConfiguring.html)

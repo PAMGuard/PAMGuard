@@ -1,8 +1,6 @@
 ---
 title: "Map Information Display Panel"
 ---
- Map information Panel  
-
 Map
 ===
 

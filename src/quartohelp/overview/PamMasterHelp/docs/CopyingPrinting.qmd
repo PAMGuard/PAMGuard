@@ -1,9 +1,7 @@
 ---
 title: "Copying and Printing"
 ---
- Copying and Printing  
-
-PAMGUARD
+PAMGuard
 ========
 
 Copying and Printing
@@ -13,7 +11,7 @@ Copying and Printing
 
 ### Copying
 
-Information from any PAMGUARD display can be copied to the computer clip board in an image format which can be directly pasted into many desktop publishing applications
+Information from any PAMGuard display can be copied to the computer clip board in an image format which can be directly pasted into many desktop publishing applications
 
 To copy the contents of any of the tabs on the main display, right click on the tab and select the 'copy tab content to clipboard' menu item. Then go to the application you want the image to appear in. for most applications, you can select 'Paste' from the Edit menu or press Ctrl and V simultaneously.
 

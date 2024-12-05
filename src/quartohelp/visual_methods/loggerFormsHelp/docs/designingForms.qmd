@@ -1,8 +1,6 @@
 ---
 title: "Designing Forms"
 ---
- Designing UDF forms  
-
 Designing PAMGuard Logger Forms
 ===============================
 

@@ -1,8 +1,6 @@
 ---
 title: "Overview"
 ---
- Target Motion Overview 
-
 Localisation
 ============
 
@@ -11,7 +9,7 @@ Overview
 
   
 
-Localisation is the process by which the possible locations of an acoustic source are determined by an array of two or more receivers. In the case of underwater acoustics the receivers are hydrophones and if using PAMGUARD the acoustic source is almost certainly a marine mammal.
+Localisation is the process by which the possible locations of an acoustic source are determined by an array of two or more receivers. In the case of underwater acoustics the receivers are hydrophones and if using PAMGuard the acoustic source is almost certainly a marine mammal.
 
 **Time Delays**  
   

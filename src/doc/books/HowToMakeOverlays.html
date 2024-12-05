@@ -1,14 +1,14 @@
 <html>
 <head>
 <LINK href="pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
-<title>Pamguard</title>
+<title>PAMGuard</title>
 </head>
 
 <body>
 
 <h1>Writing Graphic Overlays</h1>
 <h2>Overview</h2><br>
-Pamguard uses a system of graphic overlays to display information on the 
+PAMGuard uses a system of graphic overlays to display information on the 
 map and other displays. 
 <p>
 Graphic overlays all make use of sub classes of the 
@@ -19,12 +19,12 @@ into screen coordinates.
 The programmer wishing to overlay information must implement the
 <a href="../PamView/PanelOverlayDraw.html">Pamview.PanelOverlayDraw</a> 
 interface and attach that implementation to a 
-<a href="../PamguardMVC/PamDataBlock.html">PamDataBlock</a>
+<a href="../PAMGuardMVC/PamDataBlock.html">PamDataBlock</a>
 using the command
-<A HREF="../PamguardMVC/PamObservable.html#setOverlayDraw(PamView.PanelOverlayDraw)">setOverlayDraw</A>.
+<A HREF="../PAMGuardMVC/PamObservable.html#setOverlayDraw(PamView.PanelOverlayDraw)">setOverlayDraw</A>.
 <p>
 Each display that implements graphic overlays will check which 
-<a href="../PamguardMVC/PamDataBlock.html">PamDataBlocks</a> are 
+<a href="../PAMGuardMVC/PamDataBlock.html">PamDataBlocks</a> are 
 capable of drawing with their 
 <a href="../PamView/GeneralProjector.html">Projector</a>. This is
 done using the 
@@ -52,40 +52,40 @@ the user to set which graphics to overlay on a particular display.
 <p>
 The contents of 
 this menu or dialog box will have been populated by examining all 
-<a href="../PamguardMVC/PamDataBlock.html">PamDataBlocks</a>
+<a href="../PAMGuardMVC/PamDataBlock.html">PamDataBlocks</a>
 and including all those that returned true to 
 <A HREF="../PamView/PanelOverlayDraw.html#canDraw(PamView.GeneralProjector)">canDraw</A> 
 for the given 
 <a href="../PamView/GeneralProjector.html">projector</a>.
 <br>
 The display will then subscribe to 
-<a href="../PamguardMVC/PamDataBlock.html">PamDataBlocks</a>
+<a href="../PAMGuardMVC/PamDataBlock.html">PamDataBlocks</a>
 that it wishes to use as graphic overlays.  
 
 <h3>Order of events</h3>
 
 When a new 
-<a href="../PamguardMVC/PamDataUnit.html">PamDataUnit</a>
+<a href="../PAMGuardMVC/PamDataUnit.html">PamDataUnit</a>
 is added to a 
-<a href="../PamguardMVC/PamDataBlock.html">PamDataBlock</a>
+<a href="../PAMGuardMVC/PamDataBlock.html">PamDataBlock</a>
 the following events occurr.
 <p>
 <ol>
 <li>All subscribers to the 
-<a href="../PamguardMVC/PamDataBlock.html">PamDataBlock</a>
+<a href="../PAMGuardMVC/PamDataBlock.html">PamDataBlock</a>
 receive notification that there is a new
-<a href="../PamguardMVC/PamDataUnit.html">PamDataUnit</a></li>
+<a href="../PAMGuardMVC/PamDataUnit.html">PamDataUnit</a></li>
 <li>A display receiving this notification will then call the
-<a href="../PamguardMVC/PamDataBlock.html">PamDataBlock</a>
+<a href="../PAMGuardMVC/PamDataBlock.html">PamDataBlock</a>
 function 
-<A HREF="../PamguardMVC/PamObservable.html#drawDataUnit(java.awt.Graphics, PamguardMVC.PamDataUnit, PamView.GeneralProjector)">drawDataUnit</A>.</li>
+<A HREF="../PAMGuardMVC/PamObservable.html#drawDataUnit(java.awt.Graphics, PAMGuardMVC.PamDataUnit, PamView.GeneralProjector)">drawDataUnit</A>.</li>
 <li>If <a href="../PamView/PanelOverlayDraw.html">PanelOverlayDraw</a> 
 has been set for the
-<a href="../PamguardMVC/PamDataBlock.html">PamDataBlock</a>
+<a href="../PAMGuardMVC/PamDataBlock.html">PamDataBlock</a>
 , the concrete implementation of 
-<A HREF="../PamguardMVC/PamObservable.html#drawDataUnit(java.awt.Graphics, PamguardMVC.PamDataUnit, PamView.GeneralProjector)">drawDataUnit</A>
+<A HREF="../PAMGuardMVC/PamObservable.html#drawDataUnit(java.awt.Graphics, PAMGuardMVC.PamDataUnit, PamView.GeneralProjector)">drawDataUnit</A>
 will be called.</li>
-<li>Code in <A HREF="../PamguardMVC/PamObservable.html#drawDataUnit(java.awt.Graphics, PamguardMVC.PamDataUnit, PamView.GeneralProjector)">drawDataUnit</A>
+<li>Code in <A HREF="../PAMGuardMVC/PamObservable.html#drawDataUnit(java.awt.Graphics, PAMGuardMVC.PamDataUnit, PamView.GeneralProjector)">drawDataUnit</A>
 will draw additional graphics layers on top of any existing graphics using the 
 <a href="../PamView/GeneralProjector.html">projector</a> to convert data to screen coordinates.</li>
 
@@ -103,7 +103,7 @@ display types, then the
 function should return true for all of those display types. 
 <p>
 At the top of the 
-<A HREF="../PamguardMVC/PamObservable.html#drawDataUnit(java.awt.Graphics, PamguardMVC.PamDataUnit, PamView.GeneralProjector)">drawDataUnit</A>
+<A HREF="../PAMGuardMVC/PamObservable.html#drawDataUnit(java.awt.Graphics, PAMGuardMVC.PamDataUnit, PamView.GeneralProjector)">drawDataUnit</A>
 function, check the types of coordinates being used by the projector to determine the
 dipslay type and then call appropriate drawing routines depending on the axis. 
 <p>

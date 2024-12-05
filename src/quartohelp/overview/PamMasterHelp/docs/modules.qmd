@@ -1,21 +1,19 @@
 ---
 title: "PAMGUARD Modules"
 ---
+PAMGuard
+========
 
-PAMGUARD Modules
+PAMGuard Modules
+----------------
 
-# PAMGUARD
+PAMGuard contains of an ever growing number of plug-in modules, each of which performs some sort of data handling task. Individual modules may do anything from acquiring sound data, to managing a database or searching for a particular sound type. Generally, every module will acquire data either from another module, or through some external interface (such as a sound card, GPS or depth sensor readout). The output of a module may be a display, more data or both. A single module may have multiple output data streams. For instance, the sound acquisition module primarily outputs raw audio data to other PAMGuard modules, but also outputs data providing a record of when sound acquisition was started and stopped which can be stored in the database.
 
-## PAMGUARD Modules
-
-PAMGUARD contains of an ever growing number of plug-in modules, each of which performs some sort of data handling task. Individual modules may do anything from acquiring sound data, to managing a database or searching for a particular sound type. Generally, every module will acquire data either from another module, or through some external interface (such as a sound card, GPS or depth sensor readout). The output of a module may be a display, more data or both. A single module may have multiple output data streams. For instance, the sound acquisition module primarily outputs raw audio data to other PAMGUARD modules, but also outputs data providing a record of when sound acquisition was started and stopped which can be stored in the database.
-
-PAMGUARD currently contains 70 plug-in modules which can be selected and configured by the user (See the table below). It is generally possible to create multiple instances of a given module type. For instance, the operator may wish to incorporate two click detectors, each optimised for a different species, or have two sound acquisition modules, one acquiring low frequency data and one high frequency data. For certain module types (e.g. GPS acquisition), the user may be restricted to having a single instance.
+PAMGuard currently contains 70 plug-in modules which can be selected and configured by the user (See the table below). It is generally possible to create multiple instances of a given module type. For instance, the operator may wish to incorporate two click detectors, each optimised for a different species, or have two sound acquisition modules, one acquiring low frequency data and one high frequency data. For certain module types (e.g. GPS acquisition), the user may be restricted to having a single instance.
 
 We are constantly developing new modules for PAMGuard. The table also includes some information on modules which we're working on at the moment. Due to PAMGuard being open source, there may of course be other modules under development we don't yet know about.
 
- 
-Last updated 27 November 2024
+Last updated 28 November 2024
 
 [Maps and Mapping](#_Maps_and_Mapping),
 [Utilities](#_Utilities),
@@ -163,6 +161,6 @@ Last updated 27 November 2024
 
 
 
-[Previous: PAMGUARD Architecture](pamGuardArchitecture.html)
+[Previous: PAMGuard Architecture](pamGuardArchitecture.html)
 
 [Next: Graphical User Interface Overview](guiOverview.html)

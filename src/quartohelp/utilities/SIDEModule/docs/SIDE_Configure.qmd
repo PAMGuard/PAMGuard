@@ -1,8 +1,6 @@
 ---
 title: "Creation and Configuration"
 ---
- SIDE Module Configuration  
-
 SIDE Module
 ===========
 

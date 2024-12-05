@@ -1,8 +1,6 @@
 ---
 title: "File Output"
 ---
-Rocca Saved File Details  
-
 ROCCA
 =====
 

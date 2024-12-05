@@ -1,8 +1,6 @@
 ---
 title: "READONGPS Property"
 ---
- READONGPS Property  
-
 READONGPS Property
 ==================
 

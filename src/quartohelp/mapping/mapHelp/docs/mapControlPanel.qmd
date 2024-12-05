@@ -1,8 +1,6 @@
 ---
 title: "Map Controls"
 ---
- Map Control Panel  
-
 Map
 ===
 

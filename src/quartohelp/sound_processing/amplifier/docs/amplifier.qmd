@@ -1,8 +1,6 @@
 ---
 title: "Overview"
 ---
- Signal Amplifier  
-
 Signal Amplifier
 ================
 
@@ -29,4 +27,4 @@ Check the box if you wish to invert the signal on a channel (multiply all valued
 
 ### Using the Signal Amplifier
 
-Other PAMGUARD modules that use raw audio data can then subscribe to the output of the Signal Amplifier module instead of the [sound acquisition module](../../AcquisitionHelp/docs/AcquisitionOverview.html).
+Other PAMGuard modules that use raw audio data can then subscribe to the output of the Signal Amplifier module instead of the [sound acquisition module](../../AcquisitionHelp/docs/AcquisitionOverview.html).

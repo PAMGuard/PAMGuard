@@ -1,8 +1,6 @@
 ---
 title: "Map Overlays"
 ---
- Map Overlays  
-
 Map
 ===
 
@@ -11,7 +9,7 @@ Map Overlays
 
   
 
-PAMGUARD uses a system of overlays to display data from detectors and other PAMGUARD modules on the map. Which overlay options are available will depend on which modules are currently loaded.
+PAMGuard uses a system of overlays to display data from detectors and other PAMGuard modules on the map. Which overlay options are available will depend on which modules are currently loaded.
 
 ### Turning overlays on and off
 
