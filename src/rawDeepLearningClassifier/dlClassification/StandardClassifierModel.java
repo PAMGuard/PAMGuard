@@ -115,6 +115,9 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 //		System.out.println("STANDARD CLASSIFIER MODEL PREP MODEL! !!!: " +  getDLParams().modelPath);
 //		StandardModelParams oldParams = getDLParams().clone();
 		
+		//just incase group detections has been enabled
+		getDLControl().setGroupDetections(false);
+		
 		getDLWorker().prepModel(getDLParams(), dlControl);
 
 

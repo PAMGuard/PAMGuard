@@ -228,21 +228,23 @@ public class SegmenterProcess extends PamProcess {
 	 */
 	public void newData(PamDataUnit pamRawData) {
 
-//		System.out.println("New data for segmenter: " + pamRawData); 
+		//		System.out.println("New data for segmenter: " + pamRawData); 
 
 		if (!dlControl.getDLParams().useDataSelector || dlControl.getDataSelector().scoreData(pamRawData)>0) {	
 
-			if (pamRawData instanceof RawDataUnit) {
-				newRawDataUnit(pamRawData); 
+			if (dlControl.isGroupDetections()){
+				if (pamRawData instanceof RawDataUnit) {
+					newRawDataUnit(pamRawData); 
+				}
+				else if (pamRawData instanceof ClickDetection) {
+					newClickData( pamRawData);
+				}
+				else if (pamRawData instanceof ClipDataUnit)  {
+					newClipData(pamRawData);
+				}
 			}
-			else if (pamRawData instanceof ClickDetection) {
-				newClickData( pamRawData);
-			}
-			else if (pamRawData instanceof ClipDataUnit)  {
-				newClipData(pamRawData);
-			}
-			else if (pamRawData instanceof ConnectedRegionDataUnit)  {
-				newWhistleData(pamRawData);
+			else {
+				newGroupData(pamRawData);
 			}
 		}
 
@@ -253,7 +255,7 @@ public class SegmenterProcess extends PamProcess {
 	 * A new detection data unit i.e. this is only if we have detection data which is being grouped into segments. 
 	 * @param dataUnit - the whistle data unit. 
 	 */
-	private synchronized void newWhistleData(PamDataUnit dataUnit) {
+	private synchronized void newGroupData(PamDataUnit dataUnit) {
 		
 		
 		ConnectedRegionDataUnit whistle = (ConnectedRegionDataUnit) dataUnit;

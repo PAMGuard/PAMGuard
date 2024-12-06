@@ -42,7 +42,7 @@ public class DelphinIDUtils {
 		//create the delphinID worker. 
 		DelphinIDWorkerTest delphinIDWorker = new DelphinIDWorkerTest();
 
-		StandardModelParams params = new StandardModelParams();
+		StandardModelParams params = new DelphinIDParams();
 		params.modelPath = modelPath;
 
 		//prepare the model

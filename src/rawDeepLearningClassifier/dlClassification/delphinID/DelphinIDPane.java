@@ -57,6 +57,8 @@ public class DelphinIDPane extends SettingsPane<DelphinIDParams> {
 
 	private DoubleSpinnerValueFactory clickValueFactory;
 
+	private Label minDensityLabel;
+
 	public DelphinIDPane(DelphinIDClassifier delphinUIClassifier) {
 		super(null);
 		this.delphinUIClassifier = delphinUIClassifier; 
@@ -85,7 +87,7 @@ public class DelphinIDPane extends SettingsPane<DelphinIDParams> {
 		PamVBox vBox = new PamVBox(); 
 		vBox.setSpacing(5.);
 		
-		clickValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(1., Double.MAX_VALUE, 1., 5.);
+		clickValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(1., Double.MAX_VALUE, 5., 1.);
 		whislteValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 1.0, 0.3, 0.1);
 
 		/**Classification thresholds etc to set.**/
@@ -102,8 +104,8 @@ public class DelphinIDPane extends SettingsPane<DelphinIDParams> {
 		PamHBox minDensityHolder = new PamHBox();
 		minDensityHolder.setAlignment(Pos.CENTER_RIGHT);
 		minDensityHolder.setSpacing(5);
-		Label minDensity = new Label("Min. detectection density");
-		minDensityHolder.getChildren().addAll(minDensity, detectionDensitySpinner);
+		minDensityLabel = new Label("Min. detectection density");
+		minDensityHolder.getChildren().addAll(minDensityLabel, detectionDensitySpinner);
 
 		/**Classification thresholds etc to set.**/
 		Label classiferInfoLabel2 = new Label("Decision Threshold"); 
@@ -143,13 +145,13 @@ public class DelphinIDPane extends SettingsPane<DelphinIDParams> {
 		//set the correct label and minimum detection value
 		switch (input.getDataType()) {
 		case CLICKS:
-			this.detectionDensity.setText("Minimum no. clicks");
-			detectionDensitySpinner.setTooltip(new Tooltip("Set the minimum number of clicks before a segment is classified"));
+			this.minDensityLabel.setText("Minimum no. clicks");
+			minDensityLabel.setTooltip(new Tooltip("Set the minimum number of clicks before a segment is classified"));
 			detectionDensitySpinner.setValueFactory(clickValueFactory);
 			break;
 		case WHISTLES:
-			detectionDensitySpinner.setTooltip(new Tooltip("Set the minimum  whistle density before a segment is classified"));
-			this.detectionDensity.setText("Minimum whistle density");
+			minDensityLabel.setTooltip(new Tooltip("Set the minimum  whistle density before a segment is classified"));
+			this.minDensityLabel.setText("Minimum whistle density");
 			detectionDensitySpinner.setValueFactory(whislteValueFactory);
 			break;
 		default:

@@ -23,31 +23,34 @@ import us.hebi.matlab.mat.format.Mat5;
 import us.hebi.matlab.mat.types.MatFile;
 import us.hebi.matlab.mat.types.Matrix;
 import us.hebi.matlab.mat.types.Struct;
-import whistlesAndMoans.AbstractWhistleDataUnit;
 
 public class DelphinIDClickTest {
 
 	public static void main(String args[]) {
 
-		String clicksMatPath = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/clicks_20200918_123234.mat";
-		String modelFile = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/clickclassifier.zip";
+//		String clicksMatPath = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/clicks_20200918_123234.mat";
+//		String modelFile = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/clickclassifier.zip";
+
+		String clicksMatPath = "/Users/jdjm/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/clicks_20200918_123234.mat";
+		String modelFile = "/Users/jdjm/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/clickclassifier.zip";
+		String matclickSave = "/Users/jdjm/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/delphinID/click1D/click_spectrums.mat";
 
 		DetectionGroupMAT<ClickDetectionMAT> clicks = DelphinIDUtils.getClicksMAT(clicksMatPath);
 
-		//-----basic tests to check transforms----
-		//test a single segment. 
-		//		String matFileout = "/Users/au671271/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/delphinID/click1D/clickspectrum.mat";
-		//		float[][] output = testDelphinIDClickSegment(matFileout, clicks); 
-		//
-		//		//run the model
-		//
-		//		String matFileout2 = "/Users/au671271/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/delphinID/click1D/clickspectrum_results.mat";
-		//
-		//		testDelphinIDModelRaw(modelFile, output, matFileout2); 
+//		-----basic tests to check transforms----
+//		test a single segment. 
+				String matFileout = "/Users/jdjm/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/delphinID/click1D/clickspectrum.mat";
+				float[][] output = testDelphinIDClickSegment(matFileout, clicks); 
+		
+				//run the model
+		
+//				String matFileout2 = "/Users/jdjm/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/delphinID/click1D/clickspectrum_results.mat";
+//		
+//				testDelphinIDModelRaw(modelFile, output, matFileout2); 
 
 
 		//---complete test on the model and transforms------
-		float[][] results = testDelphinIDClickModel( modelFile,	clicks ); 
+		//float[][] results = testDelphinIDClickModel( modelFile,	clicks, matclickSave ); 
 
 	}
 
@@ -59,7 +62,7 @@ public class DelphinIDClickTest {
 	/****------------------------------------------------------------------****/
 
 
-	public static float[][] testDelphinIDClickModel(String modelPath,	DetectionGroupMAT<ClickDetectionMAT> clicks ) {
+	public static float[][] testDelphinIDClickModel(String modelPath,	DetectionGroupMAT<ClickDetectionMAT> clicks, String matClickSave) {
 
 		Path path = Paths.get(modelPath);
 
@@ -123,6 +126,20 @@ public class DelphinIDClickTest {
 					System.out.println(String.format("Segment: %d no. clicks %d %s" , i , segments.get(i).getSubDetectionsCount(), "-------------------------"));
 				}
 
+			}
+			
+			//create MatFile for saving the image data to. 
+			MatFile matFile = Mat5.newMatFile();
+			matFile.addArray("click_model_inputs", imageStruct);
+
+			if (matClickSave!=null) {
+				// Serialize to disk using default configurations
+				try {
+					Mat5.writeToFile(matFile,matClickSave);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 
 

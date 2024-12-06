@@ -216,7 +216,13 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	/**
 	 * DL Group detection logging. 
 	 */
-	private DLGroupDetectionLogging dlGroupDetLogging; 
+	private DLGroupDetectionLogging dlGroupDetLogging;
+
+	/**
+	 * If true then detections are saved to a group and all detections within a segment are then
+	 * passed to the deep learning classifier.
+	 */
+	private boolean groupDetections = false;
 
 	
 	
@@ -697,6 +703,28 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	public DLDefaultModelManager getDefaultModelManager() {
 		return this.defaultModelManager;
 	}
+
+	/**
+	 * Check whether group detections are being used. 
+	 * If true then detections are saved to a group and all detections within a segment are then
+	 * passed to the deep learning classifier.
+	 */
+	public boolean isGroupDetections() {
+		return groupDetections;
+	}
+	
+	/**
+	 * Set whether to use group detections. 
+	 * If true then detections are saved to a group and all detections within a segment are then
+	 * passed to the deep learning classifier.
+	 * @param groupDetections - true to use group detections. 
+	 */
+	public void setGroupDetections(boolean groupDetections) {
+		this. groupDetections=groupDetections;
+	}
+
+
+
 
 
 

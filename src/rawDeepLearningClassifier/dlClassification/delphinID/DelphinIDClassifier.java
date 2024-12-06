@@ -58,6 +58,13 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 	}
 
 	@Override
+	public void prepModel() {
+		super.prepModel();
+		//set group detections to true. 
+		getDLControl().setGroupDetections(true);
+	}
+
+	@Override
 	public String getName() {
 		return "delphinID";
 	}
@@ -131,36 +138,36 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 		if (((SegmenterDetectionGroup) groupedRawData.get(0)).getSubDetectionsCount()>=delphinIDParams.minDetectionValue) {
 			return true;
 		}
-		
+
 		return true;
 	}
 
 	private boolean whistlePreFilter(ArrayList<? extends PamDataUnit> groupedRawData) {
 		//TODO
-//		System.out.println("Check WHISTLE fragment density"); 
-//		
-//		3.	Within each time frame, the density of detection is calculated and used as a filter.
-//		-	Density 2
-//		-	where the length of frame = frame duration / mean time step across contour
-//		(time steps between time-frequency points in contour saved by ROCCA depend on FFT resolution but can vary slightly within contour)
-//
-//		4.	If a detection frame has less than 0.30 detection density, it is not used for classification
-//		double density = DelphinIDUtils.getDensity(null); 
-		
+		//		System.out.println("Check WHISTLE fragment density"); 
+		//		
+		//		3.	Within each time frame, the density of detection is calculated and used as a filter.
+		//		-	Density 2
+		//		-	where the length of frame = frame duration / mean time step across contour
+		//		(time steps between time-frequency points in contour saved by ROCCA depend on FFT resolution but can vary slightly within contour)
+		//
+		//		4.	If a detection frame has less than 0.30 detection density, it is not used for classification
+		//		double density = DelphinIDUtils.getDensity(null); 
+
 
 		if (groupedRawData==null || groupedRawData.size()<1) {
 			System.err.println("DelphinIDClassifier: + the grouped raw data is null or zero size:"); 
 			return false;
 		}
-		
+
 		System.out.println("Run DelphinID model: " +  groupedRawData.size() + " min density: " + delphinIDParams.minDetectionValue); 
-		
+
 		double density = DelphinIDUtils.getDensity((SegmenterDetectionGroup) groupedRawData.get(0)); 
-		
+
 		if (density>=delphinIDParams.minDetectionValue) {
 			return true;
 		}
-		
+
 		return true;
 	}
 
@@ -213,20 +220,20 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 		this.delphinIDParams=params;
 
 	}
-	
-	
+
+
 	@Override
 	public ArrayList<Class> getAllowedDataTypes(){
 		allowedDataTypes.clear();
-		
+
 		if (delphinIDParams.getDataType()==DelphinIDDataType.CLICKS) {
 			allowedDataTypes.add(ClickDetection.class);
 		}
-		
+
 		if (delphinIDParams.getDataType()==DelphinIDDataType.WHISTLES) {
 			allowedDataTypes.add(ConnectedRegionDataUnit.class);
 		}
-		
+
 		return allowedDataTypes;
 	}
 

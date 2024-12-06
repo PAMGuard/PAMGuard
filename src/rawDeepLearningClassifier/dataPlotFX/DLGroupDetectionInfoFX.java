@@ -29,6 +29,4 @@ public class DLGroupDetectionInfoFX extends GenericDataPlotInfo {
 		((GenericSettingsPane) this.getGraphSettingsPane()).setShowingName("Deep Learning Group Detections");
 	}
 
-
-
 }

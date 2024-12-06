@@ -36,8 +36,7 @@ public interface DLClassiferModel {
 	public ArrayList<? extends PredictionResult> runModel(ArrayList<? extends PamDataUnit> rawDataUnit);
 
 	/**
-	 * Prepare the model. This is called on PAMGuard start up.
-	 * @param file 
+	 * Prepare the model. This is called on PAMGuard start up and before processing in viewer mode. 
 	 */
 	public void prepModel();
 	
