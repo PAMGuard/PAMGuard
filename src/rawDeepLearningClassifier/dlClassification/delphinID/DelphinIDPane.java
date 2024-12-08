@@ -12,7 +12,6 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.SpinnerValueFactory.DoubleSpinnerValueFactory;
-import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -24,6 +23,7 @@ import pamViewFX.fxNodes.PamHBox;
 import pamViewFX.fxNodes.PamSpinner;
 import pamViewFX.fxNodes.PamVBox;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelPane;
+import rawDeepLearningClassifier.dlClassification.delphinID.DelphinIDParams.DelphinIDDataType;
 
 /**
  * Settings pane for delphin ID. 
@@ -142,6 +142,10 @@ public class DelphinIDPane extends SettingsPane<DelphinIDParams> {
 		decisionSlider.setValue(input.threshold);
 		detectionDensitySpinner.getValueFactory().setValue(input.minDetectionValue);
 				
+		if (input.getDataType()==null) {
+			input.dataType = DelphinIDDataType.WHISTLES;
+		}
+		
 		//set the correct label and minimum detection value
 		switch (input.getDataType()) {
 		case CLICKS:
