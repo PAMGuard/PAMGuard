@@ -201,7 +201,8 @@ public class DelphinIDClickTest {
 
 		double segLen = 4000.;
 		double segHop = 1000.0;
-		double startSeconds = 1.50355; //seconds to start segments (so we can compare to Python)
+//		double startSeconds = 1.50355; //seconds to start segments (so we can compare to Python)
+		double startSeconds = 0; //seconds to start segments (so we can compare to Python)
 		double[] freqLimits = new double[] {10000., 40188.};
 		int fftLen = 512; 
 
@@ -231,7 +232,9 @@ public class DelphinIDClickTest {
 				ArrayList<PamDataUnit<?, ?>> clicksSeg = segments.get(i).getSubDetections();
 				Spectrum spectrum  = Clicks2Spectrum.clicks2Spectrum(clicksSeg, (float) clicks.getSampleRate(), fftLen); 
 				clkStruct.set("averagespectrum", i, DLMatFile.array2Matrix(spectrum.getRealSpectrum())); 
-				clkStruct.set("nclks", i, Mat5.newScalar(clicksSeg.size())); 
+				clkStruct.set("nclks", i, Mat5.newScalar(clicksSeg.size()));
+				clkStruct.set("startseconds", i, Mat5.newScalar(segments.get(i).getStartSecond())); 
+
 
 				//System.out.println("Segment average" + i + " time:  " +  (double)(segments.get(i).getSegmentStartMillis()-dataStartMillis)/1000.  + "s no. clicks " + segments.get(i).getSubDetectionsCount() + " total: " + sum + "  spectrum " + spectrum.length() + "  " + spectrum.getRealSpectrum()[0]);
 
@@ -272,7 +275,7 @@ public class DelphinIDClickTest {
 			if (matFileout!=null){
 				MatFile matFileWrite = Mat5.newMatFile()
 						.addArray("spectrumJava",clkStruct)
-						.addArray("filedate", Mat5.newScalar(PamCalendar.millistoDateNum(clicks.getFileDataStart()))); 
+						.addArray("filedate", Mat5.newScalar(PamCalendar.millistoDateNum(clicks.getFileDataStart())));
 
 				Mat5.writeToFile(matFileWrite, matFileout);
 			}

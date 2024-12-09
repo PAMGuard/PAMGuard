@@ -346,6 +346,7 @@ public class DelphinIDUtils {
 
 			whistleGroup = new AcousticDetectionGroup(segStart, 1, segEnd, segLen);
 			whistleGroup.setHardSampleRate(sampleRate);
+			whistleGroup.setStartSecond((segStart-dataStartMillis)/1000.);
 
 			for (PamDataUnit whislte: whistles) {
 				whistleStart = whislte.getTimeMilliseconds();
