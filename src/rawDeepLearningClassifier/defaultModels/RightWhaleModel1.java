@@ -44,7 +44,8 @@ public class RightWhaleModel1 implements DLModel {
 	@Override
 	public URI getModelURI() {
 		try {
-			return new URI("https://github.com/PAMGuard/deeplearningmodels/raw/master/right_whale_1/model_lenet_dropout_input_conv_all.zip");
+//			return new URI("https://github.com/PAMGuard/deeplearningmodels/raw/master/right_whale_1/model_lenet_dropout_input_conv_all.zip");
+			return new URI("https://github.com/PAMGuard/deeplearningmodels/releases/download/1.0/model_lenet_dropout_input_conv_all.zip");
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
