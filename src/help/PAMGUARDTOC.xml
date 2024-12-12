@@ -204,8 +204,6 @@
 
    <tocitem text="Tethys Module " target="utilities.tethys.docs.tethys_module" image="topic"/>
 
-   <tocitem text="Tethys Server " target="utilities.tethys.docs.tethys_server" image="topic"/>
-
    <tocitem text="Connecting to Tethys " target="utilities.tethys.docs.connection" image="topic"/>
 
    <tocitem text="Instrument Calibrations " target="utilities.tethys.docs.calibrations" image="topic"/>

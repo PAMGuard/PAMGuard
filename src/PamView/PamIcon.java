@@ -12,6 +12,7 @@ public class PamIcon {
 	public final static int SMALL = 1;
 	public final static int NORMAL = 2;
 	public final static int LARGE = 3;
+	public final static int OLD = 4;
 
 
 	/**
@@ -42,6 +43,9 @@ public class PamIcon {
 				break;
 			case LARGE:
 				path = "Resources/PAMGuardIcon2.png";
+				break;
+			case OLD:
+				path = "Resources/PAMGuardIcon.png";
 				break;
 			}
 		}
