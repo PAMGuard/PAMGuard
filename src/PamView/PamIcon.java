@@ -45,7 +45,7 @@ public class PamIcon {
 				path = "Resources/PAMGuardIcon2.png";
 				break;
 			case OLD:
-				path = "Resources/PAMGuardIcon.png";
+				path = "Resources/pamguardIconM.png";
 				break;
 			}
 		}
