@@ -26,9 +26,7 @@ import PamguardMVC.dataSelector.DataSelector;
 import ai.djl.engine.Engine;
 import annotation.handler.AnnotationHandler;
 import dataPlotsFX.data.TDDataProviderRegisterFX;
-import dataPlotsFX.data.generic.GenericDataPlotProvider;
 import detectionPlotFX.data.DDPlotRegister;
-import generalDatabase.DBControlUnit;
 import generalDatabase.SQLLoggingAddon;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
 import rawDeepLearningClassifier.dataPlotFX.DLDetectionPlotProvider;
@@ -244,7 +242,7 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 //		 * pytorch models will not load. This is a workaround for now and the bug has been logged and 
 //		 * will been fixed in subsequent djl releases. 
 //		 */
-//		Engine.getEngine("PyTorch"); 
+		Engine.getEngine("PyTorch"); 
 
 		// segment the raw sound data
 		addPamProcess(segmenterProcess = new SegmenterProcess(this, rawDataBlock));

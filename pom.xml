@@ -54,7 +54,7 @@
 	<profiles>
 	
 		<!-- The MacOS profile creates a DMG package for installing PAMGuard on MacOS-->
-		<!--Note: Ther eis a Maven bug when using profiles when the plugin order is messed up and seemingly quite random. 
+		<!--Note: There is a Maven bug when using profiles when the plugin order is messed up and seemingly quite random. 
 		In PAMGuard it essential that the shade plugin is called before the macos plugin and so the phase of the 
 		macos bundling has been moved to deploy. To run the bundler we therefore need to put both the macossappbunlder 
 		and exec shell script into the deploy phase so they are never really called. We then explicatelyl call them after 
@@ -102,7 +102,7 @@
 							</dmg>
 							<!--Very important or deep learning does not work-->
 							 <app>
-					            <includeDependencies>false</includeDependencies>
+					            <includeDependencies>true</includeDependencies>
 					        </app>
 					        <jdk>
 								<include>true</include>
@@ -833,7 +833,7 @@
 		<dependency>
 			<groupId>com.google.protobuf</groupId>
 			<artifactId>protobuf-java</artifactId>
-			<version>3.17.0</version>
+			<version>4.29.1</version>
 		</dependency>
 
 		<!-- https://docs.unidata.ucar.edu/netcdf-java/5.2/userguide/using_netcdf_java_artifacts.html -->
@@ -841,7 +841,7 @@
 		<dependency>
 			<groupId>edu.ucar</groupId>
 			<artifactId>netcdfAll</artifactId>
-			<version>4.6.14</version>
+			<version>5.4.1</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.google.protobuf</groupId>

@@ -68,7 +68,7 @@
                 <appendVersion>false</appendVersion>
               </dmg>
               <app>
-                <includeDependencies>false</includeDependencies>
+                <includeDependencies>true</includeDependencies>
               </app>
               <jdk>
                 <include>true</include>
@@ -144,36 +144,11 @@
           <plugin>
             <artifactId>maven-compiler-plugin</artifactId>
             <version>3.12.1</version>
-            <executions>
-              <execution>
-                <id>default-compile</id>
-                <phase>compile</phase>
-                <goals>
-                  <goal>compile</goal>
-                </goals>
-                <configuration>
-                  <release>21</release>
-                  <compilerId>jdt</compilerId>
-                </configuration>
-              </execution>
-              <execution>
-                <id>default-testCompile</id>
-                <phase>test-compile</phase>
-                <goals>
-                  <goal>testCompile</goal>
-                </goals>
-                <configuration>
-                  <release>21</release>
-                  <compilerId>jdt</compilerId>
-                </configuration>
-              </execution>
-            </executions>
             <dependencies>
               <dependency>
                 <groupId>org.eclipse.tycho</groupId>
                 <artifactId>tycho-compiler-jdt</artifactId>
                 <version>1.5.1</version>
-                <scope>compile</scope>
               </dependency>
             </dependencies>
             <configuration>
@@ -206,17 +181,6 @@
                     </transformer>
                     <transformer />
                   </transformers>
-                  <filters>
-                    <filter>
-                      <artifact>*:*</artifact>
-                      <excludes>
-                        <exclude>META-INF/*.SF</exclude>
-                        <exclude>META-INF/*.DSA</exclude>
-                        <exclude>META-INF/*.RSA</exclude>
-                        <exclude>test/resources/**</exclude>
-                      </excludes>
-                    </filter>
-                  </filters>
                 </configuration>
               </execution>
             </executions>
@@ -253,7 +217,7 @@
                   <goal>copy-dependencies</goal>
                 </goals>
                 <configuration>
-                  <outputDirectory>C:\Users\dg50\source\repos\PAMGuardPAMGuard\target/tempDependencies</outputDirectory>
+                  <outputDirectory>${project.build.directory}/tempDependencies</outputDirectory>
                   <overWriteReleases>false</overWriteReleases>
                   <overWriteSnapshots>false</overWriteSnapshots>
                   <overWriteIfNewer>true</overWriteIfNewer>
@@ -271,40 +235,6 @@
                 <goals>
                   <goal>bundle</goal>
                 </goals>
-                <configuration>
-                  <plist>
-                    <JVMMainClassName>pamguard.Pamguard</JVMMainClassName>
-                    <CFBundleIconFile>src/Resources/PamguardIcon2.icns</CFBundleIconFile>
-                    <CFBundleDisplayName>PAMGuard</CFBundleDisplayName>
-                    <CFBundleDevelopmentRegion>English</CFBundleDevelopmentRegion>
-                    <CFBundleURLTypes>
-                      <string>msa</string>
-                    </CFBundleURLTypes>
-                    <JVMVersion>21+</JVMVersion>
-                    <JVMArguments>
-                      <string>-c</string>
-                    </JVMArguments>
-                    <NSAppSleepDisabled>true</NSAppSleepDisabled>
-                  </plist>
-                  <dmg>
-                    <generate>true</generate>
-                    <additionalResources>
-                      <additionalResource>
-                        <directory>C:\Users\dg50\source\repos\PAMGuardPAMGuard/target/bundle/</directory>
-                      </additionalResource>
-                    </additionalResources>
-                    <dmgFileName>Pamguard-2.02.15</dmgFileName>
-                    <appendVersion>false</appendVersion>
-                  </dmg>
-                  <jdk>
-                    <include>false</include>
-                    <location>/Library/Java/JavaVirtualMachines/amazon-corretto-21.jdk</location>
-                  </jdk>
-                  <codesign>
-                    <enable>false</enable>
-                    <identity>3rd Party Mac Developer Application: Jamie Macaulay (7365S9DZ34)</identity>
-                  </codesign>
-                </configuration>
               </execution>
             </executions>
             <configuration>
@@ -326,10 +256,10 @@
                 <generate>true</generate>
                 <additionalResources>
                   <additionalResource>
-                    <directory>C:\Users\dg50\source\repos\PAMGuardPAMGuard/target/bundle/</directory>
+                    <directory>${project.basedir}/target/bundle/</directory>
                   </additionalResource>
                 </additionalResources>
-                <dmgFileName>Pamguard-2.02.15</dmgFileName>
+                <dmgFileName>${project.build.finalName}</dmgFileName>
                 <appendVersion>false</appendVersion>
               </dmg>
               <jdk>
