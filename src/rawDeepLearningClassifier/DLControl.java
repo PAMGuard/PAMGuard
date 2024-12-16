@@ -509,7 +509,7 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	public JMenuItem createDetectionMenu(Frame parentFrame) {
 		JMenuItem menu;
 		if (this.isViewer) {
-			menu = new JMenu("Raw Deep Learning Classifier");
+			menu = new JMenu(getUnitName() + "...");
 
 			JMenuItem menuItem = new JMenuItem("Settings...");
 			menuItem.addActionListener((action) -> {
@@ -527,7 +527,7 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 		else {
 			menu = new JMenuItem();
 			// no need for nested menus if there is only one option.
-			menu.setText("Raw Deep Learning Classifier...");
+			menu.setText(getUnitName() + "...");
 			menu.addActionListener((action) -> {
 				showSettingsDialog(parentFrame);
 			});
