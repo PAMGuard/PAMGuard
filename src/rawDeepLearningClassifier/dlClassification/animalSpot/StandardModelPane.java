@@ -403,7 +403,6 @@ public abstract class StandardModelPane extends SettingsPane<StandardModelParams
 		this.getAdvSettingsPane().setParams(paramsClone);
 		
 		if (paramsClone.modelPath!=null) {
-			//this might 
 			currentSelectedFile = new File(paramsClone.modelPath);
 			
 			//this might change the paramsClone values if the model contains pamguard compatible metadata

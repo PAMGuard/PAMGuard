@@ -125,9 +125,11 @@ public class DelphinIDTransform {
 		
 		double minfragmillis = jsonObjectParams.getDouble("minclks"); 
 		int fftLen = jsonObjectParams.getInt("fft_len"); 
+		boolean spectrumdB = jsonObjectParams.getInt("spectrum_dB") == 1 ? true : false; 
 
 //		params.freqLimits = freqLimits;
 		params.minFragSize = minfragmillis;
+		params.spectrumdB = spectrumdB; 
 		params.setFftLength(fftLen);
 		
 		return params; 

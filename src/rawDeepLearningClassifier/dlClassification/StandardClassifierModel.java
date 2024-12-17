@@ -174,21 +174,23 @@ public abstract class StandardClassifierModel implements DLClassiferModel, PamSe
 		if (getDLWorker().isModelNull()) {
 			return DLStatus.MODEL_LOAD_FAILED;
 		}
-		
+
 		File file = new File(getDLParams().modelPath);
 		if (getDLParams().modelPath == null || !file.isFile()) {
 			return DLStatus.NO_MODEL_LOADED;
 		}
-		
+
 		// if continuous data is selected and all classes are false then this is a
 		// potential mistake...
-		if (dlControl.getSettingsPane().getSelectedParentDataBlock().getUnitClass() == RawDataUnit.class
-				&& (getDLParams().binaryClassification==null || PamArrayUtils.isAllFalse(getDLParams().binaryClassification))){
-			return DLStatus.NO_BINARY_CLASSIFICATION;
-//			warnings.add(new PamWarning("Generic classifier",
-//					"There are no prediction classes selected for classification. "
-//							+ "Predicitons for each segment will be saved but there will be no detections generated",
-//					1));
+		if (dlControl.getSegmenter().getParentDataBlock()!=null) {
+			if (dlControl.getSegmenter().getParentDataBlock().getUnitClass() == RawDataUnit.class
+					&& (getDLParams().binaryClassification==null || PamArrayUtils.isAllFalse(getDLParams().binaryClassification))){
+				return DLStatus.NO_BINARY_CLASSIFICATION;
+				//			warnings.add(new PamWarning("Generic classifier",
+				//					"There are no prediction classes selected for classification. "
+				//							+ "Predicitons for each segment will be saved but there will be no detections generated",
+				//					1));
+			}
 		}
 		return DLStatus.MODEL_LOAD_SUCCESS;
 	}

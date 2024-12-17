@@ -120,6 +120,10 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 	private PamGridPane segmenterGridPane;
 
+	private boolean warningShow;
+
+	private ArrayList<Class> currentAllowedDataTypes;
+
 
 	public DLSettingsPane(DLControl dlControl){
 		super(null); 
@@ -426,9 +430,19 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	 */
 	private void setSourceList(DLClassiferModel currentClassifierModel) {
 		
+		//we don't want to set the source list again and gain if the model has changed. 
+		if (currentClassifierModel==null) {
+			setDefaultSourceList();
+			currentAllowedDataTypes=null;
+			return;
+		}
+		
 		//System.out.println("SET SOURCE LIST: " + currentClassifierModel.getAllowedDataTypes()); 
+		
+		if (isNewDataType(currentAllowedDataTypes, currentClassifierModel.getAllowedDataTypes()))  {
 		//set the source list for a given classifier model. 
 		if (currentClassifierModel.getAllowedDataTypes()==null) {
+			//default is for models to require raw sound data
 			setDefaultSourceList() ;
 		}
 		else {
@@ -439,13 +453,25 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 				sourcePane.addSourceType(type, false);
 			}
 		}
-		
+			currentAllowedDataTypes = currentClassifierModel.getAllowedDataTypes();
+		}
 		//System.out.println("SET SOURCE LIST: " + sourcePane.getSourceCount()); 
 
-		//soemthing has gone wrong but at least have sound acquisition for  samplerate.  
+		//something has gone wrong but at least have sound acquisition for  sample rate.  
 		if  (sourcePane.getSourceCount()<=0) {
-			setDefaultSourceList() ;
+			setDefaultSourceList();
 		}
+	}
+	
+	private boolean isNewDataType(ArrayList<Class> currentAllowedDataTypes1, ArrayList<Class> currentAllowedDataTypes2) {
+		
+		if (currentAllowedDataTypes1==null && currentAllowedDataTypes2!=null) return true;
+		if (currentAllowedDataTypes2==null && currentAllowedDataTypes1!=null) return true;
+		if (currentAllowedDataTypes2==null && currentAllowedDataTypes1==null) return false;
+		if (!currentAllowedDataTypes2.equals(currentAllowedDataTypes2)) return true;
+		
+		return false;
+
 	}
 
 
@@ -548,6 +574,7 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	 */
 	public void showWarning(DLStatus dlWarning) {
 		ArrayList<PamWarning> dlWarnings = new ArrayList<PamWarning>();
+		
 		dlWarnings.add(statusToWarnings(dlWarning)); 
 		showWarning(dlWarnings); 
 	}
@@ -568,6 +595,10 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 	 * @param dlWarnings - list of warnings - the most important will be shown. 
 	 */
 	public void showWarning(ArrayList<PamWarning> dlWarnings) {
+		
+		System.out.println("Show warning: " + dlWarnings);
+		
+		if (warningShow) return; //not the best but don't show multiple dialogs on top of each other. 
 
 		if (dlWarnings==null || dlWarnings.size()<1) return; 
 
@@ -582,10 +613,12 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 			}
 		}
 
+		this.warningShow = true; 
 		final String warningsF = warnings; 
-		final boolean errorF = error; 
+		final boolean errorF = error;
 		Platform.runLater(()->{
 			WarnOnce.showWarningFX(null,  "Deep Learning Settings Warning",  warningsF , errorF ? AlertType.ERROR : AlertType.WARNING);
+			warningShow = false;
 			//			WarnOnce.showWarning( "Deep Learning Settings Warning",  warningsF , WarnOnce.WARNING_MESSAGE);
 		});
 
@@ -621,12 +654,13 @@ public class DLSettingsPane  extends SettingsPane<RawDLParams>{
 
 		segEnableSwitch.setSelected(currParams.enableSegmentation);
 
-		enableControls(); 
-
 		//		//set up the model and the custom pane if necessary.  
 		this.modelSelectPane.loadNewModel(currParams.modelURI); 
 		//this.modelSelectPane.updatePathLabel(); 
 		this.setClassifierPane();
+		
+		
+		enableControls(); 
 
 		//For some reason, in the FX GUI, this causes a root used in multiple scenes exceptions...not sure why. 
 		Platform.runLater(()->{
