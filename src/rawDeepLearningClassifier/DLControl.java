@@ -28,6 +28,7 @@ import annotation.handler.AnnotationHandler;
 import dataPlotsFX.data.TDDataProviderRegisterFX;
 import detectionPlotFX.data.DDPlotRegister;
 import generalDatabase.SQLLoggingAddon;
+import pamScrollSystem.AbstractScrollManager;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
 import rawDeepLearningClassifier.dataPlotFX.DLDetectionPlotProvider;
 import rawDeepLearningClassifier.dataPlotFX.DLPredictionProvider;
@@ -242,7 +243,7 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 //		 * pytorch models will not load. This is a workaround for now and the bug has been logged and 
 //		 * will been fixed in subsequent djl releases. 
 //		 */
-		Engine.getEngine("PyTorch"); 
+//		Engine.getEngine("PyTorch"); 
 
 		// segment the raw sound data
 		addPamProcess(segmenterProcess = new SegmenterProcess(this, rawDataBlock));
@@ -273,6 +274,9 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 //		//set database logging for group detections
 		dlClassifyProcess.getDLGroupDetectionDataBlock().SetLogging(dlGroupDetLogging = new DLGroupDetectionLogging(this, dlClassifyProcess.getDLGroupDetectionDataBlock()));
 		dlGroupDetLogging.setSubLogging(new DLGroupSubLogging(dlGroupDetLogging, dlClassifyProcess.getDLGroupDetectionDataBlock()));
+//		int maxndays = 1; //maximum days to load. 
+//		AbstractScrollManager.getScrollManager().addToSpecialDatablock(dlClassifyProcess.getDLGroupDetectionDataBlock(), maxndays*24*60*60*1000L , maxndays*24*60*60*1000L);
+
 		
 		//a little strange this is not automatic but seems you have to add SQL add ons explicitly. 
 		AnnotationHandler annotationHandler = dlClassifyProcess.getDLGroupDetectionDataBlock().getAnnotationHandler();

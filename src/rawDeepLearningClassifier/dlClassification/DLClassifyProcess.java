@@ -14,6 +14,7 @@ import PamguardMVC.PamDataUnit;
 import PamguardMVC.PamInstantProcess;
 import PamguardMVC.PamObservable;
 import binaryFileStorage.DataUnitFileInformation;
+import pamScrollSystem.AbstractScrollManager;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.RawDLParams;
 import rawDeepLearningClassifier.layoutFX.DLDetectionGraphics;
@@ -127,6 +128,7 @@ public class DLClassifyProcess extends PamInstantProcess {
 		dlGroupDetectionDataBlock.setNaturalLifetimeMillis(600*1000); //keep this data for a while.
 		dlGroupDetectionDataBlock.addDataAnnotationType(dlAnnotationType);
 		dlGroupDetectionDataBlock.setCanClipGenerate(true); 
+		
 
 		classificationBuffer =  new ArrayList<PamDataUnit>(); 
 

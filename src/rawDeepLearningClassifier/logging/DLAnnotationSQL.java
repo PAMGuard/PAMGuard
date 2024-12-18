@@ -69,7 +69,7 @@ public class DLAnnotationSQL implements SQLLoggingAddon   {
 	public boolean loadData(SQLTypes sqlTypes, EmptyTableDefinition pamTableDefinition, PamDataUnit pamDataUnit) {
 
 		String predictionsString = (String) predictionsItem.getValue();
-		Integer predicitonType = (Integer) predictionsItem.getValue();
+		Integer predicitonType = (Integer) typeTableItem.getValue();
 
 		if (predictionsString!=null) {
 
@@ -116,12 +116,14 @@ public class DLAnnotationSQL implements SQLLoggingAddon   {
 	    	predictions= new float[array.getJSONArray(i).length()];
 	    	
 	    	for(int j=0; j< array.getJSONArray(i).length(); j++) {
-	    		predictions[j] =  array.getJSONArray(i).getFloat(j);
+	    		predictions[j] =  array.getJSONArray(i).getBigDecimal(j).floatValue();
 	    	}
 	    	
 	    	predicitonResult= ModelResultBinaryFactory.makePredictionResult(predicitonType, predictions, classIDs,  true); 
 	    	modelResults.add(predicitonResult); 
 	    }
+	    
+	    
 	    
 	    return modelResults;
 	}

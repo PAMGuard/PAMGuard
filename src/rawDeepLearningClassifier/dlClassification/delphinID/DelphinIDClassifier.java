@@ -111,6 +111,8 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 	public ArrayList<? extends PredictionResult> runModel(ArrayList<? extends PamDataUnit> groupedRawData) {
 
 		//add an extra test to see if the detection pre count has passed. 
+		
+		//System.out.println("Run delphinID model: " + (((SegmenterDetectionGroup) groupedRawData.get(0)).getSubDetectionsCount()));
 
 		if (detectionPreFilter(groupedRawData)) {
 			return super.runModel(groupedRawData);
@@ -139,7 +141,7 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 			return true;
 		}
 
-		return true;
+		return false;
 	}
 
 	private boolean whistlePreFilter(ArrayList<? extends PamDataUnit> groupedRawData) {
@@ -160,7 +162,7 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 			return false;
 		}
 
-		System.out.println("Run DelphinID model: " +  groupedRawData.size() + " min density: " + delphinIDParams.minDetectionValue); 
+		//System.out.println("Run DelphinID model: " +  groupedRawData.size() + " min density: " + delphinIDParams.minDetectionValue); 
 
 		double density = DelphinIDUtils.getDensity((SegmenterDetectionGroup) groupedRawData.get(0)); 
 
@@ -168,7 +170,7 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 			return true;
 		}
 
-		return true;
+		return false;
 	}
 
 	@Override

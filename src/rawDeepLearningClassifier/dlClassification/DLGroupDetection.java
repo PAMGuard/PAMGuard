@@ -18,5 +18,35 @@ public class DLGroupDetection extends SegmenterDetectionGroup implements PamDete
 	}
 
 
+	public DLGroupDetection(long timeMilliseconds, int channelBitmap, long startSample, double duration) {
+		super(timeMilliseconds, channelBitmap, startSample, duration);
+	}
+
+	@Override
+	public double[] getFrequency() {
+		if ((super.getFrequency()==null || super.getFrequency()[0]  == super.getFrequency()[1]) && this.getSubDetectionsCount()>0) {
+			System.out.println("Rcalc frequency: "); 
+
+			double minFreq =  Double.POSITIVE_INFINITY;
+			double maxFreq =  Double.NEGATIVE_INFINITY;
+
+			double[] freq;
+			for (int j=0; j<getSubDetectionsCount(); j++) {
+
+
+				freq = getSubDetection(j).getFrequency();
+				if (freq[0]<minFreq) {
+					minFreq = freq[0];
+				}
+				if (freq[1]>maxFreq) {
+					maxFreq = freq[1];
+				}
+
+			}
+			this.setFrequency(new double[] {minFreq, maxFreq});
+		}
+		return super.getFrequency();
+	}
+
 
 }

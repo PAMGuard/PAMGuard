@@ -99,7 +99,11 @@ public class ClickFFTPlotManager2 extends FFTPlotManager  {
 		}
 		else {
 			double[] spectrum=((ClickDetection) detection).getPowerSpectrum(chanClick, clickPlotInfoFX.isViewer() ? true : false);
-			spectrum=((ClickDetection) detection).getPowerSpectrum(chanClick, clickPlotInfoFX.isViewer() ? true : false);
+			
+			if (spectrum==null) spectrum=((ClickDetection) detection).getPowerSpectrum(chanClick, true);
+			if (spectrum ==null) {
+				System.err.println("ClickPlotFFTManager2: Spectrum for the click is null?"); 
+			}
 			drawClickFFT(Arrays.copyOf(spectrum, spectrum.length),  pamDataUnit.getTimeMilliseconds(),  writableImage.getScrollingPLot2DSegmenter().getMaxY(),  writableImage);
 		}
 	}
