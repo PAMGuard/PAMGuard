@@ -25,12 +25,14 @@ import PamguardMVC.PamRawDataBlock;
 import PamguardMVC.dataSelector.DataSelector;
 import ai.djl.engine.Engine;
 import annotation.handler.AnnotationHandler;
+import clickTrainDetector.layout.ClickTrainSymbolManager;
 import dataPlotsFX.data.TDDataProviderRegisterFX;
 import detectionPlotFX.data.DDPlotRegister;
 import generalDatabase.SQLLoggingAddon;
 import pamScrollSystem.AbstractScrollManager;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
 import rawDeepLearningClassifier.dataPlotFX.DLDetectionPlotProvider;
+import rawDeepLearningClassifier.dataPlotFX.DLGroupSymbolManager;
 import rawDeepLearningClassifier.dataPlotFX.DLPredictionProvider;
 import rawDeepLearningClassifier.ddPlotFX.RawDLDDPlotProvider;
 import rawDeepLearningClassifier.defaultModels.DLDefaultModelManager;
@@ -298,6 +300,8 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 		overlayGraphics = new DLDetectionGraphics(dlClassifyProcess.getDLGroupDetectionDataBlock());
 		overlayGraphics.setDetectionData(true);
 		dlClassifyProcess.getDLGroupDetectionDataBlock().setOverlayDraw(overlayGraphics);
+		dlClassifyProcess.getDLGroupDetectionDataBlock().setPamSymbolManager(new DLGroupSymbolManager(dlClassifyProcess.getDLGroupDetectionDataBlock()));
+
 		
 		//set the symbol managers. 
 		dlClassifyProcess.getDLDetectionDatablock()

@@ -46,11 +46,11 @@ public class DLGroupDetectionInfoFX extends GenericDataPlotInfo {
 			TDProjectorFX tdProjector, int type) {
 
 		if (getCurrentScaleInfo().getDataType() == ParameterType.FREQUENCY) { // frequency data !
-			System.out.println("Draw frequency: " + pamDataUnit.getFrequency()[0] + "  " +  pamDataUnit.getFrequency()[1]); 
+//			System.out.println("Draw frequency: " + pamDataUnit.getFrequency()[0] + "  " +  pamDataUnit.getFrequency()[1]); 
 			return drawFrequencyData(plotNumber, pamDataUnit, g, scrollStart, tdProjector, type);
 		}
 		else if (getCurrentScaleInfo().getDataType() == ParameterType.AMPLITUDE || getCurrentScaleInfo().getDataType() == ParameterType.AMPLITUDE_STEM) {
-			System.out.println("Draw amplitude: "); 
+//			System.out.println("Draw amplitude: "); 
 			double[] amplitudes  = getAmplitudes(pamDataUnit);
 			return super.drawBoxData(plotNumber, pamDataUnit, amplitudes, g, scrollStart, tdProjector, type); 
 		}

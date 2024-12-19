@@ -25,7 +25,6 @@ public class DLGroupDetection extends SegmenterDetectionGroup implements PamDete
 	@Override
 	public double[] getFrequency() {
 		if ((super.getFrequency()==null || super.getFrequency()[0]  == super.getFrequency()[1]) && this.getSubDetectionsCount()>0) {
-			System.out.println("Rcalc frequency: "); 
 
 			double minFreq =  Double.POSITIVE_INFINITY;
 			double maxFreq =  Double.NEGATIVE_INFINITY;
