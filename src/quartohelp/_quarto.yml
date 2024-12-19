@@ -37,6 +37,7 @@ website:
           - overview/PamMasterHelp/docs/normalMode.qmd
           - overview/PamMasterHelp/docs/viewerMode.qmd
           - overview/PamMasterHelp/docs/mixedMode.qmd
+          - overview/PamMasterHelp/docs/PamdogHelp.qmd
       - section: "Core Features "
         contents:
           - overview/PamMasterHelp/docs/guiOverview.qmd
@@ -155,7 +156,6 @@ website:
             contents:
               - utilities/tethys/docs/tethys_overview.qmd
               - utilities/tethys/docs/tethys_module.qmd
-              - utilities/tethys/docs/tethys_server.qmd
               - utilities/tethys/docs/connection.qmd
               - utilities/tethys/docs/calibrations.qmd
               - utilities/tethys/docs/deployments.qmd
@@ -470,7 +470,7 @@ website:
             contents:
               - visual_methods/loggerFormsHelp/docs/loggerFormsOverview.qmd
               - visual_methods/loggerFormsHelp/docs/designingForms.qmd
-  
+              
 format:
   html:
     theme: cosmo

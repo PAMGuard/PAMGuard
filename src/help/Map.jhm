@@ -96,6 +96,8 @@
 
 <mapID target="classifiers.roccaHelp.docs.rocca_ContourExtractionManipulation_manual" url="classifiers/roccaHelp/docs/rocca_ContourExtractionManipulation.html#manual"/>
 
+<mapID target="overview.PamMasterHelp.docs.PamdogHelp" url="overview/PamMasterHelp/docs/PamdogHelp.html"/>
+
 <mapID target="classifiers.roccaHelp.docs.rocca_Configure_rocca_SchoolStatsFile" url="classifiers/roccaHelp/docs/rocca_Configure.html#rocca_SchoolStatsFile"/>
 
 <mapID target="localisation.docs.localisation_tdoa" url="localisation/docs/localisation_tdoa.html"/>

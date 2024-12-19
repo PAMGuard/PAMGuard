@@ -50,7 +50,7 @@ public class QuartoMigrate {
 
 	public static void main(String[] args) {
 		QuartoMigrate qm = new QuartoMigrate();
-		qm.convertSource(new File(qm.helpsrc));
+//		qm.convertSource(new File(qm.helpsrc));
 		qm.convertIndex();
 	}
 

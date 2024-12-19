@@ -15,6 +15,8 @@
 
   <tocitem text="Mixed Mode operation " target="overview.PamMasterHelp.docs.mixedMode" image="topic"/>
 
+  <tocitem text="PAMGuard WatchDog " target="overview.PamMasterHelp.docs.PamdogHelp" image="topic"/>
+
  </tocitem>
  <tocitem text="Core Features ">
   <tocitem text="Graphical User Interface " target="overview.PamMasterHelp.docs.guiOverview" image="topic"/>
