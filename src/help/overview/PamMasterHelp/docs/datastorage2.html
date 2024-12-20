@@ -18,15 +18,15 @@
 or via some other software. However, the database interface can be slow and the database is very inefficient at handling variable length records, such as the 
 waveform of a click, or the contour of a whistle. </p>
 <p>The Binary store is fast and is great at handling any type of data, but the files are impossible to read except 
-with proprietary computer software. You can of course work out the format of these files by looking in the source code and we 
-hope in the future to release a suite of Matlab functions which can read the binary files. </p>
+with proprietary computer software. You can of course work out the format of these files by looking in the source code and 
+there are software packages for <a href="../../../utilities/BinaryStore/docs/matlabandr.html">Matlab and R</a> which can read the binary files. 
 
 <p>Some modules can only write to the database and some only to the binary store. Some modules, on the other hand, offer the 
 choice of writing to both. </p>
 <p>For all modules, the user can control whether or not data are stored in each location. This is controlled from
 the File/Storage options menu. Selecting this menu command will bring up a dialog looking something like this:</p>
 
-<p><img src="./images/storageoptions.png" alt="Calibration" /></p>
+<p><img src="./images/storageoptions.png"></p>
 <p>Although the exact appearance will of course depend on which modules are loaded. </p>
 <p>Generally, you are advised to make sure that all data are being stored in at least one of the locations and you should 
 be aware that for data which have both options, it's quite possible that less data will be stored in the database than in the 

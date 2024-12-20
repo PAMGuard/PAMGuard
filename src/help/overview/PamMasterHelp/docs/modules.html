@@ -13,10 +13,14 @@
 	<p>PAMGuard contains of an ever growing number of plug-in modules,
 		each of which performs some sort of data handling task. Individual
 		modules may do anything from acquiring sound data, to managing a
-		database or searching for a particular sound type. Generally, every
+		database, or searching for a particular sound type. Generally, every
 		module will acquire data either from another module, or through some
 		external interface (such as a sound card, GPS or depth sensor
-		readout). The output of a module may be a display, more data or both.
+		readout). The output of a module may be a display, more data or both. Data might be
+		stores in the 
+		<a href="../../../utilities/generalDatabaseHelp/docs/database_database.html">PAMGuard database</a> or 
+		<a href="../../../utilities/BinaryStore/docs/binarystore_overview.html">binary store</a>, or might just be there for other modules
+		to subscribe to. 
 		A single module may have multiple output data streams. For instance,
 		the sound acquisition module primarily outputs raw audio data to other
 		PAMGuard modules, but also outputs data providing a record of when
