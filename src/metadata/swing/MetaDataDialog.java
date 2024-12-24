@@ -69,7 +69,7 @@ public class MetaDataDialog extends PamDialog {
 		mainPanel.add(tabbedPane, BorderLayout.CENTER);
 		tabbedPane.add(northPanel, "General");
 		tabbedPane.add(descriptionPanel.getMainPanel(), "Description");
-		tabbedPane.add(dpPanel, "Deployment");
+//		tabbedPane.add(dpPanel, "Deployment");
 		
 		setResizable(true);
 		

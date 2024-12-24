@@ -1,24 +1,32 @@
 package quartohelp;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.ListIterator;
 
+import org.jsoup.Jsoup;
+import org.jsoup.parser.Tag;
+import org.jsoup.select.Elements;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import io.github.furstenheim.CopyDown;
@@ -33,6 +41,11 @@ import javax.xml.parsers.ParserConfigurationException;
 /**
  * Functions to convert the existing javahelp html files to quarto qmd files
  * and automatically create a help side bar. 
+ * <br>To use this, you need to set the source and dest folders, then run main.
+ * you then need to copy the text output into the yaml file for the quarto project.  <br>
+ * It messes up the table of modules, so you then need to launch PAMGuard in viewer mode with the
+ * -smrudev option, export the table and copy the text back into the qmd file. 
+ *  
  * @author dg50
  *
  */
@@ -40,6 +53,16 @@ public class QuartoMigrate {
 
 	String helpsrc = "C:\\Users\\dg50\\source\\repos\\PAMGuardPAMGuard\\src\\help";
 	String helpdst = "C:\\Users\\dg50\\source\\repos\\PAMGuardPAMGuard\\src\\quartohelp";
+
+	String tblStart = "<table";
+	String tblEnd = "</table>";
+	String hdStart = "<th";
+	String hdEnd = "</th>";
+	String rowStart = "<tr";
+	String rowEnd = "</tr>";
+	String dStart = "<td";
+	String dEnd = "</td>";
+	String vertLine = "jalgfjajgfkda";
 
 	/**
 	 * Fu
@@ -50,8 +73,8 @@ public class QuartoMigrate {
 
 	public static void main(String[] args) {
 		QuartoMigrate qm = new QuartoMigrate();
-//		qm.convertSource(new File(qm.helpsrc));
-		qm.convertIndex();
+		qm.convertSource(new File(qm.helpsrc));
+//		qm.convertIndex();
 	}
 
 	/**
@@ -71,6 +94,7 @@ public class QuartoMigrate {
 			else if (name.endsWith(".html")) {
 //				convertHTMLFile(aFile);
 				convertToMD(aFile);
+//				convertToMD2(aFile);
 			}
 			else if (isImage(aFile)){
 				// just copy the file since we'll probably want it ? 
@@ -93,7 +117,7 @@ public class QuartoMigrate {
 		}
 	}
 
-	String[] imFiles = {".png", ".jpg", ".jpeg", ".bmp"};
+	String[] imFiles = {".png", ".jpg", ".jpeg", ".bmp", ".gif"};
 
 	private boolean isImage(File aFile) {
 		String fn = aFile.getName().toLowerCase();
@@ -107,12 +131,15 @@ public class QuartoMigrate {
 
 
 	private void convertToMD(File aFile) {
-		System.out.println("Converting to quarto from " + aFile.getAbsolutePath());
+//		System.out.println("Converting to quarto from " + aFile.getAbsolutePath());
 		checkDestFolder(aFile);
 		String srcName = aFile.getAbsolutePath();
 		String dstName = srcName.replace(helpsrc, helpdst);
 		dstName = dstName.replace(".html", ".qmd");
 		File dstFile = new File(dstName);
+//		if (srcName.contains("modules.html")) {
+//			System.out.println(srcName);
+//		}
 		
 		String h2 = null;
 		ArrayList<String> html = new ArrayList();
@@ -141,9 +168,19 @@ public class QuartoMigrate {
 		String md = null;
 		try {
 			String text = new String(Files.readAllBytes(aFile.toPath()), StandardCharsets.UTF_8);
+			if (text.contains("<table")) {
+				System.out.println(" table in "  + srcName);
+			}
+//			else {
+//				return;
+//			}
+//			if (srcName.contains("nNIDAQ.html")) {
+//				System.out.println("Pause");
+//			}
+			text = fixTables(text);
 			text = removeHead(text);
 			text = text.replace("PAMGUARD", "PAMGuard");
-			 md = copydown.convert(text);
+			md = copydown.convert(text);
 //			System.out.println(md);
 			if (h2 == null) {
 				int firstRet = md.indexOf("\n");
@@ -155,18 +192,21 @@ public class QuartoMigrate {
 					h2 = dstFile.getName();
 					h2.replace(".qmd", "");
 				}
-				
 			}
+			md = removeXtraHeadings(md, h2);
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
+		// finish fixing the table proble,
+		md = md.replace(vertLine, "|");
+		md = md.replace("|\r\n", "|");
 		try {
-			BufferedWriter br = new BufferedWriter(new FileWriter(dstFile));
+			BufferedOutputStream br = new BufferedOutputStream(new FileOutputStream(dstFile));
 			writeHeaderMD(br, h2);
-			br.write(md);
+			br.write(md.getBytes());
 			br.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -176,6 +216,353 @@ public class QuartoMigrate {
 		
 	}
 	
+	/**
+	 * Try a manual replacement of table text. 
+	 * @param text
+	 * @return
+	 */
+	private String fixTables(String text) {
+		int ind = 0;
+		while (true) {
+//			ind = text.indexOf(tblStart, ind);
+			int startInd = text.indexOf(tblStart);
+			ind = tagEnd(text, tblStart, ind);
+			if (ind < 0) {
+				return text;
+			}
+			ind = text.indexOf(tblEnd, ind+1);
+			int endInd = ind + tblEnd.length();
+			// now find rows within that space. 
+			// first try to find a header.
+			String tblHtml = text.substring(startInd, endInd);
+			String tblText = "\r\n";
+			int rInd = 0;
+			int nRows = 0;
+			while (true) {
+//				int hS = text.indexOf(hdStart, rInd);
+//				int hE = text.indexOf(hdEnd, rInd);
+//				if (hS >= 0) {
+//					String row = makeMDRow(text, hS, hE);
+//					tblText += row;
+//					rInd = hE;
+//					continue;
+//				}
+//				int rS = text.indexOf(rowStart, rInd);
+				int rS = tagEnd(tblHtml, rowStart, rInd);
+				int rE = tblHtml.indexOf(rowEnd, rInd);
+				if (rS >= 0) {
+					String row = makeMDRow(tblHtml, rS, rE, nRows++);
+					tblText += "<p>" + row ;
+					rInd = rE + rowEnd.length();
+					continue;
+				}
+				break;
+			}
+			String old = text.substring(startInd, endInd);
+//			System.out.println("replace " + old);
+//			System.out.println("with " + tblText);
+			String old1 = text.substring(0, startInd);
+			String old2 = text.substring(endInd);
+			text = old1 + "<br><p>" + tblText + "<p><br><br><p>" + old2;
+//			return tblText;
+		}
+		
+//		return text;
+	}
+	
+	private int tagEnd(String text, String tag, int startInd) {
+		int ind = text.indexOf(tag, startInd);
+		if (ind < 0) {
+			return ind;
+		}
+		ind = text.indexOf(">", ind+tag.length());
+		if (ind < 0) {
+			return ind;
+		}
+		return ind+1;
+	}
+
+	/**
+	 * Pull out  arow of data from between the hS and hE
+	 * @param text
+	 * @param hS
+	 * @param hE
+	 * @param nRows 
+	 * @return
+	 */
+	private String makeMDRow(String text, int hS, int hE, int nRows) {
+		text = text.substring(hS, hE);
+		if (text.contains("Era designator")) {
+			System.out.println("Era designator");
+		}
+		boolean isHead = (text.indexOf(hdStart) >= 0) || nRows == 0;
+		text = text.replace(hdStart, dStart);
+		text = text.replace(hdEnd, dEnd);
+		int ind = 0;
+		String row = vertLine + " ";
+		String headRow = vertLine + "";
+		while (true) {
+//			int s = text.indexOf(dStart, ind);
+			int s = tagEnd(text, dStart, ind);
+			int e = text.indexOf(dEnd, ind);
+			if (s < 0) {
+				break;
+			}
+			String dat = text.substring(s, e);
+			// remove any returns in the row .
+			dat = dat.replace('\r', ' ');
+			dat = dat.replace('\n', ' ');
+			dat = removeRowPs(dat);
+			row += dat + " " + vertLine + " ";
+			headRow += "----" + vertLine;
+			ind = e + dEnd.length();
+		}
+//		row += "<br>";
+		if (isHead) {
+			row +=  "<p>" + headRow ;
+		}
+		return row;
+	}
+
+	/**
+	 * Remove paragraph marks from row data since they screw it. 
+	 * @param dat
+	 * @return
+	 */
+	private String removeRowPs(String dat) {
+		int ind = 0;
+		while (true) {
+			int pS = dat.indexOf("<p",0);
+			if (pS < 0) {
+				break;
+			}
+			int pE = tagEnd(dat, "<p", 0);
+			dat = dat.substring(0, pS) + " " + dat.substring(pE);
+		}
+		dat = dat.replace("</p>", " ");
+		
+		return dat;
+	}
+
+	/**
+	 *  other lib didn't handle tables. Try a DIY approach.  
+	 * @param aFile
+	 */
+	private void convertToMD2(File aFile) {
+		// TODO Auto-generated method stub
+		System.out.println("Converting file " + aFile.getAbsolutePath());
+		checkDestFolder(aFile);
+		String srcName = aFile.getAbsolutePath();
+		String dstName = srcName.replace(helpsrc, helpdst);
+		dstName = dstName.replace(".html", ".qmd");
+		File dstFile = new File(dstName);
+		if (srcName.contains("FileTimeZone.html")) {
+			System.out.println("modules page");
+		}
+//		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+//		dbf.setValidating(false);
+////		dbf.setNamespaceAware(true);
+//		dbf.setIgnoringComments(true);
+//		dbf.setIgnoringElementContentWhitespace(true);
+////		dbf.setExpandEntityReferences(false);
+//		Document doc = null;
+//		try {
+//			DocumentBuilder db = dbf.newDocumentBuilder();
+//			doc = db.parse(new InputSource(new FileReader(aFile)));
+//		} catch (SAXException | IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//			return;
+//		} catch (ParserConfigurationException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//			return;
+//		}
+//		System.out.println(doc);
+//		NodeList nodes = doc.getChildNodes();
+//		System.out.printf("Nodes in %s is %d\n", aFile.getAbsoluteFile(), nodes.getLength());
+		
+		String h2 = null;
+		ArrayList<String> html = new ArrayList();
+		try {
+			BufferedReader br = new BufferedReader(  new FileReader(aFile));
+			while (true) {
+				String aL = br.readLine();
+				if (aL == null) {
+					break;
+				}
+				html.add(aL);
+			}
+			br.close();
+
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		h2 = findHeading(html);
+		
+		
+		org.jsoup.nodes.Document doc = null;
+		try {
+			doc = Jsoup.parse(aFile, null);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Elements body = doc.getElementsByTag("body");
+		
+//		org.jsoup.nodes.Element body = doc.getElementById("content");
+		Elements els = body.first().children();
+		ListIterator<org.jsoup.nodes.Element> it = els.listIterator();
+		String md = "";
+		String dblBreak = "\r\n\r\n";
+		while (it.hasNext()) {
+			org.jsoup.nodes.Element el = it.next();
+			Tag tag = el.tag();
+			String tagType = tag.getName().toLowerCase();
+			String t = el.ownText();
+			String h = el.html();
+//			System.out.println(t);
+//			System.out.println(h);
+			switch (tagType) {
+			case "html":
+			case "body":
+			case "#root":
+			case "em":
+			case "head":
+			case "strong":
+				continue;
+			case "h1":
+				md += "\r\n# " + el.ownText() + dblBreak;
+				break;
+			case "h2":
+				md += "\r\n## " + el.ownText() + dblBreak;
+				break;
+			case "h3":
+				md += "\r\n### " + el.ownText() + dblBreak;
+				break;
+			case "h4":
+				md += "\r\n#### " + el.ownText() + dblBreak;
+				break;
+			case "p":
+			case "P":
+			case "section":
+//				md += el.html() + dblBreak;
+				md += t + dblBreak;
+				break;
+			case "center":
+				md += "<center>" + el.ownText() + "<\\center>" + dblBreak;
+				break;
+			case "table":
+
+				md += "<"+tagType+">" + h + "<\\"+tagType+">" + dblBreak;
+				break;
+			case "a":
+				String href = el.attr("href");
+				String name = el.attr("name");
+				int nChild = el.childNodes().size();
+				String txt = "";
+				if (nChild > 0) {
+					org.jsoup.nodes.Node nn = el.childNode(0);
+					txt = nn.toString();
+				}
+				if (href != null && href.length() > 0) {
+					md += "[" + txt + "](" + href + ")";
+				}
+				else if (name != null && name.length() > 0) {
+					md += "[" + txt + "](#" + name + ")";
+				}
+				
+				break;
+			case "br":
+				md += "\r\n";
+				break;
+			case "img":
+				Elements srcEl = el.getElementsByAttribute("src");
+				String src1 = el.attr("src");
+				String width = el.attr("width");
+				md += "\r\n![](" + src1 + ")\r\n";
+				break;
+			default:
+				System.out.println("Unknown tag: " + tagType);
+				// dump the contents anyway, with the tag.
+
+				md += "<"+tagType+">" + el.ownText() + "<\\"+tagType+">" + dblBreak;
+				break;
+			}
+		}
+//		System.out.println(md);
+//		try {
+//			BufferedWriter br = new BufferedWriter(new FileWriter(dstFile));
+//			writeHeaderMD(br, h2);
+//			br.write(md);
+//			br.close();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+	}
+	
+
+	/**
+	 * Ending up with multiple repeated heading since Quarto adds the document title 
+	 * into the main document at the top. <br>
+	 * Remove any heading that is the same text as h2
+	 * See how many headings there are before body and remove all but the last. 
+	 * @param md
+	 * @param h2
+	 * @return
+	 */
+	private String removeXtraHeadings(String md, String h2) {
+		String[] lines = md.split("\n");
+		boolean[] toSkip = new boolean[lines.length];
+		if (h2 != null) {
+			// is this split into lines ? 
+		}
+//		if (md.contains("Configuring the NMEA Data Source")) {
+//			System.out.println("Configuring the NMEA Data Source");
+//		}
+		String lastHeading = null;
+		// skip all headings before the body in every file.
+		for (int i = 0; i < lines.length; i++) {
+			if (lines[i].length() == 0) {
+				continue;
+			}
+			int isTitLine = 0;
+			if (lines[i].startsWith("#")) {
+				isTitLine = 1; // line is not a heading 
+			}
+			else {
+				// is it old style
+				if (i < lines.length-1 && (lines[i+1].startsWith("===") || lines[i+1].startsWith("---"))) {
+					isTitLine = 2;
+				}
+			}
+			if (isTitLine == 0) {
+				break;
+			}
+			for (int t = 0; t < isTitLine; t++) {
+				toSkip[i+t] = true;
+			}
+			if (isTitLine > 1) {
+				i += isTitLine-1;
+			}
+		}
+		
+		String newMD = "";
+		for (int i = 0; i < lines.length; i++) {
+			if (toSkip[i]) {
+				continue;
+			}
+			newMD += lines[i] + "\r\n"; 
+		}
+		return newMD;
+	}
+	
+
 	/**
 	 * Remove the xml between <head> and </head>
 	 * @param text
@@ -191,13 +578,13 @@ public class QuartoMigrate {
 		return text;
 	}
 
-	private void writeHeaderMD(BufferedWriter br, String h2) throws IOException {
-		br.write("---\r\n");
+	private void writeHeaderMD(BufferedOutputStream br, String h2) throws IOException {
+		br.write(new String("---\r\n").getBytes());
 		if (h2 != null) {
 			h2 = h2.trim();
-			br.write(String.format("title: \"%s\"\r\n", h2));
+			br.write(String.format("title: \"%s\"\r\n", h2).getBytes());
 		}
-		br.write("---\r\n");
+		br.write(new String("---\r\n").getBytes());
 	}
 
 	private void convertHTMLFile(File aFile) {

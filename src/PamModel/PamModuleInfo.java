@@ -33,6 +33,7 @@ public class PamModuleInfo implements PamDependent{
 	private Class moduleClass;
 	private String toolTipText;
 	private String helpPoint;
+	private int allowedModes = PamPluginInterface.ALLMODES;
 	
 	private static final Class[] constrParams1 = {PamConfiguration.class, String.class};
 	private static final Class[] constrParams2 = {String.class};
@@ -337,6 +338,10 @@ public class PamModuleInfo implements PamDependent{
 			if (mi.isHidden()) {
 				continue;
 			}
+			if (mi.availableInMode() == false) {
+				continue;
+			}
+			
 			
 			//System.out.println("PamModuleInfo getmodules menu " + moduleList.get(i).getDescription());
 			menuItem = new JMenuItem(mi.toString());
@@ -643,7 +648,37 @@ public class PamModuleInfo implements PamDependent{
 		this.helpPoint = helpPoint;
 	}
 
+	/**
+	 * @return the allowedModes
+	 */
+	public int getAllowedModes() {
+		return allowedModes;
+	}
 
+	/**
+	 * @param allowedModes the allowedModes to set
+	 */
+	public void setAllowedModes(int allowedModes) {
+		this.allowedModes = allowedModes;
+	}
+
+	/**
+	 * Is this module available in this mode ? 
+	 * @return true if available. 
+	 */
+	public boolean availableInMode() {
+		if (allowedModes == PamPluginInterface.ALLMODES) {
+			return true;
+		}
+		int mode = PamController.getInstance().getRunMode();
+		if (mode == PamController.RUN_PAMVIEW && (allowedModes & PamPluginInterface.NOTINVIEWER)!=0) {
+			return false;
+		}
+		if (mode == PamController.RUN_NORMAL && (allowedModes & PamPluginInterface.NOTINVIEWER)!=0) {
+			return false;
+		}
+		return true;
+	}
 
 	
 	

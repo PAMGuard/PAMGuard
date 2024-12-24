@@ -58,6 +58,8 @@
 
 <mapID target="utilities.hydrophoneArrayManagerHelp.docs.Array_Configuration_sec1" url="utilities/hydrophoneArrayManagerHelp/docs/Array_Configuration.html#sec1"/>
 
+<mapID target="utilities.hydrophoneArrayManagerHelp.docs.Array_Configuration_sec0" url="utilities/hydrophoneArrayManagerHelp/docs/Array_Configuration.html#sec0"/>
+
 <mapID target="sound_processing.fftManagerHelp.docs.noise_removal_medianfilter" url="sound_processing/fftManagerHelp/docs/noise_removal.html#medianfilter"/>
 
 <mapID target="utilities.hydrophoneArrayManagerHelp.docs.Array_Configuration_sec5" url="utilities/hydrophoneArrayManagerHelp/docs/Array_Configuration.html#sec5"/>
@@ -805,6 +807,8 @@
 <mapID target="localisation.difar.difarLocalisation.docs.difar_PostProcessingTutorial__Toc396467146" url="localisation/difar/difarLocalisation/docs/difar_PostProcessingTutorial.html#_Toc396467146"/>
 
 <mapID target="localisation.difar.difarLocalisation.docs.difar_PostProcessingTutorial__Toc396467147" url="localisation/difar/difarLocalisation/docs/difar_PostProcessingTutorial.html#_Toc396467147"/>
+
+<mapID target="overview.PamMasterHelp.docs.projectmetadata" url="overview/PamMasterHelp/docs/projectmetadata.html"/>
 
 <mapID target="mapping.NMEA.docs.configuringNMEADataSource" url="mapping/NMEA/docs/configuringNMEADataSource.html"/>
 

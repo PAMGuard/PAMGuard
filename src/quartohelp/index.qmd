@@ -1,8 +1,6 @@
 ---
 title: "Welcome to PAMGuard Help"
 ---
-Welcome to PAMGuard Help
-------------------------
 
 This is a web version of the PAMGuard online help.
 
