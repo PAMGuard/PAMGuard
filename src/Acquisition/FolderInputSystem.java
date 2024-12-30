@@ -1042,6 +1042,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		}
 		int generalStatus = PamController.getInstance().getPamStatus();
 		File currFile = getCurrentFile();
+		// status string is nFiles, currentFile, generalStatus from PamController and current file as string. 
 		String bs = String.format("%d,%d,%d,%s", nFiles,currentFile,generalStatus,currFile);
 		return bs;
 	}

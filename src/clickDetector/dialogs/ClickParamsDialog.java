@@ -56,6 +56,7 @@ import clickDetector.ClickControl;
 import clickDetector.ClickParameters;
 import clickDetector.echoDetection.EchoDetectionSystem;
 import clickDetector.echoDetection.EchoDialogPanel;
+import soundtrap.STClickControl;
 
 /**
  * Dialog for click detection parameters.
@@ -108,6 +109,8 @@ public class ClickParamsDialog extends PamDialog implements SourcePanelMonitor {
 		excludeDataBlocks();
 		sourcePanel.addSourcePanelMonitor(this);
 		
+		boolean isSoundTrap = (clickControl instanceof STClickControl);
+		
 //		delayOptionsPanel = new DelayOptionsPanel(parentFrame);
 		clickDelayPanel = new ClickDelayPanel(clickControl, parentFrame);
 		
@@ -116,16 +119,23 @@ public class ClickParamsDialog extends PamDialog implements SourcePanelMonitor {
 			echoDialogPanel = eds.getEchoDialogPanel();
 			echoPanel = new EchoPanel();
 		}
-		
-		tabbedPane.add("Source", sourcePanel.getPanel());
-		tabbedPane.add("Trigger", triggerPanel = new TriggerPanel());
-		tabbedPane.add("Click Length", lengthPanel = new LengthPanel());
+		triggerPanel = new TriggerPanel();
+		lengthPanel = new LengthPanel();
+		noisePanel = new NoisePanel();
+				
+		if (!isSoundTrap) {
+			tabbedPane.add("Source", sourcePanel.getPanel());
+			tabbedPane.add("Trigger", triggerPanel);
+			tabbedPane.add("Click Length", lengthPanel);
+		}
 //		tabbedPane.add("Delays", delayOptionsPanel.getMainPanel());
 		tabbedPane.add("Delays", clickDelayPanel.getDialogComponent());
 		if (echoPanel != null) {
 			tabbedPane.add("Echoes", echoPanel);
 		}
-		tabbedPane.add("Noise", noisePanel = new NoisePanel());
+		if (!isSoundTrap) {
+			tabbedPane.add("Noise", noisePanel);
+		}
 
 		setDialogComponent(panel);
 

@@ -17,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.ListIterator;
 
 import org.jsoup.Jsoup;
@@ -64,17 +65,19 @@ public class QuartoMigrate {
 	String dEnd = "</td>";
 	String vertLine = "jalgfjajgfkda";
 
+	HashMap<String, String> fileTOCNames;
 	/**
 	 * Fu
 	 */
 	public QuartoMigrate() {
 		// TODO Auto-generated constructor stub
+		fileTOCNames = new HashMap<>();
 	}
 
 	public static void main(String[] args) {
 		QuartoMigrate qm = new QuartoMigrate();
 		qm.convertSource(new File(qm.helpsrc));
-//		qm.convertIndex();
+		qm.convertIndex();
 	}
 
 	/**
@@ -850,6 +853,9 @@ public class QuartoMigrate {
 	private void replaceqmdtitle(String target, String text) {
 		String dst = helpdst + File.separator + target;
 		File dstFile = new File(dst);
+		if (dst.toLowerCase().contains("dataselection.qmd")) {
+//			System.out.println("dataselection.html");
+		}
 		if (dstFile.exists() == false) {
 			return;
 		}

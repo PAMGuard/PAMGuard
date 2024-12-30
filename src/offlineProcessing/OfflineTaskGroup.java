@@ -287,7 +287,17 @@ public class OfflineTaskGroup implements PamSettings {
 	 * @return true if it exists
 	 */
 	public boolean haveTask(OfflineTask task ) {
-		return offlineTasks.contains(task);
+		if (offlineTasks.contains(task)) {
+			return true;
+		}
+		// also do a more thorough check by name
+		String taskName = task.getLongName();
+		for (OfflineTask aTask : offlineTasks) {
+			if (taskName.equals(aTask.getLongName())) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/**
@@ -309,6 +319,9 @@ public class OfflineTaskGroup implements PamSettings {
 	 * @param task task to add to the group
 	 */
 	public boolean addTask(OfflineTask task) {
+		if (haveTask(task)) {
+			return false;
+		}
 		offlineTasks.add(task);
 		task.setOfflineTaskGroup(this);
 		task.setDoRun(taskGroupParams.getTaskSelection(offlineTasks.size()-1));

@@ -227,6 +227,8 @@ public class ClickControl extends PamControlledUnit implements PamSettings, Loca
 		sortDataBlockPrefix();
 
 		viewerMode = PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW;
+		
+		boolean secondConfig = pamConfiguration != PamController.getInstance().getPamConfiguration();
 		//
 		//		if (inputControl.getPamProcess(0).getOutputDataBlock(0).getDataType() == DataType.RAW) {
 		//			rawDataBlock = (PamRawDataBlock) inputControl.getPamProcess(0).getOutputDataBlock(0);
@@ -247,7 +249,7 @@ public class ClickControl extends PamControlledUnit implements PamSettings, Loca
 
 		addPamProcess(clickDetector = new ClickDetector(this));
 
-		if (PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW) {
+		if (isViewer || secondConfig) {
 			clicksOffline = new ClicksOffline(this);
 			//			offlineToolbar.addButtons(getClicksOffline().getCommandButtons());
 		}
@@ -291,7 +293,7 @@ public class ClickControl extends PamControlledUnit implements PamSettings, Loca
 		}
 
 		//viewer mode controls. 
-		if (viewerMode) {
+		if (viewerMode || secondConfig) {
 			targetMotionLocaliser = new TargetMotionLocaliser(this, 
 					clickDetector.getOfflineEventDataBlock(), clickDetector.getClickDataBlock());
 			clickDetector.setTargetMotionLocaliser(targetMotionLocaliser);
@@ -299,10 +301,11 @@ public class ClickControl extends PamControlledUnit implements PamSettings, Loca
 			// check if a Rocca module is loaded.
 			roccaControl = (RoccaControl) PamController.getInstance().findControlledUnit(RoccaControl.unitType);
 
+			clicksOffline.getOfflineTaskGroup();
+
 		}
-		else {
-			ClicksOffline.getOfflineTaskGroup(this);
-		}
+//		else {
+//		}
 
 		if (PamGUIManager.isSwing()) {
 
@@ -897,11 +900,16 @@ public class ClickControl extends PamControlledUnit implements PamSettings, Loca
 				//clickTabMenu.remove(clickTabMenu.getMenu(i));
 
 				aMenu = createDetectionMenu(parentFrame);
-				aMenu.setText("Click Detection");
+				String txt = aMenu.getText();
+				txt = checkMenuTit(txt, "settings");
+				aMenu.setText(txt);
 				clickTabMenu.add(aMenu, i+1);
 
 				aMenu = tabPanelControl.createMenu(parentFrame);
-				aMenu.setText("Click Display");
+//				aMenu.setText("Click Display");
+				txt = aMenu.getText();
+				txt = checkMenuTit(txt, "display");
+				aMenu.setText(txt);
 				clickTabMenu.add(aMenu, i+2);
 
 				break;
@@ -909,6 +917,21 @@ public class ClickControl extends PamControlledUnit implements PamSettings, Loca
 		}
 		//		}
 		return clickTabMenu;
+	}
+
+	/**
+	 * fiddle a bit with the meny name for the display menu. 
+	 * @param fullTxt
+	 * @return
+	 */
+	private String checkMenuTit(String fullTxt, String append) {
+		int dInd = fullTxt.toLowerCase().indexOf("detector");
+		if (dInd > 0) {
+			fullTxt = fullTxt.substring(0, dInd);
+		}
+		fullTxt = fullTxt.trim();
+		fullTxt += " " + append;
+		return fullTxt;
 	}
 
 	@Override

@@ -82,6 +82,8 @@ public class STClickControl extends ClickControl implements PamSensor {
 		sudFileDWVHandler.subscribeSUD();
 		
 		PamSettingManager.getInstance().registerSettings(new SUDSettings());
+		
+
 	}
 
 	@Override
@@ -113,7 +115,7 @@ public class STClickControl extends ClickControl implements PamSensor {
 			String thisName = thisItem.getText();
 			
 			if (thisName == "Detection Parameters ...") {
-				newMenu.remove(i);
+//				newMenu.remove(i);
 			}
 			else if (thisName == "Digital pre filter ...") {
 				newMenu.remove(i);
@@ -164,7 +166,16 @@ public class STClickControl extends ClickControl implements PamSensor {
 	@Override
 	public void notifyModelChanged(int changeType) {
 		super.notifyModelChanged(changeType);
-		if (changeType == PamControllerInterface.INITIALIZATION_COMPLETE) {
+		if (changeType == PamControllerInterface.INITIALIZATION_COMPLETE) {		
+			// do a check on the sample rate since this seems a bit **ed in some configs. 
+			if (sudClickDetectorInfo != null) {
+				float fsSud = sudClickDetectorInfo.sampleRate;
+				float currFS = getClickDetector().getSampleRate();
+				if (currFS != fsSud) {
+					getSTAcquisition().getAcquisitionProcess().setSampleRate(fsSud, true);
+					getClickDetector().setSampleRate(fsSud, true);
+				}
+			}
 			sudFileDWVHandler.subscribeSUD();
 		}
 	}

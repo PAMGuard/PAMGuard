@@ -61,6 +61,8 @@ public class ClicksOffline {
 	private OfflineParameters offlineParameters = new OfflineParameters();
 
 	private OLProcessDialog clickOfflineDialog;
+
+	private OfflineTaskGroup offlineTaskGroup;
 	
 	public static final String ClickTypeLookupName = "OfflineRCEvents";
 
@@ -544,7 +546,7 @@ public class ClicksOffline {
 	public void reAnalyseClicks() {
 		if (clickOfflineDialog == null) {
 			clickOfflineDialog = new OLProcessDialog(clickControl.getGuiFrame(), 
-					getOfflineTaskGroup(clickControl), "Click Reprocessing");
+					getOfflineTaskGroup(), "Click Reprocessing");
 		}
 		clickOfflineDialog.setVisible(true);
 	}
@@ -574,19 +576,21 @@ public class ClicksOffline {
 	 * Get / Create an offline task group for click re-processing. 
 	 * @return offline task group. Create if necessary
 	 */
-	public static OfflineTaskGroup getOfflineTaskGroup(ClickControl clickControl) {
-		
-		OfflineTaskGroup offlineTaskGroup = new OfflineTaskGroup(clickControl, "Click Reprocessing");
-		
-		/**
-		 * These tasks are not registered - gets too complicated since some of them 
-		 * need references to things that may not be set or created when main constructors are 
-		 * called. 
-		 */
-		offlineTaskGroup.addTask(new ClickReClassifyTask(clickControl));
-		offlineTaskGroup.addTask(new EchoDetectionTask(clickControl));
-		offlineTaskGroup.addTask(new ClickDelayTask(clickControl));
-		offlineTaskGroup.addTask(new ClickBearingTask(clickControl));
+	public OfflineTaskGroup getOfflineTaskGroup() {
+
+		if (offlineTaskGroup == null) {
+			offlineTaskGroup = new OfflineTaskGroup(clickControl, "Click Reprocessing");
+
+			/**
+			 * These tasks are not registered - gets too complicated since some of them 
+			 * need references to things that may not be set or created when main constructors are 
+			 * called. 
+			 */
+			offlineTaskGroup.addTask(new ClickReClassifyTask(clickControl));
+			offlineTaskGroup.addTask(new EchoDetectionTask(clickControl));
+			offlineTaskGroup.addTask(new ClickDelayTask(clickControl));
+			offlineTaskGroup.addTask(new ClickBearingTask(clickControl));
+		}
 //		if (JamieDev.isEnabled()) {
 //			//re import waveform data from raw wave files. 
 //			offlineTaskGroup.addTask(new ClickWaveTask(clickControl));

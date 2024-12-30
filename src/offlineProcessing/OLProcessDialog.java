@@ -21,6 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 
@@ -116,9 +117,34 @@ public class OLProcessDialog extends PamDialog {
 	 */
 	private PamAlignmentPanel tasksPanel;
 
+	private boolean batchMode;
+
+	private TaskMonitor extraMonitor;
+
+
+	/**
+	 * Create dialog to process a group of offline tasks. 
+	 * @param parentFrame
+	 * @param taskGroup
+	 * @param title
+	 */
 	public OLProcessDialog(Window parentFrame, OfflineTaskGroup taskGroup, String title) {
+		this(parentFrame, taskGroup, title, false, null);
+	}
+	
+	/**
+	 * Create dialog to process a group of offline tasks. 
+	 * @param parentFrame
+	 * @param taskGroup
+	 * @param title
+	 * @param batchMode only true for batch processing. Will disable everything and start jobs automatically. 
+	 * @param extraMonitor additional task monitor that will get forwarded task mon messages when tasks running. 
+	 */
+	public OLProcessDialog(Window parentFrame, OfflineTaskGroup taskGroup, String title, boolean batchMode, TaskMonitor extraMonitor) {
 		super(parentFrame, title, false);
 		this.taskGroup = taskGroup;
+		this.batchMode = batchMode;
+		this.extraMonitor = extraMonitor;
 		taskGroup.setTaskMonitor(new OLMonitor());
 
 		mainPanel = new JPanel();
@@ -232,6 +258,15 @@ public class OLProcessDialog extends PamDialog {
 		
 		setResizable(true);
 
+		if (batchMode) {
+			SwingUtilities.invokeLater(new Runnable() {
+				
+				@Override
+				public void run() {
+					okButtonPressed();
+				}
+			});
+		}
 	}
 	
 	/**
@@ -328,18 +363,19 @@ public class OLProcessDialog extends PamDialog {
 		int selectedTasks = 0;
 		for (int i = 0; i < nTasks; i++) {
 			aTask = taskGroup.getTask(i);
-			taskCheckBox[i].setEnabled(aTask.canRun() && nr);
+			taskCheckBox[i].setEnabled(aTask.canRun() && nr && !batchMode);
 			if (!aTask.canRun()) {
 				taskCheckBox[i].setSelected(false);
 			}
 			if (settingsButton[i] != null) {
-				settingsButton[i].setEnabled(aTask.canRun() && nr);
+				settingsButton[i].setEnabled(aTask.canRun() && nr && !batchMode);
 			}
 			if (taskCheckBox[i].isSelected()) {
 				selectedTasks++;
 			}
 		}
-		getOkButton().setEnabled(selectedTasks > 0 && nr);
+		getOkButton().setEnabled(selectedTasks > 0 && nr && !batchMode);
+//		getCancelButton().setEnabled(!batchMode);
 	}
 
 	@Override
@@ -733,6 +769,9 @@ public class OLProcessDialog extends PamDialog {
 		@Override
 		public void setTaskStatus(TaskMonitorData taskMonitorData) {
 			status.setText(taskMonitorData.taskStatus.toString() + ", " + taskMonitorData.taskActivity.toString());
+			if (taskMonitorData.progMaximum == 0) {
+				taskMonitorData.progMaximum = 1;
+			}
 			if (taskMonitorData.fileOrStatus == null || taskMonitorData.fileOrStatus.length() == 0) {
 				currFile.setText("  ");
 			}
@@ -784,6 +823,9 @@ public class OLProcessDialog extends PamDialog {
 			
 			}
 			setStatus(taskMonitorData.taskStatus);
+			if (extraMonitor != null) {
+				extraMonitor.setTaskStatus(taskMonitorData);
+			}
 		}
 
 //		int doneFiles = 0;
@@ -811,7 +853,6 @@ public class OLProcessDialog extends PamDialog {
 //			fileProgress.setValue((int) (loaded*100));
 //		}
 //
-//		@Override
 		public void setStatus(TaskStatus taskStatus) {
 //			status.setText(TaskMonitorData.getStatusString(taskStatus));
 			currentStatus=taskStatus;

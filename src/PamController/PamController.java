@@ -79,6 +79,7 @@ import generalDatabase.DBControlUnit;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 import metadata.MetaDataContol;
+import offlineProcessing.OfflineTaskManager;
 
 //import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
 //import com.sun.org.apache.xml.internal.serialize.OutputFormat;
@@ -242,6 +243,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	// purposes.
 	private int nStarts;
 	private RestartRunnable restartRunnable;
+	private boolean batchFirst = true; // flag for starting batch offline tasks. 
 
 	private PamController(int runMode, Object object) {
 
@@ -343,8 +345,27 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 */
 	private void creationComplete() {
 		if (GlobalArguments.getParam(PamController.AUTOSTART) != null) {
-			startLater(); // may as well give AWT time to loop it's queue once more
+			if (getRunMode() == RUN_NORMAL) {
+				startLater(); // may as well give AWT time to loop it's queue once more
+			}
+			else if (getRunMode() == RUN_PAMVIEW) {
+				startOfflineTasks();
+			}
 		}
+	}
+
+	/**
+	 * Called when batch processing offline tasks from the AUTOSTART functions. 
+	 * Will start an offline task controller, which will then work it's way through 
+	 * the groups of tasks. 
+	 */
+	private void startOfflineTasks() {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				OfflineTaskManager.getManager().startBatchTasks();
+			}
+		});
 	}
 
 	/**
@@ -1990,7 +2011,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	@Override
 	public void notifyModelChanged(int changeType) {
 
-		// System.out.println("PamController: notify model changed: " +changeType );
+//		System.out.println("PamController: notify model changed: " +changeType );
 		if (changeType == CHANGED_MULTI_THREADING) {
 			changedThreading();
 		}
@@ -2043,6 +2064,13 @@ public class PamController implements PamControllerInterface, PamSettings {
 
 		if (changeType == DATA_LOAD_COMPLETE) {
 			firstDataLoadComplete = true;
+		}
+		if (firstDataLoadComplete && changeType == OFFLINE_DATA_LOADED) {
+			// this is the final notification that comes through in Viewer startup. 
+			if (runMode == RUN_PAMVIEW && GlobalArguments.isBatch() && batchFirst ) {
+				batchFirst = false; // only happens once. 
+				OfflineTaskManager.getManager().launchOfflineBatchTasks();
+			}
 		}
 
 	}

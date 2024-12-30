@@ -72,7 +72,8 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 			System.out.printf("Offline task %s with datablock %s is not associated with a PAMGuard module\n", getName(), parentDataBlock==null ?  "null": parentDataBlock.getDataName());
 		}
 		else {
-			OfflineTaskManager.getManager().registerTask(this);
+//			parentControl.getPamConfiguration().
+//			OfflineTaskManager.getManager().registerTask(this);
 		}
 		
 	}
@@ -122,13 +123,26 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 	}
 
 	/**
-	 * Get a uniquely identifyng name for the task which consists of the 
+	 * Get a uniquely identifying name for the task which consists of the 
 	 * pamControlledUnit type and name as well as the tasks shorter name from getName();
 	 * @return a long name which should be unique within a configuration. 
 	 */
 	public String getLongName() {
 		PamControlledUnit tcu = getTaskControlledUnit();
+		if (tcu == null) {
+			System.out.printf("Unregistered offline task class %s name %s \n", getClass().getName(), getName());
+			return String.format("%s:%s", getClass().getName(), getName());
+		}
 		String str = String.format("%s:%s:%s", tcu.getUnitType(), tcu.getUnitName(), getName());
+//		PamDataBlock groupDataBlock = offlineTaskGroup.getPrimaryDataBlock();
+//		String dataBlockName;
+//		if (groupDataBlock == null) {
+//			dataBlockName = "Unknown Primary Block";
+//		}
+//		else {
+//			dataBlockName = groupDataBlock.getLongDataName();
+//		}
+//		String str = String.format("%s:%s:%s:%s", tcu.getUnitType(), tcu.getUnitName(), getName());
 		return str;
 	}
 	/**
