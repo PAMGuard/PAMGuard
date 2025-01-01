@@ -286,6 +286,17 @@ public class PamSettingManager {
 	}
 
 	/**
+	 * Deregister a settings. 
+	 * @param pamUnit
+	 * @return
+	 */
+	public boolean unRegisterSettings(PamSettings pamUnit) {
+		boolean found = owners.remove(pamUnit);
+		found |= databaseOwners.remove(pamUnit);
+		found |= globalOwners.remove(pamUnit);
+		return found;
+	}
+	/**
 	 * Register modules that have settings information that
 	 * should be stored in serialised form in
 	 * psf files and database Pamguard_Settings tables.

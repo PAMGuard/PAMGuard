@@ -114,7 +114,15 @@ public class MHTClickTrainAlgorithm implements ClickTrainAlgorithm, PamSettings 
 		mhtAlgorithmInfoJSON = new MHTAlgorithmInfoJSON(this);
 
 		//register saved settings
-		PamSettingManager.getInstance().registerSettings(this);
+		boolean foundNew = PamSettingManager.getInstance().registerSettings(this);
+		if (mhtParams == null || foundNew == false) {
+			// not found since settings name has changed ? 
+			OldSettingsName oldWay = new OldSettingsName();
+			// calling this once will load the old settings, then we're done. 
+			PamSettingManager.getInstance().registerSettings(oldWay);
+			// so remove it so they aren't saved the old way any more. 
+			PamSettingManager.getInstance().unRegisterSettings(oldWay);
+		}
 
 		//setup the algorithm 
 		setupAlgorithm(); 
@@ -638,12 +646,53 @@ public class MHTClickTrainAlgorithm implements ClickTrainAlgorithm, PamSettings 
 
 	@Override
 	public String getUnitName() {
-		return getName() + "_" + this.clickTrainControl.getUnitName();
+		return this.clickTrainControl.getUnitName();
 	}
 
 	@Override
 	public String getUnitType() {
 		return getName() ;
+	}
+	
+	/**
+	 * Class to read old settings which were saved with a different name. 
+	 * For some of the offlien functions to work, latest PAMGuard needs
+	 * the getUnitName to be the same for all related settings, so this
+	 * must now be clickTRainControl.getUnitName();
+	 * @author dg50
+	 *
+	 */
+	private class OldSettingsName implements PamSettings {
+		@Override
+		public String getUnitName() {
+			return getName() + "_" + clickTrainControl.getUnitName();
+		}
+
+		@Override
+		public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
+			MHTParams oldSettings = (MHTParams) pamControlledUnitSettings.getSettings();
+			mhtParams = oldSettings;
+			setupAlgorithm();
+			//send a settings restore flag 
+			mhtParams.chi2Params.restoreSettings();
+			return true;
+		}
+
+		@Override
+		public String getUnitType() {
+			return getName() ;
+		}
+
+		@Override
+		public Serializable getSettingsReference() {
+			return mhtParams;
+		}
+
+		@Override
+		public long getSettingsVersion() {
+			return MHTParams.serialVersionUID;
+		}
+
 	}
 
 	@Override

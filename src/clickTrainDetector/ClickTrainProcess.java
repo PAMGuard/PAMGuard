@@ -91,7 +91,7 @@ public class ClickTrainProcess extends PamProcess {
 		/*
 		 * Identify by long name since that is unique, otherwise doesn't work with multiple click detectors. 
 		 */
-		sourceDataBlock = PamController.getInstance().getDataBlockByLongName(getClickTrainParams().dataSourceName);
+		sourceDataBlock = clickTrainControl.getPamConfiguration().getDataBlockByLongName(getClickTrainParams().dataSourceName);
 		if (sourceDataBlock == null) {
 			// otherwise find any click detector. 
 			sourceDataBlock = PamController.getInstance().getDataBlock(ClickDetection.class, 0);
@@ -100,6 +100,9 @@ public class ClickTrainProcess extends PamProcess {
 		if (sourceDataBlock==null) {
 			sourceDataBlock = PamController.getInstance().getDataBlock(CPODClick.class, 
 					getClickTrainParams().dataSourceName);
+		}
+		if (sourceDataBlock == null) {
+			System.out.println("Unable to find CTD source data block  " + getClickTrainParams().dataSourceName);
 		}
 		
 		//System.out.println("CPOD sample rate: " + sourceDataBlock.getSampleRate()); 

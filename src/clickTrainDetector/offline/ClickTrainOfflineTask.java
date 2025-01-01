@@ -1,5 +1,6 @@
 package clickTrainDetector.offline;
 
+import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
@@ -166,6 +167,11 @@ public class ClickTrainOfflineTask extends OfflineTask<PamDataUnit<?,?>> {
 		//there may be other tasks that do not want to delete click train
 		///e.g. the click train classifier task. 
 		if (super.isDoRun()) super.deleteOldData(taskGroupParams);
+	}
+
+	@Override
+	public PamControlledUnit getTaskControlledUnit() {
+		return clickTrainControl;
 	}
 
 }
