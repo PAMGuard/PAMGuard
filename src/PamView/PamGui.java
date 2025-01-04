@@ -572,11 +572,11 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		}
 		if (isViewer) {
 			menuItem = new JMenuItem("Export Configuration  ...");
-			menuItem.setToolTipText("Export configuration to a new psf file");
+			menuItem.setToolTipText("Export configuration to a new psfx file");
 		}
 		else {
 			menuItem = new JMenuItem("Save Configuration As ...");
-			menuItem.setToolTipText("Save configuration to a new psf file");
+			menuItem.setToolTipText("Save configuration to a new psfx file");
 		}
 		menuItem.addActionListener(new menuSaveAs());
 		fileMenu.add(menuItem);

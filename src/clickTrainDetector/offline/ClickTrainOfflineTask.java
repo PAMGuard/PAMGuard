@@ -35,7 +35,7 @@ public class ClickTrainOfflineTask extends OfflineTask<PamDataUnit<?,?>> {
 	 * @param clickTrainContol - the click train control. 
 	 */
 	public ClickTrainOfflineTask(ClickTrainControl clickTrainControl){
-		super((PamDataBlock<PamDataUnit<?, ?>>) clickTrainControl.getParentDataBlock());
+		super(clickTrainControl, (PamDataBlock<PamDataUnit<?, ?>>) clickTrainControl.getParentDataBlock());
 		//System.out.println("Offline task: Click train parent datablock: " + clickTrainControl.getParentDataBlock());
 		this.clickTrainControl=clickTrainControl; 
 //		setParentDataBlock(clickTrainControl.getParentDataBlock());

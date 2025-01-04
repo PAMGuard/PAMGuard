@@ -16,7 +16,7 @@ public class ReclassifyTask extends OfflineTask<AbstractWhistleDataUnit>{
 	long dataEndTime;
 
 	public ReclassifyTask(WhistleClassifierControl whistleClassifierControl) {
-		super(whistleClassifierControl.getWhistleClassifierProcess().getParentDataBlock());
+		super(whistleClassifierControl, whistleClassifierControl.getWhistleClassifierProcess().getParentDataBlock());
 		this.whistleClassifierControl = whistleClassifierControl;
 		whistleClassifierProcess = whistleClassifierControl.getWhistleClassifierProcess();
 		setParentDataBlock(whistleClassifierProcess.getParentDataBlock());

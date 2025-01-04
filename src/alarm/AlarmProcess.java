@@ -228,7 +228,7 @@ public class AlarmProcess extends PamProcess {
 	}
 
 	public boolean setupAlarm() {
-		dataSource = PamController.getInstance().getDataBlock(PamDataUnit.class, alarmControl.alarmParameters.dataSourceName);
+		dataSource = alarmControl.getPamConfiguration().getDataBlock(PamDataUnit.class, alarmControl.alarmParameters.dataSourceName);
 		if (dataSource == null) {
 			return false;
 		}
@@ -245,6 +245,9 @@ public class AlarmProcess extends PamProcess {
 		}
 		resetCount();
 		alarmDataBlock.setNaturalLifetime(alarmControl.alarmParameters.getHoldSeconds());
+		if (alarmControl.alarmOfflineTask != null) {
+			alarmControl.alarmOfflineTask.setParentDataBlock(dataSource);
+		}
 
 		return true;
 	}

@@ -115,7 +115,7 @@ public class PamSettingManager {
 	 * List of modules that have / want PAMGUARD Settings
 	 * which get stored in the psf file and / or the database store.
 	 */
-	private ArrayList<PamSettings> owners;
+//	private ArrayList<PamSettings> owners;
 
 	/**
 	 * List of modules that specifically use settings from the database
@@ -151,6 +151,15 @@ public class PamSettingManager {
 	static public final String fileEndXML = "psfxml";
 	
 	private static boolean saveAsPSFX = true;
+	
+	/**
+	 * A secondary configuration to use when loading configs into 
+	 * batch mode for viewing and extracting offline tasks. This is a 
+	 * real bodge and bad style, but can't do much about it at this stage. 
+	 * USe very sparingly and make sure it's set null once the external batch
+	 * configuration is loaded. 
+	 */
+	private PamConfiguration secondaryConfiguration;
 
 	static public String getCurrentSettingsFileEnd() {
 		if (saveAsPSFX) {
@@ -226,7 +235,7 @@ public class PamSettingManager {
 
 
 	private PamSettingManager() {
-		owners = new ArrayList<PamSettings>();
+//		owners = new ArrayList<PamSettings>();
 		databaseOwners = new ArrayList<PamSettings>();
 		globalOwners = new ArrayList<PamSettings>();
 		//		setCurrentFile(new File(defaultFile));
@@ -245,7 +254,8 @@ public class PamSettingManager {
 	public void reset() {
 		initialSettingsList = null;
 		databaseSettingsList = null;
-		owners = new ArrayList<PamSettings>();
+//		owners = new ArrayList<PamSettings>();
+		getOwners().clear();
 		databaseOwners = new ArrayList<PamSettings>();
 
 	}
@@ -291,7 +301,7 @@ public class PamSettingManager {
 	 * @return
 	 */
 	public boolean unRegisterSettings(PamSettings pamUnit) {
-		boolean found = owners.remove(pamUnit);
+		boolean found = getOwners().remove(pamUnit);
 		found |= databaseOwners.remove(pamUnit);
 		found |= globalOwners.remove(pamUnit);
 		return found;
@@ -310,7 +320,7 @@ public class PamSettingManager {
 	public boolean registerSettings(PamSettings pamUnit, int whichLists) {
 
 		if ((whichLists & LIST_UNITS) != 0) {
-			owners.add(pamUnit);
+			getOwners().add(pamUnit);
 		}
 		if ((whichLists & LIST_DATABASESTUFF) != 0) {
 			databaseOwners.add(pamUnit);
@@ -469,6 +479,7 @@ public class PamSettingManager {
 	 * @return Settings owner or null.
 	 */
 	public PamSettings findSettingsOwner(String unitType, String unitName, String unitClassName) {
+		ArrayList<PamSettings> owners = getOwners();
 		for (PamSettings owner:owners) {
 			if (owner.getClass() != null && unitClassName != null) {
 				if (!owner.getClass().getName().equals(unitClassName)) {
@@ -647,7 +658,8 @@ public class PamSettingManager {
 
 		ArrayList<PamControlledUnitSettings> pamSettingsList;
 		pamSettingsList = new ArrayList<PamControlledUnitSettings>();
-		for (int i = 0; i < owners.size(); i++) {
+		ArrayList<PamSettings> owners = getOwners();
+		for (int i = 0; i < getOwners().size(); i++) {
 			pamSettingsList
 			.add(new PamControlledUnitSettings(owners.get(i)
 					.getUnitType(), owners.get(i).getUnitName(),
@@ -767,6 +779,7 @@ public class PamSettingManager {
 		//XMLSettings
 		ArrayList<PamControlledUnitSettings> pamSettingsList;
 		pamSettingsList = new ArrayList<PamControlledUnitSettings>();
+		ArrayList<PamSettings> owners = getOwners();
 		for (int i = 0; i < owners.size(); i++) {
 			pamSettingsList
 			.add(new PamControlledUnitSettings(owners.get(i)
@@ -896,6 +909,7 @@ public class PamSettingManager {
 	 * all modules in the list.
 	 */
 	private void initialiseRegisteredModules() {
+		ArrayList<PamSettings> owners = getOwners();
 		if (owners == null) {
 			return;
 		}
@@ -2182,9 +2196,6 @@ public class PamSettingManager {
 
 	}
 
-	public ArrayList<PamSettings> getOwners() {
-		return owners;
-	}
 
 	/**
 	 *
@@ -2194,6 +2205,7 @@ public class PamSettingManager {
 		PamSettingsGroup psg = new PamSettingsGroup(PamCalendar.getTimeInMillis());
 		PamControlledUnitSettings pcus;
 		PamSettings ps;
+		ArrayList<PamSettings> owners = getOwners();
 		for (int i = 0; i < owners.size(); i++) {
 			ps = owners.get(i);
 			pcus = new PamControlledUnitSettings(ps.getUnitType(), ps.getUnitName(),
@@ -2269,6 +2281,7 @@ public class PamSettingManager {
 	 * @return Array list of settings.
 	 */
 	public ArrayList<PamSettings> findPamSettings(String unitType, String unitName) {
+		ArrayList<PamSettings> owners = getOwners();
 		if (owners == null) {
 			return null;
 		}
@@ -2344,6 +2357,42 @@ public class PamSettingManager {
 			int ans = WarnOnce.showWarning(frame, "New Display Scaling", message, WarnOnce.OK_OPTION);
 		}
 
+	}
+
+	/**
+	 * List of settings owners has moved to PAMConfiguration. This is so that when loading 
+	 * a secondary config in batch mode, the 'owners' can be redirected to a different
+	 * configuration. Ideally, just about everything in this entire class would move 
+	 * to PAMConfiguration, but don't want to break the static registersettings function in 
+	 * every module. 
+	 * @return the owners
+	 */
+	public ArrayList<PamSettings> getOwners() {
+		if (secondaryConfiguration != null) {
+			return secondaryConfiguration.getSettingsOwners();
+		}
+		//otherwise return the main list from the main configuration held by PamController. 
+		return PamController.getInstance().getPamConfiguration().getSettingsOwners();
+	}
+
+	/**
+	 * @return the secondaryConfiguration
+	 */
+	public PamConfiguration getSecondaryConfiguration() {
+		return secondaryConfiguration;
+	}
+
+	/**
+	 * <b>Warning - fragile code. Use very sparingly!</b><br>
+	 * A secondary configuration to use when loading configs into 
+	 * batch mode for viewing and extracting offline tasks. This is a 
+	 * real bodge and bad style, but can't do much about it at this stage. 
+	 * USe very sparingly and make sure it's set null once the external batch
+	 * configuration is loaded. 
+	 * @param secondaryConfiguration the secondaryConfiguration to set
+	 */
+	public void setSecondaryConfiguration(PamConfiguration secondaryConfiguration) {
+		this.secondaryConfiguration = secondaryConfiguration;
 	}
 
 }

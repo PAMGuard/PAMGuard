@@ -35,6 +35,8 @@ public class PamConfiguration {
 	 * List of the current controlled units (PAMGuard modules)
 	 */
 	private ArrayList<PamControlledUnit> pamControlledUnits;
+	
+	private ArrayList<PamSettings> settingsOwners = new ArrayList<>(); 
 
 	public PamConfiguration() {
 		super();
@@ -562,4 +564,31 @@ public class PamConfiguration {
 		}
 		return ots;
 	}
+
+	/**
+	 * @return the settingsOwners
+	 */
+	public ArrayList<PamSettings> getSettingsOwners() {
+		return settingsOwners;
+	}
+	
+	/**
+	 * Find the owner of some settings by type and name. 
+	 * @param unitType
+	 * @param unitName
+	 * @return Settings owner, or null. 
+	 */
+	public PamSettings findSettingOwner(String unitType, String unitName) {
+		if (settingsOwners == null) {
+			return null;
+		}
+		for (PamSettings aSet : settingsOwners) {
+			if (aSet.getUnitType().equals(unitType) && aSet.getUnitName().equals(unitName)) {
+				return aSet;
+			}
+		}
+		return null;
+	}
+
+
 }

@@ -45,6 +45,8 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 	 */
 	private PamDataBlock<T> parentDataBlock;
 
+	private PamControlledUnit parentControlledUnit;
+
 //	/**
 //	 * Default constructor. Should no longer be used, but kept in case there are subclasses
 //	 * of OfflineTask in other plugins. <br>
@@ -55,8 +57,11 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 //		super();
 //	}
 	/**
+	 * For compatibility with batch processor it's better to use the other
+	 * constructor public OfflineTask(PamControlledUnit pamControlledUnit, PamDataBlock<T> parentDataBlock)
 	 * @param parentDataBlock
 	 */
+	@Deprecated
 	public OfflineTask(PamDataBlock<T> parentDataBlock) {
 		super();
 		this.parentDataBlock = parentDataBlock;
@@ -79,10 +84,25 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 	}
 	
 	/**
+	 * Preferred constructor for offline tasks that gets a valid ref to the appropriate 
+	 * PAMControlled unit. 
+	 * @param pamControlledUnit
+	 * @param parentDataBlock
+	 */
+	public OfflineTask(PamControlledUnit pamControlledUnit, PamDataBlock<T> parentDataBlock) {
+		super();
+		this.parentControlledUnit = pamControlledUnit;
+		this.parentDataBlock = parentDataBlock;
+	}
+	
+	/**
 	 * Get the PAMControlled unit associated with a task. 
 	 * @return PAMControlled unit associated with a task. 
 	 */
 	public PamControlledUnit getTaskControlledUnit() {
+		if (parentControlledUnit != null) {
+			return parentControlledUnit;
+		}
 		if (parentDataBlock == null) {
 			return null;
 		}
@@ -90,7 +110,7 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 		if (parentProcess == null) {
 			return null;
 		}
-		return parentProcess.getPamControlledUnit();
+		return parentControlledUnit = parentProcess.getPamControlledUnit();
 	}
 
 	/**
@@ -492,6 +512,13 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 				break;
 			}
 		}
+	}
+
+	/**
+	 * @return the parentControlledUnit
+	 */
+	public PamControlledUnit getParentControlledUnit() {
+		return parentControlledUnit;
 	}
 
 
