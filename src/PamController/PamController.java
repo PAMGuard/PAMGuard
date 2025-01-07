@@ -43,6 +43,7 @@ import PamController.command.TerminalController;
 import PamController.command.WatchdogComms;
 import PamController.fileprocessing.ReprocessManager;
 import PamController.fileprocessing.ReprocessManagerMonitor;
+import PamController.fileprocessing.ReprocessStoreChoice;
 import PamController.masterReference.MasterReferencePoint;
 import PamController.settings.BatchViewSettingsImport;
 import PamController.settings.output.xml.XMLWriterDialog;
@@ -53,6 +54,7 @@ import PamModel.PamModel;
 import PamModel.PamModelSettings;
 import PamModel.PamModuleInfo;
 import PamModel.SMRUEnable;
+import PamModel.PamModel.PluginClassloader;
 import PamUtils.PamCalendar;
 import PamUtils.time.GlobalTimeManager;
 import PamView.GeneralProjector;
@@ -244,6 +246,11 @@ public class PamController implements PamControllerInterface, PamSettings {
 	private int nStarts;
 	private RestartRunnable restartRunnable;
 	private boolean batchFirst = true; // flag for starting batch offline tasks. 
+	
+	/**
+	 * Subclass of URLClassLoader, to handle loading of plugins 
+	 */
+//	private static PluginClassloader classLoader;
 
 	private PamController(int runMode, Object object) {
 
@@ -341,7 +348,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	/**
 	 * Not to sound God like, but this will be called on the AWT dispatch thread
 	 * shortly after all modules are created, PAMGuard should be fully setup and all
-	 * modules will have recieved INITIALISATION_COMPLETE and should be good to run
+	 * modules will have received INITIALISATION_COMPLETE and should be good to run
 	 */
 	private void creationComplete() {
 		if (GlobalArguments.getParam(PamController.AUTOSTART) != null) {
@@ -359,7 +366,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 	 * Will start an offline task controller, which will then work it's way through 
 	 * the groups of tasks. 
 	 */
-	private void startOfflineTasks() {
+	public void startOfflineTasks() {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -1307,7 +1314,19 @@ public class PamController implements PamControllerInterface, PamSettings {
 		 * This needs to be called after prepareproces. Now we do some extra checks on
 		 * the stores to see if we want to overwite data, carry on from where we left
 		 * off, etc.
+		 * This get's handled even if there is a worker thread. 
 		 */
+//		String reprocessString = GlobalArguments.getParam(ReprocessStoreChoice.paramName);
+//		ReprocessStoreChoice reprocesschoice = null;
+//		if (reprocessString != null) {
+//			try {
+//				reprocesschoice = ReprocessStoreChoice.valueOf(reprocessString);
+//			}
+//			catch (Exception e) {
+//				System.out.println("Invalid reprocess choice command: " + reprocessString);
+//			}
+//		}
+		
 		if (saveSettings && getRunMode() == RUN_NORMAL) { // only true on a button press or network start.
 			checkReprocessManager(saveSettings, startTime);
 		}
@@ -2212,6 +2231,7 @@ public class PamController implements PamControllerInterface, PamSettings {
 
 	public void setPamStatus(int pamStatus) {
 		this.pamStatus = pamStatus;
+//		System.out.println("Set PAM Status: " + pamStatus);
 		/*
 		 * This only get's called once when set idle at viewer mode startup.
 		 */

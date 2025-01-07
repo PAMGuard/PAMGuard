@@ -460,7 +460,8 @@ public class ClickTrainControl extends PamControlledUnit implements PamSettings 
 	 * @return the offline process. 
 	 */
 	public ClickTrainOfflineProcess getClickTrainsOffline() {
-		if ((this.isViewer || GlobalArguments.isBatch()) & clickTrainOffline == null) {
+//		if ((this.isViewer || GlobalArguments.isBatch()) & clickTrainOffline == null) {
+		if (clickTrainOffline == null) {
 			clickTrainOffline = new ClickTrainOfflineProcess(this);
 		}
 	

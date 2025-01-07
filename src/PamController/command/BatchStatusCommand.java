@@ -25,7 +25,18 @@ public class BatchStatusCommand extends ExtCommand {
 	}
 
 	@Override
-	public String execute(String command) {
+	public String execute(String command) {		
+		/**
+		 * See if we're still initialising and if so, send a dummy message back. 
+		 * Bad idea - after it's stopped, this would tell the batch controller
+		 * that it hadn't even started!
+		 */
+//		int status = PamController.getInstance().getRealStatus();
+//		if (status != PamController.PAM_RUNNING) {
+//			String bs = String.format("%d,%d,%d,%s", 0,0,status,0);
+//			return bs;
+//		}
+		// otherwise do a proper status. 
 		if (PamController.getInstance().getRunMode() == PamController.RUN_NORMAL) {
 			return getNormalModeStatus(command);
 		}
@@ -39,6 +50,8 @@ public class BatchStatusCommand extends ExtCommand {
 	}
 
 	private String getNormalModeStatus(String command) {
+
+		
 		/**
 		 * find a controlled unit thats a DataInputSource which should either be a sound daq or a Tritech daq module. 
 		 */
