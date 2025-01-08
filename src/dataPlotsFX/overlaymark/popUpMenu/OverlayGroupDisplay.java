@@ -35,7 +35,7 @@ import whistlesAndMoans.WhistleMoanControl;
 
 /**
  * 
- * A detection display which can display groups data units and 
+ * A detection display which can display group data units and 
  * their super detections in a tab pane if applicable. 
  * 
  * @author Jamie Macaulay 
@@ -252,10 +252,10 @@ public class OverlayGroupDisplay extends PamBorderPane {
 
 		this.detectionsPane.setDetectionGroup(dataList);
 	
-		
 		if (superDets!=null) {
 			this.superDetectionsDisplay.setDetectionGroup(new ArrayList<PamDataUnit>(superDets));
 		}
+		
 		this.prepareDisplay(); 
 	}
 

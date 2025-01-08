@@ -300,14 +300,14 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 		overlayGraphics = new DLDetectionGraphics(dlClassifyProcess.getDLGroupDetectionDataBlock());
 		overlayGraphics.setDetectionData(true);
 		dlClassifyProcess.getDLGroupDetectionDataBlock().setOverlayDraw(overlayGraphics);
-		dlClassifyProcess.getDLGroupDetectionDataBlock().setPamSymbolManager(new DLGroupSymbolManager(dlClassifyProcess.getDLGroupDetectionDataBlock()));
 
 		
 		//set the symbol managers. 
 		dlClassifyProcess.getDLDetectionDatablock()
 				.setPamSymbolManager(new DLSymbolManager(this, dlClassifyProcess.getDLDetectionDatablock()));
-		dlClassifyProcess.getDLGroupDetectionDataBlock()
-			.setPamSymbolManager(new StandardSymbolManager(	dlClassifyProcess.getDLGroupDetectionDataBlock(),  new SymbolData()));
+		
+		dlClassifyProcess.getDLGroupDetectionDataBlock().setPamSymbolManager(new DLGroupSymbolManager(dlClassifyProcess.getDLGroupDetectionDataBlock()));
+
 		dlClassifyProcess.getDLPredictionDataBlock()
 				.setPamSymbolManager(new PredictionSymbolManager(this, dlClassifyProcess.getDLDetectionDatablock()));
 		

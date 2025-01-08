@@ -528,6 +528,7 @@ public class DetectionGroupDisplay extends PamBorderPane {
 		for (GroupDisplayListener aListener : displayListeners) {
 			aListener.newDataUnitSelected(oldDataUnit, newDataUnit);
 		}
+		
 	}
 
 	/**

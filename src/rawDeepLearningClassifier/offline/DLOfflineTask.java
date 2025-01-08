@@ -41,23 +41,36 @@ public class DLOfflineTask extends OfflineTask<PamDataUnit<?,?>>{
 	
 //		System.out.println("--------------");
 //		System.out.println("Offline task start: " + dataUnit.getUpdateCount() + " UID " + dataUnit.getUID());
+		
+		try {
+		
 
 		//Process a data unit
 		dlControl.getSegmenter().newData(dataUnit); 
 				
-		//force click data save
-		dlControl.getDLClassifyProcess().forceRunClassifier(dataUnit);
-		
-		//must be called or can result in memory leak. 
-		dlControl.getSegmenter().getSegmenterDataBlock().clearAll();
+		if (!dlControl.isGroupDetections()) {
+			//Classifying one detection
 
-		//must be called or can result in memory leak. 
-		dlControl.getDLClassifyProcess().getDLPredictionDataBlock().clearAll();
-
-		/**
-		 * So the issue here is that the classification is not on the same thread...
-		 */
+			//force click data save
+			dlControl.getDLClassifyProcess().forceRunClassifier(dataUnit);
+			
+			//must be called or can result in memory leak. 
+			dlControl.getSegmenter().getSegmenterDataBlock().clearAll();
+	
+			//must be called or can result in memory leak. 
+			dlControl.getDLClassifyProcess().getDLPredictionDataBlock().clearAll();
+		};
+//
+//		/**
+//		 * So the issue here is that the classification is not on the same thread...
+//		 */
 //		System.out.println("Offline task complete: " + dataUnit.getUpdateCount() + " data " + dataUnit +  " no. annotations: " + dataUnit.getNumDataAnnotations() );
+//		
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		return true;
 	}
 
@@ -82,11 +95,13 @@ public class DLOfflineTask extends OfflineTask<PamDataUnit<?,?>>{
 		this.setParentDataBlock(dlControl.getParentDataBlock());
 		//dlControl.setNotifyProcesses(true);
 		this.dlControl.getDLModel().prepModel(); 
+		
 		dlControl.update(MTClassifierControl.PROCESSING_START);
+		
 		//		System.out.println("Waveform match: " + mtClassifierControl.getMTParams().classifiers.get(0).waveformMatch.toString());
 		//		System.out.println("Waveform reject: " + mtClassifierControl.getMTParams().classifiers.get(0).waveformReject.toString());
 	}
-
+		
 
 	/**
 	 * Called at the end of the thread which executes this task. 
@@ -100,6 +115,7 @@ public class DLOfflineTask extends OfflineTask<PamDataUnit<?,?>>{
 
 	@Override
 	public void newDataLoad(long startTime, long endTime, OfflineDataMapPoint mapPoint) {
+				
 		prepProcess();
 		dlControl.update(MTClassifierControl.PROCESSING_START);
 		// called whenever new data is loaded. 

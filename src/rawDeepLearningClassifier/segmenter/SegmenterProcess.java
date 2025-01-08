@@ -35,6 +35,8 @@ public class SegmenterProcess extends PamProcess {
 	 */
 	private static final double MAX_MILLIS_DRIFT = 2;
 
+	private static final long MAX_SEGMENT_GAP_MILLIS = 3600*1000L;
+
 	/**
 	 * Reference to the deep learning control. 
 	 */
@@ -228,7 +230,7 @@ public class SegmenterProcess extends PamProcess {
 	 */
 	public void newData(PamDataUnit pamRawData) {
 
-		//System.out.println("New data for segmenter: " + pamRawData + "  isGroup: " + dlControl.isGroupDetections()); 
+//		System.out.println("New data for segmenter: " + pamRawData + "  isGroup: " + dlControl.isGroupDetections()); 
 
 		if (!dlControl.getDLParams().useDataSelector || dlControl.getDataSelector().scoreData(pamRawData)>0) {	
 
@@ -257,7 +259,6 @@ public class SegmenterProcess extends PamProcess {
 	 */
 	private synchronized void newGroupData(PamDataUnit detection) {
 		
-		
 //		PamDataUnit detection = dataUnit;
 
 		//TODO
@@ -278,7 +279,7 @@ public class SegmenterProcess extends PamProcess {
 //		index =0;
 		
 //		System.out.println("Group data: " + ((detection.getTimeMilliseconds()-firstClockUpdate)/1000.) + "s " + chanGroups.length +  "  " +  index + "  " + detection.getChannelBitmap());
-//		PamArrayUtils.printArray(chanGroups);
+		//PamArrayUtils.printArray(chanGroups);
 		
 		if (index<0) {
 			return;
@@ -298,8 +299,15 @@ public class SegmenterProcess extends PamProcess {
 				newGroupSegment(index);
 			}
 			
+			//sometimes if a detection is a long time after the previous then we don't want to iterate through new segments so start again
+			if ((detection.getTimeMilliseconds() - segmentStart)>MAX_SEGMENT_GAP_MILLIS) {
+				segmentStart = detection.getTimeMilliseconds();
+				segmenterEnd = (long) (segmentStart + getSegmentLenMillis());
+				newGroupSegment(index);
+			}
+			
 			while(!detectionInSegment(detection,  segmentStart,  segmenterEnd)) {
-				//System.out.println("Detection in segment: " + segmentStart + " det millis: " + detection.getTimeMilliseconds()); 
+				System.out.println("Detection in segment: " + segmentStart + " det millis: " + detection.getTimeMilliseconds()); 
 				
 				if (detection.getTimeMilliseconds()<segmentStart) {
 					//something has gone quite wrong
@@ -888,6 +896,16 @@ public class SegmenterProcess extends PamProcess {
 
 	public SegmenterGroupDataBlock getSegmenteGrouprDataBlock() {
 		return this.segmenterGroupDataBlock;
+	}
+
+
+	/**
+	 * Set the first clock update which helps the segmenter work out where to start segmenting from. 
+	 * @param startTime - the start time in millis. 
+	 */
+	public void setFirstClockUpdate(long startTime) {
+		this.firstClockUpdate = startTime;
+		
 	}
 
 } 
