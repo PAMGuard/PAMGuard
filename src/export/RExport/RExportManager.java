@@ -190,6 +190,8 @@ public class RExportManager implements PamDataUnitExporter {
 				//check whether the same. 
 				if (rDataExport.get(i).getUnitClass().isAssignableFrom(dataUnits.get(j).getClass()) && !alreadyStruct[j]) {
 					dataList=rDataExport.get(i).detectionToStruct(dataUnits.get(j), n); 
+					
+					//System.out.println("Export data unit:  " + rDataExport.get(i).getName());
 					//dataListArray.add((rDataExport.get(i).getName() + "_" + dataUnits.get(j).getUID()), dataList);	
 					// format used in PAMBinaries
 					dataListArray.add(String.valueOf(dataUnits.get(j).getUID()), dataList);	

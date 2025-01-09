@@ -21,6 +21,7 @@ public class RSuperDetectionExport extends RDataUnitExport<SuperDetection>{
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public NamedBuilder addDetectionSpecificFields(NamedBuilder rData, SuperDetection dataUnit, int index) {
 
+		System.out.println("Export super data unit 1:  " + dataUnit);
 		//We create a struct within a struct within a struct here...
 		SuperDetection superDetection = (SuperDetection) dataUnit;
 
@@ -64,6 +65,8 @@ public class RSuperDetectionExport extends RDataUnitExport<SuperDetection>{
 			}
 
 		}
+
+		System.out.println("Export super data unit 2:  " + superDetection.getSubDetectionsCount());
 
 		rData.add("subdetections", dataUnits);
 		rData.add("nsubdet", superDetection.getSubDetectionsCount());
