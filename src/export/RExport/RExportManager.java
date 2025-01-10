@@ -94,6 +94,8 @@ public class RExportManager implements PamDataUnitExporter {
 	private void writeRFile() {
 		Context context = Context.newTopLevelContext();
 		try {
+			
+			if (allData!=null) {
 
 			FileOutputStream fos = new FileOutputStream(currentFileName);
 			GZIPOutputStream zos = new GZIPOutputStream(fos);
@@ -103,6 +105,8 @@ public class RExportManager implements PamDataUnitExporter {
 			writer.save(allData.build());
 			writer.close();
 			zos.close();
+			allData=null; //prevents writing the file again and again if offline end export is called. 
+			}
 		}
 		catch (IOException e1) {
 			e1.printStackTrace();
