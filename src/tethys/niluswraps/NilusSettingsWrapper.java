@@ -31,6 +31,21 @@ public class NilusSettingsWrapper<T extends Object> implements Serializable, Clo
 	private transient T nilusObject;
 	
 	/**
+	 * construct an empty nilus wrapper
+	 */
+	public NilusSettingsWrapper() {
+		super();
+	}
+	
+	/**
+	 * Construct a nilus wrapper with given object. 
+	 * @param nilusObject
+	 */
+	public NilusSettingsWrapper(T nilusObject) {
+		setNilusObject(nilusObject);
+	}
+
+	/**
 	 * Create a nilus object. Have to pass the class type in as 
 	 * an argument, since Class isn't serializable, so can't be stored
 	 * with the object - which contains nothing but a String, which can be safely serialised.

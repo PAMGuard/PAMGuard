@@ -1,5 +1,6 @@
 package Array;
 
+import java.util.ArrayList;
 import java.util.ListIterator;
 
 import GPS.NavDataSynchronisation;
@@ -7,6 +8,7 @@ import PamController.PamController;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
+import offlineProcessing.OfflineTaskGroup;
 import pamScrollSystem.ViewLoadObserver;
 
 public class HydrophoneDataBlock extends PamDataBlock<HydrophoneDataUnit> {
@@ -126,6 +128,17 @@ public class HydrophoneDataBlock extends PamDataBlock<HydrophoneDataUnit> {
 			}
 			return unit;
 		}
+	}
+
+	@Override
+	public ArrayList<HydrophoneDataUnit> getTaskDataCopy(long startTime, long endTime, OfflineTaskGroup taskGroup) {
+		ArrayList<HydrophoneDataUnit> phones = new ArrayList<>();
+		PamArray array = ArrayManager.getArrayManager().getCurrentArray();
+		ArrayList<Hydrophone> hydrs = array.getHydrophoneArray();
+		for (int i = 0; i < hydrs.size(); i++) {
+			phones.add(new HydrophoneDataUnit(hydrs.get(i)));
+		}
+		return phones;
 	}
 
 

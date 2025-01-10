@@ -219,7 +219,7 @@ abstract public class DataBlockSpeciesManager<T extends PamDataUnit> {
 	}
 	
 	/**
-	 * Check the species map. Only return true if every species code
+	 * Check the species map. Only return null if every species code
 	 * has a map item. Otherwise it's not safe to export. 
 	 * @return null if all codes have a lookup, otherwise some sort of useful error information
 	 */

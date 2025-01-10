@@ -16,6 +16,7 @@ import PamController.PamController;
 import PamView.MenuItemEnabler;
 import PamView.dialog.warn.WarnOnce;
 import dataModelFX.connectionNodes.ModuleIconFactory.ModuleIcon;
+import pamguard.GlobalArguments;
 
 /**
  * Holds information about available PAMGUARD modules.
@@ -334,12 +335,15 @@ public class PamModuleInfo implements PamDependent{
 		for (int i = 0; i < moduleList.size(); i++) {
 			
 			mi = moduleList.get(i);
-			
-			if (mi.isHidden()) {
-				continue;
-			}
-			if (mi.availableInMode() == false) {
-				continue;
+
+			// don't skip anything in batch view, only allow skip if it isn't. 
+			if (GlobalArguments.getParam(GlobalArguments.BATCHVIEW) == null) {
+				if (mi.isHidden()) {
+					continue;
+				}
+				if (mi.availableInMode() == false) {
+					continue;
+				}
 			}
 			
 			

@@ -145,7 +145,7 @@ public class ClickTrainAlgorithmPaneFX extends SettingsPane<ClickTrainParams> {
 		holder.setPrefWidth(prefWidth);
 		holder.setPrefHeight(prefHeight);
 
-		sourcePane = new SourcePaneFX("Click Data Source", ClickDetection.class, false, true); 
+		sourcePane = new SourcePaneFX("Click Data Source", clickTrainControl.getPamConfiguration(), ClickDetection.class, false, true); 
 //		sourcePane = new SourcePaneFX("Click Data Source", RawDataHolder.class, false, true); //should be a raw data source but not fully tested so sticking to clicks for now. 
 		sourcePane.addSourceType(CPODClick.class, false);
 //		sourcePane.addSourceType(RawDataHolder.class, false); //any raw data unit can be used for click train detection. 
@@ -510,8 +510,8 @@ public class ClickTrainAlgorithmPaneFX extends SettingsPane<ClickTrainParams> {
 	public void setParams(ClickTrainParams clickTrainParams) {
 
 		// and fill in the data source list (may have changed - or might in later versions)
-		ArrayList<PamDataBlock> rd = PamController.getInstance().getDataBlocks(ClickDetection.class, true); 
-		PamDataBlock  datablock = PamController.getInstance().getDataBlockByLongName(clickTrainParams.dataSourceName);
+		ArrayList<PamDataBlock> rd = clickTrainControl.getPamConfiguration().getDataBlocks(ClickDetection.class, true); 
+		PamDataBlock  datablock = clickTrainControl.getPamConfiguration().getDataBlockByLongName(clickTrainParams.dataSourceName);
 		
 		//use the data selector. 
 		dataSelectorCheckBox.setSelected(clickTrainParams.useDataSelector); 

@@ -1,5 +1,7 @@
 package offlineProcessing;
 
+import java.awt.Component;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
@@ -202,17 +204,34 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 	}
 
 	/**
-	 * task has settings which can be called
+	 * task has settings which can be modified. If this is true, then 
+	 * callSettings(Component component) should do something such as open a dialog or show a menu, or something. 
 	 * @return true or false
 	 */
 	public boolean hasSettings() {
 		return false;
 	}
+	
+	/**
+	 * Call any task specific settings. This replaces the older
+	 * function callSettings() which is now deprecated. Passes a 
+	 * reference to an awt component so that it's location can be used to
+	 * open a popup dialog, etc, for more complex systems with many options. 
+	 * @param component button or whatever called the settings. 
+	 * @return
+	 */
+	public boolean callSettings(Component component, Point point) {
+		return callSettings();
+	}
 
 	/**
-	 * Call any task specific settings
+	 * Call any task specific settings<br>
+	 * use callSettings(Component component) instead wherever possible. 
+	 * @param point 
+	 * @param component 
 	 * @return true if settings may have changed. 
 	 */
+	@Deprecated
 	public boolean callSettings() {
 		return false;
 	}
@@ -226,6 +245,14 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 	public boolean canRun() {
 		boolean can = getDataBlock() != null; 
 		return can;
+	}
+	
+	/**
+	 * If a task can't run, try to return a string to say why not. 
+	 * @return text reason as to why task can't run (such as missing data). 
+	 */
+	public String whyNot() {
+		return null;
 	}
 
 	/**

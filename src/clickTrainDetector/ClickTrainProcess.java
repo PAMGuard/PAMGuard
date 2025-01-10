@@ -91,7 +91,8 @@ public class ClickTrainProcess extends PamProcess {
 		/*
 		 * Identify by long name since that is unique, otherwise doesn't work with multiple click detectors. 
 		 */
-		sourceDataBlock = clickTrainControl.getPamConfiguration().getDataBlockByLongName(getClickTrainParams().dataSourceName);
+		String dsName = getClickTrainParams().dataSourceName;
+		sourceDataBlock = clickTrainControl.getPamConfiguration().getDataBlockByLongName(dsName);
 		if (sourceDataBlock == null) {
 			// otherwise find any click detector. 
 			sourceDataBlock = PamController.getInstance().getDataBlock(ClickDetection.class, 0);

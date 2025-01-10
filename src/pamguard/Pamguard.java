@@ -191,6 +191,15 @@ public class Pamguard {
 				else if (anArg.equalsIgnoreCase("-m")) {
 					runMode = PamController.RUN_MIXEDMODE;
 					System.out.println("PAMGUARD Offline mixed mode");
+				}				
+				else if (anArg.equalsIgnoreCase(GlobalArguments.BATCHVIEW)) {
+					/**
+					 * Used with batch processor when it launches the configuration to make it clear that
+					 * it's really working in viewer mode, and viewer mode settings should be available, but
+					 * settings will be read and written using psfx files, not the databsae. 
+					 */
+					GlobalArguments.setParam(GlobalArguments.BATCHVIEW, "true");
+//					runMode = PamController.RUN_PAMVIEW;
 				}
 				else if (anArg.equalsIgnoreCase("-nr")) {
 					runMode = PamController.RUN_NETWORKRECEIVER;

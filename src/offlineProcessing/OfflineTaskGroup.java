@@ -645,12 +645,17 @@ public class OfflineTaskGroup implements PamSettings {
 			else {
 				dataName = "Loaded Data";
 			}
+			
 			/**
 			 * Make sure that any data from required data blocks is loaded. First check the 
 			 * start and end times of the primary data units we actually WANT to process
 			 * Also get a count of found data - may be able to leave without having to do anything at all
+			 */			
+			/**
+			 * Count, then process the data. Copy to preserve data integrity. 
 			 */
-			ListIterator<PamDataUnit> it = primaryDataBlock.getListIterator(0);
+			ArrayList<PamDataUnit> dataCopy = primaryDataBlock.getTaskDataCopy(processStartTime, processEndTime, OfflineTaskGroup.this);
+			ListIterator<PamDataUnit> it = dataCopy.listIterator();
 			long procDataStart = Long.MAX_VALUE;
 			long procDataEnd = 0;
 			int nToProcess = 0;
@@ -694,10 +699,7 @@ public class OfflineTaskGroup implements PamSettings {
 			 * Call newDataLoaded for each task before getting on with processing individual data units. 
 			 */
 
-			/**
-			 * Now process the data. Copy to preserve data integrity. 
-			 */
-			ArrayList dataCopy = primaryDataBlock.getDataCopy();
+
 			it = dataCopy.listIterator();
 			
 			unitChanged = false;

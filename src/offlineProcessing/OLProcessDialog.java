@@ -2,6 +2,7 @@ package offlineProcessing;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -197,7 +198,7 @@ public class OLProcessDialog extends PamDialog {
 			c.gridx++;
 			if (aTask.hasSettings()) {
 				addComponent(tasksPanel, settingsButton[i] = new JButton(settings), c);
-				settingsButton[i].addActionListener(new SettingsListener(aTask));
+				settingsButton[i].addActionListener(new SettingsListener(this, aTask));
 			}
 			c.gridy++;
 		}
@@ -364,14 +365,21 @@ public class OLProcessDialog extends PamDialog {
 		for (int i = 0; i < nTasks; i++) {
 			aTask = taskGroup.getTask(i);
 			taskCheckBox[i].setEnabled(aTask.canRun() && nr && !batchMode);
-			if (!aTask.canRun()) {
+			boolean can = aTask.canRun();
+			if (!can) {
 				taskCheckBox[i].setSelected(false);
 			}
 			if (settingsButton[i] != null) {
-				settingsButton[i].setEnabled(aTask.canRun() && nr && !batchMode);
+				settingsButton[i].setEnabled(nr && (!can || taskCheckBox[i].isSelected()));
 			}
 			if (taskCheckBox[i].isSelected()) {
 				selectedTasks++;
+			}
+			if (taskCheckBox[i].isEnabled() == false) {
+				taskCheckBox[i].setToolTipText(aTask.whyNot());
+			}
+			else {
+				taskCheckBox[i].setToolTipText(null);
 			}
 		}
 		getOkButton().setEnabled(selectedTasks > 0 && nr && !batchMode);
@@ -745,17 +753,29 @@ public class OLProcessDialog extends PamDialog {
 	class SettingsListener implements ActionListener {
 
 		private OfflineTask offlineTask;
+		private Component component;
 
-		public SettingsListener(OfflineTask offlineTask) {
+		public SettingsListener(Component component, OfflineTask offlineTask) {
+			this.component = component;
 			this.offlineTask = offlineTask;
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			offlineTask.callSettings();
+			settingsAction(component, offlineTask);
 			enableControls(); 
 		}
 
+	}
+	
+	/**
+	 * Settings button action. 
+	 * @param component
+	 * @param offlineTask
+	 * @return
+	 */
+	public boolean settingsAction(Component component, OfflineTask offlineTask) {
+		return offlineTask.callSettings();
 	}
 
 	/**

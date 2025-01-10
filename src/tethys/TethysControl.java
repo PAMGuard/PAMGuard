@@ -29,6 +29,7 @@ import PamController.PamControllerInterface;
 import PamController.PamFolders;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import PamModel.SMRUEnable;
 import PamUtils.PamFileFilter;
 import PamView.PamTabPanel;
 import PamView.dialog.warn.WarnOnce;
@@ -36,6 +37,7 @@ import PamguardMVC.PamDataBlock;
 import metadata.MetaDataContol;
 import metadata.PamguardMetaData;
 import nilus.Deployment;
+import pamguard.GlobalArguments;
 import tethys.TethysState.StateType;
 import tethys.calibration.CalibrationHandler;
 import tethys.dbxml.DBXMLConnect;
@@ -55,6 +57,7 @@ import tethys.swing.ProjectDeploymentsDialog;
 import tethys.swing.TethysTabPanel;
 import tethys.swing.XMLStringView;
 import tethys.swing.documents.TethysDocumentsFrame;
+import tethys.tasks.TethysTaskManager;
 
 /**
  * Quick play with a simple system for outputting data to Tethys. At it's start
@@ -91,9 +94,11 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	private LocalizationHandler localizationHandler;
 	
 	private ITISFunctions itisFunctions;
+	private TethysTaskManager tethysTaskManager;
 
 	public TethysControl(String unitName) {
 		super(unitType, unitName);
+		setUnitTaskManager(tethysTaskManager = new TethysTaskManager(this));
 		stateObservers = new ArrayList();
 		dbxmlConnect = new DBXMLConnect(this);
 		dbxmlQueries = new DBXMLQueries(this, dbxmlConnect);
@@ -101,6 +106,11 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		detectionsHandler = new DetectionsHandler(this);
 		calibrationHandler = new CalibrationHandler(this);
 		localizationHandler = new LocalizationHandler(this);
+		
+		if (PamController.getInstance().isInitializationComplete()) {
+			// added module, so need to do more work
+			tethysTaskManager.generateTasks();
+		}
 		
 		serverCheckTimer = new Timer(10000, new ActionListener() {
 			@Override
@@ -225,6 +235,14 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		mapItem.addActionListener(SpeciesMapManager.getInstance().getImportAction(parentFrame));
 		tethysMenu.add(mapItem);
 		
+		if (SMRUEnable.isDevEnable()) {
+			JMenu menu = new JMenu("Offline tasks");
+			int n = tethysTaskManager.addMenuItems(menu);
+			if (n > 0) {
+				tethysMenu.add(menu);
+			}
+		}
+		
 		return tethysMenu;
 	}
 
@@ -250,7 +268,7 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 
 	public ArrayList<PamDataBlock> getExportableDataBlocks() {
 		ArrayList<PamDataBlock> sets = new ArrayList<>();
-		ArrayList<PamDataBlock> allDataBlocks = PamController.getInstance().getDataBlocks();
+		ArrayList<PamDataBlock> allDataBlocks = getPamConfiguration().getDataBlocks();
 		for (PamDataBlock aDataBlock : allDataBlocks) {
 			if (aDataBlock.getTethysDataProvider(this) != null) {
 				sets.add(aDataBlock);
@@ -469,11 +487,21 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 		super.notifyModelChanged(changeType);
 		switch (changeType) {
 		case PamControllerInterface.INITIALIZE_LOADDATA:
-//		case PamControllerInterface.INITIALIZATION_COMPLETE:
+			//		case PamControllerInterface.INITIALIZATION_COMPLETE:
 			initializationStuff();
 			break;
 		case PamControllerInterface.HYDROPHONE_ARRAY_CHANGED:
 			sendStateUpdate(new TethysState(StateType.UPDATEMETADATA));
+			break;
+		case PamControllerInterface.INITIALIZATION_COMPLETE:
+			tethysTaskManager.generateTasks();
+			break;
+		case PamControllerInterface.ADD_DATABLOCK:
+		case PamControllerInterface.REMOVE_DATABLOCK:
+			if (PamController.getInstance().isInitializationComplete()) {
+				tethysTaskManager.generateTasks();
+			}
+			break;
 		}
 	}
 
@@ -482,6 +510,9 @@ public class TethysControl extends PamControlledUnit implements PamSettings, Tet
 	 * a Tethys module after initialisation).
 	 */
 	private void initializationStuff() {
+		if (GlobalArguments.getParam(GlobalArguments.BATCHVIEW) != null) {
+			return;
+		}
 		deploymentHandler.createPamguardOverview();
 		serverCheckTimer.start();
 		sendStateUpdate(new TethysState(StateType.NEWPAMGUARDSELECTION));

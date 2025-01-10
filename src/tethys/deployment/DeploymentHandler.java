@@ -565,6 +565,9 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 			return;
 		}
 		RecordingList recordingList = deploymentOverview.getMasterList(getTethysControl());
+		if (recordingList == null) {
+			return;
+		}
 		ArrayList<RecordingPeriod> effortPeriods = recordingList.getEffortPeriods();
 		for (RecordingPeriod aPeriod : effortPeriods) {
 			PDeployment closestDeployment = findClosestDeployment(aPeriod, deployments);
@@ -772,6 +775,13 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 		return firstFree;
 	}
 
+	/**
+	 * Create deployment document. May be better off passing in the Metadata. 
+	 * @param i
+	 * @param recordingPeriod
+	 * @param deploymentId
+	 * @return
+	 */
 	public Deployment createDeploymentDocument(int i, RecordingPeriod recordingPeriod, String deploymentId) {
 		Deployment deployment = new Deployment();
 		try {
@@ -1360,6 +1370,13 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 	 */
 	public DeploymentExportOpts getDeploymentExportOptions() {
 		return deploymentExportOptions;
+	}
+
+	/**
+	 * @param deploymentExportOptions the deploymentExportOptions to set
+	 */
+	public void setDeploymentExportOptions(DeploymentExportOpts deploymentExportOptions) {
+		this.deploymentExportOptions = deploymentExportOptions;
 	}
 
 	@Override

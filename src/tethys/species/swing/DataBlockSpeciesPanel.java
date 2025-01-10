@@ -40,6 +40,7 @@ public class DataBlockSpeciesPanel implements PamDialogPanel {
 	public JComponent getDialogComponent() {
 		return mainPanel;
 	}
+	
 
 	@Override
 	public void setParams() {
@@ -52,7 +53,7 @@ public class DataBlockSpeciesPanel implements PamDialogPanel {
 		ArrayList<String> speciesNames = speciesManager.getAllSpeciesCodes();
 		DataBlockSpeciesMap speciesMap = speciesManager.getDatablockSpeciesMap();
 		for (String aSpecies : speciesNames) {
-			SpeciesSubPanel subPanel = new SpeciesSubPanel(aSpecies);
+			SpeciesSubPanel subPanel = new SpeciesSubPanel(dataBlock, aSpecies);
 			subPanels.add(subPanel);
 			speciesPanel.add(subPanel.getDialogComponent());
 			if (speciesMap != null) {

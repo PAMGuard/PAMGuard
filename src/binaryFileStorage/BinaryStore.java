@@ -210,7 +210,9 @@ PamSettingsSource, DataOutputStore {
 		super.notifyModelChanged(changeType);
 		switch (changeType) {
 		case PamControllerInterface.INITIALIZATION_COMPLETE:
-			doInitialStoreChecks(PamController.getMainFrame());
+			if (GlobalArguments.getParam(GlobalArguments.BATCHVIEW) == null) {
+				doInitialStoreChecks(PamController.getMainFrame());
+			}
 			break;
 		case PamControllerInterface.CHANGED_OFFLINE_DATASTORE:
 			// this gets called after INITIALIZATION_COMPLETE

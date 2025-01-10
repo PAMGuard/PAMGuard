@@ -36,7 +36,7 @@ public class PamguardMetaData implements Serializable {
 //	private LatLong recoverLatLong;
 	
 	/**
-	 * Get the deployment data
+	 * Get the deployment data. will create if needed. 
 	 * @return nilus deployment
 	 */
 	public Deployment getDeployment() {

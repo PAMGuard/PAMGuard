@@ -424,6 +424,8 @@
 
 <mapID target="sound_processing.seismicveto.docs.veto_overview" url="sound_processing/seismicveto/docs/veto_overview.html"/>
 
+<mapID target="localisation.docs.localisation_overview_gillespie" url="localisation/docs/localisation_overview.html#gillespie"/>
+
 <mapID target="classifiers.roccaHelp.docs.rocca_Configure_rocca_ClickClassifierModel" url="classifiers/roccaHelp/docs/rocca_Configure.html#rocca_ClickClassifierModel"/>
 
 <mapID target="localisation.difar.difarLocalisation.docs.difar_Calibration" url="localisation/difar/difarLocalisation/docs/difar_Calibration.html"/>

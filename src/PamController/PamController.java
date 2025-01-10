@@ -549,9 +549,9 @@ public class PamController implements PamControllerInterface, PamSettings {
 		 * to update existing settings That should probably be done here before the
 		 * final calls to setup processes, etc.
 		 */
-		if (getRunMode() == RUN_PAMVIEW && PamSettingManager.remote_psf != null) {
-			loadOtherSettings(PamSettingManager.remote_psf);
-		}
+//		if (getRunMode() == RUN_PAMVIEW && PamSettingManager.remote_psf != null) {
+//			loadOtherSettings(PamSettingManager.remote_psf);
+//		}
 
 		/*
 		 * Get any other required modules for this run mode.

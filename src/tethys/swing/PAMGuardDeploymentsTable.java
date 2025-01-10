@@ -375,10 +375,10 @@ private RecordingList masterList;
 	private void updateDeployments() {
 		DeploymentHandler deploymentHandler = getTethysControl().getDeploymentHandler();
 		deploymentOverview = deploymentHandler.getDeploymentOverview();
-		masterList = deploymentOverview.getMasterList(getTethysControl());
 		if (deploymentOverview == null) {
 			return;
 		}
+		masterList = deploymentOverview.getMasterList(getTethysControl());
 		tableModel.fireTableDataChanged();
 //		DeploymentData deplData = getTethysControl().getGlobalDeplopymentData();
 //		ArrayList<Deployment> projectDeployments = getTethysControl().getDbxmlQueries().getProjectDeployments(deplData.getProject());
@@ -401,6 +401,9 @@ private RecordingList masterList;
 				return 0;
 			}
 			else {
+				if (getMasterList() == null) {
+					return 0;
+				}
 				return getMasterList().size();
 			}
 		}

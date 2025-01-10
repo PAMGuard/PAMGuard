@@ -506,7 +506,12 @@ public class PamSettingManager {
 		case PamController.RUN_NETWORKRECEIVER:
 			return saveSettings(SAVE_PSF | SAVE_DATABASE);
 		case PamController.RUN_PAMVIEW:
-			return saveSettings(SAVE_DATABASE);
+			if (GlobalArguments.getParam(GlobalArguments.BATCHVIEW) != null) {
+				return saveSettings(SAVE_PSF | SAVE_DATABASE);
+			}
+			else {
+				return saveSettings(SAVE_DATABASE);
+			}
 		case PamController.RUN_MIXEDMODE:
 			return saveSettings(SAVE_DATABASE);
 		case PamController.RUN_NOTHING:
@@ -855,7 +860,12 @@ public class PamSettingManager {
 			ans = loadNormalSettings();
 			break;
 		case PamController.RUN_PAMVIEW:
-			ans = loadViewerSettings();
+			if (GlobalArguments.getParam(GlobalArguments.BATCHVIEW) != null) {
+				ans = loadNormalSettings();
+			}
+			else {
+				ans = loadViewerSettings();
+			}
 			break;
 		case PamController.RUN_MIXEDMODE:
 			ans = loadMixedModeSettings();
