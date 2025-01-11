@@ -203,6 +203,8 @@ public class SegmenterProcess extends PamProcess {
 
 		setParentDataBlock(rawDataBlock);
 		
+		this.dlControl.createDataSelector(rawDataBlock);
+		
 		this.firstClockUpdate = -1;
 
 	}
@@ -321,7 +323,7 @@ public class SegmenterProcess extends PamProcess {
 		}
 		
 		segmenterDetectionGroup[index].addSubDetection(detection);
-//		System.out.println("Segment sub detection count: " + 	segmenterDetectionGroup[index].getSubDetectionsCount()); 
+		//System.out.println("Segment sub detection count: " + 	segmenterDetectionGroup[index].getSubDetectionsCount()); 
 	}
 	
 	/**
@@ -335,7 +337,7 @@ public class SegmenterProcess extends PamProcess {
 		segmentStart = (long) (segmentStart+ getSegmentHopMillis());
 		segmenterEnd = (long) (segmentStart + getSegmentLenMillis());
 		
-		 newGroupSegment(index);
+		newGroupSegment(index);
 	}
 	
 	private void newGroupSegment(int index) {
@@ -358,10 +360,11 @@ public class SegmenterProcess extends PamProcess {
 				}
 			}
 			
-//			System.out.println("SAVE WHISTLE SEGMENT!: " + ((segmenterDetectionGroup[index].getSegmentStartMillis()-firstClockUpdate)/1000.) + "s" + " " + " no. whistles: " 
+//			System.out.println("SAVE GROUP SEGMENT!: " + ((segmenterDetectionGroup[index].getSegmentStartMillis()-firstClockUpdate)/1000.) + "s" + " " + " no. whistles: " 
 //			+ segmenterDetectionGroup[index].getSubDetectionsCount() + " " + PamCalendar.formatDateTime(segmenterDetectionGroup[index].getSegmentStartMillis()) + "  " 
 //					+ segmenterDetectionGroup[index]);
 			//save the data unit to the data block
+
 			if (segmenterDetectionGroup[index].getSubDetectionsCount()>0) {
 				this.segmenterGroupDataBlock.addPamData(segmenterDetectionGroup[index]);
 			}
@@ -905,7 +908,6 @@ public class SegmenterProcess extends PamProcess {
 	 */
 	public void setFirstClockUpdate(long startTime) {
 		this.firstClockUpdate = startTime;
-		
 	}
 
 } 

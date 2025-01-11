@@ -2,10 +2,13 @@ package rawDeepLearningClassifier.offline;
 
 import PamController.PamController;
 import PamguardMVC.PamDataUnit;
+import PamguardMVC.PamObservable;
+import PamguardMVC.PamObserverAdapter;
 import dataMap.OfflineDataMapPoint;
 import matchedTemplateClassifer.MTClassifierControl;
 import offlineProcessing.OfflineTask;
 import rawDeepLearningClassifier.DLControl;
+import rawDeepLearningClassifier.segmenter.SegmenterDetectionGroup;
 import rawDeepLearningClassifier.segmenter.SegmenterProcess;
 
 public class DLOfflineTask extends OfflineTask<PamDataUnit<?,?>>{
@@ -28,7 +31,12 @@ public class DLOfflineTask extends OfflineTask<PamDataUnit<?,?>>{
 		super.addAffectedDataBlock(this.dlControl.getDLClassifyProcess().getDLDetectionDatablock());
 		//prediction data block may also be affected. 
 		super.addAffectedDataBlock(this.dlControl.getDLClassifyProcess().getDLPredictionDataBlock());
+		
+		//group detections are a little difficult because they only appear after
+		dlControl.getDLClassifyProcess().getDLGroupDetectionDataBlock().addInstantObserver(new GroupObserver(this));
 	}
+	
+
 
 	@Override
 	public String getName() {
@@ -37,40 +45,38 @@ public class DLOfflineTask extends OfflineTask<PamDataUnit<?,?>>{
 
 	@Override
 	public boolean processDataUnit(PamDataUnit<?, ?> dataUnit) {
-		
-	
-//		System.out.println("--------------");
-//		System.out.println("Offline task start: " + dataUnit.getUpdateCount() + " UID " + dataUnit.getUID());
-		
+		//		System.out.println("--------------");
+		//		System.out.println("Offline task start: " + dataUnit.getUpdateCount() + " UID " + dataUnit.getUID());
 		try {
-		
+			//Process a data unit
+			dlControl.getSegmenter().newData(dataUnit); 
 
-		//Process a data unit
-		dlControl.getSegmenter().newData(dataUnit); 
-				
-		if (!dlControl.isGroupDetections()) {
-			//Classifying one detection
+			if (dlControl.isGroupDetections()) {
+				//once a segment is created we need to process it  but this is handled by the GroupObserver and not here....
+				return false; //very important or binary files become messed up and clicks/whistles are deleted. 
+			}
+			else  {
+				//Classifying one detection - we need to wait for a segment to end before 
+				//running the classifier on group detections. 
 
-			//force click data save
-			dlControl.getDLClassifyProcess().forceRunClassifier(dataUnit);
-			
-			//must be called or can result in memory leak. 
-			dlControl.getSegmenter().getSegmenterDataBlock().clearAll();
-	
-			//must be called or can result in memory leak. 
-			dlControl.getDLClassifyProcess().getDLPredictionDataBlock().clearAll();
-		};
-//
-//		/**
-//		 * So the issue here is that the classification is not on the same thread...
-//		 */
-//		System.out.println("Offline task complete: " + dataUnit.getUpdateCount() + " data " + dataUnit +  " no. annotations: " + dataUnit.getNumDataAnnotations() );
-//		
+				//force click data save
+				dlControl.getDLClassifyProcess().forceRunClassifier(dataUnit);
+
+				//must be called or can result in memory leak. 
+				dlControl.getSegmenter().getSegmenterDataBlock().clearAll();
+
+				//must be called or can result in memory leak. 
+				dlControl.getDLClassifyProcess().getDLPredictionDataBlock().clearAll();
+			};
+			//		/**
+			//		 * So the issue here is that the classification is not on the same thread...
+			//		 */
+			//		System.out.println("Offline task complete: " + dataUnit.getUpdateCount() + " data " + dataUnit +  " no. annotations: " + dataUnit.getNumDataAnnotations() );
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		return true;
 	}
 
@@ -164,6 +170,38 @@ public class DLOfflineTask extends OfflineTask<PamDataUnit<?,?>>{
 		//System.out.println("Datablock: " + getDataBlock() + " Control datablock" +  dlControl.getParentDataBlock()); 
 		boolean can = getDataBlock() != null; 
 		return can;
+	}
+	
+	
+	/**
+	 * An observer which waits until all detections within a segment have been added before passing the 
+	 * segment to a deep learning classifier. 
+	 */
+	public class GroupObserver extends PamObserverAdapter{
+		
+		private DLOfflineTask dlOfflinetask;
+
+		public GroupObserver( DLOfflineTask dlOfflinetask) {
+			this.dlOfflinetask=dlOfflinetask;
+		}
+		
+
+		@Override
+		public void addData(PamObservable observable, PamDataUnit pamDataUnit) {
+			SegmenterDetectionGroup segmenterDetectionGroup = (SegmenterDetectionGroup) pamDataUnit;
+			
+			System.out.println("HELLO NEW GROUP DATA!!" + segmenterDetectionGroup.getSubDetectionsCount()); 
+		}
+
+
+		@Override
+		public String getObserverName() {
+			return "Deep Learning Offline Group Process";
+		}
+
+
+
+		
 	}
 
 

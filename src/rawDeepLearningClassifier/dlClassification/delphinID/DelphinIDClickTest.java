@@ -31,7 +31,7 @@ public class DelphinIDClickTest {
 //		String clicksMatPath = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/clicks_20200918_123234.mat";
 //		String modelFile = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/clickclassifier.zip";
 
-		String clicksMatPath = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/clicks_20200918_123234.mat";
+		String clicksMatPath = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/clicks_20200918_123234_classified.mat";
 		String modelFile = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/clickclassifier.zip";
 		String matclickSave = "/Users/au671271/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/delphinID/click1D/click_spectrums.mat";
 
@@ -189,7 +189,7 @@ public class DelphinIDClickTest {
 
 
 	/**
-	 * This test runs delphinID on one 4 second window from whistle contours saved
+	 * This test runs delphinID on one 4 second window from clicks saved 
 	 * in a mat file. 
 	 * 
 	 * @return true if the test is passed. 
@@ -200,7 +200,7 @@ public class DelphinIDClickTest {
 		//		String clicksMatPath = "/Users/jdjm/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/clicks_20200918_123234.mat";
 
 		double segLen = 4000.;
-		double segHop = 1000.0;
+		double segHop = 1000.;
 //		double startSeconds = 1.50355; //seconds to start segments (so we can compare to Python)
 		double startSeconds = 0; //seconds to start segments (so we can compare to Python)
 		double[] freqLimits = new double[] {10000., 40188.};
@@ -219,7 +219,7 @@ public class DelphinIDClickTest {
 			dataStartMillis = (long) (dataStartMillis+(startSeconds*1000.));
 
 			//split the clicks into segments
-			ArrayList<SegmenterDetectionGroup> segments  = DelphinIDUtils.segmentDetectionData(clicks.getDetections(), dataStartMillis, segLen,  segHop);
+			ArrayList<SegmenterDetectionGroup> segments  = DelphinIDUtils.segmentDetectionData(clicks.getDetections(), dataStartMillis, segLen, segHop);
 
 
 			Struct clkStruct = Mat5.newStruct(1, segments.size());

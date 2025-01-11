@@ -676,7 +676,7 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 			//create the data selector
 			//System.out.println("Data selector: " + dataSelector); 
 			if (source!=null) {
-				dataSelector=source.getDataSelectCreator().getDataSelector(this.getUnitName() +"_clicks", false, null);
+				dataSelector=source.getDataSelectCreator().getDataSelector(this.getUnitName() +"_" + source.getDataName(), false, null);
 				//System.out.println("Data selector: " + dataSelector); 
 			}
 			else {

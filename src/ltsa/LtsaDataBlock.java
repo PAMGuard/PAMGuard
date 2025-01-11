@@ -48,6 +48,7 @@ public class LtsaDataBlock extends FFTDataBlock {
 		 *As for getOfflineData, overrride this.
 		 */
 		loadViewerData(new OfflineDataLoadInfo(startMillis, endMillis), null);
+		
 		// now send all the data to the observer (the spectrogram) 
 		// so that it redraws in the same way it does for real fft data. 
 		synchronized (getSynchLock()) {
