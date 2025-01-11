@@ -11,9 +11,12 @@ public class RClickEventExport extends RSuperDetectionExport{
 		super(mlDetectionsManager);
 	}
 	
+	@Override
 	public NamedBuilder addDetectionSpecificFields(NamedBuilder rData, SuperDetection dataUnit, int index) {
+		super.addDetectionSpecificFields(rData, dataUnit, index);
 		
 		OfflineEventDataUnit clickEvent = (OfflineEventDataUnit) dataUnit; 
+		
 
 		rData.add("event_id",  clickEvent.getEventId());
 		rData.add("event_type", clickEvent.getEventType());

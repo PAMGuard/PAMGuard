@@ -24,10 +24,9 @@ public class RSuperDetectionExport extends RDataUnitExport<SuperDetection>{
 		//We create a struct within a struct within a struct here...
 		SuperDetection superDetection = (SuperDetection) dataUnit;
 
-		ListVector.NamedBuilder dataUnits = new ListVector.NamedBuilder(); ;
-
+		ListVector.NamedBuilder dataUnits = new ListVector.NamedBuilder();
+		
 		//now iterate through the data units and add data units to the struct. 
-
 
 		//vital to clone this or we mess up all the data units in PAMGuard!
 		ArrayList<PamDataUnit> subDataUnits = (ArrayList<PamDataUnit>) superDetection.getSubDetections().clone();
@@ -51,8 +50,15 @@ public class RSuperDetectionExport extends RDataUnitExport<SuperDetection>{
 
 						//add to the struct.
 						datasUnitsStruct= exporter.detectionToStruct(subDataUnits.get(i), n);
-						dataUnits.add(exporter.getName(), datasUnitsStruct); 
+	
+						
+						System.out.println("Save sub det: " + subDataUnits.get(i).getUID());
+						
+						//must be named differently
+						dataUnits.add((exporter.getName() + "_" + subDataUnits.get(i).getUID()) , datasUnitsStruct); 
+						
 						savedUnits.add(subDataUnits.get(i));
+						
 						n++;
 					}
 				}
@@ -64,6 +70,7 @@ public class RSuperDetectionExport extends RDataUnitExport<SuperDetection>{
 			}
 
 		}
+
 
 		rData.add("subdetections", dataUnits);
 		rData.add("nsubdet", superDetection.getSubDetectionsCount());
