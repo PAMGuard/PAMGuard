@@ -1,24 +1,34 @@
 package tethys.tasks;
 
 import java.awt.Component;
-import java.awt.MouseInfo;
 import java.awt.Point;
-import java.awt.PointerInfo;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
 
+import PamController.PamController;
+import PamView.menu.ModalPopupMenu;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import dataMap.OfflineDataMapPoint;
 import tethys.TethysControl;
+import tethys.detection.DetectionsHandler;
+import tethys.output.StreamExportParams;
 import tethys.species.DataBlockSpeciesManager;
+import tethys.swing.export.DetectionsExportWizard;
 
 public class ExportDataBlockTask extends TethysTask {
+	
+	/**
+	 * Need to check ITIS codes and stream export params are all OK. 
+	 * No need to save anything since export params for all datablocks are 
+	 * in a HashMap in the main Tethys settings 
+	 */
 
 	private PamDataBlock parentDataBlock;
+	
+	private DetectionsHandler detectionsHandler;
 
 	public ExportDataBlockTask(TethysControl tethysControl, TethysTaskManager tethysTaskManager,
 			PamDataBlock parentDataBlock) {
@@ -56,7 +66,7 @@ public class ExportDataBlockTask extends TethysTask {
 
 	@Override
 	public boolean callSettings(Component component, Point point) {
-		JPopupMenu popMenu = new JPopupMenu();
+		ModalPopupMenu popMenu = new ModalPopupMenu();
 		JMenuItem menuItem = new JMenuItem("ITIS Species Codes");
 		popMenu.add(menuItem);
 		if (point == null) {
@@ -81,20 +91,17 @@ public class ExportDataBlockTask extends TethysTask {
 			}
 		});
 
-		if (component != null) {
-			popMenu.show(component, point.x, point.y);
-		}
-		else {
-			// otherwise show it wherever the mouse is. 
-			PointerInfo pointer = MouseInfo.getPointerInfo();
-			//			pointer.
-		}
-		return false;
+		return	popMenu.show(component, point.x, point.y);
 	}
 
 	protected void exportOptions(Component component, Point point) {
-		// TODO Auto-generated method stub
-
+		// use standard export dialog, but don't do the actual exporting. 
+//		StreamExportParams streamParams = getTethysControl().getTethysExportParams().getStreamParams(getTethysControl(), parentDataBlock);
+//		WrappedDescriptionType wrappedDesc = streamParams.getDetectionDescription();
+		DetectionsExportWizard.showDialog(PamController.getMainFrame(), getTethysControl(), parentDataBlock, false);
+		StreamExportParams streamParams = getTethysControl().getTethysExportParams().getStreamParams(getTethysControl(), parentDataBlock);
+		streamParams.reSerialize();
+//		wrappedDesc.reSerialise();
 	}
 
 	protected void itisCodes(Component component, Point point) {

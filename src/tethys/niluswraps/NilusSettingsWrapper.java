@@ -125,6 +125,41 @@ public class NilusSettingsWrapper<T extends Object> implements Serializable, Clo
 		return packNilusObject(nilusObject);
 	}
 	
+	/**
+	 * Fails with a DescriptionType document 
+	 * <?xml version="1.0" encoding="UTF-8"?>
+<Objectives>a</Objectives><Abstract>b</Abstract><Method>c</Method>
+
+OK with a Calibration: <?xml version="1.0" encoding="UTF-8"?>
+<Calibration xsi:schemaLocation="http://tethys.sdsu.edu/schema/1.0 tethys.xsd" xmlns="http://tethys.sdsu.edu/schema/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <Id></Id>
+   <TimeStamp>2025-01-11T00:00:00Z</TimeStamp>
+   <Type></Type>
+   <Process>
+      <Method>Manufacturers specification</Method>
+      <Software>not calibrated</Software>
+      <Version>-</Version>
+      <Parameters/>
+   </Process>
+   <ResponsibleParty>
+      <individualName>Doug</individualName>
+   </ResponsibleParty>
+   <QualityAssurance>
+      <Quality>invalid</Quality>
+      <Comment>No calibration</Comment>
+   </QualityAssurance>
+   <IntensityReference_uPa>0.0</IntensityReference_uPa>
+   <MetadataInfo>
+      <Contact>
+         <individualName>Doug</individualName>
+      </Contact>
+      <Date>2025-01-11T15:48:45.838Z</Date>
+      <UpdateFrequency>as-needed</UpdateFrequency>
+   </MetadataInfo>
+</Calibration>
+
+
+	 */
 	
 	/**
 	 * Get a document from the internal xml String representation. 

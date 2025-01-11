@@ -5,9 +5,11 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import PamView.menu.ModalPopupMenu;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import dataMap.OfflineDataMapPoint;
@@ -78,7 +80,8 @@ public class ExportDeploymentsTask extends TethysTask {
 
 	@Override
 	public boolean callSettings(Component component, Point point) {
-		JPopupMenu popMenu = new JPopupMenu();
+//		JPopupMenu popMenu = new JPopupMenu();
+		ModalPopupMenu popMenu = new ModalPopupMenu();
 		if (point == null) {
 			point = new Point(0,0);
 		}
@@ -91,6 +94,7 @@ public class ExportDeploymentsTask extends TethysTask {
 			}
 		});
 		popMenu.add(menuItem);
+//		popMenu.add(new JButton("a button"));
 		
 		menuItem = new JMenuItem("Deployment Information");
 		menuItem.addActionListener(new ActionListener() {	
@@ -101,9 +105,7 @@ public class ExportDeploymentsTask extends TethysTask {
 		});
 		popMenu.add(menuItem);
 		
-		popMenu.show(component, point.x, point.y);
-		
-		return true;
+		return popMenu.show(component, point.x, point.y);
 	}
 	
 	private PamguardMetaData getMetaData() {

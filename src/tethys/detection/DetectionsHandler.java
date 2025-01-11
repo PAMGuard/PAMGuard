@@ -627,7 +627,7 @@ public class DetectionsHandler extends CollectionHandler {
 		}
 		detections.setId(fullId);
 		//		detections.setDescription(dataProvider.getDescription(deployment, tethysExportParams));
-		detections.setDescription(exportParams.getNilusDetectionDescription());
+		detections.setDescription(exportParams.getDescription());
 		DataSourceType dataSource = new DataSourceType();
 		dataSource.setDeploymentId(deployment.nilusObject.getId());
 		//		dataSource.setEnsembleId(""); ToDo
@@ -804,7 +804,7 @@ public class DetectionsHandler extends CollectionHandler {
 			}
 		}
 
-		DetectionsExportWizard.showDialog(tethysControl.getGuiFrame(), tethysControl, dataBlock);
+		DetectionsExportWizard.showDialog(tethysControl.getGuiFrame(), tethysControl, dataBlock, true);
 
 	}
 

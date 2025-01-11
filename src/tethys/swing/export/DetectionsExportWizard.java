@@ -36,11 +36,11 @@ public class DetectionsExportWizard extends PamWizard {
 	private TethysDataProvider tethysDataProvider;
 	private ParameterCard parameterCard;
 	
-	private DetectionsExportWizard(Window parentFrame,  TethysControl tethysControl, PamDataBlock dataBlock) {
+	private DetectionsExportWizard(Window parentFrame,  TethysControl tethysControl, PamDataBlock dataBlock, boolean doExport) {
 		super(parentFrame, "Detections Export");
 		this.dataBlock = dataBlock;
 		
-		streamExportParams = tethysControl.getTethysExportParams().getStreamParams(dataBlock);
+		streamExportParams = tethysControl.getTethysExportParams().getStreamParams(tethysControl, dataBlock);
 		if (streamExportParams == null) {
 			streamExportParams = new StreamExportParams(tethysControl, dataBlock);
 		}
@@ -51,10 +51,11 @@ public class DetectionsExportWizard extends PamWizard {
 		addCard(granularityCard = new GranularityCard(this, tethysControl, dataBlock));
 		addCard(descriptionCard = new DescriptionCard(this, tethysControl));
 		addCard(parameterCard = new ParameterCard(tethysControl, this, dataBlock));
-		addCard(exportWorkerCard = new ExportWorkerCard(this, tethysControl, dataBlock));
+		if (doExport) {
+			addCard(exportWorkerCard = new ExportWorkerCard(this, tethysControl, dataBlock));
+		}
 		
 		moveFirst();
-		
 		
 		setResizable(true);
 		
@@ -67,8 +68,8 @@ public class DetectionsExportWizard extends PamWizard {
 		}
 	}
 
-	public static void showDialog(Window parentFrame, TethysControl tethysControl, PamDataBlock dataBlock) {
-		DetectionsExportWizard wiz = new DetectionsExportWizard(parentFrame, tethysControl, dataBlock);
+	public static void showDialog(Window parentFrame, TethysControl tethysControl, PamDataBlock dataBlock, boolean doExport) {
+		DetectionsExportWizard wiz = new DetectionsExportWizard(parentFrame, tethysControl, dataBlock, doExport);
 		wiz.setParams();
 		wiz.setVisible(true);
 	}
@@ -82,7 +83,7 @@ public class DetectionsExportWizard extends PamWizard {
 		}
 		if (wizardCard == descriptionCard) {
 			streamExportParams.checkDescription();
-			 descriptionCard.setParams(streamExportParams.getNilusDetectionDescription());
+			 descriptionCard.setParams(streamExportParams.getDescription());
 		}
 		if (wizardCard == algorithmCard) {
 			algorithmCard.setParams(streamExportParams);
@@ -105,7 +106,7 @@ public class DetectionsExportWizard extends PamWizard {
 			return granularityCard.getParams(streamExportParams);
 		}
 		if (wizardCard == descriptionCard) {
-			return descriptionCard.getParams(streamExportParams.getNilusDetectionDescription());
+			return descriptionCard.getParams(streamExportParams.getDescription());
 		}
 		if (wizardCard == algorithmCard) {
 			return algorithmCard.getParams(streamExportParams);

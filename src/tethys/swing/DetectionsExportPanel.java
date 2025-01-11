@@ -71,7 +71,7 @@ public class DetectionsExportPanel extends TethysGUIPanel implements StreamTable
 			}
 		}
 		
-		DetectionsExportWizard.showDialog(getTethysControl().getGuiFrame(), getTethysControl(), selectedDataBlock);
+		DetectionsExportWizard.showDialog(getTethysControl().getGuiFrame(), getTethysControl(), selectedDataBlock, true);
 	}
 
 	@Override
