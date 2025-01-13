@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -198,7 +199,7 @@ public class OLProcessDialog extends PamDialog {
 			c.gridx++;
 			if (aTask.hasSettings()) {
 				addComponent(tasksPanel, settingsButton[i] = new JButton(settings), c);
-				settingsButton[i].addActionListener(new SettingsListener(this, aTask));
+				settingsButton[i].addActionListener(new SettingsListener(settingsButton[i], aTask));
 			}
 			c.gridy++;
 		}
@@ -775,7 +776,8 @@ public class OLProcessDialog extends PamDialog {
 	 * @return
 	 */
 	public boolean settingsAction(Component component, OfflineTask offlineTask) {
-		return offlineTask.callSettings();
+		return offlineTask.callSettings(component, new Point(0,0));
+//		return offlineTask.callSettings();
 	}
 
 	/**

@@ -24,7 +24,7 @@ public class PamguardMetaData implements Serializable {
 	
 	private NilusSettingsWrapper<Deployment> deploymentWrapper;
 	
-	public boolean useAudioForDeploymentTimes = true;
+	public boolean useAudioForDeploymentTimes = false;
 	
 //	/**
 //	 * Deployment time (used if different 

@@ -423,7 +423,37 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 	 */
 	public void exportDeployments(RecordingList allPeriods) {
 		TethysReporter.getTethysReporter().clear();
-		if (deploymentExportOptions.separateDeployments) {
+		/**
+		 * now have three options for export, though this will reduce to two since one
+		 * option decides automatically on the other choice. 
+		 */
+		boolean separate = false;
+		switch (deploymentExportOptions.sepDeployments) {
+		case ALWAYSSEPARATE:
+			separate = true;
+			break;
+		case ALWAYSSINGLE:
+			separate = false;
+			break;
+		case AUTOSCHEDULE:
+			DutyCycleInfo ds = getDutyCycle();
+			if (ds == null) {
+				separate = false;
+			}
+			else {
+				if (ds.isDutyCycled) {
+					separate = false;
+				}
+				else {
+					separate = true;
+				}
+			}
+			break;
+		default:
+			break;
+		
+		}
+		if (separate) {
 			exportSeparateDeployments(allPeriods);
 		}
 		else {
@@ -1109,10 +1139,16 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 	
 	/**
 	 * Test to see if it's possible to export Deployment documents. This is basically a test of 
-	 * various metadata fields that are required, such as instrument id's. 
+	 * various metadata fields that are required, such as instrument id's.<br>
+	 * In main Tethys, this is called before the Export button is pressed, so doesn't check 
+	 * information that's filled in in the Wizard. When called from the task though it 
+	 * has to do a more complete set of checks.  
+	 * 
+	 * @param fullChecks do a more complete set of checks of EVERYTHING that's needed prior to export. If false
+	 * only do some checks that are needed prior to running the Wizard. 
 	 * @return null if OK, or a string describing the first encountered error
 	 */
-	public String canExportDeployments() {
+	public String canExportDeployments(boolean fullChecks) {
 
 		Deployment globalDeplData = tethysControl.getGlobalDeplopymentData();
 		if (globalDeplData.getProject() == null) {
@@ -1121,9 +1157,41 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 		
 		PInstrument arrayInstrument = getCurrentArrayInstrument();
 		if (arrayInstrument == null) {
-			return "No 'Instrument' set. Goto array manager";
+			return "No 'Instrument' set. Goto array manager to rectify this.";
 		}
+		if (fullChecks == false) {
+			return null;
+		}
+		// do more thorough checks of the rest of the deployment data. 
+		// first do the description
+		DescriptionType description = globalDeplData.getDescription();
+		if (description == null) {
+			return "The Project Description data has not been completed";
+		}
+		if (!checkString(description.getAbstract())) {
+			return "The project abstract must be completed";
+		}
+		if (!checkString(description.getMethod())) {
+			return "The project methods statement must be completed";
+		}
+		if (!checkString(description.getObjectives())) {
+			return "The project objectives statement must be completed";
+		}
+		// then the region and responsible party. 
+		
 		return null;
+	}
+	
+	/**
+	 * Check a string is not null and has non zero length
+	 * @param string
+	 * @return
+	 */
+	private boolean checkString(String string) {
+		if (string == null) {
+			return false;
+		}
+		return (string.length() > 0);
 	}
 	
 	/**
@@ -1327,6 +1395,19 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 			 */
 		}
 		return true;
+	}
+	
+	/**
+	 * Get the automatic duty cycle information. 
+	 * @return
+	 */
+	public DutyCycleInfo getDutyCycle() {
+		RecordingList recordingList = deploymentOverview.getMasterList(getTethysControl());
+		if (recordingList == null) {
+			return null;
+		}
+		DutyCycleInfo dutyCycleInf = recordingList.assessDutyCycle();
+		return dutyCycleInf;
 	}
 
 	@Override

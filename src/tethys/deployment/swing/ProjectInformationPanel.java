@@ -26,7 +26,8 @@ import tethys.swing.SelectProjectDialog;
 import tethys.tooltips.TethysTips;
 
 /**
- * Panel for entering project information
+ * Panel for entering project information including
+ * project name, region, cruise, and site.  
  * @author dg50
  *
  */

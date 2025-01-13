@@ -4,11 +4,13 @@ import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import PamController.PamSettings;
 import PamView.menu.ModalPopupMenu;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
@@ -64,7 +66,7 @@ public class ExportDeploymentsTask extends TethysTask {
 			return false;
 		}
 		// do other checks ....
-		String err = deploymentHandler.canExportDeployments();
+		String err = deploymentHandler.canExportDeployments(true);
 		if (err != null) {
 			whyNot = err;
 			return false;
@@ -105,7 +107,7 @@ public class ExportDeploymentsTask extends TethysTask {
 		});
 		popMenu.add(menuItem);
 		
-		return popMenu.show(component, point.x, point.y);
+		return (popMenu.show(component, point.x, point.y) != null);
 	}
 	
 	private PamguardMetaData getMetaData() {
@@ -184,6 +186,27 @@ public class ExportDeploymentsTask extends TethysTask {
 
 	protected void recordingGaps(Component component, Point point) {
 		deploymentHandler.showOptions(null);
+	}
+
+	@Override
+	public void prepareTask() {
+		// TODO Auto-generated method stub
+		super.prepareTask();
+	}
+
+	@Override
+	public void completeTask() {
+		// TODO Auto-generated method stub
+		super.completeTask();
+	}
+
+	@Override
+	public ArrayList<PamSettings> getSettingsProviders() {
+		ArrayList list = super.getSettingsProviders(); // should come back with main Tethys settings
+		// add the metadata settings to this. 
+		MetaDataContol mdc = MetaDataContol.getMetaDataControl();
+		list.add(mdc);
+		return list;
 	}
 
 }

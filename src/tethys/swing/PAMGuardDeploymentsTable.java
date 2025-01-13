@@ -338,7 +338,7 @@ private RecordingList masterList;
 	}
 
 	private void checkExportMeta() {
-		String metaErr = getTethysControl().getDeploymentHandler().canExportDeployments();
+		String metaErr = getTethysControl().getDeploymentHandler().canExportDeployments(false);
 		if (metaErr != null) {
 			mainPanel.setBackground(Color.RED);
 		}

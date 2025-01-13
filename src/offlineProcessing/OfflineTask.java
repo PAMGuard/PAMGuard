@@ -5,7 +5,9 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
+import PamController.PamConfiguration;
 import PamController.PamControlledUnit;
+import PamController.PamSettings;
 import PamController.PamViewParameters;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
@@ -548,5 +550,18 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 		return parentControlledUnit;
 	}
 
+	/*
+	 * Get a list of all Settings users associated with this module. 
+	 */
+	public ArrayList<PamSettings> getSettingsProviders() {
+		if (parentControlledUnit instanceof PamSettings == false) {
+			return null;
+		}
+		PamConfiguration config = parentControlledUnit.getPamConfiguration();
+		if (config == null) {
+			return null;
+		}
+		return config.getSettingsOwners(parentControlledUnit.getUnitName());
+	}
 
 }

@@ -91,7 +91,7 @@ public class ExportDataBlockTask extends TethysTask {
 			}
 		});
 
-		return	popMenu.show(component, point.x, point.y);
+		return	(popMenu.show(component, point.x, point.y) != null);
 	}
 
 	protected void exportOptions(Component component, Point point) {

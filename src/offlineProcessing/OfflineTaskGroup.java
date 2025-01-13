@@ -477,7 +477,9 @@ public class OfflineTaskGroup implements PamSettings {
 		private void processAllData(long startTime, long endTime) {
 			
 			//System.out.println("TaskGroupParams.dataChoice" +  taskGroupParams.dataChoice);
-			
+			if (primaryDataBlock == null) {
+				return;
+			}
 			long currentStart = primaryDataBlock.getCurrentViewDataStart();
 			long currentEnd = primaryDataBlock.getCurrentViewDataEnd();
 
@@ -630,6 +632,9 @@ public class OfflineTaskGroup implements PamSettings {
 		 * @param processEndTime
 		 */
 		private void processData(int globalProgress, OfflineDataMapPoint mapPoint, long processStartTime, long processEndTime) {
+			if (primaryDataBlock == null) {
+				return; // very rare, but does happen for some Tethys tasks. 
+			}
 			int nDatas = primaryDataBlock.getUnitsCount();
 			int nSay = Math.max(1, nDatas / 100);
 //			int nDone = 0;
@@ -910,9 +915,10 @@ public class OfflineTaskGroup implements PamSettings {
 				taskGroupParams.endRedoDataTime);
 		logTaskStatus(monData); // log first, since the dialog will update it's tool tips based on databse read.
 		newMonitorData(monData);
-		
-		long currentStart = primaryDataBlock.getCurrentViewDataStart();
-		long currentEnd = primaryDataBlock.getCurrentViewDataEnd();
+//		if (primaryDataBlock != null) {
+//			long currentStart = primaryDataBlock.getCurrentViewDataStart();
+//			long currentEnd = primaryDataBlock.getCurrentViewDataEnd();
+//		}
 		//System.out.println("TASKS COMPLETE:");
 		PamController.getInstance().notifyModelChanged(PamControllerInterface.OFFLINE_PROCESS_COMPLETE);
 	}

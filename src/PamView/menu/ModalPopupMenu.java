@@ -40,7 +40,7 @@ public class ModalPopupMenu extends JDialog {
 	private GridBagConstraints c;
 	private ArrayList<AbstractButton> buttons = new ArrayList<>();
 	boolean inAction = false; // currently in an action, so don't close if focus lost. 
-	boolean actionTaken = false; // flag for any action taken
+	AbstractButton usedButton = null; // button that get's pressed.
 	private Component invoker;
 	
 	/**
@@ -109,16 +109,16 @@ public class ModalPopupMenu extends JDialog {
 	 * @param invoker
 	 * @param x
 	 * @param y
-	 * @return True if a menu was actioned, false if closed without doing anything. 
+	 * @return Reference to the menu item that we pressed, or null if the menu wasn't used 
 	 */
-	public boolean show(Component invoker, int x, int y) {
+	public AbstractButton show(Component invoker, int x, int y) {
 		setInvoker(invoker);
 		pack();
 		hijackActions();
 		setLocation(invoker, x, y);
 		setVisible(true);
 //		System.out.println("Modeless menu return");
-		return actionTaken;
+		return usedButton;
 	}
 
 	/**
@@ -130,7 +130,7 @@ public class ModalPopupMenu extends JDialog {
 			ActionListener[] als = button.getActionListeners();
 			if (als == null)  continue;
 			for (int i = 0; i < als.length; i++) {
-				button.addActionListener(new HyperAction(als[i]));
+				button.addActionListener(new HyperAction(button, als[i]));
 				button.removeActionListener(als[i]);
 			}
 		}
@@ -148,20 +148,24 @@ public class ModalPopupMenu extends JDialog {
 	private class HyperAction implements ActionListener {
 
 		private ActionListener realAction;
+		private AbstractButton button;
 		
-		public HyperAction(ActionListener actionListener) {
+		public HyperAction(AbstractButton button, ActionListener actionListener) {
+			this.button = button;
 			realAction = actionListener;
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			inAction = true;
-			actionTaken = true;
+			usedButton = button;
 			try {
 				realAction.actionPerformed(e);
 				//			System.out.println("Real action complete");
 			}
-			catch (Exception x) {};
+			catch (Exception x) {
+				x.printStackTrace();	
+			};
 			inAction = false;
 			setVisible(false);
 		}

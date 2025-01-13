@@ -410,7 +410,7 @@ public class PamConfiguration {
 	/**
 	 * 
 	 * @return a list of PamControlledUnits which implements the 
-	 * PamSettingsSource interface
+	 * PamSettingsSource interface, e.g. Database, main settings store, binary store. 
 	 * @see PamSettingsSource
 	 */
 	public ArrayList<PamSettingsSource> findSettingsSources() {
@@ -591,5 +591,23 @@ public class PamConfiguration {
 		return null;
 	}
 
+	/**
+	 * Find multiple settings owners that have the same name irrespective of type. 
+	 * @param unitName
+	 * @return list of settings owners. 
+	 */
+	public ArrayList<PamSettings> getSettingsOwners(String unitName) {
+		if (settingsOwners == null) {
+			return null;
+		}
+		ArrayList<PamSettings> owners = new ArrayList<>();
+		for (PamSettings aSet : settingsOwners) {
+			if (aSet.getUnitName().equals(unitName)) {
+				owners.add(aSet);
+			}
+		}
+		return owners;
+		
+	}
 
 }
