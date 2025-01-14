@@ -54,11 +54,18 @@ public class TethysTaskManager extends UnitTaskManager implements PamSettings {
 	 * @return generated group
 	 */
 	public TethysTaskGroup addSingleTask(TethysTask tethysTask) {
-		TethysTaskGroup tethysTaskGroup = new TethysTaskGroup(tethysTask);
+		TethysTaskGroup tethysTaskGroup;
+		if (tethysTask instanceof ExportDataBlockTask) {
+			tethysTaskGroup = new ExportDatablockGroup((ExportDataBlockTask) tethysTask);
+		}
+		else {
+			tethysTaskGroup = new TethysTaskGroup(tethysTask);
+		}
 		// don't add because this gets done automatically from the TaskGroup contrsuctor
 //		add(tethysTaskGroup);
 		return tethysTaskGroup;
 	}
+	
 
 	@Override
 	public String getUnitName() {

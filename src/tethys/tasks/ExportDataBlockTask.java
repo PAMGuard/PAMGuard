@@ -12,13 +12,19 @@ import PamView.menu.ModalPopupMenu;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import dataMap.OfflineDataMapPoint;
+import offlineProcessing.OfflineTaskGroup.TaskGroupWorker;
+import offlineProcessing.TaskActivity;
+import offlineProcessing.TaskMonitorData;
+import offlineProcessing.TaskStatus;
 import tethys.TethysControl;
+import tethys.detection.DetectionExportObserver;
+import tethys.detection.DetectionExportProgress;
 import tethys.detection.DetectionsHandler;
 import tethys.output.StreamExportParams;
 import tethys.species.DataBlockSpeciesManager;
 import tethys.swing.export.DetectionsExportWizard;
 
-public class ExportDataBlockTask extends TethysTask {
+public class ExportDataBlockTask extends TethysTask implements DetectionExportObserver {
 	
 	/**
 	 * Need to check ITIS codes and stream export params are all OK. 
@@ -30,10 +36,15 @@ public class ExportDataBlockTask extends TethysTask {
 	
 	private DetectionsHandler detectionsHandler;
 
+	private ExportDatablockGroup exportDatablockGroup;
+
+	private TaskGroupWorker taskGroupWorker;
+
 	public ExportDataBlockTask(TethysControl tethysControl, TethysTaskManager tethysTaskManager,
 			PamDataBlock parentDataBlock) {
 		super(tethysControl, tethysTaskManager, parentDataBlock);
 		this.parentDataBlock = parentDataBlock;
+		detectionsHandler = tethysControl.getDetectionsHandler();
 	}
 
 	@Override
@@ -138,6 +149,36 @@ public class ExportDataBlockTask extends TethysTask {
 	public String whyNot() {
 		// TODO Auto-generated method stub
 		return super.whyNot();
+	}
+
+	/**
+	 * Called back from modified offlinetaskgroup which will let
+	 * the detectionshander do all the data load / management in it's own way
+	 * @param taskGroupWorker 
+	 * @param exportDatablockGroup
+	 */
+	public void runEntireTask(TaskGroupWorker taskGroupWorker, ExportDatablockGroup exportDatablockGroup) {
+		this.exportDatablockGroup = exportDatablockGroup;
+		this.taskGroupWorker = taskGroupWorker;
+		StreamExportParams exportParams = getTethysControl().getTethysExportParams().getStreamParams(getTethysControl(), parentDataBlock);
+		detectionsHandler = getTethysControl().getDetectionsHandler();
+		detectionsHandler.setActiveExport(true);
+		detectionsHandler.exportDetections(parentDataBlock, exportParams, this);
+		detectionsHandler.setActiveExport(false);
+	}
+
+	@Override
+	public void update(DetectionExportProgress progress) {
+		TaskGroupWorker tgw = taskGroupWorker;
+		if (tgw == null) return; // copy reference for thread safety.
+		TaskMonitorData tmd = null;
+		if (progress.state == DetectionExportProgress.STATE_COMPLETE) {
+			tmd = new TaskMonitorData(TaskStatus.COMPLETE, TaskActivity.PROCESSING, progress.nMapPoints, progress.doneMapPoints, "Processing", progress.lastUnitTime);
+		}
+		else {
+			tmd = new TaskMonitorData(TaskStatus.RUNNING, TaskActivity.PROCESSING, progress.nMapPoints, progress.doneMapPoints, "Processing", progress.lastUnitTime);
+		}
+		tgw.publish(tmd);
 	}
 
 

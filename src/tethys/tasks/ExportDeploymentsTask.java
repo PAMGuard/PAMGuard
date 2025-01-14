@@ -43,7 +43,10 @@ public class ExportDeploymentsTask extends TethysTask {
 
 	@Override
 	public boolean processDataUnit(PamDataUnit dataUnit) {
-		// TODO Auto-generated method stub
+		/*
+		 * There arent any data units, but should be fine to do the export from 
+		 * the completeTask function since that gets called anyway. 
+		 */
 		return false;
 	}
 
@@ -131,30 +134,6 @@ public class ExportDeploymentsTask extends TethysTask {
 		return metaData;
 	}
 	
-//	private NilusSettingsWrapper<Deployment> getWrappedDeployment() {
-//		DeploymentTaskSettings dtp = null;
-//		try {
-//			dtp = (DeploymentTaskSettings) getTethysTaskManager().getTaskParameters().getTaskSettings(this);
-//		}
-//		catch (Exception e) {
-//		}
-//		if (dtp == null) {
-//			dtp = new DeploymentTaskSettings(getLongName());
-//			getTethysTaskManager().getTaskParameters().setTaskSettings(this, dtp);
-//		}
-//
-//		try {
-//			NilusSettingsWrapper<Deployment> nsw = (NilusSettingsWrapper<Deployment>) dtp.getWrappedSample();
-//			if (nsw != null) {
-//				return nsw;
-//			}
-//		}
-//		catch (Exception e) {
-//			
-//		}
-//		return new NilusSettingsWrapper<Deployment>(null);
-//	}
-//	
 	private Deployment getOutlineDeployment() {
 		Deployment outlineDeployment = null;
 		PamguardMetaData metaData = getMetaData();
@@ -188,16 +167,10 @@ public class ExportDeploymentsTask extends TethysTask {
 		deploymentHandler.showOptions(null);
 	}
 
-	@Override
-	public void prepareTask() {
-		// TODO Auto-generated method stub
-		super.prepareTask();
-	}
 
 	@Override
 	public void completeTask() {
-		// TODO Auto-generated method stub
-		super.completeTask();
+		deploymentHandler.batchExport(getOutlineDeployment());
 	}
 
 	@Override

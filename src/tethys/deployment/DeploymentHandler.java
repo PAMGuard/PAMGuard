@@ -73,6 +73,7 @@ import nilus.MetadataInfo;
 import nilus.UnknownSensor;
 import pamMaths.PamVector;
 import pamMaths.STD;
+import pamguard.GlobalArguments;
 import tethys.Collection;
 import tethys.CollectionHandler;
 import tethys.TethysControl;
@@ -396,8 +397,16 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 		/*
 		 *  if we get here, it seems like the two lists are very different, so
 		 *  show a dialog to ask the user what to do. 
+		 *  In batch output mode, just go for the binary though. 
 		 */
-		RecordingList selList = EffortProblemDialog.showDialog(tethysControl.getGuiFrame(), overview);
+		RecordingList selList = binList;
+		if (GlobalArguments.isBatch()) {
+			
+		}
+		else {
+			// show the dialog. 
+			selList = EffortProblemDialog.showDialog(tethysControl.getGuiFrame(), overview);
+		}
 		if (selList != null) {
 			tethysControl.getTethysExportParams().setEffortSourceName(selList.getSourceName());
 		}
@@ -1463,6 +1472,51 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 	@Override
 	public String getHelpPoint() {
 		return helpPoint;
+	}
+
+	/**
+	 * Called from the offline task (which will probably only be available in batch mode)
+	 * to export all deployments. <br>
+	 * Can see various enhancements such as allowing overwriting to include in batch process parameters. 
+	 * Won't ever overwrite. 
+	 * @param outlineDeployment
+	 */
+	public void batchExport(Deployment outlineDeployment) {
+
+		deploymentOverview = getDeploymentOverview();
+		if (deploymentOverview == null) {
+			return;
+		}
+		RecordingList masterList = deploymentOverview.getMasterList(getTethysControl());
+		int doneCount = 0;
+		int notDonecount = 0;
+		ArrayList<RecordingPeriod> efforts = masterList.getEffortPeriods();
+		RecordingList newList = new RecordingList(masterList.getSourceName());
+//		ArrayList<RecordingPeriod> notDones = new ArrayList<>();
+		if (efforts.size() == 0) {
+			System.out.println("Batch Tethys Deployments: No recording periods to export");
+			return;
+		}
+		for (RecordingPeriod aPeriod : efforts) {
+			PDeployment tethysOutput = aPeriod.getMatchedTethysDeployment();
+			if (tethysOutput != null) {
+				doneCount++;
+			}
+			else {
+				notDonecount++;
+//				notDones.add(aPeriod);
+				newList.add(aPeriod);
+			}
+		}
+		if (notDonecount == 0) {
+			System.out.println("Batch Tethys Deployments: No new recording periods to export");
+			return;
+		}
+		
+		deploymentOverview = getDeploymentOverview();
+		RecordingList allPeriods = deploymentOverview.getMasterList(getTethysControl());
+		exportDeployments(newList);
+		
 	}
 
 }

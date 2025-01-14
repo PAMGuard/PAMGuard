@@ -275,7 +275,7 @@ public class DetectionsHandler extends CollectionHandler {
 	 * @param exportObserver
 	 * @return
 	 */
-	private int countDetections(PamDataBlock dataBlock, StreamExportParams streamExportParams, DetectionExportObserver exportObserver) {
+	public int countDetections(PamDataBlock dataBlock, StreamExportParams streamExportParams, DetectionExportObserver exportObserver) {
 		/*
 		 * This is currently called for the entire dataset, but we will need to loop over specific Deployment documents
 		 * and export the content of each separately.
@@ -389,7 +389,7 @@ public class DetectionsHandler extends CollectionHandler {
 	 * @param exportObserver
 	 * @return
 	 */
-	private int exportDetections(PamDataBlock dataBlock, StreamExportParams streamExportParams, DetectionExportObserver exportObserver) {
+	public int exportDetections(PamDataBlock dataBlock, StreamExportParams streamExportParams, DetectionExportObserver exportObserver) {
 		/*
 		 * This is currently called for the entire dataset, but we will need to loop over specific Deployment documents
 		 * and export the content of each separately.
@@ -812,5 +812,21 @@ public class DetectionsHandler extends CollectionHandler {
 	@Override
 	public String getHelpPoint() {
 		return helpPoint;
+	}
+
+
+	/**
+	 * @return the activeExport
+	 */
+	public boolean isActiveExport() {
+		return activeExport;
+	}
+
+
+	/**
+	 * @param activeExport the activeExport to set
+	 */
+	public void setActiveExport(boolean activeExport) {
+		this.activeExport = activeExport;
 	}
 }
