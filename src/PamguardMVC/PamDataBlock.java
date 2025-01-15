@@ -406,6 +406,9 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 		if (!isOffline) {
 			removeTimer.start();
 		}
+		
+		// can't call this here. 
+//		getDatablockSpeciesManager();
 	}
 
 	/**

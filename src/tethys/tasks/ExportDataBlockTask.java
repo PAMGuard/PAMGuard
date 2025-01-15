@@ -4,10 +4,12 @@ import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.JMenuItem;
 
 import PamController.PamController;
+import PamController.PamSettings;
 import PamView.menu.ModalPopupMenu;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
@@ -22,6 +24,7 @@ import tethys.detection.DetectionExportProgress;
 import tethys.detection.DetectionsHandler;
 import tethys.output.StreamExportParams;
 import tethys.species.DataBlockSpeciesManager;
+import tethys.species.SpeciesMapManager;
 import tethys.swing.export.DetectionsExportWizard;
 
 public class ExportDataBlockTask extends TethysTask implements DetectionExportObserver {
@@ -179,6 +182,15 @@ public class ExportDataBlockTask extends TethysTask implements DetectionExportOb
 			tmd = new TaskMonitorData(TaskStatus.RUNNING, TaskActivity.PROCESSING, progress.nMapPoints, progress.doneMapPoints, "Processing", progress.lastUnitTime);
 		}
 		tgw.publish(tmd);
+	}
+
+	@Override
+	public ArrayList<PamSettings> getSettingsProviders() {
+		// TODO Auto-generated method stub
+		ArrayList<PamSettings> list = super.getSettingsProviders();
+		// add the ITIS codes manager since datablocks will need it for Tethys tasks.
+		list.add(SpeciesMapManager.getInstance());
+		return list;
 	}
 
 

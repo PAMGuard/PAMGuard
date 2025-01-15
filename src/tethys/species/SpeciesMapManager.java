@@ -17,6 +17,7 @@ import java.util.Set;
 
 import javax.swing.JFileChooser;
 
+import PamController.PamConfiguration;
 import PamController.PamControlledUnitSettings;
 import PamController.PamController;
 import PamController.PamFolders;
@@ -30,6 +31,10 @@ import tethys.species.swing.SpeciesMapIODialog;
 /**
  * Master manager for species maps which will eventually allow for export and import from XML
  * documents, databases and other things ...<br>
+ * Might be a problem for some batch task management having these so global and having datablocks in the 
+ * external config that are not in the main model. Will move storage to individual datablocks and here simply
+ * have functions to gather all for some global output. 
+ * <br>
  * (Perhaps not as XML, will simply output the serialized map - easier. 
  * @author dg50
  *
@@ -49,6 +54,8 @@ public class SpeciesMapManager implements PamSettings {
 	private GlobalSpeciesMap globalSpeciesMap;
 
 	private JFileChooser ioFileChooser;
+	
+	private static final String unitName = "Global Species Codes";
 	
 	/**
 	 * file end type for map files 
@@ -78,28 +85,51 @@ public class SpeciesMapManager implements PamSettings {
 
 	@Override
 	public String getUnitName() {
-		return "Global Species Codes";
+		return unitName;
 	}
 
 	@Override
 	public String getUnitType() {
-		return "Global Species Codes";
+		return unitName;
 	}
 
+	/**
+	 * Gathers species maps from datablocks using the default configuration. 
+	 */
 	@Override
 	public Serializable getSettingsReference() {
-		gatherSpeciesMaps();
+//		gatherSpeciesMaps(PamController.getInstance().getPamConfiguration());
+//		return globalSpeciesMap;
+		return getSettingsReference(PamController.getInstance().getPamConfiguration());
+	}
+
+	/**
+	 * Gathers species maps from datablocks using the given configuration (used in batch control)
+	 * @param pamConfiguration
+	 * @return serialised data for species maps. 
+	 */
+	public Serializable getSettingsReference(PamConfiguration pamConfiguration) {
+		gatherSpeciesMaps(pamConfiguration);
 		return globalSpeciesMap;
 	}
 
 	/**
 	 * Get species maps from all PAMGuard datablocks which have such a map
+	 * Nothing is ever removed from here, which probably matters. 
 	 */
-	private void gatherSpeciesMaps() {
+	public void gatherSpeciesMaps() {
+		gatherSpeciesMaps(PamController.getInstance().getPamConfiguration());
+	}
+	/**
+	 * Get species maps from all PAMGuard datablocks which have such a map
+	 * Nothing is ever removed from here, which probably matters. 
+	 * @param configuration PAMGuard configuration if not the main one (used in batch processing job control)
+	 */
+	public void gatherSpeciesMaps(PamConfiguration configuration) {
 		if (globalSpeciesMap == null) {
 			globalSpeciesMap = new GlobalSpeciesMap();
 		}
-		ArrayList<PamDataBlock> allDataBlocks = PamController.getInstance().getDataBlocks();
+		ArrayList<PamDataBlock> allDataBlocks = configuration.getDataBlocks();// won't work for external config. 
 		for (PamDataBlock aBlock : allDataBlocks) {
 			DataBlockSpeciesManager spManager = aBlock.getDatablockSpeciesManager();
 			if (spManager == null) {
