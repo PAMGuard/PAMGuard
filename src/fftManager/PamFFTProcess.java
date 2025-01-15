@@ -23,6 +23,7 @@ package fftManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import PamDetection.RawDataUnit;
 import PamUtils.PamUtils;
@@ -234,7 +235,7 @@ public class PamFFTProcess extends PamProcess {
 	@Override
 	public void newData(PamObservable obs, PamDataUnit pamRawData) {
 		FFTDataUnit pu;
-/*		
+/*
  * 
  * 		int i=0;
  * 		System.out.println(pamRawData.getParentDataBlock().);
@@ -439,8 +440,26 @@ public class PamFFTProcess extends PamProcess {
 	}
 
 	@Override
-	public void prepareProcess() {
+	public boolean prepareProcessOK() {
 		setupFFT();
+
+		int fftChannelMap = fftControl.fftParameters.channelMap;
+		int sourceChannelMap = this.parentDataBlock.getChannelMap();
+		int unavailableSelectedChannels = fftChannelMap & ~sourceChannelMap;
+
+		if (unavailableSelectedChannels != 0) {
+			String commaSeparatedChannels = Arrays.stream(PamUtils.getChannelArray(unavailableSelectedChannels))
+					.mapToObj(String::valueOf)
+					.collect(Collectors.joining(", "));
+
+			System.err.printf(
+					"Error in the configuration of %s.\nFFT configuration uses the following channels that are not available in the source data: %s\n\n",
+					getProcessName(),
+					commaSeparatedChannels);
+			return false;
+		}
+
+		return true;
 	}
 	
 
