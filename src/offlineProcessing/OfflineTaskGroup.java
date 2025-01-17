@@ -584,7 +584,7 @@ public class OfflineTaskGroup implements PamSettings {
 				loadSecondaryData(mapPoint.getStartTime(), mapPoint.getEndTime());
 				//					}
 				for (OfflineTask aTask: offlineTasks) {
-					if (!aTask.isDoRun()) {
+					if (!aTask.isDoRun() || !aTask.canRun()) {
 						continue;
 					}
 					aTask.newDataLoad(mapPoint.getStartTime(), mapPoint.getEndTime(), mapPoint);

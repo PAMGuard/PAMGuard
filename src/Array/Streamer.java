@@ -530,6 +530,9 @@ public class Streamer implements Serializable, Cloneable, ManagedParameters {
 	 * @return the hydrophoneOrigin
 	 */
 	public HydrophoneOriginMethod getHydrophoneOrigin() {
+		if (hydrophoneOrigin == null) {
+			setupLocator(pamArray);
+		}
 		return hydrophoneOrigin;
 	}
 

@@ -37,6 +37,7 @@ import PamguardMVC.PamDataBlock;
 import export.ExportParams;
 import export.PamExporterManager;
 import offlineProcessing.OLProcessDialog;
+import offlineProcessing.OfflineTask;
 import offlineProcessing.OfflineTaskGroup;
 import offlineProcessing.TaskMonitorData;
 
@@ -418,7 +419,8 @@ public class ExportProcessDialog {
 				
 				this.activeTasks = 0; 
 				for (int i1=0; i1<exportTaskGroup.getNTasks(); i1++) {
-					if (exportTaskGroup.getTask(i1).isDoRun()) {
+					OfflineTask aTask = exportTaskGroup.getTask(i1);
+					if (aTask.isDoRun() && aTask.canRun()) {
 						activeTasks++;
 					}
 				}
@@ -533,7 +535,7 @@ public class ExportProcessDialog {
 			//we run from the first active task - not from zero - otherwise the first task will always run. 
 			int firstActiveTask = 0; 
 			for (int i1=0; i1<getNTasks(); i1++) {
-				if (getTask(i1).isDoRun()) {
+				if (getTask(i1).isDoRun() && getTask(i1).canRun()) {
 					firstActiveTask=i1;
 					break;
 				}

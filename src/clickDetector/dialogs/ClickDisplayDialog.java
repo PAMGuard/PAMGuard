@@ -308,7 +308,8 @@ public class ClickDisplayDialog extends PamDialog implements ActionListener {
 			logICIScale.setToolTipText("Feature under development");
 			showUnassignedICI.setSelected(btDisplayParameters.showUnassignedICI);
 			//JTextField maxICI, amplitudeRange0, amplitudeRange1, hGridiLines;
-			minICI.setText(String.format("%.3f", btDisplayParameters.minICI));
+			
+			minICI.setText(String.format("%.4f", btDisplayParameters.minICI));
 			maxICI.setText(String.format("%.3f", btDisplayParameters.maxICI));
 			amplitudeRange0.setText(String.format("%.1f", btDisplayParameters.amplitudeRange[0]));
 			amplitudeRange1.setText(String.format("%.1f", btDisplayParameters.amplitudeRange[1]));

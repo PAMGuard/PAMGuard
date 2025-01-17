@@ -1,5 +1,6 @@
 package tethys.tasks;
 
+import PamView.dialog.warn.WarnOnce;
 import offlineProcessing.TaskStatus;
 
 /**
@@ -21,9 +22,19 @@ public class ExportDatablockGroup extends TethysTaskGroup {
 
 	public void runBackgroundTasks(TaskGroupWorker taskGroupWorker) {
 		try {
-			prepareTasks();
-			exportDataBlockTask.runEntireTask(taskGroupWorker, this);
-			completeTasks();
+			if (exportDataBlockTask.canRun() == false) {
+				String whyNot = exportDataBlockTask.whyNot;
+				if (whyNot == null) {
+					whyNot = "Unknown reason";
+				}
+				String msg = String.format("Task %s cannot run because : %s", exportDataBlockTask.getLongName(), whyNot);
+				WarnOnce.showWarning("Task cannot run", msg, WarnOnce.WARNING_MESSAGE);
+			}
+			else {
+				prepareTasks();
+				exportDataBlockTask.runEntireTask(taskGroupWorker, this);
+				completeTasks();
+			}
 			setCompletionStatus(TaskStatus.COMPLETE);
 		}
 		catch (Exception e) {

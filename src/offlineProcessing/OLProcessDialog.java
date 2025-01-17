@@ -875,8 +875,14 @@ public class OLProcessDialog extends PamDialog {
 //			fileProgress.setValue((int) (loaded*100));
 //		}
 //
+		private TaskStatus lastStatus;
 		public void setStatus(TaskStatus taskStatus) {
 //			status.setText(TaskMonitorData.getStatusString(taskStatus));
+			if (taskStatus == lastStatus) {
+				// avoid doing this too much since it slows things down so return if it's not changed. 
+				return;
+			}
+			lastStatus = taskStatus; // slightly different usage to currentStatus!
 			currentStatus=taskStatus;
 			enableControls();
 			switch(taskStatus) {

@@ -413,6 +413,7 @@ public class DetectionsHandler extends CollectionHandler {
 		int totalCount = dataMap.getDataCount();
 		int skipCount = 0;
 		int exportCount = 0;
+		int processedCount = 0;
 		long lastUnitTime = 0;
 		DetectionExportProgress prog;
 		ViewerLoadPolicy viewerLoadPolicy = ViewerLoadPolicy.LOAD_UTCNORMAL;
@@ -499,8 +500,9 @@ public class DetectionsHandler extends CollectionHandler {
 					if (streamExportParams.exportLocalisations) {
 						localizationBuilder.addLocalization(dataUnit);
 					}
+					processedCount++;
 
-					if (exportCount % 100 == 0) {
+					if (processedCount % 100 == 0) {
 						prog = new DetectionExportProgress(deployment, detectionsDocument, totalMapPoints, doneMapPoints,
 								lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_GATHERING);
 						exportObserver.update(prog);

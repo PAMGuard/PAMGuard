@@ -52,7 +52,7 @@ public class TipOfTheDayManager {
 		addTipRandom(new PamTip("Feedback", "The development team love feedback. Please send us an email " +
 				"when things work as well as when they go wrong"));
 		addTipRandom(new PamTip("Support", "The PAMGuard team can help you. \nSee www.pamguard.org " +
-				"for details of our support service"));
+				"for details "));
 //		addTipRandom(new PamTip("Windows Vista", "PAMGuard may only run properly on Windows Vista " +
 //				"if you have logged on with administrator privilidges"));
 		addTipRandom(new PamTip("Time zones", "All PAMGuard data are collected in UTC (Greenwich Mean Time)"));

@@ -166,7 +166,7 @@ public class ClickTrainOfflineTask extends OfflineTask<PamDataUnit<?,?>> {
 		//only delete data if the click train task is selected- otherwise
 		//there may be other tasks that do not want to delete click train
 		///e.g. the click train classifier task. 
-		if (super.isDoRun()) super.deleteOldData(taskGroupParams);
+		if (super.isDoRun() && super.canRun()) super.deleteOldData(taskGroupParams);
 	}
 
 	@Override

@@ -161,6 +161,9 @@ public class DataMapControl extends PamControlledUnit implements PamSettings {
 		case PamControllerInterface.INITIALIZE_LOADDATA:
 		case PamControllerInterface.EXTERNAL_DATA_IMPORTED:
 			if (initialisationComplete) {
+				if (getDataMapGUI() == null) {
+					break;
+				}
 				findDataSources();
 				dataMapPanel.createDataGraphs();
 				getDataMapGUI().createDataGraphs();

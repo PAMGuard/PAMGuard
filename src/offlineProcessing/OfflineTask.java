@@ -394,9 +394,9 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 	 * @return true to run. 
 	 */
 	public boolean isDoRun() {
-		if (!canRun()) {
-			return false;
-		}
+//		if (!canRun()) {
+//			return false;
+//		}
 		return doRun;
 	}
 

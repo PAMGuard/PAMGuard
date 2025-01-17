@@ -133,6 +133,16 @@ public class ExportDataBlockTask extends TethysTask implements DetectionExportOb
 		if (!can) {
 			return false;
 		}
+
+		StreamExportParams exportParams = getTethysControl().getTethysExportParams().getStreamParams(getTethysControl(), parentDataBlock);
+		if (exportParams == null) {
+			whyNot = "No export configuration for this task";
+			return false;
+		}
+		if (exportParams.exportDetections == false && exportParams.exportLocalisations == false) {
+			whyNot = "You must select to export Detection, Localisations, or both";
+			return false;
+		}
 		DataBlockSpeciesManager speciesManager = parentDataBlock.getDatablockSpeciesManager();
 		if (speciesManager == null) {
 			whyNot = "No species manager is available for this data strea";
@@ -164,6 +174,9 @@ public class ExportDataBlockTask extends TethysTask implements DetectionExportOb
 		this.exportDatablockGroup = exportDatablockGroup;
 		this.taskGroupWorker = taskGroupWorker;
 		StreamExportParams exportParams = getTethysControl().getTethysExportParams().getStreamParams(getTethysControl(), parentDataBlock);
+		if (exportParams.exportDetections == false && exportParams.exportLocalisations == false) {
+			exportParams.exportDetections = true;
+		}
 		detectionsHandler = getTethysControl().getDetectionsHandler();
 		detectionsHandler.setActiveExport(true);
 		detectionsHandler.exportDetections(parentDataBlock, exportParams, this);
