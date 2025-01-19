@@ -88,7 +88,7 @@ public class TipOfTheDayManager {
 		addTipRandom(new PamTip("Visual data", "PAMGuard is not just for acoustic processing. " +
 				"Check out the Logger forms and the Video Range tracking modules."));
 		addTipRandom(new PamTip("We are on Facebook", "Check out the PAMGuard Facebook page at www.facebook.com/pamguard"));
-		addTipRandom(new PamTip("We are on blueSky", "PAMGuard posts on BlueSky. Check out https://bsky.app/profile/pamguard.org"));
+		addTipRandom(new PamTip("We are on BlueSky", "PAMGuard posts on BlueSky. Check out https://bsky.app/profile/pamguard.org"));
 		addTipRandom(new PamTip("64 bit processing", "PAMGuard now only works with 64 bit processors"));
 		addTipRandom(new PamTip("Clip Generator", "Use the clip generator module to create short waveform clips from detection data"));
 		addTipRandom(new PamTip("Microsoft Access", "PAMGuard no longer works with Microsoft Access databases. Use sqlite instead"));

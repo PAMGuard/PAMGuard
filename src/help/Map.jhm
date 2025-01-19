@@ -116,6 +116,8 @@
 
 <mapID target="detectors.gpl.docs.gpldisplays" url="detectors/gpl/docs/gpldisplays.html"/>
 
+<mapID target="utilities.tethys.docs.tethys_batch" url="utilities/tethys/docs/tethys_batch.html"/>
+
 <mapID target="classifiers.rawDeepLearningHelp.docs.rawDeepLearning_overview" url="classifiers/rawDeepLearningHelp/docs/rawDeepLearning_overview.html"/>
 
 <mapID target="detectors.likelihoodDetectionModuleHelp.LikelihoodDetector_helpIndex" url="detectors/likelihoodDetectionModuleHelp/LikelihoodDetector_helpIndex.html"/>

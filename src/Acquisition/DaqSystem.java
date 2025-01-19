@@ -1,5 +1,6 @@
 package Acquisition;
 
+import java.awt.AWTEvent;
 import java.awt.Component;
 
 import javax.swing.JComponent;
@@ -304,6 +305,18 @@ public abstract class DaqSystem {
 	 */
 	public DAQSettingsPane getDAQSpecificPane(AcquisitionPaneFX acquisitionPaneFX) {
 		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * Put in empty func for back compatibility. Only needs completion for Folder system. 
+	 * @param component
+	 * @param e
+	 */
+	public void startButtonXtraActions(Component component, AWTEvent e) {
+	}
+
+	public String getStartButtonToolTip() {
 		return null;
 	}
 
