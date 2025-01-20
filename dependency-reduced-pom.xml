@@ -72,6 +72,7 @@
               </app>
               <jdk>
                 <include>true</include>
+                <location>/Library/Java/JavaVirtualMachines/amazon-corretto-21.jdk</location>
               </jdk>
               <codesign>
                 <enable>false</enable>
@@ -224,53 +225,6 @@
                 </configuration>
               </execution>
             </executions>
-          </plugin>
-          <plugin>
-            <groupId>de.perdian.maven.plugins</groupId>
-            <artifactId>macosappbundler-maven-plugin</artifactId>
-            <version>1.21.1</version>
-            <executions>
-              <execution>
-                <phase>deploy</phase>
-                <goals>
-                  <goal>bundle</goal>
-                </goals>
-              </execution>
-            </executions>
-            <configuration>
-              <plist>
-                <JVMMainClassName>pamguard.Pamguard</JVMMainClassName>
-                <CFBundleIconFile>src/Resources/PamguardIcon2.icns</CFBundleIconFile>
-                <CFBundleDisplayName>PAMGuard</CFBundleDisplayName>
-                <CFBundleDevelopmentRegion>English</CFBundleDevelopmentRegion>
-                <CFBundleURLTypes>
-                  <string>msa</string>
-                </CFBundleURLTypes>
-                <JVMVersion>21+</JVMVersion>
-                <JVMArguments>
-                  <string>-c</string>
-                </JVMArguments>
-                <NSAppSleepDisabled>true</NSAppSleepDisabled>
-              </plist>
-              <dmg>
-                <generate>true</generate>
-                <additionalResources>
-                  <additionalResource>
-                    <directory>${project.basedir}/target/bundle/</directory>
-                  </additionalResource>
-                </additionalResources>
-                <dmgFileName>${project.build.finalName}</dmgFileName>
-                <appendVersion>false</appendVersion>
-              </dmg>
-              <jdk>
-                <include>false</include>
-                <location>/Library/Java/JavaVirtualMachines/amazon-corretto-21.jdk</location>
-              </jdk>
-              <codesign>
-                <enable>false</enable>
-                <identity>3rd Party Mac Developer Application: Jamie Macaulay (7365S9DZ34)</identity>
-              </codesign>
-            </configuration>
           </plugin>
         </plugins>
       </build>

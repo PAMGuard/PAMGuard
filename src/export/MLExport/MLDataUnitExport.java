@@ -4,6 +4,7 @@ import org.jamdev.jdl4pam.utils.DLMatFile;
 
 import PamUtils.PamCalendar;
 import PamguardMVC.PamDataUnit;
+import pamMaths.PamVector;
 import us.hebi.matlab.mat.format.Mat5;
 import us.hebi.matlab.mat.types.Array;
 import us.hebi.matlab.mat.types.Matrix;
@@ -150,5 +151,25 @@ public abstract class MLDataUnitExport<T extends PamDataUnit<?, ?>> {
 	public abstract String getName();
 
 
+	/**
+	 * Get the bearings from the data unit. Note these are the angles that are rotated to real workd vectors. 
+	 * @param dataUnit- data unit.
+	 * @return the angles in RADIANS.
+	 */
+	public static double[] realWordlVec2Angles(PamDataUnit dataUnit) {
+		//bearing
+		PamVector[] vector = dataUnit.getLocalisation().getRealWorldVectors();
+		double bearing = PamVector.vectorToSurfaceBearing(vector[0]);
+
+
+		//pitch
+		double x = vector[0].getElement(0);
+		double y = vector[0].getElement(1);
+		double z = vector[0].getElement(2);
+		x = Math.sqrt(x*x+y*y);
+		double pitch = Math.atan2(z,x);
+
+		return new double[] {bearing, pitch};
+	}
 	
 }
