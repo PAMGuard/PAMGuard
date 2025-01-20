@@ -302,6 +302,7 @@ public class ClickControl extends PamControlledUnit implements PamSettings, Loca
 			roccaControl = (RoccaControl) PamController.getInstance().findControlledUnit(RoccaControl.unitType);
 
 			clicksOffline.getOfflineTaskGroup();
+			clicksOffline.getEventTaskGroup();
 
 		}
 //		else {

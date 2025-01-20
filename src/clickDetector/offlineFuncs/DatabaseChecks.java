@@ -30,13 +30,15 @@ public class DatabaseChecks {
 		super();
 		this.clickControl = clickControl;
 		this.databaseCheckObserver = databaseCheckObserver;
-	}
 
-	public boolean runChecks(boolean repair) {
 		clicksOffline = clickControl.getClicksOffline();
 		clickDatablock = clickControl.getClickDataBlock();
 		eventDataBlock = clickControl.getClickDetector().getOfflineEventDataBlock();
 		clickLogging = new OfflineClickLogging(clickControl, null);
+		
+	}
+
+	public boolean runChecks(boolean repair) {
 
 		checkEvents(repair);
 		if (databaseCheckObserver.stopChecks()) {
@@ -82,7 +84,7 @@ public class DatabaseChecks {
 	 * @param repair repair the event if there is an error. 
 	 * @return true if event OK / repaired. 
 	 */
-	private boolean checkEvent(int eventId, boolean repair) {
+	public boolean checkEvent(int eventId, boolean repair) {
 		OfflineEventDataUnit anEvent = eventDataBlock.findByDatabaseIndex(eventId);
 		eventDataBlock.getLogging();
 		PamConnection con = DBControlUnit.findConnection();
