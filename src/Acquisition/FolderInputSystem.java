@@ -489,20 +489,44 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 
 	protected void selectFolder() {
 		JFileChooser fc = null;
-
+		/*
+		 * Revert to standard JFileChooser since whatever I did in PamFilechooser 
+		 * messed things up and it doubled the last folder name. 
+		 */
 		if (fc == null) {
-			fc = new PamFileChooser();
+			fc = new JFileChooser();
 			fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 			fc.setMultiSelectionEnabled(true);
 			fc.setFileFilter(getFolderFileFilter());
 		}
 
 		if (fileNameCombo.getSelectedIndex() >= 0) {
-			fc.setCurrentDirectory(new File(fileNameCombo.getSelectedItem().toString()));
+			File selFile = new File(fileNameCombo.getSelectedItem().toString());
+//			if (selFile.isDirectory()) {
+//				selFile = selFile.getParentFile();
+//			}
+			fc.setCurrentDirectory(selFile);
 		}
 
-		if (folderInputParameters.getSelectedFiles() != null) {
-			fc.setSelectedFiles(folderInputParameters.getSelectedFileFiles());
+		File[] files = folderInputParameters.getSelectedFileFiles();
+		if (files != null) {
+			// if it's a folder, don't do this or it will add the folder again. 
+			// but do want to do it if there has been a selection of files.
+//			boolean isFolder = false;
+//			String lastName = null;
+//			for (int i = 0; i < files.length; i++) {
+//				isFolder |= files[i].isDirectory();
+//				lastName = files[i].getName();
+//			}
+//			if (isFolder == false) {
+				fc.setSelectedFiles(files);
+//			}
+//			else {
+//				// need to select just the last name. 
+//				fc.setSelectedFile(files[0]);
+//				fc.setSelectedFiles(files);
+////				fc.setSelectedFile(new File(lastName));
+//			}
 		}
 
 		int ans = fc.showDialog(null, "Select files and folders");
@@ -513,7 +537,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			 * set that with setNewFile. If multiple files and directories
 			 * are accepted, select the parent directory of all of them.
 			 */
-			File[] files = fc.getSelectedFiles();
+			files = fc.getSelectedFiles();
 			if (files.length <= 0) return;
 			else if (files.length == 1) {
 				setNewFile(fc.getSelectedFile().toString());
