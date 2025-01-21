@@ -140,7 +140,10 @@ public class DLDetection extends PamDataUnit implements PamDetection, RawDataHol
 	 * @return
 	 */
 	private double[] getWaveData(int channel) {
+		if (waveData!=null) {
 		return this.getWaveData()[channel];
+		}
+		else return null;
 	}
 
 

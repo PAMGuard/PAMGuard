@@ -13,12 +13,17 @@
 #ignore target directory
 /target/
 
+#ignore quarto built website files
+/src/quartohelp/_site/
+/src/quartohelp/.Rproj.user/
+
 # Package Files remove jar from this since there is one we want. Most are in target which is excluded anyway.#
 *.notjar
 *.war
 *.nar
 *.ear
 *.zip
+!src/test/**/*.zip
 *.tar.gz
 *.rar
 *.dll
@@ -37,6 +42,10 @@ bin/
 .classpath
 target/WMM.COF
 
+# IntellIJ
+.idea
+
+# Eclipse
 settings.xml
 .classpath
 .classpath
@@ -117,3 +126,16 @@ settings.xml
 .settings/org.eclipse.jdt.core.prefs
 .classpath
 .project
+.settings/org.eclipse.core.resources.prefs
+.classpath
+.settings/org.eclipse.core.resources.prefs
+.classpath
+.classpath
+.classpath
+.classpath
+.classpath
+.classpath
+PAMGuard.app
+dependency-reduced-pom.xml
+.classpath
+.Rproj.user

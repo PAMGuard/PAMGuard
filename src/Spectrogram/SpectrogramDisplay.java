@@ -809,7 +809,7 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 		createColours();
 
 		timeAxis = new PamAxis(10, 0, imageWidth, 0, 0,
-				spectrogramParameters.displayLength, true, "seconds", "%3.1f");
+				spectrogramParameters.displayLength, true, "Time (s)", "%3.1f");
 		spectrogramAxis.setNorthAxis(timeAxis);
 
 		if (rangeSpinner != null) {
@@ -817,13 +817,15 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 		}
 
 		double fScale = 1;
+		String westLabel = "Frequency (Hz)";
 		if (spectrogramParameters.frequencyLimits[1] > 2000) {
 			fScale = 1000;
+			westLabel = "Frequency (kHz)";
 		}
 
 		frequencyAxis = new PamAxis(0, 200, 0, 10,
 				spectrogramParameters.frequencyLimits[0] / fScale,
-				spectrogramParameters.frequencyLimits[1] / fScale, true, "",
+				spectrogramParameters.frequencyLimits[1] / fScale, true, westLabel,
 				null);
 		frequencyAxis.setFractionalScale(true);
 		frequencyAxis.setCrampLabels(true);
@@ -1696,9 +1698,11 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 			// setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 10));
 			setLayout(new BorderLayout());
 			add(new AmplitudeBar(), BorderLayout.CENTER);
+
+			String label = String.format("PSD (%s)", PamController.getInstance().getGlobalMediumManager().getdBPSDString());
 			amplitudeAxis = new PamAxis(0, 200, 0, 10,
 					spectrogramParameters.amplitudeLimits[0],
-					spectrogramParameters.amplitudeLimits[1], false, "", "%3.0f");
+					spectrogramParameters.amplitudeLimits[1], false, label, "%3.0f");
 			setEastAxis(amplitudeAxis);
 		}
 
@@ -2948,9 +2952,11 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 			try {
 				//				System.out.println("Unlocked" + usedDataBlock.getDataName());
 				iterator = usedDataBlock.getListIterator(PamDataBlock.ITERATOR_END);
+//				int iUn = 0;
 				while(iterator.hasPrevious()) {
 					dataUnit = iterator.previous();
-
+//					System.out.printf("Draw data %d/%d at %s\n", ++iUn, usedDataBlock.getUnitsCount(),
+//							PamCalendar.formatTime(dataUnit.getTimeMilliseconds()));			
 					// decide whether or not to display the data unit based on the current time, unless we have frozen the
 					// image.  In that case, base the decision on the frozen time
 					long timeToUse = currentTimeMilliseconds;
@@ -2965,7 +2971,9 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 					if (dataUnit.getTimeMilliseconds() > timeToUse) {
 						continue;
 					}
-					if ((1<<spectrogramParameters.channelList[panelId] & dataUnit.getSequenceBitmap()) == 0) {
+					int wantedMap = 1<<spectrogramParameters.channelList[panelId];
+					int dataChanMap = dataUnit.getSequenceBitmap();
+					if ((wantedMap & dataChanMap) == 0) {
 						continue;
 					}
 					if (dataSelector != null && dataSelector.scoreData(dataUnit) <= 0) {
@@ -2976,6 +2984,8 @@ InternalFrameListener, DisplayPanelContainer, SpectrogramParametersUser, PamSett
 			}
 			catch (Exception e) {
 				// avoid synck lock 
+				System.out.println("Exception in wsl draw: " + e.getMessage());
+//				e.printStackTrace();
 			}
 
 		}

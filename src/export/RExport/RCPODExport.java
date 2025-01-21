@@ -10,7 +10,7 @@ import cpod.CPODClick;
 import export.MLExport.MLCPODExport;
 
 
-public class RCPODExport extends RDataUnitExport<PamDataUnit> {
+public class RCPODExport extends RDataUnitExport<PamDataUnit<?, ?>> {
 
 	@Override
 	public NamedBuilder addDetectionSpecificFields(NamedBuilder rData, PamDataUnit dataUnit, int index) {

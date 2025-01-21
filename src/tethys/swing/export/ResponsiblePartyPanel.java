@@ -9,7 +9,9 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import PamView.dialog.PamGridBagContraints;
+import nilus.ContactInfo;
 import nilus.ContactInfo.Address;
+import nilus.Helper;
 import tethys.tooltips.TethysTips;
 import nilus.ResponsibleParty;
 
@@ -76,9 +78,12 @@ public class ResponsiblePartyPanel {
 		organisation.setText(responsibleParty.getOrganizationName());
 		position.setText(responsibleParty.getPositionName());
 
-		Address addr = responsibleParty.getContactInfo().getAddress();
-		if (addr != null) {
-			email.setText(addr.getElectronicMailAddress());
+		ContactInfo contactInfo = responsibleParty.getContactInfo();
+		if (contactInfo != null) {
+			Address addr = responsibleParty.getContactInfo().getAddress();
+			if (addr != null) {
+				email.setText(addr.getElectronicMailAddress());
+			}
 		}
 		
 	}
@@ -88,7 +93,15 @@ public class ResponsiblePartyPanel {
 		responsibleParty.setIndividualName(name.getText());
 		responsibleParty.setOrganizationName(organisation.getText());
 		responsibleParty.setPositionName(position.getText());
-
+		if (responsibleParty.getContactInfo() == null) {
+			ContactInfo ci;
+			responsibleParty.setContactInfo(ci = new ContactInfo());
+			try {
+				Helper.createRequiredElements(ci);
+			} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
+				e.printStackTrace();
+			}
+		}
 		Address addr = responsibleParty.getContactInfo().getAddress();
 		if (addr == null) {
 			addr = new Address();

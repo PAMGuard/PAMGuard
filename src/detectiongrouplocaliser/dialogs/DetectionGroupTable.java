@@ -338,7 +338,7 @@ public class DetectionGroupTable extends UserDisplayComponentAdapter implements 
 	 * 
 	 * @return which data row is selected, or null.
 	 */
-	private DetectionGroupDataUnit getSelectedDataRow() {
+	public DetectionGroupDataUnit getSelectedDataRow() {
 		int row = table.getSelectedRow();
 		if (row < 0 || dataCopy == null || row >= dataCopy.size()) {
 			return null;

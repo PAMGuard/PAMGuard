@@ -204,7 +204,7 @@ public class RawDataTransforms {
 				currentSpecLen = fftLength;
 				powerSpectra[channel] = cData.magsq();
 				if (powerSpectra==null){
-					System.err.println("DLDetection: could not calculate power spectra");
+					System.err.println("RawDataTransforms: could not calculate power spectra");
 					return null;
 
 				}

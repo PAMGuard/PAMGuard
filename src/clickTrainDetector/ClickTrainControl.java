@@ -28,6 +28,7 @@ import clickTrainDetector.layout.warnings.CTWarningManager;
 import clickTrainDetector.offline.ClickTrainOfflineProcess;
 import detectionPlotFX.clickTrainDDPlot.ClickTrainDDPlotProvider;
 import detectionPlotFX.data.DDPlotRegister;
+import pamguard.GlobalArguments;
 
 /**
  * 
@@ -181,9 +182,6 @@ public class ClickTrainControl extends PamControlledUnit implements PamSettings 
 		//algorithm info manager
 		clAlgorithmInfoManager = new CTAlgorithmInfoManager(this); 
 
-		if (this.isViewer) {
-			clickTrainOffline = new ClickTrainOfflineProcess(this);
-		}
 		
 		warningManager = new CTWarningManager(this); 
 
@@ -194,6 +192,7 @@ public class ClickTrainControl extends PamControlledUnit implements PamSettings 
 //		System.out.println("----------------------------------"); 
 
 		setupClickTrainDetector();
+
 		
 		//register the DD display
 		DDPlotRegister.getInstance().registerDataInfo(new ClickTrainDDPlotProvider(this));
@@ -300,6 +299,7 @@ public class ClickTrainControl extends PamControlledUnit implements PamSettings 
 		super.notifyModelChanged(changeType);
 		if (changeType == PamControllerInterface.INITIALIZATION_COMPLETE) {
 			clickTrainProcess.setupProcess();
+			getClickTrainsOffline();
 		}
 	}
 
@@ -460,6 +460,11 @@ public class ClickTrainControl extends PamControlledUnit implements PamSettings 
 	 * @return the offline process. 
 	 */
 	public ClickTrainOfflineProcess getClickTrainsOffline() {
+//		if ((this.isViewer || GlobalArguments.isBatch()) & clickTrainOffline == null) {
+		if (clickTrainOffline == null) {
+			clickTrainOffline = new ClickTrainOfflineProcess(this);
+		}
+	
 		return this.clickTrainOffline;
 	}
 
@@ -549,7 +554,6 @@ public class ClickTrainControl extends PamControlledUnit implements PamSettings 
 	public CTAlgorithmInfoManager getCTAlgorithmInfoManager() {
 		return clAlgorithmInfoManager;
 	}
-
 
 	
 

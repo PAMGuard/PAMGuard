@@ -11,6 +11,7 @@ import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamButton;
 import pamViewFX.fxNodes.PamGridPane;
 import pamViewFX.fxNodes.PamHBox;
+import pamViewFX.fxStyles.PamStylesManagerFX;
 import dataPlotsFX.TDControl;
 import dataPlotsFX.TDParametersFX;
 import dataPlotsFX.data.TDDataProviderFX;
@@ -110,7 +111,7 @@ public class TDControlPaneFX extends Pane  {
 		this.tdDisplay=tdMainDsiplay;
 
 		//CSS styling- pane has the standard PAMGUARD settings pane styling. 		  
-		//this.getStylesheets().addAll(tdMainDsiplay.getCSSSettingsResource());
+//		this.getStylesheets().addAll(PamStylesManagerFX.getPamStylesManagerFX().getCurStyle().getDialogCSS());
 		this.getStyleClass().add("pane");
 
 		PamBorderPane mainPane=new PamBorderPane();
@@ -160,7 +161,7 @@ public class TDControlPaneFX extends Pane  {
 		
 		pause = new ToggleSwitch(); 
 //		pause.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.PAUSE, Color.WHITE, PamGuiManagerFX.iconSize));
-		pause.setGraphic(PamGlyphDude.createPamIcon("mdi2p-pause", Color.WHITE, PamGuiManagerFX.iconSize));
+		pause.setGraphic(PamGlyphDude.createPamIcon("mdi2p-pause", PamGuiManagerFX.iconSize));
 //		pause.selectedProperty().addListener((obsVal, oldVal, newVal)->{
 //			this.setPaused(newVal); 
 //		});
@@ -187,14 +188,14 @@ public class TDControlPaneFX extends Pane  {
 		//create button to add a graph
 		Button addGraph=new PamButton("Plot");
 //		addGraph.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.ADD, Color.WHITE, PamGuiManagerFX.iconSize));
-		addGraph.setGraphic(PamGlyphDude.createPamIcon("mdi2p-plus", Color.WHITE, PamGuiManagerFX.iconSize));
+		addGraph.setGraphic(PamGlyphDude.createPamIcon("mdi2p-plus", PamGuiManagerFX.iconSize));
 		addGraph.setOnAction(new AddButton());
 
 		//create a menu button to remove graphs
 		SplitMenuButton removeGraph=new SplitMenuButton();
 		removeGraph.setText("Plot");
 //		removeGraph.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.REMOVE, Color.WHITE, PamGuiManagerFX.iconSize));
-		removeGraph.setGraphic(PamGlyphDude.createPamIcon("mdi2m-minus", Color.WHITE, PamGuiManagerFX.iconSize));
+		removeGraph.setGraphic(PamGlyphDude.createPamIcon("mdi2m-minus", PamGuiManagerFX.iconSize));
 		removeGraph.setOnAction(new RemoveLastGraph());
 		removeGraph.showingProperty().addListener(new RemoveGraph(removeGraph) );
 
@@ -255,21 +256,21 @@ public class TDControlPaneFX extends Pane  {
 		//zoom in and zoom out buttons
 		zoomInto=new PamButton();
 //		zoomInto.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.ARROW_COMPRESS_ALL, Color.WHITE, PamGuiManagerFX.iconSize));
-		zoomInto.setGraphic(PamGlyphDude.createPamIcon("mdi2a-arrow-collapse-all", Color.WHITE, PamGuiManagerFX.iconSize));
+		zoomInto.setGraphic(PamGlyphDude.createPamIcon("mdi2a-arrow-collapse-all", PamGuiManagerFX.iconSize));
 		zoomInto.setOnAction((action)->{
 			tdDisplay.zoomDisplay(true);
 		}); 
 
 		zoomOut=new PamButton();
 //		zoomOut.setGraphic(PamGlyphDude.createPamGlyph(MaterialDesignIcon.ARROW_EXPAND_ALL, Color.WHITE, PamGuiManagerFX.iconSize));
-		zoomOut.setGraphic(PamGlyphDude.createPamIcon("mdi2a-arrow-expand-all", Color.WHITE, PamGuiManagerFX.iconSize));
+		zoomOut.setGraphic(PamGlyphDude.createPamIcon("mdi2a-arrow-expand-all", PamGuiManagerFX.iconSize));
 		zoomOut.setOnAction((action)->{
 			tdDisplay.zoomDisplay(false);
 		}); 
 		//create button to rotate the display
 		rotate=new PamButton();
 //		rotate.setGraphic(PamGlyphDude.createPamGlyph(MaterialIcon.ROTATE_90_DEGREES_CCW, Color.WHITE, PamGuiManagerFX.iconSize));
-		rotate.setGraphic(PamGlyphDude.createPamIcon("mdi2f-format-rotate-90", Color.WHITE, PamGuiManagerFX.iconSize));
+		rotate.setGraphic(PamGlyphDude.createPamIcon("mdi2f-format-rotate-90", PamGuiManagerFX.iconSize));
 		rotate.setOnAction(new RotateButton());
 		
 //		if (JamieDev.isEnabled()){
@@ -279,7 +280,7 @@ public class TDControlPaneFX extends Pane  {
 		//create button to open the advanced settings stage
 		wrapDisplay=new ToggleButton();
 //		wrapDisplay.setGraphic(PamGlyphDude.createPamGlyph(FontAwesomeIcon.EXCHANGE, Color.WHITE, PamGuiManagerFX.iconSize));
-		wrapDisplay.setGraphic(PamGlyphDude.createPamIcon("mdi2a-arrow-left-right-bold-outline", Color.WHITE, PamGuiManagerFX.iconSize));
+		wrapDisplay.setGraphic(PamGlyphDude.createPamIcon("mdi2a-arrow-left-right-bold-outline", PamGuiManagerFX.iconSize));
 		wrapDisplay.setOnAction((action)->{
 			Platform.runLater(()->{
 				tdDisplay.setWrapRequest(wrapDisplay.isSelected());

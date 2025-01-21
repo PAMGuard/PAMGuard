@@ -1,6 +1,7 @@
 package PamController;
 
 import java.util.ArrayList;
+import java.util.ListIterator;
 
 import binaryFileStorage.BinaryStore;
 import generalDatabase.DBControlUnit;
@@ -123,6 +124,23 @@ public class PamSettingsGroup implements Comparable<PamSettingsGroup> {
 	}
 	
 	/**
+	 * Get a list of all settings for specified unit name. 
+	 * @param unitName unit name. 
+	 * @return List of associated settings. Can be several for  a module.  
+	 */
+	public ArrayList<PamControlledUnitSettings> findSettingsForName(String unitName) {
+		ArrayList<PamControlledUnitSettings> sets = new ArrayList<>();
+		PamControlledUnitSettings pcu;
+		for (int i = 0; i < unitSettings.size(); i++) {
+			pcu = unitSettings.get(i);
+			if (pcu.getUnitName().equals(unitName)) {
+				sets.add(pcu);
+			}
+		}
+		return sets;
+	}
+	
+	/**
 	 * Return the list of used modules. These were / are settings returned
 	 * by the PamController. 
 	 * @return list of used modules. 
@@ -141,4 +159,24 @@ public class PamSettingsGroup implements Comparable<PamSettingsGroup> {
 		}
 		return null;
 	}
+	
+	/**
+	 * Replace settings in the unitSettings array list. 
+	 * @param newSet
+	 * @return
+	 */
+	public boolean replaceSettings(PamControlledUnitSettings newSet) {
+		PamControlledUnitSettings pcu = findUnitSettings(newSet.getUnitType(), 
+				newSet.getUnitName());
+		ListIterator<PamControlledUnitSettings> it = unitSettings.listIterator();
+		while (it.hasNext()) {
+			PamControlledUnitSettings aSet = it.next();
+			if (aSet.getUnitName().equals(newSet.getUnitName()) && aSet.getUnitType().equals(newSet.getUnitType())) {
+				it.set(newSet);
+				return true;
+			}
+		}
+		return false;
+	}
+	
 }

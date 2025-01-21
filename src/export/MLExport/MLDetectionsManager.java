@@ -41,12 +41,24 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 	 */
 	ArrayList<MLDataUnitExport> mlDataUnitsExport = new ArrayList<MLDataUnitExport>();
 
+	
+	/**
+	 * Get a list of all the currently implemented MARTLAB data exporters.
+	 * @return data exporters. 
+	 */
+	public ArrayList<MLDataUnitExport> getMlDataUnitsExport() {
+		return mlDataUnitsExport;
+	}
+
+
 	private Sink sink;
 
 	private File currentFile; 
 
 
 	public MLDetectionsManager(){
+		mlDataUnitsExport.add(new MLClickEventExport(this)); 
+		mlDataUnitsExport.add(new MLSuperDetExport(this));
 		mlDataUnitsExport.add(new MLClickExport()); 
 		mlDataUnitsExport.add(new MLWhistleMoanExport()); 
 		mlDataUnitsExport.add(new MLCPODExport()); 
@@ -165,7 +177,7 @@ public class MLDetectionsManager implements PamDataUnitExporter {
 
 		//iterate through possible export functions. 
 		for (int i=0; i<mlDataUnitsExport.size(); i++){
-
+			
 			//first need to figure out how many data units there are. 
 			int n=0; 
 			for (int j=0; j<dataUnits.size(); j++){

@@ -306,7 +306,7 @@ public class SettingsImport {
 		for (int i = 0; i < settings.size(); i++) {
 			PamControlledUnitSettings aSet = settings.get(i);
 			if (used[i]) continue;
-			if (SMRUEnable.isEnable()) {
+			if (SMRUEnable.isDevEnable()) {
 				System.out.println(String.format("Ungrouped settings %s-%s ", aSet.getUnitType(), aSet.getUnitName()));			
 			}
 		}

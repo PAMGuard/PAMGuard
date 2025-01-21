@@ -21,7 +21,7 @@ import generalDatabase.SQLLoggingAddon;
  * @see SoloAnnotationType
  *
  */
-public abstract class DataAnnotationType<TDataAnnotation extends DataAnnotation> {
+public abstract class DataAnnotationType<TDataAnnotation extends DataAnnotation<?>> {
 
 	public abstract String getAnnotationName();
 

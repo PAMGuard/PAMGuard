@@ -487,11 +487,19 @@ public class SourcePanel implements ActionListener{
 	
 	/**
 	 * Set the current channel selection
+	 * Only enables channels that are available (remainder are silently disabled).
 	 * @param channelList bitmap of currently selected channels
 	 */
 	public void setChannelList(int channelList) {
+		var availableChannels = getSource().getSequenceMap();
+		var toSelect = channelList & availableChannels;
+
+		if (toSelect != channelList) {
+			System.out.printf("SourcePanel: availableChannels=%d, channelList=%d, toSelect=%d - deselecting unavailable channels.\n", availableChannels, channelList, toSelect);
+		}
+
 		for (int i = 0; i < PamConstants.MAX_CHANNELS; i++) {
-			channelBoxes[i].setSelected((channelList & (1<<i)) != 0); 
+			channelBoxes[i].setSelected((toSelect & (1<<i)) != 0);
 		}
 	}
 	

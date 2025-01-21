@@ -20,6 +20,7 @@ import PamController.PamSettingManager;
 import PamController.PamSettings;
 import PamController.SettingsNameProvider;
 import PamController.SettingsPane;
+import PamUtils.PamCalendar;
 import PamUtils.PamUtils;
 import PamUtils.complex.ComplexArray;
 import PamguardMVC.PamDataBlock;
@@ -34,6 +35,8 @@ import group3dlocaliser.Group3DLocaliserControl;
 import group3dlocaliser.algorithm.toadbase.TOADInformation;
 import pamMaths.PamVector;
 import pamViewFX.fxNodes.pamDialogFX.ManagedSettingsPane;
+import warnings.PamWarning;
+import warnings.WarningSystem;
 
 /**
  * Generic TOAD calculator which does it's best by any type of sound. Can be used when 
@@ -257,12 +260,20 @@ public class GenericTOADCalculator implements TOADCalculator, PamSettings {
 		}
 		double c = geometry.getCurrentArray().getSpeedOfSound();
 		double[][] maxDelays = new double[nCh][nCh];
+		int[] hydroList = geometry.getHydrophoneList();
+		if (hydroList.length < nCh) {
+			String warn = String.format("hydrophone list length %d is less than number of channels %d\n", hydroList.length, nCh);
+			PamWarning warning = new PamWarning("GenericTOADLocaliser.getMaxDelays()", warn , 2);
+			warning.setEndOfLife(PamCalendar.getTimeInMillis() + 10000);
+			WarningSystem.getWarningSystem().addWarning(warning);
+			nCh = hydroList.length;
+		}
 		for (int i = 0; i < nCh; i++) {
 			for (int j = i+1; j < nCh; j++) {
 				int hi = hIndex == null ? i : hIndex[i];
 				int hj = hIndex == null ? j : hIndex[j];
-				PamVector v = geometry.getGeometry()[geometry.getHydrophoneList()[hi]].
-						sub(geometry.getGeometry()[geometry.getHydrophoneList()[hj]]);
+				PamVector v = geometry.getGeometry()[hydroList[hi]].
+						sub(geometry.getGeometry()[hydroList[hj]]);
 				maxDelays[i][j] = v.norm()/c;
 			}
 		}

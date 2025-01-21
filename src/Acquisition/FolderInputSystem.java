@@ -1,10 +1,12 @@
 package Acquisition;
 
+import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -20,7 +22,9 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.Timer;
 import javax.swing.border.TitledBorder;
@@ -100,9 +104,41 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 	 */
 	protected PamPanel audioLoaderHolder;
 
+
 	@Override
 	public boolean runFileAnalysis() {
 		currentFileStart = System.currentTimeMillis();
+		/**
+		 * Here, need to handle restarts if we've stopped and are restarting. 
+		 * There are two things to do. 1 identify correct file for processing based
+		 * on currentAnalysisTime, then if necessary, skip part of that first file. 
+		 */
+		if (currentFile > 0) {
+			currentFile--; // shouldn't ever need to go back more than one.  
+		}
+		millisToSkip = 0;
+		long fileStart = 0, fileEnd = 0;
+		if (currentAnalysisTime > 0) {
+			for (int i = currentFile; i < allFiles.size(); i++) {
+				WavFileType aF = allFiles.get(i);
+				AudioFormat audioformat = aF.getAudioFormat(aF);
+				if (audioformat == null) {
+					break; // can't do much now!
+				}
+				fileStart = getFileStartTime(aF);
+				fileEnd = fileStart + (long) (aF.getDurationInSeconds()*1000.);
+				if (fileEnd > currentAnalysisTime + 2000) { // don't go 2s at end of file
+					currentFile = i; // set the correct file. 
+					millisToSkip = currentAnalysisTime - fileStart; // how much of the file to skip.
+					if (millisToSkip < 0) {
+						// this is a normal gap in files. So start at the start of the file. 
+						millisToSkip = 0;
+						currentAnalysisTime = 0;
+					}
+					break;
+				}
+			}
+		}
 		return super.runFileAnalysis();
 	}
 
@@ -252,13 +288,21 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		constraints.gridy++;
 		constraints.gridx = 0;
 		constraints.gridwidth = 1;
-		addComponent(p,  new JLabel("Skip initial :"), constraints);
-		constraints.gridx++;
-		addComponent(p, skipSecondsField = new JTextField(4), constraints);
-		constraints.gridx++;
-		addComponent(p,  new JLabel("seconds"), constraints);
-		//		}
+		
+		//panel which allows the users to skip the first section of a file. 
+		PamPanel skipPanel = new PamPanel(new GridBagLayout()); 
 
+		constraints.insets = new Insets(0,0,0,5); 
+		addComponent(skipPanel,  new JLabel("Skip initial "), constraints);
+		constraints.gridx++;
+		addComponent(skipPanel, skipSecondsField = new JTextField(4), constraints);
+		constraints.gridx++;
+		addComponent(skipPanel,  new JLabel("seconds"), constraints);
+		constraints.anchor = GridBagConstraints.WEST;
+		
+		constraints.gridwidth = 3;
+		constraints.gridx = 0; 
+		addComponent(p,  skipPanel, constraints);	
 
 		//panel to show bespoke settings for certain audio loaders.
 		constraints.anchor = GridBagConstraints.WEST;
@@ -445,20 +489,44 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 
 	protected void selectFolder() {
 		JFileChooser fc = null;
-
+		/*
+		 * Revert to standard JFileChooser since whatever I did in PamFilechooser 
+		 * messed things up and it doubled the last folder name. 
+		 */
 		if (fc == null) {
-			fc = new PamFileChooser();
+			fc = new JFileChooser();
 			fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 			fc.setMultiSelectionEnabled(true);
 			fc.setFileFilter(getFolderFileFilter());
 		}
 
 		if (fileNameCombo.getSelectedIndex() >= 0) {
-			fc.setCurrentDirectory(new File(fileNameCombo.getSelectedItem().toString()));
+			File selFile = new File(fileNameCombo.getSelectedItem().toString());
+//			if (selFile.isDirectory()) {
+//				selFile = selFile.getParentFile();
+//			}
+			fc.setCurrentDirectory(selFile);
 		}
 
-		if (folderInputParameters.getSelectedFiles() != null) {
-			fc.setSelectedFiles(folderInputParameters.getSelectedFileFiles());
+		File[] files = folderInputParameters.getSelectedFileFiles();
+		if (files != null) {
+			// if it's a folder, don't do this or it will add the folder again. 
+			// but do want to do it if there has been a selection of files.
+//			boolean isFolder = false;
+//			String lastName = null;
+//			for (int i = 0; i < files.length; i++) {
+//				isFolder |= files[i].isDirectory();
+//				lastName = files[i].getName();
+//			}
+//			if (isFolder == false) {
+				fc.setSelectedFiles(files);
+//			}
+//			else {
+//				// need to select just the last name. 
+//				fc.setSelectedFile(files[0]);
+//				fc.setSelectedFiles(files);
+////				fc.setSelectedFile(new File(lastName));
+//			}
 		}
 
 		int ans = fc.showDialog(null, "Select files and folders");
@@ -469,7 +537,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 			 * set that with setNewFile. If multiple files and directories
 			 * are accepted, select the parent directory of all of them.
 			 */
-			File[] files = fc.getSelectedFiles();
+			files = fc.getSelectedFiles();
 			if (files.length <= 0) return;
 			else if (files.length == 1) {
 				setNewFile(fc.getSelectedFile().toString());
@@ -570,6 +638,9 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 				acquisitionDialog.setSampleRate(audioFormat.getSampleRate());
 				acquisitionDialog.setChannels(fudgeNumChannels(audioFormat.getChannels()));
 				audioStream.close();
+				//prevent the dialog from going nuts when components are resized. 
+				acquisitionDialog.validate();
+				acquisitionDialog.pack();
 			}
 			catch (Exception Ex) {
 				//				Ex.printStackTrace();
@@ -744,9 +815,9 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 
 	@Override
 	public void daqHasEnded() {
-		currentFile++;
+		currentFile++; // not ideal if paused in a file since it makes starter back up. 
 		if (folderInputParameters.repeatLoop && currentFile >= allFiles.size()) {
-			currentFile = 0;
+			resetToStart();
 		}
 		if (currentFile < allFiles.size()) {
 			// only restart if the file ended - not if it stopped
@@ -820,7 +891,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		folderInputParameters.subFolders = subFolders.isSelected();
 		folderInputParameters.mergeFiles = mergeFiles.isSelected();
 		folderInputParameters.repeatLoop = repeat.isSelected();
-		currentFile = 0;
+		resetToStart();
 		if (skipSecondsField!=null) {
 			try {
 				Double skipSeconds = Double.valueOf(skipSecondsField.getText())*1000.; // saved in millis.
@@ -982,6 +1053,9 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 	@Override
 	public boolean setAnalysisStartTime(long startTime) {
 				
+		if (currentAnalysisTime > 0) {
+			startTime = currentAnalysisTime;
+		}
 		/**
 		 * Called from the reprocess manager just before PAMGuard starts with a time
 		 * we want to process from. This should be equal to the start of one of the files
@@ -1031,11 +1105,67 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		}
 		int generalStatus = PamController.getInstance().getPamStatus();
 		File currFile = getCurrentFile();
+		// status string is nFiles, currentFile, generalStatus from PamController and current file as string. 
 		String bs = String.format("%d,%d,%d,%s", nFiles,currentFile,generalStatus,currFile);
 		return bs;
 	}
+	/**
+	 * Extra options for the start menu
+	 * @param component
+	 * @param e
+	 */
+	public void startButtonXtraActions(Component component, AWTEvent e) {
+		if (PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW) {
+			return;
+		}
+		long currT = currentAnalysisTime;
+		if (currT == 0) {
+			return;
+		}
+		
+		JPopupMenu popMenu = new JPopupMenu();
+		JMenuItem menuItem = new JMenuItem("Start at first file");
+		menuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				startAtStart();
+			}
+		});
+		popMenu.add(menuItem);
+		menuItem = new JMenuItem("Continue processing from " + PamCalendar.formatDBDateTime(currT));
+		menuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				startAtCurrent(currT);
+			}
+		});
+		popMenu.add(menuItem);
+		Point p = new Point(component.getWidth()/2, component.getHeight()/2);
+		
+		popMenu.show(component, p.x, p.y);
+	}
 
 
+	private void startAtStart() {
+		resetToStart();
+		PamController.getInstance().pamStart();
+	}
 
 
+	/**
+	 * Reset to start of file list and also the current time to zero. 
+	 */
+	public void resetToStart() {
+		currentFile = 0;
+		currentAnalysisTime = 0;
+	}
+
+	protected void startAtCurrent(long currT) {
+		// can probably control everything from currentAnalysisTime
+		PamController.getInstance().pamStart();
+	}
+
+	public String getStartButtonToolTip() {
+		return "Press to start processing, or right click for more options";
+	}
 }

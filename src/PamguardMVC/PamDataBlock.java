@@ -48,6 +48,7 @@ import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionProcess;
 import Localiser.LocalisationAlgorithm;
 import PamController.OfflineDataStore;
+import PamController.PamConfiguration;
 import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamController.PamControllerInterface;
@@ -85,7 +86,9 @@ import effort.binary.DataMapEffortProvider;
 import generalDatabase.SQLLogging;
 import generalDatabase.external.crossreference.CrossReference;
 import jsonStorage.JSONObjectDataSource;
+import offlineProcessing.OfflineTaskGroup;
 import pamScrollSystem.ViewLoadObserver;
+import pamguard.GlobalArguments;
 import tethys.TethysControl;
 import tethys.pamdata.TethysDataProvider;
 import tethys.species.DataBlockSpeciesManager;
@@ -403,6 +406,9 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 		if (!isOffline) {
 			removeTimer.start();
 		}
+		
+		// can't call this here. 
+//		getDatablockSpeciesManager();
 	}
 
 	/**
@@ -987,6 +993,23 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			}
 		}
 	}
+	
+	public void clearAll(boolean andDownStream) {
+		clearAll();
+		if (andDownStream) {
+			int nObs = countObservers();
+			for (int i = 0; i < nObs; i++) {
+				PamObserver obs = getPamObserver(i);
+				if (obs instanceof PamProcess) {
+					PamProcess proc = (PamProcess) obs;
+					ArrayList<PamDataBlock> procOuts = proc.getOutputDataBlocks();
+					for (PamDataBlock b : procOuts) {
+						b.clearAll(andDownStream);
+					}
+				}
+			}
+		}
+	}
 
 	/**
 	 * Reset a datablock. This is called at PamStart from PamController It's been
@@ -1088,6 +1111,9 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 //					PamCalendar.formatDateTime(offlineDataLoadInfo.getEndMillis()) ,getLongDataName());
 //		}
 
+		if (GlobalArguments.getParam(GlobalArguments.BATCHVIEW) != null) {
+			return false;
+		}
 		saveViewerData();
 
 		if (!needViewerDataLoad(offlineDataLoadInfo)) {
@@ -2667,6 +2693,7 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			return getDataCopy(getListIterator(startTimeMillis, channels, match, position));
 		}
 	}
+	
 
 	/**
 	 * Get an iterator, positioned at the given startTime.
@@ -2858,6 +2885,19 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			copy.add(iterator.next());
 		}
 		return copy;
+	}
+	
+
+	/**
+	 * Get a copy of the data for offline tasks. Required since one or two data blocks
+	 * have to do something a bit different for some specific tasks. 
+	 * @param startTime data start time
+	 * @param endTime data end time
+	 * @param taskGroup task group
+	 * @return copy of data within those times, possibly modified for specific tasks
+	 */
+	public ArrayList<Tunit> getTaskDataCopy(long startTime, long endTime, OfflineTaskGroup taskGroup) {
+		return getDataCopy(startTime, endTime, false);
 	}
 	
 	/**
@@ -4427,4 +4467,23 @@ public class PamDataBlock<Tunit extends PamDataUnit> extends PamObservable {
 			effP.realTimeStop(stopTime);
 		}
 	}
+
+	/**
+	 * Get the configuration for this datablock. Needed with batch processor since there are configs
+	 * flying everywhere. 
+	 * @return
+	 */
+	public PamConfiguration getPamConfiguration() {
+		PamConfiguration config = null;
+		if (getParentProcess() != null && getParentProcess().getPamControlledUnit() != null) {
+			config = getParentProcess().getPamControlledUnit().getPamConfiguration();
+		}
+		if (config == null) {
+			return PamController.getInstance().getPamConfiguration();
+		}
+		else {
+			return config;
+		}
+	}
+
 }

@@ -28,10 +28,10 @@ public class TipOfTheDayManager {
 	private TipOfTheDayManager() {
 		addTipRandom(new PamTip("NMEA Acquisition", "If your computer does not have a serial port, " +
 				"use a serial to USB converter", "NMEA Acquisition", null));
-		addTipRandom(new PamTip("PAMGUARD Viewer", "A new scroll system was implemented in version 1.10.00 " +
-				"(Novemeber 2010). See the PAMGUARD help for details"));
-		addTipRandom(new PamTip("Binary Storage", "A new binary data storage system is now in place. This can " +
-				"be used with or without the database"));
+//		addTipRandom(new PamTip("PAMGuard Viewer", "A new scroll system was implemented in version 1.10.00 " +
+//				"(Novemeber 2010). See the PAMGuard help for details"));
+//		addTipRandom(new PamTip("Binary Storage", "A new binary data storage system is now in place. This can " +
+//				"be used with or without the database"));
 		addTipRandom(new PamTip("Sound Acquisition", "For high sample rates (above 192 kHz) " +
 				"use National instruments data acquisition boards"));
 		addTipRandom(new PamTip("Sound Acquisition", "Multiple National Instruments cards can use a " +
@@ -47,30 +47,30 @@ public class TipOfTheDayManager {
 				"without airguns, you can use the seismic veto module to cut out the airguns"));
 		addTipRandom(new PamTip("Sound Acquisition", "The sound acquisition module works with many " +
 				"types of input device and can also be used to analyse archived data from files"));
-		addTipRandom(new PamTip("Source Code", "Did you know that all the PAMGUARD source code " +
-				"is available on the web. If you don't like something, you might be able to modify it yourself"));
+		addTipRandom(new PamTip("Source Code", "Did you know that all the PAMGuard source code " +
+				"is available on GitHub at https://github.com/PAMGuard. If you don't like something, you might be able to modify it yourself"));
 		addTipRandom(new PamTip("Feedback", "The development team love feedback. Please send us an email " +
 				"when things work as well as when they go wrong"));
-		addTipRandom(new PamTip("Support", "The PAMGUARD team can help you. \nSee www.pamguard.org " +
-				"for details of our support service"));
-		addTipRandom(new PamTip("Windows Vista", "PAMGUARD may only run properly on Windows Vista " +
-				"if you have logged on with administrator privilidges"));
-		addTipRandom(new PamTip("Time zones", "All PAMGUARD data are collected in UTC (Greenwich Mean Time)"));
-		addTipRandom(new PamTip("PC Clock updates", "PAMGUARD can set your PC clock based on accurate times from a GPS"));
+		addTipRandom(new PamTip("Support", "The PAMGuard team can help you. \nSee www.pamguard.org " +
+				"for details "));
+//		addTipRandom(new PamTip("Windows Vista", "PAMGuard may only run properly on Windows Vista " +
+//				"if you have logged on with administrator privilidges"));
+		addTipRandom(new PamTip("Time zones", "All PAMGuard data are collected in UTC (Greenwich Mean Time)"));
+//		addTipRandom(new PamTip("PC Clock updates", "PAMGuard can set your PC clock based on accurate times from a GPS"));
 		addTipRandom(new PamTip("AIS", "You can view the positions of other ships in the area using an AIS receiver and "+ 
-				"the PAMGUARD AIS processing module"));
+				"the PAMGuard AIS processing module"));
 		addTipRandom(new PamTip("Airgun display", "Used in conjunction with an AIS module, the positions of airguns can " +
 				"be displayed even if they are on a different vessel"));
-		addTipRandom(new PamTip("Static hydrophone arrays", "PAMGUARD can work with static as well as towed array data"));
-		addTipRandom(new PamTip("Online help", "All PAMGUARD modules in the Core release are documented in the online help (Nearly)"));
-		addTipRandom(new PamTip("Home page", "The PAMGUARD home page is at www.pamguard.org"));
-		addTipRandom(new PamTip("Click Detector", "The click detector can output files which are compatible with the IFAW " +
-				"RainbowClick software, but only if channels are arranged into groups of exactly two channels per group"));
-		addTipRandom(new PamTip("Right Click", "Click with the right mouse button on many PAMGUARD displays to bring " +
+		addTipRandom(new PamTip("Static hydrophone arrays", "PAMGuard can work with static as well as towed array data"));
+		addTipRandom(new PamTip("Online help", "All PAMGuard modules in the Core release are documented in the online help (Nearly)"));
+		addTipRandom(new PamTip("Home page", "The PAMGuard home page is at www.pamguard.org"));
+//		addTipRandom(new PamTip("Click Detector", "The click detector can output files which are compatible with the IFAW " +
+//				"RainbowClick software, but only if channels are arranged into groups of exactly two channels per group"));
+		addTipRandom(new PamTip("Right Click", "Click with the right mouse button on many PAMGuard displays to bring " +
 				"up lists of options"));
 		addTipRandom(new PamTip("Multiple Displays", "Right click on a tab on the main display and use the menu options " +
 				"to move display components to new windows"));
-		addTipRandom(new PamTip("Copying", "You can copy many PAMGUARD displays to the system clipboard by right clicking on " +
+		addTipRandom(new PamTip("Copying", "You can copy many PAMGuard displays to the system clipboard by right clicking on " +
 				"the tab buttons on the main display\n" +
 				"You can then paste the graphics straight into your preferred " +
 				"word processing software"));
@@ -81,18 +81,19 @@ public class TipOfTheDayManager {
 		addTipRandom(new PamTip("Map Display", "You can use the scroll wheel on the mouse to zoom the map in and out"));
 		addTipRandom(new PamTip("Bug reporting", "We can only fix them if we know about them !\n" +
 				"Please email bug reports to support@pamguard.org"));
-		addTipRandom(new PamTip("User email list", "Details of the PAMGUARD users email list " +
-				"can be found on the web at www.pamguard.org/contact.php"));
-		addTipRandom(new PamTip("Developer email list", "Details of the PAMGUARD developers email list " +
-		"can be found on the web at www.pamguard.org/contact.shtml"));
-		addTipRandom(new PamTip("Visual data", "PAMGUARD is not just for acoustic processing. " +
+//		addTipRandom(new PamTip("User email list", "Details of the PAMGuard users email list " +
+//				"can be found on the web at www.pamguard.org/contact.php"));
+//		addTipRandom(new PamTip("Developer email list", "Details of the PAMGuard developers email list " +
+//		"can be found on the web at www.pamguard.org/contact.shtml"));
+		addTipRandom(new PamTip("Visual data", "PAMGuard is not just for acoustic processing. " +
 				"Check out the Logger forms and the Video Range tracking modules."));
-		addTipRandom(new PamTip("We are on Facebook", "Check out the PAMGUARD Facebook page at www.facebook.com/pamguard"));
-		addTipRandom(new PamTip("64 bit processing", "Full 64 bit support is still under development.\n" +
-				"Even if you have a 64 bit computer, you will be better off running a 32 bit Java Virtual Machine"));
+		addTipRandom(new PamTip("We are on Facebook", "Check out the PAMGuard Facebook page at www.facebook.com/pamguard"));
+		addTipRandom(new PamTip("We are on BlueSky", "PAMGuard posts on BlueSky. Check out https://bsky.app/profile/pamguard.org"));
+		addTipRandom(new PamTip("64 bit processing", "PAMGuard now only works with 64 bit processors"));
 		addTipRandom(new PamTip("Clip Generator", "Use the clip generator module to create short waveform clips from detection data"));
-		addTipRandom(new PamTip("Java 8", "Java 8 DOES NOT support the connection to Microsoft Access databases. \n"
-				+ "Until this problem has been fixed, you should stick to Java 7."));
+		addTipRandom(new PamTip("Microsoft Access", "PAMGuard no longer works with Microsoft Access databases. Use sqlite instead"));
+		addTipRandom(new PamTip("Plugin Modules", "Several usefual plugin modules are also available at www.pamguard.org to add you your system"));
+		addTipRandom(new PamTip("Deep Learning", "PAMGuards Deep Learning classifier allows you to run AI models within PAMGuard"));
 	}
 	
 	public void addTipRandom(PamTip pamTip) {

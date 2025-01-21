@@ -29,6 +29,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 import javax.swing.border.EmptyBorder;
 
+import PamView.PamIcon;
+
 /**
  * @author Doug Gillespie
  *         <p>
@@ -84,11 +86,8 @@ public class PamInternalFrame extends JInternalFrame implements ComponentListene
 
 		pamFramePlots.setFrame(this);
 
-		if (!System.getProperty("os.name").equals("Linux")) {
-			setFrameIcon(new ImageIcon(ClassLoader
-					.getSystemResource("Resources/pamguardIcon.png")));
-		}
-
+		setFrameIcon(PamIcon.getPAMGuardImageIcon(PamIcon.SMALL));
+		
 		graphLayout = new PamGraphLayout(framePlots);
 		
 		this.add(BorderLayout.CENTER, graphLayout.getMainComponent());

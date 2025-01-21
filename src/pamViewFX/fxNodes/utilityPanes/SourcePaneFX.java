@@ -22,6 +22,7 @@ import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
 import pamViewFX.validator.PamValidator;
+import PamController.PamConfiguration;
 import PamController.PamController;
 import PamController.PamGUIManager;
 import PamDetection.LocalisationInfo;
@@ -88,6 +89,8 @@ public class SourcePaneFX extends PamBorderPane {
 	 */
     protected PamValidator channelValidator;
 	private Label channelLabel;
+	
+	private PamConfiguration pamConfiguration;
 
 	/**
 	 * Construct a panel with a titles border
@@ -106,6 +109,26 @@ public class SourcePaneFX extends PamBorderPane {
 		createPanel();
 		setSourceList();
 	}
+	/**
+	 * Construct a panel with a titles border
+	 * @param borderTitle Title to go in border
+	 * @param sourceType Data Source type
+	 * @param hasChannels Include a set of checkboxes to list available channels
+	 * @param includeSubClasses include all subclasses of sourceType in the list. 
+	 */
+	public SourcePaneFX(String borderTitle, PamConfiguration pamConfiguration, Class sourceType, boolean hasChannels, boolean includeSubClasses) {
+		if (sourceType != null) {
+			this.sourceType.add(new SourceSelection(sourceType, includeSubClasses));
+		}
+		this.pamConfiguration = pamConfiguration;
+		channelValidator = new PamValidator();
+		this.setHasChannels(hasChannels);
+		this.setBorderTitle(borderTitle);
+		createPanel();
+		setSourceList();
+	}
+	
+	
 
 	/**
 	 * Construct a panel without a border
@@ -418,7 +441,7 @@ public class SourcePaneFX extends PamBorderPane {
 	 */
 	public boolean setSource(String sourceName) {
 		// search the list for the string
-		PamDataBlock dataBlock = PamController.getInstance().getDataBlockByLongName(sourceName);
+		PamDataBlock dataBlock = getConfiguration().getDataBlockByLongName(sourceName);
 		if (dataBlock != null) {
 			setSource(dataBlock);
 			return true;
@@ -435,6 +458,15 @@ public class SourcePaneFX extends PamBorderPane {
 		//sourceList.getSelectionModel().select(0);
 		setSourceIndex(0);
 		return false;
+	}
+	
+	private PamConfiguration getConfiguration() {
+		if (pamConfiguration != null) {
+			return pamConfiguration;
+		}
+		else {
+			return PamController.getInstance().getPamConfiguration();
+		}
 	}
 	
 	/**
@@ -560,7 +592,7 @@ public class SourcePaneFX extends PamBorderPane {
 	protected List<PamDataBlock> getSourceDataBlocks() {
 		ArrayList<PamDataBlock> dataBlocks = new ArrayList<>();
 		for (SourceSelection sourceSel:sourceType) {
-			ArrayList<PamDataBlock> sl = PamController.getInstance().getDataBlocks(sourceSel.sourceType, sourceSel.allowSubClasses);
+			ArrayList<PamDataBlock> sl = getConfiguration().getDataBlocks(sourceSel.sourceType, sourceSel.allowSubClasses);
 			for (PamDataBlock db:sl) {
 				if (dataBlocks.contains(db) == false) {
 					dataBlocks.add(db);
@@ -826,4 +858,5 @@ public class SourcePaneFX extends PamBorderPane {
 	public PamValidator getChannelValidator() {
 		return channelValidator;
 	}
+
 }

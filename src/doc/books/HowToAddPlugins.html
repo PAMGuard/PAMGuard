@@ -1,19 +1,19 @@
 <html>
 <head>
 <LINK href="pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
-<title>PamGuard</title>
+<title>PAMGuard</title>
 </head>
 
 <body>
 
-<h1>Writing Pamguard Plugins</h1>
-<h2>Adding plugins to the Pamguard model</h2><br>
+<h1>Writing PAMGuard Plugins</h1>
+<h2>Adding plugins to the PAMGuard model</h2><br>
 
 <p>
-To make a Pamguard plug-in avialable to Pamguard users it is necessary to edit
+To make a PAMGuard plug-in avialable to PAMGuard users it is necessary to edit
 the java file <a href="../pammodel/PamModel.html">pammodel/PamModel.java</a>.<br>
 <p>
-First you register the module with Pamguard using<p>
+First you register the module with PAMGuard using<p>
 <pre>PamModuleInfo myModule = PamModuleInfo.registerControlledUnit(String className, String description);</pre>
 where className is the class name of the class PamControlledUnit and description is the descriptive name
 of the module. 
@@ -22,12 +22,12 @@ For example
 <pre>PamModuleInfo myModule = <a href="../pammodel/PamModuleInfo.html#registerControlledUnit(java.lang.String, java.lang.String)">PamModuleInfo.registerControlledUnit</a>("GPS.GPSControl", "GPS Processing");</pre>
 adds the GPS module. 
 <p>
-The module will now be listed in the Pamguard File/Add Modules menu from where the user can create instances of the module. 
-<p>The Pamguard settings manager will be aware of the new module and will automatically create the module
-the next time Pamguard is run.</p>
+The module will now be listed in the PAMGuard File/Add Modules menu from where the user can create instances of the module. 
+<p>The PAMGuard settings manager will be aware of the new module and will automatically create the module
+the next time PAMGuard is run.</p>
 <br>
 <h2>Add the module to a menu group</h2>
-Due to the large number of Pamguard modules now in existance, you will  want to have your module listed in one
+Due to the large number of PAMGuard modules now in existance, you will  want to have your module listed in one
 of the sub menus of the File/Add Modules menu. You can add your module to one of the existing groups or you can
 create a new group of your own. For example, the following code adds the GPS module to the Map menu group
 <pre>myModule.setModulesMenuGroup(mapsGroup);</pre>
@@ -45,7 +45,7 @@ for example
 <pre>
 myModule.addDependency(new PamDependency(NMEADataUnit.class, "NMEA.NMEAControl"));
 </pre>
-tells Pamguard that myModule is dependent on soume source of NMEADataUnit and that a possible
+tells PAMGuard that myModule is dependent on soume source of NMEADataUnit and that a possible
 source of this type of data is the NMEA.NMEAControl module.
 <p>
 Note that some types of data may be produced by many different modules, so here you should specify the
@@ -71,7 +71,7 @@ If you set a maximum number then Pamgaurd will prevent you from creating more th
 
 <p>
 
-<p CLASS="previousLink"><a href="HowToMakePlugIns.html">Previous:	How to make Pamguard plugins </a></p>
+<p CLASS="previousLink"><a href="HowToMakePlugIns.html">Previous:	How to make PAMGuard plugins </a></p>
 
 </body>
 </html>

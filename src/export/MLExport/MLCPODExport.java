@@ -16,7 +16,7 @@ import us.hebi.matlab.mat.types.Struct;
  * @author Jamie Macaulay
  *
  */
-public class MLCPODExport extends MLDataUnitExport<PamDataUnit>{
+public class MLCPODExport extends MLDataUnitExport<PamDataUnit<?, ?>>{
 
 	@Override
 	public Struct addDetectionSpecificFields(Struct mlStruct, int index, PamDataUnit dataUnit) {
@@ -105,7 +105,7 @@ public class MLCPODExport extends MLDataUnitExport<PamDataUnit>{
 
 	@Override
 	public String getName() {
-		return "raw_data_units";
+		return "cpod";
 	}
 
 }

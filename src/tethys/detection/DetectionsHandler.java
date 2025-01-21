@@ -275,7 +275,7 @@ public class DetectionsHandler extends CollectionHandler {
 	 * @param exportObserver
 	 * @return
 	 */
-	private int countDetections(PamDataBlock dataBlock, StreamExportParams streamExportParams, DetectionExportObserver exportObserver) {
+	public int countDetections(PamDataBlock dataBlock, StreamExportParams streamExportParams, DetectionExportObserver exportObserver) {
 		/*
 		 * This is currently called for the entire dataset, but we will need to loop over specific Deployment documents
 		 * and export the content of each separately.
@@ -389,7 +389,7 @@ public class DetectionsHandler extends CollectionHandler {
 	 * @param exportObserver
 	 * @return
 	 */
-	private int exportDetections(PamDataBlock dataBlock, StreamExportParams streamExportParams, DetectionExportObserver exportObserver) {
+	public int exportDetections(PamDataBlock dataBlock, StreamExportParams streamExportParams, DetectionExportObserver exportObserver) {
 		/*
 		 * This is currently called for the entire dataset, but we will need to loop over specific Deployment documents
 		 * and export the content of each separately.
@@ -413,6 +413,7 @@ public class DetectionsHandler extends CollectionHandler {
 		int totalCount = dataMap.getDataCount();
 		int skipCount = 0;
 		int exportCount = 0;
+		int processedCount = 0;
 		long lastUnitTime = 0;
 		DetectionExportProgress prog;
 		ViewerLoadPolicy viewerLoadPolicy = ViewerLoadPolicy.LOAD_UTCNORMAL;
@@ -499,8 +500,9 @@ public class DetectionsHandler extends CollectionHandler {
 					if (streamExportParams.exportLocalisations) {
 						localizationBuilder.addLocalization(dataUnit);
 					}
+					processedCount++;
 
-					if (exportCount % 100 == 0) {
+					if (processedCount % 100 == 0) {
 						prog = new DetectionExportProgress(deployment, detectionsDocument, totalMapPoints, doneMapPoints,
 								lastUnitTime, totalCount, exportCount, skipCount, DetectionExportProgress.STATE_GATHERING);
 						exportObserver.update(prog);
@@ -627,7 +629,7 @@ public class DetectionsHandler extends CollectionHandler {
 		}
 		detections.setId(fullId);
 		//		detections.setDescription(dataProvider.getDescription(deployment, tethysExportParams));
-		detections.setDescription(exportParams.getNilusDetectionDescription());
+		detections.setDescription(exportParams.getDescription());
 		DataSourceType dataSource = new DataSourceType();
 		dataSource.setDeploymentId(deployment.nilusObject.getId());
 		//		dataSource.setEnsembleId(""); ToDo
@@ -804,7 +806,7 @@ public class DetectionsHandler extends CollectionHandler {
 			}
 		}
 
-		DetectionsExportWizard.showDialog(tethysControl.getGuiFrame(), tethysControl, dataBlock);
+		DetectionsExportWizard.showDialog(tethysControl.getGuiFrame(), tethysControl, dataBlock, true);
 
 	}
 
@@ -812,5 +814,21 @@ public class DetectionsHandler extends CollectionHandler {
 	@Override
 	public String getHelpPoint() {
 		return helpPoint;
+	}
+
+
+	/**
+	 * @return the activeExport
+	 */
+	public boolean isActiveExport() {
+		return activeExport;
+	}
+
+
+	/**
+	 * @param activeExport the activeExport to set
+	 */
+	public void setActiveExport(boolean activeExport) {
+		this.activeExport = activeExport;
 	}
 }

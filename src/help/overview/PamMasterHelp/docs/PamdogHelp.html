@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+<LINK href="../../../pamHelpStylesheet.css" type=text/css rel=STYLESHEET>
+<title>PamDog Help</title>
+</head>
+<body>
+<h1>PamDog - The PAMGuard Watchdog</h1>
+<h2>Introduction</h2>
+<p>
+PamDog, the PAMGuard watchdog program, can be used when you want to start PAMGuard automatically and want to 
+ensure that it never, ever stops, or if it does stop accidentally due to a fault, it will restart itself.
+</p>
+<p>
+PamDog is particularly useful when a PAM system needs to be left running unattended. 
+</p>
+<p>
+PamDog has only been tested under Windows. Some functions may not be available under other operating systems but the main ones should be OK.
+</p>
+<h2>Installing and Running</h2>
+
+
+<p style="text-align:center;"><img src="images/TrayIcon.png"></p>
+<p>
+
+Since PAMGuard release 2.02.03, PamDog has been included in the PAMGuard build, but is not set up to run automatically when 
+Windows starts. To start PamDog, you no longer need to install Java yourself. Simply double click on the file PamguardBeta_WatchDog.exe
+which you'll find in the PAMGuard installation folder (probably C:\Program Files\Pamguard). See below for instructions 
+on making PamDog start with Windows. 
+</p>
+<p>
+By default, no user interface will be displayed. PamDog will run in the background and can be configured via an icon which will appear in 
+the Tray Icon area, that's the little icons down in the bottom right corner of the Windows task bar</p>
+
+
+<h3>Configuring and Starting PAMGuard</h3>
+<p>If you are using the watchdog DO NOT start PAMGuard in the normal way from the Windows Start menu. PamDog has to 
+start PAMGuard with some specific options enabled so that PamDog and PAMGuard can communicate. These options will not be available  
+if you've started PAMGuard from the Start menu. <p>
+<p>A typical sequence of operations required to use PamDog successfully is as follows:</p>
+<ul>
+<li>With PamDog deactivated, launch PAMGuard from the Start menu in the normal way, configure it how you want, check it's all running OK and save your psfx file.</li>
+<li>Close PAMGuard.</li>
+<li>Open the PamDog configuration dialog and configure PamDog with the correct paths and options to Java, the Pamguard executable and your psfx file.</li>
+<li>Activate PamDog, sit back and allow PamDog to launch and start PAMGuard.</li> 
+<li>If you need to modify your configuration in anyway, deactivate PamDog and repeat the above steps.</li> 
+</ul>
+
+
+<h3>Starting PamDog Automatically</h3>
+<p>
+You should not run more than one instance of PamDog at a time. Most users will want PamDog to launch automatically when Windows starts. 
+To make PamDog launch automatically, the easiest way is <!copy or move the PamDog.jar file to your Start folder.>
+simply to create a shortcut to the  PamguardBeta_WatchDog.exe program in your Start folder. 
+<p>
+To locate the Start folder click on the Windows Start button, then RIGHT click on 'All Programs'. A small menu should apear. Select 'Open' and
+a Windows explorer window should open in a folder with a name something like
+'C:\Users\*yourusername*\AppData\Roaming\Microsoft\Windows\Start Menu'
+Go into 'Programs' then into 'Startup' so that you're in a folder with a name like
+'C:\Users\*yourusername*\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup'.
+Right click on PamguardBeta_WatchDog.exe and drag across to the Startup folder. Release the mouse and select "Create Shortcuts here" from the menu. Don't 
+drag the actual .exe file across ! 
+</p>
+<p>
+Restart your computer and check that PamDog has started automatically by searching for it in the Tray Icon area.
+</p>
+
+<h2>Configuring</h2>
+<p>
+To configure PamDog, go to the System tray and find the PAMGuard watchdog icon. Click on it to open the configuration dialog or right 
+click on it for other options.
+</p>
+<p>Configuration and control options are spread over three tabs, Control, Pamguard and Java. All controls in the dialog have tool tips - 
+hover the mouse over them and they will provide some information on what they do.<p>
+
+
+<h3>Control</h3>
+<p style="text-align:center;"><img src="images/Config1.png"></p>
+<p>
+The Control panel controls whether or not the Watchdog is active. If the watchdog is correctly configured and the "Activate Watchdog" 
+button is checked, then PAMGuard will be launched automatically and if PAMGuard is stopped, will immediately restart</p>
+<p><b>Activate Watchdog: </b>Activates or deactivates the watchdog.</p>
+<p><b>UDP Port: </b>UDP (network protocol) port for communication between PamDog and PAMGuard.</p>
+<p><b>Allow system restarts: </b>Will restart Windows if the watchdog fails to start PAMGuard several times in succession. 
+Note that if this option is selected and PAMGuard cannot start for some fundamental reason, such as an acquisition device
+becoming disconnected, then the computer will continually reboot. The reboot cycle is relatively slow so there should always 
+be sufficient time one the computer has restarted to deactivate the watchdog.</p>
+<p><b>open log file folder: </b>Opens a folder containing PAMGuard and PamDog log files. Note that information displayed in 
+the terminal window when PAMGuard is running normally is written to a log file when PAMGuard is launched by PamDog.</p>
+
+
+
+<h3>Pamguard</h3>
+<p style="text-align:center;"><img src="images/Config2.png"></p>
+<p>
+The Pamguard panel controls the location of important PAMGuard files and folders and tells PamDog which PAMGuard configuration file 
+should be used.  
+</p>
+<p><b>Working Directory: </b>The folder containing the PAMGuard executable jar file. Normally this will be something like 
+C:\Program Files\Pamguard64.</p>
+<p><b>Pamguard Executable jar: </b>The main PAMGuard jar file which must be in the <b>Working Directory</b>.</p>
+<p><b>Pamguard Configuration file: </b>The PAMguard configuration (.psf) file.</p>
+<p><b>Library path: </b>The name of a folder containing library files which must be in the <b>Working Directory</b> which will be either <b>lib</b> or <b>lib64</b> for 
+32 or 64 bit versions of PAMGuard and the Java virtual machine.</p>
+<p><b>Other PAMGuard command line options: </b>Leave blank. This is for the use of the PAMGuard development team.</p>
+
+
+
+<h3>Java</h3>
+<p style="text-align:center;"><img src="images/Config3.png"></p>
+<p>
+The Java panel controls the Java virtual machine which is required to run PAMGuard. 
+</p>
+<p><b>Java Executable: </b>The Java runtime executable program. This is always called java.exe and will normally be
+found in a folder with a name like 'C:\Program Files (x86)\Java\jre1.*.*_**\bin' for 32 bit Java versions or 
+'C:\Program Files\Java\jre1.*.*_**\bin' for 64 bit Java versions.  For advanced functionality (including better task 
+killing capabilities), use the java.exe found in a jdk**** folder instead of a jre**** folder.</p>
+<p><b>Min VM Memory: </b>The minimum amount of memory to allocate to the Java virtual machine.</p>
+<p><b>Max VM Memory: </b>The maximum amount of memory to allocate to the Java virtual machine. 32 
+bit versions of Java can have a maximum of 1024 Mega bytes of memory, 64 bit versions can use up
+to 8192 Mega bytes</p>
+<p><b>Other VM command line options: </b>Leave blank. This is for the use of the PAMGuard development team.</p>
+
+
+
+
+
+</body>
+</html>

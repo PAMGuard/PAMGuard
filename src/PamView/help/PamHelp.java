@@ -63,6 +63,7 @@ import PamController.PamController;
 import PamController.PamGUIManager;
 import PamModel.PamModel;
 import PamModel.PamPluginInterface;
+import PamModel.SMRUEnable;
 import PamView.GuiFrameManager;
 
 /**
@@ -498,6 +499,9 @@ public class PamHelp {
 	}
 	
 	private boolean setCurrentID(String id) {
+//		if (SMRUEnable.isDevEnable()) {
+//			System.out.println("Opening help page: " + id);
+//		}
 		currentID = id;
 		if (currentID != null && viewer != null) {
 			try {

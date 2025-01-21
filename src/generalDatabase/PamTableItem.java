@@ -431,12 +431,19 @@ public class PamTableItem implements Cloneable {
 			return null;
 		}
 		try {
-		return (Integer) value;
+		if (value instanceof Integer) {
+			return (Integer) value;
+		}
+		else if (value instanceof Long) {
+			long longVal = (long) value;
+			return (int) longVal;
+		}
 		}
 		catch (ClassCastException e) {
 			e.printStackTrace();
 			return -1;
 		}
+		return null;
 	}
 	
 	

@@ -21,7 +21,7 @@ public class ClickTrainClass extends OfflineTask<ClickDetection>{
 	 * @param clickControl
 	 */
 	public ClickTrainClass(ClickControl clickControl) {
-		super(clickControl.getClickDataBlock());
+		super(clickControl, clickControl.getClickDataBlock());
 		this.clickControl = clickControl;
 		clickTrainDetector = clickControl.getClickTrainDetector();
 		addAffectedDataBlock(clickTrainDetector.getTrackedClickDataBlock());

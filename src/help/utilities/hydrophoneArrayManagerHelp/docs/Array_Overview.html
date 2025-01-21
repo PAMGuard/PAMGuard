@@ -10,7 +10,6 @@
 <h1>Hydrophone Array</h1>
 <h2>Overview</h2>
 
-<h3>NEW Array localisation system !</h3>
 <p>PAMGuard users are deploying more and more complicated arrays and may now be working 
 with some hydrophones deployed from a vessel while others are on free floating buoys. Other users are adding 
 heading, pitch and roll sensors to their systems.</p>
@@ -22,7 +21,7 @@ Within the PAMGuard framework, an "Array" refers to all of the hydrophones
 currently in use and only a single "Array" is loaded into memory and used at any one time. 
 </p><p>
 An array may contain multiple "Streamers" or clusters of hydrophones. Hydrophones within 
-each streamer (or cluster) are assumed to be connected to one another in some way and have a common origin. 
+each streamer (or cluster) are assumed to be connected rigidly to one another and have a common origin. 
 Within this context a moored or drifting buoy should be considered as a streamer.   
 The streamer origin will generally be referenced to the vessels GPS position, or a fixed Latitude and Longitude.  
 </p><p>
@@ -41,7 +40,7 @@ elements (transducers).</p>
 software channels.</p>
 
 <p>Each hydrophone element must be assigned to a streamer. The
-actual coordinates for each hydrophone used by PAMGUARD are the sum of
+actual coordinates for each hydrophone used by PAMGuard are the sum of
 the streamer coordinates and the individual hydrophone element
 coordinates. Although this appears to introduce some redundancy
 regarding the coordinates of each hydrophone, streamer assignment is
@@ -56,7 +55,7 @@ hydrophones individually.</p>
  
 
 <h3>The Default Array</h3>
-<p>The first time you run PAMGUARD, a default array consisting of
+<p>The first time you run PAMGuard, a default array consisting of
 two hydrophone elements spaced 3m apart at 5m depth, 100m and 103m
 astern of the vessel. Channels in the array are mapped 1:1 to ADC
 channels 0 and 1.</p>

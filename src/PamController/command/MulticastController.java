@@ -83,11 +83,13 @@ public class MulticastController extends CommandManager {
 	}
 
 	private void processDatagram(DatagramPacket datagram) {
+//		System.out.println("********************************* Multicast controller received data packet");
 		lastDatagram = datagram;
 		String str = new String(datagram.getData(), 0, datagram.getLength());
-		str = str.substring(0, datagram.getLength());
+//		System.out.println("********************************* Multicast String:" + str);
+//		str = str.substring(0, datagram.getLength());
 //		System.out.println("Datagram received \"" + str + "\"");
-		interpretCommand(str);
+		interpretCommand(str, datagram.getData());
 	}
 
 	@Override

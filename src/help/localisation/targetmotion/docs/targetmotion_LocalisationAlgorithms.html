@@ -11,7 +11,7 @@
 <body>
 
 <p>
-PAMGUARD allows the user to select a number of localisation algorithms for target motion analysis. The mathematical basis behind these algorithms can be found in the <a href="../../../localisation/docs/localisation_algorithms.html">Localisation Techniques</a> section.
+PAMGuard allows the user to select a number of localisation algorithms for target motion analysis. The mathematical basis behind these algorithms can be found in the <a href="../../../localisation/docs/localisation_algorithms.html">Localisation Techniques</a> section.
 <br><br>The Localisation algorithms utilised in target motion analysis are either 2D or 3D in nature. A 2D algorithm does not consider depth as a variable and will attempt to find the most likely position of the source on the sea surface. A 3D algorithm attempts to localise in all three dimensions. <br><br>Referring to the <a href="../../../localisation/targetmotion/docs/targetmotion_overview.html">Target Motion Overview</a> section, a single paired hydrophone array will often result in a circular probability distribution of the source location. In 2D this circle become two points and hence the 2D localisation algorithms will often have two results, one for each of the possible points. The straightness of the trackline and uncertainty in hydrophone positions dictates how similar in likelihood each of these results is. Often it will be ambiguous as to which is the more correct location of the animal. 
 </p>
 
@@ -40,7 +40,7 @@ bearing errors.<br><br>
 <br><br>
 
 <i><u>Simplex2D<br><br></u></i>
-The 2D simplex method, as it’s name implies, uses the Nelder-Mead Simplex optimisation algorithm
+The 2D simplex method, as it's name implies, uses the Nelder-Mead Simplex optimisation algorithm
 (available in the <a href="http://commons.apache.org/"> apache commons library </a>) to minimise the
 chi squared
 function, where the

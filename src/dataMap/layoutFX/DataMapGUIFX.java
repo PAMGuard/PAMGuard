@@ -50,15 +50,13 @@ public class DataMapGUIFX extends PamControlledGUIFX implements DataMapControlGU
 	@Override
 	public void createDataGraphs() {
 		dataMapPaneFX.createDataGraphs();
-		
 	}
 
 	@Override
 	public void repaintAll() {
-		dataMapPaneFX.repaintAll();
-		
+		dataMapPaneFX.repaintAll();	
 	}
-
+	
 	public void notifyModelChanged(int changeType) {
 		Platform.runLater(()->{
 			dataMapPaneFX.notifyModelChanged(changeType);

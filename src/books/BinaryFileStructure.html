@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv=Content-Type content="text/html; charset=windows-1252">
 <meta name=Generator content="Microsoft Word 11 (filtered)">
-<title>Binary file structure for PAMGUARD detector output</title>
+<title>Binary file structure for PAMGuard detector output</title>
 <style>
 <!--
  /* Font Definitions */
@@ -77,7 +77,7 @@ ul
 
 <div class=Section1>
 
-<p class=MsoTitle><span lang=EN-GB>Binary file structure for PAMGUARD detector
+<p class=MsoTitle><span lang=EN-GB>Binary file structure for PAMGuard detector
 output.</span></p>
 
 <p class=MsoNormal><span lang=EN-GB>Douglas Gillespie, 2010</span></p>
@@ -85,7 +85,7 @@ output.</span></p>
 <h1><span lang=EN-GB>1<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span></span><span lang=EN-GB>Introduction</span></h1>
 
-<p class=MsoBodyText><span lang=EN-GB>The primary storage site for PAMGUARD
+<p class=MsoBodyText><span lang=EN-GB>The primary storage site for PAMGuard
 output data is a relational database (currently either MS Access or MySQL
 although other types may be added in the future). </span></p>
 
@@ -93,7 +93,7 @@ although other types may be added in the future). </span></p>
 solutions comes from the click detector which writes binary files in the
 RainbowClick (*.clk) file format since click data is often additionally
 processed using RainbowClick offline. Over the next year or so, this offline
-nalysis functionality will be added to PAMGUARD, making RainbowClick redundant.
+nalysis functionality will be added to PAMGuard, making RainbowClick redundant.
 Long term support for the .clk format is therefore not required. </span></p>
 
 <p class=MsoBodyText><span lang=EN-GB>Current annoyances are </span></p>
@@ -106,7 +106,7 @@ RainbowClick or the time/amplitude/frequency contour of a whistle)</span></p>
 
 <p class=MsoBodyText style='margin-left:36.0pt;text-indent:-18.0pt'><span
 lang=EN-GB>2.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><span lang=EN-GB>The RainbowClick file binary format is awful –
+</span></span><span lang=EN-GB>The RainbowClick file binary format is awful -
 works OK from C, but is a nightmare in Java and is not practical to evolve. </span></p>
 
 <p class=MsoBodyText style='margin-left:36.0pt;text-indent:-18.0pt'><span
@@ -127,12 +127,12 @@ lang=EN-GB>1.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
 
 <p class=MsoBodyText style='margin-left:36.0pt;text-indent:-18.0pt'><span
 lang=EN-GB>2.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><span lang=EN-GB>We need something similar for other PAMGUARD
+</span></span><span lang=EN-GB>We need something similar for other PAMGuard
 output tasks. </span></p>
 
 <p class=MsoBodyText style='margin-left:18.0pt'><span lang=EN-GB>Therefore we
 need some new binary format storage solution which can be used by many
-different PAMGUARD modules for storing detector (and other) data. </span></p>
+different PAMGuard modules for storing detector (and other) data. </span></p>
 
 <h1><span lang=EN-GB>2<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span></span><span lang=EN-GB>Binary storage options</span></h1>
@@ -142,7 +142,7 @@ write out Java objects but cannot open these files with anything but Java (e.g.
 could not write a Matlab function to access the data). </span></p>
 
 <p class=MsoBodyText><span lang=EN-GB>Pure binary storage (like .clk files) :
-Need to translate data from each stored object from it’s Java form into a byte
+Need to translate data from each stored object from it's Java form into a byte
 array prior to storage and convert back the other way afterwards. However, data
 would be readable in Matlab or any other program so long as you knew the format
 of each object. </span></p>
@@ -150,31 +150,31 @@ of each object. </span></p>
 <h1><span lang=EN-GB>3<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span></span><span lang=EN-GB>solution:</span></h1>
 
-<p class=MsoBodyText><span lang=EN-GB>A common file format for All PAMGUARD
+<p class=MsoBodyText><span lang=EN-GB>A common file format for All PAMGuard
 module output, pgdf for <u>P</u>AM<u>G</u>UARD <u>D</u>ata <u>F</u>ile.</span></p>
 
-<p class=MsoBodyText><span lang=EN-GB>Output (from PAMGUARD) will assume one
+<p class=MsoBodyText><span lang=EN-GB>Output (from PAMGuard) will assume one
 way output and input streams rather than random access, although other programs
 could of course open the files in any way they wish. This means that the files
 will know their start time, which will be encoded in both the file name and the
 header, but the end time will only be accessible as the last object in the file
-– which may take time to read. </span></p>
+- which may take time to read. </span></p>
 
 <p class=MsoBodyText><span lang=EN-GB>Smaller index files (.pgdx)  will be
 written to accompany each pgdf file which contain just the start header and end
-footer of each file, so that PAMGUARD can rapidly query a file repository to
-see what’s in it. </span></p>
+footer of each file, so that PAMGuard can rapidly query a file repository to
+see what's in it. </span></p>
 
 <p class=MsoBodyText><span lang=EN-GB>Files will have a common structure, which
-PAMGUARD will always be able to understand, although specific objects within
+PAMGuard will always be able to understand, although specific objects within
 the file will require information specific to a particular module. </span></p>
 
-<p class=MsoBodyText><span lang=EN-GB>For a specific PAMGUARD configuration,
-all output files will be stored in the same master directory, although it’s possible
+<p class=MsoBodyText><span lang=EN-GB>For a specific PAMGuard configuration,
+all output files will be stored in the same master directory, although it's possible
 that this may contain multiple sub folders, e.g. one sub folder per day. </span></p>
 
 <p class=MsoBodyText><span lang=EN-GB>There will be a 1:1 correspondence
-between PAMGUARD data blocks and binary data streams (i.e. all objects in a
+between PAMGuard data blocks and binary data streams (i.e. all objects in a
 given file should be of the same type). </span></p>
 
 <p class=MsoBodyText><span lang=EN-GB>Output will be a series of binary
@@ -198,11 +198,11 @@ will be rigidly defined. However the data objects can be in any format (it
 being the responsibility of individual module developers to ensure backwards
 compatibility should anything change). </span></p>
 
-<p class=MsoBodyText><span lang=EN-GB>Following the standard PAMGUARD header,
+<p class=MsoBodyText><span lang=EN-GB>Following the standard PAMGuard header,
 is an optional control structure or module header. For example, a detector may
-which to write out it’s detection parameters at this point, probably as a Java
+which to write out it's detection parameters at this point, probably as a Java
 serialised object, although anything is allowed, it being the stream that
-writes the data’s responsibility to read it back in in a sensible way. </span></p>
+writes the data's responsibility to read it back in in a sensible way. </span></p>
 
 <h2><span lang=EN-GB>Format for main files:</span></h2>
 
@@ -314,7 +314,7 @@ clear=all style='page-break-before:always'>
   <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
   none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
   padding:0cm 5.4pt 0cm 5.4pt'>
-  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>“PAMGUARDDATA”</span></p>
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>"PAMGuardDATA"</span></p>
   </td>
   <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
   none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
@@ -324,7 +324,7 @@ clear=all style='page-break-before:always'>
   <td width=336 valign=top style='width:201.4pt;border-top:none;border-left:
   none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
   padding:0cm 5.4pt 0cm 5.4pt'>
-  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Just so it’s
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Just so it's
   obvious that this really is a P file</span></p>
   </td>
  </tr>
@@ -332,7 +332,7 @@ clear=all style='page-break-before:always'>
   <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
   none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
   padding:0cm 5.4pt 0cm 5.4pt'>
-  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>PAMGUARD
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>PAMGuard
   Version </span></p>
   </td>
   <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
@@ -350,7 +350,7 @@ clear=all style='page-break-before:always'>
   <td width=227 valign=top style='width:135.9pt;border-top:none;border-left:
   none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
   padding:0cm 5.4pt 0cm 5.4pt'>
-  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>PAMGUARD
+  <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>PAMGuard
   Branch</span></p>
   </td>
   <td width=113 valign=top style='width:68.0pt;border-top:none;border-left:
@@ -567,7 +567,7 @@ clear=all style='page-break-before:always'>
   none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
   padding:0cm 5.4pt 0cm 5.4pt'>
   <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Version info
-  specific to the pamguard module writing data to this stream. </span></p>
+  specific to the PAMGuard module writing data to this stream. </span></p>
   </td>
  </tr>
  <tr>
@@ -586,7 +586,7 @@ clear=all style='page-break-before:always'>
   none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
   padding:0cm 5.4pt 0cm 5.4pt'>
   <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>= Length in
-  File – 16 (a bit of redundancy) ! Can be zero if there is no additional data</span></p>
+  File - 16 (a bit of redundancy) ! Can be zero if there is no additional data</span></p>
   </td>
  </tr>
  <tr>
@@ -647,7 +647,7 @@ clear=all style='page-break-before:always'>
   none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
   padding:0cm 5.4pt 0cm 5.4pt'>
   <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>class
-  identifier which must be unique to this data stream, not across PAMGUARD</span></p>
+  identifier which must be unique to this data stream, not across PAMGuard</span></p>
   </td>
  </tr>
  <tr>
@@ -665,7 +665,7 @@ clear=all style='page-break-before:always'>
   none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
   padding:0cm 5.4pt 0cm 5.4pt'>
   <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Timestamp in
-  milliseconds relative to start of file “Data Date”</span></p>
+  milliseconds relative to start of file "Data Date"</span></p>
   </td>
  </tr>
  <tr>
@@ -684,7 +684,7 @@ clear=all style='page-break-before:always'>
   none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
   padding:0cm 5.4pt 0cm 5.4pt'>
   <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>= Length in
-  File – 12 (a bit of redundancy) !</span></p>
+  File - 12 (a bit of redundancy) !</span></p>
   </td>
  </tr>
  <tr>
@@ -745,7 +745,7 @@ clear=all style='page-break-before:always'>
   none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
   padding:0cm 5.4pt 0cm 5.4pt'>
   <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>class
-  identifier which must be unique to this data stream, not across PAMGUARD </span></p>
+  identifier which must be unique to this data stream, not across PAMGuard </span></p>
   </td>
  </tr>
  <tr>
@@ -764,7 +764,7 @@ clear=all style='page-break-before:always'>
   none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
   padding:0cm 5.4pt 0cm 5.4pt'>
   <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>Timestamp in
-  milliseconds relative to start of file “Data Date”</span></p>
+  milliseconds relative to start of file "Data Date"</span></p>
   </td>
  </tr>
  <tr>
@@ -783,7 +783,7 @@ clear=all style='page-break-before:always'>
   none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
   padding:0cm 5.4pt 0cm 5.4pt'>
   <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>= Length in
-  File – 12 (a bit of redundancy) ! </span></p>
+  File - 12 (a bit of redundancy) ! </span></p>
   </td>
  </tr>
  <tr>
@@ -883,7 +883,7 @@ clear=all style='page-break-before:always'>
   none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
   padding:0cm 5.4pt 0cm 5.4pt'>
   <p class=MsoBodyText><span lang=EN-GB style='font-size:10.0pt'>= Length in
-  File – 16 (a bit of redundancy) ! Can be zero if there is no additional data</span></p>
+  File - 16 (a bit of redundancy) ! Can be zero if there is no additional data</span></p>
   </td>
  </tr>
  <tr>
@@ -1084,7 +1084,7 @@ clear=all style='page-break-before:always'>
 often written with the DataOutputStream.writeUTF() function. For standard ASCII
 characters, this will simply be a two bytes (written as a short) giving the
 length of the string followed by one byte per character. Unicode characters are
-also supported in this format – for details see the <a
+also supported in this format - for details see the <a
 href="http://en.wikipedia.org/wiki/UTF-8#Modified_UTF-8">JAVA Help</a> and <a
 href="http://en.wikipedia.org/wiki/UTF-8#Modified_UTF-8">Wikipedia</a>. </span></p>
 
@@ -1613,7 +1613,7 @@ file every time a file starts)</span></p>
 
 <p class=MsoBodyText style='margin-left:36.0pt;text-indent:-18.0pt'><span
 lang=EN-GB>4.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><span lang=EN-GB>Reloading data for the PAMGUARD viewer. </span></p>
+</span></span><span lang=EN-GB>Reloading data for the PAMGuard viewer. </span></p>
 
 <p class=MsoBodyText style='margin-left:36.0pt;text-indent:-18.0pt'><span
 lang=EN-GB>5.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -1623,9 +1623,9 @@ analysis</span></p>
 <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
 
 <h1><span lang=EN-GB>5<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><span lang=EN-GB>PAMGUARD Modules output data</span></h1>
+</span></span><span lang=EN-GB>PAMGuard Modules output data</span></h1>
 
-<p class=MsoBodyText><span lang=EN-GB>For data streams – modify PamDataBlock,
+<p class=MsoBodyText><span lang=EN-GB>For data streams - modify PamDataBlock,
 and also make possibility of other objects sending data to BSM</span></p>
 
 <p class=MsoBodyText><span lang=EN-GB>Need to:</span></p>
@@ -1646,9 +1646,9 @@ lang=EN-GB>3.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
 <p class=MsoBodyText style='margin-left:36.0pt;text-indent:-18.0pt'><span
 lang=EN-GB>4.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
 </span></span><span lang=EN-GB>know how to recreate data units from data that
-have been read back in with PAMGUARD viewer. </span></p>
+have been read back in with PAMGuard viewer. </span></p>
 
-<p class=MsoBodyText><span lang=EN-GB>PAMGUARD Data Units</span></p>
+<p class=MsoBodyText><span lang=EN-GB>PAMGuard Data Units</span></p>
 
 <p class=MsoBodyText style='margin-left:36.0pt;text-indent:-18.0pt'><span
 lang=EN-GB>1.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -1662,13 +1662,13 @@ agreement with a central registry</span></p>
 
 <p class=MsoBodyText><span lang=EN-GB>&nbsp;</span></p>
 
-<p class=MsoBodyText><span lang=EN-GB>PAMGUARD Settings</span></p>
+<p class=MsoBodyText><span lang=EN-GB>PAMGuard Settings</span></p>
 
-<p class=MsoBodyText><span lang=EN-GB>PAMGUARD Settings are written to the
-binary store whenever PAMGUARD starts from the Start menu or from the Network
-controller. They are not written when PAMGUARD restarts due to a buffer
+<p class=MsoBodyText><span lang=EN-GB>PAMGuard Settings are written to the
+binary store whenever PAMGuard starts from the Start menu or from the Network
+controller. They are not written when PAMGuard restarts due to a buffer
 overflow in acquisition. Settings are written to .psfx files. These encapsulate
-the current psf format used for more general settings, but individual
+the current psfx format used for more general settings, but individual
 serialised Java objects are wrapped up in a similar way to other binary data so
 that other programmes (e.g. Matlab) can at least read a list of modules.</span></p>
 

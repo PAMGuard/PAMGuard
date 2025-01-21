@@ -415,7 +415,7 @@ ul
 
 <h1><a name="_Toc396467139"><span lang="EN-GB">Preparation and expectations</span></a></h1>
 
-<p class="MsoBodyText"><span lang="EN-GB">The instructions in this tutorial follow the assumption that the user already has a working installation of PAMGuard Beta version and that the user has basic familiarity with running PAMGuard. At the time of writing, the latest version of <a href="http://www.pamguard.org/download.php?id=37">PAMGuard Beta is 1.12.05 which can be downloaded</a> via the <a href="http://www.pamguard.org/">PAMGuard website</a>. Tutorials for installation and general operation of PAMGuard are available on the <a href="http://www.pamguard.org/">PAMGuard website</a>, and the PAMGuard online help system. The PAMGuard DIFAR module was developed and has only been tested on 64-bit Windows 7 with PAMGuard running uder a 32-bit version of the Java 7 runtime. Familiarity with acoustic detection, localisation, and DIFAR usage will be helpful, but is not required.</span></p>
+<p class="MsoBodyText"><span lang="EN-GB">The instructions in this tutorial follow the assumption that the user already has a working installation of PAMGuard Beta version and that the user has basic familiarity with running PAMGuard. At the time of writing, the latest version of <a href="http://www.PAMGuard.org/download.php?id=37">PAMGuard Beta is 1.12.05 which can be downloaded</a> via the <a href="http://www.PAMGuard.org/">PAMGuard website</a>. Tutorials for installation and general operation of PAMGuard are available on the <a href="http://www.PAMGuard.org/">PAMGuard website</a>, and the PAMGuard online help system. The PAMGuard DIFAR module was developed and has only been tested on 64-bit Windows 7 with PAMGuard running uder a 32-bit version of the Java 7 runtime. Familiarity with acoustic detection, localisation, and DIFAR usage will be helpful, but is not required.</span></p>
 
 <h1><a name="_Toc396467140"><span lang="EN-GB">Disclaimer</span></a></h1>
 
@@ -423,19 +423,19 @@ ul
 
 <h1><a name="_Toc396467141"><span lang="EN-GB">Installation of PAMGuard DIFAR module</span></a></h1>
 
-<p class="MsoBodyText"><span lang="EN-GB">Installation of the PAMGuard DIFAR Module follows the general procedure for the installation of custom <i>JARFILES.</i> This installation procedure has been in practice for a number of years, and is the semi-official means for installing versions of PAMGuard with custom features outside of the mainstream releases. At the time of writing this procedure is detailed on the <a href="http://www.pamguard.org/46_SystemRequirements.html">System Requirements page</a> of the PAMGuard Website. A version of these instructions tailored to the DIFAR module is included below.</span></p>
+<p class="MsoBodyText"><span lang="EN-GB">Installation of the PAMGuard DIFAR Module follows the general procedure for the installation of custom <i>JARFILES.</i> This installation procedure has been in practice for a number of years, and is the semi-official means for installing versions of PAMGuard with custom features outside of the mainstream releases. At the time of writing this procedure is detailed on the <a href="http://www.PAMGuard.org/46_SystemRequirements.html">System Requirements page</a> of the PAMGuard Website. A version of these instructions tailored to the DIFAR module is included below.</span></p>
 
 <h2><a name="_Toc396467142">Custom install of the PAMGuard DIFAR jarfile</a></h2>
 
-<p class="MsoBodyText">Download the latest PAMGuard DIFAR .jar and .ini files from the Australian Antarctic Division FTP server: <span lang="EN-GB"><a href="ftp://ftp.aad.gov.au/Public/BrianMiller/PamguardDifar/">ftp://ftp.aad.gov.au/Public/BrianMiller/PamguardDifar/</a></span></p>
+<p class="MsoBodyText">Download the latest PAMGuard DIFAR .jar and .ini files from the Australian Antarctic Division FTP server: <span lang="EN-GB"><a href="ftp://ftp.aad.gov.au/Public/BrianMiller/PAMGuardDifar/">ftp://ftp.aad.gov.au/Public/BrianMiller/PAMGuardDifar/</a></span></p>
 
 <p class="MsoBodyText">In addition to the jar file you will also need other shared libraries. (E.g. the appropriate rxtx serial library will needed in order to acquire gps data). These shared libraries can be downloaded from the lib folder on the FTP server.</p>
 
-<p class="MsoBodyText">After downloading, the .jar and .ini files and the lib folder must be copied, overwriting existing files, into an existing installation of PamguardBeta. If a default installation of PamguardBeta on windows is being used then this would mean copying the custom .jar, and .ini files and lib folder into C:\Program Files (x86)\PamguardBeta\.</p>
+<p class="MsoBodyText">After downloading, the .jar and .ini files and the lib folder must be copied, overwriting existing files, into an existing installation of PAMGuardBeta. If a default installation of PAMGuardBeta on windows is being used then this would mean copying the custom .jar, and .ini files and lib folder into C:\Program Files (x86)\PAMGuardBeta\.</p>
 
 <p class="MsoBodyText">The custom version of PAMGuard with the DIFAR module can then be launched via the usual shortcuts for PAMGuard in the start menu/desktop, or alternatively with an appropriate command line, probably along the lines of:</p>
 
-<p class="MsoPlainText">java -Djava.library.path=/your_shared_library_folder -Xms384m -Xmx1024m -jar PamguardDifar_YYYY-MM-DD.jar</p>
+<p class="MsoPlainText">java -Djava.library.path=/your_shared_library_folder -Xms384m -Xmx1024m -jar PAMGuardDifar_YYYY-MM-DD.jar</p>
 
 <p class="MsoBodyText">where:</p>
 
@@ -443,9 +443,9 @@ ul
 
 <p class="MsoBodyText" style="text-indent: -18pt; margin-left: 36pt;"><span style="font-family: Symbol;">&middot;<span style="font: 7pt/normal &quot;Times New Roman&quot;; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">-Xms</span></span><span lang="EN-GB"> </span>and <span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">&ndash;Xmx</span></span> specifies the initial and maximum memory to be reserved for PAMGuard</p>
 
-<p class="MsoBodyText" style="text-indent: -18pt; margin-left: 36pt;"><span style="font-family: Symbol;">&middot;<span style="font: 7pt/normal &quot;Times New Roman&quot;; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">PamguardDifar_YYYY-MM-DD.jar</span></span><span lang="EN-GB"> </span>specifies the runnable jarfile containing release e.g. 2014-08-04 of the PAMGuard DIFAR module.</p>
+<p class="MsoBodyText" style="text-indent: -18pt; margin-left: 36pt;"><span style="font-family: Symbol;">&middot;<span style="font: 7pt/normal &quot;Times New Roman&quot;; font-size-adjust: none; font-stretch: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span class="PlainTextChar"><span lang="EN-GB" style="line-height: 115%; font-size: 10.5pt;">PAMGuardDifar_YYYY-MM-DD.jar</span></span><span lang="EN-GB"> </span>specifies the runnable jarfile containing release e.g. 2014-08-04 of the PAMGuard DIFAR module.</p>
 
-<p class="MsoBodyText">Once you have command line that successfully launches PAMGUARD on your system then there is always the option of incorporating the command line into a suitable shell script or batch file.</p>
+<p class="MsoBodyText">Once you have command line that successfully launches PAMGuard on your system then there is always the option of incorporating the command line into a suitable shell script or batch file.</p>
 
 <h2><a name="_Toc396467143">OPTIONAL: Installation of the Greeneridge Sciences Demultiplexing Software</a></h2>
 
@@ -598,7 +598,7 @@ ul
 <p class="MsoBodyText"><img border="0" height="97" src="difar_PostProcessingTutorial_files/image008.jpg" width="255" /></p>
 
 <div style="padding: 1pt 4pt; border: 1pt solid windowtext; border-image: none;">
-<p class="MsoBodyText" style="padding: 0cm; border: currentColor; border-image: none;">NB: After importing streamers, it is recommended that you avoid using the Array Manager, as this could potentially modify the imported streamers and will almost certainly introduce bugs or undesired behaviours in PAMGUard.</p>
+<p class="MsoBodyText" style="padding: 0cm; border: currentColor; border-image: none;">NB: After importing streamers, it is recommended that you avoid using the Array Manager, as this could potentially modify the imported streamers and will almost certainly introduce bugs or undesired behaviours in PAMGuard.</p>
 </div>
 
 <h3><a name="_Toc396467153">Validating Streamer Import</a></h3>
@@ -609,7 +609,7 @@ ul
 
 <p class="MsoBodyText">The time-slider on the Data Map in Viewer-mode can be used to further verify that the times of the sonobuoys are correct/sensible.</p>
 
-<p class="MsoBodyText">Additionally, adding a Map module should show the deployment locations on the Pamguard Map (ensure that the Array Manager, Streamer Data option is checked, both by right clicking on the map and using the list, and by going to Plot Overlay Options).</p>
+<p class="MsoBodyText">Additionally, adding a Map module should show the deployment locations on the PAMGuard Map (ensure that the Array Manager, Streamer Data option is checked, both by right clicking on the map and using the list, and by going to Plot Overlay Options).</p>
 
 <p class="MsoBodyText"><img border="0" height="380" src="difar_PostProcessingTutorial_files/image010.jpg" width="504" /></p>
 
@@ -657,7 +657,7 @@ ul
 
 <p class="MsoBodyText">The GPS Import can result in an MS Access database that has an excessive file size. This provides a good excuse to create a backup of the database now that the GPS track and Sonobuoy Deployment locations have been imported.</p>
 
-<p class="MsoBodyText">Close Pamguard Viewer, open the database in MS Access, and save the database as a new MS Access database: e.g. difarTutorial-Imported.mdb.</p>
+<p class="MsoBodyText">Close PAMGuard Viewer, open the database in MS Access, and save the database as a new MS Access database: e.g. difarTutorial-Imported.mdb.</p>
 
 <p class="MsoBodyText"><img border="0" height="564" src="difar_PostProcessingTutorial_files/image018.jpg" width="470" />&nbsp;</p>
 

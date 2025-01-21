@@ -247,6 +247,11 @@ public class PamguardXMLWriter implements PamSettings {
 		return true;
 	}
 	
+	/**
+	 * USed to make a document with a load of settings in it. 
+	 * @param settings
+	 * @return
+	 */
 	public Document writeModules(ArrayList<PamSettings> settings) {
 		Document doc = createDocument(System.currentTimeMillis());
 		Element modules = doc.createElement("MODULES");
@@ -470,6 +475,44 @@ public class PamguardXMLWriter implements PamSettings {
 		
 	}
 
+	/**
+	 * Write one settings object. 
+	 * @param unitSettings
+	 * @return
+	 */
+	public Document writeSettings(PamControlledUnitSettings unitSettings) {
+		Document doc = createDocument(System.currentTimeMillis());
+		Element modules = doc.createElement("MODULES");
+		Element root = doc.createElement("PAMGUARD");
+		doc.appendChild(root);
+		root.appendChild(getInfo(doc, System.currentTimeMillis()));
+		root.appendChild(modules);
+		
+		Element modEl = doc.createElement("MODULE");
+		modEl.setAttribute("UnitType", unitSettings.getUnitType());
+		modEl.setAttribute("UnitName", unitSettings.getUnitName());
+		modules.appendChild(modEl);
+		
+		Element config = doc.createElement("CONFIGURATION");
+		modEl.appendChild(config);
+		
+
+		Element settings = doc.createElement("SETTINGS");
+		settings.setAttribute("Type", unitSettings.getUnitType());
+		settings.setAttribute("Name", unitSettings.getUnitName());
+		settings.setAttribute("Class", unitSettings.getOwnerClassName());
+		settings.setAttribute("Version", String.format("%d",unitSettings.getVersionNo()));
+		config.appendChild(settings);
+	
+		//		if (data.getClass().getName().equals("clickDetector.ClickParameters")) {
+//		unitSettings.getParameterSet().
+		Element newEl = writeObjectData(doc, settings, unitSettings.getSettings(), null);
+//		el.appendChild(newEl);
+		
+		
+		return doc;
+	}
+	
 	/**
 	 * Write a units settings. 
 	 * @param doc Document

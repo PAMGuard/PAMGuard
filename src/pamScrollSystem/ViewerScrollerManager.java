@@ -17,6 +17,7 @@ import PamController.PamControllerInterface;
 import PamController.PamGUIManager;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
+import PamUtils.PamCalendar;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.dataOffline.OfflineDataLoadInfo;
 import PamguardMVC.superdet.SuperDetDataBlock;
@@ -624,19 +625,51 @@ public class ViewerScrollerManager extends AbstractScrollManager implements PamS
 	public void centreDataAt(PamDataBlock dataBlock, long menuMouseTime) {
 		// centre all scroll bars as close to the above as is possible.
 		AbstractPamScroller aScroller;
-		long scrollRange, newMax, newMin;
 		for (int i = 0; i < pamScrollers.size(); i++) {
 			aScroller = pamScrollers.get(i);
-			scrollRange = aScroller.getMaximumMillis() - aScroller.getMinimumMillis();
-			newMin = checkMinimumTime(menuMouseTime - scrollRange / 2);
-			newMax = checkMaximumTime(newMin + scrollRange);
-			newMin = newMax-scrollRange;
-			newMin = checkGapPos(dataBlock, newMin, newMax);
-			newMax = newMin + scrollRange;
-			aScroller.setRangeMillis(newMin, newMax, false);
-			//			aScroller.setValueMillis(menuMouseTime - scrollRange/2);
+			centreScrollerAt(aScroller, dataBlock, menuMouseTime);
 		}
 		loadData(false);
+	}
+	
+	/**
+	 * Moves outer scroller to centre at given time. 
+	 * @param aScroller
+	 * @param dataBlock
+	 * @param menuMouseTime
+	 */
+	private void centreScrollerAt(AbstractPamScroller aScroller, PamDataBlock dataBlock, long menuMouseTime) {
+		long scrollRange, newMax, newMin;
+		scrollRange = aScroller.getMaximumMillis() - aScroller.getMinimumMillis();
+		newMin = checkMinimumTime(menuMouseTime - scrollRange / 2);
+		newMax = checkMaximumTime(newMin + scrollRange);
+		newMin = menuMouseTime - scrollRange/2;
+//		newMin = checkGapPos(dataBlock, newMin, newMax);
+		newMax = newMin + scrollRange;
+//		System.out.printf("Centering scoller at %s, range %s to %s\n", PamCalendar.formatDBDateTime(menuMouseTime),
+//				PamCalendar.formatDBDateTime(newMin), PamCalendar.formatDBDateTime(newMax));
+		aScroller.setRangeMillis(newMin, newMax, false);
+		aScroller.setValueMillis(menuMouseTime);
+	}
+	
+	@Override
+	public void scrollToTime(PamDataBlock dataBlock, long menuMouseTime) {
+		// centre all scroll bars as close to the above as is possible.
+		AbstractPamScroller aScroller;
+		boolean moved = false;
+		for (int i = 0; i < pamScrollers.size(); i++) {
+			aScroller = pamScrollers.get(i);
+			long scrollerMin = aScroller.getMinimumMillis();
+			long scrollerMax = aScroller.getMaximumMillis();
+			if (menuMouseTime < scrollerMin || menuMouseTime > scrollerMax) {
+				centreScrollerAt(aScroller, dataBlock, menuMouseTime);
+				moved = true;
+			}
+			aScroller.setValueMillis(menuMouseTime);
+		}
+		if (moved) {
+			loadData(false);
+		}
 	}
 
 	@Override
@@ -763,7 +796,7 @@ public class ViewerScrollerManager extends AbstractScrollManager implements PamS
 			 *  the next data.  
 			 */
 			if ((oldMinGap == OfflineDataMap.IN_GAP)) {
-				newStart = getNextDataStart(scroller, oldMin);
+				newStart = getNextDataStart(scroller, newMin);
 				if (newStart != Long.MAX_VALUE) {
 					return newStart;
 				}

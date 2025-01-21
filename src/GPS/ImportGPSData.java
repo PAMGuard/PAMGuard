@@ -19,8 +19,12 @@ import PamUtils.TxtFileUtils;
 import PamView.ImportLoadBar;
 
 /**
- * Class to take external GPS data and record in a database table. Developers should be able to easily add functions to load data the simply add to the switch statement in the doInBackground() function of the 
- * ImportGPSThread. Inside the function, the ImportGPSThread should be updated with load progress. Everything else should then just work. 
+ * Class to take external GPS data and record in a database table. Developers
+ * should be able to easily add functions to load data the simply add to the
+ * switch statement in the doInBackground() function of the ImportGPSThread.
+ * Inside the function, the ImportGPSThread should be updated with load
+ * progress. Everything else should then just work.
+ * 
  * @author Jamie Macaulay
  *
  */

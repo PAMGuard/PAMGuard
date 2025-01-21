@@ -119,7 +119,7 @@ public class TDMarkerAdapter extends TDOverlayAdapter {
 	@Override
 	public Node getIcon() {
 //		return PamGlyphDude.createPamGlyph(MaterialDesignIcon.SELECTION, Color.WHITE, PamGuiManagerFX.iconSize);
-		return PamGlyphDude.createPamIcon("mdi2s-selection", Color.WHITE, PamGuiManagerFX.iconSize);
+		return PamGlyphDude.createPamIcon("mdi2s-selection", PamGuiManagerFX.iconSize);
 	}
 
 	@Override

@@ -547,6 +547,7 @@ public class MTClassifierPane extends SettingsPane<MTClassifier> {
 
 		@Override
 		public double[][] getWaveform(RawDataUnit pamDetection) {
+			if (pamDetection==null) return null;
 			//just return the waveform. 
 			//System.out.println("Getting the waveform for the waveform plot: " + pamDetection.getRawData().length);
 			return new double[][]{pamDetection.getRawData()};

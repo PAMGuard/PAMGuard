@@ -96,6 +96,7 @@ public class ClickMapDrawing implements DataMapDrawing {
 				if (typesCount == null) {
 					continue;
 				}
+//				typesCount = nSpecies;
 				
 				nTypes = Math.min(typesCount.length, nSpecies);			
 				

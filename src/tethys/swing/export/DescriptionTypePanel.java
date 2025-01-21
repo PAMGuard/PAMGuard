@@ -18,7 +18,6 @@ import javax.swing.border.TitledBorder;
 import PamView.PamGui;
 import PamView.dialog.PamDialog;
 import nilus.DescriptionType;
-import tethys.niluswraps.WrappedDescriptionType;
 import tethys.tooltips.TethysTips;
 
 /**

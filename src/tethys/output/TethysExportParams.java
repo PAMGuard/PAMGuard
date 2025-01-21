@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import PamguardMVC.PamDataBlock;
 import generalDatabase.DBControlUnit;
+import tethys.TethysControl;
 
 
 /**
@@ -11,7 +12,7 @@ import generalDatabase.DBControlUnit;
  * @author dg50
  *
  */
-public class TethysExportParams implements Serializable, Cloneable{
+public class TethysExportParams implements Serializable, Cloneable {
 
 	public static final long serialVersionUID = 1L;
 	
@@ -116,13 +117,21 @@ public class TethysExportParams implements Serializable, Cloneable{
 		streamParamsMap.put(longDataName, exportParams);
 	}
 	
-	public StreamExportParams getStreamParams(PamDataBlock dataBlock) {
-		return getStreamParams(dataBlock.getLongDataName());
+	/**
+	 * Get params for a stream. will create if not yet existing. 
+	 * @param tethysControl needed to intialise some of the parameters. 
+	 * @param dataBlock 
+	 * @return
+	 */
+	public StreamExportParams getStreamParams(TethysControl tethysControl, PamDataBlock dataBlock) {
+		StreamExportParams params = streamParamsMap.get(dataBlock.getLongDataName());
+		if (params == null) {
+			params = new StreamExportParams(tethysControl, dataBlock);
+			setStreamParams(dataBlock, params);
+		}
+		return params;
 	}
 
-	private StreamExportParams getStreamParams(String longDataName) {
-		return streamParamsMap.get(longDataName);
-	}
 
 	/**
 	 * Source name for type of effort. 

@@ -1,28 +1,19 @@
 package clickDetector.offlineFuncs;
 
-import generalDatabase.DBControlUnit;
-import generalDatabase.PamConnection;
-import generalDatabase.PamSubtableData;
 import generalDatabase.external.crossreference.CrossReference;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Vector;
 
 import Localiser.LocalisationAlgorithm;
 import Localiser.detectionGroupLocaliser.GroupDetection;
 import PamController.PamController;
-import PamController.PamControllerInterface;
-import PamController.PamViewParameters;
-import PamUtils.PamCalendar;
 import PamView.symbol.StandardSymbolManager;
-import pamScrollSystem.ViewLoadObserver;
 import targetMotionOld.TargetMotionLocaliser;
 import tethys.TethysControl;
 import tethys.pamdata.TethysDataProvider;
 import tethys.species.DataBlockSpeciesManager;
 import clickDetector.ClickControl;
-import clickDetector.ClickDetection;
 //import staticLocaliser.StaticLocaliserControl;
 //import staticLocaliser.StaticLocaliserProvider;
 //import staticLocaliser.panels.AbstractLocaliserControl;
@@ -32,18 +23,12 @@ import clickDetector.ClickTrainDetection;
 import clickDetector.dataSelector.ClickTrainDataSelectorCreator;
 import clickDetector.tethys.ClickEventSpeciesManager;
 import clickDetector.tethys.ClickEventTethysDataProvider;
-import clickDetector.tethys.ClickTethysDataProvider;
-import dataMap.OfflineDataMap;
 import PamguardMVC.DataAutomation;
 import PamguardMVC.DataAutomationInfo;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
-import PamguardMVC.dataOffline.OfflineDataLoadInfo;
-import PamguardMVC.dataSelector.DataSelector;
 import PamguardMVC.dataSelector.DataSelectorCreator;
-import PamguardMVC.debug.Debug;
 import PamguardMVC.superdet.SuperDetDataBlock;
-import autecPhones.AutecGraphics;
 
 /**
  * PamDataBlock for offline events. 

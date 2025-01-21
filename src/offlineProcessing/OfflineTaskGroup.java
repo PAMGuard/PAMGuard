@@ -67,6 +67,11 @@ public class OfflineTaskGroup implements PamSettings {
 	private DataTimeLimits dataTimeLimits;
 
 	private volatile TaskStatus completionStatus = TaskStatus.IDLE;
+
+	volatile boolean instantKill = false;
+	
+	private CPUMonitor cpuMonitor;
+
 	
 	/**
 	 * PamControlledunit required in constructor since some bookkeeping will
@@ -287,7 +292,17 @@ public class OfflineTaskGroup implements PamSettings {
 	 * @return true if it exists
 	 */
 	public boolean haveTask(OfflineTask task ) {
-		return offlineTasks.contains(task);
+		if (offlineTasks.contains(task)) {
+			return true;
+		}
+		// also do a more thorough check by name
+		String taskName = task.getLongName();
+		for (OfflineTask aTask : offlineTasks) {
+			if (taskName.equals(aTask.getLongName())) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/**
@@ -309,6 +324,9 @@ public class OfflineTaskGroup implements PamSettings {
 	 * @param task task to add to the group
 	 */
 	public boolean addTask(OfflineTask task) {
+		if (haveTask(task)) {
+			return false;
+		}
 		offlineTasks.add(task);
 		task.setOfflineTaskGroup(this);
 		task.setDoRun(taskGroupParams.getTaskSelection(offlineTasks.size()-1));
@@ -380,10 +398,12 @@ public class OfflineTaskGroup implements PamSettings {
 	 */
 	public class TaskGroupWorker extends SwingWorker<Integer, TaskMonitorData> implements ViewLoadObserver {
 
-		volatile boolean instantKill = false;
-
-		
-		private CPUMonitor cpuMonitor = new CPUMonitor();
+	
+		public TaskGroupWorker() {
+			super();
+			instantKill = false;
+			cpuMonitor = new CPUMonitor();
+		}
 
 		public void killWorker() {
 			instantKill = true;
@@ -400,418 +420,12 @@ public class OfflineTaskGroup implements PamSettings {
 		@Override
 		protected Integer doInBackground() {
 			completionStatus = TaskStatus.RUNNING;
-			try {
-				prepareTasks();
-				switch (taskGroupParams.dataChoice) {
-				case TaskGroupParams.PROCESS_LOADED:
-					processLoadedData();
-					break;
-				case TaskGroupParams.PROCESS_ALL:
-					processAllData(0, Long.MAX_VALUE);
-					break;
-				case TaskGroupParams.PROCESS_NEW:
-					processAllData(taskGroupParams.lastDataTime, Long.MAX_VALUE);
-					break;
-				case TaskGroupParams.PROCESS_SPECIFICPERIOD:
-					processAllData(taskGroupParams.startRedoDataTime, taskGroupParams.endRedoDataTime);
-					break;
-				case TaskGroupParams.PROCESS_TME_CHUNKS:
-					processAllData(taskGroupParams.timeChunks);
-					break;
-				}
-				if (instantKill) {
-					completionStatus = TaskStatus.INTERRUPTED;
-				}
-				else {
-					completionStatus = TaskStatus.COMPLETE;
-				}
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-				completionStatus = TaskStatus.CRASHED;
-			}
-			completeTasks();
+			runBackgroundTasks(this);
 			return null;
 		}
 		
-		
-		/**
-		 * Process all data for a list of time chunks. This is robust to the list
-		 * not being in chronological order. 
-		 * 
-		 * @param timeChunks - the time chunks.
-		 */
-		private void processAllData(ArrayList<long[]> timeChunks){
-			long startTime = Long.MAX_VALUE;
-			long endTime = -Long.MAX_VALUE;
-			for (int i=0; i<timeChunks.size(); i++) {
-				if (timeChunks.get(i)[0]<startTime) {
-					startTime=timeChunks.get(i)[0];
-				}
-				if (timeChunks.get(i)[1]>endTime) {
-					endTime=timeChunks.get(i)[1];
-				}
-			}
-			processAllData(startTime,  endTime);
-		}
-		
-
-		/**
-		 * Process data between two times
-		 * @param startTime - the start time in millis
-		 * @param endTime - the end time in millis. 
-		 */
-		private void processAllData(long startTime, long endTime) {
-			
-			//System.out.println("TaskGroupParams.dataChoice" +  taskGroupParams.dataChoice);
-			
-			long currentStart = primaryDataBlock.getCurrentViewDataStart();
-			long currentEnd = primaryDataBlock.getCurrentViewDataEnd();
-
-			//			synchronized(primaryDataBlock) {
-			OfflineDataMap dataMap = primaryDataBlock.getPrimaryDataMap();
-			int nMapPoints = dataMap.getNumMapPoints(startTime, endTime);
-			int iMapPoint = 0;
-			
-			System.out.println("N MAP POINTS: "+ nMapPoints + "  dataMap: " + dataMap.getParentDataBlock() + " start: " + PamCalendar.formatDateTime(startTime) + "  "  +PamCalendar.formatDateTime(endTime));
-			
-			publish(new TaskMonitorData(TaskStatus.RUNNING, TaskActivity.PROCESSING, nMapPoints, 0, "",  
-					taskGroupParams.startRedoDataTime));
-			OfflineDataStore dataSource = dataMap.getOfflineDataSource();
-			Iterator<OfflineDataMapPoint> mapIterator = dataMap.getListIterator();
-			OfflineDataMapPoint mapPoint;
-//			System.out.println("NUMBER OF MAP POINTS: " + mapIterator.hasNext()
-//			+ "Start time: " + PamCalendar.formatDateTime(startTime) +  "End time: " + PamCalendar.formatDateTime(endTime));
-			boolean reallyDoIt = false;
-			int iPoint = 0;
-			while (mapIterator.hasNext()) {
-				mapPoint = mapIterator.next();
-				reallyDoIt = true;
-				if (mapPoint.getEndTime() < startTime || mapPoint.getStartTime() > endTime ) {
-					//System.out.println("HELLOOOOO: " + (mapPoint.getEndTime()-mapPoint.getStartTime())/1000.+  "s"); 
-					continue; // will whip through early part of list without increasing the counters
-				}
-				if (!shouldProcess(mapPoint)) {
-					Debug.out.printf("Skipping map point %s since no matching data\n", mapPoint.toString());
-					reallyDoIt = false;
-				}
-				primaryDataBlock.clearAll();
-				
-				long lastTime = taskGroupParams.startRedoDataTime;
-				
-				if (reallyDoIt) {
-					
-					Runtime.getRuntime().gc(); //garbage collection
-
-					publish(new TaskMonitorData(TaskStatus.RUNNING , TaskActivity.LOADING, nMapPoints, iPoint++, mapPoint.getName(),
-							lastTime));
-
-					primaryDataBlock.loadViewerData(new OfflineDataLoadInfo(mapPoint.getStartTime(), mapPoint.getEndTime()), null);
-
-					primaryDataBlock.sortData();
-
-					//					if (procDataEnd - procDataStart < maxSecondaryLoad) {
-					loadSecondaryData(mapPoint.getStartTime(), mapPoint.getEndTime());
-					//					}
-					for (OfflineTask aTask: offlineTasks) {
-						if (!aTask.isDoRun()) {
-							continue;
-						}
-						aTask.newDataLoad(mapPoint.getStartTime(), mapPoint.getEndTime(), mapPoint);
-					}
-					ArrayList<PamDataBlock> dataBlocks = PamController.getInstance().getDetectorDataBlocks();
-					for (PamDataBlock dataBlock:dataBlocks) {
-						// may no longer be needed depending on how reloading data goes.  
-						if (dataBlock instanceof SuperDetDataBlock) {
-							((SuperDetDataBlock) dataBlock).reattachSubdetections(null);
-						}
-					}
-					
-					if (superDetectionFilter != null) {
-						superDetectionFilter.checkSubDetectionLinks();
-					}
-					publish(new TaskMonitorData(TaskStatus.RUNNING , TaskActivity.PROCESSING, nMapPoints, 0, mapPoint.getName(),
-							lastTime));
-					
-					processData(iMapPoint, mapPoint, mapPoint.getStartTime(), mapPoint.getEndTime());
-					
-					lastTime = mapPoint.getEndTime();
-					publish(new TaskMonitorData(TaskStatus.RUNNING , TaskActivity.SAVING, nMapPoints, 0, mapPoint.getName(),
-							lastTime));
-				}
-				iMapPoint++;
-//				publish(new TaskMonitorData(taskGroupParams.dataChoice, taskGroupParams.startRedoDataTime, taskGroupParams.endRedoDataTime, nMapPoints, 0, 
-//						TaskMonitor.TASK_COMPLETE, TaskMonitor.TASK_COMPLETE, lastTime));
-				if (instantKill) {
-					break;
-				}
-			}
-			//			}
-			primaryDataBlock.loadViewerData(new OfflineDataLoadInfo(currentStart, currentEnd), null);
-		}
-
-		/**
-		 * See if it's worth loading this map point. This will currently always
-		 * return true unless there is a superDetectionFilter, in which case it will 
-		 * attempt to work out if there are any sub detections that might want
-		 * processing. 
-		 * @param mapPoint
-		 * @return
-		 */
-		private boolean shouldProcess(OfflineDataMapPoint mapPoint) {
-			if (superDetectionFilter == null) {
-				return true;
-			}
-			else {
-				return superDetectionFilter.shouldProcess(mapPoint);
-			}
-		}
-
-		private void processLoadedData() {
-			publish(new TaskMonitorData(TaskStatus.RUNNING, TaskActivity.PROCESSING, 1, 0, "Loaded Data",
-					taskGroupParams.startRedoDataTime));
-			if (dataTimeLimits == null) {
-				processData(0, null, 0, Long.MAX_VALUE);
-			}
-			else {
-				processData(0, null, dataTimeLimits.getMinimumMillis(), dataTimeLimits.getMaximumMillis());
-			}
-//			publish(new TaskMonitorData(TaskGroupParams.PROCESS_LOADED, taskGroupParams.startRedoDataTime, taskGroupParams.endRedoDataTime, 1, 0, "Loaded Data",
-//					TaskMonitor.TASK_COMPLETE, TaskMonitor.ACTIVITY_PROCESSING, taskGroupParams.endRedoDataTime));
-		}
-
-		/**
-		 * Called once at start of all processing. 
-		 */
-		private void prepareTasks() {
-			int nTasks = getNTasks();
-			OfflineTask aTask;
-			for (int iTask = 0; iTask < nTasks; iTask++) {
-				aTask = getTask(iTask);
-				if (!aTask.canRun()) {
-					continue;
-				}
-				if (aTask.isDoRun()) {
-					if (taskGroupParams.deleteOld) {
-						aTask.deleteOldData(taskGroupParams);
-					}
-					//added this here so that tasks with different
-					//parent data blocks can be run (albiet not at the same time)
-					aTask.prepareTask();
-				}
-			}			
-		}
-
-		/**
-		 * Called to process data currently in memory. i.e. get's called 
-		 * once when processing loaded data, multiple times when processing all data. 
-		 * @param globalProgress
-		 * @param mapPoint
-		 * @param processStartTime
-		 * @param processEndTime
-		 */
-		private void processData(int globalProgress, OfflineDataMapPoint mapPoint, long processStartTime, long processEndTime) {
-			int nDatas = primaryDataBlock.getUnitsCount();
-			int nSay = Math.max(1, nDatas / 100);
-//			int nDone = 0;
-			int nTasks = getNTasks();
-			PamDataUnit dataUnit;
-			OfflineTask aTask;
-			boolean unitChanged;
-			DataUnitFileInformation fileInfo;
-			String dataName;
-			if (mapPoint != null) {
-				dataName = mapPoint.getName();
-			}
-			else {
-				dataName = "Loaded Data";
-			}
-			/**
-			 * Make sure that any data from required data blocks is loaded. First check the 
-			 * start and end times of the primary data units we actually WANT to process
-			 * Also get a count of found data - may be able to leave without having to do anything at all
-			 */
-			ListIterator<PamDataUnit> it = primaryDataBlock.getListIterator(0);
-			long procDataStart = Long.MAX_VALUE;
-			long procDataEnd = 0;
-			int nToProcess = 0;
-			while (it.hasNext()) {
-				dataUnit = it.next();
-				/**
-				 * Make sure we only process data units within the current time interval. 
-				 */
-				if (dataUnit.getTimeMilliseconds() < processStartTime) {
-					continue;
-				}
-				if (dataUnit.getTimeMilliseconds() > processEndTime) {
-					break;
-				}
-//				if (shouldProcess(dataUnit) == false) {
-//					continue;
-//				}
-				procDataStart = Math.min(procDataStart, dataUnit.getTimeMilliseconds());
-				procDataEnd = Math.max(procDataEnd, dataUnit.getEndTimeInMilliseconds());
-				// do this one too - just to make sure in case end time returns zero. 
-				procDataEnd = Math.max(procDataEnd, dataUnit.getTimeMilliseconds());
-				nToProcess++; // increase toprocess counter
-			}
-			if (nToProcess == 0) {
-				return;
-			}
-			PamDataBlock aDataBlock;
-			RequiredDataBlockInfo blockInfo;
-			/* 
-			 * if the data interval is < 1 hour, then load it all now
-			 * otherwise we'll do it on a data unit basis. 
-			 */
-////			long maxSecondaryLoad = 1800L*1000L;
-////			if (procDataEnd - procDataStart < maxSecondaryLoad) {
-//				loadSecondaryData(procDataStart, procDataEnd);
-////			}
-			// remember the end time of the data so we can use the "new data" selection flag. 
-			taskGroupParams.lastDataTime = Math.min(primaryDataBlock.getCurrentViewDataEnd(),processEndTime);
-			//			synchronized(primaryDataBlock) {
-			/*
-			 * Call newDataLoaded for each task before getting on with processing individual data units. 
-			 */
-
-			/**
-			 * Now process the data
-			 */
-			it = primaryDataBlock.getListIterator(0);
-			unitChanged = false;
-			int totalUnits = 0;
-			int unitsChanged = 0;
-			boolean doTasks = false;
-			while (it.hasNext()) {
-				dataUnit = it.next();
-				totalUnits++;
-				doTasks = true;
-				/**
-				 * Make sure we only process data units within the current time interval. 
-				 */
-				if (dataUnit.getTimeMilliseconds() < processStartTime) {
-					continue;
-				}
-				if (dataUnit.getTimeMilliseconds() > processEndTime) {
-					break;
-				}
-				
-				if (!shouldProcess(dataUnit)) {
-					doTasks = false;
-				}
-				
-				if (doTasks) {
-					/*
-					 *  load the secondary datablock data. this can be called even if
-					 *  it was called earlier on since it wont' reload if data are already
-					 *  in memory.  
-					 */
-//					loadSecondaryData(dataUnit.getTimeMilliseconds(), dataUnit.getEndTimeInMilliseconds());
-
-					for (int iTask = 0; iTask < nTasks; iTask++) {
-						aTask = getTask(iTask);
-						if (!aTask.isDoRun() ||  !isInTimeChunk(dataUnit, taskGroupParams.timeChunks)) {
-							continue;
-						}
-						cpuMonitor.start();
-						unitChanged |= aTask.processDataUnit(dataUnit);
-						cpuMonitor.stop();
-					}
-					if (unitChanged) {
-						fileInfo = dataUnit.getDataUnitFileInformation();
-						if (fileInfo != null) {
-							fileInfo.setNeedsUpdate(true);
-						}
-						dataUnit.updateDataUnit(System.currentTimeMillis());
-					}
-					dataUnit.freeData();
-				}
-				if (instantKill) {
-					break;
-				}
-				unitsChanged++;
-				if (totalUnits%nSay == 0) {
-					publish(new TaskMonitorData(TaskStatus.RUNNING, TaskActivity.PROCESSING, nToProcess, totalUnits, dataName,
-							dataUnit.getTimeMilliseconds()));
-				}
-			}
-			for (int iTask = 0; iTask < nTasks; iTask++) {
-				aTask = getTask(iTask);
-				if (!aTask.isDoRun()) {
-					continue;
-				}
-				aTask.loadedDataComplete();
-			}
-			//			}
-			publish(new TaskMonitorData(TaskStatus.RUNNING, TaskActivity.SAVING, nToProcess, totalUnits, dataName,
-					processEndTime));
-			for (int i = 0; i < affectedDataBlocks.size(); i++) {
-				//System.out.println("SAVE VIEWER DATA FOR: " + affectedDataBlocks.get(i) );
-				aDataBlock = affectedDataBlocks.get(i);
-				aDataBlock.saveViewerData();
-			}
-			Debug.out.printf("Processd %d out of %d data units at " + mapPoint + "\n", unitsChanged, totalUnits);
-			commitDatabase();
-		}
-		
-		private boolean shouldProcess(PamDataUnit dataUnit) {
-			if (superDetectionFilter != null) {
-				boolean yes = superDetectionFilter.checkSubDetection(dataUnit);
-//				Debug.out.printf("Super det filter says %s\n", yes);
-				return yes;
-			}
-			return true;
-		}
-		
-		/**
-		 * Check whether a data unit is within a list of time chunks within params. Returns true if the 
-		 * PROCESS_TME_CHUNKS option is not the current data analysis choice. 
-		 * @param dataUnit - the data unit to check
-		 * @param timeChunks - a list of time chunks with each long[] a start and end time in millis
-		 * @return true if the data unit is within any of the time chunks or data choice is not PROCESS_TME_CHUNKS. 
-		 */
-		private boolean isInTimeChunk(PamDataUnit dataUnit, ArrayList<long[]> timeChunks) {
-			if (taskGroupParams.dataChoice!=TaskGroupParams.PROCESS_TME_CHUNKS) return true; 
-			for (int i=0; i<timeChunks.size(); i++) {
-				if (dataUnit.getTimeMilliseconds()>=timeChunks.get(i)[0] && dataUnit.getTimeMilliseconds()<timeChunks.get(i)[1]){
-					return true;
-				}
-			}
-			return false; 
-		}
-
-
-		private void commitDatabase() {
-			DBControlUnit dbcontrol = DBControlUnit.findDatabaseControl();
-			if (dbcontrol == null) return;
-			dbcontrol.commitChanges();
-		}
-
-		private void loadSecondaryData(long procDataStart, long procDataEnd) {
-			for (int i = 0; i < requiredDataBlocks.size(); i++) {
-				RequiredDataBlockInfo blockInfo = requiredDataBlocks.get(i);
-				PamDataBlock aDataBlock = blockInfo.getPamDataBlock();
-				long reqStart = procDataStart - blockInfo.getPreLoadTime();
-				long reqEnd = procDataEnd + blockInfo.getPostLoadTime();
-//				if (aDataBlock.getCurrentViewDataStart() > reqStart ||
-//						aDataBlock.getCurrentViewDataEnd() < reqEnd) {
-					aDataBlock.loadViewerData(new OfflineDataLoadInfo(reqStart, reqEnd), null);
-//				}
-			}
-		}
-
-		private void completeTasks() {
-			int nTasks = getNTasks();
-			OfflineTask aTask;
-			for (int iTask = 0; iTask < nTasks; iTask++) {
-				aTask = getTask(iTask);
-				if (!aTask.canRun()) {
-					continue;
-				}
-				aTask.completeTask();
-			}			
-			System.out.println(cpuMonitor.getSummary("Offline task processing: "));
+		public void publish(TaskMonitorData tmd) {
+			super.publish(tmd);
 		}
 
 		@Override
@@ -842,8 +456,442 @@ public class OfflineTaskGroup implements PamSettings {
 		}
 
 	}
+	
+	/**
+	 * Move all of the functions out of the TaskGroupWorker class so that they
+	 * can be overridden / modified in specialist versions of OfflineTaskGroup
+	 * @param taskGroupWorker
+	 */
+	public void runBackgroundTasks(TaskGroupWorker taskGroupWorker) {
+		try {
+			prepareTasks();
+			switch (taskGroupParams.dataChoice) {
+			case TaskGroupParams.PROCESS_LOADED:
+				processLoadedData(taskGroupWorker);
+				break;
+			case TaskGroupParams.PROCESS_ALL:
+				processAllData(taskGroupWorker, 0, Long.MAX_VALUE);
+				break;
+			case TaskGroupParams.PROCESS_NEW:
+				processAllData(taskGroupWorker, taskGroupParams.lastDataTime, Long.MAX_VALUE);
+				break;
+			case TaskGroupParams.PROCESS_SPECIFICPERIOD:
+				processAllData(taskGroupWorker, taskGroupParams.startRedoDataTime, taskGroupParams.endRedoDataTime);
+				break;
+			case TaskGroupParams.PROCESS_TME_CHUNKS:
+				processAllData(taskGroupWorker, taskGroupParams.timeChunks);
+				break;
+			}
+			if (instantKill) {
+				completionStatus = TaskStatus.INTERRUPTED;
+			}
+			else {
+				completionStatus = TaskStatus.COMPLETE;
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			completionStatus = TaskStatus.CRASHED;
+		}
+		completeTasks();
+	}
+	/**
+	 * Process all data for a list of time chunks. This is robust to the list
+	 * not being in chronological order. 
+	 * @param taskGroupWorker 
+	 * 
+	 * @param timeChunks - the time chunks.
+	 */
+	public void processAllData(TaskGroupWorker taskGroupWorker, ArrayList<long[]> timeChunks){
+		long startTime = Long.MAX_VALUE;
+		long endTime = -Long.MAX_VALUE;
+		for (int i=0; i<timeChunks.size(); i++) {
+			if (timeChunks.get(i)[0]<startTime) {
+				startTime=timeChunks.get(i)[0];
+			}
+			if (timeChunks.get(i)[1]>endTime) {
+				endTime=timeChunks.get(i)[1];
+			}
+		}
+		processAllData(taskGroupWorker, startTime,  endTime);
+	}
+	
 
-	private void newMonitorData(TaskMonitorData monData) {
+	/**
+	 * Process data between two times
+	 * @param taskGroupWorker 
+	 * @param startTime - the start time in millis
+	 * @param endTime - the end time in millis. 
+	 */
+	public void processAllData(TaskGroupWorker taskGroupWorker, long startTime, long endTime) {
+		
+		//System.out.println("TaskGroupParams.dataChoice" +  taskGroupParams.dataChoice);
+		if (primaryDataBlock == null) {
+			return;
+		}
+		long currentStart = primaryDataBlock.getCurrentViewDataStart();
+		long currentEnd = primaryDataBlock.getCurrentViewDataEnd();
+
+		//			synchronized(primaryDataBlock) {
+		OfflineDataMap dataMap = primaryDataBlock.getPrimaryDataMap();
+		if (dataMap==null) {
+			System.err.println("OfflineTaskGroup: processAllData: dataMap was null for " 
+					+ primaryDataBlock.getDataName());
+			return;
+		}
+		
+		int nMapPoints = dataMap.getNumMapPoints(startTime, endTime);
+		int iMapPoint = 0;
+		
+//		System.out.println("N MAP POINTS: "+ nMapPoints + "  dataMap: " + dataMap.getParentDataBlock() + " start: " + PamCalendar.formatDateTime(startTime) + "  "  +PamCalendar.formatDateTime(endTime));
+		
+		taskGroupWorker.publish(new TaskMonitorData(TaskStatus.RUNNING, TaskActivity.PROCESSING, nMapPoints, 0, "",  
+				taskGroupParams.startRedoDataTime));
+		OfflineDataStore dataSource = dataMap.getOfflineDataSource();
+		Iterator<OfflineDataMapPoint> mapIterator = dataMap.getListIterator();
+		OfflineDataMapPoint mapPoint;
+//		System.out.println("NUMBER OF MAP POINTS: " + mapIterator.hasNext()
+//		+ "Start time: " + PamCalendar.formatDateTime(startTime) +  "End time: " + PamCalendar.formatDateTime(endTime));
+		boolean reallyDoIt = false;
+		int iPoint = 0;
+		while (mapIterator.hasNext()) {
+			mapPoint = mapIterator.next();
+			reallyDoIt = true;
+			if (mapPoint.getEndTime() < startTime || mapPoint.getStartTime() > endTime ) {
+				//System.out.println("HELLOOOOO: " + (mapPoint.getEndTime()-mapPoint.getStartTime())/1000.+  "s"); 
+				continue; // will whip through early part of list without increasing the counters
+			}
+			if (!shouldProcess(mapPoint)) {
+				Debug.out.printf("Skipping map point %s since no matching data\n", mapPoint.toString());
+				reallyDoIt = false;
+			}
+			primaryDataBlock.clearAll();
+			
+			long lastTime = taskGroupParams.startRedoDataTime;
+			
+			if (reallyDoIt) {
+				
+				Runtime.getRuntime().gc(); //garbage collection
+
+				taskGroupWorker.publish(new TaskMonitorData(TaskStatus.RUNNING , TaskActivity.LOADING, nMapPoints, iPoint++, mapPoint.getName(),
+						lastTime));
+
+				primaryDataBlock.loadViewerData(new OfflineDataLoadInfo(mapPoint.getStartTime(), mapPoint.getEndTime()), null);
+
+				primaryDataBlock.sortData();
+
+				//					if (procDataEnd - procDataStart < maxSecondaryLoad) {
+				loadSecondaryData(mapPoint.getStartTime(), mapPoint.getEndTime());
+				//					}
+				for (OfflineTask aTask: offlineTasks) {
+					if (!aTask.isDoRun() || !aTask.canRun()) {
+						continue;
+					}
+					aTask.newDataLoad(mapPoint.getStartTime(), mapPoint.getEndTime(), mapPoint);
+				}
+				ArrayList<PamDataBlock> dataBlocks = PamController.getInstance().getDetectorDataBlocks();
+				for (PamDataBlock dataBlock:dataBlocks) {
+					// may no longer be needed depending on how reloading data goes.  
+					if (dataBlock instanceof SuperDetDataBlock) {
+						((SuperDetDataBlock) dataBlock).reattachSubdetections(null);
+					}
+				}
+				
+				if (superDetectionFilter != null) {
+					superDetectionFilter.checkSubDetectionLinks();
+				}
+				taskGroupWorker.publish(new TaskMonitorData(TaskStatus.RUNNING , TaskActivity.PROCESSING, nMapPoints, 0, mapPoint.getName(),
+						lastTime));
+				
+				processData(taskGroupWorker, iMapPoint, mapPoint, mapPoint.getStartTime(), mapPoint.getEndTime());
+				
+				lastTime = mapPoint.getEndTime();
+				taskGroupWorker.publish(new TaskMonitorData(TaskStatus.RUNNING , TaskActivity.SAVING, nMapPoints, 0, mapPoint.getName(),
+						lastTime));
+			}
+			iMapPoint++;
+//			publish(new TaskMonitorData(taskGroupParams.dataChoice, taskGroupParams.startRedoDataTime, taskGroupParams.endRedoDataTime, nMapPoints, 0, 
+//					TaskMonitor.TASK_COMPLETE, TaskMonitor.TASK_COMPLETE, lastTime));
+			if (instantKill) {
+				break;
+			}
+		}
+		//			}
+		primaryDataBlock.loadViewerData(new OfflineDataLoadInfo(currentStart, currentEnd), null);
+	}
+
+	/**
+	 * See if it's worth loading this map point. This will currently always
+	 * return true unless there is a superDetectionFilter, in which case it will 
+	 * attempt to work out if there are any sub detections that might want
+	 * processing. 
+	 * @param mapPoint
+	 * @return
+	 */
+	public boolean shouldProcess(OfflineDataMapPoint mapPoint) {
+		if (superDetectionFilter == null) {
+			return true;
+		}
+		else {
+			return superDetectionFilter.shouldProcess(mapPoint);
+		}
+	}
+
+	public void processLoadedData(TaskGroupWorker taskGroupWorker) {
+		taskGroupWorker.publish(new TaskMonitorData(TaskStatus.RUNNING, TaskActivity.PROCESSING, 1, 0, "Loaded Data",
+				taskGroupParams.startRedoDataTime));
+		if (dataTimeLimits == null) {
+			processData(taskGroupWorker, 0, null, 0, Long.MAX_VALUE);
+		}
+		else {
+			processData(taskGroupWorker, 0, null, dataTimeLimits.getMinimumMillis(), dataTimeLimits.getMaximumMillis());
+		}
+//		publish(new TaskMonitorData(TaskGroupParams.PROCESS_LOADED, taskGroupParams.startRedoDataTime, taskGroupParams.endRedoDataTime, 1, 0, "Loaded Data",
+//				TaskMonitor.TASK_COMPLETE, TaskMonitor.ACTIVITY_PROCESSING, taskGroupParams.endRedoDataTime));
+	}
+
+	/**
+	 * Called once at start of all processing. 
+	 */
+	public void prepareTasks() {
+		int nTasks = getNTasks();
+		OfflineTask aTask;
+		for (int iTask = 0; iTask < nTasks; iTask++) {
+			aTask = getTask(iTask);
+			if (!aTask.canRun()) {
+				continue;
+			}
+			if (aTask.isDoRun()) {
+				if (taskGroupParams.deleteOld) {
+					aTask.deleteOldData(taskGroupParams);
+				}
+				//added this here so that tasks with different
+				//parent data blocks can be run (albiet not at the same time)
+				aTask.prepareTask();
+			}
+		}			
+	}
+
+	/**
+	 * Called to process data currently in memory. i.e. get's called 
+	 * once when processing loaded data, multiple times when processing all data. 
+	 * @param globalProgress
+	 * @param mapPoint
+	 * @param processStartTime
+	 * @param processEndTime
+	 */
+	public void processData(TaskGroupWorker taskGroupWorker, int globalProgress, OfflineDataMapPoint mapPoint, long processStartTime, long processEndTime) {
+		if (primaryDataBlock == null) {
+			return; // very rare, but does happen for some Tethys tasks. 
+		}
+		int nDatas = primaryDataBlock.getUnitsCount();
+		int nSay = Math.max(1, nDatas / 100);
+//		int nDone = 0;
+		int nTasks = getNTasks();
+		PamDataUnit dataUnit;
+		OfflineTask aTask;
+		boolean unitChanged;
+		DataUnitFileInformation fileInfo;
+		String dataName;
+		if (mapPoint != null) {
+			dataName = mapPoint.getName();
+		}
+		else {
+			dataName = "Loaded Data";
+		}
+		
+		/**
+		 * Make sure that any data from required data blocks is loaded. First check the 
+		 * start and end times of the primary data units we actually WANT to process
+		 * Also get a count of found data - may be able to leave without having to do anything at all
+		 */			
+		/**
+		 * Count, then process the data. Copy to preserve data integrity. 
+		 */
+		ArrayList<PamDataUnit> dataCopy = primaryDataBlock.getTaskDataCopy(processStartTime, processEndTime, OfflineTaskGroup.this);
+		ListIterator<PamDataUnit> it = dataCopy.listIterator();
+		long procDataStart = Long.MAX_VALUE;
+		long procDataEnd = 0;
+		int nToProcess = 0;
+		while (it.hasNext()) {
+			dataUnit = it.next();
+			/**
+			 * Make sure we only process data units within the current time interval. 
+			 */
+			if (dataUnit.getTimeMilliseconds() < processStartTime) {
+				continue;
+			}
+			if (dataUnit.getTimeMilliseconds() > processEndTime) {
+				break;
+			}
+//			if (shouldProcess(dataUnit) == false) {
+//				continue;
+//			}
+			procDataStart = Math.min(procDataStart, dataUnit.getTimeMilliseconds());
+			procDataEnd = Math.max(procDataEnd, dataUnit.getEndTimeInMilliseconds());
+			// do this one too - just to make sure in case end time returns zero. 
+			procDataEnd = Math.max(procDataEnd, dataUnit.getTimeMilliseconds());
+			nToProcess++; // increase toprocess counter
+		}
+		if (nToProcess == 0) {
+			return;
+		}
+		PamDataBlock aDataBlock;
+		RequiredDataBlockInfo blockInfo;
+		/* 
+		 * if the data interval is < 1 hour, then load it all now
+		 * otherwise we'll do it on a data unit basis. 
+		 */
+////		long maxSecondaryLoad = 1800L*1000L;
+////		if (procDataEnd - procDataStart < maxSecondaryLoad) {
+//			loadSecondaryData(procDataStart, procDataEnd);
+////		}
+		// remember the end time of the data so we can use the "new data" selection flag. 
+		taskGroupParams.lastDataTime = Math.min(primaryDataBlock.getCurrentViewDataEnd(),processEndTime);
+		//			synchronized(primaryDataBlock) {
+		/*
+		 * Call newDataLoaded for each task before getting on with processing individual data units. 
+		 */
+
+
+		it = dataCopy.listIterator();
+		
+		unitChanged = false;
+		int totalUnits = 0;
+		int unitsChanged = 0;
+		boolean doTasks = false;
+		while (it.hasNext()) {
+			dataUnit = it.next();
+			totalUnits++;
+			doTasks = true;
+			/**
+			 * Make sure we only process data units within the current time interval. 
+			 */
+			if (dataUnit.getTimeMilliseconds() < processStartTime) {
+				continue;
+			}
+			if (dataUnit.getTimeMilliseconds() > processEndTime) {
+				break;
+			}
+			
+			if (!shouldProcess(dataUnit)) {
+				doTasks = false;
+			}
+			
+			if (doTasks) {
+				/*
+				 *  load the secondary datablock data. this can be called even if
+				 *  it was called earlier on since it wont' reload if data are already
+				 *  in memory.  
+				 */
+//				loadSecondaryData(dataUnit.getTimeMilliseconds(), dataUnit.getEndTimeInMilliseconds());
+
+				for (int iTask = 0; iTask < nTasks; iTask++) {
+					aTask = getTask(iTask);
+					if (!aTask.isDoRun() ||  !isInTimeChunk(dataUnit, taskGroupParams.timeChunks)) {
+						continue;
+					}
+					cpuMonitor.start();
+					unitChanged |= aTask.processDataUnit(dataUnit);
+					cpuMonitor.stop();
+				}
+				if (unitChanged) {
+					fileInfo = dataUnit.getDataUnitFileInformation();
+					if (fileInfo != null) {
+						fileInfo.setNeedsUpdate(true);
+					}
+					dataUnit.updateDataUnit(System.currentTimeMillis());
+				}
+				dataUnit.freeData();
+			}
+			if (instantKill) {
+				break;
+			}
+			unitsChanged++;
+			if (totalUnits%nSay == 0) {
+				taskGroupWorker.publish(new TaskMonitorData(TaskStatus.RUNNING, TaskActivity.PROCESSING, nToProcess, totalUnits, dataName,
+						dataUnit.getTimeMilliseconds()));
+			}
+		}
+		for (int iTask = 0; iTask < nTasks; iTask++) {
+			aTask = getTask(iTask);
+			if (!aTask.isDoRun()) {
+				continue;
+			}
+			aTask.loadedDataComplete();
+		}
+		//			}
+		taskGroupWorker.publish(new TaskMonitorData(TaskStatus.RUNNING, TaskActivity.SAVING, nToProcess, totalUnits, dataName,
+				processEndTime));
+		for (int i = 0; i < affectedDataBlocks.size(); i++) {
+			//System.out.println("SAVE VIEWER DATA FOR: " + affectedDataBlocks.get(i) );
+			aDataBlock = affectedDataBlocks.get(i);
+			aDataBlock.saveViewerData();
+		}
+		Debug.out.printf("Processd %d out of %d data units at " + mapPoint + "\n", unitsChanged, totalUnits);
+		commitDatabase();
+	}
+	
+	public boolean shouldProcess(PamDataUnit dataUnit) {
+		if (superDetectionFilter != null) {
+			boolean yes = superDetectionFilter.checkSubDetection(dataUnit);
+//			Debug.out.printf("Super det filter says %s\n", yes);
+			return yes;
+		}
+		return true;
+	}
+	
+	/**
+	 * Check whether a data unit is within a list of time chunks within params. Returns true if the 
+	 * PROCESS_TME_CHUNKS option is not the current data analysis choice. 
+	 * @param dataUnit - the data unit to check
+	 * @param timeChunks - a list of time chunks with each long[] a start and end time in millis
+	 * @return true if the data unit is within any of the time chunks or data choice is not PROCESS_TME_CHUNKS. 
+	 */
+	public boolean isInTimeChunk(PamDataUnit dataUnit, ArrayList<long[]> timeChunks) {
+		if (taskGroupParams.dataChoice!=TaskGroupParams.PROCESS_TME_CHUNKS) return true; 
+		for (int i=0; i<timeChunks.size(); i++) {
+			if (dataUnit.getTimeMilliseconds()>=timeChunks.get(i)[0] && dataUnit.getTimeMilliseconds()<timeChunks.get(i)[1]){
+				return true;
+			}
+		}
+		return false; 
+	}
+
+
+	public void commitDatabase() {
+		DBControlUnit dbcontrol = DBControlUnit.findDatabaseControl();
+		if (dbcontrol == null) return;
+		dbcontrol.commitChanges();
+	}
+
+	public void loadSecondaryData(long procDataStart, long procDataEnd) {
+		for (int i = 0; i < requiredDataBlocks.size(); i++) {
+			RequiredDataBlockInfo blockInfo = requiredDataBlocks.get(i);
+			PamDataBlock aDataBlock = blockInfo.getPamDataBlock();
+			long reqStart = procDataStart - blockInfo.getPreLoadTime();
+			long reqEnd = procDataEnd + blockInfo.getPostLoadTime();
+//			if (aDataBlock.getCurrentViewDataStart() > reqStart ||
+//					aDataBlock.getCurrentViewDataEnd() < reqEnd) {
+				aDataBlock.loadViewerData(new OfflineDataLoadInfo(reqStart, reqEnd), null);
+//			}
+		}
+	}
+
+	public void completeTasks() {
+		int nTasks = getNTasks();
+		OfflineTask aTask;
+		for (int iTask = 0; iTask < nTasks; iTask++) {
+			aTask = getTask(iTask);
+			if (!aTask.canRun()) {
+				continue;
+			}
+			aTask.completeTask();
+		}			
+		System.out.println(cpuMonitor.getSummary("Offline task processing: "));
+	}
+
+	public void newMonitorData(TaskMonitorData monData) {
 		if (taskMonitor == null) {
 			return;
 		}
@@ -867,7 +915,7 @@ public class OfflineTaskGroup implements PamSettings {
 //		}
 	}
 
-	private void logTaskStatus(TaskMonitorData monitorData) {
+	public void logTaskStatus(TaskMonitorData monitorData) {
 		for (OfflineTask aTask : offlineTasks) {
 			if (!aTask.isDoRun()) {
 				continue;
@@ -887,9 +935,10 @@ public class OfflineTaskGroup implements PamSettings {
 				taskGroupParams.endRedoDataTime);
 		logTaskStatus(monData); // log first, since the dialog will update it's tool tips based on databse read.
 		newMonitorData(monData);
-		
-		long currentStart = primaryDataBlock.getCurrentViewDataStart();
-		long currentEnd = primaryDataBlock.getCurrentViewDataEnd();
+//		if (primaryDataBlock != null) {
+//			long currentStart = primaryDataBlock.getCurrentViewDataStart();
+//			long currentEnd = primaryDataBlock.getCurrentViewDataEnd();
+//		}
 		//System.out.println("TASKS COMPLETE:");
 		PamController.getInstance().notifyModelChanged(PamControllerInterface.OFFLINE_PROCESS_COMPLETE);
 	}
@@ -977,6 +1026,20 @@ public class OfflineTaskGroup implements PamSettings {
 		affectedDataBlocks.clear();
 		offlineTasks.clear();
 		
+	}
+
+	/**
+	 * @return the completionStatus
+	 */
+	public TaskStatus getCompletionStatus() {
+		return completionStatus;
+	}
+
+	/**
+	 * @param completionStatus the completionStatus to set
+	 */
+	public void setCompletionStatus(TaskStatus completionStatus) {
+		this.completionStatus = completionStatus;
 	}
 
 

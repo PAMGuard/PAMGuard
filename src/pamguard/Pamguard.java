@@ -38,9 +38,15 @@ import java.util.TimeZone;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+
 import Acquisition.FolderInputSystem;
 import PamController.PamController;
+import PamController.PamFolders;
 import PamController.PamGUIManager;
+import PamController.PamRunModeDialog;
+import PamController.PamRunModeParams;
 import PamController.PamSettingManager;
 import PamController.PamguardVersionInfo;
 import PamController.pamBuoyGlobals;
@@ -91,7 +97,7 @@ public class Pamguard {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-
+		
 		Debug.setPrintDebug(false); // make sure the class instantiates static members. 
 		try {			
 			if (PlatformInfo.calculateOS() == OSType.WINDOWS) {
@@ -100,8 +106,8 @@ public class Pamguard {
 			else {
 				//do not use the mac version...it's awful
 				//UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			    UIManager.setLookAndFeel(new FlatLightLaf() );	
 
-				UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 			}
 			//		    for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 			//		        if ("Nimbus".equals(info.getName())) {
@@ -120,7 +126,9 @@ public class Pamguard {
 			//			  System.out.println(keys.nextElement() + ": " + ui.get(nxt));
 			//			}
 			//			PamColors.getInstance().setColors();
-		} catch (Exception e) { }
+		} catch (Exception e) { 
+			e.printStackTrace();
+		}
 
 		int runMode = PamController.RUN_NORMAL;
 		String InputPsf = "NULL";
@@ -162,6 +170,20 @@ public class Pamguard {
 			String anArg;
 			while (iArg < nArgs) {
 				anArg = args[iArg++];
+				
+				if (anArg.equalsIgnoreCase("-c")) {
+					//the user chooses which run mode
+					PamRunModeParams runbModeParams = PamRunModeDialog.showDialog(null, true);
+					if (runbModeParams==null || runbModeParams.runMode<0) {
+						//use cancelled
+						System.exit(0);
+					}
+					else {
+						//set anArg to whatever the user chose
+						anArg = runbModeParams.getRunString();
+					}
+				}
+				
 				if (anArg.equalsIgnoreCase("-v")) {
 					runMode = PamController.RUN_PAMVIEW;
 					System.out.println("PAMGUARD Viewer");
@@ -169,6 +191,15 @@ public class Pamguard {
 				else if (anArg.equalsIgnoreCase("-m")) {
 					runMode = PamController.RUN_MIXEDMODE;
 					System.out.println("PAMGUARD Offline mixed mode");
+				}				
+				else if (anArg.equalsIgnoreCase(GlobalArguments.BATCHVIEW)) {
+					/**
+					 * Used with batch processor when it launches the configuration to make it clear that
+					 * it's really working in viewer mode, and viewer mode settings should be available, but
+					 * settings will be read and written using psfx files, not the databsae. 
+					 */
+					GlobalArguments.setParam(GlobalArguments.BATCHVIEW, "true");
+//					runMode = PamController.RUN_PAMVIEW;
 				}
 				else if (anArg.equalsIgnoreCase("-nr")) {
 					runMode = PamController.RUN_NETWORKRECEIVER;
@@ -207,6 +238,10 @@ public class Pamguard {
 				}
 				else if (anArg.equalsIgnoreCase("-jamie")) {
 					JamieDev.setEnabled(true);
+					System.out.println("Enabling Jamie Macaulay modifications.");
+				}
+				else if (anArg.equalsIgnoreCase("-smrudev")) {
+					SMRUEnable.setDevEnable(true);
 					System.out.println("Enabling Jamie Macaulay modifications.");
 				}
 				else if (anArg.equalsIgnoreCase("-rocca")) {
@@ -703,6 +738,12 @@ public class Pamguard {
 	private static class FolderSizeMonitor implements Runnable {
 		@Override
 		public void run() {
+			
+			PamFolders.deleteTempFiles(".x86_64.dll");
+			PamFolders.deleteTempFiles(".dll.lck");
+			PamFolders.deleteTempFiles(".tmp");
+			PamFolders.deleteTempFiles("-sqlitejdbc.dll");
+			
 			while(true) {
 				long length = 0;
 				File dir = new File(getSettingsFolder());

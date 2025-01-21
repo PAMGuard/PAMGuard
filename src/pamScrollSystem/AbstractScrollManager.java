@@ -105,6 +105,13 @@ public abstract class AbstractScrollManager {
 	abstract public void centreDataAt(PamDataBlock dataBlock, long menuMouseTime);
 
 	/**
+	 * Move scroll to given time. Don't move the outer scroller unless necessary. 
+	 * @param dataBlock
+	 * @param menuMouseTime
+	 */
+	abstract public void scrollToTime(PamDataBlock dataBlock, long menuMouseTime);
+
+	/**
 	 * Start all data in all data blocks at the given time
 	 * @param dataBlock
 	 * @param menuMouseTime time in milliseconds

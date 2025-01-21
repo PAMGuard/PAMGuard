@@ -27,7 +27,7 @@ public class CTClassifierOfflineTask  extends OfflineTask<CTDataUnit> {
 	 * @param clickTrainContol - the click train control. 
 	 */
 	public CTClassifierOfflineTask(ClickTrainControl clickTrainControl){
-		super(clickTrainControl.getClssfdClickTrainDataBlock());
+		super(clickTrainControl, clickTrainControl.getClssfdClickTrainDataBlock());
 		this.clickTrainControl=clickTrainControl; 
 		// the parent data block is the click train detector block. 
 		setParentDataBlock(clickTrainControl.getClssfdClickTrainDataBlock());

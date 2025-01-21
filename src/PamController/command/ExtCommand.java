@@ -13,7 +13,7 @@ public abstract class ExtCommand {
 	private String name;
 	
 	private boolean immediate = false;
-
+	
 	/**
 	 * @param name Name of command (must be a single word)
 	 * @param immediate immediate execution. If false, then the command will be queued in the AWT
@@ -142,4 +142,5 @@ public abstract class ExtCommand {
 		PamController pc = PamController.getInstance();
 		return pc.findControlledUnits(unitType, unitName);
 	}
+
 }

@@ -42,6 +42,10 @@ public class AlarmControl extends PamControlledUnit implements PamSettings {
 
 	private OLProcessDialog offlineDialog;
 
+	private OfflineTaskGroup offlineTaskGroup;
+
+	protected AlarmOfflineTask alarmOfflineTask;
+
 	public AlarmControl(String unitName) {
 		super("Alarm", unitName);
 		addPamProcess(alarmProcess = new AlarmProcess(this));
@@ -55,6 +59,8 @@ public class AlarmControl extends PamControlledUnit implements PamSettings {
 		alarmActions.add(new SendEmailAction(this));
 		alarmActions.add(new AlarmUDPAction(this));
 //		alarmActions.add(new TastAction(this)); // uncomment when alarm action string ready
+		
+		createOfflineTasks();
 	}
 
 	/* (non-Javadoc)
@@ -116,11 +122,14 @@ public class AlarmControl extends PamControlledUnit implements PamSettings {
 	
 	private void offlineProcessing(Frame parentFrame) {
 		if (offlineDialog == null) {
-			OfflineTaskGroup offlineTaskGroup = new OfflineTaskGroup(this, "Noise Processing");
-			offlineTaskGroup.addTask(new AlarmOfflineTask(this));
 			offlineDialog = new OLProcessDialog(parentFrame, offlineTaskGroup, getUnitName());
 		}
 		offlineDialog.setVisible(true);
+	}
+	
+	private void createOfflineTasks() {
+		offlineTaskGroup = new OfflineTaskGroup(this, "Noise Processing");
+		offlineTaskGroup.addTask(alarmOfflineTask = new AlarmOfflineTask(this));
 	}
 
 	/* (non-Javadoc)

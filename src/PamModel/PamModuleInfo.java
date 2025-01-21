@@ -16,6 +16,7 @@ import PamController.PamController;
 import PamView.MenuItemEnabler;
 import PamView.dialog.warn.WarnOnce;
 import dataModelFX.connectionNodes.ModuleIconFactory.ModuleIcon;
+import pamguard.GlobalArguments;
 
 /**
  * Holds information about available PAMGUARD modules.
@@ -32,6 +33,8 @@ public class PamModuleInfo implements PamDependent{
 	private String defaultName;
 	private Class moduleClass;
 	private String toolTipText;
+	private String helpPoint;
+	private int allowedModes = PamPluginInterface.ALLMODES;
 	
 	private static final Class[] constrParams1 = {PamConfiguration.class, String.class};
 	private static final Class[] constrParams2 = {String.class};
@@ -332,10 +335,17 @@ public class PamModuleInfo implements PamDependent{
 		for (int i = 0; i < moduleList.size(); i++) {
 			
 			mi = moduleList.get(i);
-			
-			if (mi.isHidden()) {
-				continue;
+
+			// don't skip anything in batch view, only allow skip if it isn't. 
+			if (GlobalArguments.getParam(GlobalArguments.BATCHVIEW) == null) {
+				if (mi.isHidden()) {
+					continue;
+				}
+				if (mi.availableInMode() == false) {
+					continue;
+				}
 			}
+			
 			
 			//System.out.println("PamModuleInfo getmodules menu " + moduleList.get(i).getDescription());
 			menuItem = new JMenuItem(mi.toString());
@@ -628,7 +638,51 @@ public class PamModuleInfo implements PamDependent{
 		return guiCombatibility.get(index);
 	}
 
+	/**
+	 * @return the helpPoint
+	 */
+	protected String getHelpPoint() {
+		return helpPoint;
+	}
 
+	/**
+	 * @param helpPoint the helpPoint to set
+	 */
+	protected void setHelpPoint(String helpPoint) {
+		this.helpPoint = helpPoint;
+	}
+
+	/**
+	 * @return the allowedModes
+	 */
+	public int getAllowedModes() {
+		return allowedModes;
+	}
+
+	/**
+	 * @param allowedModes the allowedModes to set
+	 */
+	public void setAllowedModes(int allowedModes) {
+		this.allowedModes = allowedModes;
+	}
+
+	/**
+	 * Is this module available in this mode ? 
+	 * @return true if available. 
+	 */
+	public boolean availableInMode() {
+		if (allowedModes == PamPluginInterface.ALLMODES) {
+			return true;
+		}
+		int mode = PamController.getInstance().getRunMode();
+		if (mode == PamController.RUN_PAMVIEW && (allowedModes & PamPluginInterface.NOTINVIEWER)!=0) {
+			return false;
+		}
+		if (mode == PamController.RUN_NORMAL && (allowedModes & PamPluginInterface.NOTINVIEWER)!=0) {
+			return false;
+		}
+		return true;
+	}
 
 	
 	

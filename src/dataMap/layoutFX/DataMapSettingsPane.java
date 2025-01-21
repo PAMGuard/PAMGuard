@@ -120,7 +120,7 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParametersFX
 
 	private Pane dataMapChoicePane;
 
-	private CheckComboBox<String> dataMapCheckComboBox; 
+//	private CheckComboBox<String> dataMapCheckComboBox; 
 
 
 	public DataMapSettingsPane(DataMapControl dataMapControl, DataMapPaneFX dataMapPane) {
@@ -139,10 +139,10 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParametersFX
 		holder=new PamVBox(); 
 		holder.setSpacing(5);
 
-		Label dataLabel = new Label("Show data maps");
-		PamGuiManagerFX.titleFont2style(dataLabel);
-		holder.getChildren().addAll(dataLabel, dataMapChoicePane = createDataMapPane());
-		updateDataMapBinBox();
+//		Label dataLabel = new Label("Show data maps");
+//		PamGuiManagerFX.titleFont2style(dataLabel);
+//		holder.getChildren().addAll(dataLabel, dataMapChoicePane = createDataMapPane());
+//		updateDataGramShownBox();
 
 		Label scaleLabel = new Label("Data scale");
 		PamGuiManagerFX.titleFont2style(scaleLabel);
@@ -161,30 +161,40 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParametersFX
 
 	}
 
-	/**
-	 * Create the data mmpa choice pane. 
-	 * @return
-	 */
-	private Pane createDataMapPane() {
-
-		dataMapCheckComboBox = new 	CheckComboBox<String>(); 
-
-		PamHBox hBox = new PamHBox(); 
-		hBox.setSpacing(5.);
-		hBox.getChildren().addAll(dataMapCheckComboBox);
-
-		return hBox;
-	}
-
-	/**
-	 * Update the combo box which allows users to select which datagram are shown. 
-	 */
-	private void updateDataMapBinBox() {
-		dataMapCheckComboBox.getItems().clear();
-		for (int i=0; i<this.dataMapPane.getNumDataStreamPanes(); i++) {
-			dataMapCheckComboBox.getItems().add(dataMapPane.getDataStreamPane(i).getDataName().getName()); 
-		}
-	}
+//	/**
+//	 * Create the data mmpa choice pane. 
+//	 * @return
+//	 */
+//	private Pane createDataMapPane() {
+//
+//		dataMapCheckComboBox = new 	CheckComboBox<String>(); 
+//
+//		PamHBox hBox = new PamHBox(); 
+//		hBox.setSpacing(5.);
+//		hBox.getChildren().addAll(dataMapCheckComboBox);
+//
+//		return hBox;
+//	}
+//
+//	/**
+//	 * Update the combo box which allows users to select which data  are shown. 
+//	 */
+//	private void updateDataGramShownBox() {
+//		dataMapCheckComboBox.getItems().clear();
+//		for (int i=0; i<this.dataMapPane.getNumDataStreamPanes(); i++) {
+//			
+//			dataMapCheckComboBox.getItems().add(dataMapPane.getDataStreamPane(i).getDataName().getName()); 
+//			dataMapCheckComboBox.getItemBooleanProperty(i).set((dataMapPane.getDataStreamPane(i).isVisible()));
+//			
+//			final int ii = i;
+//			dataMapCheckComboBox.getItemBooleanProperty(i).addListener((obsval, oldval, newVal)->{
+//					this.dataMapPane.getDataStreamPane(ii).setVisible(newVal);
+//			
+//			});
+//		}
+//	}
+	
+	
 	/**
 	 * Adds a settings pane for the datagram if a binary store is present. 
 	 */
@@ -411,28 +421,28 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParametersFX
 	}
 
 
-
 	// use setting flag to avoid immediate callback which overwrites changes 2 and 3 ! 
 	boolean setting = false;
 
 	public void setParams(DataMapParametersFX dataMapParameters) {
-		System.out.println("----SET DATAMAP PARAMS");
+//		System.out.println("----SET DATAMAP PARAMS");
 
-		// ----- Datagram bin size ----- //
+		// ----- Datagram vertical scalee ----- //
 		setting = true;
 		//		timeSlider.setValue(dataMapParameters.hScaleChoice);
 		scaleBox.getSelectionModel().select(dataMapParameters.vScaleChoice);
 		logScaleToggle.setSelected(dataMapParameters.vLogScale);
 
-		// ----- Datagram bin size ----- //
-		//make sure combo box for datamaps  is sorted
-		updateDataMapBinBox();
-
+//		// ----- Datagram bin size ----- //
+//		//make sure combo box for data maps  is sorted
+//		updateDataGramShownBox();
+	
+		//if datagrams are available then set the colours. 
 		if (BinaryStore.findBinaryStoreControl()!=null){
 			DatagramManager dataGramManager=BinaryStore.findBinaryStoreControl().getDatagramManager();
 			dataGramComboBox.getSelectionModel().select(durationToString(dataGramManager.getDatagramSettings().datagramSeconds*1000L));
 
-			// ----- Datagram colours ----- //
+			/*****----- Datagram colours ----- *****/
 
 			//make sure the combo box has correct data streams
 			updateDatagramColorBox();
@@ -446,22 +456,21 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParametersFX
 
 				PlotParams2D plotCols =  dataMapParameters.datagramColours.get(dataGramColorBox.getItems().get(i));
 
-				System.out.println("------Set colours: " + (plotCols == null ? null : plotCols.getAmplitudeLimits()[0] + "  " +  plotCols.getAmplitudeLimits()[1]) + "  " + dataGramColorBox.getItems().get(i)); 
+//				System.out.println("------SET colours: " + (plotCols == null ? null : plotCols.getAmplitudeLimits()[0].get() + "  " +  plotCols.getAmplitudeLimits()[1].get()) + "  " + dataGramColorBox.getItems().get(i)); 
 
 				if (plotCols!=null) {
 					dataStreamPane.setMinMaxColourLimits(plotCols.getAmplitudeLimits()[0].get(), plotCols.getAmplitudeLimits()[1].get());
 					dataStreamPane.setColourArrayType(plotCols.getColourMap());
 				}
 				else {
+					//if the settings does not exist
 					dataStreamPane.setMinMaxColourLimits(-80, 80);
 					dataStreamPane.setColourArrayType(ColourArrayType.HSV);
 				}
 
 			}
 			
-			System.out.println("------Set colour box: " + dataMapParameters.selectedColourDatagram);
-
-
+			
 			//select the correct colour box - not this should also change the colours and limits of the colour settings pane. 
 			if (this.dataGramColorBox.getItems().size()>dataMapParameters.selectedColourDatagram && dataMapParameters.selectedColourDatagram>=0) {
 				dataGramColorBox.getSelectionModel().select(dataMapParameters.selectedColourDatagram);
@@ -473,12 +482,11 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParametersFX
 		}
 		setting = false;
 	}
-
-
+	
+	
 	public DataMapParametersFX getParams(DataMapParametersFX dataMapParameters) {
 		if (setting) return dataMapParameters;
-
-		System.out.println("---GET DATAMAP PARAMS");
+//		System.out.println("---GET DATAMAP PARAMS");
 
 		//		dataMapParameters.hScaleChoice = (int) timeSlider.getValue(); 
 
@@ -505,6 +513,9 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParametersFX
 
 				plotCols.getAmplitudeLimits()[0].set(dataStreamPane.getMinColourLimit());
 				plotCols.getAmplitudeLimits()[1].set(dataStreamPane.getMaxColourLimit());
+				
+//				System.out.println("------GET colours: " + (plotCols == null ? null : plotCols.getAmplitudeLimits()[0].get() + "  " +  plotCols.getAmplitudeLimits()[1].get()) + "  " + dataGramColorBox.getItems().get(i)); 
+
 				plotCols.setColourMap(dataStreamPane.getColourMapArray());
 			}
 
@@ -514,6 +525,14 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParametersFX
 		}
 
 		return dataMapParameters;
+	}
+
+	/**
+	 * Get the number of data map panes
+	 * @return the number of data stream pane.s 
+	 */
+	private int getNDataStreamPanes() {
+		return this.dataMapPane.getNumDataStreamPanes();
 	}
 
 	@Override
@@ -605,8 +624,7 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParametersFX
 			double minCol = dataStreamPane.getMinColourLimit(); 
 			double maxCol = dataStreamPane.getMaxColourLimit(); 
 			
-			System.out.println("Data stream colour limits: " + minCol + "  " + maxCol);
-
+//			System.out.println("Data stream colour limits: " + minCol + "  " + maxCol);
 			
 			//the settings will already ahve been set in the data stream pane so 
 			//make sure those are reflected in the controls. 
@@ -624,8 +642,7 @@ public class DataMapSettingsPane extends DynamicSettingsPane<DataMapParametersFX
 		 */
 		private void setColours(){
 			
-			System.out.println("Set colours: " + colourSlider.getLowValue() + "  " + colourSlider.getHighValue());
-
+//			System.out.println("Set colours: " + colourSlider.getLowValue() + "  " + colourSlider.getHighValue())
 
 			ColourArrayType colourArrayType = ColourArray.getColourArrayType(colorBox.getValue());
 

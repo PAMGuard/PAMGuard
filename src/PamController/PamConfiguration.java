@@ -35,6 +35,8 @@ public class PamConfiguration {
 	 * List of the current controlled units (PAMGuard modules)
 	 */
 	private ArrayList<PamControlledUnit> pamControlledUnits;
+	
+	private ArrayList<PamSettings> settingsOwners = new ArrayList<>(); 
 
 	public PamConfiguration() {
 		super();
@@ -408,7 +410,7 @@ public class PamConfiguration {
 	/**
 	 * 
 	 * @return a list of PamControlledUnits which implements the 
-	 * PamSettingsSource interface
+	 * PamSettingsSource interface, e.g. Database, main settings store, binary store. 
 	 * @see PamSettingsSource
 	 */
 	public ArrayList<PamSettingsSource> findSettingsSources() {
@@ -481,6 +483,7 @@ public class PamConfiguration {
 		// also tell all PamControlledUnits since they may want to find their data source 
 		// it that was created after they were - i.e. dependencies have got all muddled
 		for (int i = 0; i < pamControlledUnits.size(); i++) {
+//			System.out.println("Tell " + pamControlledUnits.get(i).getUnitName() + " change " + changeType);
 			pamControlledUnits.get(i).notifyModelChanged(changeType);
 		}
 	}
@@ -562,4 +565,49 @@ public class PamConfiguration {
 		}
 		return ots;
 	}
+
+	/**
+	 * @return the settingsOwners
+	 */
+	public ArrayList<PamSettings> getSettingsOwners() {
+		return settingsOwners;
+	}
+	
+	/**
+	 * Find the owner of some settings by type and name. 
+	 * @param unitType
+	 * @param unitName
+	 * @return Settings owner, or null. 
+	 */
+	public PamSettings findSettingOwner(String unitType, String unitName) {
+		if (settingsOwners == null) {
+			return null;
+		}
+		for (PamSettings aSet : settingsOwners) {
+			if (aSet.getUnitType().equals(unitType) && aSet.getUnitName().equals(unitName)) {
+				return aSet;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Find multiple settings owners that have the same name irrespective of type. 
+	 * @param unitName
+	 * @return list of settings owners. 
+	 */
+	public ArrayList<PamSettings> getSettingsOwners(String unitName) {
+		if (settingsOwners == null) {
+			return null;
+		}
+		ArrayList<PamSettings> owners = new ArrayList<>();
+		for (PamSettings aSet : settingsOwners) {
+			if (aSet.getUnitName().equals(unitName)) {
+				owners.add(aSet);
+			}
+		}
+		return owners;
+		
+	}
+
 }

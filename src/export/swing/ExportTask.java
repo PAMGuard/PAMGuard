@@ -6,6 +6,8 @@ import PamguardMVC.PamDataUnit;
 import PamguardMVC.dataSelector.DataSelectDialog;
 import PamguardMVC.dataSelector.DataSelectParams;
 import PamguardMVC.dataSelector.DataSelector;
+import PamguardMVC.superdet.SuperDetDataBlock;
+import PamguardMVC.superdet.SuperDetection;
 import dataMap.OfflineDataMapPoint;
 import export.PamExporterManager;
 import offlineProcessing.OfflineTask;
@@ -34,8 +36,7 @@ public class ExportTask extends OfflineTask<PamDataUnit<?,?>>{
 		super(parentDataBlock);
 		this.exporter = exporter; 
 		dataSelector=parentDataBlock.getDataSelectCreator().getDataSelector(this.getUnitName() +"_export", false, null);
-
-
+		this.addRequiredDataBlock(parentDataBlock);
 	}
 	
 	/**
@@ -53,12 +54,17 @@ public class ExportTask extends OfflineTask<PamDataUnit<?,?>>{
 
 	@Override
 	public boolean processDataUnit(PamDataUnit<?, ?> dataUnit) {
-
+		
 		//System.out.println("Huh? " + this.getDataBlock().getDataName() + "  " + dataUnit + "  " + dataUnit.getParentDataBlock().equals(this.getDataBlock()));
 		
 		if (dataUnit.getParentDataBlock().equals(this.getDataBlock())) {
 			//this is very important because the way the exporter works is that it iterates through multiple parent data blocks
-			//System.out.println(this.getDataBlock().getDataName() + "  " + dataUnit + "  " + dataSelector.scoreData(dataUnit));
+//			System.out.println(this.getDataBlock().getDataName() + "  " + dataUnit.getUID() + "  " + dataSelector.scoreData(dataUnit) +  "  " 
+//			+ (dataSelector.getParams().getCombinationFlag()  == DataSelectParams.DATA_SELECT_DISABLE));
+			
+//			if (dataUnit instanceof SuperDetection) {
+//				System.out.println("Super detection: " + ((SuperDetection) dataUnit).getSubDetectionsCount() + "  " + ((SuperDetection) dataUnit).getLoadedSubDetectionsCount());
+//			}
 			
 			if (dataSelector==null) {
 				//System.out.println("Data selector null: " + this.getDataBlock().getDataName() + "  " + dataUnit);
@@ -81,13 +87,26 @@ public class ExportTask extends OfflineTask<PamDataUnit<?,?>>{
 
 	@Override
 	public void loadedDataComplete() {
-//		System.out.println("EXPORTER: loaded data complete"); 
+		System.out.println("EXPORTER: loaded data complete"); 
 		//force the exporter so save any renaming data units in the buffer
+		
+		//exporter.exportDataUnit(null,  true);
+		//exporter.close();
+		//exporter.setCurrentFile(null)
+	}
+	
+	
+
+	/**
+	 * Called at the end of the thread which executes this task. 
+	 */
+	public void completeTask() { 
+		System.out.println("EXPORTER: complete task"); 
 		exporter.exportDataUnit(null,  true);
 		exporter.close();
 		exporter.setCurrentFile(null); 
-
 	}
+
 	/**
 	 * task has settings which can be called
 	 * @return true or false

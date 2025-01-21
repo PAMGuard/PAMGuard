@@ -854,8 +854,11 @@ public class PamArrayUtils {
 	 * @param  array2 - the array to sum.
 	 * @return the summation of all the elements in the array.
 	 */
-	public static double sum(double[][] array2) {
-		if (array2==null) System.out.println("null"); 
+	public static double sumall(double[][] array2) {
+		//TODO - use the sum function instead and the sum
+		if (array2==null) {
+			System.err.println("PamArrayUtils:sum: array is null"); 
+		}
 		double sum=0; 
 		double[] array; 
 		for (int i=0; i<array2.length; i++) {
@@ -866,6 +869,42 @@ public class PamArrayUtils {
 		}
 		return sum;
 	}
+	
+	
+	/**
+	 * Sum two arrays of the same length together. 
+	 * @param array1 - the first array to sum. 
+	 * @param array2 - the second array to sum.
+	 * @return an array which is the sumation of the two arrays. 
+	 */
+	public static double[] sum(double[]... array1){
+		
+		for (int i=0; i<array1.length; i++) {
+			if (array1[i]==null) {
+				System.err.println("PamArrayUtils:sum: array is null "); 
+				return null;
+			}
+			
+			//might be OK with two unequal lengths so need to make sure to throw this error. 
+			if (array1[i].length!=array1[0].length) {
+				System.err.println("PamArrayUtils:sum: array length must be equal"); 
+				return null;
+			}
+		}
+
+		//sum all the arrays
+		double[] arr = new double[array1[0].length];
+		
+		for (int i=0; i<array1.length; i++) {
+			for (int j=0; j<array1[i].length; j++) {
+				arr[j] = array1[i][j] + arr[j];
+			}
+		}
+		
+		return arr;
+	}
+
+
 
 	/**
 	 * Print an array to the console. 
@@ -1316,6 +1355,7 @@ public class PamArrayUtils {
 		}
 		return arrayOut;
 	}
+
 
 
 

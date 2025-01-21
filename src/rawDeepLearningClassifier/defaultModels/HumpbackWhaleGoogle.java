@@ -36,7 +36,8 @@ public class HumpbackWhaleGoogle implements DLModel {
 	@Override
 	public URI getModelURI() {
 		try {
-			return new URI("https://github.com/PAMGuard/deeplearningmodels/raw/master/humpback_whale_1/humpback_whale_1.zip");
+//			return new URI("https://github.com/PAMGuard/deeplearningmodels/raw/master/humpback_whale_1/humpback_whale_1.zip");
+			return new URI("https://github.com/PAMGuard/deeplearningmodels/releases/download/1.0/humpback_whale_1.zip");
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}

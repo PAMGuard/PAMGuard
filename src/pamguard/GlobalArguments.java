@@ -11,9 +11,15 @@ import java.util.HashMap;
 public class GlobalArguments {
 	
 	/**
-	 * Put some common flags here for convenience. 
+	 * Flag to say we're running batch jobs (viewer OR normal) 
 	 */
 	public static final String BATCHFLAG = "-batch";
+	
+	/**
+	 * Flag used when opening the psfx that's going to control viewer offline
+	 * tasks. Used in modules to make sure they load and register tasks. 
+	 */
+	public static final String BATCHVIEW = "-bv";
 
 	static HashMap<String, String> globalFlags = new HashMap<>();
 	

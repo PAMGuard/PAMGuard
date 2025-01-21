@@ -20,6 +20,8 @@
  */
 package PamModel;
 
+import PamView.help.PamHelp;
+
 /**
  * Interface for PAMGuard plugins.
  * <p>
@@ -27,7 +29,7 @@ package PamModel;
  *
  */
 public interface CommonPluginInterface {
-	
+
 	/**
 	 * The default name of the plugin.
 	 * <p>
@@ -35,7 +37,7 @@ public interface CommonPluginInterface {
 	 * @return the default name of the plugin as a String.  Cannot be null.
 	 */
 	public String getDefaultName();
-	
+
 	/**
 	 * Return the name of the helpset file.  For information on the helpset format,
 	 * see {@link https://docs.oracle.com/cd/E19253-01/819-0913/author/helpset.html}.<p>
@@ -43,7 +45,18 @@ public interface CommonPluginInterface {
 	 * include that in the filename.  For example, if the package name is MyFirstPlugin
 	 * and the help file is MyPluginHelp.hs, the return should be:<p>
 	 * {@code return "MyFirstPlugin/MyPluginHelp.hs";}<p>
-	 * If there is no helpset file, return null.
+	 * To create links into the main PAMGuard help, you need a special pattern at the 
+	 * start of each hyperlink, for example<br>
+	 * 
+        href="_mainHelp_detectors/clickDetectorHelp/docs/ClickDetector_clickDetector.html or
+	<br>href="_mainHelp_overview/PamMasterHelp/docs/normalMode.html"<p>
+	 * To make a link to context sensitive help in a dialog, or any other button that 
+	 * uses a call to PamHelp.getInstance().displayContextSensitiveHelp(...) the helpset 
+	 * name (or helpPoint) should be relative to the path of this helpset, e.g. if 
+	 * getHelpSetName returns "pambatch/help/BatchHelp.hs" and the html files are in a 
+	 * subfolder of help called docs, then a typical helpPoint might be hp = "docs.batchoverview"
+	 * 
+	 * <p>If there is no helpset file, return null.
 	 * 
 	 * @return
 	 */
@@ -71,28 +84,28 @@ public interface CommonPluginInterface {
 	 * Returns the name of the developer.  Can be company name or individual.
 	 * @return String containing the name of the developer.  Cannot be null.
 	 */
-	
+
 	public String getDeveloperName();
-	
+
 	/**
 	 * Returns the developer's contact email
 	 * @return String containing the developer's contact email.  Cannot be null.
 	 */
 	public String getContactEmail();
-	
+
 	/**
 	 * Returns the version number of the plugin
 	 * @return String containing the plugin version number.  Cannot be null
 	 */
 	public String getVersion();
-	
+
 	/**
 	 * The Pamguard version number that the plugin was developed on.
 	 * @return String containing the version number of Pamguard that the plugin was developed
 	 * on.  Cannot be null.
 	 */
 	public String getPamVerDevelopedOn();
-		
+
 	/**
 	 * The Pamguard version number that the plugin has been tested on.
 	 * @return String containing the latest version of Pamguard that the plugin has been tested
@@ -107,7 +120,7 @@ public interface CommonPluginInterface {
 	 * @return String containing a description of the plugin.  Cannot be null
 	 */
 	public String getAboutText();
-	
-	
-	
+
+
+
 }

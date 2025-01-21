@@ -23,10 +23,10 @@ binary files</i></p>
 </h3>
 
 <p>To begin we
-need to analyse the raw .wav data in PAMGUARD. Start PAMGUARD in <b><i>normal
+need to analyse the raw .wav data in PAMGuard. Start PAMGuard in <b><i>normal
 mode. </i></b>Select<b><i> File > Add Modules > Sound Processing > Sound
 Acquisition </i></b>to add the sound acquisition module. This will allow the
-raw .wav files to be analysed in PAMGUARD. Next we need a click detector. Go to
+raw .wav files to be analysed in PAMGuard. Next we need a click detector. Go to
 <b><i>File > Add Modules > Detector > Click Detector. </i></b>The click
 detector module should now appear. Finally we need a database (<b><i>File > Add
 Modules > Utilities > Database</i></b>) and binary storage (<b><i>File > Add
@@ -43,7 +43,7 @@ id="Picture 3" src="images/image003.jpg"></p>
 <p>Figure 1 The data model should look roughly like this to analyse clicks.</p>
 </center>
 
-<p>In PAMGUARD
+<p>In PAMGuard
 you always move from modules on the left to modules on the right when inputting
 settings. So here we start with sound acquisition and then move to the click
 detector. <b><i>Select Detection > Sound Acquisition... </i></b>In the dialog
@@ -130,7 +130,7 @@ detector is now set up to detect clicks in the porpoise frequency range.
 However, although we have optimised the click detector for porpoise like
 vocalisations it will still detect many different types of sounds. In order to
 determine whether porpoise are present we need to classify clicks. For this we
-can use the PAMGUARD click classifier. Go to <b><i>Click Detection > Click
+can use the PAMGuard click classifier. Go to <b><i>Click Detection > Click
 Classification</i>. </b>In the <b><i>Click Classifier Selection</i></b> drop
 down box select<b><i> Classifier with frequency sweep. </i></b>Select<b><i> New
 </i></b>to bring up a new click classifier settings dialog. In the bottom of
@@ -177,14 +177,14 @@ channel .wav files should look something like the above. </p>
 <p><b><i>A note
 on groups.</i></b><i> In
 many detectors you have the option of "grouping channels". Grouping tells
-PAMGUARD to automatically calculate extra information for those channels which
+PAMGuard to automatically calculate extra information for those channels which
 have been selected as belonging to a group. Grouped channels are saved as a
 single data unit containing information from each channel. For example, a towed
 array contains two closely spaced hydrophones. These two channels, when
-analysed in PAMGUARD, are usually grouped. If a click is detected on one of the
+analysed in PAMGuard, are usually grouped. If a click is detected on one of the
 hydrophones then a waveform clip is also automatically recorded from the other
 channel; this is then saved as a data unit containing information on both
-channels. PAMGUARD can calculate extra information for any data unit which
+channels. PAMGuard can calculate extra information for any data unit which
 contains more than channel of information. For our towed array, two clicks allow
 bearing information to be calculated for bearing time displays and target
 motion analysis. In general widely spaced hydrophones are not grouped.</i></p>

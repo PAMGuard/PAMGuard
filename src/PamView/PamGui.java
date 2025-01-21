@@ -1,4 +1,4 @@
-/*	PAMGUARD - Passive Acoustic Monitoring GUARDianship.
+/*	PAMGuard - Passive Acoustic Monitoring GUARDianship.
  * To assist in the Detection Classification and Localisation 
  * of marine mammals (cetaceans).
  *  
@@ -88,6 +88,7 @@ import PamModel.CommonPluginInterface;
 import PamModel.PamModel;
 import PamModel.PamModuleInfo;
 import PamModel.PamPluginInterface;
+import PamModel.SMRUDevFunctions;
 import PamUtils.PamCalendar;
 import PamUtils.Splash;
 import PamUtils.time.CalendarControl;
@@ -162,7 +163,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 
 		initializationComplete = PamController.getInstance().isInitializationComplete();
 
-		//		frame.setJMenuBar(new JMenuItem("Configuring PAMGUARD please be patient ..."));
+		//		frame.setJMenuBar(new JMenuItem("Configuring PAMGuard please be patient ..."));
 		if (getFrameNumber() == 0) {
 			frame.setJMenuBar(getDummyMenuBar());
 		}
@@ -171,13 +172,13 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 
 		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
-		String iconLoc;
-		switch (PamController.getInstance().getRunMode()){
-		case(PamController.RUN_NETWORKRECEIVER):iconLoc="Resources/pamguardIconNR.png";break;
-		case(PamController.RUN_PAMVIEW):iconLoc="Resources/pamguardIconV.png";break;
-		case(PamController.RUN_MIXEDMODE):iconLoc="Resources/pamguardIconM.png";break;
-		default:iconLoc="Resources/pamguardIcon.png";
-		}
+		String iconLoc = PamIcon.getPAMGuardIconPath(PamIcon.OLD);
+//		switch (PamController.getInstance().getRunMode()){
+//		case(PamController.RUN_NETWORKRECEIVER):iconLoc=PamIcon.getPAMGuardIconPath(PamIcon.NORMAL);break;
+//		case(PamController.RUN_PAMVIEW):iconLoc=PamIcon.getPAMGuardIconPath(PamIcon.NORMAL);break;
+//		case(PamController.RUN_MIXEDMODE):iconLoc=PamIcon.getPAMGuardIconPath(PamIcon.NORMAL);break;
+//		default:iconLoc=PamIcon.getPAMGuardIconPath(PamIcon.LARGE);
+//		}
 
 		frame.setIconImage(new ImageIcon(ClassLoader
 				.getSystemResource(iconLoc)).getImage());
@@ -351,22 +352,22 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		int runMode = PamController.getInstance().getRunMode();
 		switch (runMode) {
 		case PamController.RUN_NORMAL:
-			return "PAMGUARD";
+			return "PAMGuard";
 		case PamController.RUN_PAMVIEW:
-			return "PAMGUARD - Viewer";
+			return "PAMGuard - Viewer";
 		case PamController.RUN_MIXEDMODE:
-			return "PAMGUARD - Mixed mode Offline Analysis";
+			return "PAMGuard - Mixed mode Offline Analysis";
 		}
-		return "PAMGUARD";
+		return "PAMGuard";
 	}
 	/**
 	 * Makes a dummy menu bar with some text in it
-	 * which is displayed as PAMGUARD is first starting up
+	 * which is displayed as PAMGuard is first starting up
 	 * @return dummy Menu.
 	 */
 	private JMenuBar getDummyMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
-		menuBar.add(new JMenu("Configuring PAMGUARD please be patient while modules are loaded ..."));
+		menuBar.add(new JMenu("Configuring PAMGuard please be patient while modules are loaded ..."));
 		return menuBar;
 	}
 
@@ -571,11 +572,11 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		}
 		if (isViewer) {
 			menuItem = new JMenuItem("Export Configuration  ...");
-			menuItem.setToolTipText("Export configuration to a new psf file");
+			menuItem.setToolTipText("Export configuration to a new psfx file");
 		}
 		else {
 			menuItem = new JMenuItem("Save Configuration As ...");
-			menuItem.setToolTipText("Save configuration to a new psf file");
+			menuItem.setToolTipText("Save configuration to a new psfx file");
 		}
 		menuItem.addActionListener(new menuSaveAs());
 		fileMenu.add(menuItem);
@@ -614,6 +615,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		});
 		fileMenu.add(menuItem);
 //		}
+		SMRUDevFunctions.getDevFuncs().addFileMenuFuncs(fileMenu);
 
 		fileMenu.addSeparator();
 
@@ -830,7 +832,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		//		new PamHelpContentViewerUI()
 		//menu.add(PamHelp.getInstance().getMenu());
 		//		PamHelp.getInstance();
-		menuItem = new JMenuItem("About PAMGUARD");
+		menuItem = new JMenuItem("About PAMGuard");
 		menuItem.addActionListener(new menuAbout());
 		menu.add(menuItem);
 
@@ -919,12 +921,12 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		startMenuEnabler.addMenuItem(menuItem);
 		menu.add(menuItem);
 
-		menuItem = new JMenuItem("PAMGUARD Web site");
+		menuItem = new JMenuItem("PAMGuard Web site");
 		menuItem.addActionListener(new MenuPamguardURL(PamguardVersionInfo.webAddress));
 		menu.add(menuItem);
 
 		menuItem = new JMenuItem("Contact and Support");
-		menuItem.addActionListener(new MenuPamguardURL("www.pamguard.org/contact.shtml"));
+		menuItem.addActionListener(new MenuPamguardURL("www.pamguard.org/contact.html"));
 		menu.add(menuItem);
 
 		menuBar.add(menu);	
@@ -1759,7 +1761,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 	 * @return true if ok to close, false otherwise. 
 	 */
 	private boolean prepareToClose(boolean weShouldSave) {
-		//		System.out.println("Preparing to close PAMGUARD");
+		//		System.out.println("Preparing to close PAMGuard");
 
 		PamController pamController = PamController.getInstance();
 
@@ -1771,7 +1773,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 		if (pamStatus != PamController.PAM_IDLE) {
 			int ans = JOptionPane.showConfirmDialog(frame,  
 					"Are you sure you want to stop and exit",
-					"PAMGUARD is busy",
+					"PAMGuard is busy",
 					JOptionPane.YES_NO_OPTION);
 			if (ans == JOptionPane.NO_OPTION) {
 				return false;
@@ -1825,7 +1827,7 @@ public class PamGui extends PamView implements WindowListener, PamSettings {
 			}
 		}
 
-		// finally save all settings just before PAMGUARD closes. 
+		// finally save all settings just before PAMGuard closes. 
 		if (weShouldSave) {
 			PamSettingManager.getInstance().saveFinalSettings();
 		}

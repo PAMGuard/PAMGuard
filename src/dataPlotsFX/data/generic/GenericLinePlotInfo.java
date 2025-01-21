@@ -79,6 +79,17 @@ public abstract class GenericLinePlotInfo extends TDDataInfoFX {
 	 */
 	public Polygon drawPredicition(int plotNumber, PamDataUnit pamDataUnit, GraphicsContext g, double scrollStart,
 			TDProjectorFX tdProjector, int type) {
+//		System.out.println("A Plot line: "  + PamCalendar.formatDateTime(pamDataUnit.getTimeMilliseconds()));
+
+		
+		double mintC= -1000.;
+		double maxtC = tdProjector.getWidth()+1000.;
+		
+		if  (this.getTDGraph().isWrap()) {
+			mintC=0;
+			maxtC=tdProjector.getWidth(); 
+		}
+
 		
 		int chan = PamUtils.PamUtils.getLowestChannel(pamDataUnit.getChannelBitmap()); 
 
@@ -95,17 +106,23 @@ public abstract class GenericLinePlotInfo extends TDDataInfoFX {
 		//use the center of the window for plotting
 		double timeMillis = pamDataUnit.getTimeMilliseconds()+pamDataUnit.getDurationInMilliseconds()/2; 
 		double tC=tdProjector.getTimePix(timeMillis-scrollStart);
+		
 
 		//draws lines so tc should be some slop in pixels. 
-		if (tC < -1000 || tC>tdProjector.getWidth()+1000) {
-			//System.out.println("Line is outside display " + tC);
+		if (tC < mintC || tC>maxtC) {
+//			System.out.println("Line is outside display " + tC);
 			return null;
 		}
+		
+		
 
 		double dataPixel; 
 		Coordinate3d c; 
 		Color color;
 		double dataBin; //the time between the data points in millis
+		
+//		System.out.println("A Plot line 2: "  + PamCalendar.formatDateTime(pamDataUnit.getTimeMilliseconds()) + " detData " + detData.length);
+
 		for (int i=0; i<detData.length; i++) {
 
 			if (getColor(i).enabled) {
@@ -132,13 +149,16 @@ public abstract class GenericLinePlotInfo extends TDDataInfoFX {
 	
 					if (lastUnits[chan][i]==null) {
 						lastUnits[chan][i] = new Point2D(tC, dataPixel); 
-						g.fillOval(tC, dataPixel, 5,5);
+						g.fillOval(tC, dataPixel, 10,10);
+//						System.out.println("Fill oval:");
 						return null; 
 					}
 					else {
-						if (tC>lastUnits[chan][i].getX() && (!this.getTDGraph().isWrap() || 
-								(tC<tdProjector.getWidth()) && tC>=0 && lastUnits[chan][i].getX()<tdProjector.getWidth() && lastUnits[chan][i].getX()>0)) {
+						if (tC>lastUnits[chan][i].getX() && (!this.getTDGraph().isWrap() ||
+								tC<maxtC && tC>=mintC && lastUnits[chan][i].getX()<maxtC && lastUnits[chan][i].getX()>mintC)) {
 							//in wrap mode we can get some weird effects with tC co-ordintates. Still have not quite cracked this...
+							
+							
 //							if (Math.abs(tC - lastUnits[chan][i].getX())>100) {
 //								System.out.println("tC: " + tC + " lastUnits[i].getX(): " + lastUnits[chan][i].getX() 
 //										+ "  " + tdProjector. getTimeAxis().getPosition((timeMillis-scrollStart)/1000.) + "  " + tdProjector.getWidth());

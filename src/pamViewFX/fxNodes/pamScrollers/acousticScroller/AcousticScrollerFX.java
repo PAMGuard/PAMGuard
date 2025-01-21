@@ -189,6 +189,9 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 				pauseDataload(newVal);
 			}
 		});
+		
+		scrollBarPane.getScrollBox().setPrefWidth(100);
+		scrollBarPane.showVisibleRangeButton(false); 
 
 
 		if (isViewer){
@@ -402,7 +405,9 @@ public class AcousticScrollerFX extends AbstractPamScrollerFX {
 			if (currentCount==0) acousticScrollerGraphics.clearStore(); 
 		
 			@SuppressWarnings("unchecked")
-			ListIterator<PamDataUnit> it = acousticScrollerGraphics.getDataBlock().getListIterator(currentCount);		
+			ListIterator<PamDataUnit> it = acousticScrollerGraphics.getDataBlock().getListIterator(currentCount);	
+			
+			
 			
 			//			int count =0; 
 			//removing the sync lock here was reallt helpful in preventing lock ups - especially because the datagram does not

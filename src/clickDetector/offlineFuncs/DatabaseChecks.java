@@ -30,13 +30,15 @@ public class DatabaseChecks {
 		super();
 		this.clickControl = clickControl;
 		this.databaseCheckObserver = databaseCheckObserver;
-	}
 
-	public boolean runChecks(boolean repair) {
 		clicksOffline = clickControl.getClicksOffline();
 		clickDatablock = clickControl.getClickDataBlock();
 		eventDataBlock = clickControl.getClickDetector().getOfflineEventDataBlock();
 		clickLogging = new OfflineClickLogging(clickControl, null);
+		
+	}
+
+	public boolean runChecks(boolean repair) {
 
 		checkEvents(repair);
 		if (databaseCheckObserver.stopChecks()) {
@@ -82,7 +84,10 @@ public class DatabaseChecks {
 	 * @param repair repair the event if there is an error. 
 	 * @return true if event OK / repaired. 
 	 */
-	private boolean checkEvent(int eventId, boolean repair) {
+	public boolean checkEvent(int eventId, boolean repair) {
+//		if (eventId != 259) {
+//			return false;
+//		}
 		OfflineEventDataUnit anEvent = eventDataBlock.findByDatabaseIndex(eventId);
 		eventDataBlock.getLogging();
 		PamConnection con = DBControlUnit.findConnection();
@@ -153,7 +158,8 @@ public class DatabaseChecks {
 				updated = true;
 			}
 		}
-		if (Math.abs(anEvent.getEventEndTime() - lastTime) > 1000) {
+		long endDiff = anEvent.getEventEndTime() - lastTime;
+		if (Math.abs(endDiff) > 0) {
 			String msg = String.format("Event %d should have end time %s, not %s", anEvent.getDatabaseIndex(), 
 					PamCalendar.formatDateTime(lastTime), PamCalendar.formatDateTime(anEvent.getEventEndTime()));
 			databaseCheckObserver.checkOutputText(msg, 1);

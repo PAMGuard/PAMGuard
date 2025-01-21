@@ -855,7 +855,8 @@ abstract public class OfflineDataMap<TmapPoint extends OfflineDataMapPoint> {
 		for (TmapPoint mapPoint : mapPoints) {
 			if (prevPoint != null) {
 				long olap = prevPoint.getEndTime() - mapPoint.getStartTime();
-				if (mapPoint.getStartTime() < prevPoint.getEndTime()) {
+				 // allow a 1s overlap due to tiny issues in sud and other files, which sometimes have a tiny overlap
+				if (mapPoint.getStartTime() < prevPoint.getEndTime() - 1000) {
 					bigLap = Math.max(olap, bigLap);
 					overlaps.add(new MapOverlap(prevPoint.getEndTime(), mapPoint.getStartTime()));
 				}

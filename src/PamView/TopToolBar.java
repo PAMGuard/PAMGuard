@@ -6,6 +6,9 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -18,6 +21,7 @@ import org.kordamp.ikonli.swing.FontIcon;
 
 import PamController.PamControlledUnit;
 import PamController.PamController;
+import PamController.RawInputControlledUnit;
 import PamUtils.PamCalendar;
 import PamView.PamColors.PamColor;
 import PamView.component.PamSettingsIconButton;
@@ -62,12 +66,14 @@ public class TopToolBar extends PamToolBar implements ColorManaged {
 		else {
 			add(startButton = new JButton(FontIcon.of(MaterialDesignR.RECORD_CIRCLE, PamSettingsIconButton.NORMAL_SIZE, Color.RED)));
 			startButton.setDisabledIcon(FontIcon.of(MaterialDesignR.RECORD_CIRCLE, PamSettingsIconButton.NORMAL_SIZE, Color.LIGHT_GRAY));
-			startButton.setToolTipText("Start PAM processing");
+			startButton.setToolTipText("Start processing");
+			startButton.addMouseListener(new StartButtonMouse());
 			add(stopButton = new JButton(FontIcon.of(MaterialDesignP.PAUSE, PamSettingsIconButton.NORMAL_SIZE, Color.DARK_GRAY)));
 			stopButton.setDisabledIcon(FontIcon.of(MaterialDesignP.PAUSE, PamSettingsIconButton.NORMAL_SIZE, Color.LIGHT_GRAY));
-			stopButton.setToolTipText("Stop PAM processing");
+			stopButton.setToolTipText("Stop processing");
 		}
 		startButton.addActionListener(new StartButton());
+		checkStartTip();
 		stopButton.addActionListener(new StopButton());
 		startEnabler.addMenuItem(startButton);
 		stopEnabler.addMenuItem(stopButton);
@@ -81,10 +87,44 @@ public class TopToolBar extends PamToolBar implements ColorManaged {
 		barTimer.start();
 	}
 
+	private class StartButtonMouse extends MouseAdapter {
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+			if (e.isPopupTrigger()) {
+				doStartPopup(e);
+			}
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			if (e.isPopupTrigger()) {
+				doStartPopup(e);
+			}
+		}
+		
+	}
 	private PamColor defaultColor = PamColor.BORDER;
 
 	public PamColor getDefaultColor() {
 		return defaultColor;
+	}
+
+	/**
+	 * popup menu actions for start button. 
+	 * @param e
+	 */
+	public void doStartPopup(MouseEvent e) {
+		if (startButton.isEnabled() == false) {
+			return;
+		}
+		// find the first unit that's a RawInputcontrolledUnit
+		ArrayList<PamControlledUnit> rawinputs = PamController.getInstance().findControlledUnits(RawInputControlledUnit.class, true);
+		if (rawinputs == null || rawinputs.size() == 0) {
+			return;
+		}
+		RawInputControlledUnit rawinput = (RawInputControlledUnit) rawinputs.get(0);
+		rawinput.startButtonXtraActions(startButton, e);
 	}
 
 	public void setDefaultColor(PamColor defaultColor) {
@@ -131,6 +171,7 @@ public class TopToolBar extends PamToolBar implements ColorManaged {
 
 	private void tellTime() {
 		timeUTC.setText(PamCalendar.formatDateTime(PamCalendar.getTimeInMillis(), true));
+		checkStartTip();
 	}
 
 	/**
@@ -140,6 +181,8 @@ public class TopToolBar extends PamToolBar implements ColorManaged {
 	 */
 	public void setActiveControlledUnit(PamControlledUnit pamControlledUnit) {
 
+		checkStartTip();
+		
 		/** 
 		 * Enable items in the main part of the toolbar
 		 */
@@ -193,6 +236,25 @@ public class TopToolBar extends PamToolBar implements ColorManaged {
 	 */
 	public static void enableStopButton(boolean enable) {
 		stopEnabler.enableItems(enable);
+	}
+
+	private void checkStartTip() {
+
+		ArrayList<PamControlledUnit> rawinputs = PamController.getInstance().findControlledUnits(RawInputControlledUnit.class, true);
+		if (rawinputs == null || rawinputs.size() == 0) {
+			return;
+		}
+		RawInputControlledUnit rawinput = (RawInputControlledUnit) rawinputs.get(0);
+		String tip = rawinput.getStartButtonToolTip();
+		if (tip != null) {
+			startButton.setToolTipText(tip);
+		}
+		else if (pamController.getRunMode() == PamController.RUN_PAMVIEW) {
+			startButton.setToolTipText("Start sound playback");
+		}
+		else {
+			startButton.setToolTipText("Start processing");
+		}
 	}
 
 }

@@ -46,7 +46,7 @@ public class DatablockSynchInfo {
 	 * @return
 	 */
 	public StreamExportParams getExportParams() {
-		return tethysControl.getTethysExportParams().getStreamParams(dataBlock);
+		return tethysControl.getTethysExportParams().getStreamParams(tethysControl, dataBlock);
 	}
 
 	public void setDataCount(int n) {

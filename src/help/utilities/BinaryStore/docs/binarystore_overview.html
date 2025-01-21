@@ -10,10 +10,10 @@
 <h2>Overview</h2>
 <p>
 The database is not well suited for all types of data, particularly those such as clicks or whistle contours which have 
-a varying length. The binary storage system stores PAMGUARD output in a proprietary data format which is simple and efficient and
+a varying length. The binary storage system stores PAMGuard output in a proprietary data format which is simple and efficient and
 can handle any type of data.</p>
 <p>Data stored using the binary store can be reviewed with the 
-<a href="../../../overview/PamMasterHelp/docs/viewerMode.html">PAMGUARD viewer</a>. It is also possible to open the binary files using 
+<a href="../../../overview/PamMasterHelp/docs/viewerMode.html">PAMGuard viewer</a>. It is also possible to open the binary files using 
 your own software written in other programming languages such as Matlab or R.</p> 
    
 </p>
@@ -26,7 +26,7 @@ configuration.</p>
 <p>To configure the binary store, go to the <strong><em>File>Binary Storage</em></strong>... menu to open the Binary Storage dialog. </p>
 
 <p><center>
-<img alt="Image" src="./images/BinaryStoreOptions.png"/></center><br><br>
+<img src="./images/BinaryStoreOptions.png"/></center><br><br>
 </p>
 <p>Select the folder where you want to store the data and optionally set the other three options.</p>
 <p>Storing data in folders arranged by date can help with data backup and archiving.</p>
@@ -58,12 +58,12 @@ access noise data relatively quickly without having to load all binary data as w
 
 <h4>pgdx Files</h4>
 <p>pgdx files are indexing files. They contain headers and footers which are identical to those in the pgdf files, but no data. pgdx files 
-speed up indexing processes at the start of a PAMGUARD viewer session.</p> 
+speed up indexing processes at the start of a PAMGuard viewer session.</p> 
 <h4>psfx Files</h4>
-<p>psfx files contain PAMGUARD configuration data. These are basically the same data are as stored in the standard PAMGUARD configuration files, but
-wrapped with a date and other information.</p><p>One of these is written each time PAMGUARD is started, providing a permanent record of 
-PAMGUARD settings. psfx files can be loaded into the PAMGUARD Viewer from the viewer <a href="../../../utilities/datamap/docs/datamap.html">data map</a>
-or relaoded as with any other configuration file. </p>   
+<p>psfx files contain PAMGuard configuration data. These are basically the same data are as stored in the standard PAMGuard configuration files, but
+wrapped with a date and other information.</p><p>One of these is written each time PAMGuard is started, providing a permanent record of 
+PAMGuard settings. psfx files can be loaded into the PAMGuard Viewer from the viewer <a href="../../../utilities/datamap/docs/datamap.html">data map</a>
+or reloaded as with any other configuration file. </p>   
 
 <br><br><br>
 	<p CLASS="nextLink"><a href="matlabandr.html">Next: Matlab and R interfaces</a></p>

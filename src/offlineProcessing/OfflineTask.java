@@ -1,9 +1,13 @@
 package offlineProcessing;
 
+import java.awt.Component;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
+import PamController.PamConfiguration;
 import PamController.PamControlledUnit;
+import PamController.PamSettings;
 import PamController.PamViewParameters;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
@@ -45,6 +49,8 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 	 */
 	private PamDataBlock<T> parentDataBlock;
 
+	private PamControlledUnit parentControlledUnit;
+
 //	/**
 //	 * Default constructor. Should no longer be used, but kept in case there are subclasses
 //	 * of OfflineTask in other plugins. <br>
@@ -55,8 +61,11 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 //		super();
 //	}
 	/**
+	 * For compatibility with batch processor it's better to use the other
+	 * constructor public OfflineTask(PamControlledUnit pamControlledUnit, PamDataBlock<T> parentDataBlock)
 	 * @param parentDataBlock
 	 */
+	@Deprecated
 	public OfflineTask(PamDataBlock<T> parentDataBlock) {
 		super();
 		this.parentDataBlock = parentDataBlock;
@@ -72,9 +81,22 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 			System.out.printf("Offline task %s with datablock %s is not associated with a PAMGuard module\n", getName(), parentDataBlock==null ?  "null": parentDataBlock.getDataName());
 		}
 		else {
-			OfflineTaskManager.getManager().registerTask(this);
+//			parentControl.getPamConfiguration().
+//			OfflineTaskManager.getManager().registerTask(this);
 		}
 		
+	}
+	
+	/**
+	 * Preferred constructor for offline tasks that gets a valid ref to the appropriate 
+	 * PAMControlled unit. 
+	 * @param pamControlledUnit
+	 * @param parentDataBlock
+	 */
+	public OfflineTask(PamControlledUnit pamControlledUnit, PamDataBlock<T> parentDataBlock) {
+		super();
+		this.parentControlledUnit = pamControlledUnit;
+		this.parentDataBlock = parentDataBlock;
 	}
 	
 	/**
@@ -82,6 +104,9 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 	 * @return PAMControlled unit associated with a task. 
 	 */
 	public PamControlledUnit getTaskControlledUnit() {
+		if (parentControlledUnit != null) {
+			return parentControlledUnit;
+		}
 		if (parentDataBlock == null) {
 			return null;
 		}
@@ -89,7 +114,7 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 		if (parentProcess == null) {
 			return null;
 		}
-		return parentProcess.getPamControlledUnit();
+		return parentControlledUnit = parentProcess.getPamControlledUnit();
 	}
 
 	/**
@@ -122,13 +147,26 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 	}
 
 	/**
-	 * Get a uniquely identifyng name for the task which consists of the 
+	 * Get a uniquely identifying name for the task which consists of the 
 	 * pamControlledUnit type and name as well as the tasks shorter name from getName();
 	 * @return a long name which should be unique within a configuration. 
 	 */
 	public String getLongName() {
 		PamControlledUnit tcu = getTaskControlledUnit();
+		if (tcu == null) {
+			System.out.printf("Unregistered offline task class %s name %s \n", getClass().getName(), getName());
+			return String.format("%s:%s", getClass().getName(), getName());
+		}
 		String str = String.format("%s:%s:%s", tcu.getUnitType(), tcu.getUnitName(), getName());
+//		PamDataBlock groupDataBlock = offlineTaskGroup.getPrimaryDataBlock();
+//		String dataBlockName;
+//		if (groupDataBlock == null) {
+//			dataBlockName = "Unknown Primary Block";
+//		}
+//		else {
+//			dataBlockName = groupDataBlock.getLongDataName();
+//		}
+//		String str = String.format("%s:%s:%s:%s", tcu.getUnitType(), tcu.getUnitName(), getName());
 		return str;
 	}
 	/**
@@ -168,17 +206,34 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 	}
 
 	/**
-	 * task has settings which can be called
+	 * task has settings which can be modified. If this is true, then 
+	 * callSettings(Component component) should do something such as open a dialog or show a menu, or something. 
 	 * @return true or false
 	 */
 	public boolean hasSettings() {
 		return false;
 	}
+	
+	/**
+	 * Call any task specific settings. This replaces the older
+	 * function callSettings() which is now deprecated. Passes a 
+	 * reference to an awt component so that it's location can be used to
+	 * open a popup dialog, etc, for more complex systems with many options. 
+	 * @param component button or whatever called the settings. 
+	 * @return
+	 */
+	public boolean callSettings(Component component, Point point) {
+		return callSettings();
+	}
 
 	/**
-	 * Call any task specific settings
+	 * Call any task specific settings<br>
+	 * use callSettings(Component component) instead wherever possible. 
+	 * @param point 
+	 * @param component 
 	 * @return true if settings may have changed. 
 	 */
+	@Deprecated
 	public boolean callSettings() {
 		return false;
 	}
@@ -192,6 +247,14 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 	public boolean canRun() {
 		boolean can = getDataBlock() != null; 
 		return can;
+	}
+	
+	/**
+	 * If a task can't run, try to return a string to say why not. 
+	 * @return text reason as to why task can't run (such as missing data). 
+	 */
+	public String whyNot() {
+		return null;
 	}
 
 	/**
@@ -331,9 +394,9 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 	 * @return true to run. 
 	 */
 	public boolean isDoRun() {
-		if (!canRun()) {
-			return false;
-		}
+//		if (!canRun()) {
+//			return false;
+//		}
 		return doRun;
 	}
 
@@ -480,5 +543,25 @@ public abstract class OfflineTask<T extends PamDataUnit> {
 		}
 	}
 
+	/**
+	 * @return the parentControlledUnit
+	 */
+	public PamControlledUnit getParentControlledUnit() {
+		return parentControlledUnit;
+	}
+
+	/*
+	 * Get a list of all Settings users associated with this module. 
+	 */
+	public ArrayList<PamSettings> getSettingsProviders() {
+		if (parentControlledUnit instanceof PamSettings == false) {
+			return null;
+		}
+		PamConfiguration config = parentControlledUnit.getPamConfiguration();
+		if (config == null) {
+			return null;
+		}
+		return config.getSettingsOwners(parentControlledUnit.getUnitName());
+	}
 
 }

@@ -416,9 +416,7 @@ public class PamObjectViewer implements PamViewInterface, ComponentListener,
 			setTitle("Pamguard Data Model");
 
 			// fixed case of Resources 17/8/08 DG.
-			setIconImage(new ImageIcon(ClassLoader
-					.getSystemResource("Resources/pamguardIcon.png"))
-					.getImage());
+			setIconImage(PamIcon.getPAMGuardImageIcon(PamIcon.SMALL).getImage());
 //			setIconImages(getOwner().getIconImages());
 
 			setSize(new Dimension(800, 700));

@@ -16,27 +16,27 @@ public class PamguardVersionInfo {
 	 * @return release type 
 	 */
 	static public ReleaseType getReleaseType() {
-		return ReleaseType.BETA; 
+		return ReleaseType.CORE; 
 	}
 	
 	/**
 	 * Set the minimum and maximum Java versions that this version of
 	 * PAMGuard can work with. 
 	 */
-	static public final String minJavaVersion = "11.0.0";
-	static public final String maxJavaVersion = "21.99.99";
+	static public final String minJavaVersion = "11.00";
+	static public final String maxJavaVersion = "23.99.99";
 	
 
 	/**
 	 * Version number, major version.minorversion.sub-release.
 	 * Note: can't go higher than sub-release 'f'
 	 */
-	static public final String version = "2.02.13b";
+	static public final String version = "2.02.15a";
 	
 	/**
 	 * Release date
 	 */
-	static public final String date = "September 2024";
+	static public final String date = "30 December 2024";
 	
 //	/**
 //	 * Release type - Beta or Core

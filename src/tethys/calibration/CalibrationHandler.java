@@ -46,6 +46,7 @@ import tethys.TethysTimeFuncs;
 import tethys.calibration.swing.CalibrationsExportWizard;
 import tethys.dbxml.DBXMLConnect;
 import tethys.dbxml.TethysException;
+import tethys.deployment.PInstrument;
 import tethys.niluswraps.NilusChecker;
 import tethys.niluswraps.NilusSettingsWrapper;
 import tethys.niluswraps.NilusUnpacker;
@@ -53,19 +54,19 @@ import tethys.pamdata.AutoTethysProvider;
 import tethys.reporter.TethysReporter;
 
 public class CalibrationHandler extends CollectionHandler implements TethysStateObserver {
-	
+
 	private ArrayList<DocumentNilusObject<Calibration>> calibrationsList;
-	
+
 	public static final String[] updateOptions = {"as-needed", "unplanned", "yearly"};
-	
+
 	public static final String[] calibrationMethods = {"Reference hydrophone", "Manufacturers specification", "Piston phone", "Other calibrated source", "Unknown"};
-	
+
 	public static final String[] qaTypes = {"unverified", "valid", "invalid"};
-	
+
 	private Helper nilusHelper;
 
 	public static final String helpPoint = "utilities.tethys.docs.calibrations";
-	
+
 	/**
 	 * @param tethysControl
 	 */
@@ -96,10 +97,10 @@ public class CalibrationHandler extends CollectionHandler implements TethysState
 			}
 		default:
 			break;
-		
+
 		}
 	}
-	
+
 	/**
 	 * Is it a state notification we want to respond to 
 	 * @param state
@@ -121,9 +122,9 @@ public class CalibrationHandler extends CollectionHandler implements TethysState
 	 * Update the list of documents associated with the selected instrument.  
 	 */
 	private void updateDocumentsList() {
-		
+
 		calibrationsList.clear();
-		
+
 		ArrayList<DocumentInfo> docsList = getArrayCalibrations();
 		// now immediately read the calibrations in again. 
 		if (docsList == null) {
@@ -157,11 +158,11 @@ public class CalibrationHandler extends CollectionHandler implements TethysState
 					}
 				}
 				catch (Exception e) {
-					
+
 				}
 				DocumentNilusObject<Calibration> calDataUnit = new DocumentNilusObject(Collection.Calibrations, aDoc.getDocumentName(), calObj.getId(), calObj);
 				calibrationsList.add(calDataUnit);
-//				System.out.println(result);
+				//				System.out.println(result);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -169,8 +170,27 @@ public class CalibrationHandler extends CollectionHandler implements TethysState
 		}
 	}
 
+	/**
+	 * Check to see if hydrophone is named correctly. 
+	 * @return
+	 */
+	public boolean isHydrophoneNamed() {
+		PInstrument currentInstrument = getTethysControl().getDeploymentHandler().getCurrentArrayInstrument();
+		if (currentInstrument == null) {
+			return false;
+		}
+		if (currentInstrument.instrumentId == null || currentInstrument.instrumentType == null) {
+			return false;
+		}
+
+		if (currentInstrument.instrumentId.length() == 0 || currentInstrument.instrumentType.length() == 0) {
+			return false;
+		}
+		return true;
+	}
+
 	public int exportAllCalibrations() {
-		
+
 		Calibration sampleCal = new Calibration();
 		try {
 			Helper.createRequiredElements(sampleCal);
@@ -181,81 +201,77 @@ public class CalibrationHandler extends CollectionHandler implements TethysState
 		if (sampleCal == null) {
 			return 0;
 		}
-		
+
 		NilusSettingsWrapper<Calibration> wrappedSample = new NilusSettingsWrapper<Calibration>();
 		wrappedSample.setNilusObject(sampleCal);
-		
+
 		PamArray array = ArrayManager.getArrayManager().getCurrentArray();
 		int nPhone = array.getHydrophoneCount();
-		DBXMLConnect dbxml = tethysControl.getDbxmlConnect();
 		int nExport = 0;
-		boolean overwrite = false;
 		boolean exists;
 		TethysReporter.getTethysReporter().clear();
 		for (int i = 0; i < nPhone; i++) {
-//			String docName = getHydrophoneId(i);
-			NilusSettingsWrapper<Calibration> clonedWrap = wrappedSample.clone();
-			sampleCal = clonedWrap.getNilusObject(Calibration.class);
-			Calibration calDoc = createCalibrationDocument(i);
-			if (sampleCal != null) {
-				calDoc.setMetadataInfo(sampleCal.getMetadataInfo());				
-				calDoc.setProcess(sampleCal.getProcess());
-				calDoc.setQualityAssurance(sampleCal.getQualityAssurance());
-				if (NilusChecker.isEmpty(sampleCal.getResponsibleParty()) == false) {
-					calDoc.setResponsibleParty(sampleCal.getResponsibleParty());
-				}
-				calDoc.setTimeStamp(sampleCal.getTimeStamp());
-			}
-			// check the contact info in the metadata. 
-			// can't so because it's required. 
-//			MetadataInfo metaData = calDoc.getMetadataInfo();
-//			if (metaData != null) {
-//				if (NilusChecker.isEmpty(metaData.getContact())) {
-//					metaData.setContact(null);
-//				}
-//			}
-			
-			addParameterDetails(calDoc, i);
-			// run some checks of completeness of the data
-			NilusChecker.removeEmptyFields(calDoc);
-//			ArrayList<Field> emptyFields = NilusChecker.checkEmptyFields(calDoc);
-			
-			String calDocName = createDocumentName(calDoc, i);
-			exists = calDocumentExists(calDocName);
-			if (exists && overwrite == false) {
-				String msg = String.format("Calibration document %s already exists. Do you want to overwrite it and other documents from this date?", calDocName);
-				int ans = WarnOnce.showWarning("Calibration Export", msg, WarnOnce.OK_CANCEL_OPTION);
-				if (ans == WarnOnce.OK_OPTION) {
-					overwrite = true;
-				}
-				else {
-					return nExport;
-				}
-			}
-			boolean ok = false;
-			if (exists == true && overwrite == false) {
-				continue;
-			}
-			try {
-				if (exists) {
-					ok = dbxml.removeDocument(Collection.Calibrations, calDocName);
-				}
-				ok = dbxml.postAndLog(calDoc, calDocName);
-			} catch (TethysException e) {
-				e.printStackTrace();
-				tethysControl.showException(e);
-				ok = false;
-				break;
-			}
-			if (ok) {
+			boolean exp = exportOneCalibration(wrappedSample, i, false);
+			if (exp) {
 				nExport++;
 			}
 		}
-		tethysControl.sendStateUpdate(new TethysState(TethysState.StateType.EXPORTRDATA, Collection.Calibrations));
-		TethysReporter.getTethysReporter().showReport(true);
 		return nExport;
 	}
-	
+	public boolean exportOneCalibration(NilusSettingsWrapper<Calibration> wrappedSample, int i,
+			boolean overwrite) {
+		//			String docName = getHydrophoneId(i);
+		DBXMLConnect dbxml = tethysControl.getDbxmlConnect();
+		NilusSettingsWrapper<Calibration> clonedWrap = wrappedSample.clone();
+		Calibration sampleCal = clonedWrap.getNilusObject(Calibration.class);
+		Calibration calDoc = createCalibrationDocument(i);
+		if (sampleCal != null) {
+			calDoc.setMetadataInfo(sampleCal.getMetadataInfo());				
+			calDoc.setProcess(sampleCal.getProcess());
+			calDoc.setQualityAssurance(sampleCal.getQualityAssurance());
+			if (NilusChecker.isEmpty(sampleCal.getResponsibleParty()) == false) {
+				calDoc.setResponsibleParty(sampleCal.getResponsibleParty());
+			}
+			calDoc.setTimeStamp(sampleCal.getTimeStamp());
+		}
+
+		addParameterDetails(calDoc, i);
+		// run some checks of completeness of the data
+		NilusChecker.removeEmptyFields(calDoc);
+		//			ArrayList<Field> emptyFields = NilusChecker.checkEmptyFields(calDoc);
+
+		String calDocName = createDocumentName(calDoc, i);
+		boolean exists = calDocumentExists(calDocName);
+		if (exists && overwrite == false) {
+			String msg = String.format("Calibration document %s already exists. Do you want to overwrite it and other documents from this date?", calDocName);
+			int ans = WarnOnce.showWarning("Calibration Export", msg, WarnOnce.OK_CANCEL_OPTION);
+			if (ans == WarnOnce.OK_OPTION) {
+				overwrite = true;
+			}
+			else {
+				return false;
+			}
+		}
+		boolean ok = false;
+		if (exists == true && overwrite == false) {
+			return false;
+		}
+		try {
+			if (exists) {
+				ok = dbxml.removeDocument(Collection.Calibrations, calDocName);
+			}
+			ok = dbxml.postAndLog(calDoc, calDocName);
+		} catch (TethysException e) {
+			e.printStackTrace();
+			tethysControl.showException(e);
+			ok = false;
+			return false;
+		}
+		tethysControl.sendStateUpdate(new TethysState(TethysState.StateType.EXPORTRDATA, Collection.Calibrations));
+		TethysReporter.getTethysReporter().showReport(true);
+		return ok;
+	}
+
 	/**
 	 * Add the separate pamguard parameters to the document which are used
 	 * to make up the overall calibration. 
@@ -282,7 +298,7 @@ public class CalibrationHandler extends CollectionHandler implements TethysState
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	/**
@@ -364,7 +380,7 @@ public class CalibrationHandler extends CollectionHandler implements TethysState
 		 * It is recommended that the three different types of identifiers (instrument, hydrophone, preamp) be distinct, 
 		 * but the Type element may be used to distinguish them if they are not.
 		 */
-		
+
 		/*
 		 *  very remote possibility that DAQ doesn't exist. What to do in this case ? It's also possible that some configurations may 
 		 *  have to have >1 DAQ's ?  
@@ -376,16 +392,16 @@ public class CalibrationHandler extends CollectionHandler implements TethysState
 		if (channelIndex < 0 || channelIndex >= array.getHydrophoneCount()) {
 			return null;
 		}
-//		ArrayManager.getArrayManager().get
-//		hydrophones = array.
+		//		ArrayManager.getArrayManager().get
+		//		hydrophones = array.
 		Hydrophone hydrophone = array.getHydrophoneArray().get(channelIndex);
 		double hSens = hydrophone.getSensitivity();
 		double preampGain = hydrophone.getPreampGain();
-		
+
 		GlobalMediumManager mediumManager = PamController.getInstance().getGlobalMediumManager();
 		SoundMedium currentMedium = mediumManager.getCurrentMedium();
 		double dbRef = GlobalMedium.getdBreference(currentMedium); // probably in Pa, so multiply by 1e6.  20 (air) or 0 (water)
-		
+
 		/**
 		 * The calibration id can be a bit tricky, it will need to be cross referenced from the 
 		 * Deployment document, and it is likely that a deployment document will have to reference several 
@@ -395,7 +411,7 @@ public class CalibrationHandler extends CollectionHandler implements TethysState
 		 * the list of audio devices, cross referenced as the SensorId field. 
 		 * 
 		 */
-		
+
 		Calibration calibration = new Calibration();
 
 		try {
@@ -404,15 +420,15 @@ public class CalibrationHandler extends CollectionHandler implements TethysState
 			e.printStackTrace();
 		}
 		String id = getHydrophoneId(channelIndex);
-//		 id = String.format("%d", channelIndex);
+		//		 id = String.format("%d", channelIndex);
 		calibration.setId(id);
 		calibration.setTimeStamp(TethysTimeFuncs.xmlGregCalFromMillis(System.currentTimeMillis()));
-//		calibration.setType(GlobalMedium.getRecieverString(currentMedium, false, false));
+		//		calibration.setType(GlobalMedium.getRecieverString(currentMedium, false, false));
 		calibration.setType("end-to-end");
 		calibration.setIntensityReferenceUPa(AutoTethysProvider.roundSignificantFigures(dbRef*1e6,3));
-//		String sensRef = GlobalMedium.getdBRefString(currentMedium);
+		//		String sensRef = GlobalMedium.getdBRefString(currentMedium);
 		// it doesn't like this since it has a unicode character. Leave it or change the micro to 'u'
-//		calibration.setSensitivityReference(sensRef);
+		//		calibration.setSensitivityReference(sensRef);
 		calibration.setSensitivityDBV(hSens+preampGain);
 		if (soundAcquisition != null) {
 			AcquisitionProcess daqProcess = soundAcquisition.getAcquisitionProcess();
@@ -431,18 +447,18 @@ public class CalibrationHandler extends CollectionHandler implements TethysState
 		}
 		List<Double> hz = frs.getHz();
 		List<Double> db = frs.getDB();
-//		if (hz == null) {
-//			
-//		}
+		//		if (hz == null) {
+		//			
+		//		}
 		if (hz != null && db != null) {
-		hz.add(Double.valueOf(0));
-		db.add(Double.valueOf(hSens+preampGain));
+			hz.add(Double.valueOf(0));
+			db.add(Double.valueOf(hSens+preampGain));
 		}
-		
+
 		if (NilusChecker.isEmpty(calibration.getResponsibleParty())) {
 			calibration.setResponsibleParty(null);
 		}
-		
+
 		MetadataInfo metaInf = calibration.getMetadataInfo();
 		if (metaInf == null) {
 			metaInf = new MetadataInfo();
@@ -463,7 +479,7 @@ public class CalibrationHandler extends CollectionHandler implements TethysState
 		}
 		contact.setIndividualName("Unknown");
 		contact.setOrganizationName("unknown");
-		
+
 		QualityAssurance qa = calibration.getQualityAssurance();
 		if (qa == null) {
 			qa = new QualityAssurance();
@@ -471,11 +487,11 @@ public class CalibrationHandler extends CollectionHandler implements TethysState
 		}
 		qa.setQuality(QualityValueBasic.VALID);
 		qa.setComment("Unknown calibration");
-		
-		
+
+
 		return calibration;
 	}
-	
+
 	/**
 	 * See if a document already exists. This should only occur if you 
 	 * try to export the same document twice with the same calibration date. 
@@ -493,7 +509,7 @@ public class CalibrationHandler extends CollectionHandler implements TethysState
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Return if we have at least one document for every channel. 
 	 * @return true if all cal documents exist. 
@@ -508,7 +524,7 @@ public class CalibrationHandler extends CollectionHandler implements TethysState
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Find whether we have a document for this instrument and channel. 
 	 * @param iChan
@@ -525,7 +541,7 @@ public class CalibrationHandler extends CollectionHandler implements TethysState
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 
@@ -545,7 +561,7 @@ public class CalibrationHandler extends CollectionHandler implements TethysState
 		id = id.replace(" ", "_");
 		return id;
 	}
-	
+
 	/**
 	 * Make the final part of the document name / id which is the channel number. 
 	 * @param channelIndex channel index
@@ -561,7 +577,7 @@ public class CalibrationHandler extends CollectionHandler implements TethysState
 	public ArrayList<DocumentNilusObject<Calibration>> getCalibrationDataList() {
 		return calibrationsList;
 	}
-	
+
 	/**
 	 * Make a list of document names associated with this instrument. 
 	 * @return list of calibration documents using this instrument, based on the start of the document name. 
@@ -572,7 +588,7 @@ public class CalibrationHandler extends CollectionHandler implements TethysState
 			allCals = tethysControl.getDbxmlQueries().getCollectionDocumentList(Collection.Calibrations);
 		}
 		catch (Exception e) {
-			
+
 		}
 		if (allCals == null) {
 			return null;
@@ -590,5 +606,16 @@ public class CalibrationHandler extends CollectionHandler implements TethysState
 	@Override
 	public String getHelpPoint() {
 		return helpPoint;
+	}
+
+	/**
+	 * Open a dialog to get all calibration export settings. This will be the
+	 * same as the cards in the export Wizard, but arranged as tabs I think. 
+	 * <br>Or just use the Wizard!
+	 * @return
+	 */
+	public Calibration getExportSettings(Calibration currentCal) {
+		Calibration newCal = CalibrationsExportWizard.showWizard(tethysControl.getGuiFrame(), currentCal);
+		return newCal;
 	}
 }

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import pamViewFX.PamGuiManagerFX;
 import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamVBox;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -53,6 +54,9 @@ public class DBPaneFX extends SettingsPane<DBParameters> {
 		this.dBControl=dbControl;
 		mainPane=new PamBorderPane();
 		mainPane.setCenter(createDBPane());
+		
+		//padding only seems to work with CSS for atalnta stytle
+		mainPane.setStyle("-fx-padding: 5px;");
 	}
 	
 	@Override
@@ -62,7 +66,7 @@ public class DBPaneFX extends SettingsPane<DBParameters> {
 
 		dBParams.setDataBaseSystem(systemList.getSelectionModel().getSelectedIndex());
 
-		//dBParams.setUseAutoCommit(useAutoCommit.isSelected());
+
 
 		return dBParams;
 	}

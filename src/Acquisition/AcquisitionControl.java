@@ -21,6 +21,7 @@
 
 package Acquisition;
 
+import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.Window;
@@ -908,6 +909,24 @@ public class AcquisitionControl extends RawInputControlledUnit implements PamSet
 		else {
 			return null;
 		}
+	}
+
+	@Override
+	public void startButtonXtraActions(Component component, AWTEvent e) {
+		DaqSystem daqSys = findDaqSystem(null);
+		if (daqSys == null) {
+			return;
+		}
+		daqSys.startButtonXtraActions(component, e);
+	}
+	
+	@Override
+	public String getStartButtonToolTip() {
+		DaqSystem daqSys = findDaqSystem(null);
+		if (daqSys == null) {
+			return null;
+		}
+		return daqSys.getStartButtonToolTip();
 	}
 
 }

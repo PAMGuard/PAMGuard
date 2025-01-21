@@ -1,8 +1,12 @@
 package tethys.species;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
+import PamController.PamControlledUnitSettings;
 import PamController.PamController;
+import PamController.PamSettingManager;
+import PamController.PamSettings;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import tethys.species.swing.DataBlockSpeciesDialog;
@@ -14,7 +18,7 @@ import tethys.species.swing.DataBlockSpeciesDialog;
  * 1. Datablocks which have a totally free list of species codes, such as the click detector, or whistle classifier <br>
  * 1a. A slight variation on this is blocks which have a list and also a default for data units which aren't classified.<br>
  * 2. Datablocks which have a single type which may be unknown or partially known, but we want the possibility of overriding it.
- * e.g. the whistle detector may default to odontocete, but may be overridden to a mystecete species.<br> 
+ * e.g. the whistle detector may default to odontocete, but may be overridden to a mysticete species.<br> 
  * 3. Datablocks with no information, or where the list from (1.) is empty. <p>
  * In all cases, we need to handle this reasonably sensibly. The code list is always the start of this and must 
  * always return something, even if it's 'unknown'. 
@@ -22,7 +26,7 @@ import tethys.species.swing.DataBlockSpeciesDialog;
  * @author dg50
  *
  */
-abstract public class DataBlockSpeciesManager<T extends PamDataUnit> {
+abstract public class DataBlockSpeciesManager<T extends PamDataUnit> /*implements PamSettings*/ {
 	
 	/**
 	 * The serialised bit. Always exists (or should be created) even if there
@@ -32,6 +36,8 @@ abstract public class DataBlockSpeciesManager<T extends PamDataUnit> {
 	private DataBlockSpeciesMap datablockSpeciesMap;
 	
 	private PamDataBlock<T> dataBlock;
+	
+	public static final String unitType = "DBSpeciesManager";
 	
 	/*
 	 * Below are three ways of getting species codes. At least ONE of these 
@@ -72,7 +78,12 @@ abstract public class DataBlockSpeciesManager<T extends PamDataUnit> {
 	public DataBlockSpeciesManager(PamDataBlock<T> dataBlock) {
 		super();
 		this.dataBlock = dataBlock;
-		datablockSpeciesMap = SpeciesMapManager.getInstance().getSpeciesMap(dataBlock);
+//		PamSettingManager.getInstance().registerSettings(this);
+//		// if it's null, try to get from the global map, which we're about to stop using. 
+//		if (datablockSpeciesMap == null) {		
+			datablockSpeciesMap = SpeciesMapManager.getInstance().getSpeciesMap(dataBlock);
+//		}
+		// if it's still null (new configuration), then create a blank.
 		if (datablockSpeciesMap == null) {
 			datablockSpeciesMap = new DataBlockSpeciesMap();
 		}
@@ -219,7 +230,7 @@ abstract public class DataBlockSpeciesManager<T extends PamDataUnit> {
 	}
 	
 	/**
-	 * Check the species map. Only return true if every species code
+	 * Check the species map. Only return null if every species code
 	 * has a map item. Otherwise it's not safe to export. 
 	 * @return null if all codes have a lookup, otherwise some sort of useful error information
 	 */
@@ -241,4 +252,32 @@ abstract public class DataBlockSpeciesManager<T extends PamDataUnit> {
 		}
 		return null;
 	}
+
+	/*
+	@Override
+	public String getUnitName() {
+		return this.dataBlock.getLongDataName();
+	}
+
+	@Override
+	public String getUnitType() {
+		return unitType;
+	}
+
+	@Override
+	public Serializable getSettingsReference() {
+		return this.datablockSpeciesMap;
+	}
+
+	@Override
+	public long getSettingsVersion() {
+		return DataBlockSpeciesMap.serialVersionUID;
+	}
+
+	@Override
+	public boolean restoreSettings(PamControlledUnitSettings pamControlledUnitSettings) {
+		this.datablockSpeciesMap = (DataBlockSpeciesMap) pamControlledUnitSettings.getSettings();
+		return true;
+	}
+	*/
 }

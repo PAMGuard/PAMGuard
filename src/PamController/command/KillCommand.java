@@ -20,7 +20,7 @@ public class KillCommand extends ExtCommand {
 	
 	@Override
 	public String getHint() {
-		return "kill PAMguard, don't necessarily stop detectors or clean anything up";
+		return "kill PAMGuard, don't necessarily stop detectors or clean anything up";
 	}
 
 }

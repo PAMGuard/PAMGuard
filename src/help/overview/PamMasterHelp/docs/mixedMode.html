@@ -6,48 +6,48 @@
 
 <body>
 
-<h1>PAMGUARD</h1>
+<h1>PAMGuard</h1>
 <h2>Mixed Mode Operation</h2>
 <h3>Overview</h3>
 <p>
-PAMGUARD Mixed Mode is used to re-analyse data stored in audio files off-line.<p>
-When running in mixed mode, the PAMGUARD clock is set from the time in the name of the file and
+PAMGuard Mixed Mode is used to re-analyse data stored in audio files off-line.<p>
+When running in mixed mode, the PAMGuard clock is set from the time in the name of the file and
 the current position within a file of audio data. <p>
-GPS data is read back from the database in synch with the  PAMGUARD clock and sent into
-the PAMGUARD system exactly as though it was being collected in real time. <p>
-Any localisations calculated by PAMGUARD will therefore be based on the correct GPS data 
+GPS data is read back from the database in synch with the  PAMGuard clock and sent into
+the PAMGuard system exactly as though it was being collected in real time. <p>
+Any localisations calculated by PAMGuard will therefore be based on the correct GPS data 
 for the time at which the event occurred. 
 <p>
-The overall look of PAMGUARD is also identical to that experienced during real time operation at sea. 
+The overall look of PAMGuard is also identical to that experienced during real time operation at sea. 
 <p>
 New detections and localisations are written to the database. 
 GPS data recycled through the system are not re-written to the database. 
 
-<h3>Starting PAMGUARD Mixed mode operation</h3>
+<h3>Starting PAMGuard Mixed mode operation</h3>
 <p>
-PAMGUARD Mixed mode can be started from the shortcut to PAMGUARD mixed mode placed on your system when 
-you installed PAMGUARD. 
+PAMGuard Mixed mode can be started from the shortcut to PAMGuard mixed mode placed on your system when 
+you installed PAMGuard. 
 <p>
 If you are using one of the platform independent jar files, then run the jar file with the 
 program argument -m. For instance, 
-under Windows, the command line for starting PAMGUARD Beta version 1.3.02 in mixed mode with 1 Gigabyte of memory 
-is:  <br><br>
-<center><p>java -jar -mx1024m PamguardBeta_1_3_02.jar Pamguard -m</p></center> 
+under Windows, the command line for starting PAMGuard Beta version 1.3.02 in mixed mode with 1 Gigabyte of memory 
+is:  </p>
+<code>java -jar -mx4096m PAMGuardBeta_2_02_15.jar PAMGuard -m</code> 
+<br>
 
-
-<h3>Running PAMGUARD Mixed Mode</h3>
-<p>When PAMGUARD starts in Mixed mode, it will not ask for a psf file, but will instead ask for 
+<h3>Running PAMGuard Mixed Mode</h3>
+<p>When PAMGuard starts in Mixed mode, it will not ask for a psfx file, but will instead ask for 
 a database file to open. <p>
-You must select a database which was previously filled with data from PAMGUARD. 
+You must select a database which was previously filled with data from PAMGuard. 
 <p>
-As with <a href="viewerMode.html">Viewer mode</a>, PAMGUARD will read it's configuration settings
-from the database and not from a psf file. 
+As with <a href="viewerMode.html">Viewer mode</a>, PAMGuard will read it's configuration settings
+from the database and not from a psfx file. 
 <p>
 Configure the <a href="../../../sound_processing/AcquisitionHelp/docs/AcquisitionOverview.html">sound 
 acquisition module</a> to take data either from a file or a file 
 folder. 
 <p>
-When you start PAMGUARD, there may be a pause of a few seconds as GPS and other data are extracted from
+When you start PAMGuard, there may be a pause of a few seconds as GPS and other data are extracted from
 the database. 
 <p>
 Including a <a href="../../../sound_processing/soundPlaybackHelp/docs/soundPlayback_soundPlayback.html">
@@ -60,7 +60,7 @@ fully synchronised with the audio data.
  
 
 <br><br>
-<p CLASS="previousLink"><a href="viewerMode.html">Previous: PAMGUARD Viewer</a></p>
+<p CLASS="previousLink"><a href="viewerMode.html">Previous: PAMGuard Viewer</a></p>
 <p CLASS="nextLink"><a href="guiOverview.html">Next: Graphical User Interface</a></p>
 <br><br><br>
 

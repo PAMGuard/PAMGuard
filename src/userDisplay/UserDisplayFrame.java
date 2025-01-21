@@ -3,6 +3,8 @@ package userDisplay;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 
+import PamView.PamIcon;
+
 /**
  * Frames for general purpose user displays. 
  * Doesn't do much apart from use the normal frame functions, but
@@ -28,8 +30,14 @@ public class UserDisplayFrame extends JInternalFrame {
 //		getLayeredPane().add(userDisplayComponent.getComponent(), JLayeredPane.DEFAULT_LAYER);
 		add(userDisplayComponent.getComponent());
 		setTitle(userDisplayComponent.getFrameTitle());
-		setFrameIcon(new ImageIcon(ClassLoader
-				.getSystemResource("Resources/pamguardIcon.png")));
+
+		try {
+			setFrameIcon(PamIcon.getPAMGuardImageIcon(PamIcon.SMALL));
+		}
+		catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		
 		setSize(900, 400);
 		setVisible(true);
 	}

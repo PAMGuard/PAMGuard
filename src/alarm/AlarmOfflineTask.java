@@ -12,7 +12,7 @@ public class AlarmOfflineTask extends OfflineTask<PamDataUnit> {
 	private AlarmProcess alarmProcess;
 	
 	public AlarmOfflineTask(AlarmControl alarmControl) {
-		super(alarmControl.getAlarmProcess().getSourceDataBlock());
+		super(alarmControl, alarmControl.getAlarmProcess().getSourceDataBlock());
 		this.alarmControl = alarmControl;
 		alarmProcess = alarmControl.getAlarmProcess();
 		setParentDataBlock(alarmProcess.getSourceDataBlock());

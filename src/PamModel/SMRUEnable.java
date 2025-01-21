@@ -34,6 +34,8 @@ public class SMRUEnable {
 	}
 
 	private static long meygenChannel6Fail = 1510061936000L; // 2017-11-07 13:38:56 
+
+	private static boolean setDevEnable;
 	/**
 	 * @return the meygen17 flag to indicate this is data from the 
 	 * Meygen turbine in 2017. 
@@ -77,6 +79,21 @@ public class SMRUEnable {
 	 */
 	public static void setEnableDecimus(boolean enableDecimus) {
 		SMRUEnable.enableDecimus = enableDecimus;
+	}
+
+	/**
+	 * Enable some more SMRU Development stuff. 
+	 * @param devEnable
+	 */
+	public static void setDevEnable(boolean devEnable) {
+		SMRUEnable.setDevEnable= devEnable;
+	}
+
+	/**
+	 * @return the setDevEnable
+	 */
+	public static boolean isDevEnable() {
+		return setDevEnable;
 	}
 	
 }

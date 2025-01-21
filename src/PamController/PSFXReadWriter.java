@@ -1,5 +1,6 @@
 package PamController;
 
+import java.awt.Window;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
@@ -10,7 +11,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.swing.JFileChooser;
+
 import PamUtils.PamCalendar;
+import PamUtils.PamFileChooser;
+import PamUtils.PamFileFilter;
 import PamView.dialog.warn.WarnOnce;
 import binaryFileStorage.BinaryFooter;
 import binaryFileStorage.BinaryHeader;
@@ -81,15 +86,32 @@ public class PSFXReadWriter {
 	 * Initially write to a temp file, then rename the temp file.  
 	 * @param fileName the name to use for the save file (full name, including path)
 	 * @param timeStamp time stamp in milliseconds
-	 * @return
+	 * @return true on success
 	 */
 	public synchronized boolean writePSFX(String fileName, long timeStamp) {
 
 		// get an object containing everything we'll need to know. 
 		PamSettingsGroup psg = PamSettingManager.getInstance().getCurrentSettingsGroup();
+		
 		// force the time stamp to be that given - might need to be exact !
 		psg.setSettingsTime(timeStamp);
+		
+
+		return writePSFX(fileName, psg);
+	}
+	
+	/**
+	 * Write settings to the given file<br>
+	 * Initially write to a temp file, then rename the temp file.  
+	 * @param fileName the name to use for the save file (full name, including path)
+	 * @param psg PAMGuard settings group
+	 * @return true on success
+	 */
+	public synchronized boolean writePSFX(String fileName, PamSettingsGroup psg) {
+		
 		BinaryHeader header = new BinaryHeader(SETTINGSSTORE, SETTINGSSTORE, SETTINGSSTORE, 0);
+		
+		long timeStamp = psg.getSettingsTime();
 		header.setAnalysisDate(timeStamp);
 		header.setDataDate(timeStamp);
 
@@ -131,6 +153,33 @@ public class PSFXReadWriter {
 			e.printStackTrace();
 		}
 		return true;
+	}
+	
+	/**
+	 * Select a psfx file. 
+	 * @param toRead if true, only selects existing files with the open dialog. 
+	 * @return File or null. 
+	 */
+	public File selectSettingsFile(Window frame, boolean toRead) {
+		File start = new File(PamFolders.getDefaultProjectFolder());
+		JFileChooser jFileChooser = new PamFileChooser(start);
+		//		jFileChooser.setFileFilter(new SettingsFileFilter());
+		jFileChooser.setApproveButtonText("Select");
+		PamFileFilter fileFilter = new PamFileFilter("PAMGUARD Settings files", PamSettingManager.getCurrentSettingsFileEnd());
+		jFileChooser.setFileFilter(fileFilter);
+		jFileChooser.setAcceptAllFileFilterUsed(false);
+		//		jFileChooser.setFileFilter(new FileNameExtensionFilter("PAMGUARD Settings files", defaultFile));
+		int state = 0;
+		if (toRead) {
+			jFileChooser.showOpenDialog(frame);
+		}
+		else {
+			jFileChooser.showSaveDialog(frame);
+		}
+		if (state != JFileChooser.APPROVE_OPTION) return null;
+		File newFile = jFileChooser.getSelectedFile();
+		newFile = PamFileFilter.checkFileEnd(newFile, PamSettingManager.getCurrentSettingsFileEnd(), true);
+		return newFile;
 	}
 
 	private boolean writeData(DataOutputStream dos, int objectId, byte[] data) {
@@ -213,6 +262,10 @@ public class PSFXReadWriter {
 				totalLen = dis.readInt();
 				objectId = dis.readInt();
 				dataLen = dis.readInt();
+				if (dataLen < 0) {
+					System.out.println("Error reading psfx file " + file.getAbsolutePath());
+					break;
+				}
 				data = new byte[dataLen];
 				dis.read(data);
 				if (objectId == ModuleNameObject.typeId) {

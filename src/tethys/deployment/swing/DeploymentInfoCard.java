@@ -18,7 +18,7 @@ public class DeploymentInfoCard extends PamWizardCard<Deployment> {
 		super(pamWizard, title);
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-		projectInformationPanel = new ProjectInformationPanel(pamWizard, title);
+		projectInformationPanel = new ProjectInformationPanel(pamWizard, "Project Information");
 		this.add(projectInformationPanel.getMainPanel());
 		responsiblePartyPanel = new ResponsiblePartyPanel("Responsible Party");
 		this.add(responsiblePartyPanel.getMainPanel());

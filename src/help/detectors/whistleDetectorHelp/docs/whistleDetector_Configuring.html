@@ -18,7 +18,7 @@ These are either the output from an
 <a href="../../../sound_processing/fftManagerHelp/docs/FFTEngine_Overview.html">FFTEngine</a>, 
 or some other process that produces FFT / 
 Spectrogram data. If no data sources are listed, you need to create an appropriate 
-FFTEngine in the PAMGUARD data model.  
+FFTEngine in the PAMGuard data model.  
 </p>
 <h4>Channel List and Grouping</h4>
 <p>
@@ -35,7 +35,7 @@ In the example above, whistles will be detected on channels 0 and 2. Should a wh
 channel 1 or 3 will be used to calculate a bearing. 
 </p>
 <h3>Peak Detection</h3>
-<img alt="Image" src="./images/WhistlePeaks.png"/><br><br>
+<img src="./images/WhistlePeaks.png"/><br><br>
 <p>
 Two peak detectors are currently available. You are recommended to use the 'IFAW
 Whistle Peak Detector' which is the same as the peak detector on the old IFAW whistle software.  
@@ -66,7 +66,7 @@ which are passed to the whistle linker.
 <p><br>
 
 <h3>Linking</h3>
-<img alt="Image" src="./images/WhistleLinks.png"/><br><br>
+<img src="./images/WhistleLinks.png"/><br><br>
 <p>
 Three parameters control whether or not peaks from different time partitions can be joined into putative whistles. 
 <p>Several parameters can be specified.
@@ -83,7 +83,7 @@ If more than one peak is a candidate for linking to a whistle, then an overall
   within a whistle with peaks still being linked. 
 <p><br>
 <h3>Whistle Selection</h3>
-<img alt="Image" src="./images/WhistleWhistles.png"/><br><br>
+<img src="./images/WhistleWhistles.png"/><br><br>
 <p>
 Whistles are only created if the the linked peaks (putative whistles) pass two final tests:
 <p><strong>Minimum Length: </strong>Whistles must exceed some minimum length

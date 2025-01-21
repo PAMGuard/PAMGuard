@@ -390,7 +390,7 @@ public class DBControlUnit extends DBControl implements DataOutputStore {
 		protected void process(List<CreateMapInfo> dataList) {
 			if (PamGUIManager.isSwing()) {
 				if (dbMapDialog == null) {
-					dbMapDialog = DBMapMakingDialog.showDialog(null);
+					dbMapDialog = DBMapMakingDialog.showDialog(PamController.getMainFrame());
 				}
 				for (int i = 0; i < dataList.size(); i++) {
 					dbMapDialog.newData(dataList.get(i));

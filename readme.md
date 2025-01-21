@@ -1,6 +1,9 @@
 # PAMGuard
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13378951.svg)](https://doi.org/10.5281/zenodo.13378951)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13378950.svg)](https://doi.org/10.5281/zenodo.13378950)
+
+
+PAMGuard website: [www.pamguard.org](http://www.pamguard.org)
 
 ## Introduction
 PAMGuard is a bioacoustics analysis program designed for use in real time research contexts and for the processing of large datasets. PAMGuard provides users access to a suite of state-of-the-art automated analysis algorithms alongside displays for visualisation data and a comprehensive data management systems. 
@@ -13,7 +16,7 @@ PAMGuard fulfils two main requirements within marine bioacoustics
 2) **Processing and visualisation of large datasets**: Off-the-shelf autonomous PAM devices, large scale surveys involving drifters, towed arrays, gliders, bottom mounted devices and real time continuous monitoring system all generate huge volumes of data which requires automated analysis approaches. PAMGuard allows the processing of very large passive acoustic datasets using automated algorithms and crucially provides comprehensive visualisation tools for a manual analyst to check the results.
 
 ## Installation
-PAMGuard is available on Windows and can be downloaded from the [PAMGuard website](www.pamguard.org). Note that we are considering MacOS and Linux installers but they are not available at this time. 
+PAMGuard is available on Windows and can be downloaded from the [PAMGuard website](https://pamguard.org). Note that we are considering MacOS and Linux installers but they are not available at this time. 
 
 ## Quick start tutorial
 PAMGuard is a modular program with two modes; real-time and viewer. Typically a user will start with real-time model, either in the field collecting data or post processing sound files from a recorder. Once data are processed, users move on to viewer mode where data can be explored and further processed. 
@@ -26,7 +29,7 @@ Once the data has run, open PAMGuard viewer mode. Select the database you used t
 
 ## Features
 ### Hardware integration
-PAMGuard connects with hardware such as various GPS and AIS systems and a multitude of different sound cards (e.g. [National Instruments](www.ni.com) devices, [SAIL DAQ cards](www.smruconsulting.com/contact-us), almost all ASIO sound cards and standard computer sound cards) for real time data collection and processing. PAMGuard also works with some very bespoke hardware such as [DIFAR Sonobuoys]();
+PAMGuard connects with hardware such as various GPS and AIS systems and a multitude of different sound cards (e.g. [National Instruments](https://ni.com) devices, [SAIL DAQ cards](https://smruconsulting.com/contact-us), almost all ASIO sound cards and standard computer sound cards) for real time data collection and processing. PAMGuard also works with some very bespoke hardware such as [DIFAR Sonobuoys](https://pubs.aip.org/asa/jasa/article/139/3/EL83/910724);
 
 ### Real time operation
 PAMGuard takes advantage of multi-core processors to run multiple signal processing automatic analysis algorithms in real time to detect whales, dolphins, bats etc. Data are shown in different displays, including interactive spectrograms and maps. You might be using PAMGuard for simply viewing a spectrogram and making recordings or running deep learning algorithms for multiple species and localising the results to view locations on a map. Whatever acoustic workflow a user creates, PAMGuard can run it in real time. 
@@ -87,4 +90,5 @@ If you are a PAMGuard developer, you should clone and branch this repository and
 PAMGuard uses Maven as build tool. 
 
 # Organisation and License
-PAMGuard is open source under an MIT license. It is currently primarily managed by the Sea Mammal Research Unit within the [University of St Andrews](https://www.st-andrews.ac.uk/). Please get in touch if you have any questions. 
+PAMGuard is open source under the [GPL 3.0 license](https://www.gnu.org/licenses/gpl-3.0.en.html). 
+It is currently primarily managed by the Sea Mammal Research Unit within the [University of St Andrews](https://www.st-andrews.ac.uk/). Please get in touch if you have any questions. 

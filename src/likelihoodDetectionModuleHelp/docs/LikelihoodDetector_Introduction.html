@@ -58,12 +58,12 @@
       the operator's suggestions for the frequency and time resolutions and the
       audio data source's parameters.
       The module will then seek an existing
-      FFT data block within the PamGuard system that has those parameters and is
+      FFT data block within the PAMGuard system that has those parameters and is
       also for the same configured audio source. If a matching FFT process is not
       located, an FFT process is automatically created within the Likelihood
       Detection Module, and becomes the first step in the processing stream for
       the target configuration. The output of this stage of processing is a standard
-      PamGuard FFT data block (i.e., <code>RecyclingDataBlock&#60FFTDataUnit&#62</code>).
+      PAMGuard FFT data block (i.e., <code>RecyclingDataBlock&#60FFTDataUnit&#62</code>).
     </li>
     <br>
     <li>
@@ -103,7 +103,7 @@
       greater than the user-defined threshold, then a detection results.
       The output of this stage of processing is zero to many
       <code>ThresholdDetectorDataUnit</code>, which is an extension of the standard
-      PamGuard <code>PamDetection&#60&#62</code> class.
+      PAMGuard <code>PamDetection&#60&#62</code> class.
     </li>
   </ol>
 

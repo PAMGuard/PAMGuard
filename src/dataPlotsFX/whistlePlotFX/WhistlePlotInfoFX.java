@@ -2,6 +2,8 @@ package dataPlotsFX.whistlePlotFX;
 
 import java.awt.geom.Path2D;
 import java.util.ListIterator;
+
+import PamUtils.PamCalendar;
 import PamView.GeneralProjector.ParameterType;
 import PamView.GeneralProjector.ParameterUnits;
 import PamView.HoverData;
@@ -170,6 +172,7 @@ public class WhistlePlotInfoFX extends TDDataInfoFX {
 	 */
 	private void drawWhistleFFT(int plotNumber, PamDataUnit pamDataUnit,
 			GraphicsContext g, TDProjectorFX tdprojector, double scrollStart, int type) {
+				
 		if (!shouldDraw(plotNumber, pamDataUnit)){
 			//System.out.println("Cannot plot whistle");
 			iCol++;
@@ -204,9 +207,10 @@ public class WhistlePlotInfoFX extends TDDataInfoFX {
 	 * @return a 2D path in pixels of the fragment. 
 	 */
 	public static Path2D drawWhistleFragement(PamDataUnit pamDataUnit, WhistleMoanControl wmControl, int fftLength, int fftHop, float sampleRate,
-			GraphicsContext g, TimeProjectorFX tdprojector, double scrollStart, int type,  Color fillCol, Color linCol, Orientation orientation) {
-		return WhistlePlotInfoFX.drawWhistleFragement(pamDataUnit, wmControl, fftLength, fftHop, sampleRate, g, tdprojector, scrollStart, type, fillCol, linCol, false, orientation);
+			GraphicsContext g, TimeProjectorFX tdprojector, double scrollStart, int type,  Color fillCol, Color linCol, Orientation orientation, boolean iswrap) {
+		return WhistlePlotInfoFX.drawWhistleFragement(pamDataUnit, wmControl, fftLength, fftHop, sampleRate, g, tdprojector, scrollStart, type, fillCol, linCol, false, orientation, iswrap);
 	}
+
 
 	/**
 	 * Draw a whistle fragment. 
@@ -227,18 +231,22 @@ public class WhistlePlotInfoFX extends TDDataInfoFX {
 	 * @return a 2D path in pixels of the fragment. 
 	 */
 	public static Path2D drawWhistleFragement(PamDataUnit pamDataUnit, WhistleMoanControl wmControl, int fftLength, int fftHop, float sampleRate,
-			GraphicsContext g, TimeProjectorFX tdprojector, double scrollStart, int type,  Color fillCol, Color linCol, boolean useKhz, Orientation orientation) {
+			GraphicsContext g, TimeProjectorFX tdprojector, double scrollStart, int type,  Color fillCol, Color linCol, boolean useKhz, Orientation orientation, boolean iswrap) {
 
 		//get position on time axis
 		long timeMillis=pamDataUnit.getTimeMilliseconds();
 		double tC = tdprojector.getTimePix(timeMillis-scrollStart); 
+		double tCEnd = tdprojector.getTimePix(pamDataUnit.getEndTimeInMilliseconds()-scrollStart); 
+		
+//		System.out.println("Plot whislte: "  + PamCalendar.formatDateTime(timeMillis));
 
 		//		timeAxis.getPosition((timeMillis-scrollStart)/1000.);
 
-		if (tC < 0 || tC >  tdprojector.getGraphTimePixels()) {
+		//make sure that we do not cut off whistles that are partly off the screen
+		if (tCEnd < -10 || tC >  tdprojector.getGraphTimePixels()) {
 			return null;
 		}
-
+		
 		ConnectedRegionDataUnit dataUnit=((ConnectedRegionDataUnit) pamDataUnit);
 		ConnectedRegion cr = dataUnit.getConnectedRegion();
 		WhistleToneParameters wmParams = wmControl.getWhistleToneParameters();
@@ -302,7 +310,7 @@ public class WhistlePlotInfoFX extends TDDataInfoFX {
 
 			tC=tdprojector.getTimePix((long) (sliceMillis-scrollStart)); 
 						
-			if (tC < 0 || tC >  tdprojector.getGraphTimePixels()) {
+			if (iswrap && (tC < 0 || tC >  tdprojector.getGraphTimePixels())) {
 				return null;
 			}
 
@@ -432,7 +440,7 @@ public class WhistlePlotInfoFX extends TDDataInfoFX {
 		Color linCol=getFragmentColour(dataUnit, this.whistleSymbolChooser);
 
 		return drawWhistleFragement( pamDataUnit,  wmControl,  fftLength,  fftHop,  sampleRate,
-				g,  tdprojector,  scrollStart,  type,   fillCol,  linCol, tdprojector.getOrientation()) ;
+				g,  tdprojector,  scrollStart,  type,   fillCol,  linCol, tdprojector.getOrientation(), this.getTDGraph().isWrap()) ;
 	}
 
 	/**

@@ -9,13 +9,17 @@ import org.jamdev.jdl4pam.transforms.DLTransfromParams;
 
 import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
+import PamguardMVC.PamDataUnit;
 import rawDeepLearningClassifier.DLControl;
 import rawDeepLearningClassifier.dlClassification.DLClassiferModel;
+import rawDeepLearningClassifier.dlClassification.PredictionResult;
 import rawDeepLearningClassifier.dlClassification.StandardClassifierModel;
 import rawDeepLearningClassifier.dlClassification.animalSpot.StandardModelParams;
 import rawDeepLearningClassifier.dlClassification.genericModel.DLModelWorker;
 import rawDeepLearningClassifier.dlClassification.genericModel.StandardPrediction;
 import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
+import rawDeepLearningClassifier.segmenter.SegmenterDetectionGroup;
+import whistlesAndMoans.ConnectedRegionDataBlock;
 
 /**
  * A classifier based on the delphinID method which uses whistle contours to predict
@@ -25,20 +29,20 @@ import rawDeepLearningClassifier.layoutFX.DLCLassiferModelUI;
  *
  */
 public class DelphinIDClassifier extends StandardClassifierModel {
-	
-	
+
+
 	private DelphinIDParams delphinIDParams = new DelphinIDParams();
-	
-	
+
+
 	private DelphinUI delphinUI;
-	
-	
+
+
 	private DelphinIDWorker delphinIDWorker;
 
 
 	public DelphinIDClassifier(DLControl dlControl) {
 		super(dlControl);
-		
+
 		//load the previous settings
 		PamSettingManager.getInstance().registerSettings(this);
 	}
@@ -90,13 +94,73 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 		return delphinIDParams;
 
 	}
-	
-	
+
+	@Override
+	public ArrayList<? extends PredictionResult> runModel(ArrayList<? extends PamDataUnit> groupedRawData) {
+
+		//add an extra test to see if the detection pre count has passed. 
+
+		if (detectionPreFilter(groupedRawData)) {
+			return super.runModel(groupedRawData);
+		}
+		else return null;
+	}
+
+	/**
+	 * Check whether the delphinID model should run at all. 
+	 * @param groupedRawData - the grouped raw data. 
+	 * @return true if the model should run. 
+	 */
+	private boolean detectionPreFilter(ArrayList<? extends PamDataUnit> groupedRawData) {
+		if (dlControl.getSegmenter().getParentDataBlock() instanceof  ConnectedRegionDataBlock) {
+			return whistlePreFilter(groupedRawData);
+		}
+		else {
+			return clickPreFilter(groupedRawData);
+		}
+	}
+
+
+	private boolean clickPreFilter(ArrayList<? extends PamDataUnit> groupedRawData) {
+		//TODO
+//		System.out.println("Check CLICK fragment density"); 
+		return true;
+	}
+
+	private boolean whistlePreFilter(ArrayList<? extends PamDataUnit> groupedRawData) {
+		//TODO
+//		System.out.println("Check WHISTLE fragment density"); 
+//		
+//		3.	Within each time frame, the density of detection is calculated and used as a filter.
+//		-	Density 2
+//		-	where the length of frame = frame duration / mean time step across contour
+//		(time steps between time-frequency points in contour saved by ROCCA depend on FFT resolution but can vary slightly within contour)
+//
+//		4.	If a detection frame has less than 0.30 detection density, it is not used for classification
+//		double density = DelphinIDUtils.getDensity(null); 
+		
+
+		if (groupedRawData==null || groupedRawData.size()<1) {
+			System.err.println("DelphinIDClassifier: + the grouped raw data is null or zero size:"); 
+			return false;
+		}
+		
+		System.out.println("Run DelphinID model: " +  groupedRawData.size() + " min density: " + delphinIDParams.minDetectionDensity); 
+		
+		double density = DelphinIDUtils.getDensity((SegmenterDetectionGroup) groupedRawData.get(0)); 
+		
+		if (density>=delphinIDParams.minDetectionDensity) {
+			return true;
+		}
+		
+		return true;
+	}
+
 	@Override
 	public boolean isDecision(StandardPrediction modelResult, StandardModelParams modelParmas) {
 		//TODO
-		//DelphinID uses a different decision making process to most of the standard classifiers which just pass a binary threshold. 
-		return false;
+		//DelphinID might end up using a different decision making process to most of the standard classifiers which just pass a binary threshold. 
+		return super.isDecision(modelResult, modelParmas);
 	}
 
 
@@ -113,7 +177,7 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 		DelphinIDParams newParameters = (DelphinIDParams) pamControlledUnitSettings.getSettings();
 		if (newParameters!=null) {
 			delphinIDParams = (DelphinIDParams) newParameters.clone();
-//			System.out.println("DELPHINID have been restored. : " + delphinIDParams.modelPath); 
+			//			System.out.println("DELPHINID have been restored. : " + delphinIDParams.modelPath); 
 			if (delphinIDParams.dlTransfromParams!=null) {
 				delphinIDParams.dlTransfroms = DLTransformsFactory.makeDLTransforms((ArrayList<DLTransfromParams>) delphinIDParams.dlTransfromParams); 
 			}
@@ -121,7 +185,7 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 		else delphinIDParams = new DelphinIDParams();
 		return true; 
 	}
-		
+
 
 
 	@Override
@@ -139,7 +203,7 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 
 	public void setDLParams(DelphinIDParams params) {
 		this.delphinIDParams=params;
-		
+
 	}
-	
+
 }

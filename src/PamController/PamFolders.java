@@ -1,6 +1,9 @@
 package PamController;
 
 import java.io.File;
+import java.io.FilenameFilter;
+
+import org.apache.commons.io.filefilter.FileFilterUtils;
 
 import PamUtils.FileFunctions;
 
@@ -141,6 +144,57 @@ public class PamFolders {
 		// now check that folder exists
 		File f = FileFunctions.createNonIndexedFolder(homeFolder);
 		return homeFolder;
+	}
+
+	/**
+	 * Delete temporary files that get dumped in the homd folder, but not deleted properly
+	 * if PAMGuard crashes. It's possible that some may be locked by the current, or other 
+	 * running processes, so don't worry too much if some can't delete. 
+	 * @param string file mask for deleteion
+	 */
+	public static boolean deleteTempFiles(String fileMask) {
+		return deleteTempFiles(getHomeFolder(), fileMask);
+	}
+	
+	public static boolean deleteTempFiles(String root, String fileMask) {
+		File rootFolder = new File(root);
+		if (rootFolder.exists() == false) {
+			return false;
+		}
+		String[] files = null;
+		try {
+			files = rootFolder.list(new FilenameFilter() {
+
+				@Override
+				public boolean accept(File dir, String name) {
+					if (name.endsWith(fileMask)) {
+						return true;
+					}
+					return false;
+				}
+			});
+		}
+		catch (Exception e) {
+			return false;
+		}
+		if (files == null) return true;
+		int success = 0;
+		int fail = 0;
+		for (int i = 0; i < files.length; i ++) {
+			try {
+				File aFile = new File(root + File.separator + files[i]);
+				if (aFile.delete()) {
+					success++;
+				}
+				else {
+					fail++;
+				}
+			}
+			catch (Exception e) {
+				System.out.printf("Unable to delete temp file %s\n", files[i]);
+			}
+		}
+		return true;
 	}
 
 

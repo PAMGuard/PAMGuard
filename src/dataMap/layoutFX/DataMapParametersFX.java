@@ -2,6 +2,7 @@ package dataMap.layoutFX;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import PamModel.parametermanager.ManagedParameters;
 import PamModel.parametermanager.PamParameterSet;
@@ -11,20 +12,13 @@ import dataPlotsFX.scrollingPlot2D.PlotParams2D;
 
 public class DataMapParametersFX implements Cloneable, Serializable, ManagedParameters {
 
-	protected static final long serialVersionUID = 1L;
+	protected static final long serialVersionUID = 2L;
 
 	/**
 	 * The data maps which are collapsed. 
 	 */
 	public HashMap<DataMapInfo, Boolean> dataMapsCollapsed = new HashMap<DataMapInfo, Boolean>();
 
-	
-	/**
-	 * The data maps which are shown. 
-	 */
-	public HashMap<DataMapInfo, Boolean> dataMapsShown = new HashMap<DataMapInfo, Boolean>();
-
-	
 	/**
 	 * A has map of colours for each data gram. 
 	 */
@@ -60,6 +54,36 @@ public class DataMapParametersFX implements Cloneable, Serializable, ManagedPara
 	public PamParameterSet getParameterSet() {
 		PamParameterSet ps = PamParameterSet.autoGenerate(this, ParameterSetType.DISPLAY);
 		return ps;
+	}
+	
+	/**
+	 * Called before saving serialised settings
+	 */
+	public void saveSerialised() {
+		//a bit messy but have to make sure we save the plat params 
+		Iterator<DataMapInfo> keys =  this.datagramColours.keySet().iterator();
+		DataMapInfo aKey;
+		while (keys.hasNext()) {
+			aKey = keys.next();
+			PlotParams2D plotparams = datagramColours.get(aKey);
+			plotparams.getAmplitudeLimitsSerial()[0] = plotparams.getAmplitudeLimits()[0].get();
+			plotparams.getAmplitudeLimitsSerial()[1] = plotparams.getAmplitudeLimits()[1].get();
+//			System.out.println("ArrayColours " + aKey.getName() + ":" + plotparams.getAmplitudeLimits()[0].get() + "  " +  plotparams.getAmplitudeLimits()[1].get());
+		}
+	}
+	
+	public void loadSerialised() {
+		//a bit messy but have to make sure we save the plat params 
+		Iterator<DataMapInfo> keys =  this.datagramColours.keySet().iterator();
+		DataMapInfo aKey;
+		while (keys.hasNext()) {
+			aKey = keys.next();
+			PlotParams2D plotparams = datagramColours.get(aKey);
+			plotparams.getAmplitudeLimits()[0].set(plotparams.getAmplitudeLimitsSerial()[0]);
+			plotparams.getAmplitudeLimits()[1].set(plotparams.getAmplitudeLimitsSerial()[1]);
+
+			System.out.println("ArrayColours " + aKey.getName() + ":" + plotparams.getAmplitudeLimits()[0].get() + "  " +  plotparams.getAmplitudeLimits()[1].get());
+		}
 	}
 
 }

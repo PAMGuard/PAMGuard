@@ -107,6 +107,10 @@ public class BatchViewSettingsImport {
 	 * @return true if found and set sucessfully. 
 	 */
 	private boolean restoreSettings(PamControlledUnitSettings aSet) {
+		if (aSet == null) {
+			System.out.println("Empty settings sent into BatchViewSettings");
+			return false;
+		}
 		PamSettings owner = PamSettingManager.getInstance().findSettingsOwner(aSet.getUnitType(), aSet.getUnitName(), null);
 		if (owner == null) {
 			System.out.printf("Cannot find owner for %s, %s, %s\n", aSet.getUnitType(), aSet.getUnitName(), aSet.getOwnerClassName());
