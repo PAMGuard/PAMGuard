@@ -85,6 +85,9 @@ public class DatabaseChecks {
 	 * @return true if event OK / repaired. 
 	 */
 	public boolean checkEvent(int eventId, boolean repair) {
+//		if (eventId != 259) {
+//			return false;
+//		}
 		OfflineEventDataUnit anEvent = eventDataBlock.findByDatabaseIndex(eventId);
 		eventDataBlock.getLogging();
 		PamConnection con = DBControlUnit.findConnection();
@@ -155,7 +158,8 @@ public class DatabaseChecks {
 				updated = true;
 			}
 		}
-		if (Math.abs(anEvent.getEventEndTime() - lastTime) > 1000) {
+		long endDiff = anEvent.getEventEndTime() - lastTime;
+		if (Math.abs(endDiff) > 0) {
 			String msg = String.format("Event %d should have end time %s, not %s", anEvent.getDatabaseIndex(), 
 					PamCalendar.formatDateTime(lastTime), PamCalendar.formatDateTime(anEvent.getEventEndTime()));
 			databaseCheckObserver.checkOutputText(msg, 1);
