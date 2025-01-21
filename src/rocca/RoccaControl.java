@@ -246,30 +246,36 @@ public class RoccaControl extends PamControlledUnit implements PamSettings {
 			// serialVersionUID=25 2019/03/04 added
 			//rcdb.setClassifiedAs(RoccaRFModel.AMBIG);
 			
-			// serialVersionUID=25 2017/03/28 added pruning params for ONR/LMR project N00014-14-1-0413
-			// classifiers.  Check if the loaded classifier model filename matches one of the classifier
-			// names created for the project.  If so, compare the click to the parameters used to prune
-			// the datasets and exit if the click falls outside of the thresholds
-			if (roccaParameters.roccaClassifierModelFilename.getName().equals("TemPacClick.model") &&
-					(rcdb.getContour().get(RoccaContourStats.ParamIndx.SNR) > 35. ||
-							rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) < 0.005 ||
-							rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) > 0.6 )) {
-				rcdb.setNaturalLifetimeMillis(0);
-				return;
-			}
-			if (roccaParameters.roccaClassifierModelFilename.getName().equals("HIClick.model") &&
-					(rcdb.getContour().get(RoccaContourStats.ParamIndx.SNR) > 40. ||
-							rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) < 0.01 ||
-							rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) > 0.6 )) {
-				rcdb.setNaturalLifetimeMillis(0);
-				return;
-			}
-			if (roccaParameters.roccaClassifierModelFilename.getName().equals("NWAtlClick.model") &&
-					(rcdb.getContour().get(RoccaContourStats.ParamIndx.SNR) > 35. ||
-							rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) < 0.005 ||
-							rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) > 0.6 )) {
-				rcdb.setNaturalLifetimeMillis(0);
-				return;
+			// 2025/01/20 always try to classify, since we now allow Rocca to run without a classifier.  But only try to prune
+			// if we are using a classifier
+			// note that this has been in RoccaProcess.newData since 2021, but I missed it here
+			if (roccaControl.roccaParameters.isClassifyClicks()) {
+				
+				// serialVersionUID=25 2017/03/28 added pruning params for ONR/LMR project N00014-14-1-0413
+				// classifiers.  Check if the loaded classifier model filename matches one of the classifier
+				// names created for the project.  If so, compare the click to the parameters used to prune
+				// the datasets and exit if the click falls outside of the thresholds
+				if (roccaParameters.roccaClickClassifierModelFilename.getName().equals("TemPacClick.model") &&
+						(rcdb.getContour().get(RoccaContourStats.ParamIndx.SNR) > 35. ||
+								rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) < 0.005 ||
+								rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) > 0.6 )) {
+					rcdb.setNaturalLifetimeMillis(0);
+					return;
+				}
+				if (roccaParameters.roccaClickClassifierModelFilename.getName().equals("HIClick.model") &&
+						(rcdb.getContour().get(RoccaContourStats.ParamIndx.SNR) > 40. ||
+								rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) < 0.01 ||
+								rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) > 0.6 )) {
+					rcdb.setNaturalLifetimeMillis(0);
+					return;
+				}
+				if (roccaParameters.roccaClickClassifierModelFilename.getName().equals("NWAtlClick.model") &&
+						(rcdb.getContour().get(RoccaContourStats.ParamIndx.SNR) > 35. ||
+								rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) < 0.005 ||
+								rcdb.getContour().get(RoccaContourStats.ParamIndx.DURATION) > 0.6 )) {
+					rcdb.setNaturalLifetimeMillis(0);
+					return;
+				}
 			}
 
 			roccaProcess.roccaClassifier.classifyContour2(rcdb);
