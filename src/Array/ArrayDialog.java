@@ -22,6 +22,7 @@ import Acquisition.AcquisitionControl;
 import Acquisition.AcquisitionParameters;
 import PamController.PamController;
 import PamUtils.PamFileChooser;
+import PamUtils.PamFileFilter;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
 import PamView.help.PamHelp;
@@ -384,7 +385,9 @@ public class ArrayDialog extends PamDialog implements ActionListener {
 		JFileChooser fileChooser = getArrayFileChooser();
 		int state = fileChooser.showSaveDialog(this);
 		if (state == JFileChooser.APPROVE_OPTION) {
-			currentArray.setArrayFile(fileChooser.getSelectedFile().getAbsolutePath());
+			File pafFile = fileChooser.getSelectedFile();
+			pafFile = PamFileFilter.checkFileEnd(pafFile, ArrayManager.getArrayFileType(), true);
+			currentArray.setArrayFile(pafFile.getAbsolutePath());
 			ArrayManager.saveArrayToFile(currentArray);
 		}
 	}
