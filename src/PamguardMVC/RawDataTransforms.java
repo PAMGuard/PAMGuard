@@ -170,8 +170,8 @@ public class RawDataTransforms {
 			}
 
 			double[] waveformTrim = new double[maxBin-minBin]; 
-			
-//			System.out.println("minBin: " +minBin + " maxBin: " + maxBin + "  " + Math.min(this.getWaveData(channel).length, waveformTrim.length) + " " + this.getWaveData(channel).length  + "  " + this.getSampleDuration());
+
+			//			System.out.println("minBin: " +minBin + " maxBin: " + maxBin + "  " + Math.min(this.getWaveData(channel).length, waveformTrim.length) + " " + this.getWaveData(channel).length  + "  " + this.getSampleDuration());
 
 			System.arraycopy(this.getWaveData(channel), minBin, waveformTrim, 0, Math.min(this.getWaveData(channel).length-minBin-1, waveformTrim.length));
 
@@ -187,9 +187,10 @@ public class RawDataTransforms {
 	 * 
 	 * @param channel channel number
 	 * @param fftLength
+	 * @param Hann - true to use hanning window
 	 * @return Power spectrum
 	 */
-	public  double[] getPowerSpectrum(int channel, int fftLength) {
+	public  double[] getPowerSpectrum(int channel, int fftLength, boolean Hann) {
 		synchronized (synchObject) {
 			if (powerSpectra == null) {
 				powerSpectra = new double[PamUtils.getNumChannels(dataUnit.getChannelBitmap())][];
@@ -200,7 +201,13 @@ public class RawDataTransforms {
 
 			if (powerSpectra[channel] == null
 					|| powerSpectra[channel].length != fftLength / 2) {
-				ComplexArray cData = getComplexSpectrumHann(channel, fftLength);
+				ComplexArray cData;
+				if (Hann) {
+					cData = getComplexSpectrumHann(channel, fftLength);
+				}
+				else {
+					cData = getComplexSpectrum(channel, fftLength);
+				}
 				currentSpecLen = fftLength;
 				powerSpectra[channel] = cData.magsq();
 				if (powerSpectra==null){
@@ -215,6 +222,19 @@ public class RawDataTransforms {
 			return powerSpectra[channel];
 		}
 	}
+
+	/**
+	 * Returns the power spectrum for a given channel (square of magnitude of
+	 * complex spectrum)
+	 * 
+	 * @param channel channel number
+	 * @param fftLength
+	 * @return Power spectrum
+	 */
+	public  double[] getPowerSpectrum(int channel, int fftLength) {
+		return getPowerSpectrum( channel,  fftLength, true); 
+	}
+
 
 
 	/**
@@ -410,7 +430,7 @@ public class RawDataTransforms {
 				paddedRawData = new double[fftLength];
 				rawData = getWaveData(channel);
 				//double[] rotData = getRotationCorrection(channel);
-				
+
 				/**
 				 *FIXME
 				 * 11/07 Changed from getSampleDuration because an error sometimes occurs where the sample duration
@@ -418,7 +438,7 @@ public class RawDataTransforms {
 				 */
 				//mn = Math.min(fftLength, getSampleDuration().intValue());
 				mn = Math.min(fftLength, rawData.length);
-//				System.out.println("fftLength: " + rawData.length + " " + getSampleDuration().intValue() + " mn " +mn);
+				//				System.out.println("fftLength: " + rawData.length + " " + getSampleDuration().intValue() + " mn " +mn);
 				for (i = 0; i < mn; i++) {
 					paddedRawData[i] = rawData[i];//-rotData[i];
 				}

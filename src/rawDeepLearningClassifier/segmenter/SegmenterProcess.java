@@ -259,7 +259,7 @@ public class SegmenterProcess extends PamProcess {
 	 * A new detection data unit i.e. this is only if we have detection data which is being grouped into segments. 
 	 * @param detection - the whistle data unit. 
 	 */
-	private synchronized void newGroupData(PamDataUnit detection) {
+	public synchronized boolean newGroupData(PamDataUnit detection) {
 		
 //		PamDataUnit detection = dataUnit;
 
@@ -284,8 +284,10 @@ public class SegmenterProcess extends PamProcess {
 		//PamArrayUtils.printArray(chanGroups);
 		
 		if (index<0) {
-			return;
+			return false;
 		}
+		
+		boolean segSaved = false;
 	
 		if (segmenterDetectionGroup[index] == null || !detectionInSegment(detection,  segmenterDetectionGroup[index])) {
 			
@@ -309,38 +311,49 @@ public class SegmenterProcess extends PamProcess {
 			}
 			
 			while(!detectionInSegment(detection,  segmentStart,  segmenterEnd)) {
-				System.out.println("Detection in segment: " + segmentStart + " det millis: " + detection.getTimeMilliseconds()); 
+				//System.out.println("Detection in segment: " + segmentStart + " det millis: " + detection.getTimeMilliseconds()); 
 				
 				if (detection.getTimeMilliseconds()<segmentStart) {
 					//something has gone quite wrong
 					System.err.println("rawdeepLearningClassifier.segmenterProcess: Detection: " +  detection.getUID() + 
 							" was detected before the segment?  " + "seg start: " + segmentStart + " det start: " +detection.getTimeMilliseconds() );
-					return;
+					return false;
 				}
 				
-				nextGroupSegment(index);
+				segSaved = nextGroupSegment(index);
+				
 			}
 		}
 		
 		segmenterDetectionGroup[index].addSubDetection(detection);
 		//System.out.println("Segment sub detection count: " + 	segmenterDetectionGroup[index].getSubDetectionsCount()); 
+		
+		return segSaved;
 	}
 	
 	/**
 	 * Iterate to the next group segment
 	 * @param index - the group index;
 	 */
-	private void nextGroupSegment(int index) {
+	private boolean nextGroupSegment(int index) {
 		
 //		System.out.println("----------------------------------");
 
 		segmentStart = (long) (segmentStart+ getSegmentHopMillis());
 		segmenterEnd = (long) (segmentStart + getSegmentLenMillis());
 		
-		newGroupSegment(index);
+		return newGroupSegment(index);
 	}
 	
-	private void newGroupSegment(int index) {
+	/**
+	 * Create a new group segment based on the current segmentStart and segmentEnd fields. Will saved the previous segment if 
+	 * it exists and contains more than one sub detection. 
+	 * @param index - the segment group index (i.e. channel group index)
+	 * @return true of a segment has completed and saved to the segment group data block. 
+	 */
+	private boolean newGroupSegment(int index) {
+		boolean segSaved = false;
+		
 		int[] chanGroups = dlControl.getDLParams().groupedSourceParams.getChannelGroups();
 
 		long startSample = this.absMillisecondsToSamples(segmentStart);
@@ -367,10 +380,13 @@ public class SegmenterProcess extends PamProcess {
 
 			if (segmenterDetectionGroup[index].getSubDetectionsCount()>0) {
 				this.segmenterGroupDataBlock.addPamData(segmenterDetectionGroup[index]);
+				segSaved=true;
 			}
 		}
 		
 		segmenterDetectionGroup[index] = aSegment;
+		
+		return segSaved;
 	}
 	
 	private boolean detectionInSegment(PamDataUnit dataUnit, SegmenterDetectionGroup segmenterDetectionGroup2) {
@@ -897,7 +913,7 @@ public class SegmenterProcess extends PamProcess {
 	}
 
 
-	public SegmenterGroupDataBlock getSegmenteGrouprDataBlock() {
+	public SegmenterGroupDataBlock getSegmenteGroupDataBlock() {
 		return this.segmenterGroupDataBlock;
 	}
 

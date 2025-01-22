@@ -25,7 +25,7 @@ public class DLGroupDetectionLogging extends SuperDetLogging {
 
 	private DLControl dlControl;
 	
-	private PamTableItem duration, startsample;
+	private PamTableItem duration, startsample, nSubDet;
 	
 	
 
@@ -40,6 +40,8 @@ public class DLGroupDetectionLogging extends SuperDetLogging {
 //		System.out.println("Save deep learning group: " + ((SuperDetection) pamDataUnit).getSubDetectionsCount());
 		duration.setValue(pamDataUnit.getDurationInMilliseconds());
 		startsample.setValue(pamDataUnit.getStartSample());
+		nSubDet.setValue(((SuperDetection) pamDataUnit).getSubDetectionsCount());
+
 	}
 
 	public DLControl getDLControl() {
@@ -55,6 +57,7 @@ public class DLGroupDetectionLogging extends SuperDetLogging {
 		PamTableDefinition tableDef = new PamTableDefinition(dlControl.getUnitName(), UPDATE_POLICY_OVERWRITE);
 		tableDef.addTableItem(duration 	= new PamTableItem("Duration_millis", Types.DOUBLE));
 		tableDef.addTableItem(startsample 	= new PamTableItem("start_sample", Types.LONGNVARCHAR));
+		tableDef.addTableItem(nSubDet 	= new PamTableItem("n_subdetections", Types.LONGNVARCHAR));
 
 		return tableDef;
 	}

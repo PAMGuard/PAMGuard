@@ -252,7 +252,8 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 
 		// classify the raw data segments.
 		addPamProcess(dlClassifyProcess = new DLClassifyProcess(this, segmenterProcess.getSegmenterDataBlock()));
-		dlClassifyProcess.addMultiPlexDataBlock(segmenterProcess.getSegmenteGrouprDataBlock());
+		//also add group data - rare to have to into datablocks  but this will work.  
+		dlClassifyProcess.addMultiPlexDataBlock(segmenterProcess.getSegmenteGroupDataBlock());
 
 		//manages the names assigned to different output classes. 
 		dlClassNameManager = new DLClassNameManager(this);

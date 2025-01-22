@@ -20,14 +20,14 @@ public class Clicks2Spectrum {
 	private Spectrum spectrum;
 
 
-	public Clicks2Spectrum(SegmenterDetectionGroup clickGroup, int fftLen, boolean spectradB) {
-		this.spectrum = clicks2Spectrum(clickGroup.getSubDetections(), clickGroup.getSampleRate(), fftLen, spectradB);
+	public Clicks2Spectrum(SegmenterDetectionGroup clickGroup, int fftLen, boolean spectradB, boolean hann) {
+		this.spectrum = clicks2Spectrum(clickGroup.getSubDetections(), clickGroup.getSampleRate(), fftLen, spectradB, hann);
 	}
 	
 	
 
 	public Clicks2Spectrum(SegmenterDetectionGroup clickGroup, Clks2SpectrumParams transformParams) {
-		this(clickGroup, transformParams.fftLength, transformParams.spectrumdB); 
+		this(clickGroup, transformParams.fftLength, transformParams.spectrumdB, transformParams.hann); 
 	}
 
 
@@ -42,7 +42,7 @@ public class Clicks2Spectrum {
 	 * @param spectrumdB - true to average the log spectra instead of linear spectra
 	 * @return the average spectrum. 
 	 */
-	public static Spectrum clicks2Spectrum(ArrayList<? extends PamDataUnit> arrayList, float sampleRate, int fftLen, boolean spectrumdB) {
+	public static Spectrum clicks2Spectrum(ArrayList<? extends PamDataUnit> arrayList, float sampleRate, int fftLen, boolean spectrumdB, boolean hann) {
 
 
 		//create an average spectrum
@@ -50,7 +50,7 @@ public class Clicks2Spectrum {
 		double[] fftClk;
 		for (int i=0;i<arrayList.size(); i++) {
 			
-			fftClk = ((RawDataHolder) arrayList.get(i)).getDataTransforms().getPowerSpectrum(0, fftLen); 
+			fftClk = ((RawDataHolder) arrayList.get(i)).getDataTransforms().getPowerSpectrum(0, fftLen, hann); 
 			
 //			 ComplexArray arr = RawDataTransforms.getComplexSpectrumHann(((RawDataHolder) arrayList.get(i)).getWaveData()[0], fftLen); 
 			
@@ -65,7 +65,12 @@ public class Clicks2Spectrum {
 
 				//convert to log
 				for (int j=0; j<fftClk.length; j++) {
-					fftClkdB=20*Math.log10(fftClk[j]); 
+					if (spectrumdB) {
+						fftClkdB=20*Math.log10(fftClk[j]); 
+					}
+					else {
+						fftClkdB=fftClk[j]; 
+					}
 //					if (Double.isNaN(fftClkdB)) {
 //						System.out.println("Point is NaN: " + i + "  " + j + "  " + fftClk[j]); 
 //					}
@@ -106,6 +111,11 @@ public class Clicks2Spectrum {
 		 * True to average log spectra instead of linear spectra
 		 */
 		public boolean spectrumdB = true;
+
+		/**
+		 * True to apply a hanning window to click wave before FFT. 
+		 */
+		public boolean hann = false;
 
 		/**
 		 * Set the FFT length in samples

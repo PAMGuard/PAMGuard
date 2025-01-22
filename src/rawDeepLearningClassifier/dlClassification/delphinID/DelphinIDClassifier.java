@@ -112,7 +112,7 @@ public class DelphinIDClassifier extends StandardClassifierModel {
 
 		//add an extra test to see if the detection pre count has passed. 
 		
-		//System.out.println("Run delphinID model: " + (((SegmenterDetectionGroup) groupedRawData.get(0)).getSubDetectionsCount()));
+		System.out.println("Run delphinID model: " + (((SegmenterDetectionGroup) groupedRawData.get(0)).getSubDetectionsCount()) + " min clicks: " + delphinIDParams.minDetectionValue);
 
 		if (detectionPreFilter(groupedRawData)) {
 			return super.runModel(groupedRawData);
