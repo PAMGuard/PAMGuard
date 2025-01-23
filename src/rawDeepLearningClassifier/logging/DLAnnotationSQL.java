@@ -95,7 +95,7 @@ public class DLAnnotationSQL implements SQLLoggingAddon   {
 	 * @param predicitonType - the prediction object type e.g.ModelResultBinaryFactory.GENERIC
 	 * @return a list of prediction objects. 
 	 */
-	private ArrayList<PredictionResult> string2Predictions(String predictionsString, int predicitonType) {
+	public static ArrayList<PredictionResult> string2Predictions(String predictionsString, int predicitonType) {
 		ArrayList<PredictionResult> modelResults = new ArrayList<PredictionResult>(); 
 
 	    JSONObject jsonObject = new JSONObject(predictionsString);
@@ -134,7 +134,7 @@ public class DLAnnotationSQL implements SQLLoggingAddon   {
 	 * @param predictions - the spectrum. 
 	 * @return string representation for the predictions in JSON format
 	 */
-	private String prediction2String(ArrayList<PredictionResult> arrayList) {
+	public static String prediction2String(ArrayList<PredictionResult> arrayList) {
 
 		if (arrayList == null) {
 			return "null";

@@ -30,9 +30,10 @@ public class DLOfflineTask extends OfflineTask<PamDataUnit<?,?>>{
 
 		super.addAffectedDataBlock(this.dlControl.getDLClassifyProcess().getDLDetectionDatablock());
 		super.addAffectedDataBlock(this.dlControl.getDLClassifyProcess().getDLGroupDetectionDataBlock()); //important so data are deleted. 
+		
 		//prediction data block may also be affected. 
 		super.addAffectedDataBlock(this.dlControl.getDLClassifyProcess().getDLPredictionDataBlock());
-		
+
 //		//group detections are a little difficult because they only appear after
 //		dlControl.getDLClassifyProcess().getDLGroupDetectionDataBlock().addInstantObserver(new GroupObserver(this));
 	}
@@ -60,7 +61,7 @@ public class DLOfflineTask extends OfflineTask<PamDataUnit<?,?>>{
 //				System.out.println("Added data to group: " + dataUnit.getUID()); 
 				
 				if (newGroup) {
-					System.out.println("New SEGMENT run classifier: "); 
+					//System.out.println("New SEGMENT run classifier: "); 
 
 					//have to manually add this as the group data is a multiplex data block. 
 					dlControl.getDLClassifyProcess().newData(null, dlControl.getSegmenter().getSegmenteGroupDataBlock().getFirstUnit());
@@ -88,12 +89,14 @@ public class DLOfflineTask extends OfflineTask<PamDataUnit<?,?>>{
 				//must be called or can result in memory leak. 
 				dlControl.getSegmenter().getSegmenterDataBlock().clearAll();
 				
+				//must be called or can result in memory leak. 
+				dlControl.getDLClassifyProcess().getDLPredictionDataBlock().clearAll();
+				
 				saveBinary = true;
 
 			};
 			
-			//must be called or can result in memory leak. 
-			dlControl.getDLClassifyProcess().getDLPredictionDataBlock().clearAll();
+
 			
 			//		/**
 			//		 * So the issue here is that the classification is not on the same thread...
@@ -115,10 +118,11 @@ public class DLOfflineTask extends OfflineTask<PamDataUnit<?,?>>{
 		count=0; 
 		prepProcess(); 
 				
-		//this is important so that the offline taks knows that the 
+		//this is important so that the offline tasks knows that the 
 		//parent datablock (e.g. if clicks or clips) needs to be saved because
 		// an annotation has been added to it. 
 		super.addAffectedDataBlock(dlControl.getParentDataBlock());
+		
 		super.getOfflineTaskGroup().setSummaryLists();
 		
 //		for (int i=0; i<super.getNumAffectedDataBlocks(); i++) {
@@ -126,6 +130,7 @@ public class DLOfflineTask extends OfflineTask<PamDataUnit<?,?>>{
 //		}
 
 		this.setParentDataBlock(dlControl.getParentDataBlock());
+		
 		//dlControl.setNotifyProcesses(true);
 		this.dlControl.getDLModel().prepModel(); 
 		

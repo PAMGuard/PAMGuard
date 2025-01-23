@@ -50,7 +50,7 @@ public class DelphinIDWhistleTest {
 
 		
 		//0.21068583	0.28237167	0.07045266	0.1493272	0.041739468	0.04061936	0.2048038
-		String matout = "/Users/au671271/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/delphinID/whistle1D/whistle_spectrums.mat";
+		String matout = "/Users/jdjm/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/delphinID/whistle1D/whistle_spectrums.mat";
 		testDelphinIDSpectrumModel(matout);
 		
 
@@ -387,11 +387,11 @@ public class DelphinIDWhistleTest {
 		long dataStartMillis = 1340212413000L;
 
 		//path to the .mat containing whistle contours. 
-		String whistleContourPath = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/whistle_contours_20200918_123234.mat";
+		String whistleContourPath = "/Users/jdjm/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/whistle_contours_20200918_123234.mat";
 
 		//the path to the model
-		//String modelPath = "D:/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/testencounter415/whistle_model_2/whistle_4s_415.zip";
-		String modelPath = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/whistleclassifier.zip";
+		//String modelPath = "D:/Dropbox/jdjm/Deep_Learning/delphinID/testencounter415/whistle_model_2/whistle_4s_415.zip";
+		String modelPath = "/Users/jdjm/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/whistleclassifier.zip";
 		//		String modelPath =  "./src/test/resources/rawDeepLearningClassifier/DelphinID/whistle_4s_415_model.zip";
 
 		boolean whistleOK = runWhistleModel( modelPath,  whistleContourPath,  matImageSave,  startSeconds,  segLen,  segHop);

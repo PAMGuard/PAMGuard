@@ -280,10 +280,11 @@ public class DLClassifyProcess extends PamInstantProcess {
 
 		DLDataUnit dlDataUnit =  predictionToDataUnit(detectionGroup, modelResult);
 
-		this.dlModelResultDataBlock.addPamData(dlDataUnit); //here
-
-		System.out.println("DELPHINID - we have a detection: " + detectionGroup.getUID() + "  " + PamCalendar.formatDateTime(detectionGroup.getTimeMilliseconds())); 
-
+		System.out.println("Add predictions: " + dlDataUnit.getPredicitionResult().getPrediction());
+		//add to the model result. 
+		this.dlModelResultDataBlock.addPamData(dlDataUnit);
+		
+//		System.out.println("DELPHINID - we have a detection: " + detectionGroup.getUID() + "  " + PamCalendar.formatDateTime(detectionGroup.getTimeMilliseconds())); 
 //		//Now generate a detection of a decision threshold is reacheed. 
 //		if (dlDataUnit.getPredicitionResult().isBinaryClassification()) {
 //			System.out.println("DELPHINID - we have a positive detection: " + detectionGroup.getUID() + "  " + PamCalendar.formatDateTime(detectionGroup.getTimeMilliseconds())); 

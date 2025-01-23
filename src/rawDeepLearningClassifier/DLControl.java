@@ -60,6 +60,7 @@ import rawDeepLearningClassifier.logging.DLDetectionDatagram;
 import rawDeepLearningClassifier.logging.DLGroupDetectionLogging;
 import rawDeepLearningClassifier.logging.DLGroupSubLogging;
 import rawDeepLearningClassifier.logging.DLResultBinarySource;
+import rawDeepLearningClassifier.logging.DLResultLogging;
 import rawDeepLearningClassifier.offline.DLOfflineProcess;
 import rawDeepLearningClassifier.segmenter.SegmenterProcess;
 
@@ -185,6 +186,18 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	 * The binary data source for detection data
 	 */
 	private DLDetectionBinarySource dlDetectionBinarySource;
+	
+	/**
+	 * DL Group detection logging to database
+	 */
+	private DLGroupDetectionLogging dlGroupDetLogging;
+	
+	
+	/**
+	 * Logging for raw predictions to database
+	 */
+	private DLResultLogging dlResultLogging;
+
 
 	/**
 	 * The DL offline process.
@@ -214,16 +227,13 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 	 */
 	private DLDefaultModelManager defaultModelManager;
 	
-	/**
-	 * DL Group detection logging. 
-	 */
-	private DLGroupDetectionLogging dlGroupDetLogging;
 
 	/**
 	 * If true then detections are saved to a group and all detections within a segment are then
 	 * passed to the deep learning classifier.
 	 */
 	private boolean groupDetections = false;
+
 
 	
 	
@@ -268,6 +278,7 @@ public class DLControl extends PamControlledUnit implements PamSettings {
 		// add storage options etc.
 		dlBinaryDataSource = new DLResultBinarySource(dlClassifyProcess);
 		dlClassifyProcess.getDLPredictionDataBlock().setBinaryDataSource(dlBinaryDataSource);
+		dlClassifyProcess.getDLPredictionDataBlock().SetLogging(dlResultLogging = new DLResultLogging(this, dlClassifyProcess.getDLPredictionDataBlock()));
 		dlClassifyProcess.getDLPredictionDataBlock().setDatagramProvider(new DLDataUnitDatagram(this));
 
 		dlDetectionBinarySource = new DLDetectionBinarySource(this, dlClassifyProcess.getDLDetectionDatablock());

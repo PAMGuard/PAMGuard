@@ -54,9 +54,9 @@ public class DLGroupDetectionLogging extends SuperDetLogging {
 	 * @return basic table - annotations will be added shortly !
 	 */
 	public PamTableDefinition createBaseTable() {
-		PamTableDefinition tableDef = new PamTableDefinition(dlControl.getUnitName(), UPDATE_POLICY_OVERWRITE);
+		PamTableDefinition tableDef = new PamTableDefinition(dlControl.getUnitName()+"_Group_Detections", UPDATE_POLICY_OVERWRITE);
 		tableDef.addTableItem(duration 	= new PamTableItem("Duration_millis", Types.DOUBLE));
-		tableDef.addTableItem(startsample 	= new PamTableItem("start_sample", Types.LONGNVARCHAR));
+		tableDef.addTableItem(startsample 	= new PamTableItem("Start_sample", Types.LONGNVARCHAR));
 		tableDef.addTableItem(nSubDet 	= new PamTableItem("n_subdetections", Types.LONGNVARCHAR));
 
 		return tableDef;
