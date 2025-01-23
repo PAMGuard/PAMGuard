@@ -15,6 +15,7 @@ import Localiser.algorithms.timeDelayLocalisers.bearingLoc.OldAngleConverter;
 import PamUtils.PamUtils;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
+import PamguardMVC.PamProcess;
 import binaryFileStorage.BinaryDataSource;
 import binaryFileStorage.BinaryHeader;
 import binaryFileStorage.BinaryObjectData;
@@ -386,7 +387,10 @@ public class ClickBinaryDataSource extends BinaryDataSource {
 //			newClick.setMeasuredAmplitude(allMax/nChan);
 //			newClick.setMeasuredAmplitudeType(AcousticDataUnit.AMPLITUDE_SCALE_LINREFSD);
 			if (acquisitionProcess == null) {
-				acquisitionProcess = (AcquisitionProcess) clickDetector.getSourceProcess();
+				PamProcess sourceProcess = clickDetector.getSourceProcess();
+				if (sourceProcess instanceof AcquisitionProcess) {
+					acquisitionProcess = (AcquisitionProcess) clickDetector.getSourceProcess();
+				}
 			}
 			if (acquisitionProcess != null) {
 				newClick.setCalculatedAmlitudeDB(acquisitionProcess.
@@ -425,7 +429,8 @@ public class ClickBinaryDataSource extends BinaryDataSource {
 			System.out.println("IOException in Click binary file: " + e1.getMessage());
 			return null;
 		} catch (Exception e) {
-			System.out.println("Error in Click binary file: " + e.getMessage());
+			System.out.println("Error in ClickBinaryDataSource: " + e.getMessage());
+//			e.printStackTrace();
 //			return null;
 		}
 		

@@ -1276,6 +1276,11 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 			geom.setXM(hydLocs.getCoordinate(0));
 			geom.setYM(hydLocs.getCoordinate(1));
 			geom.setZM(hydLocs.getCoordinate(2));
+			audio.setGeometry(geom);
+			String hType = aPhone.getType();
+			if (hType != null && hType.length()>0) {
+				audio.setName(hType);
+			}
 //			Geometry geom = new Geometry();
 //			audio.setGeometry(geom);
 ////			nilusHelper.
