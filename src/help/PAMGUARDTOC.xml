@@ -216,6 +216,8 @@
 
    <tocitem text="Batch output " target="utilities.tethys.docs.tethys_batch" image="topic"/>
 
+   <tocitem text="PAMGuard Mapping " target="utilities.tethys.docs.tethys_mappings" image="topic"/>
+
   </tocitem>
  </tocitem>
  <tocitem text="Sensors ">

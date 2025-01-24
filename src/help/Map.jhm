@@ -636,6 +636,8 @@
 
 <mapID target="sound_processing.beamformer.docs.Beamformer_Overview" url="sound_processing/beamformer/docs/Beamformer_Overview.html"/>
 
+<mapID target="utilities.tethys.docs.tethys_mappings" url="utilities/tethys/docs/tethys_mappings.html"/>
+
 <mapID target="sound_processing.FiltersHelp.Docs.Filters_types" url="sound_processing/FiltersHelp/Docs/Filters_types.html"/>
 
 <mapID target="detectors.Pam3DHelp.docs.guiOverview" url="detectors/Pam3DHelp/docs/guiOverview.html"/>
