@@ -2,34 +2,105 @@
     "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en">
 <head>
-    <link href="../../../pamHelpStylesheet.css" type="text/css" rel="STYLESHEET">
-    <title>Tethys PAMGuard Mappings</title>
+<link href="../../../pamHelpStylesheet.css" type="text/css"
+	rel="STYLESHEET">
+<title>Tethys PAMGuard Mappings</title>
 </head>
 <body>
-    <h1>Tethys Mappings</h1>
-    <br>
-    <h3>Introduction</h3>
-  
-    <p>It is important that when PAMGuard Viewer is connected to a Tethys database, that it can 
-    correctly display lists of Tethys documents for that PAMGuard dataset. This help page explains the 
-    relationships between PAMGuard datasets and Tethys documents. </p>
-    <p>A PAMGuard dataset is likely to consist of a database, and of a folder of binary files. There may
-    also be sound recordings, though these are not required here.  </p>
-    <p>A Tethys database is likely to contain data from multiple PAMGuard datasets. These will be in the form of 
-    Calibration, Deployment, Detection, and Localization documents. Because the database name may change for a 
-    PAMGuard dataset, it is not used in the relationships between PAMGaurd and Tethys. Instead, the
-    relationship relies on the Project name and on Instrument identification from the Array Manager.</p>
-     
-    <h3>Deployments</h3>
-    <p>
-        Deployment documents are at the heart of the link between PAMGuard and Tethys. 
-    </p>
-    
-    <br>
-    <br>
-    <p class="prevLink"><a href="tethys_quickstart.html">Previous: Quick Start</a></p>
-    <br>
-    <br>
-    <br>
+	<h1>Tethys Mappings</h1>
+	<br>
+	<h3>Introduction</h3>
+
+	<p>It is important that when the PAMGuard Viewer is connected to a
+		Tethys database, that it can correctly display lists of Tethys
+		documents for that PAMGuard dataset. This help page explains the
+		relationships between PAMGuard datasets and Tethys documents.</p>
+	<p>A PAMGuard dataset is likely to consist of a database, and of a
+		folder of binary files. There may also be sound recordings, though
+		these are not required here.</p>
+
+	<p>
+		A Tethys database is likely to contain data from multiple PAMGuard
+		datasets. These will be in the form of Calibration, Deployment,
+		Detection, and Localization documents. Because the database name may
+		change for a PAMGuard dataset, it is not used in the relationships
+		between PAMGaurd and Tethys. Instead, the relationship relies on the <b>Project</b>
+		name and on <b>Instrument Id</b> from the Array Manager. Because a
+		project may have made several deployments using the same instrument,
+		the dates of the Deployment are also used.
+	</p>
+	<p>
+	Each document in a Tethys database has a <b>Name</b> (analogous to a file name and will indeed
+	be the name of the temporary file created when the data were exported) and an <b>Id</b> (often 
+	referred to as the Document Id for clarity). For Deployment, Detections, and Localizations 
+	documents, PAMGuard will always use the same Name and Id. This is not possible for Calibrations, 
+	since there may be multiple copies of Calibrations documents <a href="#calibrations">(see below)</a>. 
+	</p>
+
+	<h3>Deployments</h3>
+	<p>Deployment documents are at the heart of the link between
+		PAMGuard and Tethys. These are identified by the <b>Project Name</b>
+		from the Projects metadata, and the
+		<b>Instrument Id</b> from the Array Manager. When you open a PAMGuard dataset
+		in Viewer mode, PAMGuard will query the Tethys database for all
+		Deployment documents that have the same Project Name and the same
+		Instrument Id and then from that list it will select those deployments
+		which overlap in time with the PAMGuard data. The Instrument
+		Type in the Array Manager is not used in this linkage.</p>
+	<p>This system is robust, since it is impossible to have the
+		same instrument in two places at the same time. However it does
+		require care on the part of the user to be consistent and careful in
+		setting the Project Name and Instrument Id in PAMGuard.</p>
+		<p>For a static mooring, whether recording continuously or on a duty
+		cycle, there will be one Deployment document for each PAMGuard dataset.</p>
+		<p>For vessel based surveys, where data collection periods may have been more
+		ad-hoc (for instance only during the day time or periods of good weather), there may
+		be multiple Deployment documents, one for each recording period.</p>
+		
+	<h3>Detections and Localizations</h3>
+	<p>Every Detections and Localizations document has a cross reference to a 
+	Deployment document. Therefore, to find these documents, PAMGuard first searches
+	the database for matching Deployment documents, then for every Deployment document
+	matched to the dataset, it runs additional queries to search for Detections and 
+	Localisations that match each Deployment. </p>
+	
+	<a name="calibrations"><h3>Calibrations</h3></a>
+	<p>Calibrations documents should be created for every hydrophone or microphone within
+	the "Instrument" used for a deployment. Because a device may be reused on many 
+	Deployments or even across multiple Projects, and it may or may not have been calibrated for each one (or perhaps calibrated
+	twice for each Deployment - before and after), the relationship between Calibrations, Deployments, 
+	and a PAMGuard dataset can be more complex.  </p>
+	<p>PAMGuard creates a name for each calibration document consisting of the Instrument Name and the Instrument Id from 
+	the Array Manager and the channel number. Spaces in names are replaced with underscore characters. 
+	e.g. if a Instrument Name was "SoundTrap HF600" and the Instrument Id was "64232", and the channel number 0, then 
+	the calibration document Id would be	</p>
+	<code>
+	SoundTrap_HF600_64232_ch00
+	</code>
+	<p>However, since there may be multiple calibration documents for the same device, the document name would also contain
+	todays date, and would be something like</p>
+	<code>
+	SoundTrap_HF600_64232_250112_ch0
+	</code>
+	<p>for a document created on 12 January, 2025.</p>
+	<p>When querying the Tethys database for matching Calibrations documents, PAMGuard first reads ALL Calibrations 
+	documents from the database, then selects all of those which have an Id starting with the combined
+	Instrument Name and Instrument Id (in this case <code>SoundTrap_HF600_64232</code>). 
+	This selection will not use the document date, since the date of the calibration may not lie within the time
+	period of the Deployment. It is therefore possible that you will see multiple copies of similar calibration 
+	documents when you link PAMGuard to a Tethys database. This is fine, the only requirement being that there 
+	is at least one calibration document for each hydrophone before PAMGuard will allow you to export Deployments
+	or Calibrations. 
+	</p> 
+	
+	<br>
+	<br>
+	<p class="prevLink">
+		<a href="tethys_speciescodes.html">Previous: Species Codes</a>
+	</p>
+	<p class="nextLink">
+		<a href="tethys_batch.html">Next: Batch Output</a>
+	</p>
+	<br>
 </body>
 </html>
