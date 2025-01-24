@@ -470,6 +470,7 @@ public class HydrophoneDialogPanel implements ActionListener, ListSelectionListe
 			if (row < 0) {
 				return;
 			}
+			arrayDialog.getParams();
 			PamArray currentArray = getDialogSelectedArray();
 			Streamer oldStreamer = currentArray.getStreamer(row);
 			Streamer streamer = StreamerDialog.showDialog(arrayDialog, currentArray, oldStreamer);

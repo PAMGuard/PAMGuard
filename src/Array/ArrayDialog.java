@@ -203,6 +203,16 @@ public class ArrayDialog extends PamDialog implements ActionListener {
 		//		new MLGridBearingLocaliser(PamUtils.makeChannelMap(array.getHydrophoneCount()), 1./96000.);
 		return true;
 	}
+	
+//	/**
+//	 * Get the params from the main dialog panel, not the
+//	 * sub panels. Sub panels may need to call this before they 
+//	 * try to do their bit to ensure central dat ais up to date. 
+//	 * @return
+//	 */
+//	public boolean getCentralParams() {
+//		
+//	}
 
 	/**
 	 * Check that all software channels are assigned before 

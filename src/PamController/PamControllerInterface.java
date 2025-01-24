@@ -414,6 +414,11 @@ public interface PamControllerInterface {
 	 * go. 
 	 */
 	public static final int READY_TO_RUN = 25;
+	
+	/**
+	 * Sent when project metadata has been updated. 
+	 */
+	public static final int PROJECT_META_UPDATE = 26;
 
 	
 
