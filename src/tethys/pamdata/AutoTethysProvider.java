@@ -367,8 +367,7 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 		// the 32 bits is set. 
 		long chanMap = dataUnit.getChannelBitmap();
 		if (chanMap < 0) chanMap += 65536L;
-		addUserDefined(detParams, "ChannelBitmap", String.format("%d", chanMap));
-		addUserDefined(detParams, "ChannelBitmapX", String.format("0X%X", chanMap));
+		addUserDefined(detParams, "ChannelBitmap", String.format("0x%X", chanMap));
 
 		return detection;
 	}

@@ -1015,6 +1015,23 @@ public class PamUtils {
 		}
 		return IndexM2;
 	}
+	
+	/**
+	 * Check if a string is empty (zero length after trip) OR null. 
+	 * @param string
+	 * @return true if it's null OR empty
+	 */
+	public static boolean emptyString(String string) {
+		if (string == null) {
+			return true;
+		}
+		string = string.trim();
+		if (string.length() == 0) {
+			return true;
+		}
+		// must be at least one no blank character
+		return false;
+	}
 
 	
 }
