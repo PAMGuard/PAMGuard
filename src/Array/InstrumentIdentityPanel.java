@@ -10,6 +10,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
+import PamUtils.PamUtils;
 import PamView.dialog.PamGridBagContraints;
 import PamView.panel.WestAlignedPanel;
 
@@ -67,7 +68,7 @@ public class InstrumentIdentityPanel {
 		if (currentArray == null) {
 			return;
 		}
-		currentArray.setInstrumentType(instrumentType.getText());
-		currentArray.setInstrumentId(instrumentId.getText());
+		currentArray.setInstrumentType(PamUtils.trimString(instrumentType.getText()));
+		currentArray.setInstrumentId(PamUtils.trimString(instrumentId.getText()));
 	}
 }

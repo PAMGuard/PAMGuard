@@ -28,6 +28,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -159,7 +160,8 @@ public class Pamguard {
 		try {
 			// get the java runnable file name. 
 			//	    	http://stackoverflow.com/questions/4294522/jar-file-name-form-java-code
-			System.out.println(Pamguard.class.getProtectionDomain().getCodeSource().getLocation());
+			URL javaFile = Pamguard.class.getProtectionDomain().getCodeSource().getLocation();
+			System.out.println(javaFile);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

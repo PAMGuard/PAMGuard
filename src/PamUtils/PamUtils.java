@@ -1032,6 +1032,18 @@ public class PamUtils {
 		// must be at least one no blank character
 		return false;
 	}
+	
+	/**
+	 * Trim a string, checking it's not null first. 
+	 * @param string
+	 * @return
+	 */
+	public static String trimString(String string) {
+		if (string == null) {
+			return null;
+		}
+		return string.trim();
+	}
 
 	
 }

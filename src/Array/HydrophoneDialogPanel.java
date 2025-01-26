@@ -260,6 +260,7 @@ public class HydrophoneDialogPanel implements ActionListener, ListSelectionListe
 	}
 	
 	public void editElement() {
+		arrayDialog.getParams();
 		PamArray currentArray = getDialogSelectedArray();
 		if (currentArray == null) return;
 		int selRow = hydrophoneTable.getSelectedRow();
