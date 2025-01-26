@@ -61,7 +61,6 @@ public class DLOfflineTask extends OfflineTask<PamDataUnit<?,?>>{
 //				System.out.println("Added data to group: " + dataUnit.getUID()); 
 				
 				if (newGroup) {
-					//System.out.println("New SEGMENT run classifier: "); 
 
 					//have to manually add this as the group data is a multiplex data block. 
 					dlControl.getDLClassifyProcess().newData(null, dlControl.getSegmenter().getSegmenteGroupDataBlock().getFirstUnit());

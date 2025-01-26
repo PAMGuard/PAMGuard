@@ -42,9 +42,9 @@ public class DelphinIDClickTest {
 		String matFileout = "/Users/jdjm/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/delphinID/click1D/clickspectrum.mat";
 		float[][] output = testDelphinIDClickSegment(matFileout, clicks); 
 
-//		//produce a set of sequntial transforms
-//		String matFileout3 = "/Users/jdjm/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/delphinID/click1D/click_transform_example.mat";
-//		exportDelphinIDClickTransforms( matFileout3,  clicks, 37); 
+		//		//produce a set of sequntial transforms
+		//		String matFileout3 = "/Users/jdjm/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/delphinID/click1D/click_transform_example.mat";
+		//		exportDelphinIDClickTransforms( matFileout3,  clicks, 37); 
 
 		//		//run the model
 		String matFileout2 = "/Users/jdjm/MATLAB-Drive/MATLAB/PAMGUARD/deep_learning/delphinID/click1D/clickspectrum_results_predictions.mat";
@@ -63,8 +63,13 @@ public class DelphinIDClickTest {
 	/*
 	/****------------------------------------------------------------------****/
 
-
 	public static float[][] testDelphinIDClickModel(String modelPath,	DetectionGroupMAT<ClickDetectionMAT> clicks, String matClickSave) {
+		return testDelphinIDClickModel( modelPath,	clicks,  matClickSave,  true);
+	}
+
+
+
+	public static float[][] testDelphinIDClickModel(String modelPath,	DetectionGroupMAT<ClickDetectionMAT> clicks, String matClickSave, boolean verbose) {
 
 		Path path = Paths.get(modelPath);
 
@@ -87,8 +92,10 @@ public class DelphinIDClickTest {
 			//Note, delphinID starts from the first whistle and NOT the first file. 
 			ArrayList<SegmenterDetectionGroup> segments  = DelphinIDUtils.segmentDetectionData(clicks.getDetections(), dataStartMillis, segLen,  segHop, hardSampleRate);
 
-			for (int i=0; i<segments.size(); i++) {
-				System.out.println("Segment " + i + " contains " + segments.get(i).getSubDetectionsCount() + " clicks"); 
+			if (verbose) {
+				for (int i=0; i<segments.size(); i++) {
+					System.out.println("Segment " + i + " contains " + segments.get(i).getSubDetectionsCount() + " clicks"); 
+				}
 			}
 
 			//prepare the model - this loads the zip file and loads the correct transforms. 
@@ -98,6 +105,8 @@ public class DelphinIDClickTest {
 
 			//initialise strcuture for image data
 			Struct imageStruct = Mat5.newStruct(segments.size(), 1);
+
+			float[][] outputs = new float[segments.size()][];
 
 			for (int i=0; i<segments.size(); i++) {
 
@@ -112,11 +121,17 @@ public class DelphinIDClickTest {
 
 					float[] output =  predicition.get(0).getPrediction();
 
-					System.out.print(String.format("Segment: %d no. clicks %d %.4f s" , i , segments.get(i).getSubDetectionsCount() ,((aSegment.get(0).getSegmentStartMillis()-dataStartMillis)/1000.)));
-					for (int j=0; j<output.length; j++) {
-						System.out.print(String.format( " %.4f" , output[j])); 
+					if (verbose) {
+						System.out.print(String.format("Segment: %d no. clicks %d %.4f s" , i , segments.get(i).getSubDetectionsCount() ,((aSegment.get(0).getSegmentStartMillis()-dataStartMillis)/1000.)));
+						for (int j=0; j<output.length; j++) {
+							System.out.print(String.format( " %.4f" , output[j])); 
+						}
+						System.out.println();
 					}
-					System.out.println();
+					
+					
+					outputs[i]=output;
+
 
 					Matrix modelinput = DLMatFile.array2Matrix(PamArrayUtils.float2Double(model.getLastModelInput()[0]));
 					imageStruct.set("modelinput", i, modelinput);
@@ -125,10 +140,13 @@ public class DelphinIDClickTest {
 					imageStruct.set("prediction", i, DLMatFile.array2Matrix(PamArrayUtils.float2Double(output)));
 				}
 				else {
+					if (verbose) {
 					System.out.println(String.format("Segment: %d no. clicks %d %s" , i , segments.get(i).getSubDetectionsCount(), "-------------------------"));
+					}
 				}
 
 				imageStruct.set("nclicks", i, Mat5.newScalar(segments.get(i).getSubDetectionsCount()));
+				
 
 			}
 
@@ -145,6 +163,8 @@ public class DelphinIDClickTest {
 					e.printStackTrace();
 				}
 			}
+
+			return outputs;
 
 
 		} catch (Exception e) {

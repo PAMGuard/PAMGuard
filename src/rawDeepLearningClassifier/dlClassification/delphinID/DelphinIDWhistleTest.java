@@ -101,7 +101,7 @@ public class DelphinIDWhistleTest {
 	 * @param segHop             - the segment hop in samples
 	 * @return true if everything worked without throwing an error.
 	 */
-	public static boolean runWhistleModel(String modelPath, String whistleContourPath, String matImageSave, double startSeconds, double segLen, double segHop) {
+	public static float[][] runWhistleModel(String modelPath, String whistleContourPath, String matImageSave, double startSeconds, double segLen, double segHop) {
 		
 		//create MatFile for saving the image data to. 
 		MatFile matFile = Mat5.newMatFile();
@@ -126,9 +126,10 @@ public class DelphinIDWhistleTest {
 		DelphinIDWorkerTest model = DelphinIDUtils.prepDelphinIDModel(path.toAbsolutePath().toString());
 		model.setEnableSoftMax(false);
 
-
 		//initialise strcuture for image data
 		Struct imageStruct = Mat5.newStruct(segments.size(), 1);
+		
+		float[][] outputs = new float[segments.size()][];
 
 		for (int i=0; i<segments.size(); i++) {
 
@@ -137,22 +138,24 @@ public class DelphinIDWhistleTest {
 			aSegment.add(segments.get(i)); 
 
 			if (segments.get(i).getSubDetectionsCount()>0) {
-			//the prediction. 
-			ArrayList<StandardPrediction> predicition = model.runModel(aSegment, sampleRate, 1);		
+				//the prediction. 
+				ArrayList<StandardPrediction> predicition = model.runModel(aSegment, sampleRate, 1);		
 
-			float[] output =  predicition.get(0).getPrediction();
+				float[] output =  predicition.get(0).getPrediction();
 
-			System.out.println();
-			System.out.print(String.format("Segment: %d %.4f s" , i ,((aSegment.get(0).getSegmentStartMillis()-dataStartMillis)/1000.)));
-			for (int j=0; j<output.length; j++) {
-				System.out.print(String.format( " %.4f" , output[j])); 
-			}
+				System.out.println();
+				System.out.print(String.format("Segment: %d %.4f s" , i ,((aSegment.get(0).getSegmentStartMillis()-dataStartMillis)/1000.)));
+				for (int j=0; j<output.length; j++) {
+					System.out.print(String.format( " %.4f" , output[j])); 
+				}
 
-			Matrix modelinput = DLMatFile.array2Matrix(PamArrayUtils.float2Double(model.getLastModelInput()[0]));
-			imageStruct.set("modelinput", i, modelinput);
-			imageStruct.set("startmillis", i, Mat5.newScalar(aSegment.get(0).getSegmentStartMillis()));
-			imageStruct.set("startseconds", i, Mat5.newScalar((aSegment.get(0).getSegmentStartMillis()-dataStartMillis)/1000.));
-			imageStruct.set("prediction", i, DLMatFile.array2Matrix(PamArrayUtils.float2Double(output)));
+				Matrix modelinput = DLMatFile.array2Matrix(PamArrayUtils.float2Double(model.getLastModelInput()[0]));
+				imageStruct.set("modelinput", i, modelinput);
+				imageStruct.set("startmillis", i, Mat5.newScalar(aSegment.get(0).getSegmentStartMillis()));
+				imageStruct.set("startseconds", i, Mat5.newScalar((aSegment.get(0).getSegmentStartMillis()-dataStartMillis)/1000.));
+				imageStruct.set("prediction", i, DLMatFile.array2Matrix(PamArrayUtils.float2Double(output)));
+				
+				outputs[i] = output;
 			}
 
 		}
@@ -172,7 +175,7 @@ public class DelphinIDWhistleTest {
 		//			System.out.println("Whislte: " + i);
 		//			PamArrayUtils.printArray(whistleContours.get(i).getFreqsHz());
 		//		}
-		return true;
+		return outputs;
 	}
 
 	
@@ -205,9 +208,9 @@ public class DelphinIDWhistleTest {
 		String modelPath = "/Users/au671271/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Dde415/whistle_4s_415_model.zip";
 		//		String modelPath =  "./src/test/resources/rawDeepLearningClassifier/DelphinID/whistle_4s_415_model.zip";
 
-		boolean whistleOK = runWhistleModel( modelPath,  whistleContourPath,  matImageSave,  startSeconds,  segLen,  segHop);
+		float[][] outputs = runWhistleModel( modelPath,  whistleContourPath,  matImageSave,  startSeconds,  segLen,  segHop);
 		
-		return whistleOK;
+		return outputs!=null;
 	}
 	
 
@@ -394,9 +397,9 @@ public class DelphinIDWhistleTest {
 		String modelPath = "/Users/jdjm/Library/CloudStorage/Dropbox/PAMGuard_dev/Deep_Learning/delphinID/delphinIDmodels/Ggr242/whistleclassifier.zip";
 		//		String modelPath =  "./src/test/resources/rawDeepLearningClassifier/DelphinID/whistle_4s_415_model.zip";
 
-		boolean whistleOK = runWhistleModel( modelPath,  whistleContourPath,  matImageSave,  startSeconds,  segLen,  segHop);
+		float[][] outputs = runWhistleModel( modelPath,  whistleContourPath,  matImageSave,  startSeconds,  segLen,  segHop);
 		
-		return whistleOK;
+		return outputs!=null;
 	}
 	
 
