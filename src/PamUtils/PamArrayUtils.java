@@ -833,6 +833,21 @@ public class PamArrayUtils {
 		}
 		return sum;
 	}
+	
+
+	/**
+	 * Sum the elements in an array 
+	 * @param  array - the array to sum.
+	 * @return the summation of all the elements in the array.
+	 */
+	public static double sum(float[] array) {
+		double sum=0; 
+		for (double val:array) {
+			sum+=val;
+		}
+		return sum;
+	}
+
 
 
 	/**

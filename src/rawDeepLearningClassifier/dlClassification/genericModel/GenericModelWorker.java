@@ -47,7 +47,7 @@ public class GenericModelWorker extends DLModelWorker<StandardPrediction> {
 				waveStack[i] = transformedDataStack[i][0];
 			}
 			
-//			System.out.println("RUN GENERIC MODEL WAVE: " + waveStack.length +  "  " + waveStack[0].length +  " " + waveStack[0][0]);
+//			System.out.println("RUN GENERIC MODEL WAVE: " + waveStack.length +  "  " + waveStack[0].length +  " " + waveStack[0][0] + "  " + PamArrayUtils.max( waveStack[0]));
 //			PamArrayUtils.printArray(waveStack[0]);
 			results =  getModel().runModel(waveStack);
 		}
@@ -108,6 +108,9 @@ public class GenericModelWorker extends DLModelWorker<StandardPrediction> {
 			
 			//use softmax or not?
 			String extension = FilenameUtils.getExtension(genericParams.modelPath);
+			
+			
+			//TODO - need to add output transforms to models
 			if (extension.equals("pb")) {
 				//TensorFlow models don't need softmax?? Need to look into this more. 
 				this.setEnableSoftMax(false);

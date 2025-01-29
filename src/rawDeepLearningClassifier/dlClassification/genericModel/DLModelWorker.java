@@ -136,6 +136,7 @@ public abstract class DLModelWorker<T> {
 			float[] prob; 
 			float[] classOut; 
 			for (int i=0; i<transformedDataStack.length; i++) {
+				
 				/**
 				 * This is super weird. Reading the documentation for copyOfRange the index from and index to are inclusive. So 
 				 * to copy the first two elements indexfrom =0 and indexto = 1. But actually it seems that this should be indexfrom =0 and indexto =2. 
@@ -143,7 +144,7 @@ public abstract class DLModelWorker<T> {
 				 */
 				classOut = Arrays.copyOfRange(output, i*numclasses, (i+1)*numclasses); 
 
-				//				System.out.println("The copyOfRange is: " + i*numclasses + " to " + ((i+1)*numclasses-1) + " class out len: " + classOut.length); 
+//								System.out.println("The copyOfRange is: " + i*numclasses + " to " + ((i+1)*numclasses-1) + " class out len: " + classOut.length); 
 
 				if (enableSoftMax) {
 					prob = new float[classOut.length]; 
