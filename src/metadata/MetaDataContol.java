@@ -109,6 +109,7 @@ public class MetaDataContol extends PamControlledUnit implements PamSettings {
 		if (newData != null) {
 			this.pamguardMetaData = newData;
 			// send around a notification ? 
+			PamController.getInstance().notifyModelChanged(PamController.PROJECT_META_UPDATE);
 		}
 	}
 	

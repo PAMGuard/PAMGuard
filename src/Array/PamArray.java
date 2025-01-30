@@ -21,6 +21,11 @@
 
 package Array;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -759,6 +764,24 @@ public class PamArray implements Serializable, Cloneable, ManagedParameters {
 	 */
 	@Override
 	public PamArray clone() {
+		try {
+			// do a deeeeep clone by serializing to a byte array and reading back out again
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			ObjectOutputStream oos;
+			oos = new ObjectOutputStream(bos);
+			oos.writeObject(this);
+			oos.close();
+			byte[] data = bos.toByteArray();
+			ByteArrayInputStream bis = new ByteArrayInputStream(data);
+			ObjectInputStream ois = new ObjectInputStream(bis);
+			PamArray cloned = (PamArray) ois.readObject();
+			ois.close();
+			return cloned;
+		} catch (IOException | ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		// if it gets here, the above failed, so do the old way
 		try {
 			PamArray pa = (PamArray) super.clone();
 			if (pa.arrayFile != null) {

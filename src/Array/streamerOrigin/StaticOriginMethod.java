@@ -350,7 +350,7 @@ public class StaticOriginMethod extends HydrophoneOriginMethod {
 			if (statPos != null) {
 				gpsData = statPos.getGpsData();
 			}
-			LatLong newLatLong = LatLongDialog.showDialog(null, gpsData, "Hydrophone array reference position");
+			LatLong newLatLong = LatLongDialog.showDialog(PamDialog.getFrame(outerPanel), gpsData, "Hydrophone array reference position");
 			if (newLatLong != null) {
 				staticOriginSettings.setStaticPosition(streamer, new GpsData(newLatLong));
 				setLatLong(newLatLong);

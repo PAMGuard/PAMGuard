@@ -22,6 +22,7 @@ import Localiser.LocalisationAlgorithmInfo;
 import PamController.PamControlledUnit;
 import PamController.PamSettings;
 import PamDetection.LocalisationInfo;
+import PamUtils.PamUtils;
 import PamguardMVC.DataAutomationInfo;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
@@ -327,8 +328,11 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 		detection.setSpeciesId(species);
 		/*
 		 * NOTE: I use channel bitmaps throughout since detections are often made on multiple channels.
+		 * However, this doesn't fit with The Tethys Standard, so am going to put the first channel
+		 * in here and add the channel map as an additional parameter. 
 		 */
-		detection.setChannel(BigInteger.valueOf(dataUnit.getChannelBitmap()));
+		int firstChannel = PamUtils.getLowestChannel(dataUnit.getChannelBitmap());
+		detection.setChannel(BigInteger.valueOf(firstChannel));
 
 		nilus.Detection.Parameters detParams = new nilus.Detection.Parameters();
 		detection.setParameters(detParams);
@@ -359,6 +363,11 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 			// only write the database index if it's > 0, i.e. is used.
 			addUserDefined(detParams, "DatabaseId", String.format("%d", dataUnit.getDatabaseIndex()));
 		}
+		// output the channel map, making sure it's positive even if last of 
+		// the 32 bits is set. 
+		long chanMap = dataUnit.getChannelBitmap();
+		if (chanMap < 0) chanMap += 65536L;
+		addUserDefined(detParams, "ChannelBitmap", String.format("0x%X", chanMap));
 
 		return detection;
 	}

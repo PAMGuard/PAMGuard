@@ -260,6 +260,7 @@ public class HydrophoneDialogPanel implements ActionListener, ListSelectionListe
 	}
 	
 	public void editElement() {
+		arrayDialog.getParams();
 		PamArray currentArray = getDialogSelectedArray();
 		if (currentArray == null) return;
 		int selRow = hydrophoneTable.getSelectedRow();
@@ -470,6 +471,7 @@ public class HydrophoneDialogPanel implements ActionListener, ListSelectionListe
 			if (row < 0) {
 				return;
 			}
+			arrayDialog.getParams();
 			PamArray currentArray = getDialogSelectedArray();
 			Streamer oldStreamer = currentArray.getStreamer(row);
 			Streamer streamer = StreamerDialog.showDialog(arrayDialog, currentArray, oldStreamer);

@@ -109,4 +109,13 @@ public class TethysNoiseDataProvider extends AutoTethysProvider {
 		return super.wantExportDialogCard(wizPanel);
 	}
 
+	@Override
+	public boolean canExportLocalisations(GranularityEnumType granularityType) {
+		/* 
+		 * will ensure that this forces it to set export of detections to true
+		 * since the granularity panel will not be shown for this data type. 
+		 */
+		return false;
+	}
+
 }

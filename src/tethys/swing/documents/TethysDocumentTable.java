@@ -33,6 +33,8 @@ import PamView.tables.SwingTableColumnWidths;
 import tethys.Collection;
 import tethys.DocumentInfo;
 import tethys.TethysControl;
+import tethys.TethysState;
+import tethys.TethysState.StateType;
 import tethys.dbxml.TethysException;
 
 /**
@@ -107,6 +109,7 @@ public class TethysDocumentTable implements PamDialogPanel {
 		mainTable.addMouseListener(new TableMouse());
 		mainTable.setRowSelectionAllowed(true);
 		mainTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		new SwingTableColumnWidths(tethysControl.getUnitName()+"docstableview", mainTable);
 	}
 	
 	/**
@@ -225,6 +228,7 @@ public class TethysDocumentTable implements PamDialogPanel {
 				System.out.println(e.getMessage());
 			}
 		}
+		tethysControl.sendStateUpdate(new TethysState(StateType.DELETEDATA, collection));
 		updateTableData();
 	}
 	
@@ -245,12 +249,13 @@ public class TethysDocumentTable implements PamDialogPanel {
 		// now it's safe to delete them. 
 		for (int i = 0; i < docInfos.length; i++) {
 			try {
-				tethysControl.getDbxmlConnect().removeDocument(docInfos[i].getCollection().collectionName(), docInfos[i].getDocumentId());
+				tethysControl.getDbxmlConnect().removeDocument(docInfos[i].getCollection().collectionName(), docInfos[i].getDocumentName());
 			} catch (TethysException e) {
 				System.out.println("Failed to delete " + docInfos[i]);
 				System.out.println(e.getMessage());
 			}
 		}
+		tethysControl.sendStateUpdate(new TethysState(StateType.DELETEDATA, collection));
 		updateTableData();
 	}
 

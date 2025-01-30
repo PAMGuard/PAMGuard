@@ -387,9 +387,9 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 		if (selection == null) {
 			return 0;
 		}
-		if (selection.length > 0) {
-			System.out.println("FolderInputSystem.makeSelFileList(): Searching for sound files in " + selection[0]);
-		}
+//		if (selection.length > 0) {
+//			System.out.println("FolderInputSystem.makeSelFileList(): Searching for sound files in " + selection[0]);
+//		}
 		return makeSelFileList(selection);
 	}
 
@@ -502,31 +502,12 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 
 		if (fileNameCombo.getSelectedIndex() >= 0) {
 			File selFile = new File(fileNameCombo.getSelectedItem().toString());
-//			if (selFile.isDirectory()) {
-//				selFile = selFile.getParentFile();
-//			}
 			fc.setCurrentDirectory(selFile);
 		}
 
 		File[] files = folderInputParameters.getSelectedFileFiles();
 		if (files != null) {
-			// if it's a folder, don't do this or it will add the folder again. 
-			// but do want to do it if there has been a selection of files.
-//			boolean isFolder = false;
-//			String lastName = null;
-//			for (int i = 0; i < files.length; i++) {
-//				isFolder |= files[i].isDirectory();
-//				lastName = files[i].getName();
-//			}
-//			if (isFolder == false) {
-				fc.setSelectedFiles(files);
-//			}
-//			else {
-//				// need to select just the last name. 
-//				fc.setSelectedFile(files[0]);
-//				fc.setSelectedFiles(files);
-////				fc.setSelectedFile(new File(lastName));
-//			}
+			fc.setSelectedFiles(files);
 		}
 
 		int ans = fc.showDialog(null, "Select files and folders");

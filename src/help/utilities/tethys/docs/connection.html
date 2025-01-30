@@ -12,11 +12,11 @@
     <br>
     <p>
       Make sure you have a <a href = "tethys_server.html">Tethys Server</a> running.  The PAMGuard interface will 
-      only work with <a href="https://tethys.sdsu.edu/tethys3/">Tethys
-      3</a> or later.  The section below specifies how to set the
+      only work with <a href="https://zenodo.org/records/13626338">Tethys
+      3.1</a> or later.  The section below specifies how to set the
       address of Tethys server address as well as determine if
       PAMGuard can communicate successfully with Tethys.  (The top
-      panel will be orange if communication is not working.
+      panel will be orange if communication is not working).
     </p>
     
     <h2>Tethys Server</h2>
@@ -27,7 +27,7 @@
       indicates the address of the Tehtys server. To change this field,
       click on the gear icon. You will be prompted to provide a computer
       address (URL) and a port. The address should start with http://
-      followed by the machine name or internet protocol address unless
+      followed by the machine name or Internet protocol address unless
       the Tethys server has been configured to use an encrypted
       connection. In this case, start the address with https://.
     </p>
@@ -45,29 +45,29 @@
       communication is not possible, the panel will be colored
       orange. Likely causes for communication failure are:
     </p>
-    <ul>
-      <li>
-	The server address or port is incorrect.
-      </li>
-      
+    
+    <ol>  
       <li>
 	Tethys has not been started on the server machine. One of the
 	main reasons that we see this is when the administrator has
 	not configured Tethys to run automatically as a service. In
 	that case, when a machine reboots (e.g., for automatic
-	operaing system updates) the server will not start
+	operating system updates) the server will not start
 	automatically. The Tethys manual explains how to configure
 	Tethys as a service that starts automatically when the machine
 	boots.
+      </li>
+      <li>
+	The server address or port is incorrect.
       </li>
       
       <li>
 	Firewall rules do not permit traffic between the machine
 	executing PAMGuard and the one hosting Tethys on the selected
-	port. If you do not have adminstrative privileges, you will
+	port. If you do not have administrative privileges, you will
 	need to contact your support team for help.
       </li>
-    </ul>
+    </ol>
     
     <h2>Project and Instrument Information</h2>
 
