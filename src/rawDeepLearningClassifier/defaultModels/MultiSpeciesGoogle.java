@@ -21,7 +21,7 @@ public class MultiSpeciesGoogle implements DLModel {
 
 	@Override
 	public String getDescription() {
-		return "Detects multiple species";
+		return "A model developed by Google to detect multiple cetacean species including Humpback, Minke, Bryde's, Blue, Fin and Right whales alongside Orca whistle, calls and echolocation clicks.";
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class MultiSpeciesGoogle implements DLModel {
 	public URI getModelURI() {
 		try {
 			//				return new URI("https://github.com/PAMGuard/deeplearningmodels/raw/master/humpback_whale_2/humpback_whale_2.zip");
-			return new URI("https://github.com/PAMGuard/deeplearningmodels/releases/download/1.0/humpback_whale_2.zip");
+			return new URI("https://github.com/PAMGuard/deeplearningmodels/releases/download/1.0/multispecies-whale-tensorflow2-default-v2.zip");
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -75,7 +75,7 @@ public class MultiSpeciesGoogle implements DLModel {
 
 		genericModelParams.dlTransfromParams = dlTransformParamsArr;
 
-		genericModelParams.defaultSegmentLen =   5. *.1000;
+		genericModelParams.defaultSegmentLen =   5. * 1000.;
 		genericModelParams.binaryClassification = new boolean[] {true};
 		genericModelParams.classNames= new DLClassName[] {
 				new DLClassName("Oo", (short) 0),
