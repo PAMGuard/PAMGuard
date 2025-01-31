@@ -64,7 +64,8 @@ public class EncounterGranularityHandler extends GranularityHandler {
 			det.setStart(TethysTimeFuncs.xmlGregCalFromMillis(dataUnit.getTimeMilliseconds()));
 			det.setEnd(TethysTimeFuncs.xmlGregCalFromMillis(dataUnit.getEndTimeInMilliseconds()));
 			det.setCount(BigInteger.ONE);
-			det.setChannel(BigInteger.valueOf(dataUnit.getChannelBitmap()));
+//			det.setChannel(BigInteger.valueOf(dataUnit.getChannelBitmap()));
+			addChannelsToMap(det, dataUnit.getChannelBitmap());
 			// this should always return something, so am going to crash if it doesn't. 
 			// may revisit this later on if we've unassigned things we don't want to label
 			// in which case they should be rejected earlier than this. 
@@ -108,7 +109,8 @@ public class EncounterGranularityHandler extends GranularityHandler {
 			long detEnd = TethysTimeFuncs.millisFromGregorianXML(aDet.getEnd());
 			if (timeMilliseconds-detEnd > maxGapMillis) {
 				// only keep if it's got a min number of calls. 
-				if (aDet.getCount().intValue() >= streamExportParams.minBinCount) {
+				if (aDet.getCount().intValue() >= streamExportParams.minEncounterCount) {
+					finaliseChannels(aDet);
 					newDetections[nGood++] = aDet;
 				}
 				// remove from set. A new one will be created only when required. 

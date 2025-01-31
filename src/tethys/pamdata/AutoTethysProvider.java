@@ -372,13 +372,19 @@ abstract public class AutoTethysProvider implements TethysDataProvider {
 		return detection;
 	}
 
-	public Element addUserDefined(Parameters parameters, String parameterName, String parameterValue) {
+	public static Element addUserDefined(Parameters parameters, String parameterName, String parameterValue) {
 		UserDefined userDefined = parameters.getUserDefined();
 		if (userDefined == null) {
 			userDefined = new UserDefined();
 			parameters.setUserDefined(userDefined);
 		}
 		Element el = null;
+		Helper helper = null;
+		try {
+			helper = new Helper();
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		}
 		try {
 			el = helper.AddAnyElement(userDefined.getAny(), parameterName, parameterValue);
 		} catch (JAXBException e) {

@@ -122,11 +122,6 @@ public class SpeciesSearchDialog extends PamDialog {
 		}
 		SearchWorker searchWorker = new SearchWorker(str);
 		searchWorker.execute();
-		// then open the dialog to block this thread. 
-		synchronized (synch) {
-			workDialog = new PamWorkDialog(getOwner(), 1, "Searching Tethys Database");
-			workDialog.setVisible(true);
-		}
 	}
 	
 	public void setMapItems(ArrayList<SpeciesMapItem> newMapItems) {
@@ -161,10 +156,6 @@ public class SpeciesSearchDialog extends PamDialog {
 			if (newMapItems == null) {
 				return 0;
 			}
-			if (workDialog != null) {
-				workDialog.setVisible(false);
-				workDialog.dispose();
-			}
 			return newMapItems.size();
 		}
 
@@ -176,10 +167,24 @@ public class SpeciesSearchDialog extends PamDialog {
 				
 			}
 			setMapItems(newMapItems);
+			synchronized (synch) {
+				if (workDialog != null) {
+					workDialog.setVisible(false);
+					workDialog.dispose();
+					workDialog = null;
+				}
+			}
 		}
 
 		@Override
 		protected void process(List<PamWorkProgressMessage> chunks) {
+			// then open the dialog to block this thread. 
+			synchronized (synch) {
+				if (workDialog == null || workDialog.isVisible() == false) {
+					workDialog = new PamWorkDialog(getOwner(), 1, "Searching Tethys Database");
+					workDialog.setVisible(true);
+				}
+			}
 			for (PamWorkProgressMessage msg : chunks) {
 				synchronized (synch) {
 					if (workDialog != null) {

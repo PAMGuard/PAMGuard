@@ -12,12 +12,25 @@ import javax.swing.border.TitledBorder;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamTextDisplay;
 
+/**
+ * A simple dialog with a progress bar, and potentially also some
+ * lines of text that can be used in conjunction with a SwingWorker to 
+ * show progress of a task that's taking some time to execute. 
+ * @author dg50
+ *
+ */
 public class PamWorkDialog extends PamDialog {
 	
 	private JProgressBar progressBar;
 	
 	private PamTextDisplay[] textRows;
 
+	/**
+	 * Create the work dialog
+	 * @param parentFrame parent frame, can be null
+	 * @param nTextRows Number of rows of text, can be 0
+	 * @param title title for the dialog. 
+	 */
 	public PamWorkDialog(Window parentFrame, int nTextRows, String title) {
 		super(parentFrame, title, false);
 		JPanel mainPanel = new JPanel();
@@ -54,6 +67,12 @@ public class PamWorkDialog extends PamDialog {
 		}
 	}
 	
+	/**
+	 * Update the dialog. The message will contain a progress as a percentage
+	 * and lines of text, all of which will be updated. The number of lines of 
+	 * text should match the number of lines set in the constructor. 
+	 * @param progressMsg
+	 */
 	public void update(PamWorkProgressMessage progressMsg) {
 		if (progressMsg == null) return;
 		Integer progress = progressMsg.progress;
