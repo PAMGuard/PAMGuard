@@ -326,7 +326,7 @@ public class SweepClassifierSet extends ClickTypeCommonParams
 		checkEnergyParamsAllocation();
 		checkPeakFreqAllocation();
 		checkZCAllocation();
-		name = "Beaked Whale";
+		setName("Beaked Whale");
 		symbol = new PamSymbol(PamSymbolType.SYMBOL_DIAMOND, 10, 10, true, Color.MAGENTA, Color.MAGENTA);
 		enableLength = false;
 		minLength = 0.1;
@@ -368,11 +368,11 @@ public class SweepClassifierSet extends ClickTypeCommonParams
 		checkEnergyParamsAllocation();
 		checkPeakFreqAllocation();
 		checkZCAllocation();
-		name = "Porpoise";
+		setName("Porpoise");
 		symbol = new PamSymbol(PamSymbolType.SYMBOL_TRIANGLEU, 10, 10, true, Color.RED, Color.RED);
 		enableLength = true;
-		minLength = 0.07;
-		maxLength = 0.1;
+		minLength = 0.03;
+		maxLength = 0.22;
 		lengthdB = 6;
 		
 		enableEnergyBands = true;
