@@ -1,0 +1,16 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Fri Aug 02 15:37:21 BST 2024
+@default-talan-https\://nexus.talanlabs.com/content/repositories/releases/.lastUpdated=1721155730838
+https\://repo1.maven.org/maven2/.error=
+file\://C\:\\Users\\dg50\\source\\repos\\PAMGuardDG/repo/.error=
+file\://C\:\\Users\\dg50\\source\\repos\\PAMGuardPAMGuard/repo/.lastUpdated=1722609441195
+https\://artifacts.unidata.ucar.edu/repository/unidata-all/.error=
+https\://nexus.bedatadriven.com/content/groups/public/.error=
+https\://artifacts.unidata.ucar.edu/repository/unidata-all/.lastUpdated=1721155730561
+https\://repo1.maven.org/maven2/.lastUpdated=1721155729103
+https\://nexus.talanlabs.com/content/repositories/releases/.error=Could not transfer artifact tethys.org\:nilus\:jar\:sources\:3.1 from/to talan (https\://nexus.talanlabs.com/content/repositories/releases/)\: nexus.talanlabs.com
+https\://maven.pkg.github.com/douggillespie/xbee-java/.error=
+file\://C\:\\Users\\dg50\\source\\repos\\PAMGuardDG/repo/.lastUpdated=1721155729822
+file\://C\:\\Users\\dg50\\source\\repos\\PAMGuardPAMGuard/repo/.error=
+https\://nexus.bedatadriven.com/content/groups/public/.lastUpdated=1721155730818
+https\://maven.pkg.github.com/douggillespie/xbee-java/.lastUpdated=1721155729785

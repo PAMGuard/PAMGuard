@@ -3,12 +3,14 @@ package tethys.species.swing;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Point;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -94,6 +96,7 @@ public class SpeciesSearchDialog extends PamDialog {
 		mainPanel.add(BorderLayout.CENTER, centPanel);
 		
 		resultTable.addMouseListener(new TableMouse());
+		resultTable.getTableHeader().addMouseListener(new TableHeaderMouse());// separate listener for header. 
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -122,6 +125,13 @@ public class SpeciesSearchDialog extends PamDialog {
 		}
 		SearchWorker searchWorker = new SearchWorker(str);
 		searchWorker.execute();
+		synchronized(synch) {
+			if (workDialog == null || workDialog.isVisible() == false) {
+				workDialog = new PamWorkDialog(getOwner(), 1, "Searching Tethys Database");
+				workDialog.setVisible(true);
+				//			System.out.println
+			}
+		}
 	}
 	
 	public void setMapItems(ArrayList<SpeciesMapItem> newMapItems) {
@@ -156,6 +166,8 @@ public class SpeciesSearchDialog extends PamDialog {
 			if (newMapItems == null) {
 				return 0;
 			}
+			pm = new PamWorkProgressMessage(100, "Search Complete");
+			publish(pm);
 			return newMapItems.size();
 		}
 
@@ -167,29 +179,35 @@ public class SpeciesSearchDialog extends PamDialog {
 				
 			}
 			setMapItems(newMapItems);
-			synchronized (synch) {
-				if (workDialog != null) {
-					workDialog.setVisible(false);
-					workDialog.dispose();
-					workDialog = null;
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					synchronized (synch) {
+						if (workDialog != null) {
+							workDialog.setVisible(false);
+							workDialog.dispose();
+							workDialog = null;
+						}
+					}
 				}
-			}
+			});
 		}
 
 		@Override
 		protected void process(List<PamWorkProgressMessage> chunks) {
 			// then open the dialog to block this thread. 
-			synchronized (synch) {
-				if (workDialog == null || workDialog.isVisible() == false) {
-					workDialog = new PamWorkDialog(getOwner(), 1, "Searching Tethys Database");
-					workDialog.setVisible(true);
-				}
-			}
+//			System.out.println("Proc chunks: " + chunks.size());
 			for (PamWorkProgressMessage msg : chunks) {
 				synchronized (synch) {
+				// if this opens here, it blocks the AWT thread until it closes. 
 					if (workDialog != null) {
 						workDialog.update(msg);
 					}
+//					if (workDialog != null && msg.progress != null) {
+//						workDialog.setVisible(false);
+//						workDialog.dispose();
+//						workDialog = null;
+//					}
 				}				
 			}
 		}
@@ -245,9 +263,64 @@ public class SpeciesSearchDialog extends PamDialog {
 			if (selectedRow >= 0 && selectedRow < speciesMapItems.size()) {
 				setSelectedItem(speciesMapItems.get(selectedRow));
 			}
+			// otherwise, the mouse is probably on the top margin ? 
+			
 			tableModel.fireTableDataChanged();
 		}
 		
+	}
+	private class TableHeaderMouse extends MouseAdapter {
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if (speciesMapItems == null) {
+				return;
+			}
+			Point point = e.getPoint();
+			int column = resultTable.columnAtPoint(point);
+			if (column < 1 || column >= tableModel.getColumnCount()) {
+				return;
+			}
+			// sort using the table data model column data. 
+			sortByColumn(column);
+			
+			tableModel.fireTableDataChanged();
+		}
+		
+	}
+
+	private int lastSortColumn;
+	private int sortDirection = 1;
+	private void sortByColumn(int column) {
+		if (speciesMapItems == null) {
+			return;
+		}
+		if (column == lastSortColumn) {
+			sortDirection = -sortDirection;
+		}
+		else {
+			sortDirection = 1;
+		}
+		lastSortColumn = column;
+		speciesMapItems.sort(new Comparator<SpeciesMapItem>() {
+			@Override
+			public int compare(SpeciesMapItem o1, SpeciesMapItem o2) {
+				Object ob1 = tableModel.getValueAt(o1, column);
+				Object ob2 = tableModel.getValueAt(o2, column);
+				if (ob1 instanceof Comparable == false || ob2 instanceof Comparable == false) {
+					ob1 = String.format("%s", ob1);
+					ob2 = String.format("%s", ob2);
+				}
+				if (ob1 instanceof Comparable && ob2 instanceof Comparable) {
+					Comparable c1 = (Comparable) ob1;
+					Comparable c2 = (Comparable) ob2;
+					return c1.compareTo(c2) * sortDirection;
+				}
+				else {
+					return 0;
+				}
+			}
+		});
 	}
 	
 	private void setSelectedItem(SpeciesMapItem selItem) {
@@ -275,6 +348,10 @@ public class SpeciesSearchDialog extends PamDialog {
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			SpeciesMapItem mapItem = speciesMapItems.get(rowIndex);
+			return getValueAt(mapItem, columnIndex);
+		}
+		
+		public Object getValueAt(SpeciesMapItem mapItem, int columnIndex) {
 			switch (columnIndex) {
 			case 0:
 				return mapItem == selectedItem;
