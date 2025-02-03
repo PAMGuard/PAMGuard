@@ -82,7 +82,7 @@ public class SourcePaneFX extends PamBorderPane {
 	/**
 	 * The title labe. Sits above the combo box. 
 	 */
-	private Label titleLabel;
+	protected Label titleLabel;
 	
 	/**
 	 * Validator for channels 
@@ -857,6 +857,22 @@ public class SourcePaneFX extends PamBorderPane {
      */
 	public PamValidator getChannelValidator() {
 		return channelValidator;
+	}
+	
+	/**
+	 * Set the title.
+	 * @param titleString - the title text
+	 */
+	public void setTitleText(String titleString) {
+		titleLabel.setText(titleString);
+	}
+	
+	
+	/**
+	 * Clear the source types. 
+	 */
+	public void clearSourceTypeList() {
+		this.sourceType.clear();
 	}
 
 }
