@@ -147,7 +147,13 @@ public class DLAnnotationSQL implements SQLLoggingAddon   {
 		for (PredictionResult result : arrayList) {
 			JSONArray rowArray = new JSONArray();
 			for (float element : result.getPrediction()) {
-				rowArray.put(element);
+				//JSON does not allow non finite numbers
+				if (Float.isFinite(element)) {
+					rowArray.put(element);
+				}
+				else {
+					rowArray.put(-1.0);
+				}
 			}
 			matrixArray.put(rowArray);
 		}

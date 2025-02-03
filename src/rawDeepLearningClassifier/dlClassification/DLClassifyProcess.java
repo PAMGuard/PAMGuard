@@ -280,7 +280,7 @@ public class DLClassifyProcess extends PamInstantProcess {
 
 		DLDataUnit dlDataUnit =  predictionToDataUnit(detectionGroup, modelResult);
 
-		System.out.println("Add predictions: " + dlDataUnit.getPredicitionResult().getPrediction());
+		//System.out.println("Add predictions: " + dlDataUnit.getPredicitionResult().getPrediction());
 		//add to the model result. 
 		this.dlModelResultDataBlock.addPamData(dlDataUnit);
 		
