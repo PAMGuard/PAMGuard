@@ -97,9 +97,25 @@ public class TethysNoiseDataProvider extends AutoTethysProvider {
 	@Override
 	public boolean wantExportDialogCard(ExportWizardCard wizPanel) {
 		if (wizPanel.getClass() == GranularityCard.class) {
+			/*
+			 *  but do also need to be certain to set the granularity to call
+			 *  and the output type to detection ! 
+			 */
+			StreamExportParams params = getTethysControl().getTethysExportParams().getStreamParams(getTethysControl(), noiseDataBlock);
+			params.exportDetections = true;
+			params.exportLocalisations = false;
 			return false;
 		}
 		return super.wantExportDialogCard(wizPanel);
+	}
+
+	@Override
+	public boolean canExportLocalisations(GranularityEnumType granularityType) {
+		/* 
+		 * will ensure that this forces it to set export of detections to true
+		 * since the granularity panel will not be shown for this data type. 
+		 */
+		return false;
 	}
 
 }

@@ -1,5 +1,6 @@
 package clickTrainDetector.offline;
 
+import PamController.PamControlledUnit;
 import PamController.PamController;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
@@ -34,7 +35,7 @@ public class ClickTrainOfflineTask extends OfflineTask<PamDataUnit<?,?>> {
 	 * @param clickTrainContol - the click train control. 
 	 */
 	public ClickTrainOfflineTask(ClickTrainControl clickTrainControl){
-		super((PamDataBlock<PamDataUnit<?, ?>>) clickTrainControl.getParentDataBlock());
+		super(clickTrainControl, (PamDataBlock<PamDataUnit<?, ?>>) clickTrainControl.getParentDataBlock());
 		//System.out.println("Offline task: Click train parent datablock: " + clickTrainControl.getParentDataBlock());
 		this.clickTrainControl=clickTrainControl; 
 //		setParentDataBlock(clickTrainControl.getParentDataBlock());
@@ -165,7 +166,12 @@ public class ClickTrainOfflineTask extends OfflineTask<PamDataUnit<?,?>> {
 		//only delete data if the click train task is selected- otherwise
 		//there may be other tasks that do not want to delete click train
 		///e.g. the click train classifier task. 
-		if (super.isDoRun()) super.deleteOldData(taskGroupParams);
+		if (super.isDoRun() && super.canRun()) super.deleteOldData(taskGroupParams);
+	}
+
+	@Override
+	public PamControlledUnit getTaskControlledUnit() {
+		return clickTrainControl;
 	}
 
 }

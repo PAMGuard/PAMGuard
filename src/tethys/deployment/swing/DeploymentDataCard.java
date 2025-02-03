@@ -1,5 +1,6 @@
 package tethys.deployment.swing;
 
+import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
@@ -16,41 +17,55 @@ import javax.swing.border.TitledBorder;
 import PamController.OfflineDataStore;
 import PamController.PamController;
 import PamView.dialog.PamGridBagContraints;
+import PamView.panel.PamAlignmentPanel;
 import PamView.wizard.PamWizard;
 import PamView.wizard.PamWizardCard;
 import nilus.Deployment;
 import tethys.TethysControl;
 import tethys.deployment.DeploymentExportOpts;
 import tethys.deployment.DeploymentHandler;
+import tethys.deployment.DutyCycleInfo;
+import tethys.deployment.SepDeployment;
 
 public class DeploymentDataCard extends PamWizardCard {
 
 	private TethysControl tethysControl;
 	private DeploymentHandler deploymentHandler;
 	
-	private JRadioButton exportOne, exportMany;
+	private JRadioButton[] numDocuments;
 
 	private JTextField[] dataStores;
 //	private JTextField rawURI, binaryURI, databaseURI;
 	private ArrayList<OfflineDataStore> offlineDataStores;
+	private JLabel dutyCycle;
 
 	public DeploymentDataCard(PamWizard pamWizard, TethysControl tethysControl) {
 		super(pamWizard, "Data");
 		this.tethysControl = tethysControl;
 		deploymentHandler = tethysControl.getDeploymentHandler();
 		ButtonGroup bg = new ButtonGroup();
-		exportOne = new JRadioButton("Export a single deployment document for all data");
-		exportMany = new JRadioButton("Export separate deployment documents for each ad-hoc recording period");
-		bg.add(exportOne);
-		bg.add(exportMany);
 		
-		
-		JPanel optsPanel = new JPanel(new GridBagLayout());
+		SepDeployment[] sepOpts = SepDeployment.values();
+		numDocuments = new JRadioButton[sepOpts.length];
+		for (int i = 0; i < sepOpts.length; i++) {
+			numDocuments[i] = new JRadioButton(sepOpts[i].toString());
+			numDocuments[i].setToolTipText(sepOpts[i].getTip());
+			bg.add(numDocuments[i]);
+		}
+
+		JPanel optsPanel = new PamAlignmentPanel(new GridBagLayout(), BorderLayout.WEST);
 		optsPanel.setBorder(new TitledBorder("Number of documents"));
 		GridBagConstraints c = new PamGridBagContraints();
-		optsPanel.add(exportOne, c);
-		c.gridy++;
-		optsPanel.add(exportMany, c);
+		for (int i = 0; i < numDocuments.length; i++) {
+			c.gridwidth = 2;
+			optsPanel.add(numDocuments[i], c);
+			c.gridy++;
+		}
+		c.gridwidth = 1;
+		optsPanel.add(new JLabel("Duty cycle: ", JLabel.RIGHT), c);
+		c.gridx++;
+		optsPanel.add(dutyCycle = new JLabel(" "), c);
+
 
 		JPanel dataPanel = new JPanel(new GridBagLayout());
 		dataPanel.setBorder(new TitledBorder("Data location"));
@@ -87,11 +102,28 @@ public class DeploymentDataCard extends PamWizardCard {
 			OfflineDataStore aStore = offlineDataStores.get(i);
 			dataStores[i].setText(aStore.getDataLocation());
 		}
+		DutyCycleInfo dsInf = deploymentHandler.getDutyCycle();
+		if (dsInf == null) {
+			dutyCycle.setText("no duty cycle information");
+		}
+		else {
+			dutyCycle.setText(dsInf.toString());
+		}
 
 	}
 
 	public boolean getParams(DeploymentExportOpts exportOptions, Deployment deployment) {
-		exportOptions.separateDeployments = exportMany.isSelected();
+		SepDeployment[] sepOpts = SepDeployment.values();
+		boolean selOk = false;
+		for (int i = 0; i < sepOpts.length; i++) {
+			if (numDocuments[i].isSelected()) {
+				exportOptions.sepDeployments = sepOpts[i];
+				selOk = true;
+			}
+		}
+		if (!selOk) {
+			return false;
+		}
 		return true;
 	}
 
@@ -103,10 +135,12 @@ public class DeploymentDataCard extends PamWizardCard {
 //		exportOptions.separateDeployments = true;
 //		exportOne.setEnabled(false);
 //		exportOne.setToolTipText("Feature not yet enabled");
+
+		SepDeployment[] sepOpts = SepDeployment.values();
+		for (int i = 0; i < sepOpts.length; i++) {
+			numDocuments[i].setSelected(exportOptions.sepDeployments == sepOpts[i]);
+		}
 		
-		
-		exportOne.setSelected(exportOptions.separateDeployments == false);
-		exportMany.setSelected(exportOptions.separateDeployments == true);
 		setParams(deployment);
 	}
 

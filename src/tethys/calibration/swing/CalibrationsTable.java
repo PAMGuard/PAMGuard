@@ -269,10 +269,7 @@ public class CalibrationsTable extends TethysGUIPanel {
 	}
 
 	public Object getPhoneString(Calibration cal) {
-		Double dbV = cal.getSensitivityV();
-		if (dbV == null) {
-			dbV = cal.getSensitivityDBV();
-		}
+		Double dbV =  cal.getSensitivityDBV();
 		if (dbV == null) {
 			return null;
 		}

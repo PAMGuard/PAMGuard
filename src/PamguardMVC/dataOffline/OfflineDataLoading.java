@@ -237,9 +237,14 @@ public class OfflineDataLoading<T extends PamDataUnit> {
 			//System.out.println(String.format("%s waited %d, %d, %d, %d during ordering load", 
 			//		getDataName(), t2-t1, t3-t2, t4-t3, t5-t4));
 
-			orderData = new OrderData(offlineDataInfo);
-			//			requestCancellationObject.cancel = true;
-			orderData.execute();
+			try {
+				orderData = new OrderData(offlineDataInfo);
+				orderData.execute();
+			}
+			catch (Exception e) {
+				// can throw if orderData gets set to null in a different thread .
+				// too complicated to try to understand threading right now and don't want to create a lock
+			}
 
 			//t = new Timer(1000, new StartOrderOnTimer(orderData));
 		} // end of order lock

@@ -191,7 +191,7 @@ public class TethysConnectionPanel extends TethysGUIPanel {
 	}
 
 	protected void createNewInstrument() {
-		PamArray updatedArray = ArrayDialog.showDialog(getTethysControl().getGuiFrame(), ArrayManager.getArrayManager());
+		PamArray updatedArray = ArrayDialog.showDialog(getTethysControl().getGuiFrame(), ArrayManager.getArrayManager(), null);
 		if (updatedArray != null) {
 			updateInstrumentsList();
 		}

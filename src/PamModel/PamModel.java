@@ -200,7 +200,6 @@ final public class PamModel implements PamSettings {
 		dependencyManager = new DependencyManager(this);
 
 		isViewer = (pamController.getRunMode() == PamController.RUN_PAMVIEW);
-		//		boolean isSMRU = PamguardVersionInfo.getReleaseType() == PamguardVersionInfo.ReleaseType.SMRU;
 
 		PamModuleInfo mi;
 
@@ -344,15 +343,16 @@ final public class PamModel implements PamSettings {
 //		mi.setHidden(SMRUEnable.isEnable() == false);
 //		mi.setMaxNumber(1);
 
-		if (pamController.getRunMode() == PamController.RUN_NETWORKRECEIVER ||
-				pamController.getRunMode() == PamController.RUN_NORMAL) {
+//		if (pamController.getRunMode() == PamController.RUN_NETWORKRECEIVER ||
+//				pamController.getRunMode() == PamController.RUN_NORMAL) {
 			mi = PamModuleInfo.registerControlledUnit("networkTransfer.receive.NetworkReceiver", "Network Receiver");
 			mi.setModulesMenuGroup(utilitiesGroup);
 			mi.setToolTipText("Receives PAMGuard data sent over the network from the Network Sender module");
 			mi.setMaxNumber(1);
 			mi.setMinNumber(pamController.getRunMode() == PamController.RUN_NETWORKRECEIVER ? 1 : 0);
 			mi.setHidden(!SMRUEnable.isEnable());
-		}
+			mi.setAllowedModes(PamPluginInterface.NOTINVIEWER);
+//		}
 
 //		mi = PamModuleInfo.registerControlledUnit("decimus.summarystring.DStrControl", "Decimus Summary Strings");
 //		mi.setModulesMenuGroup(utilitiesGroup);
@@ -366,7 +366,7 @@ final public class PamModel implements PamSettings {
 //		mi.setHidden(SMRUEnable.isEnableDecimus() == false);
 		//		}
 
-		if (isViewer) {
+//		if (isViewer) {
 			mi = PamModuleInfo.registerControlledUnit(DataMapControl.class.getName(), "Data Map");
 			mi.setModulesMenuGroup(utilitiesGroup);
 			mi.setToolTipText("Shows a summary of data density over time for large datasets");
@@ -375,7 +375,8 @@ final public class PamModel implements PamSettings {
 			}
 			mi.setMaxNumber(1);
 			mi.setHelpPoint("utilities/datamap/docs/datamap.html");
-		}
+			mi.setAllowedModes(PamPluginInterface.VIEWERONLY);
+//		}
 
 		mi = PamModuleInfo.registerControlledUnit("UserInput.UserInputController", "User input");	
 		mi.setModulesMenuGroup(utilitiesGroup);
@@ -396,7 +397,7 @@ final public class PamModel implements PamSettings {
 		mi.setHelpPoint("utilities/SIDEModule/docs/SIDE_Overview.html");
 //		mi.setHidden(SMRUEnable.isEnable() == false);
 
-		if (isViewer) {
+//		if (isViewer) {
 //			mi = PamModuleInfo.registerControlledUnit("xBatLogViewer.XBatLogControl", "XBat Log Viewer");
 //			mi.setToolTipText("Displays converted xBat log files");
 //			mi.setModulesMenuGroup(utilitiesGroup);
@@ -408,11 +409,11 @@ final public class PamModel implements PamSettings {
 //			mi.setMaxNumber(1);
 //			mi.setHidden(SMRUEnable.isEnable() == false);
 			
-
 			mi = PamModuleInfo.registerControlledUnit(TurbineOperationControl.class.getName(), TurbineOperationControl.unitType);
 			mi.setModulesMenuGroup(utilitiesGroup);
 			mi.setHidden(!SMRUEnable.isEnable());
-		}
+			mi.setAllowedModes(PamPluginInterface.VIEWERONLY);
+//		}
 
 		mi = PamModuleInfo.registerControlledUnit("alarm.AlarmControl", "Alarm");
 		mi.setToolTipText("Alerts the operator when certain detections are made");
@@ -480,20 +481,22 @@ final public class PamModel implements PamSettings {
 //		mi.setToolTipText("Project Meta Data");
 //		mi.setModulesMenuGroup(utilitiesGroup);
 //		mi.setMaxNumber(1); 
-		
+
+		mi = PamModuleInfo.registerControlledUnit(TethysControl.class.getName(), TethysControl.defaultName);
+		mi.setToolTipText("Interface to Tethys Database");
+		mi.setModulesMenuGroup(utilitiesGroup);
+		mi.setMaxNumber(1);
+		//mi.addGUICompatabilityFlag(PamGUIManager.FX); //has FX enabled GUI.
+		//			mi.setHidden(!SMRUEnable.isEnable());
+		mi.setHelpPoint("utilities/tethys/docs/tethys_overview.html");
+		mi.setAllowedModes(PamPluginInterface.VIEWERONLY);
+
 		if (isViewer) {
-			mi = PamModuleInfo.registerControlledUnit(TethysControl.class.getName(), TethysControl.defaultName);
-			mi.setToolTipText("Interface to Tethys Database");
-			mi.setModulesMenuGroup(utilitiesGroup);
-			mi.setMaxNumber(1);
-			//mi.addGUICompatabilityFlag(PamGUIManager.FX); //has FX enabled GUI.
-			mi.setHidden(!SMRUEnable.isEnable());
-			mi.setHelpPoint("utilities/tethys/docs/tethys_overview.html");
-			
 			mi = PamModuleInfo.registerControlledUnit(RavenControl.class.getName(), RavenControl.defaultName);
 			mi.setToolTipText("Import data from Raven selection tables");
 			mi.setModulesMenuGroup(utilitiesGroup);
-			mi.setHidden(!SMRUEnable.isEnable());			
+			mi.setHidden(!SMRUEnable.isEnable());		
+			mi.setAllowedModes(PamPluginInterface.VIEWERONLY);	
 			
 		}		
 		

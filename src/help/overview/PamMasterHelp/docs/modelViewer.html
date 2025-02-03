@@ -10,7 +10,7 @@
 <h2>PAMGuard Data Model Viewer</h2>
 <p><br>
   The user can configure multiple PAMGuard modules in any number of ways, depending on the application. 
-  To assist the operator to apreciate how the different modules are connected and how data flows between
+  To assist the operator to appreciate how the different modules are connected and how data flows between
   them, the<strong> Data Model Viewer</strong> shows a graphical depiction of PAMGuard Modules and the processes and 
   data within them.</p>
 <p>
@@ -22,12 +22,18 @@ In this example, eleven modules are being used in the following ways:
 
 <ol>
 
+	<li><p><b><a href="../../../utilities/hydrophoneArrayManagerHelp/docs/Array_Configuration.html">Array Manager</a></b><br>
+	Manages hydrophone locations and calibration information (always present in every configuration). &nbsp;</p></li>
+	
+	<li><p><b><a href="projectmetadata.html">Meta Data / Project Information</a></b><br>
+	Project metadata (always present in every configuration). &nbsp;</p></li>
+	
+	
+	
+	
 	<li><p><b><a href="../../../mapping/NMEA/docs/configuringNMEADataSource.html">NMEA Data Collection</a></b><br>
 	Acquires NMEA data from both GPS and AIS receivers (the data are
 	multiplexed in the AIS receiver). &nbsp;</p></li>
-
-	<li><p><b><a href="../../../mapping/AIS/docs/AISOverview.html">AIS Processing</a></b><br>
-	Takes NMEA data, identifies AIS strings and unpacks the data in them. &nbsp;</p></li>
 
 	<li><p><b><a href="../../../mapping/NMEA/docs/ConfiguringGPS.html">GPS Processing</a></b><br>
 	Takes NMEA data, identifies GPS strings and unpacks the data in them. &nbsp;</p></li>
@@ -35,29 +41,33 @@ In this example, eleven modules are being used in the following ways:
 	<li><p><b><a href="../../../mapping/mapHelp/docs/overview.html">Map</a></b><br>
 	The Map display. &nbsp;</p></li>
 	
-	<li><p><b><a href="../../../utilities/generalDatabaseHelp/docs/database_database.html">ODBC Database</a></b><br>
-	Controls writing of navigation and detector data to a database. &nbsp;</p></li>
 
-	<li><p><b><a href="../../../utilities/userInputHelp/docs/userInput.html">User Input</a></b><br>
-	Provides a form for the user to type in comments. &nbsp;</p></li>
 
 	<li><p><b><a href="../../../sound_processing/AcquisitionHelp/docs/AcquisitionOverview.html">Sound Acquisition</a></b><br>
 	Acquires audio data in real time from a sound card. &nbsp;</p></li>
+	
+	<li><p><b><a href="../../../detectors/clickDetectorHelp/docs/ClickDetector_clickDetector.html">Click Detector</a></b><br>
+	Searches for sperm whales and other odontocete clicks in teh raw audio data
+	from the sound acquisition module. &nbsp;</p></li>
 	
 	<li><p><b><a href="../../../sound_processing/fftManagerHelp/docs/FFTEngine_Overview.html">FFT (Spectrogram) Engine</a></b><br>
 	Takes audio data from the Sound Acquisition module, and then computes
 	FFT's of blocks of data. &nbsp;</p></li>
 	
-	<li><p><b><a href="../../../sound_processing/SpectrogramSmoothing/docs/SpectrogramSmoothing.html">SpectrogramSmoothing</a></b><br>
-	Takes the spectrogram data and smoothes it through convolution with a Gaussian kernel. &nbsp;</p></li>
-
-	<li><p><b><a href="../../../detectors/whistleDetectorHelp/docs/whistleDetector_Overview.html">Whistle Detector</a></b><br>
+	<li><p><b><a href="../../../detectors/whistleMoanHelp/docs/whistleMoan_Overview.html">Whistle and Moan Detector</a></b><br>
 	Searches for dolphin whistles in the smoothed spectrogram data. &nbsp;</p></li>
 
-	<li><p><b><a href="../../../detectors/clickDetectorHelp/docs/ClickDetector_clickDetector.html">Click Detector</a></b><br>
-	Searches for sperm whales and other odontocete clicks in teh raw audio data
-	from the sound acquisition module. &nbsp;</p></li>
-
+	<li><p><b><a href="../../../displays/userDisplayHelp/docs/userDisplayPanel.html">User Display</a></b><br>
+	General display panel which can show spectrograms and many other data displays, depending on your configuration. &nbsp;</p></li>
+	
+	<li><p><b><a href="../../../utilities/BinaryStore/docs/binarystore_overview.htmll">Binary Store</a></b><br>
+	Controls writing of detailed detection data to binary storage files. &nbsp;</p></li>
+	
+	<li><p><b><a href="../../../utilities/generalDatabaseHelp/docs/database_database.html">Database</a></b><br>
+	Controls writing of navigation and detector data to a database. &nbsp;</p></li>
+	
+	<li><p><b><a href="../../../sound_processing/soundPlaybackHelp/docs/soundPlayback_soundPlayback.html">Sound Output</a></b><br>
+	Plays sound back through the system speakers, or other compatible sound output device. &nbsp;</p></li>
 </ol>
 
 <p>For each module, PAMGuard processes are shown in red. Some modules contain multiple processes. 
@@ -87,7 +97,7 @@ Right clicking on blank space in the Model Viewer brings up a menu from where th
 <p>
 <br>
 <p CLASS="previousLink"><a href="ImportingModules.html">Previous: Importing Modules</a></p>
-<p CLASS="nextLink"><a href="multithreading.html">Next: Multi-threading</a></p>
+<p CLASS="nextLink"><a href="projectmetadata.html">Next: Project Information</a></p>
 <br><br><br>
 
 </body>

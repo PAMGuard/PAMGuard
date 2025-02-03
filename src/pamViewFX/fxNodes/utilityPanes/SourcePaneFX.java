@@ -22,6 +22,7 @@ import pamViewFX.fxNodes.PamBorderPane;
 import pamViewFX.fxNodes.PamVBox;
 import pamViewFX.fxNodes.pamDialogFX.PamDialogFX2AWT;
 import pamViewFX.validator.PamValidator;
+import PamController.PamConfiguration;
 import PamController.PamController;
 import PamController.PamGUIManager;
 import PamDetection.LocalisationInfo;
@@ -43,7 +44,6 @@ import PamguardMVC.PamDataBlock;
 public class SourcePaneFX extends PamBorderPane {
 
 	private ArrayList<SourceSelection> sourceType = new ArrayList<>();
-	
 	private boolean hasChannels;
 	private String borderTitle;
 	
@@ -80,17 +80,17 @@ public class SourcePaneFX extends PamBorderPane {
 	private PamVBox channelListPane;
 	
 	/**
-	 * The title label. Sits above the combo box. 
+	 * The title labe. Sits above the combo box. 
 	 */
-	protected Label titleLabel;
+	private Label titleLabel;
 	
 	/**
 	 * Validator for channels 
 	 */
     protected PamValidator channelValidator;
-    
-    
 	private Label channelLabel;
+	
+	private PamConfiguration pamConfiguration;
 
 	/**
 	 * Construct a panel with a titles border
@@ -103,13 +103,32 @@ public class SourcePaneFX extends PamBorderPane {
 		if (sourceType != null) {
 			this.sourceType.add(new SourceSelection(sourceType, includeSubClasses));
 		}
-		
 		channelValidator = new PamValidator();
 		this.setHasChannels(hasChannels);
 		this.setBorderTitle(borderTitle);
 		createPanel();
 		setSourceList();
 	}
+	/**
+	 * Construct a panel with a titles border
+	 * @param borderTitle Title to go in border
+	 * @param sourceType Data Source type
+	 * @param hasChannels Include a set of checkboxes to list available channels
+	 * @param includeSubClasses include all subclasses of sourceType in the list. 
+	 */
+	public SourcePaneFX(String borderTitle, PamConfiguration pamConfiguration, Class sourceType, boolean hasChannels, boolean includeSubClasses) {
+		if (sourceType != null) {
+			this.sourceType.add(new SourceSelection(sourceType, includeSubClasses));
+		}
+		this.pamConfiguration = pamConfiguration;
+		channelValidator = new PamValidator();
+		this.setHasChannels(hasChannels);
+		this.setBorderTitle(borderTitle);
+		createPanel();
+		setSourceList();
+	}
+	
+	
 
 	/**
 	 * Construct a panel without a border
@@ -422,7 +441,7 @@ public class SourcePaneFX extends PamBorderPane {
 	 */
 	public boolean setSource(String sourceName) {
 		// search the list for the string
-		PamDataBlock dataBlock = PamController.getInstance().getDataBlockByLongName(sourceName);
+		PamDataBlock dataBlock = getConfiguration().getDataBlockByLongName(sourceName);
 		if (dataBlock != null) {
 			setSource(dataBlock);
 			return true;
@@ -439,6 +458,15 @@ public class SourcePaneFX extends PamBorderPane {
 		//sourceList.getSelectionModel().select(0);
 		setSourceIndex(0);
 		return false;
+	}
+	
+	private PamConfiguration getConfiguration() {
+		if (pamConfiguration != null) {
+			return pamConfiguration;
+		}
+		else {
+			return PamController.getInstance().getPamConfiguration();
+		}
 	}
 	
 	/**
@@ -564,8 +592,7 @@ public class SourcePaneFX extends PamBorderPane {
 	protected List<PamDataBlock> getSourceDataBlocks() {
 		ArrayList<PamDataBlock> dataBlocks = new ArrayList<>();
 		for (SourceSelection sourceSel:sourceType) {
-			//System.out.println("SOURCE TYPE BLOCKS: " + sourceSel.sourceType + "  " + sourceType.size());
-			ArrayList<PamDataBlock> sl = PamController.getInstance().getDataBlocks(sourceSel.sourceType, sourceSel.allowSubClasses);
+			ArrayList<PamDataBlock> sl = getConfiguration().getDataBlocks(sourceSel.sourceType, sourceSel.allowSubClasses);
 			for (PamDataBlock db:sl) {
 				if (dataBlocks.contains(db) == false) {
 					dataBlocks.add(db);
@@ -831,20 +858,5 @@ public class SourcePaneFX extends PamBorderPane {
 	public PamValidator getChannelValidator() {
 		return channelValidator;
 	}
-	
-	/**
-	 * Set the title.
-	 * @param titleString - the title text
-	 */
-	public void setTitleText(String titleString) {
-		titleLabel.setText(titleString);
-	}
-	
-	
-	/**
-	 * Clear the source types. 
-	 */
-	public void clearSourceTypeList() {
-		this.sourceType.clear();
-	}
+
 }

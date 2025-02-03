@@ -3,17 +3,19 @@
 
 <toc version="1.0">
  <tocitem text="Overview ">
-  <tocitem text="PAMGUARD Background " target="overview.PamMasterHelp.docs.pamguardBackground" image="topic"/>
+  <tocitem text="PAMGuard Background " target="overview.PamMasterHelp.docs.pamguardBackground" image="topic"/>
 
-  <tocitem text="PAMGUARD Architecture " target="overview.PamMasterHelp.docs.pamGuardArchitecture" image="topic"/>
+  <tocitem text="PAMGuard Architecture " target="overview.PamMasterHelp.docs.pamGuardArchitecture" image="topic"/>
 
-  <tocitem text="PAMGUARD Modules " target="overview.PamMasterHelp.docs.modules" image="topic"/>
+  <tocitem text="PAMGuard Modules " target="overview.PamMasterHelp.docs.modules" image="topic"/>
 
   <tocitem text="Normal Operation " target="overview.PamMasterHelp.docs.normalMode" image="topic"/>
 
-  <tocitem text="PAMGUARD Viewer " target="overview.PamMasterHelp.docs.viewerMode" image="topic"/>
+  <tocitem text="PAMGuard Viewer " target="overview.PamMasterHelp.docs.viewerMode" image="topic"/>
 
   <tocitem text="Mixed Mode operation " target="overview.PamMasterHelp.docs.mixedMode" image="topic"/>
+
+  <tocitem text="PAMGuard WatchDog " target="overview.PamMasterHelp.docs.PamdogHelp" image="topic"/>
 
  </tocitem>
  <tocitem text="Core Features ">
@@ -23,11 +25,13 @@
 
   <tocitem text="Multiple Displays " target="overview.PamMasterHelp.docs.multipleDisplays" image="topic"/>
 
-  <tocitem text="Adding and Removing Plug-ins " target="overview.PamMasterHelp.docs.addingRemovingPlugins" image="topic"/>
+  <tocitem text="Adding and Removing Modules " target="overview.PamMasterHelp.docs.addingRemovingPlugins" image="topic"/>
 
   <tocitem text="Importing PAMGuard Modules " target="overview.PamMasterHelp.docs.ImportingModules" image="topic"/>
 
   <tocitem text="Model Viewer " target="overview.PamMasterHelp.docs.modelViewer" image="topic"/>
+
+  <tocitem text="Project Information / Metadata " target="overview.PamMasterHelp.docs.projectmetadata" image="topic"/>
 
   <tocitem text="Multithreading " target="overview.PamMasterHelp.docs.multithreading" image="topic"/>
 
@@ -44,9 +48,9 @@
 
    <tocitem text="Array Configuration " target="utilities.hydrophoneArrayManagerHelp.docs.Array_Configuration" image="topic"/>
 
-   <tocitem text="Streamer Dialog " target="utilities.hydrophoneArrayManagerHelp.docs.Array_NewStreamer" image="topic"/>
+   <tocitem text="Streamers " target="utilities.hydrophoneArrayManagerHelp.docs.Array_NewStreamer" image="topic"/>
 
-   <tocitem text="New Hydrophone Dialog " target="utilities.hydrophoneArrayManagerHelp.docs.Array_NewHydrophone" image="topic"/>
+   <tocitem text="Hydrophones " target="utilities.hydrophoneArrayManagerHelp.docs.Array_NewHydrophone" image="topic"/>
 
   </tocitem>
   <tocitem text="Data Map ">
@@ -102,10 +106,6 @@
 
    <tocitem text="AIS Display " target="mapping.AIS.docs.AISDisplay" image="topic"/>
 
-   <tocitem text="docs ">
-    <tocitem text="images "/>
-
-   </tocitem>
   </tocitem>
   <tocitem text="Airgun Display ">
    <tocitem text="Airgun Display Overview " target="mapping.AirgunDisplay.docs.AirgunOverview" image="topic"/>
@@ -213,6 +213,10 @@
    <tocitem text="Detections and Localizations " target="utilities.tethys.docs.detect_localize" image="topic"/>
 
    <tocitem text="ITIS Species Codes " target="utilities.tethys.docs.tethys_speciescodes" image="topic"/>
+
+   <tocitem text="PAMGuard Mapping " target="utilities.tethys.docs.tethys_mappings" image="topic"/>
+
+   <tocitem text="Batch output " target="utilities.tethys.docs.tethys_batch" image="topic"/>
 
   </tocitem>
  </tocitem>

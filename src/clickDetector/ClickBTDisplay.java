@@ -482,14 +482,27 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		 *  since it's unlikely a uid that different would be in memory at the same time.  
 		 */
 		long totalId = superId<<32 | chans;
+		double fs = sampleRate; 
 		synchronized(lastClicks) {
 			ClickDetection prevClick = lastClicks.get(totalId);
 			if (prevClick == null) {
 				aClick.setTempICI(0);
 			}
 			else {
+				/*
+				 *  first do using sample number, but if it's silly, then use millis.
+				 *  Silly will occur when clicks from different files are loaded.  
+				 */
+				double fsICI = (aClick.getStartSample() - prevClick.getStartSample()) / fs;
 				double ici = (double) (aClick.getTimeMilliseconds() - prevClick.getTimeMilliseconds()) / 1000.;
-				aClick.setTempICI(ici);
+				// test to see if it's silly ...
+				if (Math.abs(ici - fsICI) > 1000) { // silly
+					aClick.setTempICI(ici);
+				}
+				else {
+					aClick.setTempICI(fsICI);;
+				}
+				
 			}
 			lastClicks.put(totalId, aClick);
 		}
@@ -945,7 +958,8 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 		 * @return
 		 */
 		public double getCurrentEnd() {
-			return Math.round(currentStart + currentRange);
+//			return Math.round(currentStart + currentRange);
+			return (currentStart + currentRange);
 		} 
 
 		/**
@@ -1795,7 +1809,10 @@ public class ClickBTDisplay extends ClickDisplay implements PamObserver, PamSett
 	//	private ClickDetection lastICIClick;
 	private double clickICIToY(ClickDetection click) {
 		//		if (click.getTempICI() > 0) {
-		return btPlot.getHeight() - yAxis.getPosition(click.getTempICI());
+		double tmpICI = click.getTempICI();
+		double nY = yAxis.getPosition(tmpICI);
+		double y = btPlot.getHeight() - nY;
+		return y;
 		//			return click.getICI() * yScale;
 		//		}
 		//		else {

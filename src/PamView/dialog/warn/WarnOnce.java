@@ -12,6 +12,7 @@ import PamController.PamControlledUnitSettings;
 import PamController.PamSettingManager;
 import PamController.PamSettings;
 import javafx.scene.control.Alert.AlertType;
+import pamguard.GlobalArguments;
 
 /**
  * Show a dialog which can display a warning message and can be told to 
@@ -238,6 +239,9 @@ public class WarnOnce implements PamSettings {
 			return false;
 		}
 		if (PamGUIManager.getGUIType() == PamGUIManager.NOGUI) {
+			return false;
+		}
+		if (GlobalArguments.getParam(GlobalArguments.BATCHFLAG) != null) {
 			return false;
 		}
 		return true;

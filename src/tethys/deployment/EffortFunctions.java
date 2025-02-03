@@ -137,8 +137,10 @@ public class EffortFunctions {
 				}
 			}
 		}
-		DeploymentExportOpts exportOptions = tethysControl.getDeploymentHandler().getDeploymentExportOptions();
-		bestList.mergeRecordingPeriods(exportOptions.maxRecordingGapSeconds*1000);
+		if (bestList != null) {
+			DeploymentExportOpts exportOptions = tethysControl.getDeploymentHandler().getDeploymentExportOptions();
+			bestList.mergeRecordingPeriods(exportOptions.maxRecordingGapSeconds*1000);
+		}
 		return bestList;
 	}
 	

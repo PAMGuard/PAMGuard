@@ -262,6 +262,10 @@ public class PSFXReadWriter {
 				totalLen = dis.readInt();
 				objectId = dis.readInt();
 				dataLen = dis.readInt();
+				if (dataLen < 0) {
+					System.out.println("Error reading psfx file " + file.getAbsolutePath());
+					break;
+				}
 				data = new byte[dataLen];
 				dis.read(data);
 				if (objectId == ModuleNameObject.typeId) {

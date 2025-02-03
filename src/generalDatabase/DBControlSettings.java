@@ -32,7 +32,24 @@ public class DBControlSettings extends DBControl {
 
 	}
 
+
+	/**
+	 * Load settings from the database using default run mode. 
+	 * @param pamConnection connection
+	 * @return list of settings
+	 */
 	public ArrayList<PamControlledUnitSettings> loadSettingsFromDB(PamConnection pamConnection) {
+		return loadSettingsFromDB(pamConnection, isViewer);
+	}
+	
+	/**
+	 * Load settings from the datbase. 
+	 * @param pamConnection connection
+	 * @param viewer as for PAMGuard viewer. Slight bodge to support getting the right settings
+	 * for the batch processor configurator. 
+	 * @return list of settings
+	 */
+	public ArrayList<PamControlledUnitSettings> loadSettingsFromDB(PamConnection pamConnection, boolean viewer) {
 
 		if (pamConnection == null) {
 			return null;
@@ -43,7 +60,7 @@ public class DBControlSettings extends DBControl {
 		 * try the last settings, if that fails, go for the main list 
 		 * of all settings. 
 		 */
-		if (isViewer) {
+		if (viewer) {
 			dbSettingsStore = getDbProcess().getLogViewerSettings().loadSettings(pamConnection);
 		}
 		if (dbSettingsStore == null || dbSettingsStore.getNumGroups() == 0) {

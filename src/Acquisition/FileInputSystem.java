@@ -147,6 +147,8 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 
 	long readFileSamples;
 
+	long millisToSkip;
+
 	protected JCheckBox repeat;
 
 	protected ByteConverter byteConverter;
@@ -173,6 +175,12 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 	private SudListener sudListener;
 
 	private boolean fullyStopped;
+
+	/**
+	 * Current analysis time - start of last data unit created. 
+	 * Can help to control restarts. 
+	 */
+	protected volatile long currentAnalysisTime;
 
 	public FileInputSystem(AcquisitionControl acquisitionControl) {
 		this.acquisitionControl = acquisitionControl;
@@ -635,6 +643,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 
 			audioStream = PamAudioFileManager.getInstance().getAudioInputStream(currentFile);
 
+
 			if (audioStream instanceof SudAudioInputStream) {
 				sudAudioInputStream = (SudAudioInputStream) audioStream;
 				if (sudListener == null) {
@@ -658,6 +667,11 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 				System.err.println("AudioFormat was null: " + currentFile.getAbsolutePath());
 				return false;
 			}
+			long toSkip = (long) (millisToSkip * audioFormat.getFrameRate() / 1000) * audioFormat.getFrameSize();
+			if (toSkip > 0) {
+				audioStream.skip(toSkip);
+			}
+			millisToSkip = 0; // only ever used once at startup. 
 
 			//			fileLength = currentFile.length();
 			fileSamples = audioStream.getFrameLength();
@@ -719,7 +733,10 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 		PamCalendar.setSoundFile(true);
 		PamCalendar.setSoundFileTimeInMillis(0);
 		long fileTime = getFileStartTime(getCurrentFile());
-		if (fileTime > 0) {
+		if (currentAnalysisTime > 0) {
+			PamCalendar.setSessionStartTime(currentAnalysisTime);
+		}
+		else if (fileTime > 0) {
 			PamCalendar.setSessionStartTime(fileTime);
 		}
 		else {
@@ -775,8 +792,6 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 
 	@Override
 	public boolean startSystem(AcquisitionControl daqControl) {
-
-
 
 		if (audioStream == null) return false;
 
@@ -918,6 +933,7 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 			byteConverter.bytesToDouble(byteData.getData(), doubleData, byteData.getLen());
 
 			long ms = acquisitionControl.getAcquisitionProcess().absSamplesToMilliseconds(totalSamples);
+			currentAnalysisTime = ms + (long) (newSamples * 1000L / sampleRate);
 			RawDataUnit newDataUnit = null;
 			for (int ichan = 0; ichan < nChannels; ichan++) {
 
@@ -1044,6 +1060,8 @@ public class FileInputSystem  extends DaqSystem implements ActionListener, PamSe
 					int convertedSamples = byteConverter.bytesToDouble(byteArray, doubleData, bytesRead);
 
 					ms = acquisitionControl.getAcquisitionProcess().absSamplesToMilliseconds(totalSamples);
+//					currentAnalysisTime = ms;
+					currentAnalysisTime = ms + (long) (newSamples * 1000L / sampleRate); // get ms of last sample for this. 
 
 					for (int ichan = 0; ichan < nChannels; ichan++) {
 

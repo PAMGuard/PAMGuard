@@ -9,9 +9,18 @@
 <h1>Hydrophone Array</h1>
 <h2>New Streamer Dialog</h2><br>
 
-The Streamer dialog has changed in release 1.13. 
+<p>A <em>streamer</em> in PAMGuard is a collection or cluster of one or more hydrophones that are physically connected and are expected to 
+move together. The name 'streamer' is a bit of a misnomer these days. It comes from early PAMGuard versions when we were 
+mostly dealing with towed hydrophone arrays, but the general concept applies to a wide range of equipment. Things that should
+be considered as a <em>streamer</em> include towed arrays, mooring buoys, fixed autonomous sensors, drifters, etc. </p>
+<p>In many circumstances, there is flexibility as to how many streamers you have and how many hydrophones. For example, if you'd put out
+ten moorings and knew the GPS locations of each, enter them as a streamer each, with one hydrophone per streamer. If you have a very long
+array with multiple active sections, you may want to enter this as a separate streamer for each section so that you can use separate 
+array sensors for each section to better determine the hydrophone positions. </p>
+
+<h3>Configuration</h3>
 <p>
-<img alt="Image" src="./Images/NewStreamer.png"/><br><br>
+<img src="./Images/NewStreamer.png"/><br><br>
 <p>The Streamer name is for information purposes only. </p>
 
 <h3>Reference Position</h3>
@@ -20,7 +29,7 @@ If GPS data is selected then the system will automatically connect to data from 
 <a href="../../../mapping/NMEA/docs/ConfiguringGPS.html">GPS Module</a>. If a fixed location is selected, then 
 additional options will appear allowing you to enter a reference Latitude and Longitude.  
 </p>
-<img alt="Image" src="./Images/FixedStreamer.png"/><br>
+<img src="./Images/FixedStreamer.png"/><br>
 <p>To change the position, use the menu on the button to the right of the displayed location. It is possible 
 to enter a new value manually, take the current GPS position or to paste in the last location clicked on the 
 <a href="../../../mapping/mapHelp/docs/overview.html">PAMGuard map</a>.
@@ -41,9 +50,14 @@ rigidly on the hull of a vessel it would be more sensible to use the Straight / 
 <p>For GPS referenced locations, if these values are not null, they will override heading values from the GPS data. If they are null, 
 then the GPS values will be used.  
 Some users are starting to collect orientation data for hydrophones which can give a more accurate 
-position than relying on the threading hydrophone model. No systems for collecting these data are yet built 
-into PAMGuard and have to date only been imported during offline analysis of data. Expect further developments in this 
-area in the near future !</p>
+position than relying on the threading hydrophone model. See the 
+<a href="../../../sensors/analogarray/docs/analogarray.html">Analog Array Sensors</a> 
+module information to see how you can hook up sensors to the array manager.
+If you wish to use other sensors, then it's possible to program new PAMGuard modules which will integrate directly
+into the array management system. An example of this is the 
+<a href="https://www.pamguard.org/plugins/rioncompass.html">RION Compass plug-in module</a> which reads a digital
+compass through a serial port. If you're interested in adding additional sensors of your own, looking 
+at the source code for the RION module is a good place to start, or contact the PAMGuard team.</p>
 
 <br>
 <h3>Interpolation</h3>

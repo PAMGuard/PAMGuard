@@ -1135,8 +1135,13 @@ public class PamAxis {
 			pixs =  totalPixs * (dataValue - getMinVal()) / (getMaxVal() - getMinVal());
 		}
 		else {
-			pixs =  totalPixs * (Math.log(dataValue) - Math.log(getMinVal())) / 
-					(Math.log(getMaxVal()) - Math.log(getMinVal()));
+			if (dataValue < getMinVal()) {
+				pixs = 0;
+			}
+			else {
+				pixs =  totalPixs * (Math.log(dataValue) - Math.log(getMinVal())) / 
+						(Math.log(getMaxVal()) - Math.log(getMinVal()));
+			}
 		}
 		if (x1 == x2) {
 			// for a while this was y1-pixs but that caused problems giving the coordinate on the

@@ -26,7 +26,7 @@ public class DescriptionCard extends PamWizardCard<DescriptionType> {
 	}
 	
 	public boolean getParams(StreamExportParams streamExportParams) {
-		return descriptionPanel.getParams(streamExportParams.getNilusDetectionDescription());
+		return descriptionPanel.getParams(streamExportParams.getDescription());
 	}
 
 	@Override
@@ -35,7 +35,7 @@ public class DescriptionCard extends PamWizardCard<DescriptionType> {
 	}
 	
 	public void setParams(StreamExportParams streamExportParams) {
-		descriptionPanel.setParams(streamExportParams.getNilusDetectionDescription());
+		descriptionPanel.setParams(streamExportParams.getDescription());
 	}
 
 }

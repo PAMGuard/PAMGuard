@@ -158,7 +158,7 @@ public class LocalizationBuilder {
 		String fullId = localisationHandler.getLocalisationdocId(prefix);
 		currentDocument.setId(fullId);
 		//		detections.setDescription(dataProvider.getDescription(deployment, tethysExportParams));
-		currentDocument.setDescription(exportParams.getNilusDetectionDescription());
+		currentDocument.setDescription(exportParams.getDescription());
 		DataSourceType dataSource = new DataSourceType();
 		dataSource.setDeploymentId(deployment.nilusObject.getId());
 		//		dataSource.setEnsembleId(""); ToDo

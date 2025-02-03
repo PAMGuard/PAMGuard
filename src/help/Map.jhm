@@ -58,6 +58,8 @@
 
 <mapID target="utilities.hydrophoneArrayManagerHelp.docs.Array_Configuration_sec1" url="utilities/hydrophoneArrayManagerHelp/docs/Array_Configuration.html#sec1"/>
 
+<mapID target="utilities.hydrophoneArrayManagerHelp.docs.Array_Configuration_sec0" url="utilities/hydrophoneArrayManagerHelp/docs/Array_Configuration.html#sec0"/>
+
 <mapID target="sound_processing.fftManagerHelp.docs.noise_removal_medianfilter" url="sound_processing/fftManagerHelp/docs/noise_removal.html#medianfilter"/>
 
 <mapID target="utilities.hydrophoneArrayManagerHelp.docs.Array_Configuration_sec5" url="utilities/hydrophoneArrayManagerHelp/docs/Array_Configuration.html#sec5"/>
@@ -96,6 +98,8 @@
 
 <mapID target="classifiers.roccaHelp.docs.rocca_ContourExtractionManipulation_manual" url="classifiers/roccaHelp/docs/rocca_ContourExtractionManipulation.html#manual"/>
 
+<mapID target="overview.PamMasterHelp.docs.PamdogHelp" url="overview/PamMasterHelp/docs/PamdogHelp.html"/>
+
 <mapID target="classifiers.roccaHelp.docs.rocca_Configure_rocca_SchoolStatsFile" url="classifiers/roccaHelp/docs/rocca_Configure.html#rocca_SchoolStatsFile"/>
 
 <mapID target="localisation.docs.localisation_tdoa" url="localisation/docs/localisation_tdoa.html"/>
@@ -111,6 +115,8 @@
 <mapID target="visual_methods.loggerFormsHelp.docs.loggerFormsOverview" url="visual_methods/loggerFormsHelp/docs/loggerFormsOverview.html"/>
 
 <mapID target="detectors.gpl.docs.gpldisplays" url="detectors/gpl/docs/gpldisplays.html"/>
+
+<mapID target="utilities.tethys.docs.tethys_batch" url="utilities/tethys/docs/tethys_batch.html"/>
 
 <mapID target="classifiers.rawDeepLearningHelp.docs.rawDeepLearning_overview" url="classifiers/rawDeepLearningHelp/docs/rawDeepLearning_overview.html"/>
 
@@ -420,6 +426,8 @@
 
 <mapID target="sound_processing.seismicveto.docs.veto_overview" url="sound_processing/seismicveto/docs/veto_overview.html"/>
 
+<mapID target="localisation.docs.localisation_overview_gillespie" url="localisation/docs/localisation_overview.html#gillespie"/>
+
 <mapID target="classifiers.roccaHelp.docs.rocca_Configure_rocca_ClickClassifierModel" url="classifiers/roccaHelp/docs/rocca_Configure.html#rocca_ClickClassifierModel"/>
 
 <mapID target="localisation.difar.difarLocalisation.docs.difar_Calibration" url="localisation/difar/difarLocalisation/docs/difar_Calibration.html"/>
@@ -628,6 +636,8 @@
 
 <mapID target="sound_processing.beamformer.docs.Beamformer_Overview" url="sound_processing/beamformer/docs/Beamformer_Overview.html"/>
 
+<mapID target="utilities.tethys.docs.tethys_mappings" url="utilities/tethys/docs/tethys_mappings.html"/>
+
 <mapID target="sound_processing.FiltersHelp.Docs.Filters_types" url="sound_processing/FiltersHelp/Docs/Filters_types.html"/>
 
 <mapID target="detectors.Pam3DHelp.docs.guiOverview" url="detectors/Pam3DHelp/docs/guiOverview.html"/>
@@ -803,6 +813,8 @@
 <mapID target="localisation.difar.difarLocalisation.docs.difar_PostProcessingTutorial__Toc396467146" url="localisation/difar/difarLocalisation/docs/difar_PostProcessingTutorial.html#_Toc396467146"/>
 
 <mapID target="localisation.difar.difarLocalisation.docs.difar_PostProcessingTutorial__Toc396467147" url="localisation/difar/difarLocalisation/docs/difar_PostProcessingTutorial.html#_Toc396467147"/>
+
+<mapID target="overview.PamMasterHelp.docs.projectmetadata" url="overview/PamMasterHelp/docs/projectmetadata.html"/>
 
 <mapID target="mapping.NMEA.docs.configuringNMEADataSource" url="mapping/NMEA/docs/configuringNMEADataSource.html"/>
 

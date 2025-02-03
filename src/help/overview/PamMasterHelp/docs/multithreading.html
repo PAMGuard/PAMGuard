@@ -9,7 +9,8 @@
 <h1>PAMGuard</h1>
 <h2>Multi-threading</h2>
 <p><br>
-  PAMGuard can operate in either a single thread mode, or a multi-thread mode. 
+  PAMGuard can operate in either a single thread mode, or a 
+  <a href="https://en.wikipedia.org/wiki/Thread_(computing)#Single-threaded_vs_multithreaded_programs">multi-thread mode</a>. 
 </p>
 <p>
   In multi-thread mode, each process within each PAMGuard module operates in a different 
@@ -39,10 +40,16 @@ that can be queued between two threads. If the data queue exceeds this time, the
 thread will wait until the second thread has processed some of the data in the queue.  </p>
 <p>More jitter allows more flexibility between threads which can allow PAMGuard to use multiple 
 processor cores more efficiently. However, increased jitter can cause a loss of synchronisation 
-between the processing, graphics output and sound play back</p>  
+between the processing, graphics output and sound play back. Generally, the default setting of 1000ms is
+about right for most operations.</p>
+
+<h4>Garbage Collection</h4>
+<p>The Java language handles garbage collection (clean up of unused objects in memory) very efficiently. Sometimes though
+it's helpful to give it a 'nudge' and tell it to clean up more often in which case the 'Run additional garbage collection' 
+option can be used.   
 <p>
 <br>
-<p CLASS="previousLink"><a href="modelViewer.html">Previous: Model viewer</a></p>
+<p CLASS="previousLink"><a href="projectmetadata.html">Previous: Project Information</a></p>
 <p CLASS="nextLink"><a href="datastorage2.html">Next: Data Storage</a></p>
 </body>
 </html>

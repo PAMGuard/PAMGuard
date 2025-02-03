@@ -138,6 +138,9 @@ public class NilusUnpacker {
 				continue;
 			}
 			String fieldName = fields[i].getName();
+//			if (fieldName.contains("abstract")) {
+//				System.out.println("Nilus Unpacker Field Name: " + fieldName);
+//			}
 			String elementName = fieldName;
 			// now try to find an annotation for the name, which might be
 			// different. 
@@ -184,6 +187,10 @@ public class NilusUnpacker {
 			else {
 				// find a setter for it. 
 				Method setter = findSetter(nilusClass, fieldName);
+				if (setter == null) {
+					// need to try the alternative name here too. 
+					setter = findSetter(nilusClass, elementName);
+				}
 				//			System.out.printf("Field %s with element %s and setter %s\n", fieldName, childName, setter);
 				if (setter == null) {
 					if (verbose) {
@@ -478,6 +485,9 @@ public class NilusUnpacker {
 		switch(fieldName) {
 		case "sampleRateKHz":
 			return "sampleRate_kHz";
+		case "Abstract":
+		case "_abstract":
+			return "abstract";
 		}
 		return null;
 	}

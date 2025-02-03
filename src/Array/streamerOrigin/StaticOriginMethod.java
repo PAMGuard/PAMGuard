@@ -71,9 +71,16 @@ public class StaticOriginMethod extends HydrophoneOriginMethod {
 	}
 
 	@Override
-	public StreamerDataUnit getLastStreamerData() {
+	public StreamerDataUnit getLastStreamerData() {	
+		StreamerDataUnit sdu;
+		GpsDataUnit setPosition = staticOriginSettings.getStaticPosition();
+		if (setPosition != null) {
+			sdu = new StreamerDataUnit(setPosition.getTimeMilliseconds(), streamer);
+			sdu.setGpsData(setPosition.getGpsData());
+			return sdu;
+		}
 		StreamerDataBlock streamerDataBlock = ArrayManager.getArrayManager().getStreamerDatabBlock();
-		StreamerDataUnit sdu = streamerDataBlock.getLastUnit(1<<streamer.getStreamerIndex());		
+		sdu = streamerDataBlock.getLastUnit(1<<streamer.getStreamerIndex());		
 		if (sdu == null) {
 		 sdu = new StreamerDataUnit(PamCalendar.getTimeInMillis(), streamer);
 		//System.out.println("StaticOriginMethod: Streamer rotation: " +sdu.getGpsData().getQuaternion().toHeading());
@@ -343,7 +350,7 @@ public class StaticOriginMethod extends HydrophoneOriginMethod {
 			if (statPos != null) {
 				gpsData = statPos.getGpsData();
 			}
-			LatLong newLatLong = LatLongDialog.showDialog(null, gpsData, "Hydrophone array reference position");
+			LatLong newLatLong = LatLongDialog.showDialog(PamDialog.getFrame(outerPanel), gpsData, "Hydrophone array reference position");
 			if (newLatLong != null) {
 				staticOriginSettings.setStaticPosition(streamer, new GpsData(newLatLong));
 				setLatLong(newLatLong);

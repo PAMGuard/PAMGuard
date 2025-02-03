@@ -19,6 +19,10 @@ public class ArrayParameters implements Serializable, ManagedParameters {
 	
 	private ArrayList<PamArray> arrayList;
 
+	public ArrayParameters() {
+		super();
+		this.arrayList = new ArrayList<>();
+	}
 	/**
 	 * @param arrayList
 	 */
@@ -26,6 +30,7 @@ public class ArrayParameters implements Serializable, ManagedParameters {
 		super();
 		this.arrayList = arrayList;
 	}
+
 
 	/**
 	 * @return the arrayList

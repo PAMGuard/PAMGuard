@@ -1,6 +1,7 @@
 # PAMGuard
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13378951.svg)](https://doi.org/10.5281/zenodo.13378951)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13378950.svg)](https://doi.org/10.5281/zenodo.13378950)
+
 
 PAMGuard website: [www.pamguard.org](http://www.pamguard.org)
 

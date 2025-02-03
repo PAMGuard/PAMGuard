@@ -13,8 +13,8 @@
 </p>
 
 
-<p><b>Time Delays</b> <br><br>
-In order to localise an acoustic source a time delay between two hydrophones is required. 
+<h3>Time Delays</h3>
+<p>In order to localise an acoustic source a time delay between two hydrophones is required. 
 This simply refers the number of seconds between two hydrophones receiving the same acoustic signal. 
 In order to get to this stage vocalisations must be first detected, classified and then the time delay between two likely signals from the same source calculated. 
 The calculation itself must be highly accurate and cannot rely on simply determining the rough start of two signals without introducing large errors.<br></p>
@@ -45,7 +45,10 @@ The accepted mathematical form is<br></p>
 
 <p>where <i>x(τ)</i> and <i>y*(&#964-t) </i> (* refers to the complex conjugate) represent two waveforms with a time separation of <i>t</i>. This results in the time dependent function <i>Cxy(t)</i>. The integral is essentially proportional to the area beneath the two waveforms and so if they overlap precisely this produces a large value. Hence <i>Cxy(t)</i> is a measure of the similarity between two waveforms over time with its maximum value corresponding to the likely time delay between the two signals.</p> 
 
-<p><b>Localising</b> 
+<p>PAMGuard applies advanced time delay measurements to most of it's time of arrival estimates, allowing the peak in the cross correlation function to be 
+determined to a much higher accuracy than a single sample. You can read more in <a href="#gillespie">Gillespie and Macaulay, 2019</a>. 
+
+<h3>Localising</h3> 
 
 <p>As long as the distance between the two receiving hydrophones is known a measured time delay can then be used to restrict the possible location of an acoustic source. In the case of just two hydrophones the source is theoretically restricted to a three dimensional hyperboloid of infinite length. It is perhaps easier to visualise this in two dimensions in which case the hyperboloid can be considered as two possible symmetrical bearings pointing towards the source. By introducing another pair of hydrophones and hence another time delay measurement the location of the source can restricted further. Now the only possible locations are the points at which the hyperboloid surfaces calculated for each hydrophone pair cross. 
 <br></p>
@@ -62,7 +65,7 @@ The accepted mathematical form is<br></p>
 <p>The number and distribution of hydrophones therefore play a key role in localisation; however other measurements also restrict the source location. The maximum detectable range of a harbour porpoise click is on the order of a few hundred meters whilst blue whales are detectable tens of kilometres away. Thus the possible ranges are restricted simply by the frequency of a vocalisation. In addition both the seabed and sea surface provide limits restricting the source location.
 </p>
 
-<p><b>Localisation Errors</b> 
+<h3>Localisation Errors</h3> 
 
 <p>In an ideal world, if we knew the exact spacing between hydrophones, accurate
 sound speed profiles in all locations and the precise time delay of a signal it
@@ -99,20 +102,24 @@ Figure 3 shows a ray trace diagram of a porpoise click in a measured environment
 </p>
 <p>The natural environment and especially the sea are fundamentally unpredictable places. The complexity of these environments means a complete and accurate mathematical model is impossible. Instead errors must be accepted as always present and localisations should always be regarded as probabilities of a source location.
 </p>
-<p><br><br><i><b>References
-</b><br><br>Magnus Wahlberg, Bertel M&oslash;hl and Peter Teglberg. Estimating source position accuracy of a large-aperture hydrophone array for biacoustics. 
-<a href="https://asa.scitation.org/doi/10.1121/1.1329619">J. Acoust Soc. Am. 109. 397-405 (2001)</a>. 
-<br><br>Stacy Lynn Deruiter. Echolocation-based foraging by harbour porpoises and sperm whales including effects of noise and acoustic propagation. 
-<a href="https://dspace.mit.edu/handle/1721.1/45314">PhD thesis (2008)</a>.
-<br><br>Line A. Kyhn, J. Tougard, F. Jensen, M. Wahlberg, G. Stone, A. Yoshinaga, K. Beedholm and P.T Madsen. 
+
+<p><br><h3>References</h3>
+
+<p><a name="gillespie"></a>Gillespie, D., and Macaulay, J. 2019. Time of arrival difference estimation for narrow band high frequency 
+echolocation clicks, The Journal of the Acoustical Society of America, 146, EL387-EL392.
+<a href="https://doi.org/10.1121/1.5129678">doi:https://doi.org/10.1121/1.5129678</a>.</p> 
+<p>Magnus Wahlberg, Bertel M&oslash;hl and Peter Teglberg. Estimating source position accuracy of a large-aperture hydrophone array for biacoustics. 
+<a href="https://asa.scitation.org/doi/10.1121/1.1329619">J. Acoust Soc. Am. 109. 397-405 (2001)</a>. </p>
+<p>Stacy Lynn Deruiter. Echolocation-based foraging by harbour porpoises and sperm whales including effects of noise and acoustic propagation. 
+<a href="https://dspace.mit.edu/handle/1721.1/45314">PhD thesis (2008)</a>.</p>
+<p>Line A. Kyhn, J. Tougard, F. Jensen, M. Wahlberg, G. Stone, A. Yoshinaga, K. Beedholm and P.T Madsen. 
 Feeding at a high pitch. Source parameters of narrow band, high frequency clicks from echolocating off-shore Hourglass dolphins and coastal Hector's dolphins.  
-<a href="https://asa.scitation.org/doi/10.1121/1.3075600">J. Acoust. Soc. Am .125, 1783-1791 (2009)</a>. 
-<br><br>Mathew J. Holman, Joshua N. Winn, David W. Latham, Francis T. O'Donovan, DavidCharbonneau, Gaspar A. Bakos, 
+<a href="https://asa.scitation.org/doi/10.1121/1.3075600">J. Acoust. Soc. Am .125, 1783-1791 (2009)</a>. </p>
+<p>Mathew J. Holman, Joshua N. Winn, David W. Latham, Francis T. O'Donovan, DavidCharbonneau, Gaspar A. Bakos, 
 Gilbert A. Esquerdo, Carl Hergenrother, Mark E. Everett and Andras Pal.  
 The Transit light curve project. I. four consecutive transits of exoplanet XO-1b.
 <a href="https://iopscience.iop.org/article/10.1086/508155">The Astrophysical Journal. 652: 1715-1723 (2006)</a>. 
-
-</i></p>
+</p>
 
 <p CLASS="nextLink"><a href="localisation_algorithms.html">Next: Localisation Techniques</a></p>
 

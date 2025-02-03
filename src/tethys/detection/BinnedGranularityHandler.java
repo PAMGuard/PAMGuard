@@ -103,7 +103,8 @@ public class BinnedGranularityHandler extends GranularityHandler {
 			det.setStart(TethysTimeFuncs.xmlGregCalFromMillis(binStart));
 			det.setEnd(TethysTimeFuncs.xmlGregCalFromMillis(binStart + binDurationMillis));
 			det.setCount(BigInteger.ONE);
-			det.setChannel(BigInteger.valueOf(dataUnit.getChannelBitmap()));
+//			det.setChannel(BigInteger.valueOf(dataUnit.getChannelBitmap()));
+			addChannelsToMap(det, dataUnit.getChannelBitmap());
 			// this should always return something, so am going to crash if it doesn't. 
 			// may revisit this later on if we've unassigned things we don't want to label
 			// in which case they should be rejected earlier than this. 
@@ -157,7 +158,7 @@ public class BinnedGranularityHandler extends GranularityHandler {
 			if (callCount < Math.max(streamExportParams.minBinCount,1)) {
 				continue; // won't add to output list
 			}
-
+			finaliseChannels(det);
 			detections[nGood++] = det;
 		}
 		

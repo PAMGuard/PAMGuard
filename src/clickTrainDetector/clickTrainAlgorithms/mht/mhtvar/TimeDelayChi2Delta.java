@@ -2,6 +2,7 @@ package clickTrainDetector.clickTrainAlgorithms.mht.mhtvar;
 
 import java.util.BitSet;
 
+import PamDetection.AbstractLocalisation;
 import PamDetection.LocContents;
 import PamUtils.PamArrayUtils;
 import PamguardMVC.PamDataBlock;
@@ -106,6 +107,10 @@ public class TimeDelayChi2Delta extends SimpleChi2Var {
 	protected double[] getDiffValue2(PamDataUnit lastDataUnit, PamDataUnit newdataUnit) {
 		//this will crash if the time delays are not the same size but this should be something caught earlier
 		//want it to crash if this happens. 
+		AbstractLocalisation localisation = newdataUnit.getLocalisation();
+		if (localisation == null) {
+			return null;
+		}
 		newDelta = new double[newdataUnit.getLocalisation().getTimeDelays().length]; 
 		for (int i=0; i<newDelta.length; i++) {
 			newDelta[i] = lastDataUnit.getLocalisation().getTimeDelays()[i]-newdataUnit.getLocalisation().getTimeDelays()[i]; 

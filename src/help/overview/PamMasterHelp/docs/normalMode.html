@@ -11,42 +11,50 @@
 <h3>Overview</h3>
 <p>
 During normal operation, PAMGuard collects data in real time via sound cards, GPS feeds, etc. 
-<p>
 The data are processed in real time by the PAMGuard modules and summary information
-is displayed on the PAMGuard GUI and / or written to the PAMGuard database.  
+is displayed on the PAMGuard GUI and / or written to the PAMGuard database.  </p>
+<p>Normal mode is also used to process sound files, or folders of sound files, that might be
+from a ship based survey or from autonomous recorders. In this case, PAMGuard can be 
+set up to process the data as fast as it can, or slowed down so that you can listen to the 
+data as they are being processed. </p>
 
-<p>
 <h3>Running PAMGuard</h3>
 <p>
 (If you're reading this, you've probably already worked this out !)
 <p>
-If you've used one of the platform dependent installers, then you should 
-start PAMGuard from one of the shortcuts placed in your system menus. This will 
-check that you have a compatible JAVA virtual machine installed and will allocate
-additional memory. 
+If you've used one of the platform dependent installers (Windows and Mac), then you should 
+start PAMGuard from one of the shortcuts placed in your system menus. 
 <p>
-If you are running one of the platform independent jar files, then you should 
+If you are running one of the platform independent jar files (Linux), then you should 
 tell the JAVA virtual machine to allocate as much memory as possible. For instance, 
-under Windows, the command line for starting PAMGuard Beta version 1.3.02 with 1 Gigabyte of memory 
+under Windows, the command line for starting PAMGuard Beta version 1.3.02 with 4 Gigabyte2 of memory 
 is:  <br><br>
-<center><p>java -jar -mx1024m PAMGuardBeta_1_3_02.jar PAMGuard</p></center> 
+<code>java -jar -mx4096m PAMGuardBeta_2_02_15.jar PAMGuard</code> 
 
-<h3>The PSF File</h3>
+<h3>The PSFX File</h3>
 <p>
-PAMGuard saves it's configuration between runs in PAMGuard Settings Files (.psf). 
+PAMGuard saves it's configuration between runs in PAMGuard Settings Files (.psfx). 
 <p>
-Each time you start PAMGuard a dialog will open asking you to select the psf file
+Each time you start PAMGuard a dialog will open asking you to select the psfx file
 you want to use. <p>
-<center><img alt="Start Dialog" src="images/startupDialog.png"/></center></p><br>
-<p>Either select a recently used psf from the drop down list or press the browse button
-to select a psf file stored elsewhere on your system.
+<center><img alt="PAMGuard Configuration Launch Dialog" src="images/startupDialog.png"/></center></p><br>
+<p>Either select a recently used psfx from the drop down list or press the browse button
+to select a psfx file stored elsewhere on your system.
 <p>
-Sample psf files may be downloaded from the <a href="http://www.PAMGuard.org">www.PAMGuard.org</a> web site. 
+Sample psfxx files may be downloaded from the <a href="http://www.pamguard.org">www.pamguard.org</a> web site. 
+
+<h3>PAMGuard WatchDog</h3>
+<p>When collecting and processing data in real time you can use the <a href="PamdogHelp.html">PAMGuard WatchDog</a>
+to keep PAMGuard running whatever happens</p>
+
+<h3>Batch Processing</h3>
+<p>If you're processing sets of data offline, you can use the <a href="https://www.pamguard.org/plugins/plugins.html">Batch Processing Plugin</a>
+to run the same configuration file on several different sets of data.</p>
 
 
 <br><br>
 <p CLASS="previousLink"><a href="modules.html">Previous: PAMGuard Modules</a></p>
-<p CLASS="nextLink"><a href="viewerMode.html">Next: PAMGuard Viewer</a></p>
+<p CLASS="nextLink"><a href="viewerMode.html">Next: PAMGuard Viewer.</a></p>
 <br>
 
 </body>

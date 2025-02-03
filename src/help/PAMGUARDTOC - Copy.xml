@@ -14,6 +14,8 @@
 
   <tocitem text="Mixed Mode operation " target="overview.PamMasterHelp.docs.mixedMode" image="topic"/>
 
+  <tocitem text="PAMGuard WatchDog " target="overview.PamMasterHelp.docs.PamdogHelp" image="topic"/>
+
  </tocitem>
  <tocitem text="Core Features ">
   <tocitem text="Graphical User Interface " target="overview.PamMasterHelp.docs.guiOverview" image="topic"/>
@@ -202,8 +204,6 @@
    <tocitem text="Tethys Overview " target="utilities.tethys.docs.tethys_overview" image="topic"/>
 
    <tocitem text="Tethys Module " target="utilities.tethys.docs.tethys_module" image="topic"/>
-
-   <tocitem text="Tethys Server " target="utilities.tethys.docs.tethys_server" image="topic"/>
 
    <tocitem text="Connecting to Tethys " target="utilities.tethys.docs.connection" image="topic"/>
 

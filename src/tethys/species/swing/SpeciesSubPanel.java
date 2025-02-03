@@ -12,9 +12,11 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
 
+import PamController.PamConfiguration;
 import PamController.PamController;
 import PamView.dialog.PamDialog;
 import PamView.dialog.PamGridBagContraints;
+import PamguardMVC.PamDataBlock;
 import tethys.TethysControl;
 import tethys.species.ITISFunctions;
 import tethys.species.SpeciesMapItem;
@@ -28,7 +30,11 @@ public class SpeciesSubPanel {
 	private JTextField itisCode, callType, latinName, commonName;
 	private JButton searchButton;
 
-	public SpeciesSubPanel(String aSpecies) {
+	private PamDataBlock dataBlock;
+
+	public SpeciesSubPanel(PamDataBlock dataBlock, String aSpecies) {
+		
+		this.dataBlock = dataBlock;
 		
 		callType = new JTextField(15);
 		pamguardName = new JLabel(aSpecies);
@@ -103,12 +109,18 @@ public class SpeciesSubPanel {
 		
 	}
 
+	private PamConfiguration getConfiguration() {
+		if (dataBlock == null) {
+			return PamController.getInstance().getPamConfiguration();
+		}
+		return dataBlock.getPamConfiguration();
+	}
 	/**
 	 * Action when 'Find' button is pressed.
 	 * @param e
 	 */
 	protected void searchSpecies(ActionEvent e) {
-		TethysControl tethysControl = (TethysControl) PamController.getInstance().findControlledUnit(TethysControl.unitType);
+		TethysControl tethysControl = (TethysControl) getConfiguration().findControlledUnit(TethysControl.unitType);
 		if (tethysControl == null) {
 			return;
 		}

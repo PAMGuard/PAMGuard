@@ -59,6 +59,13 @@ public class PamControlledUnitSettings implements Serializable, ManagedParameter
 
 	//	private PamSettings owner;
 
+	public PamControlledUnitSettings(PamSettings pamSettings) {
+		this.versionNo = pamSettings.getSettingsVersion();
+		this.unitType = pamSettings.getUnitType();
+		this.unitName = pamSettings.getUnitName();
+		this.ownerClassName = null;
+		this.settings = pamSettings.getSettingsReference();
+	}
 	/**
 	 * Make a settings object with unpacked data. This must still be used with old style psf files
 	 * @param unitType

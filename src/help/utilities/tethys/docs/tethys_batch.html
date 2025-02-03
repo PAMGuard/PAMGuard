@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+    
+    <link href="../../../pamHelpStylesheet.css" type="text/css" rel="STYLESHEET">
+    <title>Tethys Module Overview</title>
+</head>
+<body>
+    <h1>Tethys Interface</h1>
+    <h2>Batch Output</h2>
+    <p>
+        The Tethys display is great for outputting data from one set of data, giving you fine scale control 
+        over what is output, and instant access to the documents created in the database. However, what if you
+        want to output Tethys data from several different PAMGuard datasets ?  You could open each dataset with
+        PAMGuard Viewer, add the Tethys module, then output the Calibrations, Deployments, and Detections. Or
+        you could use the <a href="https://www.pamguard.org/plugins/batchprocessor.html">PAMGuard batch processor</a> 
+        (version 2.0 or later)
+        to automate the entire process and do the whole lot. This 
+        is particularly useful if the outputs take a long time, since the batch processor will run multiple
+        'jobs' sequentially, e.g. over night. 
+    </p>
+    <p>The <a href="https://www.pamguard.org/plugins/plugins.html">batch processor</a> is currently 
+    a <a href="https://www.pamguard.org/pluginmodules.html">PAMGuard plugin module</a> which is installed
+    separately from the main program. In future releases, it may be incorporated as a core module.</p>
+    <p>One installed, help pages for the batch processor will be available within the online help. Read the instructions
+    on setting up batch processing for PAMGuard viewer tasks, then configure jobs (sets of PAMGuard data to process) you 
+    want to export to Tethys. </p> 
+    <br>
+    <img src="images/tethysbatch.png">
+    <br>
+    <p>In your batch configuration psfx file (yes, you use a psfx file, for controlling Viewer tasks in the batch processor)
+    add the Tethys module if not already present. A list of possible Tethys output tasks will then be added to the 
+    the Offline Tasks table. It is quite possible that the check boxes used to select the Tethys tasks will be disabled
+    at this point. Hover the mouse over each task and it will tell you why, so that you can rectify the problem and
+    proceed.The three main reasons why a Tethys task cannot operate are</p>
+    <ol>
+    <li>The Tethys server is not running.</li>
+    <li>Instrument and array information has not been entered correctly</li>
+    <li>Required information for the task (such as Deployment abstract information) has not been entered.</li>
+    <li><a href="tethys_speciescodes.html">ITIS Species codes</a> have not been entered for Detections and Localisations output.
+    </ol>
+    <p>It is important that you set up the array for each job with correct Instrument  / array information. This can be 
+    set for each task by right clicking on the appropriate line in the jobs table.</p>
+    <p>Once all the required information has been entered, you can select the tasks you want to run and start outputting 
+    to Tethys. There are a fair number of things that can go wrong at this stage, so it's important that you check the 
+    output either in the Tethys Client, or by opening the PAMGuard datasets in viewer mode to check their Tethys output.</p>  
+    <p>Note that this is very new functionality. Feedback is very much appreciated!</p>
+    
+    
+    
+    <br>
+    <br>
+    <p class="prevLink"><a href="tethys_mappings.html">Previous: Tethys / PAMGuard mappings</a></p>
+  <p class="nextLink">
+    <a href="tethys_overview.html">Return to overview</a>
+  </p>
+    <br>
+    <br>
+    <br>
+</body>
+</html>

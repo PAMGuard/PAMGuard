@@ -1,17 +1,24 @@
 package tethys.detection;
 
 
+import java.math.BigInteger;
+
+import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import PamUtils.PamUtils;
 import PamguardMVC.PamDataBlock;
 import PamguardMVC.PamDataUnit;
 import nilus.Detection;
+import nilus.Detection.Parameters;
 import nilus.Detections;
 import nilus.GranularityEnumType;
+import nilus.Helper;
 import tethys.TethysControl;
 import tethys.output.StreamExportParams;
 import tethys.output.TethysExportParams;
+import tethys.pamdata.AutoTethysProvider;
 import tethys.species.DataBlockSpeciesManager;
 
 public abstract class GranularityHandler {
@@ -25,6 +32,8 @@ public abstract class GranularityHandler {
 	protected StreamExportParams streamExportParams;
 
 	private DataBlockSpeciesManager speciesManager;
+	
+	private Helper helper;
 
 	/**
 	 * @param tethysControl
@@ -39,6 +48,11 @@ public abstract class GranularityHandler {
 		this.tethysExportParams = tethysExportParams;
 		this.streamExportParams = streamExportParams;
 		speciesManager = dataBlock.getDatablockSpeciesManager();
+		try {
+			helper = new Helper();
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -154,6 +168,60 @@ public abstract class GranularityHandler {
 			return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * Function used when creating encounter and binned level detections. During the 
+	 * building of these, we need to accumulate a channel map. Then at the end of the 
+	 * encounter or bin, we're going to call a different function to change the 
+	 * channel number to the lowest and also set the channel map as a user field. 
+	 * @param detection
+	 * @param channelMal
+	 * @return
+	 */
+	protected int addChannelsToMap(Detection detection, int channelMap) {
+		int currMap = 0;
+		BigInteger chan = detection.getChannel();
+		if (chan != null) {
+			currMap = chan.intValue();
+		}
+		currMap |= channelMap;
+		detection.setChannel(BigInteger.valueOf(currMap));
+		return currMap;
+	}
+	
+	/**
+	 * Called to convert a channel map to a lowest channel and to add a user 
+	 * field for the channel map to the detection. <br>
+	 * Only use this if you're sure you've been accumulating channel maps, not setting
+	 * channel numbers as you created detections. 
+	 * @return current overall map/ 
+	 */
+	protected int finaliseChannels(Detection detection) {
+		int chanMap = 0;
+		BigInteger chan = detection.getChannel();
+		if (chan != null) {
+			chanMap = chan.intValue();
+		}
+		int lowestChan = PamUtils.getLowestChannel(chanMap);
+		detection.setChannel(BigInteger.valueOf(lowestChan));
+		int nChan = PamUtils.getNumChannels(chanMap);
+		if (nChan > 0) {
+			Parameters params = detection.getParameters();
+			if (params == null) {
+				params = new Parameters();
+				try {
+					helper.createRequiredElements(params);
+				} catch (IllegalArgumentException | IllegalAccessException | InstantiationException e) {
+					e.printStackTrace();
+				}
+				detection.setParameters(params);
+			}
+			if (chanMap < 0) chanMap += 65536L;
+			AutoTethysProvider.addUserDefined(params, "ChannelBitmap", String.format("0x%X", chanMap));
+		}
+		
+		return chanMap;
 	}
 
 	/**

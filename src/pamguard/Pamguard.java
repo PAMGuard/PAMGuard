@@ -28,6 +28,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -159,7 +160,8 @@ public class Pamguard {
 		try {
 			// get the java runnable file name. 
 			//	    	http://stackoverflow.com/questions/4294522/jar-file-name-form-java-code
-			System.out.println(Pamguard.class.getProtectionDomain().getCodeSource().getLocation());
+			URL javaFile = Pamguard.class.getProtectionDomain().getCodeSource().getLocation();
+			System.out.println(javaFile);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -191,6 +193,15 @@ public class Pamguard {
 				else if (anArg.equalsIgnoreCase("-m")) {
 					runMode = PamController.RUN_MIXEDMODE;
 					System.out.println("PAMGUARD Offline mixed mode");
+				}				
+				else if (anArg.equalsIgnoreCase(GlobalArguments.BATCHVIEW)) {
+					/**
+					 * Used with batch processor when it launches the configuration to make it clear that
+					 * it's really working in viewer mode, and viewer mode settings should be available, but
+					 * settings will be read and written using psfx files, not the databsae. 
+					 */
+					GlobalArguments.setParam(GlobalArguments.BATCHVIEW, "true");
+//					runMode = PamController.RUN_PAMVIEW;
 				}
 				else if (anArg.equalsIgnoreCase("-nr")) {
 					runMode = PamController.RUN_NETWORKRECEIVER;

@@ -32,14 +32,14 @@
 		with multiple types of acoustic data, from CPOD detections to single
 		channel and multi-channel hydrophone recordings.</p>
 	<h2 id="how-it-works">How it works</h2>
-	<p>PAMGuard’s click train detector utilises both a detection and
+	<p>PAMGuard's click train detector utilises both a detection and
 		classification stage to extract click trains from recordings.</p>
 	<p>The detection stage is currently based on a multi hypothesis
 		tracking (MHT) algorithm. This algorithm considers all possible
 		combinations of transient detections creating a large hypothesis
 		matrix which holds potential click trains. As more clicks are added to
 		the hypothesis matrix it grows exponentially and so, to prevent a
-		computer running out memory, it is regularly “pruned” to keep only the
+		computer running out memory, it is regularly "pruned" to keep only the
 		most likely click trains over time. The assigned likelihood of a click
 		train is based on number of properties which can be defined in by the
 		user. For example, a user might select, ICI, Amplitude and Correlation
@@ -66,7 +66,7 @@
 			pruned. After a minimum of Npmin clicks (in this case 4) each track
 			hypothesis (possible click train) is assigned a &Chi;<sup>2</sup> score.
 			The track hypothesis with lowest score (defined by larger coloured
-			circles) has it’s branch traced back Np (in this case 3) clicks. Any
+			circles) has it's branch traced back Np (in this case 3) clicks. Any
 			track hypothesis which do not include the click Np steps back are
 			pruned (defined by the double lines). Clicks which share no click
 			associations with the first track hypothesis are then pruned and the
@@ -97,12 +97,12 @@
 		correlation of the average spectrum of the click train with a
 		predefined spectral template.</p>
 	<p>A click train which has been both detected and classified is
-		saved to PAMGuard’s database and can be reclassified in PAMGuard’s
+		saved to PAMGuard's database and can be reclassified in PAMGuard's
 		viewer mode.</p>
 	<h2 id="configuring-the-click-train-detector">Configuring the
 		click train detector</h2>
 	<p>The primary settings to configure can be split into MHT Kernel
-		and &Chi;^2 settings – these are all set in the primary click train
+		and &Chi;^2 settings - these are all set in the primary click train
 		detector dialog as shown in Figure 2.</p>
 	<p align="center">
 		<img width="850" height="700" src="resources/detection_pane.png">
@@ -118,7 +118,7 @@
 		important because they influence speed (a larger number of possible
 		click trains in memory is more processor intensive) and the quality of
 		the detections (the larger the number of possibilities the more likely
-		that “true” click trains are contained in the hypothesis matrix). The
+		that "true" click trains are contained in the hypothesis matrix). The
 		specific settings are;</p>
 	<p>
 		<strong><em>Prune-back</em></strong>: The hypothesis matrix needs
@@ -151,7 +151,7 @@
 	<p>
 		<strong><em>Max no. trains</em></strong>: This is a maximum allowed
 		number of trains in the hypothesis mix. Note this refers to the number
-		of trains which can survive pruning – the actual number of potential
+		of trains which can survive pruning - the actual number of potential
 		click trains in the hypothesis mix will be much larger. Generally,
 		just via pruning, the hypothesis matrix will keep itself below the max
 		no. trains, however, in certain situations it can grow too large and
@@ -315,7 +315,7 @@
 		where LT is the long track bonus.
 	</p>
 	<p>
-		<strong><em>Coast penalty:</em></strong> add a penalty for “coasting”
+		<strong><em>Coast penalty:</em></strong> add a penalty for "coasting"
 		i.e. when an expected click, based on ICI, is not present in the click
 		train. This penalty is multiplied by the number of coasts i.e. the
 		likely number of missed clicks based on ICI
@@ -360,7 +360,7 @@
 		&Chi;<sup>2</sup> threshold classifier
 	</h3>
 	<p>
-		The click train is classified if it’s overall &Chi;<sup>2</sup> value is
+		The click train is classified if it's overall &Chi;<sup>2</sup> value is
 		lower than the set &Chi;<sup>2</sup> Threshold and it has more than Min.
 		Clicks and the time between the first and last click is greater than
 		Min. Time
@@ -373,7 +373,7 @@
 	<p>The click train is classified if the average spectra of the
 		click train has a correlation value above Spectrum Correlation
 		Threshold with a user defined spectral template. The template can be
-		set using the button on the top right of the spectrum plot – a default
+		set using the button on the top right of the spectrum plot - a default
 		spectrum can be loaded or a spectrum can be loaded from a .mat or .csv
 		file. A csv file should have the first row as the spectrum and first
 		column of the second row the sample rate. A .mat file should be a
@@ -464,12 +464,12 @@
 	</p>
 	<p>In viewer mode, add the module and then go to Settings&gt;Click
 		Train Detector &gt; Reanalyse click trains….This will bring up
-		PAMGuard’s generic data reprocessing dialog with two settings, Click
+		PAMGuard's generic data reprocessing dialog with two settings, Click
 		Train Detector or Click Train Classifier. The Click Train Detector
 		option will run the detection and classification algorithm again. The
 		Click Train Classifier will only run the classification algorithm on
 		existing detected click trains (much faster). Note that users can
-		select how much data to reprocess in the Data dropdown menu – All Data
+		select how much data to reprocess in the Data dropdown menu - All Data
 		means the entire dataset will be reprocessed, Loaded Data means just
 		the current data loaded in the display (all scrollable data), Select
 		Data allows the user to define two time limits between which all data
@@ -479,7 +479,7 @@
 		variety of displays in PAMGuard.</p>
 	<h3 id="click-bearing-time-display">Click bearing time display</h3>
 	<p>By default, clicks trains will be shown in the Click Detector
-		Module’s in built bearing time display. Different click trains are
+		Module's in built bearing time display. Different click trains are
 		represented as different colours. Note that you must right click on
 		the display and select Colour by Click Trains</p>
 	<p align="center">

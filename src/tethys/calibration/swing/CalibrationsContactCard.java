@@ -140,7 +140,9 @@ public class CalibrationsContactCard extends CalibrationsCard {
 			cardParams.setMetadataInfo(metaData);
 		}
 		metaData.setContact(checkRPChildren(metaData.getContact()));
+		
 		dataManager.getParams(metaData.getContact());
+		
 		ResponsibleParty metaContact = metaData.getContact();
 		NilusChecker.removeEmptyFields(metaData);
 		if (metaData.getContact() == null) {
@@ -204,7 +206,7 @@ public class CalibrationsContactCard extends CalibrationsCard {
 		if (metaInf != null) {
 			resp = metaInf.getContact();
 			if (resp != null) {
-				dataManager.getParams(resp);
+				dataManager.setParams(resp);
 			}
 			String uf = metaInf.getUpdateFrequency();
 			if (uf != null) {

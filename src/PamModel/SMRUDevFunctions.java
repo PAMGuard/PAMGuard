@@ -55,9 +55,9 @@ public class SMRUDevFunctions {
 		
 		// possible links into module names in table. 
 		// for a dump to go into the main help file, use helpRoot = "../../../";
-		//helpRoot = "../../../";
+		helpRoot = "../../../";
 		// for no output, set null. 
-		helpRoot = null;
+		//helpRoot = null;
 		// for ooutput into main PAMGuard pages, it's probably
 		
 		PamModel model = PamController.getInstance().getModelInterface();

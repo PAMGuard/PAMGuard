@@ -73,6 +73,7 @@ import nilus.MetadataInfo;
 import nilus.UnknownSensor;
 import pamMaths.PamVector;
 import pamMaths.STD;
+import pamguard.GlobalArguments;
 import tethys.Collection;
 import tethys.CollectionHandler;
 import tethys.TethysControl;
@@ -396,8 +397,16 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 		/*
 		 *  if we get here, it seems like the two lists are very different, so
 		 *  show a dialog to ask the user what to do. 
+		 *  In batch output mode, just go for the binary though. 
 		 */
-		RecordingList selList = EffortProblemDialog.showDialog(tethysControl.getGuiFrame(), overview);
+		RecordingList selList = binList;
+		if (GlobalArguments.isBatch()) {
+			
+		}
+		else {
+			// show the dialog. 
+			selList = EffortProblemDialog.showDialog(tethysControl.getGuiFrame(), overview);
+		}
 		if (selList != null) {
 			tethysControl.getTethysExportParams().setEffortSourceName(selList.getSourceName());
 		}
@@ -423,7 +432,37 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 	 */
 	public void exportDeployments(RecordingList allPeriods) {
 		TethysReporter.getTethysReporter().clear();
-		if (deploymentExportOptions.separateDeployments) {
+		/**
+		 * now have three options for export, though this will reduce to two since one
+		 * option decides automatically on the other choice. 
+		 */
+		boolean separate = false;
+		switch (deploymentExportOptions.sepDeployments) {
+		case ALWAYSSEPARATE:
+			separate = true;
+			break;
+		case ALWAYSSINGLE:
+			separate = false;
+			break;
+		case AUTOSCHEDULE:
+			DutyCycleInfo ds = getDutyCycle();
+			if (ds == null) {
+				separate = false;
+			}
+			else {
+				if (ds.isDutyCycled) {
+					separate = false;
+				}
+				else {
+					separate = true;
+				}
+			}
+			break;
+		default:
+			break;
+		
+		}
+		if (separate) {
 			exportSeparateDeployments(allPeriods);
 		}
 		else {
@@ -565,6 +604,9 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 			return;
 		}
 		RecordingList recordingList = deploymentOverview.getMasterList(getTethysControl());
+		if (recordingList == null) {
+			return;
+		}
 		ArrayList<RecordingPeriod> effortPeriods = recordingList.getEffortPeriods();
 		for (RecordingPeriod aPeriod : effortPeriods) {
 			PDeployment closestDeployment = findClosestDeployment(aPeriod, deployments);
@@ -772,6 +814,13 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 		return firstFree;
 	}
 
+	/**
+	 * Create deployment document. May be better off passing in the Metadata. 
+	 * @param i
+	 * @param recordingPeriod
+	 * @param deploymentId
+	 * @return
+	 */
 	public Deployment createDeploymentDocument(int i, RecordingPeriod recordingPeriod, String deploymentId) {
 		Deployment deployment = new Deployment();
 		try {
@@ -920,19 +969,21 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 			cog.setValue(PamUtils.constrainedAngle(gpsData.getCourseOverGround()));
 			cog.setNorth(HeadingTypes.TRUE.toString());
 			Double trueHead = gpsData.getTrueHeading();
-			if (trueHead != null && trueHead.isInfinite()) {
+			if (trueHead != null && !trueHead.isInfinite()) {
 				HeadingDegN th = new HeadingDegN();
 				th.setValue(PamUtils.constrainedAngle(trueHead));
-				th.setNorth(HeadingTypes.TRUE.toString());
+//				th.setNorth(HeadingTypes.TRUE.toString());
 				gpsPoint.setHeadingDegN(th);
 			}
 			else {
-				// else try magnetic
+				// else try magnetic, but corrected for deviation
 				Double magHead = gpsData.getMagneticHeading();
-				if (magHead != null && magHead.isInfinite()) {
+				if (magHead != null && !magHead.isInfinite()) {
+					magHead = gpsData.getHeading(); // corrected for deviation
+					if (magHead == null) magHead = gpsData.getMagneticHeading(); // go back!
 					HeadingDegN mh = new HeadingDegN();
 					mh.setValue(PamUtils.constrainedAngle(magHead));
-					mh.setNorth(HeadingTypes.MAGNETIC.toString());
+//					mh.setNorth(HeadingTypes.MAGNETIC.toString());
 					gpsPoint.setHeadingDegN(mh);
 				}
 			}
@@ -1099,10 +1150,16 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 	
 	/**
 	 * Test to see if it's possible to export Deployment documents. This is basically a test of 
-	 * various metadata fields that are required, such as instrument id's. 
+	 * various metadata fields that are required, such as instrument id's.<br>
+	 * In main Tethys, this is called before the Export button is pressed, so doesn't check 
+	 * information that's filled in in the Wizard. When called from the task though it 
+	 * has to do a more complete set of checks.  
+	 * 
+	 * @param fullChecks do a more complete set of checks of EVERYTHING that's needed prior to export. If false
+	 * only do some checks that are needed prior to running the Wizard. 
 	 * @return null if OK, or a string describing the first encountered error
 	 */
-	public String canExportDeployments() {
+	public String canExportDeployments(boolean fullChecks) {
 
 		Deployment globalDeplData = tethysControl.getGlobalDeplopymentData();
 		if (globalDeplData.getProject() == null) {
@@ -1111,9 +1168,41 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 		
 		PInstrument arrayInstrument = getCurrentArrayInstrument();
 		if (arrayInstrument == null) {
-			return "No 'Instrument' set. Goto array manager";
+			return "No 'Instrument' set. Goto array manager to rectify this.";
 		}
+		if (fullChecks == false) {
+			return null;
+		}
+		// do more thorough checks of the rest of the deployment data. 
+		// first do the description
+		DescriptionType description = globalDeplData.getDescription();
+		if (description == null) {
+			return "The Project Description data has not been completed";
+		}
+		if (!checkString(description.getAbstract())) {
+			return "The project abstract must be completed";
+		}
+		if (!checkString(description.getMethod())) {
+			return "The project methods statement must be completed";
+		}
+		if (!checkString(description.getObjectives())) {
+			return "The project objectives statement must be completed";
+		}
+		// then the region and responsible party. 
+		
 		return null;
+	}
+	
+	/**
+	 * Check a string is not null and has non zero length
+	 * @param string
+	 * @return
+	 */
+	private boolean checkString(String string) {
+		if (string == null) {
+			return false;
+		}
+		return (string.length() > 0);
 	}
 	
 	/**
@@ -1189,6 +1278,11 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 			geom.setXM(hydLocs.getCoordinate(0));
 			geom.setYM(hydLocs.getCoordinate(1));
 			geom.setZM(hydLocs.getCoordinate(2));
+			audio.setGeometry(geom);
+			String hType = aPhone.getType();
+			if (hType != null && hType.length()>0) {
+				audio.setName(hType);
+			}
 //			Geometry geom = new Geometry();
 //			audio.setGeometry(geom);
 ////			nilusHelper.
@@ -1318,6 +1412,19 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 		}
 		return true;
 	}
+	
+	/**
+	 * Get the automatic duty cycle information. 
+	 * @return
+	 */
+	public DutyCycleInfo getDutyCycle() {
+		RecordingList recordingList = deploymentOverview.getMasterList(getTethysControl());
+		if (recordingList == null) {
+			return null;
+		}
+		DutyCycleInfo dutyCycleInf = recordingList.assessDutyCycle();
+		return dutyCycleInf;
+	}
 
 	@Override
 	public void selectionChanged() {
@@ -1362,9 +1469,61 @@ public class DeploymentHandler extends CollectionHandler implements TethysStateO
 		return deploymentExportOptions;
 	}
 
+	/**
+	 * @param deploymentExportOptions the deploymentExportOptions to set
+	 */
+	public void setDeploymentExportOptions(DeploymentExportOpts deploymentExportOptions) {
+		this.deploymentExportOptions = deploymentExportOptions;
+	}
+
 	@Override
 	public String getHelpPoint() {
 		return helpPoint;
+	}
+
+	/**
+	 * Called from the offline task (which will probably only be available in batch mode)
+	 * to export all deployments. <br>
+	 * Can see various enhancements such as allowing overwriting to include in batch process parameters. 
+	 * Won't ever overwrite. 
+	 * @param outlineDeployment
+	 */
+	public void batchExport(Deployment outlineDeployment) {
+
+		deploymentOverview = getDeploymentOverview();
+		if (deploymentOverview == null) {
+			return;
+		}
+		RecordingList masterList = deploymentOverview.getMasterList(getTethysControl());
+		int doneCount = 0;
+		int notDonecount = 0;
+		ArrayList<RecordingPeriod> efforts = masterList.getEffortPeriods();
+		RecordingList newList = new RecordingList(masterList.getSourceName());
+//		ArrayList<RecordingPeriod> notDones = new ArrayList<>();
+		if (efforts.size() == 0) {
+			System.out.println("Batch Tethys Deployments: No recording periods to export");
+			return;
+		}
+		for (RecordingPeriod aPeriod : efforts) {
+			PDeployment tethysOutput = aPeriod.getMatchedTethysDeployment();
+			if (tethysOutput != null) {
+				doneCount++;
+			}
+			else {
+				notDonecount++;
+//				notDones.add(aPeriod);
+				newList.add(aPeriod);
+			}
+		}
+		if (notDonecount == 0) {
+			System.out.println("Batch Tethys Deployments: No new recording periods to export");
+			return;
+		}
+		
+		deploymentOverview = getDeploymentOverview();
+		RecordingList allPeriods = deploymentOverview.getMasterList(getTethysControl());
+		exportDeployments(newList);
+		
 	}
 
 }

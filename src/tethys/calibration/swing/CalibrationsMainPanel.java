@@ -69,31 +69,14 @@ public class CalibrationsMainPanel extends TethysExportPanel {
 			disableExport("Tethys Server not running");
 			return;
 		}
-		if (isHydrophoneNamed() == false) {
+		if (calibrationHandler.isHydrophoneNamed() == false) {
 			disableExport("Can't export calibrations until the Hydrophone array has been correctly named");
 			return;
 		};
 		enableExport(true);
 	}
 
-	/**
-	 * Check to see if hydrophone is named correctly. 
-	 * @return
-	 */
-	private boolean isHydrophoneNamed() {
-		PInstrument currentInstrument = getTethysControl().getDeploymentHandler().getCurrentArrayInstrument();
-		if (currentInstrument == null) {
-			return false;
-		}
-		if (currentInstrument.instrumentId == null || currentInstrument.instrumentType == null) {
-			return false;
-		}
 
-		if (currentInstrument.instrumentId.length() == 0 || currentInstrument.instrumentType.length() == 0) {
-			return false;
-		}
-		return true;
-	}
 
 	@Override
 	protected void exportButtonPressed(ActionEvent e) {

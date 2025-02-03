@@ -74,9 +74,12 @@ public class HydrophoneDialogPanel implements ActionListener, ListSelectionListe
 
 	private JLabel configPanelLabel;
 
-	HydrophoneDialogPanel (ArrayDialog arrayDialog) {
+	private ArrayManager arrayManager;
+
+	HydrophoneDialogPanel (ArrayDialog arrayDialog, ArrayManager arrayManager) {
 		
 		this.arrayDialog = arrayDialog;
+		this.arrayManager = arrayManager;
 		
 //		staticTowedPanel = new StaticTowedPanel();
 		
@@ -156,9 +159,14 @@ public class HydrophoneDialogPanel implements ActionListener, ListSelectionListe
 	
 	public void setParams(PamArray selArray) {
 		recentArrays.removeAllItems();		
-		ArrayList<PamArray> arrays = ArrayManager.getArrayManager().recentArrays;
-		for (int i = 0; i < arrays.size(); i++) {
-			recentArrays.addItem(arrays.get(i));
+		if (arrayManager != null) {
+			ArrayList<PamArray> arrays = arrayManager.recentArrays;
+			for (int i = 0; i < arrays.size(); i++) {
+				recentArrays.addItem(arrays.get(i));
+			}
+		}
+		else {
+			recentArrays.addItem(selArray);
 		}
 		if (selArray != null) {
 			recentArrays.setSelectedItem(selArray);
@@ -252,6 +260,7 @@ public class HydrophoneDialogPanel implements ActionListener, ListSelectionListe
 	}
 	
 	public void editElement() {
+		arrayDialog.getParams();
 		PamArray currentArray = getDialogSelectedArray();
 		if (currentArray == null) return;
 		int selRow = hydrophoneTable.getSelectedRow();
@@ -462,6 +471,7 @@ public class HydrophoneDialogPanel implements ActionListener, ListSelectionListe
 			if (row < 0) {
 				return;
 			}
+			arrayDialog.getParams();
 			PamArray currentArray = getDialogSelectedArray();
 			Streamer oldStreamer = currentArray.getStreamer(row);
 			Streamer streamer = StreamerDialog.showDialog(arrayDialog, currentArray, oldStreamer);

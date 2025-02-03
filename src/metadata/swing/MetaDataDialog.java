@@ -33,7 +33,7 @@ public class MetaDataDialog extends PamDialog {
 	
 	private ProjectInformationPanel projectInformationPanel;
 	
-	private DeploymentPeriodPanel deploymentPeriodPanel;
+//	private DeploymentPeriodPanel deploymentPeriodPanel;
 
 	private ResponsiblePartyPanel responsiblePanel;
 	
@@ -50,7 +50,7 @@ public class MetaDataDialog extends PamDialog {
 		
 		projectInformationPanel = new ProjectInformationPanel(parentFrame, null);
 		descriptionPanel = new DescriptionTypePanel(null, false, false, false);
-		deploymentPeriodPanel = new DeploymentPeriodPanel(parentFrame);
+//		deploymentPeriodPanel = new DeploymentPeriodPanel(parentFrame);
 		descriptionPanel.getMainPanel().setPreferredSize(new Dimension(400,300));
 		
 		responsiblePanel = new ResponsiblePartyPanel();
@@ -63,13 +63,13 @@ public class MetaDataDialog extends PamDialog {
 		northPanel.add(wp = new WestAlignedPanel(responsiblePanel.getMainPanel()));
 		wp.setBorder(new TitledBorder("Contact information"));
 
-		JPanel dpPanel = new WestAlignedPanel(deploymentPeriodPanel.getMainPanel());
-		dpPanel.setBorder(new TitledBorder("Deployment period"));
+//		JPanel dpPanel = new WestAlignedPanel(deploymentPeriodPanel.getMainPanel());
+//		dpPanel.setBorder(new TitledBorder("Deployment period"));
 
 		mainPanel.add(tabbedPane, BorderLayout.CENTER);
 		tabbedPane.add(northPanel, "General");
 		tabbedPane.add(descriptionPanel.getMainPanel(), "Description");
-		tabbedPane.add(dpPanel, "Deployment");
+//		tabbedPane.add(dpPanel, "Deployment");
 		
 		setResizable(true);
 		
@@ -92,7 +92,7 @@ public class MetaDataDialog extends PamDialog {
 		projectInformationPanel.setParams(deployment);
 		descriptionPanel.setParams(deployment.getDescription());
 		responsiblePanel.setParams(deployment.getMetadataInfo().getContact());
-		deploymentPeriodPanel.setParams(pamguardMetaData);
+//		deploymentPeriodPanel.setParams(pamguardMetaData);
 	}
 
 	@Override
@@ -101,7 +101,7 @@ public class MetaDataDialog extends PamDialog {
 		boolean ok = projectInformationPanel.getParams(deployment);
 		ok &= descriptionPanel.getParams(deployment.getDescription());
 		ok &= responsiblePanel.getParams(deployment.getMetadataInfo().getContact());
-		ok &= deploymentPeriodPanel.getParams(pamguardMetaData);
+//		ok &= deploymentPeriodPanel.getParams(pamguardMetaData);
 		
 		if (tethysControl != null) {
 			tethysControl.sendStateUpdate(new TethysState(StateType.NEWPROJECTSELECTION));

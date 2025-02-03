@@ -27,6 +27,7 @@ import Array.streamerOrigin.HydrophoneOriginMethods;
 import Array.streamerOrigin.HydrophoneOriginSystem;
 import Array.streamerOrigin.OriginDialogComponent;
 import Array.streamerOrigin.OriginSettings;
+import Array.streamerOrigin.StaticOriginMethod;
 import PamController.PamController;
 import PamUtils.LatLong;
 import PamView.dialog.PamDialog;
@@ -308,6 +309,15 @@ public class StreamerDialog extends PamDialog {
 		//		}
 
 		HydrophoneOriginMethod mth = defaultStreamer.getHydrophoneOrigin();
+		if (mth == null) {
+			StaticOriginMethod originMethod = new StaticOriginMethod(currentArray, defaultStreamer);
+			defaultStreamer.setHydrophoneOrigin(originMethod);
+			mth = originMethod;// StaticOriginMethod(currentArray, defaultStreamer);
+//			originMethod.getOriginSettings().
+		}
+//		if (mth == null) {
+//			mth = new StraightHydrophoneLocator(currentArray, defaultStreamer);
+//		}
 		OriginDialogComponent mthDialogComponent = mth.getDialogComponent();
 		if (mthDialogComponent != null) {
 			mthDialogComponent.setParams();

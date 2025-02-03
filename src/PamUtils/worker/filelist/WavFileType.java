@@ -73,7 +73,7 @@ public class WavFileType extends File {
 	 * Get the audio format. 
 	 * @return the audio format.
 	 */
-	private AudioFormat getAudioFormat(File file) {
+	public AudioFormat getAudioFormat(File file) {
 		try {
 			AudioInputStream audioStream = PamAudioFileManager.getInstance().getAudioInputStream(file);
 			

@@ -97,9 +97,9 @@ public class WhistleClassifierControl extends PamControlledUnit implements PamSe
 		whistleClassifierProcess.setupLogging();
 		
 		isViewer = PamController.getInstance().getRunMode() == PamController.RUN_PAMVIEW;
-		if (isViewer) {
+//		if (isViewer) { // so it appears in batch!
 			classifierOffline = new ClassifierOffline(this);
-		}
+//		}
 	}
 
 

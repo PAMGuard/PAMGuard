@@ -214,6 +214,7 @@ PamSettingsSource {
 		//			databaseSystem.setDatabaseName(dbParameters.databaseName);
 		// Do a quick check here to see if the database exists.  If not, warn the user before creating a new one.  Note that if
 		// the database name is null, the user is creating a brand new database so skip the check
+		checkDatabaseSystem(forcedName);
 		boolean checkExists = databaseSystem.checkDatabaseExists(forcedName);
 		if (!checkExists && forcedName != null) {
 			databaseSystem.createNewDatabase(forcedName);
@@ -265,6 +266,62 @@ PamSettingsSource {
 			//				" is not available");
 		}
 		return true;
+	}
+
+	/**
+	 * Try to check that we've a valid database system for this type of database. 
+	 * Hard to do just based on name, but will work for sqlite and other file based systems I hope. 
+	 * @param forcedName
+	 */
+	private void checkDatabaseSystem(String forcedName) {
+		if (forcedName == null) {
+			return;
+		}
+		DBSystem forcedSystem = findSystem(forcedName);
+		if (forcedSystem != null && databaseSystem != forcedSystem) {
+			selectSystem(forcedSystem.getClass(), false, forcedName);
+		}
+	}
+	
+	/**
+	 * Find a database system based on name. Not good ! Will struggle with server
+	 * databases. Need a better way of doing this. 
+	 * @param databaseName
+	 * @return
+	 */
+	private DBSystem findSystem(String databaseName) {
+		if (databaseName == null) {
+			return null;
+		}
+		int lastDot = databaseName.lastIndexOf('.');
+		if (lastDot < 0) {
+			return null;
+		}
+		String fEnd = databaseName.substring(lastDot).toLowerCase();
+		switch (fEnd) {
+		case ".sqlite":
+		case ".sqlite3":
+			return getSystem(SqliteSystem.class);
+		case ".accdb":
+			return getSystem(MSAccessSystem.class);
+
+		}
+		return null;
+	}
+	
+	/**
+	 * Get a database system by it's class name. 
+	 * @param systemClass
+	 * @return
+	 */
+	public DBSystem getSystem(Class systemClass) {
+		for (int i = 0; i < databaseSystems.size(); i++) {
+			DBSystem aSys = databaseSystems.get(i);
+			if (aSys.getClass() == systemClass) {
+				return aSys;
+			}
+		}
+		return null;		
 	}
 
 	/**
@@ -600,6 +657,14 @@ PamSettingsSource {
 			return null;
 		}
 		return dbSettingsStore.getSettingsGroup(settingsIndex);
+	}
+	
+	/**
+	 * Get the DB Setting store. Need to occasionally manipulate this externally. 
+	 * @return database settings store. 
+	 */
+	public DBSettingsStore getSettingsStore() {
+		return dbSettingsStore;
 	}
 
 	@Override

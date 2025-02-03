@@ -11,7 +11,10 @@ public class DeploymentExportOpts implements Serializable, Cloneable {
 
 	public static final long serialVersionUID = 1L;
 
-	public boolean separateDeployments;
+	/**
+	 * option on how deployments are separated. 
+	 */
+	public SepDeployment sepDeployments = SepDeployment.AUTOSCHEDULE;
 	
 	/**
 	 * Minimum number of seconds between GPS points in a track. 
