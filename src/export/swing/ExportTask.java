@@ -44,6 +44,8 @@ public class ExportTask extends OfflineTask<PamDataUnit<?,?>>{
 	 */
 	@Override
 	public void prepareTask() {
+		//save all data before exporting! 
+		PamController.getInstance().saveViewerData();
 		exporter.perpareExport();
 	}
 

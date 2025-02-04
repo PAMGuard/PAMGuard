@@ -197,6 +197,7 @@ public class SelectFolder {
 			if (!f.exists()) {
 				if (JOptionPane.showConfirmDialog(folderPanel, "The directory " + folder + " does not exist " +
 						"do you want to create it ?", "Select Directory", JOptionPane.YES_NO_CANCEL_OPTION) == JOptionPane.YES_OPTION) {
+					
 					if (!f.mkdirs()) {
 						// print a warning message
 						JOptionPane.showMessageDialog(folderPanel, "The folder " + folder + " could not be created", 
