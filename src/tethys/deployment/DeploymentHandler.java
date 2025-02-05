@@ -105,7 +105,6 @@ import tethys.swing.DeploymentTableObserver;
  */
 public class DeploymentHandler extends CollectionHandler implements TethysStateObserver, DeploymentTableObserver {
 	
-//	private TethysControl tethysControl;
 	
 	private EffortFunctions effortFunctions;
 
