@@ -316,7 +316,7 @@ public class ClickSpectrumTemplateEditDialog extends PamDialog{
 		ArrayList<double[]> fftAll=getEventFFTs(channel,true);
 		//create standard average spectrum
 		this.averageFFT=fftMean(fftAll);
-		printFFT( averageFFT);
+		//printFFT( averageFFT);
 		this.stdFFT=fftstd(fftAll,averageFFT);
 		//create log template
 		this.averageFFTLog=fftMean(convertAllFFttoLog(fftAll));		
